@@ -16,8 +16,8 @@
  */
 
 import Filter from '../components/Filter';
-import { connect } from 'react-redux';
-import { setFilter } from '../actions';
+import {connect} from 'react-redux';
+import {setFilter} from '../actions';
 
 
 const mapStateToProps = state => {

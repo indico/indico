@@ -18,23 +18,27 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-export default class IButton extends React.Component {
+export default class IButton extends React.PureComponent {
+    static propTypes = {
+        classes: PropTypes.string,
+        href: PropTypes.string,
+        title: PropTypes.string,
+        children: PropTypes.any,
+    };
+
+    static defaultProps = {
+        classes: '',
+        href: undefined,
+        title: undefined,
+        children: undefined,
+    };
+
     render() {
-        const {id, classes, href, title, name, children} = this.props;
+        const {classes, href, title, children} = this.props;
         return (
-            <a id={id} className={`i-button ${classes || ''}`}
-                href={href} title={title}>
-                {name}{children}
+            <a href={href} title={title} className={`i-button ${classes}`}>
+                {children}
             </a>
         );
     }
 }
-
-IButton.propTypes = {
-    id: PropTypes.string,
-    classes: PropTypes.string,
-    href: PropTypes.string,
-    title: PropTypes.string,
-    name: PropTypes.string,
-    children: PropTypes.node
-};

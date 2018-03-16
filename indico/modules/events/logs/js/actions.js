@@ -25,23 +25,23 @@ export const FETCH_STARTED = 'FETCH_STARTED';
 
 
 export function setKeyword(keyword) {
-    return { type: SET_KEYWORD, keyword };
+    return {type: SET_KEYWORD, keyword};
 }
 
 export function setFilter(filter) {
-    return { type: SET_FILTER, filter };
+    return {type: SET_FILTER, filter};
 }
 
 export function setPage(currentPage) {
-    return { type: SET_PAGE, currentPage };
+    return {type: SET_PAGE, currentPage};
 }
 
 export function updateEntries(entries, pages) {
-    return { type: UPDATE_ENTRIES, entries, pages };
+    return {type: UPDATE_ENTRIES, entries, pages};
 }
 
 export function fetchStarted() {
-    return { type: FETCH_STARTED };
+    return {type: FETCH_STARTED};
 }
 
 export function fetchPosts() {

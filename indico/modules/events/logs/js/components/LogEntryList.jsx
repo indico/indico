@@ -53,8 +53,9 @@ function LogEntry({entry}) {
 }
 
 LogEntry.propTypes = {
-    entry: PropTypes.object
+    entry: PropTypes.object.isRequired,
 };
+
 
 function LogDate({date, entries}) {
     return (
@@ -63,39 +64,40 @@ function LogDate({date, entries}) {
                 {date.format('dddd, D MMMM YYYY')}
             </h3>
             <ul className="event-log-entry-list">
-                {entries.map((entry, index) => {
-                    return <LogEntry key={index} entry={entry} />;
-                })}
+                {entries.map((entry) => (
+                    <LogEntry key={entry.id} entry={entry} />
+                ))}
             </ul>
         </li>
     );
 }
 
 LogDate.propTypes = {
-    entries: PropTypes.array,
-    date: PropTypes.object
+    entries: PropTypes.array.isRequired,
+    date: PropTypes.object.isRequired,
 };
 
+
 export default class LogEntryList extends React.Component {
+    static propTypes = {
+        entries: PropTypes.object.isRequired,
+        currentPage: PropTypes.number.isRequired,
+        pages: PropTypes.array.isRequired,
+        changePage: PropTypes.func.isRequired,
+    };
+
     render() {
         const {entries, pages, currentPage, changePage} = this.props;
 
         return (
             <>
                 <ul className="event-log-list">
-                    {Object.keys(entries).sort().reverse().map(date => {
-                        return <LogDate key={date} date={moment(date)} entries={entries[date]} />;
-                    })}
+                    {Object.keys(entries).sort().reverse().map(date => (
+                        <LogDate key={date} date={moment(date)} entries={entries[date]} />
+                    ))}
                 </ul>
-                <Paginator currentPage={currentPage} pages={pages}
-                           changePage={changePage} />
+                <Paginator currentPage={currentPage} pages={pages} changePage={changePage} />
             </>
         );
     }
 }
-
-LogEntryList.propTypes = {
-    entries: PropTypes.object,
-    page: PropTypes.number,
-    changePage: PropTypes.func,
-};

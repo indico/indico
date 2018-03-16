@@ -22,27 +22,27 @@ import IButton from 'indico/react/IButton';
 
 export default class Filter extends React.Component {
     render() {
-        const realms = this.props.realms;
+        const {realms, filters, setFilter} = this.props;
         return (
             <div className="toolbar">
                 <div className={`group i-selection ${realms.length <= 1 ? 'hidden' : ''}`}>
                     <span className="i-button label">Show</span>
-                    {realms.map((realm) =>
+                    {realms.map((realm) => (
                         <React.Fragment key={realm.name}>
-                            <input type="checkbox" id={`realm-${realm.name}`} data-realm={realm.name}
-                                defaultChecked={this.props.filters[realm.name]}
-                                onChange={(e) => this.props.setFilter({[realm.name]: e.target.checked})}/>
-                            <label htmlFor={`realm-${realm.name}`} className="i-button">{realm.title}</label>
+                            <input type="checkbox"
+                                   id={`realm-${realm.name}`}
+                                   data-realm={realm.name}
+                                   defaultChecked={filters[realm.name]}
+                                   onChange={(e) => setFilter({[realm.name]: e.target.checked})} />
+                            <label htmlFor={`realm-${realm.name}`} className="i-button">
+                                {realm.title}
+                            </label>
                         </React.Fragment>
-                    )}
+                    ))}
                 </div>
                 <div className="group">
-                    <IButton id="expand-all" title="Expand all">
-                        <span className="icon-stack-plus"/>
-                    </IButton>
-                    <IButton id="collapse-all" title="Collapse all">
-                        <span className="icon-stack-minus"/>
-                    </IButton>
+                    <IButton title="Expand all" classes="icon-stack-plus" />
+                    <IButton title="Collapse all" classes="icon-stack-minus" />
                 </div>
             </div>
         );
