@@ -17,8 +17,26 @@
 
 @import 'base/utilities';
 
+%line-style {
+    line-height: 2em;
+    padding: 0.25em 0;
+    margin: 0;
+}
+
 .event-log-list {
     padding: 0;
+    list-style-type: none;
+
+    > li h3.event-log-day-header {
+        @extend %line-style;
+        margin-top: 0.5em;
+        border-bottom: 1px solid $pastel-gray;
+    }
+}
+
+.event-log-entry-list {
+    padding: 0;
+    list-style-type: none;
     color: $black;
 
     li.log-realm-emails span.log-icon i.log-realm { @include icon-before('icon-mail'); }
@@ -33,13 +51,11 @@
     li.log-kind-other span.log-icon i.log-kind { display: none; }
 
     > li {
+        @extend %line-style;
         width: 100%;
-        line-height: 2em;
         display: flex;
-        list-style-type: none;
         justify-content: space-between;
         align-content: baseline;
-        padding: 0.25em 0;
         border-bottom: 1px solid $pastel-gray;
 
         > *:not(first-child) {
