@@ -9,8 +9,8 @@ extends:
 
 parserOptions:
   sourceType: module
+  ecmaVersion: 2018
   ecmaFeatures:
-    experimentalObjectRestSpread: true
     jsx: true
 
 plugins:
@@ -28,6 +28,9 @@ rules:
       ArrayExpression: first
       ObjectExpression: first
       ImportDeclaration: first
+      ignoredNodes:
+        - JSXAttribute
+        - JSXSpreadAttribute
 
   linebreak-style:
     - error
@@ -71,23 +74,45 @@ rules:
     - consistent-as-needed
   space-before-function-paren:
     - warn
-    - never
+    - anonymous: never
+      named: never
+      asyncArrow: always
   brace-style:
     - error
     - 1tbs
+  array-bracket-spacing: error
   array-callback-return: error
   arrow-spacing: error
+  comma-dangle:
+    - error
+    - only-multiline  # or always-multiline? (== require dangling commas)
   comma-spacing: error
   comma-style: error
   computed-property-spacing: error
   constructor-super: error
   curly: error
+  eol-last: error
   func-call-spacing: error
+  func-name-matching: error
   generator-star-spacing: error
+  implicit-arrow-linebreak: error
+  jsx-quotes: error
   key-spacing: error
   keyword-spacing: error
+  lines-between-class-members: error
   max-statements-per-line: error
+  new-cap: error
+  object-property-newline:
+    - error
+    - allowAllPropertiesOnSameLine: true
   object-shorthand: warn
+  operator-assignment: error
+  operator-linebreak:
+    - error
+    - after
+    - overrides:
+        ?: before
+        :: before
   prefer-arrow-callback: warn
   prefer-const: error
   prefer-numeric-literals: error
@@ -101,14 +126,21 @@ rules:
   space-in-parens: error
   space-infix-ops: error
   space-before-blocks: warn
+  space-unary-ops: error
+  spaced-comment: error
   strict: error
+  switch-colon-spacing: error
   symbol-description: error
   template-curly-spacing: error
+  template-tag-spacing: error
+  unicode-bom: error
   yield-star-spacing: error
   yoda: error
   no-unmodified-loop-condition: error
   no-unsafe-negation: error
   no-alert: error
+  no-array-constructor: error
+  no-bitwise: warn
   no-class-assign: error
   no-confusing-arrow: error
   no-const-assign: error
@@ -123,6 +155,11 @@ rules:
   no-lonely-if: error
   no-loop-func: error
   no-mixed-operators: error
+  no-multiple-empty-lines:
+    - error
+    - max: 2
+      maxBOF: 0
+      maxEOF: 0
   no-new-func: error
   no-new-object: error
   no-new-symbol: error
@@ -151,9 +188,76 @@ rules:
     - error
     - functions: false
       classes: false
-  # react/jsx stuff
+  nonblock-statement-body-position: error
+  # rules from eslint-plugin-react
+  react/button-has-type: warn
+  react/default-props-match-prop-types: error
+  react/destructuring-assignment: warn
+  react/display-name: error
+  react/forbid-component-props: error
+  react/no-access-state-in-setstate: warn
+  react/no-array-index-key: warn
+  react/jsx-boolean-value: error
+  react/jsx-closing-bracket-location:
+    - error
+    - after-props
+  react/jsx-closing-tag-location: error
+  react/jsx-curly-brace-presence: error
+  react/jsx-curly-spacing: error
+  react/jsx-equals-spacing: error
+  react/jsx-first-prop-new-line:
+    - error
+    - never
+  react/jsx-filename-extension: error
+  react/jsx-indent: error
+  # XXX: our style is not supported yet, so nothing to enforce (see yannickcr/eslint-plugin-react#398)
+  react/jsx-indent-props: off
+  react/jsx-key: error
+  react/jsx-no-comment-textnodes: error
+  react/jsx-no-duplicate-props: error
+  react/jsx-no-target-blank: error
+  react/jsx-no-undef: error
+  react/jsx-pascal-case: error
+  react/jsx-tag-spacing:
+    - error
+    - closingSlash: never
+      beforeSelfClosing: always
+      afterOpening: never
+      beforeClosing: never
   react/jsx-uses-react: error
   react/jsx-uses-vars: error
+  react/jsx-wrap-multilines: error
+  react/no-children-prop: error
+  react/no-danger-with-children: error
+  react/no-deprecated: error
+  react/no-did-mount-set-state: error
+  react/no-did-update-set-state: error
+  react/no-direct-mutation-state: error
+  react/no-find-dom-node: error
+  react/no-is-mounted: error
+  react/no-multi-comp:
+    - warn
+    - ignoreStateless: true
+  react/no-redundant-should-component-update: error
+  react/no-render-return-value: error
+  react/no-string-refs: error
+  react/no-this-in-sfc: error
+  react/no-typos: error
+  react/no-unescaped-entities:
+    - error
+    - forbid: ['>', '}']
+  react/no-unknown-property: error
+  react/no-unused-prop-types: error
+  react/no-unused-state: error
+  react/no-will-update-set-state: error
+  react/prefer-es6-class: error
+  react/prop-types: error
+  react/react-in-jsx-scope: error
+  react/require-default-props: warn
+  react/require-render-return: error
+  react/self-closing-comp: error
+  react/sort-comp: warn
+  react/void-dom-elements-no-children: error
 
 globals:
   _: false
