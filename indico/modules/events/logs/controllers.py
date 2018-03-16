@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 from collections import defaultdict
+from operator import itemgetter
 
 from flask import jsonify, request
 
@@ -42,7 +43,8 @@ class RHEventLogs(RHManageEventBase):
     def _process(self):
         entries = self.event.log_entries.order_by(EventLogEntry.logged_dt.desc()).all()
         realms = {e.realm for e in entries}
-        all_realms = [{'name': realm.name, 'title': realm.title} for realm in EventLogRealm]
+        all_realms = sorted([{'name': realm.name, 'title': realm.title} for realm in EventLogRealm],
+                            key=itemgetter('name'))
         return WPEventLogs.render_template('logs.html', self.event, entries=entries, realms=realms,
                                            all_realms=all_realms)
 
