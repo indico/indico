@@ -56,15 +56,32 @@ LogEntry.propTypes = {
     entry: PropTypes.object
 };
 
+function LogDate(props) {
+    return (
+        <li>
+            <h3 className="event-log-day-header">
+                {props.date.format('dddd, D MMMM YYYY')}
+            </h3>
+            <ul className="event-log-entry-list">
+                {props.entries.map((entry, index) => {
+                    return <LogEntry key={index} entry={entry} />;
+                })}
+            </ul>
+        </li>
+    );
+}
+
+LogDate.propTypes = {
+    entries: PropTypes.array,
+    date: PropTypes.object
+};
 
 export default class LogEntryList extends React.Component {
     render() {
         return (
             <ul className="event-log-list">
-                {Object.keys(this.props.entries).map((date, index) => {
-                    return this.props.entries[date].map((entry, index) => {
-                        return <LogEntry key={index} entry={entry} />
-                    })
+                {Object.keys(this.props.entries).map(date => {
+                    return <LogDate key={date} date={moment(date)} entries={this.props.entries[date]} />;
                 })}
             </ul>
         );
