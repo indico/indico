@@ -29,8 +29,8 @@ import '../style/logs.scss';
 const store = createStore(globalReducer, applyMiddleware(thunkMiddleware));
 
 window.addEventListener('load', () => {
-    var rootElement = document.getElementById('event-log');
-    var fetchLogsUrl = rootElement.dataset.fetchLogsUrl;
+    const rootElement = document.getElementById('event-log');
+    const fetchLogsUrl = rootElement.dataset.fetchLogsUrl;
     ReactDOM.render(
         <Provider store={store}>
             <EventLog fetchLogsUrl={fetchLogsUrl}/>
