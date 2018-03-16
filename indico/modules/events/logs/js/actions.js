@@ -44,8 +44,8 @@ export function fetchStarted() {
     return { type: FETCH_STARTED };
 }
 
-export function fetchPosts(url, page = null, pageSize = 10) {
-    return dispatch => {
+export function fetchPosts(page = null, pageSize = 10) {
+    return (dispatch, getStore, fetchLogsUrl) => {
         dispatch(fetchStarted());
 
         const options = {
@@ -53,7 +53,7 @@ export function fetchPosts(url, page = null, pageSize = 10) {
             credentials: 'same-origin', // use cookies for authentication
         };
 
-        return fetch(url, options)
+        return fetch(fetchLogsUrl, options)
             .then(data => data.json())
             .then(json => {
                 dispatch(updateEntries(json.entries));
