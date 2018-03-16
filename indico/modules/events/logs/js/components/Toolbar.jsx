@@ -23,15 +23,16 @@ import SearchBox from '../containers/SearchBox';
 
 
 class Toolbar extends React.Component {
+    getRealms() {
+        const rootElement = document.getElementById('event-log');
+        const realms = rootElement.dataset.realms;
+        return JSON.parse(realms);
+    }
+
     render() {
-        const getRealms = () => {
-            const rootElement = document.getElementById('event-log');
-            const realms = rootElement.dataset.realms;
-            return JSON.parse(realms);
-        };
         return (
             <div className="follow-scroll toolbars">
-                <Filter realms={getRealms()}/>
+                <Filter realms={this.getRealms()} />
                 <SearchBox />
             </div>
         );
