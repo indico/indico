@@ -15,7 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import 'whatwg-fetch';
+import fetch from 'cross-fetch';
 
 export const SET_KEYWORD = 'SET_KEYWORD';
 export const SET_FILTER = 'SET_FILTER';
