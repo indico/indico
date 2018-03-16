@@ -48,7 +48,7 @@ export function fetchPosts(url, page = null, pageSize = 10) {
     return dispatch => {
         dispatch(fetchStarted());
 
-        var options = {
+        const options = {
             method: 'GET',
             credentials: 'same-origin', // use cookies for authentication
         };

@@ -32,7 +32,7 @@ const initialState = {
 };
 
 export default function globalEventLogReducer(state, action) {
-    if (typeof state === 'undefined') {
+    if (state === undefined) {
         return initialState;
     }
 

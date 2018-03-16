@@ -62,6 +62,7 @@ rules:
   func-style:
     - warn
     - declaration
+    - allowArrowFunctions: true
   padded-blocks:
     - error
     - never
