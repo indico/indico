@@ -15,15 +15,16 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import debounce from 'lodash/debounce';
 import SearchBox from '../components/SearchBox';
 import {connect} from 'react-redux';
 import {setKeyword, fetchPosts} from '../actions';
 
 const mapDispatchToProps = (dispatch) => ({
-    setKeyword: (keyword) => {
+    setKeyword: debounce((keyword) => {
         dispatch(setKeyword(keyword));
         dispatch(fetchPosts());
-    }
+    }, 250)
 });
 
 export default connect(
