@@ -32,8 +32,8 @@ LOG_PAGE_SIZE = 10
 
 
 def _contains(field, text):
-    return db.func.to_tsvector('simple', field).match(preprocess_ts_string(text),
-                                                      postgresql_regconfig='simple')
+    return (db.func.to_tsvector('simple', db.func.indico.indico_unaccent(field))
+            .match(db.func.indico.indico_unaccent(preprocess_ts_string(text)), postgresql_regconfig='simple'))
 
 
 class RHEventLogs(RHManageEventBase):
