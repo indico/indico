@@ -31,7 +31,8 @@ const initialState = {
         participants: true,
         reviewing: true
     },
-    pages: []
+    pages: [],
+    detailedView: null
 };
 
 function logReducer(state = initialState, action) {
@@ -46,6 +47,8 @@ function logReducer(state = initialState, action) {
             return {...state, entries: action.entries, pages: action.pages, isFetching: false};
         case actions.FETCH_STARTED:
             return {...state, isFetching: true};
+        case actions.SET_DETAILED_VIEW:
+            return {...state, detailedView: action.entry};
         default:
             return state;
     }

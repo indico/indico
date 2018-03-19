@@ -22,6 +22,7 @@ export const SET_FILTER = 'SET_FILTER';
 export const SET_PAGE = 'SET_PAGE';
 export const UPDATE_ENTRIES = 'UPDATE_ENTRIES';
 export const FETCH_STARTED = 'FETCH_STARTED';
+export const SET_DETAILED_VIEW = 'SET_DETAILED_VIEW';
 
 
 export function setKeyword(keyword) {
@@ -34,6 +35,10 @@ export function setFilter(filter) {
 
 export function setPage(currentPage) {
     return {type: SET_PAGE, currentPage};
+}
+
+export function setDetailedView(entry) {
+    return {type: SET_DETAILED_VIEW, entry};
 }
 
 export function updateEntries(entries, pages) {
