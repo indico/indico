@@ -54,12 +54,13 @@ class RHEventLogsJSON(RHManageEventBase):
         filters = request.args.getlist('filters')
         text = request.args.get('q')
 
-        query = self.event.log_entries.order_by(EventLogEntry.logged_dt.desc())
+        if not filters:
+            return jsonify(current_page=1, pages=[], entries={})
 
-        if filters:
-            realms = {EventLogRealm.get(f) for f in filters if EventLogRealm.get(f)}
-            if realms:
-                query = query.filter(EventLogEntry.realm.in_(realms))
+        query = self.event.log_entries.order_by(EventLogEntry.logged_dt.desc())
+        realms = {EventLogRealm.get(f) for f in filters if EventLogRealm.get(f)}
+        if realms:
+            query = query.filter(EventLogEntry.realm.in_(realms))
 
         if text:
             query = query.filter(
