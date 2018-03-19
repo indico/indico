@@ -21,43 +21,61 @@ import React from 'react';
 
 import Paginator from 'indico/react/components/Paginator';
 
-function LogEntry({entry}) {
-    return (
-        <li className={`log-realm-${entry.type[0]} log-kind-${entry.type[1]}`}>
-            <span className="flexrow">
-                <span className="log-icon">
-                    <i className="log-realm" />
-                    <i className="log-kind icon-circle-small" />
-                </span>
-                <span className="bold f-self-stretch">
-                    {entry.module}
-                </span>
-            </span>
-            <span className="log-entry-description">
-                {entry.description}
-            </span>
-            <span>
-                {entry.userFullName ? (
-                    <span>
-                        <span className="text-superfluous">by </span>
-                        {entry.userFullName}
+import LogEntryModal from '../containers/LogEntryModal';
+
+
+class LogEntry extends React.PureComponent {
+    static propTypes = {
+        entry: PropTypes.object.isRequired,
+        setDetailedView: PropTypes.func.isRequired
+    };
+
+    constructor(props) {
+        super(props);
+        this.openDetails = this.openDetails.bind(this);
+    }
+
+    openDetails() {
+        const {entry, setDetailedView} = this.props;
+        setDetailedView(entry);
+    }
+
+    render() {
+        const {entry} = this.props;
+        return (
+            <li className={`log-realm-${entry.type[0]} log-kind-${entry.type[1]}`}>
+                <span className="flexrow">
+                    <span className="log-icon">
+                        <i className="log-realm" />
+                        <i className="log-kind icon-circle-small" />
                     </span>
-                ) : ''}
-                <span className="text-superfluous"> at </span>
-                <time dateTime={entry.time}>
-                    {moment(entry.time).format('HH:mm')}
-                </time>
-            </span>
-        </li>
-    );
+                    <span className="bold f-self-stretch">
+                        {entry.module}
+                    </span>
+                </span>
+                <span className="log-entry-description"
+                      onClick={this.openDetails}>
+                    {entry.description}
+                </span>
+                <span>
+                    {entry.userFullName ? (
+                        <span>
+                            <span className="text-superfluous">by </span>
+                            {entry.userFullName}
+                        </span>
+                    ) : ''}
+                    <span className="text-superfluous"> at </span>
+                    <time dateTime={entry.time}>
+                        {moment(entry.time).format('HH:mm')}
+                    </time>
+                </span>
+            </li>
+        );
+    }
 }
 
-LogEntry.propTypes = {
-    entry: PropTypes.object.isRequired,
-};
 
-
-function LogDate({date, entries}) {
+function LogDate({date, entries, setDetailedView}) {
     return (
         <li>
             <h3 className="event-log-day-header">
@@ -65,7 +83,7 @@ function LogDate({date, entries}) {
             </h3>
             <ul className="event-log-entry-list">
                 {entries.map((entry) => (
-                    <LogEntry key={entry.id} entry={entry} />
+                    <LogEntry key={entry.id} entry={entry} setDetailedView={setDetailedView} />
                 ))}
             </ul>
         </li>
@@ -75,10 +93,11 @@ function LogDate({date, entries}) {
 LogDate.propTypes = {
     entries: PropTypes.array.isRequired,
     date: PropTypes.object.isRequired,
+    setDetailedView: PropTypes.func.isRequired
 };
 
 
-export default class LogEntryList extends React.Component {
+export default class LogEntryList extends React.PureComponent {
     static propTypes = {
         entries: PropTypes.object.isRequired,
         currentPage: PropTypes.number.isRequired,
@@ -88,8 +107,7 @@ export default class LogEntryList extends React.Component {
     };
 
     render() {
-        const {entries, pages, currentPage, changePage, isFetching} = this.props;
-
+        const {entries, pages, currentPage, changePage, isFetching, setDetailedView} = this.props;
         return (
             <>
                 {isFetching && (
@@ -99,10 +117,13 @@ export default class LogEntryList extends React.Component {
                 )}
                 <ul className={`event-log-list ${isFetching ? 'loading' : ''}`}>
                     {Object.keys(entries).sort().reverse().map(date => (
-                        <LogDate key={date} date={moment(date)} entries={entries[date]} />
+                        <LogDate key={date}
+                                 date={moment(date)} entries={entries[date]}
+                                 setDetailedView={setDetailedView} />
                     ))}
                 </ul>
                 {!isFetching && <Paginator currentPage={currentPage} pages={pages} changePage={changePage} />}
+                <LogEntryModal />
             </>
         );
     }

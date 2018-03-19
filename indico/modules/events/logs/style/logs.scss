@@ -81,7 +81,9 @@
         }
 
         .log-entry-description {
+            cursor: pointer;
             flex-grow: 3;
+            text-decoration: dotted underline $gray;
         }
 
         .log-icon {
