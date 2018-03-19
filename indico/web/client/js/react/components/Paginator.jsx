@@ -31,28 +31,28 @@ export default class Paginator extends React.Component {
 
         return (
             <ul className="paginator">
-                {pages.length > 1 && currentPage !== 1 &&
+                {pages.length > 1 && currentPage !== 1 && (
                     <li className="page-arrow">
                         <IButton classes="icon-prev" onClick={() => changePage(currentPage - 1)} />
                     </li>
-                }
+                )}
                 {pages.map((number) => (
                     <li key={number} className="page-number">
                         {(number === null) ? (
                             <span className="superfluous-text">…</span>
                         ) : (
                             <IButton classes={number === currentPage ? 'highlight' : ''}
-                               onClick={() => changePage(number)}>
+                                     onClick={() => changePage(number)}>
                                 {number}
                             </IButton>
                         )}
                     </li>
                 ))}
-                {pages.length > 1 && currentPage !== pages[pages.length - 1] &&
+                {pages.length > 1 && currentPage !== pages[pages.length - 1] && (
                     <li className="page-arrow">
                         <IButton classes="icon-next" onClick={() => changePage(currentPage + 1)} />
                     </li>
-                }
+                )}
             </ul>
         );
     }

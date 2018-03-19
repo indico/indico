@@ -92,11 +92,11 @@ export default class LogEntryList extends React.Component {
 
         return (
             <>
-                {isFetching &&
+                {isFetching && (
                     <div className="event-log-list-spinner">
                         <div className="i-spinner" />
                     </div>
-                }
+                )}
                 <ul className={`event-log-list ${isFetching ? 'loading' : ''}`}>
                     {Object.keys(entries).sort().reverse().map(date => (
                         <LogDate key={date} date={moment(date)} entries={entries[date]} />
