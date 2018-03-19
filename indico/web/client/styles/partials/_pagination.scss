@@ -26,4 +26,10 @@
     li:not(:last-child) {
         margin-right: 0.2em;
     }
+
+    .page-arrow {
+        a {
+            height: 100%;
+        }
+    }
 }
