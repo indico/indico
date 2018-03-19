@@ -24,6 +24,7 @@ export default class IButton extends React.PureComponent {
         href: PropTypes.string,
         title: PropTypes.string,
         children: PropTypes.any,
+        onClick: PropTypes.func,
     };
 
     static defaultProps = {
@@ -31,12 +32,13 @@ export default class IButton extends React.PureComponent {
         href: undefined,
         title: undefined,
         children: undefined,
+        onClick: undefined,
     };
 
     render() {
-        const {classes, href, title, children} = this.props;
+        const {classes, href, title, children, onClick} = this.props;
         return (
-            <a href={href} title={title} className={`i-button ${classes}`}>
+            <a href={href} title={title} className={`i-button ${classes}`} onClick={onClick}>
                 {children}
             </a>
         );
