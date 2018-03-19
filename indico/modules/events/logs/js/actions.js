@@ -48,17 +48,16 @@ export function fetchPosts() {
     return async (dispatch, getStore, fetchLogsUrl) => {
         dispatch(fetchStarted());
 
+        const {filters, keyword, currentPage} = getStore();
         const options = {
             method: 'GET',
             credentials: 'same-origin', // use cookies for authentication
         };
-        const url = new URL(fetchLogsUrl);
-        const filters = getStore().filters;
-        const keyword = getStore().keyword;
 
-        url.searchParams.append('page', getStore().currentPage);
+        const url = new URL(fetchLogsUrl);
+        url.searchParams.append('page', currentPage);
         if (keyword) {
-            url.searchParams.append('q', getStore().keyword);
+            url.searchParams.append('q', keyword);
         }
 
         Object.keys(filters).forEach((item) => {
