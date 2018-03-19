@@ -46,6 +46,7 @@ const extraResolveAliases = [
 // Add Module Bundles
 glob.sync(path.join(config.build.rootPath, 'modules/**/module.json')).forEach((file) => {
     const module = Object.assign({produceBundle: true, partials: {}}, require(file));
+    // eslint-disable-next-line prefer-template
     const moduleName = 'module_' + (module.parent ? (module.parent + '.') : '') + module.name;
     const dirName = path.join(path.dirname(file), 'js');
 
@@ -57,7 +58,7 @@ glob.sync(path.join(config.build.rootPath, 'modules/**/module.json')).forEach((f
 
     if (module.partials) {
         for (const partial of Object.entries(module.partials)) {
-            entryPoints[moduleName + '.' + partial[0]] = [path.resolve(dirName, partial[1])];
+            entryPoints[`${moduleName}.${partial[0]}`] = [path.resolve(dirName, partial[1])];
         }
     }
 });
@@ -122,7 +123,7 @@ export default (env) => {
                             name: generateAssetPath(config),
                             context: config.build.distPath,
                             outputPath: 'mod_assets/',
-                            publicPath: config.build.distURL + 'mod_assets/',
+                            publicPath: `${config.build.distURL}mod_assets/`,
                         }
                     }
                 }

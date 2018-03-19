@@ -49,12 +49,14 @@ export function getThemeEntryPoints(config, prefix) {
         const returnValue = {};
         const escapedKey = k.replace('-', '_');
 
-        returnValue['themes_' + escapedKey] =
-            [_resolveTheme(rootPath, indicoClientPath, prefix + themes[k].stylesheet)];
+        returnValue[`themes_${escapedKey}`] = [
+            _resolveTheme(rootPath, indicoClientPath, prefix + themes[k].stylesheet)
+        ];
 
         if (themes[k].print_stylesheet) {
-            returnValue['themes_' + escapedKey + '.print'] =
-                [_resolveTheme(rootPath, indicoClientPath, prefix + themes[k].print_stylesheet)];
+            returnValue[`themes_${escapedKey}.print`] = [
+                _resolveTheme(rootPath, indicoClientPath, prefix + themes[k].print_stylesheet)
+            ];
         }
         return returnValue;
     }));
@@ -93,10 +95,12 @@ export function webpackDefaults(env, config) {
         url: true
     };
 
-    const scssIncludePath = path.join((config.isPlugin ?
-        path.resolve(config.build.indicoSourcePath, './indico/web/client') :
-        path.join(config.build.clientPath)),
-                                      'styles');
+    const scssIncludePath = path.join(
+        config.isPlugin
+            ? path.resolve(config.build.indicoSourcePath, './indico/web/client')
+            : path.join(config.build.clientPath),
+        'styles'
+    );
 
     function getDevtoolFilename(info) {
         const root = path.resolve(config.indico ? config.indico.build.rootPath : config.build.rootPath, '..');
@@ -161,9 +165,12 @@ export function webpackDefaults(env, config) {
                             options: {
                                 sourceMap: true,
                                 config: {
-                                    path: path.join(config.indico ? config.indico.build.rootPath :
-                                                                    config.build.rootPath,
-                                                    'postcss.config.js'),
+                                    path: path.join(
+                                        config.indico
+                                            ? config.indico.build.rootPath
+                                            : config.build.rootPath,
+                                        'postcss.config.js'
+                                    ),
                                     ctx: {
                                         urlnamespaces: {
                                             namespacePaths: (name) => {
@@ -200,7 +207,9 @@ export function webpackDefaults(env, config) {
                 NODE_ENV: currentEnv
             }),
             new ProgressBarPlugin({
-                format: chalk.cyan('Code being sent to the moon and back \u{1f680} \u{1f311}') + '  [:bar] ' +
+                format:
+                    // eslint-disable-next-line prefer-template
+                    chalk.cyan('Code being sent to the moon and back \u{1f680} \u{1f311}') + '  [:bar] ' +
                     chalk.green.bold(':percent') + ' (:elapsed seconds)'
             })
         ],
