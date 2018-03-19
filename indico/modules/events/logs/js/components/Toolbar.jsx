@@ -17,26 +17,30 @@
 
 import React from 'react';
 import {connect} from 'react-redux';
+import PropTypes from 'prop-types';
 
 import Filter from '../containers/Filter';
 import SearchBox from '../containers/SearchBox';
 
 
 class Toolbar extends React.Component {
-    getRealms() {
-        const rootElement = document.getElementById('event-log');
-        const realms = rootElement.dataset.realms;
-        return JSON.parse(realms);
-    }
+    static propTypes = {
+        realms: PropTypes.object.isRequired,
+    };
 
     render() {
+        const {realms} = this.props;
         return (
             <div className="follow-scroll toolbars">
-                <Filter realms={this.getRealms()} />
+                <Filter realms={realms} />
                 <SearchBox />
             </div>
         );
     }
 }
 
-export default connect()(Toolbar);
+const mapStateToProps = ({staticData}) => ({
+    realms: staticData.realms,
+});
+
+export default connect(mapStateToProps)(Toolbar);

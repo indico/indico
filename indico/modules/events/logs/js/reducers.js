@@ -16,6 +16,7 @@
  */
 
 import * as actions from './actions';
+import {combineReducers} from 'redux';
 
 
 const initialState = {
@@ -33,7 +34,7 @@ const initialState = {
     pages: []
 };
 
-export default function globalEventLogReducer(state = initialState, action) {
+function logReducer(state = initialState, action) {
     switch (action.type) {
         case actions.SET_KEYWORD:
             return {...state, keyword: action.keyword};
@@ -49,3 +50,9 @@ export default function globalEventLogReducer(state = initialState, action) {
             return state;
     }
 }
+
+
+export default combineReducers({
+    logs: logReducer,
+    staticData: (state = {}) => state,
+});
