@@ -20,10 +20,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import EventLog from './components/EventLog';
-import {createStore, applyMiddleware, compose} from 'redux';
+import {createStore, applyMiddleware} from 'redux';
 import {Provider} from 'react-redux';
 import thunkMiddleware from 'redux-thunk';
-import logger from 'redux-logger';
+import loggerMiddleware from 'redux-logger';
+import {composeWithDevTools} from 'redux-devtools-extension';
 import reducer from './reducers';
 import {fetchPosts} from './actions';
 
@@ -37,13 +38,12 @@ window.addEventListener('load', () => {
             realms: JSON.parse(rootElement.dataset.realms),
         }
     };
-    const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
-    const store = createStore(reducer, initialData, composeEnhancers(
-        applyMiddleware(
-            thunkMiddleware,
-            process.env.NODE_ENV === 'development' ? logger : null,
-        )
-    ));
+    const middleware = [thunkMiddleware];
+    if (process.env.NODE_ENV === 'development') {
+        middleware.push(loggerMiddleware);
+    }
+    const enhancer = composeWithDevTools(applyMiddleware(...middleware));
+    const store = createStore(reducer, initialData, enhancer);
 
     ReactDOM.render(
         <Provider store={store}>
