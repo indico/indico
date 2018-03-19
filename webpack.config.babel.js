@@ -77,7 +77,11 @@ export default (env) => {
         if (!filePath.match(/\.js$/)) {
             return content;
         }
-        return minify(content.toString(), {fromString: true}).code;
+        const result = minify(content.toString());
+        if (result.error) {
+            throw result.error;
+        }
+        return result.code;
     };
 
     return merge.strategy({
