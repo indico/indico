@@ -76,6 +76,8 @@ Bugfixes
 - Fix error when displaying the value of an accommodation field in the
   registrant list and someone has the "no accomodation" option selected
   (:issue:`3272`, thanks :user:`bpedersen2`)
+- Use the 'Reviewing' realm when logging actions from the abstract/paper
+  reviewing modules
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
