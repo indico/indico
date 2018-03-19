@@ -53,7 +53,19 @@ export function fetchPosts() {
             credentials: 'same-origin', // use cookies for authentication
         };
         const url = new URL(fetchLogsUrl);
+        const filters = getStore().filters;
+        const keyword = getStore().keyword;
+
         url.searchParams.append('page', getStore().currentPage);
+        if (keyword) {
+            url.searchParams.append('q', getStore().keyword);
+        }
+
+        Object.keys(filters).forEach((item) => {
+            if (filters[item]) {
+                url.searchParams.append('filters', item);
+            }
+        });
 
         const data = await fetch(url, options);
         const json = await data.json();

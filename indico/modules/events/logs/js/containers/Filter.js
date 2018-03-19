@@ -17,7 +17,7 @@
 
 import Filter from '../components/Filter';
 import {connect} from 'react-redux';
-import {setFilter} from '../actions';
+import {setFilter, fetchPosts} from '../actions';
 
 
 const mapStateToProps = state => {
@@ -27,7 +27,10 @@ const mapStateToProps = state => {
 };
 
 const mapDispatchToProps = (dispatch) => ({
-    setFilter: (filter) => dispatch(setFilter(filter))
+    setFilter: (filter) => {
+        dispatch(setFilter(filter));
+        dispatch(fetchPosts());
+    }
 });
 
 export default connect(

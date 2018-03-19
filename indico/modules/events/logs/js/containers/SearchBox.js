@@ -17,10 +17,13 @@
 
 import SearchBox from '../components/SearchBox';
 import {connect} from 'react-redux';
-import {setKeyword} from '../actions';
+import {setKeyword, fetchPosts} from '../actions';
 
 const mapDispatchToProps = (dispatch) => ({
-    setKeyword: (keyword) => dispatch(setKeyword(keyword))
+    setKeyword: (keyword) => {
+        dispatch(setKeyword(keyword));
+        dispatch(fetchPosts());
+    }
 });
 
 export default connect(
