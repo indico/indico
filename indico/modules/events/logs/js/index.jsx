@@ -20,7 +20,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import EventLog from './components/EventLog';
-import {createStore, applyMiddleware} from 'redux';
+import {createStore, applyMiddleware, compose} from 'redux';
 import {Provider} from 'react-redux';
 import thunkMiddleware from 'redux-thunk';
 import logger from 'redux-logger';
@@ -32,9 +32,12 @@ import '../style/logs.scss';
 window.addEventListener('load', () => {
     const rootElement = document.getElementById('event-log');
     const fetchLogsUrl = rootElement.dataset.fetchLogsUrl;
-    const store = createStore(globalReducer, applyMiddleware(
-        thunkMiddleware.withExtraArgument(fetchLogsUrl),
-        process.env.NODE_ENV === 'development' ? logger : null,
+    const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
+    const store = createStore(globalReducer, composeEnhancers(
+        applyMiddleware(
+            thunkMiddleware.withExtraArgument(fetchLogsUrl),
+            process.env.NODE_ENV === 'development' ? logger : null
+        )
     ));
 
     ReactDOM.render(
