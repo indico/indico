@@ -23,9 +23,27 @@
     margin: 0;
 }
 
+#event-log {
+    position: relative;
+    min-height: 400px;
+}
+
+.event-log-list-spinner {
+    position: absolute;
+    font-size: 5em;
+    left: 45%;
+    top: 45%;
+}
+
 .event-log-list {
     padding: 0;
     list-style-type: none;
+
+    &.loading {
+        background-color: #fff;
+        opacity: 0.2;
+        pointer-events: none;
+    }
 
     > li h3.event-log-day-header {
         @extend %line-style;

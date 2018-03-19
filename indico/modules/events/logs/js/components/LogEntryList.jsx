@@ -84,19 +84,25 @@ export default class LogEntryList extends React.Component {
         currentPage: PropTypes.number.isRequired,
         pages: PropTypes.array.isRequired,
         changePage: PropTypes.func.isRequired,
+        isFetching: PropTypes.bool.isRequired
     };
 
     render() {
-        const {entries, pages, currentPage, changePage} = this.props;
+        const {entries, pages, currentPage, changePage, isFetching} = this.props;
 
         return (
             <>
-                <ul className="event-log-list">
+                {isFetching &&
+                    <div className="event-log-list-spinner">
+                        <div className="i-spinner" />
+                    </div>
+                }
+                <ul className={`event-log-list ${isFetching ? 'loading' : ''}`}>
                     {Object.keys(entries).sort().reverse().map(date => (
                         <LogDate key={date} date={moment(date)} entries={entries[date]} />
                     ))}
                 </ul>
-                <Paginator currentPage={currentPage} pages={pages} changePage={changePage} />
+                {!isFetching && <Paginator currentPage={currentPage} pages={pages} changePage={changePage} />}
             </>
         );
     }
