@@ -23,7 +23,8 @@ const mapStateToProps = state => {
     return {
         entries: state.entries,
         currentPage: state.currentPage,
-        pages: state.pages
+        pages: state.pages,
+        isFetching: state.isFetching
     };
 };
 
