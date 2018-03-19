@@ -15,30 +15,27 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import LogEntryList from '../components/LogEntryList';
 import {connect} from 'react-redux';
-import {setPage, fetchPosts, setDetailedView} from '../actions';
 
-const mapStateToProps = ({logs}) => ({
-    entries: logs.entries,
-    currentPage: logs.currentPage,
-    pages: logs.pages,
-    isFetching: logs.isFetching
-});
+import LogEntryModal from '../components/LogEntryModal';
+import {setDetailedView} from '../actions';
+
+const mapStateToProps = ({logs}) => {
+    return {
+        entry: logs.detailedView
+    };
+};
 
 const mapDispatchToProps = dispatch => {
     return {
-        changePage: (page) => {
-            dispatch(setPage(page));
-            dispatch(fetchPosts());
-        },
         setDetailedView: (entry) => {
             dispatch(setDetailedView(entry));
         }
     };
 };
 
+
 export default connect(
     mapStateToProps,
     mapDispatchToProps
-)(LogEntryList);
+)(LogEntryModal);
