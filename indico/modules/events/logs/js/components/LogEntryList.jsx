@@ -103,7 +103,8 @@ export default class LogEntryList extends React.PureComponent {
         currentPage: PropTypes.number.isRequired,
         pages: PropTypes.array.isRequired,
         changePage: PropTypes.func.isRequired,
-        isFetching: PropTypes.bool.isRequired
+        isFetching: PropTypes.bool.isRequired,
+        setDetailedView: PropTypes.func.isRequired,
     };
 
     render() {
