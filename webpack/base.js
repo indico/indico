@@ -243,6 +243,12 @@ export function webpackDefaults(env, config) {
                             // with interface CSS
                             minChunks: /styles\/themes/.test(module.request) ? 9999 : 2
                         };
+                    },
+                    // react/redux and friends since they are pretty big
+                    react: {
+                        test: /\/node_modules\/(react|redux|prop-types\/|lodash-es\/|fbjs\/)/,
+                        name: 'react',
+                        chunks: 'initial',
                     }
                 }
             }
