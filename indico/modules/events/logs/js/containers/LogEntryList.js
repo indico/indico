@@ -19,23 +19,19 @@ import LogEntryList from '../components/LogEntryList';
 import {connect} from 'react-redux';
 import {setPage, fetchPosts} from '../actions';
 
-const mapStateToProps = state => {
-    return {
-        entries: state.entries,
-        currentPage: state.currentPage,
-        pages: state.pages,
-        isFetching: state.isFetching
-    };
-};
+const mapStateToProps = ({logs}) => ({
+    entries: logs.entries,
+    currentPage: logs.currentPage,
+    pages: logs.pages,
+    isFetching: logs.isFetching
+});
 
-const mapDispatchToProps = dispatch => {
-    return {
-        changePage: (page) => {
-            dispatch(setPage(page));
-            dispatch(fetchPosts());
-        }
-    };
-};
+const mapDispatchToProps = dispatch => ({
+    changePage: (page) => {
+        dispatch(setPage(page));
+        dispatch(fetchPosts());
+    }
+});
 
 export default connect(
     mapStateToProps,

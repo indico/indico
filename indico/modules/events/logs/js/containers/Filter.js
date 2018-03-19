@@ -20,11 +20,9 @@ import {connect} from 'react-redux';
 import {setFilter, fetchPosts, setPage} from '../actions';
 
 
-const mapStateToProps = state => {
-    return {
-        filters: state.filters
-    };
-};
+const mapStateToProps = ({logs}) => ({
+    filters: logs.filters,
+});
 
 const mapDispatchToProps = (dispatch) => ({
     setFilter: (filter) => {

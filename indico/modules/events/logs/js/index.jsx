@@ -24,19 +24,24 @@ import {createStore, applyMiddleware, compose} from 'redux';
 import {Provider} from 'react-redux';
 import thunkMiddleware from 'redux-thunk';
 import logger from 'redux-logger';
-import globalReducer from './reducers';
+import reducer from './reducers';
 import {fetchPosts} from './actions';
 
 import '../style/logs.scss';
 
 window.addEventListener('load', () => {
     const rootElement = document.getElementById('event-log');
-    const fetchLogsUrl = rootElement.dataset.fetchLogsUrl;
+    const initialData = {
+        staticData: {
+            fetchLogsUrl: rootElement.dataset.fetchLogsUrl,
+            realms: JSON.parse(rootElement.dataset.realms),
+        }
+    };
     const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
-    const store = createStore(globalReducer, composeEnhancers(
+    const store = createStore(reducer, initialData, composeEnhancers(
         applyMiddleware(
-            thunkMiddleware.withExtraArgument(fetchLogsUrl),
-            process.env.NODE_ENV === 'development' ? logger : null
+            thunkMiddleware,
+            process.env.NODE_ENV === 'development' ? logger : null,
         )
     ));
 

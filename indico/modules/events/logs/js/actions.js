@@ -45,10 +45,13 @@ export function fetchStarted() {
 }
 
 export function fetchPosts() {
-    return async (dispatch, getStore, fetchLogsUrl) => {
+    return async (dispatch, getStore) => {
         dispatch(fetchStarted());
 
-        const {filters, keyword, currentPage} = getStore();
+        const {
+            logs: {filters, keyword, currentPage},
+            staticData: {fetchLogsUrl},
+        } = getStore();
         const options = {
             method: 'GET',
             credentials: 'same-origin', // use cookies for authentication
