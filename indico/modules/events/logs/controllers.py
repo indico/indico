@@ -79,5 +79,5 @@ class RHEventLogsJSON(RHManageEventBase):
 
         for entry in query.items:
             day = entry.logged_dt.date()
-            entries[day.isoformat()].append(serialize_log_entry(entry))
+            entries[day.isoformat()].append(dict(serialize_log_entry(entry), html=entry.render()))
         return jsonify(current_page=page, pages=list(query.iter_pages()), entries=entries)
