@@ -20,20 +20,15 @@ import {connect} from 'react-redux';
 import LogEntryModal from '../components/LogEntryModal';
 import {setDetailedView} from '../actions';
 
-const mapStateToProps = ({logs}) => {
-    return {
-        entry: logs.detailedView
-    };
-};
+const mapStateToProps = ({logs}) => ({
+    entry: logs.detailedView
+});
 
-const mapDispatchToProps = dispatch => {
-    return {
-        setDetailedView: (entry) => {
-            dispatch(setDetailedView(entry));
-        }
-    };
-};
-
+const mapDispatchToProps = (dispatch) => ({
+    setDetailedView: (entry) => {
+        dispatch(setDetailedView(entry));
+    }
+});
 
 export default connect(
     mapStateToProps,

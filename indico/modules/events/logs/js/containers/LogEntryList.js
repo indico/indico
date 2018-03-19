@@ -26,17 +26,15 @@ const mapStateToProps = ({logs}) => ({
     isFetching: logs.isFetching
 });
 
-const mapDispatchToProps = dispatch => {
-    return {
-        changePage: (page) => {
-            dispatch(setPage(page));
-            dispatch(fetchPosts());
-        },
-        setDetailedView: (entry) => {
-            dispatch(setDetailedView(entry));
-        }
-    };
-};
+const mapDispatchToProps = dispatch => ({
+    changePage: (page) => {
+        dispatch(setPage(page));
+        dispatch(fetchPosts());
+    },
+    setDetailedView: (entry) => {
+        dispatch(setDetailedView(entry));
+    }
+});
 
 export default connect(
     mapStateToProps,

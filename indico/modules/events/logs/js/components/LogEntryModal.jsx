@@ -11,7 +11,7 @@ export default class LogEntryModal extends React.Component {
 
     static defaultProps = {
         entry: null
-    }
+    };
 
     constructor(props) {
         super(props);

@@ -25,12 +25,14 @@ export default class Modal extends React.Component {
     static propTypes = {
         title: PropTypes.string.isRequired,
         children: PropTypes.node.isRequired,
-        onClose: PropTypes.func
+        onClose: PropTypes.func,
+        contentLabel: PropTypes.string,
     };
 
     static defaultProps = {
-        onClose: () => {}
-    }
+        onClose: () => {},
+        contentLabel: 'Indico Modal Dialog'
+    };
 
     constructor(props) {
         super(props);
@@ -52,18 +54,15 @@ export default class Modal extends React.Component {
         this.setState({
             isOpen: false
         });
-        onClose.bind(this)();
+        onClose.call(this);
     }
 
     render() {
-        const props = Object.assign({
-            contentLabel: 'Indico Modal Dialog',
-        }, this.props);
-        const {title, children} = props;
+        const {title, children, contentLabel} = this.props;
         const {isOpen} = this.state;
 
         return (
-            <ReactModal appElement={document.getElementsByTagName("body")[0]}
+            <ReactModal appElement={document.body}
                         className="modal-dialog"
                         overlayClassName="modal-overlay"
                         bodyOpenClassName="modal-overlay-open"
@@ -71,7 +70,7 @@ export default class Modal extends React.Component {
                         shouldCloseOnEsc
                         shouldCloseOnOverlayClick
                         onRequestClose={this.close}
-                        {...props}>
+                        contentLabel={contentLabel}>
                 <div className="modal-dialog-header flexrow f-j-space-between">
                     <h2 className="modal-dialog-title">{title}</h2>
                     <a className="i-button text-color borderless icon-cross"
