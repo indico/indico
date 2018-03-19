@@ -17,6 +17,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
+import IButton from "../IButton";
 
 export default class Paginator extends React.Component {
     static propTypes = {
@@ -35,10 +36,10 @@ export default class Paginator extends React.Component {
                         {(number === null) ? (
                             <span className="superfluous-text">…</span>
                         ) : (
-                            <a className={`i-button ${number === currentPage ? 'highlight' : ''}`}
-                               onClick={changePage.bind(undefined, number)}>
+                            <IButton classes={number === currentPage ? 'highlight' : ''}
+                               onClick={() => changePage(number)}>
                                 {number}
-                            </a>
+                            </IButton>
                         )}
                     </li>
                 ))}
