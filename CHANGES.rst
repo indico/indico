@@ -73,6 +73,9 @@ Bugfixes
 
 - Fix selecting a person's title in a different language than English
 - Fix display issue in "now happening" (:issue:`3278`)
+- Fix error when displaying the value of an accommodation field in the
+  registrant list and someone has the "no accomodation" option selected
+  (:issue:`3272`, thanks :user:`bpedersen2`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

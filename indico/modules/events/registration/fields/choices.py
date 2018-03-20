@@ -398,6 +398,16 @@ class AccommodationField(RegistrationFormBillableItemsField):
             friendly_data['arrival_date'] = _to_date(friendly_data['arrival_date'])
             friendly_data['departure_date'] = _to_date(friendly_data['departure_date'])
             friendly_data['nights'] = (friendly_data['departure_date'] - friendly_data['arrival_date']).days
+        else:
+            friendly_data['nights'] = 0
+            if friendly_data.get('arrival_date'):
+                friendly_data['arrival_date'] = _to_date(friendly_data['arrival_date'])
+            else:
+                friendly_data['arrival_date'] = ''
+            if friendly_data.get('departure_date'):
+                friendly_data['departure_date'] = _to_date(friendly_data['departure_date'])
+            else:
+                friendly_data['departure_date'] = ''
         return friendly_data['choice'] if for_humans else friendly_data
 
     def calculate_price(self, reg_data, versioned_data):
