@@ -81,7 +81,7 @@
         margin-right: 0.4em;
     }
 
-    &:not(first-child) {
+    &:not(:first-child) {
         margin-left: 0.1em;
     }
 
