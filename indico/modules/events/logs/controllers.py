@@ -40,11 +40,8 @@ class RHEventLogs(RHManageEventBase):
     """Shows the modification/action log for the event"""
 
     def _process(self):
-        entries = self.event.log_entries.order_by(EventLogEntry.logged_dt.desc()).all()
-        realms = {e.realm for e in entries}
-        all_realms = {realm.name: realm.title for realm in EventLogRealm}
-        return WPEventLogs.render_template('logs.html', self.event, entries=entries, realms=realms,
-                                           all_realms=all_realms)
+        realms = {realm.name: realm.title for realm in EventLogRealm}
+        return WPEventLogs.render_template('logs.html', self.event, realms=realms)
 
 
 class RHEventLogsJSON(RHManageEventBase):
