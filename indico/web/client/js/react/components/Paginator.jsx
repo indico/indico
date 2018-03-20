@@ -26,10 +26,19 @@ export default class Paginator extends React.Component {
         currentPage: PropTypes.number.isRequired,
         pages: PropTypes.array.isRequired,
         changePage: PropTypes.func.isRequired,
+        hideIfSinglePage: PropTypes.bool,
+    };
+
+    static defaultProps = {
+        hideIfSinglePage: true,
     };
 
     render() {
-        const {pages, currentPage, changePage} = this.props;
+        const {pages, currentPage, changePage, hideIfSinglePage} = this.props;
+
+        if (pages.length < 2 && hideIfSinglePage) {
+            return null;
+        }
 
         let ellipsisKey = 0;
         function getPageKey(number) {
