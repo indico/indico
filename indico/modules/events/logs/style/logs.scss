@@ -76,7 +76,7 @@
         align-content: baseline;
         border-bottom: 1px solid $pastel-gray;
 
-        > *:not(first-child) {
+        > *:not(:first-child) {
             margin-left: 1em;
         }
 

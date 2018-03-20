@@ -343,7 +343,7 @@
         white-space: nowrap;
 
         margin-top: 0.2em;
-        &:not(first-child) {
+        &:not(:first-child) {
             margin-left: 0.2em;
         }
         &.is-protected {
