@@ -18,9 +18,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import IButton from 'indico/react/components/IButton';
-
 export default class Filter extends React.Component {
+    static propTypes = {
+        realms: PropTypes.object.isRequired,
+        filters: PropTypes.object.isRequired,
+        setFilter: PropTypes.func.isRequired
+    };
+
     render() {
         const {realms, filters, setFilter} = this.props;
         return (
@@ -40,17 +44,7 @@ export default class Filter extends React.Component {
                         </React.Fragment>
                     ))}
                 </div>
-                <div className="group">
-                    <IButton title="Expand all" classes="icon-stack-plus" />
-                    <IButton title="Collapse all" classes="icon-stack-minus" />
-                </div>
             </div>
         );
     }
 }
-
-Filter.propTypes = {
-    realms: PropTypes.object.isRequired,
-    filters: PropTypes.object.isRequired,
-    setFilter: PropTypes.func.isRequired
-};
