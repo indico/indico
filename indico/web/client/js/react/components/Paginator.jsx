@@ -31,15 +31,20 @@ export default class Paginator extends React.Component {
     render() {
         const {pages, currentPage, changePage} = this.props;
 
+        let ellipsisKey = 0;
+        function getPageKey(number) {
+            return number === null ? `ellipsis-${++ellipsisKey}` : `page-${number}`;
+        }
+
         return (
             <ul className="paginator">
                 {pages.length > 1 && currentPage !== 1 && (
-                    <li className="page-arrow">
+                    <li key="prev-page" className="page-arrow">
                         <IButton classes="icon-prev" onClick={() => changePage(currentPage - 1)} />
                     </li>
                 )}
                 {pages.map((number) => (
-                    <li key={number} className="page-number">
+                    <li key={getPageKey(number)} className="page-number">
                         {(number === null) ? (
                             <span className="superfluous-text">…</span>
                         ) : (
@@ -51,7 +56,7 @@ export default class Paginator extends React.Component {
                     </li>
                 ))}
                 {pages.length > 1 && currentPage !== pages[pages.length - 1] && (
-                    <li className="page-arrow">
+                    <li key="next-page" className="page-arrow">
                         <IButton classes="icon-next" onClick={() => changePage(currentPage + 1)} />
                     </li>
                 )}
