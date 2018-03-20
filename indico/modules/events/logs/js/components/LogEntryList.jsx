@@ -49,7 +49,7 @@ class LogEntry extends React.PureComponent {
                         <i className="log-realm" />
                         <i className="log-kind icon-circle-small" />
                     </span>
-                    <span className="bold f-self-stretch">
+                    <span className="bold">
                         {entry.module}
                     </span>
                 </span>
