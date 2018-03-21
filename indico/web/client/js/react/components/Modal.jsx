@@ -19,7 +19,10 @@ import React from 'react';
 import ReactModal from 'react-modal';
 import PropTypes from 'prop-types';
 
+import Slot from 'indico/react/util/Slot';
+
 import './style/modal.scss';
+
 
 export default class Modal extends React.Component {
     static propTypes = {
@@ -60,6 +63,7 @@ export default class Modal extends React.Component {
     render() {
         const {title, children, contentLabel} = this.props;
         const {isOpen} = this.state;
+        const {content, footer} = Slot.split(children);
 
         return (
             <ReactModal appElement={document.body}
@@ -77,8 +81,13 @@ export default class Modal extends React.Component {
                        onClick={this.close} />
                 </div>
                 <div className="modal-dialog-content">
-                    {children}
+                    {content}
                 </div>
+                {footer && (
+                    <div className="modal-dialog-footer">
+                        {footer}
+                    </div>
+                )}
             </ReactModal>
         );
     }
