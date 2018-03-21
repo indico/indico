@@ -58,9 +58,17 @@ function logReducer(state = initialState, action) {
         case actions.SET_PAGE:
             return {...state, currentPage: action.currentPage};
         case actions.UPDATE_ENTRIES:
-            return {...state, entries: action.entries, entryIndex: _buildDateIndex(action.entries), pages: action.pages, isFetching: false};
+            return {
+                ...state,
+                entries: action.entries,
+                entryIndex: _buildDateIndex(action.entries),
+                pages: action.pages,
+                isFetching: false,
+            };
         case actions.FETCH_STARTED:
             return {...state, isFetching: true};
+        case actions.FETCH_FAILED:
+            return {...state, isFetching: false};
         case actions.SET_DETAILED_VIEW:
             return {...state, currentViewIndex: action.currentViewIndex};
         default:
