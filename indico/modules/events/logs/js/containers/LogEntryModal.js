@@ -18,7 +18,7 @@
 import {connect} from 'react-redux';
 
 import LogEntryModal from '../components/LogEntryModal';
-import {setDetailedView} from '../actions';
+import {setDetailedView, viewPrevEntry, viewNextEntry} from '../actions';
 
 const mapStateToProps = ({logs}) => ({
     currentViewIndex: logs.currentViewIndex
@@ -27,6 +27,12 @@ const mapStateToProps = ({logs}) => ({
 const mapDispatchToProps = (dispatch) => ({
     setDetailedView: (entryIndex) => {
         dispatch(setDetailedView(entryIndex));
+    },
+    prevEntry: () => {
+        dispatch(viewPrevEntry());
+    },
+    nextEntry: () => {
+        dispatch(viewNextEntry());
     }
 });
 
