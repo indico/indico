@@ -21,12 +21,12 @@ import LogEntryModal from '../components/LogEntryModal';
 import {setDetailedView} from '../actions';
 
 const mapStateToProps = ({logs}) => ({
-    entry: logs.detailedView
+    currentViewIndex: logs.currentViewIndex
 });
 
 const mapDispatchToProps = (dispatch) => ({
-    setDetailedView: (entry) => {
-        dispatch(setDetailedView(entry));
+    setDetailedView: (entryIndex) => {
+        dispatch(setDetailedView(entryIndex));
     }
 });
 

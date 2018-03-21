@@ -37,8 +37,8 @@ export function setPage(currentPage) {
     return {type: SET_PAGE, currentPage};
 }
 
-export function setDetailedView(entry) {
-    return {type: SET_DETAILED_VIEW, entry};
+export function setDetailedView(entryIndex) {
+    return {type: SET_DETAILED_VIEW, currentViewIndex: entryIndex};
 }
 
 export function updateEntries(entries, pages) {
