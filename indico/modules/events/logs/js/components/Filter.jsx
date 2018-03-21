@@ -18,7 +18,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import IButton from 'indico/react/IButton';
+import IButton from 'indico/react/components/IButton';
 
 export default class Filter extends React.Component {
     render() {

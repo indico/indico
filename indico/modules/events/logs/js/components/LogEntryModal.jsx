@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import Modal from 'indico/react/components/Modal';
+import IButton from 'indico/react/components/IButton';
 
 export default class LogEntryModal extends React.Component {
     static propTypes = {
