@@ -20,12 +20,15 @@ import PropTypes from 'prop-types';
 
 import Modal from 'indico/react/components/Modal';
 import IButton from 'indico/react/components/IButton';
+import Slot from 'indico/react/util/Slot';
 
 export default class LogEntryModal extends React.Component {
     static propTypes = {
         entries: PropTypes.array.isRequired,
         currentViewIndex: PropTypes.number,
-        setDetailedView: PropTypes.func.isRequired
+        setDetailedView: PropTypes.func.isRequired,
+        prevEntry: PropTypes.func.isRequired,
+        nextEntry: PropTypes.func.isRequired
     };
 
     static defaultProps = {
@@ -36,6 +39,8 @@ export default class LogEntryModal extends React.Component {
         super(props);
         this.modal = undefined;
         this.onClose = this.onClose.bind(this);
+        this.prevEntry = this.prevEntry.bind(this);
+        this.nextEntry = this.nextEntry.bind(this);
     }
 
     componentDidUpdate() {
@@ -54,6 +59,16 @@ export default class LogEntryModal extends React.Component {
         setDetailedView(null);
     }
 
+    prevEntry() {
+        const {prevEntry} = this.props;
+        prevEntry();
+    }
+
+    nextEntry() {
+        const {nextEntry} = this.props;
+        nextEntry();
+    }
+
     render() {
         const {currentViewIndex, entries} = this.props;
 
@@ -69,8 +84,26 @@ export default class LogEntryModal extends React.Component {
                    }}
                    onClose={this.onClose}
                    contentLabel="Details about log entry">
-                <div>{userFullName}</div>
-                <table className="i-table" dangerouslySetInnerHTML={{__html: html}} />
+                <Slot>
+                    <table className="i-table log-modal-details" dangerouslySetInnerHTML={{__html: html}} />
+                    <div className="text-superfluous log-modal-author-info flexrow f-j-end">
+                        <span>
+                            {userFullName && <span className="log-modal-user">{userFullName} </span>}
+                            on
+                            <span className="log-modal-time"> {moment(time).format('ddd, D/M/YYYY HH:mm')}</span>
+                        </span>
+                    </div>
+                </Slot>
+                <Slot name="footer">
+                    <div className="group">
+                        <IButton title="Previous" onClick={this.prevEntry}>
+                            Previous
+                        </IButton>
+                        <IButton title="Next" onClick={this.nextEntry}>
+                            Next
+                        </IButton>
+                    </div>
+                </Slot>
             </Modal>
         );
     }

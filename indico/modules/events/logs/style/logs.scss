@@ -104,3 +104,21 @@
 
     }
 }
+
+.log-modal-author-info {
+    margin-top: 1em;
+    font-size: 1.2em;
+
+    .log-modal-user, .log-modal-time {
+        color: $light-black;
+    }
+}
+
+table.log-modal-details {
+    width: 100%;
+    margin: 0;
+
+    td.log-caption {
+        width: 200px;
+    }
+}

@@ -23,6 +23,8 @@ export const SET_PAGE = 'SET_PAGE';
 export const UPDATE_ENTRIES = 'UPDATE_ENTRIES';
 export const FETCH_STARTED = 'FETCH_STARTED';
 export const SET_DETAILED_VIEW = 'SET_DETAILED_VIEW';
+export const VIEW_PREV_ENTY = 'VIEW_PREV_ENTRY';
+export const VIEW_NEXT_ENTY = 'VIEW_NEXT_ENTRY';
 
 
 export function setKeyword(keyword) {
@@ -39,6 +41,48 @@ export function setPage(currentPage) {
 
 export function setDetailedView(entryIndex) {
     return {type: SET_DETAILED_VIEW, currentViewIndex: entryIndex};
+}
+
+export function viewPrevEntry() {
+    return async (dispatch, getStore) => {
+        const {
+            staticData: {pageSize},
+            logs: {currentViewIndex, currentPage}
+        } = getStore();
+
+        if (currentViewIndex === 0) {
+            if (currentPage === 0) {
+                // ERROR!
+            } else {
+                await dispatch(setPage(currentPage - 1));
+                await dispatch(fetchPosts());
+                await dispatch(setDetailedView(pageSize - 1));
+            }
+        } else {
+            dispatch({type: SET_DETAILED_VIEW, currentViewIndex: currentViewIndex - 1});
+        }
+    };
+}
+
+export function viewNextEntry() {
+    return async (dispatch, getStore) => {
+        const {
+            staticData: {pageSize},
+            logs: {currentViewIndex, currentPage, pages}
+        } = getStore();
+
+        if (currentViewIndex === (pageSize - 1)) {
+            if (currentPage === pages[pages.length - 1]) {
+                // ERROR!
+            } else {
+                await dispatch(setPage(currentPage + 1));
+                await dispatch(fetchPosts());
+                await dispatch(setDetailedView(0));
+            }
+        } else {
+            dispatch({type: SET_DETAILED_VIEW, currentViewIndex: currentViewIndex + 1});
+        }
+    };
 }
 
 export function updateEntries(entries, pages) {
