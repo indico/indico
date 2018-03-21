@@ -23,12 +23,13 @@ import IButton from 'indico/react/components/IButton';
 
 export default class LogEntryModal extends React.Component {
     static propTypes = {
-        entry: PropTypes.object,
+        entries: PropTypes.array.isRequired,
+        currentViewIndex: PropTypes.number,
         setDetailedView: PropTypes.func.isRequired
     };
 
     static defaultProps = {
-        entry: null
+        currentViewIndex: null
     };
 
     constructor(props) {
@@ -38,8 +39,8 @@ export default class LogEntryModal extends React.Component {
     }
 
     componentDidUpdate() {
-        const {entry} = this.props;
-        if (entry) {
+        const {currentViewIndex} = this.props;
+        if (currentViewIndex !== null) {
             this.open();
         }
     }
@@ -54,13 +55,12 @@ export default class LogEntryModal extends React.Component {
     }
 
     render() {
-        const {entry} = this.props;
+        const {currentViewIndex, entries} = this.props;
 
-        if (!entry) {
+        if (currentViewIndex === null) {
             return '';
         }
-
-        const {description, html, userFullName} = entry;
+        const {description, html, userFullName, time} = entries[currentViewIndex];
 
         return (
             <Modal title={description}

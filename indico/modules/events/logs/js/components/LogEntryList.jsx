@@ -35,9 +35,9 @@ class LogEntry extends React.PureComponent {
         this.openDetails = this.openDetails.bind(this);
     }
 
-    openDetails() {
-        const {entry, setDetailedView} = this.props;
-        setDetailedView(entry);
+    openDetails(index) {
+        const {setDetailedView} = this.props;
+        setDetailedView(index);
     }
 
     render() {
@@ -54,7 +54,7 @@ class LogEntry extends React.PureComponent {
                     </span>
                 </span>
                 <span className="log-entry-description"
-                      onClick={this.openDetails}>
+                      onClick={() => this.openDetails(entry.index)}>
                     {entry.description}
                 </span>
                 <span>
@@ -99,7 +99,8 @@ LogDate.propTypes = {
 
 export default class LogEntryList extends React.PureComponent {
     static propTypes = {
-        entries: PropTypes.object.isRequired,
+        entries: PropTypes.array.isRequired,
+        entryIndex: PropTypes.instanceOf(Map).isRequired,
         currentPage: PropTypes.number.isRequired,
         pages: PropTypes.array.isRequired,
         changePage: PropTypes.func.isRequired,
@@ -108,7 +109,7 @@ export default class LogEntryList extends React.PureComponent {
     };
 
     render() {
-        const {entries, pages, currentPage, changePage, isFetching, setDetailedView} = this.props;
+        const {entries, entryIndex, pages, currentPage, changePage, isFetching, setDetailedView} = this.props;
         return (
             <>
                 {isFetching && (
@@ -117,14 +118,14 @@ export default class LogEntryList extends React.PureComponent {
                     </div>
                 )}
                 <ul className={`event-log-list ${isFetching ? 'loading' : ''}`}>
-                    {Object.keys(entries).sort().reverse().map(date => (
+                    {[...entryIndex.entries()].map(([date, _entries]) => (
                         <LogDate key={date}
-                                 date={moment(date)} entries={entries[date]}
+                                 date={moment(date)} entries={_entries}
                                  setDetailedView={setDetailedView} />
                     ))}
                 </ul>
                 {!isFetching && <Paginator currentPage={currentPage} pages={pages} changePage={changePage} />}
-                <LogEntryModal />
+                <LogEntryModal entries={entries} />
             </>
         );
     }

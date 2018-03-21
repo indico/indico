@@ -21,6 +21,7 @@ import {setPage, fetchPosts, setDetailedView} from '../actions';
 
 const mapStateToProps = ({logs}) => ({
     entries: logs.entries,
+    entryIndex: logs.entryIndex,
     currentPage: logs.currentPage,
     pages: logs.pages,
     isFetching: logs.isFetching
@@ -31,8 +32,8 @@ const mapDispatchToProps = dispatch => ({
         dispatch(setPage(page));
         dispatch(fetchPosts());
     },
-    setDetailedView: (entry) => {
-        dispatch(setDetailedView(entry));
+    setDetailedView: (entryIndex) => {
+        dispatch(setDetailedView(entryIndex));
     }
 });
 

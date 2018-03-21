@@ -20,7 +20,8 @@ import {combineReducers} from 'redux';
 
 
 const initialState = {
-    entries: {},
+    entries: [],
+    entryIndex: new Map(),
     keyword: null,
     currentPage: 1,
     isFetching: false,
@@ -32,8 +33,21 @@ const initialState = {
         reviewing: true
     },
     pages: [],
-    detailedView: null
+    currentViewIndex: null
 };
+
+function _buildDateIndex(entries) {
+    return entries.reduce((accum, entry, index) => {
+        const date = moment(entry.time).format('YYYYMMDD');
+        if (accum.has(date)) {
+            accum.get(date).push(entry);
+        } else {
+            accum.set(date, [entry]);
+        }
+        entry.index = index;
+        return accum;
+    }, new Map());
+}
 
 function logReducer(state = initialState, action) {
     switch (action.type) {
@@ -44,11 +58,11 @@ function logReducer(state = initialState, action) {
         case actions.SET_PAGE:
             return {...state, currentPage: action.currentPage};
         case actions.UPDATE_ENTRIES:
-            return {...state, entries: action.entries, pages: action.pages, isFetching: false};
+            return {...state, entries: action.entries, entryIndex: _buildDateIndex(action.entries), pages: action.pages, isFetching: false};
         case actions.FETCH_STARTED:
             return {...state, isFetching: true};
         case actions.SET_DETAILED_VIEW:
-            return {...state, detailedView: action.entry};
+            return {...state, currentViewIndex: action.currentViewIndex};
         default:
             return state;
     }

@@ -46,7 +46,6 @@ class RHEventLogs(RHManageEventBase):
 
 class RHEventLogsJSON(RHManageEventBase):
     def _process(self):
-        entries = defaultdict(list)
         page = int(request.args.get('page', 1))
         filters = request.args.getlist('filters')
         text = request.args.get('q')
@@ -73,8 +72,5 @@ class RHEventLogsJSON(RHManageEventBase):
             ).outerjoin(db.m.User)
 
         query = query.paginate(page, LOG_PAGE_SIZE)
-
-        for entry in query.items:
-            day = entry.logged_dt.date()
-            entries[day.isoformat()].append(dict(serialize_log_entry(entry), html=entry.render()))
+        entries = [dict(serialize_log_entry(entry), html=entry.render()) for entry in query.items]
         return jsonify(current_page=page, pages=list(query.iter_pages()), entries=entries)
