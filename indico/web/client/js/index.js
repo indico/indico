@@ -22,7 +22,6 @@ import './legacy/timetable.js';
 
 import '../styles/screen.scss';
 import '@babel/polyfill';
-import 'url-polyfill';
 
 // outdatedbrowser has to be loaded with exports-loader
 // in order to be available from 'window.outdatedBrowser'

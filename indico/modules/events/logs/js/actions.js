@@ -15,13 +15,14 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import fetch from 'cross-fetch';
+import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 
 export const SET_KEYWORD = 'SET_KEYWORD';
 export const SET_FILTER = 'SET_FILTER';
 export const SET_PAGE = 'SET_PAGE';
 export const UPDATE_ENTRIES = 'UPDATE_ENTRIES';
 export const FETCH_STARTED = 'FETCH_STARTED';
+export const FETCH_FAILED = 'FETCH_FAILED';
 export const SET_DETAILED_VIEW = 'SET_DETAILED_VIEW';
 export const VIEW_PREV_ENTY = 'VIEW_PREV_ENTRY';
 export const VIEW_NEXT_ENTY = 'VIEW_NEXT_ENTRY';
@@ -93,6 +94,10 @@ export function fetchStarted() {
     return {type: FETCH_STARTED};
 }
 
+export function fetchFailed() {
+    return {type: FETCH_FAILED};
+}
+
 export function fetchPosts() {
     return async (dispatch, getStore) => {
         dispatch(fetchStarted());
@@ -101,25 +106,30 @@ export function fetchPosts() {
             logs: {filters, keyword, currentPage},
             staticData: {fetchLogsUrl},
         } = getStore();
-        const options = {
-            method: 'GET',
-            credentials: 'same-origin', // use cookies for authentication
-        };
 
-        const url = new URL(fetchLogsUrl);
-        url.searchParams.append('page', currentPage);
+        const params = {
+            page: currentPage,
+            filters: [],
+        };
         if (keyword) {
-            url.searchParams.append('q', keyword);
+            params.q = keyword;
         }
 
-        Object.keys(filters).forEach((item) => {
-            if (filters[item]) {
-                url.searchParams.append('filters', item);
+        Object.entries(filters).forEach(([item, active]) => {
+            if (active) {
+                params.filters.push(item);
             }
         });
 
-        const data = await fetch(url, options);
-        const json = await data.json();
-        dispatch(updateEntries(json.entries, json.pages));
+        let response;
+        try {
+            response = await indicoAxios.get(fetchLogsUrl, {params});
+        } catch (error) {
+            handleAxiosError(error);
+            dispatch(fetchFailed());
+            return;
+        }
+        const {entries, pages} = response.data;
+        dispatch(updateEntries(entries, pages));
     };
 }

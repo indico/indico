@@ -85,7 +85,7 @@ rules:
   arrow-spacing: error
   comma-dangle:
     - error
-    - only-multiline  # or always-multiline? (== require dangling commas)
+    - only-multiline
   comma-spacing: error
   comma-style: error
   computed-property-spacing: error
