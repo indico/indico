@@ -42,7 +42,13 @@
     }
 
     .modal-dialog-content {
-        padding: 0px;
+        padding: 1em;
+    }
+
+    .modal-dialog-footer {
+        padding: 1em;
+        background-color: $light-gray;
+        border-top: 1px solid darken($light-gray, 5%);
     }
 }
 
