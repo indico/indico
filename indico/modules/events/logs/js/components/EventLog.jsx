@@ -23,9 +23,9 @@ import LogEntryList from '../containers/LogEntryList';
 
 export default function EventLog() {
     return (
-        <div>
+        <>
             <Toolbar />
             <LogEntryList />
-        </div>
+        </>
     );
 }
