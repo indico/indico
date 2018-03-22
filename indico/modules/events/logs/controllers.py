@@ -16,8 +16,6 @@
 
 from __future__ import unicode_literals
 
-from collections import defaultdict
-
 from flask import jsonify, request
 
 from indico.core.db import db
