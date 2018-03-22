@@ -25,7 +25,17 @@
 
 #event-log {
     position: relative;
-    min-height: 400px;
+    min-height: 650px;
+    display: flex;
+    flex-direction: column;
+
+    .toolbars {
+        display: flex;
+    }
+
+    .paginator {
+        display: flex;
+    }
 }
 
 .event-log-list-spinner {
@@ -38,6 +48,9 @@
 .event-log-list {
     padding: 0;
     list-style-type: none;
+    display: flex;
+    flex-direction: column;
+    flex: 1 0 0%;
 
     &.loading {
         background-color: #fff;
@@ -80,10 +93,33 @@
             margin-left: 1em;
         }
 
+        .flexrow {
+            display: flex;
+            flex: 0.7;
+        }
+
         .log-entry-description {
             cursor: pointer;
-            flex-grow: 3;
+            flex: 2 0 0%;
+            word-wrap: break-word;
             text-decoration: dotted underline $gray;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .log-entry-user {
+            flex: 1;
+            text-align: right;
+
+            .user-fullname {
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                width: 50%;
+                display: inline-block;
+                vertical-align: middle;
+            }
         }
 
         .log-icon {

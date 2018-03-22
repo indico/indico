@@ -16,31 +16,24 @@
  */
 
 import React from 'react';
-import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 
-import Filter from '../containers/Filter';
-import SearchBox from '../containers/SearchBox';
 
-
-class Toolbar extends React.Component {
+export default class TooltipIfTruncated extends React.Component {
     static propTypes = {
-        realms: PropTypes.object.isRequired,
+        children: PropTypes.any.isRequired
     };
 
+    mouseEnter(event) {
+        const element = event.target;
+        if (element.offsetWidth < element.scrollWidth && !element.getAttribute('title')) {
+            element.setAttribute('title', element.innerText);
+        }
+    }
+
     render() {
-        const {realms} = this.props;
-        return (
-            <div className="toolbars">
-                <Filter realms={realms} />
-                <SearchBox />
-            </div>
-        );
+        const {children} = this.props;
+        const child = React.Children.only(children);
+        return React.cloneElement(child, {onMouseEnter: (event) => this.mouseEnter(event)});
     }
 }
-
-const mapStateToProps = ({staticData}) => ({
-    realms: staticData.realms,
-});
-
-export default connect(mapStateToProps)(Toolbar);
