@@ -101,7 +101,6 @@
                 top: 1px;
             }
         }
-
     }
 }
 
@@ -120,5 +119,17 @@ table.log-modal-details {
 
     td.log-caption {
         width: 200px;
+    }
+
+    .diff {
+        ins {
+            background: $light-green;
+            text-decoration: none;
+        }
+
+        del {
+            background: $light-red;
+            text-decoration: none;
+        }
     }
 }
