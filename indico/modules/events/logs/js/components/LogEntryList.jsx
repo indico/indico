@@ -20,6 +20,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import Paginator from 'indico/react/components/Paginator';
+import TooltipIfTruncated from 'indico/react/components/TooltipIfTruncated';
 
 import LogEntryModal from '../containers/LogEntryModal';
 
@@ -53,16 +54,20 @@ class LogEntry extends React.PureComponent {
                         {entry.module}
                     </span>
                 </span>
-                <span className="log-entry-description"
-                      onClick={() => this.openDetails(entry.index)}>
-                    {entry.description}
-                </span>
-                <span>
+                <TooltipIfTruncated>
+                    <span className="log-entry-description"
+                          onClick={() => this.openDetails(entry.index)}>
+                        {entry.description}
+                    </span>
+                </TooltipIfTruncated>
+                <span className="log-entry-user">
                     {entry.userFullName ? (
-                        <span>
-                            <span className="text-superfluous">by </span>
-                            {entry.userFullName}
-                        </span>
+                        <TooltipIfTruncated>
+                            <span className="user-fullname">
+                                <span className="text-superfluous">by </span>
+                                {entry.userFullName}
+                            </span>
+                        </TooltipIfTruncated>
                     ) : ''}
                     <span className="text-superfluous"> at </span>
                     <time dateTime={entry.time}>
