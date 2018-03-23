@@ -19,7 +19,7 @@ import React from 'react';
 import ReactModal from 'react-modal';
 import PropTypes from 'prop-types';
 
-import Slot from 'indico/react/util/Slot';
+import {Slot} from 'indico/react/util';
 
 import './style/modal.scss';
 

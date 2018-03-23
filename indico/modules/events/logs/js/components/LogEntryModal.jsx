@@ -19,7 +19,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import {IButton, Modal} from 'indico/react/components';
-import Slot from 'indico/react/util/Slot';
+import {Slot} from 'indico/react/util';
 
 export default class LogEntryModal extends React.Component {
     static propTypes = {
