@@ -43,7 +43,7 @@ class LogEntry extends React.PureComponent {
     render() {
         const {entry} = this.props;
         return (
-            <li className={`log-realm-${entry.type[0]} log-kind-${entry.type[1]}`}>
+            <li className={`log-realm-${entry.realm} log-kind-${entry.kind}`}>
                 <span className="flexrow">
                     <span className="log-icon">
                         <i className="log-realm" />

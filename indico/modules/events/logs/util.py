@@ -167,7 +167,8 @@ def _diff_list(a, b):
 def serialize_log_entry(entry):
     return {
         'id': entry.id,
-        'type': [entry.realm.name, entry.kind.name],
+        'realm': entry.realm.name,
+        'kind': entry.kind.name,
         'module': entry.module,
         'description': entry.summary,
         'time': entry.logged_dt.astimezone(entry.event.tzinfo).isoformat(),
