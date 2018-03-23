@@ -19,6 +19,7 @@ import errno
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 from contextlib import contextmanager
@@ -142,6 +143,8 @@ def cli():
 def _common_build_options(allow_watch=True):
     def decorator(fn):
         fn = click.option('--dev', is_flag=True, default=False, help="Build in dev mode")(fn)
+        fn = click.option('--clean/--no-clean', default=None,
+                          help="Delete everything in dist. This is disabled by default for `--dev` builds.")(fn)
         fn = click.option('--url-root', default='/', metavar='PATH',
                           help='URL root from which the assets are loaded. '
                                'Defaults to / and should usually not be changed')(fn)
@@ -151,14 +154,23 @@ def _common_build_options(allow_watch=True):
     return decorator
 
 
+def _clean(webpack_build_config, plugin_dir=None):
+    dist_path = webpack_build_config['build']['distPath']
+    if os.path.exists(dist_path):
+        warn('deleting ' + os.path.relpath(dist_path, plugin_dir or os.curdir))
+        shutil.rmtree(dist_path)
+
+
 @cli.command('indico', short_help='Builds assets of Indico.')
 @_common_build_options()
-def build_indico(dev, watch, url_root):
+def build_indico(dev, clean, watch, url_root):
     """Run webpack to build assets"""
     webpack_build_config_file = 'webpack-build-config.json'
     webpack_build_config = _get_webpack_build_config(url_root)
     with open(webpack_build_config_file, 'w') as f:
         json.dump(webpack_build_config, f, indent=2, sort_keys=True)
+    if clean or (clean is None and not dev):
+        _clean(webpack_build_config)
     args = _get_webpack_args(dev, watch)
     try:
         subprocess.check_call(['npx', 'webpack'] + args)
@@ -201,12 +213,14 @@ def _chdir(path):
 @click.argument('plugin_dir', type=click.Path(exists=True, file_okay=False, resolve_path=True),
                 callback=_validate_plugin_dir)
 @_common_build_options()
-def build_plugin(plugin_dir, dev, watch, url_root):
+def build_plugin(plugin_dir, dev, clean, watch, url_root):
     """Run webpack to build plugin assets"""
     webpack_build_config_file = os.path.join(plugin_dir, 'webpack-build-config.json')
     webpack_build_config = _get_plugin_webpack_build_config(plugin_dir, url_root)
     with open(webpack_build_config_file, 'w') as f:
         json.dump(webpack_build_config, f, indent=2, sort_keys=True)
+    if clean or (clean is None and not dev):
+        _clean(webpack_build_config, plugin_dir)
     webpack_config_file = os.path.join(plugin_dir, 'webpack.config.js')
     if not os.path.exists(webpack_config_file):
         webpack_config_file = 'plugin.webpack.config.js'
@@ -233,12 +247,13 @@ def build_plugin(plugin_dir, dev, watch, url_root):
 @click.argument('plugins_dir', type=click.Path(exists=True, file_okay=False, resolve_path=True))
 @_common_build_options(allow_watch=False)
 @click.pass_context
-def build_all_plugins(ctx, plugins_dir, dev, url_root):
+def build_all_plugins(ctx, plugins_dir, dev, clean, url_root):
     """Run webpack to build plugin assets"""
     plugins = sorted(d for d in os.listdir(plugins_dir) if _is_plugin_dir(os.path.join(plugins_dir, d)))
     for plugin in plugins:
         step('plugin: {}', plugin)
-        ctx.invoke(build_plugin, plugin_dir=os.path.join(plugins_dir, plugin), dev=dev, watch=False, url_root=url_root)
+        ctx.invoke(build_plugin, plugin_dir=os.path.join(plugins_dir, plugin), dev=dev, clean=clean, watch=False,
+                   url_root=url_root)
 
 
 if __name__ == '__main__':
