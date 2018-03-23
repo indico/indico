@@ -19,7 +19,7 @@ import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import {Paginator, TooltipIfTruncated} from 'indico/react/components';
+import {Paginator, TooltipIfTruncated, MessageBox} from 'indico/react/components';
 
 import LogEntryModal from '../containers/LogEntryModal';
 
@@ -114,14 +114,9 @@ export default class LogEntryList extends React.PureComponent {
 
     renderEmpty() {
         return (
-            <div className="info-message-box fixed-width">
-                <div className="message-box-content">
-                    <span className="icon" />
-                    <div className="message-text">
-                        No logs to show.
-                    </div>
-                </div>
-            </div>
+            <MessageBox type="info">
+                No logs to show
+            </MessageBox>
         );
     }
 
