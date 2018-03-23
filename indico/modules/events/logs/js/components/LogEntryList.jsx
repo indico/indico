@@ -40,6 +40,37 @@ class LogEntry extends React.PureComponent {
         setDetailedView(index);
     }
 
+    renderIcon(entry) {
+        if (entry.type === 'email') {
+            let props = {};
+            switch (entry.payload.state) {
+                case 'pending':
+                    props = {
+                        'className': 'icon-alarm semantic-text warning',
+                        'title': 'This email is pending and will be sent soon.',
+                        'data-qtip-style': 'warning'
+                    };
+                    break;
+                case 'sent':
+                    props = {
+                        'className': 'icon-mail semantic-text success',
+                        'title': 'This email has been sent.',
+                        'data-qtip-style': 'success'
+                    };
+                    break;
+                case 'failed':
+                    props = {
+                        'className': 'icon-warning semantic-text error',
+                        'title': 'Sending this email failed.',
+                        'data-qtip-style': 'danger'
+                    };
+                    break;
+            }
+
+            return <span {...props} />;
+        }
+    }
+
     render() {
         const {entry} = this.props;
         return (
@@ -52,6 +83,9 @@ class LogEntry extends React.PureComponent {
                     <span className="bold">
                         {entry.module}
                     </span>
+                </span>
+                <span className="mail-status-icon">
+                    {this.renderIcon(entry)}
                 </span>
                 <TooltipIfTruncated>
                     <span className="log-entry-description"
