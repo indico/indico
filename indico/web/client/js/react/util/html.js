@@ -15,5 +15,8 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-export {default as Slot} from './Slot';
-export {toClasses} from './html';
+export function toClasses(obj) {
+    return Object.entries(obj).map(
+        ([k, v]) => (v ? ` ${k}` : '')
+    ).join('').trim();
+}
