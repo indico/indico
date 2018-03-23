@@ -19,22 +19,27 @@ import React from 'react';
 import ReactModal from 'react-modal';
 import PropTypes from 'prop-types';
 
-import {Slot} from 'indico/react/util';
+import {Slot, toClasses} from 'indico/react/util';
 
 import './style/modal.scss';
 
 
 export default class Modal extends React.Component {
     static propTypes = {
-        title: PropTypes.string.isRequired,
+        title: PropTypes.string,
         children: PropTypes.node.isRequired,
         onClose: PropTypes.func,
         contentLabel: PropTypes.string,
+        header: PropTypes.bool,
+        fixedFooter: PropTypes.bool
     };
 
     static defaultProps = {
+        title: '',
         onClose: () => {},
-        contentLabel: 'Indico Modal Dialog'
+        contentLabel: 'Indico Modal Dialog',
+        header: true,
+        fixedFooter: false
     };
 
     constructor(props) {
@@ -61,13 +66,20 @@ export default class Modal extends React.Component {
     }
 
     render() {
-        const {title, children, contentLabel} = this.props;
+        const {header, title, children, contentLabel, fixedFooter} = this.props;
         const {isOpen} = this.state;
         const {content, footer} = Slot.split(children);
 
+        const classes = {
+            'modal-dialog': true,
+            'modal-with-footer': !!footer && !fixedFooter,
+            'modal-with-fixed-footer': fixedFooter,
+            'modal-with-header': header
+        };
+
         return (
             <ReactModal appElement={document.body}
-                        className="modal-dialog"
+                        className={toClasses(classes)}
                         overlayClassName="modal-overlay"
                         bodyOpenClassName="modal-overlay-open"
                         isOpen={isOpen}
@@ -75,19 +87,23 @@ export default class Modal extends React.Component {
                         shouldCloseOnOverlayClick
                         onRequestClose={this.close}
                         contentLabel={contentLabel}>
-                <div className="modal-dialog-header flexrow f-j-space-between">
-                    <h2 className="modal-dialog-title">{title}</h2>
-                    <a className="i-button text-color borderless icon-cross"
-                       onClick={this.close} />
-                </div>
-                <div className="modal-dialog-content">
-                    {content}
-                </div>
-                {footer && (
-                    <div className="modal-dialog-footer">
-                        {footer}
+                {header && (
+                    <div className="modal-dialog-header flexrow f-j-space-between">
+                        {title && <h2 className="modal-dialog-title">{title}</h2>}
+                        <a className="i-button text-color borderless icon-cross"
+                           onClick={this.close} />
                     </div>
                 )}
+                <div className="modal-overflow-container">
+                    <div className="modal-dialog-content">
+                        {content}
+                    </div>
+                    {footer && (
+                        <div className="modal-dialog-footer">
+                            {footer}
+                        </div>
+                    )}
+                </div>
             </ReactModal>
         );
     }
