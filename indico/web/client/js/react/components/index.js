@@ -16,6 +16,7 @@
  */
 
 export {default as IButton} from './IButton';
+export {default as MessageBox} from './MessageBox';
 export {default as Modal} from './Modal';
 export {default as Paginator} from './Paginator';
 export {default as TooltipIfTruncated} from './TooltipIfTruncated';
