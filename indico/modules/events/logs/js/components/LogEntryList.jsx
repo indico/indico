@@ -115,7 +115,7 @@ export default class LogEntryList extends React.PureComponent {
 
     render() {
         const {entries, entryIndex, pages, currentPage, changePage, isFetching, setDetailedView} = this.props;
-        return (
+        const eventLogList = (
             <>
                 {isFetching && (
                     <div className="event-log-list-spinner">
@@ -125,12 +125,27 @@ export default class LogEntryList extends React.PureComponent {
                 <ul className={`event-log-list ${isFetching ? 'loading' : ''}`}>
                     {[...entryIndex.entries()].map(([date, _entries]) => (
                         <LogDate key={date}
-                                 date={moment(date)} entries={_entries}
-                                 setDetailedView={setDetailedView} />
+                                date={moment(date)} entries={_entries}
+                                setDetailedView={setDetailedView} />
                     ))}
                 </ul>
                 {!isFetching && <Paginator currentPage={currentPage} pages={pages} changePage={changePage} />}
                 <LogEntryModal entries={entries} />
+            </>
+        );
+        return (
+            <>
+                {entries.length !== 0 && eventLogList}
+                {entries.length === 0 && (
+                    <div className="info-message-box fixed-width">
+                        <div className="message-box-content">
+                            <span className="icon" />
+                            <div className="message-text">
+                                No logs to show.
+                            </div>
+                        </div>
+                    </div>
+                )}
             </>
         );
     }
