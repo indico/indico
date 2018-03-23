@@ -82,7 +82,8 @@ export default class LogEntryModal extends React.Component {
                        this.modal = ref;
                    }}
                    onClose={this.onClose}
-                   contentLabel="Details about log entry">
+                   contentLabel="Details about log entry"
+                   fixedFooter>
                 <Slot>
                     <table className="i-table log-modal-details" dangerouslySetInnerHTML={{__html: html}} />
                     <div className="text-superfluous log-modal-author-info flexrow f-j-end">
@@ -94,11 +95,11 @@ export default class LogEntryModal extends React.Component {
                     </div>
                 </Slot>
                 <Slot name="footer">
-                    <div className="group">
-                        <IButton title="Previous" onClick={this.prevEntry}>
+                    <div className="group flexrow f-j-space-between">
+                        <IButton title="Previous" icon="prev" onClick={this.prevEntry}>
                             Previous
                         </IButton>
-                        <IButton title="Next" onClick={this.nextEntry}>
+                        <IButton title="Next" classes={{next: true}} highlight onClick={this.nextEntry}>
                             Next
                         </IButton>
                     </div>
