@@ -24,8 +24,8 @@ export const UPDATE_ENTRIES = 'UPDATE_ENTRIES';
 export const FETCH_STARTED = 'FETCH_STARTED';
 export const FETCH_FAILED = 'FETCH_FAILED';
 export const SET_DETAILED_VIEW = 'SET_DETAILED_VIEW';
-export const VIEW_PREV_ENTY = 'VIEW_PREV_ENTRY';
-export const VIEW_NEXT_ENTY = 'VIEW_NEXT_ENTRY';
+export const VIEW_PREV_ENTRY = 'VIEW_PREV_ENTRY';
+export const VIEW_NEXT_ENTRY = 'VIEW_NEXT_ENTRY';
 
 
 export function setKeyword(keyword) {
