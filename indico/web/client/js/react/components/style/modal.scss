@@ -17,23 +17,63 @@
 
 @import 'base/palette';
 
+$max-modal-height: 70vh;
+$modal-header-height: 60px;
+$modal-footer-height: 60px;
+
 .modal-dialog {
-    position: absolute;
+    position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     background: #fff;
-    overflow: auto;
     outline: none;
     padding: 0;
     width: 80%;
+    max-width: 900px;
+    max-height: $max-modal-height;
 
-    .modal-dialog-header {
-        width: 100%;
+    .modal-overflow-container {
+        overflow-y: auto;
+    }
+
+    .modal-dialog-content {
+        box-sizing: border-box;
+        padding: 1em;
+        max-height: 100%;
+    }
+
+    &.modal-with-header {
+        .modal-overflow-container {
+            max-height: calc(#{$max-modal-height} - #{$modal-header-height});
+        }
+
+        .modal-dialog-header {
+            box-sizing: border-box;
+            background-color: $light-gray;
+            border-bottom: 1px solid darken($light-gray, 5%);
+            padding: 1em;
+            height: $modal-header-height;
+            width: 100%;
+
+            a.icon-cross {
+                margin-left: auto;
+            }
+
+            h2.modal-dialog-title {
+                margin: 0;
+                font-weight: normal;
+            }
+        }
+    }
+
+    %modal-dialog-footer {
         box-sizing: border-box;
         background-color: $light-gray;
-        border-bottom: 1px solid $pastel-gray;
+        border-top: 1px solid darken($light-gray, 5%);
         padding: 1em;
+        height: $modal-footer-height;
+        width: 100%;
 
         h2.modal-dialog-title {
             margin: 0;
@@ -41,14 +81,48 @@
         }
     }
 
-    .modal-dialog-content {
-        padding: 1em;
+    &.modal-with-footer {
+        .modal-overflow-container {
+            max-height: calc(#{$max-modal-height} - #{$modal-footer-height});
+        }
+
+        .modal-dialog-footer {
+            @extend %modal-dialog-footer;
+        }
     }
 
-    .modal-dialog-footer {
-        padding: 1em;
-        background-color: $light-gray;
-        border-top: 1px solid darken($light-gray, 5%);
+    &.modal-with-fixed-footer {
+        position: fixed;
+        height: $max-modal-height;
+
+        .modal-overflow-container {
+            max-height: none;
+            overflow-y: visible;
+        }
+
+        .modal-dialog-content {
+            position: absolute;
+            overflow-y: auto;
+            height: calc(100% - #{$modal-footer-height});
+        }
+
+        .modal-dialog-footer {
+            @extend %modal-dialog-footer;
+            position: absolute;
+            bottom: 0;
+        }
+    }
+
+    &.modal-with-header.modal-with-footer {
+        .modal-overflow-container {
+            max-height: calc(#{$max-modal-height} - #{$modal-header-height} - #{$modal-footer-height});
+        }
+    }
+
+    &.modal-with-header.modal-with-fixed-footer {
+        .modal-dialog-content {
+            max-height: calc(#{$max-modal-height} - #{$modal-header-height} - #{$modal-footer-height});
+        }
     }
 }
 
