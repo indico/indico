@@ -74,16 +74,41 @@
     list-style-type: none;
     color: $black;
 
-    li.log-realm-emails span.log-icon i.log-realm { @include icon-before('icon-mail'); }
-    li.log-realm-event span.log-icon i.log-realm { @include icon-before('icon-time'); }
-    li.log-realm-reviewing span.log-icon i.log-realm { @include icon-before('icon-user-reading'); }
-    li.log-realm-participants span.log-icon i.log-realm { @include icon-before('icon-users'); }
-    li.log-realm-management span.log-icon i.log-realm { @include icon-before('icon-medal'); }
+    li.log-realm-emails span.log-icon i.log-realm {
+        @include icon-before('icon-mail');
+    }
 
-    li.log-kind-positive span.log-icon i.log-kind { color: $green; }
-    li.log-kind-negative span.log-icon i.log-kind { color: $red; }
-    li.log-kind-change span.log-icon i.log-kind { color: $blue; }
-    li.log-kind-other span.log-icon i.log-kind { display: none; }
+    li.log-realm-event span.log-icon i.log-realm {
+        @include icon-before('icon-time');
+    }
+
+    li.log-realm-reviewing span.log-icon i.log-realm {
+        @include icon-before('icon-user-reading');
+    }
+
+    li.log-realm-participants span.log-icon i.log-realm {
+        @include icon-before('icon-users');
+    }
+
+    li.log-realm-management span.log-icon i.log-realm {
+        @include icon-before('icon-medal');
+    }
+
+    li.log-kind-positive span.log-icon i.log-kind {
+        color: $green;
+    }
+
+    li.log-kind-negative span.log-icon i.log-kind {
+        color: $red;
+    }
+
+    li.log-kind-change span.log-icon i.log-kind {
+        color: $blue;
+    }
+
+    li.log-kind-other span.log-icon i.log-kind {
+        display: none;
+    }
 
     > li {
         @extend %line-style;
@@ -100,6 +125,13 @@
         .flexrow {
             display: flex;
             flex: 0.7;
+        }
+
+        .mail-status-icon {
+            display: flex;
+            flex: 0.1;
+            align-items: center;
+            justify-content: center;
         }
 
         .log-entry-description {

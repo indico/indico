@@ -167,6 +167,7 @@ def _diff_list(a, b):
 def serialize_log_entry(entry):
     return {
         'id': entry.id,
+        'type': entry.type,
         'realm': entry.realm.name,
         'kind': entry.kind.name,
         'module': entry.module,
