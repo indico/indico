@@ -19,8 +19,7 @@ import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import Paginator from 'indico/react/components/Paginator';
-import TooltipIfTruncated from 'indico/react/components/TooltipIfTruncated';
+import {Paginator, TooltipIfTruncated} from 'indico/react/components';
 
 import LogEntryModal from '../containers/LogEntryModal';
 
