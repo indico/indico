@@ -7,7 +7,9 @@ graft indico/htdocs/
 graft indico/migrations/
 graft indico/translations/
 graft indico/legacy/webinterface/stylesheets/
-prune indico/htdocs/static/assets
+graft indico/web/static
+prune indico/web/client
+prune indico/htdocs
 
 global-exclude *.pyc __pycache__ .keep
 include indico/migrations/versions/.keep
