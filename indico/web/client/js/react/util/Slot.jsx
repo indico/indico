@@ -21,6 +21,7 @@ import PropTypes from 'prop-types';
 
 export default class Slot extends React.Component {
     static propTypes = {
+        // eslint-disable-next-line react/no-unused-prop-types
         name: PropTypes.string
     };
 
