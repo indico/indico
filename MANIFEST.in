@@ -6,6 +6,9 @@ graft indico/core/plugins/alembic/
 graft indico/htdocs/
 graft indico/migrations/
 graft indico/translations/
+graft indico/web/static
+prune indico/web/client
+prune indico/htdocs
 
 global-exclude *.pyc __pycache__ .keep
 include indico/migrations/versions/.keep

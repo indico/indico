@@ -63,20 +63,21 @@ def run(cmd, title, shell=False):
         fail('{} failed'.format(title), verbose_msg=exc.output)
 
 
-def setup_deps():
-    info('building deps')
+def build_assets():
+    info('building assets')
     try:
-        subprocess.check_output(['node', '--version'], stderr=subprocess.STDOUT)
-    except OSError as exc:
-        warn('could not run system node: {}', exc)
-        warn('falling back to nodeenv')
-        system_node = False
-    else:
-        system_node = True
-    try:
-        subprocess.check_output(['fab', 'setup_deps:system_node={}'.format(system_node)], stderr=subprocess.STDOUT)
+        subprocess.check_output(['./bin/maintenance/build-assets.py', 'indico', '--clean'], stderr=subprocess.STDOUT)
     except subprocess.CalledProcessError as exc:
-        fail('setup_deps failed', verbose_msg=exc.output)
+        fail('building assets failed', verbose_msg=exc.output)
+
+
+def build_assets_plugin(plugin_dir):
+    info('building assets')
+    try:
+        subprocess.check_output(['./bin/maintenance/build-assets.py', 'plugin', '--clean', plugin_dir],
+                                stderr=subprocess.STDOUT)
+    except subprocess.CalledProcessError as exc:
+        fail('building assets failed', verbose_msg=exc.output)
 
 
 def clean_build_dirs():
@@ -123,12 +124,6 @@ def git_is_clean_indico():
         rv = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
         if rv:
             return False, rv
-    rv = subprocess.check_output(['git', 'ls-files', '--others', '--ignored', '--exclude-standard', 'indico/htdocs'],
-                                 stderr=subprocess.STDOUT)
-    garbage_re = re.compile(r'^indico/htdocs/(css|sass|js)/lib')
-    garbage = [x for x in rv.splitlines() if not garbage_re.search(x)]
-    if garbage:
-        return False, '\n'.join(garbage)
     return True, None
 
 
@@ -186,7 +181,7 @@ def git_is_clean_plugin():
         return True, None
     rv = subprocess.check_output(['git', 'ls-files', '--others', '--ignored', '--exclude-standard'] + toplevel,
                                  stderr=subprocess.STDOUT)
-    garbage_re = re.compile(r'(\.(py[co]|mo)$)|/(__pycache__/)')
+    garbage_re = re.compile(r'(\.(py[co]|mo)$)|(/__pycache__/)|(^({})/static/dist/)'.format('|'.join(toplevel)))
     garbage = [x for x in rv.splitlines() if not garbage_re.search(x)]
     if garbage:
         return False, '\n'.join(garbage)
@@ -200,6 +195,16 @@ def patch_indico_version(add_version_suffix):
 
 def patch_plugin_version(add_version_suffix):
     return _patch_version(add_version_suffix, 'setup.py', r"^(\s+)version='([^']+)'(,?)$", r"\1version='\2{}'\3")
+
+
+@contextmanager
+def _chdir(path):
+    cwd = os.getcwd()
+    os.chdir(path)
+    try:
+        yield
+    finally:
+        os.chdir(cwd)
 
 
 @contextmanager
@@ -230,17 +235,17 @@ def _patch_version(add_version_suffix, file_name, search, replace):
 @click.pass_obj
 def cli(obj, target_dir):
     obj['target_dir'] = target_dir
+    os.chdir(os.path.join(os.path.dirname(__file__), '..', '..'))
 
 
 @cli.command('indico')
-@click.option('--no-deps', 'deps', is_flag=True, flag_value=False, default=True, help='skip setup_deps')
+@click.option('--no-assets', 'assets', is_flag=True, flag_value=False, default=True, help='skip building assets')
 @click.option('--add-version-suffix', is_flag=True, help='Add a local suffix (+yyyymmdd.hhmm.commit) to the version')
 @click.option('--ignore-unclean', is_flag=True, help='Ignore unclean working tree')
 @click.pass_obj
-def build_indico(obj, deps, add_version_suffix, ignore_unclean):
+def build_indico(obj, assets, add_version_suffix, ignore_unclean):
     """Builds the indico wheel."""
     target_dir = obj['target_dir']
-    os.chdir(os.path.join(os.path.dirname(__file__), '..', '..'))
     # check for unclean git status
     clean, output = git_is_clean_indico()
     if not clean and ignore_unclean:
@@ -253,10 +258,10 @@ def build_indico(obj, deps, add_version_suffix, ignore_unclean):
         warn('package contains unexpected files listed in git exclusions [ignored]')
     elif not clean:
         fail('package contains unexpected files listed in git exclusions', verbose_msg=output)
-    if deps:
-        setup_deps()
+    if assets:
+        build_assets()
     else:
-        warn('building deps disabled')
+        warn('building assets disabled')
     clean_build_dirs()
     with patch_indico_version(add_version_suffix):
         build_wheel(target_dir)
@@ -272,26 +277,32 @@ def _validate_plugin_dir(ctx, param, value):
 @cli.command('plugin', short_help='Builds a plugin wheel.')
 @click.argument('plugin_dir', type=click.Path(exists=True, file_okay=False, resolve_path=True),
                 callback=_validate_plugin_dir)
+@click.option('--no-assets', 'assets', is_flag=True, flag_value=False, default=True, help='skip building assets')
 @click.option('--add-version-suffix', is_flag=True, help='Add a local suffix (+yyyymmdd.hhmm.commit) to the version')
 @click.option('--ignore-unclean', is_flag=True, help='Ignore unclean working tree')
 @click.pass_obj
-def build_plugin(obj, plugin_dir, add_version_suffix, ignore_unclean):
+def build_plugin(obj, assets, plugin_dir, add_version_suffix, ignore_unclean):
     """Builds a plugin wheel.
 
     PLUGIN_DIR is the path to the folder containing the plugin's setup.py
     """
     target_dir = obj['target_dir']
-    os.chdir(plugin_dir)
-    clean, output = git_is_clean_plugin()
-    if not clean and ignore_unclean:
-        warn('working tree is not clean, but ignored')
-    elif not clean:
-        fail('working tree is not clean', verbose_msg=output)
-    compile_catalogs()
-    clean_build_dirs()
-    with patch_plugin_version(add_version_suffix):
-        build_wheel(target_dir)
-    clean_build_dirs()
+    with _chdir(plugin_dir):
+        clean, output = git_is_clean_plugin()
+        if not clean and ignore_unclean:
+            warn('working tree is not clean, but ignored')
+        elif not clean:
+            fail('working tree is not clean', verbose_msg=output)
+    if assets:
+        build_assets_plugin(plugin_dir)
+    else:
+        warn('building assets disabled')
+    with _chdir(plugin_dir):
+        compile_catalogs()
+        clean_build_dirs()
+        with patch_plugin_version(add_version_suffix):
+            build_wheel(target_dir)
+        clean_build_dirs()
 
 
 @cli.command('all-plugins', short_help='Builds all plugin wheels in a directory.')
