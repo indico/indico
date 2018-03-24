@@ -17,14 +17,13 @@
 
 import path from 'path';
 import glob from 'glob';
-
-import config from './webpack-build-config';
-import {getThemeEntryPoints, webpackDefaults, indicoStaticLoader, generateAssetPath} from './webpack';
-
 import merge from 'webpack-merge';
 import CopyWebpackPlugin from 'copy-webpack-plugin';
 import {minify} from 'uglify-js';
 import webpack from 'webpack';
+
+import {getThemeEntryPoints, webpackDefaults, indicoStaticLoader, generateAssetPath} from './webpack';
+import config from './webpack-build-config';
 
 
 let entryPoints = {

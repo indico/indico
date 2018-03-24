@@ -17,6 +17,7 @@
 
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 
+
 export const SET_KEYWORD = 'SET_KEYWORD';
 export const SET_FILTER = 'SET_FILTER';
 export const SET_PAGE = 'SET_PAGE';

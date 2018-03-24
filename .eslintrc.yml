@@ -15,6 +15,15 @@ parserOptions:
 plugins:
   - babel
   - react
+  - import
+
+settings:
+  # we don't use the webpack resolver because it is SLOW (~1s),
+  # but our custom resolver does the job just fine while still
+  # being fast.
+  import/resolver:
+    ./eslint-import-resolver:
+      extensions: [.js, .jsx, .json]
 
 rules:
   indent:
@@ -269,6 +278,29 @@ rules:
   react/self-closing-comp: error
   react/sort-comp: warn
   react/void-dom-elements-no-children: error
+  # rules from eslint-plugin-import
+  import/default: error
+  import/export: error
+  import/first: warn
+  import/named: error
+  import/namespace: error
+  import/newline-after-import:
+    - warn
+    - count: 2
+  import/no-absolute-path: error
+  import/no-amd: error
+  import/no-commonjs: error
+  import/no-duplicates: error
+  import/no-mutable-exports: error
+  import/no-named-as-default: error
+  import/no-named-as-default-member: error
+  import/no-named-default: error
+  import/no-unresolved: error
+  import/order:
+    - warn
+    - groups: [builtin, external, internal, [parent, sibling], index]
+  import/unambiguous: error
+
 
 globals:
   _: false

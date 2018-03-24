@@ -21,6 +21,7 @@ import PropTypes from 'prop-types';
 import {IButton, Modal} from 'indico/react/components';
 import {Slot} from 'indico/react/util';
 
+
 export default class LogEntryModal extends React.Component {
     static propTypes = {
         entries: PropTypes.array.isRequired,

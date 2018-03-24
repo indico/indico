@@ -15,8 +15,8 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import Filter from '../components/Filter';
 import {connect} from 'react-redux';
+import Filter from '../components/Filter';
 import {setFilter, fetchPosts, setPage} from '../actions';
 
 

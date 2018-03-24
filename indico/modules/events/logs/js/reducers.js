@@ -15,8 +15,8 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import * as actions from './actions';
 import {combineReducers} from 'redux';
+import * as actions from './actions';
 
 
 const initialState = {
