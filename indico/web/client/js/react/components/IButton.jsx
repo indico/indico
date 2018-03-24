@@ -20,6 +20,7 @@ import PropTypes from 'prop-types';
 
 import {toClasses} from 'indico/react/util';
 
+
 export default class IButton extends React.PureComponent {
     static propTypes = {
         classes: PropTypes.object,
@@ -70,6 +71,5 @@ export default class IButton extends React.PureComponent {
                 </button>
             );
         }
-
     }
 }

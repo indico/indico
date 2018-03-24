@@ -17,8 +17,8 @@
 
 import React from 'react';
 
-import Toolbar from './Toolbar';
 import LogEntryList from '../containers/LogEntryList';
+import Toolbar from './Toolbar';
 
 
 export default function EventLog() {

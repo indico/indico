@@ -19,16 +19,18 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import EventLog from './components/EventLog';
 import {createStore, applyMiddleware} from 'redux';
 import {Provider} from 'react-redux';
 import thunkMiddleware from 'redux-thunk';
 import loggerMiddleware from 'redux-logger';
 import {composeWithDevTools} from 'redux-devtools-extension';
+
 import reducer from './reducers';
+import EventLog from './components/EventLog';
 import {fetchPosts} from './actions';
 
 import '../style/logs.scss';
+
 
 window.addEventListener('load', () => {
     const rootElement = document.getElementById('event-log');

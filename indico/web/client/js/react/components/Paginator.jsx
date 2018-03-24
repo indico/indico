@@ -21,6 +21,7 @@ import IButton from "./IButton";
 
 import './style/paginator.scss';
 
+
 export default class Paginator extends React.Component {
     static propTypes = {
         currentPage: PropTypes.number.isRequired,

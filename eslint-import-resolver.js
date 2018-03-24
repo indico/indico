@@ -15,26 +15,23 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-import PropTypes from 'prop-types';
+/* eslint-disable import/no-commonjs, import/unambiguous */
+/* global module:false __dirname:false */
+
+const path = require('path');
+const nodeResolve = require('eslint-import-resolver-node').resolve;
 
 
-export default class SearchBox extends React.Component {
-    static propTypes = {
-        setKeyword: PropTypes.func.isRequired,
-    };
-
-    render() {
-        const {setKeyword} = this.props;
-        return (
-            <div className="toolbar">
-                <div className="group">
-                    <span className="i-button label">
-                        <span className="icon-search" />
-                    </span>
-                    <input type="text" onChange={(e) => setKeyword(e.target.value.trim())} />
-                </div>
-            </div>
-        );
+module.exports = {
+    interfaceVersion: 2,
+    resolve(source, file, config) {
+        const rv = nodeResolve(source, file, config);
+        if (rv.found) {
+            return rv;
+        } else if (source.startsWith('indico/')) {
+            const realPath = path.join(__dirname, 'indico/web/client/js', source.substr(7));
+            return nodeResolve(realPath, file);
+        }
+        return {found: false};
     }
-}
+};

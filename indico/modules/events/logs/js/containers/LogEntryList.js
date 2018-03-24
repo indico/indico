@@ -15,9 +15,10 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import LogEntryList from '../components/LogEntryList';
 import {connect} from 'react-redux';
+import LogEntryList from '../components/LogEntryList';
 import {setPage, fetchPosts, setDetailedView} from '../actions';
+
 
 const mapStateToProps = ({logs}) => ({
     entries: logs.entries,
