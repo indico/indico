@@ -33,6 +33,7 @@ const initialState = {
         reviewing: true
     },
     pages: [],
+    totalPageCount: 0,
     currentViewIndex: null
 };
 
@@ -63,6 +64,7 @@ function logReducer(state = initialState, action) {
                 entries: action.entries,
                 entryIndex: _buildDateIndex(action.entries),
                 pages: action.pages,
+                totalPageCount: action.totalPageCount,
                 isFetching: false,
             };
         case actions.FETCH_STARTED:

@@ -87,8 +87,8 @@ export function viewNextEntry() {
     };
 }
 
-export function updateEntries(entries, pages) {
-    return {type: UPDATE_ENTRIES, entries, pages};
+export function updateEntries(entries, pages, totalPageCount) {
+    return {type: UPDATE_ENTRIES, entries, pages, totalPageCount};
 }
 
 export function fetchStarted() {
@@ -130,7 +130,7 @@ export function fetchPosts() {
             dispatch(fetchFailed());
             return;
         }
-        const {entries, pages} = response.data;
-        dispatch(updateEntries(entries, pages));
+        const {entries, pages, total_page_count: totalPageCount} = response.data;
+        dispatch(updateEntries(entries, pages, totalPageCount));
     };
 }
