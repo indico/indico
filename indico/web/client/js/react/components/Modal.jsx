@@ -66,6 +66,7 @@ export default class Modal extends React.Component {
     }
 
     render() {
+        /* eslint-disable react/forbid-component-props */
         const {header, title, children, contentLabel, fixedFooter} = this.props;
         const {isOpen} = this.state;
         const {content, footer} = Slot.split(children);
