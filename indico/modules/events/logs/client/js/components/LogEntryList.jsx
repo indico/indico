@@ -154,15 +154,19 @@ export default class LogEntryList extends React.PureComponent {
         );
     }
 
+    renderSpinner() {
+        return (
+            <div className="event-log-list-spinner">
+                <div className="i-spinner" />
+            </div>
+        );
+    }
+
     renderList() {
         const {entries, entryIndex, pages, currentPage, changePage, isFetching, setDetailedView} = this.props;
         return (
             <>
-                {isFetching && (
-                    <div className="event-log-list-spinner">
-                        <div className="i-spinner" />
-                    </div>
-                )}
+                {isFetching && this.renderSpinner()}
                 <ul className={`event-log-list ${isFetching ? 'loading' : ''}`}>
                     {[...entryIndex.entries()].map(([date, _entries]) => (
                         <LogDate key={date}
@@ -177,7 +181,15 @@ export default class LogEntryList extends React.PureComponent {
     }
 
     render() {
-        const {entries} = this.props;
-        return entries.length ? this.renderList() : this.renderEmpty();
+        const {entries, isFetching} = this.props;
+        if (entries.length === 0) {
+            if (isFetching) {
+                return this.renderSpinner();
+            }
+
+            return this.renderEmpty();
+        } else {
+            return this.renderList();
+        }
     }
 }
