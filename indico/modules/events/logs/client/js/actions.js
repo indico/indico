@@ -78,8 +78,8 @@ export function viewNextEntry() {
                 // ERROR!
             } else {
                 await dispatch(setPage(currentPage + 1));
-                await dispatch(fetchPosts());
                 await dispatch(setDetailedView(0));
+                await dispatch(fetchPosts());
             }
         } else {
             dispatch({type: SET_DETAILED_VIEW, currentViewIndex: currentViewIndex + 1});
