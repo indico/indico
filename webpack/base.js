@@ -16,10 +16,10 @@
  */
 
 import {createHash} from 'crypto';
-import chalk from 'chalk';
 import fs from 'fs';
 import path from 'path';
 
+import chalk from 'chalk';
 import webpack from 'webpack';
 
 import ExtractTextPlugin from 'extract-text-webpack-plugin';
@@ -223,7 +223,7 @@ export function webpackDefaults(env, config) {
             modules: nodeModules
         },
         externals: (context, request, callback) => {
-            // tell webpack to make selectize use window.jQuery (and not load it again)
+            // tell webpack to make certain packages use window.jQuery (and not load it again)
             if (/^jquery$/.test(request) && /(selectize|fullcalendar)/.test(context)) {
                 return callback(null, 'jQuery');
             }
