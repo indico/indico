@@ -30,7 +30,7 @@ export default class Slot extends React.Component {
     };
 
     static split(children) {
-        if (children.every((e) => (React.isValidElement(e) && e.type.name === 'Slot'))) {
+        if (children.every((e) => (React.isValidElement(e) && e.type === Slot))) {
             const result = {};
             React.Children.forEach(children, (child) => {
                 result[child.props.name] = child.props.children;
