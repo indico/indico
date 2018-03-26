@@ -22,7 +22,9 @@ import {setDetailedView, viewPrevEntry, viewNextEntry} from '../actions';
 
 
 const mapStateToProps = ({logs}) => ({
-    currentViewIndex: logs.currentViewIndex
+    currentViewIndex: logs.currentViewIndex,
+    currentPage: logs.currentPage,
+    totalPageCount: logs.totalPageCount
 });
 
 const mapDispatchToProps = (dispatch) => ({

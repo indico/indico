@@ -54,9 +54,12 @@ export default class IButton extends React.PureComponent {
 
         const attrs = {
             title,
-            onClick,
             className: toClasses(finalClasses)
         };
+
+        if (!disabled) {
+            attrs['onClick'] = onClick;
+        }
 
         if (this.href) {
             return (

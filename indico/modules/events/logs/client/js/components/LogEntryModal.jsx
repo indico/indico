@@ -28,7 +28,9 @@ export default class LogEntryModal extends React.Component {
         currentViewIndex: PropTypes.number,
         setDetailedView: PropTypes.func.isRequired,
         prevEntry: PropTypes.func.isRequired,
-        nextEntry: PropTypes.func.isRequired
+        nextEntry: PropTypes.func.isRequired,
+        currentPage: PropTypes.number.isRequired,
+        totalPageCount: PropTypes.number.isRequired
     };
 
     static defaultProps = {
@@ -69,12 +71,23 @@ export default class LogEntryModal extends React.Component {
         nextEntry();
     }
 
+    _isFirstEntry() {
+        const {currentPage, currentViewIndex} = this.props;
+        return currentPage === 1 && currentViewIndex === 0;
+    }
+
+    _isLastEntry() {
+        const {currentPage, totalPageCount, currentViewIndex, entries} = this.props;
+        return currentPage === totalPageCount && currentViewIndex === entries.length - 1;
+    }
+
     render() {
         const {currentViewIndex, entries} = this.props;
 
         if (currentViewIndex === null) {
             return '';
         }
+
         const {description, html, userFullName, time} = entries[currentViewIndex];
 
         return (
@@ -97,10 +110,11 @@ export default class LogEntryModal extends React.Component {
                 </Slot>
                 <Slot name="footer">
                     <div className="group flexrow f-j-space-between">
-                        <IButton title="Previous" icon="prev" onClick={this.prevEntry}>
+                        <IButton title="Previous" icon="prev" onClick={this.prevEntry} disabled={this._isFirstEntry()}>
                             Previous
                         </IButton>
-                        <IButton title="Next" classes={{next: true}} highlight onClick={this.nextEntry}>
+                        <IButton title="Next" classes={{next: true}} highlight onClick={this.nextEntry}
+                                 disabled={this._isLastEntry()}>
                             Next
                         </IButton>
                     </div>
