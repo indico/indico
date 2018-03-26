@@ -16,7 +16,6 @@
  */
 
 import './compat/jquery-ui';
-import './contrib/jquery-extra-selectors';
 
 import 'jquery-colorbox';
 import 'jquery-colorbox/example1/colorbox.css';

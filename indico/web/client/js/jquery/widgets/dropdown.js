@@ -76,7 +76,7 @@
                 var $this = $(this);
                 if (!$this.attr('href') || $this.attr('href') === "#" || $this.data('ignore-href') !== undefined ||
                         self.options.always_listen) {
-                    $this.click(function(e) {
+                    $this.on('click', function(e) {
                         if ($this.data('toggle') === 'dropdown') {
                             if ($this.data('on')) {
                                 self._close($this);
@@ -100,7 +100,7 @@
                 var $this = $(this);
                 if (!$this.attr('href') || $this.attr('href') === "#" || $this.data('ignore-href') !== undefined ||
                         self.options.always_listen) {
-                    $this.click(function(e) {
+                    $this.on('click', function(e) {
                         e.preventDefault();
                         if ($this.hasClass('disabled')) {
                             return;

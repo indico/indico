@@ -44,7 +44,7 @@
 
         var updateCount = _.debounce(function(force) {
             var $cloneButton = $('.clone-action-button');
-            var serializedForm = $form.serialize();
+            var serializedForm = $.param($form.serializeArray(), true);
 
             // make sure the form was actually changed
             if (!force && serializedForm === $form.data('initialData')) {
