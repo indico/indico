@@ -47,7 +47,7 @@ glob.sync(path.join(config.build.rootPath, 'modules/**/module.json')).forEach((f
     const module = Object.assign({produceBundle: true, partials: {}}, require(file));
     // eslint-disable-next-line prefer-template
     const moduleName = 'module_' + (module.parent ? (module.parent + '.') : '') + module.name;
-    const dirName = path.join(path.dirname(file), 'js');
+    const dirName = path.join(path.dirname(file), 'client/js');
 
     if (module.produceBundle) {
         entryPoints[moduleName] = [dirName];
