@@ -150,7 +150,7 @@
             $this.data('initialized', true);
 
             function _resetData() {
-                $this.data('initialData', $this.serialize());
+                $this.data('initialData', $.param($this.serializeArray(), true));
                 $this.data('fieldsChanged', false);
             }
             _resetData();
@@ -161,7 +161,7 @@
             });
         }).on('change input', function() {
             var $this = $(this);
-            var untouched = $this.serialize() === $this.data('initialData');
+            var untouched = $.param($this.serializeArray(), true) === $this.data('initialData');
             var $cornerMessage = $('.save-corner-message');
             $this.find('[data-disabled-until-change]').prop('disabled', untouched);
             $this.closest('form').data('fieldsChanged', !untouched);
@@ -180,7 +180,7 @@
             var $form = forms.find('[data-save-reminder]').closest('form');
             if ($form.length) {
                 var $cornerMessage = $('.save-corner-message');
-                var untouched = $form.serialize() === $form.data('initialData');
+                var untouched = $.param($form.serializeArray(), true) === $form.data('initialData');
                 if (isElementInView($form.find('[data-save-reminder]'))) {
                     hideSaveCornerMessage($cornerMessage);
                 } else if (!untouched && !$cornerMessage.length) {

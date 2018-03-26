@@ -157,7 +157,7 @@
         }
 
         if (!$('html').data('static-site')) {
-            var qs = $.param(qsParams);
+            var qs = $.param(qsParams, true);
             if (qs) {
                 url += (~url.indexOf('?') ? '&' : '?') + qs;
             }
