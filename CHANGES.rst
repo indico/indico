@@ -71,6 +71,7 @@ Bugfixes
 ^^^^^^^^
 
 - Fix selecting a person's title in a different language than English
+- Fix display issue in "now happening" (:issue:`3278`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
