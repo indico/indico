@@ -29,6 +29,7 @@ class WPManageSessions(WPEventManagement):
 class WPDisplaySession(WPConferenceDisplayBase):
     template_prefix = 'events/sessions/'
     menu_entry_name = 'timetable'
+    bundles = ('module_events.sessions.js',)
 
 
 class WPDisplayMySessionsConference(WPDisplaySession):

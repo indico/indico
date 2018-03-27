@@ -171,7 +171,7 @@
             $('#' + $(this).data('show')).show();
         }).trigger('click');
 
-        setupSessionList({
+        setupSessionsList({
             createSessionTypeURL: {{ url_for('sessions.create_type', event) | tojson }}
         });
     </script>
