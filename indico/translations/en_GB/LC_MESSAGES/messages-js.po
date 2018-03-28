@@ -1008,22 +1008,22 @@ msgstr ""
 
 #: indico/htdocs/js/indico/Core/Dialogs/Users.js:864
 #: indico/htdocs/js/indico/Core/Dialogs/Users.js:928
-msgid "Mr."
+msgid "Mr"
 msgstr ""
 
 #: indico/htdocs/js/indico/Core/Dialogs/Users.js:864
 #: indico/htdocs/js/indico/Core/Dialogs/Users.js:928
-msgid "Mrs."
+msgid "Mrs"
 msgstr ""
 
 #: indico/htdocs/js/indico/Core/Dialogs/Users.js:864
 #: indico/htdocs/js/indico/Core/Dialogs/Users.js:928
-msgid "Ms."
+msgid "Ms"
 msgstr ""
 
 #: indico/htdocs/js/indico/Core/Dialogs/Users.js:864
 #: indico/htdocs/js/indico/Core/Dialogs/Users.js:928
-msgid "Dr."
+msgid "Dr"
 msgstr ""
 
 #: indico/htdocs/js/indico/Core/Dialogs/Users.js:864
