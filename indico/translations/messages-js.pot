@@ -203,19 +203,19 @@ msgid "Title"
 msgstr ""
 
 #: indico/htdocs/js/indico/Core/Dialogs/Users.js:861
-msgid "Mr."
+msgid "Mr"
 msgstr ""
 
 #: indico/htdocs/js/indico/Core/Dialogs/Users.js:861
-msgid "Mrs."
+msgid "Mrs"
 msgstr ""
 
 #: indico/htdocs/js/indico/Core/Dialogs/Users.js:861
-msgid "Ms."
+msgid "Ms"
 msgstr ""
 
 #: indico/htdocs/js/indico/Core/Dialogs/Users.js:861
-msgid "Dr."
+msgid "Dr"
 msgstr ""
 
 #: indico/htdocs/js/indico/Core/Dialogs/Users.js:861
