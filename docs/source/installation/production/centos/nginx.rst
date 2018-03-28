@@ -147,8 +147,13 @@ most cases.
         access_log off;
       }
 
-      location ~ ^/(css|images|js|static(?!/plugins|/assets|/themes|/custom))(/.*)$ {
-        alias /opt/indico/web/htdocs/$1$2;
+      location ~ ^/(images|fonts)(.*)/(.+?)(__v[0-9a-f]+)?\.([^.]+)$ {
+        alias /opt/indico/web/static/$1$2/$3.$5;
+        access_log off;
+      }
+
+      location ~ ^/(css|dist|images|fonts)/(.*)$ {
+        alias /opt/indico/web/static/$1/$2;
         access_log off;
       }
 
