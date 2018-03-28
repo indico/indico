@@ -151,7 +151,8 @@ You will need two shells running in parallel. The first one will run the webpack
 the JavaScript and style assets every time you change them:
 
 .. code-block:: shell
-    indico webpack watch
+
+    ./bin/maintenance/build-assets.py indico --dev --watch
 
 On the second one we'll run the Indico Development server:
 
@@ -160,6 +161,20 @@ On the second one we'll run the Indico Development server:
     indico run -h <your-hostname> -q --enable-evalex
 
 Double-check that your hostname matches that which has been set in the config file (by the wizard).
+
+It is also worth mentioning that when working on a plugin, it is necessary to run another webpack watcher
+to build the plugin assets. That can be accomplished using the same command as above with an argument specifying
+which plugin you want to build the assets for:
+
+.. code-block:: shell
+
+    ./bin/maintenance/build-assets.py <plugin-name> --dev --watch
+
+You can also build the assets for all the plugins:
+
+.. code-block:: shell
+
+    ./bin/maintenance/build-assets.py all-plugins --dev <plugins-directory>
 
 
 Installing TeXLive (optional)
@@ -257,8 +272,12 @@ Here is an example of a ``nginx.conf`` you can use. It assumes your username is 
                 alias /home/jdoe/dev/indico/data/assets/$1/$2;
             }
 
-            location ~ ^/(css|images|js|static(?!/plugins|/assets|/themes|/custom))(/.*)$ {
-                alias /home/jdoe/dev/indico/src/indico/htdocs/$1$2;
+            location ~ ^/(images|fonts)(.*)/(.+?)(__v[0-9a-f]+)?\.([^.]+)$ {
+                alias /home/jdoe/dev/indico/src/indico/web/static/$1$2/$3.$5;
+            }
+
+            location ~ ^/(css|dist|images|fonts)/(.*)$ {
+                alias /home/jdoe/dev/indico/src/indico/web/static/$1/$2;
             }
 
             location / {
