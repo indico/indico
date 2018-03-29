@@ -132,7 +132,7 @@ class RegistrationCloner(EventCloner):
                     with old_registration_data.open() as fd:
                         new_registration_data.save(fd)
             db.session.flush()
-            signals.event.registration_state_updated.send(new_registration)
+            signals.event.registration_state_updated.send(new_registration, previous_state=None)
 
     def _synchronize_registration_friendly_id(self, new_event):
         new_event._last_friendly_registration_id = (
