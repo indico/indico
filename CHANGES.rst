@@ -67,6 +67,7 @@ Improvements
   registration fee (:issue:`3260`)
 - Use proper British English for person titles (:issue:`3279`)
 - Add event keywords in meta tags (:issue:`3262`, thanks :user:`bpedersen2`)
+- Improve sorting by date fields in the registrant list
 
 Bugfixes
 ^^^^^^^^

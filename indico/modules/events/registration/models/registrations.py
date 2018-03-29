@@ -551,7 +551,11 @@ class RegistrationData(StoredFileMixin, db.Model):
 
     @property
     def friendly_data(self):
-        return self.get_friendly_data(for_humans=False)
+        return self.get_friendly_data()
+
+    @property
+    def search_data(self):
+        return self.get_friendly_data(for_search=True)
 
     def get_friendly_data(self, **kwargs):
         return self.field_data.field.get_friendly_data(self, **kwargs)
