@@ -31,7 +31,7 @@ from indico.modules.events.persons.util import get_event_person
 from indico.modules.events.util import serialize_person_link
 from indico.modules.users.models.users import UserTitle
 from indico.modules.users.util import get_user_by_email
-from indico.util.i18n import _
+from indico.util.i18n import _, orig_string
 from indico.web.forms.fields import MultipleItemsField, PrincipalListField
 from indico.web.forms.widgets import JinjaWidget
 
@@ -151,7 +151,8 @@ class PersonLinkListFieldBase(EventPersonListField):
     def _get_person_link(self, data, extra_data=None):
         extra_data = extra_data or {}
         person = get_event_person(self.event, data, create_untrusted_persons=self.create_untrusted_persons)
-        person_data = {'title': next((x.value for x in UserTitle if data.get('title') == x.title), UserTitle.none),
+        person_data = {'title': next((x.value for x in UserTitle if data.get('title') == orig_string(x.title)),
+                                     UserTitle.none),
                        'first_name': data.get('firstName', ''), 'last_name': data['familyName'],
                        'affiliation': data.get('affiliation', ''), 'address': data.get('address', ''),
                        'phone': data.get('phone', ''), 'display_order': data['displayOrder']}

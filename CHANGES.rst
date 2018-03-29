@@ -66,6 +66,11 @@ Improvements
 - Show a nicer error message when entering an excessively high base
   registration fee (:issue:`3260`)
 
+Bugfixes
+^^^^^^^^
+
+- Fix selecting a person's title in a different language than English
+
 Internal Changes
 ^^^^^^^^^^^^^^^^
 
