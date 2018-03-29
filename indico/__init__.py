@@ -17,7 +17,7 @@
 from indico.util.mimetypes import register_custom_mimetypes
 
 
-__version__ = '2.1a3'
+__version__ = '2.1b1'
 
 register_custom_mimetypes()
 
