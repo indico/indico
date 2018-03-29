@@ -65,6 +65,7 @@ Improvements
   reviewing
 - Show a nicer error message when entering an excessively high base
   registration fee (:issue:`3260`)
+- Use proper British English for person titles (:issue:`3279`)
 
 Bugfixes
 ^^^^^^^^
