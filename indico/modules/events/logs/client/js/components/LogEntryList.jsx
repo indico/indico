@@ -46,7 +46,7 @@ class LogEntry extends React.PureComponent {
             switch (entry.payload.state) {
                 case 'pending':
                     props = {
-                        'className': 'icon-alarm semantic-text warning',
+                        'className': 'icon-mail semantic-text warning',
                         'title': 'This email is pending and will be sent soon.',
                         'data-qtip-style': 'warning'
                     };
@@ -60,7 +60,7 @@ class LogEntry extends React.PureComponent {
                     break;
                 case 'failed':
                     props = {
-                        'className': 'icon-warning semantic-text error',
+                        'className': 'icon-mail semantic-text error',
                         'title': 'Sending this email failed.',
                         'data-qtip-style': 'danger'
                     };
