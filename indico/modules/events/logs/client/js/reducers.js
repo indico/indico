@@ -21,7 +21,6 @@ import * as actions from './actions';
 
 const initialState = {
     entries: [],
-    entryIndex: new Map(),
     keyword: null,
     currentPage: 1,
     isFetching: false,
@@ -37,19 +36,6 @@ const initialState = {
     currentViewIndex: null
 };
 
-function _buildDateIndex(entries) {
-    return entries.reduce((accum, entry, index) => {
-        const date = moment(entry.time).format('YYYYMMDD');
-        if (accum.has(date)) {
-            accum.get(date).push(entry);
-        } else {
-            accum.set(date, [entry]);
-        }
-        entry.index = index;
-        return accum;
-    }, new Map());
-}
-
 function logReducer(state = initialState, action) {
     switch (action.type) {
         case actions.SET_KEYWORD:
@@ -62,7 +48,6 @@ function logReducer(state = initialState, action) {
             return {
                 ...state,
                 entries: action.entries,
-                entryIndex: _buildDateIndex(action.entries),
                 pages: action.pages,
                 totalPageCount: action.totalPageCount,
                 isFetching: false,

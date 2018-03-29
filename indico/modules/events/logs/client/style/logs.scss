@@ -15,7 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-@import 'base/utilities';
+@import 'base';
 
 %line-style {
     line-height: 2em;
@@ -23,9 +23,8 @@
     margin: 0;
 }
 
-#event-log {
+.event-log {
     position: relative;
-    min-height: 650px;
     display: flex;
     flex-direction: column;
 
@@ -35,6 +34,10 @@
 
     .paginator {
         display: flex;
+
+        .i-button {
+            line-height: normal;
+        }
     }
 
     .info-message-box {
@@ -46,15 +49,15 @@
     position: absolute;
     font-size: 5em;
     left: 45%;
-    top: 45%;
+    top: 250px;
 }
 
 .event-log-list {
-    padding: 0;
-    list-style-type: none;
     display: flex;
     flex-direction: column;
-    flex: 1 0 0%;
+    padding: 0;
+    list-style-type: none;
+    color: $black;
 
     &.loading {
         background-color: #fff;
@@ -62,76 +65,74 @@
         pointer-events: none;
     }
 
-    > li h3.event-log-day-header {
-        @extend %line-style;
-        margin-top: 0.5em;
-        border-bottom: 1px solid $pastel-gray;
-    }
-}
-
-.event-log-entry-list {
-    padding: 0;
-    list-style-type: none;
-    color: $black;
-
-    li.log-realm-emails span.log-icon i.log-realm {
+    li.log-realm-emails span.log-module span.log-icon i.log-realm {
         @include icon-before('icon-mail');
     }
 
-    li.log-realm-event span.log-icon i.log-realm {
+    li.log-realm-event span.log-module span.log-icon i.log-realm {
         @include icon-before('icon-time');
     }
 
-    li.log-realm-reviewing span.log-icon i.log-realm {
+    li.log-realm-reviewing span.log-module span.log-icon i.log-realm {
         @include icon-before('icon-user-reading');
     }
 
-    li.log-realm-participants span.log-icon i.log-realm {
+    li.log-realm-participants span.log-module span.log-icon i.log-realm {
         @include icon-before('icon-users');
     }
 
-    li.log-realm-management span.log-icon i.log-realm {
+    li.log-realm-management span.log-module span.log-icon i.log-realm {
         @include icon-before('icon-medal');
     }
 
-    li.log-kind-positive span.log-icon i.log-kind {
+    li.log-kind-positive span.log-module span.log-icon i.log-kind,
+    li.log-realm-emails.log-kind-positive span.log-module span.log-icon {
         color: $green;
     }
 
-    li.log-kind-negative span.log-icon i.log-kind {
+    li.log-kind-negative span.log-module span.log-icon i.log-kind,
+    li.log-realm-emails.log-kind-negative span.log-module span.log-icon {
         color: $red;
     }
 
-    li.log-kind-change span.log-icon i.log-kind {
+    li.log-kind-change span.log-module span.log-icon i.log-kind,
+    li.log-realm-emails.log-kind-change span.log-module span.log-icon {
         color: $blue;
     }
 
-    li.log-kind-other span.log-icon i.log-kind {
+    li.log-kind-other span.log-module span.log-icon i.log-kind,
+    li.log-realm-emails span.log-module span.log-icon i.log-kind {
         display: none;
     }
 
     > li {
         @extend %line-style;
-        width: 100%;
         display: flex;
-        justify-content: space-between;
-        align-content: baseline;
+        align-items: center;
+        width: 100%;
         border-bottom: 1px solid $pastel-gray;
 
-        > *:not(:first-child) {
-            margin-left: 1em;
-        }
+        .log-module {
+            @extend .flexrow;
 
-        .flexrow {
             display: flex;
-            flex: 0.7;
-        }
+            flex: 0.6;
 
-        .mail-status-icon {
-            display: flex;
-            flex: 0.1;
-            align-items: center;
-            justify-content: center;
+            .log-icon {
+                display: flex;
+                color: $dark-gray;
+                font-size: 1.2em;
+                position: relative;
+                width: 1.8em;
+
+                i.log-kind {
+                    line-height: 1em;
+                    font-size: 0.7em;
+                    position: absolute;
+                    right: 3px;
+                    top: 1px;
+                }
+            }
         }
 
         .log-entry-description {
@@ -144,33 +145,30 @@
             text-overflow: ellipsis;
         }
 
-        .log-entry-user {
-            flex: 1;
-            text-align: right;
+        .log-entry-details {
+            @extend .text-superfluous;
 
-            .user-fullname {
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                width: 50%;
-                display: inline-block;
-                vertical-align: middle;
+            display: flex;
+            flex: 0.65;
+            align-items: center;
+            justify-content: space-between;
+            margin-left: 1em;
+
+            .avatar-placeholder {
+                cursor: default;
+                opacity: 0.8;
+                width: 25px;
+                height: 25px;
+                display: flex;
+                justify-content: center;
+                color: rgba(#fff, 0.9);
+                background-color: #45f;
+                font-size: 1em;
+                border-radius: 50%;
             }
-        }
 
-        .log-icon {
-            color: $dark-gray;
-            font-size: 1.2em;
-            position: relative;
-            width: 1.6em;
-
-            i.log-kind {
-                line-height: 1em;
-                color: $blue;
-                font-size: 0.7em;
-                position: absolute;
-                right: 3px;
-                top: 1px;
+            time {
+                vertical-align: middle;
             }
         }
     }
@@ -202,6 +200,12 @@ table.log-modal-details {
         del {
             background: $light-red;
             text-decoration: none;
+        }
+    }
+
+    .mail {
+        .header, .content {
+            white-space: normal;
         }
     }
 }
