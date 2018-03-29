@@ -42,7 +42,7 @@ from indico.util.struct.enum import RichIntEnum
 
 
 class UserTitle(RichIntEnum):
-    __titles__ = ('', _('Mr.'), _('Ms.'), _('Mrs.'), _('Dr.'), _('Prof.'))
+    __titles__ = ('', _('Mr'), _('Ms'), _('Mrs'), _('Dr'), _('Prof.'))
     none = 0
     mr = 1
     ms = 2
