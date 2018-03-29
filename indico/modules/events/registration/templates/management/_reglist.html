@@ -90,12 +90,16 @@
                                     {% elif item.id in data and data[item.id].field_data.field.input_type == 'accommodation' %}
                                         <td class="i-table">
                                             {% if data[item.id].friendly_data %}
-                                                {% trans nights=data[item.id].friendly_data.nights,
-                                                         choice=data[item.id].friendly_data.choice -%}
-                                                    {{ choice }} ({{ nights }} night)
-                                                {%- pluralize -%}
-                                                    {{ choice }} ({{ nights }} nights)
-                                                {%- endtrans %}
+                                                {%- if data[item.id].friendly_data.is_no_accommodation -%}
+                                                    {{ data[item.id].friendly_data.choice }}
+                                                {%- else -%}
+                                                    {% trans nights=data[item.id].friendly_data.nights,
+                                                             choice=data[item.id].friendly_data.choice -%}
+                                                        {{ choice }} ({{ nights }} night)
+                                                    {%- pluralize -%}
+                                                        {{ choice }} ({{ nights }} nights)
+                                                    {%- endtrans %}
+                                                {%- endif -%}
                                             {% endif %}
                                         </td>
                                     {% elif item.id in data and data[item.id].field_data.field.input_type == 'multi_choice' %}
