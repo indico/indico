@@ -40,43 +40,48 @@ class LogEntry extends React.PureComponent {
         setDetailedView(index);
     }
 
-    renderIcon(entry) {
+    iconProps(entry) {
         if (entry.type === 'email') {
-            let props = {};
             switch (entry.payload.state) {
                 case 'pending':
-                    props = {
-                        'className': 'icon-mail semantic-text warning',
+                    return {
+                        'className': 'log-icon semantic-text warning',
                         'title': 'This email is pending and will be sent soon.',
                         'data-qtip-style': 'warning'
                     };
-                    break;
                 case 'sent':
-                    props = {
-                        'className': 'icon-mail semantic-text success',
+                    return {
+                        'className': 'log-icon semantic-text success',
                         'title': 'This email has been sent.',
                         'data-qtip-style': 'success'
                     };
-                    break;
                 case 'failed':
-                    props = {
-                        'className': 'icon-mail semantic-text error',
+                    return {
+                        'className': 'log-icon semantic-text error',
                         'title': 'Sending this email failed.',
                         'data-qtip-style': 'danger'
                     };
-                    break;
             }
-
-            return <span {...props} />;
         }
+
+        return {className: 'log-icon'};
+    }
+
+    entryKind(entry) {
+        if (entry.type !== 'email') {
+            return entry.kind;
+        }
+
+        const mapping = {pending: 'change', sent: 'positive', failed: 'negative'};
+        return mapping[entry.payload.state] || 'other';
     }
 
     render() {
         const {entry} = this.props;
         return (
-            <li className={`log-realm-${entry.realm} log-kind-${entry.kind}`}>
-                <span className="flexrow">
-                    <span className="log-icon">
+            <li className={`log-realm-${entry.realm} log-kind-${this.entryKind(entry)}`}>
+                <span className="log-module">
+                    <span {...this.iconProps(entry)}>
                         <i className="log-realm" />
                         <i className="log-kind icon-circle-small" />
                     </span>
@@ -84,28 +89,25 @@ class LogEntry extends React.PureComponent {
                         {entry.module}
                     </span>
                 </span>
-                <span className="mail-status-icon">
-                    {this.renderIcon(entry)}
-                </span>
                 <TooltipIfTruncated>
                     <span className="log-entry-description"
                           onClick={() => this.openDetails(entry.index)}>
                         {entry.description}
                     </span>
                 </TooltipIfTruncated>
-                <span className="log-entry-user">
-                    {entry.userFullName ? (
-                        <TooltipIfTruncated>
-                            <span className="user-fullname">
-                                <span className="text-superfluous">by </span>
-                                {entry.userFullName}
-                            </span>
-                        </TooltipIfTruncated>
+                <span className="log-entry-details">
+                    <span className="logged-time"
+                          title={moment(entry.time).format('DD/MM/YYYY HH:mm')}>
+                        <time dateTime={entry.time}>
+                            {moment(entry.time).fromNow()}
+                        </time>
+                    </span>
+                    {entry.user.fullName ? (
+                        <span className="avatar-placeholder" style={{backgroundColor: entry.user.avatarColor}}
+                              title={entry.user.fullName}>
+                            {entry.user.fullName[0]}
+                        </span>
                     ) : ''}
-                    <span className="text-superfluous"> at </span>
-                    <time dateTime={entry.time}>
-                        {moment(entry.time).format('HH:mm')}
-                    </time>
                 </span>
             </li>
         );
@@ -113,32 +115,9 @@ class LogEntry extends React.PureComponent {
 }
 
 
-function LogDate({date, entries, setDetailedView}) {
-    return (
-        <li>
-            <h3 className="event-log-day-header">
-                {date.format('dddd, D MMMM YYYY')}
-            </h3>
-            <ul className="event-log-entry-list">
-                {entries.map((entry) => (
-                    <LogEntry key={entry.id} entry={entry} setDetailedView={setDetailedView} />
-                ))}
-            </ul>
-        </li>
-    );
-}
-
-LogDate.propTypes = {
-    entries: PropTypes.array.isRequired,
-    date: PropTypes.object.isRequired,
-    setDetailedView: PropTypes.func.isRequired
-};
-
-
 export default class LogEntryList extends React.PureComponent {
     static propTypes = {
         entries: PropTypes.array.isRequired,
-        entryIndex: PropTypes.instanceOf(Map).isRequired,
         currentPage: PropTypes.number.isRequired,
         pages: PropTypes.array.isRequired,
         changePage: PropTypes.func.isRequired,
@@ -163,15 +142,13 @@ export default class LogEntryList extends React.PureComponent {
     }
 
     renderList() {
-        const {entries, entryIndex, pages, currentPage, changePage, isFetching, setDetailedView} = this.props;
+        const {entries, pages, currentPage, changePage, isFetching, setDetailedView} = this.props;
         return (
             <>
                 {isFetching && this.renderSpinner()}
                 <ul className={`event-log-list ${isFetching ? 'loading' : ''}`}>
-                    {[...entryIndex.entries()].map(([date, _entries]) => (
-                        <LogDate key={date}
-                                 date={moment(date)} entries={_entries}
-                                 setDetailedView={setDetailedView} />
+                    {entries.map((entry) => (
+                        <LogEntry key={entry.id} entry={entry} setDetailedView={setDetailedView} />
                     ))}
                 </ul>
                 {!isFetching && <Paginator currentPage={currentPage} pages={pages} changePage={changePage} />}

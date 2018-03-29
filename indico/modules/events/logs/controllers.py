@@ -70,5 +70,6 @@ class RHEventLogsJSON(RHManageEventBase):
             ).outerjoin(db.m.User)
 
         query = query.paginate(page, LOG_PAGE_SIZE)
-        entries = [dict(serialize_log_entry(entry), html=entry.render()) for entry in query.items]
+        entries = [dict(serialize_log_entry(entry), index=index, html=entry.render())
+                   for index, entry in enumerate(query.items)]
         return jsonify(current_page=page, pages=list(query.iter_pages()), total_page_count=query.pages, entries=entries)

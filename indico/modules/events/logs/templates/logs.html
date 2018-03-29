@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block content %}
-    <div id="event-log"
+    <div class="event-log"
          data-fetch-logs-url="{{ url_for('.logs', event) }}"
          data-realms={{ realms|tojson|forceescape }}>
     </div>

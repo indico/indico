@@ -176,7 +176,7 @@ def serialize_log_entry(entry):
         'time': entry.logged_dt.astimezone(entry.event.tzinfo).isoformat(),
         'payload': entry.data,
         'user': {
-            'userFullName': entry.user.full_name if entry.user else None,
+            'fullName': entry.user.full_name if entry.user else None,
             'avatarColor': get_color_for_username(entry.user.full_name) if entry.user else None
         }
     }

@@ -88,7 +88,7 @@ export default class LogEntryModal extends React.Component {
             return '';
         }
 
-        const {description, html, userFullName, time} = entries[currentViewIndex];
+        const {description, html, user: {fullName}, time} = entries[currentViewIndex];
 
         return (
             <Modal title={description}
@@ -102,7 +102,7 @@ export default class LogEntryModal extends React.Component {
                     <table className="i-table log-modal-details" dangerouslySetInnerHTML={{__html: html}} />
                     <div className="text-superfluous log-modal-author-info flexrow f-j-end">
                         <span>
-                            {userFullName && <span className="log-modal-user">{userFullName} </span>}
+                            {fullName && <span className="log-modal-user">{fullName} </span>}
                             on
                             <span className="log-modal-time"> {moment(time).format('ddd, D/M/YYYY HH:mm')}</span>
                         </span>

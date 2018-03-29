@@ -31,7 +31,7 @@ import '../style/logs.scss';
 
 
 window.addEventListener('load', () => {
-    const rootElement = document.getElementById('event-log');
+    const rootElement = document.querySelector('.event-log');
     const initialData = {
         staticData: {
             fetchLogsUrl: rootElement.dataset.fetchLogsUrl,
