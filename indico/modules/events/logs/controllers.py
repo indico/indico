@@ -26,7 +26,7 @@ from indico.modules.events.logs.views import WPEventLogs
 from indico.modules.events.management.controllers import RHManageEventBase
 
 
-LOG_PAGE_SIZE = 10
+LOG_PAGE_SIZE = 15
 
 
 def _contains(field, text):

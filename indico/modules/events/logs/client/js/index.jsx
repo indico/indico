@@ -36,7 +36,7 @@ window.addEventListener('load', () => {
         staticData: {
             fetchLogsUrl: rootElement.dataset.fetchLogsUrl,
             realms: JSON.parse(rootElement.dataset.realms),
-            pageSize: 10
+            pageSize: 15
         }
     };
     const middleware = [thunkMiddleware];
