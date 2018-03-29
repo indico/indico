@@ -165,6 +165,7 @@ def _diff_list(a, b):
 
 
 def serialize_log_entry(entry):
+    from indico.modules.users.util import get_color_for_username
     return {
         'id': entry.id,
         'type': entry.type,
@@ -174,5 +175,8 @@ def serialize_log_entry(entry):
         'description': entry.summary,
         'time': entry.logged_dt.astimezone(entry.event.tzinfo).isoformat(),
         'payload': entry.data,
-        'userFullName': entry.user.full_name if entry.user else None
+        'user': {
+            'userFullName': entry.user.full_name if entry.user else None,
+            'avatarColor': get_color_for_username(entry.user.full_name) if entry.user else None
+        }
     }
