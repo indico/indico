@@ -251,12 +251,11 @@
             var anonymous = [{_type: 'DefaultEntry', name: $T.gettext('Anonymous'), id: 'anonymous'},
                 [READ_ACCESS_PERMISSIONS]];
             this.$permissionsWidgetList.append(this._renderItem(anonymous));
-            if (this.options.objectType === 'event') {
-                var categoryManagers = [{
-                    _type: 'DefaultEntry', name: $T.gettext('Category Managers'), id: 'category-managers'
-                }, [FULL_ACCESS_PERMISSIONS]];
-                this.$permissionsWidgetList.prepend(this._renderItem(categoryManagers));
-            }
+
+            var managersTitle = this.options.objectType === 'event' ?
+                $T.gettext('Category Managers') : $T.gettext('Event Managers');
+            var categoryManagers = [{_type: 'DefaultEntry', name: managersTitle}, [FULL_ACCESS_PERMISSIONS]];
+            this.$permissionsWidgetList.prepend(this._renderItem(categoryManagers));
             this.$permissionsWidgetList.find('.anonymous').toggle(!this.isEventProtected);
 
             this._renderDropdown(this.$roleDropdown);
