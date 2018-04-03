@@ -241,14 +241,13 @@ def import_contributions_from_csv(event, f):
             'firstName': first_name,
             'familyName': last_name,
             'affiliation': affiliation,
-            'email': email
+            'email': email.lower()
         })
         link = ContributionPersonLink(person=person, is_speaker=True)
         link.populate_from_dict({
             'first_name': first_name,
             'last_name': last_name,
-            'affiliation': affiliation,
-            'email': email
+            'affiliation': affiliation
         })
         contribution.person_links.append(link)
 
