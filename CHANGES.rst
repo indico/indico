@@ -14,7 +14,7 @@ Major Features
   scope of an event. They can be used both for assigning permissions
   within the event and also for quickly seeing which user has which
   role (such as "Program Committee" in the event
-- Add new *List of Participants* (previously called *Roles*) which
+- Add new *Participant Roles* (previously called *Roles*) which
   now shows each person's custom event roles and whether they have
   registered for the event in addition to the the default roles
   (speaker, chairperson, etc.)

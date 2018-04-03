@@ -32,4 +32,4 @@ logger = Logger.get('events.roles')
 def _sidemenu_items(sender, event, **kwargs):
     if event.can_manage(session.user):
         roles_section = 'organization' if event.type == 'conference' else 'advanced'
-        return SideMenuItem('roles', _('Roles'), url_for('event_roles.manage', event), section=roles_section)
+        return SideMenuItem('roles', _('Roles Setup'), url_for('event_roles.manage', event), section=roles_section)
