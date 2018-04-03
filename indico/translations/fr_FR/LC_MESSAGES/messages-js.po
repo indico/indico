@@ -14,9 +14,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2018-03-29 16:14+0200\n"
-"PO-Revision-Date: 2018-03-29 14:18+0000\n"
-"Last-Translator: Adrian Mönnich\n"
+"POT-Creation-Date: 2018-04-03 17:09+0200\n"
+"PO-Revision-Date: 2018-04-03 15:12+0000\n"
+"Last-Translator: Thomas Baron <thomas.baron@cern.ch>\n"
 "Language-Team: French (France) (http://www.transifex.com/indico/indico/language/fr_FR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1031,7 +1031,11 @@ msgstr "Anonyme"
 msgid "Category Managers"
 msgstr "Administrateurs de catégorie"
 
-#: indico/htdocs/js/indico/jquery/permissions_widget.js:313
+#: indico/htdocs/js/indico/jquery/permissions_widget.js:256
+msgid "Event Managers"
+msgstr "Administrateurs de l'événement"
+
+#: indico/htdocs/js/indico/jquery/permissions_widget.js:312
 msgid "Select a user or group to add"
 msgstr "Veuillez choisir un utilisateur ou un groupe à ajouter"
 

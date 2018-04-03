@@ -16,8 +16,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2018-03-29 16:14+0200\n"
-"PO-Revision-Date: 2018-03-29 14:20+0000\n"
+"POT-Creation-Date: 2018-04-03 17:09+0200\n"
+"PO-Revision-Date: 2018-04-03 15:25+0000\n"
 "Last-Translator: Adrian Mönnich\n"
 "Language-Team: French (France) (http://www.transifex.com/indico/indico/language/fr_FR/)\n"
 "MIME-Version: 1.0\n"
@@ -4978,7 +4978,7 @@ msgid ""
 "require you to <strong>build your own Indico packages</strong>. To avoid "
 "this, we <strong>strongly</strong> recommend you to move your Indico "
 "instance to a subdomain!"
-msgstr ""
+msgstr "Indico est actuellement installé sur un sous-répertoire (%(script_root)s). <br>Utiliser un URL avec sous-répertoire est découragé depuis Indico 2.0, et il y aura de nouveaux changements dans la prochaine version (2.2) qui nécessitera que vous <strong>construisiez vos propres paquets Indico</strong>. Pour éviter cela, nous vous recommandons <strong>fortement</strong> de déplacer votre instance d'Indico vers un sous-domaine."
 
 #: indico/modules/core/templates/admin/settings.html:51
 msgid ""
@@ -7234,8 +7234,6 @@ msgstr "Rôles pour l'évaluation des résumés"
 #: indico/modules/events/management/templates/_event_person_list.html:18
 #: indico/modules/events/papers/templates/management/paper_person_list.html:20
 #: indico/modules/events/persons/templates/management/person_list.html:212
-#: indico/modules/events/roles/__init__.py:35
-#: indico/modules/events/roles/templates/roles.html:4
 msgid "Roles"
 msgstr "Roles"
 
@@ -11078,8 +11076,8 @@ msgstr "Paramètres de paiement:  %(method)s"
 
 #: indico/modules/events/persons/__init__.py:34
 #: indico/modules/events/persons/templates/management/person_list.html:8
-msgid "List of Participants"
-msgstr "Liste des participants"
+msgid "Participant Roles"
+msgstr "Roles des participants"
 
 #: indico/modules/events/persons/controllers.py:253
 #: indico/modules/events/surveys/controllers/management/survey.py:164
@@ -11152,7 +11150,7 @@ msgstr "Le lien vers la page d'inscription"
 
 #: indico/modules/events/persons/templates/management/_person_list_row.html:12
 msgid "The person has registered in:"
-msgstr "Cette personnes est inscrite pour: "
+msgstr "Cette personne est inscrite pour: "
 
 #: indico/modules/events/persons/templates/management/_person_list_row.html:21
 msgid "The person has not registered yet"
@@ -13166,6 +13164,11 @@ msgid ""
 "You can request additional services for your event. Click one of the service"
 " buttons below to send a request or to view/modify an existing request."
 msgstr "Vous pouvez demander des service additionnels pour votre événement. Cliquez sur un des boutons de service ci-dessous pour envoyer une demande ou afficher/modifier une demande existante."
+
+#: indico/modules/events/roles/__init__.py:35
+#: indico/modules/events/roles/templates/roles.html:4
+msgid "Roles Setup"
+msgstr "Configuration des Roles"
 
 #: indico/modules/events/roles/forms.py:31
 msgid "The full name of the role"
@@ -16553,7 +16556,7 @@ msgstr "Mme"
 
 #: indico/modules/users/models/users.py:45
 msgid "Dr"
-msgstr "Dr."
+msgstr "Dr"
 
 #: indico/modules/users/models/users.py:45
 msgid "Prof."
