@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: indico 2.1a3\n"
+"Project-Id-Version: indico 2.1b1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2018-03-29 16:14+0200\n"
+"POT-Creation-Date: 2018-04-03 17:09+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -965,7 +965,11 @@ msgstr ""
 msgid "Category Managers"
 msgstr ""
 
-#: indico/htdocs/js/indico/jquery/permissions_widget.js:313
+#: indico/htdocs/js/indico/jquery/permissions_widget.js:256
+msgid "Event Managers"
+msgstr ""
+
+#: indico/htdocs/js/indico/jquery/permissions_widget.js:312
 msgid "Select a user or group to add"
 msgstr ""
 

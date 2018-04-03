@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: indico 2.1a3\n"
+"Project-Id-Version: indico 2.1b1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2018-03-29 16:14+0200\n"
+"POT-Creation-Date: 2018-04-03 17:09+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -6580,8 +6580,7 @@ msgstr ""
 #: indico/modules/events/abstracts/templates/management/overview.html:74
 #: indico/modules/events/management/templates/_event_person_list.html:18
 #: indico/modules/events/papers/templates/management/paper_person_list.html:20
-#: indico/modules/events/persons/templates/management/person_list.html:212 indico/modules/events/roles/__init__.py:35
-#: indico/modules/events/roles/templates/roles.html:4
+#: indico/modules/events/persons/templates/management/person_list.html:212
 msgid "Roles"
 msgstr ""
 
@@ -10213,7 +10212,7 @@ msgid "Payment settings: %(method)s"
 msgstr ""
 
 #: indico/modules/events/persons/__init__.py:34 indico/modules/events/persons/templates/management/person_list.html:8
-msgid "List of Participants"
+msgid "Participant Roles"
 msgstr ""
 
 #: indico/modules/events/persons/controllers.py:253 indico/modules/events/surveys/controllers/management/survey.py:164
@@ -12206,6 +12205,10 @@ msgstr ""
 msgid ""
 "You can request additional services for your event. Click one of the service buttons below to send a request or to "
 "view/modify an existing request."
+msgstr ""
+
+#: indico/modules/events/roles/__init__.py:35 indico/modules/events/roles/templates/roles.html:4
+msgid "Roles Setup"
 msgstr ""
 
 #: indico/modules/events/roles/forms.py:31
