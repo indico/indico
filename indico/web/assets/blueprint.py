@@ -85,18 +85,27 @@ def js_vars_user():
 
 @assets_blueprint.route('/i18n/<locale_name>.js')
 def i18n_locale(locale_name):
-    """
-    Retrieve a locale in a Jed-compatible format
-    """
-    cache_file = os.path.join(config.CACHE_DIR, 'assets_i18n_{}_{}_{}.js'.format(
-        locale_name, indico.__version__, config.hash))
+    return _get_i18n_locale(locale_name)
+
+
+@assets_blueprint.route('/i18n/<locale_name>-react.js')
+def i18n_locale_react(locale_name):
+    return _get_i18n_locale(locale_name, react=True)
+
+
+def _get_i18n_locale(locale_name, react=False):
+    """Retrieve a locale in a Jed-compatible format"""
+
+    react_suffix = '-react' if react else ''
+    cache_file = os.path.join(config.CACHE_DIR, 'assets_i18n_{}{}_{}_{}.js'.format(
+        locale_name, react_suffix, indico.__version__, config.hash))
 
     if not os.path.exists(cache_file):
-        i18n_data = generate_i18n_file(locale_name)
+        i18n_data = generate_i18n_file(locale_name, react=react)
         with open(cache_file, 'wb') as f:
-            f.write("window.TRANSLATIONS = {};".format(i18n_data))
+            f.write("window.{} = {};".format('REACT_TRANSLATIONS' if react else 'TRANSLATIONS', i18n_data))
 
-    return send_file('{}.js'.format(locale_name), cache_file, mimetype='application/javascript',
+    return send_file('{}{}.js'.format(locale_name, react_suffix), cache_file, mimetype='application/javascript',
                      no_cache=False, conditional=True)
 
 
