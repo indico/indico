@@ -19,12 +19,12 @@ import os
 from flask import Response, current_app, json, redirect, render_template, send_from_directory, session
 from werkzeug.exceptions import NotFound
 
+import indico
 from indico.core.config import config
 from indico.core.plugins import plugin_engine
 from indico.modules.events.layout import theme_settings
 from indico.modules.users.util import serialize_user
 from indico.util.i18n import po_to_json
-from indico.util.string import crc32
 from indico.web.assets.util import get_asset_path
 from indico.web.assets.vars_js import generate_global_file
 from indico.web.flask.util import send_file, url_for
@@ -43,7 +43,7 @@ def js_vars_global():
     Provides a JS file with global definitions (all users)
     Useful for server-wide config options, URLs, etc...
     """
-    cache_file = os.path.join(config.CACHE_DIR, 'assets_global_{}.js'.format(config.hash))
+    cache_file = os.path.join(config.CACHE_DIR, 'assets_global_{}_{}.js'.format(indico.__version__, config.hash))
 
     if not os.path.exists(cache_file):
         data = generate_global_file()
@@ -84,8 +84,8 @@ def i18n_locale(locale_name):
     Retrieve a locale in a Jed-compatible format
     """
     root_path = os.path.join(current_app.root_path, 'translations')
-    plugin_key = ','.join(sorted(plugin_engine.get_active_plugins()))
-    cache_file = os.path.join(config.CACHE_DIR, 'assets_i18n_{}_{}.js'.format(locale_name, crc32(plugin_key)))
+    cache_file = os.path.join(config.CACHE_DIR, 'assets_i18n_{}_{}_{}.js'.format(
+        locale_name, indico.__version__, config.hash))
 
     if not os.path.exists(cache_file):
         i18n_data = locale_data(root_path, locale_name, 'indico')
