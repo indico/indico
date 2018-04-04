@@ -81,6 +81,8 @@ Bugfixes
   reviewing modules
 - Fix error when printing badges/posters with empty static text fields
   (:issue:`3290`)
+- Fix error when generating a PDF timetable including contribution
+  abstracts (:issue:`3289`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

@@ -509,7 +509,7 @@ class TimeTablePlain(PDFWithTOC):
         self._title = _("Programme")
         self._doc.leftMargin = 1 * cm
         self._doc.rightMargin = 1 * cm
-        self._doc.topMargin = 1.5 * cm
+        self._doc.topMargin = 1 * cm
         self._doc.bottomMargin = 1 * cm
         self._sortingCrit = sortingCrit
         self._firstPageNumber = firstPageNumber
@@ -915,7 +915,7 @@ class TimeTablePlain(PDFWithTOC):
                         if self._ttPDFFormat.showContribAbstract():
                             # presenter integrated in 1st column -> 2 columns only
                             row = ["time", title]
-                            widths = [1 * cm, None]
+                            widths = [0.95 * cm, None]
                         else:
                             row = ["time", title, "presenter"]
                             widths = [1 * cm, None, 5 * cm]
