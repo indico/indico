@@ -26,14 +26,12 @@ from pkgutil import walk_packages
 import click
 from babel.messages import frontend
 from babel.messages.pofile import read_po
-from flask import current_app
 from flask.helpers import get_root_path
 
-from indico.cli.core import cli_group
 from indico.util.console import cformat
 
 
-@cli_group()
+@click.group()
 def cli():
     os.chdir(os.path.join(get_root_path('indico'), '..'))
 
@@ -145,7 +143,7 @@ def check_format_strings():
     ``{error}`` but the translation uses ``{erro}``, resulting
     in errors when using the translated string.
     """
-    root_path = os.path.join(current_app.root_path, 'translations')
+    root_path = 'indico/translations'
     paths = set()
     for root, dirs, files in os.walk(root_path):
         for file in files:
