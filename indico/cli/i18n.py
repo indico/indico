@@ -45,7 +45,6 @@ MESSAGES_REACT_POT = os.path.join(TRANSLATIONS_DIR, 'messages-react.pot')
 
 DEFAULT_OPTIONS = {
     'init_catalog': {
-        'output_file': MESSAGES_POT,
         'output_dir': TRANSLATIONS_DIR
     },
     'extract_messages': {
@@ -66,7 +65,6 @@ DEFAULT_OPTIONS = {
 
     # JavaScript
     'init_catalog_js': {
-        'output_file': MESSAGES_JS_POT,
         'output_dir': TRANSLATIONS_DIR,
         'domain': 'messages-js'
     },
