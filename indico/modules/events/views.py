@@ -115,6 +115,9 @@ class WPEventBase(WPDecorated):
                 dates = ' ({} - {})'.format(to_unicode(format_date(start_dt_local, format='long')),
                                             to_unicode(format_date(end_dt_local, format='long')))
         self.title = '{} {}'.format(strip_tags(self.event.title), dates)
+        page_title = kwargs.get('page_title')
+        if page_title:
+            self.title += ': {}'.format(strip_tags(page_title))
 
     def _getHeader(self):
         raise NotImplementedError  # must be overridden by meeting/lecture and conference WPs
