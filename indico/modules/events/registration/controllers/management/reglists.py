@@ -377,8 +377,9 @@ class RHRegistrationsImport(RHRegistrationsActionBase):
         form = ImportRegistrationsForm(regform=self.regform)
 
         if form.validate_on_submit():
+            skip_moderation = self.regform.moderation_enabled and form.skip_moderation.data
             registrations = import_registrations_from_csv(self.regform, form.source_file.data,
-                                                          skip_moderation=form.skip_moderation.data,
+                                                          skip_moderation=skip_moderation,
                                                           notify_users=form.notify_users.data)
             flash(ngettext("{} registration has been imported.",
                            "{} registrations have been imported.",
