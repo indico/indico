@@ -79,7 +79,18 @@ DEFAULT_OPTIONS = {
         'input_file': MESSAGES_JS_POT,
         'output_dir': TRANSLATIONS_DIR,
         'domain': 'messages-js'
-    }
+    },
+
+    # JavaScript / React
+    'init_catalog_react': {
+        'output_dir': TRANSLATIONS_DIR,
+        'domain': 'messages-react'
+    },
+    'update_catalog_react': {
+        'input_file': MESSAGES_REACT_POT,
+        'output_dir': TRANSLATIONS_DIR,
+        'domain': 'messages-react'
+    },
 }
 
 
@@ -112,14 +123,8 @@ def wrap_distutils_command(command_class):
     return _wrapper
 
 
-cmd_list = ['init_catalog', 'extract_messages', 'update_catalog']
-cmd_list += [cmd + '_js' for cmd in cmd_list]
-cmd_list.append('compile_catalog')
-
-
-for cmd_name in cmd_list:
-    cmd_class = getattr(frontend, re.sub(r'_js$', '', cmd_name))
-
+def _make_command(cmd_name):
+    cmd_class = getattr(frontend, re.sub(r'_(js|react)$', '', cmd_name))
     cmd = click.command(cmd_name)(wrap_distutils_command(cmd_class))
     for opt, short_opt, description in cmd_class.user_options:
         long_opt_name = opt.rstrip('=')
@@ -132,8 +137,16 @@ for cmd_name in cmd_list:
         default = DEFAULT_OPTIONS.get(cmd_name, {}).get(var_name)
         is_flag = not opt.endswith('=')
         cmd = click.option(*(opts + [var_name]), is_flag=is_flag, default=default, help=description)(cmd)
+    return cmd
 
-    cli.add_command(cmd)
+
+cmd_list = ['init_catalog', 'extract_messages', 'update_catalog', 'compile_catalog',
+            'init_catalog_js', 'extract_messages_js', 'update_catalog_js',
+            'init_catalog_react', 'update_catalog_react']
+
+
+for cmd_name in cmd_list:
+    cli.add_command(_make_command(cmd_name))
 
 
 @cli.command()
@@ -146,11 +159,9 @@ def extract_messages_react():
 
 @cli.command()
 def compile_catalog_react():
-    directory = DEFAULT_OPTIONS['compile_catalog']['directory']
-    domain = DEFAULT_OPTIONS['compile_catalog']['domain']
-    for locale in os.listdir(directory):
-        po_file = os.path.join(directory, locale, 'LC_MESSAGES', domain + '-react.po')
-        json_file = os.path.join(directory, locale, 'LC_MESSAGES', domain + '-react.json')
+    for locale in os.listdir(TRANSLATIONS_DIR):
+        po_file = os.path.join(TRANSLATIONS_DIR, locale, 'LC_MESSAGES', 'messages-react.po')
+        json_file = os.path.join(TRANSLATIONS_DIR, locale, 'LC_MESSAGES', 'messages-react.json')
         if not os.path.exists(po_file):
             continue
         output = subprocess.check_output(['npx', 'react-jsx-i18n', 'compile', po_file])
