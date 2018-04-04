@@ -16,8 +16,10 @@
 
 from __future__ import unicode_literals
 
+import json
 import os
 import re
+import subprocess
 import sys
 from distutils.dist import Distribution
 from functools import wraps
@@ -39,6 +41,7 @@ def cli():
 TRANSLATIONS_DIR = 'indico/translations'
 MESSAGES_POT = os.path.join(TRANSLATIONS_DIR, 'messages.pot')
 MESSAGES_JS_POT = os.path.join(TRANSLATIONS_DIR, 'messages-js.pot')
+MESSAGES_REACT_POT = os.path.join(TRANSLATIONS_DIR, 'messages-react.pot')
 
 DEFAULT_OPTIONS = {
     'init_catalog': {
@@ -133,6 +136,29 @@ for cmd_name in cmd_list:
         cmd = click.option(*(opts + [var_name]), is_flag=is_flag, default=default, help=description)(cmd)
 
     cli.add_command(cmd)
+
+
+@cli.command()
+def extract_messages_react():
+    output = subprocess.check_output(['npx', 'react-jsx-i18n', 'extract', '--ext', 'jsx',
+                                      'indico/web/client/', 'indico/modules/'])
+    with open(MESSAGES_REACT_POT, 'wb') as f:
+        f.write(output)
+
+
+@cli.command()
+def compile_catalog_react():
+    directory = DEFAULT_OPTIONS['compile_catalog']['directory']
+    domain = DEFAULT_OPTIONS['compile_catalog']['domain']
+    for locale in os.listdir(directory):
+        po_file = os.path.join(directory, locale, 'LC_MESSAGES', domain + '-react.po')
+        json_file = os.path.join(directory, locale, 'LC_MESSAGES', domain + '-react.json')
+        if not os.path.exists(po_file):
+            continue
+        output = subprocess.check_output(['npx', 'react-jsx-i18n', 'compile', po_file])
+        json.loads(output)  # just to be sure the JSON is valid
+        with open(json_file, 'wb') as f:
+            f.write(output)
 
 
 @cli.command()
