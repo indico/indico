@@ -17,8 +17,10 @@
 from __future__ import unicode_literals
 
 import ast
+import json
 import os
 import re
+import subprocess
 from distutils.command.build import build
 
 from setuptools import find_packages, setup
@@ -47,8 +49,20 @@ class BuildWithTranslations(build):
         compile_cmd.finalize_options()
         compile_cmd.run()
 
+    def _compile_languages_react(self):
+        for locale in os.listdir('indico/translations'):
+            po_file = os.path.join('indico/translations', locale, 'LC_MESSAGES', 'messages-react.po')
+            json_file = os.path.join('indico/translations', locale, 'LC_MESSAGES', 'messages-react.json')
+            if not os.path.exists(po_file):
+                continue
+            output = subprocess.check_output(['npx', 'react-jsx-i18n', 'compile', po_file])
+            json.loads(output)  # just to be sure the JSON is valid
+            with open(json_file, 'wb') as f:
+                f.write(output)
+
     def run(self):
         self._compile_languages()
+        self._compile_languages_react()
         build.run(self)
 
 
