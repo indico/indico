@@ -106,6 +106,8 @@ class RegistrantsListToBadgesPDF(DesignerPDFBase):
                     text = placeholder.render(registration.event)
             elif item['text']:
                 text = item['text']
+            else:
+                continue
 
             self._draw_item(canvas, item, tpl_data, text, pos_x, pos_y)
 

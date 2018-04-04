@@ -79,6 +79,8 @@ Bugfixes
   (:issue:`3272`, thanks :user:`bpedersen2`)
 - Use the 'Reviewing' realm when logging actions from the abstract/paper
   reviewing modules
+- Fix error when printing badges/posters with empty static text fields
+  (:issue:`3290`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
