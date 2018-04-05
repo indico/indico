@@ -66,11 +66,11 @@ def create_contribution(event, contrib_data, custom_fields_data=None, session_bl
     start_dt = contrib_data.pop('start_dt', None)
     contrib = Contribution(event=event)
     contrib.populate_from_dict(contrib_data)
-    if start_dt is not None:
-        schedule_contribution(contrib, start_dt=start_dt, session_block=session_block, extend_parent=extend_parent)
     if custom_fields_data:
         set_custom_fields(contrib, custom_fields_data)
     db.session.flush()
+    if start_dt is not None:
+        schedule_contribution(contrib, start_dt=start_dt, session_block=session_block, extend_parent=extend_parent)
     signals.event.contribution_created.send(contrib)
     logger.info('Contribution %s created by %s', contrib, user)
     contrib.event.log(EventLogRealm.management, EventLogKind.positive, 'Contributions',
