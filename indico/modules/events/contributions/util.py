@@ -39,6 +39,7 @@ from indico.modules.events.persons.util import get_event_person
 from indico.modules.events.util import serialize_person_link, track_time_changes
 from indico.util.date_time import format_human_timedelta
 from indico.util.i18n import _
+from indico.util.string import to_unicode
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.http_api.metadata.serializer import Serializer
@@ -225,12 +226,12 @@ def import_contributions_from_csv(event, f):
         contrib_data.append({
             'start_dt': parsed_start_dt,
             'duration': parsed_duration or timedelta(minutes=20),
-            'title': title,
+            'title': to_unicode(title),
             'speaker': {
-                'first_name': first_name,
-                'last_name': last_name,
-                'affiliation': affiliation,
-                'email': email
+                'first_name': to_unicode(first_name),
+                'last_name': to_unicode(last_name),
+                'affiliation': to_unicode(affiliation),
+                'email': to_unicode(email)
             }
         })
 
