@@ -84,7 +84,7 @@ def get_postgres_version():
     return '{}.{}.{}'.format(version // 10000, version % 10000 // 100, version % 100)
 
 
-def increment_and_get(col, filter_):
+def increment_and_get(col, filter_, n=1):
     """Increments and returns a numeric column.
 
     This is committed to the database immediately in a separate
@@ -98,10 +98,11 @@ def increment_and_get(col, filter_):
     :param col: The column to update, e.g. ``SomeModel.last_num``
     :param filter_: A filter expression such as ``SomeModel.id == n``
                     to restrict which columns to update.
+    :param n: The number of units to increment the ID of.
     """
     from indico.core.db import db
     with db.tmp_session() as s:
-        rv = s.execute(update(col.class_).where(filter_).values({col: col + 1}).returning(col)).fetchone()[0]
+        rv = s.execute(update(col.class_).where(filter_).values({col: col + n}).returning(col)).fetchone()[0]
         s.commit()
     return rv
 

@@ -16,6 +16,7 @@
 
 from __future__ import unicode_literals
 
+from flask import g
 from sqlalchemy import DDL
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.event import listens_for
@@ -45,6 +46,13 @@ def _get_next_friendly_id(context):
     """Get the next friendly id for a contribution."""
     from indico.modules.events import Event
     event_id = context.current_parameters['event_id']
+
+    # Check first if there is a pre-allocated friendly id
+    # (and use it in that case)
+    friendly_ids = g.get('friendly_ids', {}).get(Contribution, {}).get(event_id, [])
+    if friendly_ids:
+        return friendly_ids.pop(0)
+
     assert event_id is not None
     return increment_and_get(Event._last_friendly_contribution_id, Event.id == event_id)
 
@@ -93,6 +101,22 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
     PRELOAD_EVENT_ATTACHED_ITEMS = True
     PRELOAD_EVENT_NOTES = True
     ATTACHMENT_FOLDER_ID_COLUMN = 'contribution_id'
+
+    @classmethod
+    def allocate_friendly_ids(cls, event, n):
+        """Allocate n Contribution friendly_ids.
+
+        This is needed so that we can allocate all IDs in one go. Not doing
+        so could result in DB deadlocks. All operations that create more than
+        one contribution should use this method.
+
+        :param event: the :class:`Event` in question
+        :param n: the number of ids to pre-allocate
+        """
+        from indico.modules.events import Event
+        fid = increment_and_get(Event._last_friendly_contribution_id, Event.id == event.id, n)
+        friendly_ids = g.setdefault('friendly_ids', {})
+        friendly_ids.setdefault(cls, {})[event.id] = range(fid - n + 1, fid + 1)
 
     @declared_attr
     def __table_args__(cls):

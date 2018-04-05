@@ -201,8 +201,8 @@ def get_contribution_ical_file(contrib):
 def import_contributions_from_csv(event, f):
     """Import timetable contributions from a CSV file into an event."""
     reader = csv.reader(f)
-    contributions = []
-    all_changes = defaultdict(list)
+    contrib_data = []
+
     for num_row, row in enumerate(reader, 1):
         try:
             start_dt, duration, title, first_name, last_name, affiliation, email = row
@@ -222,32 +222,50 @@ def import_contributions_from_csv(event, f):
         if not title:
             raise UserValueError(_("Row {}: contribution title is required").format(num_row))
 
+        contrib_data.append({
+            'start_dt': parsed_start_dt,
+            'duration': parsed_duration or timedelta(minutes=20),
+            'title': title,
+            'speaker': {
+                'first_name': first_name,
+                'last_name': last_name,
+                'affiliation': affiliation,
+                'email': email
+            }
+        })
+
+    # now that we're sure the data is OK, let's pre-allocate the friendly ids
+    # for the contributions in question
+    Contribution.allocate_friendly_ids(event, len(contrib_data))
+    contributions = []
+    all_changes = defaultdict(list)
+
+    for contrib_fields in contrib_data:
+        speaker_data = contrib_fields.pop('speaker')
+
         with track_time_changes() as changes:
-            contribution = create_contribution(event, {
-                'start_dt': parsed_start_dt,
-                'duration': parsed_duration or timedelta(minutes=20),
-                'title': title
-            }, extend_parent=True)
+            contribution = create_contribution(event, contrib_fields, extend_parent=True)
 
         contributions.append(contribution)
         for key, val in changes[event].viewitems():
             all_changes[key].append(val)
 
+        email = speaker_data['email']
         if not email:
             continue
 
         # set the information of the speaker
         person = get_event_person(event, {
-            'firstName': first_name,
-            'familyName': last_name,
-            'affiliation': affiliation,
+            'firstName': speaker_data['first_name'],
+            'familyName': speaker_data['last_name'],
+            'affiliation': speaker_data['affiliation'],
             'email': email.lower()
         })
         link = ContributionPersonLink(person=person, is_speaker=True)
         link.populate_from_dict({
-            'first_name': first_name,
-            'last_name': last_name,
-            'affiliation': affiliation
+            'first_name': speaker_data['first_name'],
+            'last_name': speaker_data['last_name'],
+            'affiliation': speaker_data['affiliation']
         })
         contribution.person_links.append(link)
 
