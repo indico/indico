@@ -31,7 +31,7 @@ class RHRoomBookingProtected(RHProtected):
             raise NotFound(_('The room booking module is not enabled.'))
         RHProtected._require_user(self)
         if not rb_check_user_access(session.user):
-            raise Forbidden(_('Your are not authorized to access the room booking system.'))
+            raise Forbidden(_('You are not authorized to access the room booking system.'))
 
 
 class RHRoomBookingBase(RHRoomBookingProtected):
