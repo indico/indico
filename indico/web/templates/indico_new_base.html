@@ -1,0 +1,63 @@
+{#- Base template for indico pages (standard "indico look") -#}
+<!DOCTYPE html>
+
+<html prefix="og: http://ogp.me/ns#"
+      data-static-site="{{ g.get('static_site', false)|tojson|forceescape }}">
+<head>
+    <title>
+        {%- if page_title %}{{ page_title }} · {% endif %}
+        {{- site_name -}}
+        {% if site_name != 'Indico' %} (Indico){% endif -%}
+    </title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="csrf-token" id="csrf-token" content="{{ session.csrf_token }}">
+    <link rel="shortcut icon" type="image/x-icon" href="{{ indico_config.IMAGES_BASE_URL }}/indico.ico">
+
+    <meta property="og:site_name" content="{{ site_name }}{% if site_name != 'Indico' %} (Indico){% endif %}">
+    {% if social.facebook_app_id -%}
+        <meta property="fb:app_id" content="{{ social.facebook_app_id }}">
+    {% endif %}
+
+    <script type="text/javascript" src="{{ url_for('assets.i18n_locale', locale_name=session.lang) }}"></script>
+    <script type="text/javascript" src="{{ url_for('assets.js_vars_global') }}"></script>
+
+    {% for bundle in bundles %}
+        {{ bundle }}
+    {% endfor %}
+    {% for bundle in print_bundles %}
+        {% for path in bundle._paths %}
+            <link rel="stylesheet" type="text/css" media="print" href="{{ path }}">
+        {% endfor %}
+    {% endfor %}
+
+    {% for url in js_files -%}
+        <script type="text/javascript" src="{{ url }}"></script>
+    {% endfor %}
+
+    <script type="text/javascript" src="{{ url_for('assets.js_vars_user') }}"></script>
+
+    {% for url in css_files -%}
+        <link rel="stylesheet" type="text/css" href="{{ url }}">
+    {% endfor %}
+
+    {{ template_hook('html-head') }}
+</head>
+<body data-user-id="{{ session.user.id if session.user else 'null' }}"
+      data-debug="{{ config.DEBUG|tojson|forceescape }}">
+    {% block body %}{% endblock %}
+</body>
+</html>
+{%- set req_stats = get_request_stats() %}
+<!--
+Queries:         {{ req_stats.query_count }}
+Duration (sql):  {{ '%.06fs'|format(req_stats.query_duration) }}
+Duration (req):  {{ '%.06fs'|format(req_stats.req_duration) }}
+{%- if session.user and session.user.is_admin %}
+Worker:          {{ indico_config.WORKER_NAME }}
+{%- endif %}
+Endpoint:        {{ request.endpoint }}
+{%- if g.rh %}
+RH:              {{ g.rh.__class__.__module__ }}.{{ g.rh.__class__.__name__ }}
+{%- endif %}
+-->
