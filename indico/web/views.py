@@ -153,29 +153,8 @@ class WPJinjaMixin(object):
         return self.render_template_func(template, **params)
 
 
-class WPBase(object):
-    title = ''
-
-    #: Whether the WP is used for management (adds suffix to page title)
-    MANAGEMENT = False
+class WPBundleMixin(object):
     print_bundles = tuple()
-
-    def __init__(self, rh, **kwargs):
-        self._rh = rh
-        self._kwargs = kwargs
-
-    def get_extra_css_files(self):
-        """Return CSS urls that will be included after all other CSS"""
-        return []
-
-    @classproperty
-    @classmethod
-    def bundles(cls):
-        _bundles = ('common.css', 'common.js', 'main.css', 'main.js', 'module_core.js', 'module_events.creation.js',
-                    'module_attachments.js')
-        if not g.get('static_site'):
-            _bundles += ('ckeditor.js',)
-        return _bundles
 
     @property
     def additional_bundles(self):
@@ -200,6 +179,31 @@ class WPBase(object):
                     raise Exception("Duplicate bundle found in {}: '{}'".format(class_.__name__, bundle))
                 seen_bundles.add(bundle)
                 yield bundle
+
+
+class WPBase(WPBundleMixin):
+    title = ''
+
+    #: Whether the WP is used for management (adds suffix to page title)
+    MANAGEMENT = False
+
+    def __init__(self, rh, **kwargs):
+        self._rh = rh
+        self._kwargs = kwargs
+
+    def get_extra_css_files(self):
+        """Return CSS urls that will be included after all other CSS"""
+        return []
+
+    @classproperty
+    @classmethod
+    def bundles(cls):
+        _bundles = ('common.css', 'common.js', 'main.css', 'main.js', 'module_core.js', 'module_events.creation.js',
+                    'module_attachments.js')
+        if not g.get('static_site'):
+            _bundles += ('ckeditor.js',)
+        return _bundles
+
 
     def _getHeadContent(self):
         """
@@ -254,6 +258,87 @@ class WPBase(object):
                                page_title=' - '.join(unicode(x) for x in title_parts if x),
                                head_content=to_unicode(self._getHeadContent()),
                                body=body)
+
+
+class WPNewBase(WPJinjaMixin):
+    title = ''
+    bundles = ()
+    print_bundles = tuple()
+
+    @classproperty
+    @classmethod
+    def additional_bundles(cls):
+        """Additional bundle objects that will be included."""
+        return {
+            'screen': (),
+            'print': ()
+        }
+
+    @classmethod
+    def _resolve_bundles(cls):
+        """Add up all bundles, following the MRO."""
+        seen_bundles = set()
+        for class_ in reversed(cls.mro()[:-1]):
+            attr = class_.__dict__.get('bundles', ())
+            if isinstance(attr, classproperty):
+                attr = attr.__get__(None, class_)
+            elif isinstance(attr, property):
+                attr = attr.fget(cls)
+
+            for bundle in attr:
+                if config.DEBUG and bundle in seen_bundles:
+                    raise Exception("Duplicate bundle found in {}: '{}'".format(class_.__name__, bundle))
+                seen_bundles.add(bundle)
+                yield bundle
+
+    #: Whether the WP is used for management (adds suffix to page title)
+    MANAGEMENT = False
+
+    def __init__(self, rh, **kwargs):
+        self._rh = rh
+        self._kwargs = kwargs
+
+    @classmethod
+    def _fix_path(cls, path):
+        url_path = urlparse(config.BASE_URL).path or '/'
+        # append base path only if not absolute already
+        # and not in 'static site' mode (has to be relative)
+        if path[0] != '/' and not g.get('static_site'):
+            path = posixpath.join(url_path, path)
+        return path
+
+    @classmethod
+    def display(cls, template_name, **params):
+        from indico.modules.admin import RHAdminBase
+        from indico.modules.core.settings import core_settings, social_settings
+
+        title_parts = [cls.title]
+        if cls.MANAGEMENT:
+            title_parts.insert(0, _('Management'))
+        elif isinstance(g.rh, RHAdminBase):
+            title_parts.insert(0, _('Administration'))
+
+        injected_bundles = values_from_signal(signals.plugin.inject_bundle.send(cls), as_list=True,
+                                              multi_value_types=list)
+        injected_bundles = []
+        custom_js = list(current_app.manifest['__custom.js'])
+        custom_css = list(current_app.manifest['__custom.css'])
+        css_files = map(cls._fix_path, custom_css)
+        js_files = map(cls._fix_path, custom_js)
+
+        bundles = itertools.chain((current_app.manifest[x] for x in cls._resolve_bundles()
+                                   if x in current_app.manifest._entries),
+                                  cls.additional_bundles['screen'], injected_bundles)
+        print_bundles = itertools.chain((current_app.manifest[x] for x in cls.print_bundles),
+                                        cls.additional_bundles['print'])
+        template = cls._prefix_template(template_name)
+        return render_template(template,
+                               css_files=css_files, js_files=js_files,
+                               bundles=bundles, print_bundles=print_bundles,
+                               site_name=core_settings.get('site_title'),
+                               social=social_settings.get_all(),
+                               page_title=' - '.join(unicode(x) for x in title_parts if x),
+                               **params)
 
 
 class WPDecorated(WPBase):
