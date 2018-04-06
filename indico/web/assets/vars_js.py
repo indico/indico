@@ -79,7 +79,8 @@ def generate_user_file(user=None):
             'id': user.id,
             'first_name': user.first_name,
             'last_name': user.last_name,
-            'favorite_users': {u.id: serialize_user(u) for u in user.favorite_users}
+            'favorite_users': {u.id: serialize_user(u) for u in user.favorite_users},
+            'language': session.lang
         }
     return render_template('assets/vars_user.js', user_vars=user_vars, user=user)
 
