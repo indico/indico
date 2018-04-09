@@ -1,6 +1,12 @@
 [main]
 host = https://www.transifex.com
 
+[indico.core-messages-react]
+file_filter = indico/translations/<lang>/LC_MESSAGES/messages-react.po
+source_file = indico/translations/messages-react.pot
+source_lang = en
+type = PO
+
 [indico.core-messages-js]
 file_filter = indico/translations/<lang>/LC_MESSAGES/messages-js.po
 source_file = indico/translations/messages-js.pot
@@ -12,4 +18,3 @@ file_filter = indico/translations/<lang>/LC_MESSAGES/messages.po
 source_file = indico/translations/messages.pot
 source_lang = en
 type = PO
-

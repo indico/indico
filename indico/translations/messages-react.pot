@@ -1,0 +1,28 @@
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2018-04-18 12:22+0200\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"MIME-Version: 1.0\n"
+"Generated-By: react-jsx-i18n-extract\n"
+"Content-Type: text/plain;\n"
+
+#: indico/modules/events/logs/client/js/components/LogEntryList.jsx:50
+msgid "This email is pending and will be sent soon."
+msgstr ""
+
+#: indico/modules/events/logs/client/js/components/LogEntryList.jsx:56
+msgid "This email has been sent."
+msgstr ""
+
+#: indico/modules/events/logs/client/js/components/LogEntryList.jsx:62
+msgid "Sending this email failed."
+msgstr ""
+
+#: indico/modules/events/logs/client/js/components/LogEntryModal.jsx:115
+msgid "Previous"
+msgstr ""
+
+#: indico/modules/events/logs/client/js/components/LogEntryModal.jsx:119
+msgid "Next"
+msgstr ""

@@ -20,6 +20,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import {Paginator, TooltipIfTruncated, MessageBox} from 'indico/react/components';
+import {Translate} from 'indico/react/i18n';
 
 import LogEntryModal from '../containers/LogEntryModal';
 
@@ -46,19 +47,19 @@ class LogEntry extends React.PureComponent {
                 case 'pending':
                     return {
                         'className': 'log-icon semantic-text warning',
-                        'title': 'This email is pending and will be sent soon.',
+                        'title': Translate.string('This email is pending and will be sent soon.'),
                         'data-qtip-style': 'warning'
                     };
                 case 'sent':
                     return {
                         'className': 'log-icon semantic-text success',
-                        'title': 'This email has been sent.',
+                        'title': Translate.string('This email has been sent.'),
                         'data-qtip-style': 'success'
                     };
                 case 'failed':
                     return {
                         'className': 'log-icon semantic-text error',
-                        'title': 'Sending this email failed.',
+                        'title': Translate.string('Sending this email failed.'),
                         'data-qtip-style': 'danger'
                     };
             }
