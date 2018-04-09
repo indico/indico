@@ -426,9 +426,13 @@ class User(PersonMixin, db.Model):
     as_legacy = as_avatar
 
     @property
-    def avatar_css(self):
+    def avatar_bg_color(self):
         from indico.modules.users.util import get_color_for_username
-        return 'background-color: {};'.format(get_color_for_username(self.full_name))
+        return get_color_for_username(self.full_name)
+
+    @property
+    def avatar_css(self):
+        return 'background-color: {};'.format(self.avatar_bg_color)
 
     @property
     def external_identities(self):
