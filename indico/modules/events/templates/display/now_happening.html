@@ -35,8 +35,8 @@
 
         function showNextEntry() {
             index = index % entries.length;
-            entries.eq(index - 1).fadeOut(100);
-            entries.eq(index).fadeIn('slow');
+            entries.eq(index - 1).hide();
+            entries.eq(index).fadeIn();
             index++;
         }
 

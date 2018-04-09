@@ -126,10 +126,11 @@ class RegistrationFormFieldBase(object):
     def view_data(self):
         return self.unprocess_field_data(self.form_item.versioned_data, self.form_item.data)
 
-    def get_friendly_data(self, registration_data, for_humans=False):
+    def get_friendly_data(self, registration_data, for_humans=False, for_search=False):
         """Return the data contained in the field
 
         If for_humans is True, return a human-readable string representation.
+        If for_search is True, return a string suitable for comparison in search.
         """
         return registration_data.data
 

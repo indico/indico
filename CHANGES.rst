@@ -38,7 +38,7 @@ Major Features
   scope of an event. They can be used both for assigning permissions
   within the event and also for quickly seeing which user has which
   role (such as "Program Committee" in the event
-- Add new *List of Participants* (previously called *Roles*) which
+- Add new *Participant Roles* (previously called *Roles*) which
   now shows each person's custom event roles and whether they have
   registered for the event in addition to the the default roles
   (speaker, chairperson, etc.)
@@ -89,6 +89,20 @@ Improvements
   reviewing
 - Show a nicer error message when entering an excessively high base
   registration fee (:issue:`3260`)
+- Use proper British English for person titles (:issue:`3279`)
+- Add event keywords in meta tags (:issue:`3262`, thanks :user:`bpedersen2`)
+- Improve sorting by date fields in the registrant list
+
+Bugfixes
+^^^^^^^^
+
+- Fix selecting a person's title in a different language than English
+- Fix display issue in "now happening" (:issue:`3278`)
+- Fix error when displaying the value of an accommodation field in the
+  registrant list and someone has the "no accomodation" option selected
+  (:issue:`3272`, thanks :user:`bpedersen2`)
+- Use the 'Reviewing' realm when logging actions from the abstract/paper
+  reviewing modules
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

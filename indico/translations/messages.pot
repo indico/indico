@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: indico 2.1a3\n"
+"Project-Id-Version: indico 2.1b1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2018-03-15 14:54+0100\n"
+"POT-Creation-Date: 2018-04-03 17:09+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4463,42 +4463,51 @@ msgid "Debug mode is enabled."
 msgstr ""
 
 #: indico/modules/core/templates/admin/settings.html:39
+#, python-format
+msgid ""
+"You are currently running Indico in a subdirectory (%(script_root)s).<br> While using a URL subdirectory has been "
+"discouraged since the release of 2.0, there will be further changes in the next release (2.2) which will require you "
+"to <strong>build your own Indico packages</strong>. To avoid this, we <strong>strongly</strong> recommend you to move"
+" your Indico instance to a subdomain!"
+msgstr ""
+
+#: indico/modules/core/templates/admin/settings.html:51
 msgid ""
 "A new Indico version (<strong id=\"new-indico-version\"></strong>) is available! Your current version is <strong id"
 "=\"cur-indico-version\"></strong>."
 msgstr ""
 
-#: indico/modules/core/templates/admin/settings.html:46
+#: indico/modules/core/templates/admin/settings.html:58
 msgid ""
 "A new version (<strong id=\"new-indico-plugins-version\"></strong>) of the official Indico plugin package is "
 "available! Your current version is <strong id=\"cur-indico-plugins-version\"></strong>."
 msgstr ""
 
-#: indico/modules/core/templates/admin/settings.html:55 indico/modules/users/templates/users_admin.html:85
+#: indico/modules/core/templates/admin/settings.html:67 indico/modules/users/templates/users_admin.html:85
 msgid "System"
 msgstr ""
 
-#: indico/modules/core/templates/admin/settings.html:58
+#: indico/modules/core/templates/admin/settings.html:70
 msgid "These settings can be changed in the indico.conf file on the server."
 msgstr ""
 
-#: indico/modules/core/templates/admin/settings.html:63
+#: indico/modules/core/templates/admin/settings.html:75
 msgid "Default language"
 msgstr ""
 
-#: indico/modules/core/templates/admin/settings.html:65
+#: indico/modules/core/templates/admin/settings.html:77
 msgid "Default timezone"
 msgstr ""
 
-#: indico/modules/core/templates/admin/settings.html:67
+#: indico/modules/core/templates/admin/settings.html:79
 msgid "Admin email"
 msgstr ""
 
-#: indico/modules/core/templates/admin/settings.html:69
+#: indico/modules/core/templates/admin/settings.html:81
 msgid "Support email"
 msgstr ""
 
-#: indico/modules/core/templates/admin/settings.html:71
+#: indico/modules/core/templates/admin/settings.html:83
 msgid "No-reply email"
 msgstr ""
 
@@ -5111,15 +5120,15 @@ msgstr ""
 msgid "Value"
 msgstr ""
 
-#: indico/modules/events/fields.py:173
+#: indico/modules/events/fields.py:174
 msgid "There is already a person with the email {}"
 msgstr ""
 
-#: indico/modules/events/fields.py:217
+#: indico/modules/events/fields.py:218
 msgid "Person with email '{}' is duplicated"
 msgstr ""
 
-#: indico/modules/events/fields.py:230
+#: indico/modules/events/fields.py:231
 msgid "Category default"
 msgstr ""
 
@@ -5824,7 +5833,7 @@ msgid "The last name of the submitter"
 msgstr ""
 
 #: indico/modules/events/abstracts/placeholders.py:166
-msgid "The title of the submitter (Dr., Prof., etc...)"
+msgid "The title of the submitter (Dr, Prof., etc...)"
 msgstr ""
 
 #: indico/modules/events/abstracts/placeholders.py:176
@@ -6571,8 +6580,7 @@ msgstr ""
 #: indico/modules/events/abstracts/templates/management/overview.html:74
 #: indico/modules/events/management/templates/_event_person_list.html:18
 #: indico/modules/events/papers/templates/management/paper_person_list.html:20
-#: indico/modules/events/persons/templates/management/person_list.html:212 indico/modules/events/roles/__init__.py:35
-#: indico/modules/events/roles/templates/roles.html:4
+#: indico/modules/events/persons/templates/management/person_list.html:212
 msgid "Roles"
 msgstr ""
 
@@ -7877,7 +7885,7 @@ msgid "There are no subcontributions in this contribution yet"
 msgstr ""
 
 #: indico/modules/events/contributions/templates/management/_types_table.html:5
-#: indico/modules/events/registration/fields/simple.py:154 indico/modules/events/registration/lists.py:62
+#: indico/modules/events/registration/fields/simple.py:156 indico/modules/events/registration/lists.py:62
 #: indico/modules/events/registration/templates/management/_reglist.html:64
 #: indico/modules/events/sessions/templates/management/_types_table.html:4
 #: indico/modules/events/surveys/fields/simple.py:59 indico/modules/events/surveys/fields/simple.py:60
@@ -7887,7 +7895,7 @@ msgid "Yes"
 msgstr ""
 
 #: indico/modules/events/contributions/templates/management/_types_table.html:5
-#: indico/modules/events/registration/fields/simple.py:154 indico/modules/events/registration/lists.py:61
+#: indico/modules/events/registration/fields/simple.py:156 indico/modules/events/registration/lists.py:61
 #: indico/modules/events/registration/templates/management/_reglist.html:66
 #: indico/modules/events/sessions/templates/management/_types_table.html:4
 #: indico/modules/events/surveys/fields/simple.py:59 indico/modules/events/surveys/fields/simple.py:60
@@ -10204,7 +10212,7 @@ msgid "Payment settings: %(method)s"
 msgstr ""
 
 #: indico/modules/events/persons/__init__.py:34 indico/modules/events/persons/templates/management/person_list.html:8
-msgid "List of Participants"
+msgid "Participant Roles"
 msgstr ""
 
 #: indico/modules/events/persons/controllers.py:253 indico/modules/events/surveys/controllers/management/survey.py:164
@@ -10947,7 +10955,7 @@ msgstr ""
 msgid "Not enough rooms in '{0}'"
 msgstr ""
 
-#: indico/modules/events/registration/fields/simple.py:113 indico/modules/events/registration/fields/simple.py:176
+#: indico/modules/events/registration/fields/simple.py:113 indico/modules/events/registration/fields/simple.py:178
 msgid "There are no places left for this option."
 msgstr ""
 
@@ -11047,7 +11055,7 @@ msgid "Cost"
 msgstr ""
 
 #: indico/modules/events/registration/templates/display/_registration_summary_blocks.html:131
-#: indico/modules/events/registration/templates/management/_reglist.html:93
+#: indico/modules/events/registration/templates/management/_reglist.html:97
 #, python-format
 msgid "%(choice)s (%(nights)s night)"
 msgid_plural "%(choice)s (%(nights)s nights)"
@@ -11147,7 +11155,7 @@ msgid "The lists of participants grouped by the registration form they used to r
 msgstr ""
 
 #: indico/modules/events/registration/templates/display/participant_list.html:76
-#: indico/modules/events/registration/templates/management/_reglist.html:126
+#: indico/modules/events/registration/templates/management/_reglist.html:131
 msgid "There are no registrations yet."
 msgstr ""
 
@@ -11466,7 +11474,7 @@ msgstr ""
 msgid "Full name"
 msgstr ""
 
-#: indico/modules/events/registration/templates/management/_reglist.html:124
+#: indico/modules/events/registration/templates/management/_reglist.html:129
 msgid ""
 "The filtering criteria do not match with any of the existing registrations. Try to clear the filters from the "
 "\"Customize list\" dialog."
@@ -12197,6 +12205,10 @@ msgstr ""
 msgid ""
 "You can request additional services for your event. Click one of the service buttons below to send a request or to "
 "view/modify an existing request."
+msgstr ""
+
+#: indico/modules/events/roles/__init__.py:35 indico/modules/events/roles/templates/roles.html:4
+msgid "Roles Setup"
 msgstr ""
 
 #: indico/modules/events/roles/forms.py:31
@@ -15460,19 +15472,19 @@ msgid "My Profile"
 msgstr ""
 
 #: indico/modules/users/models/users.py:45
-msgid "Mr."
+msgid "Mr"
 msgstr ""
 
 #: indico/modules/users/models/users.py:45
-msgid "Ms."
+msgid "Ms"
 msgstr ""
 
 #: indico/modules/users/models/users.py:45
-msgid "Mrs."
+msgid "Mrs"
 msgstr ""
 
 #: indico/modules/users/models/users.py:45
-msgid "Dr."
+msgid "Dr"
 msgstr ""
 
 #: indico/modules/users/models/users.py:45

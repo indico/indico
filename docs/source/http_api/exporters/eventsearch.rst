@@ -51,7 +51,7 @@ Result for https://indico.server/export/event/search/ichep.json?ak=00000000-0000
                 },
                 "hasAnyProtection": false,
                 "id": "104128",
-                "title": "Seminer Oturumu: \"ATLAS status and highlights as of ICHEP\" Dr. Tayfun Ince (Universitaet Bonn)"
+                "title": "Seminer Oturumu: \"ATLAS status and highlights as of ICHEP\" Dr Tayfun Ince (Universitaet Bonn)"
             },
             {
                 "startDate": {

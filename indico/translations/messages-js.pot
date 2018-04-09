@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: indico 2.1a3\n"
+"Project-Id-Version: indico 2.1b1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2018-03-15 14:54+0100\n"
+"POT-Creation-Date: 2018-04-03 17:09+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -203,19 +203,19 @@ msgid "Title"
 msgstr ""
 
 #: indico/htdocs/js/indico/Core/Dialogs/Users.js:861
-msgid "Mr."
+msgid "Mr"
 msgstr ""
 
 #: indico/htdocs/js/indico/Core/Dialogs/Users.js:861
-msgid "Mrs."
+msgid "Mrs"
 msgstr ""
 
 #: indico/htdocs/js/indico/Core/Dialogs/Users.js:861
-msgid "Ms."
+msgid "Ms"
 msgstr ""
 
 #: indico/htdocs/js/indico/Core/Dialogs/Users.js:861
-msgid "Dr."
+msgid "Dr"
 msgstr ""
 
 #: indico/htdocs/js/indico/Core/Dialogs/Users.js:861
@@ -965,7 +965,11 @@ msgstr ""
 msgid "Category Managers"
 msgstr ""
 
-#: indico/htdocs/js/indico/jquery/permissions_widget.js:313
+#: indico/htdocs/js/indico/jquery/permissions_widget.js:256
+msgid "Event Managers"
+msgstr ""
+
+#: indico/htdocs/js/indico/jquery/permissions_widget.js:312
 msgid "Select a user or group to add"
 msgstr ""
 

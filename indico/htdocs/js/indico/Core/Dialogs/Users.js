@@ -858,7 +858,7 @@ type("UserDataPopup", ["ExclusivePopupWithButtons"],
             }
 
             var form = IndicoUtil.createFormFromMap([
-               [$T('Title'), $B(Html.select({}, Html.option({}, ""), Html.option({value:'Mr.'}, $T("Mr.")), Html.option({value:'Mrs.'}, $T("Mrs.")), Html.option({value:'Ms.'}, $T("Ms.")), Html.option({value:'Dr.'}, $T("Dr.")), Html.option({value:'Prof.'}, $T("Prof."))), userData.accessor('title'))],
+               [$T('Title'), $B(Html.select({}, Html.option({}, ""), Html.option({value:'Mr'}, $T("Mr")), Html.option({value:'Mrs'}, $T("Mrs")), Html.option({value:'Ms'}, $T("Ms")), Html.option({value:'Dr'}, $T("Dr")), Html.option({value:'Prof.'}, $T("Prof."))), userData.accessor('title'))],
                [$T('Family Name'), $B(self.parameterManager.add(Html.edit({style: {width: '300px'}}), 'text', false), userData.accessor('familyName'))],
                [$T('First Name'), $B(Html.edit({style: {width: '300px'}}), userData.accessor('firstName'))],
                [$T('Affiliation'), $B(Html.edit({style: {width: '300px'}}), userData.accessor('affiliation'))],

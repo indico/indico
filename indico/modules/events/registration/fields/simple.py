@@ -55,7 +55,7 @@ class NumberField(RegistrationFormBillableField):
             return 0
         return versioned_data.get('price', 0) * int(reg_data or 0)
 
-    def get_friendly_data(self, registration_data, for_humans=False):
+    def get_friendly_data(self, registration_data, for_humans=False, for_search=False):
         if registration_data.data is None:
             return ''
         return str(registration_data.data) if for_humans else registration_data.data
@@ -78,7 +78,7 @@ class CheckboxField(RegistrationFormBillableField):
             return 0
         return versioned_data.get('price', 0)
 
-    def get_friendly_data(self, registration_data, for_humans=False):
+    def get_friendly_data(self, registration_data, for_humans=False, for_search=False):
         return self.friendly_data_mapping[registration_data.data]
 
     def get_places_used(self):
@@ -128,10 +128,12 @@ class DateField(RegistrationFormFieldBase):
             value = datetime.strptime(value, date_format).isoformat()
         return super(DateField, self).process_form_data(registration, value, old_data, billable_items_locked)
 
-    def get_friendly_data(self, registration_data, for_humans=False):
+    def get_friendly_data(self, registration_data, for_humans=False, for_search=False):
         date_string = registration_data.data
         if not date_string:
             return ''
+        elif for_search:
+            return date_string  # already in isoformat
         dt = datetime.strptime(date_string, '%Y-%m-%dT%H:%M:%S')
         return strftime_all_years(dt, self.form_item.data['date_format'])
 
@@ -195,7 +197,7 @@ class BooleanField(RegistrationFormBillableField):
             return 0
         return versioned_data.get('price', 0) if reg_data else 0
 
-    def get_friendly_data(self, registration_data, for_humans=False):
+    def get_friendly_data(self, registration_data, for_humans=False, for_search=False):
         return self.friendly_data_mapping[registration_data.data]
 
 
@@ -223,7 +225,7 @@ class CountryField(RegistrationFormFieldBase):
     def filter_choices(self):
         return OrderedDict(self.wtf_field_kwargs['choices'])
 
-    def get_friendly_data(self, registration_data, for_humans=False):
+    def get_friendly_data(self, registration_data, for_humans=False, for_search=False):
         return get_country(registration_data.data) if registration_data.data else ''
 
 
@@ -266,7 +268,7 @@ class FileField(RegistrationFormFieldBase):
     def default_value(self):
         return None
 
-    def get_friendly_data(self, registration_data, for_humans=False):
+    def get_friendly_data(self, registration_data, for_humans=False, for_search=False):
         if not registration_data:
             return ''
         return registration_data.filename

@@ -163,7 +163,7 @@ class SubmitterLastNamePlaceholder(Placeholder):
 
 class SubmitterTitlePlaceholder(Placeholder):
     name = 'submitter_title'
-    description = _('The title of the submitter (Dr., Prof., etc...)')
+    description = _('The title of the submitter (Dr, Prof., etc...)')
 
     @classmethod
     def render(cls, abstract):
