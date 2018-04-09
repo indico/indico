@@ -208,7 +208,12 @@ rules:
   react/default-props-match-prop-types: error
   react/destructuring-assignment: warn
   react/display-name: error
-  react/forbid-component-props: error
+  react/forbid-component-props:
+    - error
+    - forbid:
+      - propName: style
+      - propName: className
+        allowedFor: [ReactModal]
   react/no-access-state-in-setstate: warn
   react/no-array-index-key: warn
   react/jsx-boolean-value: error
@@ -224,14 +229,16 @@ rules:
     - never
   react/jsx-filename-extension: error
   react/jsx-indent: error
-  # XXX: our style is not supported yet, so nothing to enforce (see yannickcr/eslint-plugin-react#398)
-  react/jsx-indent-props: off
+  react/jsx-indent-props:
+    - error
+    - first
   react/jsx-key: error
   react/jsx-no-comment-textnodes: error
   react/jsx-no-duplicate-props: error
   react/jsx-no-target-blank: error
   react/jsx-no-undef: error
   react/jsx-pascal-case: error
+  react/jsx-props-no-multi-spaces: error
   react/jsx-tag-spacing:
     - error
     - closingSlash: never
