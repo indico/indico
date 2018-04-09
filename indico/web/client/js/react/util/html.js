@@ -15,7 +15,13 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-export function toClasses(obj) {
+export function toClasses(...params) {
+    const obj = params.length === 1 ? params[0] : params;
+    if (Array.isArray(obj)) {
+        return obj.join(' ').trim();
+    } else if (typeof obj === 'string') {
+        return obj;
+    }
     return Object.entries(obj).map(
         ([k, v]) => (v ? ` ${k}` : '')
     ).join('').trim();
