@@ -19,6 +19,7 @@
 
 import Palette from 'indico/utils/palette';
 
+
 (function($) {
     const FULL_ACCESS_PERMISSIONS = '_full_access';
     const READ_ACCESS_PERMISSIONS = '_read_access';
@@ -100,9 +101,9 @@ import Palette from 'indico/utils/palette';
             }
             permissions.forEach((item) => {
                 const permissionInfo = this.options.permissionsInfo[item];
-                const applyOpacity = item === READ_ACCESS_PERMISSIONS
-                    && _.contains(permissions, FULL_ACCESS_PERMISSIONS)
-                    && principal._type !== 'DefaultEntry';
+                const applyOpacity = item === READ_ACCESS_PERMISSIONS &&
+                    _.contains(permissions, FULL_ACCESS_PERMISSIONS) &&
+                    principal._type !== 'DefaultEntry';
                 const cssClasses = (applyOpacity ? 'disabled ' : '') + permissionInfo.css_class;
                 $permissionsList.append(
                     $('<li>', {class: `i-label bold ${cssClasses}`, title: permissionInfo.description})
@@ -246,8 +247,9 @@ import Palette from 'indico/utils/palette';
                                [READ_ACCESS_PERMISSIONS]];
             this.$permissionsWidgetList.append(this._renderItem(anonymous));
 
-            const managersTitle = this.options.objectType === 'event' ?
-                $T.gettext('Category Managers') : $T.gettext('Event Managers');
+            const managersTitle = this.options.objectType === 'event'
+                ? $T.gettext('Category Managers')
+                : $T.gettext('Event Managers');
             const categoryManagers = [{_type: 'DefaultEntry', name: managersTitle}, [FULL_ACCESS_PERMISSIONS]];
             this.$permissionsWidgetList.prepend(this._renderItem(categoryManagers));
             this.$permissionsWidgetList.find('.anonymous').toggle(!this.isEventProtected);
