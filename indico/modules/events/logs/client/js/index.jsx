@@ -17,15 +17,13 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {createStore, applyMiddleware} from 'redux';
 import {Provider} from 'react-redux';
-import thunkMiddleware from 'redux-thunk';
-import loggerMiddleware from 'redux-logger';
-import {composeWithDevTools} from 'redux-devtools-extension';
 
-import reducer from './reducers';
+import createReduxStore from 'indico/utils/redux';
+
 import EventLog from './components/EventLog';
 import {fetchPosts} from './actions';
+import reducer from './reducers';
 
 import '../style/logs.scss';
 
@@ -39,12 +37,9 @@ window.addEventListener('load', () => {
             pageSize: 15
         }
     };
-    const middleware = [thunkMiddleware];
-    if (process.env.NODE_ENV === 'development') {
-        middleware.push(loggerMiddleware);
-    }
-    const enhancer = composeWithDevTools(applyMiddleware(...middleware));
-    const store = createStore(reducer, initialData, enhancer);
+    const store = createReduxStore({
+        logs: reducer
+    }, initialData);
 
     ReactDOM.render(
         <Provider store={store}>

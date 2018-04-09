@@ -15,7 +15,6 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import {combineReducers} from 'redux';
 import * as actions from './actions';
 
 
@@ -36,7 +35,7 @@ const initialState = {
     currentViewIndex: null
 };
 
-function logReducer(state = initialState, action) {
+export default function logReducer(state = initialState, action) {
     switch (action.type) {
         case actions.SET_KEYWORD:
             return {...state, keyword: action.keyword};
@@ -62,9 +61,3 @@ function logReducer(state = initialState, action) {
             return state;
     }
 }
-
-
-export default combineReducers({
-    logs: logReducer,
-    staticData: (state = {}) => state,
-});
