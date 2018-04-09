@@ -110,7 +110,9 @@ rules:
   keyword-spacing: error
   lines-between-class-members: error
   max-statements-per-line: error
-  new-cap: error
+  new-cap:
+    - error
+    - capIsNewExceptionPattern: '\$\.(Event|Deferred)$'
   object-curly-spacing: error
   object-property-newline:
     - error
