@@ -15,18 +15,42 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import moment from 'moment';
-import 'antd/lib/avatar/style/css';
-import 'antd/lib/grid/style/css';
-import 'antd/lib/layout/style/css';
-import 'antd/lib/menu/style/css';
-import '../styles/main.scss';
+$white: #fff;
+$highlight-color: #7DCFB6;
+$menu-height: 75px;
 
-import setupUserActions from './components/UserActions.jsx';
+.rb-menu-bar {
+    background-color: $highlight-color;
+    padding: 0 0 0 2em;
+    height: $menu-height;
+    line-height: $menu-height;
 
-document.addEventListener("DOMContentLoaded", () => {
-    moment.locale(Indico.User.language);
-    setupUserActions(document.getElementById('rb-user-actions-container'), {
-        isAdmin: true
-    });
-});
+    h1 {
+        color: $white;
+        margin: 0;
+    }
+}
+
+.rb-menu.ant-menu.ant-menu-dark {
+    background-color: $highlight-color;
+    border-bottom: 0;
+    line-height: $menu-height;
+
+    a.ant-menu-item {
+        color: $white;
+        height: 100%;
+
+        &:hover {
+            background: darken($highlight-color, 5%);
+        }
+
+        &.ant-menu-item-active {
+            border-bottom: 0;
+            background: darken($highlight-color, 10%);
+        }
+    }
+}
+
+.rb-content {
+    padding: 2em;
+}
