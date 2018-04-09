@@ -19,6 +19,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import {IButton, Modal} from 'indico/react/components';
+import {Translate} from 'indico/react/i18n';
 import {Slot} from 'indico/react/util';
 
 
@@ -111,11 +112,11 @@ export default class LogEntryModal extends React.Component {
                 <Slot name="footer">
                     <div className="group flexrow f-j-space-between">
                         <IButton title="Previous" icon="prev" onClick={this.prevEntry} disabled={this._isFirstEntry()}>
-                            Previous
+                            <Translate>Previous</Translate>
                         </IButton>
                         <IButton title="Next" classes={{next: true}} highlight onClick={this.nextEntry}
                                  disabled={this._isLastEntry()}>
-                            Next
+                            <Translate>Next</Translate>
                         </IButton>
                     </div>
                 </Slot>
