@@ -106,6 +106,50 @@ export function webpackDefaults(env, config) {
         const root = path.resolve(config.indico ? config.indico.build.rootPath : config.build.rootPath, '..');
         return path.relative(root, info.absoluteResourcePath);
     }
+
+    function buildSCSSLoader(cssLoaderOptions = {}) {
+        return ExtractTextPlugin.extract({
+            fallback: 'style-loader',
+            use: [{
+                loader: 'css-loader',
+                options: {
+                    root: config.indico ? config.indico.build.staticPath : config.build.staticPath,
+                    sourceMap: true,
+                    url: !config.isPlugin, // FIXME: true breaks plugins, false breaks /indico/ in core
+                    ...cssLoaderOptions
+                }
+            }, {
+                loader: 'postcss-loader',
+                options: {
+                    sourceMap: true,
+                    config: {
+                        path: path.join(
+                            config.indico
+                                ? config.indico.build.rootPath
+                                : config.build.rootPath,
+                            'postcss.config.js'
+                        ),
+                        ctx: {
+                            urlnamespaces: {
+                                namespacePaths: (name) => {
+                                    return path.join(config.indico.build.staticURL, 'static/plugins', name);
+                                }
+                            }
+                        }
+                    }
+                }
+            }, {
+                loader: 'sass-loader',
+                options: {
+                    sourceMap: true,
+                    includePaths: [scssIncludePath],
+                    outputStyle: 'compact',
+                    importer: importOnce,
+                }
+            }],
+        });
+    }
+
     const indicoClientPath = config.isPlugin ? config.indico.build.clientPath : config.build.clientPath;
     const urlMapPath = path.resolve(
         config.indico ? config.indico.build.rootPath : config.build.rootPath, '..', 'url_map.json');
@@ -114,6 +158,7 @@ export function webpackDefaults(env, config) {
         urlMap: require(urlMapPath).rules,
         basePath: config.indico ? config.indico.build.baseURLPath : config.build.baseURLPath,
     }]];
+
 
     return {
         devtool: 'source-map',
@@ -149,56 +194,31 @@ export function webpackDefaults(env, config) {
                     }
                 },
                 {
-                    test: /\.css$/,
-                    use: ExtractTextPlugin.extract({
-                        fallback: 'style-loader',
-                        use: {
-                            loader: 'css-loader',
-                            options: _cssLoaderOptions
-                        }
-                    })
-                },
-                {
-                    test: /\.scss$/,
-                    use: ExtractTextPlugin.extract({
-                        fallback: 'style-loader',
-                        use: [{
-                            loader: 'css-loader',
-                            options: {
-                                root: config.indico ? config.indico.build.staticPath : config.build.staticPath,
-                                sourceMap: true,
-                                url: !config.isPlugin, // FIXME: true breaks plugins, false breaks /indico/ in core
-                            }
-                        }, {
-                            loader: 'postcss-loader',
-                            options: {
-                                sourceMap: true,
-                                config: {
-                                    path: path.join(
-                                        config.indico
-                                            ? config.indico.build.rootPath
-                                            : config.build.rootPath,
-                                        'postcss.config.js'
-                                    ),
-                                    ctx: {
-                                        urlnamespaces: {
-                                            namespacePaths: (name) => {
-                                                return path.join(config.indico.build.staticURL, 'static/plugins', name);
-                                            }
-                                        }
-                                    }
+                    oneOf: [
+                        {
+                            test: /\.css$/,
+                            use: ExtractTextPlugin.extract({
+                                fallback: 'style-loader',
+                                use: {
+                                    loader: 'css-loader',
+                                    options: _cssLoaderOptions
                                 }
-                            }
-                        }, {
-                            loader: 'sass-loader',
-                            options: {
-                                sourceMap: true,
-                                includePaths: [scssIncludePath],
-                                outputStyle: 'compact',
-                                importer: importOnce,
-                            }
-                        }],
-                    })
+                            })
+                        },
+                        {
+                            test: /\.module\.scss$/,
+                            use: buildSCSSLoader({
+                                context: path.resolve(config.build.clientPath, '../../modules'),
+                                modules: true,
+                                importLoaders: 1,
+                                localIdentName: '[path]___[name]__[local]___[hash:base64:5]'
+                            })
+                        },
+                        {
+                            test: /\.scss$/,
+                            use: buildSCSSLoader()
+                        }
+                    ]
                 }
             ]
         },

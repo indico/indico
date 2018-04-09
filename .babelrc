@@ -14,6 +14,15 @@
       "libraryName": "antd",
       "libraryDirectory": "es",
       "style": "css"
+    }],
+    ["react-css-modules", {
+      "exclude": "node_modules",
+      "context": "indico/modules",
+      "filetypes": {
+        ".scss": {
+          "syntax": "postcss-scss"
+        }
+      }
     }]
   ],
   "env": {
