@@ -17,6 +17,7 @@ logging.yaml
 # generated stuff
 *.mo
 indico/web/static/dist
+url_map.json
 
 # fetched external dependencies
 indico/htdocs/*/lib/

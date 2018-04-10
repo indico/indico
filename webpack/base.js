@@ -26,6 +26,7 @@ import ExtractTextPlugin from 'extract-text-webpack-plugin';
 import ManifestPlugin from 'webpack-manifest-plugin';
 import ProgressBarPlugin from 'progress-bar-webpack-plugin';
 import importOnce from 'node-sass-import-once';
+import flaskURLPlugin from '../babel-flask-url';
 
 
 function _resolveTheme(rootPath, indicoClientPath, filePath) {
@@ -107,6 +108,12 @@ export function webpackDefaults(env, config) {
         return path.relative(root, info.absoluteResourcePath);
     }
     const indicoClientPath = config.isPlugin ? config.indico.build.clientPath : config.build.clientPath;
+    const urlMapPath = path.resolve(
+        config.indico ? config.indico.build.rootPath : config.build.rootPath, '..', 'url_map.json');
+    const babelPlugins = [[flaskURLPlugin, {
+        importPrefix: 'indico-url',
+        urlMap: require(urlMapPath).rules
+    }]];
 
     return {
         devtool: 'source-map',
@@ -127,6 +134,7 @@ export function webpackDefaults(env, config) {
                     options: {
                         extends: path.resolve(config.indico ? config.indico.build.rootPath : config.build.rootPath,
                                               '..', '.babelrc'),
+                        plugins: babelPlugins
                     }
                 },
                 {
@@ -136,7 +144,8 @@ export function webpackDefaults(env, config) {
                     options: {
                         extends: path.resolve(config.indico ? config.indico.build.rootPath : config.build.rootPath,
                                               '..', '.babelrc'),
-                        presets: ['@babel/react']
+                        presets: ['@babel/react'],
+                        plugins: babelPlugins
                     }
                 },
                 {

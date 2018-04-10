@@ -165,12 +165,15 @@ def _clean(webpack_build_config, plugin_dir=None):
 @_common_build_options()
 def build_indico(dev, clean, watch, url_root):
     """Run webpack to build assets"""
+    clean = clean or (clean is None and not dev)
     webpack_build_config_file = 'webpack-build-config.json'
     webpack_build_config = _get_webpack_build_config(url_root)
     with open(webpack_build_config_file, 'w') as f:
         json.dump(webpack_build_config, f, indent=2, sort_keys=True)
-    if clean or (clean is None and not dev):
+    if clean:
         _clean(webpack_build_config)
+    force_url_map = ['--force'] if clean or not dev else []
+    subprocess.check_call(['python', 'bin/maintenance/dump_url_map.py'] + force_url_map)
     args = _get_webpack_args(dev, watch)
     try:
         subprocess.check_call(['npx', 'webpack'] + args)
@@ -215,12 +218,15 @@ def _chdir(path):
 @_common_build_options()
 def build_plugin(plugin_dir, dev, clean, watch, url_root):
     """Run webpack to build plugin assets"""
+    clean = clean or (clean is None and not dev)
     webpack_build_config_file = os.path.join(plugin_dir, 'webpack-build-config.json')
     webpack_build_config = _get_plugin_webpack_build_config(plugin_dir, url_root)
     with open(webpack_build_config_file, 'w') as f:
         json.dump(webpack_build_config, f, indent=2, sort_keys=True)
-    if clean or (clean is None and not dev):
+    if clean:
         _clean(webpack_build_config, plugin_dir)
+    force_url_map = ['--force'] if clean or not dev else []
+    subprocess.check_call(['python', 'bin/maintenance/dump_url_map.py'] + force_url_map)
     webpack_config_file = os.path.join(plugin_dir, 'webpack.config.js')
     if not os.path.exists(webpack_config_file):
         webpack_config_file = 'plugin.webpack.config.js'
