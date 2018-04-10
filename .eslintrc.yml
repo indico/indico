@@ -303,7 +303,9 @@ rules:
   import/no-named-as-default: error
   import/no-named-as-default-member: error
   import/no-named-default: error
-  import/no-unresolved: error
+  import/no-unresolved:
+    - error
+    - ignore: ['^indico-url:']
   import/order:
     - warn
     - groups: [builtin, external, internal, [parent, sibling], index]
