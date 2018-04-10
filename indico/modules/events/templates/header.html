@@ -54,6 +54,12 @@
             {% endfor %}
         {% endfor %}
     </ul>
+    {% if event.type == 'conference' and theme %}
+        <span class="separator"></span>
+        <a href="{{ event.url }}" class="i-button text-color subtle">
+            {%- trans %}Conference View{% endtrans -%}
+        </a>
+    {% endif %}
 {%- endmacro -%}
 
 
