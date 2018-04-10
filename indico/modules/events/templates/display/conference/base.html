@@ -5,18 +5,22 @@
 
 {%- macro _format_event_date(event) -%}
     {% set start_dt = event.start_dt_display.astimezone(event.display_tzinfo) %}
+    {% set start_dt_iso = event.start_dt.isoformat() %}
     {% set end_dt = event.end_dt_display.astimezone(event.display_tzinfo) %}
+    {% set end_dt_iso = event.end_dt.isoformat() %}
     {% if start_dt.date() == end_dt.date() %}
-        {{ start_dt | format_date('long') }}
+       <span itemprop="startDate" content="{{ start_dt_iso }}">{{ start_dt | format_date('long') }}</span>
     {% elif start_dt.year == end_dt.year and start_dt.month == end_dt.month %}
-        {{ start_dt.day }}-{{ end_dt.day }} {{ start_dt | format_date('MMMM yyyy') }}
+        <span itemprop="startDate" content="{{ start_dt_iso }}">{{ start_dt.day }}</span>{#--#}
+        -<span itemprop="endDate" content="{{ end_dt_iso }}">{{ end_dt.day }}</span>
+        {{ start_dt | format_date('MMMM yyyy') }}
     {% else %}
         {% trans start=start_dt|format_date('long'), end=end_dt|format_date('long') -%}
-            {{ start }} to {{ end }}
+            <span itemprop="startDate" content="{{ start_dt_iso }}">{{ start }}</span> to
+            <span itemprop="endDate" content="{{ end_dt_iso }}">{{ end }}</span>
         {%- endtrans %}
     {% endif %}
 {%- endmacro -%}
-
 
 {% block page %}
     <div class="conf clearfix" itemscope itemtype="http://schema.org/Event">
@@ -31,7 +35,7 @@
                                        <img src="{{ event.logo_url }}" alt="{{ event.title }}" border="0" class="confLogo">
                                     </div>
                                 {% endif %}
-                                <span itemprop="title">{{ event.title }}</span>
+                                <span itemprop="name">{{ event.title }}</span>
                             </span>
                         </a>
                     </h1>
@@ -43,7 +47,7 @@
                         {{ template_hook('conference-header', event=event) }}
                         <div class="datePlace">
                             <div class="date">{{ _format_event_date(event) }}</div>
-                            <div class="place">{{ event.venue_name }}</div>
+                            <div class="place" itemprop="location">{{ event.venue_name }}</div>
                             <div class="timezone">
                                 {%- trans tz=event.display_tzinfo.zone %}{{ tz }} timezone{% endtrans -%}
                             </div>
