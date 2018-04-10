@@ -16,6 +16,7 @@
 </%block>
 
 \usepackage{hyperref}
+\usepackage[ocgcolorlinks]{ocgx2}[2017/03/30]
 \usepackage{amssymb}
 \usepackage{amsmath}
 \usepackage{fontspec}
