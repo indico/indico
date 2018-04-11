@@ -22,4 +22,4 @@ from indico.modules.rb_new.views.base import WPRoomBookingBase
 
 class RHRoomBookingLanding(RHRoomBookingBase):
     def _process(self):
-        return WPRoomBookingBase.display('landing.html')
+        return WPRoomBookingBase.display('room_booking.html')
