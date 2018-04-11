@@ -23,3 +23,4 @@ _bp = IndicoBlueprint('rooms_new', __name__, template_folder='../templates', vir
                       url_prefix='/rooms_new')
 
 _bp.add_url_rule('/', 'roombooking', landing.RHRoomBookingLanding)
+_bp.add_url_rule('/<path:path>', 'roombooking', landing.RHRoomBookingLanding)
