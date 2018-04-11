@@ -28,7 +28,7 @@ from indico.modules.auth.util import url_for_login
 from indico.modules.events.registration.util import url_rule_to_angular
 from indico.modules.rb.models.locations import Location
 from indico.modules.users.util import serialize_user
-from indico.util.i18n import po_to_json
+from indico.util.i18n import po_to_json, get_all_locales
 from indico.web.flask.util import url_for, url_rule_to_js
 
 
@@ -79,6 +79,7 @@ def generate_user_file(user=None):
             'id': user.id,
             'first_name': user.first_name,
             'last_name': user.last_name,
+            'email': user.email,
             'favorite_users': {u.id: serialize_user(u) for u in user.favorite_users},
             'language': session.lang,
             'avatar_bg_color': user.avatar_bg_color
@@ -207,7 +208,8 @@ def generate_global_file():
 
         'Settings': {
             'ExtAuthenticators': ext_auths,
-            'RoomBookingModuleActive': config.ENABLE_ROOMBOOKING
+            'RoomBookingModuleActive': config.ENABLE_ROOMBOOKING,
+            'Languages': get_all_locales()
         },
 
         'FileRestrictions': {
