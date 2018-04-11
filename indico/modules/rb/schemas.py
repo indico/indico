@@ -14,14 +14,17 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import unicode_literals
 
-from indico.modules.rb_new.controllers.user import landing
-from indico.web.flask.wrappers import IndicoBlueprint
+from indico.core.marshmallow import mm
+from indico.modules.rb.models.rooms import Room
 
 
-_bp = IndicoBlueprint('rooms_new', __name__, template_folder='../templates', virtual_template_folder='rb_new',
-                      url_prefix='/rooms_new')
+class RoomSchema(mm.ModelSchema):
+    class Meta:
+        model = Room
+        fields = ('id', 'name', 'capacity', 'building', 'floor', 'number', 'is_public', 'location_name', 'has_vc',
+                  'has_projector', 'has_webcast_recording', 'small_photo_url')
 
-_bp.add_url_rule('/', 'roombooking', landing.RHRoomBookingLanding)
-_bp.add_url_rule('/<path:path>', 'roombooking', landing.RHRoomBookingLanding)
-_bp.add_url_rule('/api/rooms', 'available_rooms', landing.RHRoomBookingSearch)
+
+rooms_schema = RoomSchema(many=True)
