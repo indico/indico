@@ -1,38 +1,6 @@
 {% extends 'indico_new_base.html' %}
 
 {% block body %}
-    <div class="rb-menu-bar ant-row ant-layout-header">
-        <div class="ant-col-6">
-            <h1>
-                <i class="anticon anticon-home"></i>
-                {% trans %}Room Booking{% endtrans %}
-            </h1>
-        </div>
-        <div class="ant-col-12 rb-menu ant-menu ant-menu-dark ant-menu-horizontal ant-menu-root">
-            <a class="ant-menu-item ant-menu-item-active">
-                <i class="anticon anticon-plus-circle-o"></i>
-                {% trans %}Book a Room{% endtrans %}
-            </a>
-            <a class="ant-menu-item">
-                <i class="anticon anticon-profile"></i>
-                {% trans %}List of Rooms{% endtrans %}
-            </a>
-            <a class="ant-menu-item">
-                <i class="anticon anticon-schedule"></i>
-                {% trans %}Calendar{% endtrans %}
-            </a>
-            <a class="ant-menu-item">
-                <i class="anticon anticon-close-circle-o"></i>
-                {% trans %}Blockings{% endtrans %}
-            </a>
-        </div>
-        <div class="ant-col-6">
-            <div class="ant-row-flex ant-row-flex-end" id="rb-user-actions-container">
-            </div>
-        </div>
-    </div>
-    <div class="ant-layout-content rb-content">
-        {% block content %}
-        {% endblock %}
+    <div id="rb-app-container">
     </div>
 {% endblock %}

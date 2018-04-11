@@ -14,8 +14,28 @@
  * You should have received a copy of the GNU General Public License
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
+import React from 'react';
+import ReactDOM from 'react-dom';
+import {Provider, connect} from 'react-redux';
+import UserMenu from '../components/UserMenu';
 
-.user-icon {
-    font-size: 2em;
-    vertical-align: middle;
+
+const mapStateToProps = ({user, staticData}) => ({
+    userData: user,
+    staticData: staticData,
+});
+
+const Connector = connect(
+    mapStateToProps,
+    null
+)(UserMenu);
+
+
+export default function setupUserMenu(element, store) {
+    ReactDOM.render(
+        <Provider store={store}>
+            <Connector />
+        </Provider>,
+        element
+    );
 }

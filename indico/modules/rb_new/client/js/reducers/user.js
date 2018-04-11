@@ -15,18 +15,16 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import moment from 'moment';
-import 'antd/lib/avatar/style/css';
-import 'antd/lib/grid/style/css';
-import 'antd/lib/layout/style/css';
-import 'antd/lib/menu/style/css';
-import '../styles/main.scss';
+// import * as actions from './actions';
 
-import setupUserActions from './components/UserActions.jsx';
+const initialState = {
+};
 
-document.addEventListener("DOMContentLoaded", () => {
-    moment.locale(Indico.User.language);
-    setupUserActions(document.getElementById('rb-user-actions-container'), {
-        isAdmin: true
-    });
-});
+export default function reducer(state = initialState, action) {
+    switch (action.type) {
+        case 'SET_USER':
+            return {...state, ...action.data};
+        default:
+            return state;
+    }
+}

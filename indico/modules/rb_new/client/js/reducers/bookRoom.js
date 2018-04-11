@@ -15,7 +15,14 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-.user-icon {
-    font-size: 2em;
-    vertical-align: middle;
+// import * as actions from './actions';
+
+const initialState = {
+};
+
+export default function reducer(state = initialState, action) {
+    switch (action.type) {
+        default:
+            return state;
+    }
 }

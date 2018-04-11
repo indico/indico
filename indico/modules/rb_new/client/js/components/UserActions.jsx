@@ -15,31 +15,35 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+/* eslint "react/forbid-component-props": "off" */
+
 import React from 'react';
-import ReactDOM from 'react-dom';
-import {Menu, Dropdown, Icon} from 'antd';
+import {Menu, Icon} from 'antd';
 import propTypes from 'prop-types';
 
-import './UserActions.module.scss';
+import {Slot, toClasses} from 'indico/react/util';
+import ArrowDownMenu, {styles as arrowDownStyles} from 'indico/react/components/ArrowDownMenu';
+
+import userActionsStyles from './UserActions.module.scss';
 
 
-function UserActions({hasRooms, hasBlockings, isAdmin}) {
-    const menu = (
-        <Menu>
-            <Menu.Item>My Bookings</Menu.Item>
-            {hasRooms && <Menu.Item>Bookings in My Rooms</Menu.Item>}
-            {hasRooms && <Menu.Item>List of My Rooms</Menu.Item>}
-            {hasBlockings && <Menu.Item>My Blockings</Menu.Item>}
-            {isAdmin && <Menu.Item>Administration</Menu.Item>}
-        </Menu>
-    );
+export default function UserActions({hasRooms, hasBlockings, isAdmin}) {
     return (
-        <Dropdown overlay={menu}>
-            <span styleName="container">
-                <Icon styleName="anticon" type="user" size="large" />
-                <Icon styleName="anticon" type="down" />
-            </span>
-        </Dropdown>
+        <ArrowDownMenu>
+            <Slot name="avatar">
+                <Icon className={toClasses(userActionsStyles['user-icon'], arrowDownStyles['icon-change-hover'])}
+                      type="user" size="large" />
+            </Slot>
+            <Slot>
+                <Menu>
+                    <Menu.Item>My Bookings</Menu.Item>
+                    {hasRooms && <Menu.Item>Bookings in My Rooms</Menu.Item>}
+                    {hasRooms && <Menu.Item>List of My Rooms</Menu.Item>}
+                    {hasBlockings && <Menu.Item>My Blockings</Menu.Item>}
+                    {isAdmin && <Menu.Item>Administration</Menu.Item>}
+                </Menu>
+            </Slot>
+        </ArrowDownMenu>
     );
 }
 
@@ -54,10 +58,3 @@ UserActions.defaultProps = {
     hasBlockings: false,
     isAdmin: false
 };
-
-export default function setupUserActions(element, userData) {
-    ReactDOM.render(
-        <UserActions {...userData} />,
-        element
-    );
-}

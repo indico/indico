@@ -15,42 +15,30 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+@import 'base/palette';
+
 $white: #fff;
 $highlight-color: #7DCFB6;
 $menu-height: 75px;
 
-.rb-menu-bar {
-    background-color: $highlight-color;
+// TODO: move this to Indico-wide file
+.ant-layout-header.indico-top-bar {
+    background-color: $dark-blue;
+    height: 50px;
+    display: flex;
+    align-items: center;
     padding: 0 0 0 2em;
-    height: $menu-height;
-    line-height: $menu-height;
 
-    h1 {
-        color: $white;
-        margin: 0;
-    }
-}
+    .indico-top-bar-logo {
+        display: flex;
+        align-items: center;
 
-.rb-menu.ant-menu.ant-menu-dark {
-    background-color: $highlight-color;
-    border-bottom: 0;
-    line-height: $menu-height;
-
-    a.ant-menu-item {
-        color: $white;
-        height: 100%;
-
-        &:hover {
-            background: darken($highlight-color, 5%);
-        }
-
-        &.ant-menu-item-active {
-            border-bottom: 0;
-            background: darken($highlight-color, 10%);
+        img {
+            height: 30px;
         }
     }
-}
 
-.rb-content {
-    padding: 2em;
+    .indico-user-menu {
+        margin-left: auto;
+    }
 }
