@@ -14,8 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
+import {connect} from 'react-redux';
+import UserActions from '../components/UserActions';
 
-.user-icon {
-    font-size: 2em;
-    vertical-align: middle;
-}
+
+const mapStateToProps = ({user}) => ({...user});
+
+export default connect(
+    mapStateToProps,
+    null
+)(UserActions);

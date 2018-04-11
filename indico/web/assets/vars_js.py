@@ -82,7 +82,8 @@ def generate_user_file(user=None):
             'email': user.email,
             'favorite_users': {u.id: serialize_user(u) for u in user.favorite_users},
             'language': session.lang,
-            'avatar_bg_color': user.avatar_bg_color
+            'avatar_bg_color': user.avatar_bg_color,
+            'is_admin': user.is_admin
         }
     return render_template('assets/vars_user.js', user_vars=user_vars, user=user)
 
