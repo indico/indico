@@ -45,6 +45,7 @@
     "react-jsx-i18n": "*",
     "react-modal": "^3.3.2",
     "react-redux": "^5.0.7",
+    "react-router-dom": "^4.2.2",
     "redux": "^3.7.2",
     "redux-devtools-extension": "^2.13.2",
     "redux-logger": "^3.0.6",
