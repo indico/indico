@@ -16,10 +16,13 @@
  */
 
 import React from 'react';
+import {BrowserRouter, Route, Switch} from 'react-router-dom';
 import {Icon, Layout, Row, Col, Menu} from 'antd';
 
 import {Translate} from 'indico/react/i18n';
 import UserActions from '../containers/UserActions';
+import Landing from "./Landing";
+import BookRoom from "./BookRoom";
 
 import './App.module.scss';
 
@@ -63,7 +66,12 @@ export default function App() {
                 </Col>
             </Header>
             <Content styleName="rb-content">
-                New Room Booking
+                <BrowserRouter basename="/rooms_new">
+                    <Switch>
+                        <Route exact path="/" component={Landing} />
+                        <Route path="/book-room" component={BookRoom} />
+                    </Switch>
+                </BrowserRouter>
             </Content>
         </Layout>
     );
