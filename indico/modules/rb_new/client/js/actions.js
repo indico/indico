@@ -15,7 +15,6 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-.user-icon {
-    font-size: 2em;
-    vertical-align: middle;
+export function setUser(data) {
+    return {type: 'SET_USER', data};
 }

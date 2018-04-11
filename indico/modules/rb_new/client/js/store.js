@@ -15,7 +15,21 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-.user-icon {
-    font-size: 2em;
-    vertical-align: middle;
+import createReduxStore from 'indico/utils/redux';
+import {userReducer, bookRoomReducer} from './reducers';
+
+
+const initialData = {
+    staticData: {
+    },
+    user: null,
+    bookRoom: {
+    }
+};
+
+export default function createRBStore(data) {
+    return createReduxStore({
+        user: userReducer,
+        bookRoom: bookRoomReducer
+    }, Object.assign(initialData, data));
 }

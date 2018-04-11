@@ -15,7 +15,45 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-.user-icon {
-    font-size: 2em;
-    vertical-align: middle;
+@import '../../styles/main';
+
+.rb-menu-bar {
+    background-color: $highlight-color;
+    padding: 0 0 0 2em;
+    height: $menu-height;
+    line-height: $menu-height;
+
+    h1 {
+        color: $white;
+        margin: 0;
+    }
+}
+
+.rb-menu {
+    background-color: $highlight-color;
+    border-bottom: 0;
+    line-height: $menu-height;
+}
+
+.rb-menu .rb-menu-item {
+    color: $white;
+    height: 100%;
+
+    &:hover {
+        background: darken($highlight-color, 5%);
+    }
+}
+
+.rb-menu .rb-menu-item:global(.ant-menu-item-active) {
+    border-bottom: 0;
+    background: darken($highlight-color, 10%);
+}
+
+.rb-menu .rb-menu-item:global(.ant-menu-item-selected) {
+    background: darken($highlight-color, 15%);
+}
+
+
+.rb-content {
+    padding: 2em;
 }

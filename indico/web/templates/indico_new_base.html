@@ -20,6 +20,7 @@
     {% endif %}
 
     <script type="text/javascript" src="{{ url_for('assets.i18n_locale', locale_name=session.lang) }}"></script>
+    <script type="text/javascript" src="{{ url_for('assets.i18n_locale_react', locale_name=session.lang) }}"></script>
     <script type="text/javascript" src="{{ url_for('assets.js_vars_global') }}"></script>
 
     {% for bundle in bundles %}
@@ -45,6 +46,18 @@
 </head>
 <body data-user-id="{{ session.user.id if session.user else 'null' }}"
       data-debug="{{ config.DEBUG|tojson|forceescape }}">
+    {% block topbar %}
+        <div class="indico-top-bar ant-layout-header">
+            {% block logo %}
+                {%- set logo_url = indico_config.LOGO_URL or (indico_config.IMAGES_BASE_URL + '/logo_indico_bw.png') -%}
+                <a class="indico-top-bar-logo" href="{{ url_for_index() }}">
+                    <img src="{{ logo_url }}">
+                </a>
+            {% endblock %}
+            <div class="indico-user-menu" id="indico-user-menu-container">
+            </div>
+        </div>
+    {% endblock %}
     {% block body %}{% endblock %}
 </body>
 </html>

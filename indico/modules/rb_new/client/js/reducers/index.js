@@ -15,7 +15,11 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-.user-icon {
-    font-size: 2em;
-    vertical-align: middle;
-}
+import bookRoomReducer from './bookRoom';
+import userReducer from './user';
+
+
+export {
+    bookRoomReducer,
+    userReducer
+};
