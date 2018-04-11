@@ -193,7 +193,7 @@
         },
 
         _applyShowMine: function(key, toggle) {
-            var filterIcon = this._getHeader().addClass("toolbar thin").find('.icon-filter');
+            var filterIcon = $(this._getHeader()[0]).find('.icon-filter');
             var state = $.jStorage.get(key, false);
 
             if (toggle) {
