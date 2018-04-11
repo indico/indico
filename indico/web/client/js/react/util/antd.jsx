@@ -15,6 +15,25 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-export {default as Slot} from './Slot';
-export {toClasses} from './html';
-export {ContainerDiv, ContainerBound} from './antd';
+import React from 'react';
+import propTypes from 'prop-types';
+
+
+const ContainerContext = React.createContext('container');
+
+export function ContainerDiv({children, ...rest}) {
+    const containerRef = React.createRef();
+    return (
+        <ContainerContext.Provider value={() => containerRef.current}>
+            <div ref={containerRef} {...rest}>
+                {children}
+            </div>
+        </ContainerContext.Provider>
+    );
+}
+
+ContainerDiv.propTypes = {
+    children: propTypes.node.isRequired
+};
+
+export const ContainerBound = ContainerContext.Consumer;
