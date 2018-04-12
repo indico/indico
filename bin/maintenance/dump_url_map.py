@@ -21,6 +21,8 @@ import subprocess
 
 import click
 
+from flask_url_map_serializer import dump_url_map
+
 
 URL_MAP_FILE = 'url_map.json'
 
@@ -38,11 +40,9 @@ def get_map_version():
 
 def get_rules():
     from indico.web.flask.app import make_app
-    from indico.web.flask.util import url_rule_to_js
     app = make_app(set_path=True, testing=True, config_override={'BASE_URL': 'http://localhost/',
                                                                  'SECRET_KEY': '*' * 16})
-    with app.app_context():
-        return {endpoint: url_rule_to_js(endpoint) for endpoint in app.view_functions}
+    return dump_url_map(app.url_map)
 
 
 @click.command()
@@ -64,7 +64,7 @@ def main(force):
     data['version'] = version
     data['rules'] = rules
     with open(URL_MAP_FILE, 'w') as f:
-        json.dump(data, f)
+        json.dump(data, f, sort_keys=True, indent=2)
 
 
 if __name__ == '__main__':
