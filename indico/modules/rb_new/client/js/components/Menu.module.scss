@@ -15,29 +15,45 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-@import '../../styles/main';
+ @import '../../styles/main';
 
-.rb-menu-bar {
+ ul.rb-menu {
+    list-style-type: none;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
     background-color: $highlight-color;
-    padding: 0 0 0 2em;
-    height: $menu-height;
+    border-bottom: 0;
     line-height: $menu-height;
+}
+
+.rb-menu .rb-menu-item {
+    background-color: $highlight-color;
+    transition: background-color .25s ease-in;
+    height: 100%;
+    flex-grow: 1;
+    text-align: center;
+    font-size: 1.2em;
 
     a {
-        text-decoration: none;
+        color: $white;
+        display: block;
+
+        :global(.anticon) {
+            margin-right: 0.5em;
+        }
     }
 
-    h1 {
-        margin: 0;
-        color: $white;
-
-        a {
-            color: $white;
-            margin-left: 0.2em;
-        }
+    &:hover {
+        background: darken($highlight-color, 5%);
     }
 }
 
-.rb-content {
-    padding: 2em;
+.rb-menu .rb-menu-item:global(.active) {
+    border-bottom: 0;
+    background: darken($highlight-color, 10%);
+}
+
+.rb-menu .rb-menu-item:global(.selected) {
+    background: darken($highlight-color, 15%);
 }

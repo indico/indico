@@ -15,29 +15,11 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-@import '../../styles/main';
+import React from 'react';
 
-.rb-menu-bar {
-    background-color: $highlight-color;
-    padding: 0 0 0 2em;
-    height: $menu-height;
-    line-height: $menu-height;
 
-    a {
-        text-decoration: none;
-    }
-
-    h1 {
-        margin: 0;
-        color: $white;
-
-        a {
-            color: $white;
-            margin-left: 0.2em;
-        }
-    }
-}
-
-.rb-content {
-    padding: 2em;
+export default function BookRoom() {
+    return (
+        <h2>Book a Room</h2>
+    );
 }

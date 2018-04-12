@@ -15,29 +15,15 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-@import '../../styles/main';
+import React from 'react';
+import {Link} from 'react-router-dom';
 
-.rb-menu-bar {
-    background-color: $highlight-color;
-    padding: 0 0 0 2em;
-    height: $menu-height;
-    line-height: $menu-height;
 
-    a {
-        text-decoration: none;
-    }
-
-    h1 {
-        margin: 0;
-        color: $white;
-
-        a {
-            color: $white;
-            margin-left: 0.2em;
-        }
-    }
-}
-
-.rb-content {
-    padding: 2em;
+export default function Landing() {
+    return (
+        <>
+            <h2>Landing Page</h2>
+            <Link to="/book">Go to "book a room"</Link>
+        </>
+    );
 }

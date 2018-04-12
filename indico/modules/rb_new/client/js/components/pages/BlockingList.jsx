@@ -20,6 +20,6 @@ import React from 'react';
 
 export default function BookRoom() {
     return (
-        <div>Book a Room page</div>
+        <h2>Blocking List</h2>
     );
 }
