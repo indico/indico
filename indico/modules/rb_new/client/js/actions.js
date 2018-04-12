@@ -15,6 +15,45 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
+
+
+export const SET_USER = 'SET_USER';
+export const FETCH_ROOMS_STARTED = 'FETCH_ROOMS_STARTED';
+export const FETCH_ROOMS_FAILED = 'FETCH_ROOMS_FAILED';
+export const UPDATE_ROOMS = 'UPDATE_ROOMS';
+
+
 export function setUser(data) {
-    return {type: 'SET_USER', data};
+    return {type: SET_USER, data};
+}
+
+export function fetchStarted() {
+    return {type: FETCH_ROOMS_STARTED};
+}
+
+export function fetchFailed() {
+    return {type: FETCH_ROOMS_FAILED};
+}
+
+export function updateRooms(rooms) {
+    return {type: UPDATE_ROOMS, rooms};
+}
+
+export function fetchRooms() {
+    return async (dispatch, getStore) => {
+        dispatch(fetchStarted());
+
+        const {staticData: {fetchRoomsUrl}} = getStore();
+        let response;
+        try {
+            response = await indicoAxios.get(fetchRoomsUrl);
+        } catch (error) {
+            handleAxiosError(error);
+            dispatch(fetchFailed());
+            return;
+        }
+
+        dispatch(updateRooms(response.data));
+    };
 }

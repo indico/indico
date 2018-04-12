@@ -37,6 +37,9 @@ class RHRoomBookingSearch(RHRoomBookingBase):
     def _process(self):
         from indico.modules.rb.schemas import rooms_schema
 
+        if not request.args:
+            return rooms_schema.dumps(Room.query.filter(Room.is_active).all()).data
+
         min_capacity = int(request.args['capacity']) if 'capacity' in request.args else None
         room_name = request.args.get('title')
         start_dt = dateutil.parser.parse(request.args['start_dt'])

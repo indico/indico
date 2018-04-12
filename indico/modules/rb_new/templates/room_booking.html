@@ -1,6 +1,6 @@
 {% extends 'indico_new_base.html' %}
 
 {% block body %}
-    <div id="rb-app-container">
+    <div id="rb-app-container" data-fetch-rooms-url="{{ url_for('rooms_new.available_rooms') }}">
     </div>
 {% endblock %}
