@@ -14,14 +14,21 @@
  * You should have received a copy of the GNU General Public License
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
+import {connect} from 'react-redux';
 
-import bookRoomReducer from './bookRoom';
-import userReducer from './user';
-import roomBookingReducer from './roomBooking';
+import RoomList from '../components/pages/RoomList';
+import {fetchRooms} from '../actions';
 
 
-export {
-    bookRoomReducer,
-    userReducer,
-    roomBookingReducer
-};
+const mapStateToProps = ({roomBooking}) => ({...roomBooking});
+
+const mapDispatchToProps = dispatch => ({
+    fetchRooms: () => {
+        dispatch(fetchRooms());
+    }
+});
+
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(RoomList);

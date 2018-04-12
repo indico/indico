@@ -32,6 +32,7 @@ import createRBStore from './store';
 document.addEventListener("DOMContentLoaded", () => {
     moment.locale(Indico.User.language);
 
+    const appContainer = document.getElementById('rb-app-container');
     const store = createRBStore({
         user: {
             firstName: Indico.User.first_name,
@@ -42,15 +43,17 @@ document.addEventListener("DOMContentLoaded", () => {
             isAdmin: Indico.User.is_admin
         },
         staticData: {
-            availableLanguages: Indico.Settings.Languages
+            availableLanguages: Indico.Settings.Languages,
+            fetchRoomsUrl: appContainer.dataset.fetchRoomsUrl
         }
     });
+
     setupUserMenu(document.getElementById('indico-user-menu-container'), store);
 
     ReactDOM.render(
         <Provider store={store}>
             <App />
         </Provider>,
-        document.getElementById('rb-app-container')
+        appContainer
     );
 });

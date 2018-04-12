@@ -24,7 +24,7 @@ class RoomSchema(mm.ModelSchema):
     class Meta:
         model = Room
         fields = ('id', 'name', 'capacity', 'building', 'floor', 'number', 'is_public', 'location_name', 'has_vc',
-                  'has_projector', 'has_webcast_recording', 'small_photo_url')
+                  'has_projector', 'has_webcast_recording', 'small_photo_url', 'full_name')
 
 
 rooms_schema = RoomSchema(many=True)

@@ -15,13 +15,23 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import bookRoomReducer from './bookRoom';
-import userReducer from './user';
-import roomBookingReducer from './roomBooking';
+import * as actions from '../actions';
 
 
-export {
-    bookRoomReducer,
-    userReducer,
-    roomBookingReducer
+const initialState = {
+    rooms: [],
+    isFetching: false
 };
+
+export default function roomBookingReducer(state = initialState, action) {
+    switch (action.type) {
+        case actions.FETCH_ROOMS_STARTED:
+            return {...state, isFetching: true};
+        case actions.FETCH_ROOMS_FAILED:
+            return {...state, isFetching: false};
+        case actions.UPDATE_ROOMS:
+            return {...state, rooms: action.rooms, isFetching: false};
+        default:
+            return state;
+    }
+}
