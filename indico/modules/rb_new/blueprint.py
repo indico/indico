@@ -30,3 +30,4 @@ _bp.add_url_rule('/<path:path>', 'roombooking', RHRoomBookingLanding)
 
 # Backend
 _bp.add_url_rule('/api/rooms', 'available_rooms', backend.RHRoomBookingSearch)
+_bp.add_url_rule('/api/map/location', 'default_location', backend.RHRoomBookingLocation)

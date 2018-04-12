@@ -20,9 +20,10 @@ from marshmallow_enum import EnumField
 from webargs import fields
 from webargs.flaskparser import use_args
 
+from indico.modules.rb import Location
 from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.models.reservations import RepeatFrequency
-from indico.modules.rb_new.schemas import rooms_schema
+from indico.modules.rb_new.schemas import rooms_schema, aspect_schema
 from indico.modules.rb_new.util import search_for_rooms
 from indico.util.string import natural_sort_key
 
@@ -42,3 +43,8 @@ class RHRoomBookingSearch(RHRoomBookingBase):
     def _process(self, args):
         rooms = sorted(search_for_rooms(args), key=lambda r: natural_sort_key(r.full_name))
         return rooms_schema.dumps(rooms).data
+
+
+class RHRoomBookingLocation(RHRoomBookingBase):
+    def _process(self):
+        return aspect_schema.dumps(Location.default_location.default_aspect).data

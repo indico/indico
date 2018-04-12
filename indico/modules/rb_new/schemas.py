@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 from indico.core.marshmallow import mm
+from indico.modules.rb.models.aspects import Aspect
 from indico.modules.rb.models.rooms import Room
 
 
@@ -27,4 +28,11 @@ class RoomSchema(mm.ModelSchema):
                   'has_projector', 'has_webcast_recording', 'small_photo_url', 'full_name')
 
 
+class AspectSchema(mm.ModelSchema):
+    class Meta:
+        model = Aspect
+        fields = ('center_latitude', 'center_longitude', 'zoom_level')
+
+
 rooms_schema = RoomSchema(many=True)
+aspect_schema = AspectSchema()
