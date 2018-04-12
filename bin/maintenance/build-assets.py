@@ -54,6 +54,7 @@ def _get_webpack_build_config(url_root='/'):
     root_path = os.path.abspath('indico')
     return {
         'build': {
+            'baseURLPath': url_root,
             'clientPath': os.path.join(root_path, 'web', 'client'),
             'rootPath': root_path,
             'staticPath': os.path.join(root_path, 'web', 'static'),
