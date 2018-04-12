@@ -16,11 +16,10 @@
  */
 
 import React from 'react';
-import {Link} from 'react-router-dom';
 
 
-export default function Landing() {
+export default function BookRoom() {
     return (
-        <Link to="/book-room">Go to book a room</Link>
+        <h2>Calendar</h2>
     );
 }

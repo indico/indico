@@ -16,63 +16,56 @@
  */
 
 import React from 'react';
-import {BrowserRouter, Route, Switch} from 'react-router-dom';
-import {Icon, Layout, Row, Col, Menu} from 'antd';
+import {BrowserRouter, Link, Route, Switch} from 'react-router-dom';
+import {Icon, Layout, Row, Col} from 'antd';
 
 import {Translate} from 'indico/react/i18n';
 import UserActions from '../containers/UserActions';
-import Landing from "./Landing";
-import BookRoom from "./BookRoom";
+import Landing from './pages/Landing';
+import BookRoom from './pages/BookRoom';
+import Calendar from './pages/Calendar';
+import RoomList from './pages/RoomList';
+import BlockingList from './pages/BlockingList';
+import Menu from './Menu';
 
 import './App.module.scss';
 
 
 const {Header, Content} = Layout;
 
+
 export default function App() {
     return (
-        <Layout>
-            <Header styleName="rb-menu-bar">
-                <Col span={6}>
-                    <h1>
-                        <Icon type="home" />
-                        <Translate>Room Booking</Translate>
-                    </h1>
-                </Col>
-                <Col span={12}>
-                    <Menu mode="horizontal" theme="dark" styleName="rb-menu">
-                        <Menu.Item styleName="rb-menu-item">
-                            <Icon type="plus-circle-o" />
-                            <Translate>Book a Room</Translate>
-                        </Menu.Item>
-                        <Menu.Item styleName="rb-menu-item">
-                            <Icon type="profile" />
-                            <Translate>List of Rooms</Translate>
-                        </Menu.Item>
-                        <Menu.Item styleName="rb-menu-item">
-                            <Icon type="schedule" />
-                            <Translate>Calendar</Translate>
-                        </Menu.Item>
-                        <Menu.Item styleName="rb-menu-item">
-                            <Icon type="close-circle-o" />
-                            <Translate>Blockings</Translate>
-                        </Menu.Item>
-                    </Menu>
-                </Col>
-                <Col span={6}>
-                    <Row type="flex" justify="end">
-                        <UserActions />
-                    </Row>
-                </Col>
-            </Header>
-            <Content styleName="rb-content">
-                <BrowserRouter basename="/rooms_new">
+        <BrowserRouter basename="/rooms_new">
+            <Layout>
+                <Header styleName="rb-menu-bar">
+                    <Col span={6}>
+                        <h1>
+                            <Icon type="home" />
+                            <Link to="/">
+                                <Translate>Room Booking</Translate>
+                            </Link>
+                        </h1>
+                    </Col>
+                    <Col span={12}>
+                        <Menu />
+                    </Col>
+                    <Col span={6}>
+                        <Row type="flex" justify="end">
+                            <UserActions />
+                        </Row>
+                    </Col>
+                </Header>
+                <Content styleName="rb-content">
                     <Switch>
                         <Route exact path="/" component={Landing} />
-                        <Route path="/book-room" component={BookRoom} />
+                        <Route path="/book" component={BookRoom} />
+                        <Route path="/rooms" component={RoomList} />
+                        <Route path="/blockings" component={BlockingList} />
+                        <Route path="/calendar" component={Calendar} />
                     </Switch>
-                </BrowserRouter>
-            </Content>
-        </Layout>
+                </Content>
+            </Layout>
+        </BrowserRouter>
     );
 }
