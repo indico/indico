@@ -24,7 +24,7 @@ import UserActions from '../containers/UserActions';
 import Landing from './pages/Landing';
 import BookRoom from './pages/BookRoom';
 import Calendar from './pages/Calendar';
-import RoomList from './pages/RoomList';
+import RoomList from '../containers/RoomList';
 import BlockingList from './pages/BlockingList';
 import Menu from './Menu';
 
