@@ -23,6 +23,8 @@ import moment from 'moment';
 import 'antd/lib/layout/style/css';
 import '../styles/main.scss';
 
+import buildFetchRoomsURL from 'indico-url:rooms_new.available_rooms';
+
 import setupUserMenu from 'indico/react/containers/UserMenu';
 import App from './components/App';
 
@@ -44,7 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
         },
         staticData: {
             availableLanguages: Indico.Settings.Languages,
-            fetchRoomsUrl: appContainer.dataset.fetchRoomsUrl
+            fetchRoomsUrl: buildFetchRoomsURL(),
         }
     });
 
