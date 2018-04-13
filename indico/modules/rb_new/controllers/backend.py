@@ -23,7 +23,7 @@ from webargs.flaskparser import use_args
 from indico.modules.rb import Location
 from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.models.reservations import RepeatFrequency
-from indico.modules.rb_new.schemas import rooms_schema, aspect_schema
+from indico.modules.rb_new.schemas import aspect_schema, rooms_schema
 from indico.modules.rb_new.util import search_for_rooms
 from indico.util.string import natural_sort_key
 

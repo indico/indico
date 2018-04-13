@@ -18,13 +18,15 @@
 @import 'base/palette';
 
 $white: #fff;
-$highlight-color: #7DCFB6;
+$highlight-color: #7dcfb6;
+$indico-top-bar-height: 50px;
 $menu-height: 75px;
+$rb-content-padding: 2em;
 
 // TODO: move this to Indico-wide file
 .ant-layout-header.indico-top-bar {
     background-color: $dark-blue;
-    height: 50px;
+    height: $indico-top-bar-height;
     display: flex;
     align-items: center;
     padding: 0 0 0 2em;
