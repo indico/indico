@@ -24,6 +24,7 @@ import {Avatar, Divider, Icon, Select} from 'antd';
 import userDashboard from 'indico-url:users.user_dashboard';
 import userPreferences from 'indico-url:users.user_preferences';
 import authLogout from 'indico-url:auth.logout';
+import adminDashboard from 'indico-url:core.admin_dashboard';
 import changeLanguage from 'indico-url:core.change_lang';
 
 import {Translate} from 'indico/react/i18n';
@@ -92,7 +93,7 @@ export default function UserMenu({userData, staticData}) {
                         </div>
                         <Divider type="horizontal" />
                         {isAdmin && (
-                            <a href="">
+                            <a href={adminDashboard()}>
                                 <Translate>Administration</Translate>
                             </a>
                         )}
