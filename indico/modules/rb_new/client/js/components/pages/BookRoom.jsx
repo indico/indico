@@ -15,14 +15,44 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import propTypes from 'prop-types';
 import React from 'react';
 import filterBarFactory from '../../containers/FilterBar';
+import {Row, Col} from 'antd';
+import {Translate} from 'indico/react/i18n';
 
+import RoomBookingMap from "../RoomBookingMap";
 
-const FilterBar = filterBarFactory('bookRoom');
+export default class BookRoom extends React.Component {
+    static propTypes = {
+        fetchMapDefaultLocation: propTypes.func.isRequired,
+        mapLocation: propTypes.object
+    };
 
-export default function BookRoom() {
-    return (
-        <FilterBar />
-    );
+    static defaultProps = {
+        mapLocation: null
+    };
+
+    constructor(props) {
+        super(props);
+        const {fetchMapDefaultLocation, mapLocation} = props;
+        if (!mapLocation) {
+            fetchMapDefaultLocation();
+        }
+    }
+
+    render() {
+        const {mapLocation} = this.props;
+        const FilterBar = filterBarFactory('bookRoom');
+        return (
+            <Row>
+                <Col span={16}>
+                    <FilterBar />
+                </Col>
+                <Col span={8}>
+                    {mapLocation && <RoomBookingMap center={mapLocation.center} zoom={mapLocation.zoom} />}
+                </Col>
+            </Row>
+        );
+    }
 }

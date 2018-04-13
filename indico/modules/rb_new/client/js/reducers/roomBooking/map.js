@@ -15,17 +15,24 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import {combineReducers} from 'redux';
-
-import roomListReducer from './roomBooking/roomList';
-import filterReducerFactory from './roomBooking/filters';
-import mapReducer from './roomBooking/map';
+import * as actions from '../../actions';
 
 
-const reducer = combineReducers({
-    rooms: roomListReducer,
-    filters: filterReducerFactory('bookRoom'),
-    map: mapReducer
-});
+const initialState = {
+    mapLocation: null,
+    isFetching: false,
+};
 
-export default reducer;
+
+export default function mapReducer(state = initialState, action) {
+    switch (action.type) {
+        case actions.FETCH_DEFAULT_LOCATION_STARTED:
+            return {...state, isFetching: true};
+        case actions.FETCH_DEFAULT_LOCATION_FAILED:
+            return {...state, isFetching: false};
+        case actions.UPDATE_LOCATION:
+            return {...state, mapLocation: action.location, isFetching: false};
+        default:
+            return state;
+    }
+}

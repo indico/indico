@@ -15,17 +15,25 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import {combineReducers} from 'redux';
+import propTypes from 'prop-types';
+import React from 'react';
+import {Map, TileLayer} from 'react-leaflet';
 
-import roomListReducer from './roomBooking/roomList';
-import filterReducerFactory from './roomBooking/filters';
-import mapReducer from './roomBooking/map';
+import 'leaflet/dist/leaflet.css';
+import './RoomBookingMap.module.scss';
 
+export default function RoomBookingMap({center, zoom}) {
+    return (
+        <div styleName="map-container">
+            <Map center={center} zoom={zoom}>
+                <TileLayer attribution='© <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+                           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+            </Map>
+        </div>
+    );
+}
 
-const reducer = combineReducers({
-    rooms: roomListReducer,
-    filters: filterReducerFactory('bookRoom'),
-    map: mapReducer
-});
-
-export default reducer;
+RoomBookingMap.propTypes = {
+    center: propTypes.array.isRequired,
+    zoom: propTypes.number.isRequired
+};
