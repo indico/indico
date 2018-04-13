@@ -15,6 +15,8 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+/* eslint "react/forbid-component-props": "off" */
+
 import {Card, Col, Icon, List, Row} from 'antd';
 import React from 'react';
 import propTypes from 'prop-types';

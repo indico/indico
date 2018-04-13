@@ -22,6 +22,7 @@ import {Menu, Icon} from 'antd';
 import propTypes from 'prop-types';
 
 import {Slot, toClasses} from 'indico/react/util';
+import {Translate} from 'indico/react/i18n';
 import ArrowDownMenu, {styles as arrowDownStyles} from 'indico/react/components/ArrowDownMenu';
 
 import userActionsStyles from './UserActions.module.scss';
@@ -36,11 +37,11 @@ export default function UserActions({hasRooms, hasBlockings, isAdmin}) {
             </Slot>
             <Slot>
                 <Menu>
-                    <Menu.Item>My Bookings</Menu.Item>
-                    {hasRooms && <Menu.Item>Bookings in My Rooms</Menu.Item>}
-                    {hasRooms && <Menu.Item>List of My Rooms</Menu.Item>}
-                    {hasBlockings && <Menu.Item>My Blockings</Menu.Item>}
-                    {isAdmin && <Menu.Item>Administration</Menu.Item>}
+                    <Menu.Item><Translate>My Bookings</Translate></Menu.Item>
+                    {hasRooms && <Menu.Item><Translate>Bookings in My Rooms</Translate></Menu.Item>}
+                    {hasRooms && <Menu.Item><Translate>List of My Rooms</Translate></Menu.Item>}
+                    {hasBlockings && <Menu.Item><Translate>My Blockings</Translate></Menu.Item>}
+                    {isAdmin && <Menu.Item><Translate>Administration</Translate></Menu.Item>}
                 </Menu>
             </Slot>
         </ArrowDownMenu>
