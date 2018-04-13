@@ -17,13 +17,14 @@
 
 import React from 'react';
 import {Link} from 'react-router-dom';
+import {Translate} from 'indico/react/i18n';
 
 
 export default function Landing() {
     return (
         <>
-            <h2>Landing Page</h2>
-            <Link to="/book">Go to "book a room"</Link>
+            <h2><Translate>Landing Page</Translate></h2>
+            <Link to="/book"><Translate>Go to "book a room"</Translate></Link>
         </>
     );
 }

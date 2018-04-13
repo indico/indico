@@ -15,14 +15,14 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-// import * as actions from './actions';
+import * as actions from '../actions';
 
-const initialState = {
-};
+
+const initialState = {};
 
 export default function reducer(state = initialState, action) {
     switch (action.type) {
-        case 'SET_USER':
+        case actions.SET_USER:
             return {...state, ...action.data};
         default:
             return state;
