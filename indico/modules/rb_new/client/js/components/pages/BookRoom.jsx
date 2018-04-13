@@ -16,10 +16,11 @@
  */
 
 import React from 'react';
+import {Translate} from 'indico/react/i18n';
 
 
 export default function BookRoom() {
     return (
-        <h2>Book a Room</h2>
+        <h2><Translate>Book a Room</Translate></h2>
     );
 }

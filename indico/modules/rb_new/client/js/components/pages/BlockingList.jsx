@@ -16,10 +16,11 @@
  */
 
 import React from 'react';
+import {Translate} from 'indico/react/i18n';
 
 
 export default function BookRoom() {
     return (
-        <h2>Blocking List</h2>
+        <h2><Translate>Blocking List</Translate></h2>
     );
 }
