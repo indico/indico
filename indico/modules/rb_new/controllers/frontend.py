@@ -15,3 +15,11 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import unicode_literals
+
+from indico.modules.rb.controllers import RHRoomBookingBase
+from indico.modules.rb_new.views.base import WPRoomBookingBase
+
+
+class RHRoomBookingLanding(RHRoomBookingBase):
+    def _process(self):
+        return WPRoomBookingBase.display('room_booking.html')

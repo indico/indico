@@ -36,7 +36,7 @@ const {Header, Content} = Layout;
 
 export default function App() {
     return (
-        <BrowserRouter basename="/rooms_new">
+        <BrowserRouter basename="/rooms-new">
             <Layout>
                 <Header styleName="rb-menu-bar">
                     <Col span={6}>

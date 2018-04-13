@@ -15,3 +15,18 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import unicode_literals
+
+from indico.modules.rb_new.controllers import backend
+from indico.modules.rb_new.controllers.frontend import RHRoomBookingLanding
+from indico.web.flask.wrappers import IndicoBlueprint
+
+
+_bp = IndicoBlueprint('rooms_new', __name__, template_folder='templates', virtual_template_folder='rb_new',
+                      url_prefix='/rooms-new')
+
+# Frontend
+_bp.add_url_rule('/', 'roombooking', RHRoomBookingLanding)
+_bp.add_url_rule('/<path:path>', 'roombooking', RHRoomBookingLanding)
+
+# Backend
+_bp.add_url_rule('/api/rooms', 'available_rooms', backend.RHRoomBookingSearch)
