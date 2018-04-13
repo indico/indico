@@ -28,7 +28,7 @@ from indico.modules.auth.util import url_for_login
 from indico.modules.events.registration.util import url_rule_to_angular
 from indico.modules.rb.models.locations import Location
 from indico.modules.users.util import serialize_user
-from indico.util.i18n import po_to_json, get_all_locales
+from indico.util.i18n import get_all_locales, po_to_json
 from indico.web.flask.util import url_for, url_rule_to_js
 
 
