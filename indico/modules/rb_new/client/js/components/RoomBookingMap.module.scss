@@ -15,17 +15,10 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import {combineReducers} from 'redux';
+@import '../../styles/main';
 
-import roomListReducer from './roomBooking/roomList';
-import filterReducerFactory from './roomBooking/filters';
-import mapReducer from './roomBooking/map';
-
-
-const reducer = combineReducers({
-    rooms: roomListReducer,
-    filters: filterReducerFactory('bookRoom'),
-    map: mapReducer
-});
-
-export default reducer;
+.map-container {
+    & > * {
+        height: calc(100vh - (#{$indico-top-bar-height} + #{$menu-height} + 2em*2));
+    }
+}
