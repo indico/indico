@@ -19,9 +19,11 @@
         <meta property="fb:app_id" content="{{ social.facebook_app_id }}">
     {% endif %}
 
-    <script>
-        window.CKEDITOR_BASEPATH = {{ url_for('assets.dist', filename='js/ckeditor/')|tojson() }};
-    </script>
+    {% block early_js %}
+        <script>
+            window.CKEDITOR_BASEPATH = {{ url_for('assets.dist', filename='js/ckeditor/')|tojson() }};
+        </script>
+    {% endblock %}
 
     <script type="text/javascript" src="{{ url_for('assets.i18n_locale', locale_name=session.lang) }}"></script>
     <script type="text/javascript" src="{{ url_for('assets.i18n_locale_react', locale_name=session.lang) }}"></script>
@@ -40,10 +42,12 @@
         <script type="text/javascript" src="{{ url }}"></script>
     {% endfor %}
 
-    <script>
-        moment.locale({{ session.lang|tojson }});
-        IndicoGlobalVars.isUserAuthenticated = {{ session.user|bool|tojson }};
-    </script>
+    {% block late_js %}
+        <script>
+            moment.locale({{ session.lang|tojson }});
+            IndicoGlobalVars.isUserAuthenticated = {{ session.user|bool|tojson }};
+        </script>
+    {% endblock %}
 
     <script type="text/javascript" src="{{ url_for('assets.js_vars_user') }}"></script>
 
@@ -57,11 +61,13 @@
 </head>
 <body data-user-id="{{ session.user.id if session.user else 'null' }}"
       data-debug="{{ config.DEBUG|tojson|forceescape }}">
-    {#-
-    XXX: Using a block and inheritance would be nicer but for now this
-    is only called from a WP so just passing the contents is much easier
-    #}
-    {{ body|safe }}
+    {% block html_body %}
+        {#-
+        XXX: Using a block and inheritance would be nicer but for now this
+        is only called from a WP so just passing the contents is much easier
+        #}
+        {{ body|safe }}
+    {% endblock %}
 </body>
 </html>
 {%- set req_stats = get_request_stats() %}
