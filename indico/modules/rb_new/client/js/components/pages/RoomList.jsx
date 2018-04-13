@@ -21,7 +21,7 @@ import {Card, Col, Icon, List, Row} from 'antd';
 import React from 'react';
 import propTypes from 'prop-types';
 
-import {Translate, Param} from 'indico/react/i18n';
+import {PluralTranslate, Singular, Plural, Param} from 'indico/react/i18n';
 import {toClasses} from 'indico/react/util';
 import roomListStyles from './RoomList.module.scss';
 
@@ -37,9 +37,14 @@ export default class RoomList extends React.Component {
         return (
             <div className={toClasses(roomListStyles['room-list'])}>
                 <div className={toClasses(roomListStyles['results-count'])}>
-                    <Translate>
-                        <Param name="roomsCount" value={rooms.length} /> results found
-                    </Translate>
+                    <PluralTranslate>
+                        <Singular>
+                            <Param name="count" value={rooms.length} /> result found
+                        </Singular>
+                        <Plural>
+                            <Param name="count" value={rooms.length} /> results found
+                        </Plural>
+                    </PluralTranslate>
                 </div>
                 <List grid={{gutter: 12, column: 5}}
                       dataSource={rooms}
