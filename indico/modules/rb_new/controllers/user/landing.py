@@ -24,6 +24,7 @@ from indico.modules.rb import rb_settings
 from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.models.reservations import RepeatFrequency
 from indico.modules.rb.models.rooms import Room
+from indico.modules.rb_new.schemas import rooms_schema
 from indico.modules.rb_new.views.base import WPRoomBookingBase
 from indico.util.string import natural_sort_key
 
@@ -35,8 +36,6 @@ class RHRoomBookingLanding(RHRoomBookingBase):
 
 class RHRoomBookingSearch(RHRoomBookingBase):
     def _process(self):
-        from indico.modules.rb.schemas import rooms_schema
-
         if not request.args:
             return rooms_schema.dumps(Room.query.filter(Room.is_active).all()).data
 
