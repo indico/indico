@@ -39,7 +39,7 @@ export default class RoomList extends React.Component {
             <div className={toClasses(roomListStyles['room-list'])}>
                 <TextSearch />
                 <div className={toClasses(roomListStyles['results-count'])}>
-                    <PluralTranslate>
+                    <PluralTranslate count={rooms.length}>
                         <Singular>
                             <Param name="count" value={rooms.length} /> result found
                         </Singular>
