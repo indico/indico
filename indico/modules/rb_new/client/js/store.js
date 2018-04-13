@@ -24,6 +24,7 @@ const initialData = {
     user: null,
     bookRoom: {},
     roomBooking: {
+        textFilter: null,
         rooms: [],
         isFetching: false
     }

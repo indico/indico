@@ -19,6 +19,7 @@ import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 
 
 export const SET_USER = 'SET_USER';
+export const SET_TEXT_FILTER = 'SET_TEXT_FILTER';
 export const FETCH_ROOMS_STARTED = 'FETCH_ROOMS_STARTED';
 export const FETCH_ROOMS_FAILED = 'FETCH_ROOMS_FAILED';
 export const UPDATE_ROOMS = 'UPDATE_ROOMS';
@@ -26,6 +27,10 @@ export const UPDATE_ROOMS = 'UPDATE_ROOMS';
 
 export function setUser(data) {
     return {type: SET_USER, data};
+}
+
+export function setTextFilter(textFilter) {
+    return {type: SET_TEXT_FILTER, textFilter};
 }
 
 export function fetchStarted() {
@@ -44,10 +49,15 @@ export function fetchRooms() {
     return async (dispatch, getStore) => {
         dispatch(fetchStarted());
 
-        const {staticData: {fetchRoomsUrl}} = getStore();
+        const {staticData: {fetchRoomsUrl}, roomBooking: {textFilter}} = getStore();
         let response;
+        const params = {};
+        if (textFilter) {
+            params.room_name = textFilter;
+        }
+
         try {
-            response = await indicoAxios.get(fetchRoomsUrl);
+            response = await indicoAxios.get(fetchRoomsUrl, {params});
         } catch (error) {
             handleAxiosError(error);
             dispatch(fetchFailed());

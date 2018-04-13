@@ -68,3 +68,4 @@ ipython<6,>=5.4.1
 prompt-toolkit<2.0.0,>=1.0.14
 packaging>=17.1,<18
 flask-webpackext==0.1.0
+webargs==2.1.0

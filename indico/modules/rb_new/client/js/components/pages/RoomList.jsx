@@ -23,6 +23,7 @@ import propTypes from 'prop-types';
 
 import {PluralTranslate, Singular, Plural, Param} from 'indico/react/i18n';
 import {toClasses} from 'indico/react/util';
+import TextSearch from '../../containers/TextSearch';
 import roomListStyles from './RoomList.module.scss';
 
 
@@ -36,6 +37,7 @@ export default class RoomList extends React.Component {
         const {rooms} = this.props;
         return (
             <div className={toClasses(roomListStyles['room-list'])}>
+                <TextSearch />
                 <div className={toClasses(roomListStyles['results-count'])}>
                     <PluralTranslate>
                         <Singular>
