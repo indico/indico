@@ -21,9 +21,6 @@ import React from 'react';
 import propTypes from 'prop-types';
 import {Avatar, Divider, Icon, Select} from 'antd';
 
-// TODO: Remove this once ThiefMaster's done
-window.build_url = (data) => JSON.stringify(data);
-
 import userDashboard from 'indico-url:users.user_dashboard';
 import userPreferences from 'indico-url:users.user_preferences';
 import authLogout from 'indico-url:auth.logout';
@@ -31,7 +28,7 @@ import changeLanguage from 'indico-url:core.change_lang';
 
 import {Translate} from 'indico/react/i18n';
 import {Slot, ContainerDiv, ContainerBound} from 'indico/react/util';
-import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
+import {indicoAxios} from 'indico/utils/axios';
 
 import ArrowDownMenu from './ArrowDownMenu';
 import './UserMenu.module.scss';
