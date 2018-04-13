@@ -25,13 +25,7 @@ from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.models.reservations import RepeatFrequency
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb_new.schemas import rooms_schema
-from indico.modules.rb_new.views.base import WPRoomBookingBase
 from indico.util.string import natural_sort_key
-
-
-class RHRoomBookingLanding(RHRoomBookingBase):
-    def _process(self):
-        return WPRoomBookingBase.display('room_booking.html')
 
 
 class RHRoomBookingSearch(RHRoomBookingBase):
