@@ -28,8 +28,8 @@ import adminDashboard from 'indico-url:core.admin_dashboard';
 import changeLanguage from 'indico-url:core.change_lang';
 
 import {Translate} from 'indico/react/i18n';
-import {Slot, ContainerDiv, ContainerBound} from 'indico/react/util';
-import {indicoAxios} from 'indico/utils/axios';
+import {Slot} from 'indico/react/util';
+import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 
 import ArrowDownMenu from './ArrowDownMenu';
 import './UserMenu.module.scss';
@@ -56,18 +56,14 @@ export default function UserMenu({userData, staticData}) {
     );
 
     const languageSelector = (
-        <ContainerBound>
-            {(getPopupContainer) => (
-                <Select defaultValue={language}
-                        styleName="language-selector-combo"
-                        onSelect={postAndReload}
-                        getPopupContainer={getPopupContainer}>
-                    {Object.entries(availableLanguages).map(([key, name]) => (
-                        <Select.Option key={key} value={key}>{name}</Select.Option>
-                    ))}
-                </Select>
-            )}
-        </ContainerBound>
+        <Select defaultValue={language}
+                styleName="language-selector-combo"
+                onSelect={postAndReload}
+                getPopupContainer={trigger => trigger.parentNode}>
+            {Object.entries(availableLanguages).map(([key, name]) => (
+                <Select.Option key={key} value={key}>{name}</Select.Option>
+            ))}
+        </Select>
     );
 
     return (
@@ -76,32 +72,30 @@ export default function UserMenu({userData, staticData}) {
                 {avatar}
             </Slot>
             <Slot>
-                <ContainerDiv styleName="user-popup">
-                    <h3>{`${firstName} ${lastName}`}</h3>
-                    <h4>{email}</h4>
-                    <div styleName="links">
-                        <Divider type="horizontal" />
-                        <a href={userDashboard()}>
-                            <Translate>My Profile</Translate>
-                        </a>
-                        <a href={userPreferences()}>
-                            <Translate>My Preferences</Translate>
-                        </a>
-                        <div styleName="language-selector-field">
-                            <Icon type="global" styleName="language-icon" />
-                            {languageSelector}
-                        </div>
-                        <Divider type="horizontal" />
-                        {isAdmin && (
-                            <a href={adminDashboard()}>
-                                <Translate>Administration</Translate>
-                            </a>
-                        )}
-                        <a href={authLogout()}>
-                            <Translate>Logout</Translate>
-                        </a>
+                <h3>{`${firstName} ${lastName}`}</h3>
+                <h4>{email}</h4>
+                <div styleName="links">
+                    <Divider type="horizontal" />
+                    <a href={userDashboard()}>
+                        <Translate>My Profile</Translate>
+                    </a>
+                    <a href={userPreferences()}>
+                        <Translate>My Preferences</Translate>
+                    </a>
+                    <div styleName="language-selector-field">
+                        <Icon type="global" styleName="language-icon" />
+                        {languageSelector}
                     </div>
-                </ContainerDiv>
+                    <Divider type="horizontal" />
+                    {isAdmin && (
+                        <a href={adminDashboard()}>
+                            <Translate>Administration</Translate>
+                        </a>
+                    )}
+                    <a href={authLogout()}>
+                        <Translate>Logout</Translate>
+                    </a>
+                </div>
             </Slot>
         </ArrowDownMenu>
     );
