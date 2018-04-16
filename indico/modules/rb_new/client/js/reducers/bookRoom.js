@@ -15,14 +15,15 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-// import * as actions from '../actions';
+import {combineReducers} from 'redux';
+
+import roomListReducer from './roomBooking/roomList';
+import filterReducerFactory from './roomBooking/filters';
 
 
-const initialState = {};
+const reducer = combineReducers({
+    rooms: roomListReducer,
+    filters: filterReducerFactory('bookRoom')
+});
 
-export default function reducer(state = initialState, action) {
-    switch (action.type) {
-        default:
-            return state;
-    }
-}
+export default reducer;

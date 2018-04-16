@@ -15,26 +15,15 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import * as actions from '../actions';
+import {combineReducers} from 'redux';
+
+import roomListReducer from './roomBooking/roomList';
+import filterReducerFactory from './roomBooking/filters';
 
 
-const initialState = {
-    rooms: [],
-    isFetching: false,
-    textFilter: null
-};
+const reducer = combineReducers({
+    rooms: roomListReducer,
+    filters: filterReducerFactory('roomList')
+});
 
-export default function roomBookingReducer(state = initialState, action) {
-    switch (action.type) {
-        case actions.FETCH_ROOMS_STARTED:
-            return {...state, isFetching: true};
-        case actions.FETCH_ROOMS_FAILED:
-            return {...state, isFetching: false};
-        case actions.UPDATE_ROOMS:
-            return {...state, rooms: action.rooms, isFetching: false};
-        case actions.SET_TEXT_FILTER:
-            return {...state, textFilter: action.textFilter};
-        default:
-            return state;
-    }
-}
+export default reducer;

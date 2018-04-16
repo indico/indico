@@ -14,24 +14,22 @@
  * You should have received a copy of the GNU General Public License
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
-
-import debounce from 'lodash/debounce';
 import {connect} from 'react-redux';
-
-import TextSearch from '../components/TextSearch';
-import {setFilterParameter, fetchRooms} from '../actions';
+import FilterBar from '../components/FilterBar';
+import {setFilterParameter} from '../actions';
 
 
 export default (namespace) => {
+    const mapStateToProps = state => ({...state[namespace].filters});
+
     const mapDispatchToProps = dispatch => ({
-        setTextFilter: debounce((value) => {
-            dispatch(setFilterParameter(namespace, 'text', value));
-            dispatch(fetchRooms(namespace));
-        }, 250)
+        setFilterParameter: (param, value) => {
+            dispatch(setFilterParameter(namespace, param, value));
+        }
     });
 
     return connect(
-        null,
+        mapStateToProps,
         mapDispatchToProps
-    )(TextSearch);
+    )(FilterBar);
 };

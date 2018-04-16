@@ -23,14 +23,10 @@ export const SET_TEXT_FILTER = 'SET_TEXT_FILTER';
 export const FETCH_ROOMS_STARTED = 'FETCH_ROOMS_STARTED';
 export const FETCH_ROOMS_FAILED = 'FETCH_ROOMS_FAILED';
 export const UPDATE_ROOMS = 'UPDATE_ROOMS';
-
+export const SET_FILTER_PARAMETER = 'SET_FILTER_PARAMETER';
 
 export function setUser(data) {
     return {type: SET_USER, data};
-}
-
-export function setTextFilter(textFilter) {
-    return {type: SET_TEXT_FILTER, textFilter};
 }
 
 export function fetchStarted() {
@@ -45,15 +41,16 @@ export function updateRooms(rooms) {
     return {type: UPDATE_ROOMS, rooms};
 }
 
-export function fetchRooms() {
+export function fetchRooms(reducerName) {
     return async (dispatch, getStore) => {
         dispatch(fetchStarted());
 
-        const {staticData: {fetchRoomsUrl}, roomBooking: {textFilter}} = getStore();
+        const {staticData: {fetchRoomsUrl}} = getStore();
+        const {filters: {text}} = getStore()[reducerName];
         let response;
         const params = {};
-        if (textFilter) {
-            params.room_name = textFilter;
+        if (text) {
+            params.room_name = text;
         }
 
         try {
@@ -66,4 +63,8 @@ export function fetchRooms() {
 
         dispatch(updateRooms(response.data));
     };
+}
+
+export function setFilterParameter(namespace, param, data) {
+    return {type: SET_FILTER_PARAMETER, namespace, param, data};
 }

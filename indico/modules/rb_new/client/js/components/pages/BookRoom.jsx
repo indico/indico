@@ -16,11 +16,13 @@
  */
 
 import React from 'react';
-import {Translate} from 'indico/react/i18n';
+import filterBarFactory from '../../containers/FilterBar';
 
+
+const FilterBar = filterBarFactory('bookRoom');
 
 export default function BookRoom() {
     return (
-        <h2><Translate>Book a Room</Translate></h2>
+        <FilterBar />
     );
 }
