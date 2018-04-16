@@ -22,10 +22,12 @@ import React from 'react';
 import propTypes from 'prop-types';
 
 import {PluralTranslate, Singular, Plural, Param} from 'indico/react/i18n';
-import {toClasses} from 'indico/react/util';
-import TextSearch from '../../containers/TextSearch';
-import roomListStyles from './RoomList.module.scss';
+import textSearchFactory from '../../containers/TextSearch';
 
+import './RoomList.module.scss';
+
+
+const TextSearch = textSearchFactory('bookRoom');
 
 export default class RoomList extends React.Component {
     componentDidMount() {
@@ -34,22 +36,22 @@ export default class RoomList extends React.Component {
     }
 
     render() {
-        const {rooms} = this.props;
+        const {rooms: {list}} = this.props;
         return (
-            <div className={toClasses(roomListStyles['room-list'])}>
+            <div styleName="room-list">
                 <TextSearch />
-                <div className={toClasses(roomListStyles['results-count'])}>
-                    <PluralTranslate count={rooms.length}>
+                <div styleName="results-count">
+                    <PluralTranslate count={list.length}>
                         <Singular>
-                            <Param name="count" value={rooms.length} /> result found
+                            <Param name="count" value={list.length} /> result found
                         </Singular>
                         <Plural>
-                            <Param name="count" value={rooms.length} /> results found
+                            <Param name="count" value={list.length} /> results found
                         </Plural>
                     </PluralTranslate>
                 </div>
                 <List grid={{gutter: 12, column: 5}}
-                      dataSource={rooms}
+                      dataSource={list}
                       renderItem={room => (
                           <List.Item>
                               <Room room={room} />
@@ -62,14 +64,17 @@ export default class RoomList extends React.Component {
 
 
 RoomList.propTypes = {
-    rooms: propTypes.array.isRequired,
+    rooms: propTypes.shape({
+        list: propTypes.array,
+        isFetching: propTypes.bool
+    }).isRequired,
     fetchRooms: propTypes.func.isRequired
 };
 
 
 export function Room({room}) {
     const cardDescription = (
-        <div className={toClasses(roomListStyles['room-card-description'])}>
+        <div styleName="room-card-description">
             {room.full_name}
         </div>
     );
@@ -89,8 +94,8 @@ export function Room({room}) {
     );
 
     return (
-        <Card className={toClasses(roomListStyles['room-card'])}
-              cover={<img src={room.small_photo_url} width="120px" height="170px" />}>
+        <Card styleName="room-card"
+              cover={<img src={room.small_photo_url} />}>
             <Card.Meta description={cardDescription} title={cardTitle} />
         </Card>
     );

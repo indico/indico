@@ -17,11 +17,11 @@
 
 import bookRoomReducer from './bookRoom';
 import userReducer from './user';
-import roomBookingReducer from './roomBooking';
+import roomListReducer from './roomList';
 
 
 export {
     bookRoomReducer,
     userReducer,
-    roomBookingReducer
+    roomListReducer
 };

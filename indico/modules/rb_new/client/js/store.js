@@ -16,24 +16,17 @@
  */
 
 import createReduxStore from 'indico/utils/redux';
-import {userReducer, bookRoomReducer, roomBookingReducer} from './reducers';
+import {userReducer, bookRoomReducer, roomListReducer} from './reducers';
 
 
 const initialData = {
-    staticData: {},
-    user: null,
-    bookRoom: {},
-    roomBooking: {
-        textFilter: null,
-        rooms: [],
-        isFetching: false
-    }
+    staticData: {}
 };
 
 export default function createRBStore(data) {
     return createReduxStore({
         user: userReducer,
         bookRoom: bookRoomReducer,
-        roomBooking: roomBookingReducer
+        roomList: roomListReducer
     }, Object.assign(initialData, data));
 }

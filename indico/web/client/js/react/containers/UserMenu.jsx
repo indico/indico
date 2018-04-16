@@ -23,7 +23,7 @@ import UserMenu from '../components/UserMenu';
 
 const mapStateToProps = ({user, staticData}) => ({
     staticData,
-    userData: user,
+    userData: user
 });
 
 const Connector = connect(
