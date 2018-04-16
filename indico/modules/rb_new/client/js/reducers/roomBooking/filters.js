@@ -30,6 +30,10 @@ const initialState = {
     dates: {
         startDate: null,
         endDate: null
+    },
+    timeSlot: {
+        startTime: null,
+        endTime: null
     }
 };
 
