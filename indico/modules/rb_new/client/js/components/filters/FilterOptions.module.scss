@@ -15,23 +15,6 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import debounce from 'lodash/debounce';
-import {connect} from 'react-redux';
-
-import TextSearch from '../components/TextSearch';
-import {setFilterParameter, fetchRooms} from '../actions';
-
-
-export default (namespace) => {
-    const mapDispatchToProps = dispatch => ({
-        setTextFilter: debounce((value) => {
-            dispatch(setFilterParameter(namespace, 'text', value));
-            dispatch(fetchRooms(namespace));
-        }, 250)
-    });
-
-    return connect(
-        null,
-        mapDispatchToProps
-    )(TextSearch);
-};
+.filter-options :global .ant-popover-message-title {
+    padding-left: 0;
+}

@@ -21,11 +21,11 @@ import RoomList from '../components/pages/RoomList';
 import {fetchRooms} from '../actions';
 
 
-const mapStateToProps = ({roomBooking}) => ({...roomBooking});
+const mapStateToProps = ({roomList}) => ({...roomList});
 
 const mapDispatchToProps = dispatch => ({
     fetchRooms: () => {
-        dispatch(fetchRooms());
+        dispatch(fetchRooms('roomList'));
     }
 });
 

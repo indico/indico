@@ -15,23 +15,23 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import debounce from 'lodash/debounce';
-import {connect} from 'react-redux';
-
-import TextSearch from '../components/TextSearch';
-import {setFilterParameter, fetchRooms} from '../actions';
+import * as actions from '../../actions';
 
 
-export default (namespace) => {
-    const mapDispatchToProps = dispatch => ({
-        setTextFilter: debounce((value) => {
-            dispatch(setFilterParameter(namespace, 'text', value));
-            dispatch(fetchRooms(namespace));
-        }, 250)
-    });
-
-    return connect(
-        null,
-        mapDispatchToProps
-    )(TextSearch);
+const initialState = {
+    list: [],
+    isFetching: false
 };
+
+export default function reducer(state = initialState, action) {
+    switch (action.type) {
+        case actions.FETCH_ROOMS_STARTED:
+            return {...state, isFetching: true};
+        case actions.FETCH_ROOMS_FAILED:
+            return {...state, isFetching: false};
+        case actions.UPDATE_ROOMS:
+            return {...state, list: action.rooms, isFetching: false};
+        default:
+            return state;
+    }
+}
