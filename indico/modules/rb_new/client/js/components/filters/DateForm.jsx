@@ -15,22 +15,16 @@
 * along with Indico; if not, see <http://www.gnu.org/licenses/>.
 */
 
-import moment from 'moment';
 import React from 'react';
 import RangeCalendar from 'rc-calendar/lib/RangeCalendar';
 import RcCalendar from 'rc-calendar';
 import propTypes from 'prop-types';
 // Import date-picker style from ant, since range calendar has none
 import 'antd/lib/date-picker/style/css';
+import {toMoment} from '../../util';
 
 
-const _serializeDate = dt => {
-    return dt ? dt.format('YYYY-MM-DD') : null;
-};
-
-const _toMoment = dt => {
-    return dt ? moment(dt) : null;
-};
+const _serializeDate = dt => (dt ? dt.format('YYYY-MM-DD') : null);
 
 export default class DateForm extends React.Component {
     static propTypes = {
@@ -45,13 +39,12 @@ export default class DateForm extends React.Component {
         endDate: null
     };
 
-    static getDerivedStateFromProps(props, prevState) {
-        const {startDate, endDate} = props;
+    static getDerivedStateFromProps({startDate, endDate}, prevState) {
         // if there is no internal state, get the values from props
         return {
             ...prevState,
-            startDate: prevState.startDate ? prevState.startDate : _toMoment(startDate),
-            endDate: prevState.endDate ? prevState.endDate : _toMoment(endDate)
+            startDate: prevState.startDate ? prevState.startDate : toMoment(startDate),
+            endDate: prevState.endDate ? prevState.endDate : toMoment(endDate)
         };
     }
 
@@ -62,7 +55,7 @@ export default class DateForm extends React.Component {
 
     resetFields(fields) {
         // version from parent/redux will be serialized
-        this.setDates(_toMoment(fields.startDate), _toMoment(fields.endDate));
+        this.setDates(toMoment(fields.startDate), toMoment(fields.endDate));
     }
 
     setDates(startDate, endDate) {
