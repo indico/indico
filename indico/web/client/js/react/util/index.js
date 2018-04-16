@@ -17,4 +17,3 @@
 
 export {default as Slot} from './Slot';
 export {toClasses} from './html';
-export {ContainerDiv, ContainerBound} from './antd';
