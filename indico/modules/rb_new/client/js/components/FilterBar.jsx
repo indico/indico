@@ -24,11 +24,13 @@ import {Translate} from 'indico/react/i18n';
 import FilterDropdown from './filters/FilterDropdown';
 import RecurrenceForm from './filters/RecurrenceForm';
 import DateForm from './filters/DateForm';
+import TimeForm from './filters/TimeForm';
 import recurrenceRenderer from './filters/RecurrenceRenderer';
 import dateRenderer from './filters/DateRenderer';
+import timeRenderer from './filters/TimeRenderer';
 
 
-export default function FilterBar({recurrence, dates, setFilterParameter}) {
+export default function FilterBar({recurrence, dates, timeSlot, setFilterParameter}) {
     return (
         <Button.Group size="medium">
             <FilterDropdown title={<Translate>Recurrence</Translate>}
@@ -48,6 +50,15 @@ export default function FilterBar({recurrence, dates, setFilterParameter}) {
                             setGlobalState={setFilterParameter.bind(undefined, 'dates')}
                             initialValues={dates}
                             displayValue={dateRenderer} />
+            <FilterDropdown title={<Translate>Time</Translate>}
+                            form={(ref, setParentField) => (
+                                <TimeForm ref={ref}
+                                          setParentField={setParentField}
+                                          {...timeSlot} />
+                            )}
+                            setGlobalState={setFilterParameter.bind(undefined, 'timeSlot')}
+                            initialValues={timeSlot}
+                            displayValue={timeRenderer} />
         </Button.Group>
     );
 }
@@ -61,6 +72,10 @@ FilterBar.propTypes = {
     dates: propTypes.shape({
         startDate: propTypes.string,
         endDate: propTypes.string
+    }).isRequired,
+    timeSlot: propTypes.shape({
+        startTime: propTypes.string,
+        endTime: propTypes.string
     }).isRequired,
     setFilterParameter: propTypes.func.isRequired
 };

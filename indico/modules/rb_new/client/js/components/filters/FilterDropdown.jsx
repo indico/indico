@@ -28,7 +28,10 @@ export default class FilterDropdown extends React.Component {
         form: propTypes.func.isRequired,
         displayValue: propTypes.func.isRequired,
         setGlobalState: propTypes.func.isRequired,
-        initialValues: propTypes.object.isRequired
+        initialValues: propTypes.oneOfType([
+            propTypes.object,
+            propTypes.array
+        ]).isRequired
     }
 
     static getDerivedStateFromProps({initialValues, displayValue}, prevState) {
