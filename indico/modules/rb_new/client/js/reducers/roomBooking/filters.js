@@ -64,7 +64,6 @@ function mergeFilter(filters, param, data) {
 
 export default function filterReducerFactory(namespace) {
     return (state = initialState, action) => {
-        console.log(action);
         switch (action.type) {
             case actions.SET_FILTER_PARAMETER:
                 return action.namespace === namespace ? mergeFilter(state, action.param, action.data) : state;
