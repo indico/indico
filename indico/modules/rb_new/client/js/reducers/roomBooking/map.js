@@ -19,7 +19,7 @@ import * as actions from '../../actions';
 
 
 const initialState = {
-    mapLocation: null,
+    bounds: null,
     isFetching: false,
 };
 
@@ -31,7 +31,7 @@ export default function mapReducer(state = initialState, action) {
         case actions.FETCH_DEFAULT_LOCATION_FAILED:
             return {...state, isFetching: false};
         case actions.UPDATE_LOCATION:
-            return {...state, mapLocation: action.location, isFetching: false};
+            return {...state, bounds: action.location, isFetching: false};
         default:
             return state;
     }

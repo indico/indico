@@ -22,10 +22,11 @@ import {Map, TileLayer} from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import './RoomBookingMap.module.scss';
 
-export default function RoomBookingMap({center, zoom}) {
+
+export default function RoomBookingMap({bounds, onMove}) {
     return (
         <div styleName="map-container">
-            <Map center={center} zoom={zoom}>
+            <Map bounds={bounds} onDragend={onMove} onZoomend={onMove}>
                 <TileLayer attribution='© <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
             </Map>
@@ -34,6 +35,6 @@ export default function RoomBookingMap({center, zoom}) {
 }
 
 RoomBookingMap.propTypes = {
-    center: propTypes.array.isRequired,
-    zoom: propTypes.number.isRequired
+    bounds: propTypes.array.isRequired,
+    onMove: propTypes.func.isRequired
 };

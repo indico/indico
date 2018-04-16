@@ -17,32 +17,43 @@
 
 import propTypes from 'prop-types';
 import React from 'react';
-import filterBarFactory from '../../containers/FilterBar';
 import {Row, Col} from 'antd';
-import {Translate} from 'indico/react/i18n';
 
+import filterBarFactory from '../../containers/FilterBar';
 import RoomBookingMap from "../RoomBookingMap";
+
 
 export default class BookRoom extends React.Component {
     static propTypes = {
         fetchMapDefaultLocation: propTypes.func.isRequired,
-        mapLocation: propTypes.object
+        updateLocation: propTypes.func.isRequired,
+        bounds: propTypes.array
     };
 
     static defaultProps = {
-        mapLocation: null
+        bounds: null
     };
 
     constructor(props) {
         super(props);
-        const {fetchMapDefaultLocation, mapLocation} = props;
-        if (!mapLocation) {
+        const {fetchMapDefaultLocation, bounds} = props;
+        if (!bounds) {
             fetchMapDefaultLocation();
         }
     }
 
+    onMove(e) {
+        const {updateLocation} = this.props;
+        const boundsObj = e.target.getBounds();
+        const location = [
+            Object.values(boundsObj.getNorthWest()),
+            Object.values(boundsObj.getSouthEast())
+        ];
+        updateLocation(location);
+    }
+
     render() {
-        const {mapLocation} = this.props;
+        const {bounds} = this.props;
         const FilterBar = filterBarFactory('bookRoom');
         return (
             <Row>
@@ -50,7 +61,7 @@ export default class BookRoom extends React.Component {
                     <FilterBar />
                 </Col>
                 <Col span={8}>
-                    {mapLocation && <RoomBookingMap center={mapLocation.center} zoom={mapLocation.zoom} />}
+                    {bounds && <RoomBookingMap bounds={bounds} onMove={(e) => this.onMove(e)} />}
                 </Col>
             </Row>
         );

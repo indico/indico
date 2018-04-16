@@ -108,10 +108,10 @@ export function fetchMapDefaultLocation() {
         }
 
         const data = response.data;
-        const location = {
-            center: [parseFloat(data.center_latitude), parseFloat(data.center_longitude)],
-            zoom: data.zoom_level
-        };
+        const location = [
+            [parseFloat(data.top_left_latitude), parseFloat(data.top_left_longitude)],
+            [parseFloat(data.bottom_right_latitude), parseFloat(data.bottom_right_longitude)]
+        ];
         dispatch(updateLocation(location));
     };
 }
