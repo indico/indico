@@ -17,7 +17,7 @@
 import {connect} from 'react-redux';
 
 import BookRoom from '../components/pages/BookRoom';
-import {fetchMapDefaultLocation} from '../actions';
+import {fetchMapDefaultLocation, updateLocation} from '../actions';
 
 
 const mapStateToProps = ({bookRoom}) => ({...bookRoom.map});
@@ -25,6 +25,9 @@ const mapStateToProps = ({bookRoom}) => ({...bookRoom.map});
 const mapDispatchToProps = dispatch => ({
     fetchMapDefaultLocation: () => {
         dispatch(fetchMapDefaultLocation());
+    },
+    updateLocation: (location) => {
+        dispatch(updateLocation(location));
     }
 });
 
