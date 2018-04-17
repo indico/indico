@@ -21,6 +21,7 @@ import propTypes from 'prop-types';
 import {TimePicker} from 'antd';
 import {toMoment} from '../../util';
 
+
 const _serializeTime = time => (time ? time.format('HH:mm') : null);
 
 export default class TimeForm extends React.Component {
@@ -72,6 +73,7 @@ export default class TimeForm extends React.Component {
         const props = {
             minuteStep: 15,
             format: 'HH:mm',
+            allowEmpty: false,
             getPopupContainer: trigger => trigger.parentNode
         };
         return (

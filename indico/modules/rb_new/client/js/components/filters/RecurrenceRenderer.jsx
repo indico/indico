@@ -21,6 +21,9 @@ import {PluralTranslate, Translate, Singular, Plural, Param} from 'indico/react/
 
 
 export default function recurrenceRenderer({type, number, interval}) {
+    if (!type) {
+        return null;
+    }
     if (type === 'single') {
         return <Translate>Once</Translate>;
     } else if (type === 'daily') {

@@ -17,7 +17,7 @@
 
 export default function timeRenderer({startTime, endTime}) {
     if (!startTime && !endTime) {
-        return '-';
+        return null;
     } else if (!endTime) {
         return startTime;
     } else {
