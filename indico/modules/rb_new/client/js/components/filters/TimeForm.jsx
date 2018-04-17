@@ -21,14 +21,16 @@ import propTypes from 'prop-types';
 import {TimePicker} from 'antd';
 import {toMoment} from '../../util';
 
+import FilterFormComponent from './FilterFormComponent';
+
 
 const _serializeTime = time => (time ? time.format('HH:mm') : null);
 
-export default class TimeForm extends React.Component {
+export default class TimeForm extends FilterFormComponent {
     static propTypes = {
         startTime: propTypes.string,
         endTime: propTypes.string,
-        setParentField: propTypes.func.isRequired
+        ...FilterFormComponent.propTypes
     }
 
     static defaultProps = {
@@ -43,11 +45,6 @@ export default class TimeForm extends React.Component {
             startTime: prevState.startTime || toMoment(startTime),
             endTime: prevState.endTime || toMoment(endTime)
         };
-    }
-
-    constructor(props) {
-        super(props);
-        this.state = {};
     }
 
     resetFields({startTime, endTime}) {

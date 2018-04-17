@@ -16,34 +16,13 @@
 */
 
 import React from 'react';
-import propTypes from 'prop-types';
 
 import {Button, InputNumber} from 'antd';
 
+import FilterFormComponent from './FilterFormComponent';
 
-export default class CapacityForm extends React.Component {
-    static propTypes = {
-        capacity: propTypes.number,
-        setParentField: propTypes.func.isRequired
-    }
 
-    static defaultProps = {
-        capacity: null
-    }
-
-    static getDerivedStateFromProps({capacity}, prevState) {
-        // if there is no internal state, get the values from props
-        return {
-            ...prevState,
-            capacity: prevState.capacity ? prevState.capacity : capacity
-        };
-    }
-
-    constructor(props) {
-        super(props);
-        this.state = {};
-    }
-
+export default class CapacityForm extends FilterFormComponent {
     setCapacity(capacity) {
         const {setParentField} = this.props;
 

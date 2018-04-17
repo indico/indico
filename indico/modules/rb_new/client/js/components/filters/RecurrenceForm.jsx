@@ -21,15 +21,16 @@ import propTypes from 'prop-types';
 
 import {Translate} from 'indico/react/i18n';
 
+import FilterFormComponent from './FilterFormComponent';
 import './RecurrenceForm.module.scss';
 
 
-export default class RecurrenceForm extends React.Component {
+export default class RecurrenceForm extends FilterFormComponent {
     static propTypes = {
         type: propTypes.string,
         interval: propTypes.string,
         number: propTypes.number,
-        setParentField: propTypes.func.isRequired
+        ...FilterFormComponent.propTypes
     };
 
     static defaultProps = {
@@ -40,8 +41,6 @@ export default class RecurrenceForm extends React.Component {
 
     constructor(props) {
         super(props);
-        const {type, interval, number} = props;
-        this.state = {type, interval, number};
         this.onTypeChange = (e) => {
             this.stateChanger('type')(e.target.value);
         };
