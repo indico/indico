@@ -17,6 +17,7 @@
 
 /* eslint "react/forbid-component-props": "off" */
 
+import qs from 'qs';
 import React from 'react';
 import propTypes from 'prop-types';
 import {Avatar, Divider, Icon, Select} from 'antd';
@@ -36,7 +37,12 @@ import './UserMenu.module.scss';
 
 
 async function postAndReload(selectedLanguage) {
-    await indicoAxios.post(changeLanguage(), {lang: selectedLanguage});
+    try {
+        await indicoAxios.post(changeLanguage(), qs.stringify({lang: selectedLanguage}));
+    } catch (error) {
+        handleAxiosError(error);
+        return;
+    }
     location.reload();
 }
 
