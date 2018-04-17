@@ -30,9 +30,9 @@ export default function recurrenceRenderer({type, number, interval}) {
         return <Translate>Daily</Translate>;
     } else if (interval === 'day') {
         return (
-            <Translate>
+            <PluralTranslate count={number}>
                 Every <Param name="number" value={number} /> days
-            </Translate>
+            </PluralTranslate>
         );
     } else if (interval === 'week') {
         return (
