@@ -23,9 +23,9 @@ import * as actions from '../../actions';
 const initialState = {
     text: null,
     recurrence: {
-        type: 'single',
-        number: 1,
-        interval: 'week'
+        type: null,
+        number: null,
+        interval: null
     },
     dates: {
         startDate: null,
@@ -34,7 +34,8 @@ const initialState = {
     timeSlot: {
         startTime: null,
         endTime: null
-    }
+    },
+    capacity: null
 };
 
 function calculateDefaultEndDate(startDate, type, number, interval) {

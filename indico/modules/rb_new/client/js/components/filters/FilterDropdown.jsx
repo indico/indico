@@ -22,34 +22,45 @@ import propTypes from 'prop-types';
 import FilterOptions from './FilterOptions';
 
 
+function _mergeDefaults(defaults, values) {
+    return Object.assign(...Object.entries(values).map(([key, value]) => {
+        if (value === null && defaults[key] !== undefined) {
+            return [key, defaults[key]];
+        }
+        return [key, value];
+    }).map(([k, v]) => ({[k]: v})));
+}
+
 export default class FilterDropdown extends React.Component {
     static propTypes = {
         title: propTypes.element.isRequired,
         form: propTypes.func.isRequired,
-        displayValue: propTypes.func.isRequired,
+        renderValue: propTypes.func.isRequired,
         setGlobalState: propTypes.func.isRequired,
-        initialValues: propTypes.oneOfType([
-            propTypes.object,
-            propTypes.array
-        ]).isRequired
+        initialValues: propTypes.object,
+        defaults: propTypes.object
     }
 
-    static getDerivedStateFromProps({initialValues, displayValue}, prevState) {
+    static defaultProps = {
+        initialValues: {},
+        defaults: {}
+    }
+
+    static getDerivedStateFromProps({defaults, initialValues, renderValue}, prevState) {
         return {
             ...prevState,
-            fieldValues: initialValues,
-            displayValue: displayValue(initialValues)
+            fieldValues: _mergeDefaults(defaults, initialValues),
+            renderedValue: renderValue(initialValues)
         };
     }
 
     constructor(props) {
         super(props);
-        this.state = {
-            isSet: false
-        };
+        this.state = {};
 
         this.setFieldValue = this.setFieldValue.bind(this);
-        this.setDisplayValue = this.setDisplayValue.bind(this);
+        this.resetFields = this.resetFields.bind(this);
+        this.setRenderedValue = this.setRenderedValue.bind(this);
     }
 
     setFieldValue(field, value) {
@@ -65,31 +76,39 @@ export default class FilterDropdown extends React.Component {
         this.setState(newState);
     }
 
-    setDisplayValue(fieldValues) {
-        const {displayValue} = this.props;
+    resetFields() {
+        const {fieldValues} = this.state;
+        Object.keys(fieldValues).forEach(field => {
+            this.setFieldValue(field, null);
+        });
+    }
+
+    setRenderedValue(fieldValues) {
+        const {renderValue} = this.props;
+        const renderedValue = renderValue(fieldValues);
         this.setState({
-            displayValue: displayValue(fieldValues),
-            isSet: true
+            renderedValue,
         });
     }
 
     render() {
-        const {title, form, initialValues, setGlobalState} = this.props;
-        const {displayValue, isSet, fieldValues} = this.state;
+        const {title, form, defaults, initialValues, setGlobalState} = this.props;
+        const {renderedValue, fieldValues} = this.state;
         const formRef = React.createRef();
+
         return (
-            <FilterOptions title={form(formRef, this.setFieldValue)}
+            <FilterOptions title={form(formRef, fieldValues, this.setFieldValue, this.resetFields)}
                            placement="bottomRight"
                            trigger={['click']}
                            onConfirm={() => {
-                               this.setDisplayValue(fieldValues);
+                               this.setRenderedValue(fieldValues);
                                setGlobalState(fieldValues);
                            }}
                            onCancel={() => {
-                               formRef.current.resetFields(initialValues);
+                               formRef.current.resetFields(_mergeDefaults(defaults, initialValues));
                            }}>
-                <Button type={isSet ? 'primary' : ''}>
-                    {isSet ? displayValue : title}
+                <Button type={renderedValue !== null ? 'primary' : ''}>
+                    {renderedValue === null ? title : renderedValue}
                     <Icon type="down" />
                 </Button>
             </FilterOptions>

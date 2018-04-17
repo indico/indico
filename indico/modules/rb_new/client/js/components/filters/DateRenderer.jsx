@@ -23,7 +23,7 @@ export default function dateRenderer({startDate, endDate}) {
     endDate = endDate ? moment(endDate) : null;
 
     if (!startDate && !endDate) {
-        return '-';
+        return null;
     } else if (!endDate) {
         return startDate.format('ddd D MMM');
     } else {

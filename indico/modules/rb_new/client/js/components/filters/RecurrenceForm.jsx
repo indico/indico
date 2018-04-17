@@ -26,11 +26,17 @@ import './RecurrenceForm.module.scss';
 
 export default class RecurrenceForm extends React.Component {
     static propTypes = {
-        type: propTypes.string.isRequired,
-        interval: propTypes.string.isRequired,
-        number: propTypes.number.isRequired,
+        type: propTypes.string,
+        interval: propTypes.string,
+        number: propTypes.number,
         setParentField: propTypes.func.isRequired
     };
+
+    static defaultProps = {
+        type: null,
+        interval: null,
+        number: null
+    }
 
     constructor(props) {
         super(props);
