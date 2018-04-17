@@ -40,8 +40,8 @@ export default class TimeForm extends React.Component {
         // if there is no internal state, get the values from props
         return {
             ...prevState,
-            startTime: prevState.startTime ? prevState.startTime : toMoment(startTime),
-            endTime: prevState.endTime ? prevState.endTime : toMoment(endTime)
+            startTime: prevState.startTime || toMoment(startTime),
+            endTime: prevState.endTime || toMoment(endTime)
         };
     }
 
@@ -52,7 +52,7 @@ export default class TimeForm extends React.Component {
 
     resetFields({startTime, endTime}) {
         // version from parent/redux will be serialized
-        this.setTimes(toMoment(startTime), toMoment(endTime));
+        this.setTimes(toMoment(startTime, 'HH:mm:ss'), toMoment(endTime, 'HH:mm:ss'));
     }
 
     setTimes(startTime, endTime) {

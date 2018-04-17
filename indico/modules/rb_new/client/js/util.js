@@ -18,6 +18,6 @@
 import moment from 'moment';
 
 
-export function toMoment(dt) {
-    return dt ? moment(dt) : null;
+export function toMoment(dt, format) {
+    return dt ? moment(dt, format) : null;
 }
