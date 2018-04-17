@@ -23,10 +23,12 @@ import propTypes from 'prop-types';
 import 'antd/lib/date-picker/style/css';
 import {toMoment} from '../../util';
 
+import FilterFormComponent from './FilterFormComponent';
+
 
 const _serializeDate = dt => (dt ? dt.format('YYYY-MM-DD') : null);
 
-export default class DateForm extends React.Component {
+export default class DateForm extends FilterFormComponent {
     static propTypes = {
         startDate: propTypes.string,
         endDate: propTypes.string,
@@ -43,19 +45,14 @@ export default class DateForm extends React.Component {
         // if there is no internal state, get the values from props
         return {
             ...prevState,
-            startDate: prevState.startDate ? prevState.startDate : toMoment(startDate),
-            endDate: prevState.endDate ? prevState.endDate : toMoment(endDate)
+            startDate: prevState.startDate || toMoment(startDate),
+            endDate: prevState.endDate || toMoment(endDate)
         };
     }
 
-    constructor(props) {
-        super(props);
-        this.state = {};
-    }
-
-    resetFields(fields) {
+    resetFields({startDate, endDate}) {
         // version from parent/redux will be serialized
-        this.setDates(toMoment(fields.startDate), toMoment(fields.endDate));
+        this.setDates(toMoment(startDate), toMoment(endDate));
     }
 
     setDates(startDate, endDate) {
