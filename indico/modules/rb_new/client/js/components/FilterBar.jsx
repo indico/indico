@@ -48,7 +48,12 @@ export default function FilterBar({recurrence, dates, timeSlot, capacity, setFil
                             form={(ref, fieldValues, setParentField) => (
                                 <RecurrenceForm ref={ref} setParentField={setParentField} {...fieldValues} />
                             )}
-                            setGlobalState={setFilterParameter.bind(undefined, 'recurrence')}
+                            setGlobalState={({type, number, interval}) => {
+                                if (type === 'every' && number === 1 && interval === 'day') {
+                                    type = 'daily';
+                                }
+                                setFilterParameter('recurrence', {type, number, interval});
+                            }}
                             initialValues={recurrence}
                             defaults={{
                                 type: 'single',
