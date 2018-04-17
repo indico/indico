@@ -22,7 +22,7 @@ settings:
   # but our custom resolver does the job just fine while still
   # being fast.
   import/resolver:
-    ./eslint-import-resolver:
+    eslint-import-resolver-indico:
       extensions: [.js, .jsx, .json]
 
 rules:

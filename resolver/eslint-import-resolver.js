@@ -29,7 +29,7 @@ module.exports = {
         if (rv.found) {
             return rv;
         } else if (source.startsWith('indico/')) {
-            const realPath = path.join(__dirname, 'indico/web/client/js', source.substr(7));
+            const realPath = path.join(__dirname, '../indico/web/client/js', source.substr(7));
             return nodeResolve(realPath, file, config);
         }
         return {found: false};

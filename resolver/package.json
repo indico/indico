@@ -1,0 +1,6 @@
+{
+  "name": "eslint-import-resolver-indico",
+  "private": true,
+  "version": "1.0.0",
+  "main": "eslint-import-resolver.js"
+}
