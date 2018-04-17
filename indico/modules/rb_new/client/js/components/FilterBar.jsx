@@ -16,7 +16,7 @@
 */
 
 import React from 'react';
-import {Button} from 'antd';
+import {Button, Icon} from 'antd';
 import propTypes from 'prop-types';
 
 import {Translate} from 'indico/react/i18n';
@@ -25,23 +25,39 @@ import FilterDropdown from './filters/FilterDropdown';
 import RecurrenceForm from './filters/RecurrenceForm';
 import DateForm from './filters/DateForm';
 import TimeForm from './filters/TimeForm';
+import CapacityForm from './filters/CapacityForm';
+
 import recurrenceRenderer from './filters/RecurrenceRenderer';
 import dateRenderer from './filters/DateRenderer';
 import timeRenderer from './filters/TimeRenderer';
 
 
-export default function FilterBar({recurrence, dates, timeSlot, setFilterParameter}) {
+const capacityRenderer = ({capacity}) => (
+    (capacity === null)
+        ? null : (
+            <span>
+                <Icon type="user" />
+                {capacity}
+            </span>
+        ));
+
+export default function FilterBar({recurrence, dates, timeSlot, capacity, setFilterParameter}) {
     return (
         <Button.Group size="medium">
             <FilterDropdown title={<Translate>Recurrence</Translate>}
-                            form={(ref, setParentField) => (
-                                <RecurrenceForm ref={ref} setParentField={setParentField} {...recurrence} />
+                            form={(ref, fieldValues, setParentField) => (
+                                <RecurrenceForm ref={ref} setParentField={setParentField} {...fieldValues} />
                             )}
                             setGlobalState={setFilterParameter.bind(undefined, 'recurrence')}
                             initialValues={recurrence}
-                            displayValue={recurrenceRenderer} />
+                            defaults={{
+                                type: 'single',
+                                number: 1,
+                                interval: 'week'
+                            }}
+                            renderValue={recurrenceRenderer} />
             <FilterDropdown title={<Translate>Date</Translate>}
-                            form={(ref, setParentField) => (
+                            form={(ref, fieldValues, setParentField) => (
                                 <DateForm ref={ref}
                                           setParentField={setParentField}
                                           isRange={recurrence.type !== 'single'}
@@ -49,16 +65,25 @@ export default function FilterBar({recurrence, dates, timeSlot, setFilterParamet
                             )}
                             setGlobalState={setFilterParameter.bind(undefined, 'dates')}
                             initialValues={dates}
-                            displayValue={dateRenderer} />
+                            renderValue={dateRenderer} />
             <FilterDropdown title={<Translate>Time</Translate>}
-                            form={(ref, setParentField) => (
+                            form={(ref, fieldValues, setParentField) => (
                                 <TimeForm ref={ref}
                                           setParentField={setParentField}
-                                          {...timeSlot} />
+                                          {...fieldValues} />
                             )}
                             setGlobalState={setFilterParameter.bind(undefined, 'timeSlot')}
                             initialValues={timeSlot}
-                            displayValue={timeRenderer} />
+                            renderValue={timeRenderer} />
+            <FilterDropdown title={<Translate>Min. Capacity</Translate>}
+                            form={(ref, fieldValues, setParentField) => (
+                                <CapacityForm ref={ref}
+                                              setParentField={setParentField}
+                                              capacity={fieldValues.capacity} />
+                            )}
+                            setGlobalState={data => setFilterParameter('capacity', data.capacity)}
+                            initialValues={{capacity}}
+                            renderValue={capacityRenderer} />
         </Button.Group>
     );
 }
@@ -77,5 +102,10 @@ FilterBar.propTypes = {
         startTime: propTypes.string,
         endTime: propTypes.string
     }).isRequired,
+    capacity: propTypes.number,
     setFilterParameter: propTypes.func.isRequired
+};
+
+FilterBar.defaultProps = {
+    capacity: null
 };
