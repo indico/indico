@@ -20,6 +20,11 @@
     margin-bottom: 25px;
 }
 
-.filters-select {
-    width: 110px;
+.filters-trigger {
+    cursor: pointer;
+
+    .filters-down-arrow {
+        font-size: 12px;
+        margin-left: 10px;
+    }
 }
