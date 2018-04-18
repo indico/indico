@@ -40,12 +40,14 @@ export default class FilterDropdown extends React.Component {
         renderValue: propTypes.func.isRequired,
         setGlobalState: propTypes.func.isRequired,
         initialValues: propTypes.object,
-        defaults: propTypes.object
+        defaults: propTypes.object,
+        showButtons: propTypes.bool
     }
 
     static defaultProps = {
         initialValues: {},
-        defaults: {}
+        defaults: {},
+        showButtons: true
     }
 
     static getDerivedStateFromProps({defaults, initialValues, renderValue}, prevState) {
@@ -125,7 +127,7 @@ export default class FilterDropdown extends React.Component {
 
     render() {
         const formRef = React.createRef();
-        const {title, form} = this.props;
+        const {title, form, showButtons} = this.props;
         const {renderedValue, fieldValues, isOpen} = this.state;
         const trigger = (
             <Button primary={renderedValue !== null} styleName="filter-dropdown-button">
@@ -141,15 +143,17 @@ export default class FilterDropdown extends React.Component {
                    open={isOpen}
                    onClose={this.handleClose}
                    onOpen={this.handleOpen}>
-                {form(formRef, fieldValues, this.setFieldValue, this.resetFields)}
-                <Button.Group size="mini" compact floated="right">
-                    <Button onClick={this.handleCancel}>
-                        <Translate>Cancel</Translate>
-                    </Button>
-                    <Button positive onClick={this.handleOK}>
-                        <Translate>OK</Translate>
-                    </Button>
-                </Button.Group>
+                {form(formRef, fieldValues, this.setFieldValue, this.handleOK)}
+                {showButtons && (
+                    <Button.Group size="mini" compact floated="right">
+                        <Button onClick={this.handleCancel}>
+                            <Translate>Cancel</Translate>
+                        </Button>
+                        <Button positive onClick={this.handleOK}>
+                            <Translate>OK</Translate>
+                        </Button>
+                    </Button.Group>
+                )}
             </Popup>
         );
     }
