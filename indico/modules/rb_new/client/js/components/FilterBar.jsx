@@ -62,15 +62,17 @@ export default function FilterBar({recurrence, dates, timeSlot, capacity, setFil
                             }}
                             renderValue={recurrenceRenderer} />
             <FilterDropdown title={<Translate>Date</Translate>}
-                            form={(ref, fieldValues, setParentField) => (
+                            form={(ref, fieldValues, setParentField, handleOK) => (
                                 <DateForm ref={ref}
                                           setParentField={setParentField}
                                           isRange={recurrence.type !== 'single'}
+                                          handleOK={handleOK}
                                           {...dates} />
                             )}
                             setGlobalState={setFilterParameter.bind(undefined, 'dates')}
                             initialValues={dates}
-                            renderValue={dateRenderer} />
+                            renderValue={dateRenderer}
+                            showButtons={false} />
             <FilterDropdown title={<Translate>Time</Translate>}
                             form={(ref, fieldValues, setParentField) => (
                                 <TimeForm ref={ref}
