@@ -68,6 +68,7 @@ Improvements
 - Use proper British English for person titles (:issue:`3279`)
 - Add event keywords in meta tags (:issue:`3262`, thanks :user:`bpedersen2`)
 - Improve sorting by date fields in the registrant list
+- Use the user's preferred name format in more places
 
 Bugfixes
 ^^^^^^^^

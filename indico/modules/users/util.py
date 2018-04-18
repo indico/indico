@@ -162,7 +162,7 @@ def serialize_user(user):
         'id': user.id,
         'title': user.title,
         'identifier': 'User:{}'.format(user.id),
-        'name': user.full_name,
+        'name': user.display_full_name,
         'familyName': user.last_name,
         'firstName': user.first_name,
         'affiliation': user.affiliation,

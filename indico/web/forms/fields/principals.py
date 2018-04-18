@@ -31,6 +31,7 @@ from indico.modules.groups import GroupProxy
 from indico.modules.groups.util import serialize_group
 from indico.modules.networks.models.networks import IPNetworkGroup
 from indico.modules.networks.util import serialize_ip_network_group
+from indico.modules.users import User
 from indico.modules.users.util import serialize_user
 from indico.util.user import principal_from_fossil
 from indico.web.forms.fields import JSONField
@@ -99,8 +100,9 @@ class PrincipalListField(HiddenField):
 
         def key(obj):
             if isinstance(obj, PersonLinkBase):
-                return obj.name.lower()
-            return obj.principal_type, obj.name.lower()
+                return obj.display_full_name.lower()
+            name = obj.display_full_name if isinstance(obj, User) else obj.name
+            return obj.principal_type, name.lower()
 
         principals = sorted(self._get_data(), key=key)
         return map(serialize_principal, principals)

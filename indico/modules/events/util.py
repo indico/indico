@@ -184,7 +184,7 @@ def serialize_event_person(person):
     return {'_type': 'EventPerson',
             'id': person.id,
             'email': person.email,
-            'name': person.full_name,
+            'name': person.display_full_name,
             'firstName': person.first_name,
             'familyName': person.last_name,
             'title': person.title,
@@ -197,8 +197,8 @@ def serialize_event_person(person):
 def serialize_person_link(person_link):
     """Serialize PersonLink to JSON-like object"""
     data = {'email': person_link.person.email,
-            'name': person_link.full_name,
-            'fullName': person_link.full_name,
+            'name': person_link.display_full_name,
+            'fullName': person_link.display_full_name,
             'firstName': person_link.first_name,
             'familyName': person_link.last_name,
             'title': person_link.title,
