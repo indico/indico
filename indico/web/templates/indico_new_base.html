@@ -5,7 +5,7 @@
 
 {% block html_body %}
     {% block topbar %}
-        <div class="indico-top-bar ant-layout-header">
+        <div class="indico-top-bar">
             {% block logo %}
                 {%- set logo_url = indico_config.LOGO_URL or (indico_config.IMAGES_BASE_URL + '/logo_indico_bw.png') -%}
                 <a class="indico-top-bar-logo" href="{{ url_for_index() }}">
