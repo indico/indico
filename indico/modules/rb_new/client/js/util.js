@@ -21,3 +21,26 @@ import moment from 'moment';
 export function toMoment(dt, format) {
     return dt ? moment(dt, format) : null;
 }
+
+export function parseRoomListFiltersText(text) {
+    const result = {text: '', building: '', floor: ''};
+    if (!text) {
+        return result;
+    }
+
+    const parts = text.split(' ');
+    for (const item of parts) {
+        if (!item) {
+            continue;
+        }
+
+        const [filter, value] = item.trimRight().split(':');
+        if (value && ['bldg', 'floor'].includes(filter)) {
+            result[filter !== 'bldg' ? filter : 'building'] = value;
+        } else {
+            result.text = item ? item.trim() : '';
+        }
+    }
+
+    return result;
+}

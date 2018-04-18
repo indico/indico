@@ -23,8 +23,6 @@ import moment from 'moment';
 import 'semantic-ui-css/semantic.css';
 import '../styles/main.scss';
 
-import buildFetchRoomsURL from 'indico-url:rooms_new.available_rooms';
-
 import setupUserMenu from 'indico/react/containers/UserMenu';
 import App from './components/App';
 
@@ -45,8 +43,7 @@ document.addEventListener("DOMContentLoaded", () => {
             isAdmin: Indico.User.is_admin
         },
         staticData: {
-            availableLanguages: Indico.Settings.Languages,
-            fetchRoomsUrl: buildFetchRoomsURL(),
+            availableLanguages: Indico.Settings.Languages
         }
     });
 
