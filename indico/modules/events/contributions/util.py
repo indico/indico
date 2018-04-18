@@ -206,19 +206,22 @@ def import_contributions_from_csv(event, f):
 
     for num_row, row in enumerate(reader, 1):
         try:
-            start_dt, duration, title, first_name, last_name, affiliation, email = row
+            start_dt, duration, title, first_name, last_name, affiliation, email = \
+                [to_unicode(value).strip() for value in row]
+            email = email.lower()
         except ValueError:
             raise UserValueError(_('Row {}: malformed CSV data - please check that the number of columns is correct')
                                  .format(num_row))
         try:
             parsed_start_dt = event.tzinfo.localize(dateutil.parser.parse(start_dt)) if start_dt else None
         except ValueError:
-            raise UserValueError(_("Row {}: can't parse date: \"{}\"").format(num_row, start_dt))
+            raise UserValueError(_("Row {row}: can't parse date: \"{date}\"").format(row=num_row, date=start_dt))
 
         try:
             parsed_duration = timedelta(minutes=int(duration)) if duration else None
         except ValueError:
-            raise UserValueError(_("Row {}: can't parse duration: {}").format(num_row, duration))
+            raise UserValueError(_("Row {row}: can't parse duration: {duration}").format(row=num_row,
+                                                                                         duration=duration))
 
         if not title:
             raise UserValueError(_("Row {}: contribution title is required").format(num_row))
@@ -226,12 +229,12 @@ def import_contributions_from_csv(event, f):
         contrib_data.append({
             'start_dt': parsed_start_dt,
             'duration': parsed_duration or timedelta(minutes=20),
-            'title': to_unicode(title),
+            'title': title,
             'speaker': {
-                'first_name': to_unicode(first_name),
-                'last_name': to_unicode(last_name),
-                'affiliation': to_unicode(affiliation),
-                'email': to_unicode(email)
+                'first_name': first_name,
+                'last_name': last_name,
+                'affiliation': affiliation,
+                'email': email
             }
         })
 
@@ -260,7 +263,7 @@ def import_contributions_from_csv(event, f):
             'firstName': speaker_data['first_name'],
             'familyName': speaker_data['last_name'],
             'affiliation': speaker_data['affiliation'],
-            'email': email.lower()
+            'email': email
         })
         link = ContributionPersonLink(person=person, is_speaker=True)
         link.populate_from_dict({
