@@ -44,5 +44,5 @@ class WPPage(WPConferenceDisplayBase):
         WPConferenceDisplayBase.__init__(self, rh, conference, **kwargs)
 
     @property
-    def sidemenu_option(self):
-        return self.page.menu_entry.id
+    def sidemenu_entry(self):
+        return self.page.menu_entry

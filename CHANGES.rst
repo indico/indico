@@ -23,6 +23,8 @@ Improvements
 - Support markdown in survey questions (:issue:`3366`)
 - Improve event list in case of long event titles (:issue:`3607`,
   thanks :user:`nop33`)
+- Include event page title in the page's ``<title>`` (:issue:`3285`,
+  thanks :user:`bpedersen2`)
 
 Bugfixes
 ^^^^^^^^
