@@ -25,6 +25,7 @@ import FilterFormComponent from './FilterFormComponent';
 
 import './RecurrenceForm.module.scss';
 
+
 export default class RecurrenceForm extends FilterFormComponent {
     static propTypes = {
         type: propTypes.string,
