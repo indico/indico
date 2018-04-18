@@ -17,9 +17,11 @@
 
 import React from 'react';
 
-import {Button, InputNumber} from 'antd';
+import {Form, Icon, Input} from 'semantic-ui-react';
 
 import FilterFormComponent from './FilterFormComponent';
+
+import './CapacityForm.module.scss';
 
 
 export default class CapacityForm extends FilterFormComponent {
@@ -35,20 +37,20 @@ export default class CapacityForm extends FilterFormComponent {
     render() {
         const {capacity} = this.state;
         return (
-            <div>
-                <InputNumber min={1}
-                             value={capacity}
-                             step={10}
-                             onChange={value => {
-                                 this.setCapacity(value);
-                             }} />
-                <Button shape="circle"
-                        icon="close"
-                        type="dashed"
-                        disabled={!capacity}
-                        onClick={() => {
-                            this.setCapacity(null);
-                        }} />
+            <div styleName="capacity-form">
+                <Input type="number"
+                       value={capacity || ''}
+                       onChange={(_, {value}) => {
+                           this.setCapacity(value);
+                       }} />
+                <Icon name="close"
+                      inverted
+                      circular
+                      disabled={!capacity}
+                      link
+                      onClick={() => {
+                          this.setCapacity(null);
+                      }} />
             </div>
         );
     }
