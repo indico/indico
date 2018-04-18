@@ -51,7 +51,7 @@ from indico.modules.users.util import get_user_by_email
 from indico.util.date_time import format_date
 from indico.util.i18n import _
 from indico.util.spreadsheets import unique_col
-from indico.util.string import to_unicode
+from indico.util.string import is_valid_mail, to_unicode
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.widgets import SwitchWidget
 
@@ -520,26 +520,37 @@ def update_regform_item_positions(regform):
 def import_registrations_from_csv(regform, fileobj, skip_moderation=True, notify_users=False):
     """Import event registrants from a CSV file into a form."""
     reader = csv.reader(fileobj)
-    registrations = []
+    query = db.session.query(Registration.email).with_parent(regform).filter(Registration.is_active)
+    registered_emails = {email for (email,) in query}
+    used_emails = set()
+    todo = []
     for row_num, row in enumerate(reader, 1):
         try:
             first_name, last_name, affiliation, position, phone, email = [to_unicode(value).strip() for value in row]
+            email = email.lower()
         except ValueError:
             raise UserValueError(_('Row {}: malformed CSV data - please check that the number of columns is correct')
                                  .format(row_num))
 
         if not email:
             raise UserValueError(_('Row {}: missing e-mail address').format(row_num))
+        if not is_valid_mail(email, multi=False):
+            raise UserValueError(_('Row {}: invalid e-mail address').format(row_num))
         if not first_name or not last_name:
             raise UserValueError(_('Row {}: missing first or last name').format(row_num))
+        if email in registered_emails:
+            raise UserValueError(_('Row {}: a registration with this email already exists').format(row_num))
+        if email in used_emails:
+            raise UserValueError(_('Row {}: email address is not unique').format(row_num))
 
-        with db.session.no_autoflush:
-            registrations.append(create_registration(regform, {
-                'email': email,
-                'first_name': first_name.title(),
-                'last_name': last_name.title(),
-                'affiliation': affiliation,
-                'phone': phone,
-                'position': position
-            }, notify_user=notify_users, skip_moderation=skip_moderation))
-    return registrations
+        used_emails.add(email)
+        todo.append({
+            'email': email,
+            'first_name': first_name.title(),
+            'last_name': last_name.title(),
+            'affiliation': affiliation,
+            'phone': phone,
+            'position': position
+        })
+    return [create_registration(regform, data, notify_user=notify_users, skip_moderation=skip_moderation)
+            for data in todo]
