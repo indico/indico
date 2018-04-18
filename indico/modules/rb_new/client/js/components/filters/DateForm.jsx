@@ -50,11 +50,6 @@ export default class DateForm extends FilterFormComponent {
         };
     }
 
-    resetFields({startDate, endDate}) {
-        // version from parent/redux will be serialized
-        this.setDates(toMoment(startDate), toMoment(endDate));
-    }
-
     setDates(startDate, endDate) {
         const {setParentField} = this.props;
         // send serialized versions to parent/redux

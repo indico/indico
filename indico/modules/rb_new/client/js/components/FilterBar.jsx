@@ -16,7 +16,7 @@
 */
 
 import React from 'react';
-import {Button, Icon} from 'antd';
+import {Button, Icon} from 'semantic-ui-react';
 import propTypes from 'prop-types';
 
 import {Translate} from 'indico/react/i18n';
@@ -36,14 +36,14 @@ const capacityRenderer = ({capacity}) => (
     (capacity === null)
         ? null : (
             <span>
-                <Icon type="user" />
+                <Icon name="user" />
                 {capacity}
             </span>
         ));
 
 export default function FilterBar({recurrence, dates, timeSlot, capacity, setFilterParameter}) {
     return (
-        <Button.Group size="medium">
+        <Button.Group>
             <FilterDropdown title={<Translate>Recurrence</Translate>}
                             form={(ref, fieldValues, setParentField) => (
                                 <RecurrenceForm ref={ref} setParentField={setParentField} {...fieldValues} />

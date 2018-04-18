@@ -16,10 +16,12 @@
 */
 
 import React from 'react';
-import {Button, Icon} from 'antd';
+import {Button, Icon, Popup} from 'semantic-ui-react';
 import propTypes from 'prop-types';
 
-import FilterOptions from './FilterOptions';
+import {Translate} from 'indico/react/i18n';
+
+import './FilterDropdown.module.scss';
 
 
 function _mergeDefaults(defaults, values) {
@@ -56,11 +58,16 @@ export default class FilterDropdown extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = {};
+        this.state = {
+            isOpen: false
+        };
 
         this.setFieldValue = this.setFieldValue.bind(this);
-        this.resetFields = this.resetFields.bind(this);
         this.setRenderedValue = this.setRenderedValue.bind(this);
+        this.handleOpen = this.handleOpen.bind(this);
+        this.handleClose = this.handleClose.bind(this);
+        this.handleOK = this.handleOK.bind(this);
+        this.handleCancel = this.handleCancel.bind(this);
     }
 
     setFieldValue(field, value) {
@@ -76,10 +83,9 @@ export default class FilterDropdown extends React.Component {
         this.setState(newState);
     }
 
-    resetFields() {
-        const {fieldValues} = this.state;
-        Object.keys(fieldValues).forEach(field => {
-            this.setFieldValue(field, null);
+    resetFields(fieldValues) {
+        this.setState({
+            fieldValues
         });
     }
 
@@ -91,27 +97,60 @@ export default class FilterDropdown extends React.Component {
         });
     }
 
+    handleClose() {
+        this.setState({
+            isOpen: false
+        });
+    }
+
+    handleOpen() {
+        this.setState({
+            isOpen: true
+        });
+    }
+
+    handleCancel() {
+        const {defaults, initialValues} = this.props;
+        this.resetFields(_mergeDefaults(defaults, initialValues));
+        this.handleClose();
+    }
+
+    handleOK() {
+        const {setGlobalState} = this.props;
+        const {fieldValues} = this.state;
+        this.setRenderedValue(fieldValues);
+        setGlobalState(fieldValues);
+        this.handleClose();
+    }
+
     render() {
-        const {title, form, defaults, initialValues, setGlobalState} = this.props;
-        const {renderedValue, fieldValues} = this.state;
         const formRef = React.createRef();
+        const {title, form} = this.props;
+        const {renderedValue, fieldValues, isOpen} = this.state;
+        const trigger = (
+            <Button primary={renderedValue !== null} styleName="filter-dropdown-button">
+                {renderedValue === null ? title : renderedValue}
+                <Icon name="angle down" />
+            </Button>
+        );
 
         return (
-            <FilterOptions title={form(formRef, fieldValues, this.setFieldValue, this.resetFields)}
-                           placement="bottomRight"
-                           trigger={['click']}
-                           onConfirm={() => {
-                               this.setRenderedValue(fieldValues);
-                               setGlobalState(fieldValues);
-                           }}
-                           onCancel={() => {
-                               formRef.current.resetFields(_mergeDefaults(defaults, initialValues));
-                           }}>
-                <Button type={renderedValue !== null ? 'primary' : ''}>
-                    {renderedValue === null ? title : renderedValue}
-                    <Icon type="down" />
-                </Button>
-            </FilterOptions>
+            <Popup position="bottom right"
+                   trigger={trigger}
+                   on="click"
+                   open={isOpen}
+                   onClose={this.handleClose}
+                   onOpen={this.handleOpen}>
+                {form(formRef, fieldValues, this.setFieldValue, this.resetFields)}
+                <Button.Group size="mini" compact floated="right">
+                    <Button onClick={this.handleCancel}>
+                        <Translate>Cancel</Translate>
+                    </Button>
+                    <Button positive onClick={this.handleOK}>
+                        <Translate>OK</Translate>
+                    </Button>
+                </Button.Group>
+            </Popup>
         );
     }
 }
