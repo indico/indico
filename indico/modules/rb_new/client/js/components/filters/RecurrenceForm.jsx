@@ -48,12 +48,6 @@ export default class RecurrenceForm extends FilterFormComponent {
         this.onIntervalChange = this.stateChanger('interval');
     }
 
-    resetFields(fields) {
-        Object.entries(fields).forEach(([key, value]) => {
-            this.stateChanger(key)(value);
-        });
-    }
-
     stateChanger(param) {
         const {setParentField} = this.props;
         return (value) => {

@@ -42,14 +42,9 @@ export default class TimeForm extends FilterFormComponent {
         // if there is no internal state, get the values from props
         return {
             ...prevState,
-            startTime: prevState.startTime || toMoment(startTime),
-            endTime: prevState.endTime || toMoment(endTime)
+            startTime: toMoment(startTime, 'HH:mm'),
+            endTime: toMoment(endTime, 'HH:mm')
         };
-    }
-
-    resetFields({startTime, endTime}) {
-        // version from parent/redux will be serialized
-        this.setTimes(toMoment(startTime, 'HH:mm:ss'), toMoment(endTime, 'HH:mm:ss'));
     }
 
     setTimes(startTime, endTime) {
