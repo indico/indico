@@ -54,12 +54,6 @@
             {% endfor %}
         {% endfor %}
     </ul>
-    {% if event.type == 'conference' and theme %}
-        <span class="separator"></span>
-        <a href="{{ event.url }}" class="i-button text-color subtle">
-            {%- trans %}Conference View{% endtrans -%}
-        </a>
-    {% endif %}
 {%- endmacro -%}
 
 
@@ -221,6 +215,12 @@
                href="{{ url_for('event_management.settings', event) }}"
                title="{% trans %}Switch to the management area of this event{% endtrans %}"></a>
 
+            {% if event.type == 'conference' and theme %}
+                <span class="separator"></span>
+                <a href="{{ event.url }}" class="i-button text-color subtle">
+                    {%- trans %}Back to Conference View{% endtrans -%}
+                </a>
+            {% endif %}
         </div>
 
         {{ render_session_bar(protected_object=event, local_tz=event.display_tzinfo.zone) }}

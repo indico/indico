@@ -69,6 +69,8 @@ Improvements
 - Add event keywords in meta tags (:issue:`3262`, thanks :user:`bpedersen2`)
 - Improve sorting by date fields in the registrant list
 - Use the user's preferred name format in more places
+- Add "back to conference" link when viewing a conference timetable using
+  a meeting theme (:issue:`3297`, thanks :user:`bpedersen2`)
 
 Bugfixes
 ^^^^^^^^
