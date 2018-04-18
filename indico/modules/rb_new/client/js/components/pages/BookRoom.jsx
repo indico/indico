@@ -17,7 +17,7 @@
 
 import propTypes from 'prop-types';
 import React from 'react';
-import {Row, Col} from 'antd';
+import {Grid} from 'semantic-ui-react';
 
 import filterBarFactory from '../../containers/FilterBar';
 import RoomBookingMap from "../RoomBookingMap";
@@ -56,14 +56,14 @@ export default class BookRoom extends React.Component {
         const {bounds} = this.props;
         const FilterBar = filterBarFactory('bookRoom');
         return (
-            <Row>
-                <Col span={16}>
+            <Grid columns={2}>
+                <Grid.Column width={11}>
                     <FilterBar />
-                </Col>
-                <Col span={8}>
+                </Grid.Column>
+                <Grid.Column width={5}>
                     {bounds && <RoomBookingMap bounds={bounds} onMove={(e) => this.onMove(e)} />}
-                </Col>
-            </Row>
+                </Grid.Column>
+            </Grid>
         );
     }
 }
