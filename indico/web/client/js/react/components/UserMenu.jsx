@@ -20,7 +20,7 @@
 import qs from 'qs';
 import React from 'react';
 import propTypes from 'prop-types';
-import {Avatar, Divider, Icon, Select} from 'antd';
+import {Dropdown, Icon, Label} from 'semantic-ui-react';
 
 import userDashboard from 'indico-url:users.user_dashboard';
 import userPreferences from 'indico-url:users.user_preferences';
@@ -29,10 +29,8 @@ import adminDashboard from 'indico-url:core.admin_dashboard';
 import changeLanguage from 'indico-url:core.change_lang';
 
 import {Translate} from 'indico/react/i18n';
-import {Slot} from 'indico/react/util';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 
-import ArrowDownMenu from './ArrowDownMenu';
 import './UserMenu.module.scss';
 
 
@@ -54,56 +52,58 @@ export default function UserMenu({userData, staticData}) {
     const {availableLanguages} = staticData;
     const {firstName, lastName, email, language, isAdmin, avatarBgColor} = userData;
     const avatar = (
-        <Avatar style={{
+        <Label avatar style={{
             backgroundColor: avatarBgColor
-        }}>
+        }} styleName="user-menu-avatar">
             {firstName[0]}
-        </Avatar>
+        </Label>
     );
 
     const languageSelector = (
-        <Select defaultValue={language}
-                styleName="language-selector-combo"
-                onSelect={postAndReload}
-                getPopupContainer={trigger => trigger.parentNode}>
-            {Object.entries(availableLanguages).map(([key, name]) => (
-                <Select.Option key={key} value={key}>{name}</Select.Option>
-            ))}
-        </Select>
+        <Dropdown value={language}
+                  onChange={(_, {value}) => {
+                      if (value !== language) {
+                          postAndReload(value);
+                      }
+                  }}
+                  options={Object.entries(availableLanguages).map(([key, name]) => ({
+                      key, text: name, value: key
+                  }))} />);
+
+    const headerContent = (
+        <div>
+            {firstName} {lastName}
+            <br />
+            {email}
+        </div>
     );
 
     return (
-        <ArrowDownMenu>
-            <Slot name="avatar">
-                {avatar}
-            </Slot>
-            <Slot>
-                <h3>{`${firstName} ${lastName}`}</h3>
-                <h4>{email}</h4>
-                <div styleName="links">
-                    <Divider type="horizontal" />
-                    <a href={userDashboard()}>
-                        <Translate>My Profile</Translate>
-                    </a>
-                    <a href={userPreferences()}>
-                        <Translate>My Preferences</Translate>
-                    </a>
-                    <div styleName="language-selector-field">
-                        <Icon type="global" styleName="language-icon" />
-                        {languageSelector}
-                    </div>
-                    <Divider type="horizontal" />
-                    {isAdmin && (
-                        <a href={adminDashboard()}>
-                            <Translate>Administration</Translate>
-                        </a>
-                    )}
-                    <a href={authLogout()}>
-                        <Translate>Logout</Translate>
-                    </a>
-                </div>
-            </Slot>
-        </ArrowDownMenu>
+        <Dropdown trigger={avatar} pointing="top right">
+            <Dropdown.Menu>
+                <Dropdown.Header content={headerContent} />
+                <Dropdown.Divider />
+                <Dropdown.Item as="a" href={userDashboard()}>
+                    <Translate>My Profile</Translate>
+                </Dropdown.Item>
+                <Dropdown.Item as="a" href={userPreferences()}>
+                    <Translate>My Preferences</Translate>
+                </Dropdown.Item>
+                <Dropdown.Header>
+                    <Icon name="globe" />
+                    {languageSelector}
+                </Dropdown.Header>
+                <Dropdown.Divider />
+                {isAdmin && (
+                    <Dropdown.Item as="a" href={adminDashboard()}>
+                        <Translate>Administration</Translate>
+                    </Dropdown.Item>
+                )}
+                <Dropdown.Item as="a" href={authLogout()}>
+                    <Translate>Logout</Translate>
+                </Dropdown.Item>
+            </Dropdown.Menu>
+        </Dropdown>
     );
 }
 

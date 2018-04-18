@@ -18,33 +18,41 @@
 /* eslint "react/forbid-component-props": "off" */
 
 import React from 'react';
-import {Menu, Icon} from 'antd';
 import propTypes from 'prop-types';
+import {Dropdown, Icon} from 'semantic-ui-react';
 
-import {Slot, toClasses} from 'indico/react/util';
 import {Translate} from 'indico/react/i18n';
-import ArrowDownMenu, {styles as arrowDownStyles} from 'indico/react/components/ArrowDownMenu';
-
-import userActionsStyles from './UserActions.module.scss';
 
 
 export default function UserActions({hasRooms, hasBlockings, isAdmin}) {
+    const avatar = (
+        <Icon name="user"
+              size="large" />
+    );
+    const options = [
+        {
+            key: 'my_bookings',
+            text: Translate.string('My Bookings')
+        },
+        {
+            key: 'bookings_my_rooms',
+            text: Translate.string('Bookings in My Rooms')
+        },
+        {
+            key: 'my_rooms',
+            text: Translate.string('List of My Rooms')
+        },
+        {
+            key: 'my_blockings',
+            text: Translate.string('My Blockings')
+        },
+        {
+            key: 'isAdmin',
+            text: Translate.string('Administration')
+        }
+    ];
     return (
-        <ArrowDownMenu>
-            <Slot name="avatar">
-                <Icon className={toClasses(userActionsStyles['user-icon'], arrowDownStyles['icon-change-hover'])}
-                      type="user" size="large" />
-            </Slot>
-            <Slot>
-                <Menu>
-                    <Menu.Item><Translate>My Bookings</Translate></Menu.Item>
-                    {hasRooms && <Menu.Item><Translate>Bookings in My Rooms</Translate></Menu.Item>}
-                    {hasRooms && <Menu.Item><Translate>List of My Rooms</Translate></Menu.Item>}
-                    {hasBlockings && <Menu.Item><Translate>My Blockings</Translate></Menu.Item>}
-                    {isAdmin && <Menu.Item><Translate>Administration</Translate></Menu.Item>}
-                </Menu>
-            </Slot>
-        </ArrowDownMenu>
+        <Dropdown trigger={avatar} options={options} pointing="top right" />
     );
 }
 
