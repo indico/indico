@@ -17,7 +17,7 @@
 
 import React from 'react';
 
-import {Form, Icon, Input} from 'semantic-ui-react';
+import {Icon, Input} from 'semantic-ui-react';
 
 import FilterFormComponent from './FilterFormComponent';
 
