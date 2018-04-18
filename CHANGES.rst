@@ -86,6 +86,8 @@ Bugfixes
   (:issue:`3290`)
 - Fix error when generating a PDF timetable including contribution
   abstracts (:issue:`3289`)
+- Do not require management access to a category to select a badge
+  template from it as a backside.
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

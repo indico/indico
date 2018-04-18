@@ -135,6 +135,16 @@ class SpecificTemplateMixin(TemplateDesignerMixin):
         self.template = DesignerTemplate.get_one(request.view_args['template_id'])
 
 
+class BacksideTemplateProtectionMixin(object):
+    def _check_access(self):
+        self._require_user()
+        # Category templates can be used as backsides - we can't require management
+        # or even read access to the category for this as someone may be managing an
+        # event inside a category they can't access/manage.
+        if isinstance(self.target, Event):
+            SpecificTemplateMixin._check_access(self)
+
+
 class TargetFromURLMixin(TemplateDesignerMixin):
     """
     Mixin that takes the target event/category from the URL that is passed.
@@ -282,7 +292,7 @@ class RHEditDesignerTemplate(RHModifyDesignerTemplateBase):
         return jsonify_data()
 
 
-class RHDownloadTemplateImage(RHModifyDesignerTemplateBase):
+class RHDownloadTemplateImage(BacksideTemplateProtectionMixin, RHModifyDesignerTemplateBase):
     normalize_url_spec = {
         'locators': {
             lambda self: self.image
@@ -346,7 +356,7 @@ class RHListBacksideTemplates(RHModifyDesignerTemplateBase, RHListEventTemplates
                                 width=int(request.args['width']), height=int(request.args['height']))
 
 
-class RHGetTemplateData(RHModifyDesignerTemplateBase):
+class RHGetTemplateData(BacksideTemplateProtectionMixin, RHModifyDesignerTemplateBase):
     def _process(self):
         template_data = {
             'title': self.template.title,
