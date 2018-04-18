@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 from datetime import timedelta
+
 from flask import g
 
 import indico.modules.events.contributions.models.contributions as contrib_module
@@ -35,7 +36,7 @@ class Incrementer(object):
         return self.counter == n
 
 
-def test_contrib_friendly_id(monkeypatch, db, dummy_category, dummy_event, create_contribution):
+def test_contrib_friendly_id(monkeypatch, dummy_event, create_contribution):
     counter = Incrementer()
     monkeypatch.setattr(contrib_module, 'increment_and_get', counter)
 
