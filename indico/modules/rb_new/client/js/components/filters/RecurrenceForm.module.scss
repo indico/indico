@@ -15,7 +15,12 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-.recurrence-freq-item {
-    display: block;
-}
+ .recurrence-every:global(.fields.inline) {
+    :global .ui.selection.dropdown {
+        min-width: 100px;
+    }
 
+    :global .field .ui.input input {
+        width: 80px;
+    }
+}
