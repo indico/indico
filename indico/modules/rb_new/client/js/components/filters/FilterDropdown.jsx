@@ -145,7 +145,7 @@ export default class FilterDropdown extends React.Component {
                    onOpen={this.handleOpen}>
                 {form(formRef, fieldValues, this.setFieldValue, this.handleOK)}
                 {showButtons && (
-                    <Button.Group size="mini" compact floated="right">
+                    <Button.Group size="mini" compact floated="right" styleName="filter-dropdown-footer">
                         <Button onClick={this.handleCancel}>
                             <Translate>Cancel</Translate>
                         </Button>

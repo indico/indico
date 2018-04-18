@@ -20,7 +20,7 @@ import React from 'react';
 import {Provider} from 'react-redux';
 
 import moment from 'moment';
-import 'semantic-ui-css/semantic.min.css';
+import 'semantic-ui-css/semantic.css';
 import '../styles/main.scss';
 
 import buildFetchRoomsURL from 'indico-url:rooms_new.available_rooms';
