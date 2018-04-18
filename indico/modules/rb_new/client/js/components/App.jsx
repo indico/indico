@@ -17,7 +17,7 @@
 
 import React from 'react';
 import {BrowserRouter, Link, Route, Switch} from 'react-router-dom';
-import {Icon, Layout, Row, Col} from 'antd';
+import {Icon} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 import UserActions from '../containers/UserActions';
@@ -31,32 +31,27 @@ import Menu from './Menu';
 import './App.module.scss';
 
 
-const {Header, Content} = Layout;
-
-
 export default function App() {
     return (
         <BrowserRouter basename="/rooms-new">
-            <Layout>
-                <Header styleName="rb-menu-bar">
-                    <Col span={6}>
+            <div styleName="rb-layout">
+                <header styleName="rb-menu-bar">
+                    <div styleName="rb-menu-bar-side-left">
                         <h1>
-                            <Icon type="home" />
+                            <Icon name="home" />
                             <Link to="/">
                                 <Translate>Room Booking</Translate>
                             </Link>
                         </h1>
-                    </Col>
-                    <Col span={12}>
+                    </div>
+                    <div styleName="rb-menu-bar-menu">
                         <Menu />
-                    </Col>
-                    <Col span={6}>
-                        <Row type="flex" justify="end">
-                            <UserActions />
-                        </Row>
-                    </Col>
-                </Header>
-                <Content styleName="rb-content">
+                    </div>
+                    <div styleName="rb-menu-bar-side-right">
+                        <UserActions />
+                    </div>
+                </header>
+                <div styleName="rb-content">
                     <Switch>
                         <Route exact path="/" component={Landing} />
                         <Route path="/book" component={BookRoom} />
@@ -64,8 +59,8 @@ export default function App() {
                         <Route path="/blockings" component={BlockingList} />
                         <Route path="/calendar" component={Calendar} />
                     </Switch>
-                </Content>
-            </Layout>
+                </div>
+            </div>
         </BrowserRouter>
     );
 }

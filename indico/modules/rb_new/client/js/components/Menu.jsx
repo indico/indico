@@ -18,7 +18,7 @@
 import React from 'react';
 import propTypes from 'prop-types';
 import {Link, Route} from 'react-router-dom';
-import {Icon} from 'antd';
+import {Icon} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 
@@ -49,19 +49,19 @@ export default function Menu() {
     return (
         <ul styleName="rb-menu">
             <MenuItem key="book" path="/book">
-                <Icon type="plus-circle-o" />
+                <Icon name="add square" />
                 <Translate>Book a Room</Translate>
             </MenuItem>
             <MenuItem key="rooms" path="/rooms">
-                <Icon type="profile" />
+                <Icon name="list" />
                 <Translate>List of Rooms</Translate>
             </MenuItem>
             <MenuItem key="calendar" path="/calendar">
-                <Icon type="schedule" />
+                <Icon name="calendar" />
                 <Translate>Calendar</Translate>
             </MenuItem>
             <MenuItem key="blockings" path="/blockings">
-                <Icon type="close-circle-o" />
+                <Icon name="window close" />
                 <Translate>Blockings</Translate>
             </MenuItem>
         </ul>

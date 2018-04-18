@@ -24,12 +24,12 @@ $menu-height: 75px;
 $rb-content-padding: 2em;
 
 // TODO: move this to Indico-wide file
-.ant-layout-header.indico-top-bar {
+.indico-top-bar {
     background-color: $dark-blue;
     height: $indico-top-bar-height;
     display: flex;
     align-items: center;
-    padding: 0 0 0 2em;
+    padding: 0 20px 0 20px;
 
     .indico-top-bar-logo {
         display: flex;

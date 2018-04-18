@@ -25,6 +25,9 @@ ul.rb-menu {
     background-color: $highlight-color;
     border-bottom: none;
     line-height: $menu-height;
+    margin-bottom: 0;
+    padding: 0;
+    width: 100%;
 }
 
 .rb-menu .rb-menu-item {

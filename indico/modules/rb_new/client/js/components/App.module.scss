@@ -17,27 +17,77 @@
 
 @import '../../styles/main';
 
+.rb-layout {
+    // this will reset the stacking context,
+    // which will allow us to use z-indexes
+    display: flex;
+    flex-direction: column;
+}
+
 .rb-menu-bar {
     background-color: $highlight-color;
-    padding: 0 0 0 2em;
+    padding: 0 20px 0 20px;
+    margin: 0;
     height: $menu-height;
     line-height: $menu-height;
+    display: flex;
+
+    // make dropdown menus overlap whatever
+    // is in the content page
+    z-index: 2;
+
+    :global(.row) {
+        padding: 0;
+    }
 
     a {
         text-decoration: none;
     }
 
     h1 {
+        display: inline-block;
         margin: 0;
         color: $white;
+        line-height: $menu-height;
 
         a {
             color: $white;
             margin-left: 0.2em;
         }
     }
+
+    :global(.column) {
+        display: flex;
+    }
+}
+
+%rb-menu-bar-side {
+    flex-grow: 1;
+    display: flex;
+}
+
+.rb-menu-bar-side-left {
+    @extend %rb-menu-bar-side;
+
+    * {
+        margin-right: auto;
+    }
+}
+
+.rb-menu-bar-side-right {
+    @extend %rb-menu-bar-side;
+
+    * {
+        margin-left: auto;
+    }
+}
+
+.rb-menu-bar-menu {
+    flex-grow: 3;
 }
 
 .rb-content {
+    // lower z-index than menu
+    z-index: 1;
     padding: $rb-content-padding;
 }

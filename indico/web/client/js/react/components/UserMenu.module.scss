@@ -15,24 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-.user-popup {
-    min-width: 200px;
-}
-
-.links a {
-    display: block;
-}
-
-.language-selector-field {
-    margin-top: 1em;
-}
-
-.language-icon {
-    font-size: 1.5em;
-    margin-right: 0.3em;
-    vertical-align: middle;
-}
-
-.language-selector-combo {
-    vertical-align: middle;
+.user-menu-avatar:global(.ui.label) {
+    border-radius: 100%;
+    color: #fff;
 }
