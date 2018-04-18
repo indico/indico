@@ -30,6 +30,7 @@ from wtforms import BooleanField, ValidationError
 from indico.core import signals
 from indico.core.config import config
 from indico.core.db import db
+from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.core.errors import UserValueError
 from indico.modules.events import EventLogKind, EventLogRealm
 from indico.modules.events.models.events import Event
@@ -204,6 +205,7 @@ def url_rule_to_angular(endpoint):
     return prefix + ''.join(segments).split('|', 1)[-1]
 
 
+@no_autoflush
 def create_registration(regform, data, invitation=None, management=False, notify_user=True, skip_moderation=None):
     user = session.user if session else None
     registration = Registration(registration_form=regform, user=get_user_by_email(data['email']),
@@ -212,24 +214,21 @@ def create_registration(regform, data, invitation=None, management=False, notify
         skip_moderation = management
     for form_item in regform.active_fields:
         if form_item.parent.is_manager_only:
-            with db.session.no_autoflush:
-                value = form_item.field_impl.default_value
+            value = form_item.field_impl.default_value
         else:
             value = data.get(form_item.html_field_name)
-        with db.session.no_autoflush:
-            data_entry = RegistrationData()
-            registration.data.append(data_entry)
-            for attr, value in form_item.field_impl.process_form_data(registration, value).iteritems():
-                setattr(data_entry, attr, value)
+        data_entry = RegistrationData()
+        registration.data.append(data_entry)
+        for attr, value in form_item.field_impl.process_form_data(registration, value).iteritems():
+            setattr(data_entry, attr, value)
         if form_item.type == RegistrationFormItemType.field_pd and form_item.personal_data_type.column:
             setattr(registration, form_item.personal_data_type.column, value)
     if invitation is None:
         # Associate invitation based on email in case the user did not use the link
-        with db.session.no_autoflush:
-            invitation = (RegistrationInvitation
-                          .find(email=data['email'], registration_id=None)
-                          .with_parent(regform)
-                          .first())
+        invitation = (RegistrationInvitation
+                      .find(email=data['email'], registration_id=None)
+                      .with_parent(regform)
+                      .first())
     if invitation:
         invitation.state = InvitationState.accepted
         invitation.registration = registration
@@ -243,41 +242,41 @@ def create_registration(regform, data, invitation=None, management=False, notify
     return registration
 
 
+@no_autoflush
 def modify_registration(registration, data, management=False, notify_user=True):
     old_price = registration.price
     personal_data_changes = {}
-    with db.session.no_autoflush:
-        regform = registration.registration_form
-        data_by_field = registration.data_by_field
-        if management or not registration.user:
-            registration.user = get_user_by_email(data['email'])
+    regform = registration.registration_form
+    data_by_field = registration.data_by_field
+    if management or not registration.user:
+        registration.user = get_user_by_email(data['email'])
 
-        billable_items_locked = not management and registration.is_paid
-        for form_item in regform.active_fields:
-            field_impl = form_item.field_impl
-            if management or not form_item.parent.is_manager_only:
-                value = data.get(form_item.html_field_name)
-            elif form_item.id not in data_by_field:
-                # set default value for manager-only field if it didn't have one before
-                value = field_impl.default_value
-            else:
-                # manager-only field that has data which should be preserved
-                continue
+    billable_items_locked = not management and registration.is_paid
+    for form_item in regform.active_fields:
+        field_impl = form_item.field_impl
+        if management or not form_item.parent.is_manager_only:
+            value = data.get(form_item.html_field_name)
+        elif form_item.id not in data_by_field:
+            # set default value for manager-only field if it didn't have one before
+            value = field_impl.default_value
+        else:
+            # manager-only field that has data which should be preserved
+            continue
 
-            if form_item.id not in data_by_field:
-                data_by_field[form_item.id] = RegistrationData(registration=registration,
-                                                               field_data=form_item.current_data)
+        if form_item.id not in data_by_field:
+            data_by_field[form_item.id] = RegistrationData(registration=registration,
+                                                           field_data=form_item.current_data)
 
-            attrs = field_impl.process_form_data(registration, value, data_by_field[form_item.id],
-                                                 billable_items_locked=billable_items_locked)
-            for key, val in attrs.iteritems():
-                setattr(data_by_field[form_item.id], key, val)
-            if form_item.type == RegistrationFormItemType.field_pd and form_item.personal_data_type.column:
-                key = form_item.personal_data_type.column
-                if getattr(registration, key) != value:
-                    personal_data_changes[key] = value
-                setattr(registration, key, value)
-        registration.sync_state()
+        attrs = field_impl.process_form_data(registration, value, data_by_field[form_item.id],
+                                             billable_items_locked=billable_items_locked)
+        for key, val in attrs.iteritems():
+            setattr(data_by_field[form_item.id], key, val)
+        if form_item.type == RegistrationFormItemType.field_pd and form_item.personal_data_type.column:
+            key = form_item.personal_data_type.column
+            if getattr(registration, key) != value:
+                personal_data_changes[key] = value
+            setattr(registration, key, value)
+    registration.sync_state()
     db.session.flush()
     # sanity check
     if billable_items_locked and old_price != registration.price:
