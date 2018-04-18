@@ -17,11 +17,13 @@
 
 import React from 'react';
 import propTypes from 'prop-types';
+import TimePicker from 'rc-time-picker';
+import 'rc-time-picker/assets/index.css';
 
-import {TimePicker} from 'antd';
 import {toMoment} from '../../util';
 
 import FilterFormComponent from './FilterFormComponent';
+import './TimeForm.module.scss';
 
 
 const _serializeTime = time => (time ? time.format('HH:mm') : null);
@@ -63,20 +65,23 @@ export default class TimeForm extends FilterFormComponent {
     render() {
         const {startTime, endTime} = this.state;
         const props = {
-            minuteStep: 15,
+            minuteStep: 5,
             format: 'HH:mm',
             allowEmpty: false,
+            showSecond: false,
             getPopupContainer: trigger => trigger.parentNode
         };
         return (
             <div>
                 <TimePicker value={startTime}
+                            styleName="time-picker"
                             {...props}
                             onChange={(value) => {
                                 this.setTimes(value, endTime);
                             }} />
                 -
                 <TimePicker value={endTime}
+                            styleName="time-picker"
                             {...props}
                             onChange={(value) => {
                                 this.setTimes(startTime, value);
