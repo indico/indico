@@ -15,23 +15,30 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import debounce from 'lodash/debounce';
 import {connect} from 'react-redux';
 
-import TextSearch from '../components/TextSearch';
-import {setFilterParameter, fetchRooms} from '../actions';
+import RoomListFilters from '../components/RoomListFilters';
+import {fetchBuildings, fetchRooms, setFilterParameter} from '../actions';
 
 
 export default (namespace) => {
+    const mapStateToProps = ({roomList}) => ({...roomList});
+
     const mapDispatchToProps = dispatch => ({
-        setTextFilter: debounce((value) => {
+        setTextParamFilter: (value) => {
             dispatch(setFilterParameter(namespace, 'text', value));
             dispatch(fetchRooms(namespace));
-        }, 250)
+        },
+        setAdvancedParamFilter: (param, value) => {
+            dispatch(setFilterParameter(namespace, param, value));
+        },
+        fetchBuildings: () => {
+            dispatch(fetchBuildings());
+        }
     });
 
     return connect(
-        null,
+        mapStateToProps,
         mapDispatchToProps
-    )(TextSearch);
+    )(RoomListFilters);
 };

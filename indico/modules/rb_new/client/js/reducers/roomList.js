@@ -17,12 +17,13 @@
 
 import {combineReducers} from 'redux';
 
-import roomListReducer from './roomBooking/roomList';
+import {roomsReducer, buildingsReducer} from './roomBooking/roomList';
 import filterReducerFactory from './roomBooking/filters';
 
 
 const reducer = combineReducers({
-    rooms: roomListReducer,
+    rooms: roomsReducer,
+    buildings: buildingsReducer,
     filters: filterReducerFactory('roomList')
 });
 

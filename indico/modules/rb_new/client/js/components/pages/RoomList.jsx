@@ -22,12 +22,12 @@ import React from 'react';
 import propTypes from 'prop-types';
 
 import {PluralTranslate, Singular, Plural, Param} from 'indico/react/i18n';
-import textSearchFactory from '../../containers/TextSearch';
+import roomListFiltersFactory from '../../containers/RoomListFilters';
 
 import './RoomList.module.scss';
 
 
-const TextSearch = textSearchFactory('bookRoom');
+const RoomListFilters = roomListFiltersFactory('roomList');
 
 export default class RoomList extends React.Component {
     componentDidMount() {
@@ -36,10 +36,10 @@ export default class RoomList extends React.Component {
     }
 
     render() {
-        const {rooms: {list}} = this.props;
+        const {rooms: {list}, fetchRooms} = this.props;
         return (
             <div styleName="room-list">
-                <TextSearch />
+                <RoomListFilters onConfirm={() => fetchRooms('roomList')} />
                 <div styleName="results-count">
                     <PluralTranslate count={list.length}>
                         <Singular>

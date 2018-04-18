@@ -38,7 +38,11 @@
 
     .room-card {
         min-height: 300px;
-        width: 200px;
+        width: 250px;
+
+        img {
+            height: 170px;
+        }
 
         .available-equipment {
             text-align: right;

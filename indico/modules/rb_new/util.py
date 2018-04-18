@@ -16,13 +16,17 @@
 
 from __future__ import unicode_literals
 
+from collections import defaultdict
+
 from indico.core.db import db
 from indico.modules.rb import rb_settings
 from indico.modules.rb.models.rooms import Room
+from indico.modules.rb_new.schemas import rooms_schema
 
 
 def search_for_rooms(filters, only_available=False):
     query = Room.query.filter(Room.is_active)
+    criteria = {}
 
     if 'capacity' in filters:
         query = query.filter(db.or_(Room.capacity >= (filters['capacity'] * 0.8), Room.capacity.is_(None)))
@@ -30,6 +34,13 @@ def search_for_rooms(filters, only_available=False):
     if 'room_name' in filters:
         query = query.filter(Room.name.ilike('%{}%'.format(filters['room_name'])))
 
+    if 'building' in filters:
+        criteria['building'] = filters['building']
+
+    if 'floor' in filters:
+        criteria['floor'] = filters['floor']
+
+    query = query.filter_by(**criteria)
     if only_available:
         start_dt, end_dt = filters['start_dt'], filters['end_dt']
         repeatability = (filters['repeat_frequency'], filters['repeat_interval'])
@@ -49,3 +60,22 @@ def search_for_rooms(filters, only_available=False):
     else:
         rooms = query.all()
     return rooms
+
+
+def get_buildings():
+    buildings = defaultdict(dict)
+    for room in Room.query.filter_by(is_active=True):
+        buildings[room.building].setdefault('rooms', []).append(room)
+
+    buildings_tmp = defaultdict(dict)
+    for building_name, building_data in buildings.iteritems():
+        room_with_lat_lon = next((r for r in building_data['rooms'] if r.longitude and r.latitude), None)
+        if not room_with_lat_lon:
+            continue
+
+        buildings_tmp[building_name]['rooms'] = rooms_schema.dump(building_data['rooms']).data
+        buildings_tmp[building_name]['floors'] = sorted({room.floor for room in building_data['rooms']})
+        buildings_tmp[building_name]['number'] = building_name
+        buildings_tmp[building_name]['longitude'] = room_with_lat_lon.longitude
+        buildings_tmp[building_name]['latitude'] = room_with_lat_lon.latitude
+    return buildings_tmp

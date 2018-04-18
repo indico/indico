@@ -16,6 +16,7 @@
 
 from __future__ import unicode_literals
 
+from flask import jsonify
 from marshmallow_enum import EnumField
 from webargs import fields
 from webargs.flaskparser import use_args
@@ -24,22 +25,21 @@ from indico.modules.rb import Location
 from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.models.reservations import RepeatFrequency
 from indico.modules.rb_new.schemas import aspect_schema, rooms_schema
-from indico.modules.rb_new.util import search_for_rooms
+from indico.modules.rb_new.util import get_buildings, search_for_rooms
 from indico.util.string import natural_sort_key
 
 
-request_args = {
-    'capacity': fields.Int(),
-    'room_name': fields.Str(),
-    'start_dt': fields.DateTime(),
-    'end_dt': fields.DateTime(),
-    'repeat_frequency': EnumField(RepeatFrequency),
-    'repeat_interval': fields.Int(missing=0)
-}
-
-
 class RHRoomBookingSearch(RHRoomBookingBase):
-    @use_args(request_args)
+    @use_args({
+        'capacity': fields.Int(),
+        'room_name': fields.Str(),
+        'start_dt': fields.DateTime(),
+        'end_dt': fields.DateTime(),
+        'repeat_frequency': EnumField(RepeatFrequency),
+        'repeat_interval': fields.Int(missing=0),
+        'building': fields.Str(),
+        'floor': fields.Str()
+    })
     def _process(self, args):
         rooms = sorted(search_for_rooms(args), key=lambda r: natural_sort_key(r.full_name))
         return rooms_schema.dumps(rooms).data
@@ -48,3 +48,8 @@ class RHRoomBookingSearch(RHRoomBookingBase):
 class RHRoomBookingLocation(RHRoomBookingBase):
     def _process(self):
         return aspect_schema.dumps(Location.default_location.default_aspect).data
+
+
+class RHRoomBookingBuildings(RHRoomBookingBase):
+    def _process(self):
+        return jsonify(get_buildings())
