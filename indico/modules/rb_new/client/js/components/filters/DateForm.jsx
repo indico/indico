@@ -20,10 +20,12 @@ import RangeCalendar from 'rc-calendar/lib/RangeCalendar';
 import RcCalendar from 'rc-calendar';
 import propTypes from 'prop-types';
 // Import date-picker style from ant, since range calendar has none
-import 'antd/lib/date-picker/style/css';
+import 'rc-calendar/assets/index.css';
 import {toMoment} from '../../util';
 
 import FilterFormComponent from './FilterFormComponent';
+
+import './DateForm.module.scss';
 
 
 const _serializeDate = dt => (dt ? dt.format('YYYY-MM-DD') : null);
@@ -33,7 +35,8 @@ export default class DateForm extends FilterFormComponent {
         startDate: propTypes.string,
         endDate: propTypes.string,
         setParentField: propTypes.func.isRequired,
-        isRange: propTypes.bool.isRequired
+        isRange: propTypes.bool.isRequired,
+        handleOK: propTypes.func.isRequired
     };
 
     static defaultProps = {
@@ -51,38 +54,42 @@ export default class DateForm extends FilterFormComponent {
     }
 
     setDates(startDate, endDate) {
-        const {setParentField} = this.props;
-        // send serialized versions to parent/redux
-        setParentField('startDate', _serializeDate(startDate));
-        setParentField('endDate', _serializeDate(endDate));
-        this.setState({
-            startDate,
-            endDate
+        // return a promise that awaits the state update
+        return new Promise((resolve) => {
+            const {setParentField} = this.props;
+            // send serialized versions to parent/redux
+            setParentField('startDate', _serializeDate(startDate));
+            setParentField('endDate', _serializeDate(endDate));
+            this.setState({
+                startDate,
+                endDate
+            }, () => {
+                resolve();
+            });
         });
     }
 
     render() {
-        const {isRange} = this.props;
+        const {isRange, handleOK} = this.props;
         const {startDate, endDate} = this.state;
         const props = {
-            prefixCls: 'ant-calendar',
             getPopupContainer: trigger => trigger.parentNode
         };
         return (
-            <div>
+            <div styleName="date-form">
                 {isRange ? (
                     <RangeCalendar selectedValue={[startDate, endDate]}
-                                   onChange={(([start, end]) => {
-                                       if (start && end) {
-                                           this.setDates(start, end);
-                                       }
-                                   })}
+                                   onSelect={async ([start, end]) => {
+                                       await this.setDates(start, end);
+                                       handleOK();
+                                   }}
                                    {...props} />
                 ) : (
                     <RcCalendar selectedValue={startDate}
-                                onChange={((date) => {
-                                    this.setDates(date, null);
-                                })}
+                                onSelect={async (date) => {
+                                    await this.setDates(date, null);
+                                    handleOK();
+                                }}
                                 {...props} />
                 ) }
             </div>
