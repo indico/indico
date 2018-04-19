@@ -67,7 +67,7 @@ if __name__ == '__main__':
                          "allows paper reviewing, archival of conference information and electronic proceedings",
         license='https://www.gnu.org/licenses/gpl-3.0.txt',
         zip_safe=False,
-        packages=find_packages(),
+        packages=find_packages(include=('indico', 'indico.*',)),
         include_package_data=True,
         install_requires=get_requirements(),
         entry_points={

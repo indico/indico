@@ -21,9 +21,13 @@ import subprocess
 import sys
 from contextlib import contextmanager
 from datetime import datetime
+from distutils.log import ERROR, set_threshold
+from distutils.text_file import TextFile
+from glob import glob
 
 import click
 from setuptools import find_packages
+from setuptools.command.egg_info import FileList
 
 
 def fail(message, *args, **kwargs):
@@ -111,7 +115,7 @@ def build_wheel(target_dir):
 
 
 def git_is_clean_indico():
-    toplevel = list({x.split('.')[0] for x in find_packages()})
+    toplevel = list({x.split('.')[0] for x in find_packages(include=('indico', 'indico.*',))})
     cmds = [['git', 'diff', '--stat', '--color=always'] + toplevel,
             ['git', 'diff', '--stat', '--color=always', '--staged'] + toplevel,
             ['git', 'clean', '-dn', '-e', '__pycache__'] + toplevel]
@@ -128,8 +132,45 @@ def git_is_clean_indico():
     return True, None
 
 
+def _iter_package_modules(package_masks):
+    for package in find_packages(include=package_masks):
+        path = '/'.join(package.split('.'))
+        if not os.path.exists(os.path.join(path, '__init__.py')):
+            continue
+        for f in glob(os.path.join(path, '*.py')):
+            yield f
+
+
+def _get_included_files(package_masks):
+    old_threshold = set_threshold(ERROR)
+    file_list = FileList()
+    file_list.extend(_iter_package_modules(package_masks))
+    manifest = TextFile('MANIFEST.in', strip_comments=1, skip_blanks=1, join_lines=1, lstrip_ws=1, rstrip_ws=1,
+                        collapse_join=1)
+    for line in manifest.readlines():
+        file_list.process_template_line(line)
+    set_threshold(old_threshold)
+    return file_list.files
+
+
+def _get_ignored_package_files_indico():
+    files = set(_get_included_files(('indico', 'indico.*')))
+    output = subprocess.check_output(['git', 'ls-files', '--others', '--ignored', '--exclude-standard', 'indico/'])
+    ignored = {line for line in output.splitlines()}
+    htdocs_re = re.compile(r'^indico/htdocs/(css|js|sass)/lib/')
+    i18n_re = re.compile(r'^indico/translations/[a-zA-Z_]+/LC_MESSAGES/messages.mo')
+    return {path for path in ignored & files if not htdocs_re.match(path) and not i18n_re.match(path)}
+
+
+def package_is_clean_indico():
+    garbage = _get_ignored_package_files_indico()
+    if garbage:
+        return False, '\n'.join(garbage)
+    return True, None
+
+
 def git_is_clean_plugin():
-    toplevel = list({x.split('.')[0] for x in find_packages()})
+    toplevel = list({x.split('.')[0] for x in find_packages(include=('indico', 'indico.*',))})
     cmds = [['git', 'diff', '--stat', '--color=always'] + toplevel,
             ['git', 'diff', '--stat', '--color=always', '--staged'] + toplevel]
     if toplevel:
@@ -200,11 +241,18 @@ def build_indico(obj, deps, add_version_suffix, ignore_unclean):
     """Builds the indico wheel."""
     target_dir = obj['target_dir']
     os.chdir(os.path.join(os.path.dirname(__file__), '..', '..'))
+    # check for unclean git status
     clean, output = git_is_clean_indico()
     if not clean and ignore_unclean:
-        warn('working tree is not clean, but ignored')
+        warn('working tree is not clean [ignored]')
     elif not clean:
         fail('working tree is not clean', verbose_msg=output)
+    # check for git-ignored files included in the package
+    clean, output = package_is_clean_indico()
+    if not clean and ignore_unclean:
+        warn('package contains unexpected files listed in git exclusions [ignored]')
+    elif not clean:
+        fail('package contains unexpected files listed in git exclusions', verbose_msg=output)
     if deps:
         setup_deps()
     else:
