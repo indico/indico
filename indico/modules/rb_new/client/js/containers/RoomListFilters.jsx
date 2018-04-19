@@ -25,11 +25,11 @@ export default (namespace) => {
     const mapStateToProps = ({roomList}) => ({...roomList});
 
     const mapDispatchToProps = dispatch => ({
-        setTextParamFilter: (value) => {
+        setTextFilter: (value) => {
             dispatch(setFilterParameter(namespace, 'text', value));
             dispatch(fetchRooms(namespace));
         },
-        setAdvancedParamFilter: (param, value) => {
+        setAdvancedFilter: (param, value) => {
             dispatch(setFilterParameter(namespace, param, value));
         },
         fetchBuildings: () => {

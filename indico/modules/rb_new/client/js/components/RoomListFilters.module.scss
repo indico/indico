@@ -15,9 +15,18 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-.text-filter {
-    width: 350px;
+.room-filters {
+    width: 450px;
     margin-bottom: 25px;
+
+    .text-filter input {
+        width: 300px;
+        border-radius: 0 4px 4px 0;
+
+        & + i.icon.remove {
+            cursor: pointer;
+        }
+    }
 }
 
 .filters-trigger {
