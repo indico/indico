@@ -17,18 +17,30 @@
 
 import propTypes from 'prop-types';
 import React from 'react';
-import {Map, TileLayer} from 'react-leaflet';
+import ReactDOM from 'react-dom';
+import Leaflet from 'leaflet';
+import {Map, TileLayer, MapControl} from 'react-leaflet';
+import {Checkbox} from 'semantic-ui-react';
+
+import {Translate} from 'indico/react/i18n';
 
 import 'leaflet/dist/leaflet.css';
 import './RoomBookingMap.module.scss';
 
 
-export default function RoomBookingMap({bounds, onMove}) {
+export default function RoomBookingMap(props) {
+    const {bounds, onMove, searchCheckbox, isSearchEnabled, onToggleSearchCheckbox} = props;
     return (
         <div styleName="map-container">
             <Map bounds={bounds} onDragend={onMove} onZoomend={onMove}>
                 <TileLayer attribution='© <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                {searchCheckbox && (
+                    <RoomBookingMapControl position="topleft">
+                        <Checkbox label={Translate.string("Search as I move the map")} onChange={onToggleSearchCheckbox}
+                                  styleName="checkbox-control" checked={isSearchEnabled} />
+                    </RoomBookingMapControl>
+                )}
             </Map>
         </div>
     );
@@ -36,5 +48,57 @@ export default function RoomBookingMap({bounds, onMove}) {
 
 RoomBookingMap.propTypes = {
     bounds: propTypes.array.isRequired,
-    onMove: propTypes.func.isRequired
+    onMove: propTypes.func.isRequired,
+    searchCheckbox: propTypes.bool,
+    isSearchEnabled: propTypes.bool,
+    onToggleSearchCheckbox: propTypes.func,
+};
+
+RoomBookingMap.defaultProps = {
+    searchCheckbox: false,
+    isSearchEnabled: true,
+    onToggleSearchCheckbox: null,
+};
+
+
+class RoomBookingMapControl extends MapControl {
+    componentWillMount() {
+        const {position, classes} = this.props;
+        const mapControl = Leaflet.control({position});
+        mapControl.onAdd = () => {
+            const div = Leaflet.DomUtil.create('div', classes);
+            Leaflet.DomEvent.disableClickPropagation(div);
+            return div;
+        };
+
+        this.leafletElement = mapControl;
+    }
+
+    componentDidMount() {
+        super.componentDidMount();
+        this.renderControl();
+    }
+
+    componentDidUpdate(next) {
+        super.componentDidUpdate(next);
+        this.renderControl();
+    }
+
+    componentWillUnmount() {
+        ReactDOM.unmountComponentAtNode(this.leafletElement.getContainer());
+    }
+
+    renderControl() {
+        const container = this.leafletElement.getContainer();
+        ReactDOM.render(React.Children.only(this.props.children), container);
+    }
+}
+
+RoomBookingMapControl.propTypes = {
+    position: propTypes.string.isRequired,
+    classes: propTypes.string,
+};
+
+RoomBookingMapControl.defaultProps = {
+    classes: '',
 };

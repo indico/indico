@@ -16,9 +16,29 @@
  */
 
 @import '../../styles/main';
+@import 'base/palette';
 
 .map-container {
     & > * {
         height: calc(100vh - (#{$indico-top-bar-height} + #{$menu-height} + 2em*2));
+    }
+
+    // Overrides leaflet control styles to match Semantic-UI ones.
+    :global(.leaflet-control) {
+        font-family: $sui-font-family;
+        border: none;
+        box-shadow: 0.1em 0.1em 0.25em $dark-gray;
+        height: 100%;
+    }
+
+    :global(.leaflet-top.leaflet-left) {
+        display: flex;
+    }
+
+    .checkbox-control {
+        background-color: $white;
+        padding: 0.5em;
+        border-radius: 0.25em;
+        font-size: 1em;
     }
 }
