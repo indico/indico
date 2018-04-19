@@ -27,7 +27,9 @@ export default class BookRoom extends React.Component {
     static propTypes = {
         fetchMapDefaultLocation: propTypes.func.isRequired,
         updateLocation: propTypes.func.isRequired,
-        bounds: propTypes.array
+        bounds: propTypes.array,
+        search: propTypes.bool.isRequired,
+        toggleMapSearch: propTypes.func.isRequired,
     };
 
     static defaultProps = {
@@ -53,7 +55,7 @@ export default class BookRoom extends React.Component {
     }
 
     render() {
-        const {bounds} = this.props;
+        const {bounds, toggleMapSearch, search} = this.props;
         const FilterBar = filterBarFactory('bookRoom');
         return (
             <Grid columns={2}>
@@ -61,7 +63,11 @@ export default class BookRoom extends React.Component {
                     <FilterBar />
                 </Grid.Column>
                 <Grid.Column width={5}>
-                    {bounds && <RoomBookingMap bounds={bounds} onMove={(e) => this.onMove(e)} />}
+                    {bounds && (
+                        <RoomBookingMap bounds={bounds} onMove={(e) => this.onMove(e)}
+                                        searchCheckbox isSearchEnabled={search}
+                                        onToggleSearchCheckbox={(e, data) => toggleMapSearch(data.checked)} />
+                    )}
                 </Grid.Column>
             </Grid>
         );

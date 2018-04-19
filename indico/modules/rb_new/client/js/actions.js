@@ -28,10 +28,11 @@ export const SET_FILTER_PARAMETER = 'SET_FILTER_PARAMETER';
 export const FETCH_ROOMS_STARTED = 'FETCH_ROOMS_STARTED';
 export const FETCH_ROOMS_FAILED = 'FETCH_ROOMS_FAILED';
 export const UPDATE_ROOMS = 'UPDATE_ROOMS';
-// Map location
+// Map
 export const FETCH_DEFAULT_LOCATION_STARTED = 'FETCH_DEFAULT_LOCATION_STARTED';
 export const FETCH_DEFAULT_LOCATION_FAILED = 'FETCH_DEFAULT_LOCATION_FAILED';
 export const UPDATE_LOCATION = 'UPDATE_LOCATION';
+export const TOGGLE_MAP_SEARCH = 'TOGGLE_MAP_SEARCH';
 
 
 export function setUser(data) {
@@ -114,4 +115,8 @@ export function fetchMapDefaultLocation() {
         ];
         dispatch(updateLocation(location));
     };
+}
+
+export function toggleMapSearch(search) {
+    return {type: TOGGLE_MAP_SEARCH, search};
 }

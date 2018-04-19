@@ -20,6 +20,7 @@ import * as actions from '../../actions';
 
 const initialState = {
     bounds: null,
+    search: true,
     isFetching: false,
 };
 
@@ -32,6 +33,8 @@ export default function mapReducer(state = initialState, action) {
             return {...state, isFetching: false};
         case actions.UPDATE_LOCATION:
             return {...state, bounds: action.location, isFetching: false};
+        case actions.TOGGLE_MAP_SEARCH:
+            return {...state, search: action.search};
         default:
             return state;
     }

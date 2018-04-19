@@ -22,6 +22,7 @@ $highlight-color: #7dcfb6;
 $indico-top-bar-height: 50px;
 $menu-height: 75px;
 $rb-content-padding: 2em;
+$sui-font-family: Lato, 'Helvetica Neue', Arial, Helvetica, sans-serif;
 
 // TODO: move this to Indico-wide file
 .indico-top-bar {
@@ -29,7 +30,7 @@ $rb-content-padding: 2em;
     height: $indico-top-bar-height;
     display: flex;
     align-items: center;
-    padding: 0 20px 0 20px;
+    padding: 0 20px;
 
     .indico-top-bar-logo {
         display: flex;
