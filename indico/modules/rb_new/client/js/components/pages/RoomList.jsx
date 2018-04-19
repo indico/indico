@@ -17,11 +17,11 @@
 
 /* eslint "react/forbid-component-props": "off" */
 
-import {Card, Col, Icon, List, Row} from 'antd';
-import React from 'react';
 import propTypes from 'prop-types';
+import React from 'react';
+import {Card, Grid, Icon, Image} from 'semantic-ui-react';
 
-import {PluralTranslate, Singular, Plural, Param} from 'indico/react/i18n';
+import {Param, Plural, PluralTranslate, Singular} from 'indico/react/i18n';
 import roomListFiltersFactory from '../../containers/RoomListFilters';
 
 import './RoomList.module.scss';
@@ -38,26 +38,30 @@ export default class RoomList extends React.Component {
     render() {
         const {rooms: {list}, fetchRooms} = this.props;
         return (
-            <div styleName="room-list">
-                <RoomListFilters onConfirm={() => fetchRooms('roomList')} />
-                <div styleName="results-count">
-                    <PluralTranslate count={list.length}>
-                        <Singular>
-                            <Param name="count" value={list.length} /> result found
-                        </Singular>
-                        <Plural>
-                            <Param name="count" value={list.length} /> results found
-                        </Plural>
-                    </PluralTranslate>
-                </div>
-                <List grid={{gutter: 12, column: 5}}
-                      dataSource={list}
-                      renderItem={room => (
-                          <List.Item>
-                              <Room room={room} />
-                          </List.Item>
-                      )} />
-            </div>
+            <Grid columns={2}>
+                <Grid.Column width={10}>
+                    <div className="ui" styleName="room-list">
+                        <RoomListFilters onConfirm={() => fetchRooms('roomList')} />
+                        <div styleName="results-count">
+                            <PluralTranslate count={list.length}>
+                                <Singular>
+                                    <Param name="count" value={list.length} /> result found
+                                </Singular>
+                                <Plural>
+                                    <Param name="count" value={list.length} /> results found
+                                </Plural>
+                            </PluralTranslate>
+                        </div>
+                        <Grid columns={5} stackable>
+                            {list.map((room) => (
+                                <Grid.Column key={room.id}>
+                                    <Room room={room} />
+                                </Grid.Column>
+                            ))}
+                        </Grid>
+                    </div>
+                </Grid.Column>
+            </Grid>
         );
     }
 }
@@ -73,30 +77,21 @@ RoomList.propTypes = {
 
 
 export function Room({room}) {
-    const cardDescription = (
-        <div styleName="room-card-description">
-            {room.full_name}
-        </div>
-    );
-
-    const cardTitle = (
-        <div>
-            <Row>
-                <Col span={8}>
-                    <Icon type="user" /> {room.capacity}
-                </Col>
-                <Col span={16} styleName="available-equipment">
-                    {room.has_webcast_recording && <Icon type="video-camera" />}
-                    {room.is_public && <Icon type="unlock" />}
-                </Col>
-            </Row>
-        </div>
-    );
-
     return (
-        <Card styleName="room-card"
-              cover={<img src={room.small_photo_url} />}>
-            <Card.Meta description={cardDescription} title={cardTitle} />
+        <Card styleName="room-card">
+            <Image src={room.small_photo_url} />
+            <Card.Content>
+                <Card.Description styleName="room-description">
+                    {room.full_name}
+                </Card.Description>
+            </Card.Content>
+            <Card.Content styleName="room-content" extra>
+                <Icon name="user" /> {room.capacity}
+                <span styleName="room-details">
+                    {room.has_webcast_recording && <Icon name="video camera" />}
+                    {!room.is_public && <Icon name="lock" />}
+                </span>
+            </Card.Content>
         </Card>
     );
 }

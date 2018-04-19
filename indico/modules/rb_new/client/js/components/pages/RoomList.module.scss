@@ -15,21 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-:global {
-    .ant-list-item {
-        .ant-list-item-content {
-            width: 100%;
-
-            .ant-card-body {
-                max-width: 100%;
-            }
-        }
-    }
-}
-
 .room-list {
-    width: 65%;
-
     .results-count {
         margin-bottom: 10px;
         font-weight: bold;
@@ -37,21 +23,18 @@
     }
 
     .room-card {
-        min-height: 300px;
-        width: 250px;
+        height: 300px;
 
         img {
             height: 170px;
         }
 
-        .available-equipment {
-            text-align: right;
+        .room-description {
+            word-break: break-all;
         }
 
-        .room-card-description {
-            white-space: nowrap;
-            text-overflow: ellipsis;
-            overflow: hidden;
+        .room-content .room-details {
+            float: right;
         }
     }
 }

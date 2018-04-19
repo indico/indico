@@ -15,12 +15,13 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-import {Button, Form, Icon, Input, Popover, Select} from 'antd';
+import isEqual from 'lodash/isEqual';
 import propTypes from 'prop-types';
+import React from 'react';
+import {Button, Form, Icon, Input, Popup, Select} from 'semantic-ui-react';
 import {DebounceInput} from 'react-debounce-input';
 
-import {Translate} from 'indico/react/i18n';
+import {Param, Translate} from 'indico/react/i18n';
 import {parseRoomListFiltersText} from '../util';
 
 import './RoomListFilters.module.scss';
@@ -31,9 +32,10 @@ export default class RoomListFilters extends React.Component {
         super(props);
         this.state = {
             filtersVisible: false,
-            text: null,
-            building: null,
-            floor: null
+            filtersChanged: false,
+            text: '',
+            building: '',
+            floor: ''
         };
     }
 
@@ -42,121 +44,164 @@ export default class RoomListFilters extends React.Component {
         fetchBuildings();
     }
 
-    handleVisibleChange(visible) {
+    componentWillUnmount() {
+        const {setAdvancedFilter} = this.props;
+        setAdvancedFilter('text', '');
+    }
+
+    toggleFiltersPopup(visible) {
         this.setState({filtersVisible: visible});
+    }
+
+    onClose() {
+        const {filtersChanged} = this.state;
+        this.toggleFiltersPopup(false);
+        if (filtersChanged) {
+            this.applyFilters();
+            this.setState({filtersChanged: false});
+        }
     }
 
     applyFilters() {
         const {onConfirm} = this.props;
-        this.setState({filtersVisible: false});
         onConfirm();
     }
 
-    handleFiltersChange(filter, value) {
-        const {setTextParamFilter, setAdvancedParamFilter, filters: {text}} = this.props;
-        const stateUpdates = {[filter]: value};
+    updateTextFilter(filterValue) {
+        const {setTextFilter, filters: {text}} = this.props;
 
-        if (filter === 'building') {
-            stateUpdates.floor = null;
-        } else if (filter === 'text') {
-            const parsedValues = parseRoomListFiltersText(value);
-
-            stateUpdates.building = parsedValues.building;
-            stateUpdates.floor = parsedValues.floor;
+        if (filterValue === text) {
+            return;
         }
 
-        this.setState(stateUpdates, () => {
-            let textValue = null;
-            const {building, floor} = this.state;
+        const parsedValues = parseRoomListFiltersText(filterValue);
+        if (isEqual(parsedValues, parseRoomListFiltersText(text))) {
+            return;
+        }
 
-            if (filter === 'text') {
-                textValue = value;
+        const stateUpdates = {text: filterValue, filtersChanged: false};
+        stateUpdates.building = parsedValues.building;
+        stateUpdates.floor = parsedValues.floor;
+
+        this.updateComponentState('text', stateUpdates);
+        setTextFilter(filterValue);
+    }
+
+    updateFilter(filterName, value) {
+        const stateUpdates = {[filterName]: value};
+
+        if (filterName === 'building') {
+            stateUpdates.floor = '';
+        }
+
+        // eslint-disable-next-line react/destructuring-assignment
+        if (this.state[filterName] !== value) {
+            stateUpdates.filtersChanged = true;
+        }
+
+        this.updateComponentState(filterName, stateUpdates);
+    }
+
+    updateComponentState(filterName, newState) {
+        this.setState(newState, () => {
+            let textValue = '';
+            const {setAdvancedFilter} = this.props;
+            const {text: stateText} = this.state;
+
+            if (filterName === 'text') {
+                textValue = stateText;
             } else {
-                if (building) {
-                    textValue = `building:${building}`;
+                const stateToKeys = {building: 'bldg', floor: 'floor'};
+                let textParts = Object.entries(stateToKeys).filter(([stateKey]) => {
+                    return !!this.state[stateKey]; // eslint-disable-line react/destructuring-assignment
+                }).map(([stateKey, searchKey]) => {
+                    return `${searchKey}:${this.state[stateKey]}`; // eslint-disable-line react/destructuring-assignment
+                });
+
+                const text = parseRoomListFiltersText(stateText).text;
+                if (text) {
+                    textParts = [text, ...textParts];
                 }
 
-                if (floor) {
-                    textValue += ` floor:${floor}`;
-                }
+                textValue = textParts.join(' ');
             }
 
             this.setState({text: textValue});
-            setAdvancedParamFilter('text', textValue);
+            setAdvancedFilter('text', textValue);
         });
-
-        if (filter === 'text') {
-            if (value.trim() !== text.trim()) {
-                setTextParamFilter(value);
-            }
-        }
     }
 
     render() {
         const commonAttrs = {
-            showSearch: true,
-            allowClear: true,
-            style: {width: 200},
-            getPopupContainer: (target) => target.parentNode,
-            filterOption: (input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+            search: true,
+            selection: true
         };
 
-        const {buildings: {list: buildingsList}} = this.props;
-        const {building, floor} = this.state;
+        const {buildings: {list: buildingsList, isFetching}} = this.props;
+        const {building, floor, filtersChanged} = this.state;
+        let floors = [];
+
+        if (building && buildingsList[building]) {
+            floors = buildingsList[building].floors.map((floorItem) => ({
+                text: floorItem, value: floorItem
+            }));
+        }
+
+        const buildings = Object.entries(buildingsList).map(([key, val]) => ({
+            text: <Translate>Building <Param name="buildingNumber" value={val.number} /></Translate>,
+            value: key
+        }));
         const content = (
             <Form>
-                <Form.Item>
-                    <Select {...commonAttrs} placeholder="Select building"
-                            onChange={(value) => this.handleFiltersChange('building', value)}
-                            value={building}>
-                        {Object.keys(buildingsList).map(buildingItem => (
-                            <Select.Option key={buildingItem}>
-                                {buildingsList[buildingItem].title}
-                            </Select.Option>
-                        ))}
-                    </Select>
-                </Form.Item>
-                <Form.Item>
-                    <Select {...commonAttrs} placeholder="Select floor" disabled={!building}
-                            onChange={(value) => this.handleFiltersChange('floor', value)}
-                            value={floor}>
-                        {building && buildingsList[building] &&
-                            buildingsList[building].floors.map((floorItem) => (
-                                <Select.Option key={floorItem}>{floorItem}</Select.Option>
-                            ))
-                        }
-                    </Select>
-                </Form.Item>
-                <Form.Item>
-                    <Button type="primary" onClick={this.applyFilters.bind(this)}>
-                        <Translate>Apply filters</Translate>
+                <Form.Field>
+                    <Select {...commonAttrs} placeholder={Translate.string('Select building')}
+                            loading={isFetching}
+                            onChange={(event, data) => this.updateFilter('building', data.value)}
+                            value={building}
+                            options={[{text: '', value: ''}, ...buildings]} />
+                </Form.Field>
+                <Form.Field>
+                    <Select {...commonAttrs} placeholder={Translate.string('Select floor')} disabled={!building}
+                            onChange={(event, data) => this.updateFilter('floor', data.value)}
+                            value={floor}
+                            options={[{text: '', value: ''}, ...floors]} />
+                </Form.Field>
+                <Form.Field>
+                    <Button primary onClick={() => this.onClose()} disabled={!filtersChanged}>
+                        <Translate>Apply</Translate>
                     </Button>
-                </Form.Item>
+                </Form.Field>
             </Form>
         );
 
         const {filtersVisible, text} = this.state;
-        const selectBefore = (
-            <Popover content={content}
-                     placement="bottomLeft"
-                     trigger="click"
-                     visible={filtersVisible}
-                     onVisibleChange={this.handleVisibleChange.bind(this)}>
-                <span styleName="filters-trigger">
-                    <Translate>
-                        Filters
-                    </Translate>
-                    <Icon styleName="filters-down-arrow" type="down" />
-                </span>
-            </Popover>
+        let inputIcon;
+        if (text) {
+            inputIcon = <Icon link name="remove" onClick={() => this.updateTextFilter('')} />;
+        } else {
+            inputIcon = <Icon name="search" />;
+        }
+
+        const popupTrigger = (
+            <Button attached="left" icon onClick={() => this.toggleFiltersPopup(true)}>
+                <Translate>Advanced</Translate>
+                <Icon name="caret down" />
+            </Button>
         );
 
         return (
-            <div styleName="text-filter">
+            <div styleName="room-filters">
+                <Popup trigger={popupTrigger}
+                       onClose={() => this.onClose()}
+                       open={filtersVisible}
+                       content={content}
+                       position="bottom left"
+                       on="click" />
                 <DebounceInput element={Input}
+                               styleName="text-filter"
+                               icon={inputIcon}
                                debounceTimeout={300}
-                               addonBefore={selectBefore}
-                               onChange={(event) => this.handleFiltersChange('text', event.target.value)}
+                               onChange={(event) => this.updateTextFilter(event.target.value)}
                                value={text} />
             </div>
         );
@@ -164,8 +209,8 @@ export default class RoomListFilters extends React.Component {
 }
 
 RoomListFilters.propTypes = {
-    setTextParamFilter: propTypes.func.isRequired,
-    setAdvancedParamFilter: propTypes.func.isRequired,
+    setTextFilter: propTypes.func.isRequired,
+    setAdvancedFilter: propTypes.func.isRequired,
     fetchBuildings: propTypes.func.isRequired,
     onConfirm: propTypes.func.isRequired,
     filters: propTypes.object.isRequired,
