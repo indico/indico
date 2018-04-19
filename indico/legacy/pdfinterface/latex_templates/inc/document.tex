@@ -6,7 +6,8 @@
     \usepackage[a4paper, top=1em, bottom=10em]{geometry}
 \JINJA{endblock}
 
-\usepackage{hyperref}
+\usepackage\VAR{link_format.value[0] | rawlatex}{hyperref}
+\VAR{link_format.value[1] | rawlatex}
 \usepackage{amssymb}
 \usepackage{amsmath}
 \usepackage{fontspec}
