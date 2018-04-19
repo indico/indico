@@ -32,6 +32,20 @@ class BOACorrespondingAuthorType(RichEnum):
     speakers = 'speakers'
 
 
+class BOALinkFormat(RichEnum):
+    """LaTeX book of abstracts link format setting
+
+    value is a 2-tuple of strings:
+    first is the hyperref option to use
+    second sets additional tex commands
+    """
+
+    frame = ('', '')
+    colorlinks = ('[colorlinks]', '')
+    ocgx2colorlinks = ('', '\\usepackage[ocgcolorlinks]{ocgx2}[2017/03/30]')
+    unstyled = ('[hidelinks]', '')
+
+
 BOASortField.__titles__ = {
     BOASortField.id: _('ID'),
     BOASortField.abstract_title: _('Abstract title'),
@@ -51,6 +65,13 @@ BOACorrespondingAuthorType.__titles__ = {
     BOACorrespondingAuthorType.speakers: _('Speakers')
 }
 
+
+BOALinkFormat.__titles__ = {
+    BOALinkFormat.frame: _('Border around links (screen only)'),
+    BOALinkFormat.colorlinks: _('Color links'),
+    BOALinkFormat.ocgx2colorlinks: _('Color links (screen only)'),
+    BOALinkFormat.unstyled: _('Do not highlight links')
+}
 
 abstracts_settings = EventSettingsProxy('abstracts', {
     'description_settings': {
@@ -100,8 +121,10 @@ boa_settings = EventSettingsProxy('abstracts_book', {
     'show_abstract_ids': False,
     'cache_path': None,
     'min_lines_per_abstract': 0,
+    'link_format': BOALinkFormat.frame,
 }, converters={
     'sort_by': EnumConverter(BOASortField),
     'corresponding_author': EnumConverter(BOACorrespondingAuthorType),
-    'announcement_render_mode': EnumConverter(RenderMode)
+    'announcement_render_mode': EnumConverter(RenderMode),
+    'link_format': EnumConverter(BOALinkFormat),
 })

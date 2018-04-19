@@ -21,7 +21,8 @@ from indico.modules.events.abstracts.fields import (AbstractField, AbstractPerso
                                                     TrackRoleField)
 from indico.modules.events.abstracts.models.abstracts import EditTrackMode
 from indico.modules.events.abstracts.models.reviews import AbstractAction, AbstractCommentVisibility
-from indico.modules.events.abstracts.settings import BOACorrespondingAuthorType, BOASortField, abstracts_settings
+from indico.modules.events.abstracts.settings import (BOACorrespondingAuthorType, BOALinkFormat, BOASortField,
+                                                      abstracts_settings)
 from indico.modules.events.contributions.models.persons import AuthorType
 from indico.modules.events.contributions.models.types import ContributionType
 from indico.modules.events.sessions.models.sessions import Session
@@ -96,6 +97,7 @@ class BOASettingsForm(IndicoForm):
                                      description=_("Show abstract IDs in the table of contents."))
     min_lines_per_abstract = IntegerField(_("Minimum lines per abstract"),
                                           description=_("Minimum lines to reserve per abstract."))
+    link_format = IndicoEnumSelectField(_('Link formatting'), [DataRequired()], enum=BOALinkFormat, sorted=True)
 
 
 class AbstractSubmissionSettingsForm(IndicoForm):

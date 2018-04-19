@@ -230,6 +230,7 @@ class AbstractToPDF(PDFLaTeXBase):
             'tz': timezone(tz),
             'track_class': self._get_track_classification(abstract),
             'contrib_type': self._get_contrib_type(abstract),
+            'link_format': boa_settings.get(event, 'link_format'),
         })
         self._args['logo_img'] = create_event_logo_tmp_file(event, self.source_dir) if event.logo else None
 
@@ -265,6 +266,7 @@ class AbstractsToPDF(PDFLaTeXBase):
             'get_contrib_type': AbstractToPDF._get_contrib_type,
             'items': abstracts,
             'url': event.short_external_url,
+            'link_format': boa_settings.get(event, 'link_format'),
         })
 
         self._args['logo_img'] = create_event_logo_tmp_file(event, self.source_dir) if event.logo else None
@@ -363,6 +365,7 @@ class ContribToPDF(PDFLaTeXBase):
             'contrib': contrib,
             'event': event,
             'tz': timezone(tz or event.timezone),
+            'link_format': boa_settings.get(event, 'link_format'),
         })
 
         self._args['logo_img'] = create_event_logo_tmp_file(event, self.source_dir) if event.logo else None
@@ -381,7 +384,8 @@ class ContribsToPDF(PDFLaTeXBase):
             'event': event,
             'items': contribs,
             'url': event.short_external_url,
-            'tz': timezone(tz or event.timezone)
+            'tz': timezone(tz or event.timezone),
+            'link_format': boa_settings.get(event, 'link_format'),
         })
 
         self._args['logo_img'] = create_event_logo_tmp_file(event, self.source_dir) if event.logo else None
@@ -450,6 +454,7 @@ class ContributionBook(PDFLaTeXBase):
             'boa_text': boa_settings.get(event, 'extra_text'),
             'boa_text_end': boa_settings.get(event, 'extra_text_end'),
             'min_lines_per_abstract': boa_settings.get(event, 'min_lines_per_abstract'),
+            'link_format': boa_settings.get(event, 'link_format'),
         })
 
         self._args['logo_img'] = create_event_logo_tmp_file(event, self.source_dir) if event.logo else None

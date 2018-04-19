@@ -36,6 +36,8 @@ Improvements
   :user:`bpedersen2`)
 - Improve message when the call for abstracts is scheduled to open but
   hasn't started yet
+- Make link color handling for LaTeX pdfs configurable (:issue:`3283`,
+  thanks :user:`bpedersen2`)
 
 Bugfixes
 ^^^^^^^^
