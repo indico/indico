@@ -37,7 +37,7 @@ export default function RoomBookingMap(props) {
                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
                 {searchCheckbox && (
                     <RoomBookingMapControl position="topleft">
-                        <Checkbox label={Translate.string("Search as I move the map")} onChange={onToggleSearchCheckbox}
+                        <Checkbox label={Translate.string('Search as I move the map')} onChange={onToggleSearchCheckbox}
                                   styleName="checkbox-control" checked={isSearchEnabled} />
                     </RoomBookingMapControl>
                 )}
