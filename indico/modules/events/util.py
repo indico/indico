@@ -578,7 +578,7 @@ def serialize_event_for_json_ld(event, full=False):
 def serialize_person_for_json_ld(person):
     return {
         '@type': 'Person',
-        'name': person.display_full_name,
+        'name': person.full_name,
         'affiliation': {
             '@type': 'Organization',
             'name': person.affiliation
