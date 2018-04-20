@@ -35,6 +35,7 @@ from indico.modules.events.contributions import Contribution
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.sessions import Session
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
+from indico.modules.events.util import serialize_event_for_json_ld
 from indico.util.caching import memoize_redis
 from indico.util.date_time import now_utc
 from indico.util.i18n import _, ngettext
@@ -203,3 +204,7 @@ def get_image_data(image_type, category):
         'size': metadata['size'],
         'content_type': metadata['content_type']
     }
+
+
+def serialize_events_for_json_ld(events):
+    return [serialize_event_for_json_ld(event) for event in events]

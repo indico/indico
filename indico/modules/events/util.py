@@ -51,6 +51,7 @@ from indico.modules.events.timetable.models.entries import TimetableEntry
 from indico.modules.networks import IPNetworkGroup
 from indico.util.fs import chmod_umask, secure_filename
 from indico.util.i18n import _
+from indico.util.string import strip_tags
 from indico.util.user import principal_from_fossil
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file, url_for
@@ -550,6 +551,39 @@ def serialize_event_for_ical(event, detail_level):
     if detail_level == 'contributions':
         data['contributions'] = [serialize_contribution_for_ical(c) for c in event.contributions]
     return data
+
+
+def serialize_event_for_json_ld(event):
+    data = {
+        '@context': 'http://schema.org',
+        '@type': 'Event',
+        'url': event.external_url,
+        'name': event.title,
+        'startDate': event.start_dt_local.isoformat(),
+        'endDate': event.end_dt_local.isoformat(),
+        'location': {
+            '@type': 'Place',
+            'name': event.venue_name or 'No location set',
+            'address': event.address or 'No address set'
+        },
+        'description': strip_tags(event.description),
+    }
+    if event.person_links:
+        data['performer'] = map(_get_json_ld_performer, event.person_links)
+    if event.has_logo:
+        data['image'] = event.external_logo_url
+    return data
+
+
+def serialize_person_for_json_ld(person):
+    return {
+        '@type': 'Person',
+        'name': person.display_full_name,
+        'affiliation': {
+            '@type': 'Organization',
+            'name': person.affiliation
+        }
+    }
 
 
 def get_field_values(form_data):
