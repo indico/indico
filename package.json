@@ -81,6 +81,7 @@
     "css-loader": "^0.28.11",
     "eslint": "^4.19.1",
     "eslint-cli": "^1.1.1",
+    "eslint-config-indico": "^1.0.0",
     "eslint-import-resolver-indico": "file:resolver",
     "eslint-plugin-babel": "^5.0.0",
     "eslint-plugin-import": "^2.11.0",
