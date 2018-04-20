@@ -20,7 +20,7 @@ import React from 'react';
 import {Grid} from 'semantic-ui-react';
 
 import filterBarFactory from '../../containers/FilterBar';
-import RoomBookingMap from "../RoomBookingMap";
+import RoomBookingMap from '../RoomBookingMap';
 
 
 export default class BookRoom extends React.Component {

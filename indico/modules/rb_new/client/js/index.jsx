@@ -29,7 +29,7 @@ import App from './components/App';
 import createRBStore from './store';
 
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener('DOMContentLoaded', () => {
     moment.locale(Indico.User.language);
 
     const appContainer = document.getElementById('rb-app-container');

@@ -17,7 +17,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import IButton from "./IButton";
+import IButton from './IButton';
 
 import './style/paginator.scss';
 
