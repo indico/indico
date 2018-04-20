@@ -76,7 +76,7 @@
         {%- if caller -%}
             {{- caller(link) -}}
         {%- else -%}
-            <span itemprop="performers" itemscope itemtype="http://schema.org/Person" class="{{ span_class }}">
+            <span class="{{ span_class }}">
                 {{- render_user_data(link, show_title=title, italic_affiliation=italic_affiliation) -}}
             </span>
         {%- endif -%}
