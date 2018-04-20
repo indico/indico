@@ -553,7 +553,7 @@ def serialize_event_for_ical(event, detail_level):
     return data
 
 
-def serialize_event_for_json_ld(event):
+def serialize_event_for_json_ld(event, full=False):
     data = {
         '@context': 'http://schema.org',
         '@type': 'Event',
@@ -568,7 +568,7 @@ def serialize_event_for_json_ld(event):
         },
         'description': strip_tags(event.description),
     }
-    if event.person_links:
+    if full and event.person_links:
         data['performer'] = map(serialize_person_for_json_ld, event.person_links)
     if event.has_logo:
         data['image'] = event.external_logo_url

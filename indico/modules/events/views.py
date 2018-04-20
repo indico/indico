@@ -124,7 +124,7 @@ class WPEventBase(WPDecorated):
     def _getHeadContent(self):
         site_name = core_settings.get('site_title')
         meta = render_template('events/meta.html', event=self.event, site_name=site_name,
-                               json_ld=serialize_event_for_json_ld(self.event))
+                               json_ld=serialize_event_for_json_ld(self.event, full=True))
         return WPDecorated._getHeadContent(self) + meta
 
 
