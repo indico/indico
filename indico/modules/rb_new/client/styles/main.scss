@@ -24,6 +24,10 @@ $menu-height: 75px;
 $rb-content-padding: 2em;
 $sui-font-family: Lato, 'Helvetica Neue', Arial, Helvetica, sans-serif;
 
+body {
+    overflow-y: scroll;
+}
+
 // TODO: move this to Indico-wide file
 .indico-top-bar {
     background-color: $dark-blue;
