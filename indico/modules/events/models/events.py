@@ -480,6 +480,10 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         return url_for('event_images.logo_display', self, slug=self.logo_metadata['hash'])
 
     @property
+    def external_logo_url(self):
+        return url_for('event_images.logo_display', self, slug=self.logo_metadata['hash'], _external=True)
+
+    @property
     def participation_regform(self):
         return next((form for form in self.registration_forms if form.is_participation), None)
 
