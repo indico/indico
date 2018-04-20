@@ -345,7 +345,6 @@ class RHDisplayCategory(RHDisplayCategoryEventsBase):
         params.update(get_base_ical_parameters(session.user, 'category',
                                                '/export/categ/{0}.ics'.format(self.category.id), {'from': '-31d'}))
 
-
         if not self.category.is_root:
             return WPCategory.render_template('display/category.html', self.category, **params)
 

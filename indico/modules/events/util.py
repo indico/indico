@@ -569,7 +569,7 @@ def serialize_event_for_json_ld(event):
         'description': strip_tags(event.description),
     }
     if event.person_links:
-        data['performer'] = map(_get_json_ld_performer, event.person_links)
+        data['performer'] = map(serialize_person_for_json_ld, event.person_links)
     if event.has_logo:
         data['image'] = event.external_logo_url
     return data
