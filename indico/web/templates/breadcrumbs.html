@@ -1,16 +1,23 @@
-<div class="main-breadcrumb {{ 'management' if management }}">
-    <span class="path">
+<div class="main-breadcrumb {{ 'management' if management }}"
+     itemprop="breadcrumb" itemscope itemtype="http://schema.org/Breadcrumb">
+    <span class="path" itemscope itemtype="http://schema.org/BreadcrumbList">
         {% for (title, url) in items %}
-            {% if not loop.first %}
+            {%- if not loop.first -%}
                 <span class="sep">»</span>
-            {% endif %}
-            {% if url %}
-                <a href="{{ url }}" itemtype="http://data-vocabulary.org/Breadcrumb" itemprop="url" class="item" itemscope>
-                    <span itemprop="title">{{ title|truncate(40) }}</span>
-                </a>
-            {% else %}
-                <span class="item" itemprop="title">{{ title|truncate(40) }}</span>
-            {% endif %}
+            {%- endif -%}
+            {%- if url -%}
+                <span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+                    <a href="{{ url }}" itemprop="item" class="item">
+                        <span itemprop="name">{{ title|truncate(40) }}</span>
+                    </a>
+                    <meta itemprop="position" content="{{ loop.index }}" />
+                </span>
+            {%- else -%}
+                <span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+                    <span class="item" itemprop="name">{{ title|truncate(40) }}</span>
+                    <meta itemprop="position" content="{{ loop.index }}" />
+                </span>
+            {%- endif -%}
         {% endfor %}
     </span>
 </div>
