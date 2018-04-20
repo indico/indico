@@ -5,3 +5,7 @@
 {% if event.keywords -%}
     <meta name="keywords" content="{{ event.keywords|join(',') }}">
 {%- endif %}
+
+<script type="application/ld+json">
+{{ json_ld|tojson }}
+</script>

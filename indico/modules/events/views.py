@@ -120,9 +120,41 @@ class WPEventBase(WPDecorated):
     def getJSFiles(self):
         return WPDecorated.getJSFiles(self) + self._asset_env['modules_event_display_js'].urls()
 
+    def _get_json_ld_data(self):
+        data = {
+            '@context': 'http://schema.org',
+            '@type': 'Event',
+            'url': self.event.external_url,
+            'name': self.event.title,
+            'startDate': self.event.start_dt_local.isoformat(),
+            'endDate': self.event.end_dt_local.isoformat(),
+            'location': {
+                '@type': 'Place',
+                'name': self.event.venue_name or 'No location set',
+                'address': self.event.address or 'No address set'
+            },
+            'description': strip_tags(self.event.description),
+        }
+        if self.event.person_links:
+            data['performer'] = map(self._get_json_ld_performer, self.event.person_links)
+        if self.event.has_logo:
+            data['image'] = self.event.external_logo_url
+        return data
+
+    def _get_json_ld_performer(self, chair):
+        return {
+            '@type': 'Person',
+            'name': chair.display_full_name,
+            'affiliation': {
+                '@type': 'Organization',
+                'name': chair.affiliation
+            }
+        }
+
     def _getHeadContent(self):
         site_name = core_settings.get('site_title')
-        meta = render_template('events/meta.html', event=self.event, site_name=site_name)
+        meta = render_template('events/meta.html', event=self.event, site_name=site_name,
+                               json_ld=self._get_json_ld_data())
         return WPDecorated._getHeadContent(self) + meta
 
 
