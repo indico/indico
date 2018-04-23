@@ -55,6 +55,7 @@
     "react-router-redux": "^5.0.0-alpha.9",
     "redux": "^3.7.2",
     "redux-devtools-extension": "^2.13.2",
+    "redux-lazy-scroll": "^0.1.1",
     "redux-logger": "^3.0.6",
     "redux-router-querystring": "*",
     "redux-thunk": "^2.2.0",

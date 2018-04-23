@@ -20,6 +20,7 @@
 import propTypes from 'prop-types';
 import React from 'react';
 import {Card, Grid, Icon, Image} from 'semantic-ui-react';
+import LazyScroll from 'redux-lazy-scroll';
 
 import {Param, Plural, PluralTranslate, Singular} from 'indico/react/i18n';
 import roomListFiltersFactory from '../../containers/RoomListFilters';
@@ -35,30 +36,35 @@ export default class RoomList extends React.Component {
         fetchRooms();
     }
 
+    loadMore = () => {
+        const {fetchRooms} = this.props;
+        fetchRooms(false);
+    };
+
     render() {
-        const {rooms: {list}, fetchRooms} = this.props;
+        const {rooms: {list, total, isFetching}, fetchRooms} = this.props;
         return (
             <Grid columns={2}>
                 <Grid.Column width={10}>
                     <div className="ui" styleName="room-list">
                         <RoomListFilters onConfirm={() => fetchRooms('roomList')} />
                         <div styleName="results-count">
-                            <PluralTranslate count={list.length}>
+                            <PluralTranslate count={total}>
                                 <Singular>
-                                    <Param name="count" value={list.length} /> result found
+                                    <Param name="count" value={total} /> result found
                                 </Singular>
                                 <Plural>
-                                    <Param name="count" value={list.length} /> results found
+                                    <Param name="count" value={total} /> results found
                                 </Plural>
                             </PluralTranslate>
                         </div>
-                        <Grid columns={5} stackable>
-                            {list.map((room) => (
-                                <Grid.Column key={room.id}>
-                                    <Room room={room} />
-                                </Grid.Column>
-                            ))}
-                        </Grid>
+                        <LazyScroll hasMore={total > list.length} loadMore={this.loadMore} isFetching={isFetching}>
+                            <Card.Group stackable>
+                                {list.map((room) => (
+                                    <Room key={room.id} room={room} />
+                                ))}
+                            </Card.Group>
+                        </LazyScroll>
                     </div>
                 </Grid.Column>
             </Grid>
@@ -70,6 +76,7 @@ export default class RoomList extends React.Component {
 RoomList.propTypes = {
     rooms: propTypes.shape({
         list: propTypes.array,
+        total: propTypes.number,
         isFetching: propTypes.bool
     }).isRequired,
     fetchRooms: propTypes.func.isRequired

@@ -24,8 +24,8 @@ import {fetchRooms} from '../actions';
 const mapStateToProps = ({roomList}) => ({...roomList});
 
 const mapDispatchToProps = dispatch => ({
-    fetchRooms: () => {
-        dispatch(fetchRooms('roomList'));
+    fetchRooms: (clear = true) => {
+        dispatch(fetchRooms('roomList', clear));
     }
 });
 
