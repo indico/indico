@@ -20,22 +20,31 @@ import moment from 'moment';
 import * as actions from '../../actions';
 
 
-const initialState = {
-    text: null,
-    recurrence: {
-        type: null,
-        number: null,
-        interval: null
-    },
-    dates: {
-        startDate: null,
-        endDate: null
-    },
-    timeSlot: {
-        startTime: null,
-        endTime: null
-    },
-    capacity: null
+const initialStateFactory = (namespace) => {
+    const state = {
+        text: null,
+        capacity: null
+    };
+
+    if (namespace === 'bookRoom') {
+        Object.assign(state, {
+            recurrence: {
+                type: null,
+                number: null,
+                interval: null
+            },
+            dates: {
+                startDate: null,
+                endDate: null
+            },
+            timeSlot: {
+                startTime: null,
+                endTime: null
+            }
+        });
+    }
+
+    return state;
 };
 
 function calculateDefaultEndDate(startDate, type, number, interval) {
@@ -68,7 +77,7 @@ function mergeFilter(filters, param, data) {
 }
 
 export default function filterReducerFactory(namespace) {
-    return (state = initialState, action) => {
+    return (state = initialStateFactory(namespace), action) => {
         switch (action.type) {
             case actions.SET_FILTER_PARAMETER:
                 return action.namespace === namespace ? mergeFilter(state, action.param, action.data) : state;
