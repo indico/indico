@@ -42,12 +42,12 @@ class RHRoomBookingSearch(RHRoomBookingBase):
     })
     def _process(self, args):
         rooms = sorted(search_for_rooms(args), key=lambda r: natural_sort_key(r.full_name))
-        return rooms_schema.dumps(rooms).data
+        return jsonify(rooms_schema.dump(rooms).data)
 
 
 class RHRoomBookingLocation(RHRoomBookingBase):
     def _process(self):
-        return aspect_schema.dumps(Location.default_location.default_aspect).data
+        return jsonify(aspect_schema.dump(Location.default_location.default_aspect).data)
 
 
 class RHRoomBookingBuildings(RHRoomBookingBase):
