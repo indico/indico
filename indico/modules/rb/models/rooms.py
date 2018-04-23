@@ -311,12 +311,19 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
     def has_photo(self):
         return self.photo_id is not None
 
-    @property
+    @hybrid_property
     def full_name(self):
         if self.has_special_name:
             return u'{} - {}'.format(self.generate_name(), self.name)
         else:
             return u'{}'.format(self.generate_name())
+
+    @full_name.expression
+    def full_name(cls):
+        simple_name = cls.building + '-' + cls.floor + '-' + cls.number
+        return db.case([
+            [((cls.name != '') & (cls.name != simple_name)), simple_name + ' - ' + cls.name]
+        ], else_=simple_name)
 
     @property
     def has_special_name(self):

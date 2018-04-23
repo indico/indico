@@ -29,6 +29,7 @@ from sqlalchemy.orm import CompositeProperty, mapper
 from sqlalchemy.sql.ddl import CreateSchema
 
 from indico.core import signals
+from indico.core.db.sqlalchemy.custom.natsort import create_natsort_function
 from indico.core.db.sqlalchemy.custom.unaccent import create_unaccent_function
 from indico.core.db.sqlalchemy.util.models import IndicoBaseQuery, IndicoModel
 
@@ -135,8 +136,9 @@ def _before_create(target, connection, **kw):
         if not _schema_exists(connection, schema):
             CreateSchema(schema).execute(connection)
             signals.db_schema_created.send(unicode(schema), connection=connection)
-    # Create the indico_unaccent function
+    # Create our custom functions
     create_unaccent_function(connection)
+    create_natsort_function(connection)
 
 
 def _mapper_configured(mapper, class_):
