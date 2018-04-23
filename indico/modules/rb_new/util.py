@@ -25,7 +25,7 @@ from indico.modules.rb_new.schemas import rooms_schema
 
 
 def search_for_rooms(filters, only_available=False):
-    query = Room.query.filter(Room.is_active)
+    query = Room.query.filter(Room.is_active).order_by(db.func.indico.natsort(Room.full_name))
     criteria = {}
 
     if 'capacity' in filters:

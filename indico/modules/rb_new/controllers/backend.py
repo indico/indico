@@ -26,7 +26,6 @@ from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.models.reservations import RepeatFrequency
 from indico.modules.rb_new.schemas import aspect_schema, rooms_schema
 from indico.modules.rb_new.util import get_buildings, search_for_rooms
-from indico.util.string import natural_sort_key
 
 
 class RHRoomBookingSearch(RHRoomBookingBase):
@@ -41,7 +40,7 @@ class RHRoomBookingSearch(RHRoomBookingBase):
         'floor': fields.Str()
     })
     def _process(self, args):
-        rooms = sorted(search_for_rooms(args), key=lambda r: natural_sort_key(r.full_name))
+        rooms = search_for_rooms(args)
         return jsonify(rooms_schema.dump(rooms).data)
 
 
