@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 import errno
+import hashlib
 import os
 import time
 from datetime import datetime
@@ -133,3 +134,13 @@ def chmod_umask(path, execute=False):
     os.umask(umask)
     default = 0o777 if execute else 0o666
     os.chmod(path, default & ~umask)
+
+
+def get_file_checksum(fileobj, chunk_size=1024*1024, algorithm=hashlib.md5):
+    checksum = algorithm()
+    while True:
+        chunk = fileobj.read(chunk_size)
+        if not chunk:
+            break
+        checksum.update(chunk)
+    return unicode(checksum.hexdigest())

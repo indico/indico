@@ -14,7 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from hashlib import md5
 from operator import itemgetter
 
 import click
@@ -26,22 +25,13 @@ from indico.core.db import db
 from indico.core.storage import StoredFileMixin
 from indico.modules.events.static.models.static import StaticSite, StaticSiteState
 from indico.util.console import cformat
+from indico.util.fs import get_file_checksum
 from indico.web.flask.app import make_app
 
 
 SPECIAL_FILTERS = {
     StaticSite: {'state': StaticSiteState.success}
 }
-
-
-def get_file_md5(fileobj, chunk_size=1024*1024):
-    checksum = md5()
-    while True:
-        chunk = fileobj.read(chunk_size)
-        if not chunk:
-            break
-        checksum.update(chunk)
-    return unicode(checksum.hexdigest())
 
 
 def make_query(model):
@@ -78,7 +68,7 @@ def main():
             for obj in objects:
                 try:
                     with obj.open() as f:
-                        checksum = get_file_md5(f)
+                        checksum = get_file_checksum(f)
                 except Exception as exc:
                     click.echo(cformat('\n%{red!}Could not open %{reset}%{yellow}{}%{red!}: %{reset}%{yellow!}{}')
                                .format(obj, exc))
