@@ -20,8 +20,19 @@ import * as actions from '../../actions';
 
 const initialRoomsState = {
     list: [],
+    total: 0,
     isFetching: false
 };
+
+
+function mergeRooms(state, action) {
+    const {list: oldRooms} = state;
+    const {clear, total, rooms: newRooms} = action;
+    return {
+        total,
+        list: clear ? newRooms : oldRooms.concat(newRooms)
+    };
+}
 
 export function roomsReducer(state = initialRoomsState, action) {
     switch (action.type) {
@@ -30,7 +41,7 @@ export function roomsReducer(state = initialRoomsState, action) {
         case actions.FETCH_ROOMS_FAILED:
             return {...state, isFetching: false};
         case actions.UPDATE_ROOMS:
-            return {...state, list: action.rooms, isFetching: false};
+            return {...state, isFetching: false, ...mergeRooms(state, action)};
         default:
             return state;
     }

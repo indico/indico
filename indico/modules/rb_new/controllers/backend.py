@@ -37,11 +37,15 @@ class RHRoomBookingSearch(RHRoomBookingBase):
         'repeat_frequency': EnumField(RepeatFrequency),
         'repeat_interval': fields.Int(missing=0),
         'building': fields.Str(),
-        'floor': fields.Str()
+        'floor': fields.Str(),
+        'offset': fields.Int(missing=0, validate=lambda x: x >= 0),
+        'limit': fields.Int(missing=10, validate=lambda x: x >= 0),
     })
     def _process(self, args):
         rooms = search_for_rooms(args)
-        return jsonify(rooms_schema.dump(rooms).data)
+        total = len(rooms)
+        rooms = rooms[args['offset']:args['offset']+args['limit']]
+        return jsonify(total=total, rooms=rooms_schema.dump(rooms).data)
 
 
 class RHRoomBookingLocation(RHRoomBookingBase):

@@ -54,17 +54,20 @@ export function fetchRoomsFailed() {
     return {type: FETCH_ROOMS_FAILED};
 }
 
-export function updateRooms(rooms) {
-    return {type: UPDATE_ROOMS, rooms};
+export function updateRooms(rooms, total, clear) {
+    return {type: UPDATE_ROOMS, rooms, total, clear};
 }
 
-export function fetchRooms(reducerName) {
+export function fetchRooms(reducerName, clear = true) {
     return async (dispatch, getStore) => {
         dispatch(fetchRoomsStarted());
 
-        const {filters: {text}} = getStore()[reducerName];
+        const {filters: {text}, rooms: {list: oldRoomList}} = getStore()[reducerName];
         const parsed = parseRoomListFiltersText(text);
-        const params = {};
+        const params = {
+            offset: (clear ? 0 : oldRoomList.length),
+            limit: 20
+        };
 
         if (parsed.text) {
             params.room_name = parsed.text;
@@ -87,7 +90,8 @@ export function fetchRooms(reducerName) {
             return;
         }
 
-        dispatch(updateRooms(response.data));
+        const {rooms, total} = response.data;
+        dispatch(updateRooms(rooms, total, clear));
     };
 }
 

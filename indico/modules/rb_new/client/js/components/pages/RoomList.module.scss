@@ -22,8 +22,13 @@
         font-size: 1.5em;
     }
 
+    :global(.redux-lazy-scroll) {
+        overflow: visible !important;
+    }
+
     .room-card {
         height: 300px;
+        width: 300px;
 
         img {
             height: 170px;
