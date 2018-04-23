@@ -16,7 +16,8 @@
  */
 
 import React from 'react';
-import {BrowserRouter, Link, Route, Switch} from 'react-router-dom';
+import {Link, Route, Switch} from 'react-router-dom';
+import {ConnectedRouter} from 'react-router-redux';
 import {Icon} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
@@ -31,9 +32,9 @@ import Menu from './Menu';
 import './App.module.scss';
 
 
-export default function App() {
+export default function App({history}) {
     return (
-        <BrowserRouter basename="/rooms-new">
+        <ConnectedRouter history={history}>
             <div styleName="rb-layout">
                 <header styleName="rb-menu-bar">
                     <div styleName="rb-menu-bar-side-left">
@@ -61,6 +62,6 @@ export default function App() {
                     </Switch>
                 </div>
             </div>
-        </BrowserRouter>
+        </ConnectedRouter>
     );
 }

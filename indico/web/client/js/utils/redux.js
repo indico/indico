@@ -21,15 +21,32 @@ import loggerMiddleware from 'redux-logger';
 import {composeWithDevTools} from 'redux-devtools-extension';
 
 
-export default function createReduxStore(reducers, initialData = {}) {
-    const middleware = [thunkMiddleware];
+// similar to the standard combineReducers, but accepts
+// root reducers as well
+function _combineReducers(...reducers) {
+    return (state, action) => {
+        for (const reducer of reducers) {
+            if (typeof reducer === 'function') {
+                // it's a reducer
+                state = reducer(state, action);
+            } else {
+                state = combineReducers(reducer)(state, action);
+            }
+        }
+        return state;
+    };
+}
+
+
+export default function createReduxStore(reducers, initialData = {}, additionalMiddleware = [], postReducers = []) {
+    const middleware = [thunkMiddleware, ...additionalMiddleware];
     if (process.env.NODE_ENV === 'development') {
         middleware.push(loggerMiddleware);
     }
     const enhancer = composeWithDevTools(applyMiddleware(...middleware));
 
-    return createStore(combineReducers({
+    return createStore(_combineReducers({
         staticData: (state = {}) => state,
         ...reducers
-    }), initialData, enhancer);
+    }, ...postReducers), initialData, enhancer);
 }

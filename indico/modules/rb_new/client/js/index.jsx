@@ -26,7 +26,7 @@ import '../styles/main.scss';
 import setupUserMenu from 'indico/react/containers/UserMenu';
 import App from './components/App';
 
-import createRBStore from './store';
+import createRBStore, {history} from './store';
 
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     ReactDOM.render(
         <Provider store={store}>
-            <App />
+            <App history={history} />
         </Provider>,
         appContainer
     );
