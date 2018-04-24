@@ -16,34 +16,24 @@
 */
 
 import React from 'react';
-import {Button, Icon} from 'semantic-ui-react';
 import propTypes from 'prop-types';
 
 import {Translate} from 'indico/react/i18n';
+import RoomFilterBar from './RoomFilterBar';
 
 import FilterDropdown from './filters/FilterDropdown';
 import RecurrenceForm from './filters/RecurrenceForm';
 import DateForm from './filters/DateForm';
 import TimeForm from './filters/TimeForm';
-import CapacityForm from './filters/CapacityForm';
 
 import recurrenceRenderer from './filters/RecurrenceRenderer';
 import dateRenderer from './filters/DateRenderer';
 import timeRenderer from './filters/TimeRenderer';
 
 
-const capacityRenderer = ({capacity}) => (
-    (capacity === null)
-        ? null : (
-            <span>
-                <Icon name="user" />
-                {capacity}
-            </span>
-        ));
-
 export default function FilterBar({recurrence, dates, timeSlot, capacity, setFilterParameter}) {
     return (
-        <Button.Group>
+        <RoomFilterBar capacity={capacity} setFilterParameter={setFilterParameter}>
             <FilterDropdown title={<Translate>Recurrence</Translate>}
                             form={(ref, fieldValues, setParentField) => (
                                 <RecurrenceForm ref={ref} setParentField={setParentField} {...fieldValues} />
@@ -82,16 +72,7 @@ export default function FilterBar({recurrence, dates, timeSlot, capacity, setFil
                             setGlobalState={setFilterParameter.bind(undefined, 'timeSlot')}
                             initialValues={timeSlot}
                             renderValue={timeRenderer} />
-            <FilterDropdown title={<Translate>Min. Capacity</Translate>}
-                            form={(ref, fieldValues, setParentField) => (
-                                <CapacityForm ref={ref}
-                                              setParentField={setParentField}
-                                              capacity={fieldValues.capacity} />
-                            )}
-                            setGlobalState={data => setFilterParameter('capacity', data.capacity)}
-                            initialValues={{capacity}}
-                            renderValue={capacityRenderer} />
-        </Button.Group>
+        </RoomFilterBar>
     );
 }
 

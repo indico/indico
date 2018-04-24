@@ -15,30 +15,40 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import propTypes from 'prop-types';
+import PropTypes from 'prop-types';
 import React from 'react';
 import {Grid} from 'semantic-ui-react';
 
-import filterBarFactory from '../../containers/FilterBar';
 import RoomBookingMap from '../RoomBookingMap';
+import RoomSearchPane from '../RoomSearchPane';
+import BookingFilterBar from '../BookingFilterBar';
+import filterBarFactory from '../../containers/FilterBar';
+import searchBoxFactory from '../../containers/SearchBar';
+
+
+const FilterBar = filterBarFactory('bookRoom', BookingFilterBar);
+const SearchBar = searchBoxFactory('bookRoom');
 
 
 export default class BookRoom extends React.Component {
     static propTypes = {
-        fetchMapDefaultLocation: propTypes.func.isRequired,
-        updateLocation: propTypes.func.isRequired,
-        bounds: propTypes.array,
-        search: propTypes.bool.isRequired,
-        toggleMapSearch: propTypes.func.isRequired,
-    };
-
-    static defaultProps = {
-        bounds: null
+        map: PropTypes.shape({
+            bounds: PropTypes.array,
+            search: PropTypes.bool.isRequired
+        }).isRequired,
+        fetchMapDefaultLocation: PropTypes.func.isRequired,
+        updateLocation: PropTypes.func.isRequired,
+        toggleMapSearch: PropTypes.func.isRequired,
+        rooms: PropTypes.shape({
+            list: PropTypes.array,
+            isFetching: PropTypes.bool,
+        }).isRequired,
+        fetchRooms: PropTypes.func.isRequired
     };
 
     constructor(props) {
         super(props);
-        const {fetchMapDefaultLocation, bounds} = props;
+        const {fetchMapDefaultLocation, map: {bounds}} = props;
         if (!bounds) {
             fetchMapDefaultLocation();
         }
@@ -55,12 +65,14 @@ export default class BookRoom extends React.Component {
     }
 
     render() {
-        const {bounds, toggleMapSearch, search} = this.props;
-        const FilterBar = filterBarFactory('bookRoom');
+        const {toggleMapSearch, map: {bounds, search}, rooms, fetchRooms} = this.props;
         return (
             <Grid columns={2}>
                 <Grid.Column width={11}>
-                    <FilterBar />
+                    <RoomSearchPane rooms={rooms}
+                                    fetchRooms={fetchRooms}
+                                    filterBar={<FilterBar />}
+                                    searchBar={<SearchBar onConfirm={fetchRooms} />} />
                 </Grid.Column>
                 <Grid.Column width={5}>
                     {bounds && (

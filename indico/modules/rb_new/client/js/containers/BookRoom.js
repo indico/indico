@@ -17,10 +17,10 @@
 import {connect} from 'react-redux';
 
 import BookRoom from '../components/pages/BookRoom';
-import {fetchMapDefaultLocation, toggleMapSearch, updateLocation} from '../actions';
+import {fetchMapDefaultLocation, fetchRooms, toggleMapSearch, updateLocation} from '../actions';
 
 
-const mapStateToProps = ({bookRoom}) => ({...bookRoom.map});
+const mapStateToProps = ({bookRoom}) => ({...bookRoom});
 
 const mapDispatchToProps = dispatch => ({
     fetchMapDefaultLocation: () => {
@@ -31,6 +31,9 @@ const mapDispatchToProps = dispatch => ({
     },
     toggleMapSearch: (search) => {
         dispatch(toggleMapSearch(search));
+    },
+    fetchRooms: (clear = true) => {
+        dispatch(fetchRooms('bookRoom', clear));
     }
 });
 

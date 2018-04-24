@@ -16,18 +16,27 @@
  */
 
 import isEqual from 'lodash/isEqual';
-import propTypes from 'prop-types';
+import PropTypes from 'prop-types';
 import React from 'react';
 import {Button, Form, Icon, Input, Popup, Select} from 'semantic-ui-react';
 import {DebounceInput} from 'react-debounce-input';
 
 import {Translate} from 'indico/react/i18n';
-import {parseRoomListFiltersText} from '../util';
+import {parseSearchBarText} from '../util';
 
-import './RoomListFilters.module.scss';
+import './SearchBar.module.scss';
 
 
-export default class RoomListFilters extends React.Component {
+export default class SearchBar extends React.Component {
+    static propTypes = {
+        setTextFilter: PropTypes.func.isRequired,
+        setAdvancedFilter: PropTypes.func.isRequired,
+        fetchBuildings: PropTypes.func.isRequired,
+        onConfirm: PropTypes.func.isRequired,
+        filters: PropTypes.object.isRequired,
+        buildings: PropTypes.object.isRequired
+    };
+
     constructor(props) {
         super(props);
         this.state = {
@@ -74,8 +83,8 @@ export default class RoomListFilters extends React.Component {
             return;
         }
 
-        const parsedValues = parseRoomListFiltersText(filterValue);
-        if (isEqual(parsedValues, parseRoomListFiltersText(text))) {
+        const parsedValues = parseSearchBarText(filterValue);
+        if (isEqual(parsedValues, parseSearchBarText(text))) {
             return;
         }
 
@@ -118,7 +127,7 @@ export default class RoomListFilters extends React.Component {
                     return `${searchKey}:${this.state[stateKey]}`; // eslint-disable-line react/destructuring-assignment
                 });
 
-                const text = parseRoomListFiltersText(stateText).text;
+                const text = parseSearchBarText(stateText).text;
                 if (text) {
                     textParts = [text, ...textParts];
                 }
@@ -207,12 +216,3 @@ export default class RoomListFilters extends React.Component {
         );
     }
 }
-
-RoomListFilters.propTypes = {
-    setTextFilter: propTypes.func.isRequired,
-    setAdvancedFilter: propTypes.func.isRequired,
-    fetchBuildings: propTypes.func.isRequired,
-    onConfirm: propTypes.func.isRequired,
-    filters: propTypes.object.isRequired,
-    buildings: propTypes.object.isRequired
-};

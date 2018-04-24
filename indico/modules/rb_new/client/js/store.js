@@ -16,49 +16,14 @@
  */
 
 import createHistory from 'history/createBrowserHistory';
-import {queryStringMiddleware, createQueryStringReducer, validator as v} from 'redux-router-querystring';
+import {queryStringMiddleware, createQueryStringReducer} from 'redux-router-querystring';
 import {routerReducer, routerMiddleware} from 'react-router-redux';
 import createReduxStore from 'indico/utils/redux';
+
 import {userReducer, bookRoomReducer, roomListReducer} from './reducers';
 import {SET_FILTER_PARAMETER} from './actions';
+import {queryString as queryFilterRules} from './serializers/filters';
 
-
-const queryStringRules = {
-    recurrence: {
-        validator: v.isIn(['single', 'daily', 'every']),
-        stateField: 'filters.recurrence.type'
-    },
-    number: {
-        validator: v.isInt({min: 1, max: 99}),
-        sanitizer: v.toInt(),
-        stateField: 'filters.recurrence.number'
-    },
-    interval: {
-        validator: v.isIn(['day', 'week', 'month']),
-        stateField: 'filters.recurrence.interval'
-    },
-    startDate: {
-        validator: v.isDate(),
-        stateField: 'filters.dates.startDate'
-    },
-    endDate: {
-        validator: v.isDate(),
-        stateField: 'filters.dates.endDate'
-    },
-    startTime: {
-        validator: v.isTime(),
-        stateField: 'filters.timeSlot.startTime'
-    },
-    endTime: {
-        validator: v.isTime(),
-        stateField: 'filters.timeSlot.endTime'
-    },
-    capacity: {
-        validator: v.isInt({min: 1}),
-        sanitizer: v.toInt(),
-        stateField: 'filters.capacity'
-    }
-};
 
 const initialData = {
     staticData: {}
@@ -70,13 +35,18 @@ const routeConfig = {
         '/book': {
             listen: SET_FILTER_PARAMETER,
             select: ({bookRoom: {filters}}) => ({filters}),
-            serialize: queryStringRules
+            serialize: queryFilterRules
+        },
+        '/rooms': {
+            listen: SET_FILTER_PARAMETER,
+            select: ({roomList: {filters}}) => ({filters}),
+            serialize: queryFilterRules
         }
     }
 };
 
 const qsReducer = createQueryStringReducer(
-    queryStringRules,
+    queryFilterRules,
     (state) => {
         const {router: {location: {pathname}}} = state;
         return {

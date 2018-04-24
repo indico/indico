@@ -17,7 +17,7 @@
 
 import {connect} from 'react-redux';
 
-import RoomListFilters from '../components/RoomListFilters';
+import SearchBar from '../components/SearchBar';
 import {fetchBuildings, fetchRooms, setFilterParameter} from '../actions';
 
 
@@ -40,5 +40,5 @@ export default (namespace) => {
     return connect(
         mapStateToProps,
         mapDispatchToProps
-    )(RoomListFilters);
+    )(SearchBar);
 };

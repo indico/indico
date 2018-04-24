@@ -42,7 +42,8 @@ class RHRoomBookingSearch(RHRoomBookingBase):
         'limit': fields.Int(missing=10, validate=lambda x: x >= 0),
     })
     def _process(self, args):
-        rooms = search_for_rooms(args)
+        filter_availability = args.get('start_dt') and args.get('end_dt')
+        rooms = search_for_rooms(args, only_available=filter_availability)
         total = len(rooms)
         rooms = rooms[args['offset']:args['offset']+args['limit']]
         return jsonify(total=total, rooms=rooms_schema.dump(rooms).data)
