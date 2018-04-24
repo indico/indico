@@ -16,6 +16,7 @@
  */
 
 import React from 'react';
+import PropTypes from 'prop-types';
 import {Link, Route, Switch} from 'react-router-dom';
 import {ConnectedRouter} from 'react-router-redux';
 import {Icon} from 'semantic-ui-react';
@@ -65,3 +66,7 @@ export default function App({history}) {
         </ConnectedRouter>
     );
 }
+
+App.propTypes = {
+    history: PropTypes.object.isRequired
+};

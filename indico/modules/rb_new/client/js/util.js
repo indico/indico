@@ -22,7 +22,7 @@ export function toMoment(dt, format) {
     return dt ? moment(dt, format) : null;
 }
 
-export function parseRoomListFiltersText(text) {
+export function parseSearchBarText(text) {
     const result = {text: '', building: '', floor: ''};
     if (!text) {
         return result;
@@ -43,4 +43,33 @@ export function parseRoomListFiltersText(text) {
     }
 
     return result;
+}
+
+function _pruneNullLeaves(obj) {
+    return Object.assign(...Object.entries(obj).map(([k, v]) => {
+        if (v === null) {
+            return {};
+        } else if (typeof v === 'object') {
+            return {[k]: _pruneNullLeaves(v)};
+        } else {
+            return {[k]: v};
+        }
+    }));
+}
+
+export function preProcessParameters(params, rules) {
+    return _pruneNullLeaves(
+        Object.assign(...Object.entries(rules)
+            .map(([k, rule]) => {
+                if (typeof rule === 'object') {
+                    const {serializer, onlyIf} = rule;
+                    rule = serializer;
+                    if (!onlyIf(params)) {
+                        return {};
+                    }
+                }
+                const value = rule(params);
+                return {[k]: value};
+            }))
+    );
 }

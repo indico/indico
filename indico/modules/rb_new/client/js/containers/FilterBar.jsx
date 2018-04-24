@@ -15,21 +15,21 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 import {connect} from 'react-redux';
-import FilterBar from '../components/FilterBar';
-import {setFilterParameter} from '../actions';
+import {setFilterParameter, fetchRooms} from '../actions';
 
 
-export default (namespace) => {
+export default (namespace, componentClass) => {
     const mapStateToProps = state => ({...state[namespace].filters});
 
     const mapDispatchToProps = dispatch => ({
         setFilterParameter: (param, value) => {
             dispatch(setFilterParameter(namespace, param, value));
+            dispatch(fetchRooms(namespace));
         }
     });
 
     return connect(
         mapStateToProps,
         mapDispatchToProps
-    )(FilterBar);
+    )(componentClass);
 };
