@@ -24,6 +24,7 @@ import LazyScroll from 'redux-lazy-scroll';
 
 import {Param, Plural, PluralTranslate, Singular} from 'indico/react/i18n';
 import roomListFiltersFactory from '../../containers/RoomListFilters';
+import RoomBookingMap from '../RoomBookingMap';
 
 import './RoomList.module.scss';
 
@@ -31,6 +32,15 @@ import './RoomList.module.scss';
 const RoomListFilters = roomListFiltersFactory('roomList');
 
 export default class RoomList extends React.Component {
+    constructor(props) {
+        super(props);
+
+        const {bounds, fetchMapDefaultLocation} = this.props;
+        if (!bounds) {
+            fetchMapDefaultLocation();
+        }
+    }
+
     componentDidMount() {
         const {fetchRooms} = this.props;
         fetchRooms();
@@ -42,10 +52,10 @@ export default class RoomList extends React.Component {
     };
 
     render() {
-        const {rooms: {list, total, isFetching}, fetchRooms} = this.props;
+        const {rooms: {list, total, isFetching}, fetchRooms, map: {bounds, search}} = this.props;
         return (
             <Grid columns={2}>
-                <Grid.Column width={10}>
+                <Grid.Column width={11}>
                     <div className="ui" styleName="room-list">
                         <RoomListFilters onConfirm={() => fetchRooms('roomList')} />
                         <div styleName="results-count">
@@ -67,6 +77,13 @@ export default class RoomList extends React.Component {
                         </LazyScroll>
                     </div>
                 </Grid.Column>
+                <Grid.Column width={5}>
+                    {bounds && (
+                        <RoomBookingMap bounds={bounds} onMove={(e) => console.log(e)}
+                                        searchCheckbox isSearchEnabled={search}
+                                        onToggleSearchCheckbox={(e, data) => console.log(data.checked)} />
+                    )}
+                </Grid.Column>
             </Grid>
         );
     }
@@ -79,7 +96,14 @@ RoomList.propTypes = {
         total: propTypes.number,
         isFetching: propTypes.bool
     }).isRequired,
-    fetchRooms: propTypes.func.isRequired
+    fetchRooms: propTypes.func.isRequired,
+    bounds: propTypes.array,
+    fetchMapDefaultLocation: propTypes.func.isRequired,
+    map: propTypes.object.isRequired
+};
+
+RoomList.defaultProps = {
+    bounds: null
 };
 
 

@@ -19,12 +19,14 @@ import {combineReducers} from 'redux';
 
 import {roomsReducer, buildingsReducer} from './roomBooking/roomList';
 import filterReducerFactory from './roomBooking/filters';
+import mapReducer from './roomBooking/map';
 
 
 const reducer = combineReducers({
     rooms: roomsReducer,
     buildings: buildingsReducer,
-    filters: filterReducerFactory('roomList')
+    filters: filterReducerFactory('roomList'),
+    map: mapReducer
 });
 
 export default reducer;
