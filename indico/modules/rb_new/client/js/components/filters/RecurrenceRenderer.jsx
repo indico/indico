@@ -31,7 +31,12 @@ export default function recurrenceRenderer({type, number, interval}) {
     } else if (interval === 'day') {
         return (
             <PluralTranslate count={number}>
-                Every <Param name="number" value={number} /> days
+                <Singular>
+                    Daily
+                </Singular>
+                <Plural>
+                    Every <Param name="number" value={number} /> days
+                </Plural>
             </PluralTranslate>
         );
     } else if (interval === 'week') {
