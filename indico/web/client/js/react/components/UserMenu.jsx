@@ -52,7 +52,7 @@ export default function UserMenu({userData, staticData}) {
     const {availableLanguages} = staticData;
     const {firstName, lastName, email, language, isAdmin, avatarBgColor} = userData;
     const avatar = (
-        <Label style={{
+        <Label circular size="large" style={{
             backgroundColor: avatarBgColor
         }} styleName="user-menu-avatar">
             {firstName[0]}
