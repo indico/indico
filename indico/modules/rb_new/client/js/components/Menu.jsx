@@ -31,7 +31,7 @@ function MenuItem({path, children}) {
             {({match}) => (
                 <li className={match ? 'selected' : ''}
                     styleName="rb-menu-item">
-                    <Link to={path}>
+                    <Link to={path} replace={!!match}>
                         {children}
                     </Link>
                 </li>
