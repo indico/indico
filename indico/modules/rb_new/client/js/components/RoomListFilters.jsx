@@ -21,7 +21,7 @@ import React from 'react';
 import {Button, Form, Icon, Input, Popup, Select} from 'semantic-ui-react';
 import {DebounceInput} from 'react-debounce-input';
 
-import {Param, Translate} from 'indico/react/i18n';
+import {Translate} from 'indico/react/i18n';
 import {parseRoomListFiltersText} from '../util';
 
 import './RoomListFilters.module.scss';
@@ -148,7 +148,7 @@ export default class RoomListFilters extends React.Component {
         }
 
         const buildings = Object.entries(buildingsList).map(([key, val]) => ({
-            text: <Translate>Building <Param name="buildingNumber" value={val.number} /></Translate>,
+            text: Translate.string('Building {number}', {number: val.number}),
             value: key
         }));
         const content = (

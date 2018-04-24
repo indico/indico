@@ -47,7 +47,7 @@
     "react": "^16.3.1",
     "react-debounce-input": "^3.2.0",
     "react-dom": "^16.3.1",
-    "react-jsx-i18n": ">=0.0.3",
+    "react-jsx-i18n": ">=0.0.5",
     "react-leaflet": "^1.9.1",
     "react-modal": "^3.3.2",
     "react-redux": "^5.0.7",
