@@ -15,6 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import '@babel/polyfill';
 import ReactDOM from 'react-dom';
 import React from 'react';
 import {Provider} from 'react-redux';
