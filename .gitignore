@@ -41,5 +41,7 @@ htmlcov/
 # logs
 *.log
 
-# webpack
+# node/webpack
 webpack-build-config.json
+package-lock.json
+*.lock
