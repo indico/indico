@@ -76,7 +76,7 @@ const _dtHandler = (prefix) => {
             datePart = dates['startDate'];
         }
 
-        return moment(`${datePart} ${timePart}`, 'YYYY-MM-DD HH:mm').toISOString(true);
+        return moment(`${datePart} ${timePart}`, 'YYYY-MM-DD HH:mm').format('YYYY-MM-DD HH:mm');
     };
 };
 
