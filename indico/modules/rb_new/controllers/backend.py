@@ -25,7 +25,7 @@ from indico.core.db.sqlalchemy.util.queries import with_total_rows
 from indico.modules.rb import Location
 from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.models.reservations import RepeatFrequency
-from indico.modules.rb_new.schemas import aspect_schema, rooms_schema
+from indico.modules.rb_new.schemas import aspects_schema, rooms_schema
 from indico.modules.rb_new.util import get_buildings, search_for_rooms
 
 
@@ -50,9 +50,14 @@ class RHRoomBookingSearch(RHRoomBookingBase):
         return jsonify(total=total, rooms=rooms_schema.dump(rooms).data)
 
 
-class RHRoomBookingLocation(RHRoomBookingBase):
+class RHRoomBookingAspects(RHRoomBookingBase):
     def _process(self):
-        return jsonify(aspect_schema.dump(Location.default_location.default_aspect).data)
+        to_cast = ['top_left_latitude', 'top_left_longitude', 'bottom_right_latitude', 'bottom_right_longitude']
+        aspects = [
+            {k: float(v) if k in to_cast else v for k, v in aspect.viewitems()}
+            for aspect in aspects_schema.dump(Location.default_location.aspects).data
+        ]
+        return jsonify(aspects)
 
 
 class RHRoomBookingBuildings(RHRoomBookingBase):
