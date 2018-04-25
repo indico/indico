@@ -16,11 +16,11 @@
  */
 
 import buildFetchRoomsUrl from 'indico-url:rooms_new.available_rooms';
-import fetchDefaultLocationUrl from 'indico-url:rooms_new.default_location';
+import fetchDefaultAspectsUrl from 'indico-url:rooms_new.default_aspects';
 import fetchBuildingsUrl from 'indico-url:rooms_new.buildings';
 
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
-import {preProcessParameters} from './util';
+import {getAspectBounds, preProcessParameters} from './util';
 import {ajax as ajaxFilterRules} from './serializers/filters';
 
 
@@ -33,8 +33,9 @@ export const FETCH_ROOMS_STARTED = 'FETCH_ROOMS_STARTED';
 export const FETCH_ROOMS_FAILED = 'FETCH_ROOMS_FAILED';
 export const UPDATE_ROOMS = 'UPDATE_ROOMS';
 // Map
-export const FETCH_DEFAULT_LOCATION_STARTED = 'FETCH_DEFAULT_LOCATION_STARTED';
-export const FETCH_DEFAULT_LOCATION_FAILED = 'FETCH_DEFAULT_LOCATION_FAILED';
+export const FETCH_DEFAULT_ASPECTS_STARTED = 'FETCH_DEFAULT_ASPECTS_STARTED';
+export const FETCH_DEFAULT_ASPECTS_FAILED = 'FETCH_DEFAULT_ASPECTS_FAILED';
+export const UPDATE_ASPECTS = 'UPDATE_ASPECTS';
 export const UPDATE_LOCATION = 'UPDATE_LOCATION';
 export const TOGGLE_MAP_SEARCH = 'TOGGLE_MAP_SEARCH';
 // Buildings
@@ -90,37 +91,38 @@ export function setFilterParameter(namespace, param, data) {
     return {type: SET_FILTER_PARAMETER, namespace, param, data};
 }
 
-export function fetchDefaultLocationStarted() {
-    return {type: FETCH_DEFAULT_LOCATION_STARTED};
+export function fetchDefaultAspectsStarted() {
+    return {type: FETCH_DEFAULT_ASPECTS_STARTED};
 }
 
-export function fetchDefaultLocationFailed() {
-    return {type: FETCH_DEFAULT_LOCATION_FAILED};
+export function fetchDefaultAspectsFailed() {
+    return {type: FETCH_DEFAULT_ASPECTS_FAILED};
+}
+
+export function updateAspects(aspects) {
+    return {type: UPDATE_ASPECTS, aspects};
 }
 
 export function updateLocation(location) {
     return {type: UPDATE_LOCATION, location};
 }
 
-export function fetchMapDefaultLocation() {
+export function fetchMapDefaultAspects() {
     return async (dispatch) => {
-        dispatch(fetchDefaultLocationStarted());
+        dispatch(fetchDefaultAspectsStarted());
 
         let response;
         try {
-            response = await indicoAxios.get(fetchDefaultLocationUrl());
+            response = await indicoAxios.get(fetchDefaultAspectsUrl());
         } catch (error) {
             handleAxiosError(error);
-            dispatch(fetchDefaultLocationFailed());
+            dispatch(fetchDefaultAspectsFailed());
             return;
         }
 
-        const data = response.data;
-        const location = [
-            [parseFloat(data.top_left_latitude), parseFloat(data.top_left_longitude)],
-            [parseFloat(data.bottom_right_latitude), parseFloat(data.bottom_right_longitude)]
-        ];
-        dispatch(updateLocation(location));
+        dispatch(updateAspects(response.data));
+        const defaultAspect = response.data.find(aspect => aspect.default_on_startup);
+        dispatch(updateLocation(getAspectBounds(defaultAspect)));
     };
 }
 

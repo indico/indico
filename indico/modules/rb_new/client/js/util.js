@@ -45,18 +45,6 @@ export function parseSearchBarText(text) {
     return result;
 }
 
-function _pruneNullLeaves(obj) {
-    return Object.assign(...Object.entries(obj).map(([k, v]) => {
-        if (v === null) {
-            return {};
-        } else if (typeof v === 'object') {
-            return {[k]: _pruneNullLeaves(v)};
-        } else {
-            return {[k]: v};
-        }
-    }));
-}
-
 export function preProcessParameters(params, rules) {
     return _pruneNullLeaves(
         Object.assign(...Object.entries(rules)
@@ -103,4 +91,31 @@ export function sanitizeRecurrence(filters) {
         // default for the end date
         filters.dates.endDate = calculateDefaultEndDate(startDate, type, number, interval);
     }
+}
+
+export function getAspectBounds(aspect) {
+    return [
+        [aspect.top_left_latitude, aspect.top_left_longitude],
+        [aspect.bottom_right_latitude, aspect.bottom_right_longitude]
+    ];
+}
+
+export function getMapBounds(map) {
+    const boundsObj = map.getBounds();
+    return [
+        Object.values(boundsObj.getNorthWest()),
+        Object.values(boundsObj.getSouthEast())
+    ];
+}
+
+function _pruneNullLeaves(obj) {
+    return Object.assign(...Object.entries(obj).map(([k, v]) => {
+        if (v === null) {
+            return {};
+        } else if (typeof v === 'object') {
+            return {[k]: _pruneNullLeaves(v)};
+        } else {
+            return {[k]: v};
+        }
+    }));
 }

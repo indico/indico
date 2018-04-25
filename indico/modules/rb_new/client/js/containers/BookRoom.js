@@ -17,14 +17,14 @@
 import {connect} from 'react-redux';
 
 import BookRoom from '../components/pages/BookRoom';
-import {fetchMapDefaultLocation, fetchRooms, toggleMapSearch, updateLocation} from '../actions';
+import {fetchMapDefaultAspects, fetchRooms, toggleMapSearch, updateLocation} from '../actions';
 
 
 const mapStateToProps = ({bookRoom}) => ({...bookRoom});
 
 const mapDispatchToProps = dispatch => ({
-    fetchMapDefaultLocation: () => {
-        dispatch(fetchMapDefaultLocation());
+    fetchMapDefaultAspects: (callback) => {
+        dispatch(fetchMapDefaultAspects()).then(callback);
     },
     updateLocation: (location) => {
         dispatch(updateLocation(location));

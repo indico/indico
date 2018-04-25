@@ -20,6 +20,7 @@ import * as actions from '../../actions';
 
 const initialState = {
     bounds: null,
+    aspects: [],
     search: true,
     isFetching: false,
 };
@@ -27,10 +28,12 @@ const initialState = {
 
 export default function mapReducer(state = initialState, action) {
     switch (action.type) {
-        case actions.FETCH_DEFAULT_LOCATION_STARTED:
+        case actions.FETCH_DEFAULT_ASPECTS_STARTED:
             return {...state, isFetching: true};
-        case actions.FETCH_DEFAULT_LOCATION_FAILED:
+        case actions.FETCH_DEFAULT_ASPECTS_FAILED:
             return {...state, isFetching: false};
+        case actions.UPDATE_ASPECTS:
+            return {...state, aspects: action.aspects, isFetching: false};
         case actions.UPDATE_LOCATION:
             return {...state, bounds: action.location, isFetching: false};
         case actions.TOGGLE_MAP_SEARCH:

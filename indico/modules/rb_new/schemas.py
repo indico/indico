@@ -31,8 +31,9 @@ class RoomSchema(mm.ModelSchema):
 class AspectSchema(mm.ModelSchema):
     class Meta:
         model = Aspect
-        fields = ('top_left_latitude', 'top_left_longitude', 'bottom_right_latitude', 'bottom_right_longitude')
+        fields = ('name', 'top_left_latitude', 'top_left_longitude', 'bottom_right_latitude', 'bottom_right_longitude',
+                  'default_on_startup')
 
 
 rooms_schema = RoomSchema(many=True)
-aspect_schema = AspectSchema()
+aspects_schema = AspectSchema(many=True)

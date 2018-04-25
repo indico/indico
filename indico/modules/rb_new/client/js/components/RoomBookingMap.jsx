@@ -20,7 +20,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import Leaflet from 'leaflet';
 import {Map, TileLayer, MapControl} from 'react-leaflet';
-import {Checkbox} from 'semantic-ui-react';
+import {Checkbox, Dropdown} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 
@@ -29,16 +29,30 @@ import './RoomBookingMap.module.scss';
 
 
 export default function RoomBookingMap(props) {
-    const {bounds, onMove, searchCheckbox, isSearchEnabled, onToggleSearchCheckbox} = props;
+    const {bounds, onMove, searchCheckbox, isSearchEnabled, onToggleSearchCheckbox, aspects, onChangeAspect,
+           mapRef} = props;
+    const aspectOptions = Object.entries(aspects).map(([key, val]) => ({
+        text: val.name,
+        value: Number(key)
+    }));
     return (
         <div styleName="map-container">
-            <Map bounds={bounds} onDragend={onMove} onZoomend={onMove}>
+            <Map ref={mapRef} bounds={bounds} onDragend={onMove} onZoomend={onMove}>
                 <TileLayer attribution='© <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
                 {searchCheckbox && (
                     <RoomBookingMapControl position="topleft">
-                        <Checkbox label={Translate.string('Search as I move the map')} onChange={onToggleSearchCheckbox}
-                                  styleName="checkbox-control" checked={isSearchEnabled} />
+                        <Checkbox label={Translate.string('Search as I move the map')}
+                                  onChange={onToggleSearchCheckbox}
+                                  checked={isSearchEnabled} styleName="map-control-content" />
+                    </RoomBookingMapControl>
+                )}
+                {aspects && (
+                    <RoomBookingMapControl position="bottomleft">
+                        <Dropdown placeholder={Translate.string('Select aspect')} selection upward
+                                  options={aspectOptions} defaultValue={aspects.findIndex(op => op.default_on_startup)}
+                                  styleName="map-control-content aspects-dropdown"
+                                  openOnFocus={false} onChange={onChangeAspect} />
                     </RoomBookingMapControl>
                 )}
             </Map>
@@ -52,12 +66,18 @@ RoomBookingMap.propTypes = {
     searchCheckbox: propTypes.bool,
     isSearchEnabled: propTypes.bool,
     onToggleSearchCheckbox: propTypes.func,
+    aspects: propTypes.array,
+    onChangeAspect: propTypes.func,
+    mapRef: propTypes.object,
 };
 
 RoomBookingMap.defaultProps = {
     searchCheckbox: false,
     isSearchEnabled: true,
     onToggleSearchCheckbox: null,
+    aspects: [],
+    onChangeAspect: null,
+    mapRef: null,
 };
 
 
@@ -68,9 +88,9 @@ class RoomBookingMapControl extends MapControl {
         mapControl.onAdd = () => {
             const div = Leaflet.DomUtil.create('div', classes);
             Leaflet.DomEvent.disableClickPropagation(div);
+            Leaflet.DomEvent.disableScrollPropagation(div);
             return div;
         };
-
         this.leafletElement = mapControl;
     }
 

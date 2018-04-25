@@ -20,6 +20,7 @@
 
 .map-container {
     & > * {
+        font-size: 14px;
         height: calc(100vh - (#{$indico-top-bar-height} + #{$menu-height} + 2em*2));
     }
 
@@ -35,10 +36,18 @@
         display: flex;
     }
 
-    .checkbox-control {
+    .map-control-content {
         background-color: $white;
         padding: 0.5em;
         border-radius: 0.25em;
-        font-size: 1em;
+        font-size: 0.85em;
+    }
+
+    .aspects-dropdown:global(.dropdown) {
+        min-width: 10em;
+
+        :global(.menu .item) {
+            font-size: 1em;
+        }
     }
 }
