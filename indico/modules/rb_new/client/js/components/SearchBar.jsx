@@ -39,17 +39,19 @@ export default class SearchBar extends React.Component {
 
     constructor(props) {
         super(props);
+
         this.state = {
             filtersVisible: false,
             filtersChanged: false,
-            text: '',
+            inputText: '',
             building: '',
             floor: ''
         };
     }
 
     componentDidMount() {
-        const {fetchBuildings} = this.props;
+        const {fetchBuildings, filters: {building, floor}} = this.props;
+        this.updateComponentState(null, {building, floor});
         fetchBuildings();
     }
 
@@ -78,18 +80,19 @@ export default class SearchBar extends React.Component {
 
     updateTextFilter(filterValue) {
         const {setTextFilter, filters: {text}} = this.props;
+        const {inputText} = this.state;
 
         if (filterValue === text) {
             return;
         }
 
         const parsedValues = parseSearchBarText(filterValue);
-        if (isEqual(parsedValues, parseSearchBarText(text))) {
+        if (isEqual(parsedValues, parseSearchBarText(inputText))) {
             return;
         }
 
-        const stateUpdates = {text: filterValue, filtersChanged: false};
-        stateUpdates.building = parsedValues.building;
+        const stateUpdates = {inputText: filterValue, filtersChanged: false};
+        stateUpdates.building = parsedValues.building ? parseInt(parsedValues.building, 10) : null;
         stateUpdates.floor = parsedValues.floor;
 
         this.updateComponentState('text', stateUpdates);
@@ -114,11 +117,11 @@ export default class SearchBar extends React.Component {
     updateComponentState(filterName, newState) {
         this.setState(newState, () => {
             let textValue = '';
-            const {setAdvancedFilter} = this.props;
-            const {text: stateText} = this.state;
+            const {setAdvancedFilter, filters: {text}} = this.props;
+            const {inputText} = this.state;
 
             if (filterName === 'text') {
-                textValue = stateText;
+                textValue = inputText;
             } else {
                 const stateToKeys = {building: 'bldg', floor: 'floor'};
                 let textParts = Object.entries(stateToKeys).filter(([stateKey]) => {
@@ -127,7 +130,6 @@ export default class SearchBar extends React.Component {
                     return `${searchKey}:${this.state[stateKey]}`; // eslint-disable-line react/destructuring-assignment
                 });
 
-                const text = parseSearchBarText(stateText).text;
                 if (text) {
                     textParts = [text, ...textParts];
                 }
@@ -135,8 +137,11 @@ export default class SearchBar extends React.Component {
                 textValue = textParts.join(' ');
             }
 
-            this.setState({text: textValue});
-            setAdvancedFilter('text', textValue);
+            this.setState({inputText: textValue});
+
+            if (text !== textValue) {
+                setAdvancedFilter('text', textValue);
+            }
         });
     }
 
@@ -158,8 +163,9 @@ export default class SearchBar extends React.Component {
 
         const buildings = Object.entries(buildingsList).map(([key, val]) => ({
             text: Translate.string('Building {number}', {number: val.number}),
-            value: key
+            value: parseInt(key, 10)
         }));
+
         const content = (
             <Form>
                 <Form.Field>
@@ -183,9 +189,9 @@ export default class SearchBar extends React.Component {
             </Form>
         );
 
-        const {filtersVisible, text} = this.state;
+        const {filtersVisible, inputText} = this.state;
         let inputIcon;
-        if (text) {
+        if (inputText) {
             inputIcon = <Icon link name="remove" onClick={() => this.updateTextFilter('')} />;
         } else {
             inputIcon = <Icon name="search" />;
@@ -211,7 +217,7 @@ export default class SearchBar extends React.Component {
                                icon={inputIcon}
                                debounceTimeout={300}
                                onChange={(event) => this.updateTextFilter(event.target.value)}
-                               value={text} />
+                               value={inputText} />
             </div>
         );
     }
