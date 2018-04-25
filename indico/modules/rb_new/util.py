@@ -17,13 +17,16 @@
 from __future__ import unicode_literals
 
 from collections import defaultdict
+from datetime import timedelta
 
 from flask import session
-from sqlalchemy.orm import raiseload
+from sqlalchemy.orm import contains_eager, raiseload
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.queries import escape_like
 from indico.modules.rb import rb_is_admin, rb_settings
+from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
+from indico.modules.rb.models.reservations import Reservation
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb_new.schemas import rooms_schema
 
@@ -86,3 +89,52 @@ def get_buildings():
         buildings_tmp[building_name]['longitude'] = room_with_lat_lon.longitude
         buildings_tmp[building_name]['latitude'] = room_with_lat_lon.latitude
     return buildings_tmp
+
+
+def get_existing_room_occurrences(room, start_dt, end_dt):
+    return (ReservationOccurrence.query
+            .filter(Reservation.room_id == room.id, ReservationOccurrence.start_dt >= start_dt,
+                    ReservationOccurrence.end_dt <= end_dt, ReservationOccurrence.is_valid)
+            .join(ReservationOccurrence.reservation)
+            .options(ReservationOccurrence.NO_RESERVATION_USER_STRATEGY,
+                     contains_eager(ReservationOccurrence.reservation))
+            .all())
+
+
+def get_room_conflicts(room, start_dt, end_dt, repeat_frequency, repeat_interval):
+    conflicts = []
+    pre_conflicts = []
+
+    candidates = ReservationOccurrence.create_series(start_dt, end_dt, (repeat_frequency, repeat_interval))
+    occurrences = ReservationOccurrence.find_overlapping_with(room, candidates).all()
+
+    for candidate in candidates:
+        for occurrence in occurrences:
+            if candidate.overlaps(occurrence):
+                if occurrence.reservation.is_accepted:
+                    conflicts.append(occurrence)
+                else:
+                    pre_conflicts.append(occurrence)
+
+    return conflicts, pre_conflicts
+
+
+def get_rooms_availability(rooms, start_dt, end_dt, repeat_frequency, repeat_interval, flexibility):
+    period_days = (end_dt - start_dt).days
+    availability = []
+
+    for room in rooms:
+        booking_limit_days = room.booking_limit_days or rb_settings.get('booking_limit')
+        if period_days > booking_limit_days:
+            continue
+
+        start_dt = start_dt + timedelta(days=flexibility)
+        end_dt = end_dt + timedelta(days=flexibility)
+        occurrences = get_existing_room_occurrences(room, start_dt, end_dt)
+        conflicts, pre_conflicts = get_room_conflicts(room, start_dt.replace(tzinfo=None), end_dt.replace(tzinfo=None),
+                                                      repeat_frequency, repeat_interval)
+
+        availability.append({'room': room, 'occurrences': occurrences, 'conflicts': conflicts,
+                             'pre_conflicts': pre_conflicts})
+
+    return availability

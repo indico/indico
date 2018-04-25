@@ -25,8 +25,9 @@ from indico.core.db.sqlalchemy.util.queries import with_total_rows
 from indico.modules.rb import Location
 from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.models.reservations import RepeatFrequency
-from indico.modules.rb_new.schemas import aspects_schema, rooms_schema
-from indico.modules.rb_new.util import get_buildings, search_for_rooms
+from indico.modules.rb.models.rooms import Room
+from indico.modules.rb_new.schemas import aspects_schema, reservation_occurrences_schema, rooms_schema
+from indico.modules.rb_new.util import get_buildings, get_rooms_availability, search_for_rooms
 
 
 class RHRoomBookingSearch(RHRoomBookingBase):
@@ -63,3 +64,23 @@ class RHRoomBookingAspects(RHRoomBookingBase):
 class RHRoomBookingBuildings(RHRoomBookingBase):
     def _process(self):
         return jsonify(get_buildings())
+
+
+class RHRoomBookingTimeline(RHRoomBookingBase):
+    @use_args({
+        'room_ids': fields.List(fields.Int()),
+        'start_dt': fields.DateTime(),
+        'end_dt': fields.DateTime(),
+        'repeat_frequency': EnumField(RepeatFrequency),
+        'repeat_interval': fields.Int(missing=0),
+        'flexibility': fields.Int(missing=0)
+    })
+    def _process(self, args):
+        rooms = Room.query.filter(Room.is_active, Room.id.in_(args.pop('room_ids')))
+        availabilities = get_rooms_availability(rooms, **args)
+        for availability in availabilities:
+            availability['room'] = rooms_schema.dump(availability['room'], many=False).data
+            availability['occurrences'] = reservation_occurrences_schema.dump(availability['occurrences']).data
+            availability['conflicts'] = reservation_occurrences_schema.dump(availability['conflicts']).data
+            availability['pre_conflicts'] = reservation_occurrences_schema.dump(availability['pre_conflicts']).data
+        return jsonify(availabilities)

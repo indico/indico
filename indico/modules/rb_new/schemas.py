@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 
 from indico.core.marshmallow import mm
 from indico.modules.rb.models.aspects import Aspect
+from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.rooms import Room
 
 
@@ -35,5 +36,12 @@ class AspectSchema(mm.ModelSchema):
                   'default_on_startup')
 
 
+class ReservationOccurrenceSchema(mm.ModelSchema):
+    class Meta:
+        model = ReservationOccurrence
+        fields = ('start_dt', 'end_dt', 'reservation_id', 'is_valid')
+
+
 rooms_schema = RoomSchema(many=True)
 aspects_schema = AspectSchema(many=True)
+reservation_occurrences_schema = ReservationOccurrenceSchema(many=True)
