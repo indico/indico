@@ -52,6 +52,17 @@ export const queryString = {
         validator: v.isInt({min: 1}),
         sanitizer: v.toInt(),
         stateField: 'filters.capacity'
+    },
+    building: {
+        validator: v.isInt(),
+        sanitizer: v.toInt(),
+        stateField: 'filters.building'
+    },
+    floor: {
+        stateField: 'filters.floor'
+    },
+    text: {
+        stateField: 'filters.text'
     }
 };
 
@@ -99,6 +110,9 @@ export const ajax = {
         }
     },
     capacity: ({capacity}) => capacity,
+    building: ({building}) => building,
+    floor: ({floor}) => floor,
+    text: ({text}) => text,
     start_dt: {
         onlyIf: (data) => 'dates' in data,
         serializer: _dtHandler('start')

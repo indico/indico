@@ -22,7 +22,7 @@ import {fetchBuildings, fetchRooms, setFilterParameter} from '../actions';
 
 
 export default (namespace) => {
-    const mapStateToProps = ({roomList}) => ({...roomList});
+    const mapStateToProps = (state) => ({...state[namespace]});
 
     const mapDispatchToProps = dispatch => ({
         setTextFilter: (value) => {

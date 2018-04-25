@@ -18,6 +18,7 @@
 import moment from 'moment';
 
 import * as actions from '../../actions';
+import {parseSearchBarText} from '../../util';
 
 
 const initialStateFactory = (namespace) => {
@@ -41,6 +42,11 @@ const initialStateFactory = (namespace) => {
                 startTime: null,
                 endTime: null
             }
+        });
+    } else if (namespace === 'roomList') {
+        Object.assign(state, {
+            building: null,
+            floor: null
         });
     }
 
@@ -72,7 +78,14 @@ function mergeFilter(filters, param, data) {
             // default for the end date
             newFilters.dates.endDate = calculateDefaultEndDate(startDate, type, number, interval).format('YYYY-MM-DD');
         }
+    } else if (param === 'text') {
+        const dd = parseSearchBarText(data);
+
+        newFilters.text = dd.text || null;
+        newFilters.building = dd.building || null;
+        newFilters.floor = dd.floor || null;
     }
+
     return newFilters;
 }
 

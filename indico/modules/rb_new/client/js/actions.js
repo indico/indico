@@ -20,7 +20,7 @@ import fetchDefaultLocationUrl from 'indico-url:rooms_new.default_location';
 import fetchBuildingsUrl from 'indico-url:rooms_new.buildings';
 
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
-import {parseSearchBarText, preProcessParameters} from './util';
+import {preProcessParameters} from './util';
 import {ajax as ajaxFilterRules} from './serializers/filters';
 
 
@@ -62,28 +62,20 @@ export function updateRooms(rooms, total, clear) {
 
 export function fetchRooms(namespace, clear = true) {
     return async (dispatch, getStore) => {
+        const {filters, rooms: {list: oldRoomList, isFetching}} = getStore()[namespace];
+
+        if (isFetching) {
+            return;
+        }
+
         dispatch(fetchRoomsStarted());
 
-        const {filters: {text}, filters, rooms: {list: oldRoomList}} = getStore()[namespace];
-        const parsed = parseSearchBarText(text);
         const params = preProcessParameters(filters, ajaxFilterRules);
 
         Object.assign(params, {
             offset: (clear ? 0 : oldRoomList.length),
             limit: 20
         });
-
-        if (parsed.text) {
-            params.room_name = parsed.text;
-        }
-
-        if (parsed.building) {
-            params.building = parsed.building;
-        }
-
-        if (parsed.floor) {
-            params.floor = parsed.floor;
-        }
 
         let response;
         try {
