@@ -71,6 +71,8 @@ Improvements
 - Use the user's preferred name format in more places
 - Add "back to conference" link when viewing a conference timetable using
   a meeting theme (:issue:`3297`, thanks :user:`bpedersen2`)
+- Allow definition lists in places where Markdown or HTML is accepted
+  (:issue:`3325`)
 
 Bugfixes
 ^^^^^^^^

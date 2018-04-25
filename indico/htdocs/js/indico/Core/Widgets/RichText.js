@@ -278,7 +278,8 @@ function initializeEditor( wrapper, editorId, text, callbacks, width, height, si
                 {name: 'about'}
             ],
             format_tags: 'p;h1;h2;h3;pre',
-            removeDialogTabs: 'image:advanced;link:advanced'
+            removeDialogTabs: 'image:advanced;link:advanced',
+            extraAllowedContent: 'dl dt dd'
         };
 
         if (simple) {
