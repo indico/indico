@@ -16,7 +16,7 @@
 
 import ast
 import json
-from datetime import date
+from datetime import date, time
 
 from sqlalchemy import and_, cast, func, or_
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -566,6 +566,17 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
                              Blocking.end_date >= end_dt.date()]
         blockings_filter = Room.blocked_rooms.any(and_(*blocking_criteria))
         return ~occurrences_filter & ~blockings_filter
+
+    @staticmethod
+    def filter_bookable_hours(start_time, end_time):
+        if end_time == time(0):
+            end_time = time(23, 59, 59)
+        period_end_time = db.case({time(0): time(23, 59, 59)}, else_=BookableHours.end_time,
+                                  value=BookableHours.end_time)
+        bookable_hours_filter = Room.bookable_hours.any(
+            (BookableHours.start_time <= start_time) & (period_end_time >= end_time)
+        )
+        return ~Room.bookable_hours.any() | bookable_hours_filter
 
     @staticmethod
     def find_with_filters(filters, user=None):

@@ -18,14 +18,20 @@ from __future__ import unicode_literals
 
 from collections import defaultdict
 
+from flask import session
+from sqlalchemy.orm import raiseload
+
 from indico.core.db import db
-from indico.modules.rb import rb_settings
+from indico.modules.rb import rb_is_admin, rb_settings
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb_new.schemas import rooms_schema
 
 
 def search_for_rooms(filters, only_available=False):
-    query = Room.query.filter(Room.is_active).order_by(db.func.indico.natsort(Room.full_name))
+    query = (Room.query
+             .options(raiseload('owner'))
+             .filter(Room.is_active)
+             .order_by(db.func.indico.natsort(Room.full_name)))
     criteria = {}
 
     if 'capacity' in filters:
@@ -41,25 +47,23 @@ def search_for_rooms(filters, only_available=False):
         criteria['floor'] = filters['floor']
 
     query = query.filter_by(**criteria)
-    if only_available:
-        start_dt, end_dt = filters['start_dt'], filters['end_dt']
-        repeatability = (filters['repeat_frequency'], filters['repeat_interval'])
-        query = query.filter(Room.is_active,
-                             Room.filter_available(start_dt, end_dt, repeatability, include_pre_bookings=True,
-                                                   include_pending_blockings=True))
-        selected_period_days = (filters['end_dt'] - filters['start_dt']).days
+    if not only_available:
+        return query.all()
 
-        rooms = []
-        for room in query:
-            booking_limit_days = room.booking_limit_days or rb_settings.get('booking_limit')
-            if booking_limit_days is not None and selected_period_days > booking_limit_days:
-                continue
-            if not room.check_bookable_hours(start_dt.time(), end_dt.time(), quiet=True):
-                continue
-            rooms.append(room)
-    else:
-        rooms = query.all()
-    return rooms
+    start_dt, end_dt = filters['start_dt'], filters['end_dt']
+    repeatability = (filters['repeat_frequency'], filters['repeat_interval'])
+    query = query.filter(Room.filter_available(start_dt, end_dt, repeatability, include_pre_bookings=True,
+                                               include_pending_blockings=True))
+    if not rb_is_admin(session.user):
+        selected_period_days = (filters['end_dt'] - filters['start_dt']).days
+        booking_limit_days = db.func.coalesce(Room.booking_limit_days, rb_settings.get('booking_limit'))
+
+        own_rooms = [r.id for r in Room.get_owned_by(session.user)]
+        query = query.filter(db.or_(Room.id.in_(own_rooms) if own_rooms else False,
+                                    db.and_(Room.filter_bookable_hours(start_dt.time(), end_dt.time()),
+                                            db.or_(booking_limit_days.is_(None),
+                                                   selected_period_days <= booking_limit_days))))
+    return query.all()
 
 
 def get_buildings():
