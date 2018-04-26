@@ -34,17 +34,24 @@ function mergeRooms(state, action) {
     };
 }
 
-export function roomsReducer(state = initialRoomsState, action) {
-    switch (action.type) {
-        case actions.FETCH_ROOMS_STARTED:
-            return {...state, isFetching: true};
-        case actions.FETCH_ROOMS_FAILED:
-            return {...state, isFetching: false};
-        case actions.UPDATE_ROOMS:
-            return {...state, isFetching: false, ...mergeRooms(state, action)};
-        default:
+
+export function roomsReducerFactory(namespace) {
+    return (state = initialRoomsState, action) => {
+        if (action.namespace !== namespace) {
             return state;
-    }
+        }
+
+        switch (action.type) {
+            case actions.FETCH_ROOMS_STARTED:
+                return {...state, isFetching: true};
+            case actions.FETCH_ROOMS_FAILED:
+                return {...state, isFetching: false};
+            case actions.UPDATE_ROOMS:
+                return {...state, isFetching: false, ...mergeRooms(state, action)};
+            default:
+                return state;
+        }
+    };
 }
 
 

@@ -18,18 +18,14 @@
 import {connect} from 'react-redux';
 
 import SearchBar from '../components/SearchBar';
-import {fetchBuildings, fetchRooms, setFilterParameter} from '../actions';
+import {fetchBuildings, setFilterParameter} from '../actions';
 
 
 export default (namespace) => {
     const mapStateToProps = (state) => ({...state[namespace]});
 
     const mapDispatchToProps = dispatch => ({
-        setTextFilter: (value) => {
-            dispatch(setFilterParameter(namespace, 'text', value));
-            dispatch(fetchRooms(namespace));
-        },
-        setAdvancedFilter: (param, value) => {
+        setFilterParameter: (param, value) => {
             dispatch(setFilterParameter(namespace, param, value));
         },
         fetchBuildings: () => {

@@ -72,7 +72,7 @@ export default class BookRoom extends React.Component {
                     <RoomSearchPane rooms={rooms}
                                     fetchRooms={fetchRooms}
                                     filterBar={<FilterBar />}
-                                    searchBar={<SearchBar onConfirm={fetchRooms} />} />
+                                    searchBar={<SearchBar onConfirm={fetchRooms} onTextChange={fetchRooms} />} />
                 </Grid.Column>
                 <Grid.Column width={5}>
                     {bounds && (

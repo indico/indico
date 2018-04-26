@@ -53,11 +53,6 @@ export default class RoomList extends React.Component {
         }
     }
 
-    componentDidMount() {
-        const {fetchRooms} = this.props;
-        fetchRooms();
-    }
-
     render() {
         const {fetchRooms, map: {bounds, search}} = this.props;
         return (
@@ -65,7 +60,7 @@ export default class RoomList extends React.Component {
                 <Grid.Column width={11}>
                     <RoomSearchPane {...this.props}
                                     filterBar={<FilterBar />}
-                                    searchBar={<SearchBar onConfirm={fetchRooms} />} />
+                                    searchBar={<SearchBar onConfirm={fetchRooms} onTextChange={fetchRooms} />} />
                 </Grid.Column>
                 <Grid.Column width={5}>
                     {bounds && (
