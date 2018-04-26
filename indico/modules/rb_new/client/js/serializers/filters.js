@@ -114,11 +114,11 @@ export const ajax = {
     floor: ({floor}) => floor,
     text: ({text}) => text,
     start_dt: {
-        onlyIf: (data) => 'dates' in data,
+        onlyIf: (data) => data.dates && data.dates.startDate,
         serializer: _dtHandler('start')
     },
     end_dt: {
-        onlyIf: (data) => 'dates' in data,
+        onlyIf: (data) => data.dates && data.dates.endDate,
         serializer: _dtHandler('end')
     }
 };
