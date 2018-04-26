@@ -26,6 +26,7 @@ import RoomSearchPane from '../RoomSearchPane';
 import RoomFilterBar from '../RoomFilterBar';
 import filterBarFactory from '../../containers/FilterBar';
 import searchBarFactory from '../../containers/SearchBar';
+import {getMapBounds} from '../../util';
 
 
 const FilterBar = filterBarFactory('roomList', RoomFilterBar);
@@ -35,26 +36,33 @@ const SearchBar = searchBarFactory('roomList');
 export default class RoomList extends React.Component {
     static propTypes = {
         fetchRooms: PropTypes.func.isRequired,
-        bounds: PropTypes.array,
-        fetchMapDefaultLocation: PropTypes.func.isRequired,
-        map: PropTypes.object.isRequired
-    }
-
-    static defaultProps = {
-        bounds: null
+        fetchMapDefaultAspects: PropTypes.func.isRequired,
+        map: PropTypes.shape({
+            bounds: PropTypes.array,
+        }).isRequired,
+        updateLocation: PropTypes.func.isRequired,
     };
 
     constructor(props) {
         super(props);
-
-        const {bounds, fetchMapDefaultLocation} = this.props;
+        const {map: {bounds}, fetchMapDefaultAspects} = this.props;
         if (!bounds) {
-            fetchMapDefaultLocation();
+            fetchMapDefaultAspects();
         }
     }
 
+    componentDidMount() {
+        const {fetchRooms} = this.props;
+        fetchRooms();
+    }
+
+    onMove(e) {
+        const {updateLocation} = this.props;
+        updateLocation(getMapBounds(e.target));
+    }
+
     render() {
-        const {fetchRooms, map: {bounds, search}} = this.props;
+        const {fetchRooms, map: {bounds}} = this.props;
         return (
             <Grid columns={2}>
                 <Grid.Column width={11}>
@@ -64,9 +72,7 @@ export default class RoomList extends React.Component {
                 </Grid.Column>
                 <Grid.Column width={5}>
                     {bounds && (
-                        <RoomBookingMap bounds={bounds} onMove={(e) => console.log(e)}
-                                        searchCheckbox isSearchEnabled={search}
-                                        onToggleSearchCheckbox={(e, data) => console.log(data.checked)} />
+                        <RoomBookingMap bounds={bounds} onMove={(e) => this.onMove(e)} />
                     )}
                 </Grid.Column>
             </Grid>

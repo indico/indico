@@ -47,7 +47,7 @@ export default function RoomBookingMap(props) {
                                   checked={isSearchEnabled} styleName="map-control-content" />
                     </RoomBookingMapControl>
                 )}
-                {aspects && (
+                {aspects.length && (
                     <RoomBookingMapControl position="bottomleft">
                         <Dropdown placeholder={Translate.string('Select aspect')} selection upward
                                   options={aspectOptions} defaultValue={aspects.findIndex(op => op.default_on_startup)}
