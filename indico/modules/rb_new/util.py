@@ -32,23 +32,19 @@ def search_for_rooms(filters, only_available=False):
              .options(raiseload('owner'))
              .filter(Room.is_active)
              .order_by(db.func.indico.natsort(Room.full_name)))
-    criteria = {}
 
+    criteria = {}
     if 'capacity' in filters:
         query = query.filter(db.or_(Room.capacity >= (filters['capacity'] * 0.8), Room.capacity.is_(None)))
-
     if 'room_name' in filters:
         query = query.filter(Room.name.ilike('%{}%'.format(filters['room_name'])))
-
     if 'building' in filters:
         criteria['building'] = filters['building']
-
     if 'floor' in filters:
         criteria['floor'] = filters['floor']
-
     query = query.filter_by(**criteria)
     if not only_available:
-        return query.all()
+        return query
 
     start_dt, end_dt = filters['start_dt'], filters['end_dt']
     repeatability = (filters['repeat_frequency'], filters['repeat_interval'])
@@ -63,7 +59,7 @@ def search_for_rooms(filters, only_available=False):
                                     db.and_(Room.filter_bookable_hours(start_dt.time(), end_dt.time()),
                                             db.or_(booking_limit_days.is_(None),
                                                    selected_period_days <= booking_limit_days))))
-    return query.all()
+    return query
 
 
 def get_buildings():

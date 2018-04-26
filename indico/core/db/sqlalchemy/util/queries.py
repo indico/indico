@@ -168,3 +168,21 @@ def get_n_matching(query, n, predicate):
             break
         results.extend(x for x in objects if predicate(x))
     return results[:n]
+
+
+def with_total_rows(query, single_entity=True):
+    """Get the result of a query and its total row count.
+
+    :param query: a sqlalchemy query
+    :param single_entity: whether the original query only returns
+                          a single entity. In this case, each
+                          returned result will just be that entity
+                          instead of a tuple.
+    :return: a ``(results, total_count)`` tuple
+    """
+    res = query.add_columns(func.count().over()).all()
+    if not res:
+        return [], 0
+    total = res[0][-1]
+    rows = [row[0] for row in res] if single_entity else [row[:-1] for row in res]
+    return rows, total
