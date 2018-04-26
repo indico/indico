@@ -15,7 +15,11 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+ @import '../../styles/main';
+
 .room-list {
+    padding: $rb-content-padding;
+
     .results-count {
         margin-bottom: 10px;
         font-weight: bold;

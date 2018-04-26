@@ -15,37 +15,73 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import moment from 'moment';
 import React from 'react';
 import {Link} from 'react-router-dom';
 import Calendar from 'rc-calendar';
 import RangeCalendar from 'rc-calendar/lib/RangeCalendar';
 import DatePicker from 'rc-calendar/lib/Picker';
 import TimePicker from 'rc-time-picker';
-import {Button, Grid, Image, Form, Select} from 'semantic-ui-react';
-import {Translate} from 'indico/react/i18n';
+import {Button, Grid, Form, Select} from 'semantic-ui-react';
+import _ from 'lodash';
+import {toMoment} from '../../util';
 
 import './Landing.module.scss';
 
 
-export default class Landing extends React.Component {
-    constructor(props) {
-        super(props);
+const _serializeTime = time => (time ? time.format('HH:mm') : null);
 
-        this.state = {
-            bookingType: null,
-            number: null,
-            interval: null,
-            startTime: null,
-            endTime: null,
-            startDate: null,
-            endDate: null
-        };
+
+export default class Landing extends React.Component {
+    static getDerivedStateFromProps({
+        recurrence: {type, interval, number},
+        dates: {startDate, endDate},
+        timeSlot: {startTime, endTime}
+    }, prevState) {
+        return {
+            ...prevState,
+            ..._.omitBy({
+                bookingType: type,
+                interval,
+                number,
+                startDate: startDate,
+                endDate: endDate,
+                startTime: toMoment(startTime, 'HH:mm'),
+                endTime: toMoment(endTime, 'HH:mm')
+            }, _.isNull)};
     }
 
-    updateBookingType = (bookingType) => {
+    constructor(props) {
+        super(props);
+        this.state = {};
+    }
+
+    componentDidMount() {
         const {setFilterParameter} = this.props;
-        this.setState({bookingType});
-        setFilterParameter('recurrence', {type: bookingType !== 'single' ? 'every' : 'single', number: null, interval: null});
+        const startTime = moment().endOf('hour').add(1, 'm');
+        setFilterParameter('recurrence', {
+            type: 'single'
+        });
+        setFilterParameter('dates', {
+            startDate: moment().format('YYYY-MM-DD')
+        });
+        setFilterParameter('timeSlot', {
+            startTime: _serializeTime(startTime),
+            endTime: _serializeTime(startTime.clone().add(1, 'h'))
+        });
+    }
+
+    updateBookingType = (newType) => {
+        const {setFilterParameter} = this.props;
+        const {bookingType} = this.state;
+        let {number, interval} = this.state;
+
+        if (newType === 'every' && bookingType !== newType) {
+            number = 1;
+            interval = 'week';
+        }
+
+        setFilterParameter('recurrence', {type: newType, number, interval});
     }
 
     updateNumber = (number) => {
@@ -57,7 +93,7 @@ export default class Landing extends React.Component {
     updateInterval = (interval) => {
         const {setFilterParameter} = this.props;
         this.setState({interval});
-        setFilterParameter('recurrence', {type: 'every', number: parseInt(this.state.number, 10), interval: interval});
+        setFilterParameter('recurrence', {type: 'every', number: parseInt(this.state.number, 10), interval});
     }
 
     updateTimes = (startTime, endTime) => {
@@ -89,7 +125,7 @@ export default class Landing extends React.Component {
     }
 
     render() {
-        const {bookingType, startTime, endTime, startDate, endDate} = this.state;
+        const {bookingType, startTime, endTime, startDate, endDate, number, interval} = this.state;
         const timePickerProps = {
             minuteStep: 5,
             format: 'HH:mm',
@@ -110,17 +146,17 @@ export default class Landing extends React.Component {
                                             onChange={(e, {value}) => this.updateBookingType(value)}/>
                                 <Form.Radio label="Recurring booking"
                                             name="bookingType"
-                                            value="recurring"
-                                            checked={bookingType === 'recurring'}
+                                            value="every"
+                                            checked={bookingType === 'every'}
                                             onChange={(e, {value}) => this.updateBookingType(value)}/>
                             </Form.Group>
-                            {bookingType === 'recurring' &&
+                            {bookingType === 'every' &&
                                 <>
                                     <Form.Group inline>
                                         <label>Every</label>
-                                        <Form.Input type="number" onChange={(event, data) => this.updateNumber(data.value)}/>
-                                        <Select options={[{text: 'Weeks', value: 'weeks'}, {text: 'Days', value: 'days'}]}
-                                                onChange={(event, data) => this.updateInterval(data.value)}/>
+                                        <Form.Input value={number} type="number" onChange={(event, data) => this.updateNumber(data.value)}/>
+                                        <Select value={interval} options={[{text: 'Days', value: 'day'}, {text: 'Weeks', value: 'week'}, {text: 'Months', value: 'month'}]}
+                                                onChange={(event, data) => this.updateInterval(data.value)} />
                                     </Form.Group>
                                     <Form.Group inline>
                                         <DatePicker calendar={<RangeCalendar
@@ -142,7 +178,7 @@ export default class Landing extends React.Component {
                                     </Form.Group>
                                 </>
                             }
-                            {bookingType !== 'recurring' &&
+                            {bookingType !== 'every' &&
                                 <DatePicker calendar={<Calendar />}
                                             onChange={(value) => this.updateDates(value, null)}>
                                     {
