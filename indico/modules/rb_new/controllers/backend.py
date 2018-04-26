@@ -21,6 +21,7 @@ from marshmallow_enum import EnumField
 from webargs import fields
 from webargs.flaskparser import use_args
 
+from indico.core.db.sqlalchemy.util.queries import with_total_rows
 from indico.modules.rb import Location
 from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.models.reservations import RepeatFrequency
@@ -43,9 +44,8 @@ class RHRoomBookingSearch(RHRoomBookingBase):
     })
     def _process(self, args):
         filter_availability = args.get('start_dt') and args.get('end_dt')
-        rooms = search_for_rooms(args, only_available=filter_availability)
-        total = len(rooms)
-        rooms = rooms[args['offset']:args['offset']+args['limit']]
+        query = search_for_rooms(args, only_available=filter_availability)
+        rooms, total = with_total_rows(query)
         return jsonify(total=total, rooms=rooms_schema.dump(rooms).data)
 
 
