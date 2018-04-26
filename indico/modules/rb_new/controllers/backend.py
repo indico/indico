@@ -45,6 +45,7 @@ class RHRoomBookingSearch(RHRoomBookingBase):
     def _process(self, args):
         filter_availability = args.get('start_dt') and args.get('end_dt')
         query = search_for_rooms(args, only_available=filter_availability)
+        query = query.limit(args['limit']).offset(args['offset'])
         rooms, total = with_total_rows(query)
         return jsonify(total=total, rooms=rooms_schema.dump(rooms).data)
 
