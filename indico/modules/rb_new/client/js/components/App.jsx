@@ -23,7 +23,7 @@ import {Icon} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 import UserActions from '../containers/UserActions';
-import Landing from './pages/Landing';
+import Landing from '../containers/Landing';
 import Calendar from './pages/Calendar';
 import BookRoom from '../containers/BookRoom';
 import RoomList from '../containers/RoomList';
