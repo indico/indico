@@ -212,4 +212,4 @@ class TimetablePDFExportForm(IndicoForm):
 
 
 class ImportContributionsForm(IndicoForm):
-    source_file = FileField(_("Source File"), accepted_file_types='.csv')
+    source_file = FileField(_("Source File"), [DataRequired()], accepted_file_types='.csv')
