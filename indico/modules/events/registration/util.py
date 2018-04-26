@@ -518,7 +518,7 @@ def update_regform_item_positions(regform):
 
 def import_registrations_from_csv(regform, fileobj, skip_moderation=True, notify_users=False):
     """Import event registrants from a CSV file into a form."""
-    reader = csv.reader(fileobj)
+    reader = csv.reader(fileobj.read().splitlines())
     query = db.session.query(Registration.email).with_parent(regform).filter(Registration.is_active)
     registered_emails = {email for (email,) in query}
     used_emails = set()
