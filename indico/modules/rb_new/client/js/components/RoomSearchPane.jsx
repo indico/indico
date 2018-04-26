@@ -79,7 +79,7 @@ export default class RoomSearchPane extends React.Component {
 export function Room({room}) {
     return (
         <Card styleName="room-card">
-            <Image src={room.small_photo_url} />
+            <Image src={room.large_photo_url} />
             <Card.Content>
                 <Card.Description styleName="room-description">
                     {room.full_name}
