@@ -18,14 +18,17 @@
 import {connect} from 'react-redux';
 
 import RoomList from '../components/pages/RoomList';
-import {fetchMapDefaultLocation, fetchRooms} from '../actions';
+import {fetchMapDefaultAspects, fetchRooms, updateLocation} from '../actions';
 
 
 const mapStateToProps = ({roomList}) => ({...roomList});
 
 const mapDispatchToProps = dispatch => ({
-    fetchMapDefaultLocation: () => {
-        dispatch(fetchMapDefaultLocation());
+    fetchMapDefaultAspects: (callback) => {
+        dispatch(fetchMapDefaultAspects()).then(callback);
+    },
+    updateLocation: (location) => {
+        dispatch(updateLocation(location));
     },
     fetchRooms: (clear = true) => {
         dispatch(fetchRooms('roomList', clear));
