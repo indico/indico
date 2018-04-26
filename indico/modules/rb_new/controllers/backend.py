@@ -32,7 +32,7 @@ from indico.modules.rb_new.util import get_buildings, search_for_rooms
 class RHRoomBookingSearch(RHRoomBookingBase):
     @use_args({
         'capacity': fields.Int(),
-        'room_name': fields.Str(load_from='text'),
+        'text': fields.Str(),
         'start_dt': fields.DateTime(),
         'end_dt': fields.DateTime(),
         'repeat_frequency': EnumField(RepeatFrequency),

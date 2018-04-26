@@ -22,6 +22,7 @@ from flask import session
 from sqlalchemy.orm import raiseload
 
 from indico.core.db import db
+from indico.core.db.sqlalchemy.util.queries import escape_like
 from indico.modules.rb import rb_is_admin, rb_settings
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb_new.schemas import rooms_schema
@@ -36,13 +37,13 @@ def search_for_rooms(filters, only_available=False):
     criteria = {}
     if 'capacity' in filters:
         query = query.filter(db.or_(Room.capacity >= (filters['capacity'] * 0.8), Room.capacity.is_(None)))
-    if 'room_name' in filters:
-        query = query.filter(Room.name.ilike('%{}%'.format(filters['room_name'])))
     if 'building' in filters:
         criteria['building'] = filters['building']
     if 'floor' in filters:
         criteria['floor'] = filters['floor']
     query = query.filter_by(**criteria)
+    if 'text' in filters:
+        query = query.filter(_make_room_text_filter(filters['text']))
     if not only_available:
         return query
 
@@ -60,6 +61,12 @@ def search_for_rooms(filters, only_available=False):
                                             db.or_(booking_limit_days.is_(None),
                                                    selected_period_days <= booking_limit_days))))
     return query
+
+
+def _make_room_text_filter(text):
+    text = '%{}%'.format(escape_like(text))
+    columns = ('name', 'site', 'division', 'building', 'floor', 'number', 'comments', 'full_name')
+    return db.or_(getattr(Room, col).ilike(text) for col in columns)
 
 
 def get_buildings():
