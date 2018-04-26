@@ -23,7 +23,7 @@ export function toMoment(dt, format) {
 }
 
 export function parseSearchBarText(text) {
-    const result = {text: '', building: '', floor: ''};
+    const result = {text: null, building: null, floor: null};
     if (!text) {
         return result;
     }
@@ -38,7 +38,7 @@ export function parseSearchBarText(text) {
         if (value && ['bldg', 'floor'].includes(filter)) {
             result[filter !== 'bldg' ? filter : 'building'] = value;
         } else {
-            result.text = item ? item.trim() : '';
+            result.text = item ? item.trim() : null;
         }
     }
 

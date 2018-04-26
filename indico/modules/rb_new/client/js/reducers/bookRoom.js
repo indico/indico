@@ -17,13 +17,13 @@
 
 import {combineReducers} from 'redux';
 
-import {roomsReducer, buildingsReducer} from './roomBooking/roomList';
+import {roomsReducerFactory, buildingsReducer} from './roomBooking/roomList';
 import filterReducerFactory from './roomBooking/filters';
 import mapReducer from './roomBooking/map';
 
 
 const reducer = combineReducers({
-    rooms: roomsReducer,
+    rooms: roomsReducerFactory('bookRoom'),
     filters: filterReducerFactory('bookRoom'),
     map: mapReducer,
     buildings: buildingsReducer

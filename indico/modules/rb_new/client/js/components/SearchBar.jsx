@@ -15,7 +15,6 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import isEqual from 'lodash/isEqual';
 import PropTypes from 'prop-types';
 import React from 'react';
 import {Button, Form, Icon, Input, Popup, Select} from 'semantic-ui-react';
@@ -29,126 +28,110 @@ import './SearchBar.module.scss';
 
 export default class SearchBar extends React.Component {
     static propTypes = {
-        setTextFilter: PropTypes.func.isRequired,
-        setAdvancedFilter: PropTypes.func.isRequired,
+        setFilterParameter: PropTypes.func.isRequired,
         fetchBuildings: PropTypes.func.isRequired,
-        onConfirm: PropTypes.func.isRequired,
         filters: PropTypes.object.isRequired,
-        buildings: PropTypes.object.isRequired
+        buildings: PropTypes.object.isRequired,
+        onConfirm: PropTypes.func.isRequired,
+        onTextChange: PropTypes.func.isRequired
     };
 
     constructor(props) {
         super(props);
 
+        const {filters: {building, floor, text}} = this.props;
         this.state = {
-            filtersVisible: false,
+            filtersPopupVisible: false,
             filtersChanged: false,
-            inputText: '',
-            building: '',
-            floor: ''
+            inputTextValue: null,
+            roomName: text,
+            building,
+            floor
         };
     }
 
-    componentDidMount() {
-        const {fetchBuildings, filters: {building, floor}} = this.props;
-        this.updateComponentState(null, {building, floor});
-        fetchBuildings();
+    componentDidMount = () => {
+        this.props.fetchBuildings(); // eslint-disable-line react/destructuring-assignment
+        this.setState({inputTextValue: this.composeInputTextValue()});
     }
 
-    componentWillUnmount() {
-        const {setAdvancedFilter} = this.props;
-        setAdvancedFilter('text', '');
+    componentWillUnmount = () => {
+        this.props.setFilterParameter('text', null); // eslint-disable-line react/destructuring-assignment
+        this.setState({building: null, floor: null, roomName: null, inputTextValue: null});
     }
 
-    toggleFiltersPopup(visible) {
-        this.setState({filtersVisible: visible});
+    toggleFiltersPopup = (visible) => {
+        this.setState({filtersPopupVisible: visible});
     }
 
-    onClose() {
+    close = () => {
         const {filtersChanged} = this.state;
         this.toggleFiltersPopup(false);
+
         if (filtersChanged) {
-            this.applyFilters();
+            const {onConfirm} = this.props;
+            onConfirm();
             this.setState({filtersChanged: false});
         }
     }
 
-    applyFilters() {
-        const {onConfirm} = this.props;
-        onConfirm();
-    }
+    composeInputTextValue = () => {
+        const stateToKeys = {building: 'bldg', floor: 'floor'};
+        const {roomName} = this.state;
 
-    updateTextFilter(filterValue) {
-        const {setTextFilter, filters: {text}} = this.props;
-        const {inputText} = this.state;
+        let textParts = Object.entries(stateToKeys)
+            .filter(([stateKey]) => {
+                return !!this.state[stateKey]; // eslint-disable-line react/destructuring-assignment
+            })
+            .map(([stateKey, searchKey]) => {
+                return `${searchKey}:${this.state[stateKey]}`; // eslint-disable-line react/destructuring-assignment
+            });
 
-        if (filterValue === text) {
-            return;
+        if (roomName) {
+            textParts = [roomName, ...textParts];
         }
 
-        const parsedValues = parseSearchBarText(filterValue);
-        if (isEqual(parsedValues, parseSearchBarText(inputText))) {
-            return;
-        }
-
-        const stateUpdates = {inputText: filterValue, filtersChanged: false};
-        stateUpdates.building = parsedValues.building ? parseInt(parsedValues.building, 10) : null;
-        stateUpdates.floor = parsedValues.floor;
-
-        this.updateComponentState('text', stateUpdates);
-        setTextFilter(filterValue);
+        return textParts.length ? textParts.join(' ') : null;
     }
 
-    updateFilter(filterName, value) {
-        const stateUpdates = {[filterName]: value};
+    didFiltersChange = () => {
+        const {filters} = this.props;
+        const {building, floor, roomName} = this.state;
+
+        return roomName !== filters.text || building !== filters.building || floor !== filters.floor;
+    }
+
+    updateTextFilter = (filterValue) => {
+        const {setFilterParameter, onTextChange} = this.props;
+        const {building, text: roomName, floor} = parseSearchBarText(filterValue);
+        const stateUpdates = {inputTextValue: filterValue, building, floor, roomName};
+
+        this.setState(stateUpdates, () => {
+            this.composeInputTextValue();
+            setFilterParameter('text', filterValue);
+            onTextChange();
+        });
+    }
+
+    updateFilter = (filterName, value) => {
+        const filterValue = value || null;
+        const stateChanges = {[filterName]: filterValue};
+        const {setFilterParameter} = this.props;
 
         if (filterName === 'building') {
-            stateUpdates.floor = '';
+            stateChanges.floor = null;
         }
 
-        // eslint-disable-next-line react/destructuring-assignment
-        if (this.state[filterName] !== value) {
-            stateUpdates.filtersChanged = true;
-        }
-
-        this.updateComponentState(filterName, stateUpdates);
-    }
-
-    updateComponentState(filterName, newState) {
-        this.setState(newState, () => {
-            let textValue = '';
-            const {setAdvancedFilter, filters: {text}} = this.props;
-            const {inputText} = this.state;
-
-            if (filterName === 'text') {
-                textValue = inputText;
-            } else {
-                const stateToKeys = {building: 'bldg', floor: 'floor'};
-                let textParts = Object.entries(stateToKeys).filter(([stateKey]) => {
-                    return !!this.state[stateKey]; // eslint-disable-line react/destructuring-assignment
-                }).map(([stateKey, searchKey]) => {
-                    return `${searchKey}:${this.state[stateKey]}`; // eslint-disable-line react/destructuring-assignment
-                });
-
-                if (text) {
-                    textParts = [text, ...textParts];
-                }
-
-                textValue = textParts.join(' ');
-            }
-
-            this.setState({inputText: textValue});
-
-            if (text !== textValue) {
-                setAdvancedFilter('text', textValue);
-            }
+        this.setState(stateChanges, () => {
+            const inputTextValue = this.composeInputTextValue();
+            this.setState({inputTextValue, filtersChanged: this.didFiltersChange()});
+            setFilterParameter('text', inputTextValue);
         });
     }
 
     render() {
         const commonAttrs = {
-            search: true,
-            selection: true
+            search: true
         };
 
         const {buildings: {list: buildingsList, isFetching}} = this.props;
@@ -172,7 +155,7 @@ export default class SearchBar extends React.Component {
                     <Select {...commonAttrs} placeholder={Translate.string('Select building')}
                             loading={isFetching}
                             onChange={(event, data) => this.updateFilter('building', data.value)}
-                            value={building}
+                            value={building && parseInt(building, 10)}
                             options={[{text: '', value: ''}, ...buildings]} />
                 </Form.Field>
                 <Form.Field>
@@ -182,16 +165,16 @@ export default class SearchBar extends React.Component {
                             options={[{text: '', value: ''}, ...floors]} />
                 </Form.Field>
                 <Form.Field>
-                    <Button primary onClick={() => this.onClose()} disabled={!filtersChanged}>
+                    <Button primary onClick={this.close} disabled={!filtersChanged}>
                         <Translate>Apply</Translate>
                     </Button>
                 </Form.Field>
             </Form>
         );
 
-        const {filtersVisible, inputText} = this.state;
+        const {filtersPopupVisible, inputTextValue} = this.state;
         let inputIcon;
-        if (inputText) {
+        if (inputTextValue) {
             inputIcon = <Icon link name="remove" onClick={() => this.updateTextFilter('')} />;
         } else {
             inputIcon = <Icon name="search" />;
@@ -207,8 +190,8 @@ export default class SearchBar extends React.Component {
         return (
             <div styleName="room-filters">
                 <Popup trigger={popupTrigger}
-                       onClose={() => this.onClose()}
-                       open={filtersVisible}
+                       onClose={this.close}
+                       open={filtersPopupVisible}
                        content={content}
                        position="bottom left"
                        on="click" />
@@ -217,7 +200,7 @@ export default class SearchBar extends React.Component {
                                icon={inputIcon}
                                debounceTimeout={300}
                                onChange={(event) => this.updateTextFilter(event.target.value)}
-                               value={inputText} />
+                               value={inputTextValue || ''} />
             </div>
         );
     }

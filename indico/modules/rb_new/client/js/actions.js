@@ -48,27 +48,23 @@ export function setUser(data) {
     return {type: SET_USER, data};
 }
 
-export function fetchRoomsStarted() {
-    return {type: FETCH_ROOMS_STARTED};
+export function fetchRoomsStarted(namespace) {
+    return {type: FETCH_ROOMS_STARTED, namespace};
 }
 
-export function fetchRoomsFailed() {
-    return {type: FETCH_ROOMS_FAILED};
+export function fetchRoomsFailed(namespace) {
+    return {type: FETCH_ROOMS_FAILED, namespace};
 }
 
-export function updateRooms(rooms, total, clear) {
-    return {type: UPDATE_ROOMS, rooms, total, clear};
+export function updateRooms(namespace, rooms, total, clear) {
+    return {type: UPDATE_ROOMS, namespace, rooms, total, clear};
 }
 
 export function fetchRooms(namespace, clear = true) {
     return async (dispatch, getStore) => {
-        const {filters, rooms: {list: oldRoomList, isFetching}} = getStore()[namespace];
+        const {filters, rooms: {list: oldRoomList}} = getStore()[namespace];
 
-        if (isFetching) {
-            return;
-        }
-
-        dispatch(fetchRoomsStarted());
+        dispatch(fetchRoomsStarted(namespace));
 
         const params = preProcessParameters(filters, ajaxFilterRules);
 
@@ -82,11 +78,11 @@ export function fetchRooms(namespace, clear = true) {
             response = await indicoAxios.get(buildFetchRoomsUrl(), {params});
         } catch (error) {
             handleAxiosError(error);
-            dispatch(fetchRoomsFailed());
+            dispatch(fetchRoomsFailed(namespace));
             return;
         }
         const {rooms, total} = response.data;
-        dispatch(updateRooms(rooms, total, clear));
+        dispatch(updateRooms(namespace, rooms, total, clear));
     };
 }
 
