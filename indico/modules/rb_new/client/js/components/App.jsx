@@ -17,7 +17,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Link, Route, Switch} from 'react-router-dom';
+import {Link, Redirect, Route, Switch} from 'react-router-dom';
 import {ConnectedRouter} from 'react-router-redux';
 import {Icon} from 'semantic-ui-react';
 
@@ -33,40 +33,52 @@ import Menu from './Menu';
 import './App.module.scss';
 
 
-export default function App({history}) {
-    return (
-        <ConnectedRouter history={history}>
-            <div styleName="rb-layout">
-                <header styleName="rb-menu-bar">
-                    <div styleName="rb-menu-bar-side-left">
-                        <h1>
-                            <Icon name="home" />
-                            <Link to="/">
-                                <Translate>Room Booking</Translate>
-                            </Link>
-                        </h1>
+export default class App extends React.Component {
+    render() {
+        const {history, filtersSet} = this.props;
+
+        return (
+            <ConnectedRouter history={history}>
+                <div styleName="rb-layout">
+                    <header styleName="rb-menu-bar">
+                        <div styleName="rb-menu-bar-side-left">
+                            <h1>
+                                <Icon name="home" />
+                                <Link to="/">
+                                    <Translate>Room Booking</Translate>
+                                </Link>
+                            </h1>
+                        </div>
+                        <div styleName="rb-menu-bar-menu">
+                            <Menu />
+                        </div>
+                        <div styleName="rb-menu-bar-side-right">
+                            <UserActions />
+                        </div>
+                    </header>
+                    <div styleName="rb-content">
+                        <Switch>
+                            <Route exact path="/" render={() => <Redirect to="/book" />} />
+                            <Route path="/book" render={() => (
+                                filtersSet
+                                    ? (
+                                        <BookRoom />
+                                    ) : (
+                                        <Landing />
+                                    )
+                            )} />
+                            <Route path="/rooms" component={RoomList} />
+                            <Route path="/blockings" component={BlockingList} />
+                            <Route path="/calendar" component={Calendar} />
+                        </Switch>
                     </div>
-                    <div styleName="rb-menu-bar-menu">
-                        <Menu />
-                    </div>
-                    <div styleName="rb-menu-bar-side-right">
-                        <UserActions />
-                    </div>
-                </header>
-                <div styleName="rb-content">
-                    <Switch>
-                        <Route exact path="/" component={Landing} />
-                        <Route path="/book" component={BookRoom} />
-                        <Route path="/rooms" component={RoomList} />
-                        <Route path="/blockings" component={BlockingList} />
-                        <Route path="/calendar" component={Calendar} />
-                    </Switch>
                 </div>
-            </div>
-        </ConnectedRouter>
-    );
+            </ConnectedRouter>
+        );
+    }
 }
 
 App.propTypes = {
-    history: PropTypes.object.isRequired
+    history: PropTypes.object.isRequired,
+    filtersSet: PropTypes.bool.isRequired
 };

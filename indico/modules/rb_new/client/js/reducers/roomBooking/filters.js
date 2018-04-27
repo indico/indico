@@ -15,13 +15,11 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import moment from 'moment';
-
 import * as actions from '../../actions';
-import {parseSearchBarText} from '../../util';
+import {parseSearchBarText, sanitizeRecurrence} from '../../util';
 
 
-const initialStateFactory = (namespace) => {
+export const initialStateFactory = (namespace) => {
     const state = {
         text: null,
         capacity: null
@@ -53,34 +51,12 @@ const initialStateFactory = (namespace) => {
     return state;
 };
 
-function calculateDefaultEndDate(startDate, type, number, interval) {
-    const dt = moment(startDate);
-    if (type === 'daily') {
-        return dt.add(1, 'weeks');
-    } else if (interval === 'week') {
-        // 5 occurrences
-        return dt.add(4 * number, 'weeks');
-    } else {
-        // 7 occurences
-        return dt.add(6 * number, 'months');
-    }
-}
-
 function mergeFilter(filters, param, data) {
     const newFilters = Object.assign({}, filters, {[param]: data});
     if (param === 'recurrence') {
-        const {type, interval, number} = data;
-        const {dates: {endDate, startDate}} = filters;
-        if (type === 'single' && endDate) {
-            newFilters.dates.endDate = null;
-        } else if (type !== 'single' && startDate && !endDate) {
-            // if there's a start date already set, let's set a sensible
-            // default for the end date
-            newFilters.dates.endDate = calculateDefaultEndDate(startDate, type, number, interval).format('YYYY-MM-DD');
-        }
+        sanitizeRecurrence(newFilters);
     } else if (param === 'text') {
         const dd = parseSearchBarText(data);
-
         newFilters.text = dd.text || null;
         newFilters.building = dd.building || null;
         newFilters.floor = dd.floor || null;

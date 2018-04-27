@@ -24,8 +24,9 @@ import RangeCalendar from 'rc-calendar/lib/RangeCalendar';
 import DatePicker from 'rc-calendar/lib/Picker';
 import TimePicker from 'rc-time-picker';
 import {Button, Grid, Form, Select} from 'semantic-ui-react';
-import _ from 'lodash';
-import {toMoment} from '../../util';
+import {stateToQueryString} from 'redux-router-querystring';
+import {sanitizeRecurrence} from '../../util';
+import {queryString as qsRules} from '../../serializers/filters';
 
 import './Landing.module.scss';
 
@@ -39,90 +40,64 @@ export default class Landing extends React.Component {
         setFilterParameter: PropTypes.func.isRequired
     }
 
-    static getDerivedStateFromProps({
-        recurrence: {type, interval, number},
-        dates: {startDate, endDate},
-        timeSlot: {startTime, endTime}
-    }, prevState) {
-        return {
-            ...prevState,
-            ..._.omitBy({
-                bookingType: type,
-                interval,
-                number,
-                startDate,
-                endDate,
-                startTime: toMoment(startTime, 'HH:mm'),
-                endTime: toMoment(endTime, 'HH:mm')
-            }, _.isNull)};
-    }
-
     constructor(props) {
         super(props);
-        this.state = {};
-    }
-
-    componentDidMount() {
-        const {setFilterParameter} = this.props;
         const startTime = moment().endOf('hour').add(1, 'm');
-        setFilterParameter('recurrence', {
-            type: 'single'
-        });
-        setFilterParameter('dates', {
-            startDate: _serializeDate(moment())
-        });
-        setFilterParameter('timeSlot', {
-            startTime: _serializeTime(startTime),
-            endTime: _serializeTime(startTime.clone().add(1, 'h'))
-        });
+        this.state = {
+            recurrence: {
+                type: 'single',
+                number: 1,
+                interval: 'week'
+            },
+            dates: {
+                startDate: moment(),
+                endDate: null
+            },
+            timeSlot: {
+                startTime,
+                endTime: startTime.clone().add(1, 'h')
+            }
+        };
     }
 
     updateBookingType = (newType) => {
-        const {setFilterParameter} = this.props;
-        const {bookingType} = this.state;
-        let {number, interval} = this.state;
-
-        if (newType === 'every' && bookingType !== newType) {
-            number = 1;
-            interval = 'week';
-        }
-
-        setFilterParameter('recurrence', {type: newType, number, interval});
+        const {recurrence: {number, interval}} = this.state;
+        const newState = {...this.state, recurrence: {type: newType, number, interval}};
+        sanitizeRecurrence(newState);
+        this.setState(newState);
     }
 
     updateNumber = (number) => {
-        const {setFilterParameter} = this.props;
-        const {bookingType: type, interval} = this.state;
+        const {recurrence: {type, interval}} = this.state;
         this.setState({number});
-        setFilterParameter('recurrence', {type, number: parseInt(number, 10), interval});
+        this.setState({
+            recurrence: {type, number: parseInt(number, 10), interval}
+        });
     }
 
     updateInterval = (interval) => {
-        const {setFilterParameter} = this.props;
-        const {bookingType: type, number} = this.state;
-        this.setState({interval});
-        setFilterParameter('recurrence', {type, number, interval});
+        const {recurrence: {type, number}} = this.state;
+        this.setState({
+            recurrence: {type, number, interval}
+        });
     }
 
     updateTimes = (startTime, endTime) => {
-        const {setFilterParameter} = this.props;
-        this.setState({startTime, endTime});
-
-        setFilterParameter('timeSlot', {
-            startTime: _serializeTime(startTime),
-            endTime: _serializeTime(endTime)
+        this.setState({
+            timeSlot: {
+                startTime,
+                endTime
+            }
         });
     }
 
     updateDates = (startDate, endDate) => {
-        const {setFilterParameter} = this.props;
-        const dates = {
-            startDate: _serializeDate(startDate),
-            endDate: _serializeDate(endDate)
-        };
-
-        this.setState(dates);
-        setFilterParameter('dates', dates);
+        this.setState({
+            dates: {
+                startDate,
+                endDate
+            }
+        });
     }
 
     updateText = (value) => {
@@ -131,13 +106,32 @@ export default class Landing extends React.Component {
     }
 
     render() {
-        const {bookingType, startTime, endTime, startDate, endDate, number, interval} = this.state;
+        const {
+            timeSlot: {startTime, endTime},
+            dates: {startDate, endDate},
+            recurrence, recurrence: {type, number, interval}
+        } = this.state;
+
         const timePickerProps = {
             minuteStep: 5,
             format: 'HH:mm',
             allowEmpty: false,
             showSecond: false
         };
+
+        const targetQS = stateToQueryString({
+            filters: {
+                recurrence,
+                dates: {
+                    startDate: _serializeDate(startDate),
+                    endDate: _serializeDate(endDate)
+                },
+                timeSlot: {
+                    startTime: _serializeTime(startTime),
+                    endTime: _serializeTime(endTime)
+                }
+            }
+        }, qsRules);
 
         const rangeCalendar = (
             <RangeCalendar onSelect={([start, end]) => this.updateDates(start, end)}
@@ -147,21 +141,21 @@ export default class Landing extends React.Component {
         return (
             <Grid centered styleName="landing-page">
                 <Grid.Row columns={2} styleName="landing-page-form">
-                    <Grid.Column width={4} textAlign="center" verticalAlign="middle">
+                    <Grid.Column width={6} textAlign="center" verticalAlign="middle">
                         <Form>
                             <Form.Group inline>
                                 <Form.Radio label="Single booking"
-                                            name="bookingType"
+                                            name="type"
                                             value="single"
-                                            checked={bookingType === 'single'}
+                                            checked={type === 'single'}
                                             onChange={(e, {value}) => this.updateBookingType(value)} />
                                 <Form.Radio label="Recurring booking"
                                             name="bookingType"
                                             value="every"
-                                            checked={bookingType === 'every'}
+                                            checked={type === 'every'}
                                             onChange={(e, {value}) => this.updateBookingType(value)} />
                             </Form.Group>
-                            {bookingType === 'every' &&
+                            {type === 'every' &&
                                 <>
                                     <Form.Group inline>
                                         <label>Every</label>
@@ -175,8 +169,8 @@ export default class Landing extends React.Component {
                                                 () => {
                                                     return (
                                                         <Form.Group inline>
-                                                            <Form.Input styleName="booking-date" icon="calendar" value={startDate || ''} />
-                                                            <Form.Input styleName="booking-date" icon="calendar" value={endDate || ''} />
+                                                            <Form.Input styleName="booking-date" icon="calendar" value={_serializeDate(startDate) || ''} />
+                                                            <Form.Input styleName="booking-date" icon="calendar" value={_serializeDate(endDate) || ''} />
                                                         </Form.Group>
                                                     );
                                                 }
@@ -185,13 +179,13 @@ export default class Landing extends React.Component {
                                     </Form.Group>
                                 </>
                             }
-                            {bookingType !== 'every' && (
+                            {type !== 'every' && (
                                 <DatePicker calendar={<Calendar />}
                                             onChange={(value) => this.updateDates(value, null)}>
                                     {
                                         () => {
                                             return (
-                                                <Form.Input styleName="booking-date" icon="calendar" value={startDate || ''} />
+                                                <Form.Input styleName="booking-date" icon="calendar" value={_serializeDate(startDate) || ''} />
                                             );
                                         }
                                     }
@@ -206,8 +200,13 @@ export default class Landing extends React.Component {
                             </Form.Group>
                             <Form.Input icon="search" placeholder="bldg: 28" styleName="search-input"
                                         onChange={(event, data) => this.updateText(data.value)} />
-                            <Link to="/book">
-                                <Button primary>Search</Button>
+                            <Link to={{
+                                pathname: '/book',
+                                search: `?${targetQS}`
+                            }}>
+                                <Button primary>
+                                    Search
+                                </Button>
                             </Link>
                         </Form>
                     </Grid.Column>

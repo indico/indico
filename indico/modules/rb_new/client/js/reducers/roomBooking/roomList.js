@@ -29,7 +29,7 @@ function mergeRooms(state, action) {
     const {list: oldRooms} = state;
     const {clear, total, rooms: newRooms} = action;
     return {
-        total: total,
+        total,
         list: clear ? newRooms : oldRooms.concat(newRooms)
     };
 }
