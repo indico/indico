@@ -45,8 +45,11 @@ export default function createReduxStore(reducers, initialData = {}, additionalM
     }
     const enhancer = composeWithDevTools(applyMiddleware(...middleware));
 
-    return createStore(_combineReducers({
-        staticData: (state = {}) => state,
-        ...reducers
-    }, ...postReducers), initialData, enhancer);
+    return createStore(
+        _combineReducers({
+            staticData: (state = {}) => state,
+            ...reducers
+        }, ...postReducers),
+        initialData,
+        enhancer);
 }

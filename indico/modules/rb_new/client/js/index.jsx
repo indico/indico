@@ -25,7 +25,7 @@ import 'semantic-ui-css/semantic.css';
 import '../styles/main.scss';
 
 import setupUserMenu from 'indico/react/containers/UserMenu';
-import App from './components/App';
+import App from './containers/App';
 
 import createRBStore, {history} from './store';
 

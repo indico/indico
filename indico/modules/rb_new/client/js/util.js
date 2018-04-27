@@ -73,3 +73,34 @@ export function preProcessParameters(params, rules) {
             }))
     );
 }
+
+function calculateDefaultEndDate(startDate, type, number, interval) {
+    const isMoment = moment.isMoment(startDate);
+    const dt = isMoment ? startDate.clone() : moment(startDate);
+
+    console.log(dt);
+
+    if (type === 'daily') {
+        dt.add(1, 'weeks');
+    } else if (interval === 'week') {
+        // 5 occurrences
+        dt.add(4 * number, 'weeks');
+    } else {
+        // 7 occurences
+        dt.add(6 * number, 'months');
+    }
+    console.log(dt);
+    return isMoment ? dt : dt.format('YYYY-MM-DD');
+}
+
+export function sanitizeRecurrence(filters) {
+    const {dates: {endDate, startDate}, recurrence: {type, interval, number}} = filters;
+
+    if (type === 'single' && endDate) {
+        filters.dates.endDate = null;
+    } else if (type !== 'single' && startDate && !endDate) {
+        // if there's a start date already set, let's set a sensible
+        // default for the end date
+        filters.dates.endDate = calculateDefaultEndDate(startDate, type, number, interval);
+    }
+}
