@@ -16,6 +16,7 @@
  */
 
 import moment from 'moment';
+import PropTypes from 'prop-types';
 import React from 'react';
 import {Link} from 'react-router-dom';
 import Calendar from 'rc-calendar';
@@ -30,9 +31,14 @@ import './Landing.module.scss';
 
 
 const _serializeTime = time => (time ? time.format('HH:mm') : null);
+const _serializeDate = date => (date ? date.format('YYYY-MM-DD') : null);
 
 
 export default class Landing extends React.Component {
+    static propTypes = {
+        setFilterParameter: PropTypes.func.isRequired
+    }
+
     static getDerivedStateFromProps({
         recurrence: {type, interval, number},
         dates: {startDate, endDate},
@@ -44,8 +50,8 @@ export default class Landing extends React.Component {
                 bookingType: type,
                 interval,
                 number,
-                startDate: startDate,
-                endDate: endDate,
+                startDate,
+                endDate,
                 startTime: toMoment(startTime, 'HH:mm'),
                 endTime: toMoment(endTime, 'HH:mm')
             }, _.isNull)};
@@ -63,7 +69,7 @@ export default class Landing extends React.Component {
             type: 'single'
         });
         setFilterParameter('dates', {
-            startDate: moment().format('YYYY-MM-DD')
+            startDate: _serializeDate(moment())
         });
         setFilterParameter('timeSlot', {
             startTime: _serializeTime(startTime),
@@ -86,14 +92,16 @@ export default class Landing extends React.Component {
 
     updateNumber = (number) => {
         const {setFilterParameter} = this.props;
+        const {bookingType: type, interval} = this.state;
         this.setState({number});
-        setFilterParameter('recurrence', {type: 'every', number: parseInt(number, 10), interval: null});
+        setFilterParameter('recurrence', {type, number: parseInt(number, 10), interval});
     }
 
     updateInterval = (interval) => {
         const {setFilterParameter} = this.props;
+        const {bookingType: type, number} = this.state;
         this.setState({interval});
-        setFilterParameter('recurrence', {type: 'every', number: parseInt(this.state.number, 10), interval});
+        setFilterParameter('recurrence', {type, number, interval});
     }
 
     updateTimes = (startTime, endTime) => {
@@ -101,22 +109,20 @@ export default class Landing extends React.Component {
         this.setState({startTime, endTime});
 
         setFilterParameter('timeSlot', {
-            startTime: startTime ? startTime.format('HH:mm') : null,
-            endTime: endTime ? endTime.format('HH:mm') : null
+            startTime: _serializeTime(startTime),
+            endTime: _serializeTime(endTime)
         });
     }
 
     updateDates = (startDate, endDate) => {
         const {setFilterParameter} = this.props;
-        this.setState({
-            startDate: startDate ? startDate.format('YYYY-MM-DD') : null,
-            endDate: endDate ? endDate.format('YYYY-MM-DD') : null
-        });
+        const dates = {
+            startDate: _serializeDate(startDate),
+            endDate: _serializeDate(endDate)
+        };
 
-        setFilterParameter('dates', {
-            startDate: startDate ? startDate.format('YYYY-MM-DD') : null,
-            endDate: endDate ? endDate.format('YYYY-MM-DD') : null
-        });
+        this.setState(dates);
+        setFilterParameter('dates', dates);
     }
 
     updateText = (value) => {
@@ -133,6 +139,11 @@ export default class Landing extends React.Component {
             showSecond: false
         };
 
+        const rangeCalendar = (
+            <RangeCalendar onSelect={([start, end]) => this.updateDates(start, end)}
+                           selectedValue={[startDate, endDate]} />
+        );
+
         return (
             <Grid centered styleName="landing-page">
                 <Grid.Row columns={2} styleName="landing-page-form">
@@ -143,33 +154,29 @@ export default class Landing extends React.Component {
                                             name="bookingType"
                                             value="single"
                                             checked={bookingType === 'single'}
-                                            onChange={(e, {value}) => this.updateBookingType(value)}/>
+                                            onChange={(e, {value}) => this.updateBookingType(value)} />
                                 <Form.Radio label="Recurring booking"
                                             name="bookingType"
                                             value="every"
                                             checked={bookingType === 'every'}
-                                            onChange={(e, {value}) => this.updateBookingType(value)}/>
+                                            onChange={(e, {value}) => this.updateBookingType(value)} />
                             </Form.Group>
                             {bookingType === 'every' &&
                                 <>
                                     <Form.Group inline>
                                         <label>Every</label>
-                                        <Form.Input value={number} type="number" onChange={(event, data) => this.updateNumber(data.value)}/>
+                                        <Form.Input value={number} type="number" onChange={(event, data) => this.updateNumber(data.value)} />
                                         <Select value={interval} options={[{text: 'Days', value: 'day'}, {text: 'Weeks', value: 'week'}, {text: 'Months', value: 'month'}]}
                                                 onChange={(event, data) => this.updateInterval(data.value)} />
                                     </Form.Group>
                                     <Form.Group inline>
-                                        <DatePicker calendar={<RangeCalendar
-                                                                    onSelect={([start, end]) => {
-                                                                        this.updateDates(start, end);
-                                                                    }}
-                                                                    selectedValue={[startDate, endDate]} />}>
+                                        <DatePicker calendar={rangeCalendar}>
                                             {
                                                 () => {
                                                     return (
                                                         <Form.Group inline>
-                                                            <Form.Input icon="calendar" style={{width: 250}} value={startDate || ''}/>
-                                                            <Form.Input icon="calendar" style={{width: 250}} value={endDate || ''} />
+                                                            <Form.Input styleName="booking-date" icon="calendar" value={startDate || ''} />
+                                                            <Form.Input styleName="booking-date" icon="calendar" value={endDate || ''} />
                                                         </Form.Group>
                                                     );
                                                 }
@@ -178,26 +185,26 @@ export default class Landing extends React.Component {
                                     </Form.Group>
                                 </>
                             }
-                            {bookingType !== 'every' &&
+                            {bookingType !== 'every' && (
                                 <DatePicker calendar={<Calendar />}
                                             onChange={(value) => this.updateDates(value, null)}>
                                     {
                                         () => {
                                             return (
-                                                <Form.Input icon="calendar" style={{width: 250}} value={startDate || ''} />
+                                                <Form.Input styleName="booking-date" icon="calendar" value={startDate || ''} />
                                             );
                                         }
                                     }
                                 </DatePicker>
-                            }
+                            )}
                             <Form.Group inline>
                                 <TimePicker {...timePickerProps} value={startTime}
-                                            onChange={(value) => {this.updateTimes(value, endTime)}} />
+                                            onChange={(value) => this.updateTimes(value, endTime)} />
                                 -
                                 <TimePicker {...timePickerProps} value={endTime}
-                                            onChange={(value) => {this.updateTimes(startTime, value)}} />
+                                            onChange={(value) => this.updateTimes(startTime, value)} />
                             </Form.Group>
-                            <Form.Input icon="search" placeholder="bldg: 28" style={{width: 300}}
+                            <Form.Input icon="search" placeholder="bldg: 28" styleName="search-input"
                                         onChange={(event, data) => this.updateText(data.value)} />
                             <Link to="/book">
                                 <Button primary>Search</Button>
