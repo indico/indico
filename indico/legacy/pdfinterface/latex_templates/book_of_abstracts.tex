@@ -8,6 +8,9 @@
 
 
 \JINJA{block header_extra}
+    \JINJA{if min_lines_per_abstract}
+        \usepackage{needspace}
+    \JINJA{endif}
     \VAR{super()|rawlatex}
     \makeatletter
     \renewcommand\tableofcontents{%
@@ -58,6 +61,10 @@
     \JINJA{for contrib in contribs if contrib.can_access(session.user)}
         \fancyhead[L]{\small \rmfamily \color{gray} \truncateellipses{\VAR{event.title}}{300pt} / \VAR{_('Book of Abstracts')}}
         \fancyhead[R]{}
+
+        \JINJA{if min_lines_per_abstract and not loop.first}
+            \needspace{\VAR{min_lines_per_abstract}\baselineskip}
+        \JINJA{endif}
 
         \phantomsection
         \addcontentsline{toc}{chapter}{\VAR{contrib.title} \VAR{contrib.friendly_id if show_ids else ''}}

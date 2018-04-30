@@ -98,7 +98,8 @@ boa_settings = EventSettingsProxy('abstracts_book', {
     'sort_by': BOASortField.id,
     'corresponding_author': BOACorrespondingAuthorType.submitter,
     'show_abstract_ids': False,
-    'cache_path': None
+    'cache_path': None,
+    'min_lines_per_abstract': 0,
 }, converters={
     'sort_by': EnumConverter(BOASortField),
     'corresponding_author': EnumConverter(BOACorrespondingAuthorType),
