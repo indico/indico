@@ -94,6 +94,8 @@ class BOASettingsForm(IndicoForm):
                                                  enum=BOACorrespondingAuthorType, sorted=True)
     show_abstract_ids = BooleanField(_('Show abstract IDs'), widget=SwitchWidget(),
                                      description=_("Show abstract IDs in the table of contents."))
+    min_lines_per_abstract = IntegerField(_("Minimum lines per abstract"),
+                                          description=_("Minimum lines to reserve per abstract."))
 
 
 class AbstractSubmissionSettingsForm(IndicoForm):

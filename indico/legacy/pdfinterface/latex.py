@@ -449,6 +449,7 @@ class ContributionBook(PDFLaTeXBase):
             'user': user,
             'boa_text': boa_settings.get(event, 'extra_text'),
             'boa_text_end': boa_settings.get(event, 'extra_text_end'),
+            'min_lines_per_abstract': boa_settings.get(event, 'min_lines_per_abstract'),
         })
 
         self._args['logo_img'] = create_event_logo_tmp_file(event, self.source_dir) if event.logo else None
