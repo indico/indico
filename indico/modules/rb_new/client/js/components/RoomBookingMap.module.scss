@@ -50,4 +50,19 @@
             font-size: 1em;
         }
     }
+
+    :global(.marker-cluster) {
+        background-color: rgba($highlight-color, 0.8);
+        border: 2px solid darken($highlight-color, 10%);
+        border-radius: 50%;
+        color: $light-gray;
+        height: 50px;
+        width: 50px;
+        line-height: 37px;
+        text-align: center;
+        font-weight: bold;
+        font-size: 1.1em;
+        font-family: $sui-font-family;
+        text-shadow: 1px 1px $light-black;
+    }
 }
