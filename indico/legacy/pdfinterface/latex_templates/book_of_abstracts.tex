@@ -60,8 +60,7 @@
         \fancyhead[R]{}
 
         \phantomsection
-        \addcontentsline{toc}{chapter}{\VAR{contrib.title} \VAR{contrib.friendly_id if show_ids else ''}
-        }
+        \addcontentsline{toc}{chapter}{\VAR{contrib.title} \VAR{contrib.friendly_id if show_ids else ''}}
 
         \VAR{render_contribution_condensed(contrib, affiliation_contribs, corresp_authors)|rawlatex}
         \vspace{3em}
