@@ -50,7 +50,7 @@
                     \VAR{boa_text|markdown}
                 }
             }
-            \fancyfoot[C]{\thepage}
+            \fancyfoot[C]{\small \rmfamily \color{gray} \VAR{(_('Page {}')|latex(true)).format('\\thepage')|rawlatex }}
         \end{boa_text}
     \JINJA{endif}
 
