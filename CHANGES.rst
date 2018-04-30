@@ -74,6 +74,8 @@ Improvements
 - Allow definition lists in places where Markdown or HTML is accepted
   (:issue:`3325`)
 - Include event date/time in registration emails (:issue:`3337`)
+- Allow div/span/pre with classes when writing raw HTML in CKEditor
+  (:issue:`3332`, thanks :user:`bpedersen2`)
 
 Bugfixes
 ^^^^^^^^

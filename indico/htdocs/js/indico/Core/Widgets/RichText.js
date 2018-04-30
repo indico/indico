@@ -279,7 +279,8 @@ function initializeEditor( wrapper, editorId, text, callbacks, width, height, si
             ],
             format_tags: 'p;h1;h2;h3;pre',
             removeDialogTabs: 'image:advanced;link:advanced',
-            extraAllowedContent: 'dl dt dd'
+            // Note: *(*) => allow additional classes on any allowed element
+            extraAllowedContent: 'dl dt dd div span pre; *(*)'
         };
 
         if (simple) {
