@@ -23,17 +23,18 @@ $text-blue: #2a606b;
         background-image: url('../../../../../../web/static/images/globe.png');
         background-size: cover;
 
+        :global(.ui.form) {
+            display: flex;
+            align-items: center;
+            flex-direction: column;
+        }
+
         &::before {
             content: ' ';
             width: 100%;
             height: 100%;
             position: absolute;
             background-color: rgba(255, 255, 255, 0.4);
-        }
-
-        :global(.inline.fields) {
-            align-self: center;
-            display: inline-flex;
         }
 
         :global(.ui.checkbox label) {
