@@ -88,6 +88,7 @@ class BOASettingsForm(IndicoForm):
     """Settings form for the 'Book of Abstracts'"""
 
     extra_text = IndicoMarkdownField(_('Additional text'), editor=True, mathjax=True)
+    extra_text_end = IndicoMarkdownField(_('Additional text at end'), editor=True, mathjax=True)
     sort_by = IndicoEnumSelectField(_('Sort by'), [DataRequired()], enum=BOASortField, sorted=True)
     corresponding_author = IndicoEnumSelectField(_('Corresponding author'), [DataRequired()],
                                                  enum=BOACorrespondingAuthorType, sorted=True)

@@ -73,5 +73,18 @@
         \JINJA{endfor}
     \JINJA{endblock}
 
+    \JINJA{if boa_text_end}
+        \begin{boa_text_end}
+            \thispagestyle{fancy}
+            \fancyhead{}
+            \vspace{1em}
+            \normalsize {
+                \rmfamily {
+                    \VAR{boa_text_end|markdown}
+                }
+            }
+            \fancyfoot[C]{\small \rmfamily \color{gray} \VAR{(_('Page {}')|latex(true)).format('\\thepage')|rawlatex }}
+        \end{boa_text_end}
+    \JINJA{endif}
 \JINJA{endblock}
 

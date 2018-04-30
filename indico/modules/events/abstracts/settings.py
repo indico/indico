@@ -94,6 +94,7 @@ abstracts_reviewing_settings = EventSettingsProxy('abstracts_reviewing', {
 
 boa_settings = EventSettingsProxy('abstracts_book', {
     'extra_text': '',
+    'extra_text_end': '',
     'sort_by': BOASortField.id,
     'corresponding_author': BOACorrespondingAuthorType.submitter,
     'show_abstract_ids': False,
