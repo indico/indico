@@ -447,7 +447,8 @@ class ContributionBook(PDFLaTeXBase):
             'fields': [f for f in event.contribution_fields if f.is_active],
             'sorted_by': sort_by,
             'user': user,
-            'boa_text': boa_settings.get(event, 'extra_text')
+            'boa_text': boa_settings.get(event, 'extra_text'),
+            'boa_text_end': boa_settings.get(event, 'extra_text_end'),
         })
 
         self._args['logo_img'] = create_event_logo_tmp_file(event, self.source_dir) if event.logo else None
