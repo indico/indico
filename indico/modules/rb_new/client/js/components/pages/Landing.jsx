@@ -25,6 +25,7 @@ import DatePicker from 'rc-calendar/lib/Picker';
 import TimePicker from 'rc-time-picker';
 import {Button, Grid, Form, Select} from 'semantic-ui-react';
 import {stateToQueryString} from 'redux-router-querystring';
+import {Translate} from 'indico/react/i18n';
 import {sanitizeRecurrence} from '../../util';
 import {queryString as qsRules} from '../../serializers/filters';
 
@@ -138,18 +139,24 @@ export default class Landing extends React.Component {
                            selectedValue={[startDate, endDate]} />
         );
 
+        const recurrenceOptions = [
+            {text: Translate.string('Days'), value: 'day'},
+            {text: Translate.string('Weeks'), value: 'week'},
+            {text: Translate.string('Months'), value: 'month'}
+        ];
+
         return (
             <Grid centered styleName="landing-page">
                 <Grid.Row columns={2} styleName="landing-page-form">
                     <Grid.Column width={6} textAlign="center" verticalAlign="middle">
                         <Form>
                             <Form.Group inline>
-                                <Form.Radio label="Single booking"
+                                <Form.Radio label={Translate.string('Single booking')}
                                             name="type"
                                             value="single"
                                             checked={type === 'single'}
                                             onChange={(e, {value}) => this.updateBookingType(value)} />
-                                <Form.Radio label="Recurring booking"
+                                <Form.Radio label={Translate.string('Recurring booking')}
                                             name="bookingType"
                                             value="every"
                                             checked={type === 'every'}
@@ -158,9 +165,9 @@ export default class Landing extends React.Component {
                             {type === 'every' &&
                                 <>
                                     <Form.Group inline>
-                                        <label>Every</label>
+                                        <label>{Translate.string('Every')}</label>
                                         <Form.Input value={number} type="number" onChange={(event, data) => this.updateNumber(data.value)} />
-                                        <Select value={interval} options={[{text: 'Days', value: 'day'}, {text: 'Weeks', value: 'week'}, {text: 'Months', value: 'month'}]}
+                                        <Select value={interval} options={recurrenceOptions}
                                                 onChange={(event, data) => this.updateInterval(data.value)} />
                                     </Form.Group>
                                     <Form.Group inline>
@@ -185,7 +192,10 @@ export default class Landing extends React.Component {
                                     {
                                         () => {
                                             return (
-                                                <Form.Input styleName="booking-date" icon="calendar" value={_serializeDate(startDate) || ''} />
+                                                <Form.Group inline>
+                                                    <Form.Input styleName="booking-date" icon="calendar"
+                                                                value={_serializeDate(startDate) || ''} />
+                                                </Form.Group>
                                             );
                                         }
                                     }
@@ -198,14 +208,16 @@ export default class Landing extends React.Component {
                                 <TimePicker {...timePickerProps} value={endTime}
                                             onChange={(value) => this.updateTimes(startTime, value)} />
                             </Form.Group>
-                            <Form.Input icon="search" placeholder="bldg: 28" styleName="search-input"
-                                        onChange={(event, data) => this.updateText(data.value)} />
+                            <Form.Group inline>
+                                <Form.Input icon="search" placeholder="bldg: 28" styleName="search-input"
+                                            onChange={(event, data) => this.updateText(data.value)} />
+                            </Form.Group>
                             <Link to={{
                                 pathname: '/book',
                                 search: `?${targetQS}`
                             }}>
                                 <Button primary>
-                                    Search
+                                    {Translate.string('Search')}
                                 </Button>
                             </Link>
                         </Form>
