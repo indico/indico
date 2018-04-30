@@ -18,10 +18,13 @@
 import propTypes from 'prop-types';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Leaflet from 'leaflet';
-import {Map, TileLayer, MapControl} from 'react-leaflet';
 import {Checkbox, Dropdown} from 'semantic-ui-react';
+import Leaflet from 'leaflet';
+import {Map, TileLayer, MapControl, Marker} from 'react-leaflet';
+import MarkerClusterGroup from 'react-leaflet-markercluster';
 
+import icon from 'leaflet/dist/images/marker-icon.png';
+import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 import {Translate} from 'indico/react/i18n';
 
 import 'leaflet/dist/leaflet.css';
@@ -30,31 +33,53 @@ import './RoomBookingMap.module.scss';
 
 export default function RoomBookingMap(props) {
     const {bounds, onMove, searchCheckbox, isSearchEnabled, onToggleSearchCheckbox, aspects, onChangeAspect,
-           mapRef} = props;
+           mapRef, rooms} = props;
     const aspectOptions = Object.entries(aspects).map(([key, val]) => ({
         text: val.name,
         value: Number(key)
     }));
+
+    // TODO: Use custom default marker icon
+    const DefaultIcon = Leaflet.icon({
+        iconUrl: icon,
+        shadowUrl: iconShadow
+    });
+    Leaflet.Marker.prototype.options.icon = DefaultIcon;
+
+
+    const searchControl = searchCheckbox && (
+        <RoomBookingMapControl position="topleft">
+            <Checkbox label={Translate.string('Search as I move the map')}
+                      onChange={onToggleSearchCheckbox}
+                      checked={isSearchEnabled} styleName="map-control-content" />
+        </RoomBookingMapControl>
+    );
+
+    const aspectsControl = aspects.length && (
+        <RoomBookingMapControl position="bottomleft">
+            <Dropdown placeholder={Translate.string('Select aspect')} selection upward
+                      options={aspectOptions} defaultValue={aspects.findIndex(op => op.default_on_startup)}
+                      styleName="map-control-content aspects-dropdown"
+                      openOnFocus={false} onChange={onChangeAspect} />
+        </RoomBookingMapControl>
+    );
+
+    const markers = rooms.length && (
+        <MarkerClusterGroup showCoverageOnHover={false}>
+            {rooms.map((room) => (
+                <Marker key={room.id} position={[room.lat, room.lng]} />
+            ))}
+        </MarkerClusterGroup>
+    );
+
     return (
         <div styleName="map-container">
             <Map ref={mapRef} bounds={bounds} onDragend={onMove} onZoomend={onMove}>
                 <TileLayer attribution='© <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                {searchCheckbox && (
-                    <RoomBookingMapControl position="topleft">
-                        <Checkbox label={Translate.string('Search as I move the map')}
-                                  onChange={onToggleSearchCheckbox}
-                                  checked={isSearchEnabled} styleName="map-control-content" />
-                    </RoomBookingMapControl>
-                )}
-                {aspects.length && (
-                    <RoomBookingMapControl position="bottomleft">
-                        <Dropdown placeholder={Translate.string('Select aspect')} selection upward
-                                  options={aspectOptions} defaultValue={aspects.findIndex(op => op.default_on_startup)}
-                                  styleName="map-control-content aspects-dropdown"
-                                  openOnFocus={false} onChange={onChangeAspect} />
-                    </RoomBookingMapControl>
-                )}
+                {markers}
+                {searchControl}
+                {aspectsControl}
             </Map>
         </div>
     );
@@ -69,6 +94,7 @@ RoomBookingMap.propTypes = {
     aspects: propTypes.array,
     onChangeAspect: propTypes.func,
     mapRef: propTypes.object,
+    rooms: propTypes.array,
 };
 
 RoomBookingMap.defaultProps = {
@@ -78,6 +104,7 @@ RoomBookingMap.defaultProps = {
     aspects: [],
     onChangeAspect: null,
     mapRef: null,
+    rooms: [],
 };
 
 

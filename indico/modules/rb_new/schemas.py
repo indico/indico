@@ -25,7 +25,7 @@ class RoomSchema(mm.ModelSchema):
     class Meta:
         model = Room
         fields = ('id', 'name', 'capacity', 'building', 'floor', 'number', 'is_public', 'location_name', 'has_vc',
-                  'has_projector', 'has_webcast_recording', 'large_photo_url', 'full_name')
+                  'has_projector', 'has_webcast_recording', 'large_photo_url', 'full_name', 'latitude', 'longitude')
 
 
 class AspectSchema(mm.ModelSchema):

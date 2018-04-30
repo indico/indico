@@ -83,6 +83,9 @@ export default class BookRoom extends React.Component {
     render() {
         const {toggleMapSearch, map: {search, aspects}, rooms, fetchRooms} = this.props;
         const {aspectBounds} = this.state;
+        const roomMarkers = rooms.list.map((room) => (
+            {id: room.id, lat: parseFloat(room.latitude), lng: parseFloat(room.longitude)}
+        ));
         return (
             <Grid columns={2}>
                 <Grid.Column width={11}>
@@ -97,7 +100,8 @@ export default class BookRoom extends React.Component {
                                         searchCheckbox isSearchEnabled={search}
                                         onToggleSearchCheckbox={(e, data) => toggleMapSearch(data.checked)}
                                         aspects={aspects}
-                                        onChangeAspect={(e, data) => this.onChangeAspect(data.value)} />
+                                        onChangeAspect={(e, data) => this.onChangeAspect(data.value)}
+                                        rooms={roomMarkers} />
                     )}
                 </Grid.Column>
             </Grid>
