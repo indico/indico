@@ -39,7 +39,7 @@ const _serializeDate = date => (date ? date.format('YYYY-MM-DD') : null);
 export default class Landing extends React.Component {
     static propTypes = {
         setFilterParameter: PropTypes.func.isRequired
-    }
+    };
 
     constructor(props) {
         super(props);
@@ -66,7 +66,7 @@ export default class Landing extends React.Component {
         const newState = {...this.state, recurrence: {type: newType, number, interval}};
         sanitizeRecurrence(newState);
         this.setState(newState);
-    }
+    };
 
     updateNumber = (number) => {
         const {recurrence: {type, interval}} = this.state;
@@ -74,14 +74,14 @@ export default class Landing extends React.Component {
         this.setState({
             recurrence: {type, number: parseInt(number, 10), interval}
         });
-    }
+    };
 
     updateInterval = (interval) => {
         const {recurrence: {type, number}} = this.state;
         this.setState({
             recurrence: {type, number, interval}
         });
-    }
+    };
 
     updateTimes = (startTime, endTime) => {
         this.setState({
@@ -90,7 +90,7 @@ export default class Landing extends React.Component {
                 endTime
             }
         });
-    }
+    };
 
     updateDates = (startDate, endDate) => {
         this.setState({
@@ -99,12 +99,12 @@ export default class Landing extends React.Component {
                 endDate
             }
         });
-    }
+    };
 
     updateText = (value) => {
         const {setFilterParameter} = this.props;
         setFilterParameter('text', value);
-    }
+    };
 
     render() {
         const {
@@ -146,84 +146,86 @@ export default class Landing extends React.Component {
         ];
 
         return (
-            <Grid centered styleName="landing-page">
-                <Grid.Row columns={2} styleName="landing-page-form">
-                    <Grid.Column width={6} textAlign="center" verticalAlign="middle">
-                        <Form>
-                            <Form.Group inline>
-                                <Form.Radio label={Translate.string('Single booking')}
-                                            name="type"
-                                            value="single"
-                                            checked={type === 'single'}
-                                            onChange={(e, {value}) => this.updateBookingType(value)} />
-                                <Form.Radio label={Translate.string('Recurring booking')}
-                                            name="bookingType"
-                                            value="every"
-                                            checked={type === 'every'}
-                                            onChange={(e, {value}) => this.updateBookingType(value)} />
-                            </Form.Group>
-                            {type === 'every' &&
-                                <>
-                                    <Form.Group inline>
-                                        <label>{Translate.string('Every')}</label>
-                                        <Form.Input value={number} type="number" onChange={(event, data) => this.updateNumber(data.value)} />
-                                        <Select value={interval} options={recurrenceOptions}
-                                                onChange={(event, data) => this.updateInterval(data.value)} />
-                                    </Form.Group>
-                                    <Form.Group inline>
-                                        <DatePicker calendar={rangeCalendar}>
-                                            {
-                                                () => {
-                                                    return (
-                                                        <Form.Group inline>
-                                                            <Form.Input styleName="booking-date" icon="calendar" value={_serializeDate(startDate) || ''} />
-                                                            <Form.Input styleName="booking-date" icon="calendar" value={_serializeDate(endDate) || ''} />
-                                                        </Form.Group>
-                                                    );
+            <div className="landing-wrapper">
+                <Grid centered styleName="landing-page">
+                    <Grid.Row columns={2} styleName="landing-page-form">
+                        <Grid.Column width={6} textAlign="center" verticalAlign="middle">
+                            <Form>
+                                <Form.Group inline>
+                                    <Form.Radio label={Translate.string('Single booking')}
+                                                name="type"
+                                                value="single"
+                                                checked={type === 'single'}
+                                                onChange={(e, {value}) => this.updateBookingType(value)} />
+                                    <Form.Radio label={Translate.string('Recurring booking')}
+                                                name="bookingType"
+                                                value="every"
+                                                checked={type === 'every'}
+                                                onChange={(e, {value}) => this.updateBookingType(value)} />
+                                </Form.Group>
+                                {type === 'every' &&
+                                    <>
+                                        <Form.Group inline>
+                                            <label>{Translate.string('Every')}</label>
+                                            <Form.Input value={number} type="number" onChange={(event, data) => this.updateNumber(data.value)} />
+                                            <Select value={interval} options={recurrenceOptions}
+                                                    onChange={(event, data) => this.updateInterval(data.value)} />
+                                        </Form.Group>
+                                        <Form.Group inline>
+                                            <DatePicker calendar={rangeCalendar}>
+                                                {
+                                                    () => {
+                                                        return (
+                                                            <Form.Group inline>
+                                                                <Form.Input styleName="booking-date" icon="calendar" value={_serializeDate(startDate) || ''} />
+                                                                <Form.Input styleName="booking-date" icon="calendar" value={_serializeDate(endDate) || ''} />
+                                                            </Form.Group>
+                                                        );
+                                                    }
                                                 }
+                                            </DatePicker>
+                                        </Form.Group>
+                                    </>
+                                }
+                                {type !== 'every' && (
+                                    <DatePicker calendar={<Calendar />}
+                                                onChange={(value) => this.updateDates(value, null)}>
+                                        {
+                                            () => {
+                                                return (
+                                                    <Form.Group inline>
+                                                        <Form.Input styleName="booking-date" icon="calendar"
+                                                                    value={_serializeDate(startDate) || ''} />
+                                                    </Form.Group>
+                                                );
                                             }
-                                        </DatePicker>
-                                    </Form.Group>
-                                </>
-                            }
-                            {type !== 'every' && (
-                                <DatePicker calendar={<Calendar />}
-                                            onChange={(value) => this.updateDates(value, null)}>
-                                    {
-                                        () => {
-                                            return (
-                                                <Form.Group inline>
-                                                    <Form.Input styleName="booking-date" icon="calendar"
-                                                                value={_serializeDate(startDate) || ''} />
-                                                </Form.Group>
-                                            );
                                         }
-                                    }
-                                </DatePicker>
-                            )}
-                            <Form.Group inline>
-                                <TimePicker {...timePickerProps} value={startTime}
-                                            onChange={(value) => this.updateTimes(value, endTime)} />
-                                -
-                                <TimePicker {...timePickerProps} value={endTime}
-                                            onChange={(value) => this.updateTimes(startTime, value)} />
-                            </Form.Group>
-                            <Form.Group inline>
-                                <Form.Input icon="search" placeholder="bldg: 28" styleName="search-input"
-                                            onChange={(event, data) => this.updateText(data.value)} />
-                            </Form.Group>
-                            <Link to={{
-                                pathname: '/book',
-                                search: `?${targetQS}`
-                            }}>
-                                <Button primary>
-                                    {Translate.string('Search')}
-                                </Button>
-                            </Link>
-                        </Form>
-                    </Grid.Column>
-                </Grid.Row>
-            </Grid>
+                                    </DatePicker>
+                                )}
+                                <Form.Group inline>
+                                    <TimePicker {...timePickerProps} value={startTime}
+                                                onChange={(value) => this.updateTimes(value, endTime)} />
+                                    -
+                                    <TimePicker {...timePickerProps} value={endTime}
+                                                onChange={(value) => this.updateTimes(startTime, value)} />
+                                </Form.Group>
+                                <Form.Group inline>
+                                    <Form.Input icon="search" placeholder="bldg: 28" styleName="search-input"
+                                                onChange={(event, data) => this.updateText(data.value)} />
+                                </Form.Group>
+                                <Link to={{
+                                    pathname: '/book',
+                                    search: `?${targetQS}`
+                                }}>
+                                    <Button primary>
+                                        {Translate.string('Search')}
+                                    </Button>
+                                </Link>
+                            </Form>
+                        </Grid.Column>
+                    </Grid.Row>
+                </Grid>
+            </div>
         );
     }
 }

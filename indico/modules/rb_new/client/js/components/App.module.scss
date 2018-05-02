@@ -26,7 +26,7 @@
 
 .rb-menu-bar {
     background-color: $highlight-color;
-    padding: 0 20px 0 20px;
+    padding: 0 20px;
     margin: 0;
     height: $menu-height;
     line-height: $menu-height;
@@ -89,4 +89,8 @@
 .rb-content {
     // lower z-index than menu
     z-index: 1;
+
+    & > :global(:not(.landing-wrapper)) {
+        padding: $rb-content-padding;
+    }
 }
