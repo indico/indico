@@ -23,8 +23,6 @@ import Leaflet from 'leaflet';
 import {Map, TileLayer, MapControl, Marker} from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-markercluster';
 
-import icon from 'leaflet/dist/images/marker-icon.png';
-import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 import {Translate} from 'indico/react/i18n';
 
 import 'leaflet/dist/leaflet.css';
@@ -38,13 +36,7 @@ export default function RoomBookingMap(props) {
         text: val.name,
         value: Number(key)
     }));
-
-    // TODO: Use custom default marker icon
-    const DefaultIcon = Leaflet.icon({
-        iconUrl: icon,
-        shadowUrl: iconShadow
-    });
-    Leaflet.Marker.prototype.options.icon = DefaultIcon;
+    Leaflet.Marker.prototype.options.icon = Leaflet.divIcon({className: 'rb-map-marker', iconSize: [20, 20]});
 
 
     const searchControl = searchCheckbox && (

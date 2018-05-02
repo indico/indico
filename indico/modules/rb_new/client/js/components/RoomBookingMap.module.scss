@@ -51,10 +51,13 @@
         }
     }
 
+    :global(.marker-cluster), :global(.rb-map-marker) {
+        border-radius: 50%;
+    }
+
     :global(.marker-cluster) {
         background-color: rgba($highlight-color, 0.8);
         border: 2px solid darken($highlight-color, 10%);
-        border-radius: 50%;
         color: $light-gray;
         height: 50px;
         width: 50px;
@@ -64,5 +67,10 @@
         font-size: 1.1em;
         font-family: $sui-font-family;
         text-shadow: 1px 1px $light-black;
+    }
+
+    :global(.rb-map-marker) {
+        background-color: saturate(rgba($highlight-color, 0.9), 30%);
+        border: 2px solid darken($highlight-color, 20%);
     }
 }
