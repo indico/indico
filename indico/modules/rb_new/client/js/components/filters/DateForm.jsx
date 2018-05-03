@@ -68,6 +68,10 @@ export default class DateForm extends FilterFormComponent {
         });
     }
 
+    disabledDate(current) {
+        return current.isBefore(moment(), 'day');
+    }
+
     render() {
         const {isRange, handleClose} = this.props;
         const {startDate, endDate} = this.state;
@@ -82,6 +86,7 @@ export default class DateForm extends FilterFormComponent {
                                        await this.setDates(start, end);
                                        handleClose();
                                    }}
+                                   disabledDate={this.disabledDate}
                                    {...props} />
                 ) : (
                     <RcCalendar selectedValue={startDate}
@@ -89,6 +94,7 @@ export default class DateForm extends FilterFormComponent {
                                     await this.setDates(date, null);
                                     handleClose();
                                 }}
+                                disabledDate={this.disabledDate}
                                 {...props} />
                 ) }
             </div>
