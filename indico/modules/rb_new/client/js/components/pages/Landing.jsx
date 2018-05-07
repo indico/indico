@@ -23,7 +23,7 @@ import Calendar from 'rc-calendar';
 import RangeCalendar from 'rc-calendar/lib/RangeCalendar';
 import DatePicker from 'rc-calendar/lib/Picker';
 import TimePicker from 'rc-time-picker';
-import {Button, Grid, Form, Select} from 'semantic-ui-react';
+import {Button, Form, Grid, Select, Statistic} from 'semantic-ui-react';
 import {stateToQueryString} from 'redux-router-querystring';
 import {Translate} from 'indico/react/i18n';
 import {sanitizeRecurrence} from '../../util';
@@ -223,6 +223,42 @@ export default class Landing extends React.Component {
                                 </Link>
                             </Form>
                         </Grid.Column>
+                    </Grid.Row>
+                    <Grid.Row>
+                        <div styleName="statistics">
+                            <Statistic size="huge">
+                                <Statistic.Value>
+                                    230
+                                </Statistic.Value>
+                                <Statistic.Label>
+                                    {Translate.string('Active rooms')}
+                                </Statistic.Label>
+                            </Statistic>
+                            <Statistic size="huge">
+                                <Statistic.Value>
+                                    70
+                                </Statistic.Value>
+                                <Statistic.Label>
+                                    {Translate.string('Buildings')}
+                                </Statistic.Label>
+                            </Statistic>
+                            <Statistic size="huge">
+                                <Statistic.Value>
+                                    25
+                                </Statistic.Value>
+                                <Statistic.Label>
+                                    {Translate.string('Bookings today')}
+                                </Statistic.Label>
+                            </Statistic>
+                            <Statistic size="huge">
+                                <Statistic.Value>
+                                    20
+                                </Statistic.Value>
+                                <Statistic.Label>
+                                    {Translate.string('Active booking requests')}
+                                </Statistic.Label>
+                            </Statistic>
+                        </div>
                     </Grid.Row>
                 </Grid>
             </div>

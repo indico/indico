@@ -50,4 +50,18 @@ $text-blue: #2a606b;
             width: 250px;
         }
     }
+
+    .statistics {
+        margin-top: 55px;
+
+        :global(.ui.statistic) {
+            :global(.value), :global(.label) {
+                color: #7dcfb6;
+            }
+
+            &:not(:last-child) {
+                margin-right: 20px;
+            }
+        }
+    }
 }
