@@ -100,20 +100,6 @@ class IndicoFlask(PluginFlaskMixin, Flask):
             view_func = RHSimple.wrap_function(view_func)
         return super(IndicoFlask, self).add_url_rule(rule, endpoint=endpoint, view_func=view_func, **options)
 
-    def _find_error_handler(self, e):
-        # XXX: this is a backport from flask 1.0
-        # remove this method once flask 1.0 is out and we updated
-        exc_class, code = self._get_exc_class_and_code(type(e))
-        for name, c in ((request.blueprint, code), (None, code),
-                        (request.blueprint, None), (None, None)):
-            handler_map = self.error_handler_spec.setdefault(name, {}).get(c)
-            if not handler_map:
-                continue
-            for cls in exc_class.__mro__:
-                handler = handler_map.get(cls)
-                if handler is not None:
-                    return handler
-
     @property
     def static_folder(self):
         return os.path.join(self.root_path, 'web', 'static')
