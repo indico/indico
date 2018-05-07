@@ -15,16 +15,20 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-@import '../../styles/main';
 
-.room-list {
-    .results-count {
-        margin-bottom: 10px;
-        font-weight: bold;
-        font-size: 1.5em;
+.room-card {
+    height: 300px;
+    width: 300px;
+
+    img {
+        height: 170px;
     }
 
-    :global(.redux-lazy-scroll) {
-        overflow: visible !important;
+    .room-description {
+        word-break: break-all;
+    }
+
+    .room-content .room-details {
+        float: right;
     }
 }
