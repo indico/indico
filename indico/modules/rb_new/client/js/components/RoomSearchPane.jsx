@@ -17,10 +17,11 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Card, Icon, Image} from 'semantic-ui-react';
+import {Card} from 'semantic-ui-react';
 import LazyScroll from 'redux-lazy-scroll';
 
 import {Param, Plural, PluralTranslate, Singular} from 'indico/react/i18n';
+import {Room} from './Room';
 
 import './RoomSearchPane.module.scss';
 
@@ -75,27 +76,3 @@ export default class RoomSearchPane extends React.Component {
         );
     }
 }
-
-export function Room({room}) {
-    return (
-        <Card styleName="room-card">
-            <Image src={room.large_photo_url} />
-            <Card.Content>
-                <Card.Description styleName="room-description">
-                    {room.full_name}
-                </Card.Description>
-            </Card.Content>
-            <Card.Content styleName="room-content" extra>
-                <Icon name="user" /> {room.capacity}
-                <span styleName="room-details">
-                    {room.has_webcast_recording && <Icon name="video camera" />}
-                    {!room.is_public && <Icon name="lock" />}
-                </span>
-            </Card.Content>
-        </Card>
-    );
-}
-
-Room.propTypes = {
-    room: PropTypes.object.isRequired
-};
