@@ -313,12 +313,14 @@ class RHDisplayCategory(RHDisplayCategoryEventsBase):
         future_event_query = event_query.filter(Event.start_dt >= future_threshold)
         current_event_query = event_query.filter(Event.start_dt >= past_threshold,
                                                  Event.start_dt < future_threshold)
-        events = current_event_query.filter(Event.start_dt < future_threshold).all()
+        json_ld_events = events = current_event_query.filter(Event.start_dt < future_threshold).all()
         events_by_month = self.group_by_month(events)
 
         future_event_count = future_event_query.count()
-        future_events = future_event_query.all()
         past_event_count = past_event_query.count()
+
+        if not session.user and future_event_count:
+            json_ld_events = json_ld_events + future_event_query.all()
 
         show_future_events = bool(self.category.id in session.get('fetch_future_events_in', set()) or
                                   (session.user and session.user.settings.get('show_future_events', False)))
@@ -340,7 +342,7 @@ class RHDisplayCategory(RHDisplayCategoryEventsBase):
                   'past_event_count': past_event_count,
                   'show_past_events': show_past_events,
                   'past_threshold': past_threshold.strftime(threshold_format),
-                  'json_ld': map(serialize_event_for_json_ld, (events + future_events)),
+                  'json_ld': map(serialize_event_for_json_ld, json_ld_events),
                   'atom_feed_url': url_for('.export_atom', self.category),
                   'atom_feed_title': _('Events of "{}"').format(self.category.title)}
         params.update(get_base_ical_parameters(session.user, 'category',
