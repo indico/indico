@@ -17,14 +17,16 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
-import {Grid} from 'semantic-ui-react';
+import {Grid, Icon, Message} from 'semantic-ui-react';
 
+import {Slot} from 'indico/react/util';
 import RoomBookingMap from '../RoomBookingMap';
 import RoomSearchPane from '../RoomSearchPane';
 import BookingFilterBar from '../BookingFilterBar';
 import filterBarFactory from '../../containers/FilterBar';
 import searchBoxFactory from '../../containers/SearchBar';
 import {getAspectBounds, getMapBounds} from '../../util';
+import Room from '../Room';
 
 
 const FilterBar = filterBarFactory('bookRoom', BookingFilterBar);
@@ -80,6 +82,24 @@ export default class BookRoom extends React.Component {
         updateLocation(getMapBounds(map));
     }
 
+    renderRoom = (room) => {
+        return (
+            <Room key={room.id} room={room}>
+                <Slot>
+                    <Grid centered columns={3} style={{margin: 0, height: '100%', opacity: 0.9}}>
+                        <Grid.Column verticalAlign="middle" width={14}>
+                            <Message size="mini" warning compact>
+                                <Message.Header>
+                                    <Icon name="clock" /> 25 minutes later
+                                </Message.Header>
+                            </Message>
+                        </Grid.Column>
+                    </Grid>
+                </Slot>
+            </Room>
+        );
+    }
+
     render() {
         const {toggleMapSearch, map: {search, aspects}, rooms, fetchRooms} = this.props;
         const {aspectBounds} = this.state;
@@ -92,7 +112,8 @@ export default class BookRoom extends React.Component {
                     <RoomSearchPane rooms={rooms}
                                     fetchRooms={fetchRooms}
                                     filterBar={<FilterBar />}
-                                    searchBar={<SearchBar onConfirm={fetchRooms} onTextChange={fetchRooms} />} />
+                                    searchBar={<SearchBar onConfirm={fetchRooms} onTextChange={fetchRooms} />}
+                                    renderRoom={this.renderRoom} />
                 </Grid.Column>
                 <Grid.Column width={5}>
                     {aspectBounds && (

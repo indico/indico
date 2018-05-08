@@ -19,14 +19,16 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Grid} from 'semantic-ui-react';
+import {Button, Grid} from 'semantic-ui-react';
 
+import {Slot} from 'indico/react/util';
 import RoomBookingMap from '../RoomBookingMap';
 import RoomSearchPane from '../RoomSearchPane';
 import RoomFilterBar from '../RoomFilterBar';
 import filterBarFactory from '../../containers/FilterBar';
 import searchBarFactory from '../../containers/SearchBar';
 import {getMapBounds} from '../../util';
+import Room from '../Room';
 
 
 const FilterBar = filterBarFactory('roomList', RoomFilterBar);
@@ -61,6 +63,17 @@ export default class RoomList extends React.Component {
         updateLocation(getMapBounds(e.target));
     }
 
+    renderRoom = (room) => {
+        return (
+            <Room key={room.id} room={room}>
+                <Slot name="actions">
+                    <Button primary icon="edit" circular />
+                    <Button icon="star" color="teal" circular />
+                </Slot>
+            </Room>
+        );
+    }
+
     render() {
         const {fetchRooms, map: {bounds}} = this.props;
         return (
@@ -68,7 +81,8 @@ export default class RoomList extends React.Component {
                 <Grid.Column width={11}>
                     <RoomSearchPane {...this.props}
                                     filterBar={<FilterBar />}
-                                    searchBar={<SearchBar onConfirm={fetchRooms} onTextChange={fetchRooms} />} />
+                                    searchBar={<SearchBar onConfirm={fetchRooms} onTextChange={fetchRooms} />}
+                                    renderRoom={this.renderRoom} />
                 </Grid.Column>
                 <Grid.Column width={5}>
                     {bounds && (
