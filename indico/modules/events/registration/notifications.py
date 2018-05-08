@@ -32,7 +32,8 @@ def notify_invitation(invitation, email_subject, email_body, from_address):
     email_subject = replace_placeholders('registration-invitation-email', email_subject, invitation=invitation)
     template = get_template_module('emails/custom.html', subject=email_subject, body=email_body)
     email = make_email(invitation.email, from_address=from_address, template=template, html=True)
-    send_email(email, invitation.registration_form.event, 'Registration', session.user)
+    user = session.user if session else None
+    send_email(email, invitation.registration_form.event, 'Registration', user)
 
 
 def _notify_registration(registration, template, to_managers=False):
@@ -51,7 +52,8 @@ def _notify_registration(registration, template, to_managers=False):
     to_list = registration.email if not to_managers else registration.registration_form.manager_notification_recipients
     from_address = registration.registration_form.sender_address if not to_managers else None
     mail = make_email(to_list=to_list, template=template, html=True, from_address=from_address, attachments=attachments)
-    send_email(mail, event=registration.registration_form.event, module='Registration', user=session.user)
+    user = session.user if session else None
+    send_email(mail, event=registration.registration_form.event, module='Registration', user=user)
 
 
 def notify_registration_creation(registration, notify_user=True):
