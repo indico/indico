@@ -27,7 +27,6 @@
         $.ajax({
             url: url,
             dataType: 'json',
-            error: handleAjaxError,
             success: function(data) {
                 _.each(data.event_counts, function(count, id) {
                     var text = !count.value ? $T.gettext('empty')
