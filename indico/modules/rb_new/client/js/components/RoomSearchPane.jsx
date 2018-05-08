@@ -21,7 +21,6 @@ import {Card} from 'semantic-ui-react';
 import LazyScroll from 'redux-lazy-scroll';
 
 import {Param, Plural, PluralTranslate, Singular} from 'indico/react/i18n';
-import {Room} from './Room';
 
 import './RoomSearchPane.module.scss';
 
@@ -35,7 +34,8 @@ export default class RoomSearchPane extends React.Component {
         }).isRequired,
         fetchRooms: PropTypes.func.isRequired,
         filterBar: PropTypes.element.isRequired,
-        searchBar: PropTypes.element.isRequired
+        searchBar: PropTypes.element.isRequired,
+        renderRoom: PropTypes.func.isRequired
     };
 
     componentDidMount() {
@@ -49,7 +49,7 @@ export default class RoomSearchPane extends React.Component {
     };
 
     render() {
-        const {rooms: {list, total, isFetching}, filterBar, searchBar} = this.props;
+        const {rooms: {list, total, isFetching}, filterBar, searchBar, renderRoom} = this.props;
 
         return (
             <div className="ui" styleName="room-list">
@@ -67,9 +67,7 @@ export default class RoomSearchPane extends React.Component {
                 </div>
                 <LazyScroll hasMore={total > list.length} loadMore={this.loadMore} isFetching={isFetching}>
                     <Card.Group stackable>
-                        {list.map((room) => (
-                            <Room key={room.id} room={room} />
-                        ))}
+                        {list.map(renderRoom)}
                     </Card.Group>
                 </LazyScroll>
             </div>

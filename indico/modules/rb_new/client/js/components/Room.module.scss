@@ -17,18 +17,56 @@
 
 
 .room-card {
-    height: 300px;
+    height: 320px;
     width: 300px;
 
-    img {
-        height: 170px;
+    :global(.ui.active.visible.dimmer) {
+        display: flex !important;
+    }
+
+    .room-title {
+        font-size: 1em;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    .room-image {
+        position: relative;
+
+        :global(.ui.image.dimmable) {
+            width: 100%;
+        }
+
+        .room-extra-info {
+            position: absolute;
+            z-index: 1;
+            width: 100%;
+            height: 100%;
+        }
+
+        img {
+            width: 100%;
+            height: 170px !important;
+        }
     }
 
     .room-description {
         word-break: break-all;
+
+        .room-comments {
+            word-break: normal;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            height: 40px;
+        }
     }
 
-    .room-content .room-details {
-        float: right;
+    .room-content {
+        .room-details {
+            float: right;
+        }
     }
+
 }

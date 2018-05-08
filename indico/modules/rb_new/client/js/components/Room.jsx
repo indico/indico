@@ -17,32 +17,129 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Card, Icon, Image, Rating} from 'semantic-ui-react';
+import {Card, Dimmer, Icon, Image, Popup} from 'semantic-ui-react';
+
+import {Translate} from 'indico/react/i18n';
+import {Slot} from 'indico/react/util';
+import {TooltipIfTruncated} from 'indico/react/components';
+
 
 import './Room.module.scss';
 
 
-export function Room({room}) {
-    return (
-        <Card styleName="room-card">
-            <Rating icon="star" size="huge" style={{position: 'absolute', right: 10, top: 15, zIndex: 1000, color: 'darkgray'}} />
-            <Image src={room.large_photo_url} />
-            <Card.Content>
-                <Card.Description styleName="room-description">
-                    {room.full_name}
-                </Card.Description>
-            </Card.Content>
-            <Card.Content styleName="room-content" extra>
-                <Icon name="user" /> {room.capacity}
-                <span styleName="room-details">
-                    {room.has_webcast_recording && <Icon name="video camera" />}
-                    {!room.is_public && <Icon name="lock" />}
-                </span>
-            </Card.Content>
-        </Card>
-    );
+export default class Room extends React.Component {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            dimmed: false
+        };
+    }
+
+    toggleDimmer = (state) => {
+        this.setState({dimmed: state});
+    }
+
+    renderDimmedImage = (dimmer, content) => {
+        const {dimmed} = this.state;
+        const newProps = Object.assign({}, dimmer);
+        delete newProps['className'];
+
+        return (
+            <div styleName="room-image">
+                {!dimmed && content && (
+                    <div styleName="room-extra-info">
+                        {content}
+                    </div>
+                )}
+                <Image {...dimmer} />
+            </div>
+        );
+    }
+
+    renderCardImage = (room, content, actions) => {
+        const {dimmed} = this.state;
+
+        if (actions !== undefined && actions.length !== 0) {
+            const dimmerContent = (
+                <div>
+                    {actions}
+                </div>
+            );
+
+            return (
+                <Dimmer.Dimmable as={(dimmer) => this.renderDimmedImage(dimmer, content)}
+                                 dimmed={dimmed}
+                                 dimmer={{active: dimmed, content: dimmerContent}}
+                                 src={room.large_photo_url}
+                                 onMouseEnter={() => this.toggleDimmer(true)}
+                                 onMouseLeave={() => this.toggleDimmer(false)}
+                                 blurring />
+            );
+        } else {
+            return (
+                <div styleName="room-image">
+                    <div styleName="room-extra-info">
+                        {!dimmed && content}
+                    </div>
+                    <Image src={room.large_photo_url} />
+                </div>
+            );
+        }
+    }
+
+    render() {
+        const {room, children} = this.props;
+        const {content, actions} = Slot.split(children);
+
+        return (
+            <Card styleName="room-card">
+                {this.renderCardImage(room, content, actions)}
+                <Card.Content>
+                    <TooltipIfTruncated>
+                        <Card.Header styleName="room-title">
+                            {room.full_name}
+                        </Card.Header>
+                    </TooltipIfTruncated>
+                    <Card.Meta style={{fontSize: '0.8em'}}>
+                        {room.division}
+                    </Card.Meta>
+                    <Card.Description styleName="room-description">
+                        {room.comments && (
+                            <TooltipIfTruncated>
+                                <div styleName="room-comments">
+                                    {room.comments}
+                                </div>
+                            </TooltipIfTruncated>
+                        )}
+                    </Card.Description>
+                </Card.Content>
+                <Card.Content styleName="room-content" extra>
+                    <>
+                        <Icon name="user" /> {room.capacity || Translate.string('Not specified')}
+                    </>
+                    <span styleName="room-details">
+                        {!room.is_reservable && (
+                            <Popup trigger={<Icon name="dont" color="grey" />}
+                                   content={Translate.string('This room is not bookable')}
+                                   position="bottom center"
+                                   hideOnScroll />
+                        )}
+                        {room.has_webcast_recording && <Icon name="video camera" color="green" />}
+                        {!room.is_public && (
+                            <Popup trigger={<Icon name="lock" color="red" />}
+                                   content={Translate.string('This room is not publicly available')}
+                                   position="bottom center"
+                                   hideOnScroll />
+                        )}
+                    </span>
+                </Card.Content>
+            </Card>
+        );
+    }
 }
 
 Room.propTypes = {
-    room: PropTypes.object.isRequired
+    room: PropTypes.object.isRequired,
+    children: PropTypes.node.isRequired
 };

@@ -26,7 +26,9 @@ export default class TooltipIfTruncated extends React.Component {
 
     mouseEnter(event) {
         const element = event.target;
-        if (element.offsetWidth < element.scrollWidth && !element.getAttribute('title')) {
+        const overflows = element.offsetWidth < element.scrollWidth || element.offsetHeight < element.scrollHeight;
+
+        if (overflows && !element.getAttribute('title')) {
             element.setAttribute('title', element.innerText);
         }
     }
