@@ -565,12 +565,13 @@ def serialize_event_for_json_ld(event, full=False):
             '@type': 'Place',
             'name': event.venue_name or 'No location set',
             'address': event.address or 'No address set'
-        },
-        'description': strip_tags(event.description),
+        }
     }
+    if full and event.description:
+        data['description'] = strip_tags(event.description)
     if full and event.person_links:
         data['performer'] = map(serialize_person_for_json_ld, event.person_links)
-    if event.has_logo:
+    if full and event.has_logo:
         data['image'] = event.external_logo_url
     return data
 

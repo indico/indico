@@ -243,8 +243,9 @@ class RHDisplayCategoryEventsBase(RHDisplayCategoryBase):
     _category_query_options = (joinedload('children').load_only('id', 'title', 'protection_mode'),
                                undefer('attachment_count'), undefer('has_events'))
     _event_query_options = (joinedload('person_links'), joinedload('series'), undefer_group('series'),
-                            load_only('id', 'category_id', 'created_dt', 'end_dt', 'protection_mode', 'start_dt',
-                                      'title', 'type_', 'series_pos', 'series_count'))
+                            load_only('id', 'category_id', 'created_dt', 'start_dt', 'end_dt', 'timezone',
+                                      'protection_mode', 'title', 'type_', 'series_pos', 'series_count',
+                                      'own_address', 'own_venue_id', 'own_venue_name'))
 
     def _process_args(self):
         RHDisplayCategoryBase._process_args(self)
