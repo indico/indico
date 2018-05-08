@@ -1,0 +1,60 @@
+{% macro render_event_dates(event, occurences=none) %}
+    {%- filter dedent -%}
+        {% if not occurrences -%}
+            {% filter underline %}Date{% endfilter %}
+            {{ event.start_dt|format_date(timezone=event.timezone) }}
+            {%- if event.start_dt_local.date() != event.end_dt_local.date() %}
+                {#- #} - {{ event.end_dt|format_date(timezone=event.timezone) }}
+            {%- endif %}
+
+            {% filter underline %}Time{% endfilter %}
+            {{ event.start_dt|format_time(timezone=event.timezone) }} - {{ event.end_dt|format_time(timezone=event.timezone) }}
+            {#- #} ({{ event.timezone }})
+
+            {% filter underline %}URL{% endfilter %}
+            {{ event.external_url }}
+        {%- else -%}
+            {% filter underline %}Timezone{% endfilter %}
+            {{ event.timezone }}
+
+            {% filter underline %}Occurrences{% endfilter -%}
+            {% for evt in occurrences|sort(attribute='start_dt') %}
+                {{ evt.start_dt|format_date(timezone=evt.timezone) }}, {# -#}
+                {{ evt.start_dt|format_time(timezone=evt.timezone) }} - {# -#}
+                {{ evt.end_dt|format_time(timezone=evt.timezone) }}: {# -#}
+                {{ evt.external_url -}}
+            {%- endfor -%}
+        {%- endif -%}
+    {%- endfilter -%}
+{% endmacro %}
+
+{% macro render_event_dates_html(event, occurences=none) %}
+    {%- filter dedent -%}
+        {% if not occurrences -%}
+            <h3>Date</h3>
+            <p>{{ event.start_dt|format_date(timezone=event.timezone) }}
+            {%- if event.start_dt_local.date() != event.end_dt_local.date() %}
+                {#- #} - {{ event.end_dt|format_date(timezone=event.timezone) }}
+            {%- endif %}</p>
+
+            <h3>Time</h3>
+            <p>{{ event.start_dt|format_time(timezone=event.timezone) }} -
+            {{ event.end_dt|format_time(timezone=event.timezone) }}
+            {#- #} ({{ event.timezone }})</p>
+            <p>
+                <a href="{{ event.external_url }}">{{ event.external_url }}</a>
+            </p>
+        {%- else -%}
+            <h3>Timezone</h3>
+            <p>{{ event.timezone }}</p>
+
+            <h3>Occurrences</h3>
+            {% for evt in occurrences|sort(attribute='start_dt') %}
+                <p>{{ evt.start_dt|format_date(timezone=evt.timezone) }}, {# -#}
+                {{ evt.start_dt|format_time(timezone=evt.timezone) }} - {# -#}
+                {{ evt.end_dt|format_time(timezone=evt.timezone) }}: {# -#}
+                 <a href="{{ event.external_url }}">{{ evt.external_url }}</a></p>
+            {%- endfor -%}
+        {%- endif -%}
+    {%- endfilter -%}
+{% endmacro %}

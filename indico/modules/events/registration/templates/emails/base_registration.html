@@ -1,4 +1,6 @@
 {% extends 'emails/base.html' %}
+{% from 'events/emails/_event_dates.html' import render_event_dates_html %}
+
 {% block header %}{% endblock %}
 {% block footer %}{% endblock %}
 
@@ -17,6 +19,9 @@
             <h1 style="margin: 0;">
                 {{ event.title }}
             </h1>
+            <div>
+                {{- render_event_dates_html(event) -}}
+            </div>
             <h3 style="margin: 0; margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee;">
                 {{ registration.registration_form.title }}
                 <span style="float: right; font-style: italic;">

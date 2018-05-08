@@ -1,3 +1,5 @@
+{% from 'events/emails/_event_dates.html' import render_event_dates_html %}
+
 {% macro get_subject() %}Invitation to register{% endmacro %}
 
 {% macro get_html_body() %}
@@ -5,6 +7,9 @@
     <br>
     We'd like to invite you to register for the following event:<br>
     <strong>{{ event.title }}</strong><br><br>
+
+    {{- render_event_dates_html(event) -}}
+
 
     You can register (or decline the invitation) by using this link:<br>
     {invitation_link}

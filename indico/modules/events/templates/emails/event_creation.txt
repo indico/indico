@@ -1,4 +1,5 @@
 {% extends 'emails/base.txt' %}
+{% from 'events/emails/_event_dates.html' import render_event_dates %}
 
 {% block subject -%}
     New {{ event.type }} in Indico
@@ -43,31 +44,7 @@
             {{ event.description | striptags }}
         {%- endif %}
 
-        {% if not occurrences -%}
-            {% filter underline %}Date{% endfilter %}
-            {{ event.start_dt|format_date(timezone=event.timezone) }}
-            {%- if event.start_dt_local.date() != event.end_dt_local.date() %}
-                {#- #} - {{ event.end_dt|format_date(timezone=event.timezone) }}
-            {%- endif %}
-
-            {% filter underline %}Time{% endfilter %}
-            {{ event.start_dt|format_time(timezone=event.timezone) }} - {{ event.end_dt|format_time(timezone=event.timezone) }}
-            {#- #} ({{ event.timezone }})
-
-            {% filter underline %}URL{% endfilter %}
-            {{ event.external_url }}
-        {%- else -%}
-            {% filter underline %}Timezone{% endfilter %}
-            {{ event.timezone }}
-
-            {% filter underline %}Occurrences{% endfilter -%}
-            {% for evt in occurrences|sort(attribute='start_dt') %}
-                {{ evt.start_dt|format_date(timezone=evt.timezone) }}, {# -#}
-                {{ evt.start_dt|format_time(timezone=evt.timezone) }} - {# -#}
-                {{ evt.end_dt|format_time(timezone=evt.timezone) }}: {# -#}
-                {{ evt.external_url -}}
-            {%- endfor -%}
-        {%- endif -%}
+        {{- render_event_dates(event, occurrences) -}}
     {%- endfilter -%}
 {%- endblock %}
 
