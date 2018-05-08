@@ -58,24 +58,26 @@ class PersonLinkDataMixin(object):
 
 
 class AuthorsSpeakersMixin(object):
+    AUTHORS_SPEAKERS_DISPLAY_ORDER_ATTR = 'display_order_key'
+
     @property
     def speakers(self):
         return [person_link
-                for person_link in sorted(self.person_links, key=attrgetter('display_order_key'))
+                for person_link in sorted(self.person_links, key=attrgetter(self.AUTHORS_SPEAKERS_DISPLAY_ORDER_ATTR))
                 if person_link.is_speaker]
 
     @property
     def primary_authors(self):
         from indico.modules.events.contributions.models.persons import AuthorType
         return [person_link
-                for person_link in sorted(self.person_links, key=attrgetter('display_order_key'))
+                for person_link in sorted(self.person_links, key=attrgetter(self.AUTHORS_SPEAKERS_DISPLAY_ORDER_ATTR))
                 if person_link.author_type == AuthorType.primary]
 
     @property
     def secondary_authors(self):
         from indico.modules.events.contributions.models.persons import AuthorType
         return [person_link
-                for person_link in sorted(self.person_links, key=attrgetter('display_order_key'))
+                for person_link in sorted(self.person_links, key=attrgetter(self.AUTHORS_SPEAKERS_DISPLAY_ORDER_ATTR))
                 if person_link.author_type == AuthorType.secondary]
 
 
@@ -429,6 +431,10 @@ class PersonLinkBase(PersonMixin, db.Model):
     @property
     def display_order_key(self):
         return self.display_order, self.display_full_name
+
+    @property
+    def display_order_key_lastname(self):
+        return self.display_order, self.last_name, self.first_name
 
     @hybrid_property
     def object(self):

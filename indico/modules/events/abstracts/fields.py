@@ -117,6 +117,7 @@ class AbstractPersonLinkListField(PersonLinkListFieldBase):
         self.default_is_submitter = False
         self.default_is_speaker = False
         self.require_primary_author = True
+        self.sort_by_last_name = True
         super(AbstractPersonLinkListField, self).__init__(*args, **kwargs)
 
     def _convert_data(self, data):

@@ -27,6 +27,7 @@
             authorTypes: null,
             showEmptyCoauthors: true,
             sort: true,
+            sortByLastName: false,
             allow: {
                 authors: false,
                 submitters: false,
@@ -112,14 +113,18 @@
             });
         }
 
+        function getName(person) {
+            return options.sortByLastName ? '{0}, {1}'.format(person.familyName, person.firstName) : person.name;
+        }
+
         function renderPeople(people) {
             $coauthorList.empty();
             $otherList.empty();
 
             var sortedPeople = _.clone(people);
             sortedPeople.sort(function(person1, person2) {
-                var k1 = person1.displayOrder + ' ' + person1.name;
-                var k2 = person2.displayOrder + ' ' + person2.name;
+                var k1 = person1.displayOrder + ' ' + getName(person1);
+                var k2 = person2.displayOrder + ' ' + getName(person2);
                 return strnatcmp(k1, k2);
             });
 
@@ -160,7 +165,7 @@
         function renderPerson(person, $list, entryType, isSortable) {
             var $speakerLabel = $('<span>').addClass('i-label small speaker').text($T.gettext("Speaker"));
             var $personRow = $('<div>').addClass('person-row').data('person', person);
-            var $personName = $('<div>').addClass('name').text(person.name);
+            var $personName = $('<div>').addClass('name').text(getName(person));
             var $personRoles = $('<span>').addClass('person-roles');
             var $personButtons = $('<span>').addClass('person-buttons');
             var $buttonRemove = $('<a>').addClass('i-link danger icon-close')

@@ -76,6 +76,7 @@ Improvements
 - Include event date/time in registration emails (:issue:`3337`)
 - Allow div/span/pre with classes when writing raw HTML in CKEditor
   (:issue:`3332`, thanks :user:`bpedersen2`)
+- Sort abstract authors/speakers by last name (:issue:`3340`)
 
 Bugfixes
 ^^^^^^^^

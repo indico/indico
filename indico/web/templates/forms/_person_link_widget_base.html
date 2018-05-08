@@ -44,6 +44,7 @@
             eventId: {{ (field.event.id if field.event else none) | tojson }},
             authorTypes: {{ (field.author_types or none) | tojson }},
             showEmptyCoauthors: {{ field.show_empty_coauthors | default(true) | tojson }},
+            sortByLastName: {{ field.sort_by_last_name | default(false) | tojson }},
             allow: {
                 authors: {{ field.allow_authors | default(false) | tojson }},
                 submitters: {{ field.allow_submitters | default(false) | tojson }},

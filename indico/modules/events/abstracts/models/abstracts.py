@@ -129,6 +129,8 @@ class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFie
     create_judgment_endpoint = 'abstracts.judge_abstract'
     revisions_enabled = False
 
+    AUTHORS_SPEAKERS_DISPLAY_ORDER_ATTR = 'display_order_key_lastname'
+
     @declared_attr
     def __table_args__(cls):
         return auto_table_args(cls)
