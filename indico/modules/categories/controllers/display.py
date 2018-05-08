@@ -38,7 +38,7 @@ from indico.modules.categories.legacy import XMLCategorySerializer
 from indico.modules.categories.models.categories import Category
 from indico.modules.categories.serialize import (serialize_categories_ical, serialize_category, serialize_category_atom,
                                                  serialize_category_chain)
-from indico.modules.categories.util import get_category_stats, get_upcoming_events, serialize_events_for_json_ld
+from indico.modules.categories.util import get_category_stats, get_upcoming_events, serialize_event_for_json_ld
 from indico.modules.categories.views import WPCategory, WPCategoryStatistics
 from indico.modules.events.models.events import Event
 from indico.modules.events.timetable.util import get_category_timetable
@@ -339,7 +339,7 @@ class RHDisplayCategory(RHDisplayCategoryEventsBase):
                   'past_event_count': past_event_count,
                   'show_past_events': show_past_events,
                   'past_threshold': past_threshold.strftime(threshold_format),
-                  'json_ld': serialize_events_for_json_ld(events + future_events),
+                  'json_ld': map(serialize_event_for_json_ld, (events + future_events)),
                   'atom_feed_url': url_for('.export_atom', self.category),
                   'atom_feed_title': _('Events of "{}"').format(self.category.title)}
         params.update(get_base_ical_parameters(session.user, 'category',

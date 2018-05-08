@@ -204,7 +204,3 @@ def get_image_data(image_type, category):
         'size': metadata['size'],
         'content_type': metadata['content_type']
     }
-
-
-def serialize_events_for_json_ld(events):
-    return [serialize_event_for_json_ld(event) for event in events]
