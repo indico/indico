@@ -65,11 +65,6 @@ class RHRegistrationFormTickets(RHManageRegFormBase):
 class RHTicketDownload(RHRegistrationFormRegistrationBase):
     """Generate ticket for a given registration"""
 
-    def _process_args(self):
-        RHRegistrationFormRegistrationBase._process_args(self)
-        if not self.registration:
-            raise NotFound
-
     def _check_access(self):
         RHRegistrationFormRegistrationBase._check_access(self)
         if self.registration.state != RegistrationState.complete:

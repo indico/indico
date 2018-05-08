@@ -59,6 +59,8 @@ class RHRegistrationFormBase(RegistrationFormMixin, RHRegistrationFormDisplayBas
 class RHRegistrationFormRegistrationBase(RHRegistrationFormBase):
     """Base for RHs handling individual registrations"""
 
+    REGISTRATION_REQUIRED = True
+
     def _process_args(self):
         RHRegistrationFormBase._process_args(self)
         self.token = request.args.get('token')
@@ -68,6 +70,8 @@ class RHRegistrationFormRegistrationBase(RHRegistrationFormBase):
                 raise NotFound
         else:
             self.registration = self.regform.get_registration(user=session.user) if session.user else None
+        if self.REGISTRATION_REQUIRED and not self.registration:
+            raise Forbidden
 
 
 class RHRegistrationFormList(RHRegistrationFormDisplayBase):
@@ -237,6 +241,8 @@ class RHRegistrationFormCheckEmail(RHRegistrationFormBase):
 class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):
     """Display a registration form and registrations, and process submissions"""
 
+    REGISTRATION_REQUIRED = False
+
     normalize_url_spec = {
         'locators': {
             lambda self: self.regform
@@ -287,6 +293,7 @@ class RHRegistrationDisplayEdit(RegistrationEditMixin, RHRegistrationFormRegistr
 
     template_file = 'display/registration_modify.html'
     management = False
+    REGISTRATION_REQUIRED = False
 
     def _process_args(self):
         RHRegistrationFormRegistrationBase._process_args(self)

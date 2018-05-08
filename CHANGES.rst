@@ -92,6 +92,8 @@ Bugfixes
 - Do not require management access to a category to select a badge
   template from it as a backside.
 - Fix breadcrumb metadata (:issue:`3321`, thanks :user:`bpedersen2`)
+- Fix error when accessing certain registration pages without an active
+  registration
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

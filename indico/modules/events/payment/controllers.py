@@ -63,11 +63,6 @@ class RHPaymentBase(RHRegistrationFormRegistrationBase):
     """Base RH for non-management payment pages"""
     EVENT_FEATURE = 'payment'
 
-    def _process_args(self):
-        RHRegistrationFormRegistrationBase._process_args(self)
-        if self.registration is None:
-            raise NotFound
-
 
 class RHPaymentSettings(RHPaymentManagementBase):
     """Display payment settings"""
