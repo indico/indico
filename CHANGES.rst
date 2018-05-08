@@ -77,6 +77,8 @@ Improvements
 - Allow div/span/pre with classes when writing raw HTML in CKEditor
   (:issue:`3332`, thanks :user:`bpedersen2`)
 - Sort abstract authors/speakers by last name (:issue:`3340`)
+- Improve machine-readable metadata for events and categories
+  (:issue:`3287`, thanks :user:`bpedersen2`)
 
 Bugfixes
 ^^^^^^^^
