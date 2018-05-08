@@ -73,6 +73,7 @@ Improvements
   a meeting theme (:issue:`3297`, thanks :user:`bpedersen2`)
 - Allow definition lists in places where Markdown or HTML is accepted
   (:issue:`3325`)
+- Include event date/time in registration emails (:issue:`3337`)
 
 Bugfixes
 ^^^^^^^^
