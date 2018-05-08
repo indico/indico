@@ -85,19 +85,16 @@
         <ul>
             {% for event in month.events %}
                 {% set is_lecture = (event.type == 'lecture') %}
-                <li itemscope itemtype="http://data-vocabulary.org/Event">
+                <li>
                     <span class="ical">
                         <a class="icon-calendar" href="{{ url_for('events.export_event_ical', event) }}"></a>
                     </span>
                     <span class="list-name">
                         <span class="date {% if happening_now(event) %}today{% endif %}">
                             {{ format_event_date(event) }}
-                            <time itemprop="startDate" datetime="{{ event.start_dt.isoformat() }}">
                         </span>
-                        <a href="{{ event.url }}" itemprop="url">
-                            <span itemprop="summary">
-                                {{ event.get_verbose_title(show_speakers=is_lecture, show_series_pos=is_lecture) | striptags }}
-                            </span>
+                        <a href="{{ event.url }}">
+                            {{ event.get_verbose_title(show_speakers=is_lecture, show_series_pos=is_lecture) | striptags }}
                         </a>
                         <span class="protected">
                             {% if event.is_self_protected %}
