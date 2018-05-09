@@ -14,6 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+import re
 from copy import deepcopy
 from datetime import timedelta
 from itertools import takewhile
@@ -45,7 +46,7 @@ from indico.modules.events.tracks.settings import track_settings
 from indico.modules.events.util import create_event_logo_tmp_file
 from indico.util.date_time import format_date, format_datetime, format_human_timedelta, format_time, now_utc
 from indico.util.i18n import _, ngettext
-from indico.util.string import format_full_name, html_color_to_rgb, to_unicode, truncate
+from indico.util.string import format_full_name, html_color_to_rgb, render_markdown, to_unicode, truncate
 
 
 # Change reportlab default pdf font Helvetica to indico ttf font,
@@ -139,8 +140,13 @@ class ProgrammeToPDF(PDFBase):
         styles = _get_sans_style_sheet()
         style = styles["Normal"]
         style.alignment = TA_JUSTIFY
-        p = Paragraph(escape(track_settings.get(self.event, 'program').encode('utf-8')), style)
-        story.append(p)
+
+        event_program = render_markdown(track_settings.get(self.event, 'program'))
+        for i, para in enumerate(event_program.split('\n')):
+            if i > 0 and re.match(r'<(p|ul|ol)\b[^>]*>', para):
+                story.append(Spacer(1, 0.2 * inch))
+            story.append(Paragraph(para.encode('utf-8'), style))
+
         story.append(Spacer(1, 0.4*inch))
         for track in self.event.tracks:
             bogustext = track.title.encode('utf-8')

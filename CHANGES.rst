@@ -100,6 +100,8 @@ Bugfixes
 - Fix error when accessing certain registration pages without an active
   registration
 - Use event timezone when displaying event log entries (:issue:`3354`)
+- Correctly render most markdown elements when generating a programme PDF
+  (:issue:`3351`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
