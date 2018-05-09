@@ -28,12 +28,7 @@ rules:
     - error
     - capIsNewExceptionPattern: '\$\.(Event|Deferred)$'
   prefer-template: warn
-  react/forbid-component-props:
-    - error
-    - forbid:
-      - propName: style
-      - propName: className
-        allowedFor: [ReactModal]
+  react/forbid-component-props: off
 
 globals:
   _: false
