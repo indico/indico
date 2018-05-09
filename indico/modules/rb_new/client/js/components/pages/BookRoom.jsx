@@ -98,7 +98,7 @@ export default class BookRoom extends React.Component {
                 </Slot>
             </Room>
         );
-    }
+    };
 
     render() {
         const {toggleMapSearch, map: {search, aspects}, rooms, fetchRooms} = this.props;

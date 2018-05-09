@@ -42,13 +42,13 @@ export default class FilterDropdown extends React.Component {
         initialValues: propTypes.object,
         defaults: propTypes.object,
         showButtons: propTypes.bool
-    }
+    };
 
     static defaultProps = {
         initialValues: {},
         defaults: {},
         showButtons: true
-    }
+    };
 
     static getDerivedStateFromProps({defaults, initialValues, renderValue}, prevState) {
         return {

@@ -38,7 +38,7 @@ export default class Room extends React.Component {
 
     toggleDimmer = (state) => {
         this.setState({dimmed: state});
-    }
+    };
 
     renderDimmedImage = (dimmer, content) => {
         const {dimmed} = this.state;
@@ -55,7 +55,7 @@ export default class Room extends React.Component {
                 <Image {...dimmer} />
             </div>
         );
-    }
+    };
 
     renderCardImage = (room, content, actions) => {
         const {dimmed} = this.state;
@@ -86,7 +86,7 @@ export default class Room extends React.Component {
                 </div>
             );
         }
-    }
+    };
 
     render() {
         const {room, children} = this.props;
