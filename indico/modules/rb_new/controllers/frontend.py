@@ -20,6 +20,6 @@ from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb_new.views.base import WPRoomBookingBase
 
 
-class RHRoomBookingLanding(RHRoomBookingBase):
+class RHLanding(RHRoomBookingBase):
     def _process(self):
         return WPRoomBookingBase.display('room_booking.html')

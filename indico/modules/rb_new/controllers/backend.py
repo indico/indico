@@ -30,7 +30,7 @@ from indico.modules.rb_new.schemas import aspects_schema, reservation_occurrence
 from indico.modules.rb_new.util import get_buildings, get_rooms_availability, search_for_rooms
 
 
-class RHRoomBookingSearch(RHRoomBookingBase):
+class RHSearchRooms(RHRoomBookingBase):
     @use_args({
         'capacity': fields.Int(),
         'text': fields.Str(),
@@ -51,7 +51,7 @@ class RHRoomBookingSearch(RHRoomBookingBase):
         return jsonify(total=total, rooms=rooms_schema.dump(rooms).data)
 
 
-class RHRoomBookingAspects(RHRoomBookingBase):
+class RHAspects(RHRoomBookingBase):
     def _process(self):
         to_cast = ['top_left_latitude', 'top_left_longitude', 'bottom_right_latitude', 'bottom_right_longitude']
         aspects = [
@@ -61,12 +61,12 @@ class RHRoomBookingAspects(RHRoomBookingBase):
         return jsonify(aspects)
 
 
-class RHRoomBookingBuildings(RHRoomBookingBase):
+class RHBuildings(RHRoomBookingBase):
     def _process(self):
         return jsonify(get_buildings())
 
 
-class RHRoomBookingTimeline(RHRoomBookingBase):
+class RHTimeline(RHRoomBookingBase):
     @use_args({
         'room_ids': fields.List(fields.Int()),
         'start_dt': fields.DateTime(),
