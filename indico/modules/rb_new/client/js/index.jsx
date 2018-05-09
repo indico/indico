@@ -41,7 +41,8 @@ document.addEventListener('DOMContentLoaded', () => {
             email: Indico.User.email,
             avatarBgColor: Indico.User.avatar_bg_color,
             language: Indico.User.language,
-            isAdmin: Indico.User.is_admin
+            isAdmin: Indico.User.is_admin,
+            favoriteRooms: {},
         },
         staticData: {
             availableLanguages: Indico.Settings.Languages

@@ -32,6 +32,7 @@ from indico.modules.groups import GroupProxy
 from indico.modules.rb.models.blocked_rooms import BlockedRoom
 from indico.modules.rb.models.blockings import Blocking
 from indico.modules.rb.models.equipment import EquipmentType, RoomEquipmentAssociation
+from indico.modules.rb.models.favorites import favorite_room_table
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import RepeatMapping, Reservation
 from indico.modules.rb.models.room_attributes import RoomAttribute, RoomAttributeAssociation
@@ -239,6 +240,14 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         backref='room',
         cascade='all, delete-orphan',
         lazy='dynamic'
+    )
+
+    favorite_of = db.relationship(
+        'User',
+        secondary=favorite_room_table,
+        lazy=True,
+        collection_class=set,
+        backref=db.backref('favorite_rooms', lazy=True, collection_class=set),
     )
 
     #: The owner of the room. If the room has the `manager-group`

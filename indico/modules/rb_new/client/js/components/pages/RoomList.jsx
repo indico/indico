@@ -37,12 +37,15 @@ const SearchBar = searchBarFactory('roomList');
 
 export default class RoomList extends React.Component {
     static propTypes = {
-        fetchRooms: PropTypes.func.isRequired,
-        fetchMapDefaultAspects: PropTypes.func.isRequired,
         map: PropTypes.shape({
             bounds: PropTypes.array,
         }).isRequired,
+        favoriteRooms: PropTypes.object.isRequired,
+        fetchRooms: PropTypes.func.isRequired,
+        fetchMapDefaultAspects: PropTypes.func.isRequired,
         updateLocation: PropTypes.func.isRequired,
+        addFavoriteRoom: PropTypes.func.isRequired,
+        delFavoriteRoom: PropTypes.func.isRequired,
     };
 
     constructor(props) {
@@ -63,12 +66,21 @@ export default class RoomList extends React.Component {
         updateLocation(getMapBounds(e.target));
     }
 
+    toggleFavoriteRoom = (room) => {
+        const {favoriteRooms, addFavoriteRoom, delFavoriteRoom} = this.props;
+        const fn = favoriteRooms[room.id] ? delFavoriteRoom : addFavoriteRoom;
+        fn(room.id);
+    };
+
     renderRoom = (room) => {
+        const {favoriteRooms} = this.props;
+        const isFavorite = !!favoriteRooms[room.id];
         return (
             <Room key={room.id} room={room}>
                 <Slot name="actions">
                     <Button primary icon="edit" circular />
-                    <Button icon="star" color="teal" circular />
+                    <Button icon="star" color={isFavorite ? 'yellow' : 'teal'} circular
+                            onClick={() => this.toggleFavoriteRoom(room)} />
                 </Slot>
             </Room>
         );

@@ -16,14 +16,16 @@
 
 from __future__ import unicode_literals
 
-from flask import jsonify
+from flask import jsonify, request, session
 from marshmallow_enum import EnumField
 from webargs import fields
 from webargs.flaskparser import use_args
 
+from indico.core.db import db
 from indico.core.db.sqlalchemy.util.queries import with_total_rows
 from indico.modules.rb import Location
 from indico.modules.rb.controllers import RHRoomBookingBase
+from indico.modules.rb.models.favorites import favorite_room_table
 from indico.modules.rb.models.reservations import RepeatFrequency
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb_new.schemas import aspects_schema, reservation_occurrences_schema, rooms_schema
@@ -84,3 +86,24 @@ class RHTimeline(RHRoomBookingBase):
             availability['conflicts'] = reservation_occurrences_schema.dump(availability['conflicts']).data
             availability['pre_conflicts'] = reservation_occurrences_schema.dump(availability['pre_conflicts']).data
         return jsonify(availabilities)
+
+
+class RHRoomFavorites(RHRoomBookingBase):
+    def _process_args(self):
+        self.room = None
+        if 'room_id' in request.view_args:
+            self.room = Room.get_one(request.view_args['room_id'])
+
+    def _process_GET(self):
+        query = (db.session.query(favorite_room_table.c.room_id)
+                 .filter(favorite_room_table.c.user_id == session.user.id))
+        favorites = [id_ for id_, in query]
+        return jsonify(favorites)
+
+    def _process_PUT(self):
+        session.user.favorite_rooms.add(self.room)
+        return '', 204
+
+    def _process_DELETE(self):
+        session.user.favorite_rooms.discard(self.room)
+        return '', 204

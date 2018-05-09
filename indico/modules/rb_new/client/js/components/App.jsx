@@ -34,6 +34,11 @@ import './App.module.scss';
 
 
 export default class App extends React.Component {
+    componentDidMount() {
+        const {fetchFavoriteRooms} = this.props;
+        fetchFavoriteRooms();
+    }
+
     render() {
         const {history, filtersSet} = this.props;
 
@@ -80,5 +85,6 @@ export default class App extends React.Component {
 
 App.propTypes = {
     history: PropTypes.object.isRequired,
-    filtersSet: PropTypes.bool.isRequired
+    filtersSet: PropTypes.bool.isRequired,
+    fetchFavoriteRooms: PropTypes.func.isRequired,
 };

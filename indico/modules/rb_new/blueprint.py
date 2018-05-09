@@ -30,6 +30,9 @@ _bp.add_url_rule('/<path:path>', 'roombooking', RHLanding)
 
 # Backend
 _bp.add_url_rule('/api/rooms', 'available_rooms', backend.RHSearchRooms)
+_bp.add_url_rule('/api/user/favorite-rooms/', 'favorite_rooms', backend.RHRoomFavorites)
+_bp.add_url_rule('/api/user/favorite-rooms/<int:room_id>', 'favorite_rooms', backend.RHRoomFavorites,
+                 methods=('PUT', 'DELETE'))
 _bp.add_url_rule('/api/map/aspects', 'default_aspects', backend.RHAspects)
 _bp.add_url_rule('/api/buildings', 'buildings', backend.RHBuildings)
 _bp.add_url_rule('/api/timeline', 'timeline', backend.RHTimeline)
