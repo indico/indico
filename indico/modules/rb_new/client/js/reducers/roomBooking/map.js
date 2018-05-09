@@ -19,7 +19,7 @@ import * as actions from '../../actions';
 
 
 const initialState = {
-    bounds: null,
+    bounds: {},
     aspects: [],
     search: true,
     isFetching: false,

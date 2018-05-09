@@ -38,7 +38,6 @@ export default function RoomBookingMap(props) {
     }));
     Leaflet.Marker.prototype.options.icon = Leaflet.divIcon({className: 'rb-map-marker', iconSize: [20, 20]});
 
-
     const searchControl = searchCheckbox && (
         <RoomBookingMapControl position="topleft">
             <Checkbox label={Translate.string('Search as I move the map')}
@@ -64,9 +63,9 @@ export default function RoomBookingMap(props) {
         </MarkerClusterGroup>
     );
 
-    return (
+    return !_.isEmpty(bounds) && (
         <div styleName="map-container">
-            <Map ref={mapRef} bounds={bounds} onDragend={onMove} onZoomend={onMove}>
+            <Map ref={mapRef} bounds={Object.values(bounds)} onDragend={onMove} onZoomend={onMove}>
                 <TileLayer attribution='© <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
                 {markers}
@@ -78,7 +77,7 @@ export default function RoomBookingMap(props) {
 }
 
 RoomBookingMap.propTypes = {
-    bounds: propTypes.array.isRequired,
+    bounds: propTypes.object.isRequired,
     onMove: propTypes.func.isRequired,
     searchCheckbox: propTypes.bool,
     isSearchEnabled: propTypes.bool,

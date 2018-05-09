@@ -36,7 +36,7 @@ const SearchBar = searchBoxFactory('bookRoom');
 export default class BookRoom extends React.Component {
     static propTypes = {
         map: PropTypes.shape({
-            bounds: PropTypes.array,
+            bounds: PropTypes.object,
             search: PropTypes.bool.isRequired,
             aspects: PropTypes.array
         }).isRequired,
@@ -53,10 +53,10 @@ export default class BookRoom extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            aspectBounds: props.map.bounds || null
+            aspectBounds: props.map.bounds
         };
         this.map = React.createRef();
-        if (!props.map.bounds) {
+        if (_.isEmpty(props.map.bounds)) {
             const {fetchMapDefaultAspects} = props;
             const callback = () => {
                 const {map: {bounds}} = this.props;
@@ -121,14 +121,12 @@ export default class BookRoom extends React.Component {
                                     renderRoom={this.renderRoom} />
                 </Grid.Column>
                 <Grid.Column width={5}>
-                    {aspectBounds && (
-                        <RoomBookingMap mapRef={this.map} bounds={aspectBounds} onMove={(e) => this.onMove(e)}
-                                        searchCheckbox isSearchEnabled={search}
-                                        onToggleSearchCheckbox={(e, data) => toggleMapSearch(data.checked)}
-                                        aspects={aspects}
-                                        onChangeAspect={(e, data) => this.onChangeAspect(data.value)}
-                                        rooms={roomMarkers} />
-                    )}
+                    <RoomBookingMap mapRef={this.map} bounds={aspectBounds} onMove={(e) => this.onMove(e)}
+                                    searchCheckbox isSearchEnabled={search}
+                                    onToggleSearchCheckbox={(e, data) => toggleMapSearch(data.checked)}
+                                    aspects={aspects}
+                                    onChangeAspect={(e, data) => this.onChangeAspect(data.value)}
+                                    rooms={roomMarkers} />
                 </Grid.Column>
             </Grid>
         );
