@@ -38,7 +38,7 @@ const SearchBar = searchBarFactory('roomList');
 export default class RoomList extends React.Component {
     static propTypes = {
         map: PropTypes.shape({
-            bounds: PropTypes.array,
+            bounds: PropTypes.object,
         }).isRequired,
         favoriteRooms: PropTypes.object.isRequired,
         fetchRooms: PropTypes.func.isRequired,
@@ -51,7 +51,7 @@ export default class RoomList extends React.Component {
     constructor(props) {
         super(props);
         const {map: {bounds}, fetchMapDefaultAspects} = this.props;
-        if (!bounds) {
+        if (_.isEmpty(bounds)) {
             fetchMapDefaultAspects();
         }
     }
@@ -97,9 +97,7 @@ export default class RoomList extends React.Component {
                                     renderRoom={this.renderRoom} />
                 </Grid.Column>
                 <Grid.Column width={5}>
-                    {bounds && (
-                        <RoomBookingMap bounds={bounds} onMove={(e) => this.onMove(e)} />
-                    )}
+                    <RoomBookingMap bounds={bounds} onMove={(e) => this.onMove(e)} />
                 </Grid.Column>
             </Grid>
         );

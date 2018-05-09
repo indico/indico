@@ -90,18 +90,18 @@ export function sanitizeRecurrence(filters) {
 }
 
 export function getAspectBounds(aspect) {
-    return [
-        [aspect.top_left_latitude, aspect.top_left_longitude],
-        [aspect.bottom_right_latitude, aspect.bottom_right_longitude]
-    ];
+    return {
+        SW: [aspect.top_left_latitude, aspect.top_left_longitude],
+        NE: [aspect.bottom_right_latitude, aspect.bottom_right_longitude]
+    };
 }
 
 export function getMapBounds(map) {
     const boundsObj = map.getBounds();
-    return [
-        Object.values(boundsObj.getNorthWest()),
-        Object.values(boundsObj.getSouthEast())
-    ];
+    return {
+        SW: Object.values(boundsObj.getSouthWest()),
+        NE: Object.values(boundsObj.getNorthEast())
+    };
 }
 
 function _pruneNullLeaves(obj) {
