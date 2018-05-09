@@ -39,6 +39,8 @@ export default class CapacityForm extends FilterFormComponent {
         return (
             <div styleName="capacity-form">
                 <Input type="number"
+                       min="0"
+                       step="1"
                        value={capacity || ''}
                        onChange={(_, {value}) => {
                            this.setCapacity(value);
