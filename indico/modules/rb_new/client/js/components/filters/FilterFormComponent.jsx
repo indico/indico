@@ -25,7 +25,7 @@ import propTypes from 'prop-types';
 export default class FilterFormBase extends React.Component {
     static propTypes = {
         setParentField: propTypes.func.isRequired
-    }
+    };
 
     static getDerivedStateFromProps(props, prevState) {
         // override internal state from props.

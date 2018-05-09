@@ -72,7 +72,7 @@ export default class RoomList extends React.Component {
                 </Slot>
             </Room>
         );
-    }
+    };
 
     render() {
         const {fetchRooms, map: {bounds}} = this.props;

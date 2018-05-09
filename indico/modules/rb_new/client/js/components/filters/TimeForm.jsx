@@ -33,12 +33,12 @@ export default class TimeForm extends FilterFormComponent {
         startTime: propTypes.string,
         endTime: propTypes.string,
         ...FilterFormComponent.propTypes
-    }
+    };
 
     static defaultProps = {
         startTime: null,
         endTime: null
-    }
+    };
 
     static getDerivedStateFromProps({startTime, endTime}, prevState) {
         // if there is no internal state, get the values from props

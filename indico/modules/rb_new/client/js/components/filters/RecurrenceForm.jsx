@@ -38,7 +38,7 @@ export default class RecurrenceForm extends FilterFormComponent {
         type: null,
         interval: null,
         number: null
-    }
+    };
 
     constructor(props) {
         super(props);

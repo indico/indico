@@ -53,16 +53,16 @@ export default class SearchBar extends React.Component {
     componentDidMount = () => {
         this.props.fetchBuildings(); // eslint-disable-line react/destructuring-assignment
         this.setState({inputTextValue: this.composeInputTextValue()});
-    }
+    };
 
     componentWillUnmount = () => {
         this.props.setFilterParameter('text', null); // eslint-disable-line react/destructuring-assignment
         this.setState({building: null, floor: null, roomName: null, inputTextValue: null});
-    }
+    };
 
     toggleFiltersPopup = (visible) => {
         this.setState({filtersPopupVisible: visible});
-    }
+    };
 
     close = () => {
         const {filtersChanged} = this.state;
@@ -73,7 +73,7 @@ export default class SearchBar extends React.Component {
             onConfirm();
             this.setState({filtersChanged: false});
         }
-    }
+    };
 
     composeInputTextValue = () => {
         const stateToKeys = {building: 'bldg', floor: 'floor'};
@@ -92,14 +92,14 @@ export default class SearchBar extends React.Component {
         }
 
         return textParts.length ? textParts.join(' ') : null;
-    }
+    };
 
     didFiltersChange = () => {
         const {filters} = this.props;
         const {building, floor, roomName} = this.state;
 
         return roomName !== filters.text || building !== filters.building || floor !== filters.floor;
-    }
+    };
 
     updateTextFilter = (filterValue) => {
         const {setFilterParameter, onTextChange} = this.props;
@@ -111,7 +111,7 @@ export default class SearchBar extends React.Component {
             setFilterParameter('text', filterValue);
             onTextChange();
         });
-    }
+    };
 
     updateFilter = (filterName, value) => {
         const filterValue = value || null;
@@ -127,7 +127,7 @@ export default class SearchBar extends React.Component {
             this.setState({inputTextValue, filtersChanged: this.didFiltersChange()});
             setFilterParameter('text', inputTextValue);
         });
-    }
+    };
 
     render() {
         const commonAttrs = {
