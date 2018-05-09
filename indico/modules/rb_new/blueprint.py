@@ -17,7 +17,7 @@
 from __future__ import unicode_literals
 
 from indico.modules.rb_new.controllers import backend
-from indico.modules.rb_new.controllers.frontend import RHRoomBookingLanding
+from indico.modules.rb_new.controllers.frontend import RHLanding
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -25,11 +25,11 @@ _bp = IndicoBlueprint('rooms_new', __name__, template_folder='templates', virtua
                       url_prefix='/rooms-new')
 
 # Frontend
-_bp.add_url_rule('/', 'roombooking', RHRoomBookingLanding)
-_bp.add_url_rule('/<path:path>', 'roombooking', RHRoomBookingLanding)
+_bp.add_url_rule('/', 'roombooking', RHLanding)
+_bp.add_url_rule('/<path:path>', 'roombooking', RHLanding)
 
 # Backend
-_bp.add_url_rule('/api/rooms', 'available_rooms', backend.RHRoomBookingSearch)
-_bp.add_url_rule('/api/map/aspects', 'default_aspects', backend.RHRoomBookingAspects)
-_bp.add_url_rule('/api/buildings', 'buildings', backend.RHRoomBookingBuildings)
-_bp.add_url_rule('/api/timeline', 'timeline', backend.RHRoomBookingTimeline)
+_bp.add_url_rule('/api/rooms', 'available_rooms', backend.RHSearchRooms)
+_bp.add_url_rule('/api/map/aspects', 'default_aspects', backend.RHAspects)
+_bp.add_url_rule('/api/buildings', 'buildings', backend.RHBuildings)
+_bp.add_url_rule('/api/timeline', 'timeline', backend.RHTimeline)
