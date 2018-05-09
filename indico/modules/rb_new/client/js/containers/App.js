@@ -17,13 +17,20 @@
 import {connect} from 'react-redux';
 
 import App from '../components/App';
+import {fetchFavoriteRooms} from '../actions';
 
 
 const mapStateToProps = ({bookRoom: {filters: {recurrence: {type}}}}) => ({
     filtersSet: !!type
 });
 
+const mapDispatchToProps = (dispatch) => ({
+    fetchFavoriteRooms: () => {
+        dispatch(fetchFavoriteRooms());
+    }
+});
+
 export default connect(
     mapStateToProps,
-    null
+    mapDispatchToProps
 )(App);

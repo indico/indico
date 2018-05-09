@@ -369,6 +369,7 @@ class User(PersonMixin, db.Model):
     # - event_reminders (EventReminder.creator)
     # - event_roles (EventRole.members)
     # - favorite_of (User.favorite_users)
+    # - favorite_rooms (Room.favorite_of)
     # - global_abstract_reviewer_for_events (Event.global_abstract_reviewers)
     # - global_convener_for_events (Event.global_conveners)
     # - in_attachment_acls (AttachmentPrincipal.user)

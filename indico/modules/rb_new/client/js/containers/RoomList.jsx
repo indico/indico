@@ -18,10 +18,10 @@
 import {connect} from 'react-redux';
 
 import RoomList from '../components/pages/RoomList';
-import {fetchMapDefaultAspects, fetchRooms, updateLocation} from '../actions';
+import {addFavoriteRoom, delFavoriteRoom, fetchMapDefaultAspects, fetchRooms, updateLocation} from '../actions';
 
 
-const mapStateToProps = ({roomList}) => ({...roomList});
+const mapStateToProps = ({roomList, user: {favoriteRooms}}) => ({...roomList, favoriteRooms});
 
 const mapDispatchToProps = dispatch => ({
     fetchMapDefaultAspects: (callback) => {
@@ -32,7 +32,13 @@ const mapDispatchToProps = dispatch => ({
     },
     fetchRooms: (clear = true) => {
         dispatch(fetchRooms('roomList', clear));
-    }
+    },
+    addFavoriteRoom: (id) => {
+        dispatch(addFavoriteRoom(id));
+    },
+    delFavoriteRoom: (id) => {
+        dispatch(delFavoriteRoom(id));
+    },
 });
 
 export default connect(

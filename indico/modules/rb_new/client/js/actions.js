@@ -18,6 +18,7 @@
 import buildFetchRoomsUrl from 'indico-url:rooms_new.available_rooms';
 import fetchDefaultAspectsUrl from 'indico-url:rooms_new.default_aspects';
 import fetchBuildingsUrl from 'indico-url:rooms_new.buildings';
+import favoriteRoomsUrl from 'indico-url:rooms_new.favorite_rooms';
 
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {getAspectBounds, preProcessParameters} from './util';
@@ -25,7 +26,9 @@ import {ajax as ajaxFilterRules} from './serializers/filters';
 
 
 // User
-export const SET_USER = 'SET_USER';
+export const SET_FAVORITE_ROOMS = 'SET_FAVORITE_ROOMS';
+export const ADD_FAVORITE_ROOM = 'ADD_FAVORITE_ROOM';
+export const DEL_FAVORITE_ROOM = 'DEL_FAVORITE_ROOM';
 // Filter
 export const SET_FILTER_PARAMETER = 'SET_FILTER_PARAMETER';
 // Rooms
@@ -45,8 +48,47 @@ export const FETCH_BUILDINGS = 'FETCH_BUILDINGS';
 export const UPDATE_BUILDINGS = 'UPDATE_BUILDINGS';
 
 
-export function setUser(data) {
-    return {type: SET_USER, data};
+async function _sendFavoriteRoomsRequest(method, id = null) {
+    let response;
+    try {
+        response = await indicoAxios.request({
+            method,
+            url: favoriteRoomsUrl(id !== null ? {room_id: id} : {})
+        });
+    } catch (error) {
+        handleAxiosError(error);
+        return;
+    }
+    return response;
+}
+
+export function fetchFavoriteRooms() {
+    return async (dispatch) => {
+        const response = await _sendFavoriteRoomsRequest('GET');
+        if (response) {
+            dispatch({type: SET_FAVORITE_ROOMS, rooms: response.data});
+        }
+    };
+}
+
+export function addFavoriteRoom(id) {
+    return async (dispatch) => {
+        dispatch({type: ADD_FAVORITE_ROOM, id});
+        const response = await _sendFavoriteRoomsRequest('PUT', id);
+        if (!response) {
+            dispatch({type: DEL_FAVORITE_ROOM, id});
+        }
+    };
+}
+
+export function delFavoriteRoom(id) {
+    return async (dispatch) => {
+        dispatch({type: DEL_FAVORITE_ROOM, id});
+        const response = await _sendFavoriteRoomsRequest('DELETE', id);
+        if (!response) {
+            dispatch({type: ADD_FAVORITE_ROOM, id});
+        }
+    };
 }
 
 export function fetchRoomsStarted(namespace) {
