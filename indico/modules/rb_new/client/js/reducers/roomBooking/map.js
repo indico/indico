@@ -21,7 +21,7 @@ import * as actions from '../../actions';
 const initialState = {
     bounds: {},
     aspects: [],
-    search: true,
+    search: false,
     isFetching: false,
 };
 

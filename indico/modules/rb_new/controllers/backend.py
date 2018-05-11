@@ -44,6 +44,10 @@ class RHSearchRooms(RHRoomBookingBase):
         'floor': fields.Str(),
         'offset': fields.Int(missing=0, validate=lambda x: x >= 0),
         'limit': fields.Int(missing=10, validate=lambda x: x >= 0),
+        'sw_lat': fields.Float(validate=lambda x: -90 <= x <= 90),
+        'sw_lng': fields.Float(validate=lambda x: -180 <= x <= 180),
+        'ne_lat': fields.Float(validate=lambda x: -90 <= x <= 90),
+        'ne_lng': fields.Float(validate=lambda x: -180 <= x <= 180)
     })
     def _process(self, args):
         filter_availability = args.get('start_dt') and args.get('end_dt')
