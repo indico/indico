@@ -39,7 +39,8 @@ export const initialStateFactory = (namespace) => {
             timeSlot: {
                 startTime: null,
                 endTime: null
-            }
+            },
+            bounds: null
         });
     } else if (namespace === 'roomList') {
         Object.assign(state, {

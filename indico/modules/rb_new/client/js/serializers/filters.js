@@ -63,6 +63,26 @@ export const queryString = {
     },
     text: {
         stateField: 'filters.text'
+    },
+    SWLat: {
+        validator: v.isFloat({min: -90, max: 90}),
+        sanitizer: v.toFloat(),
+        stateField: 'filters.bounds.SW[0]'
+    },
+    SWLng: {
+        validator: v.isFloat({min: -180, max: 180}),
+        sanitizer: v.toFloat(),
+        stateField: 'filters.bounds.SW[1]'
+    },
+    NELat: {
+        validator: v.isFloat({min: -90, max: 90}),
+        sanitizer: v.toFloat(),
+        stateField: 'filters.bounds.NE[0]'
+    },
+    NELng: {
+        validator: v.isFloat({min: -180, max: 180}),
+        sanitizer: v.toFloat(),
+        stateField: 'filters.bounds.NE[1]'
     }
 };
 
@@ -120,5 +140,21 @@ export const ajax = {
     end_dt: {
         onlyIf: (data) => data.dates && data.dates.endDate,
         serializer: _dtHandler('end')
+    },
+    sw_lat: {
+        onlyIf: (data) => data.bounds && data.bounds.SW[0],
+        serializer: ({bounds: {SW}}) => SW[0]
+    },
+    sw_lng: {
+        onlyIf: (data) => data.bounds && data.bounds.SW[1],
+        serializer: ({bounds: {SW}}) => SW[1]
+    },
+    ne_lat: {
+        onlyIf: (data) => data.bounds && data.bounds.NE[0],
+        serializer: ({bounds: {NE}}) => NE[0]
+    },
+    ne_lng: {
+        onlyIf: (data) => data.bounds && data.bounds.NE[1],
+        serializer: ({bounds: {NE}}) => NE[1]
     }
 };

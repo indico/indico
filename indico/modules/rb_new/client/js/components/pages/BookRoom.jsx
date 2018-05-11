@@ -47,7 +47,10 @@ export default class BookRoom extends React.Component {
             list: PropTypes.array,
             isFetching: PropTypes.bool,
         }).isRequired,
-        fetchRooms: PropTypes.func.isRequired
+        fetchRooms: PropTypes.func.isRequired,
+        filters: PropTypes.shape({
+            bounds: PropTypes.object
+        }).isRequired
     };
 
     constructor(props) {
@@ -57,10 +60,11 @@ export default class BookRoom extends React.Component {
         };
         this.map = React.createRef();
         if (_.isEmpty(props.map.bounds)) {
-            const {fetchMapDefaultAspects} = props;
+            const {fetchMapDefaultAspects, toggleMapSearch} = props;
             const callback = () => {
-                const {map: {bounds}} = this.props;
-                this.setState({aspectBounds: bounds}, this.updateToMapBounds);
+                const {map: {bounds}, filters: {bounds: filterBounds}} = this.props;
+                this.setState({aspectBounds: _.isEmpty(filterBounds) ? bounds : filterBounds}, this.updateToMapBounds);
+                toggleMapSearch(!_.isEmpty(filterBounds), filterBounds);
             };
             fetchMapDefaultAspects(callback);
         }
@@ -72,8 +76,8 @@ export default class BookRoom extends React.Component {
     }
 
     onMove(e) {
-        const {updateLocation} = this.props;
-        updateLocation(getMapBounds(e.target));
+        const {updateLocation, map: {search}} = this.props;
+        updateLocation(getMapBounds(e.target), search);
     }
 
     onChangeAspect(aspectIdx) {
@@ -82,9 +86,9 @@ export default class BookRoom extends React.Component {
     }
 
     updateToMapBounds() {
-        const {updateLocation} = this.props;
+        const {updateLocation, map: {search}} = this.props;
         const map = this.map.current.leafletElement;
-        updateLocation(getMapBounds(map));
+        updateLocation(getMapBounds(map), search);
     }
 
     renderRoom = (room) => {
@@ -106,7 +110,7 @@ export default class BookRoom extends React.Component {
     };
 
     render() {
-        const {toggleMapSearch, map: {search, aspects}, rooms, fetchRooms} = this.props;
+        const {toggleMapSearch, map: {search, aspects, bounds}, rooms, fetchRooms} = this.props;
         const {aspectBounds} = this.state;
         const roomMarkers = rooms.list.map((room) => (
             {id: room.id, lat: parseFloat(room.latitude), lng: parseFloat(room.longitude)}
@@ -123,7 +127,7 @@ export default class BookRoom extends React.Component {
                 <Grid.Column width={5}>
                     <RoomBookingMap mapRef={this.map} bounds={aspectBounds} onMove={(e) => this.onMove(e)}
                                     searchCheckbox isSearchEnabled={search}
-                                    onToggleSearchCheckbox={(e, data) => toggleMapSearch(data.checked)}
+                                    onToggleSearchCheckbox={(e, data) => toggleMapSearch(data.checked, bounds)}
                                     aspects={aspects}
                                     onChangeAspect={(e, data) => this.onChangeAspect(data.value)}
                                     rooms={roomMarkers} />
