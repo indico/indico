@@ -20,7 +20,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import {Checkbox, Dropdown} from 'semantic-ui-react';
 import Leaflet from 'leaflet';
-import {Map, TileLayer, MapControl, Marker} from 'react-leaflet';
+import {Map, TileLayer, MapControl, Marker, Tooltip} from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-markercluster';
 
 import {Translate} from 'indico/react/i18n';
@@ -58,7 +58,11 @@ export default function RoomBookingMap(props) {
     const markers = rooms.length && (
         <MarkerClusterGroup showCoverageOnHover={false}>
             {rooms.map((room) => (
-                <Marker key={room.id} position={[room.lat, room.lng]} />
+                <Marker key={room.id} position={[room.lat, room.lng]}>
+                    <Tooltip direction="top">
+                        <span>{room.name}</span>
+                    </Tooltip>
+                </Marker>
             ))}
         </MarkerClusterGroup>
     );

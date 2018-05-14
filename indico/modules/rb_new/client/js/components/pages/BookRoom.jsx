@@ -113,7 +113,7 @@ export default class BookRoom extends React.Component {
         const {toggleMapSearch, map: {search, aspects, bounds}, rooms, fetchRooms} = this.props;
         const {aspectBounds} = this.state;
         const roomMarkers = rooms.list.map((room) => (
-            {id: room.id, lat: parseFloat(room.latitude), lng: parseFloat(room.longitude)}
+            {id: room.id, name: room.full_name, lat: parseFloat(room.latitude), lng: parseFloat(room.longitude)}
         ));
         return (
             <Grid columns={2}>
