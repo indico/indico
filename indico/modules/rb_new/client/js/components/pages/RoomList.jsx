@@ -76,7 +76,7 @@ export default class RoomList extends React.Component {
         const {favoriteRooms} = this.props;
         const isFavorite = !!favoriteRooms[room.id];
         return (
-            <Room key={room.id} room={room}>
+            <Room key={room.id} room={room} isFavorite={isFavorite}>
                 <Slot name="actions">
                     <Button primary icon="edit" circular />
                     <Button icon="star" color={isFavorite ? 'yellow' : 'teal'} circular

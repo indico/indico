@@ -15,6 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import isEqual from 'lodash/isEqual';
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Card, Dimmer, Icon, Image, Popup} from 'semantic-ui-react';
@@ -34,6 +35,15 @@ export default class Room extends React.Component {
         this.state = {
             dimmed: false
         };
+    }
+
+    shouldComponentUpdate(nextProps, nextState) {
+        const {isFavorite: nextIsFavorite, room: nextRoom} = nextProps;
+        const {room, isFavorite} = this.props;
+        const {dimmed} = this.state;
+        const {dimmed: nextDimmed} = nextState;
+
+        return nextIsFavorite !== isFavorite || !isEqual(room, nextRoom) || dimmed !== nextDimmed;
     }
 
     toggleDimmer = (state) => {
@@ -141,5 +151,10 @@ export default class Room extends React.Component {
 
 Room.propTypes = {
     room: PropTypes.object.isRequired,
-    children: PropTypes.node.isRequired
+    children: PropTypes.node.isRequired,
+    isFavorite: PropTypes.bool
+};
+
+Room.defaultProps = {
+    isFavorite: false
 };
