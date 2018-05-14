@@ -170,7 +170,7 @@ _OTHER_CHOICES = [('showSpeakerTitle', _('Show speaker title')),
 
 
 class TimetablePDFExportForm(IndicoForm):
-    _pdf_options_fields = {'pagesize', 'fontsize', 'firstPageNumber'}
+    _pdf_options_fields = {'pagesize', 'firstPageNumber'}
 
     advanced = BooleanField(_("Advanced timetable"), widget=SwitchWidget(),
                             description=_("Advanced customization options"))
@@ -187,10 +187,6 @@ class TimetablePDFExportForm(IndicoForm):
     other = IndicoSelectMultipleCheckboxBooleanField(_('Miscellaneous'), choices=_OTHER_CHOICES)
     pagesize = SelectField(_('Page size'), choices=[('A0', 'A0'), ('A1', 'A1'), ('A2', 'A2'), ('A3', 'A3'),
                                                     ('A4', 'A4'), ('A5', 'A5'), ('Letter', 'Letter')], default='A4')
-    fontsize = SelectField(_('Font size'), choices=[('xxx-small', _('xxx-small')), ('xx-small', _('xx-small')),
-                                                    ('x-small', _('x-small')), ('smaller', _('smaller')),
-                                                    ('small', _('small')), ('normal', _('normal')),
-                                                    ('large', _('large')), ('larger', _('larger'))], default='normal')
     firstPageNumber = IntegerField(_('Number for the first page'), [NumberRange(min=1)], default=1,
                                    widget=NumberInput(step=1))
     submitted = HiddenField()
