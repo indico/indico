@@ -142,19 +142,19 @@ export const ajax = {
         serializer: _dtHandler('end')
     },
     sw_lat: {
-        onlyIf: (data) => data.bounds && data.bounds.SW[0],
+        onlyIf: (data) => data.bounds && 'SW' in data.bounds,
         serializer: ({bounds: {SW}}) => SW[0]
     },
     sw_lng: {
-        onlyIf: (data) => data.bounds && data.bounds.SW[1],
+        onlyIf: (data) => data.bounds && 'SW' in data.bounds,
         serializer: ({bounds: {SW}}) => SW[1]
     },
     ne_lat: {
-        onlyIf: (data) => data.bounds && data.bounds.NE[0],
+        onlyIf: (data) => data.bounds && 'NE' in data.bounds,
         serializer: ({bounds: {NE}}) => NE[0]
     },
     ne_lng: {
-        onlyIf: (data) => data.bounds && data.bounds.NE[1],
+        onlyIf: (data) => data.bounds && 'NE' in data.bounds,
         serializer: ({bounds: {NE}}) => NE[1]
     }
 };
