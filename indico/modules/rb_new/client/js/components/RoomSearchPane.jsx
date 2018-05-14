@@ -38,11 +38,6 @@ export default class RoomSearchPane extends React.Component {
         renderRoom: PropTypes.func.isRequired
     };
 
-    componentDidMount() {
-        const {fetchRooms} = this.props;
-        fetchRooms();
-    }
-
     loadMore = () => {
         const {fetchRooms} = this.props;
         fetchRooms(false);
