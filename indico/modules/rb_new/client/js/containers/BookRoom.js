@@ -30,11 +30,13 @@ const mapDispatchToProps = dispatch => ({
         dispatch(updateLocation(location));
         if (search) {
             dispatch(setFilterParameter('bookRoom', 'bounds', location));
+            dispatch(fetchRooms('bookRoom'));
         }
     },
     toggleMapSearch: (search, location) => {
         dispatch(toggleMapSearch(search));
         dispatch(setFilterParameter('bookRoom', 'bounds', search ? location : {}));
+        dispatch(fetchRooms('bookRoom'));
     },
     fetchRooms: (clear = true) => {
         dispatch(fetchRooms('bookRoom', clear));
