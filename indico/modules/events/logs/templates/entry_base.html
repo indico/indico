@@ -14,14 +14,15 @@
         {{ entry.summary }}
     </td>
     <td class="i-table log-stamp text-superfluous">
+        {% set time = entry.logged_dt|format_time('medium', timezone=entry.event.tzinfo) %}
         {% if entry.user %}
-            {% trans user=entry.user.name, time=entry.logged_dt|format_time('medium') -%}
+            {% trans user=entry.user.name -%}
                 by <span class="text-normal searchable user-name">{{ user }}</span>
                 at <span class="text-normal">{{ time }}</span>
             {%- endtrans %}
         {% else %}
             <span class="text-normal">
-                {{ entry.logged_dt|format_time('medium') }}
+                {{ time }}
             </span>
         {% endif %}
     </td>

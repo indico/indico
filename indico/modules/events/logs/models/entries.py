@@ -127,7 +127,7 @@ class EventLogEntry(db.Model):
 
     @property
     def logged_date(self):
-        return self.logged_dt.date()
+        return self.logged_dt.astimezone(self.event.tzinfo).date()
 
     @property
     def renderer(self):

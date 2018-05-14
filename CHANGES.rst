@@ -99,6 +99,7 @@ Bugfixes
 - Fix breadcrumb metadata (:issue:`3321`, thanks :user:`bpedersen2`)
 - Fix error when accessing certain registration pages without an active
   registration
+- Use event timezone when displaying event log entries (:issue:`3354`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
