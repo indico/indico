@@ -66,8 +66,6 @@ function calculateDefaultEndDate(startDate, type, number, interval) {
     const isMoment = moment.isMoment(startDate);
     const dt = isMoment ? startDate.clone() : moment(startDate);
 
-    console.log(dt);
-
     if (type === 'daily') {
         dt.add(1, 'weeks');
     } else if (interval === 'week') {
@@ -77,7 +75,6 @@ function calculateDefaultEndDate(startDate, type, number, interval) {
         // 7 occurences
         dt.add(6 * number, 'months');
     }
-    console.log(dt);
     return isMoment ? dt : dt.format('YYYY-MM-DD');
 }
 

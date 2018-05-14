@@ -66,6 +66,11 @@ export default class BookRoom extends React.Component {
         }
     }
 
+    componentDidMount() {
+        const {fetchRooms} = this.props;
+        fetchRooms();
+    }
+
     onMove(e) {
         const {updateLocation} = this.props;
         updateLocation(getMapBounds(e.target));
