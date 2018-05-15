@@ -267,7 +267,9 @@ def sanitize_for_platypus(text):
         'font': ['size', 'face', 'color'],
         'img': ['src', 'width', 'height', 'valign']
     }
-    res = bleach.clean(text, tags=tags, attributes=attrs, strip=True)
+    res = bleach.clean(text, tags=tags, attributes=attrs, strip=True).strip()
+    if not res:
+        return ''
     # Convert to XHTML
     doc = html.fromstring(res)
     return etree.tostring(doc)
