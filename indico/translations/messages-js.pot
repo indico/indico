@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: indico 2.1b1\n"
+"Project-Id-Version: indico 2.1rc5\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2018-04-03 17:09+0200\n"
+"POT-Creation-Date: 2018-05-15 10:27+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -142,7 +142,7 @@ msgstr ""
 msgid "Add"
 msgstr ""
 
-#: indico/htdocs/js/indico/Core/Dialogs/Users.js:832 indico/htdocs/js/indico/widgets/person_link_widget.js:285
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:832 indico/htdocs/js/indico/widgets/person_link_widget.js:290
 msgid "Grant submission rights"
 msgstr ""
 
@@ -836,7 +836,7 @@ msgid_plural "{0} categories"
 msgstr[0] ""
 msgstr[1] ""
 
-#: indico/htdocs/js/indico/jquery/categorynavigator.js:301 indico/htdocs/js/indico/modules/categories/display.js:34
+#: indico/htdocs/js/indico/jquery/categorynavigator.js:301 indico/htdocs/js/indico/modules/categories/display.js:33
 msgid "{0} event"
 msgid_plural "{0} events"
 msgstr[0] ""
@@ -981,7 +981,7 @@ msgstr ""
 msgid "There is already another person with this email address."
 msgstr ""
 
-#: indico/htdocs/js/indico/jquery/principalfield.js:138 indico/htdocs/js/indico/widgets/person_link_widget.js:169
+#: indico/htdocs/js/indico/jquery/principalfield.js:138 indico/htdocs/js/indico/widgets/person_link_widget.js:174
 msgid "Edit information"
 msgstr ""
 
@@ -1162,19 +1162,19 @@ msgstr[1] ""
 msgid "Long lasting events"
 msgstr ""
 
-#: indico/htdocs/js/indico/modules/categories/display.js:33
+#: indico/htdocs/js/indico/modules/categories/display.js:32
 msgid "empty"
 msgstr ""
 
-#: indico/htdocs/js/indico/modules/categories/display.js:153
+#: indico/htdocs/js/indico/modules/categories/display.js:152
 msgid "Remove from your favourites"
 msgstr ""
 
-#: indico/htdocs/js/indico/modules/categories/display.js:157
+#: indico/htdocs/js/indico/modules/categories/display.js:156
 msgid "Add to your favourites"
 msgstr ""
 
-#: indico/htdocs/js/indico/modules/categories/display.js:158
+#: indico/htdocs/js/indico/modules/categories/display.js:157
 msgid "This will make events in this category visible on your <a href=\"{0}\">Dashboard</a>."
 msgstr ""
 
@@ -2095,79 +2095,79 @@ msgstr ""
 msgid "Please fill in the required fields."
 msgstr ""
 
-#: indico/htdocs/js/indico/widgets/person_link_widget.js:161
+#: indico/htdocs/js/indico/widgets/person_link_widget.js:166
 msgid "Speaker"
 msgstr ""
 
-#: indico/htdocs/js/indico/widgets/person_link_widget.js:167
+#: indico/htdocs/js/indico/widgets/person_link_widget.js:172
 msgid "Remove person"
 msgstr ""
 
-#: indico/htdocs/js/indico/widgets/person_link_widget.js:171
+#: indico/htdocs/js/indico/widgets/person_link_widget.js:176
 msgid "Configure roles"
 msgstr ""
 
-#: indico/htdocs/js/indico/widgets/person_link_widget.js:182
+#: indico/htdocs/js/indico/widgets/person_link_widget.js:187
 msgid "Submitter"
 msgstr ""
 
-#: indico/htdocs/js/indico/widgets/person_link_widget.js:227
+#: indico/htdocs/js/indico/widgets/person_link_widget.js:232
 msgid "or"
 msgstr ""
 
-#: indico/htdocs/js/indico/widgets/person_link_widget.js:245
+#: indico/htdocs/js/indico/widgets/person_link_widget.js:250
 msgid "Move to authors"
 msgstr ""
 
-#: indico/htdocs/js/indico/widgets/person_link_widget.js:249
+#: indico/htdocs/js/indico/widgets/person_link_widget.js:254
 msgid "Move to co-authors"
 msgstr ""
 
-#: indico/htdocs/js/indico/widgets/person_link_widget.js:254
+#: indico/htdocs/js/indico/widgets/person_link_widget.js:259
 msgid "Move to others"
 msgstr ""
 
-#: indico/htdocs/js/indico/widgets/person_link_widget.js:256
+#: indico/htdocs/js/indico/widgets/person_link_widget.js:261
 msgid "Not a speaker anymore"
 msgstr ""
 
-#: indico/htdocs/js/indico/widgets/person_link_widget.js:257
+#: indico/htdocs/js/indico/widgets/person_link_widget.js:262
 msgid "Make a speaker"
 msgstr ""
 
-#: indico/htdocs/js/indico/widgets/person_link_widget.js:268
+#: indico/htdocs/js/indico/widgets/person_link_widget.js:273
 msgid "People in the 'Others' section <strong>must</strong> be speakers."
 msgstr ""
 
-#: indico/htdocs/js/indico/widgets/person_link_widget.js:284
+#: indico/htdocs/js/indico/widgets/person_link_widget.js:289
 msgid "Revoke submission rights"
 msgstr ""
 
-#: indico/htdocs/js/indico/widgets/person_link_widget.js:349
+#: indico/htdocs/js/indico/widgets/person_link_widget.js:354
 msgid "Custom sorting has been applied. Click to restore alphabetical order."
 msgstr ""
 
-#: indico/htdocs/js/indico/widgets/person_link_widget.js:351
+#: indico/htdocs/js/indico/widgets/person_link_widget.js:356
 msgid "Alphabetical sorting is ON. Click to turn it off."
 msgstr ""
 
-#: indico/htdocs/js/indico/widgets/person_link_widget.js:391
+#: indico/htdocs/js/indico/widgets/person_link_widget.js:396
 msgid "You must add at least one speaker"
 msgstr ""
 
-#: indico/htdocs/js/indico/widgets/person_link_widget.js:394
+#: indico/htdocs/js/indico/widgets/person_link_widget.js:399
 msgid "You must add at least one submitter"
 msgstr ""
 
-#: indico/htdocs/js/indico/widgets/person_link_widget.js:397
+#: indico/htdocs/js/indico/widgets/person_link_widget.js:402
 msgid "You must add at least one co-author"
 msgstr ""
 
-#: indico/htdocs/js/indico/widgets/person_link_widget.js:400
+#: indico/htdocs/js/indico/widgets/person_link_widget.js:405
 msgid "You must add at least one author"
 msgstr ""
 
-#: indico/htdocs/js/indico/widgets/person_link_widget.js:403
+#: indico/htdocs/js/indico/widgets/person_link_widget.js:408
 msgid "You cannot have users in the Other section, please make them authors or co-authors"
 msgstr ""
 
