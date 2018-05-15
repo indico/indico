@@ -141,7 +141,7 @@
                     clearTimeout(disappearHandler);
                 }
                 if (options.actionCallback) {
-                    var promise = options.actionCallback();
+                    var promise = options.actionCallback() || $.Deferred();
 
                     box.addClass('progress').find('.corner-message-text').text(options.progressMessage);
                     text.remove();
