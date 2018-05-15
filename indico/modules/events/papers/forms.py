@@ -217,7 +217,7 @@ class PaperCommentForm(IndicoForm):
         comment = kwargs.get('obj')
         user = comment.user if comment else kwargs.pop('user')
         paper = kwargs.pop('paper')
-        super(IndicoForm, self).__init__(*args, **kwargs)
+        super(PaperCommentForm, self).__init__(*args, **kwargs)
         if not paper.can_judge(user):
             self.visibility.skip.add(PaperCommentVisibility.judges)
         if not paper.can_review(user):

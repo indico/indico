@@ -211,7 +211,7 @@ class EventPersonLinkListField(PersonLinkListFieldBase):
         return data
 
     def pre_validate(self, form):
-        super(PersonLinkListFieldBase, self).pre_validate(form)
+        super(EventPersonLinkListField, self).pre_validate(form)
         persons = set()
         for person_link in self.data:
             if person_link.person in persons:

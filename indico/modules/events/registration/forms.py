@@ -107,7 +107,7 @@ class RegistrationFormForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
-        super(IndicoForm, self).__init__(*args, **kwargs)
+        super(RegistrationFormForm, self).__init__(*args, **kwargs)
         self._set_currencies()
         self.notification_sender_address.description = _('Email address set as the sender of all '
                                                          'notifications sent to users. If empty, '
@@ -131,7 +131,7 @@ class RegistrationFormScheduleForm(IndicoForm):
     def __init__(self, *args, **kwargs):
         regform = kwargs.pop('regform')
         self.timezone = regform.event.timezone
-        super(IndicoForm, self).__init__(*args, **kwargs)
+        super(RegistrationFormScheduleForm, self).__init__(*args, **kwargs)
 
 
 class _UsersField(PrincipalListField):

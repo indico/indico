@@ -68,7 +68,7 @@ class SurveyForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
-        super(IndicoForm, self).__init__(*args, **kwargs)
+        super(SurveyForm, self).__init__(*args, **kwargs)
 
     def validate_title(self, field):
         query = (Survey.query.with_parent(self.event)
@@ -97,7 +97,7 @@ class ScheduleSurveyForm(IndicoForm):
         survey = kwargs.pop('survey')
         self.allow_reschedule_start = kwargs.pop('allow_reschedule_start')
         self.timezone = survey.event.timezone
-        super(IndicoForm, self).__init__(*args, **kwargs)
+        super(ScheduleSurveyForm, self).__init__(*args, **kwargs)
         if not survey.start_notification_sent or not self.allow_reschedule_start:
             del self.resend_start_notification
 

@@ -583,7 +583,7 @@ class AbstractCommentForm(IndicoForm):
         comment = kwargs.get('obj')
         user = comment.user if comment else kwargs.pop('user')
         abstract = kwargs.pop('abstract')
-        super(IndicoForm, self).__init__(*args, **kwargs)
+        super(AbstractCommentForm, self).__init__(*args, **kwargs)
         if not abstract.event.cfa.allow_contributors_in_comments:
             self.visibility.skip.add(AbstractCommentVisibility.contributors)
         if not abstract.can_judge(user) and not abstract.can_convene(user):
