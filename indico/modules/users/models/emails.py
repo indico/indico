@@ -65,7 +65,7 @@ class UserEmail(db.Model):
 
     @return_ascii
     def __repr__(self):
-        return '<UserEmail({}, {}, {})>'.format(self.id, self.email, self.is_primary, self.user)
+        return '<UserEmail({}, {}, {})>'.format(self.id, self.email, self.is_primary)
 
 
 define_unaccented_lowercase_index(UserEmail.email)

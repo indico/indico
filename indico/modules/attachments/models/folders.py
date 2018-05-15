@@ -224,8 +224,7 @@ class AttachmentFolder(LinkMixin, ProtectionMixin, db.Model):
             ', is_always_visible=False' if not self.is_always_visible else '',
             ', is_hidden=True' if self.is_hidden else '',
             ', is_deleted=True' if self.is_deleted else '',
-            self.protection_repr,
-            self.link_repr
+            self.protection_repr
         )
 
 
