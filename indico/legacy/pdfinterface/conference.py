@@ -143,10 +143,13 @@ class ProgrammeToPDF(PDFBase):
         style.alignment = TA_JUSTIFY
 
         event_program = sanitize_for_platypus(render_markdown(track_settings.get(self.event, 'program')))
-        for i, para in enumerate(event_program.split('\n')):
-            if i > 0 and re.match(r'<(p|ul|ol)\b[^>]*>', para):
-                story.append(Spacer(1, 0.2 * inch))
-            story.append(Paragraph(para.encode('utf-8'), style))
+        parts = []
+        for i, part in enumerate(re.split(r'\n+', event_program)):
+            if i > 0 and re.match(ur'<(p|ul|ol)\b[^>]*>', part):
+                # extra spacing before a block-level element
+                parts.append(u'<br/>')
+            parts.append(part)
+        story.append(Paragraph(u'\n<br/>\n'.join(parts).encode('utf-8'), style))
 
         story.append(Spacer(1, 0.4*inch))
         for track in self.event.tracks:
