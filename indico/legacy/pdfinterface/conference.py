@@ -46,7 +46,8 @@ from indico.modules.events.tracks.settings import track_settings
 from indico.modules.events.util import create_event_logo_tmp_file
 from indico.util.date_time import format_date, format_datetime, format_human_timedelta, format_time, now_utc
 from indico.util.i18n import _, ngettext
-from indico.util.string import format_full_name, html_color_to_rgb, render_markdown, to_unicode, truncate
+from indico.util.string import (format_full_name, html_color_to_rgb, render_markdown, sanitize_for_platypus, to_unicode,
+                                truncate)
 
 
 # Change reportlab default pdf font Helvetica to indico ttf font,
@@ -141,7 +142,7 @@ class ProgrammeToPDF(PDFBase):
         style = styles["Normal"]
         style.alignment = TA_JUSTIFY
 
-        event_program = render_markdown(track_settings.get(self.event, 'program'))
+        event_program = sanitize_for_platypus(render_markdown(track_settings.get(self.event, 'program')))
         for i, para in enumerate(event_program.split('\n')):
             if i > 0 and re.match(r'<(p|ul|ol)\b[^>]*>', para):
                 story.append(Spacer(1, 0.2 * inch))
