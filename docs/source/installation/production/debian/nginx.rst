@@ -262,6 +262,13 @@ Now create a user that will be used to run Indico and switch to it:
 
 You are now ready to install Indico:
 
+.. note::
+
+    If you need to migrate from Indico 1.2, you must install Indico 2.0, regardless
+    of what the latest Indico version is.  If this is the case for you, replace the
+    last command in the block below with ``pip install 'indico<2.1'``
+
+
 .. code-block:: shell
 
     virtualenv ~/.venv
