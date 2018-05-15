@@ -14,7 +14,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2018-04-03 17:09+0200\n"
+"POT-Creation-Date: 2018-05-15 10:27+0200\n"
 "PO-Revision-Date: 2018-04-03 15:12+0000\n"
 "Last-Translator: Thomas Baron <thomas.baron@cern.ch>\n"
 "Language-Team: French (France) (http://www.transifex.com/indico/indico/language/fr_FR/)\n"
@@ -162,7 +162,7 @@ msgid "Add"
 msgstr "Ajouter"
 
 #: indico/htdocs/js/indico/Core/Dialogs/Users.js:832
-#: indico/htdocs/js/indico/widgets/person_link_widget.js:285
+#: indico/htdocs/js/indico/widgets/person_link_widget.js:290
 msgid "Grant submission rights"
 msgstr "Donner les droits de dépôt"
 
@@ -896,7 +896,7 @@ msgstr[0] "{0} catégorie"
 msgstr[1] "{0} catégories"
 
 #: indico/htdocs/js/indico/jquery/categorynavigator.js:301
-#: indico/htdocs/js/indico/modules/categories/display.js:34
+#: indico/htdocs/js/indico/modules/categories/display.js:33
 msgid "{0} event"
 msgid_plural "{0} events"
 msgstr[0] "{0} événement"
@@ -1048,7 +1048,7 @@ msgid "There is already another person with this email address."
 msgstr "Il existe déjà une personne avec cette addresse électronique"
 
 #: indico/htdocs/js/indico/jquery/principalfield.js:138
-#: indico/htdocs/js/indico/widgets/person_link_widget.js:169
+#: indico/htdocs/js/indico/widgets/person_link_widget.js:174
 msgid "Edit information"
 msgstr "Modifier l'information"
 
@@ -1241,19 +1241,19 @@ msgstr[1] "{0} événements de longue durée ne sont pas montrés"
 msgid "Long lasting events"
 msgstr "Evénements de longue durée"
 
-#: indico/htdocs/js/indico/modules/categories/display.js:33
+#: indico/htdocs/js/indico/modules/categories/display.js:32
 msgid "empty"
 msgstr "vide"
 
-#: indico/htdocs/js/indico/modules/categories/display.js:153
+#: indico/htdocs/js/indico/modules/categories/display.js:152
 msgid "Remove from your favourites"
 msgstr "Supprimer de vos favoris"
 
-#: indico/htdocs/js/indico/modules/categories/display.js:157
+#: indico/htdocs/js/indico/modules/categories/display.js:156
 msgid "Add to your favourites"
 msgstr "Ajouter à vos favoris"
 
-#: indico/htdocs/js/indico/modules/categories/display.js:158
+#: indico/htdocs/js/indico/modules/categories/display.js:157
 msgid ""
 "This will make events in this category visible on your <a "
 "href=\"{0}\">Dashboard</a>."
@@ -2202,79 +2202,79 @@ msgstr "Doit être inférieur à {0}"
 msgid "Please fill in the required fields."
 msgstr "Veuillez renseigner les champs obligatoires."
 
-#: indico/htdocs/js/indico/widgets/person_link_widget.js:161
+#: indico/htdocs/js/indico/widgets/person_link_widget.js:166
 msgid "Speaker"
 msgstr "Orateur"
 
-#: indico/htdocs/js/indico/widgets/person_link_widget.js:167
+#: indico/htdocs/js/indico/widgets/person_link_widget.js:172
 msgid "Remove person"
 msgstr "Enlever la personne"
 
-#: indico/htdocs/js/indico/widgets/person_link_widget.js:171
+#: indico/htdocs/js/indico/widgets/person_link_widget.js:176
 msgid "Configure roles"
 msgstr "Configurer les roles"
 
-#: indico/htdocs/js/indico/widgets/person_link_widget.js:182
+#: indico/htdocs/js/indico/widgets/person_link_widget.js:187
 msgid "Submitter"
 msgstr "Déposant"
 
-#: indico/htdocs/js/indico/widgets/person_link_widget.js:227
+#: indico/htdocs/js/indico/widgets/person_link_widget.js:232
 msgid "or"
 msgstr "ou"
 
-#: indico/htdocs/js/indico/widgets/person_link_widget.js:245
+#: indico/htdocs/js/indico/widgets/person_link_widget.js:250
 msgid "Move to authors"
 msgstr "Déplacer vers les auteurs"
 
-#: indico/htdocs/js/indico/widgets/person_link_widget.js:249
+#: indico/htdocs/js/indico/widgets/person_link_widget.js:254
 msgid "Move to co-authors"
 msgstr "Déplacer vers les co-auteurs"
 
-#: indico/htdocs/js/indico/widgets/person_link_widget.js:254
+#: indico/htdocs/js/indico/widgets/person_link_widget.js:259
 msgid "Move to others"
 msgstr "Déplacer vers autres"
 
-#: indico/htdocs/js/indico/widgets/person_link_widget.js:256
+#: indico/htdocs/js/indico/widgets/person_link_widget.js:261
 msgid "Not a speaker anymore"
 msgstr "N'est plus un orateur"
 
-#: indico/htdocs/js/indico/widgets/person_link_widget.js:257
+#: indico/htdocs/js/indico/widgets/person_link_widget.js:262
 msgid "Make a speaker"
 msgstr "Transformer en orateur"
 
-#: indico/htdocs/js/indico/widgets/person_link_widget.js:268
+#: indico/htdocs/js/indico/widgets/person_link_widget.js:273
 msgid "People in the 'Others' section <strong>must</strong> be speakers."
 msgstr "Les personnes dans la section \"Autres\" <strong>doivent</strong> être orateurs."
 
-#: indico/htdocs/js/indico/widgets/person_link_widget.js:284
+#: indico/htdocs/js/indico/widgets/person_link_widget.js:289
 msgid "Revoke submission rights"
 msgstr "Révoquer les droits de dépôt"
 
-#: indico/htdocs/js/indico/widgets/person_link_widget.js:349
+#: indico/htdocs/js/indico/widgets/person_link_widget.js:354
 msgid "Custom sorting has been applied. Click to restore alphabetical order."
 msgstr "Le tri personnalisé a été appliqué. Cliquez pour restaurer le tri alphabétique."
 
-#: indico/htdocs/js/indico/widgets/person_link_widget.js:351
+#: indico/htdocs/js/indico/widgets/person_link_widget.js:356
 msgid "Alphabetical sorting is ON. Click to turn it off."
 msgstr "Le tri alphabétique est activé. Cliquez pour le désactiver."
 
-#: indico/htdocs/js/indico/widgets/person_link_widget.js:391
+#: indico/htdocs/js/indico/widgets/person_link_widget.js:396
 msgid "You must add at least one speaker"
 msgstr "Vous devez ajouter au moins un orateur"
 
-#: indico/htdocs/js/indico/widgets/person_link_widget.js:394
+#: indico/htdocs/js/indico/widgets/person_link_widget.js:399
 msgid "You must add at least one submitter"
 msgstr "Vous devez ajouter au moins un déposant"
 
-#: indico/htdocs/js/indico/widgets/person_link_widget.js:397
+#: indico/htdocs/js/indico/widgets/person_link_widget.js:402
 msgid "You must add at least one co-author"
 msgstr "Vous devez ajouter au moins un co-auteur"
 
-#: indico/htdocs/js/indico/widgets/person_link_widget.js:400
+#: indico/htdocs/js/indico/widgets/person_link_widget.js:405
 msgid "You must add at least one author"
 msgstr "Vous devez ajouter au moins un auteur"
 
-#: indico/htdocs/js/indico/widgets/person_link_widget.js:403
+#: indico/htdocs/js/indico/widgets/person_link_widget.js:408
 msgid ""
 "You cannot have users in the Other section, please make them authors or co-"
 "authors"
