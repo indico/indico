@@ -47,7 +47,7 @@ from indico.modules.events.registration.controllers.management import (RHManageR
 from indico.modules.events.registration.forms import (BadgeSettingsForm, CreateMultipleRegistrationsForm,
                                                       EmailRegistrantsForm, ImportRegistrationsForm)
 from indico.modules.events.registration.models.items import PersonalDataType, RegistrationFormItemType
-from indico.modules.events.registration.models.registrations import Registration, RegistrationData
+from indico.modules.events.registration.models.registrations import Registration, RegistrationData, RegistrationState
 from indico.modules.events.registration.notifications import notify_registration_state_update
 from indico.modules.events.registration.settings import event_badge_settings
 from indico.modules.events.registration.util import (create_registration, generate_spreadsheet_from_registrations,
@@ -543,6 +543,8 @@ class RHRegistrationTogglePayment(RHManageRegistrationBase):
 
 
 def _modify_registration_status(registration, approve):
+    if registration.state != RegistrationState.pending:
+        return
     if approve:
         registration.update_state(approved=True)
     else:

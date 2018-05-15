@@ -102,6 +102,8 @@ Bugfixes
 - Use event timezone when displaying event log entries (:issue:`3354`)
 - Correctly render most markdown elements when generating a programme PDF
   (:issue:`3351`)
+- Do not send any emails when trying to approve/reject a registration
+  that is not pending (:issue:`3358`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
