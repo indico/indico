@@ -127,7 +127,8 @@
                         data-href="{{ url_for('.delete_submissions', survey) }}"
                         data-title="{% trans %}Remove all selected submissions?{% endtrans %}"
                         data-confirm="{% trans %}Are you sure you want to remove all selected submissions?{% endtrans %}"
-                        data-method="DELETE" class="i-button icon-remove" disabled>
+                        data-method="DELETE"
+                        disabled>
                     {% trans %}Delete{% endtrans %}
                 </button>
             </div>
