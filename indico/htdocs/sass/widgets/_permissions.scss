@@ -84,6 +84,10 @@
             white-space: nowrap;
         }
 
+        .entry-label-extra {
+            font-size: 0.8em;
+        }
+
         .permissions-box {
             @include border-all($style: dashed);
             @include transition(background-color 0.25s);

@@ -66,14 +66,19 @@
             return $labelBox;
         },
         _renderRoleLabel: function(principal) {
-            var $text = $('<span>', {class: 'text-normal entry-label', text: principal.name});
+            var $text = $('<span>', {
+                class: 'text-normal entry-label',
+                text: principal.name,
+                'data-tooltip': principal.name
+            });
             var $code = this._renderRoleCode(principal.code, principal.color);
             return [$code, $text];
         },
         _renderOtherLabel: function(principal, type) {
-            var iconClass;
+            var iconClass, extraText;
             if (type === 'Avatar') {
                 iconClass = 'icon-user';
+                extraText = principal.email;
             } else if (type === 'Email') {
                 iconClass = 'icon-mail';
             } else if (type === 'DefaultEntry' && principal.id === 'anonymous') {
@@ -85,9 +90,16 @@
             }
             var labelIsName = _.contains(['Avatar', 'DefaultEntry', 'IPNetworkGroup'], type);
             var text = labelIsName ? principal.name : principal.id;
+            var tooltip = extraText ? '{0} ({1})'.format(text, extraText) : text;
+            var textDiv = $('<div>', {class: 'text-normal entry-label', 'data-tooltip': tooltip});
+            textDiv.append($('<span>', {text: text}));
+            if (extraText) {
+                textDiv.append('<br>');
+                textDiv.append($('<span>', {class: 'text-not-important entry-label-extra', text: extraText}));
+            }
             return [
                 $('<span>', {class: 'entry-icon '  + iconClass}),
-                $('<span>', {class: 'text-normal entry-label', text: text})
+                textDiv
             ];
         },
         _renderPermissions: function(principal, permissions) {
@@ -353,7 +365,7 @@
             this.$permissionsWidgetList.on('mouseenter', '.entry-label', function() {
                 var $this = $(this);
                 if (this.offsetWidth < this.scrollWidth && !$this.attr('title')) {
-                    $this.attr('title', $this.text());
+                    $this.attr('title', $this.attr('data-tooltip'));
                 }
             });
         }
