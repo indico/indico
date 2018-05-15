@@ -98,14 +98,7 @@ class EventPersonListField(PrincipalListField):
         return getattr(self.get_form(), 'event', None)
 
     def _convert_data(self, data):
-        result = []
-        for person_data in data:
-            person = get_event_person(person_data, create_untrusted_persons=self.create_untrusted_persons,
-                                      allow_pending=self.allow_external, allow_emails=self.allow_emails,
-                                      allow_networks=self.allow_networks, existing_data=self.object_data)
-            self.event_person_conversions[person] = data
-            result.append(person)
-        return map(get_event_person, data)
+        raise NotImplementedError
 
     def _serialize_principal(self, principal):
         from indico.modules.events.util import serialize_event_person
