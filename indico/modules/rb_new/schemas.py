@@ -26,8 +26,14 @@ class RoomSchema(mm.ModelSchema):
     class Meta:
         model = Room
         fields = ('id', 'name', 'capacity', 'building', 'floor', 'number', 'is_public', 'location_name', 'has_vc',
-                  'has_projector', 'has_webcast_recording', 'large_photo_url', 'full_name', 'latitude', 'longitude',
-                  'comments', 'division', 'is_reservable')
+                  'has_projector', 'has_webcast_recording', 'large_photo_url', 'full_name', 'comments', 'division',
+                  'is_reservable')
+
+
+class MapRoomSchema(mm.ModelSchema):
+    class Meta:
+        model = Room
+        fields = ('id', 'full_name', 'latitude', 'longitude')
 
 
 class AspectSchema(mm.ModelSchema):
@@ -44,5 +50,6 @@ class ReservationOccurrenceSchema(mm.ModelSchema):
 
 
 rooms_schema = RoomSchema(many=True)
+map_rooms_schema = MapRoomSchema(many=True)
 aspects_schema = AspectSchema(many=True)
 reservation_occurrences_schema = ReservationOccurrenceSchema(many=True)

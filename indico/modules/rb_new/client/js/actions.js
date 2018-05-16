@@ -16,6 +16,7 @@
  */
 
 import buildFetchRoomsUrl from 'indico-url:rooms_new.available_rooms';
+import fetchMapRoomsUrl from 'indico-url:rooms_new.map_rooms';
 import fetchDefaultAspectsUrl from 'indico-url:rooms_new.default_aspects';
 import fetchBuildingsUrl from 'indico-url:rooms_new.buildings';
 import favoriteRoomsUrl from 'indico-url:rooms_new.favorite_rooms';
@@ -35,6 +36,9 @@ export const SET_FILTER_PARAMETER = 'SET_FILTER_PARAMETER';
 export const FETCH_ROOMS_STARTED = 'FETCH_ROOMS_STARTED';
 export const FETCH_ROOMS_FAILED = 'FETCH_ROOMS_FAILED';
 export const UPDATE_ROOMS = 'UPDATE_ROOMS';
+export const FETCH_MAP_ROOMS_STARTED = 'FETCH_MAP_ROOMS_STARTED';
+export const FETCH_MAP_ROOMS_FAILED = 'FETCH_MAP_ROOMS_FAILED';
+export const UPDATE_MAP_ROOMS = 'UPDATE_MAP_ROOMS';
 // Map
 export const FETCH_DEFAULT_ASPECTS_STARTED = 'FETCH_DEFAULT_ASPECTS_STARTED';
 export const FETCH_DEFAULT_ASPECTS_FAILED = 'FETCH_DEFAULT_ASPECTS_FAILED';
@@ -129,47 +133,82 @@ export function fetchRooms(namespace, clear = true) {
     };
 }
 
+export function fetchMapRoomsStarted(namespace) {
+    return {type: FETCH_MAP_ROOMS_STARTED, namespace};
+}
+
+export function fetchMapRoomsFailed(namespace) {
+    return {type: FETCH_MAP_ROOMS_FAILED, namespace};
+}
+
+export function updateMapRooms(namespace, rooms) {
+    return {type: UPDATE_MAP_ROOMS, namespace, rooms};
+}
+
+export function fetchMapRooms(namespace) {
+    return async (dispatch, getStore) => {
+        const {filters} = getStore()[namespace];
+
+        dispatch(fetchMapRoomsStarted(namespace));
+
+        const params = preProcessParameters(filters, ajaxFilterRules);
+
+        let response;
+        try {
+            response = await indicoAxios.get(fetchMapRoomsUrl(), {params});
+        } catch (error) {
+            handleAxiosError(error);
+            dispatch(fetchMapRoomsFailed(namespace));
+            return;
+        }
+        const rooms = response.data.map((room) => (
+            {id: room.id, name: room.full_name, lat: parseFloat(room.latitude), lng: parseFloat(room.longitude)}
+        ));
+        dispatch(updateMapRooms(namespace, rooms));
+    };
+}
+
 export function setFilterParameter(namespace, param, data) {
     return {type: SET_FILTER_PARAMETER, namespace, param, data};
 }
 
-export function fetchDefaultAspectsStarted() {
-    return {type: FETCH_DEFAULT_ASPECTS_STARTED};
+export function fetchDefaultAspectsStarted(namespace) {
+    return {type: FETCH_DEFAULT_ASPECTS_STARTED, namespace};
 }
 
-export function fetchDefaultAspectsFailed() {
-    return {type: FETCH_DEFAULT_ASPECTS_FAILED};
+export function fetchDefaultAspectsFailed(namespace) {
+    return {type: FETCH_DEFAULT_ASPECTS_FAILED, namespace};
 }
 
-export function updateAspects(aspects) {
-    return {type: UPDATE_ASPECTS, aspects};
+export function updateAspects(namespace, aspects) {
+    return {type: UPDATE_ASPECTS, aspects, namespace};
 }
 
-export function updateLocation(location) {
-    return {type: UPDATE_LOCATION, location};
+export function updateLocation(namespace, location) {
+    return {type: UPDATE_LOCATION, location, namespace};
 }
 
-export function fetchMapDefaultAspects() {
+export function fetchMapDefaultAspects(namespace) {
     return async (dispatch) => {
-        dispatch(fetchDefaultAspectsStarted());
+        dispatch(fetchDefaultAspectsStarted(namespace));
 
         let response;
         try {
             response = await indicoAxios.get(fetchDefaultAspectsUrl());
         } catch (error) {
             handleAxiosError(error);
-            dispatch(fetchDefaultAspectsFailed());
+            dispatch(fetchDefaultAspectsFailed(namespace));
             return;
         }
 
-        dispatch(updateAspects(response.data));
+        dispatch(updateAspects(namespace, response.data));
         const defaultAspect = response.data.find(aspect => aspect.default_on_startup);
-        dispatch(updateLocation(getAspectBounds(defaultAspect)));
+        dispatch(updateLocation(namespace, getAspectBounds(defaultAspect)));
     };
 }
 
-export function toggleMapSearch(search) {
-    return {type: TOGGLE_MAP_SEARCH, search};
+export function toggleMapSearch(namespace, search) {
+    return {type: TOGGLE_MAP_SEARCH, search, namespace};
 }
 
 export function fetchBuildingsStarted() {

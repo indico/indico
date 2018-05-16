@@ -28,33 +28,45 @@ from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.models.favorites import favorite_room_table
 from indico.modules.rb.models.reservations import RepeatFrequency
 from indico.modules.rb.models.rooms import Room
-from indico.modules.rb_new.schemas import aspects_schema, reservation_occurrences_schema, rooms_schema
+from indico.modules.rb_new.schemas import aspects_schema, map_rooms_schema, reservation_occurrences_schema, rooms_schema
 from indico.modules.rb_new.util import get_buildings, get_rooms_availability, search_for_rooms
 
 
+search_room_args = {
+    'capacity': fields.Int(),
+    'text': fields.Str(),
+    'start_dt': fields.DateTime(),
+    'end_dt': fields.DateTime(),
+    'repeat_frequency': EnumField(RepeatFrequency),
+    'repeat_interval': fields.Int(missing=0),
+    'building': fields.Str(),
+    'floor': fields.Str(),
+    'sw_lat': fields.Float(validate=lambda x: -90 <= x <= 90),
+    'sw_lng': fields.Float(validate=lambda x: -180 <= x <= 180),
+    'ne_lat': fields.Float(validate=lambda x: -90 <= x <= 90),
+    'ne_lng': fields.Float(validate=lambda x: -180 <= x <= 180)
+}
+
+
 class RHSearchRooms(RHRoomBookingBase):
-    @use_args({
-        'capacity': fields.Int(),
-        'text': fields.Str(),
-        'start_dt': fields.DateTime(),
-        'end_dt': fields.DateTime(),
-        'repeat_frequency': EnumField(RepeatFrequency),
-        'repeat_interval': fields.Int(missing=0),
-        'building': fields.Str(),
-        'floor': fields.Str(),
+    @use_args(dict(search_room_args, **{
         'offset': fields.Int(missing=0, validate=lambda x: x >= 0),
-        'limit': fields.Int(missing=10, validate=lambda x: x >= 0),
-        'sw_lat': fields.Float(validate=lambda x: -90 <= x <= 90),
-        'sw_lng': fields.Float(validate=lambda x: -180 <= x <= 180),
-        'ne_lat': fields.Float(validate=lambda x: -90 <= x <= 90),
-        'ne_lng': fields.Float(validate=lambda x: -180 <= x <= 180)
-    })
+        'limit': fields.Int(missing=10, validate=lambda x: x >= 0)
+    }))
     def _process(self, args):
         filter_availability = args.get('start_dt') and args.get('end_dt')
         query = search_for_rooms(args, only_available=filter_availability)
         query = query.limit(args['limit']).offset(args['offset'])
         rooms, total = with_total_rows(query)
         return jsonify(total=total, rooms=rooms_schema.dump(rooms).data)
+
+
+class RHSearchMapRooms(RHRoomBookingBase):
+    @use_args(search_room_args)
+    def _process(self, args):
+        filter_availability = args.get('start_dt') and args.get('end_dt')
+        query = search_for_rooms(args, only_available=filter_availability)
+        return jsonify(map_rooms_schema.dump(query.all()).data)
 
 
 class RHAspects(RHRoomBookingBase):
