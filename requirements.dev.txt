@@ -2,7 +2,7 @@ babel
 pojson>=0.4
 termcolor
 nodeenv
-fabric
+fabric<2.0
 sphinx
 sphinx-autobuild
 repoze.sphinx.autointerface
