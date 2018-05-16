@@ -15,7 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 import {connect} from 'react-redux';
-import {setFilterParameter, fetchRooms} from '../actions';
+import {setFilterParameter, fetchRooms, fetchMapRooms} from '../actions';
 
 
 export default (namespace, componentClass) => {
@@ -25,6 +25,7 @@ export default (namespace, componentClass) => {
         setFilterParameter: (param, value) => {
             dispatch(setFilterParameter(namespace, param, value));
             dispatch(fetchRooms(namespace));
+            dispatch(fetchMapRooms(namespace));
         }
     });
 

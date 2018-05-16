@@ -18,27 +18,40 @@
 import * as actions from '../../actions';
 
 
-const initialState = {
+const initialMapState = {
     bounds: {},
     aspects: [],
+    rooms: [],
     search: false,
     isFetching: false,
 };
 
 
-export default function mapReducer(state = initialState, action) {
-    switch (action.type) {
-        case actions.FETCH_DEFAULT_ASPECTS_STARTED:
-            return {...state, isFetching: true};
-        case actions.FETCH_DEFAULT_ASPECTS_FAILED:
-            return {...state, isFetching: false};
-        case actions.UPDATE_ASPECTS:
-            return {...state, aspects: action.aspects, isFetching: false};
-        case actions.UPDATE_LOCATION:
-            return {...state, bounds: action.location, isFetching: false};
-        case actions.TOGGLE_MAP_SEARCH:
-            return {...state, search: action.search};
-        default:
+export function mapReducerFactory(namespace) {
+    return (state = initialMapState, action) => {
+        if (action.namespace !== namespace) {
             return state;
-    }
+        }
+
+        switch (action.type) {
+            case actions.FETCH_DEFAULT_ASPECTS_STARTED:
+                return {...state, isFetching: true};
+            case actions.FETCH_DEFAULT_ASPECTS_FAILED:
+                return {...state, isFetching: false};
+            case actions.UPDATE_ASPECTS:
+                return {...state, aspects: action.aspects, isFetching: false};
+            case actions.UPDATE_LOCATION:
+                return {...state, bounds: action.location, isFetching: false};
+            case actions.TOGGLE_MAP_SEARCH:
+                return {...state, search: action.search};
+            case actions.FETCH_MAP_ROOMS_STARTED:
+                return {...state, isFetching: true};
+            case actions.FETCH_MAP_ROOMS_FAILED:
+                return {...state, isFetching: false};
+            case actions.UPDATE_MAP_ROOMS:
+                return {...state, isFetching: false, rooms: action.rooms};
+            default:
+                return state;
+        }
+    };
 }

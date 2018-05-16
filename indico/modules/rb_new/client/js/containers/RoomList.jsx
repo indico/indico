@@ -25,10 +25,10 @@ const mapStateToProps = ({roomList, user: {favoriteRooms}}) => ({...roomList, fa
 
 const mapDispatchToProps = dispatch => ({
     fetchMapDefaultAspects: (callback) => {
-        dispatch(fetchMapDefaultAspects()).then(callback);
+        dispatch(fetchMapDefaultAspects('roomList')).then(callback);
     },
     updateLocation: (location) => {
-        dispatch(updateLocation(location));
+        dispatch(updateLocation('roomList', location));
     },
     fetchRooms: (clear = true) => {
         dispatch(fetchRooms('roomList', clear));

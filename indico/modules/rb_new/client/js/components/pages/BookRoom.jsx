@@ -38,7 +38,8 @@ export default class BookRoom extends React.Component {
         map: PropTypes.shape({
             bounds: PropTypes.object,
             search: PropTypes.bool.isRequired,
-            aspects: PropTypes.array
+            aspects: PropTypes.array,
+            rooms: PropTypes.array
         }).isRequired,
         fetchMapDefaultAspects: PropTypes.func.isRequired,
         updateLocation: PropTypes.func.isRequired,
@@ -110,11 +111,8 @@ export default class BookRoom extends React.Component {
     };
 
     render() {
-        const {toggleMapSearch, map: {search, aspects, bounds}, rooms, fetchRooms} = this.props;
+        const {toggleMapSearch, map: {search, aspects, bounds, rooms: mapRooms}, rooms, fetchRooms} = this.props;
         const {aspectBounds} = this.state;
-        const roomMarkers = rooms.list.map((room) => (
-            {id: room.id, name: room.full_name, lat: parseFloat(room.latitude), lng: parseFloat(room.longitude)}
-        ));
         return (
             <Grid columns={2}>
                 <Grid.Column width={11}>
@@ -130,7 +128,7 @@ export default class BookRoom extends React.Component {
                                     onToggleSearchCheckbox={(e, data) => toggleMapSearch(data.checked, bounds)}
                                     aspects={aspects}
                                     onChangeAspect={(e, data) => this.onChangeAspect(data.value)}
-                                    rooms={roomMarkers} />
+                                    rooms={mapRooms} />
                 </Grid.Column>
             </Grid>
         );
