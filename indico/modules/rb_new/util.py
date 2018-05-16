@@ -25,6 +25,7 @@ from sqlalchemy.orm import contains_eager, raiseload
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.queries import escape_like
 from indico.modules.rb import rb_is_admin, rb_settings
+from indico.modules.rb.models.favorites import favorite_room_table
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import Reservation
 from indico.modules.rb.models.rooms import Room
@@ -33,9 +34,12 @@ from indico.modules.rb_new.schemas import rooms_schema
 
 def search_for_rooms(filters, only_available=False):
     query = (Room.query
+             .outerjoin(favorite_room_table, db.and_(favorite_room_table.c.user_id == session.user.id,
+                                                     favorite_room_table.c.room_id == Room.id))
+             .reset_joinpoint()  # otherwise filter_by() would apply to the favorite table
              .options(raiseload('owner'))
              .filter(Room.is_active)
-             .order_by(db.func.indico.natsort(Room.full_name)))
+             .order_by(favorite_room_table.c.user_id.is_(None), db.func.indico.natsort(Room.full_name)))
 
     criteria = {}
     if 'capacity' in filters:
