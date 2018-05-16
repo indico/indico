@@ -5,7 +5,7 @@ Changelog
 Version 2.1
 -----------
 
-*Unreleased*
+*Released on May 16, 2018*
 
 Major Features
 ^^^^^^^^^^^^^^
