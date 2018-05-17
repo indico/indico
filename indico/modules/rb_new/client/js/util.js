@@ -22,26 +22,25 @@ export function toMoment(dt, format) {
     return dt ? moment(dt, format) : null;
 }
 
-export function parseSearchBarText(text) {
+export function parseSearchBarText(queryText) {
+    const resultMap = {bldg: 'building', floor: 'floor'};
     const result = {text: null, building: null, floor: null};
-    if (!text) {
+    if (!queryText) {
         return result;
     }
 
-    const parts = text.split(' ');
+    const parts = queryText.split(/\s+/).filter(x => !!x);
+    const textParts = [];
     for (const item of parts) {
-        if (!item) {
-            continue;
-        }
-
-        const [filter, value] = item.trimRight().split(':');
-        if (value && ['bldg', 'floor'].includes(filter)) {
-            result[filter !== 'bldg' ? filter : 'building'] = value;
-        } else {
-            result.text = item ? item.trim() : null;
+        const [filter, value] = item.split(':');
+        if (value && resultMap.hasOwnProperty(filter)) {
+            result[resultMap[filter]] = value;
+        } else if (item) {
+            textParts.push(item);
         }
     }
 
+    result.text = textParts.join(' ').trim() || null;
     return result;
 }
 
