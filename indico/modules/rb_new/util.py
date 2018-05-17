@@ -51,6 +51,8 @@ def search_for_rooms(filters, only_available=False):
     query = query.filter_by(**criteria)
     if 'text' in filters:
         query = query.filter(_make_room_text_filter(filters['text']))
+    if filters.get('favorite'):
+        query = query.filter(favorite_room_table.c.user_id.isnot(None))
     if not only_available:
         return query
 

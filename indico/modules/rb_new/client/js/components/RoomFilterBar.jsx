@@ -25,6 +25,7 @@ import FilterDropdown from './filters/FilterDropdown';
 import CapacityForm from './filters/CapacityForm';
 
 
+// eslint-disable-next-line react/prop-types
 const capacityRenderer = ({capacity}) => (
     (capacity === null)
         ? null : (
@@ -34,7 +35,8 @@ const capacityRenderer = ({capacity}) => (
             </span>
         ));
 
-export default function RoomFilterBar({capacity, children, setFilterParameter}) {
+
+export default function RoomFilterBar({capacity, onlyFavorites, children, setFilterParameter}) {
     return (
         <Button.Group>
             {children}
@@ -47,17 +49,21 @@ export default function RoomFilterBar({capacity, children, setFilterParameter}) 
                             setGlobalState={data => setFilterParameter('capacity', data.capacity)}
                             initialValues={{capacity}}
                             renderValue={capacityRenderer} />
+            <Button icon="star" primary={onlyFavorites}
+                    onClick={() => setFilterParameter('onlyFavorites', onlyFavorites ? undefined : true)} />
         </Button.Group>
     );
 }
 
 RoomFilterBar.propTypes = {
     capacity: propTypes.number,
+    onlyFavorites: propTypes.bool,
     setFilterParameter: propTypes.func.isRequired,
     children: propTypes.node
 };
 
 RoomFilterBar.defaultProps = {
     capacity: null,
+    onlyFavorites: false,
     children: null
 };
