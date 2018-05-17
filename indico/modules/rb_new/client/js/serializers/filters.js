@@ -48,6 +48,11 @@ export const queryString = {
         validator: v.isTime(),
         stateField: 'filters.timeSlot.endTime'
     },
+    favorite: {
+        validator: v.isBoolean(),
+        sanitizer: v.toBoolean(),
+        stateField: 'filters.onlyFavorites'
+    },
     capacity: {
         validator: v.isInt({min: 1}),
         sanitizer: v.toInt(),
@@ -130,6 +135,10 @@ export const ajax = {
         }
     },
     capacity: ({capacity}) => capacity,
+    favorite: {
+        onlyIf: ({onlyFavorites}) => onlyFavorites,
+        serializer: ({onlyFavorites}) => onlyFavorites,
+    },
     building: ({building}) => building,
     floor: ({floor}) => floor,
     text: ({text}) => text,

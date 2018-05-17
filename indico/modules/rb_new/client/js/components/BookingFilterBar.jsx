@@ -31,9 +31,9 @@ import dateRenderer from './filters/DateRenderer';
 import timeRenderer from './filters/TimeRenderer';
 
 
-export default function FilterBar({recurrence, dates, timeSlot, capacity, setFilterParameter}) {
+export default function FilterBar({recurrence, dates, timeSlot, capacity, onlyFavorites, setFilterParameter}) {
     return (
-        <RoomFilterBar capacity={capacity} setFilterParameter={setFilterParameter}>
+        <RoomFilterBar capacity={capacity} onlyFavorites={onlyFavorites} setFilterParameter={setFilterParameter}>
             <FilterDropdown title={<Translate>Recurrence</Translate>}
                             form={(ref, fieldValues, setParentField) => (
                                 <RecurrenceForm ref={ref} setParentField={setParentField} {...fieldValues} />
@@ -91,9 +91,11 @@ FilterBar.propTypes = {
         endTime: propTypes.string
     }).isRequired,
     capacity: propTypes.number,
+    onlyFavorites: propTypes.bool,
     setFilterParameter: propTypes.func.isRequired
 };
 
 FilterBar.defaultProps = {
-    capacity: null
+    capacity: null,
+    onlyFavorites: null,
 };

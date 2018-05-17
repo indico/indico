@@ -22,7 +22,8 @@ import {parseSearchBarText, sanitizeRecurrence} from '../../util';
 export const initialStateFactory = (namespace) => {
     const state = {
         text: null,
-        capacity: null
+        capacity: null,
+        onlyFavorites: false,
     };
 
     if (namespace === 'bookRoom') {

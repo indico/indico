@@ -34,6 +34,7 @@ from indico.modules.rb_new.util import get_buildings, get_rooms_availability, se
 
 search_room_args = {
     'capacity': fields.Int(),
+    'favorite': fields.Bool(),
     'text': fields.Str(),
     'start_dt': fields.DateTime(),
     'end_dt': fields.DateTime(),
