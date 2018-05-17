@@ -61,7 +61,7 @@
         {% endcall %}
 
         {% if registration.transaction %}
-            <div id="registration-summary" class="regform-done">
+            <div id="transaction-summary" class="regform-done">
                 <div class="i-box-header">
                     <div class="i-box-title">
                         {% trans %}Payment transaction{% endtrans %}
@@ -113,26 +113,30 @@
         <div class="label">
            {% trans %}Registration not paid yet{% endtrans %}
         </div>
-        {% trans -%}
-            You can mark the registration as paid manually.
-        {%- endtrans %}
+        {% if registration.is_paid %}
+            {% trans %}The current transaction is still pending.{% endtrans %}
+        {% else %}
+            {% trans %}You can mark the registration as paid manually.{% endtrans %}
+        {% endif %}
     </div>
-    <div class="toolbar">
-        <div class="group">
-            <span class="i-button label icon-coins">
-                {{ registration.render_price() }}
-            </span>
+    {% if not registration.is_paid %}
+        <div class="toolbar">
+            <div class="group">
+                <span class="i-button label icon-coins">
+                    {{ registration.render_price() }}
+                </span>
+            </div>
+            <div class="group">
+                <a class="i-button"
+                   data-update="#registration-details"
+                   data-method="POST"
+                   data-params="{{ dict(pay=1) | tojson | forceescape }}"
+                   data-href="{{ url_for('.toggle_registration_payment', registration) }}">
+                    {% trans %}Mark as paid{% endtrans %}
+                </a>
+            </div>
         </div>
-        <div class="group">
-            <a class="i-button"
-               data-update="#registration-details"
-               data-method="POST"
-               data-params="{{ dict(pay=1) | tojson | forceescape }}"
-               data-href="{{ url_for('.toggle_registration_payment', registration) }}">
-                {% trans %}Mark as paid{% endtrans %}
-            </a>
-        </div>
-    </div>
+    {% endif %}
 {% endmacro %}
 
 
