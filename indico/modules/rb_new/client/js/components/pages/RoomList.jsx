@@ -87,7 +87,7 @@ export default class RoomList extends React.Component {
     };
 
     render() {
-        const {fetchRooms, map: {bounds}} = this.props;
+        const {fetchRooms, map: {bounds, rooms}} = this.props;
         return (
             <Grid columns={2}>
                 <Grid.Column width={11}>
@@ -97,7 +97,7 @@ export default class RoomList extends React.Component {
                                     renderRoom={this.renderRoom} />
                 </Grid.Column>
                 <Grid.Column width={5}>
-                    <RoomBookingMap bounds={bounds} onMove={(e) => this.onMove(e)} />
+                    <RoomBookingMap bounds={bounds} onMove={(e) => this.onMove(e)} rooms={rooms} />
                 </Grid.Column>
             </Grid>
         );
