@@ -17,8 +17,14 @@
 import {connect} from 'react-redux';
 
 import BookRoom from '../components/pages/BookRoom';
-import {fetchMapDefaultAspects, fetchRooms, fetchMapRooms, setFilterParameter, toggleMapSearch,
-        updateLocation} from '../actions';
+import {
+    fetchMapDefaultAspects,
+    fetchRooms,
+    fetchMapRooms,
+    setFilterParameter,
+    toggleMapSearch,
+    updateLocation
+} from '../actions';
 
 
 const mapStateToProps = ({bookRoom}) => ({...bookRoom});

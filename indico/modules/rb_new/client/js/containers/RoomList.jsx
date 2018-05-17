@@ -18,7 +18,14 @@
 import {connect} from 'react-redux';
 
 import RoomList from '../components/pages/RoomList';
-import {addFavoriteRoom, delFavoriteRoom, fetchMapDefaultAspects, fetchRooms, updateLocation} from '../actions';
+import {
+    addFavoriteRoom,
+    delFavoriteRoom,
+    fetchMapDefaultAspects,
+    fetchMapRooms,
+    fetchRooms,
+    updateLocation
+} from '../actions';
 
 
 const mapStateToProps = ({roomList, user: {favoriteRooms}}) => ({...roomList, favoriteRooms});
@@ -32,6 +39,7 @@ const mapDispatchToProps = dispatch => ({
     },
     fetchRooms: (clear = true) => {
         dispatch(fetchRooms('roomList', clear));
+        dispatch(fetchMapRooms('roomList'));
     },
     addFavoriteRoom: (id) => {
         dispatch(addFavoriteRoom(id));
