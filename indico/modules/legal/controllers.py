@@ -21,7 +21,7 @@ from flask import redirect
 from indico.modules.admin import RHAdminBase
 from indico.modules.legal import legal_settings
 from indico.modules.legal.forms import LegalMessagesForm
-from indico.modules.legal.views import WPDisplayLegalMessages, WPManageLegalMessages
+from indico.modules.legal.views import WPDisplayPrivacyPolicy, WPDisplayTOS, WPManageLegalMessages
 from indico.web.flask.util import url_for
 from indico.web.rh import RH
 
@@ -35,6 +35,11 @@ class RHManageLegalMessages(RHAdminBase):
         return WPManageLegalMessages.render_template('manage_messages.html', 'legal_messages', form=form)
 
 
-class RHDisplayLegalMessages(RH):
+class RHDisplayTOS(RH):
     def _process(self):
-        return WPDisplayLegalMessages.render_template('tos.html', tos=legal_settings.get('tos'))
+        return WPDisplayTOS.render_template('tos.html', tos=legal_settings.get('tos'))
+
+
+class RHDisplayPrivacyPolicy(RH):
+    def _process(self):
+        return WPDisplayPrivacyPolicy.render_template('privacy.html', content=legal_settings.get('privacy_policy'))

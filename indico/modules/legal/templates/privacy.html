@@ -1,0 +1,10 @@
+{% extends 'layout/base.html' %}
+{% block page_class %}fixed-width-standalone-text-page{% endblock %}
+
+{% block title %}
+    {% trans %}Privacy Policy{% endtrans %}
+{% endblock %}
+
+{% block content %}
+    {{ content|sanitize_html }}
+{% endblock %}

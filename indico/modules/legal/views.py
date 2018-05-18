@@ -30,9 +30,17 @@ class WPManageLegalMessages(WPLegalMixin, WPAdmin):
     pass
 
 
-class WPDisplayLegalMessages(WPLegalMixin, WPJinjaMixin, WPDecorated):
+class WPDisplayTOS(WPLegalMixin, WPJinjaMixin, WPDecorated):
     def _get_breadcrumbs(self):
         return render_breadcrumbs(_('Terms and Conditions'))
+
+    def _getBody(self, params):
+        return self._getPageContent(params)
+
+
+class WPDisplayPrivacyPolicy(WPLegalMixin, WPJinjaMixin, WPDecorated):
+    def _get_breadcrumbs(self):
+        return render_breadcrumbs(_('Privacy Policy'))
 
     def _getBody(self, params):
         return self._getPageContent(params)

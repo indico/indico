@@ -2,6 +2,17 @@ Changelog
 =========
 
 
+Version 2.1.1
+-------------
+
+*Unreleased*
+
+Improvements
+^^^^^^^^^^^^
+
+- Add a privacy policy page linked from the footer (:issue:`1415`)
+
+
 Version 2.1
 -----------
 
