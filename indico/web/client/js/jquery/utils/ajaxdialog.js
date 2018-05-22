@@ -211,7 +211,7 @@
 
         function closeDialog(callbackData, submitted) {
             var confirmDeferred = (submitted || !options.confirmCloseUnsaved) ? $.Deferred().resolve() : confirmClose();
-            confirmDeferred.then(function() {
+            confirmDeferred.done(function() {
                 ignoreOnBeforeUnload = true;
                 var onCloseResult = _onClose(callbackData);
                 if (onCloseResult === false) {
