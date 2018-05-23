@@ -32,19 +32,19 @@ export const queryString = {
         validator: v.isIn(['day', 'week', 'month']),
         stateField: 'filters.recurrence.interval'
     },
-    startDate: {
+    sd: {
         validator: v.isDate(),
         stateField: 'filters.dates.startDate'
     },
-    endDate: {
+    ed: {
         validator: v.isDate(),
         stateField: 'filters.dates.endDate'
     },
-    startTime: {
+    st: {
         validator: v.isTime(),
         stateField: 'filters.timeSlot.startTime'
     },
-    endTime: {
+    et: {
         validator: v.isTime(),
         stateField: 'filters.timeSlot.endTime'
     },
