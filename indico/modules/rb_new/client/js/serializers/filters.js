@@ -69,22 +69,22 @@ export const queryString = {
     text: {
         stateField: 'filters.text'
     },
-    SWLat: {
+    sw_lat: {
         validator: v.isFloat({min: -90, max: 90}),
         sanitizer: v.toFloat(),
         stateField: 'filters.bounds.SW[0]'
     },
-    SWLng: {
+    sw_lng: {
         validator: v.isFloat({min: -180, max: 180}),
         sanitizer: v.toFloat(),
         stateField: 'filters.bounds.SW[1]'
     },
-    NELat: {
+    ne_lat: {
         validator: v.isFloat({min: -90, max: 90}),
         sanitizer: v.toFloat(),
         stateField: 'filters.bounds.NE[0]'
     },
-    NELng: {
+    ne_lng: {
         validator: v.isFloat({min: -180, max: 180}),
         sanitizer: v.toFloat(),
         stateField: 'filters.bounds.NE[1]'
