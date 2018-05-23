@@ -19,7 +19,6 @@ import React from 'react';
 import RangeCalendar from 'rc-calendar/lib/RangeCalendar';
 import RcCalendar from 'rc-calendar';
 import propTypes from 'prop-types';
-// Import date-picker style from ant, since range calendar has none
 import 'rc-calendar/assets/index.css';
 import {toMoment} from '../../util';
 
@@ -34,9 +33,9 @@ export default class DateForm extends FilterFormComponent {
     static propTypes = {
         startDate: propTypes.string,
         endDate: propTypes.string,
-        setParentField: propTypes.func.isRequired,
         isRange: propTypes.bool.isRequired,
-        handleOK: propTypes.func.isRequired
+        handleOK: propTypes.func.isRequired,
+        ...FilterFormComponent.propTypes
     };
 
     static defaultProps = {

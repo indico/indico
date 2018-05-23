@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 from flask import jsonify, request, session
+from marshmallow import validate
 from marshmallow_enum import EnumField
 from webargs import fields
 from webargs.flaskparser import use_args
@@ -29,11 +30,12 @@ from indico.modules.rb.models.favorites import favorite_room_table
 from indico.modules.rb.models.reservations import RepeatFrequency
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb_new.schemas import aspects_schema, map_rooms_schema, reservation_occurrences_schema, rooms_schema
-from indico.modules.rb_new.util import get_buildings, get_rooms_availability, search_for_rooms
+from indico.modules.rb_new.util import get_buildings, get_rooms_availability, search_for_rooms, get_equipment_types
 
 
 search_room_args = {
     'capacity': fields.Int(),
+    'equipment': fields.List(fields.Str(validate=validate.OneOf(get_equipment_types()))),
     'favorite': fields.Bool(),
     'text': fields.Str(),
     'start_dt': fields.DateTime(),

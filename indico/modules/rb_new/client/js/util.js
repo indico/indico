@@ -105,9 +105,15 @@ export function getMapBounds(map) {
 }
 
 function _pruneNullLeaves(obj) {
+    if (!Object.entries(obj).length) {
+        return {};
+    }
+
     return Object.assign(...Object.entries(obj).map(([k, v]) => {
         if (v === null) {
             return {};
+        } else if (Array.isArray(v)) {
+            return {[k]: v.filter(e => e !== null)};
         } else if (typeof v === 'object') {
             return {[k]: _pruneNullLeaves(v)};
         } else {

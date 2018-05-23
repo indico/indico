@@ -19,7 +19,7 @@ import React from 'react';
 import propTypes from 'prop-types';
 
 import {Translate} from 'indico/react/i18n';
-import RoomFilterBar from './RoomFilterBar';
+import RoomFilterBar, {equipmentType, staticDataType} from './RoomFilterBar';
 
 import FilterDropdown from './filters/FilterDropdown';
 import RecurrenceForm from './filters/RecurrenceForm';
@@ -31,12 +31,18 @@ import dateRenderer from './filters/DateRenderer';
 import timeRenderer from './filters/TimeRenderer';
 
 
-export default function FilterBar({recurrence, dates, timeSlot, capacity, onlyFavorites, setFilterParameter}) {
+export default function FilterBar({
+    recurrence, dates, timeSlot, capacity, onlyFavorites, equipment, setFilterParameter, staticData
+}) {
     return (
-        <RoomFilterBar capacity={capacity} onlyFavorites={onlyFavorites} setFilterParameter={setFilterParameter}>
+        <RoomFilterBar capacity={capacity}
+                       onlyFavorites={onlyFavorites}
+                       equipment={equipment}
+                       setFilterParameter={setFilterParameter}
+                       staticData={staticData}>
             <FilterDropdown title={<Translate>Recurrence</Translate>}
-                            form={(ref, fieldValues, setParentField) => (
-                                <RecurrenceForm ref={ref} setParentField={setParentField} {...fieldValues} />
+                            form={(fieldValues, setParentField) => (
+                                <RecurrenceForm setParentField={setParentField} {...fieldValues} />
                             )}
                             setGlobalState={({type, number, interval}) => {
                                 if (type === 'every' && number === 1 && interval === 'day') {
@@ -52,9 +58,8 @@ export default function FilterBar({recurrence, dates, timeSlot, capacity, onlyFa
                             }}
                             renderValue={recurrenceRenderer} />
             <FilterDropdown title={<Translate>Date</Translate>}
-                            form={(ref, fieldValues, setParentField, handleOK) => (
-                                <DateForm ref={ref}
-                                          setParentField={setParentField}
+                            form={(fieldValues, setParentField, handleOK) => (
+                                <DateForm setParentField={setParentField}
                                           isRange={recurrence.type !== 'single'}
                                           handleOK={handleOK}
                                           {...dates} />
@@ -64,9 +69,8 @@ export default function FilterBar({recurrence, dates, timeSlot, capacity, onlyFa
                             renderValue={dateRenderer}
                             showButtons={false} />
             <FilterDropdown title={<Translate>Time</Translate>}
-                            form={(ref, fieldValues, setParentField) => (
-                                <TimeForm ref={ref}
-                                          setParentField={setParentField}
+                            form={(fieldValues, setParentField) => (
+                                <TimeForm setParentField={setParentField}
                                           {...fieldValues} />
                             )}
                             setGlobalState={setFilterParameter.bind(undefined, 'timeSlot')}
@@ -76,7 +80,9 @@ export default function FilterBar({recurrence, dates, timeSlot, capacity, onlyFa
     );
 }
 
+
 FilterBar.propTypes = {
+    staticData: staticDataType.isRequired,
     recurrence: propTypes.shape({
         number: propTypes.number,
         type: propTypes.string,
@@ -92,10 +98,12 @@ FilterBar.propTypes = {
     }).isRequired,
     capacity: propTypes.number,
     onlyFavorites: propTypes.bool,
+    equipment: equipmentType,
     setFilterParameter: propTypes.func.isRequired
 };
 
 FilterBar.defaultProps = {
     capacity: null,
     onlyFavorites: null,
+    equipment: []
 };

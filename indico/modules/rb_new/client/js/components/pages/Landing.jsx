@@ -130,7 +130,8 @@ export default class Landing extends React.Component {
                 timeSlot: {
                     startTime: _serializeTime(startTime),
                     endTime: _serializeTime(endTime)
-                }
+                },
+                equipment: {}
             }
         }, qsRules);
 

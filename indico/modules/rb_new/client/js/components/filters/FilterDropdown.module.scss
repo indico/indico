@@ -15,8 +15,31 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-.filter-dropdown-button :global i.icon.angle.down {
-    padding-left: 1em;
+ @import '../../../styles/main';
+
+
+:global(.ui.button).filter-dropdown-button {
+    > :global(i.icon.angle.down) {
+        padding-left: 1em;
+        transition: padding-left .15s ease-out;
+    }
+
+    position: relative;
+    transition: width .15s ease-out;
+}
+
+:global(.ui.button).filter-dropdown-button-counter {
+    @extend .filter-dropdown-button;
+
+    > :global(.ui.white.label) {
+        color: $primary-color;
+        background-color: $white;
+        margin-left: 0.5em;
+    }
+
+    &:global(.primary) > :global(i.icon.angle.down) {
+        padding-left: 2.5em;
+    }
 }
 
 .filter-dropdown-footer:global(.ui.buttons) {

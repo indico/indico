@@ -33,22 +33,34 @@ function _mergeDefaults(defaults, values) {
     }).map(([k, v]) => ({[k]: v})));
 }
 
+const defaultTriggerRenderer = (title, renderedValue, counter) => (
+    <Button primary={renderedValue !== null}
+            styleName={counter ? 'filter-dropdown-button-counter' : 'filter-dropdown-button'}>
+        {renderedValue === null ? title : renderedValue}
+        <Icon name="angle down" />
+    </Button>
+);
+
 export default class FilterDropdown extends React.Component {
     static propTypes = {
         title: propTypes.element.isRequired,
         form: propTypes.func.isRequired,
         renderValue: propTypes.func.isRequired,
+        renderTrigger: propTypes.func,
         setGlobalState: propTypes.func.isRequired,
         initialValues: propTypes.object,
         defaults: propTypes.object,
-        showButtons: propTypes.bool
-    };
+        showButtons: propTypes.bool,
+        counter: propTypes.bool
+    }
 
     static defaultProps = {
         initialValues: {},
         defaults: {},
-        showButtons: true
-    };
+        showButtons: true,
+        renderTrigger: defaultTriggerRenderer,
+        counter: false
+    }
 
     static getDerivedStateFromProps({defaults, initialValues, renderValue}, prevState) {
         return {
@@ -126,24 +138,17 @@ export default class FilterDropdown extends React.Component {
     }
 
     render() {
-        const formRef = React.createRef();
-        const {title, form, showButtons} = this.props;
+        const {title, form, renderTrigger, showButtons, counter} = this.props;
         const {renderedValue, fieldValues, isOpen} = this.state;
-        const trigger = (
-            <Button primary={renderedValue !== null} styleName="filter-dropdown-button">
-                {renderedValue === null ? title : renderedValue}
-                <Icon name="angle down" />
-            </Button>
-        );
 
         return (
             <Popup position="bottom right"
-                   trigger={trigger}
+                   trigger={renderTrigger(title, renderedValue, counter)}
                    on="click"
                    open={isOpen}
                    onClose={this.handleClose}
                    onOpen={this.handleOpen}>
-                {form(formRef, fieldValues, this.setFieldValue, this.handleOK)}
+                {form(fieldValues, this.setFieldValue, this.handleOK)}
                 {showButtons && (
                     <Button.Group size="mini" compact floated="right" styleName="filter-dropdown-footer">
                         <Button onClick={this.handleCancel}>
