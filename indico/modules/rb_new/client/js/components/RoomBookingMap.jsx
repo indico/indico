@@ -30,8 +30,10 @@ import './RoomBookingMap.module.scss';
 
 
 export default function RoomBookingMap(props) {
-    const {bounds, onMove, searchCheckbox, isSearchEnabled, onToggleSearchCheckbox, aspects, onChangeAspect,
-           mapRef, rooms} = props;
+    const {
+        bounds, onMove, searchCheckbox, isSearchEnabled, onToggleSearchCheckbox, aspects, onChangeAspect,
+        mapRef, rooms
+    } = props;
     const aspectOptions = Object.entries(aspects).map(([key, val]) => ({
         text: val.name,
         value: Number(key)
@@ -46,7 +48,7 @@ export default function RoomBookingMap(props) {
         </RoomBookingMapControl>
     );
 
-    const aspectsControl = aspects.length && (
+    const aspectsControl = !!aspects.length && (
         <RoomBookingMapControl position="bottomleft">
             <Dropdown placeholder={Translate.string('Select aspect')} selection upward
                       options={aspectOptions} defaultValue={aspects.findIndex(op => op.default_on_startup)}
@@ -55,7 +57,7 @@ export default function RoomBookingMap(props) {
         </RoomBookingMapControl>
     );
 
-    const markers = rooms.length && (
+    const markers = !!rooms.length && (
         <MarkerClusterGroup showCoverageOnHover={false}>
             {rooms.map((room) => (
                 <Marker key={room.id} position={[room.lat, room.lng]}>
