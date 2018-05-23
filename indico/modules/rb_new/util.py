@@ -32,6 +32,21 @@ from indico.modules.rb.models.rooms import Room
 from indico.modules.rb_new.schemas import rooms_schema
 
 
+def _filter_coordinates(query, filters):
+    try:
+        sw_lat = filters['sw_lat']
+        sw_lng = filters['sw_lng']
+        ne_lat = filters['ne_lat']
+        ne_lng = filters['ne_lng']
+    except KeyError:
+        return query
+
+    return query.filter(db.cast(Room.latitude, db.Float) >= sw_lat,
+                        db.cast(Room.latitude, db.Float) <= ne_lat,
+                        db.cast(Room.longitude, db.Float) >= sw_lng,
+                        db.cast(Room.longitude, db.Float) <= ne_lng)
+
+
 def search_for_rooms(filters, only_available=False):
     query = (Room.query
              .outerjoin(favorite_room_table, db.and_(favorite_room_table.c.user_id == session.user.id,
@@ -53,6 +68,8 @@ def search_for_rooms(filters, only_available=False):
         query = query.filter(_make_room_text_filter(filters['text']))
     if filters.get('favorite'):
         query = query.filter(favorite_room_table.c.user_id.isnot(None))
+    query = _filter_coordinates(query, filters)
+
     if not only_available:
         return query
 
