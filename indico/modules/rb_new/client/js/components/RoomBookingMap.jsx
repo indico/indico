@@ -15,6 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import _ from 'lodash';
 import propTypes from 'prop-types';
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -69,9 +70,10 @@ export default function RoomBookingMap(props) {
         </MarkerClusterGroup>
     );
 
+    const onMoveDebounced = _.debounce(onMove, 750);
     return !_.isEmpty(bounds) && (
         <div styleName="map-container">
-            <Map ref={mapRef} bounds={Object.values(bounds)} onDragend={onMove} onZoomend={onMove}>
+            <Map ref={mapRef} bounds={Object.values(bounds)} onDragend={onMoveDebounced} onZoomend={onMoveDebounced}>
                 <TileLayer attribution='© <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
                 {markers}
