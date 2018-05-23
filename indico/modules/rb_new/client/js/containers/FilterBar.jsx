@@ -19,7 +19,10 @@ import {setFilterParameter, fetchRooms, fetchMapRooms} from '../actions';
 
 
 export default (namespace, componentClass) => {
-    const mapStateToProps = state => ({...state[namespace].filters});
+    const mapStateToProps = state => ({
+        staticData: state.staticData,
+        ...state[namespace].filters
+    });
 
     const mapDispatchToProps = dispatch => ({
         setFilterParameter: (param, value) => {

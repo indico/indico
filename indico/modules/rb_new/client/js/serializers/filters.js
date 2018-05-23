@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
-
+import _ from 'lodash';
 import {validator as v} from 'redux-router-querystring';
 
 
@@ -57,6 +57,21 @@ export const queryString = {
         validator: v.isInt({min: 1}),
         sanitizer: v.toInt(),
         stateField: 'filters.capacity'
+    },
+    eq: {
+        validator: () => true,
+        stateField: {
+            serialize: ({filters: {equipment}}) => Object.keys(equipment).filter(k => !!equipment[k]),
+            parse: (value, state) => {
+                if (!Array.isArray(value)) {
+                    value = [value];
+                }
+                if (!state.filters) {
+                    state.filters = {};
+                }
+                state.filters.equipment = Object.assign(...value.map(e => ({[e]: true})));
+            }
+        }
     },
     building: {
         validator: v.isInt(),
@@ -139,6 +154,7 @@ export const ajax = {
         onlyIf: ({onlyFavorites}) => onlyFavorites,
         serializer: ({onlyFavorites}) => onlyFavorites,
     },
+    equipment: ({equipment}) => Object.keys(equipment).filter(k => !!equipment[k]),
     building: ({building}) => building,
     floor: ({floor}) => floor,
     text: ({text}) => text,

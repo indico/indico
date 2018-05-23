@@ -45,7 +45,9 @@ document.addEventListener('DOMContentLoaded', () => {
             favoriteRooms: {},
         },
         staticData: {
-            availableLanguages: Indico.Settings.Languages
+            availableLanguages: Indico.Settings.Languages,
+            // TODO: get this from the server
+            equipment: Indico.Settings.EquipmentTypes
         }
     });
 

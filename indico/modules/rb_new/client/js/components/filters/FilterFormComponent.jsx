@@ -22,7 +22,7 @@ import React from 'react';
 import propTypes from 'prop-types';
 
 
-export default class FilterFormBase extends React.Component {
+export default class FilterFormComponent extends React.Component {
     static propTypes = {
         setParentField: propTypes.func.isRequired
     };

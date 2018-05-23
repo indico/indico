@@ -25,6 +25,7 @@ from sqlalchemy.orm import contains_eager, raiseload
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.queries import escape_like
 from indico.modules.rb import rb_is_admin, rb_settings
+from indico.modules.rb.models.equipment import EquipmentType, RoomEquipmentAssociation
 from indico.modules.rb.models.favorites import favorite_room_table
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import Reservation
@@ -66,6 +67,17 @@ def search_for_rooms(filters, only_available=False):
     query = query.filter_by(**criteria)
     if 'text' in filters:
         query = query.filter(_make_room_text_filter(filters['text']))
+    if filters.get('equipment'):
+        subquery = (db.session.query(RoomEquipmentAssociation)
+                    .with_entities(db.func.count(RoomEquipmentAssociation.c.room_id))
+                    .filter(
+                        RoomEquipmentAssociation.c.room_id == Room.id,
+                        EquipmentType.name.in_(filters['equipment'])
+                    )
+                    .join(EquipmentType, RoomEquipmentAssociation.c.equipment_id == EquipmentType.id)
+                    .correlate(Room)
+                    .as_scalar())
+        query = query.filter(subquery == len(filters['equipment']))
     if filters.get('favorite'):
         query = query.filter(favorite_room_table.c.user_id.isnot(None))
     query = _filter_coordinates(query, filters)
@@ -161,3 +173,15 @@ def get_rooms_availability(rooms, start_dt, end_dt, repeat_frequency, repeat_int
                              'pre_conflicts': pre_conflicts})
 
     return availability
+
+
+def get_equipment_types():
+    # TODO: get this from the DB
+    return [
+        'Projector',
+        'Whiteboard',
+        'Vidyo',
+        'Webcast/Recording',
+        'PC',
+        'Phone Conference'
+    ]

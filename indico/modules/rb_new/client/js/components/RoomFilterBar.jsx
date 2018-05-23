@@ -16,13 +16,16 @@
 */
 
 import React from 'react';
-import {Button, Icon} from 'semantic-ui-react';
-import propTypes from 'prop-types';
+import {Button, Icon, Label} from 'semantic-ui-react';
+import PropTypes from 'prop-types';
 
 import {Translate} from 'indico/react/i18n';
 
 import FilterDropdown from './filters/FilterDropdown';
 import CapacityForm from './filters/CapacityForm';
+import EquipmentForm from './filters/EquipmentForm';
+
+import './RoomFilterBar.module.scss';
 
 
 // eslint-disable-next-line react/prop-types
@@ -35,35 +38,67 @@ const capacityRenderer = ({capacity}) => (
             </span>
         ));
 
+const equipmentRenderer = ({equipment}) => {
+    if (Object.values(equipment).some(v => v)) {
+        return (
+            <>
+                <Translate>Equipment</Translate>
+                <Label circular horizontal color="white" size="medium" styleName="filter-bar-button-label">
+                    {Object.values(equipment).filter(v => v).length}
+                </Label>
+            </>
+        );
+    } else {
+        return null;
+    }
+};
 
-export default function RoomFilterBar({capacity, onlyFavorites, children, setFilterParameter}) {
+export default function RoomFilterBar({capacity, onlyFavorites, children, equipment, setFilterParameter, staticData}) {
+    const {equipment: equipmentList} = staticData;
     return (
-        <Button.Group>
+        <Button.Group size="large">
             {children}
             <FilterDropdown title={<Translate>Min. Capacity</Translate>}
-                            form={(ref, fieldValues, setParentField) => (
-                                <CapacityForm ref={ref}
-                                              setParentField={setParentField}
-                                              capacity={fieldValues.capacity} />
+                            form={({capacity: selectedCapacity}, setParentField) => (
+                                <CapacityForm setParentField={setParentField}
+                                              capacity={selectedCapacity} />
                             )}
                             setGlobalState={data => setFilterParameter('capacity', data.capacity)}
                             initialValues={{capacity}}
                             renderValue={capacityRenderer} />
+            <FilterDropdown title={<Translate>Equipment</Translate>}
+                            form={({equipment: selectedEquipment}, setParentField) => (
+                                <EquipmentForm setParentField={setParentField}
+                                               selectedEquipment={selectedEquipment}
+                                               possibleEquipment={equipmentList} />
+                            )}
+                            counter
+                            setGlobalState={data => setFilterParameter('equipment', data.equipment)}
+                            initialValues={{equipment}}
+                            renderValue={equipmentRenderer} />
             <Button icon="star" primary={onlyFavorites}
                     onClick={() => setFilterParameter('onlyFavorites', onlyFavorites ? undefined : true)} />
         </Button.Group>
     );
 }
 
+export const equipmentType = PropTypes.object;
+export const staticDataType = PropTypes.shape({
+    equipment: PropTypes.arrayOf(PropTypes.string)
+});
+
 RoomFilterBar.propTypes = {
-    capacity: propTypes.number,
-    onlyFavorites: propTypes.bool,
-    setFilterParameter: propTypes.func.isRequired,
-    children: propTypes.node
+    staticData: staticDataType.isRequired,
+    capacity: PropTypes.number,
+    equipment: equipmentType,
+    onlyFavorites: PropTypes.bool,
+    setFilterParameter: PropTypes.func.isRequired,
+    children: PropTypes.node
 };
 
 RoomFilterBar.defaultProps = {
     capacity: null,
     onlyFavorites: false,
-    children: null
+    children: null,
+    equipment: [],
 };
