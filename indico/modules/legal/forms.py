@@ -27,3 +27,4 @@ class LegalMessagesForm(IndicoForm):
     network_protected_disclaimer = TextAreaField(_("Network-protected information disclaimer"), widget=CKEditorWidget())
     restricted_disclaimer = TextAreaField(_("Restricted information disclaimer"), widget=CKEditorWidget())
     tos = TextAreaField(_("Terms and conditions"), widget=CKEditorWidget())
+    privacy_policy = TextAreaField(_("Privacy Policy"), widget=CKEditorWidget())

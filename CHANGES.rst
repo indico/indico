@@ -26,6 +26,23 @@ Internal Changes
 ----
 
 
+Version 2.1.1
+-------------
+
+*Unreleased*
+
+Improvements
+^^^^^^^^^^^^
+
+- Add a privacy policy page linked from the footer (:issue:`1415`)
+
+Bugfixes
+^^^^^^^^
+
+- Fix alignment issue in the "Indico Weeks View" timetable theme
+  (:issue:`3367`)
+
+
 Version 2.1
 -----------
 

@@ -107,7 +107,7 @@
 
 
 {% macro render_placeholder(duration) %}
-    {% set height = ((duration / 5) * px_per_5_minutes) - 1 %}
+    {% set height = ((duration / 5) * px_per_5_minutes) %}
     {% if to_subtract[-1] %}
         {% set subtract = to_subtract.pop() %}
         {% if subtract <= height %}
