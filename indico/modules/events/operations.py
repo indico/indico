@@ -140,7 +140,6 @@ def clone_event(event, start_dt, cloners, category=None):
         'timezone': event.timezone,
         'title': event.title,
         'description': event.description,
-        'visibility': event.visibility
     }
     new_event = create_event(category or event.category, event.type_, data,
                              features=features_event_settings.get(event, 'enabled'),

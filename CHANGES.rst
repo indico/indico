@@ -19,6 +19,8 @@ Bugfixes
 
 - Fix alignment issue in the "Indico Weeks View" timetable theme
   (:issue:`3367`)
+- Reset visibility when cloning an event to a different category
+  (:issue:`3372`)
 
 
 Version 2.1
