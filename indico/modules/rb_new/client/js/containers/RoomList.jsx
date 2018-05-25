@@ -21,22 +21,14 @@ import RoomList from '../components/pages/RoomList';
 import {
     addFavoriteRoom,
     delFavoriteRoom,
-    fetchMapDefaultAspects,
     fetchMapRooms,
     fetchRooms,
-    updateLocation
 } from '../actions';
 
 
 const mapStateToProps = ({roomList, user: {favoriteRooms}}) => ({...roomList, favoriteRooms});
 
 const mapDispatchToProps = dispatch => ({
-    fetchMapDefaultAspects: (callback) => {
-        dispatch(fetchMapDefaultAspects('roomList')).then(callback);
-    },
-    updateLocation: (location) => {
-        dispatch(updateLocation('roomList', location));
-    },
     fetchRooms: (clear = true) => {
         dispatch(fetchRooms('roomList', clear));
         dispatch(fetchMapRooms('roomList'));

@@ -15,56 +15,36 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint "react/forbid-component-props": "off" */
 
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Button, Grid} from 'semantic-ui-react';
 
 import {Slot} from 'indico/react/util';
-import RoomBookingMap from '../RoomBookingMap';
 import RoomSearchPane from '../RoomSearchPane';
 import RoomFilterBar from '../RoomFilterBar';
 import filterBarFactory from '../../containers/FilterBar';
 import searchBarFactory from '../../containers/SearchBar';
-import {getMapBounds} from '../../util';
+import mapControllerFactory from '../../containers/MapController';
 import Room from '../Room';
 
 
 const FilterBar = filterBarFactory('roomList', RoomFilterBar);
 const SearchBar = searchBarFactory('roomList');
+const MapController = mapControllerFactory('roomList');
 
 
 export default class RoomList extends React.Component {
     static propTypes = {
-        map: PropTypes.shape({
-            bounds: PropTypes.object,
-        }).isRequired,
         favoriteRooms: PropTypes.object.isRequired,
         fetchRooms: PropTypes.func.isRequired,
-        fetchMapDefaultAspects: PropTypes.func.isRequired,
-        updateLocation: PropTypes.func.isRequired,
+        rooms: PropTypes.shape({
+            list: PropTypes.array,
+            isFetching: PropTypes.bool,
+        }).isRequired,
         addFavoriteRoom: PropTypes.func.isRequired,
         delFavoriteRoom: PropTypes.func.isRequired,
     };
-
-    constructor(props) {
-        super(props);
-        const {map: {bounds}, fetchMapDefaultAspects} = this.props;
-        if (_.isEmpty(bounds)) {
-            fetchMapDefaultAspects();
-        }
-    }
-
-    componentDidMount() {
-        const {fetchRooms} = this.props;
-        fetchRooms();
-    }
-
-    onMove(e) {
-        const {updateLocation} = this.props;
-        updateLocation(getMapBounds(e.target));
-    }
 
     toggleFavoriteRoom = (room) => {
         const {favoriteRooms, addFavoriteRoom, delFavoriteRoom} = this.props;
@@ -87,17 +67,18 @@ export default class RoomList extends React.Component {
     };
 
     render() {
-        const {fetchRooms, map: {bounds, rooms}} = this.props;
+        const {rooms, fetchRooms} = this.props;
         return (
             <Grid columns={2}>
                 <Grid.Column width={11}>
-                    <RoomSearchPane {...this.props}
+                    <RoomSearchPane rooms={rooms}
+                                    fetchRooms={fetchRooms}
                                     filterBar={<FilterBar />}
                                     searchBar={<SearchBar onConfirm={fetchRooms} onTextChange={fetchRooms} />}
                                     renderRoom={this.renderRoom} />
                 </Grid.Column>
                 <Grid.Column width={5}>
-                    <RoomBookingMap bounds={bounds} onMove={(e) => this.onMove(e)} rooms={rooms} />
+                    <MapController />
                 </Grid.Column>
             </Grid>
         );
