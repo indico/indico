@@ -15,12 +15,14 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import _ from 'lodash';
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Dimmer, Loader} from 'semantic-ui-react';
+import {Button, Checkbox, Dimmer, Dropdown, Loader, Popup} from 'semantic-ui-react';
+import {Translate} from 'indico/react/i18n';
 
-import {getAspectBounds, getMapBounds} from '../util';
-import RoomBookingMap from './RoomBookingMap';
+import {getAspectBounds, getMapBounds, getRoomListBounds, checkRoomsInBounds} from '../util';
+import RoomBookingMap, {RoomBookingMapControl} from './RoomBookingMap';
 
 import './MapController.module.scss';
 
@@ -41,32 +43,52 @@ export default class MapController extends React.Component {
         filterBounds: null
     };
 
-    static getDerivedStateFromProps({filterBounds, map: {bounds}}) {
+    static getDerivedStateFromProps({filterBounds, map: {bounds}}, prevState) {
+        const aspectBounds = filterBounds || bounds;
         return {
-            aspectBounds: filterBounds || bounds
+            ...prevState,
+            // Take the user-set bounds, otherwise default to the map's default bounds.
+            aspectBounds
         };
     }
 
     constructor(props) {
         super(props);
-        this.map = React.createRef();
+        this.mapRef = React.createRef();
 
         this.state = {
             loading: true,
-            aspectsLoaded: false
+            aspectsLoaded: false,
+            allRoomsVisible: false
         };
-
-        this.loadAspects();
     }
 
     async componentDidMount() {
         const {fetchRooms} = this.props;
         fetchRooms();
+        this.loadAspects();
+    }
+
+    componentDidUpdate() {
+        // check whether rooms are in bounds in parallel, to
+        // avoid blocking the main thread with the calculations
+        _.defer(() => {
+            const {map: {bounds, rooms}} = this.props;
+            const {allRoomsVisible} = this.state;
+            const inBounds = !bounds || checkRoomsInBounds(rooms, bounds);
+            if (inBounds !== allRoomsVisible) {
+                this.setState({
+                    allRoomsVisible: !rooms.length || inBounds
+                });
+            }
+        });
     }
 
     async loadAspects() {
-        const {aspectBounds, fetchMapDefaultAspects} = this.props;
-        if (!aspectBounds) {
+        const {fetchMapDefaultAspects} = this.props;
+        const {aspectsLoaded} = this.state;
+
+        if (!aspectsLoaded) {
             await fetchMapDefaultAspects();
         }
         this.setState({
@@ -90,18 +112,65 @@ export default class MapController extends React.Component {
 
     onChangeAspect(aspectIdx) {
         const {map: {aspects}} = this.props;
-        this.setState({aspectBounds: getAspectBounds(aspects[aspectIdx])}, this.updateToMapBounds);
+        this.setState({
+            aspectBounds: getAspectBounds(aspects[aspectIdx])
+        });
     }
 
-    updateToMapBounds() {
+    updateToMapBounds = () => {
         const {updateLocation, map: {search}} = this.props;
-        const map = this.map.current.leafletElement;
-        updateLocation(getMapBounds(map), search);
-    }
+        if (this.mapRef.current) {
+            const map = this.mapRef.current.leafletElement;
+            updateLocation(getMapBounds(map), search);
+        }
+    };
+
+    showAllRooms = () => {
+        const {map: {rooms}} = this.props;
+        this.setState({
+            aspectBounds: getRoomListBounds(rooms),
+            allRoomsVisible: true
+        });
+    };
 
     render() {
-        const {map: {search, aspects, bounds, rooms: mapRooms}, toggleMapSearch} = this.props;
-        const {aspectBounds, aspectsLoaded, loading} = this.state;
+        const {map: {search, aspects, bounds, rooms}} = this.props;
+        const {aspectBounds, aspectsLoaded, loading, allRoomsVisible} = this.state;
+        const aspectOptions = Object.entries(aspects).map(([key, val]) => ({
+            text: val.name,
+            value: Number(key)
+        }));
+
+        const searchControl = (
+            <RoomBookingMapControl position="topleft">
+                <Checkbox label={Translate.string('Search as I move the map')}
+                          onChange={(e, data) => this.toggleMapSearch(data.checked, bounds)}
+                          checked={search} styleName="map-control-content" />
+            </RoomBookingMapControl>
+        );
+
+        const aspectsControl = !!aspects.length && (
+            <RoomBookingMapControl position="bottomleft">
+                <Dropdown placeholder={Translate.string('Select aspect')} selection upward
+                          options={aspectOptions} defaultValue={aspects.findIndex(op => op.default_on_startup)}
+                          styleName="aspects-dropdown map-control-content"
+                          openOnFocus={false} onChange={(e, data) => this.onChangeAspect(data.value)} />
+            </RoomBookingMapControl>
+        );
+
+        const showAllButton = (
+            <Button icon="expand"
+                    styleName="show-all-button map-control-content"
+                    onClick={this.showAllRooms}
+                    disabled={allRoomsVisible} />
+        );
+
+        const showAllControl = (
+            <RoomBookingMapControl position="bottomright">
+                <Popup trigger={showAllButton}
+                       content={Translate.string('Zoom out to include all listed rooms')} />
+            </RoomBookingMapControl>
+        );
 
         return (
             <Dimmer.Dimmable>
@@ -109,13 +178,16 @@ export default class MapController extends React.Component {
                     <Loader />
                 </Dimmer>
                 {aspectsLoaded && (
-                    <RoomBookingMap mapRef={this.map} bounds={aspectBounds} onMove={this.onMove}
-                                    searchCheckbox isSearchEnabled={search}
-                                    onToggleSearchCheckbox={(e, data) => toggleMapSearch(data.checked, bounds)}
+                    <RoomBookingMap mapRef={this.mapRef}
+                                    bounds={aspectBounds}
                                     aspects={aspects}
-                                    onChangeAspect={(e, data) => this.onChangeAspect(data.value)}
-                                    rooms={mapRooms}
-                                    onLoad={this.onMapLoad} />
+                                    rooms={rooms}
+                                    onLoad={this.onMapLoad}
+                                    onMove={this.onMove}>
+                        {searchControl}
+                        {aspectsControl}
+                        {showAllControl}
+                    </RoomBookingMap>
                 )}
             </Dimmer.Dimmable>
         );

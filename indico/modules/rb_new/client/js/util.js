@@ -16,6 +16,7 @@
  */
 
 import moment from 'moment';
+import LatLon from 'geodesy/latlon-vectors';
 
 
 export function toMoment(dt, format) {
@@ -101,6 +102,39 @@ export function getMapBounds(map) {
     return {
         SW: Object.values(boundsObj.getSouthWest()),
         NE: Object.values(boundsObj.getNorthEast())
+    };
+}
+
+/*
+Calculate a bounding box that encompasses all the rooms provided in
+an array.
+*/
+export function checkRoomsInBounds(rooms, bounds) {
+    if (!rooms.length) {
+        return null;
+    }
+    const polygon = [
+        new LatLon(bounds.NE[0], bounds.NE[1]),
+        new LatLon(bounds.NE[0], bounds.SW[1]),
+        new LatLon(bounds.SW[0], bounds.SW[1]),
+        new LatLon(bounds.SW[0], bounds.NE[1])
+    ];
+
+    return rooms.every(({lat, lng}) => new LatLon(lat, lng).enclosedBy(polygon));
+}
+
+export function getRoomListBounds(rooms) {
+    if (!rooms.length) {
+        return null;
+    }
+    const points = rooms.map(({lat, lng}) => new LatLon(lat, lng));
+    const center = LatLon.meanOf(points);
+    const farthest = _.max(points.map(p => center.distanceTo(p))) * 1.1;
+    const sw = center.destinationPoint(farthest, 225);
+    const ne = center.destinationPoint(farthest, 45);
+    return {
+        SW: [sw.lat, sw.lon],
+        NE: [ne.lat, ne.lon]
     };
 }
 

@@ -36,21 +36,6 @@
         display: flex;
     }
 
-    .map-control-content {
-        background-color: $white;
-        padding: 0.5em;
-        border-radius: 0.25em;
-        font-size: 0.85em;
-    }
-
-    .aspects-dropdown:global(.dropdown) {
-        min-width: 10em;
-
-        :global(.menu .item) {
-            font-size: 1em;
-        }
-    }
-
     :global(.marker-cluster), :global(.rb-map-marker) {
         border-radius: 50%;
     }

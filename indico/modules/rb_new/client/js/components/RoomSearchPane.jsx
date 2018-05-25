@@ -20,7 +20,7 @@ import PropTypes from 'prop-types';
 import {Card} from 'semantic-ui-react';
 import LazyScroll from 'redux-lazy-scroll';
 
-import {Param, Plural, PluralTranslate, Singular} from 'indico/react/i18n';
+import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
 
 import './RoomSearchPane.module.scss';
 
@@ -44,7 +44,12 @@ export default class RoomSearchPane extends React.Component {
     };
 
     render() {
-        const {rooms: {list, total, isFetching}, filterBar, searchBar, renderRoom} = this.props;
+        const {
+            rooms: {list, total, isFetching},
+            filterBar,
+            searchBar,
+            renderRoom
+        } = this.props;
 
         return (
             <div className="ui" styleName="room-list">
