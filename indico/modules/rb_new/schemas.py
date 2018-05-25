@@ -16,9 +16,12 @@
 
 from __future__ import unicode_literals
 
+from marshmallow.fields import Nested
+
 from indico.core.marshmallow import mm
 from indico.modules.rb.models.aspects import Aspect
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
+from indico.modules.rb.models.reservations import Reservation
 from indico.modules.rb.models.rooms import Room
 
 
@@ -43,13 +46,22 @@ class AspectSchema(mm.ModelSchema):
                   'default_on_startup')
 
 
+class ReservationSchema(mm.ModelSchema):
+    class Meta:
+        model = Reservation
+        fields = ('booking_reason', 'booked_for_name')
+
+
 class ReservationOccurrenceSchema(mm.ModelSchema):
+    reservation = Nested(ReservationSchema)
+
     class Meta:
         model = ReservationOccurrence
-        fields = ('start_dt', 'end_dt', 'reservation_id', 'is_valid')
+        fields = ('start_dt', 'end_dt', 'is_valid', 'reservation')
 
 
 rooms_schema = RoomSchema(many=True)
 map_rooms_schema = MapRoomSchema(many=True)
 aspects_schema = AspectSchema(many=True)
 reservation_occurrences_schema = ReservationOccurrenceSchema(many=True)
+reservation_schema = ReservationSchema()

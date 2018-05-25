@@ -30,6 +30,7 @@ from indico.modules.rb.models.reservations import RepeatFrequency
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb_new.schemas import aspects_schema, map_rooms_schema, reservation_occurrences_schema, rooms_schema
 from indico.modules.rb_new.util import get_buildings, get_equipment_types, get_rooms_availability, search_for_rooms
+from indico.web.util import jsonify_data
 
 
 search_room_args = {
@@ -102,13 +103,16 @@ class RHTimeline(RHRoomBookingBase):
     })
     def _process(self, args):
         rooms = Room.query.filter(Room.is_active, Room.id.in_(args.pop('room_ids')))
-        availabilities = get_rooms_availability(rooms, **args)
-        for availability in availabilities:
-            availability['room'] = rooms_schema.dump(availability['room'], many=False).data
-            availability['occurrences'] = reservation_occurrences_schema.dump(availability['occurrences']).data
-            availability['conflicts'] = reservation_occurrences_schema.dump(availability['conflicts']).data
-            availability['pre_conflicts'] = reservation_occurrences_schema.dump(availability['pre_conflicts']).data
-        return jsonify(availabilities)
+        date_range, availability = get_rooms_availability(rooms, **args)
+        date_range = [dt.isoformat() for dt in date_range]
+        for room_availability in availability:
+            data = availability[room_availability]
+            data.update({k: self._serialize_occurrences(data[k])
+                         for k in ['candidates', 'pre_bookings', 'bookings', 'conflicts', 'pre_conflicts']})
+        return jsonify_data(flash=False, availability=availability, date_range=date_range)
+
+    def _serialize_occurrences(self, data):
+        return {dt.isoformat(): reservation_occurrences_schema.dump(data).data for dt, data in data.iteritems()}
 
 
 class RHRoomFavorites(RHRoomBookingBase):

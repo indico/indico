@@ -14,29 +14,15 @@
  * You should have received a copy of the GNU General Public License
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
+
 import {connect} from 'react-redux';
 
-import BookRoom from '../components/pages/BookRoom';
-import {
-    fetchRooms,
-    fetchMapRooms,
-    setFilterParameter
-} from '../actions';
+import Timeline from '../components/Timeline';
 
 
-const mapStateToProps = ({bookRoom}) => ({...bookRoom});
-
-const mapDispatchToProps = dispatch => ({
-    setFilterParameter: (param, value) => {
-        dispatch(setFilterParameter('bookRoom', param, value));
-    },
-    fetchRooms: (clear = true) => {
-        dispatch(fetchRooms('bookRoom', clear));
-        dispatch(fetchMapRooms('bookRoom'));
-    }
-});
+const mapStateToProps = ({bookRoom: {timeline}}) => ({...timeline});
 
 export default connect(
     mapStateToProps,
-    mapDispatchToProps
-)(BookRoom);
+    null
+)(Timeline);

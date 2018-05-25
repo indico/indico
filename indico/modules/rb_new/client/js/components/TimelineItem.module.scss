@@ -1,0 +1,67 @@
+/* This file is part of Indico.
+ * Copyright (C) 2002 - 2018 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
+@import '../../styles/main';
+
+
+.timeline-item {
+    position: relative;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+
+    .timeline-occurrence {
+        box-sizing: border-box;
+        margin: 0;
+        cursor: pointer;
+        position: absolute;
+        padding: 0.7em;
+        z-index: 1;
+        border-radius: 0;
+        border: 0.5px solid rgba(0, 0, 0, 0.2) !important;
+
+        &:global(.candidate) {
+            opacity: 0.3;
+            background-color: $sui-green;
+        }
+
+        &:hover {
+            opacity: 0.75;
+        }
+
+
+        &:global(.pre-booking) {
+            @include stripes(#f2711c, #f48d49);
+            background-size: 35px 35px;
+        }
+
+        &:global(.booking) {
+            background-color: $sui-orange;
+        }
+
+        &:global(.conflict) {
+            background-color: $sui-red;
+        }
+
+        &:global(.pre-booking-conflict) {
+            @include stripes(#db2828, #e56868);
+            background-size: 35px 35px;
+        }
+    }
+
+}

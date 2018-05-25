@@ -20,12 +20,39 @@ import {combineReducers} from 'redux';
 import {roomsReducerFactory} from './roomBooking/roomList';
 import filterReducerFactory from './roomBooking/filters';
 import {mapReducerFactory} from './roomBooking/map';
+import * as actions from '../actions';
+
+
+const initialTimelineState = {
+    isFetching: false,
+    availability: {},
+    dateRange: []
+};
+
+function timelineReducer(state = initialTimelineState, action) {
+    switch (action.type) {
+        case actions.FETCH_TIMELINE_DATA_STARTED:
+            return {...state, isFetching: true};
+        case actions.FETCH_TIMELINE_DATA_FAILED:
+            return {...state, isFetching: false};
+        case actions.UPDATE_TIMELINE_DATA:
+            return {
+                ...state,
+                isFetching: false,
+                availability: action.timeline.availability,
+                dateRange: action.timeline.date_range
+            };
+        default:
+            return state;
+    }
+}
 
 
 const reducer = combineReducers({
     rooms: roomsReducerFactory('bookRoom'),
     filters: filterReducerFactory('bookRoom'),
     map: mapReducerFactory('bookRoom'),
+    timeline: timelineReducer
 });
 
 export default reducer;

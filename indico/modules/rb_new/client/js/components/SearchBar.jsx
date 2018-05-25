@@ -54,7 +54,6 @@ export default class SearchBar extends React.Component {
     };
 
     componentWillUnmount = () => {
-        this.props.setFilterParameter('text', null); // eslint-disable-line react/destructuring-assignment
         this.setState({building: null, floor: null, roomName: null, inputTextValue: null});
     };
 

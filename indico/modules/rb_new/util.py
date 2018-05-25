@@ -16,8 +16,9 @@
 
 from __future__ import unicode_literals
 
-from collections import defaultdict
+from collections import defaultdict, namedtuple
 from datetime import timedelta
+from itertools import groupby
 
 from flask import session
 from sqlalchemy.orm import contains_eager, raiseload
@@ -31,6 +32,7 @@ from indico.modules.rb.models.reservation_occurrences import ReservationOccurren
 from indico.modules.rb.models.reservations import Reservation
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb_new.schemas import rooms_schema
+from indico.util.struct.iterables import group_list
 
 
 def _filter_coordinates(query, filters):
@@ -143,20 +145,22 @@ def get_room_conflicts(room, start_dt, end_dt, repeat_frequency, repeat_interval
     candidates = ReservationOccurrence.create_series(start_dt, end_dt, (repeat_frequency, repeat_interval))
     occurrences = ReservationOccurrence.find_overlapping_with(room, candidates).all()
 
+    ReservationOccurrenceTmp = namedtuple('ReservationOccurrenceTmp', ('start_dt', 'end_dt', 'reservation'))
     for candidate in candidates:
         for occurrence in occurrences:
             if candidate.overlaps(occurrence):
+                overlap = candidate.get_overlap(occurrence)
+                obj = ReservationOccurrenceTmp(*overlap, reservation=occurrence.reservation)
                 if occurrence.reservation.is_accepted:
-                    conflicts.append(occurrence)
+                    conflicts.append(obj)
                 else:
-                    pre_conflicts.append(occurrence)
-
+                    pre_conflicts.append(obj)
     return conflicts, pre_conflicts
 
 
 def get_rooms_availability(rooms, start_dt, end_dt, repeat_frequency, repeat_interval, flexibility):
     period_days = (end_dt - start_dt).days
-    availability = []
+    availability = {}
 
     for room in rooms:
         booking_limit_days = room.booking_limit_days or rb_settings.get('booking_limit')
@@ -165,14 +169,26 @@ def get_rooms_availability(rooms, start_dt, end_dt, repeat_frequency, repeat_int
 
         start_dt = start_dt + timedelta(days=flexibility)
         end_dt = end_dt + timedelta(days=flexibility)
-        occurrences = get_existing_room_occurrences(room, start_dt, end_dt)
+        occurrences = get_existing_room_occurrences(room, start_dt.replace(hour=0, minute=0),
+                                                    end_dt.replace(hour=23, minute=59))
         conflicts, pre_conflicts = get_room_conflicts(room, start_dt.replace(tzinfo=None), end_dt.replace(tzinfo=None),
                                                       repeat_frequency, repeat_interval)
 
-        availability.append({'room': room, 'occurrences': occurrences, 'conflicts': conflicts,
-                             'pre_conflicts': pre_conflicts})
+        candidates = ReservationOccurrence.create_series(start_dt, end_dt, (repeat_frequency, repeat_interval))
+        date_range = sorted(set(cand.start_dt.date() for cand in candidates))
+        pre_bookings = [occ for occ in occurrences if not occ.reservation.is_accepted]
+        existing_bookings = [occ for occ in occurrences if occ.reservation.is_accepted]
+        availability[room.id] = {'room_name': room.full_name,
+                                 'candidates': group_by_occurrence_date(candidates),
+                                 'pre_bookings': group_by_occurrence_date(pre_bookings),
+                                 'bookings': group_by_occurrence_date(existing_bookings),
+                                 'conflicts': group_by_occurrence_date(conflicts),
+                                 'pre_conflicts': group_by_occurrence_date(pre_conflicts)}
+    return date_range, availability
 
-    return availability
+
+def group_by_occurrence_date(occurrences):
+    return group_list(occurrences, key=lambda obj: obj.start_dt.date())
 
 
 def get_equipment_types():
