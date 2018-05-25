@@ -22,3 +22,23 @@
 .map-dimmer:global(.ui.dimmer) {
     height: calc(100vh - (#{$indico-top-bar-height} + #{$menu-height} + 2.5em*2));
 }
+
+.aspects-dropdown:global(.dropdown) {
+    min-width: 10em;
+
+    :global(.menu .item) {
+        font-size: 1em;
+    }
+}
+
+.map-control-content {
+    background-color: $white;
+    padding: 0.5em;
+    border-radius: 0.25em;
+    font-size: 0.85em;
+}
+
+.show-all-button:global(.ui.button) {
+    background-color: #fff;
+    margin: 0;
+}

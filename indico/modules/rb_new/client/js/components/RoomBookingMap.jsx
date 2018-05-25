@@ -19,12 +19,9 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {Checkbox, Dropdown} from 'semantic-ui-react';
 import Leaflet from 'leaflet';
 import {Map, TileLayer, MapControl, Marker, Tooltip} from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-markercluster';
-
-import {Translate} from 'indico/react/i18n';
 
 import 'leaflet/dist/leaflet.css';
 import './RoomBookingMap.module.scss';
@@ -34,25 +31,16 @@ export default class RoomBookingMap extends React.Component {
     static propTypes = {
         bounds: PropTypes.object.isRequired,
         onMove: PropTypes.func.isRequired,
-        searchCheckbox: PropTypes.bool,
-        isSearchEnabled: PropTypes.bool,
-        onToggleSearchCheckbox: PropTypes.func,
-        aspects: PropTypes.array,
-        onChangeAspect: PropTypes.func,
-        mapRef: PropTypes.object,
+        mapRef: PropTypes.object.isRequired,
         rooms: PropTypes.array,
-        onLoad: PropTypes.func
+        onLoad: PropTypes.func,
+        children: PropTypes.node
     };
 
     static defaultProps = {
-        searchCheckbox: false,
-        isSearchEnabled: true,
-        onToggleSearchCheckbox: null,
-        aspects: [],
-        onChangeAspect: null,
-        mapRef: null,
         rooms: [],
-        onLoad: () => {}
+        onLoad: () => {},
+        children: null
     };
 
     componentDidMount() {
@@ -62,31 +50,9 @@ export default class RoomBookingMap extends React.Component {
 
     render() {
         const {
-            bounds, onMove, searchCheckbox, isSearchEnabled, onToggleSearchCheckbox, aspects, onChangeAspect,
-            mapRef, rooms
+            bounds, onMove, mapRef, rooms, children
         } = this.props;
-        const aspectOptions = Object.entries(aspects).map(([key, val]) => ({
-            text: val.name,
-            value: Number(key)
-        }));
         Leaflet.Marker.prototype.options.icon = Leaflet.divIcon({className: 'rb-map-marker', iconSize: [20, 20]});
-
-        const searchControl = searchCheckbox && (
-            <RoomBookingMapControl position="topleft">
-                <Checkbox label={Translate.string('Search as I move the map')}
-                          onChange={onToggleSearchCheckbox}
-                          checked={isSearchEnabled} styleName="map-control-content" />
-            </RoomBookingMapControl>
-        );
-
-        const aspectsControl = !!aspects.length && (
-            <RoomBookingMapControl position="bottomleft">
-                <Dropdown placeholder={Translate.string('Select aspect')} selection upward
-                          options={aspectOptions} defaultValue={aspects.findIndex(op => op.default_on_startup)}
-                          styleName="map-control-content aspects-dropdown"
-                          openOnFocus={false} onChange={onChangeAspect} />
-            </RoomBookingMapControl>
-        );
 
         const markers = !!rooms.length && (
             <MarkerClusterGroup showCoverageOnHover={false}>
@@ -106,12 +72,12 @@ export default class RoomBookingMap extends React.Component {
                 <Map ref={mapRef}
                      bounds={Object.values(bounds)}
                      onDragend={onMoveDebounced}
-                     onZoomend={onMoveDebounced}>
+                     onZoomend={onMoveDebounced}
+                     onMoveend={onMoveDebounced}>
                     <TileLayer attribution='© <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
                                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
                     {markers}
-                    {searchControl}
-                    {aspectsControl}
+                    {children}
                 </Map>
             </div>
         );
@@ -119,7 +85,7 @@ export default class RoomBookingMap extends React.Component {
 }
 
 
-class RoomBookingMapControl extends MapControl {
+export class RoomBookingMapControl extends MapControl {
     componentWillMount() {
         const {position, classes} = this.props;
         const mapControl = Leaflet.control({position});

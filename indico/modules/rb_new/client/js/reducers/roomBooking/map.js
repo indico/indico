@@ -19,7 +19,7 @@ import * as actions from '../../actions';
 
 
 const initialMapState = {
-    bounds: {},
+    bounds: null,
     aspects: [],
     rooms: [],
     search: false,
