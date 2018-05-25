@@ -21,6 +21,7 @@ import fetchMapAspectsUrl from 'indico-url:rooms_new.default_aspects';
 import fetchBuildingsUrl from 'indico-url:rooms_new.buildings';
 import favoriteRoomsUrl from 'indico-url:rooms_new.favorite_rooms';
 import equipmentTypesUrl from 'indico-url:rooms_new.equipment_types';
+import fetchTimelineDataUrl from 'indico-url:rooms_new.timeline';
 
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {preProcessParameters} from './util';
@@ -53,6 +54,10 @@ export const FETCH_BUILDINGS_STARTED = 'FETCH_BUILDINGS_STARTED';
 export const FETCH_BUILDINGS_FAILED = 'FETCH_BUILDINGS_FAILED';
 export const FETCH_BUILDINGS = 'FETCH_BUILDINGS';
 export const UPDATE_BUILDINGS = 'UPDATE_BUILDINGS';
+// Timeline
+export const FETCH_TIMELINE_DATA_STARTED = 'FETCH_TIMELINE_DATA_STARTED';
+export const FETCH_TIMELINE_DATA_FAILED = 'FETCH_TIMELINE_DATA_FAILED';
+export const UPDATE_TIMELINE_DATA = 'UPDATE_TIMELINE_DATA';
 
 
 export function fetchEquipmentTypes() {
@@ -148,6 +153,9 @@ export function fetchRooms(namespace, clear = true) {
         }
         const {rooms, total} = response.data;
         dispatch(updateRooms(namespace, rooms, total, clear));
+        if (namespace === 'bookRoom') {
+            dispatch(fetchTimelineData());
+        }
     };
 }
 
@@ -253,5 +261,45 @@ export function fetchBuildings() {
         }
 
         dispatch(updateBuildings(response.data));
+    };
+}
+
+
+export function fetchTimelineDataStarted() {
+    return {type: FETCH_TIMELINE_DATA_STARTED};
+}
+
+export function fetchTimelineDataFailed() {
+    return {type: FETCH_TIMELINE_DATA_FAILED};
+}
+
+export function updateTimelineData(timeline) {
+    return {type: UPDATE_TIMELINE_DATA, timeline};
+}
+
+export function fetchTimelineData() {
+    return async (dispatch, getStore) => {
+        dispatch(fetchTimelineDataStarted());
+
+        const {bookRoom: {filters, rooms: {list}}} = getStore();
+
+        if (!list.length) {
+            dispatch(updateTimelineData({date_range: [], availability: {}}));
+            return;
+        }
+
+        const params = preProcessParameters(filters, ajaxFilterRules);
+        params.room_ids = list.map((room) => room.id);
+
+        let response;
+        try {
+            response = await indicoAxios.get(fetchTimelineDataUrl(), {params});
+        } catch (error) {
+            dispatch(fetchTimelineDataFailed());
+            handleAxiosError(error);
+            return;
+        }
+
+        dispatch(updateTimelineData(response.data));
     };
 }

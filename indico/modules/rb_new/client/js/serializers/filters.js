@@ -138,7 +138,7 @@ export const ajax = {
                 return 'DAY';
             } else {
                 return {
-                    daily: 'DAY',
+                    day: 'DAY',
                     week: 'WEEK',
                     month: 'MONTH'
                 }[interval];
@@ -171,7 +171,7 @@ export const ajax = {
         serializer: _dtHandler('start')
     },
     end_dt: {
-        onlyIf: (data) => data.dates && data.dates.endDate,
+        onlyIf: (data) => data.dates,
         serializer: _dtHandler('end')
     },
     sw_lat: {
