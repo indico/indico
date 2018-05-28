@@ -43,7 +43,7 @@ const equipmentRenderer = ({equipment}) => {
         return (
             <>
                 <Translate>Equipment</Translate>
-                <Label circular horizontal color="white" size="medium" styleName="filter-bar-button-label">
+                <Label circular horizontal className="white" size="medium" styleName="filter-bar-button-label">
                     {Object.values(equipment).filter(v => v).length}
                 </Label>
             </>
