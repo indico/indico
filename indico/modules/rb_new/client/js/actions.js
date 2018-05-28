@@ -20,6 +20,7 @@ import fetchMapRoomsUrl from 'indico-url:rooms_new.map_rooms';
 import fetchDefaultAspectsUrl from 'indico-url:rooms_new.default_aspects';
 import fetchBuildingsUrl from 'indico-url:rooms_new.buildings';
 import favoriteRoomsUrl from 'indico-url:rooms_new.favorite_rooms';
+import equipmentTypesUrl from 'indico-url:rooms_new.equipment_types';
 
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {getAspectBounds, preProcessParameters} from './util';
@@ -39,6 +40,8 @@ export const UPDATE_ROOMS = 'UPDATE_ROOMS';
 export const FETCH_MAP_ROOMS_STARTED = 'FETCH_MAP_ROOMS_STARTED';
 export const FETCH_MAP_ROOMS_FAILED = 'FETCH_MAP_ROOMS_FAILED';
 export const UPDATE_MAP_ROOMS = 'UPDATE_MAP_ROOMS';
+// Equipment types
+export const SET_EQUIPMENT_TYPES = 'SET_EQUIPMENT_TYPES';
 // Map
 export const FETCH_DEFAULT_ASPECTS_STARTED = 'FETCH_DEFAULT_ASPECTS_STARTED';
 export const FETCH_DEFAULT_ASPECTS_FAILED = 'FETCH_DEFAULT_ASPECTS_FAILED';
@@ -51,6 +54,21 @@ export const FETCH_BUILDINGS_FAILED = 'FETCH_BUILDINGS_FAILED';
 export const FETCH_BUILDINGS = 'FETCH_BUILDINGS';
 export const UPDATE_BUILDINGS = 'UPDATE_BUILDINGS';
 
+
+export function fetchEquipmentTypes() {
+    return async (dispatch) => {
+        let response;
+        try {
+            response = await indicoAxios.get(equipmentTypesUrl());
+        } catch (error) {
+            handleAxiosError(error);
+            return;
+        }
+        if (response) {
+            dispatch({type: SET_EQUIPMENT_TYPES, types: response.data});
+        }
+    };
+}
 
 async function _sendFavoriteRoomsRequest(method, id = null) {
     let response;

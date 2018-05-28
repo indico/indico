@@ -27,7 +27,6 @@ from indico.core.plugins import plugin_engine
 from indico.modules.auth.util import url_for_login
 from indico.modules.events.registration.util import url_rule_to_angular
 from indico.modules.rb.models.locations import Location
-from indico.modules.rb_new.util import get_equipment_types
 from indico.modules.users.util import serialize_user
 from indico.util.i18n import get_all_locales, po_to_json
 from indico.web.flask.util import url_for, url_rule_to_js
@@ -212,7 +211,6 @@ def generate_global_file():
             'ExtAuthenticators': ext_auths,
             'RoomBookingModuleActive': config.ENABLE_ROOMBOOKING,
             'Languages': get_all_locales(),
-            'EquipmentTypes': get_equipment_types()
         },
 
         'FileRestrictions': {

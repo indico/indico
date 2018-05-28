@@ -21,7 +21,7 @@ import {queryStringMiddleware, createQueryStringReducer} from 'redux-router-quer
 import {routerReducer, routerMiddleware} from 'react-router-redux';
 import createReduxStore from 'indico/utils/redux';
 
-import {userReducer, bookRoomReducer, roomListReducer} from './reducers';
+import {userReducer, bookRoomReducer, roomListReducer, equipmentReducer} from './reducers';
 import {initialStateFactory} from './reducers/roomBooking/filters';
 import {SET_FILTER_PARAMETER} from './actions';
 import {queryString as queryFilterRules} from './serializers/filters';
@@ -76,7 +76,8 @@ export default function createRBStore(data) {
         user: userReducer,
         bookRoom: bookRoomReducer,
         roomList: roomListReducer,
-        router: routerReducer
+        router: routerReducer,
+        equipment: equipmentReducer,
     }, Object.assign(initialData, data), [
         routerMiddleware(history),
         queryStringMiddleware(history, routeConfig)

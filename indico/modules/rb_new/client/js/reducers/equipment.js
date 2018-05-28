@@ -15,15 +15,16 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import bookRoomReducer from './bookRoom';
-import userReducer from './user';
-import roomListReducer from './roomList';
-import equipmentReducer from './equipment';
+import * as actions from '../actions';
 
 
-export {
-    bookRoomReducer,
-    userReducer,
-    roomListReducer,
-    equipmentReducer,
-};
+const initialState = {types: []};
+
+export default function reducer(state = initialState, action) {
+    switch (action.type) {
+        case actions.SET_EQUIPMENT_TYPES:
+            return {...state, types: action.types};
+        default:
+            return state;
+    }
+}

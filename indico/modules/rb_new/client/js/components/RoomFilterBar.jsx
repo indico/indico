@@ -53,8 +53,22 @@ const equipmentRenderer = ({equipment}) => {
     }
 };
 
-export default function RoomFilterBar({capacity, onlyFavorites, children, equipment, setFilterParameter, staticData}) {
-    const {equipment: equipmentList} = staticData;
+export default function RoomFilterBar(
+    {capacity, onlyFavorites, children, equipment, setFilterParameter, equipmentTypes}
+) {
+    const equipmentFilter = !!equipmentTypes.length && (
+        <FilterDropdown title={<Translate>Equipment</Translate>}
+                        form={({equipment: selectedEquipment}, setParentField) => (
+                            <EquipmentForm setParentField={setParentField}
+                                           selectedEquipment={selectedEquipment}
+                                           possibleEquipment={equipmentTypes} />
+                        )}
+                        counter
+                        setGlobalState={data => setFilterParameter('equipment', data.equipment)}
+                        initialValues={{equipment}}
+                        renderValue={equipmentRenderer} />
+    );
+
     return (
         <Button.Group size="large">
             {children}
@@ -66,16 +80,7 @@ export default function RoomFilterBar({capacity, onlyFavorites, children, equipm
                             setGlobalState={data => setFilterParameter('capacity', data.capacity)}
                             initialValues={{capacity}}
                             renderValue={capacityRenderer} />
-            <FilterDropdown title={<Translate>Equipment</Translate>}
-                            form={({equipment: selectedEquipment}, setParentField) => (
-                                <EquipmentForm setParentField={setParentField}
-                                               selectedEquipment={selectedEquipment}
-                                               possibleEquipment={equipmentList} />
-                            )}
-                            counter
-                            setGlobalState={data => setFilterParameter('equipment', data.equipment)}
-                            initialValues={{equipment}}
-                            renderValue={equipmentRenderer} />
+            {equipmentFilter}
             <Button icon="star" primary={onlyFavorites}
                     onClick={() => setFilterParameter('onlyFavorites', onlyFavorites ? undefined : true)} />
         </Button.Group>
@@ -83,12 +88,9 @@ export default function RoomFilterBar({capacity, onlyFavorites, children, equipm
 }
 
 export const equipmentType = PropTypes.object;
-export const staticDataType = PropTypes.shape({
-    equipment: PropTypes.arrayOf(PropTypes.string)
-});
 
 RoomFilterBar.propTypes = {
-    staticData: staticDataType.isRequired,
+    equipmentTypes: PropTypes.arrayOf(PropTypes.string).isRequired,
     capacity: PropTypes.number,
     equipment: equipmentType,
     onlyFavorites: PropTypes.bool,

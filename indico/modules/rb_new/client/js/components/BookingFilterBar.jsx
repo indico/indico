@@ -19,7 +19,7 @@ import React from 'react';
 import propTypes from 'prop-types';
 
 import {Translate} from 'indico/react/i18n';
-import RoomFilterBar, {equipmentType, staticDataType} from './RoomFilterBar';
+import RoomFilterBar, {equipmentType} from './RoomFilterBar';
 
 import FilterDropdown from './filters/FilterDropdown';
 import RecurrenceForm from './filters/RecurrenceForm';
@@ -32,14 +32,14 @@ import timeRenderer from './filters/TimeRenderer';
 
 
 export default function FilterBar({
-    recurrence, dates, timeSlot, capacity, onlyFavorites, equipment, setFilterParameter, staticData
+    recurrence, dates, timeSlot, capacity, onlyFavorites, equipment, setFilterParameter, equipmentTypes
 }) {
     return (
         <RoomFilterBar capacity={capacity}
                        onlyFavorites={onlyFavorites}
                        equipment={equipment}
                        setFilterParameter={setFilterParameter}
-                       staticData={staticData}>
+                       equipmentTypes={equipmentTypes}>
             <FilterDropdown title={<Translate>Recurrence</Translate>}
                             form={(fieldValues, setParentField) => (
                                 <RecurrenceForm setParentField={setParentField} {...fieldValues} />
@@ -82,7 +82,7 @@ export default function FilterBar({
 
 
 FilterBar.propTypes = {
-    staticData: staticDataType.isRequired,
+    equipmentTypes: propTypes.arrayOf(propTypes.string).isRequired,
     recurrence: propTypes.shape({
         number: propTypes.number,
         type: propTypes.string,

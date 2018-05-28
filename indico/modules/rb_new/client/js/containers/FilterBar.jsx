@@ -20,7 +20,7 @@ import {setFilterParameter, fetchRooms, fetchMapRooms} from '../actions';
 
 export default (namespace, componentClass) => {
     const mapStateToProps = state => ({
-        staticData: state.staticData,
+        equipmentTypes: state.equipment.types,
         ...state[namespace].filters
     });
 
