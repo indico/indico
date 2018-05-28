@@ -52,7 +52,7 @@ export default class FilterDropdown extends React.Component {
         defaults: propTypes.object,
         showButtons: propTypes.bool,
         counter: propTypes.bool
-    }
+    };
 
     static defaultProps = {
         initialValues: {},
@@ -60,7 +60,7 @@ export default class FilterDropdown extends React.Component {
         showButtons: true,
         renderTrigger: defaultTriggerRenderer,
         counter: false
-    }
+    };
 
     static getDerivedStateFromProps({defaults, initialValues, renderValue}, prevState) {
         return {
