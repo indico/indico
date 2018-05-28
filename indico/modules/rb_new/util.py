@@ -176,12 +176,9 @@ def get_rooms_availability(rooms, start_dt, end_dt, repeat_frequency, repeat_int
 
 
 def get_equipment_types():
-    # TODO: get this from the DB
-    return [
-        'Projector',
-        'Whiteboard',
-        'Vidyo',
-        'Webcast/Recording',
-        'PC',
-        'Phone Conference'
-    ]
+    query = (db.session
+             .query(EquipmentType.name)
+             .distinct(EquipmentType.name)
+             .filter(EquipmentType.rooms.any(Room.is_active))
+             .order_by(EquipmentType.name))
+    return [row.name for row in query]
