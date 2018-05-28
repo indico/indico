@@ -82,7 +82,7 @@ export default function RoomFilterBar(
                             renderValue={capacityRenderer} />
             {equipmentFilter}
             <Button icon="star" primary={onlyFavorites}
-                    onClick={() => setFilterParameter('onlyFavorites', onlyFavorites ? undefined : true)} />
+                    onClick={() => setFilterParameter('onlyFavorites', !onlyFavorites)} />
         </Button.Group>
     );
 }
