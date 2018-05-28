@@ -51,7 +51,15 @@ export const queryString = {
     favorite: {
         validator: v.isBoolean(),
         sanitizer: v.toBoolean(),
-        stateField: 'filters.onlyFavorites'
+        stateField: {
+            serialize: ({filters: {onlyFavorites}}) => onlyFavorites || null,
+            parse: (value, state) => {
+                if (!state.filters) {
+                    state.filters = {};
+                }
+                state.filters.onlyFavorites = value;
+            }
+        }
     },
     capacity: {
         validator: v.isInt({min: 1}),
