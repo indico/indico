@@ -103,7 +103,10 @@ export default class RoomBookingMap extends React.Component {
         const onMoveDebounced = _.debounce(onMove, 750);
         return !_.isEmpty(bounds) && (
             <div styleName="map-container">
-                <Map ref={mapRef} bounds={Object.values(bounds)} onDragend={onMoveDebounced} onZoomend={onMoveDebounced}>
+                <Map ref={mapRef}
+                     bounds={Object.values(bounds)}
+                     onDragend={onMoveDebounced}
+                     onZoomend={onMoveDebounced}>
                     <TileLayer attribution='© <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
                                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
                     {markers}

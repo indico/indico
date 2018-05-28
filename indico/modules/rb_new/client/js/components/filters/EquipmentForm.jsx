@@ -29,7 +29,7 @@ export default class EquipmentForm extends FilterFormComponent {
         possibleEquipment: PropTypes.arrayOf(PropTypes.string).isRequired,
         selectedEquipment: PropTypes.object,
         ...FilterFormComponent.propTypes
-    }
+    };
 
     constructor(props) {
         super(props);
@@ -56,7 +56,7 @@ export default class EquipmentForm extends FilterFormComponent {
         possibleEquipment.forEach(eq => {
             this.setEquipment(eq, false);
         });
-    }
+    };
 
     render() {
         const {possibleEquipment} = this.props;
