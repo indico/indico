@@ -24,7 +24,7 @@ import {Dropdown, Icon} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
 
 
-export default function UserActions({hasRooms, hasBlockings, isAdmin}) {
+export default function UserActions({isAdmin}) {
     const avatar = (
         <Icon name="user"
               size="large" />
@@ -45,25 +45,19 @@ export default function UserActions({hasRooms, hasBlockings, isAdmin}) {
         {
             key: 'my_blockings',
             text: Translate.string('My Blockings')
-        },
-        {
-            key: 'isAdmin',
-            text: Translate.string('Administration')
         }
     ];
+    if (isAdmin) {
+        options.push({
+            key: 'isAdmin',
+            text: Translate.string('Administration')
+        });
+    }
     return (
         <Dropdown trigger={avatar} options={options} pointing="top right" />
     );
 }
 
 UserActions.propTypes = {
-    hasRooms: propTypes.bool,
-    hasBlockings: propTypes.bool,
-    isAdmin: propTypes.bool
-};
-
-UserActions.defaultProps = {
-    hasRooms: false,
-    hasBlockings: false,
-    isAdmin: false
+    isAdmin: propTypes.bool.isRequired
 };

@@ -19,7 +19,7 @@ import {connect} from 'react-redux';
 import UserActions from '../components/UserActions';
 
 
-const mapStateToProps = ({user}) => ({...user});
+const mapStateToProps = ({user: {isAdmin}}) => ({isAdmin});
 
 export default connect(
     mapStateToProps,
