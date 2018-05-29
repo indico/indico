@@ -20,6 +20,7 @@ import userReducer from './user';
 import roomListReducer from './roomList';
 import equipmentReducer from './equipment';
 import buildingsReducer from './buildings';
+import mapAspectsReducer from './mapAspects';
 
 
 export {
@@ -28,4 +29,5 @@ export {
     roomListReducer,
     equipmentReducer,
     buildingsReducer,
+    mapAspectsReducer,
 };

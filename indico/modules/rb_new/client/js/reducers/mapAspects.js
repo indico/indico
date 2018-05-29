@@ -14,26 +14,24 @@
  * You should have received a copy of the GNU General Public License
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
-import {connect} from 'react-redux';
 
-import App from '../components/App';
-import {fetchBuildings, fetchEquipmentTypes, fetchFavoriteRooms, fetchMapAspects} from '../actions';
+import * as actions from '../actions';
 
 
-const mapStateToProps = ({bookRoom: {filters: {recurrence: {type}}}}) => ({
-    filtersSet: !!type
-});
+const initialState = {
+    list: [],
+    isFetching: false
+};
 
-const mapDispatchToProps = (dispatch) => ({
-    fetchInitialData: () => {
-        dispatch(fetchFavoriteRooms());
-        dispatch(fetchEquipmentTypes());
-        dispatch(fetchBuildings());
-        dispatch(fetchMapAspects());
+export default function reducer(state = initialState, action) {
+    switch (action.type) {
+        case actions.UPDATE_ASPECTS:
+            return {...state, isFetching: false, list: action.aspects};
+        case actions.FETCH_MAP_ASPECTS_STARTED:
+            return {...state, isFetching: true};
+        case actions.FETCH_MAP_ASPECTS_FAILED:
+            return {...state, isFetching: false};
+        default:
+            return state;
     }
-});
-
-export default connect(
-    mapStateToProps,
-    mapDispatchToProps
-)(App);
+}

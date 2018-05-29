@@ -19,7 +19,6 @@ import {connect} from 'react-redux';
 
 import MapController from '../components/MapController';
 import {
-    fetchMapDefaultAspects,
     fetchMapRooms,
     setFilterParameter,
     fetchRooms,
@@ -29,12 +28,13 @@ import {
 
 
 export default function mapControllerFactory(namespace) {
-    const mapStateToProps = ({[namespace]: {map, filters: {bounds}}}) => ({map, filterBounds: bounds});
+    const mapStateToProps = ({mapAspects: {list: aspects}, [namespace]: {map, filters: {bounds}}}) => ({
+        aspects,
+        map,
+        filterBounds: bounds
+    });
 
     const mapDispatchToProps = dispatch => ({
-        fetchMapDefaultAspects: async () => {
-            await dispatch(fetchMapDefaultAspects(namespace));
-        },
         updateLocation: (location, search) => {
             dispatch(updateLocation(namespace, location));
             if (search) {

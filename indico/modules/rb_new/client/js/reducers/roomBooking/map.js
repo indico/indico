@@ -16,11 +16,11 @@
  */
 
 import * as actions from '../../actions';
+import {getAspectBounds} from '../../util';
 
 
 const initialMapState = {
     bounds: null,
-    aspects: [],
     rooms: [],
     search: false,
     isFetching: false,
@@ -29,17 +29,17 @@ const initialMapState = {
 
 export function mapReducerFactory(namespace) {
     return (state = initialMapState, action) => {
+        // aspect updates are global and need to run regardless of the namespace
+        if (action.type === actions.UPDATE_ASPECTS) {
+            const defaultAspect = action.aspects.find(aspect => aspect.default_on_startup);
+            return {...state, bounds: getAspectBounds(defaultAspect)};
+        }
+
         if (action.namespace !== namespace) {
             return state;
         }
 
         switch (action.type) {
-            case actions.FETCH_DEFAULT_ASPECTS_STARTED:
-                return {...state, isFetching: true};
-            case actions.FETCH_DEFAULT_ASPECTS_FAILED:
-                return {...state, isFetching: false};
-            case actions.UPDATE_ASPECTS:
-                return {...state, aspects: action.aspects, isFetching: false};
             case actions.UPDATE_LOCATION:
                 return {...state, bounds: action.location, isFetching: false};
             case actions.TOGGLE_MAP_SEARCH:
