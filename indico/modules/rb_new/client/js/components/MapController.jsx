@@ -134,7 +134,7 @@ export default class MapController extends React.Component {
     };
 
     render() {
-        const {map: {search, aspects, bounds, rooms}} = this.props;
+        const {map: {search, aspects, bounds, rooms}, toggleMapSearch} = this.props;
         const {aspectBounds, aspectsLoaded, loading, allRoomsVisible} = this.state;
         const aspectOptions = Object.entries(aspects).map(([key, val]) => ({
             text: val.name,
@@ -144,7 +144,7 @@ export default class MapController extends React.Component {
         const searchControl = (
             <RoomBookingMapControl position="topleft">
                 <Checkbox label={Translate.string('Search as I move the map')}
-                          onChange={(e, data) => this.toggleMapSearch(data.checked, bounds)}
+                          onChange={(e, data) => toggleMapSearch(data.checked, bounds)}
                           checked={search} styleName="map-control-content" />
             </RoomBookingMapControl>
         );
