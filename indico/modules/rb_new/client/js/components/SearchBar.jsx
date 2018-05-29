@@ -29,7 +29,6 @@ import './SearchBar.module.scss';
 export default class SearchBar extends React.Component {
     static propTypes = {
         setFilterParameter: PropTypes.func.isRequired,
-        fetchBuildings: PropTypes.func.isRequired,
         filters: PropTypes.object.isRequired,
         buildings: PropTypes.object.isRequired,
         onConfirm: PropTypes.func.isRequired,
@@ -51,7 +50,6 @@ export default class SearchBar extends React.Component {
     }
 
     componentDidMount = () => {
-        this.props.fetchBuildings(); // eslint-disable-line react/destructuring-assignment
         this.setState({inputTextValue: this.composeInputTextValue()});
     };
 
