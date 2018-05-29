@@ -143,7 +143,7 @@ def register_template_hook(name, receiver, priority=50, markup=True, plugin=None
             return do_stuff(something)
 
     It needs to return a unicode string. If you intend to return plaintext
-    it is adviable to set the `markup` param to `False` which results in the
+    it is advisable to set the `markup` param to `False` which results in the
     string being considered "unsafe" which will cause it to be HTML-escaped.
 
     :param name: The name of the template hook.

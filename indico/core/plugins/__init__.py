@@ -260,7 +260,7 @@ class IndicoPlugin(Plugin):
     def template_hook(self, name, receiver, priority=50, markup=True):
         """Registers a function to be called when a template hook is invoked.
 
-        For details see :func:~`indico.web.flask.templating.register_template_hook`
+        For details see :func:`~indico.web.flask.templating.register_template_hook`
         """
         register_template_hook(name, receiver, priority, markup, self)
 
