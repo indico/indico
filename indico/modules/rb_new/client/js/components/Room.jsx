@@ -18,7 +18,7 @@
 import _ from 'lodash';
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Card, Dimmer, Icon, Image, Popup} from 'semantic-ui-react';
+import {Card, Dimmer, Icon, Image, Label, Popup} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 import {Slot} from 'indico/react/util';
@@ -29,6 +29,17 @@ import './Room.module.scss';
 
 
 export default class Room extends React.Component {
+
+    static propTypes = {
+        room: PropTypes.object.isRequired,
+        children: PropTypes.node.isRequired,
+        isFavorite: PropTypes.bool
+    };
+
+    static defaultProps = {
+        isFavorite: false
+    };
+
     constructor(props) {
         super(props);
 
@@ -99,11 +110,12 @@ export default class Room extends React.Component {
     };
 
     render() {
-        const {room, children} = this.props;
+        const {room, children, isFavorite} = this.props;
         const {content, actions} = Slot.split(children);
 
         return (
             <Card styleName="room-card">
+                {isFavorite && <Label corner="right" icon="star" color="yellow" />}
                 {this.renderCardImage(room, content, actions)}
                 <Card.Content>
                     <TooltipIfTruncated>
@@ -148,13 +160,3 @@ export default class Room extends React.Component {
         );
     }
 }
-
-Room.propTypes = {
-    room: PropTypes.object.isRequired,
-    children: PropTypes.node.isRequired,
-    isFavorite: PropTypes.bool
-};
-
-Room.defaultProps = {
-    isFavorite: false
-};
