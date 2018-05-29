@@ -15,23 +15,23 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import {connect} from 'react-redux';
-
-import SearchBar from '../components/SearchBar';
-import {setFilterParameter} from '../actions';
+import * as actions from '../actions';
 
 
-export default (namespace) => {
-    const mapStateToProps = (state) => ({...state[namespace], buildings: state.buildings});
-
-    const mapDispatchToProps = dispatch => ({
-        setFilterParameter: (param, value) => {
-            dispatch(setFilterParameter(namespace, param, value));
-        },
-    });
-
-    return connect(
-        mapStateToProps,
-        mapDispatchToProps
-    )(SearchBar);
+const initialState = {
+    list: [],
+    isFetching: false
 };
+
+export default function reducer(state = initialState, action) {
+    switch (action.type) {
+        case actions.UPDATE_BUILDINGS:
+            return {...state, isFetching: false, list: action.buildings};
+        case actions.FETCH_BUILDINGS_STARTED:
+            return {...state, isFetching: true};
+        case actions.FETCH_BUILDINGS_FAILED:
+            return {...state, isFetching: false};
+        default:
+            return state;
+    }
+}
