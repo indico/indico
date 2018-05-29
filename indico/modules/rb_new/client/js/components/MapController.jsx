@@ -33,7 +33,7 @@ export default class MapController extends React.Component {
             bounds: PropTypes.object,
         }).isRequired,
         filterBounds: PropTypes.object,
-        fetchMapDefaultAspects: PropTypes.func.isRequired,
+        aspects: PropTypes.array.isRequired,
         fetchRooms: PropTypes.func.isRequired,
         toggleMapSearch: PropTypes.func.isRequired,
         updateLocation: PropTypes.func.isRequired
@@ -58,7 +58,6 @@ export default class MapController extends React.Component {
 
         this.state = {
             loading: true,
-            aspectsLoaded: false,
             allRoomsVisible: false
         };
     }
@@ -66,7 +65,6 @@ export default class MapController extends React.Component {
     async componentDidMount() {
         const {fetchRooms} = this.props;
         fetchRooms();
-        this.loadAspects();
     }
 
     componentDidUpdate() {
@@ -81,18 +79,6 @@ export default class MapController extends React.Component {
                     allRoomsVisible: !rooms.length || inBounds
                 });
             }
-        });
-    }
-
-    async loadAspects() {
-        const {fetchMapDefaultAspects} = this.props;
-        const {aspectsLoaded} = this.state;
-
-        if (!aspectsLoaded) {
-            await fetchMapDefaultAspects();
-        }
-        this.setState({
-            aspectsLoaded: true
         });
     }
 
@@ -111,7 +97,7 @@ export default class MapController extends React.Component {
     };
 
     onChangeAspect(aspectIdx) {
-        const {map: {aspects}} = this.props;
+        const {aspects} = this.props;
         this.setState({
             aspectBounds: getAspectBounds(aspects[aspectIdx])
         });
@@ -134,8 +120,12 @@ export default class MapController extends React.Component {
     };
 
     render() {
-        const {map: {search, aspects, bounds, rooms}, toggleMapSearch} = this.props;
-        const {aspectBounds, aspectsLoaded, loading, allRoomsVisible} = this.state;
+        const {
+            map: {search, bounds, rooms},
+            aspects,
+            toggleMapSearch,
+        } = this.props;
+        const {aspectBounds, loading, allRoomsVisible} = this.state;
         const aspectOptions = Object.entries(aspects).map(([key, val]) => ({
             text: val.name,
             value: Number(key)
@@ -177,7 +167,7 @@ export default class MapController extends React.Component {
                 <Dimmer active={loading} inverted styleName="map-dimmer">
                     <Loader />
                 </Dimmer>
-                {aspectsLoaded && (
+                {!!aspectBounds && (
                     <RoomBookingMap mapRef={this.mapRef}
                                     bounds={aspectBounds}
                                     aspects={aspects}
