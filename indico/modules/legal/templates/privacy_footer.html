@@ -1,8 +1,12 @@
-<a href="{{ url_for('legal.display_privacy') }}"
-   data-title="{{ _("Privacy Policy") }}"
-   data-href="{{ url_for('legal.display_privacy') }}"
-   data-ajax-dialog
-   data-hide-page-header
-   data-close-button>
-    {% trans %}Privacy{% endtrans %}
-</a>
+{% if url %}
+    <a href="{{ url }}">{% trans %}Privacy{% endtrans %}</a>
+{% else %}
+    <a href="{{ url_for('legal.display_privacy') }}"
+       data-title="{{ _("Privacy Policy") }}"
+       data-href="{{ url_for('legal.display_privacy') }}"
+       data-ajax-dialog
+       data-hide-page-header
+       data-close-button>
+        {% trans %}Privacy{% endtrans %}
+    </a>
+{% endif %}

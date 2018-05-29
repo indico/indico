@@ -1,10 +1,18 @@
 {% extends 'layout/admin_page.html' %}
-{% from 'forms/_form.html' import simple_form %}
+{% from 'forms/_form.html' import simple_form, form_fieldset, form_rows %}
 
 {% block title %}
     {% trans %}Legal and disclaimer messages{% endtrans %}
 {% endblock %}
 
 {% block content %}
-    {{ simple_form(form, back_button=false) }}
+    {% call simple_form(form, back_button=false) %}
+        {{ form_rows(form, skip=('tos_url', 'tos', 'privacy_policy_url', 'privacy_policy')) }}
+        {% call form_fieldset('Terms & Conditions') %}
+            {{ form_rows(form, ('tos_url', 'tos')) }}
+        {% endcall %}
+        {% call form_fieldset('Privacy Policy') %}
+            {{ form_rows(form, ('privacy_policy_url', 'privacy_policy')) }}
+        {% endcall %}
+    {% endcall %}
 {% endblock %}

@@ -1,8 +1,12 @@
-<a href="{{ url_for('legal.display_tos') }}"
-   data-title="{{ _("Terms and conditions") }}"
-   data-href="{{ url_for('legal.display_tos') }}"
-   data-ajax-dialog
-   data-hide-page-header
-   data-close-button>
-    {% trans %}Terms and conditions{% endtrans %}
-</a>
+{% if url %}
+    <a href="{{ url }}">{% trans %}Terms and conditions{% endtrans %}</a>
+{% else %}
+    <a href="{{ url_for('legal.display_tos') }}"
+       data-title="{{ _("Terms and conditions") }}"
+       data-href="{{ url_for('legal.display_tos') }}"
+       data-ajax-dialog
+       data-hide-page-header
+       data-close-button>
+        {% trans %}Terms and conditions{% endtrans %}
+    </a>
+{% endif %}
