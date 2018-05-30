@@ -141,7 +141,6 @@ export default class Landing extends React.Component {
         );
 
         const recurrenceOptions = [
-            {text: Translate.string('Days'), value: 'day'},
             {text: Translate.string('Weeks'), value: 'week'},
             {text: Translate.string('Months'), value: 'month'}
         ];
@@ -158,48 +157,49 @@ export default class Landing extends React.Component {
                                                 value="single"
                                                 checked={type === 'single'}
                                                 onChange={(e, {value}) => this.updateBookingType(value)} />
+                                    <Form.Radio label={Translate.string('Daily booking')}
+                                                name="type"
+                                                value="daily"
+                                                checked={type === 'daily'}
+                                                onChange={(e, {value}) => this.updateBookingType(value)} />
                                     <Form.Radio label={Translate.string('Recurring booking')}
                                                 name="bookingType"
                                                 value="every"
                                                 checked={type === 'every'}
                                                 onChange={(e, {value}) => this.updateBookingType(value)} />
                                 </Form.Group>
-                                {type === 'every' &&
-                                    <>
-                                        <Form.Group inline>
-                                            <label>{Translate.string('Every')}</label>
-                                            <Form.Input value={number} type="number" onChange={(event, data) => this.updateNumber(data.value)} />
-                                            <Select value={interval} options={recurrenceOptions}
-                                                    onChange={(event, data) => this.updateInterval(data.value)} />
-                                        </Form.Group>
-                                        <Form.Group inline>
-                                            <DatePicker calendar={rangeCalendar}>
-                                                {
-                                                    () => {
-                                                        return (
-                                                            <Form.Group inline>
-                                                                <Form.Input styleName="booking-date" icon="calendar" value={_serializeDate(startDate) || ''} />
-                                                                <Form.Input styleName="booking-date" icon="calendar" value={_serializeDate(endDate) || ''} />
-                                                            </Form.Group>
-                                                        );
-                                                    }
-                                                }
-                                            </DatePicker>
-                                        </Form.Group>
-                                    </>
-                                }
-                                {type !== 'every' && (
+                                {type === 'every' && (
+                                    <Form.Group inline>
+                                        <label>{Translate.string('Every')}</label>
+                                        <Form.Input value={number} type="number" onChange={(event, data) => this.updateNumber(data.value)} />
+                                        <Select value={interval} options={recurrenceOptions}
+                                                onChange={(event, data) => this.updateInterval(data.value)} />
+                                    </Form.Group>
+                                )}
+                                {['every', 'daily'].includes(type) && (
+                                    <Form.Group inline>
+                                        <DatePicker calendar={rangeCalendar}>
+                                            {
+                                                () => (
+                                                    <Form.Group inline>
+                                                        <Form.Input styleName="booking-date" icon="calendar" value={_serializeDate(startDate) || ''} />
+                                                        <Form.Input styleName="booking-date" icon="calendar" value={_serializeDate(endDate) || ''} />
+                                                    </Form.Group>
+                                                )
+                                            }
+                                        </DatePicker>
+                                    </Form.Group>
+                                )}
+                                {type === 'single' && (
                                     <DatePicker calendar={<Calendar />}
                                                 onChange={(value) => this.updateDates(value, null)}>
                                         {
-                                            () => {
-                                                return (
-                                                    <Form.Group inline>
-                                                        <Form.Input styleName="booking-date" icon="calendar"
-                                                                    value={_serializeDate(startDate) || ''} />
-                                                    </Form.Group>
-                                                );
-                                            }
+                                            () => (
+                                                <Form.Group inline>
+                                                    <Form.Input styleName="booking-date" icon="calendar"
+                                                                value={_serializeDate(startDate) || ''} />
+                                                </Form.Group>
+                                            )
                                         }
                                     </DatePicker>
                                 )}

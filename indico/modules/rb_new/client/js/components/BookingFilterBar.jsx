@@ -45,9 +45,6 @@ export default function FilterBar({
                                 <RecurrenceForm setParentField={setParentField} {...fieldValues} />
                             )}
                             setGlobalState={({type, number, interval}) => {
-                                if (type === 'every' && number === 1 && interval === 'day') {
-                                    type = 'daily';
-                                }
                                 setFilterParameter('recurrence', {type, number, interval});
                             }}
                             initialValues={recurrence}
