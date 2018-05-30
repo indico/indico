@@ -16,6 +16,7 @@
  */
 
 import buildFetchRoomsUrl from 'indico-url:rooms_new.available_rooms';
+import fetchMapDetailsUrl from 'indico-url:rooms_new.room_details';
 import fetchMapRoomsUrl from 'indico-url:rooms_new.map_rooms';
 import fetchMapAspectsUrl from 'indico-url:rooms_new.default_aspects';
 import fetchBuildingsUrl from 'indico-url:rooms_new.buildings';
@@ -41,6 +42,10 @@ export const UPDATE_ROOMS = 'UPDATE_ROOMS';
 export const FETCH_MAP_ROOMS_STARTED = 'FETCH_MAP_ROOMS_STARTED';
 export const FETCH_MAP_ROOMS_FAILED = 'FETCH_MAP_ROOMS_FAILED';
 export const UPDATE_MAP_ROOMS = 'UPDATE_MAP_ROOMS';
+export const FETCH_ROOM_DETAILS_STARTED = 'FETCH_ROOM_DETAILS_STARTED';
+export const FETCH_ROOM_DETAILS_FAILED = 'FETCH_ROOM_DETAILS_FAILED';
+export const UPDATE_ROOM_DETAILS = 'UPDATE_ROOM_DETAILS';
+export const SET_ROOM_DETAILS_MODAL = 'SET_ROOM_DETAILS_MODAL';
 // Equipment types
 export const SET_EQUIPMENT_TYPES = 'SET_EQUIPMENT_TYPES';
 // Map
@@ -192,6 +197,42 @@ export function fetchMapRooms(namespace) {
         ));
         dispatch(updateMapRooms(namespace, rooms));
     };
+}
+
+export function fetchRoomDetailsStarted() {
+    return {type: FETCH_ROOM_DETAILS_STARTED};
+}
+
+export function fetchRoomDetailsFailed() {
+    return {type: FETCH_ROOM_DETAILS_FAILED};
+}
+
+export function updateRoomDetails(room) {
+    return {type: UPDATE_ROOM_DETAILS, room};
+}
+
+export function fetchRoomDetails(id) {
+    return async (dispatch, getStore) => {
+        const {roomDetails: {rooms}} = getStore();
+        if (id in rooms) {
+            return;
+        }
+        dispatch(fetchRoomDetailsStarted());
+
+        let response;
+        try {
+            response = await indicoAxios.get(fetchMapDetailsUrl({room_id: id}));
+        } catch (error) {
+            handleAxiosError(error);
+            dispatch(fetchRoomDetailsFailed());
+            return;
+        }
+        dispatch(updateRoomDetails(response.data));
+    };
+}
+
+export function setRoomDetailsModal(id) {
+    return {type: SET_ROOM_DETAILS_MODAL, id};
 }
 
 export function setFilterParameter(namespace, param, data) {

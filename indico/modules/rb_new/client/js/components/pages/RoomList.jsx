@@ -18,7 +18,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Button, Grid} from 'semantic-ui-react';
+import {Button, Grid, Dimmer, Loader} from 'semantic-ui-react';
 
 import {Slot} from 'indico/react/util';
 import RoomSearchPane from '../RoomSearchPane';
@@ -27,6 +27,8 @@ import filterBarFactory from '../../containers/FilterBar';
 import searchBarFactory from '../../containers/SearchBar';
 import mapControllerFactory from '../../containers/MapController';
 import Room from '../Room';
+
+import RoomDetailsModal from '../modals/RoomDetailsModal';
 
 
 const FilterBar = filterBarFactory('roomList', RoomFilterBar);
@@ -44,6 +46,13 @@ export default class RoomList extends React.Component {
         }).isRequired,
         addFavoriteRoom: PropTypes.func.isRequired,
         delFavoriteRoom: PropTypes.func.isRequired,
+        fetchRoomDetails: PropTypes.func.isRequired,
+        roomDetails: PropTypes.shape({
+            list: PropTypes.array,
+            isFetching: PropTypes.bool,
+            currentViewID: PropTypes.number,
+        }).isRequired,
+        setRoomDetailsModal: PropTypes.func.isRequired,
     };
 
     toggleFavoriteRoom = (room) => {
@@ -52,13 +61,19 @@ export default class RoomList extends React.Component {
         fn(room.id);
     };
 
+    handleOpenModal = (id) => {
+        const {fetchRoomDetails, setRoomDetailsModal} = this.props;
+        fetchRoomDetails(id);
+        setRoomDetailsModal(id);
+    };
+
     renderRoom = (room) => {
         const {favoriteRooms} = this.props;
         const isFavorite = !!favoriteRooms[room.id];
         return (
             <Room key={room.id} room={room} isFavorite={isFavorite}>
                 <Slot name="actions">
-                    <Button primary icon="edit" circular />
+                    <Button primary icon="edit" circular onClick={() => this.handleOpenModal(room.id)} />
                     <Button icon="star" color={isFavorite ? 'yellow' : 'teal'} circular
                             onClick={() => this.toggleFavoriteRoom(room)} />
                 </Slot>
@@ -67,7 +82,7 @@ export default class RoomList extends React.Component {
     };
 
     render() {
-        const {rooms, fetchRooms} = this.props;
+        const {rooms, fetchRooms, roomDetails, setRoomDetailsModal} = this.props;
         return (
             <Grid columns={2}>
                 <Grid.Column width={11}>
@@ -76,6 +91,12 @@ export default class RoomList extends React.Component {
                                     filterBar={<FilterBar />}
                                     searchBar={<SearchBar onConfirm={fetchRooms} onTextChange={fetchRooms} />}
                                     renderRoom={this.renderRoom} />
+                    <Dimmer.Dimmable>
+                        <Dimmer active={roomDetails.isFetching} page>
+                            <Loader />
+                        </Dimmer>
+                        <RoomDetailsModal roomDetails={roomDetails} setRoomDetailsModal={setRoomDetailsModal} />
+                    </Dimmer.Dimmable>
                 </Grid.Column>
                 <Grid.Column width={5}>
                     <MapController />

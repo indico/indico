@@ -22,7 +22,13 @@ import {routerReducer, routerMiddleware} from 'react-router-redux';
 import createReduxStore from 'indico/utils/redux';
 
 import {
-    userReducer, bookRoomReducer, roomListReducer, equipmentReducer, buildingsReducer, mapAspectsReducer
+    userReducer,
+    bookRoomReducer,
+    roomListReducer,
+    equipmentReducer,
+    buildingsReducer,
+    mapAspectsReducer,
+    roomDetailsReducer,
 } from './reducers';
 import {initialStateFactory} from './reducers/roomBooking/filters';
 import {SET_FILTER_PARAMETER} from './actions';
@@ -82,6 +88,7 @@ export default function createRBStore(data) {
         equipment: equipmentReducer,
         buildings: buildingsReducer,
         mapAspects: mapAspectsReducer,
+        roomDetails: roomDetailsReducer,
     }, Object.assign(initialData, data), [
         routerMiddleware(history),
         queryStringMiddleware(history, routeConfig)

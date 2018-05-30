@@ -16,21 +16,37 @@
 
 from __future__ import unicode_literals
 
-from marshmallow.fields import Nested
+from marshmallow.fields import Nested, String
 
 from indico.core.marshmallow import mm
 from indico.modules.rb.models.aspects import Aspect
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import Reservation
+from indico.modules.rb.models.room_attributes import RoomAttributeAssociation
 from indico.modules.rb.models.rooms import Room
 
 
+_room_fields = ('id', 'name', 'capacity', 'building', 'floor', 'number', 'is_public', 'location_name', 'has_vc',
+                'has_projector', 'has_webcast_recording', 'large_photo_url', 'full_name', 'comments', 'division',
+                'is_reservable')
+
+
+class RoomAttributesSchema(mm.ModelSchema):
+    title = String(attribute='attribute.title')
+
+    class Meta:
+        model = RoomAttributeAssociation
+        fields = ('value', 'title')
+
+
 class RoomSchema(mm.ModelSchema):
+    owner_name = String(attribute='owner.full_name')
+    attributes = Nested(RoomAttributesSchema, many=True)
+
     class Meta:
         model = Room
-        fields = ('id', 'name', 'capacity', 'building', 'floor', 'number', 'is_public', 'location_name', 'has_vc',
-                  'has_projector', 'has_webcast_recording', 'large_photo_url', 'full_name', 'comments', 'division',
-                  'is_reservable')
+        fields = _room_fields + ('surface_area', 'latitude', 'longitude', 'telephone', 'key_location',
+                                 'max_advance_days', 'owner_name', 'attributes')
 
 
 class MapRoomSchema(mm.ModelSchema):
@@ -60,7 +76,8 @@ class ReservationOccurrenceSchema(mm.ModelSchema):
         fields = ('start_dt', 'end_dt', 'is_valid', 'reservation')
 
 
-rooms_schema = RoomSchema(many=True)
+rooms_schema = RoomSchema(many=True, only=_room_fields)
+room_details_schema = RoomSchema()
 map_rooms_schema = MapRoomSchema(many=True)
 aspects_schema = AspectSchema(many=True)
 reservation_occurrences_schema = ReservationOccurrenceSchema(many=True)

@@ -22,11 +22,17 @@ import {
     addFavoriteRoom,
     delFavoriteRoom,
     fetchMapRooms,
+    fetchRoomDetails,
     fetchRooms,
+    setRoomDetailsModal,
 } from '../actions';
 
 
-const mapStateToProps = ({roomList, user: {favoriteRooms}}) => ({...roomList, favoriteRooms});
+const mapStateToProps = ({roomList, user: {favoriteRooms}, roomDetails}) => ({
+    ...roomList,
+    favoriteRooms,
+    roomDetails
+});
 
 const mapDispatchToProps = dispatch => ({
     fetchRooms: (clear = true) => {
@@ -39,6 +45,12 @@ const mapDispatchToProps = dispatch => ({
     delFavoriteRoom: (id) => {
         dispatch(delFavoriteRoom(id));
     },
+    fetchRoomDetails: (id) => {
+        dispatch(fetchRoomDetails(id));
+    },
+    setRoomDetailsModal: (id) => {
+        dispatch(setRoomDetailsModal(id));
+    }
 });
 
 export default connect(

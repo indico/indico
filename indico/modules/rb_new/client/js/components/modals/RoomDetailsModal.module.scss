@@ -15,17 +15,26 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import {combineReducers} from 'redux';
+:global(.ui.modal .header).room-details-header {
+    display: flex;
+    justify-content: space-between;
+}
 
-import {roomsReducerFactory} from './roomBooking/roomList';
-import filterReducerFactory from './roomBooking/filters';
-import {mapReducerFactory} from './roomBooking/map';
+.room-details {
+    :global(.ui.icon.message).message-icon :global(.icon) {
+        font-size: 2em;
+    }
 
+    .attribute-title {
+        padding-right: 1em;
+    }
 
-const reducer = combineReducers({
-    rooms: roomsReducerFactory('roomList'),
-    filters: filterReducerFactory('roomList'),
-    map: mapReducerFactory('roomList'),
-});
+    .equipment-box {
+        padding-top: 0.75em;
 
-export default reducer;
+        :global(.icon) {
+            display: inline;
+            padding: 0 0.25em;
+        }
+    }
+}

@@ -28,7 +28,8 @@ from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.models.favorites import favorite_room_table
 from indico.modules.rb.models.reservations import RepeatFrequency
 from indico.modules.rb.models.rooms import Room
-from indico.modules.rb_new.schemas import aspects_schema, map_rooms_schema, reservation_occurrences_schema, rooms_schema
+from indico.modules.rb_new.schemas import (aspects_schema, map_rooms_schema, reservation_occurrences_schema,
+                                           room_details_schema, rooms_schema)
 from indico.modules.rb_new.util import get_buildings, get_equipment_types, get_rooms_availability, search_for_rooms
 from indico.web.util import jsonify_data
 
@@ -70,6 +71,15 @@ class RHSearchMapRooms(RHRoomBookingBase):
         filter_availability = args.get('start_dt') and args.get('end_dt')
         query = search_for_rooms(args, only_available=filter_availability)
         return jsonify(map_rooms_schema.dump(query.all()).data)
+
+
+class RHRoomDetails(RHRoomBookingBase):
+    def _process_args(self):
+        self.room = Room.get_one(request.view_args['room_id'])
+
+    def _process(self):
+        room_details = room_details_schema.dump(self.room).data
+        return jsonify(room_details)
 
 
 class RHAspects(RHRoomBookingBase):
