@@ -22,6 +22,14 @@ const path = require('path');
 const nodeResolve = require('eslint-import-resolver-node').resolve;
 
 
+let indicoBase;
+if (path.basename(path.dirname(__dirname)) === 'node_modules') {
+    // yarn doesn't symlink `file:...` packages so they are copied to node_modules
+    indicoBase = path.join(__dirname, '../..');
+} else {
+    indicoBase = path.join(__dirname, '..');
+}
+
 module.exports = {
     interfaceVersion: 2,
     resolve(source, file, config) {
@@ -29,7 +37,7 @@ module.exports = {
         if (rv.found) {
             return rv;
         } else if (source.startsWith('indico/')) {
-            const realPath = path.join(__dirname, '../indico/web/client/js', source.substr(7));
+            const realPath = path.join(indicoBase, 'indico/web/client/js', source.substr(7));
             return nodeResolve(realPath, file, config);
         }
         return {found: false};
