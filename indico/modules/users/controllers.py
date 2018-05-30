@@ -25,6 +25,8 @@ from flask import flash, jsonify, redirect, request, session
 from markupsafe import Markup, escape
 from sqlalchemy.orm import joinedload, load_only, subqueryload, undefer
 from sqlalchemy.orm.exc import StaleDataError
+from webargs import fields, validate
+from webargs.flaskparser import use_args
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from indico.core import signals
@@ -43,8 +45,9 @@ from indico.modules.users.forms import (AdminAccountRegistrationForm, AdminsForm
                                         SearchForm, UserDetailsForm, UserEmailsForm, UserPreferencesForm)
 from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.operations import create_user
-from indico.modules.users.util import (get_linked_events, get_related_categories, get_suggested_categories, merge_users,
-                                       search_users, serialize_user)
+from indico.modules.users.util import (build_user_search_query, get_linked_events, get_related_categories,
+                                       get_suggested_categories, merge_users, search_users, serialize_user)
+from indico.modules.users.schemas import user_schema
 from indico.modules.users.views import WPUser, WPUsersAdmin
 from indico.util.date_time import now_utc, timedelta_split
 from indico.util.event import truncate_path
@@ -517,3 +520,17 @@ class RHRejectRegistrationRequest(RHRegistrationRequestBase):
         send_email(make_email(self.request.email, template=tpl))
         flash(_('The request has been rejected.'), 'success')
         return jsonify_data()
+
+
+class RHUserSearch(RHProtected):
+    """Search for users based on given criteria"""
+
+    @use_args({
+        'email': fields.Str(validate=lambda s: len(s) > 3 and '@' in s),
+        'name': fields.Str(validate=validate.Length(min=3))
+    })
+    def _process(self, args):
+        if not args:
+            raise BadRequest()
+        query = build_user_search_query(args).limit(10)
+        return jsonify(user_schema.dump(query.all(), many=True))

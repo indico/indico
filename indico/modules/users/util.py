@@ -26,6 +26,7 @@ from indico.core.auth import multipass
 from indico.core.db import db
 from indico.core.db.sqlalchemy.custom.unaccent import unaccent_match
 from indico.core.db.sqlalchemy.principals import PrincipalType
+from indico.core.db.sqlalchemy.util.queries import escape_like
 from indico.modules.categories import Category
 from indico.modules.categories.models.principals import CategoryPrincipal
 from indico.modules.events import Event
@@ -34,7 +35,7 @@ from indico.modules.users.models.affiliations import UserAffiliation
 from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.models.suggestions import SuggestedCategory
 from indico.util.event import truncate_path
-from indico.util.string import crc32
+from indico.util.string import crc32, remove_accents
 
 
 # colors for user-specific avatar bubbles
@@ -172,6 +173,44 @@ def serialize_user(user):
     }
 
 
+def _build_name_search(name_list):
+    text = remove_accents('%{}%'.format('%'.join(escape_like(name) for name in name_list)))
+    return db.func.indico.indico_unaccent(db.func.concat(User.first_name, ' ', User.last_name)).ilike(text)
+
+
+def build_user_search_query(criteria, exact=False, include_deleted=False, include_pending=False):
+    unspecified = object()
+    query = User.query.options(db.joinedload(User._all_emails))
+
+    if not include_pending:
+        query = query.filter(~User.is_pending)
+    if not include_deleted:
+        query = query.filter(~User.is_deleted)
+
+    affiliation = criteria.pop('affiliation', unspecified)
+    if affiliation is not unspecified:
+        query = query.join(UserAffiliation).filter(unaccent_match(UserAffiliation.name, affiliation, exact))
+
+    email = criteria.pop('email', unspecified)
+    if email is not unspecified:
+        query = query.join(UserEmail).filter(unaccent_match(UserEmail.email, email, exact))
+
+    # search on any of the name fields (first_name OR last_name)
+    name = criteria.pop('name', unspecified)
+    if name is not unspecified:
+        if exact:
+            raise ValueError("'name' is not compatible with 'exact'")
+        if 'first_name' in criteria or 'last_name' in criteria:
+            raise ValueError("'name' is not compatible with (first|last)_name")
+        name = name.split()
+        query = query.filter(_build_name_search(name))
+
+    for k, v in criteria.iteritems():
+        query = query.filter(unaccent_match(getattr(User, k), v, exact))
+
+    return query
+
+
 def search_users(exact=False, include_deleted=False, include_pending=False, external=False, allow_system_user=False,
                  **criteria):
     """Searches for users.
@@ -188,38 +227,26 @@ def search_users(exact=False, include_deleted=False, include_pending=False, exte
     :param allow_system_user: Whether the system user may be returned
                               in the search results.
     :param criteria: A dict containing any of the following keys:
-                     first_name, last_name, email, affiliation, phone,
+                     name, first_name, last_name, email, affiliation, phone,
                      address
     :return: A set of matching users. If `external` was set, it may
              contain both :class:`~flask_multipass.IdentityInfo` objects
              for external users not yet in Indico and :class:`.User`
              objects for existing users.
     """
-    unspecified = object()
-    query = User.query.options(db.joinedload(User.identities),
-                               db.joinedload(User._all_emails),
-                               db.joinedload(User.merged_into_user))
+
     criteria = {key: value.strip() for key, value in criteria.iteritems() if value.strip()}
-    original_criteria = dict(criteria)
 
     if not criteria:
         return set()
 
-    if not include_pending:
-        query = query.filter(~User.is_pending)
-    if not include_deleted:
-        query = query.filter(~User.is_deleted)
-
-    affiliation = criteria.pop('affiliation', unspecified)
-    if affiliation is not unspecified:
-        query = query.join(UserAffiliation).filter(unaccent_match(UserAffiliation.name, affiliation, exact))
-
-    email = criteria.pop('email', unspecified)
-    if email is not unspecified:
-        query = query.join(UserEmail).filter(unaccent_match(UserEmail.email, email, exact))
-
-    for k, v in criteria.iteritems():
-        query = query.filter(unaccent_match(getattr(User, k), v, exact))
+    query = (build_user_search_query(
+                dict(criteria),
+                exact=exact,
+                include_deleted=include_deleted,
+                include_pending=include_pending)
+             .options(db.joinedload(User.identities),
+                      db.joinedload(User.merged_into_user)))
 
     found_emails = {}
     found_identities = {}
@@ -234,7 +261,7 @@ def search_users(exact=False, include_deleted=False, include_pending=False, exte
 
     # external user providers
     if external:
-        identities = multipass.search_identities(exact=exact, **original_criteria)
+        identities = multipass.search_identities(exact=exact, **criteria)
 
         for ident in identities:
             if not ident.data.get('email'):

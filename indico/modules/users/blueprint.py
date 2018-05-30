@@ -25,7 +25,8 @@ from indico.modules.users.controllers import (RHAcceptRegistrationRequest, RHAdm
                                               RHUserEmailsVerify, RHUserFavorites, RHUserFavoritesCategoryAPI,
                                               RHUserFavoritesUserRemove, RHUserFavoritesUsersAdd, RHUserPreferences,
                                               RHUsersAdmin, RHUsersAdminCreate, RHUsersAdminMerge,
-                                              RHUsersAdminMergeCheck, RHUsersAdminSettings, RHUserSuggestionsRemove)
+                                              RHUsersAdminMergeCheck, RHUsersAdminSettings, RHUserSearch,
+                                              RHUserSuggestionsRemove)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -66,6 +67,8 @@ with _bp.add_prefixed_rules('/<int:user_id>'):
     _bp.add_url_rule('/emails/<email>', 'user_emails_delete', RHUserEmailsDelete, methods=('DELETE',))
     _bp.add_url_rule('/emails/make-primary', 'user_emails_set_primary', RHUserEmailsSetPrimary, methods=('POST',))
 
+# User search
+_bp.add_url_rule('/search/', 'user_search', RHUserSearch)
 
 # Users API
 _bp.add_url_rule('!/api/user/', 'authenticated_user', fetch_authenticated_user)
