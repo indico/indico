@@ -19,7 +19,9 @@ import _ from 'lodash';
 import createHistory from 'history/createBrowserHistory';
 import {queryStringMiddleware, createQueryStringReducer} from 'redux-router-querystring';
 import {routerReducer, routerMiddleware} from 'react-router-redux';
+import {reducer as reduxFormReducer} from 'redux-form';
 import createReduxStore from 'indico/utils/redux';
+
 
 import {
     userReducer,
@@ -89,6 +91,7 @@ export default function createRBStore(data) {
         buildings: buildingsReducer,
         mapAspects: mapAspectsReducer,
         roomDetails: roomDetailsReducer,
+        form: reduxFormReducer
     }, Object.assign(initialData, data), [
         routerMiddleware(history),
         queryStringMiddleware(history, routeConfig)
