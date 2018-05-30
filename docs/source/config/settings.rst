@@ -388,6 +388,14 @@ Development
 
     Default: ``'https://hub.getindico.io'``
 
+.. data:: DISABLE_CELERY_CHECK
+
+    Disables the warning about Celery not running or being outdated. When set to
+    ``None``, the warning is disabled when :data:`DEBUG` is enabled; otherwise
+    this setting enables/disables the warning regardless of debug mode.
+
+    Default: ``None``
+
 
 Directories
 -----------

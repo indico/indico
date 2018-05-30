@@ -12,6 +12,7 @@ Improvements
 
 - Add a privacy policy page linked from the footer (:issue:`1415`)
 - *Terms & Conditions* can now link to an external URL
+- Show a warning to all admins if Celery is not running or outdated
 
 Bugfixes
 ^^^^^^^^

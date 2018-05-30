@@ -56,6 +56,7 @@ DEFAULTS = {
     'DEBUG': False,
     'DEFAULT_LOCALE': 'en_GB',
     'DEFAULT_TIMEZONE': 'UTC',
+    'DISABLE_CELERY_CHECK': None,
     'ENABLE_ROOMBOOKING': False,
     'EXTERNAL_REGISTRATION_URL': None,
     'FLOWER_URL': None,
@@ -171,6 +172,8 @@ def _postprocess_config(data):
         raise ValueError('Invalid default timezone: {}'.format(data['DEFAULT_TIMEZONE']))
     data['BASE_URL'] = data['BASE_URL'].rstrip('/')
     data['STATIC_SITE_STORAGE'] = data['STATIC_SITE_STORAGE'] or data['ATTACHMENT_STORAGE']
+    if data['DISABLE_CELERY_CHECK'] is None:
+        data['DISABLE_CELERY_CHECK'] = data['DEBUG']
 
 
 def _sanitize_data(data, allow_internal=False):
