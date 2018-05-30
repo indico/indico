@@ -66,10 +66,6 @@ export default class RecurrenceForm extends FilterFormComponent {
         const {type, interval, number} = this.state;
         const intervalOptions = [
             {
-                value: 'day',
-                text: Translate.string('Days')
-            },
-            {
                 value: 'week',
                 text: Translate.string('Weeks')
             },

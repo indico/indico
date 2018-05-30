@@ -28,17 +28,6 @@ export default function recurrenceRenderer({type, number, interval}) {
         return <Translate>Once</Translate>;
     } else if (type === 'daily') {
         return <Translate>Daily</Translate>;
-    } else if (interval === 'day') {
-        return (
-            <PluralTranslate count={number}>
-                <Singular>
-                    Daily
-                </Singular>
-                <Plural>
-                    Every <Param name="number" value={number} /> days
-                </Plural>
-            </PluralTranslate>
-        );
     } else if (interval === 'week') {
         return (
             <PluralTranslate count={number}>

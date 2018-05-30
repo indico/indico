@@ -29,7 +29,7 @@ export const queryString = {
         stateField: 'filters.recurrence.number'
     },
     interval: {
-        validator: v.isIn(['day', 'week', 'month']),
+        validator: v.isIn(['week', 'month']),
         stateField: 'filters.recurrence.interval'
     },
     sd: {
@@ -138,7 +138,6 @@ export const ajax = {
                 return 'DAY';
             } else {
                 return {
-                    day: 'DAY',
                     week: 'WEEK',
                     month: 'MONTH'
                 }[interval];
