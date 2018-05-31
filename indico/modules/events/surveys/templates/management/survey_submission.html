@@ -6,8 +6,8 @@
 
 {% block description %}
     {% if not submission.is_anonymous %}
-        {% trans submitter_name=submission.user.full_name -%}
-            Submitter: {{ submitter_name }}
+        {% trans submitter_name=submission.user.full_name, submitter_email=submission.user.email -%}
+            Submitter: {{ submitter_name }} ({{ submitter_email }})
         {%- endtrans %}
     {% else %}
         {% trans -%}

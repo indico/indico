@@ -92,7 +92,7 @@ def generate_spreadsheet_from_survey(survey, submission_ids):
     :param survey: `Survey` for which the user wants to export submissions
     :param submission_ids: The list of submissions to include in the file
     """
-    field_names = ['Submitter', 'Submission Date']
+    field_names = ['Submitter', 'Submitter Email', 'Submission Date']
     sorted_questions = sorted(survey.questions, key=attrgetter('parent.position', 'position'))
     field_names += [unique_col(_format_title(question), question.id) for question in sorted_questions]
 
@@ -101,6 +101,7 @@ def generate_spreadsheet_from_survey(survey, submission_ids):
     for submission in submissions:
         submission_dict = {
             'Submitter': submission.user.full_name if not submission.is_anonymous else None,
+            'Submitter Email': submission.user.email if not submission.is_anonymous else None,
             'Submission Date': submission.submitted_dt,
         }
         for key in field_names:

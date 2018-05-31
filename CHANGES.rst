@@ -7,6 +7,12 @@ Version 2.1.2
 
 *Unreleased*
 
+Improvements
+^^^^^^^^^^^^
+
+- Show email address for non-anonymous survey submissions
+  (:issue:`3258`)
+
 Bugfixes
 ^^^^^^^^
 
