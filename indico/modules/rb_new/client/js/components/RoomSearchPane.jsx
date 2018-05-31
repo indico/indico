@@ -20,7 +20,7 @@ import PropTypes from 'prop-types';
 import {Card} from 'semantic-ui-react';
 import LazyScroll from 'redux-lazy-scroll';
 
-import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
+import {Param, Plural, PluralTranslate, Singular} from 'indico/react/i18n';
 
 import './RoomSearchPane.module.scss';
 

@@ -29,7 +29,6 @@ import './Room.module.scss';
 
 
 export default class Room extends React.Component {
-
     static propTypes = {
         room: PropTypes.object.isRequired,
         children: PropTypes.node.isRequired,
