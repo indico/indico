@@ -109,6 +109,18 @@ div.announcement-bar {
     }
 }
 
+div.celery-error-bar {
+    @extend div.announcement-bar;
+
+    background-color: $red;
+    border-bottom: 2px solid $dark-red;
+    color: $light-red;
+
+    .icon {
+        color: $red;
+    }
+}
+
 /* Breadcrumbs */
 
 div.main-breadcrumb {

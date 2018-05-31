@@ -37,9 +37,15 @@ class RHManageLegalMessages(RHAdminBase):
 
 class RHDisplayTOS(RH):
     def _process(self):
+        url = legal_settings.get('tos_url')
+        if url:
+            return redirect(url)
         return WPDisplayTOS.render_template('tos.html', tos=legal_settings.get('tos'))
 
 
 class RHDisplayPrivacyPolicy(RH):
     def _process(self):
+        url = legal_settings.get('privacy_policy_url')
+        if url:
+            return redirect(url)
         return WPDisplayPrivacyPolicy.render_template('privacy.html', content=legal_settings.get('privacy_policy'))

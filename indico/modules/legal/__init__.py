@@ -37,7 +37,9 @@ _DEFAULT_PROTECTED_DISCLAIMER = ("As such, this information is intended for an i
 legal_settings = SettingsProxy('legal', {
     'network_protected_disclaimer': _DEFAULT_PROTECTED_DISCLAIMER,
     'restricted_disclaimer': _DEFAULT_RESTRICTED_DISCLAIMER,
+    'tos_url': '',
     'tos': '',
+    'privacy_policy_url': '',
     'privacy_policy': ''
 })
 
@@ -50,11 +52,13 @@ def _sidemenu_items(sender, **kwargs):
 
 @template_hook('page-footer')
 def _inject_tos_footer(**kwargs):
-    if legal_settings.get('tos'):
-        return render_template('legal/tos_footer.html')
+    url = legal_settings.get('tos_url')
+    if url or legal_settings.get('tos'):
+        return render_template('legal/tos_footer.html', url=url)
 
 
 @template_hook('page-footer')
 def _inject_privacy_footer(**kwargs):
-    if legal_settings.get('privacy_policy'):
-        return render_template('legal/privacy_footer.html')
+    url = legal_settings.get('privacy_policy_url')
+    if url or legal_settings.get('privacy_policy'):
+        return render_template('legal/privacy_footer.html', url=url)

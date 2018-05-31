@@ -29,18 +29,24 @@ Internal Changes
 Version 2.1.1
 -------------
 
-*Unreleased*
+*Released on May 31, 2018*
 
 Improvements
 ^^^^^^^^^^^^
 
 - Add a privacy policy page linked from the footer (:issue:`1415`)
+- Terms & Conditions can now link to an external URL
+- Show a warning to all admins if Celery is not running or outdated
+- Add registration ID placeholder for badges (:issue:`3370`, thanks
+  :user:`bpedersen2`)
 
 Bugfixes
 ^^^^^^^^
 
 - Fix alignment issue in the "Indico Weeks View" timetable theme
   (:issue:`3367`)
+- Reset visibility when cloning an event to a different category
+  (:issue:`3372`)
 
 
 Version 2.1

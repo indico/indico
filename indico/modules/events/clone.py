@@ -108,11 +108,15 @@ class EventProtectionCloner(EventCloner):
             self._clone_protection(new_event)
             self._clone_session_coordinator_privs(new_event)
             self._clone_acl(new_event)
+            self._clone_visibility(new_event)
         db.session.flush()
 
     def _clone_protection(self, new_event):
         new_event.protection_mode = self.old_event.protection_mode
         new_event.access_key = self.old_event.access_key
+
+    def _clone_visibility(self, new_event):
+        new_event.visibility = self.old_event.visibility if new_event.category == self.old_event.category else None
 
     def _clone_session_coordinator_privs(self, new_event):
         session_settings_data = session_settings.get_all(self.old_event)

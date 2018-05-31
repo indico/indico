@@ -32,7 +32,7 @@ __all__ = ('EventDatesPlaceholder', 'EventDescriptionPlaceholder', 'Registration
            'RegistrationFullNameNoTitlePlaceholderD', 'RegistrationTitlePlaceholder',
            'RegistrationFirstNamePlaceholder', 'RegistrationLastNamePlaceholder', 'RegistrationTicketQRPlaceholder',
            'RegistrationEmailPlaceholder', 'RegistrationAmountPlaceholder', 'RegistrationPricePlaceholder',
-           'RegistrationAffiliationPlaceholder',
+           'RegistrationFriendlyIDPlaceholder', 'RegistrationAffiliationPlaceholder',
            'RegistrationPositionPlaceholder', 'RegistrationAddressPlaceholder', 'RegistrationCountryPlaceholder',
            'RegistrationPhonePlaceholder', 'EventTitlePlaceholder', 'CategoryTitlePlaceholder', 'EventRoomPlaceholder',
            'EventVenuePlaceholder', 'EventSpeakersPlaceholder')
@@ -266,6 +266,12 @@ class RegistrationPricePlaceholder(RegistrationPlaceholder):
     def render(cls, registration):
         # XXX: Use event locale once we have such a setting
         return format_currency(registration.price, registration.currency, locale='en_GB')
+
+
+class RegistrationFriendlyIDPlaceholder(RegistrationPlaceholder):
+    name = 'registration_friendly_id'
+    description = _('Registration ID')
+    field = 'friendly_id'
 
 
 class RegistrationAffiliationPlaceholder(RegistrationPDPlaceholder):

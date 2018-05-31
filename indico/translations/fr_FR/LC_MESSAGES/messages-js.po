@@ -14,7 +14,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2018-05-15 10:27+0200\n"
+"POT-Creation-Date: 2018-05-30 16:14+0200\n"
 "PO-Revision-Date: 2018-04-03 15:12+0000\n"
 "Last-Translator: Thomas Baron <thomas.baron@cern.ch>\n"
 "Language-Team: French (France) (http://www.transifex.com/indico/indico/language/fr_FR/)\n"
@@ -306,7 +306,7 @@ msgid "Submission rights"
 msgstr "Droits de dépôt"
 
 #: indico/htdocs/js/indico/Core/Dialogs/Users.js:1076
-#: indico/htdocs/js/indico/jquery/permissions_widget.js:154
+#: indico/htdocs/js/indico/jquery/permissions_widget.js:166
 msgid "Are you sure you want to remove yourself from the list?"
 msgstr "Êtes-vous sûr de vouloir vous retirer de la liste ?"
 
@@ -1003,39 +1003,39 @@ msgstr "Supprimer"
 msgid "Empty values are not allowed."
 msgstr "Les champs vides ne sont pas acceptés."
 
-#: indico/htdocs/js/indico/jquery/permissions_widget.js:129
+#: indico/htdocs/js/indico/jquery/permissions_widget.js:141
 msgid "IP networks cannot have management permissions"
 msgstr "Les réseaux IP n'ont pas de droit d'administration"
 
-#: indico/htdocs/js/indico/jquery/permissions_widget.js:136
+#: indico/htdocs/js/indico/jquery/permissions_widget.js:148
 msgid "Assign Permissions"
 msgstr "Assigner les permissions"
 
-#: indico/htdocs/js/indico/jquery/permissions_widget.js:153
+#: indico/htdocs/js/indico/jquery/permissions_widget.js:165
 msgid "Delete entry '{0}'"
 msgstr "Effacer l'entrée '{0}'"
 
-#: indico/htdocs/js/indico/jquery/permissions_widget.js:195
+#: indico/htdocs/js/indico/jquery/permissions_widget.js:207
 msgid "All IP Networks were added"
 msgstr "Tous les réseaux IP ont été ajouté"
 
-#: indico/htdocs/js/indico/jquery/permissions_widget.js:217
+#: indico/htdocs/js/indico/jquery/permissions_widget.js:229
 msgid "This entry was already added"
 msgstr "Cette entrée existait déjà"
 
-#: indico/htdocs/js/indico/jquery/permissions_widget.js:251
+#: indico/htdocs/js/indico/jquery/permissions_widget.js:263
 msgid "Anonymous"
 msgstr "Anonyme"
 
-#: indico/htdocs/js/indico/jquery/permissions_widget.js:256
+#: indico/htdocs/js/indico/jquery/permissions_widget.js:268
 msgid "Category Managers"
 msgstr "Administrateurs de catégorie"
 
-#: indico/htdocs/js/indico/jquery/permissions_widget.js:256
+#: indico/htdocs/js/indico/jquery/permissions_widget.js:268
 msgid "Event Managers"
 msgstr "Administrateurs de l'événement"
 
-#: indico/htdocs/js/indico/jquery/permissions_widget.js:312
+#: indico/htdocs/js/indico/jquery/permissions_widget.js:324
 msgid "Select a user or group to add"
 msgstr "Veuillez choisir un utilisateur ou un groupe à ajouter"
 

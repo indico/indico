@@ -1,0 +1,17 @@
+<div class="celery-error-bar">
+    <div class="flexrow f-self-stretch f-j-center f-a-center">
+        <i class="icon icon-warning"></i>
+        <div>
+            {% if down %}
+                {% trans %}
+                    The Celery task scheduler does not seem to be running. This means that email sending and periodic
+                    tasks such as event reminders do not work.
+                {% endtrans %}
+            {% else %}
+                {% trans %}
+                    The Celery task scheduler is running a different Indico version.
+                {% endtrans %}
+            {% endif %}
+        </div>
+    </div>
+</div>

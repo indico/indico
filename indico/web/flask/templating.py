@@ -20,7 +20,7 @@ import functools
 import itertools
 import posixpath
 import re
-from heapq import heappush
+from operator import itemgetter
 
 from flask import current_app
 from flask_pluginengine.util import get_state
@@ -143,7 +143,7 @@ def register_template_hook(name, receiver, priority=50, markup=True, plugin=None
             return do_stuff(something)
 
     It needs to return a unicode string. If you intend to return plaintext
-    it is adviable to set the `markup` param to `False` which results in the
+    it is advisable to set the `markup` param to `False` which results in the
     string being considered "unsafe" which will cause it to be HTML-escaped.
 
     :param name: The name of the template hook.
@@ -187,7 +187,8 @@ def call_template_hook(*name, **kwargs):
         if value:
             if is_markup:
                 value = Markup(value)
-            heappush(values, (priority, value))
+            values.append((priority, value))
+    values.sort(key=itemgetter(0))
     if as_list:
         return [x[1] for x in values]
     else:
