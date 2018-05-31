@@ -20,6 +20,11 @@
                             <span class="label">{% trans %}Answered:{% endtrans %}</span>
                             <span class="content">{{ question.not_empty_answers|count }}</span>
                         </div>
+                        {% if question.description %}
+                            <div class="i-box-description">
+                                {{ question.description }}
+                            </div>
+                        {% endif %}
                     </div>
                     <div class="i-box-content">
                         {% if question.not_empty_answers %}

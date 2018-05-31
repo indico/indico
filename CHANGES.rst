@@ -2,6 +2,16 @@ Changelog
 =========
 
 
+Version 2.1.2
+-------------
+
+*Unreleased*
+
+Bugfixes
+^^^^^^^^
+
+- Show question description in survey results (:issue:`3383`)
+
 Version 2.1.1
 -------------
 
