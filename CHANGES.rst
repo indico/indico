@@ -17,6 +17,7 @@ Bugfixes
 ^^^^^^^^
 
 - Show question description in survey results (:issue:`3383`)
+- Allow paper managers to submit paper revisions
 
 Version 2.1.1
 -------------
