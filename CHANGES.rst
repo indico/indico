@@ -25,6 +25,21 @@ Internal Changes
 
 ----
 
+Version 2.1.2
+-------------
+
+*Unreleased*
+
+Improvements
+^^^^^^^^^^^^
+
+- Show email address for non-anonymous survey submissions
+  (:issue:`3258`)
+
+Bugfixes
+^^^^^^^^
+
+- Show question description in survey results (:issue:`3383`)
 
 Version 2.1.1
 -------------

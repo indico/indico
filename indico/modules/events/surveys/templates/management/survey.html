@@ -1,5 +1,7 @@
 {% extends 'events/surveys/management/_survey_base.html' %}
 
+{% set has_users = submitted_surveys|rejectattr('is_anonymous')|any %}
+
 {% block content %}
     {% if survey.private and survey.state.name in ('active_and_clean', 'active_and_answered') %}
         <div class="action-box highlight">
@@ -141,6 +143,9 @@
                     <th>{% trans %}ID{% endtrans %}</th>
                     <th>{% trans %}Submitted{% endtrans %}</th>
                     <th>{% trans %}User{% endtrans %}</th>
+                    {% if has_users %}
+                        <th>{% trans %}Email{% endtrans %}</th>
+                    {% endif %}
                     <th></th>
                 </tr>
             </thead>
@@ -175,6 +180,13 @@
                 <em>{% trans %}Anonymous{% endtrans %}</em>
             {% endif %}
         </td>
+        {% if has_users %}
+            <td>
+                {% if not submission.is_anonymous %}
+                    {{ submission.user.email }}
+                {% endif %}
+            </td>
+        {% endif %}
         <td>
             <a href="#" class="icon-remove right js-delete-submission hide-if-locked"
                data-href="{{ url_for('.delete_submissions', survey) }}"
