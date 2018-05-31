@@ -5,7 +5,7 @@ Changelog
 Version 2.1.1
 -------------
 
-*Unreleased*
+*Released on May 31, 2018*
 
 Improvements
 ^^^^^^^^^^^^
