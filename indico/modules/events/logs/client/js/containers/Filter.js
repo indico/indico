@@ -17,7 +17,7 @@
 
 import {connect} from 'react-redux';
 import Filter from '../components/Filter';
-import {setFilter, fetchPosts, setPage} from '../actions';
+import {setFilter, fetchLogEntries, setPage} from '../actions';
 
 
 const mapStateToProps = ({logs}) => ({
@@ -28,7 +28,7 @@ const mapDispatchToProps = (dispatch) => ({
     setFilter: (filter) => {
         dispatch(setFilter(filter));
         dispatch(setPage(1));
-        dispatch(fetchPosts());
+        dispatch(fetchLogEntries());
     }
 });
 

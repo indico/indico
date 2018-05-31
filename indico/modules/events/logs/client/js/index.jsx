@@ -22,7 +22,7 @@ import {Provider} from 'react-redux';
 import createReduxStore from 'indico/utils/redux';
 
 import EventLog from './components/EventLog';
-import {fetchPosts} from './actions';
+import {fetchLogEntries} from './actions';
 import reducer from './reducers';
 
 import '../style/logs.scss';
@@ -48,5 +48,5 @@ window.addEventListener('load', () => {
         rootElement
     );
 
-    store.dispatch(fetchPosts());
+    store.dispatch(fetchLogEntries());
 });

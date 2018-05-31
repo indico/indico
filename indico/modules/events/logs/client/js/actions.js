@@ -57,7 +57,7 @@ export function viewPrevEntry() {
                 // ERROR!
             } else {
                 await dispatch(setPage(currentPage - 1));
-                await dispatch(fetchPosts());
+                await dispatch(fetchLogEntries());
                 await dispatch(setDetailedView(pageSize - 1));
             }
         } else {
@@ -79,7 +79,7 @@ export function viewNextEntry() {
             } else {
                 await dispatch(setPage(currentPage + 1));
                 await dispatch(setDetailedView(0));
-                await dispatch(fetchPosts());
+                await dispatch(fetchLogEntries());
             }
         } else {
             dispatch({type: SET_DETAILED_VIEW, currentViewIndex: currentViewIndex + 1});
@@ -99,7 +99,7 @@ export function fetchFailed() {
     return {type: FETCH_FAILED};
 }
 
-export function fetchPosts() {
+export function fetchLogEntries() {
     return async (dispatch, getStore) => {
         dispatch(fetchStarted());
 

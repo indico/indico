@@ -17,7 +17,7 @@
 
 import {connect} from 'react-redux';
 import LogEntryList from '../components/LogEntryList';
-import {setPage, fetchPosts, setDetailedView} from '../actions';
+import {setPage, fetchLogEntries, setDetailedView} from '../actions';
 
 
 const mapStateToProps = ({logs}) => ({
@@ -30,7 +30,7 @@ const mapStateToProps = ({logs}) => ({
 const mapDispatchToProps = dispatch => ({
     changePage: (page) => {
         dispatch(setPage(page));
-        dispatch(fetchPosts());
+        dispatch(fetchLogEntries());
     },
     setDetailedView: (entryIndex) => {
         dispatch(setDetailedView(entryIndex));
