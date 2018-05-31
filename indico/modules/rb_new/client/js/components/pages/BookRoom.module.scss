@@ -15,9 +15,12 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+@import '../../../styles/util';
+
+
 .view-icons {
     :global(i.active) {
-        color: blue;
+        color: $primary-color;
     }
 
     :global(i.icons) {
