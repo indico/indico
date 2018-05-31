@@ -15,7 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-@import '../../styles/main';
+@import '../../styles/util';
 
 
 .timeline-item {
@@ -44,9 +44,8 @@
             opacity: 0.75;
         }
 
-
         &:global(.pre-booking) {
-            @include stripes(#f2711c, #f48d49);
+            @include stripes($pre-booking-stripe-colors...);
             background-size: 35px 35px;
         }
 
@@ -59,7 +58,7 @@
         }
 
         &:global(.pre-booking-conflict) {
-            @include stripes(#db2828, #e56868);
+            @include stripes($pre-booking-conflict-stripe-colors...);
             background-size: 35px 35px;
         }
     }
