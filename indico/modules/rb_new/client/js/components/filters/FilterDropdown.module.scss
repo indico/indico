@@ -15,17 +15,17 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
- @import '../../../styles/main';
+@import '../../../styles/util';
 
 
 :global(.ui.button).filter-dropdown-button {
+    position: relative;
+    transition: width 0.15s ease-out;
+
     > :global(i.icon.angle.down) {
         padding-left: 1em;
-        transition: padding-left .15s ease-out;
+        transition: padding-left 0.15s ease-out;
     }
-
-    position: relative;
-    transition: width .15s ease-out;
 }
 
 :global(.ui.button).filter-dropdown-button-counter {

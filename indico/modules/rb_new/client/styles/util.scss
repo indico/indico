@@ -15,33 +15,35 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+
 @import 'base/palette';
 
+$white: #fff;
+$highlight-color: #7dcfb6;
+$primary-color: #2185d0;
+
+$sui-red: #db2828;
+$sui-orange: #f2711c;
+$sui-green: #21ba45;
+
+$pre-booking-stripe-colors: ($sui-orange, lighten($sui-orange, 14%));
+$pre-booking-conflict-stripe-colors: ($sui-red, lighten($sui-red, 14%));
+
 $indico-top-bar-height: 50px;
+$menu-height: 75px;
+$rb-content-padding: 2em;
+$sui-font-family: Lato, 'Helvetica Neue', Arial, Helvetica, sans-serif;
 
 
-body {
-    overflow-y: scroll;
-}
-
-// TODO: move this to Indico-wide file
-.indico-top-bar {
-    background-color: $dark-blue;
-    height: $indico-top-bar-height;
-    display: flex;
-    align-items: center;
-    padding: 0 20px;
-
-    .indico-top-bar-logo {
-        display: flex;
-        align-items: center;
-
-        img {
-            height: 30px;
-        }
-    }
-
-    .indico-user-menu {
-        margin-left: auto;
-    }
+@mixin stripes($first, $second) {
+    background-image: linear-gradient(
+        45deg,
+        $first 25%,
+        $second 25%,
+        $second 50%,
+        $first 50%,
+        $first 75%,
+        $second 75%,
+        $second 100%
+    );
 }
