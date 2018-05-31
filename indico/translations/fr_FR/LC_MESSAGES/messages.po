@@ -16,9 +16,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2018-05-30 16:14+0200\n"
-"PO-Revision-Date: 2018-05-31 07:11+0000\n"
-"Last-Translator: Thomas Baron <thomas.baron@cern.ch>\n"
+"POT-Creation-Date: 2018-05-31 12:02+0200\n"
+"PO-Revision-Date: 2018-05-31 13:06+0000\n"
+"Last-Translator: Adrian Mönnich\n"
 "Language-Team: French (France) (http://www.transifex.com/indico/indico/language/fr_FR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -84,7 +84,7 @@ msgstr "Accéder aux zones publiques de la contribution sélectionnée"
 #: indico/modules/events/registration/templates/management/regform.html:64
 #: indico/modules/events/registration/templates/management/regform.html:80
 #: indico/modules/events/registration/templates/management/regform_list.html:94
-#: indico/modules/events/surveys/templates/management/survey.html:80
+#: indico/modules/events/surveys/templates/management/survey.html:82
 #: indico/modules/events/surveys/templates/management/survey_list.html:42
 msgid "Manage"
 msgstr "Gérer"
@@ -571,7 +571,7 @@ msgstr "Liste des participants"
 #: indico/modules/events/registration/templates/management/_reglist.html:23
 #: indico/modules/events/sessions/templates/management/_session_list.html:12
 #: indico/modules/events/sessions/util.py:83
-#: indico/modules/events/surveys/templates/management/survey.html:141
+#: indico/modules/events/surveys/templates/management/survey.html:143
 msgid "ID"
 msgstr "Identifiant"
 
@@ -949,7 +949,7 @@ msgstr "Modifier"
 #: indico/modules/events/layout/templates/layout_conference.html:67
 #: indico/modules/events/management/templates/_action_menu.html:91
 #: indico/modules/events/reminders/templates/reminders.html:36
-#: indico/modules/events/surveys/templates/management/survey.html:132
+#: indico/modules/events/surveys/templates/management/survey.html:134
 #: indico/modules/events/templates/admin/_reference_type_list.html:25
 #: indico/modules/oauth/templates/app_details.html:39
 msgid "Delete"
@@ -2770,7 +2770,7 @@ msgid "API Keys"
 msgstr "Clés API"
 
 #: indico/modules/api/templates/admin_keys.html:9
-#: indico/modules/events/surveys/templates/management/survey.html:143
+#: indico/modules/events/surveys/templates/management/survey.html:145
 #: indico/modules/rb/forms/reservations.py:117
 #: indico/modules/rb/forms/reservations.py:146
 msgid "User"
@@ -3309,7 +3309,7 @@ msgstr "Gérer les documents de '%(title)s'"
 #: indico/modules/events/registration/templates/management/regform_reglist.html:21
 #: indico/modules/events/registration/templates/management/reglist_filter.html:62
 #: indico/modules/events/sessions/templates/management/session_list.html:51
-#: indico/modules/events/surveys/templates/management/survey.html:100
+#: indico/modules/events/surveys/templates/management/survey.html:102
 msgid "None"
 msgstr "Aucun"
 
@@ -4720,7 +4720,7 @@ msgstr "Aller à la page d'accueil de l'événement"
 #: indico/modules/events/registration/templates/management/regform_reglist.html:20
 #: indico/modules/events/registration/templates/management/reglist_filter.html:61
 #: indico/modules/events/sessions/templates/management/session_list.html:46
-#: indico/modules/events/surveys/templates/management/survey.html:97
+#: indico/modules/events/surveys/templates/management/survey.html:99
 #: indico/modules/groups/controllers.py:50
 msgid "All"
 msgstr "Tous"
@@ -6613,7 +6613,7 @@ msgstr "Le résumé a été retiré"
 
 #: indico/modules/events/abstracts/models/abstracts.py:45
 #: indico/modules/events/papers/models/revisions.py:35
-#: indico/modules/events/surveys/templates/management/survey.html:142
+#: indico/modules/events/surveys/templates/management/survey.html:144
 msgid "Submitted"
 msgstr "Déposé"
 
@@ -6786,7 +6786,7 @@ msgstr "Télécharger les fichiers attachés"
 #: indico/modules/events/contributions/templates/management/contributions.html:93
 #: indico/modules/events/registration/templates/management/regform_reglist.html:69
 #: indico/modules/events/sessions/templates/management/session_list.html:90
-#: indico/modules/events/surveys/templates/management/survey.html:109
+#: indico/modules/events/surveys/templates/management/survey.html:111
 #: indico/modules/events/surveys/templates/management/survey_questionnaire.html:16
 msgid "Export"
 msgstr "Exporter"
@@ -6967,7 +6967,7 @@ msgstr "Interrompre le traitement à ce point si déclenché"
 
 #: indico/modules/events/abstracts/templates/management/_notification_tpl_list.html:40
 #: indico/modules/events/registration/templates/management/regform.html:23
-#: indico/modules/events/surveys/templates/management/survey.html:63
+#: indico/modules/events/surveys/templates/management/survey.html:65
 #: indico/modules/events/templates/admin/_reference_type_list.html:19
 #: indico/modules/vc/templates/manage_event.html:43
 msgid "Edit"
@@ -8713,12 +8713,12 @@ msgid "PDF (book of abstracts - sorted by board number)"
 msgstr "PDF (recueil des résumés - classés par numéro de panneau)"
 
 #: indico/modules/events/contributions/templates/management/contributions.html:117
-#: indico/modules/events/surveys/templates/management/survey.html:115
+#: indico/modules/events/surveys/templates/management/survey.html:117
 msgid "CSV"
 msgstr "CSV"
 
 #: indico/modules/events/contributions/templates/management/contributions.html:123
-#: indico/modules/events/surveys/templates/management/survey.html:121
+#: indico/modules/events/surveys/templates/management/survey.html:123
 msgid "XLSX (Excel)"
 msgstr "XLSX (Excel)"
 
@@ -9737,6 +9737,7 @@ msgstr "Envoyer les courriels"
 #: indico/modules/events/registration/forms.py:182
 #: indico/modules/events/registration/templates/management/regform_invite.html:7
 #: indico/modules/events/registration/templates/management/regform_reglist.html:110
+#: indico/modules/events/surveys/templates/management/survey.html:147
 #: indico/modules/groups/templates/_group_members.html:10
 #: indico/modules/users/forms.py:95
 msgid "Email"
@@ -9780,7 +9781,7 @@ msgid "Short URL"
 msgstr "URL court"
 
 #: indico/modules/events/management/templates/_settings.html:53
-#: indico/modules/events/surveys/templates/management/survey.html:15
+#: indico/modules/events/surveys/templates/management/survey.html:17
 #: indico/modules/events/templates/footer.html:12
 msgid "Copy link to clipboard"
 msgstr "Copier le lien dans le presse-papier"
@@ -11050,7 +11051,7 @@ msgstr "Paramètre de paiement globaux"
 #: indico/modules/events/payment/templates/management/payments.html:21
 #: indico/modules/events/registration/templates/management/regform.html:17
 #: indico/modules/events/surveys/templates/management/edit_survey.html:4
-#: indico/modules/events/surveys/templates/management/survey.html:53
+#: indico/modules/events/surveys/templates/management/survey.html:55
 msgid "General settings"
 msgstr "Configuration générale"
 
@@ -13963,70 +13964,70 @@ msgstr "Voulez-vous vraiment supprimer cet élément texte?"
 msgid "Manage \"%(title)s\""
 msgstr "Gérer \"%(title)s\""
 
-#: indico/modules/events/surveys/templates/management/survey.html:10
+#: indico/modules/events/surveys/templates/management/survey.html:12
 msgid "The survey is private"
 msgstr "Ce sondage est privé"
 
-#: indico/modules/events/surveys/templates/management/survey.html:20
+#: indico/modules/events/surveys/templates/management/survey.html:22
 #, python-format
 msgid ""
 "The survey is accessible only by people with this "
 "%(link_start)slink%(link_end)s"
 msgstr "Ce sondage n'est accessible qu'aux personnes ayant ce %(link_start)slien%(link_end)s"
 
-#: indico/modules/events/surveys/templates/management/survey.html:27
+#: indico/modules/events/surveys/templates/management/survey.html:29
 msgid "Send survey links"
 msgstr "Envoyer les liens du sondage"
 
-#: indico/modules/events/surveys/templates/management/survey.html:30
+#: indico/modules/events/surveys/templates/management/survey.html:32
 msgid "Send links"
 msgstr "Envoyer les liens"
 
-#: indico/modules/events/surveys/templates/management/survey.html:55
+#: indico/modules/events/surveys/templates/management/survey.html:57
 msgid "Edit settings for this survey."
 msgstr "Modifier les paramètres de ce sondage"
 
-#: indico/modules/events/surveys/templates/management/survey.html:60
+#: indico/modules/events/surveys/templates/management/survey.html:62
 msgid "Edit survey"
 msgstr "Modifier le sondage"
 
-#: indico/modules/events/surveys/templates/management/survey.html:74
+#: indico/modules/events/surveys/templates/management/survey.html:76
 msgid "Questionnaire"
 msgstr "Questionnaire"
 
-#: indico/modules/events/surveys/templates/management/survey.html:76
+#: indico/modules/events/surveys/templates/management/survey.html:78
 msgid "Add, remove or modify questions."
 msgstr "Ajouter, supprimer ou modifier les questions."
 
-#: indico/modules/events/surveys/templates/management/survey.html:88
+#: indico/modules/events/surveys/templates/management/survey.html:90
 msgid "Submissions"
 msgstr "Réponses"
 
-#: indico/modules/events/surveys/templates/management/survey.html:106
+#: indico/modules/events/surveys/templates/management/survey.html:108
 msgid "Results"
 msgstr "Résultats"
 
-#: indico/modules/events/surveys/templates/management/survey.html:128
+#: indico/modules/events/surveys/templates/management/survey.html:130
 msgid "Remove all selected submissions?"
 msgstr "Supprimer toutes les réponses sélectionnées?"
 
-#: indico/modules/events/surveys/templates/management/survey.html:129
+#: indico/modules/events/surveys/templates/management/survey.html:131
 msgid "Are you sure you want to remove all selected submissions?"
 msgstr "Voulez-vous vraiment supprimer toutes les réponses sélectionnées?"
 
-#: indico/modules/events/surveys/templates/management/survey.html:156
+#: indico/modules/events/surveys/templates/management/survey.html:161
 msgid "There are no submissions yet."
 msgstr "Il n'y a encore aucune réponse."
 
-#: indico/modules/events/surveys/templates/management/survey.html:175
+#: indico/modules/events/surveys/templates/management/survey.html:180
 msgid "Anonymous"
 msgstr "Anonyme"
 
-#: indico/modules/events/surveys/templates/management/survey.html:182
+#: indico/modules/events/surveys/templates/management/survey.html:194
 msgid "Remove submission?"
 msgstr "Supprimer la réponse?"
 
-#: indico/modules/events/surveys/templates/management/survey.html:183
+#: indico/modules/events/surveys/templates/management/survey.html:195
 msgid "Are you sure you want to remove this submission?"
 msgstr "Voulez-vous vraiment supprimer cette réponse?"
 
@@ -14107,23 +14108,23 @@ msgstr "Résultats pour \"%(title)s\""
 msgid "Answered:"
 msgstr "Répondu:"
 
-#: indico/modules/events/surveys/templates/management/survey_results.html:39
+#: indico/modules/events/surveys/templates/management/survey_results.html:44
 msgid "No answer has been recorded for this question."
 msgstr "Aucune réponse n'a été enregistrée pour cette question."
 
-#: indico/modules/events/surveys/templates/management/survey_results.html:61
+#: indico/modules/events/surveys/templates/management/survey_results.html:66
 msgid "Average:"
 msgstr "Moyenne:"
 
-#: indico/modules/events/surveys/templates/management/survey_results.html:64
+#: indico/modules/events/surveys/templates/management/survey_results.html:69
 msgid "Min:"
 msgstr "Minimum:"
 
-#: indico/modules/events/surveys/templates/management/survey_results.html:67
+#: indico/modules/events/surveys/templates/management/survey_results.html:72
 msgid "Max:"
 msgstr "Maximum:"
 
-#: indico/modules/events/surveys/templates/management/survey_results.html:70
+#: indico/modules/events/surveys/templates/management/survey_results.html:75
 msgid "Total:"
 msgstr "Total:"
 
@@ -14134,8 +14135,8 @@ msgstr "Réponse #%(id)s"
 
 #: indico/modules/events/surveys/templates/management/survey_submission.html:9
 #, python-format
-msgid "Submitter: %(submitter_name)s"
-msgstr "Déposant:  %(submitter_name)s"
+msgid "Submitter: %(submitter_name)s (%(submitter_email)s)"
+msgstr "Déposant: %(submitter_name)s (%(submitter_email)s)"
 
 #: indico/modules/events/surveys/templates/management/survey_submission.html:13
 msgid "Submitter: <em>Anonymous</em>"
