@@ -15,14 +15,14 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import buildFetchRoomsUrl from 'indico-url:rooms_new.available_rooms';
-import fetchMapDetailsUrl from 'indico-url:rooms_new.room_details';
-import fetchMapRoomsUrl from 'indico-url:rooms_new.map_rooms';
-import fetchMapAspectsUrl from 'indico-url:rooms_new.default_aspects';
-import fetchBuildingsUrl from 'indico-url:rooms_new.buildings';
-import favoriteRoomsUrl from 'indico-url:rooms_new.favorite_rooms';
-import equipmentTypesUrl from 'indico-url:rooms_new.equipment_types';
-import fetchTimelineDataUrl from 'indico-url:rooms_new.timeline';
+import buildFetchRoomsURL from 'indico-url:rooms_new.available_rooms';
+import fetchMapDetailsURL from 'indico-url:rooms_new.room_details';
+import fetchMapRoomsURL from 'indico-url:rooms_new.map_rooms';
+import fetchMapAspectsURL from 'indico-url:rooms_new.default_aspects';
+import fetchBuildingsURL from 'indico-url:rooms_new.buildings';
+import favoriteRoomsURL from 'indico-url:rooms_new.favorite_rooms';
+import equipmentTypesURL from 'indico-url:rooms_new.equipment_types';
+import fetchTimelineDataURL from 'indico-url:rooms_new.timeline';
 
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {preProcessParameters} from './util';
@@ -69,7 +69,7 @@ export function fetchEquipmentTypes() {
     return async (dispatch) => {
         let response;
         try {
-            response = await indicoAxios.get(equipmentTypesUrl());
+            response = await indicoAxios.get(equipmentTypesURL());
         } catch (error) {
             handleAxiosError(error);
             return;
@@ -85,7 +85,7 @@ async function _sendFavoriteRoomsRequest(method, id = null) {
     try {
         response = await indicoAxios.request({
             method,
-            url: favoriteRoomsUrl(id !== null ? {room_id: id} : {})
+            url: favoriteRoomsURL(id !== null ? {room_id: id} : {})
         });
     } catch (error) {
         handleAxiosError(error);
@@ -150,7 +150,7 @@ export function fetchRooms(namespace, clear = true) {
 
         let response;
         try {
-            response = await indicoAxios.get(buildFetchRoomsUrl(), {params});
+            response = await indicoAxios.get(buildFetchRoomsURL(), {params});
         } catch (error) {
             handleAxiosError(error);
             dispatch(fetchRoomsFailed(namespace));
@@ -186,7 +186,7 @@ export function fetchMapRooms(namespace) {
 
         let response;
         try {
-            response = await indicoAxios.get(fetchMapRoomsUrl(), {params});
+            response = await indicoAxios.get(fetchMapRoomsURL(), {params});
         } catch (error) {
             handleAxiosError(error);
             dispatch(fetchMapRoomsFailed(namespace));
@@ -221,7 +221,7 @@ export function fetchRoomDetails(id) {
 
         let response;
         try {
-            response = await indicoAxios.get(fetchMapDetailsUrl({room_id: id}));
+            response = await indicoAxios.get(fetchMapDetailsURL({room_id: id}));
         } catch (error) {
             handleAxiosError(error);
             dispatch(fetchRoomDetailsFailed());
@@ -261,7 +261,7 @@ export function fetchMapAspects() {
 
         let response;
         try {
-            response = await indicoAxios.get(fetchMapAspectsUrl());
+            response = await indicoAxios.get(fetchMapAspectsURL());
         } catch (error) {
             handleAxiosError(error);
             dispatch(fetchMapAspectsFailed());
@@ -294,7 +294,7 @@ export function fetchBuildings() {
 
         let response;
         try {
-            response = await indicoAxios.get(fetchBuildingsUrl());
+            response = await indicoAxios.get(fetchBuildingsURL());
         } catch (error) {
             dispatch(fetchBuildingsFailed());
             handleAxiosError(error);
@@ -334,7 +334,7 @@ export function fetchTimelineData() {
 
         let response;
         try {
-            response = await indicoAxios.get(fetchTimelineDataUrl(), {params});
+            response = await indicoAxios.get(fetchTimelineDataURL(), {params});
         } catch (error) {
             dispatch(fetchTimelineDataFailed());
             handleAxiosError(error);
