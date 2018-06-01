@@ -24,6 +24,7 @@ export const initialStateFactory = (namespace) => {
         text: null,
         capacity: null,
         onlyFavorites: false,
+        onlyMine: false,
         equipment: {}
     };
 

@@ -82,6 +82,9 @@ def search_for_rooms(filters, only_available=False):
         query = query.filter(subquery == len(filters['equipment']))
     if filters.get('favorite'):
         query = query.filter(favorite_room_table.c.user_id.isnot(None))
+    if filters.get('mine'):
+        # TODO: include acl/egroup-based room ownership
+        query = query.filter(Room.owner == session.user)
     query = _filter_coordinates(query, filters)
 
     if not only_available:

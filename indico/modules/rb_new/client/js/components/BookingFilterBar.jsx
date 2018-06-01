@@ -32,14 +32,18 @@ import timeRenderer from './filters/TimeRenderer';
 
 
 export default function FilterBar({
-    recurrence, dates, timeSlot, capacity, onlyFavorites, equipment, setFilterParameter, equipmentTypes
+    recurrence, dates, timeSlot, capacity, onlyFavorites, onlyMine, equipment, setFilterParameter, equipmentTypes,
+    hasOwnedRooms, hasFavoriteRooms
 }) {
     return (
         <RoomFilterBar capacity={capacity}
                        onlyFavorites={onlyFavorites}
+                       onlyMine={onlyMine}
                        equipment={equipment}
                        setFilterParameter={setFilterParameter}
-                       equipmentTypes={equipmentTypes}>
+                       equipmentTypes={equipmentTypes}
+                       hasOwnedRooms={hasOwnedRooms}
+                       hasFavoriteRooms={hasFavoriteRooms}>
             <FilterDropdown title={<Translate>Recurrence</Translate>}
                             form={(fieldValues, setParentField) => (
                                 <RecurrenceForm setParentField={setParentField} {...fieldValues} />
@@ -95,12 +99,18 @@ FilterBar.propTypes = {
     }).isRequired,
     capacity: propTypes.number,
     onlyFavorites: propTypes.bool,
+    onlyMine: propTypes.bool,
     equipment: equipmentType,
-    setFilterParameter: propTypes.func.isRequired
+    setFilterParameter: propTypes.func.isRequired,
+    hasOwnedRooms: propTypes.bool,
+    hasFavoriteRooms: propTypes.bool,
 };
 
 FilterBar.defaultProps = {
     capacity: null,
     onlyFavorites: null,
-    equipment: []
+    onlyMine: null,
+    equipment: [],
+    hasOwnedRooms: false,
+    hasFavoriteRooms: false,
 };

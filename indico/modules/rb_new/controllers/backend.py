@@ -38,6 +38,7 @@ search_room_args = {
     'capacity': fields.Int(),
     'equipment': fields.List(fields.Str()),
     'favorite': fields.Bool(),
+    'mine': fields.Bool(),
     'text': fields.Str(),
     'start_dt': fields.DateTime(),
     'end_dt': fields.DateTime(),
@@ -144,3 +145,10 @@ class RHRoomFavorites(RHRoomBookingBase):
     def _process_DELETE(self):
         session.user.favorite_rooms.discard(self.room)
         return '', 204
+
+
+class RHUserInfo(RHRoomBookingBase):
+    def _process(self):
+        # TODO: include acl/egroup-based room ownership
+        has_owned_rooms = Room.query.filter(Room.is_active, Room.owner == session.user).has_rows()
+        return jsonify(has_owned_rooms=has_owned_rooms)

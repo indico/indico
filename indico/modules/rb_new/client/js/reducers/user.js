@@ -24,6 +24,8 @@ export default function reducer(state = initialState, action) {
     switch (action.type) {
         case actions.SET_FAVORITE_ROOMS:
             return {...state, favoriteRooms: Object.assign({}, ...action.rooms.map((id) => ({[id]: true})))};
+        case actions.SET_USER_INFO:
+            return {...state, hasOwnedRooms: action.data.has_owned_rooms};
         case actions.ADD_FAVORITE_ROOM:
             return {...state, favoriteRooms: {...state.favoriteRooms, [action.id]: true}};
         case actions.DEL_FAVORITE_ROOM:

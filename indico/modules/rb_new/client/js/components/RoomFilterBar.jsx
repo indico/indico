@@ -16,7 +16,7 @@
 */
 
 import React from 'react';
-import {Button, Icon, Label} from 'semantic-ui-react';
+import {Button, Icon, Label, Popup} from 'semantic-ui-react';
 import PropTypes from 'prop-types';
 
 import {Translate} from 'indico/react/i18n';
@@ -54,7 +54,10 @@ const equipmentRenderer = ({equipment}) => {
 };
 
 export default function RoomFilterBar(
-    {capacity, onlyFavorites, children, equipment, setFilterParameter, equipmentTypes}
+    {
+        capacity, onlyFavorites, onlyMine, children, equipment, setFilterParameter, equipmentTypes,
+        hasOwnedRooms, hasFavoriteRooms
+    }
 ) {
     const equipmentFilter = !!equipmentTypes.length && (
         <FilterDropdown title={<Translate>Equipment</Translate>}
@@ -81,8 +84,14 @@ export default function RoomFilterBar(
                             initialValues={{capacity}}
                             renderValue={capacityRenderer} />
             {equipmentFilter}
-            <Button icon="star" primary={onlyFavorites}
-                    onClick={() => setFilterParameter('onlyFavorites', !onlyFavorites)} />
+            {(hasOwnedRooms || onlyMine) && (
+                <Popup trigger={<Button icon="user" primary={onlyMine}
+                                        onClick={() => setFilterParameter('onlyMine', !onlyMine)} />}
+                       content={Translate.string('Show only rooms I manage')} />
+            )}
+            <Popup trigger={<Button icon="star" primary={onlyFavorites} disabled={!onlyFavorites && !hasFavoriteRooms}
+                                    onClick={() => setFilterParameter('onlyFavorites', !onlyFavorites)} />}
+                   content={Translate.string('Show only my favorite rooms')} />
         </Button.Group>
     );
 }
@@ -94,6 +103,9 @@ RoomFilterBar.propTypes = {
     capacity: PropTypes.number,
     equipment: equipmentType,
     onlyFavorites: PropTypes.bool,
+    onlyMine: PropTypes.bool,
+    hasFavoriteRooms: PropTypes.bool,
+    hasOwnedRooms: PropTypes.bool,
     setFilterParameter: PropTypes.func.isRequired,
     children: PropTypes.node
 };
@@ -101,6 +113,9 @@ RoomFilterBar.propTypes = {
 RoomFilterBar.defaultProps = {
     capacity: null,
     onlyFavorites: false,
+    onlyMine: false,
+    hasFavoriteRooms: false,
+    hasOwnedRooms: false,
     children: null,
     equipment: [],
 };

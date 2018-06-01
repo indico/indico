@@ -17,7 +17,7 @@
 import {connect} from 'react-redux';
 
 import App from '../components/App';
-import {fetchBuildings, fetchEquipmentTypes, fetchFavoriteRooms, fetchMapAspects} from '../actions';
+import {fetchBuildings, fetchEquipmentTypes, fetchFavoriteRooms, fetchUserInfo, fetchMapAspects} from '../actions';
 
 
 const mapStateToProps = ({bookRoom: {filters: {recurrence: {type}}}}) => ({
@@ -26,6 +26,7 @@ const mapStateToProps = ({bookRoom: {filters: {recurrence: {type}}}}) => ({
 
 const mapDispatchToProps = (dispatch) => ({
     fetchInitialData: () => {
+        dispatch(fetchUserInfo());
         dispatch(fetchFavoriteRooms());
         dispatch(fetchEquipmentTypes());
         dispatch(fetchBuildings());

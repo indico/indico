@@ -43,6 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
             language: Indico.User.language,
             isAdmin: Indico.User.is_admin,
             favoriteRooms: {},
+            hasOwnedRooms: false,
         },
         staticData: {
             availableLanguages: Indico.Settings.Languages

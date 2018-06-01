@@ -21,7 +21,9 @@ import {setFilterParameter, fetchRooms, fetchMapRooms} from '../actions';
 export default (namespace, componentClass) => {
     const mapStateToProps = state => ({
         equipmentTypes: state.equipment.types,
-        ...state[namespace].filters
+        ...state[namespace].filters,
+        hasOwnedRooms: state.user.hasOwnedRooms,
+        hasFavoriteRooms: Object.values(state.user.favoriteRooms).some(fr => fr)
     });
 
     const mapDispatchToProps = dispatch => ({

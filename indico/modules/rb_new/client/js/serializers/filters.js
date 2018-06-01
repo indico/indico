@@ -18,6 +18,19 @@
 import {validator as v} from 'redux-router-querystring';
 
 
+function _boolStateField(name) {
+    return {
+        serialize: ({filters: {[name]: value}}) => value || null,
+        parse: (value, state) => {
+            if (!state.filters) {
+                state.filters = {};
+            }
+            state.filters[name] = value;
+        }
+    };
+}
+
+
 export const queryString = {
     recurrence: {
         validator: v.isIn(['single', 'daily', 'every']),
@@ -51,15 +64,12 @@ export const queryString = {
     favorite: {
         validator: v.isBoolean(),
         sanitizer: v.toBoolean(),
-        stateField: {
-            serialize: ({filters: {onlyFavorites}}) => onlyFavorites || null,
-            parse: (value, state) => {
-                if (!state.filters) {
-                    state.filters = {};
-                }
-                state.filters.onlyFavorites = value;
-            }
-        }
+        stateField: _boolStateField('onlyFavorites')
+    },
+    mine: {
+        validator: v.isBoolean(),
+        sanitizer: v.toBoolean(),
+        stateField: _boolStateField('onlyMine')
     },
     capacity: {
         validator: v.isInt({min: 1}),
@@ -158,6 +168,10 @@ export const ajax = {
     favorite: {
         onlyIf: ({onlyFavorites}) => onlyFavorites,
         serializer: ({onlyFavorites}) => onlyFavorites,
+    },
+    mine: {
+        onlyIf: ({onlyMine}) => onlyMine,
+        serializer: ({onlyMine}) => onlyMine,
     },
     equipment: ({equipment}) => Object.keys(equipment).filter(k => !!equipment[k]),
     building: ({building}) => building,

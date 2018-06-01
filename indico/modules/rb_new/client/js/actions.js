@@ -21,6 +21,7 @@ import fetchMapRoomsURL from 'indico-url:rooms_new.map_rooms';
 import fetchMapAspectsURL from 'indico-url:rooms_new.default_aspects';
 import fetchBuildingsURL from 'indico-url:rooms_new.buildings';
 import favoriteRoomsURL from 'indico-url:rooms_new.favorite_rooms';
+import fetchUserInfoURL from 'indico-url:rooms_new.user_info';
 import equipmentTypesURL from 'indico-url:rooms_new.equipment_types';
 import fetchTimelineDataURL from 'indico-url:rooms_new.timeline';
 
@@ -33,6 +34,7 @@ import {ajax as ajaxFilterRules} from './serializers/filters';
 export const SET_FAVORITE_ROOMS = 'SET_FAVORITE_ROOMS';
 export const ADD_FAVORITE_ROOM = 'ADD_FAVORITE_ROOM';
 export const DEL_FAVORITE_ROOM = 'DEL_FAVORITE_ROOM';
+export const SET_USER_INFO = 'SET_USER_INFO';
 // Filter
 export const SET_FILTER_PARAMETER = 'SET_FILTER_PARAMETER';
 // Rooms
@@ -119,6 +121,22 @@ export function delFavoriteRoom(id) {
         const response = await _sendFavoriteRoomsRequest('DELETE', id);
         if (!response) {
             dispatch({type: ADD_FAVORITE_ROOM, id});
+        }
+    };
+}
+
+export function fetchUserInfo() {
+    return async (dispatch) => {
+        let response;
+        try {
+            response = await indicoAxios.get(fetchUserInfoURL());
+        } catch (error) {
+            handleAxiosError(error);
+            return;
+        }
+
+        if (response) {
+            dispatch({type: SET_USER_INFO, data: response.data});
         }
     };
 }
