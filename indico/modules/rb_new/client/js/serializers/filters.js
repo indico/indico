@@ -82,8 +82,6 @@ export const queryString = {
         }
     },
     building: {
-        validator: v.isInt(),
-        sanitizer: v.toInt(),
         stateField: 'filters.building'
     },
     floor: {
