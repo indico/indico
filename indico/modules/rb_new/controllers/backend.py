@@ -30,7 +30,8 @@ from indico.modules.rb.models.reservations import RepeatFrequency
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb_new.schemas import (aspects_schema, map_rooms_schema, reservation_occurrences_schema,
                                            room_details_schema, rooms_schema)
-from indico.modules.rb_new.util import get_buildings, get_equipment_types, get_rooms_availability, search_for_rooms
+from indico.modules.rb_new.util import (get_buildings, get_equipment_types, get_rooms_availability, has_managed_rooms,
+                                        search_for_rooms)
 from indico.web.util import jsonify_data
 
 
@@ -149,6 +150,4 @@ class RHRoomFavorites(RHRoomBookingBase):
 
 class RHUserInfo(RHRoomBookingBase):
     def _process(self):
-        # TODO: include acl/egroup-based room ownership
-        has_owned_rooms = Room.query.filter(Room.is_active, Room.owner == session.user).has_rows()
-        return jsonify(has_owned_rooms=has_owned_rooms)
+        return jsonify(has_owned_rooms=has_managed_rooms(session.user))

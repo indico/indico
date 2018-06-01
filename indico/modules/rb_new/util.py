@@ -18,11 +18,13 @@ from __future__ import unicode_literals
 
 from collections import defaultdict, namedtuple
 from datetime import timedelta
-from itertools import groupby
+from itertools import chain
 
 from flask import session
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import contains_eager, raiseload
 
+from indico.core.auth import multipass
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.queries import escape_like
 from indico.modules.rb import rb_is_admin, rb_settings
@@ -30,8 +32,10 @@ from indico.modules.rb.models.equipment import EquipmentType, RoomEquipmentAssoc
 from indico.modules.rb.models.favorites import favorite_room_table
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import Reservation
+from indico.modules.rb.models.room_attributes import RoomAttributeAssociation
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb_new.schemas import rooms_schema
+from indico.util.caching import memoize_redis
 from indico.util.struct.iterables import group_list
 
 
@@ -83,8 +87,9 @@ def search_for_rooms(filters, only_available=False):
     if filters.get('favorite'):
         query = query.filter(favorite_room_table.c.user_id.isnot(None))
     if filters.get('mine'):
-        # TODO: include acl/egroup-based room ownership
-        query = query.filter(Room.owner == session.user)
+        ids = get_managed_room_ids(session.user)
+        if ids:
+            query = query.filter(Room.id.in_(ids))
     query = _filter_coordinates(query, filters)
 
     if not only_available:
@@ -201,3 +206,38 @@ def get_equipment_types():
              .filter(EquipmentType.rooms.any(Room.is_active))
              .order_by(EquipmentType.name))
     return [row.name for row in query]
+
+
+def _can_get_all_groups(user):
+    return all(multipass.identity_providers[x.provider].supports_get_identity_groups for x in user.identities)
+
+
+def _query_managed_rooms(user):
+    # We can get a list of all groups for the user
+    iterator = chain.from_iterable(multipass.identity_providers[x.provider].get_identity_groups(x.identifier)
+                                   for x in user.identities)
+    groups = {(g.provider.name, g.name) for g in iterator}
+    # XXX: refactor this once we have a proper ACL for rooms
+    if multipass.default_group_provider:
+        groups = {name for provider, name in groups if provider == multipass.default_group_provider.name}
+    else:
+        groups = {unicode(group.id) for group in user.local_groups}
+    attrs = [db.cast(x, JSONB) for x in groups]
+    is_manager = Room.attributes.any(db.cast(RoomAttributeAssociation.value, JSONB).in_(attrs))
+    return Room.query.filter(Room.is_active, db.or_(Room.owner == user, is_manager))
+
+
+@memoize_redis(900)
+def has_managed_rooms(user):
+    if _can_get_all_groups(user):
+        return _query_managed_rooms(user).has_rows()
+    else:
+        return Room.user_owns_rooms(user)
+
+
+@memoize_redis(900)
+def get_managed_room_ids(user):
+    if _can_get_all_groups(user):
+        return {id_ for id_, in _query_managed_rooms(user).with_entities(Room.id)}
+    else:
+        return {r.id for r in Room.get_owned_by(user)}
