@@ -20,13 +20,17 @@ import BookRoom from '../components/pages/BookRoom';
 import {
     fetchRooms,
     fetchMapRooms,
-    setFilterParameter
+    setFilterParameter,
+    updateRooms
 } from '../actions';
 
 
 const mapStateToProps = ({bookRoom}) => ({...bookRoom});
 
 const mapDispatchToProps = dispatch => ({
+    clearRoomList: () => {
+        dispatch(updateRooms('bookRoom', [], 0, true));
+    },
     setFilterParameter: (param, value) => {
         dispatch(setFilterParameter('bookRoom', param, value));
     },

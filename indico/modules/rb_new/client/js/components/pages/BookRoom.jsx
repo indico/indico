@@ -46,7 +46,8 @@ export default class BookRoom extends React.Component {
             isFetching: PropTypes.bool,
         }).isRequired,
         fetchRooms: PropTypes.func.isRequired,
-        timeline: PropTypes.object.isRequired
+        timeline: PropTypes.object.isRequired,
+        clearRoomList: PropTypes.func.isRequired
     };
 
     constructor(props) {
@@ -58,8 +59,9 @@ export default class BookRoom extends React.Component {
     }
 
     componentWillUnmount() {
-        const {setFilterParameter} = this.props;
+        const {setFilterParameter, clearRoomList} = this.props;
         setFilterParameter('text', null);
+        clearRoomList();
     }
 
     renderRoom = (room) => {
