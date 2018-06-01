@@ -161,6 +161,8 @@ def get_room_conflicts(room, start_dt, end_dt, repeat_frequency, repeat_interval
 def get_rooms_availability(rooms, start_dt, end_dt, repeat_frequency, repeat_interval, flexibility):
     period_days = (end_dt - start_dt).days
     availability = {}
+    candidates = ReservationOccurrence.create_series(start_dt, end_dt, (repeat_frequency, repeat_interval))
+    date_range = sorted(set(cand.start_dt.date() for cand in candidates))
 
     for room in rooms:
         booking_limit_days = room.booking_limit_days or rb_settings.get('booking_limit')
@@ -174,8 +176,6 @@ def get_rooms_availability(rooms, start_dt, end_dt, repeat_frequency, repeat_int
         conflicts, pre_conflicts = get_room_conflicts(room, start_dt.replace(tzinfo=None), end_dt.replace(tzinfo=None),
                                                       repeat_frequency, repeat_interval)
 
-        candidates = ReservationOccurrence.create_series(start_dt, end_dt, (repeat_frequency, repeat_interval))
-        date_range = sorted(set(cand.start_dt.date() for cand in candidates))
         pre_bookings = [occ for occ in occurrences if not occ.reservation.is_accepted]
         existing_bookings = [occ for occ in occurrences if occ.reservation.is_accepted]
         availability[room.id] = {'room_name': room.full_name,

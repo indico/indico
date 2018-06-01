@@ -66,11 +66,10 @@ export default class Timeline extends React.Component {
 
     isDateWithinTimelineRange = (date) => {
         const {dateRange} = this.props;
-        return dateRange.filter((dt) => _toMoment(dt).isSame(date)).length !== 0;
+        return dateRange.filter((dt) => _toMoment(dt).isSame(date, 'day')).length !== 0;
     };
 
     onSelect = (date) => {
-        const {activeDate} = this.state;
         const {dateRange} = this.props;
         const startDate = _toMoment(dateRange[0]);
         const endDate = _toMoment(dateRange[dateRange.length - 1]);
@@ -79,18 +78,6 @@ export default class Timeline extends React.Component {
             return;
         } else if (this.isDateWithinTimelineRange(date)) {
             this.setState({activeDate: date});
-        } else {
-            if (date.diff(activeDate, 'month') === 0) {
-                return;
-            }
-
-            for (let item of dateRange) {
-                item = _toMoment(item);
-                if (item.month() === date.month()) {
-                    this.setState({activeDate: item});
-                    return;
-                }
-            }
         }
     };
 
@@ -103,6 +90,13 @@ export default class Timeline extends React.Component {
         } else {
             return this.renderEmptyMessage();
         }
+    };
+
+    calendarDisabledDate = (date) => {
+        if (!date) {
+            return false;
+        }
+        return !this.isDateWithinTimelineRange(date);
     };
 
     renderTimeline = () => {
@@ -118,12 +112,7 @@ export default class Timeline extends React.Component {
             this.setState({activeDate: currentDate});
         }
 
-        const calendar = (
-            <Calendar disabledDate={(date) => (date ? !this.isDateWithinTimelineRange(date) : false)}
-                      onChange={this.onSelect}
-                      value={currentDate} />
-        );
-
+        const calendar = <Calendar disabledDate={this.calendarDisabledDate} onChange={this.onSelect} />;
         return (
             <>
                 <Segment styleName="legend" basic>
