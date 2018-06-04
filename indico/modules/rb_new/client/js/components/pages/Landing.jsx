@@ -22,12 +22,12 @@ import {Link} from 'react-router-dom';
 import Calendar from 'rc-calendar';
 import RangeCalendar from 'rc-calendar/lib/RangeCalendar';
 import DatePicker from 'rc-calendar/lib/Picker';
-import TimePicker from 'rc-time-picker';
 import {Button, Form, Grid, Select, Statistic} from 'semantic-ui-react';
 import {stateToQueryString} from 'redux-router-querystring';
 import {Translate} from 'indico/react/i18n';
 import {sanitizeRecurrence} from '../../util';
 import {queryString as qsRules} from '../../serializers/filters';
+import TimeRangePicker from '../TimeRangePicker';
 
 import './Landing.module.scss';
 
@@ -113,13 +113,6 @@ export default class Landing extends React.Component {
             recurrence, recurrence: {type, number, interval}
         } = this.state;
 
-        const timePickerProps = {
-            minuteStep: 5,
-            format: 'HH:mm',
-            allowEmpty: false,
-            showSecond: false
-        };
-
         const targetQS = stateToQueryString({
             filters: {
                 recurrence,
@@ -204,11 +197,9 @@ export default class Landing extends React.Component {
                                     </DatePicker>
                                 )}
                                 <Form.Group inline>
-                                    <TimePicker {...timePickerProps} value={startTime}
-                                                onChange={(value) => this.updateTimes(value, endTime)} />
-                                    -
-                                    <TimePicker {...timePickerProps} value={endTime}
-                                                onChange={(value) => this.updateTimes(startTime, value)} />
+                                    <TimeRangePicker startTime={startTime}
+                                                     endTime={endTime}
+                                                     onChange={(start, end) => this.updateTimes(start, end)} />
                                 </Form.Group>
                                 <Form.Group inline>
                                     <Form.Input icon="search" placeholder="bldg: 28" styleName="search-input"
