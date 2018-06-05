@@ -48,8 +48,8 @@ export default class TimeRangePicker extends React.Component {
     };
 
     static defaultProps = {
-        startTime: null,
-        endTime: null,
+        startTime: moment().startOf('hour').add(1, 'h'),
+        endTime: moment().startOf('hour').add(2, 'h')
     };
 
     constructor(props) {
@@ -74,27 +74,44 @@ export default class TimeRangePicker extends React.Component {
         });
         if (!found) {
             options.push({key: value, value, text: value});
+            return true;
         }
+        return false;
     }
 
     setStartTime(startTime, endTime) {
-        const start = toMoment(startTime, 'HH:mm');
+        const start = moment(startTime, ['HH:mm', 'HHmm', 'Hmm']);
         const end = toMoment(endTime, 'HH:mm');
-        this.setState({
-            startTime: start
-        });
-        const {onChange} = this.props;
-        onChange(start, end);
+        if (start.isValid()) {
+            const options = generateTimeOptions();
+            const added = this.addOptionIfNotExist(options, _serializeTime(moment(start)));
+            if (added) {
+                this.updateOptions(options, true);
+            }
+            this.setState({
+                startTime: start
+            });
+            const {onChange} = this.props;
+            onChange(start, end);
+        }
     }
+
 
     setEndTime(startTime, endTime) {
         const start = toMoment(startTime, 'HH:mm');
-        const end = toMoment(endTime, 'HH:mm');
-        this.setState({
-            endTime: end
-        });
-        const {onChange} = this.props;
-        onChange(start, end);
+        const end = moment(endTime, ['HH:mm', 'HHmm', 'Hmm']);
+        if (end.isValid()) {
+            const options = generateTimeOptions();
+            const added = this.addOptionIfNotExist(options, _serializeTime(moment(end)));
+            if (added) {
+                this.updateOptions(options, false);
+            }
+            this.setState({
+                endTime: end
+            });
+            const {onChange} = this.props;
+            onChange(start, end);
+        }
     }
 
     updateOptions(options, start) {
@@ -113,39 +130,27 @@ export default class TimeRangePicker extends React.Component {
         return [];
     };
 
-    itemAdded = (data, start) => {
-        const value = data['value'];
-        const options = generateTimeOptions();
-        const isValid = moment(value, 'HH:mm', true).isValid();
-        if (isValid) {
-            this.addOptionIfNotExist(options, value);
-        }
-        this.updateOptions(options, start);
-    };
-
     render() {
         const {startTime, endTime, startOptions, endOptions} = this.state;
         return (
             <div>
                 <Dropdown options={startOptions}
-                          onAddItem={(e, data) => this.itemAdded(data, true)}
                           search={(list, query) => this.searchTime(list, query)}
                           selection
                           allowAdditions
                           additionLabel=""
                           styleName="time-dropdown"
-                          defaultValue={_serializeTime(startTime)}
+                          value={_serializeTime(startTime)}
                           onChange={(_, {value}) => {
                               this.setStartTime(value, endTime);
                           }} />
                 <Dropdown options={endOptions}
-                          onAddItem={(e, data) => this.itemAdded(data, false)}
                           search={(list, query) => this.searchTime(list, query, false)}
                           selection
                           allowAdditions
                           additionLabel=""
                           styleName="time-dropdown"
-                          defaultValue={_serializeTime(endTime)}
+                          value={_serializeTime(endTime)}
                           onChange={(_, {value}) => {
                               this.setEndTime(startTime, value);
                           }} />
