@@ -56,12 +56,25 @@ export default class TimeRangePicker extends React.Component {
         super(props);
 
         const {startTime, endTime} = this.props;
+        const startOptions = generateTimeOptions();
+        const endOptions = generateTimeOptions();
+        this.addOptionIfNotExist(startOptions, _serializeTime(moment(startTime)));
+        this.addOptionIfNotExist(endOptions, _serializeTime(moment(endTime)));
         this.state = {
             startTime,
             endTime,
-            startOptions: generateTimeOptions(),
-            endOptions: generateTimeOptions()
+            startOptions,
+            endOptions
         };
+    }
+
+    addOptionIfNotExist(options, value) {
+        const found = options.some((el) => {
+            return el.value === value;
+        });
+        if (!found) {
+            options.push({key: value, value, text: value});
+        }
     }
 
     setStartTime(startTime, endTime) {
@@ -102,16 +115,10 @@ export default class TimeRangePicker extends React.Component {
 
     itemAdded = (data, start) => {
         const value = data['value'];
-        const result = {key: value, value, text: value};
         const options = generateTimeOptions();
-        const found = options.some((el) => {
-            return el.value === value;
-        });
-        if (!found) {
-            const isValid = moment(value, 'HH:mm', true).isValid();
-            if (isValid) {
-                options.push(result);
-            }
+        const isValid = moment(value, 'HH:mm', true).isValid();
+        if (isValid) {
+            this.addOptionIfNotExist(options, value);
         }
         this.updateOptions(options, start);
     };
