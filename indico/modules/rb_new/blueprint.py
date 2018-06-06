@@ -40,3 +40,5 @@ _bp.add_url_rule('/api/map/aspects', 'default_aspects', backend.RHAspects)
 _bp.add_url_rule('/api/buildings', 'buildings', backend.RHBuildings)
 _bp.add_url_rule('/api/timeline', 'timeline', backend.RHTimeline)
 _bp.add_url_rule('/api/equipment', 'equipment_types', backend.RHEquipmentTypes)
+_bp.add_url_rule('/api/booking/create', 'create_booking', backend.RHCreateBooking,
+                 methods=('POST',))

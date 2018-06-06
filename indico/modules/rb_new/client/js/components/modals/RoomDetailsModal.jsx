@@ -17,9 +17,10 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Button, Grid, Modal, Image, Header, Message, Icon, List, Popup} from 'semantic-ui-react';
+import {Button, Grid, Modal, Header, Message, List} from 'semantic-ui-react';
 
 import {Translate, Param} from 'indico/react/i18n';
+import {RoomBasicDetails} from '../RoomBasicDetails';
 
 import './RoomDetailsModal.module.scss';
 
@@ -46,7 +47,7 @@ export default class RoomDetailsModal extends React.Component {
         }
         const room = rooms[currentViewID];
         return (
-            <Modal open onClose={this.handleCloseModal}>
+            <Modal open onClose={this.handleCloseModal} closeIcon>
                 <Modal.Header styleName="room-details-header">
                     <Translate>Room Details</Translate>
                     <span>
@@ -84,58 +85,6 @@ function RoomDetails({room}) {
 }
 
 RoomDetails.propTypes = {
-    room: PropTypes.object.isRequired,
-};
-
-export function RoomBasicDetails({room}) {
-    return (
-        <Grid columns={2}>
-            <Grid.Column textAlign="center">
-                <Image src={room.large_photo_url} />
-                <RoomEquipmentBox room={room} />
-            </Grid.Column>
-            <Grid.Column>
-                <Header>
-                    {room.full_name}
-                    <Header.Subheader>{room.division}</Header.Subheader>
-                </Header>
-                <div>{room.location_name}</div>
-                <Translate>Owner</Translate>: {room.owner_name}
-                <div>
-                    <Icon name="location arrow" /> {room.latitude}, {room.longitude}
-                </div>
-                {room.telephone && <div><Icon name="phone" /> {room.telephone}</div>}
-                {room.capacity && <div>{room.capacity} <Translate>seats</Translate></div>}
-                {room.surface_area && <div>{room.surface_area}m²</div>}
-            </Grid.Column>
-        </Grid>
-    );
-}
-
-RoomBasicDetails.propTypes = {
-    room: PropTypes.object.isRequired,
-};
-
-function RoomEquipmentBox({room}) {
-    return (
-        <div styleName="equipment-box">
-            {room.has_vc && (
-                <Popup trigger={<Icon name="video camera" color="teal" size="large" />}
-                       content={Translate.string('Videoconference available')} />
-            )}
-            {room.has_webcast_recording && (
-                <Popup trigger={<Icon name="podcast" color="teal" size="large" />}
-                       content={Translate.string('Webcast recording available')} />
-            )}
-            {room.has_projector && (
-                <Popup trigger={<Icon name="film" color="teal" size="large" />}
-                       content={Translate.string('Projector available')} />
-            )}
-        </div>
-    );
-}
-
-RoomEquipmentBox.propTypes = {
     room: PropTypes.object.isRequired,
 };
 

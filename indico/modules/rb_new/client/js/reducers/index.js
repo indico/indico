@@ -22,6 +22,7 @@ import equipmentReducer from './equipment';
 import buildingsReducer from './buildings';
 import mapAspectsReducer from './mapAspects';
 import roomDetailsReducer from './roomDetails';
+import bookRoomFormReducer from './bookRoomForm';
 
 
 export {
@@ -32,4 +33,5 @@ export {
     buildingsReducer,
     mapAspectsReducer,
     roomDetailsReducer,
+    bookRoomFormReducer
 };

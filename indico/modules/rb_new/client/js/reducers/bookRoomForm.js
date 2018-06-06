@@ -1,0 +1,54 @@
+/* This file is part of Indico.
+ * Copyright (C) 2002 - 2018 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
+import _ from 'lodash';
+import {actionTypes as reduxFormActions} from 'redux-form';
+import {BOOKING_ONGOING, BOOKING_CONFIRMED, BOOKING_FAILED, RESET_BOOKING_STATE} from '../actions';
+
+
+const initialState = {
+    bookingState: {
+        ongoing: false,
+        success: null
+    },
+    fields: {
+        user: {
+            disabled: true
+        }
+    }
+};
+
+export default function reducer(state = initialState, action) {
+    // if usage !== 'someone' (=== 'myself'), then we disable the user input
+    if (action.type === reduxFormActions.CHANGE && action.meta.field === 'usage') {
+        return _.set(_.cloneDeep(state), 'fields.user.disabled', action.payload !== 'someone');
+    }
+
+    const {type, message, isPrebooking} = action;
+
+    switch (type) {
+        case BOOKING_ONGOING:
+            return {...state, bookingState: {ongoing: true}};
+        case BOOKING_CONFIRMED:
+            return {...state, bookingState: {ongoing: false, success: true, message: null, isPrebooking}};
+        case BOOKING_FAILED:
+            return {...state, bookingState: {ongoing: false, success: false, message}};
+        case RESET_BOOKING_STATE:
+            return {...initialState};
+    }
+    return state;
+}

@@ -16,6 +16,7 @@
  */
 
 import {validator as v} from 'redux-router-querystring';
+import {recurrenceIntervalSerializer, recurrenceFrequencySerializer, filterDTHandler} from './common';
 
 
 function _boolStateField(name) {
@@ -122,48 +123,9 @@ export const queryString = {
     }
 };
 
-const _dtHandler = (prefix) => {
-    return function({dates, timeSlot}) {
-        const timePart = timeSlot[`${prefix}Time`];
-        let datePart = dates[`${prefix}Date`];
-
-        // single bookings have a 'null' endDate
-        if (datePart === null && prefix === 'end') {
-            datePart = dates['startDate'];
-        }
-
-        return moment(`${datePart} ${timePart}`, 'YYYY-MM-DD HH:mm').format('YYYY-MM-DD HH:mm');
-    };
-};
-
 export const ajax = {
-    repeat_frequency: {
-        onlyIf: (data) => 'recurrence' in data,
-        serializer: ({recurrence: {type, interval}}) => {
-            if (type === 'single') {
-                return 'NEVER';
-            } else if (type === 'daily') {
-                return 'DAY';
-            } else {
-                return {
-                    week: 'WEEK',
-                    month: 'MONTH'
-                }[interval];
-            }
-        }
-    },
-    repeat_interval: {
-        onlyIf: (data) => 'recurrence' in data,
-        serializer: ({recurrence: {type, number}}) => {
-            if (type === 'single') {
-                return 0;
-            } else if (type === 'daily') {
-                return 1;
-            } else {
-                return number;
-            }
-        }
-    },
+    repeat_frequency: recurrenceFrequencySerializer,
+    repeat_interval: recurrenceIntervalSerializer,
     capacity: ({capacity}) => capacity,
     favorite: {
         onlyIf: ({onlyFavorites}) => onlyFavorites,
@@ -179,11 +141,11 @@ export const ajax = {
     text: ({text}) => text,
     start_dt: {
         onlyIf: (data) => data.dates && data.dates.startDate,
-        serializer: _dtHandler('start')
+        serializer: filterDTHandler('start')
     },
     end_dt: {
         onlyIf: (data) => data.dates,
-        serializer: _dtHandler('end')
+        serializer: filterDTHandler('end')
     },
     sw_lat: {
         onlyIf: (data) => data.bounds && 'SW' in data.bounds,

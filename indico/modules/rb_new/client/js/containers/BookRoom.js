@@ -21,11 +21,14 @@ import {
     fetchRooms,
     fetchMapRooms,
     setFilterParameter,
-    updateRooms
+    updateRooms,
+    fetchRoomDetails,
+    setRoomDetailsModal,
+    resetBookingState
 } from '../actions';
 
 
-const mapStateToProps = ({bookRoom}) => ({...bookRoom});
+const mapStateToProps = ({bookRoom, roomDetails}) => ({...bookRoom, roomDetails});
 
 const mapDispatchToProps = dispatch => ({
     clearRoomList: () => {
@@ -37,6 +40,15 @@ const mapDispatchToProps = dispatch => ({
     fetchRooms: (clear = true) => {
         dispatch(fetchRooms('bookRoom', clear));
         dispatch(fetchMapRooms('bookRoom'));
+    },
+    fetchRoomDetails: (id) => {
+        dispatch(fetchRoomDetails(id));
+    },
+    setRoomDetailsModal: (id) => {
+        dispatch(setRoomDetailsModal(id));
+    },
+    resetBookingState: () => {
+        dispatch(resetBookingState());
     }
 });
 

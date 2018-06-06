@@ -31,6 +31,7 @@ import {
     buildingsReducer,
     mapAspectsReducer,
     roomDetailsReducer,
+    bookRoomFormReducer
 } from './reducers';
 import {initialStateFactory} from './reducers/roomBooking/filters';
 import {SET_FILTER_PARAMETER} from './actions';
@@ -91,7 +92,9 @@ export default function createRBStore(data) {
         buildings: buildingsReducer,
         mapAspects: mapAspectsReducer,
         roomDetails: roomDetailsReducer,
-        form: reduxFormReducer
+        form: reduxFormReducer.plugin({
+            roomModal: bookRoomFormReducer
+        })
     }, Object.assign(initialData, data), [
         routerMiddleware(history),
         queryStringMiddleware(history, routeConfig)

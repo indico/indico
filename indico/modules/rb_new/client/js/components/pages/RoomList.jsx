@@ -73,7 +73,7 @@ export default class RoomList extends React.Component {
         return (
             <Room key={room.id} room={room} isFavorite={isFavorite}>
                 <Slot name="actions">
-                    <Button primary icon="edit" circular onClick={() => this.handleOpenModal(room.id)} />
+                    <Button primary icon="search" circular onClick={() => this.handleOpenModal(room.id)} />
                     <Button icon="star" color={isFavorite ? 'yellow' : 'teal'} circular
                             onClick={() => this.toggleFavoriteRoom(room)} />
                 </Slot>

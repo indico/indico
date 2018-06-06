@@ -22,19 +22,19 @@ import {Form, Label} from 'semantic-ui-react';
 
 export function ReduxFormField(
     {
-        input, label, placeholder, required, children,
-        meta: {touched, invalid, error, disabled, submitting},
+        input, label, placeholder, required, children, disabled,
+        meta: {touched, invalid, error, disabled: metaDisabled, submitting},
         as: Component,
         ...props
     }
 ) {
     return (
         <Form.Field required={required} error={touched && invalid}>
-            {label && <label>{label}</label>}
             <Component {...input}
                        {...props}
+                       label={label}
                        placeholder={placeholder}
-                       disabled={disabled || submitting} />
+                       disabled={disabled || metaDisabled || submitting} />
             {touched && error && <Label basic color="red" pointing="above" content={error} />}
             {children}
         </Form.Field>
@@ -42,6 +42,7 @@ export function ReduxFormField(
 }
 
 ReduxFormField.propTypes = {
+    disabled: PropTypes.bool,
     input: PropTypes.object.isRequired,
     required: PropTypes.bool,
     label: PropTypes.string,
@@ -52,8 +53,27 @@ ReduxFormField.propTypes = {
 };
 
 ReduxFormField.defaultProps = {
+    disabled: false,
     required: false,
     placeholder: null,
     label: null,
     children: null,
+};
+
+export function ReduxRadioField({input, input: {value}, radioValue, ...props}) {
+    return (
+        <ReduxFormField input={input}
+                        {...props}
+                        checked={radioValue === value}
+                        onChange={(__, {checked}) => {
+                            if (checked) {
+                                input.onChange(radioValue);
+                            }
+                        }} />
+    );
+}
+
+ReduxRadioField.propTypes = {
+    input: PropTypes.object.isRequired,
+    radioValue: PropTypes.string.isRequired
 };

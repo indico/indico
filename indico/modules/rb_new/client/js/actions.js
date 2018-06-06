@@ -24,10 +24,12 @@ import favoriteRoomsURL from 'indico-url:rooms_new.favorite_rooms';
 import fetchUserInfoURL from 'indico-url:rooms_new.user_info';
 import equipmentTypesURL from 'indico-url:rooms_new.equipment_types';
 import fetchTimelineDataURL from 'indico-url:rooms_new.timeline';
+import createBookingURL from 'indico-url:rooms_new.create_booking';
 
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {preProcessParameters} from './util';
 import {ajax as ajaxFilterRules} from './serializers/filters';
+import {ajax as ajaxBookingRules} from './serializers/bookings';
 
 
 // User
@@ -65,7 +67,11 @@ export const UPDATE_BUILDINGS = 'UPDATE_BUILDINGS';
 export const FETCH_TIMELINE_DATA_STARTED = 'FETCH_TIMELINE_DATA_STARTED';
 export const FETCH_TIMELINE_DATA_FAILED = 'FETCH_TIMELINE_DATA_FAILED';
 export const UPDATE_TIMELINE_DATA = 'UPDATE_TIMELINE_DATA';
-
+// Bookings
+export const BOOKING_ONGOING = 'BOOKING_ONGOING';
+export const BOOKING_CONFIRMED = 'BOOKING_CONFIRMED';
+export const BOOKING_FAILED = 'BOOKING_FAILED';
+export const RESET_BOOKING_STATE = 'RESET_BOOKING_STATE';
 
 export function fetchEquipmentTypes() {
     return async (dispatch) => {
@@ -323,7 +329,6 @@ export function fetchBuildings() {
     };
 }
 
-
 export function fetchTimelineDataStarted() {
     return {type: FETCH_TIMELINE_DATA_STARTED};
 }
@@ -361,4 +366,29 @@ export function fetchTimelineData() {
 
         dispatch(updateTimelineData(response.data));
     };
+}
+
+export function createBooking(args) {
+    return async (dispatch) => {
+        let response;
+        const params = preProcessParameters(args, ajaxBookingRules);
+        dispatch({type: BOOKING_ONGOING});
+
+        try {
+            response = await indicoAxios.post(createBookingURL(), params);
+        } catch (error) {
+            handleAxiosError(error);
+            return;
+        }
+        const {success, msg, is_prebooking: isPrebooking} = response.data;
+        if (success) {
+            dispatch({type: BOOKING_CONFIRMED, isPrebooking});
+        } else {
+            dispatch({type: BOOKING_FAILED, message: msg});
+        }
+    };
+}
+
+export function resetBookingState() {
+    return {type: RESET_BOOKING_STATE};
 }

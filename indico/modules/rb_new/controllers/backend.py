@@ -16,22 +16,26 @@
 
 from __future__ import unicode_literals
 
+from datetime import datetime, time
 from flask import jsonify, request, session
 from marshmallow_enum import EnumField
-from webargs import fields
+from webargs import fields, validate
 from webargs.flaskparser import use_args
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.queries import with_total_rows
-from indico.modules.rb import Location
+from indico.core.errors import NoReportError
+from indico.modules.rb import Location, rb_settings
 from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.models.favorites import favorite_room_table
-from indico.modules.rb.models.reservations import RepeatFrequency
+from indico.modules.rb.models.reservations import RepeatFrequency, Reservation
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb_new.schemas import (aspects_schema, map_rooms_schema, reservation_occurrences_schema,
                                            room_details_schema, rooms_schema)
 from indico.modules.rb_new.util import (get_buildings, get_equipment_types, get_rooms_availability, has_managed_rooms,
                                         search_for_rooms)
+from indico.modules.users.models.users import User
+from indico.util.i18n import _
 from indico.web.util import jsonify_data
 
 
@@ -151,3 +155,43 @@ class RHRoomFavorites(RHRoomBookingBase):
 class RHUserInfo(RHRoomBookingBase):
     def _process(self):
         return jsonify(has_owned_rooms=has_managed_rooms(session.user))
+
+
+class RHCreateBooking(RHRoomBookingBase):
+    def _validate_room_booking_limit(self, start_dt, end_dt, booking_limit_days):
+        day_start_dt = datetime.combine(start_dt.date(), time())
+        day_end_dt = datetime.combine(end_dt.date(), time(23, 59))
+        selected_period_days = (day_end_dt - day_start_dt).days
+        return selected_period_days <= booking_limit_days
+
+    @use_args({
+        'start_dt': fields.DateTime(required=True),
+        'end_dt': fields.DateTime(required=True),
+        'repeat_frequency': EnumField(RepeatFrequency, required=True),
+        'repeat_interval': fields.Int(missing=0),
+        'room_id': fields.Int(required=True),
+        'user_id': fields.Int(),
+        'booking_reason': fields.String(validate=validate.Length(min=3)),
+        'is_prebooking': fields.Bool(missing=False)
+    })
+    def _process(self, args):
+        room = Room.get_one(args.pop('room_id'))
+        user_id = args.pop('user_id', None)
+        booked_for = User.get_one(user_id) if user_id else session.user
+        is_prebooking = args.pop('is_prebooking')
+
+        # Check that the booking is not longer than allowed
+        booking_limit_days = room.booking_limit_days or rb_settings.get('booking_limit')
+        if not self._validate_room_booking_limit(args['start_dt'], args['end_dt'], booking_limit_days):
+            msg = (_('Bookings for the room "{}" may not be longer than {} days')
+                   .format(room.name, booking_limit_days))
+            return jsonify(success=False, msg=msg)
+
+        try:
+            Reservation.create_from_data(room, dict(args, booked_for_user=booked_for), session.user,
+                                         prebook=is_prebooking)
+            db.session.flush()
+        except NoReportError as e:
+            db.session.rollback()
+            return jsonify(success=False, msg=unicode(e))
+        return jsonify(success=True, is_prebooking=is_prebooking)
