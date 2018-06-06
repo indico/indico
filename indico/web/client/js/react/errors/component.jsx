@@ -19,12 +19,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Button, Form, Icon, Message, Modal, TextArea} from 'semantic-ui-react';
-import {Field, SubmissionError} from 'redux-form';
+import {Field} from 'redux-form';
 import reportErrorURL from 'indico-url:core.report_error_api';
 
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
-import {fieldRequired, ReduxFormField} from './util';
+import {createSubmissionError, fieldRequired, ReduxFormField} from './util';
 
 
 export default class ErrorDialog extends React.Component {
@@ -73,7 +73,7 @@ export default class ErrorDialog extends React.Component {
                 email: email || undefined
             });
         } catch (error) {
-            throw new SubmissionError({_error: Translate.string('Submitting your error report failed')});
+            throw createSubmissionError(error, Translate.string('Submitting your error report failed'));
         }
     };
 

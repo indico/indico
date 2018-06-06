@@ -16,10 +16,10 @@
 
 from __future__ import unicode_literals
 
-from flask import current_app, request, session
+from flask import current_app, jsonify, request, session
 from itsdangerous import BadData
 from sqlalchemy.exc import DatabaseError
-from werkzeug.exceptions import BadRequestKeyError, Forbidden, HTTPException
+from werkzeug.exceptions import BadRequestKeyError, Forbidden, HTTPException, UnprocessableEntity
 
 from indico.core.errors import IndicoError, get_error_description
 from indico.core.logger import Logger, sentry_log_exception
@@ -40,6 +40,19 @@ def handle_forbidden(exc):
     if session.user is None and not request.is_xhr and request.blueprint != 'auth':
         return redirect_to_login(reason=_('Please log in to access this page.'))
     return render_error(exc, _('Access Denied'), get_error_description(exc), exc.code)
+
+
+@errors_bp.app_errorhandler(UnprocessableEntity)
+def handle_unprocessableentity(exc):
+    data = getattr(exc, 'data', None)
+    if data and 'messages' in data and (request.is_xhr or request.is_json):
+        # this error came from a webargs parsing failure
+        response = jsonify(webargs_errors=data['messages'])
+        response.status_code = exc.code
+        return response
+    if exc.response:
+        return exc
+    return render_error(exc, exc.name, get_error_description(exc), exc.code)
 
 
 @errors_bp.app_errorhandler(BadRequestKeyError)

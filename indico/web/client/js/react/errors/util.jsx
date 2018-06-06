@@ -17,6 +17,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
+import {SubmissionError} from 'redux-form';
 import {Form, Label} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
@@ -65,4 +66,14 @@ ReduxFormField.defaultProps = {
 
 export function fieldRequired(value) {
     return value ? undefined : Translate.string('This field is required.');
+}
+
+
+export function createSubmissionError(error, defaultMessage = null) {
+    const webargsErrors = error.response && error.response.data && error.response.data.webargs_errors;
+    if (webargsErrors && error.response.status === 422) {
+        return new SubmissionError(webargsErrors);
+    } else {
+        return new SubmissionError({_error: defaultMessage || error.message});
+    }
 }
