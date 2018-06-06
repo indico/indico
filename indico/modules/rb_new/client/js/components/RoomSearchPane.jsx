@@ -17,7 +17,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Card} from 'semantic-ui-react';
+import {Card, Sticky} from 'semantic-ui-react';
 import LazyScroll from 'redux-lazy-scroll';
 
 import {Param, Plural, PluralTranslate, Singular} from 'indico/react/i18n';
@@ -38,6 +38,11 @@ export default class RoomSearchPane extends React.Component {
         renderRoom: PropTypes.func.isRequired
     };
 
+    constructor(props) {
+        super(props);
+        this.contextRef = React.createRef();
+    }
+
     loadMore = () => {
         const {fetchRooms} = this.props;
         fetchRooms(false);
@@ -52,9 +57,11 @@ export default class RoomSearchPane extends React.Component {
         } = this.props;
 
         return (
-            <div className="ui" styleName="room-list">
-                {filterBar}
-                {searchBar}
+            <div className="ui" styleName="room-list" ref={this.contextRef}>
+                <Sticky context={this.contextRef.current} className="sticky-filters">
+                    {filterBar}
+                    {searchBar}
+                </Sticky>
                 <div styleName="results-count">
                     <PluralTranslate count={total}>
                         <Singular>

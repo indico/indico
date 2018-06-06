@@ -17,7 +17,7 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
-import {Grid, Icon, Message} from 'semantic-ui-react';
+import {Grid, Icon, Message, Sticky} from 'semantic-ui-react';
 import _ from 'lodash';
 
 import {Slot, toClasses} from 'indico/react/util';
@@ -52,7 +52,6 @@ export default class BookRoom extends React.Component {
 
     constructor(props) {
         super(props);
-
         this.state = {
             view: 'book'
         };
@@ -83,7 +82,7 @@ export default class BookRoom extends React.Component {
     };
 
     renderMainContent = () => {
-        const {view} = this.state;
+        const {view, timelineRef} = this.state;
         const {rooms, fetchRooms} = this.props;
         const filterBar = <FilterBar />;
         const searchBar = <SearchBar onConfirm={fetchRooms} onTextChange={fetchRooms} />;
@@ -98,11 +97,13 @@ export default class BookRoom extends React.Component {
             );
         } else if (view === 'timeline') {
             return (
-                <>
-                    {filterBar}
-                    {searchBar}
+                <div ref={(ref) => this.handleContextRef(ref, 'timelineRef')}>
+                    <Sticky context={timelineRef} className="sticky-filters">
+                        {filterBar}
+                        {searchBar}
+                    </Sticky>
                     <Timeline minHour={6} maxHour={22} />
-                </>
+                </div>
             );
         }
     };
@@ -116,8 +117,18 @@ export default class BookRoom extends React.Component {
         }
     };
 
+    handleContextRef = (ref, kind) => {
+        if (kind in this.state) {
+            const {[kind]: context} = this.state;
+            if (context !== null) {
+                return;
+            }
+        }
+        this.setState({[kind]: ref});
+    };
+
     render() {
-        const {view} = this.state;
+        const {view, switcherRef} = this.state;
         const {timeline: {availability}} = this.props;
         const timelineDataAvailable = !_.isEmpty(availability);
         const hasConflicts = Object.values(availability).some((data) => {
@@ -130,17 +141,21 @@ export default class BookRoom extends React.Component {
                     {this.renderMainContent()}
                 </Grid.Column>
                 <Grid.Column width={1} styleName="view-icons">
-                    <span>
-                        <Icon size="big" className={toClasses({active: view === 'book'})}
-                              name="list" onClick={() => this.setState({view: 'book'})} />
-                        <Icon.Group size="big" className={toClasses({active: view === 'timeline', disabled: !timelineDataAvailable})}
-                                    onClick={this.switchToTimeline}>
-                            <Icon name="calendar outline" disabled={!timelineDataAvailable} />
-                            {hasConflicts && (
-                                <Icon name="exclamation triangle" color="red" corner />
-                            )}
-                        </Icon.Group>
-                    </span>
+                    <div ref={(ref) => this.handleContextRef(ref, 'switcherRef')} styleName="view-icons-context">
+                        <Sticky context={switcherRef} offset={30}>
+                            <span>
+                                <Icon size="big" className={toClasses({active: view === 'book'})}
+                                      name="list" onClick={() => this.setState({view: 'book', timelineRef: null})} />
+                                <Icon.Group size="big" className={toClasses({active: view === 'timeline', disabled: !timelineDataAvailable})}
+                                            onClick={this.switchToTimeline}>
+                                    <Icon name="calendar outline" disabled={!timelineDataAvailable} />
+                                    {hasConflicts && (
+                                        <Icon name="exclamation triangle" color="red" corner />
+                                    )}
+                                </Icon.Group>
+                            </span>
+                        </Sticky>
+                    </div>
                 </Grid.Column>
                 <Grid.Column width={5}>
                     <MapController />

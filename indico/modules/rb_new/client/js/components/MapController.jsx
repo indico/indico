@@ -18,7 +18,7 @@
 import _ from 'lodash';
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Button, Checkbox, Dimmer, Dropdown, Loader, Popup} from 'semantic-ui-react';
+import {Button, Checkbox, Dimmer, Dropdown, Loader, Popup, Sticky} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
 
 import {getAspectBounds, getMapBounds, getRoomListBounds, checkRoomsInBounds} from '../util';
@@ -55,6 +55,7 @@ export default class MapController extends React.Component {
     constructor(props) {
         super(props);
         this.mapRef = React.createRef();
+        this.contextRef = React.createRef();
 
         this.state = {
             loading: true,
@@ -163,23 +164,27 @@ export default class MapController extends React.Component {
         );
 
         return (
-            <Dimmer.Dimmable>
-                <Dimmer active={loading} inverted styleName="map-dimmer">
-                    <Loader />
-                </Dimmer>
-                {!!aspectBounds && (
-                    <RoomBookingMap mapRef={this.mapRef}
-                                    bounds={aspectBounds}
-                                    aspects={aspects}
-                                    rooms={rooms}
-                                    onLoad={this.onMapLoad}
-                                    onMove={this.onMove}>
-                        {searchControl}
-                        {aspectsControl}
-                        {showAllControl}
-                    </RoomBookingMap>
-                )}
-            </Dimmer.Dimmable>
+            <div styleName="map-context" ref={this.contextRef}>
+                <Sticky context={this.contextRef.current} offset={30}>
+                    <Dimmer.Dimmable>
+                        <Dimmer inverted active={loading} styleName="map-dimmer">
+                            <Loader />
+                        </Dimmer>
+                        {!!aspectBounds && (
+                            <RoomBookingMap mapRef={this.mapRef}
+                                            bounds={aspectBounds}
+                                            aspects={aspects}
+                                            rooms={rooms}
+                                            onLoad={this.onMapLoad}
+                                            onMove={this.onMove}>
+                                {searchControl}
+                                {aspectsControl}
+                                {showAllControl}
+                            </RoomBookingMap>
+                        )}
+                    </Dimmer.Dimmable>
+                </Sticky>
+            </div>
         );
     }
 }
