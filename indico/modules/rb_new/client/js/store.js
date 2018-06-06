@@ -82,7 +82,7 @@ export const history = createHistory({
 });
 
 export default function createRBStore(data) {
-    return createReduxStore({
+    return createReduxStore('rb-new', {
         user: userReducer,
         bookRoom: bookRoomReducer,
         roomList: roomListReducer,

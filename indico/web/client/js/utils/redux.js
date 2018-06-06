@@ -37,9 +37,11 @@ function _combineReducers(...reducers) {
 }
 
 
-export default function createReduxStore(reducers, initialData = {}, additionalMiddleware = [], postReducers = []) {
+export default function createReduxStore(
+    name, reducers, initialData = {}, additionalMiddleware = [], postReducers = []
+) {
     const middleware = [thunkMiddleware, ...additionalMiddleware];
-    const enhancer = composeWithDevTools(applyMiddleware(...middleware));
+    const composeEnhancers = composeWithDevTools({name: `Indico:${name}`});
 
     return createStore(
         _combineReducers({
@@ -47,5 +49,5 @@ export default function createReduxStore(reducers, initialData = {}, additionalM
             ...reducers
         }, ...postReducers),
         initialData,
-        enhancer);
+        composeEnhancers(applyMiddleware(...middleware)));
 }

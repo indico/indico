@@ -37,7 +37,7 @@ window.addEventListener('load', () => {
             pageSize: 15
         }
     };
-    const store = createReduxStore({
+    const store = createReduxStore('event-logs', {
         logs: reducer
     }, initialData);
 
