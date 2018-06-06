@@ -129,7 +129,8 @@ export default class ErrorDialog extends React.Component {
         const {title, message, reportable} = errorData;
 
         return (
-            <Modal size="tiny" dimmer="blurring" open={dialogVisible} onClose={this.clearError}>
+            <Modal size="tiny" dimmer="blurring" closeOnRootNodeClick={false} closeOnEscape={false}
+                   open={dialogVisible} onClose={this.clearError}>
                 <Modal.Content>
                     <Message error icon>
                         <Icon name="exclamation triangle" />
