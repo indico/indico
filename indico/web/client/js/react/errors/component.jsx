@@ -22,7 +22,7 @@ import {Button, Form, Icon, Message, Modal, TextArea} from 'semantic-ui-react';
 import {Field, SubmissionError} from 'redux-form';
 import reportErrorURL from 'indico-url:core.report_error_api';
 
-import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
+import {Translate} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
 import {fieldRequired, ReduxFormField} from './util';
 
@@ -155,18 +155,9 @@ export default class ErrorDialog extends React.Component {
                 <Modal.Actions>
                     {reportable && this.renderReportActions()}
                     <Button onClick={this.clearError}>
-                        {!remainingErrors
-                            ? <Translate>Dismiss</Translate>
-                            : (
-                                <PluralTranslate count={remainingErrors}>
-                                    <Singular>
-                                        Dismiss (one more error)
-                                    </Singular>
-                                    <Plural>
-                                        Dismiss (<Param name="count" value={remainingErrors} /> more errors)
-                                    </Plural>
-                                </PluralTranslate>
-                            )
+                        {remainingErrors
+                            ? <Translate>Dismiss (show next error)</Translate>
+                            : <Translate>Dismiss</Translate>
                         }
                     </Button>
                 </Modal.Actions>
