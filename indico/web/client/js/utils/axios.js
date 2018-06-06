@@ -22,6 +22,7 @@ import isURLSameOrigin from 'axios/lib/helpers/isURLSameOrigin';
 import qs from 'qs';
 
 import {$T} from 'indico/utils/i18n';
+import showReactErrorDialog from 'indico/react/errors';
 
 
 export const indicoAxios = axios.create({
@@ -41,13 +42,18 @@ indicoAxios.interceptors.request.use((config) => {
 
 export function handleAxiosError(error) {
     if (error.response && error.response.data && error.response.data.error) {
-        showErrorDialog(error.response.data.error);
+        error = error.response.data.error;
     } else {
-        showErrorDialog({
+        error = {
             title: $T.gettext('Something went wrong'),
             message: error.message,
             report_url: null
-        });
+        };
+    }
+    if (window.showErrorDialog) {
+        showErrorDialog(error);
+    } else {
+        showReactErrorDialog(error);
     }
 }
 

@@ -23,6 +23,8 @@ from flask import flash, jsonify, redirect, request, session
 from packaging.version import Version
 from pkg_resources import DistributionNotFound, get_distribution
 from pytz import common_timezones_set
+from webargs import fields
+from webargs.flaskparser import use_kwargs
 from werkzeug.exceptions import NotFound, ServiceUnavailable
 from werkzeug.urls import url_join, url_parse
 
@@ -53,22 +55,16 @@ class RHContact(RH):
         return WPContact.render_template('contact.html')
 
 
-class RHReportError(RH):
-    NOT_SANITIZED_FIELDS = {'comment'}
-
+class RHReportErrorBase(RH):
     def _process_args(self):
         self.error_data = load_error_data(request.view_args['error_id'])
         if self.error_data is None:
             raise NotFound('Error details not found. We might be having some technical issues; please try again later.')
 
-    def _process(self):
-        form = ReportErrorForm(email=(session.user.email if session.user else ''))
-        if form.validate_on_submit():
-            self._send_email(form.email.data, form.comment.data)
-            if config.SENTRY_DSN and self.error_data['sentry_event_id'] is not None:
-                self._send_sentry(form.email.data, form.comment.data)
-            return jsonify_data(flash=False)
-        return jsonify_form(form)
+    def _save_report(self, email, comment):
+        self._send_email(email, comment)
+        if config.SENTRY_DSN and self.error_data['sentry_event_id'] is not None:
+            self._send_sentry(email, comment)
 
     def _send_email(self, email, comment):
         # using reply-to for the user email would be nicer, but email clients
@@ -102,6 +98,25 @@ class RHReportError(RH):
         except Exception:
             # don't bother users if this fails!
             Logger.get('sentry').exception('Could not submit user feedback')
+
+
+class RHReportError(RHReportErrorBase):
+    def _process(self):
+        form = ReportErrorForm(email=(session.user.email if session.user else ''))
+        if form.validate_on_submit():
+            self._save_report(form.email.data, form.comment.data)
+            return jsonify_data(flash=False)
+        return jsonify_form(form)
+
+
+class RHReportErrorAPI(RHReportErrorBase):
+    @use_kwargs({
+        'email': fields.Email(),
+        'comment': fields.String(required=True),
+    })
+    def _process(self, email, comment):
+        self._save_report(email, comment)
+        return '', 204
 
 
 class RHSettings(RHAdminBase):
