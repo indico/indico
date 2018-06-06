@@ -35,7 +35,6 @@
                 showErrorDialog({
                     title: $T.gettext('Something went wrong'),
                     message: '{0} ({1})'.format(data.statusText.toLowerCase(), data.status),
-                    suggest_login: false,
                     report_url: null
                 });
                 return true;

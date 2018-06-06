@@ -46,7 +46,6 @@ export function handleAxiosError(error) {
         showErrorDialog({
             title: $T.gettext('Something went wrong'),
             message: error.message,
-            suggest_login: false,
             report_url: null
         });
     }

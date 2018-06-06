@@ -106,7 +106,6 @@ def _jsonify_error(exc, title, message, code):
     error_data = {
         'title': title,
         'message': message,
-        'suggest_login': isinstance(exc, Forbidden) and session.user is None,
         'report_url': report_url
     }
     response = jsonify(error=error_data)
