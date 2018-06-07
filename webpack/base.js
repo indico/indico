@@ -165,7 +165,7 @@ export function webpackDefaults(env, config) {
         context: config.build.clientPath,
         output: {
             path: config.build.distPath,
-            filename: "js/[name].[chunkhash:8].bundle.js",
+            filename: 'js/[name].[chunkhash:8].bundle.js',
             publicPath: config.build.distURL,
             devtoolModuleFilenameTemplate: (info) => `webpack:///${getDevtoolFilename(info)}`,
             devtoolFallbackModuleFilenameTemplate: (info) => `webpack:///${getDevtoolFilename(info)}?${info.hash}`,
@@ -275,8 +275,8 @@ export function webpackDefaults(env, config) {
                     // 'common' chunk, which should include common dependencies
                     common: (module) => {
                         return {
-                            name: "common",
-                            chunks: "initial",
+                            name: 'common',
+                            chunks: 'initial',
                             // theme CSS files shouldn't be included in the
                             // common.css chunk, otherwise they will interfere
                             // with interface CSS
@@ -288,6 +288,13 @@ export function webpackDefaults(env, config) {
                         test: /\/node_modules\/(react|redux|prop-types\/|lodash-es\/|fbjs\/)/,
                         name: 'react',
                         chunks: 'initial',
+                        priority: 10,
+                    },
+                    semanticui: {
+                        test: /node_modules\/semantic-ui-react\//,
+                        name: 'semantic-ui',
+                        chunks: 'initial',
+                        priority: 10,
                     }
                 }
             }
