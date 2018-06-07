@@ -43,7 +43,7 @@ export default class Landing extends React.Component {
 
     constructor(props) {
         super(props);
-        const startTime = moment().endOf('hour').add(1, 'm');
+        const startTime = moment().startOf('hour').add(1, 'h');
         this.state = {
             recurrence: {
                 type: 'single',
