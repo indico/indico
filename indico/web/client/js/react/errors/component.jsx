@@ -24,7 +24,7 @@ import reportErrorURL from 'indico-url:core.report_error_api';
 
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
-import {createSubmissionError, fieldRequired, ReduxFormField} from './util';
+import {createSubmissionError, ReduxFormField, validators as v} from 'indico/react/forms';
 
 
 export default class ErrorDialog extends React.Component {
@@ -84,7 +84,7 @@ export default class ErrorDialog extends React.Component {
                 {error && <Message error content={error} />}
                 <Field name="comment" component={ReduxFormField} as={TextArea}
                        label={Translate.string('Details')} autoFocus required
-                       validate={fieldRequired}>
+                       validate={v.required}>
                     <p style={{fontStyle: 'italic', fontSize: '0.9em', color: '#999'}}>
                         <Translate>
                             Please let us know what you were doing when the error showed up.
