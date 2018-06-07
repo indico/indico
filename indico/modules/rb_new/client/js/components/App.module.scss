@@ -90,7 +90,7 @@
     // lower z-index than menu
     z-index: 1;
 
-    & > :global(:not(.landing-wrapper)) {
+    & > :global(.ui.grid:not(.landing-wrapper)) {
         padding: $rb-content-padding;
     }
 }
