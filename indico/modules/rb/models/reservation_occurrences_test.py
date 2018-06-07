@@ -183,8 +183,7 @@ def test_iter_start_time_weekly(interval, days_elapsed, expected_length):
 @pytest.mark.parametrize(('interval', 'days_elapsed', 'expected_length'), (
     (0, 0,  None),
     (1, 0,  1),
-    (1, 40, 2),
-    (2, 0,  None),
+    (1, 40, 2)
 ))
 def test_iter_start_time_monthly(interval, days_elapsed, expected_length):
     assert days_elapsed >= 0
