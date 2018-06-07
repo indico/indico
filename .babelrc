@@ -10,11 +10,6 @@
     "@babel/plugin-transform-runtime",
     "@babel/plugin-proposal-object-rest-spread",
     "@babel/plugin-proposal-class-properties",
-    ["import", {
-      "libraryName": "antd",
-      "libraryDirectory": "es",
-      "style": "css"
-    }],
     ["react-css-modules", {
       "exclude": "node_modules",
       "context": "indico/modules",
