@@ -11,6 +11,7 @@
     "@babel/plugin-proposal-object-rest-spread",
     "@babel/plugin-proposal-class-properties",
     "@babel/plugin-syntax-dynamic-import",
+    "lodash",
     ["react-css-modules", {
       "exclude": "node_modules",
       "context": "indico/modules",
