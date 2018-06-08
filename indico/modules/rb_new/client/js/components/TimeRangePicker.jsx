@@ -90,7 +90,7 @@ export default class TimeRangePicker extends React.Component {
         while (next < end) {
             duration = _humanizeDuration(moment.duration(next.diff(start)));
             serializedNext = _serializeTime(moment(next));
-            text = <span>{serializedNext} <span styleName="duration">({duration})</span></span>;
+            text = <div>{serializedNext} <div styleName="duration">({duration})</div></div>;
             options.push({key: serializedNext, value: serializedNext, text});
             next.add(30, 'm');
         }
