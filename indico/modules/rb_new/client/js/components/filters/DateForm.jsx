@@ -69,7 +69,9 @@ export default class DateForm extends FilterFormComponent {
     }
 
     disabledDate(current) {
-        return current.isBefore(moment(), 'day');
+        if (current) {
+            return current.isBefore(moment(), 'day');
+        }
     }
 
     render() {
