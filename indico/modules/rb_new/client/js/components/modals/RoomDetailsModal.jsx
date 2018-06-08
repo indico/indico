@@ -48,7 +48,7 @@ export default class RoomDetailsModal extends React.Component {
         return (
             <Modal open onClose={this.handleCloseModal}>
                 <Modal.Header styleName="room-details-header">
-                    {room.name}
+                    <Translate>Room Details</Translate>
                     <span>
                         <Button icon="pencil" circular />
                     </span>
@@ -96,7 +96,7 @@ export function RoomBasicDetails({room}) {
             </Grid.Column>
             <Grid.Column>
                 <Header>
-                    {room.name}
+                    {room.full_name}
                     <Header.Subheader>{room.division}</Header.Subheader>
                 </Header>
                 <div>{room.location_name}</div>
