@@ -18,21 +18,10 @@
 import _ from 'lodash';
 import createHistory from 'history/createBrowserHistory';
 import {queryStringMiddleware, createQueryStringReducer} from 'redux-router-querystring';
-import {routerReducer, routerMiddleware} from 'react-router-redux';
-import {reducer as reduxFormReducer} from 'redux-form';
+import {routerMiddleware} from 'react-router-redux';
 import createReduxStore from 'indico/utils/redux';
 
-
-import {
-    userReducer,
-    bookRoomReducer,
-    roomListReducer,
-    equipmentReducer,
-    buildingsReducer,
-    mapAspectsReducer,
-    roomDetailsReducer,
-    bookRoomFormReducer
-} from './reducers';
+import reducers from './reducers';
 import {initialStateFactory} from './reducers/roomBooking/filters';
 import {SET_FILTER_PARAMETER} from './actions';
 import {queryString as queryFilterRules} from './serializers/filters';
@@ -83,22 +72,12 @@ export const history = createHistory({
 });
 
 export default function createRBStore(data) {
-    return createReduxStore('rb-new', {
-        user: userReducer,
-        bookRoom: bookRoomReducer,
-        roomList: roomListReducer,
-        router: routerReducer,
-        equipment: equipmentReducer,
-        buildings: buildingsReducer,
-        mapAspects: mapAspectsReducer,
-        roomDetails: roomDetailsReducer,
-        form: reduxFormReducer.plugin({
-            roomModal: bookRoomFormReducer
-        })
-    }, Object.assign(initialData, data), [
-        routerMiddleware(history),
-        queryStringMiddleware(history, routeConfig)
-    ], [
-        qsReducer
-    ]);
+    return createReduxStore('rb-new',
+                            reducers,
+                            Object.assign(initialData, data), [
+                                routerMiddleware(history),
+                                queryStringMiddleware(history, routeConfig)
+                            ], [
+                                qsReducer
+                            ]);
 }

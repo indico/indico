@@ -21,12 +21,21 @@ import PropTypes from 'prop-types';
 
 import {Translate} from 'indico/react/i18n';
 
-import FilterDropdown from './filters/FilterDropdown';
+import filterDropdownFactory from '../containers/FilterDropdown';
 import CapacityForm from './filters/CapacityForm';
 import EquipmentForm from './filters/EquipmentForm';
 
 import './RoomFilterBar.module.scss';
 
+
+export function FilterDropdownFactory({name, ...props}) {
+    const Component = filterDropdownFactory(name);
+    return <Component {...props} />;
+}
+
+FilterDropdownFactory.propTypes = {
+    name: PropTypes.string.isRequired
+};
 
 // eslint-disable-next-line react/prop-types
 const capacityRenderer = ({capacity}) => (
@@ -60,29 +69,31 @@ export default function RoomFilterBar(
     }
 ) {
     const equipmentFilter = !!equipmentTypes.length && (
-        <FilterDropdown title={<Translate>Equipment</Translate>}
-                        form={({equipment: selectedEquipment}, setParentField) => (
-                            <EquipmentForm setParentField={setParentField}
-                                           selectedEquipment={selectedEquipment}
-                                           possibleEquipment={equipmentTypes} />
-                        )}
-                        counter
-                        setGlobalState={data => setFilterParameter('equipment', data.equipment)}
-                        initialValues={{equipment}}
-                        renderValue={equipmentRenderer} />
+        <FilterDropdownFactory name="equipment"
+                               title={<Translate>Equipment</Translate>}
+                               form={({equipment: selectedEquipment}, setParentField) => (
+                                   <EquipmentForm setParentField={setParentField}
+                                                  selectedEquipment={selectedEquipment}
+                                                  possibleEquipment={equipmentTypes} />
+                               )}
+                               counter
+                               setGlobalState={data => setFilterParameter('equipment', data.equipment)}
+                               initialValues={{equipment}}
+                               renderValue={equipmentRenderer} />
     );
 
     return (
         <Button.Group size="large">
             {children}
-            <FilterDropdown title={<Translate>Min. Capacity</Translate>}
-                            form={({capacity: selectedCapacity}, setParentField) => (
-                                <CapacityForm setParentField={setParentField}
-                                              capacity={selectedCapacity} />
-                            )}
-                            setGlobalState={data => setFilterParameter('capacity', data.capacity)}
-                            initialValues={{capacity}}
-                            renderValue={capacityRenderer} />
+            <FilterDropdownFactory name="capacity"
+                                   title={<Translate>Min. Capacity</Translate>}
+                                   form={({capacity: selectedCapacity}, setParentField) => (
+                                       <CapacityForm setParentField={setParentField}
+                                                     capacity={selectedCapacity} />
+                                   )}
+                                   setGlobalState={data => setFilterParameter('capacity', data.capacity)}
+                                   initialValues={{capacity}}
+                                   renderValue={capacityRenderer} />
             {equipmentFilter}
             {(hasOwnedRooms || onlyMine) && (
                 <Popup trigger={<Button icon="user" primary={onlyMine}

@@ -17,9 +17,7 @@
 
 import React from 'react';
 import {Button, Icon, Popup} from 'semantic-ui-react';
-import propTypes from 'prop-types';
-
-import {Translate} from 'indico/react/i18n';
+import PropTypes from 'prop-types';
 
 import './FilterDropdown.module.scss';
 
@@ -43,15 +41,17 @@ const defaultTriggerRenderer = (title, renderedValue, counter) => (
 
 export default class FilterDropdown extends React.Component {
     static propTypes = {
-        title: propTypes.element.isRequired,
-        form: propTypes.func.isRequired,
-        renderValue: propTypes.func.isRequired,
-        renderTrigger: propTypes.func,
-        setGlobalState: propTypes.func.isRequired,
-        initialValues: propTypes.object,
-        defaults: propTypes.object,
-        showButtons: propTypes.bool,
-        counter: propTypes.bool
+        title: PropTypes.element.isRequired,
+        form: PropTypes.func.isRequired,
+        renderValue: PropTypes.func.isRequired,
+        renderTrigger: PropTypes.func,
+        setGlobalState: PropTypes.func.isRequired,
+        initialValues: PropTypes.object,
+        defaults: PropTypes.object,
+        counter: PropTypes.bool,
+        open: PropTypes.bool,
+        openDropdown: PropTypes.func.isRequired,
+        closeDropdown: PropTypes.func.isRequired
     };
 
     static defaultProps = {
@@ -59,7 +59,8 @@ export default class FilterDropdown extends React.Component {
         defaults: {},
         showButtons: true,
         renderTrigger: defaultTriggerRenderer,
-        counter: false
+        counter: false,
+        open: false
     };
 
     static getDerivedStateFromProps({defaults, initialValues, renderValue}, prevState) {
@@ -72,19 +73,10 @@ export default class FilterDropdown extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = {
-            isOpen: false
-        };
-
-        this.setFieldValue = this.setFieldValue.bind(this);
-        this.setRenderedValue = this.setRenderedValue.bind(this);
-        this.handleOpen = this.handleOpen.bind(this);
-        this.handleClose = this.handleClose.bind(this);
-        this.handleOK = this.handleOK.bind(this);
-        this.handleCancel = this.handleCancel.bind(this);
+        this.state = {};
     }
 
-    setFieldValue(field, value) {
+    setFieldValue = (field, value) => {
         // Do incremental state updates, to avoid working
         // on an outdated state (consecutive calls)
         const newState = this.setState((prevState) => ({
@@ -95,7 +87,7 @@ export default class FilterDropdown extends React.Component {
             }
         }));
         this.setState(newState);
-    }
+    };
 
     resetFields(fieldValues) {
         this.setState({
@@ -103,62 +95,39 @@ export default class FilterDropdown extends React.Component {
         });
     }
 
-    setRenderedValue(fieldValues) {
+    setRenderedValue = (fieldValues) => {
         const {renderValue} = this.props;
         const renderedValue = renderValue(fieldValues);
         this.setState({
             renderedValue,
         });
-    }
+    };
 
-    handleClose() {
-        this.setState({
-            isOpen: false
-        });
-    }
-
-    handleOpen() {
-        this.setState({
-            isOpen: true
-        });
-    }
-
-    handleCancel() {
-        const {defaults, initialValues} = this.props;
-        this.resetFields(_mergeDefaults(defaults, initialValues));
-        this.handleClose();
-    }
-
-    handleOK() {
-        const {setGlobalState} = this.props;
+    handleClose = () => {
+        const {closeDropdown, setGlobalState} = this.props;
         const {fieldValues} = this.state;
         this.setRenderedValue(fieldValues);
         setGlobalState(fieldValues);
-        this.handleClose();
-    }
+        closeDropdown();
+    };
+
+    handleOpen = () => {
+        const {openDropdown} = this.props;
+        openDropdown();
+    };
 
     render() {
-        const {title, form, renderTrigger, showButtons, counter} = this.props;
-        const {renderedValue, fieldValues, isOpen} = this.state;
+        const {title, form, renderTrigger, counter, open} = this.props;
+        const {renderedValue, fieldValues} = this.state;
 
         return (
-            <Popup position="bottom right"
+            <Popup position="bottom left"
                    trigger={renderTrigger(title, renderedValue, counter)}
                    on="click"
-                   open={isOpen}
+                   open={open}
                    onClose={this.handleClose}
                    onOpen={this.handleOpen}>
-                {form(fieldValues, this.setFieldValue, this.handleOK)}
-                {showButtons && (
-                    <Button.Group size="mini" compact floated="right" styleName="filter-dropdown-footer">
-                        <Button onClick={this.handleCancel}>
-                            <Translate>Cancel</Translate>
-                        </Button>
-                        <Button positive onClick={this.handleOK}>
-                            <Translate>OK</Translate>
-                        </Button>
-                    </Button.Group>
-                )}
+                {form(fieldValues, this.setFieldValue, this.handleClose)}
             </Popup>
         );
     }

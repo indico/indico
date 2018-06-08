@@ -16,12 +16,11 @@
 */
 
 import React from 'react';
-import propTypes from 'prop-types';
+import PropTypes from 'prop-types';
 
 import {Translate} from 'indico/react/i18n';
-import RoomFilterBar, {equipmentType} from './RoomFilterBar';
+import RoomFilterBar, {equipmentType, FilterDropdownFactory} from './RoomFilterBar';
 
-import FilterDropdown from './filters/FilterDropdown';
 import RecurrenceForm from './filters/RecurrenceForm';
 import DateForm from './filters/DateForm';
 import TimeForm from './filters/TimeForm';
@@ -31,86 +30,93 @@ import dateRenderer from './filters/DateRenderer';
 import timeRenderer from './filters/TimeRenderer';
 
 
-export default function FilterBar({
-    recurrence, dates, timeSlot, capacity, onlyFavorites, onlyMine, equipment, setFilterParameter, equipmentTypes,
-    hasOwnedRooms, hasFavoriteRooms
-}) {
-    return (
-        <RoomFilterBar capacity={capacity}
-                       onlyFavorites={onlyFavorites}
-                       onlyMine={onlyMine}
-                       equipment={equipment}
-                       setFilterParameter={setFilterParameter}
-                       equipmentTypes={equipmentTypes}
-                       hasOwnedRooms={hasOwnedRooms}
-                       hasFavoriteRooms={hasFavoriteRooms}>
-            <FilterDropdown title={<Translate>Recurrence</Translate>}
-                            form={(fieldValues, setParentField) => (
-                                <RecurrenceForm setParentField={setParentField} {...fieldValues} />
-                            )}
-                            setGlobalState={({type, number, interval}) => {
-                                setFilterParameter('recurrence', {type, number, interval});
-                            }}
-                            initialValues={recurrence}
-                            defaults={{
-                                type: 'single',
-                                number: 1,
-                                interval: 'week'
-                            }}
-                            renderValue={recurrenceRenderer} />
-            <FilterDropdown title={<Translate>Date</Translate>}
-                            form={(fieldValues, setParentField, handleOK) => (
-                                <DateForm setParentField={setParentField}
-                                          isRange={recurrence.type !== 'single'}
-                                          handleOK={handleOK}
-                                          {...dates} />
-                            )}
-                            setGlobalState={setFilterParameter.bind(undefined, 'dates')}
-                            initialValues={dates}
-                            renderValue={dateRenderer}
-                            showButtons={false} />
-            <FilterDropdown title={<Translate>Time</Translate>}
-                            form={(fieldValues, setParentField) => (
-                                <TimeForm setParentField={setParentField}
-                                          {...fieldValues} />
-                            )}
-                            setGlobalState={setFilterParameter.bind(undefined, 'timeSlot')}
-                            initialValues={timeSlot}
-                            renderValue={timeRenderer} />
-        </RoomFilterBar>
-    );
+export default class FilterBar extends React.Component {
+
+    static propTypes = {
+        equipmentTypes: PropTypes.arrayOf(PropTypes.string).isRequired,
+        recurrence: PropTypes.shape({
+            number: PropTypes.number,
+            type: PropTypes.string,
+            interval: PropTypes.string
+        }).isRequired,
+        dates: PropTypes.shape({
+            startDate: PropTypes.string,
+            endDate: PropTypes.string
+        }).isRequired,
+        timeSlot: PropTypes.shape({
+            startTime: PropTypes.string,
+            endTime: PropTypes.string
+        }).isRequired,
+        capacity: PropTypes.number,
+        onlyFavorites: PropTypes.bool,
+        onlyMine: PropTypes.bool,
+        equipment: equipmentType,
+        setFilterParameter: PropTypes.func.isRequired,
+        hasOwnedRooms: PropTypes.bool,
+        hasFavoriteRooms: PropTypes.bool
+    };
+
+    static defaultProps = {
+        capacity: null,
+        onlyFavorites: null,
+        onlyMine: null,
+        equipment: [],
+        hasOwnedRooms: false,
+        hasFavoriteRooms: false,
+    };
+
+    render() {
+        const {
+            recurrence, dates, timeSlot, capacity, onlyFavorites, onlyMine, equipment, setFilterParameter,
+            equipmentTypes, hasOwnedRooms, hasFavoriteRooms
+        } = this.props;
+
+        return (
+            <RoomFilterBar capacity={capacity}
+                           onlyFavorites={onlyFavorites}
+                           onlyMine={onlyMine}
+                           equipment={equipment}
+                           setFilterParameter={setFilterParameter}
+                           equipmentTypes={equipmentTypes}
+                           hasOwnedRooms={hasOwnedRooms}
+                           hasFavoriteRooms={hasFavoriteRooms}>
+                <FilterDropdownFactory name="recurrence"
+                                       title={<Translate>Recurrence</Translate>}
+                                       form={(fieldValues, setParentField) => (
+                                           <RecurrenceForm setParentField={setParentField} {...fieldValues} />
+                                       )}
+                                       setGlobalState={({type, number, interval}) => {
+                                           setFilterParameter('recurrence', {type, number, interval});
+                                       }}
+                                       initialValues={recurrence}
+                                       defaults={{
+                                           type: 'single',
+                                           number: 1,
+                                           interval: 'week'
+                                       }}
+                                       renderValue={recurrenceRenderer} />
+                <FilterDropdownFactory name="dates"
+                                       title={<Translate>Date</Translate>}
+                                       form={(fieldValues, setParentField, handleClose) => (
+                                           <DateForm setParentField={setParentField}
+                                                     isRange={recurrence.type !== 'single'}
+                                                     handleClose={handleClose}
+                                                     {...dates} />
+                                       )}
+                                       setGlobalState={setFilterParameter.bind(undefined, 'dates')}
+                                       initialValues={dates}
+                                       renderValue={dateRenderer}
+                                       showButtons={false} />
+                <FilterDropdownFactory name="timeSlot"
+                                       title={<Translate>Time</Translate>}
+                                       form={(fieldValues, setParentField) => (
+                                           <TimeForm setParentField={setParentField}
+                                                     {...fieldValues} />
+                                       )}
+                                       setGlobalState={setFilterParameter.bind(undefined, 'timeSlot')}
+                                       initialValues={timeSlot}
+                                       renderValue={timeRenderer} />
+            </RoomFilterBar>
+        );
+    }
 }
-
-
-FilterBar.propTypes = {
-    equipmentTypes: propTypes.arrayOf(propTypes.string).isRequired,
-    recurrence: propTypes.shape({
-        number: propTypes.number,
-        type: propTypes.string,
-        interval: propTypes.string
-    }).isRequired,
-    dates: propTypes.shape({
-        startDate: propTypes.string,
-        endDate: propTypes.string
-    }).isRequired,
-    timeSlot: propTypes.shape({
-        startTime: propTypes.string,
-        endTime: propTypes.string
-    }).isRequired,
-    capacity: propTypes.number,
-    onlyFavorites: propTypes.bool,
-    onlyMine: propTypes.bool,
-    equipment: equipmentType,
-    setFilterParameter: propTypes.func.isRequired,
-    hasOwnedRooms: propTypes.bool,
-    hasFavoriteRooms: propTypes.bool,
-};
-
-FilterBar.defaultProps = {
-    capacity: null,
-    onlyFavorites: null,
-    onlyMine: null,
-    equipment: [],
-    hasOwnedRooms: false,
-    hasFavoriteRooms: false,
-};

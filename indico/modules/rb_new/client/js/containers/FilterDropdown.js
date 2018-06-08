@@ -15,28 +15,28 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 import {connect} from 'react-redux';
-import {setFilterParameter, fetchRooms, fetchMapRooms} from '../actions';
+
+import FilterDropdown from '../components/filters/FilterDropdown';
+import {
+    openFilterDropdown,
+    closeFilterDropdown
+} from '../actions';
 
 
-export default (namespace, componentClass) => {
-    const mapStateToProps = state => ({
-        equipmentTypes: state.equipment.types,
-        ...state[namespace].filters,
-        hasOwnedRooms: state.user.hasOwnedRooms,
-        hasFavoriteRooms: Object.values(state.user.favoriteRooms).some(fr => fr),
-        namespace
-    });
+export default function filterDropdownFactory(name) {
+    const mapStateToProps = ({ui: {filters}}) => ({open: filters[name]});
 
     const mapDispatchToProps = dispatch => ({
-        setFilterParameter: (param, value) => {
-            dispatch(setFilterParameter(namespace, param, value));
-            dispatch(fetchRooms(namespace));
-            dispatch(fetchMapRooms(namespace));
+        openDropdown() {
+            dispatch(openFilterDropdown(name));
+        },
+        closeDropdown() {
+            dispatch(closeFilterDropdown(name));
         }
     });
 
     return connect(
         mapStateToProps,
         mapDispatchToProps
-    )(componentClass);
-};
+    )(FilterDropdown);
+}

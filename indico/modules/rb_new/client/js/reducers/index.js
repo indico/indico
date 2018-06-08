@@ -15,6 +15,9 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import {routerReducer} from 'react-router-redux';
+import {reducer as reduxFormReducer} from 'redux-form';
+
 import bookRoomReducer from './bookRoom';
 import userReducer from './user';
 import roomListReducer from './roomList';
@@ -23,15 +26,22 @@ import buildingsReducer from './buildings';
 import mapAspectsReducer from './mapAspects';
 import roomDetailsReducer from './roomDetails';
 import bookRoomFormReducer from './bookRoomForm';
+import uiReducer from './uiReducer';
 
 
-export {
-    bookRoomReducer,
-    userReducer,
-    roomListReducer,
-    equipmentReducer,
-    buildingsReducer,
-    mapAspectsReducer,
-    roomDetailsReducer,
-    bookRoomFormReducer
+const reducers = {
+    user: userReducer,
+    bookRoom: bookRoomReducer,
+    roomList: roomListReducer,
+    router: routerReducer,
+    equipment: equipmentReducer,
+    buildings: buildingsReducer,
+    mapAspects: mapAspectsReducer,
+    roomDetails: roomDetailsReducer,
+    ui: uiReducer,
+    form: reduxFormReducer.plugin({
+        roomModal: bookRoomFormReducer
+    })
 };
+
+export default reducers;

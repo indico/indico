@@ -73,6 +73,9 @@ export const BOOKING_CONFIRMED = 'BOOKING_CONFIRMED';
 export const BOOKING_FAILED = 'BOOKING_FAILED';
 export const RESET_BOOKING_STATE = 'RESET_BOOKING_STATE';
 
+export const OPEN_FILTER_DROPDOWN = 'OPEN_FILTER_DROPDOWN';
+export const CLOSE_FILTER_DROPDOWN = 'CLOSE_FILTER_DROPDOWN';
+
 export function fetchEquipmentTypes() {
     return async (dispatch) => {
         let response;
@@ -391,4 +394,12 @@ export function createBooking(args) {
 
 export function resetBookingState() {
     return {type: RESET_BOOKING_STATE};
+}
+
+export function openFilterDropdown(name) {
+    return {type: OPEN_FILTER_DROPDOWN, name};
+}
+
+export function closeFilterDropdown(name) {
+    return {type: CLOSE_FILTER_DROPDOWN, name};
 }
