@@ -32,8 +32,9 @@ import TimeRangePicker from '../TimeRangePicker';
 import './Landing.module.scss';
 
 
+const _formatDateStr = 'YYYY-MM-DD';
 const _serializeTime = time => (time ? time.format('HH:mm') : null);
-const _serializeDate = date => (date ? date.format('YYYY-MM-DD') : null);
+const _serializeDate = date => (date ? date.format(_formatDateStr) : null);
 
 
 export default class Landing extends React.Component {
@@ -137,13 +138,15 @@ export default class Landing extends React.Component {
         const calendar = (
             <RcCalendar selectedValue={startDate}
                         onSelect={(date) => this.updateDates(date, null)}
-                        disabledDate={this.disabledDate} />
+                        disabledDate={this.disabledDate}
+                        format={_formatDateStr} />
         );
 
         const rangeCalendar = (
             <RangeCalendar onSelect={([start, end]) => this.updateDates(start, end)}
                            selectedValue={[startDate, endDate]}
-                           disabledDate={this.disabledDate} />
+                           disabledDate={this.disabledDate}
+                           format={_formatDateStr} />
         );
 
         const recurrenceOptions = [
