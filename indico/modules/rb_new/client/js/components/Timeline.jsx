@@ -19,7 +19,7 @@ import _ from 'lodash';
 import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
-import {Button, Container, Label, Loader, Message, Segment} from 'semantic-ui-react';
+import {Button, Container, Label, Loader, Message, Segment, Icon, Popup} from 'semantic-ui-react';
 import DatePicker from 'rc-calendar/lib/Picker';
 import Calendar from 'rc-calendar';
 import {Translate} from 'indico/react/i18n';
@@ -170,16 +170,12 @@ export default class Timeline extends React.Component {
             conflicts: availability.conflicts[activeDate.format('YYYY-MM-DD')] || [],
             preConflicts: availability.pre_conflicts[activeDate.format('YYYY-MM-DD')] || []
         };
-
+        // TODO: Consider plan B (availability='alternatives') option when implemented
+        const hasConflicts = !(_.isEmpty(availability.conflicts) && _.isEmpty(availability.pre_conflicts));
         return (
             <div styleName="timeline-row" key={`room-${roomId}`}>
-                <TooltipIfTruncated>
-                    <div styleName="timeline-row-label">
-                        <div styleName="label">
-                            {availability.room_name}
-                        </div>
-                    </div>
-                </TooltipIfTruncated>
+                <TimelineRowLabel roomName={availability.room_name}
+                                  availability={hasConflicts ? 'conflict' : 'available'} />
                 <div styleName="timeline-row-content" style={{flex: columns}}>
                     <TimelineItem step={step} startHour={minHour} endHour={maxHour} data={data} />
                 </div>
@@ -216,3 +212,41 @@ export default class Timeline extends React.Component {
         );
     }
 }
+
+function TimelineRowLabel({roomName, availability}) {
+    let color, tooltip;
+    switch (availability) {
+        case 'conflict':
+            color = 'red';
+            tooltip = Translate.string('Conflicts for the selected period');
+            break;
+        case 'alternatives':
+            color = 'orange';
+            tooltip = Translate.string('Room suggested based on the selected criteria');
+            break;
+        default:
+            color = 'green';
+            tooltip = Translate.string('Room available');
+    }
+    const roomLabel = (
+        <span>
+            <Icon name="circle" size="tiny" color={color} styleName="dot" />
+            <span>{roomName}</span>
+        </span>
+    );
+
+    return (
+        <TooltipIfTruncated>
+            <div styleName="timeline-row-label">
+                <div styleName="label">
+                    <Popup trigger={roomLabel} content={tooltip} size="small" />
+                </div>
+            </div>
+        </TooltipIfTruncated>
+    );
+}
+
+TimelineRowLabel.propTypes = {
+    roomName: PropTypes.string.isRequired,
+    availability: PropTypes.oneOf(['available', 'alternatives', 'conflict']).isRequired
+};

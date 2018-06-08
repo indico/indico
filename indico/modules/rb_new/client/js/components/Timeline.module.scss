@@ -55,7 +55,6 @@ $row-height: 50px;
 
         .timeline-row-label {
             height: 100%;
-            text-align: center;
             line-height: $row-height;
             flex: 1;
             overflow: hidden;
@@ -68,6 +67,10 @@ $row-height: 50px;
                 white-space: nowrap;
                 min-width: 0;
                 padding-right: 10px;
+
+                .dot {
+                    vertical-align: 0.5em;
+                }
             }
         }
 
