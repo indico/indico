@@ -19,7 +19,7 @@ import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
 import {Link} from 'react-router-dom';
-import Calendar from 'rc-calendar';
+import RcCalendar from 'rc-calendar';
 import RangeCalendar from 'rc-calendar/lib/RangeCalendar';
 import DatePicker from 'rc-calendar/lib/Picker';
 import {Button, Form, Grid, Select, Statistic} from 'semantic-ui-react';
@@ -106,6 +106,12 @@ export default class Landing extends React.Component {
         setFilterParameter('text', value);
     };
 
+    disabledDate = (current) => {
+        if (current) {
+            return current.isBefore(moment(), 'day');
+        }
+    };
+
     render() {
         const {
             timeSlot: {startTime, endTime},
@@ -128,9 +134,16 @@ export default class Landing extends React.Component {
             }
         }, qsRules);
 
+        const calendar = (
+            <RcCalendar selectedValue={startDate}
+                        onSelect={(date) => this.updateDates(date, null)}
+                        disabledDate={this.disabledDate} />
+        );
+
         const rangeCalendar = (
             <RangeCalendar onSelect={([start, end]) => this.updateDates(start, end)}
-                           selectedValue={[startDate, endDate]} />
+                           selectedValue={[startDate, endDate]}
+                           disabledDate={this.disabledDate} />
         );
 
         const recurrenceOptions = [
@@ -184,8 +197,7 @@ export default class Landing extends React.Component {
                                     </Form.Group>
                                 )}
                                 {type === 'single' && (
-                                    <DatePicker calendar={<Calendar />}
-                                                onChange={(value) => this.updateDates(value, null)}>
+                                    <DatePicker calendar={calendar}>
                                         {
                                             () => (
                                                 <Form.Group inline>
