@@ -27,7 +27,8 @@ import FilterFormComponent from './FilterFormComponent';
 import './DateForm.module.scss';
 
 
-const _serializeDate = dt => (dt ? dt.format('YYYY-MM-DD') : null);
+const _formatDateStr = 'YYYY-MM-DD';
+const _serializeDate = date => (date ? date.format(_formatDateStr) : null);
 
 export default class DateForm extends FilterFormComponent {
     static propTypes = {
@@ -89,6 +90,7 @@ export default class DateForm extends FilterFormComponent {
                                        handleOK();
                                    }}
                                    disabledDate={this.disabledDate}
+                                   format={_formatDateStr}
                                    {...props} />
                 ) : (
                     <RcCalendar selectedValue={startDate}
@@ -97,6 +99,7 @@ export default class DateForm extends FilterFormComponent {
                                     handleOK();
                                 }}
                                 disabledDate={this.disabledDate}
+                                format={_formatDateStr}
                                 {...props} />
                 ) }
             </div>
