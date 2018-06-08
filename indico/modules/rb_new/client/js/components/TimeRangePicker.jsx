@@ -19,6 +19,7 @@ import moment from 'moment';
 import React from 'react';
 import propTypes from 'prop-types';
 import {Dropdown} from 'semantic-ui-react';
+import {Translate} from 'indico/react/i18n';
 import {toMoment} from '../util';
 
 import './TimeRangePicker.module.scss';
@@ -30,13 +31,11 @@ function _humanizeDuration(duration) {
     const hours = duration.hours();
     const minutes = duration.minutes();
     if (hours === 1 && minutes === 0) {
-        return `${hours} hour`;
+        return Translate.string('1 hour');
     } else if (hours !== 0) {
-        const fraction = minutes / 60;
-
-        return `${hours + fraction} hours`;
+        return Translate.string('{time} hours', {time: hours + (minutes / 60)});
     } else {
-        return `${minutes} minutes`;
+        return Translate.string('{time} minutes', {time: minutes});
     }
 }
 
@@ -59,8 +58,8 @@ export default class TimeRangePicker extends React.Component {
         const startOptions = this.generateStartTimeOptions();
         const endOptions = this.generateEndTimeOptions(startTime);
         const duration = moment.duration(endTime.diff(startTime));
-        this.addOptionIfNotExist(startOptions, _serializeTime(moment(startTime)));
-        this.addOptionIfNotExist(endOptions, _serializeTime(moment(endTime)));
+        this.addOptionIfMissing(startOptions, _serializeTime(moment(startTime)));
+        this.addOptionIfMissing(endOptions, _serializeTime(moment(endTime)));
         this.state = {
             startTime,
             endTime,
@@ -91,14 +90,14 @@ export default class TimeRangePicker extends React.Component {
         while (next < end) {
             duration = _humanizeDuration(moment.duration(next.diff(start)));
             serializedNext = _serializeTime(moment(next));
-            text = <span>{serializedNext} <span styleName="duration">({duration })</span></span>;
+            text = <span>{serializedNext} <span styleName="duration">({duration})</span></span>;
             options.push({key: serializedNext, value: serializedNext, text});
             next.add(30, 'm');
         }
         return options;
     };
 
-    addOptionIfNotExist = (options, value) => {
+    addOptionIfMissing = (options, value) => {
         const found = options.some((el) => {
             return el.value === value;
         });
@@ -123,8 +122,8 @@ export default class TimeRangePicker extends React.Component {
             }
             const startOptions = this.generateStartTimeOptions();
             const endOptions = this.generateEndTimeOptions(start);
-            this.addOptionIfNotExist(startOptions, _serializeTime(moment(start)));
-            this.addOptionIfNotExist(endOptions, _serializeTime(moment(end)));
+            this.addOptionIfMissing(startOptions, _serializeTime(moment(start)));
+            this.addOptionIfMissing(endOptions, _serializeTime(moment(end)));
             this.setState({
                 startTime: start,
                 endTime: end,
@@ -151,8 +150,8 @@ export default class TimeRangePicker extends React.Component {
             }
             const startOptions = this.generateStartTimeOptions();
             const endOptions = this.generateEndTimeOptions(start);
-            this.addOptionIfNotExist(startOptions, _serializeTime(moment(start)));
-            this.addOptionIfNotExist(endOptions, _serializeTime(moment(end)));
+            this.addOptionIfMissing(startOptions, _serializeTime(moment(start)));
+            this.addOptionIfMissing(endOptions, _serializeTime(moment(end)));
             this.setState({
                 startTime: start,
                 endTime: end,
@@ -165,16 +164,12 @@ export default class TimeRangePicker extends React.Component {
         }
     };
 
-    searchTime = () => {
-        return [];
-    };
-
     render() {
         const {startTime, endTime, startOptions, endOptions, duration} = this.state;
         return (
             <div>
                 <Dropdown options={startOptions}
-                          search={this.searchTime}
+                          search={() => []}
                           icon={null}
                           text={_serializeTime(startTime)}
                           selection
@@ -186,7 +181,7 @@ export default class TimeRangePicker extends React.Component {
                               this.updateStartTime(value, endTime, duration);
                           }} />
                 <Dropdown options={endOptions}
-                          search={this.searchTime}
+                          search={() => []}
                           icon={null}
                           text={_serializeTime(endTime)}
                           selection
