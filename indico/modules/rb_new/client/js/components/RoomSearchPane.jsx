@@ -17,7 +17,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Card, Grid, Sticky} from 'semantic-ui-react';
+import {Card, Grid, Sticky, Loader} from 'semantic-ui-react';
 import LazyScroll from 'redux-lazy-scroll';
 
 import {Param, Plural, PluralTranslate, Singular} from 'indico/react/i18n';
@@ -87,6 +87,7 @@ export default class RoomSearchPane extends React.Component {
                     <Card.Group stackable>
                         {list.map(renderRoom)}
                     </Card.Group>
+                    <Loader active={isFetching} inline="centered" styleName="rooms-loader" />
                 </LazyScroll>
             </div>
         );
