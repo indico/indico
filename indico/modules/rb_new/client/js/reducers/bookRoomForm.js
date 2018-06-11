@@ -35,7 +35,10 @@ const initialState = {
 export default function reducer(state = initialState, action) {
     // if usage !== 'someone' (=== 'myself'), then we disable the user input
     if (action.type === reduxFormActions.CHANGE && action.meta.field === 'usage') {
-        return _.set(_.cloneDeep(state), 'fields.user.disabled', action.payload !== 'someone');
+        const newState = _.cloneDeep(state);
+        _.set(newState, 'fields.user.disabled', action.payload !== 'someone');
+        _.set(newState, 'values.user', null);
+        return newState;
     }
 
     const {type, message, isPrebooking} = action;

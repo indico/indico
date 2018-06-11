@@ -15,6 +15,8 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+/* eslint "react/no-unused-state": "off" */
+
 import _ from 'lodash';
 import React from 'react';
 import PropTypes from 'prop-types';
@@ -50,13 +52,27 @@ export default class UserSearchField extends React.Component {
         disabled: false
     };
 
+    static getDerivedStateFromProps({value: {id: userId}}, state) {
+        if (userId !== state.prevPropsUserId) {
+            return {
+                ...state,
+                prevPropsUserId: userId,
+                userId
+            };
+        }
+        return null;
+    }
+
     constructor(props) {
         super(props);
         const {defaultValue} = this.props;
+        const userId = defaultValue && defaultValue.id;
+
         this.state = {
             isFetching: false,
             options: [],
-            dropdownValue: defaultValue && defaultValue.id
+            prevPropsUserId: userId,
+            userId
         };
         this.userCache = {};
     }
@@ -92,7 +108,7 @@ export default class UserSearchField extends React.Component {
 
     render() {
         const {multiple, onChange, disabled} = this.props;
-        const {isFetching, options, dropdownValue} = this.state;
+        const {isFetching, options, userId} = this.state;
 
         return (
             <Dropdown search={opts => opts}
@@ -102,12 +118,12 @@ export default class UserSearchField extends React.Component {
                       minCharacters={3}
                       multiple={multiple}
                       options={options}
-                      value={dropdownValue}
+                      value={userId}
                       placeholder={Translate.string('Write a name or e-mail...')}
                       onChange={(__, {value: id}) => {
                           const val = this.userCache[id];
                           this.setState({
-                              dropdownValue: id
+                              userId: id
                           });
                           onChange(val);
                       }}
