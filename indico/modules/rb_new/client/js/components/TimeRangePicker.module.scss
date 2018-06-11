@@ -14,15 +14,23 @@
  * You should have received a copy of the GNU General Public License
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
-
-.time-dropdown {
+.start-time-dropdown {
     min-width: 90px !important;
     margin-right: 14px;
     text-align: center !important;
 }
 
+.end-time-dropdown {
+    min-width: 90px !important;
+    margin-right: 14px;
+    text-align: center !important;
+
+    :global(.menu) {
+        min-width: 140px !important;
+    }
+}
+
 .duration {
-    font-size: x-small;
+    font-size: 0.7em;
     color: #808c99;
-    min-width: 60px;
 }

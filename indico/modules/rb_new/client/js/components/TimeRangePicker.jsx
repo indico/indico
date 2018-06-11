@@ -84,11 +84,11 @@ export default class TimeRangePicker extends React.Component {
         const options = [];
         const end = moment().endOf('day');
         const next = moment(start).add(30, 'm');
-        let serializedNext, duration, text;
+        let serializedNext, duration;
         while (next < end) {
             duration = _humanizeDuration(moment.duration(next.diff(start)));
             serializedNext = serializeTime(moment(next));
-            text = <div>{serializedNext} <div styleName="duration">({duration})</div></div>;
+            const text = <div>{serializedNext} <span styleName="duration">({duration})</span></div>;
             options.push({key: serializedNext, value: serializedNext, text});
             next.add(30, 'm');
         }
@@ -175,7 +175,7 @@ export default class TimeRangePicker extends React.Component {
                           selection
                           allowAdditions
                           additionLabel=""
-                          styleName="time-dropdown"
+                          styleName="start-time-dropdown"
                           value={serializeTime(startTime)}
                           onChange={(_, {value}) => {
                               this.updateStartTime(value, endTime, duration);
@@ -187,7 +187,7 @@ export default class TimeRangePicker extends React.Component {
                           selection
                           allowAdditions
                           additionLabel=""
-                          styleName="time-dropdown"
+                          styleName="end-time-dropdown"
                           value={serializeTime(endTime)}
                           onChange={(_, {value}) => {
                               this.updateEndTime(startTime, value, duration);
