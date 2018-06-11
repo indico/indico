@@ -19,13 +19,13 @@ import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
 import {Link} from 'react-router-dom';
-import RcCalendar from 'rc-calendar';
+import RCCalendar from 'rc-calendar';
 import RangeCalendar from 'rc-calendar/lib/RangeCalendar';
 import DatePicker from 'rc-calendar/lib/Picker';
 import {Button, Form, Grid, Select, Statistic} from 'semantic-ui-react';
 import {stateToQueryString} from 'redux-router-querystring';
 import {Translate} from 'indico/react/i18n';
-import {sanitizeRecurrence} from '../../util';
+import {sanitizeRecurrence, serializeTime} from '../../util';
 import {queryString as qsRules} from '../../serializers/filters';
 import TimeRangePicker from '../TimeRangePicker';
 
@@ -33,7 +33,6 @@ import './Landing.module.scss';
 
 
 const _formatDateStr = 'YYYY-MM-DD';
-const _serializeTime = time => (time ? time.format('HH:mm') : null);
 const _serializeDate = date => (date ? date.format(_formatDateStr) : null);
 
 
@@ -128,15 +127,15 @@ export default class Landing extends React.Component {
                     endDate: _serializeDate(endDate)
                 },
                 timeSlot: {
-                    startTime: _serializeTime(startTime),
-                    endTime: _serializeTime(endTime)
+                    startTime: serializeTime(startTime),
+                    endTime: serializeTime(endTime)
                 },
                 equipment: {}
             }
         }, qsRules);
 
         const calendar = (
-            <RcCalendar selectedValue={startDate}
+            <RCCalendar selectedValue={startDate}
                         onSelect={(date) => this.updateDates(date, null)}
                         disabledDate={this.disabledDate}
                         format={_formatDateStr} />
@@ -214,7 +213,7 @@ export default class Landing extends React.Component {
                                 <Form.Group inline>
                                     <TimeRangePicker startTime={startTime}
                                                      endTime={endTime}
-                                                     onChange={(start, end) => this.updateTimes(start, end)} />
+                                                     onChange={this.updateTimes} />
                                 </Form.Group>
                                 <Form.Group inline>
                                     <Form.Input icon="search" placeholder="bldg: 28" styleName="search-input"

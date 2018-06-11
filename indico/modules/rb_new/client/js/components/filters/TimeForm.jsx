@@ -19,14 +19,12 @@ import React from 'react';
 import propTypes from 'prop-types';
 import 'rc-time-picker/assets/index.css';
 
-import {toMoment} from '../../util';
+import {toMoment, serializeTime} from '../../util';
 
 import FilterFormComponent from './FilterFormComponent';
 import './TimeForm.module.scss';
 import TimeRangePicker from '../TimeRangePicker';
 
-
-const _serializeTime = time => (time ? time.format('HH:mm') : null);
 
 export default class TimeForm extends FilterFormComponent {
     static propTypes = {
@@ -53,8 +51,8 @@ export default class TimeForm extends FilterFormComponent {
         const {setParentField} = this.props;
 
         // send serialized versions to parent/redux
-        setParentField('startTime', _serializeTime(startTime));
-        setParentField('endTime', _serializeTime(endTime));
+        setParentField('startTime', serializeTime(startTime));
+        setParentField('endTime', serializeTime(endTime));
 
         this.setState({
             startTime,
