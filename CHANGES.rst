@@ -20,6 +20,7 @@ Bugfixes
 - Allow paper managers to submit paper revisions
 - Fix error when not providing a URL for privacy policy or terms
 - Use consistent order for privacy/terms links in the footer
+- Fix cloning of locked events
 
 Version 2.1.1
 -------------
