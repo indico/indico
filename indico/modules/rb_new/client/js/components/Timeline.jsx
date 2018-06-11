@@ -25,6 +25,7 @@ import Calendar from 'rc-calendar';
 import {Translate} from 'indico/react/i18n';
 import {TooltipIfTruncated} from 'indico/react/components';
 import TimelineItem from './TimelineItem';
+import BookRoomModal from '../containers/BookRoomModal';
 
 import './Timeline.module.scss';
 
@@ -40,7 +41,9 @@ export default class Timeline extends React.Component {
         step: PropTypes.number,
         dateRange: PropTypes.array.isRequired,
         availability: PropTypes.object.isRequired,
-        isFetching: PropTypes.bool.isRequired
+        isFetching: PropTypes.bool.isRequired,
+        resetBookingState: PropTypes.func.isRequired,
+        recurrenceType: PropTypes.string.isRequired
     };
 
     static defaultProps = {
@@ -150,8 +153,8 @@ export default class Timeline extends React.Component {
                             </div>
                         ))}
                     </div>
-                    {Object.entries(availability).map(([roomId, roomAvailability]) => (
-                        this.renderTimelineRow(roomId, roomAvailability)
+                    {Object.entries(availability).map(([, roomAvailability]) => (
+                        this.renderTimelineRow(roomAvailability)
                     ))}
                     {this.renderDividers(hourSeries.length)}
                 </div>
@@ -159,9 +162,9 @@ export default class Timeline extends React.Component {
         );
     };
 
-    renderTimelineRow = (roomId, availability) => {
+    renderTimelineRow = (availability) => {
         const {activeDate} = this.state;
-        const {minHour, maxHour, step} = this.props;
+        const {minHour, maxHour, step, recurrenceType} = this.props;
         const columns = ((maxHour - minHour) / step) + 1;
         const data = {
             candidates: availability.candidates[activeDate.format('YYYY-MM-DD')] || [],
@@ -173,11 +176,17 @@ export default class Timeline extends React.Component {
         // TODO: Consider plan B (availability='alternatives') option when implemented
         const hasConflicts = !(_.isEmpty(availability.conflicts) && _.isEmpty(availability.pre_conflicts));
         return (
-            <div styleName="timeline-row" key={`room-${roomId}`}>
-                <TimelineRowLabel roomName={availability.room_name}
+            <div styleName="timeline-row" key={`room-${availability.room.id}`}>
+                <TimelineRowLabel roomName={availability.room.full_name}
                                   availability={hasConflicts ? 'conflict' : 'available'} />
                 <div styleName="timeline-row-content" style={{flex: columns}}>
-                    <TimelineItem step={step} startHour={minHour} endHour={maxHour} data={data} />
+                    <TimelineItem step={step} startHour={minHour} endHour={maxHour} data={data}
+                                  bookable={!hasConflicts}
+                                  onClick={() => {
+                                      if (!hasConflicts || recurrenceType !== 'single') {
+                                          this.openBookingModal(availability.room);
+                                      }
+                                  }} />
                 </div>
             </div>
         );
@@ -204,10 +213,29 @@ export default class Timeline extends React.Component {
         );
     };
 
+    openBookingModal = (room) => {
+        this.setState({
+            bookingModal: true,
+            selectedRoom: room
+        });
+    };
+
+    closeBookingModal = () => {
+        const {resetBookingState} = this.props;
+        resetBookingState();
+        this.setState({
+            bookingModal: false
+        });
+    };
+
     render() {
+        const {bookingModal, selectedRoom} = this.state;
         return (
             <Container>
                 {this.renderContent()}
+                <BookRoomModal open={bookingModal}
+                               room={selectedRoom}
+                               onClose={this.closeBookingModal} />
             </Container>
         );
     }

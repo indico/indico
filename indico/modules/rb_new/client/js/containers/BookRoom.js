@@ -34,8 +34,8 @@ const mapDispatchToProps = dispatch => ({
     clearRoomList: () => {
         dispatch(updateRooms('bookRoom', [], 0, true));
     },
-    setFilterParameter: (param, value) => {
-        dispatch(setFilterParameter('bookRoom', param, value));
+    clearTextFilter: () => {
+        dispatch(setFilterParameter('bookRoom', 'text', null));
     },
     fetchRooms: (clear = true) => {
         dispatch(fetchRooms('bookRoom', clear));
@@ -49,6 +49,11 @@ const mapDispatchToProps = dispatch => ({
     },
     resetBookingState: () => {
         dispatch(resetBookingState());
+    },
+    setFilterParameter: (param, value) => {
+        dispatch(setFilterParameter('bookRoom', param, value));
+        dispatch(fetchRooms('bookRoom'));
+        dispatch(fetchMapRooms('bookRoom'));
     }
 });
 

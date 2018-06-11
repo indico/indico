@@ -32,19 +32,22 @@ import './Room.module.scss';
 export default class Room extends React.Component {
     static propTypes = {
         room: PropTypes.object.isRequired,
-        children: PropTypes.node.isRequired,
+        children: PropTypes.node,
         isFavorite: PropTypes.bool
     };
 
     static defaultProps = {
-        isFavorite: false
+        isFavorite: false,
+        children: null
     };
 
     shouldComponentUpdate(nextProps) {
         const {isFavorite: nextIsFavorite, room: nextRoom} = nextProps;
         const {room, isFavorite} = this.props;
+        const {children} = this.props;
+        const {children: nextChildren} = nextProps;
 
-        return nextIsFavorite !== isFavorite || !_.isEqual(room, nextRoom);
+        return nextIsFavorite !== isFavorite || !_.isEqual(room, nextRoom) || !_.isEqual(nextChildren, children);
     }
 
     renderCardImage = (room, content, actions) => {

@@ -228,7 +228,8 @@ class BookRoomModal extends React.Component {
         if (!room) {
             return null;
         }
-        const conflictsExist = availability && !!availability.conflicts.length;
+
+        const conflictsExist = availability && !!Object.keys(availability.conflicts).length;
         const bookingBlocked = bookingState.success || bookingState.ongoing;
         const buttonsBlocked = bookingBlocked || (conflictsExist && !skipConflicts);
         const {is_auto_confirm: isDirectlyBookable} = room;

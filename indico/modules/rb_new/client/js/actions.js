@@ -25,6 +25,7 @@ import fetchUserInfoURL from 'indico-url:rooms_new.user_info';
 import equipmentTypesURL from 'indico-url:rooms_new.equipment_types';
 import fetchTimelineDataURL from 'indico-url:rooms_new.timeline';
 import createBookingURL from 'indico-url:rooms_new.create_booking';
+import fetchSuggestionsURL from 'indico-url:rooms_new.suggestions';
 
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {preProcessParameters} from './util';
@@ -72,6 +73,10 @@ export const BOOKING_ONGOING = 'BOOKING_ONGOING';
 export const BOOKING_CONFIRMED = 'BOOKING_CONFIRMED';
 export const BOOKING_FAILED = 'BOOKING_FAILED';
 export const RESET_BOOKING_STATE = 'RESET_BOOKING_STATE';
+// Suggestions
+export const FETCH_SUGGESTIONS_STARTED = 'FETCH_SUGGESTIONS_STARTED';
+export const FETCH_SUGGESTIONS_FAILED = 'FETCH_SUGGESTIONS_FAILED';
+export const UPDATE_SUGGESTIONS = 'UPDATE_SUGGESTIONS';
 
 export const OPEN_FILTER_DROPDOWN = 'OPEN_FILTER_DROPDOWN';
 export const CLOSE_FILTER_DROPDOWN = 'CLOSE_FILTER_DROPDOWN';
@@ -183,10 +188,17 @@ export function fetchRooms(namespace, clear = true) {
             dispatch(fetchRoomsFailed(namespace));
             return;
         }
+
         const {rooms, total} = response.data;
         dispatch(updateRooms(namespace, rooms, total, clear));
         if (namespace === 'bookRoom') {
-            dispatch(fetchTimelineData());
+            dispatch(updateRoomSuggestions([]));
+            const {bookRoom: {rooms: {list}}} = getStore();
+            if (list.length === total || total === 0) {
+                dispatch(fetchRoomSuggestions());
+            } else {
+                dispatch(fetchTimelineData());
+            }
         }
     };
 }
@@ -348,15 +360,16 @@ export function fetchTimelineData() {
     return async (dispatch, getStore) => {
         dispatch(fetchTimelineDataStarted());
 
-        const {bookRoom: {filters, rooms: {list}}} = getStore();
+        const {bookRoom: {filters, suggestions: {list: suggestionsList}, rooms: {list}}} = getStore();
 
-        if (!list.length) {
+        if (!list.length && !suggestionsList.length) {
             dispatch(updateTimelineData({date_range: [], availability: {}}));
             return;
         }
 
         const params = preProcessParameters(filters, ajaxFilterRules);
-        params.room_ids = list.map((room) => room.id);
+        const rooms = [...list, ...suggestionsList.map(({room}) => room)];
+        params.room_ids = rooms.map((room) => room.id);
 
         let response;
         try {
@@ -396,4 +409,37 @@ export function createBooking(args) {
 
 export function resetBookingState() {
     return {type: RESET_BOOKING_STATE};
+}
+
+export function fetchRoomSuggestionsStarted() {
+    return {type: FETCH_SUGGESTIONS_STARTED};
+}
+
+export function fetchRoomSuggestionsFailed() {
+    return {type: FETCH_SUGGESTIONS_FAILED};
+}
+
+export function fetchRoomSuggestions() {
+    return async (dispatch, getStore) => {
+        dispatch(fetchRoomSuggestionsStarted());
+
+        let response;
+        const {bookRoom: {filters}} = getStore();
+        const params = preProcessParameters(filters, ajaxFilterRules);
+
+        try {
+            response = await indicoAxios.get(fetchSuggestionsURL(), {params});
+        } catch (error) {
+            dispatch(fetchRoomSuggestionsFailed());
+            handleAxiosError(error);
+            return;
+        }
+
+        dispatch(updateRoomSuggestions(response.data));
+        dispatch(fetchTimelineData());
+    };
+}
+
+export function updateRoomSuggestions(suggestions) {
+    return {type: UPDATE_SUGGESTIONS, suggestions};
 }

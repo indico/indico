@@ -15,13 +15,14 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+
+import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
 import _ from 'lodash';
-import {Button, Dimmer, Grid, Icon, Loader, Message, Sticky, Popup} from 'semantic-ui-react';
-
+import {Button, Card, Dimmer, Grid, Header, Icon, Label, Loader, Message, Popup, Sticky} from 'semantic-ui-react';
 import {Slot, toClasses} from 'indico/react/util';
-import {Translate} from 'indico/react/i18n';
+import {PluralTranslate, Translate, Singular, Param, Plural} from 'indico/react/i18n';
 import mapControllerFactory from '../../containers/MapController';
 import RoomSearchPane from '../RoomSearchPane';
 import BookingFilterBar from '../BookingFilterBar';
@@ -43,11 +44,13 @@ const MapController = mapControllerFactory('bookRoom');
 export default class BookRoom extends React.Component {
     static propTypes = {
         setFilterParameter: PropTypes.func.isRequired,
+        clearTextFilter: PropTypes.func.isRequired,
         rooms: PropTypes.shape({
             list: PropTypes.array,
             isFetching: PropTypes.bool,
         }).isRequired,
         fetchRooms: PropTypes.func.isRequired,
+        filters: PropTypes.object.isRequired,
         timeline: PropTypes.object.isRequired,
         clearRoomList: PropTypes.func.isRequired,
         roomDetails: PropTypes.shape({
@@ -57,7 +60,8 @@ export default class BookRoom extends React.Component {
         }).isRequired,
         fetchRoomDetails: PropTypes.func.isRequired,
         setRoomDetailsModal: PropTypes.func.isRequired,
-        resetBookingState: PropTypes.func.isRequired
+        resetBookingState: PropTypes.func.isRequired,
+        suggestions: PropTypes.object.isRequired
     };
 
     constructor(props) {
@@ -68,8 +72,8 @@ export default class BookRoom extends React.Component {
     }
 
     componentWillUnmount() {
-        const {setFilterParameter, clearRoomList} = this.props;
-        setFilterParameter('text', null);
+        const {clearTextFilter, clearRoomList} = this.props;
+        clearTextFilter();
         clearRoomList();
     }
 
@@ -91,17 +95,6 @@ export default class BookRoom extends React.Component {
         const showDetailsBtn = <Button primary icon="search" circular onClick={() => this.openDetailsModal(room.id)} />;
         return (
             <Room key={room.id} room={room}>
-                <Slot>
-                    <Grid centered columns={3} style={{margin: 0, height: '100%', opacity: 0.9}}>
-                        <Grid.Column verticalAlign="middle" width={14}>
-                            <Message size="mini" warning compact>
-                                <Message.Header>
-                                    <Icon name="clock" /> 25 minutes later
-                                </Message.Header>
-                            </Message>
-                        </Grid.Column>
-                    </Grid>
-                </Slot>
                 <Slot name="actions">
                     <Popup trigger={bookingModalBtn} content={Translate.string('Book room')} position="top center" hideOnScroll />
                     <Popup trigger={showDetailsBtn} content={Translate.string('Room details')} position="top center" hideOnScroll />
@@ -124,6 +117,7 @@ export default class BookRoom extends React.Component {
                                     filterBar={filterBar}
                                     searchBar={searchBar}
                                     renderRoom={this.renderRoom}
+                                    renderSuggestions={this.renderSuggestions}
                                     extraIcons={this.renderViewSwitch()} />
                     <Dimmer.Dimmable>
                         <Dimmer active={roomDetails.isFetching} page>
@@ -152,6 +146,97 @@ export default class BookRoom extends React.Component {
                 </div>
             );
         }
+    };
+
+    renderSuggestions = () => {
+        const {suggestions} = this.props;
+
+        if (!suggestions.list || !suggestions.list.length) {
+            return;
+        }
+
+        return (
+            <>
+                <Header as="h2">
+                    <Translate>Room suggestions</Translate>
+                </Header>
+                <Card.Group styleName="suggestions" stackable>
+                    {suggestions.list.map((suggestion) => this.renderSuggestion(suggestion))}
+                </Card.Group>
+            </>
+        );
+    };
+
+    renderSuggestion = ({room, suggestions}) => {
+        return (
+            <Room key={room.id} room={room}>
+                <Slot>
+                    <Grid centered styleName="suggestion" columns={3}>
+                        <Grid.Column verticalAlign="middle" width={14}>
+                            {this.renderSuggestionText(room, suggestions)}
+                        </Grid.Column>
+                    </Grid>
+                </Slot>
+            </Room>
+        );
+    };
+
+    renderSuggestionText = (room, {time, duration, skip}) => {
+        return (
+            <>
+                {time && (
+                    <Message styleName="suggestion-text" size="mini" onClick={() => this.updateFilters('time', time)}
+                             warning compact>
+                        <Message.Header>
+                            <Icon name="clock" />
+                            <PluralTranslate count={time}>
+                                <Singular>
+                                    One minute <Param name="modifier" value={time < 0 ? 'earlier' : 'later'} />
+                                </Singular>
+                                <Plural>
+                                    <Param name="count" value={Math.abs(time)} /> minutes{' '}
+                                    <Param name="modifier" value={time < 0 ? 'earlier' : 'later'} />
+                                </Plural>
+                            </PluralTranslate>
+                        </Message.Header>
+                    </Message>
+                )}
+                {duration && time && (
+                    <div>
+                        <Label color="brown" circular>{Translate.string('or')}</Label>
+                    </div>
+                )}
+                {duration && (
+                    <Message styleName="suggestion-text" size="mini" onClick={() => this.updateFilters('duration', duration)}
+                             warning compact>
+                        <Message.Header>
+                            <Icon name="hourglass full" /> {PluralTranslate.string('One minute shorter', '{duration} minutes shorter', duration, {duration})}
+                        </Message.Header>
+                    </Message>
+                )}
+                {skip && (
+                    <Message styleName="suggestion-text" size="mini" onClick={() => this.openBookingModal(room)}
+                             warning compact>
+                        <Message.Header>
+                            <Icon name="calendar times" /> {PluralTranslate.string('Skip one day', 'Skip {skip} days', skip, {skip})}
+                        </Message.Header>
+                    </Message>
+                )}
+            </>
+        );
+    };
+
+    updateFilters = (filter, value) => {
+        const {setFilterParameter} = this.props;
+        let {filters: {timeSlot: {startTime, endTime}}} = this.props;
+
+        if (filter === 'duration') {
+            endTime = moment(endTime, 'HH:mm').subtract(value, 'minutes').format('HH:mm');
+        } else if (filter === 'time') {
+            startTime = moment(startTime, 'HH:mm').add(value, 'minutes').format('HH:mm');
+            endTime = moment(endTime, 'HH:mm').add(value, 'minutes').format('HH:mm');
+        }
+        setFilterParameter('timeSlot', {startTime, endTime});
     };
 
     renderViewSwitch() {

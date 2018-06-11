@@ -129,13 +129,16 @@ export const ajax = {
     capacity: ({capacity}) => capacity,
     favorite: {
         onlyIf: ({onlyFavorites}) => onlyFavorites,
-        serializer: ({onlyFavorites}) => onlyFavorites,
+        serializer: ({onlyFavorites}) => onlyFavorites
+    },
+    equipment: {
+        onlyIf: ({equipment}) => equipment && equipment.length,
+        serializer: ({equipment}) => Object.keys(equipment).filter(k => !!equipment[k])
     },
     mine: {
         onlyIf: ({onlyMine}) => onlyMine,
         serializer: ({onlyMine}) => onlyMine,
     },
-    equipment: ({equipment}) => Object.keys(equipment).filter(k => !!equipment[k]),
     building: ({building}) => building,
     floor: ({floor}) => floor,
     text: ({text}) => text,

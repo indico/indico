@@ -39,3 +39,16 @@
         height: 100%;
     }
 }
+
+.suggestions {
+    .suggestion {
+        margin: 0 !important;
+        height: 100%;
+        opacity: 0.9;
+
+        .suggestion-text {
+            cursor: pointer;
+            pointer-events: all;
+        }
+    }
+}

@@ -47,12 +47,31 @@ function timelineReducer(state = initialTimelineState, action) {
     }
 }
 
+const initialSuggestionsState = {
+    isFetching: false,
+    list: []
+};
+
+function suggestionsReducer(state = initialSuggestionsState, action) {
+    switch (action.type) {
+        case actions.FETCH_SUGGESTIONS_STARTED:
+            return {...state, isFetching: true};
+        case actions.FETCH_SUGGESTIONS_FAILED:
+            return {...state, isFetching: false};
+        case actions.UPDATE_SUGGESTIONS:
+            return {...state, isFetching: false, list: action.suggestions};
+        default:
+            return state;
+    }
+}
+
 
 const reducer = combineReducers({
     rooms: roomsReducerFactory('bookRoom'),
     filters: filterReducerFactory('bookRoom'),
     map: mapReducerFactory('bookRoom'),
-    timeline: timelineReducer
+    timeline: timelineReducer,
+    suggestions: suggestionsReducer
 });
 
 export default reducer;

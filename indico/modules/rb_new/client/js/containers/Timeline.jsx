@@ -18,11 +18,19 @@
 import {connect} from 'react-redux';
 
 import Timeline from '../components/Timeline';
+import {resetBookingState} from '../actions';
 
 
-const mapStateToProps = ({bookRoom: {timeline}}) => ({...timeline});
+const mapStateToProps = (
+    {bookRoom: {timeline, filters: {recurrence: {type}}}}) => ({...timeline, recurrenceType: type}
+);
+const mapDispatchToProps = dispatch => ({
+    resetBookingState: () => {
+        dispatch(resetBookingState());
+    }
+});
 
 export default connect(
     mapStateToProps,
-    null
+    mapDispatchToProps
 )(Timeline);

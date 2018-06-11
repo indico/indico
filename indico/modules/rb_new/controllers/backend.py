@@ -33,8 +33,8 @@ from indico.modules.rb.models.reservations import RepeatFrequency, Reservation
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb_new.schemas import (aspects_schema, map_rooms_schema, reservation_occurrences_schema,
                                            room_details_schema, rooms_schema)
-from indico.modules.rb_new.util import (get_buildings, get_equipment_types, get_rooms_availability, has_managed_rooms,
-                                        search_for_rooms)
+from indico.modules.rb_new.util import (get_buildings, get_equipment_types, get_rooms_availability, get_suggestions,
+                                        has_managed_rooms, search_for_rooms)
 from indico.modules.users.models.users import User
 from indico.util.i18n import _
 from indico.web.util import jsonify_data
@@ -122,8 +122,9 @@ class RHTimeline(RHRoomBookingBase):
         rooms = Room.query.filter(Room.is_active, Room.id.in_(args.pop('room_ids')))
         date_range, availability = get_rooms_availability(rooms, **args)
         date_range = [dt.isoformat() for dt in date_range]
-        for room_availability in availability:
-            data = availability[room_availability]
+        for room_id in availability:
+            data = availability[room_id]
+            data['room'] = rooms_schema.dump(data['room'], many=False).data
             data.update({k: self._serialize_occurrences(data[k])
                          for k in ['candidates', 'pre_bookings', 'bookings', 'conflicts', 'pre_conflicts']})
         return jsonify_data(flash=False, availability=availability, date_range=date_range)
@@ -196,3 +197,10 @@ class RHCreateBooking(RHRoomBookingBase):
             db.session.rollback()
             return jsonify(success=False, msg=unicode(e))
         return jsonify(success=True, is_prebooking=is_prebooking)
+
+
+class RHRoomSuggestions(RHRoomBookingBase):
+    @use_args(search_room_args)
+    def _process(self, args):
+        return jsonify([dict(suggestion, room=rooms_schema.dump(suggestion['room'], many=False).data)
+                        for suggestion in get_suggestions(args)])

@@ -37,7 +37,13 @@ export default class TimelineItem extends React.Component {
         startHour: PropTypes.number.isRequired,
         endHour: PropTypes.number.isRequired,
         step: PropTypes.number.isRequired,
-        data: PropTypes.object.isRequired
+        data: PropTypes.object.isRequired,
+        bookable: PropTypes.bool,
+        onClick: PropTypes.func.isRequired
+    };
+
+    static defaultProps = {
+        bookable: false
     };
 
     calculateWidth = (startDt, endDt) => {
@@ -66,7 +72,7 @@ export default class TimelineItem extends React.Component {
 
     renderOccurrence = (occurrence, additionalClasses = '') => {
         const {start_dt: startDt, end_dt: endDt, reservation} = occurrence;
-        const {startHour, endHour, step} = this.props;
+        const {startHour, endHour, step, bookable, onClick} = this.props;
         const segmentStartDt = moment(startDt, 'YYYY-MM-DD HH:mm');
         const segmentEndDt = moment(endDt, 'YYYY-MM-DD HH:mm');
         const blockWidth = 100 / (((endHour - startHour) / step) + 1);
@@ -79,12 +85,12 @@ export default class TimelineItem extends React.Component {
                     {segmentStartDt.format('HH:mm')} - {segmentEndDt.format('HH:mm')}
                 </div>
                 <div>
-                    {reservation ? reservation.booking_reason : Translate.string('Click to book it')}
+                    {reservation ? reservation.booking_reason : (bookable ? Translate.string('Click to book it') : '')}
                 </div>
             </>
         );
         const segment = (
-            <div className={additionalClasses}
+            <div className={additionalClasses} onClick={!reservation ? onClick : null}
                  styleName="timeline-occurrence"
                  style={{left: `${segmentPosition}%`, width: `calc(${segmentWidth}% + 1px)`}} />
         );

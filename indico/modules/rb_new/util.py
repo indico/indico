@@ -26,17 +26,21 @@ from sqlalchemy.orm import contains_eager, raiseload
 
 from indico.core.auth import multipass
 from indico.core.db import db
-from indico.core.db.sqlalchemy.util.queries import escape_like
+from indico.core.db.sqlalchemy.util.queries import db_dates_overlap, escape_like
 from indico.modules.rb import rb_is_admin, rb_settings
 from indico.modules.rb.models.equipment import EquipmentType, RoomEquipmentAssociation
 from indico.modules.rb.models.favorites import favorite_room_table
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
-from indico.modules.rb.models.reservations import Reservation
+from indico.modules.rb.models.reservations import RepeatFrequency, Reservation
 from indico.modules.rb.models.room_attributes import RoomAttributeAssociation
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb_new.schemas import rooms_schema
 from indico.util.caching import memoize_redis
 from indico.util.struct.iterables import group_list
+
+
+BOOKING_TIME_DIFF = 20  # (minutes)
+DURATION_FACTOR = 0.25
 
 
 def _filter_coordinates(query, filters):
@@ -136,14 +140,18 @@ def get_buildings():
     return buildings_tmp
 
 
-def get_existing_room_occurrences(room, start_dt, end_dt):
-    return (ReservationOccurrence.query
-            .filter(Reservation.room_id == room.id, ReservationOccurrence.start_dt >= start_dt,
-                    ReservationOccurrence.end_dt <= end_dt, ReservationOccurrence.is_valid)
-            .join(ReservationOccurrence.reservation)
-            .options(ReservationOccurrence.NO_RESERVATION_USER_STRATEGY,
-                     contains_eager(ReservationOccurrence.reservation))
-            .all())
+def get_existing_room_occurrences(room, start_dt, end_dt, allow_overlapping=False):
+    query = (ReservationOccurrence.query
+             .filter(Reservation.room_id == room.id, ReservationOccurrence.is_valid)
+             .join(ReservationOccurrence.reservation)
+             .options(ReservationOccurrence.NO_RESERVATION_USER_STRATEGY,
+                      contains_eager(ReservationOccurrence.reservation)))
+
+    if allow_overlapping:
+        query = query.filter(db_dates_overlap(ReservationOccurrence, 'start_dt', start_dt, 'end_dt', end_dt))
+    else:
+        query = query.filter(ReservationOccurrence.start_dt >= start_dt, ReservationOccurrence.end_dt <= end_dt)
+    return query.all()
 
 
 def get_room_conflicts(room, start_dt, end_dt, repeat_frequency, repeat_interval):
@@ -186,7 +194,7 @@ def get_rooms_availability(rooms, start_dt, end_dt, repeat_frequency, repeat_int
 
         pre_bookings = [occ for occ in occurrences if not occ.reservation.is_accepted]
         existing_bookings = [occ for occ in occurrences if occ.reservation.is_accepted]
-        availability[room.id] = {'room_name': room.full_name,
+        availability[room.id] = {'room': room,
                                  'candidates': group_by_occurrence_date(candidates),
                                  'pre_bookings': group_by_occurrence_date(pre_bookings),
                                  'bookings': group_by_occurrence_date(existing_bookings),
@@ -241,3 +249,99 @@ def get_managed_room_ids(user):
         return {id_ for id_, in _query_managed_rooms(user).with_entities(Room.id)}
     else:
         return {r.id for r in Room.get_owned_by(user)}
+
+
+def get_suggestions(filters):
+    room_filters = {key: value for key, value in filters.iteritems()
+                    if key in ('capacity', 'equipment', 'building', 'text', 'floor')}
+
+    query = search_for_rooms(room_filters, only_available=False)
+    query = query.filter(~Room.filter_available(filters['start_dt'], filters['end_dt'],
+                                                (filters['repeat_frequency'], filters['repeat_interval'])))
+    rooms = query.all()
+    if filters['repeat_frequency'] == RepeatFrequency.NEVER:
+        return sort_suggestions(get_single_booking_suggestions(rooms, filters['start_dt'], filters['end_dt']))
+    else:
+        return get_number_of_skipped_days_for_rooms(rooms, filters['start_dt'], filters['end_dt'],
+                                                    filters['repeat_frequency'], filters['repeat_interval'])
+
+
+def get_single_booking_suggestions(rooms, start_dt, end_dt):
+    data = []
+    for room in rooms:
+        suggestions = {}
+        suggested_time = get_start_time_suggestion(room, start_dt, end_dt)
+        if suggested_time:
+            suggested_time_change = (suggested_time - start_dt).total_seconds() / 60
+            if suggested_time_change:
+                suggestions['time'] = suggested_time_change
+
+        duration_suggestion = get_duration_suggestion(room, start_dt, end_dt)
+        original_duration = (end_dt - start_dt).total_seconds() / 60
+        if duration_suggestion and duration_suggestion <= DURATION_FACTOR * original_duration:
+            suggestions['duration'] = duration_suggestion
+        if suggestions:
+            data.append({'room': room, 'suggestions': suggestions})
+    return data
+
+
+def get_number_of_skipped_days_for_rooms(rooms, start_dt, end_dt, repeat_frequency, repeat_interval):
+    data = []
+    for room in rooms:
+        conflicts = get_room_conflicts(room, start_dt, end_dt, repeat_frequency, repeat_interval)
+        number_of_conflicting_days = len(group_by_occurrence_date(conflicts[0]))
+        if number_of_conflicting_days:
+            data.append({'room': room, 'suggestions': {'skip': number_of_conflicting_days}})
+    return sorted(data, key=lambda item: item['suggestions']['skip'])
+
+
+def get_start_time_suggestion(room, from_, to):
+    duration = (to - from_).total_seconds() / 60
+    new_start_dt = from_ - timedelta(minutes=BOOKING_TIME_DIFF)
+    new_end_dt = to + timedelta(minutes=BOOKING_TIME_DIFF)
+    occurrences = get_existing_room_occurrences(room, new_start_dt, new_end_dt, allow_overlapping=True)
+
+    if not occurrences:
+        return from_ - timedelta(minutes=BOOKING_TIME_DIFF)
+
+    candidates = []
+    period_start = new_start_dt
+    for occurrence in occurrences:
+        occ_start, occ_end = occurrence.start_dt, occurrence.end_dt
+        if period_start < occ_start:
+            candidates.append((period_start, occ_start))
+        period_start = occ_end
+
+    if period_start < new_end_dt:
+        candidates.append((period_start, new_end_dt))
+
+    for candidate in candidates:
+        start, end = candidate
+        candidate_duration = (end - start).total_seconds() / 60
+        if duration <= candidate_duration:
+            return start
+
+
+def get_duration_suggestion(room, from_, to):
+    occurrences = get_existing_room_occurrences(room, from_, to, allow_overlapping=True)
+    old_duration = (to - from_).total_seconds() / 60
+    duration = old_duration
+    for occurrence in occurrences:
+        start, end = occurrence.start_dt, occurrence.end_dt
+        if end > from_ and end < to:
+            if start > from_:
+                continue
+            duration -= (end - from_).total_seconds() / 60
+        if start > from_ and start < to:
+            if end < to:
+                continue
+            duration -= (to - start).total_seconds() / 60
+    return abs(duration - old_duration) if old_duration != duration else None
+
+
+def sort_suggestions(suggestions):
+    def cmp_fn(a, b):
+        a_time, a_duration = abs(a.get('time', 0)), a.get('duration', 0)
+        b_time, b_duration = abs(b.get('time', 0)), b.get('duration', 0)
+        return int(a_time + a_duration * 0.2) - int(b_time + b_duration * 0.2)
+    return sorted(suggestions, cmp=cmp_fn, key=lambda item: item['suggestions'])

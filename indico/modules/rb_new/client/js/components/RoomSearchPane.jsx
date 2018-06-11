@@ -20,7 +20,7 @@ import PropTypes from 'prop-types';
 import {Card, Grid, Sticky, Loader} from 'semantic-ui-react';
 import LazyScroll from 'redux-lazy-scroll';
 
-import {Param, Plural, PluralTranslate, Singular} from 'indico/react/i18n';
+import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
 
 import './RoomSearchPane.module.scss';
 
@@ -36,11 +36,13 @@ export default class RoomSearchPane extends React.Component {
         filterBar: PropTypes.element.isRequired,
         searchBar: PropTypes.element.isRequired,
         renderRoom: PropTypes.func.isRequired,
-        extraIcons: PropTypes.element
+        extraIcons: PropTypes.element,
+        renderSuggestions: PropTypes.func
     };
 
     static defaultProps = {
-        extraIcons: null
+        extraIcons: null,
+        renderSuggestions: null
     };
 
     constructor(props) {
@@ -59,7 +61,8 @@ export default class RoomSearchPane extends React.Component {
             filterBar,
             searchBar,
             renderRoom,
-            extraIcons
+            extraIcons,
+            renderSuggestions
         } = this.props;
 
         return (
@@ -74,14 +77,17 @@ export default class RoomSearchPane extends React.Component {
                     {searchBar}
                 </Sticky>
                 <div styleName="results-count">
-                    <PluralTranslate count={total}>
-                        <Singular>
-                            <Param name="count" value={total} /> result found
-                        </Singular>
-                        <Plural>
-                            <Param name="count" value={total} /> results found
-                        </Plural>
-                    </PluralTranslate>
+                    {total === 0 && !isFetching && Translate.string('No exact matches were found')}
+                    {total !== 0 && (
+                        <PluralTranslate count={total}>
+                            <Singular>
+                                <Param name="count" value={total} /> result found
+                            </Singular>
+                            <Plural>
+                                <Param name="count" value={total} /> results found
+                            </Plural>
+                        </PluralTranslate>
+                    )}
                 </div>
                 <LazyScroll hasMore={total > list.length} loadMore={this.loadMore} isFetching={isFetching}>
                     <Card.Group stackable>
@@ -89,6 +95,7 @@ export default class RoomSearchPane extends React.Component {
                     </Card.Group>
                     <Loader active={isFetching} inline="centered" styleName="rooms-loader" />
                 </LazyScroll>
+                {renderSuggestions && renderSuggestions()}
             </div>
         );
     }
