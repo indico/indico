@@ -17,7 +17,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Card, Sticky} from 'semantic-ui-react';
+import {Card, Grid, Sticky} from 'semantic-ui-react';
 import LazyScroll from 'redux-lazy-scroll';
 
 import {Param, Plural, PluralTranslate, Singular} from 'indico/react/i18n';
@@ -35,7 +35,12 @@ export default class RoomSearchPane extends React.Component {
         fetchRooms: PropTypes.func.isRequired,
         filterBar: PropTypes.element.isRequired,
         searchBar: PropTypes.element.isRequired,
-        renderRoom: PropTypes.func.isRequired
+        renderRoom: PropTypes.func.isRequired,
+        extraIcons: PropTypes.element
+    };
+
+    static defaultProps = {
+        extraIcons: null
     };
 
     constructor(props) {
@@ -53,13 +58,19 @@ export default class RoomSearchPane extends React.Component {
             rooms: {list, total, isFetching},
             filterBar,
             searchBar,
-            renderRoom
+            renderRoom,
+            extraIcons
         } = this.props;
 
         return (
             <div className="ui" styleName="room-list" ref={this.contextRef}>
                 <Sticky context={this.contextRef.current} className="sticky-filters">
-                    {filterBar}
+                    <Grid>
+                        <Grid.Column width={extraIcons ? 13 : 16}>
+                            {filterBar}
+                        </Grid.Column>
+                        {extraIcons}
+                    </Grid>
                     {searchBar}
                 </Sticky>
                 <div styleName="results-count">

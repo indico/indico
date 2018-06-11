@@ -120,12 +120,14 @@ export default class BookRoom extends React.Component {
                                     fetchRooms={fetchRooms}
                                     filterBar={filterBar}
                                     searchBar={searchBar}
-                                    renderRoom={this.renderRoom} />
+                                    renderRoom={this.renderRoom}
+                                    extraIcons={this.renderViewSwitch()} />
                     <Dimmer.Dimmable>
                         <Dimmer active={roomDetails.isFetching} page>
                             <Loader />
                         </Dimmer>
-                        <RoomDetailsModal roomDetails={roomDetails} setRoomDetailsModal={setRoomDetailsModal} />
+                        <RoomDetailsModal roomDetails={roomDetails}
+                                          setRoomDetailsModal={setRoomDetailsModal} />
                     </Dimmer.Dimmable>
                 </>
             );
@@ -133,14 +135,52 @@ export default class BookRoom extends React.Component {
             return (
                 <div ref={(ref) => this.handleContextRef(ref, 'timelineRef')}>
                     <Sticky context={timelineRef} className="sticky-filters">
-                        {filterBar}
-                        {searchBar}
+                        <Grid>
+                            <Grid.Column width={13}>
+                                {filterBar}
+                            </Grid.Column>
+                            {this.renderViewSwitch()}
+                        </Grid>
+                        <Grid.Row>
+                            {searchBar}
+                        </Grid.Row>
                     </Sticky>
                     <Timeline minHour={6} maxHour={22} />
                 </div>
             );
         }
     };
+
+    renderViewSwitch() {
+        const {switcherRef, view} = this.state;
+        const {timeline: {availability}} = this.props;
+        const timelineDataAvailable = !_.isEmpty(availability);
+        const hasConflicts = Object.values(availability).some((data) => {
+            return !_.isEmpty(data.conflicts);
+        });
+        const classes = toClasses({active: view === 'timeline', disabled: !timelineDataAvailable});
+
+        return (
+            <Grid.Column width={3} styleName="view-icons" textAlign="right" verticalAlign="middle">
+                <div ref={(ref) => this.handleContextRef(ref, 'switcherRef')} styleName="view-icons-context">
+                    <Sticky context={switcherRef} offset={30}>
+                        <span>
+                            <Icon size="big" className={toClasses({active: view === 'book'})}
+                                  name="list" onClick={() => this.setState({view: 'book', timelineRef: null})} />
+                            <Icon.Group size="big"
+                                        className={classes}
+                                        onClick={this.switchToTimeline}>
+                                <Icon name="calendar outline" disabled={!timelineDataAvailable} />
+                                {hasConflicts && (
+                                    <Icon name="exclamation triangle" color="red" corner />
+                                )}
+                            </Icon.Group>
+                        </span>
+                    </Sticky>
+                </div>
+            </Grid.Column>
+        );
+    }
 
     switchToTimeline = () => {
         const {timeline: {availability}} = this.props;
@@ -170,34 +210,11 @@ export default class BookRoom extends React.Component {
     };
 
     render() {
-        const {view, bookingModal, selectedRoom, switcherRef} = this.state;
-        const {timeline: {availability}} = this.props;
-        const timelineDataAvailable = !_.isEmpty(availability);
-        const hasConflicts = Object.values(availability).some((data) => {
-            return !_.isEmpty(data.conflicts);
-        });
-
+        const {bookingModal, selectedRoom} = this.state;
         return (
             <Grid columns={2}>
-                <Grid.Column width={10}>
+                <Grid.Column width={11}>
                     {this.renderMainContent()}
-                </Grid.Column>
-                <Grid.Column width={1} styleName="view-icons">
-                    <div ref={(ref) => this.handleContextRef(ref, 'switcherRef')} styleName="view-icons-context">
-                        <Sticky context={switcherRef} offset={30}>
-                            <span>
-                                <Icon size="big" className={toClasses({active: view === 'book'})}
-                                      name="list" onClick={() => this.setState({view: 'book', timelineRef: null})} />
-                                <Icon.Group size="big" className={toClasses({active: view === 'timeline', disabled: !timelineDataAvailable})}
-                                            onClick={this.switchToTimeline}>
-                                    <Icon name="calendar outline" disabled={!timelineDataAvailable} />
-                                    {hasConflicts && (
-                                        <Icon name="exclamation triangle" color="red" corner />
-                                    )}
-                                </Icon.Group>
-                            </span>
-                        </Sticky>
-                    </div>
                 </Grid.Column>
                 <Grid.Column width={5}>
                     <MapController />
