@@ -40,4 +40,4 @@ const mapDispatchToProps = (dispatch) => ({
 });
 
 const container = connect(mapStateToProps, mapDispatchToProps)(ErrorDialog);
-export default reduxForm({form: 'reportError'})(container);
+export default reduxForm({form: 'reportError', touchOnBlur: false})(container);
