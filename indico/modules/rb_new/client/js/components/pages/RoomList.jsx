@@ -18,9 +18,10 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Button, Grid, Dimmer, Loader} from 'semantic-ui-react';
+import {Button, Grid, Dimmer, Loader, Popup} from 'semantic-ui-react';
 
 import {Slot} from 'indico/react/util';
+import {Translate} from 'indico/react/i18n';
 import RoomSearchPane from '../RoomSearchPane';
 import RoomFilterBar from '../RoomFilterBar';
 import filterBarFactory from '../../containers/FilterBar';
@@ -70,12 +71,19 @@ export default class RoomList extends React.Component {
     renderRoom = (room) => {
         const {favoriteRooms} = this.props;
         const isFavorite = !!favoriteRooms[room.id];
+        const showDetailsBtn = <Button primary icon="search" circular onClick={() => this.handleOpenModal(room.id)} />;
+        const toggleFavoriteBtn = (
+            <Button icon="star" color={isFavorite ? 'yellow' : 'teal'} circular
+                    onClick={() => this.toggleFavoriteRoom(room)} />
+        );
+        const toggleFavoriteToolip = (
+            isFavorite ? Translate.string('Remove from favourites') : Translate.string('Add to favourites')
+        );
         return (
             <Room key={room.id} room={room} isFavorite={isFavorite}>
                 <Slot name="actions">
-                    <Button primary icon="search" circular onClick={() => this.handleOpenModal(room.id)} />
-                    <Button icon="star" color={isFavorite ? 'yellow' : 'teal'} circular
-                            onClick={() => this.toggleFavoriteRoom(room)} />
+                    <Popup trigger={showDetailsBtn} content={Translate.string('Room details')} position="top center" />
+                    <Popup trigger={toggleFavoriteBtn} content={toggleFavoriteToolip} position="top center" />
                 </Slot>
             </Room>
         );

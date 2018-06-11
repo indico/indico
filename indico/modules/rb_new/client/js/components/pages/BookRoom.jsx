@@ -18,9 +18,10 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import _ from 'lodash';
-import {Button, Dimmer, Grid, Icon, Loader, Message, Sticky} from 'semantic-ui-react';
+import {Button, Dimmer, Grid, Icon, Loader, Message, Sticky, Popup} from 'semantic-ui-react';
 
 import {Slot, toClasses} from 'indico/react/util';
+import {Translate} from 'indico/react/i18n';
 import mapControllerFactory from '../../containers/MapController';
 import RoomSearchPane from '../RoomSearchPane';
 import BookingFilterBar from '../BookingFilterBar';
@@ -86,6 +87,8 @@ export default class BookRoom extends React.Component {
     };
 
     renderRoom = (room) => {
+        const bookingModalBtn = <Button positive icon="check" circular onClick={() => this.openBookingModal(room)} />;
+        const showDetailsBtn = <Button primary icon="search" circular onClick={() => this.openDetailsModal(room.id)} />;
         return (
             <Room key={room.id} room={room}>
                 <Slot>
@@ -100,8 +103,8 @@ export default class BookRoom extends React.Component {
                     </Grid>
                 </Slot>
                 <Slot name="actions">
-                    <Button positive icon="check" circular onClick={() => this.openBookingModal(room)} />
-                    <Button primary icon="search" circular onClick={() => this.openDetailsModal(room.id)} />
+                    <Popup trigger={bookingModalBtn} content={Translate.string('Book room')} position="top center" hideOnScroll />
+                    <Popup trigger={showDetailsBtn} content={Translate.string('Room details')} position="top center" hideOnScroll />
                 </Slot>
             </Room>
         );
