@@ -18,11 +18,12 @@
 import _ from 'lodash';
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Card, Dimmer, Icon, Image, Label, Popup} from 'semantic-ui-react';
+import {Card, Icon, Image, Label, Popup} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 import {Slot} from 'indico/react/util';
 import {TooltipIfTruncated} from 'indico/react/components';
+import DimmableImage from  './Dimmer.jsx';
 
 
 import './Room.module.scss';
@@ -39,68 +40,30 @@ export default class Room extends React.Component {
         isFavorite: false
     };
 
-    constructor(props) {
-        super(props);
-
-        this.state = {
-            dimmed: false
-        };
-    }
-
-    shouldComponentUpdate(nextProps, nextState) {
+    shouldComponentUpdate(nextProps) {
         const {isFavorite: nextIsFavorite, room: nextRoom} = nextProps;
         const {room, isFavorite} = this.props;
-        const {dimmed} = this.state;
-        const {dimmed: nextDimmed} = nextState;
 
-        return nextIsFavorite !== isFavorite || !_.isEqual(room, nextRoom) || dimmed !== nextDimmed;
+        return nextIsFavorite !== isFavorite || !_.isEqual(room, nextRoom);
     }
 
-    toggleDimmer = (state) => {
-        this.setState({dimmed: state});
-    };
-
-    renderDimmedImage = (dimmer, content) => {
-        const {dimmed} = this.state;
-        const newProps = Object.assign({}, dimmer);
-        delete newProps['className'];
-
-        return (
-            <div styleName="room-image">
-                {!dimmed && content && (
-                    <div styleName="room-extra-info">
-                        {content}
-                    </div>
-                )}
-                <Image {...dimmer} />
-            </div>
-        );
-    };
-
     renderCardImage = (room, content, actions) => {
-        const {dimmed} = this.state;
-
         if (actions !== undefined && actions.length !== 0) {
             const dimmerContent = (
                 <div>
                     {actions}
                 </div>
             );
-
             return (
-                <Dimmer.Dimmable as={(dimmer) => this.renderDimmedImage(dimmer, content)}
-                                 dimmed={dimmed}
-                                 dimmer={{active: dimmed, content: dimmerContent}}
-                                 src={room.large_photo_url}
-                                 onMouseEnter={() => this.toggleDimmer(true)}
-                                 onMouseLeave={() => this.toggleDimmer(false)}
-                                 blurring />
+                <DimmableImage src={room.large_photo_url}
+                               content={content}
+                               hoverContent={dimmerContent} />
             );
         } else {
             return (
                 <div styleName="room-image">
                     <div styleName="room-extra-info">
-                        {!dimmed && content}
+                        {content}
                     </div>
                     <Image src={room.large_photo_url} />
                 </div>
