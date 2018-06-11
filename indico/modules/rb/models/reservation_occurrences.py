@@ -137,17 +137,15 @@ class ReservationOccurrence(db.Model, Serializer):
         if repeat_frequency == RepeatFrequency.NEVER:
             return [start]
 
-        if repeat_frequency == RepeatFrequency.DAY:
-            if repeat_interval == 1:
-                return rrule.rrule(rrule.DAILY, dtstart=start, until=end)
-            else:
+        elif repeat_frequency == RepeatFrequency.DAY:
+            if repeat_interval != 1:
                 raise IndicoError(u'Unsupported interval')
+            return rrule.rrule(rrule.DAILY, dtstart=start, until=end)
 
         elif repeat_frequency == RepeatFrequency.WEEK:
-            if 0 < repeat_interval < 4:
-                return rrule.rrule(rrule.WEEKLY, dtstart=start, until=end, interval=repeat_interval)
-            else:
+            if repeat_interval <= 0:
                 raise IndicoError(u'Unsupported interval')
+            return rrule.rrule(rrule.WEEKLY, dtstart=start, until=end, interval=repeat_interval)
 
         elif repeat_frequency == RepeatFrequency.MONTH:
             if repeat_interval == 0:
