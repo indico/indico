@@ -50,14 +50,14 @@ def _sidemenu_items(sender, **kwargs):
         yield SideMenuItem('legal_messages', _('Legal/Disclaimers'), url_for('legal.manage'), section='security')
 
 
-@template_hook('page-footer')
+@template_hook('page-footer', priority=50)
 def _inject_tos_footer(**kwargs):
     url = legal_settings.get('tos_url')
     if url or legal_settings.get('tos'):
         return render_template('legal/tos_footer.html', url=url)
 
 
-@template_hook('page-footer')
+@template_hook('page-footer', priority=51)
 def _inject_privacy_footer(**kwargs):
     url = legal_settings.get('privacy_policy_url')
     if url or legal_settings.get('privacy_policy'):
