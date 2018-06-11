@@ -41,18 +41,19 @@ export default class ErrorDialog extends React.Component {
         clearError: PropTypes.func.isRequired,
         showReportForm: PropTypes.func.isRequired,
         // redux-form stuff
-        error: PropTypes.string,
-        submitting: PropTypes.bool.isRequired,
-        invalid: PropTypes.bool.isRequired,
-        pristine: PropTypes.bool.isRequired,
-        submitSucceeded: PropTypes.bool.isRequired,
-        submitFailed: PropTypes.bool.isRequired,
-        handleSubmit: PropTypes.func.isRequired,
+        form: PropTypes.shape({
+            error: PropTypes.string,
+            submitting: PropTypes.bool.isRequired,
+            invalid: PropTypes.bool.isRequired,
+            pristine: PropTypes.bool.isRequired,
+            submitSucceeded: PropTypes.bool.isRequired,
+            submitFailed: PropTypes.bool.isRequired,
+            handleSubmit: PropTypes.func.isRequired,
+        }).isRequired,
     };
 
     static defaultProps = {
         errorData: undefined,
-        error: undefined,
     };
 
     clearError = () => {
@@ -78,7 +79,7 @@ export default class ErrorDialog extends React.Component {
     };
 
     renderReportForm() {
-        const {handleSubmit, submitFailed, submitSucceeded, error} = this.props;
+        const {form: {handleSubmit, submitFailed, submitSucceeded, error}} = this.props;
         return (
             <Form onSubmit={handleSubmit(this.submitReport)} error={submitFailed} success={submitSucceeded}>
                 {error && <Message error content={error} />}
@@ -105,7 +106,7 @@ export default class ErrorDialog extends React.Component {
     }
 
     renderReportActions() {
-        const {submitting, handleSubmit, invalid, pristine, submitSucceeded, formVisible} = this.props;
+        const {form: {submitting, handleSubmit, invalid, pristine, submitSucceeded}, formVisible} = this.props;
         if (formVisible) {
             return (
                 <Button type="submit" primary
@@ -121,7 +122,7 @@ export default class ErrorDialog extends React.Component {
     }
 
     render() {
-        const {errorData, remainingErrors, dialogVisible, formVisible, submitSucceeded} = this.props;
+        const {errorData, remainingErrors, dialogVisible, formVisible, form: {submitSucceeded}} = this.props;
         if (!dialogVisible) {
             return null;
         }
