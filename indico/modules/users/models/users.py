@@ -42,13 +42,14 @@ from indico.util.struct.enum import RichIntEnum
 
 
 class UserTitle(RichIntEnum):
-    __titles__ = ('', _('Mr'), _('Ms'), _('Mrs'), _('Dr'), _('Prof.'))
+    __titles__ = ('', _('Mr'), _('Ms'), _('Mrs'), _('Dr'), _('Prof.'), _('Eur Ing'))
     none = 0
     mr = 1
     ms = 2
     mrs = 3
     dr = 4
     prof = 5
+    euring = 6
 
 
 class NameFormat(RichIntEnum):
