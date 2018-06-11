@@ -169,7 +169,7 @@ export default class BookRoom extends React.Component {
                     <Sticky context={switcherRef} offset={30}>
                         <span>
                             <Icon size="big" className={toClasses({active: view === 'book'})}
-                                  name="list" onClick={() => this.setState({view: 'book', timelineRef: null})} />
+                                  name="grid layout" onClick={() => this.setState({view: 'book', timelineRef: null})} />
                             <Icon.Group size="big"
                                         className={classes}
                                         onClick={this.switchToTimeline}>
