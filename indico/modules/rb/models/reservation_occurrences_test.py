@@ -163,7 +163,11 @@ def test_iter_start_time_daily(interval, days_elapsed, expected_length):
     (3, 14, 1),
     (3, 21, 2),
     (3, 63, 4),
-    (4, 0,  None),
+    (4, 0,  1),
+    (4, 27, 1),
+    (4, 28, 2),
+    (4, 83, 3),
+    (4, 84, 4),
 ))
 def test_iter_start_time_weekly(interval, days_elapsed, expected_length):
     assert days_elapsed >= 0
