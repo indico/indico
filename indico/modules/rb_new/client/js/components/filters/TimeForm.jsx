@@ -66,7 +66,7 @@ export default class TimeForm extends FilterFormComponent {
             <div>
                 <TimeRangePicker startTime={startTime}
                                  endTime={endTime}
-                                 onChange={(start, end) => this.setTimes(start, end)} />
+                                 onChange={this.setTimes} />
             </div>
         );
     }
