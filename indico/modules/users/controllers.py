@@ -45,9 +45,9 @@ from indico.modules.users.forms import (AdminAccountRegistrationForm, AdminsForm
                                         SearchForm, UserDetailsForm, UserEmailsForm, UserPreferencesForm)
 from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.operations import create_user
+from indico.modules.users.schemas import user_schema
 from indico.modules.users.util import (build_user_search_query, get_linked_events, get_related_categories,
                                        get_suggested_categories, merge_users, search_users, serialize_user)
-from indico.modules.users.schemas import user_schema
 from indico.modules.users.views import WPUser, WPUsersAdmin
 from indico.util.date_time import now_utc, timedelta_split
 from indico.util.event import truncate_path
