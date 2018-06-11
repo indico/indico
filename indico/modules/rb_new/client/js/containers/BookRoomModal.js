@@ -21,10 +21,11 @@ import {createBooking} from  '../actions';
 
 
 const mapStateToProps = ({
-    bookRoom: {filters: {recurrence, dates, timeSlot}}, form, user
+    bookRoom: {filters: {recurrence, dates, timeSlot}, timeline: {availability}}, form, user
 }, {room}) => ({
     bookingData: {recurrence, dates, timeSlot, room},
     bookingState: form.roomModal && form.roomModal.bookingState,
+    availability: room && availability[room.id],
     user
 });
 

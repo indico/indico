@@ -17,10 +17,10 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Button, Form, Grid, Icon, Label, Message, Modal, Segment} from 'semantic-ui-react';
+import {Button, Checkbox, Form, Grid, Icon, Label, Message, Modal, Segment} from 'semantic-ui-react';
 import {reduxForm, Field} from 'redux-form';
 import {ReduxFormField, ReduxRadioField} from 'indico/react/forms';
-import {Translate, Param} from 'indico/react/i18n';
+import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
 import UserSearchField from 'indico/react/components/UserSearchField';
 import recurrenceRenderer from '../filters/RecurrenceRenderer';
 import {toMoment} from '../../util';
@@ -57,13 +57,19 @@ class BookRoomModal extends React.Component {
         onSubmit: PropTypes.func.isRequired,
         onClose: PropTypes.func.isRequired,
         pristine: PropTypes.bool.isRequired,
-        invalid: PropTypes.bool.isRequired
+        invalid: PropTypes.bool.isRequired,
+        availability: PropTypes.object
     };
 
     static defaultProps = {
         open: false,
         room: null,
-        bookingState: {}
+        bookingState: {},
+        availability: null
+    };
+
+    state = {
+        skipConflicts: false
     };
 
     renderUserSearchField({input, ...props}) {
@@ -71,6 +77,7 @@ class BookRoomModal extends React.Component {
             <ReduxFormField input={input}
                             as={UserSearchField}
                             {...props}
+                            defaultValue={input.value.id}
                             onChange={(user) => {
                                 input.onChange(user);
                             }} />
@@ -164,23 +171,70 @@ class BookRoomModal extends React.Component {
         );
     }
 
+    renderBookingConstraints(conflicts) {
+        const {skipConflicts} = this.state;
+        return (
+            <>
+                <Message color="yellow" attached icon>
+                    <Icon name="warning circle" />
+                    <Message.Content>
+                        <Message.Header>
+                            <Translate>Booking conflicts</Translate>
+                        </Message.Header>
+                        <PluralTranslate count={conflicts.length}>
+                            <Singular>
+                                Your booking conflicts with another existing one.
+                            </Singular>
+                            <Plural>
+                                <Param name="count" value={conflicts.length} /> occurrences of your booking
+                                conflict with existing bookings.
+                            </Plural>
+                        </PluralTranslate>
+                    </Message.Content>
+                </Message>
+                <Segment attached="bottom">
+                    <Checkbox toggle
+                              defaultChecked={skipConflicts}
+                              label={Translate.string('I understand, please skip any days with conflicting occurrences.')}
+                              onChange={(_, {checked}) => {
+                                  this.setState({
+                                      skipConflicts: checked
+                                  });
+                              }} />
+                </Segment>
+            </>
+        );
+    }
+
     submitFormFactory = (isPrebooking) => (data, ...args) => {
         const {onSubmit} = this.props;
         onSubmit({...data, isPrebooking}, ...args);
     };
 
+    onClose = () => {
+        const {onClose} = this.props;
+        // reset state when dialog is closed
+        this.setState({
+            skipConflicts: false
+        });
+        onClose();
+    };
+
     render() {
         const {bookingData: {recurrence, dates, timeSlot}, open, room, bookingState,
-               onClose, user} = this.props;
+               user, availability} = this.props;
+        const {skipConflicts} = this.state;
+
         if (!room) {
             return null;
         }
-
+        const conflictsExist = availability && !!availability.conflicts.length;
         const bookingBlocked = bookingState.success || bookingState.ongoing;
+        const buttonsBlocked = bookingBlocked || (conflictsExist && !skipConflicts);
         const {is_auto_confirm: isDirectlyBookable} = room;
 
         return (
-            <Modal open={open} onClose={onClose} closeIcon>
+            <Modal open={open} onClose={this.onClose} closeIcon>
                 <Modal.Header>
                     <Translate>Book a Room</Translate>
                 </Modal.Header>
@@ -219,19 +273,21 @@ class BookRoomModal extends React.Component {
                                            disabled={bookingBlocked} />
                                 </Form>
                             </Segment>
+                            {conflictsExist &&
+                                this.renderBookingConstraints(Object.values(availability.conflicts))}
                             {this.renderBookingState(bookingState)}
                         </Grid.Column>
                     </Grid>
                 </Modal.Content>
                 <Modal.Actions>
                     {(isDirectlyBookable || user.isAdmin) &&
-                     this.renderBookingButton(false, bookingBlocked)}
+                     this.renderBookingButton(false, buttonsBlocked)}
                     {!isDirectlyBookable &&
-                     this.renderBookingButton(true, bookingBlocked)}
+                     this.renderBookingButton(true, buttonsBlocked)}
                     <Button content={(bookingState.success
                         ? Translate.string('Close')
                         : Translate.string("I've changed my mind!"))}
-                            onClick={onClose} />
+                            onClick={this.onClose} />
 
                 </Modal.Actions>
             </Modal>
