@@ -386,6 +386,8 @@ export function createBooking(args) {
         const {success, msg, is_prebooking: isPrebooking} = response.data;
         if (success) {
             dispatch({type: BOOKING_CONFIRMED, isPrebooking});
+            // reload rooms without the newly booked one
+            dispatch(fetchRooms('bookRoom'));
         } else {
             dispatch({type: BOOKING_FAILED, message: msg});
         }
