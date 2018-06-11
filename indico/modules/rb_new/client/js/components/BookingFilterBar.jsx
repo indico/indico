@@ -109,8 +109,9 @@ export default class FilterBar extends React.Component {
                                        showButtons={false} />
                 <FilterDropdownFactory name="timeSlot"
                                        title={<Translate>Time</Translate>}
-                                       form={(fieldValues, setParentField) => (
+                                       form={(fieldValues, setParentField, handleClose) => (
                                            <TimeForm setParentField={setParentField}
+                                                     handleClose={handleClose}
                                                      {...fieldValues} />
                                        )}
                                        setGlobalState={setFilterParameter.bind(undefined, 'timeSlot')}

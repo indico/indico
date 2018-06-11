@@ -47,18 +47,29 @@ export default class TimeForm extends FilterFormComponent {
         };
     }
 
-    setTimes(startTime, endTime) {
-        const {setParentField} = this.props;
+    setTimes = async (startTime, endTime, isEnd) => {
+        const {handleClose, setParentField} = this.props;
+        const {startTime: prevStartTime, endTime: prevEndTime} = this.state;
+
+        // if everything stays the same, do nothing
+        if (startTime === prevStartTime && endTime === prevEndTime) {
+            return;
+        }
 
         // send serialized versions to parent/redux
-        setParentField('startTime', serializeTime(startTime));
-        setParentField('endTime', serializeTime(endTime));
+        await setParentField('startTime', serializeTime(startTime));
+        await setParentField('endTime', serializeTime(endTime));
 
         this.setState({
             startTime,
             endTime
+        }, () => {
+            if (isEnd) {
+                // set the end time -> close pop-up
+                handleClose();
+            }
         });
-    }
+    };
 
     render() {
         const {startTime, endTime} = this.state;

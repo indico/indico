@@ -26,7 +26,6 @@ import buildingsReducer from './buildings';
 import mapAspectsReducer from './mapAspects';
 import roomDetailsReducer from './roomDetails';
 import bookRoomFormReducer from './bookRoomForm';
-import uiReducer from './uiReducer';
 
 
 const reducers = {
@@ -38,7 +37,6 @@ const reducers = {
     buildings: buildingsReducer,
     mapAspects: mapAspectsReducer,
     roomDetails: roomDetailsReducer,
-    ui: uiReducer,
     form: reduxFormReducer.plugin({
         roomModal: bookRoomFormReducer
     })

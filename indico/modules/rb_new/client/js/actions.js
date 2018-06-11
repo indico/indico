@@ -397,11 +397,3 @@ export function createBooking(args) {
 export function resetBookingState() {
     return {type: RESET_BOOKING_STATE};
 }
-
-export function openFilterDropdown(name) {
-    return {type: OPEN_FILTER_DROPDOWN, name};
-}
-
-export function closeFilterDropdown(name) {
-    return {type: CLOSE_FILTER_DROPDOWN, name};
-}

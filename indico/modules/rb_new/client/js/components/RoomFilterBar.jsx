@@ -21,16 +21,26 @@ import PropTypes from 'prop-types';
 
 import {Translate} from 'indico/react/i18n';
 
-import filterDropdownFactory from '../containers/FilterDropdown';
+import FilterDropdown from './filters/FilterDropdown';
 import CapacityForm from './filters/CapacityForm';
 import EquipmentForm from './filters/EquipmentForm';
 
 import './RoomFilterBar.module.scss';
 
 
+const FilterBarContext = React.createContext();
+
 export function FilterDropdownFactory({name, ...props}) {
-    const Component = filterDropdownFactory(name);
-    return <Component {...props} />;
+    return (
+        <FilterBarContext.Consumer>
+            {({state, onDropdownOpen, onDropdownClose}) => (
+                <FilterDropdown open={state[name]}
+                                onOpen={() => onDropdownOpen(name)}
+                                onClose={() => onDropdownClose(name)}
+                                {...props} />
+            )}
+        </FilterBarContext.Consumer>
+    );
 }
 
 FilterDropdownFactory.propTypes = {
@@ -62,71 +72,92 @@ const equipmentRenderer = ({equipment}) => {
     }
 };
 
-export default function RoomFilterBar(
-    {
-        capacity, onlyFavorites, onlyMine, children, equipment, setFilterParameter, equipmentTypes,
-        hasOwnedRooms, hasFavoriteRooms
-    }
-) {
-    const equipmentFilter = !!equipmentTypes.length && (
-        <FilterDropdownFactory name="equipment"
-                               title={<Translate>Equipment</Translate>}
-                               form={({equipment: selectedEquipment}, setParentField) => (
-                                   <EquipmentForm setParentField={setParentField}
-                                                  selectedEquipment={selectedEquipment}
-                                                  possibleEquipment={equipmentTypes} />
-                               )}
-                               counter
-                               setGlobalState={data => setFilterParameter('equipment', data.equipment)}
-                               initialValues={{equipment}}
-                               renderValue={equipmentRenderer} />
-    );
-
-    return (
-        <Button.Group size="large">
-            {children}
-            <FilterDropdownFactory name="capacity"
-                                   title={<Translate>Min. Capacity</Translate>}
-                                   form={({capacity: selectedCapacity}, setParentField) => (
-                                       <CapacityForm setParentField={setParentField}
-                                                     capacity={selectedCapacity} />
-                                   )}
-                                   setGlobalState={data => setFilterParameter('capacity', data.capacity)}
-                                   initialValues={{capacity}}
-                                   renderValue={capacityRenderer} />
-            {equipmentFilter}
-            {(hasOwnedRooms || onlyMine) && (
-                <Popup trigger={<Button icon="user" primary={onlyMine}
-                                        onClick={() => setFilterParameter('onlyMine', !onlyMine)} />}
-                       content={Translate.string('Show only rooms I manage')} />
-            )}
-            <Popup trigger={<Button icon="star" primary={onlyFavorites} disabled={!onlyFavorites && !hasFavoriteRooms}
-                                    onClick={() => setFilterParameter('onlyFavorites', !onlyFavorites)} />}
-                   content={Translate.string('Show only my favorite rooms')} />
-        </Button.Group>
-    );
-}
-
 export const equipmentType = PropTypes.object;
 
-RoomFilterBar.propTypes = {
-    equipmentTypes: PropTypes.arrayOf(PropTypes.string).isRequired,
-    capacity: PropTypes.number,
-    equipment: equipmentType,
-    onlyFavorites: PropTypes.bool,
-    onlyMine: PropTypes.bool,
-    hasFavoriteRooms: PropTypes.bool,
-    hasOwnedRooms: PropTypes.bool,
-    setFilterParameter: PropTypes.func.isRequired,
-    children: PropTypes.node
-};
+export default class RoomFilterBar extends React.Component {
+    static propTypes = {
+        equipmentTypes: PropTypes.arrayOf(PropTypes.string).isRequired,
+        capacity: PropTypes.number,
+        equipment: equipmentType,
+        onlyFavorites: PropTypes.bool,
+        onlyMine: PropTypes.bool,
+        hasFavoriteRooms: PropTypes.bool,
+        hasOwnedRooms: PropTypes.bool,
+        setFilterParameter: PropTypes.func.isRequired,
+        children: PropTypes.node
+    };
 
-RoomFilterBar.defaultProps = {
-    capacity: null,
-    onlyFavorites: false,
-    onlyMine: false,
-    hasFavoriteRooms: false,
-    hasOwnedRooms: false,
-    children: null,
-    equipment: [],
-};
+    static defaultProps = {
+        capacity: null,
+        onlyFavorites: false,
+        onlyMine: false,
+        hasFavoriteRooms: false,
+        hasOwnedRooms: false,
+        children: null,
+        equipment: [],
+    };
+
+    state = {};
+
+    onDropdownOpen = (name) => {
+        this.setState(
+            (prevState) => Object.assign({}, ...Object.keys(prevState).map(k => ({[k]: null})), {[name]: true}));
+    };
+
+    onDropdownClose = (name) => {
+        this.setState({
+            [name]: false
+        });
+    };
+
+    render() {
+        const {
+            capacity, onlyFavorites, onlyMine, children, equipment, setFilterParameter, equipmentTypes,
+            hasOwnedRooms, hasFavoriteRooms
+        } = this.props;
+
+        const equipmentFilter = !!equipmentTypes.length && (
+            <FilterDropdownFactory name="equipment"
+                                   title={<Translate>Equipment</Translate>}
+                                   form={({equipment: selectedEquipment}, setParentField) => (
+                                       <EquipmentForm setParentField={setParentField}
+                                                      selectedEquipment={selectedEquipment}
+                                                      possibleEquipment={equipmentTypes} />
+                                   )}
+                                   counter
+                                   setGlobalState={data => setFilterParameter('equipment', data.equipment)}
+                                   initialValues={{equipment}}
+                                   renderValue={equipmentRenderer} />
+        );
+
+        return (
+            <Button.Group size="large">
+                <FilterBarContext.Provider value={{
+                    onDropdownOpen: this.onDropdownOpen,
+                    onDropdownClose: this.onDropdownClose,
+                    state: this.state
+                }}>
+                    {children}
+                    <FilterDropdownFactory name="capacity"
+                                           title={<Translate>Min. Capacity</Translate>}
+                                           form={({capacity: selectedCapacity}, setParentField) => (
+                                               <CapacityForm setParentField={setParentField}
+                                                             capacity={selectedCapacity} />
+                                           )}
+                                           setGlobalState={data => setFilterParameter('capacity', data.capacity)}
+                                           initialValues={{capacity}}
+                                           renderValue={capacityRenderer} />
+                    {equipmentFilter}
+                    {(hasOwnedRooms || onlyMine) && (
+                        <Popup trigger={<Button icon="user" primary={onlyMine}
+                                                onClick={() => setFilterParameter('onlyMine', !onlyMine)} />}
+                               content={Translate.string('Show only rooms I manage')} />
+                    )}
+                    <Popup trigger={<Button icon="star" primary={onlyFavorites} disabled={!onlyFavorites && !hasFavoriteRooms}
+                                            onClick={() => setFilterParameter('onlyFavorites', !onlyFavorites)} />}
+                           content={Translate.string('Show only my favorite rooms')} />
+                </FilterBarContext.Provider>
+            </Button.Group>
+        );
+    }
+}

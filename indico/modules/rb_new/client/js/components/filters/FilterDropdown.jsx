@@ -50,8 +50,8 @@ export default class FilterDropdown extends React.Component {
         defaults: PropTypes.object,
         counter: PropTypes.bool,
         open: PropTypes.bool,
-        openDropdown: PropTypes.func.isRequired,
-        closeDropdown: PropTypes.func.isRequired
+        onOpen: PropTypes.func.isRequired,
+        onClose: PropTypes.func.isRequired
     };
 
     static defaultProps = {
@@ -77,16 +77,21 @@ export default class FilterDropdown extends React.Component {
     }
 
     setFieldValue = (field, value) => {
-        // Do incremental state updates, to avoid working
-        // on an outdated state (consecutive calls)
-        const newState = this.setState((prevState) => ({
-            ...prevState,
-            fieldValues: {
-                ...prevState.fieldValues,
-                [field]: value
-            }
-        }));
-        this.setState(newState);
+        // return promise that resolves only after the
+        // state is properly set
+        return new Promise((resolve) => {
+            // Do incremental state updates, to avoid working
+            // on an outdated state (consecutive calls)
+            this.setState((prevState) => ({
+                ...prevState,
+                fieldValues: {
+                    ...prevState.fieldValues,
+                    [field]: value
+                }
+            }), () => {
+                resolve();
+            });
+        });
     };
 
     resetFields(fieldValues) {
@@ -104,16 +109,16 @@ export default class FilterDropdown extends React.Component {
     };
 
     handleClose = () => {
-        const {closeDropdown, setGlobalState} = this.props;
+        const {onClose, setGlobalState} = this.props;
         const {fieldValues} = this.state;
         this.setRenderedValue(fieldValues);
         setGlobalState(fieldValues);
-        closeDropdown();
+        onClose();
     };
 
     handleOpen = () => {
-        const {openDropdown} = this.props;
-        openDropdown();
+        const {onOpen} = this.props;
+        onOpen();
     };
 
     render() {
