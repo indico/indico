@@ -17,8 +17,8 @@
 
 import React from 'react';
 import RangeCalendar from 'rc-calendar/lib/RangeCalendar';
-import RcCalendar from 'rc-calendar';
-import propTypes from 'prop-types';
+import RCCalendar from 'rc-calendar';
+import PropTypes from 'prop-types';
 import 'rc-calendar/assets/index.css';
 import {toMoment} from '../../util';
 
@@ -32,10 +32,10 @@ const _serializeDate = date => (date ? date.format(_formatDateStr) : null);
 
 export default class DateForm extends FilterFormComponent {
     static propTypes = {
-        startDate: propTypes.string,
-        endDate: propTypes.string,
-        isRange: propTypes.bool.isRequired,
-        handleClose: propTypes.func.isRequired,
+        startDate: PropTypes.string,
+        endDate: PropTypes.string,
+        isRange: PropTypes.bool.isRequired,
+        handleClose: PropTypes.func.isRequired,
         ...FilterFormComponent.propTypes
     };
 
@@ -93,7 +93,7 @@ export default class DateForm extends FilterFormComponent {
                                    format={_formatDateStr}
                                    {...props} />
                 ) : (
-                    <RcCalendar selectedValue={startDate}
+                    <RCCalendar selectedValue={startDate}
                                 onSelect={async (date) => {
                                     await this.setDates(date, null);
                                     handleClose();

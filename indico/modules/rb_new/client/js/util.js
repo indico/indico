@@ -23,6 +23,10 @@ export function toMoment(dt, format) {
     return dt ? moment(dt, format) : null;
 }
 
+export function serializeTime(time) {
+    return time ? time.format('HH:mm') : null;
+}
+
 export function parseSearchBarText(queryText) {
     const resultMap = {bldg: 'building', floor: 'floor'};
     const result = {text: null, building: null, floor: null};

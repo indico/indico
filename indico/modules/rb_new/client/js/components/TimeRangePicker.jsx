@@ -17,15 +17,13 @@
 
 import moment from 'moment';
 import React from 'react';
-import propTypes from 'prop-types';
+import PropTypes from 'prop-types';
 import {Dropdown} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
-import {toMoment} from '../util';
+import {toMoment, serializeTime} from '../util';
 
 import './TimeRangePicker.module.scss';
 
-
-const _serializeTime = time => (time ? time.format('HH:mm') : null);
 
 function _humanizeDuration(duration) {
     const hours = duration.hours();
@@ -41,9 +39,9 @@ function _humanizeDuration(duration) {
 
 export default class TimeRangePicker extends React.Component {
     static propTypes = {
-        startTime: propTypes.object,
-        endTime: propTypes.object,
-        onChange: propTypes.func.isRequired,
+        startTime: PropTypes.object,
+        endTime: PropTypes.object,
+        onChange: PropTypes.func.isRequired,
     };
 
     static defaultProps = {
@@ -58,8 +56,8 @@ export default class TimeRangePicker extends React.Component {
         const startOptions = this.generateStartTimeOptions();
         const endOptions = this.generateEndTimeOptions(startTime);
         const duration = moment.duration(endTime.diff(startTime));
-        this.addOptionIfMissing(startOptions, _serializeTime(moment(startTime)));
-        this.addOptionIfMissing(endOptions, _serializeTime(moment(endTime)));
+        this.addOptionIfMissing(startOptions, serializeTime(moment(startTime)));
+        this.addOptionIfMissing(endOptions, serializeTime(moment(endTime)));
         this.state = {
             startTime,
             endTime,
@@ -75,7 +73,7 @@ export default class TimeRangePicker extends React.Component {
         const next = moment().startOf('day');
         let serializedNext;
         while (next < end) {
-            serializedNext = _serializeTime(moment(next));
+            serializedNext = serializeTime(moment(next));
             options.push({key: serializedNext, value: serializedNext, text: serializedNext});
             next.add(30, 'm');
         }
@@ -89,7 +87,7 @@ export default class TimeRangePicker extends React.Component {
         let serializedNext, duration, text;
         while (next < end) {
             duration = _humanizeDuration(moment.duration(next.diff(start)));
-            serializedNext = _serializeTime(moment(next));
+            serializedNext = serializeTime(moment(next));
             text = <div>{serializedNext} <div styleName="duration">({duration})</div></div>;
             options.push({key: serializedNext, value: serializedNext, text});
             next.add(30, 'm');
@@ -109,59 +107,61 @@ export default class TimeRangePicker extends React.Component {
     };
 
     updateStartTime = (startTime, endTime, duration) => {
-        const start = moment(startTime, ['HH:mm', 'HHmm', 'Hmm']);
+        const start = moment(startTime, ['HH:mm', 'Hmm']);
         let end = toMoment(endTime, 'HH:mm');
-        if (start.isValid()) {
-            if (end <= start) {
-                end = moment(start).add(duration);
-                if (end > moment().endOf('day')) {
-                    end = moment().endOf('day');
-                }
-            } else {
-                duration = moment.duration(end.diff(start));
-            }
-            const startOptions = this.generateStartTimeOptions();
-            const endOptions = this.generateEndTimeOptions(start);
-            this.addOptionIfMissing(startOptions, _serializeTime(moment(start)));
-            this.addOptionIfMissing(endOptions, _serializeTime(moment(end)));
-            this.setState({
-                startTime: start,
-                endTime: end,
-                duration,
-                startOptions,
-                endOptions
-            });
-            const {onChange} = this.props;
-            onChange(start, end);
+        if (!start.isValid()) {
+            return;
         }
+        if (end <= start) {
+            end = moment(start).add(duration);
+            if (end > moment().endOf('day')) {
+                end = moment().endOf('day');
+            }
+        } else {
+            duration = moment.duration(end.diff(start));
+        }
+        const startOptions = this.generateStartTimeOptions();
+        const endOptions = this.generateEndTimeOptions(start);
+        this.addOptionIfMissing(startOptions, serializeTime(moment(start)));
+        this.addOptionIfMissing(endOptions, serializeTime(moment(end)));
+        this.setState({
+            startTime: start,
+            endTime: end,
+            duration,
+            startOptions,
+            endOptions
+        });
+        const {onChange} = this.props;
+        onChange(start, end);
     };
 
     updateEndTime = (startTime, endTime, duration) => {
         let start = toMoment(startTime, 'HH:mm');
-        const end = moment(endTime, ['HH:mm', 'HHmm', 'Hmm']);
-        if (end.isValid()) {
-            if (end <= start) {
-                start = moment(end).subtract(duration);
-                if (start < moment().startOf('day')) {
-                    start = moment().startOf('day');
-                }
-            } else {
-                duration = moment.duration(end.diff(start));
-            }
-            const startOptions = this.generateStartTimeOptions();
-            const endOptions = this.generateEndTimeOptions(start);
-            this.addOptionIfMissing(startOptions, _serializeTime(moment(start)));
-            this.addOptionIfMissing(endOptions, _serializeTime(moment(end)));
-            this.setState({
-                startTime: start,
-                endTime: end,
-                duration,
-                startOptions,
-                endOptions,
-            });
-            const {onChange} = this.props;
-            onChange(start, end);
+        const end = moment(endTime, ['HH:mm', 'Hmm']);
+        if (!end.isValid()) {
+            return;
         }
+        if (end <= start) {
+            start = moment(end).subtract(duration);
+            if (start < moment().startOf('day')) {
+                start = moment().startOf('day');
+            }
+        } else {
+            duration = moment.duration(end.diff(start));
+        }
+        const startOptions = this.generateStartTimeOptions();
+        const endOptions = this.generateEndTimeOptions(start);
+        this.addOptionIfMissing(startOptions, serializeTime(moment(start)));
+        this.addOptionIfMissing(endOptions, serializeTime(moment(end)));
+        this.setState({
+            startTime: start,
+            endTime: end,
+            duration,
+            startOptions,
+            endOptions,
+        });
+        const {onChange} = this.props;
+        onChange(start, end);
     };
 
     render() {
@@ -171,24 +171,24 @@ export default class TimeRangePicker extends React.Component {
                 <Dropdown options={startOptions}
                           search={() => []}
                           icon={null}
-                          text={_serializeTime(startTime)}
+                          text={serializeTime(startTime)}
                           selection
                           allowAdditions
                           additionLabel=""
                           styleName="time-dropdown"
-                          value={_serializeTime(startTime)}
+                          value={serializeTime(startTime)}
                           onChange={(_, {value}) => {
                               this.updateStartTime(value, endTime, duration);
                           }} />
                 <Dropdown options={endOptions}
                           search={() => []}
                           icon={null}
-                          text={_serializeTime(endTime)}
+                          text={serializeTime(endTime)}
                           selection
                           allowAdditions
                           additionLabel=""
                           styleName="time-dropdown"
-                          value={_serializeTime(endTime)}
+                          value={serializeTime(endTime)}
                           onChange={(_, {value}) => {
                               this.updateEndTime(startTime, value, duration);
                           }} />
