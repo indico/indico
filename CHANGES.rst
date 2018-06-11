@@ -18,6 +18,7 @@ Bugfixes
 
 - Show question description in survey results (:issue:`3383`)
 - Allow paper managers to submit paper revisions
+- Fix error when not providing a URL for privacy policy or terms
 
 Version 2.1.1
 -------------
