@@ -24,7 +24,7 @@ import {Dropdown, Icon} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
 
 
-export default function UserActions({isAdmin, hasOwnedRooms}) {
+export default function UserActions({isAdmin, hasOwnedRooms, gotoMyRoomsList}) {
     const avatar = <Icon name="user" size="large" />;
     const options = [];
     options.push({
@@ -38,7 +38,8 @@ export default function UserActions({isAdmin, hasOwnedRooms}) {
         });
         options.push({
             key: 'my_rooms',
-            text: Translate.string('List of My Rooms')
+            text: Translate.string('List of My Rooms'),
+            onClick: gotoMyRoomsList,
         });
     }
     options.push({
@@ -59,4 +60,5 @@ export default function UserActions({isAdmin, hasOwnedRooms}) {
 UserActions.propTypes = {
     isAdmin: propTypes.bool.isRequired,
     hasOwnedRooms: propTypes.bool.isRequired,
+    gotoMyRoomsList: propTypes.func.isRequired,
 };

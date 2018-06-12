@@ -16,12 +16,18 @@
  */
 
 import {connect} from 'react-redux';
+import {push as pushRoute} from 'react-router-redux';
 import UserActions from '../components/UserActions';
 
 
 const mapStateToProps = ({user: {isAdmin, hasOwnedRooms}}) => ({isAdmin, hasOwnedRooms});
+const mapDispatchToProps = dispatch => ({
+    gotoMyRoomsList: () => {
+        dispatch(pushRoute('/rooms?mine=true'));
+    },
+});
 
 export default connect(
     mapStateToProps,
-    null
+    mapDispatchToProps
 )(UserActions);
