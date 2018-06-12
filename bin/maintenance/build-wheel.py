@@ -152,9 +152,9 @@ def _get_ignored_package_files_indico():
     files = set(_get_included_files(('indico', 'indico.*')))
     output = subprocess.check_output(['git', 'ls-files', '--others', '--ignored', '--exclude-standard', 'indico/'])
     ignored = {line for line in output.splitlines()}
-    htdocs_re = re.compile(r'^indico/htdocs/(css|js|sass)/lib/')
+    dist_path = 'indico/web/static/dist/'
     i18n_re = re.compile(r'^indico/translations/[a-zA-Z_]+/LC_MESSAGES/messages.mo')
-    return {path for path in ignored & files if not htdocs_re.match(path) and not i18n_re.match(path)}
+    return {path for path in ignored & files if not path.startswith(dist_path) and not i18n_re.match(path)}
 
 
 def package_is_clean_indico():
