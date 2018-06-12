@@ -29,12 +29,14 @@ export default function UserActions({isAdmin, hasOwnedRooms, gotoMyRoomsList}) {
     const options = [];
     options.push({
         key: 'my_bookings',
-        text: Translate.string('My Bookings')
+        text: Translate.string('My Bookings'),
+        disabled: true,
     });
     if (hasOwnedRooms) {
         options.push({
             key: 'bookings_my_rooms',
-            text: Translate.string('Bookings in My Rooms')
+            text: Translate.string('Bookings in My Rooms'),
+            disabled: true,
         });
         options.push({
             key: 'my_rooms',
@@ -44,12 +46,14 @@ export default function UserActions({isAdmin, hasOwnedRooms, gotoMyRoomsList}) {
     }
     options.push({
         key: 'my_blockings',
-        text: Translate.string('My Blockings')
+        text: Translate.string('My Blockings'),
+        disabled: true,
     });
     if (isAdmin) {
         options.push({
             key: 'isAdmin',
-            text: Translate.string('Administration')
+            text: Translate.string('Administration'),
+            disabled: true,
         });
     }
     return (
