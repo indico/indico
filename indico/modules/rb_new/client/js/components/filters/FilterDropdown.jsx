@@ -131,7 +131,8 @@ export default class FilterDropdown extends React.Component {
                    on="click"
                    open={open}
                    onClose={this.handleClose}
-                   onOpen={this.handleOpen}>
+                   onOpen={this.handleOpen}
+                   hideOnScroll>
                 {form(fieldValues, this.setFieldValue, this.handleClose)}
             </Popup>
         );
