@@ -42,10 +42,6 @@ ul.rb-menu {
     a {
         color: $white;
         display: block;
-
-        :global(.anticon) {
-            margin-right: 0.5em;
-        }
     }
 
     &:hover {
