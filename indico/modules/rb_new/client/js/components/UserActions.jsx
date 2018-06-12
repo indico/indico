@@ -24,29 +24,27 @@ import {Dropdown, Icon} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
 
 
-export default function UserActions({isAdmin}) {
-    const avatar = (
-        <Icon name="user"
-              size="large" />
-    );
-    const options = [
-        {
-            key: 'my_bookings',
-            text: Translate.string('My Bookings')
-        },
-        {
+export default function UserActions({isAdmin, hasOwnedRooms}) {
+    const avatar = <Icon name="user" size="large" />;
+    const options = [];
+    options.push({
+        key: 'my_bookings',
+        text: Translate.string('My Bookings')
+    });
+    if (hasOwnedRooms) {
+        options.push({
             key: 'bookings_my_rooms',
             text: Translate.string('Bookings in My Rooms')
-        },
-        {
+        });
+        options.push({
             key: 'my_rooms',
             text: Translate.string('List of My Rooms')
-        },
-        {
-            key: 'my_blockings',
-            text: Translate.string('My Blockings')
-        }
-    ];
+        });
+    }
+    options.push({
+        key: 'my_blockings',
+        text: Translate.string('My Blockings')
+    });
     if (isAdmin) {
         options.push({
             key: 'isAdmin',
@@ -59,5 +57,6 @@ export default function UserActions({isAdmin}) {
 }
 
 UserActions.propTypes = {
-    isAdmin: propTypes.bool.isRequired
+    isAdmin: propTypes.bool.isRequired,
+    hasOwnedRooms: propTypes.bool.isRequired,
 };
