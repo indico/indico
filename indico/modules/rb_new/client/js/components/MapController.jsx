@@ -143,7 +143,7 @@ export default class MapController extends React.Component {
         const aspectsControl = !!aspects.length && (
             <RoomBookingMapControl position="bottomleft">
                 <Dropdown placeholder={Translate.string('Select aspect')} selection upward
-                          options={aspectOptions} defaultValue={aspects.findIndex(op => op.default_on_startup)}
+                          options={aspectOptions} value={null}
                           styleName="aspects-dropdown map-control-content"
                           openOnFocus={false} onChange={(e, data) => this.onChangeAspect(data.value)} />
             </RoomBookingMapControl>
