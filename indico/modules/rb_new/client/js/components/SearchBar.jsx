@@ -191,7 +191,8 @@ export default class SearchBar extends React.Component {
                        open={filtersPopupVisible}
                        content={content}
                        position="bottom left"
-                       on="click" />
+                       on="click"
+                       hideOnScroll />
                 <DebounceInput element={Input}
                                styleName="text-filter"
                                icon={inputIcon}
