@@ -14,6 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
+
 .start-time-dropdown {
     min-width: 90px !important;
     margin-right: 14px;
@@ -33,4 +34,9 @@
 .duration {
     font-size: 0.7em;
     color: #808c99;
+    white-space: nowrap;
+}
+
+.end-time-item {
+    white-space: nowrap;
 }

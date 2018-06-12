@@ -33,7 +33,7 @@ function _humanizeDuration(duration) {
     } else if (hours !== 0) {
         return Translate.string('{time} hours', {time: hours + (minutes / 60)});
     } else {
-        return Translate.string('{time} minutes', {time: minutes});
+        return Translate.string('{time} min', {time: minutes});
     }
 }
 
@@ -72,6 +72,7 @@ export default class TimeRangePicker extends React.Component {
         const end = moment().endOf('day');
         const next = moment().startOf('day');
         let serializedNext;
+        // eslint-disable-next-line no-unmodified-loop-condition
         while (next < end) {
             serializedNext = serializeTime(moment(next));
             options.push({key: serializedNext, value: serializedNext, text: serializedNext});
@@ -85,10 +86,13 @@ export default class TimeRangePicker extends React.Component {
         const end = moment().endOf('day');
         const next = moment(start).add(30, 'm');
         let serializedNext, duration;
+        // eslint-disable-next-line no-unmodified-loop-condition
         while (next < end) {
             duration = _humanizeDuration(moment.duration(next.diff(start)));
             serializedNext = serializeTime(moment(next));
-            const text = <div>{serializedNext} <span styleName="duration">({duration})</span></div>;
+            const text = (
+                <div styleName="end-time-item">{serializedNext} <span styleName="duration">({duration})</span></div>
+            );
             options.push({key: serializedNext, value: serializedNext, text});
             next.add(30, 'm');
         }
