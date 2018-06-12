@@ -274,6 +274,11 @@ def _validate_plugin_dir(ctx, param, value):
     return value
 
 
+def _plugin_has_assets(plugin_dir):
+    return (os.path.exists(os.path.join(plugin_dir, 'webpack.config.js')) or
+            os.path.exists(os.path.join(plugin_dir, 'webpack-bundles.json')))
+
+
 @cli.command('plugin', short_help='Builds a plugin wheel.')
 @click.argument('plugin_dir', type=click.Path(exists=True, file_okay=False, resolve_path=True),
                 callback=_validate_plugin_dir)
@@ -294,7 +299,10 @@ def build_plugin(obj, assets, plugin_dir, add_version_suffix, ignore_unclean):
         elif not clean:
             fail('working tree is not clean', verbose_msg=output)
     if assets:
-        build_assets_plugin(plugin_dir)
+        if not _plugin_has_assets(plugin_dir):
+            noop('plugin has no assets')
+        else:
+            build_assets_plugin(plugin_dir)
     else:
         warn('building assets disabled')
     with _chdir(plugin_dir):
