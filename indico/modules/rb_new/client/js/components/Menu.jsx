@@ -16,16 +16,25 @@
  */
 
 import React from 'react';
-import propTypes from 'prop-types';
+import PropTypes from 'prop-types';
 import {Link, Route} from 'react-router-dom';
-import {Icon} from 'semantic-ui-react';
+import {Icon, Popup} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 
 import './Menu.module.scss';
 
 
-function MenuItem({path, children}) {
+function MenuItem({path, children, disabled}) {
+    if (disabled) {
+        return (
+            <Route path={path}>
+                <Popup trigger={<li styleName="rb-menu-item"><span styleName="disabled">{children}</span></li>}
+                       content={Translate.string('Coming soon!')}
+                       position="bottom center" />
+            </Route>
+        );
+    }
     return (
         <Route path={path}>
             {({match}) => (
@@ -41,8 +50,13 @@ function MenuItem({path, children}) {
 }
 
 MenuItem.propTypes = {
-    path: propTypes.string.isRequired,
-    children: propTypes.node.isRequired
+    path: PropTypes.string.isRequired,
+    children: PropTypes.node.isRequired,
+    disabled: PropTypes.bool
+};
+
+MenuItem.defaultProps = {
+    disabled: false,
 };
 
 export default function Menu() {
@@ -56,11 +70,11 @@ export default function Menu() {
                 <Icon name="list" />
                 <Translate>List of Rooms</Translate>
             </MenuItem>
-            <MenuItem key="calendar" path="/calendar">
+            <MenuItem key="calendar" path="/calendar" disabled>
                 <Icon name="calendar" />
                 <Translate>Calendar</Translate>
             </MenuItem>
-            <MenuItem key="blockings" path="/blockings">
+            <MenuItem key="blockings" path="/blockings" disabled>
                 <Icon name="window close" />
                 <Translate>Blockings</Translate>
             </MenuItem>

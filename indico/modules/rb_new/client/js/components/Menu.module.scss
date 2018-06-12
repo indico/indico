@@ -47,6 +47,11 @@ ul.rb-menu {
     &:hover {
         background: darken($highlight-color, 5%);
     }
+
+    .disabled {
+        color: lighten($highlight-color, 25%);
+        display: block;
+    }
 }
 
 .rb-menu .rb-menu-item:global(.active) {
