@@ -248,17 +248,27 @@ export default class BookRoom extends React.Component {
         });
         const classes = toClasses({active: view === 'timeline', disabled: !timelineDataAvailable});
 
+        const listIcon = (
+            <Icon size="big" className={toClasses({active: view === 'book'})} name="grid layout"
+                  onClick={() => this.setState({view: 'book', timelineRef: null})} />
+        );
+        const timelineIcon = <Icon name="calendar outline" disabled={!timelineDataAvailable} />;
         return (
             <Grid.Column width={3} styleName="view-icons" textAlign="right" verticalAlign="middle">
                 <div ref={(ref) => this.handleContextRef(ref, 'switcherRef')} styleName="view-icons-context">
                     <Sticky context={switcherRef} offset={30}>
                         <span>
-                            <Icon size="big" className={toClasses({active: view === 'book'})}
-                                  name="grid layout" onClick={() => this.setState({view: 'book', timelineRef: null})} />
+                            {view === 'timeline'
+                                ? <Popup trigger={listIcon} content={Translate.string('List view')} />
+                                : listIcon
+                            }
                             <Icon.Group size="big"
                                         className={classes}
                                         onClick={this.switchToTimeline}>
-                                <Icon name="calendar outline" disabled={!timelineDataAvailable} />
+                                {view === 'book'
+                                    ? <Popup trigger={timelineIcon} content={Translate.string('Timeline view')} />
+                                    : timelineIcon
+                                }
                                 {hasConflicts && (
                                     <Icon name="exclamation triangle" color="red" corner />
                                 )}
