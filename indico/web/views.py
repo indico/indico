@@ -320,7 +320,6 @@ class WPNewBase(WPJinjaMixin):
 
         injected_bundles = values_from_signal(signals.plugin.inject_bundle.send(cls), as_list=True,
                                               multi_value_types=list)
-        injected_bundles = []
         custom_js = list(current_app.manifest['__custom.js'])
         custom_css = list(current_app.manifest['__custom.css'])
         css_files = map(cls._fix_path, custom_css)
