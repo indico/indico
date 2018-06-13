@@ -28,7 +28,7 @@ import RoomSearchPane from '../RoomSearchPane';
 import BookingFilterBar from '../BookingFilterBar';
 import filterBarFactory from '../../containers/FilterBar';
 import searchBoxFactory from '../../containers/SearchBar';
-import Room from '../Room';
+import Room from '../../containers/Room';
 import Timeline from '../../containers/Timeline';
 import BookRoomModal from '../../containers/BookRoomModal';
 import RoomDetailsModal from '../modals/RoomDetailsModal';
@@ -94,7 +94,7 @@ export default class BookRoom extends React.Component {
         const bookingModalBtn = <Button positive icon="check" circular onClick={() => this.openBookingModal(room)} />;
         const showDetailsBtn = <Button primary icon="search" circular onClick={() => this.openDetailsModal(room.id)} />;
         return (
-            <Room key={room.id} room={room}>
+            <Room key={room.id} room={room} showFavoriteButton>
                 <Slot name="actions">
                     <Popup trigger={bookingModalBtn} content={Translate.string('Book room')} position="top center" hideOnScroll />
                     <Popup trigger={showDetailsBtn} content={Translate.string('Room details')} position="top center" hideOnScroll />

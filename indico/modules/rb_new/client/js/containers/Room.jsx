@@ -17,29 +17,22 @@
 
 import {connect} from 'react-redux';
 
-import RoomList from '../components/pages/RoomList';
-import {fetchMapRooms, fetchRoomDetails, fetchRooms, setRoomDetailsModal} from '../actions';
+import Room from '../components/Room';
+import {addFavoriteRoom, delFavoriteRoom} from '../actions';
 
 
-const mapStateToProps = ({roomList, roomDetails}) => ({
-    ...roomList,
-    roomDetails
-});
+const mapStateToProps = ({user: {favoriteRooms}}) => ({favoriteRooms});
 
 const mapDispatchToProps = dispatch => ({
-    fetchRooms: (clear = true) => {
-        dispatch(fetchRooms('roomList', clear));
-        dispatch(fetchMapRooms('roomList'));
+    addFavoriteRoom: (id) => {
+        dispatch(addFavoriteRoom(id));
     },
-    fetchRoomDetails: (id) => {
-        dispatch(fetchRoomDetails(id));
+    delFavoriteRoom: (id) => {
+        dispatch(delFavoriteRoom(id));
     },
-    setRoomDetailsModal: (id) => {
-        dispatch(setRoomDetailsModal(id));
-    }
 });
 
 export default connect(
     mapStateToProps,
     mapDispatchToProps
-)(RoomList);
+)(Room);

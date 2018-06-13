@@ -27,8 +27,7 @@ import RoomFilterBar from '../RoomFilterBar';
 import filterBarFactory from '../../containers/FilterBar';
 import searchBarFactory from '../../containers/SearchBar';
 import mapControllerFactory from '../../containers/MapController';
-import Room from '../Room';
-
+import Room from '../../containers/Room';
 import RoomDetailsModal from '../modals/RoomDetailsModal';
 
 
@@ -39,14 +38,11 @@ const MapController = mapControllerFactory('roomList');
 
 export default class RoomList extends React.Component {
     static propTypes = {
-        favoriteRooms: PropTypes.object.isRequired,
         fetchRooms: PropTypes.func.isRequired,
         rooms: PropTypes.shape({
             list: PropTypes.array,
             isFetching: PropTypes.bool,
         }).isRequired,
-        addFavoriteRoom: PropTypes.func.isRequired,
-        delFavoriteRoom: PropTypes.func.isRequired,
         fetchRoomDetails: PropTypes.func.isRequired,
         roomDetails: PropTypes.shape({
             list: PropTypes.array,
@@ -56,12 +52,6 @@ export default class RoomList extends React.Component {
         setRoomDetailsModal: PropTypes.func.isRequired,
     };
 
-    toggleFavoriteRoom = (room) => {
-        const {favoriteRooms, addFavoriteRoom, delFavoriteRoom} = this.props;
-        const fn = favoriteRooms[room.id] ? delFavoriteRoom : addFavoriteRoom;
-        fn(room.id);
-    };
-
     handleOpenModal = (id) => {
         const {fetchRoomDetails, setRoomDetailsModal} = this.props;
         fetchRoomDetails(id);
@@ -69,21 +59,11 @@ export default class RoomList extends React.Component {
     };
 
     renderRoom = (room) => {
-        const {favoriteRooms} = this.props;
-        const isFavorite = !!favoriteRooms[room.id];
         const showDetailsBtn = <Button primary icon="search" circular onClick={() => this.handleOpenModal(room.id)} />;
-        const toggleFavoriteBtn = (
-            <Button icon="star" color={isFavorite ? 'yellow' : 'teal'} circular
-                    onClick={() => this.toggleFavoriteRoom(room)} />
-        );
-        const toggleFavoriteToolip = (
-            isFavorite ? Translate.string('Remove from favourites') : Translate.string('Add to favourites')
-        );
         return (
-            <Room key={room.id} room={room} isFavorite={isFavorite}>
+            <Room key={room.id} room={room} showFavoriteButton>
                 <Slot name="actions">
                     <Popup trigger={showDetailsBtn} content={Translate.string('Room details')} position="top center" />
-                    <Popup trigger={toggleFavoriteBtn} content={toggleFavoriteToolip} position="top center" />
                 </Slot>
             </Room>
         );

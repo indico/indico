@@ -18,12 +18,12 @@
 import _ from 'lodash';
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Card, Icon, Image, Label, Popup} from 'semantic-ui-react';
+import {Card, Icon, Image, Label, Popup, Button} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 import {Slot} from 'indico/react/util';
 import {TooltipIfTruncated} from 'indico/react/components';
-import DimmableImage from  './Dimmer.jsx';
+import DimmableImage from './Dimmer.jsx';
 
 
 import './Room.module.scss';
@@ -33,28 +33,55 @@ export default class Room extends React.Component {
     static propTypes = {
         room: PropTypes.object.isRequired,
         children: PropTypes.node,
-        isFavorite: PropTypes.bool
+        showFavoriteButton: PropTypes.bool,
+        favoriteRooms: PropTypes.object.isRequired,
+        addFavoriteRoom: PropTypes.func.isRequired,
+        delFavoriteRoom: PropTypes.func.isRequired,
     };
 
     static defaultProps = {
-        isFavorite: false,
+        showFavoriteButton: false,
         children: null
     };
 
     shouldComponentUpdate(nextProps) {
-        const {isFavorite: nextIsFavorite, room: nextRoom} = nextProps;
-        const {room, isFavorite} = this.props;
+        const {favoriteRooms: nextFavoriteRooms, room: nextRoom} = nextProps;
+        const {room, favoriteRooms} = this.props;
         const {children} = this.props;
         const {children: nextChildren} = nextProps;
 
-        return nextIsFavorite !== isFavorite || !_.isEqual(room, nextRoom) || !_.isEqual(nextChildren, children);
+        return (
+            !_.isEqual(room, nextRoom) ||
+            nextFavoriteRooms[room.id] !== favoriteRooms[room.id] ||
+            !_.isEqual(nextChildren, children)
+        );
+    }
+
+    isFavorite() {
+        const {favoriteRooms, room} = this.props;
+        return !!favoriteRooms[room.id];
+    }
+
+    renderFavoriteButton() {
+        const {addFavoriteRoom, delFavoriteRoom, room} = this.props;
+        const isFavorite = this.isFavorite();
+        const button = (
+            <Button icon="star" color={isFavorite ? 'yellow' : 'teal'} circular
+                    onClick={() => (isFavorite ? delFavoriteRoom : addFavoriteRoom)(room.id)} />
+        );
+        const tooltip = isFavorite
+            ? Translate.string('Remove from favourites')
+            : Translate.string('Add to favourites');
+        return <Popup trigger={button} content={tooltip} position="top center" />;
     }
 
     renderCardImage = (room, content, actions) => {
-        if (actions !== undefined && actions.length !== 0) {
+        const {showFavoriteButton} = this.props;
+        if ((actions !== undefined && actions.length !== 0) || showFavoriteButton) {
             const dimmerContent = (
                 <div>
                     {actions}
+                    {showFavoriteButton && this.renderFavoriteButton()}
                 </div>
             );
             return (
@@ -75,12 +102,12 @@ export default class Room extends React.Component {
     };
 
     render() {
-        const {room, children, isFavorite} = this.props;
+        const {room, children} = this.props;
         const {content, actions} = Slot.split(children);
 
         return (
             <Card styleName="room-card">
-                {isFavorite && <Label corner="right" icon="star" color="yellow" />}
+                {this.isFavorite() && <Label corner="right" icon="star" color="yellow" />}
                 {this.renderCardImage(room, content, actions)}
                 <Card.Content>
                     <TooltipIfTruncated>

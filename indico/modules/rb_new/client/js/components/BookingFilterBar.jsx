@@ -31,7 +31,6 @@ import timeRenderer from './filters/TimeRenderer';
 
 
 export default class FilterBar extends React.Component {
-
     static propTypes = {
         equipmentTypes: PropTypes.arrayOf(PropTypes.string).isRequired,
         recurrence: PropTypes.shape({
