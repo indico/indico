@@ -195,7 +195,7 @@ class RHVersionCheck(RHAdminBase):
 
     def _check_version(self, distribution, current_version=None):
         try:
-            response = requests.get('https://pypi.python.org/pypi/{}/json'.format(distribution))
+            response = requests.get('https://pypi.org/pypi/{}/json'.format(distribution))
         except requests.RequestException as exc:
             Logger.get('versioncheck').warning('Version check for %s failed: %s', distribution, exc)
             raise NoReportError.wrap_exc(ServiceUnavailable())
