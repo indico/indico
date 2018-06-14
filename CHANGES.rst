@@ -2,6 +2,16 @@ Changelog
 =========
 
 
+Version 2.1.3
+-------------
+
+*Unreleased*
+
+Bugfixes
+^^^^^^^^
+
+- Point to correct day in "edit session timetable" link (:issue:`3419`)
+
 Version 2.1.2
 -------------
 
