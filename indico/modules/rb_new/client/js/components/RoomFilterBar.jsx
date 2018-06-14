@@ -153,7 +153,8 @@ export default class RoomFilterBar extends React.Component {
                                                 onClick={() => setFilterParameter('onlyMine', !onlyMine)} />}
                                content={Translate.string('Show only rooms I manage')} />
                     )}
-                    <Popup trigger={<Button icon="star" primary={onlyFavorites} disabled={!onlyFavorites && !hasFavoriteRooms}
+                    <Popup trigger={<Button icon="star" primary={onlyFavorites}
+                                            disabled={!onlyFavorites && !hasFavoriteRooms}
                                             onClick={() => setFilterParameter('onlyFavorites', !onlyFavorites)} />}
                            content={Translate.string('Show only my favorite rooms')} />
                 </FilterBarContext.Provider>
