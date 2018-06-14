@@ -43,15 +43,6 @@ export default class MapController extends React.Component {
         filterBounds: null
     };
 
-    static getDerivedStateFromProps({filterBounds, map: {bounds}}, prevState) {
-        const aspectBounds = filterBounds || bounds;
-        return {
-            ...prevState,
-            // Take the user-set bounds, otherwise default to the map's default bounds.
-            aspectBounds
-        };
-    }
-
     constructor(props) {
         super(props);
         this.mapRef = React.createRef();
@@ -60,6 +51,15 @@ export default class MapController extends React.Component {
         this.state = {
             loading: true,
             allRoomsVisible: false
+        };
+    }
+
+    static getDerivedStateFromProps({filterBounds, map: {bounds}}, prevState) {
+        const aspectBounds = filterBounds || bounds;
+        return {
+            ...prevState,
+            // Take the user-set bounds, otherwise default to the map's default bounds.
+            aspectBounds
         };
     }
 

@@ -27,16 +27,13 @@ export default class FilterFormComponent extends React.Component {
         setParentField: propTypes.func.isRequired
     };
 
+    state = {};
+
     static getDerivedStateFromProps(props, prevState) {
         // override internal state from props.
         // this allows other widgets and reducers to perform
         // corrections which will be reflected next time the
         // component is rendered
         return {...prevState, ...props};
-    }
-
-    constructor(props) {
-        super(props);
-        this.state = {};
     }
 }

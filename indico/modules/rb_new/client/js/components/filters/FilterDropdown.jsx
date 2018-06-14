@@ -63,17 +63,14 @@ export default class FilterDropdown extends React.Component {
         open: false
     };
 
+    state = {};
+
     static getDerivedStateFromProps({defaults, initialValues, renderValue}, prevState) {
         return {
             ...prevState,
             fieldValues: _mergeDefaults(defaults, initialValues),
             renderedValue: renderValue(initialValues)
         };
-    }
-
-    constructor(props) {
-        super(props);
-        this.state = {};
     }
 
     setFieldValue = (field, value) => {

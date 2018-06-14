@@ -52,17 +52,6 @@ export default class UserSearchField extends React.Component {
         disabled: false
     };
 
-    static getDerivedStateFromProps({value: {id: userId}}, state) {
-        if (userId !== state.prevPropsUserId) {
-            return {
-                ...state,
-                prevPropsUserId: userId,
-                userId
-            };
-        }
-        return null;
-    }
-
     constructor(props) {
         super(props);
         const {defaultValue} = this.props;
@@ -75,6 +64,17 @@ export default class UserSearchField extends React.Component {
             userId
         };
         this.userCache = {};
+    }
+
+    static getDerivedStateFromProps({value: {id: userId}}, state) {
+        if (userId !== state.prevPropsUserId) {
+            return {
+                ...state,
+                prevPropsUserId: userId,
+                userId
+            };
+        }
+        return null;
     }
 
     renderUser({first_name: firstName, last_name: lastName, email, id}) {
