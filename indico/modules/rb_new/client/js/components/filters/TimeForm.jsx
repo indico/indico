@@ -41,9 +41,9 @@ export default class TimeForm extends FilterFormComponent {
     static getDerivedStateFromProps({startTime, endTime}, prevState) {
         // if there is no internal state, get the values from props
         return {
-            ...prevState,
             startTime: toMoment(startTime, 'HH:mm'),
-            endTime: toMoment(endTime, 'HH:mm')
+            endTime: toMoment(endTime, 'HH:mm'),
+            ...prevState
         };
     }
 

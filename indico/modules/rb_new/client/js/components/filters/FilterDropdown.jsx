@@ -15,6 +15,7 @@
 * along with Indico; if not, see <http://www.gnu.org/licenses/>.
 */
 
+import _ from 'lodash';
 import React from 'react';
 import {Button, Icon, Popup} from 'semantic-ui-react';
 import PropTypes from 'prop-types';
@@ -65,12 +66,27 @@ export default class FilterDropdown extends React.Component {
 
     state = {};
 
-    static getDerivedStateFromProps({defaults, initialValues, renderValue}, prevState) {
-        return {
-            ...prevState,
-            fieldValues: _mergeDefaults(defaults, initialValues),
-            renderedValue: renderValue(initialValues)
-        };
+    static getDerivedStateFromProps(props, prevState) {
+        const prevProps = prevState.prevProps;
+        const {defaults, initialValues, renderValue} = props;
+        const fieldValues = _mergeDefaults(defaults, initialValues);
+        const renderedValue = renderValue(initialValues);
+
+        if (!_.isEqual(prevProps, props)) {
+            return {
+                ...prevState,
+                fieldValues,
+                renderedValue,
+                prevProps: props
+            };
+        } else {
+            return {
+                fieldValues,
+                renderedValue,
+                ...prevState,
+                prevProps: props
+            };
+        }
     }
 
     setFieldValue = (field, value) => {
