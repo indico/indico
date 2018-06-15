@@ -47,9 +47,9 @@ export default class DateForm extends FilterFormComponent {
     static getDerivedStateFromProps({startDate, endDate}, prevState) {
         // if there is no internal state, get the values from props
         return {
-            ...prevState,
             startDate: prevState.startDate || toMoment(startDate),
-            endDate: prevState.endDate || toMoment(endDate)
+            endDate: prevState.endDate || toMoment(endDate),
+            ...prevState
         };
     }
 

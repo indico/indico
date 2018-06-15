@@ -54,13 +54,23 @@ export default class MapController extends React.Component {
         };
     }
 
-    static getDerivedStateFromProps({filterBounds, map: {bounds}}, prevState) {
+    static getDerivedStateFromProps(props, prevState) {
+        const {filterBounds, map: {bounds}} = props;
         const aspectBounds = filterBounds || bounds;
-        return {
-            ...prevState,
-            // Take the user-set bounds, otherwise default to the map's default bounds.
-            aspectBounds
-        };
+        const prevProps = prevState.prevProps || props;
+        if (!_.isEqual(prevProps, props)) {
+            return {
+                ...prevState,
+                aspectBounds,
+                prevProps: props
+            };
+        } else {
+            return {
+                aspectBounds,
+                ...prevState,
+                prevProps
+            };
+        }
     }
 
     async componentDidMount() {
