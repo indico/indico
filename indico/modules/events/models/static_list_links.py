@@ -18,8 +18,8 @@ from __future__ import unicode_literals
 
 from uuid import UUID, uuid4
 
-from sqlalchemy.dialects.postgresql import UUID as pg_UUID
 from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.dialects.postgresql import UUID as pg_UUID
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import UTCDateTime

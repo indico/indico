@@ -15,8 +15,9 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from collections import OrderedDict
+from datetime import datetime
 from datetime import time as dt_time
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 import pytz
 from babel.dates import format_date as _format_date
