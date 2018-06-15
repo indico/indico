@@ -38,7 +38,7 @@ export default class EquipmentForm extends FilterFormComponent {
     }
 
     static getDerivedStateFromProps({selectedEquipment}, prevState) {
-        return {...prevState, ...selectedEquipment};
+        return {...selectedEquipment, ...prevState};
     }
 
     setEquipment(eqName, value) {
