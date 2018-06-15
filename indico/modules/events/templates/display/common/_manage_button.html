@@ -80,7 +80,8 @@
             {% endif %}
             {% if session_.can_manage(session.user, 'coordinate') %}
                 <li>
-                    <a href="{{ url_for('timetable.manage_session', session_) }}"
+                    <a href="{{ url_for('timetable.manage_session', session_,
+                                        _anchor=item.start_dt.astimezone(session_.event.tzinfo).strftime('%Y%m%d')) }}"
                        title="{% trans %}Edit the timetable for this session{% endtrans %}">
                         {% trans %}Edit session timetable{% endtrans %}
                     </a>
