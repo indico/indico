@@ -64,6 +64,10 @@
         }
     }
 
+    :global(.content) {
+        max-height: 105px;
+    }
+
     .room-content {
         .room-details {
             float: right;
