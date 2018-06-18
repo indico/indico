@@ -20,10 +20,6 @@
     height: 320px;
     width: 300px;
 
-    :global(.ui.active.visible.dimmer) {
-        display: flex !important;
-    }
-
     .room-title {
         font-size: 1em;
         text-overflow: ellipsis;
