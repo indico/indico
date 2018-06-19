@@ -24,7 +24,7 @@ import './TimelineItem.module.scss';
 
 
 const classes = {
-    candidates: 'candidate',
+    candidates: 'default',
     preBookings: 'pre-booking',
     preConflicts: 'pre-booking-conflict',
     bookings: 'booking',
@@ -39,11 +39,12 @@ export default class TimelineItem extends React.Component {
         step: PropTypes.number.isRequired,
         data: PropTypes.object.isRequired,
         bookable: PropTypes.bool,
-        onClick: PropTypes.func.isRequired
+        onClick: PropTypes.func
     };
 
     static defaultProps = {
-        bookable: false
+        bookable: false,
+        onClick: null
     };
 
     calculateWidth = (startDt, endDt) => {
@@ -90,7 +91,7 @@ export default class TimelineItem extends React.Component {
             </>
         );
         const segment = (
-            <div className={additionalClasses} onClick={!reservation ? onClick : null}
+            <div className={additionalClasses} onClick={onClick && !reservation ? onClick : null}
                  styleName="timeline-occurrence"
                  style={{left: `${segmentPosition}%`, width: `calc(${segmentWidth}% + 1px)`}} />
         );
@@ -108,7 +109,7 @@ export default class TimelineItem extends React.Component {
                 occurrences.map((occurrence, i) => (
                     // eslint-disable-next-line react/no-array-index-key
                     <React.Fragment key={i}>
-                        {this.renderOccurrence(occurrence, classes[name])}
+                        {this.renderOccurrence(occurrence, classes[name] || 'default')}
                     </React.Fragment>
                 ))
             ))
