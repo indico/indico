@@ -1,0 +1,76 @@
+/* This file is part of Indico.
+ * Copyright (C) 2002 - 2018 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
+
+@import '../../styles/util';
+
+$row-height: 50px;
+
+.timeline-content {
+    position: relative;
+
+    .timeline-header {
+        display: flex;
+        height: $row-height;
+
+        .timeline-header-label {
+            flex: 1;
+            height: 100%;
+            line-height: $row-height;
+            text-align: center;
+        }
+    }
+
+    .timeline-divider {
+        position: absolute;
+        top: 0;
+        height: 100%;
+        border-left: 1px solid #ededee;
+    }
+
+    .timeline-row {
+        height: $row-height;
+        width: 100%;
+        display: flex;
+
+        .timeline-row-label {
+            height: 100%;
+            line-height: $row-height;
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+
+            .label {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                min-width: 0;
+                padding-right: 10px;
+
+                .dot {
+                    vertical-align: 0.5em;
+                }
+            }
+        }
+
+        .timeline-row-content {
+            position: relative;
+            height: $row-height;
+        }
+    }
+}

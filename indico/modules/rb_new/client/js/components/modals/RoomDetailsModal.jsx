@@ -22,6 +22,7 @@ import {Button, Grid, Modal, Header, Message, List} from 'semantic-ui-react';
 import {Translate, Param} from 'indico/react/i18n';
 import {RoomBasicDetails} from '../RoomBasicDetails';
 
+import TimelineContent from '../TimelineContent';
 import './RoomDetailsModal.module.scss';
 
 

@@ -19,13 +19,12 @@ import _ from 'lodash';
 import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
-import {Button, Container, Label, Loader, Message, Segment, Icon, Popup} from 'semantic-ui-react';
+import {Button, Container, Label, Loader, Message, Segment} from 'semantic-ui-react';
 import DatePicker from 'rc-calendar/lib/Picker';
 import Calendar from 'rc-calendar';
 import {Translate} from 'indico/react/i18n';
-import {TooltipIfTruncated} from 'indico/react/components';
-import TimelineItem from './TimelineItem';
 import BookRoomModal from '../containers/BookRoomModal';
+import TimelineContent from './TimelineContent';
 
 import './Timeline.module.scss';
 
@@ -102,106 +101,80 @@ export default class Timeline extends React.Component {
         return !this.isDateWithinTimelineRange(date);
     };
 
-    renderTimeline = () => {
+    renderTimelineLegend = () => {
         const {activeDate} = this.state;
-        const {minHour, maxHour, step, availability, dateRange} = this.props;
-        const hourSeries = _.range(minHour, maxHour + step, step);
+        const {dateRange} = this.props;
+        let currentDate = activeDate;
         const startDate = _toMoment(dateRange[0]);
         const endDate = _toMoment(dateRange[dateRange.length - 1]);
-
-        let currentDate = activeDate;
         if (!this.isDateWithinTimelineRange(currentDate)) {
             currentDate = _toMoment(startDate);
             this.setState({activeDate: currentDate});
         }
-
         const calendar = <Calendar disabledDate={this.calendarDisabledDate} onChange={this.onSelect} />;
         return (
+            <Segment styleName="legend" basic>
+                <Label.Group as="span" size="large" styleName="labels">
+                    <Label color="green">{Translate.string('Available')}</Label>
+                    <Label color="orange">{Translate.string('Booked')}</Label>
+                    <Label styleName="pre-booking">{Translate.string('Pre-Booking')}</Label>
+                    <Label color="red">{Translate.string('Conflict')}</Label>
+                    <Label styleName="pre-booking-conflict">{Translate.string('Conflict with Pre-Booking')}</Label>
+                </Label.Group>
+                <Button.Group floated="right" size="small">
+                    <Button icon="left arrow"
+                            onClick={() => this.changeSelectedDate('prev')}
+                            disabled={moment(currentDate).subtract(1, 'day').isBefore(startDate)} />
+                    <DatePicker calendar={calendar}>
+                        {
+                            () => (
+                                <Button primary>
+                                    {currentDate.format(DATE_FORMAT)}
+                                </Button>
+                            )
+                        }
+                    </DatePicker>
+                    <Button icon="right arrow"
+                            onClick={() => this.changeSelectedDate('next')}
+                            disabled={moment(currentDate).add(1, 'day').isAfter(endDate)} />
+                </Button.Group>
+            </Segment>
+        );
+    };
+
+    renderTimeline = () => {
+        const {activeDate} = this.state;
+        const {minHour, maxHour, step, availability, recurrenceType} = this.props;
+        const hourSeries = _.range(minHour, maxHour + step, step);
+
+        const rows = [];
+        Object.values(availability).forEach((roomAvailability) => {
+            const av = {
+                candidates: roomAvailability.candidates[activeDate.format('YYYY-MM-DD')] || [],
+                preBookings: roomAvailability.pre_bookings[activeDate.format('YYYY-MM-DD')] || [],
+                bookings: roomAvailability.bookings[activeDate.format('YYYY-MM-DD')] || [],
+                conflicts: roomAvailability.conflicts[activeDate.format('YYYY-MM-DD')] || [],
+                preConflicts: roomAvailability.pre_conflicts[activeDate.format('YYYY-MM-DD')] || []
+            };
+            const room = roomAvailability.room;
+            rows.push({availability: av, label: room.full_name, conflictIndicator: true, id: room.id, room});
+        });
+
+        return (
             <>
-                <Segment styleName="legend" basic>
-                    <Label.Group as="span" size="large" styleName="labels">
-                        <Label color="green">{Translate.string('Available')}</Label>
-                        <Label color="orange">{Translate.string('Booked')}</Label>
-                        <Label styleName="pre-booking">{Translate.string('Pre-Booking')}</Label>
-                        <Label color="red">{Translate.string('Conflict')}</Label>
-                        <Label styleName="pre-booking-conflict">{Translate.string('Conflict with Pre-Booking')}</Label>
-                    </Label.Group>
-                    <Button.Group floated="right" size="small">
-                        <Button icon="left arrow"
-                                onClick={() => this.changeSelectedDate('prev')}
-                                disabled={moment(currentDate).subtract(1, 'day').isBefore(startDate)} />
-                        <DatePicker calendar={calendar}>
-                            {
-                                () => (
-                                    <Button primary>
-                                        {currentDate.format(DATE_FORMAT)}
-                                    </Button>
-                                )
-                            }
-                        </DatePicker>
-                        <Button icon="right arrow"
-                                onClick={() => this.changeSelectedDate('next')}
-                                disabled={moment(currentDate).add(1, 'day').isAfter(endDate)} />
-                    </Button.Group>
-                </Segment>
+                {this.renderTimelineLegend()}
                 <div styleName="timeline">
-                    <div styleName="timeline-header">
-                        <div styleName="timeline-header-label" />
-                        {hourSeries.map((hour) => (
-                            <div styleName="timeline-header-label" key={`timeline-header-${hour}`}>
-                                {moment({hours: hour}).format('H:mm')}
-                            </div>
-                        ))}
-                    </div>
-                    {Object.entries(availability).map(([, roomAvailability]) => (
-                        this.renderTimelineRow(roomAvailability)
-                    ))}
-                    {this.renderDividers(hourSeries.length)}
+                    <TimelineContent rows={rows}
+                                     hourSeries={hourSeries}
+                                     minHour={minHour}
+                                     maxHour={maxHour}
+                                     recurrenceType={recurrenceType}
+                                     openModal={this.openBookingModal} />
                 </div>
             </>
         );
     };
 
-    renderTimelineRow = (availability) => {
-        const {activeDate} = this.state;
-        const {minHour, maxHour, step, recurrenceType} = this.props;
-        const columns = ((maxHour - minHour) / step) + 1;
-        const data = {
-            candidates: availability.candidates[activeDate.format('YYYY-MM-DD')] || [],
-            preBookings: availability.pre_bookings[activeDate.format('YYYY-MM-DD')] || [],
-            bookings: availability.bookings[activeDate.format('YYYY-MM-DD')] || [],
-            conflicts: availability.conflicts[activeDate.format('YYYY-MM-DD')] || [],
-            preConflicts: availability.pre_conflicts[activeDate.format('YYYY-MM-DD')] || []
-        };
-        // TODO: Consider plan B (availability='alternatives') option when implemented
-        const hasConflicts = !(_.isEmpty(availability.conflicts) && _.isEmpty(availability.pre_conflicts));
-        return (
-            <div styleName="timeline-row" key={`room-${availability.room.id}`}>
-                <TimelineRowLabel roomName={availability.room.full_name}
-                                  availability={hasConflicts ? 'conflict' : 'available'} />
-                <div styleName="timeline-row-content" style={{flex: columns}}>
-                    <TimelineItem step={step} startHour={minHour} endHour={maxHour} data={data}
-                                  bookable={!hasConflicts}
-                                  onClick={() => {
-                                      if (!hasConflicts || recurrenceType !== 'single') {
-                                          this.openBookingModal(availability.room);
-                                      }
-                                  }} />
-                </div>
-            </div>
-        );
-    };
-
-    renderDividers = (count) => {
-        const leftOffset = 100 / (count + 1);
-
-        return (
-            _.times(count, (i) => (
-                // eslint-disable-next-line react/no-array-index-key
-                <div styleName="divider" style={{left: `${(i + 1) * leftOffset}%`}} key={`divider-${i}`} />
-            ))
-        );
-    };
 
     renderEmptyMessage = () => {
         return (
@@ -240,41 +213,3 @@ export default class Timeline extends React.Component {
         );
     }
 }
-
-function TimelineRowLabel({roomName, availability}) {
-    let color, tooltip;
-    switch (availability) {
-        case 'conflict':
-            color = 'red';
-            tooltip = Translate.string('Conflicts for the selected period');
-            break;
-        case 'alternatives':
-            color = 'orange';
-            tooltip = Translate.string('Room suggested based on the selected criteria');
-            break;
-        default:
-            color = 'green';
-            tooltip = Translate.string('Room available');
-    }
-    const roomLabel = (
-        <span>
-            <Icon name="circle" size="tiny" color={color} styleName="dot" />
-            <span>{roomName}</span>
-        </span>
-    );
-
-    return (
-        <TooltipIfTruncated>
-            <div styleName="timeline-row-label">
-                <div styleName="label">
-                    <Popup trigger={roomLabel} content={tooltip} size="small" />
-                </div>
-            </div>
-        </TooltipIfTruncated>
-    );
-}
-
-TimelineRowLabel.propTypes = {
-    roomName: PropTypes.string.isRequired,
-    availability: PropTypes.oneOf(['available', 'alternatives', 'conflict']).isRequired
-};

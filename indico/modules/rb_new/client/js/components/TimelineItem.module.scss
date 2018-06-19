@@ -35,7 +35,7 @@
         border-radius: 0;
         border: 0.5px solid rgba(0, 0, 0, 0.2) !important;
 
-        &:global(.candidate) {
+        &:global(.default) {
             opacity: 0.3;
             background-color: $sui-green;
         }
