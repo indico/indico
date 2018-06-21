@@ -47,7 +47,7 @@ class AbstractCommentSchema(mm.ModelSchema):
 class AbstractReviewQuestionSchema(mm.ModelSchema):
     class Meta:
         model = AbstractReviewQuestion
-        fields = ('id', 'no_score', 'position', 'text')
+        fields = ('id', 'no_score', 'position', 'title')
 
 
 class AbstractReviewRatingSchema(mm.ModelSchema):
