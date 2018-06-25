@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 from marshmallow.fields import Nested, String
 
 from indico.core.marshmallow import mm
+from indico.modules.rb import Blocking
 from indico.modules.rb.models.aspects import Aspect
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import Reservation
@@ -76,9 +77,16 @@ class ReservationOccurrenceSchema(mm.ModelSchema):
         fields = ('start_dt', 'end_dt', 'is_valid', 'reservation')
 
 
+class BlockingSchema(mm.ModelSchema):
+    class Meta:
+        model = Blocking
+        fields = ('reason',)
+
+
 rooms_schema = RoomSchema(many=True, only=_room_fields)
 room_details_schema = RoomSchema()
 map_rooms_schema = MapRoomSchema(many=True)
 aspects_schema = AspectSchema(many=True)
 reservation_occurrences_schema = ReservationOccurrenceSchema(many=True)
 reservation_schema = ReservationSchema()
+blocking_schema = BlockingSchema(many=True)

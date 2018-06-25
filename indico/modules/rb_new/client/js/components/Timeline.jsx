@@ -130,6 +130,8 @@ export default class Timeline extends React.Component {
                     <Label styleName="pre-booking">{Translate.string('Pre-Booking')}</Label>
                     <Label color="red">{Translate.string('Conflict')}</Label>
                     <Label styleName="pre-booking-conflict">{Translate.string('Conflict with Pre-Booking')}</Label>
+                    <Label styleName="blocking">{Translate.string('Blocked')}</Label>
+                    <Label styleName="unavailable">{Translate.string('Not available')}</Label>
                 </Label.Group>
                 {Object.keys(availability).length > 1 && (
                     <Button.Group floated="right" size="small">
@@ -171,7 +173,8 @@ export default class Timeline extends React.Component {
                     preBookings: roomAvailability.pre_bookings[dt] || [],
                     bookings: roomAvailability.bookings[dt] || [],
                     conflicts: roomAvailability.conflicts[dt] || [],
-                    preConflicts: roomAvailability.pre_conflicts[dt] || []
+                    preConflicts: roomAvailability.pre_conflicts[dt] || [],
+                    blockings: roomAvailability.blockings[dt] || []
                 };
                 return {availability: av, label: dt, conflictIndicator: true, id: dt, room};
             });
@@ -183,7 +186,8 @@ export default class Timeline extends React.Component {
                     preBookings: roomAvailability.pre_bookings[dt] || [],
                     bookings: roomAvailability.bookings[dt] || [],
                     conflicts: roomAvailability.conflicts[dt] || [],
-                    preConflicts: roomAvailability.pre_conflicts[dt] || []
+                    preConflicts: roomAvailability.pre_conflicts[dt] || [],
+                    blockings: roomAvailability.blockings[dt] || []
                 };
 
                 const room = roomAvailability.room;

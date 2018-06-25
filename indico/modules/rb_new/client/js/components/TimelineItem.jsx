@@ -28,7 +28,8 @@ const classes = {
     preBookings: 'pre-booking',
     preConflicts: 'pre-booking-conflict',
     bookings: 'booking',
-    conflicts: 'conflict'
+    conflicts: 'conflict',
+    blockings: 'blocking'
 };
 
 
@@ -70,26 +71,39 @@ export default class TimelineItem extends React.Component {
     };
 
     renderOccurrence = (occurrence, additionalClasses = '') => {
-        const {start_dt: startDt, end_dt: endDt, reservation, bookable} = occurrence;
+        let segmentStartDt, segmentEndDt, popupContent;
+        const {reservation, reason, bookable} = occurrence;
         const {startHour, endHour, step, onClick} = this.props;
-        const segmentStartDt = moment(startDt, 'YYYY-MM-DD HH:mm');
-        const segmentEndDt = moment(endDt, 'YYYY-MM-DD HH:mm');
+        if (additionalClasses === 'blocking') {
+            segmentStartDt = moment(startHour, 'HH:mm');
+            segmentEndDt = moment(endHour, 'HH:mm');
+        } else {
+            const {start_dt: startDt, end_dt: endDt} = occurrence;
+            segmentStartDt = moment(startDt, 'YYYY-MM-DD HH:mm');
+            segmentEndDt = moment(endDt, 'YYYY-MM-DD HH:mm');
+        }
         const blockWidth = 100 / (((endHour - startHour) / step) + 1);
         const segmentWidth = this.calculateWidth(segmentStartDt, segmentEndDt) * blockWidth;
         const segmentPosition = this.calculatePosition(segmentStartDt) * blockWidth;
+        if (additionalClasses === 'blocking') {
+            popupContent = (
+                <div>{Translate.string('Room blocked: {reason}', {reason})}</div>
+            );
+        } else {
+            popupContent = (
+                <>
+                    <div>
+                        {segmentStartDt.format('HH:mm')} - {segmentEndDt.format('HH:mm')}
+                    </div>
+                    <div>
+                        {reservation ? reservation.booking_reason : (bookable ? Translate.string('Click to book it') : '')}
+                    </div>
+                </>
+            );
+        }
 
-        const popupContent = (
-            <>
-                <div>
-                    {segmentStartDt.format('HH:mm')} - {segmentEndDt.format('HH:mm')}
-                </div>
-                <div>
-                    {reservation ? reservation.booking_reason : (bookable ? Translate.string('Click to book it') : '')}
-                </div>
-            </>
-        );
         const segment = (
-            <div className={additionalClasses} onClick={onClick && !reservation ? onClick : null}
+            <div className={additionalClasses} onClick={onClick && !reservation && !reason ? onClick : null}
                  styleName="timeline-occurrence"
                  style={{left: `${segmentPosition}%`, width: `calc(${segmentWidth}% + 1px)`}} />
         );

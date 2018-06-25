@@ -23,20 +23,29 @@
     position: relative;
 }
 
-.legend {
-    .labels {
-        :global(.label) {
-            color: white;
+.legend .labels {
+    :global(.label) {
+        color: white;
 
-            &.pre-booking {
-                @include stripes($pre-booking-stripe-colors...);
-                background-size: 35px 35px;
-            }
+        &.pre-booking {
+            @include stripes($pre-booking-stripe-colors...);
+            background-size: 35px 35px;
+        }
 
-            &.pre-booking-conflict {
-                @include stripes($pre-booking-conflict-stripe-colors...);
-                background-size: 35px 35px;
-            }
+        &.pre-booking-conflict {
+            @include stripes($pre-booking-conflict-stripe-colors...);
+            background-size: 35px 35px;
+        }
+
+        &.unavailable {
+            background-color: $sui-grey;
+            opacity: 0.5;
+        }
+
+        &.blocking {
+            @include stripes($blocking-stripe-colors...);
+            background-size: 35px 35px;
+
         }
     }
 }
