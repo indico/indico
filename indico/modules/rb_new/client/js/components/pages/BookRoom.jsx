@@ -181,10 +181,14 @@ export default class BookRoom extends React.Component {
         );
     };
 
+    suggestionTooltip = (element) => (
+        <Popup trigger={element} content={Translate.string('The filtering criteria will be adjusted accordingly')} />
+    );
+
     renderSuggestionText = (room, {time, duration, skip}) => {
         return (
             <>
-                {time && (
+                {time && this.suggestionTooltip(
                     <Message styleName="suggestion-text" size="mini" onClick={() => this.updateFilters('time', time)}
                              warning compact>
                         <Message.Header>
@@ -206,7 +210,7 @@ export default class BookRoom extends React.Component {
                         <Label color="brown" circular>{Translate.string('or')}</Label>
                     </div>
                 )}
-                {duration && (
+                {duration && this.suggestionTooltip(
                     <Message styleName="suggestion-text" size="mini" onClick={() => this.updateFilters('duration', duration)}
                              warning compact>
                         <Message.Header>
