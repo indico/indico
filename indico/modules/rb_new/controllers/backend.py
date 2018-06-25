@@ -16,7 +16,8 @@
 
 from __future__ import unicode_literals
 
-from datetime import datetime, time
+from datetime import datetime, time, timedelta
+from operator import itemgetter
 
 from flask import jsonify, request, session
 from marshmallow_enum import EnumField
@@ -31,11 +32,12 @@ from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.models.favorites import favorite_room_table
 from indico.modules.rb.models.reservations import RepeatFrequency, Reservation
 from indico.modules.rb.models.rooms import Room
-from indico.modules.rb_new.schemas import (aspects_schema, map_rooms_schema, reservation_occurrences_schema,
-                                           room_details_schema, rooms_schema)
-from indico.modules.rb_new.util import (get_buildings, get_equipment_types, get_rooms_availability, get_suggestions,
-                                        has_managed_rooms, search_for_rooms)
+from indico.modules.rb_new.schemas import aspects_schema, map_rooms_schema, room_details_schema, rooms_schema
+from indico.modules.rb_new.util import (get_buildings, get_equipment_types, get_existing_room_occurrences,
+                                        get_rooms_availability, get_suggestions, group_by_occurrence_date,
+                                        has_managed_rooms, search_for_rooms, serialize_occurrences)
 from indico.modules.users.models.users import User
+from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.web.util import jsonify_data
 
@@ -86,6 +88,18 @@ class RHRoomDetails(RHRoomBookingBase):
 
     def _process(self):
         room_details = room_details_schema.dump(self.room).data
+        last_bookings = get_existing_room_occurrences(self.room, now_utc().date(), now_utc().date() + timedelta(days=5),
+                                                      only_accepted=True)
+        bookings = [
+            {
+                'availability': {'usage': bookings},
+                'label': date,
+                'conflictIndicator': False,
+                'id': date
+            } for date, bookings in serialize_occurrences(group_by_occurrence_date(last_bookings)).iteritems()
+        ]
+
+        room_details['bookings'] = sorted(bookings, key=itemgetter('id'))
         return jsonify(room_details)
 
 
@@ -125,12 +139,9 @@ class RHTimeline(RHRoomBookingBase):
         for room_id in availability:
             data = availability[room_id]
             data['room'] = rooms_schema.dump(data['room'], many=False).data
-            data.update({k: self._serialize_occurrences(data[k])
+            data.update({k: serialize_occurrences(data[k])
                          for k in ['candidates', 'pre_bookings', 'bookings', 'conflicts', 'pre_conflicts']})
         return jsonify_data(flash=False, availability=availability, date_range=date_range)
-
-    def _serialize_occurrences(self, data):
-        return {dt.isoformat(): reservation_occurrences_schema.dump(data).data for dt, data in data.iteritems()}
 
 
 class RHRoomFavorites(RHRoomBookingBase):

@@ -35,23 +35,26 @@ export default class TimelineContent extends React.Component {
         hourSeries: PropTypes.array.isRequired,
         recurrenceType: PropTypes.string,
         openModal: PropTypes.func,
+        longLabel: PropTypes.bool,
     };
 
     static defaultProps = {
         step: 2,
         recurrenceType: null,
         openModal: null,
+        longLabel: false,
     };
 
     renderTimelineRow = ({availability, label, conflictIndicator, id, room}) => {
-        const {minHour, maxHour, step, recurrenceType, openModal} = this.props;
+        const {minHour, maxHour, step, recurrenceType, openModal, longLabel} = this.props;
         const columns = ((maxHour - minHour) / step) + 1;
         // TODO: Consider plan B (availability='alternatives') option when implemented
         const hasConflicts = !(_.isEmpty(availability.conflicts) && _.isEmpty(availability.preConflicts));
         return (
             <div styleName="timeline-row" key={`element-${id}`}>
                 <TimelineRowLabel label={label}
-                                  availability={conflictIndicator ? (hasConflicts ? 'conflict' : 'available') : null} />
+                                  availability={conflictIndicator ? (hasConflicts ? 'conflict' : 'available') : null}
+                                  longLabel={longLabel} />
                 <div styleName="timeline-row-content" style={{flex: columns}}>
                     <TimelineItem step={step} startHour={minHour} endHour={maxHour} data={availability}
                                   bookable={!hasConflicts}
@@ -65,23 +68,25 @@ export default class TimelineContent extends React.Component {
         );
     };
 
-    renderDividers = (count) => {
-        const leftOffset = 100 / (count + 1);
+    renderDividers = (count, longLabel) => {
+        const leftOffset = 100 / (count + (longLabel ? 2 : 1));
 
         return (
             _.times(count, (i) => (
                 // eslint-disable-next-line react/no-array-index-key
-                <div styleName="timeline-divider" style={{left: `${(i + 1) * leftOffset}%`}} key={`divider-${i}`} />
+                <div styleName="timeline-divider"
+                     style={{left: `${((i + 1) * leftOffset) + (longLabel ? leftOffset : 0)}%`}}
+                     key={`divider-${i}`} />
             ))
         );
     };
 
     render() {
-        const {rows, hourSeries} = this.props;
+        const {rows, hourSeries, longLabel} = this.props;
         return (
             <div styleName="timeline-content">
                 <div styleName="timeline-header">
-                    <div styleName="timeline-header-label" />
+                    <div styleName="timeline-header-label" style={{flex: longLabel ? 2 : 1}} />
                     {hourSeries.map((hour) => (
                         <div styleName="timeline-header-label" key={`timeline-header-${hour}`}>
                             {moment({hours: hour}).format('H:mm')}
@@ -89,14 +94,14 @@ export default class TimelineContent extends React.Component {
                     ))}
                 </div>
                 {rows.map((rowProps) => this.renderTimelineRow(rowProps))}
-                {this.renderDividers(hourSeries.length)}
+                {this.renderDividers(hourSeries.length, longLabel)}
             </div>
         );
     }
 }
 
 
-function TimelineRowLabel({label, availability}) {
+function TimelineRowLabel({label, availability, longLabel}) {
     let color, tooltip;
     switch (availability) {
         case 'conflict':
@@ -120,7 +125,7 @@ function TimelineRowLabel({label, availability}) {
 
     return (
         <TooltipIfTruncated>
-            <div styleName="timeline-row-label">
+            <div styleName="timeline-row-label" style={{flex: (longLabel ? 2 : 1)}}>
                 <div styleName="label">
                     {availability ? <Popup trigger={roomLabel} content={tooltip} size="small" /> : roomLabel}
                 </div>
@@ -131,9 +136,11 @@ function TimelineRowLabel({label, availability}) {
 
 TimelineRowLabel.propTypes = {
     label: PropTypes.string.isRequired,
-    availability: PropTypes.oneOf(['available', 'alternatives', 'conflict'])
+    availability: PropTypes.oneOf(['available', 'alternatives', 'conflict']),
+    longLabel: PropTypes.bool,
 };
 
 TimelineRowLabel.defaultProps = {
     availability: null,
+    longLabel: false,
 };

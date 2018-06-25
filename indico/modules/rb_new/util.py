@@ -34,7 +34,7 @@ from indico.modules.rb.models.reservation_occurrences import ReservationOccurren
 from indico.modules.rb.models.reservations import RepeatFrequency, Reservation
 from indico.modules.rb.models.room_attributes import RoomAttributeAssociation
 from indico.modules.rb.models.rooms import Room
-from indico.modules.rb_new.schemas import rooms_schema
+from indico.modules.rb_new.schemas import reservation_occurrences_schema, rooms_schema
 from indico.util.caching import memoize_redis
 from indico.util.struct.iterables import group_list
 
@@ -140,10 +140,11 @@ def get_buildings():
     return buildings_tmp
 
 
-def get_existing_room_occurrences(room, start_dt, end_dt, allow_overlapping=False):
+def get_existing_room_occurrences(room, start_dt, end_dt, allow_overlapping=False, only_accepted=False):
     query = (ReservationOccurrence.query
              .filter(Reservation.room_id == room.id, ReservationOccurrence.is_valid)
              .join(ReservationOccurrence.reservation)
+             .order_by(ReservationOccurrence.start_dt.asc())
              .options(ReservationOccurrence.NO_RESERVATION_USER_STRATEGY,
                       contains_eager(ReservationOccurrence.reservation)))
 
@@ -151,6 +152,8 @@ def get_existing_room_occurrences(room, start_dt, end_dt, allow_overlapping=Fals
         query = query.filter(db_dates_overlap(ReservationOccurrence, 'start_dt', start_dt, 'end_dt', end_dt))
     else:
         query = query.filter(ReservationOccurrence.start_dt >= start_dt, ReservationOccurrence.end_dt <= end_dt)
+    if only_accepted:
+        query = query.filter(Reservation.is_accepted)
     return query.all()
 
 
@@ -345,3 +348,7 @@ def sort_suggestions(suggestions):
         b_time, b_duration = abs(b.get('time', 0)), b.get('duration', 0)
         return int(a_time + a_duration * 0.2) - int(b_time + b_duration * 0.2)
     return sorted(suggestions, cmp=cmp_fn, key=lambda item: item['suggestions'])
+
+
+def serialize_occurrences(data):
+    return {dt.isoformat(): reservation_occurrences_schema.dump(data).data for dt, data in data.iteritems()}
