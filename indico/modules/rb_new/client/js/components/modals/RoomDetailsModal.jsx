@@ -17,7 +17,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Button, Grid, Modal, Header, Message, List} from 'semantic-ui-react';
+import {Button, Grid, Modal, Header, Message, List, Icon} from 'semantic-ui-react';
 
 import {Translate, Param} from 'indico/react/i18n';
 import {RoomBasicDetails} from '../RoomBasicDetails';
@@ -48,7 +48,7 @@ export default class RoomDetailsModal extends React.Component {
         }
         const room = rooms[currentViewID];
         return (
-            <Modal open onClose={this.handleCloseModal} closeIcon>
+            <Modal open onClose={this.handleCloseModal} size="large" closeIcon>
                 <Modal.Header styleName="room-details-header">
                     <Translate>Room Details</Translate>
                     <span>
@@ -64,6 +64,11 @@ export default class RoomDetailsModal extends React.Component {
 }
 
 function RoomDetails({room}) {
+    const minHour = 6;
+    const maxHour = 22;
+    const step = 2;
+    const hourSeries = _.range(minHour, maxHour + step, step);
+
     return (
         <div styleName="room-details">
             <Grid columns={2}>
@@ -78,6 +83,18 @@ function RoomDetails({room}) {
                 </Grid.Column>
                 <Grid.Column>
                     <Header><Translate>Usage</Translate></Header>
+                    {!_.isEmpty(room.bookings) ? (
+                        <TimelineContent rows={room.bookings}
+                                         hourSeries={hourSeries}
+                                         minHour={minHour}
+                                         maxHour={maxHour}
+                                         longLabel />
+                    ) : (
+                        <Message info>
+                            <Icon name="info" size="large" />
+                            <Translate>No recent usage of this room</Translate>
+                        </Message>
+                    )}
                     <Header><Translate>Statistics</Translate></Header>
                 </Grid.Column>
             </Grid>

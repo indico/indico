@@ -50,7 +50,6 @@ $row-height: 50px;
         .timeline-row-label {
             height: 100%;
             line-height: $row-height;
-            flex: 1;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
