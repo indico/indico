@@ -213,12 +213,14 @@ def get_rooms_availability(rooms, start_dt, end_dt, repeat_frequency, repeat_int
         room_conflicts, pre_room_conflicts = conflicts.get(room.id, ([], []))
         pre_bookings = [occ for occ in room_occurrences if not occ.reservation.is_accepted]
         existing_bookings = [occ for occ in room_occurrences if occ.reservation.is_accepted]
+        blockings = get_blockings(room, candidates)
         availability[room.id] = {'room': room,
                                  'candidates': group_by_occurrence_date(candidates),
                                  'pre_bookings': group_by_occurrence_date(pre_bookings),
                                  'bookings': group_by_occurrence_date(existing_bookings),
                                  'conflicts': group_by_occurrence_date(room_conflicts),
-                                 'pre_conflicts': group_by_occurrence_date(pre_room_conflicts)}
+                                 'pre_conflicts': group_by_occurrence_date(pre_room_conflicts),
+                                 'blockings': blockings}
     return date_range, availability
 
 
@@ -233,6 +235,21 @@ def get_equipment_types():
              .filter(EquipmentType.rooms.any(Room.is_active))
              .order_by(EquipmentType.name))
     return [row.name for row in query]
+
+
+def get_blockings(room, candidates):
+    blocked_rooms = room.get_blocked_rooms(*(candidate.start_dt for candidate in candidates))
+    if blocked_rooms == []:
+        return {}
+    blockings_occurences = {}
+    dates = list(candidate.start_dt.date() for candidate in candidates)
+    for room in blocked_rooms:
+        blocking = room.blocking
+        for date in dates:
+            if blocking.start_date <= date <= blocking.end_date:
+                occurence = blocking
+                blockings_occurences[date] = [occurence]
+    return blockings_occurences
 
 
 def _can_get_all_groups(user):

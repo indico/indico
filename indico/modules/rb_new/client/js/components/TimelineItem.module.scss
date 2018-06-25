@@ -61,6 +61,11 @@
             @include stripes($pre-booking-conflict-stripe-colors...);
             background-size: 35px 35px;
         }
-    }
 
+        &:global(.blocking) {
+            @include stripes($blocking-stripe-colors...);
+            background-size: 35px 35px;
+            opacity: 0.3;
+        }
+    }
 }
