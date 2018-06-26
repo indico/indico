@@ -415,11 +415,11 @@ def get_base_ical_parameters(user, detail, path, params=None):
             'user_logged': user is not None, 'request_urls': request_urls}
 
 
-def create_event_logo_tmp_file(event):
+def create_event_logo_tmp_file(event, tmppath=None):
     """Creates a temporary file with the event's logo"""
     logo_meta = event.logo_metadata
     logo_extension = guess_extension(logo_meta['content_type']) or os.path.splitext(logo_meta['filename'])[1]
-    temp_file = NamedTemporaryFile(delete=False, dir=config.TEMP_DIR, suffix=logo_extension)
+    temp_file = NamedTemporaryFile(delete=False, dir=tmppath or config.TEMP_DIR, suffix=logo_extension)
     temp_file.write(event.logo)
     temp_file.flush()
     return temp_file

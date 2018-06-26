@@ -322,7 +322,7 @@ class ContribToPDF(PDFLaTeXBase):
         })
 
         if event.logo:
-            self.temp_file = create_event_logo_tmp_file(event)
+            self.temp_file = create_event_logo_tmp_file(event, self._dir)
             self._args['logo_img'] = self.temp_file.name
 
 
@@ -345,7 +345,7 @@ class ContribsToPDF(PDFLaTeXBase):
         })
 
         if event.logo:
-            self.temp_file = create_event_logo_tmp_file(event)
+            self.temp_file = create_event_logo_tmp_file(event, self._dir)
             self._args['logo_img'] = self.temp_file.name
 
 
@@ -405,7 +405,7 @@ class ContributionBook(PDFLaTeXBase):
         })
 
         if event.logo:
-            self.temp_file = create_event_logo_tmp_file(event)
+            self.temp_file = create_event_logo_tmp_file(event, self._dir)
             self._args['logo_img'] = self.temp_file.name
 
 

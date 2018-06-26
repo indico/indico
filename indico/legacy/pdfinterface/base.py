@@ -677,9 +677,10 @@ class PDFLaTeXBase(object):
         self._args = {
             'md_convert': _convert_markdown
         }
+        self._dir = tempfile.mkdtemp(prefix="indico-texgen-", dir=config.TEMP_DIR)
 
     def generate(self):
-        latex = LatexRunner(has_toc=self._table_of_contents)
+        latex = LatexRunner(has_toc=self._table_of_contents, dir=self._dir)
         pdffile = latex.run(self._tpl_filename, **self._args)
         return pdffile
 
@@ -700,8 +701,9 @@ class LatexRunner(object):
     Handles the PDF generation from a chosen LaTeX template
     """
 
-    def __init__(self, has_toc=False):
+    def __init__(self, has_toc=False, dir=None):
         self.has_toc = has_toc
+        self._dir = dir
 
     def run_latex(self, source_file, log_file=None):
         pdflatex_cmd = [config.XELATEX_PATH,
@@ -727,7 +729,8 @@ class LatexRunner(object):
         template_dir = os.path.join(get_root_path('indico'), 'legacy/webinterface/tpls/latex')
         template = tpl_render(os.path.join(template_dir, template_name), kwargs)
 
-        self._dir = tempfile.mkdtemp(prefix="indico-texgen-", dir=config.TEMP_DIR)
+        if not self._dir:
+            self._dir = tempfile.mkdtemp(prefix="indico-texgen-", dir=config.TEMP_DIR)
         chmod_umask(self._dir, execute=True)
         source_filename = os.path.join(self._dir, template_name + '.tex')
         target_filename = os.path.join(self._dir, template_name + '.pdf')
