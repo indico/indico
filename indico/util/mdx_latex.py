@@ -417,7 +417,7 @@ class LaTeXTreeProcessor(markdown.treeprocessors.Treeprocessor):
         elif ournode.tag == 'q':
             buffer += "`%s'" % subcontent.strip()
         elif ournode.tag == 'p':
-            if self.configs.get('apply_br', False):
+            if self.configs.get('apply_br'):
                 subcontent = subcontent.replace('\n', '\\\\\\relax\n')
             buffer += '\n%s\n' % subcontent.strip()
         elif ournode.tag == 'strong':

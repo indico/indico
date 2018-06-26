@@ -19,6 +19,7 @@ from sqlalchemy.orm import contains_eager, joinedload, load_only, noload
 from indico.core.db import db
 from indico.core.errors import UserValueError
 from indico.modules.attachments.util import get_attached_items
+from indico.modules.events.abstracts.settings import BOASortField
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.persons import ContributionPersonLink, SubContributionPersonLink
 from indico.modules.events.contributions.models.principals import ContributionPrincipal
@@ -93,13 +94,41 @@ def serialize_contribution_person_link(person_link, is_submitter=None):
     return data
 
 
+def sort_contribs(contribs, sort_by):
+    mapping = {'number': 'id', 'name': 'title'}
+    if sort_by == BOASortField.schedule:
+        key_func = lambda c: (c.start_dt is None, c.start_dt)
+    elif sort_by == BOASortField.session_title:
+        key_func = lambda c: (c.session is None, c.session.title.lower() if c.session else '')
+    elif sort_by == BOASortField.speaker:
+        def key_func(c):
+            speakers = c.speakers
+            if not c.speakers:
+                return True, None
+            return False, speakers[0].get_full_name(last_name_upper=False, abbrev_first_name=False).lower()
+    elif sort_by == BOASortField.board_number:
+        key_func = attrgetter('board_number')
+    elif sort_by == BOASortField.session_board_number:
+        key_func = lambda c: (c.session is None, c.session.title.lower() if c.session else '', c.board_number)
+    elif sort_by == BOASortField.schedule_board_number:
+        key_func = lambda c: (c.start_dt is None, c.start_dt, c.board_number if c.board_number else '')
+    elif sort_by == BOASortField.session_schedule_board:
+        key_func = lambda c: (c.session is None, c.session.title.lower() if c.session else '',
+                              c.start_dt is None, c.start_dt, c.board_number if c.board_number else '')
+    elif isinstance(sort_by, (str, unicode)) and sort_by:
+        key_func = attrgetter(mapping.get(sort_by) or sort_by)
+    else:
+        key_func = attrgetter('title')
+    return sorted(contribs, key=key_func)
+
+
 def generate_spreadsheet_from_contributions(contributions):
     """Return a tuple consisting of spreadsheet columns and respective
     contribution values"""
 
     headers = ['Id', 'Title', 'Description', 'Date', 'Duration', 'Type', 'Session', 'Track', 'Presenters', 'Materials']
     rows = []
-    for c in sorted(contributions, key=attrgetter('friendly_id')):
+    for c in sort_contribs(contributions, sort_by='friendly_id'):
         contrib_data = {'Id': c.friendly_id, 'Title': c.title, 'Description': c.description,
                         'Duration': format_human_timedelta(c.duration),
                         'Date': c.timetable_entry.start_dt if c.timetable_entry else None,
