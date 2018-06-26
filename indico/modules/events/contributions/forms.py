@@ -9,12 +9,14 @@ from __future__ import unicode_literals
 
 from datetime import timedelta
 
+from flask import request
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
-from wtforms.fields import BooleanField, StringField, TextAreaField
+from wtforms.fields import BooleanField, HiddenField, SelectField, StringField, TextAreaField
 from wtforms.validators import DataRequired, ValidationError
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.descriptions import RenderMode
+from indico.modules.events.abstracts.settings import BOASortField
 from indico.modules.events.contributions.fields import (ContributionPersonLinkListField,
                                                         SubContributionPersonLinkListField)
 from indico.modules.events.contributions.models.references import ContributionReference, SubContributionReference
@@ -25,8 +27,8 @@ from indico.util.date_time import get_day_end
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import IndicoForm, generated_data
-from indico.web.forms.fields import (IndicoDateTimeField, IndicoLocationField, IndicoProtectionField,
-                                     IndicoTagListField, TimeDeltaField)
+from indico.web.forms.fields import (HiddenFieldList, IndicoDateTimeField, IndicoEnumSelectField, IndicoLocationField,
+                                     IndicoProtectionField, IndicoTagListField, TimeDeltaField)
 from indico.web.forms.fields.principals import PermissionsField
 from indico.web.forms.validators import DateTimeRange, MaxDuration
 from indico.web.forms.widgets import SwitchWidget
@@ -199,3 +201,22 @@ class ContributionTypeForm(IndicoForm):
             query = query.filter(ContributionType.id != self.contrib_type.id)
         if query.count():
             raise ValidationError(_("A contribution type with this name already exists"))
+
+
+class ContributionExportTeXForm(IndicoForm):
+    """Form for Tex-based export selection"""
+    format = SelectField(_('Format'), default='PDF')
+    sort_by = IndicoEnumSelectField(_('Sort by'), enum=BOASortField, default=BOASortField.abstract_title,
+                                    sorted=True)
+    contrib_ids = HiddenFieldList()
+    submitted = HiddenField()
+
+    def __init__(self, *args, **kwargs):
+        self.contribs = kwargs.get('contribs')
+        super(ContributionExportTeXForm, self).__init__(*args, **kwargs)
+        self.contrib_ids.data = [c.id for c in self.contribs]
+        self.format.choices = {'PDF': 'PDF',
+                               'TeX': 'Zipped TeX directory'}.items()
+
+    def is_submitted(self):
+        return super(ContributionExportTeXForm, self).is_submitted() and 'submitted' in request.form

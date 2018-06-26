@@ -57,9 +57,9 @@ class PDFLaTeXBase(object):
 
         self._args = {'markdown': _convert_markdown}
 
-    def generate(self):
+    def generate(self, return_source=False):
         latex = LatexRunner(self.source_dir, has_toc=self._table_of_contents)
-        return latex.run(self.LATEX_TEMPLATE, **self._args)
+        return latex.run(self.LATEX_TEMPLATE, return_source=return_source, **self._args)
 
 
 class LaTeXRuntimeException(Exception):
@@ -163,11 +163,9 @@ class LatexRunner(object):
         env.globals['ngettext'] = ngettext
         env.globals['session'] = session
         template = env.get_or_select_template(template_name)
-        distribution = pkg_resources.get_distribution('indico-fonts')
-        font_dir = os.path.join(distribution.location, 'indico_fonts', '')  # XXX: trailing slash required
-        return template.render(font_dir=font_dir, **kwargs)
+        return template.render(font_dir='fonts/', **kwargs)
 
-    def run(self, template_name, **kwargs):
+    def run(self, template_name, return_source=False, **kwargs):
         chmod_umask(self.source_dir, execute=True)
         source_filename = os.path.join(self.source_dir, template_name + '.tex')
         target_filename = os.path.join(self.source_dir, template_name + '.pdf')
@@ -175,6 +173,17 @@ class LatexRunner(object):
         source = self._render_template(template_name + '.tex', kwargs)
         with codecs.open(source_filename, 'wb', encoding='utf-8') as f:
             f.write(source)
+
+
+        distribution = pkg_resources.get_distribution('indico-fonts')
+        font_dir = os.path.join(distribution.location, 'indico_fonts')
+        try:
+            os.symlink(font_dir, os.path.join(self.source_dir, 'fonts'))
+        except Exception:
+            copytree(font_dir, os.path.join(self.source_dir, 'fonts'))
+
+        if return_source:
+            return source_filename
 
         log_filename = os.path.join(self.source_dir, 'output.log')
         log_file = open(log_filename, 'a+')
@@ -189,6 +198,7 @@ class LatexRunner(object):
                 # something went terribly wrong, no LaTeX file was produced
                 raise LaTeXRuntimeException(source_filename, log_filename)
 
+	
         return target_filename
 
 

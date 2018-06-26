@@ -1,0 +1,11 @@
+{% from 'forms/_form.html' import simple_form  %}
+{% from 'message_box.html' import message_box %}
+
+{% call message_box('highlight', large_icon=true) %}
+    {% trans -%}
+    Please select the  desired format and sort order.
+    {%- endtrans %}
+{% endcall %}
+
+{{ simple_form(form, back=_('Cancel'), footer_align_right=true, disabled_until_change=false,
+               form_header_kwargs={'method':'POST', 'action': url_for('.contributions_tex_export_dialog', event)}) }}

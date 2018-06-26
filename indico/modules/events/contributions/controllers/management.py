@@ -7,16 +7,22 @@
 
 from __future__ import unicode_literals
 
+import os
+import uuid
 from operator import attrgetter
+from tempfile import NamedTemporaryFile
+from zipfile import ZipFile
 
 from flask import flash, jsonify, redirect, request, session
 from sqlalchemy.orm import undefer
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
+from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.protection import ProtectionMode, render_acl
 from indico.core.permissions import get_principal_permissions, update_permissions
-from indico.legacy.pdfinterface.latex import ContribsToPDF, ContributionBook
+from indico.legacy.common.cache import GenericCache
+from indico.legacy.pdfinterface.latex import AbstractBook, ContribsToPDF, ContributionBook, LaTeXRuntimeException
 from indico.modules.attachments.controllers.event_package import AttachmentPackageGeneratorMixin
 from indico.modules.events.abstracts.forms import AbstractContentSettingsForm
 from indico.modules.events.abstracts.settings import BOASortField, abstracts_settings
@@ -24,8 +30,9 @@ from indico.modules.events.contributions import contribution_settings, get_contr
 from indico.modules.events.contributions.clone import ContributionCloner
 from indico.modules.events.contributions.controllers.common import ContributionListMixin
 from indico.modules.events.contributions.forms import (ContributionDefaultDurationForm, ContributionDurationForm,
-                                                       ContributionProtectionForm, ContributionStartDateForm,
-                                                       ContributionTypeForm, SubContributionForm)
+                                                       ContributionExportTeXForm, ContributionProtectionForm,
+                                                       ContributionStartDateForm, ContributionTypeForm,
+                                                       SubContributionForm)
 from indico.modules.events.contributions.lists import ContributionListGenerator
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.fields import ContributionField
@@ -47,17 +54,20 @@ from indico.modules.events.sessions import Session
 from indico.modules.events.timetable.forms import ImportContributionsForm
 from indico.modules.events.timetable.operations import update_timetable_entry
 from indico.modules.events.tracks.models.tracks import Track
-from indico.modules.events.util import check_event_locked, get_field_values, track_time_changes
+from indico.modules.events.util import ZipGeneratorMixin, check_event_locked, get_field_values, track_time_changes
 from indico.util.date_time import format_datetime, format_human_timedelta
+from indico.util.fs import chmod_umask
 from indico.util.i18n import _, ngettext
 from indico.util.spreadsheets import send_csv, send_xlsx
 from indico.util.string import handle_legacy_description
 from indico.web.flask.templating import get_template_module
-from indico.web.flask.util import send_file, url_for
+from indico.web.flask.util import redirect_or_jsonify, send_file, url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.forms.fields.principals import serialize_principal
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
+
+export_list_cache = GenericCache('export-list')
 
 def _render_subcontribution_list(contrib):
     tpl = get_template_module('events/contributions/management/_subcontribution_list.html')
@@ -454,38 +464,78 @@ class RHContributionsExportPDF(RHManageContributionsExportActionsBase):
         return send_file('contributions.pdf', pdf.generate(), 'application/pdf')
 
 
-class RHContributionsExportPDFBook(RHManageContributionsExportActionsBase):
+def get_export_formats():
+    # to be converted to a signal later
+    export_formats = [('PDF1', _('PDF'), render_pdf, ContributionBook),
+                      ('ZIP1', _('TeX Archive'), render_archive, ContributionBook),
+                      ('PDF2', _('PDF (BoA)'), render_pdf, AbstractBook),
+                      ('ZIP2', _('TeX Archive (BoA)'), render_archive, AbstractBook),
+                      ]
+    return export_formats
+
+
+class RHContributionExportTexConfig(RHManageContributionsExportActionsBase):
+    """Configure Export via LaTeX"""
+
+    ALLOW_LOCKED = True
     def _process(self):
-        pdf = ContributionBook(self.event, session.user, self.contribs, tz=self.event.timezone)
-        return send_file('book-of-abstracts.pdf', pdf.generate(), 'application/pdf')
+        form = ContributionExportTeXForm(contribs=self.contribs)
+        form.format.choices = [f[0:2] for f in get_export_formats()]
+        if form.validate_on_submit():
+            data = form.data
+            data.pop('submitted', None)
+            data['contribution_ids'] = [x.id for x in self.contribs]
+            key = unicode(uuid.uuid4())
+            export_list_cache.set(key, data, time=1800)
+            download_url = url_for('.contributions_tex_export_book', self.event, uuid=key)
+            return jsonify_data(flash=False, redirect=download_url, redirect_no_loading=True)
+
+        return jsonify_form(form, disabled_until_change=False)
+
+def render_pdf(event, contribs, sort_by, opts):
+    pdf = opts(event, session.user, contribs, tz=event.timezone, sort_by=sort_by)
+    res = pdf.generate()
+    return send_file('book-of-abstracts.pdf', res, 'application/pdf')
 
 
-class RHContributionsExportPDFBookSorted(RHManageContributionsExportActionsBase):
+def render_archive(event, contribs, sort_by, opts):
+    pdf = opts(event, session.user, contribs, tz=event.timezone, sort_by=sort_by)
+    res = pdf.generate(return_source=True)
+
+    files = os.listdir(pdf._dir)
+    temp_file = NamedTemporaryFile(suffix='indico.tmp', dir=config.TEMP_DIR)
+    with ZipFile(temp_file.name, 'w', allowZip64=True) as zip_handler:
+        for f in files:
+            af = os.path.abspath(os.path.join(pdf._dir, f))
+            print af
+            if os.path.islink(af):
+                continue
+            if os.path.isdir(af):
+                continue
+            zip_handler.write(af, os.path.basename(f).encode('utf-8'))
+
+    temp_file.delete = False
+    zip_file_name = 'contributions-tex.zip'
+    chmod_umask(temp_file.name)
+    return send_file(zip_file_name, temp_file.name, 'application/zip', inline=False)
+
+
+class RHContributionsExportTeXBook(RHManageContributionsExportActionsBase):
+    """Handle export contributions via LaTeX"""
+
     def _process(self):
-        pdf = ContributionBook(self.event, session.user, self.contribs, tz=self.event.timezone,
-                               sort_by=BOASortField.board_number)
-        return send_file('book-of-abstracts.pdf', pdf.generate(), 'application/pdf')
+        config_params = export_list_cache.get(request.view_args['uuid'])
+        output_format = config_params['format']
+        sort_by = config_params['sort_by']
+        contribs = (Contribution.query.with_parent(self.event)
+                    .filter(Contribution.id.in_(config_params['contribution_ids'])).all())
 
+        for exporter in get_export_formats():
+            if output_format == exporter[0]:
+                func = exporter[2]
+                opts = exporter[3]
 
-class RHContributionsExportPDFBookSortedSession(RHManageContributionsExportActionsBase):
-    def _process(self):
-        pdf = ContributionBook(self.event, session.user, self.contribs, tz=self.event.timezone,
-                               sort_by=BOASortField.session_board_number)
-        return send_file('book-of-abstracts.pdf', pdf.generate(), 'application/pdf')
-
-
-class RHContributionsExportPDFBookSortedSchedule(RHManageContributionsExportActionsBase):
-    def _process(self):
-        pdf = ContributionBook(self.event, session.user, self.contribs, tz=self.event.timezone,
-                               sort_by=BOASortField.schedule_board_number)
-        return send_file('book-of-abstracts.pdf', pdf.generate(), 'application/pdf')
-
-
-class RHContributionsExportPDFBookSortedAll(RHManageContributionsExportActionsBase):
-    def _process(self):
-        pdf = ContributionBook(self.event, session.user, self.contribs, tz=self.event.timezone,
-                               sort_by=BOASortField.session_schedule_board)
-        return send_file('book-of-abstracts.pdf', pdf.generate(), 'application/pdf')
+        return func(self.event, contribs, sort_by, opts)
 
 
 class RHContributionsImportCSV(RHManageContributionsBase):
