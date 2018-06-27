@@ -64,15 +64,11 @@ export default class BookRoom extends React.Component {
         fetchRoomDetails: PropTypes.func.isRequired,
         resetBookingState: PropTypes.func.isRequired,
         suggestions: PropTypes.object.isRequired,
-        pushState: PropTypes.func.isRequired
+        pushState: PropTypes.func.isRequired,
+        toggleTimelineView: PropTypes.func.isRequired
     };
 
-    constructor(props) {
-        super(props);
-        this.state = {
-            view: 'book'
-        };
-    }
+    state = {};
 
     componentWillUnmount() {
         const {clearTextFilter, clearRoomList} = this.props;
@@ -107,12 +103,12 @@ export default class BookRoom extends React.Component {
     };
 
     renderMainContent = () => {
-        const {view, timelineRef} = this.state;
-        const {fetchRooms, roomDetails, rooms} = this.props;
+        const {timelineRef} = this.state;
+        const {fetchRooms, roomDetails, rooms,  timeline: {isVisible}} = this.props;
         const filterBar = <FilterBar />;
         const searchBar = <SearchBar onConfirm={fetchRooms} onTextChange={fetchRooms} />;
 
-        if (view === 'book') {
+        if (!isVisible) {
             return (
                 <>
                     <RoomSearchPane rooms={rooms}
@@ -129,7 +125,7 @@ export default class BookRoom extends React.Component {
                     </Dimmer.Dimmable>
                 </>
             );
-        } else if (view === 'timeline') {
+        } else {
             return (
                 <div ref={(ref) => this.handleContextRef(ref, 'timelineRef')}>
                     <Sticky context={timelineRef} className="sticky-filters">
@@ -247,18 +243,18 @@ export default class BookRoom extends React.Component {
     };
 
     renderViewSwitch() {
-        const {switcherRef, view} = this.state;
-        const {timeline: {availability}} = this.props;
+        const {switcherRef} = this.state;
+        const {timeline: {availability, isVisible}} = this.props;
         const timelineDataAvailable = !_.isEmpty(availability);
         const hasConflicts = Object.values(availability).some((data) => {
             return !_.isEmpty(data.conflicts);
         });
-        const classes = toClasses({active: view === 'timeline', disabled: !timelineDataAvailable});
+        const classes = toClasses({active: isVisible, disabled: !timelineDataAvailable});
 
         const listBtn = (
             <Button icon={<Icon name="grid layout" styleName="switcher-icon" />}
-                    className={toClasses({active: view === 'book'})}
-                    onClick={() => this.setState({view: 'book', timelineRef: null})} circular />
+                    className={toClasses({active: !isVisible})}
+                    onClick={this.switchToRoomList} circular />
         );
         const timelineBtn = (
             <Button icon={<Icon name="calendar outline" styleName="switcher-icon" disabled={!timelineDataAvailable} />}
@@ -269,12 +265,12 @@ export default class BookRoom extends React.Component {
                 <div ref={(ref) => this.handleContextRef(ref, 'switcherRef')} styleName="view-icons-context">
                     <Sticky context={switcherRef} offset={30}>
                         <span styleName="icons-wrapper">
-                            {view === 'timeline'
+                            {isVisible
                                 ? <Popup trigger={listBtn} content={Translate.string('List view')} />
                                 : listBtn
                             }
                             <Icon.Group onClick={this.switchToTimeline}>
-                                {view === 'book'
+                                {!isVisible
                                     ? <Popup trigger={timelineBtn} content={Translate.string('Timeline view')} />
                                     : timelineBtn
                                 }
@@ -289,12 +285,17 @@ export default class BookRoom extends React.Component {
         );
     }
 
-    switchToTimeline = () => {
-        const {timeline: {availability}} = this.props;
-        const timelineDataAvailable = !_.isEmpty(availability);
+    switchToRoomList = () => {
+        const {toggleTimelineView} = this.props;
+        toggleTimelineView(false);
+        this.setState({timelineRef: null});
+    };
 
+    switchToTimeline = () => {
+        const {timeline: {availability}, toggleTimelineView} = this.props;
+        const timelineDataAvailable = !_.isEmpty(availability);
         if (timelineDataAvailable) {
-            this.setState({view: 'timeline'});
+            toggleTimelineView(true);
         }
     };
 

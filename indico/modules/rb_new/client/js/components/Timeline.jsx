@@ -42,7 +42,8 @@ export default class Timeline extends React.Component {
         isFetching: PropTypes.bool.isRequired,
         resetBookingState: PropTypes.func.isRequired,
         recurrenceType: PropTypes.string.isRequired,
-        pushState: PropTypes.func.isRequired
+        pushState: PropTypes.func.isRequired,
+        isFetchingRooms: PropTypes.bool.isRequired,
     };
 
     static defaultProps = {
@@ -84,9 +85,9 @@ export default class Timeline extends React.Component {
     };
 
     renderContent = () => {
-        const {isFetching, availability} = this.props;
-        if (isFetching) {
-            return <Loader size="massive" active />;
+        const {availability, isFetching, isFetchingRooms} = this.props;
+        if (isFetching || isFetchingRooms) {
+            return <Loader active />;
         } else if (!_.isEmpty(availability)) {
             return this.renderTimeline();
         } else {

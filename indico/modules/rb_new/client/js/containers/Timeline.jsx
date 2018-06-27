@@ -25,11 +25,11 @@ import {pushStateMergeProps} from '../util';
 import {queryString as queryStringSerializer} from '../serializers/filters';
 
 
-const mapStateToProps = ({bookRoom, roomDetails}) => ({
+const mapStateToProps = ({bookRoom}) => ({
     ...bookRoom.timeline,
     recurrenceType: bookRoom.filters.recurrence.type,
     queryString: stateToQueryString(bookRoom, queryStringSerializer),
-    roomDetails
+    isFetchingRooms: bookRoom.rooms.isFetching,
 });
 
 const mapDispatchToProps = dispatch => ({

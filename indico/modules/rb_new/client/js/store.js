@@ -23,8 +23,10 @@ import createReduxStore from 'indico/utils/redux';
 
 import reducers from './reducers';
 import {initialStateFactory} from './reducers/roomBooking/filters';
-import {SET_FILTER_PARAMETER} from './actions';
+import {initialTimelineState} from './reducers/bookRoom';
+import {SET_FILTER_PARAMETER, TOGGLE_TIMELINE_VIEW} from './actions';
 import {queryString as queryFilterRules} from './serializers/filters';
+import {queryString as queryTimelineRules} from './serializers/timeline';
 
 
 const initialData = {
@@ -34,11 +36,18 @@ const initialData = {
 const routeConfig = {
     reduxPathname: ({router: {location: {pathname}}}) => pathname,
     routes: {
-        '/book': {
-            listen: SET_FILTER_PARAMETER,
-            select: ({bookRoom: {filters}}) => ({filters}),
-            serialize: queryFilterRules
-        },
+        '/book': [
+            {
+                listen: SET_FILTER_PARAMETER,
+                select: ({bookRoom: {filters}}) => ({filters}),
+                serialize: queryFilterRules
+            },
+            {
+                listen: TOGGLE_TIMELINE_VIEW,
+                select: ({bookRoom: {timeline}}) => ({timeline}),
+                serialize: queryTimelineRules
+            }
+        ],
         '/rooms': {
             listen: SET_FILTER_PARAMETER,
             select: ({roomList: {filters}}) => ({filters}),
@@ -59,7 +68,7 @@ export const history = createHistory({
     basename: '/rooms-new'
 });
 
-const qsReducer = createQueryStringReducer(
+const qsFilterReducer = createQueryStringReducer(
     queryFilterRules,
     (state, action) => {
         if (action.type === 'INIT') {
@@ -78,6 +87,22 @@ const qsReducer = createQueryStringReducer(
         : state)
 );
 
+const qsTimelineReducer = createQueryStringReducer(
+    queryTimelineRules,
+    (state, action) => {
+        if (action.type === 'INIT') {
+            return {
+                namespace: 'bookRoom',
+                queryString: history.location.search.slice(1)
+            };
+        }
+        return null;
+    },
+    (state, namespace) => (namespace
+        ? _.merge({}, state, {[namespace]: {timeline: initialTimelineState}})
+        : state)
+);
+
 export default function createRBStore(data) {
     return createReduxStore('rb-new',
                             reducers,
@@ -85,7 +110,8 @@ export default function createRBStore(data) {
                                 routerMiddleware(history),
                                 queryStringMiddleware(history, routeConfig, {usePush: false})
                             ], [
-                                qsReducer
+                                qsFilterReducer,
+                                qsTimelineReducer
                             ],
                             rootReducer => connectRouter(history)(rootReducer)
     );

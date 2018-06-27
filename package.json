@@ -61,7 +61,7 @@
     "redux": "^4.0.0",
     "redux-devtools-extension": "^2.13.5",
     "redux-lazy-scroll": "^0.1.1",
-    "redux-router-querystring": ">=0.0.6",
+    "redux-router-querystring": ">=0.0.7",
     "redux-thunk": "^2.3.0",
     "rrule": "^2.2.0",
     "selectize": "^0.12.5",

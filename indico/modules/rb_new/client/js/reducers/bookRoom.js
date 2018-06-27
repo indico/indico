@@ -23,10 +23,11 @@ import {mapReducerFactory} from './roomBooking/map';
 import * as actions from '../actions';
 
 
-const initialTimelineState = {
+export const initialTimelineState = {
     isFetching: false,
     availability: {},
-    dateRange: []
+    dateRange: [],
+    isVisible: false
 };
 
 function timelineReducer(state = initialTimelineState, action) {
@@ -42,6 +43,8 @@ function timelineReducer(state = initialTimelineState, action) {
                 availability: action.timeline.availability,
                 dateRange: action.timeline.date_range
             };
+        case actions.TOGGLE_TIMELINE_VIEW:
+            return {...state, isVisible: action.isVisible};
         default:
             return state;
     }

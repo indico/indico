@@ -70,6 +70,7 @@ export const UPDATE_BUILDINGS = 'UPDATE_BUILDINGS';
 export const FETCH_TIMELINE_DATA_STARTED = 'FETCH_TIMELINE_DATA_STARTED';
 export const FETCH_TIMELINE_DATA_FAILED = 'FETCH_TIMELINE_DATA_FAILED';
 export const UPDATE_TIMELINE_DATA = 'UPDATE_TIMELINE_DATA';
+export const TOGGLE_TIMELINE_VIEW = 'TOGGLE_TIMELINE_VIEW';
 // Bookings
 export const BOOKING_ONGOING = 'BOOKING_ONGOING';
 export const BOOKING_CONFIRMED = 'BOOKING_CONFIRMED';
@@ -404,6 +405,10 @@ export function fetchTimelineData() {
         }
         dispatch(updateTimelineData(response.data));
     };
+}
+
+export function toggleTimelineView(isVisible) {
+    return {type: TOGGLE_TIMELINE_VIEW, isVisible};
 }
 
 export function createBooking(args) {

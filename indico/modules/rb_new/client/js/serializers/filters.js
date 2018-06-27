@@ -17,19 +17,7 @@
 
 import {validator as v} from 'redux-router-querystring';
 import {recurrenceIntervalSerializer, recurrenceFrequencySerializer, filterDTHandler} from './common';
-
-
-function _boolStateField(name) {
-    return {
-        serialize: ({filters: {[name]: value}}) => value || null,
-        parse: (value, state) => {
-            if (!state.filters) {
-                state.filters = {};
-            }
-            state.filters[name] = value;
-        }
-    };
-}
+import {boolStateField} from '../util';
 
 
 export const queryString = {
@@ -65,12 +53,12 @@ export const queryString = {
     favorite: {
         validator: v.isBoolean(),
         sanitizer: v.toBoolean(),
-        stateField: _boolStateField('onlyFavorites')
+        stateField: boolStateField('filters', 'onlyFavorites')
     },
     mine: {
         validator: v.isBoolean(),
         sanitizer: v.toBoolean(),
-        stateField: _boolStateField('onlyMine')
+        stateField: boolStateField('filters', 'onlyMine')
     },
     capacity: {
         validator: v.isInt({min: 1}),

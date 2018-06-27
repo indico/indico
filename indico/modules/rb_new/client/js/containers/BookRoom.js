@@ -25,7 +25,8 @@ import {
     setFilterParameter,
     updateRooms,
     fetchRoomDetails,
-    resetBookingState
+    resetBookingState,
+    toggleTimelineView
 } from '../actions';
 import {pushStateMergeProps} from '../util';
 
@@ -59,6 +60,9 @@ const mapDispatchToProps = dispatch => ({
         dispatch(setFilterParameter('bookRoom', param, value));
         dispatch(fetchRooms('bookRoom'));
         dispatch(fetchMapRooms('bookRoom'));
+    },
+    toggleTimelineView: (isVisible) => {
+        dispatch(toggleTimelineView(isVisible));
     },
     dispatch
 });
