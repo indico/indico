@@ -104,7 +104,7 @@ export default class BookRoom extends React.Component {
 
     renderMainContent = () => {
         const {timelineRef} = this.state;
-        const {fetchRooms, roomDetails, rooms,  timeline: {isVisible}} = this.props;
+        const {fetchRooms, roomDetails, rooms, timeline: {isVisible}} = this.props;
         const filterBar = <FilterBar />;
         const searchBar = <SearchBar onConfirm={fetchRooms} onTextChange={fetchRooms} />;
 

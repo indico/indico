@@ -50,6 +50,15 @@ export default class Timeline extends React.Component {
         step: 2
     };
 
+    static getDerivedStateFromProps(props, state) {
+        const activeDate = _toMoment(props.dateRange[0]);
+        if (!_.isEmpty(props.dateRange) && activeDate !== state.activeDate) {
+            return {...state, activeDate};
+        } else {
+            return state;
+        }
+    }
+
     constructor(props) {
         super(props);
 
@@ -126,19 +135,19 @@ export default class Timeline extends React.Component {
                     <Button.Group floated="right" size="small">
                         <Button icon="left arrow"
                                 onClick={() => this.changeSelectedDate('prev')}
-                                disabled={moment(currentDate).subtract(1, 'day').isBefore(startDate)} />
+                                disabled={moment(activeDate).subtract(1, 'day').isBefore(startDate)} />
                         <DatePicker calendar={calendar}>
                             {
                                 () => (
                                     <Button primary>
-                                        {currentDate.format(DATE_FORMAT)}
+                                        {activeDate.format(DATE_FORMAT)}
                                     </Button>
                                 )
                             }
                         </DatePicker>
                         <Button icon="right arrow"
                                 onClick={() => this.changeSelectedDate('next')}
-                                disabled={moment(currentDate).add(1, 'day').isAfter(endDate)} />
+                                disabled={moment(activeDate).add(1, 'day').isAfter(endDate)} />
                     </Button.Group>
                 )}
             </Segment>
