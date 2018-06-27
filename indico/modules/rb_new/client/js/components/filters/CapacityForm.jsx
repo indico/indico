@@ -43,7 +43,7 @@ export default class CapacityForm extends FilterFormComponent {
                        step="1"
                        value={capacity || ''}
                        onChange={(_, {value}) => {
-                           this.setCapacity(value);
+                           this.setCapacity(+value);
                        }} />
                 <Icon name="close"
                       inverted
