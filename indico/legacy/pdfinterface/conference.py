@@ -14,6 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+import os
 import re
 from copy import deepcopy
 from datetime import timedelta
@@ -323,7 +324,7 @@ class ContribToPDF(PDFLaTeXBase):
 
         if event.logo:
             self.temp_file = create_event_logo_tmp_file(event, self._dir)
-            self._args['logo_img'] = self.temp_file.name
+            self._args['logo_img'] = os.path.basename(self.temp_file.name)
 
 
 class ContribsToPDF(PDFLaTeXBase):
@@ -346,7 +347,7 @@ class ContribsToPDF(PDFLaTeXBase):
 
         if event.logo:
             self.temp_file = create_event_logo_tmp_file(event, self._dir)
-            self._args['logo_img'] = self.temp_file.name
+            self._args['logo_img'] = os.path.basename(self.temp_file.name)
 
 
 class ContributionBook(PDFLaTeXBase):
@@ -406,7 +407,7 @@ class ContributionBook(PDFLaTeXBase):
 
         if event.logo:
             self.temp_file = create_event_logo_tmp_file(event, self._dir)
-            self._args['logo_img'] = self.temp_file.name
+            self._args['logo_img'] = os.path.basename(self.temp_file.name)
 
 
 class AbstractBook(ContributionBook):
