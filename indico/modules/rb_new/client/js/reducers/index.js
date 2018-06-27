@@ -15,7 +15,6 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import {routerReducer} from 'react-router-redux';
 import {reducer as reduxFormReducer} from 'redux-form';
 
 import bookRoomReducer from './bookRoom';
@@ -32,7 +31,6 @@ const reducers = {
     user: userReducer,
     bookRoom: bookRoomReducer,
     roomList: roomListReducer,
-    router: routerReducer,
     equipment: equipmentReducer,
     buildings: buildingsReducer,
     mapAspects: mapAspectsReducer,

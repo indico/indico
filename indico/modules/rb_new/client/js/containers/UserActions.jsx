@@ -16,7 +16,7 @@
  */
 
 import {connect} from 'react-redux';
-import {push as pushRoute} from 'react-router-redux';
+import {push as pushRoute} from 'connected-react-router';
 import UserActions from '../components/UserActions';
 
 

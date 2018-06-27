@@ -15,6 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 import {connect} from 'react-redux';
+import {LOCATION_CHANGE} from 'connected-react-router';
 
 import App from '../components/App';
 import {fetchBuildings, fetchEquipmentTypes, fetchFavoriteRooms, fetchUserInfo, fetchMapAspects} from '../actions';
@@ -24,13 +25,25 @@ const mapStateToProps = ({bookRoom: {filters: {recurrence: {type}}}}) => ({
     filtersSet: !!type
 });
 
-const mapDispatchToProps = (dispatch) => ({
-    fetchInitialData: () => {
+const mapDispatchToProps = (dispatch, {history: {location}}) => ({
+    fetchInitialData() {
         dispatch(fetchUserInfo());
         dispatch(fetchFavoriteRooms());
         dispatch(fetchEquipmentTypes());
         dispatch(fetchBuildings());
         dispatch(fetchMapAspects());
+    },
+    triggerLocationChange() {
+        if (!location.hash) {
+            return;
+        }
+        dispatch({
+            type: LOCATION_CHANGE,
+            payload: {
+                location,
+                action: 'PUSH'
+            }
+        });
     }
 });
 
