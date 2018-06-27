@@ -18,7 +18,7 @@
 import _ from 'lodash';
 import createHistory from 'history/createBrowserHistory';
 import {queryStringMiddleware, createQueryStringReducer} from 'redux-router-querystring';
-import {routerMiddleware} from 'react-router-redux';
+import {connectRouter, routerMiddleware, LOCATION_CHANGE} from 'connected-react-router';
 import createReduxStore from 'indico/utils/redux';
 
 import reducers from './reducers';
@@ -50,8 +50,8 @@ const routeConfig = {
 const qsReducer = createQueryStringReducer(
     queryFilterRules,
     (state, action) => {
-        if (action.type === '@@router/LOCATION_CHANGE') {
-            const {payload: {search, pathname}} = action;
+        if (action.type === LOCATION_CHANGE) {
+            const {payload: {location: {search, pathname}}} = action;
             return {
                 namespace: {
                     '/book': 'bookRoom',
@@ -79,5 +79,7 @@ export default function createRBStore(data) {
                                 queryStringMiddleware(history, routeConfig)
                             ], [
                                 qsReducer
-                            ]);
+                            ],
+                            rootReducer => connectRouter(history)(rootReducer)
+    );
 }

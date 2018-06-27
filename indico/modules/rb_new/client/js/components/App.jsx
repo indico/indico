@@ -18,7 +18,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Link, Redirect, Route, Switch} from 'react-router-dom';
-import {ConnectedRouter} from 'react-router-redux';
+import {ConnectedRouter} from 'connected-react-router';
 import {Icon} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
@@ -35,8 +35,12 @@ import './App.module.scss';
 
 export default class App extends React.Component {
     componentDidMount() {
-        const {fetchInitialData} = this.props;
+        const {fetchInitialData, triggerLocationChange} = this.props;
         fetchInitialData();
+        // We need to explicitly trigger a location change
+        // the first time the page is loaded, so that the
+        // query string parameters are taken into account.
+        triggerLocationChange();
     }
 
     render() {
@@ -87,4 +91,5 @@ App.propTypes = {
     history: PropTypes.object.isRequired,
     filtersSet: PropTypes.bool.isRequired,
     fetchInitialData: PropTypes.func.isRequired,
+    triggerLocationChange: PropTypes.func.isRequired
 };

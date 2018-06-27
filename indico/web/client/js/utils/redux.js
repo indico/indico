@@ -23,31 +23,24 @@ import {composeWithDevTools} from 'redux-devtools-extension';
 // similar to the standard combineReducers, but accepts
 // root reducers as well
 function _combineReducers(...reducers) {
-    return (state, action) => {
-        for (const reducer of reducers) {
-            if (typeof reducer === 'function') {
-                // it's a reducer
-                state = reducer(state, action);
-            } else {
-                state = combineReducers(reducer)(state, action);
-            }
-        }
-        return state;
-    };
+    const reducerFunctions = reducers.map(reducer => (
+        (typeof reducer === 'function') ? reducer : combineReducers(reducer))
+    );
+
+    return (state, action) => reducerFunctions.reduce((st, fn) => fn(st, action), state);
 }
 
-
 export default function createReduxStore(
-    name, reducers, initialData = {}, additionalMiddleware = [], postReducers = []
+    name, reducers, initialData = {}, additionalMiddleware = [], postReducers = [], enhancer = r => r
 ) {
     const middleware = [thunkMiddleware, ...additionalMiddleware];
     const composeEnhancers = composeWithDevTools({name: `Indico:${name}`});
 
     return createStore(
-        _combineReducers({
+        enhancer(_combineReducers({
             staticData: (state = {}) => state,
             ...reducers
-        }, ...postReducers),
+        }, ...postReducers)),
         initialData,
         composeEnhancers(applyMiddleware(...middleware)));
 }
