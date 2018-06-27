@@ -35,6 +35,7 @@ Bugfixes
 ^^^^^^^^
 
 - Point to correct day in "edit session timetable" link (:issue:`3419`)
+- Fix error when exporting abstracts with review questions to JSON
 
 Version 2.1.2
 -------------
