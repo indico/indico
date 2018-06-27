@@ -65,6 +65,7 @@ Version 2.1: (August 2013)
 
 from __future__ import absolute_import
 
+import os
 import re
 import textwrap
 import xml.dom.minidom
@@ -227,7 +228,7 @@ def latex_render_error(message):
        \end{tcolorbox}""" % message)
 
 
-def latex_render_image(src, alt, strict=False):
+def latex_render_image(src, alt, strict=False, tmpdir=None):
     """
     Generate LaTeX code that includes an arbitrary image from a URL.
 
@@ -270,7 +271,7 @@ def latex_render_image(src, alt, strict=False):
                     extension = IMAGE_FORMAT_EXTENSIONS.get(image.format, '.png')
                 except IOError:
                     raise ImageURLException("Cannot read image data. Maybe not an image file?")
-            with NamedTemporaryFile(prefix='indico-latex-', suffix=extension, delete=False) as tempfile:
+            with NamedTemporaryFile(prefix='indico-latex-', suffix=extension, delete=False, dir=tmpdir) as tempfile:
                 tempfile.write(resp.content)
     except ImageURLException, e:
         if strict:
@@ -285,7 +286,7 @@ def latex_render_image(src, alt, strict=False):
           \includegraphics[max width=\linewidth]{%s}
           \caption{%s}
         \end{figure}
-        """ % (tempfile.name, alt)), tempfile.name)
+        """ % (os.path.basename(tempfile.name), alt)), tempfile.name)
 
 
 def makeExtension(configs=None):
@@ -408,7 +409,7 @@ class LaTeXTreeProcessor(markdown.treeprocessors.Treeprocessor):
         elif ournode.tag == 'q':
             buffer += "`%s'" % subcontent.strip()
         elif ournode.tag == 'p':
-            if 'apply_br' in self.configs:
+            if self.configs.get('apply_br', False):
                 subcontent = subcontent.replace('\n', '\\\\\\relax\n')
             buffer += '\n%s\n' % subcontent.strip()
         elif ournode.tag == 'strong':
@@ -429,7 +430,8 @@ class LaTeXTreeProcessor(markdown.treeprocessors.Treeprocessor):
         elif ournode.tag == 'td':
             buffer += '<td>%s</td>' % subcontent
         elif ournode.tag == 'img':
-            buffer += latex_render_image(ournode.get('src'), ournode.get('alt'))[0]
+            buffer += latex_render_image(ournode.get('src'), ournode.get('alt'),
+                                         tmpdir=self.configs.get('tmpdir'))[0]
         elif ournode.tag == 'a':
             buffer += '<a href=\"%s\">%s</a>' % (ournode.get('href'), subcontent)
         else:

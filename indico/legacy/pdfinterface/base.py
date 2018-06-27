@@ -665,7 +665,8 @@ class PDFLaTeXBase(object):
         # Markdown -> LaTeX renderer
         # safe_mode - strip out all HTML
         md = markdown.Markdown(safe_mode='remove')
-        latex_mdx = mdx_latex.LaTeXExtension(configs={'apply_br'})
+        self._dir = tempfile.mkdtemp(prefix="indico-texgen-", dir=config.TEMP_DIR)
+        latex_mdx = mdx_latex.LaTeXExtension(configs={'apply_br': True, 'tmpdir': self._dir})
         latex_mdx.extendMarkdown(md, markdown.__dict__)
 
         def _escape_latex_math(string):
@@ -677,7 +678,6 @@ class PDFLaTeXBase(object):
         self._args = {
             'md_convert': _convert_markdown
         }
-        self._dir = tempfile.mkdtemp(prefix="indico-texgen-", dir=config.TEMP_DIR)
 
     def generate(self):
         latex = LatexRunner(has_toc=self._table_of_contents, dir=self._dir)
@@ -712,7 +712,9 @@ class LatexRunner(object):
                         '-output-directory', self._dir,
                         source_file]
 
+        curdir = os.path.curdir
         try:
+            os.chdir(self._dir)
             subprocess.check_call(pdflatex_cmd, stdout=log_file)
             Logger.get('pdflatex').debug("PDF created successfully!")
 
@@ -724,6 +726,8 @@ class LatexRunner(object):
                 if log_file:
                     log_file.flush()
                 raise
+        finally:
+            os.chdir(curdir)
 
     def run(self, template_name, **kwargs):
         template_dir = os.path.join(get_root_path('indico'), 'legacy/webinterface/tpls/latex')
