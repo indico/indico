@@ -20,6 +20,7 @@ import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
 import _ from 'lodash';
+import {Route} from 'react-router-dom';
 import {Button, Card, Dimmer, Grid, Header, Icon, Label, Loader, Message, Popup, Sticky} from 'semantic-ui-react';
 import {Slot, toClasses} from 'indico/react/util';
 import {PluralTranslate, Translate, Singular, Param, Plural} from 'indico/react/i18n';
@@ -32,6 +33,7 @@ import Room from '../../containers/Room';
 import Timeline from '../../containers/Timeline';
 import BookRoomModal from '../../containers/BookRoomModal';
 import RoomDetailsModal from '../modals/RoomDetailsModal';
+import {history} from '../../store';
 
 import './BookRoom.module.scss';
 
@@ -47,6 +49,7 @@ export default class BookRoom extends React.Component {
         clearTextFilter: PropTypes.func.isRequired,
         rooms: PropTypes.shape({
             list: PropTypes.array,
+            map: PropTypes.object,
             isFetching: PropTypes.bool,
         }).isRequired,
         fetchRooms: PropTypes.func.isRequired,
@@ -56,10 +59,8 @@ export default class BookRoom extends React.Component {
         roomDetails: PropTypes.shape({
             list: PropTypes.array,
             isFetching: PropTypes.bool,
-            currentViewID: PropTypes.number,
         }).isRequired,
         fetchRoomDetails: PropTypes.func.isRequired,
-        setRoomDetailsModal: PropTypes.func.isRequired,
         resetBookingState: PropTypes.func.isRequired,
         suggestions: PropTypes.object.isRequired
     };
@@ -77,22 +78,22 @@ export default class BookRoom extends React.Component {
         clearRoomList();
     }
 
-    openDetailsModal = (id) => {
-        const {fetchRoomDetails, setRoomDetailsModal} = this.props;
-        fetchRoomDetails(id);
-        setRoomDetailsModal(id);
-    };
-
-    openBookingModal = (room) => {
-        this.setState({
-            bookingModal: true,
-            selectedRoom: room
-        });
-    };
-
     renderRoom = (room) => {
-        const bookingModalBtn = <Button positive icon="check" circular onClick={() => this.openBookingModal(room)} />;
-        const showDetailsBtn = <Button primary icon="search" circular onClick={() => this.openDetailsModal(room.id)} />;
+        const {id} = room;
+        const {fetchRoomDetails} = this.props;
+
+        const bookingModalBtn = (
+            <Button positive icon="check" circular onClick={() => {
+                // open confirm dialog, keep same filtering parameters
+                history.push(`/book/${id}/confirm${history.location.search}`);
+            }} />
+        );
+        const showDetailsBtn = (
+            <Button primary icon="search" circular onClick={() => {
+                fetchRoomDetails(id);
+                history.push(`/book/${id}/details${history.location.search}`);
+            }} />
+        );
         return (
             <Room key={room.id} room={room} showFavoriteButton>
                 <Slot name="actions">
@@ -105,7 +106,7 @@ export default class BookRoom extends React.Component {
 
     renderMainContent = () => {
         const {view, timelineRef} = this.state;
-        const {fetchRooms, roomDetails, rooms, setRoomDetailsModal} = this.props;
+        const {fetchRooms, roomDetails, rooms} = this.props;
         const filterBar = <FilterBar />;
         const searchBar = <SearchBar onConfirm={fetchRooms} onTextChange={fetchRooms} />;
 
@@ -123,8 +124,6 @@ export default class BookRoom extends React.Component {
                         <Dimmer active={roomDetails.isFetching} page>
                             <Loader />
                         </Dimmer>
-                        <RoomDetailsModal roomDetails={roomDetails}
-                                          setRoomDetailsModal={setRoomDetailsModal} />
                     </Dimmer.Dimmable>
                 </>
             );
@@ -306,13 +305,11 @@ export default class BookRoom extends React.Component {
     closeBookingModal = () => {
         const {resetBookingState} = this.props;
         resetBookingState();
-        this.setState({
-            bookingModal: false
-        });
+        history.goBack();
     };
 
     render() {
-        const {bookingModal, selectedRoom} = this.state;
+        const {rooms: {map: roomMap}, roomDetails} = this.props;
         return (
             <Grid columns={2}>
                 <Grid.Column width={11}>
@@ -321,9 +318,17 @@ export default class BookRoom extends React.Component {
                 <Grid.Column width={5}>
                     <MapController />
                 </Grid.Column>
-                <BookRoomModal open={bookingModal}
-                               room={selectedRoom}
-                               onClose={this.closeBookingModal} />
+                <Route exact path="/book/:roomId/confirm" render={({match: {params: {roomId}}}) => (
+                    <BookRoomModal open
+                                   room={roomMap[roomId]}
+                                   onClose={this.closeBookingModal} />
+                )} />
+                <Route exact path="/book/:roomId/details" render={({match: {params: {roomId}}}) => (
+                    <RoomDetailsModal roomDetails={roomDetails.rooms[roomId]}
+                                      onClose={() => {
+                                          history.goBack();
+                                      }} />
+                )} />
             </Grid>
         );
     }

@@ -20,8 +20,7 @@ import * as actions from '../actions';
 
 const initialState = {
     rooms: {},
-    isFetching: false,
-    currentViewID: null
+    isFetching: false
 };
 
 export default function reducer(state = initialState, action) {
@@ -32,8 +31,6 @@ export default function reducer(state = initialState, action) {
             return {...state, isFetching: false};
         case actions.UPDATE_ROOM_DETAILS:
             return {...state, isFetching: false, rooms: {...state.rooms, [action.room.id]: action.room}};
-        case actions.SET_ROOM_DETAILS_MODAL:
-            return {...state, currentViewID: action.id};
         default:
             return state;
     }

@@ -28,25 +28,25 @@ import './RoomDetailsModal.module.scss';
 
 export default class RoomDetailsModal extends React.Component {
     static propTypes = {
-        roomDetails: PropTypes.shape({
-            list: PropTypes.array,
-            isFetching: PropTypes.bool,
-            currentViewID: PropTypes.number,
-        }).isRequired,
-        setRoomDetailsModal: PropTypes.func.isRequired,
+        roomDetails: PropTypes.object,
+        onClose: PropTypes.func
+    };
+
+    static defaultProps = {
+        roomDetails: null,
+        onClose: () => {}
     };
 
     handleCloseModal = () => {
-        const {setRoomDetailsModal} = this.props;
-        setRoomDetailsModal(null);
+        const {onClose} = this.props;
+        onClose();
     };
 
     render() {
-        const {roomDetails: {rooms, currentViewID}} = this.props;
-        if (!(currentViewID in rooms)) {
+        const {roomDetails} = this.props;
+        if (!roomDetails) {
             return null;
         }
-        const room = rooms[currentViewID];
         return (
             <Modal open onClose={this.handleCloseModal} size="large" closeIcon>
                 <Modal.Header styleName="room-details-header">
@@ -56,7 +56,7 @@ export default class RoomDetailsModal extends React.Component {
                     </span>
                 </Modal.Header>
                 <Modal.Content>
-                    <RoomDetails room={room} />
+                    <RoomDetails room={roomDetails} />
                 </Modal.Content>
             </Modal>
         );

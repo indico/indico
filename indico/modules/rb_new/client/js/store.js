@@ -47,16 +47,24 @@ const routeConfig = {
     }
 };
 
+function pathMatch(map, path) {
+    for (const pth in map) {
+        if (new RegExp(pth).test(path)) {
+            return map[pth];
+        }
+    }
+}
+
 const qsReducer = createQueryStringReducer(
     queryFilterRules,
     (state, action) => {
         if (action.type === LOCATION_CHANGE) {
             const {payload: {location: {search, pathname}}} = action;
             return {
-                namespace: {
-                    '/book': 'bookRoom',
-                    '/rooms': 'roomList'
-                }[pathname],
+                namespace: pathMatch({
+                    '^/book': 'bookRoom',
+                    '^/rooms': 'roomList'
+                }, pathname),
                 queryString: search.slice(1)
             };
         }

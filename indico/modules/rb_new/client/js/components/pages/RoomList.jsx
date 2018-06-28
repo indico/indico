@@ -19,6 +19,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Button, Grid, Dimmer, Loader, Popup} from 'semantic-ui-react';
+import {Route} from 'react-router-dom';
 
 import {Slot} from 'indico/react/util';
 import {Translate} from 'indico/react/i18n';
@@ -29,6 +30,7 @@ import searchBarFactory from '../../containers/SearchBar';
 import mapControllerFactory from '../../containers/MapController';
 import Room from '../../containers/Room';
 import RoomDetailsModal from '../modals/RoomDetailsModal';
+import {history} from '../../store';
 
 
 const FilterBar = filterBarFactory('roomList', RoomFilterBar);
@@ -47,19 +49,19 @@ export default class RoomList extends React.Component {
         roomDetails: PropTypes.shape({
             list: PropTypes.array,
             isFetching: PropTypes.bool,
-            currentViewID: PropTypes.number,
-        }).isRequired,
-        setRoomDetailsModal: PropTypes.func.isRequired,
-    };
-
-    handleOpenModal = (id) => {
-        const {fetchRoomDetails, setRoomDetailsModal} = this.props;
-        fetchRoomDetails(id);
-        setRoomDetailsModal(id);
+        }).isRequired
     };
 
     renderRoom = (room) => {
-        const showDetailsBtn = <Button primary icon="search" circular onClick={() => this.handleOpenModal(room.id)} />;
+        const {id} = room;
+        const {fetchRoomDetails} = this.props;
+        const showDetailsBtn = (
+            <Button primary icon="search" circular onClick={() => {
+                fetchRoomDetails(id);
+                history.push(`/rooms/${id}/details${history.location.search}`);
+            }} />
+        );
+
         return (
             <Room key={room.id} room={room} showFavoriteButton>
                 <Slot name="actions">
@@ -70,7 +72,7 @@ export default class RoomList extends React.Component {
     };
 
     render() {
-        const {rooms, fetchRooms, roomDetails, setRoomDetailsModal} = this.props;
+        const {rooms, fetchRooms, roomDetails} = this.props;
         return (
             <Grid columns={2}>
                 <Grid.Column width={11}>
@@ -83,12 +85,17 @@ export default class RoomList extends React.Component {
                         <Dimmer active={roomDetails.isFetching} page>
                             <Loader />
                         </Dimmer>
-                        <RoomDetailsModal roomDetails={roomDetails} setRoomDetailsModal={setRoomDetailsModal} />
                     </Dimmer.Dimmable>
                 </Grid.Column>
                 <Grid.Column width={5}>
                     <MapController />
                 </Grid.Column>
+                <Route exact path="/rooms/:roomId/details" render={({match: {params: {roomId}}}) => (
+                    <RoomDetailsModal roomDetails={roomDetails.rooms[roomId]}
+                                      onClose={() => {
+                                          history.goBack();
+                                      }} />
+                )} />
             </Grid>
         );
     }

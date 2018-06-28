@@ -18,7 +18,7 @@
 import {connect} from 'react-redux';
 
 import RoomList from '../components/pages/RoomList';
-import {fetchMapRooms, fetchRoomDetails, fetchRooms, setRoomDetailsModal} from '../actions';
+import {fetchMapRooms, fetchRoomDetails, fetchRooms} from '../actions';
 
 
 const mapStateToProps = ({roomList, roomDetails}) => ({
@@ -33,9 +33,6 @@ const mapDispatchToProps = dispatch => ({
     },
     fetchRoomDetails: (id) => {
         dispatch(fetchRoomDetails(id));
-    },
-    setRoomDetailsModal: (id) => {
-        dispatch(setRoomDetailsModal(id));
     }
 });
 

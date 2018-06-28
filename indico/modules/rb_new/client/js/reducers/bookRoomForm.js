@@ -17,7 +17,7 @@
 
 import _ from 'lodash';
 import {actionTypes as reduxFormActions} from 'redux-form';
-import {BOOKING_ONGOING, BOOKING_CONFIRMED, BOOKING_FAILED, RESET_BOOKING_STATE} from '../actions';
+import * as actions from '../actions';
 
 
 const initialState = {
@@ -44,13 +44,13 @@ export default function reducer(state = initialState, action) {
     const {type, message, isPrebooking} = action;
 
     switch (type) {
-        case BOOKING_ONGOING:
+        case actions.BOOKING_ONGOING:
             return {...state, bookingState: {ongoing: true}};
-        case BOOKING_CONFIRMED:
+        case actions.BOOKING_CONFIRMED:
             return {...state, bookingState: {ongoing: false, success: true, message: null, isPrebooking}};
-        case BOOKING_FAILED:
+        case actions.BOOKING_FAILED:
             return {...state, bookingState: {ongoing: false, success: false, message}};
-        case RESET_BOOKING_STATE:
+        case actions.RESET_BOOKING_STATE:
             return {...initialState};
     }
     return state;

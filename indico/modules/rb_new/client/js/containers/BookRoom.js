@@ -23,7 +23,6 @@ import {
     setFilterParameter,
     updateRooms,
     fetchRoomDetails,
-    setRoomDetailsModal,
     resetBookingState
 } from '../actions';
 
@@ -43,9 +42,6 @@ const mapDispatchToProps = dispatch => ({
     },
     fetchRoomDetails: (id) => {
         dispatch(fetchRoomDetails(id));
-    },
-    setRoomDetailsModal: (id) => {
-        dispatch(setRoomDetailsModal(id));
     },
     resetBookingState: () => {
         dispatch(resetBookingState());

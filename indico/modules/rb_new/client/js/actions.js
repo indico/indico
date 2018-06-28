@@ -50,7 +50,6 @@ export const UPDATE_MAP_ROOMS = 'UPDATE_MAP_ROOMS';
 export const FETCH_ROOM_DETAILS_STARTED = 'FETCH_ROOM_DETAILS_STARTED';
 export const FETCH_ROOM_DETAILS_FAILED = 'FETCH_ROOM_DETAILS_FAILED';
 export const UPDATE_ROOM_DETAILS = 'UPDATE_ROOM_DETAILS';
-export const SET_ROOM_DETAILS_MODAL = 'SET_ROOM_DETAILS_MODAL';
 // Equipment types
 export const SET_EQUIPMENT_TYPES = 'SET_EQUIPMENT_TYPES';
 // Map
@@ -270,10 +269,6 @@ export function fetchRoomDetails(id) {
     };
 }
 
-export function setRoomDetailsModal(id) {
-    return {type: SET_ROOM_DETAILS_MODAL, id};
-}
-
 export function setFilterParameter(namespace, param, data) {
     return {type: SET_FILTER_PARAMETER, namespace, param, data};
 }
@@ -399,8 +394,6 @@ export function createBooking(args) {
         const {success, msg, is_prebooking: isPrebooking} = response.data;
         if (success) {
             dispatch({type: BOOKING_CONFIRMED, isPrebooking});
-            // reload rooms without the newly booked one
-            dispatch(fetchRooms('bookRoom'));
         } else {
             dispatch({type: BOOKING_FAILED, message: msg});
         }
