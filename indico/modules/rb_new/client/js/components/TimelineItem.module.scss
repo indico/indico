@@ -30,14 +30,13 @@
         margin: 0;
         cursor: pointer;
         position: absolute;
-        padding: 0.7em 0;
-        z-index: 1;
+        padding: 0.7em;
+        z-index: 2;
         border-radius: 0;
-        border: 0.5px solid rgba(0, 0, 0, 0.2) !important;
+        border: 0.5px solid rgba(0, 0, 0, 0.2);
 
         &:global(.default) {
-            opacity: 0.3;
-            background-color: $sui-green;
+            background-color: lighten($sui-green, 15%);
         }
 
         &:hover {
@@ -63,9 +62,15 @@
         }
 
         &:global(.blocking) {
-            @include stripes($blocking-stripe-colors...);
-            background-size: 35px 35px;
-            opacity: 0.3;
+            @include thin-stripes($blocking-stripe-colors...);
+            background-size: 30px 30px;
+            z-index: 1;
+            border: 1px solid darken($light-red, 10%);
+            height: 30px;
+        }
+
+        &:global(.nonbookable-period) {
+            background-color: $sui-grey;
         }
     }
 }

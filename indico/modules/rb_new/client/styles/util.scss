@@ -27,9 +27,11 @@ $sui-orange: #f2711c;
 $sui-green: #21ba45;
 $sui-grey: #767676;
 
+$light-red: #ffbdbd;
+
 $pre-booking-stripe-colors: ($sui-orange, lighten($sui-orange, 14%));
 $pre-booking-conflict-stripe-colors: ($sui-red, lighten($sui-red, 14%));
-$blocking-stripe-colors: ($sui-grey, lighten($sui-grey, 14%));
+$blocking-stripe-colors: (lighten($light-red, 10%), $light-red);
 
 $indico-top-bar-height: 50px;
 $menu-height: 75px;
@@ -47,5 +49,23 @@ $sui-font-family: Lato, 'Helvetica Neue', Arial, Helvetica, sans-serif;
         $first 75%,
         $second 75%,
         $second 100%
+    );
+}
+
+@mixin thin-stripes($first, $second) {
+    background-image: linear-gradient(
+        -45deg,
+        $first 22%,
+        $second 24%,
+        $second 26%,
+        $first 28%,
+        $first 47%,
+        $second 49%,
+        $second 51%,
+        $first 53%,
+        $first 72%,
+        $second 74%,
+        $second 76%,
+        $first 78%
     );
 }

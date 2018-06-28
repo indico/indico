@@ -37,15 +37,15 @@
             background-size: 35px 35px;
         }
 
-        &.unavailable {
+        &.nonbookable-period {
             background-color: $sui-grey;
-            opacity: 0.5;
         }
 
         &.blocking {
-            @include stripes($blocking-stripe-colors...);
+            @include thin-stripes($blocking-stripe-colors...);
             background-size: 35px 35px;
-
+            border: 1px solid darken($light-red, 10%);
+            color: darken($light-red, 30%);
         }
     }
 }
