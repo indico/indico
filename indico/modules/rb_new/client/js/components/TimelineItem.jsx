@@ -29,7 +29,8 @@ const classes = {
     preConflicts: 'pre-booking-conflict',
     bookings: 'booking',
     conflicts: 'conflict',
-    blockings: 'blocking'
+    blockings: 'blocking',
+    nonbookablePeriods: 'nonbookable-period',
 };
 
 
