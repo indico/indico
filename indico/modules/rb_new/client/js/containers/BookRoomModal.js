@@ -17,7 +17,7 @@
 import {connect} from 'react-redux';
 
 import BookRoomModal from '../components/modals/BookRoomModal';
-import {createBooking} from  '../actions';
+import {createBooking} from '../actions';
 
 
 const mapStateToProps = ({
