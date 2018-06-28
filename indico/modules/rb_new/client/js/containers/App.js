@@ -34,7 +34,7 @@ const mapDispatchToProps = (dispatch, {history: {location}}) => ({
         dispatch(fetchMapAspects());
     },
     triggerLocationChange() {
-        if (!location.hash) {
+        if (!location.search) {
             return;
         }
         dispatch({
