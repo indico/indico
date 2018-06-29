@@ -242,7 +242,9 @@ class Survey(db.Model):
         if not self.has_ended:
             if not self.submissions:
                 return SurveyState.active_and_clean
-            return SurveyState.active_and_answered
+            # Do not accept any more submissions if submission limit reached.
+            if self.submission_limit is None or len(self.submissions) < self.submission_limit:
+                return SurveyState.active_and_answered
         return SurveyState.finished
 
     @property
