@@ -34,3 +34,9 @@ Called when a subcontribution is deleted. The *sender* is the subcontribution.
 subcontribution_updated = _signals.signal('subcontribution-updated', """
 Called when a subcontribution is modified. The *sender* is the subcontribution.
 """)
+
+get_export_formats = _signals.signal('get-export-formats', """
+Called to get available export formats, expects a list of (key, display string, callable, opts)
+as return values. The callable should accept (event, contribs, sort_by, opts) as arguments and should
+return the final export data via send_file or similar.
+""")

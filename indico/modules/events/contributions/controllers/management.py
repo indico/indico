@@ -17,6 +17,7 @@ from flask import flash, jsonify, redirect, request, session
 from sqlalchemy.orm import undefer
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
+from indico.core import signals
 from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.protection import ProtectionMode, render_acl
@@ -58,6 +59,7 @@ from indico.modules.events.util import ZipGeneratorMixin, check_event_locked, ge
 from indico.util.date_time import format_datetime, format_human_timedelta
 from indico.util.fs import chmod_umask
 from indico.util.i18n import _, ngettext
+from indico.util.signals import values_from_signal
 from indico.util.spreadsheets import send_csv, send_xlsx
 from indico.util.string import handle_legacy_description
 from indico.web.flask.templating import get_template_module
@@ -465,13 +467,18 @@ class RHContributionsExportPDF(RHManageContributionsExportActionsBase):
 
 
 def get_export_formats():
-    # to be converted to a signal later
+    return values_from_signal(signals.event.contributions.get_export_formats.send(), as_list=True)
+
+
+@signals.event.contributions.get_export_formats.connect
+def _get_export_formats(sender, **kwargs):
     export_formats = [('PDF1', _('PDF'), render_pdf, ContributionBook),
                       ('ZIP1', _('TeX Archive'), render_archive, ContributionBook),
                       ('PDF2', _('PDF (BoA)'), render_pdf, AbstractBook),
                       ('ZIP2', _('TeX Archive (BoA)'), render_archive, AbstractBook),
                       ]
-    return export_formats
+    for val in export_formats:
+        yield val
 
 
 class RHContributionExportTexConfig(RHManageContributionsExportActionsBase):
