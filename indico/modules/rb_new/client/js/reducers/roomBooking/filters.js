@@ -25,7 +25,7 @@ export const initialStateFactory = (namespace) => {
         capacity: null,
         onlyFavorites: false,
         onlyMine: false,
-        equipment: {}
+        equipment: []
     };
 
     if (namespace === 'bookRoom') {
@@ -74,6 +74,10 @@ export default function filterReducerFactory(namespace) {
         switch (action.type) {
             case actions.SET_FILTER_PARAMETER:
                 return action.namespace === namespace ? mergeFilter(state, action.param, action.data) : state;
+            case actions.SET_FILTERS:
+                return action.namespace === namespace ? action.params : state;
+            case actions.RESET_FILTERS:
+                return (!action.namespace || action.namespace === namespace) ? initialStateFactory(namespace) : state;
             default:
                 return state;
         }

@@ -58,12 +58,12 @@ const capacityRenderer = ({capacity}) => (
         ));
 
 const equipmentRenderer = ({equipment}) => {
-    if (Object.values(equipment).some(v => v)) {
+    if (equipment.length) {
         return (
             <>
                 <Translate>Equipment</Translate>
                 <Label circular horizontal className="white" size="medium" styleName="filter-bar-button-label">
-                    {Object.values(equipment).filter(v => v).length}
+                    {equipment.length}
                 </Label>
             </>
         );
@@ -72,7 +72,7 @@ const equipmentRenderer = ({equipment}) => {
     }
 };
 
-export const equipmentType = PropTypes.object;
+export const equipmentType = PropTypes.array;
 
 export default class RoomFilterBar extends React.Component {
     static propTypes = {
@@ -115,6 +115,7 @@ export default class RoomFilterBar extends React.Component {
             capacity, onlyFavorites, onlyMine, children, equipment, setFilterParameter, equipmentTypes,
             hasOwnedRooms, hasFavoriteRooms
         } = this.props;
+
 
         const equipmentFilter = !!equipmentTypes.length && (
             <FilterDropdownFactory name="equipment"

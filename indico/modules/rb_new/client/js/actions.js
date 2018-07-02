@@ -40,6 +40,8 @@ export const DEL_FAVORITE_ROOM = 'DEL_FAVORITE_ROOM';
 export const SET_USER_INFO = 'SET_USER_INFO';
 // Filter
 export const SET_FILTER_PARAMETER = 'SET_FILTER_PARAMETER';
+export const SET_FILTERS = 'SET_FILTERS';
+export const RESET_FILTERS = 'RESET_FILTERS';
 // Rooms
 export const FETCH_ROOMS_STARTED = 'FETCH_ROOMS_STARTED';
 export const FETCH_ROOMS_FAILED = 'FETCH_ROOMS_FAILED';
@@ -271,6 +273,14 @@ export function fetchRoomDetails(id) {
 
 export function setFilterParameter(namespace, param, data) {
     return {type: SET_FILTER_PARAMETER, namespace, param, data};
+}
+
+export function setFilters(namespace, params) {
+    return {type: SET_FILTERS, namespace, params};
+}
+
+export function resetFilters(namespace) {
+    return {type: RESET_FILTERS, namespace};
 }
 
 export function updateLocation(namespace, location) {

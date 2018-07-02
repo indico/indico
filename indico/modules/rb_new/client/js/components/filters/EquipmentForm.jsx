@@ -15,6 +15,8 @@
 * along with Indico; if not, see <http://www.gnu.org/licenses/>.
 */
 
+import _ from 'lodash';
+
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Form, Icon} from 'semantic-ui-react';
@@ -27,27 +29,35 @@ import FilterFormComponent from './FilterFormComponent';
 export default class EquipmentForm extends FilterFormComponent {
     static propTypes = {
         possibleEquipment: PropTypes.arrayOf(PropTypes.string).isRequired,
-        selectedEquipment: PropTypes.object,
+        selectedEquipment: PropTypes.arrayOf(PropTypes.string),
         ...FilterFormComponent.propTypes
     };
 
     constructor(props) {
         super(props);
         const {possibleEquipment, selectedEquipment} = props;
-        this.state = Object.assign(...possibleEquipment.map(eq => ({[eq]: !!selectedEquipment[eq]})));
+        this.state = {
+            equipment: possibleEquipment.filter(eq => selectedEquipment.indexOf(eq) >= 0)
+        };
     }
 
     static getDerivedStateFromProps({selectedEquipment}, prevState) {
-        return {...selectedEquipment, ...prevState};
+        return {equipment: selectedEquipment, ...prevState};
     }
 
     setEquipment(eqName, value) {
         const {setParentField} = this.props;
 
-        this.setState({
-            [eqName]: value
+        this.setState((oldState) => {
+            const equipmentList = _.without(oldState.equipment, eqName);
+            if (value) {
+                equipmentList.push(eqName);
+            }
+            return {
+                equipment: equipmentList
+            };
         }, () => {
-            setParentField('equipment', this.state);
+            setParentField('equipment', this.state.equipment);
         });
     }
 
@@ -60,11 +70,12 @@ export default class EquipmentForm extends FilterFormComponent {
 
     render() {
         const {possibleEquipment} = this.props;
+        const {equipment} = this.state;
         return (
             <>
                 <Form.Group>
                     {possibleEquipment.map(equip => (
-                        <Form.Checkbox checked={!!this.state[equip]}
+                        <Form.Checkbox checked={equipment.indexOf(equip) >= 0}
                                        key={equip}
                                        label={equip}
                                        onChange={(_, {checked}) => {
@@ -72,7 +83,7 @@ export default class EquipmentForm extends FilterFormComponent {
                                        }} />
                     ))}
                 </Form.Group>
-                {Object.values(this.state).some(v => v) && (
+                {!!equipment.length && (
                     <div style={{marginTop: '1em'}}>
                         <Form.Button fluid basic color="red" size="mini" onClick={this.resetSelection}>
                             <Icon name="remove" circular />

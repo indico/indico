@@ -16,6 +16,7 @@
  */
 
 import {connect} from 'react-redux';
+import {goBack, push} from 'connected-react-router';
 
 import RoomList from '../components/pages/RoomList';
 import {fetchMapRooms, fetchRoomDetails, fetchRooms} from '../actions';
@@ -33,6 +34,12 @@ const mapDispatchToProps = dispatch => ({
     },
     fetchRoomDetails: (id) => {
         dispatch(fetchRoomDetails(id));
+    },
+    onModalClose() {
+        dispatch(goBack());
+    },
+    pushState(url) {
+        dispatch(push(url));
     }
 });
 

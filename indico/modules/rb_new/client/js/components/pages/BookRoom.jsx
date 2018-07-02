@@ -62,7 +62,9 @@ export default class BookRoom extends React.Component {
         }).isRequired,
         fetchRoomDetails: PropTypes.func.isRequired,
         resetBookingState: PropTypes.func.isRequired,
-        suggestions: PropTypes.object.isRequired
+        suggestions: PropTypes.object.isRequired,
+        onModalClose: PropTypes.func.isRequired,
+        pushState: PropTypes.func.isRequired
     };
 
     constructor(props) {
@@ -80,18 +82,18 @@ export default class BookRoom extends React.Component {
 
     renderRoom = (room) => {
         const {id} = room;
-        const {fetchRoomDetails} = this.props;
+        const {fetchRoomDetails, pushState} = this.props;
 
         const bookingModalBtn = (
             <Button positive icon="check" circular onClick={() => {
                 // open confirm dialog, keep same filtering parameters
-                history.push(`/book/${id}/confirm${history.location.search}`);
+                pushState(`/book/${id}/confirm${history.location.search}`);
             }} />
         );
         const showDetailsBtn = (
             <Button primary icon="search" circular onClick={() => {
                 fetchRoomDetails(id);
-                history.push(`/book/${id}/details${history.location.search}`);
+                pushState(`/book/${id}/details${history.location.search}`);
             }} />
         );
         return (
@@ -303,13 +305,13 @@ export default class BookRoom extends React.Component {
     };
 
     closeBookingModal = () => {
-        const {resetBookingState} = this.props;
+        const {onModalClose, resetBookingState} = this.props;
         resetBookingState();
-        history.goBack();
+        onModalClose();
     };
 
     render() {
-        const {rooms: {map: roomMap}, roomDetails} = this.props;
+        const {rooms: {map: roomMap}, roomDetails, onModalClose} = this.props;
         return (
             <Grid columns={2}>
                 <Grid.Column width={11}>
@@ -325,9 +327,7 @@ export default class BookRoom extends React.Component {
                 )} />
                 <Route exact path="/book/:roomId/details" render={({match: {params: {roomId}}}) => (
                     <RoomDetailsModal roomDetails={roomDetails.rooms[roomId]}
-                                      onClose={() => {
-                                          history.goBack();
-                                      }} />
+                                      onClose={onModalClose} />
                 )} />
             </Grid>
         );

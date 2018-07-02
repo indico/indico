@@ -80,7 +80,7 @@ export const queryString = {
     eq: {
         validator: () => true,
         stateField: {
-            serialize: ({filters: {equipment}}) => Object.keys(equipment).filter(k => !!equipment[k]),
+            serialize: ({filters: {equipment}}) => equipment,
             parse: (value, state) => {
                 if (!Array.isArray(value)) {
                     value = [value];
@@ -88,7 +88,7 @@ export const queryString = {
                 if (!state.filters) {
                     state.filters = {};
                 }
-                state.filters.equipment = Object.assign(...value.map(e => ({[e]: true})));
+                state.filters.equipment = value;
             }
         }
     },
@@ -133,7 +133,7 @@ export const ajax = {
     },
     equipment: {
         onlyIf: ({equipment}) => equipment && equipment.length,
-        serializer: ({equipment}) => Object.keys(equipment).filter(k => !!equipment[k])
+        serializer: ({equipment}) => equipment
     },
     mine: {
         onlyIf: ({onlyMine}) => onlyMine,

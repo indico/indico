@@ -15,15 +15,18 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 import {connect} from 'react-redux';
-import {setFilterParameter} from '../actions';
+import {setFilterParameter, setFilters} from '../actions';
 import Landing from '../components/pages/Landing';
 
 
 const mapStateToProps = state => ({...state['bookRoom'].filters});
 
 const mapDispatchToProps = dispatch => ({
-    setFilterParameter: (param, value) => {
+    setFilterParameter(param, value) {
         dispatch(setFilterParameter('bookRoom', param, value));
+    },
+    setFilters(data) {
+        dispatch(setFilters('bookRoom', data));
     }
 });
 

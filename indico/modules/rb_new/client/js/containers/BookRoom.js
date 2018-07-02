@@ -15,6 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 import {connect} from 'react-redux';
+import {goBack, push} from 'connected-react-router';
 
 import BookRoom from '../components/pages/BookRoom';
 import {
@@ -30,26 +31,32 @@ import {
 const mapStateToProps = ({bookRoom, roomDetails}) => ({...bookRoom, roomDetails});
 
 const mapDispatchToProps = dispatch => ({
-    clearRoomList: () => {
+    clearRoomList() {
         dispatch(updateRooms('bookRoom', [], 0, true));
     },
-    clearTextFilter: () => {
+    clearTextFilter() {
         dispatch(setFilterParameter('bookRoom', 'text', null));
     },
-    fetchRooms: (clear = true) => {
+    fetchRooms(clear = true) {
         dispatch(fetchRooms('bookRoom', clear));
         dispatch(fetchMapRooms('bookRoom'));
     },
-    fetchRoomDetails: (id) => {
+    fetchRoomDetails(id) {
         dispatch(fetchRoomDetails(id));
     },
-    resetBookingState: () => {
+    resetBookingState() {
         dispatch(resetBookingState());
     },
-    setFilterParameter: (param, value) => {
+    setFilterParameter(param, value) {
         dispatch(setFilterParameter('bookRoom', param, value));
         dispatch(fetchRooms('bookRoom'));
         dispatch(fetchMapRooms('bookRoom'));
+    },
+    onModalClose() {
+        dispatch(goBack());
+    },
+    pushState(url) {
+        dispatch(push(url));
     }
 });
 

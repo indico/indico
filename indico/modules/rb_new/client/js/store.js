@@ -18,7 +18,7 @@
 import _ from 'lodash';
 import createHistory from 'history/createBrowserHistory';
 import {queryStringMiddleware, createQueryStringReducer} from 'redux-router-querystring';
-import {connectRouter, routerMiddleware, LOCATION_CHANGE} from 'connected-react-router';
+import {connectRouter, routerMiddleware} from 'connected-react-router';
 import createReduxStore from 'indico/utils/redux';
 
 import reducers from './reducers';
@@ -55,17 +55,20 @@ function pathMatch(map, path) {
     }
 }
 
+export const history = createHistory({
+    basename: '/rooms-new'
+});
+
 const qsReducer = createQueryStringReducer(
     queryFilterRules,
     (state, action) => {
-        if (action.type === LOCATION_CHANGE) {
-            const {payload: {location: {search, pathname}}} = action;
+        if (action.type === '@@INIT') {
             return {
                 namespace: pathMatch({
                     '^/book': 'bookRoom',
                     '^/rooms': 'roomList'
-                }, pathname),
-                queryString: search.slice(1)
+                }, history.location.pathname),
+                queryString: history.location.search.slice(1)
             };
         }
         return null;
@@ -75,16 +78,12 @@ const qsReducer = createQueryStringReducer(
         : state)
 );
 
-export const history = createHistory({
-    basename: '/rooms-new'
-});
-
 export default function createRBStore(data) {
     return createReduxStore('rb-new',
                             reducers,
                             Object.assign(initialData, data), [
                                 routerMiddleware(history),
-                                queryStringMiddleware(history, routeConfig)
+                                queryStringMiddleware(history, routeConfig, {usePush: false})
                             ], [
                                 qsReducer
                             ],

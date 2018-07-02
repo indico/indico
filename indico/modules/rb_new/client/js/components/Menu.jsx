@@ -16,48 +16,13 @@
  */
 
 import React from 'react';
-import PropTypes from 'prop-types';
-import {Link, Route} from 'react-router-dom';
-import {Icon, Popup} from 'semantic-ui-react';
+import {Icon} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
+import MenuItem from '../containers/MenuItem.js';
 
 import './Menu.module.scss';
 
-
-function MenuItem({path, children, disabled}) {
-    if (disabled) {
-        return (
-            <Route path={path}>
-                <Popup trigger={<li styleName="rb-menu-item"><span styleName="disabled">{children}</span></li>}
-                       content={Translate.string('Coming soon!')}
-                       position="bottom center" />
-            </Route>
-        );
-    }
-    return (
-        <Route path={path}>
-            {({match}) => (
-                <li className={match ? 'selected' : ''}
-                    styleName="rb-menu-item">
-                    <Link to={path} replace={!!match}>
-                        {children}
-                    </Link>
-                </li>
-            )}
-        </Route>
-    );
-}
-
-MenuItem.propTypes = {
-    path: PropTypes.string.isRequired,
-    children: PropTypes.node.isRequired,
-    disabled: PropTypes.bool
-};
-
-MenuItem.defaultProps = {
-    disabled: false,
-};
 
 export default function Menu() {
     return (

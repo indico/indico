@@ -18,15 +18,12 @@
 import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
-import {Link} from 'react-router-dom';
 import RCCalendar from 'rc-calendar';
 import RangeCalendar from 'rc-calendar/lib/RangeCalendar';
 import DatePicker from 'rc-calendar/lib/Picker';
 import {Button, Form, Grid, Select, Statistic} from 'semantic-ui-react';
-import {stateToQueryString} from 'redux-router-querystring';
 import {Translate} from 'indico/react/i18n';
 import {sanitizeRecurrence, serializeTime} from '../../util';
-import {queryString as qsRules} from '../../serializers/filters';
 import TimeRangePicker from '../TimeRangePicker';
 
 import './Landing.module.scss';
@@ -38,7 +35,8 @@ const _serializeDate = date => (date ? date.format(_formatDateStr) : null);
 
 export default class Landing extends React.Component {
     static propTypes = {
-        setFilterParameter: PropTypes.func.isRequired
+        setFilterParameter: PropTypes.func.isRequired,
+        setFilters: PropTypes.func.isRequired
     };
 
     constructor(props) {
@@ -112,27 +110,33 @@ export default class Landing extends React.Component {
         }
     };
 
+    doSearch = () => {
+        const {
+            timeSlot: {startTime, endTime},
+            dates: {startDate, endDate},
+            recurrence
+        } = this.state;
+        const {setFilters} = this.props;
+        setFilters({
+            recurrence,
+            dates: {
+                startDate: _serializeDate(startDate),
+                endDate: _serializeDate(endDate)
+            },
+            timeSlot: {
+                startTime: serializeTime(startTime),
+                endTime: serializeTime(endTime)
+            },
+            equipment: {}
+        });
+    };
+
     render() {
         const {
             timeSlot: {startTime, endTime},
             dates: {startDate, endDate},
-            recurrence, recurrence: {type, number, interval}
+            recurrence: {type, number, interval}
         } = this.state;
-
-        const targetQS = stateToQueryString({
-            filters: {
-                recurrence,
-                dates: {
-                    startDate: _serializeDate(startDate),
-                    endDate: _serializeDate(endDate)
-                },
-                timeSlot: {
-                    startTime: serializeTime(startTime),
-                    endTime: serializeTime(endTime)
-                },
-                equipment: {}
-            }
-        }, qsRules);
 
         const calendar = (
             <RCCalendar selectedValue={startDate}
@@ -219,14 +223,9 @@ export default class Landing extends React.Component {
                                     <Form.Input icon="search" placeholder="bldg: 28" styleName="search-input"
                                                 onChange={(event, data) => this.updateText(data.value)} />
                                 </Form.Group>
-                                <Link to={{
-                                    pathname: '/book',
-                                    search: `?${targetQS}`
-                                }}>
-                                    <Button primary>
-                                        {Translate.string('Search')}
-                                    </Button>
-                                </Link>
+                                <Button primary onClick={this.doSearch}>
+                                    {Translate.string('Search')}
+                                </Button>
                             </Form>
                         </Grid.Column>
                     </Grid.Row>

@@ -49,16 +49,18 @@ export default class RoomList extends React.Component {
         roomDetails: PropTypes.shape({
             list: PropTypes.array,
             isFetching: PropTypes.bool,
-        }).isRequired
+        }).isRequired,
+        onModalClose: PropTypes.func.isRequired,
+        pushState: PropTypes.func.isRequired
     };
 
     renderRoom = (room) => {
         const {id} = room;
-        const {fetchRoomDetails} = this.props;
+        const {fetchRoomDetails, pushState} = this.props;
         const showDetailsBtn = (
             <Button primary icon="search" circular onClick={() => {
                 fetchRoomDetails(id);
-                history.push(`/rooms/${id}/details${history.location.search}`);
+                pushState(`/rooms/${id}/details${history.location.search}`);
             }} />
         );
 
@@ -72,7 +74,7 @@ export default class RoomList extends React.Component {
     };
 
     render() {
-        const {rooms, fetchRooms, roomDetails} = this.props;
+        const {rooms, fetchRooms, onModalClose, roomDetails} = this.props;
         return (
             <Grid columns={2}>
                 <Grid.Column width={11}>
@@ -92,9 +94,7 @@ export default class RoomList extends React.Component {
                 </Grid.Column>
                 <Route exact path="/rooms/:roomId/details" render={({match: {params: {roomId}}}) => (
                     <RoomDetailsModal roomDetails={roomDetails.rooms[roomId]}
-                                      onClose={() => {
-                                          history.goBack();
-                                      }} />
+                                      onClose={onModalClose} />
                 )} />
             </Grid>
         );

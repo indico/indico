@@ -15,27 +15,18 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 import {connect} from 'react-redux';
+import {resetFilters} from '../actions';
 
-import App from '../components/App';
-import {fetchBuildings, fetchEquipmentTypes, fetchFavoriteRooms, fetchUserInfo, fetchMapAspects} from '../actions';
-import {history} from '../store';
+import MenuItem from '../components/MenuItem';
 
 
-const mapStateToProps = ({bookRoom: {filters: {recurrence: {type}}}}) => ({
-    filtersSet: !!history.location.search || !!type
-});
-
-const mapDispatchToProps = (dispatch) => ({
-    fetchInitialData() {
-        dispatch(fetchUserInfo());
-        dispatch(fetchFavoriteRooms());
-        dispatch(fetchEquipmentTypes());
-        dispatch(fetchBuildings());
-        dispatch(fetchMapAspects());
+const mapDispatchToProps = dispatch => ({
+    onClick() {
+        dispatch(resetFilters());
     }
 });
 
 export default connect(
-    mapStateToProps,
+    null,
     mapDispatchToProps
-)(App);
+)(MenuItem);

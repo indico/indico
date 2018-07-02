@@ -35,12 +35,8 @@ import './App.module.scss';
 
 export default class App extends React.Component {
     componentDidMount() {
-        const {fetchInitialData, triggerLocationChange} = this.props;
+        const {fetchInitialData} = this.props;
         fetchInitialData();
-        // We need to explicitly trigger a location change
-        // the first time the page is loaded, so that the
-        // query string parameters are taken into account.
-        triggerLocationChange();
     }
 
     render() {
@@ -68,10 +64,10 @@ export default class App extends React.Component {
                     <div styleName="rb-content">
                         <Switch>
                             <Route exact path="/" render={() => <Redirect to="/book" />} />
-                            <Route path="/book" render={() => (
+                            <Route path="/book" render={({location}) => (
                                 filtersSet
                                     ? (
-                                        <BookRoom />
+                                        <BookRoom location={location} />
                                     ) : (
                                         <Landing />
                                     )
@@ -90,6 +86,5 @@ export default class App extends React.Component {
 App.propTypes = {
     history: PropTypes.object.isRequired,
     filtersSet: PropTypes.bool.isRequired,
-    fetchInitialData: PropTypes.func.isRequired,
-    triggerLocationChange: PropTypes.func.isRequired
+    fetchInitialData: PropTypes.func.isRequired
 };
