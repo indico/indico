@@ -103,7 +103,7 @@ export default class Timeline extends React.Component {
 
     renderTimelineLegend = () => {
         const {activeDate} = this.state;
-        const {dateRange} = this.props;
+        const {dateRange, availability} = this.props;
         let currentDate = activeDate;
         const startDate = _toMoment(dateRange[0]);
         const endDate = _toMoment(dateRange[dateRange.length - 1]);
@@ -121,44 +121,64 @@ export default class Timeline extends React.Component {
                     <Label color="red">{Translate.string('Conflict')}</Label>
                     <Label styleName="pre-booking-conflict">{Translate.string('Conflict with Pre-Booking')}</Label>
                 </Label.Group>
-                <Button.Group floated="right" size="small">
-                    <Button icon="left arrow"
-                            onClick={() => this.changeSelectedDate('prev')}
-                            disabled={moment(currentDate).subtract(1, 'day').isBefore(startDate)} />
-                    <DatePicker calendar={calendar}>
-                        {
-                            () => (
-                                <Button primary>
-                                    {currentDate.format(DATE_FORMAT)}
-                                </Button>
-                            )
-                        }
-                    </DatePicker>
-                    <Button icon="right arrow"
-                            onClick={() => this.changeSelectedDate('next')}
-                            disabled={moment(currentDate).add(1, 'day').isAfter(endDate)} />
-                </Button.Group>
+                {Object.keys(availability).length > 1 && (
+                    <Button.Group floated="right" size="small">
+                        <Button icon="left arrow"
+                                onClick={() => this.changeSelectedDate('prev')}
+                                disabled={moment(currentDate).subtract(1, 'day').isBefore(startDate)} />
+                        <DatePicker calendar={calendar}>
+                            {
+                                () => (
+                                    <Button primary>
+                                        {currentDate.format(DATE_FORMAT)}
+                                    </Button>
+                                )
+                            }
+                        </DatePicker>
+                        <Button icon="right arrow"
+                                onClick={() => this.changeSelectedDate('next')}
+                                disabled={moment(currentDate).add(1, 'day').isAfter(endDate)} />
+                    </Button.Group>
+                )}
             </Segment>
         );
     };
 
     renderTimeline = () => {
         const {activeDate} = this.state;
-        const {minHour, maxHour, step, availability, recurrenceType} = this.props;
+        const {minHour, maxHour, step, availability, recurrenceType, dateRange} = this.props;
         const hourSeries = _.range(minHour, maxHour + step, step);
 
-        const rows = [];
-        Object.values(availability).forEach((roomAvailability) => {
-            const av = {
-                candidates: roomAvailability.candidates[activeDate.format('YYYY-MM-DD')] || [],
-                preBookings: roomAvailability.pre_bookings[activeDate.format('YYYY-MM-DD')] || [],
-                bookings: roomAvailability.bookings[activeDate.format('YYYY-MM-DD')] || [],
-                conflicts: roomAvailability.conflicts[activeDate.format('YYYY-MM-DD')] || [],
-                preConflicts: roomAvailability.pre_conflicts[activeDate.format('YYYY-MM-DD')] || []
-            };
+        let rows = [];
+        if (Object.keys(availability).length === 1) {
+            const roomId = Object.keys(availability)[0];
+            const roomAvailability = availability[roomId];
             const room = roomAvailability.room;
-            rows.push({availability: av, label: room.full_name, conflictIndicator: true, id: room.id, room});
-        });
+
+            rows = dateRange.map((dt) => {
+                const av = {
+                    candidates: roomAvailability.candidates[dt] || [],
+                    preBookings: roomAvailability.pre_bookings[dt] || [],
+                    bookings: roomAvailability.bookings[dt] || [],
+                    conflicts: roomAvailability.conflicts[dt] || [],
+                    preConflicts: roomAvailability.pre_conflicts[dt] || []
+                };
+                return {availability: av, label: dt, conflictIndicator: true, id: dt, room};
+            });
+        } else {
+            rows = Object.values(availability).map((roomAvailability) => {
+                const av = {
+                    candidates: roomAvailability.candidates[activeDate.format('YYYY-MM-DD')] || [],
+                    preBookings: roomAvailability.pre_bookings[activeDate.format('YYYY-MM-DD')] || [],
+                    bookings: roomAvailability.bookings[activeDate.format('YYYY-MM-DD')] || [],
+                    conflicts: roomAvailability.conflicts[activeDate.format('YYYY-MM-DD')] || [],
+                    preConflicts: roomAvailability.pre_conflicts[activeDate.format('YYYY-MM-DD')] || []
+                };
+
+                const room = roomAvailability.room;
+                return {availability: av, label: room.full_name, conflictIndicator: true, id: room.id, room};
+            });
+        }
 
         return (
             <>
