@@ -33,6 +33,7 @@ from indico.modules.rb.models.favorites import favorite_room_table
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import RepeatFrequency, Reservation
 from indico.modules.rb.models.room_attributes import RoomAttributeAssociation
+from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb_new.schemas import reservation_occurrences_schema, rooms_schema
 from indico.util.caching import memoize_redis
@@ -213,14 +214,15 @@ def get_rooms_availability(rooms, start_dt, end_dt, repeat_frequency, repeat_int
         room_conflicts, pre_room_conflicts = conflicts.get(room.id, ([], []))
         pre_bookings = [occ for occ in room_occurrences if not occ.reservation.is_accepted]
         existing_bookings = [occ for occ in room_occurrences if occ.reservation.is_accepted]
-        blockings = get_blockings(room, candidates)
         availability[room.id] = {'room': room,
                                  'candidates': group_by_occurrence_date(candidates),
                                  'pre_bookings': group_by_occurrence_date(pre_bookings),
                                  'bookings': group_by_occurrence_date(existing_bookings),
                                  'conflicts': group_by_occurrence_date(room_conflicts),
                                  'pre_conflicts': group_by_occurrence_date(pre_room_conflicts),
-                                 'blockings': blockings}
+                                 'blockings': get_blockings(room, candidates),
+                                 'nonbookable_periods': get_nonbookable_periods(room, candidates),
+                                 'unbookable_hours': get_unbookable_hours(room, candidates)}
     return date_range, availability
 
 
@@ -241,15 +243,42 @@ def get_blockings(room, candidates):
     blocked_rooms = room.get_blocked_rooms(*(candidate.start_dt for candidate in candidates))
     if blocked_rooms == []:
         return {}
-    blockings_occurences = {}
+    occurences = {}
     dates = list(candidate.start_dt.date() for candidate in candidates)
     for room in blocked_rooms:
         blocking = room.blocking
         for date in dates:
             if blocking.start_date <= date <= blocking.end_date:
-                occurence = blocking
-                blockings_occurences[date] = [occurence]
-    return blockings_occurences
+                occurences[date] = [blocking]
+    return occurences
+
+
+def get_unbookable_hours(room, candidates):
+    hours = room.bookable_hours
+    if hours == []:
+        return {}
+    dates = list(candidate.start_dt for candidate in candidates)
+    occurences = {}
+    for date in dates:
+        occurences[date.date()] = [hours]
+    return occurences
+
+
+def get_nonbookable_periods(room, candidates):
+    periods = room.nonbookable_periods
+    if periods == []:
+        return {}
+    dates = list(candidate.start_dt for candidate in candidates)
+    occurences = {}
+    for period in periods:
+        for date in dates:
+            if period.start_dt <= date <= period.end_dt:
+                period_occurence = NonBookablePeriod()
+                period_occurence.start_dt = (date.replace(hour=0, minute=0)
+                                             if period.start_dt != date else period.start_dt)
+                period_occurence.end_dt = date.replace(hour=23, minute=59) if period.end_dt != date else period.end_dt
+                occurences[date.date()] = [period_occurence]
+    return occurences
 
 
 def _can_get_all_groups(user):

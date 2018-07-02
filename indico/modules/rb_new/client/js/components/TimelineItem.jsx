@@ -73,13 +73,12 @@ export default class TimelineItem extends React.Component {
 
     renderOccurrence = (occurrence, additionalClasses = '') => {
         let segmentStartDt, segmentEndDt, popupContent;
-        const {reservation, reason, bookable} = occurrence;
+        const {start_dt: startDt, end_dt: endDt, reservation, reason, bookable} = occurrence;
         const {startHour, endHour, step, onClick} = this.props;
         if (additionalClasses === 'blocking') {
             segmentStartDt = moment(startHour, 'HH:mm');
             segmentEndDt = moment(endHour, 'HH:mm');
         } else {
-            const {start_dt: startDt, end_dt: endDt} = occurrence;
             segmentStartDt = moment(startDt, 'YYYY-MM-DD HH:mm');
             segmentEndDt = moment(endDt, 'YYYY-MM-DD HH:mm');
         }
