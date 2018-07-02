@@ -93,7 +93,7 @@
     "eslint-import-resolver-indico": "file:resolver",
     "eslint-plugin-babel": "^5.0.0",
     "eslint-plugin-import": "^2.11.0",
-    "eslint-plugin-react": "^7.9.1",
+    "eslint-plugin-react": "^7.10.0",
     "exports-loader": "^0.7.0",
     "extract-text-webpack-plugin": "^4.0.0-alpha.0",
     "file-loader": "^1.1.11",
