@@ -17,7 +17,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Button, Checkbox, Form, Grid, Icon, Label, Message, Modal, Segment} from 'semantic-ui-react';
+import {Button, Checkbox, Form, Grid, Icon, Label, Message, Modal, Radio, Segment} from 'semantic-ui-react';
 import {reduxForm, Field} from 'redux-form';
 import {ReduxFormField, ReduxRadioField} from 'indico/react/forms';
 import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
@@ -226,7 +226,7 @@ class BookRoomModal extends React.Component {
                 <Segment attached="bottom">
                     <Checkbox toggle
                               defaultChecked={skipConflicts}
-                              label={Translate.string('I understand, please skip any days with conflicting occurrences.')}
+                              componentLabel={Translate.string('I understand, please skip any days with conflicting occurrences.')}
                               onChange={(_, {checked}) => {
                                   this.setState({
                                       skipConflicts: checked
@@ -293,14 +293,14 @@ class BookRoomModal extends React.Component {
                                         <Field name="usage"
                                                radioValue="myself"
                                                component={ReduxRadioField}
-                                               as={Form.Radio}
-                                               label={Translate.string("I'll be using it myself")}
+                                               as={Radio}
+                                               componentLabel={Translate.string("I'll be using it myself")}
                                                disabled={bookingBlocked} />
                                         <Field name="usage"
                                                radioValue="someone"
                                                component={ReduxRadioField}
-                                               as={Form.Radio}
-                                               label={Translate.string("I'm booking it for someone else")}
+                                               as={Radio}
+                                               componentLabel={Translate.string("I'm booking it for someone else")}
                                                disabled={bookingBlocked} />
                                     </Form.Group>
                                     <Field name="user"

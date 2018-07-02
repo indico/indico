@@ -17,7 +17,6 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {reducer as reduxFormReducer} from 'redux-form';
 import {Provider} from 'react-redux';
 
 import createReduxStore from 'indico/utils/redux';
@@ -31,7 +30,6 @@ export default function showReactErrorDialog(error) {
     if (!store) {
         store = createReduxStore('errors', {
             errors: reducer,
-            form: reduxFormReducer,
         });
         const container = document.createElement('div');
         document.body.appendChild(container);

@@ -19,12 +19,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Button, Form, Icon, Message, Modal, TextArea} from 'semantic-ui-react';
-import {Field} from 'redux-form';
+import {Form as FinalForm, Field} from 'react-final-form';
 import reportErrorURL from 'indico-url:core.report_error_api';
 
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
-import {createSubmissionError, ReduxFormField, validators as v} from 'indico/react/forms';
+import {handleSubmissionError, ReduxFormField, validators as v} from 'indico/react/forms';
 
 
 export default class ErrorDialog extends React.Component {
@@ -40,16 +40,6 @@ export default class ErrorDialog extends React.Component {
         formVisible: PropTypes.bool.isRequired,
         clearError: PropTypes.func.isRequired,
         showReportForm: PropTypes.func.isRequired,
-        // redux-form stuff
-        form: PropTypes.shape({
-            error: PropTypes.string,
-            submitting: PropTypes.bool.isRequired,
-            invalid: PropTypes.bool.isRequired,
-            pristine: PropTypes.bool.isRequired,
-            submitSucceeded: PropTypes.bool.isRequired,
-            submitFailed: PropTypes.bool.isRequired,
-            handleSubmit: PropTypes.func.isRequired,
-        }).isRequired,
     };
 
     static defaultProps = {
@@ -74,17 +64,17 @@ export default class ErrorDialog extends React.Component {
                 email: email || undefined
             });
         } catch (error) {
-            throw createSubmissionError(error, Translate.string('Submitting your error report failed'));
+            return handleSubmissionError(error, Translate.string('Submitting your error report failed'));
         }
     };
 
-    renderReportForm() {
-        const {form: {handleSubmit, submitFailed, submitSucceeded, error}} = this.props;
+    renderReportForm({handleSubmit, submitFailed, submitSucceeded, hasSubmitErrors, submitError, submitting}) {
         return (
-            <Form onSubmit={handleSubmit(this.submitReport)} error={submitFailed} success={submitSucceeded}>
-                {error && <Message error content={error} />}
+            <Form onSubmit={handleSubmit} error={submitFailed} success={submitSucceeded}>
+                {hasSubmitErrors && <Message error content={submitError} />}
                 <Field name="comment" component={ReduxFormField} as={TextArea}
                        label={Translate.string('Details')} autoFocus required
+                       disabled={submitting}
                        validate={v.required}>
                     <p style={{fontStyle: 'italic', fontSize: '0.9em', color: '#999'}}>
                         <Translate>
@@ -93,7 +83,8 @@ export default class ErrorDialog extends React.Component {
                     </p>
                 </Field>
                 <Field name="email" component={ReduxFormField} as="input" type="email"
-                       label={Translate.string('Email address')}>
+                       label={Translate.string('Email address')}
+                       disabled={submitting}>
                     <p style={{fontStyle: 'italic', fontSize: '0.9em', color: '#999'}}>
                         <Translate>
                             If you enter your email address we can contact you to follow-up
@@ -105,13 +96,14 @@ export default class ErrorDialog extends React.Component {
         );
     }
 
-    renderReportActions() {
-        const {form: {submitting, handleSubmit, invalid, pristine, submitSucceeded}, formVisible} = this.props;
+    renderReportActions({submitting, handleSubmit, hasValidationErrors, submitSucceeded}) {
+        const {formVisible} = this.props;
         if (formVisible) {
             return (
                 <Button type="submit" primary
-                        loading={submitting} disabled={submitting || invalid || pristine || submitSucceeded}
-                        onClick={handleSubmit(this.submitReport)}>
+                        loading={submitting}
+                        disabled={submitting || hasValidationErrors || submitSucceeded}
+                        onClick={handleSubmit}>
                     {submitSucceeded && <Icon name="checkmark" />}
                     <Translate>Submit Report</Translate>
                 </Button>
@@ -122,16 +114,16 @@ export default class ErrorDialog extends React.Component {
     }
 
     render() {
-        const {errorData, remainingErrors, dialogVisible, formVisible, form: {submitSucceeded}} = this.props;
+        const {errorData, remainingErrors, dialogVisible, formVisible} = this.props;
         if (!dialogVisible) {
             return null;
         }
 
         const {title, message, reportable} = errorData;
 
-        return (
+        const modal = (fprops) => (
             <Modal size="tiny" dimmer="blurring" closeOnRootNodeClick={false} closeOnEscape={false}
-                   open={dialogVisible} onClose={this.clearError}>
+                   open={dialogVisible}>
                 <Modal.Content>
                     <Message error icon>
                         <Icon name="exclamation triangle" />
@@ -149,14 +141,17 @@ export default class ErrorDialog extends React.Component {
                             </Translate>
                         </p>
                     )}
-                    {formVisible && !submitSucceeded && this.renderReportForm()}
-                    {submitSucceeded && (
+                    {formVisible && !fprops.submitSucceeded && this.renderReportForm(fprops)}
+                    {fprops.submitSucceeded && (
                         <Message success><Translate>Thanks for your error report.</Translate></Message>
                     )}
                 </Modal.Content>
                 <Modal.Actions>
-                    {reportable && this.renderReportActions()}
-                    <Button onClick={this.clearError}>
+                    {reportable && this.renderReportActions(fprops)}
+                    <Button onClick={() => {
+                        fprops.form.reset();
+                        this.clearError();
+                    }}>
                         {remainingErrors
                             ? <Translate>Dismiss (show next error)</Translate>
                             : <Translate>Dismiss</Translate>
@@ -164,6 +159,12 @@ export default class ErrorDialog extends React.Component {
                     </Button>
                 </Modal.Actions>
             </Modal>
+        );
+
+        return (
+            <FinalForm initialValues={{email: Indico.User.email}}
+                       onSubmit={this.submitReport}
+                       render={modal} />
         );
     }
 }

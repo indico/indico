@@ -22,20 +22,33 @@ import {Form, Label} from 'semantic-ui-react';
 
 export function ReduxFormField(
     {
-        input, label, placeholder, required, children, disabled,
-        meta: {touched, invalid, error, disabled: metaDisabled, submitting},
+        input, label, placeholder, required, children, disabled, componentLabel,
+        meta: {touched, error, submitError, disabled: metaDisabled, submitting, dirty, dirtySinceLastSubmit},
         as: Component,
         ...props
     }
 ) {
+    // we show errors if:
+    // - the field was touched (focused+unfocused)
+    //   ...and failed local validation
+    //   ...and does not have the initial value
+    // - there was an error during submission
+    //   ...and the field has not been modified since the failed submission
+    let errorLabel = null;
+    if (touched && error && dirty) {
+        errorLabel = <Label basic color="red" pointing="above" content={error} />;
+    } else if (submitError && !dirtySinceLastSubmit) {
+        errorLabel = <Label basic color="red" pointing="above" content={submitError} />;
+    }
     return (
-        <Form.Field required={required} error={touched && invalid}>
+        <Form.Field required={required} error={!!errorLabel}>
+            {label && <label>{label}</label>}
             <Component {...input}
                        {...props}
-                       label={label}
+                       label={componentLabel}
                        placeholder={placeholder}
                        disabled={disabled || metaDisabled || submitting} />
-            {touched && error && <Label basic color="red" pointing="above" content={error} />}
+            {errorLabel}
             {children}
         </Form.Field>
     );
@@ -46,6 +59,7 @@ ReduxFormField.propTypes = {
     input: PropTypes.object.isRequired,
     required: PropTypes.bool,
     label: PropTypes.string,
+    componentLabel: PropTypes.string,
     placeholder: PropTypes.string,
     meta: PropTypes.object.isRequired,
     as: PropTypes.oneOfType([PropTypes.string, PropTypes.object, PropTypes.func]).isRequired,
@@ -57,6 +71,7 @@ ReduxFormField.defaultProps = {
     required: false,
     placeholder: null,
     label: null,
+    componentLabel: null,
     children: null,
 };
 

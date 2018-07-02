@@ -16,7 +16,6 @@
  */
 
 import {connect} from 'react-redux';
-import {reduxForm, reset} from 'redux-form';
 
 import ErrorDialog from './component';
 import {clearError, showReportForm} from './actions';
@@ -35,13 +34,7 @@ const mapDispatchToProps = (dispatch) => ({
     },
     clearError() {
         dispatch(clearError());
-        dispatch(reset('reportError'));
     },
 });
 
-const container = connect(mapStateToProps, mapDispatchToProps)(ErrorDialog);
-export default reduxForm({
-    form: 'reportError',
-    touchOnBlur: false,
-    propNamespace: 'form',
-})(container);
+export default connect(mapStateToProps, mapDispatchToProps)(ErrorDialog);

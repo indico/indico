@@ -16,14 +16,17 @@
  */
 
 import _ from 'lodash';
-import {SubmissionError} from 'redux-form';
+import {FORM_ERROR} from 'final-form';
 
 
-export function createSubmissionError(error, defaultMessage = null) {
+export function handleSubmissionError(error, defaultMessage = null) {
     const webargsErrors = _.get(error, 'response.data.webargs_errors');
     if (webargsErrors && error.response.status === 422) {
-        return new SubmissionError(webargsErrors);
+        // flatten errors in case there's more than one
+        return Object.assign(...Object.entries(webargsErrors).map(([field, errors]) => ({
+            [field]: errors.join(' / ')
+        })));
     } else {
-        return new SubmissionError({_error: defaultMessage || error.message});
+        return {[FORM_ERROR]: defaultMessage || error.message};
     }
 }
