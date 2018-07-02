@@ -174,7 +174,8 @@ export default class Timeline extends React.Component {
                     bookings: roomAvailability.bookings[dt] || [],
                     conflicts: roomAvailability.conflicts[dt] || [],
                     preConflicts: roomAvailability.pre_conflicts[dt] || [],
-                    blockings: roomAvailability.blockings[dt] || []
+                    blockings: roomAvailability.blockings[dt] || [],
+                    nonbookablePeriods: roomAvailability.nonbookable_periods[dt] || []
                 };
                 return {availability: av, label: dt, conflictIndicator: true, id: dt, room};
             });
@@ -187,7 +188,8 @@ export default class Timeline extends React.Component {
                     bookings: roomAvailability.bookings[dt] || [],
                     conflicts: roomAvailability.conflicts[dt] || [],
                     preConflicts: roomAvailability.pre_conflicts[dt] || [],
-                    blockings: roomAvailability.blockings[dt] || []
+                    blockings: roomAvailability.blockings[dt] || [],
+                    nonbookablePeriods: roomAvailability.nonbookable_periods[dt] || []
                 };
 
                 const room = roomAvailability.room;

@@ -24,6 +24,8 @@ from indico.modules.rb.models.aspects import Aspect
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import Reservation
 from indico.modules.rb.models.room_attributes import RoomAttributeAssociation
+from indico.modules.rb.models.room_bookable_hours import BookableHours
+from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
 from indico.modules.rb.models.rooms import Room
 
 
@@ -83,6 +85,20 @@ class BlockingSchema(mm.ModelSchema):
         fields = ('reason',)
 
 
+class NonBookablePeriodSchema(mm.ModelSchema):
+
+    class Meta:
+        model = NonBookablePeriod
+        fields = ('start_dt', 'end_dt')
+
+
+class UnbookableHoursSchema(mm.ModelSchema):
+
+    class Meta:
+        model = BookableHours
+        fields = ('start_time', 'end_time')
+
+
 rooms_schema = RoomSchema(many=True, only=_room_fields)
 room_details_schema = RoomSchema()
 map_rooms_schema = MapRoomSchema(many=True)
@@ -90,3 +106,5 @@ aspects_schema = AspectSchema(many=True)
 reservation_occurrences_schema = ReservationOccurrenceSchema(many=True)
 reservation_schema = ReservationSchema()
 blocking_schema = BlockingSchema(many=True)
+nonbookable_periods_schema = NonBookablePeriodSchema(many=True)
+unbookable_hours_schema = UnbookableHoursSchema(many=True)
