@@ -17,7 +17,8 @@
 import {connect} from 'react-redux';
 
 import App from '../components/App';
-import {fetchBuildings, fetchEquipmentTypes, fetchFavoriteRooms, fetchUserInfo, fetchMapAspects} from '../actions';
+import {fetchBuildings, fetchEquipmentTypes, fetchFavoriteRooms, fetchUserInfo,
+        fetchMapAspects, resetFilters} from '../actions';
 import {history} from '../store';
 
 
@@ -32,6 +33,9 @@ const mapDispatchToProps = (dispatch) => ({
         dispatch(fetchEquipmentTypes());
         dispatch(fetchBuildings());
         dispatch(fetchMapAspects());
+    },
+    resetFilters() {
+        dispatch(resetFilters());
     }
 });
 
