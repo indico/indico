@@ -21,7 +21,7 @@ import PropTypes from 'prop-types';
 import {Button, Grid, Dimmer, Loader, Popup} from 'semantic-ui-react';
 import {Route} from 'react-router-dom';
 
-import {Slot} from 'indico/react/util';
+import {Preloader, Slot} from 'indico/react/util';
 import {Translate} from 'indico/react/i18n';
 import RoomSearchPane from '../RoomSearchPane';
 import RoomFilterBar from '../RoomFilterBar';
@@ -73,6 +73,19 @@ export default class RoomList extends React.Component {
         );
     };
 
+    roomPreloader(componentFunc) {
+        const {fetchRoomDetails} = this.props;
+        return ({match: {params: {roomId}}}) => (
+            <Preloader checkCached={({roomDetails: {rooms: cachedRooms}}) => {
+                return !!cachedRooms[roomId];
+            }}
+                       action={() => fetchRoomDetails(roomId)}
+                       dimmer={<Dimmer page />}>
+                {() => componentFunc(roomId)}
+            </Preloader>
+        );
+    }
+
     render() {
         const {rooms, fetchRooms, onModalClose, roomDetails} = this.props;
         return (
@@ -92,10 +105,10 @@ export default class RoomList extends React.Component {
                 <Grid.Column width={5}>
                     <MapController />
                 </Grid.Column>
-                <Route exact path="/rooms/:roomId/details" render={({match: {params: {roomId}}}) => (
+                <Route exact path="/rooms/:roomId/details" render={this.roomPreloader((roomId) => (
                     <RoomDetailsModal roomDetails={roomDetails.rooms[roomId]}
                                       onClose={onModalClose} />
-                )} />
+                ))} />
             </Grid>
         );
     }
