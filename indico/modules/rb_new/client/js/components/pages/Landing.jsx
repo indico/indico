@@ -127,7 +127,7 @@ export default class Landing extends React.Component {
                 startTime: serializeTime(startTime),
                 endTime: serializeTime(endTime)
             },
-            equipment: {}
+            equipment: []
         });
     };
 
