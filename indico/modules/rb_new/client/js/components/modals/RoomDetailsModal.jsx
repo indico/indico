@@ -86,8 +86,6 @@ function RoomDetails({room}) {
                     {!_.isEmpty(room.bookings) ? (
                         <TimelineContent rows={room.bookings}
                                          hourSeries={hourSeries}
-                                         minHour={minHour}
-                                         maxHour={maxHour}
                                          longLabel />
                     ) : (
                         <Message info>

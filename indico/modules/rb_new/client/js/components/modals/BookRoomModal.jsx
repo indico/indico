@@ -25,6 +25,7 @@ import UserSearchField from 'indico/react/components/UserSearchField';
 import recurrenceRenderer from '../filters/RecurrenceRenderer';
 import {toMoment} from '../../util';
 import {RoomBasicDetails} from '../RoomBasicDetails';
+import TimelineContent from '../TimelineContent';
 
 import './BookRoomModal.module.scss';
 
@@ -58,18 +59,21 @@ class BookRoomModal extends React.Component {
         onClose: PropTypes.func.isRequired,
         pristine: PropTypes.bool.isRequired,
         invalid: PropTypes.bool.isRequired,
-        availability: PropTypes.object
+        availability: PropTypes.object,
+        dateRange: PropTypes.array
     };
 
     static defaultProps = {
         open: false,
         room: null,
         bookingState: {},
-        availability: null
+        availability: null,
+        dateRange: null
     };
 
     state = {
-        skipConflicts: false
+        skipConflicts: false,
+        bookingConflictsVisible: false
     };
 
     renderUserSearchField({input, ...props}) {
@@ -171,8 +175,27 @@ class BookRoomModal extends React.Component {
         );
     }
 
+    renderRoomTimeline(availability) {
+        const hourSeries = _.range(6, 24, 2);
+        const {dateRange} = this.props;
+        const room = availability.room;
+        const rows = dateRange.map((dt) => {
+            const av = {
+                candidates: availability.candidates[dt].map((candidate) => ({...candidate, bookable: false})) || [],
+                preBookings: availability.pre_bookings[dt] || [],
+                bookings: availability.bookings[dt] || [],
+                conflicts: availability.conflicts[dt] || [],
+                preConflicts: availability.pre_conflicts[dt] || []
+            };
+            return {id: dt, label: dt, conflictIndicator: true, availability: av, room};
+        });
+
+        return <TimelineContent rows={rows} hourSeries={hourSeries} />;
+    }
+
     renderBookingConstraints(conflicts) {
         const {skipConflicts} = this.state;
+
         return (
             <>
                 <Message color="yellow" attached icon>
@@ -223,7 +246,7 @@ class BookRoomModal extends React.Component {
     render() {
         const {bookingData: {recurrence, dates, timeSlot}, open, room, bookingState,
                user, availability} = this.props;
-        const {skipConflicts} = this.state;
+        const {skipConflicts, bookingConflictsVisible} = this.state;
 
         if (!room) {
             return null;
@@ -233,9 +256,10 @@ class BookRoomModal extends React.Component {
         const bookingBlocked = bookingState.success || bookingState.ongoing;
         const buttonsBlocked = bookingBlocked || (conflictsExist && !skipConflicts);
         const {is_auto_confirm: isDirectlyBookable} = room;
+        const link = <a style={{cursor: 'pointer'}} onClick={() => this.setState({bookingConflictsVisible: true})} />;
 
         return (
-            <Modal open={open} onClose={this.onClose} closeIcon>
+            <Modal open={open} onClose={this.onClose} size="large" closeIcon>
                 <Modal.Header>
                     <Translate>Book a Room</Translate>
                 </Modal.Header>
@@ -244,6 +268,14 @@ class BookRoomModal extends React.Component {
                         <Grid.Column width={8}>
                             <RoomBasicDetails room={room} />
                             {this.renderTimeInformation(recurrence, dates, timeSlot)}
+                            <Message attached="bottom">
+                                <Message.Content>
+                                    <Translate>
+                                        Consult the <Param name="bookings-link" wrapper={link}>timeline view </Param> to see
+                                        the other room bookings for the selected period.
+                                    </Translate>
+                                </Message.Content>
+                            </Message>
                         </Grid.Column>
                         <Grid.Column width={8}>
                             <Segment inverted color="blue">
@@ -274,8 +306,7 @@ class BookRoomModal extends React.Component {
                                            disabled={bookingBlocked} />
                                 </Form>
                             </Segment>
-                            {conflictsExist &&
-                                this.renderBookingConstraints(Object.values(availability.conflicts))}
+                            {conflictsExist && this.renderBookingConstraints(Object.values(availability.conflicts))}
                             {this.renderBookingState(bookingState)}
                         </Grid.Column>
                     </Grid>
@@ -289,7 +320,16 @@ class BookRoomModal extends React.Component {
                         ? Translate.string('Close')
                         : Translate.string("I've changed my mind!"))}
                             onClick={this.onClose} />
-
+                    <Modal open={bookingConflictsVisible}
+                           onClose={() => this.setState({bookingConflictsVisible: false})}
+                           size="large" closeIcon>
+                        <Modal.Header>
+                            <Translate>Bookings</Translate>
+                        </Modal.Header>
+                        <Modal.Content scrolling>
+                            {availability && this.renderRoomTimeline(availability)}
+                        </Modal.Content>
+                    </Modal>
                 </Modal.Actions>
             </Modal>
         );

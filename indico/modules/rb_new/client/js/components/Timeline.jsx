@@ -157,7 +157,7 @@ export default class Timeline extends React.Component {
 
             rows = dateRange.map((dt) => {
                 const av = {
-                    candidates: roomAvailability.candidates[dt] || [],
+                    candidates: roomAvailability.candidates[dt].map((cand) => ({...cand, bookable: true})) || [],
                     preBookings: roomAvailability.pre_bookings[dt] || [],
                     bookings: roomAvailability.bookings[dt] || [],
                     conflicts: roomAvailability.conflicts[dt] || [],
@@ -166,13 +166,14 @@ export default class Timeline extends React.Component {
                 return {availability: av, label: dt, conflictIndicator: true, id: dt, room};
             });
         } else {
+            const dt = activeDate.format('YYYY-MM-DD');
             rows = Object.values(availability).map((roomAvailability) => {
                 const av = {
-                    candidates: roomAvailability.candidates[activeDate.format('YYYY-MM-DD')] || [],
-                    preBookings: roomAvailability.pre_bookings[activeDate.format('YYYY-MM-DD')] || [],
-                    bookings: roomAvailability.bookings[activeDate.format('YYYY-MM-DD')] || [],
-                    conflicts: roomAvailability.conflicts[activeDate.format('YYYY-MM-DD')] || [],
-                    preConflicts: roomAvailability.pre_conflicts[activeDate.format('YYYY-MM-DD')] || []
+                    candidates: roomAvailability.candidates[dt].map((cand) => ({...cand, bookable: true})) || [],
+                    preBookings: roomAvailability.pre_bookings[dt] || [],
+                    bookings: roomAvailability.bookings[dt] || [],
+                    conflicts: roomAvailability.conflicts[dt] || [],
+                    preConflicts: roomAvailability.pre_conflicts[dt] || []
                 };
 
                 const room = roomAvailability.room;
@@ -186,8 +187,6 @@ export default class Timeline extends React.Component {
                 <div styleName="timeline">
                     <TimelineContent rows={rows}
                                      hourSeries={hourSeries}
-                                     minHour={minHour}
-                                     maxHour={maxHour}
                                      recurrenceType={recurrenceType}
                                      openModal={this.openBookingModal} />
                 </div>

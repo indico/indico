@@ -28,8 +28,6 @@ import './TimelineContent.module.scss';
 
 export default class TimelineContent extends React.Component {
     static propTypes = {
-        minHour: PropTypes.number.isRequired,
-        maxHour: PropTypes.number.isRequired,
         step: PropTypes.number,
         rows: PropTypes.array.isRequired,
         hourSeries: PropTypes.array.isRequired,
@@ -46,7 +44,9 @@ export default class TimelineContent extends React.Component {
     };
 
     renderTimelineRow = ({availability, label, conflictIndicator, id, room}) => {
-        const {minHour, maxHour, step, recurrenceType, openModal, longLabel} = this.props;
+        const {hourSeries, step, recurrenceType, openModal, longLabel} = this.props;
+        const minHour = hourSeries[0];
+        const maxHour = hourSeries[hourSeries.length - 1];
         const columns = ((maxHour - minHour) / step) + 1;
         // TODO: Consider plan B (availability='alternatives') option when implemented
         const hasConflicts = !(_.isEmpty(availability.conflicts) && _.isEmpty(availability.preConflicts));
@@ -57,7 +57,6 @@ export default class TimelineContent extends React.Component {
                                   longLabel={longLabel} />
                 <div styleName="timeline-row-content" style={{flex: columns}}>
                     <TimelineItem step={step} startHour={minHour} endHour={maxHour} data={availability}
-                                  bookable={!hasConflicts}
                                   onClick={() => {
                                       if (openModal && (!hasConflicts || recurrenceType !== 'single')) {
                                           openModal(room);

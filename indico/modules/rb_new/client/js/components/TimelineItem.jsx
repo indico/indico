@@ -38,12 +38,10 @@ export default class TimelineItem extends React.Component {
         endHour: PropTypes.number.isRequired,
         step: PropTypes.number.isRequired,
         data: PropTypes.object.isRequired,
-        bookable: PropTypes.bool,
         onClick: PropTypes.func
     };
 
     static defaultProps = {
-        bookable: false,
         onClick: null
     };
 
@@ -72,8 +70,8 @@ export default class TimelineItem extends React.Component {
     };
 
     renderOccurrence = (occurrence, additionalClasses = '') => {
-        const {start_dt: startDt, end_dt: endDt, reservation} = occurrence;
-        const {startHour, endHour, step, bookable, onClick} = this.props;
+        const {start_dt: startDt, end_dt: endDt, reservation, bookable} = occurrence;
+        const {startHour, endHour, step, onClick} = this.props;
         const segmentStartDt = moment(startDt, 'YYYY-MM-DD HH:mm');
         const segmentEndDt = moment(endDt, 'YYYY-MM-DD HH:mm');
         const blockWidth = 100 / (((endHour - startHour) / step) + 1);

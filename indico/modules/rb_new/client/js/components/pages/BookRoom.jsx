@@ -187,6 +187,7 @@ export default class BookRoom extends React.Component {
     );
 
     renderSuggestionText = (room, {time, duration, skip}) => {
+        const {pushState} = this.props;
         return (
             <>
                 {time && this.suggestionTooltip(
@@ -220,8 +221,9 @@ export default class BookRoom extends React.Component {
                     </Message>
                 )}
                 {skip && (
-                    <Message styleName="suggestion-text" size="mini" onClick={() => this.openBookingModal(room)}
-                             warning compact>
+                    <Message styleName="suggestion-text" size="mini" onClick={() => {
+                        pushState(`/book/${room.id}/confirm${history.location.search}`);
+                    }} warning compact>
                         <Message.Header>
                             <Icon name="calendar times" /> {PluralTranslate.string('Skip one day', 'Skip {skip} days', skip, {skip})}
                         </Message.Header>
@@ -310,8 +312,20 @@ export default class BookRoom extends React.Component {
         onModalClose();
     };
 
+    getRoomFromSuggestions = (roomId) => {
+        const {suggestions: {list}} = this.props;
+        if (!list.length) {
+            return;
+        }
+
+        return list.filter((suggestion) => {
+            return suggestion.room.id === parseInt(roomId, 10);
+        })[0].room;
+    };
+
     render() {
         const {rooms: {map: roomMap}, roomDetails, onModalClose} = this.props;
+
         return (
             <Grid columns={2}>
                 <Grid.Column width={11}>
@@ -322,7 +336,7 @@ export default class BookRoom extends React.Component {
                 </Grid.Column>
                 <Route exact path="/book/:roomId/confirm" render={({match: {params: {roomId}}}) => (
                     <BookRoomModal open
-                                   room={roomMap[roomId]}
+                                   room={roomId in roomMap ? roomMap[roomId] : this.getRoomFromSuggestions(roomId)}
                                    onClose={this.closeBookingModal} />
                 )} />
                 <Route exact path="/book/:roomId/details" render={({match: {params: {roomId}}}) => (
