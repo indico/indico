@@ -62,7 +62,7 @@ export const history = createHistory({
 const qsReducer = createQueryStringReducer(
     queryFilterRules,
     (state, action) => {
-        if (action.type === '@@INIT') {
+        if (action.type === '@@redux/INIT') {
             return {
                 namespace: pathMatch({
                     '^/book': 'bookRoom',
