@@ -17,7 +17,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Button, Grid, Modal, Header, Message, List, Icon} from 'semantic-ui-react';
+import {Button, Grid, Modal, Header, Message, List} from 'semantic-ui-react';
 
 import {Translate, Param} from 'indico/react/i18n';
 import {RoomBasicDetails} from '../RoomBasicDetails';
@@ -83,16 +83,11 @@ function RoomDetails({room}) {
                 </Grid.Column>
                 <Grid.Column>
                     <Header><Translate>Usage</Translate></Header>
-                    {!_.isEmpty(room.bookings) ? (
-                        <TimelineContent rows={room.bookings}
-                                         hourSeries={hourSeries}
-                                         longLabel />
-                    ) : (
-                        <Message info>
-                            <Icon name="info" size="large" />
-                            <Translate>No recent usage of this room</Translate>
-                        </Message>
-                    )}
+                    <TimelineContent rows={room.bookings}
+                                     hourSeries={hourSeries}
+                                     minHour={minHour}
+                                     maxHour={maxHour}
+                                     longLabel />
                     <Header><Translate>Statistics</Translate></Header>
                 </Grid.Column>
             </Grid>

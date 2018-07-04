@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from datetime import datetime, time, timedelta
+from datetime import date, datetime, time, timedelta
 from operator import itemgetter
 
 from flask import jsonify, request, session
@@ -37,7 +37,7 @@ from indico.modules.rb_new.util import (get_buildings, get_equipment_types, get_
                                         get_rooms_availability, get_suggestions, group_by_occurrence_date,
                                         has_managed_rooms, search_for_rooms, serialize_occurrences)
 from indico.modules.users.models.users import User
-from indico.util.date_time import now_utc
+from indico.util.date_time import iterdays
 from indico.util.i18n import _
 from indico.web.util import jsonify_data
 
@@ -88,15 +88,18 @@ class RHRoomDetails(RHRoomBookingBase):
 
     def _process(self):
         room_details = room_details_schema.dump(self.room).data
-        last_bookings = get_existing_room_occurrences(self.room, now_utc().date(), now_utc().date() + timedelta(days=5),
-                                                      only_accepted=True)
+        start_dt = date.today()
+        end_dt = start_dt + timedelta(days=4)
+        last_bookings = group_by_occurrence_date(get_existing_room_occurrences(self.room, start_dt, end_dt,
+                                                                               only_accepted=True))
+        range_bookings = {day.date(): last_bookings.get(day.date()) for day in iterdays(start_dt, end_dt)}
         bookings = [
             {
-                'availability': {'usage': bookings},
-                'label': date,
+                'availability': {'usage': bookings or []},
+                'label': dt,
                 'conflictIndicator': False,
-                'id': date
-            } for date, bookings in serialize_occurrences(group_by_occurrence_date(last_bookings)).iteritems()
+                'id': dt
+            } for dt, bookings in serialize_occurrences(range_bookings).iteritems()
         ]
 
         room_details['bookings'] = sorted(bookings, key=itemgetter('id'))
