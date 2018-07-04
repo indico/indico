@@ -144,6 +144,10 @@ class RHTimeline(RHRoomBookingBase):
             data['room'] = rooms_schema.dump(data['room'], many=False).data
             data.update({k: serialize_occurrences(data[k])
                          for k in ['candidates', 'pre_bookings', 'bookings', 'conflicts', 'pre_conflicts']})
+            data.update({
+                'num_days_available': len(date_range) - len(data['conflicts']),
+                'all_days_available': not data['conflicts']
+            })
         return jsonify_data(flash=False, availability=availability, date_range=date_range)
 
 
