@@ -30,7 +30,8 @@ const classes = {
     bookings: 'booking',
     conflicts: 'conflict',
     blockings: 'blocking',
-    nonbookablePeriods: 'nonbookable-period',
+    nonbookablePeriods: 'unbookable-periods',
+    unbookableHours: 'unbookable-hours',
 };
 
 
@@ -73,11 +74,15 @@ export default class TimelineItem extends React.Component {
 
     renderOccurrence = (occurrence, additionalClasses = '') => {
         let segmentStartDt, segmentEndDt, popupContent;
-        const {start_dt: startDt, end_dt: endDt, reservation, reason, bookable} = occurrence;
+        const {start_dt: startDt, end_dt: endDt, start_time: startTime, end_time: endTime,
+               reservation, reason, bookable} = occurrence;
         const {startHour, endHour, step, onClick} = this.props;
         if (additionalClasses === 'blocking') {
             segmentStartDt = moment(startHour, 'HH:mm');
             segmentEndDt = moment(endHour, 'HH:mm');
+        } else if (additionalClasses === 'unbookable-hours') {
+            segmentStartDt = moment(startTime, 'HH:mm');
+            segmentEndDt = moment(endTime, 'HH:mm');
         } else {
             segmentStartDt = moment(startDt, 'YYYY-MM-DD HH:mm');
             segmentEndDt = moment(endDt, 'YYYY-MM-DD HH:mm');
@@ -87,18 +92,29 @@ export default class TimelineItem extends React.Component {
         const segmentPosition = this.calculatePosition(segmentStartDt) * blockWidth;
         if (additionalClasses === 'blocking') {
             popupContent = (
-                <div>{Translate.string('Room blocked: {reason}', {reason})}</div>
+                <div styleName="popup">{Translate.string('Room blocked: {reason}', {reason})}</div>
+            );
+        } else if (additionalClasses === 'unbookable-periods') {
+            popupContent = (
+                <div styleName="popup">{Translate.string('Not possible to book in this period')}</div>
+            );
+        } else if (additionalClasses === 'unbookable-hours') {
+            popupContent = (
+                <div styleName="popup">
+                    <div>{Translate.string('Not possible to book between:')}</div>
+                    <div>{segmentStartDt.format('HH:mm')} - {segmentEndDt.format('HH:mm')}</div>
+                </div>
             );
         } else {
             popupContent = (
-                <>
+                <div styleName="popup">
                     <div>
                         {segmentStartDt.format('HH:mm')} - {segmentEndDt.format('HH:mm')}
                     </div>
                     <div>
                         {reservation ? reservation.booking_reason : (bookable ? Translate.string('Click to book it') : '')}
                     </div>
-                </>
+                </div>
             );
         }
 

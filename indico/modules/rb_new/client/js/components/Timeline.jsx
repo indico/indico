@@ -131,7 +131,7 @@ export default class Timeline extends React.Component {
                     <Label color="red">{Translate.string('Conflict')}</Label>
                     <Label styleName="pre-booking-conflict">{Translate.string('Conflict with Pre-Booking')}</Label>
                     <Label styleName="blocking">{Translate.string('Blocked')}</Label>
-                    <Label styleName="nonbookable-period">{Translate.string('Not bookable')}</Label>
+                    <Label styleName="unbookable">{Translate.string('Not bookable')}</Label>
                 </Label.Group>
                 {Object.keys(availability).length > 1 && (
                     <Button.Group floated="right" size="small">
@@ -156,11 +156,25 @@ export default class Timeline extends React.Component {
         );
     };
 
+    invertHours = (hours) => {
+        const invertedHours = [];
+        const first = {start_time: '00:00', end_time: hours[0].data.start_time};
+        invertedHours.push(first);
+        for (let i = 1; i < hours.length; i++) {
+            const hour = {start_time: hours[i - 1].data.end_time, end_time: hours[i].data.start_time};
+            invertedHours.push(hour);
+        }
+        const last = {start_time: hours[hours.length - 1].data.end_time, end_time: '23:59'};
+        invertedHours.push(last);
+        return invertedHours;
+    };
+
     renderTimeline = () => {
         const {activeDate} = this.state;
         const {minHour, maxHour, step, availability, recurrenceType, dateRange} = this.props;
         const hourSeries = _.range(minHour, maxHour + step, step);
-
+        const unbookableHours = (availability.bookable_hours && availability.bookable_hours.length > 0)
+            ? this.invertHours(availability.bookable_hours) : [];
         let rows = [];
         if (Object.keys(availability).length === 1) {
             const roomId = Object.keys(availability)[0];
@@ -175,7 +189,8 @@ export default class Timeline extends React.Component {
                     conflicts: roomAvailability.conflicts[dt] || [],
                     preConflicts: roomAvailability.pre_conflicts[dt] || [],
                     blockings: roomAvailability.blockings[dt] || [],
-                    nonbookablePeriods: roomAvailability.nonbookable_periods[dt] || []
+                    nonbookablePeriods: roomAvailability.nonbookable_periods[dt] || [],
+                    unbookableHours
                 };
                 return {availability: av, label: dt, conflictIndicator: true, id: dt, room};
             });
@@ -189,7 +204,8 @@ export default class Timeline extends React.Component {
                     conflicts: roomAvailability.conflicts[dt] || [],
                     preConflicts: roomAvailability.pre_conflicts[dt] || [],
                     blockings: roomAvailability.blockings[dt] || [],
-                    nonbookablePeriods: roomAvailability.nonbookable_periods[dt] || []
+                    nonbookablePeriods: roomAvailability.nonbookable_periods[dt] || [],
+                    unbookableHours
                 };
 
                 const room = roomAvailability.room;

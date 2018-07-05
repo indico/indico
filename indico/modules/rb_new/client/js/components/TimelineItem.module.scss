@@ -31,7 +31,7 @@
         cursor: pointer;
         position: absolute;
         padding: 0.7em;
-        z-index: 2;
+        z-index: 3;
         border-radius: 0;
         border: 0.5px solid rgba(0, 0, 0, 0.2);
 
@@ -61,6 +61,18 @@
             background-size: 35px 35px;
         }
 
+        &:global(.unbookable-periods) {
+            background-color: lighten($sui-grey, 40%);
+            z-index: 2;
+            height: 30px;
+        }
+
+        &:global(.unbookable-hours) {
+            background-color: lighten($sui-grey, 40%);
+            z-index: 1;
+            height: 30px;
+        }
+
         &:global(.blocking) {
             @include thin-stripes($blocking-stripe-colors...);
             background-size: 30px 30px;
@@ -68,9 +80,9 @@
             border: 1px solid darken($light-red, 10%);
             height: 30px;
         }
-
-        &:global(.nonbookable-period) {
-            background-color: $sui-grey;
-        }
     }
 }
+
+.popup {
+    align-items: center;
+ }
