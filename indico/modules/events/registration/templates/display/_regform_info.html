@@ -2,21 +2,37 @@
 
 {% macro render_regform_info(regform) %}
     <div class="infogrid condensed">
-        {% if regform.is_scheduled %}
+        {% if regform.is_scheduled and (not regform.has_started or regform.end_dt) %}
             <div class="infoline date">
                 <i class="icon icon-time"></i>
                 <div class="text">
                     <div>
-                        <span class="label">
-                            {% trans %}From{% endtrans %}
-                        </span>
-                        <span class="datetime">
-                            {{ regform.start_dt|format_date(timezone=regform.event.tzinfo) }}
-                        </span>
+                        {% if regform.is_open %}
+                            <span class="label">
+                                {% trans %}Registration is open{% endtrans %}
+                            </span>
+                        {% else %}
+                            <span class="label">
+                                {% if regform.has_ended %}
+                                    {% trans %}Opened{% endtrans %}
+                                {% else %}
+                                    {% trans %}Opens{% endtrans %}
+                                {% endif %}
+                            </span>
+                            <span class="datetime">
+                                {{ regform.start_dt|format_date(timezone=regform.event.tzinfo) }}
+                            </span>
+                        {% endif %}
                     </div>
                     <div>
                         <span class="label">
-                            {% trans %}To{% endtrans %}
+                            {% if regform.is_open %}
+                                {% trans %}Deadline{% endtrans %}
+                            {% elif regform.has_ended %}
+                                {% trans %}Closed{% endtrans %}
+                            {% else %}
+                                {% trans %}Closes{% endtrans %}
+                            {% endif %}
                         </span>
                         <span class="datetime">
                             {% if regform.end_dt %}
