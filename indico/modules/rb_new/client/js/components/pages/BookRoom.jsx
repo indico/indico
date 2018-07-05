@@ -22,7 +22,7 @@ import React from 'react';
 import _ from 'lodash';
 import {Route} from 'react-router-dom';
 import {Button, Card, Dimmer, Grid, Header, Icon, Label, Loader, Message, Popup, Sticky} from 'semantic-ui-react';
-import {Slot, toClasses} from 'indico/react/util';
+import {Preloader, Slot, toClasses} from 'indico/react/util';
 import {PluralTranslate, Translate, Singular, Param, Plural} from 'indico/react/i18n';
 import mapControllerFactory from '../../containers/MapController';
 import RoomSearchPane from '../RoomSearchPane';
@@ -32,8 +32,7 @@ import searchBoxFactory from '../../containers/SearchBar';
 import Room from '../../containers/Room';
 import Timeline from '../../containers/Timeline';
 import BookRoomModal from '../../containers/BookRoomModal';
-import RoomDetailsModal from '../modals/RoomDetailsModal';
-import {history} from '../../store';
+import roomDetailsModalFactory from '../modals/RoomDetailsModal';
 
 import './BookRoom.module.scss';
 
@@ -41,6 +40,7 @@ import './BookRoom.module.scss';
 const FilterBar = filterBarFactory('bookRoom', BookingFilterBar);
 const SearchBar = searchBoxFactory('bookRoom');
 const MapController = mapControllerFactory('bookRoom');
+const RoomDetailsModal = roomDetailsModalFactory('bookRoom');
 
 
 export default class BookRoom extends React.Component {
@@ -63,7 +63,6 @@ export default class BookRoom extends React.Component {
         fetchRoomDetails: PropTypes.func.isRequired,
         resetBookingState: PropTypes.func.isRequired,
         suggestions: PropTypes.object.isRequired,
-        onModalClose: PropTypes.func.isRequired,
         pushState: PropTypes.func.isRequired
     };
 
@@ -87,13 +86,13 @@ export default class BookRoom extends React.Component {
         const bookingModalBtn = (
             <Button positive icon="check" circular onClick={() => {
                 // open confirm dialog, keep same filtering parameters
-                pushState(`/book/${id}/confirm${history.location.search}`);
+                pushState(`/book/${id}/confirm`, true);
             }} />
         );
         const showDetailsBtn = (
             <Button primary icon="search" circular onClick={() => {
                 fetchRoomDetails(id);
-                pushState(`/book/${id}/details${history.location.search}`);
+                pushState(`/book/${id}/details`, true);
             }} />
         );
         return (
@@ -222,7 +221,7 @@ export default class BookRoom extends React.Component {
                 )}
                 {skip && (
                     <Message styleName="suggestion-text" size="mini" onClick={() => {
-                        pushState(`/book/${room.id}/confirm${history.location.search}`);
+                        pushState(`/book/${room.id}/confirm`, true);
                     }} warning compact>
                         <Message.Header>
                             <Icon name="calendar times" /> {PluralTranslate.string('Skip one day', 'Skip {skip} days', skip, {skip})}
@@ -309,25 +308,29 @@ export default class BookRoom extends React.Component {
     };
 
     closeBookingModal = () => {
-        const {onModalClose, resetBookingState} = this.props;
+        const {resetBookingState} = this.props;
         resetBookingState();
-        onModalClose();
+        this.closeModal();
     };
 
-    getRoomFromSuggestions = (roomId) => {
-        const {suggestions: {list}} = this.props;
-        if (!list.length) {
-            return;
-        }
-
-        return list.filter((suggestion) => {
-            return suggestion.room.id === parseInt(roomId, 10);
-        })[0].room;
+    closeModal = () => {
+        const {pushState} = this.props;
+        pushState(`/book`, true);
     };
+
+    roomPreloader(componentFunc) {
+        const {fetchRoomDetails} = this.props;
+        return ({match: {params: {roomId}}}) => (
+            <Preloader checkCached={({roomDetails: {rooms: cachedRooms}}) => !!cachedRooms[roomId]}
+                       action={() => fetchRoomDetails(roomId)}
+                       dimmer={<Dimmer page />}>
+                {() => componentFunc(roomId)}
+            </Preloader>
+        );
+    }
 
     render() {
-        const {rooms: {map: roomMap}, roomDetails, onModalClose} = this.props;
-
+        const {roomDetails} = this.props;
         return (
             <Grid columns={2}>
                 <Grid.Column width={11}>
@@ -336,15 +339,15 @@ export default class BookRoom extends React.Component {
                 <Grid.Column width={5}>
                     <MapController />
                 </Grid.Column>
-                <Route exact path="/book/:roomId/confirm" render={({match: {params: {roomId}}}) => (
+                <Route exact path="/book/:roomId/confirm" render={this.roomPreloader((roomId) => (
                     <BookRoomModal open
-                                   room={roomId in roomMap ? roomMap[roomId] : this.getRoomFromSuggestions(roomId)}
+                                   room={roomDetails.rooms[roomId]}
                                    onClose={this.closeBookingModal} />
-                )} />
-                <Route exact path="/book/:roomId/details" render={({match: {params: {roomId}}}) => (
+                ))} />
+                <Route exact path="/book/:roomId/details" render={this.roomPreloader((roomId) => (
                     <RoomDetailsModal roomDetails={roomDetails.rooms[roomId]}
-                                      onClose={onModalClose} />
-                )} />
+                                      onClose={this.closeModal} />
+                ))} />
             </Grid>
         );
     }

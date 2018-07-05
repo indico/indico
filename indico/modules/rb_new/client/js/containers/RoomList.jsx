@@ -16,16 +16,21 @@
  */
 
 import {connect} from 'react-redux';
-import {goBack, push} from 'connected-react-router';
+import {stateToQueryString} from 'redux-router-querystring';
 
 import RoomList from '../components/pages/RoomList';
 import {fetchMapRooms, fetchRoomDetails, fetchRooms} from '../actions';
+import {queryString as queryStringSerializer} from '../serializers/filters';
+import {pushStateMergeProps} from '../util';
 
 
-const mapStateToProps = ({roomList, roomDetails}) => ({
-    ...roomList,
-    roomDetails
-});
+const mapStateToProps = ({roomList, roomDetails}) => {
+    return {
+        ...roomList,
+        roomDetails,
+        queryString: stateToQueryString(roomList, queryStringSerializer)
+    };
+};
 
 const mapDispatchToProps = dispatch => ({
     fetchRooms: (clear = true) => {
@@ -35,15 +40,11 @@ const mapDispatchToProps = dispatch => ({
     fetchRoomDetails: (id) => {
         dispatch(fetchRoomDetails(id));
     },
-    onModalClose() {
-        dispatch(goBack());
-    },
-    pushState(url) {
-        dispatch(push(url));
-    }
+    dispatch
 });
 
 export default connect(
     mapStateToProps,
-    mapDispatchToProps
+    mapDispatchToProps,
+    pushStateMergeProps
 )(RoomList);

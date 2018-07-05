@@ -18,15 +18,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Button, Grid, Modal, Header, Message, List} from 'semantic-ui-react';
+import {connect} from 'react-redux';
 
 import {Translate, Param} from 'indico/react/i18n';
-import {RoomBasicDetails} from '../RoomBasicDetails';
 
+import {RoomBasicDetails} from '../RoomBasicDetails';
 import TimelineContent from '../TimelineContent';
+
 import './RoomDetailsModal.module.scss';
 
 
-export default class RoomDetailsModal extends React.Component {
+class RoomDetailsModal extends React.Component {
     static propTypes = {
         roomDetails: PropTypes.object,
         onClose: PropTypes.func
@@ -62,6 +64,21 @@ export default class RoomDetailsModal extends React.Component {
         );
     }
 }
+
+export default (namespace) => {
+    const mapStateToProps = state => ({
+        equipmentTypes: state.equipment.types,
+        ...state[namespace].filters,
+        hasOwnedRooms: state.user.hasOwnedRooms,
+        hasFavoriteRooms: Object.values(state.user.favoriteRooms).some(fr => fr),
+        namespace
+    });
+
+    return connect(
+        mapStateToProps,
+        null
+    )(RoomDetailsModal);
+};
 
 function RoomDetails({room}) {
     const minHour = 6;

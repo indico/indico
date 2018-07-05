@@ -15,8 +15,9 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import moment from 'moment';
+import {push} from 'connected-react-router';
 import LatLon from 'geodesy/latlon-vectors';
+import moment from 'moment';
 
 
 export function toMoment(dt, format) {
@@ -159,3 +160,15 @@ function _pruneNullLeaves(obj) {
         }
     }));
 }
+
+export const pushStateMergeProps = (stateProps, dispatchProps, ownProps) => ({
+    ...ownProps,
+    ...stateProps,
+    ...dispatchProps,
+    pushState(url, restoreQueryString = false) {
+        if (restoreQueryString) {
+            url += `?${stateProps.queryString}`;
+        }
+        dispatchProps.dispatch(push(url));
+    }
+});

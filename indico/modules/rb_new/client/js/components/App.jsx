@@ -64,12 +64,12 @@ export default class App extends React.Component {
                     <div styleName="rb-content">
                         <Switch>
                             <Route exact path="/" render={() => <Redirect to="/book" />} />
-                            <Route path="/book" render={({location}) => (
+                            <Route path="/book" render={({location, match: {isExact}}) => (
                                 filtersSet
                                     ? (
                                         <BookRoom location={location} />
                                     ) : (
-                                        <Landing />
+                                        isExact ? <Landing /> : <Redirect to="/book" />
                                     )
                             )} />
                             <Route path="/rooms" component={RoomList} />

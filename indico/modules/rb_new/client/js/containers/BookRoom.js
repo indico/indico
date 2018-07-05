@@ -15,8 +15,9 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 import {connect} from 'react-redux';
-import {goBack, push} from 'connected-react-router';
+import {stateToQueryString} from 'redux-router-querystring';
 
+import {queryString as queryStringSerializer} from '../serializers/filters';
 import BookRoom from '../components/pages/BookRoom';
 import {
     fetchRooms,
@@ -26,9 +27,16 @@ import {
     fetchRoomDetails,
     resetBookingState
 } from '../actions';
+import {pushStateMergeProps} from '../util';
 
 
-const mapStateToProps = ({bookRoom, roomDetails}) => ({...bookRoom, roomDetails});
+const mapStateToProps = ({bookRoom, roomDetails}) => {
+    return {
+        ...bookRoom,
+        roomDetails,
+        queryString: stateToQueryString(bookRoom, queryStringSerializer)
+    };
+};
 
 const mapDispatchToProps = dispatch => ({
     clearRoomList() {
@@ -52,15 +60,11 @@ const mapDispatchToProps = dispatch => ({
         dispatch(fetchRooms('bookRoom'));
         dispatch(fetchMapRooms('bookRoom'));
     },
-    onModalClose() {
-        dispatch(goBack());
-    },
-    pushState(url) {
-        dispatch(push(url));
-    }
+    dispatch
 });
 
 export default connect(
     mapStateToProps,
-    mapDispatchToProps
+    mapDispatchToProps,
+    pushStateMergeProps
 )(BookRoom);

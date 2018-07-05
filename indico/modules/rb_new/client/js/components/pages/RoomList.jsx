@@ -29,13 +29,13 @@ import filterBarFactory from '../../containers/FilterBar';
 import searchBarFactory from '../../containers/SearchBar';
 import mapControllerFactory from '../../containers/MapController';
 import Room from '../../containers/Room';
-import RoomDetailsModal from '../modals/RoomDetailsModal';
-import {history} from '../../store';
+import roomDetailsModalFactory from '../modals/RoomDetailsModal';
 
 
 const FilterBar = filterBarFactory('roomList', RoomFilterBar);
 const SearchBar = searchBarFactory('roomList');
 const MapController = mapControllerFactory('roomList');
+const RoomDetailsModal = roomDetailsModalFactory('roomList');
 
 
 export default class RoomList extends React.Component {
@@ -50,17 +50,15 @@ export default class RoomList extends React.Component {
             list: PropTypes.array,
             isFetching: PropTypes.bool,
         }).isRequired,
-        onModalClose: PropTypes.func.isRequired,
-        pushState: PropTypes.func.isRequired
+        pushState: PropTypes.func.isRequired,
     };
 
     renderRoom = (room) => {
         const {id} = room;
-        const {fetchRoomDetails, pushState} = this.props;
+        const {pushState} = this.props;
         const showDetailsBtn = (
             <Button primary icon="search" circular onClick={() => {
-                fetchRoomDetails(id);
-                pushState(`/rooms/${id}/details${history.location.search}`);
+                pushState(`/rooms/${id}/details`);
             }} />
         );
 
@@ -73,12 +71,15 @@ export default class RoomList extends React.Component {
         );
     };
 
+    closeBookingModal = () => {
+        const {pushState} = this.props;
+        pushState('/rooms', true);
+    };
+
     roomPreloader(componentFunc) {
         const {fetchRoomDetails} = this.props;
         return ({match: {params: {roomId}}}) => (
-            <Preloader checkCached={({roomDetails: {rooms: cachedRooms}}) => {
-                return !!cachedRooms[roomId];
-            }}
+            <Preloader checkCached={({roomDetails: {rooms: cachedRooms}}) => !!cachedRooms[roomId]}
                        action={() => fetchRoomDetails(roomId)}
                        dimmer={<Dimmer page />}>
                 {() => componentFunc(roomId)}
@@ -87,7 +88,7 @@ export default class RoomList extends React.Component {
     }
 
     render() {
-        const {rooms, fetchRooms, onModalClose, roomDetails} = this.props;
+        const {rooms, fetchRooms, roomDetails} = this.props;
         return (
             <Grid columns={2}>
                 <Grid.Column width={11}>
@@ -107,7 +108,7 @@ export default class RoomList extends React.Component {
                 </Grid.Column>
                 <Route exact path="/rooms/:roomId/details" render={this.roomPreloader((roomId) => (
                     <RoomDetailsModal roomDetails={roomDetails.rooms[roomId]}
-                                      onClose={onModalClose} />
+                                      onClose={this.closeBookingModal} />
                 ))} />
             </Grid>
         );
