@@ -119,7 +119,7 @@ export default class TimelineItem extends React.Component {
         }
 
         const segment = (
-            <div className={additionalClasses} onClick={onClick && !reservation && !reason ? onClick : null}
+            <div className={additionalClasses} onClick={onClick && additionalClasses === 'default' ? onClick : null}
                  styleName="timeline-occurrence"
                  style={{left: `${segmentPosition}%`, width: `calc(${segmentWidth}% + 1px)`}} />
         );
