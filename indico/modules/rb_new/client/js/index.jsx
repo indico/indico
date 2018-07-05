@@ -50,6 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    store.dispatch({type: '@@indico/INIT'});
     setupUserMenu(document.getElementById('indico-user-menu-container'), store);
 
     ReactDOM.render(
