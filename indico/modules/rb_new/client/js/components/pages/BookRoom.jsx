@@ -255,29 +255,31 @@ export default class BookRoom extends React.Component {
         });
         const classes = toClasses({active: view === 'timeline', disabled: !timelineDataAvailable});
 
-        const listIcon = (
-            <Icon size="big" className={toClasses({active: view === 'book'})} name="grid layout"
-                  onClick={() => this.setState({view: 'book', timelineRef: null})} />
+        const listBtn = (
+            <Button icon={<Icon name="grid layout" styleName="switcher-icon" />}
+                    className={toClasses({active: view === 'book'})}
+                    onClick={() => this.setState({view: 'book', timelineRef: null})} circular />
         );
-        const timelineIcon = <Icon name="calendar outline" disabled={!timelineDataAvailable} />;
+        const timelineBtn = (
+            <Button icon={<Icon name="calendar outline" styleName="switcher-icon" disabled={!timelineDataAvailable} />}
+                    className={classes} circular />
+        );
         return (
             <Grid.Column width={3} styleName="view-icons" textAlign="right" verticalAlign="middle">
                 <div ref={(ref) => this.handleContextRef(ref, 'switcherRef')} styleName="view-icons-context">
                     <Sticky context={switcherRef} offset={30}>
-                        <span>
+                        <span styleName="icons-wrapper">
                             {view === 'timeline'
-                                ? <Popup trigger={listIcon} content={Translate.string('List view')} />
-                                : listIcon
+                                ? <Popup trigger={listBtn} content={Translate.string('List view')} />
+                                : listBtn
                             }
-                            <Icon.Group size="big"
-                                        className={classes}
-                                        onClick={this.switchToTimeline}>
+                            <Icon.Group onClick={this.switchToTimeline}>
                                 {view === 'book'
-                                    ? <Popup trigger={timelineIcon} content={Translate.string('Timeline view')} />
-                                    : timelineIcon
+                                    ? <Popup trigger={timelineBtn} content={Translate.string('Timeline view')} />
+                                    : timelineBtn
                                 }
                                 {hasConflicts && (
-                                    <Icon name="exclamation triangle" color="red" corner />
+                                    <Icon name="exclamation triangle" styleName="conflicts-icon" color="red" corner />
                                 )}
                             </Icon.Group>
                         </span>
