@@ -56,7 +56,7 @@ export const initialStateFactory = (namespace) => {
 };
 
 function mergeFilter(filters, param, data) {
-    const newFilters = Object.assign({}, filters, {[param]: data});
+    const newFilters = {...filters, [param]: data};
     if (param === 'recurrence') {
         sanitizeRecurrence(newFilters);
     } else if (param === 'text') {

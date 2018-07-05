@@ -33,7 +33,7 @@ function mergeRooms(state, action) {
     return {
         total,
         list: clear ? newList : oldList.concat(newList),
-        map: clear ? newMap : Object.assign({}, oldMap, newMap)
+        map: clear ? newMap : {...oldMap, ...newMap}
     };
 }
 
