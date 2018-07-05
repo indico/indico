@@ -92,22 +92,22 @@ export default class TimelineItem extends React.Component {
         const segmentPosition = this.calculatePosition(segmentStartDt) * blockWidth;
         if (additionalClasses === 'blocking') {
             popupContent = (
-                <div styleName="popup">{Translate.string('Room blocked: {reason}', {reason})}</div>
+                <div styleName="popup-center">{Translate.string('Room blocked: {reason}', {reason})}</div>
             );
         } else if (additionalClasses === 'unbookable-periods') {
             popupContent = (
-                <div styleName="popup">{Translate.string('Not possible to book in this period')}</div>
+                <div styleName="popup-center">{Translate.string('Not possible to book in this period')}</div>
             );
         } else if (additionalClasses === 'unbookable-hours') {
             popupContent = (
-                <div styleName="popup">
+                <div styleName="popup-center">
                     <div>{Translate.string('Not possible to book between:')}</div>
                     <div>{segmentStartDt.format('HH:mm')} - {segmentEndDt.format('HH:mm')}</div>
                 </div>
             );
         } else {
             popupContent = (
-                <div styleName="popup">
+                <div styleName="popup-center">
                     <div>
                         {segmentStartDt.format('HH:mm')} - {segmentEndDt.format('HH:mm')}
                     </div>
