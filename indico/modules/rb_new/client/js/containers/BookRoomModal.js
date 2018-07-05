@@ -17,21 +17,30 @@
 import {connect} from 'react-redux';
 
 import BookRoomModal from '../components/modals/BookRoomModal';
-import {createBooking} from '../actions';
+import {createBooking, fetchBookingAvailability} from '../actions';
 
 
 const mapStateToProps = ({
-    bookRoom: {filters: {recurrence, dates, timeSlot}, timeline: {availability, dateRange}}, form, user
-}, {room}) => ({
-    bookingData: {recurrence, dates, timeSlot, room},
-    bookingState: form.roomModal && form.roomModal.bookingState,
-    availability: room && availability[room.id],
-    dateRange,
+    bookRoom: {filters: {recurrence, dates, timeSlot}},
+    form: {roomModal},
     user
-});
+}, {room}) => {
+    const bookingState = roomModal && roomModal.bookingState;
+    const timeline = bookingState && bookingState.timeline;
+    return {
+        bookingData: {recurrence, dates, timeSlot, room},
+        bookingState,
+        user,
+        availability: timeline && timeline.availability,
+        dateRange: timeline && timeline.dateRange
+    };
+};
 
-const mapDispatchToProps = dispatch => ({
-    onSubmit: ({reason, usage, user, isPrebooking}, __, {bookingData: {recurrence, dates, timeSlot, room}}) => {
+const mapDispatchToProps = (dispatch) => ({
+    onSubmit: (
+        {reason, usage, user, isPrebooking},
+        __,
+        {bookingData: {recurrence, dates, timeSlot, room: roomData}}) => {
         dispatch(createBooking({
             reason,
             usage,
@@ -39,13 +48,28 @@ const mapDispatchToProps = dispatch => ({
             recurrence,
             dates,
             timeSlot,
-            room,
+            room: roomData,
             isPrebooking
         }));
-    }
+    },
+    dispatch
 });
+
+const mergeProps = (stateProps, dispatchProps, ownProps) => {
+    const {bookingData: {room, ...filters}} = stateProps;
+    const {dispatch} = dispatchProps;
+    return {
+        ...stateProps,
+        ...dispatchProps,
+        ...ownProps,
+        fetchAvailability() {
+            dispatch(fetchBookingAvailability(room, filters));
+        }
+    };
+};
 
 export default connect(
     mapStateToProps,
     mapDispatchToProps,
+    mergeProps,
 )(BookRoomModal);

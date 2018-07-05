@@ -22,10 +22,8 @@ import filterReducerFactory from './roomBooking/filters';
 import {mapReducerFactory} from './roomBooking/map';
 
 
-const reducer = combineReducers({
+export default combineReducers({
     rooms: roomsReducerFactory('roomList'),
     filters: filterReducerFactory('roomList'),
-    map: mapReducerFactory('roomList'),
+    map: mapReducerFactory('roomList')
 });
-
-export default reducer;

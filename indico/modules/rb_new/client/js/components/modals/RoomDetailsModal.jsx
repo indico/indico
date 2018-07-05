@@ -15,10 +15,11 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import {push} from 'connected-react-router';
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Button, Grid, Modal, Header, Message, List} from 'semantic-ui-react';
 import {connect} from 'react-redux';
+import {Button, Grid, Icon, Modal, Header, Message, List, Segment} from 'semantic-ui-react';
 
 import {Translate, Param} from 'indico/react/i18n';
 
@@ -31,7 +32,8 @@ import './RoomDetailsModal.module.scss';
 class RoomDetailsModal extends React.Component {
     static propTypes = {
         roomDetails: PropTypes.object,
-        onClose: PropTypes.func
+        onClose: PropTypes.func,
+        bookRoom: PropTypes.func.isRequired
     };
 
     static defaultProps = {
@@ -45,7 +47,7 @@ class RoomDetailsModal extends React.Component {
     };
 
     render() {
-        const {roomDetails} = this.props;
+        const {bookRoom, roomDetails} = this.props;
         if (!roomDetails) {
             return null;
         }
@@ -58,7 +60,7 @@ class RoomDetailsModal extends React.Component {
                     </span>
                 </Modal.Header>
                 <Modal.Content>
-                    <RoomDetails room={roomDetails} />
+                    <RoomDetails room={roomDetails} bookRoom={bookRoom} />
                 </Modal.Content>
             </Modal>
         );
@@ -74,13 +76,23 @@ export default (namespace) => {
         namespace
     });
 
+    const mapDispatchToProps = dispatch => ({
+        bookRoom(room) {
+            if (namespace === 'roomList') {
+                dispatch(push(`/rooms/${room.id}/book`));
+            } else {
+                dispatch(push(`/book/${room.id}/confirm`));
+            }
+        }
+    });
+
     return connect(
         mapStateToProps,
-        null
+        mapDispatchToProps
     )(RoomDetailsModal);
 };
 
-function RoomDetails({room}) {
+function RoomDetails({bookRoom, room}) {
     const minHour = 6;
     const maxHour = 22;
     const step = 2;
@@ -104,6 +116,16 @@ function RoomDetails({room}) {
                                      hourSeries={hourSeries}
                                      longLabel />
                     <Header><Translate>Statistics</Translate></Header>
+                    <Message attached info>
+                        <Icon name="info" />
+                        <Translate>Would you like to use this room?</Translate>
+                    </Message>
+                    <Segment attached="bottom">
+                        <Button color="green" onClick={() => bookRoom(room)}>
+                            <Icon name="check circle" />
+                            <Translate>Book it</Translate>
+                        </Button>
+                    </Segment>
                 </Grid.Column>
             </Grid>
         </div>
@@ -111,6 +133,7 @@ function RoomDetails({room}) {
 }
 
 RoomDetails.propTypes = {
+    bookRoom: PropTypes.func.isRequired,
     room: PropTypes.object.isRequired,
 };
 

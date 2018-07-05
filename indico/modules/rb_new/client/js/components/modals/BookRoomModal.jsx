@@ -60,7 +60,8 @@ class BookRoomModal extends React.Component {
         pristine: PropTypes.bool.isRequired,
         invalid: PropTypes.bool.isRequired,
         availability: PropTypes.object,
-        dateRange: PropTypes.array
+        dateRange: PropTypes.array,
+        fetchAvailability: PropTypes.func.isRequired
     };
 
     static defaultProps = {
@@ -75,6 +76,13 @@ class BookRoomModal extends React.Component {
         skipConflicts: false,
         bookingConflictsVisible: false
     };
+
+    componentDidMount() {
+        const {availability, fetchAvailability} = this.props;
+        if (!availability) {
+            fetchAvailability();
+        }
+    }
 
     renderUserSearchField({input, ...props}) {
         return (

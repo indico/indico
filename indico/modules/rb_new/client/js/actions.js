@@ -82,6 +82,9 @@ export const UPDATE_SUGGESTIONS = 'UPDATE_SUGGESTIONS';
 export const OPEN_FILTER_DROPDOWN = 'OPEN_FILTER_DROPDOWN';
 export const CLOSE_FILTER_DROPDOWN = 'CLOSE_FILTER_DROPDOWN';
 
+export const SET_BOOKING_AVAILABILITY = 'SET_BOOKING_AVAILABILITY';
+
+
 export function fetchEquipmentTypes() {
     return async (dispatch) => {
         let response;
@@ -361,6 +364,21 @@ export function updateTimelineData(timeline) {
     return {type: UPDATE_TIMELINE_DATA, timeline};
 }
 
+async function _fetchTimelineData(filters, rooms) {
+    const params = preProcessParameters(filters, ajaxFilterRules);
+    params.room_ids = rooms.map((room) => room.id);
+
+    let response;
+    try {
+        response = await indicoAxios.get(fetchTimelineDataURL(), {params});
+    } catch (error) {
+        handleAxiosError(error);
+        throw error;
+    }
+
+    return response.data;
+}
+
 export function fetchTimelineData() {
     return async (dispatch, getStore) => {
         dispatch(fetchTimelineDataStarted());
@@ -371,21 +389,14 @@ export function fetchTimelineData() {
             dispatch(updateTimelineData({date_range: [], availability: {}}));
             return;
         }
-
-        const params = preProcessParameters(filters, ajaxFilterRules);
+        let result;
         const rooms = [...list, ...suggestionsList.map(({room}) => room)];
-        params.room_ids = rooms.map((room) => room.id);
-
-        let response;
         try {
-            response = await indicoAxios.get(fetchTimelineDataURL(), {params});
+            result = await _fetchTimelineData(filters, rooms);
         } catch (error) {
             dispatch(fetchTimelineDataFailed());
-            handleAxiosError(error);
-            return;
         }
-
-        dispatch(updateTimelineData(response.data));
+        dispatch(updateTimelineData(result));
     };
 }
 
@@ -445,4 +456,11 @@ export function fetchRoomSuggestions() {
 
 export function updateRoomSuggestions(suggestions) {
     return {type: UPDATE_SUGGESTIONS, suggestions};
+}
+
+export function fetchBookingAvailability(room, filters) {
+    return async (dispatch) => {
+        const {availability, date_range: dateRange} = await _fetchTimelineData(filters, [room]);
+        dispatch({type: SET_BOOKING_AVAILABILITY, availability: availability[room.id], dateRange});
+    };
 }

@@ -23,7 +23,8 @@ import * as actions from '../actions';
 const initialState = {
     bookingState: {
         ongoing: false,
-        success: null
+        success: null,
+        timeline: null
     },
     fields: {
         user: {
@@ -41,7 +42,7 @@ export default function reducer(state = initialState, action) {
         return newState;
     }
 
-    const {type, message, isPrebooking} = action;
+    const {type, message, isPrebooking, availability, dateRange} = action;
 
     switch (type) {
         case actions.BOOKING_ONGOING:
@@ -52,6 +53,8 @@ export default function reducer(state = initialState, action) {
             return {...state, bookingState: {ongoing: false, success: false, message}};
         case actions.RESET_BOOKING_STATE:
             return {...initialState};
+        case actions.SET_BOOKING_AVAILABILITY:
+            return {...state, bookingState: {...state.bookingState, timeline: {availability, dateRange}}};
     }
     return state;
 }

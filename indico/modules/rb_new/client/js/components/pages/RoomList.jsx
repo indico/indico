@@ -30,6 +30,7 @@ import searchBarFactory from '../../containers/SearchBar';
 import mapControllerFactory from '../../containers/MapController';
 import Room from '../../containers/Room';
 import roomDetailsModalFactory from '../modals/RoomDetailsModal';
+import BookFromListModal from '../modals/BookFromListModal';
 
 
 const FilterBar = filterBarFactory('roomList', RoomFilterBar);
@@ -109,6 +110,10 @@ export default class RoomList extends React.Component {
                 <Route exact path="/rooms/:roomId/details" render={this.roomPreloader((roomId) => (
                     <RoomDetailsModal roomDetails={roomDetails.rooms[roomId]}
                                       onClose={this.closeBookingModal} />
+                ))} />
+                <Route exact path="/rooms/:roomId/book" render={this.roomPreloader((roomId) => (
+                    <BookFromListModal room={roomDetails.rooms[roomId]}
+                                       onClose={this.closeBookingModal} />
                 ))} />
             </Grid>
         );
