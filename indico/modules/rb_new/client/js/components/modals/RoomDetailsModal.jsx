@@ -85,8 +85,6 @@ function RoomDetails({room}) {
                     <Header><Translate>Usage</Translate></Header>
                     <TimelineContent rows={room.bookings}
                                      hourSeries={hourSeries}
-                                     minHour={minHour}
-                                     maxHour={maxHour}
                                      longLabel />
                     <Header><Translate>Statistics</Translate></Header>
                 </Grid.Column>
