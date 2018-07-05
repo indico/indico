@@ -222,7 +222,7 @@ def get_rooms_availability(rooms, start_dt, end_dt, repeat_frequency, repeat_int
                                  'pre_conflicts': group_by_occurrence_date(pre_room_conflicts),
                                  'blockings': get_blockings(room, candidates),
                                  'nonbookable_periods': get_nonbookable_periods(room, candidates),
-                                 'unbookable_hours': get_unbookable_hours(room, candidates)}
+                                 'bookable_hours': get_bookable_hours(room)}
     return date_range, availability
 
 
@@ -253,14 +253,9 @@ def get_blockings(room, candidates):
     return occurences
 
 
-def get_unbookable_hours(room, candidates):
+def get_bookable_hours(room):
     hours = room.bookable_hours
-    if hours == []:
-        return {}
-    dates = list(candidate.start_dt for candidate in candidates)
-    occurences = {}
-    for date in dates:
-        occurences[date.date()] = [hours]
+    occurences = [hour for hour in hours]
     return occurences
 
 

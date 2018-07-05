@@ -92,7 +92,7 @@ class NonBookablePeriodSchema(mm.ModelSchema):
         fields = ('start_dt', 'end_dt')
 
 
-class UnbookableHoursSchema(mm.ModelSchema):
+class BookableHoursSchema(mm.ModelSchema):
 
     class Meta:
         model = BookableHours
@@ -107,4 +107,4 @@ reservation_occurrences_schema = ReservationOccurrenceSchema(many=True)
 reservation_schema = ReservationSchema()
 blocking_schema = BlockingSchema(many=True)
 nonbookable_periods_schema = NonBookablePeriodSchema(many=True)
-unbookable_hours_schema = UnbookableHoursSchema(many=True)
+bookable_hours_schema = BookableHoursSchema()
