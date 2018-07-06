@@ -31,11 +31,14 @@ import {setFilters, fetchBookingAvailability, resetBookingState} from '../../act
 import BookingBootstrapForm from '../BookingBootstrapForm';
 
 
-function ConflictIndicator({
-    availability: {
-        num_days_available: numDaysAvailable,
-        all_days_available: allDaysAvailable}
-}) {
+function ConflictIndicator(
+    {
+        availability: {
+            num_days_available: numDaysAvailable,
+            all_days_available: allDaysAvailable
+        }
+    }
+) {
     // todo: warning in case there are pre-booking conflicts
     return (
         allDaysAvailable ? (

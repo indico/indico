@@ -78,7 +78,7 @@ export default class EquipmentForm extends FilterFormComponent {
                         <Form.Checkbox checked={equipment.indexOf(equip) >= 0}
                                        key={equip}
                                        label={equip}
-                                       onChange={(_, {checked}) => {
+                                       onChange={(__, {checked}) => {
                                            this.setEquipment(equip, checked);
                                        }} />
                     ))}
