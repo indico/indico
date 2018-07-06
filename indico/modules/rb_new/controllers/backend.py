@@ -152,7 +152,7 @@ class RHTimeline(RHRoomBookingBase):
             data['room'] = rooms_schema.dump(data['room'], many=False).data
             data.update({'blockings': self._serialize_blockings(data['blockings'])})
             data.update({'nonbookable_periods': self._serialize_nonbookable_periods(data['nonbookable_periods'])})
-            data.update({'bookable_hours': self._serialize_bookable_hours(data['bookable_hours'])})
+            data.update({'unbookable_hours': self._serialize_unbookable_hours(data['unbookable_hours'])})
             data.update({k: serialize_occurrences(data[k])
                          for k in ['candidates', 'pre_bookings', 'bookings', 'conflicts', 'pre_conflicts']})
             data.update({
@@ -167,8 +167,8 @@ class RHTimeline(RHRoomBookingBase):
     def _serialize_nonbookable_periods(self, data):
         return {dt.isoformat(): nonbookable_periods_schema.dump(data).data for dt, data in data.iteritems()}
 
-    def _serialize_bookable_hours(self, data):
-        return [bookable_hours_schema.dump(d) for d in data]
+    def _serialize_unbookable_hours(self, data):
+        return [bookable_hours_schema.dump(d).data for d in data]
 
 
 class RHRoomFavorites(RHRoomBookingBase):
