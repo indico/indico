@@ -193,7 +193,7 @@ export default class BookingBootstrapForm extends React.Component {
                                 checked={type === 'daily'}
                                 onChange={(e, {value}) => this.updateBookingType(value)} />
                     <Form.Radio label={Translate.string('Recurring booking')}
-                                name="bookingType"
+                                name="type"
                                 value="every"
                                 checked={type === 'every'}
                                 onChange={(e, {value}) => this.updateBookingType(value)} />
