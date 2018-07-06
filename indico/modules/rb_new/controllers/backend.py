@@ -136,7 +136,7 @@ class RHTimeline(RHRoomBookingBase):
         'flexibility': fields.Int(missing=0)
     })
     def _process(self, args):
-        rooms = Room.query.filter(Room.is_active, Room.id.in_(args.pop('room_ids')))
+        rooms = Room.query.filter(Room.is_active, Room.id.in_(args.pop('room_ids'))).all()
         date_range, availability = get_rooms_availability(rooms, **args)
         date_range = [dt.isoformat() for dt in date_range]
         for room_id in availability:

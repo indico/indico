@@ -141,8 +141,13 @@ def get_buildings():
 
 
 def get_existing_room_occurrences(room, start_dt, end_dt, allow_overlapping=False, only_accepted=False):
+    return get_existing_rooms_occurrences([room], start_dt, end_dt, allow_overlapping, only_accepted).get(room.id, [])
+
+
+def get_existing_rooms_occurrences(rooms, start_dt, end_dt, allow_overlapping=False, only_accepted=False):
+    room_ids = [room.id for room in rooms]
     query = (ReservationOccurrence.query
-             .filter(Reservation.room_id == room.id, ReservationOccurrence.is_valid)
+             .filter(ReservationOccurrence.is_valid, Reservation.room_id.in_(room_ids))
              .join(ReservationOccurrence.reservation)
              .order_by(ReservationOccurrence.start_dt.asc())
              .options(ReservationOccurrence.NO_RESERVATION_USER_STRATEGY,
@@ -154,27 +159,37 @@ def get_existing_room_occurrences(room, start_dt, end_dt, allow_overlapping=Fals
         query = query.filter(ReservationOccurrence.start_dt >= start_dt, ReservationOccurrence.end_dt <= end_dt)
     if only_accepted:
         query = query.filter(Reservation.is_accepted)
-    return query.all()
+    return group_list(query, key=lambda obj: obj.reservation.room.id)
 
 
-def get_room_conflicts(room, start_dt, end_dt, repeat_frequency, repeat_interval):
-    conflicts = []
-    pre_conflicts = []
-
+def get_rooms_conflicts(rooms, start_dt, end_dt, repeat_frequency, repeat_interval):
+    room_conflicts = {}
     candidates = ReservationOccurrence.create_series(start_dt, end_dt, (repeat_frequency, repeat_interval))
-    occurrences = ReservationOccurrence.find_overlapping_with(room, candidates).all()
+    room_ids = [room.id for room in rooms]
+    query = (ReservationOccurrence.query
+             .filter(Reservation.room_id.in_(room_ids),
+                     ReservationOccurrence.is_valid,
+                     ReservationOccurrence.filter_overlap(candidates))
+             .join(ReservationOccurrence.reservation)
+             .options(ReservationOccurrence.NO_RESERVATION_USER_STRATEGY,
+                      contains_eager(ReservationOccurrence.reservation)))
 
     ReservationOccurrenceTmp = namedtuple('ReservationOccurrenceTmp', ('start_dt', 'end_dt', 'reservation'))
-    for candidate in candidates:
-        for occurrence in occurrences:
-            if candidate.overlaps(occurrence):
-                overlap = candidate.get_overlap(occurrence)
-                obj = ReservationOccurrenceTmp(*overlap, reservation=occurrence.reservation)
-                if occurrence.reservation.is_accepted:
-                    conflicts.append(obj)
-                else:
-                    pre_conflicts.append(obj)
-    return conflicts, pre_conflicts
+    overlapping_occurrences = group_list(query, key=lambda obj: obj.reservation.room.id)
+    for room_id, occurrences in overlapping_occurrences.iteritems():
+        conflicts = []
+        pre_conflicts = []
+        for candidate in candidates:
+            for occurrence in occurrences:
+                if candidate.overlaps(occurrence):
+                    overlap = candidate.get_overlap(occurrence)
+                    obj = ReservationOccurrenceTmp(*overlap, reservation=occurrence.reservation)
+                    if occurrence.reservation.is_accepted:
+                        conflicts.append(obj)
+                    else:
+                        pre_conflicts.append(obj)
+        room_conflicts[room_id] = (conflicts, pre_conflicts)
+    return room_conflicts
 
 
 def get_rooms_availability(rooms, start_dt, end_dt, repeat_frequency, repeat_interval, flexibility):
@@ -182,6 +197,10 @@ def get_rooms_availability(rooms, start_dt, end_dt, repeat_frequency, repeat_int
     availability = {}
     candidates = ReservationOccurrence.create_series(start_dt, end_dt, (repeat_frequency, repeat_interval))
     date_range = sorted(set(cand.start_dt.date() for cand in candidates))
+    occurrences = get_existing_rooms_occurrences(rooms, start_dt.replace(hour=0, minute=0),
+                                                 end_dt.replace(hour=23, minute=59))
+    conflicts = get_rooms_conflicts(rooms, start_dt.replace(tzinfo=None), end_dt.replace(tzinfo=None),
+                                    repeat_frequency, repeat_interval)
 
     for room in rooms:
         booking_limit_days = room.booking_limit_days or rb_settings.get('booking_limit')
@@ -190,19 +209,16 @@ def get_rooms_availability(rooms, start_dt, end_dt, repeat_frequency, repeat_int
 
         start_dt = start_dt + timedelta(days=flexibility)
         end_dt = end_dt + timedelta(days=flexibility)
-        occurrences = get_existing_room_occurrences(room, start_dt.replace(hour=0, minute=0),
-                                                    end_dt.replace(hour=23, minute=59))
-        conflicts, pre_conflicts = get_room_conflicts(room, start_dt.replace(tzinfo=None), end_dt.replace(tzinfo=None),
-                                                      repeat_frequency, repeat_interval)
-
-        pre_bookings = [occ for occ in occurrences if not occ.reservation.is_accepted]
-        existing_bookings = [occ for occ in occurrences if occ.reservation.is_accepted]
+        room_occurrences = occurrences.get(room.id, [])
+        room_conflicts, pre_room_conflicts = conflicts.get(room.id, ([], []))
+        pre_bookings = [occ for occ in room_occurrences if not occ.reservation.is_accepted]
+        existing_bookings = [occ for occ in room_occurrences if occ.reservation.is_accepted]
         availability[room.id] = {'room': room,
                                  'candidates': group_by_occurrence_date(candidates),
                                  'pre_bookings': group_by_occurrence_date(pre_bookings),
                                  'bookings': group_by_occurrence_date(existing_bookings),
-                                 'conflicts': group_by_occurrence_date(conflicts),
-                                 'pre_conflicts': group_by_occurrence_date(pre_conflicts)}
+                                 'conflicts': group_by_occurrence_date(room_conflicts),
+                                 'pre_conflicts': group_by_occurrence_date(pre_room_conflicts)}
     return date_range, availability
 
 
@@ -290,9 +306,10 @@ def get_single_booking_suggestions(rooms, start_dt, end_dt):
 
 def get_number_of_skipped_days_for_rooms(rooms, start_dt, end_dt, repeat_frequency, repeat_interval):
     data = []
+    conflicts = get_rooms_conflicts(rooms, start_dt, end_dt, repeat_frequency, repeat_interval)
     for room in rooms:
-        conflicts = get_room_conflicts(room, start_dt, end_dt, repeat_frequency, repeat_interval)
-        number_of_conflicting_days = len(group_by_occurrence_date(conflicts[0]))
+        room_conflicts = conflicts.get(room.id, ([], []))
+        number_of_conflicting_days = len(group_by_occurrence_date(room_conflicts[0]))
         if number_of_conflicting_days:
             data.append({'room': room, 'suggestions': {'skip': number_of_conflicting_days}})
     return sorted(data, key=lambda item: item['suggestions']['skip'])
