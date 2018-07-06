@@ -17,7 +17,7 @@
 from __future__ import unicode_literals
 
 from collections import defaultdict, namedtuple
-from datetime import timedelta
+from datetime import datetime, timedelta
 from itertools import chain
 
 from flask import session
@@ -33,10 +33,12 @@ from indico.modules.rb.models.favorites import favorite_room_table
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import RepeatFrequency, Reservation
 from indico.modules.rb.models.room_attributes import RoomAttributeAssociation
+from indico.modules.rb.models.room_bookable_hours import BookableHours
 from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb_new.schemas import reservation_occurrences_schema, rooms_schema
 from indico.util.caching import memoize_redis
+from indico.util.date_time import get_overlap, overlaps
 from indico.util.struct.iterables import group_list
 
 
@@ -163,8 +165,10 @@ def get_existing_rooms_occurrences(rooms, start_dt, end_dt, allow_overlapping=Fa
     return group_list(query, key=lambda obj: obj.reservation.room.id)
 
 
-def get_rooms_conflicts(rooms, start_dt, end_dt, repeat_frequency, repeat_interval):
+def get_rooms_conflicts(rooms, start_dt, end_dt, repeat_frequency, repeat_interval, blockings=None,
+                       nonbookable_periods=None, bookable_hours=None):
     room_conflicts = {}
+
     candidates = ReservationOccurrence.create_series(start_dt, end_dt, (repeat_frequency, repeat_interval))
     room_ids = [room.id for room in rooms]
     query = (ReservationOccurrence.query
@@ -189,6 +193,30 @@ def get_rooms_conflicts(rooms, start_dt, end_dt, repeat_frequency, repeat_interv
                         conflicts.append(obj)
                     else:
                         pre_conflicts.append(obj)
+        if blockings:
+            for date, blocking in blockings.iteritems():
+                if (date == candidate.start_dt.date()):
+                    if blocking[0].can_be_overridden(session.user, room=room):
+                        continue
+                    obj = ReservationOccurrenceTmp(candidate.start_dt, candidate.end_dt, None)
+                    conflicts.append(obj)
+        if nonbookable_periods:
+            for _, periods in nonbookable_periods.iteritems():
+                for period in periods:
+                    if overlaps((candidate.start_dt, candidate.end_dt), (period.start_dt, period.end_dt)):
+                        overlap = get_overlap((candidate.start_dt, candidate.end_dt), (period.start_dt, period.end_dt))
+                        obj = ReservationOccurrenceTmp(overlap[0], overlap[1], None)
+                        conflicts.append(obj)
+        if bookable_hours:
+            for hours in bookable_hours:
+                hours_start_dt = candidate.start_dt.replace(hour=hours.start_time.hour,
+                                                            minute=hours.start_time.minute)
+                hours_end_dt = candidate.end_dt.replace(hour=hours.end_time.hour,
+                                                        minute=hours.end_time.minute)
+                if overlaps((candidate.start_dt, candidate.end_dt), (hours_start_dt, hours_end_dt)):
+                    overlap = get_overlap((candidate.start_dt, candidate.end_dt), (hours_start_dt, hours_end_dt))
+                    obj = ReservationOccurrenceTmp(overlap[0], overlap[1], None)
+                    conflicts.append(obj)
         room_conflicts[room_id] = (conflicts, pre_conflicts)
     return room_conflicts
 
@@ -214,15 +242,18 @@ def get_rooms_availability(rooms, start_dt, end_dt, repeat_frequency, repeat_int
         room_conflicts, pre_room_conflicts = conflicts.get(room.id, ([], []))
         pre_bookings = [occ for occ in room_occurrences if not occ.reservation.is_accepted]
         existing_bookings = [occ for occ in room_occurrences if occ.reservation.is_accepted]
+        blockings = get_blockings(room, candidates)
+        nonbookable_periods = get_nonbookable_periods(room, candidates)
+        unbookable_hours = get_unbookable_hours(room)
         availability[room.id] = {'room': room,
                                  'candidates': group_by_occurrence_date(candidates),
                                  'pre_bookings': group_by_occurrence_date(pre_bookings),
                                  'bookings': group_by_occurrence_date(existing_bookings),
                                  'conflicts': group_by_occurrence_date(room_conflicts),
                                  'pre_conflicts': group_by_occurrence_date(pre_room_conflicts),
-                                 'blockings': get_blockings(room, candidates),
-                                 'nonbookable_periods': get_nonbookable_periods(room, candidates),
-                                 'bookable_hours': get_bookable_hours(room)}
+                                 'blockings': blockings,
+                                 'nonbookable_periods': nonbookable_periods,
+                                 'unbookable_hours': unbookable_hours}
     return date_range, availability
 
 
@@ -253,10 +284,21 @@ def get_blockings(room, candidates):
     return occurences
 
 
-def get_bookable_hours(room):
-    hours = room.bookable_hours
-    occurences = [hour for hour in hours]
-    return occurences
+def get_unbookable_hours(room):
+    hours = [hour for hour in room.bookable_hours]
+
+    if hours and len(hours) > 0:
+        inverted_hours = []
+        first = BookableHours(start_time=datetime.strptime('00:00', '%H:%M').time(), end_time=hours[0].start_time)
+        inverted_hours.append(first)
+        for i in range(1, len(hours)):
+            hour = BookableHours(start_time=hours[i - 1].end_time, end_time=hours[i].start_time)
+            inverted_hours.append(hour)
+        last = BookableHours(start_time=hours[len(hours) - 1].end_time,
+                             end_time=datetime.strptime('23:59', '%H:%M').time())
+        inverted_hours.append(last)
+        return inverted_hours
+    return []
 
 
 def get_nonbookable_periods(room, candidates):
@@ -272,7 +314,7 @@ def get_nonbookable_periods(room, candidates):
                 period_occurence.start_dt = (date.replace(hour=0, minute=0)
                                              if period.start_dt != date else period.start_dt)
                 period_occurence.end_dt = date.replace(hour=23, minute=59) if period.end_dt != date else period.end_dt
-                occurences[date.date()] = [period_occurence]
+                occurences.setdefault(date.date(), []).append(period_occurence)
     return occurences
 
 
