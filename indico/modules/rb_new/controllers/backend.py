@@ -42,6 +42,8 @@ from indico.util.i18n import _
 from indico.web.util import jsonify_data
 
 
+NUM_SUGGESTIONS = 5
+
 search_room_args = {
     'capacity': fields.Int(),
     'equipment': fields.List(fields.Str()),
@@ -127,17 +129,22 @@ class RHEquipmentTypes(RHRoomBookingBase):
 
 
 class RHTimeline(RHRoomBookingBase):
-    @use_args({
-        'room_ids': fields.List(fields.Int()),
-        'start_dt': fields.DateTime(),
-        'end_dt': fields.DateTime(),
-        'repeat_frequency': EnumField(RepeatFrequency),
-        'repeat_interval': fields.Int(missing=0),
-        'flexibility': fields.Int(missing=0)
-    })
+    @use_args(dict(search_room_args, **{
+        'limit': fields.Int(missing=None),
+        'additional_room_ids': fields.List(fields.Int())
+    }))
     def _process(self, args):
-        rooms = Room.query.filter(Room.is_active, Room.id.in_(args.pop('room_ids'))).all()
-        date_range, availability = get_rooms_availability(rooms, **args)
+        query = search_for_rooms(args, only_available=True)
+        if 'limit' in args:
+            query = query.limit(args.pop('limit'))
+
+        rooms = query.all()
+        if 'additional_room_ids' in args:
+            rooms.extend(Room.query.filter(Room.is_active, Room.id.in_(args.pop('additional_room_ids'))))
+
+        date_range, availability = get_rooms_availability(rooms, args['start_dt'], args['end_dt'],
+                                                          args['repeat_frequency'], args['repeat_interval'],
+                                                          flexibility=0)
         date_range = [dt.isoformat() for dt in date_range]
         for room_id in availability:
             data = availability[room_id]
@@ -221,4 +228,4 @@ class RHRoomSuggestions(RHRoomBookingBase):
     @use_args(search_room_args)
     def _process(self, args):
         return jsonify([dict(suggestion, room=rooms_schema.dump(suggestion['room'], many=False).data)
-                        for suggestion in get_suggestions(args)])
+                        for suggestion in get_suggestions(args, limit=NUM_SUGGESTIONS)])

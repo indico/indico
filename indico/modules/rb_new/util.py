@@ -270,7 +270,7 @@ def get_managed_room_ids(user):
         return {r.id for r in Room.get_owned_by(user)}
 
 
-def get_suggestions(filters):
+def get_suggestions(filters, limit=None):
     room_filters = {key: value for key, value in filters.iteritems()
                     if key in ('capacity', 'equipment', 'building', 'text', 'floor')}
 
@@ -279,15 +279,20 @@ def get_suggestions(filters):
                                                 (filters['repeat_frequency'], filters['repeat_interval'])))
     rooms = query.all()
     if filters['repeat_frequency'] == RepeatFrequency.NEVER:
-        return sort_suggestions(get_single_booking_suggestions(rooms, filters['start_dt'], filters['end_dt']))
+        return sort_suggestions(get_single_booking_suggestions(rooms, filters['start_dt'], filters['end_dt'],
+                                                               limit=limit))
     else:
         return get_number_of_skipped_days_for_rooms(rooms, filters['start_dt'], filters['end_dt'],
-                                                    filters['repeat_frequency'], filters['repeat_interval'])
+                                                    filters['repeat_frequency'], filters['repeat_interval'],
+                                                    limit=limit)
 
 
-def get_single_booking_suggestions(rooms, start_dt, end_dt):
+def get_single_booking_suggestions(rooms, start_dt, end_dt, limit=None):
     data = []
     for room in rooms:
+        if limit and len(data) == limit:
+            break
+
         suggestions = {}
         suggested_time = get_start_time_suggestion(room, start_dt, end_dt)
         if suggested_time:
@@ -304,10 +309,13 @@ def get_single_booking_suggestions(rooms, start_dt, end_dt):
     return data
 
 
-def get_number_of_skipped_days_for_rooms(rooms, start_dt, end_dt, repeat_frequency, repeat_interval):
+def get_number_of_skipped_days_for_rooms(rooms, start_dt, end_dt, repeat_frequency, repeat_interval, limit=None):
     data = []
     conflicts = get_rooms_conflicts(rooms, start_dt, end_dt, repeat_frequency, repeat_interval)
     for room in rooms:
+        if limit and len(data) == limit:
+            break
+
         room_conflicts = conflicts.get(room.id, ([], []))
         number_of_conflicting_days = len(group_by_occurrence_date(room_conflicts[0]))
         if number_of_conflicting_days:

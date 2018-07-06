@@ -83,6 +83,7 @@ export const OPEN_FILTER_DROPDOWN = 'OPEN_FILTER_DROPDOWN';
 export const CLOSE_FILTER_DROPDOWN = 'CLOSE_FILTER_DROPDOWN';
 
 export const SET_BOOKING_AVAILABILITY = 'SET_BOOKING_AVAILABILITY';
+const ROOM_RESULT_LIMIT = 20;
 
 
 export function fetchEquipmentTypes() {
@@ -181,7 +182,7 @@ export function fetchRooms(namespace, clear = true) {
 
         Object.assign(params, {
             offset: (clear ? 0 : oldRoomList.length),
-            limit: 20
+            limit: ROOM_RESULT_LIMIT
         });
 
         let response;
@@ -364,9 +365,13 @@ export function updateTimelineData(timeline) {
     return {type: UPDATE_TIMELINE_DATA, timeline};
 }
 
-async function _fetchTimelineData(filters, rooms) {
+async function _fetchTimelineData(filters, rooms, limit = null) {
     const params = preProcessParameters(filters, ajaxFilterRules);
-    params.room_ids = rooms.map((room) => room.id);
+    params.additional_room_ids = rooms.map((room) => room.id);
+
+    if (limit) {
+        params.limit = limit;
+    }
 
     let response;
     try {
@@ -390,9 +395,9 @@ export function fetchTimelineData() {
             return;
         }
         let result;
-        const rooms = [...list, ...suggestionsList.map(({room}) => room)];
+        const rooms = suggestionsList.map(({room}) => room);
         try {
-            result = await _fetchTimelineData(filters, rooms);
+            result = await _fetchTimelineData(filters, rooms, list.length);
         } catch (error) {
             dispatch(fetchTimelineDataFailed());
         }
