@@ -22,11 +22,11 @@ from indico.modules.categories.compat import compat_category
 from indico.modules.categories.controllers.admin import RHManageUpcomingEvents
 from indico.modules.categories.controllers.display import (RHCategoryCalendarView, RHCategoryIcon, RHCategoryInfo,
                                                            RHCategoryLogo, RHCategoryOverview, RHCategorySearch,
-                                                           RHCategoryStatistics, RHDisplayCategory, RHEventList,
-                                                           RHExportCategoryAtom, RHExportCategoryICAL,
-                                                           RHReachableCategoriesInfo, RHShowFutureEventsInCategory,
-                                                           RHShowPastEventsInCategory, RHSubcatInfo,
-                                                           RHXMLExportCategoryInfo)
+                                                           RHCategoryStatistics, RHCategoryUpcomingEvent,
+                                                           RHDisplayCategory, RHEventList, RHExportCategoryAtom,
+                                                           RHExportCategoryICAL, RHReachableCategoriesInfo,
+                                                           RHShowFutureEventsInCategory, RHShowPastEventsInCategory,
+                                                           RHSubcatInfo, RHXMLExportCategoryInfo)
 from indico.modules.categories.controllers.management import (RHCreateCategory, RHDeleteCategory, RHDeleteEvents,
                                                               RHDeleteSubcategories, RHManageCategoryContent,
                                                               RHManageCategoryIcon, RHManageCategoryLogo,
@@ -83,6 +83,7 @@ _bp.add_url_rule('/show-past-events', 'show_past_events', RHShowPastEventsInCate
 _bp.add_url_rule('/statistics', 'statistics', RHCategoryStatistics)
 _bp.add_url_rule('/subcat-info', 'subcat_info', RHSubcatInfo)
 _bp.add_url_rule('/calendar', 'calendar', RHCategoryCalendarView)
+_bp.add_url_rule('/upcoming', 'upcoming_event', RHCategoryUpcomingEvent)
 
 # Event creation - redirect to anchor page opening the dialog
 _bp.add_url_rule('/create/event/<any(lecture,meeting,conference):event_type>', view_func=_redirect_event_creation)

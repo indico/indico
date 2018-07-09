@@ -26,13 +26,14 @@ from time import mktime
 
 import dateutil
 from dateutil.relativedelta import relativedelta
-from flask import Response, jsonify, request, session
+from flask import Response, flash, jsonify, redirect, request, session
 from pytz import utc
 from sqlalchemy.orm import joinedload, load_only, subqueryload, undefer, undefer_group
 from werkzeug.exceptions import BadRequest, NotFound
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.colors import ColorTuple
+from indico.core.db.sqlalchemy.util.queries import get_n_matching
 from indico.modules.categories.controllers.base import RHDisplayCategoryBase
 from indico.modules.categories.legacy import XMLCategorySerializer
 from indico.modules.categories.models.categories import Category
@@ -670,3 +671,26 @@ class RHCategoryCalendarView(RHDisplayCategoryBase):
     def _render_ongoing_events(self, ongoing_events):
         template = get_template_module('categories/display/_calendar_ongoing_events.html')
         return template.render_ongoing_events(ongoing_events, self.category.display_tzinfo)
+
+
+class RHCategoryUpcomingEvent(RHDisplayCategoryBase):
+    """Redirect to the upcoming event of a category."""
+
+    def _process(self):
+        event = self._get_upcoming_event()
+        if event:
+            return redirect(event.url)
+        else:
+            flash(_('There are no upcoming events for this category'))
+            return redirect(self.category.url)
+
+    def _get_upcoming_event(self):
+        query = (Event.query
+                 .filter(Event.is_visible_in(self.category),
+                         Event.start_dt > now_utc(),
+                         ~Event.is_deleted)
+                 .options(subqueryload('acl_entries'))
+                 .order_by(Event.start_dt, Event.id))
+        res = get_n_matching(query, 1, lambda event: event.can_access(session.user))
+        if res:
+            return res[0]

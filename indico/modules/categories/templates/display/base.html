@@ -38,6 +38,9 @@
                    data-toggle="dropdown"></a>
                 <ul class="dropdown">
                     <li>
+                        <a href="{{ url_for('.upcoming_event', category) }}">{% trans %}Upcoming event{% endtrans %}</a>
+                    </li>
+                    <li>
                         <a href="{{ url_for('.overview', category, period='day') }}">{% trans %}Today's events{% endtrans %}</a>
                     </li>
                     <li>
