@@ -17,6 +17,7 @@ Improvements
 
 - Rework the event log viewer to be more responsive and not freeze the
   whole browser when there are thousands of log entries
+- Add shortcut to next upcoming event in a category (:issue:`3388`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
