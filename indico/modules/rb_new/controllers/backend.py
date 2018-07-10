@@ -32,11 +32,12 @@ from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.models.favorites import favorite_room_table
 from indico.modules.rb.models.reservations import RepeatFrequency, Reservation
 from indico.modules.rb.models.rooms import Room
-from indico.modules.rb_new.schemas import (aspects_schema, blocking_schema, bookable_hours_schema, map_rooms_schema,
-                                           nonbookable_periods_schema, room_details_schema, rooms_schema)
+from indico.modules.rb_new.schemas import aspects_schema, map_rooms_schema, room_details_schema, rooms_schema
 from indico.modules.rb_new.util import (get_buildings, get_equipment_types, get_existing_room_occurrences,
                                         get_rooms_availability, get_suggestions, group_by_occurrence_date,
-                                        has_managed_rooms, search_for_rooms, serialize_occurrences)
+                                        has_managed_rooms, search_for_rooms, serialize_blockings,
+                                        serialize_nonbookable_periods, serialize_occurrences,
+                                        serialize_unbookable_hours)
 from indico.modules.users.models.users import User
 from indico.util.date_time import iterdays
 from indico.util.i18n import _
@@ -150,9 +151,9 @@ class RHTimeline(RHRoomBookingBase):
         for room_id in availability:
             data = availability[room_id]
             data['room'] = rooms_schema.dump(data['room'], many=False).data
-            data.update({'blockings': self._serialize_blockings(data['blockings'])})
-            data.update({'nonbookable_periods': self._serialize_nonbookable_periods(data['nonbookable_periods'])})
-            data.update({'unbookable_hours': self._serialize_unbookable_hours(data['unbookable_hours'])})
+            data.update({'blockings': serialize_blockings(data['blockings'])})
+            data.update({'nonbookable_periods': serialize_nonbookable_periods(data['nonbookable_periods'])})
+            data.update({'unbookable_hours': serialize_unbookable_hours(data['unbookable_hours'])})
             data.update({k: serialize_occurrences(data[k])
                          for k in ['candidates', 'pre_bookings', 'bookings', 'conflicts', 'pre_conflicts']})
             data.update({
@@ -160,15 +161,6 @@ class RHTimeline(RHRoomBookingBase):
                 'all_days_available': not data['conflicts']
             })
         return jsonify_data(flash=False, availability=availability, date_range=date_range)
-
-    def _serialize_blockings(self, data):
-        return {dt.isoformat(): blocking_schema.dump(data).data for dt, data in data.iteritems()}
-
-    def _serialize_nonbookable_periods(self, data):
-        return {dt.isoformat(): nonbookable_periods_schema.dump(data).data for dt, data in data.iteritems()}
-
-    def _serialize_unbookable_hours(self, data):
-        return [bookable_hours_schema.dump(d).data for d in data]
 
 
 class RHRoomFavorites(RHRoomBookingBase):
