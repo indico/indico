@@ -36,7 +36,8 @@ from indico.modules.rb.models.room_attributes import RoomAttributeAssociation
 from indico.modules.rb.models.room_bookable_hours import BookableHours
 from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
 from indico.modules.rb.models.rooms import Room
-from indico.modules.rb_new.schemas import reservation_occurrences_schema, rooms_schema
+from indico.modules.rb_new.schemas import (blocking_schema, bookable_hours_schema, nonbookable_periods_schema,
+                                           reservation_occurrences_schema, rooms_schema)
 from indico.util.caching import memoize_redis
 from indico.util.date_time import get_overlap, overlaps
 from indico.util.struct.iterables import group_list
@@ -461,3 +462,15 @@ def sort_suggestions(suggestions):
 
 def serialize_occurrences(data):
     return {dt.isoformat(): reservation_occurrences_schema.dump(data).data for dt, data in data.iteritems()}
+
+
+def serialize_blockings(data):
+    return {dt.isoformat(): blocking_schema.dump(data).data for dt, data in data.iteritems()}
+
+
+def serialize_nonbookable_periods(data):
+    return {dt.isoformat(): nonbookable_periods_schema.dump(data).data for dt, data in data.iteritems()}
+
+
+def serialize_unbookable_hours(data):
+    return [bookable_hours_schema.dump(d).data for d in data]
