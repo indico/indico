@@ -55,6 +55,7 @@ export function handleAxiosError(error) {
         // dynamic import to avoid getting all the react and semantic-ui-react stuff into common.js
         import('indico/react/errors').then(({default: showReactErrorDialog}) => showReactErrorDialog(error));
     }
+    return error.message;
 }
 
 export default indicoAxios;
