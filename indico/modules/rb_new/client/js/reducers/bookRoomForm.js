@@ -15,46 +15,29 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
-import {actionTypes as reduxFormActions} from 'redux-form';
 import * as actions from '../actions';
 
 
 const initialState = {
-    bookingState: {
-        ongoing: false,
-        success: null,
-        timeline: null
-    },
-    fields: {
-        user: {
-            disabled: true
-        }
-    }
+    ongoing: false,
+    success: null,
+    timeline: null,
 };
 
 export default function reducer(state = initialState, action) {
-    // if usage !== 'someone' (=== 'myself'), then we disable the user input
-    if (action.type === reduxFormActions.CHANGE && action.meta.field === 'usage') {
-        const newState = _.cloneDeep(state);
-        _.set(newState, 'fields.user.disabled', action.payload !== 'someone');
-        _.set(newState, 'values.user', null);
-        return newState;
-    }
-
     const {type, message, isPrebooking, availability, dateRange} = action;
 
     switch (type) {
         case actions.BOOKING_ONGOING:
-            return {...state, bookingState: {ongoing: true}};
+            return {...state, ongoing: true};
         case actions.BOOKING_CONFIRMED:
-            return {...state, bookingState: {ongoing: false, success: true, message: null, isPrebooking}};
+            return {...state, ongoing: false, success: true, message: null, isPrebooking};
         case actions.BOOKING_FAILED:
-            return {...state, bookingState: {ongoing: false, success: false, message}};
+            return {...state, ongoing: false, success: false, message};
         case actions.RESET_BOOKING_STATE:
             return {...initialState};
         case actions.SET_BOOKING_AVAILABILITY:
-            return {...state, bookingState: {...state.bookingState, timeline: {availability, dateRange}}};
+            return {...state, ...state.bookingState, timeline: {availability, dateRange}};
     }
     return state;
 }

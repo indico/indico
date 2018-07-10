@@ -18,8 +18,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Button, Checkbox, Form, Grid, Icon, Label, Message, Modal, Radio, Segment} from 'semantic-ui-react';
-import {reduxForm, Field} from 'redux-form';
-import {ReduxFormField, ReduxRadioField} from 'indico/react/forms';
+import {Form as FinalForm, Field} from 'react-final-form';
+import {FORM_ERROR} from 'final-form';
+import createDecorator from 'final-form-calculate';
+import {ReduxFormField, ReduxRadioField, formatters} from 'indico/react/forms';
 import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
 import UserSearchField from 'indico/react/components/UserSearchField';
 import recurrenceRenderer from '../filters/RecurrenceRenderer';
@@ -30,8 +32,6 @@ import TimelineContent from '../TimelineContent';
 import './BookRoomModal.module.scss';
 
 
-const normalizeReason = (text) => text.trim();
-
 function validate({usage, user, reason}) {
     const errors = {};
     if (!usage) {
@@ -40,25 +40,31 @@ function validate({usage, user, reason}) {
     if (usage === 'someone' && !user) {
         errors.user = Translate.string('Please specify a user');
     }
-    if (!reason) {
+    if (!reason || reason.length < 3) {
         errors.reason = Translate.string('You need to provide a reason');
     }
     return errors;
 }
 
+const formDecorator = createDecorator({
+    field: 'usage',
+    updates: (usage) => {
+        if (usage !== 'someone') {
+            return {user: null};
+        }
+        return {};
+    }
+});
 
-class BookRoomModal extends React.Component {
+
+export default class BookRoomModal extends React.Component {
     static propTypes = {
         open: PropTypes.bool,
         room: PropTypes.object,
         user: PropTypes.object.isRequired,
-        handleSubmit: PropTypes.func.isRequired,
         bookingData: PropTypes.object.isRequired,
-        bookingState: PropTypes.object,
         onSubmit: PropTypes.func.isRequired,
         onClose: PropTypes.func.isRequired,
-        pristine: PropTypes.bool.isRequired,
-        invalid: PropTypes.bool.isRequired,
         availability: PropTypes.object,
         dateRange: PropTypes.array,
         fetchAvailability: PropTypes.func.isRequired
@@ -67,7 +73,6 @@ class BookRoomModal extends React.Component {
     static defaultProps = {
         open: false,
         room: null,
-        bookingState: {},
         availability: null,
         dateRange: null
     };
@@ -136,27 +141,29 @@ class BookRoomModal extends React.Component {
         );
     }
 
-    renderBookingState({success, message, isPrebooking}) {
-        if (success) {
+    renderBookingState({submitSucceeded, submitError, submitFailed, values}) {
+        if (submitSucceeded) {
             return (
-                <Message color={isPrebooking ? 'orange' : 'green'}>
+                <Message color={values.isPrebooking ? 'orange' : 'green'}>
                     <Message.Header>
-                        {isPrebooking ? (
+                        {values.isPrebooking ? (
                             <Translate>The room has been pre-booked!</Translate>
                         ) : (
                             <Translate>The room has been booked!</Translate>
                         )}
                     </Message.Header>
-                    <Translate>You can consult your (pre-)booking <Param name="link" wrapper={<a />}>here</Param>.</Translate>
+                    <Translate>
+                        You can consult your (pre-)booking <Param name="link" wrapper={<a />}>here</Param>.
+                    </Translate>
                 </Message>
             );
-        } else if (success === false) {
+        } else if (submitFailed) {
             return (
                 <Message color="red">
                     <Message.Header>
                         <Translate>Couldn't book the room</Translate>
                     </Message.Header>
-                    {message}
+                    {submitError}
                 </Message>
             );
         } else {
@@ -164,14 +171,14 @@ class BookRoomModal extends React.Component {
         }
     }
 
-    renderBookingButton(isPrebooking, bookingBlocked) {
-        const {pristine, invalid, bookingState, handleSubmit} = this.props;
+    renderBookingButton(isPrebooking, bookingBlocked, {pristine, hasValidationErrors, form, submitting, values}) {
         return (
             <Button primary={!isPrebooking}
                     color={isPrebooking ? 'orange' : null}
-                    disabled={bookingBlocked || pristine || invalid}
-                    loading={bookingState.ongoing}
+                    disabled={bookingBlocked || pristine || hasValidationErrors}
+                    loading={submitting && values.isPrebooking === isPrebooking}
                     type="submit"
+                    form="book-room-form"
                     content={(
                         isPrebooking ? (
                             Translate.string('Create Pre-booking')
@@ -179,7 +186,9 @@ class BookRoomModal extends React.Component {
                             Translate.string('Create Booking')
                         )
                     )}
-                    onClick={handleSubmit(this.submitFormFactory(isPrebooking))} />
+                    onClick={() => {
+                        form.change('isPrebooking', isPrebooking);
+                    }} />
         );
     }
 
@@ -226,7 +235,7 @@ class BookRoomModal extends React.Component {
                 <Segment attached="bottom">
                     <Checkbox toggle
                               defaultChecked={skipConflicts}
-                              componentLabel={Translate.string('I understand, please skip any days with conflicting occurrences.')}
+                              label={Translate.string('I understand, please skip any days with conflicting occurrences.')}
                               onChange={(_, {checked}) => {
                                   this.setState({
                                       skipConflicts: checked
@@ -237,9 +246,12 @@ class BookRoomModal extends React.Component {
         );
     }
 
-    submitFormFactory = (isPrebooking) => (data, ...args) => {
+    submitBooking = async (data) => {
         const {onSubmit} = this.props;
-        onSubmit({...data, isPrebooking}, ...args);
+        const rv = await onSubmit(data, this.props);
+        if (!rv.success) {
+            return {[FORM_ERROR]: rv.msg};
+        }
     };
 
     onClose = () => {
@@ -252,8 +264,10 @@ class BookRoomModal extends React.Component {
     };
 
     render() {
-        const {bookingData: {recurrence, dates, timeSlot}, open, room, bookingState,
-               user, availability} = this.props;
+        const {
+            bookingData: {recurrence, dates, timeSlot},
+            open, room, user, availability
+        } = this.props;
         const {skipConflicts, bookingConflictsVisible} = this.state;
 
         if (!room) {
@@ -261,13 +275,13 @@ class BookRoomModal extends React.Component {
         }
 
         const conflictsExist = availability && !!Object.keys(availability.conflicts).length;
-        const bookingBlocked = bookingState.success || bookingState.ongoing;
-        const buttonsBlocked = bookingBlocked || (conflictsExist && !skipConflicts);
+        const bookingBlocked = ({submitting, submitSucceeded}) => submitting || submitSucceeded;
+        const buttonsBlocked = (fprops) => bookingBlocked(fprops) || (conflictsExist && !skipConflicts);
         const {is_auto_confirm: isDirectlyBookable} = room;
         const link = <a style={{cursor: 'pointer'}} onClick={() => this.setState({bookingConflictsVisible: true})} />;
 
-        return (
-            <Modal open={open} onClose={this.onClose} size="large" closeIcon>
+        const renderModalContent = (fprops) => (
+            <>
                 <Modal.Header>
                     <Translate>Book a Room</Translate>
                 </Modal.Header>
@@ -279,15 +293,15 @@ class BookRoomModal extends React.Component {
                             <Message attached="bottom">
                                 <Message.Content>
                                     <Translate>
-                                        Consult the <Param name="bookings-link" wrapper={link}>timeline view </Param> to see
-                                        the other room bookings for the selected period.
+                                        Consult the <Param name="bookings-link" wrapper={link}>timeline view </Param> to
+                                        see the other room bookings for the selected period.
                                     </Translate>
                                 </Message.Content>
                             </Message>
                         </Grid.Column>
                         <Grid.Column width={8}>
                             <Segment inverted color="blue">
-                                <Form inverted>
+                                <Form inverted id="book-room-form" onSubmit={fprops.handleSubmit}>
                                     <h2><Icon name="user" />Usage</h2>
                                     <Form.Group>
                                         <Field name="usage"
@@ -295,39 +309,40 @@ class BookRoomModal extends React.Component {
                                                component={ReduxRadioField}
                                                as={Radio}
                                                componentLabel={Translate.string("I'll be using it myself")}
-                                               disabled={bookingBlocked} />
+                                               disabled={bookingBlocked(fprops)} />
                                         <Field name="usage"
                                                radioValue="someone"
                                                component={ReduxRadioField}
                                                as={Radio}
                                                componentLabel={Translate.string("I'm booking it for someone else")}
-                                               disabled={bookingBlocked} />
+                                               disabled={bookingBlocked(fprops)} />
                                     </Form.Group>
                                     <Field name="user"
                                            component={this.renderUserSearchField}
-                                           disabled={bookingBlocked} />
+                                           disabled={bookingBlocked(fprops) || fprops.values.usage !== 'someone'}
+                                           clearIfDisabled />
                                     <Field name="reason"
-                                           normalize={normalizeReason}
                                            component={ReduxFormField}
                                            as={Form.TextArea}
+                                           format={formatters.trim}
+                                           formatOnBlur
                                            placeholder={Translate.string('Reason for booking')}
-                                           disabled={bookingBlocked} />
+                                           disabled={bookingBlocked(fprops)} />
                                 </Form>
                             </Segment>
                             {conflictsExist && this.renderBookingConstraints(Object.values(availability.conflicts))}
-                            {this.renderBookingState(bookingState)}
+                            {this.renderBookingState(fprops)}
                         </Grid.Column>
                     </Grid>
                 </Modal.Content>
                 <Modal.Actions>
-                    {(isDirectlyBookable || user.isAdmin) &&
-                     this.renderBookingButton(false, buttonsBlocked)}
-                    {!isDirectlyBookable &&
-                     this.renderBookingButton(true, buttonsBlocked)}
-                    <Button content={(bookingState.success
+                    {(isDirectlyBookable || user.isAdmin) && (
+                        this.renderBookingButton(false, buttonsBlocked(fprops), fprops)
+                    )}
+                    {!isDirectlyBookable && this.renderBookingButton(true, buttonsBlocked(fprops), fprops)}
+                    <Button type="button" onClick={this.onClose} content={(fprops.submitSucceeded
                         ? Translate.string('Close')
-                        : Translate.string("I've changed my mind!"))}
-                            onClick={this.onClose} />
+                        : Translate.string("I've changed my mind!"))} />
                     <Modal open={bookingConflictsVisible}
                            onClose={() => this.setState({bookingConflictsVisible: false})}
                            size="large" closeIcon>
@@ -339,12 +354,14 @@ class BookRoomModal extends React.Component {
                         </Modal.Content>
                     </Modal>
                 </Modal.Actions>
+            </>
+        );
+
+        return (
+            <Modal open={open} onClose={this.onClose} size="large" closeIcon>
+                <FinalForm onSubmit={this.submitBooking} validate={validate} decorators={[formDecorator]}
+                           render={renderModalContent} />
             </Modal>
         );
     }
 }
-
-export default reduxForm({
-    form: 'roomModal',
-    validate
-})(BookRoomModal);

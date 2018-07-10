@@ -198,7 +198,7 @@ class RHCreateBooking(RHRoomBookingBase):
         'repeat_interval': fields.Int(missing=0),
         'room_id': fields.Int(required=True),
         'user_id': fields.Int(),
-        'booking_reason': fields.String(validate=validate.Length(min=3)),
+        'booking_reason': fields.String(load_from='reason', validate=validate.Length(min=3)),
         'is_prebooking': fields.Bool(missing=False)
     })
     def _process(self, args):

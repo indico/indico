@@ -414,14 +414,15 @@ export function createBooking(args) {
         try {
             response = await indicoAxios.post(createBookingURL(), params);
         } catch (error) {
-            handleAxiosError(error);
-            return;
+            return {success: false, msg: handleAxiosError(error)};
         }
         const {success, msg, is_prebooking: isPrebooking} = response.data;
         if (success) {
             dispatch({type: BOOKING_CONFIRMED, isPrebooking});
+            return {success};
         } else {
             dispatch({type: BOOKING_FAILED, message: msg});
+            return {success, msg};
         }
     };
 }

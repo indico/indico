@@ -22,26 +22,22 @@ import {createBooking, fetchBookingAvailability} from '../actions';
 
 const mapStateToProps = ({
     bookRoom: {filters: {recurrence, dates, timeSlot}},
-    form: {roomModal},
-    user
+    bookRoomForm: {timeline},
+    user,
 }, {room}) => {
-    const bookingState = roomModal && roomModal.bookingState;
-    const timeline = bookingState && bookingState.timeline;
     return {
         bookingData: {recurrence, dates, timeSlot, room},
-        bookingState,
-        user,
         availability: timeline && timeline.availability,
-        dateRange: timeline && timeline.dateRange
+        dateRange: timeline && timeline.dateRange,
+        user,
     };
 };
 
 const mapDispatchToProps = (dispatch) => ({
     onSubmit: (
         {reason, usage, user, isPrebooking},
-        __,
         {bookingData: {recurrence, dates, timeSlot, room: roomData}}) => {
-        dispatch(createBooking({
+        return dispatch(createBooking({
             reason,
             usage,
             user,

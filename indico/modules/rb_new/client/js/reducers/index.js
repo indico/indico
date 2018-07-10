@@ -15,8 +15,6 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import {reducer as reduxFormReducer} from 'redux-form';
-
 import bookRoomReducer from './bookRoom';
 import userReducer from './user';
 import roomListReducer from './roomList';
@@ -35,9 +33,7 @@ const reducers = {
     buildings: buildingsReducer,
     mapAspects: mapAspectsReducer,
     roomDetails: roomDetailsReducer,
-    form: reduxFormReducer.plugin({
-        roomModal: bookRoomFormReducer
-    })
+    bookRoomForm: bookRoomFormReducer,
 };
 
 export default reducers;

@@ -118,7 +118,7 @@ class BookFromListModal extends React.Component {
 }
 
 export default connect(
-    ({form: {roomModal: {bookingState: {timeline}}}}) => ({
+    ({bookRoomForm: {timeline}}) => ({
         availability: timeline ? timeline.availability : null
     }),
     (dispatch, {room}) => ({

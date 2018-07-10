@@ -15,7 +15,11 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-export {handleSubmissionError} from './errors';
-export {ReduxFormField, ReduxRadioField} from './fields';
-export {default as validators} from './validators';
-export {default as formatters} from './formatters';
+function trim(value) {
+    return value === undefined ? '' : value.trim();
+}
+
+
+export default {
+    trim,
+};

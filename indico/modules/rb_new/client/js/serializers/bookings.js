@@ -22,7 +22,7 @@ export const ajax = {
     end_dt: filterDTHandler('end'),
     repeat_frequency: recurrenceFrequencySerializer,
     repeat_interval: recurrenceIntervalSerializer,
-    booking_reason: ({reason}) => reason,
+    reason: ({reason}) => reason,
     user_id: {
         onlyIf: ({usage}) => usage === 'someone',
         serializer: ({user: {id}}) => id
