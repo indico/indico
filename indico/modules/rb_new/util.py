@@ -309,11 +309,12 @@ def get_nonbookable_periods(room, candidates):
     occurences = {}
     for period in periods:
         for date in dates:
-            if period.start_dt <= date <= period.end_dt:
+            if period.start_dt.date() <= date.date() <= period.end_dt.date():
                 period_occurence = NonBookablePeriod()
                 period_occurence.start_dt = (date.replace(hour=0, minute=0)
-                                             if period.start_dt != date else period.start_dt)
-                period_occurence.end_dt = date.replace(hour=23, minute=59) if period.end_dt != date else period.end_dt
+                                             if period.start_dt.date() != date.date() else period.start_dt)
+                period_occurence.end_dt = (date.replace(hour=23, minute=59)
+                                           if period.end_dt.date() != date.date() else period.end_dt)
                 occurences.setdefault(date.date(), []).append(period_occurence)
     return occurences
 
