@@ -89,7 +89,7 @@ export function submitFormAction(submitFunc, requestAction, successAction, error
                 return {data: null, error: handleSubmissionError(error)};
             } else {
                 // anything else here is unexpected and triggers the usual error dialog
-                const message = handleAxiosError(error);
+                const message = handleAxiosError(error, true);
                 dispatcher(dispatch, errorAction, {error: {[FORM_ERROR]: message}});
                 return {data: null, error: {[FORM_ERROR]: message}};
             }
@@ -118,7 +118,7 @@ export function ajaxAction(requestFunc, requestAction, successAction, errorActio
         try {
             response = await requestFunc();
         } catch (error) {
-            const message = handleAxiosError(error);
+            const message = handleAxiosError(error, true);
             dispatcher(dispatch, errorAction, {error: message});
             return {data: null, error: message};
         }

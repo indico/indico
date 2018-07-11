@@ -39,10 +39,13 @@ indicoAxios.interceptors.request.use((config) => {
 });
 
 
-export function handleAxiosError(error) {
+export function handleAxiosError(error, strict = false) {
     if (error.response && error.response.data && error.response.data.error) {
         error = error.response.data.error;
     } else {
+        if (strict) {
+            throw error;
+        }
         error = {
             title: $T.gettext('Something went wrong'),
             message: error.message,
