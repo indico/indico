@@ -29,7 +29,7 @@ from indico.core.db.sqlalchemy.links import LinkType
 from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.modules.attachments import Attachment
 from indico.modules.attachments.models.folders import AttachmentFolder
-from indico.modules.categories import upcoming_events_settings
+from indico.modules.categories import Category, upcoming_events_settings
 from indico.modules.events import Event
 from indico.modules.events.contributions import Contribution
 from indico.modules.events.contributions.models.subcontributions import SubContribution
@@ -143,12 +143,13 @@ def get_upcoming_events():
                           Event.end_dt.astimezone(tz) > now)
                   .options(load_only('id', 'title', 'start_dt', 'end_dt')))
     queries = []
-    cols = {'category': Event.category_id,
-            'event': Event.id}
+    predicates = {'category': lambda id_: Event.category_id == id_,
+                  'category_tree': lambda id_: Event.category_chain_overlaps(id_) & Event.is_visible_in(id_),
+                  'event': lambda id_: Event.id == id_}
     for entry in data['entries']:
         delta = timedelta(days=entry['days'])
         query = (base_query
-                 .filter(cols[entry['type']] == entry['id'])
+                 .filter(predicates[entry['type']](entry['id']))
                  .filter(db.cast(Event.start_dt.astimezone(tz), db.Date) > (now - delta).date())
                  .with_entities(Event, db.literal(entry['weight']).label('weight')))
         queries.append(query)

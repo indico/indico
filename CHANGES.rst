@@ -25,6 +25,7 @@ Improvements
   thanks :user:`nop33`)
 - Include event page title in the page's ``<title>`` (:issue:`3285`,
   thanks :user:`bpedersen2`)
+- Add option to include subcategories in upcoming events (:issue:`3449`)
 
 Bugfixes
 ^^^^^^^^
