@@ -167,7 +167,7 @@ def get_existing_rooms_occurrences(rooms, start_dt, end_dt, allow_overlapping=Fa
 
 
 def get_rooms_conflicts(rooms, start_dt, end_dt, repeat_frequency, repeat_interval, blockings=None,
-                       nonbookable_periods=None, bookable_hours=None):
+                       nonbookable_periods=None, unbookable_hours=None):
     room_conflicts = {}
 
     candidates = ReservationOccurrence.create_series(start_dt, end_dt, (repeat_frequency, repeat_interval))
@@ -208,8 +208,8 @@ def get_rooms_conflicts(rooms, start_dt, end_dt, repeat_frequency, repeat_interv
                         overlap = get_overlap((candidate.start_dt, candidate.end_dt), (period.start_dt, period.end_dt))
                         obj = ReservationOccurrenceTmp(overlap[0], overlap[1], None)
                         conflicts.append(obj)
-        if bookable_hours:
-            for hours in bookable_hours:
+        if unbookable_hours:
+            for hours in unbookable_hours:
                 hours_start_dt = candidate.start_dt.replace(hour=hours.start_time.hour,
                                                             minute=hours.start_time.minute)
                 hours_end_dt = candidate.end_dt.replace(hour=hours.end_time.hour,
