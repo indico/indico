@@ -114,6 +114,7 @@ def search_for_rooms(filters, only_available=False):
         own_rooms = [r.id for r in Room.get_owned_by(session.user)]
         query = query.filter(db.or_(Room.id.in_(own_rooms) if own_rooms else False,
                                     db.and_(Room.filter_bookable_hours(start_dt.time(), end_dt.time()),
+                                            Room.filter_nonbookable_periods(start_dt, end_dt),
                                             db.or_(booking_limit_days.is_(None),
                                                    selected_period_days <= booking_limit_days))))
     return query
