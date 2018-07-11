@@ -162,7 +162,9 @@ class UpcomingEventsForm(IndicoForm):
                                           'step': 1, 'coerce': int},
                                          {'id': 'weight', 'caption': _("Weight"), 'required': True, 'type': 'number',
                                           'coerce': float}],
-                                 choices={'type': {'category': _('Category'), 'event': _('Event')}},
+                                 choices={'type': {'category': _('Category'),
+                                                   'category_tree': _('Category & Subcategories'),
+                                                   'event': _('Event')}},
                                  description=_("Specify categories/events shown in the 'upcoming events' list on the "
                                                "home page."))
 
@@ -172,9 +174,9 @@ class UpcomingEventsForm(IndicoForm):
         for entry in field.data:
             if entry['days'] < 0:
                 raise ValidationError(_("'Days' must be a positive integer"))
-            if entry['type'] not in {'category', 'event'}:
+            if entry['type'] not in {'category', 'category_tree', 'event'}:
                 raise ValidationError(_('Invalid type'))
-            if entry['type'] == 'category' and not Category.get(entry['id'], is_deleted=False):
+            if entry['type'] in {'category', 'category_tree'} and not Category.get(entry['id'], is_deleted=False):
                 raise ValidationError(_('Invalid category: {}').format(entry['id']))
             if entry['type'] == 'event' and not Event.get(entry['id'], is_deleted=False):
                 raise ValidationError(_('Invalid event: {}').format(entry['id']))
