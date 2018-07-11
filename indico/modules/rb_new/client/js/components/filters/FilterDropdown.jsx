@@ -122,10 +122,12 @@ export default class FilterDropdown extends React.Component {
     };
 
     handleClose = () => {
-        const {onClose, setGlobalState} = this.props;
+        const {onClose, setGlobalState, initialValues} = this.props;
         const {fieldValues} = this.state;
-        this.setRenderedValue(fieldValues);
-        setGlobalState(fieldValues);
+        if (!_.isEqual(initialValues, fieldValues)) {
+            this.setRenderedValue(fieldValues);
+            setGlobalState(fieldValues);
+        }
         onClose();
     };
 
