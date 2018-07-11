@@ -26,8 +26,10 @@ export default combineReducers({
         switch (action.type) {
             case actions.RESET_BOOKING_AVAILABILITY:
                 return null;
-            case actions.SET_BOOKING_AVAILABILITY:
-                return {availability: action.availability, dateRange: action.dateRange};
+            case actions.SET_BOOKING_AVAILABILITY: {
+                const {availability, dateRange} = action.data;
+                return {availability, dateRange};
+            }
             default:
                 return state;
         }
