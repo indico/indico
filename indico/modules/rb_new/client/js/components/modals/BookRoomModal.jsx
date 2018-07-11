@@ -19,7 +19,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {Button, Checkbox, Form, Grid, Icon, Label, Message, Modal, Radio, Segment} from 'semantic-ui-react';
 import {Form as FinalForm, Field} from 'react-final-form';
-import {FORM_ERROR} from 'final-form';
 import createDecorator from 'final-form-calculate';
 import {ReduxFormField, ReduxRadioField, formatters} from 'indico/react/forms';
 import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
@@ -249,8 +248,8 @@ export default class BookRoomModal extends React.Component {
     submitBooking = async (data) => {
         const {onSubmit} = this.props;
         const rv = await onSubmit(data, this.props);
-        if (!rv.success) {
-            return {[FORM_ERROR]: rv.msg};
+        if (rv.error) {
+            return rv.error;
         }
     };
 

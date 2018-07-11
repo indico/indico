@@ -15,29 +15,21 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import {combineReducers} from 'redux';
+import {requestReducer} from 'indico/utils/redux';
 import * as actions from '../actions';
 
 
-const initialState = {
-    ongoing: false,
-    success: null,
-    timeline: null,
-};
-
-export default function reducer(state = initialState, action) {
-    const {type, message, isPrebooking, availability, dateRange} = action;
-
-    switch (type) {
-        case actions.BOOKING_ONGOING:
-            return {...state, ongoing: true};
-        case actions.BOOKING_CONFIRMED:
-            return {...state, ongoing: false, success: true, message: null, isPrebooking};
-        case actions.BOOKING_FAILED:
-            return {...state, ongoing: false, success: false, message};
-        case actions.RESET_BOOKING_STATE:
-            return {...initialState};
-        case actions.SET_BOOKING_AVAILABILITY:
-            return {...state, ...state.bookingState, timeline: {availability, dateRange}};
+export default combineReducers({
+    request: requestReducer(actions.BOOKING_ONGOING, actions.BOOKING_CONFIRMED, actions.BOOKING_FAILED),
+    timeline: (state = null, action) => {
+        switch (action.type) {
+            case actions.RESET_BOOKING_AVAILABILITY:
+                return null;
+            case actions.SET_BOOKING_AVAILABILITY:
+                return {availability: action.availability, dateRange: action.dateRange};
+            default:
+                return state;
+        }
     }
-    return state;
-}
+});

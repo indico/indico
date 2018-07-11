@@ -28,6 +28,7 @@ import createBookingURL from 'indico-url:rooms_new.create_booking';
 import fetchSuggestionsURL from 'indico-url:rooms_new.suggestions';
 
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
+import {submitFormAction} from 'indico/utils/redux';
 import {preProcessParameters} from './util';
 import {ajax as ajaxFilterRules} from './serializers/filters';
 import {ajax as ajaxBookingRules} from './serializers/bookings';
@@ -73,7 +74,7 @@ export const UPDATE_TIMELINE_DATA = 'UPDATE_TIMELINE_DATA';
 export const BOOKING_ONGOING = 'BOOKING_ONGOING';
 export const BOOKING_CONFIRMED = 'BOOKING_CONFIRMED';
 export const BOOKING_FAILED = 'BOOKING_FAILED';
-export const RESET_BOOKING_STATE = 'RESET_BOOKING_STATE';
+export const RESET_BOOKING_AVAILABILITY = 'RESET_BOOKING_AVAILABILITY';
 // Suggestions
 export const FETCH_SUGGESTIONS_STARTED = 'FETCH_SUGGESTIONS_STARTED';
 export const FETCH_SUGGESTIONS_FAILED = 'FETCH_SUGGESTIONS_FAILED';
@@ -406,29 +407,15 @@ export function fetchTimelineData() {
 }
 
 export function createBooking(args) {
-    return async (dispatch) => {
-        let response;
-        const params = preProcessParameters(args, ajaxBookingRules);
-        dispatch({type: BOOKING_ONGOING});
-
-        try {
-            response = await indicoAxios.post(createBookingURL(), params);
-        } catch (error) {
-            return {success: false, msg: handleAxiosError(error)};
-        }
-        const {success, msg, is_prebooking: isPrebooking} = response.data;
-        if (success) {
-            dispatch({type: BOOKING_CONFIRMED, isPrebooking});
-            return {success};
-        } else {
-            dispatch({type: BOOKING_FAILED, message: msg});
-            return {success, msg};
-        }
-    };
+    const params = preProcessParameters(args, ajaxBookingRules);
+    return submitFormAction(
+        () => indicoAxios.post(createBookingURL(), params),
+        BOOKING_ONGOING, BOOKING_CONFIRMED, BOOKING_FAILED
+    );
 }
 
 export function resetBookingState() {
-    return {type: RESET_BOOKING_STATE};
+    return {type: RESET_BOOKING_AVAILABILITY};
 }
 
 export function fetchRoomSuggestionsStarted() {
