@@ -17,20 +17,33 @@
 
 import {connect} from 'react-redux';
 
+import {stateToQueryString} from 'redux-router-querystring';
+
 import Timeline from '../components/Timeline';
-import {resetBookingState} from '../actions';
+import {resetBookingState, fetchRoomDetails} from '../actions';
+import {pushStateMergeProps} from '../util';
+import {queryString as queryStringSerializer} from '../serializers/filters';
 
 
-const mapStateToProps = (
-    {bookRoom: {timeline, filters: {recurrence: {type}}}}) => ({...timeline, recurrenceType: type}
-);
+const mapStateToProps = ({bookRoom, roomDetails}) => ({
+    ...bookRoom.timeline,
+    recurrenceType: bookRoom.filters.recurrence.type,
+    queryString: stateToQueryString(bookRoom, queryStringSerializer),
+    roomDetails
+});
+
 const mapDispatchToProps = dispatch => ({
     resetBookingState: () => {
         dispatch(resetBookingState());
-    }
+    },
+    fetchRoomDetails(id) {
+        dispatch(fetchRoomDetails(id));
+    },
+    dispatch
 });
 
 export default connect(
     mapStateToProps,
-    mapDispatchToProps
+    mapDispatchToProps,
+    pushStateMergeProps
 )(Timeline);

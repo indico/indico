@@ -23,7 +23,6 @@ import {Button, Container, Label, Loader, Message, Segment} from 'semantic-ui-re
 import DatePicker from 'rc-calendar/lib/Picker';
 import Calendar from 'rc-calendar';
 import {Translate} from 'indico/react/i18n';
-import BookRoomModal from '../containers/BookRoomModal';
 import TimelineContent from './TimelineContent';
 
 import './Timeline.module.scss';
@@ -42,7 +41,8 @@ export default class Timeline extends React.Component {
         availability: PropTypes.object.isRequired,
         isFetching: PropTypes.bool.isRequired,
         resetBookingState: PropTypes.func.isRequired,
-        recurrenceType: PropTypes.string.isRequired
+        recurrenceType: PropTypes.string.isRequired,
+        pushState: PropTypes.func.isRequired
     };
 
     static defaultProps = {
@@ -206,28 +206,20 @@ export default class Timeline extends React.Component {
     };
 
     openBookingModal = (room) => {
-        this.setState({
-            bookingModal: true,
-            selectedRoom: room
-        });
+        const {pushState} = this.props;
+        pushState(`/book/${room.id}/confirm`, true);
     };
 
     closeBookingModal = () => {
-        const {resetBookingState} = this.props;
+        const {resetBookingState, pushState} = this.props;
         resetBookingState();
-        this.setState({
-            bookingModal: false
-        });
+        pushState(`/book`, true);
     };
 
     render() {
-        const {bookingModal, selectedRoom} = this.state;
         return (
             <Container>
                 {this.renderContent()}
-                <BookRoomModal open={bookingModal}
-                               room={selectedRoom}
-                               onClose={this.closeBookingModal} />
             </Container>
         );
     }

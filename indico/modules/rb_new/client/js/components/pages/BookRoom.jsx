@@ -22,7 +22,7 @@ import React from 'react';
 import _ from 'lodash';
 import {Route} from 'react-router-dom';
 import {Button, Card, Dimmer, Grid, Header, Icon, Label, Loader, Message, Popup, Sticky} from 'semantic-ui-react';
-import {Preloader, Slot, toClasses} from 'indico/react/util';
+import {Slot, toClasses} from 'indico/react/util';
 import {PluralTranslate, Translate, Singular, Param, Plural} from 'indico/react/i18n';
 import mapControllerFactory from '../../containers/MapController';
 import RoomSearchPane from '../RoomSearchPane';
@@ -33,6 +33,7 @@ import Room from '../../containers/Room';
 import Timeline from '../../containers/Timeline';
 import BookRoomModal from '../../containers/BookRoomModal';
 import roomDetailsModalFactory from '../modals/RoomDetailsModal';
+import {roomPreloader} from '../../util';
 
 import './BookRoom.module.scss';
 
@@ -318,19 +319,8 @@ export default class BookRoom extends React.Component {
         pushState(`/book`, true);
     };
 
-    roomPreloader(componentFunc) {
-        const {fetchRoomDetails} = this.props;
-        return ({match: {params: {roomId}}}) => (
-            <Preloader checkCached={({roomDetails: {rooms: cachedRooms}}) => !!cachedRooms[roomId]}
-                       action={() => fetchRoomDetails(roomId)}
-                       dimmer={<Dimmer page />}>
-                {() => componentFunc(roomId)}
-            </Preloader>
-        );
-    }
-
     render() {
-        const {roomDetails} = this.props;
+        const {roomDetails, fetchRoomDetails} = this.props;
         return (
             <Grid columns={2}>
                 <Grid.Column width={11}>
@@ -339,15 +329,15 @@ export default class BookRoom extends React.Component {
                 <Grid.Column width={5}>
                     <MapController />
                 </Grid.Column>
-                <Route exact path="/book/:roomId/confirm" render={this.roomPreloader((roomId) => (
+                <Route exact path="/book/:roomId/confirm" render={roomPreloader((roomId) => (
                     <BookRoomModal open
                                    room={roomDetails.rooms[roomId]}
                                    onClose={this.closeBookingModal} />
-                ))} />
-                <Route exact path="/book/:roomId/details" render={this.roomPreloader((roomId) => (
+                ), fetchRoomDetails)} />
+                <Route exact path="/book/:roomId/details" render={roomPreloader((roomId) => (
                     <RoomDetailsModal roomDetails={roomDetails.rooms[roomId]}
                                       onClose={this.closeModal} />
-                ))} />
+                ), fetchRoomDetails)} />
             </Grid>
         );
     }

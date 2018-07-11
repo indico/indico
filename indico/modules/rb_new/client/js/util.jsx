@@ -15,9 +15,12 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import React from 'react';
 import {push} from 'connected-react-router';
 import LatLon from 'geodesy/latlon-vectors';
 import moment from 'moment';
+import {Dimmer} from 'semantic-ui-react';
+import {Preloader} from 'indico/react/util';
 
 
 export function toMoment(dt, format) {
@@ -172,3 +175,15 @@ export const pushStateMergeProps = (stateProps, dispatchProps, ownProps) => ({
         dispatchProps.dispatch(push(url));
     }
 });
+
+
+export const roomPreloader = (componentFunc, action) => {
+    // eslint-disable-next-line react/display-name, react/prop-types
+    return ({match: {params: {roomId}}}) => (
+        <Preloader checkCached={({roomDetails: {rooms: cachedRooms}}) => !!cachedRooms[roomId]}
+                   action={() => action(roomId)}
+                   dimmer={<Dimmer page />}>
+            {() => componentFunc(roomId)}
+        </Preloader>
+    );
+};
