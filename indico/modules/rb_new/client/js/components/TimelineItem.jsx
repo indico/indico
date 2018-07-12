@@ -34,6 +34,12 @@ const classes = {
     unbookableHours: 'unbookable-hours',
 };
 
+const types = {
+    candidates: 'candidate',
+    blockings: 'blocking',
+    nonbookablePeriods: 'unbookable-periods',
+    unbookableHours: 'unbookable-hours',
+};
 
 export default class TimelineItem extends React.Component {
     static propTypes = {
@@ -72,15 +78,15 @@ export default class TimelineItem extends React.Component {
         return (segmentStartDuration - (startHour * 60)) / (step * 60);
     };
 
-    renderOccurrence = (occurrence, additionalClasses = '') => {
+    renderOccurrence = (occurrence, additionalClasses = '', type = '') => {
         let segmentStartDt, segmentEndDt, popupContent;
         const {start_dt: startDt, end_dt: endDt, start_time: startTime, end_time: endTime,
                reservation, reason, bookable} = occurrence;
         const {startHour, endHour, step, onClick} = this.props;
-        if (additionalClasses === 'blocking') {
+        if (type === 'blocking') {
             segmentStartDt = moment(startHour, 'HH:mm');
             segmentEndDt = moment(endHour, 'HH:mm');
-        } else if (additionalClasses === 'unbookable-hours') {
+        } else if (type === 'unbookable-hours') {
             segmentStartDt = moment(startTime, 'HH:mm');
             segmentEndDt = moment(endTime, 'HH:mm');
         } else {
@@ -90,15 +96,15 @@ export default class TimelineItem extends React.Component {
         const blockWidth = 100 / (((endHour - startHour) / step) + 1);
         const segmentWidth = this.calculateWidth(segmentStartDt, segmentEndDt) * blockWidth;
         const segmentPosition = this.calculatePosition(segmentStartDt) * blockWidth;
-        if (additionalClasses === 'blocking') {
+        if (type === 'blocking') {
             popupContent = (
                 <div styleName="popup-center">{Translate.string('Room blocked: {reason}', {reason})}</div>
             );
-        } else if (additionalClasses === 'unbookable-periods') {
+        } else if (type === 'unbookable-periods') {
             popupContent = (
                 <div styleName="popup-center">{Translate.string('Not possible to book in this period')}</div>
             );
-        } else if (additionalClasses === 'unbookable-hours') {
+        } else if (type === 'unbookable-hours') {
             popupContent = (
                 <div styleName="popup-center">
                     <div>{Translate.string('Not possible to book between:')}</div>
@@ -119,7 +125,7 @@ export default class TimelineItem extends React.Component {
         }
 
         const segment = (
-            <div className={additionalClasses} onClick={onClick && additionalClasses === 'default' ? onClick : null}
+            <div className={additionalClasses} onClick={onClick && type === 'candidate' ? onClick : null}
                  styleName="timeline-occurrence"
                  style={{left: `${segmentPosition}%`, width: `calc(${segmentWidth}% + 1px)`}} />
         );
@@ -137,7 +143,7 @@ export default class TimelineItem extends React.Component {
                 occurrences.map((occurrence, i) => (
                     // eslint-disable-next-line react/no-array-index-key
                     <React.Fragment key={i}>
-                        {this.renderOccurrence(occurrence, classes[name] || 'default')}
+                        {this.renderOccurrence(occurrence, classes[name] || 'default', types[name])}
                     </React.Fragment>
                 ))
             ))
