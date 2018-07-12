@@ -167,7 +167,7 @@ def get_category_timetable(categ_ids, start_dt, end_dt, detail_level='event', tz
     # specified range of dates (and category set)
     events = _query_events(categ_ids, day_start, day_end)
     if from_categ:
-        events = events.filter(Event.is_visible_in(from_categ))
+        events = events.filter(Event.is_visible_in(from_categ.id))
     for eid, tt_start_dt in events:
         if tt_start_dt:
             items[eid][tt_start_dt.astimezone(tz).date()].append(tt_start_dt)
