@@ -10,17 +10,20 @@ Version 2.2
 Major Features
 ^^^^^^^^^^^^^^
 
-- TODO
+- Rewrite the room booking frontend to be more straightforward
 
 Improvements
 ^^^^^^^^^^^^
 
-- TODO
+- Rework the event log viewer to be more responsive and not freeze the
+  whole browser when there are thousands of log entries
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
 
-- TODO
+- Use webpack to build static assets
+- Add React+Redux for new frontend modules
+- Enable modern ES201x features
 
 
 ----
