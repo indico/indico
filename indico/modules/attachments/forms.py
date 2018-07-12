@@ -145,15 +145,18 @@ class AttachmentPackageForm(IndicoForm):
 
     filter_type = IndicoRadioField(_('Include'), [DataRequired()])
 
-    sessions = IndicoSelectMultipleCheckboxField(_('Sessions'), [HiddenUnless('filter_type', 'sessions'),
-                                                                 DataRequired()],
+    sessions = IndicoSelectMultipleCheckboxField(_('Sessions'),
+                                                 [UsedIf(lambda form, _: form.filter_type.data == 'sessions'),
+                                                  DataRequired()],
                                                  description=_('Include materials from selected sessions'),
                                                  coerce=int)
     contributions = IndicoSelectMultipleCheckboxField(_('Contributions'),
-                                                      [HiddenUnless('filter_type', 'contributions'), DataRequired()],
+                                                      [UsedIf(lambda form, _: form.filter_type.data == 'contributions'),
+                                                       DataRequired()],
                                                       description=_('Include materials from selected contributions'),
                                                       coerce=int)
-    dates = IndicoSelectMultipleCheckboxField(_('Events scheduled on'), [HiddenUnless('filter_type', 'dates'),
-                                                                         DataRequired()],
+    dates = IndicoSelectMultipleCheckboxField(_('Events scheduled on'),
+                                              [UsedIf(lambda form, _: form.filter_type.data == 'dates'),
+                                               DataRequired()],
                                               description=_('Include materials from sessions/contributions scheduled '
                                                             'on the selected dates'))

@@ -51,4 +51,17 @@
             <input type="submit" class='i-button big highlight' value="{% trans %}Download package{% endtrans %}">
         {% endcall %}
     {% endcall %}
+
+    <script>
+        (function() {
+            'use strict';
+
+            $('#filter_type input:radio').on('change', function() {
+                $('#form-group-sessions').toggle(this.value === 'sessions');
+                $('#form-group-contributions').toggle(this.value === 'contributions');
+                $('#form-group-dates').toggle(this.value === 'dates');
+            });
+            $('#filter_type input:radio:checked').trigger('change');
+        })();
+    </script>
 {% endblock %}
