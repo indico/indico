@@ -440,12 +440,12 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         return (cte.c.id == Event.category_id) & cte.c.path.overlap(category_ids)
 
     @classmethod
-    def is_visible_in(cls, category):
+    def is_visible_in(cls, category_id):
         """
         Create a filter that checks whether the event is visible in
         the specified category.
         """
-        cte = category.visible_categories_cte
+        cte = Category.get_visible_categories_cte(category_id)
         return (db.exists(db.select([1]))
                 .where(db.and_(cte.c.id == Event.category_id,
                                db.or_(Event.visibility.is_(None), Event.visibility > cte.c.level))))

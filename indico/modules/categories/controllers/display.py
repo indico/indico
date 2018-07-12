@@ -644,12 +644,12 @@ class RHCategoryCalendarView(RHDisplayCategoryBase):
         end = tz.localize(dateutil.parser.parse(request.args['end'])).astimezone(utc)
         query = (Event.query
                  .filter(Event.starts_between(start, end),
-                         Event.is_visible_in(self.category),
+                         Event.is_visible_in(self.category.id),
                          ~Event.is_deleted)
                  .options(load_only('id', 'title', 'start_dt', 'end_dt', 'category_id')))
         events = self._get_event_data(query)
         ongoing_events = (Event.query
-                          .filter(Event.is_visible_in(self.category),
+                          .filter(Event.is_visible_in(self.category.id),
                                   Event.start_dt < start,
                                   Event.end_dt > end)
                           .options(load_only('id', 'title', 'start_dt', 'end_dt', 'timezone'))
