@@ -36,7 +36,7 @@ from indico.modules.rb.models.room_attributes import RoomAttributeAssociation
 from indico.modules.rb.models.room_bookable_hours import BookableHours
 from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
 from indico.modules.rb.models.rooms import Room
-from indico.modules.rb_new.schemas import (blocking_schema, bookable_hours_schema, nonbookable_periods_schema,
+from indico.modules.rb_new.schemas import (blockings_schema, bookable_hours_schema, nonbookable_periods_schema,
                                            reservation_occurrences_schema, rooms_schema)
 from indico.util.caching import memoize_redis
 from indico.util.date_time import get_overlap, overlaps
@@ -203,10 +203,10 @@ def get_rooms_conflicts(rooms, start_dt, end_dt, repeat_frequency, repeat_interv
                     obj = ReservationOccurrenceTmp(candidate.start_dt, candidate.end_dt, None)
                     conflicts.append(obj)
         if nonbookable_periods:
-            for _, periods in nonbookable_periods.iteritems():
+            for periods in nonbookable_periods.itervalues():
                 for period in periods:
-                    if overlaps((candidate.start_dt, candidate.end_dt), (period.start_dt, period.end_dt)):
-                        overlap = get_overlap((candidate.start_dt, candidate.end_dt), (period.start_dt, period.end_dt))
+                    overlap = get_overlap((candidate.start_dt, candidate.end_dt), (period.start_dt, period.end_dt))
+                    if overlap.count(None) != len(overlap):
                         obj = ReservationOccurrenceTmp(overlap[0], overlap[1], None)
                         conflicts.append(obj)
         if unbookable_hours:
@@ -215,8 +215,8 @@ def get_rooms_conflicts(rooms, start_dt, end_dt, repeat_frequency, repeat_interv
                                                             minute=hours.start_time.minute)
                 hours_end_dt = candidate.end_dt.replace(hour=hours.end_time.hour,
                                                         minute=hours.end_time.minute)
-                if overlaps((candidate.start_dt, candidate.end_dt), (hours_start_dt, hours_end_dt)):
-                    overlap = get_overlap((candidate.start_dt, candidate.end_dt), (hours_start_dt, hours_end_dt))
+                overlap = get_overlap((candidate.start_dt, candidate.end_dt), (hours_start_dt, hours_end_dt))
+                if overlap.count(None) != len(overlap):
                     obj = ReservationOccurrenceTmp(overlap[0], overlap[1], None)
                     conflicts.append(obj)
         room_conflicts[room_id] = (conflicts, pre_conflicts)
@@ -274,7 +274,7 @@ def get_equipment_types():
 
 def get_blockings(room, candidates):
     blocked_rooms = room.get_blocked_rooms(*(candidate.start_dt for candidate in candidates))
-    if blocked_rooms == []:
+    if not blocked_rooms:
         return {}
     occurences = {}
     dates = list(candidate.start_dt.date() for candidate in candidates)
@@ -289,14 +289,14 @@ def get_blockings(room, candidates):
 def get_unbookable_hours(room):
     hours = [hour for hour in room.bookable_hours]
 
-    if hours and len(hours) > 0:
+    if hours:
         inverted_hours = []
         first = BookableHours(start_time=datetime.strptime('00:00', '%H:%M').time(), end_time=hours[0].start_time)
         inverted_hours.append(first)
         for i in range(1, len(hours)):
             hour = BookableHours(start_time=hours[i - 1].end_time, end_time=hours[i].start_time)
             inverted_hours.append(hour)
-        last = BookableHours(start_time=hours[len(hours) - 1].end_time,
+        last = BookableHours(start_time=hours[-1].end_time,
                              end_time=datetime.strptime('23:59', '%H:%M').time())
         inverted_hours.append(last)
         return inverted_hours
@@ -305,10 +305,10 @@ def get_unbookable_hours(room):
 
 def get_nonbookable_periods(room, candidates):
     periods = room.nonbookable_periods
-    if periods == []:
+    if not periods:
         return {}
-    dates = list(candidate.start_dt for candidate in candidates)
-    occurences = {}
+    dates = [candidate.start_dt for candidate in candidates]
+    occurences = defaultdict(list)
     for period in periods:
         for date in dates:
             if period.start_dt.date() <= date.date() <= period.end_dt.date():
@@ -466,7 +466,7 @@ def serialize_occurrences(data):
 
 
 def serialize_blockings(data):
-    return {dt.isoformat(): blocking_schema.dump(data).data for dt, data in data.iteritems()}
+    return {dt.isoformat(): blockings_schema.dump(data).data for dt, data in data.iteritems()}
 
 
 def serialize_nonbookable_periods(data):

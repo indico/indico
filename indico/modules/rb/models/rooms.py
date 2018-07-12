@@ -589,11 +589,10 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
 
     @staticmethod
     def filter_nonbookable_periods(start_dt, end_dt):
-        nonbookable_periods_filter = Room.nonbookable_periods.any(or_(and_(NonBookablePeriod.start_dt <= start_dt,
-                                                                           NonBookablePeriod.end_dt >= start_dt),
-                                                                      and_(NonBookablePeriod.start_dt <= end_dt,
-                                                                           NonBookablePeriod.end_dt >= end_dt)))
-        return ~nonbookable_periods_filter
+        return ~Room.nonbookable_periods.any(or_(and_(NonBookablePeriod.start_dt <= start_dt,
+                                                      NonBookablePeriod.end_dt >= start_dt),
+                                                 and_(NonBookablePeriod.start_dt <= end_dt,
+                                                      NonBookablePeriod.end_dt >= end_dt)))
 
     @staticmethod
     def find_with_filters(filters, user=None):

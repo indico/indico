@@ -151,9 +151,9 @@ class RHTimeline(RHRoomBookingBase):
         for room_id in availability:
             data = availability[room_id]
             data['room'] = rooms_schema.dump(data['room'], many=False).data
-            data.update({'blockings': serialize_blockings(data['blockings'])})
-            data.update({'nonbookable_periods': serialize_nonbookable_periods(data['nonbookable_periods'])})
-            data.update({'unbookable_hours': serialize_unbookable_hours(data['unbookable_hours'])})
+            data['blockings'] = serialize_blockings(data['blockings'])
+            data['nonbookable_periods'] = serialize_nonbookable_periods(data['nonbookable_periods'])
+            data['unbookable_hours'] = serialize_unbookable_hours(data['unbookable_hours'])
             data.update({k: serialize_occurrences(data[k])
                          for k in ['candidates', 'pre_bookings', 'bookings', 'conflicts', 'pre_conflicts']})
             data.update({

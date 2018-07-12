@@ -19,8 +19,8 @@ from __future__ import unicode_literals
 from marshmallow.fields import Nested, String
 
 from indico.core.marshmallow import mm
-from indico.modules.rb import Blocking
 from indico.modules.rb.models.aspects import Aspect
+from indico.modules.rb.models.blockings import Blocking
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import Reservation
 from indico.modules.rb.models.room_attributes import RoomAttributeAssociation
@@ -86,14 +86,12 @@ class BlockingSchema(mm.ModelSchema):
 
 
 class NonBookablePeriodSchema(mm.ModelSchema):
-
     class Meta:
         model = NonBookablePeriod
         fields = ('start_dt', 'end_dt')
 
 
 class BookableHoursSchema(mm.ModelSchema):
-
     class Meta:
         model = BookableHours
         fields = ('start_time', 'end_time')
@@ -105,6 +103,6 @@ map_rooms_schema = MapRoomSchema(many=True)
 aspects_schema = AspectSchema(many=True)
 reservation_occurrences_schema = ReservationOccurrenceSchema(many=True)
 reservation_schema = ReservationSchema()
-blocking_schema = BlockingSchema(many=True)
+blockings_schema = BlockingSchema(many=True)
 nonbookable_periods_schema = NonBookablePeriodSchema(many=True)
 bookable_hours_schema = BookableHoursSchema()
