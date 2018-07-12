@@ -53,7 +53,8 @@
                     {% endif %}
                 {% else %}
                     <a class="icon-list i-link" title="{% trans %}View session details{% endtrans %}"
-                       href="{{ url_for('sessions.display_session', block.session) }}"></a>
+                       href="{{ url_for('sessions.display_session', block.session,
+                                        _anchor=block.start_dt.astimezone(block.event.tzinfo).strftime('%Y%m%d')) }}"></a>
                 {% endif %}
             </div>
         </div>
