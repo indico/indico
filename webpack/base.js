@@ -291,7 +291,7 @@ export function webpackDefaults(env, config) {
                         priority: 10,
                     },
                     semanticui: {
-                        test: /node_modules\/semantic-ui-react\//,
+                        test: /node_modules\/semantic-ui/,
                         name: 'semantic-ui',
                         chunks: 'initial',
                         priority: 10,
