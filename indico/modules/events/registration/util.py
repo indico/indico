@@ -149,7 +149,7 @@ def make_registration_form(regform, management=False, registration=None):
 
     class RegistrationFormWTF(IndicoForm):
         if management:
-            notify_user = BooleanField(_("Send email"), widget=SwitchWidget())
+            notify_user = BooleanField(_('Send email'), widget=SwitchWidget())
 
         def validate_email(self, field):
             status = check_registration_email(regform, field.data, registration, management=management)
@@ -159,8 +159,10 @@ def make_registration_form(regform, management=False, registration=None):
     for form_item in regform.active_fields:
         if not management and form_item.parent.is_manager_only:
             continue
+
         field_impl = form_item.field_impl
         setattr(RegistrationFormWTF, form_item.html_field_name, field_impl.create_wtf_field())
+
     RegistrationFormWTF.modified_registration = registration
     return RegistrationFormWTF
 
