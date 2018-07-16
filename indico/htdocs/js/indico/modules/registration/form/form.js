@@ -301,6 +301,10 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
                 }
             });
 
+            element.ready(function() {
+                $(document).trigger('indico:registration-form-loaded');
+            });
+
             scope.validate = function() {
                 scope.validationStarted = true;
                 return scope.registrationForm.$valid;

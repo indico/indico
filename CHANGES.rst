@@ -21,6 +21,10 @@ Bugfixes
 - Fix error when a session coordinator tries changing the color of a break
   using the color picker in the balloon's tooltip
 
+Internal Changes
+^^^^^^^^^^^^^^^^
+- Add some new signals and template hooks to the registration module
+
 Version 2.1.2
 -------------
 

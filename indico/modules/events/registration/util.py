@@ -236,6 +236,7 @@ def create_registration(regform, data, invitation=None, management=False, notify
         invitation.registration = registration
     registration.sync_state(_skip_moderation=skip_moderation)
     db.session.flush()
+    signals.event.registration_created.send(registration, management=management)
     notify_registration_creation(registration, notify_user)
     logger.info('New registration %s by %s', registration, user)
     regform.event.log(EventLogRealm.management if management else EventLogRealm.participants,
@@ -286,6 +287,7 @@ def modify_registration(registration, data, management=False, notify_user=True):
                         old_price, registration.price)
     if personal_data_changes:
         signals.event.registration_personal_data_modified.send(registration, change=personal_data_changes)
+    signals.event.registration_updated.send(registration, management=management)
     notify_registration_modification(registration, notify_user)
     logger.info('Registration %s modified by %s', registration, session.user)
     regform.event.log(EventLogRealm.management if management else EventLogRealm.participants,

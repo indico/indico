@@ -29,6 +29,8 @@
                  update-mode="true">
             </div>
         </div>
+        {{ template_hook('after-regform', event=event, regform=registration.registration_form,
+                         registration=registration, management=False) }}
     {% else %}
         {% call message_box('error') %}
             {% if not registration.registration_form.is_modification_open -%}

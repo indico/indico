@@ -111,5 +111,6 @@
                  notify-default="{{ session.get('registration_notify_user_default', true) | tojson | forceescape }}">
             </div>
         </div>
+        {{ template_hook('after-regform', event=event, regform=regform, management=management, registration=none) }}
     {% endif %}
 {% endblock %}
