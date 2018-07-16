@@ -28,6 +28,7 @@ from indico.util.i18n import _
 from indico.util.string import to_unicode
 from indico.web.errors import render_error
 from indico.web.flask.wrappers import IndicoBlueprint
+from indico.web.util import ExpectedError
 
 
 errors_bp = IndicoBlueprint('errors', __name__)
@@ -40,6 +41,13 @@ def handle_forbidden(exc):
     if session.user is None and not request.is_xhr and request.blueprint != 'auth':
         return redirect_to_login(reason=_('Please log in to access this page.'))
     return render_error(exc, _('Access Denied'), get_error_description(exc), exc.code)
+
+
+@errors_bp.app_errorhandler(ExpectedError)
+def handle_expectederror(exc):
+    response = jsonify(exc.data)
+    response.status_code = 418
+    return response
 
 
 @errors_bp.app_errorhandler(UnprocessableEntity)

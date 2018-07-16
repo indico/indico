@@ -87,6 +87,10 @@ export function submitFormAction(submitFunc, requestAction, successAction, error
                 // if it's 422 we assume it's from webargs validation
                 dispatcher(dispatch, errorAction, {error: handleSubmissionError(error)});
                 return {data: null, error: handleSubmissionError(error)};
+            } else if (_.get(error, 'response.status') === 418) {
+                // this is an error that was expected, and will be handled by the app
+                dispatcher(dispatch, errorAction, {error: {[FORM_ERROR]: error.response.data.message}});
+                return {data: null, error: {[FORM_ERROR]: error.response.data.message}};
             } else {
                 // anything else here is unexpected and triggers the usual error dialog
                 const message = handleAxiosError(error, true);
@@ -96,15 +100,6 @@ export function submitFormAction(submitFunc, requestAction, successAction, error
         }
 
         const {data} = response;
-
-        // the request had a successful status code, but may still contain an error
-        // XXX: maybe we should use a custom 4xx error for this... 418/teapot maybe?
-        if (data.error) {
-            dispatcher(dispatch, errorAction, {error: {[FORM_ERROR]: data.error}});
-            return {data: null, error: {[FORM_ERROR]: data.error}};
-        }
-
-        // it really was successful => dispatch whatever success action(s) we have
         dispatcher(dispatch, successAction, {data});
         return {data, error: null};
     };
@@ -118,22 +113,18 @@ export function ajaxAction(requestFunc, requestAction, successAction, errorActio
         try {
             response = await requestFunc();
         } catch (error) {
-            const message = handleAxiosError(error, true);
-            dispatcher(dispatch, errorAction, {error: message});
-            return {data: null, error: message};
+            if (_.get(error, 'response.status') === 418) {
+                // this is an error that was expected, and will be handled by the app
+                dispatcher(dispatch, errorAction, {error: error.response.data});
+                return {data: null, error: error.response.data};
+            } else {
+                const message = handleAxiosError(error, true);
+                dispatcher(dispatch, errorAction, {error: message});
+                return {data: null, error: message};
+            }
         }
 
-        let {data} = response;
-
-        // the request had a successful status code, but may still contain an error
-        // XXX: maybe we should use a custom 4xx error for this... 418/teapot maybe?
-        if (data.error) {
-            dispatcher(dispatch, errorAction, {error: data.error});
-            return {data: null, error: data.error};
-        }
-
-        // it really was successful => dispatch whatever success action(s) we have
-        data = transformData(data);
+        const data = transformData(response.data);
         dispatcher(dispatch, successAction, {data});
         return {data, error: null};
     };

@@ -20,6 +20,7 @@ from datetime import datetime
 
 from flask import g, has_request_context, jsonify, render_template, request, session
 from markupsafe import Markup
+from werkzeug.exceptions import ImATeapot
 
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
@@ -109,6 +110,23 @@ def jsonify_data(flash=True, **json_data):
     if flash:
         json_data['flashed_messages'] = render_template('flashed_messages.html')
     return jsonify(**json_data)
+
+
+class ExpectedError(ImATeapot):
+    """
+    An error that is expected to happen and is guaranteed to be handled
+    by client-side code.
+
+    Use this class in new react-based code together with the AJAX
+    actions when you expect things to go wrong and want to handle
+    them in a nicer way than the usual error dialog.
+
+    :param message: A short message describing the error
+    :param data: Any additional data to return
+    """
+    def __init__(self, message, **data):
+        super(ExpectedError, self).__init__(message or 'Something went wrong')
+        self.data = dict(data, message=message)
 
 
 def _format_request_data(data, hide_passwords=False):

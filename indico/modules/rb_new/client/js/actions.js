@@ -378,12 +378,7 @@ async function _fetchTimelineData(filters, rooms, limit = null) {
         params.limit = limit;
     }
 
-    try {
-        return await indicoAxios.get(fetchTimelineDataURL(), {params});
-    } catch (error) {
-        handleAxiosError(error);
-        throw error;
-    }
+    return await indicoAxios.get(fetchTimelineDataURL(), {params});
 }
 
 export function fetchTimelineData() {
@@ -401,6 +396,7 @@ export function fetchTimelineData() {
         try {
             response = await _fetchTimelineData(filters, rooms, list.length);
         } catch (error) {
+            handleAxiosError(error);
             dispatch(fetchTimelineDataFailed());
             return;
         }

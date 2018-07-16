@@ -41,7 +41,7 @@ from indico.modules.rb_new.util import (get_buildings, get_equipment_types, get_
 from indico.modules.users.models.users import User
 from indico.util.date_time import iterdays
 from indico.util.i18n import _
-from indico.web.util import jsonify_data
+from indico.web.util import ExpectedError, jsonify_data
 
 
 NUM_SUGGESTIONS = 5
@@ -226,8 +226,8 @@ class RHCreateBooking(RHRoomBookingBase):
             db.session.flush()
         except NoReportError as e:
             db.session.rollback()
-            return jsonify(success=False, msg=unicode(e))
-        return jsonify(success=True, is_prebooking=is_prebooking)
+            raise ExpectedError(unicode(e))
+        return jsonify(is_prebooking=is_prebooking)
 
 
 class RHRoomSuggestions(RHRoomBookingBase):
