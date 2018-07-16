@@ -21,7 +21,18 @@ import * as actions from '../actions';
 
 
 export default combineReducers({
-    request: requestReducer(actions.BOOKING_ONGOING, actions.BOOKING_CONFIRMED, actions.BOOKING_FAILED),
+    requests: combineReducers({
+        booking: requestReducer(
+            actions.BOOKING_ONGOING,
+            actions.BOOKING_CONFIRMED,
+            actions.BOOKING_FAILED
+        ),
+        timeline: requestReducer(
+            actions.GET_BOOKING_AVAILABILITY_REQUEST,
+            actions.GET_BOOKING_AVAILABILITY_SUCCESS,
+            actions.GET_BOOKING_AVAILABILITY_ERROR
+        ),
+    }),
     timeline: (state = null, action) => {
         switch (action.type) {
             case actions.RESET_BOOKING_AVAILABILITY:
