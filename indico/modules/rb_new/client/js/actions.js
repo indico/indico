@@ -402,6 +402,7 @@ export function fetchTimelineData() {
             response = await _fetchTimelineData(filters, rooms, list.length);
         } catch (error) {
             dispatch(fetchTimelineDataFailed());
+            return;
         }
         dispatch(updateTimelineData(response.data));
     };
