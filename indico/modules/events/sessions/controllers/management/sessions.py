@@ -25,6 +25,7 @@ from indico.core.db.sqlalchemy.colors import ColorTuple
 from indico.core.db.sqlalchemy.protection import ProtectionMode, render_acl
 from indico.core.permissions import get_principal_permissions
 from indico.modules.events import EventLogKind, EventLogRealm
+from indico.modules.events.contributions import contribution_settings
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.management.controllers.base import RHContributionPersonListMixin
 from indico.modules.events.operations import update_permissions
@@ -88,7 +89,9 @@ class RHCreateSession(RHManageSessionsBase):
     def _process(self):
         inherited_location = self.event.location_data
         inherited_location['inheriting'] = True
-        form = SessionForm(obj=FormDefaults(colors=get_random_color(self.event), location_data=inherited_location),
+        default_duration = contribution_settings.get(self.event, 'default_duration')
+        form = SessionForm(obj=FormDefaults(colors=get_random_color(self.event), location_data=inherited_location,
+                                            default_contribution_duration=default_duration),
                            event=self.event)
         if form.validate_on_submit():
             new_session = create_session(self.event, form.data)

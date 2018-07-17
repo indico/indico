@@ -25,6 +25,7 @@ from wtforms.validators import DataRequired, InputRequired, NumberRange, Validat
 from wtforms.widgets.html5 import NumberInput
 from wtforms_components import TimeField
 
+from indico.modules.events.contributions import contribution_settings
 from indico.modules.events.contributions.forms import ContributionForm
 from indico.modules.events.sessions.forms import SessionBlockForm
 from indico.modules.events.timetable.models.entries import TimetableEntryType
@@ -110,13 +111,16 @@ class BreakEntryForm(EntryFormMixin, IndicoForm):
 
 class ContributionEntryForm(EntryFormMixin, ContributionForm):
     _entry_type = TimetableEntryType.CONTRIBUTION
-    _default_duration = timedelta(minutes=20)
     _display_fields = ('title', 'description', 'type', 'time', 'duration', 'person_link_data', 'location_data',
                        'keywords', 'references')
 
     def __init__(self, *args, **kwargs):
         kwargs['to_schedule'] = kwargs.get('to_schedule', True)
         super(ContributionEntryForm, self).__init__(*args, **kwargs)
+
+    @property
+    def _default_duration(self):
+        return contribution_settings.get(self.event, 'default_duration')
 
 
 class SessionBlockEntryForm(EntryFormMixin, SessionBlockForm):

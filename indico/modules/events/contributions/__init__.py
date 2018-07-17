@@ -16,14 +16,18 @@
 
 from __future__ import unicode_literals
 
+from datetime import timedelta
+
 from flask import flash, session
 
 from indico.core import signals
 from indico.core.logger import Logger
 from indico.core.permissions import ManagementPermission, check_permissions
+from indico.core.settings.converters import TimedeltaConverter
 from indico.modules.events.contributions.contrib_fields import get_contrib_field_types
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.fields import ContributionField
+from indico.modules.events.settings import EventSettingsProxy
 from indico.util.i18n import _, ngettext
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
@@ -122,3 +126,10 @@ def _extend_event_menu(sender, **kwargs):
                         is_enabled=False, static_site=True)
     yield MenuEntryData(title=_("Speaker List"), name='speaker_index', endpoint='contributions.speaker_list',
                         position=6, is_enabled=False, static_site=True)
+
+
+contribution_settings = EventSettingsProxy('contributions', {
+    'default_duration': timedelta(minutes=20)
+}, converters={
+    'default_duration': TimedeltaConverter
+})
