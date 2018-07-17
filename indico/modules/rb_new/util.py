@@ -47,6 +47,7 @@ from indico.util.struct.iterables import group_list
 
 BOOKING_TIME_DIFF = 20  # (minutes)
 DURATION_FACTOR = 0.25
+TempReservationOccurrence = namedtuple('ReservationOccurrenceTmp', ('start_dt', 'end_dt', 'reservation'))
 
 
 def _filter_coordinates(query, filters):
@@ -192,59 +193,73 @@ def get_rooms_conflicts(rooms, start_dt, end_dt, repeat_frequency, repeat_interv
              .options(ReservationOccurrence.NO_RESERVATION_USER_STRATEGY,
                       contains_eager(ReservationOccurrence.reservation)))
 
-    ReservationOccurrenceTmp = namedtuple('ReservationOccurrenceTmp', ('start_dt', 'end_dt', 'reservation'))
     overlapping_occurrences = group_list(query, key=lambda obj: obj.reservation.room.id)
     for room_id, occurrences in overlapping_occurrences.iteritems():
-        conflicts = []
-        pre_conflicts = []
-        for candidate in candidates:
-            for occurrence in occurrences:
-                if candidate.overlaps(occurrence):
-                    overlap = candidate.get_overlap(occurrence)
-                    obj = ReservationOccurrenceTmp(*overlap, reservation=occurrence.reservation)
-                    if occurrence.reservation.is_accepted:
-                        conflicts.append(obj)
-                    else:
-                        pre_conflicts.append(obj)
-        rooms_conflicts[room_id] = conflicts
-        rooms_pre_conflicts[room_id] = pre_conflicts
+        rooms_conflicts[room_id], rooms_pre_conflicts[room_id] = get_room_bookings_conflicts(candidates, occurrences)
 
     for room_id, occurrences in blocked_rooms.iteritems():
-        conflicts = []
-        for candidate in candidates:
-            for occurrence in occurrences:
-                blocking = occurrence.blocking
-                if blocking.start_date <= candidate.start_dt.date() <= blocking.end_date:
-                    if blocking.can_be_overridden(session.user, room=Room.get(room_id)):
-                        continue
-                    obj = ReservationOccurrenceTmp(candidate.start_dt, candidate.end_dt, None)
-                    conflicts.append(obj)
-        rooms_conflicts[room_id] += conflicts
+        rooms_conflicts[room_id] += get_room_blockings_conflicts(room_id, candidates, occurrences)
 
-    for room_id, periods in nonbookable_periods.iteritems():
-        conflicts = []
-        for candidate in candidates:
-            for period in periods:
-                overlap = get_overlap((candidate.start_dt, candidate.end_dt), (period.start_dt, period.end_dt))
-                if overlap.count(None) != len(overlap):
-                    obj = ReservationOccurrenceTmp(overlap[0], overlap[1], None)
-                    conflicts.append(obj)
-        rooms_conflicts[room_id] += conflicts
+    for room_id, occurrences in nonbookable_periods.iteritems():
+        rooms_conflicts[room_id] += get_room_nonbookable_periods_conflicts(candidates, occurrences)
 
     for room_id, occurrences in unbookable_hours.iteritems():
-        conflicts = []
-        for candidate in candidates:
-            for occurrence in occurrences:
-                hours_start_dt = candidate.start_dt.replace(hour=occurrence.start_time.hour,
-                                                            minute=occurrence.start_time.minute)
-                hours_end_dt = candidate.end_dt.replace(hour=occurrence.end_time.hour,
-                                                        minute=occurrence.end_time.minute)
-                overlap = get_overlap((candidate.start_dt, candidate.end_dt), (hours_start_dt, hours_end_dt))
-                if overlap.count(None) != len(overlap):
-                    obj = ReservationOccurrenceTmp(overlap[0], overlap[1], None)
-                    conflicts.append(obj)
-        rooms_conflicts[room_id] += conflicts
+        rooms_conflicts[room_id] += get_room_unbookable_hours_conflicts(candidates, occurrences)
     return rooms_conflicts, rooms_pre_conflicts
+
+
+def get_room_bookings_conflicts(candidates, occurrences):
+    conflicts = []
+    pre_conflicts = []
+    for candidate in candidates:
+        for occurrence in occurrences:
+            if candidate.overlaps(occurrence):
+                overlap = candidate.get_overlap(occurrence)
+                obj = TempReservationOccurrence(*overlap, reservation=occurrence.reservation)
+                if occurrence.reservation.is_accepted:
+                    conflicts.append(obj)
+                else:
+                    pre_conflicts.append(obj)
+    return conflicts, pre_conflicts
+
+
+def get_room_blockings_conflicts(room_id, candidates, occurrences):
+    conflicts = []
+    for candidate in candidates:
+        for occurrence in occurrences:
+            blocking = occurrence.blocking
+            if blocking.start_date <= candidate.start_dt.date() <= blocking.end_date:
+                if blocking.can_be_overridden(session.user, room=Room.get(room_id)):
+                    continue
+                obj = TempReservationOccurrence(candidate.start_dt, candidate.end_dt, None)
+                conflicts.append(obj)
+    return conflicts
+
+
+def get_room_nonbookable_periods_conflicts(candidates, occurrences):
+    conflicts = []
+    for candidate in candidates:
+        for occurrence in occurrences:
+            overlap = get_overlap((candidate.start_dt, candidate.end_dt), (occurrence.start_dt, occurrence.end_dt))
+            if overlap.count(None) != len(overlap):
+                obj = TempReservationOccurrence(overlap[0], overlap[1], None)
+                conflicts.append(obj)
+    return conflicts
+
+
+def get_room_unbookable_hours_conflicts(candidates, occurrences):
+    conflicts = []
+    for candidate in candidates:
+        for occurrence in occurrences:
+            hours_start_dt = candidate.start_dt.replace(hour=occurrence.start_time.hour,
+                                                        minute=occurrence.start_time.minute)
+            hours_end_dt = candidate.end_dt.replace(hour=occurrence.end_time.hour,
+                                                    minute=occurrence.end_time.minute)
+            overlap = get_overlap((candidate.start_dt, candidate.end_dt), (hours_start_dt, hours_end_dt))
+            if overlap.count(None) != len(overlap):
+                obj = TempReservationOccurrence(overlap[0], overlap[1], None)
+                conflicts.append(obj)
+    return conflicts
 
 
 def get_rooms_availability(rooms, start_dt, end_dt, repeat_frequency, repeat_interval, flexibility):
@@ -295,29 +310,29 @@ def group_by_occurrence_date(occurrences):
 def group_blockings(blocked_rooms, dates):
     if not blocked_rooms:
         return {}
-    occurences = {}
+    occurrences = {}
     for blocked_room in blocked_rooms:
         blocking = blocked_room.blocking
         for date in dates:
             if blocking.start_date <= date <= blocking.end_date:
-                occurences[date] = [blocking]
-    return occurences
+                occurrences[date] = [blocking]
+    return occurrences
 
 
 def group_nonbookable_periods(periods, dates):
     if not periods:
         return {}
-    occurences = defaultdict(list)
+    occurrences = defaultdict(list)
     for period in periods:
         for date in dates:
             if period.start_dt.date() <= date <= period.end_dt.date():
-                period_occurence = NonBookablePeriod()
-                period_occurence.start_dt = ((datetime.combine(date, time(0)))
+                period_occurrence = NonBookablePeriod()
+                period_occurrence.start_dt = ((datetime.combine(date, time(0)))
                                              if period.start_dt.date() != date else period.start_dt)
-                period_occurence.end_dt = ((datetime.combine(date, time(23, 59)))
+                period_occurrence.end_dt = ((datetime.combine(date, time(23, 59)))
                                            if period.end_dt.date() != date else period.end_dt)
-                occurences[date].append(period_occurence)
-    return occurences
+                occurrences[date].append(period_occurrence)
+    return occurrences
 
 
 def get_equipment_types():

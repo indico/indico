@@ -80,8 +80,15 @@ export default class TimelineItem extends React.Component {
 
     renderOccurrence = (occurrence, additionalClasses = '', type = '') => {
         let segmentStartDt, segmentEndDt, popupContent;
-        const {start_dt: startDt, end_dt: endDt, start_time: startTime, end_time: endTime,
-               reservation, reason, bookable} = occurrence;
+        const {
+            start_dt: startDt,
+            end_dt: endDt,
+            start_time: startTime,
+            end_time: endTime,
+            reservation,
+            reason,
+            bookable
+        } = occurrence;
         const {startHour, endHour, step, onClick} = this.props;
         if (type === 'blocking') {
             segmentStartDt = moment(startHour, 'HH:mm');
@@ -112,14 +119,18 @@ export default class TimelineItem extends React.Component {
                 </div>
             );
         } else {
+            let popupMessage;
+            if (reservation) {
+                popupMessage = reservation.booking_reason;
+            } else if (bookable) {
+                popupMessage = Translate.string('Click to book it');
+            }
             popupContent = (
                 <div styleName="popup-center">
                     <div>
                         {segmentStartDt.format('HH:mm')} - {segmentEndDt.format('HH:mm')}
                     </div>
-                    <div>
-                        {reservation ? reservation.booking_reason : (bookable ? Translate.string('Click to book it') : '')}
-                    </div>
+                    <div>{popupMessage}</div>
                 </div>
             );
         }
