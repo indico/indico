@@ -21,6 +21,7 @@ import React from 'react';
 import {Form, Grid, Statistic} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
 import BookingBootstrapForm from '../BookingBootstrapForm';
+import {parseSearchBarText} from '../../util';
 
 import './Landing.module.scss';
 
@@ -43,9 +44,11 @@ export default class Landing extends React.Component {
     doSearch = (formState) => {
         const {text} = this.state;
         const {setFilters} = this.props;
+        const parsed = parseSearchBarText(text);
+
         setFilters({
             ...formState,
-            text,
+            ...parsed,
             equipment: []
         });
     };
