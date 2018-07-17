@@ -571,8 +571,8 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
             valid_states = (BlockedRoom.State.accepted,)
         blocking_criteria = [BlockedRoom.blocking_id == Blocking.id,
                              BlockedRoom.state.in_(valid_states),
-                             Blocking.start_date <= start_dt.date(),
-                             Blocking.end_date >= end_dt.date()]
+                             Blocking.start_date <= end_dt.date(),
+                             Blocking.end_date >= start_dt.date()]
         blockings_filter = Room.blocked_rooms.any(and_(*blocking_criteria))
         return ~occurrences_filter & ~blockings_filter
 
@@ -589,10 +589,8 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
 
     @staticmethod
     def filter_nonbookable_periods(start_dt, end_dt):
-        return ~Room.nonbookable_periods.any(or_(and_(NonBookablePeriod.start_dt <= start_dt,
-                                                      NonBookablePeriod.end_dt >= start_dt),
-                                                 and_(NonBookablePeriod.start_dt <= end_dt,
-                                                      NonBookablePeriod.end_dt >= end_dt)))
+        return ~Room.nonbookable_periods.any(and_(NonBookablePeriod.start_dt <= end_dt,
+                                                  NonBookablePeriod.end_dt >= start_dt))
 
     @staticmethod
     def find_with_filters(filters, user=None):
