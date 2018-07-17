@@ -147,11 +147,14 @@ def get_buildings():
     return buildings_tmp
 
 
-def get_existing_room_occurrences(room, start_dt, end_dt, allow_overlapping=False, only_accepted=False):
-    return get_existing_rooms_occurrences([room], start_dt, end_dt, allow_overlapping, only_accepted).get(room.id, [])
+def get_existing_room_occurrences(room, start_dt, end_dt, repeat_frequency, repeat_interval, allow_overlapping=False,
+                                  only_accepted=False):
+    return get_existing_rooms_occurrences([room], start_dt, end_dt, repeat_frequency, repeat_interval,
+                                          allow_overlapping, only_accepted).get(room.id, [])
 
 
-def get_existing_rooms_occurrences(rooms, start_dt, end_dt, allow_overlapping=False, only_accepted=False):
+def get_existing_rooms_occurrences(rooms, start_dt, end_dt, repeat_frequency, repeat_interval, allow_overlapping=False,
+                                   only_accepted=False):
     room_ids = [room.id for room in rooms]
     query = (ReservationOccurrence.query
              .filter(ReservationOccurrence.is_valid, Reservation.room_id.in_(room_ids))
@@ -166,6 +169,11 @@ def get_existing_rooms_occurrences(rooms, start_dt, end_dt, allow_overlapping=Fa
         query = query.filter(ReservationOccurrence.start_dt >= start_dt, ReservationOccurrence.end_dt <= end_dt)
     if only_accepted:
         query = query.filter(Reservation.is_accepted)
+    if repeat_frequency != RepeatFrequency.NEVER:
+        candidates = ReservationOccurrence.create_series(start_dt, end_dt, (repeat_frequency, repeat_interval))
+        dates = [candidate.start_dt for candidate in candidates]
+        query = query.filter(db.cast(ReservationOccurrence.start_dt, db.Date).in_(dates))
+
     return group_list(query, key=lambda obj: obj.reservation.room.id)
 
 
@@ -245,7 +253,7 @@ def get_rooms_availability(rooms, start_dt, end_dt, repeat_frequency, repeat_int
     candidates = ReservationOccurrence.create_series(start_dt, end_dt, (repeat_frequency, repeat_interval))
     date_range = sorted(set(cand.start_dt.date() for cand in candidates))
     occurrences = get_existing_rooms_occurrences(rooms, start_dt.replace(hour=0, minute=0),
-                                                 end_dt.replace(hour=23, minute=59))
+                                                 end_dt.replace(hour=23, minute=59), repeat_frequency, repeat_interval)
     blocked_rooms = get_rooms_blockings(rooms, start_dt.date(), end_dt.date())
     unbookable_hours = get_rooms_unbookable_hours(rooms)
     nonbookable_periods = get_rooms_nonbookable_periods(rooms, start_dt, end_dt)
