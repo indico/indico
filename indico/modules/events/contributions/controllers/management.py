@@ -29,12 +29,12 @@ from indico.legacy.pdfinterface.conference import ContribsToPDF, ContributionBoo
 from indico.modules.attachments.controllers.event_package import AttachmentPackageGeneratorMixin
 from indico.modules.events.abstracts.forms import AbstractContentSettingsForm
 from indico.modules.events.abstracts.settings import abstracts_settings
-from indico.modules.events.contributions import get_contrib_field_types
+from indico.modules.events.contributions import contribution_settings, get_contrib_field_types
 from indico.modules.events.contributions.clone import ContributionCloner
 from indico.modules.events.contributions.controllers.common import ContributionListMixin
-from indico.modules.events.contributions.forms import (ContributionDurationForm, ContributionProtectionForm,
-                                                       ContributionStartDateForm, ContributionTypeForm,
-                                                       SubContributionForm)
+from indico.modules.events.contributions.forms import (ContributionDefaultDurationForm, ContributionDurationForm,
+                                                       ContributionProtectionForm, ContributionStartDateForm,
+                                                       ContributionTypeForm, SubContributionForm)
 from indico.modules.events.contributions.lists import ContributionListGenerator
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.fields import ContributionField
@@ -175,8 +175,10 @@ class RHCreateContribution(RHManageContributionsBase):
     def _process(self):
         inherited_location = self.event.location_data
         inherited_location['inheriting'] = True
+        default_duration = contribution_settings.get(self.event, 'default_duration')
         contrib_form_class = make_contribution_form(self.event)
-        form = contrib_form_class(obj=FormDefaults(location_data=inherited_location), event=self.event)
+        form = contrib_form_class(obj=FormDefaults(location_data=inherited_location, duration=default_duration),
+                                  event=self.event)
         if form.validate_on_submit():
             # Create empty contribution so it can be compared to the new one in flash_if_unregistered
             contrib = Contribution()
@@ -494,6 +496,18 @@ class RHManageContributionTypes(RHManageContributionsBase):
         contrib_types = self.event.contribution_types.order_by(db.func.lower(ContributionType.name)).all()
         return jsonify_template('events/contributions/management/types_dialog.html', event=self.event,
                                 contrib_types=contrib_types)
+
+
+class RHManageDefaultContributionDuration(RHManageContributionsBase):
+    """Dialog to manage the default contribution duration"""
+
+    def _process(self):
+        form = ContributionDefaultDurationForm(duration=contribution_settings.get(self.event, 'default_duration'))
+        if form.validate_on_submit():
+            contribution_settings.set(self.event, 'default_duration', form.duration.data)
+            flash(_("Default contribution duration was changed successfully"))
+            return jsonify_data()
+        return jsonify_form(form)
 
 
 class RHManageContributionTypeBase(RHManageContributionsBase):

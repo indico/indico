@@ -23,7 +23,7 @@ from flask import session
 from indico.core import signals
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
-from indico.modules.events.contributions import logger
+from indico.modules.events.contributions import contribution_settings, logger
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.persons import ContributionPersonLink
 from indico.modules.events.contributions.models.subcontributions import SubContribution
@@ -170,7 +170,10 @@ def create_contribution_from_abstract(abstract, contrib_session=None):
         link.populate_from_attrs(abstract_person_link, person_link_attrs)
         contrib_person_links.add(link)
 
-    duration = contrib_session.default_contribution_duration if contrib_session else timedelta(minutes=15)
+    if contrib_session:
+        duration = contrib_session.default_contribution_duration
+    else:
+        duration = contribution_settings.get(event, 'default_duration')
     custom_fields_data = {'custom_{}'.format(field_value.contribution_field.id): field_value.data for
                           field_value in abstract.field_values}
     return create_contribution(event, {'friendly_id': abstract.friendly_id,

@@ -183,6 +183,11 @@ class ContributionDurationForm(IndicoForm):
                 raise ValidationError(error_msg)
 
 
+class ContributionDefaultDurationForm(IndicoForm):
+    duration = TimeDeltaField(_('Duration'), [DataRequired(), MaxDuration(timedelta(days=1))],
+                              units=('minutes', 'hours'))
+
+
 class ContributionTypeForm(IndicoForm):
     """Form to create or edit a ContributionType"""
 

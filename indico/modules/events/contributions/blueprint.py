@@ -103,6 +103,10 @@ _bp.add_url_rule('/manage/contributions/types/<int:contrib_type_id>', 'manage_ty
 _bp.add_url_rule('/manage/contributions/types/<int:contrib_type_id>/delete', 'delete_type',
                  management.RHDeleteContributionType, methods=('POST',))
 
+# Default contribution duration
+_bp.add_url_rule('/manage/contributions/duration', 'manage_default_duration',
+                 management.RHManageDefaultContributionDuration, methods=('GET', 'POST',))
+
 # Custom contribution fields
 _bp.add_url_rule('/manage/contributions/fields/', 'manage_fields', management.RHManageContributionFields)
 _bp.add_url_rule('/manage/contributions/fields/create/<field_type>', 'create_field',
