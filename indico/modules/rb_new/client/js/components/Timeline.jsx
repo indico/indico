@@ -24,6 +24,7 @@ import DatePicker from 'rc-calendar/lib/Picker';
 import Calendar from 'rc-calendar';
 import {Translate} from 'indico/react/i18n';
 import TimelineContent from './TimelineContent';
+import {isDateWithinRange} from '../util';
 
 import './Timeline.module.scss';
 
@@ -50,22 +51,14 @@ export default class Timeline extends React.Component {
         step: 2
     };
 
+    state = {};
+
     static getDerivedStateFromProps(props, state) {
-        const activeDate = _toMoment(props.dateRange[0]);
-        if (!_.isEmpty(props.dateRange) && activeDate !== state.activeDate) {
-            return {...state, activeDate};
+        if (!_.isEmpty(props.dateRange) && !isDateWithinRange(state.activeDate, props.dateRange, _toMoment)) {
+            return {...state, activeDate: _toMoment(props.dateRange[0])};
         } else {
             return state;
         }
-    }
-
-    constructor(props) {
-        super(props);
-
-        const {dateRange} = this.props;
-        this.state = {
-            activeDate: _toMoment(dateRange[0])
-        };
     }
 
     changeSelectedDate = (mode) => {
@@ -76,11 +69,6 @@ export default class Timeline extends React.Component {
         this.setState({activeDate: _toMoment(dateRange[index])});
     };
 
-    isDateWithinTimelineRange = (date) => {
-        const {dateRange} = this.props;
-        return dateRange.filter((dt) => _toMoment(dt).isSame(date, 'day')).length !== 0;
-    };
-
     onSelect = (date) => {
         const {dateRange} = this.props;
         const startDate = _toMoment(dateRange[0]);
@@ -88,7 +76,7 @@ export default class Timeline extends React.Component {
 
         if (date.isBefore(_toMoment(startDate)) || date.isAfter(_toMoment(endDate))) {
             return;
-        } else if (this.isDateWithinTimelineRange(date)) {
+        } else if (isDateWithinRange(date, dateRange, _toMoment)) {
             this.setState({activeDate: date});
         }
     };
@@ -105,22 +93,18 @@ export default class Timeline extends React.Component {
     };
 
     calendarDisabledDate = (date) => {
+        const {dateRange} = this.props;
         if (!date) {
             return false;
         }
-        return !this.isDateWithinTimelineRange(date);
+        return !isDateWithinRange(date, dateRange, _toMoment);
     };
 
     renderTimelineLegend = () => {
         const {activeDate} = this.state;
         const {dateRange, availability} = this.props;
-        let currentDate = activeDate;
         const startDate = _toMoment(dateRange[0]);
         const endDate = _toMoment(dateRange[dateRange.length - 1]);
-        if (!this.isDateWithinTimelineRange(currentDate)) {
-            currentDate = _toMoment(startDate);
-            this.setState({activeDate: currentDate});
-        }
         const calendar = <Calendar disabledDate={this.calendarDisabledDate} onChange={this.onSelect} />;
         return (
             <Segment styleName="legend" basic>

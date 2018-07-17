@@ -198,3 +198,7 @@ export function boolStateField(namespace, name) {
         }
     };
 }
+
+export function isDateWithinRange(date, dateRange, _toMoment) {
+    return date && dateRange.filter((dt) => _toMoment(dt).isSame(date, 'day')).length !== 0;
+}
