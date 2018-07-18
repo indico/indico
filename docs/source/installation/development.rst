@@ -196,7 +196,7 @@ You should obviously install nginx first::
 
     sudo yum install nginx  # centos/fedora
     sudo apt install nginx  # debian/ubuntu
-    sudo brew install nginx # macOS
+    brew install nginx      # macOS
 
 Here is an example of a ``nginx.conf`` you can use. It assumes your username is ``jdoe`` and the hostname is
 ``acme.example.org``::
