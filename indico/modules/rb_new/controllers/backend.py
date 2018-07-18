@@ -92,9 +92,10 @@ class RHRoomDetails(RHRoomBookingBase):
 
     def _process(self):
         room_details = room_details_schema.dump(self.room).data
-        start_dt = date.today()
-        end_dt = start_dt + timedelta(days=4)
+        start_dt = datetime.combine(date.today(), time(0, 0))
+        end_dt = datetime.combine(start_dt + timedelta(days=4), time(23, 59))
         last_bookings = group_by_occurrence_date(get_existing_room_occurrences(self.room, start_dt, end_dt,
+                                                                               RepeatFrequency.DAY, 1,
                                                                                only_accepted=True))
         range_bookings = {day.date(): last_bookings.get(day.date()) for day in iterdays(start_dt, end_dt)}
         bookings = [

@@ -148,8 +148,8 @@ def get_buildings():
     return buildings_tmp
 
 
-def get_existing_room_occurrences(room, start_dt, end_dt, repeat_frequency, repeat_interval, allow_overlapping=False,
-                                  only_accepted=False):
+def get_existing_room_occurrences(room, start_dt, end_dt, repeat_frequency=RepeatFrequency.NEVER, repeat_interval=None,
+                                  allow_overlapping=False, only_accepted=False):
     return get_existing_rooms_occurrences([room], start_dt, end_dt, repeat_frequency, repeat_interval,
                                           allow_overlapping, only_accepted).get(room.id, [])
 
