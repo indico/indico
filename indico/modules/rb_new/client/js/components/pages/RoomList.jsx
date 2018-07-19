@@ -103,7 +103,7 @@ export default class RoomList extends React.Component {
                     <div className="ui" styleName="room-list" ref={this.contextRef}>
                         <Sticky context={this.contextRef.current} className="sticky-filters">
                             <Grid>
-                                <Grid.Column width={13}>
+                                <Grid.Column width={16}>
                                     <FilterBar />
                                 </Grid.Column>
                             </Grid>

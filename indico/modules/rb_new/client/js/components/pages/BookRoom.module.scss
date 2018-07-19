@@ -69,3 +69,20 @@
         }
     }
 }
+
+.available-room-list {
+    .results-count {
+        margin-bottom: 10px;
+        font-weight: bold;
+        font-size: 1.5em;
+    }
+
+    :global(.redux-lazy-scroll) {
+        overflow: visible !important;
+        margin: 0.15em;
+    }
+}
+
+:global(.ui.inline.loader).rooms-loader {
+    margin-top: 2em;
+}

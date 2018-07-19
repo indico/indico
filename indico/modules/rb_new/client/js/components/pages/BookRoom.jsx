@@ -22,10 +22,11 @@ import React from 'react';
 import _ from 'lodash';
 import {Route} from 'react-router-dom';
 import {Button, Card, Dimmer, Grid, Header, Icon, Label, Loader, Message, Popup, Sticky} from 'semantic-ui-react';
+import LazyScroll from 'redux-lazy-scroll';
+
 import {Slot, toClasses} from 'indico/react/util';
 import {PluralTranslate, Translate, Singular, Param, Plural} from 'indico/react/i18n';
 import mapControllerFactory from '../../containers/MapController';
-import RoomSearchPane from '../RoomSearchPane';
 import BookingFilterBar from '../BookingFilterBar';
 import filterBarFactory from '../../containers/FilterBar';
 import searchBoxFactory from '../../containers/SearchBar';
@@ -68,6 +69,11 @@ export default class BookRoom extends React.Component {
         toggleTimelineView: PropTypes.func.isRequired
     };
 
+    constructor(props) {
+        super(props);
+        this.contextRef = React.createRef();
+    }
+
     state = {};
 
     componentWillUnmount() {
@@ -104,20 +110,47 @@ export default class BookRoom extends React.Component {
 
     renderMainContent = () => {
         const {timelineRef} = this.state;
-        const {fetchRooms, roomDetails, rooms, timeline: {isVisible}} = this.props;
+        const {fetchRooms, roomDetails, rooms: {list, total, isFetching}, timeline: {isVisible}} = this.props;
         const filterBar = <FilterBar />;
         const searchBar = <SearchBar onConfirm={fetchRooms} onTextChange={fetchRooms} />;
 
         if (!isVisible) {
             return (
                 <>
-                    <RoomSearchPane rooms={rooms}
-                                    fetchRooms={fetchRooms}
-                                    filterBar={filterBar}
-                                    searchBar={searchBar}
-                                    renderRoom={this.renderRoom}
-                                    renderSuggestions={this.renderSuggestions}
-                                    extraIcons={this.renderViewSwitch()} />
+                    <div className="ui" styleName="available-room-list" ref={this.contextRef}>
+                        <Sticky context={this.contextRef.current} className="sticky-filters">
+                            <Grid>
+                                <Grid.Column width={13}>
+                                    {filterBar}
+                                </Grid.Column>
+                                {this.renderViewSwitch()}
+                            </Grid>
+                            {searchBar}
+                        </Sticky>
+                        <div styleName="results-count">
+                            {total === 0 && !isFetching && (
+                                Translate.string('There are no rooms available during the selected period')
+                            )}
+                            {total !== 0 && (
+                                <PluralTranslate count={total}>
+                                    <Singular>
+                                        There is <Param name="count" value={total} /> room available for booking
+                                    </Singular>
+                                    <Plural>
+                                        There are <Param name="count" value={total} /> rooms available for booking
+                                    </Plural>
+                                </PluralTranslate>
+                            )}
+                        </div>
+                        <LazyScroll hasMore={total > list.length} loadMore={() => fetchRooms(false)}
+                                    isFetching={isFetching}>
+                            <Card.Group stackable>
+                                {list.map(this.renderRoom)}
+                            </Card.Group>
+                            <Loader active={isFetching} inline="centered" styleName="rooms-loader" />
+                        </LazyScroll>
+                        {this.renderSuggestions()}
+                    </div>
                     <Dimmer.Dimmable>
                         <Dimmer active={roomDetails.isFetching} page>
                             <Loader />
@@ -155,7 +188,7 @@ export default class BookRoom extends React.Component {
         return (
             <>
                 <Header as="h2">
-                    <Translate>Room suggestions</Translate>
+                    <Translate>Rooms that you might be interested in</Translate>
                 </Header>
                 <Card.Group styleName="suggestions" stackable>
                     {suggestions.list.map((suggestion) => this.renderSuggestion(suggestion))}
