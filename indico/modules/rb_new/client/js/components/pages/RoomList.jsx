@@ -18,12 +18,12 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Button, Grid, Dimmer, Loader, Popup} from 'semantic-ui-react';
+import {Button, Card, Grid, Dimmer, Loader, Popup, Sticky} from 'semantic-ui-react';
 import {Route} from 'react-router-dom';
+import LazyScroll from 'redux-lazy-scroll';
 
 import {Preloader, Slot} from 'indico/react/util';
-import {Translate} from 'indico/react/i18n';
-import RoomSearchPane from '../RoomSearchPane';
+import {Param, Plural, PluralTranslate, Translate, Singular} from 'indico/react/i18n';
 import RoomFilterBar from '../RoomFilterBar';
 import filterBarFactory from '../../containers/FilterBar';
 import searchBarFactory from '../../containers/SearchBar';
@@ -31,6 +31,8 @@ import mapControllerFactory from '../../containers/MapController';
 import Room from '../../containers/Room';
 import roomDetailsModalFactory from '../modals/RoomDetailsModal';
 import BookFromListModal from '../modals/BookFromListModal';
+
+import './RoomList.module.scss';
 
 
 const FilterBar = filterBarFactory('roomList', RoomFilterBar);
@@ -53,6 +55,11 @@ export default class RoomList extends React.Component {
         }).isRequired,
         pushState: PropTypes.func.isRequired,
     };
+
+    constructor(props) {
+        super(props);
+        this.contextRef = React.createRef();
+    }
 
     renderRoom = (room) => {
         const {id} = room;
@@ -89,15 +96,40 @@ export default class RoomList extends React.Component {
     }
 
     render() {
-        const {rooms, fetchRooms, roomDetails} = this.props;
+        const {rooms: {list, total, isFetching}, fetchRooms, roomDetails} = this.props;
         return (
             <Grid columns={2}>
                 <Grid.Column width={11}>
-                    <RoomSearchPane rooms={rooms}
-                                    fetchRooms={fetchRooms}
-                                    filterBar={<FilterBar />}
-                                    searchBar={<SearchBar onConfirm={fetchRooms} onTextChange={fetchRooms} />}
-                                    renderRoom={this.renderRoom} />
+                    <div className="ui" styleName="room-list" ref={this.contextRef}>
+                        <Sticky context={this.contextRef.current} className="sticky-filters">
+                            <Grid>
+                                <Grid.Column width={13}>
+                                    <FilterBar />
+                                </Grid.Column>
+                            </Grid>
+                            <SearchBar onConfirm={fetchRooms} onTextChange={fetchRooms} />
+                        </Sticky>
+                        <div styleName="results-count">
+                            {total === 0 && !isFetching && Translate.string('There are no rooms matching the criteria')}
+                            {total !== 0 && (
+                                <PluralTranslate count={total}>
+                                    <Singular>
+                                        There is <Param name="count" value={total} /> room matching the criteria
+                                    </Singular>
+                                    <Plural>
+                                        There are <Param name="count" value={total} /> rooms matching the criteria
+                                    </Plural>
+                                </PluralTranslate>
+                            )}
+                        </div>
+                        <LazyScroll hasMore={total > list.length} loadMore={() => fetchRooms(false)}
+                                    isFetching={isFetching}>
+                            <Card.Group stackable>
+                                {list.map(this.renderRoom)}
+                            </Card.Group>
+                            <Loader active={isFetching} inline="centered" styleName="rooms-loader" />
+                        </LazyScroll>
+                    </div>
                     <Dimmer.Dimmable>
                         <Dimmer active={roomDetails.isFetching} page>
                             <Loader />
