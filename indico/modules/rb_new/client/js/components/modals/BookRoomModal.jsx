@@ -94,7 +94,6 @@ export default class BookRoomModal extends React.Component {
             <ReduxFormField input={input}
                             as={UserSearchField}
                             {...props}
-                            defaultValue={input.value.id}
                             onChange={(user) => {
                                 input.onChange(user);
                             }} />
