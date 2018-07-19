@@ -332,8 +332,7 @@ export default class BookRoomModal extends React.Component {
                                     </Form.Group>
                                     <Field name="user"
                                            component={this.renderUserSearchField}
-                                           disabled={bookingBlocked(fprops) || fprops.values.usage !== 'someone'}
-                                           clearIfDisabled />
+                                           disabled={bookingBlocked(fprops) || fprops.values.usage !== 'someone'} />
                                     <Field name="reason"
                                            component={ReduxFormField}
                                            as={Form.TextArea}
