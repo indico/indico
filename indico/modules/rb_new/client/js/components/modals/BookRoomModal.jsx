@@ -78,7 +78,8 @@ export default class BookRoomModal extends React.Component {
 
     state = {
         skipConflicts: false,
-        bookingConflictsVisible: false
+        bookingConflictsVisible: false,
+        booking: null,
     };
 
     componentDidMount() {
@@ -142,6 +143,11 @@ export default class BookRoomModal extends React.Component {
 
     renderBookingState({submitSucceeded, submitError, submitFailed, values}) {
         if (submitSucceeded) {
+            const {booking} = this.state;
+            const bookingLink = (
+                // TODO: add link to view booking details
+                <a style={{cursor: 'pointer'}} onClick={() => alert(`TODO: View booking ${booking.id}`)} />
+            );
             return (
                 <Message color={values.isPrebooking ? 'orange' : 'green'}>
                     <Message.Header>
@@ -151,9 +157,15 @@ export default class BookRoomModal extends React.Component {
                             <Translate>The room has been booked!</Translate>
                         )}
                     </Message.Header>
-                    <Translate>
-                        You can consult your (pre-)booking <Param name="link" wrapper={<a />}>here</Param>.
-                    </Translate>
+                    {values.isPrebooking ? (
+                        <Translate>
+                            You can consult your booking <Param name="link" wrapper={bookingLink}>here</Param>.
+                        </Translate>
+                    ) : (
+                        <Translate>
+                            You can consult your pre-booking <Param name="link" wrapper={bookingLink}>here</Param>.
+                        </Translate>
+                    )}
                 </Message>
             );
         } else if (submitFailed) {
@@ -250,6 +262,8 @@ export default class BookRoomModal extends React.Component {
         const rv = await onSubmit(data, this.props);
         if (rv.error) {
             return rv.error;
+        } else {
+            this.setState({booking: rv.data.booking});
         }
     };
 

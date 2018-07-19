@@ -68,7 +68,7 @@ class AspectSchema(mm.ModelSchema):
 class ReservationSchema(mm.ModelSchema):
     class Meta:
         model = Reservation
-        fields = ('booking_reason', 'booked_for_name')
+        fields = ('id', 'booking_reason', 'booked_for_name')
 
 
 class ReservationOccurrenceSchema(mm.ModelSchema):

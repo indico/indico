@@ -32,7 +32,8 @@ from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.models.favorites import favorite_room_table
 from indico.modules.rb.models.reservations import RepeatFrequency, Reservation
 from indico.modules.rb.models.rooms import Room
-from indico.modules.rb_new.schemas import aspects_schema, map_rooms_schema, room_details_schema, rooms_schema
+from indico.modules.rb_new.schemas import (aspects_schema, map_rooms_schema, reservation_schema, room_details_schema,
+                                           rooms_schema)
 from indico.modules.rb_new.util import (get_buildings, get_equipment_types, get_existing_room_occurrences,
                                         get_rooms_availability, get_suggestions, group_by_occurrence_date,
                                         has_managed_rooms, search_for_rooms, serialize_blockings,
@@ -221,13 +222,13 @@ class RHCreateBooking(RHRoomBookingBase):
             return jsonify(success=False, msg=msg)
 
         try:
-            Reservation.create_from_data(room, dict(args, booked_for_user=booked_for), session.user,
-                                         prebook=is_prebooking)
+            resv = Reservation.create_from_data(room, dict(args, booked_for_user=booked_for), session.user,
+                                                prebook=is_prebooking)
             db.session.flush()
         except NoReportError as e:
             db.session.rollback()
             raise ExpectedError(unicode(e))
-        return jsonify(is_prebooking=is_prebooking)
+        return jsonify(booking=reservation_schema.dump(resv).data)
 
 
 class RHRoomSuggestions(RHRoomBookingBase):
