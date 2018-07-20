@@ -45,6 +45,8 @@ function timelineReducer(state = initialTimelineState, action) {
             };
         case actions.TOGGLE_TIMELINE_VIEW:
             return {...state, isVisible: action.isVisible};
+        case actions.RESET_PAGE_STATE:
+            return {...state, isVisible: false};
         default:
             return state;
     }
