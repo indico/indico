@@ -17,7 +17,8 @@
 import {connect} from 'react-redux';
 import {stateToQueryString} from 'redux-router-querystring';
 
-import {queryString as queryStringSerializer} from '../serializers/filters';
+import {queryString as queryStringFilterSerializer} from '../serializers/filters';
+import {queryString as queryStringTimelineSerializer} from '../serializers/timeline';
 import BookRoom from '../components/pages/BookRoom';
 import {
     fetchRooms,
@@ -35,7 +36,7 @@ const mapStateToProps = ({bookRoom, mapAspects: {list}, roomDetails, staticData:
     return {
         ...bookRoom,
         roomDetails,
-        queryString: stateToQueryString(bookRoom, queryStringSerializer),
+        queryString: stateToQueryString(bookRoom, queryStringFilterSerializer, queryStringTimelineSerializer),
         showMap: !!list.length && !!tileServerURL
     };
 };
