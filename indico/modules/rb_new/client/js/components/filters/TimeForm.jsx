@@ -52,23 +52,6 @@ export default class TimeForm extends FilterFormComponent {
         this.formRef = React.createRef();
     }
 
-    // XXX: Workaround for what seems to be a semantic-ui-react bug.
-    // Remove once upstream fix available
-    mouseUpHandler = (e) => {
-        const {handleClose} = this.props;
-        if (!this.formRef.current.contains(e.target)) {
-            handleClose();
-        }
-    };
-
-    componentDidMount() {
-        document.addEventListener('mouseup', this.mouseUpHandler);
-    }
-
-    componentWillUnmount() {
-        document.removeEventListener('mouseup', this.mouseUpHandler);
-    }
-
     setTimes = async (startTime, endTime, isEnd) => {
         const {handleClose, setParentField} = this.props;
         const {startTime: prevStartTime, endTime: prevEndTime} = this.state;

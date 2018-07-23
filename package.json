@@ -66,7 +66,7 @@
     "rrule": "^2.2.0",
     "selectize": "^0.12.5",
     "semantic-ui-css": "^2.3.2",
-    "semantic-ui-react": "github:pferreir/Semantic-UI-React#indico",
+    "semantic-ui-react": "^0.82.1",
     "tablesorter": "^2.30.6",
     "taggle": "^1.14.0",
     "underscore": "^1.9.1",
