@@ -31,11 +31,12 @@ import {
 import {pushStateMergeProps} from '../util';
 
 
-const mapStateToProps = ({bookRoom, roomDetails}) => {
+const mapStateToProps = ({bookRoom, mapAspects: {list}, roomDetails, staticData: {tileServerURL}}) => {
     return {
         ...bookRoom,
         roomDetails,
-        queryString: stateToQueryString(bookRoom, queryStringSerializer)
+        queryString: stateToQueryString(bookRoom, queryStringSerializer),
+        showMap: !!list.length && !!tileServerURL
     };
 };
 

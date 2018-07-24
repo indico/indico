@@ -46,7 +46,8 @@ document.addEventListener('DOMContentLoaded', () => {
             hasOwnedRooms: false,
         },
         staticData: {
-            availableLanguages: Indico.Settings.Languages
+            availableLanguages: Indico.Settings.Languages,
+            tileServerURL: Indico.Settings.TileServerURL
         }
     });
 

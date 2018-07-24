@@ -26,6 +26,7 @@ from indico.core.config import config
 from indico.core.plugins import plugin_engine
 from indico.modules.auth.util import url_for_login
 from indico.modules.events.registration.util import url_rule_to_angular
+from indico.modules.rb import rb_settings
 from indico.modules.rb.models.locations import Location
 from indico.modules.users.util import serialize_user
 from indico.util.i18n import get_all_locales, po_to_json
@@ -210,6 +211,7 @@ def generate_global_file():
         'Settings': {
             'ExtAuthenticators': ext_auths,
             'RoomBookingModuleActive': config.ENABLE_ROOMBOOKING,
+            'TileServerURL': rb_settings.get('tileserver_url'),
             'Languages': get_all_locales(),
         },
 

@@ -44,7 +44,8 @@ rb_settings = SettingsProxy('roombooking', {
     'notification_before_days_weekly': 5,
     'notification_before_days_monthly': 7,
     'notifications_enabled': True,
-    'booking_limit': 365
+    'booking_limit': 365,
+    'tileserver_url': ''
 }, acls={'admin_principals', 'authorized_principals'})
 
 

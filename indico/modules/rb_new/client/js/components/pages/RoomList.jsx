@@ -54,6 +54,7 @@ export default class RoomList extends React.Component {
             isFetching: PropTypes.bool,
         }).isRequired,
         pushState: PropTypes.func.isRequired,
+        showMap: PropTypes.bool.isRequired
     };
 
     constructor(props) {
@@ -96,10 +97,10 @@ export default class RoomList extends React.Component {
     }
 
     render() {
-        const {rooms: {list, total, isFetching}, fetchRooms, roomDetails} = this.props;
+        const {rooms: {list, total, isFetching}, fetchRooms, roomDetails, showMap} = this.props;
         return (
             <Grid columns={2}>
-                <Grid.Column width={11}>
+                <Grid.Column width={showMap ? 11 : 16}>
                     <div className="ui" styleName="room-list" ref={this.contextRef}>
                         <Sticky context={this.contextRef.current} className="sticky-filters">
                             <Grid>
@@ -136,9 +137,11 @@ export default class RoomList extends React.Component {
                         </Dimmer>
                     </Dimmer.Dimmable>
                 </Grid.Column>
-                <Grid.Column width={5}>
-                    <MapController />
-                </Grid.Column>
+                {showMap && (
+                    <Grid.Column width={5}>
+                        <MapController />
+                    </Grid.Column>
+                )}
                 <Route exact path="/rooms/:roomId/details" render={this.roomPreloader((roomId) => (
                     <RoomDetailsModal roomDetails={roomDetails.rooms[roomId]}
                                       onClose={this.closeBookingModal} />

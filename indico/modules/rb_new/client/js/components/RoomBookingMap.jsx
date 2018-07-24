@@ -19,6 +19,7 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
 import ReactDOM from 'react-dom';
+import {connect} from 'react-redux';
 import Leaflet from 'leaflet';
 import {Map, TileLayer, MapControl, Marker, Tooltip} from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-markercluster';
@@ -27,20 +28,22 @@ import 'leaflet/dist/leaflet.css';
 import './RoomBookingMap.module.scss';
 
 
-export default class RoomBookingMap extends React.Component {
+class RoomBookingMap extends React.Component {
     static propTypes = {
         bounds: PropTypes.object.isRequired,
         onMove: PropTypes.func.isRequired,
         mapRef: PropTypes.object.isRequired,
         rooms: PropTypes.array,
         onLoad: PropTypes.func,
-        children: PropTypes.node
+        children: PropTypes.node,
+        tileServerURL: PropTypes.string
     };
 
     static defaultProps = {
         rooms: [],
         onLoad: () => {},
-        children: null
+        children: null,
+        tileServerURL: ''
     };
 
     componentDidMount() {
@@ -50,7 +53,7 @@ export default class RoomBookingMap extends React.Component {
 
     render() {
         const {
-            bounds, onMove, mapRef, rooms, children
+            bounds, onMove, mapRef, rooms, children, tileServerURL
         } = this.props;
         Leaflet.Marker.prototype.options.icon = Leaflet.divIcon({className: 'rb-map-marker', iconSize: [20, 20]});
 
@@ -75,7 +78,9 @@ export default class RoomBookingMap extends React.Component {
                      onZoomend={onMoveDebounced}
                      onMoveend={onMoveDebounced}>
                     <TileLayer attribution='© <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-                               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                               minZoom="14"
+                               maxZoom="20"
+                               url={tileServerURL} />
                     {markers}
                     {children}
                 </Map>
@@ -126,3 +131,8 @@ RoomBookingMapControl.propTypes = {
 RoomBookingMapControl.defaultProps = {
     classes: '',
 };
+
+export default connect(
+    ({staticData: {tileServerURL}}) => ({tileServerURL}),
+    null
+)(RoomBookingMap);
