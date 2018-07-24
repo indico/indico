@@ -30,6 +30,7 @@ from indico.modules.rb.models.room_bookable_hours import BookableHours
 from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.views.admin import rooms as room_views
+from indico.modules.rb_new.util import build_rooms_spritesheet
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
@@ -49,6 +50,7 @@ class RHRoomBookingDeleteRoom(RHRoomBookingAdminBase):
             return redirect(url_for('rooms.roomBooking-roomDetails', self._room))
         else:
             db.session.delete(self._room)
+            build_rooms_spritesheet()
             flash(_(u'Room deleted'), 'success')
             return redirect(url_for('rooms_admin.roomBooking-adminLocation', self._room.location))
 
@@ -115,9 +117,11 @@ class RHRoomBookingCreateModifyRoomBase(RHRoomBookingAdminBase):
         if form.small_photo.data and form.large_photo.data:
             _cache.delete_multi('photo-{}-{}'.format(room.id, size) for size in {'small', 'large'})
             room.photo = Photo(thumbnail=form.small_photo.data.read(), data=form.large_photo.data.read())
+            build_rooms_spritesheet()
         elif form.delete_photos.data:
             _cache.delete_multi('photo-{}-{}'.format(room.id, size) for size in {'small', 'large'})
             room.photo = None
+            build_rooms_spritesheet()
         # Custom attributes
         room.attributes = [RoomAttributeAssociation(value=form['attribute_{}'.format(attr.id)].data,
                                                     attribute_id=attr.id)

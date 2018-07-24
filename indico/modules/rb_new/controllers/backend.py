@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 from datetime import date, datetime, time, timedelta
+from io import BytesIO
 from operator import itemgetter
 
 from flask import jsonify, request, session
@@ -27,6 +28,7 @@ from webargs.flaskparser import use_args, use_kwargs
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.queries import with_total_rows
 from indico.core.errors import NoReportError
+from indico.legacy.common.cache import GenericCache
 from indico.modules.groups import GroupProxy
 from indico.modules.rb import Location, rb_settings
 from indico.modules.rb.controllers import RHRoomBookingBase
@@ -35,15 +37,16 @@ from indico.modules.rb.models.reservations import RepeatFrequency, Reservation
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb_new.schemas import (aspects_schema, blockings_schema, locations_schema, map_rooms_schema,
                                            reservation_schema, room_details_schema, rooms_schema)
-from indico.modules.rb_new.util import (approve_or_request_blocking, create_blocking, get_buildings,
-                                        get_equipment_types, get_existing_room_occurrences, get_room_blockings,
-                                        get_room_calendar, get_rooms_availability, get_suggestions,
+from indico.modules.rb_new.util import (approve_or_request_blocking, build_rooms_spritesheet, create_blocking,
+                                        get_buildings, get_equipment_types, get_existing_room_occurrences,
+                                        get_room_blockings, get_room_calendar, get_rooms_availability, get_suggestions,
                                         group_by_occurrence_date, has_managed_rooms, search_for_rooms,
                                         serialize_blockings, serialize_nonbookable_periods, serialize_occurrences,
                                         serialize_unbookable_hours)
 from indico.modules.users.models.users import User
 from indico.util.date_time import iterdays
 from indico.util.i18n import _
+from indico.web.flask.util import send_file
 from indico.web.util import ExpectedError, jsonify_data
 
 
@@ -66,6 +69,8 @@ search_room_args = {
     'ne_lat': fields.Float(validate=lambda x: -90 <= x <= 90),
     'ne_lng': fields.Float(validate=lambda x: -180 <= x <= 180)
 }
+
+_cache = GenericCache('Rooms')
 
 
 def _serialize_availability(availability):
@@ -302,3 +307,15 @@ class RHCreateRoomBlocking(RHRoomBookingBase):
         blocking = create_blocking(rooms, start_date, end_date, reason, allowed)
         approve_or_request_blocking(blocking)
         return jsonify_data(flash=False)
+
+
+class RHRoomsSprite(RHRoomBookingBase):
+    def _process(self):
+        sprite_mapping = _cache.get('rooms-sprite-mapping')
+        if sprite_mapping is None:
+            build_rooms_spritesheet()
+        photo_data = _cache.get('rooms-sprite')
+        io = BytesIO(photo_data)
+        res = send_file('rooms-sprite.jpg', io, 'image/jpeg', no_cache=True, conditional=True)
+        res.cache_control.max_age = 31536000  # 365 days
+        return res

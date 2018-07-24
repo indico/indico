@@ -16,18 +16,23 @@
 
 from __future__ import unicode_literals
 
+import os
 from collections import OrderedDict, defaultdict, namedtuple
 from datetime import datetime, time, timedelta
+from hashlib import md5
+from io import BytesIO
 from itertools import chain, groupby
 from operator import attrgetter
 
-from flask import session
+from PIL import Image
+from flask import current_app, session
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import contains_eager, joinedload, raiseload
 
 from indico.core.auth import multipass
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.queries import db_dates_overlap, escape_like
+from indico.legacy.common.cache import GenericCache
 from indico.modules.rb import rb_is_admin, rb_settings
 from indico.modules.rb.models.blocked_rooms import BlockedRoom, BlockedRoomState
 from indico.modules.rb.models.blockings import Blocking
@@ -49,7 +54,10 @@ from indico.util.struct.iterables import group_list
 
 BOOKING_TIME_DIFF = 20  # (minutes)
 DURATION_FACTOR = 0.25
+ROOM_PHOTO_DIMENSIONS = (290, 170)
 TempReservationOccurrence = namedtuple('ReservationOccurrenceTmp', ('start_dt', 'end_dt', 'reservation'))
+
+_cache = GenericCache('Rooms')
 
 
 def _filter_coordinates(query, filters):
@@ -632,3 +640,34 @@ def approve_or_request_blocking(blocking):
 
     for owner, rooms in rooms_by_owner.iteritems():
         notify_request(owner, blocking, rooms)
+
+
+def build_rooms_spritesheet():
+    image_width, image_height = ROOM_PHOTO_DIMENSIONS
+    rooms = Room.query.filter(Room.photo).all()
+    room_count = len(rooms)
+    mapping = dict()
+    sprite_width = (image_width * (room_count + 1))  # +1 for the placeholder
+    sprite_height = image_height
+    sprite = Image.new(
+        mode='RGB',
+        size=(sprite_width, sprite_height),
+        color=(0, 0, 0))
+
+    # Placeholder image at position 0
+    no_photo_path = 'web/static/images/rooms/large_photos/NoPhoto.jpg'
+    no_photo_image = Image.open(os.path.join(current_app.root_path, no_photo_path))
+    image = no_photo_image.resize(ROOM_PHOTO_DIMENSIONS, Image.ANTIALIAS)
+    sprite.paste(image, (0, 0))
+    for count, room in enumerate(rooms, start=1):
+        location = image_width * count
+        image = Image.open(BytesIO(room.photo.data)).resize(ROOM_PHOTO_DIMENSIONS, Image.ANTIALIAS)
+        sprite.paste(image, (location, 0))
+        mapping[room.id] = count
+
+    output = BytesIO()
+    sprite.save(output, 'JPEG')
+    value = output.getvalue()
+    _cache.set('rooms-sprite', value)
+    _cache.set('rooms-sprite-mapping', mapping)
+    _cache.set('rooms-sprite-token', md5(value).hexdigest()[:6])

@@ -24,6 +24,7 @@ from werkzeug.urls import url_parse
 from indico.core.auth import multipass
 from indico.core.config import config
 from indico.core.plugins import plugin_engine
+from indico.legacy.common.cache import GenericCache
 from indico.modules.auth.util import url_for_login
 from indico.modules.events.registration.util import url_rule_to_angular
 from indico.modules.rb import rb_settings
@@ -31,6 +32,9 @@ from indico.modules.rb.models.locations import Location
 from indico.modules.users.util import serialize_user
 from indico.util.i18n import get_all_locales, po_to_json
 from indico.web.flask.util import url_for, url_rule_to_js
+
+
+_cache = GenericCache('Rooms')
 
 
 def get_locale_data(path, name, domain, react=False):
@@ -205,7 +209,8 @@ def generate_global_file():
         'Data': {
             'WeekDays': ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
             'DefaultLocation': default_location,
-            'Locations': location_names
+            'Locations': location_names,
+            'RoomsSpriteToken': _cache.get('rooms-sprite-token'),
         },
 
         'Settings': {

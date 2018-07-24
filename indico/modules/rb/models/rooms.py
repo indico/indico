@@ -401,6 +401,11 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
     def notification_emails(self):
         return set(filter(None, map(unicode.strip, self.get_attribute_value(u'notification-email', u'').split(u','))))
 
+    @property
+    def sprite_position(self):
+        sprite_mapping = _cache.get('rooms-sprite-mapping')
+        return sprite_mapping.get(self.id, 0) if sprite_mapping else None  # placeholder at position 0
+
     @return_ascii
     def __repr__(self):
         return u'<Room({0}, {1}, {2})>'.format(
