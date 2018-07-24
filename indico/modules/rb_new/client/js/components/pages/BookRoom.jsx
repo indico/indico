@@ -66,7 +66,8 @@ export default class BookRoom extends React.Component {
         resetBookingState: PropTypes.func.isRequired,
         suggestions: PropTypes.object.isRequired,
         pushState: PropTypes.func.isRequired,
-        toggleTimelineView: PropTypes.func.isRequired
+        toggleTimelineView: PropTypes.func.isRequired,
+        showMap: PropTypes.bool.isRequired
     };
 
     constructor(props) {
@@ -354,15 +355,17 @@ export default class BookRoom extends React.Component {
     };
 
     render() {
-        const {roomDetails, fetchRoomDetails} = this.props;
+        const {roomDetails, fetchRoomDetails, showMap} = this.props;
         return (
             <Grid columns={2}>
-                <Grid.Column width={11}>
+                <Grid.Column width={showMap ? 11 : 16}>
                     {this.renderMainContent()}
                 </Grid.Column>
-                <Grid.Column width={5}>
-                    <MapController />
-                </Grid.Column>
+                {showMap && (
+                    <Grid.Column width={5}>
+                        <MapController />
+                    </Grid.Column>
+                )}
                 <Route exact path="/book/:roomId/confirm" render={roomPreloader((roomId) => (
                     <BookRoomModal open
                                    room={roomDetails.rooms[roomId]}

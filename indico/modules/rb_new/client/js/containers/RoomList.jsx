@@ -24,11 +24,12 @@ import {queryString as queryStringSerializer} from '../serializers/filters';
 import {pushStateMergeProps} from '../util';
 
 
-const mapStateToProps = ({roomList, roomDetails}) => {
+const mapStateToProps = ({roomList, roomDetails, mapAspects: {list}, staticData: {tileServerURL}}) => {
     return {
         ...roomList,
         roomDetails,
-        queryString: stateToQueryString(roomList, queryStringSerializer)
+        queryString: stateToQueryString(roomList, queryStringSerializer),
+        showMap: !!list.length && !!tileServerURL
     };
 };
 
