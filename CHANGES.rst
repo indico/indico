@@ -14,6 +14,8 @@ Bugfixes
 - Fix error when exporting abstracts with review questions to JSON
 - Point the timetable to correct day in the session details
 - Fix massive performance issue on the material package page in big events
+- Fix error when using the checkin app to mark someone as checked in
+  (:issue:`3473`, thanks :user:`femtobit`)
 
 Version 2.1.2
 -------------

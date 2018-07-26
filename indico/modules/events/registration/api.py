@@ -20,6 +20,7 @@ from flask import jsonify, request
 from sqlalchemy.orm import joinedload
 from werkzeug.exceptions import BadRequest, Forbidden
 
+from indico.core import signals
 from indico.modules.events.models.events import Event
 from indico.modules.events.registration.util import build_registration_api_data, build_registrations_api_data
 from indico.modules.oauth import oauth
