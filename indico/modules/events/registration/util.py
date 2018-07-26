@@ -7,7 +7,7 @@
 
 import csv
 import itertools
-from collections import OrderedDict
+from collections import Counter, OrderedDict
 from operator import attrgetter
 
 from flask import current_app, json, session
@@ -348,6 +348,49 @@ def generate_spreadsheet_from_registrations(registrations, regform_items, static
     return field_names, rows
 
 
+def generate_spreadsheet_from_registrations_for_import(registrations, regform_items, static_items):
+    """Generates a spreadsheet data from a given registration list.
+
+    :param registrations: The list of registrations to include in the file
+    :param regform_items: The registration form items to be used as columns
+    :param static_items: Registration form information as extra columns
+    """
+    field_names = ['ID', ]
+    special_item_mapping = OrderedDict([
+        ('reg_date', ('Registration date', lambda x: x.submitted_dt)),
+        ('state', ('Registration state', lambda x: x.state.title)),
+        ('price', ('Price', lambda x: x.render_price())),
+        ('checked_in', ('Checked in', lambda x: x.checked_in)),
+        ('checked_in_date', ('Check-in date', lambda x: x.checked_in_dt if x.checked_in else '')),
+        ('payment_date', ('Payment date', lambda x: (x.transaction.timestamp
+                                                     if (x.transaction is not None and
+                                                         x.transaction.status == TransactionStatus.successful)
+                                                     else '')))
+    ])
+    for item in regform_items:
+        field_title = item.parent.title + '#' + item.title
+        field_names.append(item.html_field_name + ':' + field_title)
+    field_names.extend(title for name, (title, fn) in special_item_mapping.iteritems() if name in static_items)
+    rows = []
+    for registration in registrations:
+        data = registration.data_by_field
+        registration_dict = {'ID': registration.friendly_id, }
+        for item in regform_items:
+            key = item.html_field_name
+            if item.input_type == 'accommodation':
+
+                registration_dict[key] = json.dumps(data[item.id].friendly_data) if item.id in data else ''
+            else:
+                registration_dict[key] = data[item.id].friendly_data if item.id in data else ''
+        for name, (title, fn) in special_item_mapping.iteritems():
+            if name not in static_items:
+                continue
+            value = fn(registration)
+            registration_dict[title] = value
+        rows.append(registration_dict)
+    return field_names, rows
+
+
 def get_registrations_with_tickets(user, event):
     query = (Registration.query.with_parent(event)
              .filter(Registration.user == user,
@@ -549,6 +592,30 @@ def update_regform_item_positions(regform):
             child.position = next(positions if child_active else disabled_positions)
 
 
+def map_header_to_fields(header, regform):
+    """Map CSV header item to field name for import
+
+    returns None to indicate the column is unknown and should be skipped
+    """
+    header = header.strip()
+    if header == 'Id':
+        return None
+    if ':' in header:
+        html_field_name, field_title = header.split(':')
+    else:
+        html_field_name = field_title = header
+    for item in regform.active_fields:
+        if html_field_name == item.html_field_name:
+            return html_field_name
+        if field_title == item.parent.title + '#' + item.title:
+            return item.html_field_name
+    else:
+        if html_field_name in ['reg_date', 'state', 'price', 'checked_in',
+                               'checked_in_date', 'payment_date']:
+            return html_field_name
+    return None
+
+
 def import_registrations_from_csv(regform, fileobj, skip_moderation=True, notify_users=False):
     """Import event registrants from a CSV file into a form."""
     with csv_text_io_wrapper(fileobj) as ftxt:
@@ -557,36 +624,45 @@ def import_registrations_from_csv(regform, fileobj, skip_moderation=True, notify
     registered_emails = {email for (email,) in query}
     used_emails = set()
     todo = []
-    for row_num, row in enumerate(reader, 1):
+    keys = []
+    header_row = next(reader)
+    try:
+        keys = [map_header_to_fields(value, regform) for value in header_row]
+    except ValueError:
+        raise UserValueError(_('Malformed CSV header - please check that the field names are correct'))
+    missing = []
+    req_fields = [f.html_field_name for f in regform.active_fields if f.is_required]
+    for req in req_fields:
+        if req not in keys:
+            missing.append(req)
+    if missing:
+        raise UserValueError(_('Header: Missing required fields: {}'). format(','.join(missing)))
+
+    for row_num, row in enumerate(reader):
+        source_row = row_num + 1
         try:
-            first_name, last_name, affiliation, position, phone, email = [value.strip() for value in row]
-            email = email.lower()
+            regdata = {key: value.strip() for key, value in zip(keys, row) if key is not None}
         except ValueError:
-            raise UserValueError(_('Row {}: malformed CSV data - please check that the number of columns is correct')
-                                 .format(row_num))
+            raise UserValueError(_('Row {}: malformed CSV data '
+                                   '- please check that the number of columns is correct')
+                                 .format(source_row))
 
-        if not email:
-            raise UserValueError(_('Row {}: missing e-mail address').format(row_num))
-        if not validate_email(email):
-            raise UserValueError(_('Row {}: invalid e-mail address').format(row_num))
-        if not first_name or not last_name:
-            raise UserValueError(_('Row {}: missing first or last name').format(row_num))
-        if email in registered_emails:
-            raise UserValueError(_('Row {}: a registration with this email already exists').format(row_num))
-        if email in used_emails:
-            raise UserValueError(_('Row {}: email address is not unique').format(row_num))
+        if not regdata.get('email'):
+            raise UserValueError(_('Row {}: missing e-mail address').format(source_row))
+        regdata['email'] = regdata['email'].lower()
+        if not validate_email(regdata['email']):
+            raise UserValueError(_('Row {}: invalid e-mail address').format(source_row))
+        if not regdata.get('first_name') or not regdata.get('last_name'):
+            raise UserValueError(_('Row {}: missing first or last name').format(source_row))
+        if regdata['email'] in registered_emails:
+            raise UserValueError(_('Row {}: a registration with this email already exists').format(source_row))
+        if regdata['email'] in used_emails:
+            raise UserValueError(_('Row {}: email address is not unique').format(source_row))
 
-        used_emails.add(email)
-        todo.append({
-            'email': email,
-            'first_name': first_name.title(),
-            'last_name': last_name.title(),
-            'affiliation': affiliation,
-            'phone': phone,
-            'position': position
-        })
+        used_emails.add(regdata['email'])
+        todo.append(regdata)
     return [create_registration(regform, data, notify_user=notify_users, skip_moderation=skip_moderation)
-            for data in todo]
+            for data in todo], Counter(keys)[None]
 
 
 def get_registered_event_persons(event):

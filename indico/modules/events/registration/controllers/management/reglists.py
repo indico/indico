@@ -40,6 +40,7 @@ from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.registration.notifications import notify_registration_state_update
 from indico.modules.events.registration.settings import event_badge_settings
 from indico.modules.events.registration.util import (create_registration, generate_spreadsheet_from_registrations,
+                                                     generate_spreadsheet_from_registrations_for_import,
                                                      get_event_section_data, get_ticket_attachments, get_title_uuid,
                                                      import_registrations_from_csv, make_registration_form)
 from indico.modules.events.registration.views import WPManageRegistration
@@ -351,6 +352,16 @@ class RHRegistrationsExportCSV(RHRegistrationsExportBase):
         return send_csv('registrations.csv', headers, rows)
 
 
+class RHRegistrationsExportCSVForImport(RHRegistrationsExportBase):
+    """Export registration list to a CSV file for import into another form"""
+
+    def _process(self):
+        headers, rows = generate_spreadsheet_from_registrations_for_import(self.registrations,
+                                                                           self.export_config['regform_items'],
+                                                                           self.export_config['static_item_ids'])
+        return send_csv('registrations.csv', headers, rows)
+
+
 class RHRegistrationsExportExcel(RHRegistrationsExportBase):
     """Export registration list to an XLSX file."""
 
@@ -368,12 +379,13 @@ class RHRegistrationsImport(RHRegistrationsActionBase):
 
         if form.validate_on_submit():
             skip_moderation = self.regform.moderation_enabled and form.skip_moderation.data
-            registrations = import_registrations_from_csv(self.regform, form.source_file.data,
-                                                          skip_moderation=skip_moderation,
-                                                          notify_users=form.notify_users.data)
+            registrations, skipped_cols = import_registrations_from_csv(self.regform, form.source_file.data,
+                                                                        skip_moderation=skip_moderation,
+                                                                        notify_users=form.notify_users.data)
             flash(ngettext("{} registration has been imported.",
                            "{} registrations have been imported.",
                            len(registrations)).format(len(registrations)), 'success')
+            flash(ngettext("{} columns skipped").format(skipped_cols), 'success')
             return jsonify_data(flash=False, redirect=url_for('.manage_reglist', self.regform),
                                 redirect_no_loading=True)
         return jsonify_template('events/registration/management/import_registrations.html', form=form,

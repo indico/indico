@@ -7,29 +7,16 @@
         following order:
     {% endtrans %}
     <ul>
+    {% for regform.active_fields as form_item %}
         <li>
-            {%- trans %}First Name{% endtrans -%}
+            {form_item.html_field_name}{% if form_item.is_required %}*{% endif %}
         </li>
-        <li>
-            {%- trans %}Last Name{% endtrans -%}
-        </li>
-        <li>
-            {%- trans %}Affiliation{% endtrans -%}
-        </li>
-        <li>
-            {%- trans %}Position{% endtrans -%}
-        </li>
-        <li>
-            {%- trans %}Phone Number{% endtrans -%}
-        </li>
-        <li>
-            {%- trans %}E-mail{% endtrans -%}
-        </li>
+    {% endfor %}
     </ul>
-    {% trans -%}
-        The fields "First Name", "Last Name" and "E-mail" are mandatory.
-    {%- endtrans %}
     <br>
+    {% trans -%}
+        The first  line should name the fields like shown above.
+    {%- endtrans %}
     {% trans -%}
         Users will be matched with existing Indico identities through their e-mail.
     {%- endtrans %}
