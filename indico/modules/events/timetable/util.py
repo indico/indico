@@ -255,11 +255,12 @@ def get_category_timetable(categ_ids, start_dt, end_dt, detail_level='event', tz
     return result
 
 
-def render_entry_info_balloon(entry, editable=False, sess=None):
+def render_entry_info_balloon(entry, editable=False, sess=None, is_session_timetable=False):
     if entry.break_:
         return render_template('events/timetable/balloons/break.html', break_=entry.break_, editable=editable,
                                can_manage_event=entry.event.can_manage(session.user), color_list=get_colors(),
-                               event_locked=entry.event.is_locked)
+                               event_locked=entry.event.is_locked,
+                               is_session_timetable=is_session_timetable)
     elif entry.contribution:
         return render_template('events/timetable/balloons/contribution.html', contrib=entry.contribution,
                                editable=editable,
@@ -270,7 +271,8 @@ def render_entry_info_balloon(entry, editable=False, sess=None):
         return render_template('events/timetable/balloons/block.html', block=entry.session_block, editable=editable,
                                can_manage_session=sess.can_manage(session.user) if sess else True,
                                can_manage_blocks=sess.can_manage_blocks(session.user) if sess else True,
-                               color_list=get_colors(), event_locked=entry.event.is_locked)
+                               color_list=get_colors(), event_locked=entry.event.is_locked,
+                               is_session_timetable=is_session_timetable)
     else:
         raise ValueError("Invalid entry")
 

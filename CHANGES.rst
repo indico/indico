@@ -16,6 +16,8 @@ Bugfixes
 - Fix massive performance issue on the material package page in big events
 - Fix error when using the checkin app to mark someone as checked in
   (:issue:`3473`, thanks :user:`femtobit`)
+- Only return timetable entries for the current session when updating a
+  session through the timetable (:issue:`3474`)
 
 Version 2.1.2
 -------------

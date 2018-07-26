@@ -539,6 +539,7 @@ function loadBalloonContent(self, api, editable) {
     };
     if (self.timetable.isSessionTimetable) {
         urlParams.session_id = self.eventData.sessionId;
+        urlParams.is_session_timetable = 1;
     }
 
     $.ajax({

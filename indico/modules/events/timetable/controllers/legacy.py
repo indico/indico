@@ -522,10 +522,16 @@ class RHLegacyTimetableEditEntryDateTime(RHManageTimetableEntryBase):
 
 
 class RHLegacyTimetableEditSession(RHSessionREST):
+    def _process_args(self):
+        RHSessionREST._process_args(self)
+        self.is_session_timetable = request.args.get('is_session_timetable') == '1'
+
     def _process_PATCH(self):
         RHSessionREST._process_PATCH(self)
-        return jsonify_data(entries=[serialize_entry_update(block.timetable_entry) for block in self.session.blocks],
-                            flash=False)
+        entries = [serialize_entry_update(block.timetable_entry,
+                                          session_=(self.session if self.is_session_timetable else None))
+                   for block in self.session.blocks]
+        return jsonify_data(entries=entries, flash=False)
 
 
 class RHLegacyTimetableBreakREST(RHBreakREST):

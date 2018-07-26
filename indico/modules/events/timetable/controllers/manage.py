@@ -146,10 +146,12 @@ class RHManageTimetableEntryInfo(RHManageTimetableBase):
 
     def _process_args(self):
         RHManageTimetableBase._process_args(self)
+        self.is_session_timetable = request.args.get('is_session_timetable') == '1'
         self.entry = self.event.timetable_entries.filter_by(id=request.view_args['entry_id']).first_or_404()
 
     def _process(self):
-        html = render_entry_info_balloon(self.entry, editable=True, sess=self.session)
+        html = render_entry_info_balloon(self.entry, editable=True, sess=self.session,
+                                         is_session_timetable=self.is_session_timetable)
         return jsonify(html=html)
 
 
