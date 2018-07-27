@@ -39,7 +39,7 @@ export default function Menu() {
                 <Icon name="calendar" />
                 <Translate>Calendar</Translate>
             </MenuItem>
-            <MenuItem key="blockings" path="/blockings" disabled>
+            <MenuItem key="blockings" path="/blockings">
                 <Icon name="window close" />
                 <Translate>Blockings</Translate>
             </MenuItem>

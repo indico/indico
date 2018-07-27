@@ -15,27 +15,23 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import bookRoomReducer from './bookRoom';
-import userReducer from './user';
-import roomListReducer from './roomList';
-import equipmentReducer from './equipment';
-import buildingsReducer from './buildings';
-import mapAspectsReducer from './mapAspects';
-import roomDetailsReducer from './roomDetails';
-import bookRoomFormReducer from './bookRoomForm';
-import blockingsReducer from './blockings';
+import * as actions from '../actions';
 
 
-const reducers = {
-    user: userReducer,
-    bookRoom: bookRoomReducer,
-    roomList: roomListReducer,
-    equipment: equipmentReducer,
-    buildings: buildingsReducer,
-    mapAspects: mapAspectsReducer,
-    roomDetails: roomDetailsReducer,
-    bookRoomForm: bookRoomFormReducer,
-    blockings: blockingsReducer
+const initialState = {
+    list: [],
+    isFetching: false
 };
 
-export default reducers;
+export default function reducer(state = initialState, action) {
+    switch (action.type) {
+        case actions.UPDATE_BLOCKINGS:
+            return {...state, isFetching: false, list: action.blockings};
+        case actions.FETCH_BLOCKINGS_STARTED:
+            return {...state, isFetching: true};
+        case actions.FETCH_BLOCKINGS_FAILED:
+            return {...state, isFetching: false};
+        default:
+            return state;
+    }
+}
