@@ -34,7 +34,7 @@ export default class MapController extends React.Component {
         }).isRequired,
         filterBounds: PropTypes.object,
         aspects: PropTypes.array.isRequired,
-        fetchRooms: PropTypes.func.isRequired,
+        fetchMapRooms: PropTypes.func.isRequired,
         toggleMapSearch: PropTypes.func.isRequired,
         updateLocation: PropTypes.func.isRequired
     };
@@ -74,8 +74,8 @@ export default class MapController extends React.Component {
     }
 
     async componentDidMount() {
-        const {fetchRooms} = this.props;
-        fetchRooms();
+        const {fetchMapRooms} = this.props;
+        fetchMapRooms();
     }
 
     componentDidUpdate() {

@@ -62,6 +62,11 @@ export default class RoomList extends React.Component {
         this.contextRef = React.createRef();
     }
 
+    componentDidMount() {
+        const {fetchRooms} = this.props;
+        fetchRooms();
+    }
+
     renderRoom = (room) => {
         const {id} = room;
         const {pushState} = this.props;

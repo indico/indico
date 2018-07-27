@@ -49,8 +49,7 @@ export default function mapControllerFactory(namespace) {
             dispatch(fetchRooms(namespace));
             dispatch(fetchMapRooms(namespace));
         },
-        fetchRooms: (clear = true) => {
-            dispatch(fetchRooms(namespace, clear));
+        fetchMapRooms: () => {
             dispatch(fetchMapRooms(namespace));
         }
     });

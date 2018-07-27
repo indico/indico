@@ -114,7 +114,7 @@ class RHRoomDetails(RHRoomBookingBase):
 
 class RHAspects(RHRoomBookingBase):
     def _process(self):
-        if not Location.find_all():
+        if not Location.query.has_rows():
             return jsonify([])
 
         to_cast = ['top_left_latitude', 'top_left_longitude', 'bottom_right_latitude', 'bottom_right_longitude']

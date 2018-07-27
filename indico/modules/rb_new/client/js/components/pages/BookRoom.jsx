@@ -77,6 +77,11 @@ export default class BookRoom extends React.Component {
 
     state = {};
 
+    componentDidMount() {
+        const {fetchRooms} = this.props;
+        fetchRooms();
+    }
+
     componentWillUnmount() {
         const {clearTextFilter, clearRoomList} = this.props;
         clearTextFilter();
