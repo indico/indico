@@ -43,3 +43,4 @@ _bp.add_url_rule('/api/equipment', 'equipment_types', backend.RHEquipmentTypes)
 _bp.add_url_rule('/api/booking/create', 'create_booking', backend.RHCreateBooking,
                  methods=('POST',))
 _bp.add_url_rule('/api/suggestions', 'suggestions', backend.RHRoomSuggestions)
+_bp.add_url_rule('/api/blockings', 'blockings', backend.RHRoomBlockings)

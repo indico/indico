@@ -541,3 +541,7 @@ def serialize_nonbookable_periods(data):
 
 def serialize_unbookable_hours(data):
     return [bookable_hours_schema.dump(d).data for d in data]
+
+
+def get_room_blockings(user):
+    return Blocking.query.filter(Blocking.created_by_user == user).all()

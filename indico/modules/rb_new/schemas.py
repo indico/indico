@@ -20,6 +20,7 @@ from marshmallow.fields import Nested, String
 
 from indico.core.marshmallow import mm
 from indico.modules.rb.models.aspects import Aspect
+from indico.modules.rb.models.blocked_rooms import BlockedRoom
 from indico.modules.rb.models.blockings import Blocking
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import Reservation
@@ -79,10 +80,20 @@ class ReservationOccurrenceSchema(mm.ModelSchema):
         fields = ('start_dt', 'end_dt', 'is_valid', 'reservation')
 
 
+class BlockedRoomSchema(mm.ModelSchema):
+    room = Nested(RoomSchema, many=False)
+
+    class Meta:
+        model = BlockedRoom
+        fields = ('rejection_reason', 'room')
+
+
 class BlockingSchema(mm.ModelSchema):
+    blocked_rooms = Nested(BlockedRoomSchema, many=True)
+
     class Meta:
         model = Blocking
-        fields = ('reason',)
+        fields = ('id', 'start_date', 'end_date', 'reason', 'blocked_rooms')
 
 
 class NonBookablePeriodSchema(mm.ModelSchema):

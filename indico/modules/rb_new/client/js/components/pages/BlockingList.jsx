@@ -16,11 +16,79 @@
  */
 
 import React from 'react';
-import {Translate} from 'indico/react/i18n';
+import {connect} from 'react-redux';
+import PropTypes from 'prop-types';
+import {Container, Card, Image, Loader} from 'semantic-ui-react';
+import {Param, PluralTranslate, Plural, Singular} from 'indico/react/i18n';
+import {fetchBlockings} from '../../actions';
+
+import './BlockingList.module.scss';
 
 
-export default function BookRoom() {
-    return (
-        <h2><Translate>Blocking List</Translate></h2>
-    );
+class BlockingList extends React.Component {
+    static propTypes = {
+        list: PropTypes.array.isRequired,
+        isFetching: PropTypes.bool.isRequired,
+        fetchBlockings: PropTypes.func.isRequired
+    };
+
+    componentDidMount() {
+        this.props.fetchBlockings(); // eslint-disable-line react/destructuring-assignment
+    }
+
+    renderBlocking = (blocking) => {
+        const numberOfBlockedRooms = blocking.blocked_rooms.length;
+        return (
+            <Card key={blocking.id}>
+                <Image key={blocking.blocked_rooms[0].room.id}
+                       src={blocking.blocked_rooms[0].room.large_photo_url}
+                       size="medium" />
+                <Card.Content>
+                    <Card.Header>
+                        <PluralTranslate count={numberOfBlockedRooms}>
+                            <Singular>
+                                1 room
+                            </Singular>
+                            <Plural>
+                                <Param name="count" value={numberOfBlockedRooms} /> rooms
+                            </Plural>
+                        </PluralTranslate>
+                    </Card.Header>
+                    <Card.Meta>
+                        {blocking.start_date} - {blocking.end_date}
+                    </Card.Meta>
+                    <Card.Description>
+                        {blocking.reason}
+                    </Card.Description>
+                </Card.Content>
+            </Card>
+        );
+    };
+
+    render() {
+        const {list: blockings, isFetching} = this.props;
+        return (
+            <>
+                <Container styleName="blockings-list" fluid>
+                    <Card.Group stackable>
+                        {blockings.map(this.renderBlocking)}
+                    </Card.Group>
+                    <Loader active={isFetching} inline="centered" />
+                </Container>
+            </>
+        );
+    }
 }
+
+const mapStateToProps = ({blockings}) => ({...blockings});
+
+const mapDispatchToProps = dispatch => ({
+    fetchBlockings: () => {
+        dispatch(fetchBlockings());
+    }
+});
+
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(BlockingList);
