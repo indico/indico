@@ -59,10 +59,10 @@ class RoomBookingMap extends React.Component {
 
         const markers = !!rooms.length && (
             <MarkerClusterGroup showCoverageOnHover={false}>
-                {rooms.map((room) => (
-                    <Marker key={room.id} position={[room.lat, room.lng]}>
+                {rooms.filter(({lat, lng}) => !!(lat && lng)).map(({id, name, lat, lng}) => (
+                    <Marker key={id} position={[lat, lng]}>
                         <Tooltip direction="top">
-                            <span>{room.name}</span>
+                            <span>{name}</span>
                         </Tooltip>
                     </Marker>
                 ))}
