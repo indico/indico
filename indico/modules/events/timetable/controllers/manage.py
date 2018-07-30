@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 import dateutil.parser
 from flask import jsonify, request, session
-from werkzeug.exceptions import BadRequest
+from werkzeug.exceptions import BadRequest, Forbidden
 
 from indico.core.db.sqlalchemy.colors import ColorTuple
 from indico.modules.events.contributions import Contribution
@@ -162,6 +162,12 @@ class RHBreakREST(RHManageTimetableBase):
         RHManageTimetableBase._process_args(self)
         self.entry = self.event.timetable_entries.filter_by(break_id=request.view_args['break_id']).first_or_404()
         self.break_ = self.entry.break_
+
+    def _check_access(self):
+        if not self.entry.parent or self.entry.parent.type != TimetableEntryType.SESSION_BLOCK:
+            RHManageTimetableBase._check_access(self)
+        elif not self.entry.parent.session_block.session.can_manage(session.user, permission='coordinate'):
+            raise Forbidden
 
     def _process_PATCH(self):
         data = request.json

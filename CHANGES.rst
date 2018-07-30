@@ -18,6 +18,8 @@ Bugfixes
   (:issue:`3473`, thanks :user:`femtobit`)
 - Only return timetable entries for the current session when updating a
   session through the timetable (:issue:`3474`)
+- Fix error when a session coordinator tries changing the color of a break
+  using the color picker in the balloon's tooltip
 
 Version 2.1.2
 -------------
