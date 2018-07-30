@@ -88,4 +88,4 @@ a good idea to periodically update the TeXLive packages by running:
 
 .. code-block:: shell
 
-    /opt/texlive/bin/x86_64-linux/tlmgr update --all
+    /opt/texlive/bin/x86_64-linux/tlmgr update --self --all
