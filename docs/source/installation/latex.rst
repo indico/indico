@@ -10,7 +10,16 @@ Since Indico requires quite a few LaTeX packages which are not always]
 installed by default when using the texlive packages of the various
 linux distrubtions, we recommend installing it manually.
 
-The following commands should work fine to install everything you need.
+First of all, you will need to install some dependencies so that all TeX
+formats are generated successfully upon TeXLive installation.
+
+.. code-block:: shell
+
+    yum install fontconfig ghostscript     # CentOS / CC7
+    apt install libfontconfig1 ghostscript # Debian / Ubuntu
+
+You are now ready to install TeXLive. The following commands should work
+fine to install everything you need.
 You need to run the installation as root or create ``/opt/texlive`` as
 root and grant your user write access to it.
 
