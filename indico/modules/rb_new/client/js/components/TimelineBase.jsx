@@ -39,6 +39,7 @@ export default class TimelineBase extends React.Component {
         rows: PropTypes.arrayOf(PropTypes.object).isRequired,
         legend: PropTypes.node.isRequired,
         emptyMessage: PropTypes.node,
+        extraContent: PropTypes.node,
         minHour: PropTypes.number.isRequired,
         maxHour: PropTypes.number.isRequired,
         step: PropTypes.number,
@@ -59,7 +60,8 @@ export default class TimelineBase extends React.Component {
         ),
         step: 2,
         onClick: null,
-        activeDate: null
+        activeDate: null,
+        extraContent: null
     };
 
     calendarDisabledDate = (date) => {
@@ -89,7 +91,9 @@ export default class TimelineBase extends React.Component {
     };
 
     renderTimeline = () => {
-        const {activeDate, dateRange, legend, maxHour, minHour, onClick, recurrenceType, rows, step} = this.props;
+        const {
+            activeDate, dateRange, extraContent, legend, maxHour, minHour, onClick, recurrenceType, rows, step
+        } = this.props;
         const hourSeries = _.range(minHour, maxHour + step, step);
         const calendar = <Calendar disabledDate={this.calendarDisabledDate} onChange={this.onSelect} />;
         const startDate = _toMoment(dateRange[0]);
@@ -122,6 +126,7 @@ export default class TimelineBase extends React.Component {
                     )}
                 </Segment>
                 <div styleName="timeline">
+                    {extraContent}
                     <TimelineContent rows={rows}
                                      hourSeries={hourSeries}
                                      recurrenceType={recurrenceType}

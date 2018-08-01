@@ -21,8 +21,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {connect} from 'react-redux';
 import {stateToQueryString} from 'redux-router-querystring';
-import {Label, Message} from 'semantic-ui-react';
-import {Translate} from 'indico/react/i18n';
+import {Label, Message, Segment} from 'semantic-ui-react';
+import {Translate, Param} from 'indico/react/i18n';
 import {isDateWithinRange, pushStateMergeProps} from '../util';
 import {queryString as queryStringSerializer} from '../serializers/filters';
 import TimelineBase from './TimelineBase';
@@ -33,7 +33,6 @@ import './Timeline.module.scss';
 
 const DATE_FORMAT = 'YYYY-MM-DD';
 const _toMoment = (date) => moment(date, DATE_FORMAT);
-
 
 class BookingTimeline extends React.Component {
     static propTypes = {
@@ -59,6 +58,12 @@ class BookingTimeline extends React.Component {
         }
     }
 
+    get singleRoom() {
+        const {availability} = this.props;
+        const keys = Object.keys(availability);
+        return keys.length === 1 && availability[keys[0]];
+    }
+
     calcRows = () => {
         const {activeDate} = this.state;
         const {availability, dateRange} = this.props;
@@ -69,9 +74,8 @@ class BookingTimeline extends React.Component {
 
         let rows = [];
 
-        if (Object.keys(availability).length === 1) {
-            const roomId = Object.keys(availability)[0];
-            const roomAvailability = availability[roomId];
+        if (this.singleRoom) {
+            const roomAvailability = this.singleRoom;
             const room = roomAvailability.room;
 
             rows = dateRange.map((dt) => {
@@ -114,6 +118,14 @@ class BookingTimeline extends React.Component {
         pushState(`/book/${room.id}/confirm`, true);
     };
 
+    renderRoomSummary({room: {full_name: fullName}}) {
+        return (
+            <Segment>
+                <Translate>Availability for room <Param name="roomName" value={<strong>{fullName}</strong>} /></Translate>
+            </Segment>
+        );
+    }
+
     render() {
         const {dateRange, maxHour, minHour, isFetching, isFetchingRooms, recurrenceType} = this.props;
         const {activeDate} = this.state;
@@ -150,6 +162,7 @@ class BookingTimeline extends React.Component {
                                   activeDate: newDate
                               });
                           }}
+                          extraContent={this.singleRoom && this.renderRoomSummary(this.singleRoom)}
                           isFetching={isFetching}
                           isFetchingRooms={isFetchingRooms}
                           recurrenceType={recurrenceType} />
