@@ -22,6 +22,7 @@ from indico.core.marshmallow import mm
 from indico.modules.rb.models.aspects import Aspect
 from indico.modules.rb.models.blocked_rooms import BlockedRoom
 from indico.modules.rb.models.blockings import Blocking
+from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import Reservation
 from indico.modules.rb.models.room_attributes import RoomAttributeAssociation
@@ -108,6 +109,14 @@ class BookableHoursSchema(mm.ModelSchema):
         fields = ('start_time', 'end_time')
 
 
+class LocationsSchema(mm.ModelSchema):
+    rooms = Nested(RoomSchema, many=True, only=('id', 'name', 'full_name', 'large_photo_url'))
+
+    class Meta:
+        model = Location
+        fields = ('id', 'name', 'rooms')
+
+
 rooms_schema = RoomSchema(many=True, only=_room_fields)
 room_details_schema = RoomSchema()
 map_rooms_schema = MapRoomSchema(many=True)
@@ -117,3 +126,4 @@ reservation_schema = ReservationSchema()
 blockings_schema = BlockingSchema(many=True)
 nonbookable_periods_schema = NonBookablePeriodSchema(many=True)
 bookable_hours_schema = BookableHoursSchema()
+locations_schema = LocationsSchema(many=True)
