@@ -15,26 +15,22 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-@import '../../styles/util';
+.room-selector {
+    .selected-rooms-row {
+        padding-top: 0 !important;
 
-.room-list {
-    .results-count {
-        margin-bottom: 10px;
-        font-weight: bold;
-        font-size: 1.5em;
+        .rooms-list {
+            max-height: 180px;
+            overflow-y: auto;
+
+            :global(.item) {
+                display: flex;
+                align-items: center;
+
+                .remove-btn-content {
+                    margin-left: auto;
+                }
+            }
+        }
     }
-
-    :global(.redux-lazy-scroll) {
-        overflow: visible !important;
-        margin: 0.15em;
-    }
-
-    .blocking-add-btn {
-        pointer-events: all;
-        margin: 10px;
-    }
-}
-
-:global(.ui.inline.loader).rooms-loader {
-    margin-top: 2em;
 }
