@@ -18,7 +18,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Button, Card, Grid, Dimmer, Loader, Popup, Sticky} from 'semantic-ui-react';
+import {Button, Card, Dimmer, Dropdown, Grid, Loader, Popup, Sticky} from 'semantic-ui-react';
 import {Route} from 'react-router-dom';
 import LazyScroll from 'redux-lazy-scroll';
 
@@ -31,6 +31,7 @@ import mapControllerFactory from '../../containers/MapController';
 import Room from '../../containers/Room';
 import roomDetailsModalFactory from '../modals/RoomDetailsModal';
 import BookFromListModal from '../modals/BookFromListModal';
+import BlockingModal from '../modals/BlockingModal';
 
 import './RoomList.module.scss';
 
@@ -62,6 +63,11 @@ export default class RoomList extends React.Component {
         this.contextRef = React.createRef();
     }
 
+    state = {
+        blockingMode: false,
+        blockings: {}
+    };
+
     componentDidMount() {
         const {fetchRooms} = this.props;
         fetchRooms();
@@ -70,24 +76,76 @@ export default class RoomList extends React.Component {
     renderRoom = (room) => {
         const {id} = room;
         const {pushState} = this.props;
+        const {blockingMode, blockings} = this.state;
+
         const showDetailsBtn = (
-            <Button primary icon="search" circular onClick={() => {
-                pushState(`/rooms/${id}/details`);
-            }} />
+            <Button icon="search"
+                    onClick={() => {
+                        pushState(`/rooms/${id}/details`);
+                    }}
+                    primary
+                    circular />
         );
 
-        return (
-            <Room key={room.id} room={room} showFavoriteButton>
-                <Slot name="actions">
-                    <Popup trigger={showDetailsBtn} content={Translate.string('Room details')} position="top center" />
-                </Slot>
-            </Room>
+        const openBlockingModalBtn = (
+            <Button icon="lock"
+                    onClick={() => {
+                        pushState('/rooms/blocking/create');
+                        this.setState({blockings: {...blockings, [room.id]: room}});
+                    }}
+                    circular
+                    negative />
         );
+
+        if (blockingMode) {
+            const isRoomInTheList = room.id in blockings;
+            const buttonProps = {compact: true, size: 'tiny'};
+
+            if (!isRoomInTheList) {
+                buttonProps.icon = 'check';
+            } else {
+                buttonProps.icon = 'remove';
+                buttonProps.negative = true;
+            }
+
+            return (
+                <Room key={room.id} room={room}>
+                    <Slot>
+                        <Button styleName="blocking-add-btn"
+                                onClick={() => {
+                                    if (room.id in blockings) {
+                                        const newBlockings = {...blockings};
+                                        delete newBlockings[room.id];
+                                        this.setState({blockings: newBlockings});
+                                    } else {
+                                        this.setState({blockings: {...blockings, [room.id]: room}});
+                                    }
+                                }}
+                                {...buttonProps} />
+                    </Slot>
+                </Room>
+            );
+        } else {
+            return (
+                <Room key={room.id} room={room} showFavoriteButton>
+                    <Slot name="actions">
+                        <Popup trigger={openBlockingModalBtn} content={Translate.string('Block this room')} />
+                        <Popup trigger={showDetailsBtn} content={Translate.string('Room details')} position="top center" />
+                    </Slot>
+                </Room>
+            );
+        }
     };
 
     closeBookingModal = () => {
         const {pushState} = this.props;
         pushState('/rooms', true);
+    };
+
+    closeBlockingModal = () => {
+        const {pushState} = this.props;
+        pushState('/rooms', true);
+        this.setState({blockingMode: false, blockings: []});
     };
 
     roomPreloader(componentFunc) {
@@ -101,16 +159,52 @@ export default class RoomList extends React.Component {
         );
     }
 
+    toggleBlockingMode = () => {
+        const {blockingMode} = this.state;
+        this.setState({blockingMode: !blockingMode, blockings: []});
+    };
+
     render() {
-        const {rooms: {list, total, isFetching}, fetchRooms, roomDetails, showMap} = this.props;
+        const {rooms: {list, total, isFetching}, fetchRooms, roomDetails, showMap, pushState} = this.props;
+        const {blockingMode, blockings} = this.state;
+        const menuOptions = [{
+            text: Translate.string('Block rooms'),
+            value: 'block-rooms',
+            onClick: this.toggleBlockingMode,
+            icon: 'lock'
+        }];
+
         return (
             <Grid columns={2}>
                 <Grid.Column width={showMap ? 11 : 16}>
                     <div className="ui" styleName="room-list" ref={this.contextRef}>
                         <Sticky context={this.contextRef.current} className="sticky-filters">
                             <Grid>
-                                <Grid.Column width={16}>
+                                <Grid.Column width={12}>
                                     <FilterBar />
+                                </Grid.Column>
+                                <Grid.Column width={4} textAlign="right" verticalAlign="middle">
+                                    {!blockingMode && (
+                                        <Dropdown className="icon"
+                                                  text={Translate.string('Actions')}
+                                                  options={menuOptions}
+                                                  direction="left"
+                                                  button
+                                                  floating
+                                                  labeled />
+                                    )}
+                                    {blockingMode && (
+                                        <>
+                                            <Button icon="check"
+                                                    disabled={Object.keys(blockings).length === 0}
+                                                    onClick={() => {
+                                                        pushState('/rooms/blocking/create');
+                                                    }}
+                                                    primary
+                                                    circular />
+                                            <Button icon="cancel" onClick={this.toggleBlockingMode} circular />
+                                        </>
+                                    )}
                                 </Grid.Column>
                             </Grid>
                             <SearchBar onConfirm={fetchRooms} onTextChange={fetchRooms} />
@@ -155,6 +249,11 @@ export default class RoomList extends React.Component {
                     <BookFromListModal room={roomDetails.rooms[roomId]}
                                        onClose={this.closeBookingModal} />
                 ))} />
+                <Route exact path="/rooms/blocking/create" render={() => (
+                    <BlockingModal open
+                                   rooms={Object.values(blockings)}
+                                   onClose={this.closeBlockingModal} />
+                )} />
             </Grid>
         );
     }

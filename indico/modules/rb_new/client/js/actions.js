@@ -27,6 +27,7 @@ import fetchTimelineDataURL from 'indico-url:rooms_new.timeline';
 import createBookingURL from 'indico-url:rooms_new.create_booking';
 import fetchSuggestionsURL from 'indico-url:rooms_new.suggestions';
 import fetchBlockingsURL from 'indico-url:rooms_new.blockings';
+import createBlockingURL from 'indico-url:rooms_new.create_blocking';
 
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {submitFormAction, ajaxAction} from 'indico/utils/redux';
@@ -90,9 +91,13 @@ export const CLOSE_FILTER_DROPDOWN = 'CLOSE_FILTER_DROPDOWN';
 
 export const SET_BOOKING_AVAILABILITY = 'SET_BOOKING_AVAILABILITY';
 
+// Blockings
 export const FETCH_BLOCKINGS_STARTED = 'FETCH_BLOCKINGS_STARTED';
 export const FETCH_BLOCKINGS_FAILED = 'FETCH_BLOCKINGS_FAILED';
 export const UPDATE_BLOCKINGS = 'UPDATE_BLOCKINGS';
+export const BLOCKING_ONGOING = 'BLOCKING_ONGOING';
+export const BLOCKING_CONFIRMED = 'BLOCKING_CONFIRMED';
+export const BLOCKING_FAILED = 'BLOCKING_FAILED';
 
 
 const ROOM_RESULT_LIMIT = 20;
@@ -498,4 +503,12 @@ export function fetchBlockings() {
 
         dispatch(updateBlockings(response.data));
     };
+}
+
+
+export function createBlocking(formData) {
+    return submitFormAction(
+        () => indicoAxios.post(createBlockingURL(), formData),
+        BLOCKING_ONGOING, BLOCKING_CONFIRMED, BLOCKING_FAILED
+    );
 }

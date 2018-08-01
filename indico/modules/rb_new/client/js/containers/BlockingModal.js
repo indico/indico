@@ -14,27 +14,19 @@
  * You should have received a copy of the GNU General Public License
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
+import {connect} from 'react-redux';
 
-@import '../../../styles/util';
+import BlockingModal from '../components/modals/BlockingModal';
+import {createBlocking} from '../actions';
 
-.room-list {
-    .results-count {
-        margin-bottom: 10px;
-        font-weight: bold;
-        font-size: 1.5em;
+
+const mapDispatchToProps = (dispatch) => ({
+    createBlocking: (formData) => {
+        return dispatch(createBlocking(formData));
     }
+});
 
-    :global(.redux-lazy-scroll) {
-        overflow: visible !important;
-        margin: 0.15em;
-    }
-
-    .blocking-add-btn {
-        pointer-events: all;
-        margin: 10px;
-    }
-}
-
-:global(.ui.inline.loader).rooms-loader {
-    margin-top: 2em;
-}
+export default connect(
+    null,
+    mapDispatchToProps
+)(BlockingModal);
