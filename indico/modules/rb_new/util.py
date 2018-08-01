@@ -38,6 +38,7 @@ from indico.modules.rb.models.room_attributes import RoomAttributeAssociation
 from indico.modules.rb.models.room_bookable_hours import BookableHours
 from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
 from indico.modules.rb.models.rooms import Room
+from indico.modules.rb.notifications.blockings import notify_request
 from indico.modules.rb_new.schemas import (blockings_schema, bookable_hours_schema, nonbookable_periods_schema,
                                            reservation_occurrences_schema, rooms_schema)
 from indico.util.caching import memoize_redis
@@ -545,3 +546,29 @@ def serialize_unbookable_hours(data):
 
 def get_room_blockings(user):
     return Blocking.query.filter(Blocking.created_by_user == user).all()
+
+
+def create_blocking(rooms, start_date, end_date, reason, allowed):
+    blocking = Blocking()
+    blocking.start_date = start_date
+    blocking.end_date = end_date
+    blocking.reason = reason
+    blocking.created_by_user = session.user
+    blocking.allowed = allowed
+    blocking.blocked_rooms = [BlockedRoom(room_id=room.id) for room in rooms]
+    db.session.add(blocking)
+    db.session.flush()
+    return blocking
+
+
+def approve_or_request_blocking(blocking):
+    rooms_by_owner = defaultdict(list)
+    for blocked_room in blocking.blocked_rooms:
+        owner = blocked_room.room.owner
+        if owner == session.user:
+            blocked_room.approve(notify_blocker=False)
+        else:
+            rooms_by_owner[owner].append(blocked_room)
+
+    for owner, rooms in rooms_by_owner.iteritems():
+        notify_request(owner, blocking, rooms)
