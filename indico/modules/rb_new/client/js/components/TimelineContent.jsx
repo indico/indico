@@ -32,19 +32,19 @@ export default class TimelineContent extends React.Component {
         rows: PropTypes.array.isRequired,
         hourSeries: PropTypes.array.isRequired,
         recurrenceType: PropTypes.string,
-        openModal: PropTypes.func,
+        onClick: PropTypes.func,
         longLabel: PropTypes.bool,
     };
 
     static defaultProps = {
         step: 2,
         recurrenceType: null,
-        openModal: null,
+        onClick: null,
         longLabel: false,
     };
 
     renderTimelineRow = ({availability, label, conflictIndicator, id, room}) => {
-        const {hourSeries, step, recurrenceType, openModal, longLabel} = this.props;
+        const {hourSeries, step, recurrenceType, onClick, longLabel} = this.props;
         const minHour = hourSeries[0];
         const maxHour = hourSeries[hourSeries.length - 1];
         const columns = ((maxHour - minHour) / step) + 1;
@@ -58,8 +58,8 @@ export default class TimelineContent extends React.Component {
                 <div styleName="timeline-row-content" style={{flex: columns}}>
                     <TimelineItem step={step} startHour={minHour} endHour={maxHour} data={availability}
                                   onClick={() => {
-                                      if (openModal && (!hasConflicts || recurrenceType !== 'single')) {
-                                          openModal(room);
+                                      if (onClick && (!hasConflicts || recurrenceType !== 'single')) {
+                                          onClick(room);
                                       }
                                   }} />
                 </div>

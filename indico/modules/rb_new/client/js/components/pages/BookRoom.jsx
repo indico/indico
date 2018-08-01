@@ -31,7 +31,7 @@ import BookingFilterBar from '../BookingFilterBar';
 import filterBarFactory from '../../containers/FilterBar';
 import searchBoxFactory from '../../containers/SearchBar';
 import Room from '../../containers/Room';
-import Timeline from '../../containers/Timeline';
+import BookingTimeline from '../BookingTimeline';
 import BookRoomModal from '../../containers/BookRoomModal';
 import roomDetailsModalFactory from '../modals/RoomDetailsModal';
 import {roomPreloader} from '../../util';
@@ -178,7 +178,7 @@ export default class BookRoom extends React.Component {
                             {searchBar}
                         </Grid.Row>
                     </Sticky>
-                    <Timeline minHour={6} maxHour={22} />
+                    <BookingTimeline minHour={6} maxHour={22} />
                 </div>
             );
         }
