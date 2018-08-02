@@ -21,7 +21,10 @@ import Room from '../components/Room';
 import {addFavoriteRoom, delFavoriteRoom} from '../actions';
 
 
-const mapStateToProps = ({user: {favoriteRooms}}) => ({favoriteRooms});
+const mapStateToProps = ({user: {favoriteRooms}, staticData: {roomsSpriteToken}}) => ({
+    favoriteRooms,
+    roomsSpriteToken
+});
 
 const mapDispatchToProps = dispatch => ({
     addFavoriteRoom: (id) => {

@@ -18,13 +18,14 @@
 import _ from 'lodash';
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Card, Icon, Image, Label, Popup, Button} from 'semantic-ui-react';
+import {Card, Icon, Label, Popup, Button} from 'semantic-ui-react';
+import roomsSpriteURL from 'indico-url:rooms_new.sprite';
 
 import {Translate} from 'indico/react/i18n';
 import {Slot} from 'indico/react/util';
 import {TooltipIfTruncated} from 'indico/react/components';
+import SpriteImage from './SpriteImage';
 import DimmableImage from './Dimmer.jsx';
-
 
 import './Room.module.scss';
 
@@ -85,9 +86,10 @@ export default class Room extends React.Component {
                 </div>
             );
             return (
-                <DimmableImage src={room.large_photo_url}
+                <DimmableImage src={roomsSpriteURL}
                                content={content}
-                               hoverContent={dimmerContent} />
+                               hoverContent={dimmerContent}
+                               spritePos={room.sprite_position} />
             );
         } else {
             return (
@@ -95,7 +97,7 @@ export default class Room extends React.Component {
                     <div styleName="room-extra-info">
                         {content}
                     </div>
-                    <Image src={room.large_photo_url} />
+                    <SpriteImage src={roomsSpriteURL} pos={room.sprite_position} />
                 </div>
             );
         }

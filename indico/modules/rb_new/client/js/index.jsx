@@ -48,7 +48,8 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         staticData: {
             availableLanguages: Indico.Settings.Languages,
-            tileServerURL: Indico.Settings.TileServerURL
+            tileServerURL: Indico.Settings.TileServerURL,
+            roomsSpriteToken: Indico.Data.RoomsSpriteToken
         }
     });
 

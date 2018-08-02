@@ -32,8 +32,8 @@ from indico.modules.rb.models.rooms import Room
 
 
 _room_fields = ('id', 'name', 'capacity', 'building', 'floor', 'number', 'is_public', 'location_name', 'has_vc',
-                'has_projector', 'has_webcast_recording', 'large_photo_url', 'full_name', 'comments', 'division',
-                'is_reservable', 'is_auto_confirm', 'sprite_position')
+                'has_projector', 'has_webcast_recording', 'full_name', 'comments', 'division', 'is_reservable',
+                'is_auto_confirm', 'sprite_position')
 
 
 class RoomAttributesSchema(mm.ModelSchema):

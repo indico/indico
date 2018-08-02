@@ -18,11 +18,6 @@
 .dimmable-image {
     position: relative;
 
-    img {
-        width: 100%;
-        height: 170px !important;
-    }
-
     .content {
         position: absolute;
         top: 0;
@@ -39,7 +34,7 @@
         transform: translate(-50%, -50%);
     }
 
-    &:hover img {
+    &:hover :global(.img) {
         filter: blur(2px) contrast(150%) brightness(40%);
         transition: all 30ms ease;
     }

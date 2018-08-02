@@ -17,10 +17,12 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Grid, Header, Icon, Image, Popup} from 'semantic-ui-react';
+import roomsSpriteURL from 'indico-url:rooms_new.sprite';
+import {Grid, Header, Icon, Popup} from 'semantic-ui-react';
 import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
 
 import './RoomBasicDetails.module.scss';
+import SpriteImage from './SpriteImage';
 
 
 function RoomEquipmentBox({room}) {
@@ -48,13 +50,14 @@ RoomEquipmentBox.propTypes = {
 
 export function RoomBasicDetails({room}) {
     const {
-        owner_name: owner, latitude, longitude, division, location_name: location, large_photo_url: photoURL,
-        surface_area: surface, capacity, telephone, full_name: name
+        owner_name: owner, latitude, longitude, division, location_name: location, surface_area: surface, capacity,
+        telephone, full_name: name
     } = room;
     return (
         <Grid columns={2}>
             <Grid.Column textAlign="center">
-                <Image src={photoURL} />
+                <SpriteImage src={roomsSpriteURL} pos={room.sprite_position}
+                             styles={{transform: 'scale(0.85)', transformOrigin: 0}} />
                 <RoomEquipmentBox room={room} />
             </Grid.Column>
             <Grid.Column>
