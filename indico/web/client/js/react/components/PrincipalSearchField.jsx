@@ -23,6 +23,7 @@ import PropTypes from 'prop-types';
 import {Dropdown} from 'semantic-ui-react';
 
 import searchUsersURL from 'indico-url:users.user_search';
+import searchGroupsURL from 'indico-url:groups.group_search';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {Translate} from 'indico/react/i18n';
 
@@ -38,18 +39,32 @@ const searchUser = async (data) => {
     return response.data.data;
 };
 
-export default class UserSearchField extends React.Component {
+const searchGroups = async (data) => {
+    let response;
+    try {
+        response = await indicoAxios.get(searchGroupsURL(data));
+    } catch (error) {
+        handleAxiosError(error);
+        return;
+    }
+
+    return response.data;
+};
+
+export default class PrincipalSearchField extends React.Component {
     static propTypes = {
         multiple: PropTypes.bool,
         defaultValue: PropTypes.object,
         onChange: PropTypes.func.isRequired,
-        disabled: PropTypes.bool
+        disabled: PropTypes.bool,
+        withGroups: PropTypes.bool
     };
 
     static defaultProps = {
         multiple: false,
         defaultValue: null,
-        disabled: false
+        disabled: false,
+        withGroups: false
     };
 
     constructor(props) {
@@ -66,8 +81,9 @@ export default class UserSearchField extends React.Component {
         this.userCache = {};
     }
 
-    static getDerivedStateFromProps({value: {id: userId}}, state) {
-        if (userId !== state.prevPropsUserId) {
+    static getDerivedStateFromProps({value: {id: userId}, multiple}, state) {
+        const valuesChanged = multiple ? !_.isEqual(userId, state.prevPropsUserId) : userId !== state.prevPropsUserId;
+        if (valuesChanged) {
             return {
                 ...state,
                 prevPropsUserId: userId,
@@ -77,13 +93,23 @@ export default class UserSearchField extends React.Component {
         return null;
     }
 
-    renderUser({first_name: firstName, last_name: lastName, email, id}) {
-        return {
-            text: `${firstName} ${lastName}`,
-            description: email,
-            value: id,
-            key: id
-        };
+    renderItem({first_name: firstName, last_name: lastName, email, id, is_group: isGroup, name: groupName}) {
+        if (isGroup) {
+            return {
+                text: groupName,
+                value: groupName,
+                key: groupName,
+                icon: 'users'
+            };
+        } else {
+            return {
+                text: `${firstName} ${lastName}`,
+                description: email,
+                value: id,
+                key: id,
+                icon: 'user'
+            };
+        }
     }
 
     handleSearchChange = _.debounce(async (__, {searchQuery}) => {
@@ -94,12 +120,18 @@ export default class UserSearchField extends React.Component {
         this.setState({
             isFetching: true
         });
-        const query = (searchQuery.indexOf('@') !== -1)
-            ? {email: searchQuery}
-            : {name: searchQuery};
-        const users = await searchUser(query);
-        const options = users.map(this.renderUser);
-        this.userCache = Object.assign(this.userCache, ...users.map(user => ({[user.id]: user})));
+
+        const query = (searchQuery.indexOf('@') !== -1) ? {email: searchQuery} : {name: searchQuery};
+        const {withGroups} = this.props;
+        let items = [];
+
+        items = items.concat(await searchUser(query));
+        if (withGroups) {
+            items = items.concat(await searchGroups({name: searchQuery}));
+        }
+
+        const options = items.map(this.renderItem);
+        this.userCache = Object.assign(this.userCache, ...items.map(item => ({[item.id]: item})));
         this.setState({
             isFetching: false,
             options
@@ -109,6 +141,16 @@ export default class UserSearchField extends React.Component {
     render() {
         const {multiple, onChange, disabled} = this.props;
         const {isFetching, options, userId} = this.state;
+        let dropdownValues, selectedValues, dropdownOptions;
+
+        if (multiple) {
+            dropdownValues = userId === undefined ? [] : userId;
+            selectedValues = dropdownValues.map((id) => this.userCache[id]).map(this.renderItem);
+            dropdownOptions = isFetching ? selectedValues : options.concat(selectedValues);
+        } else {
+            dropdownValues = selectedValues = userId;
+            dropdownOptions = options;
+        }
 
         return (
             <Dropdown search={opts => opts}
@@ -117,19 +159,26 @@ export default class UserSearchField extends React.Component {
                       fluid
                       minCharacters={3}
                       multiple={multiple}
-                      options={options}
-                      value={userId}
-                      placeholder={Translate.string('Write a name or e-mail...')}
-                      onChange={(__, {value: id}) => {
-                          const val = this.userCache[id];
+                      options={dropdownOptions}
+                      value={dropdownValues}
+                      placeholder={Translate.string('Write a name (of the group or user) or e-mail...')}
+                      onChange={(__, {value}) => {
+                          let fieldValue;
+                          if (multiple) {
+                              fieldValue = value.map((id) => this.userCache[id]);
+                          } else {
+                              fieldValue = this.userCache[value];
+                          }
+
                           this.setState({
-                              userId: id
+                              userId: value
                           });
-                          onChange(val);
+                          onChange(fieldValue);
                       }}
                       onSearchChange={this.handleSearchChange}
                       disabled={isFetching || disabled}
-                      loading={isFetching} />
+                      loading={isFetching}
+                      noResultsMessage={isFetching ? null : Translate.string('No results found')} />
         );
     }
 }

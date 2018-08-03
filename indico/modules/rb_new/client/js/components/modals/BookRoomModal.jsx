@@ -22,7 +22,7 @@ import {Form as FinalForm, Field} from 'react-final-form';
 import createDecorator from 'final-form-calculate';
 import {ReduxFormField, ReduxRadioField, formatters} from 'indico/react/forms';
 import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
-import UserSearchField from 'indico/react/components/UserSearchField';
+import PrincipalSearchField from 'indico/react/components/PrincipalSearchField';
 import recurrenceRenderer from '../filters/RecurrenceRenderer';
 import {toMoment} from '../../util';
 import {RoomBasicDetails} from '../RoomBasicDetails';
@@ -89,10 +89,10 @@ export default class BookRoomModal extends React.Component {
         }
     }
 
-    renderUserSearchField({input, ...props}) {
+    renderPrincipalSearchField({input, ...props}) {
         return (
             <ReduxFormField input={input}
-                            as={UserSearchField}
+                            as={PrincipalSearchField}
                             {...props}
                             onChange={(user) => {
                                 input.onChange(user);
@@ -145,6 +145,7 @@ export default class BookRoomModal extends React.Component {
             const {booking} = this.state;
             const bookingLink = (
                 // TODO: add link to view booking details
+                // eslint-disable-next-line no-alert
                 <a style={{cursor: 'pointer'}} onClick={() => alert(`TODO: View booking ${booking.id}`)} />
             );
             return (
@@ -330,7 +331,7 @@ export default class BookRoomModal extends React.Component {
                                                disabled={bookingBlocked(fprops)} />
                                     </Form.Group>
                                     <Field name="user"
-                                           component={this.renderUserSearchField}
+                                           component={this.renderPrincipalSearchField}
                                            disabled={bookingBlocked(fprops) || fprops.values.usage !== 'someone'} />
                                     <Field name="reason"
                                            component={ReduxFormField}
