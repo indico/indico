@@ -150,6 +150,7 @@ export default class RoomSelector extends React.Component {
                     <Grid.Column width={2}>
                         <Button floated="right"
                                 icon="plus"
+                                type="button"
                                 disabled={!selectedRoom}
                                 onClick={() => {
                                     const newRooms = [...rooms, selectedRoom];

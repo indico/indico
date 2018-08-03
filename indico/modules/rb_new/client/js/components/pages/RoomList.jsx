@@ -185,13 +185,10 @@ export default class RoomList extends React.Component {
                                 </Grid.Column>
                                 <Grid.Column width={4} textAlign="right" verticalAlign="middle">
                                     {!blockingMode && (
-                                        <Dropdown className="icon"
-                                                  text={Translate.string('Actions')}
+                                        <Dropdown text={Translate.string('Actions')}
                                                   options={menuOptions}
                                                   direction="left"
-                                                  button
-                                                  floating
-                                                  labeled />
+                                                  button />
                                     )}
                                     {blockingMode && (
                                         <>
