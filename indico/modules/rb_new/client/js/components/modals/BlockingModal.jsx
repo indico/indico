@@ -57,6 +57,16 @@ const formDecorator = createDecorator({
             room_ids: rooms.map((room) => room.id)
         };
     }
+}, {
+    field: 'allowed',
+    updates: (allowed) => {
+        return {
+            allowed_principals: allowed.map((obj) => ({
+                id: obj.id,
+                is_group: obj.is_group
+            }))
+        };
+    }
 });
 
 
@@ -132,6 +142,7 @@ export default class BlockingModal extends React.Component {
     };
 
     renderModalContent = (fprops) => {
+        const {onClose} = this.props;
         const {form: {mutators}, submitSucceeded} = fprops;
 
         // set `touched` flag so in case of a validation error we properly
@@ -201,6 +212,11 @@ export default class BlockingModal extends React.Component {
                 </Modal.Content>
                 <Modal.Actions>
                     {this.renderSubmitButton(fprops)}
+                    <Button type="button" onClick={onClose}>
+                        <Translate>
+                            Close
+                        </Translate>
+                    </Button>
                 </Modal.Actions>
             </>
         );

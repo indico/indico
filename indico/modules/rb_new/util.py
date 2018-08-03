@@ -548,13 +548,13 @@ def get_room_blockings(user):
     return Blocking.query.filter(Blocking.created_by_user == user).all()
 
 
-def create_blocking(rooms, start_date, end_date, reason, allowed):
+def create_blocking(rooms, start_date, end_date, reason, allowed_principals):
     blocking = Blocking()
     blocking.start_date = start_date
     blocking.end_date = end_date
     blocking.reason = reason
     blocking.created_by_user = session.user
-    blocking.allowed = allowed
+    blocking.allowed = allowed_principals
     blocking.blocked_rooms = [BlockedRoom(room_id=room.id) for room in rooms]
     db.session.add(blocking)
     db.session.flush()

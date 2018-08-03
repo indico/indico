@@ -27,6 +27,7 @@ from webargs.flaskparser import use_args
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.queries import with_total_rows
 from indico.core.errors import NoReportError
+from indico.modules.groups import GroupProxy
 from indico.modules.rb import Location, rb_settings
 from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.models.favorites import favorite_room_table
@@ -259,11 +260,17 @@ class RHCreateRoomBlocking(RHRoomBookingBase):
         'start_date': fields.Date(),
         'end_date': fields.Date(),
         'reason': fields.Str(),
-        'allowed_principal_ids': fields.List(fields.Int(), missing=[])
+        'allowed_principals': fields.List(fields.Dict(), missing=[])
     })
     def _process(self, args):
         rooms = Room.query.filter(Room.id.in_(args['room_ids'])).all()
+        allowed_principals = []
+        for obj in args['allowed_principals']:
+            if obj.get('is_group'):
+                allowed_principals.extend(GroupProxy.search(obj['id'], exact=True))
+            else:
+                allowed_principals.append(User.query.filter(User.id == obj['id']).one())
         blocking = create_blocking(rooms, args['start_date'], args['end_date'], args['reason'],
-                                   args['allowed_principal_ids'])
+                                   allowed_principals)
         approve_blocking(blocking)
         return jsonify_data(flash=False)
