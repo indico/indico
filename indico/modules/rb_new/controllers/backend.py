@@ -22,7 +22,7 @@ from operator import itemgetter
 from flask import jsonify, request, session
 from marshmallow_enum import EnumField
 from webargs import fields, validate
-from webargs.flaskparser import use_args
+from webargs.flaskparser import use_args, use_kwargs
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.queries import with_total_rows
@@ -37,9 +37,9 @@ from indico.modules.rb_new.schemas import (aspects_schema, blockings_schema, loc
                                            reservation_schema, room_details_schema, rooms_schema)
 from indico.modules.rb_new.util import (approve_or_request_blocking, create_blocking, get_buildings,
                                         get_equipment_types, get_existing_room_occurrences, get_room_blockings,
-                                        get_rooms_availability, get_suggestions, group_by_occurrence_date,
-                                        has_managed_rooms, search_for_rooms, serialize_blockings,
-                                        serialize_nonbookable_periods, serialize_occurrences,
+                                        get_room_calendar, get_rooms_availability, get_suggestions,
+                                        group_by_occurrence_date, has_managed_rooms, search_for_rooms,
+                                        serialize_blockings, serialize_nonbookable_periods, serialize_occurrences,
                                         serialize_unbookable_hours)
 from indico.modules.users.models.users import User
 from indico.util.date_time import iterdays
@@ -66,6 +66,17 @@ search_room_args = {
     'ne_lat': fields.Float(validate=lambda x: -90 <= x <= 90),
     'ne_lng': fields.Float(validate=lambda x: -180 <= x <= 180)
 }
+
+
+def _serialize_availability(availability):
+    for data in availability.viewvalues():
+        data['room'] = rooms_schema.dump(data['room'], many=False).data
+        data['blockings'] = serialize_blockings(data['blockings'])
+        data['nonbookable_periods'] = serialize_nonbookable_periods(data['nonbookable_periods'])
+        data['unbookable_hours'] = serialize_unbookable_hours(data['unbookable_hours'])
+        data.update({k: serialize_occurrences(data[k]) if k in data else []
+                     for k in ['candidates', 'pre_bookings', 'bookings', 'conflicts', 'pre_conflicts']})
+    return availability
 
 
 class RHSearchRooms(RHRoomBookingBase):
@@ -155,19 +166,27 @@ class RHTimeline(RHRoomBookingBase):
                                                           args['repeat_frequency'], args['repeat_interval'],
                                                           flexibility=0)
         date_range = [dt.isoformat() for dt in date_range]
-        for room_id in availability:
-            data = availability[room_id]
-            data['room'] = rooms_schema.dump(data['room'], many=False).data
-            data['blockings'] = serialize_blockings(data['blockings'])
-            data['nonbookable_periods'] = serialize_nonbookable_periods(data['nonbookable_periods'])
-            data['unbookable_hours'] = serialize_unbookable_hours(data['unbookable_hours'])
-            data.update({k: serialize_occurrences(data[k])
-                         for k in ['candidates', 'pre_bookings', 'bookings', 'conflicts', 'pre_conflicts']})
+
+        for data in availability.viewvalues():
+            # add additional helpful attributes
             data.update({
                 'num_days_available': len(date_range) - len(data['conflicts']),
                 'all_days_available': not data['conflicts']
             })
-        return jsonify_data(flash=False, availability=availability, date_range=date_range)
+
+        return jsonify_data(flash=False,
+                            availability=_serialize_availability(availability),
+                            date_range=date_range)
+
+
+class RHCalendar(RHRoomBookingBase):
+    @use_kwargs({
+        'start_dt': fields.DateTime(),
+        'end_dt': fields.DateTime(),
+    })
+    def _process(self, start_dt, end_dt):
+        calendar = get_room_calendar(start_dt, end_dt)
+        return jsonify_data(flash=False, calendar=_serialize_availability(calendar).values())
 
 
 class RHRoomFavorites(RHRoomBookingBase):

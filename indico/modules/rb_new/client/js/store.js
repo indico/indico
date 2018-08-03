@@ -24,9 +24,11 @@ import createReduxStore from 'indico/utils/redux';
 import reducers from './reducers';
 import {initialStateFactory} from './reducers/roomBooking/filters';
 import {initialTimelineState} from './reducers/bookRoom';
-import {SET_FILTER_PARAMETER, TOGGLE_TIMELINE_VIEW} from './actions';
+import {initialCalendarState} from './reducers/calendar'
+import * as actions from './actions';
 import {queryString as queryFilterRules} from './serializers/filters';
 import {queryString as queryTimelineRules} from './serializers/timeline';
+import {queryString as queryCalendarRules} from './serializers/calendar';
 
 
 const initialData = {
@@ -38,20 +40,25 @@ const routeConfig = {
     routes: {
         '/book': [
             {
-                listen: SET_FILTER_PARAMETER,
+                listen: actions.SET_FILTER_PARAMETER,
                 select: ({bookRoom: {filters}}) => ({filters}),
                 serialize: queryFilterRules
             },
             {
-                listen: TOGGLE_TIMELINE_VIEW,
+                listen: actions.TOGGLE_TIMELINE_VIEW,
                 select: ({bookRoom: {timeline}}) => ({timeline}),
                 serialize: queryTimelineRules
             }
         ],
         '/rooms': {
-            listen: SET_FILTER_PARAMETER,
+            listen: actions.SET_FILTER_PARAMETER,
             select: ({roomList: {filters}}) => ({filters}),
             serialize: queryFilterRules
+        },
+        '/calendar': {
+            listen: actions.SET_CALENDAR_DATE,
+            select: ({calendar}) => calendar,
+            serialize: queryCalendarRules
         }
     }
 };
@@ -103,6 +110,22 @@ const qsTimelineReducer = createQueryStringReducer(
         : state)
 );
 
+const qsCalendarReducer = createQueryStringReducer(
+    queryCalendarRules,
+    (state, action) => {
+        if (action.type === 'INIT') {
+            return {
+                namespace: 'calendar',
+                queryString: history.location.search.slice(1)
+            };
+        }
+        return null;
+    },
+    (state, namespace) => (namespace
+        ? _.merge({}, state, {[namespace]: initialCalendarState})
+        : state)
+);
+
 export default function createRBStore(data) {
     return createReduxStore('rb-new',
                             reducers,
@@ -111,7 +134,8 @@ export default function createRBStore(data) {
                                 queryStringMiddleware(history, routeConfig, {usePush: false})
                             ], [
                                 qsFilterReducer,
-                                qsTimelineReducer
+                                qsTimelineReducer,
+                                qsCalendarReducer
                             ],
                             rootReducer => connectRouter(history)(rootReducer)
     );

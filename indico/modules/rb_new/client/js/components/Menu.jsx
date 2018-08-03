@@ -35,7 +35,7 @@ export default function Menu() {
                 <Icon name="list" />
                 <Translate>List of Rooms</Translate>
             </MenuItem>
-            <MenuItem key="calendar" path="/calendar" disabled>
+            <MenuItem key="calendar" path="/calendar">
                 <Icon name="calendar" />
                 <Translate>Calendar</Translate>
             </MenuItem>

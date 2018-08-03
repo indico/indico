@@ -28,6 +28,7 @@ import createBookingURL from 'indico-url:rooms_new.create_booking';
 import fetchSuggestionsURL from 'indico-url:rooms_new.suggestions';
 import fetchBlockingsURL from 'indico-url:rooms_new.blockings';
 import createBlockingURL from 'indico-url:rooms_new.create_blocking';
+import fetchCalendarURL from 'indico-url:rooms_new.calendar';
 
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {submitFormAction, ajaxAction} from 'indico/utils/redux';
@@ -99,6 +100,10 @@ export const CREATE_BLOCKING = 'CREATE_BLOCKING';
 export const BLOCKING_CONFIRMED = 'BLOCKING_CONFIRMED';
 export const BLOCKING_FAILED = 'BLOCKING_FAILED';
 
+// Calendar
+export const SET_CALENDAR_ROWS = 'SET_CALENDAR_ROWS';
+export const SET_CALENDAR_DATE = 'SET_CALENDAR_DATE';
+export const SET_CALENDAR_FETCHING = 'SET_CALENDAR_FETCHING';
 
 const ROOM_RESULT_LIMIT = 20;
 
@@ -507,10 +512,32 @@ export function fetchBlockings() {
     };
 }
 
-
 export function createBlocking(formData) {
     return submitFormAction(
         () => indicoAxios.post(createBlockingURL(), formData),
         CREATE_BLOCKING, BLOCKING_CONFIRMED, BLOCKING_FAILED
     );
+}
+export function setCalendarDate(date) {
+    return {type: SET_CALENDAR_DATE, date};
+}
+
+export function setCalendarRows(data) {
+    return {type: SET_CALENDAR_ROWS, data};
+}
+
+export function fetchCalendar() {
+    return (dispatch, getState) => {
+        const {calendar: {date}} = getState();
+        dispatch(ajaxAction(
+            () => indicoAxios.get(fetchCalendarURL({
+                start_dt: `${date}T00:00:00`,
+                end_dt: `${date}T23:59:59`
+            })),
+            SET_CALENDAR_FETCHING,
+            SET_CALENDAR_ROWS,
+            null,
+            ({calendar: result}) => result
+        ));
+    };
 }
