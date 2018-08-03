@@ -23,7 +23,7 @@ import setFieldTouched from 'final-form-set-field-touched';
 import createDecorator from 'final-form-calculate';
 import {Translate} from 'indico/react/i18n';
 import {ReduxFormField, formatters} from 'indico/react/forms';
-import UserSearchField from 'indico/react/components/UserSearchField';
+import PrincipalSearchField from 'indico/react/components/PrincipalSearchField';
 import DatePeriodField from 'indico/react/components/DatePeriodField';
 import RoomSelector from '../RoomSelector';
 
@@ -77,15 +77,16 @@ export default class BlockingModal extends React.Component {
         await createBlocking(formData);
     };
 
-    renderUserSearchField = ({input, ...props}) => {
+    renderPrincipalSearchField = ({input, ...props}) => {
         return (
             <ReduxFormField input={input}
-                            as={UserSearchField}
+                            as={PrincipalSearchField}
                             label={Translate.string('Allowed users / groups')}
                             onChange={(user) => {
                                 input.onChange(user);
                             }}
-                            required
+                            multiple
+                            withGroups
                             {...props} />
         );
     };
@@ -176,7 +177,7 @@ export default class BlockingModal extends React.Component {
                             </Grid.Column>
                             <Grid.Column width={8}>
                                 <Field name="allowed"
-                                       component={this.renderUserSearchField} />
+                                       component={this.renderPrincipalSearchField} />
                                 <Field name="period"
                                        component={this.renderBlockingPeriodField} />
                                 <Field name="reason"

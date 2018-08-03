@@ -20,6 +20,8 @@ from operator import attrgetter
 
 from flask import flash, jsonify, redirect, request
 from sqlalchemy.orm import joinedload
+from webargs import fields
+from webargs.flaskparser import use_args
 from werkzeug.exceptions import NotFound
 
 from indico.core.auth import multipass
@@ -34,6 +36,7 @@ from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
+from indico.web.rh import RHProtected
 
 
 class RHGroups(RHAdminBase):
@@ -140,3 +143,12 @@ class RHGroupDeleteMember(RHLocalGroupBase):
     def _process(self):
         self.group.members.discard(User.get(request.view_args['user_id']))
         return jsonify(success=True)
+
+
+class RHGroupSearch(RHProtected):
+    @use_args({
+        'name': fields.Str()
+    })
+    def _process(self, args):
+        groups = GroupProxy.search(args['name'])
+        return jsonify([{'is_group': group.is_group, 'name': group.name, 'id': group.name} for group in groups])
