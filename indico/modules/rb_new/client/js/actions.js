@@ -35,7 +35,8 @@ import {preProcessParameters} from './util';
 import {ajax as ajaxFilterRules} from './serializers/filters';
 import {ajax as ajaxBookingRules} from './serializers/bookings';
 
-
+// Page state
+export const RESET_PAGE_STATE = 'RESET_PAGE_STATE';
 // User
 export const SET_FAVORITE_ROOMS = 'SET_FAVORITE_ROOMS';
 export const ADD_FAVORITE_ROOM = 'ADD_FAVORITE_ROOM';
@@ -44,7 +45,6 @@ export const SET_USER_INFO = 'SET_USER_INFO';
 // Filter
 export const SET_FILTER_PARAMETER = 'SET_FILTER_PARAMETER';
 export const SET_FILTERS = 'SET_FILTERS';
-export const RESET_FILTERS = 'RESET_FILTERS';
 // Rooms
 export const FETCH_ROOMS_STARTED = 'FETCH_ROOMS_STARTED';
 export const FETCH_ROOMS_FAILED = 'FETCH_ROOMS_FAILED';
@@ -301,7 +301,7 @@ export function setFilters(namespace, params) {
 }
 
 export function resetFilters(namespace) {
-    return {type: RESET_FILTERS, namespace};
+    return {type: RESET_PAGE_STATE, namespace};
 }
 
 export function updateLocation(namespace, location) {
