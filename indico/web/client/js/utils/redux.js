@@ -108,18 +108,24 @@ export function submitFormAction(submitFunc, requestAction, successAction, error
 
 export function ajaxAction(requestFunc, requestAction, successAction, errorAction, transformData = d => d) {
     return async (dispatch) => {
-        dispatcher(dispatch, requestAction);
+        if (requestAction) {
+            dispatcher(dispatch, requestAction);
+        }
         let response;
         try {
             response = await requestFunc();
         } catch (error) {
             if (_.get(error, 'response.status') === 418) {
                 // this is an error that was expected, and will be handled by the app
-                dispatcher(dispatch, errorAction, {error: error.response.data});
+                if (errorAction) {
+                    dispatcher(dispatch, errorAction, {error: error.response.data});
+                }
                 return {data: null, error: error.response.data};
             } else {
                 const message = handleAxiosError(error, true);
-                dispatcher(dispatch, errorAction, {error: message});
+                if (errorAction) {
+                    dispatcher(dispatch, errorAction, {error: message});
+                }
                 return {data: null, error: message};
             }
         }
