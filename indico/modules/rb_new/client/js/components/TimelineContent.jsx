@@ -33,7 +33,7 @@ export default class TimelineContent extends React.Component {
         hourSeries: PropTypes.array.isRequired,
         recurrenceType: PropTypes.string,
         onClick: PropTypes.func,
-        longLabel: PropTypes.bool,
+        longLabel: PropTypes.bool
     };
 
     static defaultProps = {

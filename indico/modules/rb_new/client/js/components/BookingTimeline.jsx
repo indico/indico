@@ -64,6 +64,26 @@ class BookingTimeline extends React.Component {
         return keys.length === 1 && availability[keys[0]];
     }
 
+    _getRowSerializer(dt) {
+        return ({candidates, pre_bookings: preBookings, bookings, pre_conflicts: preConflicts, conflicts,
+                 blockings, nonbookable_periods: nonbookablePeriods, unbookable_hours: unbookableHours,
+                 room}) => {
+            const av = {
+                candidates: candidates[dt].map((cand) => ({...cand, bookable: true})) || [],
+                preBookings: preBookings[dt] || [],
+                bookings: bookings[dt] || [],
+                conflicts: conflicts[dt] || [],
+                preConflicts: preConflicts[dt] || [],
+                blockings: blockings[dt] || [],
+                nonbookablePeriods: nonbookablePeriods[dt] || [],
+                unbookableHours: unbookableHours || []
+            };
+            const {full_name: fullName, id} = room;
+
+            return {availability: av, label: fullName, conflictIndicator: true, id, room};
+        };
+    }
+
     calcRows = () => {
         const {activeDate} = this.state;
         const {availability, dateRange} = this.props;
@@ -72,45 +92,13 @@ class BookingTimeline extends React.Component {
             return [];
         }
 
-        let rows = [];
-
         if (this.singleRoom) {
             const roomAvailability = this.singleRoom;
-            const room = roomAvailability.room;
-
-            rows = dateRange.map((dt) => {
-                const av = {
-                    candidates: roomAvailability.candidates[dt].map((cand) => ({...cand, bookable: true})) || [],
-                    preBookings: roomAvailability.pre_bookings[dt] || [],
-                    bookings: roomAvailability.bookings[dt] || [],
-                    conflicts: roomAvailability.conflicts[dt] || [],
-                    preConflicts: roomAvailability.pre_conflicts[dt] || [],
-                    blockings: roomAvailability.blockings[dt] || [],
-                    nonbookablePeriods: roomAvailability.nonbookable_periods[dt] || [],
-                    unbookableHours: roomAvailability.unbookable_hours || []
-                };
-                return {availability: av, label: dt, conflictIndicator: true, id: dt, room};
-            });
+            return dateRange.map(dt => this._getRowSerializer(dt)(roomAvailability));
         } else {
             const dt = activeDate.format('YYYY-MM-DD');
-            rows = Object.values(availability).map((roomAvailability) => {
-                const av = {
-                    candidates: roomAvailability.candidates[dt].map((cand) => ({...cand, bookable: true})) || [],
-                    preBookings: roomAvailability.pre_bookings[dt] || [],
-                    bookings: roomAvailability.bookings[dt] || [],
-                    conflicts: roomAvailability.conflicts[dt] || [],
-                    preConflicts: roomAvailability.pre_conflicts[dt] || [],
-                    blockings: roomAvailability.blockings[dt] || [],
-                    nonbookablePeriods: roomAvailability.nonbookable_periods[dt] || [],
-                    unbookableHours: roomAvailability.unbookable_hours || []
-                };
-
-                const room = roomAvailability.room;
-                return {availability: av, label: room.full_name, conflictIndicator: true, id: room.id, room};
-            });
+            return Object.values(availability).map(this._getRowSerializer(dt));
         }
-
-        return rows;
     };
 
     openBookingModal = (room) => {
@@ -163,8 +151,7 @@ class BookingTimeline extends React.Component {
                               });
                           }}
                           extraContent={this.singleRoom && this.renderRoomSummary(this.singleRoom)}
-                          isFetching={isFetching}
-                          isFetchingRooms={isFetchingRooms}
+                          isLoading={isFetching || isFetchingRooms}
                           recurrenceType={recurrenceType} />
         );
     }

@@ -34,7 +34,7 @@ const _toMoment = (date) => moment(date, DATE_FORMAT);
 
 export default class TimelineBase extends React.Component {
     static propTypes = {
-        activeDate: PropTypes.instanceOf(moment),
+        activeDate: PropTypes.instanceOf(moment).isRequired,
         onDateChange: PropTypes.func.isRequired,
         rows: PropTypes.arrayOf(PropTypes.object).isRequired,
         legend: PropTypes.node.isRequired,
@@ -44,24 +44,25 @@ export default class TimelineBase extends React.Component {
         maxHour: PropTypes.number.isRequired,
         step: PropTypes.number,
         onClick: PropTypes.func,
-        dateRange: PropTypes.array.isRequired,
-        isFetching: PropTypes.bool.isRequired,
-        isFetchingRooms: PropTypes.bool.isRequired,
-        recurrenceType: PropTypes.string.isRequired,
+        dateRange: PropTypes.array,
+        isLoading: PropTypes.bool,
+        recurrenceType: PropTypes.string,
     };
 
     static defaultProps = {
         emptyMessage: (
             <Message warning>
                 <Translate>
-                    There are no rooms matching the criteria.
+                    No occurrences found
                 </Translate>
             </Message>
         ),
         step: 2,
         onClick: null,
-        activeDate: null,
-        extraContent: null
+        extraContent: null,
+        isLoading: false,
+        dateRange: [],
+        recurrenceType: 'single'
     };
 
     calendarDisabledDate = (date) => {
@@ -69,33 +70,40 @@ export default class TimelineBase extends React.Component {
         if (!date) {
             return false;
         }
-        return !isDateWithinRange(date, dateRange, _toMoment);
+        return dateRange.length !== 0 && !isDateWithinRange(date, dateRange, _toMoment);
     };
 
     changeSelectedDate = (mode) => {
         const {activeDate, dateRange, onDateChange} = this.props;
-        const index = dateRange.findIndex((dt) => _toMoment(dt).isSame(activeDate)) + (mode === 'next' ? 1 : -1);
-        onDateChange(_toMoment(dateRange[index]));
+        const step = mode === 'next' ? 1 : -1;
+
+        // dateRange is not set (unlimited)
+        if (dateRange.length === 0) {
+            onDateChange(activeDate.clone().add(step, 'day'));
+        } else {
+            const index = dateRange.findIndex((dt) => _toMoment(dt).isSame(activeDate)) + step;
+            onDateChange(_toMoment(dateRange[index]));
+        }
     };
 
     onSelect = (date) => {
         const {dateRange, onDateChange} = this.props;
-        const startDate = _toMoment(dateRange[0]);
-        const endDate = _toMoment(dateRange[dateRange.length - 1]);
+        const freeRange = dateRange.length === 0;
 
-        if (date.isBefore(_toMoment(startDate)) || date.isAfter(_toMoment(endDate))) {
-            return;
-        } else if (isDateWithinRange(date, dateRange, _toMoment)) {
+        if (freeRange || isDateWithinRange(date, dateRange, _toMoment)) {
             onDateChange(date);
         }
     };
 
     renderTimeline = () => {
         const {
-            activeDate, dateRange, extraContent, legend, maxHour, minHour, onClick, recurrenceType, rows, step
+            activeDate, dateRange, extraContent, legend, maxHour, minHour, onClick, recurrenceType, rows, step,
+            isLoading
         } = this.props;
         const hourSeries = _.range(minHour, maxHour + step, step);
         const calendar = <Calendar disabledDate={this.calendarDisabledDate} onChange={this.onSelect} />;
+
+        const freeRange = dateRange.length === 0;
         const startDate = _toMoment(dateRange[0]);
         const endDate = _toMoment(dateRange[dateRange.length - 1]);
 
@@ -109,7 +117,7 @@ export default class TimelineBase extends React.Component {
                         <Button.Group floated="right" size="small">
                             <Button icon="left arrow"
                                     onClick={() => this.changeSelectedDate('prev')}
-                                    disabled={activeDate.clone().subtract(1, 'day').isBefore(startDate)} />
+                                    disabled={!freeRange && activeDate.clone().subtract(1, 'day').isBefore(startDate)} />
                             <DatePicker calendar={calendar}>
                                 {
                                     () => (
@@ -127,24 +135,25 @@ export default class TimelineBase extends React.Component {
                 </Segment>
                 <div styleName="timeline">
                     {extraContent}
-                    <TimelineContent rows={rows}
-                                     hourSeries={hourSeries}
-                                     recurrenceType={recurrenceType}
-                                     onClick={onClick} />
+                    {isLoading ? (
+                        <Loader active />
+                    ) : (
+                        <TimelineContent rows={rows}
+                                         hourSeries={hourSeries}
+                                         recurrenceType={recurrenceType}
+                                         onClick={onClick} />
+                    )}
                 </div>
             </>
         );
     };
 
     renderContent = () => {
-        const {isFetching, isFetchingRooms, emptyMessage, rows} = this.props;
-        if (isFetching || isFetchingRooms) {
-            return <Loader active />;
-        } else if (!_.isEmpty(rows)) {
-            return this.renderTimeline();
-        } else {
+        const {emptyMessage, rows, isLoading} = this.props;
+        if (!isLoading && _.isEmpty(rows)) {
             return emptyMessage;
         }
+        return this.renderTimeline();
     };
 
     render() {
