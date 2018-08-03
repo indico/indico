@@ -86,7 +86,7 @@ export default function filterReducerFactory(namespace) {
                 return action.namespace === namespace ? mergeFilter(state, action.param, action.data) : state;
             case actions.SET_FILTERS:
                 return action.namespace === namespace ? action.params : state;
-            case actions.RESET_FILTERS:
+            case actions.RESET_PAGE_STATE:
                 return (!action.namespace || action.namespace === namespace) ? initialStateFactory(namespace) : state;
             default:
                 return state;
