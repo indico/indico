@@ -16,13 +16,14 @@
 
 from __future__ import unicode_literals
 
-from collections import defaultdict, namedtuple
+from collections import OrderedDict, defaultdict, namedtuple
 from datetime import datetime, time, timedelta
-from itertools import chain
+from itertools import chain, groupby
+from operator import attrgetter
 
 from flask import session
 from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.orm import contains_eager, raiseload
+from sqlalchemy.orm import contains_eager, joinedload, raiseload
 
 from indico.core.auth import multipass
 from indico.core.db import db
@@ -42,7 +43,7 @@ from indico.modules.rb.notifications.blockings import notify_request
 from indico.modules.rb_new.schemas import (blockings_schema, bookable_hours_schema, nonbookable_periods_schema,
                                            reservation_occurrences_schema, rooms_schema)
 from indico.util.caching import memoize_redis
-from indico.util.date_time import get_overlap
+from indico.util.date_time import get_overlap, iterdays
 from indico.util.struct.iterables import group_list
 
 
@@ -302,6 +303,49 @@ def get_rooms_availability(rooms, start_dt, end_dt, repeat_frequency, repeat_int
                                  'nonbookable_periods': group_nonbookable_periods(room_nonbookable_periods, dates),
                                  'unbookable_hours': room_unbookable_hours}
     return date_range, availability
+
+
+def get_room_calendar(start_dt, end_dt):
+    start_dt = start_dt.replace(hour=0, minute=0)
+    end_dt = end_dt.replace(hour=23, minute=59)
+
+    query = (ReservationOccurrence.query
+             .filter(ReservationOccurrence.is_valid)
+             .filter(ReservationOccurrence.start_dt >= start_dt, ReservationOccurrence.end_dt <= end_dt)
+             .join(Reservation)
+             .join(Room)
+             .filter(Room.is_active)
+             .options(joinedload('reservation').joinedload('room')))
+
+    rooms = (Room.query
+             .filter(Room.is_active).options(joinedload('location'))
+             .order_by(db.func.indico.natsort(Room.full_name))
+             .all())
+
+    unbookable_hours = get_rooms_unbookable_hours(rooms)
+    nonbookable_periods = get_rooms_nonbookable_periods(rooms, start_dt, end_dt)
+    occurrences_by_room = groupby(query, attrgetter('reservation.room'))
+    blocked_rooms = get_rooms_blockings(rooms, start_dt.date(), end_dt.date())
+
+    dates = [d.date() for d in iterdays(start_dt, end_dt)]
+
+    calendar = OrderedDict((room.id, {
+        'room': room,
+        'nonbookable_periods': group_nonbookable_periods(nonbookable_periods.get(room.id, []), dates),
+        'unbookable_hours': unbookable_hours.get(room.id, []),
+        'blockings': group_blockings(blocked_rooms.get(room.id, []), dates),
+    }) for room in rooms)
+
+    for room, occurrences in occurrences_by_room:
+        occurrences = list(occurrences)
+        pre_bookings = [occ for occ in occurrences if not occ.reservation.is_accepted]
+        existing_bookings = [occ for occ in occurrences if occ.reservation.is_accepted]
+
+        calendar[room.id].update({
+            'bookings': group_by_occurrence_date(existing_bookings),
+            'pre_bookings': group_by_occurrence_date(pre_bookings)
+        })
+    return calendar
 
 
 def group_by_occurrence_date(occurrences):

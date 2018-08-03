@@ -15,12 +15,92 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import moment from 'moment';
+import PropTypes from 'prop-types';
 import React from 'react';
+import {Grid, Label} from 'semantic-ui-react';
+import {connect} from 'react-redux';
 import {Translate} from 'indico/react/i18n';
 
+import TimelineBase from '../TimelineBase';
+import * as actions from '../../actions';
 
-export default function BookRoom() {
-    return (
-        <h2><Translate>Calendar</Translate></h2>
-    );
+import '../Timeline.module.scss';
+
+
+class Calendar extends React.Component {
+    static propTypes = {
+        fetchCalendar: PropTypes.func.isRequired,
+        date: PropTypes.string,
+        setDate: PropTypes.func.isRequired,
+        rows: PropTypes.arrayOf(PropTypes.object).isRequired,
+        isFetching: PropTypes.bool.isRequired
+    };
+
+    static defaultProps = {
+        date: null
+    };
+
+    componentDidMount() {
+        const {date, fetchCalendar, setDate} = this.props;
+        if (!date) {
+            setDate(moment());
+        }
+        fetchCalendar();
+    }
+
+    _getRowSerializer(dt) {
+        return ({bookings, pre_bookings: preBookings, nonbookable_periods: nonbookablePeriods,
+                 unbookable_hours: unbookableHours, blockings, room}) => ({
+            availability: {
+                preBookings: preBookings[dt] || [],
+                bookings: bookings[dt] || [],
+                nonbookablePeriods: nonbookablePeriods[dt] || [],
+                unbookableHours: unbookableHours || [],
+                blockings: blockings[dt] || []
+            },
+            label: room.full_name,
+            id: room.id,
+            room
+        });
+    }
+
+    render() {
+        const {date, rows, setDate, isFetching} = this.props;
+        const legend = (
+            <>
+                <Label color="orange">{Translate.string('Booked')}</Label>
+                <Label styleName="pre-booking">{Translate.string('Pre-Booking')}</Label>
+                <Label styleName="blocking">{Translate.string('Blocked')}</Label>
+                <Label styleName="unbookable">{Translate.string('Not bookable')}</Label>
+            </>
+        );
+
+        return (
+            <Grid>
+                <Grid.Row>
+                    <TimelineBase minHour={6}
+                                  maxHour={22}
+                                  legend={legend}
+                                  rows={rows.map(this._getRowSerializer(date))}
+                                  activeDate={moment(date)}
+                                  onDateChange={setDate}
+                                  isLoading={isFetching} />
+                </Grid.Row>
+            </Grid>
+        );
+    }
 }
+
+export default connect(
+    ({calendar}) => calendar,
+    dispatch => ({
+        fetchCalendar() {
+            dispatch(actions.fetchCalendar());
+        },
+        setDate(date) {
+            dispatch(actions.setCalendarDate(date.format('YYYY-MM-DD')));
+            dispatch(actions.fetchCalendar());
+        }
+    })
+)(Calendar);

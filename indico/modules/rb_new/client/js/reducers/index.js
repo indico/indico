@@ -24,6 +24,7 @@ import mapAspectsReducer from './mapAspects';
 import roomDetailsReducer from './roomDetails';
 import bookRoomFormReducer from './bookRoomForm';
 import blockingsReducer from './blockings';
+import calendarReducer from './calendar';
 
 
 const reducers = {
@@ -35,7 +36,8 @@ const reducers = {
     mapAspects: mapAspectsReducer,
     roomDetails: roomDetailsReducer,
     bookRoomForm: bookRoomFormReducer,
-    blockingList: blockingsReducer
+    blockingList: blockingsReducer,
+    calendar: calendarReducer
 };
 
 export default reducers;
