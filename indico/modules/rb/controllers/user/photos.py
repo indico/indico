@@ -29,23 +29,22 @@ from indico.web.flask.util import send_file
 _cache = GenericCache('Rooms')
 
 
-def _redirect_no_photo(size):
-    return redirect(posixpath.join(config.IMAGES_BASE_URL, 'rooms/{}_photos/NoPhoto.jpg'.format(size)))
+def _redirect_no_photo():
+    return redirect(posixpath.join(config.IMAGES_BASE_URL, 'rooms/large_photos/NoPhoto.jpg'))
 
 
-def room_photo(roomID, size, **kw):
-    cache_key = 'photo-{}-{}'.format(roomID, size)
+def room_photo(roomID,  **kw):
+    cache_key = 'photo-{}-large'.format(roomID)
     photo_data = _cache.get(cache_key)
 
     if photo_data == '*':
-        return _redirect_no_photo(size)
+        return _redirect_no_photo()
     elif photo_data is None:
         photo = Photo.find_first(Room.id == roomID, _join=Photo.room)
         if photo is None:
             _cache.set(cache_key, '*')
-            return _redirect_no_photo(size)
-        photo_data = photo.thumbnail if size == 'small' else photo.data
-        _cache.set(cache_key, photo_data)
+            return _redirect_no_photo()
+        _cache.set(cache_key, photo.data)
 
     io = BytesIO(photo_data)
-    return send_file('photo-{}.jpg'.format(size), io, 'image/jpeg', no_cache=False)
+    return send_file('photo-large.jpg', io, 'image/jpeg', no_cache=False)

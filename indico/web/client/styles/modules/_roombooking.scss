@@ -350,3 +350,32 @@ table.booking-stats {
         }
     }
 }
+
+.sprite-wrapper {
+    height: 100px;
+    width: 200px;
+
+    &.mini {
+        height: 15px;
+        width: 50px;
+    }
+}
+
+.room-sprite {
+    height: 170px;
+    width: 290px;
+    transform: scale(0.8);
+    transform-origin: 0;
+
+    &.small, &.mini {
+        transform-origin: 0 0;
+    }
+
+    &.small {
+        transform: scale(0.5);
+    }
+
+    &.mini {
+        transform: scale(0.15);
+    }
+}

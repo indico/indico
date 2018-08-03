@@ -249,14 +249,6 @@
                                         ${ form.large_photo() } ${ contextHelp('photoCH' ) }
                                     </td>
                                 </tr>
-                                <tr>
-                                    <td align="right" valign="top" style="padding-right: 5px;">
-                                        <small>${ form.small_photo.label.text }</small>
-                                    </td>
-                                    <td align="left" class="blacktext">
-                                        ${ form.small_photo() }
-                                    </td>
-                                </tr>
                             </table>
                         </td>
                     </tr>

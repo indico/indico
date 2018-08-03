@@ -7,7 +7,8 @@
         <td>
             % if room.has_photo:
                 <a href="${ room.large_photo_url }" class="js-lightbox">
-                    <img border="1px" height="100" src="${ room.small_photo_url }"/>
+                    <div class="room-sprite" style="background: url(${sprite_url}) -${room.sprite_position * 290}px 0">
+                    </div>
                 </a>
             % endif
         </td>

@@ -49,14 +49,12 @@ def test_urls_transient_object():
     assert room.booking_url is None
     assert room.details_url is None
     assert room.large_photo_url is None
-    assert room.small_photo_url is None
 
 
 def test_urls(dummy_room):
     assert dummy_room.booking_url is not None
     assert dummy_room.details_url is not None
     assert dummy_room.large_photo_url is not None
-    assert dummy_room.small_photo_url is not None
 
 
 def test_has_photo(db, dummy_room):

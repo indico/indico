@@ -183,7 +183,8 @@
             rooms: rooms,
             myRooms: myRooms,
             selectName: 'room_ids',
-            simpleMode: true
+            simpleMode: true,
+            spriteURL: '${ sprite_url }'
         });
 
         $('#timerange').timerange({

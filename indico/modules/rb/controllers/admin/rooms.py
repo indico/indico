@@ -114,12 +114,12 @@ class RHRoomBookingCreateModifyRoomBase(RHRoomBookingAdminBase):
         form.populate_obj(room, skip=('bookable_hours', 'nonbookable_periods'), existing_only=True)
         room.update_name()
         # Photos
-        if form.small_photo.data and form.large_photo.data:
-            _cache.delete_multi('photo-{}-{}'.format(room.id, size) for size in {'small', 'large'})
-            room.photo = Photo(thumbnail=form.small_photo.data.read(), data=form.large_photo.data.read())
+        if form.large_photo.data:
+            _cache.delete('photo-{}-large'.format(room.id))
+            room.photo = Photo(data=form.large_photo.data.read())
             build_rooms_spritesheet()
         elif form.delete_photos.data:
-            _cache.delete_multi('photo-{}-{}'.format(room.id, size) for size in {'small', 'large'})
+            _cache.delete('photo-{}-large'.format(room.id))
             room.photo = None
             build_rooms_spritesheet()
         # Custom attributes

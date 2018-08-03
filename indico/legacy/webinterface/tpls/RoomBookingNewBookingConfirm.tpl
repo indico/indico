@@ -19,7 +19,8 @@
     <i class="icon-location"></i>
     ${ _('Room Details') }
 </h2>
-<%include file="RoomBookingRoomMiniDetails.tpl" args="room=room, event=event, endpoints=endpoints, allow_room_change=False"/>
+<%include file="RoomBookingRoomMiniDetails.tpl"
+          args="room=room, event=event, endpoints=endpoints, allow_room_change=False, sprite_url=sprite_url"/>
 
 <h2 class="group-title">
     <i class="icon-calendar"></i>

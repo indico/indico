@@ -59,7 +59,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
     __public__ = [
         'id', 'name', 'location_name', 'floor', 'number', 'building',
         'booking_url', 'capacity', 'comments', 'owner_id', 'details_url',
-        'large_photo_url', 'small_photo_url', 'has_photo', 'is_active',
+        'large_photo_url', 'has_photo', 'sprite_position', 'is_active',
         'is_reservable', 'is_auto_confirm', 'marker_description', 'kind',
         'booking_limit_days'
     ]
@@ -298,12 +298,6 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         if self.id is None:
             return None
         return url_for('rooms.photo', self, size='large')
-
-    @property
-    def small_photo_url(self):
-        if self.id is None:
-            return None
-        return url_for('rooms.photo', self, size='small')
 
     @property
     def map_url(self):

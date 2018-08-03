@@ -32,7 +32,9 @@
                                 <tr style="height: 60px;">
                                     <td ${onclick} style="padding: 0 10px 6px 0; cursor: pointer;">
                                         % if reservation.room.has_photo:
-                                            <img src="${ reservation.room.small_photo_url }">
+                                            <div class="room-sprite small"
+                                                 style="background: url(${sprite_url}) -${reservation.room.sprite_position * 290}px 0">
+                                            </div>
                                         % else:
                                             &nbsp;
                                         % endif

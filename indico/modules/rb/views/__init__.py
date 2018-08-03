@@ -18,10 +18,15 @@ from __future__ import unicode_literals
 
 from flask import render_template_string
 
+from indico.legacy.common.cache import GenericCache
 from indico.util.i18n import _
 from indico.util.string import to_unicode
 from indico.web.breadcrumbs import render_breadcrumbs
+from indico.web.flask.util import url_for
 from indico.web.views import WPDecorated, WPJinjaMixin
+
+
+_cache = GenericCache('Rooms')
 
 
 class WPRoomBookingBase(WPJinjaMixin, WPDecorated):
@@ -31,6 +36,7 @@ class WPRoomBookingBase(WPJinjaMixin, WPDecorated):
 
     def __init__(self, rh, **kwargs):
         kwargs['active_menu_item'] = self.sidemenu_option
+        kwargs['sprite_url'] = url_for('rooms_new.sprite', {'version': _cache.get('rooms-sprite-token')})
         WPDecorated.__init__(self, rh, **kwargs)
 
     def _get_breadcrumbs(self):

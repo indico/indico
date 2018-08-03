@@ -51,7 +51,8 @@
                 roomMaxCapacity: maxRoomCapacity,
                 userData: ${ 'rbUserData' if not ignore_userdata else {}},
                 selectName: '${ form.room_ids.name }',
-                selectedRooms: ${ form.room_ids.data | j, n }
+                selectedRooms: ${ form.room_ids.data | j, n },
+                spriteURL: '${ sprite_url }'
             });
         }
 

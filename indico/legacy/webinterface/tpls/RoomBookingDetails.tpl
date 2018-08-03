@@ -197,7 +197,9 @@
                         </td>
                         <td align="left" class="thumbnail">
                           <a href="${ reservation.room.large_photo_url }" class="js-lightbox">
-                            <img border="1px" src="${ reservation.room.small_photo_url }"/>
+                            <div class="room-sprite"
+                                 style="background: url(${sprite_url}) -${reservation.room.sprite_position * 290}px 0">
+                            </div>
                           </a>
                         </td>
                       </tr>

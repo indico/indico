@@ -36,7 +36,11 @@
                                 % endif
                                 <tr style="height: 60px" id="${ room.id }" class="resvHover">
                                   <td ${ on_click_details_url }>
-                                    <img src="${ room.small_photo_url }" />
+                                    <div class="sprite-wrapper">
+                                      <div class="room-sprite small"
+                                           style="background: url(${sprite_url}) -${room.sprite_position * 290}px 0">
+                                      </div>
+                                    </div>
                                   </td>
                                   <td ${ on_click_details_url }>
                                     ${ room.building }-${ room.floor }-${ room.number }

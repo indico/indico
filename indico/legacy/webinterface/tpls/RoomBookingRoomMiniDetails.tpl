@@ -37,7 +37,9 @@
             </td>
             <td align="left" class="thumbnail">
                 <a href="${ room.large_photo_url }" class="js-lightbox">
-                    <img border="1" src="${ room.small_photo_url }" alt="${ _('Room picture') }"/>
+                    <div class="room-sprite"
+                         style="background: url(${sprite_url}) -${room.sprite_position * 290}px 0">
+                    </div>
                 </a>
             </td>
         </tr>

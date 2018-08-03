@@ -14,6 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from indico.legacy.common.cache import GenericCache
 from indico.legacy.webinterface.wcomponents import TabControl, WTabControl, WTemplated
 from indico.modules.events.management.views import WPEventManagementLegacy
 from indico.modules.rb.models.reservations import Reservation
@@ -23,6 +24,9 @@ from indico.modules.rb.views.user.reservations import (WPRoomBookingBookingDetai
                                                        WPRoomBookingNewBookingSelectRoom, WPRoomBookingNewBookingSimple)
 from indico.modules.rb.views.user.rooms import WPRoomBookingRoomDetails
 from indico.web.flask.util import url_for
+
+
+_cache = GenericCache('Rooms')
 
 
 class WPRoomBookingEventBase(WPEventManagementLegacy):
@@ -42,6 +46,7 @@ class WPRoomBookingEventBase(WPEventManagementLegacy):
     def _getPageContent(self, params):
         self._createTabCtrl()
         params['event'] = self.event
+        params['sprite_url'] = url_for('rooms_new.sprite', {'version': _cache.get('rooms-sprite-token')})
         return WTabControl(self._tabCtrl).getHTML(self._getTabContent(params))
 
     def _getTabContent(self, params):

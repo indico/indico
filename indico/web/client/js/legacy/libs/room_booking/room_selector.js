@@ -379,8 +379,9 @@
                     .children(":first-child").addClass("roomname")
                     .next().addClass("roomlocation");
 
+                var sprite = "<div class='room-sprite mini' style='background: url("+self.options.spriteURL+") -"+rooms[index].sprite_position * 290+"px 0'></div>";
                 var pic = $('<a>', {'class': 'roompicture js-lightbox'})
-                    .append($("<img src='" + rooms[index].small_photo_url + "'/>"))
+                    .append($("<div class='sprite-wrapper mini'>{0}</div>".format(sprite)))
                     .prependTo(item);
                 if (rooms[index].has_photo) {
                     pic.find("img")

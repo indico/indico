@@ -26,10 +26,6 @@ class Photo(db.Model):
         db.Integer,
         primary_key=True
     )
-    thumbnail = db.Column(
-        db.LargeBinary,
-        nullable=True
-    )
     data = db.Column(
         db.LargeBinary,
         nullable=True
