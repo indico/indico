@@ -95,7 +95,7 @@ export const SET_BOOKING_AVAILABILITY = 'SET_BOOKING_AVAILABILITY';
 export const FETCH_BLOCKINGS_STARTED = 'FETCH_BLOCKINGS_STARTED';
 export const FETCH_BLOCKINGS_FAILED = 'FETCH_BLOCKINGS_FAILED';
 export const UPDATE_BLOCKINGS = 'UPDATE_BLOCKINGS';
-export const BLOCKING_ONGOING = 'BLOCKING_ONGOING';
+export const CREATE_BLOCKING = 'CREATE_BLOCKING';
 export const BLOCKING_CONFIRMED = 'BLOCKING_CONFIRMED';
 export const BLOCKING_FAILED = 'BLOCKING_FAILED';
 
@@ -509,6 +509,6 @@ export function fetchBlockings() {
 export function createBlocking(formData) {
     return submitFormAction(
         () => indicoAxios.post(createBlockingURL(), formData),
-        BLOCKING_ONGOING, BLOCKING_CONFIRMED, BLOCKING_FAILED
+        CREATE_BLOCKING, BLOCKING_CONFIRMED, BLOCKING_FAILED
     );
 }
