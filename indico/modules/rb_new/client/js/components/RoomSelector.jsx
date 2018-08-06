@@ -65,6 +65,14 @@ export default class RoomSelector extends React.Component {
         };
     }
 
+    componentDidMount() {
+        // eslint-disable-next-line react/no-did-mount-set-state
+        this.setState({isFetchingLocations: true}, async () => {
+            const result = await fetchLocations();
+            this.setState({locations: result.data, isFetchingLocations: false});
+        });
+    }
+
     removeItem = (room) => {
         const {selectedRooms} = this.state;
         const {onChange} = this.props;
@@ -119,16 +127,6 @@ export default class RoomSelector extends React.Component {
                                   onChange={(event, data) => {
                                       const selected = locations.find((loc) => loc.id === data.value);
                                       this.setState({selectedLocation: selected});
-                                  }}
-                                  onOpen={() => {
-                                      if (locations.length) {
-                                          return;
-                                      }
-
-                                      this.setState({isFetchingLocations: true}, async () => {
-                                          const result = await fetchLocations();
-                                          this.setState({locations: result.data, isFetchingLocations: false});
-                                      });
                                   }}
                                   fluid
                                   search
