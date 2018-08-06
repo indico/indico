@@ -87,16 +87,6 @@ export default class RoomList extends React.Component {
                     circular />
         );
 
-        const openBlockingModalBtn = (
-            <Button icon="lock"
-                    onClick={() => {
-                        pushState('/rooms/blocking/create');
-                        this.setState({blockings: {...blockings, [room.id]: room}});
-                    }}
-                    circular
-                    negative />
-        );
-
         if (blockingMode) {
             const isRoomInTheList = room.id in blockings;
             const buttonProps = {compact: true, size: 'tiny'};
@@ -129,7 +119,6 @@ export default class RoomList extends React.Component {
             return (
                 <Room key={room.id} room={room} showFavoriteButton>
                     <Slot name="actions">
-                        <Popup trigger={openBlockingModalBtn} content={Translate.string('Block this room')} />
                         <Popup trigger={showDetailsBtn} content={Translate.string('Room details')} position="top center" />
                     </Slot>
                 </Room>
@@ -184,13 +173,7 @@ export default class RoomList extends React.Component {
                                     <FilterBar />
                                 </Grid.Column>
                                 <Grid.Column width={4} textAlign="right" verticalAlign="middle">
-                                    {!blockingMode && (
-                                        <Dropdown text={Translate.string('Actions')}
-                                                  options={menuOptions}
-                                                  direction="left"
-                                                  button />
-                                    )}
-                                    {blockingMode && (
+                                    {blockingMode ? (
                                         <>
                                             <Button icon="check"
                                                     disabled={Object.keys(blockings).length === 0}
@@ -201,6 +184,12 @@ export default class RoomList extends React.Component {
                                                     circular />
                                             <Button icon="cancel" onClick={this.toggleBlockingMode} circular />
                                         </>
+                                    ) : (
+                                        <Dropdown text={Translate.string('Actions')}
+                                                  options={menuOptions}
+                                                  direction="left"
+                                                  button
+                                                  floating />
                                     )}
                                 </Grid.Column>
                             </Grid>
