@@ -93,24 +93,18 @@ export default class PrincipalSearchField extends React.Component {
         return null;
     }
 
-    renderItem({first_name: firstName, last_name: lastName, email, id, is_group: isGroup, name: groupName}) {
-        if (isGroup) {
-            return {
-                text: groupName,
-                value: groupName,
-                key: groupName,
-                icon: 'users'
-            };
-        } else {
-            return {
-                text: `${firstName} ${lastName}`,
-                description: email,
-                value: id,
-                key: id,
-                icon: 'user'
-            };
-        }
-    }
+    renderItem = ({is_group: isGroup, ...itemData}) => (isGroup ? {
+        text: itemData.name,
+        value: itemData.name,
+        key: itemData.name,
+        icon: 'users'
+    } : {
+        text: `${itemData.first_name} ${itemData.last_name}`,
+        description: itemData.email,
+        value: itemData.id,
+        key: itemData.id,
+        icon: 'user'
+    });
 
     handleSearchChange = _.debounce(async (__, {searchQuery}) => {
         if (searchQuery.trim().length < 3) {
@@ -123,18 +117,23 @@ export default class PrincipalSearchField extends React.Component {
 
         const query = (searchQuery.indexOf('@') !== -1) ? {email: searchQuery} : {name: searchQuery};
         const {withGroups} = this.props;
-        let items = [];
+        const promises = [];
 
-        items = items.concat(await searchUser(query));
+        promises.push(searchUser(query));
         if (withGroups) {
-            items = items.concat(await searchGroups({name: searchQuery}));
+            promises.push(searchGroups({name: searchQuery}));
         }
 
-        const options = items.map(this.renderItem);
+        const principals = await Promise.all(promises);
+        const items = [];
+        for (const principalList of principals) {
+            items.push(...principalList);
+        }
+
         this.userCache = Object.assign(this.userCache, ...items.map(item => ({[item.id]: item})));
         this.setState({
             isFetching: false,
-            options
+            options: items.map(this.renderItem)
         });
     }, 500);
 
