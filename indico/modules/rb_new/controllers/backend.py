@@ -35,10 +35,11 @@ from indico.modules.rb.models.reservations import RepeatFrequency, Reservation
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb_new.schemas import (aspects_schema, blockings_schema, locations_schema, map_rooms_schema,
                                            reservation_schema, room_details_schema, rooms_schema)
-from indico.modules.rb_new.util import (approve_blocking, create_blocking, get_buildings, get_equipment_types,
-                                        get_existing_room_occurrences, get_room_blockings, get_rooms_availability,
-                                        get_suggestions, group_by_occurrence_date, has_managed_rooms, search_for_rooms,
-                                        serialize_blockings, serialize_nonbookable_periods, serialize_occurrences,
+from indico.modules.rb_new.util import (approve_or_request_blocking, create_blocking, get_buildings,
+                                        get_equipment_types, get_existing_room_occurrences, get_room_blockings,
+                                        get_rooms_availability, get_suggestions, group_by_occurrence_date,
+                                        has_managed_rooms, search_for_rooms, serialize_blockings,
+                                        serialize_nonbookable_periods, serialize_occurrences,
                                         serialize_unbookable_hours)
 from indico.modules.users.models.users import User
 from indico.util.date_time import iterdays
@@ -272,5 +273,5 @@ class RHCreateRoomBlocking(RHRoomBookingBase):
                 allowed_principals.append(User.query.filter(User.id == obj['id']).one())
         blocking = create_blocking(rooms, args['start_date'], args['end_date'], args['reason'],
                                    allowed_principals)
-        approve_blocking(blocking)
+        approve_or_request_blocking(blocking)
         return jsonify_data(flash=False)
