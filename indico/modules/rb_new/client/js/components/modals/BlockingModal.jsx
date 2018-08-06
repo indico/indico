@@ -16,6 +16,7 @@
  */
 
 import React from 'react';
+import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import {Button, Divider, Form, Grid, Message, Icon, Modal} from 'semantic-ui-react';
 import {Form as FinalForm, Field} from 'react-final-form';
@@ -26,6 +27,7 @@ import {ReduxFormField, formatters} from 'indico/react/forms';
 import PrincipalSearchField from 'indico/react/components/PrincipalSearchField';
 import DatePeriodField from 'indico/react/components/DatePeriodField';
 import RoomSelector from '../RoomSelector';
+import {createBlocking} from '../../actions';
 
 
 function validate({period, reason, rooms}) {
@@ -70,7 +72,7 @@ const formDecorator = createDecorator({
 });
 
 
-export default class BlockingModal extends React.Component {
+class BlockingModal extends React.Component {
     static propTypes = {
         open: PropTypes.bool.isRequired,
         onClose: PropTypes.func.isRequired,
@@ -83,8 +85,7 @@ export default class BlockingModal extends React.Component {
     };
 
     createBlocking = async (formData) => {
-        const {createBlocking} = this.props;
-        await createBlocking(formData);
+        await this.props.createBlocking(formData); // eslint-disable-line react/destructuring-assignment
     };
 
     renderPrincipalSearchField = ({input, ...props}) => {
@@ -235,3 +236,14 @@ export default class BlockingModal extends React.Component {
         );
     }
 }
+
+const mapDispatchToProps = (dispatch) => ({
+    createBlocking: (formData) => {
+        return dispatch(createBlocking(formData));
+    }
+});
+
+export default connect(
+    null,
+    mapDispatchToProps
+)(BlockingModal);
