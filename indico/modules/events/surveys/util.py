@@ -25,9 +25,7 @@ from indico.core.db import db
 from indico.modules.events import Event
 from indico.modules.events.surveys.models.submissions import SurveySubmission
 from indico.util.caching import memoize_request
-from indico.util.date_time import format_datetime
 from indico.util.spreadsheets import unique_col
-from indico.util.string import to_unicode
 from indico.web.forms.base import IndicoForm
 
 
