@@ -45,37 +45,41 @@ export default class TimelineItem extends React.Component {
     static propTypes = {
         startHour: PropTypes.number.isRequired,
         endHour: PropTypes.number.isRequired,
-        step: PropTypes.number.isRequired,
         data: PropTypes.object.isRequired,
-        onClick: PropTypes.func
+        onClick: PropTypes.func,
+        children: PropTypes.node
     };
 
     static defaultProps = {
-        onClick: null
+        onClick: null,
+        children: []
     };
 
     calculateWidth = (startDt, endDt) => {
-        const {startHour, endHour, step} = this.props;
-        let segmentStartDuration = (startDt.hours() * 60) + startDt.minutes();
-        let segmentEndDuration = (endDt.hours() * 60) + endDt.minutes();
+        const {startHour, endHour} = this.props;
+        let segStartMins = (startDt.hours() * 60) + startDt.minutes();
+        let segEndMins = (endDt.hours() * 60) + endDt.minutes();
 
-        if (segmentStartDuration < startHour * 60) {
-            segmentStartDuration = startHour * 60;
+        if (segStartMins < startHour * 60) {
+            segStartMins = startHour * 60;
         }
-        if (segmentEndDuration > endHour * 60) {
-            segmentEndDuration = endHour * 60;
+        if (segEndMins > endHour * 60) {
+            segEndMins = endHour * 60;
         }
 
-        return (segmentEndDuration - segmentStartDuration) / (step * 60);
+        return (segEndMins - segStartMins) / ((endHour - startHour) * 60) * 100;
     };
 
     calculatePosition = (startDt) => {
-        const {startHour, step} = this.props;
-        let segmentStartDuration = (startDt.hours() * 60) + startDt.minutes();
-        if (segmentStartDuration < startHour * 60) {
-            segmentStartDuration = startHour * 60;
+        const {startHour, endHour} = this.props;
+        const startMins = startHour * 60;
+        let segStartMins = (startDt.hours() * 60) + startDt.minutes() - startMins;
+
+        if (segStartMins < 0) {
+            segStartMins = 0;
         }
-        return (segmentStartDuration - (startHour * 60)) / (step * 60);
+
+        return (segStartMins / ((endHour - startHour) * 60)) * 100;
     };
 
     renderOccurrence = (occurrence, additionalClasses = '', type = '') => {
@@ -89,7 +93,7 @@ export default class TimelineItem extends React.Component {
             reason,
             bookable
         } = occurrence;
-        const {startHour, endHour, step, onClick} = this.props;
+        const {startHour, endHour, onClick} = this.props;
         if (type === 'blocking') {
             segmentStartDt = moment(startHour, 'HH:mm');
             segmentEndDt = moment(endHour, 'HH:mm');
@@ -100,9 +104,9 @@ export default class TimelineItem extends React.Component {
             segmentStartDt = moment(startDt, 'YYYY-MM-DD HH:mm');
             segmentEndDt = moment(endDt, 'YYYY-MM-DD HH:mm');
         }
-        const blockWidth = 100 / (((endHour - startHour) / step) + 1);
-        const segmentWidth = this.calculateWidth(segmentStartDt, segmentEndDt) * blockWidth;
-        const segmentPosition = this.calculatePosition(segmentStartDt) * blockWidth;
+        const segmentWidth = this.calculateWidth(segmentStartDt, segmentEndDt);
+        const segmentPosition = this.calculatePosition(segmentStartDt);
+
         if (type === 'blocking') {
             popupContent = (
                 <div styleName="popup-center">{Translate.string('Room blocked: {reason}', {reason})}</div>
@@ -162,8 +166,10 @@ export default class TimelineItem extends React.Component {
     };
 
     render() {
+        const {children} = this.props;
         return (
             <div styleName="timeline-item">
+                {children}
                 {this.renderOccurrences()}
             </div>
         );

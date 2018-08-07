@@ -113,8 +113,7 @@ function RoomDetails({bookRoom, room}) {
                 <Grid.Column>
                     <Header><Translate>Usage</Translate></Header>
                     <TimelineContent rows={room.bookings}
-                                     hourSeries={hourSeries}
-                                     longLabel />
+                                     hourSeries={hourSeries} />
                     <Header><Translate>Statistics</Translate></Header>
                     <Message attached info>
                         <Icon name="info" />
