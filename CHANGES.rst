@@ -7,6 +7,11 @@ Version 2.1.3
 
 *Unreleased*
 
+Improvements
+^^^^^^^^^^^^
+
+- Improve survey result display (:issue:`3486`)
+
 Bugfixes
 ^^^^^^^^
 

@@ -104,6 +104,25 @@
         display: inline-block;
         vertical-align: top;
         width: 49%;
+        position: relative;
+
+        .axis-x-label {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            text-align: center;
+            color: $gray;
+        }
+
+        .axis-y-label {
+            position: absolute;
+            bottom: 50%;
+            left: 0;
+            text-align: center;
+            transform: rotate(-90deg);
+            color: $gray;
+        }
     }
 
     .number-answer {
@@ -137,6 +156,12 @@
             font-weight: bold;
         }
     }
+
+    .survey-summary {
+        margin-bottom: 1em;
+        color: $gray;
+        font-style: italic;
+    }
 }
 
 #survey-submission {
@@ -147,7 +172,7 @@
     }
 
     .i-box {
-      margin-bottom: 1em;
+        margin-bottom: 1em;
     }
 }
 
