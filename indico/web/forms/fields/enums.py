@@ -25,6 +25,8 @@ from indico.web.forms.widgets import JinjaWidget
 
 
 class _EnumFieldMixin(object):
+    keep_enum = True
+
     def process_formdata(self, valuelist):
         if valuelist:
             if valuelist[0] in ('', '__None') and self.none is not None:
@@ -34,6 +36,8 @@ class _EnumFieldMixin(object):
                     self.data = self.enum[valuelist[0]]
                 except KeyError:
                     raise ValueError(self.gettext('Not a valid choice'))
+        if self.data is not None and not self.keep_enum:
+            self.data = self.data.value
 
 
 class IndicoEnumSelectField(_EnumFieldMixin, SelectFieldBase):
@@ -42,13 +46,14 @@ class IndicoEnumSelectField(_EnumFieldMixin, SelectFieldBase):
     widget = Select()
 
     def __init__(self, label=None, validators=None, enum=None, sorted=False, only=None, skip=None, none=None,
-                 titles=None, **kwargs):
+                 titles=None, keep_enum=True, **kwargs):
         super(IndicoEnumSelectField, self).__init__(label, validators, **kwargs)
         self.enum = enum
         self.sorted = sorted
         self.only = set(only) if only is not None else None
         self.skip = set(skip or set())
         self.none = none
+        self.keep_enum = keep_enum
         self.titles = titles
 
     def iter_choices(self):
