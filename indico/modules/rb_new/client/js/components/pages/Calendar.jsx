@@ -60,7 +60,7 @@ class Calendar extends React.Component {
                 blockings: blockings[dt] || []
             },
             label: room.full_name,
-            id: room.id,
+            key: room.id,
             room
         });
     }
@@ -85,7 +85,8 @@ class Calendar extends React.Component {
                                   rows={rows.map(this._getRowSerializer(date))}
                                   activeDate={moment(date)}
                                   onDateChange={setDate}
-                                  isLoading={isFetching} />
+                                  isLoading={isFetching}
+                                  longLabel />
                 </Grid.Row>
             </Grid>
         );

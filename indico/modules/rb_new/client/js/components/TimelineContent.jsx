@@ -33,7 +33,8 @@ export default class TimelineContent extends React.Component {
         hourSeries: PropTypes.array.isRequired,
         recurrenceType: PropTypes.string,
         onClick: PropTypes.func,
-        longLabel: PropTypes.bool
+        longLabel: PropTypes.bool,
+        itemClass: PropTypes.func
     };
 
     static defaultProps = {
@@ -41,40 +42,41 @@ export default class TimelineContent extends React.Component {
         recurrenceType: null,
         onClick: null,
         longLabel: false,
+        itemClass: TimelineItem
     };
 
-    renderTimelineRow = ({availability, label, conflictIndicator, id, room}) => {
-        const {hourSeries, step, recurrenceType, onClick, longLabel} = this.props;
+    renderTimelineRow = ({availability, label, conflictIndicator, key, room}) => {
+        const {hourSeries, itemClass: ItemClass, step, recurrenceType, onClick, longLabel} = this.props;
         const minHour = hourSeries[0];
         const maxHour = hourSeries[hourSeries.length - 1];
         const columns = ((maxHour - minHour) / step) + 1;
         // TODO: Consider plan B (availability='alternatives') option when implemented
         const hasConflicts = !(_.isEmpty(availability.conflicts) && _.isEmpty(availability.preConflicts));
         return (
-            <div styleName="timeline-row" key={`element-${id}`}>
+            <div styleName="timeline-row" key={`element-${key}`}>
                 <TimelineRowLabel label={label}
                                   availability={conflictIndicator ? (hasConflicts ? 'conflict' : 'available') : null}
                                   longLabel={longLabel} />
                 <div styleName="timeline-row-content" style={{flex: columns}}>
-                    <TimelineItem step={step} startHour={minHour} endHour={maxHour} data={availability}
-                                  onClick={() => {
-                                      if (onClick && (!hasConflicts || recurrenceType !== 'single')) {
-                                          onClick(room);
-                                      }
-                                  }} />
+                    <ItemClass startHour={minHour} endHour={maxHour} data={availability}
+                               onClick={() => {
+                                   if (onClick && (!hasConflicts || recurrenceType !== 'single')) {
+                                       onClick(room);
+                                   }
+                               }} />
                 </div>
             </div>
         );
     };
 
-    renderDividers = (count, longLabel) => {
-        const leftOffset = 100 / (count + (longLabel ? 2 : 1));
+    renderDividers = (count) => {
+        const leftOffset = (100 / count);
 
         return (
-            _.times(count, (i) => (
+            _.times(count + 1, (i) => (
                 // eslint-disable-next-line react/no-array-index-key
                 <div styleName="timeline-divider"
-                     style={{left: `${((i + 1) * leftOffset) + (longLabel ? leftOffset : 0)}%`}}
+                     style={{left: `${(i * leftOffset)}%`}}
                      key={`divider-${i}`} />
             ))
         );
@@ -82,19 +84,27 @@ export default class TimelineContent extends React.Component {
 
     render() {
         const {rows, hourSeries, longLabel} = this.props;
+        const labelWidth = longLabel ? 200 : 150;
         return (
-            <div styleName="timeline-content">
+            <>
                 <div styleName="timeline-header">
-                    <div styleName="timeline-header-label" style={{flex: longLabel ? 2 : 1}} />
-                    {hourSeries.map((hour) => (
+                    <div style={{width: labelWidth}} />
+                    {hourSeries.slice(0, -1).map((hour) => (
                         <div styleName="timeline-header-label" key={`timeline-header-${hour}`}>
-                            {moment({hours: hour}).format('H:mm')}
+                            <span styleName="timeline-label-text">
+                                {moment({hours: hour}).format('H:mm')}
+                            </span>
                         </div>
                     ))}
                 </div>
-                {rows.map((rowProps) => this.renderTimelineRow(rowProps))}
-                {this.renderDividers(hourSeries.length, longLabel)}
-            </div>
+                <div styleName="timeline-content">
+                    {rows.map((rowProps) => this.renderTimelineRow(rowProps))}
+                    <div style={{left: labelWidth, width: `calc(100% - ${labelWidth}px)`}}
+                         styleName="timeline-lines">
+                        {this.renderDividers(hourSeries.length - 1, longLabel)}
+                    </div>
+                </div>
+            </>
         );
     }
 }
@@ -124,7 +134,7 @@ function TimelineRowLabel({label, availability, longLabel}) {
 
     return (
         <TooltipIfTruncated>
-            <div styleName="timeline-row-label" style={{flex: (longLabel ? 2 : 1)}}>
+            <div styleName="timeline-row-label" style={{width: longLabel ? 200 : 150}}>
                 <div styleName="label">
                     {availability ? <Popup trigger={roomLabel} content={tooltip} size="small" /> : roomLabel}
                 </div>

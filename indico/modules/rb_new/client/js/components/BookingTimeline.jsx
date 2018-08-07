@@ -64,7 +64,7 @@ class BookingTimeline extends React.Component {
         return keys.length === 1 && availability[keys[0]];
     }
 
-    _getRowSerializer(dt) {
+    _getRowSerializer(dt, singleRoom = false) {
         return ({candidates, pre_bookings: preBookings, bookings, pre_conflicts: preConflicts, conflicts,
                  blockings, nonbookable_periods: nonbookablePeriods, unbookable_hours: unbookableHours,
                  room}) => {
@@ -80,7 +80,13 @@ class BookingTimeline extends React.Component {
             };
             const {full_name: fullName, id} = room;
 
-            return {availability: av, label: fullName, conflictIndicator: true, id, room};
+            return {
+                availability: av,
+                label: singleRoom ? dt : fullName,
+                key: singleRoom ? dt : id,
+                conflictIndicator: true,
+                room
+            };
         };
     }
 
@@ -94,7 +100,7 @@ class BookingTimeline extends React.Component {
 
         if (this.singleRoom) {
             const roomAvailability = this.singleRoom;
-            return dateRange.map(dt => this._getRowSerializer(dt)(roomAvailability));
+            return dateRange.map(dt => this._getRowSerializer(dt, true)(roomAvailability));
         } else {
             const dt = activeDate.format('YYYY-MM-DD');
             return Object.values(availability).map(this._getRowSerializer(dt));
@@ -152,7 +158,8 @@ class BookingTimeline extends React.Component {
                           }}
                           extraContent={this.singleRoom && this.renderRoomSummary(this.singleRoom)}
                           isLoading={isFetching || isFetchingRooms}
-                          recurrenceType={recurrenceType} />
+                          recurrenceType={recurrenceType}
+                          disableDatePicker={!!this.singleRoom} />
         );
     }
 }

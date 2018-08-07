@@ -25,6 +25,7 @@ import Calendar from 'rc-calendar';
 import {Translate} from 'indico/react/i18n';
 import TimelineContent from './TimelineContent';
 import {isDateWithinRange} from '../util';
+import TimelineItem from './TimelineItem';
 
 import './Timeline.module.scss';
 
@@ -47,6 +48,9 @@ export default class TimelineBase extends React.Component {
         dateRange: PropTypes.array,
         isLoading: PropTypes.bool,
         recurrenceType: PropTypes.string,
+        itemClass: PropTypes.func,
+        longLabel: PropTypes.bool,
+        disableDatePicker: PropTypes.bool
     };
 
     static defaultProps = {
@@ -62,7 +66,10 @@ export default class TimelineBase extends React.Component {
         extraContent: null,
         isLoading: false,
         dateRange: [],
-        recurrenceType: 'single'
+        recurrenceType: 'single',
+        itemClass: TimelineItem,
+        longLabel: false,
+        disableDatePicker: false
     };
 
     calendarDisabledDate = (date) => {
@@ -98,7 +105,7 @@ export default class TimelineBase extends React.Component {
     renderTimeline = () => {
         const {
             activeDate, dateRange, extraContent, legend, maxHour, minHour, onClick, recurrenceType, rows, step,
-            isLoading
+            isLoading, itemClass, longLabel, disableDatePicker
         } = this.props;
         const hourSeries = _.range(minHour, maxHour + step, step);
         const calendar = <Calendar disabledDate={this.calendarDisabledDate} onChange={this.onSelect} />;
@@ -113,7 +120,7 @@ export default class TimelineBase extends React.Component {
                     <Label.Group as="span" size="large" styleName="labels">
                         {legend}
                     </Label.Group>
-                    {rows.length > 1 && (
+                    {rows.length > 1 && !disableDatePicker && (
                         <Button.Group floated="right" size="small">
                             <Button icon="left arrow"
                                     onClick={() => this.changeSelectedDate('prev')}
@@ -141,7 +148,9 @@ export default class TimelineBase extends React.Component {
                         <TimelineContent rows={rows}
                                          hourSeries={hourSeries}
                                          recurrenceType={recurrenceType}
-                                         onClick={onClick} />
+                                         onClick={onClick}
+                                         itemClass={itemClass}
+                                         longLabel={longLabel} />
                     )}
                 </div>
             </>
