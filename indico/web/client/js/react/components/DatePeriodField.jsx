@@ -26,21 +26,23 @@ import './DatePeriodField.module.scss';
 export default class DatePeriodField extends React.Component {
     static propTypes = {
         onChange: PropTypes.func.isRequired,
-        disabled: PropTypes.bool
+        disabled: PropTypes.bool,
+        disabledDate: PropTypes.func
     };
 
     static defaultProps = {
-        disabled: false
+        disabled: false,
+        disabledDate: null
     };
 
     render() {
-        const {onChange, disabled} = this.props;
+        const {onChange, disabledDate, disabled} = this.props;
 
         return (
             <RangeCalendar onSelect={(val) => {
                 onChange(val);
             }}
-                           disabled={disabled} />
+                           disabledDate={(date) => (disabled ? true : disabledDate ? disabledDate(date) : null)} />
         );
     }
 }

@@ -41,11 +41,13 @@ const fetchLocations = async () => {
 export default class RoomSelector extends React.Component {
     static propTypes = {
         onChange: PropTypes.func.isRequired,
-        initialValue: PropTypes.array
+        initialValue: PropTypes.array,
+        disabled: PropTypes.bool
     };
 
     static defaultProps = {
-        initialValue: []
+        initialValue: [],
+        disabled: false
     };
 
     constructor(props) {
@@ -84,22 +86,25 @@ export default class RoomSelector extends React.Component {
     };
 
     renderRoomItem = (room) => {
+        const {disabled} = this.props;
         return (
             <List.Item key={room.id}>
                 <Image src={room.large_photo_url} size="mini" />
                 <List.Content>
                     <List.Header>{room.full_name}</List.Header>
                 </List.Content>
-                <List.Content styleName="remove-btn-content">
-                    <Icon name="remove"
-                          onClick={() => this.removeItem(room)} />
-                </List.Content>
+                {!disabled && (
+                    <List.Content styleName="remove-btn-content">
+                        <Icon name="remove"
+                              onClick={() => this.removeItem(room)} />
+                    </List.Content>
+                )}
             </List.Item>
         );
     };
 
     render() {
-        const {onChange} = this.props;
+        const {onChange, disabled} = this.props;
         const {locations, selectedLocation, selectedRoom, selectedRooms: rooms, isFetchingLocations} = this.state;
         const locationOptions = locations
             .sort((a, b) => a.name.localeCompare(b.name))
@@ -128,13 +133,14 @@ export default class RoomSelector extends React.Component {
                                       const selected = locations.find((loc) => loc.id === data.value);
                                       this.setState({selectedLocation: selected});
                                   }}
+                                  disabled={disabled}
                                   fluid
                                   search
                                   selection />
                     </Grid.Column>
                     <Grid.Column width={9}>
                         <Dropdown placeholder={Translate.string('Room')}
-                                  disabled={!selectedLocation}
+                                  disabled={disabled || !selectedLocation}
                                   options={roomOptions}
                                   value={selectedRoom && selectedRoom.id}
                                   onChange={(event, data) => {
@@ -149,7 +155,7 @@ export default class RoomSelector extends React.Component {
                         <Button floated="right"
                                 icon="plus"
                                 type="button"
-                                disabled={!selectedRoom}
+                                disabled={disabled || !selectedRoom}
                                 onClick={() => {
                                     const newRooms = [...rooms, selectedRoom];
                                     this.setState({
