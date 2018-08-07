@@ -144,7 +144,7 @@ class BlockingModal extends React.Component {
 
     renderModalContent = (fprops) => {
         const {onClose} = this.props;
-        const {form: {mutators}, submitSucceeded} = fprops;
+        const {form: {mutators}, submitting, submitSucceeded} = fprops;
 
         // set `touched` flag so in case of a validation error we properly
         // show the error label
@@ -185,19 +185,23 @@ class BlockingModal extends React.Component {
                                 </Message>
                                 <Divider hidden section />
                                 <Field name="rooms"
-                                       component={this.renderRoomSearchField} />
+                                       component={this.renderRoomSearchField}
+                                       disabled={submitting || submitSucceeded} />
                             </Grid.Column>
                             <Grid.Column width={8}>
                                 <Field name="allowed"
-                                       component={this.renderPrincipalSearchField} />
+                                       component={this.renderPrincipalSearchField}
+                                       disabled={submitting || submitSucceeded} />
                                 <Field name="period"
-                                       component={this.renderBlockingPeriodField} />
+                                       component={this.renderBlockingPeriodField}
+                                       disabled={submitting || submitSucceeded} />
                                 <Field name="reason"
                                        label={Translate.string('Reason')}
                                        component={ReduxFormField}
                                        as={Form.TextArea}
                                        format={formatters.trim}
                                        placeholder={Translate.string('Reason for blocking')}
+                                       disabled={submitting || submitSucceeded}
                                        formatOnBlur
                                        required />
                                 {submitSucceeded && (
