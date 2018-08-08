@@ -10,6 +10,9 @@ Version 2.1.3
 Security fixes
 ^^^^^^^^^^^^^^
 
+- Only return timetable entries for the current session when updating a
+  session through the timetable (:issue:`3474`, thanks :user:`glunardi`
+  for reporting)
 - Prevent session managers/coordinators from modifying certain timetable
   entries or scheduling contributions not assigned to their session
 - Restrict access to timetable entry details to users who are authorized
@@ -30,8 +33,6 @@ Bugfixes
 - Fix massive performance issue on the material package page in big events
 - Fix error when using the checkin app to mark someone as checked in
   (:issue:`3473`, thanks :user:`femtobit`)
-- Only return timetable entries for the current session when updating a
-  session through the timetable (:issue:`3474`)
 - Fix error when a session coordinator tries changing the color of a break
   using the color picker in the balloon's tooltip
 
