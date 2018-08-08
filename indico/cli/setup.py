@@ -42,7 +42,7 @@ from terminaltables import AsciiTable
 from werkzeug.urls import url_parse
 
 from indico.util.console import cformat
-from indico.util.string import is_valid_mail
+from indico.util.string import validate_email
 
 
 click.disable_unicode_literals_warning = True
@@ -414,7 +414,7 @@ class SetupWizard(object):
 
     def _prompt_emails(self):
         def _check_email(email):
-            if is_valid_mail(email, False):
+            if validate_email(email):
                 return True
             _warn('Invalid email address')
             return False

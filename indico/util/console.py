@@ -28,7 +28,7 @@ from click.types import convert_type
 from colorclass import Color
 from termcolor import colored
 
-from indico.util.string import is_valid_mail, to_unicode
+from indico.util.string import to_unicode, validate_email
 
 
 def prompt_email(prompt=u'Email', default=None, confirm=False):
@@ -36,7 +36,7 @@ def prompt_email(prompt=u'Email', default=None, confirm=False):
 
     def _proc_email(val):
         val = conv(val).strip()
-        if not is_valid_mail(val, multi=False):
+        if not validate_email(val):
             raise click.UsageError(u'invalid email')
         return val
 

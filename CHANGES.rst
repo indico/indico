@@ -11,6 +11,7 @@ Improvements
 ^^^^^^^^^^^^
 
 - Improve survey result display (:issue:`3486`)
+- Improve email validation for registrations (:issue:`3471`)
 
 Bugfixes
 ^^^^^^^^

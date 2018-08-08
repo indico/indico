@@ -52,7 +52,7 @@ from indico.modules.users.util import get_user_by_email
 from indico.util.date_time import format_date
 from indico.util.i18n import _
 from indico.util.spreadsheets import unique_col
-from indico.util.string import is_valid_mail, to_unicode
+from indico.util.string import to_unicode, validate_email
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.widgets import SwitchWidget
 
@@ -127,6 +127,8 @@ def check_registration_email(regform, email, registration=None, management=False
         elif user:
             return dict(status='ok', user=user.full_name, self=(not management and user == session.user),
                         same=(user == registration.user))
+        elif not validate_email(email):
+            return dict(status='error', conflict='email-invalid')
         elif regform.require_user and (management or email != registration.email):
             return dict(status='warning' if management else 'error', conflict='no-user')
         else:
@@ -138,6 +140,8 @@ def check_registration_email(regform, email, registration=None, management=False
             return dict(status='error', conflict='user-already-registered')
         elif user:
             return dict(status='ok', user=user.full_name, self=(not management and user == session.user), same=False)
+        elif not validate_email(email):
+            return dict(status='error', conflict='email-invalid')
         elif regform.require_user:
             return dict(status='warning' if management else 'error', conflict='no-user')
         else:
@@ -537,7 +541,7 @@ def import_registrations_from_csv(regform, fileobj, skip_moderation=True, notify
 
         if not email:
             raise UserValueError(_('Row {}: missing e-mail address').format(row_num))
-        if not is_valid_mail(email, multi=False):
+        if not validate_email(email):
             raise UserValueError(_('Row {}: invalid e-mail address').format(row_num))
         if not first_name or not last_name:
             raise UserValueError(_('Row {}: missing first or last name').format(row_num))

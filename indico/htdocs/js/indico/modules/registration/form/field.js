@@ -186,6 +186,8 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
                     msg = $T.gettext("The registration will be re-associated to a different user (<strong>{0}</strong>).").format(name);
                 } else if (data.conflict == 'email-no-user') {
                     msg = $T.gettext("The registration will be disassociated from the current user (<strong>{0}</strong>).").format(name);
+                } else if (data.conflict === 'email-invalid') {
+                    msg = $T.gettext("This email address is invalid.").format(name);
                 } else if (!data.user) {
                     msg = $T.gettext('The registration will not be associated with any Indico account.');
                 } else if (data.self) {

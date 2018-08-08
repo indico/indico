@@ -23,7 +23,7 @@ from wtforms.fields import Field, HiddenField, PasswordField, RadioField, Select
 from wtforms.widgets import CheckboxInput
 
 from indico.util.i18n import _
-from indico.util.string import is_valid_mail, sanitize_email
+from indico.util.string import sanitize_email, validate_email
 from indico.web.forms.fields.util import is_preprocessed_formdata
 from indico.web.forms.widgets import HiddenInputs, JinjaWidget, PasswordWidget
 
@@ -117,7 +117,7 @@ class EmailListField(TextListField):
         self.data = map(sanitize_email, self.data)
 
     def _validate_item(self, line):
-        if not is_valid_mail(line, False):
+        if not validate_email(line):
             raise ValueError(_('Invalid email address: {}').format(escape(line)))
 
 

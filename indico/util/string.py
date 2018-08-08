@@ -32,6 +32,7 @@ from operator import attrgetter
 from uuid import uuid4
 
 import bleach
+import email_validator
 import markdown
 import translitcodec  # this is NOT unused. it needs to be imported to register the codec.
 from html2text import HTML2Text
@@ -275,34 +276,35 @@ def sanitize_for_platypus(text):
     return etree.tostring(doc)
 
 
-# TODO: reference implementation from indico.legacy
-# but, it's not totally correct according to RFC, see test cases
-# However, this regex is pretty good in term of practicality
-# but it may be updated to cover all cases
-VALID_EMAIL_REGEX = re.compile(r"""[-a-zA-Z0-9!#$%&'*+/=?\^_`{|}~]+
-                                   (?:.[-a-zA-Z0-9!#$%&'*+/=?^_`{|}~]+)*
-                                   @
-                                   (?:[a-zA-Z0-9](?:[-a-zA-Z0-9]*[a-zA-Z0-9])?.)+
-                                   [a-zA-Z0-9](?:[-a-zA-Z0-9]*[a-zA-Z0-9])?""", re.X)
-
-
 def is_valid_mail(emails_string, multi=True):
-    """
-    Checks the validity of an email address or a series of email addresses
-
-    - emails_string: a string representing a single email address or several
-    email addresses separated by separators
-    - multi: flag if multiple email addresses are allowed
-
-    Returns True if emails are valid.
-    """
-
+    # XXX: This is deprecated, use `validate_email` or `validate_emails` instead!
+    # Remove this in 2.2 when the 'multi' mode is not needed anymore (only used in RB)
+    # and don't forget to update the paypal plugin as well!
     if not emails_string:
         return False
-    emails = re.split(r'[\s;,]+', emails_string)
-    if not multi and len(emails) > 1:
+    return validate_emails(emails_string) if multi else validate_email(emails_string)
+
+
+def validate_email(email):
+    """Validate the given email address.
+
+    This checks both if it looks valid and if it has valid
+    MX (or A/AAAA) records.
+    """
+    email = to_unicode(email)
+    try:
+        email_validator.validate_email(email)
+    except email_validator.EmailNotValidError:
         return False
-    return all(re.match(VALID_EMAIL_REGEX, email) for email in emails if email)
+    else:
+        return True
+
+
+def validate_emails(emails):
+    """Validate a space/semicolon/comma-separated list of email addresses."""
+    emails = to_unicode(emails)
+    emails = re.split(ur'[\s;,]+', emails)
+    return all(validate_email(email) for email in emails if email)
 
 
 def natural_sort_key(s, _nsre=re.compile('([0-9]+)')):
@@ -549,7 +551,7 @@ def sanitize_email(email, require_valid=False):
     if '<' in email:
         m = re.search(r'<([^>]+)>', email)
         email = email if m is None else m.group(1)
-    if not require_valid or is_valid_mail(email, False):
+    if not require_valid or validate_email(email):
         return email
     else:
         return None
