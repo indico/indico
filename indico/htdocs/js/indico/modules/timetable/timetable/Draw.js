@@ -706,7 +706,7 @@ function loadBalloonContent(self, api, editable) {
         // Change the target of the qTip position in order to open it at the mouse position
         $content.closest('.qtip').trigger('qbubble:ajaxload');
     }, function(xhr, status, error) {
-        if (xhr.status == 404) {
+        if (xhr.status === 404 || xhr.status === 403) {
             handleErrorResponse(xhr);
             api.set('content.text', $T.gettext('This timetable entry does not exist anymore. Please refresh the page.'));
         }

@@ -22,6 +22,7 @@ from flask import request, session
 from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.modules.events.management.controllers import RHManageEventBase
+from indico.modules.events.timetable import TimetableEntryType
 
 
 class SessionManagementLevel(Enum):
@@ -64,7 +65,6 @@ class RHManageTimetableBase(RHManageEventBase):
 
 
 class RHManageTimetableEntryBase(RHManageTimetableBase):
-
     normalize_url_spec = {
         'locators': {
             lambda self: self._get_locator()
@@ -84,3 +84,14 @@ class RHManageTimetableEntryBase(RHManageTimetableBase):
         self.entry = None
         if 'entry_id' in request.view_args:
             self.entry = self.event.timetable_entries.filter_by(id=request.view_args['entry_id']).first_or_404()
+
+    def _check_access(self):
+        if self.session and self.entry:
+            entry_session = None
+            if self.entry.parent and self.entry.parent.type == TimetableEntryType.SESSION_BLOCK:
+                entry_session = self.entry.parent.session_block.session
+            elif self.entry.type == TimetableEntryType.SESSION_BLOCK:
+                entry_session = self.entry.session_block.session
+            if entry_session != self.session:
+                raise Forbidden('Timetable entry is not in the specified session')
+        RHManageTimetableBase._check_access(self)

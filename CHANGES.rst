@@ -7,6 +7,14 @@ Version 2.1.3
 
 *Unreleased*
 
+Security fixes
+^^^^^^^^^^^^^^
+
+- Prevent session managers/coordinators from modifying certain timetable
+  entries or scheduling contributions not assigned to their session
+- Restrict access to timetable entry details to users who are authorized
+  to see them
+
 Improvements
 ^^^^^^^^^^^^
 

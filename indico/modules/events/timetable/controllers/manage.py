@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 import dateutil.parser
 from flask import jsonify, request, session
-from werkzeug.exceptions import BadRequest, Forbidden
+from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from indico.core.db.sqlalchemy.colors import ColorTuple
 from indico.modules.events.contributions import Contribution
@@ -139,15 +139,16 @@ class RHTimetableREST(RHManageTimetableEntryBase):
             delete_timetable_entry(self.entry)
 
 
-class RHManageTimetableEntryInfo(RHManageTimetableBase):
+class RHManageTimetableEntryInfo(RHManageTimetableEntryBase):
     """Display timetable entry info balloon in management mode."""
 
     session_management_level = SessionManagementLevel.coordinate
 
     def _process_args(self):
-        RHManageTimetableBase._process_args(self)
+        RHManageTimetableEntryBase._process_args(self)
         self.is_session_timetable = request.args.get('is_session_timetable') == '1'
-        self.entry = self.event.timetable_entries.filter_by(id=request.view_args['entry_id']).first_or_404()
+        if not self.entry:
+            raise NotFound
 
     def _process(self):
         html = render_entry_info_balloon(self.entry, editable=True, sess=self.session,
