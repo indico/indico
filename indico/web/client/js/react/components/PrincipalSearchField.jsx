@@ -95,8 +95,8 @@ export default class PrincipalSearchField extends React.Component {
 
     renderItem = ({is_group: isGroup, ...itemData}) => (isGroup ? {
         text: itemData.name,
-        value: itemData.name,
-        key: itemData.name,
+        value: itemData.id,
+        key: itemData.id,
         icon: 'users'
     } : {
         text: `${itemData.first_name} ${itemData.last_name}`,

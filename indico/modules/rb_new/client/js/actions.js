@@ -93,12 +93,13 @@ export const CLOSE_FILTER_DROPDOWN = 'CLOSE_FILTER_DROPDOWN';
 export const SET_BOOKING_AVAILABILITY = 'SET_BOOKING_AVAILABILITY';
 
 // Blockings
-export const FETCH_BLOCKINGS_STARTED = 'FETCH_BLOCKINGS_STARTED';
-export const FETCH_BLOCKINGS_FAILED = 'FETCH_BLOCKINGS_FAILED';
-export const UPDATE_BLOCKINGS = 'UPDATE_BLOCKINGS';
-export const CREATE_BLOCKING = 'CREATE_BLOCKING';
-export const BLOCKING_CONFIRMED = 'BLOCKING_CONFIRMED';
-export const BLOCKING_FAILED = 'BLOCKING_FAILED';
+export const GET_BLOCKINGS_REQUEST = 'GET_BLOCKINGS_REQUEST';
+export const GET_BLOCKINGS_SUCCESS = 'GET_BLOCKINGS_SUCCESS';
+export const GET_BLOCKINGS_ERROR = 'GET_BLOCKINGS_ERROR';
+export const SET_BLOCKINGS = 'SET_BLOCKINGS';
+export const CREATE_BLOCKING_REQUEST = 'CREATE_BLOCKING_REQUEST';
+export const CREATE_BLOCKING_SUCCESS = 'CREATE_BLOCKING_SUCCESS';
+export const CREATE_BLOCKING_ERROR = 'CREATE_BLOCKING_ERROR';
 
 // Calendar
 export const SET_CALENDAR_ROWS = 'SET_CALENDAR_ROWS';
@@ -480,42 +481,23 @@ export function fetchBookingAvailability(room, filters) {
     );
 }
 
-export function fetchBlockingsStarted() {
-    return {type: FETCH_BLOCKINGS_STARTED};
-}
-
-export function fetchBlockingsFailed() {
-    return {type: FETCH_BLOCKINGS_FAILED};
-}
-
-export function updateBlockings(blockings) {
-    return {type: UPDATE_BLOCKINGS, blockings};
-}
-
 export function fetchBlockings() {
     return async (dispatch, getStore) => {
-        dispatch(fetchBlockingsStarted());
-
-        let response;
         const {blockingList: {filters}} = getStore();
         const params = preProcessParameters(filters, ajaxFilterRules);
-
-        try {
-            response = await indicoAxios.get(fetchBlockingsURL(), {params});
-        } catch (error) {
-            dispatch(fetchBlockingsFailed());
-            handleAxiosError(error);
-            return;
-        }
-
-        dispatch(updateBlockings(response.data));
+        return await ajaxAction(
+            () => indicoAxios.get(fetchBlockingsURL(), {params}),
+            GET_BLOCKINGS_REQUEST,
+            [GET_BLOCKINGS_SUCCESS, SET_BLOCKINGS],
+            GET_BLOCKINGS_ERROR
+        )(dispatch);
     };
 }
 
 export function createBlocking(formData) {
     return submitFormAction(
         () => indicoAxios.post(createBlockingURL(), formData),
-        CREATE_BLOCKING, BLOCKING_CONFIRMED, BLOCKING_FAILED
+        CREATE_BLOCKING_REQUEST, CREATE_BLOCKING_SUCCESS, CREATE_BLOCKING_ERROR
     );
 }
 export function setCalendarDate(date) {

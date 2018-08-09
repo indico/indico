@@ -284,22 +284,21 @@ class RHLocations(RHRoomBookingBase):
 
 
 class RHCreateRoomBlocking(RHRoomBookingBase):
-    @use_args({
+    @use_kwargs({
         'room_ids': fields.List(fields.Int(), missing=[]),
         'start_date': fields.Date(),
         'end_date': fields.Date(),
         'reason': fields.Str(),
         'allowed_principals': fields.List(fields.Dict(), missing=[])
     })
-    def _process(self, args):
-        rooms = Room.query.filter(Room.id.in_(args['room_ids'])).all()
-        allowed_principals = []
-        for obj in args['allowed_principals']:
+    def _process(self, room_ids, start_date, end_date, reason, allowed_principals):
+        rooms = Room.query.filter(Room.id.in_(room_ids)).all()
+        allowed = []
+        for obj in allowed_principals:
             if obj.get('is_group'):
-                allowed_principals.extend(GroupProxy.search(obj['id'], exact=True))
+                allowed.append(GroupProxy(obj['id'], provider=obj['provider']))
             else:
-                allowed_principals.append(User.query.filter(User.id == obj['id']).one())
-        blocking = create_blocking(rooms, args['start_date'], args['end_date'], args['reason'],
-                                   allowed_principals)
+                allowed.append(User.query.filter(User.id == obj['id']).one())
+        blocking = create_blocking(rooms, start_date, end_date, reason, allowed)
         approve_or_request_blocking(blocking)
         return jsonify_data(flash=False)
