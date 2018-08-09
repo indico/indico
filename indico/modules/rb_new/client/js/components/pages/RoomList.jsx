@@ -88,10 +88,10 @@ export default class RoomList extends React.Component {
         );
 
         if (blockingMode) {
-            const isRoomInTheList = room.id in blockings;
+            const isRoomBlocked = room.id in blockings;
             const buttonProps = {compact: true, size: 'tiny'};
 
-            if (!isRoomInTheList) {
+            if (!isRoomBlocked) {
                 buttonProps.icon = 'check';
             } else {
                 buttonProps.icon = 'remove';
