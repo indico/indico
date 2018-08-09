@@ -544,8 +544,24 @@ def serialize_unbookable_hours(data):
     return [bookable_hours_schema.dump(d).data for d in data]
 
 
-def get_room_blockings(user):
-    return Blocking.query.filter(Blocking.created_by_user == user).all()
+def get_room_blockings(start_dt=None, end_dt=None, created_by=None, in_rooms_owned_by=None):
+    query = Blocking.query
+    if start_dt and not end_dt:
+        query = query.filter(Blocking.is_active_at(start_dt))
+    elif start_dt and end_dt:
+        query = query.filter(db_dates_overlap(Blocking, 'start_date', start_dt, 'end_date', end_dt))
+
+    criteria = []
+    if created_by:
+        criteria.append(Blocking.created_by_user == created_by)
+    if in_rooms_owned_by:
+        criteria.append(Room.owner == in_rooms_owned_by)
+        query = (query
+                 .join(Blocking.blocked_rooms)
+                 .join(BlockedRoom.room))
+
+    query = query.filter(db.or_(*criteria))
+    return query.all()
 
 
 def create_blocking(rooms, start_date, end_date, reason, allowed_principals):

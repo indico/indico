@@ -82,7 +82,7 @@ class ReservationOccurrenceSchema(mm.ModelSchema):
 
 
 class BlockedRoomSchema(mm.ModelSchema):
-    room = Nested(RoomSchema, many=False)
+    room = Nested(RoomSchema, many=False, only=('id', 'name', 'large_photo_url', 'full_name'))
 
     class Meta:
         model = BlockedRoom

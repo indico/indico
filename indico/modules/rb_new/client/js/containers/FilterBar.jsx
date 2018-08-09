@@ -15,7 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 import {connect} from 'react-redux';
-import {setFilterParameter, fetchRooms, fetchMapRooms} from '../actions';
+import {setFilterParameter, fetchRooms, fetchMapRooms, fetchBlockings} from '../actions';
 
 
 export default (namespace, componentClass) => {
@@ -30,8 +30,12 @@ export default (namespace, componentClass) => {
     const mapDispatchToProps = dispatch => ({
         setFilterParameter: (param, value) => {
             dispatch(setFilterParameter(namespace, param, value));
-            dispatch(fetchRooms(namespace));
-            dispatch(fetchMapRooms(namespace));
+            if (namespace === 'blockingList') {
+                dispatch(fetchBlockings());
+            } else {
+                dispatch(fetchRooms(namespace));
+                dispatch(fetchMapRooms(namespace));
+            }
         }
     });
 

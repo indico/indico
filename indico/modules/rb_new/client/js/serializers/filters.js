@@ -89,6 +89,16 @@ export const queryString = {
     text: {
         stateField: 'filters.text'
     },
+    blockingsInMyRooms: {
+        stateField: 'filters.blockingsInMyRooms',
+        validator: v.isBoolean(),
+        sanitizer: v.toBoolean()
+    },
+    myBlockings: {
+        stateField: 'filters.myBlockings',
+        validator: v.isBoolean(),
+        sanitizer: v.toBoolean()
+    },
     sw_lat: {
         validator: v.isFloat({min: -90, max: 90}),
         sanitizer: v.toFloat(),
@@ -130,6 +140,8 @@ export const ajax = {
     building: ({building}) => building,
     floor: ({floor}) => floor,
     text: ({text}) => text,
+    blockings_in_my_rooms: ({blockingsInMyRooms}) => blockingsInMyRooms,
+    my_blockings: ({myBlockings}) => myBlockings,
     start_dt: {
         onlyIf: (data) => data.dates && data.dates.startDate,
         serializer: filterDTHandler('start')

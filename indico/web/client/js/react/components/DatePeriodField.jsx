@@ -39,9 +39,10 @@ export default class DatePeriodField extends React.Component {
         const {onChange, disabledDate, disabled} = this.props;
 
         return (
-            <RangeCalendar onSelect={(val) => {
-                onChange(val);
-            }}
+            <RangeCalendar styleName="date-period-field"
+                           onSelect={(val) => {
+                               onChange(val);
+                           }}
                            disabledDate={(date) => (disabled ? true : disabledDate ? disabledDate(date) : null)} />
         );
     }
