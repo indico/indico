@@ -35,7 +35,7 @@ const reducers = {
     mapAspects: mapAspectsReducer,
     roomDetails: roomDetailsReducer,
     bookRoomForm: bookRoomFormReducer,
-    blockings: blockingsReducer
+    blockingList: blockingsReducer
 };
 
 export default reducers;

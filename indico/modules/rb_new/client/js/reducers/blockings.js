@@ -15,6 +15,9 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import {combineReducers} from 'redux';
+
+import filterReducerFactory from './roomBooking/filters';
 import * as actions from '../actions';
 
 
@@ -23,7 +26,7 @@ const initialState = {
     isFetching: false
 };
 
-export default function reducer(state = initialState, action) {
+function blockingsReducer(state = initialState, action) {
     switch (action.type) {
         case actions.UPDATE_BLOCKINGS:
             return {...state, isFetching: false, list: action.blockings};
@@ -35,3 +38,8 @@ export default function reducer(state = initialState, action) {
             return state;
     }
 }
+
+export default combineReducers({
+    blockings: blockingsReducer,
+    filters: filterReducerFactory('blockingList')
+});

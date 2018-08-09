@@ -15,6 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import moment from 'moment';
 import * as actions from '../../actions';
 import {parseSearchBarText, sanitizeRecurrence} from '../../util';
 
@@ -49,6 +50,15 @@ export const initialStateFactory = (namespace) => {
         Object.assign(state, {
             building: null,
             floor: null
+        });
+    } else if (namespace === 'blockingList') {
+        Object.assign(state, {
+            myBlockings: false,
+            blockingsInMyRooms: false,
+            dates: {
+                startDate: moment().format('YYYY-MM-DD'),
+                endDate: null
+            }
         });
     }
 

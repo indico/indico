@@ -244,8 +244,17 @@ class RHRoomSuggestions(RHRoomBookingBase):
 
 
 class RHRoomBlockings(RHRoomBookingBase):
-    def _process(self):
-        blockings = get_room_blockings(session.user)
+    @use_args({
+        'start_dt': fields.Date(),
+        'end_dt': fields.Date(),
+        'blockings_in_my_rooms': fields.Bool(),
+        'my_blockings': fields.Bool()
+    })
+    def _process(self, args):
+        filters = {'start_dt': args['start_dt'], 'end_dt': args['end_dt'],
+                   'created_by': session.user if args['my_blockings'] else None,
+                   'in_rooms_owned_by': session.user if args['blockings_in_my_rooms'] else None}
+        blockings = get_room_blockings(**filters)
         return jsonify(blockings_schema.dump(blockings).data)
 
 

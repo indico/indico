@@ -488,13 +488,15 @@ export function updateBlockings(blockings) {
 }
 
 export function fetchBlockings() {
-    return async (dispatch) => {
+    return async (dispatch, getStore) => {
         dispatch(fetchBlockingsStarted());
 
         let response;
+        const {blockingList: {filters}} = getStore();
+        const params = preProcessParameters(filters, ajaxFilterRules);
 
         try {
-            response = await indicoAxios.get(fetchBlockingsURL());
+            response = await indicoAxios.get(fetchBlockingsURL(), {params});
         } catch (error) {
             dispatch(fetchBlockingsFailed());
             handleAxiosError(error);

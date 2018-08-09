@@ -16,8 +16,12 @@
  */
 
 
-.blockings-list {
+.blockings-container {
     padding: 2em;
     height: 500px !important;
     width: 70% !important;
+
+    .blockings-list {
+        margin-top: 10px;
+    }
 }

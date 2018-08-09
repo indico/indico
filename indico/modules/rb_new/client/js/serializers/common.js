@@ -17,7 +17,7 @@
 
 export const filterDTHandler = (prefix) => {
     return function({dates, timeSlot}) {
-        const timePart = timeSlot[`${prefix}Time`];
+        const timePart = timeSlot === undefined ? '' : timeSlot[`${prefix}Time`];
         let datePart = dates[`${prefix}Date`];
 
         // single bookings have a 'null' endDate
@@ -25,7 +25,7 @@ export const filterDTHandler = (prefix) => {
             datePart = dates['startDate'];
         }
 
-        return `${datePart} ${timePart}`;
+        return `${datePart} ${timePart}`.trimRight();
     };
 };
 
