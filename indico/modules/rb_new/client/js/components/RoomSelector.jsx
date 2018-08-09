@@ -108,17 +108,13 @@ export default class RoomSelector extends React.Component {
         const {locations, selectedLocation, selectedRoom, selectedRooms: rooms, isFetchingLocations} = this.state;
         const locationOptions = locations
             .sort((a, b) => a.name.localeCompare(b.name))
-            .map((location) => {
-                return {text: location.name, value: location.id};
-            });
+            .map((location) => ({text: location.name, value: location.id}));
         let roomOptions = [];
         if (selectedLocation) {
             roomOptions = selectedLocation.rooms
                 .filter((room) => rooms.findIndex((item) => item.id === room.id) === -1)
                 .sort((a, b) => a.full_name.localeCompare(b.full_name))
-                .map((room) => {
-                    return {text: room.full_name, value: room.id};
-                });
+                .map((room) => ({text: room.full_name, value: room.id}));
         }
 
         return (
@@ -183,7 +179,7 @@ export default class RoomSelector extends React.Component {
                         {rooms.length === 0 && (
                             <Message info>
                                 <Translate>
-                                    There are no rooms selected for this blocking!
+                                    There are no rooms selected for this blocking.
                                 </Translate>
                             </Message>
                         )}
