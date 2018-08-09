@@ -19,13 +19,14 @@ import _ from 'lodash';
 import moment from 'moment';
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Button, Container, Label, Loader, Message, Segment} from 'semantic-ui-react';
+import {Button, Container, Loader, Message} from 'semantic-ui-react';
 import DatePicker from 'rc-calendar/lib/Picker';
 import Calendar from 'rc-calendar';
 import {Translate} from 'indico/react/i18n';
 import TimelineContent from './TimelineContent';
 import {isDateWithinRange} from '../util';
 import TimelineItem from './TimelineItem';
+import TimelineLegend from './TimelineLegend';
 
 import './Timeline.module.scss';
 
@@ -38,7 +39,13 @@ export default class TimelineBase extends React.Component {
         activeDate: PropTypes.instanceOf(moment).isRequired,
         onDateChange: PropTypes.func.isRequired,
         rows: PropTypes.arrayOf(PropTypes.object).isRequired,
-        legend: PropTypes.node.isRequired,
+        legendLabels: PropTypes.arrayOf(
+            PropTypes.shape({
+                label: PropTypes.string,
+                color: PropTypes.string,
+                style: PropTypes.string
+            })
+        ).isRequired,
         emptyMessage: PropTypes.node,
         extraContent: PropTypes.node,
         minHour: PropTypes.number.isRequired,
@@ -102,44 +109,44 @@ export default class TimelineBase extends React.Component {
         }
     };
 
-    renderTimeline = () => {
-        const {
-            activeDate, dateRange, extraContent, legend, maxHour, minHour, onClick, recurrenceType, rows, step,
-            isLoading, itemClass, longLabel, disableDatePicker
-        } = this.props;
-        const hourSeries = _.range(minHour, maxHour + step, step);
-        const calendar = <Calendar disabledDate={this.calendarDisabledDate} onChange={this.onSelect} />;
-
-        const freeRange = dateRange.length === 0;
+    renderDateSwitcher = () => {
+        const {activeDate, rows, dateRange, disableDatePicker} = this.props;
         const startDate = _toMoment(dateRange[0]);
         const endDate = _toMoment(dateRange[dateRange.length - 1]);
+        const calendar = <Calendar disabledDate={this.calendarDisabledDate} onChange={this.onSelect} />;
+        const freeRange = dateRange.length === 0;
+        return (
+            rows.length > 1 && !disableDatePicker && (
+                <Button.Group floated="right" size="small">
+                    <Button icon="left arrow"
+                            onClick={() => this.changeSelectedDate('prev')}
+                            disabled={!freeRange && activeDate.clone().subtract(1, 'day').isBefore(startDate)} />
+                    <DatePicker calendar={calendar}>
+                        {
+                            () => (
+                                <Button primary>
+                                    {activeDate.format(DATE_FORMAT)}
+                                </Button>
+                            )
+                        }
+                    </DatePicker>
+                    <Button icon="right arrow"
+                            onClick={() => this.changeSelectedDate('next')}
+                            disabled={activeDate.clone().add(1, 'day').isAfter(endDate)} />
+                </Button.Group>
+            )
+        );
+    };
 
+    renderTimeline = () => {
+        const {
+            extraContent, legendLabels, maxHour, minHour, onClick, recurrenceType, rows, step, isLoading, itemClass,
+            longLabel
+        } = this.props;
+        const hourSeries = _.range(minHour, maxHour + step, step);
         return (
             <>
-                <Segment styleName="legend" basic>
-                    <Label.Group as="span" size="large" styleName="labels">
-                        {legend}
-                    </Label.Group>
-                    {rows.length > 1 && !disableDatePicker && (
-                        <Button.Group floated="right" size="small">
-                            <Button icon="left arrow"
-                                    onClick={() => this.changeSelectedDate('prev')}
-                                    disabled={!freeRange && activeDate.clone().subtract(1, 'day').isBefore(startDate)} />
-                            <DatePicker calendar={calendar}>
-                                {
-                                    () => (
-                                        <Button primary>
-                                            {activeDate.format(DATE_FORMAT)}
-                                        </Button>
-                                    )
-                                }
-                            </DatePicker>
-                            <Button icon="right arrow"
-                                    onClick={() => this.changeSelectedDate('next')}
-                                    disabled={activeDate.clone().add(1, 'day').isAfter(endDate)} />
-                        </Button.Group>
-                    )}
-                </Segment>
+                <TimelineLegend labels={legendLabels} aside={this.renderDateSwitcher()} />
                 <div styleName="timeline">
                     {extraContent}
                     {isLoading ? (

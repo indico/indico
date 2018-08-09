@@ -19,12 +19,11 @@ import {push} from 'connected-react-router';
 import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import {Button, Grid, Icon, Modal, Header, Message, List, Segment} from 'semantic-ui-react';
-
+import {Button, Grid, Icon, Modal, Header, Message, List, Segment, Popup} from 'semantic-ui-react';
 import {Translate, Param} from 'indico/react/i18n';
-
 import {RoomBasicDetails} from '../RoomBasicDetails';
 import TimelineContent from '../TimelineContent';
+import TimelineLegend from '../TimelineLegend';
 
 import './RoomDetailsModal.module.scss';
 
@@ -97,6 +96,15 @@ function RoomDetails({bookRoom, room}) {
     const maxHour = 22;
     const step = 2;
     const hourSeries = _.range(minHour, maxHour + step, step);
+    const legendLabels = [
+        {label: 'Available', color: 'green'},
+        {label: 'Booked', color: 'orange'},
+        {label: 'Pre-Booking', style: 'pre-booking'},
+        {label: 'Conflict', color: 'red'},
+        {label: 'Conflict with Pre-Booking', style: 'pre-booking-conflict'},
+        {label: 'Blocked', style: 'blocking'},
+        {label: 'Not bookable', style: 'unbookable'}
+    ];
 
     return (
         <div styleName="room-details">
@@ -111,7 +119,11 @@ function RoomDetails({bookRoom, room}) {
                     </div>
                 </Grid.Column>
                 <Grid.Column>
-                    <Header><Translate>Usage</Translate></Header>
+                    <Header className="legend-header">
+                        <Translate>Usage</Translate>
+                        <Popup trigger={<Icon name="info circle" className="legend-info-icon" />}
+                               content={<TimelineLegend labels={legendLabels} compact />} />
+                    </Header>
                     <TimelineContent rows={room.bookings.map((row) => ({...row, key: row.id}))}
                                      hourSeries={hourSeries} />
                     <Header><Translate>Statistics</Translate></Header>

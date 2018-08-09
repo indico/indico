@@ -17,7 +17,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Button, Checkbox, Form, Grid, Icon, Label, Message, Modal, Radio, Segment} from 'semantic-ui-react';
+import {Button, Checkbox, Form, Grid, Icon, Label, Message, Modal, Radio, Segment, Popup} from 'semantic-ui-react';
 import {Form as FinalForm, Field} from 'react-final-form';
 import createDecorator from 'final-form-calculate';
 import {ReduxFormField, ReduxRadioField, formatters} from 'indico/react/forms';
@@ -27,6 +27,7 @@ import recurrenceRenderer from '../filters/RecurrenceRenderer';
 import {toMoment} from '../../util';
 import {RoomBasicDetails} from '../RoomBasicDetails';
 import TimelineContent from '../TimelineContent';
+import TimelineLegend from '../TimelineLegend';
 
 import './BookRoomModal.module.scss';
 
@@ -291,6 +292,15 @@ export default class BookRoomModal extends React.Component {
         const buttonsBlocked = (fprops) => bookingBlocked(fprops) || (conflictsExist && !skipConflicts);
         const {is_auto_confirm: isDirectlyBookable} = room;
         const link = <a style={{cursor: 'pointer'}} onClick={() => this.setState({bookingConflictsVisible: true})} />;
+        const legendLabels = [
+            {label: 'Available', color: 'green'},
+            {label: 'Booked', color: 'orange'},
+            {label: 'Pre-Booking', style: 'pre-booking'},
+            {label: 'Conflict', color: 'red'},
+            {label: 'Conflict with Pre-Booking', style: 'pre-booking-conflict'},
+            {label: 'Blocked', style: 'blocking'},
+            {label: 'Not bookable', style: 'unbookable'}
+        ];
 
         const renderModalContent = (fprops) => (
             <>
@@ -357,8 +367,10 @@ export default class BookRoomModal extends React.Component {
                     <Modal open={bookingConflictsVisible}
                            onClose={() => this.setState({bookingConflictsVisible: false})}
                            size="large" closeIcon>
-                        <Modal.Header>
+                        <Modal.Header className="legend-header">
                             <Translate>Bookings</Translate>
+                            <Popup trigger={<Icon name="info circle" className="legend-info-icon" />}
+                                   content={<TimelineLegend labels={legendLabels} compact />} />
                         </Modal.Header>
                         <Modal.Content scrolling>
                             {availability && this.renderRoomTimeline(availability)}

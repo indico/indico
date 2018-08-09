@@ -62,3 +62,12 @@ body {
         transition: all, 0.25s ease-in;
     }
 }
+
+.header.legend-header {
+    .icon.legend-info-icon {
+        color: $gray;
+        padding-left: 0.5em;
+        font-size: 0.9em;
+        vertical-align: baseline;
+    }
+}

@@ -21,7 +21,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {connect} from 'react-redux';
 import {stateToQueryString} from 'redux-router-querystring';
-import {Label, Message, Segment} from 'semantic-ui-react';
+import {Message, Segment} from 'semantic-ui-react';
 import {Translate, Param} from 'indico/react/i18n';
 import {isDateWithinRange, pushStateMergeProps} from '../util';
 import {queryString as queryStringSerializer} from '../serializers/filters';
@@ -123,17 +123,15 @@ class BookingTimeline extends React.Component {
     render() {
         const {dateRange, maxHour, minHour, isFetching, isFetchingRooms, recurrenceType} = this.props;
         const {activeDate} = this.state;
-        const legend = (
-            <>
-                <Label color="green">{Translate.string('Available')}</Label>
-                <Label color="orange">{Translate.string('Booked')}</Label>
-                <Label styleName="pre-booking">{Translate.string('Pre-Booking')}</Label>
-                <Label color="red">{Translate.string('Conflict')}</Label>
-                <Label styleName="pre-booking-conflict">{Translate.string('Conflict with Pre-Booking')}</Label>
-                <Label styleName="blocking">{Translate.string('Blocked')}</Label>
-                <Label styleName="unbookable">{Translate.string('Not bookable')}</Label>
-            </>
-        );
+        const legendLabels = [
+            {label: 'Available', color: 'green'},
+            {label: 'Booked', color: 'orange'},
+            {label: 'Pre-Booking', style: 'pre-booking'},
+            {label: 'Conflict', color: 'red'},
+            {label: 'Conflict with Pre-Booking', style: 'pre-booking-conflict'},
+            {label: 'Blocked', style: 'blocking'},
+            {label: 'Not bookable', style: 'unbookable'}
+        ];
         const emptyMessage = (
             <Message warning>
                 <Translate>
@@ -144,7 +142,7 @@ class BookingTimeline extends React.Component {
 
         return (
             <TimelineBase rows={this.calcRows()}
-                          legend={legend}
+                          legendLabels={legendLabels}
                           emptyMessage={emptyMessage}
                           onClick={this.openBookingModal}
                           dateRange={dateRange}

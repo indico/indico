@@ -86,21 +86,19 @@ class Calendar extends React.Component {
 
     render() {
         const {date, rows, setDate, isFetching} = this.props;
-        const legend = (
-            <>
-                <Label color="orange">{Translate.string('Booked')}</Label>
-                <Label styleName="pre-booking">{Translate.string('Pre-Booking')}</Label>
-                <Label styleName="blocking">{Translate.string('Blocked')}</Label>
-                <Label styleName="unbookable">{Translate.string('Not bookable')}</Label>
-            </>
-        );
+        const legendLabels = [
+            {label: 'Booked', color: 'orange'},
+            {label: 'Pre-Booking', style: 'pre-booking'},
+            {label: 'Blocked', style: 'blocking'},
+            {label: 'Not bookable', style: 'unbookable'}
+        ];
 
         return (
             <Grid>
                 <Grid.Row>
                     <TimelineBase minHour={6}
                                   maxHour={22}
-                                  legend={legend}
+                                  legendLabels={legendLabels}
                                   rows={rows.map(this._getRowSerializer(date))}
                                   activeDate={moment(date)}
                                   onDateChange={setDate}
