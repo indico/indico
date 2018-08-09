@@ -27,19 +27,19 @@ import {ReduxFormField, formatters} from 'indico/react/forms';
 import PrincipalSearchField from 'indico/react/components/PrincipalSearchField';
 import DatePeriodField from 'indico/react/components/DatePeriodField';
 import RoomSelector from '../RoomSelector';
-import {createBlocking} from '../../actions';
+import {createBlocking as createBlockingAction} from '../../actions';
 
 
 function validate({period, reason, rooms}) {
     const errors = {};
     if (period === undefined || !period.length) {
-        errors.period = Translate.string('Please choose a valid period!');
+        errors.period = Translate.string('Please choose a valid period.');
     }
     if (!reason) {
-        errors.reason = Translate.string('Please provide the reason for the blocking!');
+        errors.reason = Translate.string('Please provide the reason for the blocking.');
     }
     if (rooms === undefined || !rooms.length) {
-        errors.rooms = Translate.string('Please choose at least one room for this blocking!');
+        errors.rooms = Translate.string('Please choose at least one room for this blocking.');
     }
     return errors;
 }
@@ -65,7 +65,8 @@ const formDecorator = createDecorator({
         return {
             allowed_principals: allowed.map((obj) => ({
                 id: obj.id,
-                is_group: obj.is_group
+                is_group: obj.is_group,
+                provider: obj.provider
             }))
         };
     }
@@ -85,7 +86,11 @@ class BlockingModal extends React.Component {
     };
 
     createBlocking = async (formData) => {
-        await this.props.createBlocking(formData); // eslint-disable-line react/destructuring-assignment
+        const {createBlocking} = this.props;
+        const rv = await createBlocking(formData);
+        if (rv.error) {
+            return rv.error;
+        }
     };
 
     renderPrincipalSearchField = ({input, ...props}) => {
@@ -156,7 +161,7 @@ class BlockingModal extends React.Component {
                     <Translate>Create a blocking</Translate>
                 </Modal.Header>
                 <Modal.Content>
-                    <Form id="blocking-form" onSubmit={fprops.handleSubmit}>
+                    <Form id="blocking-form" onSubmit={fprops.handleSubmit} success={submitSucceeded}>
                         <Grid>
                             <Grid.Column width={8}>
                                 <Message icon info>
@@ -175,11 +180,9 @@ class BlockingModal extends React.Component {
                                     <Icon name="warning sign" />
                                     <Message.Content>
                                         <Translate>
-                                            When blocking rooms nobody but you, the rooms' managers and those
-                                            users/groups you specify in the "Allowed users/groups" list will be able to
-                                            create bookings for the specified rooms in the given timeframe. You can
-                                            also block rooms you do not own - however, those blockings have to be
-                                            approved by the owners of those rooms.
+                                            Please take into account that rooms blockings should only be used for short
+                                            term events and never for long-lasting periods. If you wish to somehow
+                                            mark a room as unusable, please ask its owner to set it as such.
                                         </Translate>
                                     </Message.Content>
                                 </Message>
@@ -204,13 +207,11 @@ class BlockingModal extends React.Component {
                                        disabled={submitting || submitSucceeded}
                                        formatOnBlur
                                        required />
-                                {submitSucceeded && (
-                                    <Message positive>
-                                        <Translate>
-                                            The blocking has been successfully created.
-                                        </Translate>
-                                    </Message>
-                                )}
+                                <Message success>
+                                    <Translate>
+                                        The blocking has been successfully created.
+                                    </Translate>
+                                </Message>
                             </Grid.Column>
                         </Grid>
                     </Form>
@@ -243,7 +244,7 @@ class BlockingModal extends React.Component {
 
 const mapDispatchToProps = (dispatch) => ({
     createBlocking: (formData) => {
-        return dispatch(createBlocking(formData));
+        return dispatch(createBlockingAction(formData));
     }
 });
 
