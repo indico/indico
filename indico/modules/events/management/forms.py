@@ -45,7 +45,7 @@ from indico.modules.events.timetable.util import get_top_level_entries
 from indico.modules.events.util import check_permissions
 from indico.util.date_time import format_datetime, format_human_timedelta, now_utc, relativedelta
 from indico.util.i18n import _
-from indico.util.string import is_valid_mail, to_unicode
+from indico.util.string import to_unicode, validate_email
 from indico.web.flask.util import url_for
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import (IndicoDateField, IndicoDateTimeField, IndicoEnumSelectField, IndicoLocationField,
@@ -209,7 +209,7 @@ class EventContactInfoForm(IndicoForm):
 
     def validate_contact_emails(self, field):
         for email in field.data:
-            if not is_valid_mail(email, False):
+            if not validate_email(email):
                 raise ValidationError(_('Invalid email address: {}').format(escape(email)))
 
 

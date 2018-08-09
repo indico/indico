@@ -5,7 +5,7 @@
         <div class="title">{{ break_.title }}</div>
         {% if editable %}
             <div class="group right entry-action-buttons hide-if-locked">
-                {{ render_palette_picker(break_, 'timetable.legacy_break_rest', color_list) }}
+                {{ render_palette_picker(break_, 'timetable.legacy_break_rest', color_list, is_session_timetable) }}
                 <a class="i-link icon-edit js-dialog-action js-edit js-hide-balloon"
                    title="{% trans %}Edit break{% endtrans %}"
                    data-title="{% trans title=break_.title %}Edit break '{{ title }}'{% endtrans %}"></a>

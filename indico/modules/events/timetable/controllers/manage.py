@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 import dateutil.parser
 from flask import jsonify, request, session
-from werkzeug.exceptions import BadRequest
+from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from indico.core.db.sqlalchemy.colors import ColorTuple
 from indico.modules.events.contributions import Contribution
@@ -139,17 +139,20 @@ class RHTimetableREST(RHManageTimetableEntryBase):
             delete_timetable_entry(self.entry)
 
 
-class RHManageTimetableEntryInfo(RHManageTimetableBase):
+class RHManageTimetableEntryInfo(RHManageTimetableEntryBase):
     """Display timetable entry info balloon in management mode."""
 
     session_management_level = SessionManagementLevel.coordinate
 
     def _process_args(self):
-        RHManageTimetableBase._process_args(self)
-        self.entry = self.event.timetable_entries.filter_by(id=request.view_args['entry_id']).first_or_404()
+        RHManageTimetableEntryBase._process_args(self)
+        self.is_session_timetable = request.args.get('is_session_timetable') == '1'
+        if not self.entry:
+            raise NotFound
 
     def _process(self):
-        html = render_entry_info_balloon(self.entry, editable=True, sess=self.session)
+        html = render_entry_info_balloon(self.entry, editable=True, sess=self.session,
+                                         is_session_timetable=self.is_session_timetable)
         return jsonify(html=html)
 
 
@@ -160,6 +163,12 @@ class RHBreakREST(RHManageTimetableBase):
         RHManageTimetableBase._process_args(self)
         self.entry = self.event.timetable_entries.filter_by(break_id=request.view_args['break_id']).first_or_404()
         self.break_ = self.entry.break_
+
+    def _check_access(self):
+        if not self.entry.parent or self.entry.parent.type != TimetableEntryType.SESSION_BLOCK:
+            RHManageTimetableBase._check_access(self)
+        elif not self.entry.parent.session_block.session.can_manage(session.user, permission='coordinate'):
+            raise Forbidden
 
     def _process_PATCH(self):
         data = request.json

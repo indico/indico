@@ -1,14 +1,14 @@
 <form novalidate
-    id="registrationForm"
-    name="registrationForm"
-    class="RegistrationForm"
-    action="{{ postUrl }}"
-    method="POST"
-    enctype="multipart/form-data"
-    ng-submit="submit()">
+      id="registrationForm"
+      name="registrationForm"
+      class="RegistrationForm"
+      action="{{ postUrl }}"
+      method="POST"
+      enctype="multipart/form-data"
+      ng-submit="submit()">
 
     <div ng-if="editMode"
-        ng-include="getTpl('toolbar.tpl.html')"></div>
+         ng-include="getTpl('toolbar.tpl.html')"></div>
 
     <div ng-model="sections" class="regform-section-list" ui-sortable="sectionSortableOptions">
         <div ng-animate="animations.section" ng-repeat="section in sections | filter: {enabled: true}">
@@ -63,20 +63,20 @@
                    ng-switch-default class="i-button highlight"
                    value="{{ isModerated ? 'Apply' : 'Register' | i18n }}">
             <input type="submit" id="regformSubmit"
-                 ng-switch-when="true" class="i-button highlight" value="{{ 'Modify' | i18n }}">
+                   ng-switch-when="true" class="i-button highlight" value="{{ 'Modify' | i18n }}">
         </div>
     </div>
 
     <input type="hidden" value="{{ confId }}" id="conf_id">
 
     <nd-dialog nd-add-section-dialog
-        ng-if="editMode"
-        show="dialogs.addsection"
-        heading="{{ 'New section' | i18n }}"
-        ok-button="{{ 'Add' | i18n }}"
-        ok-callback="api.createSection(dialogScope, false)"
-        validate="true"
-        data="sections">
+               ng-if="editMode"
+               show="dialogs.addsection"
+               heading="{{ 'New section' | i18n }}"
+               ok-button="{{ 'Add' | i18n }}"
+               ok-callback="api.createSection(dialogScope, false)"
+               validate="true"
+               data="sections">
     </nd-dialog>
 
     <nd-dialog nd-add-section-dialog
@@ -90,18 +90,18 @@
     </nd-dialog>
 
     <nd-dialog nd-section-management-dialog
-        ng-if="editMode"
-        show="dialogs.management"
-        ok-button="{{ 'Close' | i18n }}"
-        ok-only="true"
-        heading="{{ 'Section Management' | i18n }}"
-        api="api"
-        data="sections">
+               ng-if="editMode"
+               show="dialogs.management"
+               ok-button="{{ 'Close' | i18n }}"
+               ok-only="true"
+               heading="{{ 'Section Management' | i18n }}"
+               api="api"
+               data="sections">
     </nd-dialog>
 
     <nd-dialog nd-error-dialog
-        heading="{{ 'Form validation'| i18n }}"
-        show="dialogs.error"
-        ok-only="true">
+               heading="{{ 'Form validation'| i18n }}"
+               show="dialogs.error"
+               ok-only="true">
     </nd-dialog>
 </form>

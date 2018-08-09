@@ -37,6 +37,16 @@ Called when the checkin state of a registration changes. The `sender` is the
 `Registration` object.
 """)
 
+registration_created = _signals.signal('registration-created', """
+Called when a new registration has been created. The `sender` is the `Registration` object.
+The `management` kwarg is set to `True` if the registration was created from the event management area.
+""")
+
+registration_updated = _signals.signal('registration-updated', """
+Called when a registration has been updated. The `sender` is the `Registration` object.
+The `management` kwarg is set to `True` if the registration was updated from the event management area.
+""")
+
 registration_deleted = _signals.signal('registration-deleted', """
 Called when a registration is removed. The `sender` is the `Registration` object.
 """)

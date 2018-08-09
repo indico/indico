@@ -1,4 +1,4 @@
-{% macro render_time_and_location(obj, editable, use_event_tz) %}
+{% macro render_time_and_location(obj, editable, use_event_tz, is_session_timetable=false) %}
     {% set tt_entry = obj.timetable_entry %}
     {% set event = tt_entry.event %}
     {% set tz = event.tzinfo if use_event_tz else event.display_tzinfo %}
@@ -36,11 +36,11 @@
     </dl>
 {% endmacro %}
 
-{% macro render_palette_picker(obj, endpoint, color_list) %}
+{% macro render_palette_picker(obj, endpoint, color_list, is_session_timetable) %}
     <a class="i-button color-button palette-picker palette-picker-trigger"
        style="{{ obj.colors.css }}"
        data-method="PATCH"
-       data-href="{{ url_for(endpoint, obj) }}"
+       data-href="{{ url_for(endpoint, obj, is_session_timetable=is_session_timetable|int) }}"
        data-palette="{{ color_list | tojson | forceescape }}"
        data-initial-color="{{ obj.colors | tojson | forceescape }}"
        title="{% trans %}Change colour{% endtrans %}"></a>

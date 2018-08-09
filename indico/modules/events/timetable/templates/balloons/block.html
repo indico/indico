@@ -40,7 +40,7 @@
             <div class="group right entry-action-buttons">
                 {% if editable and not block.event.is_locked %}
                     {% if can_manage_session %}
-                        {{ render_palette_picker(block.session, 'timetable.session_rest', color_list) }}
+                        {{ render_palette_picker(block.session, 'timetable.session_rest', color_list, is_session_timetable) }}
                         <a class="i-link icon-edit js-dialog-action js-edit js-hide-balloon"
                            title="{% trans %}Edit session{% endtrans %}"
                            data-extra-params='{"edit_session": 1}'

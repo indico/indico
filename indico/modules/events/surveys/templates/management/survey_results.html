@@ -6,6 +6,13 @@
 
 {% block content %}
     <div id="survey-results" class="i-box-group vert">
+        <div class="survey-summary">
+            {% trans count=survey.submissions|length %}
+                One person responded to this survey
+            {% pluralize %}
+                {{ count }} people responded to this survey
+            {% endtrans %}
+        </div>
         {% for section in survey.sections if section.children %}
             {% if section.display_as_section %}
                 <h4>{{ section.title }}</h4>
@@ -71,9 +78,6 @@
         <div class="chart-option-details">
             <strong>{% trans %}Max:{% endtrans %}</strong> {{ summary.max }}
         </div>
-        <div class="chart-option-details">
-            <strong>{% trans %}Total:{% endtrans %}</strong> {{ summary.total }}
-        </div>
     </div>
     {{ _chart('bar', summary) }}
 {% endmacro %}
@@ -104,6 +108,10 @@
 
 {% macro _chart(chart_type, summary, short_labels=false) %}
     <div class="chart-answer">
+        {% if chart_type == 'bar' %}
+            <div class="axis-y-label">{% trans %}Answers{% endtrans %}</div>
+            <div class="axis-x-label">{% trans %}# of times chosen{% endtrans %}</div>
+        {% endif %}
         <div class="survey-{{ chart_type }}-chart"
             data-labels="{{ (summary.labels if short_labels else summary.absolute.keys())|tojson|forceescape }}"
             data-series-absolute="{{ summary.absolute.values() }}"

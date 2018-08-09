@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 from io import BytesIO
 
 from flask import jsonify, request, session
+from werkzeug.exceptions import Forbidden
 
 from indico.legacy.pdfinterface.conference import SimplifiedTimeTablePlain, TimetablePDFFormat, TimeTablePlain
 from indico.modules.events.controllers.base import RHDisplayEventBase
@@ -62,6 +63,11 @@ class RHTimetableEntryInfo(RHDisplayEventBase):
     def _process_args(self):
         RHDisplayEventBase._process_args(self)
         self.entry = self.event.timetable_entries.filter_by(id=request.view_args['entry_id']).first_or_404()
+
+    def _check_access(self):
+        RHDisplayEventBase._check_access(self)
+        if not self.entry.can_view(session.user):
+            raise Forbidden
 
     def _process(self):
         html = render_entry_info_balloon(self.entry)

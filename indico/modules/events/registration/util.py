@@ -52,7 +52,7 @@ from indico.modules.users.util import get_user_by_email
 from indico.util.date_time import format_date
 from indico.util.i18n import _
 from indico.util.spreadsheets import unique_col
-from indico.util.string import is_valid_mail, to_unicode
+from indico.util.string import to_unicode, validate_email
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.widgets import SwitchWidget
 
@@ -127,6 +127,8 @@ def check_registration_email(regform, email, registration=None, management=False
         elif user:
             return dict(status='ok', user=user.full_name, self=(not management and user == session.user),
                         same=(user == registration.user))
+        elif not validate_email(email):
+            return dict(status='error', conflict='email-invalid')
         elif regform.require_user and (management or email != registration.email):
             return dict(status='warning' if management else 'error', conflict='no-user')
         else:
@@ -138,6 +140,8 @@ def check_registration_email(regform, email, registration=None, management=False
             return dict(status='error', conflict='user-already-registered')
         elif user:
             return dict(status='ok', user=user.full_name, self=(not management and user == session.user), same=False)
+        elif not validate_email(email):
+            return dict(status='error', conflict='email-invalid')
         elif regform.require_user:
             return dict(status='warning' if management else 'error', conflict='no-user')
         else:
@@ -149,7 +153,7 @@ def make_registration_form(regform, management=False, registration=None):
 
     class RegistrationFormWTF(IndicoForm):
         if management:
-            notify_user = BooleanField(_("Send email"), widget=SwitchWidget())
+            notify_user = BooleanField(_('Send email'), widget=SwitchWidget())
 
         def validate_email(self, field):
             status = check_registration_email(regform, field.data, registration, management=management)
@@ -159,8 +163,10 @@ def make_registration_form(regform, management=False, registration=None):
     for form_item in regform.active_fields:
         if not management and form_item.parent.is_manager_only:
             continue
+
         field_impl = form_item.field_impl
         setattr(RegistrationFormWTF, form_item.html_field_name, field_impl.create_wtf_field())
+
     RegistrationFormWTF.modified_registration = registration
     return RegistrationFormWTF
 
@@ -234,6 +240,7 @@ def create_registration(regform, data, invitation=None, management=False, notify
         invitation.registration = registration
     registration.sync_state(_skip_moderation=skip_moderation)
     db.session.flush()
+    signals.event.registration_created.send(registration, management=management)
     notify_registration_creation(registration, notify_user)
     logger.info('New registration %s by %s', registration, user)
     regform.event.log(EventLogRealm.management if management else EventLogRealm.participants,
@@ -284,6 +291,7 @@ def modify_registration(registration, data, management=False, notify_user=True):
                         old_price, registration.price)
     if personal_data_changes:
         signals.event.registration_personal_data_modified.send(registration, change=personal_data_changes)
+    signals.event.registration_updated.send(registration, management=management)
     notify_registration_modification(registration, notify_user)
     logger.info('Registration %s modified by %s', registration, session.user)
     regform.event.log(EventLogRealm.management if management else EventLogRealm.participants,
@@ -533,7 +541,7 @@ def import_registrations_from_csv(regform, fileobj, skip_moderation=True, notify
 
         if not email:
             raise UserValueError(_('Row {}: missing e-mail address').format(row_num))
-        if not is_valid_mail(email, multi=False):
+        if not validate_email(email):
             raise UserValueError(_('Row {}: invalid e-mail address').format(row_num))
         if not first_name or not last_name:
             raise UserValueError(_('Row {}: missing first or last name').format(row_num))

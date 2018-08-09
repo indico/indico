@@ -23,7 +23,7 @@ from operator import attrgetter
 import dateutil.parser
 from flask import flash, jsonify, request, session
 from pytz import utc
-from werkzeug.exceptions import BadRequest, NotFound
+from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from indico.core.errors import UserValueError
 from indico.modules.events.contributions import Contribution
@@ -310,6 +310,8 @@ class RHLegacyTimetableScheduleContribution(RHManageTimetableBase):
             self.session_block = self.event.get_session_block(request.view_args['block_id'])
             if self.session_block is None:
                 raise NotFound
+            if self.session and self.session != self.session_block.session:
+                raise BadRequest
 
     def _process(self):
         data = request.json
@@ -324,6 +326,8 @@ class RHLegacyTimetableScheduleContribution(RHManageTimetableBase):
         query = Contribution.query.with_parent(self.event).filter(Contribution.id.in_(data['contribution_ids']))
         with track_time_changes(auto_extend='end', user=session.user) as changes:
             for contribution in query:
+                if self.session and contribution.session_id != self.session.id:
+                    raise Forbidden('Contribution not assigned to this session')
                 start_dt = find_next_start_dt(contribution.duration,
                                               obj=self.session_block or self.event,
                                               day=None if self.session_block else day,
@@ -522,10 +526,16 @@ class RHLegacyTimetableEditEntryDateTime(RHManageTimetableEntryBase):
 
 
 class RHLegacyTimetableEditSession(RHSessionREST):
+    def _process_args(self):
+        RHSessionREST._process_args(self)
+        self.is_session_timetable = request.args.get('is_session_timetable') == '1'
+
     def _process_PATCH(self):
         RHSessionREST._process_PATCH(self)
-        return jsonify_data(entries=[serialize_entry_update(block.timetable_entry) for block in self.session.blocks],
-                            flash=False)
+        entries = [serialize_entry_update(block.timetable_entry,
+                                          session_=(self.session if self.is_session_timetable else None))
+                   for block in self.session.blocks]
+        return jsonify_data(entries=entries, flash=False)
 
 
 class RHLegacyTimetableBreakREST(RHBreakREST):
