@@ -17,29 +17,35 @@
 
 import {combineReducers} from 'redux';
 
+import {requestReducer} from 'indico/utils/redux';
 import filterReducerFactory from './roomBooking/filters';
 import * as actions from '../actions';
 
 
-const initialState = {
-    list: [],
-    isFetching: false
-};
-
-function blockingsReducer(state = initialState, action) {
+function blockingsReducer(state = [], action) {
     switch (action.type) {
-        case actions.UPDATE_BLOCKINGS:
-            return {...state, isFetching: false, list: action.blockings};
-        case actions.FETCH_BLOCKINGS_STARTED:
-            return {...state, isFetching: true};
-        case actions.FETCH_BLOCKINGS_FAILED:
-            return {...state, isFetching: false};
+        case actions.SET_BLOCKINGS:
+            return [...action.data];
         default:
             return state;
     }
 }
 
 export default combineReducers({
-    blockings: blockingsReducer,
+    blockings: combineReducers({
+        list: blockingsReducer,
+        requests: combineReducers({
+            getBlockings: requestReducer(
+                actions.GET_BLOCKINGS_REQUEST,
+                actions.GET_BLOCKINGS_SUCCESS,
+                actions.GET_BLOCKINGS_ERROR
+            ),
+            createBlocking: requestReducer(
+                actions.CREATE_BLOCKING_REQUEST,
+                actions.CREATE_BLOCKING_SUCCESS,
+                actions.CREATE_BLOCKING_ERROR
+            )
+        })
+    }),
     filters: filterReducerFactory('blockingList')
 });

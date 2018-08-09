@@ -20,7 +20,8 @@ import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import {Container, Grid, Item, Loader, Message} from 'semantic-ui-react';
 import {PluralTranslate, Translate} from 'indico/react/i18n';
-import {fetchBlockings} from '../../actions';
+import {RequestState} from 'indico/utils/redux';
+import {fetchBlockings as fetchBlockingsAction} from '../../actions';
 import BlockingFilterBar from '../BlockingFilterBar';
 import filterBarFactory from '../../containers/FilterBar';
 
@@ -78,7 +79,8 @@ class BlockingList extends React.Component {
     };
 
     componentDidMount() {
-        this.props.fetchBlockings(); // eslint-disable-line react/destructuring-assignment
+        const {fetchBlockings} = this.props;
+        fetchBlockings();
     }
 
     renderBlocking = (blocking) => {
@@ -95,14 +97,15 @@ class BlockingList extends React.Component {
             <>
                 <Container styleName="blockings-container">
                     <FilterBar />
-                    {blockings.length ? (
+                    {!isFetching && blockings.length !== 0 && (
                         <>
                             <Grid columns={4} styleName="blockings-list" stackable>
                                 {blockings.map(this.renderBlocking)}
                             </Grid>
-                            <Loader active={isFetching} inline="centered" />
                         </>
-                    ) : (
+                    )}
+                    {isFetching && <Loader inline="centered" active />}
+                    {!isFetching && blockings.length === 0 && (
                         <Message info>
                             <Translate>
                                 There are no blockings.
@@ -115,11 +118,14 @@ class BlockingList extends React.Component {
     }
 }
 
-const mapStateToProps = ({blockingList: {blockings}}) => ({...blockings});
+const mapStateToProps = ({blockingList: {blockings: {list, requests: {getBlockings: {state}}}}}) => ({
+    list,
+    isFetching: state === RequestState.STARTED
+});
 
 const mapDispatchToProps = dispatch => ({
     fetchBlockings: () => {
-        dispatch(fetchBlockings());
+        dispatch(fetchBlockingsAction());
     }
 });
 
