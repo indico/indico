@@ -21,7 +21,7 @@ from operator import attrgetter
 from flask import flash, jsonify, redirect, request
 from sqlalchemy.orm import joinedload
 from webargs import fields
-from webargs.flaskparser import use_args
+from webargs.flaskparser import use_kwargs
 from werkzeug.exceptions import NotFound
 
 from indico.core.auth import multipass
@@ -146,9 +146,11 @@ class RHGroupDeleteMember(RHLocalGroupBase):
 
 
 class RHGroupSearch(RHProtected):
-    @use_args({
+    @use_kwargs({
         'name': fields.Str()
     })
-    def _process(self, args):
-        groups = GroupProxy.search(args['name'])
-        return jsonify([{'is_group': group.is_group, 'name': group.name, 'id': group.name} for group in groups])
+    def _process(self, name):
+        groups = GroupProxy.search(name)
+        return jsonify([{'is_group': True, 'name': group.name, 'id': getattr(group, 'id', group.name),
+                         'provider': group.provider}
+                        for group in groups])
