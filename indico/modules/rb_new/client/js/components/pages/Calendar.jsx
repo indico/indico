@@ -18,9 +18,8 @@
 import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
-import {Grid, Label} from 'semantic-ui-react';
+import {Grid} from 'semantic-ui-react';
 import {connect} from 'react-redux';
-import {Translate} from 'indico/react/i18n';
 
 import TimelineBase from '../TimelineBase';
 import * as actions from '../../actions';

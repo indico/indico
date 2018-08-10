@@ -21,7 +21,7 @@ from collections import OrderedDict, defaultdict, namedtuple
 from datetime import datetime, time, timedelta
 from io import BytesIO
 from itertools import chain, groupby
-from operator import attrgetter
+from operator import attrgetter, itemgetter
 
 from flask import current_app, session
 from PIL import Image
@@ -354,6 +354,28 @@ def get_room_calendar(start_date, end_date):
             'pre_bookings': group_by_occurrence_date(pre_bookings)
         })
     return calendar
+
+
+def get_room_details_availability(room, start_dt, end_dt):
+    dates = [d.date() for d in iterdays(start_dt, end_dt)]
+
+    bookings = get_existing_room_occurrences(room, start_dt, end_dt, RepeatFrequency.DAY, 1, only_accepted=True)
+    blockings = get_rooms_blockings([room], start_dt.date(), end_dt.date()).get(room.id, [])
+    unbookable_hours = get_rooms_unbookable_hours([room]).get(room.id, [])
+    nonbookable_periods = get_rooms_nonbookable_periods([room], start_dt, end_dt).get(room.id, [])
+
+    availability = []
+    for dt in dates:
+        iso_dt = dt.isoformat()
+        availability.append({
+            'bookings': serialize_occurrences(group_by_occurrence_date(bookings)).get(iso_dt),
+            'blockings': serialize_blockings(group_blockings(blockings, dates)).get(iso_dt),
+            'nonbookable_periods': serialize_nonbookable_periods(
+                group_nonbookable_periods(nonbookable_periods, dates)).get(iso_dt),
+            'unbookable_hours': serialize_unbookable_hours(unbookable_hours),
+            'dt': iso_dt,
+        })
+    return sorted(availability, key=itemgetter('dt'))
 
 
 def group_by_occurrence_date(occurrences):

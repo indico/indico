@@ -18,7 +18,6 @@ from __future__ import unicode_literals
 
 from datetime import date, datetime, time, timedelta
 from io import BytesIO
-from operator import itemgetter
 
 from flask import jsonify, redirect, request, session
 from marshmallow_enum import EnumField
@@ -38,13 +37,12 @@ from indico.modules.rb.models.rooms import Room
 from indico.modules.rb_new.schemas import (aspects_schema, blockings_schema, locations_schema, map_rooms_schema,
                                            reservation_schema, room_details_schema, rooms_schema)
 from indico.modules.rb_new.util import (approve_or_request_blocking, build_rooms_spritesheet, create_blocking,
-                                        get_buildings, get_equipment_types, get_existing_room_occurrences,
-                                        get_room_blockings, get_room_calendar, get_rooms_availability, get_suggestions,
-                                        group_by_occurrence_date, has_managed_rooms, search_for_rooms,
-                                        serialize_blockings, serialize_nonbookable_periods, serialize_occurrences,
+                                        get_buildings, get_equipment_types, get_room_blockings, get_room_calendar,
+                                        get_room_details_availability, get_rooms_availability, get_suggestions,
+                                        has_managed_rooms, search_for_rooms, serialize_blockings,
+                                        serialize_nonbookable_periods, serialize_occurrences,
                                         serialize_unbookable_hours)
 from indico.modules.users.models.users import User
-from indico.util.date_time import iterdays
 from indico.util.i18n import _
 from indico.web.flask.util import send_file, url_for
 from indico.web.util import ExpectedError, jsonify_data
@@ -113,20 +111,7 @@ class RHRoomDetails(RHRoomBookingBase):
         room_details = room_details_schema.dump(self.room).data
         start_dt = datetime.combine(date.today(), time(0, 0))
         end_dt = datetime.combine(start_dt + timedelta(days=4), time(23, 59))
-        last_bookings = group_by_occurrence_date(get_existing_room_occurrences(self.room, start_dt, end_dt,
-                                                                               RepeatFrequency.DAY, 1,
-                                                                               only_accepted=True))
-        range_bookings = {day.date(): last_bookings.get(day.date()) for day in iterdays(start_dt, end_dt)}
-        bookings = [
-            {
-                'availability': {'usage': bookings or []},
-                'label': dt,
-                'conflictIndicator': False,
-                'id': dt
-            } for dt, bookings in serialize_occurrences(range_bookings).iteritems()
-        ]
-
-        room_details['bookings'] = sorted(bookings, key=itemgetter('id'))
+        room_details['availability'] = get_room_details_availability(self.room, start_dt, end_dt)
         return jsonify(room_details)
 
 

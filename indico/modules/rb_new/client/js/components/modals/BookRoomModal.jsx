@@ -203,21 +203,30 @@ export default class BookRoomModal extends React.Component {
         );
     }
 
+    _getRowSerializer(dt) {
+        return ({bookings, pre_bookings: preBookings, candidates, nonbookable_periods: nonbookablePeriods,
+                 unbookable_hours: unbookableHours, blockings, conflicts, pre_conflicts: preConflicts, room}) => ({
+            availability: {
+                candidates: candidates[dt].map((candidate) => ({...candidate, bookable: false})) || [],
+                preBookings: preBookings[dt] || [],
+                bookings: bookings[dt] || [],
+                conflicts: conflicts[dt] || [],
+                preConflicts: preConflicts[dt] || [],
+                nonbookablePeriods: nonbookablePeriods[dt] || [],
+                unbookableHours: unbookableHours || [],
+                blockings: blockings[dt] || []
+            },
+            label: dt,
+            key: dt,
+            conflictIndicator: true,
+            room
+        });
+    }
+
     renderRoomTimeline(availability) {
         const hourSeries = _.range(6, 24, 2);
         const {dateRange} = this.props;
-        const room = availability.room;
-        const rows = dateRange.map((dt) => {
-            const av = {
-                candidates: availability.candidates[dt].map((candidate) => ({...candidate, bookable: false})) || [],
-                preBookings: availability.pre_bookings[dt] || [],
-                bookings: availability.bookings[dt] || [],
-                conflicts: availability.conflicts[dt] || [],
-                preConflicts: availability.pre_conflicts[dt] || []
-            };
-            return {id: dt, key: dt, label: dt, conflictIndicator: true, availability: av, room};
-        });
-
+        const rows = dateRange.map((dt) => this._getRowSerializer(dt)(availability));
         return <TimelineContent rows={rows} hourSeries={hourSeries} />;
     }
 
@@ -301,7 +310,6 @@ export default class BookRoomModal extends React.Component {
             {label: 'Blocked', style: 'blocking'},
             {label: 'Not bookable', style: 'unbookable'}
         ];
-
         const renderModalContent = (fprops) => (
             <>
                 <Modal.Header>

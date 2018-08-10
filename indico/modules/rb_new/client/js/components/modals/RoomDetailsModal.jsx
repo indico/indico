@@ -97,14 +97,26 @@ function RoomDetails({bookRoom, room}) {
     const step = 2;
     const hourSeries = _.range(minHour, maxHour + step, step);
     const legendLabels = [
-        {label: 'Available', color: 'green'},
         {label: 'Booked', color: 'orange'},
         {label: 'Pre-Booking', style: 'pre-booking'},
-        {label: 'Conflict', color: 'red'},
-        {label: 'Conflict with Pre-Booking', style: 'pre-booking-conflict'},
         {label: 'Blocked', style: 'blocking'},
         {label: 'Not bookable', style: 'unbookable'}
     ];
+
+    const _getRowSerializer = ({
+        bookings, nonbookable_periods: nonbookablePeriods, unbookable_hours: unbookableHours, blockings, dt
+    }) => ({
+        availability: {
+            bookings: bookings || [],
+            nonbookablePeriods: nonbookablePeriods || [],
+            unbookableHours: unbookableHours || [],
+            blockings: blockings || []
+        },
+        label: dt,
+        conflictIndicator: false,
+        key: dt
+    });
+
 
     return (
         <div styleName="room-details">
@@ -124,7 +136,7 @@ function RoomDetails({bookRoom, room}) {
                         <Popup trigger={<Icon name="info circle" className="legend-info-icon" />}
                                content={<TimelineLegend labels={legendLabels} compact />} />
                     </Header>
-                    <TimelineContent rows={room.bookings.map((row) => ({...row, key: row.id}))}
+                    <TimelineContent rows={room.availability.map(_getRowSerializer)}
                                      hourSeries={hourSeries} />
                     <Header><Translate>Statistics</Translate></Header>
                     <Message attached info>
