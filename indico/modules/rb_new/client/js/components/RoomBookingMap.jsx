@@ -91,6 +91,15 @@ class RoomBookingMap extends React.Component {
 
 
 export class RoomBookingMapControl extends MapControl {
+    static propTypes = {
+        position: PropTypes.string.isRequired,
+        classes: PropTypes.string,
+    };
+
+    static defaultProps = {
+        classes: '',
+    };
+
     componentWillMount() {
         const {position, classes} = this.props;
         const mapControl = Leaflet.control({position});
@@ -122,15 +131,6 @@ export class RoomBookingMapControl extends MapControl {
         ReactDOM.render(React.Children.only(this.props.children), container);
     }
 }
-
-RoomBookingMapControl.propTypes = {
-    position: PropTypes.string.isRequired,
-    classes: PropTypes.string,
-};
-
-RoomBookingMapControl.defaultProps = {
-    classes: '',
-};
 
 export default connect(
     ({staticData: {tileServerURL}}) => ({tileServerURL}),

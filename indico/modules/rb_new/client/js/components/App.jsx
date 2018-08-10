@@ -34,6 +34,13 @@ import './App.module.scss';
 
 
 export default class App extends React.Component {
+    static propTypes = {
+        history: PropTypes.object.isRequired,
+        filtersSet: PropTypes.bool.isRequired,
+        fetchInitialData: PropTypes.func.isRequired,
+        resetFilters: PropTypes.func.isRequired
+    };
+
     componentDidMount() {
         const {fetchInitialData} = this.props;
         fetchInitialData();
@@ -82,10 +89,3 @@ export default class App extends React.Component {
         );
     }
 }
-
-App.propTypes = {
-    history: PropTypes.object.isRequired,
-    filtersSet: PropTypes.bool.isRequired,
-    fetchInitialData: PropTypes.func.isRequired,
-    resetFilters: PropTypes.func.isRequired
-};
