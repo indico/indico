@@ -37,6 +37,7 @@ import {ajax as ajaxFilterRules} from './serializers/filters';
 import {ajax as ajaxBookingRules} from './serializers/bookings';
 
 // Page state
+export const INIT = 'INIT';
 export const RESET_PAGE_STATE = 'RESET_PAGE_STATE';
 // User
 export const SET_FAVORITE_ROOMS = 'SET_FAVORITE_ROOMS';
@@ -108,6 +109,10 @@ export const SET_CALENDAR_FETCHING = 'SET_CALENDAR_FETCHING';
 
 const ROOM_RESULT_LIMIT = 20;
 
+
+export function init() {
+    return {type: INIT};
+}
 
 export function fetchEquipmentTypes() {
     return async (dispatch) => {

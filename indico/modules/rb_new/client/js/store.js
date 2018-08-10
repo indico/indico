@@ -78,7 +78,7 @@ export const history = createHistory({
 const qsFilterReducer = createQueryStringReducer(
     queryFilterRules,
     (state, action) => {
-        if (action.type === 'INIT') {
+        if (action.type === actions.INIT) {
             return {
                 namespace: pathMatch({
                     '^/book': 'bookRoom',
@@ -97,7 +97,7 @@ const qsFilterReducer = createQueryStringReducer(
 const qsTimelineReducer = createQueryStringReducer(
     queryTimelineRules,
     (state, action) => {
-        if (action.type === 'INIT') {
+        if (action.type === actions.INIT) {
             return {
                 namespace: 'bookRoom',
                 queryString: history.location.search.slice(1)
@@ -113,7 +113,7 @@ const qsTimelineReducer = createQueryStringReducer(
 const qsCalendarReducer = createQueryStringReducer(
     queryCalendarRules,
     (state, action) => {
-        if (action.type === 'INIT') {
+        if (action.type === actions.INIT) {
             return {
                 namespace: 'calendar',
                 queryString: history.location.search.slice(1)
