@@ -78,7 +78,7 @@ def search_for_rooms(filters, only_available=False):
 
     criteria = {}
     if 'capacity' in filters:
-        query = query.filter(db.or_(Room.capacity >= (filters['capacity'] * 0.8), Room.capacity.is_(None)))
+        query = query.filter(Room.capacity >= filters['capacity'])
     if 'building' in filters:
         criteria['building'] = filters['building']
     if 'floor' in filters:
