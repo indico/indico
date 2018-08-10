@@ -45,8 +45,9 @@ class Calendar extends React.Component {
         const {date, fetchCalendar, setDate} = this.props;
         if (!date) {
             setDate(moment());
+        } else {
+            fetchCalendar();
         }
-        fetchCalendar();
     }
 
     _getRowSerializer(dt) {
