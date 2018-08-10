@@ -28,6 +28,7 @@ from indico.legacy.pdfinterface.base import escape
 from indico.modules.events.abstracts.models.abstracts import AbstractReviewingState, AbstractState
 from indico.modules.events.abstracts.models.reviews import AbstractAction
 from indico.modules.events.abstracts.settings import BOACorrespondingAuthorType, BOASortField, boa_settings
+from indico.modules.events.contributions.util import sort_contribs
 from indico.modules.events.util import create_event_logo_tmp_file
 from indico.util import mdx_latex
 from indico.util.date_time import format_date, format_human_timedelta, format_time
@@ -404,36 +405,12 @@ class ContribsToPDF(PDFLaTeXBase):
 class ContributionBook(PDFLaTeXBase):
     LATEX_TEMPLATE = 'contribution_list_book'
 
-    def _sort_contribs(self, contribs, sort_by):
-        mapping = {'number': 'id', 'name': 'title'}
-        if sort_by == BOASortField.schedule:
-            key_func = lambda c: (c.start_dt is None, c.start_dt)
-        elif sort_by == BOASortField.session_title:
-            key_func = lambda c: (c.session is None, c.session.title.lower() if c.session else '')
-        elif sort_by == BOASortField.speaker:
-            def key_func(c):
-                speakers = c.speakers
-                if not c.speakers:
-                    return True, None
-                return False, speakers[0].get_full_name(last_name_upper=False, abbrev_first_name=False).lower()
-        elif sort_by == BOASortField.board_number:
-            key_func = attrgetter('board_number')
-        elif sort_by == BOASortField.session_board_number:
-            key_func = lambda c: (c.session is None, c.session.title.lower() if c.session else '', c.board_number)
-        elif sort_by == BOASortField.schedule_board_number:
-            key_func = lambda c: (c.start_dt is None, c.start_dt, c.board_number if c.board_number else '')
-        elif sort_by == BOASortField.session_schedule_board:
-            key_func = lambda c: (c.session is None, c.session.title.lower() if c.session else '',
-                                  c.start_dt is None, c.start_dt, c.board_number if c.board_number else '')
-        else:
-            key_func = attrgetter(mapping.get(sort_by) or 'title')
-        return sorted(contribs, key=key_func)
 
     def __init__(self, event, user, contribs=None, tz=None, sort_by=""):
         super(ContributionBook, self).__init__()
 
         tz = tz or event.timezone
-        contribs = self._sort_contribs(contribs or event.contributions, sort_by)
+        contribs = sort_contribs(contribs or event.contributions, sort_by)
         affiliation_contribs = {}
         corresp_authors = {}
 

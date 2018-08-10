@@ -509,17 +509,19 @@ def render_archive(event, contribs, sort_by, opts):
     pdf = opts(event, session.user, contribs, tz=event.timezone, sort_by=sort_by)
     res = pdf.generate(return_source=True)
 
-    files = os.listdir(pdf._dir)
     temp_file = NamedTemporaryFile(suffix='indico.tmp', dir=config.TEMP_DIR)
     with ZipFile(temp_file.name, 'w', allowZip64=True) as zip_handler:
-        for f in files:
-            af = os.path.abspath(os.path.join(pdf._dir, f))
-            print af
-            if os.path.islink(af):
-                continue
-            if os.path.isdir(af):
-                continue
-            zip_handler.write(af, os.path.basename(f).encode('utf-8'))
+        for dirpath, dirnames, files in os.walk(pdf.source_dir, followlinks=True):
+            for f in files:
+                if f.startswith('.'):
+                    continue
+                if f.endswith(('.py', '.pyc', '.pyo')):
+                    continue
+                pf = os.path.join(dirpath, f)
+                af = os.path.abspath(pf)
+                rp = os.path.relpath(pf, pdf.source_dir)
+                archivename = rp.encode('utf-8')
+                zip_handler.write(af, archivename)
 
     temp_file.delete = False
     zip_file_name = 'contributions-tex.zip'
