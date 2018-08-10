@@ -306,7 +306,7 @@ export function setFilters(namespace, params) {
     return {type: SET_FILTERS, namespace, params};
 }
 
-export function resetFilters(namespace) {
+export function resetPageState(namespace) {
     return {type: RESET_PAGE_STATE, namespace};
 }
 

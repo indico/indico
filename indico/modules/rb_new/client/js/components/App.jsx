@@ -38,7 +38,7 @@ export default class App extends React.Component {
         history: PropTypes.object.isRequired,
         filtersSet: PropTypes.bool.isRequired,
         fetchInitialData: PropTypes.func.isRequired,
-        resetFilters: PropTypes.func.isRequired
+        resetPageState: PropTypes.func.isRequired
     };
 
     componentDidMount() {
@@ -47,7 +47,7 @@ export default class App extends React.Component {
     }
 
     render() {
-        const {history, filtersSet, resetFilters} = this.props;
+        const {history, filtersSet, resetPageState} = this.props;
 
         return (
             <ConnectedRouter history={history}>
@@ -56,7 +56,7 @@ export default class App extends React.Component {
                         <div styleName="rb-menu-bar-side-left">
                             <h1>
                                 <Icon name="home" />
-                                <Link to="/" onClick={resetFilters}>
+                                <Link to="/" onClick={resetPageState}>
                                     <Translate>Room Booking</Translate>
                                 </Link>
                             </h1>

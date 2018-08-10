@@ -15,14 +15,14 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 import {connect} from 'react-redux';
-import {resetFilters} from '../actions';
+import {resetPageState} from '../actions';
 
 import MenuItem from '../components/MenuItem';
 
 
 const mapDispatchToProps = dispatch => ({
     onClick() {
-        dispatch(resetFilters());
+        dispatch(resetPageState());
     }
 });
 
