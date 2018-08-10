@@ -9,6 +9,7 @@ import cgi
 import math
 import os
 import xml.sax.saxutils as saxutils
+from shutil import copytree
 
 import pkg_resources
 from PIL import Image as PILImage
