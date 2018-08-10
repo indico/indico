@@ -34,7 +34,11 @@ class Calendar extends React.Component {
         date: PropTypes.string,
         setDate: PropTypes.func.isRequired,
         rows: PropTypes.arrayOf(PropTypes.object).isRequired,
-        isFetching: PropTypes.bool.isRequired
+        isFetching: PropTypes.bool.isRequired,
+        location: PropTypes.shape({
+            pathname: PropTypes.string.isRequired,
+            search: PropTypes.string.isRequired,
+        }).isRequired,
     };
 
     static defaultProps = {
@@ -42,6 +46,20 @@ class Calendar extends React.Component {
     };
 
     componentDidMount() {
+        this._updateCalendar();
+    }
+
+    componentDidUpdate({location: prevLocation}) {
+        const {location} = this.props;
+        // this updates the calendar when
+        // 1) the query string changes due to the user changing the date
+        // 2) the user clicks on "calendar" again (which also causes a query string change)
+        if (location.pathname === prevLocation.pathname && location.search !== prevLocation.search) {
+            this._updateCalendar();
+        }
+    }
+
+    _updateCalendar() {
         const {date, fetchCalendar, setDate} = this.props;
         if (!date) {
             setDate(moment());
@@ -102,7 +120,8 @@ export default connect(
         },
         setDate(date) {
             dispatch(actions.setCalendarDate(date.format('YYYY-MM-DD')));
-            dispatch(actions.fetchCalendar());
+            // dispatching the date change causes a query string update and
+            // the corresponding location change will trigger a new fetch
         }
     })
 )(Calendar);
