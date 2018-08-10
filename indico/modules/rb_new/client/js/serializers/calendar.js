@@ -24,3 +24,9 @@ export const queryString = {
         stateField: 'date'
     }
 };
+
+
+export const ajax = {
+    start_date: ({date}) => date,
+    end_date: ({date}) => date,
+};

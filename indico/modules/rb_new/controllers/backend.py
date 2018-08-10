@@ -181,11 +181,11 @@ class RHTimeline(RHRoomBookingBase):
 
 class RHCalendar(RHRoomBookingBase):
     @use_kwargs({
-        'start_dt': fields.DateTime(),
-        'end_dt': fields.DateTime(),
+        'start_date': fields.Date(),
+        'end_date': fields.Date(),
     })
-    def _process(self, start_dt, end_dt):
-        calendar = get_room_calendar(start_dt, end_dt)
+    def _process(self, start_date, end_date):
+        calendar = get_room_calendar(start_date, end_date)
         return jsonify_data(flash=False, calendar=_serialize_availability(calendar).values())
 
 

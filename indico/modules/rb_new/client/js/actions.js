@@ -35,6 +35,7 @@ import {submitFormAction, ajaxAction} from 'indico/utils/redux';
 import {preProcessParameters} from './util';
 import {ajax as ajaxFilterRules} from './serializers/filters';
 import {ajax as ajaxBookingRules} from './serializers/bookings';
+import {ajax as ajaxCalendarRules} from './serializers/calendar';
 
 // Page state
 export const INIT = 'INIT';
@@ -515,12 +516,10 @@ export function setCalendarRows(data) {
 
 export function fetchCalendar() {
     return (dispatch, getState) => {
-        const {calendar: {date}} = getState();
+        const {calendar} = getState();
+        const params = preProcessParameters(calendar, ajaxCalendarRules);
         dispatch(ajaxAction(
-            () => indicoAxios.get(fetchCalendarURL({
-                start_dt: `${date}T00:00:00`,
-                end_dt: `${date}T23:59:59`
-            })),
+            () => indicoAxios.get(fetchCalendarURL(params)),
             SET_CALENDAR_FETCHING,
             SET_CALENDAR_ROWS,
             null,
