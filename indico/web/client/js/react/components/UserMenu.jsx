@@ -19,7 +19,7 @@
 
 import qs from 'qs';
 import React from 'react';
-import propTypes from 'prop-types';
+import PropTypes from 'prop-types';
 import {Dropdown, Icon, Label} from 'semantic-ui-react';
 
 import userDashboard from 'indico-url:users.user_dashboard';
@@ -108,15 +108,15 @@ export default function UserMenu({userData, staticData}) {
 }
 
 UserMenu.propTypes = {
-    userData: propTypes.shape({
-        firstName: propTypes.string,
-        lastName: propTypes.string,
-        id: propTypes.number,
-        language: propTypes.string,
-        isAdmin: propTypes.bool,
-        avatarBgColor: propTypes.string
+    userData: PropTypes.shape({
+        firstName: PropTypes.string,
+        lastName: PropTypes.string,
+        id: PropTypes.number,
+        language: PropTypes.string,
+        isAdmin: PropTypes.bool,
+        avatarBgColor: PropTypes.string
     }).isRequired,
-    staticData: propTypes.shape({
-        availableLanguages: propTypes.object
+    staticData: PropTypes.shape({
+        availableLanguages: PropTypes.object
     }).isRequired
 };

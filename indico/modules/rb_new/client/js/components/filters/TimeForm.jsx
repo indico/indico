@@ -16,7 +16,7 @@
 */
 
 import React from 'react';
-import propTypes from 'prop-types';
+import PropTypes from 'prop-types';
 import 'rc-time-picker/assets/index.css';
 
 import {toMoment, serializeTime} from '../../util';
@@ -28,8 +28,8 @@ import TimeRangePicker from '../TimeRangePicker';
 
 export default class TimeForm extends FilterFormComponent {
     static propTypes = {
-        startTime: propTypes.string,
-        endTime: propTypes.string,
+        startTime: PropTypes.string,
+        endTime: PropTypes.string,
         ...FilterFormComponent.propTypes
     };
 

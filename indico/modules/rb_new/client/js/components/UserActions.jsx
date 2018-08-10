@@ -18,7 +18,7 @@
 /* eslint "react/forbid-component-props": "off" */
 
 import React from 'react';
-import propTypes from 'prop-types';
+import PropTypes from 'prop-types';
 import {Dropdown, Icon} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
@@ -62,7 +62,7 @@ export default function UserActions({isAdmin, hasOwnedRooms, gotoMyRoomsList}) {
 }
 
 UserActions.propTypes = {
-    isAdmin: propTypes.bool.isRequired,
-    hasOwnedRooms: propTypes.bool.isRequired,
-    gotoMyRoomsList: propTypes.func.isRequired,
+    isAdmin: PropTypes.bool.isRequired,
+    hasOwnedRooms: PropTypes.bool.isRequired,
+    gotoMyRoomsList: PropTypes.func.isRequired,
 };

@@ -17,7 +17,7 @@
 
 import React from 'react';
 import {Form, Input, Radio, Select} from 'semantic-ui-react';
-import propTypes from 'prop-types';
+import PropTypes from 'prop-types';
 
 import {Translate} from 'indico/react/i18n';
 
@@ -28,9 +28,9 @@ import './RecurrenceForm.module.scss';
 
 export default class RecurrenceForm extends FilterFormComponent {
     static propTypes = {
-        type: propTypes.string,
-        interval: propTypes.string,
-        number: propTypes.number,
+        type: PropTypes.string,
+        interval: PropTypes.string,
+        number: PropTypes.number,
         ...FilterFormComponent.propTypes
     };
 

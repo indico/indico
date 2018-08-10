@@ -19,12 +19,12 @@
 
 
 import React from 'react';
-import propTypes from 'prop-types';
+import PropTypes from 'prop-types';
 
 
 export default class FilterFormComponent extends React.Component {
     static propTypes = {
-        setParentField: propTypes.func.isRequired
+        setParentField: PropTypes.func.isRequired
     };
 
     state = {};
