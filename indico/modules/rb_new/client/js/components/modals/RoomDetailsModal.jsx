@@ -112,7 +112,7 @@ function RoomDetails({bookRoom, room}) {
                 </Grid.Column>
                 <Grid.Column>
                     <Header><Translate>Usage</Translate></Header>
-                    <TimelineContent rows={room.bookings}
+                    <TimelineContent rows={room.bookings.map((row) => ({...row, key: row.id}))}
                                      hourSeries={hourSeries} />
                     <Header><Translate>Statistics</Translate></Header>
                     <Message attached info>

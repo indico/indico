@@ -214,7 +214,7 @@ export default class BookRoomModal extends React.Component {
                 conflicts: availability.conflicts[dt] || [],
                 preConflicts: availability.pre_conflicts[dt] || []
             };
-            return {id: dt, label: dt, conflictIndicator: true, availability: av, room};
+            return {id: dt, key: dt, label: dt, conflictIndicator: true, availability: av, room};
         });
 
         return <TimelineContent rows={rows} hourSeries={hourSeries} />;
