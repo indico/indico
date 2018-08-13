@@ -97,10 +97,10 @@ function RoomDetails({bookRoom, room}) {
     const step = 2;
     const hourSeries = _.range(minHour, maxHour + step, step);
     const legendLabels = [
-        {label: 'Booked', color: 'orange'},
-        {label: 'Pre-Booking', style: 'pre-booking'},
-        {label: 'Blocked', style: 'blocking'},
-        {label: 'Not bookable', style: 'unbookable'}
+        {label: Translate.string('Booked'), color: 'orange'},
+        {label: Translate.string('Pre-Booking'), style: 'pre-booking'},
+        {label: Translate.string('Blocked'), style: 'blocking'},
+        {label: Translate.string('Not bookable'), style: 'unbookable'}
     ];
 
     const rowSerializer = ({

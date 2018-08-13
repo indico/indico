@@ -302,13 +302,13 @@ export default class BookRoomModal extends React.Component {
         const {is_auto_confirm: isDirectlyBookable} = room;
         const link = <a style={{cursor: 'pointer'}} onClick={() => this.setState({bookingConflictsVisible: true})} />;
         const legendLabels = [
-            {label: 'Available', color: 'green'},
-            {label: 'Booked', color: 'orange'},
-            {label: 'Pre-Booking', style: 'pre-booking'},
-            {label: 'Conflict', color: 'red'},
-            {label: 'Conflict with Pre-Booking', style: 'pre-booking-conflict'},
-            {label: 'Blocked', style: 'blocking'},
-            {label: 'Not bookable', style: 'unbookable'}
+            {label: Translate.string('Available'), color: 'green'},
+            {label: Translate.string('Booked'), color: 'orange'},
+            {label: Translate.string('Pre-Booking'), style: 'pre-booking'},
+            {label: Translate.string('Conflict'), color: 'red'},
+            {label: Translate.string('Conflict with Pre-Booking'), style: 'pre-booking-conflict'},
+            {label: Translate.string('Blocked'), style: 'blocking'},
+            {label: Translate.string('Not bookable'), style: 'unbookable'}
         ];
         const renderModalContent = (fprops) => (
             <>

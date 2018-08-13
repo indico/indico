@@ -21,6 +21,7 @@ import React from 'react';
 import {Grid} from 'semantic-ui-react';
 import {connect} from 'react-redux';
 
+import {Translate} from 'indico/react/i18n';
 import TimelineBase from '../TimelineBase';
 import * as actions from '../../actions';
 
@@ -86,10 +87,10 @@ class Calendar extends React.Component {
     render() {
         const {date, rows, setDate, isFetching} = this.props;
         const legendLabels = [
-            {label: 'Booked', color: 'orange'},
-            {label: 'Pre-Booking', style: 'pre-booking'},
-            {label: 'Blocked', style: 'blocking'},
-            {label: 'Not bookable', style: 'unbookable'}
+            {label: Translate.string('Booked'), color: 'orange'},
+            {label: Translate.string('Pre-Booking'), style: 'pre-booking'},
+            {label: Translate.string('Blocked'), style: 'blocking'},
+            {label: Translate.string('Not bookable'), style: 'unbookable'}
         ];
 
         return (
