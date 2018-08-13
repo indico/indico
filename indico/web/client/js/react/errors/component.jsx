@@ -122,7 +122,7 @@ export default class ErrorDialog extends React.Component {
         const {title, message, reportable} = errorData;
 
         const modal = (fprops) => (
-            <Modal size="tiny" dimmer="blurring" closeOnRootNodeClick={false} closeOnEscape={false}
+            <Modal size="tiny" dimmer="blurring" closeOnDimmerClick={false} closeOnEscape={false}
                    open={dialogVisible}>
                 <Modal.Content>
                     <Message error icon>
