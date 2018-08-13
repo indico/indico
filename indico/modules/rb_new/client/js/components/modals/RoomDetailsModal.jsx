@@ -103,8 +103,8 @@ function RoomDetails({bookRoom, room}) {
         {label: 'Not bookable', style: 'unbookable'}
     ];
 
-    const _getRowSerializer = ({
-        bookings, nonbookable_periods: nonbookablePeriods, unbookable_hours: unbookableHours, blockings, dt
+    const rowSerializer = ({
+        bookings, nonbookable_periods: nonbookablePeriods, unbookable_hours: unbookableHours, blockings, day
     }) => ({
         availability: {
             bookings: bookings || [],
@@ -112,9 +112,9 @@ function RoomDetails({bookRoom, room}) {
             unbookableHours: unbookableHours || [],
             blockings: blockings || []
         },
-        label: dt,
+        label: day,
         conflictIndicator: false,
-        key: dt
+        key: day
     });
 
 
@@ -136,7 +136,7 @@ function RoomDetails({bookRoom, room}) {
                         <Popup trigger={<Icon name="info circle" className="legend-info-icon" />}
                                content={<TimelineLegend labels={legendLabels} compact />} />
                     </Header>
-                    <TimelineContent rows={room.availability.map(_getRowSerializer)}
+                    <TimelineContent rows={room.availability.map(rowSerializer)}
                                      hourSeries={hourSeries} />
                     <Header><Translate>Statistics</Translate></Header>
                     <Message attached info>

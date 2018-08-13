@@ -67,15 +67,15 @@ class Calendar extends React.Component {
         }
     }
 
-    _getRowSerializer(dt) {
+    _getRowSerializer(day) {
         return ({bookings, pre_bookings: preBookings, nonbookable_periods: nonbookablePeriods,
                  unbookable_hours: unbookableHours, blockings, room}) => ({
             availability: {
-                preBookings: preBookings[dt] || [],
-                bookings: bookings[dt] || [],
-                nonbookablePeriods: nonbookablePeriods[dt] || [],
+                preBookings: preBookings[day] || [],
+                bookings: bookings[day] || [],
+                nonbookablePeriods: nonbookablePeriods[day] || [],
                 unbookableHours: unbookableHours || [],
-                blockings: blockings[dt] || []
+                blockings: blockings[day] || []
             },
             label: room.full_name,
             key: room.id,

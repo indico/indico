@@ -365,17 +365,17 @@ def get_room_details_availability(room, start_dt, end_dt):
     nonbookable_periods = get_rooms_nonbookable_periods([room], start_dt, end_dt).get(room.id, [])
 
     availability = []
-    for dt in dates:
-        iso_dt = dt.isoformat()
+    for day in dates:
+        iso_day = day.isoformat()
         availability.append({
-            'bookings': serialize_occurrences(group_by_occurrence_date(bookings)).get(iso_dt),
-            'blockings': serialize_blockings(group_blockings(blockings, dates)).get(iso_dt),
+            'bookings': serialize_occurrences(group_by_occurrence_date(bookings)).get(iso_day),
+            'blockings': serialize_blockings(group_blockings(blockings, dates)).get(iso_day),
             'nonbookable_periods': serialize_nonbookable_periods(
-                group_nonbookable_periods(nonbookable_periods, dates)).get(iso_dt),
+                group_nonbookable_periods(nonbookable_periods, dates)).get(iso_day),
             'unbookable_hours': serialize_unbookable_hours(unbookable_hours),
-            'dt': iso_dt,
+            'day': iso_day,
         })
-    return sorted(availability, key=itemgetter('dt'))
+    return sorted(availability, key=itemgetter('day'))
 
 
 def group_by_occurrence_date(occurrences):

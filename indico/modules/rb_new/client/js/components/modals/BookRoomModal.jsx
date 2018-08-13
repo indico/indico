@@ -203,21 +203,21 @@ export default class BookRoomModal extends React.Component {
         );
     }
 
-    _getRowSerializer(dt) {
+    _getRowSerializer(day) {
         return ({bookings, pre_bookings: preBookings, candidates, nonbookable_periods: nonbookablePeriods,
                  unbookable_hours: unbookableHours, blockings, conflicts, pre_conflicts: preConflicts, room}) => ({
             availability: {
-                candidates: candidates[dt].map((candidate) => ({...candidate, bookable: false})) || [],
-                preBookings: preBookings[dt] || [],
-                bookings: bookings[dt] || [],
-                conflicts: conflicts[dt] || [],
-                preConflicts: preConflicts[dt] || [],
-                nonbookablePeriods: nonbookablePeriods[dt] || [],
+                candidates: candidates[day].map((candidate) => ({...candidate, bookable: false})) || [],
+                preBookings: preBookings[day] || [],
+                bookings: bookings[day] || [],
+                conflicts: conflicts[day] || [],
+                preConflicts: preConflicts[day] || [],
+                nonbookablePeriods: nonbookablePeriods[day] || [],
                 unbookableHours: unbookableHours || [],
-                blockings: blockings[dt] || []
+                blockings: blockings[day] || []
             },
-            label: dt,
-            key: dt,
+            label: day,
+            key: day,
             conflictIndicator: true,
             room
         });
@@ -226,7 +226,7 @@ export default class BookRoomModal extends React.Component {
     renderRoomTimeline(availability) {
         const hourSeries = _.range(6, 24, 2);
         const {dateRange} = this.props;
-        const rows = dateRange.map((dt) => this._getRowSerializer(dt)(availability));
+        const rows = dateRange.map((day) => this._getRowSerializer(day)(availability));
         return <TimelineContent rows={rows} hourSeries={hourSeries} />;
     }
 
