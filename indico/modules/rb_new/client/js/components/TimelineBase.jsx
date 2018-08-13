@@ -27,6 +27,7 @@ import TimelineContent from './TimelineContent';
 import {isDateWithinRange} from '../util';
 import TimelineItem from './TimelineItem';
 import TimelineLegend from './TimelineLegend';
+import {legendLabelShape} from '../props';
 
 import './Timeline.module.scss';
 
@@ -39,13 +40,7 @@ export default class TimelineBase extends React.Component {
         activeDate: PropTypes.instanceOf(moment).isRequired,
         onDateChange: PropTypes.func.isRequired,
         rows: PropTypes.arrayOf(PropTypes.object).isRequired,
-        legendLabels: PropTypes.arrayOf(
-            PropTypes.shape({
-                label: PropTypes.string,
-                color: PropTypes.string,
-                style: PropTypes.string
-            })
-        ).isRequired,
+        legendLabels: PropTypes.arrayOf(legendLabelShape).isRequired,
         emptyMessage: PropTypes.node,
         extraContent: PropTypes.node,
         minHour: PropTypes.number.isRequired,

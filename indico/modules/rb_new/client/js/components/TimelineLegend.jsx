@@ -20,6 +20,7 @@ import React from 'react';
 import {Label, Segment, List} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
 
+import {legendLabelShape} from '../props';
 import './TimelineLegend.module.scss';
 
 
@@ -48,13 +49,7 @@ export default function TimelineLegend({labels, aside, compact}) {
 }
 
 TimelineLegend.propTypes = {
-    labels: PropTypes.arrayOf(
-        PropTypes.shape({
-            label: PropTypes.string,
-            color: PropTypes.string,
-            style: PropTypes.string
-        })
-    ).isRequired,
+    labels: PropTypes.arrayOf(legendLabelShape).isRequired,
     aside: PropTypes.node,
     compact: PropTypes.bool
 };
