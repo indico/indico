@@ -297,7 +297,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
     def large_photo_url(self):
         if self.id is None:
             return None
-        return url_for('rooms.photo', self, size='large')
+        return url_for('rooms.photo', roomID=self.id)
 
     @property
     def map_url(self):

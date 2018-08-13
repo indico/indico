@@ -29,7 +29,7 @@ _bp = IndicoBlueprint('rooms', __name__, template_folder='../templates', virtual
 
 
 # Photos
-_bp.add_url_rule('/room/<roomLocation>/<int:roomID>/photo-large.jpg', 'photo', photo_handlers.room_photo)
+_bp.add_url_rule('/room/<int:roomID>/photo.jpg', 'photo', photo_handlers.room_photo)
 
 
 # Home, map, lists, search

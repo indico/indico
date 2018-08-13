@@ -115,11 +115,11 @@ class RHRoomBookingCreateModifyRoomBase(RHRoomBookingAdminBase):
         room.update_name()
         # Photos
         if form.large_photo.data:
-            _cache.delete('photo-{}-large'.format(room.id))
+            _cache.delete('photo-{}'.format(room.id))
             room.photo = Photo(data=form.large_photo.data.read())
             build_rooms_spritesheet()
         elif form.delete_photos.data:
-            _cache.delete('photo-{}-large'.format(room.id))
+            _cache.delete('photo-{}'.format(room.id))
             room.photo = None
             build_rooms_spritesheet()
         # Custom attributes

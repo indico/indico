@@ -7,7 +7,6 @@ Create Date: 2018-08-03 17:03:28.054462
 
 import sqlalchemy as sa
 from alembic import op
-from sqlalchemy.dialects import postgresql
 
 
 # revision identifiers, used by Alembic.
@@ -22,5 +21,4 @@ def upgrade():
 
 
 def downgrade():
-    op.add_column('photos', sa.Column('thumbnail', postgresql.BYTEA(), autoincrement=False, nullable=True),
-                  schema='roombooking')
+    op.add_column('photos', sa.Column('thumbnail', sa.LargeBinary(), nullable=True), schema='roombooking')

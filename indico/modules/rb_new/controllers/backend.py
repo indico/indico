@@ -20,7 +20,7 @@ from datetime import date, datetime, time, timedelta
 from io import BytesIO
 from operator import itemgetter
 
-from flask import jsonify, request, session
+from flask import jsonify, redirect, request, session
 from marshmallow_enum import EnumField
 from webargs import fields, validate
 from webargs.flaskparser import use_args, use_kwargs
@@ -46,7 +46,7 @@ from indico.modules.rb_new.util import (approve_or_request_blocking, build_rooms
 from indico.modules.users.models.users import User
 from indico.util.date_time import iterdays
 from indico.util.i18n import _
-from indico.web.flask.util import send_file
+from indico.web.flask.util import send_file, url_for
 from indico.web.util import ExpectedError, jsonify_data
 
 
@@ -315,4 +315,6 @@ class RHRoomsSprite(RHRoomBookingBase):
         if sprite_mapping is None:
             build_rooms_spritesheet()
         photo_data = _cache.get('rooms-sprite')
+        if 'version' not in request.view_args:
+            return redirect(url_for('.sprite', version=_cache.get('rooms-sprite-token')))
         return send_file('rooms-sprite.jpg', BytesIO(photo_data), 'image/jpeg', no_cache=False, cache_timeout=365*86400)
