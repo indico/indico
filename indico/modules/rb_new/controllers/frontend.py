@@ -16,10 +16,12 @@
 
 from __future__ import unicode_literals
 
+from indico.legacy.common.cache import GenericCache
 from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb_new.views.base import WPRoomBookingBase
 
 
 class RHLanding(RHRoomBookingBase):
     def _process(self):
-        return WPRoomBookingBase.display('room_booking.html')
+        sprite_token = GenericCache('Rooms').get('rooms-sprite-token', '')
+        return WPRoomBookingBase.display('room_booking.html', sprite_token=sprite_token)

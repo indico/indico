@@ -314,7 +314,7 @@ class RHRoomsSprite(RHRoomBookingBase):
         sprite_mapping = _cache.get('rooms-sprite-mapping')
         if sprite_mapping is None:
             build_rooms_spritesheet()
-        photo_data = _cache.get('rooms-sprite')
         if 'version' not in request.view_args:
             return redirect(url_for('.sprite', version=_cache.get('rooms-sprite-token')))
+        photo_data = _cache.get('rooms-sprite')
         return send_file('rooms-sprite.jpg', BytesIO(photo_data), 'image/jpeg', no_cache=False, cache_timeout=365*86400)

@@ -19,13 +19,12 @@ from __future__ import unicode_literals
 import os
 from collections import OrderedDict, defaultdict, namedtuple
 from datetime import datetime, time, timedelta
-from hashlib import md5
 from io import BytesIO
 from itertools import chain, groupby
 from operator import attrgetter
 
-from PIL import Image
 from flask import current_app, session
+from PIL import Image
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import contains_eager, joinedload, raiseload
 
@@ -49,6 +48,7 @@ from indico.modules.rb_new.schemas import (blockings_schema, bookable_hours_sche
                                            reservation_occurrences_schema, rooms_schema)
 from indico.util.caching import memoize_redis
 from indico.util.date_time import get_overlap, iterdays
+from indico.util.string import crc32
 from indico.util.struct.iterables import group_list
 
 
@@ -646,19 +646,15 @@ def build_rooms_spritesheet():
     image_width, image_height = ROOM_PHOTO_DIMENSIONS
     rooms = Room.query.filter(Room.photo).all()
     room_count = len(rooms)
-    mapping = dict()
     sprite_width = (image_width * (room_count + 1))  # +1 for the placeholder
     sprite_height = image_height
-    sprite = Image.new(
-        mode='RGB',
-        size=(sprite_width, sprite_height),
-        color=(0, 0, 0))
-
+    sprite = Image.new(mode='RGB', size=(sprite_width, sprite_height), color=(0, 0, 0))
     # Placeholder image at position 0
     no_photo_path = 'web/static/images/rooms/large_photos/NoPhoto.jpg'
     no_photo_image = Image.open(os.path.join(current_app.root_path, no_photo_path))
     image = no_photo_image.resize(ROOM_PHOTO_DIMENSIONS, Image.ANTIALIAS)
     sprite.paste(image, (0, 0))
+    mapping = {}
     for count, room in enumerate(rooms, start=1):
         location = image_width * count
         image = Image.open(BytesIO(room.photo.data)).resize(ROOM_PHOTO_DIMENSIONS, Image.ANTIALIAS)
@@ -670,4 +666,4 @@ def build_rooms_spritesheet():
     value = output.getvalue()
     _cache.set('rooms-sprite', value)
     _cache.set('rooms-sprite-mapping', mapping)
-    _cache.set('rooms-sprite-token', md5(value).hexdigest()[:6])
+    _cache.set('rooms-sprite-token', crc32(value))
