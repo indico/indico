@@ -20,10 +20,10 @@ import PropTypes from 'prop-types';
 import 'rc-time-picker/assets/index.css';
 
 import {toMoment, serializeTime} from '../../util';
-
 import FilterFormComponent from './FilterFormComponent';
-import './TimeForm.module.scss';
 import TimeRangePicker from '../TimeRangePicker';
+
+import './TimeForm.module.scss';
 
 
 export default class TimeForm extends FilterFormComponent {

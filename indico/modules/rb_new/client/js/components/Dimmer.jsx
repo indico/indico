@@ -19,8 +19,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {Image} from 'semantic-ui-react';
 
-import './Dimmer.module.scss';
 import SpriteImage from './SpriteImage';
+
+import './Dimmer.module.scss';
 
 
 export default class DimmableImage extends React.Component {

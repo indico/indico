@@ -24,11 +24,12 @@ import {push} from 'connected-react-router';
 
 import {Translate} from 'indico/react/i18n';
 
-import './RoomDetailsModal.module.scss';
 import {queryString as queryStringSerializer} from '../../serializers/filters';
 import {RoomBasicDetails} from '../RoomBasicDetails';
 import {setFilters, fetchBookingAvailability, resetBookingState} from '../../actions';
 import BookingBootstrapForm from '../BookingBootstrapForm';
+
+import './RoomDetailsModal.module.scss';
 
 
 function ConflictIndicator(

@@ -22,8 +22,9 @@ import roomsSpriteURL from 'indico-url:rooms_new.sprite';
 import {Grid, Header, Icon, Popup} from 'semantic-ui-react';
 import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
 
-import './RoomBasicDetails.module.scss';
 import SpriteImage from './SpriteImage';
+
+import './RoomBasicDetails.module.scss';
 
 
 function RoomEquipmentBox({room}) {
