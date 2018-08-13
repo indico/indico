@@ -315,7 +315,4 @@ class RHRoomsSprite(RHRoomBookingBase):
         if sprite_mapping is None:
             build_rooms_spritesheet()
         photo_data = _cache.get('rooms-sprite')
-        io = BytesIO(photo_data)
-        res = send_file('rooms-sprite.jpg', io, 'image/jpeg', no_cache=True, conditional=True)
-        res.cache_control.max_age = 31536000  # 365 days
-        return res
+        return send_file('rooms-sprite.jpg', BytesIO(photo_data), 'image/jpeg', no_cache=False, cache_timeout=365*86400)

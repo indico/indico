@@ -270,7 +270,8 @@ def _is_office_mimetype(mimetype):
     return False
 
 
-def send_file(name, path_or_fd, mimetype, last_modified=None, no_cache=True, inline=None, conditional=False, safe=True):
+def send_file(name, path_or_fd, mimetype, last_modified=None, no_cache=True, inline=None, conditional=False, safe=True,
+              **kwargs):
     """Sends a file to the user.
 
     `name` is required and should be the filename visible to the user.
@@ -300,7 +301,7 @@ def send_file(name, path_or_fd, mimetype, last_modified=None, no_cache=True, inl
         inline = False
     try:
         rv = _send_file(path_or_fd, mimetype=mimetype, as_attachment=not inline, attachment_filename=name,
-                        conditional=conditional)
+                        conditional=conditional, **kwargs)
     except IOError:
         if not current_app.debug:
             raise
