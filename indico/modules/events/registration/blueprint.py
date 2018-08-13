@@ -171,7 +171,7 @@ _bp.add_url_rule('/registrations/<int:reg_form_id>/edit', 'edit_registration_dis
 _bp.add_url_rule('/registrations/<int:reg_form_id>/check-email', 'check_email', display.RHRegistrationFormCheckEmail)
 _bp.add_url_rule('/registrations/<int:reg_form_id>/decline-invitation', 'decline_invitation',
                  display.RHRegistrationFormDeclineInvitation, methods=('POST',))
-_bp.add_url_rule('/registrations/<int:reg_form_id>/ticket.pdf', 'ticket_download', tickets.RHTicketDownload)
+_bp.add_url_rule('/registrations/<int:reg_form_id>/ticket.pdf', 'ticket_download', display.RHTicketDownload)
 
 
 # API

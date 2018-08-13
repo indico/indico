@@ -20,18 +20,14 @@ from io import BytesIO
 
 import qrcode
 from flask import json, render_template
-from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.core.config import config
 from indico.core.db import db
 from indico.modules.designer import PageOrientation, PageSize
-from indico.modules.events.registration.controllers.display import RHRegistrationFormRegistrationBase
 from indico.modules.events.registration.controllers.management import RHManageRegFormBase
 from indico.modules.events.registration.forms import TicketsForm
-from indico.modules.events.registration.models.registrations import RegistrationState
-from indico.modules.events.registration.util import generate_ticket
 from indico.modules.oauth.models.applications import OAuthApplication, SystemAppType
-from indico.web.flask.util import secure_filename, send_file, url_for
+from indico.web.flask.util import send_file, url_for
 from indico.web.util import jsonify_data, jsonify_template
 
 
@@ -60,25 +56,6 @@ class RHRegistrationFormTickets(RHManageRegFormBase):
             return jsonify_data(flash=False, tickets_enabled=self.regform.tickets_enabled)
 
         return jsonify_template('events/registration/management/regform_tickets.html', regform=self.regform, form=form)
-
-
-class RHTicketDownload(RHRegistrationFormRegistrationBase):
-    """Generate ticket for a given registration"""
-
-    def _check_access(self):
-        RHRegistrationFormRegistrationBase._check_access(self)
-        if self.registration.state != RegistrationState.complete:
-            raise Forbidden
-        if not self.regform.tickets_enabled:
-            raise Forbidden
-        if not self.regform.ticket_on_event_page and not self.regform.ticket_on_summary_page:
-            raise Forbidden
-        if self.registration.is_ticket_blocked:
-            raise Forbidden
-
-    def _process(self):
-        filename = secure_filename('{}-Ticket.pdf'.format(self.event.title), 'ticket.pdf')
-        return send_file(filename, generate_ticket(self.registration), 'application/pdf')
 
 
 class RHTicketConfigQRCodeImage(RHManageRegFormBase):
