@@ -17,14 +17,12 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import {connect} from 'react-redux';
 
 
-class SpriteImage extends React.Component {
+export default class SpriteImage extends React.Component {
     static propTypes = {
-        src: PropTypes.func.isRequired,
+        src: PropTypes.string.isRequired,
         pos: PropTypes.number.isRequired,
-        roomsSpriteToken: PropTypes.string.isRequired,
         height: PropTypes.number,
         width: PropTypes.number,
         styles: PropTypes.object
@@ -37,9 +35,9 @@ class SpriteImage extends React.Component {
     };
 
     render() {
-        const {src, pos, width, height, roomsSpriteToken, styles} = this.props;
+        const {src, pos, width, height, styles} = this.props;
         const style = {
-            background: `url(${src({version: roomsSpriteToken})}) -${pos * width}px 0`,
+            background: `url(${src}) -${pos * width}px 0`,
             height: `${height}px`,
             width: `${width}px`,
             ...styles
@@ -47,8 +45,3 @@ class SpriteImage extends React.Component {
         return <div style={style} className="img" />;
     }
 }
-
-const mapStateToProps = ({staticData: {roomsSpriteToken}}) => ({roomsSpriteToken});
-export default connect(
-    mapStateToProps
-)(SpriteImage);

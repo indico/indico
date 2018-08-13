@@ -25,10 +25,7 @@ import SpriteImage from './SpriteImage';
 
 export default class DimmableImage extends React.Component {
     static propTypes = {
-        src: PropTypes.oneOfType([
-            PropTypes.string,
-            PropTypes.func
-        ]).isRequired,
+        src: PropTypes.string.isRequired,
         content: PropTypes.node,
         hoverContent: PropTypes.node,
         spritePos: PropTypes.number

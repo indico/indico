@@ -16,6 +16,7 @@
  */
 
 import React from 'react';
+import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import roomsSpriteURL from 'indico-url:rooms_new.sprite';
 import {Grid, Header, Icon, Popup} from 'semantic-ui-react';
@@ -48,7 +49,7 @@ RoomEquipmentBox.propTypes = {
     room: PropTypes.object.isRequired,
 };
 
-export function RoomBasicDetails({room}) {
+function _RoomBasicDetails({room, roomsSpriteToken}) {
     const {
         owner_name: owner, latitude, longitude, division, location_name: location, surface_area: surface, capacity,
         telephone, full_name: name
@@ -56,7 +57,7 @@ export function RoomBasicDetails({room}) {
     return (
         <Grid columns={2}>
             <Grid.Column textAlign="center">
-                <SpriteImage src={roomsSpriteURL} pos={room.sprite_position}
+                <SpriteImage src={roomsSpriteURL({version: roomsSpriteToken})} pos={room.sprite_position}
                              styles={{transform: 'scale(0.85)', transformOrigin: 0}} />
                 <RoomEquipmentBox room={room} />
             </Grid.Column>
@@ -91,6 +92,12 @@ export function RoomBasicDetails({room}) {
     );
 }
 
-RoomBasicDetails.propTypes = {
+_RoomBasicDetails.propTypes = {
     room: PropTypes.object.isRequired,
+    roomsSpriteToken: PropTypes.string.isRequired,
 };
+
+
+export const RoomBasicDetails = connect(
+    ({staticData: {roomsSpriteToken}}) => ({roomsSpriteToken})
+)(_RoomBasicDetails);

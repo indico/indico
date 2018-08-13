@@ -36,6 +36,7 @@ export default class Room extends React.Component {
         children: PropTypes.node,
         showFavoriteButton: PropTypes.bool,
         favoriteRooms: PropTypes.object.isRequired,
+        roomsSpriteToken: PropTypes.string.isRequired,
         addFavoriteRoom: PropTypes.func.isRequired,
         delFavoriteRoom: PropTypes.func.isRequired,
     };
@@ -77,7 +78,7 @@ export default class Room extends React.Component {
     }
 
     renderCardImage = (room, content, actions) => {
-        const {showFavoriteButton} = this.props;
+        const {showFavoriteButton, roomsSpriteToken} = this.props;
         if ((actions !== undefined && actions.length !== 0) || showFavoriteButton) {
             const dimmerContent = (
                 <div>
@@ -86,7 +87,7 @@ export default class Room extends React.Component {
                 </div>
             );
             return (
-                <DimmableImage src={roomsSpriteURL}
+                <DimmableImage src={roomsSpriteURL({version: roomsSpriteToken})}
                                content={content}
                                hoverContent={dimmerContent}
                                spritePos={room.sprite_position} />
@@ -97,7 +98,7 @@ export default class Room extends React.Component {
                     <div styleName="room-extra-info">
                         {content}
                     </div>
-                    <SpriteImage src={roomsSpriteURL} pos={room.sprite_position} />
+                    <SpriteImage src={roomsSpriteURL({version: roomsSpriteToken})} pos={room.sprite_position} />
                 </div>
             );
         }
