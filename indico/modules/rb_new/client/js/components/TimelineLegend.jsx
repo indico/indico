@@ -18,7 +18,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import {Label, Segment, List} from 'semantic-ui-react';
-import {Translate} from 'indico/react/i18n';
 
 import {legendLabelShape} from '../props';
 import './TimelineLegend.module.scss';
@@ -31,7 +30,7 @@ export default function TimelineLegend({labels, aside, compact}) {
                 <List.Item key={label}>
                     <List.Content styleName="labels">
                         <Label color={color} styleName={`compact ${style || ''}`} />
-                        <span styleName="text">{Translate.string(label)}</span>
+                        <span styleName="text">{label}</span>
                     </List.Content>
                 </List.Item>
             ))}
@@ -40,7 +39,7 @@ export default function TimelineLegend({labels, aside, compact}) {
         <Segment styleName="legend" basic>
             <Label.Group as="span" size="large" styleName="labels">
                 {labels.map(({label, color, style}) => (
-                    <Label color={color} styleName={style || ''} key={label}>{Translate.string(label)}</Label>
+                    <Label color={color} styleName={style || ''} key={label}>{label}</Label>
                 ))}
             </Label.Group>
             {aside}

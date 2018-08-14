@@ -53,7 +53,7 @@
     "react-debounce-input": "^3.2.0",
     "react-dom": "^16.4.1",
     "react-final-form": "^3.6.4",
-    "react-jsx-i18n": ">=0.1.0",
+    "react-jsx-i18n": ">=0.1.1",
     "react-leaflet": "^1.9.1",
     "react-leaflet-markercluster": "^1.1.8",
     "react-modal": "^3.5.1",
