@@ -33,13 +33,15 @@ from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.invitations import InvitationState, RegistrationInvitation
 from indico.modules.events.registration.models.items import PersonalDataType
 from indico.modules.events.registration.models.registrations import Registration, RegistrationState
-from indico.modules.events.registration.util import (check_registration_email, create_registration, get_event_regforms,
-                                                     get_event_section_data, get_title_uuid, make_registration_form)
+from indico.modules.events.registration.util import (check_registration_email, create_registration, generate_ticket,
+                                                     get_event_regforms, get_event_section_data, get_title_uuid,
+                                                     make_registration_form)
 from indico.modules.events.registration.views import (WPDisplayRegistrationFormConference,
                                                       WPDisplayRegistrationFormSimpleEvent,
                                                       WPDisplayRegistrationParticipantList)
+from indico.util.fs import secure_filename
 from indico.util.i18n import _
-from indico.web.flask.util import url_for
+from indico.web.flask.util import send_file, url_for
 
 
 class RHRegistrationFormDisplayBase(RHDisplayEventBase):
@@ -323,3 +325,23 @@ class RHRegistrationFormDeclineInvitation(InvitationMixin, RHRegistrationFormBas
             self.invitation.state = InvitationState.declined
             flash(_("You declined the invitation to register."))
         return redirect(self.event.url)
+
+
+class RHTicketDownload(RHRegistrationFormRegistrationBase):
+    """Generate ticket for a given registration"""
+
+    def _check_access(self):
+        RHRegistrationFormRegistrationBase._check_access(self)
+        if self.registration.state != RegistrationState.complete:
+            raise Forbidden
+        if not self.regform.tickets_enabled:
+            raise Forbidden
+        if (not self.regform.ticket_on_event_page and not self.regform.ticket_on_summary_page
+                and not self.regform.event.can_manage(session.user, 'registration')):
+            raise Forbidden
+        if self.registration.is_ticket_blocked:
+            raise Forbidden
+
+    def _process(self):
+        filename = secure_filename('{}-Ticket.pdf'.format(self.event.title), 'ticket.pdf')
+        return send_file(filename, generate_ticket(self.registration), 'application/pdf')

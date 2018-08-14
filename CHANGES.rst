@@ -29,6 +29,16 @@ Internal Changes
 
 ----
 
+Version 2.1.4
+-------------
+
+*Unreleased*
+
+Bugfixes
+^^^^^^^^
+
+- Let managers download tickets for registrants even if all public ticket
+  downloads are disabled (:issue:`3493`)
 
 Version 2.1.3
 -------------
