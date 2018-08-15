@@ -189,14 +189,6 @@ export function fetchUserInfo() {
     };
 }
 
-export function fetchRoomsStarted(namespace) {
-    return {type: FETCH_ROOMS_STARTED, namespace};
-}
-
-export function fetchRoomsFailed(namespace) {
-    return {type: FETCH_ROOMS_FAILED, namespace};
-}
-
 export function updateRooms(namespace, rooms, total, clear) {
     return {type: UPDATE_ROOMS, namespace, rooms, total, clear};
 }
@@ -205,7 +197,7 @@ export function fetchRooms(namespace, clear = true) {
     return async (dispatch, getStore) => {
         const {filters, rooms: {list: oldRoomList}} = getStore()[namespace];
 
-        dispatch(fetchRoomsStarted(namespace));
+        dispatch({type: FETCH_ROOMS_STARTED, namespace});
 
         const params = preProcessParameters(filters, ajaxFilterRules);
 
@@ -219,7 +211,7 @@ export function fetchRooms(namespace, clear = true) {
             response = await indicoAxios.get(buildFetchRoomsURL(), {params});
         } catch (error) {
             handleAxiosError(error);
-            dispatch(fetchRoomsFailed(namespace));
+            dispatch({type: FETCH_ROOMS_FAILED, namespace});
             return;
         }
 
@@ -237,14 +229,6 @@ export function fetchRooms(namespace, clear = true) {
     };
 }
 
-export function fetchMapRoomsStarted(namespace) {
-    return {type: FETCH_MAP_ROOMS_STARTED, namespace};
-}
-
-export function fetchMapRoomsFailed(namespace) {
-    return {type: FETCH_MAP_ROOMS_FAILED, namespace};
-}
-
 export function updateMapRooms(namespace, rooms) {
     return {type: UPDATE_MAP_ROOMS, namespace, rooms};
 }
@@ -253,7 +237,7 @@ export function fetchMapRooms(namespace) {
     return async (dispatch, getStore) => {
         const {filters} = getStore()[namespace];
 
-        dispatch(fetchMapRoomsStarted(namespace));
+        dispatch({type: FETCH_MAP_ROOMS_STARTED, namespace});
 
         const params = preProcessParameters(filters, ajaxFilterRules);
 
@@ -262,7 +246,7 @@ export function fetchMapRooms(namespace) {
             response = await indicoAxios.get(fetchMapRoomsURL(), {params});
         } catch (error) {
             handleAxiosError(error);
-            dispatch(fetchMapRoomsFailed(namespace));
+            dispatch({type: FETCH_MAP_ROOMS_FAILED, namespace});
             return;
         }
         const rooms = response.data.map((room) => (
@@ -272,35 +256,23 @@ export function fetchMapRooms(namespace) {
     };
 }
 
-export function fetchRoomDetailsStarted() {
-    return {type: FETCH_ROOM_DETAILS_STARTED};
-}
-
-export function fetchRoomDetailsFailed() {
-    return {type: FETCH_ROOM_DETAILS_FAILED};
-}
-
-export function updateRoomDetails(room) {
-    return {type: UPDATE_ROOM_DETAILS, room};
-}
-
 export function fetchRoomDetails(id) {
     return async (dispatch, getStore) => {
         const {roomDetails: {rooms}} = getStore();
         if (id in rooms) {
             return;
         }
-        dispatch(fetchRoomDetailsStarted());
+        dispatch({type: FETCH_ROOM_DETAILS_STARTED});
 
         let response;
         try {
             response = await indicoAxios.get(fetchMapDetailsURL({room_id: id}));
         } catch (error) {
             handleAxiosError(error);
-            dispatch(fetchRoomDetailsFailed());
+            dispatch({type: FETCH_ROOM_DETAILS_FAILED});
             return;
         }
-        dispatch(updateRoomDetails(response.data));
+        dispatch({type: UPDATE_ROOM_DETAILS, room: response.data});
     };
 }
 
@@ -320,32 +292,20 @@ export function updateLocation(namespace, location) {
     return {type: UPDATE_LOCATION, location, namespace};
 }
 
-export function fetchMapAspectsStarted() {
-    return {type: FETCH_MAP_ASPECTS_STARTED};
-}
-
-export function fetchMapAspectsFailed() {
-    return {type: FETCH_MAP_ASPECTS_FAILED};
-}
-
-export function updateMapAspects(aspects) {
-    return {type: UPDATE_ASPECTS, aspects};
-}
-
 export function fetchMapAspects() {
     return async (dispatch) => {
-        dispatch(fetchMapAspectsStarted());
+        dispatch({type: FETCH_MAP_ASPECTS_STARTED});
 
         let response;
         try {
             response = await indicoAxios.get(fetchMapAspectsURL());
         } catch (error) {
             handleAxiosError(error);
-            dispatch(fetchMapAspectsFailed());
+            dispatch({type: FETCH_MAP_ASPECTS_FAILED});
             return;
         }
 
-        dispatch(updateMapAspects(response.data));
+        dispatch({type: UPDATE_ASPECTS, aspects: response.data});
     };
 }
 
@@ -353,45 +313,21 @@ export function toggleMapSearch(namespace, search) {
     return {type: TOGGLE_MAP_SEARCH, search, namespace};
 }
 
-export function fetchBuildingsStarted() {
-    return {type: FETCH_BUILDINGS_STARTED};
-}
-
-export function fetchBuildingsFailed() {
-    return {type: FETCH_BUILDINGS_FAILED};
-}
-
-export function updateBuildings(buildings) {
-    return {type: UPDATE_BUILDINGS, buildings};
-}
-
 export function fetchBuildings() {
     return async (dispatch) => {
-        dispatch(fetchBuildingsStarted());
+        dispatch({type: FETCH_BUILDINGS_STARTED});
 
         let response;
         try {
             response = await indicoAxios.get(fetchBuildingsURL());
         } catch (error) {
-            dispatch(fetchBuildingsFailed());
+            dispatch({type: FETCH_BUILDINGS_FAILED});
             handleAxiosError(error);
             return;
         }
 
-        dispatch(updateBuildings(response.data));
+        dispatch({type: UPDATE_BUILDINGS, buildings: response.data});
     };
-}
-
-export function fetchTimelineDataStarted() {
-    return {type: FETCH_TIMELINE_DATA_STARTED};
-}
-
-export function fetchTimelineDataFailed() {
-    return {type: FETCH_TIMELINE_DATA_FAILED};
-}
-
-export function updateTimelineData(timeline) {
-    return {type: UPDATE_TIMELINE_DATA, timeline};
 }
 
 async function _fetchTimelineData(filters, rooms, limit = null) {
@@ -407,12 +343,12 @@ async function _fetchTimelineData(filters, rooms, limit = null) {
 
 export function fetchTimelineData() {
     return async (dispatch, getStore) => {
-        dispatch(fetchTimelineDataStarted());
+        dispatch({type: FETCH_TIMELINE_DATA_STARTED});
 
         const {bookRoom: {filters, suggestions: {list: suggestionsList}, rooms: {list}}} = getStore();
 
         if (!list.length && !suggestionsList.length) {
-            dispatch(updateTimelineData({date_range: [], availability: {}}));
+            dispatch({type: UPDATE_TIMELINE_DATA, timeline: {date_range: [], availability: {}}});
             return;
         }
         let response;
@@ -421,10 +357,10 @@ export function fetchTimelineData() {
             response = await _fetchTimelineData(filters, rooms, list.length);
         } catch (error) {
             handleAxiosError(error);
-            dispatch(fetchTimelineDataFailed());
+            dispatch({type: FETCH_TIMELINE_DATA_FAILED});
             return;
         }
-        dispatch(updateTimelineData(response.data));
+        dispatch({type: UPDATE_TIMELINE_DATA, timeline: response.data});
     };
 }
 
@@ -444,17 +380,10 @@ export function resetBookingState() {
     return {type: RESET_BOOKING_AVAILABILITY};
 }
 
-export function fetchRoomSuggestionsStarted() {
-    return {type: FETCH_SUGGESTIONS_STARTED};
-}
-
-export function fetchRoomSuggestionsFailed() {
-    return {type: FETCH_SUGGESTIONS_FAILED};
-}
 
 export function fetchRoomSuggestions() {
     return async (dispatch, getStore) => {
-        dispatch(fetchRoomSuggestionsStarted());
+        dispatch({type: FETCH_SUGGESTIONS_STARTED});
 
         let response;
         const {bookRoom: {filters}} = getStore();
@@ -463,7 +392,7 @@ export function fetchRoomSuggestions() {
         try {
             response = await indicoAxios.get(fetchSuggestionsURL(), {params});
         } catch (error) {
-            dispatch(fetchRoomSuggestionsFailed());
+            dispatch({type: FETCH_SUGGESTIONS_FAILED});
             handleAxiosError(error);
             return;
         }
@@ -508,10 +437,6 @@ export function createBlocking(formData) {
 }
 export function setCalendarDate(date) {
     return {type: SET_CALENDAR_DATE, date};
-}
-
-export function setCalendarRows(data) {
-    return {type: SET_CALENDAR_ROWS, data};
 }
 
 export function fetchCalendar() {
