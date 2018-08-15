@@ -94,10 +94,6 @@ class BookingTimeline extends React.Component {
         const {activeDate} = this.state;
         const {availability, dateRange} = this.props;
 
-        if (!activeDate) {
-            return [];
-        }
-
         if (this.singleRoom) {
             const roomAvailability = this.singleRoom;
             return dateRange.map(dt => this._getRowSerializer(dt, true)(roomAvailability));
@@ -139,6 +135,11 @@ class BookingTimeline extends React.Component {
                 </Translate>
             </Message>
         );
+
+        if (!activeDate) {
+            // this happens for a short time when loading the timeline with a direct link
+            return null;
+        }
 
         return (
             <TimelineBase rows={this.calcRows()}
