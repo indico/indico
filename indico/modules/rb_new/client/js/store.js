@@ -24,44 +24,41 @@ import createReduxStore from 'indico/utils/redux';
 import reducers from './reducers';
 import {initialStateFactory} from './reducers/roomBooking/filters';
 import {initialTimelineState} from './reducers/bookRoom';
-import {initialCalendarState} from './reducers/calendar';
+import {calendarRouteConfig, qsCalendarReducer} from './modules/calendar';
 import * as actions from './actions';
 import {queryString as queryFilterRules} from './serializers/filters';
 import {queryString as queryTimelineRules} from './serializers/timeline';
-import {queryString as queryCalendarRules} from './serializers/calendar';
 
 
 const initialData = {
     staticData: {}
 };
 
-const routeConfig = {
-    reduxPathname: ({router: {location: {pathname}}}) => pathname,
-    routes: {
-        '/book': [
-            {
+function getRouteConfig() {
+    return {
+        reduxPathname: ({router: {location: {pathname}}}) => pathname,
+        routes: {
+            '/book': [
+                {
+                    listen: actions.SET_FILTER_PARAMETER,
+                    select: ({bookRoom: {filters}}) => ({filters}),
+                    serialize: queryFilterRules
+                },
+                {
+                    listen: actions.TOGGLE_TIMELINE_VIEW,
+                    select: ({bookRoom: {timeline}}) => ({timeline}),
+                    serialize: queryTimelineRules
+                }
+            ],
+            '/rooms': {
                 listen: actions.SET_FILTER_PARAMETER,
-                select: ({bookRoom: {filters}}) => ({filters}),
+                select: ({roomList: {filters}}) => ({filters}),
                 serialize: queryFilterRules
             },
-            {
-                listen: actions.TOGGLE_TIMELINE_VIEW,
-                select: ({bookRoom: {timeline}}) => ({timeline}),
-                serialize: queryTimelineRules
-            }
-        ],
-        '/rooms': {
-            listen: actions.SET_FILTER_PARAMETER,
-            select: ({roomList: {filters}}) => ({filters}),
-            serialize: queryFilterRules
-        },
-        '/calendar': {
-            listen: actions.SET_CALENDAR_DATE,
-            select: ({calendar}) => calendar,
-            serialize: queryCalendarRules
+            ...calendarRouteConfig
         }
-    }
-};
+    };
+}
 
 function pathMatch(map, path) {
     for (const pth in map) {
@@ -110,28 +107,13 @@ const qsTimelineReducer = createQueryStringReducer(
         : state)
 );
 
-const qsCalendarReducer = createQueryStringReducer(
-    queryCalendarRules,
-    (state, action) => {
-        if (action.type === actions.INIT) {
-            return {
-                namespace: 'calendar',
-                queryString: history.location.search.slice(1)
-            };
-        }
-        return null;
-    },
-    (state, namespace) => (namespace
-        ? _.merge({}, state, {[namespace]: initialCalendarState})
-        : state)
-);
 
 export default function createRBStore(data) {
     return createReduxStore('rb-new',
                             reducers,
                             Object.assign(initialData, data), [
                                 routerMiddleware(history),
-                                queryStringMiddleware(history, routeConfig, {usePush: false})
+                                queryStringMiddleware(history, getRouteConfig(), {usePush: false})
                             ], [
                                 qsFilterReducer,
                                 qsTimelineReducer,

@@ -15,26 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import * as actions from '../actions';
-
-
-export const initialCalendarState = {
-    date: null,
-    rows: [],
-    isFetching: false
+export const ajax = {
+    start_date: ({date}) => date,
+    end_date: ({date}) => date,
 };
-
-export default function reducer(state = initialCalendarState, action) {
-    switch (action.type) {
-        case actions.SET_CALENDAR_FETCHING:
-            return {...state, isFetching: true};
-        case actions.SET_CALENDAR_DATE:
-            return {...state, date: action.date};
-        case actions.RESET_PAGE_STATE:
-            return initialCalendarState;
-        case actions.SET_CALENDAR_ROWS:
-            return {...state, rows: action.data, isFetching: false};
-        default:
-            return state;
-    }
-}

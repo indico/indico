@@ -15,18 +15,6 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import {validator as v} from 'redux-router-querystring';
-
-
-export const queryString = {
-    date: {
-        validator: (date) => v.isDate(date) && moment(date).isBetween('1970-01-01', '2999-12-31'),
-        stateField: 'date'
-    }
-};
-
-
-export const ajax = {
-    start_date: ({date}) => date,
-    end_date: ({date}) => date,
-};
+export {default as Calendar} from './Calendar';
+export {default as calendarReducer} from './reducers';
+export {queryStringReducer as qsCalendarReducer, routeConfig as calendarRouteConfig} from './queryString';

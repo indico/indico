@@ -18,26 +18,30 @@
 import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
+import {bindActionCreators} from 'redux';
 import {Grid} from 'semantic-ui-react';
 import {connect} from 'react-redux';
 
 import {Translate} from 'indico/react/i18n';
-import TimelineBase from '../TimelineBase';
-import * as actions from '../../actions';
+import {RequestState} from 'indico/utils/redux';
+import TimelineBase from '../../components/TimelineBase';
+import * as calendarActions from './actions';
 
-import '../Timeline.module.scss';
+import '../../components/Timeline.module.scss';
 
 
 class Calendar extends React.Component {
     static propTypes = {
-        fetchCalendar: PropTypes.func.isRequired,
         date: PropTypes.string,
-        setDate: PropTypes.func.isRequired,
         rows: PropTypes.arrayOf(PropTypes.object).isRequired,
         isFetching: PropTypes.bool.isRequired,
         location: PropTypes.shape({
             pathname: PropTypes.string.isRequired,
             search: PropTypes.string.isRequired,
+        }).isRequired,
+        actions: PropTypes.shape({
+            fetchCalendar: PropTypes.func.isRequired,
+            setDate: PropTypes.func.isRequired,
         }).isRequired,
     };
 
@@ -60,7 +64,7 @@ class Calendar extends React.Component {
     }
 
     _updateCalendar() {
-        const {date, fetchCalendar, setDate} = this.props;
+        const {date, actions: {fetchCalendar, setDate}} = this.props;
         if (!date) {
             setDate(moment());
         } else {
@@ -85,7 +89,7 @@ class Calendar extends React.Component {
     }
 
     render() {
-        const {date, rows, setDate, isFetching} = this.props;
+        const {date, rows, isFetching, actions: {setDate}} = this.props;
         const legendLabels = [
             {label: Translate.string('Booked'), color: 'orange'},
             {label: Translate.string('Pre-Booking'), style: 'pre-booking'},
@@ -110,16 +114,16 @@ class Calendar extends React.Component {
     }
 }
 
+
 export default connect(
-    ({calendar}) => calendar,
+    ({calendar}) => ({
+        isFetching: calendar.request.state === RequestState.STARTED,
+        ...calendar.data,
+    }),
     dispatch => ({
-        fetchCalendar() {
-            dispatch(actions.fetchCalendar());
-        },
-        setDate(date) {
-            dispatch(actions.setCalendarDate(date.format('YYYY-MM-DD')));
-            // dispatching the date change causes a query string update and
-            // the corresponding location change will trigger a new fetch
-        }
+        actions: bindActionCreators({
+            fetchCalendar: calendarActions.fetchCalendar,
+            setDate: (date) => calendarActions.setDate(date.format('YYYY-MM-DD')),
+        }, dispatch)
     })
 )(Calendar);
