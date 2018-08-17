@@ -49,6 +49,7 @@ export default combineReducers({
             case actions.USER_INFO_RECEIVED: {
                 const user = action.data;
                 return {
+                    id: user.id,
                     firstName: user.first_name,
                     lastName: user.last_name,
                     email: user.email,
