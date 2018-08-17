@@ -23,9 +23,9 @@ import * as actions from '../actions';
 export default combineReducers({
     requests: combineReducers({
         booking: requestReducer(
-            actions.BOOKING_ONGOING,
-            actions.BOOKING_CONFIRMED,
-            actions.BOOKING_FAILED
+            actions.CREATE_BOOKING_REQUEST,
+            actions.CREATE_BOOKING_SUCCESS,
+            actions.CREATE_BOOKING_FAILED
         ),
         timeline: requestReducer(
             actions.GET_BOOKING_AVAILABILITY_REQUEST,
