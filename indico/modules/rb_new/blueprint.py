@@ -53,5 +53,7 @@ _bp.add_url_rule('/api/suggestions', 'suggestions', backend.RHRoomSuggestions)
 _bp.add_url_rule('/api/blockings', 'blockings', backend.RHRoomBlockings)
 _bp.add_url_rule('/api/locations', 'locations', backend.RHLocations)
 _bp.add_url_rule('/api/blockings/create', 'create_blocking', backend.RHCreateRoomBlocking, methods=('POST',))
+_bp.add_url_rule('/api/blockings/<int:blocking_id>/update', 'update_blocking', backend.RHUpdateRoomBlocking,
+                 methods=('PATCH',))
 _bp.add_url_rule('/rooms-sprite-<version>.jpg', 'sprite', backend.RHRoomsSprite)
 _bp.add_url_rule('/rooms-sprite.jpg', 'sprite', backend.RHRoomsSprite)

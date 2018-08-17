@@ -32,6 +32,7 @@ from indico.core.auth import multipass
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.queries import db_dates_overlap, escape_like
 from indico.legacy.common.cache import GenericCache
+from indico.modules.groups import GroupProxy
 from indico.modules.rb import rb_is_admin, rb_settings
 from indico.modules.rb.models.blocked_rooms import BlockedRoom, BlockedRoomState
 from indico.modules.rb.models.blockings import Blocking
@@ -46,6 +47,7 @@ from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.notifications.blockings import notify_request
 from indico.modules.rb_new.schemas import (blockings_schema, bookable_hours_schema, nonbookable_periods_schema,
                                            reservation_occurrences_schema, rooms_schema)
+from indico.modules.users.models.users import User
 from indico.util.caching import memoize_redis
 from indico.util.date_time import get_overlap, iterdays
 from indico.util.string import crc32
@@ -638,17 +640,34 @@ def get_room_blockings(start_date=None, end_date=None, created_by=None, in_rooms
     return query.all()
 
 
-def create_blocking(rooms, start_date, end_date, reason, allowed_principals):
-    blocking = Blocking()
-    blocking.start_date = start_date
-    blocking.end_date = end_date
+def _populate_blocking(blocking, room_ids, reason, allowed_principals, start_date=None, end_date=None):
     blocking.reason = reason
     blocking.created_by_user = session.user
-    blocking.allowed = allowed_principals
-    blocking.blocked_rooms = [BlockedRoom(room_id=room.id) for room in rooms]
+    blocking.allowed = [GroupProxy(pr['id'], provider=pr['provider'])
+                        if pr.get('is_group')
+                        else User.get_one(pr['id'])
+                        for pr in allowed_principals]
+
+    with db.session.no_autoflush:
+        blocking.blocked_rooms = [BlockedRoom(room_id=room.id) for room in Room.query.filter(Room.id.in_(room_ids))]
+
+    if start_date:
+        blocking.start_date = start_date
+    if end_date:
+        blocking.end_date = end_date
+
+
+def create_blocking(blocking_data):
+    blocking = Blocking()
+    _populate_blocking(blocking, **blocking_data)
     db.session.add(blocking)
     db.session.flush()
     return blocking
+
+
+def update_blocking(blocking, blocking_data):
+    _populate_blocking(blocking, **blocking_data)
+    db.session.flush()
 
 
 def approve_or_request_blocking(blocking):
