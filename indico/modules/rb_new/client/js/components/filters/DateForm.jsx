@@ -37,12 +37,14 @@ export default class DateForm extends FilterFormComponent {
         endDate: PropTypes.string,
         isRange: PropTypes.bool.isRequired,
         handleClose: PropTypes.func.isRequired,
+        disabledDate: PropTypes.func,
         ...FilterFormComponent.propTypes
     };
 
     static defaultProps = {
         startDate: null,
-        endDate: null
+        endDate: null,
+        disabledDate: null
     };
 
     static getDerivedStateFromProps({startDate, endDate}, prevState) {
@@ -77,7 +79,7 @@ export default class DateForm extends FilterFormComponent {
     }
 
     render() {
-        const {isRange, handleClose} = this.props;
+        const {isRange, handleClose, disabledDate} = this.props;
         const {startDate, endDate} = this.state;
         const props = {
             getPopupContainer: trigger => trigger.parentNode
@@ -90,7 +92,7 @@ export default class DateForm extends FilterFormComponent {
                                        await this.setDates(start, end);
                                        handleClose();
                                    }}
-                                   disabledDate={this.disabledDate}
+                                   disabledDate={disabledDate || this.disabledDate}
                                    format={_formatDateStr}
                                    {...props} />
                 ) : (
@@ -99,7 +101,7 @@ export default class DateForm extends FilterFormComponent {
                                     await this.setDates(date, null);
                                     handleClose();
                                 }}
-                                disabledDate={this.disabledDate}
+                                disabledDate={disabledDate || this.disabledDate}
                                 format={_formatDateStr}
                                 {...props} />
                 ) }

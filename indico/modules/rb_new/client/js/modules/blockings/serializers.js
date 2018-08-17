@@ -27,6 +27,15 @@ export const ajax = {
         onlyIf: ({myBlockings}) => myBlockings,
         serializer: ({myBlockings}) => myBlockings,
     },
+    room_ids: {
+        onlyIf: ({rooms}) => rooms && rooms.length,
+        serializer: ({rooms}) => rooms.map((room) => room.id)
+    },
+    allowed_principals: {
+        onlyIf: ({allowed}) => !!allowed,
+        serializer: ({allowed}) => allowed.map((obj) => ({id: obj.id, is_group: obj.is_group, provider: obj.provider}))
+    },
+    reason: ({reason}) => reason,
     start_date: filterDTHandler('start'),
     end_date: filterDTHandler('end'),
 };

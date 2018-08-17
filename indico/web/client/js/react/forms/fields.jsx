@@ -22,7 +22,7 @@ import {Form, Label} from 'semantic-ui-react';
 
 export function ReduxFormField(
     {
-        input, label, placeholder, required, children, disabled, componentLabel,
+        input, label, placeholder, required, children, disabled, componentLabel, defaultValue,
         meta: {touched, error, submitError, submitting, dirty, dirtySinceLastSubmit},
         as: Component,
         ...props
@@ -40,8 +40,9 @@ export function ReduxFormField(
     } else if (submitError && !dirtySinceLastSubmit) {
         errorLabel = <Label basic color="red" pointing="above" content={submitError} />;
     }
+
     return (
-        <Form.Field required={required} error={!!errorLabel}>
+        <Form.Field required={required} error={!!errorLabel} defaultValue={defaultValue}>
             {label && <label>{label}</label>}
             <Component {...input}
                        {...props}

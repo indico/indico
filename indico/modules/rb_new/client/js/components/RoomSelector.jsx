@@ -16,11 +16,14 @@
  */
 
 import React from 'react';
+import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
-import {Button, Dropdown, Grid, Icon, Image, List, Message, Segment} from 'semantic-ui-react';
+import {Button, Dropdown, Grid, Icon, List, Message, Segment} from 'semantic-ui-react';
 import getLocationsURL from 'indico-url:rooms_new.locations';
+import roomsSpriteURL from 'indico-url:rooms_new.sprite';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {Translate} from 'indico/react/i18n';
+import SpriteImage from './SpriteImage';
 
 import './RoomSelector.module.scss';
 
@@ -38,11 +41,12 @@ const fetchLocations = async () => {
 };
 
 
-export default class RoomSelector extends React.Component {
+class RoomSelector extends React.Component {
     static propTypes = {
         onChange: PropTypes.func.isRequired,
         initialValue: PropTypes.array,
-        disabled: PropTypes.bool
+        disabled: PropTypes.bool,
+        roomsSpriteToken: PropTypes.string.isRequired
     };
 
     static defaultProps = {
@@ -86,10 +90,14 @@ export default class RoomSelector extends React.Component {
     };
 
     renderRoomItem = (room) => {
-        const {disabled} = this.props;
+        const {disabled, roomsSpriteToken} = this.props;
         return (
             <List.Item key={room.id}>
-                <Image src={room.large_photo_url} size="mini" />
+                <div className="image-wrapper" style={{width: 55, height: 25}}>
+                    <SpriteImage src={roomsSpriteURL({version: roomsSpriteToken})}
+                                 pos={room.sprite_position}
+                                 styles={{transformOrigin: '0 0', transform: 'scale(0.15)'}} />
+                </div>
                 <List.Content>
                     <List.Header>{room.full_name}</List.Header>
                 </List.Content>
@@ -120,49 +128,54 @@ export default class RoomSelector extends React.Component {
         return (
             <Grid styleName="room-selector">
                 <Grid.Row>
-                    <Grid.Column width={5}>
-                        <Dropdown placeholder={Translate.string('Location')}
-                                  options={locationOptions}
-                                  value={selectedLocation && selectedLocation.id}
-                                  loading={isFetchingLocations}
-                                  onChange={(event, data) => {
-                                      const selected = locations.find((loc) => loc.id === data.value);
-                                      this.setState({selectedLocation: selected});
-                                  }}
-                                  disabled={disabled}
-                                  fluid
-                                  search
-                                  selection />
-                    </Grid.Column>
-                    <Grid.Column width={9}>
-                        <Dropdown placeholder={Translate.string('Room')}
-                                  disabled={disabled || !selectedLocation}
-                                  options={roomOptions}
-                                  value={selectedRoom && selectedRoom.id}
-                                  onChange={(event, data) => {
-                                      const selected = selectedLocation.rooms.find((room) => room.id === data.value);
-                                      this.setState({selectedRoom: selected});
-                                  }}
-                                  fluid
-                                  search
-                                  selection />
-                    </Grid.Column>
-                    <Grid.Column width={2}>
-                        <Button floated="right"
-                                icon="plus"
-                                type="button"
-                                disabled={disabled || !selectedRoom}
-                                onClick={() => {
-                                    const newRooms = [...rooms, selectedRoom];
-                                    this.setState({
-                                        selectedRooms: newRooms,
-                                        selectedLocation: null,
-                                        selectedRoom: null
-                                    });
-                                    onChange(newRooms);
-                                }}
-                                primary />
-                    </Grid.Column>
+                    {!disabled && (
+                        <>
+                            <Grid.Column width={5}>
+                                <Dropdown placeholder={Translate.string('Location')}
+                                          options={locationOptions}
+                                          value={selectedLocation && selectedLocation.id}
+                                          loading={isFetchingLocations}
+                                          onChange={(event, data) => {
+                                              const selected = locations.find((loc) => loc.id === data.value);
+                                              this.setState({selectedLocation: selected});
+                                          }}
+                                          fluid
+                                          search
+                                          selection />
+                            </Grid.Column>
+                            <Grid.Column width={9}>
+                                <Dropdown placeholder={Translate.string('Room')}
+                                          disabled={!selectedLocation}
+                                          options={roomOptions}
+                                          value={selectedRoom && selectedRoom.id}
+                                          onChange={(event, data) => {
+                                              const selected = selectedLocation.rooms.find((room) => (
+                                                  room.id === data.value
+                                              ));
+                                              this.setState({selectedRoom: selected});
+                                          }}
+                                          fluid
+                                          search
+                                          selection />
+                            </Grid.Column>
+                            <Grid.Column width={2}>
+                                <Button floated="right"
+                                        icon="plus"
+                                        type="button"
+                                        disabled={!selectedRoom}
+                                        onClick={() => {
+                                            const newRooms = [...rooms, selectedRoom];
+                                            this.setState({
+                                                selectedRooms: newRooms,
+                                                selectedLocation: null,
+                                                selectedRoom: null
+                                            });
+                                            onChange(newRooms);
+                                        }}
+                                        primary />
+                            </Grid.Column>
+                        </>
+                    )}
                 </Grid.Row>
                 <Grid.Row styleName="selected-rooms-row">
                     <Grid.Column>
@@ -189,3 +202,8 @@ export default class RoomSelector extends React.Component {
         );
     }
 }
+
+export default connect(
+    ({config: {data: {roomsSpriteToken}}}) => ({roomsSpriteToken}),
+    null
+)(RoomSelector);

@@ -93,9 +93,9 @@ export default class BookRoomModal extends React.Component {
 
     renderPrincipalSearchField({input, ...props}) {
         return (
-            <ReduxFormField input={input}
+            <ReduxFormField {...props}
+                            input={{...input, value: null}}
                             as={PrincipalSearchField}
-                            {...props}
                             onChange={(user) => {
                                 input.onChange(user);
                             }} />
