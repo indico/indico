@@ -23,17 +23,19 @@ import {Grid} from 'semantic-ui-react';
 import {connect} from 'react-redux';
 
 import {Translate} from 'indico/react/i18n';
-import {RequestState} from 'indico/utils/redux';
 import TimelineBase from '../../components/TimelineBase';
 import * as calendarActions from './actions';
+import * as calendarSelectors from './selectors';
 
 import '../../components/Timeline.module.scss';
 
 
 class Calendar extends React.Component {
     static propTypes = {
-        date: PropTypes.string,
-        rows: PropTypes.arrayOf(PropTypes.object).isRequired,
+        calendarData: PropTypes.shape({
+            date: PropTypes.string,
+            rows: PropTypes.arrayOf(PropTypes.object).isRequired,
+        }).isRequired,
         isFetching: PropTypes.bool.isRequired,
         location: PropTypes.shape({
             pathname: PropTypes.string.isRequired,
@@ -43,10 +45,6 @@ class Calendar extends React.Component {
             fetchCalendar: PropTypes.func.isRequired,
             setDate: PropTypes.func.isRequired,
         }).isRequired,
-    };
-
-    static defaultProps = {
-        date: null
     };
 
     componentDidMount() {
@@ -64,7 +62,7 @@ class Calendar extends React.Component {
     }
 
     _updateCalendar() {
-        const {date, actions: {fetchCalendar, setDate}} = this.props;
+        const {calendarData: {date}, actions: {fetchCalendar, setDate}} = this.props;
         if (!date) {
             setDate(moment());
         } else {
@@ -89,7 +87,7 @@ class Calendar extends React.Component {
     }
 
     render() {
-        const {date, rows, isFetching, actions: {setDate}} = this.props;
+        const {isFetching, calendarData: {date, rows}, actions: {setDate}} = this.props;
         const legendLabels = [
             {label: Translate.string('Booked'), color: 'orange'},
             {label: Translate.string('Pre-Booking'), style: 'pre-booking'},
@@ -116,9 +114,9 @@ class Calendar extends React.Component {
 
 
 export default connect(
-    ({calendar}) => ({
-        isFetching: calendar.request.state === RequestState.STARTED,
-        ...calendar.data,
+    state => ({
+        isFetching: calendarSelectors.isFetching(state),
+        calendarData: calendarSelectors.getCalendarData(state),
     }),
     dispatch => ({
         actions: bindActionCreators({
