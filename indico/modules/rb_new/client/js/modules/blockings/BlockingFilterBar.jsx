@@ -94,6 +94,7 @@ class BlockingFilterBar extends React.Component {
                                        form={(fieldValues, setParentField, handleClose) => (
                                            <DateForm setParentField={setParentField}
                                                      handleClose={handleClose}
+                                                     disabledDate={() => false}
                                                      isRange
                                                      {...dates} />
                                        )}
