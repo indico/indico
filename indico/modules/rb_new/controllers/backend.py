@@ -23,15 +23,15 @@ from flask import jsonify, redirect, request, session
 from marshmallow_enum import EnumField
 from webargs import fields, validate
 from webargs.flaskparser import use_args, use_kwargs
-from werkzeug.exceptions import NotFound
+from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.queries import with_total_rows
 from indico.core.errors import NoReportError
 from indico.legacy.common.cache import GenericCache
-from indico.modules.groups import GroupProxy
 from indico.modules.rb import Location, rb_settings
 from indico.modules.rb.controllers import RHRoomBookingBase
+from indico.modules.rb.models.blockings import Blocking
 from indico.modules.rb.models.favorites import favorite_room_table
 from indico.modules.rb.models.reservations import RepeatFrequency, Reservation
 from indico.modules.rb.models.rooms import Room
@@ -42,7 +42,7 @@ from indico.modules.rb_new.util import (approve_or_request_blocking, build_rooms
                                         get_buildings, get_equipment_types, get_room_blockings, get_room_calendar,
                                         get_room_details_availability, get_rooms_availability, get_suggestions,
                                         search_for_rooms, serialize_blockings, serialize_nonbookable_periods,
-                                        serialize_occurrences, serialize_unbookable_hours)
+                                        serialize_occurrences, serialize_unbookable_hours, update_blocking)
 from indico.modules.users.models.users import User
 from indico.util.i18n import _, get_all_locales
 from indico.web.flask.util import send_file, url_for
@@ -298,23 +298,35 @@ class RHLocations(RHRoomBookingBase):
 
 
 class RHCreateRoomBlocking(RHRoomBookingBase):
-    @use_kwargs({
+    @use_args({
         'room_ids': fields.List(fields.Int(), missing=[]),
         'start_date': fields.Date(),
         'end_date': fields.Date(),
         'reason': fields.Str(),
+        'allowed_principals': fields.List(fields.Dict())
+    })
+    def _process(self, args):
+        blocking = create_blocking(args)
+        approve_or_request_blocking(blocking)
+        return jsonify_data(flash=False)
+
+
+class RHUpdateRoomBlocking(RHRoomBookingBase):
+    def _check_access(self):
+        RHRoomBookingBase._check_access(self)
+        if not self.blocking.can_be_modified(session.user):
+            raise Forbidden
+
+    def _process_args(self):
+        self.blocking = Blocking.get_one(request.view_args['blocking_id'])
+
+    @use_args({
+        'room_ids': fields.List(fields.Int(), required=True),
+        'reason': fields.Str(required=True),
         'allowed_principals': fields.List(fields.Dict(), missing=[])
     })
-    def _process(self, room_ids, start_date, end_date, reason, allowed_principals):
-        rooms = Room.query.filter(Room.id.in_(room_ids)).all()
-        allowed = []
-        for obj in allowed_principals:
-            if obj.get('is_group'):
-                allowed.append(GroupProxy(obj['id'], provider=obj['provider']))
-            else:
-                allowed.append(User.query.filter(User.id == obj['id']).one())
-        blocking = create_blocking(rooms, start_date, end_date, reason, allowed)
-        approve_or_request_blocking(blocking)
+    def _process(self, args):
+        update_blocking(self.blocking, args)
         return jsonify_data(flash=False)
 
 
