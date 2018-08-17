@@ -20,9 +20,12 @@ import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import {Container, Grid, Loader, Message} from 'semantic-ui-react';
+import {Route} from 'react-router-dom';
 import {Translate} from 'indico/react/i18n';
-import BlockingFilterBar from './BlockingFilterBar';
 import BlockingCard from './BlockingCard';
+import BlockingFilterBar from './BlockingFilterBar';
+import BlockingModal from './BlockingModal';
+import {pushStateMergeProps} from '../../util';
 import * as blockingsActions from './actions';
 import * as blockingsSelectors from './selectors';
 
@@ -33,6 +36,7 @@ class BlockingList extends React.Component {
     static propTypes = {
         list: PropTypes.array.isRequired,
         isFetching: PropTypes.bool.isRequired,
+        pushState: PropTypes.func.isRequired,
         actions: PropTypes.exact({
             fetchBlockings: PropTypes.func.isRequired,
         }).isRequired,
@@ -46,9 +50,19 @@ class BlockingList extends React.Component {
     renderBlocking = (blocking) => {
         return (
             <Grid.Column key={blocking.id}>
-                <BlockingCard blocking={blocking} />
+                <BlockingCard blocking={blocking} onClick={() => this.openBlockingDetailsModal(blocking)} />
             </Grid.Column>
         );
+    };
+
+    openBlockingDetailsModal = (blocking) => {
+        const {pushState} = this.props;
+        pushState(`/blockings/${blocking.id}/details`);
+    };
+
+    closeBlockingDetailsModal = () => {
+        const {pushState} = this.props;
+        pushState(`/blockings`);
     };
 
     render() {
@@ -72,6 +86,19 @@ class BlockingList extends React.Component {
                             </Translate>
                         </Message>
                     )}
+                    <Route exact path="/blockings/:blockingId/details" render={({match: {params: {blockingId}}}) => {
+                        const blocking = blockings.find((blockingData) => blockingData.id === parseInt(blockingId, 10));
+                        if (!blocking) {
+                            return null;
+                        }
+
+                        return (
+                            <BlockingModal open
+                                           blocking={blocking}
+                                           onClose={this.closeBlockingDetailsModal}
+                                           mode="read" />
+                        );
+                    }} />
                 </Container>
             </>
         );
@@ -88,5 +115,7 @@ export default connect(
         actions: bindActionCreators({
             fetchBlockings: blockingsActions.fetchBlockings,
         }, dispatch),
-    })
+        dispatch
+    }),
+    pushStateMergeProps
 )(BlockingList);

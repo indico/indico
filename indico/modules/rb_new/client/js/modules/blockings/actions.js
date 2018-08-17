@@ -17,6 +17,7 @@
 
 import fetchBlockingsURL from 'indico-url:rooms_new.blockings';
 import createBlockingURL from 'indico-url:rooms_new.create_blocking';
+import updateBlockingURL from 'indico-url:rooms_new.update_blocking';
 
 import {indicoAxios} from 'indico/utils/axios';
 import {ajaxAction, submitFormAction} from 'indico/utils/redux';
@@ -33,6 +34,10 @@ export const BLOCKINGS_RECEIVED = 'blockings/BLOCKINGS_RECEIVED';
 export const CREATE_BLOCKING_REQUEST = 'blockings/CREATE_BLOCKING_REQUEST';
 export const CREATE_BLOCKING_SUCCESS = 'blockings/CREATE_BLOCKING_SUCCESS';
 export const CREATE_BLOCKING_ERROR = 'blockings/CREATE_BLOCKING_ERROR';
+
+export const UPDATE_BLOCKING_REQUEST = 'blockings/UPDATE_BLOCKING_REQUEST';
+export const UPDATE_BLOCKING_SUCCESS = 'blockings/UPDATE_BLOCKING_SUCCESS';
+export const UPDATE_BLOCKING_ERROR = 'blockings/UPDATE_BLOCKING_ERROR';
 
 export const FILTER_NAMESPACE = 'blockings';
 
@@ -55,10 +60,17 @@ export function setFilterParameter(param, value) {
 }
 
 export function createBlocking(formData) {
+    const data = preProcessParameters(formData, ajaxRules);
     return submitFormAction(
-        () => indicoAxios.post(createBlockingURL(), formData),
-        CREATE_BLOCKING_REQUEST,
-        CREATE_BLOCKING_SUCCESS,
-        CREATE_BLOCKING_ERROR
+        () => indicoAxios.post(createBlockingURL(), data),
+        CREATE_BLOCKING_REQUEST, CREATE_BLOCKING_SUCCESS, CREATE_BLOCKING_ERROR
+    );
+}
+
+export function updateBlocking(blockingId, formData) {
+    const data = preProcessParameters(formData, ajaxRules);
+    return submitFormAction(
+        () => indicoAxios.patch(updateBlockingURL({blocking_id: blockingId}), data),
+        UPDATE_BLOCKING_REQUEST, UPDATE_BLOCKING_SUCCESS, UPDATE_BLOCKING_ERROR
     );
 }

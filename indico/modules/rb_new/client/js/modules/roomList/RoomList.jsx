@@ -37,9 +37,9 @@ import roomDetailsModalFactory from '../../components/modals/RoomDetailsModal';
 import BookFromListModal from '../../components/modals/BookFromListModal';
 import {BlockingModal} from '../blockings';
 import {queryString as queryStringSerializer} from '../../serializers/filters';
+import {actions as roomsActions, selectors as roomsSelectors} from '../../common/rooms';
 import * as actions from '../../actions';
 import * as selectors from '../../selectors';
-import {actions as roomsActions, selectors as roomsSelectors} from '../../common/rooms';
 
 import './RoomList.module.scss';
 
@@ -102,8 +102,8 @@ class RoomList extends React.Component {
             if (!isRoomSelected) {
                 buttonProps.icon = 'check';
             } else {
-                buttonProps.icon = 'remove';
-                buttonProps.negative = true;
+                buttonProps.icon = 'check';
+                buttonProps.primary = true;
             }
 
             return (
@@ -244,11 +244,14 @@ class RoomList extends React.Component {
                         <Route exact path="/rooms/:roomId/book" render={roomPreloader((roomId) => (
                             <BookFromListModal roomId={roomId} onClose={this.closeBookingModal} />
                         ), fetchRoomDetails)} />
-                        <Route exact path="/rooms/blocking/create" render={() => (
-                            <BlockingModal open
-                                           rooms={Object.values(selection)}
-                                           onClose={this.closeBlockingModal} />
-                        )} />
+                        <Route exact path="/rooms/blocking/create" render={() => {
+                            const blocking = {blocked_rooms: Object.values(selection).map((room) => ({room}))};
+                            return (
+                                <BlockingModal open
+                                               blocking={blocking}
+                                               onClose={this.closeBlockingModal} />
+                            );
+                        }} />
                     </>
                 )}
             </Grid>

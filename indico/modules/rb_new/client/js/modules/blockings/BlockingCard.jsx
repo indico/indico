@@ -15,15 +15,24 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import moment from 'moment';
 import React from 'react';
+import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import {Item} from 'semantic-ui-react';
+import roomsSpriteURL from 'indico-url:rooms_new.sprite';
 import {PluralTranslate} from 'indico/react/i18n';
+import {TooltipIfTruncated} from 'indico/react/components';
+import SpriteImage from '../../components/SpriteImage';
+
+import './BlockingCard.module.scss';
 
 
-export default class BlockingCard extends React.Component {
+class BlockingCard extends React.Component {
     static propTypes = {
-        blocking: PropTypes.object.isRequired
+        blocking: PropTypes.object.isRequired,
+        onClick: PropTypes.func.isRequired,
+        roomsSpriteToken: PropTypes.string.isRequired
     };
 
     renderCardHeader() {
@@ -38,20 +47,28 @@ export default class BlockingCard extends React.Component {
     }
 
     render() {
-        const {blocking} = this.props;
+        const {blocking, onClick, roomsSpriteToken} = this.props;
         const {blocked_rooms: blockedRooms} = blocking;
 
         return (
-            <Item.Group>
+            <Item.Group onClick={onClick} styleName="blocking-item">
                 <Item key={blocking.id}>
-                    <Item.Image src={blockedRooms[0].room.large_photo_url} size="small" />
+                    <div className="image">
+                        <SpriteImage src={roomsSpriteURL({version: roomsSpriteToken})}
+                                     pos={blockedRooms[0].room.sprite_position}
+                                     styles={{transform: 'scale(0.5)', transformOrigin: '0 0'}} />
+                    </div>
                     <Item.Content>
                         <Item.Header>{this.renderCardHeader()}</Item.Header>
                         <Item.Meta>
-                            {blocking.start_date} - {blocking.end_date}
+                            {moment(blocking.start_date).format('ll')} - {moment(blocking.end_date).format('ll')}
                         </Item.Meta>
                         <Item.Description>
-                            {blocking.reason}
+                            <TooltipIfTruncated>
+                                <div styleName="blocking-reason">
+                                    {blocking.reason}
+                                </div>
+                            </TooltipIfTruncated>
                         </Item.Description>
                     </Item.Content>
                 </Item>
@@ -59,3 +76,8 @@ export default class BlockingCard extends React.Component {
         );
     }
 }
+
+export default connect(
+    ({config: {data: {roomsSpriteToken}}}) => ({roomsSpriteToken}),
+    null
+)(BlockingCard);

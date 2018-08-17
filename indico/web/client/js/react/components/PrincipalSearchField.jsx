@@ -20,7 +20,7 @@
 import _ from 'lodash';
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Dropdown} from 'semantic-ui-react';
+import {Dropdown, Label} from 'semantic-ui-react';
 
 import searchUsersURL from 'indico-url:users.user_search';
 import searchGroupsURL from 'indico-url:groups.group_search';
@@ -54,7 +54,10 @@ const searchGroups = async (data) => {
 export default class PrincipalSearchField extends React.Component {
     static propTypes = {
         multiple: PropTypes.bool,
-        defaultValue: PropTypes.object,
+        value: PropTypes.oneOfType([
+            PropTypes.object,
+            PropTypes.array
+        ]),
         onChange: PropTypes.func.isRequired,
         disabled: PropTypes.bool,
         withGroups: PropTypes.bool
@@ -62,32 +65,56 @@ export default class PrincipalSearchField extends React.Component {
 
     static defaultProps = {
         multiple: false,
-        defaultValue: null,
+        value: null,
         disabled: false,
         withGroups: false
     };
 
     constructor(props) {
         super(props);
-        const {defaultValue} = this.props;
-        const userId = defaultValue && defaultValue.id;
+
+        const {multiple, onChange} = this.props;
+        let {value} = this.props;
+        let dropdownValue;
+
+        if (multiple) {
+            value = value || [];
+            dropdownValue = value.length !== 0 ? value.map((val) => val.id) : [];
+        } else {
+            dropdownValue = value && value.id;
+        }
 
         this.state = {
             isFetching: false,
             options: [],
-            prevPropsUserId: userId,
-            userId
+            prevPropsValue: dropdownValue,
+            value: dropdownValue
         };
-        this.userCache = {};
+
+        if (multiple) {
+            this.userCache = Object.assign({}, ...value.map((val) => ({[val.id]: val})));
+        } else {
+            this.userCache = {};
+        }
+
+        onChange(value);
     }
 
-    static getDerivedStateFromProps({value: {id: userId}, multiple}, state) {
-        const valuesChanged = multiple ? !_.isEqual(userId, state.prevPropsUserId) : userId !== state.prevPropsUserId;
+    static getDerivedStateFromProps({value, multiple}, state) {
+        let valuesChanged, newValue;
+        if (multiple) {
+            newValue = value.map((val) => val.id);
+            valuesChanged = !_.isEqual(newValue.sort(), state.prevPropsValue.sort());
+        } else {
+            valuesChanged = value !== state.prevPropsValue;
+            newValue = value;
+        }
+
         if (valuesChanged) {
             return {
                 ...state,
-                prevPropsUserId: userId,
-                userId
+                prevPropsValue: newValue,
+                value: newValue
             };
         }
         return null;
@@ -99,7 +126,7 @@ export default class PrincipalSearchField extends React.Component {
         key: itemData.id,
         icon: 'users'
     } : {
-        text: `${itemData.first_name} ${itemData.last_name}`,
+        text: itemData.full_name,
         description: itemData.email,
         value: itemData.id,
         key: itemData.id,
@@ -139,39 +166,46 @@ export default class PrincipalSearchField extends React.Component {
 
     render() {
         const {multiple, onChange, disabled} = this.props;
-        const {isFetching, options, userId} = this.state;
+        const {isFetching, options, value} = this.state;
         let dropdownValues, selectedValues, dropdownOptions;
+        let placeholder = Translate.string('Write a name (of the group or user) or e-mail...');
 
         if (multiple) {
-            dropdownValues = userId === undefined ? [] : userId;
+            dropdownValues = value || [];
             selectedValues = dropdownValues.map((id) => this.userCache[id]).map(this.renderItem);
             dropdownOptions = isFetching ? selectedValues : options.concat(selectedValues);
+
+            if (!dropdownValues.length && disabled) {
+                placeholder = Translate.string('Nobody');
+            }
         } else {
-            dropdownValues = selectedValues = userId;
+            dropdownValues = value ? value : null;
             dropdownOptions = options;
         }
 
+        const renderDisabledLabel = (item) => (
+            <Label key={item.key} icon={item.icon} content={item.text} removeIcon={null} />
+        );
+        const dropdownProps = disabled ? {icon: null, renderLabel: renderDisabledLabel} : {search: opts => opts};
         return (
-            <Dropdown search={opts => opts}
-                      deburr
+            <Dropdown deburr
                       selection
                       fluid
+                      {...dropdownProps}
                       minCharacters={3}
                       multiple={multiple}
                       options={dropdownOptions}
                       value={dropdownValues}
-                      placeholder={Translate.string('Write a name (of the group or user) or e-mail...')}
-                      onChange={(__, {value}) => {
+                      placeholder={placeholder}
+                      onChange={(__, {value: val}) => {
                           let fieldValue;
                           if (multiple) {
-                              fieldValue = value.map((id) => this.userCache[id]);
+                              fieldValue = val.map((id) => this.userCache[id]);
                           } else {
-                              fieldValue = this.userCache[value];
+                              fieldValue = this.userCache[val];
                           }
 
-                          this.setState({
-                              userId: value
-                          });
+                          this.setState({value: val});
                           onChange(fieldValue);
                       }}
                       onSearchChange={this.handleSearchChange}

@@ -33,4 +33,10 @@
             margin-left: -10px;
         }
     }
+
+    &:global(.disabled) {
+        :global(.rc-calendar-date-panel) {
+            pointer-events: none;
+        }
+    }
 }

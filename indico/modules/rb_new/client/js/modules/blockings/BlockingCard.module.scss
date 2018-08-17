@@ -15,24 +15,18 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-.room-selector {
-    .selected-rooms-row {
-        padding-top: 0 !important;
 
-        .rooms-list {
-            max-height: 140px;
-            overflow: hidden;
-            overflow-y: auto;
+.blocking-item {
+    cursor: pointer;
 
-            :global(.item) {
-                display: flex;
-                overflow: hidden;
-                align-items: center;
+    :global(.image) {
+        width: 150px !important;
+        height: 100px;
+    }
 
-                .remove-btn-content {
-                    margin-left: auto;
-                }
-            }
-        }
+    .blocking-reason {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: pre;
     }
 }
