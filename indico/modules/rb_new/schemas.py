@@ -16,11 +16,13 @@
 
 from __future__ import unicode_literals
 
-from marshmallow.fields import Nested, String
+from flask import session
+from marshmallow.fields import Boolean, Method, Nested, String
 
 from indico.core.marshmallow import mm
 from indico.modules.rb.models.aspects import Aspect
 from indico.modules.rb.models.blocked_rooms import BlockedRoom
+from indico.modules.rb.models.blocking_principals import BlockingPrincipal
 from indico.modules.rb.models.blockings import Blocking
 from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
@@ -82,19 +84,43 @@ class ReservationOccurrenceSchema(mm.ModelSchema):
 
 
 class BlockedRoomSchema(mm.ModelSchema):
-    room = Nested(RoomSchema, many=False, only=('id', 'name', 'large_photo_url', 'full_name'))
+    room = Nested(RoomSchema, only=('id', 'name', 'sprite_position', 'full_name'))
 
     class Meta:
         model = BlockedRoom
         fields = ('rejection_reason', 'room')
 
 
+class BlockingPrincipalSchema(mm.ModelSchema):
+    id = Method('get_id')
+    full_name = String()
+    provider = String(missing=None)
+    is_group = Boolean(missing=False)
+
+    class Meta:
+        model = BlockingPrincipal
+        fields = ('id', 'name', 'is_group', 'email', 'full_name', 'provider')
+
+    def get_id(self, blocking_principal):
+        if not blocking_principal.is_group:
+            return blocking_principal.id
+        elif blocking_principal.provider is None or blocking_principal.provider == 'indico':
+            return blocking_principal.id
+        else:
+            return blocking_principal.name
+
+
 class BlockingSchema(mm.ModelSchema):
     blocked_rooms = Nested(BlockedRoomSchema, many=True)
+    allowed = Nested(BlockingPrincipalSchema, many=True)
+    can_edit = Method('get_can_edit')
 
     class Meta:
         model = Blocking
-        fields = ('id', 'start_date', 'end_date', 'reason', 'blocked_rooms')
+        fields = ('id', 'start_date', 'end_date', 'reason', 'blocked_rooms', 'allowed', 'created_by_id', 'can_edit')
+
+    def get_can_edit(self, blocking):
+        return blocking.can_be_modified(session.user)
 
 
 class NonBookablePeriodSchema(mm.ModelSchema):
@@ -110,7 +136,7 @@ class BookableHoursSchema(mm.ModelSchema):
 
 
 class LocationsSchema(mm.ModelSchema):
-    rooms = Nested(RoomSchema, many=True, only=('id', 'name', 'full_name', 'large_photo_url'))
+    rooms = Nested(RoomSchema, many=True, only=('id', 'name', 'full_name', 'sprite_position'))
 
     class Meta:
         model = Location
