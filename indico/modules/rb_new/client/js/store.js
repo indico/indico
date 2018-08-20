@@ -24,7 +24,7 @@ import createReduxStore from 'indico/utils/redux';
 import reducers from './reducers';
 import {initialStateFactory} from './reducers/roomBooking/filters';
 import {initialTimelineState} from './reducers/bookRoom';
-import {calendarRouteConfig, qsCalendarReducer} from './modules/calendar';
+import {routeConfig as calendarRouteConfig, queryStringReducer as qsCalendarReducer} from './modules/calendar';
 import * as actions from './actions';
 import {queryString as queryFilterRules} from './serializers/filters';
 import {queryString as queryTimelineRules} from './serializers/timeline';

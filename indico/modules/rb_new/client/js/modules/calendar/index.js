@@ -15,6 +15,6 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-export {default as Calendar} from './Calendar';
-export {default as calendarReducer} from './reducers';
-export {queryStringReducer as qsCalendarReducer, routeConfig as calendarRouteConfig} from './queryString';
+export {default} from './Calendar';
+export {default as reducer} from './reducers';
+export {queryStringReducer, routeConfig} from './queryString';

@@ -24,7 +24,7 @@ import mapAspectsReducer from './mapAspects';
 import roomDetailsReducer from './roomDetails';
 import bookRoomFormReducer from './bookRoomForm';
 import blockingsReducer from './blockings';
-import {calendarReducer} from '../modules/calendar';
+import {reducer as calendarReducer} from '../modules/calendar';
 
 
 const reducers = {
