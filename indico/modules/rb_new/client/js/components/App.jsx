@@ -26,7 +26,7 @@ import UserActions from '../containers/UserActions';
 import Landing from '../containers/Landing';
 import Calendar from '../modules/calendar';
 import BookRoom from '../containers/BookRoom';
-import RoomList from '../containers/RoomList';
+import RoomList from '../modules/roomList';
 import BlockingList from './pages/BlockingList';
 import Menu from './Menu';
 

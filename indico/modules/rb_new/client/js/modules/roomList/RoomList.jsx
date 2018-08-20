@@ -18,20 +18,27 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
+import {bindActionCreators} from 'redux';
+import {connect} from 'react-redux';
 import {Button, Card, Dimmer, Dropdown, Grid, Loader, Popup, Sticky} from 'semantic-ui-react';
 import {Route} from 'react-router-dom';
 import LazyScroll from 'redux-lazy-scroll';
+import {stateToQueryString} from 'redux-router-querystring';
 
-import {Preloader, Slot} from 'indico/react/util';
+import {Slot} from 'indico/react/util';
 import {Param, Plural, PluralTranslate, Translate, Singular} from 'indico/react/i18n';
-import RoomFilterBar from '../RoomFilterBar';
+import {pushStateMergeProps, roomPreloader} from '../../util';
+import RoomFilterBar from '../../components/RoomFilterBar';
 import filterBarFactory from '../../containers/FilterBar';
 import searchBarFactory from '../../containers/SearchBar';
 import mapControllerFactory from '../../containers/MapController';
 import Room from '../../containers/Room';
-import roomDetailsModalFactory from '../modals/RoomDetailsModal';
-import BookFromListModal from '../modals/BookFromListModal';
-import BlockingModal from '../modals/BlockingModal';
+import roomDetailsModalFactory from '../../components/modals/RoomDetailsModal';
+import BookFromListModal from '../../components/modals/BookFromListModal';
+import BlockingModal from '../../components/modals/BlockingModal';
+import {queryString as queryStringSerializer} from '../../serializers/filters';
+import * as actions from '../../actions';
+import {actions as roomDetailsActions, selectors as roomDetailsSelectors} from '../../common/roomDetails';
 
 import './RoomList.module.scss';
 
@@ -42,20 +49,19 @@ const MapController = mapControllerFactory('roomList');
 const RoomDetailsModal = roomDetailsModalFactory('roomList');
 
 
-export default class RoomList extends React.Component {
+class RoomList extends React.Component {
     static propTypes = {
-        fetchRooms: PropTypes.func.isRequired,
         rooms: PropTypes.shape({
             list: PropTypes.array,
             isFetching: PropTypes.bool,
         }).isRequired,
-        fetchRoomDetails: PropTypes.func.isRequired,
-        roomDetails: PropTypes.shape({
-            list: PropTypes.array,
-            isFetching: PropTypes.bool,
-        }).isRequired,
+        roomDetailsFetching: PropTypes.bool.isRequired,
         pushState: PropTypes.func.isRequired,
-        showMap: PropTypes.bool.isRequired
+        showMap: PropTypes.bool.isRequired,
+        actions: PropTypes.exact({
+            fetchRooms: PropTypes.func.isRequired,
+            fetchRoomDetails: PropTypes.func.isRequired,
+        }).isRequired,
     };
 
     constructor(props) {
@@ -69,7 +75,7 @@ export default class RoomList extends React.Component {
     };
 
     componentDidMount() {
-        const {fetchRooms} = this.props;
+        const {actions: {fetchRooms}} = this.props;
         fetchRooms();
     }
 
@@ -137,24 +143,19 @@ export default class RoomList extends React.Component {
         this.setState({blockingMode: false, blockings: []});
     };
 
-    roomPreloader(componentFunc) {
-        const {fetchRoomDetails} = this.props;
-        return ({match: {params: {roomId}}}) => (
-            <Preloader checkCached={({roomDetails: {rooms: cachedRooms}}) => !!cachedRooms[roomId]}
-                       action={() => fetchRoomDetails(roomId)}
-                       dimmer={<Dimmer page />}>
-                {() => componentFunc(roomId)}
-            </Preloader>
-        );
-    }
-
     toggleBlockingMode = () => {
         const {blockingMode} = this.state;
         this.setState({blockingMode: !blockingMode, blockings: []});
     };
 
     render() {
-        const {rooms: {list, total, isFetching}, fetchRooms, roomDetails, showMap, pushState} = this.props;
+        const {
+            rooms: {list, total, isFetching},
+            actions: {fetchRooms, fetchRoomDetails},
+            roomDetailsFetching,
+            showMap,
+            pushState
+        } = this.props;
         const {blockingMode, blockings} = this.state;
         const menuOptions = [{
             text: Translate.string('Block rooms'),
@@ -217,7 +218,7 @@ export default class RoomList extends React.Component {
                         </LazyScroll>
                     </div>
                     <Dimmer.Dimmable>
-                        <Dimmer active={roomDetails.isFetching} page>
+                        <Dimmer active={roomDetailsFetching} page>
                             <Loader />
                         </Dimmer>
                     </Dimmer.Dimmable>
@@ -227,14 +228,12 @@ export default class RoomList extends React.Component {
                         <MapController />
                     </Grid.Column>
                 )}
-                <Route exact path="/rooms/:roomId/details" render={this.roomPreloader((roomId) => (
-                    <RoomDetailsModal roomDetails={roomDetails.rooms[roomId]}
-                                      onClose={this.closeBookingModal} />
-                ))} />
-                <Route exact path="/rooms/:roomId/book" render={this.roomPreloader((roomId) => (
-                    <BookFromListModal room={roomDetails.rooms[roomId]}
-                                       onClose={this.closeBookingModal} />
-                ))} />
+                <Route exact path="/rooms/:roomId/details" render={roomPreloader((roomId) => (
+                    <RoomDetailsModal roomId={roomId} onClose={this.closeBookingModal} />
+                ), fetchRoomDetails)} />
+                <Route exact path="/rooms/:roomId/book" render={roomPreloader((roomId) => (
+                    <BookFromListModal roomId={roomId} onClose={this.closeBookingModal} />
+                ), fetchRoomDetails)} />
                 <Route exact path="/rooms/blocking/create" render={() => (
                     <BlockingModal open
                                    rooms={Object.values(blockings)}
@@ -244,3 +243,24 @@ export default class RoomList extends React.Component {
         );
     }
 }
+
+
+export default connect(
+    state => ({
+        ...state.roomList,
+        roomDetailsFetching: roomDetailsSelectors.isFetching(state),
+        queryString: stateToQueryString(state.roomList, queryStringSerializer),
+        showMap: !!state.mapAspects.list && !!state.staticData.tileServerURL,
+    }),
+    dispatch => ({
+        actions: {
+            fetchRooms: (clear = true) => {
+                dispatch(actions.fetchRooms('roomList', clear));
+                dispatch(actions.fetchMapRooms('roomList'));
+            },
+            fetchRoomDetails: bindActionCreators(roomDetailsActions.fetchDetails, dispatch),
+        },
+        dispatch,
+    }),
+    pushStateMergeProps,
+)(RoomList);

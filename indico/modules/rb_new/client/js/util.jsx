@@ -22,6 +22,8 @@ import moment from 'moment';
 import {Dimmer} from 'semantic-ui-react';
 import {Preloader} from 'indico/react/util';
 
+import {selectors as roomDetailsSelectors} from './common/roomDetails';
+
 
 export function toMoment(dt, format) {
     return dt ? moment(dt, format) : null;
@@ -164,22 +166,25 @@ function _pruneNullLeaves(obj) {
     }));
 }
 
-export const pushStateMergeProps = (stateProps, dispatchProps, ownProps) => ({
-    ...ownProps,
-    ...stateProps,
-    ...dispatchProps,
-    pushState(url, restoreQueryString = false) {
-        if (restoreQueryString) {
-            url += `?${stateProps.queryString}`;
+export const pushStateMergeProps = (stateProps, dispatchProps, ownProps) => {
+    const {dispatch, ...realDispatchProps} = dispatchProps;
+    return {
+        ...ownProps,
+        ...stateProps,
+        ...realDispatchProps,
+        pushState(url, restoreQueryString = false) {
+            if (restoreQueryString) {
+                url += `?${stateProps.queryString}`;
+            }
+            dispatch(push(url));
         }
-        dispatchProps.dispatch(push(url));
-    }
-});
+    };
+};
 
 export const roomPreloader = (componentFunc, action) => {
     // eslint-disable-next-line react/display-name, react/prop-types
     return ({match: {params: {roomId}}}) => (
-        <Preloader checkCached={({roomDetails: {rooms: cachedRooms}}) => !!cachedRooms[roomId]}
+        <Preloader checkCached={state => roomDetailsSelectors.hasDetails(state, roomId)}
                    action={() => action(roomId)}
                    dimmer={<Dimmer page />}>
             {() => componentFunc(roomId)}

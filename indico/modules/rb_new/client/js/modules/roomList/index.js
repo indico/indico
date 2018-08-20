@@ -15,34 +15,4 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-import PropTypes from 'prop-types';
-import {connect} from 'react-redux';
-
-
-class Preloader extends React.Component {
-    static propTypes = {
-        isCached: PropTypes.bool.isRequired,
-        action: PropTypes.func.isRequired,
-        children: PropTypes.func.isRequired,
-        dimmer: PropTypes.element.isRequired
-    };
-
-    componentDidMount() {
-        const {action, isCached} = this.props;
-        if (!isCached) {
-            action();
-        }
-    }
-
-    render() {
-        const {children, dimmer, isCached} = this.props;
-        return (isCached ? children() : dimmer);
-    }
-}
-
-export default connect(
-    (state, {checkCached}) => ({
-        isCached: checkCached(state)
-    })
-)(Preloader);
+export {default} from './RoomList';

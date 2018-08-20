@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
+
+import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import {stateToQueryString} from 'redux-router-querystring';
 
@@ -25,19 +27,19 @@ import {
     fetchMapRooms,
     setFilterParameter,
     updateRooms,
-    fetchRoomDetails,
     resetBookingState,
     toggleTimelineView
 } from '../actions';
 import {pushStateMergeProps} from '../util';
+import {actions as roomDetailsActions, selectors as roomDetailsSelectors} from '../common/roomDetails';
 
 
-const mapStateToProps = ({bookRoom, mapAspects: {list}, roomDetails, staticData: {tileServerURL}}) => {
+const mapStateToProps = (state) => {
     return {
-        ...bookRoom,
-        roomDetails,
-        queryString: stateToQueryString(bookRoom, queryStringFilterSerializer, queryStringTimelineSerializer),
-        showMap: !!list.length && !!tileServerURL
+        ...state.bookRoom,
+        roomDetailsFetching: roomDetailsSelectors.isFetching(state),
+        queryString: stateToQueryString(state.bookRoom, queryStringFilterSerializer, queryStringTimelineSerializer),
+        showMap: !!state.mapAspects.list && !!state.staticData.tileServerURL,
     };
 };
 
@@ -52,9 +54,7 @@ const mapDispatchToProps = dispatch => ({
         dispatch(fetchRooms('bookRoom', clear));
         dispatch(fetchMapRooms('bookRoom'));
     },
-    fetchRoomDetails(id) {
-        dispatch(fetchRoomDetails(id));
-    },
+    fetchRoomDetails: bindActionCreators(roomDetailsActions.fetchDetails, dispatch),
     resetBookingState() {
         dispatch(resetBookingState());
     },

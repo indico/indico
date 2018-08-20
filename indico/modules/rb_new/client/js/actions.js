@@ -16,7 +16,6 @@
  */
 
 import buildFetchRoomsURL from 'indico-url:rooms_new.available_rooms';
-import fetchMapDetailsURL from 'indico-url:rooms_new.room_details';
 import fetchMapRoomsURL from 'indico-url:rooms_new.map_rooms';
 import fetchMapAspectsURL from 'indico-url:rooms_new.default_aspects';
 import fetchBuildingsURL from 'indico-url:rooms_new.buildings';
@@ -54,8 +53,6 @@ export const UPDATE_ROOMS = 'UPDATE_ROOMS';
 export const FETCH_MAP_ROOMS_STARTED = 'FETCH_MAP_ROOMS_STARTED';
 export const FETCH_MAP_ROOMS_FAILED = 'FETCH_MAP_ROOMS_FAILED';
 export const UPDATE_MAP_ROOMS = 'UPDATE_MAP_ROOMS';
-export const FETCH_ROOM_DETAILS_STARTED = 'FETCH_ROOM_DETAILS_STARTED';
-export const FETCH_ROOM_DETAILS_FAILED = 'FETCH_ROOM_DETAILS_FAILED';
 export const UPDATE_ROOM_DETAILS = 'UPDATE_ROOM_DETAILS';
 // Equipment types
 export const SET_EQUIPMENT_TYPES = 'SET_EQUIPMENT_TYPES';
@@ -247,26 +244,6 @@ export function fetchMapRooms(namespace) {
             {id: room.id, name: room.full_name, lat: parseFloat(room.latitude), lng: parseFloat(room.longitude)}
         ));
         dispatch(updateMapRooms(namespace, rooms));
-    };
-}
-
-export function fetchRoomDetails(id) {
-    return async (dispatch, getStore) => {
-        const {roomDetails: {rooms}} = getStore();
-        if (id in rooms) {
-            return;
-        }
-        dispatch({type: FETCH_ROOM_DETAILS_STARTED});
-
-        let response;
-        try {
-            response = await indicoAxios.get(fetchMapDetailsURL({room_id: id}));
-        } catch (error) {
-            handleAxiosError(error);
-            dispatch({type: FETCH_ROOM_DETAILS_FAILED});
-            return;
-        }
-        dispatch({type: UPDATE_ROOM_DETAILS, room: response.data});
     };
 }
 

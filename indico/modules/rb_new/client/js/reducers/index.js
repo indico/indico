@@ -21,7 +21,7 @@ import roomListReducer from './roomList';
 import equipmentReducer from './equipment';
 import buildingsReducer from './buildings';
 import mapAspectsReducer from './mapAspects';
-import roomDetailsReducer from './roomDetails';
+import {reducer as roomDetailsReducer} from '../common/roomDetails';
 import bookRoomFormReducer from './bookRoomForm';
 import blockingsReducer from './blockings';
 import {reducer as calendarReducer} from '../modules/calendar';

@@ -41,7 +41,7 @@ class Calendar extends React.Component {
             pathname: PropTypes.string.isRequired,
             search: PropTypes.string.isRequired,
         }).isRequired,
-        actions: PropTypes.shape({
+        actions: PropTypes.exact({
             fetchCalendar: PropTypes.func.isRequired,
             setDate: PropTypes.func.isRequired,
         }).isRequired,

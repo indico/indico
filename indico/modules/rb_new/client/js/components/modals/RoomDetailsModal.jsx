@@ -24,6 +24,7 @@ import {Translate, Param} from 'indico/react/i18n';
 import {RoomBasicDetails} from '../RoomBasicDetails';
 import TimelineContent from '../TimelineContent';
 import TimelineLegend from '../TimelineLegend';
+import {selectors as roomDetailsSelectors} from '../../common/roomDetails';
 
 import './RoomDetailsModal.module.scss';
 
@@ -67,11 +68,12 @@ class RoomDetailsModal extends React.Component {
 }
 
 export default (namespace) => {
-    const mapStateToProps = state => ({
+    const mapStateToProps = (state, {roomId}) => ({
         equipmentTypes: state.equipment.types,
         ...state[namespace].filters,
         hasOwnedRooms: state.user.hasOwnedRooms,
         hasFavoriteRooms: Object.values(state.user.favoriteRooms).some(fr => fr),
+        roomDetails: roomDetailsSelectors.getDetails(state, roomId),
         namespace
     });
 

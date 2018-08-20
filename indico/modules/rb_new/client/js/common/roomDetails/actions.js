@@ -15,34 +15,28 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import fetchCalendarURL from 'indico-url:rooms_new.calendar';
+import fetchRoomDetailsURL from 'indico-url:rooms_new.room_details';
 import {indicoAxios} from 'indico/utils/axios';
 import {ajaxAction} from 'indico/utils/redux';
-import {preProcessParameters} from '../../util';
-import {ajax as ajaxRules} from './serializers';
 
 
-export const SET_DATE = 'calendar/SET_DATE';
-export const ROWS_RECEIVED = 'calendar/ROWS_RECEIVED';
-export const FETCH_REQUEST = 'calendar/FETCH_REQUEST';
-export const FETCH_SUCCESS = 'calendar/FETCH_SUCCESS';
-export const FETCH_ERROR = 'calendar/FETCH_ERROR';
+export const DETAILS_RECEIVED = 'roomDetails/DETAILS_RECEIVED';
+export const FETCH_REQUEST = 'roomDetails/FETCH_REQUEST';
+export const FETCH_SUCCESS = 'roomDetails/FETCH_SUCCESS';
+export const FETCH_ERROR = 'roomDetails/FETCH_ERROR';
 
 
-export function setDate(date) {
-    return {type: SET_DATE, date};
-}
-
-export function fetchCalendar() {
-    return async (dispatch, getState) => {
-        const {calendar: {data}} = getState();
-        const params = preProcessParameters(data, ajaxRules);
+export function fetchDetails(id) {
+    return async (dispatch, getStore) => {
+        const {roomDetails: {rooms}} = getStore();
+        if (id in rooms) {
+            return;
+        }
         return await ajaxAction(
-            () => indicoAxios.get(fetchCalendarURL(params)),
+            () => indicoAxios.get(fetchRoomDetailsURL({room_id: id})),
             FETCH_REQUEST,
-            [ROWS_RECEIVED, FETCH_SUCCESS],
-            [FETCH_ERROR],
-            ({calendar: result}) => result
+            [DETAILS_RECEIVED, FETCH_SUCCESS],
+            FETCH_ERROR
         )(dispatch);
     };
 }

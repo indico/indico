@@ -15,23 +15,26 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import * as actions from '../actions';
+import {combineReducers} from 'redux';
+
+import {requestReducer} from 'indico/utils/redux';
+import * as roomDetailsActions from './actions';
 
 
-const initialState = {
-    rooms: {},
-    isFetching: false
-};
-
-export default function reducer(state = initialState, action) {
-    switch (action.type) {
-        case actions.FETCH_ROOM_DETAILS_STARTED:
-            return {...state, isFetching: true};
-        case actions.FETCH_ROOM_DETAILS_FAILED:
-            return {...state, isFetching: false};
-        case actions.UPDATE_ROOM_DETAILS:
-            return {...state, isFetching: false, rooms: {...state.rooms, [action.room.id]: action.room}};
-        default:
-            return state;
+export default combineReducers({
+    request: requestReducer(
+        roomDetailsActions.FETCH_REQUEST,
+        roomDetailsActions.FETCH_SUCCESS,
+        roomDetailsActions.FETCH_ERROR
+    ),
+    rooms: (state = {}, action) => {
+        switch (action.type) {
+            case roomDetailsActions.DETAILS_RECEIVED: {
+                const room = action.data;
+                return {...state, [room.id]: room};
+            }
+            default:
+                return state;
+        }
     }
-}
+});

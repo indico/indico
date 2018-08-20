@@ -58,10 +58,7 @@ export default class BookRoom extends React.Component {
         filters: PropTypes.object.isRequired,
         timeline: PropTypes.object.isRequired,
         clearRoomList: PropTypes.func.isRequired,
-        roomDetails: PropTypes.shape({
-            list: PropTypes.array,
-            isFetching: PropTypes.bool,
-        }).isRequired,
+        roomDetailsFetching: PropTypes.bool.isRequired,
         fetchRoomDetails: PropTypes.func.isRequired,
         resetBookingState: PropTypes.func.isRequired,
         suggestions: PropTypes.object.isRequired,
@@ -116,7 +113,7 @@ export default class BookRoom extends React.Component {
 
     renderMainContent = () => {
         const {timelineRef} = this.state;
-        const {fetchRooms, roomDetails, rooms: {list, total, isFetching}, timeline: {isVisible}} = this.props;
+        const {fetchRooms, roomDetailsFetching, rooms: {list, total, isFetching}, timeline: {isVisible}} = this.props;
         const filterBar = <FilterBar />;
         const searchBar = <SearchBar onConfirm={fetchRooms} onTextChange={fetchRooms} />;
 
@@ -158,7 +155,7 @@ export default class BookRoom extends React.Component {
                         {this.renderSuggestions()}
                     </div>
                     <Dimmer.Dimmable>
-                        <Dimmer active={roomDetails.isFetching} page>
+                        <Dimmer active={roomDetailsFetching} page>
                             <Loader />
                         </Dimmer>
                     </Dimmer.Dimmable>
@@ -360,7 +357,7 @@ export default class BookRoom extends React.Component {
     };
 
     render() {
-        const {roomDetails, fetchRoomDetails, showMap} = this.props;
+        const {fetchRoomDetails, showMap} = this.props;
         return (
             <Grid columns={2}>
                 <Grid.Column width={showMap ? 11 : 16}>
@@ -372,13 +369,10 @@ export default class BookRoom extends React.Component {
                     </Grid.Column>
                 )}
                 <Route exact path="/book/:roomId/confirm" render={roomPreloader((roomId) => (
-                    <BookRoomModal open
-                                   room={roomDetails.rooms[roomId]}
-                                   onClose={this.closeBookingModal} />
+                    <BookRoomModal open roomId={roomId} onClose={this.closeBookingModal} />
                 ), fetchRoomDetails)} />
                 <Route exact path="/book/:roomId/details" render={roomPreloader((roomId) => (
-                    <RoomDetailsModal roomDetails={roomDetails.rooms[roomId]}
-                                      onClose={this.closeModal} />
+                    <RoomDetailsModal roomId={roomId} onClose={this.closeModal} />
                 ), fetchRoomDetails)} />
             </Grid>
         );

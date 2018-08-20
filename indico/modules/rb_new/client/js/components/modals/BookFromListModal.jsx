@@ -28,6 +28,7 @@ import {queryString as queryStringSerializer} from '../../serializers/filters';
 import {RoomBasicDetails} from '../RoomBasicDetails';
 import {setFilters, fetchBookingAvailability, resetBookingState} from '../../actions';
 import BookingBootstrapForm from '../BookingBootstrapForm';
+import {selectors as roomDetailsSelectors} from '../../common/roomDetails';
 
 import './RoomDetailsModal.module.scss';
 
@@ -119,20 +120,31 @@ class BookFromListModal extends React.Component {
 }
 
 export default connect(
-    ({bookRoomForm: {timeline}}) => ({
-        availability: timeline ? timeline.availability : null
+    (state, {roomId}) => ({
+        room: roomDetailsSelectors.getDetails(state, roomId),
+        availability: state.bookRoomForm.timeline ? state.bookRoomForm.timeline.availability : null,
     }),
-    (dispatch, {room}) => ({
-        refreshCollisions(filters) {
-            dispatch(fetchBookingAvailability(room, filters));
-        },
+    (dispatch) => ({
         resetCollisions() {
             dispatch(resetBookingState());
         },
-        onBook(filters) {
-            const qs = stateToQueryString({filters}, queryStringSerializer);
-            dispatch(setFilters('bookRoom', filters));
-            dispatch(push(`/book/${room.id}/confirm?${qs}`));
-        }
-    })
+        dispatch,
+    }),
+    (stateProps, dispatchProps, ownProps) => {
+        const {room} = stateProps;
+        const {dispatch, ...realDispatchProps} = dispatchProps;
+        return {
+            ...ownProps,
+            ...stateProps,
+            ...realDispatchProps,
+            refreshCollisions(filters) {
+                dispatch(fetchBookingAvailability(room, filters));
+            },
+            onBook(filters) {
+                const qs = stateToQueryString({filters}, queryStringSerializer);
+                dispatch(setFilters('bookRoom', filters));
+                dispatch(push(`/book/${room.id}/confirm?${qs}`));
+            },
+        };
+    }
 )(BookFromListModal);

@@ -18,18 +18,22 @@ import {connect} from 'react-redux';
 
 import BookRoomModal from '../components/modals/BookRoomModal';
 import {createBooking, fetchBookingAvailability} from '../actions';
+import {selectors as roomDetailsSelectors} from '../common/roomDetails';
 
 
-const mapStateToProps = ({
-    bookRoom: {filters: {recurrence, dates, timeSlot}},
-    bookRoomForm: {timeline},
-    user,
-}, {room}) => {
+const mapStateToProps = (state, {roomId}) => {
+    const {
+        bookRoom: {filters: {recurrence, dates, timeSlot}},
+        bookRoomForm: {timeline},
+        user,
+    } = state;
+    const room = roomDetailsSelectors.getDetails(state, roomId);
     return {
-        bookingData: {recurrence, dates, timeSlot, room},
+        bookingData: {recurrence, dates, timeSlot},
         availability: timeline && timeline.availability,
         dateRange: timeline && timeline.dateRange,
         user,
+        room,
     };
 };
 
@@ -52,7 +56,7 @@ const mapDispatchToProps = (dispatch) => ({
 });
 
 const mergeProps = (stateProps, dispatchProps, ownProps) => {
-    const {bookingData: {room, ...filters}} = stateProps;
+    const {bookingData: filters, room} = stateProps;
     const {dispatch} = dispatchProps;
     return {
         ...stateProps,
