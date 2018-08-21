@@ -20,20 +20,17 @@ import * as actions from '../../actions';
 
 const initialRoomsState = {
     list: [],
-    map: {},
     total: 0,
     isFetching: false
 };
 
 
 function mergeRooms(state, action) {
-    const {list: oldList, map: oldMap} = state;
+    const {list: oldList} = state;
     const {clear, total, rooms: newList} = action;
-    const newMap = newList.reduce((obj, r) => ({...obj, [r.id]: r}), {});
     return {
         total,
         list: clear ? newList : oldList.concat(newList),
-        map: clear ? newMap : {...oldMap, ...newMap}
     };
 }
 

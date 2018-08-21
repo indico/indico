@@ -51,7 +51,7 @@ export default class BookRoom extends React.Component {
         clearTextFilter: PropTypes.func.isRequired,
         rooms: PropTypes.shape({
             list: PropTypes.array,
-            map: PropTypes.object,
+            total: PropTypes.number,
             isFetching: PropTypes.bool,
         }).isRequired,
         fetchRooms: PropTypes.func.isRequired,
