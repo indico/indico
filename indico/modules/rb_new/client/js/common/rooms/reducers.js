@@ -15,10 +15,26 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import {RequestState} from 'indico/utils/redux';
+import {combineReducers} from 'redux';
+
+import {requestReducer} from 'indico/utils/redux';
+import * as roomsActions from './actions';
 
 
-export const isFetching = ({roomDetails}) => roomDetails.request.state === RequestState.STARTED;
-const getRooms = ({roomDetails}) => roomDetails.rooms;
-export const getDetails = (state, roomId) => getRooms(state)[roomId];
-export const hasDetails = (state, roomId) => getRooms(state).hasOwnProperty(roomId);
+export default combineReducers({
+    request: requestReducer(
+        roomsActions.FETCH_DETAILS_REQUEST,
+        roomsActions.FETCH_DETAILS_SUCCESS,
+        roomsActions.FETCH_DETAILS_ERROR
+    ),
+    rooms: (state = {}, action) => {
+        switch (action.type) {
+            case roomsActions.DETAILS_RECEIVED: {
+                const room = action.data;
+                return {...state, [room.id]: room};
+            }
+            default:
+                return state;
+        }
+    }
+});

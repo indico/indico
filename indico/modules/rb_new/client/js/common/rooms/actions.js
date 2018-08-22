@@ -20,23 +20,23 @@ import {indicoAxios} from 'indico/utils/axios';
 import {ajaxAction} from 'indico/utils/redux';
 
 
-export const DETAILS_RECEIVED = 'roomDetails/DETAILS_RECEIVED';
-export const FETCH_REQUEST = 'roomDetails/FETCH_REQUEST';
-export const FETCH_SUCCESS = 'roomDetails/FETCH_SUCCESS';
-export const FETCH_ERROR = 'roomDetails/FETCH_ERROR';
+export const DETAILS_RECEIVED = 'rooms/DETAILS_RECEIVED';
+export const FETCH_DETAILS_REQUEST = 'rooms/FETCH_DETAILS_REQUEST';
+export const FETCH_DETAILS_SUCCESS = 'rooms/FETCH_DETAILS_SUCCESS';
+export const FETCH_DETAILS_ERROR = 'rooms/FETCH_DETAILS_ERROR';
 
 
 export function fetchDetails(id) {
     return async (dispatch, getStore) => {
-        const {roomDetails: {rooms}} = getStore();
+        const {rooms: {details: rooms}} = getStore();
         if (id in rooms) {
             return;
         }
         return await ajaxAction(
             () => indicoAxios.get(fetchRoomDetailsURL({room_id: id})),
-            FETCH_REQUEST,
-            [DETAILS_RECEIVED, FETCH_SUCCESS],
-            FETCH_ERROR
+            FETCH_DETAILS_REQUEST,
+            [DETAILS_RECEIVED, FETCH_DETAILS_SUCCESS],
+            FETCH_DETAILS_ERROR
         )(dispatch);
     };
 }

@@ -38,7 +38,7 @@ import BookFromListModal from '../../components/modals/BookFromListModal';
 import BlockingModal from '../../components/modals/BlockingModal';
 import {queryString as queryStringSerializer} from '../../serializers/filters';
 import * as actions from '../../actions';
-import {actions as roomDetailsActions, selectors as roomDetailsSelectors} from '../../common/roomDetails';
+import {actions as roomsActions, selectors as roomsSelectors} from '../../common/rooms';
 
 import './RoomList.module.scss';
 
@@ -248,7 +248,7 @@ class RoomList extends React.Component {
 export default connect(
     state => ({
         ...state.roomList,
-        roomDetailsFetching: roomDetailsSelectors.isFetching(state),
+        roomDetailsFetching: roomsSelectors.isFetching(state),
         queryString: stateToQueryString(state.roomList, queryStringSerializer),
         showMap: !!state.mapAspects.list && !!state.staticData.tileServerURL,
     }),
@@ -258,7 +258,7 @@ export default connect(
                 dispatch(actions.fetchRooms('roomList', clear));
                 dispatch(actions.fetchMapRooms('roomList'));
             },
-            fetchRoomDetails: bindActionCreators(roomDetailsActions.fetchDetails, dispatch),
+            fetchRoomDetails: bindActionCreators(roomsActions.fetchDetails, dispatch),
         },
         dispatch,
     }),

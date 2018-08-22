@@ -22,7 +22,7 @@ import moment from 'moment';
 import {Dimmer} from 'semantic-ui-react';
 import {Preloader} from 'indico/react/util';
 
-import {selectors as roomDetailsSelectors} from './common/roomDetails';
+import {selectors as roomsSelectors} from './common/rooms';
 
 
 export function toMoment(dt, format) {
@@ -184,7 +184,7 @@ export const pushStateMergeProps = (stateProps, dispatchProps, ownProps) => {
 export const roomPreloader = (componentFunc, action) => {
     // eslint-disable-next-line react/display-name, react/prop-types
     return ({match: {params: {roomId}}}) => (
-        <Preloader checkCached={state => roomDetailsSelectors.hasDetails(state, roomId)}
+        <Preloader checkCached={state => roomsSelectors.hasDetails(state, roomId)}
                    action={() => action(roomId)}
                    dimmer={<Dimmer page />}>
             {() => componentFunc(roomId)}

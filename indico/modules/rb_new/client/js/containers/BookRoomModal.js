@@ -18,7 +18,7 @@ import {connect} from 'react-redux';
 
 import BookRoomModal from '../components/modals/BookRoomModal';
 import {createBooking, fetchBookingAvailability} from '../actions';
-import {selectors as roomDetailsSelectors} from '../common/roomDetails';
+import {selectors as roomsSelectors} from '../common/rooms';
 
 
 const mapStateToProps = (state, {roomId}) => {
@@ -27,7 +27,7 @@ const mapStateToProps = (state, {roomId}) => {
         bookRoomForm: {timeline},
         user,
     } = state;
-    const room = roomDetailsSelectors.getDetails(state, roomId);
+    const room = roomsSelectors.getDetails(state, roomId);
     return {
         bookingData: {recurrence, dates, timeSlot},
         availability: timeline && timeline.availability,

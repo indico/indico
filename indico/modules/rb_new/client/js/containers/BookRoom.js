@@ -31,13 +31,13 @@ import {
     toggleTimelineView
 } from '../actions';
 import {pushStateMergeProps} from '../util';
-import {actions as roomDetailsActions, selectors as roomDetailsSelectors} from '../common/roomDetails';
+import {actions as roomsActions, selectors as roomsSelectors} from '../common/rooms';
 
 
 const mapStateToProps = (state) => {
     return {
         ...state.bookRoom,
-        roomDetailsFetching: roomDetailsSelectors.isFetching(state),
+        roomDetailsFetching: roomsSelectors.isFetching(state),
         queryString: stateToQueryString(state.bookRoom, queryStringFilterSerializer, queryStringTimelineSerializer),
         showMap: !!state.mapAspects.list && !!state.staticData.tileServerURL,
     };
@@ -54,7 +54,7 @@ const mapDispatchToProps = dispatch => ({
         dispatch(fetchRooms('bookRoom', clear));
         dispatch(fetchMapRooms('bookRoom'));
     },
-    fetchRoomDetails: bindActionCreators(roomDetailsActions.fetchDetails, dispatch),
+    fetchRoomDetails: bindActionCreators(roomsActions.fetchDetails, dispatch),
     resetBookingState() {
         dispatch(resetBookingState());
     },

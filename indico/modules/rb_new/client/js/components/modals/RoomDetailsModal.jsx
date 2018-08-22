@@ -24,7 +24,7 @@ import {Translate, Param} from 'indico/react/i18n';
 import {RoomBasicDetails} from '../RoomBasicDetails';
 import TimelineContent from '../TimelineContent';
 import TimelineLegend from '../TimelineLegend';
-import {selectors as roomDetailsSelectors} from '../../common/roomDetails';
+import {selectors as roomsSelectors} from '../../common/rooms';
 
 import './RoomDetailsModal.module.scss';
 
@@ -73,7 +73,7 @@ export default (namespace) => {
         ...state[namespace].filters,
         hasOwnedRooms: state.user.hasOwnedRooms,
         hasFavoriteRooms: Object.values(state.user.favoriteRooms).some(fr => fr),
-        roomDetails: roomDetailsSelectors.getDetails(state, roomId),
+        roomDetails: roomsSelectors.getDetails(state, roomId),
         namespace
     });
 

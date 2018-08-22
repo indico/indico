@@ -28,7 +28,7 @@ import {queryString as queryStringSerializer} from '../../serializers/filters';
 import {RoomBasicDetails} from '../RoomBasicDetails';
 import {setFilters, fetchBookingAvailability, resetBookingState} from '../../actions';
 import BookingBootstrapForm from '../BookingBootstrapForm';
-import {selectors as roomDetailsSelectors} from '../../common/roomDetails';
+import {selectors as roomsSelectors} from '../../common/rooms';
 
 import './RoomDetailsModal.module.scss';
 
@@ -121,7 +121,7 @@ class BookFromListModal extends React.Component {
 
 export default connect(
     (state, {roomId}) => ({
-        room: roomDetailsSelectors.getDetails(state, roomId),
+        room: roomsSelectors.getDetails(state, roomId),
         availability: state.bookRoomForm.timeline ? state.bookRoomForm.timeline.availability : null,
     }),
     (dispatch) => ({

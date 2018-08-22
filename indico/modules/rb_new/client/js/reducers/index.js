@@ -21,7 +21,7 @@ import roomListReducer from './roomList';
 import equipmentReducer from './equipment';
 import buildingsReducer from './buildings';
 import mapAspectsReducer from './mapAspects';
-import {reducer as roomDetailsReducer} from '../common/roomDetails';
+import {reducer as roomsReducer} from '../common/rooms';
 import bookRoomFormReducer from './bookRoomForm';
 import blockingsReducer from './blockings';
 import {reducer as calendarReducer} from '../modules/calendar';
@@ -34,7 +34,7 @@ const reducers = {
     equipment: equipmentReducer,
     buildings: buildingsReducer,
     mapAspects: mapAspectsReducer,
-    roomDetails: roomDetailsReducer,
+    rooms: roomsReducer,
     bookRoomForm: bookRoomFormReducer,
     blockingList: blockingsReducer,
     calendar: calendarReducer
