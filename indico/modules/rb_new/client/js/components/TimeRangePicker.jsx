@@ -56,14 +56,16 @@ export default class TimeRangePicker extends React.Component {
         const startOptions = this.generateStartTimeOptions();
         const endOptions = this.generateEndTimeOptions(startTime);
         const duration = moment.duration(endTime.diff(startTime));
-        this.addOptionIfMissing(startOptions, serializeTime(moment(startTime)));
-        this.addOptionIfMissing(endOptions, serializeTime(moment(endTime)));
+        const startSearchQuery = serializeTime(moment(startTime));
+        const endSearchQuery = serializeTime(moment(endTime));
         this.state = {
             startTime,
             endTime,
             startOptions,
             endOptions,
-            duration
+            duration,
+            startSearchQuery,
+            endSearchQuery
         };
     }
 
@@ -99,23 +101,26 @@ export default class TimeRangePicker extends React.Component {
         return options;
     };
 
-    addOptionIfMissing = (options, value) => {
-        const found = options.some((el) => {
-            return el.value === value;
-        });
-        if (!found) {
-            options.unshift({key: value, value, text: value});
-            return true;
-        }
-        return false;
-    };
-
-    updateStartTime = (startTime, endTime, duration) => {
-        const start = moment(startTime, ['HH:mm', 'Hmm']);
-        let end = toMoment(endTime, 'HH:mm');
-        if (!start.isValid()) {
+    updateStartTime = (event, currentStartTime, previousStartTime, endTime, duration, startSearchQuery) => {
+        if (event.type === 'keydown' && (event.keyCode === 40 || event.keyCode === 38)) {
+            this.setState({
+                startSearchQuery: currentStartTime
+            });
             return;
         }
+        let start;
+        if (event.type === 'click') {
+            start = moment(currentStartTime, ['HH:mm', 'Hmm']);
+        } else {
+            start = moment(startSearchQuery, ['HH:mm', 'Hmm']);
+        }
+        if (!start.isValid()) {
+            this.setState({
+                startSearchQuery: serializeTime(previousStartTime)
+            });
+            return;
+        }
+        let end = toMoment(endTime, 'HH:mm');
         if (end <= start) {
             end = moment(start).add(duration);
             if (end > moment().endOf('day')) {
@@ -124,27 +129,39 @@ export default class TimeRangePicker extends React.Component {
         } else {
             duration = moment.duration(end.diff(start));
         }
-        const startOptions = this.generateStartTimeOptions();
         const endOptions = this.generateEndTimeOptions(start);
-        this.addOptionIfMissing(startOptions, serializeTime(moment(start)));
-        this.addOptionIfMissing(endOptions, serializeTime(moment(end)));
         this.setState({
             startTime: start,
             endTime: end,
+            startSearchQuery: serializeTime(start),
+            endSearchQuery: serializeTime(end),
             duration,
-            startOptions,
-            endOptions
+            endOptions,
         });
         const {onChange} = this.props;
         onChange(start, end);
     };
 
-    updateEndTime = (startTime, endTime, duration) => {
-        let start = toMoment(startTime, 'HH:mm');
-        const end = moment(endTime, ['HH:mm', 'Hmm']);
-        if (!end.isValid()) {
+    updateEndTime = (event, currentEndTime, previousEndTime, startTime, duration, endSearchQuery) => {
+        if (event.type === 'keydown' && (event.keyCode === 40 || event.keyCode === 38)) {
+            this.setState({
+                endSearchQuery: currentEndTime
+            });
             return;
         }
+        let end;
+        if (event.type === 'click') {
+            end = moment(currentEndTime, ['HH:mm', 'Hmm']);
+        } else {
+            end = moment(endSearchQuery, ['HH:mm', 'Hmm']);
+        }
+        if (!end.isValid()) {
+            this.setState({
+                endSearchQuery: serializeTime(previousEndTime)
+            });
+            return;
+        }
+        let start = toMoment(startTime, 'HH:mm');
         if (end <= start) {
             start = moment(end).subtract(duration);
             if (start < moment().startOf('day')) {
@@ -153,48 +170,56 @@ export default class TimeRangePicker extends React.Component {
         } else {
             duration = moment.duration(end.diff(start));
         }
-        const startOptions = this.generateStartTimeOptions();
         const endOptions = this.generateEndTimeOptions(start);
-        this.addOptionIfMissing(startOptions, serializeTime(moment(start)));
-        this.addOptionIfMissing(endOptions, serializeTime(moment(end)));
         this.setState({
             startTime: start,
             endTime: end,
+            startSearchQuery: serializeTime(start),
+            endSearchQuery: serializeTime(end),
             duration,
-            startOptions,
             endOptions,
         });
         const {onChange} = this.props;
         onChange(start, end, true);
     };
 
+    onStartSearchChange = (event) => {
+        this.setState({
+            startSearchQuery: event.target.value
+        });
+    };
+
+    onEndSearchChange = (event) => {
+        this.setState({
+            endSearchQuery: event.target.value
+        });
+    };
+
     render() {
-        const {startTime, endTime, startOptions, endOptions, duration} = this.state;
+        const {startTime, endTime, startOptions, endOptions, duration, startSearchQuery, endSearchQuery} = this.state;
         return (
             <div styleName="time-range-picker">
                 <Dropdown options={startOptions}
-                          search={() => []}
+                          search={() => startOptions}
                           icon={null}
-                          text={serializeTime(startTime)}
                           selection
-                          allowAdditions
-                          additionLabel=""
                           styleName="start-time-dropdown"
+                          searchQuery={startSearchQuery}
+                          onSearchChange={(event) => this.onStartSearchChange(event)}
                           value={serializeTime(startTime)}
-                          onChange={(_, {value}) => {
-                              this.updateStartTime(value, endTime, duration);
+                          onChange={(event, {value}) => {
+                              this.updateStartTime(event, value, startTime, endTime, duration, startSearchQuery);
                           }} />
                 <Dropdown options={endOptions}
-                          search={() => []}
+                          search={() => this.generateEndTimeOptions(startTime)}
                           icon={null}
-                          text={serializeTime(endTime)}
                           selection
-                          allowAdditions
-                          additionLabel=""
                           styleName="end-time-dropdown"
+                          searchQuery={endSearchQuery}
+                          onSearchChange={(event) => this.onEndSearchChange(event)}
                           value={serializeTime(endTime)}
-                          onChange={(_, {value}) => {
-                              this.updateEndTime(startTime, value, duration);
+                          onChange={(event, {value}) => {
+                              this.updateEndTime(event, value, endTime, startTime, duration, endSearchQuery);
                           }} />
             </div>
         );
