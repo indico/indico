@@ -15,22 +15,63 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import {combineReducers} from 'redux';
+
+import {requestReducer} from 'indico/utils/redux';
 import * as actions from '../actions';
 
 
-const initialState = {};
+const initialUserInfoState = {
+    firstName: '',
+    lastName: '',
+    email: '',
+    avatarBgColor: '',
+    language: '',
+    isAdmin: false,
+    hasOwnedRooms: false,
+};
 
-export default function reducer(state = initialState, action) {
-    switch (action.type) {
-        case actions.SET_FAVORITE_ROOMS:
-            return {...state, favoriteRooms: Object.assign({}, ...action.rooms.map((id) => ({[id]: true})))};
-        case actions.SET_USER_INFO:
-            return {...state, hasOwnedRooms: action.data.has_owned_rooms};
-        case actions.ADD_FAVORITE_ROOM:
-            return {...state, favoriteRooms: {...state.favoriteRooms, [action.id]: true}};
-        case actions.DEL_FAVORITE_ROOM:
-            return {...state, favoriteRooms: {...state.favoriteRooms, [action.id]: false}};
-        default:
-            return state;
+export default combineReducers({
+    requests: combineReducers({
+        info: requestReducer(
+            actions.FETCH_USER_INFO_REQUEST,
+            actions.FETCH_USER_INFO_SUCCESS,
+            actions.FETCH_USER_INFO_ERROR
+        ),
+        favorites: requestReducer(
+            actions.FETCH_FAVORITES_REQUEST,
+            actions.FETCH_FAVORITES_SUCCESS,
+            actions.FETCH_FAVORITES_ERROR
+        ),
+    }),
+    info: (state = initialUserInfoState, action) => {
+        switch (action.type) {
+            case actions.USER_INFO_RECEIVED: {
+                const user = action.data;
+                return {
+                    firstName: user.first_name,
+                    lastName: user.last_name,
+                    email: user.email,
+                    avatarBgColor: user.avatar_bg_color,
+                    language: user.language,
+                    isAdmin: user.is_admin,
+                    hasOwnedRooms: user.has_owned_rooms
+                };
+            }
+            default:
+                return state;
+        }
+    },
+    favorites: (state = {}, action) => {
+        switch (action.type) {
+            case actions.FAVORITES_RECEIVED:
+                return action.data.reduce((obj, id) => ({...obj, [id]: true}), {});
+            case actions.ADD_FAVORITE_ROOM:
+                return {...state, [action.id]: true};
+            case actions.DEL_FAVORITE_ROOM:
+                return {...state, [action.id]: false};
+            default:
+                return state;
+        }
     }
-}
+});

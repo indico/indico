@@ -16,14 +16,15 @@
  */
 import {connect} from 'react-redux';
 import {setFilterParameter, fetchRooms, fetchMapRooms, fetchBlockings} from '../actions';
+import * as selectors from '../selectors';
 
 
 export default (namespace, componentClass) => {
     const mapStateToProps = state => ({
-        equipmentTypes: state.equipment.types,
+        equipmentTypes: selectors.getEquipmentTypes(state),
         ...state[namespace].filters,
-        hasOwnedRooms: state.user.hasOwnedRooms,
-        hasFavoriteRooms: Object.values(state.user.favoriteRooms).some(fr => fr),
+        hasOwnedRooms: selectors.hasOwnedRooms(state),
+        hasFavoriteRooms: selectors.hasFavoriteRooms(state),
         namespace
     });
 

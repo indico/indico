@@ -15,16 +15,24 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import {combineReducers} from 'redux';
+
+import {requestReducer} from 'indico/utils/redux';
 import * as actions from '../actions';
 
 
-const initialState = {types: []};
-
-export default function reducer(state = initialState, action) {
-    switch (action.type) {
-        case actions.SET_EQUIPMENT_TYPES:
-            return {...state, types: action.types};
-        default:
-            return state;
+export default combineReducers({
+    request: requestReducer(
+        actions.FETCH_EQUIPMENT_TYPES_REQUEST,
+        actions.FETCH_EQUIPMENT_TYPES_SUCCESS,
+        actions.FETCH_EQUIPMENT_TYPES_ERROR
+    ),
+    types: (state = [], action) => {
+        switch (action.type) {
+            case actions.EQUIPMENT_TYPES_RECEIVED:
+                return action.data;
+            default:
+                return state;
+        }
     }
-}
+});

@@ -17,29 +17,31 @@
 import {connect} from 'react-redux';
 
 import App from '../components/App';
-import {fetchBuildings, fetchEquipmentTypes, fetchFavoriteRooms, fetchUserInfo,
-        fetchMapAspects, resetPageState} from '../actions';
+import {
+    fetchBuildings, fetchEquipmentTypes, fetchFavoriteRooms, fetchUserInfo,
+    fetchMapAspects, resetPageState
+} from '../actions';
 import {history} from '../store';
+import {actions as roomsActions} from '../common/rooms';
+import * as selectors from '../selectors';
 
-
-const mapStateToProps = ({bookRoom: {filters: {recurrence: {type}}}}) => ({
-    filtersSet: !!history.location.search || !!type
-});
-
-const mapDispatchToProps = (dispatch) => ({
-    fetchInitialData() {
-        dispatch(fetchUserInfo());
-        dispatch(fetchFavoriteRooms());
-        dispatch(fetchEquipmentTypes());
-        dispatch(fetchBuildings());
-        dispatch(fetchMapAspects());
-    },
-    resetPageState() {
-        dispatch(resetPageState());
-    }
-});
 
 export default connect(
-    mapStateToProps,
-    mapDispatchToProps
+    state => ({
+        filtersSet: !!history.location.search || !!state.bookRoom.filters.recurrence.type,
+        isInitializing: selectors.isInitializing(state),
+    }),
+    dispatch => ({
+        fetchInitialData() {
+            dispatch(fetchUserInfo());
+            dispatch(fetchFavoriteRooms());
+            dispatch(fetchEquipmentTypes());
+            dispatch(fetchBuildings());
+            dispatch(fetchMapAspects());
+            dispatch(roomsActions.fetchRooms());
+        },
+        resetPageState() {
+            dispatch(resetPageState());
+        }
+    })
 )(App);

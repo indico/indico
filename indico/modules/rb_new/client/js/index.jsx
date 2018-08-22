@@ -29,6 +29,7 @@ import App from './containers/App';
 
 import createRBStore, {history} from './store';
 import {init} from './actions';
+import {getUserInfo} from './selectors';
 
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -36,16 +37,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const appContainer = document.getElementById('rb-app-container');
     const store = createRBStore({
-        user: {
-            firstName: Indico.User.first_name,
-            lastName: Indico.User.last_name,
-            email: Indico.User.email,
-            avatarBgColor: Indico.User.avatar_bg_color,
-            language: Indico.User.language,
-            isAdmin: Indico.User.is_admin,
-            favoriteRooms: {},
-            hasOwnedRooms: false,
-        },
         staticData: {
             availableLanguages: Indico.Settings.Languages,
             tileServerURL: Indico.Settings.TileServerURL,
@@ -54,7 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     store.dispatch(init());
-    setupUserMenu(document.getElementById('indico-user-menu-container'), store);
+    setupUserMenu(document.getElementById('indico-user-menu-container'), store, getUserInfo);
 
     ReactDOM.render(
         <Provider store={store}>

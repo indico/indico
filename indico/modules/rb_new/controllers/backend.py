@@ -35,7 +35,7 @@ from indico.modules.rb.models.favorites import favorite_room_table
 from indico.modules.rb.models.reservations import RepeatFrequency, Reservation
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb_new.schemas import (aspects_schema, blockings_schema, locations_schema, map_rooms_schema,
-                                           reservation_schema, room_details_schema, rooms_schema)
+                                           rb_user_schema, reservation_schema, room_details_schema, rooms_schema)
 from indico.modules.rb_new.util import (approve_or_request_blocking, build_rooms_spritesheet, create_blocking,
                                         get_buildings, get_equipment_types, get_room_blockings, get_room_calendar,
                                         get_room_details_availability, get_rooms_availability, get_suggestions,
@@ -202,7 +202,9 @@ class RHRoomFavorites(RHRoomBookingBase):
 
 class RHUserInfo(RHRoomBookingBase):
     def _process(self):
-        return jsonify(has_owned_rooms=has_managed_rooms(session.user))
+        data = rb_user_schema.dump(session.user).data
+        data['language'] = session.lang
+        return jsonify(data)
 
 
 class RHCreateBooking(RHRoomBookingBase):

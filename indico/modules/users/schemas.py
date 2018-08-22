@@ -23,7 +23,7 @@ from indico.modules.users import User
 class UserSchema(mm.ModelSchema):
     class Meta:
         model = User
-        fields = ('id', 'first_name', 'last_name', 'email', 'affiliation')
+        fields = ('id', 'first_name', 'last_name', 'email', 'affiliation', 'avatar_bg_color')
 
 
 user_schema = UserSchema()

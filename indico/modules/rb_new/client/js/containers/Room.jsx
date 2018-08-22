@@ -15,27 +15,21 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 
 import Room from '../components/Room';
 import {addFavoriteRoom, delFavoriteRoom} from '../actions';
+import * as selectors from '../selectors';
 
-
-const mapStateToProps = ({user: {favoriteRooms}, staticData: {roomsSpriteToken}}) => ({
-    favoriteRooms,
-    roomsSpriteToken
-});
-
-const mapDispatchToProps = dispatch => ({
-    addFavoriteRoom: (id) => {
-        dispatch(addFavoriteRoom(id));
-    },
-    delFavoriteRoom: (id) => {
-        dispatch(delFavoriteRoom(id));
-    },
-});
 
 export default connect(
-    mapStateToProps,
-    mapDispatchToProps
+    state => ({
+        favoriteRooms: selectors.getFavoriteRooms(state),
+        roomsSpriteToken: selectors.getRoomsSpriteToken(state),
+    }),
+    dispatch => bindActionCreators({
+        addFavoriteRoom,
+        delFavoriteRoom,
+    }, dispatch)
 )(Room);

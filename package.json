@@ -64,6 +64,7 @@
     "redux-lazy-scroll": "^0.1.1",
     "redux-router-querystring": ">=0.0.9",
     "redux-thunk": "^2.3.0",
+    "reselect": "^3.0.1",
     "rrule": "^2.2.0",
     "selectize": "^0.12.5",
     "semantic-ui-css": "^2.3.2",

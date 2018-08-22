@@ -21,18 +21,14 @@ import {Provider, connect} from 'react-redux';
 import UserMenu from '../components/UserMenu';
 
 
-const mapStateToProps = ({user, staticData}) => ({
-    staticData,
-    userData: user
-});
+export default function setupUserMenu(element, store, userInfoSelector) {
+    const Connector = connect(
+        state => ({
+            staticData: state.staticData,
+            userData: userInfoSelector(state),
+        })
+    )(UserMenu);
 
-const Connector = connect(
-    mapStateToProps,
-    null
-)(UserMenu);
-
-
-export default function setupUserMenu(element, store) {
     ReactDOM.render(
         <Provider store={store}>
             <Connector />

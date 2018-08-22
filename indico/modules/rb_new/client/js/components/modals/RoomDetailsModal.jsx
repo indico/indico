@@ -25,6 +25,7 @@ import {RoomBasicDetails} from '../RoomBasicDetails';
 import TimelineContent from '../TimelineContent';
 import TimelineLegend from '../TimelineLegend';
 import {selectors as roomsSelectors} from '../../common/rooms';
+import * as selectors from '../../selectors';
 
 import './RoomDetailsModal.module.scss';
 
@@ -71,8 +72,8 @@ export default (namespace) => {
     const mapStateToProps = (state, {roomId}) => ({
         equipmentTypes: state.equipment.types,
         ...state[namespace].filters,
-        hasOwnedRooms: state.user.hasOwnedRooms,
-        hasFavoriteRooms: Object.values(state.user.favoriteRooms).some(fr => fr),
+        hasOwnedRooms: selectors.hasOwnedRooms(state),
+        hasFavoriteRooms: selectors.hasFavoriteRooms(state),
         roomDetails: roomsSelectors.getDetails(state, roomId),
         namespace
     });

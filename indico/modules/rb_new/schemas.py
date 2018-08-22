@@ -29,6 +29,7 @@ from indico.modules.rb.models.room_attributes import RoomAttributeAssociation
 from indico.modules.rb.models.room_bookable_hours import BookableHours
 from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
 from indico.modules.rb.models.rooms import Room
+from indico.modules.users.schemas import UserSchema
 
 
 _room_fields = ('id', 'name', 'capacity', 'building', 'floor', 'number', 'is_public', 'location_name', 'has_vc',
@@ -117,6 +118,18 @@ class LocationsSchema(mm.ModelSchema):
         fields = ('id', 'name', 'rooms')
 
 
+class RBUserSchema(UserSchema):
+    has_owned_rooms = mm.Method('has_managed_rooms')
+
+    class Meta:
+        fields = UserSchema.Meta.fields + ('has_owned_rooms', 'is_admin')
+
+    def has_managed_rooms(self, user):
+        from indico.modules.rb_new.util import has_managed_rooms
+        return has_managed_rooms(user)
+
+
+rb_user_schema = RBUserSchema()
 rooms_schema = RoomSchema(many=True, only=_room_fields)
 room_details_schema = RoomSchema()
 map_rooms_schema = MapRoomSchema(many=True)

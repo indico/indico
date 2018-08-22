@@ -19,7 +19,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {Link, Redirect, Route, Switch} from 'react-router-dom';
 import {ConnectedRouter} from 'connected-react-router';
-import {Icon} from 'semantic-ui-react';
+import {Dimmer, Icon, Loader} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 import UserActions from '../containers/UserActions';
@@ -37,6 +37,7 @@ export default class App extends React.Component {
     static propTypes = {
         history: PropTypes.object.isRequired,
         filtersSet: PropTypes.bool.isRequired,
+        isInitializing: PropTypes.bool.isRequired,
         fetchInitialData: PropTypes.func.isRequired,
         resetPageState: PropTypes.func.isRequired
     };
@@ -47,7 +48,7 @@ export default class App extends React.Component {
     }
 
     render() {
-        const {history, filtersSet, resetPageState} = this.props;
+        const {history, filtersSet, resetPageState, isInitializing} = this.props;
 
         return (
             <ConnectedRouter history={history}>
@@ -84,6 +85,11 @@ export default class App extends React.Component {
                             <Route path="/calendar" component={Calendar} />
                         </Switch>
                     </div>
+                    <Dimmer.Dimmable>
+                        <Dimmer active={isInitializing} page>
+                            <Loader />
+                        </Dimmer>
+                    </Dimmer.Dimmable>
                 </div>
             </ConnectedRouter>
         );

@@ -39,10 +39,16 @@ import {ajax as ajaxBookingRules} from './serializers/bookings';
 export const INIT = 'INIT';
 export const RESET_PAGE_STATE = 'RESET_PAGE_STATE';
 // User
-export const SET_FAVORITE_ROOMS = 'SET_FAVORITE_ROOMS';
+export const FETCH_FAVORITES_REQUEST = 'FETCH_FAVORITES_REQUEST';
+export const FETCH_FAVORITES_SUCCESS = 'FETCH_FAVORITES_SUCCESS';
+export const FETCH_FAVORITES_ERROR = 'FETCH_FAVORITES_ERROR';
+export const FAVORITES_RECEIVED = 'FAVORITES_RECEIVED';
 export const ADD_FAVORITE_ROOM = 'ADD_FAVORITE_ROOM';
 export const DEL_FAVORITE_ROOM = 'DEL_FAVORITE_ROOM';
-export const SET_USER_INFO = 'SET_USER_INFO';
+export const FETCH_USER_INFO_REQUEST = 'FETCH_USER_INFO_REQUEST';
+export const FETCH_USER_INFO_SUCCESS = 'FETCH_USER_INFO_SUCCESS';
+export const FETCH_USER_INFO_ERROR = 'FETCH_USER_INFO_ERROR';
+export const USER_INFO_RECEIVED = 'USER_INFO_RECEIVED';
 // Filter
 export const SET_FILTER_PARAMETER = 'SET_FILTER_PARAMETER';
 export const SET_FILTERS = 'SET_FILTERS';
@@ -55,7 +61,10 @@ export const FETCH_MAP_ROOMS_FAILED = 'FETCH_MAP_ROOMS_FAILED';
 export const UPDATE_MAP_ROOMS = 'UPDATE_MAP_ROOMS';
 export const UPDATE_ROOM_DETAILS = 'UPDATE_ROOM_DETAILS';
 // Equipment types
-export const SET_EQUIPMENT_TYPES = 'SET_EQUIPMENT_TYPES';
+export const FETCH_EQUIPMENT_TYPES_REQUEST = 'FETCH_EQUIPMENT_TYPES_REQUEST';
+export const FETCH_EQUIPMENT_TYPES_SUCCESS = 'FETCH_EQUIPMENT_TYPES_SUCCESS';
+export const FETCH_EQUIPMENT_TYPES_ERROR = 'FETCH_EQUIPMENT_TYPES_ERROR';
+export const EQUIPMENT_TYPES_RECEIVED = 'EQUIPMENT_TYPES_RECEIVED';
 // Map
 export const FETCH_MAP_ASPECTS_STARTED = 'FETCH_MAP_ASPECTS_STARTED';
 export const FETCH_MAP_ASPECTS_FAILED = 'FETCH_MAP_ASPECTS_FAILED';
@@ -107,18 +116,12 @@ export function init() {
 }
 
 export function fetchEquipmentTypes() {
-    return async (dispatch) => {
-        let response;
-        try {
-            response = await indicoAxios.get(equipmentTypesURL());
-        } catch (error) {
-            handleAxiosError(error);
-            return;
-        }
-        if (response) {
-            dispatch({type: SET_EQUIPMENT_TYPES, types: response.data});
-        }
-    };
+    return ajaxAction(
+        () => indicoAxios.get(equipmentTypesURL()),
+        FETCH_EQUIPMENT_TYPES_REQUEST,
+        [EQUIPMENT_TYPES_RECEIVED, FETCH_EQUIPMENT_TYPES_SUCCESS],
+        FETCH_EQUIPMENT_TYPES_ERROR,
+    );
 }
 
 async function _sendFavoriteRoomsRequest(method, id = null) {
@@ -136,12 +139,12 @@ async function _sendFavoriteRoomsRequest(method, id = null) {
 }
 
 export function fetchFavoriteRooms() {
-    return async (dispatch) => {
-        const response = await _sendFavoriteRoomsRequest('GET');
-        if (response) {
-            dispatch({type: SET_FAVORITE_ROOMS, rooms: response.data});
-        }
-    };
+    return ajaxAction(
+        () => indicoAxios.get(favoriteRoomsURL()),
+        FETCH_FAVORITES_REQUEST,
+        [FAVORITES_RECEIVED, FETCH_FAVORITES_SUCCESS],
+        FETCH_FAVORITES_ERROR
+    );
 }
 
 export function addFavoriteRoom(id) {
@@ -165,19 +168,12 @@ export function delFavoriteRoom(id) {
 }
 
 export function fetchUserInfo() {
-    return async (dispatch) => {
-        let response;
-        try {
-            response = await indicoAxios.get(fetchUserInfoURL());
-        } catch (error) {
-            handleAxiosError(error);
-            return;
-        }
-
-        if (response) {
-            dispatch({type: SET_USER_INFO, data: response.data});
-        }
-    };
+    return ajaxAction(
+        () => indicoAxios.get(fetchUserInfoURL()),
+        FETCH_USER_INFO_REQUEST,
+        [USER_INFO_RECEIVED, FETCH_USER_INFO_SUCCESS],
+        FETCH_USER_INFO_ERROR
+    );
 }
 
 export function updateRooms(namespace, rooms, total, clear) {
