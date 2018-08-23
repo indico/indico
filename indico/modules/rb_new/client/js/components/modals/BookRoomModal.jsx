@@ -25,7 +25,7 @@ import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/
 import PrincipalSearchField from 'indico/react/components/PrincipalSearchField';
 import recurrenceRenderer from '../filters/RecurrenceRenderer';
 import {toMoment} from '../../util';
-import {RoomBasicDetails} from '../RoomBasicDetails';
+import RoomBasicDetails from '../RoomBasicDetails';
 import TimelineContent from '../TimelineContent';
 import TimelineLegend from '../TimelineLegend';
 

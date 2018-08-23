@@ -50,7 +50,7 @@ RoomEquipmentBox.propTypes = {
     room: PropTypes.object.isRequired,
 };
 
-function _RoomBasicDetails({room, roomsSpriteToken}) {
+function RoomBasicDetails({room, roomsSpriteToken}) {
     const {
         owner_name: owner, latitude, longitude, division, location_name: location, surface_area: surface, capacity,
         telephone, full_name: name
@@ -93,12 +93,14 @@ function _RoomBasicDetails({room, roomsSpriteToken}) {
     );
 }
 
-_RoomBasicDetails.propTypes = {
+RoomBasicDetails.propTypes = {
     room: PropTypes.object.isRequired,
     roomsSpriteToken: PropTypes.string.isRequired,
 };
 
 
-export const RoomBasicDetails = connect(
-    ({staticData: {roomsSpriteToken}}) => ({roomsSpriteToken})
-)(_RoomBasicDetails);
+export default connect(
+    state => ({
+        roomsSpriteToken: selectors.getRoomsSpriteToken(state),
+    })
+)(RoomBasicDetails);

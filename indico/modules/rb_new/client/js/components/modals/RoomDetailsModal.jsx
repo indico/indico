@@ -21,7 +21,7 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {Button, Grid, Icon, Modal, Header, Message, List, Segment, Popup} from 'semantic-ui-react';
 import {Translate, Param} from 'indico/react/i18n';
-import {RoomBasicDetails} from '../RoomBasicDetails';
+import RoomBasicDetails from '../RoomBasicDetails';
 import TimelineContent from '../TimelineContent';
 import TimelineLegend from '../TimelineLegend';
 import {selectors as roomsSelectors} from '../../common/rooms';
