@@ -18,19 +18,20 @@
 import {createSelector} from 'reselect';
 
 import {RequestState} from 'indico/utils/redux';
-import {selectors as roomsSelectors} from './common/rooms';
-import {selectors as userSelectors} from './common/user';
 
 
-// TODO: move these to common/.../selectors.js
-export const getRoomsSpriteToken = ({staticData}) => staticData.roomsSpriteToken;
+export const hasLoadedUserInfo = ({user}) => user.requests.info.state === RequestState.SUCCESS;
+export const getUserInfo = ({user}) => user.info;
+export const isUserAdmin = state => getUserInfo(state).isAdmin;
+export const hasOwnedRooms = state => getUserInfo(state).hasOwnedRooms;
 
-const hasLoadedEquipmentTypes = ({equipment}) => equipment.request.state === RequestState.SUCCESS;
-export const getEquipmentTypes = ({equipment}) => equipment.types;
-
-export const isInitializing = createSelector(
-    userSelectors.hasLoadedUserInfo,
-    roomsSelectors.hasLoadedRooms,
-    hasLoadedEquipmentTypes,
-    (...ready) => ready.some(x => !x)
+const getFavoriteRooms = ({user}) => user.favorites;
+export const hasFavoriteRooms = createSelector(
+    getFavoriteRooms,
+    favoriteRooms => Object.values(favoriteRooms).some(fr => fr),
+);
+export const makeIsFavoriteRoom = () => createSelector(
+    getFavoriteRooms,
+    (state, {room}) => room.id,
+    (favoriteRooms, roomId) => !!favoriteRooms[roomId]
 );

@@ -17,12 +17,10 @@
 import {connect} from 'react-redux';
 
 import App from '../components/App';
-import {
-    fetchBuildings, fetchEquipmentTypes, fetchFavoriteRooms, fetchUserInfo,
-    fetchMapAspects, resetPageState
-} from '../actions';
+import {fetchBuildings, fetchEquipmentTypes, fetchMapAspects, resetPageState} from '../actions';
 import {history} from '../store';
 import {actions as roomsActions} from '../common/rooms';
+import {actions as userActions} from '../common/user';
 import * as selectors from '../selectors';
 
 
@@ -33,8 +31,8 @@ export default connect(
     }),
     dispatch => ({
         fetchInitialData() {
-            dispatch(fetchUserInfo());
-            dispatch(fetchFavoriteRooms());
+            dispatch(userActions.fetchUserInfo());
+            dispatch(userActions.fetchFavoriteRooms());
             dispatch(fetchEquipmentTypes());
             dispatch(fetchBuildings());
             dispatch(fetchMapAspects());

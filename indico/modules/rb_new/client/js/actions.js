@@ -19,8 +19,6 @@ import buildSearchRoomsURL from 'indico-url:rooms_new.search_rooms';
 import fetchMapRoomsURL from 'indico-url:rooms_new.map_rooms';
 import fetchMapAspectsURL from 'indico-url:rooms_new.default_aspects';
 import fetchBuildingsURL from 'indico-url:rooms_new.buildings';
-import favoriteRoomsURL from 'indico-url:rooms_new.favorite_rooms';
-import fetchUserInfoURL from 'indico-url:rooms_new.user_info';
 import equipmentTypesURL from 'indico-url:rooms_new.equipment_types';
 import fetchTimelineDataURL from 'indico-url:rooms_new.timeline';
 import createBookingURL from 'indico-url:rooms_new.create_booking';
@@ -38,17 +36,6 @@ import {ajax as ajaxBookingRules} from './serializers/bookings';
 // Page state
 export const INIT = 'INIT';
 export const RESET_PAGE_STATE = 'RESET_PAGE_STATE';
-// User
-export const FETCH_FAVORITES_REQUEST = 'FETCH_FAVORITES_REQUEST';
-export const FETCH_FAVORITES_SUCCESS = 'FETCH_FAVORITES_SUCCESS';
-export const FETCH_FAVORITES_ERROR = 'FETCH_FAVORITES_ERROR';
-export const FAVORITES_RECEIVED = 'FAVORITES_RECEIVED';
-export const ADD_FAVORITE_ROOM = 'ADD_FAVORITE_ROOM';
-export const DEL_FAVORITE_ROOM = 'DEL_FAVORITE_ROOM';
-export const FETCH_USER_INFO_REQUEST = 'FETCH_USER_INFO_REQUEST';
-export const FETCH_USER_INFO_SUCCESS = 'FETCH_USER_INFO_SUCCESS';
-export const FETCH_USER_INFO_ERROR = 'FETCH_USER_INFO_ERROR';
-export const USER_INFO_RECEIVED = 'USER_INFO_RECEIVED';
 // Filter
 export const SET_FILTER_PARAMETER = 'SET_FILTER_PARAMETER';
 export const SET_FILTERS = 'SET_FILTERS';
@@ -121,58 +108,6 @@ export function fetchEquipmentTypes() {
         FETCH_EQUIPMENT_TYPES_REQUEST,
         [EQUIPMENT_TYPES_RECEIVED, FETCH_EQUIPMENT_TYPES_SUCCESS],
         FETCH_EQUIPMENT_TYPES_ERROR,
-    );
-}
-
-async function _sendFavoriteRoomsRequest(method, id = null) {
-    let response;
-    try {
-        response = await indicoAxios.request({
-            method,
-            url: favoriteRoomsURL(id !== null ? {room_id: id} : {})
-        });
-    } catch (error) {
-        handleAxiosError(error);
-        return;
-    }
-    return response;
-}
-
-export function fetchFavoriteRooms() {
-    return ajaxAction(
-        () => indicoAxios.get(favoriteRoomsURL()),
-        FETCH_FAVORITES_REQUEST,
-        [FAVORITES_RECEIVED, FETCH_FAVORITES_SUCCESS],
-        FETCH_FAVORITES_ERROR
-    );
-}
-
-export function addFavoriteRoom(id) {
-    return async (dispatch) => {
-        dispatch({type: ADD_FAVORITE_ROOM, id});
-        const response = await _sendFavoriteRoomsRequest('PUT', id);
-        if (!response) {
-            dispatch({type: DEL_FAVORITE_ROOM, id});
-        }
-    };
-}
-
-export function delFavoriteRoom(id) {
-    return async (dispatch) => {
-        dispatch({type: DEL_FAVORITE_ROOM, id});
-        const response = await _sendFavoriteRoomsRequest('DELETE', id);
-        if (!response) {
-            dispatch({type: ADD_FAVORITE_ROOM, id});
-        }
-    };
-}
-
-export function fetchUserInfo() {
-    return ajaxAction(
-        () => indicoAxios.get(fetchUserInfoURL()),
-        FETCH_USER_INFO_REQUEST,
-        [USER_INFO_RECEIVED, FETCH_USER_INFO_SUCCESS],
-        FETCH_USER_INFO_ERROR
     );
 }
 

@@ -16,12 +16,12 @@
  */
 
 import bookRoomReducer from './bookRoom';
-import userReducer from './user';
 import roomListReducer from './roomList';
 import equipmentReducer from './equipment';
 import buildingsReducer from './buildings';
 import mapAspectsReducer from './mapAspects';
 import {reducer as roomsReducer} from '../common/rooms';
+import {reducer as userReducer} from '../common/user';
 import bookRoomFormReducer from './bookRoomForm';
 import blockingsReducer from './blockings';
 import {reducer as calendarReducer} from '../modules/calendar';

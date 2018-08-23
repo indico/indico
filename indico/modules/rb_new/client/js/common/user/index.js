@@ -15,22 +15,9 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import {createSelector} from 'reselect';
-
-import {RequestState} from 'indico/utils/redux';
-import {selectors as roomsSelectors} from './common/rooms';
-import {selectors as userSelectors} from './common/user';
+import * as actions from './actions';
+import * as selectors from './selectors';
 
 
-// TODO: move these to common/.../selectors.js
-export const getRoomsSpriteToken = ({staticData}) => staticData.roomsSpriteToken;
-
-const hasLoadedEquipmentTypes = ({equipment}) => equipment.request.state === RequestState.SUCCESS;
-export const getEquipmentTypes = ({equipment}) => equipment.types;
-
-export const isInitializing = createSelector(
-    userSelectors.hasLoadedUserInfo,
-    roomsSelectors.hasLoadedRooms,
-    hasLoadedEquipmentTypes,
-    (...ready) => ready.some(x => !x)
-);
+export {default as reducer} from './reducers';
+export {actions, selectors};

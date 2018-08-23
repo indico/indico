@@ -29,7 +29,7 @@ import App from './containers/App';
 
 import createRBStore, {history} from './store';
 import {init} from './actions';
-import {getUserInfo} from './selectors';
+import {selectors as userSelectors} from './common/user';
 
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     store.dispatch(init());
-    setupUserMenu(document.getElementById('indico-user-menu-container'), store, getUserInfo);
+    setupUserMenu(document.getElementById('indico-user-menu-container'), store, userSelectors.getUserInfo);
 
     ReactDOM.render(
         <Provider store={store}>

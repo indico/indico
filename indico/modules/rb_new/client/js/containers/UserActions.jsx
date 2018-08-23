@@ -20,13 +20,13 @@ import {connect} from 'react-redux';
 import {push as pushRoute} from 'connected-react-router';
 import UserActions from '../components/UserActions';
 
-import * as selectors from '../selectors';
+import {selectors as userSelectors} from '../common/user';
 
 
 export default connect(
     state => ({
-        isAdmin: selectors.isUserAdmin(state),
-        hasOwnedRooms: selectors.hasOwnedRooms(state),
+        isAdmin: userSelectors.isUserAdmin(state),
+        hasOwnedRooms: userSelectors.hasOwnedRooms(state),
     }),
     dispatch => bindActionCreators({
         gotoMyRoomsList: () => pushRoute('/rooms?mine=true'),

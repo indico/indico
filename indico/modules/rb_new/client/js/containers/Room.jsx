@@ -19,20 +19,20 @@ import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 
 import Room from '../components/Room';
-import {addFavoriteRoom, delFavoriteRoom} from '../actions';
 import * as selectors from '../selectors';
+import {actions as userActions, selectors as userSelectors} from '../common/user';
 
 
 export default connect(
     () => {
-        const isFavoriteRoom = selectors.makeIsFavoriteRoom();
+        const isFavoriteRoom = userSelectors.makeIsFavoriteRoom();
         return (state, props) => ({
             isFavorite: isFavoriteRoom(state, props),
             roomsSpriteToken: selectors.getRoomsSpriteToken(state),
         });
     },
     dispatch => bindActionCreators({
-        addFavoriteRoom,
-        delFavoriteRoom,
+        addFavoriteRoom: userActions.addFavoriteRoom,
+        delFavoriteRoom: userActions.delFavoriteRoom,
     }, dispatch)
 )(Room);
