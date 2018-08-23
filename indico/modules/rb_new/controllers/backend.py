@@ -44,7 +44,7 @@ from indico.modules.rb_new.util import (approve_or_request_blocking, build_rooms
                                         search_for_rooms, serialize_blockings, serialize_nonbookable_periods,
                                         serialize_occurrences, serialize_unbookable_hours)
 from indico.modules.users.models.users import User
-from indico.util.i18n import _
+from indico.util.i18n import _, get_all_locales
 from indico.web.flask.util import send_file, url_for
 from indico.web.util import ExpectedError, jsonify_data
 
@@ -81,6 +81,13 @@ def _serialize_availability(availability):
         data.update({k: serialize_occurrences(data[k]) if k in data else []
                      for k in ['candidates', 'pre_bookings', 'bookings', 'conflicts', 'pre_conflicts']})
     return availability
+
+
+class RHConfig(RHRoomBookingBase):
+    def _process(self):
+        return jsonify(rooms_sprite_token=unicode(_cache.get('rooms-sprite-token', '')),
+                       languages=get_all_locales(),
+                       tileserver_url=rb_settings.get('tileserver_url'))
 
 
 class RHRooms(RHRoomBookingBase):

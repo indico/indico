@@ -15,23 +15,9 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import {createSelector} from 'reselect';
-
-import {selectors as configSelectors} from './common/config';
-import {selectors as roomsSelectors} from './common/rooms';
-import {selectors as userSelectors} from './common/user';
+import * as actions from './actions';
+import * as selectors from './selectors';
 
 
-export const isInitializing = createSelector(
-    configSelectors.hasLoadedConfig,
-    userSelectors.hasLoadedUserInfo,
-    roomsSelectors.hasLoadedRooms,
-    roomsSelectors.hasLoadedEquipmentTypes,
-    (...ready) => ready.some(x => !x)
-);
-
-export const isMapEnabled = createSelector(
-    configSelectors.getTileServerURL,
-    (state) => state.mapAspects.list,  // TODO: use proper selector
-    (tileServerURL, mapAspects) => !!tileServerURL && !!mapAspects
-);
+export {default as reducer} from './reducers';
+export {actions, selectors};

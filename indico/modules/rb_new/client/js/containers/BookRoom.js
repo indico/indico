@@ -40,7 +40,7 @@ const mapStateToProps = (state) => {
         roomDetailsFetching: roomsSelectors.isFetchingDetails(state),
         isInitializing: selectors.isInitializing(state),
         queryString: stateToQueryString(state.bookRoom, queryStringFilterSerializer, queryStringTimelineSerializer),
-        showMap: !!state.mapAspects.list && !!state.staticData.tileServerURL,
+        showMap: selectors.isMapEnabled(state),
     };
 };
 

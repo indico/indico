@@ -19,6 +19,7 @@ import {connect} from 'react-redux';
 import App from '../components/App';
 import {fetchBuildings, fetchMapAspects, resetPageState} from '../actions';
 import {history} from '../store';
+import {actions as configActions} from '../common/config';
 import {actions as roomsActions} from '../common/rooms';
 import {actions as userActions} from '../common/user';
 import * as selectors from '../selectors';
@@ -31,6 +32,7 @@ export default connect(
     }),
     dispatch => ({
         fetchInitialData() {
+            dispatch(configActions.fetchConfig());
             dispatch(userActions.fetchUserInfo());
             dispatch(userActions.fetchFavoriteRooms());
             dispatch(roomsActions.fetchEquipmentTypes());

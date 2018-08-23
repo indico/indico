@@ -23,6 +23,7 @@ import {Grid, Header, Icon, Popup} from 'semantic-ui-react';
 import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
 
 import SpriteImage from './SpriteImage';
+import {selectors as configSelectors} from '../common/config';
 
 import './RoomBasicDetails.module.scss';
 
@@ -101,6 +102,6 @@ RoomBasicDetails.propTypes = {
 
 export default connect(
     state => ({
-        roomsSpriteToken: selectors.getRoomsSpriteToken(state),
+        roomsSpriteToken: configSelectors.getRoomsSpriteToken(state),
     })
 )(RoomBasicDetails);

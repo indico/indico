@@ -44,12 +44,11 @@ async function postAndReload(selectedLanguage) {
     location.reload();
 }
 
-export default function UserMenu({userData, staticData}) {
+export default function UserMenu({userData, languages}) {
     if (!userData) {
         return '';
     }
 
-    const {availableLanguages} = staticData;
     const {firstName, lastName, email, language, isAdmin, avatarBgColor} = userData;
     const avatar = (
         <Label circular size="large" style={{
@@ -66,7 +65,7 @@ export default function UserMenu({userData, staticData}) {
                           postAndReload(value);
                       }
                   }}
-                  options={Object.entries(availableLanguages).map(([key, name]) => ({
+                  options={Object.entries(languages).map(([key, name]) => ({
                       key, text: name, value: key
                   }))} />);
 
@@ -116,7 +115,5 @@ UserMenu.propTypes = {
         isAdmin: PropTypes.bool,
         avatarBgColor: PropTypes.string
     }).isRequired,
-    staticData: PropTypes.shape({
-        availableLanguages: PropTypes.object
-    }).isRequired
+    languages: PropTypes.object.isRequired,
 };

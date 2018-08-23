@@ -30,10 +30,6 @@ import {queryString as queryFilterRules} from './serializers/filters';
 import {queryString as queryTimelineRules} from './serializers/timeline';
 
 
-const initialData = {
-    staticData: {}
-};
-
 function getRouteConfig() {
     return {
         reduxPathname: ({router: {location: {pathname}}}) => pathname,
@@ -108,17 +104,19 @@ const qsTimelineReducer = createQueryStringReducer(
 );
 
 
-export default function createRBStore(data) {
-    return createReduxStore('rb-new',
-                            reducers,
-                            Object.assign(initialData, data), [
-                                routerMiddleware(history),
-                                queryStringMiddleware(history, getRouteConfig(), {usePush: false})
-                            ], [
-                                qsFilterReducer,
-                                qsTimelineReducer,
-                                qsCalendarReducer
-                            ],
-                            rootReducer => connectRouter(history)(rootReducer)
-    );
+export default function createRBStore() {
+    return createReduxStore(
+        'rb-new',
+        reducers,
+        {},
+        [
+            routerMiddleware(history),
+            queryStringMiddleware(history, getRouteConfig(), {usePush: false})
+        ],
+        [
+            qsFilterReducer,
+            qsTimelineReducer,
+            qsCalendarReducer
+        ],
+        rootReducer => connectRouter(history)(rootReducer));
 }

@@ -15,23 +15,10 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import {createSelector} from 'reselect';
-
-import {selectors as configSelectors} from './common/config';
-import {selectors as roomsSelectors} from './common/rooms';
-import {selectors as userSelectors} from './common/user';
+import {RequestState} from 'indico/utils/redux';
 
 
-export const isInitializing = createSelector(
-    configSelectors.hasLoadedConfig,
-    userSelectors.hasLoadedUserInfo,
-    roomsSelectors.hasLoadedRooms,
-    roomsSelectors.hasLoadedEquipmentTypes,
-    (...ready) => ready.some(x => !x)
-);
-
-export const isMapEnabled = createSelector(
-    configSelectors.getTileServerURL,
-    (state) => state.mapAspects.list,  // TODO: use proper selector
-    (tileServerURL, mapAspects) => !!tileServerURL && !!mapAspects
-);
+export const hasLoadedConfig = ({config}) => config.request.state === RequestState.SUCCESS;
+export const getRoomsSpriteToken = ({config}) => config.data.roomsSpriteToken;
+export const getTileServerURL = ({config}) => config.data.tileServerURL;
+export const getLanguages = ({config}) => config.data.languages;

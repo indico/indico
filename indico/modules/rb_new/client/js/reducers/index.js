@@ -19,6 +19,7 @@ import bookRoomReducer from './bookRoom';
 import roomListReducer from './roomList';
 import buildingsReducer from './buildings';
 import mapAspectsReducer from './mapAspects';
+import {reducer as configReducer} from '../common/config';
 import {reducer as roomsReducer} from '../common/rooms';
 import {reducer as userReducer} from '../common/user';
 import bookRoomFormReducer from './bookRoomForm';
@@ -27,6 +28,7 @@ import {reducer as calendarReducer} from '../modules/calendar';
 
 
 const reducers = {
+    config: configReducer,
     user: userReducer,
     bookRoom: bookRoomReducer,
     roomList: roomListReducer,

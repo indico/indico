@@ -257,7 +257,7 @@ export default connect(
         ...state.roomList,
         roomDetailsFetching: roomsSelectors.isFetchingDetails(state),
         queryString: stateToQueryString(state.roomList, queryStringSerializer),
-        showMap: !!state.mapAspects.list && !!state.staticData.tileServerURL,
+        showMap: selectors.isMapEnabled(state),
         isInitializing: selectors.isInitializing(state),
     }),
     dispatch => ({

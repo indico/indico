@@ -21,11 +21,11 @@ import {Provider, connect} from 'react-redux';
 import UserMenu from '../components/UserMenu';
 
 
-export default function setupUserMenu(element, store, userInfoSelector) {
+export default function setupUserMenu(element, store, userInfoSelector, languageSelector) {
     const Connector = connect(
         state => ({
-            staticData: state.staticData,
             userData: userInfoSelector(state),
+            languages: languageSelector(state),
         })
     )(UserMenu);
 

@@ -29,6 +29,7 @@ import App from './containers/App';
 
 import createRBStore, {history} from './store';
 import {init} from './actions';
+import {selectors as configSelectors} from './common/config';
 import {selectors as userSelectors} from './common/user';
 
 
@@ -36,16 +37,13 @@ document.addEventListener('DOMContentLoaded', () => {
     moment.locale(Indico.User.language);
 
     const appContainer = document.getElementById('rb-app-container');
-    const store = createRBStore({
-        staticData: {
-            availableLanguages: Indico.Settings.Languages,
-            tileServerURL: Indico.Settings.TileServerURL,
-            roomsSpriteToken: appContainer.dataset.spriteToken,
-        }
-    });
+    const store = createRBStore();
 
     store.dispatch(init());
-    setupUserMenu(document.getElementById('indico-user-menu-container'), store, userSelectors.getUserInfo);
+    setupUserMenu(
+        document.getElementById('indico-user-menu-container'), store,
+        userSelectors.getUserInfo, configSelectors.getLanguages
+    );
 
     ReactDOM.render(
         <Provider store={store}>

@@ -23,6 +23,7 @@ import {connect} from 'react-redux';
 import Leaflet from 'leaflet';
 import {Map, TileLayer, MapControl, Marker, Tooltip} from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-markercluster';
+import {selectors as configSelectors} from '../common/config';
 
 import 'leaflet/dist/leaflet.css';
 import './RoomBookingMap.module.scss';
@@ -133,6 +134,7 @@ export class RoomBookingMapControl extends MapControl {
 }
 
 export default connect(
-    ({staticData: {tileServerURL}}) => ({tileServerURL}),
-    null
+    state => ({
+        tileServerURL: configSelectors.getTileServerURL(state),
+    }),
 )(RoomBookingMap);

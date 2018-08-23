@@ -15,23 +15,22 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import {createSelector} from 'reselect';
-
-import {selectors as configSelectors} from './common/config';
-import {selectors as roomsSelectors} from './common/rooms';
-import {selectors as userSelectors} from './common/user';
+import fetchConfigURL from 'indico-url:rooms_new.config';
+import {indicoAxios} from 'indico/utils/axios';
+import {ajaxAction} from 'indico/utils/redux';
 
 
-export const isInitializing = createSelector(
-    configSelectors.hasLoadedConfig,
-    userSelectors.hasLoadedUserInfo,
-    roomsSelectors.hasLoadedRooms,
-    roomsSelectors.hasLoadedEquipmentTypes,
-    (...ready) => ready.some(x => !x)
-);
+export const FETCH_REQUEST = 'config/FETCH_REQUEST';
+export const FETCH_SUCCESS = 'config/FETCH_SUCCESS';
+export const FETCH_ERROR = 'config/FETCH_ERROR';
+export const CONFIG_RECEIVED = 'config/CONFIG_RECEIVED';
 
-export const isMapEnabled = createSelector(
-    configSelectors.getTileServerURL,
-    (state) => state.mapAspects.list,  // TODO: use proper selector
-    (tileServerURL, mapAspects) => !!tileServerURL && !!mapAspects
-);
+
+export function fetchConfig() {
+    return ajaxAction(
+        () => indicoAxios.get(fetchConfigURL()),
+        FETCH_REQUEST,
+        [CONFIG_RECEIVED, FETCH_SUCCESS],
+        [FETCH_ERROR]
+    );
+}
