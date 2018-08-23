@@ -17,7 +17,6 @@
 
 import bookRoomReducer from './bookRoom';
 import roomListReducer from './roomList';
-import equipmentReducer from './equipment';
 import buildingsReducer from './buildings';
 import mapAspectsReducer from './mapAspects';
 import {reducer as roomsReducer} from '../common/rooms';
@@ -31,7 +30,6 @@ const reducers = {
     user: userReducer,
     bookRoom: bookRoomReducer,
     roomList: roomListReducer,
-    equipment: equipmentReducer,
     buildings: buildingsReducer,
     mapAspects: mapAspectsReducer,
     rooms: roomsReducer,

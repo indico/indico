@@ -17,20 +17,16 @@
 
 import {createSelector} from 'reselect';
 
-import {RequestState} from 'indico/utils/redux';
 import {selectors as roomsSelectors} from './common/rooms';
 import {selectors as userSelectors} from './common/user';
 
 
-// TODO: move these to common/.../selectors.js
+// TODO: move to common/.../selectors.js
 export const getRoomsSpriteToken = ({staticData}) => staticData.roomsSpriteToken;
-
-const hasLoadedEquipmentTypes = ({equipment}) => equipment.request.state === RequestState.SUCCESS;
-export const getEquipmentTypes = ({equipment}) => equipment.types;
 
 export const isInitializing = createSelector(
     userSelectors.hasLoadedUserInfo,
     roomsSelectors.hasLoadedRooms,
-    hasLoadedEquipmentTypes,
+    roomsSelectors.hasLoadedEquipmentTypes,
     (...ready) => ready.some(x => !x)
 );

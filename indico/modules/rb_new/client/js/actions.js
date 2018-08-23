@@ -19,7 +19,6 @@ import buildSearchRoomsURL from 'indico-url:rooms_new.search_rooms';
 import fetchMapRoomsURL from 'indico-url:rooms_new.map_rooms';
 import fetchMapAspectsURL from 'indico-url:rooms_new.default_aspects';
 import fetchBuildingsURL from 'indico-url:rooms_new.buildings';
-import equipmentTypesURL from 'indico-url:rooms_new.equipment_types';
 import fetchTimelineDataURL from 'indico-url:rooms_new.timeline';
 import createBookingURL from 'indico-url:rooms_new.create_booking';
 import fetchSuggestionsURL from 'indico-url:rooms_new.suggestions';
@@ -47,11 +46,6 @@ export const FETCH_MAP_ROOMS_STARTED = 'FETCH_MAP_ROOMS_STARTED';
 export const FETCH_MAP_ROOMS_FAILED = 'FETCH_MAP_ROOMS_FAILED';
 export const UPDATE_MAP_ROOMS = 'UPDATE_MAP_ROOMS';
 export const UPDATE_ROOM_DETAILS = 'UPDATE_ROOM_DETAILS';
-// Equipment types
-export const FETCH_EQUIPMENT_TYPES_REQUEST = 'FETCH_EQUIPMENT_TYPES_REQUEST';
-export const FETCH_EQUIPMENT_TYPES_SUCCESS = 'FETCH_EQUIPMENT_TYPES_SUCCESS';
-export const FETCH_EQUIPMENT_TYPES_ERROR = 'FETCH_EQUIPMENT_TYPES_ERROR';
-export const EQUIPMENT_TYPES_RECEIVED = 'EQUIPMENT_TYPES_RECEIVED';
 // Map
 export const FETCH_MAP_ASPECTS_STARTED = 'FETCH_MAP_ASPECTS_STARTED';
 export const FETCH_MAP_ASPECTS_FAILED = 'FETCH_MAP_ASPECTS_FAILED';
@@ -100,15 +94,6 @@ const ROOM_RESULT_LIMIT = 20;
 
 export function init() {
     return {type: INIT};
-}
-
-export function fetchEquipmentTypes() {
-    return ajaxAction(
-        () => indicoAxios.get(equipmentTypesURL()),
-        FETCH_EQUIPMENT_TYPES_REQUEST,
-        [EQUIPMENT_TYPES_RECEIVED, FETCH_EQUIPMENT_TYPES_SUCCESS],
-        FETCH_EQUIPMENT_TYPES_ERROR,
-    );
 }
 
 export function updateRooms(namespace, rooms, total, clear) {

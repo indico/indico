@@ -23,6 +23,13 @@ import * as roomsActions from './actions';
 
 export default combineReducers({
     requests: combineReducers({
+        // global data
+        equipmentTypes: requestReducer(
+            roomsActions.FETCH_EQUIPMENT_TYPES_REQUEST,
+            roomsActions.FETCH_EQUIPMENT_TYPES_SUCCESS,
+            roomsActions.FETCH_EQUIPMENT_TYPES_ERROR
+        ),
+        // room-specific data
         rooms: requestReducer(
             roomsActions.FETCH_ROOMS_REQUEST,
             roomsActions.FETCH_ROOMS_SUCCESS,
@@ -39,6 +46,14 @@ export default combineReducers({
             roomsActions.FETCH_ATTRIBUTES_ERROR
         ),
     }),
+    equipmentTypes: (state = [], action) => {
+        switch (action.type) {
+            case roomsActions.EQUIPMENT_TYPES_RECEIVED:
+                return action.data;
+            default:
+                return state;
+        }
+    },
     rooms: (state = {}, action) => {
         switch (action.type) {
             case roomsActions.ROOMS_RECEIVED:

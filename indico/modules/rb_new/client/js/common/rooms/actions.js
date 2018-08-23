@@ -15,12 +15,19 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import fetchEquipmentTypesURL from 'indico-url:rooms_new.equipment_types';
 import fetchRoomsURL from 'indico-url:rooms_new.rooms';
 import fetchRoomAvailabilityURL from 'indico-url:rooms_new.room_availability';
 import fetchRoomAttributesURL from 'indico-url:rooms_new.room_attributes';
+
 import {indicoAxios} from 'indico/utils/axios';
 import {ajaxAction} from 'indico/utils/redux';
 
+
+export const FETCH_EQUIPMENT_TYPES_REQUEST = 'rooms/FETCH_EQUIPMENT_TYPES_REQUEST';
+export const FETCH_EQUIPMENT_TYPES_SUCCESS = 'rooms/FETCH_EQUIPMENT_TYPES_SUCCESS';
+export const FETCH_EQUIPMENT_TYPES_ERROR = 'rooms/FETCH_EQUIPMENT_TYPES_ERROR';
+export const EQUIPMENT_TYPES_RECEIVED = 'rooms/EQUIPMENT_TYPES_RECEIVED';
 
 export const ROOMS_RECEIVED = 'rooms/ROOMS_RECEIVED';
 export const FETCH_ROOMS_REQUEST = 'rooms/FETCH_ROOMS_REQUEST';
@@ -37,6 +44,15 @@ export const FETCH_ATTRIBUTES_REQUEST = 'rooms/FETCH_ATTRIBUTES_REQUEST';
 export const FETCH_ATTRIBUTES_SUCCESS = 'rooms/FETCH_ATTRIBUTES_SUCCESS';
 export const FETCH_ATTRIBUTES_ERROR = 'rooms/FETCH_ATTRIBUTES_ERROR';
 
+
+export function fetchEquipmentTypes() {
+    return ajaxAction(
+        () => indicoAxios.get(fetchEquipmentTypesURL()),
+        FETCH_EQUIPMENT_TYPES_REQUEST,
+        [EQUIPMENT_TYPES_RECEIVED, FETCH_EQUIPMENT_TYPES_SUCCESS],
+        FETCH_EQUIPMENT_TYPES_ERROR,
+    );
+}
 
 export function fetchRooms() {
     return ajaxAction(

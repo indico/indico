@@ -20,6 +20,9 @@ import {createSelector} from 'reselect';
 import {RequestState} from 'indico/utils/redux';
 
 
+export const hasLoadedEquipmentTypes = ({rooms}) => rooms.requests.equipmentTypes.state === RequestState.SUCCESS;
+export const getEquipmentTypes = ({rooms}) => rooms.equipmentTypes;
+
 const getAllRooms = ({rooms}) => rooms.rooms;
 export const hasLoadedRooms = ({rooms}) => rooms.requests.rooms.state === RequestState.SUCCESS;
 export const getRoom = (state, {roomId}) => getAllRooms(state)[roomId];
