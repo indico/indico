@@ -23,6 +23,7 @@ from flask import jsonify, redirect, request, session
 from marshmallow_enum import EnumField
 from webargs import fields, validate
 from webargs.flaskparser import use_args, use_kwargs
+from werkzeug.exceptions import NotFound
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.queries import with_total_rows
@@ -35,13 +36,13 @@ from indico.modules.rb.models.favorites import favorite_room_table
 from indico.modules.rb.models.reservations import RepeatFrequency, Reservation
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb_new.schemas import (aspects_schema, blockings_schema, locations_schema, map_rooms_schema,
-                                           rb_user_schema, reservation_schema, room_details_schema, rooms_schema)
+                                           rb_user_schema, reservation_schema, room_attributes_schema,
+                                           room_details_schema, rooms_schema)
 from indico.modules.rb_new.util import (approve_or_request_blocking, build_rooms_spritesheet, create_blocking,
                                         get_buildings, get_equipment_types, get_room_blockings, get_room_calendar,
                                         get_room_details_availability, get_rooms_availability, get_suggestions,
-                                        has_managed_rooms, search_for_rooms, serialize_blockings,
-                                        serialize_nonbookable_periods, serialize_occurrences,
-                                        serialize_unbookable_hours)
+                                        search_for_rooms, serialize_blockings, serialize_nonbookable_periods,
+                                        serialize_occurrences, serialize_unbookable_hours)
 from indico.modules.users.models.users import User
 from indico.util.i18n import _
 from indico.web.flask.util import send_file, url_for
@@ -82,6 +83,12 @@ def _serialize_availability(availability):
     return availability
 
 
+class RHRooms(RHRoomBookingBase):
+    def _process(self):
+        rooms = Room.query.filter_by(is_active=True).all()
+        return jsonify(room_details_schema.dump(rooms, many=True).data)
+
+
 class RHSearchRooms(RHRoomBookingBase):
     @use_args(dict(search_room_args, **{
         'offset': fields.Int(missing=0, validate=lambda x: x >= 0),
@@ -103,16 +110,24 @@ class RHSearchMapRooms(RHRoomBookingBase):
         return jsonify(map_rooms_schema.dump(query.all()).data)
 
 
-class RHRoomDetails(RHRoomBookingBase):
+class RHRoomBase(RHRoomBookingBase):
     def _process_args(self):
         self.room = Room.get_one(request.view_args['room_id'])
+        if not self.room.is_active:
+            raise NotFound
 
+
+class RHRoomAvailability(RHRoomBase):
     def _process(self):
-        room_details = room_details_schema.dump(self.room).data
-        start_dt = datetime.combine(date.today(), time(0, 0))
-        end_dt = datetime.combine(start_dt + timedelta(days=4), time(23, 59))
-        room_details['availability'] = get_room_details_availability(self.room, start_dt, end_dt)
-        return jsonify(room_details)
+        today = date.today()
+        start_dt = datetime.combine(today, time(0, 0))
+        end_dt = datetime.combine(today + timedelta(days=4), time(23, 59))
+        return jsonify(get_room_details_availability(self.room, start_dt, end_dt))
+
+
+class RHRoomAttributes(RHRoomBase):
+    def _process(self):
+        return jsonify(room_attributes_schema.dump(self.room.attributes).data)
 
 
 class RHAspects(RHRoomBookingBase):

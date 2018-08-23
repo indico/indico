@@ -47,12 +47,11 @@ class RoomAttributesSchema(mm.ModelSchema):
 
 class RoomSchema(mm.ModelSchema):
     owner_name = String(attribute='owner.full_name')
-    attributes = Nested(RoomAttributesSchema, many=True)
 
     class Meta:
         model = Room
         fields = _room_fields + ('surface_area', 'latitude', 'longitude', 'telephone', 'key_location',
-                                 'max_advance_days', 'owner_name', 'attributes')
+                                 'max_advance_days', 'owner_name')
 
 
 class MapRoomSchema(mm.ModelSchema):
@@ -132,6 +131,7 @@ class RBUserSchema(UserSchema):
 rb_user_schema = RBUserSchema()
 rooms_schema = RoomSchema(many=True, only=_room_fields)
 room_details_schema = RoomSchema()
+room_attributes_schema = RoomAttributesSchema(many=True)
 map_rooms_schema = MapRoomSchema(many=True)
 aspects_schema = AspectSchema(many=True)
 reservation_occurrences_schema = ReservationOccurrenceSchema(many=True)

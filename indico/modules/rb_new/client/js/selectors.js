@@ -24,7 +24,7 @@ import {selectors as roomsSelectors} from './common/rooms';
 // TODO: move these to common/.../selectors.js
 export const getRoomsSpriteToken = ({staticData}) => staticData.roomsSpriteToken;
 
-const isFetchingUserInfo = ({user}) => user.requests.info.state === RequestState.STARTED;
+const hasLoadedUserInfo = ({user}) => user.requests.info.state === RequestState.SUCCESS;
 export const getUserInfo = ({user}) => user.info;
 export const isUserAdmin = state => getUserInfo(state).isAdmin;
 export const hasOwnedRooms = state => getUserInfo(state).hasOwnedRooms;
@@ -40,12 +40,12 @@ export const makeIsFavoriteRoom = () => createSelector(
 );
 
 
-const isFetchingEquipmentTypes = ({equipment}) => equipment.request.state === RequestState.STARTED;
+const hasLoadedEquipmentTypes = ({equipment}) => equipment.request.state === RequestState.SUCCESS;
 export const getEquipmentTypes = ({equipment}) => equipment.types;
 
 export const isInitializing = createSelector(
-    isFetchingUserInfo,
-    roomsSelectors.isFetchingRooms,
-    isFetchingEquipmentTypes,
-    (...fetching) => fetching.some(x => x)
+    hasLoadedUserInfo,
+    roomsSelectors.hasLoadedRooms,
+    hasLoadedEquipmentTypes,
+    (...ready) => ready.some(x => !x)
 );

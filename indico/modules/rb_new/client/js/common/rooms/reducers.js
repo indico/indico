@@ -22,19 +22,49 @@ import * as roomsActions from './actions';
 
 
 export default combineReducers({
-    request: requestReducer(
-        roomsActions.FETCH_DETAILS_REQUEST,
-        roomsActions.FETCH_DETAILS_SUCCESS,
-        roomsActions.FETCH_DETAILS_ERROR
-    ),
+    requests: combineReducers({
+        rooms: requestReducer(
+            roomsActions.FETCH_ROOMS_REQUEST,
+            roomsActions.FETCH_ROOMS_SUCCESS,
+            roomsActions.FETCH_ROOMS_ERROR
+        ),
+        availability: requestReducer(
+            roomsActions.FETCH_AVAILABILITY_REQUEST,
+            roomsActions.FETCH_AVAILABILITY_SUCCESS,
+            roomsActions.FETCH_AVAILABILITY_ERROR
+        ),
+        attributes: requestReducer(
+            roomsActions.FETCH_ATTRIBUTES_REQUEST,
+            roomsActions.FETCH_ATTRIBUTES_SUCCESS,
+            roomsActions.FETCH_ATTRIBUTES_ERROR
+        ),
+    }),
     rooms: (state = {}, action) => {
         switch (action.type) {
-            case roomsActions.DETAILS_RECEIVED: {
-                const room = action.data;
-                return {...state, [room.id]: room};
+            case roomsActions.ROOMS_RECEIVED:
+                return action.data.reduce((obj, r) => ({...obj, [r.id]: r}), {});
+            default:
+                return state;
+        }
+    },
+    availability: (state = {}, action) => {
+        switch (action.type) {
+            case roomsActions.AVAILABILITY_RECEIVED: {
+                const {id, availability} = action.data;
+                return {...state, [id]: availability};
             }
             default:
                 return state;
         }
-    }
+    },
+    attributes: (state = {}, action) => {
+        switch (action.type) {
+            case roomsActions.ATTRIBUTES_RECEIVED: {
+                const {id, attributes} = action.data;
+                return {...state, [id]: attributes};
+            }
+            default:
+                return state;
+        }
+    },
 });

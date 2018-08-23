@@ -27,7 +27,7 @@ const mapStateToProps = (state, {roomId}) => {
         bookRoomForm: {timeline},
         user,
     } = state;
-    const room = roomsSelectors.getDetails(state, roomId);
+    const room = roomsSelectors.getRoom(state, {roomId});
     return {
         bookingData: {recurrence, dates, timeSlot},
         availability: timeline && timeline.availability,

@@ -15,7 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import buildFetchRoomsURL from 'indico-url:rooms_new.available_rooms';
+import buildSearchRoomsURL from 'indico-url:rooms_new.search_rooms';
 import fetchMapRoomsURL from 'indico-url:rooms_new.map_rooms';
 import fetchMapAspectsURL from 'indico-url:rooms_new.default_aspects';
 import fetchBuildingsURL from 'indico-url:rooms_new.buildings';
@@ -195,7 +195,7 @@ export function fetchRooms(namespace, clear = true) {
 
         let response;
         try {
-            response = await indicoAxios.get(buildFetchRoomsURL(), {params});
+            response = await indicoAxios.get(buildSearchRoomsURL(), {params});
         } catch (error) {
             handleAxiosError(error);
             dispatch({type: FETCH_ROOMS_FAILED, namespace});

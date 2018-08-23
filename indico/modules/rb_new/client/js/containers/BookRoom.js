@@ -15,7 +15,6 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import {stateToQueryString} from 'redux-router-querystring';
 
@@ -32,12 +31,14 @@ import {
 } from '../actions';
 import {pushStateMergeProps} from '../util';
 import {actions as roomsActions, selectors as roomsSelectors} from '../common/rooms';
+import * as selectors from '../selectors';
 
 
 const mapStateToProps = (state) => {
     return {
         ...state.bookRoom,
-        roomDetailsFetching: roomsSelectors.isFetching(state),
+        roomDetailsFetching: roomsSelectors.isFetchingDetails(state),
+        isInitializing: selectors.isInitializing(state),
         queryString: stateToQueryString(state.bookRoom, queryStringFilterSerializer, queryStringTimelineSerializer),
         showMap: !!state.mapAspects.list && !!state.staticData.tileServerURL,
     };
@@ -54,7 +55,9 @@ const mapDispatchToProps = dispatch => ({
         dispatch(fetchRooms('bookRoom', clear));
         dispatch(fetchMapRooms('bookRoom'));
     },
-    fetchRoomDetails: bindActionCreators(roomsActions.fetchDetails, dispatch),
+    fetchRoomDetails(id) {
+        dispatch(roomsActions.fetchDetails(id));
+    },
     resetBookingState() {
         dispatch(resetBookingState());
     },

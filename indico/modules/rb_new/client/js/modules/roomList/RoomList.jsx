@@ -38,6 +38,7 @@ import BookFromListModal from '../../components/modals/BookFromListModal';
 import BlockingModal from '../../components/modals/BlockingModal';
 import {queryString as queryStringSerializer} from '../../serializers/filters';
 import * as actions from '../../actions';
+import * as selectors from '../../selectors';
 import {actions as roomsActions, selectors as roomsSelectors} from '../../common/rooms';
 
 import './RoomList.module.scss';
@@ -58,6 +59,7 @@ class RoomList extends React.Component {
         roomDetailsFetching: PropTypes.bool.isRequired,
         pushState: PropTypes.func.isRequired,
         showMap: PropTypes.bool.isRequired,
+        isInitializing: PropTypes.bool.isRequired,
         actions: PropTypes.exact({
             fetchRooms: PropTypes.func.isRequired,
             fetchRoomDetails: PropTypes.func.isRequired,
@@ -154,7 +156,8 @@ class RoomList extends React.Component {
             actions: {fetchRooms, fetchRoomDetails},
             roomDetailsFetching,
             showMap,
-            pushState
+            pushState,
+            isInitializing,
         } = this.props;
         const {blockingMode, blockings} = this.state;
         const menuOptions = [{
@@ -228,17 +231,21 @@ class RoomList extends React.Component {
                         <MapController />
                     </Grid.Column>
                 )}
-                <Route exact path="/rooms/:roomId/details" render={roomPreloader((roomId) => (
-                    <RoomDetailsModal roomId={roomId} onClose={this.closeBookingModal} />
-                ), fetchRoomDetails)} />
-                <Route exact path="/rooms/:roomId/book" render={roomPreloader((roomId) => (
-                    <BookFromListModal roomId={roomId} onClose={this.closeBookingModal} />
-                ), fetchRoomDetails)} />
-                <Route exact path="/rooms/blocking/create" render={() => (
-                    <BlockingModal open
-                                   rooms={Object.values(blockings)}
-                                   onClose={this.closeBlockingModal} />
-                )} />
+                {!isInitializing && (
+                    <>
+                        <Route exact path="/rooms/:roomId/details" render={roomPreloader((roomId) => (
+                            <RoomDetailsModal roomId={roomId} onClose={this.closeBookingModal} />
+                        ), fetchRoomDetails)} />
+                        <Route exact path="/rooms/:roomId/book" render={roomPreloader((roomId) => (
+                            <BookFromListModal roomId={roomId} onClose={this.closeBookingModal} />
+                        ), fetchRoomDetails)} />
+                        <Route exact path="/rooms/blocking/create" render={() => (
+                            <BlockingModal open
+                                           rooms={Object.values(blockings)}
+                                           onClose={this.closeBlockingModal} />
+                        )} />
+                    </>
+                )}
             </Grid>
         );
     }
@@ -248,9 +255,10 @@ class RoomList extends React.Component {
 export default connect(
     state => ({
         ...state.roomList,
-        roomDetailsFetching: roomsSelectors.isFetching(state),
+        roomDetailsFetching: roomsSelectors.isFetchingDetails(state),
         queryString: stateToQueryString(state.roomList, queryStringSerializer),
         showMap: !!state.mapAspects.list && !!state.staticData.tileServerURL,
+        isInitializing: selectors.isInitializing(state),
     }),
     dispatch => ({
         actions: {

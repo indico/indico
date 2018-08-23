@@ -15,10 +15,31 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import {createSelector} from 'reselect';
+
 import {RequestState} from 'indico/utils/redux';
 
 
-export const isFetching = ({rooms}) => rooms.request.state === RequestState.STARTED;
-const getRooms = ({rooms}) => rooms.rooms;
-export const getDetails = (state, roomId) => getRooms(state)[roomId];
-export const hasDetails = (state, roomId) => getRooms(state).hasOwnProperty(roomId);
+const getAllRooms = ({rooms}) => rooms.rooms;
+export const hasLoadedRooms = ({rooms}) => rooms.requests.rooms.state === RequestState.SUCCESS;
+export const getRoom = (state, {roomId}) => getAllRooms(state)[roomId];
+
+const getAllAvailabilities = ({rooms}) => rooms.availability;
+export const isFetchingAvailability = ({rooms}) => rooms.requests.availability.state === RequestState.STARTED;
+export const getAvailability = (state, {roomId}) => getAllAvailabilities(state)[roomId];
+
+const getAllAttributes = ({rooms}) => rooms.attributes;
+export const isFetchingAttributes = ({rooms}) => rooms.requests.attributes.state === RequestState.STARTED;
+export const getAttributes = (state, {roomId}) => getAllAttributes(state)[roomId];
+
+export const isFetchingDetails = createSelector(
+    isFetchingAvailability,
+    isFetchingAttributes,
+    (...fetching) => fetching.some(x => x)
+);
+
+export const hasDetails = createSelector(
+    getAvailability,
+    getAttributes,
+    (...details) => details.every(x => x !== undefined)
+);

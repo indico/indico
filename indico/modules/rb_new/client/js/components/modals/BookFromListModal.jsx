@@ -121,7 +121,7 @@ class BookFromListModal extends React.Component {
 
 export default connect(
     (state, {roomId}) => ({
-        room: roomsSelectors.getDetails(state, roomId),
+        room: roomsSelectors.getRoom(state, {roomId}),
         availability: state.bookRoomForm.timeline ? state.bookRoomForm.timeline.availability : null,
     }),
     (dispatch) => ({

@@ -15,28 +15,73 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import fetchRoomDetailsURL from 'indico-url:rooms_new.room_details';
+import fetchRoomsURL from 'indico-url:rooms_new.rooms';
+import fetchRoomAvailabilityURL from 'indico-url:rooms_new.room_availability';
+import fetchRoomAttributesURL from 'indico-url:rooms_new.room_attributes';
 import {indicoAxios} from 'indico/utils/axios';
 import {ajaxAction} from 'indico/utils/redux';
 
 
-export const DETAILS_RECEIVED = 'rooms/DETAILS_RECEIVED';
-export const FETCH_DETAILS_REQUEST = 'rooms/FETCH_DETAILS_REQUEST';
-export const FETCH_DETAILS_SUCCESS = 'rooms/FETCH_DETAILS_SUCCESS';
-export const FETCH_DETAILS_ERROR = 'rooms/FETCH_DETAILS_ERROR';
+export const ROOMS_RECEIVED = 'rooms/ROOMS_RECEIVED';
+export const FETCH_ROOMS_REQUEST = 'rooms/FETCH_ROOMS_REQUEST';
+export const FETCH_ROOMS_SUCCESS = 'rooms/FETCH_ROOMS_SUCCESS';
+export const FETCH_ROOMS_ERROR = 'rooms/FETCH_ROOMS_ERROR';
 
+export const AVAILABILITY_RECEIVED = 'rooms/AVAILABILITY_RECEIVED';
+export const FETCH_AVAILABILITY_REQUEST = 'rooms/FETCH_AVAILABILITY_REQUEST';
+export const FETCH_AVAILABILITY_SUCCESS = 'rooms/FETCH_AVAILABILITY_SUCCESS';
+export const FETCH_AVAILABILITY_ERROR = 'rooms/FETCH_AVAILABILITY_ERROR';
+
+export const ATTRIBUTES_RECEIVED = 'rooms/ATTRIBUTES_RECEIVED';
+export const FETCH_ATTRIBUTES_REQUEST = 'rooms/FETCH_ATTRIBUTES_REQUEST';
+export const FETCH_ATTRIBUTES_SUCCESS = 'rooms/FETCH_ATTRIBUTES_SUCCESS';
+export const FETCH_ATTRIBUTES_ERROR = 'rooms/FETCH_ATTRIBUTES_ERROR';
+
+
+export function fetchRooms() {
+    return ajaxAction(
+        () => indicoAxios.get(fetchRoomsURL()),
+        FETCH_ROOMS_REQUEST,
+        [ROOMS_RECEIVED, FETCH_ROOMS_SUCCESS],
+        FETCH_ROOMS_ERROR
+    );
+}
 
 export function fetchDetails(id) {
+    return async (dispatch) => {
+        dispatch(fetchAvailability(id));
+        dispatch(fetchAttributes(id));
+    };
+}
+
+export function fetchAvailability(id) {
     return async (dispatch, getStore) => {
-        const {rooms: {details: rooms}} = getStore();
+        const {rooms: {availability: rooms}} = getStore();
         if (id in rooms) {
             return;
         }
         return await ajaxAction(
-            () => indicoAxios.get(fetchRoomDetailsURL({room_id: id})),
-            FETCH_DETAILS_REQUEST,
-            [DETAILS_RECEIVED, FETCH_DETAILS_SUCCESS],
-            FETCH_DETAILS_ERROR
+            () => indicoAxios.get(fetchRoomAvailabilityURL({room_id: id})),
+            FETCH_AVAILABILITY_REQUEST,
+            [AVAILABILITY_RECEIVED, FETCH_AVAILABILITY_SUCCESS],
+            FETCH_AVAILABILITY_ERROR,
+            data => ({id, availability: data}),
+        )(dispatch);
+    };
+}
+
+export function fetchAttributes(id) {
+    return async (dispatch, getStore) => {
+        const {rooms: {attributes: rooms}} = getStore();
+        if (id in rooms) {
+            return;
+        }
+        return await ajaxAction(
+            () => indicoAxios.get(fetchRoomAttributesURL({room_id: id})),
+            FETCH_ATTRIBUTES_REQUEST,
+            [ATTRIBUTES_RECEIVED, FETCH_ATTRIBUTES_SUCCESS],
+            FETCH_ATTRIBUTES_ERROR,
+            data => ({id, attributes: data}),
         )(dispatch);
     };
 }

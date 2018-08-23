@@ -25,20 +25,22 @@ import {RoomBasicDetails} from '../RoomBasicDetails';
 import TimelineContent from '../TimelineContent';
 import TimelineLegend from '../TimelineLegend';
 import {selectors as roomsSelectors} from '../../common/rooms';
-import * as selectors from '../../selectors';
 
 import './RoomDetailsModal.module.scss';
 
 
 class RoomDetailsModal extends React.Component {
     static propTypes = {
-        roomDetails: PropTypes.object,
+        room: PropTypes.object.isRequired,
+        availability: PropTypes.array.isRequired,
+        attributes: PropTypes.array.isRequired,
         onClose: PropTypes.func,
-        bookRoom: PropTypes.func.isRequired
+        actions: PropTypes.exact({
+            bookRoom: PropTypes.func.isRequired,
+        }).isRequired,
     };
 
     static defaultProps = {
-        roomDetails: null,
         onClose: () => {}
     };
 
@@ -48,10 +50,7 @@ class RoomDetailsModal extends React.Component {
     };
 
     render() {
-        const {bookRoom, roomDetails} = this.props;
-        if (!roomDetails) {
-            return null;
-        }
+        const {actions: {bookRoom}, room, availability, attributes} = this.props;
         return (
             <Modal open onClose={this.handleCloseModal} size="large" closeIcon>
                 <Modal.Header styleName="room-details-header">
@@ -61,7 +60,10 @@ class RoomDetailsModal extends React.Component {
                     </span>
                 </Modal.Header>
                 <Modal.Content>
-                    <RoomDetails room={roomDetails} bookRoom={bookRoom} />
+                    <RoomDetails room={room}
+                                 attributes={attributes}
+                                 availability={availability}
+                                 bookRoom={bookRoom} />
                 </Modal.Content>
             </Modal>
         );
@@ -70,22 +72,21 @@ class RoomDetailsModal extends React.Component {
 
 export default (namespace) => {
     const mapStateToProps = (state, {roomId}) => ({
-        equipmentTypes: state.equipment.types,
-        ...state[namespace].filters,
-        hasOwnedRooms: selectors.hasOwnedRooms(state),
-        hasFavoriteRooms: selectors.hasFavoriteRooms(state),
-        roomDetails: roomsSelectors.getDetails(state, roomId),
-        namespace
+        room: roomsSelectors.getRoom(state, {roomId}),
+        availability: roomsSelectors.getAvailability(state, {roomId}),
+        attributes: roomsSelectors.getAttributes(state, {roomId}),
     });
 
     const mapDispatchToProps = dispatch => ({
-        bookRoom(room) {
-            if (namespace === 'roomList') {
-                dispatch(push(`/rooms/${room.id}/book`));
-            } else {
-                dispatch(push(`/book/${room.id}/confirm`));
-            }
-        }
+        actions: {
+            bookRoom(room) {
+                if (namespace === 'roomList') {
+                    dispatch(push(`/rooms/${room.id}/book`));
+                } else {
+                    dispatch(push(`/book/${room.id}/confirm`));
+                }
+            },
+        },
     });
 
     return connect(
@@ -94,7 +95,7 @@ export default (namespace) => {
     )(RoomDetailsModal);
 };
 
-function RoomDetails({bookRoom, room}) {
+function RoomDetails({bookRoom, room, availability, attributes}) {
     const minHour = 6;
     const maxHour = 22;
     const step = 2;
@@ -130,7 +131,7 @@ function RoomDetails({bookRoom, room}) {
                         <RoomAvailabilityBox room={room} />
                         <RoomCommentsBox room={room} />
                         <RoomKeyLocationBox room={room} />
-                        <RoomCustomAttributesBox room={room} />
+                        <RoomCustomAttributesBox attributes={attributes} />
                     </div>
                 </Grid.Column>
                 <Grid.Column>
@@ -139,7 +140,7 @@ function RoomDetails({bookRoom, room}) {
                         <Popup trigger={<Icon name="info circle" className="legend-info-icon" />}
                                content={<TimelineLegend labels={legendLabels} compact />} />
                     </Header>
-                    <TimelineContent rows={room.availability.map(rowSerializer)}
+                    <TimelineContent rows={availability.map(rowSerializer)}
                                      hourSeries={hourSeries} />
                     <Header><Translate>Statistics</Translate></Header>
                     <Message attached info>
@@ -161,7 +162,10 @@ function RoomDetails({bookRoom, room}) {
 RoomDetails.propTypes = {
     bookRoom: PropTypes.func.isRequired,
     room: PropTypes.object.isRequired,
+    availability: PropTypes.array.isRequired,
+    attributes: PropTypes.array.isRequired,
 };
+
 
 function RoomAvailabilityBox({room}) {
     return (
@@ -208,12 +212,12 @@ RoomKeyLocationBox.propTypes = {
     room: PropTypes.object.isRequired,
 };
 
-function RoomCustomAttributesBox({room}) {
+function RoomCustomAttributesBox({attributes}) {
     return (
-        !!room.attributes.length && (
+        !!attributes.length && (
             <Message>
                 <List>
-                    {room.attributes.map(({title, value}) => (
+                    {attributes.map(({title, value}) => (
                         <List.Item key={title}>
                             <span styleName="attribute-title"><strong>{title}</strong></span>
                             <span>{value}</span>
@@ -226,5 +230,8 @@ function RoomCustomAttributesBox({room}) {
 }
 
 RoomCustomAttributesBox.propTypes = {
-    room: PropTypes.object.isRequired,
+    attributes: PropTypes.arrayOf(PropTypes.shape({
+        title: PropTypes.string.isRequired,
+        value: PropTypes.string.isRequired,
+    })).isRequired,
 };

@@ -54,6 +54,7 @@ export default class BookRoom extends React.Component {
             total: PropTypes.number,
             isFetching: PropTypes.bool,
         }).isRequired,
+        isInitializing: PropTypes.bool.isRequired,
         fetchRooms: PropTypes.func.isRequired,
         filters: PropTypes.object.isRequired,
         timeline: PropTypes.object.isRequired,
@@ -87,7 +88,7 @@ export default class BookRoom extends React.Component {
 
     renderRoom = (room) => {
         const {id} = room;
-        const {fetchRoomDetails, pushState} = this.props;
+        const {pushState} = this.props;
 
         const bookingModalBtn = (
             <Button positive icon="check" circular onClick={() => {
@@ -97,7 +98,6 @@ export default class BookRoom extends React.Component {
         );
         const showDetailsBtn = (
             <Button primary icon="search" circular onClick={() => {
-                fetchRoomDetails(id);
                 pushState(`/book/${id}/details`, true);
             }} />
         );
@@ -357,7 +357,7 @@ export default class BookRoom extends React.Component {
     };
 
     render() {
-        const {fetchRoomDetails, showMap} = this.props;
+        const {fetchRoomDetails, showMap, isInitializing} = this.props;
         return (
             <Grid columns={2}>
                 <Grid.Column width={showMap ? 11 : 16}>
@@ -368,12 +368,16 @@ export default class BookRoom extends React.Component {
                         <MapController />
                     </Grid.Column>
                 )}
-                <Route exact path="/book/:roomId/confirm" render={roomPreloader((roomId) => (
-                    <BookRoomModal open roomId={roomId} onClose={this.closeBookingModal} />
-                ), fetchRoomDetails)} />
-                <Route exact path="/book/:roomId/details" render={roomPreloader((roomId) => (
-                    <RoomDetailsModal roomId={roomId} onClose={this.closeModal} />
-                ), fetchRoomDetails)} />
+                {!isInitializing && (
+                    <>
+                        <Route exact path="/book/:roomId/confirm" render={roomPreloader((roomId) => (
+                            <BookRoomModal open roomId={roomId} onClose={this.closeBookingModal} />
+                        ), fetchRoomDetails)} />
+                        <Route exact path="/book/:roomId/details" render={roomPreloader((roomId) => (
+                            <RoomDetailsModal roomId={roomId} onClose={this.closeModal} />
+                        ), fetchRoomDetails)} />
+                    </>
+                )}
             </Grid>
         );
     }

@@ -184,7 +184,7 @@ export const pushStateMergeProps = (stateProps, dispatchProps, ownProps) => {
 export const roomPreloader = (componentFunc, action) => {
     // eslint-disable-next-line react/display-name, react/prop-types
     return ({match: {params: {roomId}}}) => (
-        <Preloader checkCached={state => roomsSelectors.hasDetails(state, roomId)}
+        <Preloader checkCached={state => roomsSelectors.hasDetails(state, {roomId})}
                    action={() => action(roomId)}
                    dimmer={<Dimmer page />}>
             {() => componentFunc(roomId)}
