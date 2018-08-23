@@ -16,6 +16,8 @@
 
 from __future__ import unicode_literals
 
+from flask import jsonify
+
 from indico.modules.rb_new.controllers import backend
 from indico.modules.rb_new.controllers.frontend import RHLanding
 from indico.web.flask.wrappers import IndicoBlueprint
@@ -29,6 +31,7 @@ _bp.add_url_rule('/', 'roombooking', RHLanding)
 _bp.add_url_rule('/<path:path>', 'roombooking', RHLanding)
 
 # Backend
+_bp.add_url_rule('/api/<path:path>', '404', lambda path: (jsonify(), 404))
 _bp.add_url_rule('/api/rooms', 'available_rooms', backend.RHSearchRooms)
 _bp.add_url_rule('/api/room/<int:room_id>', 'room_details', backend.RHRoomDetails)
 _bp.add_url_rule('/api/map/rooms', 'map_rooms', backend.RHSearchMapRooms)
