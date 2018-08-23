@@ -33,6 +33,12 @@ export const hasFavoriteRooms = createSelector(
     getFavoriteRooms,
     favoriteRooms => Object.values(favoriteRooms).some(fr => fr),
 );
+export const makeIsFavoriteRoom = () => createSelector(
+    getFavoriteRooms,
+    (state, {room}) => room.id,
+    (favoriteRooms, roomId) => !!favoriteRooms[roomId]
+);
+
 
 const isFetchingEquipmentTypes = ({equipment}) => equipment.request.state === RequestState.STARTED;
 export const getEquipmentTypes = ({equipment}) => equipment.types;

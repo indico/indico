@@ -24,10 +24,13 @@ import * as selectors from '../selectors';
 
 
 export default connect(
-    state => ({
-        favoriteRooms: selectors.getFavoriteRooms(state),
-        roomsSpriteToken: selectors.getRoomsSpriteToken(state),
-    }),
+    () => {
+        const isFavoriteRoom = selectors.makeIsFavoriteRoom();
+        return (state, props) => ({
+            isFavorite: isFavoriteRoom(state, props),
+            roomsSpriteToken: selectors.getRoomsSpriteToken(state),
+        });
+    },
     dispatch => bindActionCreators({
         addFavoriteRoom,
         delFavoriteRoom,

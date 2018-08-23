@@ -35,7 +35,7 @@ export default class Room extends React.Component {
         room: PropTypes.object.isRequired,
         children: PropTypes.node,
         showFavoriteButton: PropTypes.bool,
-        favoriteRooms: PropTypes.object.isRequired,
+        isFavorite: PropTypes.bool.isRequired,
         roomsSpriteToken: PropTypes.string.isRequired,
         addFavoriteRoom: PropTypes.func.isRequired,
         delFavoriteRoom: PropTypes.func.isRequired,
@@ -47,26 +47,20 @@ export default class Room extends React.Component {
     };
 
     shouldComponentUpdate(nextProps) {
-        const {favoriteRooms: nextFavoriteRooms, room: nextRoom} = nextProps;
-        const {room, favoriteRooms} = this.props;
+        const {isFavorite: nextIsFavorite, room: nextRoom} = nextProps;
+        const {room, isFavorite} = this.props;
         const {children} = this.props;
         const {children: nextChildren} = nextProps;
 
         return (
             !_.isEqual(room, nextRoom) ||
-            nextFavoriteRooms[room.id] !== favoriteRooms[room.id] ||
+            nextIsFavorite !== isFavorite ||
             !_.isEqual(nextChildren, children)
         );
     }
 
-    isFavorite() {
-        const {favoriteRooms, room} = this.props;
-        return !!favoriteRooms[room.id];
-    }
-
     renderFavoriteButton() {
-        const {addFavoriteRoom, delFavoriteRoom, room} = this.props;
-        const isFavorite = this.isFavorite();
+        const {addFavoriteRoom, delFavoriteRoom, room, isFavorite} = this.props;
         const button = (
             <Button icon="star" color={isFavorite ? 'yellow' : 'teal'} circular
                     onClick={() => (isFavorite ? delFavoriteRoom : addFavoriteRoom)(room.id)} />
@@ -105,12 +99,12 @@ export default class Room extends React.Component {
     };
 
     render() {
-        const {room, children} = this.props;
+        const {room, children, isFavorite} = this.props;
         const {content, actions} = Slot.split(children);
 
         return (
             <Card styleName="room-card">
-                {this.isFavorite() && <Label corner="right" icon="star" color="yellow" />}
+                {isFavorite && <Label corner="right" icon="star" color="yellow" />}
                 {this.renderCardImage(room, content, actions)}
                 <Card.Content>
                     <TooltipIfTruncated>
