@@ -27,6 +27,7 @@ import './TimeRangePicker.module.scss';
 
 const arrowUpKeyCode = 38;
 const arrowDownKeyCode = 40;
+const optionsStartHour = '06:00';
 
 function _humanizeDuration(duration) {
     const hours = duration.hours();
@@ -75,7 +76,7 @@ export default class TimeRangePicker extends React.Component {
     generateStartTimeOptions = () => {
         const options = [];
         const end = moment().endOf('day');
-        const next = moment().startOf('day');
+        const next = moment(optionsStartHour, 'HH:mm');
         let serializedNext;
         // eslint-disable-next-line no-unmodified-loop-condition
         while (next < end) {
