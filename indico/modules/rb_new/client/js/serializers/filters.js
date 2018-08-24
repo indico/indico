@@ -53,12 +53,12 @@ export const queryString = {
     favorite: {
         validator: v.isBoolean(),
         sanitizer: v.toBoolean(),
-        stateField: boolStateField('filters', 'onlyFavorites')
+        stateField: boolStateField('filters.onlyFavorites')
     },
     mine: {
         validator: v.isBoolean(),
         sanitizer: v.toBoolean(),
-        stateField: boolStateField('filters', 'onlyMine')
+        stateField: boolStateField('filters.onlyMine')
     },
     capacity: {
         validator: v.isInt({min: 1}),

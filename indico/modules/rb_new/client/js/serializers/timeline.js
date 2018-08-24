@@ -23,6 +23,6 @@ export const queryString = {
     timeline: {
         validator: v.isBoolean(),
         sanitizer: v.toBoolean(),
-        stateField: boolStateField('timeline', 'isVisible')
+        stateField: boolStateField('timeline.isVisible')
     }
 };

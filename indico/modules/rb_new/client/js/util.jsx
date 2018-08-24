@@ -15,6 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import _ from 'lodash';
 import React from 'react';
 import {push} from 'connected-react-router';
 import LatLon from 'geodesy/latlon-vectors';
@@ -192,14 +193,11 @@ export const roomPreloader = (componentFunc, action) => {
     );
 };
 
-export function boolStateField(namespace, name) {
+export function boolStateField(name) {
     return {
-        serialize: ({[namespace]: {[name]: value}}) => value || null,
+        serialize: state => _.get(state, name) || null,
         parse: (value, state) => {
-            if (!state[namespace]) {
-                state[namespace] = {};
-            }
-            state[namespace][name] = value;
+            _.set(state, name, value);
         }
     };
 }
