@@ -16,6 +16,7 @@
  */
 
 @import '../../styles/util';
+@import 'base/palette';
 
 
 .timeline-item {
@@ -78,9 +79,35 @@
             background-size: 30px 30px;
             z-index: 1;
             border: 1px solid darken($light-red, 10%);
-            height: 30px;
+            padding: 0.9em 0.2em;
         }
     }
+}
+
+.editable-timeline-canvas {
+    position: absolute;
+    width: 100%;
+    height: 1.4em;
+    cursor: pointer;
+    transition: background-color 0.25s ease-in;
+    z-index: 1;
+    opacity: 0.4;
+
+    &:hover {
+        background-color: $gray;
+    }
+}
+
+.editable-timeline-slot {
+    position: absolute;
+    z-index: 2;
+    background-color: $sui-green;
+    top: 0;
+    height: 100%;
+}
+
+.editable-timeline-time-popup:global(.ui.top.left.popup) {
+    margin-left: -1em;
 }
 
 .popup-center {

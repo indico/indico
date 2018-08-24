@@ -36,7 +36,8 @@ export default class TimelineContent extends React.Component {
         recurrenceType: PropTypes.string,
         onClick: PropTypes.func,
         longLabel: PropTypes.bool,
-        itemClass: PropTypes.func
+        itemClass: PropTypes.func,
+        itemProps: PropTypes.object
     };
 
     static defaultProps = {
@@ -44,11 +45,16 @@ export default class TimelineContent extends React.Component {
         recurrenceType: null,
         onClick: null,
         longLabel: false,
-        itemClass: TimelineItem
+        itemClass: TimelineItem,
+        itemProps: {},
+    };
+
+    state = {
+        selectable: true
     };
 
     renderTimelineRow = ({availability, label, conflictIndicator, key, room}) => {
-        const {hourSeries, itemClass: ItemClass, step, recurrenceType, onClick, longLabel} = this.props;
+        const {hourSeries, itemClass: ItemClass, itemProps, step, recurrenceType, onClick, longLabel} = this.props;
         const minHour = hourSeries[0];
         const maxHour = hourSeries[hourSeries.length - 1];
         const columns = ((maxHour - minHour) / step) + 1;
@@ -60,12 +66,16 @@ export default class TimelineContent extends React.Component {
                                   availability={conflictIndicator ? (hasConflicts ? 'conflict' : 'available') : null}
                                   longLabel={longLabel} />
                 <div styleName="timeline-row-content" style={{flex: columns}}>
-                    <ItemClass startHour={minHour} endHour={maxHour} data={availability}
+                    <ItemClass startHour={minHour} endHour={maxHour} data={availability} room={room}
                                onClick={() => {
                                    if (onClick && (!hasConflicts || recurrenceType !== 'single')) {
                                        onClick(room);
                                    }
-                               }} />
+                               }}
+                               setSelectable={selectable => {
+                                   this.setState({selectable});
+                               }}
+                               {...itemProps} />
                 </div>
             </div>
         );
@@ -86,10 +96,11 @@ export default class TimelineContent extends React.Component {
 
     render() {
         const {rows, hourSeries, longLabel} = this.props;
+        const {selectable} = this.state;
         const labelWidth = longLabel ? 200 : 150;
         return (
             <>
-                <div styleName="timeline-header">
+                <div styleName="timeline-header" className={!selectable && 'timeline-non-selectable'}>
                     <div style={{width: labelWidth}} />
                     {hourSeries.slice(0, -1).map((hour) => (
                         <div styleName="timeline-header-label" key={`timeline-header-${hour}`}>
@@ -99,7 +110,7 @@ export default class TimelineContent extends React.Component {
                         </div>
                     ))}
                 </div>
-                <div styleName="timeline-content">
+                <div styleName="timeline-content" className={!selectable && 'timeline-non-selectable'}>
                     {rows.map((rowProps) => this.renderTimelineRow(rowProps))}
                     <div style={{left: labelWidth, width: `calc(100% - ${labelWidth}px)`}}
                          styleName="timeline-lines">

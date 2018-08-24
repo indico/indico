@@ -168,9 +168,9 @@ export default class TimelineItem extends React.Component {
     };
 
     render() {
-        const {children} = this.props;
+        const {children, startHour, endHour, data, onClick, ...restProps} = this.props;
         return (
-            <div styleName="timeline-item">
+            <div styleName="timeline-item" {...restProps}>
                 {children}
                 {this.renderOccurrences()}
             </div>
