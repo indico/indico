@@ -51,6 +51,7 @@ export default class TimelineBase extends React.Component {
         isLoading: PropTypes.bool,
         recurrenceType: PropTypes.string,
         itemClass: PropTypes.func,
+        itemProps: PropTypes.object,
         longLabel: PropTypes.bool,
         disableDatePicker: PropTypes.bool
     };
@@ -70,6 +71,7 @@ export default class TimelineBase extends React.Component {
         dateRange: [],
         recurrenceType: 'single',
         itemClass: TimelineItem,
+        itemProps: {},
         longLabel: false,
         disableDatePicker: false
     };
@@ -136,7 +138,7 @@ export default class TimelineBase extends React.Component {
     renderTimeline = () => {
         const {
             extraContent, legendLabels, maxHour, minHour, onClick, recurrenceType, rows, step, isLoading, itemClass,
-            longLabel
+            itemProps, longLabel
         } = this.props;
         const hourSeries = _.range(minHour, maxHour + step, step);
         return (
@@ -152,6 +154,7 @@ export default class TimelineBase extends React.Component {
                                          recurrenceType={recurrenceType}
                                          onClick={onClick}
                                          itemClass={itemClass}
+                                         itemProps={itemProps}
                                          longLabel={longLabel} />
                     )}
                 </div>

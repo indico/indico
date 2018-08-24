@@ -39,6 +39,10 @@ $row-height: 50px;
             color: $gray;
         }
     }
+
+    &:global(.timeline-non-selectable) {
+        user-select: none;
+    }
 }
 
 .timeline-lines {
@@ -86,5 +90,9 @@ $row-height: 50px;
             position: relative;
             height: $row-height;
         }
+    }
+
+    &:global(.timeline-non-selectable) {
+        user-select: none;
     }
 }

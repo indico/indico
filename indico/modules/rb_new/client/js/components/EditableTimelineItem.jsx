@@ -24,35 +24,40 @@ import TimelineItem from './TimelineItem';
 
 import './TimelineItem.module.scss';
 
+
 const RESOLUTION_MINUTES = 15;
 
 export default class EditableTimelineItem extends React.Component {
     static propTypes = {
         startHour: PropTypes.number.isRequired,
-        endHour: PropTypes.number.isRequired
+        endHour: PropTypes.number.isRequired,
+        onAddSlot: PropTypes.func.isRequired,
+        room: PropTypes.object.isRequired,
+        setSelectable: PropTypes.func
     };
 
-    constructor(props) {
-        super(props);
-        this.divRef = React.createRef();
-        this.slotRef = React.createRef();
-    }
+    static defaultProps = {
+        setSelectable: null
+    };
 
     state = {
-        editing: false
+        isEditing: false,
+        canvasRef: null,
+        slotRef: null,
+        hintPosition: null
     };
 
     componentDidMount() {
-        document.addEventListener('mouseup', this.mouseUpHandler);
+        document.addEventListener('mouseup', this.handleMouseUp);
     }
 
     componentWillUnmount() {
-        document.removeEventListener('mouseup', this.mouseUpHandler);
+        document.removeEventListener('mouseup', this.handleMouseUp);
     }
 
     calcSlotPosition(event) {
         const {startHour, endHour} = this.props;
-        const el = this.divRef.current;
+        const {canvasRef: el} = this.state;
         const rect = el.getBoundingClientRect();
         const x = event.pageX - rect.x;
         const totalMinutes = (endHour - startHour) * 60;
@@ -67,62 +72,219 @@ export default class EditableTimelineItem extends React.Component {
         };
     }
 
-    mouseDownHandler = e => {
-        const {hours, minutes, pixels} = this.calcSlotPosition(e);
+    setSelectable(state) {
+        const {setSelectable} = this.props;
+        if (setSelectable) {
+            setSelectable(state);
+        }
+    }
 
+    setNotEditing() {
+        this.setSelectable(true);
         this.setState({
-            editing: true,
-            slotStartTime: `${hours}:${minutes}`,
+            isEditing: false,
+            slotStartTime: null,
+            slotEndTime: null,
+            slotStartPx: null,
+            slotEndPx: null
+        });
+    }
+
+    scheduleCancel() {
+        this.setState({
+            isCancelling: true,
+            hintPosition: null
+        });
+
+        setTimeout(() => {
+            const {isCancelling} = this.state;
+            if (!isCancelling) {
+                return;
+            }
+            this.setNotEditing();
+        }, 1000);
+    }
+
+    handleMouseDown = e => {
+        const {hours, minutes, pixels} = this.calcSlotPosition(e);
+        const slotStartTime = `${hours}:${minutes.toString().padStart(2, '0')}`;
+
+        this.setSelectable(false);
+        this.setState({
+            isEditing: true,
+            slotStartTime,
             slotStartPx: pixels,
-            slotEndPx: pixels + 15
+            slotEndPx: pixels,
+            slotOriginTime: slotStartTime,
+            slotOriginPx: pixels,
+            isCancelling: false
         });
     };
 
-    mouseMove = e => {
-        const {editing} = this.state;
+    handleMouseMove = e => {
+        const {isEditing, slotOriginTime, slotOriginPx, canvasRef, slotRef} = this.state;
 
-        if (editing) {
+        if (e.target !== canvasRef && e.target !== slotRef) {
+            this.scheduleCancel();
+            return;
+        }
+
+        this.setState({
+            hintPosition: this.calcSlotPosition(e),
+            isCancelling: false
+        });
+
+        if (isEditing) {
             const {hours, minutes, pixels} = this.calcSlotPosition(e);
-            this.setState({
-                slotEndTime: `${hours}:${minutes}`,
-                slotEndPx: pixels
-            });
+            const newTime = `${hours}:${minutes.toString().padStart(2, '0')}`;
+
+            if ((pixels - slotOriginPx) > 0) {
+                this.setState({
+                    slotStartTime: slotOriginTime,
+                    slotEndTime: newTime,
+                    slotStartPx: slotOriginPx,
+                    slotEndPx: pixels
+                });
+            } else {
+                this.setState({
+                    slotStartTime: newTime,
+                    slotEndTime: slotOriginTime,
+                    slotStartPx: pixels,
+                    slotEndPx: slotOriginPx
+                });
+            }
         }
     };
 
-    mouseUpHandler = e => {
-        const {editing} = this.state;
-        if (!editing) {
+    handleMouseUp = e => {
+        const {isEditing, slotStartTime, slotEndTime, isCancelling} = this.state;
+        const {onAddSlot, room} = this.props;
+
+        e.stopPropagation();
+
+        if (!isEditing || isCancelling) {
             return;
         }
-        // this.setState({
-        //     editing: false
-        // });
+
+        this.setNotEditing();
+
+        if (slotStartTime === slotEndTime || !slotEndTime) {
+            return;
+        }
+
+        onAddSlot({
+            slotStartTime: `0${slotStartTime}`.slice(-5),
+            slotEndTime: `0${slotEndTime}`.slice(-5),
+            room
+        });
+    };
+
+    handleMouseEnter = e => {
+        const {canvasRef} = this.state;
+
+        // ignore event if we're on an occurrence
+        if (e.target !== canvasRef) {
+            return;
+        }
+
+        this.setState({
+            hintPosition: this.calcSlotPosition(e),
+            isCancelling: false
+        });
         e.stopPropagation();
     };
 
+    handleMouseLeave = () => {
+        this.scheduleCancel();
+    };
+
+    renderTimeLabels(width, slotStartTime, slotEndTime) {
+        const {slotRef} = this.state;
+        if (width === 0) {
+            return (
+                <Popup context={slotRef}
+                       content={Translate.string('Drag the mouse to create a booking')}
+                       position="top center"
+                       size="mini"
+                       open />
+            );
+        } else if (width < 50) {
+            return (
+                <Popup key={`${slotStartTime}:${slotEndTime}`}
+                       context={slotRef}
+                       content={`${slotStartTime} - ${slotEndTime}`}
+                       size="mini"
+                       position="bottom center"
+                       open />
+            );
+        } else {
+            return (
+                <>
+                    <Popup key={slotStartTime}
+                           context={slotRef}
+                           content={slotStartTime}
+                           position="top left"
+                           size="mini"
+                           open />
+                    <Popup key={slotEndTime}
+                           context={slotRef}
+                           content={slotEndTime}
+                           position="bottom right"
+                           size="mini"
+                           open />
+                </>
+            );
+        }
+    }
+
+    setCanvasRef = ref => {
+        this.setState({
+            canvasRef: ref
+        });
+    };
+
+    setSlotRef = ref => {
+        this.setState({
+            slotRef: ref
+        });
+    };
+
     render() {
-        const {editing, slotStartPx, slotEndPx, slotStartTime, slotEndTime} = this.state;
-        console.log(this.slotRef.current)
+        const {
+            isEditing, slotStartPx, slotEndPx, slotStartTime, slotRef,
+            slotEndTime, canvasRef, hintPosition
+        } = this.state;
+        const {onAddSlot, setSelectable, ...restProps} = this.props;
+        const width = slotEndPx - slotStartPx;
+
         return (
-            <TimelineItem {...this.props}>
+            <TimelineItem {...restProps}
+                          onMouseDown={this.handleMouseDown}
+                          onMouseEnter={this.handleMouseEnter}>
                 <div styleName="editable-timeline-canvas"
-                     onMouseDown={this.mouseDownHandler}
-                     onMouseMove={this.mouseMove}
-                     onMouseLeave={this.mouseUpHandler}
-                     ref={this.divRef}>
-                    {editing && (
-                        <div style={{left: slotStartPx, width: slotEndPx - slotStartPx}}
+                     onMouseMove={this.handleMouseMove}
+                     onMouseLeave={this.handleMouseLeave}
+                     ref={this.setCanvasRef}>
+                    {isEditing && (
+                        <div style={{left: slotStartPx, width: width || 15}}
                              styleName="editable-timeline-slot"
-                             ref={this.slotRef} />
+                             ref={this.setSlotRef} />
+                    )}
+                    {!isEditing && canvasRef && hintPosition !== null && (
+                        <Popup header={`${hintPosition.hours}:${hintPosition.minutes.toString().padStart(2, '0')}`}
+                               content={Translate.string('Tip: click and drag to book!')}
+                               position="top left"
+                               horizontalOffset={-hintPosition.pixels}
+                               context={canvasRef}
+                               // TODO: get rid of this key={...} attribute once bug fixed
+                               // https://github.com/Semantic-Org/Semantic-UI-React/issues/3050
+                               key={hintPosition.pixels}
+                               size="mini"
+                               styleName="editable-timeline-time-popup"
+                               open />
                     )}
                 </div>
-                {editing && (
-                    <>
-                        <Popup context={this.slotRef.current} content={slotStartTime} position="bottom left" open />
-                        <Popup context={this.slotRef.current} content={slotEndTime} position="top right" open />
-                    </>
-                )}
+                {isEditing && slotRef && this.renderTimeLabels(width, slotStartTime, slotEndTime)}
             </TimelineItem>
         );
     }

@@ -82,11 +82,13 @@ class BookFromListModal extends React.Component {
         onBook: PropTypes.func.isRequired,
         availability: PropTypes.object,
         availabilityLoading: PropTypes.bool.isRequired,
+        defaults: PropTypes.object
     };
 
     static defaultProps = {
         onClose: () => {},
-        availability: null
+        availability: null,
+        defaults: undefined
     };
 
     handleCloseModal = () => {
@@ -96,7 +98,7 @@ class BookFromListModal extends React.Component {
     };
 
     render() {
-        const {room, refreshCollisions, availability, availabilityLoading, onBook} = this.props;
+        const {room, refreshCollisions, availability, availabilityLoading, onBook, defaults} = this.props;
         const buttonDisabled = availabilityLoading || !availability || availability.num_days_available === 0;
         return (
             <Modal open onClose={this.handleCloseModal} size="large" closeIcon>
@@ -112,7 +114,8 @@ class BookFromListModal extends React.Component {
                             <BookingBootstrapForm buttonCaption={<Translate>Book</Translate>}
                                                   buttonDisabled={buttonDisabled}
                                                   onChange={refreshCollisions}
-                                                  onSearch={onBook}>
+                                                  onSearch={onBook}
+                                                  defaults={defaults}>
                                 {availability && <ConflictIndicator availability={availability} />}
                             </BookingBootstrapForm>
                         </Grid.Column>

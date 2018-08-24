@@ -38,20 +38,16 @@ export default class BookingBootstrapForm extends React.Component {
         onChange: PropTypes.func,
         buttonCaption: PropTypes.object,
         children: PropTypes.node,
-        buttonDisabled: PropTypes.bool
+        buttonDisabled: PropTypes.bool,
+        defaults: PropTypes.object
     };
 
     static defaultProps = {
         children: null,
         buttonCaption: <Translate>Search</Translate>,
         onChange: () => {},
-        buttonDisabled: false
-    };
-
-    constructor(props) {
-        super(props);
-        const startTime = moment().startOf('hour').add(1, 'h');
-        this.state = {
+        buttonDisabled: false,
+        defaults: {
             recurrence: {
                 type: 'single',
                 number: 1,
@@ -62,10 +58,17 @@ export default class BookingBootstrapForm extends React.Component {
                 endDate: null
             },
             timeSlot: {
-                startTime,
-                endTime: startTime.clone().add(1, 'h')
+                startTime: moment().startOf('hour').add(1, 'h'),
+                endTime: moment().startOf('hour').add(2, 'h')
             }
-        };
+        }
+    };
+
+    constructor(props) {
+        super(props);
+
+        const {defaults} = props;
+        this.state = defaults;
     }
 
     componentDidMount() {
