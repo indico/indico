@@ -25,9 +25,9 @@ import {toMoment, serializeTime} from '../util';
 import './TimeRangePicker.module.scss';
 
 
-const arrowUpKeyCode = 38;
-const arrowDownKeyCode = 40;
-const optionsStartHour = '06:00';
+const ARROW_UP = 38;
+const ARROW_DOWN = 40;
+const START_HOUR = '06:00';
 
 function _humanizeDuration(duration) {
     const hours = duration.hours();
@@ -76,7 +76,7 @@ export default class TimeRangePicker extends React.Component {
     generateStartTimeOptions = () => {
         const options = [];
         const end = moment().endOf('day');
-        const next = moment(optionsStartHour, 'HH:mm');
+        const next = moment(START_HOUR, 'HH:mm');
         let serializedNext;
         // eslint-disable-next-line no-unmodified-loop-condition
         while (next < end) {
@@ -106,7 +106,7 @@ export default class TimeRangePicker extends React.Component {
     };
 
     updateStartTime = (event, currentStartTime, previousStartTime, endTime, duration, startSearchQuery) => {
-        if (event.type === 'keydown' && (event.keyCode === arrowUpKeyCode || event.keyCode === arrowDownKeyCode)) {
+        if (event.type === 'keydown' && (event.keyCode === ARROW_UP || event.keyCode === ARROW_DOWN)) {
             this.setState({
                 startSearchQuery: currentStartTime
             });
@@ -147,7 +147,7 @@ export default class TimeRangePicker extends React.Component {
     };
 
     updateEndTime = (event, currentEndTime, previousEndTime, startTime, duration, endSearchQuery) => {
-        if (event.type === 'keydown' && (event.keyCode === arrowUpKeyCode || event.keyCode === arrowDownKeyCode)) {
+        if (event.type === 'keydown' && (event.keyCode === ARROW_UP || event.keyCode === ARROW_DOWN)) {
             this.setState({
                 endSearchQuery: currentEndTime
             });
