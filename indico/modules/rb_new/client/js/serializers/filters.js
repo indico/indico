@@ -89,18 +89,6 @@ export const queryString = {
     text: {
         stateField: 'filters.text'
     },
-    /*
-    myRooms: {
-        stateField: 'filters.myRooms',
-        validator: v.isBoolean(),
-        sanitizer: v.toBoolean()
-    },
-    myBlockings: {
-        stateField: 'filters.myBlockings',
-        validator: v.isBoolean(),
-        sanitizer: v.toBoolean()
-    },
-    */
     sw_lat: {
         validator: v.isFloat({min: -90, max: 90}),
         sanitizer: v.toFloat(),

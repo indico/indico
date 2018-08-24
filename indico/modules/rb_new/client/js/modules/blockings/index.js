@@ -22,4 +22,5 @@ import * as selectors from './selectors';
 export {default} from './BlockingList';
 export {default as BlockingModal} from './BlockingModal';
 export {default as reducer} from './reducers';
+export {queryStringReducer, routeConfig} from './queryString';
 export {actions, selectors};

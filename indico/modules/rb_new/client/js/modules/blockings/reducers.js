@@ -22,7 +22,7 @@ import filterReducerFactory from '../../reducers/roomBooking/filters';
 import * as blockingsActions from './actions';
 
 
-const initialFilterStateFactory = () => ({
+export const initialFilterStateFactory = () => ({
     myBlockings: false,
     myRooms: false,
     dates: {

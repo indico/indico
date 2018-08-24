@@ -25,6 +25,7 @@ import reducers from './reducers';
 import {initialRoomFilterStateFactory} from './reducers/roomBooking/filters';
 import {initialTimelineState} from './reducers/bookRoom';
 import {routeConfig as calendarRouteConfig, queryStringReducer as qsCalendarReducer} from './modules/calendar';
+import {routeConfig as blockingsRouteConfig, queryStringReducer as qsBlockingsReducer} from './modules/blockings';
 import * as actions from './actions';
 import {queryString as queryFilterRules} from './serializers/filters';
 import {queryString as queryTimelineRules} from './serializers/timeline';
@@ -51,7 +52,8 @@ function getRouteConfig() {
                 select: ({roomList: {filters}}) => ({filters}),
                 serialize: queryFilterRules
             },
-            ...calendarRouteConfig
+            ...calendarRouteConfig,
+            ...blockingsRouteConfig,
         }
     };
 }
@@ -120,7 +122,8 @@ export default function createRBStore() {
         [
             qsFilterReducer,
             qsTimelineReducer,
-            qsCalendarReducer
+            qsCalendarReducer,
+            qsBlockingsReducer,
         ],
         rootReducer => connectRouter(history)(rootReducer));
 }
