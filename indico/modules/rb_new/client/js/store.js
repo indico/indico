@@ -22,7 +22,7 @@ import {connectRouter, routerMiddleware} from 'connected-react-router';
 import createReduxStore from 'indico/utils/redux';
 
 import reducers from './reducers';
-import {initialStateFactory} from './reducers/roomBooking/filters';
+import {initialRoomFilterStateFactory} from './reducers/roomBooking/filters';
 import {initialTimelineState} from './reducers/bookRoom';
 import {routeConfig as calendarRouteConfig, queryStringReducer as qsCalendarReducer} from './modules/calendar';
 import * as actions from './actions';
@@ -83,7 +83,7 @@ const qsFilterReducer = createQueryStringReducer(
         return null;
     },
     (state, namespace) => (namespace
-        ? _.merge({}, state, {[namespace]: {filters: initialStateFactory(namespace)}})
+        ? _.merge({}, state, {[namespace]: {filters: initialRoomFilterStateFactory(namespace)}})
         : state)
 );
 

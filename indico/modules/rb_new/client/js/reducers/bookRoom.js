@@ -18,7 +18,7 @@
 import {combineReducers} from 'redux';
 
 import {roomsReducerFactory} from './roomBooking/roomList';
-import filterReducerFactory from './roomBooking/filters';
+import filterReducerFactory, {initialRoomFilterStateFactory} from './roomBooking/filters';
 import {mapReducerFactory} from './roomBooking/map';
 import * as actions from '../actions';
 
@@ -73,7 +73,7 @@ function suggestionsReducer(state = initialSuggestionsState, action) {
 
 const reducer = combineReducers({
     rooms: roomsReducerFactory('bookRoom'),
-    filters: filterReducerFactory('bookRoom'),
+    filters: filterReducerFactory('bookRoom', initialRoomFilterStateFactory),
     map: mapReducerFactory('bookRoom'),
     timeline: timelineReducer,
     suggestions: suggestionsReducer

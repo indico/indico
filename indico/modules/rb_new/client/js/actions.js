@@ -22,8 +22,6 @@ import fetchBuildingsURL from 'indico-url:rooms_new.buildings';
 import fetchTimelineDataURL from 'indico-url:rooms_new.timeline';
 import createBookingURL from 'indico-url:rooms_new.create_booking';
 import fetchSuggestionsURL from 'indico-url:rooms_new.suggestions';
-import fetchBlockingsURL from 'indico-url:rooms_new.blockings';
-import createBlockingURL from 'indico-url:rooms_new.create_blocking';
 
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {submitFormAction, ajaxAction} from 'indico/utils/redux';
@@ -79,15 +77,6 @@ export const OPEN_FILTER_DROPDOWN = 'OPEN_FILTER_DROPDOWN';
 export const CLOSE_FILTER_DROPDOWN = 'CLOSE_FILTER_DROPDOWN';
 
 export const SET_BOOKING_AVAILABILITY = 'SET_BOOKING_AVAILABILITY';
-
-// Blockings
-export const GET_BLOCKINGS_REQUEST = 'GET_BLOCKINGS_REQUEST';
-export const GET_BLOCKINGS_SUCCESS = 'GET_BLOCKINGS_SUCCESS';
-export const GET_BLOCKINGS_ERROR = 'GET_BLOCKINGS_ERROR';
-export const SET_BLOCKINGS = 'SET_BLOCKINGS';
-export const CREATE_BLOCKING_REQUEST = 'CREATE_BLOCKING_REQUEST';
-export const CREATE_BLOCKING_SUCCESS = 'CREATE_BLOCKING_SUCCESS';
-export const CREATE_BLOCKING_ERROR = 'CREATE_BLOCKING_ERROR';
 
 const ROOM_RESULT_LIMIT = 20;
 
@@ -300,25 +289,5 @@ export function fetchBookingAvailability(room, filters) {
         [GET_BOOKING_AVAILABILITY_SUCCESS, SET_BOOKING_AVAILABILITY],
         GET_BOOKING_AVAILABILITY_ERROR,
         ({availability, date_range: dateRange}) => ({availability: availability[room.id], dateRange})
-    );
-}
-
-export function fetchBlockings() {
-    return async (dispatch, getStore) => {
-        const {blockingList: {filters}} = getStore();
-        const params = preProcessParameters(filters, ajaxFilterRules);
-        return await ajaxAction(
-            () => indicoAxios.get(fetchBlockingsURL(), {params}),
-            GET_BLOCKINGS_REQUEST,
-            [GET_BLOCKINGS_SUCCESS, SET_BLOCKINGS],
-            GET_BLOCKINGS_ERROR
-        )(dispatch);
-    };
-}
-
-export function createBlocking(formData) {
-    return submitFormAction(
-        () => indicoAxios.post(createBlockingURL(), formData),
-        CREATE_BLOCKING_REQUEST, CREATE_BLOCKING_SUCCESS, CREATE_BLOCKING_ERROR
     );
 }

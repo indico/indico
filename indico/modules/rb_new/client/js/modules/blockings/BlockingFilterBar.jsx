@@ -18,16 +18,19 @@
 import React from 'react';
 import {Button, Popup} from 'semantic-ui-react';
 import PropTypes from 'prop-types';
+import {connect} from 'react-redux';
 
 import {Translate} from 'indico/react/i18n';
-import dateRenderer from './filters/DateRenderer';
-import DateForm from './filters/DateForm';
-import FilterDropdown from './filters/FilterDropdown';
+import * as blockingsActions from './actions';
+import * as blockingsSelectors from './selectors';
+import dateRenderer from '../../components/filters/DateRenderer';
+import DateForm from '../../components/filters/DateForm';
+import FilterDropdown from '../../components/filters/FilterDropdown';
 
 
 const FilterBarContext = React.createContext();
 
-export function FilterDropdownFactory({name, ...props}) {
+function FilterDropdownFactory({name, ...props}) {
     return (
         <FilterBarContext.Consumer>
             {({state, onDropdownOpen, onDropdownClose}) => (
@@ -45,27 +48,31 @@ FilterDropdownFactory.propTypes = {
 };
 
 
-export default class BlockingFilterBar extends React.Component {
+class BlockingFilterBar extends React.Component {
     static propTypes = {
-        myBlockings: PropTypes.bool,
-        blockingsInMyRooms: PropTypes.bool,
-        dates: PropTypes.object,
-        children: PropTypes.node,
-        setFilterParameter: PropTypes.func.isRequired
-    };
-
-    static defaultProps = {
-        myBlockings: false,
-        blockingsInMyRooms: false,
-        dates: null,
-        children: null
+        filters: PropTypes.shape({
+            myBlockings: PropTypes.bool.isRequired,
+            myRooms: PropTypes.bool.isRequired,
+            dates: PropTypes.shape({
+                startDate: PropTypes.string,
+                endDate: PropTypes.string,
+            }).isRequired,
+        }).isRequired,
+        actions: PropTypes.exact({
+            setFilterParameter: PropTypes.func.isRequired,
+        }).isRequired,
     };
 
     state = {};
 
     onDropdownOpen = (name) => {
-        this.setState((prevState) => Object.assign({}, ...Object.keys(prevState).map(k => ({[k]: null})),
-                                                   {[name]: true}));
+        this.setState((prevState) => {
+            return Object.assign(
+                {},
+                ...Object.keys(prevState).map(k => ({[k]: null})),
+                {[name]: true}
+            );
+        });
     };
 
     onDropdownClose = (name) => {
@@ -75,14 +82,13 @@ export default class BlockingFilterBar extends React.Component {
     };
 
     render() {
-        const {myBlockings, blockingsInMyRooms, dates, children, setFilterParameter} = this.props;
+        const {filters: {myBlockings, myRooms, dates}, actions: {setFilterParameter}} = this.props;
         return (
             <FilterBarContext.Provider value={{
                 onDropdownOpen: this.onDropdownOpen,
                 onDropdownClose: this.onDropdownClose,
                 state: this.state
             }}>
-                {children}
                 <FilterDropdownFactory name="dates"
                                        title={<Translate>Period</Translate>}
                                        form={(fieldValues, setParentField, handleClose) => (
@@ -97,15 +103,29 @@ export default class BlockingFilterBar extends React.Component {
                                        showButtons={false} />
                 <Button.Group>
                     <Popup trigger={<Button content={Translate.string('Blockings in my rooms')}
-                                            primary={blockingsInMyRooms}
-                                            onClick={() => setFilterParameter('blockingsInMyRooms', !blockingsInMyRooms)} />}
-                           content={Translate.string('Show blockings in my rooms')} />
+                                            primary={myRooms}
+                                            onClick={() => setFilterParameter('myRooms', !myRooms)} />}
+                           content={Translate.string('Show only blockings in my rooms')} />
                     <Popup trigger={<Button content={Translate.string('My blockings')}
                                             primary={myBlockings}
                                             onClick={() => setFilterParameter('myBlockings', !myBlockings)} />}
-                           content={Translate.string('Show my blockings')} />
+                           content={Translate.string('Show only my blockings')} />
                 </Button.Group>
             </FilterBarContext.Provider>
         );
     }
 }
+
+export default connect(
+    state => ({
+        filters: blockingsSelectors.getFilters(state),
+    }),
+    dispatch => ({
+        actions: {
+            setFilterParameter: (param, value) => {
+                dispatch(blockingsActions.setFilterParameter(param, value));
+                dispatch(blockingsActions.fetchBlockings());
+            }
+        }
+    }),
+)(BlockingFilterBar);

@@ -15,12 +15,11 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import moment from 'moment';
 import * as actions from '../../actions';
 import {parseSearchBarText, sanitizeRecurrence} from '../../util';
 
 
-export const initialStateFactory = (namespace) => {
+export const initialRoomFilterStateFactory = (namespace) => {
     const state = {
         text: null,
         capacity: null,
@@ -51,15 +50,6 @@ export const initialStateFactory = (namespace) => {
             building: null,
             floor: null
         });
-    } else if (namespace === 'blockingList') {
-        Object.assign(state, {
-            myBlockings: false,
-            blockingsInMyRooms: false,
-            dates: {
-                startDate: moment().format('YYYY-MM-DD'),
-                endDate: null
-            }
-        });
     }
 
     return state;
@@ -79,15 +69,21 @@ function mergeFilter(filters, param, data) {
     return newFilters;
 }
 
-export default function filterReducerFactory(namespace) {
-    return (state = initialStateFactory(namespace), action) => {
+export default function filterReducerFactory(namespace, initialState) {
+    let factory;
+    if (typeof initialState === 'function') {
+        factory = initialState;
+    } else {
+        factory = () => initialState;
+    }
+    return (state = factory(namespace), action) => {
         switch (action.type) {
             case actions.SET_FILTER_PARAMETER:
                 return action.namespace === namespace ? mergeFilter(state, action.param, action.data) : state;
             case actions.SET_FILTERS:
                 return action.namespace === namespace ? action.params : state;
             case actions.RESET_PAGE_STATE:
-                return (!action.namespace || action.namespace === namespace) ? initialStateFactory(namespace) : state;
+                return (!action.namespace || action.namespace === namespace) ? factory(namespace) : state;
             default:
                 return state;
         }

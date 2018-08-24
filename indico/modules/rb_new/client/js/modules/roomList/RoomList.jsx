@@ -35,7 +35,7 @@ import mapControllerFactory from '../../containers/MapController';
 import Room from '../../containers/Room';
 import roomDetailsModalFactory from '../../components/modals/RoomDetailsModal';
 import BookFromListModal from '../../components/modals/BookFromListModal';
-import BlockingModal from '../../components/modals/BlockingModal';
+import {BlockingModal} from '../blockings';
 import {queryString as queryStringSerializer} from '../../serializers/filters';
 import * as actions from '../../actions';
 import * as selectors from '../../selectors';
@@ -95,6 +95,7 @@ class RoomList extends React.Component {
                     circular />
         );
 
+        // TODO: rename this to something like "selectionMode"
         if (blockingMode) {
             const isRoomBlocked = room.id in blockings;
             const buttonProps = {compact: true, size: 'tiny'};

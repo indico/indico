@@ -14,8 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
+
 import {connect} from 'react-redux';
-import {setFilterParameter, searchRooms, fetchMapRooms, fetchBlockings} from '../actions';
+import {setFilterParameter, searchRooms, fetchMapRooms} from '../actions';
 import {selectors as userSelectors} from '../common/user';
 import {selectors as roomsSelectors} from '../common/rooms';
 
@@ -32,12 +33,8 @@ export default (namespace, componentClass) => {
     const mapDispatchToProps = dispatch => ({
         setFilterParameter: (param, value) => {
             dispatch(setFilterParameter(namespace, param, value));
-            if (namespace === 'blockingList') {
-                dispatch(fetchBlockings());
-            } else {
-                dispatch(searchRooms(namespace));
-                dispatch(fetchMapRooms(namespace));
-            }
+            dispatch(searchRooms(namespace));
+            dispatch(fetchMapRooms(namespace));
         }
     });
 

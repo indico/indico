@@ -18,12 +18,12 @@
 import {combineReducers} from 'redux';
 
 import {roomsReducerFactory} from './roomBooking/roomList';
-import filterReducerFactory from './roomBooking/filters';
+import filterReducerFactory, {initialRoomFilterStateFactory} from './roomBooking/filters';
 import {mapReducerFactory} from './roomBooking/map';
 
 
 export default combineReducers({
     rooms: roomsReducerFactory('roomList'),
-    filters: filterReducerFactory('roomList'),
+    filters: filterReducerFactory('roomList', initialRoomFilterStateFactory),
     map: mapReducerFactory('roomList')
 });

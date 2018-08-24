@@ -618,23 +618,23 @@ def serialize_unbookable_hours(data):
     return [bookable_hours_schema.dump(d).data for d in data]
 
 
-def get_room_blockings(start_dt=None, end_dt=None, created_by=None, in_rooms_owned_by=None):
-    query = Blocking.query
-    if start_dt and not end_dt:
-        query = query.filter(Blocking.is_active_at(start_dt))
-    elif start_dt and end_dt:
-        query = query.filter(db_dates_overlap(Blocking, 'start_date', start_dt, 'end_date', end_dt))
+def get_room_blockings(start_date=None, end_date=None, created_by=None, in_rooms_owned_by=None):
+    query = (Blocking.query
+             .join(Blocking.blocked_rooms)
+             .join(BlockedRoom.room)
+             .options(contains_eager('blocked_rooms').contains_eager('room')))
+    if start_date and not end_date:
+        query = query.filter(Blocking.is_active_at(start_date))
+    elif start_date and end_date:
+        query = query.filter(db_dates_overlap(Blocking, 'start_date', start_date, 'end_date', end_date))
 
     criteria = []
     if created_by:
         criteria.append(Blocking.created_by_user == created_by)
     if in_rooms_owned_by:
         criteria.append(Room.owner == in_rooms_owned_by)
-        query = (query
-                 .join(Blocking.blocked_rooms)
-                 .join(BlockedRoom.room))
 
-    query = query.filter(db.or_(*criteria))
+    query = query.filter(db.and_(*criteria))
     return query.all()
 
 

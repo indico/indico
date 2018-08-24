@@ -27,7 +27,7 @@ import Landing from '../containers/Landing';
 import Calendar from '../modules/calendar';
 import BookRoom from '../containers/BookRoom';
 import RoomList from '../modules/roomList';
-import BlockingList from './pages/BlockingList';
+import BlockingList from '../modules/blockings';
 import Menu from './Menu';
 
 import './App.module.scss';

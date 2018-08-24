@@ -15,21 +15,9 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import {bindActionCreators} from 'redux';
-import {connect} from 'react-redux';
-import {push as pushRoute} from 'connected-react-router';
-import UserActions from '../components/UserActions';
-
-import {selectors as userSelectors} from '../common/user';
+import {RequestState} from 'indico/utils/redux';
 
 
-export default connect(
-    state => ({
-        isAdmin: userSelectors.isUserAdmin(state),
-        hasOwnedRooms: userSelectors.hasOwnedRooms(state),
-    }),
-    dispatch => bindActionCreators({
-        gotoMyRoomsList: () => pushRoute('/rooms?mine=true'),
-        gotoMyBlockings: () => pushRoute('/blockings?mine=true'),
-    }, dispatch)
-)(UserActions);
+export const getAllBlockings = ({blockings}) => blockings.blockings;
+export const isFetchingBlockings = ({blockings}) => blockings.requests.blockings.state === RequestState.STARTED;
+export const getFilters = ({blockings}) => blockings.filters;

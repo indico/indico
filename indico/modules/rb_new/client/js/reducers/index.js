@@ -23,7 +23,7 @@ import {reducer as configReducer} from '../common/config';
 import {reducer as roomsReducer} from '../common/rooms';
 import {reducer as userReducer} from '../common/user';
 import bookRoomFormReducer from './bookRoomForm';
-import blockingsReducer from './blockings';
+import {reducer as blockingsReducer} from '../modules/blockings';
 import {reducer as calendarReducer} from '../modules/calendar';
 
 
@@ -36,7 +36,7 @@ const reducers = {
     mapAspects: mapAspectsReducer,
     rooms: roomsReducer,
     bookRoomForm: bookRoomFormReducer,
-    blockingList: blockingsReducer,
+    blockings: blockingsReducer,
     calendar: calendarReducer
 };
 

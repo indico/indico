@@ -26,8 +26,8 @@ import {Translate} from 'indico/react/i18n';
 import {ReduxFormField, formatters} from 'indico/react/forms';
 import PrincipalSearchField from 'indico/react/components/PrincipalSearchField';
 import DatePeriodField from 'indico/react/components/DatePeriodField';
-import RoomSelector from '../RoomSelector';
-import {createBlocking as createBlockingAction} from '../../actions';
+import RoomSelector from '../../components/RoomSelector';
+import * as blockingsActions from './actions';
 
 
 function validate({period, reason, rooms}) {
@@ -142,7 +142,7 @@ class BlockingModal extends React.Component {
                     disabled={hasValidationErrors || pristine || submitSucceeded}
                     loading={submitting}
                     primary>
-                <Translate>Create a blocking</Translate>
+                <Translate>Block these rooms</Translate>
             </Button>
         );
     };
@@ -242,13 +242,11 @@ class BlockingModal extends React.Component {
     }
 }
 
-const mapDispatchToProps = (dispatch) => ({
-    createBlocking: (formData) => {
-        return dispatch(createBlockingAction(formData));
-    }
-});
-
 export default connect(
     null,
-    mapDispatchToProps
+    dispatch => ({
+        createBlocking: (formData) => {
+            return dispatch(blockingsActions.createBlocking(formData));
+        }
+    })
 )(BlockingModal);

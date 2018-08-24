@@ -16,70 +16,30 @@
  */
 
 import React from 'react';
+import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
-import {Container, Grid, Item, Loader, Message} from 'semantic-ui-react';
-import {PluralTranslate, Translate} from 'indico/react/i18n';
-import {RequestState} from 'indico/utils/redux';
-import {fetchBlockings as fetchBlockingsAction} from '../../actions';
-import BlockingFilterBar from '../BlockingFilterBar';
-import filterBarFactory from '../../containers/FilterBar';
+import {Container, Grid, Loader, Message} from 'semantic-ui-react';
+import {Translate} from 'indico/react/i18n';
+import BlockingFilterBar from './BlockingFilterBar';
+import BlockingCard from './BlockingCard';
+import * as blockingsActions from './actions';
+import * as blockingsSelectors from './selectors';
 
 import './BlockingList.module.scss';
-
-
-const FilterBar = filterBarFactory('blockingList', BlockingFilterBar);
-
-
-class BlockingCard extends React.Component {
-    static propTypes = {
-        blocking: PropTypes.object.isRequired
-    };
-
-    renderCardHeader() {
-        const {blocking} = this.props;
-        const {blocked_rooms: blockedRooms} = blocking;
-
-        if (blockedRooms.length === 1) {
-            return blockedRooms[0].room.name;
-        }
-
-        return PluralTranslate.string('1 room', '{count} rooms', blockedRooms.length, {count: blockedRooms.length});
-    }
-
-    render() {
-        const {blocking} = this.props;
-        const {blocked_rooms: blockedRooms} = blocking;
-
-        return (
-            <Item.Group>
-                <Item key={blocking.id}>
-                    <Item.Image src={blockedRooms[0].room.large_photo_url} size="small" />
-                    <Item.Content>
-                        <Item.Header>{this.renderCardHeader()}</Item.Header>
-                        <Item.Meta>
-                            {blocking.start_date} - {blocking.end_date}
-                        </Item.Meta>
-                        <Item.Description>
-                            {blocking.reason}
-                        </Item.Description>
-                    </Item.Content>
-                </Item>
-            </Item.Group>
-        );
-    }
-}
 
 
 class BlockingList extends React.Component {
     static propTypes = {
         list: PropTypes.array.isRequired,
         isFetching: PropTypes.bool.isRequired,
-        fetchBlockings: PropTypes.func.isRequired
+        actions: PropTypes.exact({
+            fetchBlockings: PropTypes.func.isRequired,
+        }).isRequired,
     };
 
     componentDidMount() {
-        const {fetchBlockings} = this.props;
+        const {actions: {fetchBlockings}} = this.props;
         fetchBlockings();
     }
 
@@ -96,7 +56,7 @@ class BlockingList extends React.Component {
         return (
             <>
                 <Container styleName="blockings-container">
-                    <FilterBar />
+                    <BlockingFilterBar />
                     {!isFetching && blockings.length !== 0 && (
                         <>
                             <Grid columns={4} styleName="blockings-list" stackable>
@@ -118,18 +78,15 @@ class BlockingList extends React.Component {
     }
 }
 
-const mapStateToProps = ({blockingList: {blockings: {list, requests: {getBlockings: {state}}}}}) => ({
-    list,
-    isFetching: state === RequestState.STARTED
-});
-
-const mapDispatchToProps = dispatch => ({
-    fetchBlockings: () => {
-        dispatch(fetchBlockingsAction());
-    }
-});
 
 export default connect(
-    mapStateToProps,
-    mapDispatchToProps
+    state => ({
+        list: blockingsSelectors.getAllBlockings(state),
+        isFetching: blockingsSelectors.isFetchingBlockings(state),
+    }),
+    dispatch => ({
+        actions: bindActionCreators({
+            fetchBlockings: blockingsActions.fetchBlockings,
+        }, dispatch),
+    })
 )(BlockingList);
