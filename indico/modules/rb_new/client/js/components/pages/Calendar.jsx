@@ -54,7 +54,10 @@ class Calendar extends React.Component {
         // this updates the calendar when
         // 1) the query string changes due to the user changing the date
         // 2) the user clicks on "calendar" again (which also causes a query string change)
-        if (location.pathname === prevLocation.pathname && location.search !== prevLocation.search) {
+        if (
+            location.pathname === prevLocation.pathname &&
+            (location.search !== prevLocation.search || location.key !== prevLocation.key)
+        ) {
             this._updateCalendar();
         }
     }
