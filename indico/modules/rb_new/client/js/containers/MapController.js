@@ -21,7 +21,7 @@ import MapController from '../components/MapController';
 import {
     fetchMapRooms,
     setFilterParameter,
-    fetchRooms,
+    searchRooms,
     toggleMapSearch,
     updateLocation
 } from '../actions';
@@ -39,14 +39,14 @@ export default function mapControllerFactory(namespace) {
             dispatch(updateLocation(namespace, location));
             if (search) {
                 dispatch(setFilterParameter(namespace, 'bounds', location));
-                dispatch(fetchRooms(namespace));
+                dispatch(searchRooms(namespace));
                 dispatch(fetchMapRooms(namespace));
             }
         },
         toggleMapSearch: (search, location) => {
             dispatch(toggleMapSearch(namespace, search));
             dispatch(setFilterParameter(namespace, 'bounds', search ? location : null));
-            dispatch(fetchRooms(namespace));
+            dispatch(searchRooms(namespace));
             dispatch(fetchMapRooms(namespace));
         },
         fetchMapRooms: () => {

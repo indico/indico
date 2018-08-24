@@ -263,7 +263,7 @@ export default connect(
     dispatch => ({
         actions: {
             fetchRooms: (clear = true) => {
-                dispatch(actions.fetchRooms('roomList', clear));
+                dispatch(actions.searchRooms('roomList', clear));
                 dispatch(actions.fetchMapRooms('roomList'));
             },
             fetchRoomDetails: bindActionCreators(roomsActions.fetchDetails, dispatch),

@@ -39,8 +39,8 @@ export const RESET_PAGE_STATE = 'RESET_PAGE_STATE';
 export const SET_FILTER_PARAMETER = 'SET_FILTER_PARAMETER';
 export const SET_FILTERS = 'SET_FILTERS';
 // Rooms
-export const FETCH_ROOMS_STARTED = 'FETCH_ROOMS_STARTED';
-export const FETCH_ROOMS_FAILED = 'FETCH_ROOMS_FAILED';
+export const SEARCH_ROOMS_STARTED = 'SEARCH_ROOMS_STARTED';
+export const SEARCH_ROOMS_FAILED = 'SEARCH_ROOMS_FAILED';
 export const UPDATE_ROOMS = 'UPDATE_ROOMS';
 export const FETCH_MAP_ROOMS_STARTED = 'FETCH_MAP_ROOMS_STARTED';
 export const FETCH_MAP_ROOMS_FAILED = 'FETCH_MAP_ROOMS_FAILED';
@@ -100,11 +100,11 @@ export function updateRooms(namespace, rooms, total, clear) {
     return {type: UPDATE_ROOMS, namespace, rooms, total, clear};
 }
 
-export function fetchRooms(namespace, clear = true) {
+export function searchRooms(namespace, clear = true) {
     return async (dispatch, getStore) => {
         const {filters, rooms: {list: oldRoomList}} = getStore()[namespace];
 
-        dispatch({type: FETCH_ROOMS_STARTED, namespace});
+        dispatch({type: SEARCH_ROOMS_STARTED, namespace});
 
         const params = preProcessParameters(filters, ajaxFilterRules);
 
@@ -118,7 +118,7 @@ export function fetchRooms(namespace, clear = true) {
             response = await indicoAxios.get(buildSearchRoomsURL(), {params});
         } catch (error) {
             handleAxiosError(error);
-            dispatch({type: FETCH_ROOMS_FAILED, namespace});
+            dispatch({type: SEARCH_ROOMS_FAILED, namespace});
             return;
         }
 

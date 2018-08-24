@@ -22,7 +22,7 @@ import {queryString as queryStringFilterSerializer} from '../serializers/filters
 import {queryString as queryStringTimelineSerializer} from '../serializers/timeline';
 import BookRoom from '../components/pages/BookRoom';
 import {
-    fetchRooms,
+    searchRooms,
     fetchMapRooms,
     setFilterParameter,
     updateRooms,
@@ -52,7 +52,7 @@ const mapDispatchToProps = dispatch => ({
         dispatch(setFilterParameter('bookRoom', 'text', null));
     },
     fetchRooms(clear = true) {
-        dispatch(fetchRooms('bookRoom', clear));
+        dispatch(searchRooms('bookRoom', clear));
         dispatch(fetchMapRooms('bookRoom'));
     },
     fetchRoomDetails(id) {
@@ -63,7 +63,7 @@ const mapDispatchToProps = dispatch => ({
     },
     setFilterParameter(param, value) {
         dispatch(setFilterParameter('bookRoom', param, value));
-        dispatch(fetchRooms('bookRoom'));
+        dispatch(searchRooms('bookRoom'));
         dispatch(fetchMapRooms('bookRoom'));
     },
     toggleTimelineView: (isVisible) => {

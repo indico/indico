@@ -15,7 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 import {connect} from 'react-redux';
-import {setFilterParameter, fetchRooms, fetchMapRooms, fetchBlockings} from '../actions';
+import {setFilterParameter, searchRooms, fetchMapRooms, fetchBlockings} from '../actions';
 import {selectors as userSelectors} from '../common/user';
 import {selectors as roomsSelectors} from '../common/rooms';
 
@@ -35,7 +35,7 @@ export default (namespace, componentClass) => {
             if (namespace === 'blockingList') {
                 dispatch(fetchBlockings());
             } else {
-                dispatch(fetchRooms(namespace));
+                dispatch(searchRooms(namespace));
                 dispatch(fetchMapRooms(namespace));
             }
         }

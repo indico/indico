@@ -42,9 +42,9 @@ export function roomsReducerFactory(namespace) {
         }
 
         switch (action.type) {
-            case actions.FETCH_ROOMS_STARTED:
+            case actions.SEARCH_ROOMS_STARTED:
                 return {...state, isFetching: true};
-            case actions.FETCH_ROOMS_FAILED:
+            case actions.SEARCH_ROOMS_FAILED:
                 return {...state, isFetching: false};
             case actions.UPDATE_ROOMS:
                 return {...state, isFetching: false, ...mergeRooms(state, action)};
