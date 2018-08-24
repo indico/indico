@@ -72,11 +72,15 @@ const qsFilterReducer = createQueryStringReducer(
     queryFilterRules,
     (state, action) => {
         if (action.type === actions.INIT) {
+            const namespace = pathMatch({
+                '^/book': 'bookRoom',
+                '^/rooms': 'roomList'
+            }, history.location.pathname);
+            if (!namespace) {
+                return null;
+            }
             return {
-                namespace: pathMatch({
-                    '^/book': 'bookRoom',
-                    '^/rooms': 'roomList'
-                }, history.location.pathname),
+                namespace,
                 queryString: history.location.search.slice(1)
             };
         }
