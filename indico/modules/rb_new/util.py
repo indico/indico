@@ -626,7 +626,7 @@ def get_room_blockings(start_date=None, end_date=None, created_by=None, in_rooms
     if start_date and not end_date:
         query = query.filter(Blocking.is_active_at(start_date))
     elif start_date and end_date:
-        query = query.filter(db_dates_overlap(Blocking, 'start_date', start_date, 'end_date', end_date))
+        query = query.filter(db_dates_overlap(Blocking, 'start_date', start_date, 'end_date', end_date, inclusive=True))
 
     criteria = []
     if created_by:
