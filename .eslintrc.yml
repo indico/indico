@@ -29,6 +29,9 @@ rules:
   new-cap:
     - error
     - capIsNewExceptionPattern: '\$\.(Event|Deferred)$'
+  no-unused-vars:
+    - error
+    - ignoreRestSiblings: true
   prefer-template: warn
   react/forbid-component-props: off
 
