@@ -72,8 +72,8 @@ class RoomList extends React.Component {
     }
 
     state = {
-        blockingMode: false,
-        blockings: {}
+        selectionMode: null,
+        selection: {}
     };
 
     componentDidMount() {
@@ -84,7 +84,7 @@ class RoomList extends React.Component {
     renderRoom = (room) => {
         const {id} = room;
         const {pushState} = this.props;
-        const {blockingMode, blockings} = this.state;
+        const {selectionMode, selection} = this.state;
 
         const showDetailsBtn = (
             <Button icon="search"
@@ -95,12 +95,11 @@ class RoomList extends React.Component {
                     circular />
         );
 
-        // TODO: rename this to something like "selectionMode"
-        if (blockingMode) {
-            const isRoomBlocked = room.id in blockings;
+        if (selectionMode) {
+            const isRoomSelected = room.id in selection;
             const buttonProps = {compact: true, size: 'tiny'};
 
-            if (!isRoomBlocked) {
+            if (!isRoomSelected) {
                 buttonProps.icon = 'check';
             } else {
                 buttonProps.icon = 'remove';
@@ -110,14 +109,14 @@ class RoomList extends React.Component {
             return (
                 <Room key={room.id} room={room}>
                     <Slot>
-                        <Button styleName="blocking-add-btn"
+                        <Button styleName="selection-add-btn"
                                 onClick={() => {
-                                    if (room.id in blockings) {
-                                        const newBlockings = {...blockings};
-                                        delete newBlockings[room.id];
-                                        this.setState({blockings: newBlockings});
+                                    if (room.id in selection) {
+                                        const newSelection = {...selection};
+                                        delete newSelection[room.id];
+                                        this.setState({selection: newSelection});
                                     } else {
-                                        this.setState({blockings: {...blockings, [room.id]: room}});
+                                        this.setState({selection: {...selection, [room.id]: room}});
                                     }
                                 }}
                                 {...buttonProps} />
@@ -143,12 +142,15 @@ class RoomList extends React.Component {
     closeBlockingModal = () => {
         const {pushState} = this.props;
         pushState('/rooms', true);
-        this.setState({blockingMode: false, blockings: []});
+        this.clearSelectionMode();
     };
 
-    toggleBlockingMode = () => {
-        const {blockingMode} = this.state;
-        this.setState({blockingMode: !blockingMode, blockings: []});
+    clearSelectionMode = () => {
+        this.setState({selectionMode: null, selection: []});
+    };
+
+    setSelectionMode = (type) => () => {
+        this.setState({selectionMode: type, selection: []});
     };
 
     render() {
@@ -160,11 +162,11 @@ class RoomList extends React.Component {
             pushState,
             isInitializing,
         } = this.props;
-        const {blockingMode, blockings} = this.state;
+        const {selectionMode, selection} = this.state;
         const menuOptions = [{
             text: Translate.string('Block rooms'),
             value: 'block-rooms',
-            onClick: this.toggleBlockingMode,
+            onClick: this.setSelectionMode('blocking'),
             icon: 'lock'
         }];
 
@@ -178,16 +180,18 @@ class RoomList extends React.Component {
                                     <FilterBar />
                                 </Grid.Column>
                                 <Grid.Column width={4} textAlign="right" verticalAlign="middle">
-                                    {blockingMode ? (
+                                    {selectionMode ? (
                                         <>
                                             <Button icon="check"
-                                                    disabled={Object.keys(blockings).length === 0}
+                                                    disabled={Object.keys(selection).length === 0}
                                                     onClick={() => {
-                                                        pushState('/rooms/blocking/create');
+                                                        if (selectionMode === 'blocking') {
+                                                            pushState('/rooms/blocking/create');
+                                                        }
                                                     }}
                                                     primary
                                                     circular />
-                                            <Button icon="cancel" onClick={this.toggleBlockingMode} circular />
+                                            <Button icon="cancel" onClick={this.clearSelectionMode} circular />
                                         </>
                                     ) : (
                                         <Dropdown text={Translate.string('Actions')}
@@ -242,7 +246,7 @@ class RoomList extends React.Component {
                         ), fetchRoomDetails)} />
                         <Route exact path="/rooms/blocking/create" render={() => (
                             <BlockingModal open
-                                           rooms={Object.values(blockings)}
+                                           rooms={Object.values(selection)}
                                            onClose={this.closeBlockingModal} />
                         )} />
                     </>
