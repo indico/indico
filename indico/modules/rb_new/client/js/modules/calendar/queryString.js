@@ -16,6 +16,7 @@
  */
 
 import _ from 'lodash';
+import moment from 'moment';
 import {createQueryStringReducer, validator as v} from 'redux-router-querystring';
 
 import * as actions from '../../actions';

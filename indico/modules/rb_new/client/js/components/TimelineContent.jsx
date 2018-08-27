@@ -15,6 +15,8 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import _ from 'lodash';
+import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
 import {Icon, Popup} from 'semantic-ui-react';

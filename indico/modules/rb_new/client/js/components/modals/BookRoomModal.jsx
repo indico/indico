@@ -15,6 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import _ from 'lodash';
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Button, Checkbox, Form, Grid, Icon, Label, Message, Modal, Radio, Segment, Popup} from 'semantic-ui-react';
@@ -256,7 +257,7 @@ export default class BookRoomModal extends React.Component {
                     <Checkbox toggle
                               defaultChecked={skipConflicts}
                               label={Translate.string('I understand, please skip any days with conflicting occurrences.')}
-                              onChange={(_, {checked}) => {
+                              onChange={(__, {checked}) => {
                                   this.setState({
                                       skipConflicts: checked
                                   });

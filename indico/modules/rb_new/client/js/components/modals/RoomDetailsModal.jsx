@@ -15,6 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import _ from 'lodash';
 import {push} from 'connected-react-router';
 import React from 'react';
 import PropTypes from 'prop-types';

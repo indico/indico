@@ -15,6 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
 import {Button, Form, Select} from 'semantic-ui-react';

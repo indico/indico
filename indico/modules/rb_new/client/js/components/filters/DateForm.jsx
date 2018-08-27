@@ -15,6 +15,7 @@
 * along with Indico; if not, see <http://www.gnu.org/licenses/>.
 */
 
+import moment from 'moment';
 import React from 'react';
 import RangeCalendar from 'rc-calendar/lib/RangeCalendar';
 import RCCalendar from 'rc-calendar';

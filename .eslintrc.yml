@@ -33,20 +33,8 @@ rules:
   react/forbid-component-props: off
 
 globals:
-  _: false
-  $T: false
-  K: false
-  moment: false
   Indico: false
   IndicoUI: false
-  build_url: false
-  alertPopup: false
-  confirmPrompt: false
-  handleFlashes: false
-  handleAjaxError: false
-  ajaxDialog: false
-  cornerMessage: false
-  enableIfChecked: false
   global: false
   require: false
   process: false

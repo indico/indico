@@ -15,6 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import moment from 'moment';
 import {combineReducers} from 'redux';
 
 import {requestReducer} from 'indico/utils/redux';
