@@ -23,12 +23,11 @@ import {connect} from 'react-redux';
 import {stateToQueryString} from 'redux-router-querystring';
 import {Message, Segment} from 'semantic-ui-react';
 import {Translate, Param} from 'indico/react/i18n';
-import {isDateWithinRange, pushStateMergeProps} from '../util';
-import {queryString as queryStringSerializer} from '../serializers/filters';
-import TimelineBase from './TimelineBase';
-import * as actions from '../actions';
+import {isDateWithinRange, pushStateMergeProps} from '../../util';
+import {queryString as queryStringSerializer} from '../../serializers/filters';
+import TimelineBase from '../../components/TimelineBase';
 
-import './Timeline.module.scss';
+import '../../components/Timeline.module.scss';
 
 
 const DATE_FORMAT = 'YYYY-MM-DD';
@@ -173,9 +172,6 @@ export default connect(
         };
     },
     dispatch => ({
-        resetBookingState: () => {
-            dispatch(actions.resetBookingState());
-        },
         dispatch
     }),
     pushStateMergeProps

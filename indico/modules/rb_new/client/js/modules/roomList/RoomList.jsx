@@ -155,7 +155,7 @@ class RoomList extends React.Component {
 
     render() {
         const {
-            rooms: {list, total, isFetching},
+            rooms: {list, matching, isFetching},
             actions: {fetchRooms, fetchRoomDetails},
             roomDetailsFetching,
             showMap,
@@ -205,19 +205,19 @@ class RoomList extends React.Component {
                             <SearchBar onConfirm={fetchRooms} onTextChange={fetchRooms} />
                         </Sticky>
                         <div styleName="results-count">
-                            {total === 0 && !isFetching && Translate.string('There are no rooms matching the criteria')}
-                            {total !== 0 && (
-                                <PluralTranslate count={total}>
+                            {matching === 0 && !isFetching && Translate.string('There are no rooms matching the criteria')}
+                            {matching !== 0 && (
+                                <PluralTranslate count={matching}>
                                     <Singular>
-                                        There is <Param name="count" value={total} /> room matching the criteria
+                                        There is <Param name="count" value={matching} /> room matching the criteria
                                     </Singular>
                                     <Plural>
-                                        There are <Param name="count" value={total} /> rooms matching the criteria
+                                        There are <Param name="count" value={matching} /> rooms matching the criteria
                                     </Plural>
                                 </PluralTranslate>
                             )}
                         </div>
-                        <LazyScroll hasMore={total > list.length} loadMore={() => fetchRooms(false)}
+                        <LazyScroll hasMore={matching > list.length} loadMore={() => fetchRooms(false)}
                                     isFetching={isFetching}>
                             <Card.Group stackable>
                                 {list.map(this.renderRoom)}

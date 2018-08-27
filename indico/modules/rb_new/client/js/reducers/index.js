@@ -15,14 +15,13 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import bookRoomReducer from './bookRoom';
 import roomListReducer from './roomList';
 import buildingsReducer from './buildings';
 import mapAspectsReducer from './mapAspects';
 import {reducer as configReducer} from '../common/config';
 import {reducer as roomsReducer} from '../common/rooms';
+import {reducer as bookRoomReducer} from '../modules/bookRoom';
 import {reducer as userReducer} from '../common/user';
-import bookRoomFormReducer from './bookRoomForm';
 import {reducer as blockingsReducer} from '../modules/blockings';
 import {reducer as calendarReducer} from '../modules/calendar';
 
@@ -35,7 +34,6 @@ const reducers = {
     buildings: buildingsReducer,
     mapAspects: mapAspectsReducer,
     rooms: roomsReducer,
-    bookRoomForm: bookRoomFormReducer,
     blockings: blockingsReducer,
     calendar: calendarReducer
 };

@@ -19,15 +19,10 @@ import buildSearchRoomsURL from 'indico-url:rooms_new.search_rooms';
 import fetchMapRoomsURL from 'indico-url:rooms_new.map_rooms';
 import fetchMapAspectsURL from 'indico-url:rooms_new.default_aspects';
 import fetchBuildingsURL from 'indico-url:rooms_new.buildings';
-import fetchTimelineDataURL from 'indico-url:rooms_new.timeline';
-import createBookingURL from 'indico-url:rooms_new.create_booking';
-import fetchSuggestionsURL from 'indico-url:rooms_new.suggestions';
 
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
-import {submitFormAction, ajaxAction} from 'indico/utils/redux';
 import {preProcessParameters} from './util';
 import {ajax as ajaxFilterRules} from './serializers/filters';
-import {ajax as ajaxBookingRules} from './serializers/bookings';
 
 
 // Page state
@@ -55,28 +50,6 @@ export const FETCH_BUILDINGS_STARTED = 'FETCH_BUILDINGS_STARTED';
 export const FETCH_BUILDINGS_FAILED = 'FETCH_BUILDINGS_FAILED';
 export const FETCH_BUILDINGS = 'FETCH_BUILDINGS';
 export const UPDATE_BUILDINGS = 'UPDATE_BUILDINGS';
-// Timeline
-export const FETCH_TIMELINE_DATA_STARTED = 'FETCH_TIMELINE_DATA_STARTED';
-export const FETCH_TIMELINE_DATA_FAILED = 'FETCH_TIMELINE_DATA_FAILED';
-export const UPDATE_TIMELINE_DATA = 'UPDATE_TIMELINE_DATA';
-export const TOGGLE_TIMELINE_VIEW = 'TOGGLE_TIMELINE_VIEW';
-// Bookings
-export const CREATE_BOOKING_REQUEST = 'CREATE_BOOKING_REQUEST';
-export const CREATE_BOOKING_SUCCESS = 'CREATE_BOOKING_SUCCESS';
-export const CREATE_BOOKING_FAILED = 'CREATE_BOOKING_FAILED';
-export const GET_BOOKING_AVAILABILITY_REQUEST = 'GET_BOOKING_AVAILABILITY_REQUEST';
-export const GET_BOOKING_AVAILABILITY_SUCCESS = 'GET_BOOKING_AVAILABILITY_SUCCESS';
-export const GET_BOOKING_AVAILABILITY_ERROR = 'GET_BOOKING_AVAILABILITY_ERROR';
-export const RESET_BOOKING_AVAILABILITY = 'RESET_BOOKING_AVAILABILITY';
-// Suggestions
-export const FETCH_SUGGESTIONS_STARTED = 'FETCH_SUGGESTIONS_STARTED';
-export const FETCH_SUGGESTIONS_FAILED = 'FETCH_SUGGESTIONS_FAILED';
-export const UPDATE_SUGGESTIONS = 'UPDATE_SUGGESTIONS';
-
-export const OPEN_FILTER_DROPDOWN = 'OPEN_FILTER_DROPDOWN';
-export const CLOSE_FILTER_DROPDOWN = 'CLOSE_FILTER_DROPDOWN';
-
-export const SET_BOOKING_AVAILABILITY = 'SET_BOOKING_AVAILABILITY';
 
 const ROOM_RESULT_LIMIT = 20;
 
@@ -85,8 +58,8 @@ export function init() {
     return {type: INIT};
 }
 
-export function updateRooms(namespace, rooms, total, clear) {
-    return {type: UPDATE_ROOMS, namespace, rooms, total, clear};
+export function updateRooms(namespace, rooms, matching, clear) {
+    return {type: UPDATE_ROOMS, namespace, rooms, matching, clear};
 }
 
 export function searchRooms(namespace, clear = true) {
@@ -111,17 +84,9 @@ export function searchRooms(namespace, clear = true) {
             return;
         }
 
-        const {rooms, total} = response.data;
-        dispatch(updateRooms(namespace, rooms, total, clear));
-        if (namespace === 'bookRoom') {
-            dispatch(updateRoomSuggestions([]));
-            const {bookRoom: {rooms: {list}}} = getStore();
-            if (list.length === total || total === 0) {
-                dispatch(fetchRoomSuggestions());
-            } else {
-                dispatch(fetchTimelineData());
-            }
-        }
+        const {rooms, matching} = response.data;
+        dispatch(updateRooms(namespace, rooms, matching, clear));
+        return matching;
     };
 }
 
@@ -204,90 +169,4 @@ export function fetchBuildings() {
 
         dispatch({type: UPDATE_BUILDINGS, buildings: response.data});
     };
-}
-
-async function _fetchTimelineData(filters, rooms, limit = null) {
-    const params = preProcessParameters(filters, ajaxFilterRules);
-    params.additional_room_ids = rooms.map((room) => room.id);
-
-    if (limit) {
-        params.limit = limit;
-    }
-
-    return await indicoAxios.get(fetchTimelineDataURL(), {params});
-}
-
-export function fetchTimelineData() {
-    return async (dispatch, getStore) => {
-        dispatch({type: FETCH_TIMELINE_DATA_STARTED});
-
-        const {bookRoom: {filters, suggestions: {list: suggestionsList}, rooms: {list}}} = getStore();
-
-        if (!list.length && !suggestionsList.length) {
-            dispatch({type: UPDATE_TIMELINE_DATA, timeline: {date_range: [], availability: {}}});
-            return;
-        }
-        let response;
-        const rooms = suggestionsList.map(({room}) => room);
-        try {
-            response = await _fetchTimelineData(filters, rooms, list.length);
-        } catch (error) {
-            handleAxiosError(error);
-            dispatch({type: FETCH_TIMELINE_DATA_FAILED});
-            return;
-        }
-        dispatch({type: UPDATE_TIMELINE_DATA, timeline: response.data});
-    };
-}
-
-export function toggleTimelineView(isVisible) {
-    return {type: TOGGLE_TIMELINE_VIEW, isVisible};
-}
-
-export function createBooking(args) {
-    const params = preProcessParameters(args, ajaxBookingRules);
-    return submitFormAction(
-        () => indicoAxios.post(createBookingURL(), params),
-        CREATE_BOOKING_REQUEST, CREATE_BOOKING_SUCCESS, CREATE_BOOKING_FAILED
-    );
-}
-
-export function resetBookingState() {
-    return {type: RESET_BOOKING_AVAILABILITY};
-}
-
-
-export function fetchRoomSuggestions() {
-    return async (dispatch, getStore) => {
-        dispatch({type: FETCH_SUGGESTIONS_STARTED});
-
-        let response;
-        const {bookRoom: {filters}} = getStore();
-        const params = preProcessParameters(filters, ajaxFilterRules);
-
-        try {
-            response = await indicoAxios.get(fetchSuggestionsURL(), {params});
-        } catch (error) {
-            dispatch({type: FETCH_SUGGESTIONS_FAILED});
-            handleAxiosError(error);
-            return;
-        }
-
-        dispatch(updateRoomSuggestions(response.data));
-        dispatch(fetchTimelineData());
-    };
-}
-
-export function updateRoomSuggestions(suggestions) {
-    return {type: UPDATE_SUGGESTIONS, suggestions};
-}
-
-export function fetchBookingAvailability(room, filters) {
-    return ajaxAction(
-        () => _fetchTimelineData(filters, [room]),
-        GET_BOOKING_AVAILABILITY_REQUEST,
-        [GET_BOOKING_AVAILABILITY_SUCCESS, SET_BOOKING_AVAILABILITY],
-        GET_BOOKING_AVAILABILITY_ERROR,
-        ({availability, date_range: dateRange}) => ({availability: availability[room.id], dateRange})
-    );
 }

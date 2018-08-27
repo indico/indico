@@ -15,14 +15,21 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import {validator as v} from 'redux-router-querystring';
-import {boolStateField} from '../util';
+import {
+    filterDTHandler, recurrenceIntervalSerializer, recurrenceFrequencySerializer
+} from '../../serializers/common';
 
 
-export const queryString = {
-    timeline: {
-        validator: v.isBoolean(),
-        sanitizer: v.toBoolean(),
-        stateField: boolStateField('timeline.isVisible')
-    }
+export const ajax = {
+    start_dt: filterDTHandler('start'),
+    end_dt: filterDTHandler('end'),
+    repeat_frequency: recurrenceFrequencySerializer,
+    repeat_interval: recurrenceIntervalSerializer,
+    reason: ({reason}) => reason,
+    user_id: {
+        onlyIf: ({usage}) => usage === 'someone',
+        serializer: ({user: {id}}) => id
+    },
+    room_id: ({room: {id}}) => id,
+    is_prebooking: ({isPrebooking}) => isPrebooking
 };

@@ -15,7 +15,8 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-
+import {connect} from 'react-redux';
+import {stateToQueryString} from 'redux-router-querystring';
 import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -27,14 +28,21 @@ import LazyScroll from 'redux-lazy-scroll';
 import {Slot, toClasses} from 'indico/react/util';
 import {PluralTranslate, Translate, Singular, Param, Plural} from 'indico/react/i18n';
 import mapControllerFactory from '../../containers/MapController';
-import BookingFilterBar from '../BookingFilterBar';
 import filterBarFactory from '../../containers/FilterBar';
 import searchBoxFactory from '../../containers/SearchBar';
 import Room from '../../containers/Room';
-import BookingTimeline from '../BookingTimeline';
-import BookRoomModal from '../../containers/BookRoomModal';
-import roomDetailsModalFactory from '../modals/RoomDetailsModal';
-import {roomPreloader} from '../../util';
+import BookingFilterBar from './BookingFilterBar';
+import BookingTimeline from './BookingTimeline';
+import BookRoomModal from './BookRoomModal';
+import roomDetailsModalFactory from '../../components/modals/RoomDetailsModal';
+import {roomPreloader, pushStateMergeProps} from '../../util';
+import {queryString as qsFilterRules} from '../../serializers/filters';
+import {rules as qsBookRoomRules} from './queryString';
+
+import * as bookRoomActions from './actions';
+import * as globalActions from '../../actions';
+import * as globalSelectors from '../../selectors';
+import {actions as roomsActions, selectors as roomsSelectors} from '../../common/rooms';
 
 import './BookRoom.module.scss';
 
@@ -45,13 +53,13 @@ const MapController = mapControllerFactory('bookRoom');
 const RoomDetailsModal = roomDetailsModalFactory('bookRoom');
 
 
-export default class BookRoom extends React.Component {
+class BookRoom extends React.Component {
     static propTypes = {
         setFilterParameter: PropTypes.func.isRequired,
         clearTextFilter: PropTypes.func.isRequired,
         rooms: PropTypes.shape({
             list: PropTypes.array,
-            total: PropTypes.number,
+            matching: PropTypes.number,
             isFetching: PropTypes.bool,
         }).isRequired,
         isInitializing: PropTypes.bool.isRequired,
@@ -61,7 +69,7 @@ export default class BookRoom extends React.Component {
         clearRoomList: PropTypes.func.isRequired,
         roomDetailsFetching: PropTypes.bool.isRequired,
         fetchRoomDetails: PropTypes.func.isRequired,
-        resetBookingState: PropTypes.func.isRequired,
+        resetBookingAvailability: PropTypes.func.isRequired,
         suggestions: PropTypes.object.isRequired,
         pushState: PropTypes.func.isRequired,
         toggleTimelineView: PropTypes.func.isRequired,
@@ -113,7 +121,9 @@ export default class BookRoom extends React.Component {
 
     renderMainContent = () => {
         const {timelineRef} = this.state;
-        const {fetchRooms, roomDetailsFetching, rooms: {list, total, isFetching}, timeline: {isVisible}} = this.props;
+        const {
+            fetchRooms, roomDetailsFetching, rooms: {list, matching, isFetching}, timeline: {isVisible}
+        } = this.props;
         const filterBar = <FilterBar />;
         const searchBar = <SearchBar onConfirm={fetchRooms} onTextChange={fetchRooms} />;
 
@@ -131,21 +141,21 @@ export default class BookRoom extends React.Component {
                             {searchBar}
                         </Sticky>
                         <div styleName="results-count">
-                            {total === 0 && !isFetching && (
+                            {matching === 0 && !isFetching && (
                                 Translate.string('There are no rooms available during the selected period')
                             )}
-                            {total !== 0 && (
-                                <PluralTranslate count={total}>
+                            {matching !== 0 && (
+                                <PluralTranslate count={matching}>
                                     <Singular>
-                                        There is <Param name="count" value={total} /> room available for booking
+                                        There is <Param name="count" value={matching} /> room available for booking
                                     </Singular>
                                     <Plural>
-                                        There are <Param name="count" value={total} /> rooms available for booking
+                                        There are <Param name="count" value={matching} /> rooms available for booking
                                     </Plural>
                                 </PluralTranslate>
                             )}
                         </div>
-                        <LazyScroll hasMore={total > list.length} loadMore={() => fetchRooms(false)}
+                        <LazyScroll hasMore={matching > list.length} loadMore={() => fetchRooms(false)}
                                     isFetching={isFetching}>
                             <Card.Group stackable>
                                 {list.map(this.renderRoom)}
@@ -346,8 +356,8 @@ export default class BookRoom extends React.Component {
     };
 
     closeBookingModal = () => {
-        const {resetBookingState} = this.props;
-        resetBookingState();
+        const {resetBookingAvailability} = this.props;
+        resetBookingAvailability();
         this.closeModal();
     };
 
@@ -382,3 +392,48 @@ export default class BookRoom extends React.Component {
         );
     }
 }
+
+
+const mapStateToProps = (state) => {
+    return {
+        ...state.bookRoom,
+        roomDetailsFetching: roomsSelectors.isFetchingDetails(state),
+        isInitializing: globalSelectors.isInitializing(state),
+        queryString: stateToQueryString(state.bookRoom, qsFilterRules, qsBookRoomRules),
+        showMap: globalSelectors.isMapEnabled(state),
+    };
+};
+
+const mapDispatchToProps = dispatch => ({
+    clearRoomList() {
+        dispatch(globalActions.updateRooms('bookRoom', [], 0, true));
+    },
+    clearTextFilter() {
+        dispatch(globalActions.setFilterParameter('bookRoom', 'text', null));
+    },
+    fetchRooms(clear = true) {
+        dispatch(bookRoomActions.searchRooms(clear));
+        dispatch(globalActions.fetchMapRooms('bookRoom'));
+    },
+    fetchRoomDetails(id) {
+        dispatch(roomsActions.fetchDetails(id));
+    },
+    resetBookingAvailability() {
+        dispatch(bookRoomActions.resetBookingAvailability());
+    },
+    setFilterParameter(param, value) {
+        dispatch(globalActions.setFilterParameter('bookRoom', param, value));
+        dispatch(bookRoomActions.searchRooms());
+        dispatch(globalActions.fetchMapRooms('bookRoom'));
+    },
+    toggleTimelineView: (isVisible) => {
+        dispatch(bookRoomActions.toggleTimelineView(isVisible));
+    },
+    dispatch
+});
+
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps,
+    pushStateMergeProps
+)(BookRoom);

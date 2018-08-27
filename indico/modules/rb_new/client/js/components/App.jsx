@@ -25,7 +25,7 @@ import {Translate} from 'indico/react/i18n';
 import UserActions from '../containers/UserActions';
 import Landing from '../containers/Landing';
 import Calendar from '../modules/calendar';
-import BookRoom from '../containers/BookRoom';
+import BookRoom from '../modules/bookRoom';
 import RoomList from '../modules/roomList';
 import BlockingList from '../modules/blockings';
 import Menu from './Menu';

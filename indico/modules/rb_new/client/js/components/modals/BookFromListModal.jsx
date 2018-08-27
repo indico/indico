@@ -26,7 +26,8 @@ import {Translate} from 'indico/react/i18n';
 
 import {queryString as queryStringSerializer} from '../../serializers/filters';
 import RoomBasicDetails from '../RoomBasicDetails';
-import {setFilters, fetchBookingAvailability, resetBookingState} from '../../actions';
+import * as globalActions from '../../actions';
+import * as bookRoomActions from '../../modules/bookRoom/actions';
 import BookingBootstrapForm from '../BookingBootstrapForm';
 import {selectors as roomsSelectors} from '../../common/rooms';
 
@@ -122,11 +123,11 @@ class BookFromListModal extends React.Component {
 export default connect(
     (state, {roomId}) => ({
         room: roomsSelectors.getRoom(state, {roomId}),
-        availability: state.bookRoomForm.timeline ? state.bookRoomForm.timeline.availability : null,
+        availability: state.bookRoom.bookingForm.availability
     }),
     (dispatch) => ({
         resetCollisions() {
-            dispatch(resetBookingState());
+            dispatch(bookRoomActions.resetBookingAvailability());
         },
         dispatch,
     }),
@@ -138,11 +139,11 @@ export default connect(
             ...stateProps,
             ...realDispatchProps,
             refreshCollisions(filters) {
-                dispatch(fetchBookingAvailability(room, filters));
+                dispatch(bookRoomActions.fetchBookingAvailability(room, filters));
             },
             onBook(filters) {
                 const qs = stateToQueryString({filters}, queryStringSerializer);
-                dispatch(setFilters('bookRoom', filters));
+                dispatch(globalActions.setFilters('bookRoom', filters));
                 dispatch(push(`/book/${room.id}/confirm?${qs}`));
             },
         };

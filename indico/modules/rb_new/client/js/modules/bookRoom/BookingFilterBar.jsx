@@ -19,15 +19,15 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import {Translate} from 'indico/react/i18n';
-import RoomFilterBar, {equipmentType, FilterDropdownFactory} from './RoomFilterBar';
+import RoomFilterBar, {equipmentType, FilterDropdownFactory} from '../../components/RoomFilterBar';
 
-import RecurrenceForm from './filters/RecurrenceForm';
-import DateForm from './filters/DateForm';
-import TimeForm from './filters/TimeForm';
+import RecurrenceForm from '../../components/filters/RecurrenceForm';
+import DateForm from '../../components/filters/DateForm';
+import TimeForm from '../../components/filters/TimeForm';
 
-import recurrenceRenderer from './filters/RecurrenceRenderer';
-import dateRenderer from './filters/DateRenderer';
-import timeRenderer from './filters/TimeRenderer';
+import recurrenceRenderer from '../../components/filters/RecurrenceRenderer';
+import dateRenderer from '../../components/filters/DateRenderer';
+import timeRenderer from '../../components/filters/TimeRenderer';
 
 
 export default class FilterBar extends React.Component {

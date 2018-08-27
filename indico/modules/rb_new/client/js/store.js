@@ -23,35 +23,23 @@ import createReduxStore from 'indico/utils/redux';
 
 import reducers from './reducers';
 import {initialRoomFilterStateFactory} from './reducers/roomBooking/filters';
-import {initialTimelineState} from './reducers/bookRoom';
+import {routeConfig as bookRoomRouteConfig, queryStringReducer as qsBookRoomReducer} from './modules/bookRoom';
 import {routeConfig as calendarRouteConfig, queryStringReducer as qsCalendarReducer} from './modules/calendar';
 import {routeConfig as blockingsRouteConfig, queryStringReducer as qsBlockingsReducer} from './modules/blockings';
 import * as actions from './actions';
 import {queryString as queryFilterRules} from './serializers/filters';
-import {queryString as queryTimelineRules} from './serializers/timeline';
 
 
 function getRouteConfig() {
     return {
         reduxPathname: ({router: {location: {pathname}}}) => pathname,
         routes: {
-            '/book': [
-                {
-                    listen: actions.SET_FILTER_PARAMETER,
-                    select: ({bookRoom: {filters}}) => ({filters}),
-                    serialize: queryFilterRules
-                },
-                {
-                    listen: actions.TOGGLE_TIMELINE_VIEW,
-                    select: ({bookRoom: {timeline}}) => ({timeline}),
-                    serialize: queryTimelineRules
-                }
-            ],
             '/rooms': {
                 listen: actions.SET_FILTER_PARAMETER,
                 select: ({roomList: {filters}}) => ({filters}),
                 serialize: queryFilterRules
             },
+            ...bookRoomRouteConfig,
             ...calendarRouteConfig,
             ...blockingsRouteConfig,
         }
@@ -93,23 +81,6 @@ const qsFilterReducer = createQueryStringReducer(
         : state)
 );
 
-const qsTimelineReducer = createQueryStringReducer(
-    queryTimelineRules,
-    (state, action) => {
-        if (action.type === actions.INIT) {
-            return {
-                namespace: 'bookRoom',
-                queryString: history.location.search.slice(1)
-            };
-        }
-        return null;
-    },
-    (state, namespace) => (namespace
-        ? _.merge({}, state, {[namespace]: {timeline: initialTimelineState}})
-        : state)
-);
-
-
 export default function createRBStore() {
     return createReduxStore(
         'rb-new',
@@ -121,7 +92,7 @@ export default function createRBStore() {
         ],
         [
             qsFilterReducer,
-            qsTimelineReducer,
+            qsBookRoomReducer,
             qsCalendarReducer,
             qsBlockingsReducer,
         ],

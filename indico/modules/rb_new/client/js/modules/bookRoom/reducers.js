@@ -17,10 +17,12 @@
 
 import {combineReducers} from 'redux';
 
-import {roomsReducerFactory} from './roomBooking/roomList';
-import filterReducerFactory, {initialRoomFilterStateFactory} from './roomBooking/filters';
-import {mapReducerFactory} from './roomBooking/map';
-import * as actions from '../actions';
+import {requestReducer} from 'indico/utils/redux';
+import {roomsReducerFactory} from '../../reducers/roomBooking/roomList';
+import filterReducerFactory, {initialRoomFilterStateFactory} from '../../reducers/roomBooking/filters';
+import {mapReducerFactory} from '../../reducers/roomBooking/map';
+import * as actions from './actions';
+import * as globalActions from '../../actions';
 
 
 export const initialTimelineState = {
@@ -45,7 +47,7 @@ function timelineReducer(state = initialTimelineState, action) {
             };
         case actions.TOGGLE_TIMELINE_VIEW:
             return {...state, isVisible: action.isVisible};
-        case actions.RESET_PAGE_STATE:
+        case globalActions.RESET_PAGE_STATE:
             return action.namespace === 'bookRoom' ? {...state, isVisible: false} : state;
         default:
             return state;
@@ -70,13 +72,37 @@ function suggestionsReducer(state = initialSuggestionsState, action) {
     }
 }
 
+const bookingFormReducer = combineReducers({
+    requests: combineReducers({
+        booking: requestReducer(
+            actions.CREATE_BOOKING_REQUEST,
+            actions.CREATE_BOOKING_SUCCESS,
+            actions.CREATE_BOOKING_FAILED
+        ),
+        timeline: requestReducer(
+            actions.GET_BOOKING_AVAILABILITY_REQUEST,
+            actions.GET_BOOKING_AVAILABILITY_SUCCESS,
+            actions.GET_BOOKING_AVAILABILITY_ERROR
+        ),
+    }),
+    availability: (state = null, action) => {
+        switch (action.type) {
+            case actions.RESET_BOOKING_AVAILABILITY:
+                return null;
+            case actions.SET_BOOKING_AVAILABILITY: {
+                return {...action.data};
+            }
+            default:
+                return state;
+        }
+    }
+});
 
-const reducer = combineReducers({
+export default combineReducers({
     rooms: roomsReducerFactory('bookRoom'),
     filters: filterReducerFactory('bookRoom', initialRoomFilterStateFactory),
     map: mapReducerFactory('bookRoom'),
     timeline: timelineReducer,
-    suggestions: suggestionsReducer
+    suggestions: suggestionsReducer,
+    bookingForm: bookingFormReducer
 });
-
-export default reducer;

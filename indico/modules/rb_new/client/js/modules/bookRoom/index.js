@@ -14,19 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
-import {filterDTHandler, recurrenceIntervalSerializer, recurrenceFrequencySerializer} from './common';
 
-
-export const ajax = {
-    start_dt: filterDTHandler('start'),
-    end_dt: filterDTHandler('end'),
-    repeat_frequency: recurrenceFrequencySerializer,
-    repeat_interval: recurrenceIntervalSerializer,
-    reason: ({reason}) => reason,
-    user_id: {
-        onlyIf: ({usage}) => usage === 'someone',
-        serializer: ({user: {id}}) => id
-    },
-    room_id: ({room: {id}}) => id,
-    is_prebooking: ({isPrebooking}) => isPrebooking
-};
+export {default} from './BookRoom';
+export {default as reducer} from './reducers';
+export {queryStringReducer, routeConfig} from './queryString';

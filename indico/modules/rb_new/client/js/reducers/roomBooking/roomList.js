@@ -20,16 +20,16 @@ import * as actions from '../../actions';
 
 const initialRoomsState = {
     list: [],
-    total: 0,
+    matching: 0,
     isFetching: false
 };
 
 
 function mergeRooms(state, action) {
     const {list: oldList} = state;
-    const {clear, total, rooms: newList} = action;
+    const {clear, matching, rooms: newList} = action;
     return {
-        total,
+        matching,
         list: clear ? newList : oldList.concat(newList),
     };
 }

@@ -17,6 +17,7 @@
 
 import _ from 'lodash';
 import React from 'react';
+import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import {Button, Checkbox, Form, Grid, Icon, Label, Message, Modal, Radio, Segment, Popup} from 'semantic-ui-react';
 import {Form as FinalForm, Field} from 'react-final-form';
@@ -24,11 +25,13 @@ import createDecorator from 'final-form-calculate';
 import {ReduxFormField, ReduxRadioField, formatters} from 'indico/react/forms';
 import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
 import PrincipalSearchField from 'indico/react/components/PrincipalSearchField';
-import recurrenceRenderer from '../filters/RecurrenceRenderer';
+import recurrenceRenderer from '../../components/filters/RecurrenceRenderer';
 import {toMoment} from '../../util';
-import RoomBasicDetails from '../RoomBasicDetails';
-import TimelineContent from '../TimelineContent';
-import TimelineLegend from '../TimelineLegend';
+import RoomBasicDetails from '../../components/RoomBasicDetails';
+import TimelineContent from '../../components/TimelineContent';
+import TimelineLegend from '../../components/TimelineLegend';
+import {selectors as roomsSelectors} from '../../common/rooms';
+import * as actions from './actions';
 
 import './BookRoomModal.module.scss';
 
@@ -57,8 +60,7 @@ const formDecorator = createDecorator({
     }
 });
 
-
-export default class BookRoomModal extends React.Component {
+class BookRoomModal extends React.Component {
     static propTypes = {
         open: PropTypes.bool,
         room: PropTypes.object,
@@ -67,15 +69,13 @@ export default class BookRoomModal extends React.Component {
         onSubmit: PropTypes.func.isRequired,
         onClose: PropTypes.func.isRequired,
         availability: PropTypes.object,
-        dateRange: PropTypes.array,
         fetchAvailability: PropTypes.func.isRequired
     };
 
     static defaultProps = {
         open: false,
         room: null,
-        availability: null,
-        dateRange: null
+        availability: null
     };
 
     state = {
@@ -226,7 +226,7 @@ export default class BookRoomModal extends React.Component {
 
     renderRoomTimeline(availability) {
         const hourSeries = _.range(6, 24, 2);
-        const {dateRange} = this.props;
+        const {availability: {dateRange}} = this.props;
         const rows = dateRange.map((day) => this._getRowSerializer(day)(availability));
         return <TimelineContent rows={rows} hourSeries={hourSeries} />;
     }
@@ -397,3 +397,54 @@ export default class BookRoomModal extends React.Component {
         );
     }
 }
+
+const mapStateToProps = (state, {roomId}) => {
+    const {
+        bookRoom: {filters: {recurrence, dates, timeSlot}, bookingForm: {availability}},
+        user,
+    } = state;
+    const room = roomsSelectors.getRoom(state, {roomId});
+    return {
+        bookingData: {recurrence, dates, timeSlot},
+        availability,
+        user,
+        room,
+    };
+};
+
+const mapDispatchToProps = (dispatch) => ({
+    onSubmit: (
+        {reason, usage, user, isPrebooking},
+        {bookingData: {recurrence, dates, timeSlot}, room}) => {
+        return dispatch(actions.createBooking({
+            reason,
+            usage,
+            user,
+            recurrence,
+            dates,
+            timeSlot,
+            room,
+            isPrebooking
+        }));
+    },
+    dispatch
+});
+
+const mergeProps = (stateProps, dispatchProps, ownProps) => {
+    const {bookingData: filters, room} = stateProps;
+    const {dispatch, ...realDispatchProps} = dispatchProps;
+    return {
+        ...stateProps,
+        ...realDispatchProps,
+        ...ownProps,
+        fetchAvailability() {
+            dispatch(actions.fetchBookingAvailability(room, filters));
+        }
+    };
+};
+
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps,
+    mergeProps,
+)(BookRoomModal);
