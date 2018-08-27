@@ -23,9 +23,9 @@ from werkzeug.exceptions import Forbidden
 
 from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.models.blockings import Blocking
+from indico.modules.rb_new.operations.blockings import (approve_or_request_blocking, create_blocking,
+                                                        get_room_blockings, update_blocking)
 from indico.modules.rb_new.schemas import blockings_schema
-from indico.modules.rb_new.util import (approve_or_request_blocking, create_blocking, get_room_blockings,
-                                        update_blocking)
 from indico.web.util import jsonify_data
 
 

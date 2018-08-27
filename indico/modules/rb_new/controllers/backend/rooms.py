@@ -29,8 +29,9 @@ from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.models.favorites import favorite_room_table
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb_new.controllers.backend.common import search_room_args
+from indico.modules.rb_new.operations.bookings import get_room_details_availability
+from indico.modules.rb_new.operations.rooms import search_for_rooms
 from indico.modules.rb_new.schemas import map_rooms_schema, room_attributes_schema, room_details_schema, rooms_schema
-from indico.modules.rb_new.util import get_room_details_availability, search_for_rooms
 
 
 class RHRooms(RHRoomBookingBase):
