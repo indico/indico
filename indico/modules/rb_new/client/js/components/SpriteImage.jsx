@@ -25,23 +25,33 @@ export default class SpriteImage extends React.Component {
         pos: PropTypes.number.isRequired,
         height: PropTypes.number,
         width: PropTypes.number,
-        styles: PropTypes.object
+        styles: PropTypes.object,
+        scale: PropTypes.string,
+        origin: PropTypes.string
     };
 
     static defaultProps = {
         width: 290,
         height: 170,
-        styles: {}
+        styles: {},
+        scale: null,
+        origin: null
     };
 
     render() {
-        const {src, pos, width, height, styles} = this.props;
+        const {src, pos, width, height, styles, scale, origin} = this.props;
         const style = {
             background: `url(${src}) -${pos * width}px 0`,
             height: `${height}px`,
             width: `${width}px`,
             ...styles
         };
+
+        if (origin && scale) {
+            style.transformOrigin = origin;
+            style.transform = `scale(${scale})`;
+        }
+
         return <div style={style} className="img" />;
     }
 }
