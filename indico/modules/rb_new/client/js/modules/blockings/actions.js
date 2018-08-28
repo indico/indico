@@ -74,3 +74,7 @@ export function updateBlocking(blockingId, formData) {
         UPDATE_BLOCKING_REQUEST, UPDATE_BLOCKING_SUCCESS, UPDATE_BLOCKING_ERROR
     );
 }
+
+export function updateBlockingsList(blockings) {
+    return {type: BLOCKINGS_RECEIVED, data: blockings};
+}
