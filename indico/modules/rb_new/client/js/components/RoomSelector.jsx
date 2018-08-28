@@ -96,7 +96,8 @@ class RoomSelector extends React.Component {
                 <div className="image-wrapper" style={{width: 55, height: 25}}>
                     <SpriteImage src={roomsSpriteURL({version: roomsSpriteToken})}
                                  pos={room.sprite_position}
-                                 styles={{transformOrigin: '0 0', transform: 'scale(0.15)'}} />
+                                 origin="0 0"
+                                 scale="0.15" />
                 </div>
                 <List.Content>
                     <List.Header>{room.full_name}</List.Header>

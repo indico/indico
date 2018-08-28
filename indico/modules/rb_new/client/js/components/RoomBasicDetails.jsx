@@ -60,7 +60,8 @@ function RoomBasicDetails({room, roomsSpriteToken}) {
         <Grid columns={2}>
             <Grid.Column textAlign="center">
                 <SpriteImage src={roomsSpriteURL({version: roomsSpriteToken})} pos={room.sprite_position}
-                             styles={{transform: 'scale(0.85)', transformOrigin: 0}} />
+                             origin="0"
+                             scale="0.85" />
                 <RoomEquipmentBox room={room} />
             </Grid.Column>
             <Grid.Column>

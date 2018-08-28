@@ -56,7 +56,8 @@ class BlockingCard extends React.Component {
                     <div className="image">
                         <SpriteImage src={roomsSpriteURL({version: roomsSpriteToken})}
                                      pos={blockedRooms[0].room.sprite_position}
-                                     styles={{transform: 'scale(0.5)', transformOrigin: '0 0'}} />
+                                     origin="0 0"
+                                     scale="0.5" />
                     </div>
                     <Item.Content>
                         <Item.Header>{this.renderCardHeader()}</Item.Header>
