@@ -29,6 +29,7 @@ import PrincipalSearchField from 'indico/react/components/PrincipalSearchField';
 import DatePeriodField from 'indico/react/components/DatePeriodField';
 import RoomSelector from '../../components/RoomSelector';
 import {getUserInfo} from '../../common/user/selectors';
+import {getAllBlockings} from '../../modules/blockings/selectors';
 import * as blockingsActions from './actions';
 
 import './BlockingModal.module.scss';
@@ -53,8 +54,9 @@ class BlockingModal extends React.Component {
         onClose: PropTypes.func.isRequired,
         createBlocking: PropTypes.func.isRequired,
         updateBlocking: PropTypes.func.isRequired,
-        fetchBlockings: PropTypes.func.isRequired,
+        updateBlockingsList: PropTypes.func.isRequired,
         user: PropTypes.object.isRequired,
+        blockings: PropTypes.array.isRequired,
         open: PropTypes.bool,
         mode: PropTypes.oneOf(['view', 'edit', 'create']),
         blocking: PropTypes.shape({
@@ -91,7 +93,7 @@ class BlockingModal extends React.Component {
     }
 
     processBlocking = async (formData) => {
-        const {createBlocking, updateBlocking, fetchBlockings, blocking: {id}} = this.props;
+        const {createBlocking, updateBlocking, updateBlockingsList, blocking: {id}, blockings} = this.props;
         const {mode} = this.state;
         let rv;
 
@@ -100,7 +102,9 @@ class BlockingModal extends React.Component {
         } else if (mode === 'edit') {
             rv = await updateBlocking(id, formData);
             if (!rv.error) {
-                fetchBlockings();
+                const newBlockings = [...blockings];
+                newBlockings[blockings.findIndex((value) => value.id === id)] = rv.data.blocking;
+                updateBlockingsList(newBlockings);
             }
         }
 
@@ -361,14 +365,15 @@ const mapDispatchToProps = (dispatch) => ({
     updateBlocking: (blockingId, formData) => {
         return dispatch(blockingsActions.updateBlocking(blockingId, formData));
     },
-    fetchBlockings: () => {
-        dispatch(blockingsActions.fetchBlockings());
+    updateBlockingsList: (blockings) => {
+        dispatch(blockingsActions.updateBlockingsList(blockings));
     }
 });
 
 export default connect(
     state => ({
-        user: getUserInfo(state)
+        user: getUserInfo(state),
+        blockings: getAllBlockings(state)
     }),
     mapDispatchToProps
 )(BlockingModal);

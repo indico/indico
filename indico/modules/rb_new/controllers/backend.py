@@ -327,7 +327,7 @@ class RHUpdateRoomBlocking(RHRoomBookingBase):
     })
     def _process(self, args):
         update_blocking(self.blocking, args)
-        return jsonify_data(flash=False)
+        return jsonify_data(flash=False, blocking=blockings_schema.dump(self.blocking, many=False).data)
 
 
 class RHRoomsSprite(RHRoomBookingBase):
