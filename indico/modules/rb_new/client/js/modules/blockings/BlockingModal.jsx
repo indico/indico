@@ -56,8 +56,8 @@ class BlockingModal extends React.Component {
         fetchBlockings: PropTypes.func.isRequired,
         user: PropTypes.object.isRequired,
         open: PropTypes.bool,
-        mode: PropTypes.oneOf(['read', 'edit', 'new']),
-        blocking: PropTypes.exact({
+        mode: PropTypes.oneOf(['view', 'edit', 'create']),
+        blocking: PropTypes.shape({
             id: PropTypes.number,
             blocked_rooms: PropTypes.array,
             allowed: PropTypes.array,
@@ -70,7 +70,7 @@ class BlockingModal extends React.Component {
 
     static defaultProps = {
         open: false,
-        mode: 'new',
+        mode: 'create',
         blocking: {
             blockingId: null,
             blocked_rooms: [],
@@ -95,7 +95,7 @@ class BlockingModal extends React.Component {
         const {mode} = this.state;
         let rv;
 
-        if (mode === 'new') {
+        if (mode === 'create') {
             rv = await createBlocking(formData);
         } else if (mode === 'edit') {
             rv = await updateBlocking(id, formData);
@@ -139,7 +139,7 @@ class BlockingModal extends React.Component {
                             as={DatePeriodField}
                             label={Translate.string('Period')}
                             initialValue={initialValue}
-                            showToday={mode !== 'read'}
+                            showToday={mode !== 'view'}
                             onChange={(values) => {
                                 if (values.length) {
                                     input.onChange({
@@ -148,7 +148,7 @@ class BlockingModal extends React.Component {
                                     });
                                 }
                             }}
-                            required={mode !== 'read'} />
+                            required={mode !== 'view'} />
         );
     };
 
@@ -157,7 +157,7 @@ class BlockingModal extends React.Component {
         const {mode} = this.state;
         let label;
 
-        if (mode === 'new') {
+        if (mode === 'create') {
             label = Translate.string('Rooms to block');
         } else {
             label = Translate.string('Blocked rooms');
@@ -171,7 +171,7 @@ class BlockingModal extends React.Component {
                             onChange={(values) => {
                                 input.onChange(values);
                             }}
-                            required={mode !== 'read'} />
+                            required={mode !== 'view'} />
         );
     };
 
@@ -194,7 +194,7 @@ class BlockingModal extends React.Component {
 
     renderHeaderText = () => {
         const {mode} = this.state;
-        if (mode === 'read') {
+        if (mode === 'view') {
             return <Translate>Blocking details</Translate>;
         } else if (mode === 'edit') {
             return <Translate>Update blocking</Translate>;
@@ -214,11 +214,11 @@ class BlockingModal extends React.Component {
     };
 
     renderModalContent = (fprops) => {
-        const {onClose, blocking, user} = this.props;
+        const {onClose, blocking} = this.props;
         const {form: {mutators}, submitting, submitSucceeded} = fprops;
         const {mode} = this.state;
-        const formProps = mode === 'read' ? {} : {onSubmit: fprops.handleSubmit, success: submitSucceeded};
-        const canEdit = !!blocking.id && mode !== 'edit' && (user.id === blocking.created_by_id || user.isAdmin);
+        const formProps = mode === 'view' ? {} : {onSubmit: fprops.handleSubmit, success: submitSucceeded};
+        const canEdit = !!blocking.id && mode !== 'edit' && blocking.can_edit;
 
         // set `touched` flag so in case of a validation error we properly
         // show the error label
@@ -236,7 +236,7 @@ class BlockingModal extends React.Component {
                         <span>
                             <Button icon="pencil"
                                     onClick={() => {
-                                        const newMode = mode === 'edit' ? 'read' : 'edit';
+                                        const newMode = mode === 'edit' ? 'view' : 'edit';
                                         this.setState({mode: newMode});
                                     }}
                                     circular />
@@ -273,16 +273,16 @@ class BlockingModal extends React.Component {
                                 <Field name="rooms"
                                        isEqual={(a, b) => _.isEqual(a, b)}
                                        component={this.renderRoomSearchField}
-                                       disabled={mode === 'read' || submitting || submitSucceeded} />
+                                       disabled={mode === 'view' || submitting || submitSucceeded} />
                             </Grid.Column>
                             <Grid.Column width={8}>
                                 <Field name="allowed"
                                        isEqual={(a, b) => !this.hasAllowedFieldChanged(a, b)}
                                        component={this.renderPrincipalSearchField}
-                                       disabled={mode === 'read' || submitting || submitSucceeded} />
+                                       disabled={mode === 'view' || submitting || submitSucceeded} />
                                 <Field name="dates"
                                        component={this.renderBlockingPeriodField}
-                                       disabled={mode !== 'new' || submitting || submitSucceeded} />
+                                       disabled={mode !== 'create' || submitting || submitSucceeded} />
                                 <Field name="reason"
                                        format={formatters.trim}
                                        render={(fieldProps) => {
@@ -290,7 +290,7 @@ class BlockingModal extends React.Component {
                                            if (mode === 'edit') {
                                                props.defaultValue = blocking.reason;
                                                props.value = undefined;
-                                           } else if (mode === 'read') {
+                                           } else if (mode === 'view') {
                                                props.value = blocking.reason;
                                            }
 
@@ -300,8 +300,8 @@ class BlockingModal extends React.Component {
                                                                as={Form.TextArea}
                                                                label={Translate.string('Reason')}
                                                                placeholder={Translate.string('Provide reason for blocking')}
-                                                               disabled={mode === 'read' || submitting || submitSucceeded}
-                                                               required={mode !== 'read'} />
+                                                               disabled={mode === 'view' || submitting || submitSucceeded}
+                                                               required={mode !== 'view'} />
                                            );
                                        }}
                                        formatOnBlur />
@@ -317,7 +317,7 @@ class BlockingModal extends React.Component {
                     </Form>
                 </Modal.Content>
                 <Modal.Actions>
-                    {mode !== 'read' && this.renderSubmitButton(fprops)}
+                    {mode !== 'view' && this.renderSubmitButton(fprops)}
                     <Button type="button" onClick={onClose}>
                         <Translate>
                             Close
@@ -334,7 +334,7 @@ class BlockingModal extends React.Component {
             blocking: {blocked_rooms: blockedRooms, allowed, start_date: startDate, end_date: endDate, reason}
         } = this.props;
         const {mode} = this.state;
-        const props = mode === 'read' ? {onSubmit() {}} : {validate, onSubmit: this.processBlocking};
+        const props = mode === 'view' ? {onSubmit() {}} : {validate, onSubmit: this.processBlocking};
         const dates = {startDate: null, endDate: null};
         const rooms = blockedRooms.map((blockedRoom) => blockedRoom.room);
 
