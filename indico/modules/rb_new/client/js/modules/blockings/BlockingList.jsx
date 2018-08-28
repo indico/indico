@@ -96,7 +96,7 @@ class BlockingList extends React.Component {
                             <BlockingModal open
                                            blocking={blocking}
                                            onClose={this.closeBlockingDetailsModal}
-                                           mode="read" />
+                                           mode="view" />
                         );
                     }} />
                 </Container>
