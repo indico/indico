@@ -640,10 +640,18 @@ def get_room_blockings(start_date=None, end_date=None, created_by=None, in_rooms
     return query.all()
 
 
+def _group_id_or_name(principal):
+    provider = principal['provider']
+    if provider is None or provider == 'indico':
+        return principal['id']
+    else:
+        return principal['name']
+
+
 def _populate_blocking(blocking, room_ids, reason, allowed_principals, start_date=None, end_date=None):
     blocking.reason = reason
     blocking.created_by_user = session.user
-    blocking.allowed = [GroupProxy(pr['id'], provider=pr['provider'])
+    blocking.allowed = [GroupProxy(_group_id_or_name(pr), provider=pr['provider'])
                         if pr.get('is_group')
                         else User.get_one(pr['id'])
                         for pr in allowed_principals]

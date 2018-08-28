@@ -92,22 +92,22 @@ class BlockedRoomSchema(mm.ModelSchema):
 
 
 class BlockingPrincipalSchema(mm.ModelSchema):
-    id = Method('get_id')
+    identifier = Method('get_identifier')
     full_name = String()
     provider = String(missing=None)
+    email = String(missing=None)
     is_group = Boolean(missing=False)
 
     class Meta:
         model = BlockingPrincipal
-        fields = ('id', 'name', 'is_group', 'email', 'full_name', 'provider')
+        fields = ('id', 'identifier', 'name', 'is_group', 'email', 'full_name', 'provider')
 
-    def get_id(self, blocking_principal):
-        if not blocking_principal.is_group:
-            return blocking_principal.id
-        elif blocking_principal.provider is None or blocking_principal.provider == 'indico':
-            return blocking_principal.id
+    def get_identifier(self, blocking_principal):
+        if blocking_principal.is_group:
+            return 'Group:{}:{}'.format(blocking_principal.provider or '',
+                                        getattr(blocking_principal, 'id', blocking_principal.name))
         else:
-            return blocking_principal.name
+            return 'User:{}'.format(blocking_principal.id)
 
 
 class BlockingSchema(mm.ModelSchema):
