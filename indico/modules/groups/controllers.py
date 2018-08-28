@@ -152,5 +152,6 @@ class RHGroupSearch(RHProtected):
     def _process(self, name):
         groups = GroupProxy.search(name)
         return jsonify([{'is_group': True, 'name': group.name, 'id': getattr(group, 'id', group.name),
-                         'provider': group.provider}
+                         'provider': group.provider,
+                         'identifier': 'Group:{}:{}'.format(group.provider or '', getattr(group, 'id', group.name))}
                         for group in groups])

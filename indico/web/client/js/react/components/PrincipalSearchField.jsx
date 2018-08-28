@@ -79,9 +79,9 @@ export default class PrincipalSearchField extends React.Component {
 
         if (multiple) {
             value = value || [];
-            dropdownValue = value.length !== 0 ? value.map((val) => val.id) : [];
+            dropdownValue = value.map((val) => val.identifier);
         } else {
-            dropdownValue = value && value.id;
+            dropdownValue = value && value.identifier;
         }
 
         this.state = {
@@ -92,7 +92,7 @@ export default class PrincipalSearchField extends React.Component {
         };
 
         if (multiple) {
-            this.userCache = Object.assign({}, ...value.map((val) => ({[val.id]: val})));
+            this.userCache = Object.assign({}, ...value.map((val) => ({[val.identifier]: val})));
         } else {
             this.userCache = {};
         }
@@ -103,7 +103,7 @@ export default class PrincipalSearchField extends React.Component {
     static getDerivedStateFromProps({value, multiple}, state) {
         let valuesChanged, newValue;
         if (multiple) {
-            newValue = value.map((val) => val.id);
+            newValue = value.map((val) => val.identifier);
             valuesChanged = !_.isEqual(newValue.sort(), state.prevPropsValue.sort());
         } else {
             valuesChanged = value !== state.prevPropsValue;
@@ -122,14 +122,14 @@ export default class PrincipalSearchField extends React.Component {
 
     renderItem = ({is_group: isGroup, ...itemData}) => (isGroup ? {
         text: itemData.name,
-        value: itemData.id,
-        key: itemData.id,
+        value: itemData.identifier,
+        key: itemData.identifier,
         icon: 'users'
     } : {
         text: itemData.full_name,
         description: itemData.email,
-        value: itemData.id,
-        key: itemData.id,
+        value: itemData.identifier,
+        key: itemData.identifier,
         icon: 'user'
     });
 
@@ -157,7 +157,7 @@ export default class PrincipalSearchField extends React.Component {
             items.push(...principalList);
         }
 
-        this.userCache = Object.assign(this.userCache, ...items.map(item => ({[item.id]: item})));
+        this.userCache = Object.assign(this.userCache, ...items.map(item => ({[item.identifier]: item})));
         this.setState({
             isFetching: false,
             options: items.map(this.renderItem)
