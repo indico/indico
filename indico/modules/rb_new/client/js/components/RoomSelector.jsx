@@ -25,6 +25,7 @@ import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {Translate} from 'indico/react/i18n';
 import SpriteImage from './SpriteImage';
 import {camelizeKeys} from '../util';
+import * as configSelectors from '../common/config/selectors';
 
 import './RoomSelector.module.scss';
 
@@ -206,6 +207,7 @@ class RoomSelector extends React.Component {
 }
 
 export default connect(
-    ({config: {data: {roomsSpriteToken}}}) => ({roomsSpriteToken}),
-    null
+    (state) => ({
+        roomsSpriteToken: configSelectors.getRoomsSpriteToken(state)
+    })
 )(RoomSelector);
