@@ -415,6 +415,10 @@ class User(PersonMixin, db.Model):
         return 'User', self.id
 
     @property
+    def identifier(self):
+        return 'User:{}'.format(self.id)
+
+    @property
     def as_avatar(self):
         # TODO: remove this after DB is free of Avatars
         from indico.modules.users.legacy import AvatarUserWrapper

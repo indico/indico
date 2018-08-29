@@ -17,7 +17,7 @@
 from __future__ import unicode_literals
 
 from flask import session
-from marshmallow.fields import Boolean, Function, Method, Nested, String
+from marshmallow.fields import Boolean, Function, Nested, String
 
 from indico.core.marshmallow import mm
 from indico.modules.rb.models.aspects import Aspect
@@ -92,7 +92,7 @@ class BlockedRoomSchema(mm.ModelSchema):
 
 
 class BlockingPrincipalSchema(mm.ModelSchema):
-    identifier = Method('get_identifier')
+    identifier = Function(lambda blocking_principal: blocking_principal.identifier)
     full_name = String()
     provider = String(missing=None)
     email = String(missing=None)
@@ -101,13 +101,6 @@ class BlockingPrincipalSchema(mm.ModelSchema):
     class Meta:
         model = BlockingPrincipal
         fields = ('id', 'identifier', 'name', 'is_group', 'email', 'full_name', 'provider')
-
-    def get_identifier(self, blocking_principal):
-        if blocking_principal.is_group:
-            return 'Group:{}:{}'.format(blocking_principal.provider or '',
-                                        getattr(blocking_principal, 'id', blocking_principal.name))
-        else:
-            return 'User:{}'.format(blocking_principal.id)
 
 
 class BlockingSchema(mm.ModelSchema):

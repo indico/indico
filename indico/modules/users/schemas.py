@@ -23,7 +23,7 @@ from indico.modules.users import User
 
 
 class UserSchema(mm.ModelSchema):
-    identifier = Function(lambda user: 'User:{}'.format(user.id))
+    identifier = Function(lambda user: user.identifier)
 
     class Meta:
         model = User
