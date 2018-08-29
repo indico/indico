@@ -40,7 +40,7 @@ const mapStateToProps = (state, {roomId}) => {
 const mapDispatchToProps = (dispatch) => ({
     onSubmit: (
         {reason, usage, user, isPrebooking},
-        {bookingData: {recurrence, dates, timeSlot, room: roomData}}) => {
+        {bookingData: {recurrence, dates, timeSlot}, room: roomData}) => {
         return dispatch(createBooking({
             reason,
             usage,
