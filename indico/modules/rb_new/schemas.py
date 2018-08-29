@@ -17,7 +17,7 @@
 from __future__ import unicode_literals
 
 from flask import session
-from marshmallow.fields import Boolean, Method, Nested, String
+from marshmallow.fields import Boolean, Function, Method, Nested, String
 
 from indico.core.marshmallow import mm
 from indico.modules.rb.models.aspects import Aspect
@@ -113,14 +113,11 @@ class BlockingPrincipalSchema(mm.ModelSchema):
 class BlockingSchema(mm.ModelSchema):
     blocked_rooms = Nested(BlockedRoomSchema, many=True)
     allowed = Nested(BlockingPrincipalSchema, many=True)
-    can_edit = Method('get_can_edit')
+    can_edit = Function(lambda blocking: blocking.can_be_modified(session.user))
 
     class Meta:
         model = Blocking
         fields = ('id', 'start_date', 'end_date', 'reason', 'blocked_rooms', 'allowed', 'created_by_id', 'can_edit')
-
-    def get_can_edit(self, blocking):
-        return blocking.can_be_modified(session.user)
 
 
 class NonBookablePeriodSchema(mm.ModelSchema):

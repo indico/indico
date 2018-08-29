@@ -16,21 +16,18 @@
 
 from __future__ import unicode_literals
 
-from marshmallow.fields import Method
+from marshmallow.fields import Function
 
 from indico.core.marshmallow import mm
 from indico.modules.users import User
 
 
 class UserSchema(mm.ModelSchema):
-    identifier = Method('get_identifier')
+    identifier = Function(lambda user: 'User:{}'.format(user.id))
 
     class Meta:
         model = User
         fields = ('id', 'identifier', 'first_name', 'last_name', 'email', 'affiliation', 'avatar_bg_color', 'full_name')
-
-    def get_identifier(self, user):
-        return 'User:{}'.format(user.id)
 
 
 user_schema = UserSchema()
