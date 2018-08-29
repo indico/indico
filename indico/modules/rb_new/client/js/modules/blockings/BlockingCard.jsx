@@ -24,6 +24,7 @@ import roomsSpriteURL from 'indico-url:rooms_new.sprite';
 import {PluralTranslate} from 'indico/react/i18n';
 import {TooltipIfTruncated} from 'indico/react/components';
 import SpriteImage from '../../components/SpriteImage';
+import * as configSelectors from '../../common/config/selectors';
 
 import './BlockingCard.module.scss';
 
@@ -79,6 +80,7 @@ class BlockingCard extends React.Component {
 }
 
 export default connect(
-    ({config: {data: {roomsSpriteToken}}}) => ({roomsSpriteToken}),
-    null
+    (state) => ({
+        roomsSpriteToken: configSelectors.getRoomsSpriteToken(state)
+    })
 )(BlockingCard);
