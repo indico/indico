@@ -88,6 +88,11 @@ class GroupProxy(object):
         """The serializable principal identifier of this group"""
         raise NotImplementedError
 
+    @property
+    def identifier(self):
+        provider, id_or_name = self.as_principal[1]
+        return 'Group:{}:{}'.format(provider or '', id_or_name)
+
     @cached_property
     def as_legacy_group(self):
         """The legacy-style group wrapper"""
