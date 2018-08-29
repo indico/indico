@@ -306,7 +306,7 @@ class RHCreateRoomBlocking(RHRoomBookingBase):
         'allowed_principals': fields.List(fields.Dict())
     })
     def _process(self, args):
-        blocking = create_blocking(args)
+        blocking = create_blocking(created_by=session.user, **args)
         approve_or_request_blocking(blocking)
         return jsonify_data(flash=False)
 
@@ -326,8 +326,8 @@ class RHUpdateRoomBlocking(RHRoomBookingBase):
         'allowed_principals': fields.List(fields.Dict(), missing=[])
     })
     def _process(self, args):
-        update_blocking(self.blocking, args)
-        return jsonify_data(flash=False, blocking=blockings_schema.dump(self.blocking, many=False).data)
+        update_blocking(self.blocking, **args)
+        return jsonify(blocking=blockings_schema.dump(self.blocking, many=False).data)
 
 
 class RHRoomsSprite(RHRoomBookingBase):

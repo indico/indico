@@ -650,31 +650,28 @@ def _group_id_or_name(principal):
 
 
 @no_autoflush
-def _populate_blocking(blocking, room_ids, reason, allowed_principals, start_date=None, end_date=None):
+def _populate_blocking(blocking, room_ids, allowed_principals, reason):
     blocking.blocked_rooms = [BlockedRoom(room_id=room.id) for room in Room.query.filter(Room.id.in_(room_ids))]
-    blocking.created_by_user = session.user
     blocking.reason = reason
     blocking.allowed = [GroupProxy(_group_id_or_name(pr), provider=pr['provider'])
                         if pr.get('is_group')
                         else User.get_one(pr['id'])
                         for pr in allowed_principals]
 
-    if start_date:
-        blocking.start_date = start_date
-    if end_date:
-        blocking.end_date = end_date
 
-
-def create_blocking(blocking_data):
+def create_blocking(room_ids, allowed_principals, start_date, end_date, reason, created_by):
     blocking = Blocking()
-    _populate_blocking(blocking, **blocking_data)
+    blocking.start_date = start_date
+    blocking.end_date = end_date
+    blocking.created_by_user = created_by
+    _populate_blocking(blocking, room_ids, allowed_principals, reason)
     db.session.add(blocking)
     db.session.flush()
     return blocking
 
 
-def update_blocking(blocking, blocking_data):
-    _populate_blocking(blocking, **blocking_data)
+def update_blocking(blocking, room_ids, allowed_principals, reason):
+    _populate_blocking(blocking, room_ids, allowed_principals, reason)
     db.session.flush()
 
 
