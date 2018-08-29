@@ -34,7 +34,10 @@ export const ajax = {
     allowed_principals: {
         onlyIf: ({allowed}) => !!allowed,
         serializer: ({allowed}) => allowed.map((obj) => ({
-            id: obj.id, is_group: obj.is_group, provider: obj.provider, name: obj.name
+            id: obj.id,
+            is_group: obj.isGroup,
+            provider: obj.provider,
+            name: obj.name
         }))
     },
     reason: ({reason}) => reason,

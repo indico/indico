@@ -31,6 +31,7 @@ from sqlalchemy.orm import contains_eager, joinedload, raiseload
 from indico.core.auth import multipass
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.queries import db_dates_overlap, escape_like
+from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.legacy.common.cache import GenericCache
 from indico.modules.groups import GroupProxy
 from indico.modules.rb import rb_is_admin, rb_settings
@@ -648,16 +649,15 @@ def _group_id_or_name(principal):
         return principal['name']
 
 
+@no_autoflush
 def _populate_blocking(blocking, room_ids, reason, allowed_principals, start_date=None, end_date=None):
-    blocking.reason = reason
+    blocking.blocked_rooms = [BlockedRoom(room_id=room.id) for room in Room.query.filter(Room.id.in_(room_ids))]
     blocking.created_by_user = session.user
+    blocking.reason = reason
     blocking.allowed = [GroupProxy(_group_id_or_name(pr), provider=pr['provider'])
                         if pr.get('is_group')
                         else User.get_one(pr['id'])
                         for pr in allowed_principals]
-
-    with db.session.no_autoflush:
-        blocking.blocked_rooms = [BlockedRoom(room_id=room.id) for room in Room.query.filter(Room.id.in_(room_ids))]
 
     if start_date:
         blocking.start_date = start_date

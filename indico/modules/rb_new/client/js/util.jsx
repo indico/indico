@@ -205,3 +205,17 @@ export function boolStateField(name) {
 export function isDateWithinRange(date, dateRange, _toMoment) {
     return date && dateRange.filter((dt) => _toMoment(dt).isSame(date, 'day')).length !== 0;
 }
+
+export function camelizeKeys(obj) {
+    if (!_.isPlainObject(obj) && !_.isArray(obj)) {
+        return obj;
+    }
+
+    if (_.isArray(obj)) {
+        return obj.map(camelizeKeys);
+    }
+
+    return Object.entries(obj).reduce((accum, [key, value]) => {
+        return {...accum, [_.camelCase(key)]: camelizeKeys(value)};
+    }, {});
+}

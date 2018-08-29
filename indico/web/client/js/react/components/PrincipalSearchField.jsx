@@ -26,6 +26,7 @@ import searchUsersURL from 'indico-url:users.user_search';
 import searchGroupsURL from 'indico-url:groups.group_search';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {Translate} from 'indico/react/i18n';
+import {camelizeKeys} from '../../../../../modules/rb_new/client/js/util';
 
 
 const searchUser = async (data) => {
@@ -36,7 +37,7 @@ const searchUser = async (data) => {
         handleAxiosError(error);
         return;
     }
-    return response.data.data;
+    return camelizeKeys(response.data.data);
 };
 
 const searchGroups = async (data) => {
@@ -48,7 +49,7 @@ const searchGroups = async (data) => {
         return;
     }
 
-    return response.data;
+    return camelizeKeys(response.data);
 };
 
 export default class PrincipalSearchField extends React.Component {
@@ -120,13 +121,13 @@ export default class PrincipalSearchField extends React.Component {
         return null;
     }
 
-    renderItem = ({is_group: isGroup, ...itemData}) => (isGroup ? {
+    renderItem = ({isGroup, ...itemData}) => (isGroup ? {
         text: itemData.name,
         value: itemData.identifier,
         key: itemData.identifier,
         icon: 'users'
     } : {
-        text: itemData.full_name,
+        text: itemData.fullName,
         description: itemData.email,
         value: itemData.identifier,
         key: itemData.identifier,

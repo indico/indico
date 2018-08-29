@@ -20,6 +20,7 @@ import {combineReducers} from 'redux';
 
 import {requestReducer} from 'indico/utils/redux';
 import filterReducerFactory from '../../reducers/roomBooking/filters';
+import {camelizeKeys} from '../../util';
 import * as blockingsActions from './actions';
 
 
@@ -48,7 +49,7 @@ export default combineReducers({
     blockings: (state = [], action) => {
         switch (action.type) {
             case blockingsActions.BLOCKINGS_RECEIVED:
-                return action.data;
+                return action.data.map((blocking) => camelizeKeys(blocking));
             default:
                 return state;
         }
