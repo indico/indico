@@ -166,10 +166,15 @@ export default class PrincipalSearchField extends React.Component {
     }, 500);
 
     render() {
-        const {multiple, onChange, disabled} = this.props;
+        const {multiple, onChange, disabled, withGroups} = this.props;
         const {isFetching, options, value} = this.state;
-        let dropdownValues, selectedValues, dropdownOptions;
-        let placeholder = Translate.string('Write a name (of the group or user) or e-mail...');
+        let dropdownValues, selectedValues, dropdownOptions, placeholder;
+
+        if (withGroups) {
+            placeholder = Translate.string('Write a name (of the group or user) or e-mail...');
+        } else {
+            placeholder = Translate.string('Write a name of the user or e-mail...');
+        }
 
         if (multiple) {
             dropdownValues = value || [];
