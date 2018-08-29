@@ -30,6 +30,7 @@ from indico.modules.admin import RHAdminBase
 from indico.modules.groups import GroupProxy
 from indico.modules.groups.forms import EditGroupForm, SearchForm
 from indico.modules.groups.models.groups import LocalGroup
+from indico.modules.groups.util import serialize_group
 from indico.modules.groups.views import WPGroupsAdmin
 from indico.modules.users import User
 from indico.util.i18n import _
@@ -151,7 +152,4 @@ class RHGroupSearch(RHProtected):
     })
     def _process(self, name):
         groups = GroupProxy.search(name)
-        return jsonify([{'is_group': True, 'name': group.name, 'id': getattr(group, 'id', group.name),
-                         'provider': group.provider,
-                         'identifier': 'Group:{}:{}'.format(group.provider or '', getattr(group, 'id', group.name))}
-                        for group in groups])
+        return jsonify([serialize_group(group) for group in groups])
