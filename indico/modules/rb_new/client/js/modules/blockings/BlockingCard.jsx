@@ -37,7 +37,7 @@ class BlockingCard extends React.Component {
 
     renderCardHeader() {
         const {blocking} = this.props;
-        const {blocked_rooms: blockedRooms} = blocking;
+        const {blockedRooms} = blocking;
 
         if (blockedRooms.length === 1) {
             return blockedRooms[0].room.name;
@@ -48,21 +48,21 @@ class BlockingCard extends React.Component {
 
     render() {
         const {blocking, onClick, roomsSpriteToken} = this.props;
-        const {blocked_rooms: blockedRooms} = blocking;
+        const {blockedRooms} = blocking;
 
         return (
             <Item.Group onClick={onClick} styleName="blocking-item">
                 <Item key={blocking.id}>
                     <div className="image">
                         <SpriteImage src={roomsSpriteURL({version: roomsSpriteToken})}
-                                     pos={blockedRooms[0].room.sprite_position}
+                                     pos={blockedRooms[0].room.spritePosition}
                                      origin="0 0"
                                      scale="0.5" />
                     </div>
                     <Item.Content>
                         <Item.Header>{this.renderCardHeader()}</Item.Header>
                         <Item.Meta>
-                            {moment(blocking.start_date).format('ll')} - {moment(blocking.end_date).format('ll')}
+                            {moment(blocking.startDate).format('ll')} - {moment(blocking.endDate).format('ll')}
                         </Item.Meta>
                         <Item.Description>
                             <TooltipIfTruncated>

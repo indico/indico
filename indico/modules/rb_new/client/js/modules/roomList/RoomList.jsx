@@ -27,7 +27,7 @@ import {stateToQueryString} from 'redux-router-querystring';
 
 import {Slot} from 'indico/react/util';
 import {Param, Plural, PluralTranslate, Translate, Singular} from 'indico/react/i18n';
-import {pushStateMergeProps, roomPreloader} from '../../util';
+import {camelizeKeys, pushStateMergeProps, roomPreloader} from '../../util';
 import RoomFilterBar from '../../components/RoomFilterBar';
 import filterBarFactory from '../../containers/FilterBar';
 import searchBarFactory from '../../containers/SearchBar';
@@ -245,7 +245,10 @@ class RoomList extends React.Component {
                             <BookFromListModal roomId={roomId} onClose={this.closeBookingModal} />
                         ), fetchRoomDetails)} />
                         <Route exact path="/rooms/blocking/create" render={() => {
-                            const blocking = {blocked_rooms: Object.values(selection).map((room) => ({room}))};
+                            const blocking = {
+                                blockedRooms: Object.values(selection).map((room) => ({room: camelizeKeys(room)}))
+                            };
+
                             return (
                                 <BlockingModal open
                                                blocking={blocking}

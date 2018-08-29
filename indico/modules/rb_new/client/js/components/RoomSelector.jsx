@@ -24,6 +24,7 @@ import roomsSpriteURL from 'indico-url:rooms_new.sprite';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {Translate} from 'indico/react/i18n';
 import SpriteImage from './SpriteImage';
+import {camelizeKeys} from '../util';
 
 import './RoomSelector.module.scss';
 
@@ -37,7 +38,7 @@ const fetchLocations = async () => {
         return;
     }
 
-    return response;
+    return camelizeKeys(response);
 };
 
 
@@ -95,12 +96,12 @@ class RoomSelector extends React.Component {
             <List.Item key={room.id}>
                 <div className="image-wrapper" style={{width: 55, height: 25}}>
                     <SpriteImage src={roomsSpriteURL({version: roomsSpriteToken})}
-                                 pos={room.sprite_position}
+                                 pos={room.spritePosition}
                                  origin="0 0"
                                  scale="0.15" />
                 </div>
                 <List.Content>
-                    <List.Header>{room.full_name}</List.Header>
+                    <List.Header>{room.fullName}</List.Header>
                 </List.Content>
                 {!disabled && (
                     <List.Content styleName="remove-btn-content">
@@ -122,8 +123,8 @@ class RoomSelector extends React.Component {
         if (selectedLocation) {
             roomOptions = selectedLocation.rooms
                 .filter((room) => rooms.findIndex((item) => item.id === room.id) === -1)
-                .sort((a, b) => a.full_name.localeCompare(b.full_name))
-                .map((room) => ({text: room.full_name, value: room.id}));
+                .sort((a, b) => a.fullName.localeCompare(b.fullName))
+                .map((room) => ({text: room.fullName, value: room.id}));
         }
 
         return (

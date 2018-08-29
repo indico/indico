@@ -61,12 +61,12 @@ class BlockingModal extends React.Component {
         mode: PropTypes.oneOf(['view', 'edit', 'create']),
         blocking: PropTypes.shape({
             id: PropTypes.number,
-            blocked_rooms: PropTypes.array,
+            blockedRooms: PropTypes.array,
             allowed: PropTypes.array,
-            start_date: PropTypes.string,
-            end_date: PropTypes.string,
+            startDate: PropTypes.string,
+            endDate: PropTypes.string,
             reason: PropTypes.string,
-            created_by_id: PropTypes.number
+            createdById: PropTypes.number
         })
     };
 
@@ -75,10 +75,10 @@ class BlockingModal extends React.Component {
         mode: 'create',
         blocking: {
             blockingId: null,
-            blocked_rooms: [],
+            blockedRooms: [],
             allowed: [],
-            start_date: null,
-            end_date: null,
+            startDate: null,
+            endDate: null,
             reason: ''
         }
     };
@@ -129,7 +129,7 @@ class BlockingModal extends React.Component {
     };
 
     renderBlockingPeriodField = ({input, ...props}) => {
-        const {blocking: {start_date: startDate, end_date: endDate}} = this.props;
+        const {blocking: {startDate, endDate}} = this.props;
         const {mode} = this.state;
         const initialValue = [];
 
@@ -157,7 +157,7 @@ class BlockingModal extends React.Component {
     };
 
     renderRoomSearchField = ({input, ...props}) => {
-        const {blocking: {blocked_rooms: blockedRooms}} = this.props;
+        const {blocking: {blockedRooms}} = this.props;
         const {mode} = this.state;
         let label;
 
@@ -222,7 +222,7 @@ class BlockingModal extends React.Component {
         const {form: {mutators}, submitting, submitSucceeded} = fprops;
         const {mode} = this.state;
         const formProps = mode === 'view' ? {} : {onSubmit: fprops.handleSubmit, success: submitSucceeded};
-        const canEdit = !!blocking.id && mode !== 'edit' && blocking.can_edit;
+        const canEdit = !!blocking.id && mode !== 'edit' && blocking.canEdit;
 
         // set `touched` flag so in case of a validation error we properly
         // show the error label
@@ -333,10 +333,7 @@ class BlockingModal extends React.Component {
     };
 
     render() {
-        const {
-            open, onClose,
-            blocking: {blocked_rooms: blockedRooms, allowed, start_date: startDate, end_date: endDate, reason}
-        } = this.props;
+        const {open, onClose, blocking: {blockedRooms, allowed, startDate, endDate, reason}} = this.props;
         const {mode} = this.state;
         const props = mode === 'view' ? {onSubmit() {}} : {validate, onSubmit: this.processBlocking};
         const dates = {startDate: null, endDate: null};
