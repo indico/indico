@@ -25,14 +25,6 @@ import {boolStateField} from '../../util';
 
 
 const rules = {
-    sd: {
-        validator: v.isDate(),
-        stateField: 'dates.startDate'
-    },
-    ed: {
-        validator: v.isDate(),
-        stateField: 'dates.endDate'
-    },
     myRooms: {
         stateField: boolStateField('myRooms'),
         validator: v.isBoolean(),
@@ -43,6 +35,10 @@ const rules = {
         validator: v.isBoolean(),
         sanitizer: v.toBoolean()
     },
+    timeframe: {
+        stateField: 'timeframe',
+        validator: v.isIn(['recent', 'year', 'all'])
+    }
 };
 
 

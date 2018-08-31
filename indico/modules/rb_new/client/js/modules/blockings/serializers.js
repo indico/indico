@@ -19,6 +19,10 @@ import {filterDTHandler} from '../../serializers/common';
 
 
 export const ajax = {
+    timeframe: {
+        onlyIf: ({timeframe}) => !!timeframe,
+        serializer: ({timeframe}) => timeframe
+    },
     my_rooms: {
         onlyIf: ({myRooms}) => myRooms,
         serializer: ({myRooms}) => myRooms,
@@ -40,7 +44,16 @@ export const ajax = {
             name: obj.name
         }))
     },
-    reason: ({reason}) => reason,
-    start_date: filterDTHandler('start'),
-    end_date: filterDTHandler('end'),
+    reason: {
+        onlyIf: ({reason}) => !!reason,
+        serializer: ({reason}) => reason
+    },
+    start_date: {
+        onlyIf: ({start_date: startDate}) => !!startDate,
+        serializer: filterDTHandler('start')
+    },
+    end_date: {
+        onlyIf: ({end_date: endDate}) => !!endDate,
+        serializer: filterDTHandler('end')
+    }
 };

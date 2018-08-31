@@ -278,14 +278,12 @@ class RHRoomSuggestions(RHRoomBookingBase):
 
 class RHRoomBlockings(RHRoomBookingBase):
     @use_kwargs({
-        'start_date': fields.Date(),
-        'end_date': fields.Date(),
+        'timeframe': fields.Str(),
         'my_rooms': fields.Bool(),
         'mine': fields.Bool()
     })
-    def _process(self, start_date, end_date, my_rooms, mine):
-        filters = {'start_date': start_date, 'end_date': end_date,
-                   'created_by': session.user if mine else None,
+    def _process(self, timeframe, my_rooms, mine):
+        filters = {'timeframe': timeframe, 'created_by': session.user if mine else None,
                    'in_rooms_owned_by': session.user if my_rooms else None}
         blockings = get_room_blockings(**filters)
         return jsonify(blockings_schema.dump(blockings).data)

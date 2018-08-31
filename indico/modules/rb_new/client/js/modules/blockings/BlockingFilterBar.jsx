@@ -16,92 +16,51 @@
 */
 
 import React from 'react';
-import {Button, Popup} from 'semantic-ui-react';
+import {Button, Dropdown, Popup} from 'semantic-ui-react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 
+import {toClasses} from 'indico/react/util';
 import {Translate} from 'indico/react/i18n';
 import * as blockingsActions from './actions';
 import * as blockingsSelectors from './selectors';
-import dateRenderer from '../../components/filters/DateRenderer';
-import DateForm from '../../components/filters/DateForm';
-import FilterDropdown from '../../components/filters/FilterDropdown';
 
 
-const FilterBarContext = React.createContext();
-
-function FilterDropdownFactory({name, ...props}) {
-    return (
-        <FilterBarContext.Consumer>
-            {({state, onDropdownOpen, onDropdownClose}) => (
-                <FilterDropdown open={state[name]}
-                                onOpen={() => onDropdownOpen(name)}
-                                onClose={() => onDropdownClose(name)}
-                                {...props} />
-            )}
-        </FilterBarContext.Consumer>
-    );
-}
-
-FilterDropdownFactory.propTypes = {
-    name: PropTypes.string.isRequired
+const timeframeOptions = {
+    recent: Translate.string('Active and future'),
+    year: Translate.string('All blockings this year'),
+    all: Translate.string('All blockings')
 };
-
 
 class BlockingFilterBar extends React.Component {
     static propTypes = {
         filters: PropTypes.shape({
             myBlockings: PropTypes.bool.isRequired,
             myRooms: PropTypes.bool.isRequired,
-            dates: PropTypes.shape({
-                startDate: PropTypes.string,
-                endDate: PropTypes.string,
-            }).isRequired,
+            timeframe: PropTypes.oneOf(['recent', 'year', 'all']),
         }).isRequired,
         actions: PropTypes.exact({
             setFilterParameter: PropTypes.func.isRequired,
         }).isRequired,
     };
 
-    state = {};
-
-    onDropdownOpen = (name) => {
-        this.setState((prevState) => {
-            return Object.assign(
-                {},
-                ...Object.keys(prevState).map(k => ({[k]: null})),
-                {[name]: true}
-            );
-        });
-    };
-
-    onDropdownClose = (name) => {
-        this.setState({
-            [name]: false
-        });
-    };
-
     render() {
-        const {filters: {myBlockings, myRooms, dates}, actions: {setFilterParameter}} = this.props;
+        const {filters: {myBlockings, myRooms, timeframe}, actions: {setFilterParameter}} = this.props;
+        const filterByDateOptions = Object.entries(timeframeOptions).map(([key, value]) => ({
+            text: value,
+            value: key
+        }));
+
         return (
-            <FilterBarContext.Provider value={{
-                onDropdownOpen: this.onDropdownOpen,
-                onDropdownClose: this.onDropdownClose,
-                state: this.state
-            }}>
-                <FilterDropdownFactory name="dates"
-                                       title={<Translate>Period</Translate>}
-                                       form={(fieldValues, setParentField, handleClose) => (
-                                           <DateForm setParentField={setParentField}
-                                                     handleClose={handleClose}
-                                                     disabledDate={() => false}
-                                                     isRange
-                                                     {...dates} />
-                                       )}
-                                       setGlobalState={(value) => setFilterParameter('dates', value)}
-                                       initialValues={dates}
-                                       renderValue={dateRenderer}
-                                       showButtons={false} />
+            <>
+                <Dropdown text={timeframe ? timeframeOptions[timeframe] : Translate.string('Filter by date')}
+                          className={toClasses({primary: !!timeframe})}
+                          options={filterByDateOptions}
+                          direction="right"
+                          value={timeframe}
+                          onChange={(__, {value}) => setFilterParameter('timeframe', value)}
+                          button
+                          floating />
                 <Button.Group>
                     <Popup trigger={<Button content={Translate.string('Blockings in my rooms')}
                                             primary={myRooms}
@@ -112,7 +71,7 @@ class BlockingFilterBar extends React.Component {
                                             onClick={() => setFilterParameter('myBlockings', !myBlockings)} />}
                            content={Translate.string('Show only my blockings')} />
                 </Button.Group>
-            </FilterBarContext.Provider>
+            </>
         );
     }
 }

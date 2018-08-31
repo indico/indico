@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 import os
 from collections import OrderedDict, defaultdict, namedtuple
-from datetime import datetime, time, timedelta
+from datetime import date, datetime, time, timedelta
 from io import BytesIO
 from itertools import chain, groupby
 from operator import attrgetter, itemgetter
@@ -621,17 +621,18 @@ def serialize_unbookable_hours(data):
     return [bookable_hours_schema.dump(d).data for d in data]
 
 
-def get_room_blockings(start_date=None, end_date=None, created_by=None, in_rooms_owned_by=None):
+def get_room_blockings(timeframe=None, created_by=None, in_rooms_owned_by=None):
     query = (Blocking.query
              .join(Blocking.blocked_rooms)
              .join(BlockedRoom.room)
              .options(contains_eager('blocked_rooms').contains_eager('room')))
-    if start_date and not end_date:
-        query = query.filter(Blocking.is_active_at(start_date))
-    elif start_date and end_date:
-        query = query.filter(db_dates_overlap(Blocking, 'start_date', start_date, 'end_date', end_date, inclusive=True))
 
     criteria = []
+    if timeframe == 'recent':
+        criteria.append(Blocking.end_date >= date.today())
+    elif timeframe == 'year':
+        criteria.extend([Blocking.start_date <= date(date.today().year, 12, 31),
+                         Blocking.end_date >= date(date.today().year, 1, 1)])
     if created_by:
         criteria.append(Blocking.created_by_user == created_by)
     if in_rooms_owned_by:
