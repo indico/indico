@@ -37,7 +37,7 @@ _bp.add_url_rule('/', 'index', RHLayoutEdit, methods=('GET', 'POST'))
 _bp.add_url_rule('/timetable-theme-form', 'timetable_theme_form', RHLayoutTimetableThemeForm)
 _bp.add_url_rule('/menu/', 'menu', RHMenuEdit)
 _bp.add_url_rule('/menu/toggle-customize', 'menu_toggle_custom', RHMenuToggleCustom, methods=('POST',))
-_bp.add_url_rule('/menu/<int:menu_entry_id>/', 'menu_entry_edit', RHMenuEntryEdit, methods=('GET', 'POST',))
+_bp.add_url_rule('/menu/<int:menu_entry_id>/', 'menu_entry_edit', RHMenuEntryEdit, methods=('GET', 'POST'))
 _bp.add_url_rule('/menu/<int:menu_entry_id>/position', 'menu_entry_position', RHMenuEntryPosition, methods=('POST',))
 _bp.add_url_rule('/menu/<int:menu_entry_id>/toggle-enabled', 'menu_entry_toggle_enabled', RHMenuEntryToggleEnabled,
                  methods=('POST',))
