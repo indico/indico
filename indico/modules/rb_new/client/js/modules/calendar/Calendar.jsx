@@ -18,7 +18,6 @@
 import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
-import {bindActionCreators} from 'redux';
 import {Grid} from 'semantic-ui-react';
 import {connect} from 'react-redux';
 
@@ -37,10 +36,6 @@ class Calendar extends React.Component {
             rows: PropTypes.arrayOf(PropTypes.object).isRequired,
         }).isRequired,
         isFetching: PropTypes.bool.isRequired,
-        location: PropTypes.shape({
-            pathname: PropTypes.string.isRequired,
-            search: PropTypes.string.isRequired,
-        }).isRequired,
         actions: PropTypes.exact({
             fetchCalendar: PropTypes.func.isRequired,
             setDate: PropTypes.func.isRequired,
@@ -48,26 +43,8 @@ class Calendar extends React.Component {
     };
 
     componentDidMount() {
-        this._updateCalendar();
-    }
-
-    componentDidUpdate({location: prevLocation}) {
-        const {location} = this.props;
-        // this updates the calendar when
-        // 1) the query string changes due to the user changing the date
-        // 2) the user clicks on "calendar" again (which also causes a query string change)
-        if (location.pathname === prevLocation.pathname && location.search !== prevLocation.search) {
-            this._updateCalendar();
-        }
-    }
-
-    _updateCalendar() {
-        const {calendarData: {date}, actions: {fetchCalendar, setDate}} = this.props;
-        if (!date) {
-            setDate(moment());
-        } else {
-            fetchCalendar();
-        }
+        const {actions: {fetchCalendar}} = this.props;
+        fetchCalendar();
     }
 
     _getRowSerializer(day) {
@@ -101,8 +78,8 @@ class Calendar extends React.Component {
                     <TimelineBase minHour={6}
                                   maxHour={22}
                                   legendLabels={legendLabels}
-                                  rows={rows.map(this._getRowSerializer(date))}
-                                  activeDate={moment(date)}
+                                  rows={rows.map(this._getRowSerializer(date || moment().format('YYYY-MM-DD')))}
+                                  activeDate={date ? moment(date) : moment()}
                                   onDateChange={setDate}
                                   isLoading={isFetching}
                                   longLabel />
@@ -119,9 +96,12 @@ export default connect(
         calendarData: calendarSelectors.getCalendarData(state),
     }),
     dispatch => ({
-        actions: bindActionCreators({
-            fetchCalendar: calendarActions.fetchCalendar,
-            setDate: (date) => calendarActions.setDate(date.format('YYYY-MM-DD')),
-        }, dispatch)
+        actions: {
+            fetchCalendar: () => dispatch(calendarActions.fetchCalendar()),
+            setDate: (date) => {
+                dispatch(calendarActions.setDate(date.format('YYYY-MM-DD')));
+                dispatch(calendarActions.fetchCalendar());
+            },
+        }
     })
 )(Calendar);
