@@ -49,11 +49,11 @@ export const ajax = {
         serializer: ({reason}) => reason
     },
     start_date: {
-        onlyIf: ({start_date: startDate}) => !!startDate,
+        onlyIf: ({dates}) => dates && dates.startDate,
         serializer: filterDTHandler('start')
     },
     end_date: {
-        onlyIf: ({end_date: endDate}) => !!endDate,
+        onlyIf: ({dates}) => dates && dates.endDate,
         serializer: filterDTHandler('end')
     }
 };
