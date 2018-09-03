@@ -14,6 +14,7 @@ Bugfixes
   downloads are disabled (:issue:`3493`)
 - Do not count deleted registrations when printing tickets from the badge
   designer page
+- Hide "Save answers" in surveys while not logged in
 
 Version 2.1.3
 -------------

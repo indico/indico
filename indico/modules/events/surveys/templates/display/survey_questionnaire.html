@@ -34,7 +34,7 @@
         {% endcall %}
     {% endfor %}
     {% call form_footer(form) %}
-        {% if partial_completion %}
+        {% if partial_completion and session.user %}
             <a class="i-button big js-save-answers"
                data-href="{{ url_for('.display_save_answers', survey.locator.token) }}"
                data-method="POST"

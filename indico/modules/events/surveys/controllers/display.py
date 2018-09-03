@@ -144,7 +144,7 @@ class RHSubmitSurvey(RHSubmitSurveyBase):
 class RHSaveSurveyAnswers(RHSubmitSurveyBase):
     def _check_access(self):
         RHSubmitSurveyBase._check_access(self)
-        if not self.survey.partial_completion:
+        if not self.survey.partial_completion or not session.user:
             raise Forbidden
 
     def _process(self):
