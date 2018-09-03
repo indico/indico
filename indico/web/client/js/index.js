@@ -15,13 +15,14 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import '@babel/polyfill';
+
 import './jquery';
 import './legacy/presentation.js';
 import './legacy/indico.js';
 import './legacy/timetable.js';
 
 import '../styles/screen.scss';
-import '@babel/polyfill';
 
 // outdatedbrowser has to be loaded with exports-loader
 // in order to be available from 'window.outdatedBrowser'
