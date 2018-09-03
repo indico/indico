@@ -26,9 +26,13 @@
     text-align: center;
     font-size: 1.2em;
 
-    a {
+    a, span {
         color: $white;
         display: block;
+    }
+
+    span {
+        cursor: default;
     }
 
     &:hover {

@@ -38,11 +38,14 @@ export default function MenuItem({path, children, disabled, onClick}) {
     return (
         <Route path={path}>
             {({match}) => (
-                <li className={match ? 'selected' : ''}
-                    styleName="rb-menu-item">
-                    <Link to={path} replace={!!match} onClick={onClick}>
-                        {children}
-                    </Link>
+                <li className={match ? 'selected' : ''} styleName="rb-menu-item">
+                    {match
+                        ? <span>{children}</span>
+                        : (
+                            <Link to={path} onClick={onClick}>
+                                {children}
+                            </Link>
+                        )}
                 </li>
             )}
         </Route>
