@@ -481,7 +481,7 @@ class RHRegistrationsConfigBadges(RHRegistrationsActionBase):
         } for tpl in all_templates if tpl.type.name == 'badge'}
         settings = event_badge_settings.get_all(self.event.id)
         form = BadgeSettingsForm(self.event, template=self.template_id, tickets=self.TICKET_BADGES, **settings)
-        all_registrations = self.registrations or self.regform.registrations
+        all_registrations = [r for r in (self.registrations or self.regform.registrations) if r.is_active]
         registrations = self._filter_registrations(all_registrations)
         if self.event.is_locked:
             del form.save_values
