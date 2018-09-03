@@ -18,6 +18,7 @@
 import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
+import {bindActionCreators} from 'redux';
 import {Grid} from 'semantic-ui-react';
 import {connect} from 'react-redux';
 
@@ -45,6 +46,13 @@ class Calendar extends React.Component {
     componentDidMount() {
         const {actions: {fetchCalendar}} = this.props;
         fetchCalendar();
+    }
+
+    componentDidUpdate({calendarData: {date: prevDate}}) {
+        const {calendarData: {date}, actions: {fetchCalendar}} = this.props;
+        if (prevDate !== date) {
+            fetchCalendar();
+        }
     }
 
     _getRowSerializer(day) {
@@ -96,12 +104,9 @@ export default connect(
         calendarData: calendarSelectors.getCalendarData(state),
     }),
     dispatch => ({
-        actions: {
-            fetchCalendar: () => dispatch(calendarActions.fetchCalendar()),
-            setDate: (date) => {
-                dispatch(calendarActions.setDate(date.format('YYYY-MM-DD')));
-                dispatch(calendarActions.fetchCalendar());
-            },
-        }
+        actions: bindActionCreators({
+            fetchCalendar: calendarActions.fetchCalendar,
+            setDate: (date) => calendarActions.setDate(date.format('YYYY-MM-DD')),
+        }, dispatch)
     })
 )(Calendar);
