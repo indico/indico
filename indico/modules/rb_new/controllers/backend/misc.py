@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 from io import BytesIO
 
-from flask import jsonify, session, redirect, request
+from flask import jsonify, redirect, request, session
 
 from indico.modules.rb import rb_settings
 from indico.modules.rb.controllers import RHRoomBookingBase

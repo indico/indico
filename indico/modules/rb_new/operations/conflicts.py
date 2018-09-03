@@ -25,7 +25,6 @@ from indico.modules.rb.models.reservation_occurrences import ReservationOccurren
 from indico.modules.rb.models.reservations import Reservation
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb_new.util import TempReservationOccurrence
-
 from indico.util.date_time import get_overlap
 from indico.util.struct.iterables import group_list
 
@@ -112,4 +111,3 @@ def get_room_unbookable_hours_conflicts(candidates, occurrences):
                 obj = TempReservationOccurrence(overlap[0], overlap[1], None)
                 conflicts.append(obj)
     return conflicts
-

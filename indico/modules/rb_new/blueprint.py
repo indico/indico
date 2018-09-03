@@ -22,6 +22,7 @@ from indico.modules.rb_new.controllers.backend import blockings, bookings, locat
 from indico.modules.rb_new.controllers.frontend import RHLanding
 from indico.web.flask.wrappers import IndicoBlueprint
 
+
 _bp = IndicoBlueprint('rooms_new', __name__, template_folder='templates', virtual_template_folder='rb_new',
                       url_prefix='/rooms-new')
 

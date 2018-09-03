@@ -17,8 +17,8 @@
 from __future__ import unicode_literals
 
 import os
-from io import BytesIO
 from collections import namedtuple
+from io import BytesIO
 
 from flask import current_app
 from PIL import Image
@@ -27,8 +27,8 @@ from indico.legacy.common.cache import GenericCache
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb_new.schemas import (blockings_schema, bookable_hours_schema, nonbookable_periods_schema,
                                            reservation_occurrences_schema)
-from indico.util.struct.iterables import group_list
 from indico.util.string import crc32
+from indico.util.struct.iterables import group_list
 
 
 ROOM_PHOTO_DIMENSIONS = (290, 170)

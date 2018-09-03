@@ -30,15 +30,15 @@ from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.models.reservations import RepeatFrequency, Reservation
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb_new.controllers.backend.common import search_room_args
-from indico.modules.rb_new.schemas import reservation_schema, rooms_schema
 from indico.modules.rb_new.operations.bookings import get_room_calendar, get_rooms_availability
 from indico.modules.rb_new.operations.rooms import search_for_rooms
 from indico.modules.rb_new.operations.suggestions import get_suggestions
+from indico.modules.rb_new.schemas import reservation_schema, rooms_schema
 from indico.modules.rb_new.util import (serialize_blockings, serialize_nonbookable_periods, serialize_occurrences,
                                         serialize_unbookable_hours)
 from indico.modules.users.models.users import User
 from indico.util.i18n import _
-from indico.web.util import jsonify_data, ExpectedError
+from indico.web.util import ExpectedError, jsonify_data
 
 
 NUM_SUGGESTIONS = 5
