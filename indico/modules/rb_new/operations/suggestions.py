@@ -18,14 +18,16 @@ from __future__ import unicode_literals
 
 from datetime import timedelta
 
-from indico.modules.rb_new.operations.bookings import get_existing_room_occurrences
+from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
+from indico.modules.rb.models.reservations import RepeatFrequency
+from indico.modules.rb.models.rooms import Room
 from indico.modules.rb_new.operations.blockings import get_rooms_blockings
+from indico.modules.rb_new.operations.bookings import get_existing_room_occurrences
 from indico.modules.rb_new.operations.conflicts import get_rooms_conflicts
 from indico.modules.rb_new.operations.misc import get_rooms_nonbookable_periods, get_rooms_unbookable_hours
 from indico.modules.rb_new.operations.rooms import search_for_rooms
 from indico.modules.rb_new.util import group_by_occurrence_date
-from indico.modules.rb.models.reservations import RepeatFrequency
-from indico.modules.rb.models.rooms import Room
+
 
 BOOKING_TIME_DIFF = 20  # (minutes)
 DURATION_FACTOR = 0.25
@@ -72,6 +74,7 @@ def get_single_booking_suggestions(rooms, start_dt, end_dt, limit=None):
 
 def get_number_of_skipped_days_for_rooms(rooms, start_dt, end_dt, repeat_frequency, repeat_interval, limit=None):
     data = []
+    candidates = ReservationOccurrence.create_series(start_dt, end_dt, (repeat_frequency, repeat_interval))
     blocked_rooms = get_rooms_blockings(rooms, start_dt.date(), end_dt.date())
     unbookable_hours = get_rooms_unbookable_hours(rooms)
     nonbookable_periods = get_rooms_nonbookable_periods(rooms, start_dt, end_dt)
@@ -82,7 +85,7 @@ def get_number_of_skipped_days_for_rooms(rooms, start_dt, end_dt, repeat_frequen
             break
 
         number_of_conflicting_days = len(group_by_occurrence_date(conflicts.get(room.id, [])))
-        if number_of_conflicting_days:
+        if number_of_conflicting_days and number_of_conflicting_days < len(candidates):
             data.append({'room': room, 'suggestions': {'skip': number_of_conflicting_days}})
     return sorted(data, key=lambda item: item['suggestions']['skip'])
 
