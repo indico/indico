@@ -16,25 +16,13 @@
  */
 
 import React from 'react';
-import {Popup} from 'semantic-ui-react';
 import PropTypes from 'prop-types';
 import {Link, Route} from 'react-router-dom';
-
-import {Translate} from 'indico/react/i18n';
 
 import './MenuItem.module.scss';
 
 
-export default function MenuItem({path, children, disabled, onClick}) {
-    if (disabled) {
-        return (
-            <Route path={path}>
-                <Popup trigger={<li styleName="rb-menu-item"><span styleName="disabled">{children}</span></li>}
-                       content={Translate.string('Coming soon!')}
-                       position="bottom center" />
-            </Route>
-        );
-    }
+export default function MenuItem({path, children, onClick}) {
     return (
         <Route path={path}>
             {({match}) => (
@@ -55,10 +43,5 @@ export default function MenuItem({path, children, disabled, onClick}) {
 MenuItem.propTypes = {
     path: PropTypes.string.isRequired,
     children: PropTypes.node.isRequired,
-    disabled: PropTypes.bool,
     onClick: PropTypes.func.isRequired,
-};
-
-MenuItem.defaultProps = {
-    disabled: false,
 };
