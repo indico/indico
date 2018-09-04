@@ -16,6 +16,7 @@
 */
 
 import React from 'react';
+import {bindActionCreators} from 'redux';
 import {Button, Dropdown, Popup} from 'semantic-ui-react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
@@ -81,11 +82,8 @@ export default connect(
         filters: blockingsSelectors.getFilters(state),
     }),
     dispatch => ({
-        actions: {
-            setFilterParameter: (param, value) => {
-                dispatch(blockingsActions.setFilterParameter(param, value));
-                dispatch(blockingsActions.fetchBlockings());
-            }
-        }
+        actions: bindActionCreators({
+            setFilterParameter: blockingsActions.setFilterParameter,
+        }, dispatch)
     }),
 )(BlockingFilterBar);

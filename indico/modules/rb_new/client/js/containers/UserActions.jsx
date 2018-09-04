@@ -15,12 +15,13 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import {push as pushRoute} from 'connected-react-router';
 import UserActions from '../components/UserActions';
 
 import {selectors as userSelectors} from '../common/user';
+import {actions as blockingsActions} from '../modules/blockings';
+import * as globalActions from '../actions';
 
 
 export default connect(
@@ -28,8 +29,14 @@ export default connect(
         isAdmin: userSelectors.isUserAdmin(state),
         hasOwnedRooms: userSelectors.hasOwnedRooms(state),
     }),
-    dispatch => bindActionCreators({
-        gotoMyRoomsList: () => pushRoute('/rooms?mine=true'),
-        gotoMyBlockings: () => pushRoute('/blockings?mine=true'),
-    }, dispatch)
+    dispatch => ({
+        gotoMyRoomsList() {
+            dispatch(globalActions.setFilterParameter('roomList', 'onlyMine', true));
+            dispatch(pushRoute('/rooms?mine=true'));
+        },
+        gotoMyBlockings() {
+            dispatch(blockingsActions.setFilterParameter('myBlockings', true));
+            dispatch(pushRoute('/blockings?myBlockings=true'));
+        },
+    })
 )(UserActions);

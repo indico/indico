@@ -37,6 +37,7 @@ class BlockingList extends React.Component {
         list: PropTypes.array.isRequired,
         isFetching: PropTypes.bool.isRequired,
         pushState: PropTypes.func.isRequired,
+        filters: PropTypes.object.isRequired,
         actions: PropTypes.exact({
             fetchBlockings: PropTypes.func.isRequired,
         }).isRequired,
@@ -45,6 +46,13 @@ class BlockingList extends React.Component {
     componentDidMount() {
         const {actions: {fetchBlockings}} = this.props;
         fetchBlockings();
+    }
+
+    componentDidUpdate({filters: prevFilters}) {
+        const {filters, actions: {fetchBlockings}} = this.props;
+        if (prevFilters !== filters) {
+            fetchBlockings();
+        }
     }
 
     renderBlocking = (blocking) => {
@@ -110,6 +118,7 @@ export default connect(
     state => ({
         list: blockingsSelectors.getAllBlockings(state),
         isFetching: blockingsSelectors.isFetchingBlockings(state),
+        filters: blockingsSelectors.getFilters(state),
     }),
     dispatch => ({
         actions: bindActionCreators({
