@@ -21,8 +21,8 @@ import MenuItem from '../components/MenuItem';
 
 
 const mapDispatchToProps = dispatch => ({
-    onClick() {
-        dispatch(resetPageState());
+    resetPageState(namespace) {
+        dispatch(resetPageState(namespace));
     }
 });
 

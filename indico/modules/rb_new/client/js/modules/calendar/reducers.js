@@ -32,7 +32,7 @@ export default combineReducers({
     data: (state = initialState, action) => {
         switch (action.type) {
             case actions.RESET_PAGE_STATE:
-                return initialState;
+                return action.namespace === 'calendar' ? initialState : state;
             case calendarActions.SET_DATE:
                 return {...state, rows: [], date: action.date};
             case calendarActions.ROWS_RECEIVED:

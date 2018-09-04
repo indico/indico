@@ -57,7 +57,7 @@ export default class App extends React.Component {
                         <div styleName="rb-menu-bar-side-left">
                             <h1>
                                 <Icon name="home" />
-                                <Link to="/" onClick={resetPageState}>
+                                <Link to="/" onClick={() => resetPageState('bookRoom')}>
                                     <Translate>Room Booking</Translate>
                                 </Link>
                             </h1>

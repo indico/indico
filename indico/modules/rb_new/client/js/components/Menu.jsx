@@ -27,19 +27,19 @@ import './Menu.module.scss';
 export default function Menu() {
     return (
         <ul styleName="rb-menu">
-            <MenuItem key="book" path="/book">
+            <MenuItem key="book" path="/book" namespace="bookRoom">
                 <Icon name="add square" />
                 <Translate>Book a Room</Translate>
             </MenuItem>
-            <MenuItem key="rooms" path="/rooms">
+            <MenuItem key="rooms" path="/rooms" namespace="roomList">
                 <Icon name="list" />
                 <Translate>List of Rooms</Translate>
             </MenuItem>
-            <MenuItem key="calendar" path="/calendar">
+            <MenuItem key="calendar" path="/calendar" namespace="calendar">
                 <Icon name="calendar" />
                 <Translate>Calendar</Translate>
             </MenuItem>
-            <MenuItem key="blockings" path="/blockings">
+            <MenuItem key="blockings" path="/blockings" namespace="blockings">
                 <Icon name="window close" />
                 <Translate>Blockings</Translate>
             </MenuItem>

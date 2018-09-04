@@ -40,8 +40,8 @@ export default connect(
             dispatch(fetchMapAspects());
             dispatch(roomsActions.fetchRooms());
         },
-        resetPageState() {
-            dispatch(resetPageState());
+        resetPageState(namespace) {
+            dispatch(resetPageState(namespace));
         }
     })
 )(App);

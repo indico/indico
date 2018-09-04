@@ -46,7 +46,7 @@ function timelineReducer(state = initialTimelineState, action) {
         case actions.TOGGLE_TIMELINE_VIEW:
             return {...state, isVisible: action.isVisible};
         case actions.RESET_PAGE_STATE:
-            return {...state, isVisible: false};
+            return action.namespace === 'bookRoom' ? {...state, isVisible: false} : state;
         default:
             return state;
     }

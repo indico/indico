@@ -22,7 +22,7 @@ import {Link, Route} from 'react-router-dom';
 import './MenuItem.module.scss';
 
 
-export default function MenuItem({path, children, onClick}) {
+export default function MenuItem({namespace, path, children, resetPageState}) {
     return (
         <Route path={path}>
             {({match}) => (
@@ -30,7 +30,7 @@ export default function MenuItem({path, children, onClick}) {
                     {match
                         ? <span>{children}</span>
                         : (
-                            <Link to={path} onClick={onClick}>
+                            <Link to={path} onClick={() => resetPageState(namespace)}>
                                 {children}
                             </Link>
                         )}
@@ -41,7 +41,8 @@ export default function MenuItem({path, children, onClick}) {
 }
 
 MenuItem.propTypes = {
+    namespace: PropTypes.string.isRequired,
     path: PropTypes.string.isRequired,
     children: PropTypes.node.isRequired,
-    onClick: PropTypes.func.isRequired,
+    resetPageState: PropTypes.func.isRequired,
 };
