@@ -15,7 +15,9 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-/* global ConfirmPopup:false, SpecialRemovePopup:false, AlertPopup:false, Palette:false */
+/* global ConfirmPopup:false, SpecialRemovePopup:false, AlertPopup:false */
+
+import Palette from '../../utils/palette';
 
 (function(global) {
     global.confirmPrompt = function confirmPrompt(message, title) {

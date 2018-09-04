@@ -15,7 +15,6 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-/* global Palette:false */
 /* eslint-disable max-len */
 
 import {$T} from '../../utils/i18n';
