@@ -292,7 +292,7 @@ class BookRoom extends React.Component {
         const {switcherRef} = this.state;
         const {timeline: {availability, isVisible}} = this.props;
         const timelineDataAvailable = !_.isEmpty(availability);
-        const hasConflicts = Object.values(availability).some((data) => {
+        const hasConflicts = timelineDataAvailable && Object.values(availability).some((data) => {
             return !_.isEmpty(data.conflicts);
         });
         const classes = toClasses({active: isVisible, disabled: !timelineDataAvailable});
