@@ -67,8 +67,9 @@ class BookingTimeline extends React.Component {
         return ({candidates, pre_bookings: preBookings, bookings, pre_conflicts: preConflicts, conflicts,
                  blockings, nonbookable_periods: nonbookablePeriods, unbookable_hours: unbookableHours,
                  room}) => {
+            const hasConflicts = conflicts[dt] && conflicts[dt].length !== 0;
             const av = {
-                candidates: candidates[dt].map((cand) => ({...cand, bookable: true})) || [],
+                candidates: candidates[dt].map((cand) => ({...cand, bookable: !hasConflicts})) || [],
                 preBookings: preBookings[dt] || [],
                 bookings: bookings[dt] || [],
                 conflicts: conflicts[dt] || [],

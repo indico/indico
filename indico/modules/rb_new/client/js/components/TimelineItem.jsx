@@ -141,10 +141,11 @@ export default class TimelineItem extends React.Component {
         }
 
         const segment = (
-            <div className={additionalClasses} onClick={onClick && type === 'candidate' ? onClick : null}
+            <div className={additionalClasses} onClick={onClick && bookable && type === 'candidate' ? onClick : null}
                  styleName="timeline-occurrence"
                  style={{left: `${segmentPosition}%`, width: `calc(${segmentWidth}% + 1px)`}} />
         );
+
         return (
             <Popup trigger={segment} content={popupContent} position="bottom center"
                    header={reservation && reservation.booked_for_name}
