@@ -15,10 +15,9 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import * as selectors from './selectors';
+import {RequestState} from 'indico/utils/redux';
 
 
-export {default} from './BookRoom';
-export {default as reducer} from './reducers';
-export {queryStringReducer, routeConfig} from './queryString';
-export {selectors};
+export const isFetchingFormTimeline = ({bookRoom}) => {
+    return bookRoom.bookingForm.requests.timeline.state === RequestState.STARTED;
+};

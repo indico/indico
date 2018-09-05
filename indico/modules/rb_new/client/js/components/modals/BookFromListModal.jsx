@@ -30,6 +30,7 @@ import * as globalActions from '../../actions';
 import * as bookRoomActions from '../../modules/bookRoom/actions';
 import BookingBootstrapForm from '../BookingBootstrapForm';
 import {selectors as roomsSelectors} from '../../common/rooms';
+import {selectors as bookRoomSelectors} from '../../modules/bookRoom';
 
 import './RoomDetailsModal.module.scss';
 
@@ -79,7 +80,8 @@ class BookFromListModal extends React.Component {
         resetCollisions: PropTypes.func.isRequired,
         onClose: PropTypes.func,
         onBook: PropTypes.func.isRequired,
-        availability: PropTypes.object
+        availability: PropTypes.object,
+        availabilityLoading: PropTypes.bool.isRequired,
     };
 
     static defaultProps = {
@@ -94,7 +96,8 @@ class BookFromListModal extends React.Component {
     };
 
     render() {
-        const {room, refreshCollisions, availability, onBook} = this.props;
+        const {room, refreshCollisions, availability, availabilityLoading, onBook} = this.props;
+        const buttonDisabled = availabilityLoading || !availability || availability.num_days_available === 0;
         return (
             <Modal open onClose={this.handleCloseModal} size="large" closeIcon>
                 <Modal.Header styleName="room-details-header">
@@ -107,7 +110,7 @@ class BookFromListModal extends React.Component {
                         </Grid.Column>
                         <Grid.Column width={8}>
                             <BookingBootstrapForm buttonCaption={<Translate>Book</Translate>}
-                                                  buttonDisabled={availability && availability.num_days_available === 0}
+                                                  buttonDisabled={buttonDisabled}
                                                   onChange={refreshCollisions}
                                                   onSearch={onBook}>
                                 {availability && <ConflictIndicator availability={availability} />}
@@ -123,7 +126,8 @@ class BookFromListModal extends React.Component {
 export default connect(
     (state, {roomId}) => ({
         room: roomsSelectors.getRoom(state, {roomId}),
-        availability: state.bookRoom.bookingForm.availability
+        availability: state.bookRoom.bookingForm.availability,
+        availabilityLoading: bookRoomSelectors.isFetchingFormTimeline(state),
     }),
     (dispatch) => ({
         resetCollisions() {
