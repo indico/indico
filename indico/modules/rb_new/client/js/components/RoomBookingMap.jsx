@@ -118,8 +118,8 @@ export class RoomBookingMapControl extends MapControl {
         this.renderControl();
     }
 
-    componentDidUpdate(next) {
-        super.componentDidUpdate(next);
+    componentDidUpdate(prevProps) {
+        super.componentDidUpdate(prevProps);
         this.renderControl();
     }
 
