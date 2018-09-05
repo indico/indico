@@ -20,13 +20,13 @@
 import _ from 'lodash';
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Dropdown, Label} from 'semantic-ui-react';
+import {Dropdown, Icon, Label} from 'semantic-ui-react';
 
 import searchUsersURL from 'indico-url:users.user_search';
 import searchGroupsURL from 'indico-url:groups.group_search';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {Translate} from 'indico/react/i18n';
-import {camelizeKeys} from '../../../../../modules/rb_new/client/js/util';
+import camelizeKeys from 'indico/utils/camelize';
 
 
 const searchUser = async (data) => {
@@ -61,14 +61,16 @@ export default class PrincipalSearchField extends React.Component {
         ]),
         onChange: PropTypes.func.isRequired,
         disabled: PropTypes.bool,
-        withGroups: PropTypes.bool
+        withGroups: PropTypes.bool,
+        favoriteUsers: PropTypes.array
     };
 
     static defaultProps = {
         multiple: false,
         value: null,
         disabled: false,
-        withGroups: false
+        withGroups: false,
+        favoriteUsers: []
     };
 
     constructor(props) {
@@ -123,6 +125,11 @@ export default class PrincipalSearchField extends React.Component {
         return null;
     }
 
+    isInFavorites = (userId) => {
+        const {favoriteUsers} = this.props;
+        return favoriteUsers.some((favoriteUser) => favoriteUser.id === userId);
+    };
+
     renderItem = ({isGroup, ...itemData}) => (isGroup ? {
         text: itemData.name,
         value: itemData.identifier,
@@ -133,8 +140,33 @@ export default class PrincipalSearchField extends React.Component {
         description: itemData.email,
         value: itemData.identifier,
         key: itemData.identifier,
-        icon: 'user'
+        icon: <Icon color={this.isInFavorites(itemData.id) ? 'yellow' : null} name={this.isInFavorites(itemData.id) ? 'star' : 'user'} />
     });
+
+    sortPrincipals = (a, b) => {
+        const {withGroups} = this.props;
+        if (withGroups) {
+            if (a.isGroup && b.isGroup) {
+                return a.name.localeCompare(b.name);
+            } else if (a.isGroup) {
+                return 1;
+            } else if (b.isGroup) {
+                return -1;
+            }
+        }
+
+        const isAInFavorites = this.isInFavorites(a.id);
+        const isBInFavorites = this.isInFavorites(b.id);
+        if (isAInFavorites && isBInFavorites) {
+            return a.fullName.localeCompare(b.fullName);
+        } else if (isAInFavorites) {
+            return -1;
+        } else if (isBInFavorites) {
+            return 1;
+        } else {
+            return a.fullName.localeCompare(b.fullName);
+        }
+    };
 
     handleSearchChange = _.debounce(async (__, {searchQuery}) => {
         if (searchQuery.trim().length < 3) {
@@ -163,7 +195,7 @@ export default class PrincipalSearchField extends React.Component {
         this.userCache = Object.assign(this.userCache, ...items.map(item => ({[item.identifier]: item})));
         this.setState({
             isFetching: false,
-            options: items.map(this.renderItem),
+            options: items.sort(this.sortPrincipals).map(this.renderItem),
             open: true
         });
     }, 1000);
@@ -214,6 +246,7 @@ export default class PrincipalSearchField extends React.Component {
                       options={dropdownOptions}
                       value={dropdownValues}
                       placeholder={placeholder}
+                      onClose={() => this.setState({open: false, searchQuery: ''})}
                       onChange={(__, {value: val}) => {
                           let fieldValue;
                           if (multiple) {
@@ -222,7 +255,7 @@ export default class PrincipalSearchField extends React.Component {
                               fieldValue = this.userCache[val];
                           }
 
-                          this.setState({value: val, searchQuery: '', options: [], open: false});
+                          this.setState({value: val, searchQuery: '', open: false});
                           onChange(fieldValue);
                       }}
                       onSearchChange={this.handleSearchChange}

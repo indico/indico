@@ -27,7 +27,8 @@ import {stateToQueryString} from 'redux-router-querystring';
 
 import {Slot} from 'indico/react/util';
 import {Param, Plural, PluralTranslate, Translate, Singular} from 'indico/react/i18n';
-import {camelizeKeys, pushStateMergeProps, roomPreloader} from '../../util';
+import camelizeKeys from 'indico/utils/camelize';
+import {pushStateMergeProps, roomPreloader} from '../../util';
 import RoomFilterBar from '../../components/RoomFilterBar';
 import filterBarFactory from '../../containers/FilterBar';
 import searchBarFactory from '../../containers/SearchBar';

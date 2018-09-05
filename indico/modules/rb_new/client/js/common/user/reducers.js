@@ -18,6 +18,7 @@
 import {combineReducers} from 'redux';
 
 import {requestReducer} from 'indico/utils/redux';
+import camelizeKeys from 'indico/utils/camelize';
 import * as actions from './actions';
 
 
@@ -29,6 +30,7 @@ const initialUserInfoState = {
     language: '',
     isAdmin: false,
     hasOwnedRooms: false,
+    favoriteUsers: []
 };
 
 export default combineReducers({
@@ -56,7 +58,8 @@ export default combineReducers({
                     avatarBgColor: user.avatar_bg_color,
                     language: user.language,
                     isAdmin: user.is_admin,
-                    hasOwnedRooms: user.has_owned_rooms
+                    hasOwnedRooms: user.has_owned_rooms,
+                    favoriteUsers: camelizeKeys(user.favorite_users)
                 };
             }
             default:

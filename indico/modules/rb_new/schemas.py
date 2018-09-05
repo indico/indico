@@ -135,9 +135,10 @@ class LocationsSchema(mm.ModelSchema):
 
 class RBUserSchema(UserSchema):
     has_owned_rooms = mm.Method('has_managed_rooms')
+    favorite_users = Nested(UserSchema, many=True)
 
     class Meta:
-        fields = UserSchema.Meta.fields + ('has_owned_rooms', 'is_admin')
+        fields = UserSchema.Meta.fields + ('has_owned_rooms', 'favorite_users', 'is_admin')
 
     def has_managed_rooms(self, user):
         from indico.modules.rb_new.operations.rooms import has_managed_rooms

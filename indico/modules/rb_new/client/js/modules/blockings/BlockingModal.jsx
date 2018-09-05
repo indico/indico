@@ -28,8 +28,8 @@ import {ReduxFormField, formatters} from 'indico/react/forms';
 import PrincipalSearchField from 'indico/react/components/PrincipalSearchField';
 import DatePeriodField from 'indico/react/components/DatePeriodField';
 import RoomSelector from '../../components/RoomSelector';
-import {getUserInfo} from '../../common/user/selectors';
 import {getAllBlockings} from '../../modules/blockings/selectors';
+import {getFavoriteUsers} from '../../common/user/selectors';
 import * as blockingsActions from './actions';
 
 import './BlockingModal.module.scss';
@@ -55,8 +55,8 @@ class BlockingModal extends React.Component {
         createBlocking: PropTypes.func.isRequired,
         updateBlocking: PropTypes.func.isRequired,
         updateBlockingsList: PropTypes.func.isRequired,
-        user: PropTypes.object.isRequired,
         blockings: PropTypes.array.isRequired,
+        favoriteUsers: PropTypes.array.isRequired,
         open: PropTypes.bool,
         mode: PropTypes.oneOf(['view', 'edit', 'create']),
         blocking: PropTypes.shape({
@@ -114,10 +114,11 @@ class BlockingModal extends React.Component {
     };
 
     renderPrincipalSearchField = ({input, ...props}) => {
-        const {blocking: {allowed}} = this.props;
+        const {blocking: {allowed}, favoriteUsers} = this.props;
         return (
             <ReduxFormField {...props}
                             input={{...input, value: allowed || []}}
+                            favoriteUsers={favoriteUsers}
                             as={PrincipalSearchField}
                             label={Translate.string('Allowed users / groups')}
                             onChange={(user) => {
@@ -369,8 +370,8 @@ const mapDispatchToProps = (dispatch) => ({
 
 export default connect(
     state => ({
-        user: getUserInfo(state),
-        blockings: getAllBlockings(state)
+        blockings: getAllBlockings(state),
+        favoriteUsers: getFavoriteUsers(state)
     }),
     mapDispatchToProps
 )(BlockingModal);

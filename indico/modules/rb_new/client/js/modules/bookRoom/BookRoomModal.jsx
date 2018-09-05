@@ -69,7 +69,8 @@ class BookRoomModal extends React.Component {
         onSubmit: PropTypes.func.isRequired,
         onClose: PropTypes.func.isRequired,
         availability: PropTypes.object,
-        fetchAvailability: PropTypes.func.isRequired
+        fetchAvailability: PropTypes.func.isRequired,
+        favoriteUsers: PropTypes.array.isRequired
     };
 
     static defaultProps = {
@@ -91,16 +92,18 @@ class BookRoomModal extends React.Component {
         }
     }
 
-    renderPrincipalSearchField({input, ...props}) {
+    renderPrincipalSearchField = ({input, ...props}) => {
+        const {favoriteUsers} = this.props;
         return (
             <ReduxFormField {...props}
                             input={{...input, value: null}}
+                            favoriteUsers={favoriteUsers}
                             as={PrincipalSearchField}
                             onChange={(user) => {
                                 input.onChange(user);
                             }} />
         );
-    }
+    };
 
     renderTimeInformation(recurrence, {startDate, endDate}, {startTime, endTime}) {
         const {type} = recurrence;
@@ -406,6 +409,7 @@ const mapStateToProps = (state, {roomId}) => {
     const room = roomsSelectors.getRoom(state, {roomId});
     return {
         bookingData: {recurrence, dates, timeSlot},
+        favoriteUsers: user.info.favoriteUsers,
         availability,
         user,
         room,

@@ -24,6 +24,7 @@ export const hasLoadedUserInfo = ({user}) => user.requests.info.state === Reques
 export const getUserInfo = ({user}) => user.info;
 export const isUserAdmin = state => getUserInfo(state).isAdmin;
 export const hasOwnedRooms = state => getUserInfo(state).hasOwnedRooms;
+export const getFavoriteUsers = state => getUserInfo(state).favoriteUsers;
 
 const getFavoriteRooms = ({user}) => user.favorites;
 export const hasFavoriteRooms = createSelector(
