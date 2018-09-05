@@ -25,7 +25,10 @@ export const initialRoomFilterStateFactory = (namespace) => {
         capacity: null,
         onlyFavorites: false,
         onlyMine: false,
-        equipment: []
+        equipment: [],
+        bounds: null,
+        building: null,
+        floor: null,
     };
 
     if (namespace === 'bookRoom') {
@@ -43,12 +46,6 @@ export const initialRoomFilterStateFactory = (namespace) => {
                 startTime: null,
                 endTime: null
             },
-            bounds: null
-        });
-    } else if (namespace === 'roomList') {
-        Object.assign(state, {
-            building: null,
-            floor: null
         });
     }
 
