@@ -27,8 +27,9 @@ import * as globalActions from '../../actions';
 
 export const initialTimelineState = {
     isFetching: false,
-    availability: {},
-    dateRange: []
+    availability: [],
+    dateRange: [],
+    isVisible: false
 };
 
 const baseTimelineReducer = (requestAction, successAction, errorAction) => (state = initialTimelineState, action) => {

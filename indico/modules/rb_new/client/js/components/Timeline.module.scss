@@ -18,4 +18,8 @@
 
 .timeline {
     position: relative;
+
+    :global(.redux-lazy-scroll) {
+        overflow: hidden !important;
+    }
 }

@@ -82,8 +82,9 @@ class RHTimeline(RHRoomBookingBase):
                 'all_days_available': not data['conflicts']
             })
 
+        serialized = _serialize_availability(availability)
         return jsonify_data(flash=False,
-                            availability=_serialize_availability(availability),
+                            availability=serialized.items(),
                             date_range=date_range)
 
 
