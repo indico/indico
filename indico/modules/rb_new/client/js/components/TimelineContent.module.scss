@@ -95,4 +95,8 @@ $row-height: 50px;
     &:global(.timeline-non-selectable) {
         user-select: none;
     }
+
+    & + .timeline-loader {
+        margin-top: 2em !important;
+    }
 }

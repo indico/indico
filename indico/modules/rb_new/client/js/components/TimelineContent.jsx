@@ -19,7 +19,8 @@ import _ from 'lodash';
 import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
-import {Icon, Popup} from 'semantic-ui-react';
+import {Icon, Loader, Popup} from 'semantic-ui-react';
+import LazyScroll from 'redux-lazy-scroll';
 import {Translate} from 'indico/react/i18n';
 import {TooltipIfTruncated} from 'indico/react/components';
 
@@ -37,7 +38,9 @@ export default class TimelineContent extends React.Component {
         onClick: PropTypes.func,
         longLabel: PropTypes.bool,
         itemClass: PropTypes.func,
-        itemProps: PropTypes.object
+        itemProps: PropTypes.object,
+        isLoading: PropTypes.bool,
+        lazyScroll: PropTypes.object
     };
 
     static defaultProps = {
@@ -47,6 +50,8 @@ export default class TimelineContent extends React.Component {
         longLabel: false,
         itemClass: TimelineItem,
         itemProps: {},
+        isLoading: false,
+        lazyScroll: null
     };
 
     state = {
@@ -95,9 +100,12 @@ export default class TimelineContent extends React.Component {
     };
 
     render() {
-        const {rows, hourSeries, longLabel} = this.props;
+        const {rows, hourSeries, longLabel, lazyScroll, isLoading} = this.props;
         const {selectable} = this.state;
         const labelWidth = longLabel ? 200 : 150;
+        const WrapperComponent = lazyScroll ? LazyScroll : React.Fragment;
+        const wrapperProps = lazyScroll || {};
+
         return (
             <>
                 <div styleName="timeline-header" className={!selectable && 'timeline-non-selectable'}>
@@ -110,13 +118,16 @@ export default class TimelineContent extends React.Component {
                         </div>
                     ))}
                 </div>
-                <div styleName="timeline-content" className={!selectable && 'timeline-non-selectable'}>
-                    {rows.map((rowProps) => this.renderTimelineRow(rowProps))}
-                    <div style={{left: labelWidth, width: `calc(100% - ${labelWidth}px)`}}
-                         styleName="timeline-lines">
-                        {this.renderDividers(hourSeries.length - 1, longLabel)}
+                <WrapperComponent {...wrapperProps}>
+                    <div styleName="timeline-content" className={!selectable && 'timeline-non-selectable'}>
+                        {rows.map((rowProps) => this.renderTimelineRow(rowProps))}
+                        <div style={{left: labelWidth, width: `calc(100% - ${labelWidth}px)`}}
+                             styleName="timeline-lines">
+                            {this.renderDividers(hourSeries.length - 1, longLabel)}
+                        </div>
                     </div>
-                </div>
+                    <Loader active={wrapperProps.isFetching || isLoading} inline="centered" styleName="timeline-loader" />
+                </WrapperComponent>
             </>
         );
     }

@@ -99,7 +99,7 @@ def get_existing_rooms_occurrences(rooms, start_dt, end_dt, repeat_frequency, re
 
 def get_rooms_availability(rooms, start_dt, end_dt, repeat_frequency, repeat_interval, flexibility):
     period_days = (end_dt - start_dt).days
-    availability = {}
+    availability = OrderedDict()
     candidates = ReservationOccurrence.create_series(start_dt, end_dt, (repeat_frequency, repeat_interval))
     date_range = sorted(set(cand.start_dt.date() for cand in candidates))
     occurrences = get_existing_rooms_occurrences(rooms, start_dt.replace(hour=0, minute=0),

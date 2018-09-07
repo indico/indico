@@ -180,7 +180,7 @@ class BookRoom extends React.Component {
             return (
                 <div ref={(ref) => this.handleContextRef(ref, 'timelineRef')}>
                     {this.renderFilters('timelineRef')}
-                    <BookingTimeline minHour={6} maxHour={22} />
+                    <BookingTimeline minHour={6} maxHour={22} loadMore={() => fetchRooms(true)} />
                 </div>
             );
         }
@@ -286,7 +286,7 @@ class BookRoom extends React.Component {
     renderViewSwitch() {
         const {timeline: {availability, isVisible}} = this.props;
         const timelineDataAvailable = !_.isEmpty(availability);
-        const hasConflicts = timelineDataAvailable && Object.values(availability).some((data) => {
+        const hasConflicts = timelineDataAvailable && availability.some(([, data]) => {
             return !_.isEmpty(data.conflicts);
         });
         const classes = toClasses({active: isVisible, disabled: !timelineDataAvailable});
@@ -329,7 +329,7 @@ class BookRoom extends React.Component {
 
     switchToTimeline = () => {
         const {timeline: {availability}, toggleTimelineView} = this.props;
-        const timelineDataAvailable = !_.isEmpty(availability);
+        const timelineDataAvailable = availability.length !== 0;
         if (timelineDataAvailable) {
             toggleTimelineView(true);
         }

@@ -38,14 +38,16 @@ export class BookingTimelineComponent extends React.Component {
     static propTypes = {
         minHour: PropTypes.number.isRequired,
         maxHour: PropTypes.number.isRequired,
+        availability: PropTypes.array.isRequired,
         dateRange: PropTypes.array.isRequired,
-        availability: PropTypes.object.isRequired,
         pushState: PropTypes.func.isRequired,
+        loadMore: PropTypes.func.isRequired,
 
         // from redux state
         isFetching: PropTypes.bool.isRequired,
         isFetchingRooms: PropTypes.bool.isRequired,
         recurrenceType: PropTypes.string.isRequired,
+        rooms: PropTypes.object.isRequired
     };
 
     state = {};
@@ -60,8 +62,7 @@ export class BookingTimelineComponent extends React.Component {
 
     get singleRoom() {
         const {availability} = this.props;
-        const keys = Object.keys(availability);
-        return keys.length === 1 && availability[keys[0]];
+        return availability.length === 1 && availability[0];
     }
 
     _getRowSerializer(dt, singleRoom = false) {
@@ -100,7 +101,7 @@ export class BookingTimelineComponent extends React.Component {
             return dateRange.map(dt => this._getRowSerializer(dt, true)(roomAvailability));
         } else {
             const dt = activeDate.format('YYYY-MM-DD');
-            return Object.values(availability).map(this._getRowSerializer(dt));
+            return availability.map(([, data]) => data).map(this._getRowSerializer(dt));
         }
     };
 
@@ -118,7 +119,9 @@ export class BookingTimelineComponent extends React.Component {
     }
 
     render() {
-        const {dateRange, maxHour, minHour, isFetching, isFetchingRooms, recurrenceType} = this.props;
+        const {
+            dateRange, isFetching, maxHour, minHour, isFetchingRooms, recurrenceType, rooms, loadMore
+        } = this.props;
         const {activeDate} = this.state;
         const legendLabels = [
             {label: Translate.string('Available'), color: 'green'},
@@ -142,6 +145,12 @@ export class BookingTimelineComponent extends React.Component {
             return null;
         }
 
+        const lazyScroll = {
+            loadMore,
+            hasMore: rooms.matching > rooms.list.length,
+            isFetching: isFetching || isFetchingRooms
+        };
+
         return (
             <TimelineBase rows={this.calcRows()}
                           legendLabels={legendLabels}
@@ -159,7 +168,8 @@ export class BookingTimelineComponent extends React.Component {
                           extraContent={this.singleRoom && this.renderRoomSummary(this.singleRoom)}
                           isLoading={isFetching || isFetchingRooms}
                           recurrenceType={recurrenceType}
-                          disableDatePicker={!!this.singleRoom} />
+                          disableDatePicker={!!this.singleRoom}
+                          lazyScroll={lazyScroll} />
         );
     }
 }
@@ -169,6 +179,7 @@ export default connect(
         const {bookRoom} = state;
         return {
             ...bookRoom.timeline,
+            rooms: bookRoom.rooms,
             recurrenceType: bookRoom.filters.recurrence.type,
             queryString: stateToQueryString(bookRoom, queryStringSerializer),
             isFetchingRooms: selectors.isFetchingRooms(state)

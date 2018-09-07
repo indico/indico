@@ -19,7 +19,7 @@ import _ from 'lodash';
 import moment from 'moment';
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Button, Container, Dimmer, Loader, Message} from 'semantic-ui-react';
+import {Button, Container, Message} from 'semantic-ui-react';
 import DatePicker from 'rc-calendar/lib/Picker';
 import Calendar from 'rc-calendar';
 import {Translate} from 'indico/react/i18n';
@@ -53,7 +53,8 @@ export default class TimelineBase extends React.Component {
         itemClass: PropTypes.func,
         itemProps: PropTypes.object,
         longLabel: PropTypes.bool,
-        disableDatePicker: PropTypes.bool
+        disableDatePicker: PropTypes.bool,
+        lazyScroll: PropTypes.object
     };
 
     static defaultProps = {
@@ -73,7 +74,8 @@ export default class TimelineBase extends React.Component {
         itemClass: TimelineItem,
         itemProps: {},
         longLabel: false,
-        disableDatePicker: false
+        disableDatePicker: false,
+        lazyScroll: null
     };
 
     calendarDisabledDate = (date) => {
@@ -138,7 +140,7 @@ export default class TimelineBase extends React.Component {
     renderTimeline = () => {
         const {
             extraContent, legendLabels, maxHour, minHour, onClick, recurrenceType, rows, step, isLoading, itemClass,
-            itemProps, longLabel
+            itemProps, longLabel, lazyScroll
         } = this.props;
         const hourSeries = _.range(minHour, maxHour + step, step);
         return (
@@ -146,19 +148,15 @@ export default class TimelineBase extends React.Component {
                 <TimelineLegend labels={legendLabels} aside={this.renderDateSwitcher()} />
                 <div styleName="timeline">
                     {extraContent}
-                    {isLoading ? (
-                        <Dimmer active inverted>
-                            <Loader active />
-                        </Dimmer>
-                    ) : (
-                        <TimelineContent rows={rows}
-                                         hourSeries={hourSeries}
-                                         recurrenceType={recurrenceType}
-                                         onClick={onClick}
-                                         itemClass={itemClass}
-                                         itemProps={itemProps}
-                                         longLabel={longLabel} />
-                    )}
+                    <TimelineContent rows={rows}
+                                     hourSeries={hourSeries}
+                                     recurrenceType={recurrenceType}
+                                     onClick={onClick}
+                                     itemClass={itemClass}
+                                     itemProps={itemProps}
+                                     longLabel={longLabel}
+                                     isLoading={isLoading}
+                                     lazyScroll={lazyScroll} />
                 </div>
             </>
         );

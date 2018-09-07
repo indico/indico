@@ -75,7 +75,10 @@ export function fetchBookingAvailability(room, filters) {
         GET_BOOKING_AVAILABILITY_REQUEST,
         [SET_BOOKING_AVAILABILITY, GET_BOOKING_AVAILABILITY_SUCCESS],
         GET_BOOKING_AVAILABILITY_ERROR,
-        ({availability, date_range: dateRange}) => ({...availability[room.id], dateRange})
+        ({availability, date_range: dateRange}) => {
+            const roomAvailability = availability.find((obj) => obj[0] === room.id)[1];
+            return {...roomAvailability, dateRange};
+        }
     );
 }
 
@@ -115,7 +118,7 @@ export function fetchTimelineData() {
         const {bookRoom: {filters, suggestions: {list: suggestionsList}, rooms: {list}}} = getStore();
 
         if (!list.length && !suggestionsList.length) {
-            dispatch({type: UPDATE_TIMELINE_DATA, data: {date_range: [], availability: null}});
+            dispatch({type: UPDATE_TIMELINE_DATA, data: {date_range: [], availability: []}});
             return;
         }
         let response;
