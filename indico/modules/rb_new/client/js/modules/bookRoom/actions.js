@@ -136,9 +136,9 @@ export function updateRoomSuggestions(suggestions) {
     return {type: UPDATE_SUGGESTIONS, suggestions};
 }
 
-export function searchRooms(clear = true) {
+export function searchRooms(loadMore = false) {
     return async (dispatch, getStore) => {
-        const total = await dispatch(roomListSearchRooms('bookRoom', clear));
+        const total = await dispatch(roomListSearchRooms('bookRoom', loadMore));
         dispatch(updateRoomSuggestions([]));
         const {bookRoom: {rooms: {list}}} = getStore();
         if (list.length === total || total === 0) {

@@ -155,7 +155,7 @@ class BookRoom extends React.Component {
                                 </PluralTranslate>
                             )}
                         </div>
-                        <LazyScroll hasMore={matching > list.length} loadMore={() => fetchRooms(false)}
+                        <LazyScroll hasMore={matching > list.length} loadMore={() => fetchRooms(true)}
                                     isFetching={isFetching}>
                             <Card.Group stackable>
                                 {list.map(this.renderRoom)}
@@ -411,8 +411,8 @@ const mapDispatchToProps = dispatch => ({
     clearTextFilter() {
         dispatch(globalActions.setFilterParameter('bookRoom', 'text', null));
     },
-    fetchRooms(clear = true) {
-        dispatch(bookRoomActions.searchRooms(clear));
+    fetchRooms(loadMore = false) {
+        dispatch(bookRoomActions.searchRooms(loadMore));
         dispatch(globalActions.fetchMapRooms('bookRoom'));
     },
     fetchRoomDetails(id) {

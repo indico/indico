@@ -27,10 +27,10 @@ const initialRoomsState = {
 
 function mergeRooms(state, action) {
     const {list: oldList} = state;
-    const {clear, matching, rooms: newList} = action;
+    const {loadMore, matching, rooms: newList} = action;
     return {
         matching,
-        list: clear ? newList : oldList.concat(newList),
+        list: loadMore ? oldList.concat(newList) : newList
     };
 }
 

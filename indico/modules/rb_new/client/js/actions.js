@@ -58,11 +58,11 @@ export function init() {
     return {type: INIT};
 }
 
-export function updateRooms(namespace, rooms, matching, clear) {
-    return {type: UPDATE_ROOMS, namespace, rooms, matching, clear};
+export function updateRooms(namespace, rooms, matching, loadMore) {
+    return {type: UPDATE_ROOMS, namespace, rooms, matching, loadMore};
 }
 
-export function searchRooms(namespace, clear = true) {
+export function searchRooms(namespace, loadMore = false) {
     return async (dispatch, getStore) => {
         const {filters, rooms: {list: oldRoomList}} = getStore()[namespace];
 
@@ -71,7 +71,7 @@ export function searchRooms(namespace, clear = true) {
         const params = preProcessParameters(filters, ajaxFilterRules);
 
         Object.assign(params, {
-            offset: (clear ? 0 : oldRoomList.length),
+            offset: (loadMore ? oldRoomList.length : 0),
             limit: ROOM_RESULT_LIMIT
         });
 
@@ -85,7 +85,7 @@ export function searchRooms(namespace, clear = true) {
         }
 
         const {rooms, matching} = response.data;
-        dispatch(updateRooms(namespace, rooms, matching, clear));
+        dispatch(updateRooms(namespace, rooms, matching, loadMore));
         return matching;
     };
 }

@@ -218,7 +218,7 @@ class RoomList extends React.Component {
                                 </PluralTranslate>
                             )}
                         </div>
-                        <LazyScroll hasMore={matching > list.length} loadMore={() => fetchRooms(false)}
+                        <LazyScroll hasMore={matching > list.length} loadMore={() => fetchRooms(true)}
                                     isFetching={isFetching}>
                             <Card.Group stackable>
                                 {list.map(this.renderRoom)}
@@ -274,8 +274,8 @@ export default connect(
     }),
     dispatch => ({
         actions: {
-            fetchRooms: (clear = true) => {
-                dispatch(actions.searchRooms('roomList', clear));
+            fetchRooms: (loadMore = false) => {
+                dispatch(actions.searchRooms('roomList', loadMore));
                 dispatch(actions.fetchMapRooms('roomList'));
             },
             fetchRoomDetails: bindActionCreators(roomsActions.fetchDetails, dispatch),
