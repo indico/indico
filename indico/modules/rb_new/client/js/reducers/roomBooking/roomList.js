@@ -21,7 +21,8 @@ import * as actions from '../../actions';
 const initialRoomsState = {
     list: [],
     matching: 0,
-    isFetching: false
+    isFetching: false,
+    isLoadingMore: null
 };
 
 
@@ -43,11 +44,11 @@ export function roomsReducerFactory(namespace) {
 
         switch (action.type) {
             case actions.SEARCH_ROOMS_STARTED:
-                return {...state, isFetching: true};
+                return {...state, isFetching: true, isLoadingMore: action.loadMore};
             case actions.SEARCH_ROOMS_FAILED:
-                return {...state, isFetching: false};
+                return {...state, isFetching: false, isLoadingMore: null};
             case actions.UPDATE_ROOMS:
-                return {...state, isFetching: false, ...mergeRooms(state, action)};
+                return {...state, isFetching: false, isLoadingMore: null, ...mergeRooms(state, action)};
             default:
                 return state;
         }

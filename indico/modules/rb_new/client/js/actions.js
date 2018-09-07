@@ -66,7 +66,7 @@ export function searchRooms(namespace, loadMore = false) {
     return async (dispatch, getStore) => {
         const {filters, rooms: {list: oldRoomList}} = getStore()[namespace];
 
-        dispatch({type: SEARCH_ROOMS_STARTED, namespace});
+        dispatch({type: SEARCH_ROOMS_STARTED, namespace, loadMore});
 
         const params = preProcessParameters(filters, ajaxFilterRules);
 

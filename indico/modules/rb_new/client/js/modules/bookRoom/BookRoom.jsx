@@ -61,6 +61,7 @@ class BookRoom extends React.Component {
             list: PropTypes.array,
             matching: PropTypes.number,
             isFetching: PropTypes.bool,
+            isLoadingMore: PropTypes.bool
         }).isRequired,
         isInitializing: PropTypes.bool.isRequired,
         fetchRooms: PropTypes.func.isRequired,
@@ -122,10 +123,18 @@ class BookRoom extends React.Component {
     renderMainContent = () => {
         const {timelineRef} = this.state;
         const {
-            fetchRooms, roomDetailsFetching, rooms: {list, matching, isFetching}, timeline: {isVisible}
+            fetchRooms,
+            roomDetailsFetching,
+            rooms: {
+                list, matching, isFetching, isLoadingMore
+            },
+            timeline: {
+                isVisible
+            }
         } = this.props;
         const filterBar = <FilterBar />;
         const searchBar = <SearchBar onConfirm={fetchRooms} onTextChange={fetchRooms} />;
+        const showResults = !isFetching || isLoadingMore;
 
         if (!isVisible) {
             return (
@@ -157,12 +166,14 @@ class BookRoom extends React.Component {
                         </div>
                         <LazyScroll hasMore={matching > list.length} loadMore={() => fetchRooms(true)}
                                     isFetching={isFetching}>
-                            <Card.Group stackable>
-                                {list.map(this.renderRoom)}
-                            </Card.Group>
+                            {showResults && (
+                                <Card.Group stackable>
+                                    {list.map(this.renderRoom)}
+                                </Card.Group>
+                            )}
                             <Loader active={isFetching} inline="centered" styleName="rooms-loader" />
                         </LazyScroll>
-                        {this.renderSuggestions()}
+                        {showResults && this.renderSuggestions()}
                     </div>
                     <Dimmer.Dimmable>
                         <Dimmer active={roomDetailsFetching} page>
