@@ -34,6 +34,7 @@ import Room from '../../containers/Room';
 import BookingFilterBar from './BookingFilterBar';
 import BookingTimeline from './BookingTimeline';
 import BookRoomModal from './BookRoomModal';
+import SearchResultCount from './SearchResultCount';
 import roomDetailsModalFactory from '../../components/modals/RoomDetailsModal';
 import {roomPreloader, pushStateMergeProps} from '../../util';
 import {queryString as qsFilterRules} from '../../serializers/filters';
@@ -126,7 +127,7 @@ class BookRoom extends React.Component {
             fetchRooms,
             roomDetailsFetching,
             rooms: {
-                list, matching, isFetching, isLoadingMore
+                list, matching, total, isFetching, isLoadingMore
             },
             timeline: {
                 isVisible
@@ -149,21 +150,7 @@ class BookRoom extends React.Component {
                             </Grid>
                             {searchBar}
                         </Sticky>
-                        <div styleName="results-count">
-                            {matching === 0 && !isFetching && (
-                                Translate.string('There are no rooms available during the selected period')
-                            )}
-                            {matching !== 0 && (
-                                <PluralTranslate count={matching}>
-                                    <Singular>
-                                        There is <Param name="count" value={matching} /> room available for booking
-                                    </Singular>
-                                    <Plural>
-                                        There are <Param name="count" value={matching} /> rooms available for booking
-                                    </Plural>
-                                </PluralTranslate>
-                            )}
-                        </div>
+                        <SearchResultCount matching={matching} total={total} isFetching={isFetching} />
                         <LazyScroll hasMore={matching > list.length} loadMore={() => fetchRooms(true)}
                                     isFetching={isFetching}>
                             {showResults && (

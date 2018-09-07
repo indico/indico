@@ -58,8 +58,8 @@ export function init() {
     return {type: INIT};
 }
 
-export function updateRooms(namespace, rooms, matching, loadMore) {
-    return {type: UPDATE_ROOMS, namespace, rooms, matching, loadMore};
+export function updateRooms(namespace, rooms, matching, total, loadMore) {
+    return {type: UPDATE_ROOMS, namespace, rooms, matching, total, loadMore};
 }
 
 export function searchRooms(namespace, loadMore = false) {
@@ -84,8 +84,8 @@ export function searchRooms(namespace, loadMore = false) {
             return;
         }
 
-        const {rooms, matching} = response.data;
-        dispatch(updateRooms(namespace, rooms, matching, loadMore));
+        const {rooms, matching, total} = response.data;
+        dispatch(updateRooms(namespace, rooms, matching, total, loadMore));
         return matching;
     };
 }
