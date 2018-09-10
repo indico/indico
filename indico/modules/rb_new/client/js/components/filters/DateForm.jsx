@@ -97,6 +97,7 @@ export default class DateForm extends FilterFormComponent {
                                    {...props} />
                 ) : (
                     <RCCalendar selectedValue={startDate}
+                                defaultValue={startDate}
                                 onSelect={async (date) => {
                                     await this.setDates(date, null);
                                     handleClose();
