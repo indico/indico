@@ -19,7 +19,7 @@ import _ from 'lodash';
 import moment from 'moment';
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Button, Container, Loader, Message} from 'semantic-ui-react';
+import {Button, Container, Dimmer, Loader, Message} from 'semantic-ui-react';
 import DatePicker from 'rc-calendar/lib/Picker';
 import Calendar from 'rc-calendar';
 import {Translate} from 'indico/react/i18n';
@@ -147,7 +147,9 @@ export default class TimelineBase extends React.Component {
                 <div styleName="timeline">
                     {extraContent}
                     {isLoading ? (
-                        <Loader active />
+                        <Dimmer active inverted>
+                            <Loader active />
+                        </Dimmer>
                     ) : (
                         <TimelineContent rows={rows}
                                          hourSeries={hourSeries}
