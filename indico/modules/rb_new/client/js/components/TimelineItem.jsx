@@ -48,12 +48,14 @@ export default class TimelineItem extends React.Component {
         endHour: PropTypes.number.isRequired,
         data: PropTypes.object.isRequired,
         onClick: PropTypes.func,
-        children: PropTypes.node
+        children: PropTypes.node,
+        setSelectable: PropTypes.func
     };
 
     static defaultProps = {
         onClick: null,
-        children: []
+        children: [],
+        setSelectable: null
     };
 
     calculateWidth = (startDt, endDt) => {
@@ -168,7 +170,7 @@ export default class TimelineItem extends React.Component {
     };
 
     render() {
-        const {children, startHour, endHour, data, onClick, ...restProps} = this.props;
+        const {children, startHour, endHour, data, onClick, setSelectable, ...restProps} = this.props;
         return (
             <div styleName="timeline-item" {...restProps}>
                 {children}
