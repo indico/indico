@@ -21,6 +21,7 @@ Improvements
 - Make registration period display less confusing (:issue:`3359`)
 - Add setting for the default contribution duration of an event
   (:issue:`3446`)
+- Add edit button to custom conference pages (:issue:`3284`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

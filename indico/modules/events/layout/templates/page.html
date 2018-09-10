@@ -5,6 +5,19 @@
     {{ page.menu_entry.title }}
 {% endblock %}
 
+{% block page_actions %}
+    {% if event.can_manage(session.user) %}
+        <div class="toolbar">
+            <a href="#"
+               class="i-button icon-edit"
+               data-href="{{ url_for('event_layout.menu_entry_edit', page.menu_entry) }}"
+               data-title="{% trans %}Edit page{% endtrans %}"
+               data-ajax-dialog
+               data-reload-after></a>
+        </div>
+    {% endif %}
+{% endblock %}
+
 {% block content %}
     {{ page.html|sanitize_html }}
 {% endblock %}
