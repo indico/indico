@@ -37,7 +37,7 @@ def get_suggestions(filters, limit=None):
     room_filters = {key: value for key, value in filters.iteritems()
                     if key in ('capacity', 'equipment', 'building', 'text', 'floor')}
 
-    query = search_for_rooms(room_filters, only_available=False)
+    query = search_for_rooms(room_filters)
     query = query.filter(~Room.filter_available(filters['start_dt'], filters['end_dt'],
                                                 (filters['repeat_frequency'], filters['repeat_interval'])))
     rooms = query.all()

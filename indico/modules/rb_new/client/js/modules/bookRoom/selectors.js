@@ -18,6 +18,11 @@
 import {RequestState} from 'indico/utils/redux';
 
 
+export const isFetchingRooms = ({bookRoom: {rooms}}) => rooms.isFetching;
 export const isFetchingFormTimeline = ({bookRoom}) => {
     return bookRoom.bookingForm.requests.timeline.state === RequestState.STARTED;
 };
+export const getUnavailableRoomInfo = ({bookRoom: {unavailableRooms}}) => unavailableRooms.availability;
+export const getTimelineDateRange = ({bookRoom: {timeline}}) => timeline.dateRange;
+export const isFetchingUnavailableRooms = ({bookRoom: {unavailableRooms}}) => unavailableRooms.isFetching;
+export const getFilters = ({bookRoom}) => bookRoom.filters;

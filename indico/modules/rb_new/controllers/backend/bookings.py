@@ -58,10 +58,11 @@ def _serialize_availability(availability):
 class RHTimeline(RHRoomBookingBase):
     @use_args(dict(search_room_args, **{
         'limit': fields.Int(missing=None),
-        'additional_room_ids': fields.List(fields.Int())
+        'additional_room_ids': fields.List(fields.Int()),
+        'unavailable': fields.Bool(missing=False)
     }))
     def _process(self, args):
-        query = search_for_rooms(args, only_available=True)
+        query = search_for_rooms(args, availability=not args['unavailable'])
         if 'limit' in args:
             query = query.limit(args.pop('limit'))
 

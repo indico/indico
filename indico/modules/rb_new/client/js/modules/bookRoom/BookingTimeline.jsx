@@ -26,6 +26,7 @@ import {Translate, Param} from 'indico/react/i18n';
 import {isDateWithinRange, pushStateMergeProps} from '../../util';
 import {queryString as queryStringSerializer} from '../../serializers/filters';
 import TimelineBase from '../../components/TimelineBase';
+import * as selectors from './selectors';
 
 import '../../components/Timeline.module.scss';
 
@@ -33,7 +34,7 @@ import '../../components/Timeline.module.scss';
 const DATE_FORMAT = 'YYYY-MM-DD';
 const _toMoment = (date) => moment(date, DATE_FORMAT);
 
-class BookingTimeline extends React.Component {
+export class BookingTimelineComponent extends React.Component {
     static propTypes = {
         minHour: PropTypes.number.isRequired,
         maxHour: PropTypes.number.isRequired,
@@ -164,16 +165,17 @@ class BookingTimeline extends React.Component {
 }
 
 export default connect(
-    ({bookRoom}) => {
+    state => {
+        const {bookRoom} = state;
         return {
             ...bookRoom.timeline,
             recurrenceType: bookRoom.filters.recurrence.type,
             queryString: stateToQueryString(bookRoom, queryStringSerializer),
-            isFetchingRooms: bookRoom.rooms.isFetching
+            isFetchingRooms: selectors.isFetchingRooms(state)
         };
     },
     dispatch => ({
         dispatch
     }),
     pushStateMergeProps
-)(BookingTimeline);
+)(BookingTimelineComponent);

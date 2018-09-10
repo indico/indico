@@ -28,31 +28,44 @@ import * as globalActions from '../../actions';
 export const initialTimelineState = {
     isFetching: false,
     availability: {},
-    dateRange: [],
-    isVisible: false
+    dateRange: []
 };
 
-function timelineReducer(state = initialTimelineState, action) {
+const baseTimelineReducer = (requestAction, successAction, errorAction) => (state = initialTimelineState, action) => {
     switch (action.type) {
-        case actions.FETCH_TIMELINE_DATA_STARTED:
+        case requestAction:
             return {...state, isFetching: true};
-        case actions.FETCH_TIMELINE_DATA_FAILED:
+        case successAction:
             return {...state, isFetching: false};
-        case actions.UPDATE_TIMELINE_DATA:
+        case errorAction:
             return {
                 ...state,
                 isFetching: false,
-                availability: action.timeline.availability,
-                dateRange: action.timeline.date_range
+                availability: action.data.availability,
+                dateRange: action.data.date_range
             };
+    }
+    return state;
+};
+
+function timelineReducer(state = {...initialTimelineState, isVisible: false}, action) {
+    const reducer = baseTimelineReducer(actions.FETCH_TIMELINE_DATA_STARTED,
+                                        actions.FETCH_TIMELINE_DATA_FAILED,
+                                        actions.UPDATE_TIMELINE_DATA);
+    state = reducer(state, action);
+
+    switch (action.type) {
         case actions.TOGGLE_TIMELINE_VIEW:
             return {...state, isVisible: action.isVisible};
         case globalActions.RESET_PAGE_STATE:
             return action.namespace === 'bookRoom' ? {...state, isVisible: false} : state;
-        default:
-            return state;
     }
+    return state;
 }
+
+const unavailableReducer = baseTimelineReducer(actions.FETCH_UNAVAILABLE_ROOMS_STARTED,
+                                               actions.FETCH_UNAVAILABLE_ROOMS_FAILED,
+                                               actions.UPDATE_UNAVAILABLE_ROOMS);
 
 const initialSuggestionsState = {
     isFetching: false,
@@ -103,6 +116,7 @@ export default combineReducers({
     filters: filterReducerFactory('bookRoom', initialRoomFilterStateFactory),
     map: mapReducerFactory('bookRoom'),
     timeline: timelineReducer,
+    unavailableRooms: unavailableReducer,
     suggestions: suggestionsReducer,
     bookingForm: bookingFormReducer
 });

@@ -47,13 +47,13 @@ class RHSearchRooms(RHRoomBookingBase):
     }))
     def _process(self, args):
         filter_availability = args.get('start_dt') and args.get('end_dt')
-        query = search_for_rooms(args, only_available=filter_availability)
+        query = search_for_rooms(args, availability=filter_availability or None)
         query = query.limit(args['limit']).offset(args['offset'])
         total = None
 
         if filter_availability and not args['offset']:
             # we only calculate the total on the first request
-            total = search_for_rooms(args, only_available=False).count()
+            total = search_for_rooms(args).count()
 
         rooms, matching = with_total_rows(query)
         return jsonify(matching=matching, rooms=rooms_schema.dump(rooms).data, total=total)
@@ -63,7 +63,7 @@ class RHSearchMapRooms(RHRoomBookingBase):
     @use_args(search_room_args)
     def _process(self, args):
         filter_availability = args.get('start_dt') and args.get('end_dt')
-        query = search_for_rooms(args, only_available=filter_availability)
+        query = search_for_rooms(args, availability=filter_availability or None)
         return jsonify(map_rooms_schema.dump(query.all()).data)
 
 

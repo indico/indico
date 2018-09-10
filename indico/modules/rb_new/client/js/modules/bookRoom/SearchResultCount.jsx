@@ -15,14 +15,34 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react';
+import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import {Icon, Label, Menu, Message, Popup} from 'semantic-ui-react';
+import {stateToQueryString} from 'redux-router-querystring/dist/routing';
+import {Route, withRouter} from 'react-router-dom';
 import {Translate, Param} from 'indico/react/i18n';
+import {queryString as qsFilterRules} from '../../serializers/filters';
+import {rules as qsBookRoomRules} from './queryString';
 
 import './BookRoom.module.scss';
+import * as selectors from './selectors';
+import {pushStateMergeProps} from '../../util';
+import UnavailableRoomsModal from './UnavailableRoomsModal';
 
 
-export default class SearchResultCount extends React.Component {
+class SearchResultCount extends React.Component {
+    static propTypes = {
+        isFetching: PropTypes.bool.isRequired,
+        matching: PropTypes.number,
+        total: PropTypes.number,
+        pushState: PropTypes.func.isRequired
+    };
+
+    static defaultProps = {
+        matching: null,
+        total: null
+    };
+
     renderRoomTotal(count) {
         const trigger = (
             <Menu.Item as="span">
@@ -37,7 +57,7 @@ export default class SearchResultCount extends React.Component {
         return (
             <Popup trigger={trigger}>
                 <Translate>
-                    Number of rooms matching your filtering criteria
+                    Number of rooms matching your filtering criteria.
                 </Translate>
             </Popup>
         );
@@ -59,7 +79,7 @@ export default class SearchResultCount extends React.Component {
         return (
             <Popup trigger={trigger}>
                 <Translate>
-                    Rooms that are free on that time slot. Click for more details
+                    Rooms that are free on that time slot.
                 </Translate>
             </Popup>
         );
@@ -68,7 +88,7 @@ export default class SearchResultCount extends React.Component {
     renderUnavailable(count) {
         const label = <Label color="red" horizontal size="small">{count}</Label>;
         const trigger = (
-            <Menu.Item link>
+            <Menu.Item link onClick={this.openUnavailableRoomsModal}>
                 <Icon name="remove" />
                 <Translate>
                     Unavailable
@@ -80,7 +100,7 @@ export default class SearchResultCount extends React.Component {
         return (
             <Popup trigger={trigger}>
                 <Translate>
-                Rooms unavailable during that time slot
+                    Rooms unavailable during that time slot (click for details).
                 </Translate>
             </Popup>
         );
@@ -101,6 +121,16 @@ export default class SearchResultCount extends React.Component {
                      content={Translate.string('No rooms are available during that timeslot')} />
         );
     }
+
+    openUnavailableRoomsModal = () => {
+        const {pushState} = this.props;
+        pushState('/book/unavailable', true);
+    };
+
+    closeModal = () => {
+        const {pushState} = this.props;
+        pushState(`/book`, true);
+    };
 
     render() {
         const {isFetching, matching, total} = this.props;
@@ -136,19 +166,21 @@ export default class SearchResultCount extends React.Component {
                         {total === 0 && this.renderNoRooms()}
                     </>
                 )}
+                <Route exact path="/book/unavailable" render={() => (
+                    <UnavailableRoomsModal onClose={this.closeModal} />
+                )} />
             </div>
         );
     }
 }
 
-
-SearchResultCount.propTypes = {
-    isFetching: PropTypes.bool.isRequired,
-    matching: PropTypes.number,
-    total: PropTypes.number
-};
-
-SearchResultCount.defaultProps = {
-    matching: null,
-    total: null
-};
+export default withRouter(connect(
+    state => ({
+        isFetching: selectors.isFetchingRooms(state),
+        queryString: stateToQueryString(state.bookRoom, qsFilterRules, qsBookRoomRules)
+    }),
+    dispatch => ({
+        dispatch
+    }),
+    pushStateMergeProps
+)(SearchResultCount));

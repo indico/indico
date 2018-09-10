@@ -45,6 +45,12 @@ export const FETCH_TIMELINE_DATA_FAILED = 'bookRoom/FETCH_TIMELINE_DATA_FAILED';
 export const UPDATE_TIMELINE_DATA = 'bookRoom/UPDATE_TIMELINE_DATA';
 export const TOGGLE_TIMELINE_VIEW = 'bookRoom/TOGGLE_TIMELINE_VIEW';
 
+// Unavailable room list
+export const FETCH_UNAVAILABLE_ROOMS_STARTED = 'bookRoom/FETCH_UNAVAILABLE_ROOMS_STARTED';
+export const FETCH_UNAVAILABLE_ROOMS_FAILED = 'bookRoom/FETCH_UNAVAILABLE_ROOMS_FAILED';
+export const UPDATE_UNAVAILABLE_ROOMS = 'bookRoom/UPDATE_UNAVAILABLE_ROOMS';
+
+
 // Suggestions
 export const FETCH_SUGGESTIONS_STARTED = 'bookRoom/FETCH_SUGGESTIONS_STARTED';
 export const FETCH_SUGGESTIONS_FAILED = 'bookRoom/FETCH_SUGGESTIONS_FAILED';
@@ -73,9 +79,27 @@ export function fetchBookingAvailability(room, filters) {
     );
 }
 
+export function fetchUnavailableRooms(filters, date = null) {
+    const params = {...filters, unavailable: true};
+    if (date) {
+        params.dates = {
+            startDate: date,
+            endDate: date
+        };
+    }
+    return ajaxAction(
+        () => _fetchTimelineData(params),
+        FETCH_UNAVAILABLE_ROOMS_STARTED,
+        UPDATE_UNAVAILABLE_ROOMS,
+        FETCH_UNAVAILABLE_ROOMS_FAILED
+    );
+}
+
 async function _fetchTimelineData(filters, rooms, limit = null) {
     const params = preProcessParameters(filters, ajaxFilterRules);
-    params.additional_room_ids = rooms.map((room) => room.id);
+    if (rooms) {
+        params.additional_room_ids = rooms.map(room => room.id);
+    }
 
     if (limit) {
         params.limit = limit;
@@ -91,7 +115,7 @@ export function fetchTimelineData() {
         const {bookRoom: {filters, suggestions: {list: suggestionsList}, rooms: {list}}} = getStore();
 
         if (!list.length && !suggestionsList.length) {
-            dispatch({type: UPDATE_TIMELINE_DATA, timeline: {date_range: [], availability: null}});
+            dispatch({type: UPDATE_TIMELINE_DATA, data: {date_range: [], availability: null}});
             return;
         }
         let response;
@@ -103,7 +127,7 @@ export function fetchTimelineData() {
             dispatch({type: FETCH_TIMELINE_DATA_FAILED});
             return;
         }
-        dispatch({type: UPDATE_TIMELINE_DATA, timeline: response.data});
+        dispatch({type: UPDATE_TIMELINE_DATA, data: response.data});
     };
 }
 

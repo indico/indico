@@ -153,5 +153,6 @@ export const ajax = {
     ne_lng: {
         onlyIf: (data) => data.bounds && 'NE' in data.bounds,
         serializer: ({bounds: {NE}}) => NE[1]
-    }
+    },
+    unavailable: ({unavailable}) => unavailable
 };

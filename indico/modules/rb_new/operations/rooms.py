@@ -89,7 +89,13 @@ def get_managed_room_ids(user):
         return {r.id for r in Room.get_owned_by(user)}
 
 
-def search_for_rooms(filters, only_available=False):
+def search_for_rooms(filters, availability=None):
+    """Search for a room, using the provided filters.
+
+    :param filters: The filters, provided as a dictionary
+    :param availability: A boolean specifying whether (un)available rooms should be provided,
+                         or `None` in case all rooms should be returned.
+    """
     query = (Room.query
              .outerjoin(favorite_room_table, db.and_(favorite_room_table.c.user_id == session.user.id,
                                                      favorite_room_table.c.room_id == Room.id))
@@ -127,13 +133,19 @@ def search_for_rooms(filters, only_available=False):
             query = query.filter(Room.id.in_(ids))
     query = _filter_coordinates(query, filters)
 
-    if not only_available:
+    if availability is None:
         return query
 
     start_dt, end_dt = filters['start_dt'], filters['end_dt']
     repeatability = (filters['repeat_frequency'], filters['repeat_interval'])
-    query = query.filter(Room.filter_available(start_dt, end_dt, repeatability, include_pre_bookings=True,
-                                               include_pending_blockings=True))
+    availability_query = Room.filter_available(start_dt, end_dt, repeatability, include_pre_bookings=True,
+                                               include_pending_blockings=True)
+
+    if availability is False:
+        availability_query = ~availability_query
+
+    query = query.filter(availability_query)
+
     if not rb_is_admin(session.user):
         selected_period_days = (filters['end_dt'] - filters['start_dt']).days
         booking_limit_days = db.func.coalesce(Room.booking_limit_days, rb_settings.get('booking_limit'))
