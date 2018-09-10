@@ -21,7 +21,7 @@ import PropTypes from 'prop-types';
 
 import {Translate} from 'indico/react/i18n';
 
-import FilterFormComponent from './FilterFormComponent';
+import FilterFormComponent from '../../../common/filters/FilterFormComponent';
 
 import './RecurrenceForm.module.scss';
 

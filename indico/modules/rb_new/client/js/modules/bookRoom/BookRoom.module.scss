@@ -20,6 +20,9 @@
 
 
 .view-icons {
+    height: 100%;
+    margin-left: auto;
+
     :global(.ui.active.button),
     :global(.ui.active.button:hover) {
         background-color: $primary-color;
@@ -43,17 +46,13 @@
         cursor: default;
     }
 
-    .view-icons-context {
-        height: 100%;
+    .icons-wrapper {
+        display: flex;
+        justify-content: flex-end;
 
-        .icons-wrapper {
-            display: flex;
-            justify-content: flex-end;
-
-            :global(.corner.icon).conflicts-icon {
-                font-size: 0.7em;
-                cursor: default;
-            }
+        :global(.corner.icon).conflicts-icon {
+            font-size: 0.7em;
+            cursor: default;
         }
     }
 }
@@ -110,6 +109,14 @@
     :global(.redux-lazy-scroll) {
         overflow: visible !important;
         margin: 0.15em;
+    }
+}
+
+.filter-row {
+    display: flex;
+
+    > *:not(:last-child) {
+        margin-right: 10px;
     }
 }
 

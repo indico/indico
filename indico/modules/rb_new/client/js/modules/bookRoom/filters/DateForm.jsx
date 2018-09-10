@@ -21,9 +21,10 @@ import RangeCalendar from 'rc-calendar/lib/RangeCalendar';
 import RCCalendar from 'rc-calendar';
 import PropTypes from 'prop-types';
 import 'rc-calendar/assets/index.css';
-import {toMoment} from '../../util';
+import {toMoment} from '../../../util';
 
-import FilterFormComponent from './FilterFormComponent';
+import FilterFormComponent from '../../../common/filters/FilterFormComponent';
+
 
 import './DateForm.module.scss';
 

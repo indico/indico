@@ -28,10 +28,10 @@ import LazyScroll from 'redux-lazy-scroll';
 import {Slot, toClasses} from 'indico/react/util';
 import {PluralTranslate, Translate, Singular, Param, Plural} from 'indico/react/i18n';
 import mapControllerFactory from '../../containers/MapController';
-import filterBarFactory from '../../containers/FilterBar';
 import searchBoxFactory from '../../containers/SearchBar';
 import Room from '../../containers/Room';
 import BookingFilterBar from './BookingFilterBar';
+import roomFilterBarFactory from '../../modules/roomList/RoomFilterBar';
 import BookingTimeline from './BookingTimeline';
 import BookRoomModal from './BookRoomModal';
 import SearchResultCount from './SearchResultCount';
@@ -48,12 +48,12 @@ import {actions as roomsActions, selectors as roomsSelectors} from '../../common
 import './BookRoom.module.scss';
 
 
-const FilterBar = filterBarFactory('bookRoom', BookingFilterBar);
 const SearchBar = searchBoxFactory('bookRoom');
 const MapController = mapControllerFactory('bookRoom');
 const RoomDetailsModal = roomDetailsModalFactory('bookRoom');
+const RoomFilterBar = roomFilterBarFactory('bookRoom', bookRoomActions.searchRooms);
 
-
+/* eslint-disable react/no-unused-state */
 class BookRoom extends React.Component {
     static propTypes = {
         setFilterParameter: PropTypes.func.isRequired,
@@ -77,11 +77,6 @@ class BookRoom extends React.Component {
         toggleTimelineView: PropTypes.func.isRequired,
         showMap: PropTypes.bool.isRequired
     };
-
-    constructor(props) {
-        super(props);
-        this.contextRef = React.createRef();
-    }
 
     state = {};
 
@@ -121,8 +116,22 @@ class BookRoom extends React.Component {
         );
     };
 
+    renderFilters(refName) {
+        const {fetchRooms} = this.props;
+        const {[refName]: ref} = this.state;
+        return (
+            <Sticky context={ref} className="sticky-filters">
+                <div styleName="filter-row">
+                    <BookingFilterBar />
+                    <RoomFilterBar />
+                    {this.renderViewSwitch()}
+                </div>
+                <SearchBar onConfirm={fetchRooms} onTextChange={fetchRooms} />
+            </Sticky>
+        );
+    }
+
     renderMainContent = () => {
-        const {timelineRef} = this.state;
         const {
             fetchRooms,
             roomDetailsFetching,
@@ -133,23 +142,13 @@ class BookRoom extends React.Component {
                 isVisible
             }
         } = this.props;
-        const filterBar = <FilterBar />;
-        const searchBar = <SearchBar onConfirm={fetchRooms} onTextChange={fetchRooms} />;
         const showResults = !isFetching || isLoadingMore;
 
         if (!isVisible) {
             return (
                 <>
-                    <div className="ui" styleName="available-room-list" ref={this.contextRef}>
-                        <Sticky context={this.contextRef.current} className="sticky-filters">
-                            <Grid>
-                                <Grid.Column width={13}>
-                                    {filterBar}
-                                </Grid.Column>
-                                {this.renderViewSwitch()}
-                            </Grid>
-                            {searchBar}
-                        </Sticky>
+                    <div className="ui" styleName="available-room-list" ref={ref => this.handleContextRef(ref, 'tileRef')}>
+                        {this.renderFilters('tileRef')}
                         <SearchResultCount matching={matching} total={total} isFetching={isFetching} />
                         <LazyScroll hasMore={matching > list.length} loadMore={() => fetchRooms(true)}
                                     isFetching={isFetching}>
@@ -172,17 +171,7 @@ class BookRoom extends React.Component {
         } else {
             return (
                 <div ref={(ref) => this.handleContextRef(ref, 'timelineRef')}>
-                    <Sticky context={timelineRef} className="sticky-filters">
-                        <Grid>
-                            <Grid.Column width={13}>
-                                {filterBar}
-                            </Grid.Column>
-                            {this.renderViewSwitch()}
-                        </Grid>
-                        <Grid.Row>
-                            {searchBar}
-                        </Grid.Row>
-                    </Sticky>
+                    {this.renderFilters('timelineRef')}
                     <BookingTimeline minHour={6} maxHour={22} />
                 </div>
             );
@@ -287,7 +276,6 @@ class BookRoom extends React.Component {
     };
 
     renderViewSwitch() {
-        const {switcherRef} = this.state;
         const {timeline: {availability, isVisible}} = this.props;
         const timelineDataAvailable = !_.isEmpty(availability);
         const hasConflicts = timelineDataAvailable && Object.values(availability).some((data) => {
@@ -305,27 +293,23 @@ class BookRoom extends React.Component {
                     className={classes} circular />
         );
         return (
-            <Grid.Column width={3} styleName="view-icons" textAlign="right" verticalAlign="middle">
-                <div ref={(ref) => this.handleContextRef(ref, 'switcherRef')} styleName="view-icons-context">
-                    <Sticky context={switcherRef} offset={30}>
-                        <span styleName="icons-wrapper">
-                            {isVisible
-                                ? <Popup trigger={listBtn} content={Translate.string('List view')} />
-                                : listBtn
-                            }
-                            <Icon.Group onClick={this.switchToTimeline}>
-                                {!isVisible
-                                    ? <Popup trigger={timelineBtn} content={Translate.string('Timeline view')} />
-                                    : timelineBtn
-                                }
-                                {hasConflicts && (
-                                    <Icon name="exclamation triangle" styleName="conflicts-icon" color="red" corner />
-                                )}
-                            </Icon.Group>
-                        </span>
-                    </Sticky>
-                </div>
-            </Grid.Column>
+            <div styleName="view-icons">
+                <span styleName="icons-wrapper">
+                    {isVisible
+                        ? <Popup trigger={listBtn} content={Translate.string('List view')} />
+                        : listBtn
+                    }
+                    <Icon.Group onClick={this.switchToTimeline}>
+                        {!isVisible
+                            ? <Popup trigger={timelineBtn} content={Translate.string('Timeline view')} />
+                            : timelineBtn
+                        }
+                        {hasConflicts && (
+                            <Icon name="exclamation triangle" styleName="conflicts-icon" color="red" corner />
+                        )}
+                    </Icon.Group>
+                </span>
+            </div>
         );
     }
 
@@ -341,6 +325,7 @@ class BookRoom extends React.Component {
         if (timelineDataAvailable) {
             toggleTimelineView(true);
         }
+        this.setState({tileRef: null});
     };
 
     handleContextRef = (ref, kind) => {

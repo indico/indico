@@ -19,7 +19,7 @@ import React from 'react';
 
 import {Icon, Input} from 'semantic-ui-react';
 
-import FilterFormComponent from './FilterFormComponent';
+import FilterFormComponent from '../../../common/filters/FilterFormComponent';
 
 import './CapacityForm.module.scss';
 

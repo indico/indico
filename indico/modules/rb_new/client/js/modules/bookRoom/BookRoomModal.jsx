@@ -25,7 +25,7 @@ import createDecorator from 'final-form-calculate';
 import {ReduxFormField, ReduxRadioField, formatters} from 'indico/react/forms';
 import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
 import PrincipalSearchField from 'indico/react/components/PrincipalSearchField';
-import recurrenceRenderer from '../../components/filters/RecurrenceRenderer';
+import recurrenceRenderer from './filters/RecurrenceRenderer';
 import {toMoment} from '../../util';
 import RoomBasicDetails from '../../components/RoomBasicDetails';
 import TimelineContent from '../../components/TimelineContent';

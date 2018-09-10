@@ -19,9 +19,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import 'rc-time-picker/assets/index.css';
 
-import {toMoment, serializeTime} from '../../util';
-import FilterFormComponent from './FilterFormComponent';
-import TimeRangePicker from '../TimeRangePicker';
+import {toMoment, serializeTime} from '../../../util';
+import FilterFormComponent from '../../../common/filters/FilterFormComponent';
+import TimeRangePicker from '../../../components/TimeRangePicker';
 
 import './TimeForm.module.scss';
 

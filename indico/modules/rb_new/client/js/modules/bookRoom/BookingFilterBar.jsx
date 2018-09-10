@@ -17,22 +17,25 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
+import {Button} from 'semantic-ui-react';
+import {connect} from 'react-redux';
 
 import {Translate} from 'indico/react/i18n';
-import RoomFilterBar, {equipmentType, FilterDropdownFactory} from '../../components/RoomFilterBar';
+import {FilterBarController, FilterDropdownFactory} from '../../common/filters/FilterBar';
 
-import RecurrenceForm from '../../components/filters/RecurrenceForm';
-import DateForm from '../../components/filters/DateForm';
-import TimeForm from '../../components/filters/TimeForm';
+import RecurrenceForm from './filters/RecurrenceForm';
+import DateForm from './filters/DateForm';
+import TimeForm from './filters/TimeForm';
 
-import recurrenceRenderer from '../../components/filters/RecurrenceRenderer';
-import dateRenderer from '../../components/filters/DateRenderer';
-import timeRenderer from '../../components/filters/TimeRenderer';
+import recurrenceRenderer from './filters/RecurrenceRenderer';
+import dateRenderer from './filters/DateRenderer';
+import timeRenderer from './filters/TimeRenderer';
+import * as bookingActions from './actions';
+import * as globalActions from '../../actions';
 
 
-export default class FilterBar extends React.Component {
+class BookingFilterBar extends React.Component {
     static propTypes = {
-        equipmentTypes: PropTypes.arrayOf(PropTypes.string).isRequired,
         recurrence: PropTypes.shape({
             number: PropTypes.number,
             type: PropTypes.string,
@@ -46,75 +49,72 @@ export default class FilterBar extends React.Component {
             startTime: PropTypes.string,
             endTime: PropTypes.string
         }).isRequired,
-        capacity: PropTypes.number,
-        onlyFavorites: PropTypes.bool,
-        onlyMine: PropTypes.bool,
-        equipment: equipmentType,
-        setFilterParameter: PropTypes.func.isRequired,
-        hasOwnedRooms: PropTypes.bool,
-        hasFavoriteRooms: PropTypes.bool
-    };
-
-    static defaultProps = {
-        capacity: null,
-        onlyFavorites: null,
-        onlyMine: null,
-        equipment: [],
-        hasOwnedRooms: false,
-        hasFavoriteRooms: false,
+        actions: PropTypes.shape({
+            setFilterParameter: PropTypes.func
+        }).isRequired
     };
 
     render() {
         const {
-            recurrence, dates, timeSlot, capacity, onlyFavorites, onlyMine, equipment, setFilterParameter,
-            equipmentTypes, hasOwnedRooms, hasFavoriteRooms
+            recurrence, dates, timeSlot, actions: {setFilterParameter}
         } = this.props;
 
         return (
-            <RoomFilterBar capacity={capacity}
-                           onlyFavorites={onlyFavorites}
-                           onlyMine={onlyMine}
-                           equipment={equipment}
-                           setFilterParameter={setFilterParameter}
-                           equipmentTypes={equipmentTypes}
-                           hasOwnedRooms={hasOwnedRooms}
-                           hasFavoriteRooms={hasFavoriteRooms}>
-                <FilterDropdownFactory name="recurrence"
-                                       title={<Translate>Recurrence</Translate>}
-                                       form={(fieldValues, setParentField) => (
-                                           <RecurrenceForm setParentField={setParentField} {...fieldValues} />
-                                       )}
-                                       setGlobalState={({type, number, interval}) => {
-                                           setFilterParameter('recurrence', {type, number, interval});
-                                       }}
-                                       initialValues={recurrence}
-                                       defaults={{
-                                           type: 'single',
-                                           number: 1,
-                                           interval: 'week'
-                                       }}
-                                       renderValue={recurrenceRenderer} />
-                <FilterDropdownFactory name="dates"
-                                       title={<Translate>Date</Translate>}
-                                       form={(fieldValues, setParentField) => (
-                                           <DateForm setParentField={setParentField}
-                                                     isRange={recurrence.type !== 'single'}
-                                                     {...dates} />
-                                       )}
-                                       setGlobalState={setFilterParameter.bind(undefined, 'dates')}
-                                       initialValues={dates}
-                                       renderValue={dateRenderer}
-                                       showButtons={false} />
-                <FilterDropdownFactory name="timeSlot"
-                                       title={<Translate>Time</Translate>}
-                                       form={(fieldValues, setParentField) => (
-                                           <TimeForm setParentField={setParentField}
-                                                     {...fieldValues} />
-                                       )}
-                                       setGlobalState={setFilterParameter.bind(undefined, 'timeSlot')}
-                                       initialValues={timeSlot}
-                                       renderValue={timeRenderer} />
-            </RoomFilterBar>
+            <Button.Group size="large">
+                <Button icon="calendar alternate outline" as="div" disabled />
+                <FilterBarController>
+                    <FilterDropdownFactory name="recurrence"
+                                           title={<Translate>Recurrence</Translate>}
+                                           form={(fieldValues, setParentField) => (
+                                               <RecurrenceForm setParentField={setParentField} {...fieldValues} />
+                                           )}
+                                           setGlobalState={({type, number, interval}) => {
+                                               setFilterParameter('recurrence', {type, number, interval});
+                                           }}
+                                           initialValues={recurrence}
+                                           defaults={{
+                                               type: 'single',
+                                               number: 1,
+                                               interval: 'week'
+                                           }}
+                                           renderValue={recurrenceRenderer} />
+                    <FilterDropdownFactory name="dates"
+                                           title={<Translate>Date</Translate>}
+                                           form={(fieldValues, setParentField) => (
+                                               <DateForm setParentField={setParentField}
+                                                         isRange={recurrence.type !== 'single'}
+                                                         {...dates} />
+                                           )}
+                                           setGlobalState={setFilterParameter.bind(undefined, 'dates')}
+                                           initialValues={dates}
+                                           renderValue={dateRenderer}
+                                           showButtons={false} />
+                    <FilterDropdownFactory name="timeSlot"
+                                           title={<Translate>Time</Translate>}
+                                           form={(fieldValues, setParentField) => (
+                                               <TimeForm setParentField={setParentField}
+                                                         {...fieldValues} />
+                                           )}
+                                           setGlobalState={setFilterParameter.bind(undefined, 'timeSlot')}
+                                           initialValues={timeSlot}
+                                           renderValue={timeRenderer} />
+                </FilterBarController>
+            </Button.Group>
         );
     }
 }
+
+export default connect(
+    state => ({
+        ...state.bookRoom.filters
+    }),
+    dispatch => ({
+        actions: {
+            setFilterParameter: (param, value) => {
+                dispatch(globalActions.setFilterParameter('bookRoom', param, value));
+                dispatch(bookingActions.searchRooms());
+                dispatch(globalActions.fetchMapRooms('bookRoom'));
+            }
+        }
+    })
+)(BookingFilterBar);

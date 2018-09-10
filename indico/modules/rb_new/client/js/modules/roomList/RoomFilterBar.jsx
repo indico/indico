@@ -18,34 +18,19 @@
 import React from 'react';
 import {Button, Icon, Label, Popup} from 'semantic-ui-react';
 import PropTypes from 'prop-types';
+import {connect} from 'react-redux';
 
 import {Translate} from 'indico/react/i18n';
 
-import FilterDropdown from './filters/FilterDropdown';
 import CapacityForm from './filters/CapacityForm';
 import EquipmentForm from './filters/EquipmentForm';
+import {FilterBarController, FilterDropdownFactory} from '../../common/filters/FilterBar';
+import * as globalActions from '../../actions';
+import {selectors as roomsSelectors} from '../../common/rooms';
+import {selectors as userSelectors} from '../../common/user';
 
 import './RoomFilterBar.module.scss';
 
-
-const FilterBarContext = React.createContext();
-
-export function FilterDropdownFactory({name, ...props}) {
-    return (
-        <FilterBarContext.Consumer>
-            {({state, onDropdownOpen, onDropdownClose}) => (
-                <FilterDropdown open={state[name]}
-                                onOpen={() => onDropdownOpen(name)}
-                                onClose={() => onDropdownClose(name)}
-                                {...props} />
-            )}
-        </FilterBarContext.Consumer>
-    );
-}
-
-FilterDropdownFactory.propTypes = {
-    name: PropTypes.string.isRequired
-};
 
 // eslint-disable-next-line react/prop-types
 const capacityRenderer = ({capacity}) => (
@@ -74,7 +59,7 @@ const equipmentRenderer = ({equipment}) => {
 
 export const equipmentType = PropTypes.array;
 
-export default class RoomFilterBar extends React.Component {
+class RoomFilterBarBase extends React.Component {
     static propTypes = {
         equipmentTypes: PropTypes.arrayOf(PropTypes.string).isRequired,
         capacity: PropTypes.number,
@@ -83,8 +68,9 @@ export default class RoomFilterBar extends React.Component {
         onlyMine: PropTypes.bool,
         hasFavoriteRooms: PropTypes.bool,
         hasOwnedRooms: PropTypes.bool,
-        setFilterParameter: PropTypes.func.isRequired,
-        children: PropTypes.node
+        actions: PropTypes.shape({
+            setFilterParameter: PropTypes.func
+        }).isRequired
     };
 
     static defaultProps = {
@@ -97,23 +83,10 @@ export default class RoomFilterBar extends React.Component {
         equipment: [],
     };
 
-    state = {};
-
-    onDropdownOpen = (name) => {
-        this.setState(
-            (prevState) => Object.assign({}, ...Object.keys(prevState).map(k => ({[k]: null})), {[name]: true}));
-    };
-
-    onDropdownClose = (name) => {
-        this.setState({
-            [name]: false
-        });
-    };
-
     render() {
         const {
-            capacity, onlyFavorites, onlyMine, children, equipment, setFilterParameter, equipmentTypes,
-            hasOwnedRooms, hasFavoriteRooms
+            capacity, onlyFavorites, onlyMine, equipment, equipmentTypes,
+            hasOwnedRooms, hasFavoriteRooms, actions: {setFilterParameter}
         } = this.props;
 
 
@@ -133,12 +106,8 @@ export default class RoomFilterBar extends React.Component {
 
         return (
             <Button.Group size="large">
-                <FilterBarContext.Provider value={{
-                    onDropdownOpen: this.onDropdownOpen,
-                    onDropdownClose: this.onDropdownClose,
-                    state: this.state
-                }}>
-                    {children}
+                <Button icon="filter" as="div" disabled />
+                <FilterBarController>
                     <FilterDropdownFactory name="capacity"
                                            title={<Translate>Min. Capacity</Translate>}
                                            form={({capacity: selectedCapacity}, setParentField) => (
@@ -158,8 +127,26 @@ export default class RoomFilterBar extends React.Component {
                                             disabled={!onlyFavorites && !hasFavoriteRooms}
                                             onClick={() => setFilterParameter('onlyFavorites', !onlyFavorites)} />}
                            content={Translate.string('Show only my favorite rooms')} />
-                </FilterBarContext.Provider>
+                </FilterBarController>
             </Button.Group>
         );
     }
 }
+
+export default (namespace, searchAction = globalActions.searchRooms) => connect(
+    state => ({
+        ...state[namespace].filters,
+        equipmentTypes: roomsSelectors.getEquipmentTypes(state),
+        hasOwnedRooms: userSelectors.hasOwnedRooms(state),
+        hasFavoriteRooms: userSelectors.hasFavoriteRooms(state)
+    }),
+    dispatch => ({
+        actions: {
+            setFilterParameter: (param, value) => {
+                dispatch(globalActions.setFilterParameter(namespace, param, value));
+                dispatch(searchAction());
+                dispatch(globalActions.fetchMapRooms(namespace));
+            }
+        }
+    })
+)(RoomFilterBarBase);

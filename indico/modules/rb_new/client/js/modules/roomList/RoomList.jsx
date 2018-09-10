@@ -29,8 +29,7 @@ import {Slot} from 'indico/react/util';
 import {Param, Plural, PluralTranslate, Translate, Singular} from 'indico/react/i18n';
 import camelizeKeys from 'indico/utils/camelize';
 import {pushStateMergeProps, roomPreloader} from '../../util';
-import RoomFilterBar from '../../components/RoomFilterBar';
-import filterBarFactory from '../../containers/FilterBar';
+import roomFilterBarFactory from './RoomFilterBar';
 import searchBarFactory from '../../containers/SearchBar';
 import mapControllerFactory from '../../containers/MapController';
 import Room from '../../containers/Room';
@@ -45,11 +44,10 @@ import * as selectors from '../../selectors';
 import './RoomList.module.scss';
 
 
-const FilterBar = filterBarFactory('roomList', RoomFilterBar);
 const SearchBar = searchBarFactory('roomList');
 const MapController = mapControllerFactory('roomList');
 const RoomDetailsModal = roomDetailsModalFactory('roomList');
-
+const RoomFilterBar = roomFilterBarFactory('roomList');
 
 class RoomList extends React.Component {
     static propTypes = {
@@ -178,7 +176,7 @@ class RoomList extends React.Component {
                         <Sticky context={this.contextRef.current} className="sticky-filters">
                             <Grid>
                                 <Grid.Column width={12}>
-                                    <FilterBar />
+                                    <RoomFilterBar />
                                 </Grid.Column>
                                 <Grid.Column width={4} textAlign="right" verticalAlign="middle">
                                     {selectionMode ? (

@@ -62,7 +62,7 @@ export function updateRooms(namespace, rooms, matching, total, loadMore) {
     return {type: UPDATE_ROOMS, namespace, rooms, matching, total, loadMore};
 }
 
-export function searchRooms(namespace, loadMore = false) {
+export function searchRooms(namespace = 'roomList', loadMore = false) {
     return async (dispatch, getStore) => {
         const {filters, rooms: {list: oldRoomList}} = getStore()[namespace];
 
