@@ -171,7 +171,7 @@ class RoomList extends React.Component {
 
         return (
             <Grid columns={2}>
-                <Grid.Column width={showMap ? 11 : 16}>
+                <Grid.Column computer={showMap ? 11 : 16} mobile={16}>
                     <div className="ui" styleName="room-list" ref={this.contextRef}>
                         <Sticky context={this.contextRef.current} className="sticky-filters">
                             <Grid>
@@ -231,7 +231,7 @@ class RoomList extends React.Component {
                     </Dimmer.Dimmable>
                 </Grid.Column>
                 {showMap && (
-                    <Grid.Column width={5}>
+                    <Grid.Column computer={5} only="computer">
                         <MapController />
                     </Grid.Column>
                 )}

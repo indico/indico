@@ -122,11 +122,13 @@ class BookRoom extends React.Component {
         return (
             <Sticky context={ref} className="sticky-filters">
                 <div styleName="filter-row">
-                    <BookingFilterBar />
-                    <RoomFilterBar />
+                    <div styleName="filter-row-filters">
+                        <BookingFilterBar />
+                        <RoomFilterBar />
+                        <SearchBar onConfirm={fetchRooms} onTextChange={fetchRooms} />
+                    </div>
                     {this.renderViewSwitch()}
                 </div>
-                <SearchBar onConfirm={fetchRooms} onTextChange={fetchRooms} />
             </Sticky>
         );
     }
@@ -353,11 +355,11 @@ class BookRoom extends React.Component {
         const {fetchRoomDetails, showMap, isInitializing} = this.props;
         return (
             <Grid columns={2}>
-                <Grid.Column width={showMap ? 11 : 16}>
+                <Grid.Column computer={showMap ? 11 : 16} mobile={16}>
                     {this.renderMainContent()}
                 </Grid.Column>
                 {showMap && (
-                    <Grid.Column width={5}>
+                    <Grid.Column computer={5} only="computer">
                         <MapController />
                     </Grid.Column>
                 )}
