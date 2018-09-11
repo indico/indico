@@ -15,20 +15,25 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import React from 'react';
+import {connect} from 'react-redux';
 import moment from 'moment';
 import PropTypes from 'prop-types';
-import React from 'react';
-import {Form, Grid, Statistic} from 'semantic-ui-react';
-import {Translate} from 'indico/react/i18n';
-import BookingBootstrapForm from '../BookingBootstrapForm';
+import {Form, Grid} from 'semantic-ui-react';
+
+import * as globalActions from '../../actions';
+import BookingBootstrapForm from '../../components/BookingBootstrapForm';
 import {parseSearchBarText} from '../../util';
+import LandingStatistics from './LandingStatistics';
 
 import './Landing.module.scss';
 
 
-export default class Landing extends React.Component {
+class Landing extends React.Component {
     static propTypes = {
-        setFilters: PropTypes.func.isRequired
+        actions: PropTypes.exact({
+            setFilters: PropTypes.func.isRequired,
+        }).isRequired
     };
 
     state = {
@@ -43,7 +48,7 @@ export default class Landing extends React.Component {
 
     doSearch = (formState) => {
         const {text} = this.state;
-        const {setFilters} = this.props;
+        const {actions: {setFilters}} = this.props;
         const parsed = parseSearchBarText(text);
 
         setFilters({
@@ -73,38 +78,7 @@ export default class Landing extends React.Component {
                     </Grid.Row>
                     <Grid.Row>
                         <div styleName="statistics">
-                            <Statistic size="huge">
-                                <Statistic.Value>
-                                    230
-                                </Statistic.Value>
-                                <Statistic.Label>
-                                    {Translate.string('Active rooms')}
-                                </Statistic.Label>
-                            </Statistic>
-                            <Statistic size="huge">
-                                <Statistic.Value>
-                                    70
-                                </Statistic.Value>
-                                <Statistic.Label>
-                                    {Translate.string('Buildings')}
-                                </Statistic.Label>
-                            </Statistic>
-                            <Statistic size="huge">
-                                <Statistic.Value>
-                                    25
-                                </Statistic.Value>
-                                <Statistic.Label>
-                                    {Translate.string('Bookings today')}
-                                </Statistic.Label>
-                            </Statistic>
-                            <Statistic size="huge">
-                                <Statistic.Value>
-                                    20
-                                </Statistic.Value>
-                                <Statistic.Label>
-                                    {Translate.string('Active booking requests')}
-                                </Statistic.Label>
-                            </Statistic>
+                            <LandingStatistics />
                         </div>
                     </Grid.Row>
                 </Grid>
@@ -112,3 +86,15 @@ export default class Landing extends React.Component {
         );
     }
 }
+
+
+export default connect(
+    null,
+    dispatch => ({
+        actions: {
+            setFilters(data) {
+                dispatch(globalActions.setFilters('bookRoom', data));
+            }
+        }
+    })
+)(Landing);

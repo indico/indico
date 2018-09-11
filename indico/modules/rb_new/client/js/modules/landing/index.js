@@ -14,23 +14,5 @@
  * You should have received a copy of the GNU General Public License
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
-import {connect} from 'react-redux';
-import {setFilterParameter, setFilters} from '../actions';
-import Landing from '../components/pages/Landing';
 
-
-const mapStateToProps = state => ({...state['bookRoom'].filters});
-
-const mapDispatchToProps = dispatch => ({
-    setFilterParameter(param, value) {
-        dispatch(setFilterParameter('bookRoom', param, value));
-    },
-    setFilters(data) {
-        dispatch(setFilters('bookRoom', data));
-    }
-});
-
-export default connect(
-    mapStateToProps,
-    mapDispatchToProps
-)(Landing);
+export {default} from './Landing';

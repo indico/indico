@@ -23,7 +23,7 @@ import {Dimmer, Icon, Loader} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 import UserActions from '../containers/UserActions';
-import Landing from '../containers/Landing';
+import Landing from '../modules/landing';
 import Calendar from '../modules/calendar';
 import BookRoom from '../modules/bookRoom';
 import RoomList from '../modules/roomList';
