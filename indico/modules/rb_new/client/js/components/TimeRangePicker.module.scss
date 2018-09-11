@@ -15,28 +15,32 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-.start-time-dropdown {
-    min-width: 90px !important;
-    margin-right: 14px;
-    text-align: center !important;
-}
+.time-range-picker {
+    display: flex;
+    justify-content: space-between;
+    width: 200px;
 
-.end-time-dropdown {
-    min-width: 90px !important;
-    margin-right: 14px;
-    text-align: center !important;
-
-    :global(.menu) {
-        min-width: 140px !important;
+    .start-time-dropdown {
+        min-width: 90px !important;
+        text-align: center !important;
     }
-}
 
-.duration {
-    font-size: 0.7em;
-    color: #808c99;
-    white-space: nowrap;
-}
+    .end-time-dropdown {
+        min-width: 90px !important;
+        text-align: center !important;
 
-.end-time-item {
-    white-space: nowrap;
+        :global(.menu) {
+            min-width: 140px !important;
+        }
+    }
+
+    .duration {
+        font-size: 0.7em;
+        color: #808c99;
+        white-space: nowrap;
+    }
+
+    .end-time-item {
+        white-space: nowrap;
+    }
 }

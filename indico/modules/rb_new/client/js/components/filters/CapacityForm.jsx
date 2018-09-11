@@ -36,23 +36,17 @@ export default class CapacityForm extends FilterFormComponent {
 
     render() {
         const {capacity} = this.state;
+        const icon = <Icon name="close" onClick={() => this.setCapacity(null)} link />;
         return (
             <div styleName="capacity-form">
                 <Input type="number"
-                       min="0"
+                       min="1"
                        step="1"
+                       icon={capacity ? icon : null}
                        value={capacity || ''}
-                       onChange={(_, {value}) => {
-                           this.setCapacity(+value);
+                       onChange={(__, {value}) => {
+                           this.setCapacity(!value ? null : +value);
                        }} />
-                <Icon name="close"
-                      inverted
-                      circular
-                      disabled={!capacity}
-                      link
-                      onClick={() => {
-                          this.setCapacity(null);
-                      }} />
             </div>
         );
     }

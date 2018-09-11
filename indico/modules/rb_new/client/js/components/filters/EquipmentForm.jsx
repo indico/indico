@@ -19,9 +19,7 @@ import _ from 'lodash';
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Form, Icon} from 'semantic-ui-react';
-
-import {Translate} from 'indico/react/i18n';
+import {Form} from 'semantic-ui-react';
 
 import FilterFormComponent from './FilterFormComponent';
 
@@ -61,13 +59,6 @@ export default class EquipmentForm extends FilterFormComponent {
         });
     }
 
-    resetSelection = () => {
-        const {possibleEquipment} = this.props;
-        possibleEquipment.forEach(eq => {
-            this.setEquipment(eq, false);
-        });
-    };
-
     render() {
         const {possibleEquipment} = this.props;
         const {equipment} = this.state;
@@ -83,14 +74,6 @@ export default class EquipmentForm extends FilterFormComponent {
                                        }} />
                     ))}
                 </Form.Group>
-                {!!equipment.length && (
-                    <div style={{marginTop: '1em'}}>
-                        <Form.Button fluid basic color="red" size="mini" onClick={this.resetSelection}>
-                            <Icon name="remove" circular />
-                            <Translate>Reset</Translate>
-                        </Form.Button>
-                    </div>
-                )}
             </>
         );
     }

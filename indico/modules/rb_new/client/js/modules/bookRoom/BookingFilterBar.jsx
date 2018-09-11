@@ -96,10 +96,9 @@ export default class FilterBar extends React.Component {
                                        renderValue={recurrenceRenderer} />
                 <FilterDropdownFactory name="dates"
                                        title={<Translate>Date</Translate>}
-                                       form={(fieldValues, setParentField, handleClose) => (
+                                       form={(fieldValues, setParentField) => (
                                            <DateForm setParentField={setParentField}
                                                      isRange={recurrence.type !== 'single'}
-                                                     handleClose={handleClose}
                                                      {...dates} />
                                        )}
                                        setGlobalState={setFilterParameter.bind(undefined, 'dates')}
@@ -108,9 +107,8 @@ export default class FilterBar extends React.Component {
                                        showButtons={false} />
                 <FilterDropdownFactory name="timeSlot"
                                        title={<Translate>Time</Translate>}
-                                       form={(fieldValues, setParentField, handleClose) => (
+                                       form={(fieldValues, setParentField) => (
                                            <TimeForm setParentField={setParentField}
-                                                     handleClose={handleClose}
                                                      {...fieldValues} />
                                        )}
                                        setGlobalState={setFilterParameter.bind(undefined, 'timeSlot')}

@@ -171,7 +171,7 @@ export default class TimeRangePicker extends React.Component {
     render() {
         const {startTime, endTime, startOptions, endOptions, duration} = this.state;
         return (
-            <div>
+            <div styleName="time-range-picker">
                 <Dropdown options={startOptions}
                           search={() => []}
                           icon={null}

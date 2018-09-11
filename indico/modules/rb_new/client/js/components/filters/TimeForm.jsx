@@ -52,8 +52,8 @@ export default class TimeForm extends FilterFormComponent {
         this.formRef = React.createRef();
     }
 
-    setTimes = async (startTime, endTime, isEnd) => {
-        const {handleClose, setParentField} = this.props;
+    setTimes = async (startTime, endTime) => {
+        const {setParentField} = this.props;
         const {startTime: prevStartTime, endTime: prevEndTime} = this.state;
 
         // if everything stays the same, do nothing
@@ -68,11 +68,6 @@ export default class TimeForm extends FilterFormComponent {
         this.setState({
             startTime,
             endTime
-        }, () => {
-            if (isEnd) {
-                // set the end time -> close pop-up
-                handleClose();
-            }
         });
     };
 

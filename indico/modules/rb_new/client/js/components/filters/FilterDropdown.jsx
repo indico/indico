@@ -19,6 +19,7 @@ import _ from 'lodash';
 import React from 'react';
 import {Button, Icon, Popup} from 'semantic-ui-react';
 import PropTypes from 'prop-types';
+import {Translate} from 'indico/react/i18n';
 
 import './FilterDropdown.module.scss';
 
@@ -121,10 +122,16 @@ export default class FilterDropdown extends React.Component {
         });
     };
 
-    handleClose = () => {
-        const {onClose, setGlobalState, initialValues} = this.props;
+    hasValuesChanged = () => {
+        const {initialValues} = this.props;
         const {fieldValues} = this.state;
-        if (!_.isEqual(initialValues, fieldValues)) {
+        return !_.isEqual(initialValues, fieldValues);
+    };
+
+    handleClose = () => {
+        const {onClose, setGlobalState} = this.props;
+        const {fieldValues} = this.state;
+        if (this.hasValuesChanged()) {
             this.setRenderedValue(fieldValues);
             setGlobalState(fieldValues);
         }
@@ -137,11 +144,12 @@ export default class FilterDropdown extends React.Component {
     };
 
     render() {
-        const {title, form, renderTrigger, counter, open} = this.props;
+        const {title, form, renderTrigger, counter, open, onClose} = this.props;
         const {renderedValue, fieldValues} = this.state;
 
         return (
             <Popup position="bottom left"
+                   styleName="filter-dropdown"
                    trigger={renderTrigger(title, renderedValue, counter)}
                    on="click"
                    open={open}
@@ -149,6 +157,16 @@ export default class FilterDropdown extends React.Component {
                    onOpen={this.handleOpen}
                    hideOnScroll>
                 {form(fieldValues, this.setFieldValue, this.handleClose)}
+                <Button.Group size="small" floated="right" styleName="filter-dropdown-actions">
+                    <Button content={Translate.string('Apply')}
+                            onClick={this.handleClose}
+                            disabled={!this.hasValuesChanged()}
+                            positive
+                            compact />
+                    <Button content={Translate.string('Cancel')}
+                            onClick={onClose}
+                            compact />
+                </Button.Group>
             </Popup>
         );
     }

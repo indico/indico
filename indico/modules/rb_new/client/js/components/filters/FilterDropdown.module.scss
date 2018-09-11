@@ -17,6 +17,11 @@
 
 @import '../../../styles/util';
 
+.filter-dropdown {
+    .filter-dropdown-actions {
+        margin-top: 15px;
+    }
+}
 
 :global(.ui.button).filter-dropdown-button {
     position: relative;

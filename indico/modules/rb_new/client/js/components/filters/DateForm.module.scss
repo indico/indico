@@ -15,7 +15,9 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-.date-form :global .rc-calendar-range.rc-calendar {
-    box-shadow: none;
-    border: none;
+.date-form {
+    :global .rc-calendar {
+        box-shadow: none;
+        border: none;
+    }
 }

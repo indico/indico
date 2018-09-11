@@ -36,7 +36,6 @@ export default class DateForm extends FilterFormComponent {
         startDate: PropTypes.string,
         endDate: PropTypes.string,
         isRange: PropTypes.bool.isRequired,
-        handleClose: PropTypes.func.isRequired,
         disabledDate: PropTypes.func,
         ...FilterFormComponent.propTypes
     };
@@ -79,7 +78,7 @@ export default class DateForm extends FilterFormComponent {
     }
 
     render() {
-        const {isRange, handleClose, disabledDate} = this.props;
+        const {isRange, disabledDate} = this.props;
         const {startDate, endDate} = this.state;
         const props = {
             getPopupContainer: trigger => trigger.parentNode
@@ -90,7 +89,6 @@ export default class DateForm extends FilterFormComponent {
                     <RangeCalendar selectedValue={[startDate, endDate]}
                                    onSelect={async ([start, end]) => {
                                        await this.setDates(start, end);
-                                       handleClose();
                                    }}
                                    disabledDate={disabledDate || this.disabledDate}
                                    format={_formatDateStr}
@@ -100,7 +98,6 @@ export default class DateForm extends FilterFormComponent {
                                 defaultValue={startDate}
                                 onSelect={async (date) => {
                                     await this.setDates(date, null);
-                                    handleClose();
                                 }}
                                 disabledDate={disabledDate || this.disabledDate}
                                 format={_formatDateStr}

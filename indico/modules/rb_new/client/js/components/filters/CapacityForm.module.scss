@@ -19,9 +19,4 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-
-    :global .ui.input input {
-        width: 80px;
-        margin-right: 0.2em;
-    }
 }
