@@ -360,5 +360,5 @@ class RHEditEventPerson(RHPersonsBase):
             update_person(self.person, form.data)
             person_data = self.get_persons()[self.person.email or self.person.id]
             tpl = get_template_module('events/persons/management/_person_list_row.html')
-            return jsonify_data(html=tpl.render_person_row(person_data))
+            return jsonify_data(html=tpl.render_person_row(person_data, bool(self.event.registration_forms)))
         return jsonify_form(form)

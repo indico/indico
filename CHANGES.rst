@@ -16,6 +16,7 @@ Bugfixes
   designer page
 - Hide "Save answers" in surveys while not logged in
 - Fix importing event archives containing registrations with attachments
+- Fix display issue in participants table after editing data (:issue:`3511`)
 
 Version 2.1.3
 -------------
