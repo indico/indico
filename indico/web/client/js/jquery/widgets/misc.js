@@ -67,7 +67,7 @@
         }).end();
     };
 
-    $.fn.copyURLTooltip = function(url) {
+    $.fn.copyURLTooltip = function(url, hideEvent = 'mouseleave') {
         /*
          * Creates a tooltip with a URL in a text input with indication on how
          * to copy it.
@@ -96,7 +96,7 @@
                 at: 'bottom center'
             },
             hide: {
-                event: 'mouseleave',
+                event: hideEvent,
                 fixed: true,
                 delay: 700
             },
