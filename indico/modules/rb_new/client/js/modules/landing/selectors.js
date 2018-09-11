@@ -15,5 +15,5 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-export {default} from './Landing';
-export {default as reducer} from './reducers';
+export const getStatistics = ({landing}) => landing.stats.data;
+export const hasStatistics = (state) => getStatistics(state) !== null;

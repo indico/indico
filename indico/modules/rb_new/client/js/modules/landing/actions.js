@@ -15,5 +15,22 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-export {default} from './Landing';
-export {default as reducer} from './reducers';
+import fetchStatsURL from 'indico-url:rooms_new.stats';
+import {indicoAxios} from 'indico/utils/axios';
+import {ajaxAction} from 'indico/utils/redux';
+
+
+export const STATS_RECEIVED = 'landing/STATS_RECEIVED';
+export const FETCH_STATS_REQUEST = 'landing/FETCH_STATS_REQUEST';
+export const FETCH_STATS_SUCCESS = 'landing/FETCH_STATS_SUCCESS';
+export const FETCH_STATS_ERROR = 'landing/FETCH_STATS_ERROR';
+
+
+export function fetchStatistics() {
+    return ajaxAction(
+        () => indicoAxios.get(fetchStatsURL()),
+        FETCH_STATS_REQUEST,
+        [STATS_RECEIVED, FETCH_STATS_SUCCESS],
+        FETCH_STATS_ERROR
+    );
+}

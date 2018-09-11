@@ -15,5 +15,27 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-export {default} from './Landing';
-export {default as reducer} from './reducers';
+import {combineReducers} from 'redux';
+import camelizeKeys from 'indico/utils/camelize';
+import {requestReducer} from 'indico/utils/redux';
+
+import * as landingActions from './actions';
+
+
+export default combineReducers({
+    stats: combineReducers({
+        request: requestReducer(
+            landingActions.FETCH_STATS_REQUEST,
+            landingActions.FETCH_STATS_SUCCESS,
+            landingActions.FETCH_STATS_ERROR
+        ),
+        data: (state = null, action) => {
+            switch (action.type) {
+                case landingActions.STATS_RECEIVED:
+                    return camelizeKeys(action.data);
+                default:
+                    return state;
+            }
+        }
+    }),
+});

@@ -24,6 +24,7 @@ import {reducer as bookRoomReducer} from '../modules/bookRoom';
 import {reducer as userReducer} from '../common/user';
 import {reducer as blockingsReducer} from '../modules/blockings';
 import {reducer as calendarReducer} from '../modules/calendar';
+import {reducer as landingReducer} from '../modules/landing';
 
 
 const reducers = {
@@ -35,7 +36,8 @@ const reducers = {
     mapAspects: mapAspectsReducer,
     rooms: roomsReducer,
     blockings: blockingsReducer,
-    calendar: calendarReducer
+    calendar: calendarReducer,
+    landing: landingReducer,
 };
 
 export default reducers;

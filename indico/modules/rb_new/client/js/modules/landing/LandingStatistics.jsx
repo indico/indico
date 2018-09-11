@@ -16,17 +16,50 @@
  */
 
 import React from 'react';
-import {Statistic} from 'semantic-ui-react';
+import {bindActionCreators} from 'redux';
+import {connect} from 'react-redux';
+import PropTypes from 'prop-types';
+import {Loader, Statistic} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
 
+import * as landingActions from './actions';
+import * as landingSelectors from './selectors';
 
-export default class LandingStatistics extends React.Component {
+
+class LandingStatistics extends React.Component {
+    static propTypes = {
+        hasStatistics: PropTypes.bool.isRequired,
+        statistics: PropTypes.shape({
+            activeRooms: PropTypes.number.isRequired,
+            bookingsToday: PropTypes.number.isRequired,
+            buildings: PropTypes.number.isRequired,
+            pendingBookings: PropTypes.number.isRequired,
+        }),
+        actions: PropTypes.exact({
+            fetchStatistics: PropTypes.func.isRequired,
+        }).isRequired,
+    };
+
+    static defaultProps = {
+        statistics: null,
+    };
+
+    componentDidMount() {
+        const {actions: {fetchStatistics}} = this.props;
+        fetchStatistics();
+    }
+
     render() {
+        const {hasStatistics} = this.props;
+        if (!hasStatistics) {
+            return <Loader size="massive" active />;
+        }
+        const {statistics: {activeRooms, bookingsToday, buildings, pendingBookings}} = this.props;
         return (
             <>
                 <Statistic size="huge">
                     <Statistic.Value>
-                        230
+                        {activeRooms}
                     </Statistic.Value>
                     <Statistic.Label>
                         <Translate>Active rooms</Translate>
@@ -34,7 +67,7 @@ export default class LandingStatistics extends React.Component {
                 </Statistic>
                 <Statistic size="huge">
                     <Statistic.Value>
-                        70
+                        {buildings}
                     </Statistic.Value>
                     <Statistic.Label>
                         <Translate>Buildings</Translate>
@@ -42,7 +75,7 @@ export default class LandingStatistics extends React.Component {
                 </Statistic>
                 <Statistic size="huge">
                     <Statistic.Value>
-                        25
+                        {bookingsToday}
                     </Statistic.Value>
                     <Statistic.Label>
                         <Translate>Bookings today</Translate>
@@ -50,7 +83,7 @@ export default class LandingStatistics extends React.Component {
                 </Statistic>
                 <Statistic size="huge">
                     <Statistic.Value>
-                        20
+                        {pendingBookings}
                     </Statistic.Value>
                     <Statistic.Label>
                         <Translate>Active booking requests</Translate>
@@ -60,3 +93,15 @@ export default class LandingStatistics extends React.Component {
         );
     }
 }
+
+export default connect(
+    state => ({
+        statistics: landingSelectors.getStatistics(state),
+        hasStatistics: landingSelectors.hasStatistics(state),
+    }),
+    dispatch => ({
+        actions: bindActionCreators({
+            fetchStatistics: landingActions.fetchStatistics,
+        }, dispatch)
+    })
+)(LandingStatistics);

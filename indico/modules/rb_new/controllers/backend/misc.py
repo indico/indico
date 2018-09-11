@@ -16,15 +16,21 @@
 
 from __future__ import unicode_literals
 
+from datetime import date, datetime, time, timedelta
 from io import BytesIO
 
 from flask import jsonify, redirect, request, session
 
+from indico.core.db.sqlalchemy.util.queries import db_dates_overlap
 from indico.modules.rb import rb_settings
 from indico.modules.rb.controllers import RHRoomBookingBase
+from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
+from indico.modules.rb.models.reservations import Reservation
+from indico.modules.rb.models.rooms import Room
 from indico.modules.rb_new.controllers.backend.common import _cache
 from indico.modules.rb_new.schemas import rb_user_schema
 from indico.modules.rb_new.util import build_rooms_spritesheet
+from indico.util.caching import memoize_redis
 from indico.util.i18n import get_all_locales
 from indico.web.flask.util import send_file, url_for
 
@@ -52,3 +58,25 @@ class RHRoomsSprite(RHRoomBookingBase):
             return redirect(url_for('.sprite', version=_cache.get('rooms-sprite-token')))
         photo_data = _cache.get('rooms-sprite')
         return send_file('rooms-sprite.jpg', BytesIO(photo_data), 'image/jpeg', no_cache=False, cache_timeout=365*86400)
+
+
+class RHStats(RHRoomBookingBase):
+    def _process(self):
+        return self._get_stats(date.today())
+
+    @staticmethod
+    @memoize_redis(3600)
+    def _get_stats(date):
+        today_dt = datetime.combine(date, time())
+        bookings_today = (ReservationOccurrence.query
+                          .filter(ReservationOccurrence.is_valid,
+                                  db_dates_overlap(ReservationOccurrence,
+                                                   'start_dt', today_dt,
+                                                   'end_dt', today_dt + timedelta(days=1)))
+                          .count())
+        return jsonify(
+            active_rooms=Room.query.filter_by(is_active=True).count(),
+            buildings=Room.query.distinct(Room.building).filter_by(is_active=True).count(),
+            pending_bookings=Reservation.query.filter(Reservation.is_pending, ~Reservation.is_archived).count(),
+            bookings_today=bookings_today
+        )

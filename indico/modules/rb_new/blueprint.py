@@ -33,6 +33,7 @@ _bp.add_url_rule('/<path:path>', 'roombooking', RHLanding)
 # Backend
 _bp.add_url_rule('/api/<path:path>', '404', lambda path: (jsonify(), 404))
 _bp.add_url_rule('/api/config', 'config', misc.RHConfig)
+_bp.add_url_rule('/api/stats', 'stats', misc.RHStats)
 _bp.add_url_rule('/api/rooms/search', 'search_rooms', rooms.RHSearchRooms)
 _bp.add_url_rule('/api/rooms/', 'rooms', rooms.RHRooms)
 _bp.add_url_rule('/api/rooms/<int:room_id>/availability', 'room_availability', rooms.RHRoomAvailability)
