@@ -15,6 +15,8 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+@import 'base/palette';
+
 $text-blue: #2a606b;
 
 .landing-page {
@@ -38,7 +40,7 @@ $text-blue: #2a606b;
         }
 
         :global(.ui.checkbox label) {
-            color: $text-blue;
+            color: $dark-black;
             font-weight: bold;
         }
 

@@ -19,7 +19,8 @@ import React from 'react';
 import {connect} from 'react-redux';
 import moment from 'moment';
 import PropTypes from 'prop-types';
-import {Form, Grid} from 'semantic-ui-react';
+import {Checkbox, Form, Grid} from 'semantic-ui-react';
+import {Translate} from 'indico/react/i18n';
 
 import * as globalActions from '../../actions';
 import BookingBootstrapForm from '../../components/BookingBootstrapForm';
@@ -33,11 +34,13 @@ class Landing extends React.Component {
     static propTypes = {
         actions: PropTypes.exact({
             setFilters: PropTypes.func.isRequired,
-        }).isRequired
+        }).isRequired,
+        userHasFavorites: PropTypes.bool.isRequired
     };
 
     state = {
-        text: null
+        text: null,
+        onlyFavorites: false
     };
 
     disabledDate = (current) => {
@@ -47,13 +50,14 @@ class Landing extends React.Component {
     };
 
     doSearch = (formState) => {
-        const {text} = this.state;
+        const {onlyFavorites, text} = this.state;
         const {actions: {setFilters}} = this.props;
         const parsed = parseSearchBarText(text);
 
         setFilters({
             ...formState,
             ...parsed,
+            onlyFavorites,
             equipment: []
         });
     };
@@ -62,18 +66,31 @@ class Landing extends React.Component {
         this.setState({text});
     };
 
+    toggleFavorites = (_, {checked}) => {
+        this.setState({onlyFavorites: checked});
+    };
+
     render() {
+        const {userHasFavorites} = this.props;
         return (
             <div className="landing-wrapper">
                 <Grid centered styleName="landing-page">
                     <Grid.Row columns={2} styleName="landing-page-form">
                         <Grid.Column width={6} textAlign="center" verticalAlign="middle">
-                            <BookingBootstrapForm onSearch={this.doSearch}>
-                                <Form.Group inline>
-                                    <Form.Input placeholder="bldg: 28" styleName="search-input"
-                                                onChange={(event, data) => this.updateText(data.value)} />
-                                </Form.Group>
-                            </BookingBootstrapForm>
+                            <div>
+                                <BookingBootstrapForm onSearch={this.doSearch}>
+                                    <Form.Group inline>
+                                        <Form.Input placeholder="bldg: 28" styleName="search-input"
+                                                    onChange={(event, data) => this.updateText(data.value)} />
+                                    </Form.Group>
+                                    {userHasFavorites && (
+                                        <Form.Field>
+                                            <Checkbox label={Translate.string('Search only my favourites')}
+                                                      onClick={this.toggleFavorites} />
+                                        </Form.Field>
+                                    )}
+                                </BookingBootstrapForm>
+                            </div>
                         </Grid.Column>
                     </Grid.Row>
                     <Grid.Row>
@@ -89,7 +106,9 @@ class Landing extends React.Component {
 
 
 export default connect(
-    null,
+    state => ({
+        userHasFavorites: Object.keys(state.user.favorites).length > 0
+    }),
     dispatch => ({
         actions: {
             setFilters(data) {
