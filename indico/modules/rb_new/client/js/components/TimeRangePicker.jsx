@@ -25,8 +25,7 @@ import {toMoment, serializeTime} from '../util';
 import './TimeRangePicker.module.scss';
 
 
-const ARROW_UP = 38;
-const ARROW_DOWN = 40;
+const ARROW_KEYS = ['ArrowUp', 'ArrowDown', 'Up', 'Down'];
 const START_HOUR = '06:00';
 
 function _humanizeDuration(duration) {
@@ -106,7 +105,7 @@ export default class TimeRangePicker extends React.Component {
     };
 
     updateStartTime = (event, currentStartTime, previousStartTime, endTime, duration, startSearchQuery) => {
-        if (event.type === 'keydown' && (event.keyCode === ARROW_UP || event.keyCode === ARROW_DOWN)) {
+        if (event.type === 'keydown' && ARROW_KEYS.includes(event.key)) {
             this.setState({
                 startSearchQuery: currentStartTime
             });
@@ -147,7 +146,7 @@ export default class TimeRangePicker extends React.Component {
     };
 
     updateEndTime = (event, currentEndTime, previousEndTime, startTime, duration, endSearchQuery) => {
-        if (event.type === 'keydown' && (event.keyCode === ARROW_UP || event.keyCode === ARROW_DOWN)) {
+        if (event.type === 'keydown' && ARROW_KEYS.includes(event.key)) {
             this.setState({
                 endSearchQuery: currentEndTime
             });
