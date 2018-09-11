@@ -87,7 +87,7 @@ def memoize_redis(ttl):
 
     def decorator(f):
         def _get_key(args, kwargs):
-            return f.__name__, make_hashable(getcallargs(f, *args, **kwargs))
+            return f.__module__, f.__name__, make_hashable(getcallargs(f, *args, **kwargs))
 
         def _clear_cached(*args, **kwargs):
             cache.delete(_get_key(args, kwargs))
