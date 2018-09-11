@@ -68,7 +68,7 @@
     "rrule": "^2.4.1",
     "selectize": "^0.12.5",
     "semantic-ui-css": "^2.3.2",
-    "semantic-ui-react": "^0.82.3",
+    "semantic-ui-react": "^0.82.4",
     "tablesorter": "^2.31.0",
     "taggle": "^1.14.0",
     "underscore": "^1.9.1",

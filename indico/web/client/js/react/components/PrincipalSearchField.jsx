@@ -229,7 +229,7 @@ export default class PrincipalSearchField extends React.Component {
         );
         const dropdownProps = disabled ? {icon: null, renderLabel: renderDisabledLabel} : {search: opts => opts};
         const searchInput = {
-            onInput: ({target: {value: inputValue}}) => this.setState({searchQuery: inputValue, open: false}),
+            onChange: ({target: {value: inputValue}}) => this.setState({searchQuery: inputValue, open: false}),
             disabled: isFetching || disabled
         };
         return (

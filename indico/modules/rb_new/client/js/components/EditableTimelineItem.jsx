@@ -276,9 +276,6 @@ export default class EditableTimelineItem extends React.Component {
                                position="top left"
                                horizontalOffset={-hintPosition.pixels}
                                context={canvasRef}
-                               // TODO: get rid of this key={...} attribute once bug fixed
-                               // https://github.com/Semantic-Org/Semantic-UI-React/issues/3050
-                               key={hintPosition.pixels}
                                size="mini"
                                styleName="editable-timeline-time-popup"
                                open />
