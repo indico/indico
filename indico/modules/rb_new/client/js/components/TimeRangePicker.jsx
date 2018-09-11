@@ -208,7 +208,7 @@ export default class TimeRangePicker extends React.Component {
                           selection
                           styleName="start-time-dropdown"
                           searchQuery={startSearchQuery}
-                          onSearchChange={(event) => this.onStartSearchChange(event)}
+                          onSearchChange={this.onStartSearchChange}
                           value={serializeTime(startTime)}
                           onChange={(event, {value}) => {
                               this.updateStartTime(event, value, startTime, endTime, duration, startSearchQuery);
@@ -219,7 +219,7 @@ export default class TimeRangePicker extends React.Component {
                           selection
                           styleName="end-time-dropdown"
                           searchQuery={endSearchQuery}
-                          onSearchChange={(event) => this.onEndSearchChange(event)}
+                          onSearchChange={this.onEndSearchChange}
                           value={serializeTime(endTime)}
                           onChange={(event, {value}) => {
                               this.updateEndTime(event, value, endTime, startTime, duration, endSearchQuery);
