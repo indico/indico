@@ -153,7 +153,7 @@ export default class FilterDropdown extends React.Component {
                    trigger={renderTrigger(title, renderedValue, counter)}
                    on="click"
                    open={open}
-                   onClose={this.handleClose}
+                   onClose={onClose}
                    onOpen={this.handleOpen}
                    hideOnScroll>
                 {form(fieldValues, this.setFieldValue, this.handleClose)}
