@@ -51,7 +51,7 @@ import './BookRoom.module.scss';
 const SearchBar = searchBoxFactory('bookRoom');
 const MapController = mapControllerFactory('bookRoom');
 const RoomDetailsModal = roomDetailsModalFactory('bookRoom');
-const RoomFilterBar = roomFilterBarFactory('bookRoom', bookRoomActions.searchRooms);
+const RoomFilterBar = roomFilterBarFactory('bookRoom');
 
 /* eslint-disable react/no-unused-state */
 class BookRoom extends React.Component {
@@ -83,6 +83,13 @@ class BookRoom extends React.Component {
     componentDidMount() {
         const {fetchRooms} = this.props;
         fetchRooms();
+    }
+
+    componentDidUpdate({filters: prevFilters}) {
+        const {filters, fetchRooms} = this.props;
+        if (!_.isEqual(prevFilters, filters)) {
+            fetchRooms();
+        }
     }
 
     componentWillUnmount() {
@@ -117,7 +124,6 @@ class BookRoom extends React.Component {
     };
 
     renderFilters(refName) {
-        const {fetchRooms} = this.props;
         const {[refName]: ref} = this.state;
         return (
             <Sticky context={ref} className="sticky-filters">
@@ -125,7 +131,7 @@ class BookRoom extends React.Component {
                     <div styleName="filter-row-filters">
                         <BookingFilterBar />
                         <RoomFilterBar />
-                        <SearchBar onConfirm={fetchRooms} onTextChange={fetchRooms} />
+                        <SearchBar onConfirm={() => null} onTextChange={() => null} />
                     </div>
                     {this.renderViewSwitch()}
                 </div>
@@ -408,8 +414,6 @@ const mapDispatchToProps = dispatch => ({
     },
     setFilterParameter(param, value) {
         dispatch(globalActions.setFilterParameter('bookRoom', param, value));
-        dispatch(bookRoomActions.searchRooms());
-        dispatch(globalActions.fetchMapRooms('bookRoom'));
     },
     toggleTimelineView: (isVisible) => {
         dispatch(bookRoomActions.toggleTimelineView(isVisible));

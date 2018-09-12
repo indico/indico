@@ -30,7 +30,6 @@ import TimeForm from './filters/TimeForm';
 import recurrenceRenderer from './filters/RecurrenceRenderer';
 import dateRenderer from './filters/DateRenderer';
 import timeRenderer from './filters/TimeRenderer';
-import * as bookingActions from './actions';
 import * as globalActions from '../../actions';
 
 
@@ -112,8 +111,6 @@ export default connect(
         actions: {
             setFilterParameter: (param, value) => {
                 dispatch(globalActions.setFilterParameter('bookRoom', param, value));
-                dispatch(bookingActions.searchRooms());
-                dispatch(globalActions.fetchMapRooms('bookRoom'));
             }
         }
     })

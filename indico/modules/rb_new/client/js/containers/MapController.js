@@ -19,9 +19,7 @@ import {connect} from 'react-redux';
 
 import MapController from '../components/MapController';
 import {
-    fetchMapRooms,
     setFilterParameter,
-    searchRooms,
     toggleMapSearch,
     updateLocation
 } from '../actions';
@@ -39,23 +37,12 @@ export default function mapControllerFactory(namespace) {
             dispatch(updateLocation(namespace, location));
             if (search) {
                 dispatch(setFilterParameter(namespace, 'bounds', location));
-                if (namespace === 'bookRoom') {
-                    dispatch(searchRooms(namespace));
-                    dispatch(fetchMapRooms(namespace));
-                }
             }
         },
         toggleMapSearch: (search, location) => {
             dispatch(toggleMapSearch(namespace, search));
             dispatch(setFilterParameter(namespace, 'bounds', search ? location : null));
-            if (namespace === 'bookRoom') {
-                dispatch(searchRooms(namespace));
-                dispatch(fetchMapRooms(namespace));
-            }
         },
-        fetchMapRooms: () => {
-            dispatch(fetchMapRooms(namespace));
-        }
     });
 
     return connect(

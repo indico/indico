@@ -133,7 +133,7 @@ class RoomFilterBarBase extends React.Component {
     }
 }
 
-export default (namespace, searchAction = null) => connect(
+export default (namespace) => connect(
     state => ({
         ...state[namespace].filters,
         equipmentTypes: roomsSelectors.getEquipmentTypes(state),
@@ -144,10 +144,6 @@ export default (namespace, searchAction = null) => connect(
         actions: {
             setFilterParameter: (param, value) => {
                 dispatch(globalActions.setFilterParameter(namespace, param, value));
-                if (namespace === 'bookRoom') {
-                    dispatch(searchAction());
-                    dispatch(globalActions.fetchMapRooms(namespace));
-                }
             }
         }
     })
