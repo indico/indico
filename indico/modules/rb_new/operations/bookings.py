@@ -148,6 +148,7 @@ def get_room_calendar(start_date, end_date):
              .join(Reservation)
              .join(Room)
              .filter(Room.is_active)
+             .order_by(db.func.indico.natsort(Room.full_name))
              .options(joinedload('reservation').joinedload('room')))
 
     rooms = (Room.query
