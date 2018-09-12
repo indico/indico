@@ -211,18 +211,16 @@ export default class BookingBootstrapForm extends React.Component {
                     </Form.Group>
                 )}
                 {['every', 'daily'].includes(type) && (
-                    <Form.Group inline>
-                        <DatePicker calendar={rangeCalendar}>
-                            {
-                                () => (
-                                    <Form.Group inline>
-                                        <Form.Input styleName="booking-date" icon="calendar" value={moment(startDate).format('L') || ''} />
-                                        <Form.Input styleName="booking-date" icon="calendar" value={moment(endDate).format('L') || ''} />
-                                    </Form.Group>
-                                )
-                            }
-                        </DatePicker>
-                    </Form.Group>
+                    <DatePicker calendar={rangeCalendar}>
+                        {
+                            () => (
+                                <Form.Group inline>
+                                    <Form.Input styleName="booking-date" icon="calendar" value={moment(startDate).format('L') || ''} />
+                                    <Form.Input styleName="booking-date" icon="calendar" value={moment(endDate).format('L') || ''} />
+                                </Form.Group>
+                            )
+                        }
+                    </DatePicker>
                 )}
                 {type === 'single' && (
                     <DatePicker calendar={calendar}>

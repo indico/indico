@@ -19,11 +19,37 @@
 
 $text-blue: #2a606b;
 
-.landing-page {
-    .landing-page-form {
-        height: 700px;
-        background-image: url('../../../../../../web/static/images/globe.png');
+@keyframes fade-slide-down {
+    0% {
+        opacity: 0;
+        transform: translate(-2rem, -2rem);
+    }
+
+    100% {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+.landing-page:global(.ui.grid) {
+    height: calc(100vh - 125px);
+    align-content: space-between;
+    flex-direction: column;
+
+    &::before {
+        content: ' ';
+        position: absolute;
+        left: 0;
+        box-sizing: border-box;
+        height: calc(100vh - 125px);
+        width: 120%;
+        background-image: url('static:images/globe.png');
         background-size: cover;
+        animation: fade-slide-down 2s ease-out forwards;
+    }
+
+    .landing-page-form {
+        flex-grow: 1;
 
         :global(.ui.form) {
             display: flex;
@@ -39,9 +65,22 @@ $text-blue: #2a606b;
             background-color: rgba(255, 255, 255, 0.4);
         }
 
-        :global(.ui.checkbox label) {
-            color: $dark-black;
-            font-weight: bold;
+        :global(.ui.checkbox.radio) {
+            padding: 0.5em;
+            border-radius: 0.4em;
+
+            :global(label) {
+                color: $dark-black;
+                font-weight: bold;
+            }
+
+            &:global(.checked) {
+                background-color: #45ba97;
+
+                :global(label) {
+                    color: #fff;
+                }
+            }
         }
 
         .search-input :global(.ui.icon.input) {
@@ -49,16 +88,39 @@ $text-blue: #2a606b;
         }
     }
 
-    .statistics {
-        margin-top: 55px;
+    .landing-page-card:global(.ui.card) {
+        transition: max-height 0.25s ease-out;
+        margin: 10vh auto auto auto;
 
-        :global(.ui.statistic) {
-            :global(.value), :global(.label) {
-                color: #7dcfb6;
-            }
+        @media (min-width: 600px) {
+            min-width: 520px;
+        }
 
-            &:not(:last-child) {
-                margin-right: 70px;
+        @media (max-height: 600px) {
+            margin-top: 10px;
+        }
+
+        .landing-page-card-content {
+            padding: 1em;
+        }
+    }
+
+    .landing-page-statistics {
+        max-height: 200px;
+        background-color: #fff;
+
+        .statistics {
+            margin-top: 25px;
+
+            :global(.ui.statistic) {
+
+                :global(.value), :global(.label) {
+                    color: #7dcfb6;
+                }
+
+                &:not(:last-child) {
+                    margin-right: 70px;
+                }
             }
         }
     }

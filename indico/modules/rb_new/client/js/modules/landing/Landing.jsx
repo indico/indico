@@ -19,13 +19,14 @@ import React from 'react';
 import {connect} from 'react-redux';
 import moment from 'moment';
 import PropTypes from 'prop-types';
-import {Checkbox, Form, Grid} from 'semantic-ui-react';
+import {Card, Checkbox, Form, Grid} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
 
 import * as globalActions from '../../actions';
 import BookingBootstrapForm from '../../components/BookingBootstrapForm';
 import {parseSearchBarText} from '../../util';
 import LandingStatistics from './LandingStatistics';
+import {selectors as userSelectors} from '../../common/user';
 
 import './Landing.module.scss';
 
@@ -74,10 +75,15 @@ class Landing extends React.Component {
         const {userHasFavorites} = this.props;
         return (
             <div className="landing-wrapper">
-                <Grid centered styleName="landing-page">
-                    <Grid.Row columns={2} styleName="landing-page-form">
-                        <Grid.Column width={6} textAlign="center" verticalAlign="middle">
-                            <div>
+                <Grid centered styleName="landing-page" columns={1}>
+                    <Grid.Row styleName="landing-page-form">
+                        <Card styleName="landing-page-card">
+                            <Card.Content>
+                                <Card.Header>
+                                    <Translate>Start your booking...</Translate>
+                                </Card.Header>
+                            </Card.Content>
+                            <Card.Content styleName="landing-page-card-content">
                                 <BookingBootstrapForm onSearch={this.doSearch}>
                                     <Form.Group inline>
                                         <Form.Input placeholder="bldg: 28" styleName="search-input"
@@ -90,10 +96,10 @@ class Landing extends React.Component {
                                         </Form.Field>
                                     )}
                                 </BookingBootstrapForm>
-                            </div>
-                        </Grid.Column>
+                            </Card.Content>
+                        </Card>
                     </Grid.Row>
-                    <Grid.Row>
+                    <Grid.Row styleName="landing-page-statistics">
                         <div styleName="statistics">
                             <LandingStatistics />
                         </div>
@@ -107,7 +113,7 @@ class Landing extends React.Component {
 
 export default connect(
     state => ({
-        userHasFavorites: Object.keys(state.user.favorites).length > 0
+        userHasFavorites: userSelectors.hasFavoriteRooms(state)
     }),
     dispatch => ({
         actions: {

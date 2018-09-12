@@ -81,6 +81,7 @@ export function generateAssetPath(config, virtualVersion = false) {
 }
 
 export function webpackDefaults(env, config) {
+    const globalBuildConfig = config.indico ? config.indico.build : config.build;
     const currentEnv = (env ? env.NODE_ENV : null) || 'development';
     const nodeModules = [path.join(config.build.indicoSourcePath || path.resolve(config.build.rootPath, '..'),
                                    'node_modules')];
@@ -124,15 +125,16 @@ export function webpackDefaults(env, config) {
                     sourceMap: true,
                     config: {
                         path: path.join(
-                            config.indico
-                                ? config.indico.build.rootPath
-                                : config.build.rootPath,
+                            globalBuildConfig.rootPath,
                             'postcss.config.js'
                         ),
                         ctx: {
                             urlnamespaces: {
                                 namespacePaths: (name) => {
-                                    return path.join(config.indico.build.staticURL, 'static/plugins', name);
+                                    if (name === 'static') {
+                                        return globalBuildConfig.staticURL.replace(/\/$/, '');
+                                    }
+                                    return path.join(globalBuildConfig.staticURL, 'static/plugins', name);
                                 }
                             }
                         }
