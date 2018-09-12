@@ -15,7 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-
+import _ from 'lodash';
 import React from 'react';
 import PropTypes from 'prop-types';
 import {bindActionCreators} from 'redux';
@@ -78,6 +78,13 @@ class RoomList extends React.Component {
     componentDidMount() {
         const {actions: {fetchRooms}} = this.props;
         fetchRooms();
+    }
+
+    componentDidUpdate({filters: prevFilters}) {
+        const {filters, actions: {fetchRooms}} = this.props;
+        if (!_.isEqual(prevFilters, filters)) {
+            fetchRooms();
+        }
     }
 
     renderRoom = (room) => {
@@ -201,7 +208,7 @@ class RoomList extends React.Component {
                                     )}
                                 </Grid.Column>
                             </Grid>
-                            <SearchBar onConfirm={fetchRooms} onTextChange={fetchRooms} />
+                            <SearchBar onConfirm={() => null} onTextChange={() => null} />
                         </Sticky>
                         <div styleName="results-count">
                             {matching === 0 && !isFetching && Translate.string('There are no rooms matching the criteria')}

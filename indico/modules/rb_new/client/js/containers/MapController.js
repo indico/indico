@@ -39,15 +39,19 @@ export default function mapControllerFactory(namespace) {
             dispatch(updateLocation(namespace, location));
             if (search) {
                 dispatch(setFilterParameter(namespace, 'bounds', location));
-                dispatch(searchRooms(namespace));
-                dispatch(fetchMapRooms(namespace));
+                if (namespace === 'bookRoom') {
+                    dispatch(searchRooms(namespace));
+                    dispatch(fetchMapRooms(namespace));
+                }
             }
         },
         toggleMapSearch: (search, location) => {
             dispatch(toggleMapSearch(namespace, search));
             dispatch(setFilterParameter(namespace, 'bounds', search ? location : null));
-            dispatch(searchRooms(namespace));
-            dispatch(fetchMapRooms(namespace));
+            if (namespace === 'bookRoom') {
+                dispatch(searchRooms(namespace));
+                dispatch(fetchMapRooms(namespace));
+            }
         },
         fetchMapRooms: () => {
             dispatch(fetchMapRooms(namespace));
