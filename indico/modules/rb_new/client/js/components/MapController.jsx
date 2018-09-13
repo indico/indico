@@ -29,9 +29,9 @@ import './MapController.module.scss';
 
 export default class MapController extends React.Component {
     static propTypes = {
-        map: PropTypes.shape({
-            bounds: PropTypes.object,
-        }).isRequired,
+        rooms: PropTypes.arrayOf(PropTypes.object).isRequired,
+        search: PropTypes.bool.isRequired,
+        bounds: PropTypes.object.isRequired,
         filterBounds: PropTypes.object,
         aspects: PropTypes.array.isRequired,
         toggleMapSearch: PropTypes.func.isRequired,
@@ -46,15 +46,15 @@ export default class MapController extends React.Component {
         super(props);
         this.mapRef = React.createRef();
         this.contextRef = React.createRef();
-
-        this.state = {
-            loading: true,
-            allRoomsVisible: false
-        };
     }
 
+    state = {
+        loading: true,
+        allRoomsVisible: false
+    };
+
     static getDerivedStateFromProps(props, prevState) {
-        const {filterBounds, map: {bounds}} = props;
+        const {filterBounds, bounds} = props;
         const aspectBounds = filterBounds || bounds;
         const prevProps = prevState.prevProps || props;
         if (!_.isEqual(prevProps, props)) {
@@ -73,8 +73,8 @@ export default class MapController extends React.Component {
     }
 
     componentDidUpdate(prevProps) {
-        const {map: {bounds, rooms}} = this.props;
-        const {map: {bounds: prevBounds, rooms: prevRooms}} = prevProps;
+        const {bounds, rooms} = this.props;
+        const {bounds: prevBounds, rooms: prevRooms} = prevProps;
         if (bounds === prevBounds && rooms === prevRooms) {
             return;
         }
@@ -102,7 +102,7 @@ export default class MapController extends React.Component {
     };
 
     onMove = (e) => {
-        const {updateLocation, map: {search}} = this.props;
+        const {updateLocation, search} = this.props;
         updateLocation(getMapBounds(e.target), search);
     };
 
@@ -114,7 +114,7 @@ export default class MapController extends React.Component {
     }
 
     updateToMapBounds = () => {
-        const {updateLocation, map: {search}} = this.props;
+        const {updateLocation, search} = this.props;
         if (this.mapRef.current) {
             const map = this.mapRef.current.leafletElement;
             updateLocation(getMapBounds(map), search);
@@ -122,7 +122,7 @@ export default class MapController extends React.Component {
     };
 
     showAllRooms = () => {
-        const {map: {rooms}} = this.props;
+        const {rooms} = this.props;
         this.setState({
             aspectBounds: getRoomListBounds(rooms),
             allRoomsVisible: true
@@ -130,11 +130,7 @@ export default class MapController extends React.Component {
     };
 
     render() {
-        const {
-            map: {search, bounds, rooms},
-            aspects,
-            toggleMapSearch,
-        } = this.props;
+        const {search, bounds, rooms, aspects, toggleMapSearch} = this.props;
         const {aspectBounds, loading, allRoomsVisible} = this.state;
         const aspectOptions = Object.entries(aspects).map(([key, val]) => ({
             text: val.name,

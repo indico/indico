@@ -38,8 +38,9 @@ import BookFromListModal from '../../components/modals/BookFromListModal';
 import {BlockingModal} from '../blockings';
 import {queryString as queryStringSerializer} from '../../serializers/filters';
 import {actions as roomsActions, selectors as roomsSelectors} from '../../common/rooms';
-import * as actions from '../../actions';
 import * as selectors from '../../selectors';
+import * as roomsListActions from './actions';
+import * as roomsListSelectors from './selectors';
 
 import './RoomList.module.scss';
 
@@ -51,16 +52,15 @@ const RoomFilterBar = roomFilterBarFactory('roomList');
 
 class RoomList extends React.Component {
     static propTypes = {
-        rooms: PropTypes.shape({
-            list: PropTypes.array,
-            isFetching: PropTypes.bool,
-        }).isRequired,
+        filters: PropTypes.object.isRequired,
+        results: PropTypes.arrayOf(PropTypes.object).isRequired,
+        isSearching: PropTypes.bool.isRequired,
         roomDetailsFetching: PropTypes.bool.isRequired,
-        pushState: PropTypes.func.isRequired,
         showMap: PropTypes.bool.isRequired,
         isInitializing: PropTypes.bool.isRequired,
+        pushState: PropTypes.func.isRequired,
         actions: PropTypes.exact({
-            fetchRooms: PropTypes.func.isRequired,
+            searchRooms: PropTypes.func.isRequired,
             fetchRoomDetails: PropTypes.func.isRequired,
         }).isRequired,
     };
@@ -72,18 +72,21 @@ class RoomList extends React.Component {
 
     state = {
         selectionMode: null,
-        selection: {}
+        selection: {},
+        numVisibleRooms: 20,
     };
 
     componentDidMount() {
-        const {actions: {fetchRooms}} = this.props;
-        fetchRooms();
+        const {actions: {searchRooms}} = this.props;
+        searchRooms();
     }
 
     componentDidUpdate({filters: prevFilters}) {
-        const {filters, actions: {fetchRooms}} = this.props;
+        const {filters, actions: {searchRooms}} = this.props;
         if (!_.isEqual(prevFilters, filters)) {
-            fetchRooms();
+            searchRooms();
+            // eslint-disable-next-line react/no-did-update-set-state
+            this.setState({numVisibleRooms: 20});
         }
     }
 
@@ -159,14 +162,32 @@ class RoomList extends React.Component {
         this.setState({selectionMode: type, selection: []});
     };
 
+    hasMoreRooms = () => {
+        const {numVisibleRooms} = this.state;
+        const {results} = this.props;
+        return numVisibleRooms < results.length;
+    };
+
+    loadMoreRooms = () => {
+        const {numVisibleRooms} = this.state;
+        this.setState({numVisibleRooms: numVisibleRooms + 20});
+    };
+
+    get visibleRooms() {
+        const {numVisibleRooms} = this.state;
+        const {results} = this.props;
+        return results.slice(0, numVisibleRooms);
+    }
+
     render() {
         const {
-            rooms: {list, matching, isFetching},
-            actions: {fetchRooms, fetchRoomDetails},
+            results,
+            actions: {fetchRoomDetails},
             roomDetailsFetching,
             showMap,
             pushState,
             isInitializing,
+            isSearching,
         } = this.props;
         const {selectionMode, selection} = this.state;
         const menuOptions = [{
@@ -211,25 +232,27 @@ class RoomList extends React.Component {
                             <SearchBar />
                         </Sticky>
                         <div styleName="results-count">
-                            {matching === 0 && !isFetching && Translate.string('There are no rooms matching the criteria')}
-                            {matching !== 0 && (
-                                <PluralTranslate count={matching}>
+                            {results.length === 0 && !isSearching && Translate.string('There are no rooms matching the criteria')}
+                            {results.length !== 0 && (
+                                <PluralTranslate count={results.length}>
                                     <Singular>
-                                        There is <Param name="count" value={matching} /> room matching the criteria
+                                        There is <Param name="count" value={results.length} /> room matching the criteria
                                     </Singular>
                                     <Plural>
-                                        There are <Param name="count" value={matching} /> rooms matching the criteria
+                                        There are <Param name="count" value={results.length} /> rooms matching the criteria
                                     </Plural>
                                 </PluralTranslate>
                             )}
                         </div>
-                        <LazyScroll hasMore={matching > list.length} loadMore={() => fetchRooms(true)}
-                                    isFetching={isFetching}>
-                            <Card.Group stackable>
-                                {list.map(this.renderRoom)}
-                            </Card.Group>
-                            <Loader active={isFetching} inline="centered" styleName="rooms-loader" />
-                        </LazyScroll>
+                        {isSearching ? (
+                            <Loader active inline="centered" styleName="rooms-loader" />
+                        ) : (
+                            <LazyScroll hasMore={this.hasMoreRooms()} loadMore={this.loadMoreRooms}>
+                                <Card.Group stackable>
+                                    {this.visibleRooms.map(this.renderRoom)}
+                                </Card.Group>
+                            </LazyScroll>
+                        )}
                     </div>
                     <Dimmer.Dimmable>
                         <Dimmer active={roomDetailsFetching} page>
@@ -271,21 +294,20 @@ class RoomList extends React.Component {
 
 export default connect(
     state => ({
-        ...state.roomList,
+        filters: roomsListSelectors.getFilters(state),
+        results: roomsListSelectors.getSearchResults(state),
+        isSearching: roomsListSelectors.isSearching(state),
         roomDetailsFetching: roomsSelectors.isFetchingDetails(state),
-        queryString: stateToQueryString(state.roomList, queryStringSerializer),
         showMap: selectors.isMapReady(state),
         isInitializing: selectors.isInitializing(state),
+        queryString: stateToQueryString(state.roomList, queryStringSerializer), // for pushStateMergeProps
     }),
     dispatch => ({
-        actions: {
-            fetchRooms: (loadMore = false) => {
-                dispatch(actions.searchRooms('roomList', loadMore));
-                dispatch(actions.fetchMapRooms('roomList'));
-            },
-            fetchRoomDetails: bindActionCreators(roomsActions.fetchDetails, dispatch),
-        },
-        dispatch,
+        dispatch, // for pushStateMergeProps
+        actions: bindActionCreators({
+            searchRooms: roomsListActions.searchRooms,
+            fetchRoomDetails: roomsActions.fetchDetails,
+        }, dispatch)
     }),
     pushStateMergeProps,
 )(RoomList);

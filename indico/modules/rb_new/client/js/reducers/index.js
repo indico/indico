@@ -15,7 +15,6 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import roomListReducer from './roomList';
 import buildingsReducer from './buildings';
 import mapAspectsReducer from './mapAspects';
 import {reducer as configReducer} from '../common/config';
@@ -25,6 +24,7 @@ import {reducer as userReducer} from '../common/user';
 import {reducer as blockingsReducer} from '../modules/blockings';
 import {reducer as calendarReducer} from '../modules/calendar';
 import {reducer as landingReducer} from '../modules/landing';
+import {reducer as roomListReducer} from '../modules/roomList';
 
 
 const reducers = {

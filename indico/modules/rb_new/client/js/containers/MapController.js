@@ -23,14 +23,26 @@ import {
     toggleMapSearch,
     updateLocation
 } from '../actions';
+import {selectors as roomListSelectors} from '../modules/roomList';
 
 
 export default function mapControllerFactory(namespace) {
-    const mapStateToProps = ({mapAspects: {list: aspects}, [namespace]: {map, filters: {bounds}}}) => ({
-        aspects,
-        map,
-        filterBounds: bounds
-    });
+    const mapStateToProps = (state) => {
+        const {
+            mapAspects: {list: aspects},
+            [namespace]: {map, filters: {bounds}}
+        } = state;
+        const rooms = namespace === 'roomList'
+            ? roomListSelectors.getSearchResultsForMap(state)
+            : state[namespace].map.rooms;
+        return {
+            aspects,
+            rooms,
+            bounds: map.bounds,
+            search: map.search,
+            filterBounds: bounds
+        };
+    };
 
     const mapDispatchToProps = dispatch => ({
         updateLocation: (location, search) => {
