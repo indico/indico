@@ -72,17 +72,21 @@ export default class App extends React.Component {
                     <div styleName="rb-content">
                         <Switch>
                             <Route exact path="/" render={() => <Redirect to="/book" />} />
-                            <Route path="/book" render={({location, match: {isExact}}) => (
-                                filtersSet
-                                    ? (
-                                        <BookRoom location={location} />
-                                    ) : (
-                                        isExact ? <Landing /> : <Redirect to="/book" />
-                                    )
-                            )} />
-                            <Route path="/rooms" component={RoomList} />
-                            <Route path="/blockings" component={BlockingList} />
-                            <Route path="/calendar" component={Calendar} />
+                            {!isInitializing && (
+                                <>
+                                    <Route path="/book" render={({location, match: {isExact}}) => (
+                                        filtersSet
+                                            ? (
+                                                <BookRoom location={location} />
+                                            ) : (
+                                                isExact ? <Landing /> : <Redirect to="/book" />
+                                            )
+                                    )} />
+                                    <Route path="/rooms" component={RoomList} />
+                                    <Route path="/blockings" component={BlockingList} />
+                                    <Route path="/calendar" component={Calendar} />
+                                </>
+                            )}
                         </Switch>
                     </div>
                     <Dimmer.Dimmable>
