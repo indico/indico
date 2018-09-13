@@ -59,6 +59,13 @@ class RHSearchRooms(RHRoomBookingBase):
         return jsonify(matching=matching, rooms=rooms_schema.dump(rooms).data, total=total)
 
 
+class RHSearchRoomsNew(RHRoomBookingBase):
+    @use_args(search_room_args)
+    def _process(self, args):
+        room_ids = [id_ for id_, in search_for_rooms(args).with_entities(Room.id)]
+        return jsonify(room_ids)
+
+
 class RHSearchMapRooms(RHRoomBookingBase):
     @use_args(search_room_args)
     def _process(self, args):

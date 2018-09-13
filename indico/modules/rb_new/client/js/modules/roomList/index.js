@@ -15,4 +15,9 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import * as selectors from './selectors';
+
+
 export {default} from './RoomList';
+export {default as reducer} from './reducers';
+export {selectors};

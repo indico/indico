@@ -16,14 +16,29 @@
  */
 
 import {combineReducers} from 'redux';
+import {requestReducer} from 'indico/utils/redux';
 
-import {roomsReducerFactory} from './roomBooking/roomList';
-import filterReducerFactory, {initialRoomFilterStateFactory} from './roomBooking/filters';
-import {mapReducerFactory} from './roomBooking/map';
+import * as roomListActions from './actions';
+import filterReducerFactory, {initialRoomFilterStateFactory} from '../../reducers/roomBooking/filters';
+import {mapReducerFactory} from '../../reducers/roomBooking/map';
 
 
 export default combineReducers({
-    rooms: roomsReducerFactory('roomList'),
+    search: combineReducers({
+        request: requestReducer(
+            roomListActions.SEARCH_ROOMS_REQUEST,
+            roomListActions.SEARCH_ROOMS_SUCCESS,
+            roomListActions.SEARCH_ROOMS_ERROR
+        ),
+        results: (state = [], action) => {
+            switch (action.type) {
+                case roomListActions.SEARCH_RESULTS_RECEIVED:
+                    return action.data;
+                default:
+                    return state;
+            }
+        }
+    }),
     filters: filterReducerFactory('roomList', initialRoomFilterStateFactory),
-    map: mapReducerFactory('roomList')
+    map: mapReducerFactory('roomList'),
 });
