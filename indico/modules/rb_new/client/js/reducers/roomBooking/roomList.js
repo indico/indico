@@ -22,7 +22,8 @@ const initialRoomsState = {
     list: [],
     matching: 0,
     isFetching: false,
-    isLoadingMore: null
+    isLoadingMore: null,
+    total: 0
 };
 
 

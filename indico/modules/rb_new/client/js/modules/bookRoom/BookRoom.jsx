@@ -391,7 +391,7 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = dispatch => ({
     clearRoomList() {
-        dispatch(globalActions.updateRooms('bookRoom', [], 0, true));
+        dispatch(globalActions.updateRooms('bookRoom', [], 0, 0));
     },
     clearTextFilter() {
         dispatch(globalActions.setFilterParameter('bookRoom', 'text', null));
