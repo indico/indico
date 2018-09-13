@@ -72,11 +72,16 @@ export default class MapController extends React.Component {
         }
     }
 
-    componentDidUpdate() {
+    componentDidUpdate(prevProps) {
+        const {map: {bounds, rooms}} = this.props;
+        const {map: {bounds: prevBounds, rooms: prevRooms}} = prevProps;
+        if (bounds === prevBounds && rooms === prevRooms) {
+            return;
+        }
+
         // check whether rooms are in bounds in parallel, to
         // avoid blocking the main thread with the calculations
         _.defer(() => {
-            const {map: {bounds, rooms}} = this.props;
             const {allRoomsVisible} = this.state;
             const inBounds = !bounds || checkRoomsInBounds(rooms, bounds);
             if (inBounds !== allRoomsVisible) {
