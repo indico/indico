@@ -32,12 +32,14 @@ export default connect(
     }),
     dispatch => ({
         fetchInitialData() {
-            dispatch(configActions.fetchConfig());
+            dispatch(configActions.fetchConfig()).then(() => {
+                // we only need map aspects if the map is enabled, which depends on the config
+                dispatch(fetchMapAspects());
+            });
             dispatch(userActions.fetchUserInfo());
             dispatch(userActions.fetchFavoriteRooms());
             dispatch(roomsActions.fetchEquipmentTypes());
             dispatch(fetchBuildings());
-            dispatch(fetchMapAspects());
             dispatch(roomsActions.fetchRooms());
         },
         resetPageState(namespace) {

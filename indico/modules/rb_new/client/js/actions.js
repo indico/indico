@@ -23,6 +23,7 @@ import fetchBuildingsURL from 'indico-url:rooms_new.buildings';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {preProcessParameters} from './util';
 import {ajax as ajaxFilterRules} from './serializers/filters';
+import * as selectors from './selectors';
 
 
 // Page state
@@ -96,7 +97,12 @@ export function updateMapRooms(namespace, rooms) {
 
 export function fetchMapRooms(namespace) {
     return async (dispatch, getStore) => {
-        const {filters} = getStore()[namespace];
+        const state = getStore();
+        if (!selectors.isMapEnabled(getStore())) {
+            return;
+        }
+
+        const {filters} = state[namespace];
 
         dispatch({type: FETCH_MAP_ROOMS_STARTED, namespace});
 
@@ -134,7 +140,11 @@ export function updateLocation(namespace, location) {
 }
 
 export function fetchMapAspects() {
-    return async (dispatch) => {
+    return async (dispatch, getStore) => {
+        if (!selectors.isMapEnabled(getStore())) {
+            return;
+        }
+
         dispatch({type: FETCH_MAP_ASPECTS_STARTED});
 
         let response;

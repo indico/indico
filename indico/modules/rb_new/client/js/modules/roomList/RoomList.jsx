@@ -274,7 +274,7 @@ export default connect(
         ...state.roomList,
         roomDetailsFetching: roomsSelectors.isFetchingDetails(state),
         queryString: stateToQueryString(state.roomList, queryStringSerializer),
-        showMap: selectors.isMapEnabled(state),
+        showMap: selectors.isMapReady(state),
         isInitializing: selectors.isInitializing(state),
     }),
     dispatch => ({

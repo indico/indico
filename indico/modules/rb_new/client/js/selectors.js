@@ -30,8 +30,10 @@ export const isInitializing = createSelector(
     (...ready) => ready.some(x => !x)
 );
 
-export const isMapEnabled = createSelector(
-    configSelectors.getTileServerURL,
-    (state) => state.mapAspects.list,  // TODO: use proper selector
-    (tileServerURL, mapAspects) => !!tileServerURL && !!mapAspects
+export const isMapEnabled = state => !!configSelectors.getTileServerURL(state);
+
+export const isMapReady = createSelector(
+    isMapEnabled,
+    state => state.mapAspects.list,  // TODO: use proper selector
+    (mapEnabled, mapAspects) => mapEnabled && !!mapAspects
 );
