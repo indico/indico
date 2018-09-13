@@ -178,7 +178,7 @@ export default class SearchBar extends React.Component {
         }
 
         const popupTrigger = (
-            <Button attached="left" icon onClick={() => this.toggleFiltersPopup(true)}>
+            <Button attached="left" size="large" onClick={() => this.toggleFiltersPopup(true)} icon>
                 <Translate>Advanced</Translate>
                 <Icon name="caret down" />
             </Button>
@@ -194,6 +194,7 @@ export default class SearchBar extends React.Component {
                        on="click"
                        hideOnScroll />
                 <DebounceInput element={Input}
+                               size="large"
                                styleName="text-filter"
                                icon={inputIcon}
                                debounceTimeout={300}
