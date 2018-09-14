@@ -17,4 +17,5 @@
 
 export {default as Preloader} from './Preloader';
 export {default as Slot} from './Slot';
+export {default as Overridable} from './Overridable';
 export {toClasses} from './html';

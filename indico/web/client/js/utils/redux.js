@@ -44,6 +44,7 @@ export default function createReduxStore(
     return createStore(
         enhancer(combineRootReducers({
             staticData: (state = {}) => state,
+            _overrides: (state = {}) => state,
             ...reducers
         }, ...postReducers)),
         initialData,

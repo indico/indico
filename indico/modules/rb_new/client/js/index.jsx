@@ -16,36 +16,7 @@
  */
 
 import '@babel/polyfill';
-import ReactDOM from 'react-dom';
-import React from 'react';
-import {Provider} from 'react-redux';
-
-import 'semantic-ui-css/semantic.css';
-import '../styles/main.scss';
-
-import setupUserMenu from 'indico/react/containers/UserMenu';
-import App from './containers/App';
-
-import createRBStore, {history} from './store';
-import {init} from './actions';
-import {selectors as configSelectors} from './common/config';
-import {selectors as userSelectors} from './common/user';
+import setup from './setup';
 
 
-document.addEventListener('DOMContentLoaded', () => {
-    const appContainer = document.getElementById('rb-app-container');
-    const store = createRBStore();
-
-    store.dispatch(init());
-    setupUserMenu(
-        document.getElementById('indico-user-menu-container'), store,
-        userSelectors.getUserInfo, configSelectors.getLanguages
-    );
-
-    ReactDOM.render(
-        <Provider store={store}>
-            <App history={history} />
-        </Provider>,
-        appContainer
-    );
-});
+setup();

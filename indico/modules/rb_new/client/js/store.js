@@ -81,11 +81,11 @@ const qsFilterReducer = createQueryStringReducer(
         : state)
 );
 
-export default function createRBStore() {
+export default function createRBStore(overrides = {}) {
     return createReduxStore(
         'rb-new',
         reducers,
-        {},
+        {_overrides: overrides},
         [
             routerMiddleware(history),
             queryStringMiddleware(history, getRouteConfig(), {usePush: false})
