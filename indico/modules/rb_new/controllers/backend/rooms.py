@@ -62,8 +62,11 @@ class RHSearchRooms(RHRoomBookingBase):
 class RHSearchRoomsNew(RHRoomBookingBase):
     @use_args(search_room_args)
     def _process(self, args):
-        room_ids = [id_ for id_, in search_for_rooms(args).with_entities(Room.id)]
-        return jsonify(room_ids)
+        filter_availability = 'start_dt' in args and 'end_dt' in args
+        search_query = search_for_rooms(args, availability=(filter_availability or None))
+        room_ids = [id_ for id_, in search_query.with_entities(Room.id)]
+        total = len(room_ids) if not filter_availability else search_for_rooms(args).count()
+        return jsonify(rooms=room_ids, total=total)
 
 
 class RHSearchMapRooms(RHRoomBookingBase):

@@ -24,7 +24,12 @@ import {roomSearchActionsFactory} from './actions';
 
 
 export function roomSearchReducerFactory(namespace) {
+    const initialSearchResultsState = {
+        rooms: [],
+        total: 0,
+    };
     const actions = roomSearchActionsFactory(namespace);
+
     return combineReducers({
         search: combineReducers({
             request: requestReducer(
@@ -32,7 +37,7 @@ export function roomSearchReducerFactory(namespace) {
                 actions.SEARCH_ROOMS_SUCCESS,
                 actions.SEARCH_ROOMS_ERROR
             ),
-            results: (state = [], action) => {
+            results: (state = initialSearchResultsState, action) => {
                 switch (action.type) {
                     case actions.SEARCH_RESULTS_RECEIVED:
                         return action.data;
