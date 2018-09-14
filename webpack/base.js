@@ -92,7 +92,7 @@ export function webpackDefaults(env, config) {
     }
 
     const _cssLoaderOptions = {
-        root: config.indico ? config.indico.build.staticPath : config.build.staticPath,
+        root: globalBuildConfig.staticPath,
         url: true
     };
 
@@ -104,7 +104,7 @@ export function webpackDefaults(env, config) {
     );
 
     function getDevtoolFilename(info) {
-        const root = path.resolve(config.indico ? config.indico.build.rootPath : config.build.rootPath, '..');
+        const root = path.resolve(globalBuildConfig.rootPath, '..');
         return path.relative(root, info.absoluteResourcePath);
     }
 
@@ -114,7 +114,7 @@ export function webpackDefaults(env, config) {
             use: [{
                 loader: 'css-loader',
                 options: {
-                    root: config.indico ? config.indico.build.staticPath : config.build.staticPath,
+                    root: globalBuildConfig.staticPath,
                     sourceMap: true,
                     url: !config.isPlugin, // FIXME: true breaks plugins, false breaks /indico/ in core
                     ...cssLoaderOptions
@@ -152,13 +152,12 @@ export function webpackDefaults(env, config) {
         });
     }
 
-    const indicoClientPath = config.isPlugin ? config.indico.build.clientPath : config.build.clientPath;
-    const urlMapPath = path.resolve(
-        config.indico ? config.indico.build.rootPath : config.build.rootPath, '..', 'url_map.json');
+    const indicoClientPath = globalBuildConfig.clientPath;
+    const urlMapPath = path.resolve(globalBuildConfig.rootPath, '..', 'url_map.json');
     const babelPlugins = [['flask-urls', {
         importPrefix: 'indico-url',
         urlMap: require(urlMapPath).rules,
-        basePath: config.indico ? config.indico.build.baseURLPath : config.build.baseURLPath,
+        basePath: globalBuildConfig.baseURLPath,
     }]];
 
 
@@ -179,7 +178,7 @@ export function webpackDefaults(env, config) {
                     loader: 'babel-loader',
                     exclude: /node_modules/,
                     options: {
-                        extends: path.resolve(config.indico ? config.indico.build.rootPath : config.build.rootPath,
+                        extends: path.resolve(globalBuildConfig.rootPath,
                                               '..', '.babelrc'),
                         plugins: babelPlugins
                     }
@@ -189,7 +188,7 @@ export function webpackDefaults(env, config) {
                     loader: 'babel-loader',
                     exclude: /node_modules/,
                     options: {
-                        extends: path.resolve(config.indico ? config.indico.build.rootPath : config.build.rootPath,
+                        extends: path.resolve(globalBuildConfig.rootPath,
                                               '..', '.babelrc'),
                         presets: ['@babel/react'],
                         plugins: babelPlugins
