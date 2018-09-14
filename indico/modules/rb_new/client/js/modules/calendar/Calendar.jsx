@@ -20,12 +20,15 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {bindActionCreators} from 'redux';
 import {Dimmer, Grid} from 'semantic-ui-react';
+import {Route} from 'react-router-dom';
 import {connect} from 'react-redux';
 
 import {Translate} from 'indico/react/i18n';
 import {Preloader} from 'indico/react/util';
 import {serializeDate} from 'indico/utils/date';
 import TimelineBase from '../../components/TimelineBase';
+import roomDetailsModalFactory from '../../components/modals/RoomDetailsModal';
+import {pushStateMergeProps, roomPreloader} from '../../util';
 import * as calendarActions from './actions';
 import * as calendarSelectors from './selectors';
 import * as roomActions from '../../common/rooms/actions';
@@ -38,6 +41,8 @@ import BookFromListModal from '../../components/modals/BookFromListModal';
 import '../../components/Timeline.module.scss';
 
 
+const RoomDetailsModal = roomDetailsModalFactory('calendar');
+
 class Calendar extends React.Component {
     static propTypes = {
         calendarData: PropTypes.shape({
@@ -49,7 +54,8 @@ class Calendar extends React.Component {
             fetchCalendar: PropTypes.func.isRequired,
             setDate: PropTypes.func.isRequired,
             fetchRoomDetails: PropTypes.func.isRequired
-        }).isRequired
+        }).isRequired,
+        pushState: PropTypes.func.isRequired,
     };
 
     state = {};
@@ -107,6 +113,16 @@ class Calendar extends React.Component {
         });
     };
 
+    onClickLabel = (id) => {
+        const {pushState} = this.props;
+        pushState(`/calendar/${id}/details`);
+    };
+
+    closeModal = () => {
+        const {pushState} = this.props;
+        pushState('/calendar');
+    };
+
     render() {
         const {isFetching, calendarData: {date, rows}, actions: {setDate, fetchRoomDetails}} = this.props;
         const {bookingRoomId, modalFields} = this.state;
@@ -129,8 +145,15 @@ class Calendar extends React.Component {
                                   isLoading={isFetching}
                                   itemClass={EditableTimelineItem}
                                   itemProps={{onAddSlot: this.onAddSlot}}
+                                  onClickLabel={this.onClickLabel}
                                   longLabel />
                 </Grid.Row>
+                <Route exact path="/calendar/:roomId/details" render={roomPreloader((roomId) => (
+                    <RoomDetailsModal roomId={roomId} onClose={this.closeModal} />
+                ), fetchRoomDetails)} />
+                <Route exact path="/calendar/:roomId/book" render={roomPreloader((roomId) => (
+                    <BookFromListModal roomId={roomId} onClose={this.closeModal} />
+                ), fetchRoomDetails)} />
                 {bookingRoomId && (
                     <Preloader checkCached={state => !!roomSelectors.hasDetails(state, {roomId: bookingRoomId})}
                                action={() => fetchRoomDetails(bookingRoomId)}
@@ -158,7 +181,9 @@ export default connect(
         actions: bindActionCreators({
             fetchCalendar: calendarActions.fetchCalendar,
             fetchRoomDetails: roomActions.fetchDetails,
-            setDate: (date) => calendarActions.setDate(serializeDate(date)),
-        }, dispatch)
-    })
+            setDate: (date) => calendarActions.setDate(date.format(date)),
+        }, dispatch),
+        dispatch
+    }),
+    pushStateMergeProps
 )(Calendar);

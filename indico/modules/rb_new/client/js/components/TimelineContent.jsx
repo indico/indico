@@ -37,6 +37,7 @@ export default class TimelineContent extends React.Component {
         recurrenceType: PropTypes.string,
         onClick: PropTypes.func,
         longLabel: PropTypes.bool,
+        onClickLabel: PropTypes.func,
         itemClass: PropTypes.func,
         itemProps: PropTypes.object,
         isLoading: PropTypes.bool,
@@ -48,6 +49,7 @@ export default class TimelineContent extends React.Component {
         recurrenceType: null,
         onClick: null,
         longLabel: false,
+        onClickLabel: null,
         itemClass: TimelineItem,
         itemProps: {},
         isLoading: false,
@@ -56,6 +58,11 @@ export default class TimelineContent extends React.Component {
 
     state = {
         selectable: true
+    };
+
+    onClickLabel = (id) => {
+        const {onClickLabel} = this.props;
+        return onClickLabel ? () => onClickLabel(id) : false;
     };
 
     renderTimelineRow = ({availability, label, conflictIndicator, key, room}) => {
@@ -69,7 +76,8 @@ export default class TimelineContent extends React.Component {
             <div styleName="timeline-row" key={`element-${key}`}>
                 <TimelineRowLabel label={label}
                                   availability={conflictIndicator ? (hasConflicts ? 'conflict' : 'available') : null}
-                                  longLabel={longLabel} />
+                                  longLabel={longLabel}
+                                  onClickLabel={this.onClickLabel(room.id)} />
                 <div styleName="timeline-row-content" style={{flex: columns}}>
                     <ItemClass startHour={minHour} endHour={maxHour} data={availability} room={room}
                                onClick={() => {
@@ -133,8 +141,7 @@ export default class TimelineContent extends React.Component {
     }
 }
 
-
-function TimelineRowLabel({label, availability, longLabel}) {
+function TimelineRowLabel({label, availability, longLabel, onClickLabel}) {
     let color, tooltip;
     switch (availability) {
         case 'conflict':
@@ -152,7 +159,10 @@ function TimelineRowLabel({label, availability, longLabel}) {
     const roomLabel = (
         <span>
             {availability && <Icon name="circle" size="tiny" color={color} styleName="dot" />}
-            <span>{label}</span>
+            {onClickLabel
+                ? <a style={{cursor: 'pointer'}} onClick={onClickLabel}>{label}</a>
+                : <span>{label}</span>
+            }
         </span>
     );
 
@@ -171,9 +181,14 @@ TimelineRowLabel.propTypes = {
     label: PropTypes.string.isRequired,
     availability: PropTypes.oneOf(['available', 'alternatives', 'conflict']),
     longLabel: PropTypes.bool,
+    onClickLabel: PropTypes.oneOfType([
+        PropTypes.func,
+        PropTypes.bool
+    ])
 };
 
 TimelineRowLabel.defaultProps = {
     availability: null,
     longLabel: false,
+    onClickLabel: null,
 };

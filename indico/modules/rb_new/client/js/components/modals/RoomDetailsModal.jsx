@@ -84,6 +84,8 @@ export default (namespace) => {
             bookRoom(room) {
                 if (namespace === 'roomList') {
                     dispatch(push(`/rooms/${room.id}/book`));
+                } else if (namespace === 'calendar') {
+                    dispatch(push(`/calendar/${room.id}/book`));
                 } else {
                     dispatch(push(`/book/${room.id}/confirm`));
                 }
@@ -120,9 +122,9 @@ function RoomDetails({bookRoom, room, availability, attributes}) {
         },
         label: moment(day).format('L'),
         conflictIndicator: false,
-        key: day
+        key: day,
+        room
     });
-
 
     return (
         <div styleName="room-details">
