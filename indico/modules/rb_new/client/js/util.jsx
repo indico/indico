@@ -22,17 +22,10 @@ import LatLon from 'geodesy/latlon-vectors';
 import moment from 'moment';
 import {Dimmer} from 'semantic-ui-react';
 import {Preloader} from 'indico/react/util';
+import {serializeDate} from 'indico/utils/date';
 
 import {selectors as roomsSelectors} from './common/rooms';
 
-
-export function toMoment(dt, format) {
-    return dt ? moment(dt, format) : null;
-}
-
-export function serializeTime(time) {
-    return time ? time.format('HH:mm') : null;
-}
 
 export function parseSearchBarText(queryText) {
     const resultMap = {bldg: 'building', floor: 'floor'};
@@ -86,7 +79,7 @@ function calculateDefaultEndDate(startDate, type, number, interval) {
         // 7 occurences
         dt.add(6 * number, 'months');
     }
-    return isMoment ? dt : dt.format('YYYY-MM-DD');
+    return isMoment ? dt : serializeDate(dt);
 }
 
 export function sanitizeRecurrence(filters) {

@@ -122,7 +122,7 @@ export default class TimelineItem extends React.Component {
             popupContent = (
                 <div styleName="popup-center">
                     <div>{Translate.string('Not possible to book between:')}</div>
-                    <div>{segmentStartDt.format('HH:mm')} - {segmentEndDt.format('HH:mm')}</div>
+                    <div>{segmentStartDt.format('LT')} - {segmentEndDt.format('LT')}</div>
                 </div>
             );
         } else {
@@ -135,7 +135,7 @@ export default class TimelineItem extends React.Component {
             popupContent = (
                 <div styleName="popup-center">
                     <div>
-                        {segmentStartDt.format('HH:mm')} - {segmentEndDt.format('HH:mm')}
+                        {segmentStartDt.format('LT')} - {segmentEndDt.format('LT')}
                     </div>
                     <div>{popupMessage}</div>
                 </div>

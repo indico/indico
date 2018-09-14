@@ -24,6 +24,7 @@ import {connect} from 'react-redux';
 
 import {Translate} from 'indico/react/i18n';
 import {Preloader} from 'indico/react/util';
+import {serializeDate} from 'indico/utils/date';
 import TimelineBase from '../../components/TimelineBase';
 import * as calendarActions from './actions';
 import * as calendarSelectors from './selectors';
@@ -122,7 +123,7 @@ class Calendar extends React.Component {
                     <TimelineBase minHour={6}
                                   maxHour={22}
                                   legendLabels={legendLabels}
-                                  rows={rows.map(this._getRowSerializer(date || moment().format('YYYY-MM-DD')))}
+                                  rows={rows.map(this._getRowSerializer(date || serializeDate(moment())))}
                                   activeDate={date ? moment(date) : moment()}
                                   onDateChange={setDate}
                                   isLoading={isFetching}
@@ -157,7 +158,7 @@ export default connect(
         actions: bindActionCreators({
             fetchCalendar: calendarActions.fetchCalendar,
             fetchRoomDetails: roomActions.fetchDetails,
-            setDate: (date) => calendarActions.setDate(date.format('YYYY-MM-DD')),
+            setDate: (date) => calendarActions.setDate(serializeDate(date)),
         }, dispatch)
     })
 )(Calendar);

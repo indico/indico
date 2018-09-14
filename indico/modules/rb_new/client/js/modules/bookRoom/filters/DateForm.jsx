@@ -21,16 +21,13 @@ import RangeCalendar from 'rc-calendar/lib/RangeCalendar';
 import RCCalendar from 'rc-calendar';
 import PropTypes from 'prop-types';
 import 'rc-calendar/assets/index.css';
-import {toMoment} from '../../../util';
+import {serializeDate, toMoment} from 'indico/utils/date';
 
 import FilterFormComponent from '../../../common/filters/FilterFormComponent';
 
 
 import './DateForm.module.scss';
 
-
-const _formatDateStr = 'YYYY-MM-DD';
-const _serializeDate = date => (date ? date.format(_formatDateStr) : null);
 
 export default class DateForm extends FilterFormComponent {
     static propTypes = {
@@ -61,8 +58,8 @@ export default class DateForm extends FilterFormComponent {
         return new Promise((resolve) => {
             const {setParentField} = this.props;
             // send serialized versions to parent/redux
-            setParentField('startDate', _serializeDate(startDate));
-            setParentField('endDate', _serializeDate(endDate));
+            setParentField('startDate', serializeDate(startDate));
+            setParentField('endDate', serializeDate(endDate));
             this.setState({
                 startDate,
                 endDate
@@ -92,7 +89,7 @@ export default class DateForm extends FilterFormComponent {
                                        await this.setDates(start, end);
                                    }}
                                    disabledDate={disabledDate || this.disabledDate}
-                                   format={_formatDateStr}
+                                   format="L"
                                    {...props} />
                 ) : (
                     <RCCalendar selectedValue={startDate}
@@ -101,7 +98,7 @@ export default class DateForm extends FilterFormComponent {
                                     await this.setDates(date, null);
                                 }}
                                 disabledDate={disabledDate || this.disabledDate}
-                                format={_formatDateStr}
+                                format="L"
                                 {...props} />
                 ) }
             </div>

@@ -20,7 +20,6 @@ import ReactDOM from 'react-dom';
 import React from 'react';
 import {Provider} from 'react-redux';
 
-import moment from 'moment';
 import 'semantic-ui-css/semantic.css';
 import '../styles/main.scss';
 
@@ -33,9 +32,7 @@ import {selectors as configSelectors} from './common/config';
 import {selectors as userSelectors} from './common/user';
 
 
-document.addEventListener('DOMContentLoaded', () => {
-    moment.locale(Indico.User.language);
-
+document.addEventListener('DOMContentLoaded', async () => {
     const appContainer = document.getElementById('rb-app-container');
     const store = createRBStore();
 

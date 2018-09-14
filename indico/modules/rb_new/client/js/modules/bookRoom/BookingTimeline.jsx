@@ -23,16 +23,14 @@ import {connect} from 'react-redux';
 import {stateToQueryString} from 'redux-router-querystring';
 import {Message, Segment} from 'semantic-ui-react';
 import {Translate, Param} from 'indico/react/i18n';
+import {serializeDate, toMoment} from 'indico/utils/date';
+import TimelineBase from '../../components/TimelineBase';
 import {isDateWithinRange, pushStateMergeProps} from '../../util';
 import {queryString as queryStringSerializer} from '../../serializers/filters';
-import TimelineBase from '../../components/TimelineBase';
 import * as selectors from './selectors';
 
 import '../../components/Timeline.module.scss';
 
-
-const DATE_FORMAT = 'YYYY-MM-DD';
-const _toMoment = (date) => moment(date, DATE_FORMAT);
 
 export class BookingTimelineComponent extends React.Component {
     static propTypes = {
@@ -41,20 +39,25 @@ export class BookingTimelineComponent extends React.Component {
         availability: PropTypes.array.isRequired,
         dateRange: PropTypes.array.isRequired,
         pushState: PropTypes.func.isRequired,
-        loadMore: PropTypes.func.isRequired,
+        loadMore: PropTypes.func,
 
         // from redux state
         isFetching: PropTypes.bool.isRequired,
         isFetchingRooms: PropTypes.bool.isRequired,
         recurrenceType: PropTypes.string.isRequired,
-        rooms: PropTypes.object.isRequired
+        rooms: PropTypes.object
+    };
+
+    static defaultProps = {
+        loadMore: null,
+        rooms: null
     };
 
     state = {};
 
     static getDerivedStateFromProps({dateRange}, state) {
-        if (!_.isEmpty(dateRange) && !isDateWithinRange(state.activeDate, dateRange, _toMoment)) {
-            return {...state, activeDate: _toMoment(dateRange[0])};
+        if (!_.isEmpty(dateRange) && !isDateWithinRange(state.activeDate, dateRange, toMoment)) {
+            return {...state, activeDate: toMoment(dateRange[0])};
         } else {
             return state;
         }
@@ -84,7 +87,7 @@ export class BookingTimelineComponent extends React.Component {
 
             return {
                 availability: av,
-                label: singleRoom ? dt : fullName,
+                label: singleRoom ? moment(dt).format('L') : fullName,
                 key: singleRoom ? dt : id,
                 conflictIndicator: true,
                 room
@@ -100,7 +103,7 @@ export class BookingTimelineComponent extends React.Component {
             const roomAvailability = this.singleRoom;
             return dateRange.map(dt => this._getRowSerializer(dt, true)(roomAvailability));
         } else {
-            const dt = activeDate.format('YYYY-MM-DD');
+            const dt = serializeDate(activeDate);
             return availability.map(([, data]) => data).map(this._getRowSerializer(dt));
         }
     };
@@ -145,14 +148,18 @@ export class BookingTimelineComponent extends React.Component {
             return null;
         }
 
-        const lazyScroll = {
-            loadMore,
-            hasMore: rooms.matching > rooms.list.length,
-            isFetching: isFetching || isFetchingRooms
-        };
+        const props = {};
+        if (loadMore && rooms) {
+            props.lazyScroll = {
+                loadMore,
+                hasMore: rooms.matching > rooms.list.length,
+                isFetching: isFetching || isFetchingRooms
+            };
+        }
 
         return (
-            <TimelineBase rows={this.calcRows()}
+            <TimelineBase {...props}
+                          rows={this.calcRows()}
                           legendLabels={legendLabels}
                           emptyMessage={emptyMessage}
                           onClick={this.openBookingModal}
@@ -168,8 +175,7 @@ export class BookingTimelineComponent extends React.Component {
                           extraContent={this.singleRoom && this.renderRoomSummary(this.singleRoom)}
                           isLoading={isFetching || isFetchingRooms}
                           recurrenceType={recurrenceType}
-                          disableDatePicker={!!this.singleRoom}
-                          lazyScroll={lazyScroll} />
+                          disableDatePicker={!!this.singleRoom} />
         );
     }
 }

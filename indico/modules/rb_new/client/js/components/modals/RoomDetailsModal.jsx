@@ -16,6 +16,7 @@
  */
 
 import _ from 'lodash';
+import moment from 'moment';
 import {push} from 'connected-react-router';
 import React from 'react';
 import PropTypes from 'prop-types';
@@ -117,7 +118,7 @@ function RoomDetails({bookRoom, room, availability, attributes}) {
             unbookableHours: unbookableHours || [],
             blockings: blockings || []
         },
-        label: day,
+        label: moment(day).format('L'),
         conflictIndicator: false,
         key: day
     });

@@ -113,7 +113,7 @@ export default class TimelineContent extends React.Component {
                     {hourSeries.slice(0, -1).map((hour) => (
                         <div styleName="timeline-header-label" key={`timeline-header-${hour}`}>
                             <span styleName="timeline-label-text">
-                                {moment({hours: hour}).format('H:mm')}
+                                {moment({hours: hour}).format('LT')}
                             </span>
                         </div>
                     ))}

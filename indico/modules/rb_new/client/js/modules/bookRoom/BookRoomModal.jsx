@@ -16,6 +16,7 @@
  */
 
 import _ from 'lodash';
+import moment from 'moment';
 import React from 'react';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
@@ -25,12 +26,12 @@ import createDecorator from 'final-form-calculate';
 import {ReduxFormField, ReduxRadioField, formatters} from 'indico/react/forms';
 import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
 import PrincipalSearchField from 'indico/react/components/PrincipalSearchField';
+import {toMoment} from 'indico/utils/date';
+import {selectors as roomsSelectors} from '../../common/rooms';
 import recurrenceRenderer from './filters/RecurrenceRenderer';
-import {toMoment} from '../../util';
 import RoomBasicDetails from '../../components/RoomBasicDetails';
 import TimelineContent from '../../components/TimelineContent';
 import TimelineLegend from '../../components/TimelineLegend';
-import {selectors as roomsSelectors} from '../../common/rooms';
 import * as actions from './actions';
 
 import './BookRoomModal.module.scss';
@@ -220,7 +221,7 @@ class BookRoomModal extends React.Component {
                 unbookableHours: unbookableHours || [],
                 blockings: blockings[day] || []
             },
-            label: day,
+            label: moment(day).format('L'),
             key: day,
             conflictIndicator: true,
             room
