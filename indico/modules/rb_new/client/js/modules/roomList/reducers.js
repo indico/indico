@@ -15,30 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import {combineReducers} from 'redux';
-import {requestReducer} from 'indico/utils/redux';
-
-import * as roomListActions from './actions';
-import filterReducerFactory, {initialRoomFilterStateFactory} from '../../reducers/roomBooking/filters';
-import {mapReducerFactory} from '../../reducers/roomBooking/map';
+import {roomSearchReducerFactory} from '../../common/roomSearch';
 
 
-export default combineReducers({
-    search: combineReducers({
-        request: requestReducer(
-            roomListActions.SEARCH_ROOMS_REQUEST,
-            roomListActions.SEARCH_ROOMS_SUCCESS,
-            roomListActions.SEARCH_ROOMS_ERROR
-        ),
-        results: (state = [], action) => {
-            switch (action.type) {
-                case roomListActions.SEARCH_RESULTS_RECEIVED:
-                    return action.data;
-                default:
-                    return state;
-            }
-        }
-    }),
-    filters: filterReducerFactory('roomList', initialRoomFilterStateFactory),
-    map: mapReducerFactory('roomList'),
-});
+export default roomSearchReducerFactory('roomList');

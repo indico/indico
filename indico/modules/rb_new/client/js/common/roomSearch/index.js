@@ -15,7 +15,6 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import {roomSearchActionsFactory} from '../../common/roomSearch';
-
-
-export const {searchRooms} = roomSearchActionsFactory('roomList');
+export {roomSearchActionsFactory} from './actions';
+export {roomSearchReducerFactory} from './reducers';
+export {roomSearchSelectorFactory} from './selectors';
