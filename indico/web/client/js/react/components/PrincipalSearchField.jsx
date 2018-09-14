@@ -92,8 +92,7 @@ export default class PrincipalSearchField extends React.Component {
             options: [],
             prevPropsValue: dropdownValue,
             value: dropdownValue,
-            searchQuery: '',
-            open: false
+            searchQuery: ''
         };
 
         if (multiple) {
@@ -195,14 +194,13 @@ export default class PrincipalSearchField extends React.Component {
         this.userCache = Object.assign(this.userCache, ...items.map(item => ({[item.identifier]: item})));
         this.setState({
             isFetching: false,
-            options: items.sort(this.sortPrincipals).map(this.renderItem),
-            open: true
+            options: items.sort(this.sortPrincipals).map(this.renderItem)
         });
     }, 1000);
 
     render() {
         const {multiple, onChange, disabled, withGroups} = this.props;
-        const {isFetching, options, value, searchQuery, open} = this.state;
+        const {isFetching, options, value, searchQuery} = this.state;
         let dropdownValues, selectedValues, dropdownOptions, placeholder;
 
         if (withGroups) {
@@ -229,7 +227,7 @@ export default class PrincipalSearchField extends React.Component {
         );
         const dropdownProps = disabled ? {icon: null, renderLabel: renderDisabledLabel} : {search: opts => opts};
         const searchInput = {
-            onChange: ({target: {value: inputValue}}) => this.setState({searchQuery: inputValue, open: false}),
+            onChange: ({target: {value: inputValue}}) => this.setState({searchQuery: inputValue}),
             disabled: isFetching || disabled
         };
         return (
@@ -238,7 +236,6 @@ export default class PrincipalSearchField extends React.Component {
                       fluid
                       closeOnChange
                       {...dropdownProps}
-                      open={open}
                       minCharacters={3}
                       searchInput={searchInput}
                       searchQuery={searchQuery}
@@ -246,7 +243,7 @@ export default class PrincipalSearchField extends React.Component {
                       options={dropdownOptions}
                       value={dropdownValues}
                       placeholder={placeholder}
-                      onClose={() => this.setState({open: false, searchQuery: ''})}
+                      onClose={() => this.setState({searchQuery: '', options: []})}
                       onChange={(__, {value: val}) => {
                           let fieldValue;
                           if (multiple) {
@@ -255,7 +252,7 @@ export default class PrincipalSearchField extends React.Component {
                               fieldValue = this.userCache[val];
                           }
 
-                          this.setState({value: val, searchQuery: '', open: false});
+                          this.setState({value: val, searchQuery: ''});
                           onChange(fieldValue);
                       }}
                       onSearchChange={this.handleSearchChange}
