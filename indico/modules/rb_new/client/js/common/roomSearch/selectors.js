@@ -22,7 +22,7 @@ import {selectors as roomsSelectors} from '../rooms';
 
 export function roomSearchSelectorFactory(namespace) {
     const getFilters = ({[namespace]: stateSlice}) => stateSlice.filters;
-    const getSearchResultIds = ({[namespace]: stateSlice}) => stateSlice.search.results;
+    const getSearchResultIds = ({[namespace]: stateSlice}) => stateSlice.search.results.rooms;
     const isSearching = ({[namespace]: stateSlice}) => stateSlice.search.request.state === RequestState.STARTED;
 
     const getSearchResults = createSelector(
