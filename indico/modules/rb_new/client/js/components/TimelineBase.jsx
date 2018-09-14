@@ -51,6 +51,7 @@ export default class TimelineBase extends React.Component {
         itemClass: PropTypes.func,
         itemProps: PropTypes.object,
         longLabel: PropTypes.bool,
+        onClickLabel: PropTypes.func,
         disableDatePicker: PropTypes.bool,
         lazyScroll: PropTypes.object
     };
@@ -72,6 +73,7 @@ export default class TimelineBase extends React.Component {
         itemClass: TimelineItem,
         itemProps: {},
         longLabel: false,
+        onClickLabel: null,
         disableDatePicker: false,
         lazyScroll: null
     };
@@ -140,7 +142,7 @@ export default class TimelineBase extends React.Component {
     renderTimeline = () => {
         const {
             extraContent, legendLabels, maxHour, minHour, onClick, recurrenceType, rows, step, isLoading, itemClass,
-            itemProps, longLabel, lazyScroll
+            itemProps, longLabel, onClickLabel, lazyScroll
         } = this.props;
         const hourSeries = _.range(minHour, maxHour + step, step);
         return (
@@ -155,6 +157,7 @@ export default class TimelineBase extends React.Component {
                                      itemClass={itemClass}
                                      itemProps={itemProps}
                                      longLabel={longLabel}
+                                     onClickLabel={onClickLabel}
                                      isLoading={isLoading}
                                      lazyScroll={lazyScroll} />
                 </div>
