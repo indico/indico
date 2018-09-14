@@ -36,7 +36,7 @@ export default class DatePeriodField extends React.Component {
         disabled: false,
         disabledDate: null,
         initialValue: null,
-        format: 'll'
+        format: 'L'
     };
 
     constructor(props) {

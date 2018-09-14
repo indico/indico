@@ -29,7 +29,7 @@ import {BookingTimelineComponent} from './BookingTimeline';
 class UnavailableRoomsModal extends React.Component {
     static propTypes = {
         actions: PropTypes.object.isRequired,
-        availability: PropTypes.object,
+        availability: PropTypes.array,
         filters: PropTypes.object.isRequired,
         isFetching: PropTypes.bool.isRequired,
         dateRange: PropTypes.array.isRequired,
@@ -37,7 +37,7 @@ class UnavailableRoomsModal extends React.Component {
     };
 
     static defaultProps = {
-        availability: null,
+        availability: [],
         onClose: null
     };
 

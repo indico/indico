@@ -23,14 +23,12 @@ import RCCalendar from 'rc-calendar';
 import RangeCalendar from 'rc-calendar/lib/RangeCalendar';
 import DatePicker from 'rc-calendar/lib/Picker';
 import {Translate} from 'indico/react/i18n';
+import {serializeDate, serializeTime} from 'indico/utils/date';
 import TimeRangePicker from './TimeRangePicker';
-import {sanitizeRecurrence, serializeTime} from '../util';
+import {sanitizeRecurrence} from '../util';
 
 import './BookingBootstrapForm.module.scss';
 
-
-const _formatDateStr = 'YYYY-MM-DD';
-const _serializeDate = date => (date ? date.format(_formatDateStr) : null);
 
 export default class BookingBootstrapForm extends React.Component {
     static propTypes = {
@@ -42,27 +40,29 @@ export default class BookingBootstrapForm extends React.Component {
         defaults: PropTypes.object
     };
 
-    static defaultProps = {
-        children: null,
-        buttonCaption: <Translate>Search</Translate>,
-        onChange: () => {},
-        buttonDisabled: false,
-        defaults: {
-            recurrence: {
-                type: 'single',
-                number: 1,
-                interval: 'week'
-            },
-            dates: {
-                startDate: moment(),
-                endDate: null
-            },
-            timeSlot: {
-                startTime: moment().startOf('hour').add(1, 'h'),
-                endTime: moment().startOf('hour').add(2, 'h')
+    static get defaultProps() {
+        return {
+            children: null,
+            buttonCaption: <Translate>Search</Translate>,
+            onChange: () => {},
+            buttonDisabled: false,
+            defaults: {
+                recurrence: {
+                    type: 'single',
+                    number: 1,
+                    interval: 'week'
+                },
+                dates: {
+                    startDate: moment(),
+                    endDate: null
+                },
+                timeSlot: {
+                    startTime: moment().startOf('hour').add(1, 'h'),
+                    endTime: moment().startOf('hour').add(2, 'h')
+                }
             }
-        }
-    };
+        };
+    }
 
     constructor(props) {
         super(props);
@@ -140,8 +140,8 @@ export default class BookingBootstrapForm extends React.Component {
         return {
             recurrence,
             dates: {
-                startDate: _serializeDate(startDate),
-                endDate: _serializeDate(endDate)
+                startDate: serializeDate(startDate),
+                endDate: serializeDate(endDate)
             },
             timeSlot: {
                 startTime: serializeTime(startTime),
@@ -168,14 +168,14 @@ export default class BookingBootstrapForm extends React.Component {
             <RCCalendar selectedValue={startDate}
                         onSelect={(date) => this.updateDates(date, null)}
                         disabledDate={this.disabledDate}
-                        format={_formatDateStr} />
+                        format="L" />
         );
 
         const rangeCalendar = (
             <RangeCalendar onSelect={([start, end]) => this.updateDates(start, end)}
                            selectedValue={[startDate, endDate]}
                            disabledDate={this.disabledDate}
-                           format={_formatDateStr} />
+                           format="L" />
         );
 
         const recurrenceOptions = [
@@ -216,8 +216,8 @@ export default class BookingBootstrapForm extends React.Component {
                             {
                                 () => (
                                     <Form.Group inline>
-                                        <Form.Input styleName="booking-date" icon="calendar" value={_serializeDate(startDate) || ''} />
-                                        <Form.Input styleName="booking-date" icon="calendar" value={_serializeDate(endDate) || ''} />
+                                        <Form.Input styleName="booking-date" icon="calendar" value={moment(startDate).format('L') || ''} />
+                                        <Form.Input styleName="booking-date" icon="calendar" value={moment(endDate).format('L') || ''} />
                                     </Form.Group>
                                 )
                             }
@@ -230,7 +230,7 @@ export default class BookingBootstrapForm extends React.Component {
                             () => (
                                 <Form.Group inline>
                                     <Form.Input styleName="booking-date" icon="calendar"
-                                                value={_serializeDate(startDate) || ''} />
+                                                value={serializeDate(startDate, 'L') || ''} />
                                 </Form.Group>
                             )
                         }

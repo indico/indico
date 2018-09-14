@@ -27,6 +27,7 @@ import {Translate} from 'indico/react/i18n';
 import {ReduxFormField, formatters} from 'indico/react/forms';
 import PrincipalSearchField from 'indico/react/components/PrincipalSearchField';
 import DatePeriodField from 'indico/react/components/DatePeriodField';
+import {serializeDate} from 'indico/utils/date';
 import RoomSelector from '../../components/RoomSelector';
 import {getAllBlockings} from '../../modules/blockings/selectors';
 import {getFavoriteUsers} from '../../common/user/selectors';
@@ -148,8 +149,8 @@ class BlockingModal extends React.Component {
                             onChange={(values) => {
                                 if (values.length) {
                                     input.onChange({
-                                        startDate: moment(values[0], 'YYYY-MM-DD').format('YYYY-MM-DD'),
-                                        endDate: moment(values[1], 'YYYY-MM-DD').format('YYYY-MM-DD')
+                                        startDate: serializeDate(moment(values[0], 'YYYY-MM-DD')),
+                                        endDate: serializeDate(moment(values[1], 'YYYY-MM-DD'))
                                     });
                                 }
                             }}

@@ -19,12 +19,13 @@ import moment from 'moment';
 import {combineReducers} from 'redux';
 
 import {requestReducer} from 'indico/utils/redux';
+import {serializeDate} from 'indico/utils/date';
 import * as actions from '../../actions';
 import * as calendarActions from './actions';
 
 
 export const initialState = {
-    date: moment().format('YYYY-MM-DD'),
+    date: serializeDate(moment()),
     rows: [],
 };
 

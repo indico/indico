@@ -19,7 +19,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import 'rc-time-picker/assets/index.css';
 
-import {toMoment, serializeTime} from '../../../util';
+import {serializeTime, toMoment} from 'indico/utils/date';
 import FilterFormComponent from '../../../common/filters/FilterFormComponent';
 import TimeRangePicker from '../../../components/TimeRangePicker';
 

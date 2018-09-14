@@ -23,6 +23,7 @@ import {Button, Container, Message} from 'semantic-ui-react';
 import DatePicker from 'rc-calendar/lib/Picker';
 import Calendar from 'rc-calendar';
 import {Translate} from 'indico/react/i18n';
+import {toMoment} from 'indico/utils/date';
 import TimelineContent from './TimelineContent';
 import {isDateWithinRange} from '../util';
 import TimelineItem from './TimelineItem';
@@ -31,9 +32,6 @@ import {legendLabelShape} from '../props';
 
 import './Timeline.module.scss';
 
-
-const DATE_FORMAT = 'YYYY-MM-DD';
-const _toMoment = (date) => moment(date, DATE_FORMAT);
 
 export default class TimelineBase extends React.Component {
     static propTypes = {
@@ -83,7 +81,7 @@ export default class TimelineBase extends React.Component {
         if (!date) {
             return false;
         }
-        return dateRange.length !== 0 && !isDateWithinRange(date, dateRange, _toMoment);
+        return dateRange.length !== 0 && !isDateWithinRange(date, dateRange, toMoment);
     };
 
     changeSelectedDate = (mode) => {
@@ -94,8 +92,8 @@ export default class TimelineBase extends React.Component {
         if (dateRange.length === 0) {
             onDateChange(activeDate.clone().add(step, 'day'));
         } else {
-            const index = dateRange.findIndex((dt) => _toMoment(dt).isSame(activeDate)) + step;
-            onDateChange(_toMoment(dateRange[index]));
+            const index = dateRange.findIndex((dt) => toMoment(dt).isSame(activeDate)) + step;
+            onDateChange(toMoment(dateRange[index]));
         }
     };
 
@@ -103,15 +101,15 @@ export default class TimelineBase extends React.Component {
         const {dateRange, onDateChange} = this.props;
         const freeRange = dateRange.length === 0;
 
-        if (freeRange || isDateWithinRange(date, dateRange, _toMoment)) {
+        if (freeRange || isDateWithinRange(date, dateRange, toMoment)) {
             onDateChange(date);
         }
     };
 
     renderDateSwitcher = () => {
         const {activeDate, dateRange, disableDatePicker, isLoading} = this.props;
-        const startDate = _toMoment(dateRange[0]);
-        const endDate = _toMoment(dateRange[dateRange.length - 1]);
+        const startDate = toMoment(dateRange[0]);
+        const endDate = toMoment(dateRange[dateRange.length - 1]);
         const calendar = <Calendar disabledDate={this.calendarDisabledDate} onChange={this.onSelect} />;
         const freeRange = dateRange.length === 0;
         return (
@@ -124,7 +122,7 @@ export default class TimelineBase extends React.Component {
                         {
                             () => (
                                 <Button primary>
-                                    {activeDate.format(DATE_FORMAT)}
+                                    {activeDate.format('L')}
                                 </Button>
                             )
                         }

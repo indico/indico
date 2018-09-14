@@ -19,6 +19,7 @@ import fetchUserInfoURL from 'indico-url:rooms_new.user_info';
 import favoriteRoomsURL from 'indico-url:rooms_new.favorite_rooms';
 
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
+import {setMomentLocale} from 'indico/utils/date';
 import {ajaxAction} from 'indico/utils/redux';
 
 
@@ -37,12 +38,17 @@ export const DEL_FAVORITE_ROOM = 'user/DEL_FAVORITE_ROOM';
 
 
 export function fetchUserInfo() {
-    return ajaxAction(
-        () => indicoAxios.get(fetchUserInfoURL()),
-        FETCH_USER_INFO_REQUEST,
-        [USER_INFO_RECEIVED, FETCH_USER_INFO_SUCCESS],
-        FETCH_USER_INFO_ERROR
-    );
+    return async (dispatch) => {
+        const result = await ajaxAction(
+            () => indicoAxios.get(fetchUserInfoURL()),
+            FETCH_USER_INFO_REQUEST,
+            [USER_INFO_RECEIVED, FETCH_USER_INFO_SUCCESS],
+            FETCH_USER_INFO_ERROR
+        )(dispatch);
+
+        await setMomentLocale(result.data.language);
+        return result;
+    };
 }
 
 async function _sendFavoriteRoomsRequest(method, id = null) {

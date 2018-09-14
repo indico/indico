@@ -27,6 +27,7 @@ import LazyScroll from 'redux-lazy-scroll';
 
 import {Slot, toClasses} from 'indico/react/util';
 import {PluralTranslate, Translate, Singular, Param, Plural} from 'indico/react/i18n';
+import {serializeTime} from 'indico/utils/date';
 import mapControllerFactory from '../../containers/MapController';
 import searchBoxFactory from '../../containers/SearchBar';
 import Room from '../../containers/Room';
@@ -275,10 +276,10 @@ class BookRoom extends React.Component {
         let {filters: {timeSlot: {startTime, endTime}}} = this.props;
 
         if (filter === 'duration') {
-            endTime = moment(endTime, 'HH:mm').subtract(value, 'minutes').format('HH:mm');
+            endTime = serializeTime(moment(endTime, 'HH:mm').subtract(value, 'minutes'));
         } else if (filter === 'time') {
-            startTime = moment(startTime, 'HH:mm').add(value, 'minutes').format('HH:mm');
-            endTime = moment(endTime, 'HH:mm').add(value, 'minutes').format('HH:mm');
+            startTime = serializeTime(moment(startTime, 'HH:mm').add(value, 'minutes'));
+            endTime = serializeTime(moment(endTime, 'HH:mm').add(value, 'minutes'));
         }
         setFilterParameter('timeSlot', {startTime, endTime});
     };
