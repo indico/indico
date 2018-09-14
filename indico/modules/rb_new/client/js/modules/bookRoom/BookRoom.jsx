@@ -392,7 +392,7 @@ const mapStateToProps = (state) => {
         roomDetailsFetching: roomsSelectors.isFetchingDetails(state),
         isInitializing: globalSelectors.isInitializing(state),
         queryString: stateToQueryString(state.bookRoom, qsFilterRules, qsBookRoomRules),
-        showMap: globalSelectors.isMapReady(state),
+        showMap: globalSelectors.isMapVisible(state),
     };
 };
 

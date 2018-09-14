@@ -31,8 +31,8 @@ export function mapReducerFactory(namespace) {
     return (state = initialMapState, action) => {
         // aspect updates are global and need to run regardless of the namespace
         if (action.type === actions.UPDATE_ASPECTS) {
-            const defaultAspect = action.aspects.find(aspect => aspect.default_on_startup);
-            return {...state, bounds: defaultAspect ? getAspectBounds(defaultAspect) : []};
+            const defaultAspect = action.aspects.find(aspect => aspect.default_on_startup) || action.aspects[0];
+            return {...state, bounds: defaultAspect ? getAspectBounds(defaultAspect) : null};
         }
 
         if (action.namespace !== namespace) {

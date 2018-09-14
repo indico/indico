@@ -298,7 +298,7 @@ export default connect(
         results: roomsListSelectors.getSearchResults(state),
         isSearching: roomsListSelectors.isSearching(state),
         roomDetailsFetching: roomsSelectors.isFetchingDetails(state),
-        showMap: selectors.isMapReady(state),
+        showMap: selectors.isMapVisible(state),
         isInitializing: selectors.isInitializing(state),
         queryString: stateToQueryString(state.roomList, queryStringSerializer), // for pushStateMergeProps
     }),

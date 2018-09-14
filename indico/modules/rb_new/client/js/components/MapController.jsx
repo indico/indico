@@ -31,7 +31,7 @@ export default class MapController extends React.Component {
     static propTypes = {
         rooms: PropTypes.arrayOf(PropTypes.object).isRequired,
         search: PropTypes.bool.isRequired,
-        bounds: PropTypes.object.isRequired,
+        bounds: PropTypes.object,
         filterBounds: PropTypes.object,
         aspects: PropTypes.array.isRequired,
         toggleMapSearch: PropTypes.func.isRequired,
@@ -39,7 +39,8 @@ export default class MapController extends React.Component {
     };
 
     static defaultProps = {
-        filterBounds: null
+        filterBounds: null,
+        bounds: null,
     };
 
     constructor(props) {
