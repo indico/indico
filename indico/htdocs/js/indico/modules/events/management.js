@@ -110,6 +110,20 @@
         $('.js-reset-role-filter').toggleClass('disabled', isInitialState);
     }
 
+    function initTooltip() {
+        $('.js-show-regforms').qtip({
+            content: {
+                text: function() {
+                    return $(this).data('title');
+                }
+            },
+            hide: {
+                delay: 100,
+                fixed: true
+            }
+        });
+    }
+
     global.setupEventPersonsList = function setupEventPersonsList(options) {
         options = $.extend({
             hasNoAccountFilter: false
@@ -208,17 +222,7 @@
             });
         }
 
-        $('.js-show-regforms').qtip({
-            content: {
-                text: function() {
-                    return $(this).data('title');
-                }
-            },
-            hide: {
-                delay: 100,
-                fixed: true
-            }
-        });
+        initTooltip();
 
         var $personFilters = $('#person-filters');
         // Sets background color of role filter items based on their colored squared color
@@ -248,6 +252,8 @@
             $checkbox.prop('checked', !$checkbox.prop('checked')).trigger('change');
             toggleResetBtn();
         });
+
+        $('#event-participants-list').on('indico:htmlUpdated', initTooltip);
     };
 
 
