@@ -31,8 +31,6 @@ export default class SearchBar extends React.Component {
         setFilterParameter: PropTypes.func.isRequired,
         filters: PropTypes.object.isRequired,
         buildings: PropTypes.object.isRequired,
-        onConfirm: PropTypes.func.isRequired,
-        onTextChange: PropTypes.func.isRequired
     };
 
     constructor(props) {
@@ -66,8 +64,6 @@ export default class SearchBar extends React.Component {
         this.toggleFiltersPopup(false);
 
         if (filtersChanged) {
-            const {onConfirm} = this.props;
-            onConfirm();
             this.setState({filtersChanged: false});
         }
     };
@@ -99,14 +95,13 @@ export default class SearchBar extends React.Component {
     };
 
     updateTextFilter = (filterValue) => {
-        const {setFilterParameter, onTextChange} = this.props;
+        const {setFilterParameter} = this.props;
         const {building, text: roomName, floor} = parseSearchBarText(filterValue);
         const stateUpdates = {inputTextValue: filterValue, building, floor, roomName};
 
         this.setState(stateUpdates, () => {
             this.composeInputTextValue();
             setFilterParameter('text', filterValue);
-            onTextChange();
         });
     };
 

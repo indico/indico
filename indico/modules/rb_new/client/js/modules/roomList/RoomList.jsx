@@ -208,7 +208,7 @@ class RoomList extends React.Component {
                                     )}
                                 </Grid.Column>
                             </Grid>
-                            <SearchBar onConfirm={() => null} onTextChange={() => null} />
+                            <SearchBar />
                         </Sticky>
                         <div styleName="results-count">
                             {matching === 0 && !isFetching && Translate.string('There are no rooms matching the criteria')}

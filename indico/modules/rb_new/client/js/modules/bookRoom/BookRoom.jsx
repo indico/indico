@@ -131,7 +131,7 @@ class BookRoom extends React.Component {
                     <div styleName="filter-row-filters">
                         <BookingFilterBar />
                         <RoomFilterBar />
-                        <SearchBar onConfirm={() => null} onTextChange={() => null} />
+                        <SearchBar />
                     </div>
                     {this.renderViewSwitch()}
                 </div>
