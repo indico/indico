@@ -50,9 +50,11 @@ const baseTimelineReducer = (requestAction, successAction, errorAction) => (stat
 };
 
 function timelineReducer(state = {...initialTimelineState, isVisible: false}, action) {
-    const reducer = baseTimelineReducer(actions.FETCH_TIMELINE_DATA_STARTED,
-                                        actions.UPDATE_TIMELINE_DATA,
-                                        actions.FETCH_TIMELINE_DATA_FAILED);
+    const reducer = baseTimelineReducer(
+        actions.FETCH_TIMELINE_DATA_STARTED,
+        actions.UPDATE_TIMELINE_DATA,
+        actions.FETCH_TIMELINE_DATA_FAILED
+    );
     state = reducer(state, action);
 
     switch (action.type) {
@@ -64,9 +66,11 @@ function timelineReducer(state = {...initialTimelineState, isVisible: false}, ac
     return state;
 }
 
-const unavailableReducer = baseTimelineReducer(actions.FETCH_UNAVAILABLE_ROOMS_STARTED,
-                                               actions.UPDATE_UNAVAILABLE_ROOMS,
-                                               actions.FETCH_UNAVAILABLE_ROOMS_FAILED);
+const unavailableReducer = baseTimelineReducer(
+    actions.FETCH_UNAVAILABLE_ROOMS_STARTED,
+    actions.UPDATE_UNAVAILABLE_ROOMS,
+    actions.FETCH_UNAVAILABLE_ROOMS_FAILED
+);
 
 const initialSuggestionsState = {
     isFetching: false,
