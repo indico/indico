@@ -98,5 +98,18 @@ $row-height: 50px;
 
     & + .timeline-loader {
         margin-top: 2em !important;
+        color: rgba(0, 0, 0, 0.87) !important;
+
+        &:not(.active) {
+            display: none;
+        }
+
+        &::before {
+            border-color: rgba(0, 0, 0, 0.1) !important;
+        }
+
+        &::after {
+            border-color: $sui-grey transparent transparent !important;
+        }
     }
 }
