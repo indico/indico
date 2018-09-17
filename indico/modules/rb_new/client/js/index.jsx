@@ -32,7 +32,7 @@ import {selectors as configSelectors} from './common/config';
 import {selectors as userSelectors} from './common/user';
 
 
-document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener('DOMContentLoaded', () => {
     const appContainer = document.getElementById('rb-app-container');
     const store = createRBStore();
 
