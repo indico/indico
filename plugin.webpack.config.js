@@ -20,6 +20,7 @@
 
 const path = require('path');
 const process = require('process');
+const glob = require('glob');
 const merge = require('webpack-merge');
 const _ = require('lodash');
 
@@ -33,12 +34,40 @@ if (!_.isEmpty(config.themes)) {
     Object.assign(entry, base.getThemeEntryPoints(config, './themes/'));
 }
 
+
+function generateModuleAliases() {
+    return glob.sync(path.join(config.indico.build.rootPath, 'modules/**/module.json')).map(file => {
+        const mod = {produceBundle: true, partials: {}, ...require(file)};
+        const dirName = path.join(path.dirname(file), 'client/js');
+        const modulePath = path.join('indico/modules', mod.parent || '', mod.name);
+        return {
+            name: modulePath,
+            alias: dirName,
+            onlyModule: false
+        };
+    });
+}
+
 module.exports = (env) => {
-    return merge(base.webpackDefaults(env, config), {
+    return merge.strategy({
+        'resolve.alias': 'prepend'
+    })(base.webpackDefaults(env, config, bundles), {
         entry,
         externals: {
-            jquery: 'jQuery',
-            moment: 'moment'
+            jquery: 'jQuery'
+        },
+        module: {
+            rules: [
+                {
+                    test: /.*\.(jpe?g|png|gif|svg|woff2?|ttf|eot)$/,
+                    use: {
+                        loader: 'file-loader'
+                    }
+                }
+            ]
+        },
+        resolve: {
+            alias: generateModuleAliases()
         }
     });
 };

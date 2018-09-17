@@ -80,7 +80,7 @@ export function generateAssetPath(config, virtualVersion = false) {
     };
 }
 
-export function webpackDefaults(env, config) {
+export function webpackDefaults(env, config, bundles) {
     const globalBuildConfig = config.indico ? config.indico.build : config.build;
     const currentEnv = (env ? env.NODE_ENV : null) || 'development';
     const nodeModules = [path.join(config.build.indicoSourcePath || path.resolve(config.build.rootPath, '..'),
@@ -106,6 +106,21 @@ export function webpackDefaults(env, config) {
     function getDevtoolFilename(info) {
         const root = path.resolve(globalBuildConfig.rootPath, '..');
         return path.relative(root, info.absoluteResourcePath);
+    }
+
+    function sassOverrider(url) {
+        const match = url.match(/^(\w+):([\w/-_]+)/);
+        if (match) {
+            if (config.isPlugin) {
+                const {sassOverrides} = bundles;
+                if (sassOverrides && sassOverrides[url]) {
+                    return {file: path.join(config.build.clientPath, sassOverrides[url])};
+                }
+            }
+            const modPath = path.join(globalBuildConfig.rootPath, 'modules', match[1]);
+            return {file: path.join(modPath, 'client', match[2])};
+        }
+        return null;
     }
 
     function buildSCSSLoader(cssLoaderOptions = {}) {
@@ -146,7 +161,7 @@ export function webpackDefaults(env, config) {
                     sourceMap: true,
                     includePaths: [scssIncludePath],
                     outputStyle: 'compact',
-                    importer: importOnce,
+                    importer: [sassOverrider, importOnce],
                 }
             }],
         });
@@ -209,7 +224,7 @@ export function webpackDefaults(env, config) {
                         {
                             test: /\.module\.scss$/,
                             use: buildSCSSLoader({
-                                context: path.resolve(config.build.clientPath, '../../modules'),
+                                context: path.resolve(globalBuildConfig.clientPath, '../../modules'),
                                 modules: true,
                                 importLoaders: 1,
                                 localIdentName: '[path]___[name]__[local]___[hash:base64:5]'
