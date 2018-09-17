@@ -151,7 +151,7 @@ class BookRoomModal extends React.Component {
             const {booking} = this.state;
             const bookingLink = (
                 // TODO: add link to view booking details
-                <a style={{cursor: 'pointer'}} onClick={() => alert(`TODO: View booking ${booking.id}`)} />
+                <a onClick={() => alert(`TODO: View booking ${booking.id}`)} />
             );
             return (
                 <Message color={values.isPrebooking ? 'orange' : 'green'}>
@@ -305,7 +305,7 @@ class BookRoomModal extends React.Component {
         const bookingBlocked = ({submitting, submitSucceeded}) => submitting || submitSucceeded;
         const buttonsBlocked = (fprops) => bookingBlocked(fprops) || (conflictsExist && !skipConflicts);
         const {is_auto_confirm: isDirectlyBookable} = room;
-        const link = <a style={{cursor: 'pointer'}} onClick={() => this.setState({bookingConflictsVisible: true})} />;
+        const link = <a onClick={() => this.setState({bookingConflictsVisible: true})} />;
         const legendLabels = [
             {label: Translate.string('Available'), color: 'green'},
             {label: Translate.string('Booked'), color: 'orange'},

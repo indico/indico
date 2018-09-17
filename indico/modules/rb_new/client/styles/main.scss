@@ -24,6 +24,10 @@ body {
     overflow-y: scroll;
 }
 
+a {
+    cursor: pointer;
+}
+
 // TODO: move this to Indico-wide file
 .indico-top-bar {
     background-color: $dark-blue;

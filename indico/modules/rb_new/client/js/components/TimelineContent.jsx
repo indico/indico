@@ -159,10 +159,7 @@ function TimelineRowLabel({label, availability, longLabel, onClickLabel}) {
     const roomLabel = (
         <span>
             {availability && <Icon name="circle" size="tiny" color={color} styleName="dot" />}
-            {onClickLabel
-                ? <a style={{cursor: 'pointer'}} onClick={onClickLabel}>{label}</a>
-                : <span>{label}</span>
-            }
+            {onClickLabel ? <a onClick={onClickLabel}>{label}</a> : <span>{label}</span>}
         </span>
     );
 
