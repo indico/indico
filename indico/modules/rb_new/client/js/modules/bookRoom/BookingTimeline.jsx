@@ -65,7 +65,7 @@ export class BookingTimelineComponent extends React.Component {
 
     get singleRoom() {
         const {availability} = this.props;
-        return availability.length === 1 && availability[0];
+        return availability.length === 1 && availability[0][1];
     }
 
     _getRowSerializer(dt, singleRoom = false) {
