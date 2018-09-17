@@ -36,9 +36,9 @@ const baseTimelineReducer = (requestAction, successAction, errorAction) => (stat
     switch (action.type) {
         case requestAction:
             return {...state, isFetching: true};
-        case successAction:
-            return {...state, isFetching: false};
         case errorAction:
+            return {...state, isFetching: false};
+        case successAction:
             return {
                 ...state,
                 isFetching: false,
@@ -51,8 +51,8 @@ const baseTimelineReducer = (requestAction, successAction, errorAction) => (stat
 
 function timelineReducer(state = {...initialTimelineState, isVisible: false}, action) {
     const reducer = baseTimelineReducer(actions.FETCH_TIMELINE_DATA_STARTED,
-                                        actions.FETCH_TIMELINE_DATA_FAILED,
-                                        actions.UPDATE_TIMELINE_DATA);
+                                        actions.UPDATE_TIMELINE_DATA,
+                                        actions.FETCH_TIMELINE_DATA_FAILED);
     state = reducer(state, action);
 
     switch (action.type) {
@@ -65,8 +65,8 @@ function timelineReducer(state = {...initialTimelineState, isVisible: false}, ac
 }
 
 const unavailableReducer = baseTimelineReducer(actions.FETCH_UNAVAILABLE_ROOMS_STARTED,
-                                               actions.FETCH_UNAVAILABLE_ROOMS_FAILED,
-                                               actions.UPDATE_UNAVAILABLE_ROOMS);
+                                               actions.UPDATE_UNAVAILABLE_ROOMS,
+                                               actions.FETCH_UNAVAILABLE_ROOMS_FAILED);
 
 const initialSuggestionsState = {
     isFetching: false,
