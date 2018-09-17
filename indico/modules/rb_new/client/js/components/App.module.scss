@@ -15,7 +15,8 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-@import '../../styles/util';
+@import 'rb_new:styles/util';
+@import 'rb_new:styles/palette';
 
 .rb-layout {
     // this will reset the stacking context,

@@ -15,9 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-@import 'base/palette';
-
-$text-blue: #2a606b;
+@import 'rb_new:styles/palette';
 
 @keyframes fade-slide-down {
     0% {
@@ -37,14 +35,13 @@ $text-blue: #2a606b;
     flex-direction: column;
 
     &::before {
+        @extend %rb-splash-background;
         content: ' ';
         position: absolute;
         left: 0;
         box-sizing: border-box;
         height: calc(100vh - 125px);
         width: 120%;
-        background-image: url('static:images/globe.png');
-        background-size: cover;
         animation: fade-slide-down 2s ease-out forwards;
     }
 
@@ -75,7 +72,7 @@ $text-blue: #2a606b;
             }
 
             &:global(.checked) {
-                background-color: #45ba97;
+                background-color: $dark-highlight-color;
 
                 :global(label) {
                     color: #fff;
@@ -115,7 +112,7 @@ $text-blue: #2a606b;
             :global(.ui.statistic) {
 
                 :global(.value), :global(.label) {
-                    color: #7dcfb6;
+                    color: $highlight-color;
                 }
 
                 &:not(:last-child) {
