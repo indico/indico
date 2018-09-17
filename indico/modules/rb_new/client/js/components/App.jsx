@@ -35,11 +35,18 @@ import './App.module.scss';
 
 export default class App extends React.Component {
     static propTypes = {
+        title: PropTypes.string,
+        iconName: PropTypes.string,
         history: PropTypes.object.isRequired,
         filtersSet: PropTypes.bool.isRequired,
         isInitializing: PropTypes.bool.isRequired,
         fetchInitialData: PropTypes.func.isRequired,
         resetPageState: PropTypes.func.isRequired
+    };
+
+    static defaultProps = {
+        title: Translate.string('Room Booking'),
+        iconName: 'home'
     };
 
     componentDidMount() {
@@ -48,7 +55,7 @@ export default class App extends React.Component {
     }
 
     render() {
-        const {history, filtersSet, resetPageState, isInitializing} = this.props;
+        const {title, history, iconName, filtersSet, resetPageState, isInitializing} = this.props;
 
         return (
             <ConnectedRouter history={history}>
@@ -56,9 +63,9 @@ export default class App extends React.Component {
                     <header styleName="rb-menu-bar">
                         <div styleName="rb-menu-bar-side-left">
                             <h1>
-                                <Icon name="home" />
+                                <Icon name={iconName} />
                                 <Link to="/" onClick={() => resetPageState('bookRoom')}>
-                                    <Translate>Room Booking</Translate>
+                                    {title}
                                 </Link>
                             </h1>
                         </div>
