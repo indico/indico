@@ -243,7 +243,8 @@ export default class PrincipalSearchField extends React.Component {
                       options={dropdownOptions}
                       value={dropdownValues}
                       placeholder={placeholder}
-                      onClose={() => this.setState({searchQuery: '', options: []})}
+                      onClose={() => this.setState({searchQuery: ''})}
+                      onOpen={() => this.setState({options: []})}
                       onChange={(__, {value: val}) => {
                           let fieldValue;
                           if (multiple) {
