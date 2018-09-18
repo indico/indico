@@ -18,6 +18,10 @@ from __future__ import unicode_literals
 
 from datetime import timedelta
 
+from indico.core.db import db
+from indico.core.db.sqlalchemy.util.queries import db_dates_overlap
+from indico.modules.rb.models.blocked_rooms import BlockedRoom, BlockedRoomState
+from indico.modules.rb.models.blockings import Blocking
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import RepeatFrequency
 from indico.modules.rb.models.rooms import Room

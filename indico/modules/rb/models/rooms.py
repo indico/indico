@@ -568,11 +568,14 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
             valid_states = (BlockedRoom.State.accepted, BlockedRoom.State.pending)
         else:
             valid_states = (BlockedRoom.State.accepted,)
-        blocking_criteria = [BlockedRoom.blocking_id == Blocking.id,
+        blocking_criteria = [Room.id == BlockedRoom.room_id,
                              BlockedRoom.state.in_(valid_states),
                              Blocking.start_date <= end_dt.date(),
                              Blocking.end_date >= start_dt.date()]
-        blockings_filter = Room.blocked_rooms.any(and_(*blocking_criteria))
+        blockings_filter = (BlockedRoom.query
+                            .join(Blocking.blocked_rooms)
+                            .exists()
+                            .where(and_(*blocking_criteria)))
         return ~occurrences_filter & ~blockings_filter
 
     @staticmethod
