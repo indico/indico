@@ -26,7 +26,7 @@ from indico.modules.rb.models.reservation_occurrences import ReservationOccurren
 from indico.modules.rb.models.reservations import RepeatFrequency
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb_new.operations.blockings import get_rooms_blockings
-from indico.modules.rb_new.operations.bookings import get_existing_room_occurrences
+from indico.modules.rb_new.operations.bookings import get_existing_rooms_occurrences
 from indico.modules.rb_new.operations.conflicts import get_rooms_conflicts
 from indico.modules.rb_new.operations.misc import get_rooms_nonbookable_periods, get_rooms_unbookable_hours
 from indico.modules.rb_new.operations.rooms import search_for_rooms
@@ -59,18 +59,22 @@ def get_suggestions(filters, limit=None):
 
 def get_single_booking_suggestions(rooms, start_dt, end_dt, limit=None):
     data = []
+    new_start_dt = start_dt - timedelta(minutes=BOOKING_TIME_DIFF)
+    new_end_dt = end_dt + timedelta(minutes=BOOKING_TIME_DIFF)
+    rooms_occurrences = get_existing_rooms_occurrences(rooms, new_start_dt, new_end_dt, RepeatFrequency.NEVER, None,
+                                                       allow_overlapping=True)
     for room in rooms:
         if limit and len(data) == limit:
             break
 
         suggestions = {}
-        suggested_time = get_start_time_suggestion(room, start_dt, end_dt)
+        suggested_time = get_start_time_suggestion(rooms_occurrences.get(room.id, []), start_dt, end_dt)
         if suggested_time:
             suggested_time_change = (suggested_time - start_dt).total_seconds() / 60
             if suggested_time_change:
                 suggestions['time'] = suggested_time_change
 
-        duration_suggestion = get_duration_suggestion(room, start_dt, end_dt)
+        duration_suggestion = get_duration_suggestion(rooms_occurrences.get(room.id, []), start_dt, end_dt)
         original_duration = (end_dt - start_dt).total_seconds() / 60
         if duration_suggestion and duration_suggestion <= DURATION_FACTOR * original_duration:
             suggestions['duration'] = duration_suggestion
@@ -97,14 +101,13 @@ def get_number_of_skipped_days_for_rooms(rooms, start_dt, end_dt, repeat_frequen
     return sorted(data, key=lambda item: item['suggestions']['skip'])
 
 
-def get_start_time_suggestion(room, from_, to):
+def get_start_time_suggestion(occurrences, from_, to):
     duration = (to - from_).total_seconds() / 60
     new_start_dt = from_ - timedelta(minutes=BOOKING_TIME_DIFF)
     new_end_dt = to + timedelta(minutes=BOOKING_TIME_DIFF)
-    occurrences = get_existing_room_occurrences(room, new_start_dt, new_end_dt, allow_overlapping=True)
 
     if not occurrences:
-        return from_ - timedelta(minutes=BOOKING_TIME_DIFF)
+        return new_start_dt
 
     candidates = []
     period_start = new_start_dt
@@ -124,8 +127,7 @@ def get_start_time_suggestion(room, from_, to):
             return start
 
 
-def get_duration_suggestion(room, from_, to):
-    occurrences = get_existing_room_occurrences(room, from_, to, allow_overlapping=True)
+def get_duration_suggestion(occurrences, from_, to):
     old_duration = (to - from_).total_seconds() / 60
     duration = old_duration
     for occurrence in occurrences:
