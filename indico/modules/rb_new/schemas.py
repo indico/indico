@@ -17,7 +17,9 @@
 from __future__ import unicode_literals
 
 from flask import session
+from marshmallow import Schema, ValidationError, fields, validate, validates_schema
 from marshmallow.fields import Boolean, Function, Nested, String
+from marshmallow_enum import EnumField
 
 from indico.core.marshmallow import mm
 from indico.modules.rb.models.aspects import Aspect
@@ -26,7 +28,7 @@ from indico.modules.rb.models.blocking_principals import BlockingPrincipal
 from indico.modules.rb.models.blockings import Blocking
 from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
-from indico.modules.rb.models.reservations import Reservation
+from indico.modules.rb.models.reservations import RepeatFrequency, Reservation
 from indico.modules.rb.models.room_attributes import RoomAttributeAssociation
 from indico.modules.rb.models.room_bookable_hours import BookableHours
 from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
@@ -139,6 +141,25 @@ class RBUserSchema(UserSchema):
         return has_managed_rooms(user)
 
 
+class CreateBookingSchema(Schema):
+    start_dt = fields.DateTime(required=True)
+    end_dt = fields.DateTime(required=True)
+    repeat_frequency = EnumField(RepeatFrequency, required=True)
+    repeat_interval = fields.Int(missing=0, validate=lambda x: x >= 0)
+    room_id = fields.Int(required=True)
+    user_id = fields.Int()
+    booking_reason = fields.String(load_from='reason', validate=validate.Length(min=3))
+    is_prebooking = fields.Bool(missing=False)
+
+    class Meta:
+        strict = True
+
+    @validates_schema
+    def validate_dts(self, data):
+        if data['start_dt'] >= data['end_dt']:
+            raise ValidationError(_('Booking cannot end before it starts'))
+
+
 rb_user_schema = RBUserSchema()
 rooms_schema = RoomSchema(many=True, only=_room_fields)
 room_details_schema = RoomSchema()
@@ -151,3 +172,4 @@ simple_blockings_schema = BlockingSchema(many=True, only=('id', 'reason'))
 nonbookable_periods_schema = NonBookablePeriodSchema(many=True)
 bookable_hours_schema = BookableHoursSchema()
 locations_schema = LocationsSchema(many=True)
+create_booking_args = CreateBookingSchema()
