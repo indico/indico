@@ -127,7 +127,7 @@ class RHCreateBooking(RHRoomBookingBase):
         if not self._validate_room_booking_limit(args['start_dt'], args['end_dt'], booking_limit_days):
             msg = (_('Bookings for the room "{}" may not be longer than {} days')
                    .format(room.name, booking_limit_days))
-            return jsonify(success=False, msg=msg)
+            raise ExpectedError(msg)
 
         try:
             resv = Reservation.create_from_data(room, dict(args, booked_for_user=booked_for), session.user,
