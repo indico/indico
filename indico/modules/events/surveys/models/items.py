@@ -21,6 +21,7 @@ from sqlalchemy.event import listens_for
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
+from indico.core.db.sqlalchemy.descriptions import DescriptionMixin, RenderMode
 from indico.modules.events.surveys.fields import get_field_types
 from indico.util.string import return_ascii, text_to_repr
 from indico.util.struct.enum import IndicoEnum
@@ -44,7 +45,7 @@ class SurveyItemType(int, IndicoEnum):
     text = 3
 
 
-class SurveyItem(db.Model):
+class SurveyItem(DescriptionMixin, db.Model):
     __tablename__ = 'items'
     __table_args__ = (db.CheckConstraint("type != {type} OR ("
                                          "title IS NOT NULL AND "
@@ -74,6 +75,9 @@ class SurveyItem(db.Model):
         'polymorphic_on': 'type',
         'polymorphic_identity': None
     }
+
+    possible_render_modes = {RenderMode.markdown}
+    default_render_mode = RenderMode.markdown
 
     #: The ID of the item
     id = db.Column(
@@ -110,12 +114,6 @@ class SurveyItem(db.Model):
         db.String,
         nullable=True,
         default=_get_item_default_title
-    )
-    #: The description of the item
-    description = db.Column(
-        db.Text,
-        nullable=False,
-        default=''
     )
     #: If a section should be rendered as a section
     display_as_section = db.Column(
