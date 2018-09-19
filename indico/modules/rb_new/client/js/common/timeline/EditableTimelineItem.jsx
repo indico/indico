@@ -33,10 +33,12 @@ export default class EditableTimelineItem extends React.Component {
         endHour: PropTypes.number.isRequired,
         onAddSlot: PropTypes.func.isRequired,
         room: PropTypes.object.isRequired,
-        setSelectable: PropTypes.func
+        setSelectable: PropTypes.func,
+        onClick: PropTypes.func,
     };
 
     static defaultProps = {
+        onClick: null,
         setSelectable: null
     };
 

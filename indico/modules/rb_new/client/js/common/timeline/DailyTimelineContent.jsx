@@ -96,6 +96,7 @@ export default class DailyTimelineContent extends React.Component {
                                   longLabel={longLabel}
                                   onClickLabel={this.onClickLabel(room.id)} />
                 <div styleName="timeline-row-content" style={{flex: columns}}>
+
                     <ItemClass startHour={minHour} endHour={maxHour} data={availability} room={room}
                                onClick={() => {
                                    if (onClick && (!hasConflicts || recurrenceType !== 'single')) {

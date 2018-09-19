@@ -167,6 +167,7 @@ class Calendar extends React.Component {
                             <TimelineBase rows={rows.map(this._getRowSerializer(date || serializeDate(moment())))}
                                           onClickLabel={openRoomDetails}
                                           isLoading={isFetching}
+                                          onClick={this.openDetailsModal}
                                           itemClass={EditableTimelineItem}
                                           itemProps={{onAddSlot: this.onAddSlot}}
                                           showUnused={showUnused}

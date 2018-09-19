@@ -38,6 +38,7 @@ const classes = {
 const types = {
     candidates: 'candidate',
     blockings: 'blocking',
+    bookings: 'booking',
     nonbookablePeriods: 'unbookable-periods',
     unbookableHours: 'unbookable-hours',
 };
@@ -96,9 +97,9 @@ export default class TimelineItem extends React.Component {
             end_time: endTime,
             reservation,
             reason,
-            bookable
+            bookable,
         } = occurrence;
-        const {startHour, endHour, onClick} = this.props;
+        const {startHour, endHour, onClick, room} = this.props;
         if (type === 'blocking') {
             segmentStartDt = moment(startHour, 'HH:mm');
             segmentEndDt = moment(endHour, 'HH:mm');
@@ -143,9 +144,16 @@ export default class TimelineItem extends React.Component {
                 </div>
             );
         }
-
         const segment = (
-            <div className={additionalClasses} onClick={onClick && bookable && type === 'candidate' ? onClick : null}
+            <div className={additionalClasses} onClick={() => {
+                if (onClick) {
+                    if (bookable && type === 'candidate') {
+                        onClick(room);
+                    } else if (type === 'booking') {
+                        onClick(reservation);
+                    }
+                }
+            }}
                  styleName="timeline-occurrence"
                  style={{left: `${segmentPosition}%`, width: `calc(${segmentWidth}% + 1px)`}} />
         );
