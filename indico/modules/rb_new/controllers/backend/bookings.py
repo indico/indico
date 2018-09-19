@@ -19,8 +19,8 @@ from __future__ import unicode_literals
 from datetime import date, datetime, time
 
 from flask import jsonify, request, session
+from marshmallow import fields
 from marshmallow_enum import EnumField
-from webargs import fields, validate
 from webargs.flaskparser import use_args, use_kwargs
 from werkzeug.exceptions import NotFound
 
@@ -33,7 +33,7 @@ from indico.modules.rb.models.rooms import Room
 from indico.modules.rb_new.controllers.backend.common import search_room_args
 from indico.modules.rb_new.operations.bookings import get_room_calendar, get_rooms_availability
 from indico.modules.rb_new.operations.suggestions import get_suggestions
-from indico.modules.rb_new.schemas import reservation_schema
+from indico.modules.rb_new.schemas import create_booking_args, reservation_schema
 from indico.modules.rb_new.util import (serialize_blockings, serialize_nonbookable_periods, serialize_occurrences,
                                         serialize_unbookable_hours)
 from indico.modules.users.models.users import User
@@ -106,16 +106,7 @@ class RHCreateBooking(RHRoomBookingBase):
         selected_period_days = (day_end_dt - day_start_dt).days
         return selected_period_days <= booking_limit_days
 
-    @use_args({
-        'start_dt': fields.DateTime(required=True),
-        'end_dt': fields.DateTime(required=True),
-        'repeat_frequency': EnumField(RepeatFrequency, required=True),
-        'repeat_interval': fields.Int(missing=0),
-        'room_id': fields.Int(required=True),
-        'user_id': fields.Int(),
-        'booking_reason': fields.String(load_from='reason', validate=validate.Length(min=3)),
-        'is_prebooking': fields.Bool(missing=False)
-    })
+    @use_args(create_booking_args)
     def _process(self, args):
         room = Room.get_one(args.pop('room_id'))
         user_id = args.pop('user_id', None)
