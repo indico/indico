@@ -15,6 +15,7 @@ Bugfixes
 - Do not count deleted registrations when printing tickets from the badge
   designer page
 - Hide "Save answers" in surveys while not logged in
+- Fix importing event archives containing registrations with attachments
 
 Version 2.1.3
 -------------
