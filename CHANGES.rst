@@ -22,6 +22,7 @@ Improvements
 - Add setting for the default contribution duration of an event
   (:issue:`3446`)
 - Add edit button to custom conference pages (:issue:`3284`)
+- Support markdown in survey questions (:issue:`3366`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
