@@ -115,6 +115,8 @@
                data-ajax-dialog
                data-reload-after></a>
         {%- endif %}
+        {{ template_hook('url-shortener', target=url_for('contributions.display_contribution', contribution),
+                         classes='i-button icon-link') }}
         <a href="{{ url_for('contributions.export_pdf', contribution) }}" class="i-button icon-file-pdf"></a>
         {% if contribution.timetable_entry -%}
             {% if g.static_site %}
