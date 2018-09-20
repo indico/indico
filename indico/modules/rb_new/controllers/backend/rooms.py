@@ -19,19 +19,18 @@ from __future__ import unicode_literals
 from datetime import date, datetime, time, timedelta
 
 from flask import jsonify, request, session
-from webargs import fields
 from webargs.flaskparser import use_args
 from werkzeug.exceptions import NotFound
 
 from indico.core.db import db
-from indico.core.db.sqlalchemy.util.queries import with_total_rows
 from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.models.favorites import favorite_room_table
+from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb_new.controllers.backend.common import search_room_args
 from indico.modules.rb_new.operations.bookings import get_room_details_availability
 from indico.modules.rb_new.operations.rooms import search_for_rooms
-from indico.modules.rb_new.schemas import map_rooms_schema, room_attributes_schema, room_details_schema, rooms_schema
+from indico.modules.rb_new.schemas import room_attributes_schema, room_details_schema
 
 
 class RHRooms(RHRoomBookingBase):
@@ -41,40 +40,21 @@ class RHRooms(RHRoomBookingBase):
 
 
 class RHSearchRooms(RHRoomBookingBase):
-    @use_args(dict(search_room_args, **{
-        'offset': fields.Int(missing=0, validate=lambda x: x >= 0),
-        'limit': fields.Int(missing=10, validate=lambda x: x >= 0),
-    }))
-    def _process(self, args):
-        filter_availability = args.get('start_dt') and args.get('end_dt')
-        query = search_for_rooms(args, availability=filter_availability or None)
-        query = query.limit(args['limit']).offset(args['offset'])
-        total = None
-
-        if filter_availability and not args['offset']:
-            # we only calculate the total on the first request
-            total = search_for_rooms(args).count()
-
-        rooms, matching = with_total_rows(query)
-        return jsonify(matching=matching, rooms=rooms_schema.dump(rooms).data, total=total)
-
-
-class RHSearchRoomsNew(RHRoomBookingBase):
     @use_args(search_room_args)
     def _process(self, args):
-        filter_availability = 'start_dt' in args and 'end_dt' in args
+        filter_availability = all(x in args for x in ('start_dt', 'end_dt', 'repeat_frequency', 'repeat_interval'))
         search_query = search_for_rooms(args, availability=(filter_availability or None))
         room_ids = [id_ for id_, in search_query.with_entities(Room.id)]
         total = len(room_ids) if not filter_availability else search_for_rooms(args).count()
-        return jsonify(rooms=room_ids, total=total)
+        return jsonify(rooms=room_ids, total=total, availability_days=self._get_date_range(args))
 
-
-class RHSearchMapRooms(RHRoomBookingBase):
-    @use_args(search_room_args)
-    def _process(self, args):
-        filter_availability = args.get('start_dt') and args.get('end_dt')
-        query = search_for_rooms(args, availability=filter_availability or None)
-        return jsonify(map_rooms_schema.dump(query.all()).data)
+    def _get_date_range(self, filters):
+        try:
+            start_dt, end_dt = filters['start_dt'], filters['end_dt']
+            repetition = filters['repeat_frequency'], filters['repeat_interval']
+        except KeyError:
+            return None
+        return [dt.date().isoformat() for dt in ReservationOccurrence.iter_start_time(start_dt, end_dt, repetition)]
 
 
 class RHRoomBase(RHRoomBookingBase):

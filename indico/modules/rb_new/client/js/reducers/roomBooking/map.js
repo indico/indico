@@ -21,9 +21,7 @@ import {getAspectBounds} from '../../util';
 
 const initialMapState = {
     bounds: null,
-    rooms: [],
     search: false,
-    isFetching: false,
 };
 
 
@@ -41,15 +39,9 @@ export function mapReducerFactory(namespace) {
 
         switch (action.type) {
             case actions.UPDATE_LOCATION:
-                return {...state, bounds: action.location, isFetching: false};
+                return {...state, bounds: action.location};
             case actions.TOGGLE_MAP_SEARCH:
                 return {...state, search: action.search};
-            case actions.FETCH_MAP_ROOMS_STARTED:
-                return {...state, isFetching: true};
-            case actions.FETCH_MAP_ROOMS_FAILED:
-                return {...state, isFetching: false};
-            case actions.UPDATE_MAP_ROOMS:
-                return {...state, isFetching: false, rooms: action.rooms};
             default:
                 return state;
         }

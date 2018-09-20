@@ -15,14 +15,57 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import {createSelector} from 'reselect';
 import {RequestState} from 'indico/utils/redux';
+import {roomSearchSelectorFactory} from '../../common/roomSearch';
+import {selectors as roomsSelectors} from '../../common/rooms';
 
 
-export const isFetchingRooms = ({bookRoom: {rooms}}) => rooms.isFetching;
+const {
+    getFilters,
+    isSearching,
+    getSearchResults,
+    getSearchResultIds,
+    getTotalResultCount,
+    getSearchResultsForMap,
+    getAvailabilityDateRange,
+    hasUnavailableRooms
+} = roomSearchSelectorFactory('bookRoom');
+
 export const isFetchingFormTimeline = ({bookRoom}) => {
     return bookRoom.bookingForm.requests.timeline.state === RequestState.STARTED;
 };
-export const getUnavailableRoomInfo = ({bookRoom: {unavailableRooms}}) => unavailableRooms.availability;
-export const getTimelineDateRange = ({bookRoom: {timeline}}) => timeline.dateRange;
-export const isFetchingUnavailableRooms = ({bookRoom: {unavailableRooms}}) => unavailableRooms.isFetching;
-export const getFilters = ({bookRoom}) => bookRoom.filters;
+export const isFetchingUnavailableRooms = ({bookRoom}) => {
+    return bookRoom.unavailableRooms.request.state === RequestState.STARTED;
+};
+export const getUnavailableRoomInfo = ({bookRoom}) => bookRoom.unavailableRooms.data;
+export const isFetchingTimeline = ({bookRoom}) => bookRoom.timeline.request.state === RequestState.STARTED;
+export const isTimelineVisible = ({bookRoom}) => bookRoom.timeline.data.isVisible;
+export const getTimelineDateRange = ({bookRoom}) => bookRoom.timeline.data.dateRange;
+export const getTimelineAvailability = ({bookRoom}) => bookRoom.timeline.data.availability;
+export const hasMoreTimelineData = createSelector(
+    getTimelineAvailability,
+    ({bookRoom}) => bookRoom.timeline.data.roomIds,
+    (availability, roomIds) => roomIds.length > availability.length
+);
+const getRawSuggestions = ({bookRoom}) => bookRoom.suggestions.list;
+export const getSuggestions = createSelector(
+    getRawSuggestions,
+    roomsSelectors.getAllRooms,
+    (suggestions, allRooms) => suggestions.map(suggestion => ({...suggestion, room: allRooms[suggestion.room_id]}))
+);
+export const getSuggestedRoomIds = createSelector(
+    getRawSuggestions,
+    suggestions => suggestions.map(x => x.room_id)
+);
+
+export {
+    getFilters,
+    isSearching,
+    getSearchResults,
+    getSearchResultIds,
+    getTotalResultCount,
+    getSearchResultsForMap,
+    getAvailabilityDateRange,
+    hasUnavailableRooms,
+};

@@ -32,13 +32,14 @@ class UnavailableRoomsModal extends React.Component {
         availability: PropTypes.array,
         filters: PropTypes.object.isRequired,
         isFetching: PropTypes.bool.isRequired,
-        dateRange: PropTypes.array.isRequired,
+        dateRange: PropTypes.array,
         onClose: PropTypes.func
     };
 
     static defaultProps = {
         availability: [],
-        onClose: null
+        onClose: null,
+        dateRange: null,
     };
 
     componentDidMount() {
@@ -48,6 +49,9 @@ class UnavailableRoomsModal extends React.Component {
 
     render() {
         const {availability, dateRange, filters, isFetching, onClose} = this.props;
+        if (!dateRange) {
+            return null;
+        }
         return (
             <Modal open onClose={onClose} size="large" closeIcon>
                 <Modal.Header>
@@ -73,7 +77,7 @@ export default connect(
         availability: selectors.getUnavailableRoomInfo(state),
         filters: selectors.getFilters(state),
         isFetching: selectors.isFetchingUnavailableRooms(state),
-        dateRange: selectors.getTimelineDateRange(state)
+        dateRange: selectors.getAvailabilityDateRange(state),
     }),
     dispatch => ({
         actions: bindActionCreators({

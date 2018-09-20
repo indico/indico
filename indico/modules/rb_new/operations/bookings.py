@@ -97,7 +97,7 @@ def get_existing_rooms_occurrences(rooms, start_dt, end_dt, repeat_frequency, re
     return group_list(query, key=lambda obj: obj.reservation.room.id)
 
 
-def get_rooms_availability(rooms, start_dt, end_dt, repeat_frequency, repeat_interval, flexibility):
+def get_rooms_availability(rooms, start_dt, end_dt, repeat_frequency, repeat_interval):
     period_days = (end_dt - start_dt).days
     availability = OrderedDict()
     candidates = ReservationOccurrence.create_series(start_dt, end_dt, (repeat_frequency, repeat_interval))
@@ -116,8 +116,6 @@ def get_rooms_availability(rooms, start_dt, end_dt, repeat_frequency, repeat_int
         if period_days > booking_limit_days:
             continue
 
-        start_dt = start_dt + timedelta(days=flexibility)
-        end_dt = end_dt + timedelta(days=flexibility)
         room_occurrences = occurrences.get(room.id, [])
         room_conflicts = conflicts.get(room.id, [])
         pre_room_conflicts = pre_conflicts.get(room.id, [])

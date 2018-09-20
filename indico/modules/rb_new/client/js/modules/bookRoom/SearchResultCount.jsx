@@ -32,7 +32,7 @@ import UnavailableRoomsModal from './UnavailableRoomsModal';
 
 class SearchResultCount extends React.Component {
     static propTypes = {
-        isFetching: PropTypes.bool.isRequired,
+        isSearching: PropTypes.bool.isRequired,
         matching: PropTypes.number,
         total: PropTypes.number,
         pushState: PropTypes.func.isRequired
@@ -133,18 +133,18 @@ class SearchResultCount extends React.Component {
     };
 
     render() {
-        const {isFetching, matching, total} = this.props;
+        const {isSearching, matching, total} = this.props;
         const style = {
-            display: (isFetching || (total > 0)) ? 'inline-flex' : 'none'
+            display: (isSearching || (total > 0)) ? 'inline-flex' : 'none'
         };
 
         return (
             <div styleName="results-count">
                 <Menu icon
                       styleName="results-count-menu"
-                      className={isFetching ? 'loading' : null}
+                      className={isSearching ? 'loading' : null}
                       style={style}>
-                    {isFetching ? (
+                    {isSearching ? (
                         <div styleName="loading-indicator">
                             <div className="bar" />
                             <div className="bar" />
@@ -160,7 +160,7 @@ class SearchResultCount extends React.Component {
                         )
                     )}
                 </Menu>
-                {!isFetching && (
+                {!isSearching && (
                     <>
                         {total > 0 && matching === 0 && this.renderNoMatching()}
                         {total === 0 && this.renderNoRooms()}
@@ -176,7 +176,7 @@ class SearchResultCount extends React.Component {
 
 export default withRouter(connect(
     state => ({
-        isFetching: selectors.isFetchingRooms(state),
+        isSearching: selectors.isSearching(state),
         queryString: stateToQueryString(state.bookRoom, qsFilterRules, qsBookRoomRules)
     }),
     dispatch => ({

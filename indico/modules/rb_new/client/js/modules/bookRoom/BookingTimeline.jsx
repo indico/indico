@@ -19,6 +19,7 @@ import _ from 'lodash';
 import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
+import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import {stateToQueryString} from 'redux-router-querystring';
 import {Message, Segment} from 'semantic-ui-react';
@@ -27,45 +28,54 @@ import {serializeDate, toMoment} from 'indico/utils/date';
 import TimelineBase from '../../components/TimelineBase';
 import {isDateWithinRange, pushStateMergeProps} from '../../util';
 import {queryString as queryStringSerializer} from '../../serializers/filters';
-import * as selectors from './selectors';
+import * as bookRoomActions from './actions';
 
 import '../../components/Timeline.module.scss';
+import * as bookRoomSelectors from './selectors';
 
+
+const timelinePropTypes = {
+    minHour: PropTypes.number.isRequired,
+    maxHour: PropTypes.number.isRequired,
+    availability: PropTypes.array.isRequired,
+    dateRange: PropTypes.arrayOf(PropTypes.string).isRequired,
+    recurrenceType: PropTypes.string.isRequired,
+};
 
 export class BookingTimelineComponent extends React.Component {
     static propTypes = {
-        minHour: PropTypes.number.isRequired,
-        maxHour: PropTypes.number.isRequired,
-        availability: PropTypes.array.isRequired,
-        dateRange: PropTypes.array.isRequired,
+        ...timelinePropTypes,
         pushState: PropTypes.func.isRequired,
-        loadMore: PropTypes.func,
-
-        // from redux state
+        lazyScroll: PropTypes.object,
         isFetching: PropTypes.bool.isRequired,
-        isFetchingRooms: PropTypes.bool.isRequired,
-        recurrenceType: PropTypes.string.isRequired,
-        rooms: PropTypes.object
+        showEmptyMessage: PropTypes.bool,
+        allowSingleRoom: PropTypes.bool,
     };
 
     static defaultProps = {
-        loadMore: null,
-        rooms: null
+        lazyScroll: null,
+        allowSingleRoom: true,
+        showEmptyMessage: true,
     };
 
     state = {};
 
-    static getDerivedStateFromProps({dateRange}, state) {
+    static getDerivedStateFromProps({dateRange, defaultDate}, state) {
         if (!_.isEmpty(dateRange) && !isDateWithinRange(state.activeDate, dateRange, toMoment)) {
             return {...state, activeDate: toMoment(dateRange[0])};
+        } else if (_.isEmpty(dateRange)) {
+            return {...state, activeDate: toMoment(defaultDate)};
         } else {
             return state;
         }
     }
 
     get singleRoom() {
-        const {availability} = this.props;
-        return availability.length === 1 && availability[0][1];
+        const {availability, allowSingleRoom} = this.props;
+        if (!allowSingleRoom || availability.length !== 1) {
+            return null;
+        }
+        return availability[0][1];
     }
 
     _getRowSerializer(dt, singleRoom = false) {
@@ -123,7 +133,7 @@ export class BookingTimelineComponent extends React.Component {
 
     render() {
         const {
-            dateRange, isFetching, maxHour, minHour, isFetchingRooms, recurrenceType, rooms, loadMore
+            dateRange, isFetching, maxHour, minHour, recurrenceType, lazyScroll, showEmptyMessage
         } = this.props;
         const {activeDate} = this.state;
         const legendLabels = [
@@ -135,30 +145,21 @@ export class BookingTimelineComponent extends React.Component {
             {label: Translate.string('Blocked'), style: 'blocking'},
             {label: Translate.string('Not bookable'), style: 'unbookable'}
         ];
-        const emptyMessage = (
+        const emptyMessage = showEmptyMessage ? (
             <Message warning>
                 <Translate>
                     There are no rooms matching the criteria.
                 </Translate>
             </Message>
-        );
+        ) : null;
 
         if (!activeDate) {
             // this happens for a short time when loading the timeline with a direct link
             return null;
         }
 
-        const props = {};
-        if (loadMore && rooms) {
-            props.lazyScroll = {
-                loadMore,
-                hasMore: rooms.matching > rooms.list.length,
-                isFetching: isFetching || isFetchingRooms
-            };
-        }
-
         return (
-            <TimelineBase {...props}
+            <TimelineBase lazyScroll={lazyScroll}
                           rows={this.calcRows()}
                           legendLabels={legendLabels}
                           emptyMessage={emptyMessage}
@@ -173,26 +174,145 @@ export class BookingTimelineComponent extends React.Component {
                               });
                           }}
                           extraContent={this.singleRoom && this.renderRoomSummary(this.singleRoom)}
-                          isLoading={isFetching || isFetchingRooms}
+                          isLoading={isFetching}
                           recurrenceType={recurrenceType}
                           disableDatePicker={!!this.singleRoom} />
         );
     }
 }
 
-export default connect(
-    state => {
-        const {bookRoom} = state;
-        return {
-            ...bookRoom.timeline,
-            rooms: bookRoom.rooms,
-            recurrenceType: bookRoom.filters.recurrence.type,
-            queryString: stateToQueryString(bookRoom, queryStringSerializer),
-            isFetchingRooms: selectors.isFetchingRooms(state)
+class BookingTimeline extends React.Component {
+    static propTypes = {
+        ...timelinePropTypes,
+        fetchingTimeline: PropTypes.bool.isRequired,
+        hasMoreTimelineData: PropTypes.bool.isRequired,
+        filters: PropTypes.shape({
+            dates: PropTypes.object.isRequired,
+            timeSlot: PropTypes.object.isRequired,
+            recurrence: PropTypes.object.isRequired,
+        }).isRequired,
+        pushState: PropTypes.func.isRequired,
+        actions: PropTypes.exact({
+            fetchTimeline: PropTypes.func.isRequired,
+            initTimeline: PropTypes.func.isRequired,
+            addTimelineRooms: PropTypes.func.isRequired,
+            fetchRoomSuggestions: PropTypes.func.isRequired,
+        }).isRequired,
+    };
+
+    componentDidMount() {
+        const {
+            actions: {initTimeline, fetchTimeline, fetchRoomSuggestions},
+            filters: {dates, timeSlot, recurrence},
+            roomIds,
+            suggestedRoomIds,
+        } = this.props;
+        initTimeline(roomIds, dates, timeSlot, recurrence);
+        if (roomIds.length) {
+            fetchTimeline();
+        }
+        if (suggestedRoomIds.length) {
+            this.processSuggestedRooms();
+        } else {
+            fetchRoomSuggestions();
+        }
+    }
+
+    componentDidUpdate({roomIds: prevRoomIds, suggestedRoomIds: prevSuggestedRoomIds, filters: prevFilters}) {
+        const {
+            actions: {initTimeline, fetchTimeline, fetchRoomSuggestions},
+            filters,
+            roomIds,
+            suggestedRoomIds,
+        } = this.props;
+        const {dates, timeSlot, recurrence} = filters;
+        // reset the timeline when filters changed
+        if (!_.isEqual(prevFilters, filters)) {
+            initTimeline([], dates, timeSlot, recurrence);
+        }
+        // reset and update the timeline when the search results changed
+        if (!_.isEqual(prevRoomIds, roomIds)) {
+            initTimeline(roomIds, dates, timeSlot, recurrence);
+            if (roomIds.length) {
+                fetchTimeline();
+            }
+            if (!suggestedRoomIds.length) {
+                fetchRoomSuggestions();
+            }
+        }
+        if (!_.isEqual(prevSuggestedRoomIds, suggestedRoomIds) && suggestedRoomIds.length) {
+            this.processSuggestedRooms();
+        }
+    }
+
+    processSuggestedRooms() {
+        const {
+            actions: {fetchTimeline, addTimelineRooms},
+            roomIds,
+            suggestedRoomIds,
+        } = this.props;
+        addTimelineRooms(suggestedRoomIds);
+        // if we have no normal results there is no lazy scroller to trigger the fetching
+        if (!roomIds.length) {
+            fetchTimeline();
+        }
+    }
+
+    render() {
+        const {
+            fetchingTimeline,
+            hasMoreTimelineData,
+            pushState,
+            minHour,
+            maxHour,
+            availability,
+            dateRange,
+            recurrenceType,
+            actions: {fetchTimeline},
+            filters: {dates: {startDate}},
+            suggestedRoomIds,
+        } = this.props;
+        const lazyScroll = {
+            hasMore: hasMoreTimelineData,
+            loadMore: fetchTimeline,
+            isFetching: fetchingTimeline,
         };
-    },
+        return (
+            <BookingTimelineComponent lazyScroll={lazyScroll}
+                                      isFetching={fetchingTimeline}
+                                      pushState={pushState}
+                                      minHour={minHour}
+                                      maxHour={maxHour}
+                                      availability={availability}
+                                      dateRange={dateRange}
+                                      recurrenceType={recurrenceType}
+                                      defaultDate={startDate}
+                                      allowSingleRoom={!suggestedRoomIds.length}
+                                      showEmptyMessage={false} />
+        );
+    }
+}
+
+export default connect(
+    state => ({
+        availability: bookRoomSelectors.getTimelineAvailability(state),
+        dateRange: bookRoomSelectors.getTimelineDateRange(state),
+        fetchingTimeline: bookRoomSelectors.isFetchingTimeline(state),
+        roomIds: bookRoomSelectors.getSearchResultIds(state),
+        suggestedRoomIds: bookRoomSelectors.getSuggestedRoomIds(state),
+        hasMoreTimelineData: bookRoomSelectors.hasMoreTimelineData(state),
+        recurrenceType: state.bookRoom.filters.recurrence.type,
+        queryString: stateToQueryString(state.bookRoom, queryStringSerializer),
+        filters: bookRoomSelectors.getFilters(state),
+    }),
     dispatch => ({
+        actions: bindActionCreators({
+            initTimeline: bookRoomActions.initTimeline,
+            fetchTimeline: bookRoomActions.fetchTimeline,
+            addTimelineRooms: bookRoomActions.addTimelineRooms,
+            fetchRoomSuggestions: bookRoomActions.fetchRoomSuggestions,
+        }, dispatch),
         dispatch
     }),
     pushStateMergeProps
-)(BookingTimelineComponent);
+)(BookingTimeline);

@@ -18,10 +18,11 @@ from __future__ import unicode_literals
 
 from datetime import date, datetime, time
 
-from flask import jsonify, session
+from flask import jsonify, request, session
 from marshmallow_enum import EnumField
 from webargs import fields, validate
 from webargs.flaskparser import use_args, use_kwargs
+from werkzeug.exceptions import NotFound
 
 from indico.core.db import db
 from indico.core.errors import NoReportError
@@ -38,7 +39,7 @@ from indico.modules.rb_new.util import (serialize_blockings, serialize_nonbookab
                                         serialize_unbookable_hours)
 from indico.modules.users.models.users import User
 from indico.util.i18n import _
-from indico.web.util import ExpectedError, jsonify_data
+from indico.web.util import ExpectedError
 
 
 NUM_SUGGESTIONS = 5
@@ -56,23 +57,27 @@ def _serialize_availability(availability):
 
 
 class RHTimeline(RHRoomBookingBase):
-    @use_args(dict(search_room_args, **{
-        'limit': fields.Int(missing=None),
-        'additional_room_ids': fields.List(fields.Int()),
-        'unavailable': fields.Bool(missing=False)
-    }))
-    def _process(self, args):
-        query = search_for_rooms(args, availability=not args['unavailable'])
-        if 'limit' in args:
-            query = query.limit(args.pop('limit'))
+    def _process_args(self):
+        self.room = None
+        if 'room_id' in request.view_args:
+            self.room = Room.get_one(request.view_args['room_id'])
+            if not self.room.is_active:
+                raise NotFound
 
-        rooms = query.all()
-        if 'additional_room_ids' in args:
-            rooms.extend(Room.query.filter(Room.is_active, Room.id.in_(args.pop('additional_room_ids'))))
+    def _process(self):
+        if self.room:
+            return self._process_single(self.room)
+        else:
+            return self._process_multi()
 
-        date_range, availability = get_rooms_availability(rooms, args['start_dt'], args['end_dt'],
-                                                          args['repeat_frequency'], args['repeat_interval'],
-                                                          flexibility=0)
+    @use_kwargs({
+        'start_dt': fields.DateTime(required=True),
+        'end_dt': fields.DateTime(required=True),
+        'repeat_frequency': EnumField(RepeatFrequency, missing='NEVER'),
+        'repeat_interval': fields.Int(missing=1),
+    })
+    def _process_single(self, room, **kwargs):
+        date_range, availability = get_rooms_availability([room], **kwargs)
         date_range = [dt.isoformat() for dt in date_range]
 
         for data in availability.viewvalues():
@@ -81,11 +86,43 @@ class RHTimeline(RHRoomBookingBase):
                 'num_days_available': len(date_range) - len(data['conflicts']),
                 'all_days_available': not data['conflicts']
             })
-
         serialized = _serialize_availability(availability)
-        return jsonify_data(flash=False,
-                            availability=serialized.items(),
-                            date_range=date_range)
+        availability = serialized[room.id]
+        return jsonify(availability=availability, date_range=date_range)
+
+    @use_kwargs({
+        'start_dt': fields.DateTime(required=True),
+        'end_dt': fields.DateTime(required=True),
+        'repeat_frequency': EnumField(RepeatFrequency, missing='NEVER'),
+        'repeat_interval': fields.Int(missing=1),
+        'room_ids': fields.List(fields.Int(), missing=[]),
+        'unavailable': fields.Bool(missing=False),
+    })
+    def _process_multi(self, room_ids, unavailable, **kwargs):
+        if unavailable:
+            query = search_for_rooms(kwargs, availability=False)
+            if room_ids:
+                query = query.filter(Room.id.in_(room_ids))
+            rooms = query.all()
+        else:
+            rooms = Room.query.filter(Room.id.in_(room_ids), Room.is_active).all()
+        date_range, availability = get_rooms_availability(rooms, **kwargs)
+        date_range = [dt.isoformat() for dt in date_range]
+
+        for data in availability.viewvalues():
+            # add additional helpful attributes
+            data.update({
+                'num_days_available': len(date_range) - len(data['conflicts']),
+                'all_days_available': not data['conflicts']
+            })
+        serialized = _serialize_availability(availability)
+        if room_ids:
+            # keep order if we used explicit room ids
+            availability = sorted(serialized.items(), key=lambda x: room_ids.index(x[0]))
+        else:
+            # already sorted by search in case of unavailability (or empty)
+            availability = serialized.items()
+        return jsonify(availability=availability, date_range=date_range)
 
 
 class RHCalendar(RHRoomBookingBase):
@@ -95,7 +132,7 @@ class RHCalendar(RHRoomBookingBase):
     })
     def _process(self, start_date, end_date):
         calendar = get_room_calendar(start_date or date.today(), end_date or date.today())
-        return jsonify_data(flash=False, calendar=_serialize_availability(calendar).values())
+        return jsonify(calendar=_serialize_availability(calendar).values())
 
 
 class RHCreateBooking(RHRoomBookingBase):
@@ -141,5 +178,4 @@ class RHCreateBooking(RHRoomBookingBase):
 class RHRoomSuggestions(RHRoomBookingBase):
     @use_args(search_room_args)
     def _process(self, args):
-        return jsonify([dict(suggestion, room=rooms_schema.dump(suggestion['room'], many=False).data)
-                        for suggestion in get_suggestions(args, limit=NUM_SUGGESTIONS)])
+        return jsonify(get_suggestions(args, limit=NUM_SUGGESTIONS))

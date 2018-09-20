@@ -56,12 +56,6 @@ class RoomSchema(mm.ModelSchema):
                                  'max_advance_days', 'owner_name')
 
 
-class MapRoomSchema(mm.ModelSchema):
-    class Meta:
-        model = Room
-        fields = ('id', 'full_name', 'latitude', 'longitude')
-
-
 class AspectSchema(mm.ModelSchema):
     class Meta:
         model = Aspect
@@ -149,7 +143,6 @@ rb_user_schema = RBUserSchema()
 rooms_schema = RoomSchema(many=True, only=_room_fields)
 room_details_schema = RoomSchema()
 room_attributes_schema = RoomAttributesSchema(many=True)
-map_rooms_schema = MapRoomSchema(many=True)
 aspects_schema = AspectSchema(many=True)
 reservation_occurrences_schema = ReservationOccurrenceSchema(many=True)
 reservation_schema = ReservationSchema()

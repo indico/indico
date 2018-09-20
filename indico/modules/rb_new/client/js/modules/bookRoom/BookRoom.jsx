@@ -44,13 +44,14 @@ import {rules as qsBookRoomRules} from './queryString';
 import * as bookRoomActions from './actions';
 import * as globalActions from '../../actions';
 import * as globalSelectors from '../../selectors';
+import * as bookRoomSelectors from './selectors';
 import {actions as roomsActions, selectors as roomsSelectors} from '../../common/rooms';
 
 import './BookRoom.module.scss';
 
 
 const SearchBar = searchBoxFactory('bookRoom');
-const MapController = mapControllerFactory('bookRoom');
+const MapController = mapControllerFactory('bookRoom', bookRoomSelectors);
 const RoomDetailsModal = roomDetailsModalFactory('bookRoom');
 const RoomFilterBar = roomFilterBarFactory('bookRoom');
 
@@ -59,44 +60,52 @@ class BookRoom extends React.Component {
     static propTypes = {
         setFilterParameter: PropTypes.func.isRequired,
         clearTextFilter: PropTypes.func.isRequired,
-        rooms: PropTypes.shape({
-            list: PropTypes.array,
-            matching: PropTypes.number,
-            isFetching: PropTypes.bool,
-            isLoadingMore: PropTypes.bool
-        }).isRequired,
+        results: PropTypes.arrayOf(PropTypes.object).isRequired,
         isInitializing: PropTypes.bool.isRequired,
-        fetchRooms: PropTypes.func.isRequired,
+        isSearching: PropTypes.bool.isRequired,
+        isTimelineVisible: PropTypes.bool.isRequired,
+        hasConflicts: PropTypes.bool.isRequired,
+        totalResultCount: PropTypes.number.isRequired,
+        searchRooms: PropTypes.func.isRequired,
         filters: PropTypes.object.isRequired,
-        timeline: PropTypes.object.isRequired,
-        clearRoomList: PropTypes.func.isRequired,
         roomDetailsFetching: PropTypes.bool.isRequired,
         fetchRoomDetails: PropTypes.func.isRequired,
+        fetchRoomSuggestions: PropTypes.func.isRequired,
+        resetRoomSuggestions: PropTypes.func.isRequired,
         resetBookingAvailability: PropTypes.func.isRequired,
-        suggestions: PropTypes.object.isRequired,
+        suggestions: PropTypes.arrayOf(PropTypes.object).isRequired,
         pushState: PropTypes.func.isRequired,
         toggleTimelineView: PropTypes.func.isRequired,
         showMap: PropTypes.bool.isRequired
     };
 
-    state = {};
+    state = {
+        maxVisibleRooms: 20,
+        suggestionsRequested: false,
+    };
 
     componentDidMount() {
-        const {fetchRooms} = this.props;
-        fetchRooms();
+        const {searchRooms} = this.props;
+        searchRooms();
     }
 
     componentDidUpdate({filters: prevFilters}) {
-        const {filters, fetchRooms} = this.props;
+        const {filters} = this.props;
         if (!_.isEqual(prevFilters, filters)) {
-            fetchRooms();
+            this.restartSearch();
         }
     }
 
     componentWillUnmount() {
-        const {clearTextFilter, clearRoomList} = this.props;
+        const {clearTextFilter} = this.props;
         clearTextFilter();
-        clearRoomList();
+    }
+
+    restartSearch() {
+        const {searchRooms, resetRoomSuggestions} = this.props;
+        searchRooms();
+        resetRoomSuggestions();
+        this.setState({maxVisibleRooms: 20, suggestionsRequested: false});
     }
 
     renderRoom = (room) => {
@@ -140,35 +149,61 @@ class BookRoom extends React.Component {
         );
     }
 
+    hasMoreRooms = (allowSuggestions = true) => {
+        const {maxVisibleRooms, suggestionsRequested} = this.state;
+        const {results} = this.props;
+        return maxVisibleRooms < results.length || (allowSuggestions && !suggestionsRequested);
+    };
+
+    loadMoreRooms = () => {
+        const {fetchRoomSuggestions} = this.props;
+        const {maxVisibleRooms} = this.state;
+        if (this.hasMoreRooms(false)) {
+            this.setState({maxVisibleRooms: maxVisibleRooms + 20});
+        } else {
+            this.setState({suggestionsRequested: true});
+            fetchRoomSuggestions();
+        }
+    };
+
+    get visibleRooms() {
+        const {maxVisibleRooms} = this.state;
+        const {results} = this.props;
+        return results.slice(0, maxVisibleRooms);
+    }
+
+    get timelineButtonEnabled() {
+        const {results, suggestions} = this.props;
+        return !!(results.length || suggestions.length);
+    }
+
     renderMainContent = () => {
         const {
-            fetchRooms,
             roomDetailsFetching,
-            rooms: {
-                list, matching, total, isFetching, isLoadingMore
-            },
-            timeline: {
-                isVisible
-            }
+            isSearching,
+            totalResultCount,
+            results,
+            isTimelineVisible,
         } = this.props;
-        const showResults = !isFetching || isLoadingMore;
 
-        if (!isVisible) {
+        if (!isTimelineVisible) {
             return (
                 <>
                     <div className="ui" styleName="available-room-list" ref={ref => this.handleContextRef(ref, 'tileRef')}>
                         {this.renderFilters('tileRef')}
-                        <SearchResultCount matching={matching} total={total} isFetching={isFetching} />
-                        <LazyScroll hasMore={matching > list.length} loadMore={() => fetchRooms(true)}
-                                    isFetching={isFetching}>
-                            {showResults && (
-                                <Card.Group stackable>
-                                    {list.map(this.renderRoom)}
-                                </Card.Group>
-                            )}
-                            <Loader active={isFetching} inline="centered" styleName="rooms-loader" />
-                        </LazyScroll>
-                        {showResults && this.renderSuggestions()}
+                        <SearchResultCount matching={results.length} total={totalResultCount}
+                                           isFetching={isSearching} />
+                        {!isSearching && (
+                            <>
+                                <LazyScroll hasMore={this.hasMoreRooms()} loadMore={this.loadMoreRooms}>
+                                    <Card.Group stackable>
+                                        {this.visibleRooms.map(this.renderRoom)}
+                                    </Card.Group>
+                                    <Loader active={isSearching} inline="centered" styleName="rooms-loader" />
+                                </LazyScroll>
+                                {this.renderSuggestions()}
+                            </>
+                        )}
                     </div>
                     <Dimmer.Dimmable>
                         <Dimmer active={roomDetailsFetching} page>
@@ -179,9 +214,10 @@ class BookRoom extends React.Component {
             );
         } else {
             return (
-                <div ref={(ref) => this.handleContextRef(ref, 'timelineRef')}>
+                <div styleName="available-room-list" ref={(ref) => this.handleContextRef(ref, 'timelineRef')}>
                     {this.renderFilters('timelineRef')}
-                    <BookingTimeline minHour={6} maxHour={22} loadMore={() => fetchRooms(true)} />
+                    <SearchResultCount matching={results.length} total={totalResultCount} isFetching={isSearching} />
+                    <BookingTimeline minHour={6} maxHour={22} />
                 </div>
             );
         }
@@ -189,8 +225,7 @@ class BookRoom extends React.Component {
 
     renderSuggestions = () => {
         const {suggestions} = this.props;
-
-        if (!suggestions.list || !suggestions.list.length) {
+        if (!suggestions.length) {
             return;
         }
 
@@ -200,7 +235,7 @@ class BookRoom extends React.Component {
                     <Translate>Rooms that you might be interested in</Translate>
                 </Header>
                 <Card.Group styleName="suggestions" stackable>
-                    {suggestions.list.map((suggestion) => this.renderSuggestion(suggestion))}
+                    {suggestions.map((suggestion) => this.renderSuggestion(suggestion))}
                 </Card.Group>
             </>
         );
@@ -285,31 +320,28 @@ class BookRoom extends React.Component {
     };
 
     renderViewSwitch() {
-        const {timeline: {availability, isVisible}} = this.props;
-        const timelineDataAvailable = !_.isEmpty(availability);
-        const hasConflicts = timelineDataAvailable && availability.some(([, data]) => {
-            return !_.isEmpty(data.conflicts);
-        });
-        const classes = toClasses({active: isVisible, disabled: !timelineDataAvailable});
+        const {isTimelineVisible, hasConflicts} = this.props;
+        const classes = toClasses({active: isTimelineVisible, disabled: !this.timelineButtonEnabled});
 
         const listBtn = (
             <Button icon={<Icon name="grid layout" styleName="switcher-icon" />}
-                    className={toClasses({active: !isVisible})}
+                    className={toClasses({active: !isTimelineVisible})}
                     onClick={this.switchToRoomList} circular />
         );
         const timelineBtn = (
-            <Button icon={<Icon name="calendar outline" styleName="switcher-icon" disabled={!timelineDataAvailable} />}
+            <Button icon={<Icon name="calendar outline" styleName="switcher-icon"
+                                disabled={!this.timelineButtonEnabled} />}
                     className={classes} circular />
         );
         return (
             <div styleName="view-icons">
                 <span styleName="icons-wrapper">
-                    {isVisible
+                    {isTimelineVisible
                         ? <Popup trigger={listBtn} content={Translate.string('List view')} />
                         : listBtn
                     }
                     <Icon.Group onClick={this.switchToTimeline}>
-                        {!isVisible
+                        {!isTimelineVisible
                             ? <Popup trigger={timelineBtn} content={Translate.string('Timeline view')} />
                             : timelineBtn
                         }
@@ -323,18 +355,20 @@ class BookRoom extends React.Component {
     }
 
     switchToRoomList = () => {
-        const {toggleTimelineView} = this.props;
-        toggleTimelineView(false);
-        this.setState({timelineRef: null});
+        const {toggleTimelineView, isTimelineVisible} = this.props;
+        if (isTimelineVisible) {
+            toggleTimelineView(false);
+            this.setState({timelineRef: null});
+            this.restartSearch();
+        }
     };
 
     switchToTimeline = () => {
-        const {timeline: {availability}, toggleTimelineView} = this.props;
-        const timelineDataAvailable = availability.length !== 0;
-        if (timelineDataAvailable) {
+        const {toggleTimelineView, isTimelineVisible} = this.props;
+        if (!isTimelineVisible && this.timelineButtonEnabled) {
             toggleTimelineView(true);
+            this.setState({tileRef: null});
         }
-        this.setState({tileRef: null});
     };
 
     handleContextRef = (ref, kind) => {
@@ -388,7 +422,13 @@ class BookRoom extends React.Component {
 
 const mapStateToProps = (state) => {
     return {
-        ...state.bookRoom,
+        isTimelineVisible: bookRoomSelectors.isTimelineVisible(state),
+        filters: bookRoomSelectors.getFilters(state),
+        results: bookRoomSelectors.getSearchResults(state),
+        suggestions: bookRoomSelectors.getSuggestions(state),
+        totalResultCount: bookRoomSelectors.getTotalResultCount(state),
+        isSearching: bookRoomSelectors.isSearching(state),
+        hasConflicts: bookRoomSelectors.hasUnavailableRooms(state),
         roomDetailsFetching: roomsSelectors.isFetchingDetails(state),
         isInitializing: globalSelectors.isInitializing(state),
         queryString: stateToQueryString(state.bookRoom, qsFilterRules, qsBookRoomRules),
@@ -397,15 +437,17 @@ const mapStateToProps = (state) => {
 };
 
 const mapDispatchToProps = dispatch => ({
-    clearRoomList() {
-        dispatch(globalActions.updateRooms('bookRoom', [], 0, 0));
+    searchRooms() {
+        dispatch(bookRoomActions.searchRooms());
     },
     clearTextFilter() {
         dispatch(globalActions.setFilterParameter('bookRoom', 'text', null));
     },
-    fetchRooms(loadMore = false) {
-        dispatch(bookRoomActions.searchRooms(loadMore));
-        dispatch(globalActions.fetchMapRooms('bookRoom'));
+    fetchRoomSuggestions() {
+        dispatch(bookRoomActions.fetchRoomSuggestions());
+    },
+    resetRoomSuggestions() {
+        dispatch(bookRoomActions.resetRoomSuggestions());
     },
     fetchRoomDetails(id) {
         dispatch(roomsActions.fetchDetails(id));
@@ -416,8 +458,8 @@ const mapDispatchToProps = dispatch => ({
     setFilterParameter(param, value) {
         dispatch(globalActions.setFilterParameter('bookRoom', param, value));
     },
-    toggleTimelineView: (isVisible) => {
-        dispatch(bookRoomActions.toggleTimelineView(isVisible));
+    toggleTimelineView(visible) {
+        dispatch(bookRoomActions.toggleTimelineView(visible));
     },
     dispatch
 });
