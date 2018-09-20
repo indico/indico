@@ -88,6 +88,8 @@ export function fetchBookingAvailability(room, filters) {
 
 export function fetchUnavailableRooms(filters) {
     return async (dispatch) => {
+        dispatch({type: GET_UNAVAILABLE_TIMELINE_REQUEST});
+
         const searchParams = preProcessParameters(filters, ajaxFilterRules);
         searchParams.unavailable = true;
         let response;
@@ -95,7 +97,7 @@ export function fetchUnavailableRooms(filters) {
             response = await indicoAxios.get(searchRoomsURL(), {params: searchParams});
         } catch (error) {
             const message = handleAxiosError(error, true);
-            dispatch(GET_UNAVAILABLE_TIMELINE_ERROR, {error: message});
+            dispatch({type: GET_UNAVAILABLE_TIMELINE_ERROR, error: message});
             return;
         }
 
@@ -104,7 +106,7 @@ export function fetchUnavailableRooms(filters) {
         const timelineParams = preProcessParameters({dates, timeSlot, recurrence}, ajaxFilterRules);
         return await ajaxAction(
             () => indicoAxios.post(fetchTimelineURL(), {room_ids: roomIds}, {params: timelineParams}),
-            GET_UNAVAILABLE_TIMELINE_REQUEST,
+            null,
             [UNAVAILABLE_TIMELINE_RECEIVED, GET_UNAVAILABLE_TIMELINE_SUCCESS],
             GET_UNAVAILABLE_TIMELINE_ERROR
         )(dispatch);
