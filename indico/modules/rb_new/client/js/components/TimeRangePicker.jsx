@@ -124,10 +124,13 @@ export default class TimeRangePicker extends React.Component {
             return;
         }
         let end = toMoment(endTime, 'HH:mm');
-        if (end <= start) {
+        if (end.isSameOrBefore(start, 'minute')) {
             end = moment(start).add(duration);
             if (end > moment().endOf('day')) {
                 end = moment().endOf('day');
+                if (start.isSame(end, 'minute')) {
+                    start = moment(end).subtract(duration);
+                }
             }
         } else {
             duration = moment.duration(end.diff(start));
@@ -165,10 +168,13 @@ export default class TimeRangePicker extends React.Component {
             return;
         }
         let start = toMoment(startTime, 'HH:mm');
-        if (end <= start) {
+        if (end.isSameOrBefore(start, 'minute')) {
             start = moment(end).subtract(duration);
             if (start < moment().startOf('day')) {
                 start = moment().startOf('day');
+                if (end.isSame(start, 'minute')) {
+                    end = moment(start).add(duration);
+                }
             }
         } else {
             duration = moment.duration(end.diff(start));
