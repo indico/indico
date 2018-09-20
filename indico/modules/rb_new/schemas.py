@@ -81,6 +81,17 @@ class ReservationOccurrenceSchema(mm.ModelSchema):
         fields = ('start_dt', 'end_dt', 'is_valid', 'reservation')
 
 
+class ReservationDetailsSchema(mm.ModelSchema):
+    room = Nested(RoomSchema, only=('id', 'name', 'sprite_position', 'full_name'))
+    booked_for_user = Nested(UserSchema, only=('id', 'full_name', 'phone', 'email'))
+    created_by_user = Nested(UserSchema, only=('full_name'))
+
+    class Meta:
+        model = Reservation
+        fields = ('id', 'start_dt', 'end_dt', 'repetition', 'booking_reason', 'created_dt', 'status_string',
+                  'uses_vc', 'needs_vc_assistance', 'booked_for_user', 'room', 'created_by_user', )
+
+
 class BlockedRoomSchema(mm.ModelSchema):
     room = Nested(RoomSchema, only=('id', 'name', 'sprite_position', 'full_name'))
     state = EnumField(BlockedRoomState)
@@ -176,6 +187,7 @@ room_attributes_schema = RoomAttributesSchema(many=True)
 aspects_schema = AspectSchema(many=True)
 reservation_occurrences_schema = ReservationOccurrenceSchema(many=True)
 reservation_schema = ReservationSchema()
+reservation_details_schema = ReservationDetailsSchema()
 blockings_schema = BlockingSchema(many=True)
 simple_blockings_schema = BlockingSchema(many=True, only=('id', 'reason'))
 nonbookable_periods_schema = NonBookablePeriodSchema(many=True)

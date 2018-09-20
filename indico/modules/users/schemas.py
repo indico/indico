@@ -27,7 +27,8 @@ class UserSchema(mm.ModelSchema):
 
     class Meta:
         model = User
-        fields = ('id', 'identifier', 'first_name', 'last_name', 'email', 'affiliation', 'avatar_bg_color', 'full_name')
+        fields = ('id', 'identifier', 'first_name', 'last_name', 'email', 'affiliation', 'avatar_bg_color', 'full_name',
+                  'phone')
 
 
 user_schema = UserSchema()

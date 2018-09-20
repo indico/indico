@@ -49,6 +49,7 @@ _bp.add_url_rule('/api/calendar', 'calendar', bookings.RHCalendar, methods=('GET
 _bp.add_url_rule('/api/equipment', 'equipment_types', locations.RHEquipmentTypes)
 _bp.add_url_rule('/api/booking/create', 'create_booking', bookings.RHCreateBooking,
                  methods=('POST',))
+_bp.add_url_rule('/api/bookings/<int:booking_id>/details', 'booking_details', bookings.RHBookingDetails)
 _bp.add_url_rule('/api/suggestions', 'suggestions', bookings.RHRoomSuggestions)
 _bp.add_url_rule('/api/locations', 'locations', locations.RHLocations)
 _bp.add_url_rule('/api/blockings/', 'blockings', blockings.RHRoomBlockings)
