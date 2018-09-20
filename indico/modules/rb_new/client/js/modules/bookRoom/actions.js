@@ -18,6 +18,7 @@
 import createBookingURL from 'indico-url:rooms_new.create_booking';
 import fetchTimelineURL from 'indico-url:rooms_new.timeline';
 import fetchSuggestionsURL from 'indico-url:rooms_new.suggestions';
+import searchRoomsURL from 'indico-url:rooms_new.search_rooms';
 
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {ajaxAction, submitFormAction} from 'indico/utils/redux';
@@ -86,13 +87,28 @@ export function fetchBookingAvailability(room, filters) {
 }
 
 export function fetchUnavailableRooms(filters) {
-    const params = preProcessParameters({...filters, unavailable: true}, ajaxFilterRules);
-    return ajaxAction(
-        () => indicoAxios.get(fetchTimelineURL(), {params}),
-        GET_UNAVAILABLE_TIMELINE_REQUEST,
-        [UNAVAILABLE_TIMELINE_RECEIVED, GET_UNAVAILABLE_TIMELINE_SUCCESS],
-        GET_UNAVAILABLE_TIMELINE_ERROR
-    );
+    return async (dispatch) => {
+        const searchParams = preProcessParameters(filters, ajaxFilterRules);
+        searchParams.unavailable = true;
+        let response;
+        try {
+            response = await indicoAxios.get(searchRoomsURL(), {params: searchParams});
+        } catch (error) {
+            const message = handleAxiosError(error, true);
+            dispatch(GET_UNAVAILABLE_TIMELINE_ERROR, {error: message});
+            return;
+        }
+
+        const roomIds = response.data.rooms;
+        const {dates, timeSlot, recurrence} = filters;
+        const timelineParams = preProcessParameters({dates, timeSlot, recurrence}, ajaxFilterRules);
+        return await ajaxAction(
+            () => indicoAxios.post(fetchTimelineURL(), {room_ids: roomIds}, {params: timelineParams}),
+            GET_UNAVAILABLE_TIMELINE_REQUEST,
+            [UNAVAILABLE_TIMELINE_RECEIVED, GET_UNAVAILABLE_TIMELINE_SUCCESS],
+            GET_UNAVAILABLE_TIMELINE_ERROR
+        )(dispatch);
+    };
 }
 
 export function initTimeline(roomIds, dates, timeSlot, recurrence) {

@@ -19,8 +19,9 @@ from __future__ import unicode_literals
 from datetime import date, datetime, time, timedelta
 
 from flask import jsonify, request, session
+from webargs import fields
 from webargs.flaskparser import use_args
-from werkzeug.exceptions import NotFound
+from werkzeug.exceptions import NotFound, UnprocessableEntity
 
 from indico.core.db import db
 from indico.modules.rb.controllers import RHRoomBookingBase
@@ -40,10 +41,19 @@ class RHRooms(RHRoomBookingBase):
 
 
 class RHSearchRooms(RHRoomBookingBase):
-    @use_args(search_room_args)
+    @use_args(dict(search_room_args, **{
+        'unavailable': fields.Bool(missing=False)
+    }))
     def _process(self, args):
         filter_availability = all(x in args for x in ('start_dt', 'end_dt', 'repeat_frequency', 'repeat_interval'))
-        search_query = search_for_rooms(args, availability=(filter_availability or None))
+        only_unavailable = args.pop('unavailable')
+        if not filter_availability:
+            availability = None
+            if only_unavailable:
+                raise UnprocessableEntity('Required data to filter by availability is not present')
+        else:
+            availability = not only_unavailable
+        search_query = search_for_rooms(args, availability=availability)
         room_ids = [id_ for id_, in search_query.with_entities(Room.id)]
         total = len(room_ids) if not filter_availability else search_for_rooms(args).count()
         return jsonify(rooms=room_ids, total=total, availability_days=self._get_date_range(args))
