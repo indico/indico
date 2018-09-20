@@ -18,59 +18,73 @@
 import {combineReducers} from 'redux';
 
 import {requestReducer} from 'indico/utils/redux';
-import {roomsReducerFactory} from '../../reducers/roomBooking/roomList';
-import filterReducerFactory, {initialRoomFilterStateFactory} from '../../reducers/roomBooking/filters';
-import {mapReducerFactory} from '../../reducers/roomBooking/map';
 import * as actions from './actions';
 import * as globalActions from '../../actions';
+import {roomSearchReducerFactory} from '../../common/roomSearch';
 
 
 export const initialTimelineState = {
-    isFetching: false,
     availability: [],
     dateRange: [],
-    isVisible: false
+    isVisible: false,
+    roomIds: [],
+    params: null,
 };
-
-const baseTimelineReducer = (requestAction, successAction, errorAction) => (state = initialTimelineState, action) => {
-    switch (action.type) {
-        case requestAction:
-            return {...state, isFetching: true};
-        case errorAction:
-            return {...state, isFetching: false};
-        case successAction:
-            return {
-                ...state,
-                isFetching: false,
-                availability: action.data.availability,
-                dateRange: action.data.date_range
-            };
+const timelineReducer = combineReducers({
+    request: requestReducer(
+        actions.GET_TIMELINE_REQUEST,
+        actions.GET_TIMELINE_SUCCESS,
+        actions.GET_TIMELINE_ERROR
+    ),
+    data: (state = initialTimelineState, action) => {
+        switch (action.type) {
+            case actions.TOGGLE_TIMELINE_VIEW:
+                return {...state, isVisible: action.visible};
+            case globalActions.RESET_PAGE_STATE:
+                return action.namespace === 'bookRoom' ? {...state, isVisible: false} : state;
+            case actions.INIT_TIMELINE:
+                return {
+                    ...state,
+                    dateRange: [],
+                    availability: [],
+                    params: action.params,
+                    roomIds: action.roomIds
+                };
+            case actions.ADD_TIMELINE_ROOMS:
+                return {
+                    ...state,
+                    roomIds: state.roomIds.concat(action.roomIds),
+                };
+            case actions.TIMELINE_RECEIVED:
+                return {
+                    ...state,
+                    dateRange: action.data.date_range,
+                    availability: state.availability.concat(action.data.availability),
+                };
+            default:
+                return state;
+        }
     }
-    return state;
-};
+});
 
-function timelineReducer(state = {...initialTimelineState, isVisible: false}, action) {
-    const reducer = baseTimelineReducer(
-        actions.FETCH_TIMELINE_DATA_STARTED,
-        actions.UPDATE_TIMELINE_DATA,
-        actions.FETCH_TIMELINE_DATA_FAILED
-    );
-    state = reducer(state, action);
 
-    switch (action.type) {
-        case actions.TOGGLE_TIMELINE_VIEW:
-            return {...state, isVisible: action.isVisible};
-        case globalActions.RESET_PAGE_STATE:
-            return action.namespace === 'bookRoom' ? {...state, isVisible: false} : state;
+const unavailableReducer = combineReducers({
+    request: requestReducer(
+        actions.GET_UNAVAILABLE_TIMELINE_REQUEST,
+        actions.GET_UNAVAILABLE_TIMELINE_SUCCESS,
+        actions.GET_UNAVAILABLE_TIMELINE_ERROR
+    ),
+    data: (state = [], action) => {
+        switch (action.type) {
+            case actions.GET_UNAVAILABLE_TIMELINE_REQUEST:
+                return [];
+            case actions.UNAVAILABLE_TIMELINE_RECEIVED:
+                return action.data.availability;
+            default:
+                return state;
+        }
     }
-    return state;
-}
-
-const unavailableReducer = baseTimelineReducer(
-    actions.FETCH_UNAVAILABLE_ROOMS_STARTED,
-    actions.UPDATE_UNAVAILABLE_ROOMS,
-    actions.FETCH_UNAVAILABLE_ROOMS_FAILED
-);
+});
 
 const initialSuggestionsState = {
     isFetching: false,
@@ -80,11 +94,13 @@ const initialSuggestionsState = {
 function suggestionsReducer(state = initialSuggestionsState, action) {
     switch (action.type) {
         case actions.FETCH_SUGGESTIONS_STARTED:
-            return {...state, isFetching: true};
+            return {...state, isFetching: true, list: []};
         case actions.FETCH_SUGGESTIONS_FAILED:
             return {...state, isFetching: false};
         case actions.UPDATE_SUGGESTIONS:
             return {...state, isFetching: false, list: action.suggestions};
+        case actions.RESET_SUGGESTIONS:
+            return {...state, isFetching: false, list: []};
         default:
             return state;
     }
@@ -107,19 +123,15 @@ const bookingFormReducer = combineReducers({
         switch (action.type) {
             case actions.RESET_BOOKING_AVAILABILITY:
                 return null;
-            case actions.SET_BOOKING_AVAILABILITY: {
-                return {...action.data};
-            }
+            case actions.SET_BOOKING_AVAILABILITY:
+                return {...action.data.availability, dateRange: action.data.date_range};
             default:
                 return state;
         }
     }
 });
 
-export default combineReducers({
-    rooms: roomsReducerFactory('bookRoom'),
-    filters: filterReducerFactory('bookRoom', initialRoomFilterStateFactory),
-    map: mapReducerFactory('bookRoom'),
+export default roomSearchReducerFactory('bookRoom', {
     timeline: timelineReducer,
     unavailableRooms: unavailableReducer,
     suggestions: suggestionsReducer,

@@ -16,7 +16,7 @@
  */
 
 import createBookingURL from 'indico-url:rooms_new.create_booking';
-import fetchTimelineDataURL from 'indico-url:rooms_new.timeline';
+import fetchTimelineURL from 'indico-url:rooms_new.timeline';
 import fetchSuggestionsURL from 'indico-url:rooms_new.suggestions';
 
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
@@ -25,7 +25,8 @@ import {ajax as ajaxRules} from './serializers';
 import {ajax as ajaxFilterRules} from '../../serializers/filters';
 import {preProcessParameters} from '../../util';
 
-import {searchRooms as roomListSearchRooms} from '../../actions';
+import {roomSearchActionsFactory} from '../../common/roomSearch';
+
 
 // Booking creation
 export const CREATE_BOOKING_REQUEST = 'bookRoom/CREATE_BOOKING_REQUEST';
@@ -40,21 +41,25 @@ export const RESET_BOOKING_AVAILABILITY = 'bookRoom/RESET_BOOKING_AVAILABILITY';
 export const SET_BOOKING_AVAILABILITY = 'bookRoom/SET_BOOKING_AVAILABILITY';
 
 // Timeline
-export const FETCH_TIMELINE_DATA_STARTED = 'bookRoom/FETCH_TIMELINE_DATA_STARTED';
-export const FETCH_TIMELINE_DATA_FAILED = 'bookRoom/FETCH_TIMELINE_DATA_FAILED';
-export const UPDATE_TIMELINE_DATA = 'bookRoom/UPDATE_TIMELINE_DATA';
 export const TOGGLE_TIMELINE_VIEW = 'bookRoom/TOGGLE_TIMELINE_VIEW';
+export const INIT_TIMELINE = 'bookRoom/INIT_TIMELINE';
+export const ADD_TIMELINE_ROOMS = 'bookRoom/ADD_TIMELINE_ROOMS';
+export const GET_TIMELINE_REQUEST = 'bookRoom/GET_TIMELINE_REQUEST';
+export const GET_TIMELINE_SUCCESS = 'bookRoom/GET_TIMELINE_SUCCESS';
+export const GET_TIMELINE_ERROR = 'bookRoom/GET_TIMELINE_ERROR';
+export const TIMELINE_RECEIVED = 'bookRoom/TIMELINE_RECEIVED';
 
 // Unavailable room list
-export const FETCH_UNAVAILABLE_ROOMS_STARTED = 'bookRoom/FETCH_UNAVAILABLE_ROOMS_STARTED';
-export const FETCH_UNAVAILABLE_ROOMS_FAILED = 'bookRoom/FETCH_UNAVAILABLE_ROOMS_FAILED';
-export const UPDATE_UNAVAILABLE_ROOMS = 'bookRoom/UPDATE_UNAVAILABLE_ROOMS';
-
+export const GET_UNAVAILABLE_TIMELINE_REQUEST = 'bookRoom/GET_UNAVAILABLE_TIMELINE_REQUEST';
+export const GET_UNAVAILABLE_TIMELINE_SUCCESS = 'bookRoom/GET_UNAVAILABLE_TIMELINE_SUCCESS';
+export const GET_UNAVAILABLE_TIMELINE_ERROR = 'bookRoom/GET_UNAVAILABLE_TIMELINE_ERROR';
+export const UNAVAILABLE_TIMELINE_RECEIVED = 'bookRoom/UNAVAILABLE_TIMELINE_RECEIVED';
 
 // Suggestions
 export const FETCH_SUGGESTIONS_STARTED = 'bookRoom/FETCH_SUGGESTIONS_STARTED';
 export const FETCH_SUGGESTIONS_FAILED = 'bookRoom/FETCH_SUGGESTIONS_FAILED';
 export const UPDATE_SUGGESTIONS = 'bookRoom/UPDATE_SUGGESTIONS';
+export const RESET_SUGGESTIONS = 'bookRoom/RESET_SUGGESTIONS';
 
 
 export function createBooking(args) {
@@ -70,72 +75,75 @@ export function resetBookingAvailability() {
 }
 
 export function fetchBookingAvailability(room, filters) {
+    const {dates, timeSlot, recurrence} = filters;
+    const params = preProcessParameters({dates, timeSlot, recurrence}, ajaxFilterRules);
     return ajaxAction(
-        () => _fetchTimelineData(filters, [room]),
+        () => indicoAxios.get(fetchTimelineURL({room_id: room.id}), {params}),
         GET_BOOKING_AVAILABILITY_REQUEST,
         [SET_BOOKING_AVAILABILITY, GET_BOOKING_AVAILABILITY_SUCCESS],
-        GET_BOOKING_AVAILABILITY_ERROR,
-        ({availability, date_range: dateRange}) => {
-            const roomAvailability = availability.find((obj) => obj[0] === room.id)[1];
-            return {...roomAvailability, dateRange};
-        }
+        GET_BOOKING_AVAILABILITY_ERROR
     );
 }
 
-export function fetchUnavailableRooms(filters, date = null) {
-    const params = {...filters, unavailable: true};
-    if (date) {
-        params.dates = {
-            startDate: date,
-            endDate: date
-        };
-    }
+export function fetchUnavailableRooms(filters) {
+    const params = preProcessParameters({...filters, unavailable: true}, ajaxFilterRules);
     return ajaxAction(
-        () => _fetchTimelineData(params),
-        FETCH_UNAVAILABLE_ROOMS_STARTED,
-        UPDATE_UNAVAILABLE_ROOMS,
-        FETCH_UNAVAILABLE_ROOMS_FAILED
+        () => indicoAxios.get(fetchTimelineURL(), {params}),
+        GET_UNAVAILABLE_TIMELINE_REQUEST,
+        [UNAVAILABLE_TIMELINE_RECEIVED, GET_UNAVAILABLE_TIMELINE_SUCCESS],
+        GET_UNAVAILABLE_TIMELINE_ERROR
     );
 }
 
-async function _fetchTimelineData(filters, rooms, limit = null) {
-    const params = preProcessParameters(filters, ajaxFilterRules);
-    if (rooms) {
-        params.additional_room_ids = rooms.map(room => room.id);
-    }
-
-    if (limit) {
-        params.limit = limit;
-    }
-
-    return await indicoAxios.get(fetchTimelineDataURL(), {params});
-}
-
-export function fetchTimelineData() {
-    return async (dispatch, getStore) => {
-        dispatch({type: FETCH_TIMELINE_DATA_STARTED});
-
-        const {bookRoom: {filters, suggestions: {list: suggestionsList}, rooms: {list}}} = getStore();
-
-        if (!list.length && !suggestionsList.length) {
-            dispatch({type: UPDATE_TIMELINE_DATA, data: {date_range: [], availability: []}});
-            return;
-        }
-        let response;
-        const rooms = suggestionsList.map(({room}) => room);
-        try {
-            response = await _fetchTimelineData(filters, rooms, list.length);
-        } catch (error) {
-            handleAxiosError(error);
-            dispatch({type: FETCH_TIMELINE_DATA_FAILED});
-            return;
-        }
-        dispatch({type: UPDATE_TIMELINE_DATA, data: response.data});
+export function initTimeline(roomIds, dates, timeSlot, recurrence) {
+    return {
+        type: INIT_TIMELINE,
+        params: {dates, timeSlot, recurrence},
+        roomIds
     };
 }
 
-export function toggleTimelineView(isVisible) {
-    return {type: TOGGLE_TIMELINE_VIEW, isVisible};
+export function addTimelineRooms(roomIds) {
+    return {
+        type: ADD_TIMELINE_ROOMS,
+        roomIds
+    };
+}
+
+export function fetchTimeline() {
+    const PER_PAGE = 20;
+
+    return async (dispatch, getStore) => {
+        const {
+            bookRoom: {
+                timeline: {
+                    data: {
+                        params: stateParams,
+                        roomIds: stateRoomIds,
+                        availability: stateAvailability,
+                    }
+                }
+            }
+        } = getStore();
+        const params = preProcessParameters(stateParams, ajaxFilterRules);
+        const numFetchedIds = stateAvailability.length;
+        const roomIds = stateRoomIds.slice(numFetchedIds, numFetchedIds + PER_PAGE);
+        if (!roomIds.length) {
+            console.warn('Tried to fetch timeline for zero rooms');
+            return Promise.reject();
+        }
+
+        return await ajaxAction(
+            () => indicoAxios.post(fetchTimelineURL(), {room_ids: roomIds}, {params}),
+            GET_TIMELINE_REQUEST,
+            [TIMELINE_RECEIVED, GET_TIMELINE_SUCCESS],
+            GET_TIMELINE_ERROR
+        )(dispatch);
+    };
+}
+
+export function toggleTimelineView(visible) {
+    return {type: TOGGLE_TIMELINE_VIEW, visible};
 }
 
 export function fetchRoomSuggestions() {
@@ -155,7 +163,6 @@ export function fetchRoomSuggestions() {
         }
 
         dispatch(updateRoomSuggestions(response.data));
-        dispatch(fetchTimelineData());
     };
 }
 
@@ -163,15 +170,8 @@ export function updateRoomSuggestions(suggestions) {
     return {type: UPDATE_SUGGESTIONS, suggestions};
 }
 
-export function searchRooms(loadMore = false) {
-    return async (dispatch, getStore) => {
-        const total = await dispatch(roomListSearchRooms('bookRoom', loadMore));
-        dispatch(updateRoomSuggestions([]));
-        const {bookRoom: {rooms: {list}}} = getStore();
-        if (list.length === total || total === 0) {
-            dispatch(fetchRoomSuggestions());
-        } else {
-            dispatch(fetchTimelineData());
-        }
-    };
+export function resetRoomSuggestions() {
+    return {type: RESET_SUGGESTIONS};
 }
+
+export const {searchRooms} = roomSearchActionsFactory('bookRoom');

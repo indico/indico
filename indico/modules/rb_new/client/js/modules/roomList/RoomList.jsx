@@ -46,7 +46,7 @@ import './RoomList.module.scss';
 
 
 const SearchBar = searchBarFactory('roomList');
-const MapController = mapControllerFactory('roomList');
+const MapController = mapControllerFactory('roomList', roomsListSelectors);
 const RoomDetailsModal = roomDetailsModalFactory('roomList');
 const RoomFilterBar = roomFilterBarFactory('roomList');
 

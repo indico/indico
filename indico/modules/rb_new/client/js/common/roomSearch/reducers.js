@@ -16,6 +16,7 @@
  */
 
 import {combineReducers} from 'redux';
+import camelizeKeys from 'indico/utils/camelize';
 import {requestReducer} from 'indico/utils/redux';
 
 import filterReducerFactory, {initialRoomFilterStateFactory} from '../../reducers/roomBooking/filters';
@@ -23,7 +24,7 @@ import {mapReducerFactory} from '../../reducers/roomBooking/map';
 import {roomSearchActionsFactory} from './actions';
 
 
-export function roomSearchReducerFactory(namespace) {
+export function roomSearchReducerFactory(namespace, extra = {}) {
     const initialSearchResultsState = {
         rooms: [],
         total: 0,
@@ -40,7 +41,7 @@ export function roomSearchReducerFactory(namespace) {
             results: (state = initialSearchResultsState, action) => {
                 switch (action.type) {
                     case actions.SEARCH_RESULTS_RECEIVED:
-                        return action.data;
+                        return camelizeKeys(action.data);
                     default:
                         return state;
                 }
@@ -48,5 +49,6 @@ export function roomSearchReducerFactory(namespace) {
         }),
         filters: filterReducerFactory(namespace, initialRoomFilterStateFactory),
         map: mapReducerFactory(namespace),
+        ...extra
     });
 }

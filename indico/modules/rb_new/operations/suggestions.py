@@ -42,12 +42,15 @@ def get_suggestions(filters, limit=None):
                                                 (filters['repeat_frequency'], filters['repeat_interval'])))
     rooms = query.all()
     if filters['repeat_frequency'] == RepeatFrequency.NEVER:
-        return sort_suggestions(get_single_booking_suggestions(rooms, filters['start_dt'], filters['end_dt'],
-                                                               limit=limit))
+        suggestions = sort_suggestions(get_single_booking_suggestions(rooms, filters['start_dt'], filters['end_dt'],
+                                                                      limit=limit))
     else:
-        return get_number_of_skipped_days_for_rooms(rooms, filters['start_dt'], filters['end_dt'],
-                                                    filters['repeat_frequency'], filters['repeat_interval'],
-                                                    limit=limit)
+        suggestions = get_number_of_skipped_days_for_rooms(rooms, filters['start_dt'], filters['end_dt'],
+                                                           filters['repeat_frequency'], filters['repeat_interval'],
+                                                           limit=limit)
+    for entry in suggestions:
+        entry['room_id'] = entry.pop('room').id
+    return suggestions
 
 
 def get_single_booking_suggestions(rooms, start_dt, end_dt, limit=None):

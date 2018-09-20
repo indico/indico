@@ -30,7 +30,7 @@ export const rules = {
     timeline: {
         validator: v.isBoolean(),
         sanitizer: v.toBoolean(),
-        stateField: boolStateField('timeline.isVisible')
+        stateField: boolStateField('timeline.data.isVisible')
     }
 };
 
@@ -61,6 +61,6 @@ export const queryStringReducer = createQueryStringReducer(
         return null;
     },
     (state, namespace) => (namespace
-        ? _.merge({}, state, {[namespace]: {timeline: initialTimelineState}})
+        ? _.merge({}, state, {[namespace]: {timeline: {data: initialTimelineState}}})
         : state)
 );
