@@ -20,6 +20,7 @@ import {stateToQueryString} from 'redux-router-querystring';
 import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
+import {bindActionCreators} from 'redux';
 import _ from 'lodash';
 import {Route} from 'react-router-dom';
 import {Button, Card, Dimmer, Grid, Header, Icon, Label, Loader, Message, Popup, Sticky} from 'semantic-ui-react';
@@ -58,25 +59,27 @@ const RoomFilterBar = roomFilterBarFactory('bookRoom');
 /* eslint-disable react/no-unused-state */
 class BookRoom extends React.Component {
     static propTypes = {
-        setFilterParameter: PropTypes.func.isRequired,
-        clearTextFilter: PropTypes.func.isRequired,
         results: PropTypes.arrayOf(PropTypes.object).isRequired,
         isInitializing: PropTypes.bool.isRequired,
         isSearching: PropTypes.bool.isRequired,
         isTimelineVisible: PropTypes.bool.isRequired,
         hasConflicts: PropTypes.bool.isRequired,
         totalResultCount: PropTypes.number.isRequired,
-        searchRooms: PropTypes.func.isRequired,
         filters: PropTypes.object.isRequired,
         roomDetailsFetching: PropTypes.bool.isRequired,
-        fetchRoomDetails: PropTypes.func.isRequired,
-        fetchRoomSuggestions: PropTypes.func.isRequired,
-        resetRoomSuggestions: PropTypes.func.isRequired,
-        resetBookingAvailability: PropTypes.func.isRequired,
         suggestions: PropTypes.arrayOf(PropTypes.object).isRequired,
         pushState: PropTypes.func.isRequired,
-        toggleTimelineView: PropTypes.func.isRequired,
-        showMap: PropTypes.bool.isRequired
+        showMap: PropTypes.bool.isRequired,
+        actions: PropTypes.exact({
+            setFilterParameter: PropTypes.func.isRequired,
+            clearTextFilter: PropTypes.func.isRequired,
+            searchRooms: PropTypes.func.isRequired,
+            fetchRoomDetails: PropTypes.func.isRequired,
+            fetchRoomSuggestions: PropTypes.func.isRequired,
+            resetRoomSuggestions: PropTypes.func.isRequired,
+            resetBookingAvailability: PropTypes.func.isRequired,
+            toggleTimelineView: PropTypes.func.isRequired,
+        }).isRequired,
     };
 
     state = {
@@ -85,7 +88,7 @@ class BookRoom extends React.Component {
     };
 
     componentDidMount() {
-        const {searchRooms} = this.props;
+        const {actions: {searchRooms}} = this.props;
         searchRooms();
     }
 
@@ -97,12 +100,12 @@ class BookRoom extends React.Component {
     }
 
     componentWillUnmount() {
-        const {clearTextFilter} = this.props;
+        const {actions: {clearTextFilter}} = this.props;
         clearTextFilter();
     }
 
     restartSearch() {
-        const {searchRooms, resetRoomSuggestions} = this.props;
+        const {actions: {searchRooms, resetRoomSuggestions}} = this.props;
         searchRooms();
         resetRoomSuggestions();
         this.setState({maxVisibleRooms: 20, suggestionsRequested: false});
@@ -156,7 +159,7 @@ class BookRoom extends React.Component {
     };
 
     loadMoreRooms = () => {
-        const {fetchRoomSuggestions} = this.props;
+        const {actions: {fetchRoomSuggestions}} = this.props;
         const {maxVisibleRooms} = this.state;
         if (this.hasMoreRooms(false)) {
             this.setState({maxVisibleRooms: maxVisibleRooms + 20});
@@ -307,7 +310,7 @@ class BookRoom extends React.Component {
     };
 
     updateFilters = (filter, value) => {
-        const {setFilterParameter} = this.props;
+        const {actions: {setFilterParameter}} = this.props;
         let {filters: {timeSlot: {startTime, endTime}}} = this.props;
 
         if (filter === 'duration') {
@@ -355,7 +358,7 @@ class BookRoom extends React.Component {
     }
 
     switchToRoomList = () => {
-        const {toggleTimelineView, isTimelineVisible} = this.props;
+        const {actions: {toggleTimelineView}, isTimelineVisible} = this.props;
         if (isTimelineVisible) {
             toggleTimelineView(false);
             this.setState({timelineRef: null});
@@ -364,7 +367,7 @@ class BookRoom extends React.Component {
     };
 
     switchToTimeline = () => {
-        const {toggleTimelineView, isTimelineVisible} = this.props;
+        const {actions: {toggleTimelineView}, isTimelineVisible} = this.props;
         if (!isTimelineVisible && this.timelineButtonEnabled) {
             toggleTimelineView(true);
             this.setState({tileRef: null});
@@ -382,7 +385,7 @@ class BookRoom extends React.Component {
     };
 
     closeBookingModal = () => {
-        const {resetBookingAvailability} = this.props;
+        const {actions: {resetBookingAvailability}} = this.props;
         resetBookingAvailability();
         this.closeModal();
     };
@@ -393,7 +396,7 @@ class BookRoom extends React.Component {
     };
 
     render() {
-        const {fetchRoomDetails, showMap, isInitializing} = this.props;
+        const {actions: {fetchRoomDetails}, showMap, isInitializing} = this.props;
         return (
             <Grid columns={2}>
                 <Grid.Column computer={showMap ? 11 : 16} mobile={16}>
@@ -437,30 +440,16 @@ const mapStateToProps = (state) => {
 };
 
 const mapDispatchToProps = dispatch => ({
-    searchRooms() {
-        dispatch(bookRoomActions.searchRooms());
-    },
-    clearTextFilter() {
-        dispatch(globalActions.setFilterParameter('bookRoom', 'text', null));
-    },
-    fetchRoomSuggestions() {
-        dispatch(bookRoomActions.fetchRoomSuggestions());
-    },
-    resetRoomSuggestions() {
-        dispatch(bookRoomActions.resetRoomSuggestions());
-    },
-    fetchRoomDetails(id) {
-        dispatch(roomsActions.fetchDetails(id));
-    },
-    resetBookingAvailability() {
-        dispatch(bookRoomActions.resetBookingAvailability());
-    },
-    setFilterParameter(param, value) {
-        dispatch(globalActions.setFilterParameter('bookRoom', param, value));
-    },
-    toggleTimelineView(visible) {
-        dispatch(bookRoomActions.toggleTimelineView(visible));
-    },
+    actions: bindActionCreators({
+        searchRooms: bookRoomActions.searchRooms,
+        clearTextFilter: () => globalActions.setFilterParameter('bookRoom', 'text', null),
+        fetchRoomSuggestions: bookRoomActions.fetchRoomSuggestions,
+        resetRoomSuggestions: bookRoomActions.resetRoomSuggestions,
+        fetchRoomDetails: roomsActions.fetchDetails,
+        resetBookingAvailability: bookRoomActions.resetBookingAvailability,
+        setFilterParameter: (param, value) => globalActions.setFilterParameter('bookRoom', param, value),
+        toggleTimelineView: bookRoomActions.toggleTimelineView,
+    }, dispatch),
     dispatch
 });
 
