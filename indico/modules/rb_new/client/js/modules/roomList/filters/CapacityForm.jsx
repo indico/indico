@@ -45,7 +45,7 @@ export default class CapacityForm extends FilterFormComponent {
                        icon={capacity ? icon : null}
                        value={capacity || ''}
                        onChange={(__, {value}) => {
-                           this.setCapacity(!value ? null : +value);
+                           this.setCapacity(!value ? null : Math.abs(+value));
                        }} />
             </div>
         );
