@@ -61,7 +61,8 @@ def get_rooms_blockings(rooms, start_date, end_date):
                      BlockedRoom.state == BlockedRoomState.accepted,
                      Blocking.start_date <= end_date,
                      Blocking.end_date >= start_date)
-             .join(BlockedRoom.blocking))
+             .join(BlockedRoom.blocking)
+             .options(contains_eager('blocking')))
     return group_list(query, key=lambda obj: obj.room_id)
 
 
