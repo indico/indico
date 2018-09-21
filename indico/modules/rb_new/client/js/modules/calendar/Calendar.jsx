@@ -19,7 +19,7 @@ import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
 import {bindActionCreators} from 'redux';
-import {Dimmer, Grid} from 'semantic-ui-react';
+import {Dimmer, Grid, Loader} from 'semantic-ui-react';
 import {Route} from 'react-router-dom';
 import {connect} from 'react-redux';
 
@@ -33,7 +33,7 @@ import * as calendarActions from './actions';
 import * as calendarSelectors from './selectors';
 import * as roomActions from '../../common/rooms/actions';
 import * as roomSelectors from '../../common/rooms/selectors';
-
+import {selectors as roomsSelectors} from '../../common/rooms';
 import EditableTimelineItem from '../../components/EditableTimelineItem';
 import BookFromListModal from '../../components/modals/BookFromListModal';
 
@@ -56,6 +56,7 @@ class Calendar extends React.Component {
             fetchRoomDetails: PropTypes.func.isRequired
         }).isRequired,
         pushState: PropTypes.func.isRequired,
+        roomDetailsFetching: PropTypes.bool.isRequired
     };
 
     state = {};
@@ -124,7 +125,9 @@ class Calendar extends React.Component {
     };
 
     render() {
-        const {isFetching, calendarData: {date, rows}, actions: {setDate, fetchRoomDetails}} = this.props;
+        const {
+            isFetching, calendarData: {date, rows}, actions: {setDate, fetchRoomDetails}, roomDetailsFetching
+        } = this.props;
         const {bookingRoomId, modalFields} = this.state;
         const legendLabels = [
             {label: Translate.string('Booked'), color: 'orange'},
@@ -147,6 +150,11 @@ class Calendar extends React.Component {
                                   itemProps={{onAddSlot: this.onAddSlot}}
                                   onClickLabel={this.onClickLabel}
                                   longLabel />
+                    <Dimmer.Dimmable>
+                        <Dimmer active={roomDetailsFetching} page>
+                            <Loader />
+                        </Dimmer>
+                    </Dimmer.Dimmable>
                 </Grid.Row>
                 <Route exact path="/calendar/:roomId/details" render={roomPreloader((roomId) => (
                     <RoomDetailsModal roomId={roomId} onClose={this.closeModal} />
@@ -175,7 +183,8 @@ export default connect(
     state => ({
         isFetching: calendarSelectors.isFetching(state),
         calendarData: calendarSelectors.getCalendarData(state),
-        rooms: roomSelectors.getAllRooms(state)
+        rooms: roomSelectors.getAllRooms(state),
+        roomDetailsFetching: roomsSelectors.isFetchingDetails(state)
     }),
     dispatch => ({
         actions: bindActionCreators({
