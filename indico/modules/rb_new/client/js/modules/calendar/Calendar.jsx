@@ -19,8 +19,8 @@ import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
 import {bindActionCreators} from 'redux';
-import {Dimmer, Grid, Loader} from 'semantic-ui-react';
 import {Route} from 'react-router-dom';
+import {Container, Dimmer, Grid, Loader, Sticky} from 'semantic-ui-react';
 import {connect} from 'react-redux';
 
 import {Translate} from 'indico/react/i18n';
@@ -36,7 +36,7 @@ import * as roomSelectors from '../../common/rooms/selectors';
 import {selectors as roomsSelectors} from '../../common/rooms';
 import EditableTimelineItem from '../../components/EditableTimelineItem';
 import BookFromListModal from '../../components/modals/BookFromListModal';
-
+import TimelineHeader from '../../components/TimelineHeader';
 
 import '../../components/Timeline.module.scss';
 
@@ -58,6 +58,12 @@ class Calendar extends React.Component {
         pushState: PropTypes.func.isRequired,
         roomDetailsFetching: PropTypes.bool.isRequired
     };
+
+
+    constructor(props) {
+        super(props);
+        this.contextRef = React.createRef();
+    }
 
     state = {};
 
@@ -139,22 +145,27 @@ class Calendar extends React.Component {
         return (
             <Grid>
                 <Grid.Row>
-                    <TimelineBase minHour={6}
-                                  maxHour={22}
-                                  legendLabels={legendLabels}
-                                  rows={rows.map(this._getRowSerializer(date || serializeDate(moment())))}
-                                  activeDate={date ? moment(date) : moment()}
-                                  onDateChange={setDate}
-                                  isLoading={isFetching}
-                                  itemClass={EditableTimelineItem}
-                                  itemProps={{onAddSlot: this.onAddSlot}}
-                                  onClickLabel={this.onClickLabel}
-                                  longLabel />
-                    <Dimmer.Dimmable>
-                        <Dimmer active={roomDetailsFetching} page>
-                            <Loader />
-                        </Dimmer>
-                    </Dimmer.Dimmable>
+                    <Container>
+                        <div ref={this.contextRef}>
+                            <Sticky context={this.contextRef.current} className="sticky-filters">
+                                <TimelineHeader activeDate={date ? moment(date) : moment()}
+                                                onDateChange={setDate}
+                                                legendLabels={legendLabels} />
+                            </Sticky>
+                            <TimelineBase minHour={6}
+                                          maxHour={22}
+                                          rows={rows.map(this._getRowSerializer(date || serializeDate(moment())))}
+                                          isLoading={isFetching}
+                                          itemClass={EditableTimelineItem}
+                                          itemProps={{onAddSlot: this.onAddSlot}}
+                                          longLabel />
+                            <Dimmer.Dimmable>
+                                <Dimmer active={roomDetailsFetching} page>
+                                    <Loader />
+                                </Dimmer>
+                            </Dimmer.Dimmable>
+                        </div>
+                    </Container>
                 </Grid.Row>
                 <Route exact path="/calendar/:roomId/details" render={roomPreloader((roomId) => (
                     <RoomDetailsModal roomId={roomId} onClose={this.closeModal} />

@@ -28,7 +28,7 @@ import LazyScroll from 'redux-lazy-scroll';
 
 import {Slot, toClasses} from 'indico/react/util';
 import {PluralTranslate, Translate, Singular, Param, Plural} from 'indico/react/i18n';
-import {serializeTime} from 'indico/utils/date';
+import {serializeTime, toMoment} from 'indico/utils/date';
 import mapControllerFactory from '../../containers/MapController';
 import searchBoxFactory from '../../containers/SearchBar';
 import Room from '../../containers/Room';
@@ -38,10 +38,10 @@ import BookingTimeline from './BookingTimeline';
 import BookRoomModal from './BookRoomModal';
 import SearchResultCount from './SearchResultCount';
 import roomDetailsModalFactory from '../../components/modals/RoomDetailsModal';
-import {roomPreloader, pushStateMergeProps} from '../../util';
+import TimelineHeader from '../../components/TimelineHeader';
+import {roomPreloader, pushStateMergeProps, isDateWithinRange} from '../../util';
 import {queryString as qsFilterRules} from '../../serializers/filters';
 import {rules as qsBookRoomRules} from './queryString';
-
 import * as bookRoomActions from './actions';
 import * as globalActions from '../../actions';
 import * as globalSelectors from '../../selectors';
@@ -80,12 +80,21 @@ class BookRoom extends React.Component {
             resetBookingAvailability: PropTypes.func.isRequired,
             toggleTimelineView: PropTypes.func.isRequired,
         }).isRequired,
+        dateRange: PropTypes.array.isRequired,
     };
 
     state = {
         maxVisibleRooms: 20,
         suggestionsRequested: false,
     };
+
+    static getDerivedStateFromProps({dateRange}, state) {
+        if (!_.isEmpty(dateRange) && !isDateWithinRange(state.activeDate, dateRange, toMoment)) {
+            return {...state, activeDate: toMoment(dateRange[0])};
+        } else {
+            return state;
+        }
+    }
 
     componentDidMount() {
         const {actions: {searchRooms}} = this.props;
@@ -137,7 +146,24 @@ class BookRoom extends React.Component {
     };
 
     renderFilters(refName) {
-        const {[refName]: ref} = this.state;
+        const {[refName]: ref, activeDate} = this.state;
+        const {
+            dateRange,
+            isSearching,
+            totalResultCount,
+            results,
+            isTimelineVisible
+        } = this.props;
+
+        const legendLabels = [
+            {label: Translate.string('Available'), color: 'green'},
+            {label: Translate.string('Booked'), color: 'orange'},
+            {label: Translate.string('Pre-Booking'), style: 'pre-booking'},
+            {label: Translate.string('Conflict'), color: 'red'},
+            {label: Translate.string('Conflict with Pre-Booking'), style: 'pre-booking-conflict'},
+            {label: Translate.string('Blocked'), style: 'blocking'},
+            {label: Translate.string('Not bookable'), style: 'unbookable'}
+        ];
         return (
             <Sticky context={ref} className="sticky-filters">
                 <div styleName="filter-row">
@@ -148,6 +174,19 @@ class BookRoom extends React.Component {
                     </div>
                     {this.renderViewSwitch()}
                 </div>
+                <SearchResultCount matching={results.length}
+                                   total={totalResultCount}
+                                   isFetching={isSearching} />
+                {isTimelineVisible && activeDate && (
+                    <TimelineHeader activeDate={activeDate}
+                                    onDateChange={(newDate) => {
+                                        this.setState({
+                                            activeDate: newDate
+                                        });
+                                    }}
+                                    legendLabels={legendLabels}
+                                    dateRange={dateRange} />
+                )}
             </Sticky>
         );
     }
@@ -184,8 +223,6 @@ class BookRoom extends React.Component {
         const {
             roomDetailsFetching,
             isSearching,
-            totalResultCount,
-            results,
             isTimelineVisible,
         } = this.props;
 
@@ -194,8 +231,6 @@ class BookRoom extends React.Component {
                 <>
                     <div className="ui" styleName="available-room-list" ref={ref => this.handleContextRef(ref, 'tileRef')}>
                         {this.renderFilters('tileRef')}
-                        <SearchResultCount matching={results.length} total={totalResultCount}
-                                           isFetching={isSearching} />
                         {!isSearching && (
                             <>
                                 <LazyScroll hasMore={this.hasMoreRooms()} loadMore={this.loadMoreRooms}>
@@ -219,7 +254,6 @@ class BookRoom extends React.Component {
             return (
                 <div styleName="available-room-list" ref={(ref) => this.handleContextRef(ref, 'timelineRef')}>
                     {this.renderFilters('timelineRef')}
-                    <SearchResultCount matching={results.length} total={totalResultCount} isFetching={isSearching} />
                     <BookingTimeline minHour={6} maxHour={22} />
                 </div>
             );
@@ -436,6 +470,7 @@ const mapStateToProps = (state) => {
         isInitializing: globalSelectors.isInitializing(state),
         queryString: stateToQueryString(state.bookRoom, qsFilterRules, qsBookRoomRules),
         showMap: globalSelectors.isMapVisible(state),
+        dateRange: bookRoomSelectors.getTimelineDateRange(state)
     };
 };
 
