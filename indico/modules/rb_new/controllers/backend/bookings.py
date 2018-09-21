@@ -32,9 +32,8 @@ from indico.modules.rb.models.reservations import RepeatFrequency, Reservation
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb_new.controllers.backend.common import search_room_args
 from indico.modules.rb_new.operations.bookings import get_room_calendar, get_rooms_availability
-from indico.modules.rb_new.operations.rooms import search_for_rooms
 from indico.modules.rb_new.operations.suggestions import get_suggestions
-from indico.modules.rb_new.schemas import reservation_schema, rooms_schema
+from indico.modules.rb_new.schemas import reservation_schema
 from indico.modules.rb_new.util import (serialize_blockings, serialize_nonbookable_periods, serialize_occurrences,
                                         serialize_unbookable_hours)
 from indico.modules.users.models.users import User
@@ -47,7 +46,6 @@ NUM_SUGGESTIONS = 5
 
 def _serialize_availability(availability):
     for data in availability.viewvalues():
-        data['room'] = rooms_schema.dump(data['room'], many=False).data
         data['blockings'] = serialize_blockings(data['blockings'])
         data['nonbookable_periods'] = serialize_nonbookable_periods(data['nonbookable_periods'])
         data['unbookable_hours'] = serialize_unbookable_hours(data['unbookable_hours'])
@@ -98,7 +96,7 @@ class RHCalendar(RHRoomBookingBase):
     })
     def _process(self, start_date, end_date):
         calendar = get_room_calendar(start_date or date.today(), end_date or date.today())
-        return jsonify(calendar=_serialize_availability(calendar).values())
+        return jsonify(_serialize_availability(calendar).values())
 
 
 class RHCreateBooking(RHRoomBookingBase):

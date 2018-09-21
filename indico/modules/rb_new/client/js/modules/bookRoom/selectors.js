@@ -38,11 +38,22 @@ export const isFetchingFormTimeline = ({bookRoom}) => {
 export const isFetchingUnavailableRooms = ({bookRoom}) => {
     return bookRoom.unavailableRooms.request.state === RequestState.STARTED;
 };
-export const getUnavailableRoomInfo = ({bookRoom}) => bookRoom.unavailableRooms.data;
+const resolveTimelineRooms = (availability, allRooms) => {
+    return availability.map(([roomId, data]) => [roomId, {...data, room: allRooms[data.room_id]}]);
+};
+export const getUnavailableRoomInfo = createSelector(
+    ({bookRoom}) => bookRoom.unavailableRooms.data,
+    roomsSelectors.getAllRooms,
+    resolveTimelineRooms
+);
 export const isFetchingTimeline = ({bookRoom}) => bookRoom.timeline.request.state === RequestState.STARTED;
 export const isTimelineVisible = ({bookRoom}) => bookRoom.timeline.data.isVisible;
 export const getTimelineDateRange = ({bookRoom}) => bookRoom.timeline.data.dateRange;
-export const getTimelineAvailability = ({bookRoom}) => bookRoom.timeline.data.availability;
+export const getTimelineAvailability = createSelector(
+    ({bookRoom}) => bookRoom.timeline.data.availability,
+    roomsSelectors.getAllRooms,
+    resolveTimelineRooms,
+);
 export const hasMoreTimelineData = createSelector(
     getTimelineAvailability,
     ({bookRoom}) => bookRoom.timeline.data.roomIds,

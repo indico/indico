@@ -41,8 +41,7 @@ export function fetchCalendar() {
             () => indicoAxios.get(fetchCalendarURL(params)),
             FETCH_REQUEST,
             [ROWS_RECEIVED, FETCH_SUCCESS],
-            [FETCH_ERROR],
-            ({calendar: result}) => result
+            [FETCH_ERROR]
         )(dispatch);
     };
 }

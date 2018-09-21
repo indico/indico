@@ -124,7 +124,7 @@ def get_rooms_availability(rooms, start_dt, end_dt, repeat_frequency, repeat_int
         room_blocked_rooms = blocked_rooms.get(room.id, [])
         room_nonbookable_periods = nonbookable_periods.get(room.id, [])
         room_unbookable_hours = unbookable_hours.get(room.id, [])
-        availability[room.id] = {'room': room,
+        availability[room.id] = {'room_id': room.id,
                                  'candidates': group_by_occurrence_date(candidates),
                                  'pre_bookings': group_by_occurrence_date(pre_bookings),
                                  'bookings': group_by_occurrence_date(existing_bookings),
@@ -162,7 +162,7 @@ def get_room_calendar(start_date, end_date):
     dates = [d.date() for d in iterdays(start_dt, end_dt)]
 
     calendar = OrderedDict((room.id, {
-        'room': room,
+        'room_id': room.id,
         'nonbookable_periods': group_nonbookable_periods(nonbookable_periods.get(room.id, []), dates),
         'unbookable_hours': unbookable_hours.get(room.id, []),
         'blockings': group_blockings(blocked_rooms.get(room.id, []), dates),
