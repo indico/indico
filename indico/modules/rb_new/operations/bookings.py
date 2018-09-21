@@ -140,6 +140,10 @@ def get_room_calendar(start_date, end_date):
     start_dt = datetime.combine(start_date, time(hour=0, minute=0))
     end_dt = datetime.combine(end_date, time(hour=23, minute=59))
 
+    reservation_strategy = contains_eager('reservation')
+    reservation_strategy.noload('room')
+    reservation_strategy.noload('booked_for_user')
+    reservation_strategy.noload('created_by_user')
     query = (ReservationOccurrence.query
              .filter(ReservationOccurrence.is_valid)
              .filter(ReservationOccurrence.start_dt >= start_dt, ReservationOccurrence.end_dt <= end_dt)
@@ -147,7 +151,7 @@ def get_room_calendar(start_date, end_date):
              .join(Room)
              .filter(Room.is_active)
              .order_by(db.func.indico.natsort(Room.full_name))
-             .options(joinedload('reservation').joinedload('room')))
+             .options(reservation_strategy))
 
     rooms = (Room.query
              .filter(Room.is_active).options(joinedload('location'))
@@ -156,7 +160,7 @@ def get_room_calendar(start_date, end_date):
 
     unbookable_hours = get_rooms_unbookable_hours(rooms)
     nonbookable_periods = get_rooms_nonbookable_periods(rooms, start_dt, end_dt)
-    occurrences_by_room = groupby(query, attrgetter('reservation.room'))
+    occurrences_by_room = groupby(query, attrgetter('reservation.room_id'))
     blocked_rooms = get_rooms_blockings(rooms, start_date, end_date)
 
     dates = [d.date() for d in iterdays(start_dt, end_dt)]
@@ -168,12 +172,12 @@ def get_room_calendar(start_date, end_date):
         'blockings': group_blockings(blocked_rooms.get(room.id, []), dates),
     }) for room in rooms)
 
-    for room, occurrences in occurrences_by_room:
+    for room_id, occurrences in occurrences_by_room:
         occurrences = list(occurrences)
         pre_bookings = [occ for occ in occurrences if not occ.reservation.is_accepted]
         existing_bookings = [occ for occ in occurrences if occ.reservation.is_accepted]
 
-        calendar[room.id].update({
+        calendar[room_id].update({
             'bookings': group_by_occurrence_date(existing_bookings),
             'pre_bookings': group_by_occurrence_date(pre_bookings)
         })
