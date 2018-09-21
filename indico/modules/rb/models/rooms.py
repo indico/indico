@@ -25,7 +25,7 @@ from sqlalchemy.orm import contains_eager
 from indico.core.db.sqlalchemy import db
 from indico.core.db.sqlalchemy.custom import static_array
 from indico.core.db.sqlalchemy.util.cache import cached, versioned_cache
-from indico.core.db.sqlalchemy.util.queries import escape_like
+from indico.core.db.sqlalchemy.util.queries import db_dates_overlap, escape_like
 from indico.core.errors import NoReportError
 from indico.legacy.common.cache import GenericCache
 from indico.modules.groups import GroupProxy
@@ -562,7 +562,9 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
                                 overlap_criteria]
         if not include_pre_bookings:
             reservation_criteria.append(Reservation.is_accepted)
-        occurrences_filter = Reservation.occurrences.any(and_(*reservation_criteria))
+        occurrences_filter = (Reservation.query
+                              .join(ReservationOccurrence.reservation)
+                              .filter(and_(*reservation_criteria)))
         # Check availability against blockings
         if include_pending_blockings:
             valid_states = (BlockedRoom.State.accepted, BlockedRoom.State.pending)
@@ -570,13 +572,12 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
             valid_states = (BlockedRoom.State.accepted,)
         blocking_criteria = [Room.id == BlockedRoom.room_id,
                              BlockedRoom.state.in_(valid_states),
-                             Blocking.start_date <= end_dt.date(),
-                             Blocking.end_date >= start_dt.date()]
+                             db_dates_overlap(Blocking, 'start_date', end_dt.date(), 'end_date', start_dt.date(),
+                                              inclusive=True)]
         blockings_filter = (BlockedRoom.query
                             .join(Blocking.blocked_rooms)
-                            .exists()
-                            .where(and_(*blocking_criteria)))
-        return ~occurrences_filter & ~blockings_filter
+                            .filter(and_(*blocking_criteria)))
+        return ~occurrences_filter.exists() & ~blockings_filter.exists()
 
     @staticmethod
     def filter_bookable_hours(start_time, end_time):

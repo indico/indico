@@ -18,14 +18,11 @@ from __future__ import unicode_literals
 
 from datetime import timedelta
 
-from indico.core.db import db
-from indico.core.db.sqlalchemy.util.queries import db_dates_overlap
 from indico.modules.rb.models.blocked_rooms import BlockedRoom, BlockedRoomState
-from indico.modules.rb.models.blockings import Blocking
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import RepeatFrequency
 from indico.modules.rb.models.rooms import Room
-from indico.modules.rb_new.operations.blockings import get_rooms_blockings
+from indico.modules.rb_new.operations.blockings import get_blocked_rooms, get_rooms_blockings
 from indico.modules.rb_new.operations.bookings import get_existing_rooms_occurrences
 from indico.modules.rb_new.operations.conflicts import get_rooms_conflicts
 from indico.modules.rb_new.operations.misc import get_rooms_nonbookable_periods, get_rooms_unbookable_hours
@@ -38,13 +35,8 @@ DURATION_FACTOR = 0.25
 
 
 def get_suggestions(filters, limit=None):
-    room_filters = {key: value for key, value in filters.iteritems()
-                    if key in ('capacity', 'equipment', 'building', 'text', 'floor')}
-
-    query = search_for_rooms(room_filters)
-    query = query.filter(~Room.filter_available(filters['start_dt'], filters['end_dt'],
-                                                (filters['repeat_frequency'], filters['repeat_interval'])))
-    rooms = query.all()
+    blocked_rooms = get_blocked_rooms(filters['start_dt'], filters['end_dt'], [BlockedRoomState.accepted])
+    rooms = [room for room in search_for_rooms(filters, False) if room not in blocked_rooms]
     if filters['repeat_frequency'] == RepeatFrequency.NEVER:
         suggestions = sort_suggestions(get_single_booking_suggestions(rooms, filters['start_dt'], filters['end_dt'],
                                                                       limit=limit))

@@ -23,6 +23,7 @@ from flask import session
 from sqlalchemy.orm import contains_eager
 
 from indico.core.db import db
+from indico.core.db.sqlalchemy.util.queries import db_dates_overlap
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.groups import GroupProxy
 from indico.modules.rb.models.blocked_rooms import BlockedRoom, BlockedRoomState
@@ -111,3 +112,14 @@ def approve_or_request_blocking(blocking):
 
     for owner, rooms in rooms_by_owner.iteritems():
         notify_request(owner, blocking, rooms)
+
+
+def get_blocked_rooms(start_dt, end_dt, states=None):
+    query = (Room.query
+             .join(Room.blocked_rooms)
+             .join(BlockedRoom.blocking)
+             .filter(db_dates_overlap(Blocking, 'start_date', start_dt, 'end_date', end_dt)))
+
+    if states:
+        query = query.filter(BlockedRoom.state.in_(states))
+    return query.all()
