@@ -29,9 +29,9 @@ import TimelineBase from '../../components/TimelineBase';
 import {isDateWithinRange, pushStateMergeProps} from '../../util';
 import {queryString as queryStringSerializer} from '../../serializers/filters';
 import * as bookRoomActions from './actions';
+import * as bookRoomSelectors from './selectors';
 
 import '../../components/Timeline.module.scss';
-import * as bookRoomSelectors from './selectors';
 
 
 const timelinePropTypes = {
@@ -140,16 +140,6 @@ export class BookingTimelineComponent extends React.Component {
         const {
             dateRange, isFetching, maxHour, minHour, recurrenceType, lazyScroll, showEmptyMessage
         } = this.props;
-        const {activeDate} = this.state;
-        const legendLabels = [
-            {label: Translate.string('Available'), color: 'green'},
-            {label: Translate.string('Booked'), color: 'orange'},
-            {label: Translate.string('Pre-Booking'), style: 'pre-booking'},
-            {label: Translate.string('Conflict'), color: 'red'},
-            {label: Translate.string('Conflict with Pre-Booking'), style: 'pre-booking-conflict'},
-            {label: Translate.string('Blocked'), style: 'blocking'},
-            {label: Translate.string('Not bookable'), style: 'unbookable'}
-        ];
         const emptyMessage = showEmptyMessage ? (
             <Message warning>
                 <Translate>
@@ -158,27 +148,15 @@ export class BookingTimelineComponent extends React.Component {
             </Message>
         ) : null;
 
-        if (!activeDate) {
-            // this happens for a short time when loading the timeline with a direct link
-            return null;
-        }
-
         return (
             <TimelineBase lazyScroll={lazyScroll}
                           rows={this.calcRows()}
-                          legendLabels={legendLabels}
                           emptyMessage={emptyMessage}
                           onClick={this.openBookingModal}
                           onClickLabel={this.openRoomModal}
                           dateRange={dateRange}
                           minHour={minHour}
                           maxHour={maxHour}
-                          activeDate={activeDate}
-                          onDateChange={(newDate) => {
-                              this.setState({
-                                  activeDate: newDate
-                              });
-                          }}
                           extraContent={this.singleRoom && this.renderRoomSummary(this.singleRoom)}
                           isLoading={isFetching}
                           recurrenceType={recurrenceType}
