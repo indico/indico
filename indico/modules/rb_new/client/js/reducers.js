@@ -15,6 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+
 import {reducer as configReducer} from './common/config';
 import {reducer as mapReducer} from './common/map';
 import {reducer as roomsReducer} from './common/rooms';
@@ -24,6 +25,7 @@ import {reducer as blockingsReducer} from './modules/blockings';
 import {reducer as calendarReducer} from './modules/calendar';
 import {reducer as landingReducer} from './modules/landing';
 import {reducer as roomListReducer} from './modules/roomList';
+import {reducer as bookingReducer} from './common/bookings';
 
 
 export default () => ({
@@ -36,4 +38,5 @@ export default () => ({
     blockings: blockingsReducer,
     calendar: calendarReducer,
     landing: landingReducer,
+    bookings: bookingReducer
 });

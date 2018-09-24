@@ -24,6 +24,7 @@ import {Translate} from 'indico/react/i18n';
 import RoomBasicDetails from '../RoomBasicDetails';
 
 import './BookingDetailsModal.module.scss';
+import {selectors as bookingsSelectors} from '../../common/bookings';
 
 
 class BookingDetailsModal extends React.Component {
@@ -56,7 +57,9 @@ class BookingDetailsModal extends React.Component {
     }
 }
 
-const mapStateToProps = () => {};
+const mapStateToProps = (state, {bookingId}) => ({
+    booking: bookingsSelectors.getDetails(state, {bookingId})
+});
 
 export default connect(
     mapStateToProps,
