@@ -29,7 +29,7 @@ import TimelineItem from './TimelineItem';
 import './TimelineContent.module.scss';
 
 
-export default class TimelineContent extends React.Component {
+export default class DailyTimelineContent extends React.Component {
     static propTypes = {
         step: PropTypes.number,
         rows: PropTypes.array.isRequired,
@@ -131,7 +131,7 @@ export default class TimelineContent extends React.Component {
                         {rows.map((rowProps) => this.renderTimelineRow(rowProps))}
                         <div style={{left: labelWidth, width: `calc(100% - ${labelWidth}px)`}}
                              styleName="timeline-lines">
-                            {this.renderDividers(hourSeries.length - 1)}
+                            {this.renderDividers(hourSeries.length - 1, longLabel)}
                         </div>
                     </div>
                     <Loader active={wrapperProps.isFetching || isLoading} inline="centered" styleName="timeline-loader" />

@@ -30,7 +30,7 @@ import {toMoment} from 'indico/utils/date';
 import {selectors as roomsSelectors} from '../../common/rooms';
 import recurrenceRenderer from './filters/RecurrenceRenderer';
 import RoomBasicDetails from '../../components/RoomBasicDetails';
-import {TimelineContent, TimelineLegend} from '../../common/timeline';
+import {DailyTimelineContent, TimelineLegend} from '../../common/timeline';
 import * as actions from './actions';
 
 import './BookRoomModal.module.scss';
@@ -233,7 +233,7 @@ class BookRoomModal extends React.Component {
         const hourSeries = _.range(6, 24, 2);
         const {availability: {dateRange}} = this.props;
         const rows = dateRange.map((day) => this._getRowSerializer(day)(availability));
-        return <TimelineContent rows={rows} hourSeries={hourSeries} />;
+        return <DailyTimelineContent rows={rows} hourSeries={hourSeries} />;
     }
 
     renderBookingConstraints(conflicts) {

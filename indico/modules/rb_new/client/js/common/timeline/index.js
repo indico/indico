@@ -17,6 +17,6 @@
 
 export {default as EditableTimelineItem} from './EditableTimelineItem';
 export {default as TimelineBase} from './TimelineBase';
-export {default as TimelineContent} from './TimelineContent';
+export {default as DailyTimelineContent} from './DailyTimelineContent';
 export {default as TimelineHeader} from './TimelineHeader';
 export {default as TimelineLegend} from './TimelineLegend';

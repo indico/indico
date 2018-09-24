@@ -20,7 +20,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {Message} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
-import TimelineContent from './TimelineContent';
+import DailyTimelineContent from './DailyTimelineContent';
 import TimelineItem from './TimelineItem';
 
 import './Timeline.module.scss';
@@ -74,16 +74,16 @@ export default class TimelineBase extends React.Component {
             <>
                 <div styleName="timeline">
                     {extraContent}
-                    <TimelineContent rows={rows}
-                                     hourSeries={hourSeries}
-                                     recurrenceType={recurrenceType}
-                                     onClick={onClick}
-                                     itemClass={itemClass}
-                                     itemProps={itemProps}
-                                     longLabel={longLabel}
-                                     onClickLabel={onClickLabel}
-                                     isLoading={isLoading}
-                                     lazyScroll={lazyScroll} />
+                    <DailyTimelineContent rows={rows}
+                                          hourSeries={hourSeries}
+                                          recurrenceType={recurrenceType}
+                                          onClick={onClick}
+                                          itemClass={itemClass}
+                                          itemProps={itemProps}
+                                          longLabel={longLabel}
+                                          onClickLabel={onClickLabel}
+                                          isLoading={isLoading}
+                                          lazyScroll={lazyScroll} />
                 </div>
             </>
         );

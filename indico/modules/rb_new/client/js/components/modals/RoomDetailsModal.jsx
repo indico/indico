@@ -25,7 +25,7 @@ import {connect} from 'react-redux';
 import {Button, Grid, Icon, Modal, Header, Message, List, Segment, Popup} from 'semantic-ui-react';
 import {Translate, Param} from 'indico/react/i18n';
 import RoomBasicDetails from '../RoomBasicDetails';
-import {TimelineContent, TimelineLegend} from '../../common/timeline';
+import {DailyTimelineContent, TimelineLegend} from '../../common/timeline';
 import {selectors as roomsSelectors} from '../../common/rooms';
 import {queryStringRules as qsRoomSearchRules} from '../../common/roomSearch';
 import {queryStringRules as qsBookRoomRules} from '../../modules/bookRoom';
@@ -149,8 +149,8 @@ function RoomDetails({bookRoom, room, availability, attributes}) {
                         <Popup trigger={<Icon name="info circle" className="legend-info-icon" />}
                                content={<TimelineLegend labels={legendLabels} compact />} />
                     </Header>
-                    <TimelineContent rows={availability.map(rowSerializer)}
-                                     hourSeries={hourSeries} />
+                    <DailyTimelineContent rows={availability.map(rowSerializer)}
+                                          hourSeries={hourSeries} />
                     <Header><Translate>Statistics</Translate></Header>
                     <Message attached info>
                         <Icon name="info" />
