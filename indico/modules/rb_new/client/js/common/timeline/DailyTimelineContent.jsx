@@ -33,7 +33,6 @@ export default class DailyTimelineContent extends React.Component {
     static propTypes = {
         step: PropTypes.number,
         rows: PropTypes.array.isRequired,
-        hourSeries: PropTypes.array.isRequired,
         recurrenceType: PropTypes.string,
         onClick: PropTypes.func,
         longLabel: PropTypes.bool,
@@ -41,7 +40,10 @@ export default class DailyTimelineContent extends React.Component {
         itemClass: PropTypes.func,
         itemProps: PropTypes.object,
         isLoading: PropTypes.bool,
-        lazyScroll: PropTypes.object
+        lazyScroll: PropTypes.object,
+        minHour: PropTypes.number,
+        maxHour: PropTypes.number,
+        hourStep: PropTypes.number
     };
 
     static defaultProps = {
@@ -53,7 +55,10 @@ export default class DailyTimelineContent extends React.Component {
         itemClass: TimelineItem,
         itemProps: {},
         isLoading: false,
-        lazyScroll: null
+        lazyScroll: null,
+        minHour: 6,
+        maxHour: 22,
+        hourStep: 2
     };
 
     state = {
@@ -66,10 +71,10 @@ export default class DailyTimelineContent extends React.Component {
     };
 
     renderTimelineRow = ({availability, label, conflictIndicator, key, room}) => {
-        const {hourSeries, itemClass: ItemClass, itemProps, step, recurrenceType, onClick, longLabel} = this.props;
-        const minHour = hourSeries[0];
-        const maxHour = hourSeries[hourSeries.length - 1];
-        const columns = ((maxHour - minHour) / step) + 1;
+        const {
+            minHour, maxHour, hourStep, itemClass: ItemClass, itemProps, recurrenceType, onClick, longLabel
+        } = this.props;
+        const columns = ((maxHour - minHour) / hourStep) + 1;
         // TODO: Consider plan B (availability='alternatives') option when implemented
         const hasConflicts = !(_.isEmpty(availability.conflicts) && _.isEmpty(availability.preConflicts));
         return (
@@ -108,11 +113,13 @@ export default class DailyTimelineContent extends React.Component {
     };
 
     render() {
-        const {rows, hourSeries, longLabel, lazyScroll, isLoading} = this.props;
+        const {rows, minHour, maxHour, hourStep, longLabel, lazyScroll, isLoading} = this.props;
         const {selectable} = this.state;
         const labelWidth = longLabel ? 200 : 150;
         const WrapperComponent = lazyScroll ? LazyScroll : React.Fragment;
         const wrapperProps = lazyScroll || {};
+        const hourSeries = _.range(minHour, maxHour + hourStep, hourStep);
+
 
         return (
             <>

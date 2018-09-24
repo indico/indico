@@ -31,9 +31,9 @@ export default class TimelineBase extends React.Component {
         rows: PropTypes.arrayOf(PropTypes.object).isRequired,
         emptyMessage: PropTypes.node,
         extraContent: PropTypes.node,
-        minHour: PropTypes.number.isRequired,
-        maxHour: PropTypes.number.isRequired,
-        step: PropTypes.number,
+        minHour: PropTypes.number,
+        maxHour: PropTypes.number,
+        hourStep: PropTypes.number,
         onClick: PropTypes.func,
         isLoading: PropTypes.bool,
         recurrenceType: PropTypes.string,
@@ -52,7 +52,9 @@ export default class TimelineBase extends React.Component {
                 </Translate>
             </Message>
         ),
-        step: 2,
+        hourStep: 2,
+        minHour: 6,
+        maxHour: 22,
         onClick: null,
         extraContent: null,
         isLoading: false,
@@ -66,16 +68,17 @@ export default class TimelineBase extends React.Component {
 
     renderTimeline = () => {
         const {
-            extraContent, maxHour, minHour, onClick, recurrenceType, rows, step, isLoading, itemClass,
-            itemProps, longLabel, onClickLabel, lazyScroll
+            extraContent, onClick, recurrenceType, rows, isLoading, itemClass, itemProps, longLabel,
+            onClickLabel, lazyScroll, minHour, maxHour, hourStep
         } = this.props;
-        const hourSeries = _.range(minHour, maxHour + step, step);
         return (
             <>
                 <div styleName="timeline">
                     {extraContent}
                     <DailyTimelineContent rows={rows}
-                                          hourSeries={hourSeries}
+                                          minHour={minHour}
+                                          maxHour={maxHour}
+                                          hourStep={hourStep}
                                           recurrenceType={recurrenceType}
                                           onClick={onClick}
                                           itemClass={itemClass}

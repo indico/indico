@@ -62,8 +62,6 @@ class UnavailableRoomsModal extends React.Component {
                     <BookingTimelineComponent isFetching={isFetching}
                                               isFetchingRooms={false}
                                               recurrenceType={filters.recurrence.type}
-                                              minHour={6}
-                                              maxHour={22}
                                               availability={availability}
                                               dateRange={dateRange} />
                 </Modal.Content>

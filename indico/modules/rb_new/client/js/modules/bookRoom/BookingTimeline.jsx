@@ -35,8 +35,6 @@ import '../../common/timeline/Timeline.module.scss';
 
 
 const timelinePropTypes = {
-    minHour: PropTypes.number.isRequired,
-    maxHour: PropTypes.number.isRequired,
     availability: PropTypes.array.isRequired,
     dateRange: PropTypes.arrayOf(PropTypes.string).isRequired,
     recurrenceType: PropTypes.string.isRequired,
@@ -142,7 +140,7 @@ export class BookingTimelineComponent extends React.Component {
 
     render() {
         const {
-            dateRange, isFetching, maxHour, minHour, recurrenceType, lazyScroll, showEmptyMessage, pushState
+            dateRange, isFetching, recurrenceType, lazyScroll, showEmptyMessage, pushState
         } = this.props;
         const emptyMessage = showEmptyMessage ? (
             <Message warning>
@@ -159,8 +157,6 @@ export class BookingTimelineComponent extends React.Component {
                           onClick={pushState ? this.openBookingModal : null}
                           onClickLabel={pushState ? this.openRoomModal : null}
                           dateRange={dateRange}
-                          minHour={minHour}
-                          maxHour={maxHour}
                           extraContent={this.singleRoom && this.renderRoomSummary(this.singleRoom)}
                           isLoading={isFetching}
                           recurrenceType={recurrenceType}
@@ -256,8 +252,6 @@ class BookingTimeline extends React.Component {
             fetchingTimeline,
             hasMoreTimelineData,
             pushState,
-            minHour,
-            maxHour,
             availability,
             dateRange,
             recurrenceType,
@@ -274,8 +268,6 @@ class BookingTimeline extends React.Component {
             <BookingTimelineComponent lazyScroll={lazyScroll}
                                       isFetching={fetchingTimeline}
                                       pushState={pushState}
-                                      minHour={minHour}
-                                      maxHour={maxHour}
                                       availability={availability}
                                       dateRange={dateRange}
                                       recurrenceType={recurrenceType}

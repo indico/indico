@@ -147,13 +147,11 @@ class Calendar extends React.Component {
                                                 onDateChange={setDate}
                                                 legendLabels={legendLabels} />
                             </Sticky>
-                            <TimelineBase minHour={6}
-                                          maxHour={22}
-                                          rows={rows.map(this._getRowSerializer(date || serializeDate(moment())))}
-                                          onClickLabel={this.onClickLabel}
+                            <TimelineBase rows={rows.map(this._getRowSerializer(date || serializeDate(moment())))}
                                           isLoading={isFetching}
                                           itemClass={EditableTimelineItem}
                                           itemProps={{onAddSlot: this.onAddSlot}}
+                                          onClickLabel={this.onClickLabel}
                                           longLabel />
                         </div>
                     </Container>

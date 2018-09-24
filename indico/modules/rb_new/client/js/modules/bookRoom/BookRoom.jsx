@@ -251,7 +251,7 @@ class BookRoom extends React.Component {
             return (
                 <div styleName="available-room-list" ref={(ref) => this.handleContextRef(ref, 'timelineRef')}>
                     {this.renderFilters('timelineRef')}
-                    <BookingTimeline minHour={6} maxHour={22} />
+                    <BookingTimeline />
                 </div>
             );
         }

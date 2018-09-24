@@ -15,7 +15,6 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
 import moment from 'moment';
 import {push} from 'connected-react-router';
 import {stateToQueryString} from 'redux-router-querystring';
@@ -105,10 +104,6 @@ export default (namespace) => {
 };
 
 function RoomDetails({bookRoom, room, availability, attributes}) {
-    const minHour = 6;
-    const maxHour = 22;
-    const step = 2;
-    const hourSeries = _.range(minHour, maxHour + step, step);
     const legendLabels = [
         {label: Translate.string('Booked'), color: 'orange'},
         {label: Translate.string('Pre-Booking'), style: 'pre-booking'},
@@ -149,8 +144,7 @@ function RoomDetails({bookRoom, room, availability, attributes}) {
                         <Popup trigger={<Icon name="info circle" className="legend-info-icon" />}
                                content={<TimelineLegend labels={legendLabels} compact />} />
                     </Header>
-                    <DailyTimelineContent rows={availability.map(rowSerializer)}
-                                          hourSeries={hourSeries} />
+                    <DailyTimelineContent rows={availability.map(rowSerializer)} />
                     <Header><Translate>Statistics</Translate></Header>
                     <Message attached info>
                         <Icon name="info" />
