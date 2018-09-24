@@ -82,7 +82,7 @@ class ReservationOccurrenceSchema(mm.ModelSchema):
 
 
 class ReservationDetailsSchema(mm.ModelSchema):
-    room = Nested(RoomSchema, only=('id', 'name', 'sprite_position', 'full_name'))
+    room = Nested(RoomSchema)
     booked_for_user = Nested(UserSchema, only=('id', 'full_name', 'phone', 'email'))
     created_by_user = Nested(UserSchema, only=('full_name'))
 
