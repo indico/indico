@@ -183,6 +183,11 @@ class BookingTimeline extends React.Component {
             addTimelineRooms: PropTypes.func.isRequired,
             fetchRoomSuggestions: PropTypes.func.isRequired,
         }).isRequired,
+        showSuggestions: PropTypes.bool
+    };
+
+    static defaultProps = {
+        showSuggestions: true
     };
 
     componentDidMount() {
@@ -192,6 +197,7 @@ class BookingTimeline extends React.Component {
             roomIds,
             suggestedRoomIds,
             searchFinished,
+            showSuggestions
         } = this.props;
         initTimeline(roomIds, dates, timeSlot, recurrence);
         if (roomIds.length) {
@@ -199,7 +205,7 @@ class BookingTimeline extends React.Component {
         }
         if (suggestedRoomIds.length) {
             this.processSuggestedRooms();
-        } else if (searchFinished) {
+        } else if (searchFinished && showSuggestions) {
             fetchRoomSuggestions();
         }
     }
@@ -216,6 +222,7 @@ class BookingTimeline extends React.Component {
             roomIds,
             suggestedRoomIds,
             searchFinished,
+            showSuggestions
         } = this.props;
         const {dates, timeSlot, recurrence} = filters;
         // reset the timeline when filters changed
@@ -227,7 +234,9 @@ class BookingTimeline extends React.Component {
             if (roomIds.length) {
                 fetchTimeline();
             }
-            fetchRoomSuggestions();
+            if (showSuggestions) {
+                fetchRoomSuggestions();
+            }
         }
         if (!_.isEqual(prevSuggestedRoomIds, suggestedRoomIds) && suggestedRoomIds.length) {
             this.processSuggestedRooms();

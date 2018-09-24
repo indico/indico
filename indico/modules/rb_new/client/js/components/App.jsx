@@ -22,6 +22,7 @@ import {ConnectedRouter} from 'connected-react-router';
 import {Dimmer, Icon, Loader} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
+import {Overridable} from 'indico/react/util';
 import UserActions from '../containers/UserActions';
 import Landing from '../modules/landing';
 import Calendar from '../modules/calendar';
@@ -93,11 +94,14 @@ export default class App extends React.Component {
                         <Switch>
                             <Route exact path="/" render={() => <Redirect to="/book" />} />
                             <ConditionalRoute path="/book" render={({location, match: {isExact}}) => (
-                                filtersSet ? (
-                                    <BookRoom location={location} />
-                                ) : (
-                                    isExact ? <Landing /> : <Redirect to="/book" />
-                                )
+                                filtersSet
+                                    ? (
+                                        <Overridable id="BookRoom">
+                                            <BookRoom location={location} />
+                                        </Overridable>
+                                    ) : (
+                                        isExact ? <Landing /> : <Redirect to="/book" />
+                                    )
                             )} active={!isInitializing} />
                             <ConditionalRoute path="/rooms" component={RoomList} active={!isInitializing} />
                             <ConditionalRoute path="/blockings" component={BlockingList} active={!isInitializing} />

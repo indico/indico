@@ -25,7 +25,7 @@ export const filterDTHandler = (prefix) => {
             datePart = dates['startDate'];
         }
 
-        return `${datePart} ${timePart}`.trimRight();
+        return `${datePart} ${timePart || ''}`.trimRight();
     };
 };
 

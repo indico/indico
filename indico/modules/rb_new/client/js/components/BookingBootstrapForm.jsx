@@ -37,7 +37,8 @@ export default class BookingBootstrapForm extends React.Component {
         buttonCaption: PropTypes.object,
         children: PropTypes.node,
         buttonDisabled: PropTypes.bool,
-        defaults: PropTypes.object
+        defaults: PropTypes.object,
+        dayBased: PropTypes.bool
     };
 
     static get defaultProps() {
@@ -46,6 +47,7 @@ export default class BookingBootstrapForm extends React.Component {
             buttonCaption: <Translate>Search</Translate>,
             onChange: () => {},
             buttonDisabled: false,
+            dayBased: false,
             defaults: {
                 recurrence: {
                     type: 'single',
@@ -131,23 +133,28 @@ export default class BookingBootstrapForm extends React.Component {
     };
 
     get serializedState() {
+        const {dayBased} = this.props;
         const {
             timeSlot: {startTime, endTime},
             dates: {startDate, endDate},
             recurrence
         } = this.state;
 
-        return {
+        const state = {
             recurrence,
             dates: {
                 startDate: serializeDate(startDate),
                 endDate: serializeDate(endDate)
-            },
-            timeSlot: {
+            }
+        };
+
+        if (!dayBased) {
+            state.timeSlot = {
                 startTime: serializeTime(startTime),
                 endTime: serializeTime(endTime)
-            },
-        };
+            };
+        }
+        return state;
     }
 
     onSearch = () => {
@@ -162,7 +169,7 @@ export default class BookingBootstrapForm extends React.Component {
             dates: {startDate, endDate}
         } = this.state;
 
-        const {buttonCaption, buttonDisabled, children} = this.props;
+        const {buttonCaption, buttonDisabled, children, dayBased} = this.props;
 
         const calendar = (
             <RCCalendar selectedValue={startDate}
@@ -234,11 +241,13 @@ export default class BookingBootstrapForm extends React.Component {
                         }
                     </DatePicker>
                 )}
-                <Form.Group inline>
-                    <TimeRangePicker startTime={startTime}
-                                     endTime={endTime}
-                                     onChange={this.updateTimes} />
-                </Form.Group>
+                {!dayBased && (
+                    <Form.Group inline>
+                        <TimeRangePicker startTime={startTime}
+                                         endTime={endTime}
+                                         onChange={this.updateTimes} />
+                    </Form.Group>
+                )}
                 {children}
                 <Button primary disabled={buttonDisabled} onClick={this.onSearch}>
                     {buttonCaption}

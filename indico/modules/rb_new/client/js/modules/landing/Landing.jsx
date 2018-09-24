@@ -21,6 +21,7 @@ import moment from 'moment';
 import PropTypes from 'prop-types';
 import {Card, Checkbox, Form, Grid} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
+import {Overridable} from 'indico/react/util';
 
 import {actions as filtersActions} from '../../common/filters';
 import BookingBootstrapForm from '../../components/BookingBootstrapForm';
@@ -84,18 +85,20 @@ class Landing extends React.Component {
                                 </Card.Header>
                             </Card.Content>
                             <Card.Content styleName="landing-page-card-content">
-                                <BookingBootstrapForm onSearch={this.doSearch}>
-                                    <Form.Group inline>
-                                        <Form.Input placeholder="bldg: 28" styleName="search-input"
-                                                    onChange={(event, data) => this.updateText(data.value)} />
-                                    </Form.Group>
-                                    {userHasFavorites && (
-                                        <Form.Field>
-                                            <Checkbox label={Translate.string('Search only my favourites')}
-                                                      onClick={this.toggleFavorites} />
-                                        </Form.Field>
-                                    )}
-                                </BookingBootstrapForm>
+                                <Overridable id="BookingBootstrapForm">
+                                    <BookingBootstrapForm onSearch={this.doSearch}>
+                                        <Form.Group inline>
+                                            <Form.Input placeholder="bldg: 28" styleName="search-input"
+                                                        onChange={(event, data) => this.updateText(data.value)} />
+                                        </Form.Group>
+                                        {userHasFavorites && (
+                                            <Form.Field>
+                                                <Checkbox label={Translate.string('Search only my favourites')}
+                                                          onClick={this.toggleFavorites} />
+                                            </Form.Field>
+                                        )}
+                                    </BookingBootstrapForm>
+                                </Overridable>
                             </Card.Content>
                         </Card>
                     </Grid.Row>

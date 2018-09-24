@@ -23,6 +23,7 @@ import {Grid, Icon, Modal, Message} from 'semantic-ui-react';
 import {push} from 'connected-react-router';
 
 import {Translate} from 'indico/react/i18n';
+import {Overridable} from 'indico/react/util';
 
 import {queryStringRules as queryStringSerializer} from '../../common/roomSearch';
 import RoomBasicDetails from '../RoomBasicDetails';
@@ -111,13 +112,15 @@ class BookFromListModal extends React.Component {
                             <RoomBasicDetails room={room} />
                         </Grid.Column>
                         <Grid.Column width={8}>
-                            <BookingBootstrapForm buttonCaption={<Translate>Book</Translate>}
-                                                  buttonDisabled={buttonDisabled}
-                                                  onChange={refreshCollisions}
-                                                  onSearch={onBook}
-                                                  defaults={defaults}>
-                                {availability && <ConflictIndicator availability={availability} />}
-                            </BookingBootstrapForm>
+                            <Overridable id="BookingBootstrapForm">
+                                <BookingBootstrapForm buttonCaption={<Translate>Book</Translate>}
+                                                      buttonDisabled={buttonDisabled}
+                                                      onChange={refreshCollisions}
+                                                      onSearch={onBook}
+                                                      defaults={defaults}>
+                                    {availability && <ConflictIndicator availability={availability} />}
+                                </BookingBootstrapForm>
+                            </Overridable>
                         </Grid.Column>
                     </Grid>
                 </Modal.Content>

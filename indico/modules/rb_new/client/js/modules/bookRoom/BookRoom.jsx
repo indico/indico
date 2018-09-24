@@ -26,7 +26,7 @@ import {Route} from 'react-router-dom';
 import {Button, Card, Grid, Header, Icon, Label, Loader, Message, Popup, Sticky} from 'semantic-ui-react';
 import LazyScroll from 'redux-lazy-scroll';
 
-import {Slot, toClasses} from 'indico/react/util';
+import {Overridable, Slot, toClasses} from 'indico/react/util';
 import {PluralTranslate, Translate, Singular, Param, Plural} from 'indico/react/i18n';
 import {serializeTime, toMoment} from 'indico/utils/date';
 import searchBarFactory from '../../containers/SearchBar';
@@ -81,6 +81,11 @@ class BookRoom extends React.Component {
             toggleTimelineView: PropTypes.func.isRequired,
         }).isRequired,
         dateRange: PropTypes.array.isRequired,
+        showSuggestions: PropTypes.bool
+    };
+
+    static defaultProps = {
+        showSuggestions: true
     };
 
     state = {
@@ -168,7 +173,9 @@ class BookRoom extends React.Component {
             <Sticky context={ref} className="sticky-filters">
                 <div styleName="filter-row">
                     <div styleName="filter-row-filters">
-                        <BookingFilterBar />
+                        <Overridable id="BookingFilterBar">
+                            <BookingFilterBar />
+                        </Overridable>
                         <RoomFilterBar />
                         <SearchBar />
                     </div>
@@ -201,11 +208,11 @@ class BookRoom extends React.Component {
     };
 
     loadMoreRooms = () => {
-        const {actions: {fetchRoomSuggestions}} = this.props;
+        const {actions: {fetchRoomSuggestions}, showSuggestions} = this.props;
         const {maxVisibleRooms} = this.state;
         if (this.hasMoreRooms(false)) {
             this.setState({maxVisibleRooms: maxVisibleRooms + 20});
-        } else {
+        } else if (showSuggestions) {
             this.setState({suggestionsRequested: true});
             fetchRoomSuggestions();
         }
@@ -226,6 +233,7 @@ class BookRoom extends React.Component {
         const {
             isSearching,
             isTimelineVisible,
+            showSuggestions
         } = this.props;
 
         if (!isTimelineVisible) {
@@ -251,7 +259,7 @@ class BookRoom extends React.Component {
             return (
                 <div styleName="available-room-list" ref={(ref) => this.handleContextRef(ref, 'timelineRef')}>
                     {this.renderFilters('timelineRef')}
-                    <BookingTimeline />
+                    <BookingTimeline showSuggestions={showSuggestions} />
                 </div>
             );
         }

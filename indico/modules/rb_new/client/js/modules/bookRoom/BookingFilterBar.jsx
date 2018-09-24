@@ -47,15 +47,21 @@ class BookingFilterBar extends React.Component {
         timeSlot: PropTypes.shape({
             startTime: PropTypes.string,
             endTime: PropTypes.string
-        }).isRequired,
+        }),
         actions: PropTypes.shape({
             setFilterParameter: PropTypes.func
-        }).isRequired
+        }).isRequired,
+        dayBased: PropTypes.bool
+    };
+
+    static defaultProps = {
+        dayBased: false,
+        timeSlot: null
     };
 
     render() {
         const {
-            recurrence, dates, timeSlot, actions: {setFilterParameter}
+            recurrence, dates, timeSlot, actions: {setFilterParameter}, dayBased
         } = this.props;
 
         return (
@@ -88,15 +94,17 @@ class BookingFilterBar extends React.Component {
                                            initialValues={dates}
                                            renderValue={dateRenderer}
                                            showButtons={false} />
-                    <FilterDropdownFactory name="timeSlot"
-                                           title={<Translate>Time</Translate>}
-                                           form={(fieldValues, setParentField) => (
-                                               <TimeForm setParentField={setParentField}
-                                                         {...fieldValues} />
-                                           )}
-                                           setGlobalState={setFilterParameter.bind(undefined, 'timeSlot')}
-                                           initialValues={timeSlot}
-                                           renderValue={timeRenderer} />
+                    {!dayBased && (
+                        <FilterDropdownFactory name="timeSlot"
+                                               title={<Translate>Time</Translate>}
+                                               form={(fieldValues, setParentField) => (
+                                                   <TimeForm setParentField={setParentField}
+                                                             {...fieldValues} />
+                                               )}
+                                               setGlobalState={setFilterParameter.bind(undefined, 'timeSlot')}
+                                               initialValues={timeSlot}
+                                               renderValue={timeRenderer} />
+                    )}
                 </FilterBarController>
             </Button.Group>
         );
