@@ -36,7 +36,7 @@ Internal Changes
 Version 2.1.4
 -------------
 
-*Unreleased*
+*Released on September 25, 2018*
 
 Bugfixes
 ^^^^^^^^
@@ -46,6 +46,9 @@ Bugfixes
 - Do not count deleted registrations when printing tickets from the badge
   designer page
 - Hide "Save answers" in surveys while not logged in
+- Fix importing event archives containing registrations with attachments
+- Fix display issue in participants table after editing data (:issue:`3511`)
+- Fix errors when booking rooms via API
 
 Version 2.1.3
 -------------

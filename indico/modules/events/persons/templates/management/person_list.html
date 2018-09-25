@@ -199,7 +199,7 @@
                 {% endcall %}
             {% endif %}
             <table class="i-table-widget tablesorter">
-                {% set event_has_registration_forms = event.registration_forms != [] %}
+                {% set event_has_registration_forms = event.registration_forms|bool %}
                 <thead>
                     <tr class="i-table">
                         <th class="i-table thin-column hide-if-locked" data-sorter="false"></th>

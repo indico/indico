@@ -181,7 +181,7 @@ class BookRoomHook(HTTPAPIHook):
         username = get_query_parameter(self._queryParams, 'username')
         if not username:
             raise HTTPAPIError('No username provided')
-        users = User.find_all(~User.is_deleted, Identity.identifier == username)
+        users = User.query.join(User.identities).filter(~User.is_deleted, Identity.identifier == username).all()
         if not users:
             raise HTTPAPIError('Username does not exist')
         elif len(users) != 1:
@@ -219,8 +219,6 @@ class BookRoomHook(HTTPAPIHook):
             'repeat_interval': 0,
             'room_id': self._room.id,
             'booked_for_user': self._params['booked_for'],
-            'contact_email': self._params['booked_for'].email,
-            'contact_phone': self._params['booked_for'].phone,
             'booking_reason': self._params['reason']
         })
         try:

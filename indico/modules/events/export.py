@@ -136,6 +136,11 @@ def _get_pk(table):
     return pks[0]
 
 
+def _has_single_pk(table):
+    """Check if the table has a single PK."""
+    return len(inspect(table).primary_key.columns.values()) == 1
+
+
 def _get_inserted_pk(result):
     """Get the single PK value inserted by a query"""
     assert len(result.inserted_primary_key) == 1
@@ -654,13 +659,16 @@ class EventImporter(object):
             for code in missing_user_exec:
                 insert_values.update(_exec_custom(code))
         if file_data is not None:
-            # restore a file from the import archive and save it in storage
-            pk_name = _get_pk(table).name
-            assert pk_name not in insert_values
-            # get an ID early since we use it in the filename
-            stmt = db.func.nextval(db.func.pg_get_serial_sequence(table.fullname, pk_name))
-            insert_values[pk_name] = pk_value = db.session.query(stmt).scalar()
-            insert_values.update(self._process_file(pk_value, file_data))
+            if _has_single_pk(table):
+                # restore a file from the import archive and save it in storage
+                pk_name = _get_pk(table).name
+                assert pk_name not in insert_values
+                # get an ID early since we use it in the filename
+                stmt = db.func.nextval(db.func.pg_get_serial_sequence(table.fullname, pk_name))
+                insert_values[pk_name] = pk_value = db.session.query(stmt).scalar()
+                insert_values.update(self._process_file(pk_value, file_data))
+            else:
+                insert_values.update(self._process_file(unicode(uuid4()), file_data))
         if self.verbose and table.fullname in self.spec['verbose']:
             fmt = self.spec['verbose'][table.fullname]
             click.echo(fmt.format(**insert_values))
