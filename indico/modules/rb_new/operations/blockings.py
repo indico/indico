@@ -20,7 +20,7 @@ from collections import defaultdict
 from datetime import date
 
 from flask import session
-from sqlalchemy.orm import contains_eager
+from sqlalchemy.orm import contains_eager, selectinload
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.queries import db_dates_overlap
@@ -38,7 +38,8 @@ def get_room_blockings(timeframe=None, created_by=None, in_rooms_owned_by=None):
     query = (Blocking.query
              .join(Blocking.blocked_rooms)
              .join(BlockedRoom.room)
-             .options(contains_eager('blocked_rooms').contains_eager('room')))
+             .options(contains_eager('blocked_rooms').contains_eager('room'),
+                      selectinload('_allowed')))
 
     criteria = []
     if timeframe == 'recent':
