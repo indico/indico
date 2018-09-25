@@ -27,7 +27,7 @@ import RecurrenceForm from './filters/RecurrenceForm';
 import DateForm from './filters/DateForm';
 import TimeForm from './filters/TimeForm';
 
-import recurrenceRenderer from './filters/RecurrenceRenderer';
+import recurrenceRenderer from '../../components/RecurrenceRenderer';
 import dateRenderer from './filters/DateRenderer';
 import timeRenderer from './filters/TimeRenderer';
 import {actions as filtersActions} from '../../common/filters';

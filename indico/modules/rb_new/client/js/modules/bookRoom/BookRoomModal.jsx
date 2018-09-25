@@ -21,7 +21,7 @@ import React from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import PropTypes from 'prop-types';
-import {Button, Checkbox, Form, Grid, Icon, Label, Message, Modal, Radio, Segment, Popup} from 'semantic-ui-react';
+import {Button, Checkbox, Form, Grid, Icon, Message, Modal, Radio, Segment, Popup} from 'semantic-ui-react';
 import {Form as FinalForm, Field} from 'react-final-form';
 import createDecorator from 'final-form-calculate';
 import {ReduxFormField, ReduxRadioField, formatters} from 'indico/react/forms';
@@ -30,13 +30,10 @@ import PrincipalSearchField from 'indico/react/components/PrincipalSearchField';
 import {Overridable} from 'indico/react/util';
 import {toMoment} from 'indico/utils/date';
 import {selectors as roomsSelectors} from '../../common/rooms';
-import recurrenceRenderer from './filters/RecurrenceRenderer';
 import RoomBasicDetails from '../../components/RoomBasicDetails';
 import {DailyTimelineContent, TimelineLegend} from '../../common/timeline';
 import * as actions from './actions';
 import {selectors as userSelectors} from '../../common/user';
-
-import './BookRoomModal.module.scss';
 
 
 function validate({usage, user, reason}) {
