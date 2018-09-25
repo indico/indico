@@ -20,7 +20,7 @@ from flask import jsonify
 
 from indico.modules.rb import Location
 from indico.modules.rb.controllers import RHRoomBookingBase
-from indico.modules.rb_new.operations.locations import get_buildings, get_equipment_types
+from indico.modules.rb_new.operations.locations import get_equipment_types
 from indico.modules.rb_new.schemas import aspects_schema, locations_schema
 
 
@@ -41,11 +41,6 @@ class RHAspects(RHRoomBookingBase):
             for aspect in aspects_schema.dump(Location.default_location.aspects).data
         ]
         return jsonify(aspects)
-
-
-class RHBuildings(RHRoomBookingBase):
-    def _process(self):
-        return jsonify(get_buildings())
 
 
 class RHEquipmentTypes(RHRoomBookingBase):

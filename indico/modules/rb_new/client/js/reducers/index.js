@@ -15,7 +15,6 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import buildingsReducer from './buildings';
 import mapAspectsReducer from './mapAspects';
 import {reducer as configReducer} from '../common/config';
 import {reducer as roomsReducer} from '../common/rooms';
@@ -32,7 +31,6 @@ const reducers = {
     user: userReducer,
     bookRoom: bookRoomReducer,
     roomList: roomListReducer,
-    buildings: buildingsReducer,
     mapAspects: mapAspectsReducer,
     rooms: roomsReducer,
     blockings: blockingsReducer,

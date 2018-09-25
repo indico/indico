@@ -16,22 +16,23 @@
  */
 
 import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
 
 import SearchBar from '../components/SearchBar';
-import {setFilterParameter} from '../actions';
+import {selectors as roomsSelectors} from '../common/rooms';
+import * as globalActions from '../actions';
 
 
-export default (namespace) => {
-    const mapStateToProps = (state) => ({...state[namespace], buildings: state.buildings});
-
-    const mapDispatchToProps = dispatch => ({
-        setFilterParameter: (param, value) => {
-            dispatch(setFilterParameter(namespace, param, value));
-        },
-    });
-
+export default (namespace, searchRoomsSelectors) => {
     return connect(
-        mapStateToProps,
-        mapDispatchToProps
+        state => ({
+            filters: searchRoomsSelectors.getFilters(state),
+            buildings: roomsSelectors.getBuildings(state),
+        }),
+        dispatch => ({
+            actions: bindActionCreators({
+                setFilterParameter: (param, value) => globalActions.setFilterParameter(namespace, param, value),
+            }, dispatch)
+        })
     )(SearchBar);
 };

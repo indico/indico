@@ -28,9 +28,11 @@ import './SearchBar.module.scss';
 
 export default class SearchBar extends React.Component {
     static propTypes = {
-        setFilterParameter: PropTypes.func.isRequired,
         filters: PropTypes.object.isRequired,
         buildings: PropTypes.object.isRequired,
+        actions: PropTypes.exact({
+            setFilterParameter: PropTypes.func.isRequired,
+        }).isRequired,
     };
 
     constructor(props) {
@@ -95,7 +97,7 @@ export default class SearchBar extends React.Component {
     };
 
     updateTextFilter = (filterValue) => {
-        const {setFilterParameter} = this.props;
+        const {actions: {setFilterParameter}} = this.props;
         const {building, text: roomName, floor} = parseSearchBarText(filterValue);
         const stateUpdates = {inputTextValue: filterValue, building, floor, roomName};
 
@@ -108,7 +110,7 @@ export default class SearchBar extends React.Component {
     updateFilter = (filterName, value) => {
         const filterValue = value || null;
         const stateChanges = {[filterName]: filterValue};
-        const {setFilterParameter} = this.props;
+        const {actions: {setFilterParameter}} = this.props;
 
         if (filterName === 'building') {
             stateChanges.floor = null;
@@ -126,7 +128,7 @@ export default class SearchBar extends React.Component {
             search: true
         };
 
-        const {buildings: {list: buildingsList, isFetching}} = this.props;
+        const {buildings: buildingsList} = this.props;
         const {building, floor, filtersChanged} = this.state;
         let floors = [];
 
@@ -145,7 +147,6 @@ export default class SearchBar extends React.Component {
             <Form>
                 <Form.Field>
                     <Select {...commonAttrs} placeholder={Translate.string('Select building')}
-                            loading={isFetching}
                             onChange={(event, data) => this.updateFilter('building', data.value)}
                             value={building && parseInt(building, 10)}
                             options={[{text: '', value: ''}, ...buildings]} />

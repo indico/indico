@@ -16,7 +16,6 @@
  */
 
 import fetchMapAspectsURL from 'indico-url:rooms_new.default_aspects';
-import fetchBuildingsURL from 'indico-url:rooms_new.buildings';
 
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import * as selectors from './selectors';
@@ -34,11 +33,6 @@ export const FETCH_MAP_ASPECTS_FAILED = 'FETCH_MAP_ASPECTS_FAILED';
 export const UPDATE_ASPECTS = 'UPDATE_ASPECTS';
 export const UPDATE_LOCATION = 'UPDATE_LOCATION';
 export const TOGGLE_MAP_SEARCH = 'TOGGLE_MAP_SEARCH';
-// Buildings
-export const FETCH_BUILDINGS_STARTED = 'FETCH_BUILDINGS_STARTED';
-export const FETCH_BUILDINGS_FAILED = 'FETCH_BUILDINGS_FAILED';
-export const FETCH_BUILDINGS = 'FETCH_BUILDINGS';
-export const UPDATE_BUILDINGS = 'UPDATE_BUILDINGS';
 
 
 export function init() {
@@ -84,21 +78,4 @@ export function fetchMapAspects() {
 
 export function toggleMapSearch(namespace, search) {
     return {type: TOGGLE_MAP_SEARCH, search, namespace};
-}
-
-export function fetchBuildings() {
-    return async (dispatch) => {
-        dispatch({type: FETCH_BUILDINGS_STARTED});
-
-        let response;
-        try {
-            response = await indicoAxios.get(fetchBuildingsURL());
-        } catch (error) {
-            dispatch({type: FETCH_BUILDINGS_FAILED});
-            handleAxiosError(error);
-            return;
-        }
-
-        dispatch({type: UPDATE_BUILDINGS, buildings: response.data});
-    };
 }

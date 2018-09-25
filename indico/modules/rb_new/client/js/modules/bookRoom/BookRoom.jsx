@@ -30,7 +30,7 @@ import {Slot, toClasses} from 'indico/react/util';
 import {PluralTranslate, Translate, Singular, Param, Plural} from 'indico/react/i18n';
 import {serializeTime} from 'indico/utils/date';
 import mapControllerFactory from '../../containers/MapController';
-import searchBoxFactory from '../../containers/SearchBar';
+import searchBarFactory from '../../containers/SearchBar';
 import Room from '../../containers/Room';
 import BookingFilterBar from './BookingFilterBar';
 import roomFilterBarFactory from '../../modules/roomList/RoomFilterBar';
@@ -51,7 +51,7 @@ import {actions as roomsActions, selectors as roomsSelectors} from '../../common
 import './BookRoom.module.scss';
 
 
-const SearchBar = searchBoxFactory('bookRoom');
+const SearchBar = searchBarFactory('bookRoom', bookRoomSelectors);
 const MapController = mapControllerFactory('bookRoom', bookRoomSelectors);
 const RoomDetailsModal = roomDetailsModalFactory('bookRoom');
 const RoomFilterBar = roomFilterBarFactory('bookRoom');
