@@ -5,7 +5,7 @@ Changelog
 Version 2.1.4
 -------------
 
-*Unreleased*
+*Released on September 25, 2018*
 
 Bugfixes
 ^^^^^^^^
