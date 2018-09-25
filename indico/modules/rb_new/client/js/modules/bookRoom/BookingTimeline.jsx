@@ -123,6 +123,11 @@ export class BookingTimelineComponent extends React.Component {
         pushState(`/book/${room.id}/confirm`, true);
     };
 
+    openRoomModal = (roomId) => {
+        const {pushState} = this.props;
+        pushState(`/book/${roomId}/details`, true);
+    };
+
     renderRoomSummary({room: {full_name: fullName}}) {
         return (
             <Segment>
@@ -164,6 +169,7 @@ export class BookingTimelineComponent extends React.Component {
                           legendLabels={legendLabels}
                           emptyMessage={emptyMessage}
                           onClick={this.openBookingModal}
+                          onClickLabel={this.openRoomModal}
                           dateRange={dateRange}
                           minHour={minHour}
                           maxHour={maxHour}
