@@ -16,7 +16,7 @@ settings:
     eslint-import-resolver-indico:
       extensions: [.js, .jsx, .json]
   react:
-    version: '16.5.1'
+    version: '16.5.2'
 
 rules:
   func-style:
