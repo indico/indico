@@ -18,7 +18,7 @@ import React from 'react';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import {Icon, Label, Menu, Message, Popup} from 'semantic-ui-react';
-import {stateToQueryString} from 'redux-router-querystring/dist/routing';
+import {stateToQueryString} from 'redux-router-querystring';
 import {Route, withRouter} from 'react-router-dom';
 import {Translate, Param} from 'indico/react/i18n';
 import {queryString as qsFilterRules} from '../../serializers/filters';
