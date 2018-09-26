@@ -26,6 +26,7 @@ export function roomSearchSelectorFactory(namespace) {
     const getTotalResultCount = ({[namespace]: stateSlice}) => stateSlice.search.results.total;
     const getAvailabilityDateRange = ({[namespace]: stateSlice}) => stateSlice.search.results.availabilityDays;
     const isSearching = ({[namespace]: stateSlice}) => stateSlice.search.request.state === RequestState.STARTED;
+    const isSearchFinished = ({[namespace]: stateSlice}) => stateSlice.search.request.state === RequestState.SUCCESS;
     const hasUnavailableRooms = createSelector(
         getSearchResultIds,
         getTotalResultCount,
@@ -51,6 +52,7 @@ export function roomSearchSelectorFactory(namespace) {
     return {
         getFilters,
         isSearching,
+        isSearchFinished,
         getSearchResults,
         getSearchResultIds,
         getTotalResultCount,

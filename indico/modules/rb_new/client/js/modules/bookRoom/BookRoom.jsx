@@ -62,6 +62,7 @@ class BookRoom extends React.Component {
         results: PropTypes.arrayOf(PropTypes.object).isRequired,
         isInitializing: PropTypes.bool.isRequired,
         isSearching: PropTypes.bool.isRequired,
+        searchFinished: PropTypes.bool.isRequired,
         isTimelineVisible: PropTypes.bool.isRequired,
         hasConflicts: PropTypes.bool.isRequired,
         totalResultCount: PropTypes.number.isRequired,
@@ -193,7 +194,10 @@ class BookRoom extends React.Component {
 
     hasMoreRooms = (allowSuggestions = true) => {
         const {maxVisibleRooms, suggestionsRequested} = this.state;
-        const {results} = this.props;
+        const {results, searchFinished} = this.props;
+        if (!searchFinished) {
+            return false;
+        }
         return maxVisibleRooms < results.length || (allowSuggestions && !suggestionsRequested);
     };
 
@@ -465,6 +469,7 @@ const mapStateToProps = (state) => {
         suggestions: bookRoomSelectors.getSuggestions(state),
         totalResultCount: bookRoomSelectors.getTotalResultCount(state),
         isSearching: bookRoomSelectors.isSearching(state),
+        searchFinished: bookRoomSelectors.isSearchFinished(state),
         hasConflicts: bookRoomSelectors.hasUnavailableRooms(state),
         roomDetailsFetching: roomsSelectors.isFetchingDetails(state),
         isInitializing: globalSelectors.isInitializing(state),

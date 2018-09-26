@@ -24,6 +24,7 @@ import {selectors as roomsSelectors} from '../../common/rooms';
 const {
     getFilters,
     isSearching,
+    isSearchFinished,
     getSearchResults,
     getSearchResultIds,
     getTotalResultCount,
@@ -74,6 +75,7 @@ export const getSuggestedRoomIds = createSelector(
 export {
     getFilters,
     isSearching,
+    isSearchFinished,
     getSearchResults,
     getSearchResultIds,
     getTotalResultCount,
