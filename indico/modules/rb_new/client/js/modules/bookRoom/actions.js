@@ -57,9 +57,10 @@ export const GET_UNAVAILABLE_TIMELINE_ERROR = 'bookRoom/GET_UNAVAILABLE_TIMELINE
 export const UNAVAILABLE_TIMELINE_RECEIVED = 'bookRoom/UNAVAILABLE_TIMELINE_RECEIVED';
 
 // Suggestions
-export const FETCH_SUGGESTIONS_STARTED = 'bookRoom/FETCH_SUGGESTIONS_STARTED';
-export const FETCH_SUGGESTIONS_FAILED = 'bookRoom/FETCH_SUGGESTIONS_FAILED';
-export const UPDATE_SUGGESTIONS = 'bookRoom/UPDATE_SUGGESTIONS';
+export const FETCH_SUGGESTIONS_REQUEST = 'bookRoom/FETCH_SUGGESTIONS_REQUEST';
+export const FETCH_SUGGESTIONS_SUCCESS = 'bookRoom/FETCH_SUGGESTIONS_SUCCESS';
+export const FETCH_SUGGESTIONS_ERROR = 'bookRoom/FETCH_SUGGESTIONS_ERROR';
+export const SUGGESTIONS_RECEIVED = 'bookRoom/SUGGESTIONS_RECEIVED';
 export const RESET_SUGGESTIONS = 'bookRoom/RESET_SUGGESTIONS';
 
 
@@ -166,26 +167,16 @@ export function toggleTimelineView(visible) {
 
 export function fetchRoomSuggestions() {
     return async (dispatch, getStore) => {
-        dispatch({type: FETCH_SUGGESTIONS_STARTED});
-
-        let response;
         const {bookRoom: {filters}} = getStore();
         const params = preProcessParameters(filters, ajaxFilterRules);
 
-        try {
-            response = await indicoAxios.get(fetchSuggestionsURL(), {params});
-        } catch (error) {
-            dispatch({type: FETCH_SUGGESTIONS_FAILED});
-            handleAxiosError(error);
-            return;
-        }
-
-        dispatch(updateRoomSuggestions(response.data));
+        return await ajaxAction(
+            () => indicoAxios.get(fetchSuggestionsURL(), {params}),
+            FETCH_SUGGESTIONS_REQUEST,
+            [SUGGESTIONS_RECEIVED, FETCH_SUGGESTIONS_SUCCESS],
+            FETCH_SUGGESTIONS_ERROR
+        )(dispatch);
     };
-}
-
-export function updateRoomSuggestions(suggestions) {
-    return {type: UPDATE_SUGGESTIONS, suggestions};
 }
 
 export function resetRoomSuggestions() {

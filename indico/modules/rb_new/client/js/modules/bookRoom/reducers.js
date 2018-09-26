@@ -86,25 +86,23 @@ const unavailableReducer = combineReducers({
     }
 });
 
-const initialSuggestionsState = {
-    isFetching: false,
-    list: []
-};
-
-function suggestionsReducer(state = initialSuggestionsState, action) {
-    switch (action.type) {
-        case actions.FETCH_SUGGESTIONS_STARTED:
-            return {...state, isFetching: true, list: []};
-        case actions.FETCH_SUGGESTIONS_FAILED:
-            return {...state, isFetching: false};
-        case actions.UPDATE_SUGGESTIONS:
-            return {...state, isFetching: false, list: action.suggestions};
-        case actions.RESET_SUGGESTIONS:
-            return {...state, isFetching: false, list: []};
-        default:
-            return state;
+const suggestionsReducer = combineReducers({
+    request: requestReducer(
+        actions.FETCH_SUGGESTIONS_REQUEST,
+        actions.FETCH_SUGGESTIONS_SUCCESS,
+        actions.FETCH_SUGGESTIONS_ERROR
+    ),
+    data: (state = [], action) => {
+        switch (action.type) {
+            case actions.RESET_SUGGESTIONS:
+                return [];
+            case actions.SUGGESTIONS_RECEIVED:
+                return action.data;
+            default:
+                return state;
+        }
     }
-}
+});
 
 const bookingFormReducer = combineReducers({
     requests: combineReducers({
