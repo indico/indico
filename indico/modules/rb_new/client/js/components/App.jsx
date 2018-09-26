@@ -33,6 +33,19 @@ import Menu from './Menu';
 import './App.module.scss';
 
 
+function ConditionalRoute({active, component, render, ...props}) {
+    const routeProps = {};
+    if (component) {
+        routeProps.component = active ? component : null;
+    } else if (render) {
+        routeProps.render = active ? render : null;
+    } else {
+        throw new Error('either "component" or "render" should be provided as a prop');
+    }
+
+    return <Route {...props} {...routeProps} />;
+}
+
 export default class App extends React.Component {
     static propTypes = {
         title: PropTypes.string,
@@ -79,21 +92,16 @@ export default class App extends React.Component {
                     <div styleName="rb-content">
                         <Switch>
                             <Route exact path="/" render={() => <Redirect to="/book" />} />
-                            {!isInitializing && (
-                                <>
-                                    <Route path="/book" render={({location, match: {isExact}}) => (
-                                        filtersSet
-                                            ? (
-                                                <BookRoom location={location} />
-                                            ) : (
-                                                isExact ? <Landing /> : <Redirect to="/book" />
-                                            )
-                                    )} />
-                                    <Route path="/rooms" component={RoomList} />
-                                    <Route path="/blockings" component={BlockingList} />
-                                    <Route path="/calendar" component={Calendar} />
-                                </>
-                            )}
+                            <ConditionalRoute path="/book" render={({location, match: {isExact}}) => (
+                                filtersSet ? (
+                                    <BookRoom location={location} />
+                                ) : (
+                                    isExact ? <Landing /> : <Redirect to="/book" />
+                                )
+                            )} active={!isInitializing} />
+                            <ConditionalRoute path="/rooms" component={RoomList} active={!isInitializing} />
+                            <ConditionalRoute path="/blockings" component={BlockingList} active={!isInitializing} />
+                            <ConditionalRoute path="/calendar" component={Calendar} active={!isInitializing} />
                         </Switch>
                     </div>
                     <Dimmer.Dimmable>
