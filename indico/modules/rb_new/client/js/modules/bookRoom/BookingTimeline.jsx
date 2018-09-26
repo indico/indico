@@ -169,6 +169,7 @@ class BookingTimeline extends React.Component {
     static propTypes = {
         ...timelinePropTypes,
         fetchingTimeline: PropTypes.bool.isRequired,
+        fetchingSuggestions: PropTypes.bool.isRequired,
         hasMoreTimelineData: PropTypes.bool.isRequired,
         filters: PropTypes.shape({
             dates: PropTypes.object.isRequired,
@@ -208,6 +209,7 @@ class BookingTimeline extends React.Component {
             filters,
             roomIds,
             suggestedRoomIds,
+            fetchingSuggestions,
         } = this.props;
         const {dates, timeSlot, recurrence} = filters;
         // reset the timeline when filters changed
@@ -220,7 +222,7 @@ class BookingTimeline extends React.Component {
             if (roomIds.length) {
                 fetchTimeline();
             }
-            if (!suggestedRoomIds.length) {
+            if (!suggestedRoomIds.length && !fetchingSuggestions) {
                 fetchRoomSuggestions();
             }
         }
@@ -282,6 +284,7 @@ export default connect(
         availability: bookRoomSelectors.getTimelineAvailability(state),
         dateRange: bookRoomSelectors.getTimelineDateRange(state),
         fetchingTimeline: bookRoomSelectors.isFetchingTimeline(state),
+        fetchingSuggestions: bookRoomSelectors.isFetchingSuggestions(state),
         roomIds: bookRoomSelectors.getSearchResultIds(state),
         suggestedRoomIds: bookRoomSelectors.getSuggestedRoomIds(state),
         hasMoreTimelineData: bookRoomSelectors.hasMoreTimelineData(state),

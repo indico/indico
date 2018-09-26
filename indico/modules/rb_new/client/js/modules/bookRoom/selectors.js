@@ -59,6 +59,7 @@ export const hasMoreTimelineData = createSelector(
     ({bookRoom}) => bookRoom.timeline.data.roomIds,
     (availability, roomIds) => roomIds.length > availability.length
 );
+export const isFetchingSuggestions = ({bookRoom}) => bookRoom.suggestions.isFetching;
 const getRawSuggestions = ({bookRoom}) => bookRoom.suggestions.list;
 export const getSuggestions = createSelector(
     getRawSuggestions,
