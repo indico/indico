@@ -151,6 +151,7 @@ class BookRoomModal extends React.Component {
             const {booking} = this.state;
             const bookingLink = (
                 // TODO: add link to view booking details
+                // eslint-disable-next-line no-alert
                 <a onClick={() => alert(`TODO: View booking ${booking.id}`)} />
             );
             return (

@@ -8,12 +8,15 @@ addons:
   postgresql: 9.6
 install:
   - pip install -U pip setuptools
-  - pip install isort
+  - pip install -r requirements.dev.txt
   - pip install -e .
+  - npm install
 script:
   - isort -rc --diff --check-only indico/
   - python bin/maintenance/update_backrefs.py --ci
+  - npx eslint --ext .js --ext .jsx indico/modules/rb_new/ indico/modules/events/logs/ indico/web/client/js/react/
   - pytest
+  - python bin/maintenance/build-assets.py indico --dev
 notifications:
   email: false
   irc:
