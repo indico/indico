@@ -33,7 +33,6 @@ export default function BookingTimeInformation({recurrence, dates, timeSlot}) {
     const eDate = endDate ? toMoment(endDate) : null;
     const sTime = toMoment(startTime, 'HH:mm');
     const eTime = endTime ? toMoment(endTime, 'HH:mm') : null;
-
     return (
         <div styleName="booking-time-info">
             <Segment attached="top" color="teal">

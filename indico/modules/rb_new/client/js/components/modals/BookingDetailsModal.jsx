@@ -15,16 +15,18 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import moment from 'moment';
 import React from 'react';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
-import {Modal, Grid} from 'semantic-ui-react';
-import {Translate} from 'indico/react/i18n';
-
-import RoomBasicDetails from '../RoomBasicDetails';
+import {Button, Modal, Message, Grid, Header, ModalActions, Icon} from 'semantic-ui-react';
+import {Param, Translate} from 'indico/react/i18n';
+import {toMoment, serializeDate} from 'indico/utils/date';
+import BookingTimeInformation from '../BookingTimeInformation';
+import RoomBasicDetails from '../../components/RoomBasicDetails';
+import {selectors as bookingsSelectors} from '../../common/bookings';
 
 import './BookingDetailsModal.module.scss';
-import {selectors as bookingsSelectors} from '../../common/bookings';
 
 
 class BookingDetailsModal extends React.Component {
@@ -52,6 +54,13 @@ class BookingDetailsModal extends React.Component {
                 <Modal.Content>
                     <BookingDetails booking={booking} />
                 </Modal.Content>
+                <ModalActions>
+                    <Button type="button" content={Translate.string('Cancel')} />
+                    <Button type="button" content={Translate.string('Reject')} />
+                    <Button type="button" content={Translate.string('Modify')} />
+                    <Button type="button" content={Translate.string('Delete')} />
+                    <Button type="button" content={Translate.string('Clone')} />
+                </ModalActions>
             </Modal>
         );
     }
@@ -70,18 +79,72 @@ BookingDetails.propTypes = {
 };
 
 function BookingDetails({booking}) {
-    const room = booking.room;
+    const {
+        room, booked_for_user: bookedFor, start_dt: startDt, end_dt: endDt, repetition,
+        created_by_user: createdBy, created_dt: createdDt, booking_reason: reason
+    } = booking;
+    const {full_name: bookedForName, email: bookedForEmail, phone: bookedForPhone} = bookedFor;
+    const dates = {startDate: startDt, endDate: endDt};
+    const createdOn = serializeDate(toMoment(createdDt));
+    const times = {startTime: moment(startDt).utc().format('HH:mm'), endTime: moment(endDt).utc().format('HH:mm')};
+    const recurrence = getRecurrence(repetition);
     return (
         <div>
             <Grid columns={2}>
                 <Grid.Column>
-                    <div>
-                        <RoomBasicDetails room={room} />
-                    </div>
+                    <RoomBasicDetails room={room} />
+                    <BookingTimeInformation recurrence={recurrence}
+                                            dates={dates}
+                                            timeSlot={times} />
+                    <Message attached="bottom">
+                        <Message.Content>
+                            <Translate>
+                                Consult the timeline view to see the booking occurrences.
+                            </Translate>
+                        </Message.Content>
+                    </Message>
                 </Grid.Column>
                 <Grid.Column>
+                    <Grid columns={2}>
+                        <Grid.Column>
+                            <Header><Icon name="user" /><Translate>Booked for</Translate></Header>
+                            <div>{bookedForName}</div>
+                            {bookedForPhone && <div><Icon name="phone" />{bookedForPhone}</div>}
+                            {bookedForEmail && <div><Icon name="mail" />{bookedForEmail}</div>}
+                        </Grid.Column>
+                        <Grid.Column>
+                            <Header><Translate>Reason</Translate></Header>
+                            <div>{reason}</div>
+                        </Grid.Column>
+                    </Grid>
+                    <Header>Booking history</Header>
+                    <div>
+                        <Translate>
+                            <Param name="date" value={createdOn} /> - booking created by <Param name="created_by" value={createdBy} />
+                        </Translate>
+                    </div>
                 </Grid.Column>
             </Grid>
         </div>
     );
+}
+
+function getRecurrence(repetition) {
+    const repeatFrequency = repetition[0];
+    const repeatInterval = repetition[1];
+    let type = 'single';
+    let number = null;
+    let interval = null;
+    if (repeatFrequency === 1) {
+        type = 'daily';
+    } else if (repeatFrequency === 2) {
+        type = 'every';
+        interval = 'week';
+        number = repeatInterval;
+    } else if (repeatFrequency === 3) {
+        type = 'every';
+        interval = 'month';
+        number = repeatInterval;
+    }
+    return ({type, number, interval});
 }
