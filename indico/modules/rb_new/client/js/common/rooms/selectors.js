@@ -59,16 +59,10 @@ export const getBuildings = createSelector(
             roomsByBuilding[room.building].push(room);
         });
         return Object.entries(roomsByBuilding).reduce((obj, [building, rooms]) => {
-            const room = rooms.find(r => r.longitude && r.latitude);
-            if (!room) {
-                return obj;
-            }
             const data = {
                 rooms,
                 floors: _.sortedUniq(rooms.map(r => r.floor).sort()),
                 number: building,
-                longitude: room.longitude,
-                latitude: room.latitude,
             };
             return {...obj, [building]: data};
         }, {});
