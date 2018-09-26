@@ -18,7 +18,7 @@
 import _ from 'lodash';
 import createHistory from 'history/createBrowserHistory';
 import {queryStringMiddleware, createQueryStringReducer} from 'redux-router-querystring';
-import {connectRouter, routerMiddleware} from 'connected-react-router';
+import {connectRouter, routerMiddleware, LOCATION_CHANGE} from 'connected-react-router';
 import createReduxStore from 'indico/utils/redux';
 
 import reducers from './reducers';
@@ -61,17 +61,26 @@ export const history = createHistory({
 const qsFilterReducer = createQueryStringReducer(
     queryFilterRules,
     (state, action) => {
-        if (action.type === actions.INIT) {
+        if (action.type === actions.INIT || action.type === LOCATION_CHANGE) {
+            let pathname, queryString;
+            if (action.type === actions.INIT) {
+                pathname = history.location.pathname;
+                queryString = history.location.search;
+            } else {
+                pathname = action.payload.location.pathname;
+                queryString = action.payload.location.search;
+            }
+
             const namespace = pathMatch({
                 '^/book': 'bookRoom',
                 '^/rooms': 'roomList'
-            }, history.location.pathname);
+            }, pathname);
             if (!namespace) {
                 return null;
             }
             return {
                 namespace,
-                queryString: history.location.search.slice(1)
+                queryString: queryString.slice(1)
             };
         }
         return null;
