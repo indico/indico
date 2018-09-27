@@ -527,10 +527,13 @@ class RHUserSearch(RHProtected):
 
     @use_args({
         'email': fields.Str(validate=lambda s: len(s) > 3 and '@' in s),
-        'name': fields.Str(validate=validate.Length(min=3))
+        'name': fields.Str(validate=validate.Length(min=3)),
+        'favorites_first': fields.Bool(missing=False)
     })
     def _process(self, args):
         if not args:
             raise BadRequest()
-        query = build_user_search_query(args).limit(10)
-        return jsonify(user_schema.dump(query.all(), many=True))
+
+        favorites_first = args.pop('favorites_first')
+        query = build_user_search_query(args, favorites_first=favorites_first)
+        return jsonify(user_schema.dump(query.limit(10).all(), many=True))
