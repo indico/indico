@@ -31,13 +31,13 @@ import camelizeKeys from 'indico/utils/camelize';
 import {pushStateMergeProps, roomPreloader} from '../../util';
 import roomFilterBarFactory from './RoomFilterBar';
 import searchBarFactory from '../../containers/SearchBar';
-import mapControllerFactory from '../../containers/MapController';
 import Room from '../../containers/Room';
 import roomDetailsModalFactory from '../../components/modals/RoomDetailsModal';
 import BookFromListModal from '../../components/modals/BookFromListModal';
 import {BlockingModal} from '../blockings';
 import {queryStringRules as queryStringSerializer} from '../../common/roomSearch';
 import {actions as roomsActions, selectors as roomsSelectors} from '../../common/rooms';
+import {mapControllerFactory, selectors as mapSelectors} from '../../common/map';
 import * as selectors from '../../selectors';
 import * as roomsListActions from './actions';
 import * as roomsListSelectors from './selectors';
@@ -298,7 +298,7 @@ export default connect(
         results: roomsListSelectors.getSearchResults(state),
         isSearching: roomsListSelectors.isSearching(state),
         roomDetailsFetching: roomsSelectors.isFetchingDetails(state),
-        showMap: selectors.isMapVisible(state),
+        showMap: mapSelectors.isMapVisible(state),
         isInitializing: selectors.isInitializing(state),
         queryString: stateToQueryString(state.roomList, queryStringSerializer), // for pushStateMergeProps
     }),

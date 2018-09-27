@@ -15,23 +15,10 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import * as actions from '../actions';
+import * as actions from './actions';
+import * as selectors from './selectors';
 
 
-const initialState = {
-    list: [],
-    isFetching: false
-};
-
-export default function reducer(state = initialState, action) {
-    switch (action.type) {
-        case actions.UPDATE_ASPECTS:
-            return {...state, isFetching: false, list: action.aspects};
-        case actions.FETCH_MAP_ASPECTS_STARTED:
-            return {...state, isFetching: true};
-        case actions.FETCH_MAP_ASPECTS_FAILED:
-            return {...state, isFetching: false};
-        default:
-            return state;
-    }
-}
+export {default as mapControllerFactory} from './MapController';
+export {default as reducer, mapSearchReducerFactory} from './reducers';
+export {actions, selectors};

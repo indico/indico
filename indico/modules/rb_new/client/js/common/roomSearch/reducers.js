@@ -20,7 +20,7 @@ import camelizeKeys from 'indico/utils/camelize';
 import {requestReducer} from 'indico/utils/redux';
 
 import {filterReducerFactory} from '../filters';
-import {mapReducerFactory} from '../../reducers/roomBooking/map';
+import {mapSearchReducerFactory} from '../map';
 import {roomSearchActionsFactory} from './actions';
 import {parseSearchBarText, sanitizeRecurrence} from '../../util';
 
@@ -97,7 +97,7 @@ export function roomSearchReducerFactory(namespace, extra = {}) {
             }
         }),
         filters: filterReducerFactory(namespace, initialRoomFilterStateFactory, processRoomFilters),
-        map: mapReducerFactory(namespace),
+        map: mapSearchReducerFactory(namespace),
         ...extra
     });
 }

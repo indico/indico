@@ -15,22 +15,9 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import fetchMapAspectsURL from 'indico-url:rooms_new.default_aspects';
-
-import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
-import * as selectors from './selectors';
-
-
 // Page state
 export const INIT = 'INIT';
 export const RESET_PAGE_STATE = 'RESET_PAGE_STATE';
-
-// Map
-export const FETCH_MAP_ASPECTS_STARTED = 'FETCH_MAP_ASPECTS_STARTED';
-export const FETCH_MAP_ASPECTS_FAILED = 'FETCH_MAP_ASPECTS_FAILED';
-export const UPDATE_ASPECTS = 'UPDATE_ASPECTS';
-export const UPDATE_LOCATION = 'UPDATE_LOCATION';
-export const TOGGLE_MAP_SEARCH = 'TOGGLE_MAP_SEARCH';
 
 
 export function init() {
@@ -39,33 +26,4 @@ export function init() {
 
 export function resetPageState(namespace) {
     return {type: RESET_PAGE_STATE, namespace};
-}
-
-export function updateLocation(namespace, location) {
-    return {type: UPDATE_LOCATION, location, namespace};
-}
-
-export function fetchMapAspects() {
-    return async (dispatch, getStore) => {
-        if (!selectors.isMapEnabled(getStore())) {
-            return;
-        }
-
-        dispatch({type: FETCH_MAP_ASPECTS_STARTED});
-
-        let response;
-        try {
-            response = await indicoAxios.get(fetchMapAspectsURL());
-        } catch (error) {
-            handleAxiosError(error);
-            dispatch({type: FETCH_MAP_ASPECTS_FAILED});
-            return;
-        }
-
-        dispatch({type: UPDATE_ASPECTS, aspects: response.data});
-    };
-}
-
-export function toggleMapSearch(namespace, search) {
-    return {type: TOGGLE_MAP_SEARCH, search, namespace};
 }

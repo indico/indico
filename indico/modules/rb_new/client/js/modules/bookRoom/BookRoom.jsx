@@ -29,11 +29,10 @@ import LazyScroll from 'redux-lazy-scroll';
 import {Slot, toClasses} from 'indico/react/util';
 import {PluralTranslate, Translate, Singular, Param, Plural} from 'indico/react/i18n';
 import {serializeTime, toMoment} from 'indico/utils/date';
-import mapControllerFactory from '../../containers/MapController';
 import searchBarFactory from '../../containers/SearchBar';
 import Room from '../../containers/Room';
 import BookingFilterBar from './BookingFilterBar';
-import roomFilterBarFactory from '../../modules/roomList/RoomFilterBar';
+import {roomFilterBarFactory} from '../../modules/roomList';
 import BookingTimeline from './BookingTimeline';
 import BookRoomModal from './BookRoomModal';
 import SearchResultCount from './SearchResultCount';
@@ -47,6 +46,7 @@ import {actions as filtersActions} from '../../common/filters';
 import * as globalSelectors from '../../selectors';
 import * as bookRoomSelectors from './selectors';
 import {actions as roomsActions, selectors as roomsSelectors} from '../../common/rooms';
+import {mapControllerFactory, selectors as mapSelectors} from '../../common/map';
 
 import './BookRoom.module.scss';
 
@@ -474,7 +474,7 @@ const mapStateToProps = (state) => {
         roomDetailsFetching: roomsSelectors.isFetchingDetails(state),
         isInitializing: globalSelectors.isInitializing(state),
         queryString: stateToQueryString(state.bookRoom, qsFilterRules, qsBookRoomRules),
-        showMap: globalSelectors.isMapVisible(state),
+        showMap: mapSelectors.isMapVisible(state),
         dateRange: bookRoomSelectors.getTimelineDateRange(state)
     };
 };

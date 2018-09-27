@@ -15,21 +15,38 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import * as actions from '../../actions';
-import {getAspectBounds} from '../../util';
+import {combineReducers} from 'redux';
+import {requestReducer} from 'indico/utils/redux';
+import * as mapActions from './actions';
+import {getAspectBounds} from './util';
 
 
-const initialMapState = {
-    bounds: null,
-    search: false,
-};
+export default combineReducers({
+    request: requestReducer(
+        mapActions.FETCH_ASPECTS_REQUEST,
+        mapActions.FETCH_ASPECTS_SUCCESS,
+        mapActions.FETCH_ASPECTS_ERROR
+    ),
+    aspects: (state = [], action) => {
+        switch (action.type) {
+            case mapActions.ASPECTS_RECEIVED:
+                return action.data;
+            default:
+                return state;
+        }
+    }
+});
 
+export function mapSearchReducerFactory(namespace) {
+    const initialState = {
+        bounds: null,
+        search: false,
+    };
 
-export function mapReducerFactory(namespace) {
-    return (state = initialMapState, action) => {
+    return (state = initialState, action) => {
         // aspect updates are global and need to run regardless of the namespace
-        if (action.type === actions.UPDATE_ASPECTS) {
-            const defaultAspect = action.aspects.find(aspect => aspect.default_on_startup) || action.aspects[0];
+        if (action.type === mapActions.ASPECTS_RECEIVED) {
+            const defaultAspect = action.data.find(aspect => aspect.default_on_startup) || action.data[0];
             return {...state, bounds: defaultAspect ? getAspectBounds(defaultAspect) : null};
         }
 
@@ -38,9 +55,9 @@ export function mapReducerFactory(namespace) {
         }
 
         switch (action.type) {
-            case actions.UPDATE_LOCATION:
+            case mapActions.UPDATE_LOCATION:
                 return {...state, bounds: action.location};
-            case actions.TOGGLE_MAP_SEARCH:
+            case mapActions.TOGGLE_MAP_SEARCH:
                 return {...state, search: action.search};
             default:
                 return state;
