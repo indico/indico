@@ -22,7 +22,7 @@ import PropTypes from 'prop-types';
 import {Card, Checkbox, Form, Grid} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
 
-import * as globalActions from '../../actions';
+import {actions as filtersActions} from '../../common/filters';
 import BookingBootstrapForm from '../../components/BookingBootstrapForm';
 import {parseSearchBarText} from '../../util';
 import LandingStatistics from './LandingStatistics';
@@ -118,7 +118,7 @@ export default connect(
     dispatch => ({
         actions: {
             setFilters(data) {
-                dispatch(globalActions.setFilters('bookRoom', data));
+                dispatch(filtersActions.setFilters('bookRoom', data));
             }
         }
     })

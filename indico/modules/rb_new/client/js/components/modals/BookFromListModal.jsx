@@ -24,9 +24,9 @@ import {push} from 'connected-react-router';
 
 import {Translate} from 'indico/react/i18n';
 
-import {queryString as queryStringSerializer} from '../../serializers/filters';
+import {queryStringRules as queryStringSerializer} from '../../common/roomSearch';
 import RoomBasicDetails from '../RoomBasicDetails';
-import * as globalActions from '../../actions';
+import {actions as filtersActions} from '../../common/filters';
 import * as bookRoomActions from '../../modules/bookRoom/actions';
 import BookingBootstrapForm from '../BookingBootstrapForm';
 import {selectors as roomsSelectors} from '../../common/rooms';
@@ -150,7 +150,7 @@ export default connect(
             },
             onBook(filters) {
                 const qs = stateToQueryString({filters}, queryStringSerializer);
-                dispatch(globalActions.setFilters('bookRoom', filters));
+                dispatch(filtersActions.setFilters('bookRoom', filters));
                 dispatch(push(`/book/${room.id}/confirm?${qs}`));
             },
         };

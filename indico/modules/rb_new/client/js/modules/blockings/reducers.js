@@ -19,7 +19,7 @@ import {combineReducers} from 'redux';
 
 import {requestReducer} from 'indico/utils/redux';
 import camelizeKeys from 'indico/utils/camelize';
-import filterReducerFactory from '../../reducers/roomBooking/filters';
+import {filterReducerFactory} from '../../common/filters';
 import * as blockingsActions from './actions';
 
 

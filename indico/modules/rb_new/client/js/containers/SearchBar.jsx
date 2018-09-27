@@ -20,7 +20,7 @@ import {bindActionCreators} from 'redux';
 
 import SearchBar from '../components/SearchBar';
 import {selectors as roomsSelectors} from '../common/rooms';
-import * as globalActions from '../actions';
+import {actions as filtersActions} from '../common/filters';
 
 
 export default (namespace, searchRoomsSelectors) => {
@@ -31,7 +31,7 @@ export default (namespace, searchRoomsSelectors) => {
         }),
         dispatch => ({
             actions: bindActionCreators({
-                setFilterParameter: (param, value) => globalActions.setFilterParameter(namespace, param, value),
+                setFilterParameter: (param, value) => filtersActions.setFilterParameter(namespace, param, value),
             }, dispatch)
         })
     )(SearchBar);

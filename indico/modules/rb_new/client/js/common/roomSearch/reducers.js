@@ -19,9 +19,58 @@ import {combineReducers} from 'redux';
 import camelizeKeys from 'indico/utils/camelize';
 import {requestReducer} from 'indico/utils/redux';
 
-import filterReducerFactory, {initialRoomFilterStateFactory} from '../../reducers/roomBooking/filters';
+import {filterReducerFactory} from '../filters';
 import {mapReducerFactory} from '../../reducers/roomBooking/map';
 import {roomSearchActionsFactory} from './actions';
+import {parseSearchBarText, sanitizeRecurrence} from '../../util';
+
+
+function processRoomFilters(filters, param) {
+    if (param === 'recurrence') {
+        sanitizeRecurrence(filters);
+    } else if (param === 'text') {
+        const dd = parseSearchBarText(filters.text);
+        filters.text = dd.text || null;
+        filters.building = dd.building || null;
+        filters.floor = dd.floor || null;
+    }
+
+    return filters;
+}
+
+
+export function initialRoomFilterStateFactory(namespace) {
+    const state = {
+        text: null,
+        capacity: null,
+        onlyFavorites: false,
+        onlyMine: false,
+        equipment: [],
+        bounds: null,
+        building: null,
+        floor: null,
+    };
+
+    if (namespace === 'bookRoom') {
+        Object.assign(state, {
+            recurrence: {
+                type: null,
+                number: null,
+                interval: null
+            },
+            dates: {
+                startDate: null,
+                endDate: null
+            },
+            timeSlot: {
+                startTime: null,
+                endTime: null
+            },
+        });
+    }
+
+    return state;
+}
 
 
 export function roomSearchReducerFactory(namespace, extra = {}) {
@@ -47,7 +96,7 @@ export function roomSearchReducerFactory(namespace, extra = {}) {
                 }
             }
         }),
-        filters: filterReducerFactory(namespace, initialRoomFilterStateFactory),
+        filters: filterReducerFactory(namespace, initialRoomFilterStateFactory, processRoomFilters),
         map: mapReducerFactory(namespace),
         ...extra
     });

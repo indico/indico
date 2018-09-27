@@ -19,7 +19,7 @@ import searchRoomsURL from 'indico-url:rooms_new.search_rooms';
 import {indicoAxios} from 'indico/utils/axios';
 import {ajaxAction} from 'indico/utils/redux';
 import {preProcessParameters} from '../../util';
-import {ajax as ajaxFilterRules} from '../../serializers/filters';
+import {ajax as ajaxFilterRules} from './serializers';
 
 
 export function roomSearchActionsFactory(namespace) {

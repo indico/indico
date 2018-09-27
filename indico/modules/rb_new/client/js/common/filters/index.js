@@ -15,8 +15,8 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-export {roomSearchActionsFactory} from './actions';
-export {roomSearchReducerFactory} from './reducers';
-export {roomSearchSelectorFactory} from './selectors';
-export {queryStringReducer, rules as queryStringRules} from './queryString';
-export {ajax as ajaxRules} from './serializers';
+import * as actions from './actions';
+
+
+export {filterReducerFactory} from './reducers';
+export {actions};

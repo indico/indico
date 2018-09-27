@@ -36,7 +36,7 @@ import Room from '../../containers/Room';
 import roomDetailsModalFactory from '../../components/modals/RoomDetailsModal';
 import BookFromListModal from '../../components/modals/BookFromListModal';
 import {BlockingModal} from '../blockings';
-import {queryString as queryStringSerializer} from '../../serializers/filters';
+import {queryStringRules as queryStringSerializer} from '../../common/roomSearch';
 import {actions as roomsActions, selectors as roomsSelectors} from '../../common/rooms';
 import * as selectors from '../../selectors';
 import * as roomsListActions from './actions';

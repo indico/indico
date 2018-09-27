@@ -15,8 +15,14 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-export {roomSearchActionsFactory} from './actions';
-export {roomSearchReducerFactory} from './reducers';
-export {roomSearchSelectorFactory} from './selectors';
-export {queryStringReducer, rules as queryStringRules} from './queryString';
-export {ajax as ajaxRules} from './serializers';
+import {actions as filtersActions} from '../../common/filters';
+import {queryStringRules as queryFilterRules} from '../../common/roomSearch';
+
+
+export const routeConfig = {
+    '/rooms': {
+        listen: filtersActions.SET_FILTER_PARAMETER,
+        select: ({roomList: {filters}}) => ({filters}),
+        serialize: queryFilterRules
+    },
+};

@@ -25,7 +25,7 @@ import {Translate} from 'indico/react/i18n';
 import CapacityForm from './filters/CapacityForm';
 import EquipmentForm from './filters/EquipmentForm';
 import {FilterBarController, FilterDropdownFactory} from '../../common/filters/FilterBar';
-import * as globalActions from '../../actions';
+import {actions as filtersActions} from '../../common/filters';
 import {selectors as roomsSelectors} from '../../common/rooms';
 import {selectors as userSelectors} from '../../common/user';
 
@@ -143,7 +143,7 @@ export default (namespace) => connect(
     dispatch => ({
         actions: {
             setFilterParameter: (param, value) => {
-                dispatch(globalActions.setFilterParameter(namespace, param, value));
+                dispatch(filtersActions.setFilterParameter(namespace, param, value));
             }
         }
     })

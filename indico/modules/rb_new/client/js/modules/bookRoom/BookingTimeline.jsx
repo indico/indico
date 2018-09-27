@@ -27,7 +27,7 @@ import {Translate, Param} from 'indico/react/i18n';
 import {serializeDate, toMoment} from 'indico/utils/date';
 import TimelineBase from '../../components/TimelineBase';
 import {isDateWithinRange, pushStateMergeProps} from '../../util';
-import {queryString as queryStringSerializer} from '../../serializers/filters';
+import {queryStringRules as queryStringSerializer} from '../../common/roomSearch';
 import * as bookRoomActions from './actions';
 import * as bookRoomSelectors from './selectors';
 

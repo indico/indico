@@ -24,9 +24,7 @@ import * as selectors from './selectors';
 // Page state
 export const INIT = 'INIT';
 export const RESET_PAGE_STATE = 'RESET_PAGE_STATE';
-// Filter
-export const SET_FILTER_PARAMETER = 'SET_FILTER_PARAMETER';
-export const SET_FILTERS = 'SET_FILTERS';
+
 // Map
 export const FETCH_MAP_ASPECTS_STARTED = 'FETCH_MAP_ASPECTS_STARTED';
 export const FETCH_MAP_ASPECTS_FAILED = 'FETCH_MAP_ASPECTS_FAILED';
@@ -37,14 +35,6 @@ export const TOGGLE_MAP_SEARCH = 'TOGGLE_MAP_SEARCH';
 
 export function init() {
     return {type: INIT};
-}
-
-export function setFilterParameter(namespace, param, data) {
-    return {type: SET_FILTER_PARAMETER, namespace, param, data};
-}
-
-export function setFilters(namespace, params) {
-    return {type: SET_FILTERS, namespace, params};
 }
 
 export function resetPageState(namespace) {

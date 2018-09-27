@@ -86,11 +86,11 @@ export function sanitizeRecurrence(filters) {
     const {dates: {endDate, startDate}, recurrence: {type, interval, number}} = filters;
 
     if (type === 'single' && endDate) {
-        filters.dates.endDate = null;
+        filters.dates = {...filters.dates, endDate: null};
     } else if (type !== 'single' && startDate && !endDate) {
         // if there's a start date already set, let's set a sensible
         // default for the end date
-        filters.dates.endDate = calculateDefaultEndDate(startDate, type, number, interval);
+        filters.dates = {...filters.dates, endDate: calculateDefaultEndDate(startDate, type, number, interval)};
     }
 }
 

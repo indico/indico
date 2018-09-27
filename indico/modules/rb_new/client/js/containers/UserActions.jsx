@@ -21,7 +21,7 @@ import UserActions from '../components/UserActions';
 
 import {selectors as userSelectors} from '../common/user';
 import {actions as blockingsActions} from '../modules/blockings';
-import * as globalActions from '../actions';
+import {actions as filtersActions} from '../common/filters';
 
 
 export default connect(
@@ -31,7 +31,7 @@ export default connect(
     }),
     dispatch => ({
         gotoMyRoomsList() {
-            dispatch(globalActions.setFilterParameter('roomList', 'onlyMine', true));
+            dispatch(filtersActions.setFilterParameter('roomList', 'onlyMine', true));
             dispatch(pushRoute('/rooms?mine=true'));
         },
         gotoMyBlockings() {
