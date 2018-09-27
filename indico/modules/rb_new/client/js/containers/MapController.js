@@ -18,8 +18,8 @@
 import {connect} from 'react-redux';
 
 import MapController from '../components/MapController';
+import {actions as filtersActions} from '../common/filters';
 import {
-    setFilterParameter,
     toggleMapSearch,
     updateLocation
 } from '../actions';
@@ -44,12 +44,12 @@ export default function mapControllerFactory(namespace, searchRoomSelectors) {
         updateLocation: (location, search) => {
             dispatch(updateLocation(namespace, location));
             if (search) {
-                dispatch(setFilterParameter(namespace, 'bounds', location));
+                dispatch(filtersActions.setFilterParameter(namespace, 'bounds', location));
             }
         },
         toggleMapSearch: (search, location) => {
             dispatch(toggleMapSearch(namespace, search));
-            dispatch(setFilterParameter(namespace, 'bounds', search ? location : null));
+            dispatch(filtersActions.setFilterParameter(namespace, 'bounds', search ? location : null));
         },
     });
 

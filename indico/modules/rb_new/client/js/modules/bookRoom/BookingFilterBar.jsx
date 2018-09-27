@@ -30,7 +30,7 @@ import TimeForm from './filters/TimeForm';
 import recurrenceRenderer from './filters/RecurrenceRenderer';
 import dateRenderer from './filters/DateRenderer';
 import timeRenderer from './filters/TimeRenderer';
-import * as globalActions from '../../actions';
+import {actions as filtersActions} from '../../common/filters';
 
 
 class BookingFilterBar extends React.Component {
@@ -110,7 +110,7 @@ export default connect(
     dispatch => ({
         actions: {
             setFilterParameter: (param, value) => {
-                dispatch(globalActions.setFilterParameter('bookRoom', param, value));
+                dispatch(filtersActions.setFilterParameter('bookRoom', param, value));
             }
         }
     })

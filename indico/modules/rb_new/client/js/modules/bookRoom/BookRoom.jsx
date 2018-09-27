@@ -40,10 +40,10 @@ import SearchResultCount from './SearchResultCount';
 import roomDetailsModalFactory from '../../components/modals/RoomDetailsModal';
 import TimelineHeader from '../../components/TimelineHeader';
 import {roomPreloader, pushStateMergeProps, isDateWithinRange} from '../../util';
-import {queryString as qsFilterRules} from '../../serializers/filters';
+import {queryStringRules as qsFilterRules} from '../../common/roomSearch';
 import {rules as qsBookRoomRules} from './queryString';
 import * as bookRoomActions from './actions';
-import * as globalActions from '../../actions';
+import {actions as filtersActions} from '../../common/filters';
 import * as globalSelectors from '../../selectors';
 import * as bookRoomSelectors from './selectors';
 import {actions as roomsActions, selectors as roomsSelectors} from '../../common/rooms';
@@ -482,12 +482,12 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = dispatch => ({
     actions: bindActionCreators({
         searchRooms: bookRoomActions.searchRooms,
-        clearTextFilter: () => globalActions.setFilterParameter('bookRoom', 'text', null),
+        clearTextFilter: () => filtersActions.setFilterParameter('bookRoom', 'text', null),
         fetchRoomSuggestions: bookRoomActions.fetchRoomSuggestions,
         resetRoomSuggestions: bookRoomActions.resetRoomSuggestions,
         fetchRoomDetails: roomsActions.fetchDetails,
         resetBookingAvailability: bookRoomActions.resetBookingAvailability,
-        setFilterParameter: (param, value) => globalActions.setFilterParameter('bookRoom', param, value),
+        setFilterParameter: (param, value) => filtersActions.setFilterParameter('bookRoom', param, value),
         toggleTimelineView: bookRoomActions.toggleTimelineView,
     }, dispatch),
     dispatch

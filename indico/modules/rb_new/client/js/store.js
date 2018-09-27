@@ -15,30 +15,24 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
 import createHistory from 'history/createBrowserHistory';
-import {queryStringMiddleware, createQueryStringReducer} from 'redux-router-querystring';
-import {connectRouter, routerMiddleware, LOCATION_CHANGE} from 'connected-react-router';
+import {queryStringMiddleware} from 'redux-router-querystring';
+import {connectRouter, routerMiddleware} from 'connected-react-router';
 import createReduxStore from 'indico/utils/redux';
 
 import reducers from './reducers';
-import {initialRoomFilterStateFactory} from './reducers/roomBooking/filters';
+import {queryStringReducer as qsRoomSearchReducer} from './common/roomSearch';
+import {routeConfig as roomListRouteConfig} from './modules/roomList';
 import {routeConfig as bookRoomRouteConfig, queryStringReducer as qsBookRoomReducer} from './modules/bookRoom';
 import {routeConfig as calendarRouteConfig, queryStringReducer as qsCalendarReducer} from './modules/calendar';
 import {routeConfig as blockingsRouteConfig, queryStringReducer as qsBlockingsReducer} from './modules/blockings';
-import * as actions from './actions';
-import {queryString as queryFilterRules} from './serializers/filters';
 
 
 function getRouteConfig() {
     return {
         reduxPathname: ({router: {location: {pathname}}}) => pathname,
         routes: {
-            '/rooms': {
-                listen: actions.SET_FILTER_PARAMETER,
-                select: ({roomList: {filters}}) => ({filters}),
-                serialize: queryFilterRules
-            },
+            ...roomListRouteConfig,
             ...bookRoomRouteConfig,
             ...calendarRouteConfig,
             ...blockingsRouteConfig,
@@ -46,49 +40,11 @@ function getRouteConfig() {
     };
 }
 
-function pathMatch(map, path) {
-    for (const pth in map) {
-        if (new RegExp(pth).test(path)) {
-            return map[pth];
-        }
-    }
-}
-
 export const history = createHistory({
+    // XXX: how does this work with `/indico` etc?!
     basename: '/rooms-new'
 });
 
-const qsFilterReducer = createQueryStringReducer(
-    queryFilterRules,
-    (state, action) => {
-        if (action.type === actions.INIT || action.type === LOCATION_CHANGE) {
-            let pathname, queryString;
-            if (action.type === actions.INIT) {
-                pathname = history.location.pathname;
-                queryString = history.location.search;
-            } else {
-                pathname = action.payload.location.pathname;
-                queryString = action.payload.location.search;
-            }
-
-            const namespace = pathMatch({
-                '^/book': 'bookRoom',
-                '^/rooms': 'roomList'
-            }, pathname);
-            if (!namespace) {
-                return null;
-            }
-            return {
-                namespace,
-                queryString: queryString.slice(1)
-            };
-        }
-        return null;
-    },
-    (state, namespace) => (namespace
-        ? _.merge({}, state, {[namespace]: {filters: initialRoomFilterStateFactory(namespace)}})
-        : state)
-);
 
 export default function createRBStore(overrides = {}) {
     return createReduxStore(
@@ -100,7 +56,7 @@ export default function createRBStore(overrides = {}) {
             queryStringMiddleware(history, getRouteConfig(), {usePush: false})
         ],
         [
-            qsFilterReducer,
+            qsRoomSearchReducer,
             qsBookRoomReducer,
             qsCalendarReducer,
             qsBlockingsReducer,

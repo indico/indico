@@ -22,6 +22,7 @@ import {history} from '../../store';
 import {initialFilterStateFactory} from './reducers';
 import * as actions from '../../actions';
 import {boolStateField} from '../../util';
+import {actions as filtersActions} from '../../common/filters';
 
 
 const rules = {
@@ -44,7 +45,7 @@ const rules = {
 
 export const routeConfig = {
     '/blockings': {
-        listen: actions.SET_FILTER_PARAMETER,
+        listen: filtersActions.SET_FILTER_PARAMETER,
         select: ({blockings: {filters}}) => filters,
         serialize: rules,
     }

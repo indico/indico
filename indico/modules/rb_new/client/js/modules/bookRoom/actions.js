@@ -23,10 +23,8 @@ import searchRoomsURL from 'indico-url:rooms_new.search_rooms';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {ajaxAction, submitFormAction} from 'indico/utils/redux';
 import {ajax as ajaxRules} from './serializers';
-import {ajax as ajaxFilterRules} from '../../serializers/filters';
+import {roomSearchActionsFactory, ajaxRules as ajaxFilterRules} from '../../common/roomSearch';
 import {preProcessParameters} from '../../util';
-
-import {roomSearchActionsFactory} from '../../common/roomSearch';
 
 
 // Booking creation

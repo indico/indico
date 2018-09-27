@@ -15,8 +15,14 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-export {roomSearchActionsFactory} from './actions';
-export {roomSearchReducerFactory} from './reducers';
-export {roomSearchSelectorFactory} from './selectors';
-export {queryStringReducer, rules as queryStringRules} from './queryString';
-export {ajax as ajaxRules} from './serializers';
+export const SET_FILTER_PARAMETER = 'filters/SET_PARAMETER';
+export const SET_FILTERS = 'filters/SET';
+
+
+export function setFilterParameter(namespace, param, data) {
+    return {type: SET_FILTER_PARAMETER, namespace, param, data};
+}
+
+export function setFilters(namespace, params) {
+    return {type: SET_FILTERS, namespace, params};
+}

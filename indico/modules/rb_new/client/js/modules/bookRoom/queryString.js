@@ -23,7 +23,8 @@ import * as globalActions from '../../actions';
 import * as actions from './actions';
 import {history} from '../../store';
 import {initialTimelineState} from './reducers';
-import {queryString as queryFilterRules} from '../../serializers/filters';
+import {actions as filtersActions} from '../../common/filters';
+import {queryStringRules as queryFilterRules} from '../../common/roomSearch';
 
 
 export const rules = {
@@ -37,7 +38,7 @@ export const rules = {
 export const routeConfig = {
     '/book': [
         {
-            listen: globalActions.SET_FILTER_PARAMETER,
+            listen: filtersActions.SET_FILTER_PARAMETER,
             select: ({bookRoom: {filters}}) => ({filters}),
             serialize: queryFilterRules
         },

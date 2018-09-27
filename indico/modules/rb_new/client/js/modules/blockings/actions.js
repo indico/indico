@@ -23,7 +23,7 @@ import {indicoAxios} from 'indico/utils/axios';
 import {ajaxAction, submitFormAction} from 'indico/utils/redux';
 import {preProcessParameters} from '../../util';
 import {ajax as ajaxRules} from './serializers';
-import * as actions from '../../actions';
+import {actions as filtersActions} from '../../common/filters';
 
 
 export const FETCH_BLOCKINGS_REQUEST = 'blockings/FETCH_BLOCKINGS_REQUEST';
@@ -56,7 +56,7 @@ export function fetchBlockings() {
 }
 
 export function setFilterParameter(param, value) {
-    return actions.setFilterParameter(FILTER_NAMESPACE, param, value);
+    return filtersActions.setFilterParameter(FILTER_NAMESPACE, param, value);
 }
 
 export function createBlocking(formData) {

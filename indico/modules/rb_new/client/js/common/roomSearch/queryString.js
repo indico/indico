@@ -15,12 +15,17 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import {validator as v} from 'redux-router-querystring';
-import {recurrenceIntervalSerializer, recurrenceFrequencySerializer, filterDTHandler} from './common';
-import {boolStateField} from '../util';
+import _ from 'lodash';
+import {createQueryStringReducer, validator as v} from 'redux-router-querystring';
+import {LOCATION_CHANGE} from 'connected-react-router';
+
+import {history} from '../../store';
+import * as actions from '../../actions';
+import {initialRoomFilterStateFactory} from './reducers';
+import {boolStateField} from '../../util';
 
 
-export const queryString = {
+export const rules = {
     recurrence: {
         validator: v.isIn(['single', 'daily', 'every']),
         stateField: 'filters.recurrence.type'
@@ -111,48 +116,44 @@ export const queryString = {
     }
 };
 
-export const ajax = {
-    repeat_frequency: recurrenceFrequencySerializer,
-    repeat_interval: recurrenceIntervalSerializer,
-    capacity: ({capacity}) => capacity,
-    favorite: {
-        onlyIf: ({onlyFavorites}) => onlyFavorites,
-        serializer: ({onlyFavorites}) => onlyFavorites
+
+function pathMatch(map, path) {
+    for (const pth in map) {
+        if (new RegExp(pth).test(path)) {
+            return map[pth];
+        }
+    }
+}
+
+
+export const queryStringReducer = createQueryStringReducer(
+    rules,
+    (state, action) => {
+        if (action.type === actions.INIT || action.type === LOCATION_CHANGE) {
+            let pathname, queryString;
+            if (action.type === actions.INIT) {
+                pathname = history.location.pathname;
+                queryString = history.location.search;
+            } else {
+                pathname = action.payload.location.pathname;
+                queryString = action.payload.location.search;
+            }
+
+            const namespace = pathMatch({
+                '^/book': 'bookRoom',
+                '^/rooms': 'roomList'
+            }, pathname);
+            if (!namespace) {
+                return null;
+            }
+            return {
+                namespace,
+                queryString: queryString.slice(1)
+            };
+        }
+        return null;
     },
-    equipment: {
-        onlyIf: ({equipment}) => equipment && equipment.length,
-        serializer: ({equipment}) => equipment
-    },
-    mine: {
-        onlyIf: ({onlyMine}) => onlyMine,
-        serializer: ({onlyMine}) => onlyMine,
-    },
-    building: ({building}) => building,
-    floor: ({floor}) => floor,
-    text: ({text}) => text,
-    start_dt: {
-        onlyIf: (data) => data.dates && data.dates.startDate,
-        serializer: filterDTHandler('start')
-    },
-    end_dt: {
-        onlyIf: (data) => data.dates,
-        serializer: filterDTHandler('end')
-    },
-    sw_lat: {
-        onlyIf: (data) => data.bounds && 'SW' in data.bounds,
-        serializer: ({bounds: {SW}}) => SW[0]
-    },
-    sw_lng: {
-        onlyIf: (data) => data.bounds && 'SW' in data.bounds,
-        serializer: ({bounds: {SW}}) => SW[1]
-    },
-    ne_lat: {
-        onlyIf: (data) => data.bounds && 'NE' in data.bounds,
-        serializer: ({bounds: {NE}}) => NE[0]
-    },
-    ne_lng: {
-        onlyIf: (data) => data.bounds && 'NE' in data.bounds,
-        serializer: ({bounds: {NE}}) => NE[1]
-    },
-    unavailable: ({unavailable}) => unavailable
-};
+    (state, namespace) => (namespace
+        ? _.merge({}, state, {[namespace]: {filters: initialRoomFilterStateFactory(namespace)}})
+        : state)
+);
