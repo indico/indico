@@ -79,7 +79,6 @@ def get_existing_rooms_occurrences(rooms, start_dt, end_dt, repeat_frequency, re
     query = (ReservationOccurrence.query
              .filter(ReservationOccurrence.is_valid, Reservation.room_id.in_(room_ids))
              .join(ReservationOccurrence.reservation)
-             .order_by(ReservationOccurrence.start_dt.asc())
              .options(ReservationOccurrence.NO_RESERVATION_USER_STRATEGY,
                       contains_eager(ReservationOccurrence.reservation)))
 
@@ -94,7 +93,8 @@ def get_existing_rooms_occurrences(rooms, start_dt, end_dt, repeat_frequency, re
         dates = [candidate.start_dt for candidate in candidates]
         query = query.filter(db.cast(ReservationOccurrence.start_dt, db.Date).in_(dates))
 
-    return group_list(query, key=lambda obj: obj.reservation.room.id)
+    return group_list(query, key=lambda obj: obj.reservation.room.id,
+                      sort_by=lambda obj: (obj.reservation.room_id, obj.start_dt))
 
 
 def get_rooms_availability(rooms, start_dt, end_dt, repeat_frequency, repeat_interval):
