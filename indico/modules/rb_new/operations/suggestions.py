@@ -18,10 +18,9 @@ from __future__ import unicode_literals
 
 from datetime import timedelta
 
-from indico.modules.rb.models.blocked_rooms import BlockedRoom, BlockedRoomState
+from indico.modules.rb.models.blocked_rooms import BlockedRoomState
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import RepeatFrequency
-from indico.modules.rb.models.rooms import Room
 from indico.modules.rb_new.operations.blockings import get_blocked_rooms, get_rooms_blockings
 from indico.modules.rb_new.operations.bookings import get_existing_rooms_occurrences
 from indico.modules.rb_new.operations.conflicts import get_rooms_conflicts
@@ -124,11 +123,11 @@ def get_duration_suggestion(occurrences, from_, to):
     duration = old_duration
     for occurrence in occurrences:
         start, end = occurrence.start_dt, occurrence.end_dt
-        if end > from_ and end < to:
+        if from_ < end < to:
             if start > from_:
                 continue
             duration -= (end - from_).total_seconds() / 60
-        if start > from_ and start < to:
+        if from_ < start < to:
             if end < to:
                 continue
             duration -= (to - start).total_seconds() / 60
