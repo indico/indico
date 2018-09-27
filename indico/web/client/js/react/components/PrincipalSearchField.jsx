@@ -32,7 +32,7 @@ import camelizeKeys from 'indico/utils/camelize';
 const searchUser = async (data) => {
     let response;
     try {
-        response = await indicoAxios.get(searchUsersURL(data));
+        response = await indicoAxios.get(searchUsersURL(), {params: {...data, favorites_first: true}});
     } catch (error) {
         handleAxiosError(error);
         return;

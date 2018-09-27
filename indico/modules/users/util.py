@@ -19,7 +19,9 @@ from __future__ import unicode_literals
 from collections import OrderedDict
 from operator import itemgetter
 
+from flask import session
 from sqlalchemy.orm import contains_eager, joinedload, load_only, undefer
+from sqlalchemy.sql.expression import nullslast
 
 from indico.core import signals
 from indico.core.auth import multipass
@@ -33,6 +35,7 @@ from indico.modules.events import Event
 from indico.modules.users import User, logger
 from indico.modules.users.models.affiliations import UserAffiliation
 from indico.modules.users.models.emails import UserEmail
+from indico.modules.users.models.favorites import favorite_user_table
 from indico.modules.users.models.suggestions import SuggestedCategory
 from indico.util.event import truncate_path
 from indico.util.string import crc32, remove_accents
@@ -178,7 +181,8 @@ def _build_name_search(name_list):
     return db.func.indico.indico_unaccent(db.func.concat(User.first_name, ' ', User.last_name)).ilike(text)
 
 
-def build_user_search_query(criteria, exact=False, include_deleted=False, include_pending=False):
+def build_user_search_query(criteria, exact=False, include_deleted=False, include_pending=False,
+                            favorites_first=False):
     unspecified = object()
     query = User.query.options(db.joinedload(User._all_emails))
 
@@ -208,6 +212,14 @@ def build_user_search_query(criteria, exact=False, include_deleted=False, includ
     for k, v in criteria.iteritems():
         query = query.filter(unaccent_match(getattr(User, k), v, exact))
 
+    if favorites_first:
+        query = (query.outerjoin(favorite_user_table, db.and_(favorite_user_table.c.user_id == session.user.id,
+                                                              favorite_user_table.c.target_id == User.id))
+                      .order_by(nullslast(favorite_user_table.c.user_id)))
+
+    query = query.order_by(db.func.lower(db.func.indico.indico_unaccent(User.first_name)),
+                           db.func.lower(db.func.indico.indico_unaccent(User.last_name)),
+                           User.id)
     return query
 
 
