@@ -123,6 +123,8 @@ def get_duration_suggestion(occurrences, from_, to):
     duration = old_duration
     for occurrence in occurrences:
         start, end = occurrence.start_dt, occurrence.end_dt
+        if start < from_:
+            continue
         if from_ < end < to:
             if start > from_:
                 continue
