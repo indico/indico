@@ -156,7 +156,9 @@ export const queryStringReducer = createQueryStringReducer(
         }
         return null;
     },
-    (state, namespace) => (namespace
-        ? _.merge({}, state, {[namespace]: {filters: initialRoomFilterStateFactory(namespace)}})
-        : state)
+    (state, namespace, error_ = false) => (namespace
+        ? _.merge({}, state, {[namespace]: {filters: {...initialRoomFilterStateFactory(namespace),
+                                                      error: error_ ? error_ : state[namespace].filters.error}}})
+        : state
+    )
 );
