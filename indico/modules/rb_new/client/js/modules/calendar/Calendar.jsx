@@ -201,7 +201,7 @@ export default connect(
         actions: bindActionCreators({
             fetchCalendar: calendarActions.fetchCalendar,
             fetchRoomDetails: roomActions.fetchDetails,
-            setDate: (date) => calendarActions.setDate(date.format(date)),
+            setDate: (date) => calendarActions.setDate(serializeDate(date)),
         }, dispatch),
         dispatch
     }),
