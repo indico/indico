@@ -39,11 +39,11 @@ export const ajax = {
     text: ({text}) => text,
     division: ({division}) => division,
     start_dt: {
-        onlyIf: (data) => data.dates && data.dates.startDate,
+        onlyIf: (data) => data.dates && data.dates.startDate && data.timeSlot.startTime,
         serializer: filterDTHandler('start')
     },
     end_dt: {
-        onlyIf: (data) => data.dates,
+        onlyIf: (data) => data.dates && data.timeSlot.endTime,
         serializer: filterDTHandler('end')
     },
     sw_lat: {

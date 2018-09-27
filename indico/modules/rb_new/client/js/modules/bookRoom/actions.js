@@ -23,10 +23,11 @@ import searchRoomsURL from 'indico-url:rooms_new.search_rooms';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {ajaxAction, submitFormAction} from 'indico/utils/redux';
 import {ajax as ajaxRules} from './serializers';
-import {roomSearchActionsFactory, ajaxRules as ajaxFilterRules} from '../../common/roomSearch';
+import {validateFilters} from '../../common/filters';
 import {preProcessParameters} from '../../util';
 import {actions as modalActions} from '../../modals';
 
+import {roomSearchActionsFactory, ajaxRules as ajaxFilterRules} from '../../common/roomSearch';
 
 // Booking creation
 export const CREATE_BOOKING_REQUEST = 'bookRoom/CREATE_BOOKING_REQUEST';
@@ -167,6 +168,9 @@ export function toggleTimelineView(visible) {
 export function fetchRoomSuggestions() {
     return async (dispatch, getStore) => {
         const {bookRoom: {filters}} = getStore();
+        if (!validateFilters(filters, 'bookRoom', dispatch)) {
+            return;
+        }
         const params = preProcessParameters(filters, ajaxFilterRules);
 
         return await ajaxAction(

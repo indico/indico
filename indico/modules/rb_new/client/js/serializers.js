@@ -30,7 +30,7 @@ export const filterDTHandler = (prefix) => {
 };
 
 export const recurrenceFrequencySerializer = {
-    onlyIf: (data) => 'recurrence' in data,
+    onlyIf: (data) => data.recurrence && data.recurrence.interval && data.recurrence.type,
     serializer: ({recurrence: {type, interval}}) => {
         if (type === 'single') {
             return 'NEVER';

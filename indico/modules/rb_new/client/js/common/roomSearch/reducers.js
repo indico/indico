@@ -49,7 +49,8 @@ export function initialRoomFilterStateFactory(namespace) {
         bounds: null,
         building: null,
         floor: null,
-        division: null
+        division: null,
+        error: false
     };
 
     if (namespace === 'bookRoom') {

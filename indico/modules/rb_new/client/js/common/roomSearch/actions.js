@@ -20,6 +20,7 @@ import {indicoAxios} from 'indico/utils/axios';
 import {ajaxAction} from 'indico/utils/redux';
 import {preProcessParameters} from '../../util';
 import {ajax as ajaxFilterRules} from './serializers';
+import {validateFilters} from '../filters';
 
 
 export function roomSearchActionsFactory(namespace) {
@@ -31,8 +32,10 @@ export function roomSearchActionsFactory(namespace) {
     function searchRooms() {
         return async (dispatch, getStore) => {
             const {[namespace]: {filters}} = getStore();
+            if (!validateFilters(filters, namespace, dispatch)) {
+                return;
+            }
             const params = preProcessParameters(filters, ajaxFilterRules);
-
             return await ajaxAction(
                 () => indicoAxios.get(searchRoomsURL(), {params}),
                 SEARCH_ROOMS_REQUEST,

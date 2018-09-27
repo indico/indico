@@ -19,4 +19,5 @@ import * as actions from './actions';
 
 
 export {filterReducerFactory} from './reducers';
+export {validateFilters} from './validation';
 export {actions};
