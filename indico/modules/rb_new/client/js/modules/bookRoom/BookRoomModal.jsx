@@ -165,11 +165,11 @@ class BookRoomModal extends React.Component {
                     </Message.Header>
                     {values.isPrebooking ? (
                         <Translate>
-                            You can consult your booking <Param name="link" wrapper={bookingLink}>here</Param>.
+                            You can consult your pre-booking <Param name="link" wrapper={bookingLink}>here</Param>.
                         </Translate>
                     ) : (
                         <Translate>
-                            You can consult your pre-booking <Param name="link" wrapper={bookingLink}>here</Param>.
+                            You can consult your booking <Param name="link" wrapper={bookingLink}>here</Param>.
                         </Translate>
                     )}
                 </Message>
