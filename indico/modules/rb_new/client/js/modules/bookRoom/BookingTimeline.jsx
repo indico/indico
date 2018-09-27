@@ -169,7 +169,7 @@ class BookingTimeline extends React.Component {
     static propTypes = {
         ...timelinePropTypes,
         fetchingTimeline: PropTypes.bool.isRequired,
-        fetchingSuggestions: PropTypes.bool.isRequired,
+        searchFinished: PropTypes.bool.isRequired,
         hasMoreTimelineData: PropTypes.bool.isRequired,
         filters: PropTypes.shape({
             dates: PropTypes.object.isRequired,
@@ -191,6 +191,7 @@ class BookingTimeline extends React.Component {
             filters: {dates, timeSlot, recurrence},
             roomIds,
             suggestedRoomIds,
+            searchFinished,
         } = this.props;
         initTimeline(roomIds, dates, timeSlot, recurrence);
         if (roomIds.length) {
@@ -198,33 +199,35 @@ class BookingTimeline extends React.Component {
         }
         if (suggestedRoomIds.length) {
             this.processSuggestedRooms();
-        } else {
+        } else if (searchFinished) {
             fetchRoomSuggestions();
         }
     }
 
-    componentDidUpdate({roomIds: prevRoomIds, suggestedRoomIds: prevSuggestedRoomIds, filters: prevFilters}) {
+    componentDidUpdate(prevProps) {
+        const {
+            suggestedRoomIds: prevSuggestedRoomIds,
+            filters: prevFilters,
+            searchFinished: prevSearchFinished
+        } = prevProps;
         const {
             actions: {initTimeline, fetchTimeline, fetchRoomSuggestions},
             filters,
             roomIds,
             suggestedRoomIds,
-            fetchingSuggestions,
+            searchFinished,
         } = this.props;
         const {dates, timeSlot, recurrence} = filters;
         // reset the timeline when filters changed
         if (!_.isEqual(prevFilters, filters)) {
             initTimeline([], dates, timeSlot, recurrence);
         }
-        // reset and update the timeline when the search results changed
-        if (!_.isEqual(prevRoomIds, roomIds)) {
+        if (!prevSearchFinished && searchFinished) {
             initTimeline(roomIds, dates, timeSlot, recurrence);
             if (roomIds.length) {
                 fetchTimeline();
             }
-            if (!suggestedRoomIds.length && !fetchingSuggestions) {
-                fetchRoomSuggestions();
-            }
+            fetchRoomSuggestions();
         }
         if (!_.isEqual(prevSuggestedRoomIds, suggestedRoomIds) && suggestedRoomIds.length) {
             this.processSuggestedRooms();
@@ -284,7 +287,7 @@ export default connect(
         availability: bookRoomSelectors.getTimelineAvailability(state),
         dateRange: bookRoomSelectors.getTimelineDateRange(state),
         fetchingTimeline: bookRoomSelectors.isFetchingTimeline(state),
-        fetchingSuggestions: bookRoomSelectors.isFetchingSuggestions(state),
+        searchFinished: bookRoomSelectors.isSearchFinished(state),
         roomIds: bookRoomSelectors.getSearchResultIds(state),
         suggestedRoomIds: bookRoomSelectors.getSuggestedRoomIds(state),
         hasMoreTimelineData: bookRoomSelectors.hasMoreTimelineData(state),
