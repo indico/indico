@@ -29,15 +29,3 @@ export const isInitializing = createSelector(
     roomsSelectors.hasLoadedEquipmentTypes,
     (...ready) => ready.some(x => !x)
 );
-
-export const isMapEnabled = state => !!configSelectors.getTileServerURL(state);
-
-// the map is visible if it's enabled and we are fetching aspects OR actually have aspects
-// that way we don't have a larger room list for a moment while loading aspects, and the
-// map has its own loading indicator anyway while there are no aspects
-export const isMapVisible = createSelector(
-    isMapEnabled,
-    state => state.mapAspects.isFetching,  // TODO: use proper selector
-    state => state.mapAspects.list,  // TODO: use proper selector
-    (mapEnabled, aspectsFetching, mapAspects) => mapEnabled && (aspectsFetching || !!mapAspects.length)
-);

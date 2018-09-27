@@ -17,30 +17,33 @@
 
 import _ from 'lodash';
 import React from 'react';
+import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import {Button, Checkbox, Dimmer, Dropdown, Loader, Popup, Sticky} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
 
-import {getAspectBounds, getMapBounds, getRoomListBounds, checkRoomsInBounds} from '../util';
+import {getAspectBounds, getMapBounds, getRoomListBounds, checkRoomsInBounds} from './util';
 import RoomBookingMap, {RoomBookingMapControl} from './RoomBookingMap';
+import {actions as filtersActions} from '../filters';
+import * as mapActions from './actions';
+import * as mapSelectors from './selectors';
 
 import './MapController.module.scss';
 
 
-export default class MapController extends React.Component {
+class MapController extends React.Component {
     static propTypes = {
-        rooms: PropTypes.arrayOf(PropTypes.object).isRequired,
-        search: PropTypes.bool.isRequired,
-        bounds: PropTypes.object,
-        filterBounds: PropTypes.object,
         aspects: PropTypes.array.isRequired,
-        toggleMapSearch: PropTypes.func.isRequired,
-        updateLocation: PropTypes.func.isRequired
-    };
-
-    static defaultProps = {
-        filterBounds: null,
-        bounds: null,
+        rooms: PropTypes.arrayOf(PropTypes.object).isRequired,
+        searchEnabled: PropTypes.bool.isRequired,
+        mapData: PropTypes.shape({
+            bounds: PropTypes.object,
+            filterBounds: PropTypes.object,
+        }).isRequired,
+        actions: PropTypes.exact({
+            toggleMapSearch: PropTypes.func.isRequired,
+            updateLocation: PropTypes.func.isRequired
+        }).isRequired,
     };
 
     constructor(props) {
@@ -55,7 +58,7 @@ export default class MapController extends React.Component {
     };
 
     static getDerivedStateFromProps(props, prevState) {
-        const {filterBounds, bounds} = props;
+        const {mapData: {bounds, filterBounds}} = props;
         const aspectBounds = filterBounds || bounds;
         const prevProps = prevState.prevProps || props;
         if (!_.isEqual(prevProps, props)) {
@@ -74,8 +77,8 @@ export default class MapController extends React.Component {
     }
 
     componentDidUpdate(prevProps) {
-        const {bounds, rooms} = this.props;
-        const {bounds: prevBounds, rooms: prevRooms} = prevProps;
+        const {mapData: {bounds}, rooms} = this.props;
+        const {mapData: {bounds: prevBounds}, rooms: prevRooms} = prevProps;
         if (bounds === prevBounds && rooms === prevRooms) {
             return;
         }
@@ -94,7 +97,7 @@ export default class MapController extends React.Component {
     }
 
     onMapLoad = async () => {
-        const {filterBounds, toggleMapSearch} = this.props;
+        const {filterBounds, actions: {toggleMapSearch}} = this.props;
         this.updateToMapBounds();
         toggleMapSearch(!_.isEmpty(filterBounds), filterBounds);
         this.setState({
@@ -103,8 +106,8 @@ export default class MapController extends React.Component {
     };
 
     onMove = (e) => {
-        const {updateLocation, search} = this.props;
-        updateLocation(getMapBounds(e.target), search);
+        const {searchEnabled, actions: {updateLocation}} = this.props;
+        updateLocation(getMapBounds(e.target), searchEnabled);
     };
 
     onChangeAspect(aspectIdx) {
@@ -115,10 +118,10 @@ export default class MapController extends React.Component {
     }
 
     updateToMapBounds = () => {
-        const {updateLocation, search} = this.props;
+        const {searchEnabled, actions: {updateLocation}} = this.props;
         if (this.mapRef.current) {
             const map = this.mapRef.current.leafletElement;
-            updateLocation(getMapBounds(map), search);
+            updateLocation(getMapBounds(map), searchEnabled);
         }
     };
 
@@ -131,7 +134,7 @@ export default class MapController extends React.Component {
     };
 
     render() {
-        const {search, bounds, rooms, aspects, toggleMapSearch} = this.props;
+        const {searchEnabled, rooms, aspects, mapData: {bounds}, actions: {toggleMapSearch}} = this.props;
         const {aspectBounds, loading, allRoomsVisible} = this.state;
         const aspectOptions = Object.entries(aspects).map(([key, val]) => ({
             text: val.name,
@@ -142,7 +145,7 @@ export default class MapController extends React.Component {
             <RoomBookingMapControl position="topleft">
                 <Checkbox label={Translate.string('Search as I move the map')}
                           onChange={(e, data) => toggleMapSearch(data.checked, bounds)}
-                          checked={search} styleName="map-control-content" />
+                          checked={searchEnabled} styleName="map-control-content" />
             </RoomBookingMapControl>
         );
 
@@ -193,4 +196,34 @@ export default class MapController extends React.Component {
             </div>
         );
     }
+}
+
+
+export default function mapControllerFactory(namespace, searchRoomSelectors) {
+    const getMapData = mapSelectors.makeGetMapData(namespace);
+    const isMapSearchEnabled = mapSelectors.makeIsMapSearchEnabled(namespace);
+    return connect(
+        state => {
+            return {
+                aspects: mapSelectors.getMapAspects(state),
+                rooms: searchRoomSelectors.getSearchResultsForMap(state),
+                mapData: getMapData(state),
+                searchEnabled: isMapSearchEnabled(state),
+            };
+        },
+        dispatch => ({
+            actions: {
+                updateLocation: (location, search) => {
+                    dispatch(mapActions.updateLocation(namespace, location));
+                    if (search) {
+                        dispatch(filtersActions.setFilterParameter(namespace, 'bounds', location));
+                    }
+                },
+                toggleMapSearch: (search, location) => {
+                    dispatch(mapActions.toggleMapSearch(namespace, search));
+                    dispatch(filtersActions.setFilterParameter(namespace, 'bounds', search ? location : null));
+                },
+            }
+        })
+    )(MapController);
 }

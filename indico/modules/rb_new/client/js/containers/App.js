@@ -17,9 +17,10 @@
 import {connect} from 'react-redux';
 
 import App from '../components/App';
-import {fetchMapAspects, resetPageState} from '../actions';
+import {resetPageState} from '../actions';
 import {history} from '../store';
 import {actions as configActions} from '../common/config';
+import {actions as mapActions} from '../common/map';
 import {actions as roomsActions} from '../common/rooms';
 import {actions as userActions} from '../common/user';
 import * as selectors from '../selectors';
@@ -34,7 +35,7 @@ export default connect(
         fetchInitialData() {
             dispatch(configActions.fetchConfig()).then(() => {
                 // we only need map aspects if the map is enabled, which depends on the config
-                dispatch(fetchMapAspects());
+                dispatch(mapActions.fetchAspects());
             });
             dispatch(userActions.fetchUserInfo());
             dispatch(userActions.fetchFavoriteRooms());

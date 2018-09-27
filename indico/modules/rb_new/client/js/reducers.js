@@ -15,27 +15,25 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import mapAspectsReducer from './mapAspects';
-import {reducer as configReducer} from '../common/config';
-import {reducer as roomsReducer} from '../common/rooms';
-import {reducer as bookRoomReducer} from '../modules/bookRoom';
-import {reducer as userReducer} from '../common/user';
-import {reducer as blockingsReducer} from '../modules/blockings';
-import {reducer as calendarReducer} from '../modules/calendar';
-import {reducer as landingReducer} from '../modules/landing';
-import {reducer as roomListReducer} from '../modules/roomList';
+import {reducer as configReducer} from './common/config';
+import {reducer as mapReducer} from './common/map';
+import {reducer as roomsReducer} from './common/rooms';
+import {reducer as bookRoomReducer} from './modules/bookRoom';
+import {reducer as userReducer} from './common/user';
+import {reducer as blockingsReducer} from './modules/blockings';
+import {reducer as calendarReducer} from './modules/calendar';
+import {reducer as landingReducer} from './modules/landing';
+import {reducer as roomListReducer} from './modules/roomList';
 
 
-const reducers = {
+export default {
     config: configReducer,
     user: userReducer,
     bookRoom: bookRoomReducer,
     roomList: roomListReducer,
-    mapAspects: mapAspectsReducer,
+    map: mapReducer,
     rooms: roomsReducer,
     blockings: blockingsReducer,
     calendar: calendarReducer,
     landing: landingReducer,
 };
-
-export default reducers;
