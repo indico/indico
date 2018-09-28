@@ -31,9 +31,10 @@ from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.models.reservations import RepeatFrequency, Reservation
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb_new.controllers.backend.common import search_room_args
-from indico.modules.rb_new.operations.bookings import get_room_calendar, get_rooms_availability
+from indico.modules.rb_new.operations.bookings import get_booking_occurrences, get_room_calendar, get_rooms_availability
 from indico.modules.rb_new.operations.suggestions import get_suggestions
-from indico.modules.rb_new.schemas import create_booking_args, reservation_schema, reservation_details_schema
+from indico.modules.rb_new.schemas import (create_booking_args, reservation_details_occurrences_schema,
+                                           reservation_details_schema, reservation_schema)
 from indico.modules.rb_new.util import (group_by_occurrence_date, serialize_blockings, serialize_nonbookable_periods,
                                         serialize_occurrences, serialize_unbookable_hours)
 from indico.modules.users.models.users import User
@@ -142,4 +143,9 @@ class RHBookingDetails(RHRoomBookingBase):
         self.booking = Reservation.get_one(request.view_args['booking_id'])
 
     def _process(self):
-        return jsonify(reservation_details_schema.dump(self.booking).data)
+        attributes = reservation_details_schema.dump(self.booking).data
+        date_range, occurrences = get_booking_occurrences(self.booking)
+        date_range = [dt.isoformat() for dt in date_range]
+        serialized = {dt.isoformat(): reservation_details_occurrences_schema.dump(data).data
+                      for dt, data in occurrences.iteritems()}
+        return jsonify(attributes=attributes, id=self.booking.id, occurrences=serialized, date_range=date_range)
