@@ -131,7 +131,7 @@ export default class TimelineContent extends React.Component {
                         {rows.map((rowProps) => this.renderTimelineRow(rowProps))}
                         <div style={{left: labelWidth, width: `calc(100% - ${labelWidth}px)`}}
                              styleName="timeline-lines">
-                            {this.renderDividers(hourSeries.length - 1, longLabel)}
+                            {this.renderDividers(hourSeries.length - 1)}
                         </div>
                     </div>
                     <Loader active={wrapperProps.isFetching || isLoading} inline="centered" styleName="timeline-loader" />
