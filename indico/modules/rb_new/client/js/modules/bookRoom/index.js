@@ -20,5 +20,5 @@ import * as selectors from './selectors';
 
 export {default} from './BookRoom';
 export {default as reducer} from './reducers';
-export {queryStringReducer, routeConfig} from './queryString';
+export {queryStringReducer, routeConfig, rules as queryStringRules} from './queryString';
 export {selectors};

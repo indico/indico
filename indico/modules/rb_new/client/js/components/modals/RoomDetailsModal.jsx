@@ -18,6 +18,7 @@
 import _ from 'lodash';
 import moment from 'moment';
 import {push} from 'connected-react-router';
+import {stateToQueryString} from 'redux-router-querystring';
 import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
@@ -27,6 +28,8 @@ import RoomBasicDetails from '../RoomBasicDetails';
 import TimelineContent from '../TimelineContent';
 import TimelineLegend from '../TimelineLegend';
 import {selectors as roomsSelectors} from '../../common/rooms';
+import {queryStringRules as qsRoomSearchRules} from '../../common/roomSearch';
+import {queryStringRules as qsBookRoomRules} from '../../modules/bookRoom';
 
 import './RoomDetailsModal.module.scss';
 
@@ -73,29 +76,32 @@ class RoomDetailsModal extends React.Component {
 }
 
 export default (namespace) => {
-    const mapStateToProps = (state, {roomId}) => ({
-        room: roomsSelectors.getRoom(state, {roomId}),
-        availability: roomsSelectors.getAvailability(state, {roomId}),
-        attributes: roomsSelectors.getAttributes(state, {roomId}),
-    });
-
-    const mapDispatchToProps = dispatch => ({
-        actions: {
-            bookRoom(room) {
-                if (namespace === 'roomList') {
-                    dispatch(push(`/rooms/${room.id}/book`));
-                } else if (namespace === 'calendar') {
-                    dispatch(push(`/calendar/${room.id}/book`));
-                } else {
-                    dispatch(push(`/book/${room.id}/confirm`));
-                }
-            },
-        },
-    });
-
     return connect(
-        mapStateToProps,
-        mapDispatchToProps
+        (state, {roomId}) => ({
+            room: roomsSelectors.getRoom(state, {roomId}),
+            availability: roomsSelectors.getAvailability(state, {roomId}),
+            attributes: roomsSelectors.getAttributes(state, {roomId}),
+            queryString: stateToQueryString(state.bookRoom, qsRoomSearchRules, qsBookRoomRules)
+        }),
+        dispatch => ({dispatch}),
+        (stateProps, {dispatch}, ownProps) => {
+            const {queryString, ...realStateProps} = stateProps;
+            return {
+                ...ownProps,
+                ...realStateProps,
+                actions: {
+                    bookRoom: (room) => {
+                        if (namespace === 'roomList') {
+                            dispatch(push(`/rooms/${room.id}/book`));
+                        } else if (namespace === 'calendar') {
+                            dispatch(push(`/calendar/${room.id}/book`));
+                        } else {
+                            dispatch(push(`/book/${room.id}/confirm?${queryString}`));
+                        }
+                    }
+                }
+            };
+        }
     )(RoomDetailsModal);
 };
 
