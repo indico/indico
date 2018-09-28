@@ -34,7 +34,8 @@ export default class DailyTimelineContent extends React.Component {
         step: PropTypes.number,
         rows: PropTypes.array.isRequired,
         recurrenceType: PropTypes.string,
-        onClick: PropTypes.func,
+        onClickCandidate: PropTypes.func,
+        onClickReservation: PropTypes.func,
         longLabel: PropTypes.bool,
         onClickLabel: PropTypes.func,
         itemClass: PropTypes.func,
@@ -50,7 +51,8 @@ export default class DailyTimelineContent extends React.Component {
     static defaultProps = {
         step: 2,
         recurrenceType: null,
-        onClick: null,
+        onClickCandidate: null,
+        onClickReservation: null,
         longLabel: false,
         onClickLabel: null,
         itemClass: TimelineItem,
@@ -79,7 +81,8 @@ export default class DailyTimelineContent extends React.Component {
 
     renderTimelineRow = ({availability, label, conflictIndicator, key, room}) => {
         const {
-            minHour, maxHour, hourStep, itemClass: ItemClass, itemProps, recurrenceType, onClick, longLabel, showUnused
+            minHour, maxHour, hourStep, itemClass: ItemClass, itemProps, recurrenceType, onClickCandidate,
+            onClickReservation, longLabel, showUnused
         } = this.props;
         const columns = ((maxHour - minHour) / hourStep) + 1;
 
@@ -96,11 +99,11 @@ export default class DailyTimelineContent extends React.Component {
                                   longLabel={longLabel}
                                   onClickLabel={this.onClickLabel(room.id)} />
                 <div styleName="timeline-row-content" style={{flex: columns}}>
-
                     <ItemClass startHour={minHour} endHour={maxHour} data={availability} room={room}
-                               onClick={() => {
-                                   if (onClick && (!hasConflicts || recurrenceType !== 'single')) {
-                                       onClick(room.id);
+                               onClickReservation={onClickReservation}
+                               onClickCandidate={() => {
+                                   if (onClickCandidate && (!hasConflicts || recurrenceType !== 'single')) {
+                                       onClickCandidate(room.id);
                                    }
                                }}
                                setSelectable={selectable => {

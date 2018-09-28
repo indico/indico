@@ -148,8 +148,9 @@ class _BookingTimelineComponent extends React.Component {
             <TimelineBase lazyScroll={lazyScroll}
                           rows={this.calcRows()}
                           emptyMessage={emptyMessage}
-                          onClick={clickable ? openBookingForm : null}
+                          onClickCandidate={clickable ? openBookingForm : null}
                           onClickLabel={clickable ? openRoomDetails : null}
+
                           dateRange={dateRange}
                           extraContent={this.singleRoom && this.renderRoomSummary(this.singleRoom)}
                           isLoading={isFetching}

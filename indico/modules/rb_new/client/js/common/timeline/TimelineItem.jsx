@@ -48,13 +48,15 @@ export default class TimelineItem extends React.Component {
         startHour: PropTypes.number.isRequired,
         endHour: PropTypes.number.isRequired,
         data: PropTypes.object.isRequired,
-        onClick: PropTypes.func,
+        onClickCandidate: PropTypes.func,
+        onClickReservation: PropTypes.func,
         children: PropTypes.node,
         setSelectable: PropTypes.func
     };
 
     static defaultProps = {
-        onClick: null,
+        onClickCandidate: null,
+        onClickReservation: null,
         children: [],
         setSelectable: null
     };
@@ -97,9 +99,9 @@ export default class TimelineItem extends React.Component {
             end_time: endTime,
             reservation,
             reason,
-            bookable,
+            bookable
         } = occurrence;
-        const {startHour, endHour, onClick, room} = this.props;
+        const {startHour, endHour, onClickCandidate, onClickReservation, room} = this.props;
         if (type === 'blocking') {
             segmentStartDt = moment(startHour, 'HH:mm');
             segmentEndDt = moment(endHour, 'HH:mm');
@@ -144,14 +146,13 @@ export default class TimelineItem extends React.Component {
                 </div>
             );
         }
+
         const segment = (
             <div className={additionalClasses} onClick={() => {
-                if (onClick) {
-                    if (bookable && type === 'candidate') {
-                        onClick(room);
-                    } else if (type === 'booking') {
-                        onClick(reservation);
-                    }
+                if (onClickCandidate && bookable && type === 'candidate') {
+                    onClickCandidate(room);
+                } else if (onClickReservation && type === 'booking') {
+                    onClickReservation(reservation);
                 }
             }}
                  styleName="timeline-occurrence"
@@ -180,7 +181,9 @@ export default class TimelineItem extends React.Component {
     };
 
     render() {
-        const {children, startHour, endHour, data, onClick, setSelectable, ...restProps} = this.props;
+        const {
+            children, startHour, endHour, data, onClickCandidate, onClickReservation, setSelectable, ...restProps
+        } = this.props;
         return (
             <div styleName="timeline-item" {...restProps}>
                 {children}

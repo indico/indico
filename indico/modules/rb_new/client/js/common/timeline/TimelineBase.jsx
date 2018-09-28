@@ -34,7 +34,8 @@ export default class TimelineBase extends React.Component {
         minHour: PropTypes.number,
         maxHour: PropTypes.number,
         hourStep: PropTypes.number,
-        onClick: PropTypes.func,
+        onClickCandidate: PropTypes.func,
+        onClickReservation: PropTypes.func,
         isLoading: PropTypes.bool,
         recurrenceType: PropTypes.string,
         itemClass: PropTypes.func,
@@ -53,10 +54,12 @@ export default class TimelineBase extends React.Component {
                 </Translate>
             </Message>
         ),
+
         hourStep: 2,
         minHour: 6,
         maxHour: 22,
-        onClick: null,
+        onClickCandidate: null,
+        onClickReservation: null,
         extraContent: null,
         isLoading: false,
         recurrenceType: 'single',
@@ -70,8 +73,8 @@ export default class TimelineBase extends React.Component {
 
     renderTimeline = () => {
         const {
-            extraContent, onClick, recurrenceType, rows, isLoading, itemClass, itemProps, longLabel,
-            onClickLabel, lazyScroll, minHour, maxHour, hourStep, showUnused
+            extraContent, onClickCandidate, onClickReservation, recurrenceType, rows, isLoading, itemClass, itemProps,
+            longLabel, onClickLabel, lazyScroll, minHour, maxHour, hourStep, showUnused
         } = this.props;
         return (
             <>
@@ -82,7 +85,8 @@ export default class TimelineBase extends React.Component {
                                           maxHour={maxHour}
                                           hourStep={hourStep}
                                           recurrenceType={recurrenceType}
-                                          onClick={onClick}
+                                          onClickCandidate={onClickCandidate}
+                                          onClickReservation={onClickReservation}
                                           itemClass={itemClass}
                                           itemProps={itemProps}
                                           longLabel={longLabel}
