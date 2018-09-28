@@ -62,7 +62,7 @@ class UnavailableRoomsModal extends React.Component {
                                               isFetchingRooms={false}
                                               recurrenceType={filters.recurrence.type}
                                               minHour={6}
-                                              maxHour={20}
+                                              maxHour={22}
                                               availability={availability}
                                               dateRange={dateRange}
                                               pushState={() => {}} />
