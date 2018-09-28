@@ -25,13 +25,13 @@ import {stateToQueryString} from 'redux-router-querystring';
 import {Message, Segment} from 'semantic-ui-react';
 import {Translate, Param} from 'indico/react/i18n';
 import {serializeDate, toMoment} from 'indico/utils/date';
-import TimelineBase from '../../components/TimelineBase';
+import {TimelineBase} from '../../common/timeline';
 import {isDateWithinRange, pushStateMergeProps} from '../../util';
 import {queryStringRules as queryStringSerializer} from '../../common/roomSearch';
 import * as bookRoomActions from './actions';
 import * as bookRoomSelectors from './selectors';
 
-import '../../components/Timeline.module.scss';
+import '../../common/timeline/Timeline.module.scss';
 
 
 const timelinePropTypes = {

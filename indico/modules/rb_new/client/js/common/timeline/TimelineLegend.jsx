@@ -19,7 +19,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {Label, Segment, List} from 'semantic-ui-react';
 
-import {legendLabelShape} from '../props';
+import {legendLabelShape} from '../../props';
+
 import './TimelineLegend.module.scss';
 
 

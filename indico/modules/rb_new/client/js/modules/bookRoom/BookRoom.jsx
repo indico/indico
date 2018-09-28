@@ -37,7 +37,7 @@ import BookingTimeline from './BookingTimeline';
 import BookRoomModal from './BookRoomModal';
 import SearchResultCount from './SearchResultCount';
 import roomDetailsModalFactory from '../../components/modals/RoomDetailsModal';
-import TimelineHeader from '../../components/TimelineHeader';
+import {TimelineHeader} from '../../common/timeline';
 import {roomPreloader, pushStateMergeProps, isDateWithinRange} from '../../util';
 import {queryStringRules as qsFilterRules} from '../../common/roomSearch';
 import {rules as qsBookRoomRules} from './queryString';

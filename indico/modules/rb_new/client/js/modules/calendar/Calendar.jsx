@@ -26,7 +26,6 @@ import {connect} from 'react-redux';
 import {Translate} from 'indico/react/i18n';
 import {Preloader} from 'indico/react/util';
 import {serializeDate} from 'indico/utils/date';
-import TimelineBase from '../../components/TimelineBase';
 import roomDetailsModalFactory from '../../components/modals/RoomDetailsModal';
 import {pushStateMergeProps, roomPreloader} from '../../util';
 import * as calendarActions from './actions';
@@ -34,11 +33,10 @@ import * as calendarSelectors from './selectors';
 import * as roomActions from '../../common/rooms/actions';
 import * as roomSelectors from '../../common/rooms/selectors';
 import {selectors as roomsSelectors} from '../../common/rooms';
-import EditableTimelineItem from '../../components/EditableTimelineItem';
+import {EditableTimelineItem, TimelineBase, TimelineHeader} from '../../common/timeline';
 import BookFromListModal from '../../components/modals/BookFromListModal';
-import TimelineHeader from '../../components/TimelineHeader';
 
-import '../../components/Timeline.module.scss';
+import '../../common/timeline/Timeline.module.scss';
 
 
 const RoomDetailsModal = roomDetailsModalFactory('calendar');

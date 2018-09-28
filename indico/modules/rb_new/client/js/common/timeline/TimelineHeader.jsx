@@ -24,8 +24,8 @@ import moment from 'moment';
 import DatePicker from 'rc-calendar/lib/Picker';
 import {toMoment} from 'indico/utils/date';
 import TimelineLegend from './TimelineLegend';
-import {legendLabelShape} from '../props';
-import {isDateWithinRange} from '../util';
+import {legendLabelShape} from '../../props';
+import {isDateWithinRange} from '../../util';
 
 
 export default class TimelineHeader extends React.Component {

@@ -30,8 +30,7 @@ import {toMoment} from 'indico/utils/date';
 import {selectors as roomsSelectors} from '../../common/rooms';
 import recurrenceRenderer from './filters/RecurrenceRenderer';
 import RoomBasicDetails from '../../components/RoomBasicDetails';
-import TimelineContent from '../../components/TimelineContent';
-import TimelineLegend from '../../components/TimelineLegend';
+import {TimelineContent, TimelineLegend} from '../../common/timeline';
 import * as actions from './actions';
 
 import './BookRoomModal.module.scss';
