@@ -50,12 +50,14 @@ export class BookingTimelineComponent extends React.Component {
         isFetching: PropTypes.bool.isRequired,
         showEmptyMessage: PropTypes.bool,
         allowSingleRoom: PropTypes.bool,
+        bookingAllowed: PropTypes.bool,
     };
 
     static defaultProps = {
         lazyScroll: null,
         allowSingleRoom: true,
         showEmptyMessage: true,
+        bookingAllowed: false,
     };
 
     state = {};
@@ -79,12 +81,13 @@ export class BookingTimelineComponent extends React.Component {
     }
 
     _getRowSerializer(dt, singleRoom = false) {
+        const {bookingAllowed} = this.props;
         return ({candidates, pre_bookings: preBookings, bookings, pre_conflicts: preConflicts, conflicts,
                  blockings, nonbookable_periods: nonbookablePeriods, unbookable_hours: unbookableHours,
                  room}) => {
             const hasConflicts = conflicts[dt] && conflicts[dt].length !== 0;
             const av = {
-                candidates: candidates[dt].map((cand) => ({...cand, bookable: !hasConflicts})) || [],
+                candidates: candidates[dt].map((cand) => ({...cand, bookable: bookingAllowed && !hasConflicts})) || [],
                 preBookings: preBookings[dt] || [],
                 bookings: bookings[dt] || [],
                 conflicts: conflicts[dt] || [],
@@ -277,7 +280,8 @@ class BookingTimeline extends React.Component {
                                       recurrenceType={recurrenceType}
                                       defaultDate={startDate}
                                       allowSingleRoom={!suggestedRoomIds.length}
-                                      showEmptyMessage={false} />
+                                      showEmptyMessage={false}
+                                      bookingAllowed />
         );
     }
 }
