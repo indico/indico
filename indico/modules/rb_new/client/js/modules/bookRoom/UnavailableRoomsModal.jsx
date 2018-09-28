@@ -49,9 +49,10 @@ class UnavailableRoomsModal extends React.Component {
 
     render() {
         const {availability, dateRange, filters, isFetching, onClose} = this.props;
-        if (!dateRange) {
+        if (!dateRange || availability.length === 0) {
             return null;
         }
+
         return (
             <Modal open onClose={onClose} size="large" closeIcon>
                 <Modal.Header>
