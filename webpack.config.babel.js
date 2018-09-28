@@ -27,6 +27,7 @@ import config from './webpack-build-config';
 
 
 let entryPoints = {
+    jquery: ['./js/jquery/index.js'],
     main: ['./js/index.js'],
     ckeditor: ['./js/jquery/ckeditor.js'],
     conferences: ['./styles/legacy/Conf_Basic.scss'],

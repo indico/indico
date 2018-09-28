@@ -29,4 +29,3 @@ import 'jquery-ui/ui/widgets/slider';
 import 'jquery-ui/ui/widgets/tabs';
 
 import 'jquery-ui/themes/base/all.css';
-import '../../../styles/custom/jquery-ui.css';

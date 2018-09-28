@@ -198,12 +198,11 @@ class WPBase(WPBundleMixin):
     @classproperty
     @classmethod
     def bundles(cls):
-        _bundles = ('common.css', 'common.js', 'main.css', 'main.js', 'module_core.js', 'module_events.creation.js',
-                    'module_attachments.js')
+        _bundles = ('common.css', 'common.js', 'jquery.css', 'jquery.js', 'main.css', 'main.js', 'module_core.js',
+                    'module_events.creation.js', 'module_attachments.js')
         if not g.get('static_site'):
             _bundles += ('ckeditor.js',)
         return _bundles
-
 
     def _getHeadContent(self):
         """

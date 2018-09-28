@@ -28,7 +28,7 @@ $dropzone-border-width: 2;
     padding: 30px 20px;
     margin-bottom: 3em;
     width: (($dropzone-padding + $dropzone-border-width) * 2 +
-            ($image-preview-width + ($image-preview-margin * 2)) * 5) + 'px';
+            ($image-preview-width + ($image-preview-margin * 2)) * 5) * 1px;
     cursor: pointer;
 
     .dz-preview.dz-file-preview .dz-image,
@@ -98,7 +98,7 @@ $dropzone-border-width: 2;
                 text-align: center;
 
                 button {
-                    margin: $image-preview-margin + 'px';
+                    margin: $image-preview-margin * 1px;
                     height: inherit;
                 }
             }

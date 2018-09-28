@@ -449,8 +449,8 @@ type("JTabWidget", ["IWidget"], {
             .attr('title', $T('Previous tab'))
             .css(arrowsCommonCss)
             .css('left', 0)
-            .addClass('ui-state-active ui-corner-tl ui-corner-bl')
-            .append($('<span/>').disableSelection().addClass('ui-icon ui-icon-carat-1-w').html($T('Previous tab')).css('marginTop', arrowsTopMargin))
+            .addClass('ui-state-active ui-corner-tl ui-corner-bl tab-scroll-button')
+            .append($('<span/>').disableSelection().addClass('ui-icon ui-icon-caret-1-w').html($T('Previous tab')).css('marginTop', arrowsTopMargin))
             .click(function() {
                 if($(this).hasClass('ui-state-disabled')) {
                     return;
@@ -462,8 +462,8 @@ type("JTabWidget", ["IWidget"], {
             .attr('title', $T('Next tab'))
             .css(arrowsCommonCss)
             .css('right', 0)
-            .addClass('ui-state-active ui-corner-tr ui-corner-br')
-            .append($('<span/>').addClass('ui-icon ui-icon-carat-1-e').html($T('Next tab')).css('marginTop', arrowsTopMargin))
+            .addClass('ui-state-active ui-corner-tr ui-corner-br tab-scroll-button')
+            .append($('<span/>').addClass('ui-icon ui-icon-caret-1-e').html($T('Next tab')).css('marginTop', arrowsTopMargin))
             .click(function() {
                 if($(this).hasClass('ui-state-disabled')) {
                     return;

@@ -140,19 +140,16 @@
 }
 
 .ui-tabs li.ui-corner-top, .ui-tabs li.ui-corner-all {
-    -moz-border-radius-topleft: 0px;
-    -webkit-border-top-left-radius: 0px;
-    border-top-left-radius: 0px;
-    -moz-border-radius-topright: 0px;
-    -webkit-border-top-right-radius: 0px;
-    border-top-right-radius: 0px;
     border-radius: 0;
-    -moz-border-radius: 0;
-    -webkit-border-radius: 0;
+}
+
+.ui-tabs .tab-scroll-button .ui-icon {
+    background-image: url(~jquery-ui/themes/base/images/ui-icons_777620_256x240.png);
 }
 
 .ui-tabs {
     position: relative;
+    border: none !important;
     padding: 0;
     zoom: 1;
 }
@@ -182,11 +179,10 @@
 
 .ui-widget-content {
     background: #FFFFFF;
-    border: none !important;
+    border: none;
 }
 
 .ui-widget-overlay {
     background: #444444 url(~jquery-ui/themes/base/images/ui-bg_flat_0_aaaaaa_40x100.png) 50% 50% repeat;
     opacity: .50;
-    filter:Alpha(Opacity=50);
 }

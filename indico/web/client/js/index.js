@@ -17,7 +17,6 @@
 
 import '@babel/polyfill';
 
-import './jquery';
 import './legacy/presentation.js';
 import './legacy/indico.js';
 import './legacy/timetable.js';
