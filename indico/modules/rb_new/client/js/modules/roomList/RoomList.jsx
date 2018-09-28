@@ -98,7 +98,7 @@ class RoomList extends React.Component {
         const showDetailsBtn = (
             <Button icon="search"
                     onClick={() => {
-                        pushState(`/rooms/${id}/details`);
+                        pushState(`/rooms/${id}/details`, true);
                     }}
                     primary
                     circular />
