@@ -44,7 +44,7 @@ const extraResolveAliases = [
 
 // Add Module Bundles
 glob.sync(path.join(config.build.rootPath, 'modules/**/module.json')).forEach((file) => {
-    const module = Object.assign({produceBundle: true, partials: {}}, require(file));
+    const module = {produceBundle: true, partials: {}, ...require(file)};
     // eslint-disable-next-line prefer-template
     const moduleName = 'module_' + (module.parent ? (module.parent + '.') : '') + module.name;
     const dirName = path.join(path.dirname(file), 'client/js');
@@ -52,7 +52,7 @@ glob.sync(path.join(config.build.rootPath, 'modules/**/module.json')).forEach((f
     if (module.produceBundle) {
         entryPoints[moduleName] = [dirName];
     }
-    const modulePath = path.join('indico/modules', module.parent || '',  module.name);
+    const modulePath = path.join('indico/modules', module.parent || '', module.name);
     extraResolveAliases.push({name: modulePath, alias: dirName, onlyModule: false});
 
     if (module.partials) {
