@@ -15,7 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import {filterDTHandler} from '../../serializers/common';
+import {filterDTHandler} from '../../serializers';
 
 
 export const ajax = {

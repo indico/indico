@@ -17,7 +17,7 @@
 
 import {
     filterDTHandler, recurrenceIntervalSerializer, recurrenceFrequencySerializer
-} from '../../serializers/common';
+} from '../../serializers';
 
 
 export const ajax = {

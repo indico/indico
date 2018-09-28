@@ -15,7 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import {filterDTHandler, recurrenceFrequencySerializer, recurrenceIntervalSerializer} from '../../serializers/common';
+import {filterDTHandler, recurrenceFrequencySerializer, recurrenceIntervalSerializer} from '../../serializers';
 
 
 export const ajax = {
