@@ -19,9 +19,9 @@
 
 @font-face {
     font-family: "icomoon-ultimate";
-    src: url("/fonts/icomoon/icomoon.svg#icomoon-ultimate") format("svg"),
-         url("/fonts/icomoon/icomoon.woff") format("woff"),
-         url("/fonts/icomoon/icomoon.ttf") format("truetype");
+    src: url("static:fonts/icomoon/icomoon.svg#icomoon-ultimate") format("svg"),
+         url("static:fonts/icomoon/icomoon.woff") format("woff"),
+         url("static:fonts/icomoon/icomoon.ttf") format("truetype");
     font-weight: normal;
     font-style: normal;
 }
@@ -546,7 +546,7 @@ i[class^="icon-"]:before {
     min-width: 1.2em;
     min-height: 1.2em;
     height: 100%;
-    background-image: url('/images/loading.gif');
+    background-image: url('static:images/loading.gif');
     background-repeat: no-repeat;
     background-size: 1.2em 1.2em;
     vertical-align: middle !important;

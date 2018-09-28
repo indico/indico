@@ -102,7 +102,7 @@ td.suggestedUsersPanel {
 
 .arrowExpandIcon
 {
-    background: transparent url(/images/menu_arrow_black.png) scroll no-repeat center center;
+    background: transparent url('static:images/menu_arrow_black.png') scroll no-repeat center center;
     font-weight: normal;
     vertical-align: middle;
     display:block;
@@ -212,25 +212,25 @@ div.tabScrollArrowBg {
     width: 15px;
     height: 15px;
     display: none;
-    background: white url(/images/tab_scroll_arrows.png) no-repeat scroll 0 -60px;
+    background: white url(static:images/tab_scroll_arrows.png) no-repeat scroll 0 -60px;
 }
 
 div.tabScrollArrow {
     border: 1px solid #999999;
     width: 13px;
     height: 13px;
-    background: transparent url(/images/tab_scroll_arrows.png) no-repeat scroll 0 0;
+    background: transparent url(static:images/tab_scroll_arrows.png) no-repeat scroll 0 0;
 }
 
 div.tabGradient {
-    background: white url(/images/tab_bg.png) repeat-x scroll 0 -60px;
+    background: white url(static:images/tab_bg.png) repeat-x scroll 0 -60px;
     /*border-left: 1px solid #777777;
     border-right: 1px solid #777777;*/
     height: 20px;
 }
 
 div.tabBorderGradient {
-    background: white url(/images/tab_bg.png) repeat-x scroll 0 -80px;
+    background: white url(static:images/tab_bg.png) repeat-x scroll 0 -80px;
     height: 20px;
     width: 1px;
     display: inline;
@@ -241,7 +241,7 @@ div.tabBorderGradient {
     border-width: 1px;
     border-color: #999999;
     border-bottom: 0;
-    background: white url(/images/tab_bg.png) repeat-x scroll 0 -30px;
+    background: white url(static:images/tab_bg.png) repeat-x scroll 0 -30px;
     padding-top: 3px;
     margin-left: 1px;
     cursor: pointer;
@@ -417,13 +417,13 @@ div.balloonPopupCloseButton {
     cursor: pointer;
     top: 10px;
     right: 10px;
-    background-image: url('/images/popup_close_button.png');
+    background-image: url('static:images/popup_close_button.png');
     width: 15px;
     height: 15px;
 }
 
 .loadingPopup {
-    background: transparent url('/images/load_lightblue.gif') scroll no-repeat center center;
+    background: transparent url('static:images/load_lightblue.gif') scroll no-repeat center center;
     min-width: 130px;
     height: 70px;
 }
@@ -498,7 +498,7 @@ div.timetableBlockMaterial {
     float: right;
     width: 12px;
     height: 12px;
-    background: transparent url(/images/material_folder.png) scroll no-repeat 3px 3px;
+    background: transparent url(static:images/material_folder.png) scroll no-repeat 3px 3px;
 }
 
 div.timetableBlockMaterial:hover, div.timetableBlockMaterialActive {
@@ -590,13 +590,13 @@ div.balloonPopupCloseButton {
     cursor: pointer;
     top: 10px;
     right: 10px;
-    background-image: url('/images/popup_close_button.png');
+    background-image: url('static:images/popup_close_button.png');
     width: 15px;
     height: 15px;
 }
 
 .loadingPopup {
-    background: transparent url('/images/load_lightblue.gif') scroll no-repeat center center;
+    background: transparent url('static:images/load_lightblue.gif') scroll no-repeat center center;
     min-width: 130px;
     height: 70px;
 }
@@ -608,7 +608,7 @@ div.balloonPopupCloseButton {
 }
 
 div.timetablePreLoading {
-    background: transparent url('/images/load_big.gif') scroll no-repeat center center;
+    background: transparent url('static:images/load_big.gif') scroll no-repeat center center;
 }
 div.timetablePreLoading .text {
     color: #777;
@@ -622,7 +622,7 @@ div.timetableLoading {
     top: 40px;
     left: 0px;
     padding: 10px 0 6px 35px;
-    background: transparent url('/images/loading.gif') scroll no-repeat 10px center;
+    background: transparent url('static:images/loading.gif') scroll no-repeat 10px center;
     color: #444;
 }
 
@@ -662,7 +662,7 @@ div.timetableLoading {
     width: 16px;
     height: 16px;
     cursor: pointer;
-    background: transparent url('/images/close_button.png') scroll no-repeat 0 0;
+    background: transparent url('static:images/close_button.png') scroll no-repeat 0 0;
 }
 
 .timetableFilter .closeButton:hover {
@@ -1432,7 +1432,7 @@ div#social:hover {
 
 #dragTip .pointer {
     position: absolute;
-    background: url('/images/pointer_tip.png');
+    background: url('static:images/pointer_tip.png');
     height: 7px;
     width: 5px;
     top: 6px;
