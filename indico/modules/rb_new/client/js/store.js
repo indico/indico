@@ -41,8 +41,7 @@ function getRouteConfig() {
 }
 
 export const history = createHistory({
-    // XXX: how does this work with `/indico` etc?!
-    basename: '/rooms-new'
+    basename: `${Indico.Urls.BasePath}/rooms-new`
 });
 
 
