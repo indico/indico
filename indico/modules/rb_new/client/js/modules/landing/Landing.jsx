@@ -42,7 +42,9 @@ class Landing extends React.Component {
 
     state = {
         text: null,
-        onlyFavorites: false
+        extraState: {
+            onlyFavorites: false
+        }
     };
 
     disabledDate = (current) => {
@@ -52,14 +54,14 @@ class Landing extends React.Component {
     };
 
     doSearch = (formState) => {
-        const {onlyFavorites, text} = this.state;
+        const {extraState, text} = this.state;
         const {actions: {setFilters}} = this.props;
         const parsed = parseSearchBarText(text);
 
         setFilters({
             ...formState,
             ...parsed,
-            onlyFavorites,
+            ...extraState,
             equipment: []
         });
     };
@@ -69,11 +71,17 @@ class Landing extends React.Component {
     };
 
     toggleFavorites = (_, {checked}) => {
-        this.setState({onlyFavorites: checked});
+        this.setExtraState({onlyFavorites: checked});
+    };
+
+    setExtraState = (attrs) => {
+        const {extraState} = this.state;
+        this.setState({extraState: {...extraState, ...attrs}});
     };
 
     render() {
         const {userHasFavorites} = this.props;
+        const {extraState} = this.state;
         return (
             <div className="landing-wrapper">
                 <Grid centered styleName="landing-page" columns={1}>
@@ -91,12 +99,14 @@ class Landing extends React.Component {
                                             <Form.Input placeholder="bldg: 28" styleName="search-input"
                                                         onChange={(event, data) => this.updateText(data.value)} />
                                         </Form.Group>
-                                        {userHasFavorites && (
-                                            <Form.Field>
-                                                <Checkbox label={Translate.string('Search only my favourites')}
-                                                          onClick={this.toggleFavorites} />
-                                            </Form.Field>
-                                        )}
+                                        <Overridable id="Landing.bootstrapOptions" setOptions={this.setExtraState} options={extraState}>
+                                            {userHasFavorites && (
+                                                <Form.Field>
+                                                    <Checkbox label={Translate.string('Search only my favourites')}
+                                                              onClick={this.toggleFavorites} />
+                                                </Form.Field>
+                                            )}
+                                        </Overridable>
                                     </BookingBootstrapForm>
                                 </Overridable>
                             </Card.Content>
