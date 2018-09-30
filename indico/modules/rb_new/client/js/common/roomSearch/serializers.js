@@ -37,6 +37,7 @@ export const ajax = {
     building: ({building}) => building,
     floor: ({floor}) => floor,
     text: ({text}) => text,
+    division: ({division}) => division,
     start_dt: {
         onlyIf: (data) => data.dates && data.dates.startDate,
         serializer: filterDTHandler('start')

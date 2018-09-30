@@ -32,6 +32,7 @@ search_room_args = {
     'favorite': fields.Bool(),
     'mine': fields.Bool(),
     'text': fields.Str(),
+    'division': fields.Str(),
     'start_dt': fields.DateTime(),
     'end_dt': fields.DateTime(),
     'repeat_frequency': EnumField(RepeatFrequency),

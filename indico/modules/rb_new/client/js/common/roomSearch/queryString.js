@@ -94,6 +94,9 @@ export const rules = {
     text: {
         stateField: 'filters.text'
     },
+    division: {
+        stateField: 'filters.division'
+    },
     sw_lat: {
         validator: v.isFloat({min: -90, max: 90}),
         sanitizer: v.toFloat(),
