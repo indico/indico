@@ -21,6 +21,7 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 
 import {Translate} from 'indico/react/i18n';
+import {Overridable} from 'indico/react/util';
 
 import CapacityForm from './filters/CapacityForm';
 import EquipmentForm from './filters/EquipmentForm';
@@ -86,7 +87,8 @@ class RoomFilterBarBase extends React.Component {
     render() {
         const {
             capacity, onlyFavorites, onlyMine, equipment, equipmentTypes,
-            hasOwnedRooms, hasFavoriteRooms, actions: {setFilterParameter}
+            hasOwnedRooms, hasFavoriteRooms, actions: {setFilterParameter},
+            ...extraProps
         } = this.props;
 
 
@@ -123,6 +125,7 @@ class RoomFilterBarBase extends React.Component {
                                                 onClick={() => setFilterParameter('onlyMine', !onlyMine)} />}
                                content={Translate.string('Show only rooms I manage')} />
                     )}
+                    <Overridable id="RoomFilterBar.extraFilters" setFilter={setFilterParameter} filters={extraProps} />
                     <Popup trigger={<Button icon="star" primary={onlyFavorites}
                                             disabled={!onlyFavorites && !hasFavoriteRooms}
                                             onClick={() => setFilterParameter('onlyFavorites', !onlyFavorites)} />}
