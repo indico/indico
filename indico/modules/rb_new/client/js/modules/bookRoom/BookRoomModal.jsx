@@ -26,6 +26,7 @@ import createDecorator from 'final-form-calculate';
 import {ReduxFormField, ReduxRadioField, formatters} from 'indico/react/forms';
 import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
 import PrincipalSearchField from 'indico/react/components/PrincipalSearchField';
+import {Overridable} from 'indico/react/util';
 import {toMoment} from 'indico/utils/date';
 import {selectors as roomsSelectors} from '../../common/rooms';
 import recurrenceRenderer from './filters/RecurrenceRenderer';
@@ -60,6 +61,65 @@ const formDecorator = createDecorator({
     }
 });
 
+export function TimeInformation({recurrence, dates: {startDate, endDate}, timeSlot}) {
+    const {type} = recurrence;
+    const mStartDate = toMoment(startDate);
+    const mEndDate = endDate ? toMoment(endDate) : null;
+    let timeInfo = null;
+
+    if (timeSlot) {
+        const {startTime, endTime} = timeSlot;
+        const mStartTime = toMoment(startTime, 'HH:mm');
+        const mEndTime = endTime ? toMoment(endTime, 'HH:mm') : null;
+        timeInfo = (
+            <Segment attached="bottom">
+                <Icon name="clock" />
+                <strong>{mStartTime.format('LT')}</strong>
+                {' → '}
+                <strong>{mEndTime.format('LT')}</strong>
+            </Segment>
+        );
+    }
+
+    return (
+        <div styleName="booking-time-info">
+            <Segment attached="top" color="teal">
+                <Icon name="calendar outline" />
+                {(endDate && startDate !== endDate)
+                    ? (
+                        <Translate>
+                            <Param name="startDate"
+                                   wrapper={<strong />}
+                                   value={mStartDate.format('L')} /> to <Param name="endDate"
+                                                                               wrapper={<strong />}
+                                                                               value={mEndDate.format('L')} />
+                        </Translate>
+                    ) : (
+                        <strong>{mStartDate.format('L')}</strong>
+                    )
+                }
+                {(type === 'daily' || type === 'every') && (
+                    <Label basic pointing="left">
+                        {recurrenceRenderer(recurrence)}
+                    </Label>
+                )}
+            </Segment>
+            {timeInfo}
+        </div>
+    );
+}
+
+TimeInformation.propTypes = {
+    recurrence: PropTypes.object.isRequired,
+    dates: PropTypes.object.isRequired,
+    timeSlot: PropTypes.object
+};
+
+TimeInformation.defaultProps = {
+    timeSlot: null
+};
+
+
 class BookRoomModal extends React.Component {
     static propTypes = {
         open: PropTypes.bool,
@@ -70,13 +130,15 @@ class BookRoomModal extends React.Component {
         onClose: PropTypes.func.isRequired,
         availability: PropTypes.object,
         fetchAvailability: PropTypes.func.isRequired,
-        favoriteUsers: PropTypes.array.isRequired
+        favoriteUsers: PropTypes.array.isRequired,
+        timeInformationComponent: PropTypes.func,
     };
 
     static defaultProps = {
         open: false,
         room: null,
-        availability: null
+        availability: null,
+        timeInformationComponent: TimeInformation
     };
 
     state = {
@@ -104,46 +166,6 @@ class BookRoomModal extends React.Component {
                             }} />
         );
     };
-
-    renderTimeInformation(recurrence, {startDate, endDate}, {startTime, endTime}) {
-        const {type} = recurrence;
-        const sDate = toMoment(startDate);
-        const eDate = endDate ? toMoment(endDate) : null;
-        const sTime = toMoment(startTime, 'HH:mm');
-        const eTime = endTime ? toMoment(endTime, 'HH:mm') : null;
-
-        return (
-            <div styleName="booking-time-info">
-                <Segment attached="top" color="teal">
-                    <Icon name="calendar outline" />
-                    {(endDate && startDate !== endDate)
-                        ? (
-                            <Translate>
-                                <Param name="startTime"
-                                       wrapper={<strong />}
-                                       value={sDate.format('L')} /> to <Param name="endTime"
-                                                                              wrapper={<strong />}
-                                                                              value={eDate.format('L')} />
-                            </Translate>
-                        ) : (
-                            <strong>{sDate.format('L')}</strong>
-                        )
-                    }
-                    {(type === 'daily' || type === 'every') && (
-                        <Label basic pointing="left">
-                            {recurrenceRenderer(recurrence)}
-                        </Label>
-                    )}
-                </Segment>
-                <Segment attached="bottom">
-                    <Icon name="clock" />
-                    <strong>{sTime.format('LT')}</strong>
-                    {' '}&rarr;{' '}
-                    <strong>{eTime.format('LT')}</strong>
-                </Segment>
-            </div>
-        );
-    }
 
     renderBookingState({submitSucceeded, submitError, submitFailed, values}) {
         if (submitSucceeded) {
@@ -294,7 +316,7 @@ class BookRoomModal extends React.Component {
     render() {
         const {
             bookingData: {recurrence, dates, timeSlot},
-            open, room, user, availability
+            open, room, user, availability, timeInformationComponent: TimeInformationComponent
         } = this.props;
         const {skipConflicts, bookingConflictsVisible} = this.state;
 
@@ -325,7 +347,9 @@ class BookRoomModal extends React.Component {
                     <Grid>
                         <Grid.Column width={8}>
                             <RoomBasicDetails room={room} />
-                            {this.renderTimeInformation(recurrence, dates, timeSlot)}
+                            <Overridable id="TimeInformation">
+                                <TimeInformationComponent dates={dates} timeSlot={timeSlot} recurrence={recurrence} />
+                            </Overridable>
                             <Message attached="bottom">
                                 <Message.Content>
                                     <Translate>
