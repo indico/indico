@@ -4,25 +4,26 @@ import {connect} from 'react-redux';
 
 
 function Overridable({children, overrides, id, ...restProps}) {
-    const childProps = children.props;
+    const childProps = children ? children.props : {};
     const Override = overrides[id];
     const newProps = {...restProps, ...childProps};
 
     return (Override !== undefined) ? (
         <Override {...newProps} />
     ) : (
-        React.cloneElement(children, {...newProps})
+        !!children && React.cloneElement(children, {...newProps})
     );
 }
 
 Overridable.propTypes = {
-    children: PropTypes.node.isRequired,
+    children: PropTypes.node,
     overrides: PropTypes.object.isRequired,
     id: PropTypes.string
 };
 
 Overridable.defaultProps = {
-    id: null
+    id: null,
+    children: null
 };
 
 export default connect(({_overrides}) => ({
