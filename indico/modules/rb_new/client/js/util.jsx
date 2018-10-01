@@ -19,7 +19,7 @@ import _ from 'lodash';
 import React from 'react';
 import {push} from 'connected-react-router';
 import moment from 'moment';
-import {Dimmer} from 'semantic-ui-react';
+import {Dimmer, Loader} from 'semantic-ui-react';
 import {Preloader} from 'indico/react/util';
 import {serializeDate} from 'indico/utils/date';
 
@@ -131,7 +131,7 @@ export const roomPreloader = (componentFunc, action) => {
     return ({match: {params: {roomId}}}) => (
         <Preloader checkCached={state => roomsSelectors.hasDetails(state, {roomId})}
                    action={() => action(roomId)}
-                   dimmer={<Dimmer page />}>
+                   dimmer={<Dimmer active page><Loader /></Dimmer>}>
             {() => componentFunc(roomId)}
         </Preloader>
     );

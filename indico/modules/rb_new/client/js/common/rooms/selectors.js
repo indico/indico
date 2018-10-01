@@ -36,12 +36,6 @@ const getAllAttributes = ({rooms}) => rooms.attributes;
 export const isFetchingAttributes = ({rooms}) => rooms.requests.attributes.state === RequestState.STARTED;
 export const getAttributes = (state, {roomId}) => getAllAttributes(state)[roomId];
 
-export const isFetchingDetails = createSelector(
-    isFetchingAvailability,
-    isFetchingAttributes,
-    (...fetching) => fetching.some(x => x)
-);
-
 export const hasDetails = createSelector(
     getAvailability,
     getAttributes,

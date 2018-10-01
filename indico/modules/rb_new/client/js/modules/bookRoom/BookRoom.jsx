@@ -23,7 +23,7 @@ import React from 'react';
 import {bindActionCreators} from 'redux';
 import _ from 'lodash';
 import {Route} from 'react-router-dom';
-import {Button, Card, Dimmer, Grid, Header, Icon, Label, Loader, Message, Popup, Sticky} from 'semantic-ui-react';
+import {Button, Card, Grid, Header, Icon, Label, Loader, Message, Popup, Sticky} from 'semantic-ui-react';
 import LazyScroll from 'redux-lazy-scroll';
 
 import {Slot, toClasses} from 'indico/react/util';
@@ -45,7 +45,7 @@ import * as bookRoomActions from './actions';
 import {actions as filtersActions} from '../../common/filters';
 import * as globalSelectors from '../../selectors';
 import * as bookRoomSelectors from './selectors';
-import {actions as roomsActions, selectors as roomsSelectors} from '../../common/rooms';
+import {actions as roomsActions} from '../../common/rooms';
 import {mapControllerFactory, selectors as mapSelectors} from '../../common/map';
 
 import './BookRoom.module.scss';
@@ -67,7 +67,6 @@ class BookRoom extends React.Component {
         hasConflicts: PropTypes.bool.isRequired,
         totalResultCount: PropTypes.number.isRequired,
         filters: PropTypes.object.isRequired,
-        roomDetailsFetching: PropTypes.bool.isRequired,
         suggestions: PropTypes.arrayOf(PropTypes.object).isRequired,
         pushState: PropTypes.func.isRequired,
         showMap: PropTypes.bool.isRequired,
@@ -225,7 +224,6 @@ class BookRoom extends React.Component {
 
     renderMainContent = () => {
         const {
-            roomDetailsFetching,
             isSearching,
             isTimelineVisible,
         } = this.props;
@@ -247,11 +245,6 @@ class BookRoom extends React.Component {
                             </>
                         )}
                     </div>
-                    <Dimmer.Dimmable>
-                        <Dimmer active={roomDetailsFetching} page>
-                            <Loader />
-                        </Dimmer>
-                    </Dimmer.Dimmable>
                 </>
             );
         } else {
@@ -471,7 +464,6 @@ const mapStateToProps = (state) => {
         isSearching: bookRoomSelectors.isSearching(state),
         searchFinished: bookRoomSelectors.isSearchFinished(state),
         hasConflicts: bookRoomSelectors.hasUnavailableRooms(state),
-        roomDetailsFetching: roomsSelectors.isFetchingDetails(state),
         isInitializing: globalSelectors.isInitializing(state),
         queryString: stateToQueryString(state.bookRoom, qsFilterRules, qsBookRoomRules),
         showMap: mapSelectors.isMapVisible(state),

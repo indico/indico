@@ -20,7 +20,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
-import {Button, Card, Dimmer, Dropdown, Grid, Loader, Popup, Sticky} from 'semantic-ui-react';
+import {Button, Card, Dropdown, Grid, Loader, Popup, Sticky} from 'semantic-ui-react';
 import {Route} from 'react-router-dom';
 import LazyScroll from 'redux-lazy-scroll';
 import {stateToQueryString} from 'redux-router-querystring';
@@ -36,7 +36,7 @@ import roomDetailsModalFactory from '../../components/modals/RoomDetailsModal';
 import BookFromListModal from '../../components/modals/BookFromListModal';
 import {BlockingModal} from '../blockings';
 import {queryStringRules as queryStringSerializer} from '../../common/roomSearch';
-import {actions as roomsActions, selectors as roomsSelectors} from '../../common/rooms';
+import {actions as roomsActions} from '../../common/rooms';
 import {mapControllerFactory, selectors as mapSelectors} from '../../common/map';
 import * as selectors from '../../selectors';
 import * as roomsListActions from './actions';
@@ -55,7 +55,6 @@ class RoomList extends React.Component {
         filters: PropTypes.object.isRequired,
         results: PropTypes.arrayOf(PropTypes.object).isRequired,
         isSearching: PropTypes.bool.isRequired,
-        roomDetailsFetching: PropTypes.bool.isRequired,
         showMap: PropTypes.bool.isRequired,
         isInitializing: PropTypes.bool.isRequired,
         pushState: PropTypes.func.isRequired,
@@ -183,7 +182,6 @@ class RoomList extends React.Component {
         const {
             results,
             actions: {fetchRoomDetails},
-            roomDetailsFetching,
             showMap,
             pushState,
             isInitializing,
@@ -254,11 +252,6 @@ class RoomList extends React.Component {
                             </LazyScroll>
                         )}
                     </div>
-                    <Dimmer.Dimmable>
-                        <Dimmer active={roomDetailsFetching} page>
-                            <Loader />
-                        </Dimmer>
-                    </Dimmer.Dimmable>
                 </Grid.Column>
                 {showMap && (
                     <Grid.Column computer={5} only="computer">
@@ -297,7 +290,6 @@ export default connect(
         filters: roomsListSelectors.getFilters(state),
         results: roomsListSelectors.getSearchResults(state),
         isSearching: roomsListSelectors.isSearching(state),
-        roomDetailsFetching: roomsSelectors.isFetchingDetails(state),
         showMap: mapSelectors.isMapVisible(state),
         isInitializing: selectors.isInitializing(state),
         queryString: stateToQueryString(state.roomList, queryStringSerializer), // for pushStateMergeProps

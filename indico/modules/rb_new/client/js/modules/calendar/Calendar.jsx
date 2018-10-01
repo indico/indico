@@ -32,7 +32,6 @@ import * as calendarActions from './actions';
 import * as calendarSelectors from './selectors';
 import * as roomActions from '../../common/rooms/actions';
 import * as roomSelectors from '../../common/rooms/selectors';
-import {selectors as roomsSelectors} from '../../common/rooms';
 import {EditableTimelineItem, TimelineBase, TimelineHeader} from '../../common/timeline';
 import BookFromListModal from '../../components/modals/BookFromListModal';
 
@@ -54,7 +53,6 @@ class Calendar extends React.Component {
             fetchRoomDetails: PropTypes.func.isRequired
         }).isRequired,
         pushState: PropTypes.func.isRequired,
-        roomDetailsFetching: PropTypes.bool.isRequired
     };
 
 
@@ -130,7 +128,7 @@ class Calendar extends React.Component {
 
     render() {
         const {
-            isFetching, calendarData: {date, rows}, actions: {setDate, fetchRoomDetails}, roomDetailsFetching
+            isFetching, calendarData: {date, rows}, actions: {setDate, fetchRoomDetails}
         } = this.props;
         const {bookingRoomId, modalFields} = this.state;
         const legendLabels = [
@@ -157,11 +155,6 @@ class Calendar extends React.Component {
                                           itemClass={EditableTimelineItem}
                                           itemProps={{onAddSlot: this.onAddSlot}}
                                           longLabel />
-                            <Dimmer.Dimmable>
-                                <Dimmer active={roomDetailsFetching} page>
-                                    <Loader />
-                                </Dimmer>
-                            </Dimmer.Dimmable>
                         </div>
                     </Container>
                 </Grid.Row>
@@ -174,7 +167,7 @@ class Calendar extends React.Component {
                 {bookingRoomId && (
                     <Preloader checkCached={state => !!roomSelectors.hasDetails(state, {roomId: bookingRoomId})}
                                action={() => fetchRoomDetails(bookingRoomId)}
-                               dimmer={<Dimmer page />}>
+                               dimmer={<Dimmer active page><Loader /></Dimmer>}>
                         {() => (
                             <BookFromListModal roomId={bookingRoomId}
                                                onClose={this.onCloseBookingModal}
@@ -193,7 +186,6 @@ export default connect(
         isFetching: calendarSelectors.isFetching(state),
         calendarData: calendarSelectors.getCalendarData(state),
         rooms: roomSelectors.getAllRooms(state),
-        roomDetailsFetching: roomsSelectors.isFetchingDetails(state)
     }),
     dispatch => ({
         actions: bindActionCreators({
