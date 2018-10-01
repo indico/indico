@@ -52,6 +52,14 @@ export default class TimelineHeader extends React.Component {
         return dateRange.length !== 0 && !isDateWithinRange(date, dateRange, toMoment);
     };
 
+    onSelect = (date) => {
+        const {dateRange, onDateChange} = this.props;
+        const freeRange = dateRange.length === 0;
+        if (freeRange || isDateWithinRange(date, dateRange, toMoment)) {
+            onDateChange(date);
+        }
+    };
+
     changeSelectedDate = (mode) => {
         const {activeDate, dateRange, onDateChange} = this.props;
         const step = mode === 'next' ? 1 : -1;
