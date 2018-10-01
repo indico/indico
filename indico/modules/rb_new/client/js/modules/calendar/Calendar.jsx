@@ -30,8 +30,7 @@ import roomDetailsModalFactory from '../../components/modals/RoomDetailsModal';
 import {pushStateMergeProps, roomPreloader} from '../../util';
 import * as calendarActions from './actions';
 import * as calendarSelectors from './selectors';
-import * as roomActions from '../../common/rooms/actions';
-import * as roomSelectors from '../../common/rooms/selectors';
+import {actions as roomsActions, selectors as roomsSelectors} from '../../common/rooms';
 import {EditableTimelineItem, TimelineBase, TimelineHeader} from '../../common/timeline';
 import BookFromListModal from '../../components/modals/BookFromListModal';
 
@@ -166,7 +165,7 @@ class Calendar extends React.Component {
                     <BookFromListModal roomId={roomId} onClose={this.closeModal} />
                 ), fetchRoomDetails)} />
                 {bookingRoomId && (
-                    <Preloader checkCached={state => !!roomSelectors.hasDetails(state, {roomId: bookingRoomId})}
+                    <Preloader checkCached={state => !!roomsSelectors.hasDetails(state, {roomId: bookingRoomId})}
                                action={() => fetchRoomDetails(bookingRoomId)}
                                dimmer={<Dimmer active page><Loader /></Dimmer>}>
                         {() => (
@@ -186,12 +185,12 @@ export default connect(
     state => ({
         isFetching: calendarSelectors.isFetching(state),
         calendarData: calendarSelectors.getCalendarData(state),
-        rooms: roomSelectors.getAllRooms(state),
+        rooms: roomsSelectors.getAllRooms(state),
     }),
     dispatch => ({
         actions: bindActionCreators({
             fetchCalendar: calendarActions.fetchCalendar,
-            fetchRoomDetails: roomActions.fetchDetails,
+            fetchRoomDetails: roomsActions.fetchDetails,
             setDate: (date) => calendarActions.setDate(serializeDate(date)),
         }, dispatch),
         dispatch
