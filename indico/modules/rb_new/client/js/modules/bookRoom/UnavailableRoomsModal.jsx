@@ -65,8 +65,7 @@ class UnavailableRoomsModal extends React.Component {
                                               minHour={6}
                                               maxHour={22}
                                               availability={availability}
-                                              dateRange={dateRange}
-                                              pushState={() => {}} />
+                                              dateRange={dateRange} />
                 </Modal.Content>
             </Modal>
         );

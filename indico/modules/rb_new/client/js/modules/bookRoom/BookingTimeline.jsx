@@ -45,7 +45,7 @@ const timelinePropTypes = {
 export class BookingTimelineComponent extends React.Component {
     static propTypes = {
         ...timelinePropTypes,
-        pushState: PropTypes.func.isRequired,
+        pushState: PropTypes.func,
         lazyScroll: PropTypes.object,
         isFetching: PropTypes.bool.isRequired,
         showEmptyMessage: PropTypes.bool,
@@ -54,6 +54,7 @@ export class BookingTimelineComponent extends React.Component {
     };
 
     static defaultProps = {
+        pushState: null,
         lazyScroll: null,
         allowSingleRoom: true,
         showEmptyMessage: true,
@@ -141,7 +142,7 @@ export class BookingTimelineComponent extends React.Component {
 
     render() {
         const {
-            dateRange, isFetching, maxHour, minHour, recurrenceType, lazyScroll, showEmptyMessage
+            dateRange, isFetching, maxHour, minHour, recurrenceType, lazyScroll, showEmptyMessage, pushState
         } = this.props;
         const emptyMessage = showEmptyMessage ? (
             <Message warning>
@@ -155,8 +156,8 @@ export class BookingTimelineComponent extends React.Component {
             <TimelineBase lazyScroll={lazyScroll}
                           rows={this.calcRows()}
                           emptyMessage={emptyMessage}
-                          onClick={this.openBookingModal}
-                          onClickLabel={this.openRoomModal}
+                          onClick={pushState ? this.openBookingModal : null}
+                          onClickLabel={pushState ? this.openRoomModal : null}
                           dateRange={dateRange}
                           minHour={minHour}
                           maxHour={maxHour}

@@ -151,6 +151,7 @@ class Calendar extends React.Component {
                             <TimelineBase minHour={6}
                                           maxHour={22}
                                           rows={rows.map(this._getRowSerializer(date || serializeDate(moment())))}
+                                          onClickLabel={this.onClickLabel}
                                           isLoading={isFetching}
                                           itemClass={EditableTimelineItem}
                                           itemProps={{onAddSlot: this.onAddSlot}}
