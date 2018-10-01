@@ -22,6 +22,8 @@ import {requestReducer} from 'indico/utils/redux';
 import {serializeDate} from 'indico/utils/date';
 import * as actions from '../../actions';
 import * as calendarActions from './actions';
+import {filterReducerFactory} from '../../common/filters';
+import {processRoomFilters} from '../../common/roomSearch/reducers';
 
 
 export const initialState = {
@@ -29,8 +31,16 @@ export const initialState = {
     rows: [],
 };
 
+export const initialFilterState = {
+    text: null,
+    building: null,
+    floor: null,
+    onlyFavorites: false
+};
+
 export default combineReducers({
     request: requestReducer(calendarActions.FETCH_REQUEST, calendarActions.FETCH_SUCCESS, calendarActions.FETCH_ERROR),
+    filters: filterReducerFactory('calendar', initialFilterState, processRoomFilters),
     data: (state = initialState, action) => {
         switch (action.type) {
             case actions.RESET_PAGE_STATE:

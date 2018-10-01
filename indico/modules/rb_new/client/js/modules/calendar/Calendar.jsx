@@ -15,24 +15,31 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import _ from 'lodash';
+
 import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
 import {bindActionCreators} from 'redux';
-import {Container, Grid, Sticky} from 'semantic-ui-react';
+import {Button, Container, Grid, Popup, Sticky} from 'semantic-ui-react';
 import {connect} from 'react-redux';
 
 import {Translate} from 'indico/react/i18n';
 import {serializeDate} from 'indico/utils/date';
+import searchBarFactory from '../../containers/SearchBar';
 import * as calendarActions from './actions';
 import * as calendarSelectors from './selectors';
 import {selectors as roomsSelectors, actions as roomsActions} from '../../common/rooms';
 import {EditableTimelineItem, TimelineBase, TimelineHeader} from '../../common/timeline';
 import {actions as bookRoomActions} from '../../modules/bookRoom';
+import {actions as filtersActions} from '../../common/filters';
+import * as userSelectors from '../../common/user/selectors';
 
 
-import '../../common/timeline/Timeline.module.scss';
+import './Calendar.module.scss';
 
+
+const SearchBar = searchBarFactory('calendar', calendarSelectors);
 
 class Calendar extends React.Component {
     static propTypes = {
@@ -46,23 +53,33 @@ class Calendar extends React.Component {
             setDate: PropTypes.func.isRequired,
             openRoomDetails: PropTypes.func.isRequired,
             openBookRoom: PropTypes.func.isRequired,
+            setFilterParameter: PropTypes.func.isRequired
         }).isRequired,
+        filters: PropTypes.object.isRequired,
+        hasFavoriteRooms: PropTypes.bool,
     };
 
+    static defaultProps = {
+        hasFavoriteRooms: false,
+    };
 
     constructor(props) {
         super(props);
         this.contextRef = React.createRef();
     }
 
+    state = {
+        showUnused: true,
+    };
+
     componentDidMount() {
         const {actions: {fetchCalendar}} = this.props;
         fetchCalendar();
     }
 
-    componentDidUpdate({calendarData: {date: prevDate}}) {
-        const {calendarData: {date}, actions: {fetchCalendar}} = this.props;
-        if (prevDate !== date) {
+    componentDidUpdate({calendarData: {date: prevDate}, filters: prevFilters}) {
+        const {calendarData: {date}, actions: {fetchCalendar}, filters} = this.props;
+        if (prevDate !== date || !_.isEqual(prevFilters, filters)) {
             fetchCalendar();
         }
     }
@@ -100,23 +117,44 @@ class Calendar extends React.Component {
         });
     };
 
+    toggleShowUnused = () => {
+        const {showUnused} = this.state;
+        this.setState({showUnused: !showUnused});
+    };
+
     render() {
         const {
-            isFetching, calendarData: {date, rows}, actions: {setDate, openRoomDetails}
+            isFetching, calendarData: {date, rows}, actions: {setDate, openRoomDetails, setFilterParameter},
+            hasFavoriteRooms, filters: {onlyFavorites}
         } = this.props;
+        const {showUnused} = this.state;
         const legendLabels = [
             {label: Translate.string('Booked'), color: 'orange'},
             {label: Translate.string('Pre-Booking'), style: 'pre-booking'},
             {label: Translate.string('Blocked'), style: 'blocking'},
             {label: Translate.string('Not bookable'), style: 'unbookable'}
         ];
-
         return (
             <Grid>
                 <Grid.Row>
                     <Container>
                         <div ref={this.contextRef}>
                             <Sticky context={this.contextRef.current} className="sticky-filters">
+                                <Grid.Row>
+                                    <div className="filter-row">
+                                        <SearchBar />
+                                        <Popup trigger={<Button circular
+                                                                icon="star"
+                                                                primary={onlyFavorites}
+                                                                disabled={!onlyFavorites && !hasFavoriteRooms}
+                                                                onClick={() => setFilterParameter('onlyFavorites', !onlyFavorites)} />}
+                                               content={Translate.string('Show only my favorite rooms')} />
+                                        <Popup trigger={<Button circular
+                                                                icon={showUnused ? 'eye' : 'eye slash'}
+                                                                onClick={this.toggleShowUnused} />}
+                                               content={showUnused ? 'Hide empty rows' : 'Show empty rows'} />
+                                    </div>
+                                </Grid.Row>
                                 <TimelineHeader activeDate={date ? moment(date) : moment()}
                                                 onDateChange={setDate}
                                                 legendLabels={legendLabels} />
@@ -126,6 +164,7 @@ class Calendar extends React.Component {
                                           isLoading={isFetching}
                                           itemClass={EditableTimelineItem}
                                           itemProps={{onAddSlot: this.onAddSlot}}
+                                          showUnused={showUnused}
                                           longLabel />
                         </div>
                     </Container>
@@ -140,7 +179,9 @@ export default connect(
     state => ({
         isFetching: calendarSelectors.isFetching(state),
         calendarData: calendarSelectors.getCalendarData(state),
+        filters: calendarSelectors.getFilters(state),
         rooms: roomsSelectors.getAllRooms(state),
+        hasFavoriteRooms: userSelectors.hasFavoriteRooms(state)
     }),
     dispatch => ({
         actions: bindActionCreators({
@@ -148,6 +189,7 @@ export default connect(
             setDate: (date) => calendarActions.setDate(serializeDate(date)),
             openRoomDetails: roomsActions.openRoomDetails,
             openBookRoom: bookRoomActions.openBookRoom,
-        }, dispatch),
+            setFilterParameter: (param, value) => filtersActions.setFilterParameter('calendar', param, value)
+        }, dispatch)
     }),
 )(Calendar);

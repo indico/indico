@@ -41,7 +41,8 @@ export default class TimelineBase extends React.Component {
         itemProps: PropTypes.object,
         longLabel: PropTypes.bool,
         onClickLabel: PropTypes.func,
-        lazyScroll: PropTypes.object
+        lazyScroll: PropTypes.object,
+        showUnused: PropTypes.bool
     };
 
     static defaultProps = {
@@ -63,13 +64,14 @@ export default class TimelineBase extends React.Component {
         itemProps: {},
         longLabel: false,
         onClickLabel: null,
-        lazyScroll: null
+        lazyScroll: null,
+        showUnused: false
     };
 
     renderTimeline = () => {
         const {
             extraContent, onClick, recurrenceType, rows, isLoading, itemClass, itemProps, longLabel,
-            onClickLabel, lazyScroll, minHour, maxHour, hourStep
+            onClickLabel, lazyScroll, minHour, maxHour, hourStep, showUnused
         } = this.props;
         return (
             <>
@@ -86,7 +88,9 @@ export default class TimelineBase extends React.Component {
                                           longLabel={longLabel}
                                           onClickLabel={onClickLabel}
                                           isLoading={isLoading}
-                                          lazyScroll={lazyScroll} />
+                                          lazyScroll={lazyScroll}
+                                          showUnused={showUnused} />
+
                 </div>
             </>
         );

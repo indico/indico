@@ -43,7 +43,8 @@ export default class DailyTimelineContent extends React.Component {
         lazyScroll: PropTypes.object,
         minHour: PropTypes.number,
         maxHour: PropTypes.number,
-        hourStep: PropTypes.number
+        hourStep: PropTypes.number,
+        showUnused: PropTypes.bool,
     };
 
     static defaultProps = {
@@ -58,7 +59,8 @@ export default class DailyTimelineContent extends React.Component {
         lazyScroll: null,
         minHour: 6,
         maxHour: 22,
-        hourStep: 2
+        hourStep: 2,
+        showUnused: false
     };
 
     state = {
@@ -70,13 +72,23 @@ export default class DailyTimelineContent extends React.Component {
         return onClickLabel ? () => onClickLabel(id) : false;
     };
 
+    hasUsage = ({preBookings, blockings, bookings, nonbookablePeriods, unbookableHours}) => {
+        return !(_.isEmpty(preBookings) && _.isEmpty(blockings) && _.isEmpty(nonbookablePeriods) &&
+                 _.isEmpty(bookings) && _.isEmpty(nonbookablePeriods) && _.isEmpty(unbookableHours));
+    };
+
     renderTimelineRow = ({availability, label, conflictIndicator, key, room}) => {
         const {
-            minHour, maxHour, hourStep, itemClass: ItemClass, itemProps, recurrenceType, onClick, longLabel
+            minHour, maxHour, hourStep, itemClass: ItemClass, itemProps, recurrenceType, onClick, longLabel, showUnused
         } = this.props;
         const columns = ((maxHour - minHour) / hourStep) + 1;
+
         // TODO: Consider plan B (availability='alternatives') option when implemented
         const hasConflicts = !(_.isEmpty(availability.conflicts) && _.isEmpty(availability.preConflicts));
+        if (!showUnused && !this.hasUsage(availability)) {
+            return null;
+        }
+
         return (
             <div styleName="timeline-row" key={`element-${key}`}>
                 <TimelineRowLabel label={label}
@@ -87,7 +99,7 @@ export default class DailyTimelineContent extends React.Component {
                     <ItemClass startHour={minHour} endHour={maxHour} data={availability} room={room}
                                onClick={() => {
                                    if (onClick && (!hasConflicts || recurrenceType !== 'single')) {
-                                       onClick(room.id);
+                                       onClick(room);
                                    }
                                }}
                                setSelectable={selectable => {

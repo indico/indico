@@ -110,27 +110,6 @@
     }
 }
 
-.filter-row {
-    display: flex;
-    align-items: baseline;
-    flex-direction: row;
-
-    .filter-row-filters {
-        display: flex;
-        align-items: baseline;
-        flex-direction: row;
-        flex-wrap: wrap;
-
-        > :global(.ui.buttons), > .view-icons {
-            margin-bottom: 10px;
-        }
-
-        > :not(:last-child) {
-            margin-right: 10px;
-        }
-    }
-}
-
 :global(.ui.inline.loader).rooms-loader {
     margin-top: 2em;
 }

@@ -132,10 +132,9 @@ def get_rooms_availability(rooms, start_dt, end_dt, repeat_frequency, repeat_int
     return date_range, availability
 
 
-def get_room_calendar(start_date, end_date):
-    start_dt = datetime.combine(start_date, time(hour=0, minute=0))
-    end_dt = datetime.combine(end_date, time(hour=23, minute=59))
-
+def get_room_calendar(day, room_ids):
+    start_dt = datetime.combine(day, time(hour=0, minute=0))
+    end_dt = datetime.combine(day, time(hour=23, minute=59))
     reservation_strategy = contains_eager('reservation')
     reservation_strategy.noload('room')
     reservation_strategy.noload('booked_for_user')
@@ -145,19 +144,24 @@ def get_room_calendar(start_date, end_date):
              .filter(ReservationOccurrence.start_dt >= start_dt, ReservationOccurrence.end_dt <= end_dt)
              .join(Reservation)
              .join(Room)
-             .filter(Room.is_active)
+             .filter(Room.is_active, Room.id.in_(room_ids) if room_ids else True)
              .order_by(db.func.indico.natsort(Room.full_name))
              .options(reservation_strategy))
 
+    if room_ids:
+        print "TRUE"
+    else:
+        print "FALSE"
     rooms = (Room.query
-             .filter(Room.is_active).options(joinedload('location'))
+             .filter(Room.is_active, Room.id.in_(room_ids) if room_ids else True)
+             .options(joinedload('location'))
              .order_by(db.func.indico.natsort(Room.full_name))
              .all())
 
     unbookable_hours = get_rooms_unbookable_hours(rooms)
     nonbookable_periods = get_rooms_nonbookable_periods(rooms, start_dt, end_dt)
     occurrences_by_room = groupby(query, attrgetter('reservation.room_id'))
-    blocked_rooms = get_rooms_blockings(rooms, start_date, end_date)
+    blocked_rooms = get_rooms_blockings(rooms, start_dt, end_dt)
 
     dates = [d.date() for d in iterdays(start_dt, end_dt)]
 

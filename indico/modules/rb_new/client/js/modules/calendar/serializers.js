@@ -15,7 +15,10 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import {ajax as roomSearchAjaxRules} from '../../common/roomSearch/serializers';
+
 export const ajax = {
+    ...roomSearchAjaxRules,
     start_date: ({date}) => date,
     end_date: ({date}) => date,
 };
