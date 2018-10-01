@@ -84,7 +84,9 @@ export default class App extends React.Component {
                             </h1>
                         </div>
                         <div styleName="rb-menu-bar-menu">
-                            <Menu />
+                            <Overridable id="Menu">
+                                <Menu />
+                            </Overridable>
                         </div>
                         <div styleName="rb-menu-bar-side-right">
                             <UserActions />

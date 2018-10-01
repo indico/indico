@@ -16,6 +16,7 @@
  */
 
 import React from 'react';
+import PropTypes from 'prop-types';
 import {Icon} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
@@ -24,25 +25,42 @@ import MenuItem from '../containers/MenuItem.js';
 import './Menu.module.scss';
 
 
-export default function Menu() {
+const defaultLabels = {
+    bookRoom: <Translate>Book a Room</Translate>,
+    roomList: <Translate>List of Rooms</Translate>,
+    calendar: <Translate>Calendar</Translate>,
+    blockings: <Translate>Blockings</Translate>
+};
+
+
+export default function Menu({labels}) {
+    const finalLabels = {...defaultLabels, ...labels};
     return (
         <ul styleName="rb-menu">
             <MenuItem key="book" path="/book" namespace="bookRoom">
                 <Icon name="add square" />
-                <Translate>Book a Room</Translate>
+                {finalLabels.bookRoom}
             </MenuItem>
             <MenuItem key="rooms" path="/rooms" namespace="roomList">
                 <Icon name="list" />
-                <Translate>List of Rooms</Translate>
+                {finalLabels.roomList}
             </MenuItem>
             <MenuItem key="calendar" path="/calendar" namespace="calendar">
                 <Icon name="calendar" />
-                <Translate>Calendar</Translate>
+                {finalLabels.calendar}
             </MenuItem>
             <MenuItem key="blockings" path="/blockings" namespace="blockings">
                 <Icon name="window close" />
-                <Translate>Blockings</Translate>
+                {finalLabels.blockings}
             </MenuItem>
         </ul>
     );
 }
+
+Menu.propTypes = {
+    labels: PropTypes.object
+};
+
+Menu.defaultProps = {
+    labels: {}
+};

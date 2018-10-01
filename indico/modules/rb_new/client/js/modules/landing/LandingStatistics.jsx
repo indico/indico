@@ -26,6 +26,13 @@ import * as landingActions from './actions';
 import * as landingSelectors from './selectors';
 
 
+const defaultLabels = {
+    activeRooms: <Translate>Active rooms</Translate>,
+    buildings: <Translate>Buildings</Translate>,
+    bookingsToday: <Translate>Bookings today</Translate>,
+    pendingBookings: <Translate>Active booking requests</Translate>
+};
+
 class LandingStatistics extends React.Component {
     static propTypes = {
         hasStatistics: PropTypes.bool.isRequired,
@@ -38,10 +45,12 @@ class LandingStatistics extends React.Component {
         actions: PropTypes.exact({
             fetchStatistics: PropTypes.func.isRequired,
         }).isRequired,
+        labels: PropTypes.object
     };
 
     static defaultProps = {
         statistics: null,
+        labels: {}
     };
 
     componentDidMount() {
@@ -54,7 +63,8 @@ class LandingStatistics extends React.Component {
         if (!hasStatistics) {
             return <Loader size="massive" active />;
         }
-        const {statistics: {activeRooms, bookingsToday, buildings, pendingBookings}} = this.props;
+        const {statistics: {activeRooms, bookingsToday, buildings, pendingBookings}, labels} = this.props;
+        const finalLabels = {...defaultLabels, ...labels};
         return (
             <>
                 <Statistic size="huge">
@@ -62,7 +72,7 @@ class LandingStatistics extends React.Component {
                         {activeRooms}
                     </Statistic.Value>
                     <Statistic.Label>
-                        <Translate>Active rooms</Translate>
+                        {finalLabels.activeRooms}
                     </Statistic.Label>
                 </Statistic>
                 <Statistic size="huge">
@@ -70,7 +80,7 @@ class LandingStatistics extends React.Component {
                         {buildings}
                     </Statistic.Value>
                     <Statistic.Label>
-                        <Translate>Buildings</Translate>
+                        {finalLabels.buildings}
                     </Statistic.Label>
                 </Statistic>
                 <Statistic size="huge">
@@ -78,7 +88,7 @@ class LandingStatistics extends React.Component {
                         {bookingsToday}
                     </Statistic.Value>
                     <Statistic.Label>
-                        <Translate>Bookings today</Translate>
+                        {finalLabels.bookingsToday}
                     </Statistic.Label>
                 </Statistic>
                 <Statistic size="huge">
@@ -86,7 +96,7 @@ class LandingStatistics extends React.Component {
                         {pendingBookings}
                     </Statistic.Value>
                     <Statistic.Label>
-                        <Translate>Active booking requests</Translate>
+                        {finalLabels.pendingBookings}
                     </Statistic.Label>
                 </Statistic>
             </>

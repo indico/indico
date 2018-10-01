@@ -114,7 +114,9 @@ class Landing extends React.Component {
                     </Grid.Row>
                     <Grid.Row styleName="landing-page-statistics">
                         <div styleName="statistics">
-                            <LandingStatistics />
+                            <Overridable id="LandingStatistics">
+                                <LandingStatistics />
+                            </Overridable>
                         </div>
                     </Grid.Row>
                 </Grid>

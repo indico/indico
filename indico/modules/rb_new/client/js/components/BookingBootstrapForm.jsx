@@ -15,6 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import _ from 'lodash';
 import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -48,21 +49,7 @@ export default class BookingBootstrapForm extends React.Component {
             onChange: () => {},
             buttonDisabled: false,
             dayBased: false,
-            defaults: {
-                recurrence: {
-                    type: 'single',
-                    number: 1,
-                    interval: 'week'
-                },
-                dates: {
-                    startDate: moment(),
-                    endDate: null
-                },
-                timeSlot: {
-                    startTime: moment().startOf('hour').add(1, 'h'),
-                    endTime: moment().startOf('hour').add(2, 'h')
-                }
-            }
+            defaults: {}
         };
     }
 
@@ -70,7 +57,21 @@ export default class BookingBootstrapForm extends React.Component {
         super(props);
 
         const {defaults} = props;
-        this.state = defaults;
+        this.state = _.merge({
+            recurrence: {
+                type: 'single',
+                number: 1,
+                interval: 'week'
+            },
+            dates: {
+                startDate: moment(),
+                endDate: null
+            },
+            timeSlot: {
+                startTime: moment().startOf('hour').add(1, 'h'),
+                endTime: moment().startOf('hour').add(2, 'h')
+            }
+        }, defaults);
     }
 
     componentDidMount() {
