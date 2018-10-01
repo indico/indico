@@ -25,7 +25,7 @@ import {roomSearchActionsFactory} from './actions';
 import {parseSearchBarText, sanitizeRecurrence} from '../../util';
 
 
-function processRoomFilters(filters, param) {
+export function processRoomFilters(filters, param) {
     if (param === 'recurrence') {
         sanitizeRecurrence(filters);
     } else if (param === 'text') {

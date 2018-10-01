@@ -187,8 +187,8 @@ class BookRoom extends React.Component {
         ];
         return (
             <Sticky context={ref} className="sticky-filters">
-                <div styleName="filter-row">
-                    <div styleName="filter-row-filters">
+                <div className="filter-row">
+                    <div className="filter-row-filters">
                         <Overridable id="BookingFilterBar">
                             <BookingFilterBar />
                         </Overridable>

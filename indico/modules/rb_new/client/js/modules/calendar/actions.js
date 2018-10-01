@@ -14,9 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
+import _ from 'lodash';
 
 import fetchCalendarURL from 'indico-url:rooms_new.calendar';
-import {indicoAxios} from 'indico/utils/axios';
+import searchRoomsURL from 'indico-url:rooms_new.search_rooms';
+
+import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {ajaxAction} from 'indico/utils/redux';
 import {preProcessParameters} from '../../util';
 import {ajax as ajaxRules} from './serializers';
@@ -35,11 +38,30 @@ export function setDate(date) {
 
 export function fetchCalendar() {
     return async (dispatch, getState) => {
-        const {calendar: {data}} = getState();
-        const params = preProcessParameters(data, ajaxRules);
+        dispatch({type: FETCH_REQUEST});
+
+        const {calendar: {data: {date}}, calendar: {filters}} = getState();
+        let roomIds = undefined;
+        if (!_.isEmpty(filters)) {
+            const searchParams = preProcessParameters({...filters}, ajaxRules);
+            let response;
+            try {
+                response = await indicoAxios.get(searchRoomsURL(), {params: searchParams});
+            } catch (error) {
+                const message = handleAxiosError(error, true);
+                dispatch({type: FETCH_ERROR, error: message});
+                return;
+            }
+            roomIds = response.data.rooms;
+            if (!roomIds.length) {
+                dispatch({type: ROWS_RECEIVED, data: []});
+                dispatch({type: FETCH_SUCCESS});
+                return;
+            }
+        }
         return await ajaxAction(
-            () => indicoAxios.get(fetchCalendarURL(params)),
-            FETCH_REQUEST,
+            () => indicoAxios.post(fetchCalendarURL(), {room_ids: roomIds}, {params: {day: date}}),
+            null,
             [ROWS_RECEIVED, FETCH_SUCCESS],
             [FETCH_ERROR]
         )(dispatch);

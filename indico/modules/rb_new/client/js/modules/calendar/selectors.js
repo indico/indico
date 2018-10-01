@@ -29,3 +29,4 @@ export const getCalendarData = createSelector(
         rows: rows.map(entry => ({...entry, room: allRooms[entry.room_id]}))
     })
 );
+export const getFilters = ({['calendar']: stateSlice}) => stateSlice.filters;
