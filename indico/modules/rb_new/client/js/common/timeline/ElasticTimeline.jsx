@@ -26,11 +26,9 @@ import TimelineItem from './TimelineItem';
 import './Timeline.module.scss';
 
 
-export default class TimelineBase extends React.Component {
+export default class ElasticTimeline extends React.Component {
     static propTypes = {
         rows: PropTypes.arrayOf(PropTypes.object).isRequired,
-        emptyMessage: PropTypes.node,
-        extraContent: PropTypes.node,
         minHour: PropTypes.number,
         maxHour: PropTypes.number,
         hourStep: PropTypes.number,
@@ -38,11 +36,14 @@ export default class TimelineBase extends React.Component {
         onClickReservation: PropTypes.func,
         isLoading: PropTypes.bool,
         recurrenceType: PropTypes.string,
+
         itemClass: PropTypes.func,
         itemProps: PropTypes.object,
-        longLabel: PropTypes.bool,
         onClickLabel: PropTypes.func,
+        longLabel: PropTypes.bool,
+        emptyMessage: PropTypes.node,
         lazyScroll: PropTypes.object,
+        extraContent: PropTypes.node,
         showUnused: PropTypes.bool
     };
 

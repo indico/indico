@@ -28,11 +28,11 @@ import searchBarFactory from '../../components/SearchBar';
 import * as calendarActions from './actions';
 import * as calendarSelectors from './selectors';
 import {actions as bookingsActions} from '../../common/bookings';
-import {EditableTimelineItem, TimelineBase, TimelineHeader} from '../../common/timeline';
+import {selectors as roomsSelectors, actions as roomsActions} from '../../common/rooms';
+import {EditableTimelineItem, ElasticTimeline, TimelineHeader} from '../../common/timeline';
 import {actions as bookRoomActions} from '../../modules/bookRoom';
 import {actions as filtersActions} from '../../common/filters';
 import {selectors as userSelectors} from '../../common/user';
-import {selectors as roomsSelectors, actions as roomsActions} from '../../common/rooms';
 
 import './Calendar.module.scss';
 
@@ -168,14 +168,14 @@ class Calendar extends React.Component {
                                                 onDateChange={(newDate) => setFilterParameter('date', serializeDate(newDate))}
                                                 legendLabels={legendLabels} />
                             </Sticky>
-                            <TimelineBase rows={rows.map(this._getRowSerializer(date || serializeDate(moment())))}
-                                          onClickLabel={openRoomDetails}
-                                          isLoading={isFetching}
-                                          onClickReservation={openBookingDetails}
-                                          itemClass={EditableTimelineItem}
-                                          itemProps={{onAddSlot: this.onAddSlot}}
-                                          showUnused={showUnused}
-                                          longLabel />
+                            <ElasticTimeline rows={rows.map(this._getRowSerializer(date || serializeDate(moment())))}
+                                             onClickLabel={openRoomDetails}
+                                             isLoading={isFetching}
+                                             onClickReservation={openBookingDetails}
+                                             itemClass={EditableTimelineItem}
+                                             itemProps={{onAddSlot: this.onAddSlot}}
+                                             showUnused={showUnused}
+                                             longLabel />
                         </div>
                     </Container>
                 </Grid.Row>
