@@ -24,7 +24,7 @@ import {connect} from 'react-redux';
 import {Message, Segment} from 'semantic-ui-react';
 import {Translate, Param} from 'indico/react/i18n';
 import {serializeDate, toMoment} from 'indico/utils/date';
-import {TimelineBase} from '../../common/timeline';
+import {ElasticTimeline} from '../../common/timeline';
 import {isDateWithinRange} from '../../util';
 import {actions as roomsActions} from '../../common/rooms';
 import * as bookRoomActions from './actions';
@@ -144,16 +144,16 @@ class _BookingTimelineComponent extends React.Component {
         ) : null;
 
         return (
-            <TimelineBase lazyScroll={lazyScroll}
-                          rows={this.calcRows()}
-                          emptyMessage={emptyMessage}
-                          onClickCandidate={clickable ? openBookingForm : null}
-                          onClickLabel={clickable ? openRoomDetails : null}
-                          dateRange={dateRange}
-                          extraContent={this.singleRoom && this.renderRoomSummary(this.singleRoom)}
-                          isLoading={isFetching}
-                          recurrenceType={recurrenceType}
-                          disableDatePicker={!!this.singleRoom} />
+            <ElasticTimeline lazyScroll={lazyScroll}
+                             rows={this.calcRows()}
+                             emptyMessage={emptyMessage}
+                             onClickCandidate={clickable ? openBookingForm : null}
+                             onClickLabel={clickable ? openRoomDetails : null}
+                             dateRange={dateRange}
+                             extraContent={this.singleRoom && this.renderRoomSummary(this.singleRoom)}
+                             isLoading={isFetching}
+                             recurrenceType={recurrenceType}
+                             disableDatePicker={!!this.singleRoom} />
         );
     }
 }
