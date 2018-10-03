@@ -398,7 +398,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
     @property
     def sprite_position(self):
         sprite_mapping = _cache.get('rooms-sprite-mapping')
-        return sprite_mapping.get(self.id, 0) if sprite_mapping else None  # placeholder at position 0
+        return sprite_mapping.get(self.id, 0) if sprite_mapping else 0  # placeholder at position 0
 
     @return_ascii
     def __repr__(self):
