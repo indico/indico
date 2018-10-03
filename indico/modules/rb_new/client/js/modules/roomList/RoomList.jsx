@@ -32,13 +32,12 @@ import {pushStateMergeProps, roomPreloader} from '../../util';
 import roomFilterBarFactory from './RoomFilterBar';
 import searchBarFactory from '../../containers/SearchBar';
 import Room from '../../containers/Room';
-import roomDetailsModalFactory from '../../components/modals/RoomDetailsModal';
 import BookFromListModal from '../../components/modals/BookFromListModal';
 import {BlockingModal} from '../blockings';
 import {queryStringRules as queryStringSerializer} from '../../common/roomSearch';
 import {actions as roomsActions} from '../../common/rooms';
 import {mapControllerFactory, selectors as mapSelectors} from '../../common/map';
-import * as selectors from '../../selectors';
+import {actions as modalActions} from '../../modals';
 import * as roomsListActions from './actions';
 import * as roomsListSelectors from './selectors';
 
@@ -47,7 +46,6 @@ import './RoomList.module.scss';
 
 const SearchBar = searchBarFactory('roomList', roomsListSelectors);
 const MapController = mapControllerFactory('roomList', roomsListSelectors);
-const RoomDetailsModal = roomDetailsModalFactory('roomList');
 const RoomFilterBar = roomFilterBarFactory('roomList');
 
 class RoomList extends React.Component {
@@ -56,11 +54,11 @@ class RoomList extends React.Component {
         results: PropTypes.arrayOf(PropTypes.object).isRequired,
         isSearching: PropTypes.bool.isRequired,
         showMap: PropTypes.bool.isRequired,
-        isInitializing: PropTypes.bool.isRequired,
         pushState: PropTypes.func.isRequired,
         actions: PropTypes.exact({
             searchRooms: PropTypes.func.isRequired,
             fetchRoomDetails: PropTypes.func.isRequired,
+            openRoomDetails: PropTypes.func.isRequired,
         }).isRequired,
     };
 
@@ -91,14 +89,12 @@ class RoomList extends React.Component {
 
     renderRoom = (room) => {
         const {id} = room;
-        const {pushState} = this.props;
+        const {actions: {openRoomDetails}} = this.props;
         const {selectionMode, selection} = this.state;
 
         const showDetailsBtn = (
             <Button icon="search"
-                    onClick={() => {
-                        pushState(`/rooms/${id}/details`, true);
-                    }}
+                    onClick={() => openRoomDetails(id)}
                     primary
                     circular />
         );
@@ -184,7 +180,6 @@ class RoomList extends React.Component {
             actions: {fetchRoomDetails},
             showMap,
             pushState,
-            isInitializing,
             isSearching,
         } = this.props;
         const {selectionMode, selection} = this.state;
@@ -258,27 +253,20 @@ class RoomList extends React.Component {
                         <MapController />
                     </Grid.Column>
                 )}
-                {!isInitializing && (
-                    <>
-                        <Route exact path="/rooms/:roomId/details" render={roomPreloader((roomId) => (
-                            <RoomDetailsModal roomId={roomId} onClose={this.closeBookingModal} />
-                        ), fetchRoomDetails)} />
-                        <Route exact path="/rooms/:roomId/book" render={roomPreloader((roomId) => (
-                            <BookFromListModal roomId={roomId} onClose={this.closeBookingModal} />
-                        ), fetchRoomDetails)} />
-                        <Route exact path="/rooms/blocking/create" render={() => {
-                            const blocking = {
-                                blockedRooms: Object.values(selection).map((room) => ({room: camelizeKeys(room)}))
-                            };
+                <Route exact path="/rooms/:roomId/book" render={roomPreloader((roomId) => (
+                    <BookFromListModal roomId={roomId} onClose={this.closeBookingModal} />
+                ), fetchRoomDetails)} />
+                <Route exact path="/rooms/blocking/create" render={() => {
+                    const blocking = {
+                        blockedRooms: Object.values(selection).map((room) => ({room: camelizeKeys(room)}))
+                    };
 
-                            return (
-                                <BlockingModal open
-                                               blocking={blocking}
-                                               onClose={this.closeBlockingModal} />
-                            );
-                        }} />
-                    </>
-                )}
+                    return (
+                        <BlockingModal open
+                                       blocking={blocking}
+                                       onClose={this.closeBlockingModal} />
+                    );
+                }} />
             </Grid>
         );
     }
@@ -291,7 +279,6 @@ export default connect(
         results: roomsListSelectors.getSearchResults(state),
         isSearching: roomsListSelectors.isSearching(state),
         showMap: mapSelectors.isMapVisible(state),
-        isInitializing: selectors.isInitializing(state),
         queryString: stateToQueryString(state.roomList, queryStringSerializer), // for pushStateMergeProps
     }),
     dispatch => ({
@@ -299,6 +286,7 @@ export default connect(
         actions: bindActionCreators({
             searchRooms: roomsListActions.searchRooms,
             fetchRoomDetails: roomsActions.fetchDetails,
+            openRoomDetails: modalActions.openRoomDetails,
         }, dispatch)
     }),
     pushStateMergeProps,

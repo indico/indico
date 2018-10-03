@@ -36,31 +36,28 @@ import {roomFilterBarFactory} from '../../modules/roomList';
 import BookingTimeline from './BookingTimeline';
 import BookRoomModal from './BookRoomModal';
 import SearchResultCount from './SearchResultCount';
-import roomDetailsModalFactory from '../../components/modals/RoomDetailsModal';
 import {TimelineHeader} from '../../common/timeline';
 import {roomPreloader, pushStateMergeProps, isDateWithinRange} from '../../util';
 import {queryStringRules as qsFilterRules} from '../../common/roomSearch';
 import {rules as qsBookRoomRules} from './queryString';
 import * as bookRoomActions from './actions';
 import {actions as filtersActions} from '../../common/filters';
-import * as globalSelectors from '../../selectors';
 import * as bookRoomSelectors from './selectors';
 import {actions as roomsActions} from '../../common/rooms';
 import {mapControllerFactory, selectors as mapSelectors} from '../../common/map';
+import {actions as modalActions} from '../../modals';
 
 import './BookRoom.module.scss';
 
 
 const SearchBar = searchBarFactory('bookRoom', bookRoomSelectors);
 const MapController = mapControllerFactory('bookRoom', bookRoomSelectors);
-const RoomDetailsModal = roomDetailsModalFactory('bookRoom');
 const RoomFilterBar = roomFilterBarFactory('bookRoom');
 
 /* eslint-disable react/no-unused-state */
 class BookRoom extends React.Component {
     static propTypes = {
         results: PropTypes.arrayOf(PropTypes.object).isRequired,
-        isInitializing: PropTypes.bool.isRequired,
         isSearching: PropTypes.bool.isRequired,
         searchFinished: PropTypes.bool.isRequired,
         isTimelineVisible: PropTypes.bool.isRequired,
@@ -79,6 +76,7 @@ class BookRoom extends React.Component {
             resetRoomSuggestions: PropTypes.func.isRequired,
             resetBookingAvailability: PropTypes.func.isRequired,
             toggleTimelineView: PropTypes.func.isRequired,
+            openRoomDetails: PropTypes.func.isRequired,
         }).isRequired,
         dateRange: PropTypes.array.isRequired,
         showSuggestions: PropTypes.bool
@@ -127,7 +125,7 @@ class BookRoom extends React.Component {
 
     renderRoom = (room) => {
         const {id} = room;
-        const {pushState} = this.props;
+        const {pushState, actions: {openRoomDetails}} = this.props;
 
         const bookingModalBtn = (
             <Button positive icon="check" circular onClick={() => {
@@ -136,9 +134,7 @@ class BookRoom extends React.Component {
             }} />
         );
         const showDetailsBtn = (
-            <Button primary icon="search" circular onClick={() => {
-                pushState(`/book/${id}/details`, true);
-            }} />
+            <Button primary icon="search" circular onClick={() => openRoomDetails(id)} />
         );
         return (
             <Room key={room.id} room={room} showFavoriteButton>
@@ -435,7 +431,7 @@ class BookRoom extends React.Component {
     };
 
     render() {
-        const {actions: {fetchRoomDetails}, showMap, isInitializing} = this.props;
+        const {actions: {fetchRoomDetails}, showMap} = this.props;
         return (
             <Grid columns={2}>
                 <Grid.Column computer={showMap ? 11 : 16} mobile={16}>
@@ -446,16 +442,9 @@ class BookRoom extends React.Component {
                         <MapController />
                     </Grid.Column>
                 )}
-                {!isInitializing && (
-                    <>
-                        <Route exact path="/book/:roomId/confirm" render={roomPreloader((roomId) => (
-                            <BookRoomModal open roomId={roomId} onClose={this.closeBookingModal} />
-                        ), fetchRoomDetails)} />
-                        <Route exact path="/book/:roomId/details" render={roomPreloader((roomId) => (
-                            <RoomDetailsModal roomId={roomId} onClose={this.closeModal} />
-                        ), fetchRoomDetails)} />
-                    </>
-                )}
+                <Route exact path="/book/:roomId/confirm" render={roomPreloader((roomId) => (
+                    <BookRoomModal open roomId={roomId} onClose={this.closeBookingModal} />
+                ), fetchRoomDetails)} />
             </Grid>
         );
     }
@@ -472,7 +461,6 @@ const mapStateToProps = (state) => {
         isSearching: bookRoomSelectors.isSearching(state),
         searchFinished: bookRoomSelectors.isSearchFinished(state),
         hasConflicts: bookRoomSelectors.hasUnavailableRooms(state),
-        isInitializing: globalSelectors.isInitializing(state),
         queryString: stateToQueryString(state.bookRoom, qsFilterRules, qsBookRoomRules),
         showMap: mapSelectors.isMapVisible(state),
         dateRange: bookRoomSelectors.getTimelineDateRange(state)
@@ -489,6 +477,7 @@ const mapDispatchToProps = dispatch => ({
         resetBookingAvailability: bookRoomActions.resetBookingAvailability,
         setFilterParameter: (param, value) => filtersActions.setFilterParameter('bookRoom', param, value),
         toggleTimelineView: bookRoomActions.toggleTimelineView,
+        openRoomDetails: modalActions.openRoomDetails,
     }, dispatch),
     dispatch
 });

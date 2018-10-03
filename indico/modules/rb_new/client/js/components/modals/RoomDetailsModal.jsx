@@ -16,8 +16,6 @@
  */
 
 import moment from 'moment';
-import {push} from 'connected-react-router';
-import {stateToQueryString} from 'redux-router-querystring';
 import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
@@ -26,8 +24,6 @@ import {Translate, Param} from 'indico/react/i18n';
 import RoomBasicDetails from '../RoomBasicDetails';
 import {DailyTimelineContent, TimelineLegend} from '../../common/timeline';
 import {selectors as roomsSelectors} from '../../common/rooms';
-import {queryStringRules as qsRoomSearchRules} from '../../common/roomSearch';
-import {queryStringRules as qsBookRoomRules} from '../../modules/bookRoom';
 
 import './RoomDetailsModal.module.scss';
 
@@ -37,14 +33,8 @@ class RoomDetailsModal extends React.Component {
         room: PropTypes.object.isRequired,
         availability: PropTypes.array.isRequired,
         attributes: PropTypes.array.isRequired,
-        onClose: PropTypes.func,
-        actions: PropTypes.exact({
-            bookRoom: PropTypes.func.isRequired,
-        }).isRequired,
-    };
-
-    static defaultProps = {
-        onClose: () => {}
+        onClose: PropTypes.func.isRequired,
+        onBook: PropTypes.func.isRequired,
     };
 
     handleCloseModal = () => {
@@ -53,7 +43,7 @@ class RoomDetailsModal extends React.Component {
     };
 
     render() {
-        const {actions: {bookRoom}, room, availability, attributes} = this.props;
+        const {onBook, room, availability, attributes} = this.props;
         return (
             <Modal open onClose={this.handleCloseModal} size="large" closeIcon>
                 <Modal.Header styleName="room-details-header">
@@ -66,42 +56,21 @@ class RoomDetailsModal extends React.Component {
                     <RoomDetails room={room}
                                  attributes={attributes}
                                  availability={availability}
-                                 bookRoom={bookRoom} />
+                                 bookRoom={onBook} />
                 </Modal.Content>
             </Modal>
         );
     }
 }
 
-export default (namespace) => {
-    return connect(
-        (state, {roomId}) => ({
-            room: roomsSelectors.getRoom(state, {roomId}),
-            availability: roomsSelectors.getAvailability(state, {roomId}),
-            attributes: roomsSelectors.getAttributes(state, {roomId}),
-            queryString: stateToQueryString(state.bookRoom, qsRoomSearchRules, qsBookRoomRules)
-        }),
-        dispatch => ({dispatch}),
-        (stateProps, {dispatch}, ownProps) => {
-            const {queryString, ...realStateProps} = stateProps;
-            return {
-                ...ownProps,
-                ...realStateProps,
-                actions: {
-                    bookRoom: (room) => {
-                        if (namespace === 'roomList') {
-                            dispatch(push(`/rooms/${room.id}/book`));
-                        } else if (namespace === 'calendar') {
-                            dispatch(push(`/calendar/${room.id}/book`));
-                        } else {
-                            dispatch(push(`/book/${room.id}/confirm?${queryString}`));
-                        }
-                    }
-                }
-            };
-        }
-    )(RoomDetailsModal);
-};
+export default connect(
+    (state, {roomId}) => ({
+        room: roomsSelectors.getRoom(state, {roomId}),
+        availability: roomsSelectors.getAvailability(state, {roomId}),
+        attributes: roomsSelectors.getAttributes(state, {roomId}),
+    })
+)(RoomDetailsModal);
+
 
 function RoomDetails({bookRoom, room, availability, attributes}) {
     const legendLabels = [
@@ -151,7 +120,7 @@ function RoomDetails({bookRoom, room, availability, attributes}) {
                         <Translate>Would you like to use this room?</Translate>
                     </Message>
                     <Segment attached="bottom">
-                        <Button color="green" onClick={() => bookRoom(room)}>
+                        <Button color="green" onClick={() => bookRoom(room.id)}>
                             <Icon name="check circle" />
                             <Translate>Book it</Translate>
                         </Button>

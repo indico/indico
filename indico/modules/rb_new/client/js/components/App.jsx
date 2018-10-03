@@ -29,6 +29,7 @@ import Calendar from '../modules/calendar';
 import BookRoom from '../modules/bookRoom';
 import RoomList from '../modules/roomList';
 import BlockingList from '../modules/blockings';
+import ModalController from '../modals';
 import Menu from './Menu';
 
 import './App.module.scss';
@@ -109,6 +110,7 @@ export default class App extends React.Component {
                             <ConditionalRoute path="/blockings" component={BlockingList} active={!isInitializing} />
                             <ConditionalRoute path="/calendar" component={Calendar} active={!isInitializing} />
                         </Switch>
+                        <ModalController />
                     </div>
                     <Dimmer.Dimmable>
                         <Dimmer active={isInitializing} page>

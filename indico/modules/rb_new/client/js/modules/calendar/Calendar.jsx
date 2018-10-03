@@ -19,25 +19,21 @@ import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
 import {bindActionCreators} from 'redux';
-import {Route} from 'react-router-dom';
 import {Container, Dimmer, Grid, Loader, Sticky} from 'semantic-ui-react';
 import {connect} from 'react-redux';
 
 import {Translate} from 'indico/react/i18n';
 import {Preloader} from 'indico/react/util';
 import {serializeDate} from 'indico/utils/date';
-import roomDetailsModalFactory from '../../components/modals/RoomDetailsModal';
-import {pushStateMergeProps, roomPreloader} from '../../util';
 import * as calendarActions from './actions';
 import * as calendarSelectors from './selectors';
 import {actions as roomsActions, selectors as roomsSelectors} from '../../common/rooms';
 import {EditableTimelineItem, TimelineBase, TimelineHeader} from '../../common/timeline';
 import BookFromListModal from '../../components/modals/BookFromListModal';
+import {actions as modalActions} from '../../modals';
 
 import '../../common/timeline/Timeline.module.scss';
 
-
-const RoomDetailsModal = roomDetailsModalFactory('calendar');
 
 class Calendar extends React.Component {
     static propTypes = {
@@ -49,9 +45,9 @@ class Calendar extends React.Component {
         actions: PropTypes.exact({
             fetchCalendar: PropTypes.func.isRequired,
             setDate: PropTypes.func.isRequired,
-            fetchRoomDetails: PropTypes.func.isRequired
+            fetchRoomDetails: PropTypes.func.isRequired,
+            openRoomDetails: PropTypes.func.isRequired,
         }).isRequired,
-        pushState: PropTypes.func.isRequired,
     };
 
 
@@ -115,19 +111,9 @@ class Calendar extends React.Component {
         });
     };
 
-    onClickLabel = (id) => {
-        const {pushState} = this.props;
-        pushState(`/calendar/${id}/details`);
-    };
-
-    closeModal = () => {
-        const {pushState} = this.props;
-        pushState('/calendar');
-    };
-
     render() {
         const {
-            isFetching, calendarData: {date, rows}, actions: {setDate, fetchRoomDetails}
+            isFetching, calendarData: {date, rows}, actions: {setDate, fetchRoomDetails, openRoomDetails}
         } = this.props;
         const {bookingRoomId, modalFields} = this.state;
         const legendLabels = [
@@ -148,20 +134,19 @@ class Calendar extends React.Component {
                                                 legendLabels={legendLabels} />
                             </Sticky>
                             <TimelineBase rows={rows.map(this._getRowSerializer(date || serializeDate(moment())))}
+                                          onClickLabel={openRoomDetails}
                                           isLoading={isFetching}
                                           itemClass={EditableTimelineItem}
                                           itemProps={{onAddSlot: this.onAddSlot}}
-                                          onClickLabel={this.onClickLabel}
                                           longLabel />
                         </div>
                     </Container>
                 </Grid.Row>
-                <Route exact path="/calendar/:roomId/details" render={roomPreloader((roomId) => (
-                    <RoomDetailsModal roomId={roomId} onClose={this.closeModal} />
-                ), fetchRoomDetails)} />
+                {/*
                 <Route exact path="/calendar/:roomId/book" render={roomPreloader((roomId) => (
                     <BookFromListModal roomId={roomId} onClose={this.closeModal} />
                 ), fetchRoomDetails)} />
+                */}
                 {bookingRoomId && (
                     <Preloader checkCached={state => !!roomsSelectors.hasDetails(state, {roomId: bookingRoomId})}
                                action={() => fetchRoomDetails(bookingRoomId)}
@@ -190,8 +175,7 @@ export default connect(
             fetchCalendar: calendarActions.fetchCalendar,
             fetchRoomDetails: roomsActions.fetchDetails,
             setDate: (date) => calendarActions.setDate(serializeDate(date)),
+            openRoomDetails: modalActions.openRoomDetails,
         }, dispatch),
-        dispatch
     }),
-    pushStateMergeProps
 )(Calendar);
