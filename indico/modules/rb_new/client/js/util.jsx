@@ -18,6 +18,9 @@
 import _ from 'lodash';
 import {push} from 'connected-react-router';
 import moment from 'moment';
+import {Popup} from 'semantic-ui-react';
+import PropTypes from 'prop-types';
+import React from 'react';
 import {serializeDate} from 'indico/utils/date';
 
 
@@ -133,3 +136,18 @@ export function boolStateField(name) {
 export function isDateWithinRange(date, dateRange, _toMoment) {
     return date && dateRange.filter((dt) => _toMoment(dt).isSame(date, 'day')).length !== 0;
 }
+
+
+export function PopupParam({content, children}) {
+    const trigger = <span>{children}</span>;
+    return <Popup trigger={trigger} content={content} />;
+}
+
+PopupParam.propTypes = {
+    content: PropTypes.object.isRequired,
+    children: PropTypes.object,
+};
+
+PopupParam.defaultProps = {
+    children: null,
+};

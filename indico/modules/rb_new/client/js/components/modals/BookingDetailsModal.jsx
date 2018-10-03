@@ -20,7 +20,7 @@ import moment from 'moment';
 import React from 'react';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
-import {Button, Modal, Message, Grid, Header, ModalActions, Icon, Popup} from 'semantic-ui-react';
+import {Button, Modal, Message, Grid, Header, ModalActions, Icon, Popup, List} from 'semantic-ui-react';
 import {Param, Translate} from 'indico/react/i18n';
 import {toMoment, serializeDate} from 'indico/utils/date';
 import BookingTimeInformation from '../BookingTimeInformation';
@@ -28,6 +28,7 @@ import RoomBasicDetails from '../../components/RoomBasicDetails';
 import {selectors as bookingsSelectors} from '../../common/bookings';
 import TimelineContent from '../../components/TimelineContent';
 import TimelineLegend from '../../components/TimelineLegend';
+import {PopupParam} from '../../util';
 
 import './BookingDetailsModal.module.scss';
 
@@ -89,13 +90,56 @@ class BookingDetailsModal extends React.Component {
         return <TimelineContent rows={rows} hourSeries={hourSeries} />;
     };
 
+    renderBookingHistory = (editLogs, createdOn, createdBy) => {
+        const items = (editLogs ? editLogs.map((log, i) => {
+            const {timestamp, info, user_name: userName} = log;
+            const basicInfo = <strong>{info[0]}</strong>;
+            const details = (info[1] ? info[1] : null);
+            const dateValue = serializeDate(toMoment(timestamp));
+            const date = <Param name="date" value={dateValue} wrapper={<span styleName="log-date" />} />;
+            const mainInfo = <Param name="details" value={basicInfo} />;
+            const user = <Param name="user" value={userName} />;
+            if (details) {
+                const popupContent = <Param name="details" wrapper={<span styleName="popup-center" />} value={details} />;
+                const wrapper = <PopupParam content={<Translate>{popupContent}</Translate>} />;
+                const popupInfo = <Param name="info" wrapper={wrapper} value={basicInfo} />;
+                return (
+                    <List.Item key={i}>
+                        <Translate>{date} - {popupInfo} by {user}</Translate>
+                    </List.Item>
+                );
+            }
+            return (
+                <List.Item key={i}>
+                    <Translate>{date} - {mainInfo} by {user}</Translate>
+                </List.Item>
+            );
+        }) : null);
+        const bookingCreatedDate = <Param name="date" value={createdOn} wrapper={<span styleName="log-date" />} />;
+        const bookingCreatedBy = <Param name="created-by" value={createdBy} />;
+        const bookingCreatedInfo = <Param name="created-info" value={<strong>Booking created </strong>} />;
+        return (
+            <div>
+                <Header><Translate>Booking history</Translate></Header>
+                <List divided styleName="log-list">
+                    {items}
+                    <List.Item>
+                        <Translate>
+                            {bookingCreatedDate} - {bookingCreatedInfo} by {bookingCreatedBy}
+                        </Translate>
+                    </List.Item>
+                </List>
+            </div>
+        );
+    };
+
     render() {
         const {booking} = this.props;
         const {
             room, booked_for_user: bookedFor, start_dt: startDt, end_dt: endDt, repetition, created_by_user: createdBy,
             created_dt: createdDt, booking_reason: reason
         } = booking.attributes;
-        const {occurrences, date_range: dateRange} = booking;
+        const {occurrences, date_range: dateRange, edit_logs: editLogs} = booking;
         const {occurrencesVisible} = this.state;
         const {full_name: bookedForName, email: bookedForEmail, phone: bookedForPhone} = bookedFor;
         const dates = {startDate: startDt, endDate: endDt};
@@ -128,23 +172,18 @@ class BookingDetailsModal extends React.Component {
                         </Grid.Column>
                         <Grid.Column>
                             <Grid>
-                                <Grid.Column width={6}>
+                                <Grid.Column width={8}>
                                     <Header><Icon name="user" /><Translate>Booked for</Translate></Header>
                                     <div>{bookedForName}</div>
                                     {bookedForPhone && <div><Icon name="phone" />{bookedForPhone}</div>}
                                     {bookedForEmail && <div><Icon name="mail" />{bookedForEmail}</div>}
                                 </Grid.Column>
-                                <Grid.Column width={10}>
+                                <Grid.Column width={8}>
                                     <Header><Translate>Reason</Translate></Header>
                                     <div>{reason}</div>
                                 </Grid.Column>
+                                {this.renderBookingHistory(editLogs, createdOn, createdBy)}
                             </Grid>
-                            <Header>Booking history</Header>
-                            <div>
-                                <Translate>
-                                    <Param name="date" value={createdOn} /> - booking created by <Param name="created_by" value={createdBy} />
-                                </Translate>
-                            </div>
                         </Grid.Column>
                     </Grid>
                 </Modal.Content>

@@ -27,6 +27,7 @@ from indico.modules.rb.models.blocked_rooms import BlockedRoom, BlockedRoomState
 from indico.modules.rb.models.blocking_principals import BlockingPrincipal
 from indico.modules.rb.models.blockings import Blocking
 from indico.modules.rb.models.locations import Location
+from indico.modules.rb.models.reservation_edit_logs import ReservationEditLog
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import RepeatFrequency, Reservation
 from indico.modules.rb.models.room_attributes import RoomAttributeAssociation
@@ -169,6 +170,7 @@ class RBUserSchema(UserSchema):
         return has_managed_rooms(user)
 
 
+<<<<<<< a96f74b074d6fba81c670a3bd9432a0111570abf
 class CreateBookingSchema(Schema):
     start_dt = fields.DateTime(required=True)
     end_dt = fields.DateTime(required=True)
@@ -186,6 +188,12 @@ class CreateBookingSchema(Schema):
     def validate_dts(self, data):
         if data['start_dt'] >= data['end_dt']:
             raise ValidationError(_('Booking cannot end before it starts'))
+=======
+class ReservationEditLogSchema(UserSchema):
+    class Meta:
+        model = ReservationEditLog
+        fields = ('timestamp', 'info', 'user_name')
+>>>>>>> Add history to booking details modal
 
 
 rb_user_schema = RBUserSchema()
@@ -193,6 +201,7 @@ rooms_schema = RoomSchema(many=True, only=_room_fields)
 room_details_schema = RoomSchema()
 room_attributes_schema = RoomAttributesSchema(many=True)
 aspects_schema = AspectSchema(many=True)
+reservation_edit_log_schema = ReservationEditLogSchema(many=True)
 reservation_occurrences_schema = ReservationOccurrenceSchema(many=True)
 reservation_schema = ReservationSchema()
 reservation_details_schema = ReservationDetailsSchema()
