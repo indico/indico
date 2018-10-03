@@ -48,7 +48,7 @@ class UnavailableRoomsModal extends React.Component {
     }
 
     render() {
-        const {availability, dateRange, filters, isFetching, onClose} = this.props;
+        const {availability, dateRange, isFetching, onClose} = this.props;
         if (!dateRange || availability.length === 0) {
             return <Dimmer active page><Loader /></Dimmer>;
         }
@@ -61,7 +61,6 @@ class UnavailableRoomsModal extends React.Component {
                 <Modal.Content scrolling>
                     <BookingTimelineComponent isFetching={isFetching}
                                               isFetchingRooms={false}
-                                              recurrenceType={filters.recurrence.type}
                                               availability={availability}
                                               dateRange={dateRange} />
                 </Modal.Content>

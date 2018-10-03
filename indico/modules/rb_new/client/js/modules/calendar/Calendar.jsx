@@ -23,7 +23,6 @@ import {bindActionCreators} from 'redux';
 import {Button, ButtonGroup, Container, Grid, Popup, Sticky} from 'semantic-ui-react';
 import {connect} from 'react-redux';
 import {Translate} from 'indico/react/i18n';
-import {serializeDate} from 'indico/utils/date';
 import searchBarFactory from '../../components/SearchBar';
 import * as calendarActions from './actions';
 import * as calendarSelectors from './selectors';
@@ -41,10 +40,8 @@ const SearchBar = searchBarFactory('calendar', calendarSelectors);
 
 class Calendar extends React.Component {
     static propTypes = {
-        calendarData: PropTypes.shape({
-            date: PropTypes.string,
-            rows: PropTypes.arrayOf(PropTypes.object).isRequired,
-        }).isRequired,
+        calendarData: PropTypes.object.isRequired,
+        datePicker: PropTypes.object.isRequired,
         isFetching: PropTypes.bool.isRequired,
         actions: PropTypes.exact({
             fetchCalendar: PropTypes.func.isRequired,
@@ -72,21 +69,13 @@ class Calendar extends React.Component {
         fetchCalendar();
     }
 
-    componentDidUpdate({filters: prevFilters}) {
-        const {actions: {fetchCalendar}, filters} = this.props;
-        if (!_.isEqual(prevFilters, filters)) {
-            fetchCalendar(this.hasOnlyDateChanged(prevFilters, filters));
+    componentDidUpdate({datePicker: {selectedDate: prevDate}, filters: prevFilters}) {
+        const {datePicker: {selectedDate}, actions: {fetchCalendar}, filters} = this.props;
+        const filtersChanged = !_.isEqual(prevFilters, filters);
+        if (prevDate !== selectedDate || filtersChanged) {
+            fetchCalendar(filtersChanged);
         }
     }
-
-    hasOnlyDateChanged = (prevFilters, filters) => {
-        return (
-            prevFilters.text === filters.text &&
-            prevFilters.building === filters.building &&
-            prevFilters.onlyFavorites === filters.onlyFavorites &&
-            prevFilters.date !== filters.date
-        );
-    };
 
     _getRowSerializer(day) {
         return ({bookings, preBookings, nonbookablePeriods, unbookableHours, blockings, room}) => ({
@@ -104,10 +93,10 @@ class Calendar extends React.Component {
     }
 
     onAddSlot = ({room: {id}, slotStartTime, slotEndTime}) => {
-        const {filters: {date}, actions: {openBookRoom}} = this.props;
+        const {datePicker: {selectedDate}, actions: {openBookRoom}} = this.props;
         openBookRoom(id, {
             dates: {
-                startDate: date,
+                startDate: moment(selectedDate, 'YYYY-MM-DD'),
                 endDate: null,
             },
             timeSlot: {
@@ -127,9 +116,10 @@ class Calendar extends React.Component {
 
     render() {
         const {
-            isFetching, calendarData: {rows}, actions: {openRoomDetails, setFilterParameter, openBookingDetails},
-            hasFavoriteRooms, filters: {date, onlyFavorites}
+            isFetching, calendarData: {rows}, actions: {openRoomDetails, setDate, setFilterParameter, openBookingDetails},
+            datePicker, hasFavoriteRooms, filters: {onlyFavorites}
         } = this.props;
+        const {selectedDate} = datePicker;
         const {showUnused} = this.state;
         const legendLabels = [
             {label: Translate.string('Booked'), color: 'orange'},
@@ -164,11 +154,12 @@ class Calendar extends React.Component {
                                         <SearchBar />
                                     </div>
                                 </Grid.Row>
-                                <TimelineHeader activeDate={date ? moment(date) : moment()}
-                                                onDateChange={(newDate) => setFilterParameter('date', serializeDate(newDate))}
+                                <TimelineHeader activeDate={selectedDate ? moment(selectedDate) : moment()}
+                                                onDateChange={setDate}
                                                 legendLabels={legendLabels} />
                             </Sticky>
-                            <ElasticTimeline rows={rows.map(this._getRowSerializer(date || serializeDate(moment())))}
+                            <ElasticTimeline availability={rows}
+                                             datePicker={datePicker}
                                              onClickLabel={openRoomDetails}
                                              isLoading={isFetching}
                                              onClickReservation={openBookingDetails}
@@ -192,6 +183,7 @@ export default connect(
         filters: calendarSelectors.getFilters(state),
         rooms: roomsSelectors.getAllRooms(state),
         hasFavoriteRooms: userSelectors.hasFavoriteRooms(state),
+        datePicker: calendarSelectors.getDatePickerInfo(state)
     }),
     dispatch => ({
         actions: bindActionCreators({

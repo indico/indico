@@ -23,8 +23,11 @@ import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {ajaxAction} from 'indico/utils/redux';
 import {preProcessParameters} from '../../util';
 import {ajaxRules as roomSearchAjaxRules} from '../../common/roomSearch';
+import {ajax as ajaxRules} from './serializers';
 
 
+export const SET_DATE = 'calendar/SET_DATE';
+export const SET_MODE = 'calendar/SET_MODE';
 export const ROWS_RECEIVED = 'calendar/ROWS_RECEIVED';
 export const FETCH_REQUEST = 'calendar/FETCH_REQUEST';
 export const FETCH_SUCCESS = 'calendar/FETCH_SUCCESS';
@@ -32,13 +35,13 @@ export const FETCH_ERROR = 'calendar/FETCH_ERROR';
 export const ROOM_IDS_RECEIVED = 'calendar/ROOM_IDS_RECEIVED';
 
 
-export function fetchCalendar(onlyDateChanged = false) {
+export function fetchCalendar(fetchRooms = true) {
     return async (dispatch, getState) => {
         dispatch({type: FETCH_REQUEST});
-        const {calendar: {filters}, calendar: {data: {roomIds}}} = getState();
+        const {calendar: {filters, data: {roomIds}, datePicker}} = getState();
         let newRoomIds = roomIds;
 
-        if (!onlyDateChanged) {
+        if (fetchRooms) {
             newRoomIds = null;
             if (!_.isEmpty(filters)) {
                 const searchParams = preProcessParameters({...filters}, roomSearchAjaxRules);
@@ -60,8 +63,9 @@ export function fetchCalendar(onlyDateChanged = false) {
             }
         }
 
+        const params = preProcessParameters(datePicker, ajaxRules);
         return await ajaxAction(
-            () => indicoAxios.post(fetchCalendarURL(), {room_ids: newRoomIds}, {params: {day: filters.date}}),
+            () => indicoAxios.post(fetchCalendarURL(), {room_ids: newRoomIds}, {params}),
             null,
             [ROWS_RECEIVED, FETCH_SUCCESS],
             [FETCH_ERROR]
