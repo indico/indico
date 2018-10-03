@@ -26,20 +26,20 @@ import TimelineItem from './TimelineItem';
 import './Timeline.module.scss';
 
 
+/**
+ * An *elastic* implementation of a Timeline, which can provide
+ * an overview by day, week or month.
+ */
 export default class ElasticTimeline extends React.Component {
     static propTypes = {
         rows: PropTypes.arrayOf(PropTypes.object).isRequired,
-        minHour: PropTypes.number,
-        maxHour: PropTypes.number,
-        hourStep: PropTypes.number,
-        onClickCandidate: PropTypes.func,
-        onClickReservation: PropTypes.func,
+        datePicker: PropTypes.object.isRequired,
         isLoading: PropTypes.bool,
-        recurrenceType: PropTypes.string,
-
         itemClass: PropTypes.func,
         itemProps: PropTypes.object,
         onClickLabel: PropTypes.func,
+        onClickCandidate: PropTypes.func,
+        onClickReservation: PropTypes.func,
         longLabel: PropTypes.bool,
         emptyMessage: PropTypes.node,
         lazyScroll: PropTypes.object,
@@ -55,15 +55,10 @@ export default class ElasticTimeline extends React.Component {
                 </Translate>
             </Message>
         ),
-
-        hourStep: 2,
-        minHour: 6,
-        maxHour: 22,
         onClickCandidate: null,
         onClickReservation: null,
         extraContent: null,
         isLoading: false,
-        recurrenceType: 'single',
         itemClass: TimelineItem,
         itemProps: {},
         longLabel: false,
@@ -74,28 +69,29 @@ export default class ElasticTimeline extends React.Component {
 
     renderTimeline = () => {
         const {
-            extraContent, onClickCandidate, onClickReservation, recurrenceType, rows, isLoading, itemClass, itemProps,
-            longLabel, onClickLabel, lazyScroll, minHour, maxHour, hourStep, showUnused
+            extraContent, onClickCandidate, onClickReservation, rows, isLoading, itemClass, itemProps,
+            longLabel, onClickLabel, lazyScroll, datePicker: {minHour, maxHour, hourStep, mode},
+            showUnused
         } = this.props;
         return (
             <>
                 <div styleName="timeline">
                     {extraContent}
-                    <DailyTimelineContent rows={rows}
-                                          minHour={minHour}
-                                          maxHour={maxHour}
-                                          hourStep={hourStep}
-                                          recurrenceType={recurrenceType}
-                                          onClickCandidate={onClickCandidate}
-                                          onClickReservation={onClickReservation}
-                                          itemClass={itemClass}
-                                          itemProps={itemProps}
-                                          longLabel={longLabel}
-                                          onClickLabel={onClickLabel}
-                                          isLoading={isLoading}
-                                          lazyScroll={lazyScroll}
-                                          showUnused={showUnused} />
-
+                    {mode === 'day' && (
+                        <DailyTimelineContent rows={rows}
+                                              minHour={minHour}
+                                              maxHour={maxHour}
+                                              hourStep={hourStep}
+                                              onClickCandidate={onClickCandidate}
+                                              onClickReservation={onClickReservation}
+                                              itemClass={itemClass}
+                                              itemProps={itemProps}
+                                              longLabel={longLabel}
+                                              onClickLabel={onClickLabel}
+                                              isLoading={isLoading}
+                                              lazyScroll={lazyScroll}
+                                              showUnused={showUnused} />
+                    )}
                 </div>
             </>
         );

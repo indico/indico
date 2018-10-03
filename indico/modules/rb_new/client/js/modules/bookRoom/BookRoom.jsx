@@ -27,7 +27,7 @@ import LazyScroll from 'redux-lazy-scroll';
 
 import {Overridable, Slot, toClasses} from 'indico/react/util';
 import {PluralTranslate, Translate, Singular, Param, Plural} from 'indico/react/i18n';
-import {serializeTime, toMoment} from 'indico/utils/date';
+import {serializeTime, serializeDate, toMoment} from 'indico/utils/date';
 import searchBarFactory from '../../components/SearchBar';
 import Room from '../../components/Room';
 import BookingFilterBar from './BookingFilterBar';
@@ -35,7 +35,6 @@ import {roomFilterBarFactory} from '../../modules/roomList';
 import BookingTimeline from './BookingTimeline';
 import SearchResultCount from './SearchResultCount';
 import {TimelineHeader} from '../../common/timeline';
-import {isDateWithinRange} from '../../util';
 import {queryStringRules as qsFilterRules} from '../../common/roomSearch';
 import {rules as qsBookRoomRules} from './queryString';
 import * as bookRoomActions from './actions';
@@ -72,9 +71,11 @@ class BookRoom extends React.Component {
             toggleTimelineView: PropTypes.func.isRequired,
             openRoomDetails: PropTypes.func.isRequired,
             openBookingForm: PropTypes.func.isRequired,
+            setDate: PropTypes.func.isRequired
         }).isRequired,
-        dateRange: PropTypes.array.isRequired,
-        showSuggestions: PropTypes.bool
+        datePicker: PropTypes.object.isRequired,
+        showSuggestions: PropTypes.bool,
+        dateRange: PropTypes.array.isRequired
     };
 
     static defaultProps = {
@@ -85,14 +86,6 @@ class BookRoom extends React.Component {
         maxVisibleRooms: 20,
         suggestionsRequested: false,
     };
-
-    static getDerivedStateFromProps({dateRange}, state) {
-        if (!_.isEmpty(dateRange) && !isDateWithinRange(state.activeDate, dateRange, toMoment)) {
-            return {...state, activeDate: toMoment(dateRange[0])};
-        } else {
-            return state;
-        }
-    }
 
     componentDidMount() {
         const {actions: {searchRooms}} = this.props;
@@ -167,13 +160,15 @@ class BookRoom extends React.Component {
     };
 
     renderFilters(refName) {
-        const {[refName]: ref, activeDate} = this.state;
+        const {[refName]: ref} = this.state;
         const {
-            dateRange,
             isSearching,
             totalResultCount,
             results,
-            isTimelineVisible
+            isTimelineVisible,
+            actions,
+            dateRange,
+            datePicker: {selectedDate}
         } = this.props;
 
         const legendLabels = [
@@ -200,13 +195,9 @@ class BookRoom extends React.Component {
                 <SearchResultCount matching={results.length}
                                    total={totalResultCount}
                                    isFetching={isSearching} />
-                {isTimelineVisible && activeDate && (
-                    <TimelineHeader activeDate={activeDate}
-                                    onDateChange={(newDate) => {
-                                        this.setState({
-                                            activeDate: newDate
-                                        });
-                                    }}
+                {isTimelineVisible && selectedDate && (
+                    <TimelineHeader activeDate={toMoment(selectedDate)}
+                                    onDateChange={actions.setDate}
                                     legendLabels={legendLabels}
                                     dateRange={dateRange} />
                 )}
@@ -450,7 +441,8 @@ const mapStateToProps = (state) => {
         hasConflicts: bookRoomSelectors.hasUnavailableRooms(state),
         queryString: stateToQueryString(state.bookRoom, qsFilterRules, qsBookRoomRules),
         showMap: mapSelectors.isMapVisible(state),
-        dateRange: bookRoomSelectors.getTimelineDateRange(state)
+        dateRange: bookRoomSelectors.getTimelineDateRange(state),
+        datePicker: bookRoomSelectors.getTimelineDatePicker(state)
     };
 };
 
@@ -464,6 +456,7 @@ const mapDispatchToProps = dispatch => ({
         toggleTimelineView: bookRoomActions.toggleTimelineView,
         openRoomDetails: roomsActions.openRoomDetailsBook,
         openBookingForm: bookRoomActions.openBookingForm,
+        setDate: date => bookRoomActions.setDate(serializeDate(date))
     }, dispatch),
 });
 

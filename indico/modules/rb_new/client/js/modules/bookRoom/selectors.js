@@ -49,7 +49,8 @@ export const getUnavailableRoomInfo = createSelector(
 );
 export const isFetchingTimeline = ({bookRoom}) => bookRoom.timeline.request.state === RequestState.STARTED;
 export const isTimelineVisible = ({bookRoom}) => bookRoom.timeline.data.isVisible;
-export const getTimelineDateRange = ({bookRoom}) => bookRoom.timeline.data.dateRange;
+export const getTimelineDateRange = ({bookRoom}) => bookRoom.timeline.datePicker.dateRange;
+export const getTimelineDatePicker = ({bookRoom}) => bookRoom.timeline.datePicker;
 export const getTimelineAvailability = createSelector(
     ({bookRoom}) => bookRoom.timeline.data.availability,
     roomsSelectors.getAllRooms,

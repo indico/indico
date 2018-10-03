@@ -22,14 +22,44 @@ import {requestReducer} from 'indico/utils/redux';
 import * as actions from './actions';
 import * as globalActions from '../../actions';
 import {roomSearchReducerFactory} from '../../common/roomSearch';
+import {initialDatePickerState} from '../../common/timeline/reducers';
 
 
 export const initialTimelineState = {
     availability: [],
-    dateRange: [],
     isVisible: false,
+    /** Rooms currently visible */
     roomIds: [],
+    /** Here, parameters are saved for future requests (other rooms) */
     params: null,
+};
+
+const datePickerReducer = (state = initialDatePickerState, action) => {
+    switch (action.type) {
+        case actions.SET_TIMELINE_MODE:
+            return {
+                ...state,
+                mode: action.mode
+            };
+        case actions.SET_TIMELINE_DATE:
+            return {
+                ...state,
+                selectedDate: action.date
+            };
+        case actions.INIT_TIMELINE:
+            return {
+                ...state,
+                dateRange: [],
+                selectedDate: action.params.dates.startDate
+            };
+        case actions.TIMELINE_RECEIVED:
+            return {
+                ...state,
+                dateRange: action.data.date_range
+            };
+        default:
+            return state;
+    }
 };
 
 const timelineReducer = combineReducers({
@@ -38,6 +68,7 @@ const timelineReducer = combineReducers({
         actions.GET_TIMELINE_SUCCESS,
         actions.GET_TIMELINE_ERROR
     ),
+    datePicker: datePickerReducer,
     data: (state = initialTimelineState, action) => {
         switch (action.type) {
             case actions.TOGGLE_TIMELINE_VIEW:
@@ -47,7 +78,6 @@ const timelineReducer = combineReducers({
             case actions.INIT_TIMELINE:
                 return {
                     ...state,
-                    dateRange: [],
                     availability: [],
                     params: action.params,
                     roomIds: action.roomIds
@@ -60,7 +90,6 @@ const timelineReducer = combineReducers({
             case actions.TIMELINE_RECEIVED:
                 return {
                     ...state,
-                    dateRange: action.data.date_range,
                     availability: state.availability.concat(camelizeKeys(action.data.availability)),
                 };
             case actions.CREATE_BOOKING_SUCCESS: {

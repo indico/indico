@@ -23,9 +23,7 @@ import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import {Message, Segment} from 'semantic-ui-react';
 import {Translate, Param} from 'indico/react/i18n';
-import {serializeDate, toMoment} from 'indico/utils/date';
 import {ElasticTimeline} from '../../common/timeline';
-import {isDateWithinRange} from '../../util';
 import {actions as roomsActions} from '../../common/rooms';
 import * as bookRoomActions from './actions';
 import * as bookRoomSelectors from './selectors';
@@ -34,9 +32,8 @@ import '../../common/timeline/Timeline.module.scss';
 
 
 const timelinePropTypes = {
-    availability: PropTypes.array.isRequired,
-    dateRange: PropTypes.arrayOf(PropTypes.string).isRequired,
-    recurrenceType: PropTypes.string.isRequired,
+    datePicker: PropTypes.object.isRequired,
+    availability: PropTypes.array.isRequired
 };
 
 class _BookingTimelineComponent extends React.Component {
@@ -63,16 +60,6 @@ class _BookingTimelineComponent extends React.Component {
     };
 
     state = {};
-
-    static getDerivedStateFromProps({dateRange, defaultDate}, state) {
-        if (!_.isEmpty(dateRange) && !isDateWithinRange(state.activeDate, dateRange, toMoment)) {
-            return {...state, activeDate: toMoment(dateRange[0])};
-        } else if (_.isEmpty(dateRange)) {
-            return {...state, activeDate: toMoment(defaultDate)};
-        } else {
-            return state;
-        }
-    }
 
     get singleRoom() {
         const {availability, allowSingleRoom} = this.props;
@@ -110,15 +97,13 @@ class _BookingTimelineComponent extends React.Component {
     }
 
     calcRows = () => {
-        const {activeDate} = this.state;
-        const {availability, dateRange} = this.props;
+        const {availability, dateRange, datePicker: {selectedDate}} = this.props;
 
         if (this.singleRoom) {
             const roomAvailability = this.singleRoom;
             return dateRange.map(dt => this._getRowSerializer(dt, true)(roomAvailability));
         } else {
-            const dt = serializeDate(activeDate);
-            return availability.map(([, data]) => data).map(this._getRowSerializer(dt));
+            return availability.map(([, data]) => data).map(this._getRowSerializer(selectedDate));
         }
     };
 
@@ -132,8 +117,8 @@ class _BookingTimelineComponent extends React.Component {
 
     render() {
         const {
-            dateRange, isFetching, recurrenceType, lazyScroll, showEmptyMessage, clickable,
-            actions: {openBookingForm, openRoomDetails},
+            isFetching, lazyScroll, showEmptyMessage, clickable, datePicker,
+            actions: {openBookingForm, openRoomDetails}
         } = this.props;
         const emptyMessage = showEmptyMessage ? (
             <Message warning>
@@ -146,13 +131,12 @@ class _BookingTimelineComponent extends React.Component {
         return (
             <ElasticTimeline lazyScroll={lazyScroll}
                              rows={this.calcRows()}
+                             datePicker={datePicker}
                              emptyMessage={emptyMessage}
                              onClickCandidate={clickable ? openBookingForm : null}
                              onClickLabel={clickable ? openRoomDetails : null}
-                             dateRange={dateRange}
                              extraContent={this.singleRoom && this.renderRoomSummary(this.singleRoom)}
                              isLoading={isFetching}
-                             recurrenceType={recurrenceType}
                              disableDatePicker={!!this.singleRoom} />
         );
     }
@@ -264,8 +248,7 @@ class BookingTimeline extends React.Component {
             fetchingTimeline,
             hasMoreTimelineData,
             availability,
-            dateRange,
-            recurrenceType,
+            datePicker,
             actions: {fetchTimeline},
             filters: {dates: {startDate}},
             suggestedRoomIds,
@@ -280,8 +263,7 @@ class BookingTimeline extends React.Component {
             <BookingTimelineComponent lazyScroll={lazyScroll}
                                       isFetching={fetchingTimeline}
                                       availability={availability}
-                                      dateRange={dateRange}
-                                      recurrenceType={recurrenceType}
+                                      datePicker={datePicker}
                                       defaultDate={startDate}
                                       allowSingleRoom={!suggestedRoomIds.length}
                                       showEmptyMessage={false}
@@ -294,13 +276,12 @@ class BookingTimeline extends React.Component {
 export default connect(
     state => ({
         availability: bookRoomSelectors.getTimelineAvailability(state),
-        dateRange: bookRoomSelectors.getTimelineDateRange(state),
+        datePicker: bookRoomSelectors.getTimelineDatePicker(state),
         fetchingTimeline: bookRoomSelectors.isFetchingTimeline(state),
         searchFinished: bookRoomSelectors.isSearchFinished(state),
         roomIds: bookRoomSelectors.getSearchResultIds(state),
         suggestedRoomIds: bookRoomSelectors.getSuggestedRoomIds(state),
         hasMoreTimelineData: bookRoomSelectors.hasMoreTimelineData(state),
-        recurrenceType: state.bookRoom.filters.recurrence.type,
         filters: bookRoomSelectors.getFilters(state),
     }),
     dispatch => ({

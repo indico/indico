@@ -33,7 +33,6 @@ export default class DailyTimelineContent extends React.Component {
     static propTypes = {
         step: PropTypes.number,
         rows: PropTypes.array.isRequired,
-        recurrenceType: PropTypes.string,
         onClickCandidate: PropTypes.func,
         onClickReservation: PropTypes.func,
         longLabel: PropTypes.bool,
@@ -50,7 +49,6 @@ export default class DailyTimelineContent extends React.Component {
 
     static defaultProps = {
         step: 2,
-        recurrenceType: null,
         onClickCandidate: null,
         onClickReservation: null,
         longLabel: false,
@@ -81,12 +79,10 @@ export default class DailyTimelineContent extends React.Component {
 
     renderTimelineRow = ({availability, label, conflictIndicator, key, room}) => {
         const {
-            minHour, maxHour, hourStep, itemClass: ItemClass, itemProps, recurrenceType, onClickCandidate,
+            minHour, maxHour, hourStep, itemClass: ItemClass, itemProps, onClickCandidate,
             onClickReservation, longLabel, showUnused
         } = this.props;
         const columns = ((maxHour - minHour) / hourStep) + 1;
-
-        // TODO: Consider plan B (availability='alternatives') option when implemented
         const hasConflicts = !(_.isEmpty(availability.conflicts) && _.isEmpty(availability.preConflicts));
         if (!showUnused && !this.hasUsage(availability)) {
             return null;
@@ -102,7 +98,7 @@ export default class DailyTimelineContent extends React.Component {
                     <ItemClass startHour={minHour} endHour={maxHour} data={availability} room={room}
                                onClickReservation={onClickReservation}
                                onClickCandidate={() => {
-                                   if (onClickCandidate && (!hasConflicts || recurrenceType !== 'single')) {
+                                   if (onClickCandidate && !hasConflicts) {
                                        onClickCandidate(room.id);
                                    }
                                }}

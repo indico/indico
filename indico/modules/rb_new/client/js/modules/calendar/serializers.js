@@ -15,19 +15,14 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import {createSelector} from 'reselect';
-import {RequestState} from 'indico/utils/redux';
-import {selectors as roomsSelectors} from '../../common/rooms';
+import {serializeDate, toMoment} from 'indico/utils/date';
 
 
-export const isFetching = ({calendar}) => calendar.request.state === RequestState.STARTED;
-export const getDatePickerInfo = ({calendar}) => calendar.datePicker;
-export const getCalendarData = createSelector(
-    ({calendar: {data}}) => data,
-    roomsSelectors.getAllRooms,
-    ({roomIds, rows}, allRooms) => ({
-        roomIds,
-        rows: rows.map(entry => ({...entry, room: allRooms[entry.roomId]}))
-    })
-);
-export const getFilters = ({calendar}) => calendar.filters;
+export const ajax = {
+    start_date: ({selectedDate, mode}) => (
+        serializeDate(toMoment(selectedDate).startOf(mode))
+    ),
+    end_date: ({selectedDate, mode}) => (
+        serializeDate(toMoment(selectedDate).endOf(mode))
+    )
+};

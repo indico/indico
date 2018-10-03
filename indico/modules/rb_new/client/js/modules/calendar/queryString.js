@@ -21,34 +21,35 @@ import {createQueryStringReducer, validator as v} from 'redux-router-querystring
 
 import * as actions from '../../actions';
 import {history} from '../../store';
-import {initialFilterState} from './reducers';
+import {initialState} from './reducers';
 import {actions as filtersActions} from '../../common/filters';
 import {boolStateField} from '../../util';
+import * as calendarActions from './actions';
 
 
 const rules = {
     date: {
         validator: (date) => v.isDate(date) && moment(date).isBetween('1970-01-01', '2999-12-31'),
-        stateField: 'date'
+        stateField: 'datePicker.selectedDate'
     },
     favorite: {
         validator: v.isBoolean(),
         sanitizer: v.toBoolean(),
-        stateField: boolStateField('onlyFavorites')
+        stateField: boolStateField('filters.onlyFavorites')
     },
     building: {
-        stateField: 'building'
+        stateField: 'filters.building'
     },
     text: {
-        stateField: 'text'
-    },
+        stateField: 'filters.text'
+    }
 };
 
 
 export const routeConfig = {
     '/calendar': {
-        listen: [filtersActions.SET_FILTER_PARAMETER, filtersActions.SET_FILTERS],
-        select: ({calendar: {filters}}) => filters,
+        listen: [filtersActions.SET_FILTER_PARAMETER, filtersActions.SET_FILTERS, calendarActions.SET_DATE],
+        select: ({calendar}) => calendar,
         serialize: rules
     }
 };
@@ -59,13 +60,13 @@ export const queryStringReducer = createQueryStringReducer(
     (state, action) => {
         if (action.type === actions.INIT) {
             return {
-                namespace: 'calendar.filters',
+                namespace: 'calendar',
                 queryString: history.location.search.slice(1)
             };
         }
         return null;
     },
     (state, namespace) => (namespace
-        ? _.merge({}, state, _.set({}, namespace, initialFilterState()))
+        ? _.merge({}, state, _.set({}, namespace, initialState()))
         : state)
 );

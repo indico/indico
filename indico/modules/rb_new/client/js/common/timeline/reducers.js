@@ -15,19 +15,11 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import {createSelector} from 'reselect';
-import {RequestState} from 'indico/utils/redux';
-import {selectors as roomsSelectors} from '../../common/rooms';
-
-
-export const isFetching = ({calendar}) => calendar.request.state === RequestState.STARTED;
-export const getDatePickerInfo = ({calendar}) => calendar.datePicker;
-export const getCalendarData = createSelector(
-    ({calendar: {data}}) => data,
-    roomsSelectors.getAllRooms,
-    ({roomIds, rows}, allRooms) => ({
-        roomIds,
-        rows: rows.map(entry => ({...entry, room: allRooms[entry.roomId]}))
-    })
-);
-export const getFilters = ({calendar}) => calendar.filters;
+export const initialDatePickerState = {
+    selectedDate: null,
+    dateRange: [],
+    minHour: 6,
+    maxHour: 23,
+    hourStep: 2,
+    mode: 'day'
+};

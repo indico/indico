@@ -19,35 +19,56 @@ import moment from 'moment';
 import {combineReducers} from 'redux';
 
 import camelizeKeys from 'indico/utils/camelize';
-import {requestReducer} from 'indico/utils/redux';
 import {serializeDate} from 'indico/utils/date';
+import {requestReducer} from 'indico/utils/redux';
 import {actions as bookRoomActions} from '../../modules/bookRoom';
 import * as calendarActions from './actions';
 import {filterReducerFactory} from '../../common/filters';
 import {processRoomFilters} from '../../common/roomSearch/reducers';
+import {initialDatePickerState} from '../../common/timeline/reducers';
 
 
-export const initialState = {
+const datePickerState = () => ({...initialDatePickerState, selectedDate: serializeDate(moment())});
+
+const datePickerReducer = (state = datePickerState(), action) => {
+    if (action.type === calendarActions.SET_DATE) {
+        return {
+            ...state,
+            dateRange: [],
+            selectedDate: action.date
+        };
+    }
+    return state;
+};
+
+export const initialDataState = {
     rows: [],
     roomIds: null
 };
 
-export const initialFilterState = () => ({
+export const initialFilterState = {
     text: null,
     building: null,
-    onlyFavorites: false,
-    date: serializeDate(moment()),
+    onlyFavorites: false
+};
+
+export const initialState = () => ({
+    filters: initialFilterState,
+    data: initialDataState,
+    datePicker: datePickerState()
 });
 
 export default combineReducers({
     request: requestReducer(calendarActions.FETCH_REQUEST, calendarActions.FETCH_SUCCESS, calendarActions.FETCH_ERROR),
     filters: filterReducerFactory('calendar', initialFilterState, processRoomFilters),
-    data: (state = initialState, action) => {
+    data: (state = initialDataState, action) => {
         switch (action.type) {
             case calendarActions.ROWS_RECEIVED:
                 return {...state, rows: camelizeKeys(action.data)};
+            case calendarActions.SET_DATE:
+                return {...state, rows: []};
             case calendarActions.ROOM_IDS_RECEIVED:
-                return {...state, roomIds: action.data};
+                return {...state, roomIds: action.data.slice()};
             case bookRoomActions.CREATE_BOOKING_SUCCESS: {
                 const {data: {occurrences, room_id: roomId}} = action;
                 const {rows} = state;
@@ -68,5 +89,6 @@ export default combineReducers({
             default:
                 return state;
         }
-    }
+    },
+    datePicker: datePickerReducer
 });
