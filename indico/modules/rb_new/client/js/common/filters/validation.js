@@ -22,6 +22,11 @@ import showReactErrorDialog from 'indico/react/errors';
 import {resetPageState} from '../../actions';
 
 
+/**
+ * Performs more complex validation of the filter parameters, combining more than one value.
+ * @param {Object} filters - Filters to validate.
+ * @returns {boolean} Whether it's valid or not.
+ */
 const mixedValidator = (filters) => {
     if (!('timeSlot' in filters)) {
         return true;
@@ -31,6 +36,12 @@ const mixedValidator = (filters) => {
     return !(st && et && toMoment(st, 'HH:mm').isSameOrAfter(toMoment(et, 'HH:mm')));
 };
 
+/**
+ * @param {Object} filters - Filters to validate.
+ * @param namespace
+ * @param dispatch
+ * @returns {boolean} Whether it's valid or not.
+ */
 export const validateFilters = (filters, namespace, dispatch) => {
     if (!filters.error && mixedValidator(filters)) {
         return true;
