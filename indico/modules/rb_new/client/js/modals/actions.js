@@ -20,9 +20,12 @@ import {push} from 'connected-react-router';
 import {history} from '../store';
 
 
-function openModal(name, value) {
+function openModal(name, value, payload = null) {
     const {location: {pathname: path, search: queryString}} = history;
-    const data = `${name}:${value}`;
+    let data = `${name}:${value}`;
+    if (payload !== null) {
+        data += `:${JSON.stringify(payload)}`;
+    }
     // eslint-disable-next-line prefer-template
     return push(path + (queryString ? `${queryString}&` : '?') + `modal=${encodeURIComponent(data)}`);
 }
@@ -30,4 +33,4 @@ function openModal(name, value) {
 export const openRoomDetails = (roomId) => openModal('room-details', roomId);
 export const openRoomDetailsBook = (roomId) => openModal('room-details-book', roomId);
 export const openBookRoom = (roomId) => openModal('book-room', roomId);
-export const openBookingForm = (roomId, filters) => openModal('booking-form', JSON.stringify({roomId, filters}));
+export const openBookingForm = (roomId, data) => openModal('booking-form', roomId, data);

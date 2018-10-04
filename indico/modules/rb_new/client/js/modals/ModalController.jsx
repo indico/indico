@@ -60,7 +60,12 @@ class ModalController extends React.PureComponent {
         if (Array.isArray(modalData)) {
             modalData = modalData[modalData.length - 1];
         }
-        return [modalData.split(/:(.+)/, 2), modalData];
+        const match = modalData.match(/^([^:]+):([^:]+)(?::(.+))?$/); // foo:bar[:...]
+        if (!match) {
+            return null;
+        }
+        const [orig, name, value, payload] = match;
+        return {orig, name, value, payload: JSON.parse(payload || 'null')};
     }
 
     getQueryStringWithout(arg) {
@@ -113,10 +118,9 @@ class ModalController extends React.PureComponent {
         ));
     }
 
-    renderBookingForm(data, onClose) {
-        const {roomId, filters} = JSON.parse(data);
+    renderBookingForm(roomId, data, onClose) {
         return this.withRoomPreloader('bookingForm', roomId, () => (
-            <BookRoomModal open roomId={roomId} onClose={onClose} bookingData={filters} />
+            <BookRoomModal open roomId={roomId} onClose={onClose} bookingData={data} />
         ));
     }
 
@@ -129,10 +133,10 @@ class ModalController extends React.PureComponent {
         if (!queryData) {
             return null;
         }
-        const [[name, value], orig] = queryData;
+        const {orig, name, value, payload} = queryData;
         const closeHandler = this.makeCloseHandler(orig);
         if (name === 'booking-form') {
-            return this.renderBookingForm(value, closeHandler);
+            return this.renderBookingForm(value, payload, closeHandler);
         } else if (name === 'book-room') {
             return this.renderBookRoom(value, closeHandler);
         } else if (name === 'room-details') {
