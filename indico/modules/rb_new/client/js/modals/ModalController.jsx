@@ -19,11 +19,13 @@ import qs from 'qs';
 import React from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
+import moment from 'moment';
 import PropTypes from 'prop-types';
 import {Dimmer, Loader} from 'semantic-ui-react';
 import {push} from 'connected-react-router';
 
 import {Preloader} from 'indico/react/util';
+import {toMoment} from 'indico/utils/date';
 import {actions as roomsActions, selectors as roomsSelectors} from '../common/rooms';
 import RoomDetailsModal from '../components/modals/RoomDetailsModal';
 import BookFromListModal from '../components/modals/BookFromListModal';
@@ -112,9 +114,22 @@ class ModalController extends React.PureComponent {
         ));
     }
 
-    renderBookRoom(roomId, onClose) {
+    renderBookRoom(roomId, defaults, onClose) {
+        if (defaults) {
+            defaults = {
+                ...defaults,
+                dates: {
+                    startDate: toMoment(defaults.dates.startDate, moment.HTML5_FMT.DATE),
+                    endDate: toMoment(defaults.dates.endDate, moment.HTML5_FMT.DATE),
+                },
+                timeSlot: {
+                    startTime: toMoment(defaults.timeSlot.startTime, moment.HTML5_FMT.TIME),
+                    endTime: toMoment(defaults.timeSlot.endTime, moment.HTML5_FMT.TIME),
+                },
+            };
+        }
         return this.withRoomPreloader('bookRoom', roomId, () => (
-            <BookFromListModal roomId={roomId} onClose={onClose} />
+            <BookFromListModal roomId={roomId} onClose={onClose} defaults={defaults} />
         ));
     }
 
@@ -138,7 +153,7 @@ class ModalController extends React.PureComponent {
         if (name === 'booking-form') {
             return this.renderBookingForm(value, payload, closeHandler);
         } else if (name === 'book-room') {
-            return this.renderBookRoom(value, closeHandler);
+            return this.renderBookRoom(value, payload, closeHandler);
         } else if (name === 'room-details') {
             return this.renderRoomDetails(value, closeHandler);
         } else if (name === 'room-details-book') {

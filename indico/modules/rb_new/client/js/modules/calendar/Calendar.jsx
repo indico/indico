@@ -19,17 +19,15 @@ import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
 import {bindActionCreators} from 'redux';
-import {Container, Dimmer, Grid, Loader, Sticky} from 'semantic-ui-react';
+import {Container, Grid, Sticky} from 'semantic-ui-react';
 import {connect} from 'react-redux';
 
 import {Translate} from 'indico/react/i18n';
-import {Preloader} from 'indico/react/util';
 import {serializeDate} from 'indico/utils/date';
 import * as calendarActions from './actions';
 import * as calendarSelectors from './selectors';
-import {actions as roomsActions, selectors as roomsSelectors} from '../../common/rooms';
+import {selectors as roomsSelectors} from '../../common/rooms';
 import {EditableTimelineItem, TimelineBase, TimelineHeader} from '../../common/timeline';
-import BookFromListModal from '../../components/modals/BookFromListModal';
 import {actions as modalActions} from '../../modals';
 
 import '../../common/timeline/Timeline.module.scss';
@@ -45,8 +43,8 @@ class Calendar extends React.Component {
         actions: PropTypes.exact({
             fetchCalendar: PropTypes.func.isRequired,
             setDate: PropTypes.func.isRequired,
-            fetchRoomDetails: PropTypes.func.isRequired,
             openRoomDetails: PropTypes.func.isRequired,
+            openBookRoom: PropTypes.func.isRequired,
         }).isRequired,
     };
 
@@ -55,8 +53,6 @@ class Calendar extends React.Component {
         super(props);
         this.contextRef = React.createRef();
     }
-
-    state = {};
 
     componentDidMount() {
         const {actions: {fetchCalendar}} = this.props;
@@ -87,35 +83,26 @@ class Calendar extends React.Component {
     }
 
     onAddSlot = ({room: {id}, slotStartTime, slotEndTime}) => {
-        const {calendarData: {date}} = this.props;
-        this.setState({
-            bookingRoomId: id,
-            modalFields: {
-                dates: {
-                    startDate: moment(date, 'YYYY-MM-DD'),
-                    endDate: null
-                },
-                timeSlot: {
-                    startTime: moment(slotStartTime, 'hh:mm'),
-                    endTime: moment(slotEndTime, 'hh:mm')
-                },
-                recurrence: {type: 'single'}
-            }
-        });
-    };
-
-    onCloseBookingModal = () => {
-        this.setState({
-            bookingRoomId: null,
-            modalFields: null
+        const {calendarData: {date}, actions: {openBookRoom}} = this.props;
+        openBookRoom(id, {
+            dates: {
+                startDate: date,
+                endDate: null,
+            },
+            timeSlot: {
+                startTime: slotStartTime,
+                endTime: slotEndTime,
+            },
+            recurrence: {
+                type: 'single',
+            },
         });
     };
 
     render() {
         const {
-            isFetching, calendarData: {date, rows}, actions: {setDate, fetchRoomDetails, openRoomDetails}
+            isFetching, calendarData: {date, rows}, actions: {setDate, openRoomDetails}
         } = this.props;
-        const {bookingRoomId, modalFields} = this.state;
         const legendLabels = [
             {label: Translate.string('Booked'), color: 'orange'},
             {label: Translate.string('Pre-Booking'), style: 'pre-booking'},
@@ -142,17 +129,6 @@ class Calendar extends React.Component {
                         </div>
                     </Container>
                 </Grid.Row>
-                {bookingRoomId && (
-                    <Preloader checkCached={state => !!roomsSelectors.hasDetails(state, {roomId: bookingRoomId})}
-                               action={() => fetchRoomDetails(bookingRoomId)}
-                               dimmer={<Dimmer active page><Loader /></Dimmer>}>
-                        {() => (
-                            <BookFromListModal roomId={bookingRoomId}
-                                               onClose={this.onCloseBookingModal}
-                                               defaults={modalFields} />
-                        )}
-                    </Preloader>
-                )}
             </Grid>
         );
     }
@@ -168,9 +144,9 @@ export default connect(
     dispatch => ({
         actions: bindActionCreators({
             fetchCalendar: calendarActions.fetchCalendar,
-            fetchRoomDetails: roomsActions.fetchDetails,
             setDate: (date) => calendarActions.setDate(serializeDate(date)),
             openRoomDetails: modalActions.openRoomDetails,
+            openBookRoom: modalActions.openBookRoom,
         }, dispatch),
     }),
 )(Calendar);

@@ -32,5 +32,5 @@ function openModal(name, value, payload = null) {
 
 export const openRoomDetails = (roomId) => openModal('room-details', roomId);
 export const openRoomDetailsBook = (roomId) => openModal('room-details-book', roomId);
-export const openBookRoom = (roomId) => openModal('book-room', roomId);
+export const openBookRoom = (roomId, data = null) => openModal('book-room', roomId, data);
 export const openBookingForm = (roomId, data) => openModal('booking-form', roomId, data);
