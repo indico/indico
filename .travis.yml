@@ -4,6 +4,7 @@ python:
   - 2.7
 git:
   submodules: false
+  depth: 500
 addons:
   postgresql: 9.6
 install:
