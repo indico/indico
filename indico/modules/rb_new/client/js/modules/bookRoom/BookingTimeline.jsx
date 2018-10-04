@@ -21,13 +21,12 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
-import {stateToQueryString} from 'redux-router-querystring';
 import {Message, Segment} from 'semantic-ui-react';
 import {Translate, Param} from 'indico/react/i18n';
 import {serializeDate, toMoment} from 'indico/utils/date';
 import {TimelineBase} from '../../common/timeline';
-import {isDateWithinRange, pushStateMergeProps} from '../../util';
-import {queryStringRules as queryStringSerializer} from '../../common/roomSearch';
+import {isDateWithinRange} from '../../util';
+import {actions as modalActions} from '../../modals';
 import * as bookRoomActions from './actions';
 import * as bookRoomSelectors from './selectors';
 
@@ -40,19 +39,23 @@ const timelinePropTypes = {
     recurrenceType: PropTypes.string.isRequired,
 };
 
-export class BookingTimelineComponent extends React.Component {
+class _BookingTimelineComponent extends React.Component {
     static propTypes = {
         ...timelinePropTypes,
-        pushState: PropTypes.func,
+        clickable: PropTypes.bool,
         lazyScroll: PropTypes.object,
         isFetching: PropTypes.bool.isRequired,
         showEmptyMessage: PropTypes.bool,
         allowSingleRoom: PropTypes.bool,
         bookingAllowed: PropTypes.bool,
+        actions: PropTypes.exact({
+            openRoomDetails: PropTypes.func.isRequired,
+            openBookingForm: PropTypes.func.isRequired,
+        }).isRequired,
     };
 
     static defaultProps = {
-        pushState: null,
+        clickable: false,
         lazyScroll: null,
         allowSingleRoom: true,
         showEmptyMessage: true,
@@ -120,16 +123,6 @@ export class BookingTimelineComponent extends React.Component {
         }
     };
 
-    openBookingModal = (room) => {
-        const {pushState} = this.props;
-        pushState(`/book/${room.id}/confirm`, true);
-    };
-
-    openRoomModal = (roomId) => {
-        const {pushState} = this.props;
-        pushState(`/book/${roomId}/details`, true);
-    };
-
     renderRoomSummary({room: {full_name: fullName}}) {
         return (
             <Segment>
@@ -140,7 +133,8 @@ export class BookingTimelineComponent extends React.Component {
 
     render() {
         const {
-            dateRange, isFetching, recurrenceType, lazyScroll, showEmptyMessage, pushState
+            dateRange, isFetching, recurrenceType, lazyScroll, showEmptyMessage, clickable,
+            actions: {openBookingForm, openRoomDetails},
         } = this.props;
         const emptyMessage = showEmptyMessage ? (
             <Message warning>
@@ -154,8 +148,8 @@ export class BookingTimelineComponent extends React.Component {
             <TimelineBase lazyScroll={lazyScroll}
                           rows={this.calcRows()}
                           emptyMessage={emptyMessage}
-                          onClick={pushState ? this.openBookingModal : null}
-                          onClickLabel={pushState ? this.openRoomModal : null}
+                          onClick={clickable ? openBookingForm : null}
+                          onClickLabel={clickable ? openRoomDetails : null}
                           dateRange={dateRange}
                           extraContent={this.singleRoom && this.renderRoomSummary(this.singleRoom)}
                           isLoading={isFetching}
@@ -164,6 +158,17 @@ export class BookingTimelineComponent extends React.Component {
         );
     }
 }
+
+export const BookingTimelineComponent = connect(
+    null,
+    dispatch => ({
+        actions: bindActionCreators({
+            openRoomDetails: modalActions.openRoomDetailsBook,
+            openBookingForm: modalActions.openBookingForm,
+        }, dispatch),
+    })
+)(_BookingTimelineComponent);
+
 
 class BookingTimeline extends React.Component {
     static propTypes = {
@@ -176,7 +181,6 @@ class BookingTimeline extends React.Component {
             timeSlot: PropTypes.object.isRequired,
             recurrence: PropTypes.object.isRequired,
         }).isRequired,
-        pushState: PropTypes.func.isRequired,
         actions: PropTypes.exact({
             fetchTimeline: PropTypes.func.isRequired,
             initTimeline: PropTypes.func.isRequired,
@@ -260,7 +264,6 @@ class BookingTimeline extends React.Component {
         const {
             fetchingTimeline,
             hasMoreTimelineData,
-            pushState,
             availability,
             dateRange,
             recurrenceType,
@@ -276,14 +279,14 @@ class BookingTimeline extends React.Component {
         return (
             <BookingTimelineComponent lazyScroll={lazyScroll}
                                       isFetching={fetchingTimeline}
-                                      pushState={pushState}
                                       availability={availability}
                                       dateRange={dateRange}
                                       recurrenceType={recurrenceType}
                                       defaultDate={startDate}
                                       allowSingleRoom={!suggestedRoomIds.length}
                                       showEmptyMessage={false}
-                                      bookingAllowed />
+                                      bookingAllowed
+                                      clickable />
         );
     }
 }
@@ -298,7 +301,6 @@ export default connect(
         suggestedRoomIds: bookRoomSelectors.getSuggestedRoomIds(state),
         hasMoreTimelineData: bookRoomSelectors.hasMoreTimelineData(state),
         recurrenceType: state.bookRoom.filters.recurrence.type,
-        queryString: stateToQueryString(state.bookRoom, queryStringSerializer),
         filters: bookRoomSelectors.getFilters(state),
     }),
     dispatch => ({
@@ -308,7 +310,5 @@ export default connect(
             addTimelineRooms: bookRoomActions.addTimelineRooms,
             fetchRoomSuggestions: bookRoomActions.fetchRoomSuggestions,
         }, dispatch),
-        dispatch
-    }),
-    pushStateMergeProps
+    })
 )(BookingTimeline);

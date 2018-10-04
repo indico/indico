@@ -103,12 +103,10 @@ class ModalController extends React.PureComponent {
     }
 
     renderRoomDetails(roomId, onClose, bookingPage = false) {
-        const {actions: {openBookRoom, openBookingForm}, bookRoomFilters: {dates, timeSlot, recurrence}} = this.props;
+        const {actions: {openBookRoom, openBookingForm}} = this.props;
         // if we are on the booking page, we have booking data in the redux state
         // and do not need to go through the bootstrap dialog
-        const onBook = bookingPage
-            ? (id) => openBookingForm(id, {dates, timeSlot, recurrence})
-            : openBookRoom;
+        const onBook = bookingPage ? openBookingForm : openBookRoom;
         return this.withRoomPreloader('roomDetails', roomId, () => (
             <RoomDetailsModal roomId={roomId} onClose={onClose} onBook={onBook} />
         ));
@@ -134,6 +132,11 @@ class ModalController extends React.PureComponent {
     }
 
     renderBookingForm(roomId, data, onClose) {
+        const {bookRoomFilters: {dates, timeSlot, recurrence}} = this.props;
+        if (!data) {
+            // used on the book-room page to avoid duplicate data that is always present
+            data = {dates, timeSlot, recurrence};
+        }
         return this.withRoomPreloader('bookingForm', roomId, () => (
             <BookRoomModal open roomId={roomId} onClose={onClose} bookingData={data} />
         ));

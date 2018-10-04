@@ -118,8 +118,13 @@ class BookRoom extends React.Component {
         this.setState({maxVisibleRooms: 20, suggestionsRequested: false});
     }
 
-    openBookingForm(room, overrides = {}) {
+    openBookingForm(room, overrides = null) {
         const {actions: {openBookingForm}, filters: {dates, timeSlot, recurrence}} = this.props;
+        if (!overrides) {
+            openBookingForm(room.id);
+            return;
+        }
+        // if we have overrides, we need to pass the data explicitly
         const bookingData = {dates, timeSlot, recurrence};
         if (overrides.time) {
             const {startTime, endTime} = timeSlot;

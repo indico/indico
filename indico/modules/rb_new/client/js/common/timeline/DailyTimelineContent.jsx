@@ -87,7 +87,7 @@ export default class DailyTimelineContent extends React.Component {
                     <ItemClass startHour={minHour} endHour={maxHour} data={availability} room={room}
                                onClick={() => {
                                    if (onClick && (!hasConflicts || recurrenceType !== 'single')) {
-                                       onClick(room);
+                                       onClick(room.id);
                                    }
                                }}
                                setSelectable={selectable => {
