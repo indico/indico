@@ -28,4 +28,6 @@ function openModal(name, value) {
 }
 
 export const openRoomDetails = (roomId) => openModal('room-details', roomId);
+export const openRoomDetailsBook = (roomId) => openModal('room-details-book', roomId);
 export const openBookRoom = (roomId) => openModal('book-room', roomId);
+export const openBookingForm = (roomId, filters) => openModal('booking-form', JSON.stringify({roomId, filters}));

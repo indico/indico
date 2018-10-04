@@ -28,14 +28,12 @@ import {stateToQueryString} from 'redux-router-querystring';
 import {Slot} from 'indico/react/util';
 import {Param, Plural, PluralTranslate, Translate, Singular} from 'indico/react/i18n';
 import camelizeKeys from 'indico/utils/camelize';
-import {pushStateMergeProps, roomPreloader} from '../../util';
+import {pushStateMergeProps} from '../../util';
 import roomFilterBarFactory from './RoomFilterBar';
 import searchBarFactory from '../../containers/SearchBar';
 import Room from '../../containers/Room';
-import BookFromListModal from '../../components/modals/BookFromListModal';
 import {BlockingModal} from '../blockings';
 import {queryStringRules as queryStringSerializer} from '../../common/roomSearch';
-import {actions as roomsActions} from '../../common/rooms';
 import {mapControllerFactory, selectors as mapSelectors} from '../../common/map';
 import {actions as modalActions} from '../../modals';
 import * as roomsListActions from './actions';
@@ -57,7 +55,6 @@ class RoomList extends React.Component {
         pushState: PropTypes.func.isRequired,
         actions: PropTypes.exact({
             searchRooms: PropTypes.func.isRequired,
-            fetchRoomDetails: PropTypes.func.isRequired,
             openRoomDetails: PropTypes.func.isRequired,
         }).isRequired,
     };
@@ -138,11 +135,6 @@ class RoomList extends React.Component {
         }
     };
 
-    closeBookingModal = () => {
-        const {pushState} = this.props;
-        pushState('/rooms', true);
-    };
-
     closeBlockingModal = () => {
         const {pushState} = this.props;
         pushState('/rooms', true);
@@ -177,7 +169,6 @@ class RoomList extends React.Component {
     render() {
         const {
             results,
-            actions: {fetchRoomDetails},
             showMap,
             pushState,
             isSearching,
@@ -253,9 +244,6 @@ class RoomList extends React.Component {
                         <MapController />
                     </Grid.Column>
                 )}
-                <Route exact path="/rooms/:roomId/book" render={roomPreloader((roomId) => (
-                    <BookFromListModal roomId={roomId} onClose={this.closeBookingModal} />
-                ), fetchRoomDetails)} />
                 <Route exact path="/rooms/blocking/create" render={() => {
                     const blocking = {
                         blockedRooms: Object.values(selection).map((room) => ({room: camelizeKeys(room)}))
@@ -285,7 +273,6 @@ export default connect(
         dispatch, // for pushStateMergeProps
         actions: bindActionCreators({
             searchRooms: roomsListActions.searchRooms,
-            fetchRoomDetails: roomsActions.fetchDetails,
             openRoomDetails: modalActions.openRoomDetails,
         }, dispatch)
     }),

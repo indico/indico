@@ -15,7 +15,6 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
 import qs from 'qs';
 import React from 'react';
 import {bindActionCreators} from 'redux';
@@ -27,8 +26,11 @@ import {push} from 'connected-react-router';
 import {Preloader} from 'indico/react/util';
 import {actions as roomsActions, selectors as roomsSelectors} from '../common/rooms';
 import RoomDetailsModal from '../components/modals/RoomDetailsModal';
+import BookFromListModal from '../components/modals/BookFromListModal';
+import BookRoomModal from '../modules/bookRoom/BookRoomModal';
 import * as globalSelectors from '../selectors';
 import * as modalActions from './actions';
+import {selectors as bookRoomSelectors} from '../modules/bookRoom';
 
 
 class ModalController extends React.PureComponent {
@@ -36,10 +38,16 @@ class ModalController extends React.PureComponent {
         isInitializing: PropTypes.bool.isRequired,
         path: PropTypes.string.isRequired,
         queryString: PropTypes.string.isRequired,
+        bookRoomFilters: PropTypes.shape({
+            dates: PropTypes.object.isRequired,
+            timeSlot: PropTypes.object.isRequired,
+            recurrence: PropTypes.object.isRequired,
+        }).isRequired,
         actions: PropTypes.exact({
             pushState: PropTypes.func.isRequired,
             fetchRoomDetails: PropTypes.func.isRequired,
             openBookRoom: PropTypes.func.isRequired,
+            openBookingForm: PropTypes.func.isRequired,
         }).isRequired,
     };
 
@@ -47,12 +55,12 @@ class ModalController extends React.PureComponent {
         const {queryString} = this.props;
         let {modal: modalData} = qs.parse(queryString);
         if (!modalData) {
-            return [];
+            return null;
         }
-        if (!Array.isArray(modalData)) {
-            modalData = [modalData];
+        if (Array.isArray(modalData)) {
+            modalData = modalData[modalData.length - 1];
         }
-        return _.uniq(modalData).map(data => [data.split(':', 2), data]);
+        return [modalData.split(/:(.+)/, 2), modalData];
     }
 
     getQueryStringWithout(arg) {
@@ -74,21 +82,42 @@ class ModalController extends React.PureComponent {
         };
     }
 
-    renderRoomDetails(roomId, onClose) {
-        const {actions: {fetchRoomDetails, openBookRoom}} = this.props;
-        const key = `roomDetails-${roomId}`;
+    withRoomPreloader(name, roomId, render) {
+        const {actions: {fetchRoomDetails}} = this.props;
+        const key = `${name}-${roomId}`;
         return (
             <Preloader checkCached={state => roomsSelectors.hasDetails(state, {roomId})}
                        action={() => fetchRoomDetails(roomId)}
                        dimmer={<Dimmer active page><Loader /></Dimmer>}
                        key={key}>
-                {() => (
-                    <RoomDetailsModal roomId={roomId}
-                                      onClose={onClose}
-                                      onBook={openBookRoom} />
-                )}
+                {render}
             </Preloader>
         );
+    }
+
+    renderRoomDetails(roomId, onClose, bookingPage = false) {
+        const {actions: {openBookRoom, openBookingForm}, bookRoomFilters: {dates, timeSlot, recurrence}} = this.props;
+        // if we are on the booking page, we have booking data in the redux state
+        // and do not need to go through the bootstrap dialog
+        const onBook = bookingPage
+            ? (id) => openBookingForm(id, {dates, timeSlot, recurrence})
+            : openBookRoom;
+        return this.withRoomPreloader('roomDetails', roomId, () => (
+            <RoomDetailsModal roomId={roomId} onClose={onClose} onBook={onBook} />
+        ));
+    }
+
+    renderBookRoom(roomId, onClose) {
+        return this.withRoomPreloader('bookRoom', roomId, () => (
+            <BookFromListModal roomId={roomId} onClose={onClose} />
+        ));
+    }
+
+    renderBookingForm(data, onClose) {
+        const {roomId, filters} = JSON.parse(data);
+        return this.withRoomPreloader('bookingForm', roomId, () => (
+            <BookRoomModal open roomId={roomId} onClose={onClose} bookingData={filters} />
+        ));
     }
 
     render() {
@@ -96,19 +125,30 @@ class ModalController extends React.PureComponent {
         if (isInitializing) {
             return null;
         }
-        return this.getQueryData().map(([[name, value], orig]) => {
-            if (name === 'room-details') {
-                return this.renderRoomDetails(value, this.makeCloseHandler(orig));
-            } else {
-                return null;
-            }
-        });
+        const queryData = this.getQueryData();
+        if (!queryData) {
+            return null;
+        }
+        const [[name, value], orig] = queryData;
+        const closeHandler = this.makeCloseHandler(orig);
+        if (name === 'booking-form') {
+            return this.renderBookingForm(value, closeHandler);
+        } else if (name === 'book-room') {
+            return this.renderBookRoom(value, closeHandler);
+        } else if (name === 'room-details') {
+            return this.renderRoomDetails(value, closeHandler);
+        } else if (name === 'room-details-book') {
+            return this.renderRoomDetails(value, closeHandler, true);
+        } else {
+            return null;
+        }
     }
 }
 
 export default connect(
     state => ({
         isInitializing: globalSelectors.isInitializing(state),
+        bookRoomFilters: bookRoomSelectors.getFilters(state),
         path: state.router.location.pathname,
         queryString: state.router.location.search.substr(1),
     }),
@@ -117,6 +157,7 @@ export default connect(
             pushState: push,
             fetchRoomDetails: roomsActions.fetchDetails,
             openBookRoom: modalActions.openBookRoom,
+            openBookingForm: modalActions.openBookingForm,
         }, dispatch),
     }),
 )(ModalController);

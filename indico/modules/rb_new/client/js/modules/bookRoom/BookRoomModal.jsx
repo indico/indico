@@ -19,6 +19,7 @@ import _ from 'lodash';
 import moment from 'moment';
 import React from 'react';
 import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
 import PropTypes from 'prop-types';
 import {Button, Checkbox, Form, Grid, Icon, Label, Message, Modal, Radio, Segment, Popup} from 'semantic-ui-react';
 import {Form as FinalForm, Field} from 'react-final-form';
@@ -33,6 +34,7 @@ import recurrenceRenderer from './filters/RecurrenceRenderer';
 import RoomBasicDetails from '../../components/RoomBasicDetails';
 import {DailyTimelineContent, TimelineLegend} from '../../common/timeline';
 import * as actions from './actions';
+import {selectors as userSelectors} from '../../common/user';
 
 import './BookRoomModal.module.scss';
 
@@ -126,12 +128,15 @@ class BookRoomModal extends React.Component {
         room: PropTypes.object,
         user: PropTypes.object.isRequired,
         bookingData: PropTypes.object.isRequired,
-        onSubmit: PropTypes.func.isRequired,
         onClose: PropTypes.func.isRequired,
         availability: PropTypes.object,
-        fetchAvailability: PropTypes.func.isRequired,
         favoriteUsers: PropTypes.array.isRequired,
         timeInformationComponent: PropTypes.func,
+        actions: PropTypes.exact({
+            createBooking: PropTypes.func.isRequired,
+            fetchAvailability: PropTypes.func.isRequired,
+            resetAvailability: PropTypes.func.isRequired,
+        }).isRequired,
     };
 
     static defaultProps = {
@@ -148,10 +153,13 @@ class BookRoomModal extends React.Component {
     };
 
     componentDidMount() {
-        const {availability, fetchAvailability} = this.props;
-        if (!availability) {
-            fetchAvailability();
-        }
+        const {actions: {fetchAvailability}, room, bookingData} = this.props;
+        fetchAvailability(room, bookingData);
+    }
+
+    componentWillUnmount() {
+        const {actions: {resetAvailability}} = this.props;
+        resetAvailability();
     }
 
     renderPrincipalSearchField = ({input, ...props}) => {
@@ -295,8 +303,8 @@ class BookRoomModal extends React.Component {
     }
 
     submitBooking = async (data) => {
-        const {onSubmit} = this.props;
-        const rv = await onSubmit(data, this.props);
+        const {actions: {createBooking}} = this.props;
+        const rv = await createBooking(data, this.props);
         if (rv.error) {
             return rv.error;
         } else {
@@ -427,54 +435,31 @@ class BookRoomModal extends React.Component {
     }
 }
 
-const mapStateToProps = (state, {roomId}) => {
-    const {
-        bookRoom: {filters: {recurrence, dates, timeSlot}, bookingForm: {availability}},
-        user,
-    } = state;
-    const room = roomsSelectors.getRoom(state, {roomId});
-    return {
-        bookingData: {recurrence, dates, timeSlot},
-        favoriteUsers: user.info.favoriteUsers,
-        availability,
-        user,
-        room,
-    };
-};
-
-const mapDispatchToProps = (dispatch) => ({
-    onSubmit: (
-        {reason, usage, user, isPrebooking},
-        {bookingData: {recurrence, dates, timeSlot}, room}) => {
-        return dispatch(actions.createBooking({
-            reason,
-            usage,
-            user,
-            recurrence,
-            dates,
-            timeSlot,
-            room,
-            isPrebooking
-        }));
-    },
-    dispatch
-});
-
-const mergeProps = (stateProps, dispatchProps, ownProps) => {
-    const {bookingData: filters, room} = stateProps;
-    const {dispatch, ...realDispatchProps} = dispatchProps;
-    return {
-        ...stateProps,
-        ...realDispatchProps,
-        ...ownProps,
-        fetchAvailability() {
-            dispatch(actions.fetchBookingAvailability(room, filters));
-        }
-    };
-};
-
 export default connect(
-    mapStateToProps,
-    mapDispatchToProps,
-    mergeProps,
+    (state, {roomId}) => ({
+        favoriteUsers: userSelectors.getFavoriteUsers(state),
+        availability: state.bookRoom.bookingForm.availability,
+        user: state.user,
+        room: roomsSelectors.getRoom(state, {roomId}),
+    }),
+    dispatch => ({
+        actions: bindActionCreators({
+            fetchAvailability: actions.fetchBookingAvailability,
+            resetAvailability: actions.resetBookingAvailability,
+            createBooking: (data, props) => {
+                const {reason, usage, user, isPrebooking} = data;
+                const {bookingData: {recurrence, dates, timeSlot}, room} = props;
+                return actions.createBooking({
+                    reason,
+                    usage,
+                    user,
+                    recurrence,
+                    dates,
+                    timeSlot,
+                    room,
+                    isPrebooking
+                });
+            },
+        }, dispatch)
+    })
 )(BookRoomModal);

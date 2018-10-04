@@ -17,21 +17,19 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
+import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
-import {stateToQueryString} from 'redux-router-querystring';
 import {Grid, Icon, Modal, Message} from 'semantic-ui-react';
-import {push} from 'connected-react-router';
 
 import {Translate} from 'indico/react/i18n';
 import {Overridable} from 'indico/react/util';
 
-import {queryStringRules as queryStringSerializer} from '../../common/roomSearch';
 import RoomBasicDetails from '../RoomBasicDetails';
-import {actions as filtersActions} from '../../common/filters';
 import * as bookRoomActions from '../../modules/bookRoom/actions';
 import BookingBootstrapForm from '../BookingBootstrapForm';
 import {selectors as roomsSelectors} from '../../common/rooms';
 import {selectors as bookRoomSelectors} from '../../modules/bookRoom';
+import {actions as modalActions} from '../../modals';
 
 import './RoomDetailsModal.module.scss';
 
@@ -78,12 +76,14 @@ class BookFromListModal extends React.Component {
     static propTypes = {
         room: PropTypes.object.isRequired,
         refreshCollisions: PropTypes.func.isRequired,
-        resetCollisions: PropTypes.func.isRequired,
         onClose: PropTypes.func,
-        onBook: PropTypes.func.isRequired,
         availability: PropTypes.object,
         availabilityLoading: PropTypes.bool.isRequired,
-        defaults: PropTypes.object
+        defaults: PropTypes.object,
+        actions: PropTypes.exact({
+            resetCollisions: PropTypes.func.isRequired,
+            openBookingForm: PropTypes.func.isRequired,
+        }).isRequired,
     };
 
     static defaultProps = {
@@ -93,13 +93,18 @@ class BookFromListModal extends React.Component {
     };
 
     handleCloseModal = () => {
-        const {onClose, resetCollisions} = this.props;
+        const {onClose, actions: {resetCollisions}} = this.props;
         resetCollisions();
         onClose();
     };
 
+    handleBook = (data) => {
+        const {room, actions: {openBookingForm}} = this.props;
+        openBookingForm(room.id, data);
+    };
+
     render() {
-        const {room, refreshCollisions, availability, availabilityLoading, onBook, defaults} = this.props;
+        const {room, refreshCollisions, availability, availabilityLoading, defaults} = this.props;
         const buttonDisabled = availabilityLoading || !availability || availability.num_days_available === 0;
         return (
             <Modal open onClose={this.handleCloseModal} size="large" closeIcon>
@@ -116,7 +121,7 @@ class BookFromListModal extends React.Component {
                                 <BookingBootstrapForm buttonCaption={<Translate>Book</Translate>}
                                                       buttonDisabled={buttonDisabled}
                                                       onChange={refreshCollisions}
-                                                      onSearch={onBook}
+                                                      onSearch={this.handleBook}
                                                       defaults={defaults}>
                                     {availability && <ConflictIndicator availability={availability} />}
                                 </BookingBootstrapForm>
@@ -136,9 +141,10 @@ export default connect(
         availabilityLoading: bookRoomSelectors.isFetchingFormTimeline(state),
     }),
     (dispatch) => ({
-        resetCollisions() {
-            dispatch(bookRoomActions.resetBookingAvailability());
-        },
+        actions: bindActionCreators({
+            resetCollisions: bookRoomActions.resetBookingAvailability,
+            openBookingForm: modalActions.openBookingForm,
+        }, dispatch),
         dispatch,
     }),
     (stateProps, dispatchProps, ownProps) => {
@@ -150,11 +156,6 @@ export default connect(
             ...realDispatchProps,
             refreshCollisions(filters) {
                 dispatch(bookRoomActions.fetchBookingAvailability(room, filters));
-            },
-            onBook(filters) {
-                const qs = stateToQueryString({filters}, queryStringSerializer);
-                dispatch(filtersActions.setFilters('bookRoom', filters));
-                dispatch(push(`/book/${room.id}/confirm?${qs}`));
             },
         };
     }

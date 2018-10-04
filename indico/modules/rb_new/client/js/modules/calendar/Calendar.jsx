@@ -142,11 +142,6 @@ class Calendar extends React.Component {
                         </div>
                     </Container>
                 </Grid.Row>
-                {/*
-                <Route exact path="/calendar/:roomId/book" render={roomPreloader((roomId) => (
-                    <BookFromListModal roomId={roomId} onClose={this.closeModal} />
-                ), fetchRoomDetails)} />
-                */}
                 {bookingRoomId && (
                     <Preloader checkCached={state => !!roomsSelectors.hasDetails(state, {roomId: bookingRoomId})}
                                action={() => fetchRoomDetails(bookingRoomId)}

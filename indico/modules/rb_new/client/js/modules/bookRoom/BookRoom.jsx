@@ -22,7 +22,6 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {bindActionCreators} from 'redux';
 import _ from 'lodash';
-import {Route} from 'react-router-dom';
 import {Button, Card, Grid, Header, Icon, Label, Loader, Message, Popup, Sticky} from 'semantic-ui-react';
 import LazyScroll from 'redux-lazy-scroll';
 
@@ -34,16 +33,14 @@ import Room from '../../containers/Room';
 import BookingFilterBar from './BookingFilterBar';
 import {roomFilterBarFactory} from '../../modules/roomList';
 import BookingTimeline from './BookingTimeline';
-import BookRoomModal from './BookRoomModal';
 import SearchResultCount from './SearchResultCount';
 import {TimelineHeader} from '../../common/timeline';
-import {roomPreloader, pushStateMergeProps, isDateWithinRange} from '../../util';
+import {isDateWithinRange} from '../../util';
 import {queryStringRules as qsFilterRules} from '../../common/roomSearch';
 import {rules as qsBookRoomRules} from './queryString';
 import * as bookRoomActions from './actions';
 import {actions as filtersActions} from '../../common/filters';
 import * as bookRoomSelectors from './selectors';
-import {actions as roomsActions} from '../../common/rooms';
 import {mapControllerFactory, selectors as mapSelectors} from '../../common/map';
 import {actions as modalActions} from '../../modals';
 
@@ -65,18 +62,16 @@ class BookRoom extends React.Component {
         totalResultCount: PropTypes.number.isRequired,
         filters: PropTypes.object.isRequired,
         suggestions: PropTypes.arrayOf(PropTypes.object).isRequired,
-        pushState: PropTypes.func.isRequired,
         showMap: PropTypes.bool.isRequired,
         actions: PropTypes.exact({
             setFilterParameter: PropTypes.func.isRequired,
             clearTextFilter: PropTypes.func.isRequired,
             searchRooms: PropTypes.func.isRequired,
-            fetchRoomDetails: PropTypes.func.isRequired,
             fetchRoomSuggestions: PropTypes.func.isRequired,
             resetRoomSuggestions: PropTypes.func.isRequired,
-            resetBookingAvailability: PropTypes.func.isRequired,
             toggleTimelineView: PropTypes.func.isRequired,
             openRoomDetails: PropTypes.func.isRequired,
+            openBookingForm: PropTypes.func.isRequired,
         }).isRequired,
         dateRange: PropTypes.array.isRequired,
         showSuggestions: PropTypes.bool
@@ -123,24 +118,44 @@ class BookRoom extends React.Component {
         this.setState({maxVisibleRooms: 20, suggestionsRequested: false});
     }
 
-    renderRoom = (room) => {
-        const {id} = room;
-        const {pushState, actions: {openRoomDetails}} = this.props;
+    openBookingForm(room, overrides = {}) {
+        const {actions: {openBookingForm}, filters: {dates, timeSlot, recurrence}} = this.props;
+        const bookingData = {dates, timeSlot, recurrence};
+        if (overrides.time) {
+            const {startTime, endTime} = timeSlot;
+            bookingData.timeSlot = {
+                startTime: serializeTime(moment(startTime, 'HH:mm').add(overrides.time, 'minutes')),
+                endTime: serializeTime(moment(endTime, 'HH:mm').add(overrides.time, 'minutes')),
+            };
+        } else if (overrides.duration) {
+            const {startTime, endTime} = timeSlot;
+            bookingData.timeSlot = {
+                startTime,
+                endTime: serializeTime(moment(endTime, 'HH:mm').subtract(overrides.duration, 'minutes'))
+            };
+        }
+        openBookingForm(room.id, bookingData);
+    }
 
+    renderRoom = (room) => {
+        const {actions: {openRoomDetails}} = this.props;
         const bookingModalBtn = (
-            <Button positive icon="check" circular onClick={() => {
-                // open confirm dialog, keep same filtering parameters
-                pushState(`/book/${id}/confirm`, true);
-            }} />
+            <Button positive icon="check" circular onClick={() => this.openBookingForm(room)} />
         );
         const showDetailsBtn = (
-            <Button primary icon="search" circular onClick={() => openRoomDetails(id)} />
+            <Button primary icon="search" circular onClick={() => openRoomDetails(room.id)} />
         );
         return (
             <Room key={room.id} room={room} showFavoriteButton>
                 <Slot name="actions">
-                    <Popup trigger={bookingModalBtn} content={Translate.string('Book room')} position="top center" hideOnScroll />
-                    <Popup trigger={showDetailsBtn} content={Translate.string('Room details')} position="top center" hideOnScroll />
+                    <Popup trigger={bookingModalBtn}
+                           content={Translate.string('Book room')}
+                           position="top center"
+                           hideOnScroll />
+                    <Popup trigger={showDetailsBtn}
+                           content={Translate.string('Room details')}
+                           position="top center"
+                           hideOnScroll />
                 </Slot>
             </Room>
         );
@@ -293,16 +308,11 @@ class BookRoom extends React.Component {
         );
     };
 
-    suggestionTooltip = (element) => (
-        <Popup trigger={element} content={Translate.string('The filtering criteria will be adjusted accordingly')} />
-    );
-
     renderSuggestionText = (room, {time, duration, skip}) => {
-        const {pushState} = this.props;
         return (
             <>
-                {time && this.suggestionTooltip(
-                    <Message styleName="suggestion-text" size="mini" onClick={() => this.updateFilters('time', time)}
+                {time && (
+                    <Message styleName="suggestion-text" size="mini" onClick={() => this.openBookingForm(room, {time})}
                              warning compact>
                         <Message.Header>
                             <Icon name="clock" />
@@ -323,8 +333,8 @@ class BookRoom extends React.Component {
                         <Label color="brown" circular>{Translate.string('or')}</Label>
                     </div>
                 )}
-                {duration && this.suggestionTooltip(
-                    <Message styleName="suggestion-text" size="mini" onClick={() => this.updateFilters('duration', duration)}
+                {duration && (
+                    <Message styleName="suggestion-text" size="mini" onClick={() => this.openBookingForm(room, {duration})}
                              warning compact>
                         <Message.Header>
                             <Icon name="hourglass full" /> {PluralTranslate.string('One minute shorter', '{duration} minutes shorter', duration, {duration})}
@@ -332,9 +342,8 @@ class BookRoom extends React.Component {
                     </Message>
                 )}
                 {skip && (
-                    <Message styleName="suggestion-text" size="mini" onClick={() => {
-                        pushState(`/book/${room.id}/confirm`, true);
-                    }} warning compact>
+                    <Message styleName="suggestion-text" size="mini" onClick={() => this.openBookingForm(room)}
+                             warning compact>
                         <Message.Header>
                             <Icon name="calendar times" /> {PluralTranslate.string('Skip one day', 'Skip {skip} days', skip, {skip})}
                         </Message.Header>
@@ -342,19 +351,6 @@ class BookRoom extends React.Component {
                 )}
             </>
         );
-    };
-
-    updateFilters = (filter, value) => {
-        const {actions: {setFilterParameter}} = this.props;
-        let {filters: {timeSlot: {startTime, endTime}}} = this.props;
-
-        if (filter === 'duration') {
-            endTime = serializeTime(moment(endTime, 'HH:mm').subtract(value, 'minutes'));
-        } else if (filter === 'time') {
-            startTime = serializeTime(moment(startTime, 'HH:mm').add(value, 'minutes'));
-            endTime = serializeTime(moment(endTime, 'HH:mm').add(value, 'minutes'));
-        }
-        setFilterParameter('timeSlot', {startTime, endTime});
     };
 
     renderViewSwitch() {
@@ -419,19 +415,8 @@ class BookRoom extends React.Component {
         this.setState({[kind]: ref});
     };
 
-    closeBookingModal = () => {
-        const {actions: {resetBookingAvailability}} = this.props;
-        resetBookingAvailability();
-        this.closeModal();
-    };
-
-    closeModal = () => {
-        const {pushState} = this.props;
-        pushState(`/book`, true);
-    };
-
     render() {
-        const {actions: {fetchRoomDetails}, showMap} = this.props;
+        const {showMap} = this.props;
         return (
             <Grid columns={2}>
                 <Grid.Column computer={showMap ? 11 : 16} mobile={16}>
@@ -442,9 +427,6 @@ class BookRoom extends React.Component {
                         <MapController />
                     </Grid.Column>
                 )}
-                <Route exact path="/book/:roomId/confirm" render={roomPreloader((roomId) => (
-                    <BookRoomModal open roomId={roomId} onClose={this.closeBookingModal} />
-                ), fetchRoomDetails)} />
             </Grid>
         );
     }
@@ -473,17 +455,14 @@ const mapDispatchToProps = dispatch => ({
         clearTextFilter: () => filtersActions.setFilterParameter('bookRoom', 'text', null),
         fetchRoomSuggestions: bookRoomActions.fetchRoomSuggestions,
         resetRoomSuggestions: bookRoomActions.resetRoomSuggestions,
-        fetchRoomDetails: roomsActions.fetchDetails,
-        resetBookingAvailability: bookRoomActions.resetBookingAvailability,
         setFilterParameter: (param, value) => filtersActions.setFilterParameter('bookRoom', param, value),
         toggleTimelineView: bookRoomActions.toggleTimelineView,
-        openRoomDetails: modalActions.openRoomDetails,
+        openRoomDetails: modalActions.openRoomDetailsBook,
+        openBookingForm: modalActions.openBookingForm,
     }, dispatch),
-    dispatch
 });
 
 export default connect(
     mapStateToProps,
     mapDispatchToProps,
-    pushStateMergeProps
 )(BookRoom);
