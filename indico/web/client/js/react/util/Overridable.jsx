@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
+import {withRouter} from 'react-router-dom';
 
 
 function Overridable({children, overrides, id, ...restProps}) {
@@ -26,6 +27,10 @@ Overridable.defaultProps = {
     children: null
 };
 
-export default connect(({_overrides}) => ({
+const ConnectedOverriable = connect(({_overrides}) => ({
     overrides: _overrides
 }))(Overridable);
+
+
+export default ConnectedOverriable;
+export const RouteAwareOverridable = withRouter(ConnectedOverriable);

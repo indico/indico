@@ -22,7 +22,7 @@ import {ConnectedRouter} from 'connected-react-router';
 import {Dimmer, Icon, Loader} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
-import {Overridable} from 'indico/react/util';
+import {Overridable, RouteAwareOverridable} from 'indico/react/util';
 import UserActions from '../containers/UserActions';
 import Landing from '../modules/landing';
 import Calendar from '../modules/calendar';
@@ -84,9 +84,9 @@ export default class App extends React.Component {
                             </h1>
                         </div>
                         <div styleName="rb-menu-bar-menu">
-                            <Overridable id="Menu">
+                            <RouteAwareOverridable id="Menu">
                                 <Menu />
-                            </Overridable>
+                            </RouteAwareOverridable>
                         </div>
                         <div styleName="rb-menu-bar-side-right">
                             <UserActions />
