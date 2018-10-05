@@ -14,20 +14,17 @@
  * You should have received a copy of the GNU General Public License
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
+
 import React from 'react';
 import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
 import PropTypes from 'prop-types';
 import {Icon, Label, Menu, Message, Popup} from 'semantic-ui-react';
-import {stateToQueryString} from 'redux-router-querystring';
-import {Route, withRouter} from 'react-router-dom';
 import {Translate, Param} from 'indico/react/i18n';
-import {queryStringRules as qsFilterRules} from '../../common/roomSearch';
-import {rules as qsBookRoomRules} from './queryString';
+import {actions as modalActions} from '../../modals';
+import * as selectors from './selectors';
 
 import './BookRoom.module.scss';
-import * as selectors from './selectors';
-import {pushStateMergeProps} from '../../util';
-import UnavailableRoomsModal from './UnavailableRoomsModal';
 
 
 class SearchResultCount extends React.Component {
@@ -35,7 +32,9 @@ class SearchResultCount extends React.Component {
         isSearching: PropTypes.bool.isRequired,
         matching: PropTypes.number,
         total: PropTypes.number,
-        pushState: PropTypes.func.isRequired
+        actions: PropTypes.exact({
+            openUnavailableRooms: PropTypes.func.isRequired,
+        }).isRequired,
     };
 
     static defaultProps = {
@@ -86,9 +85,10 @@ class SearchResultCount extends React.Component {
     }
 
     renderUnavailable(count) {
+        const {actions: {openUnavailableRooms}} = this.props;
         const label = <Label color="red" horizontal size="small">{count}</Label>;
         const trigger = (
-            <Menu.Item link onClick={this.openUnavailableRoomsModal}>
+            <Menu.Item link onClick={openUnavailableRooms}>
                 <Icon name="remove" />
                 <Translate>
                     Unavailable
@@ -121,16 +121,6 @@ class SearchResultCount extends React.Component {
                      content={Translate.string('No rooms are available during that timeslot')} />
         );
     }
-
-    openUnavailableRoomsModal = () => {
-        const {pushState} = this.props;
-        pushState('/book/unavailable', true);
-    };
-
-    closeModal = () => {
-        const {pushState} = this.props;
-        pushState(`/book`, true);
-    };
 
     render() {
         const {isSearching, matching, total} = this.props;
@@ -166,21 +156,18 @@ class SearchResultCount extends React.Component {
                         {total === 0 && this.renderNoRooms()}
                     </>
                 )}
-                <Route exact path="/book/unavailable" render={() => (
-                    <UnavailableRoomsModal onClose={this.closeModal} />
-                )} />
             </div>
         );
     }
 }
 
-export default withRouter(connect(
+export default connect(
     state => ({
         isSearching: selectors.isSearching(state),
-        queryString: stateToQueryString(state.bookRoom, qsFilterRules, qsBookRoomRules)
     }),
     dispatch => ({
-        dispatch
+        actions: bindActionCreators({
+            openUnavailableRooms: modalActions.openUnavailableRooms,
+        }, dispatch),
     }),
-    pushStateMergeProps
-)(SearchResultCount));
+)(SearchResultCount);

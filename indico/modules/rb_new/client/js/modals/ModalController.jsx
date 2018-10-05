@@ -30,6 +30,7 @@ import {actions as roomsActions, selectors as roomsSelectors} from '../common/ro
 import RoomDetailsModal from '../components/modals/RoomDetailsModal';
 import BookFromListModal from '../components/modals/BookFromListModal';
 import BookRoomModal from '../modules/bookRoom/BookRoomModal';
+import UnavailableRoomsModal from '../modules/bookRoom/UnavailableRoomsModal';
 import {BlockingPreloader, BlockingModal} from '../modules/blockings';
 import * as globalSelectors from '../selectors';
 import * as modalActions from './actions';
@@ -63,7 +64,7 @@ class ModalController extends React.PureComponent {
         if (Array.isArray(modalData)) {
             modalData = modalData[modalData.length - 1];
         }
-        const match = modalData.match(/^([^:]+):([^:]+)(?::(.+))?$/); // foo:bar[:...]
+        const match = modalData.match(/^([^:]+)(?::([^:]+)(?::(.+))?)?$/); // foo[:bar[:...]]
         if (!match) {
             return null;
         }
@@ -136,6 +137,10 @@ class ModalController extends React.PureComponent {
         ));
     }
 
+    renderUnavailableRooms(onClose) {
+        return <UnavailableRoomsModal onClose={onClose} />;
+    }
+
     renderBookingForm(roomId, data, onClose) {
         const {bookRoomFilters: {dates, timeSlot, recurrence}} = this.props;
         if (!data) {
@@ -162,6 +167,8 @@ class ModalController extends React.PureComponent {
             return this.renderBookingForm(+value, payload, closeHandler);
         } else if (name === 'book-room') {
             return this.renderBookRoom(+value, payload, closeHandler);
+        } else if (name === 'unavailable-rooms') {
+            return this.renderUnavailableRooms(closeHandler);
         } else if (name === 'room-details') {
             return this.renderRoomDetails(+value, closeHandler);
         } else if (name === 'room-details-book') {
