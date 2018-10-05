@@ -19,7 +19,7 @@ import React from 'react';
 import {bindActionCreators} from 'redux';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import {Modal} from 'semantic-ui-react';
+import {Dimmer, Loader, Modal} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
 import * as selectors from './selectors';
 import * as actions from './actions';
@@ -50,7 +50,7 @@ class UnavailableRoomsModal extends React.Component {
     render() {
         const {availability, dateRange, filters, isFetching, onClose} = this.props;
         if (!dateRange || availability.length === 0) {
-            return null;
+            return <Dimmer active page><Loader /></Dimmer>;
         }
 
         return (
