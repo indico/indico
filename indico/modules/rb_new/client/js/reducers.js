@@ -26,7 +26,7 @@ import {reducer as landingReducer} from './modules/landing';
 import {reducer as roomListReducer} from './modules/roomList';
 
 
-export default {
+export default () => ({
     config: configReducer,
     user: userReducer,
     bookRoom: bookRoomReducer,
@@ -36,4 +36,4 @@ export default {
     blockings: blockingsReducer,
     calendar: calendarReducer,
     landing: landingReducer,
-};
+});

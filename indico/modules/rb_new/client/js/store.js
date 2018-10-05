@@ -20,7 +20,7 @@ import {queryStringMiddleware} from 'redux-router-querystring';
 import {connectRouter, routerMiddleware} from 'connected-react-router';
 import createReduxStore from 'indico/utils/redux';
 
-import reducers from './reducers';
+import getReducers from './reducers';
 import {queryStringReducer as qsRoomSearchReducer} from './common/roomSearch';
 import {routeConfig as roomListRouteConfig} from './modules/roomList';
 import {routeConfig as bookRoomRouteConfig, queryStringReducer as qsBookRoomReducer} from './modules/bookRoom';
@@ -48,7 +48,7 @@ export const history = createHistory({
 export default function createRBStore(overrides = {}) {
     return createReduxStore(
         'rb-new',
-        reducers,
+        getReducers(),
         {_overrides: overrides},
         [
             routerMiddleware(history),
