@@ -19,5 +19,6 @@ import {RequestState} from 'indico/utils/redux';
 
 
 export const getAllBlockings = ({blockings}) => blockings.blockings;
+export const getBlocking = (state, {blockingId}) => getAllBlockings(state)[blockingId];
 export const isFetchingBlockings = ({blockings}) => blockings.requests.blockings.state === RequestState.STARTED;
 export const getFilters = ({blockings}) => blockings.filters;

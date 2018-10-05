@@ -50,10 +50,11 @@ _bp.add_url_rule('/api/equipment', 'equipment_types', locations.RHEquipmentTypes
 _bp.add_url_rule('/api/booking/create', 'create_booking', bookings.RHCreateBooking,
                  methods=('POST',))
 _bp.add_url_rule('/api/suggestions', 'suggestions', bookings.RHRoomSuggestions)
-_bp.add_url_rule('/api/blockings', 'blockings', blockings.RHRoomBlockings)
 _bp.add_url_rule('/api/locations', 'locations', locations.RHLocations)
-_bp.add_url_rule('/api/blockings/create', 'create_blocking', blockings.RHCreateRoomBlocking, methods=('POST',))
-_bp.add_url_rule('/api/blockings/<int:blocking_id>/update', 'update_blocking', blockings.RHUpdateRoomBlocking,
+_bp.add_url_rule('/api/blockings/', 'blockings', blockings.RHRoomBlockings)
+_bp.add_url_rule('/api/blockings/', 'create_blocking', blockings.RHCreateRoomBlocking, methods=('POST',))
+_bp.add_url_rule('/api/blockings/<int:blocking_id>', 'blocking', blockings.RHRoomBlocking)
+_bp.add_url_rule('/api/blockings/<int:blocking_id>', 'update_blocking', blockings.RHUpdateRoomBlocking,
                  methods=('PATCH',))
 _bp.add_url_rule('/rooms-sprite-<version>.jpg', 'sprite', misc.RHRoomsSprite)
 _bp.add_url_rule('/rooms-sprite.jpg', 'sprite', misc.RHRoomsSprite)

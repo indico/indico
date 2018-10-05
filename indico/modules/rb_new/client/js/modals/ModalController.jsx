@@ -30,6 +30,7 @@ import {actions as roomsActions, selectors as roomsSelectors} from '../common/ro
 import RoomDetailsModal from '../components/modals/RoomDetailsModal';
 import BookFromListModal from '../components/modals/BookFromListModal';
 import BookRoomModal from '../modules/bookRoom/BookRoomModal';
+import {BlockingPreloader, BlockingModal} from '../modules/blockings';
 import * as globalSelectors from '../selectors';
 import * as modalActions from './actions';
 import {selectors as bookRoomSelectors} from '../modules/bookRoom';
@@ -112,6 +113,10 @@ class ModalController extends React.PureComponent {
         ));
     }
 
+    renderBlockingDetails(blockingId, onClose) {
+        return <BlockingPreloader blockingId={blockingId} component={BlockingModal} onClose={onClose} />;
+    }
+
     renderBookRoom(roomId, defaults, onClose) {
         if (defaults) {
             defaults = {
@@ -154,13 +159,15 @@ class ModalController extends React.PureComponent {
         const {orig, name, value, payload} = queryData;
         const closeHandler = this.makeCloseHandler(orig);
         if (name === 'booking-form') {
-            return this.renderBookingForm(value, payload, closeHandler);
+            return this.renderBookingForm(+value, payload, closeHandler);
         } else if (name === 'book-room') {
-            return this.renderBookRoom(value, payload, closeHandler);
+            return this.renderBookRoom(+value, payload, closeHandler);
         } else if (name === 'room-details') {
-            return this.renderRoomDetails(value, closeHandler);
+            return this.renderRoomDetails(+value, closeHandler);
         } else if (name === 'room-details-book') {
-            return this.renderRoomDetails(value, closeHandler, true);
+            return this.renderRoomDetails(+value, closeHandler, true);
+        } else if (name === 'blocking-details') {
+            return this.renderBlockingDetails(+value, closeHandler);
         } else {
             return null;
         }

@@ -16,6 +16,7 @@
  */
 
 import fetchBlockingsURL from 'indico-url:rooms_new.blockings';
+import fetchBlockingURL from 'indico-url:rooms_new.blocking';
 import createBlockingURL from 'indico-url:rooms_new.create_blocking';
 import updateBlockingURL from 'indico-url:rooms_new.update_blocking';
 
@@ -30,6 +31,11 @@ export const FETCH_BLOCKINGS_REQUEST = 'blockings/FETCH_BLOCKINGS_REQUEST';
 export const FETCH_BLOCKINGS_SUCCESS = 'blockings/FETCH_BLOCKINGS_SUCCESS';
 export const FETCH_BLOCKINGS_ERROR = 'blockings/FETCH_BLOCKINGS_ERROR';
 export const BLOCKINGS_RECEIVED = 'blockings/BLOCKINGS_RECEIVED';
+
+export const FETCH_BLOCKING_REQUEST = 'blockings/FETCH_BLOCKING_REQUEST';
+export const FETCH_BLOCKING_SUCCESS = 'blockings/FETCH_BLOCKING_SUCCESS';
+export const FETCH_BLOCKING_ERROR = 'blockings/FETCH_BLOCKING_ERROR';
+export const BLOCKING_RECEIVED = 'blockings/BLOCKING_RECEIVED';
 
 export const CREATE_BLOCKING_REQUEST = 'blockings/CREATE_BLOCKING_REQUEST';
 export const CREATE_BLOCKING_SUCCESS = 'blockings/CREATE_BLOCKING_SUCCESS';
@@ -55,6 +61,17 @@ export function fetchBlockings() {
     };
 }
 
+export function fetchBlocking(blockingId) {
+    return async (dispatch) => {
+        return await ajaxAction(
+            () => indicoAxios.get(fetchBlockingURL({blocking_id: blockingId})),
+            FETCH_BLOCKING_REQUEST,
+            [BLOCKING_RECEIVED, FETCH_BLOCKING_SUCCESS],
+            FETCH_BLOCKING_ERROR
+        )(dispatch);
+    };
+}
+
 export function setFilterParameter(param, value) {
     return filtersActions.setFilterParameter(FILTER_NAMESPACE, param, value);
 }
@@ -71,10 +88,8 @@ export function updateBlocking(blockingId, formData) {
     const data = preProcessParameters(formData, ajaxRules);
     return submitFormAction(
         () => indicoAxios.patch(updateBlockingURL({blocking_id: blockingId}), data),
-        UPDATE_BLOCKING_REQUEST, UPDATE_BLOCKING_SUCCESS, UPDATE_BLOCKING_ERROR
+        UPDATE_BLOCKING_REQUEST,
+        [BLOCKING_RECEIVED, UPDATE_BLOCKING_SUCCESS],
+        UPDATE_BLOCKING_ERROR
     );
-}
-
-export function updateBlockingsList(blockings) {
-    return {type: BLOCKINGS_RECEIVED, data: blockings};
 }

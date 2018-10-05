@@ -36,16 +36,23 @@ export default combineReducers({
             blockingsActions.FETCH_BLOCKINGS_SUCCESS,
             blockingsActions.FETCH_BLOCKINGS_ERROR
         ),
+        blocking: requestReducer(
+            blockingsActions.FETCH_BLOCKING_REQUEST,
+            blockingsActions.FETCH_BLOCKING_SUCCESS,
+            blockingsActions.FETCH_BLOCKING_ERROR
+        ),
         create: requestReducer(
             blockingsActions.CREATE_BLOCKING_REQUEST,
             blockingsActions.CREATE_BLOCKING_SUCCESS,
             blockingsActions.CREATE_BLOCKING_ERROR
         ),
     }),
-    blockings: (state = [], action) => {
+    blockings: (state = {}, action) => {
         switch (action.type) {
             case blockingsActions.BLOCKINGS_RECEIVED:
-                return action.data.map((blocking) => camelizeKeys(blocking));
+                return action.data.reduce((obj, b) => ({...obj, [b.id]: camelizeKeys(b)}), {});
+            case blockingsActions.BLOCKING_RECEIVED:
+                return {...state, [action.data.id]: camelizeKeys(action.data)};
             default:
                 return state;
         }

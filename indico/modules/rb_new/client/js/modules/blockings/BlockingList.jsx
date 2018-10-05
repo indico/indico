@@ -20,12 +20,10 @@ import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import {Container, Grid, Loader, Message} from 'semantic-ui-react';
-import {Route} from 'react-router-dom';
 import {Translate} from 'indico/react/i18n';
 import BlockingCard from './BlockingCard';
 import BlockingFilterBar from './BlockingFilterBar';
-import BlockingModal from './BlockingModal';
-import {pushStateMergeProps} from '../../util';
+import {actions as modalActions} from '../../modals';
 import * as blockingsActions from './actions';
 import * as blockingsSelectors from './selectors';
 
@@ -34,12 +32,12 @@ import './BlockingList.module.scss';
 
 class BlockingList extends React.Component {
     static propTypes = {
-        list: PropTypes.array.isRequired,
+        blockings: PropTypes.object.isRequired,
         isFetching: PropTypes.bool.isRequired,
-        pushState: PropTypes.func.isRequired,
         filters: PropTypes.object.isRequired,
         actions: PropTypes.exact({
             fetchBlockings: PropTypes.func.isRequired,
+            openBlockingDetails: PropTypes.func.isRequired,
         }).isRequired,
     };
 
@@ -56,57 +54,36 @@ class BlockingList extends React.Component {
     }
 
     renderBlocking = (blocking) => {
+        const {actions: {openBlockingDetails}} = this.props;
         return (
             <Grid.Column key={blocking.id}>
-                <BlockingCard blocking={blocking} onClick={() => this.openBlockingDetailsModal(blocking)} />
+                <BlockingCard blocking={blocking} onClick={() => openBlockingDetails(blocking.id)} />
             </Grid.Column>
         );
     };
 
-    openBlockingDetailsModal = (blocking) => {
-        const {pushState} = this.props;
-        pushState(`/blockings/${blocking.id}/details`);
-    };
-
-    closeBlockingDetailsModal = () => {
-        const {pushState} = this.props;
-        pushState(`/blockings`);
-    };
-
     render() {
-        const {list: blockings, isFetching} = this.props;
+        const {blockings, isFetching} = this.props;
+        const blockingsList = Object.values(blockings);
         return (
             <>
                 <Container styleName="blockings-container">
                     <BlockingFilterBar />
-                    {!isFetching && blockings.length !== 0 && (
+                    {!isFetching && blockingsList.length !== 0 && (
                         <>
                             <Grid columns={4} styleName="blockings-list" stackable>
-                                {blockings.map(this.renderBlocking)}
+                                {blockingsList.map(this.renderBlocking)}
                             </Grid>
                         </>
                     )}
                     {isFetching && <Loader inline="centered" active />}
-                    {!isFetching && blockings.length === 0 && (
+                    {!isFetching && blockingsList.length === 0 && (
                         <Message info>
                             <Translate>
                                 There are no blockings.
                             </Translate>
                         </Message>
                     )}
-                    <Route exact path="/blockings/:blockingId/details" render={({match: {params: {blockingId}}}) => {
-                        const blocking = blockings.find((blockingData) => blockingData.id === parseInt(blockingId, 10));
-                        if (!blocking) {
-                            return null;
-                        }
-
-                        return (
-                            <BlockingModal open
-                                           blocking={blocking}
-                                           onClose={this.closeBlockingDetailsModal}
-                                           mode="view" />
-                        );
-                    }} />
                 </Container>
             </>
         );
@@ -116,15 +93,14 @@ class BlockingList extends React.Component {
 
 export default connect(
     state => ({
-        list: blockingsSelectors.getAllBlockings(state),
+        blockings: blockingsSelectors.getAllBlockings(state),
         isFetching: blockingsSelectors.isFetchingBlockings(state),
         filters: blockingsSelectors.getFilters(state),
     }),
     dispatch => ({
         actions: bindActionCreators({
             fetchBlockings: blockingsActions.fetchBlockings,
+            openBlockingDetails: modalActions.openBlockingDetails,
         }, dispatch),
-        dispatch
-    }),
-    pushStateMergeProps
+    })
 )(BlockingList);

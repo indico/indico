@@ -18,6 +18,7 @@
 import _ from 'lodash';
 import moment from 'moment';
 import React from 'react';
+import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import {Button, Divider, Form, Grid, Message, Icon, Modal} from 'semantic-ui-react';
@@ -29,8 +30,7 @@ import PrincipalSearchField from 'indico/react/components/PrincipalSearchField';
 import DatePeriodField from 'indico/react/components/DatePeriodField';
 import {serializeDate} from 'indico/utils/date';
 import RoomSelector from '../../components/RoomSelector';
-import {getAllBlockings} from '../../modules/blockings/selectors';
-import {getFavoriteUsers} from '../../common/user/selectors';
+import {selectors as userSelectors} from '../../common/user';
 import * as blockingsActions from './actions';
 
 import './BlockingModal.module.scss';
@@ -53,12 +53,7 @@ function validate({dates, reason, rooms}) {
 class BlockingModal extends React.Component {
     static propTypes = {
         onClose: PropTypes.func.isRequired,
-        createBlocking: PropTypes.func.isRequired,
-        updateBlocking: PropTypes.func.isRequired,
-        updateBlockingsList: PropTypes.func.isRequired,
-        blockings: PropTypes.array.isRequired,
         favoriteUsers: PropTypes.array.isRequired,
-        open: PropTypes.bool,
         mode: PropTypes.oneOf(['view', 'edit', 'create']),
         blocking: PropTypes.shape({
             id: PropTypes.number,
@@ -68,12 +63,15 @@ class BlockingModal extends React.Component {
             endDate: PropTypes.string,
             reason: PropTypes.string,
             createdById: PropTypes.number
-        })
+        }),
+        actions: PropTypes.exact({
+            createBlocking: PropTypes.func.isRequired,
+            updateBlocking: PropTypes.func.isRequired,
+        }).isRequired,
     };
 
     static defaultProps = {
-        open: false,
-        mode: 'create',
+        mode: 'view',
         blocking: {
             blockingId: null,
             blockedRooms: [],
@@ -93,8 +91,8 @@ class BlockingModal extends React.Component {
         };
     }
 
-    processBlocking = async (formData) => {
-        const {createBlocking, updateBlocking, updateBlockingsList, blocking: {id}, blockings} = this.props;
+    handleSubmit = async (formData) => {
+        const {actions: {createBlocking, updateBlocking}, blocking: {id}} = this.props;
         const {mode} = this.state;
         let rv;
 
@@ -102,11 +100,6 @@ class BlockingModal extends React.Component {
             rv = await createBlocking(formData);
         } else if (mode === 'edit') {
             rv = await updateBlocking(id, formData);
-            if (!rv.error) {
-                const newBlockings = [...blockings];
-                newBlockings[blockings.findIndex((value) => value.id === id)] = rv.data.blocking;
-                updateBlockingsList(newBlockings);
-            }
         }
 
         if (rv.error) {
@@ -224,7 +217,7 @@ class BlockingModal extends React.Component {
         const {form: {mutators}, submitting, submitSucceeded} = fprops;
         const {mode} = this.state;
         const formProps = mode === 'view' ? {} : {onSubmit: fprops.handleSubmit, success: submitSucceeded};
-        const canEdit = !!blocking.id && mode !== 'edit' && blocking.canEdit;
+        const canEdit = !!blocking.id && blocking.canEdit;
 
         // set `touched` flag so in case of a validation error we properly
         // show the error label
@@ -335,9 +328,9 @@ class BlockingModal extends React.Component {
     };
 
     render() {
-        const {open, onClose, blocking: {blockedRooms, allowed, startDate, endDate, reason}} = this.props;
+        const {onClose, blocking: {blockedRooms, allowed, startDate, endDate, reason}} = this.props;
         const {mode} = this.state;
-        const props = mode === 'view' ? {onSubmit() {}} : {validate, onSubmit: this.processBlocking};
+        const props = mode === 'view' ? {onSubmit() {}} : {validate, onSubmit: this.handleSubmit};
         const dates = {startDate: null, endDate: null};
         const rooms = blockedRooms.map((blockedRoom) => blockedRoom.room);
 
@@ -347,7 +340,7 @@ class BlockingModal extends React.Component {
         }
 
         return (
-            <Modal open={open} onClose={onClose} size="large" closeIcon>
+            <Modal open onClose={onClose} size="large" closeIcon>
                 <FinalForm {...props}
                            render={this.renderModalContent}
                            mutators={{setFieldTouched}}
@@ -357,22 +350,14 @@ class BlockingModal extends React.Component {
     }
 }
 
-const mapDispatchToProps = (dispatch) => ({
-    createBlocking: (formData) => {
-        return dispatch(blockingsActions.createBlocking(formData));
-    },
-    updateBlocking: (blockingId, formData) => {
-        return dispatch(blockingsActions.updateBlocking(blockingId, formData));
-    },
-    updateBlockingsList: (blockings) => {
-        dispatch(blockingsActions.updateBlockingsList(blockings));
-    }
-});
-
 export default connect(
     state => ({
-        blockings: getAllBlockings(state),
-        favoriteUsers: getFavoriteUsers(state)
+        favoriteUsers: userSelectors.getFavoriteUsers(state),
     }),
-    mapDispatchToProps
+    dispatch => ({
+        actions: bindActionCreators({
+            createBlocking: blockingsActions.createBlocking,
+            updateBlocking: blockingsActions.updateBlocking,
+        }, dispatch),
+    })
 )(BlockingModal);

@@ -250,9 +250,7 @@ class RoomList extends React.Component {
                     };
 
                     return (
-                        <BlockingModal open
-                                       blocking={blocking}
-                                       onClose={this.closeBlockingModal} />
+                        <BlockingModal mode="create" blocking={blocking} onClose={this.closeBlockingModal} />
                     );
                 }} />
             </Grid>

@@ -59,7 +59,7 @@ class RHUpdateRoomBlocking(RHRoomBookingBase):
     })
     def _process(self, args):
         update_blocking(self.blocking, **args)
-        return jsonify(blocking=blockings_schema.dump(self.blocking, many=False).data)
+        return jsonify(blockings_schema.dump(self.blocking, many=False).data)
 
 
 class RHRoomBlockings(RHRoomBookingBase):
@@ -73,3 +73,11 @@ class RHRoomBlockings(RHRoomBookingBase):
                    'in_rooms_owned_by': session.user if my_rooms else None}
         blockings = get_room_blockings(**filters)
         return jsonify(blockings_schema.dump(blockings).data)
+
+
+class RHRoomBlocking(RHRoomBookingBase):
+    def _process_args(self):
+        self.blocking = Blocking.get_one(request.view_args['blocking_id'])
+
+    def _process(self):
+        return jsonify(blockings_schema.dump(self.blocking, many=False).data)
