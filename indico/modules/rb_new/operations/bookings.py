@@ -112,10 +112,6 @@ def get_rooms_availability(rooms, start_dt, end_dt, repeat_frequency, repeat_int
                                                    nonbookable_periods, unbookable_hours)
     dates = list(candidate.start_dt.date() for candidate in candidates)
     for room in rooms:
-        booking_limit_days = room.booking_limit_days or rb_settings.get('booking_limit')
-        if period_days > booking_limit_days:
-            continue
-
         room_occurrences = occurrences.get(room.id, [])
         room_conflicts = conflicts.get(room.id, [])
         pre_room_conflicts = pre_conflicts.get(room.id, [])
