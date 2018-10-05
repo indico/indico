@@ -16,14 +16,9 @@
  */
 
 import _ from 'lodash';
-import React from 'react';
 import {push} from 'connected-react-router';
 import moment from 'moment';
-import {Dimmer, Loader} from 'semantic-ui-react';
-import {Preloader} from 'indico/react/util';
 import {serializeDate} from 'indico/utils/date';
-
-import {selectors as roomsSelectors} from './common/rooms';
 
 
 export function parseSearchBarText(queryText) {
@@ -124,17 +119,6 @@ export const pushStateMergeProps = (stateProps, dispatchProps, ownProps) => {
             dispatch(push(url));
         }
     };
-};
-
-export const roomPreloader = (componentFunc, action) => {
-    // eslint-disable-next-line react/display-name, react/prop-types
-    return ({match: {params: {roomId}}}) => (
-        <Preloader checkCached={state => roomsSelectors.hasDetails(state, {roomId})}
-                   action={() => action(roomId)}
-                   dimmer={<Dimmer active page><Loader /></Dimmer>}>
-            {() => componentFunc(roomId)}
-        </Preloader>
-    );
 };
 
 export function boolStateField(name) {
