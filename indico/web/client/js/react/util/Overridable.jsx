@@ -5,14 +5,14 @@ import {withRouter} from 'react-router-dom';
 
 
 function Overridable({children, overrides, id, ...restProps}) {
-    const childProps = children ? children.props : {};
+    const child = children ? React.Children.only(children) : null;
+    const childProps = child ? child.props : {};
     const Override = overrides[id];
-    const newProps = {...restProps, ...childProps};
 
     return (Override !== undefined) ? (
-        <Override {...newProps} />
+        <Override {...childProps} {...restProps} />
     ) : (
-        !!children && React.cloneElement(children, {...newProps})
+        child ? React.cloneElement(child, childProps) : null
     );
 }
 

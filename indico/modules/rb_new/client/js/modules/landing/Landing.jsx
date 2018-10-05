@@ -99,7 +99,9 @@ class Landing extends React.Component {
                                             <Form.Input placeholder="bldg: 28" styleName="search-input"
                                                         onChange={(event, data) => this.updateText(data.value)} />
                                         </Form.Group>
-                                        <Overridable id="Landing.bootstrapOptions" setOptions={this.setExtraState} options={extraState}>
+                                        <Overridable id="Landing.bootstrapOptions"
+                                                     setOptions={this.setExtraState}
+                                                     options={extraState}>
                                             {userHasFavorites && (
                                                 <Form.Field>
                                                     <Checkbox label={Translate.string('Search only my favourites')}

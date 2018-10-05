@@ -28,8 +28,8 @@ export default function setup(overrides = {}) {
 
         ReactDOM.render(
             <Provider store={store}>
-                <Overridable id="App" history={history}>
-                    <App />
+                <Overridable id="App">
+                    <App history={history} />
                 </Overridable>
             </Provider>,
             appContainer
