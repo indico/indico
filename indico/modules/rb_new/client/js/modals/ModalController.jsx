@@ -148,7 +148,7 @@ class ModalController extends React.PureComponent {
             data = {dates, timeSlot, recurrence};
         }
         return this.withRoomPreloader('bookingForm', roomId, () => (
-            <BookRoomModal open roomId={roomId} onClose={onClose} bookingData={data} />
+            <BookRoomModal roomId={roomId} onClose={onClose} bookingData={data} />
         ));
     }
 

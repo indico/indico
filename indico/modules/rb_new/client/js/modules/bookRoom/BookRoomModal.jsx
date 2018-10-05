@@ -124,7 +124,6 @@ TimeInformation.defaultProps = {
 
 class BookRoomModal extends React.Component {
     static propTypes = {
-        open: PropTypes.bool,
         room: PropTypes.object,
         user: PropTypes.object.isRequired,
         bookingData: PropTypes.object.isRequired,
@@ -140,7 +139,6 @@ class BookRoomModal extends React.Component {
     };
 
     static defaultProps = {
-        open: false,
         room: null,
         availability: null,
         timeInformationComponent: TimeInformation
@@ -324,7 +322,7 @@ class BookRoomModal extends React.Component {
     render() {
         const {
             bookingData: {recurrence, dates, timeSlot},
-            open, room, user, availability, timeInformationComponent: TimeInformationComponent
+            room, user, availability, timeInformationComponent: TimeInformationComponent
         } = this.props;
         const {skipConflicts, bookingConflictsVisible} = this.state;
 
@@ -427,7 +425,7 @@ class BookRoomModal extends React.Component {
         );
 
         return (
-            <Modal open={open} onClose={this.onClose} size="large" closeIcon>
+            <Modal open onClose={this.onClose} size="large" closeIcon>
                 <FinalForm onSubmit={this.submitBooking} validate={validate} decorators={[formDecorator]}
                            render={renderModalContent} />
             </Modal>
