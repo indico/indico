@@ -16,7 +16,6 @@
 
 from __future__ import unicode_literals
 
-import re
 import csv
 from collections import defaultdict
 from datetime import timedelta
@@ -40,7 +39,7 @@ from indico.modules.events.persons.util import get_event_person
 from indico.modules.events.util import serialize_person_link, track_time_changes
 from indico.util.date_time import format_human_timedelta
 from indico.util.i18n import _
-from indico.util.string import to_unicode
+from indico.util.string import to_unicode, validate_email
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.http_api.metadata.serializer import Serializer
@@ -199,11 +198,6 @@ def get_contribution_ical_file(contrib):
     serializer = Serializer.create('ics')
     return BytesIO(serializer(data))
 
-def is_valid_email(email):
-    if len(email) > 7:
-        if re.match("^.+@([?)[a-zA-Z0-9-.]+.([a-zA-Z]{2,3}|[0-9]{1,3})(]?)$", email) != None:
-            return True
-    return False
 
 def import_contributions_from_csv(event, f):
     """Import timetable contributions from a CSV file into an event."""
@@ -232,10 +226,8 @@ def import_contributions_from_csv(event, f):
         if not title:
             raise UserValueError(_("Row {}: contribution title is required").format(num_row))
 
-        
-        if not email or not is_valid_email(email):
+        if not validate_email(email):
             raise UserValueError(_("Row {row}: doesn't have valid email address: {email}").format(row=num_row, email=email))
-
 
         contrib_data.append({
             'start_dt': parsed_start_dt,
@@ -266,7 +258,7 @@ def import_contributions_from_csv(event, f):
             all_changes[key].append(val)
 
         email = speaker_data['email']
-        if not email or not is_valid_email(email):
+        if not email:
             continue
 
         # set the information of the speaker
