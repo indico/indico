@@ -16,6 +16,7 @@
 
 from __future__ import unicode_literals
 
+import re
 import csv
 from collections import defaultdict
 from datetime import timedelta
