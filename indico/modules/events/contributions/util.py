@@ -198,6 +198,11 @@ def get_contribution_ical_file(contrib):
     serializer = Serializer.create('ics')
     return BytesIO(serializer(data))
 
+def is_valid_email(email):
+    if len(email) > 7:
+        if re.match("^.+@([?)[a-zA-Z0-9-.]+.([a-zA-Z]{2,3}|[0-9]{1,3})(]?)$", email) != None:
+            return True
+    return False
 
 def import_contributions_from_csv(event, f):
     """Import timetable contributions from a CSV file into an event."""
@@ -225,6 +230,11 @@ def import_contributions_from_csv(event, f):
 
         if not title:
             raise UserValueError(_("Row {}: contribution title is required").format(num_row))
+
+        
+        if not email or not is_valid_email(email):
+            raise UserValueError(_("Row {row}: doesn't have valid email address: {email}").format(row=num_row, email=email))
+
 
         contrib_data.append({
             'start_dt': parsed_start_dt,
@@ -255,7 +265,7 @@ def import_contributions_from_csv(event, f):
             all_changes[key].append(val)
 
         email = speaker_data['email']
-        if not email:
+        if not email or not is_valid_email(email):
             continue
 
         # set the information of the speaker
