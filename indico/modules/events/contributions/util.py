@@ -226,8 +226,8 @@ def import_contributions_from_csv(event, f):
         if not title:
             raise UserValueError(_("Row {}: contribution title is required").format(num_row))
 
-        if not validate_email(email):
-            raise UserValueError(_("Row {row}: doesn't have valid email address: {email}").format(row=num_row, email=email))
+        if email and not validate_email(email):
+            raise UserValueError(_("Row {row}: invalid email address: {email}").format(row=num_row, email=email))
 
         contrib_data.append({
             'start_dt': parsed_start_dt,
