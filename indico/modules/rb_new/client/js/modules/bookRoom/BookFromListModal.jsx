@@ -30,7 +30,7 @@ import {selectors as roomsSelectors} from '../../common/rooms';
 import * as bookRoomActions from './actions';
 import * as bookRoomSelectors from './selectors';
 
-import '../../components/modals/RoomDetailsModal.module.scss';
+import '../../common/rooms/RoomDetailsModal.module.scss';
 
 
 function ConflictIndicator(

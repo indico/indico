@@ -22,9 +22,9 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {Button, Grid, Icon, Modal, Header, Message, List, Segment, Popup} from 'semantic-ui-react';
 import {Translate, Param} from 'indico/react/i18n';
-import RoomBasicDetails from '../RoomBasicDetails';
-import {DailyTimelineContent, TimelineLegend} from '../../common/timeline';
-import {selectors as roomsSelectors} from '../../common/rooms';
+import RoomBasicDetails from '../../components/RoomBasicDetails';
+import {DailyTimelineContent, TimelineLegend} from '../timeline';
+import * as roomsSelectors from './selectors';
 import {actions as bookRoomActions} from '../../modules/bookRoom';
 
 import './RoomDetailsModal.module.scss';
