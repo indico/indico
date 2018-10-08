@@ -15,11 +15,22 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import * as actions from './actions';
-import * as selectors from './selectors';
+import React from 'react';
+
+import {RoomDetailsPreloader} from '../../common/rooms';
+import RoomDetailsModal from '../../components/modals/RoomDetailsModal';
 
 
-export {default as reducer} from './reducers';
-export {default as RoomDetailsPreloader} from './RoomDetailsPreloader';
-export {default as modalHandlers} from './modals';
-export {actions, selectors};
+export default {
+    /* eslint-disable react/display-name */
+    'room-details': (onClose, roomId) => (
+        <RoomDetailsPreloader roomId={roomId}>
+            {() => <RoomDetailsModal roomId={roomId} onClose={onClose} promptDatesOnBook />}
+        </RoomDetailsPreloader>
+    ),
+    'room-details-book': (onClose, roomId) => (
+        <RoomDetailsPreloader roomId={roomId}>
+            {() => <RoomDetailsModal roomId={roomId} onClose={onClose} />}
+        </RoomDetailsPreloader>
+    ),
+};

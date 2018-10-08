@@ -24,14 +24,14 @@ import {Grid, Icon, Modal, Message} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
 import {Overridable} from 'indico/react/util';
 
-import RoomBasicDetails from '../RoomBasicDetails';
-import * as bookRoomActions from '../../modules/bookRoom/actions';
-import BookingBootstrapForm from '../BookingBootstrapForm';
+import RoomBasicDetails from '../../components/RoomBasicDetails';
+import BookingBootstrapForm from '../../components/BookingBootstrapForm';
 import {selectors as roomsSelectors} from '../../common/rooms';
-import {selectors as bookRoomSelectors} from '../../modules/bookRoom';
 import {actions as modalActions} from '../../modals';
+import * as bookRoomActions from './actions';
+import * as bookRoomSelectors from './selectors';
 
-import './RoomDetailsModal.module.scss';
+import '../../components/modals/RoomDetailsModal.module.scss';
 
 
 function ConflictIndicator(

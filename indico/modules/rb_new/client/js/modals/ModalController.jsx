@@ -19,22 +19,13 @@ import qs from 'qs';
 import React from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
-import moment from 'moment';
 import PropTypes from 'prop-types';
-import {Dimmer, Loader} from 'semantic-ui-react';
 import {push} from 'connected-react-router';
 
-import {Preloader} from 'indico/react/util';
-import {toMoment} from 'indico/utils/date';
-import {actions as roomsActions, selectors as roomsSelectors} from '../common/rooms';
-import RoomDetailsModal from '../components/modals/RoomDetailsModal';
-import BookFromListModal from '../components/modals/BookFromListModal';
-import BookRoomModal from '../modules/bookRoom/BookRoomModal';
-import UnavailableRoomsModal from '../modules/bookRoom/UnavailableRoomsModal';
-import {BlockingPreloader, BlockingModal} from '../modules/blockings';
+import {modalHandlers as blockingModalHandlers} from '../modules/blockings';
+import {modalHandlers as bookRoomModalHandlers} from '../modules/bookRoom';
+import {modalHandlers as roomsModalHandlers} from '../common/rooms';
 import * as globalSelectors from '../selectors';
-import * as modalActions from './actions';
-import {selectors as bookRoomSelectors} from '../modules/bookRoom';
 
 
 class ModalController extends React.PureComponent {
@@ -42,18 +33,21 @@ class ModalController extends React.PureComponent {
         isInitializing: PropTypes.bool.isRequired,
         path: PropTypes.string.isRequired,
         queryString: PropTypes.string.isRequired,
-        bookRoomFilters: PropTypes.shape({
-            dates: PropTypes.object.isRequired,
-            timeSlot: PropTypes.object.isRequired,
-            recurrence: PropTypes.object.isRequired,
-        }).isRequired,
         actions: PropTypes.exact({
             pushState: PropTypes.func.isRequired,
-            fetchRoomDetails: PropTypes.func.isRequired,
-            openBookRoom: PropTypes.func.isRequired,
-            openBookingForm: PropTypes.func.isRequired,
         }).isRequired,
     };
+
+    constructor(props) {
+        super(props);
+
+        this.modalHandlers = {
+            ...blockingModalHandlers,
+            ...bookRoomModalHandlers,
+            ...roomsModalHandlers,
+        };
+    }
+
 
     getQueryData() {
         const {queryString} = this.props;
@@ -64,12 +58,12 @@ class ModalController extends React.PureComponent {
         if (Array.isArray(modalData)) {
             modalData = modalData[modalData.length - 1];
         }
-        const match = modalData.match(/^([^:]+)(?::([^:]+)(?::(.+))?)?$/); // foo[:bar[:...]]
+        const match = modalData.match(/^([^:]+)(?::(\d+)(?::(.+))?)?$/); // foo[:123[:...]]
         if (!match) {
             return null;
         }
         const [orig, name, value, payload] = match;
-        return {orig, name, value, payload: JSON.parse(payload || 'null')};
+        return {orig, name, value: parseInt(value, 10), payload: JSON.parse(payload || 'null')};
     }
 
     getQueryStringWithout(arg) {
@@ -91,67 +85,6 @@ class ModalController extends React.PureComponent {
         };
     }
 
-    withRoomPreloader(name, roomId, render) {
-        const {actions: {fetchRoomDetails}} = this.props;
-        const key = `${name}-${roomId}`;
-        return (
-            <Preloader checkCached={state => roomsSelectors.hasDetails(state, {roomId})}
-                       action={() => fetchRoomDetails(roomId)}
-                       dimmer={<Dimmer active page><Loader /></Dimmer>}
-                       key={key}>
-                {render}
-            </Preloader>
-        );
-    }
-
-    renderRoomDetails(roomId, onClose, bookingPage = false) {
-        const {actions: {openBookRoom, openBookingForm}} = this.props;
-        // if we are on the booking page, we have booking data in the redux state
-        // and do not need to go through the bootstrap dialog
-        const onBook = bookingPage ? openBookingForm : openBookRoom;
-        return this.withRoomPreloader('roomDetails', roomId, () => (
-            <RoomDetailsModal roomId={roomId} onClose={onClose} onBook={onBook} />
-        ));
-    }
-
-    renderBlockingDetails(blockingId, onClose) {
-        return <BlockingPreloader blockingId={blockingId} component={BlockingModal} onClose={onClose} />;
-    }
-
-    renderBookRoom(roomId, defaults, onClose) {
-        if (defaults) {
-            defaults = {
-                ...defaults,
-                dates: {
-                    startDate: toMoment(defaults.dates.startDate, moment.HTML5_FMT.DATE),
-                    endDate: toMoment(defaults.dates.endDate, moment.HTML5_FMT.DATE),
-                },
-                timeSlot: {
-                    startTime: toMoment(defaults.timeSlot.startTime, moment.HTML5_FMT.TIME),
-                    endTime: toMoment(defaults.timeSlot.endTime, moment.HTML5_FMT.TIME),
-                },
-            };
-        }
-        return this.withRoomPreloader('bookRoom', roomId, () => (
-            <BookFromListModal roomId={roomId} onClose={onClose} defaults={defaults} />
-        ));
-    }
-
-    renderUnavailableRooms(onClose) {
-        return <UnavailableRoomsModal onClose={onClose} />;
-    }
-
-    renderBookingForm(roomId, data, onClose) {
-        const {bookRoomFilters: {dates, timeSlot, recurrence}} = this.props;
-        if (!data) {
-            // used on the book-room page to avoid duplicate data that is always present
-            data = {dates, timeSlot, recurrence};
-        }
-        return this.withRoomPreloader('bookingForm', roomId, () => (
-            <BookRoomModal roomId={roomId} onClose={onClose} bookingData={data} />
-        ));
-    }
-
     render() {
         const {isInitializing} = this.props;
         if (isInitializing) {
@@ -163,37 +96,20 @@ class ModalController extends React.PureComponent {
         }
         const {orig, name, value, payload} = queryData;
         const closeHandler = this.makeCloseHandler(orig);
-        if (name === 'booking-form') {
-            return this.renderBookingForm(+value, payload, closeHandler);
-        } else if (name === 'book-room') {
-            return this.renderBookRoom(+value, payload, closeHandler);
-        } else if (name === 'unavailable-rooms') {
-            return this.renderUnavailableRooms(closeHandler);
-        } else if (name === 'room-details') {
-            return this.renderRoomDetails(+value, closeHandler);
-        } else if (name === 'room-details-book') {
-            return this.renderRoomDetails(+value, closeHandler, true);
-        } else if (name === 'blocking-details') {
-            return this.renderBlockingDetails(+value, closeHandler);
-        } else {
-            return null;
-        }
+        const handler = this.modalHandlers[name];
+        return handler ? handler(closeHandler, value, payload) : null;
     }
 }
 
 export default connect(
     state => ({
         isInitializing: globalSelectors.isInitializing(state),
-        bookRoomFilters: bookRoomSelectors.getFilters(state),
         path: state.router.location.pathname,
         queryString: state.router.location.search.substr(1),
     }),
     dispatch => ({
         actions: bindActionCreators({
             pushState: push,
-            fetchRoomDetails: roomsActions.fetchDetails,
-            openBookRoom: modalActions.openBookRoom,
-            openBookingForm: modalActions.openBookingForm,
         }, dispatch),
     }),
 )(ModalController);

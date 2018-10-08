@@ -17,6 +17,7 @@
 
 import moment from 'moment';
 import React from 'react';
+import {bindActionCreators} from 'redux';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {Button, Grid, Icon, Modal, Header, Message, List, Segment, Popup} from 'semantic-ui-react';
@@ -24,6 +25,7 @@ import {Translate, Param} from 'indico/react/i18n';
 import RoomBasicDetails from '../RoomBasicDetails';
 import {DailyTimelineContent, TimelineLegend} from '../../common/timeline';
 import {selectors as roomsSelectors} from '../../common/rooms';
+import * as modalActions from '../../modals/actions';
 
 import './RoomDetailsModal.module.scss';
 
@@ -34,7 +36,15 @@ class RoomDetailsModal extends React.Component {
         availability: PropTypes.array.isRequired,
         attributes: PropTypes.array.isRequired,
         onClose: PropTypes.func.isRequired,
-        onBook: PropTypes.func.isRequired,
+        promptDatesOnBook: PropTypes.bool,
+        actions: PropTypes.exact({
+            openBookRoom: PropTypes.func.isRequired,
+            openBookingForm: PropTypes.func.isRequired,
+        }).isRequired,
+    };
+
+    static defaultProps = {
+        promptDatesOnBook: false,
     };
 
     handleCloseModal = () => {
@@ -43,7 +53,10 @@ class RoomDetailsModal extends React.Component {
     };
 
     render() {
-        const {onBook, room, availability, attributes} = this.props;
+        const {
+            room, availability, attributes, promptDatesOnBook,
+            actions: {openBookRoom, openBookingForm},
+        } = this.props;
         return (
             <Modal open onClose={this.handleCloseModal} size="large" closeIcon>
                 <Modal.Header styleName="room-details-header">
@@ -56,7 +69,7 @@ class RoomDetailsModal extends React.Component {
                     <RoomDetails room={room}
                                  attributes={attributes}
                                  availability={availability}
-                                 bookRoom={onBook} />
+                                 bookRoom={promptDatesOnBook ? openBookRoom : openBookingForm} />
                 </Modal.Content>
             </Modal>
         );
@@ -68,7 +81,13 @@ export default connect(
         room: roomsSelectors.getRoom(state, {roomId}),
         availability: roomsSelectors.getAvailability(state, {roomId}),
         attributes: roomsSelectors.getAttributes(state, {roomId}),
-    })
+    }),
+    dispatch => ({
+        actions: bindActionCreators({
+            openBookRoom: modalActions.openBookRoom,
+            openBookingForm: modalActions.openBookingForm,
+        }, dispatch),
+    }),
 )(RoomDetailsModal);
 
 

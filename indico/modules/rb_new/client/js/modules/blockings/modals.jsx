@@ -15,11 +15,15 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import * as actions from './actions';
-import * as selectors from './selectors';
+import React from 'react';
+
+import BlockingPreloader from './BlockingPreloader';
+import BlockingModal from './BlockingModal';
 
 
-export {default as reducer} from './reducers';
-export {default as RoomDetailsPreloader} from './RoomDetailsPreloader';
-export {default as modalHandlers} from './modals';
-export {actions, selectors};
+export default {
+    /* eslint-disable react/display-name */
+    'blocking-details': (onClose, blockingId) => (
+        <BlockingPreloader blockingId={blockingId} component={BlockingModal} onClose={onClose} />
+    )
+};
