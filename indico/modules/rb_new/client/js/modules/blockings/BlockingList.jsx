@@ -23,7 +23,6 @@ import {Container, Grid, Loader, Message} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
 import BlockingCard from './BlockingCard';
 import BlockingFilterBar from './BlockingFilterBar';
-import {actions as modalActions} from '../../modals';
 import * as blockingsActions from './actions';
 import * as blockingsSelectors from './selectors';
 
@@ -100,7 +99,7 @@ export default connect(
     dispatch => ({
         actions: bindActionCreators({
             fetchBlockings: blockingsActions.fetchBlockings,
-            openBlockingDetails: modalActions.openBlockingDetails,
+            openBlockingDetails: blockingsActions.openBlockingDetails,
         }, dispatch),
     })
 )(BlockingList);

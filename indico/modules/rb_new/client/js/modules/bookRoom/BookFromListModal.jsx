@@ -27,7 +27,6 @@ import {Overridable} from 'indico/react/util';
 import RoomBasicDetails from '../../components/RoomBasicDetails';
 import BookingBootstrapForm from '../../components/BookingBootstrapForm';
 import {selectors as roomsSelectors} from '../../common/rooms';
-import {actions as modalActions} from '../../modals';
 import * as bookRoomActions from './actions';
 import * as bookRoomSelectors from './selectors';
 
@@ -143,7 +142,7 @@ export default connect(
     (dispatch) => ({
         actions: bindActionCreators({
             resetCollisions: bookRoomActions.resetBookingAvailability,
-            openBookingForm: modalActions.openBookingForm,
+            openBookingForm: bookRoomActions.openBookingForm,
         }, dispatch),
         dispatch,
     }),

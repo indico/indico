@@ -40,9 +40,9 @@ import {queryStringRules as qsFilterRules} from '../../common/roomSearch';
 import {rules as qsBookRoomRules} from './queryString';
 import * as bookRoomActions from './actions';
 import {actions as filtersActions} from '../../common/filters';
+import {actions as roomsActions} from '../../common/rooms';
 import * as bookRoomSelectors from './selectors';
 import {mapControllerFactory, selectors as mapSelectors} from '../../common/map';
-import {actions as modalActions} from '../../modals';
 
 import './BookRoom.module.scss';
 
@@ -462,8 +462,8 @@ const mapDispatchToProps = dispatch => ({
         resetRoomSuggestions: bookRoomActions.resetRoomSuggestions,
         setFilterParameter: (param, value) => filtersActions.setFilterParameter('bookRoom', param, value),
         toggleTimelineView: bookRoomActions.toggleTimelineView,
-        openRoomDetails: modalActions.openRoomDetailsBook,
-        openBookingForm: modalActions.openBookingForm,
+        openRoomDetails: roomsActions.openRoomDetailsBook,
+        openBookingForm: bookRoomActions.openBookingForm,
     }, dispatch),
 });
 

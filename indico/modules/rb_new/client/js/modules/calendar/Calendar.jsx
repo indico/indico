@@ -26,9 +26,10 @@ import {Translate} from 'indico/react/i18n';
 import {serializeDate} from 'indico/utils/date';
 import * as calendarActions from './actions';
 import * as calendarSelectors from './selectors';
-import {selectors as roomsSelectors} from '../../common/rooms';
+import {selectors as roomsSelectors, actions as roomsActions} from '../../common/rooms';
 import {EditableTimelineItem, TimelineBase, TimelineHeader} from '../../common/timeline';
-import {actions as modalActions} from '../../modals';
+import {actions as bookRoomActions} from '../../modules/bookRoom';
+
 
 import '../../common/timeline/Timeline.module.scss';
 
@@ -145,8 +146,8 @@ export default connect(
         actions: bindActionCreators({
             fetchCalendar: calendarActions.fetchCalendar,
             setDate: (date) => calendarActions.setDate(serializeDate(date)),
-            openRoomDetails: modalActions.openRoomDetails,
-            openBookRoom: modalActions.openBookRoom,
+            openRoomDetails: roomsActions.openRoomDetails,
+            openBookRoom: bookRoomActions.openBookRoom,
         }, dispatch),
     }),
 )(Calendar);

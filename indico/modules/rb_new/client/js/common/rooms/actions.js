@@ -22,6 +22,7 @@ import fetchRoomAttributesURL from 'indico-url:rooms_new.room_attributes';
 
 import {indicoAxios} from 'indico/utils/axios';
 import {ajaxAction} from 'indico/utils/redux';
+import {actions as modalActions} from '../../modals';
 
 
 export const FETCH_EQUIPMENT_TYPES_REQUEST = 'rooms/FETCH_EQUIPMENT_TYPES_REQUEST';
@@ -101,3 +102,6 @@ export function fetchAttributes(id) {
         )(dispatch);
     };
 }
+
+export const openRoomDetails = (roomId) => modalActions.openModal('room-details', roomId);
+export const openRoomDetailsBook = (roomId) => modalActions.openModal('room-details-book', roomId);

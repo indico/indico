@@ -21,7 +21,7 @@ import {bindActionCreators} from 'redux';
 import PropTypes from 'prop-types';
 import {Icon, Label, Menu, Message, Popup} from 'semantic-ui-react';
 import {Translate, Param} from 'indico/react/i18n';
-import {actions as modalActions} from '../../modals';
+import {actions as bookRoomActions} from '../../modules/bookRoom';
 import * as selectors from './selectors';
 
 import './BookRoom.module.scss';
@@ -167,7 +167,7 @@ export default connect(
     }),
     dispatch => ({
         actions: bindActionCreators({
-            openUnavailableRooms: modalActions.openUnavailableRooms,
+            openUnavailableRooms: bookRoomActions.openUnavailableRooms,
         }, dispatch),
     }),
 )(SearchResultCount);

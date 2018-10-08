@@ -25,6 +25,7 @@ import {ajaxAction, submitFormAction} from 'indico/utils/redux';
 import {preProcessParameters} from '../../util';
 import {ajax as ajaxRules} from './serializers';
 import {actions as filtersActions} from '../../common/filters';
+import {actions as modalActions} from '../../modals';
 
 
 export const FETCH_BLOCKINGS_REQUEST = 'blockings/FETCH_BLOCKINGS_REQUEST';
@@ -93,3 +94,5 @@ export function updateBlocking(blockingId, formData) {
         UPDATE_BLOCKING_ERROR
     );
 }
+
+export const openBlockingDetails = (blockingId) => modalActions.openModal('blocking-details', blockingId);

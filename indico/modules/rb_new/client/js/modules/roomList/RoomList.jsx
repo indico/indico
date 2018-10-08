@@ -35,7 +35,7 @@ import Room from '../../containers/Room';
 import {BlockingModal} from '../blockings';
 import {queryStringRules as queryStringSerializer} from '../../common/roomSearch';
 import {mapControllerFactory, selectors as mapSelectors} from '../../common/map';
-import {actions as modalActions} from '../../modals';
+import {actions as roomsActions} from '../../common/rooms';
 import * as roomsListActions from './actions';
 import * as roomsListSelectors from './selectors';
 
@@ -271,7 +271,7 @@ export default connect(
         dispatch, // for pushStateMergeProps
         actions: bindActionCreators({
             searchRooms: roomsListActions.searchRooms,
-            openRoomDetails: modalActions.openRoomDetails,
+            openRoomDetails: roomsActions.openRoomDetails,
         }, dispatch)
     }),
     pushStateMergeProps,

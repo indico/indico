@@ -25,7 +25,7 @@ import {Translate, Param} from 'indico/react/i18n';
 import RoomBasicDetails from '../RoomBasicDetails';
 import {DailyTimelineContent, TimelineLegend} from '../../common/timeline';
 import {selectors as roomsSelectors} from '../../common/rooms';
-import * as modalActions from '../../modals/actions';
+import {actions as bookRoomActions} from '../../modules/bookRoom';
 
 import './RoomDetailsModal.module.scss';
 
@@ -84,8 +84,8 @@ export default connect(
     }),
     dispatch => ({
         actions: bindActionCreators({
-            openBookRoom: modalActions.openBookRoom,
-            openBookingForm: modalActions.openBookingForm,
+            openBookRoom: bookRoomActions.openBookRoom,
+            openBookingForm: bookRoomActions.openBookingForm,
         }, dispatch),
     }),
 )(RoomDetailsModal);

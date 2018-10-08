@@ -15,6 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import * as actions from './actions';
 import * as selectors from './selectors';
 
 
@@ -22,4 +23,4 @@ export {default} from './BookRoom';
 export {default as reducer} from './reducers';
 export {queryStringReducer, routeConfig, rules as queryStringRules} from './queryString';
 export {default as modalHandlers} from './modals';
-export {selectors};
+export {actions, selectors};

@@ -25,6 +25,7 @@ import {ajaxAction, submitFormAction} from 'indico/utils/redux';
 import {ajax as ajaxRules} from './serializers';
 import {roomSearchActionsFactory, ajaxRules as ajaxFilterRules} from '../../common/roomSearch';
 import {preProcessParameters} from '../../util';
+import {actions as modalActions} from '../../modals';
 
 
 // Booking creation
@@ -182,3 +183,7 @@ export function resetRoomSuggestions() {
 }
 
 export const {searchRooms} = roomSearchActionsFactory('bookRoom');
+
+export const openBookRoom = (roomId, data = null) => modalActions.openModal('book-room', roomId, data);
+export const openUnavailableRooms = () => modalActions.openModal('unavailable-rooms');
+export const openBookingForm = (roomId, data) => modalActions.openModal('booking-form', roomId, data);

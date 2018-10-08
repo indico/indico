@@ -26,7 +26,7 @@ import {Translate, Param} from 'indico/react/i18n';
 import {serializeDate, toMoment} from 'indico/utils/date';
 import {TimelineBase} from '../../common/timeline';
 import {isDateWithinRange} from '../../util';
-import {actions as modalActions} from '../../modals';
+import {actions as roomsActions} from '../../common/rooms';
 import * as bookRoomActions from './actions';
 import * as bookRoomSelectors from './selectors';
 
@@ -163,8 +163,8 @@ export const BookingTimelineComponent = connect(
     null,
     dispatch => ({
         actions: bindActionCreators({
-            openRoomDetails: modalActions.openRoomDetailsBook,
-            openBookingForm: modalActions.openBookingForm,
+            openRoomDetails: roomsActions.openRoomDetailsBook,
+            openBookingForm: bookRoomActions.openBookingForm,
         }, dispatch),
     })
 )(_BookingTimelineComponent);
