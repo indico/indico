@@ -39,7 +39,7 @@ from indico.modules.events.persons.util import get_event_person
 from indico.modules.events.util import serialize_person_link, track_time_changes
 from indico.util.date_time import format_human_timedelta
 from indico.util.i18n import _
-from indico.util.string import to_unicode
+from indico.util.string import to_unicode, validate_email
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.http_api.metadata.serializer import Serializer
@@ -225,6 +225,9 @@ def import_contributions_from_csv(event, f):
 
         if not title:
             raise UserValueError(_("Row {}: contribution title is required").format(num_row))
+
+        if email and not validate_email(email):
+            raise UserValueError(_("Row {row}: invalid email address: {email}").format(row=num_row, email=email))
 
         contrib_data.append({
             'start_dt': parsed_start_dt,

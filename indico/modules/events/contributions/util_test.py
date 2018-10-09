@@ -125,3 +125,6 @@ def test_import_contributions_errors(db, dummy_event):
 
     e = _check_importer_exception(dummy_event, b'2010-02-23T00:00:00,15min,Test,,,,')
     assert 'parse duration' in e.message
+
+    e = _check_importer_exception(dummy_event, b'2010-02-23T00:00:00,15,Test,Test,Test,Test,foobar')
+    assert 'invalid email' in e.message
