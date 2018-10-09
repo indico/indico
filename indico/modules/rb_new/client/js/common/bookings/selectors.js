@@ -14,6 +14,18 @@
  * You should have received a copy of the GNU General Public License
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
+import {createSelector} from 'reselect';
+import {selectors as roomsSelectors} from '../../common/rooms';
+
 
 export const getDetails = (state, {bookingId}) => state.bookings.details[bookingId];
+
+export const getDetailsWithRoom = createSelector(
+    getDetails,
+    roomsSelectors.getAllRooms,
+    (booking, allRooms) => {
+        booking.attributes.room = allRooms[booking.attributes.room_id];
+        return booking;
+    }
+);
 export const hasDetails = (state, {bookingId}) => getDetails(state, {bookingId}) !== undefined;

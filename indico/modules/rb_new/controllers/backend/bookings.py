@@ -147,10 +147,10 @@ class RHBookingDetails(RHRoomBookingBase):
         attributes = reservation_details_schema.dump(self.booking).data
         date_range, occurrences = get_booking_occurrences(self.booking)
         date_range = [dt.isoformat() for dt in date_range]
-        serialized = {dt.isoformat(): reservation_details_occurrences_schema.dump(data).data
-                      for dt, data in occurrences.iteritems()}
+        occurrences = {dt.isoformat(): reservation_details_occurrences_schema.dump(data).data
+                       for dt, data in occurrences.iteritems()}
         edit_logs = sorted(reservation_edit_log_schema.dump(self.booking.edit_logs).data,
                            key=itemgetter('timestamp'),
                            reverse=True)
-        return jsonify(attributes=attributes, id=self.booking.id, occurrences=serialized, date_range=date_range,
+        return jsonify(attributes=attributes, id=self.booking.id, occurrences=occurrences, date_range=date_range,
                        edit_logs=edit_logs)

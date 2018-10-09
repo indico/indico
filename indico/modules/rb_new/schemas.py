@@ -91,14 +91,13 @@ class ReservationDetailsOccurrenceSchema(mm.ModelSchema):
 
 
 class ReservationDetailsSchema(mm.ModelSchema):
-    room = Nested(RoomSchema)
     booked_for_user = Nested(UserSchema, only=('full_name', 'phone', 'email'))
     created_by_user = Nested(UserSchema, only=('full_name'))
 
     class Meta:
         model = Reservation
-        fields = ('start_dt', 'end_dt', 'repetition', 'booking_reason', 'created_dt', 'status_string',
-                  'uses_vc', 'needs_vc_assistance', 'booked_for_user', 'room', 'created_by_user', )
+        fields = ('start_dt', 'end_dt', 'repetition', 'booking_reason', 'created_dt', 'booked_for_user', 'room_id',
+                  'created_by_user', )
 
 
 class BlockedRoomSchema(mm.ModelSchema):

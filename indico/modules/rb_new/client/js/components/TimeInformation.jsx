@@ -22,17 +22,29 @@ import {Translate, Param} from 'indico/react/i18n';
 import {toMoment} from 'indico/utils/date';
 import recurrenceRenderer from './RecurrenceRenderer';
 
-import './BookingTimeInformation.module.scss';
+import './TimeInformation.module.scss';
 
 
-export default function BookingTimeInformation({recurrence, dates, timeSlot}) {
-    const {startDate, endDate} = dates;
-    const {startTime, endTime} = timeSlot;
+export default function TimeInformation({recurrence, dates: {startDate, endDate}, timeSlot}) {
     const {type} = recurrence;
-    const sDate = toMoment(startDate);
-    const eDate = endDate ? toMoment(endDate) : null;
-    const sTime = toMoment(startTime, 'HH:mm');
-    const eTime = endTime ? toMoment(endTime, 'HH:mm') : null;
+    const mStartDate = toMoment(startDate);
+    const mEndDate = endDate ? toMoment(endDate) : null;
+    let timeInfo = null;
+
+    if (timeSlot) {
+        const {startTime, endTime} = timeSlot;
+        const mStartTime = toMoment(startTime, 'HH:mm');
+        const mEndTime = endTime ? toMoment(endTime, 'HH:mm') : null;
+        timeInfo = (
+            <Segment attached="bottom">
+                <Icon name="clock" />
+                <strong>{mStartTime.format('LT')}</strong>
+                {' → '}
+                <strong>{mEndTime.format('LT')}</strong>
+            </Segment>
+        );
+    }
+
     return (
         <div styleName="booking-time-info">
             <Segment attached="top" color="teal">
@@ -40,14 +52,14 @@ export default function BookingTimeInformation({recurrence, dates, timeSlot}) {
                 {(endDate && startDate !== endDate)
                     ? (
                         <Translate>
-                            <Param name="startTime"
+                            <Param name="startDate"
                                    wrapper={<strong />}
-                                   value={sDate.format('L')} /> to <Param name="endTime"
-                                                                          wrapper={<strong />}
-                                                                          value={eDate.format('L')} />
+                                   value={mStartDate.format('L')} /> to <Param name="endDate"
+                                                                               wrapper={<strong />}
+                                                                               value={mEndDate.format('L')} />
                         </Translate>
                     ) : (
-                        <strong>{sDate.format('L')}</strong>
+                        <strong>{mStartDate.format('L')}</strong>
                     )
                 }
                 {(type === 'daily' || type === 'every') && (
@@ -56,18 +68,17 @@ export default function BookingTimeInformation({recurrence, dates, timeSlot}) {
                     </Label>
                 )}
             </Segment>
-            <Segment attached="bottom">
-                <Icon name="clock" />
-                <strong>{sTime.format('LT')}</strong>
-                {' '}&rarr;{' '}
-                <strong>{eTime.format('LT')}</strong>
-            </Segment>
+            {timeInfo}
         </div>
     );
 }
 
-BookingTimeInformation.propTypes = {
+TimeInformation.propTypes = {
     recurrence: PropTypes.object.isRequired,
     dates: PropTypes.object.isRequired,
-    timeSlot: PropTypes.object.isRequired
+    timeSlot: PropTypes.object
+};
+
+TimeInformation.defaultProps = {
+    timeSlot: null
 };

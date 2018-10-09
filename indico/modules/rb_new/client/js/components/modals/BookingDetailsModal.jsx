@@ -23,11 +23,10 @@ import PropTypes from 'prop-types';
 import {Button, Modal, Message, Grid, Header, ModalActions, Icon, Popup, List} from 'semantic-ui-react';
 import {Param, Translate} from 'indico/react/i18n';
 import {toMoment, serializeDate} from 'indico/utils/date';
-import BookingTimeInformation from '../BookingTimeInformation';
+import BookingTimeInformation from '../TimeInformation';
 import RoomBasicDetails from '../../components/RoomBasicDetails';
 import {selectors as bookingsSelectors} from '../../common/bookings';
-import TimelineContent from '../../components/TimelineContent';
-import TimelineLegend from '../../components/TimelineLegend';
+import {DailyTimelineContent, TimelineLegend} from '../../common/timeline';
 import {PopupParam} from '../../util';
 
 import './BookingDetailsModal.module.scss';
@@ -87,7 +86,7 @@ class BookingDetailsModal extends React.Component {
     renderTimeline = (occurrences, dateRange) => {
         const hourSeries = _.range(6, 24, 2);
         const rows = dateRange.map((day) => this._getRowSerializer(day)(occurrences));
-        return <TimelineContent rows={rows} hourSeries={hourSeries} />;
+        return <DailyTimelineContent rows={rows} hourSeries={hourSeries} />;
     };
 
     renderBookingHistory = (editLogs, createdOn, createdBy) => {
@@ -212,7 +211,7 @@ class BookingDetailsModal extends React.Component {
 }
 
 const mapStateToProps = (state, {bookingId}) => ({
-    booking: bookingsSelectors.getDetails(state, {bookingId})
+    booking: bookingsSelectors.getDetailsWithRoom(state, {bookingId})
 });
 
 export default connect(
