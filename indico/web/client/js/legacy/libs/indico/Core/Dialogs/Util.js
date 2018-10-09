@@ -21,17 +21,17 @@
     var ERROR_DIALOG_TEMPLATE = _.template(
         '<div class="error-dialog">' +
         '    <div class="error-message-box">' +
-        '        <div class="message-text"><%= errorText %></div>' +
+        '        <div class="message-text"><%- errorText %></div>' +
         '    </div>' +
-        '    <p class="js-info-text"><%= infoText %></p>' +
+        '    <p class="js-info-text"><%- infoText %></p>' +
         '    <div class="actions">' +
         '        <button class="i-button big warning js-report-button"' +
         '                data-href="<%= url %>"' +
         '                data-title="<%= reportText %>"' +
         '                data-ajax-dialog>' +
-        '            <%= reportText %>' +
+        '            <%- reportText %>' +
         '        </button>' +
-        '        <button class="i-button big" data-button-back><%= closeText %></button>' +
+        '        <button class="i-button big" data-button-back><%- closeText %></button>' +
         '    </div>' +
         '</div>'
     );
