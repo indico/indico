@@ -31,37 +31,41 @@ import recurrenceRenderer from './filters/RecurrenceRenderer';
 import dateRenderer from './filters/DateRenderer';
 import timeRenderer from './filters/TimeRenderer';
 import {actions as filtersActions} from '../../common/filters';
+import * as bookRoomSelectors from './selectors';
 
 
 class BookingFilterBar extends React.Component {
     static propTypes = {
-        recurrence: PropTypes.shape({
-            number: PropTypes.number,
-            type: PropTypes.string,
-            interval: PropTypes.string
+        dayBased: PropTypes.bool,
+        filters: PropTypes.shape({
+            recurrence: PropTypes.shape({
+                number: PropTypes.number,
+                type: PropTypes.string,
+                interval: PropTypes.string
+            }).isRequired,
+            dates: PropTypes.shape({
+                startDate: PropTypes.string,
+                endDate: PropTypes.string
+            }).isRequired,
+            timeSlot: PropTypes.shape({
+                startTime: PropTypes.string,
+                endTime: PropTypes.string
+            }),
         }).isRequired,
-        dates: PropTypes.shape({
-            startDate: PropTypes.string,
-            endDate: PropTypes.string
-        }).isRequired,
-        timeSlot: PropTypes.shape({
-            startTime: PropTypes.string,
-            endTime: PropTypes.string
-        }),
         actions: PropTypes.shape({
             setFilterParameter: PropTypes.func
         }).isRequired,
-        dayBased: PropTypes.bool
     };
 
     static defaultProps = {
         dayBased: false,
-        timeSlot: null
     };
 
     render() {
         const {
-            recurrence, dates, timeSlot, actions: {setFilterParameter}, dayBased
+            dayBased,
+            filters: {recurrence, dates, timeSlot},
+            actions: {setFilterParameter},
         } = this.props;
 
         return (
@@ -113,7 +117,7 @@ class BookingFilterBar extends React.Component {
 
 export default connect(
     state => ({
-        ...state.bookRoom.filters
+        filters: bookRoomSelectors.getFilters(state),
     }),
     dispatch => ({
         actions: {
