@@ -161,18 +161,17 @@ class BookRoomModal extends React.Component {
         resetAvailability();
     }
 
-    renderPrincipalSearchField = ({input, showCurrentUserPlaceholder, ...props}) => {
+    renderPrincipalSearchField = ({showCurrentUserPlaceholder, ...fieldProps}) => {
         const {favoriteUsers, userFullName} = this.props;
         if (showCurrentUserPlaceholder) {
-            props.placeholder = userFullName;
+            fieldProps.placeholder = userFullName;
         }
         return (
-            <ReduxFormField {...props}
-                            input={{...input, value: null}}
+            <ReduxFormField {...fieldProps}
                             favoriteUsers={favoriteUsers}
                             as={PrincipalSearchField}
                             onChange={(user) => {
-                                input.onChange(user);
+                                fieldProps.input.onChange(user);
                             }} />
         );
     };

@@ -29,7 +29,7 @@ import {Translate} from 'indico/react/i18n';
 import camelizeKeys from 'indico/utils/camelize';
 
 
-const searchUser = async (data) => {
+const searchUsers = async (data) => {
     let response;
     try {
         response = await indicoAxios.get(searchUsersURL(), {params: {...data, favorites_first: true}});
@@ -78,7 +78,7 @@ export default class PrincipalSearchField extends React.Component {
     constructor(props) {
         super(props);
 
-        const {multiple, onChange} = this.props;
+        const {multiple} = this.props;
         let {value} = this.props;
         let dropdownValue;
 
@@ -103,7 +103,7 @@ export default class PrincipalSearchField extends React.Component {
             this.userCache = {};
         }
 
-        onChange(value);
+        this.notifyChange(value);
     }
 
     static getDerivedStateFromProps({value, multiple}, state) {
@@ -112,8 +112,8 @@ export default class PrincipalSearchField extends React.Component {
             newValue = value.map((val) => val.identifier);
             valuesChanged = !_.isEqual(newValue.sort(), state.prevPropsValue.sort());
         } else {
-            valuesChanged = value !== state.prevPropsValue;
-            newValue = value;
+            newValue = value.identifier;
+            valuesChanged = newValue !== state.prevPropsValue;
         }
 
         if (valuesChanged) {
@@ -124,6 +124,17 @@ export default class PrincipalSearchField extends React.Component {
             };
         }
         return null;
+    }
+
+    shouldComponentUpdate(nextProps, nextState) {
+        const {value: prevValue, disabled: prevDisabled, placeholder: prevPlaceholder} = this.props;
+        const {value, disabled, placeholder} = nextProps;
+        return (
+            nextState !== this.state ||
+            prevDisabled !== disabled ||
+            prevPlaceholder !== placeholder ||
+            !_.isEqual(prevValue, value)
+        );
     }
 
     isInFavorites = (userId) => {
@@ -182,7 +193,7 @@ export default class PrincipalSearchField extends React.Component {
         const {withGroups} = this.props;
         const promises = [];
 
-        promises.push(searchUser(query));
+        promises.push(searchUsers(query));
         if (withGroups) {
             promises.push(searchGroups({name: searchQuery}));
         }
@@ -200,8 +211,26 @@ export default class PrincipalSearchField extends React.Component {
         });
     }, 1000);
 
+    handleSelectionChange = (__, {value}) => {
+        const {multiple} = this.props;
+        let fieldValue;
+        if (multiple) {
+            fieldValue = value.map((id) => this.userCache[id]);
+        } else {
+            fieldValue = this.userCache[value];
+        }
+
+        this.setState({value, searchQuery: ''});
+        this.notifyChange(fieldValue);
+    };
+
+    notifyChange = (value) => {
+        const {onChange} = this.props;
+        onChange(value);
+    };
+
     render() {
-        const {multiple, onChange, disabled, withGroups} = this.props;
+        const {multiple, disabled, withGroups} = this.props;
         const {isFetching, options, value, searchQuery} = this.state;
         let {placeholder} = this.props;
         let dropdownValues, selectedValues, dropdownOptions;
@@ -232,9 +261,18 @@ export default class PrincipalSearchField extends React.Component {
         );
         const dropdownProps = disabled ? {icon: null, renderLabel: renderDisabledLabel} : {search: opts => opts};
         const searchInput = {
-            onChange: ({target: {value: inputValue}}) => this.setState({searchQuery: inputValue}),
+            onChange: ({target: {value: inputValue}}) => {
+                const {value: stateValue} = this.state;
+                const valueChanged = stateValue !== null;
+                const clearSingleValue = multiple ? {} : {value: null};
+                this.setState({searchQuery: inputValue, ...clearSingleValue});
+                if (!multiple && valueChanged) {
+                    this.notifyChange(null);
+                }
+            },
             disabled: isFetching || disabled
         };
+
         return (
             <Dropdown deburr
                       selection
@@ -249,17 +287,7 @@ export default class PrincipalSearchField extends React.Component {
                       value={dropdownValues}
                       placeholder={placeholder}
                       onOpen={() => this.setState({options: []})}
-                      onChange={(__, {value: val}) => {
-                          let fieldValue;
-                          if (multiple) {
-                              fieldValue = val.map((id) => this.userCache[id]);
-                          } else {
-                              fieldValue = this.userCache[val];
-                          }
-
-                          this.setState({value: val, searchQuery: ''});
-                          onChange(fieldValue);
-                      }}
+                      onChange={this.handleSelectionChange}
                       onSearchChange={this.handleSearchChange}
                       disabled={isFetching || disabled}
                       loading={isFetching}

@@ -115,8 +115,8 @@ class BlockingModal extends React.Component {
                             favoriteUsers={favoriteUsers}
                             as={PrincipalSearchField}
                             label={Translate.string('Allowed users / groups')}
-                            onChange={(user) => {
-                                input.onChange(user);
+                            onChange={(principals) => {
+                                input.onChange(principals);
                             }}
                             multiple
                             withGroups />
