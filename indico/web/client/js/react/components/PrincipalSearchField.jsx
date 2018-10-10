@@ -62,7 +62,8 @@ export default class PrincipalSearchField extends React.Component {
         onChange: PropTypes.func.isRequired,
         disabled: PropTypes.bool,
         withGroups: PropTypes.bool,
-        favoriteUsers: PropTypes.array
+        favoriteUsers: PropTypes.array,
+        placeholder: PropTypes.string,
     };
 
     static defaultProps = {
@@ -70,7 +71,8 @@ export default class PrincipalSearchField extends React.Component {
         value: null,
         disabled: false,
         withGroups: false,
-        favoriteUsers: []
+        favoriteUsers: [],
+        placeholder: null,
     };
 
     constructor(props) {
@@ -201,12 +203,15 @@ export default class PrincipalSearchField extends React.Component {
     render() {
         const {multiple, onChange, disabled, withGroups} = this.props;
         const {isFetching, options, value, searchQuery} = this.state;
-        let dropdownValues, selectedValues, dropdownOptions, placeholder;
+        let {placeholder} = this.props;
+        let dropdownValues, selectedValues, dropdownOptions;
 
-        if (withGroups) {
-            placeholder = Translate.string('Write a name (of the group or user) or e-mail...');
-        } else {
-            placeholder = Translate.string('Write a name of the user or e-mail...');
+        if (!placeholder) {
+            if (withGroups) {
+                placeholder = Translate.string('Write the name or e-mail of a user or a group name...');
+            } else {
+                placeholder = Translate.string('Write the name or e-mail of the user...');
+            }
         }
 
         if (multiple) {
