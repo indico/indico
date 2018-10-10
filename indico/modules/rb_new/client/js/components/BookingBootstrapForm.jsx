@@ -28,8 +28,6 @@ import {serializeDate, serializeTime} from 'indico/utils/date';
 import TimeRangePicker from './TimeRangePicker';
 import {sanitizeRecurrence} from '../util';
 
-import './BookingBootstrapForm.module.scss';
-
 
 export default class BookingBootstrapForm extends React.Component {
     static propTypes = {
@@ -223,8 +221,8 @@ export default class BookingBootstrapForm extends React.Component {
                         {
                             () => (
                                 <Form.Group inline>
-                                    <Form.Input styleName="booking-date" icon="calendar" value={moment(startDate).format('L') || ''} />
-                                    <Form.Input styleName="booking-date" icon="calendar" value={moment(endDate).format('L') || ''} />
+                                    <Form.Input icon="calendar" value={moment(startDate).format('L') || ''} />
+                                    <Form.Input icon="calendar" value={moment(endDate).format('L') || ''} />
                                 </Form.Group>
                             )
                         }
@@ -235,8 +233,7 @@ export default class BookingBootstrapForm extends React.Component {
                         {
                             () => (
                                 <Form.Group inline>
-                                    <Form.Input styleName="booking-date" icon="calendar"
-                                                value={serializeDate(startDate, 'L') || ''} />
+                                    <Form.Input icon="calendar" value={serializeDate(startDate, 'L') || ''} />
                                 </Form.Group>
                             )
                         }
