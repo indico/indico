@@ -126,6 +126,7 @@ class BookRoomModal extends React.Component {
     static propTypes = {
         room: PropTypes.object,
         isAdmin: PropTypes.bool.isRequired,
+        userFullName: PropTypes.string.isRequired,
         bookingData: PropTypes.object.isRequired,
         onClose: PropTypes.func.isRequired,
         availability: PropTypes.object,
@@ -160,8 +161,11 @@ class BookRoomModal extends React.Component {
         resetAvailability();
     }
 
-    renderPrincipalSearchField = ({input, ...props}) => {
-        const {favoriteUsers} = this.props;
+    renderPrincipalSearchField = ({input, showCurrentUserPlaceholder, ...props}) => {
+        const {favoriteUsers, userFullName} = this.props;
+        if (showCurrentUserPlaceholder) {
+            props.placeholder = userFullName;
+        }
         return (
             <ReduxFormField {...props}
                             input={{...input, value: null}}
@@ -386,7 +390,8 @@ class BookRoomModal extends React.Component {
                                     </Form.Group>
                                     <Field name="user"
                                            component={this.renderPrincipalSearchField}
-                                           disabled={bookingBlocked(fprops) || fprops.values.usage !== 'someone'} />
+                                           disabled={bookingBlocked(fprops) || fprops.values.usage !== 'someone'}
+                                           showCurrentUserPlaceholder={fprops.values.usage === 'myself'} />
                                     <Field name="reason"
                                            component={ReduxFormField}
                                            as={Form.TextArea}
@@ -438,6 +443,7 @@ export default connect(
     (state, {roomId}) => ({
         favoriteUsers: userSelectors.getFavoriteUsers(state),
         isAdmin: userSelectors.isUserAdmin(state),
+        userFullName: userSelectors.getUserFullName(state),
         availability: state.bookRoom.bookingForm.availability,
         room: roomsSelectors.getRoom(state, {roomId}),
     }),
