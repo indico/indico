@@ -15,8 +15,6 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint "react/no-unused-state": "off" */
-
 import _ from 'lodash';
 import React from 'react';
 import PropTypes from 'prop-types';
@@ -86,13 +84,13 @@ export default class PrincipalSearchField extends React.Component {
             value = value || [];
             dropdownValue = value.map((val) => val.identifier);
         } else {
-            dropdownValue = value && value.identifier;
+            dropdownValue = value ? value.identifier : null;
         }
 
         this.state = {
             isFetching: false,
             options: [],
-            prevPropsValue: dropdownValue,
+            prevPropsValue: dropdownValue,  // eslint-disable-line react/no-unused-state
             value: dropdownValue,
             searchQuery: ''
         };
@@ -112,7 +110,7 @@ export default class PrincipalSearchField extends React.Component {
             newValue = value.map((val) => val.identifier);
             valuesChanged = !_.isEqual(newValue.sort(), state.prevPropsValue.sort());
         } else {
-            newValue = value.identifier;
+            newValue = value ? value.identifier : null;
             valuesChanged = newValue !== state.prevPropsValue;
         }
 
