@@ -19,6 +19,7 @@ import fetchBookingDetailsURL from 'indico-url:rooms_new.booking_details';
 
 import {indicoAxios} from 'indico/utils/axios';
 import {ajaxAction} from 'indico/utils/redux';
+import {actions as modalActions} from '../../modals';
 
 
 export const BOOKING_DETAILS_RECEIVED = 'bookings/BOOKING_DETAILS_RECEIVED';
@@ -37,3 +38,5 @@ export function fetchBookingDetails(id) {
         )(dispatch);
     };
 }
+
+export const openBookingDetails = (bookingId) => modalActions.openModal('booking-details', bookingId);

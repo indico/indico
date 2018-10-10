@@ -15,11 +15,11 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import * as actions from './actions';
-import * as selectors from './selectors';
+import React from 'react';
+import BookingDetailsPreloader from './BookingDetailsPreloader';
 
 
-export {default as reducer} from './reducers';
-export {default as BookingDetailsPreloader} from './BookingDetailsPreloader';
-export {default as modalHandlers} from './modals';
-export {actions, selectors};
+export default {
+    /* eslint-disable react/display-name */
+    'booking-details': (onClose, bookingId) => <BookingDetailsPreloader bookingId={bookingId} onClose={onClose} />
+};

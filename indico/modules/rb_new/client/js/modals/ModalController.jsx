@@ -25,6 +25,7 @@ import {push} from 'connected-react-router';
 import {modalHandlers as blockingModalHandlers} from '../modules/blockings';
 import {modalHandlers as bookRoomModalHandlers} from '../modules/bookRoom';
 import {modalHandlers as roomsModalHandlers} from '../common/rooms';
+import {modalHandlers as bookingsModalHandlers} from '../common/bookings';
 import * as globalSelectors from '../selectors';
 
 
@@ -45,6 +46,7 @@ class ModalController extends React.PureComponent {
             ...blockingModalHandlers,
             ...bookRoomModalHandlers,
             ...roomsModalHandlers,
+            ...bookingsModalHandlers,
         };
     }
 

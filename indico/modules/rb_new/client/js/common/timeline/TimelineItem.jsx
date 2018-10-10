@@ -150,9 +150,9 @@ export default class TimelineItem extends React.Component {
         const segment = (
             <div className={additionalClasses} onClick={() => {
                 if (onClickCandidate && bookable && type === 'candidate') {
-                    onClickCandidate(room);
+                    onClickCandidate(room.id);
                 } else if (onClickReservation && type === 'booking') {
-                    onClickReservation(reservation);
+                    onClickReservation(reservation.id);
                 }
             }}
                  styleName="timeline-occurrence"

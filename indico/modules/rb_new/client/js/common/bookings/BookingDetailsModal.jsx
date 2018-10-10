@@ -23,10 +23,10 @@ import PropTypes from 'prop-types';
 import {Button, Modal, Message, Grid, Header, ModalActions, Icon, Popup, List} from 'semantic-ui-react';
 import {Param, Translate} from 'indico/react/i18n';
 import {toMoment, serializeDate} from 'indico/utils/date';
-import BookingTimeInformation from '../TimeInformation';
+import BookingTimeInformation from '../../components/TimeInformation';
 import RoomBasicDetails from '../../components/RoomBasicDetails';
-import {selectors as bookingsSelectors} from '../../common/bookings';
-import {DailyTimelineContent, TimelineLegend} from '../../common/timeline';
+import * as bookingsSelectors from './selectors';
+import {DailyTimelineContent, TimelineLegend} from '../timeline';
 import {PopupParam} from '../../util';
 
 import './BookingDetailsModal.module.scss';

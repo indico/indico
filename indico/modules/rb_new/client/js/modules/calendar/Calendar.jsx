@@ -27,6 +27,7 @@ import {serializeDate} from 'indico/utils/date';
 import searchBarFactory from '../../containers/SearchBar';
 import * as calendarActions from './actions';
 import * as calendarSelectors from './selectors';
+import {actions as bookingsActions} from '../../common/bookings';
 import {EditableTimelineItem, TimelineBase, TimelineHeader} from '../../common/timeline';
 import {actions as bookRoomActions} from '../../modules/bookRoom';
 import {actions as filtersActions} from '../../common/filters';
@@ -49,7 +50,8 @@ class Calendar extends React.Component {
             fetchCalendar: PropTypes.func.isRequired,
             openRoomDetails: PropTypes.func.isRequired,
             openBookRoom: PropTypes.func.isRequired,
-            setFilterParameter: PropTypes.func.isRequired
+            setFilterParameter: PropTypes.func.isRequired,
+            openBookingDetails: PropTypes.func.isRequired,
         }).isRequired,
         filters: PropTypes.object.isRequired,
         hasFavoriteRooms: PropTypes.bool.isRequired,
@@ -123,7 +125,7 @@ class Calendar extends React.Component {
 
     render() {
         const {
-            isFetching, calendarData: {rows}, actions: {openRoomDetails, setFilterParameter},
+            isFetching, calendarData: {rows}, actions: {openRoomDetails, setFilterParameter, openBookingDetails},
             hasFavoriteRooms, filters: {date, onlyFavorites}
         } = this.props;
         const {showUnused} = this.state;
@@ -167,7 +169,7 @@ class Calendar extends React.Component {
                             <TimelineBase rows={rows.map(this._getRowSerializer(date || serializeDate(moment())))}
                                           onClickLabel={openRoomDetails}
                                           isLoading={isFetching}
-                                          onClickReservation={this.openDetailsModal}
+                                          onClickReservation={openBookingDetails}
                                           itemClass={EditableTimelineItem}
                                           itemProps={{onAddSlot: this.onAddSlot}}
                                           showUnused={showUnused}
@@ -195,6 +197,7 @@ export default connect(
             openRoomDetails: roomsActions.openRoomDetails,
             openBookRoom: bookRoomActions.openBookRoom,
             setFilterParameter: (param, value) => filtersActions.setFilterParameter('calendar', param, value),
-        }, dispatch)
+            openBookingDetails: bookingsActions.openBookingDetails,
+        }, dispatch),
     }),
 )(Calendar);
