@@ -148,10 +148,6 @@ def get_room_calendar(day, room_ids):
              .order_by(db.func.indico.natsort(Room.full_name))
              .options(reservation_strategy))
 
-    if room_ids:
-        print "TRUE"
-    else:
-        print "FALSE"
     rooms = (Room.query
              .filter(Room.is_active, Room.id.in_(room_ids) if room_ids else True)
              .options(joinedload('location'))

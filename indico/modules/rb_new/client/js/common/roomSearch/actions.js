@@ -36,6 +36,7 @@ export function roomSearchActionsFactory(namespace) {
                 return;
             }
             const params = preProcessParameters(filters, ajaxFilterRules);
+
             return await ajaxAction(
                 () => indicoAxios.get(searchRoomsURL(), {params}),
                 SEARCH_ROOMS_REQUEST,

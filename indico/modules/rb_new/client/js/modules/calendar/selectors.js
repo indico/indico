@@ -24,9 +24,9 @@ export const isFetching = ({calendar}) => calendar.request.state === RequestStat
 export const getCalendarData = createSelector(
     ({calendar}) => calendar.data,
     roomsSelectors.getAllRooms,
-    ({date, rows}, allRooms) => ({
-        date,
+    ({roomIds, rows}, allRooms) => ({
+        roomIds,
         rows: rows.map(entry => ({...entry, room: allRooms[entry.room_id]}))
     })
 );
-export const getFilters = ({['calendar']: stateSlice}) => stateSlice.filters;
+export const getFilters = ({calendar}) => calendar.filters;

@@ -27,16 +27,17 @@ import {processRoomFilters} from '../../common/roomSearch/reducers';
 
 
 export const initialState = {
-    date: serializeDate(moment()),
     rows: [],
+    roomIds: null
 };
 
-export const initialFilterState = {
+export const initialFilterState = () => ({
     text: null,
     building: null,
     floor: null,
-    onlyFavorites: false
-};
+    onlyFavorites: false,
+    date: serializeDate(moment()),
+});
 
 export default combineReducers({
     request: requestReducer(calendarActions.FETCH_REQUEST, calendarActions.FETCH_SUCCESS, calendarActions.FETCH_ERROR),
@@ -45,10 +46,10 @@ export default combineReducers({
         switch (action.type) {
             case actions.RESET_PAGE_STATE:
                 return action.namespace === 'calendar' ? initialState : state;
-            case calendarActions.SET_DATE:
-                return {...state, rows: [], date: action.date};
             case calendarActions.ROWS_RECEIVED:
                 return {...state, rows: action.data};
+            case calendarActions.ROOM_IDS_RECEIVED:
+                return {...state, roomIds: action.data};
             default:
                 return state;
         }

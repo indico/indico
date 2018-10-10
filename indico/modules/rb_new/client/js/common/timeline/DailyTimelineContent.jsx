@@ -72,9 +72,9 @@ export default class DailyTimelineContent extends React.Component {
         return onClickLabel ? () => onClickLabel(id) : false;
     };
 
-    hasUsage = ({preBookings, blockings, bookings, nonbookablePeriods, unbookableHours}) => {
-        return !(_.isEmpty(preBookings) && _.isEmpty(blockings) && _.isEmpty(nonbookablePeriods) &&
-                 _.isEmpty(bookings) && _.isEmpty(nonbookablePeriods) && _.isEmpty(unbookableHours));
+    hasUsage = (availability) => {
+        const fields = ['preBookings', 'blockings', 'bookings', 'nonbookablePeriods', 'unbookableHours'];
+        return fields.some(field => !_.isEmpty(availability[field]));
     };
 
     renderTimelineRow = ({availability, label, conflictIndicator, key, room}) => {
@@ -99,7 +99,7 @@ export default class DailyTimelineContent extends React.Component {
                     <ItemClass startHour={minHour} endHour={maxHour} data={availability} room={room}
                                onClick={() => {
                                    if (onClick && (!hasConflicts || recurrenceType !== 'single')) {
-                                       onClick(room);
+                                       onClick(room.id);
                                    }
                                }}
                                setSelectable={selectable => {

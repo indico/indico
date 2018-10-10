@@ -111,7 +111,7 @@ export default class SearchBar extends React.Component {
         const filterValue = value || null;
         const stateChanges = {[filterName]: filterValue};
         const {actions: {setFilterParameter}} = this.props;
-        console.warn(filterName);
+
         if (filterName === 'building') {
             stateChanges.floor = null;
         }
