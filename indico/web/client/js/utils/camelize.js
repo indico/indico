@@ -28,6 +28,10 @@ export default function camelizeKeys(obj) {
     }
 
     return Object.entries(obj).reduce((accum, [key, value]) => {
-        return {...accum, [_.camelCase(key)]: camelizeKeys(value)};
+        if (key.match('^[A-Za-z_]+$')) {
+            return {...accum, [_.camelCase(key)]: camelizeKeys(value)};
+        } else {
+            return {...accum, key: camelizeKeys(value)};
+        }
     }, {});
 }
