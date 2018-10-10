@@ -125,7 +125,7 @@ TimeInformation.defaultProps = {
 class BookRoomModal extends React.Component {
     static propTypes = {
         room: PropTypes.object,
-        user: PropTypes.object.isRequired,
+        isAdmin: PropTypes.bool.isRequired,
         bookingData: PropTypes.object.isRequired,
         onClose: PropTypes.func.isRequired,
         availability: PropTypes.object,
@@ -322,7 +322,8 @@ class BookRoomModal extends React.Component {
     render() {
         const {
             bookingData: {recurrence, dates, timeSlot},
-            room, user, availability, timeInformationComponent: TimeInformationComponent
+            room, isAdmin, availability,
+            timeInformationComponent: TimeInformationComponent
         } = this.props;
         const {skipConflicts, bookingConflictsVisible} = this.state;
 
@@ -401,7 +402,7 @@ class BookRoomModal extends React.Component {
                     </Grid>
                 </Modal.Content>
                 <Modal.Actions>
-                    {(isDirectlyBookable || user.isAdmin) && (
+                    {(isDirectlyBookable || isAdmin) && (
                         this.renderBookingButton(false, buttonsBlocked(fprops), fprops)
                     )}
                     {!isDirectlyBookable && this.renderBookingButton(true, buttonsBlocked(fprops), fprops)}
@@ -436,8 +437,8 @@ class BookRoomModal extends React.Component {
 export default connect(
     (state, {roomId}) => ({
         favoriteUsers: userSelectors.getFavoriteUsers(state),
+        isAdmin: userSelectors.isUserAdmin(state),
         availability: state.bookRoom.bookingForm.availability,
-        user: state.user,
         room: roomsSelectors.getRoom(state, {roomId}),
     }),
     dispatch => ({
