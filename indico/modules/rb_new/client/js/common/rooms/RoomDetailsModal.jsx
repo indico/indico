@@ -23,6 +23,7 @@ import {connect} from 'react-redux';
 import {Button, Grid, Icon, Modal, Header, Message, List, Segment, Popup} from 'semantic-ui-react';
 import {Translate, Param} from 'indico/react/i18n';
 import RoomBasicDetails from '../../components/RoomBasicDetails';
+import RoomKeyLocation from '../../components/RoomKeyLocation';
 import {DailyTimelineContent, TimelineLegend} from '../timeline';
 import * as roomsSelectors from './selectors';
 import {actions as bookRoomActions} from '../../modules/bookRoom';
@@ -122,7 +123,7 @@ function RoomDetails({bookRoom, room, availability, attributes}) {
                         <RoomBasicDetails room={room} />
                         <RoomAvailabilityBox room={room} />
                         <RoomCommentsBox room={room} />
-                        <RoomKeyLocationBox room={room} />
+                        <RoomKeyLocation room={room} />
                         <RoomCustomAttributesBox attributes={attributes} />
                     </div>
                 </Grid.Column>
@@ -189,17 +190,6 @@ function RoomCommentsBox({room}) {
 }
 
 RoomCommentsBox.propTypes = {
-    room: PropTypes.object.isRequired,
-};
-
-function RoomKeyLocationBox({room}) {
-    return room.key_location && (
-        <Message styleName="message-icon" icon="key"
-                 content={<span dangerouslySetInnerHTML={{__html: room.key_location}} />} />
-    );
-}
-
-RoomKeyLocationBox.propTypes = {
     room: PropTypes.object.isRequired,
 };
 

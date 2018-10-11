@@ -169,7 +169,6 @@ class RBUserSchema(UserSchema):
         return has_managed_rooms(user)
 
 
-<<<<<<< a96f74b074d6fba81c670a3bd9432a0111570abf
 class CreateBookingSchema(Schema):
     start_dt = fields.DateTime(required=True)
     end_dt = fields.DateTime(required=True)
@@ -187,12 +186,12 @@ class CreateBookingSchema(Schema):
     def validate_dts(self, data):
         if data['start_dt'] >= data['end_dt']:
             raise ValidationError(_('Booking cannot end before it starts'))
-=======
+
+
 class ReservationEditLogSchema(UserSchema):
     class Meta:
         model = ReservationEditLog
         fields = ('timestamp', 'info', 'user_name')
->>>>>>> Add history to booking details modal
 
 
 rb_user_schema = RBUserSchema()

@@ -25,6 +25,7 @@ import {Param, Translate} from 'indico/react/i18n';
 import {toMoment, serializeDate} from 'indico/utils/date';
 import BookingTimeInformation from '../../components/TimeInformation';
 import RoomBasicDetails from '../../components/RoomBasicDetails';
+import RoomKeyLocation from '../../components/RoomKeyLocation';
 import * as bookingsSelectors from './selectors';
 import {DailyTimelineContent, TimelineLegend} from '../timeline';
 import {PopupParam} from '../../util';
@@ -157,10 +158,11 @@ class BookingDetailsModal extends React.Component {
                     <Grid columns={2}>
                         <Grid.Column>
                             <RoomBasicDetails room={room} />
+                            <RoomKeyLocation room={room} />
                             <BookingTimeInformation recurrence={recurrence}
                                                     dates={dates}
                                                     timeSlot={times} />
-                            <Message attached="bottom">
+                            <Message success attached="bottom">
                                 <Message.Content>
                                     <Translate>
                                         Consult the <Param name="occurrences-link" wrapper={link}>timeline view</Param> to see the booking occurrences.
