@@ -17,7 +17,7 @@
 from __future__ import unicode_literals
 
 from flask import session
-from marshmallow import Schema, ValidationError, fields, validate, validates_schema
+from marshmallow import Schema, ValidationError, fields, post_dump, validate, validates_schema
 from marshmallow.fields import Boolean, Function, Nested, String
 from marshmallow_enum import EnumField
 
@@ -34,6 +34,7 @@ from indico.modules.rb.models.room_bookable_hours import BookableHours
 from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
 from indico.modules.rb.models.rooms import Room
 from indico.modules.users.schemas import UserSchema
+from indico.util.string import natural_sort_key
 
 
 _room_fields = ('id', 'name', 'capacity', 'building', 'floor', 'number', 'is_public', 'location_name', 'has_vc',
@@ -85,6 +86,12 @@ class BlockedRoomSchema(mm.ModelSchema):
     class Meta:
         model = BlockedRoom
         fields = ('rejection_reason', 'room')
+
+    @post_dump(pass_many=True)
+    def sort_rooms(self, data, many):
+        if many:
+            data = sorted(data, key=lambda x: natural_sort_key(x['room']['full_name']))
+        return data
 
 
 class BlockingPrincipalSchema(mm.ModelSchema):
