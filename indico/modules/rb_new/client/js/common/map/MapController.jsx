@@ -97,7 +97,7 @@ class MapController extends React.Component {
     }
 
     onMapLoad = async () => {
-        const {filterBounds, actions: {toggleMapSearch}} = this.props;
+        const {mapData: {filterBounds}, actions: {toggleMapSearch}} = this.props;
         this.updateToMapBounds();
         toggleMapSearch(!_.isEmpty(filterBounds), filterBounds);
         this.setState({
@@ -203,14 +203,12 @@ export default function mapControllerFactory(namespace, searchRoomSelectors) {
     const getMapData = mapSelectors.makeGetMapData(namespace);
     const isMapSearchEnabled = mapSelectors.makeIsMapSearchEnabled(namespace);
     return connect(
-        state => {
-            return {
-                aspects: mapSelectors.getMapAspects(state),
-                rooms: searchRoomSelectors.getSearchResultsForMap(state),
-                mapData: getMapData(state),
-                searchEnabled: isMapSearchEnabled(state),
-            };
-        },
+        state => ({
+            aspects: mapSelectors.getMapAspects(state),
+            rooms: searchRoomSelectors.getSearchResultsForMap(state),
+            mapData: getMapData(state),
+            searchEnabled: isMapSearchEnabled(state),
+        }),
         dispatch => ({
             actions: {
                 updateLocation: (location, search) => {
