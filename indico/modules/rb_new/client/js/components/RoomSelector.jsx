@@ -58,11 +58,7 @@ class RoomSelector extends React.Component {
 
     constructor(props) {
         super(props);
-        const {initialValue, onChange} = this.props;
-
-        if (initialValue) {
-            onChange(initialValue);
-        }
+        const {initialValue} = this.props;
 
         this.state = {
             isFetchingLocations: false,

@@ -100,8 +100,6 @@ export default class PrincipalSearchField extends React.Component {
         } else {
             this.userCache = {};
         }
-
-        this.notifyChange(value);
     }
 
     static getDerivedStateFromProps({value, multiple}, state) {
