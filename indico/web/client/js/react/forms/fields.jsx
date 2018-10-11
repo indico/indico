@@ -35,7 +35,7 @@ export function ReduxFormField(
     // - there was an error during submission
     //   ...and the field has not been modified since the failed submission
     let errorLabel = null;
-    if (touched && error && dirty) {
+    if (touched && error && (dirty || required)) {
         errorLabel = <Label basic color="red" pointing="above" content={error} />;
     } else if (submitError && !dirtySinceLastSubmit) {
         errorLabel = <Label basic color="red" pointing="above" content={submitError} />;
