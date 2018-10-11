@@ -76,8 +76,12 @@ class RoomSelector extends React.Component {
     componentDidMount() {
         // eslint-disable-next-line react/no-did-mount-set-state
         this.setState({isFetchingLocations: true}, async () => {
-            const result = await fetchLocations();
-            this.setState({locations: result.data, isFetchingLocations: false});
+            const {data: locations} = await fetchLocations();
+            this.setState({
+                locations,
+                isFetchingLocations: false,
+                selectedLocation: locations.length === 1 ? locations[0] : null,
+            });
         });
     }
 
