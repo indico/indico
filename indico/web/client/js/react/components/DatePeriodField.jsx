@@ -39,13 +39,6 @@ export default class DatePeriodField extends React.Component {
         format: 'L'
     };
 
-    constructor(props) {
-        super(props);
-
-        const {onChange, initialValue} = this.props;
-        onChange(initialValue);
-    }
-
     render() {
         const {onChange, disabledDate, disabled, initialValue, format} = this.props;
         return (
