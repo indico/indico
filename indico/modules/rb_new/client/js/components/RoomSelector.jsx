@@ -81,6 +81,12 @@ class RoomSelector extends React.Component {
         });
     }
 
+    shouldComponentUpdate(nextProps, nextState) {
+        const {disabled: prevDisabled} = this.props;
+        const {disabled} = nextProps;
+        return nextState !== this.state || disabled !== prevDisabled;
+    }
+
     removeItem = (room) => {
         const {selectedRooms} = this.state;
         const {onChange} = this.props;
