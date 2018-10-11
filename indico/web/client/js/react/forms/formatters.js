@@ -16,7 +16,7 @@
  */
 
 function trim(value) {
-    return value === undefined ? '' : value.trim();
+    return value === undefined ? undefined : value.trim();
 }
 
 
