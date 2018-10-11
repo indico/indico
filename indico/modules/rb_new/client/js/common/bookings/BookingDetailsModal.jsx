@@ -91,7 +91,7 @@ class BookingDetailsModal extends React.Component {
 
     renderBookingHistory = (editLogs, createdOn, createdBy) => {
         const items = (editLogs ? editLogs.map((log, i) => {
-            const {timestamp, info, user_name: userName} = log;
+            const {timestamp, info, userName} = log;
             const basicInfo = <strong>{info[0]}</strong>;
             const details = (info[1] ? info[1] : null);
             const dateValue = serializeDate(toMoment(timestamp));
@@ -135,12 +135,11 @@ class BookingDetailsModal extends React.Component {
     render() {
         const {booking} = this.props;
         const {
-            room, booked_for_user: bookedFor, start_dt: startDt, end_dt: endDt, repetition, created_by_user: createdBy,
-            created_dt: createdDt, booking_reason: reason
+            room, bookedForUser, startDt, endDt, repetition, createdByUser, createdDt, bookingReason
         } = booking.attributes;
-        const {occurrences, date_range: dateRange, edit_logs: editLogs} = booking;
+        const {occurrences, dateRange, editLogs} = booking;
         const {occurrencesVisible} = this.state;
-        const {full_name: bookedForName, email: bookedForEmail, phone: bookedForPhone} = bookedFor;
+        const {fullName: bookedForName, email: bookedForEmail, phone: bookedForPhone} = bookedForUser;
         const dates = {startDate: startDt, endDate: endDt};
         const createdOn = serializeDate(toMoment(createdDt));
         const times = {startTime: moment(startDt).utc().format('HH:mm'), endTime: moment(endDt).utc().format('HH:mm')};
@@ -179,9 +178,9 @@ class BookingDetailsModal extends React.Component {
                                 </Grid.Column>
                                 <Grid.Column width={8}>
                                     <Header><Translate>Reason</Translate></Header>
-                                    <div>{reason}</div>
+                                    <div>{bookingReason}</div>
                                 </Grid.Column>
-                                {this.renderBookingHistory(editLogs, createdOn, createdBy)}
+                                {this.renderBookingHistory(editLogs, createdOn, createdByUser)}
                             </Grid>
                         </Grid.Column>
                     </Grid>

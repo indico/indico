@@ -17,6 +17,7 @@
 
 import {combineReducers} from 'redux';
 
+import camelizeKeys from 'indico/utils/camelize';
 import {requestReducer} from 'indico/utils/redux';
 import * as actions from './actions';
 import * as globalActions from '../../actions';
@@ -60,7 +61,7 @@ const timelineReducer = combineReducers({
                 return {
                     ...state,
                     dateRange: action.data.date_range,
-                    availability: state.availability.concat(action.data.availability),
+                    availability: state.availability.concat(camelizeKeys(action.data.availability)),
                 };
             case actions.CREATE_BOOKING_SUCCESS: {
                 const {data: {room_id: roomId}} = action;
@@ -89,7 +90,7 @@ const unavailableReducer = combineReducers({
             case actions.GET_UNAVAILABLE_TIMELINE_REQUEST:
                 return [];
             case actions.UNAVAILABLE_TIMELINE_RECEIVED:
-                return action.data.availability;
+                return camelizeKeys(action.data.availability);
             default:
                 return state;
         }
@@ -132,7 +133,7 @@ const bookingFormReducer = combineReducers({
             case actions.RESET_BOOKING_AVAILABILITY:
                 return null;
             case actions.SET_BOOKING_AVAILABILITY:
-                return {...action.data.availability, dateRange: action.data.date_range};
+                return {...camelizeKeys(action.data.availability), dateRange: action.data.date_range};
             default:
                 return state;
         }

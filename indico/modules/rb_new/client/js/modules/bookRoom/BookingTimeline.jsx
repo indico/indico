@@ -84,9 +84,8 @@ class _BookingTimelineComponent extends React.Component {
 
     _getRowSerializer(dt, singleRoom = false) {
         const {bookingAllowed} = this.props;
-        return ({candidates, pre_bookings: preBookings, bookings, pre_conflicts: preConflicts, conflicts,
-                 blockings, nonbookable_periods: nonbookablePeriods, unbookable_hours: unbookableHours,
-                 room}) => {
+        return ({candidates, preBookings, bookings, preConflicts, conflicts, blockings, nonbookablePeriods,
+                 unbookableHours, room}) => {
             const hasConflicts = conflicts[dt] && conflicts[dt].length !== 0;
             const av = {
                 candidates: candidates[dt].map((cand) => ({...cand, bookable: bookingAllowed && !hasConflicts})) || [],

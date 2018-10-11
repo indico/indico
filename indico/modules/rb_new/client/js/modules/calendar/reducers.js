@@ -18,6 +18,7 @@
 import moment from 'moment';
 import {combineReducers} from 'redux';
 
+import camelizeKeys from 'indico/utils/camelize';
 import {requestReducer} from 'indico/utils/redux';
 import {serializeDate} from 'indico/utils/date';
 import {actions as bookRoomActions} from '../../modules/bookRoom';
@@ -48,7 +49,7 @@ export default combineReducers({
             case actions.RESET_PAGE_STATE:
                 return action.namespace === 'calendar' ? initialState : state;
             case calendarActions.ROWS_RECEIVED:
-                return {...state, rows: action.data};
+                return {...state, rows: camelizeKeys(action.data)};
             case calendarActions.ROOM_IDS_RECEIVED:
                 return {...state, roomIds: action.data};
             case bookRoomActions.CREATE_BOOKING_SUCCESS: {

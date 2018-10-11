@@ -31,7 +31,7 @@ export default function camelizeKeys(obj) {
         if (key.match('^[A-Za-z_]+$')) {
             return {...accum, [_.camelCase(key)]: camelizeKeys(value)};
         } else {
-            return {...accum, key: camelizeKeys(value)};
+            return {...accum, [key]: camelizeKeys(value)};
         }
     }, {});
 }

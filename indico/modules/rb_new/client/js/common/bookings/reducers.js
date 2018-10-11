@@ -16,6 +16,7 @@
  */
 
 import {combineReducers} from 'redux';
+import camelizeKeys from 'indico/utils/camelize';
 import {requestReducer} from 'indico/utils/redux';
 import * as bookingsActions from './actions';
 
@@ -31,7 +32,7 @@ export default combineReducers({
     details: (state = {}, action) => {
         switch (action.type) {
             case bookingsActions.BOOKING_DETAILS_RECEIVED: {
-                const {id, ...data} = action.data;
+                const {id, ...data} = camelizeKeys(action.data);
                 return {...state, [id]: data};
             }
             default:

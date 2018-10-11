@@ -40,7 +40,7 @@ export const isFetchingUnavailableRooms = ({bookRoom}) => {
     return bookRoom.unavailableRooms.request.state === RequestState.STARTED;
 };
 const resolveTimelineRooms = (availability, allRooms) => {
-    return availability.map(([roomId, data]) => [roomId, {...data, room: allRooms[data.room_id]}]);
+    return availability.map(([roomId, data]) => [roomId, {...data, room: allRooms[data.roomId]}]);
 };
 export const getUnavailableRoomInfo = createSelector(
     ({bookRoom}) => bookRoom.unavailableRooms.data,

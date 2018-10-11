@@ -24,7 +24,7 @@ export const getDetailsWithRoom = createSelector(
     getDetails,
     roomsSelectors.getAllRooms,
     (booking, allRooms) => {
-        booking.attributes.room = allRooms[booking.attributes.room_id];
+        booking.attributes.room = allRooms[booking.attributes.roomId];
         return booking;
     }
 );

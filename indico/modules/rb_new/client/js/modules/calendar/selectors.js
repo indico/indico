@@ -26,7 +26,7 @@ export const getCalendarData = createSelector(
     roomsSelectors.getAllRooms,
     ({roomIds, rows}, allRooms) => ({
         roomIds,
-        rows: rows.map(entry => ({...entry, room: allRooms[entry.room_id]}))
+        rows: rows.map(entry => ({...entry, room: allRooms[entry.roomId]}))
     })
 );
 export const getFilters = ({calendar}) => calendar.filters;

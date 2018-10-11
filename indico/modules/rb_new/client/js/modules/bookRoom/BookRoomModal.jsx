@@ -177,8 +177,8 @@ class BookRoomModal extends React.Component {
 
     _getRowSerializer(day) {
         const {room} = this.props;
-        return ({bookings, pre_bookings: preBookings, candidates, nonbookable_periods: nonbookablePeriods,
-                 unbookable_hours: unbookableHours, blockings, conflicts, pre_conflicts: preConflicts}) => ({
+        return ({bookings, preBookings, candidates, nonbookablePeriods, unbookableHours, blockings, conflicts,
+                 preConflicts}) => ({
             availability: {
                 candidates: candidates[day].map((candidate) => ({...candidate, bookable: false})) || [],
                 preBookings: preBookings[day] || [],
