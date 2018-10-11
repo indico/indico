@@ -23,7 +23,6 @@ import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import {Button, Divider, Form, Grid, Message, Icon, Modal} from 'semantic-ui-react';
 import {Form as FinalForm, Field} from 'react-final-form';
-import setFieldTouched from 'final-form-set-field-touched';
 import {Translate} from 'indico/react/i18n';
 import {ReduxFormField, formatters} from 'indico/react/forms';
 import PrincipalSearchField from 'indico/react/components/PrincipalSearchField';
@@ -208,18 +207,10 @@ class BlockingModal extends React.Component {
 
     renderModalContent = (fprops) => {
         const {onClose, blocking} = this.props;
-        const {form: {mutators}, submitting, submitSucceeded} = fprops;
+        const {submitting, submitSucceeded} = fprops;
         const {mode} = this.state;
         const formProps = mode === 'view' ? {} : {onSubmit: fprops.handleSubmit, success: submitSucceeded};
         const canEdit = !!blocking.id && blocking.canEdit;
-
-        // set `touched` flag so in case of a validation error we properly
-        // show the error label
-        mutators.setFieldTouched('rooms', true);
-        if (mode === 'edit') {
-            mutators.setFieldTouched('dates', true);
-            mutators.setFieldTouched('reason', true);
-        }
 
         return (
             <>
@@ -342,7 +333,6 @@ class BlockingModal extends React.Component {
             <Modal open onClose={onClose} size="large" closeIcon>
                 <FinalForm {...props}
                            render={this.renderModalContent}
-                           mutators={{setFieldTouched}}
                            initialValues={{rooms, dates, allowed: allowed || [], reason}} />
             </Modal>
         );

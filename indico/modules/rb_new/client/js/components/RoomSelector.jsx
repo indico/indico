@@ -46,6 +46,8 @@ const fetchLocations = async () => {
 class RoomSelector extends React.Component {
     static propTypes = {
         onChange: PropTypes.func.isRequired,
+        onFocus: PropTypes.func.isRequired,
+        onBlur: PropTypes.func.isRequired,
         initialValue: PropTypes.array,
         disabled: PropTypes.bool,
         roomsSpriteToken: PropTypes.string.isRequired
@@ -92,6 +94,7 @@ class RoomSelector extends React.Component {
         const {onChange} = this.props;
         const newRooms = selectedRooms.filter((selectedRoom) => selectedRoom.id !== room.id);
 
+        this.setTouched();
         this.setState({selectedRooms: newRooms}, () => {
             onChange(newRooms);
         });
@@ -112,16 +115,23 @@ class RoomSelector extends React.Component {
                 </List.Content>
                 {!disabled && (
                     <List.Content styleName="remove-btn-content">
-                        <Icon name="remove"
-                              onClick={() => this.removeItem(room)} />
+                        <Icon name="remove" onClick={() => this.removeItem(room)} />
                     </List.Content>
                 )}
             </List.Item>
         );
     };
 
+    setTouched = () => {
+        // pretend focus+blur to mark the field as touched in case an action changes
+        // the data without actually involving focus and blur of a form element
+        const {onFocus, onBlur} = this.props;
+        onFocus();
+        onBlur();
+    };
+
     render() {
-        const {onChange, disabled} = this.props;
+        const {onChange, onFocus, onBlur, disabled} = this.props;
         const {locations, selectedLocation, selectedRoom, selectedRooms: rooms, isFetchingLocations} = this.state;
         const locationOptions = locations.map((location) => ({text: location.name, value: location.id}));
         let roomOptions = [];
@@ -145,6 +155,8 @@ class RoomSelector extends React.Component {
                                               const selected = locations.find((loc) => loc.id === data.value);
                                               this.setState({selectedLocation: selected});
                                           }}
+                                          onFocus={onFocus}
+                                          onBlur={onBlur}
                                           fluid
                                           search
                                           selection />
@@ -160,6 +172,8 @@ class RoomSelector extends React.Component {
                                               ));
                                               this.setState({selectedRoom: selected});
                                           }}
+                                          onFocus={onFocus}
+                                          onBlur={onBlur}
                                           fluid
                                           search
                                           selection />
