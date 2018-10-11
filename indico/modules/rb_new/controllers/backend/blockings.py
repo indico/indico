@@ -23,8 +23,7 @@ from werkzeug.exceptions import Forbidden
 
 from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.models.blockings import Blocking
-from indico.modules.rb_new.operations.blockings import (approve_or_request_blocking, create_blocking,
-                                                        get_room_blockings, update_blocking)
+from indico.modules.rb_new.operations.blockings import create_blocking, get_room_blockings, update_blocking
 from indico.modules.rb_new.schemas import blockings_schema
 from indico.web.util import jsonify_data
 
@@ -38,8 +37,7 @@ class RHCreateRoomBlocking(RHRoomBookingBase):
         'allowed_principals': fields.List(fields.Dict())
     })
     def _process(self, args):
-        blocking = create_blocking(created_by=session.user, **args)
-        approve_or_request_blocking(blocking)
+        create_blocking(created_by=session.user, **args)
         return jsonify_data(flash=False)
 
 

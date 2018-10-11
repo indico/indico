@@ -75,7 +75,7 @@ class BlockedRoom(db.Model):
 
     @property
     def state_name(self):
-        return BlockedRoomState(self.state).title
+        return BlockedRoomState(self.state).title if self.state is not None else None
 
     @classmethod
     def find_with_filters(cls, filters):

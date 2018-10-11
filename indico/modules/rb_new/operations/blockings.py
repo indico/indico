@@ -78,12 +78,46 @@ def _group_id_or_name(principal):
 
 @no_autoflush
 def _populate_blocking(blocking, room_ids, allowed_principals, reason):
-    blocking.blocked_rooms = [BlockedRoom(room_id=room.id) for room in Room.query.filter(Room.id.in_(room_ids))]
     blocking.reason = reason
-    blocking.allowed = [GroupProxy(_group_id_or_name(pr), provider=pr['provider'])
-                        if pr.get('is_group')
-                        else User.get_one(pr['id'])
-                        for pr in allowed_principals]
+    principals = {GroupProxy(_group_id_or_name(pr), provider=pr['provider'])
+                  if pr.get('is_group')
+                  else User.get_one(pr['id'])
+                  for pr in allowed_principals}
+    # We don't use `=` here to prevent SQLAlchemy from deleting and re-adding unchanged entries
+    blocking.allowed |= principals  # add new
+    blocking.allowed &= principals  # remove deleted
+    _update_blocked_rooms(blocking, room_ids)
+
+
+def _update_blocked_rooms(blocking, room_ids):
+    old_blocked = {br.room_id for br in blocking.blocked_rooms}
+    new_blocked = set(room_ids)
+    added_blocks = new_blocked - old_blocked
+    removed_blocks = old_blocked - new_blocked
+    blocked_rooms_by_room = {br.room_id: br for br in blocking.blocked_rooms}
+    for room_id in removed_blocks:
+        blocking.blocked_rooms.remove(blocked_rooms_by_room[room_id])
+    added_blocked_rooms = set()
+    rooms = {r.id: r for r in Room.query.filter(Room.is_active, Room.id.in_(added_blocks))}
+    for room_id in added_blocks:
+        blocked_room = BlockedRoom(room=rooms[room_id])
+        blocking.blocked_rooms.append(blocked_room)
+        added_blocked_rooms.add(blocked_room)
+    _approve_or_request_rooms(blocking, added_blocked_rooms)
+
+
+def _approve_or_request_rooms(blocking, blocked_rooms=None):
+    if blocked_rooms is None:
+        blocked_rooms = set(blocking.blocked_rooms)
+    rooms_by_owner = defaultdict(list)
+    for blocked_room in blocked_rooms:
+        owner = blocked_room.room.owner
+        if owner == session.user:
+            blocked_room.approve(notify_blocker=False)
+        else:
+            rooms_by_owner[owner].append(blocked_room)
+    for owner, rooms in rooms_by_owner.iteritems():
+        notify_request(owner, blocking, rooms)
 
 
 def create_blocking(room_ids, allowed_principals, start_date, end_date, reason, created_by):
@@ -100,19 +134,6 @@ def create_blocking(room_ids, allowed_principals, start_date, end_date, reason, 
 def update_blocking(blocking, room_ids, allowed_principals, reason):
     _populate_blocking(blocking, room_ids, allowed_principals, reason)
     db.session.flush()
-
-
-def approve_or_request_blocking(blocking):
-    rooms_by_owner = defaultdict(list)
-    for blocked_room in blocking.blocked_rooms:
-        owner = blocked_room.room.owner
-        if owner == session.user:
-            blocked_room.approve(notify_blocker=False)
-        else:
-            rooms_by_owner[owner].append(blocked_room)
-
-    for owner, rooms in rooms_by_owner.iteritems():
-        notify_request(owner, blocking, rooms)
 
 
 def get_blocked_rooms(start_dt, end_dt, states=None):
