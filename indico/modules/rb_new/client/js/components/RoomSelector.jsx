@@ -173,7 +173,6 @@ class RoomSelector extends React.Component {
                                             const newRooms = [...rooms, selectedRoom];
                                             this.setState({
                                                 selectedRooms: newRooms,
-                                                selectedLocation: null,
                                                 selectedRoom: null
                                             });
                                             onChange(newRooms);
