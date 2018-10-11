@@ -121,14 +121,11 @@ class RoomSelector extends React.Component {
     render() {
         const {onChange, disabled} = this.props;
         const {locations, selectedLocation, selectedRoom, selectedRooms: rooms, isFetchingLocations} = this.state;
-        const locationOptions = locations
-            .sort((a, b) => a.name.localeCompare(b.name))
-            .map((location) => ({text: location.name, value: location.id}));
+        const locationOptions = locations.map((location) => ({text: location.name, value: location.id}));
         let roomOptions = [];
         if (selectedLocation) {
             roomOptions = selectedLocation.rooms
                 .filter((room) => rooms.findIndex((item) => item.id === room.id) === -1)
-                .sort((a, b) => a.fullName.localeCompare(b.fullName))
                 .map((room) => ({text: room.fullName, value: room.id}));
         }
 
