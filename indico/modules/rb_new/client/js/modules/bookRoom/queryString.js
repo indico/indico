@@ -38,7 +38,7 @@ export const rules = {
 export const routeConfig = {
     '/book': [
         {
-            listen: filtersActions.SET_FILTER_PARAMETER,
+            listen: [filtersActions.SET_FILTER_PARAMETER, filtersActions.SET_FILTERS],
             select: ({bookRoom: {filters}}) => ({filters}),
             serialize: queryFilterRules
         },

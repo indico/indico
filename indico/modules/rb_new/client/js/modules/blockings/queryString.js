@@ -45,7 +45,7 @@ const rules = {
 
 export const routeConfig = {
     '/blockings': {
-        listen: filtersActions.SET_FILTER_PARAMETER,
+        listen: [filtersActions.SET_FILTER_PARAMETER, filtersActions.SET_FILTERS],
         select: ({blockings: {filters}}) => filters,
         serialize: rules,
     }

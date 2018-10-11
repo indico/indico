@@ -21,7 +21,7 @@ import {queryStringRules as queryFilterRules} from '../../common/roomSearch';
 
 export const routeConfig = {
     '/rooms': {
-        listen: filtersActions.SET_FILTER_PARAMETER,
+        listen: [filtersActions.SET_FILTER_PARAMETER, filtersActions.SET_FILTERS],
         select: ({roomList: {filters}}) => ({filters}),
         serialize: queryFilterRules
     },
