@@ -178,7 +178,8 @@ def serialize_user(user):
 
 def _build_name_search(name_list):
     text = remove_accents('%{}%'.format('%'.join(escape_like(name) for name in name_list)))
-    return db.func.indico.indico_unaccent(db.func.concat(User.first_name, ' ', User.last_name)).ilike(text)
+    return db.or_(db.func.indico.indico_unaccent(db.func.concat(User.first_name, ' ', User.last_name)).ilike(text),
+                  db.func.indico.indico_unaccent(db.func.concat(User.last_name, ' ', User.first_name)).ilike(text))
 
 
 def build_user_search_query(criteria, exact=False, include_deleted=False, include_pending=False,
@@ -206,8 +207,7 @@ def build_user_search_query(criteria, exact=False, include_deleted=False, includ
             raise ValueError("'name' is not compatible with 'exact'")
         if 'first_name' in criteria or 'last_name' in criteria:
             raise ValueError("'name' is not compatible with (first|last)_name")
-        name = name.split()
-        query = query.filter(_build_name_search(name))
+        query = query.filter(_build_name_search(name.replace(',', '').split()))
 
     for k, v in criteria.iteritems():
         query = query.filter(unaccent_match(getattr(User, k), v, exact))
