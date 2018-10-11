@@ -171,9 +171,7 @@ class BookRoomModal extends React.Component {
                             input={{...input, value: input.value || null}}
                             favoriteUsers={favoriteUsers}
                             as={PrincipalSearchField}
-                            onChange={(user) => {
-                                input.onChange(user);
-                            }} />
+                            onChange={input.onChange} />
         );
     };
 

@@ -39,6 +39,12 @@ export default class DatePeriodField extends React.Component {
         format: 'L'
     };
 
+    shouldComponentUpdate(nextProps, nextState) {
+        const {disabled: prevDisabled} = this.props;
+        const {disabled} = nextProps;
+        return nextState !== this.state || disabled !== prevDisabled;
+    }
+
     render() {
         const {onChange, disabledDate, disabled, initialValue, format} = this.props;
         return (
