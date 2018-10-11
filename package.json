@@ -20,7 +20,6 @@
     "dropzone": "~5.5.1",
     "final-form": "^4.10.0",
     "final-form-calculate": "^1.2.1",
-    "final-form-set-field-touched": "^1.0.0",
     "flask-urls": "*",
     "fullcalendar": "^3.9.0",
     "geodesy": "^1.1.3",

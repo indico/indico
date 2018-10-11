@@ -386,8 +386,9 @@ class BookRoomModal extends React.Component {
                                                disabled={bookingBlocked(fprops)} />
                                     </Form.Group>
                                     <Field name="user"
-                                           component={this.renderPrincipalSearchField}
+                                           render={this.renderPrincipalSearchField}
                                            disabled={bookingBlocked(fprops) || fprops.values.usage !== 'someone'}
+                                           required={fprops.values.usage === 'someone'}
                                            showCurrentUserPlaceholder={fprops.values.usage === 'myself'} />
                                     <Field name="reason"
                                            component={ReduxFormField}
@@ -395,7 +396,8 @@ class BookRoomModal extends React.Component {
                                            format={formatters.trim}
                                            formatOnBlur
                                            placeholder={Translate.string('Reason for booking')}
-                                           disabled={bookingBlocked(fprops)} />
+                                           disabled={bookingBlocked(fprops)}
+                                           required />
                                 </Form>
                             </Segment>
                             {conflictsExist && this.renderBookingConstraints(Object.values(availability.conflicts))}
@@ -430,7 +432,7 @@ class BookRoomModal extends React.Component {
         return (
             <Modal open onClose={this.onClose} size="large" closeIcon>
                 <FinalForm onSubmit={this.submitBooking} validate={validate} decorators={[formDecorator]}
-                           render={renderModalContent} />
+                           render={renderModalContent} initialValues={{user: null}} />
             </Modal>
         );
     }

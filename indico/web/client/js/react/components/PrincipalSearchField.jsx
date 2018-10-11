@@ -58,6 +58,8 @@ export default class PrincipalSearchField extends React.Component {
             PropTypes.array
         ]),
         onChange: PropTypes.func.isRequired,
+        onFocus: PropTypes.func.isRequired,
+        onBlur: PropTypes.func.isRequired,
         disabled: PropTypes.bool,
         withGroups: PropTypes.bool,
         favoriteUsers: PropTypes.array,
@@ -226,7 +228,7 @@ export default class PrincipalSearchField extends React.Component {
     };
 
     render() {
-        const {multiple, disabled, withGroups} = this.props;
+        const {multiple, disabled, withGroups, onFocus, onBlur} = this.props;
         const {isFetching, options, value, searchQuery} = this.state;
         let {placeholder} = this.props;
         let dropdownValues, selectedValues, dropdownOptions;
@@ -266,7 +268,9 @@ export default class PrincipalSearchField extends React.Component {
                     this.notifyChange(null);
                 }
             },
-            disabled: isFetching || disabled
+            onFocus,
+            onBlur,
+            disabled: isFetching || disabled,
         };
 
         return (
