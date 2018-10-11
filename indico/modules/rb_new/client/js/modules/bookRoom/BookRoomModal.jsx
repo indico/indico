@@ -170,8 +170,7 @@ class BookRoomModal extends React.Component {
             <ReduxFormField {...fieldProps}
                             input={{...input, value: input.value || null}}
                             favoriteUsers={favoriteUsers}
-                            as={PrincipalSearchField}
-                            onChange={input.onChange} />
+                            as={PrincipalSearchField} />
         );
     };
 
