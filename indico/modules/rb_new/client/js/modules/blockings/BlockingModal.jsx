@@ -115,7 +115,6 @@ class BlockingModal extends React.Component {
                             favoriteUsers={favoriteUsers}
                             as={PrincipalSearchField}
                             label={Translate.string('Allowed users / groups')}
-                            onChange={input.onChange}
                             multiple
                             withGroups />
         );
@@ -165,7 +164,6 @@ class BlockingModal extends React.Component {
                             as={RoomSelector}
                             initialValue={blockedRooms.map((blockedRoom) => blockedRoom.room)}
                             label={label}
-                            onChange={input.onChange}
                             required={mode !== 'view'} />
         );
     };
