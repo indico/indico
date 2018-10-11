@@ -234,9 +234,14 @@ class BlockingModal extends React.Component {
                     {canEdit && (
                         <span>
                             <Button icon="pencil"
+                                    primary={mode === 'edit'}
                                     onClick={() => {
-                                        const newMode = mode === 'edit' ? 'view' : 'edit';
-                                        this.setState({mode: newMode});
+                                        if (mode === 'edit') {
+                                            fprops.form.reset();
+                                            this.setState({mode: 'view'});
+                                        } else {
+                                            this.setState({mode: 'edit'});
+                                        }
                                     }}
                                     circular />
                         </span>
