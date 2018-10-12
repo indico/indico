@@ -34,6 +34,7 @@ from indico.modules.rb.models.room_bookable_hours import BookableHours
 from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
 from indico.modules.rb.models.rooms import Room
 from indico.modules.users.schemas import UserSchema
+from indico.util.i18n import _
 from indico.util.string import natural_sort_key
 
 
