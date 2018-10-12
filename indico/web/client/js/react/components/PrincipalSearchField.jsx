@@ -56,7 +56,7 @@ export default class PrincipalSearchField extends React.Component {
         value: PropTypes.oneOfType([
             PropTypes.object,
             PropTypes.array
-        ]),
+        ]).isRequired,
         onChange: PropTypes.func.isRequired,
         onFocus: PropTypes.func.isRequired,
         onBlur: PropTypes.func.isRequired,

@@ -15,6 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import _ from 'lodash';
 import React from 'react';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
@@ -48,28 +49,21 @@ class RoomSelector extends React.Component {
         onChange: PropTypes.func.isRequired,
         onFocus: PropTypes.func.isRequired,
         onBlur: PropTypes.func.isRequired,
-        initialValue: PropTypes.array,
+        value: PropTypes.array.isRequired,
         disabled: PropTypes.bool,
         roomsSpriteToken: PropTypes.string.isRequired
     };
 
     static defaultProps = {
-        initialValue: [],
         disabled: false
     };
 
-    constructor(props) {
-        super(props);
-        const {initialValue} = this.props;
-
-        this.state = {
-            isFetchingLocations: false,
-            locations: [],
-            selectedLocation: null,
-            selectedRoom: null,
-            selectedRooms: initialValue
-        };
-    }
+    state = {
+        isFetchingLocations: false,
+        locations: [],
+        selectedLocation: null,
+        selectedRoom: null,
+    };
 
     componentDidMount() {
         // eslint-disable-next-line react/no-did-mount-set-state
@@ -84,20 +78,20 @@ class RoomSelector extends React.Component {
     }
 
     shouldComponentUpdate(nextProps, nextState) {
-        const {disabled: prevDisabled} = this.props;
-        const {disabled} = nextProps;
-        return nextState !== this.state || disabled !== prevDisabled;
+        const {disabled: prevDisabled, value: prevValue} = this.props;
+        const {disabled, value} = nextProps;
+        return (
+            nextState !== this.state ||
+            disabled !== prevDisabled ||
+            !_.isEqual(value, prevValue)
+        );
     }
 
     removeItem = (room) => {
-        const {selectedRooms} = this.state;
-        const {onChange} = this.props;
-        const newRooms = selectedRooms.filter((selectedRoom) => selectedRoom.id !== room.id);
-
+        const {onChange, value} = this.props;
+        const newRooms = value.filter(item => item.id !== room.id);
         this.setTouched();
-        this.setState({selectedRooms: newRooms}, () => {
-            onChange(newRooms);
-        });
+        onChange(newRooms);
     };
 
     renderRoomItem = (room) => {
@@ -131,8 +125,8 @@ class RoomSelector extends React.Component {
     };
 
     render() {
-        const {onChange, onFocus, onBlur, disabled} = this.props;
-        const {locations, selectedLocation, selectedRoom, selectedRooms: rooms, isFetchingLocations} = this.state;
+        const {onChange, onFocus, onBlur, disabled, value: rooms} = this.props;
+        const {locations, selectedLocation, selectedRoom, isFetchingLocations} = this.state;
         const locationOptions = locations.map((location) => ({text: location.name, value: location.id}));
         let roomOptions = [];
         if (selectedLocation) {
@@ -184,12 +178,8 @@ class RoomSelector extends React.Component {
                                         type="button"
                                         disabled={!selectedRoom}
                                         onClick={() => {
-                                            const newRooms = [...rooms, selectedRoom];
-                                            this.setState({
-                                                selectedRooms: newRooms,
-                                                selectedRoom: null
-                                            });
-                                            onChange(newRooms);
+                                            this.setState({selectedRoom: null});
+                                            onChange([...rooms, selectedRoom]);
                                         }}
                                         primary />
                             </Grid.Column>

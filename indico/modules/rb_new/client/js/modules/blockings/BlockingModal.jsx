@@ -148,7 +148,6 @@ class BlockingModal extends React.Component {
     };
 
     renderRoomSearchField = ({input, ...props}) => {
-        const {blocking: {blockedRooms}} = this.props;
         const {mode} = this.state;
         let label;
 
@@ -157,11 +156,11 @@ class BlockingModal extends React.Component {
         } else {
             label = Translate.string('Blocked rooms');
         }
+
         return (
             <ReduxFormField {...props}
                             input={input}
                             as={RoomSelector}
-                            initialValue={blockedRooms.map((blockedRoom) => blockedRoom.room)}
                             label={label}
                             required={mode !== 'view'} />
         );
