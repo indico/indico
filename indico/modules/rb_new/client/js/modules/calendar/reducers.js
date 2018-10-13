@@ -22,6 +22,7 @@ import camelizeKeys from 'indico/utils/camelize';
 import {serializeDate} from 'indico/utils/date';
 import {requestReducer} from 'indico/utils/redux';
 import {actions as bookRoomActions} from '../../modules/bookRoom';
+import * as actions from '../../actions';
 import * as calendarActions from './actions';
 import {filterReducerFactory} from '../../common/filters';
 import {processRoomFilters} from '../../common/roomSearch/reducers';
@@ -31,12 +32,20 @@ import {initialDatePickerState} from '../../common/timeline/reducers';
 const datePickerState = () => ({...initialDatePickerState, selectedDate: serializeDate(moment())});
 
 const datePickerReducer = (state = datePickerState(), action) => {
-    if (action.type === calendarActions.SET_DATE) {
-        return {
-            ...state,
-            dateRange: [],
-            selectedDate: action.date
-        };
+    switch (action.type) {
+        case calendarActions.SET_DATE:
+            return {
+                ...state,
+                dateRange: [],
+                selectedDate: action.date
+            };
+        case calendarActions.SET_MODE:
+            return {
+                ...state,
+                mode: action.mode
+            };
+        case actions.RESET_PAGE_STATE:
+            return datePickerState();
     }
     return state;
 };

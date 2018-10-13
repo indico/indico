@@ -71,7 +71,8 @@ class BookRoom extends React.Component {
             toggleTimelineView: PropTypes.func.isRequired,
             openRoomDetails: PropTypes.func.isRequired,
             openBookingForm: PropTypes.func.isRequired,
-            setDate: PropTypes.func.isRequired
+            setDate: PropTypes.func.isRequired,
+            setTimelineMode: PropTypes.func.isRequired
         }).isRequired,
         datePicker: PropTypes.object.isRequired,
         showSuggestions: PropTypes.bool,
@@ -168,7 +169,7 @@ class BookRoom extends React.Component {
             isTimelineVisible,
             actions,
             dateRange,
-            datePicker: {selectedDate}
+            datePicker: {selectedDate, mode}
         } = this.props;
 
         const legendLabels = [
@@ -197,7 +198,9 @@ class BookRoom extends React.Component {
                                    isFetching={isSearching} />
                 {isTimelineVisible && selectedDate && (
                     <TimelineHeader activeDate={toMoment(selectedDate)}
+                                    mode={mode}
                                     onDateChange={actions.setDate}
+                                    setMode={actions.setTimelineMode}
                                     legendLabels={legendLabels}
                                     dateRange={dateRange} />
                 )}
@@ -456,7 +459,8 @@ const mapDispatchToProps = dispatch => ({
         toggleTimelineView: bookRoomActions.toggleTimelineView,
         openRoomDetails: roomsActions.openRoomDetailsBook,
         openBookingForm: bookRoomActions.openBookingForm,
-        setDate: date => bookRoomActions.setDate(serializeDate(date))
+        setDate: date => bookRoomActions.setDate(serializeDate(date)),
+        setTimelineMode: bookRoomActions.setTimelineMode
     }, dispatch),
 });
 

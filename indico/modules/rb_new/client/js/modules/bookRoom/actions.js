@@ -195,3 +195,7 @@ export const openBookingForm = (roomId, data) => modalActions.openModal('booking
 export function setDate(date) {
     return {type: SET_TIMELINE_DATE, date};
 }
+
+export function setTimelineMode(mode) {
+    return {type: SET_TIMELINE_MODE, mode};
+}

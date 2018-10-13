@@ -24,8 +24,12 @@ $row-height: 50px;
     display: flex;
     height: $row-height;
 
-    .timeline-header-label {
+    .timeline-header-labels {
         flex: 1;
+        position: relative;
+    }
+
+    .timeline-header-label {
         height: 100%;
         line-height: $row-height;
         text-align: left;
@@ -53,7 +57,7 @@ $row-height: 50px;
         position: absolute;
         top: 0;
         height: 100%;
-        border-left: 1px solid #ededee;
+        border-left: 1px solid $light-gray;
     }
 }
 

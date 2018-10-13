@@ -23,6 +23,7 @@ import {bindActionCreators} from 'redux';
 import {Button, ButtonGroup, Container, Grid, Popup, Sticky} from 'semantic-ui-react';
 import {connect} from 'react-redux';
 import {Translate} from 'indico/react/i18n';
+import {serializeDate} from 'indico/utils/date';
 import searchBarFactory from '../../components/SearchBar';
 import * as calendarActions from './actions';
 import * as calendarSelectors from './selectors';
@@ -45,6 +46,8 @@ class Calendar extends React.Component {
         isFetching: PropTypes.bool.isRequired,
         actions: PropTypes.exact({
             fetchCalendar: PropTypes.func.isRequired,
+            setDate: PropTypes.func.isRequired,
+            setMode: PropTypes.func.isRequired,
             openRoomDetails: PropTypes.func.isRequired,
             openBookRoom: PropTypes.func.isRequired,
             setFilterParameter: PropTypes.func.isRequired,
@@ -69,10 +72,10 @@ class Calendar extends React.Component {
         fetchCalendar();
     }
 
-    componentDidUpdate({datePicker: {selectedDate: prevDate}, filters: prevFilters}) {
-        const {datePicker: {selectedDate}, actions: {fetchCalendar}, filters} = this.props;
+    componentDidUpdate({datePicker: {selectedDate: prevDate, mode: prevMode}, filters: prevFilters}) {
+        const {datePicker: {selectedDate, mode}, actions: {fetchCalendar}, filters} = this.props;
         const filtersChanged = !_.isEqual(prevFilters, filters);
-        if (prevDate !== selectedDate || filtersChanged) {
+        if (prevDate !== selectedDate || mode !== prevMode || filtersChanged) {
             fetchCalendar(filtersChanged);
         }
     }
@@ -116,8 +119,18 @@ class Calendar extends React.Component {
 
     render() {
         const {
-            isFetching, calendarData: {rows}, actions: {openRoomDetails, setDate, setFilterParameter, openBookingDetails},
-            datePicker, hasFavoriteRooms, filters: {onlyFavorites}
+            isFetching,
+            calendarData: {
+                rows
+            },
+            actions: {
+                openRoomDetails, setDate, setFilterParameter, openBookingDetails, setMode
+            },
+            datePicker,
+            hasFavoriteRooms,
+            filters: {
+                onlyFavorites
+            }
         } = this.props;
         const {selectedDate} = datePicker;
         const {showUnused} = this.state;
@@ -155,6 +168,8 @@ class Calendar extends React.Component {
                                     </div>
                                 </Grid.Row>
                                 <TimelineHeader activeDate={selectedDate ? moment(selectedDate) : moment()}
+                                                setMode={setMode}
+                                                mode={datePicker.mode}
                                                 onDateChange={setDate}
                                                 legendLabels={legendLabels} />
                             </Sticky>
@@ -188,6 +203,8 @@ export default connect(
     dispatch => ({
         actions: bindActionCreators({
             fetchCalendar: calendarActions.fetchCalendar,
+            setDate: (date) => calendarActions.setDate(serializeDate(date)),
+            setMode: calendarActions.setMode,
             openRoomDetails: roomsActions.openRoomDetails,
             openBookRoom: bookRoomActions.openBookRoom,
             setFilterParameter: (param, value) => filtersActions.setFilterParameter('calendar', param, value),

@@ -15,11 +15,35 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-export const initialDatePickerState = {
-    selectedDate: null,
-    dateRange: [],
-    minHour: 6,
-    maxHour: 23,
-    hourStep: 2,
-    mode: 'days'
-};
+@import 'rb_new:styles/palette';
+@import './TimelineContent.module.scss';
+
+.timeline-day-divider {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    border-left: 1px solid $pastel-gray;
+}
+
+.timeline-row-content {
+    display: flex;
+    width: 100%;
+}
+
+.timeline-header-labels {
+    flex: 1;
+    display: flex;
+    position: relative;
+}
+
+.timeline-header-label {
+    flex: 1;
+    height: 100%;
+    line-height: $row-height;
+    text-align: center;
+
+    .timeline-label-text {
+        display: inline-block;
+        color: $gray;
+    }
+}

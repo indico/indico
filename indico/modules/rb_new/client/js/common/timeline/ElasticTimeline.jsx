@@ -15,12 +15,13 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Message} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
+import {serializeDate, toMoment} from 'indico/utils/date';
 import DailyTimelineContent from './DailyTimelineContent';
+import WeeklyTimelineContent from './WeeklyTimelineContent';
 import TimelineItem from './TimelineItem';
 
 import './Timeline.module.scss';
@@ -32,8 +33,10 @@ import './Timeline.module.scss';
  */
 export default class ElasticTimeline extends React.Component {
     static propTypes = {
-        rows: PropTypes.arrayOf(PropTypes.object).isRequired,
+        availability: PropTypes.array.isRequired,
         datePicker: PropTypes.object.isRequired,
+        bookingAllowed: PropTypes.bool,
+
         isLoading: PropTypes.bool,
         itemClass: PropTypes.func,
         itemProps: PropTypes.object,
@@ -57,6 +60,7 @@ export default class ElasticTimeline extends React.Component {
         ),
         onClickCandidate: null,
         onClickReservation: null,
+        bookingAllowed: false,
         extraContent: null,
         isLoading: false,
         itemClass: TimelineItem,
@@ -67,18 +71,78 @@ export default class ElasticTimeline extends React.Component {
         showUnused: true
     };
 
+    _getDayRowSerializer(dt) {
+        const {bookingAllowed} = this.props;
+        return ({
+            candidates, preBookings, bookings, preConflicts, conflicts, blockings, nonbookablePeriods,
+            unbookableHours
+        }) => {
+            const hasConflicts = !!(conflicts[dt] || []).length;
+            return {
+                candidates: candidates[dt] ? [{...candidates[dt][0], bookable: bookingAllowed && !hasConflicts}] : [],
+                preBookings: preBookings[dt] || [],
+                bookings: bookings[dt] || [],
+                conflicts: conflicts[dt] || [],
+                preConflicts: preConflicts[dt] || [],
+                blockings: blockings[dt] || [],
+                nonbookablePeriods: nonbookablePeriods[dt] || [],
+                unbookableHours: unbookableHours[dt] || []
+            };
+        };
+    }
+
+    calcDailyRows() {
+        const {availability, datePicker: {selectedDate, dateRange}} = this.props;
+
+        if (this.singleRoom) {
+            const roomAvailability = this.singleRoom;
+            return dateRange.map(dt => ({
+                ...this._getRowSerializer(dt)(roomAvailability),
+                label: toMoment(dt).format('L'),
+                key: dt
+            }));
+        }
+        return availability.map(([, data]) => data).map((data) => ({
+            availability: this._getDayRowSerializer(selectedDate)(data),
+            label: data.room.full_name,
+            key: data.room.id,
+            conflictIndicator: true,
+            room: data.room
+        }));
+    }
+
+    calcWeeklyRows() {
+        const {availability, datePicker: {selectedDate}} = this.props;
+        const weekStart = toMoment(selectedDate, 'YYYY-MM-DD').startOf('week');
+        const weekRange = [...Array(7).keys()].map(n => serializeDate(weekStart.clone().add(n, 'days')));
+        if (!availability.length) {
+            return [];
+        }
+
+        return availability.map(([, data]) => {
+            const {room} = data;
+            return {
+                availability: weekRange.map(dt => [dt, this._getDayRowSerializer(dt)(data)]),
+                label: room.full_name,
+                key: room.id,
+                conflictIndicator: true,
+                room
+            };
+        });
+    }
+
     renderTimeline = () => {
         const {
-            extraContent, onClickCandidate, onClickReservation, rows, isLoading, itemClass, itemProps,
-            longLabel, onClickLabel, lazyScroll, datePicker: {minHour, maxHour, hourStep, mode},
+            extraContent, onClickCandidate, onClickReservation, availability, isLoading, itemClass,
+            itemProps, longLabel, onClickLabel, lazyScroll, datePicker: {minHour, maxHour, hourStep, mode},
             showUnused
         } = this.props;
         return (
             <>
                 <div styleName="timeline">
                     {extraContent}
-                    {mode === 'day' && (
-                        <DailyTimelineContent rows={rows}
+                    {mode === 'days' && (
+                        <DailyTimelineContent rows={this.calcDailyRows(availability)}
                                               minHour={minHour}
                                               maxHour={maxHour}
                                               hourStep={hourStep}
@@ -92,14 +156,29 @@ export default class ElasticTimeline extends React.Component {
                                               lazyScroll={lazyScroll}
                                               showUnused={showUnused} />
                     )}
+                    {mode === 'weeks' && (
+                        <WeeklyTimelineContent rows={this.calcWeeklyRows(availability)}
+                                               minHour={minHour}
+                                               maxHour={maxHour}
+                                               hourStep={hourStep}
+                                               onClickCandidate={onClickCandidate}
+                                               onClickReservation={onClickReservation}
+                                               itemClass={itemClass}
+                                               itemProps={itemProps}
+                                               longLabel={longLabel}
+                                               onClickLabel={onClickLabel}
+                                               isLoading={isLoading}
+                                               lazyScroll={lazyScroll}
+                                               showUnused={showUnused} />
+                    )}
                 </div>
             </>
         );
     };
 
     render() {
-        const {emptyMessage, rows, isLoading} = this.props;
-        if (!isLoading && _.isEmpty(rows)) {
+        const {emptyMessage, isLoading, availability} = this.props;
+        if (!isLoading && !availability.length) {
             return emptyMessage;
         }
         return this.renderTimeline();

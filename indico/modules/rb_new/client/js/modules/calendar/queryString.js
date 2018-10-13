@@ -42,13 +42,22 @@ const rules = {
     },
     text: {
         stateField: 'filters.text'
+    },
+    mode: {
+        validator: v.isIn(['days', 'weeks', 'months']),
+        stateField: 'mode'
     }
 };
 
 
 export const routeConfig = {
     '/calendar': {
-        listen: [filtersActions.SET_FILTER_PARAMETER, filtersActions.SET_FILTERS, calendarActions.SET_DATE],
+        listen: [
+            filtersActions.SET_FILTER_PARAMETER,
+            filtersActions.SET_FILTERS,
+            calendarActions.SET_DATE,
+            calendarActions.SET_MODE
+        ],
         select: ({calendar}) => calendar,
         serialize: rules
     }

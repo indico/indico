@@ -22,6 +22,7 @@ import RCCalendar from 'rc-calendar';
 import {Button} from 'semantic-ui-react';
 import moment from 'moment';
 import DatePicker from 'rc-calendar/lib/Picker';
+import {Translate} from 'indico/react/i18n';
 import {toMoment} from 'indico/utils/date';
 import TimelineLegend from './TimelineLegend';
 import {legendLabelShape} from '../../props';
@@ -36,12 +37,15 @@ export default class TimelineHeader extends React.Component {
         dateRange: PropTypes.array,
         isLoading: PropTypes.bool,
         disableDatePicker: PropTypes.bool,
+        mode: PropTypes.string,
+        setMode: PropTypes.func.isRequired
     };
 
     static defaultProps = {
         isLoading: false,
         dateRange: [],
         disableDatePicker: false,
+        mode: 'days'
     };
 
     calendarDisabledDate = (date) => {
@@ -60,21 +64,38 @@ export default class TimelineHeader extends React.Component {
         }
     };
 
-    changeSelectedDate = (mode) => {
-        const {activeDate, dateRange, onDateChange} = this.props;
-        const step = mode === 'next' ? 1 : -1;
+    changeSelectedDate = (direction) => {
+        const {activeDate, dateRange, onDateChange, mode} = this.props;
+        const step = direction === 'next' ? 1 : -1;
 
         // dateRange is not set (unlimited)
-        if (dateRange.length === 0) {
-            onDateChange(activeDate.clone().add(step, 'day'));
+        if (dateRange.length === 0 || mode !== 'days') {
+            onDateChange(activeDate.clone().add(step, mode));
         } else {
             const index = dateRange.findIndex((dt) => toMoment(dt).isSame(activeDate)) + step;
             onDateChange(toMoment(dateRange[index]));
         }
     };
 
+    renderModeSwitcher() {
+        const {setMode, mode} = this.props;
+        return !!mode && (
+            <Button.Group size="small" style={{marginRight: 10}}>
+                <Button content={Translate.string('Day')}
+                        onClick={() => setMode('days')}
+                        primary={mode === 'days'} />
+                <Button content={Translate.string('Week')}
+                        onClick={() => setMode('weeks')}
+                        primary={mode === 'weeks'} />
+                <Button content={Translate.string('Month')}
+                        onClick={() => setMode('months')}
+                        primary={mode === 'months'} />
+            </Button.Group>
+        );
+    }
+
     renderDateSwitcher = () => {
-        const {activeDate, dateRange, disableDatePicker, isLoading} = this.props;
+        const {activeDate, dateRange, disableDatePicker, isLoading, mode} = this.props;
         const startDate = toMoment(dateRange[0]);
         const endDate = toMoment(dateRange[dateRange.length - 1]);
         const calendar = (
@@ -82,29 +103,30 @@ export default class TimelineHeader extends React.Component {
                         onChange={this.onSelect}
                         value={activeDate} />
         );
-        const freeRange = dateRange.length === 0;
-        const prevDisabled = isLoading || (!freeRange && activeDate.clone().subtract(1, 'day').isBefore(startDate));
-        const nextDisabled = isLoading || activeDate.clone().add(1, 'day').isAfter(endDate);
+        const prevDisabled = isLoading || activeDate.clone().subtract(1, mode).isBefore(startDate);
+        const nextDisabled = isLoading || activeDate.clone().add(1, mode).isAfter(endDate);
         return (
             !disableDatePicker && (
-                <Button.Group floated="right" size="small">
-                    <Button icon="left arrow"
-                            onClick={() => this.changeSelectedDate('prev')}
-                            disabled={prevDisabled} />
-                    <DatePicker calendar={calendar} disabled={isLoading || (prevDisabled && nextDisabled)}
-                                value={activeDate}>
-                        {
-                            () => (
-                                <Button primary>
-                                    {activeDate.format('L')}
-                                </Button>
-                            )
-                        }
-                    </DatePicker>
-                    <Button icon="right arrow"
-                            onClick={() => this.changeSelectedDate('next')}
-                            disabled={nextDisabled} />
-                </Button.Group>
+                <div>
+                    {this.renderModeSwitcher()}
+                    <Button.Group size="small">
+                        <Button icon="left arrow"
+                                onClick={() => this.changeSelectedDate('prev')}
+                                disabled={prevDisabled} />
+                        <DatePicker calendar={calendar} disabled={isLoading || (prevDisabled && nextDisabled)}>
+                            {
+                                () => (
+                                    <Button primary>
+                                        {activeDate.format('L')}
+                                    </Button>
+                                )
+                            }
+                        </DatePicker>
+                        <Button icon="right arrow"
+                                onClick={() => this.changeSelectedDate('next')}
+                                disabled={nextDisabled} />
+                    </Button.Group>
+                </div>
             )
         );
     };
