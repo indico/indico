@@ -16,7 +16,6 @@
  */
 
 import _ from 'lodash';
-import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
 import {bindActionCreators} from 'redux';
@@ -69,44 +68,6 @@ class _BookingTimelineComponent extends React.Component {
         return availability[0][1];
     }
 
-    _getRowSerializer(dt, singleRoom = false) {
-        const {bookingAllowed} = this.props;
-        return ({candidates, preBookings, bookings, preConflicts, conflicts, blockings, nonbookablePeriods,
-                 unbookableHours, room}) => {
-            const hasConflicts = conflicts[dt] && conflicts[dt].length !== 0;
-            const av = {
-                candidates: candidates[dt].map((cand) => ({...cand, bookable: bookingAllowed && !hasConflicts})) || [],
-                preBookings: preBookings[dt] || [],
-                bookings: bookings[dt] || [],
-                conflicts: conflicts[dt] || [],
-                preConflicts: preConflicts[dt] || [],
-                blockings: blockings[dt] || [],
-                nonbookablePeriods: nonbookablePeriods[dt] || [],
-                unbookableHours: unbookableHours || []
-            };
-            const {full_name: fullName, id} = room;
-
-            return {
-                availability: av,
-                label: singleRoom ? moment(dt).format('L') : fullName,
-                key: singleRoom ? dt : id,
-                conflictIndicator: true,
-                room
-            };
-        };
-    }
-
-    calcRows = () => {
-        const {availability, dateRange, datePicker: {selectedDate}} = this.props;
-
-        if (this.singleRoom) {
-            const roomAvailability = this.singleRoom;
-            return dateRange.map(dt => this._getRowSerializer(dt, true)(roomAvailability));
-        } else {
-            return availability.map(([, data]) => data).map(this._getRowSerializer(selectedDate));
-        }
-    };
-
     renderRoomSummary({room: {full_name: fullName}}) {
         return (
             <Segment>
@@ -118,7 +79,7 @@ class _BookingTimelineComponent extends React.Component {
     render() {
         const {
             isFetching, lazyScroll, showEmptyMessage, clickable, datePicker,
-            actions: {openBookingForm, openRoomDetails}
+            actions: {openBookingForm, openRoomDetails}, availability, bookingAllowed
         } = this.props;
         const emptyMessage = showEmptyMessage ? (
             <Message warning>
@@ -129,15 +90,18 @@ class _BookingTimelineComponent extends React.Component {
         ) : null;
 
         return (
-            <ElasticTimeline lazyScroll={lazyScroll}
-                             rows={this.calcRows()}
-                             datePicker={datePicker}
-                             emptyMessage={emptyMessage}
-                             onClickCandidate={clickable ? openBookingForm : null}
-                             onClickLabel={clickable ? openRoomDetails : null}
-                             extraContent={this.singleRoom && this.renderRoomSummary(this.singleRoom)}
-                             isLoading={isFetching}
-                             disableDatePicker={!!this.singleRoom} />
+            datePicker.selectedDate && (
+                <ElasticTimeline lazyScroll={lazyScroll}
+                                 availability={availability}
+                                 bookingAllowed={bookingAllowed}
+                                 datePicker={datePicker}
+                                 emptyMessage={emptyMessage}
+                                 onClickCandidate={clickable ? openBookingForm : null}
+                                 onClickLabel={clickable ? openRoomDetails : null}
+                                 extraContent={this.singleRoom && this.renderRoomSummary(this.singleRoom)}
+                                 isLoading={isFetching}
+                                 disableDatePicker={!!this.singleRoom} />
+            )
         );
     }
 }

@@ -35,6 +35,14 @@ export const FETCH_ERROR = 'calendar/FETCH_ERROR';
 export const ROOM_IDS_RECEIVED = 'calendar/ROOM_IDS_RECEIVED';
 
 
+export function setDate(date) {
+    return {type: SET_DATE, date};
+}
+
+export function setMode(mode) {
+    return {type: SET_MODE, mode};
+}
+
 export function fetchCalendar(fetchRooms = true) {
     return async (dispatch, getState) => {
         dispatch({type: FETCH_REQUEST});

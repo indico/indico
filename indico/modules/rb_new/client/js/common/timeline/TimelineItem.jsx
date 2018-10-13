@@ -43,6 +43,14 @@ const types = {
     unbookableHours: 'unbookable-hours',
 };
 
+function getKeyForOccurrence({reservation, startDt, endDt}) {
+    let key = '';
+    if (reservation) {
+        key += `${reservation.id}-`;
+    }
+    return `${name}-${key}${startDt}-${endDt}`;
+}
+
 export default class TimelineItem extends React.Component {
     static propTypes = {
         startHour: PropTypes.number.isRequired,
@@ -168,16 +176,12 @@ export default class TimelineItem extends React.Component {
 
     renderOccurrences = () => {
         const {data} = this.props;
-        return (
-            Object.entries(data).map(([name, occurrences]) => (
-                occurrences.map((occurrence, i) => (
-                    // eslint-disable-next-line react/no-array-index-key
-                    <React.Fragment key={i}>
-                        {this.renderOccurrence(occurrence, classes[name] || 'default', types[name])}
-                    </React.Fragment>
-                ))
-            ))
-        );
+        return Object.entries(data).map(([name, occurrences]) => (
+            occurrences.map(occurrence => (
+                <React.Fragment key={getKeyForOccurrence(occurrence)}>
+                    {this.renderOccurrence(occurrence, classes[name] || 'default', types[name])}
+                </React.Fragment>
+            ))));
     };
 
     render() {

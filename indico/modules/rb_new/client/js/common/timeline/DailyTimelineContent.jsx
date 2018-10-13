@@ -77,7 +77,7 @@ export default class DailyTimelineContent extends React.Component {
         return fields.some(field => !_.isEmpty(availability[field]));
     };
 
-    renderTimelineRow = ({availability, label, conflictIndicator, key, room}) => {
+    renderTimelineRow({availability, label, conflictIndicator, key, room}) {
         const {
             minHour, maxHour, hourStep, itemClass: ItemClass, itemProps, onClickCandidate,
             onClickReservation, longLabel, showUnused
@@ -109,20 +109,41 @@ export default class DailyTimelineContent extends React.Component {
                 </div>
             </div>
         );
-    };
+    }
 
-    renderDividers = (count) => {
+    renderDividers(count, step) {
         const leftOffset = (100 / count);
 
+        return _.range(0, count, step).map(i => (
+            // eslint-disable-next-line react/no-array-index-key
+            <div styleName="timeline-divider"
+                 style={{left: `${(i * leftOffset)}%`}}
+                 key={`divider-${i}`} />
+        ));
+    }
+
+    renderHeader(hourSpan, hourSeries) {
+        const {selectable} = this.state;
+        const {longLabel, hourStep} = this.props;
+        const labelWidth = longLabel ? 200 : 150;
+
         return (
-            _.times(count + 1, (i) => (
-                // eslint-disable-next-line react/no-array-index-key
-                <div styleName="timeline-divider"
-                     style={{left: `${(i * leftOffset)}%`}}
-                     key={`divider-${i}`} />
-            ))
+            <div styleName="timeline-header" className={!selectable && 'timeline-non-selectable'}>
+                <div style={{width: labelWidth}} />
+                <div styleName="timeline-header-labels">
+                    {_.range(0, hourSpan, hourStep).map((i, n) => (
+                        <div styleName="timeline-header-label"
+                             key={`timeline-header-${i}`}
+                             style={{position: 'absolute', left: `${i / hourSpan * 100}%`}}>
+                            <span styleName="timeline-label-text">
+                                {moment({hours: hourSeries[n]}).format('LT')}
+                            </span>
+                        </div>
+                    ))}
+                </div>
+            </div>
         );
-    };
+    }
 
     render() {
         const {rows, minHour, maxHour, hourStep, longLabel, lazyScroll, isLoading} = this.props;
@@ -131,25 +152,17 @@ export default class DailyTimelineContent extends React.Component {
         const WrapperComponent = lazyScroll ? LazyScroll : React.Fragment;
         const wrapperProps = lazyScroll || {};
         const hourSeries = _.range(minHour, maxHour + hourStep, hourStep);
+        const hourSpan = maxHour - minHour;
 
         return (
             <>
-                <div styleName="timeline-header" className={!selectable && 'timeline-non-selectable'}>
-                    <div style={{width: labelWidth}} />
-                    {hourSeries.slice(0, -1).map((hour) => (
-                        <div styleName="timeline-header-label" key={`timeline-header-${hour}`}>
-                            <span styleName="timeline-label-text">
-                                {moment({hours: hour}).format('LT')}
-                            </span>
-                        </div>
-                    ))}
-                </div>
+                {!!rows.length && this.renderHeader(hourSpan, hourSeries)}
                 <WrapperComponent {...wrapperProps}>
                     <div styleName="timeline-content" className={!selectable && 'timeline-non-selectable'}>
                         {rows.map((rowProps) => this.renderTimelineRow(rowProps))}
                         <div style={{left: labelWidth, width: `calc(100% - ${labelWidth}px)`}}
                              styleName="timeline-lines">
-                            {this.renderDividers(hourSeries.length - 1, longLabel)}
+                            {this.renderDividers(hourSpan, hourStep)}
                         </div>
                     </div>
                     <Loader active={wrapperProps.isFetching || isLoading} inline="centered" styleName="timeline-loader" />
@@ -159,7 +172,7 @@ export default class DailyTimelineContent extends React.Component {
     }
 }
 
-function TimelineRowLabel({label, availability, longLabel, onClickLabel}) {
+export function TimelineRowLabel({label, availability, longLabel, onClickLabel}) {
     let color, tooltip;
     switch (availability) {
         case 'conflict':
@@ -180,10 +193,14 @@ function TimelineRowLabel({label, availability, longLabel, onClickLabel}) {
             {onClickLabel ? <a onClick={onClickLabel}>{label}</a> : <span>{label}</span>}
         </span>
     );
+    const width = longLabel ? 200 : 150;
 
     return (
         <TooltipIfTruncated>
-            <div styleName="timeline-row-label" style={{width: longLabel ? 200 : 150}}>
+            <div styleName="timeline-row-label" style={{
+                minWidth: width,
+                maxWidth: width
+            }}>
                 <div styleName="label">
                     {availability ? <Popup trigger={roomLabel} content={tooltip} size="small" /> : roomLabel}
                 </div>
