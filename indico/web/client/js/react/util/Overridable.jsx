@@ -27,10 +27,10 @@ Overridable.defaultProps = {
     children: null
 };
 
-const ConnectedOverriable = connect(({_overrides}) => ({
+const ConnectedOverridable = connect(({_overrides}) => ({
     overrides: _overrides
 }))(Overridable);
 
 
-export default ConnectedOverriable;
-export const RouteAwareOverridable = withRouter(ConnectedOverriable);
+export default ConnectedOverridable;
+export const RouteAwareOverridable = withRouter(ConnectedOverridable);
