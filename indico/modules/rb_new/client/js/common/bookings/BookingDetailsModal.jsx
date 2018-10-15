@@ -133,6 +133,32 @@ class BookingDetailsModal extends React.Component {
         );
     };
 
+    renderBookedFor = (bookedForUser) => {
+        if (bookedForUser) {
+            const {fullName: bookedForName, email: bookedForEmail, phone: bookedForPhone} = bookedForUser;
+            return (
+                <>
+                    <Header><Icon name="user" /><Translate>Booked for</Translate></Header>
+                    <div>{bookedForName}</div>
+                    {bookedForPhone && <div><Icon name="phone" />{bookedForPhone}</div>}
+                    {bookedForEmail && <div><Icon name="mail" />{bookedForEmail}</div>}
+                </ >
+            );
+        }
+    };
+
+    renderReason = (reason) => (
+        <Message info icon styleName="message-icon">
+            <Icon name="info" />
+            <Message.Content>
+                <Message.Header>
+                    <Translate>Booking reason: </Translate>
+                </Message.Header>
+                {reason}
+            </Message.Content>
+        </Message>
+    );
+
     render() {
         const {booking} = this.props;
         const {
@@ -140,7 +166,7 @@ class BookingDetailsModal extends React.Component {
         } = booking.attributes;
         const {occurrences, dateRange, editLogs} = booking;
         const {occurrencesVisible} = this.state;
-        const {fullName: bookedForName, email: bookedForEmail, phone: bookedForPhone} = bookedForUser;
+
         const dates = {startDate: startDt, endDate: endDt};
         const createdOn = serializeDate(toMoment(createdDt));
         const times = {startTime: moment(startDt).utc().format('HH:mm'), endTime: moment(endDt).utc().format('HH:mm')};
@@ -170,19 +196,8 @@ class BookingDetailsModal extends React.Component {
                             </Button>
                         </Grid.Column>
                         <Grid.Column>
-                            <Header><Icon name="user" /><Translate>Booked for</Translate></Header>
-                            <div>{bookedForName}</div>
-                            {bookedForPhone && <div><Icon name="phone" />{bookedForPhone}</div>}
-                            {bookedForEmail && <div><Icon name="mail" />{bookedForEmail}</div>}
-                            <Message info icon styleName="message-icon">
-                                <Icon name="info" />
-                                <Message.Content>
-                                    <Message.Header>
-                                        <Translate>Booking reason: </Translate>
-                                    </Message.Header>
-                                    {bookingReason}
-                                </Message.Content>
-                            </Message>
+                            {this.renderBookedFor(bookedForUser)}
+                            {this.renderReason(bookingReason)}
                             {this.renderBookingHistory(editLogs, createdOn, createdByUser)}
                             <div styleName="action-buttons">
                                 <Button type="button" icon="cancel" content={<Translate>Cancel booking</Translate>} />
