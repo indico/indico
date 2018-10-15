@@ -34,8 +34,8 @@ from indico.modules.rb_new.controllers.backend.common import search_room_args
 from indico.modules.rb_new.operations.bookings import get_room_calendar, get_rooms_availability
 from indico.modules.rb_new.operations.suggestions import get_suggestions
 from indico.modules.rb_new.schemas import create_booking_args, reservation_schema
-from indico.modules.rb_new.util import (serialize_blockings, serialize_nonbookable_periods, serialize_occurrences,
-                                        serialize_unbookable_hours)
+from indico.modules.rb_new.util import (group_by_occurrence_date, serialize_blockings, serialize_nonbookable_periods,
+                                        serialize_occurrences, serialize_unbookable_hours)
 from indico.modules.users.models.users import User
 from indico.util.i18n import _
 from indico.web.util import ExpectedError
@@ -127,7 +127,8 @@ class RHCreateBooking(RHRoomBookingBase):
         except NoReportError as e:
             db.session.rollback()
             raise ExpectedError(unicode(e))
-        return jsonify(booking=reservation_schema.dump(resv).data)
+        return jsonify(room_id=room.id, booking=reservation_schema.dump(resv).data,
+                       occurrences=serialize_occurrences(group_by_occurrence_date(resv.occurrences.all())))
 
 
 class RHRoomSuggestions(RHRoomBookingBase):

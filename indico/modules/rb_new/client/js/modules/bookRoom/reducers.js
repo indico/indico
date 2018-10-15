@@ -30,6 +30,7 @@ export const initialTimelineState = {
     roomIds: [],
     params: null,
 };
+
 const timelineReducer = combineReducers({
     request: requestReducer(
         actions.GET_TIMELINE_REQUEST,
@@ -61,6 +62,15 @@ const timelineReducer = combineReducers({
                     dateRange: action.data.date_range,
                     availability: state.availability.concat(action.data.availability),
                 };
+            case actions.CREATE_BOOKING_SUCCESS: {
+                const {data: {room_id: roomId}} = action;
+                const {roomIds, availability} = state;
+                return {
+                    ...state,
+                    roomIds: roomIds.filter((id) => id !== roomId),
+                    availability: availability.filter(([id]) => id !== roomId)
+                };
+            }
             default:
                 return state;
         }
