@@ -19,4 +19,5 @@ export {default as EditableTimelineItem} from './EditableTimelineItem';
 export {default as ElasticTimeline} from './ElasticTimeline';
 export {default as DailyTimelineContent} from './DailyTimelineContent';
 export {default as TimelineHeader} from './TimelineHeader';
+export {default as TimelineItem} from './TimelineItem';
 export {default as TimelineLegend} from './TimelineLegend';
