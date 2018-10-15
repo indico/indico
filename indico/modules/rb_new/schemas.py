@@ -23,7 +23,7 @@ from marshmallow_enum import EnumField
 
 from indico.core.marshmallow import mm
 from indico.modules.rb.models.aspects import Aspect
-from indico.modules.rb.models.blocked_rooms import BlockedRoom
+from indico.modules.rb.models.blocked_rooms import BlockedRoom, BlockedRoomState
 from indico.modules.rb.models.blocking_principals import BlockingPrincipal
 from indico.modules.rb.models.blockings import Blocking
 from indico.modules.rb.models.locations import Location
@@ -83,10 +83,11 @@ class ReservationOccurrenceSchema(mm.ModelSchema):
 
 class BlockedRoomSchema(mm.ModelSchema):
     room = Nested(RoomSchema, only=('id', 'name', 'sprite_position', 'full_name'))
+    state = EnumField(BlockedRoomState)
 
     class Meta:
         model = BlockedRoom
-        fields = ('rejection_reason', 'room')
+        fields = ('room', 'state', 'rejection_reason', 'rejected_by')
 
     @post_dump(pass_many=True)
     def sort_rooms(self, data, many):

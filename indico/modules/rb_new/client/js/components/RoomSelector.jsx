@@ -51,11 +51,13 @@ class RoomSelector extends React.Component {
         onBlur: PropTypes.func.isRequired,
         value: PropTypes.array.isRequired,
         disabled: PropTypes.bool,
-        roomsSpriteToken: PropTypes.string.isRequired
+        roomsSpriteToken: PropTypes.string.isRequired,
+        renderRoomActions: PropTypes.func,
     };
 
     static defaultProps = {
-        disabled: false
+        disabled: false,
+        renderRoomActions: () => {},
     };
 
     state = {
@@ -95,7 +97,8 @@ class RoomSelector extends React.Component {
     };
 
     renderRoomItem = (room) => {
-        const {disabled, roomsSpriteToken} = this.props;
+        const {disabled, roomsSpriteToken, renderRoomActions} = this.props;
+
         return (
             <List.Item key={room.id}>
                 <div className="image-wrapper" style={{width: 55, height: 25}}>
@@ -107,11 +110,10 @@ class RoomSelector extends React.Component {
                 <List.Content>
                     <List.Header>{room.fullName}</List.Header>
                 </List.Content>
-                {!disabled && (
-                    <List.Content styleName="remove-btn-content">
-                        <Icon name="remove" onClick={() => this.removeItem(room)} />
-                    </List.Content>
-                )}
+                <List.Content styleName="room-actions">
+                    {renderRoomActions(room)}
+                    {!disabled && <Icon name="remove" onClick={() => this.removeItem(room)} />}
+                </List.Content>
             </List.Item>
         );
     };

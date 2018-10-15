@@ -20,9 +20,9 @@ import React from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
-import {Button, Divider, Form, Grid, Message, Icon, Modal} from 'semantic-ui-react';
+import {Button, Divider, Form, Grid, Message, Icon, Modal, Popup} from 'semantic-ui-react';
 import {Form as FinalForm, Field} from 'react-final-form';
-import {Translate} from 'indico/react/i18n';
+import {Param, Translate} from 'indico/react/i18n';
 import {ReduxFormField, formatters} from 'indico/react/forms';
 import PrincipalSearchField from 'indico/react/components/PrincipalSearchField';
 import DatePeriodField from 'indico/react/components/DatePeriodField';
@@ -128,6 +128,46 @@ class BlockingModal extends React.Component {
         );
     };
 
+    renderRoomState = (room) => {
+        const {state} = room;
+        if (!room.state) {
+            return null;
+        }
+
+        const {rejectionReason, rejectedBy} = room;
+        const stateIconProps = {
+            accepted: {name: 'check circle', color: 'green'},
+            rejected: {name: 'dont', color: 'red'},
+            pending: {name: 'question circle', color: 'orange'}
+        }[state];
+
+        let popupContent;
+        if (state === 'accepted') {
+            popupContent = Translate.string('Blocking has been accepted');
+        } else if (state === 'pending') {
+            popupContent = Translate.string('Pending blocking');
+        } else {
+            popupContent = (
+                <>
+                    <Translate>
+                        Booking rejected by <Param name="rejectedBy" value={rejectedBy} wrapper={<strong />} />
+                    </Translate>
+                    <br />
+                    <Translate>
+                        Reason: <Param name="rejectionReason" value={rejectionReason} wrapper={<strong />} />
+                    </Translate>
+                </>
+            );
+        }
+
+        return (
+            <Popup trigger={<Icon {...stateIconProps} />}
+                   position="right center"
+                   content={popupContent}
+                   flowing />
+        );
+    };
+
     renderRoomSearchField = ({input, ...props}) => {
         const {mode} = this.state;
         let label;
@@ -143,7 +183,8 @@ class BlockingModal extends React.Component {
                             input={input}
                             as={RoomSelector}
                             label={label}
-                            required={mode !== 'view'} />
+                            required={mode !== 'view'}
+                            renderRoomActions={this.renderRoomState} />
         );
     };
 
@@ -302,8 +343,13 @@ class BlockingModal extends React.Component {
         const {onClose, blocking: {blockedRooms, allowed, startDate, endDate, reason}} = this.props;
         const {mode} = this.state;
         const props = mode === 'view' ? {onSubmit() {}} : {validate, onSubmit: this.handleSubmit};
-        const rooms = blockedRooms.map((blockedRoom) => blockedRoom.room);
         const dates = mode !== 'create' ? {startDate, endDate} : null;
+        const rooms = blockedRooms.map(({room, state, rejectionReason, rejectedBy}) => ({
+            ...room,
+            state,
+            rejectionReason,
+            rejectedBy
+        }));
 
         return (
             <Modal open onClose={onClose} size="large" closeIcon>
