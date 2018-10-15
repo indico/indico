@@ -60,7 +60,7 @@ export default class DailyTimelineContent extends React.Component {
         minHour: 6,
         maxHour: 22,
         hourStep: 2,
-        showUnused: false
+        showUnused: true
     };
 
     state = {
