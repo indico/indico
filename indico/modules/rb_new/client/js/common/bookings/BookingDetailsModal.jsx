@@ -20,7 +20,7 @@ import moment from 'moment';
 import React from 'react';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
-import {Button, Modal, Message, Grid, Header, ModalActions, Icon, Popup, List} from 'semantic-ui-react';
+import {Button, Modal, Message, Grid, Header, Icon, Popup, List} from 'semantic-ui-react';
 import {Param, Translate} from 'indico/react/i18n';
 import {toMoment, serializeDate} from 'indico/utils/date';
 import BookingTimeInformation from '../../components/TimeInformation';
@@ -76,7 +76,7 @@ class BookingDetailsModal extends React.Component {
         const {booking: {attributes: {room}}} = this.props;
         return (occurrences) => ({
             availability: {
-                candidates: occurrences[day].map((candidate) => ({...candidate, bookable: false})) || [],
+                bookings: occurrences[day].map((candidate) => ({...candidate, bookable: false})) || [],
             },
             label: moment(day).format('L'),
             key: day,
@@ -95,7 +95,7 @@ class BookingDetailsModal extends React.Component {
             const {timestamp, info, userName} = log;
             const basicInfo = <strong>{info[0]}</strong>;
             const details = (info[1] ? info[1] : null);
-            const dateValue = serializeDate(toMoment(timestamp));
+            const dateValue = serializeDate(toMoment(timestamp), 'L');
             const date = <Param name="date" value={dateValue} wrapper={<span styleName="log-date" />} />;
             const mainInfo = <Param name="details" value={basicInfo} />;
             const user = <Param name="user" value={userName} />;
@@ -119,7 +119,7 @@ class BookingDetailsModal extends React.Component {
         const bookingCreatedBy = <Param name="created-by" value={createdBy} />;
         const bookingCreatedInfo = <Param name="created-info" value={<strong>Booking created </strong>} />;
         return (
-            <div>
+            <div styleName="booking-logs">
                 <Header><Translate>Booking history</Translate></Header>
                 <List divided styleName="log-list">
                     {items}
@@ -145,14 +145,17 @@ class BookingDetailsModal extends React.Component {
         const createdOn = serializeDate(toMoment(createdDt));
         const times = {startTime: moment(startDt).utc().format('HH:mm'), endTime: moment(endDt).utc().format('HH:mm')};
         const recurrence = this.getRecurrence(repetition);
-        const link = <a onClick={() => this.setState({occurrencesVisible: true})} />;
         const legendLabels = [
-            {label: Translate.string('Occurrence'), color: 'green'},
+            {label: Translate.string('Occurrence'), color: 'orange'},
         ];
         return (
             <Modal open onClose={this.handleCloseModal} size="large" closeIcon>
-                <Modal.Header>
+                <Modal.Header styleName="booking-modal-header">
                     <Translate>Booking Details</Translate>
+                    <span>
+                        <Button icon="pencil" circular />
+                        <Button icon="trash" circular />
+                    </span>
                 </Modal.Header>
                 <Modal.Content>
                     <Grid columns={2}>
@@ -162,50 +165,44 @@ class BookingDetailsModal extends React.Component {
                             <BookingTimeInformation recurrence={recurrence}
                                                     dates={dates}
                                                     timeSlot={times} />
-                            <Message success attached="bottom">
-                                <Message.Content>
-                                    <Translate>
-                                        Consult the <Param name="occurrences-link" wrapper={link}>timeline view</Param> to see the booking occurrences.
-                                    </Translate>
-                                </Message.Content>
-                            </Message>
+                            <Button attached="bottom" color="blue" fluid onClick={() => this.setState({occurrencesVisible: true})}>
+                                <Translate>Consult the booking occurrences</Translate>
+                            </Button>
                         </Grid.Column>
                         <Grid.Column>
-                            <Grid>
-                                <Grid.Column width={8}>
-                                    <Header><Icon name="user" /><Translate>Booked for</Translate></Header>
-                                    <div>{bookedForName}</div>
-                                    {bookedForPhone && <div><Icon name="phone" />{bookedForPhone}</div>}
-                                    {bookedForEmail && <div><Icon name="mail" />{bookedForEmail}</div>}
-                                </Grid.Column>
-                                <Grid.Column width={8}>
-                                    <Header><Translate>Reason</Translate></Header>
-                                    <div>{bookingReason}</div>
-                                </Grid.Column>
-                                {this.renderBookingHistory(editLogs, createdOn, createdByUser)}
-                            </Grid>
+                            <Header><Icon name="user" /><Translate>Booked for</Translate></Header>
+                            <div>{bookedForName}</div>
+                            {bookedForPhone && <div><Icon name="phone" />{bookedForPhone}</div>}
+                            {bookedForEmail && <div><Icon name="mail" />{bookedForEmail}</div>}
+                            <Message info icon styleName="message-icon">
+                                <Icon name="info" />
+                                <Message.Content>
+                                    <Message.Header>
+                                        <Translate>Booking reason: </Translate>
+                                    </Message.Header>
+                                    {bookingReason}
+                                </Message.Content>
+                            </Message>
+                            {this.renderBookingHistory(editLogs, createdOn, createdByUser)}
+                            <div styleName="action-buttons">
+                                <Button type="button" icon="cancel" content={<Translate>Cancel booking</Translate>} />
+                                <Button type="button" icon="cancel" color="red" content={<Translate>Reject booking</Translate>} />
+                            </div>
                         </Grid.Column>
                     </Grid>
                 </Modal.Content>
-                <ModalActions>
-                    <Button type="button" content={Translate.string('Cancel')} />
-                    <Button type="button" content={Translate.string('Reject')} />
-                    <Button type="button" content={Translate.string('Modify')} />
-                    <Button type="button" content={Translate.string('Delete')} />
-                    <Button type="button" content={Translate.string('Clone')} />
-                    <Modal open={occurrencesVisible}
-                           onClose={() => this.setState({occurrencesVisible: false})}
-                           size="large" closeIcon>
-                        <Modal.Header className="legend-header">
-                            <Translate>Bookings</Translate>
-                            <Popup trigger={<Icon name="info circle" className="legend-info-icon" />}
-                                   content={<TimelineLegend labels={legendLabels} compact />} />
-                        </Modal.Header>
-                        <Modal.Content scrolling>
-                            {occurrences && this.renderTimeline(occurrences, dateRange)}
-                        </Modal.Content>
-                    </Modal>
-                </ModalActions>
+                <Modal open={occurrencesVisible}
+                       onClose={() => this.setState({occurrencesVisible: false})}
+                       size="large" closeIcon>
+                    <Modal.Header className="legend-header">
+                        <Translate>Occurrences</Translate>
+                        <Popup trigger={<Icon name="info circle" className="legend-info-icon" />}
+                               content={<TimelineLegend labels={legendLabels} compact />} />
+                    </Modal.Header>
+                    <Modal.Content scrolling>
+                        {occurrences && this.renderTimeline(occurrences, dateRange)}
+                    </Modal.Content>
+                </Modal>
             </Modal>
         );
     }

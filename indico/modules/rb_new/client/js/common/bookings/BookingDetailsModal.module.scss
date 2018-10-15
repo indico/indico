@@ -18,9 +18,8 @@
 
 
 .log-list {
-    max-height: 200px;
-    width: 480px;
-    overflow-y: scroll;
+    max-height: 140px;
+    overflow-y: auto;
     overflow-x: auto;
 }
 
@@ -30,4 +29,24 @@
 
 .popup-center {
     text-align: center;
+}
+
+.booking-logs {
+    margin-top: 20px;
+}
+
+:global(.ui.icon.message).message-icon :global(.icon) {
+    font-size: 2em;
+}
+
+:global(.ui.modal .header).booking-modal-header {
+    display: flex;
+    justify-content: space-between;
+}
+
+.action-buttons {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    margin: 1em;
 }
