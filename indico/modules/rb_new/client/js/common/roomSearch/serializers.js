@@ -38,11 +38,11 @@ export const ajax = {
     text: ({text}) => text,
     division: ({division}) => division,
     start_dt: {
-        onlyIf: (data) => data.dates && data.dates.startDate && data.timeSlot.startTime,
+        onlyIf: (data) => data.dates && data.dates.startDate,
         serializer: filterDTHandler('start')
     },
     end_dt: {
-        onlyIf: (data) => data.dates && data.timeSlot.endTime,
+        onlyIf: (data) => data.dates && data.dates.endDate,
         serializer: filterDTHandler('end')
     },
     sw_lat: {
