@@ -16,7 +16,6 @@
  */
 
 import _ from 'lodash';
-import moment from 'moment';
 import React from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
@@ -27,7 +26,6 @@ import {Translate} from 'indico/react/i18n';
 import {ReduxFormField, formatters} from 'indico/react/forms';
 import PrincipalSearchField from 'indico/react/components/PrincipalSearchField';
 import DatePeriodField from 'indico/react/components/DatePeriodField';
-import {serializeDate} from 'indico/utils/date';
 import RoomSelector from '../../components/RoomSelector';
 import {selectors as userSelectors} from '../../common/user';
 import * as blockingsActions from './actions';
@@ -37,13 +35,13 @@ import './BlockingModal.module.scss';
 
 function validate({dates, reason, rooms}) {
     const errors = {};
-    if (dates === undefined || !dates.startDate || !dates.endDate) {
+    if (!dates) {
         errors.dates = Translate.string('Please choose a valid period.');
     }
     if (!reason) {
         errors.reason = Translate.string('Please provide the reason for the blocking.');
     }
-    if (rooms === undefined || !rooms.length) {
+    if (!rooms || !rooms.length) {
         errors.rooms = Translate.string('Please choose at least one room for this blocking.');
     }
     return errors;
@@ -119,29 +117,13 @@ class BlockingModal extends React.Component {
     };
 
     renderBlockingPeriodField = ({input, ...props}) => {
-        const {blocking: {startDate, endDate}} = this.props;
         const {mode} = this.state;
-        const initialValue = [];
-
-        if (startDate && endDate) {
-            initialValue.push(...[moment(startDate, 'YYYY-MM-DD'), moment(endDate, 'YYYY-MM-DD')]);
-        }
-
         return (
             <ReduxFormField {...props}
                             input={input}
                             as={DatePeriodField}
                             label={Translate.string('Period')}
-                            initialValue={initialValue}
                             showToday={mode !== 'view'}
-                            onChange={(values) => {
-                                if (values.length) {
-                                    input.onChange({
-                                        startDate: serializeDate(moment(values[0], 'YYYY-MM-DD')),
-                                        endDate: serializeDate(moment(values[1], 'YYYY-MM-DD'))
-                                    });
-                                }
-                            }}
                             required={mode !== 'view'} />
         );
     };
@@ -269,7 +251,8 @@ class BlockingModal extends React.Component {
                                        disabled={mode === 'view' || submitting || submitSucceeded} />
                                 <Field name="dates"
                                        component={this.renderBlockingPeriodField}
-                                       disabled={mode !== 'create' || submitting || submitSucceeded} />
+                                       disabled={mode !== 'create' || submitting || submitSucceeded}
+                                       allowNull />
                                 <Field name="reason"
                                        format={formatters.trim}
                                        render={(fieldProps) => {
@@ -319,13 +302,8 @@ class BlockingModal extends React.Component {
         const {onClose, blocking: {blockedRooms, allowed, startDate, endDate, reason}} = this.props;
         const {mode} = this.state;
         const props = mode === 'view' ? {onSubmit() {}} : {validate, onSubmit: this.handleSubmit};
-        const dates = {startDate: null, endDate: null};
         const rooms = blockedRooms.map((blockedRoom) => blockedRoom.room);
-
-        if (startDate && endDate) {
-            dates.startDate = moment(startDate, 'YYYY-MM-DD');
-            dates.endDate = moment(endDate, 'YYYY-MM-DD');
-        }
+        const dates = mode !== 'create' ? {startDate, endDate} : null;
 
         return (
             <Modal open onClose={onClose} size="large" closeIcon>

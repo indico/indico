@@ -86,6 +86,7 @@ export function createBlocking(formData) {
 }
 
 export function updateBlocking(blockingId, formData) {
+    delete formData.dates;
     const data = preProcessParameters(formData, ajaxRules);
     return submitFormAction(
         () => indicoAxios.patch(updateBlockingURL({blocking_id: blockingId}), data),
