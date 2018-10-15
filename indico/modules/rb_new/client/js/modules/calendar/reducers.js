@@ -20,6 +20,7 @@ import {combineReducers} from 'redux';
 
 import {requestReducer} from 'indico/utils/redux';
 import {serializeDate} from 'indico/utils/date';
+import {actions as bookRoomActions} from '../../modules/bookRoom';
 import * as actions from '../../actions';
 import * as calendarActions from './actions';
 import {filterReducerFactory} from '../../common/filters';
@@ -50,6 +51,23 @@ export default combineReducers({
                 return {...state, rows: action.data};
             case calendarActions.ROOM_IDS_RECEIVED:
                 return {...state, roomIds: action.data};
+            case bookRoomActions.CREATE_BOOKING_SUCCESS: {
+                const {data: {occurrences, room_id: roomId}} = action;
+                const {rows} = state;
+                const newRows = rows.map((row) => {
+                    if (row.room_id !== roomId) {
+                        return row;
+                    }
+
+                    const newRow = {...row};
+                    for (const dt of Object.keys(occurrences)) {
+                        newRow.bookings[dt] = [...newRow.bookings[dt], ...occurrences[dt]];
+                    }
+                    return newRow;
+                });
+
+                return {...state, rows: newRows};
+            }
             default:
                 return state;
         }

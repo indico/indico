@@ -63,7 +63,6 @@ export const FETCH_SUGGESTIONS_ERROR = 'bookRoom/FETCH_SUGGESTIONS_ERROR';
 export const SUGGESTIONS_RECEIVED = 'bookRoom/SUGGESTIONS_RECEIVED';
 export const RESET_SUGGESTIONS = 'bookRoom/RESET_SUGGESTIONS';
 
-
 export function createBooking(args) {
     const params = preProcessParameters(args, ajaxRules);
     return submitFormAction(

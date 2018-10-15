@@ -22,6 +22,7 @@ import {requestReducer} from 'indico/utils/redux';
 import {filterReducerFactory} from '../filters';
 import {mapSearchReducerFactory} from '../map';
 import {roomSearchActionsFactory} from './actions';
+import {actions as bookRoomActions} from '../../modules/bookRoom';
 import {parseSearchBarText, sanitizeRecurrence} from '../../util';
 
 
@@ -93,6 +94,18 @@ export function roomSearchReducerFactory(namespace, extra = {}) {
                 switch (action.type) {
                     case actions.SEARCH_RESULTS_RECEIVED:
                         return camelizeKeys(action.data);
+                    case bookRoomActions.CREATE_BOOKING_SUCCESS: {
+                        if (namespace !== 'bookRoom') {
+                            return state;
+                        }
+
+                        const {data: {room_id: roomId}} = action;
+                        const {rooms} = state;
+                        return {
+                            ...state,
+                            rooms: rooms.filter((id) => id !== roomId)
+                        };
+                    }
                     default:
                         return state;
                 }
