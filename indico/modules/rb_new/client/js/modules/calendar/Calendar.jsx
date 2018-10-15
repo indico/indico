@@ -29,7 +29,7 @@ import * as calendarActions from './actions';
 import * as calendarSelectors from './selectors';
 import {actions as bookingsActions} from '../../common/bookings';
 import {selectors as roomsSelectors, actions as roomsActions} from '../../common/rooms';
-import {EditableTimelineItem, ElasticTimeline, TimelineHeader} from '../../common/timeline';
+import {EditableTimelineItem, ElasticTimeline, TimelineHeader, TimelineItem} from '../../common/timeline';
 import {actions as bookRoomActions} from '../../modules/bookRoom';
 import {actions as filtersActions} from '../../common/filters';
 import {selectors as userSelectors} from '../../common/user';
@@ -178,7 +178,7 @@ class Calendar extends React.Component {
                                              onClickLabel={openRoomDetails}
                                              isLoading={isFetching}
                                              onClickReservation={openBookingDetails}
-                                             itemClass={EditableTimelineItem}
+                                             itemClass={datePicker.mode === 'day' ? EditableTimelineItem : TimelineItem}
                                              itemProps={{onAddSlot: this.onAddSlot}}
                                              showUnused={showUnused}
                                              longLabel />
