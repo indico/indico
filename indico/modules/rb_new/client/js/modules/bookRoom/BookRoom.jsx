@@ -39,7 +39,7 @@ import {queryStringRules as qsFilterRules} from '../../common/roomSearch';
 import {rules as qsBookRoomRules} from './queryString';
 import * as bookRoomActions from './actions';
 import {actions as filtersActions} from '../../common/filters';
-import {actions as roomsActions} from '../../common/rooms';
+import {actions as roomsActions, RoomRenderer} from '../../common/rooms';
 import * as bookRoomSelectors from './selectors';
 import {mapControllerFactory, selectors as mapSelectors} from '../../common/map';
 
@@ -245,6 +245,14 @@ class BookRoom extends React.Component {
             isTimelineVisible,
             showSuggestions
         } = this.props;
+        const {actions: {openRoomDetails}} = this.props;
+
+        const bookingModalBtn = room => (
+            <Button positive icon="check" circular onClick={() => this.openBookingForm(room)} />
+        );
+        const showDetailsBtn = ({id}) => (
+            <Button primary icon="search" circular onClick={() => openRoomDetails(id)} />
+        );
 
         if (!isTimelineVisible) {
             return (
@@ -254,9 +262,23 @@ class BookRoom extends React.Component {
                         {!isSearching && (
                             <>
                                 <LazyScroll hasMore={this.hasMoreRooms()} loadMore={this.loadMoreRooms}>
-                                    <Card.Group stackable>
-                                        {this.visibleRooms.map(this.renderRoom)}
-                                    </Card.Group>
+                                    <Overridable id="RoomRenderer">
+                                        <RoomRenderer rooms={this.visibleRooms}>
+                                            {room => (
+                                                <Slot name="actions">
+                                                    <Popup trigger={bookingModalBtn(room)}
+                                                           content={Translate.string('Book room')}
+                                                           position="top center"
+                                                           hideOnScroll />
+                                                    <Popup trigger={showDetailsBtn(room)}
+                                                           content={Translate.string('Room details')}
+                                                           position="top center"
+                                                           hideOnScroll />
+                                                </Slot>
+
+                                            )}
+                                        </RoomRenderer>
+                                    </Overridable>
                                     <Loader active={isSearching} inline="centered" styleName="rooms-loader" />
                                 </LazyScroll>
                                 {this.renderSuggestions()}

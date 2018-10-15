@@ -15,28 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-.room-list {
-    .results-count {
-        margin-bottom: 10px;
-        font-weight: bold;
-        font-size: 1.5em;
-    }
-
-    :global(.redux-lazy-scroll) {
-        overflow: visible !important;
-        margin: 0.15em;
-    }
-
-    .actions {
-        margin-left: auto;
-
-        :global(.ui.button.dropdown) {
-            display: flex;
-            align-items: baseline;
-        }
-    }
-}
-
-:global(.ui.inline.loader).rooms-loader {
-    margin-top: 2em;
+.selection-add-btn {
+    pointer-events: all;
+    margin: 10px;
 }

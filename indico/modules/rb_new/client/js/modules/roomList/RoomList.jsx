@@ -20,22 +20,21 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
-import {Button, Card, Dropdown, Grid, Loader, Popup, Sticky} from 'semantic-ui-react';
+import {Button, Dropdown, Grid, Loader, Popup, Sticky} from 'semantic-ui-react';
 import {Route} from 'react-router-dom';
 import LazyScroll from 'redux-lazy-scroll';
 import {stateToQueryString} from 'redux-router-querystring';
 
-import {Slot} from 'indico/react/util';
+import {Overridable, Slot} from 'indico/react/util';
 import {Param, Plural, PluralTranslate, Translate, Singular} from 'indico/react/i18n';
 import camelizeKeys from 'indico/utils/camelize';
 import {pushStateMergeProps} from '../../util';
 import roomFilterBarFactory from './RoomFilterBar';
 import searchBarFactory from '../../components/SearchBar';
-import Room from '../../components/Room';
 import {BlockingModal} from '../blockings';
 import {queryStringRules as queryStringSerializer} from '../../common/roomSearch';
 import {mapControllerFactory, selectors as mapSelectors} from '../../common/map';
-import {actions as roomsActions} from '../../common/rooms';
+import {actions as roomsActions, RoomRenderer} from '../../common/rooms';
 import * as roomsListActions from './actions';
 import * as roomsListSelectors from './selectors';
 
@@ -45,6 +44,7 @@ import './RoomList.module.scss';
 const SearchBar = searchBarFactory('roomList', roomsListSelectors);
 const MapController = mapControllerFactory('roomList', roomsListSelectors);
 const RoomFilterBar = roomFilterBarFactory('roomList');
+
 
 class RoomList extends React.Component {
     static propTypes = {
@@ -84,57 +84,6 @@ class RoomList extends React.Component {
         }
     }
 
-    renderRoom = (room) => {
-        const {id} = room;
-        const {actions: {openRoomDetails}} = this.props;
-        const {selectionMode, selection} = this.state;
-
-        const showDetailsBtn = (
-            <Button icon="search"
-                    onClick={() => openRoomDetails(id)}
-                    primary
-                    circular />
-        );
-
-        if (selectionMode) {
-            const isRoomSelected = room.id in selection;
-            const buttonProps = {compact: true, size: 'tiny'};
-
-            if (!isRoomSelected) {
-                buttonProps.icon = 'check';
-            } else {
-                buttonProps.icon = 'check';
-                buttonProps.primary = true;
-            }
-
-            return (
-                <Room key={room.id} room={room}>
-                    <Slot>
-                        <Button styleName="selection-add-btn"
-                                onClick={() => {
-                                    if (room.id in selection) {
-                                        const newSelection = {...selection};
-                                        delete newSelection[room.id];
-                                        this.setState({selection: newSelection});
-                                    } else {
-                                        this.setState({selection: {...selection, [room.id]: room}});
-                                    }
-                                }}
-                                {...buttonProps} />
-                    </Slot>
-                </Room>
-            );
-        } else {
-            return (
-                <Room key={room.id} room={room} showFavoriteButton>
-                    <Slot name="actions">
-                        <Popup trigger={showDetailsBtn} content={Translate.string('Room details')} position="top center" />
-                    </Slot>
-                </Room>
-            );
-        }
-    };
-
     closeBlockingModal = () => {
         const {pushState} = this.props;
         pushState('/rooms', true);
@@ -166,12 +115,24 @@ class RoomList extends React.Component {
         return results.slice(0, numVisibleRooms);
     }
 
+    onSelectRoom = (room) => {
+        const {selection} = this.state;
+        if (room.id in selection) {
+            const newSelection = {...selection};
+            delete newSelection[room.id];
+            this.setState({selection: newSelection});
+        } else {
+            this.setState({selection: {...selection, [room.id]: room}});
+        }
+    };
+
     render() {
         const {
             results,
             showMap,
             pushState,
             isSearching,
+            actions: {openRoomDetails}
         } = this.props;
         const {selectionMode, selection} = this.state;
         const menuOptions = [{
@@ -233,9 +194,23 @@ class RoomList extends React.Component {
                             <Loader active inline="centered" styleName="rooms-loader" />
                         ) : (
                             <LazyScroll hasMore={this.hasMoreRooms()} loadMore={this.loadMoreRooms}>
-                                <Card.Group stackable>
-                                    {this.visibleRooms.map(this.renderRoom)}
-                                </Card.Group>
+                                <Overridable id="RoomRenderer">
+                                    <RoomRenderer rooms={this.visibleRooms}
+                                                  selectedRooms={selection}
+                                                  inSelectionMode={selectionMode}
+                                                  onSelectRoom={this.onSelectRoom}>
+                                        {({id}) => (
+                                            <Slot name="actions">
+                                                <Popup trigger={<Button icon="search"
+                                                                        onClick={() => openRoomDetails(id)}
+                                                                        primary
+                                                                        circular />}
+                                                       content={Translate.string('Room details')}
+                                                       position="top center" />
+                                            </Slot>
+                                        )}
+                                    </RoomRenderer>
+                                </Overridable>
                             </LazyScroll>
                         )}
                     </div>
