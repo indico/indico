@@ -49,13 +49,11 @@ const rules = {
 
 
 export const routeConfig = {
-    '/calendar':
-        {
-            listen: [filtersActions.SET_FILTER_PARAMETER, filtersActions.SET_FILTERS],
-            select: ({calendar: {filters}}) => filters,
-            serialize: rules
-        }
-
+    '/calendar': {
+        listen: [filtersActions.SET_FILTER_PARAMETER, filtersActions.SET_FILTERS],
+        select: ({calendar: {filters}}) => filters,
+        serialize: rules
+    }
 };
 
 
