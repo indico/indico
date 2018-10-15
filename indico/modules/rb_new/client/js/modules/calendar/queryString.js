@@ -21,7 +21,7 @@ import {createQueryStringReducer, validator as v} from 'redux-router-querystring
 
 import * as actions from '../../actions';
 import {history} from '../../store';
-import {initialState} from './reducers';
+import {initialFilterState} from './reducers';
 import {actions as filtersActions} from '../../common/filters';
 import {boolStateField} from '../../util';
 
@@ -29,21 +29,21 @@ import {boolStateField} from '../../util';
 const rules = {
     date: {
         validator: (date) => v.isDate(date) && moment(date).isBetween('1970-01-01', '2999-12-31'),
-        stateField: 'filters.date'
+        stateField: 'date'
     },
     favorite: {
         validator: v.isBoolean(),
         sanitizer: v.toBoolean(),
-        stateField: boolStateField('filters.onlyFavorites')
+        stateField: boolStateField('onlyFavorites')
     },
     building: {
-        stateField: 'filters.building'
+        stateField: 'building'
     },
     floor: {
-        stateField: 'filters.floor'
+        stateField: 'floor'
     },
     text: {
-        stateField: 'filters.text'
+        stateField: 'text'
     },
 };
 
@@ -51,8 +51,8 @@ const rules = {
 export const routeConfig = {
     '/calendar':
         {
-            listen: filtersActions.SET_FILTER_PARAMETER,
-            select: ({calendar: {filters}}) => ({filters}),
+            listen: [filtersActions.SET_FILTER_PARAMETER, filtersActions.SET_FILTERS],
+            select: ({calendar: {filters}}) => filters,
             serialize: rules
         }
 
@@ -64,13 +64,13 @@ export const queryStringReducer = createQueryStringReducer(
     (state, action) => {
         if (action.type === actions.INIT) {
             return {
-                namespace: 'calendar',
+                namespace: 'calendar.filters',
                 queryString: history.location.search.slice(1)
             };
         }
         return null;
     },
     (state, namespace) => (namespace
-        ? _.merge({}, state, _.set({}, namespace, initialState))
+        ? _.merge({}, state, _.set({}, namespace, initialFilterState()))
         : state)
 );
