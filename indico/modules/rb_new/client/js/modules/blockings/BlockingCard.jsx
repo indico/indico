@@ -47,6 +47,19 @@ class BlockingCard extends React.Component {
         return PluralTranslate.string('1 room', '{count} rooms', blockedRooms.length, {count: blockedRooms.length});
     }
 
+    renderDate() {
+        const {blocking: {startDate, endDate}} = this.props;
+        if (startDate === endDate) {
+            return moment(startDate).format('ll');
+        } else {
+            return (
+                <>
+                    {moment(startDate).format('ll')} - {moment(endDate).format('ll')}
+                </>
+            );
+        }
+    }
+
     render() {
         const {blocking, onClick, roomsSpriteToken} = this.props;
         const {blockedRooms} = blocking;
@@ -62,9 +75,7 @@ class BlockingCard extends React.Component {
                     </div>
                     <Item.Content>
                         <Item.Header>{this.renderCardHeader()}</Item.Header>
-                        <Item.Meta>
-                            {moment(blocking.startDate).format('ll')} - {moment(blocking.endDate).format('ll')}
-                        </Item.Meta>
+                        <Item.Meta>{this.renderDate()}</Item.Meta>
                         <Item.Description>
                             <TooltipIfTruncated>
                                 <div styleName="blocking-reason">
