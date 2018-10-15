@@ -56,7 +56,7 @@ export default class PrincipalSearchField extends React.Component {
         value: PropTypes.oneOfType([
             PropTypes.object,
             PropTypes.array
-        ]).isRequired,
+        ]),
         onChange: PropTypes.func.isRequired,
         onFocus: PropTypes.func.isRequired,
         onBlur: PropTypes.func.isRequired,
@@ -78,51 +78,20 @@ export default class PrincipalSearchField extends React.Component {
     constructor(props) {
         super(props);
 
-        const {multiple} = this.props;
-        let {value} = this.props;
-        let dropdownValue;
+        const {multiple, value} = this.props;
 
         if (multiple) {
-            value = value || [];
-            dropdownValue = value.map((val) => val.identifier);
+            this.userCache = Object.assign({}, ...(value || []).map((val) => ({[val.identifier]: val})));
         } else {
-            dropdownValue = value ? value.identifier : null;
-        }
-
-        this.state = {
-            isFetching: false,
-            options: [],
-            prevPropsValue: dropdownValue,  // eslint-disable-line react/no-unused-state
-            value: dropdownValue,
-            searchQuery: ''
-        };
-
-        if (multiple) {
-            this.userCache = Object.assign({}, ...value.map((val) => ({[val.identifier]: val})));
-        } else {
-            this.userCache = {};
+            this.userCache = value ? {[value.identifier]: value} : {};
         }
     }
 
-    static getDerivedStateFromProps({value, multiple}, state) {
-        let valuesChanged, newValue;
-        if (multiple) {
-            newValue = value.map((val) => val.identifier);
-            valuesChanged = !_.isEqual(newValue.sort(), state.prevPropsValue.sort());
-        } else {
-            newValue = value ? value.identifier : null;
-            valuesChanged = newValue !== state.prevPropsValue;
-        }
-
-        if (valuesChanged) {
-            return {
-                ...state,
-                prevPropsValue: newValue,
-                value: newValue
-            };
-        }
-        return null;
-    }
+    state = {
+        isFetching: false,
+        options: [],
+        searchQuery: ''
+    };
 
     shouldComponentUpdate(nextProps, nextState) {
         const {value: prevValue, disabled: prevDisabled, placeholder: prevPlaceholder} = this.props;
@@ -133,6 +102,15 @@ export default class PrincipalSearchField extends React.Component {
             prevPlaceholder !== placeholder ||
             !_.isEqual(prevValue, value)
         );
+    }
+
+    get identifierValue() {
+        const {value, multiple} = this.props;
+        if (multiple) {
+            return (value || []).sort(this.sortPrincipals).map(val => val.identifier);
+        } else {
+            return value ? value.identifier : null;
+        }
     }
 
     isInFavorites = (userId) => {
@@ -150,7 +128,10 @@ export default class PrincipalSearchField extends React.Component {
         description: itemData.email,
         value: itemData.identifier,
         key: itemData.identifier,
-        icon: <Icon color={this.isInFavorites(itemData.id) ? 'yellow' : null} name={this.isInFavorites(itemData.id) ? 'star' : 'user'} />
+        icon: (
+            <Icon color={this.isInFavorites(itemData.id) ? 'yellow' : null}
+                  name={this.isInFavorites(itemData.id) ? 'star' : 'user'} />
+        )
     });
 
     sortPrincipals = (a, b) => {
@@ -213,12 +194,12 @@ export default class PrincipalSearchField extends React.Component {
         const {multiple} = this.props;
         let fieldValue;
         if (multiple) {
-            fieldValue = value.map((id) => this.userCache[id]);
+            fieldValue = value.map(id => this.userCache[id]);
         } else {
             fieldValue = this.userCache[value];
         }
 
-        this.setState({value, searchQuery: ''});
+        this.setState({searchQuery: ''});
         this.notifyChange(fieldValue);
     };
 
@@ -229,9 +210,8 @@ export default class PrincipalSearchField extends React.Component {
 
     render() {
         const {multiple, disabled, withGroups, onFocus, onBlur} = this.props;
-        const {isFetching, options, value, searchQuery} = this.state;
+        const {isFetching, options, searchQuery} = this.state;
         let {placeholder} = this.props;
-        let dropdownValues, selectedValues, dropdownOptions;
 
         if (!placeholder) {
             if (withGroups) {
@@ -241,17 +221,14 @@ export default class PrincipalSearchField extends React.Component {
             }
         }
 
-        if (multiple) {
-            dropdownValues = value || [];
-            selectedValues = dropdownValues.map((id) => this.userCache[id]).map(this.renderItem);
-            dropdownOptions = isFetching ? selectedValues : options.concat(selectedValues);
+        const selectedValues = multiple ? this.identifierValue : [this.identifierValue].filter(x => !!x);
+        const selectedOptions = selectedValues.map(id => this.userCache[id]).map(this.renderItem);
+        const dropdownOptions = isFetching
+            ? selectedOptions
+            : _.uniqWith(options.concat(selectedOptions), (a, b) => a.key === b.key);
 
-            if (!dropdownValues.length && disabled) {
-                placeholder = Translate.string('Nobody');
-            }
-        } else {
-            dropdownValues = value ? value : null;
-            dropdownOptions = options;
+        if (multiple && !selectedValues.length && disabled) {
+            placeholder = Translate.string('Nobody');
         }
 
         const renderDisabledLabel = (item) => (
@@ -260,11 +237,10 @@ export default class PrincipalSearchField extends React.Component {
         const dropdownProps = disabled ? {icon: null, renderLabel: renderDisabledLabel} : {search: opts => opts};
         const searchInput = {
             onChange: ({target: {value: inputValue}}) => {
-                const {value: stateValue} = this.state;
-                const valueChanged = stateValue !== null;
+                const {value: oldValue} = this.props;
                 const clearSingleValue = multiple ? {} : {value: null};
                 this.setState({searchQuery: inputValue, ...clearSingleValue});
-                if (!multiple && valueChanged) {
+                if (!multiple && oldValue !== null) {
                     this.notifyChange(null);
                 }
             },
@@ -284,7 +260,7 @@ export default class PrincipalSearchField extends React.Component {
                       searchQuery={searchQuery}
                       multiple={multiple}
                       options={dropdownOptions}
-                      value={dropdownValues}
+                      value={multiple ? selectedValues : selectedValues[0]}
                       placeholder={placeholder}
                       onOpen={() => this.setState({options: []})}
                       onChange={this.handleSelectionChange}

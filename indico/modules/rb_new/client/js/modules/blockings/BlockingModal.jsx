@@ -106,11 +106,10 @@ class BlockingModal extends React.Component {
         }
     };
 
-    renderPrincipalSearchField = ({input, ...props}) => {
-        const {blocking: {allowed}, favoriteUsers} = this.props;
+    renderPrincipalSearchField = (props) => {
+        const {favoriteUsers} = this.props;
         return (
             <ReduxFormField {...props}
-                            input={{...input, value: allowed || []}}
                             favoriteUsers={favoriteUsers}
                             as={PrincipalSearchField}
                             label={Translate.string('Allowed users / groups')}
