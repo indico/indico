@@ -17,15 +17,16 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Icon, Segment, Label} from 'semantic-ui-react';
-import {Translate, Param} from 'indico/react/i18n';
+import {Button, Icon, Segment, Label} from 'semantic-ui-react';
+import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
 import {toMoment} from 'indico/utils/date';
-import recurrenceRenderer from './RecurrenceRenderer';
+import {renderRecurrence} from '../util';
 
 import './TimeInformation.module.scss';
 
 
-export default function TimeInformation({recurrence, dates: {startDate, endDate}, timeSlot}) {
+export default function TimeInformation({recurrence, dates: {startDate, endDate}, timeSlot, onClickOccurrences,
+                                         occurrencesNumber}) {
     const {type} = recurrence;
     const mStartDate = toMoment(startDate);
     const mEndDate = endDate ? toMoment(endDate) : null;
@@ -44,29 +45,50 @@ export default function TimeInformation({recurrence, dates: {startDate, endDate}
             </Segment>
         );
     }
-
     return (
         <div styleName="booking-time-info">
             <Segment attached="top" color="teal">
-                <Icon name="calendar outline" />
-                {(endDate && startDate !== endDate)
-                    ? (
-                        <Translate>
-                            <Param name="startDate"
-                                   wrapper={<strong />}
-                                   value={mStartDate.format('L')} /> to <Param name="endDate"
-                                                                               wrapper={<strong />}
-                                                                               value={mEndDate.format('L')} />
-                        </Translate>
-                    ) : (
-                        <strong>{mStartDate.format('L')}</strong>
-                    )
-                }
-                {(type === 'daily' || type === 'every') && (
-                    <Label basic pointing="left">
-                        {recurrenceRenderer(recurrence)}
-                    </Label>
-                )}
+                <div styleName="occurences-details">
+                    <div>
+                        <Icon name="calendar outline" />
+                        {(mEndDate && !mStartDate.isSame(mEndDate, 'day'))
+                            ? (
+                                <Translate>
+                                    <Param name="startDate"
+                                           wrapper={<strong />}
+                                           value={mStartDate.format('L')} /> to <Param name="endDate"
+                                                                                       wrapper={<strong />}
+                                                                                       value={mEndDate.format('L')} />
+                                </Translate>
+                            ) : (
+                                <strong>{mStartDate.format('L')}</strong>
+                            )
+                        }
+                        {(type === 'daily' || type === 'every') && (
+                            <Label basic pointing="left">
+                                {renderRecurrence(recurrence)}
+                            </Label>
+                        )}
+                    </div>
+                    {(occurrencesNumber) && (
+                        <Button color="blue" size="small" hovercontent="See timeline" styleName="hover-button"
+                                onClick={() => onClickOccurrences()}>
+                            <span styleName="content">
+                                <PluralTranslate count={occurrencesNumber}>
+                                    <Singular>
+                                        1 occurrence
+                                    </Singular>
+                                    <Plural>
+                                        <Param name="count" value={occurrencesNumber} /> occurrences
+                                    </Plural>
+                                </PluralTranslate>
+                            </span>
+                            <span styleName="hover-content">
+                                <Translate>See timeline</Translate>
+                            </span>
+                        </Button>
+                    )}
+                </div>
             </Segment>
             {timeInfo}
         </div>
@@ -75,10 +97,20 @@ export default function TimeInformation({recurrence, dates: {startDate, endDate}
 
 TimeInformation.propTypes = {
     recurrence: PropTypes.object.isRequired,
-    dates: PropTypes.object.isRequired,
-    timeSlot: PropTypes.object
+    dates: PropTypes.shape({
+        startDate: PropTypes.string.isRequired,
+        endDate: PropTypes.string.isRequired
+    }).isRequired,
+    timeSlot: PropTypes.shape({
+        startTime: PropTypes.string,
+        endTime: PropTypes.string
+    }),
+    onClickOccurrences: PropTypes.func,
+    occurrencesNumber: PropTypes.number
 };
 
 TimeInformation.defaultProps = {
-    timeSlot: null
+    timeSlot: null,
+    onClickOccurrences: () => {},
+    occurrencesNumber: null
 };

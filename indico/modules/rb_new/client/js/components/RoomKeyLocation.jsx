@@ -25,7 +25,7 @@ import './RoomKeyLocation.module.scss';
 export default function RoomKeyLocation({room}) {
     return room.key_location && (
         <Message styleName="message-icon" icon="key"
-                 content={<span dangerouslySetInnerHTML={{__html: room.key_location}} />} />
+                 content={room.key_location} />
     );
 }
 

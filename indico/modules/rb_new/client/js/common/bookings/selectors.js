@@ -24,8 +24,7 @@ export const getDetailsWithRoom = createSelector(
     getDetails,
     roomsSelectors.getAllRooms,
     (booking, allRooms) => {
-        booking.attributes.room = allRooms[booking.attributes.roomId];
-        return booking;
+        return {...booking, room: allRooms[booking.roomId]};
     }
 );
 export const hasDetails = (state, {bookingId}) => getDetails(state, {bookingId}) !== undefined;

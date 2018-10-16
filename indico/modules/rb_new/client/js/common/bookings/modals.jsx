@@ -17,9 +17,12 @@
 
 import React from 'react';
 import BookingDetailsPreloader from './BookingDetailsPreloader';
+import BookingDetailsModal from './BookingDetailsModal';
 
 
 export default {
     /* eslint-disable react/display-name */
-    'booking-details': (onClose, bookingId) => <BookingDetailsPreloader bookingId={bookingId} onClose={onClose} />
+    'booking-details': (onClose, bookingId) => (
+        <BookingDetailsPreloader bookingId={bookingId} component={BookingDetailsModal} onClose={onClose} />
+    )
 };

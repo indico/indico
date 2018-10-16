@@ -17,7 +17,6 @@
 from __future__ import unicode_literals
 
 from datetime import date, datetime, time
-from operator import itemgetter
 
 from flask import jsonify, request, session
 from marshmallow import fields
@@ -149,8 +148,9 @@ class RHBookingDetails(RHRoomBookingBase):
         date_range = [dt.isoformat() for dt in date_range]
         occurrences = {dt.isoformat(): reservation_details_occurrences_schema.dump(data).data
                        for dt, data in occurrences.iteritems()}
-        edit_logs = sorted(reservation_edit_log_schema.dump(self.booking.edit_logs).data,
-                           key=itemgetter('timestamp'),
-                           reverse=True)
-        return jsonify(attributes=attributes, id=self.booking.id, occurrences=occurrences, date_range=date_range,
-                       edit_logs=edit_logs)
+        edit_logs = reservation_edit_log_schema.dump(self.booking.edit_logs).data
+        booking_details = dict(attributes)
+        booking_details['occurrences'] = occurrences
+        booking_details['date_range'] = date_range
+        booking_details['edit_logs'] = edit_logs
+        return jsonify(booking_details)

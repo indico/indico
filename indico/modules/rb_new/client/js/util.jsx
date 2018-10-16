@@ -22,6 +22,7 @@ import {Popup} from 'semantic-ui-react';
 import PropTypes from 'prop-types';
 import React from 'react';
 import {serializeDate} from 'indico/utils/date';
+import {PluralTranslate, Translate, Singular, Plural, Param} from 'indico/react/i18n';
 
 
 export function parseSearchBarText(queryText) {
@@ -151,3 +152,36 @@ PopupParam.propTypes = {
 PopupParam.defaultProps = {
     children: null,
 };
+
+export function renderRecurrence({type, number, interval}) {
+    if (!type) {
+        return null;
+    }
+    if (type === 'single') {
+        return <Translate>Once</Translate>;
+    } else if (type === 'daily') {
+        return <Translate>Daily</Translate>;
+    } else if (interval === 'week') {
+        return (
+            <PluralTranslate count={number}>
+                <Singular>
+                    Weekly
+                </Singular>
+                <Plural>
+                    Every <Param name="number" value={number} /> weeks
+                </Plural>
+            </PluralTranslate>
+        );
+    } else {
+        return (
+            <PluralTranslate count={number}>
+                <Singular>
+                    Monthly
+                </Singular>
+                <Plural>
+                    Every <Param name="number" value={number} /> months
+                </Plural>
+            </PluralTranslate>
+        );
+    }
+}

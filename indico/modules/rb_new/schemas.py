@@ -16,6 +16,7 @@
 
 from __future__ import unicode_literals
 
+from operator import itemgetter
 from flask import session
 from marshmallow import Schema, ValidationError, fields, post_dump, validate, validates_schema
 from marshmallow.fields import Boolean, Function, Nested, String
@@ -96,8 +97,8 @@ class ReservationDetailsSchema(mm.ModelSchema):
 
     class Meta:
         model = Reservation
-        fields = ('start_dt', 'end_dt', 'repetition', 'booking_reason', 'created_dt', 'booked_for_user', 'room_id',
-                  'created_by_user', )
+        fields = ('id', 'start_dt', 'end_dt', 'repetition', 'booking_reason', 'created_dt', 'booked_for_user',
+                  'room_id', 'created_by_user', )
 
 
 class BlockedRoomSchema(mm.ModelSchema):
@@ -192,6 +193,12 @@ class ReservationEditLogSchema(UserSchema):
     class Meta:
         model = ReservationEditLog
         fields = ('timestamp', 'info', 'user_name')
+
+    @post_dump(pass_many=True)
+    def sort_logs(self, data, many):
+        if many:
+            data = sorted(data, key=itemgetter('timestamp'), reverse=True)
+        return data
 
 
 rb_user_schema = RBUserSchema()

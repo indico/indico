@@ -23,7 +23,7 @@ import PropTypes from 'prop-types';
 import {Button, Modal, Message, Grid, Header, Icon, Popup, List} from 'semantic-ui-react';
 import {Param, Translate} from 'indico/react/i18n';
 import {toMoment, serializeDate} from 'indico/utils/date';
-import BookingTimeInformation from '../../components/TimeInformation';
+import TimeInformation from '../../components/TimeInformation';
 import RoomBasicDetails from '../../components/RoomBasicDetails';
 import RoomKeyLocation from '../../components/RoomKeyLocation';
 import * as bookingsSelectors from './selectors';
@@ -73,7 +73,7 @@ class BookingDetailsModal extends React.Component {
     };
 
     _getRowSerializer(day) {
-        const {booking: {attributes: {room}}} = this.props;
+        const {booking: {room}} = this.props;
         return (occurrences) => ({
             availability: {
                 bookings: occurrences[day].map((candidate) => ({...candidate, bookable: false})) || [],
@@ -85,39 +85,46 @@ class BookingDetailsModal extends React.Component {
     }
 
     renderTimeline = (occurrences, dateRange) => {
-        const hourSeries = _.range(6, 24, 2);
+        const hourSeries = _.range(6, 22, 2);
         const rows = dateRange.map((day) => this._getRowSerializer(day)(occurrences));
         return <DailyTimelineContent rows={rows} hourSeries={hourSeries} />;
     };
 
     renderBookingHistory = (editLogs, createdOn, createdBy) => {
-        const items = (editLogs ? editLogs.map((log, i) => {
+        const createdDate = serializeDate(toMoment(createdOn), 'L');
+        const items = (editLogs.map((log, i) => {
             const {timestamp, info, userName} = log;
             const basicInfo = <strong>{info[0]}</strong>;
             const details = (info[1] ? info[1] : null);
-            const dateValue = serializeDate(toMoment(timestamp), 'L');
-            const date = <Param name="date" value={dateValue} wrapper={<span styleName="log-date" />} />;
-            const mainInfo = <Param name="details" value={basicInfo} />;
-            const user = <Param name="user" value={userName} />;
+            const logDate = serializeDate(toMoment(timestamp), 'L');
             if (details) {
-                const popupContent = <Param name="details" wrapper={<span styleName="popup-center" />} value={details} />;
-                const wrapper = <PopupParam content={<Translate>{popupContent}</Translate>} />;
-                const popupInfo = <Param name="info" wrapper={wrapper} value={basicInfo} />;
+                const popupContent = <span styleName="popup-center"> {details}</span>;
+                const wrapper = <PopupParam content={popupContent} />;
                 return (
                     <List.Item key={i}>
-                        <Translate>{date} - {popupInfo} by {user}</Translate>
+                        <Translate>
+                            <Param name="date"
+                                   value={logDate}
+                                   wrapper={<span styleName="log-date" />} /> - <Param name="info"
+                                                                                       wrapper={wrapper}
+                                                                                       value={basicInfo} /> by <Param name="user"
+                                                                                                                      value={userName} />
+                        </Translate>
                     </List.Item>
                 );
             }
             return (
                 <List.Item key={i}>
-                    <Translate>{date} - {mainInfo} by {user}</Translate>
+                    <Translate>
+                        <Param name="date"
+                               value={logDate}
+                               wrapper={<span styleName="log-date" />} /> - {<Param name="details"
+                                                                                    value={basicInfo} />} by <Param name="user"
+                                                                                                                    value={userName} />
+                    </Translate>
                 </List.Item>
             );
-        }) : null);
-        const bookingCreatedDate = <Param name="date" value={createdOn} wrapper={<span styleName="log-date" />} />;
-        const bookingCreatedBy = <Param name="created-by" value={createdBy} />;
-        const bookingCreatedInfo = <Param name="created-info" value={<strong>Booking created </strong>} />;
+        }));
         return (
             <div styleName="booking-logs">
                 <Header><Translate>Booking history</Translate></Header>
@@ -125,7 +132,11 @@ class BookingDetailsModal extends React.Component {
                     {items}
                     <List.Item>
                         <Translate>
-                            {bookingCreatedDate} - {bookingCreatedInfo} by {bookingCreatedBy}
+                            <Param name="date"
+                                   value={createdDate}
+                                   wrapper={<span styleName="log-date" />} /> - <Param name="created-by"
+                                                                                       value={createdBy} /> by <Param name="created-info"
+                                                                                                                      value={<strong>Booking created </strong>} />
                         </Translate>
                     </List.Item>
                 </List>
@@ -160,13 +171,13 @@ class BookingDetailsModal extends React.Component {
     );
 
     render() {
-        const {booking} = this.props;
         const {
-            room, bookedForUser, startDt, endDt, repetition, createdByUser, createdDt, bookingReason
-        } = booking.attributes;
-        const {occurrences, dateRange, editLogs} = booking;
+            booking: {
+                room, bookedForUser, startDt, endDt, repetition, createdByUser, createdDt, bookingReason,
+                occurrences, dateRange, editLogs
+            }
+        } = this.props;
         const {occurrencesVisible} = this.state;
-
         const dates = {startDate: startDt, endDate: endDt};
         const createdOn = serializeDate(toMoment(createdDt));
         const times = {startTime: moment(startDt).utc().format('HH:mm'), endTime: moment(endDt).utc().format('HH:mm')};
@@ -188,12 +199,11 @@ class BookingDetailsModal extends React.Component {
                         <Grid.Column>
                             <RoomBasicDetails room={room} />
                             <RoomKeyLocation room={room} />
-                            <BookingTimeInformation recurrence={recurrence}
-                                                    dates={dates}
-                                                    timeSlot={times} />
-                            <Button attached="bottom" color="blue" fluid onClick={() => this.setState({occurrencesVisible: true})}>
-                                <Translate>Consult the booking occurrences</Translate>
-                            </Button>
+                            <TimeInformation recurrence={recurrence}
+                                             dates={dates}
+                                             timeSlot={times}
+                                             onClickOccurrences={() => this.setState({occurrencesVisible: true})}
+                                             occurrencesNumber={dateRange.length} />
                         </Grid.Column>
                         <Grid.Column>
                             {this.renderBookedFor(bookedForUser)}
@@ -223,10 +233,8 @@ class BookingDetailsModal extends React.Component {
     }
 }
 
-const mapStateToProps = (state, {bookingId}) => ({
-    booking: bookingsSelectors.getDetailsWithRoom(state, {bookingId})
-});
-
 export default connect(
-    mapStateToProps,
+    (state, {bookingId}) => ({
+        booking: bookingsSelectors.getDetailsWithRoom(state, {bookingId})
+    })
 )(BookingDetailsModal);

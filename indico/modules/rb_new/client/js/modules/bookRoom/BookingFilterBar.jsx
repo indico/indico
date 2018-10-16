@@ -27,7 +27,7 @@ import RecurrenceForm from './filters/RecurrenceForm';
 import DateForm from './filters/DateForm';
 import TimeForm from './filters/TimeForm';
 
-import recurrenceRenderer from '../../components/RecurrenceRenderer';
+import {renderRecurrence} from '../../util';
 import dateRenderer from './filters/DateRenderer';
 import timeRenderer from './filters/TimeRenderer';
 import {actions as filtersActions} from '../../common/filters';
@@ -86,7 +86,7 @@ class BookingFilterBar extends React.Component {
                                                number: 1,
                                                interval: 'week'
                                            }}
-                                           renderValue={recurrenceRenderer} />
+                                           renderValue={renderRecurrence} />
                     <FilterDropdownFactory name="dates"
                                            title={<Translate>Date</Translate>}
                                            form={(fieldValues, setParentField) => (

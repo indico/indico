@@ -38,5 +38,5 @@ export default () => ({
     blockings: blockingsReducer,
     calendar: calendarReducer,
     landing: landingReducer,
-    bookings: bookingReducer
+    bookings: bookingReducer,
 });

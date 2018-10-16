@@ -18,3 +18,29 @@
 .booking-time-info {
     margin-top: 10px;
 }
+
+.occurences-details {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .hover-button {
+<<<<<<< HEAD
+        min-width: 120px;
+=======
+        min-width: 140px;
+
+        .hover-content {
+            display: none;
+        }
+>>>>>>> 4c3cf40... fixup! Add occurrences button to TimeInformation
+    }
+
+    .hover-button:hover .content {
+        display: none;
+    }
+
+    .hover-button:hover .hover-content {
+        display: block;
+    }
+}

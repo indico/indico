@@ -24,15 +24,14 @@ import {Dimmer, Loader} from 'semantic-ui-react';
 import {Preloader} from 'indico/react/util';
 import * as bookingsActions from './actions';
 import * as bookingsSelectors from './selectors';
-import BookingDetailsModal from './BookingDetailsModal';
 
 
-const BookingDetailsPreloader = ({bookingId, fetchDetails, onClose}) => (
+const BookingDetailsPreloader = ({bookingId, component: Component, fetchDetails, onClose}) => (
     <Preloader checkCached={state => bookingsSelectors.hasDetails(state, {bookingId})}
                action={() => fetchDetails(bookingId)}
                dimmer={<Dimmer active page><Loader /></Dimmer>}>
         {() => {
-            return (<BookingDetailsModal bookingId={bookingId} onClose={onClose} />);
+            return <Component bookingId={bookingId} onClose={onClose} />;
         }}
     </Preloader>
 );
@@ -40,6 +39,7 @@ const BookingDetailsPreloader = ({bookingId, fetchDetails, onClose}) => (
 BookingDetailsPreloader.propTypes = {
     bookingId: PropTypes.number.isRequired,
     fetchDetails: PropTypes.func.isRequired,
+    component: PropTypes.func.isRequired,
     onClose: PropTypes.func.isRequired,
 };
 
