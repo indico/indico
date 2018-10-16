@@ -22,6 +22,7 @@ import isURLSameOrigin from 'axios/lib/helpers/isURLSameOrigin';
 import qs from 'qs';
 
 import {$T} from 'indico/utils/i18n';
+import showReactErrorDialog from 'indico/react/errors';
 
 
 export const indicoAxios = axios.create({
@@ -55,8 +56,7 @@ export function handleAxiosError(error, strict = false) {
     if (window.showErrorDialog) {
         showErrorDialog(error);
     } else {
-        // dynamic import to avoid getting all the react and semantic-ui-react stuff into common.js
-        import('indico/react/errors').then(({default: showReactErrorDialog}) => showReactErrorDialog(error));
+        showReactErrorDialog(error);
     }
     return error.message;
 }
