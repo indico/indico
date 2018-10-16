@@ -26,7 +26,7 @@ import style from './WeeklyTimelineContent.module.scss';
 /* eslint-enable no-unused-vars */
 
 export default class WeeklyTimelineContent extends DailyTimelineContent {
-    renderTimelineRow({availability, room, label, conflictIndicator}) {
+    renderTimelineRow({availability, room, label, conflictIndicator}, key, rowStyle = null) {
         const {
             minHour, maxHour, itemClass: ItemClass, itemProps, longLabel,
             onClickReservation, onClickCandidate
@@ -35,7 +35,7 @@ export default class WeeklyTimelineContent extends DailyTimelineContent {
             !!conflicts.length
         ));
         return (
-            <div styleName="baseStyle.timeline-row" key={`element-${room.id}`}>
+            <div styleName="baseStyle.timeline-row" key={key} style={rowStyle}>
                 <TimelineRowLabel label={label}
                                   availability={conflictIndicator ? (hasConflicts ? 'conflict' : 'available') : null}
                                   longLabel={longLabel}

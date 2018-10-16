@@ -19,7 +19,8 @@ import _ from 'lodash';
 import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
-import {Icon, Loader, Popup} from 'semantic-ui-react';
+import {AutoSizer, List, WindowScroller} from 'react-virtualized';
+import {Dimmer, Icon, Loader, Popup} from 'semantic-ui-react';
 import LazyScroll from 'redux-lazy-scroll';
 import {Translate} from 'indico/react/i18n';
 import {TooltipIfTruncated} from 'indico/react/components';
@@ -72,24 +73,15 @@ export default class DailyTimelineContent extends React.Component {
         return onClickLabel ? () => onClickLabel(id) : false;
     };
 
-    hasUsage = (availability) => {
-        const fields = ['preBookings', 'blockings', 'bookings', 'nonbookablePeriods', 'unbookableHours', 'candidates'];
-        return fields.some(field => !_.isEmpty(availability[field]));
-    };
-
-    renderTimelineRow({availability, label, conflictIndicator, key, room}) {
+    renderTimelineRow({availability, label, conflictIndicator, room}, key, rowStyle = null) {
         const {
             minHour, maxHour, hourStep, itemClass: ItemClass, itemProps, onClickCandidate,
-            onClickReservation, longLabel, showUnused
+            onClickReservation, longLabel
         } = this.props;
         const columns = ((maxHour - minHour) / hourStep) + 1;
         const hasConflicts = !(_.isEmpty(availability.conflicts) && _.isEmpty(availability.preConflicts));
-        if (!showUnused && !this.hasUsage(availability)) {
-            return null;
-        }
-
         return (
-            <div styleName="timeline-row" key={`element-${key}`}>
+            <div styleName="timeline-row" key={key} style={rowStyle}>
                 <TimelineRowLabel label={label}
                                   availability={conflictIndicator ? (hasConflicts ? 'conflict' : 'available') : null}
                                   longLabel={longLabel}
@@ -158,16 +150,43 @@ export default class DailyTimelineContent extends React.Component {
             <>
                 {!!rows.length && this.renderHeader(hourSpan, hourSeries)}
                 <WrapperComponent {...wrapperProps}>
-                    <div styleName="timeline-content" className={!selectable && 'timeline-non-selectable'}>
-                        {rows.map((rowProps) => this.renderTimelineRow(rowProps))}
-                        <div style={{left: labelWidth, width: `calc(100% - ${labelWidth}px)`}}
-                             styleName="timeline-lines">
-                            {this.renderDividers(hourSpan, hourStep)}
-                        </div>
-                    </div>
-                    {(wrapperProps.isFetching || isLoading) && (
-                        <Loader active inline="centered" styleName="timeline-loader" />
-                    )}
+                    <WindowScroller>
+                        {({height, isScrolling, onChildScroll, scrollTop}) => (
+                            <AutoSizer disableHeight>
+                                {({width}) => (
+                                    <div styleName="timeline-content"
+                                         className={!selectable && 'timeline-non-selectable'}
+                                         style={{width}}>
+                                        {(wrapperProps.isFetching || isLoading) && (
+                                            <Dimmer active inverted>
+                                                <Loader active styleName="timeline-loader" />
+                                            </Dimmer>
+                                        )}
+                                        <div style={{
+                                            left: labelWidth,
+                                            width: `calc(100% - ${labelWidth}px)`,
+                                        }}
+                                             styleName="timeline-lines">
+                                            {this.renderDividers(hourSpan, hourStep)}
+                                        </div>
+                                        <List width={width}
+                                              height={height}
+                                              autoHeight
+                                              rowCount={rows.length}
+                                              overscanRowCount={15}
+                                              rowHeight={50}
+                                              rowRenderer={({index, style, key}) => (
+                                                  this.renderTimelineRow(rows[index], key, style)
+                                              )}
+                                              isScrolling={isScrolling}
+                                              onScroll={onChildScroll}
+                                              scrollTop={scrollTop}
+                                              tabIndex={null} />
+                                    </div>
+                                )}
+                            </AutoSizer>
+                        )}
+                    </WindowScroller>
                 </WrapperComponent>
             </>
         );

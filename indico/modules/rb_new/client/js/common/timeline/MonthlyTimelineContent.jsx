@@ -34,7 +34,7 @@ export default class MonthlyTimelineContent extends WeeklyTimelineContent {
         return [];
     }
 
-    renderTimelineRow({availability, room, label, conflictIndicator}) {
+    renderTimelineRow({availability, room, label, conflictIndicator}, key, rowStyle = null) {
         const {
             minHour, maxHour, itemClass: ItemClass, itemProps, longLabel,
             onClickCandidate, onClickReservation
@@ -43,7 +43,7 @@ export default class MonthlyTimelineContent extends WeeklyTimelineContent {
             !!conflicts.length
         ));
         return (
-            <div styleName="baseStyle.timeline-row" key={`element-${room.id}`}>
+            <div styleName="baseStyle.timeline-row" key={key} style={rowStyle}>
                 <TimelineRowLabel label={label}
                                   availability={conflictIndicator ? (hasConflicts ? 'conflict' : 'available') : null}
                                   longLabel={longLabel}

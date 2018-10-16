@@ -15,6 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import _ from 'lodash';
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Message} from 'semantic-ui-react';
@@ -155,6 +156,27 @@ export default class ElasticTimeline extends React.Component {
         return d;
     }
 
+    hasUsage = (availability) => {
+        const fields = [
+            'preBookings',
+            'blockings',
+            'bookings',
+            'nonbookablePeriods',
+            'unbookableHours',
+            'candidates'
+        ];
+        return fields.some(field => !_.isEmpty(availability[field]));
+    };
+
+    /** Filter out rooms that are not used at all */
+    filterUnused(rows, mode) {
+        if (mode === 'days') {
+            return rows.filter(({availability: av}) => this.hasUsage(av));
+        } else {
+            return rows.filter(({availability: av}) => av.some(([, a]) => this.hasUsage(a)));
+        }
+    }
+
     renderTimeline = () => {
         const {
             extraContent, onClickCandidate, onClickReservation, availability, isLoading, itemClass,
@@ -170,6 +192,10 @@ export default class ElasticTimeline extends React.Component {
         } else if (mode === 'months') {
             Component = MonthlyTimelineContent;
             rows = this.calcMonthlyRows(availability);
+        }
+
+        if (!showUnused) {
+            rows = this.filterUnused(rows, mode);
         }
 
         return (
