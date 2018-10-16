@@ -45,3 +45,13 @@ export async function setMomentLocale(locale) {
     }
     moment.locale(momentLocale);
 }
+
+export function dayRange(start, end, step = 1) {
+    const next = start.clone();
+    const result = [];
+    while (next.isSameOrBefore(end)) {
+        result.push(next.clone());
+        next.add(step, 'd');
+    }
+    return result;
+}

@@ -18,18 +18,26 @@
 import _ from 'lodash';
 import React from 'react';
 import {toMoment} from 'indico/utils/date';
-import DailyTimelineContent, {TimelineRowLabel} from './DailyTimelineContent';
+import WeeklyTimelineContent, {TimelineRowLabel} from './DailyTimelineContent';
 
 /* eslint-disable no-unused-vars */
 import baseStyle from './TimelineContent.module.scss';
 import style from './WeeklyTimelineContent.module.scss';
 /* eslint-enable no-unused-vars */
 
-export default class WeeklyTimelineContent extends DailyTimelineContent {
+export default class MonthlyTimelineContent extends WeeklyTimelineContent {
+    get dates() {
+        const {rows} = this.props;
+        if (rows.length) {
+            return rows[0].availability.map(([dt]) => dt);
+        }
+        return [];
+    }
+
     renderTimelineRow({availability, room, label, conflictIndicator}) {
         const {
             minHour, maxHour, itemClass: ItemClass, itemProps, longLabel,
-            onClickReservation, onClickCandidate
+            onClickCandidate, onClickReservation
         } = this.props;
         const hasConflicts = availability.some(([, {conflicts}]) => (
             !!conflicts.length
@@ -63,34 +71,32 @@ export default class WeeklyTimelineContent extends DailyTimelineContent {
         );
     }
 
-    renderDividers(hourSpan, hourStep) {
-        const daySize = (100 / 7);
+    renderDividers() {
+        const nDays = this.dates.length;
+        const daySize = (100 / nDays);
 
         return (
-            _.times(7, n => (
+            _.times(nDays, n => (
                 <div styleName="style.timeline-day-divider"
                      style={{left: `${n * daySize}%`, width: `${daySize}%`}}
-                     key={`day-divider-${n}`}>
-                    {super.renderDividers(hourSpan, hourStep)}
-                </div>
+                     key={`day-divider-${n}`} />
             ))
         );
     }
 
     renderHeader() {
-        const {longLabel, selectable, rows} = this.props;
+        const {longLabel, selectable} = this.props;
         const labelWidth = longLabel ? 200 : 150;
-        const dates = rows[0].availability.map(([dt]) => dt);
         return (
             <>
                 <div styleName="baseStyle.timeline-header" className={!selectable && 'timeline-non-selectable'}>
                     <div style={{minWidth: labelWidth}} />
                     <div styleName="style.timeline-header-labels">
-                        {_.map(dates, (dt, n) => (
+                        {_.map(this.dates, (dt, n) => (
                             <div styleName="style.timeline-header-label"
                                  key={`timeline-header-${n}`}>
                                 <span styleName="style.timeline-label-text">
-                                    {toMoment(dt, 'YYYY-MM-DD').format('ddd D MMM')}
+                                    {toMoment(dt, 'YYYY-MM-DD').format('D')}
                                 </span>
                             </div>
                         ))}
