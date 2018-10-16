@@ -48,6 +48,36 @@ export default class TimelineHeader extends React.Component {
         mode: 'days'
     };
 
+    constructor(props) {
+        super(props);
+        const {mode, activeDate} = this.props;
+        this.checkDateForMode(activeDate, mode);
+    }
+
+    componentDidUpdate(prevProps) {
+        const {mode, activeDate} = this.props;
+        const {mode: prevMode, activeDate: prevActiveDate} = prevProps;
+        if (prevMode !== mode || !prevActiveDate.isSame(activeDate)) {
+            this.checkDateForMode(activeDate, mode);
+        }
+    }
+
+    checkDateForMode(date, mode, alwaysChange = false) {
+        const {onDateChange} = this.props;
+        let expectedDate;
+        if (mode === 'weeks') {
+            expectedDate = date.clone().startOf('week');
+        } else if (mode === 'months') {
+            expectedDate = date.clone().startOf('month');
+        } else {
+            expectedDate = date.clone();
+        }
+
+        if (alwaysChange || !expectedDate.isSame(date)) {
+            onDateChange(expectedDate);
+        }
+    }
+
     calendarDisabledDate = (date) => {
         const {dateRange} = this.props;
         if (!date) {
@@ -57,11 +87,24 @@ export default class TimelineHeader extends React.Component {
     };
 
     onSelect = (date) => {
-        const {dateRange, onDateChange} = this.props;
+        const {mode, dateRange} = this.props;
         const freeRange = dateRange.length === 0;
         if (freeRange || isDateWithinRange(date, dateRange, toMoment)) {
-            onDateChange(date);
+            if (mode === 'weeks') {
+                date = date.clone().startOf('week');
+            } else if (mode === 'months') {
+                date = date.clone().startOf('month');
+            } else {
+                date = date.clone();
+            }
+            this.checkDateForMode(date, mode, true);
         }
+    };
+
+    handleModeChange = (mode) => {
+        const {activeDate, setMode} = this.props;
+        setMode(mode);
+        this.checkDateForMode(activeDate, mode);
     };
 
     changeSelectedDate = (direction) => {
@@ -78,17 +121,17 @@ export default class TimelineHeader extends React.Component {
     };
 
     renderModeSwitcher() {
-        const {setMode, mode} = this.props;
+        const {mode} = this.props;
         return !!mode && (
             <Button.Group size="small" style={{marginRight: 10}}>
                 <Button content={Translate.string('Day')}
-                        onClick={() => setMode('days')}
+                        onClick={() => this.handleModeChange('days')}
                         primary={mode === 'days'} />
                 <Button content={Translate.string('Week')}
-                        onClick={() => setMode('weeks')}
+                        onClick={() => this.handleModeChange('weeks')}
                         primary={mode === 'weeks'} />
                 <Button content={Translate.string('Month')}
-                        onClick={() => setMode('months')}
+                        onClick={() => this.handleModeChange('months')}
                         primary={mode === 'months'} />
             </Button.Group>
         );
