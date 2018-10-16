@@ -116,7 +116,7 @@ def generate_spreadsheet_from_contributions(contributions):
                         'Session': c.session.title if c.session else None,
                         'Track': c.track.title if c.track else None,
                         'Materials': None,
-                        'Presenters': ', '.join(speaker.person.full_name for speaker in c.speakers)}
+                        'Presenters': ', '.join(speaker.full_name for speaker in c.speakers)}
 
         attachments = []
         attached_items = get_attached_items(c)

@@ -41,6 +41,17 @@ Internal Changes
 
 ----
 
+
+Version 2.1.5
+-------------
+
+*Unreleased*
+
+Bugfixes
+^^^^^^^^
+
+- Use correct speaker name when exporting contributions to spreadsheets
+
 Version 2.1.4
 -------------
 
