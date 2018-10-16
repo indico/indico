@@ -94,11 +94,17 @@ class ReservationDetailsOccurrenceSchema(mm.ModelSchema):
 class ReservationDetailsSchema(mm.ModelSchema):
     booked_for_user = Nested(UserSchema, only=('full_name', 'phone', 'email'))
     created_by_user = Nested(UserSchema, only=('full_name'))
+    can_accept = Function(lambda booking: booking.can_be_accepted(session.user))
+    can_cancel = Function(lambda booking: booking.can_be_cancelled(session.user))
+    can_delete = Function(lambda booking: booking.can_be_deleted(session.user))
+    can_modify = Function(lambda booking: booking.can_be_modified(session.user))
+    can_reject = Function(lambda booking: booking.can_be_rejected(session.user))
 
     class Meta:
         model = Reservation
         fields = ('id', 'start_dt', 'end_dt', 'repetition', 'booking_reason', 'created_dt', 'booked_for_user',
-                  'room_id', 'created_by_user', )
+                  'room_id', 'created_by_user', 'can_accept', 'can_cancel', 'can_delete', 'can_modify', 'can_reject',
+                  'is_cancelled', 'is_rejected', 'is_accepted')
 
 
 class BlockedRoomSchema(mm.ModelSchema):

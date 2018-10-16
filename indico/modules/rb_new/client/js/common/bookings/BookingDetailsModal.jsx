@@ -134,9 +134,8 @@ class BookingDetailsModal extends React.Component {
                         <Translate>
                             <Param name="date"
                                    value={createdDate}
-                                   wrapper={<span styleName="log-date" />} /> - <Param name="created-by"
-                                                                                       value={createdBy} /> by <Param name="created-info"
-                                                                                                                      value={<strong>Booking created </strong>} />
+                                   wrapper={<span styleName="log-date" />} /> - Booking created by <Param name="created-by"
+                                                                                                          value={createdBy} />
                         </Translate>
                     </List.Item>
                 </List>
@@ -170,11 +169,37 @@ class BookingDetailsModal extends React.Component {
         </Message>
     );
 
+    renderActionButtons = (canAccept, canCancel, canReject, isAccepted) => (
+        <div styleName="action-buttons">
+            {canCancel && (
+                <Button type="button"
+                        icon="remove circle"
+                        size="small"
+                        content={<Translate>Cancel booking</Translate>} />
+            )}
+            {canReject && (
+                <Button type="button"
+                        icon="remove circle"
+                        color="red"
+                        size="small"
+                        content={<Translate>Reject booking</Translate>} />
+            )}
+            {!isAccepted && canAccept && (
+                <Button type="button"
+                        icon="check circle"
+                        color="green"
+                        size="small"
+                        content={<Translate>Accept booking</Translate>} />
+            )}
+        </div>
+    );
+
     render() {
         const {
             booking: {
                 room, bookedForUser, startDt, endDt, repetition, createdByUser, createdDt, bookingReason,
-                occurrences, dateRange, editLogs
+                occurrences, dateRange, editLogs, canAccept, canCancel, canDelete, canModify, canReject, isCancelled,
+                isRejected, isAccepted
             }
         } = this.props;
         const {occurrencesVisible} = this.state;
@@ -185,13 +210,14 @@ class BookingDetailsModal extends React.Component {
         const legendLabels = [
             {label: Translate.string('Occurrence'), color: 'orange'},
         ];
+        const showActionButtons = (!isCancelled && !isRejected);
         return (
             <Modal open onClose={this.handleCloseModal} size="large" closeIcon>
                 <Modal.Header styleName="booking-modal-header">
                     <Translate>Booking Details</Translate>
                     <span>
-                        <Button icon="pencil" circular />
-                        <Button icon="trash" circular />
+                        {canModify && <Button icon="pencil" circular />}
+                        {canDelete && <Button icon="trash" circular />}
                     </span>
                 </Modal.Header>
                 <Modal.Content>
@@ -209,10 +235,7 @@ class BookingDetailsModal extends React.Component {
                             {this.renderBookedFor(bookedForUser)}
                             {this.renderReason(bookingReason)}
                             {this.renderBookingHistory(editLogs, createdOn, createdByUser)}
-                            <div styleName="action-buttons">
-                                <Button type="button" icon="cancel" content={<Translate>Cancel booking</Translate>} />
-                                <Button type="button" icon="cancel" color="red" content={<Translate>Reject booking</Translate>} />
-                            </div>
+                            {showActionButtons && this.renderActionButtons(canAccept, canCancel, canReject, isAccepted)}
                         </Grid.Column>
                     </Grid>
                 </Modal.Content>
