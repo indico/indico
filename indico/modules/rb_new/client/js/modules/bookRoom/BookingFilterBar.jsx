@@ -96,8 +96,7 @@ class BookingFilterBar extends React.Component {
                                            )}
                                            setGlobalState={setFilterParameter.bind(undefined, 'dates')}
                                            initialValues={dates}
-                                           renderValue={dateRenderer}
-                                           showButtons={false} />
+                                           renderValue={dateRenderer} />
                     {!dayBased && (
                         <FilterDropdownFactory name="timeSlot"
                                                title={<Translate>Time</Translate>}

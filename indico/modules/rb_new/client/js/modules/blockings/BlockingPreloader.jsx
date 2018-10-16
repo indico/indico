@@ -28,6 +28,7 @@ class BlockingPreloader extends React.Component {
     static propTypes = {
         blockingId: PropTypes.number.isRequired,
         component: PropTypes.func.isRequired,
+        componentProps: PropTypes.object,
         blocking: PropTypes.object,
         actions: PropTypes.exact({
             fetchBlocking: PropTypes.func.isRequired,
@@ -36,6 +37,7 @@ class BlockingPreloader extends React.Component {
 
     static defaultProps = {
         blocking: undefined,
+        componentProps: {},
     };
 
     componentDidMount() {

@@ -48,6 +48,18 @@ function ConditionalRoute({active, component, render, ...props}) {
     return <Route {...props} {...routeProps} />;
 }
 
+ConditionalRoute.propTypes = {
+    active: PropTypes.bool.isRequired,
+    component: PropTypes.oneOfType([PropTypes.func, PropTypes.element]),
+    render: PropTypes.func,
+};
+
+ConditionalRoute.defaultProps = {
+    component: null,
+    render: null,
+};
+
+
 export default class App extends React.Component {
     static propTypes = {
         title: PropTypes.string,

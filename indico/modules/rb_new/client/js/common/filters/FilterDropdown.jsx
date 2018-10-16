@@ -59,7 +59,6 @@ export default class FilterDropdown extends React.Component {
     static defaultProps = {
         initialValues: {},
         defaults: {},
-        showButtons: true,
         renderTrigger: defaultTriggerRenderer,
         counter: false,
         open: false

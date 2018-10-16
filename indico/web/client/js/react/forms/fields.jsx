@@ -65,6 +65,7 @@ ReduxFormField.propTypes = {
     meta: PropTypes.object.isRequired,
     as: PropTypes.oneOfType([PropTypes.string, PropTypes.object, PropTypes.func]).isRequired,
     children: PropTypes.node,
+    defaultValue: PropTypes.any,
 };
 
 ReduxFormField.defaultProps = {
@@ -74,6 +75,7 @@ ReduxFormField.defaultProps = {
     label: null,
     componentLabel: null,
     children: null,
+    defaultValue: null,
 };
 
 export function ReduxRadioField({input, input: {value}, radioValue, ...props}) {

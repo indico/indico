@@ -80,7 +80,6 @@ class RoomFilterBarBase extends React.Component {
         onlyMine: false,
         hasFavoriteRooms: false,
         hasOwnedRooms: false,
-        children: null,
         equipment: [],
     };
 
