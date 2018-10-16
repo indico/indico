@@ -182,10 +182,10 @@ class RoomList extends React.Component {
                             {results.length !== 0 && (
                                 <PluralTranslate count={results.length}>
                                     <Singular>
-                                        There is <Param name="count" value={results.length} /> room matching the criteria
+                                        There is <Param name="count" value={results.length} /> match
                                     </Singular>
                                     <Plural>
-                                        There are <Param name="count" value={results.length} /> rooms matching the criteria
+                                        There are <Param name="count" value={results.length} /> matches
                                     </Plural>
                                 </PluralTranslate>
                             )}
