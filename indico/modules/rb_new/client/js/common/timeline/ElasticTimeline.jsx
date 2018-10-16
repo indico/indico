@@ -19,9 +19,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {Message} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
-import {serializeDate, toMoment} from 'indico/utils/date';
+import {dayRange, serializeDate, toMoment} from 'indico/utils/date';
 import DailyTimelineContent from './DailyTimelineContent';
 import WeeklyTimelineContent from './WeeklyTimelineContent';
+import MonthlyTimelineContent from './MonthlyTimelineContent';
 import TimelineItem from './TimelineItem';
 
 import './Timeline.module.scss';
@@ -131,46 +132,63 @@ export default class ElasticTimeline extends React.Component {
         });
     }
 
+    calcMonthlyRows() {
+        const {availability, datePicker: {selectedDate}} = this.props;
+        const date = toMoment(selectedDate, 'YYYY-MM-DD');
+        const monthStart = date.clone().startOf('month');
+        const monthEnd = date.clone().endOf('month');
+        const monthRange = dayRange(monthStart, monthEnd).map(d => d.format('YYYY-MM-DD'));
+        if (!availability.length) {
+            return [];
+        }
+
+        const d = availability.map(([, data]) => {
+            const {room} = data;
+            return {
+                availability: monthRange.map(dt => [dt, this._getDayRowSerializer(dt)(data)]),
+                label: room.full_name,
+                key: room.id,
+                conflictIndicator: true,
+                room
+            };
+        });
+        return d;
+    }
+
     renderTimeline = () => {
         const {
             extraContent, onClickCandidate, onClickReservation, availability, isLoading, itemClass,
             itemProps, longLabel, onClickLabel, lazyScroll, datePicker: {minHour, maxHour, hourStep, mode},
             showUnused
         } = this.props;
+        let Component = DailyTimelineContent;
+        let rows = this.calcDailyRows(availability);
+
+        if (mode === 'weeks') {
+            Component = WeeklyTimelineContent;
+            rows = this.calcWeeklyRows(availability);
+        } else if (mode === 'months') {
+            Component = MonthlyTimelineContent;
+            rows = this.calcMonthlyRows(availability);
+        }
+
         return (
             <>
                 <div styleName="timeline">
                     {extraContent}
-                    {mode === 'days' && (
-                        <DailyTimelineContent rows={this.calcDailyRows(availability)}
-                                              minHour={minHour}
-                                              maxHour={maxHour}
-                                              hourStep={hourStep}
-                                              onClickCandidate={onClickCandidate}
-                                              onClickReservation={onClickReservation}
-                                              itemClass={itemClass}
-                                              itemProps={itemProps}
-                                              longLabel={longLabel}
-                                              onClickLabel={onClickLabel}
-                                              isLoading={isLoading}
-                                              lazyScroll={lazyScroll}
-                                              showUnused={showUnused} />
-                    )}
-                    {mode === 'weeks' && (
-                        <WeeklyTimelineContent rows={this.calcWeeklyRows(availability)}
-                                               minHour={minHour}
-                                               maxHour={maxHour}
-                                               hourStep={hourStep}
-                                               onClickCandidate={onClickCandidate}
-                                               onClickReservation={onClickReservation}
-                                               itemClass={itemClass}
-                                               itemProps={itemProps}
-                                               longLabel={longLabel}
-                                               onClickLabel={onClickLabel}
-                                               isLoading={isLoading}
-                                               lazyScroll={lazyScroll}
-                                               showUnused={showUnused} />
-                    )}
+                    <Component rows={rows}
+                               minHour={minHour}
+                               maxHour={maxHour}
+                               hourStep={hourStep}
+                               onClickCandidate={onClickCandidate}
+                               onClickReservation={onClickReservation}
+                               itemClass={itemClass}
+                               itemProps={itemProps}
+                               longLabel={longLabel}
+                               onClickLabel={onClickLabel}
+                               isLoading={isLoading}
+                               lazyScroll={lazyScroll}
+                               showUnused={showUnused} />
                 </div>
             </>
         );
