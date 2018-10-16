@@ -44,7 +44,7 @@ COORDINATOR_PRIV_TITLES = {'manage-contributions': _('Contributions'),
                            'manage-blocks': _('Session blocks')}
 COORDINATOR_PRIV_DESCS = {'manage-contributions': _('Allows coordinators to modify contributions in their sessions.'),
                           'manage-blocks': _('Allows coordinators to manage/reschedule session blocks of their '
-                                             'sessions.  This includes creating new session blocks..')}
+                                             'sessions.  This includes creating new session blocks.')}
 
 
 @signals.users.merged.connect
