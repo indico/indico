@@ -104,6 +104,7 @@ export default class RecurrenceForm extends FilterFormComponent {
                                type="number"
                                min="1"
                                max="99"
+                               step="1"
                                disabled={type !== 'every'}
                                onChange={this.onNumberChange} />
                     </Form.Field>

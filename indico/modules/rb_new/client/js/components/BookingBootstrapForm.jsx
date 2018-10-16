@@ -211,7 +211,12 @@ export default class BookingBootstrapForm extends React.Component {
                 {type === 'every' && (
                     <Form.Group inline>
                         <label>{Translate.string('Every')}</label>
-                        <Form.Input value={number} type="number" onChange={(event, data) => this.updateNumber(data.value)} />
+                        <Form.Input type="number"
+                                    value={number}
+                                    min="1"
+                                    max="99"
+                                    step="1"
+                                    onChange={(event, data) => this.updateNumber(data.value)} />
                         <Select value={interval} options={recurrenceOptions}
                                 onChange={(event, data) => this.updateInterval(data.value)} />
                     </Form.Group>
