@@ -103,10 +103,6 @@ $row-height: 50px;
         margin-top: 2em !important;
         color: rgba(0, 0, 0, 0.87) !important;
 
-        &:not(.active) {
-            display: none;
-        }
-
         &::before {
             border-color: rgba(0, 0, 0, 0.1) !important;
         }

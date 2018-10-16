@@ -165,7 +165,9 @@ export default class DailyTimelineContent extends React.Component {
                             {this.renderDividers(hourSpan, hourStep)}
                         </div>
                     </div>
-                    <Loader active={wrapperProps.isFetching || isLoading} inline="centered" styleName="timeline-loader" />
+                    {(wrapperProps.isFetching || isLoading) && (
+                        <Loader active inline="centered" styleName="timeline-loader" />
+                    )}
                 </WrapperComponent>
             </>
         );
