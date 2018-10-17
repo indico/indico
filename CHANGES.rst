@@ -35,6 +35,8 @@ Bugfixes
 - Do not show border after last item in badge designer toolbar
   (:issue:`3607`, thanks :user:`nop33`)
 - Correctly align centered footer links (:issue:`3599`, thanks :user:`nop33`)
+- Fix top/right alignment of session bar in event display view (:issue:`3599`,
+  thanks :user:`nop33`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
