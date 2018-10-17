@@ -32,7 +32,7 @@ def get_map_version():
     # whenever something changed
     h = hashlib.md5()
     h.update(os.getcwd())
-    h.update(subprocess.check_output(['git', 'describe']))
+    h.update(subprocess.check_output(['git', 'describe', '--always']))
     h.update(subprocess.check_output(['git', 'status']))
     h.update(subprocess.check_output(['git', 'diff']))
     return h.hexdigest()
