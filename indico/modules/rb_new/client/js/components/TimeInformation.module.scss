@@ -22,14 +22,23 @@
 .occurences-details {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: baseline;
 
     .hover-button {
-        min-width: 140px;
+        min-width: 150px;
+
+        .content {
+            display: block;
+        }
 
         .hover-content {
             display: none;
         }
+    }
+
+    :global(.icon) {
+        display: inline;
+        padding: 0 0.25em;
     }
 
     .hover-button:hover .content {

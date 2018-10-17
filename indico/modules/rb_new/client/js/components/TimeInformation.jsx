@@ -73,7 +73,8 @@ export default function TimeInformation({recurrence, dates: {startDate, endDate}
                     {(occurrencesNumber) && (
                         <Button color="blue" size="small" hovercontent="See timeline" styleName="hover-button"
                                 onClick={() => onClickOccurrences()}>
-                            <span styleName="content">
+                            <div styleName="content">
+                                <Icon name="list" />
                                 <PluralTranslate count={occurrencesNumber}>
                                     <Singular>
                                         1 occurrence
@@ -82,10 +83,10 @@ export default function TimeInformation({recurrence, dates: {startDate, endDate}
                                         <Param name="count" value={occurrencesNumber} /> occurrences
                                     </Plural>
                                 </PluralTranslate>
-                            </span>
-                            <span styleName="hover-content">
-                                <Translate>See timeline</Translate>
-                            </span>
+                            </div>
+                            <div styleName="hover-content">
+                                <Icon name="list" /><Translate>See timeline</Translate>
+                            </div>
                         </Button>
                     )}
                 </div>
