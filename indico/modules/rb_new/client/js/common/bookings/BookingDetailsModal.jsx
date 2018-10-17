@@ -103,12 +103,11 @@ class BookingDetailsModal extends React.Component {
                 return (
                     <List.Item key={i}>
                         <Translate>
-                            <Param name="date"
-                                   value={logDate}
-                                   wrapper={<span styleName="log-date" />} /> - <Param name="info"
-                                                                                       wrapper={wrapper}
-                                                                                       value={basicInfo} /> by <Param name="user"
-                                                                                                                      value={userName} />
+                            <Param name="date" value={logDate} wrapper={<span styleName="log-date" />} />
+                            {' - '}
+                            <Param name="info" wrapper={wrapper} value={basicInfo} /> by
+                            {' '}
+                            <Param name="user" value={userName} />
                         </Translate>
                     </List.Item>
                 );
@@ -116,11 +115,11 @@ class BookingDetailsModal extends React.Component {
             return (
                 <List.Item key={i}>
                     <Translate>
-                        <Param name="date"
-                               value={logDate}
-                               wrapper={<span styleName="log-date" />} /> - {<Param name="details"
-                                                                                    value={basicInfo} />} by <Param name="user"
-                                                                                                                    value={userName} />
+                        <Param name="date" value={logDate} wrapper={<span styleName="log-date" />} />
+                        {' - '}
+                        <Param name="details" value={basicInfo} /> by
+                        {' '}
+                        <Param name="user" value={userName} />
                     </Translate>
                 </List.Item>
             );
@@ -132,10 +131,11 @@ class BookingDetailsModal extends React.Component {
                     {items}
                     <List.Item>
                         <Translate>
-                            <Param name="date"
-                                   value={createdDate}
-                                   wrapper={<span styleName="log-date" />} /> - Booking created by <Param name="created-by"
-                                                                                                          value={createdBy} />
+                            <Param name="date" value={createdDate} wrapper={<span styleName="log-date" />} />
+                            {' - '}
+                            <Param name="details" wrapper={<strong />}>Booking created</Param> by
+                            {' '}
+                            <Param name="created-by" value={createdBy} />
                         </Translate>
                     </List.Item>
                 </List>
