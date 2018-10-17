@@ -145,9 +145,10 @@ class Calendar extends React.Component {
                                             <ButtonGroup size="large">
                                                 <Button size="large" icon="filter" disabled />
                                                 <Popup trigger={<Button size="large"
+                                                                        primary={!showUnused}
                                                                         icon={showUnused ? 'minus square outline' : 'plus square outline'}
                                                                         onClick={this.toggleShowUnused} />}
-                                                       content={showUnused ? 'Hide empty rows' : 'Show empty rows'} />
+                                                       content={showUnused ? 'Hide unused rooms' : 'Show unused rooms'} />
                                                 <Popup trigger={<Button size="large"
                                                                         icon="star"
                                                                         primary={onlyFavorites}
