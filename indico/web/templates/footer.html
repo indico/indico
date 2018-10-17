@@ -4,7 +4,7 @@
             <a href="https://getindico.io">Indico</a>
         {%- endset -%}
         <div class="flexrow f-j-space-between">
-            <div class="flexrow f-a-center">
+            <div class="flexrow f-a-center f-self-stretch">
                 {% block footer_logo %}
                     {% set filename = 'indico_small_white.png' if dark else 'indico_small.png' %}
                     <img src="{{ url_for('assets.image', filename=filename) }}" class="footer-logo" alt="Indico">
@@ -32,7 +32,7 @@
                     </li>
                 {% endfor %}
             </ul>
-            <div class="footer-extra">
+            <div class="footer-extra f-self-stretch">
                 {% block footer_extra %}
                 {% endblock %}
             </div>

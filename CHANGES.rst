@@ -34,6 +34,7 @@ Bugfixes
 - Fix incorrect order of session blocks inside timetable (:issue:`2999`)
 - Add missing email validation to contribution CSV import (:issue:`3568`,
   thanks :user:`Kush22`)
+- Correctly align centered footer links (:issue:`3599`, thanks :user:`nop33`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
