@@ -18,7 +18,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import Calendar from 'rc-calendar';
+import RCCalendar from 'rc-calendar';
 import {Button} from 'semantic-ui-react';
 import moment from 'moment';
 import DatePicker from 'rc-calendar/lib/Picker';
@@ -78,10 +78,9 @@ export default class TimelineHeader extends React.Component {
         const startDate = toMoment(dateRange[0]);
         const endDate = toMoment(dateRange[dateRange.length - 1]);
         const calendar = (
-            <Calendar disabledDate={this.calendarDisabledDate}
-                      selectedValue={activeDate}
-                      onChange={this.onSelect}
-                      value={activeDate} />
+            <RCCalendar disabledDate={this.calendarDisabledDate}
+                        onChange={this.onSelect}
+                        value={activeDate} />
         );
         const freeRange = dateRange.length === 0;
         const prevDisabled = isLoading || (!freeRange && activeDate.clone().subtract(1, 'day').isBefore(startDate));
