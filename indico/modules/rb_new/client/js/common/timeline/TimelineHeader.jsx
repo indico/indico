@@ -77,7 +77,12 @@ export default class TimelineHeader extends React.Component {
         const {activeDate, dateRange, disableDatePicker, isLoading} = this.props;
         const startDate = toMoment(dateRange[0]);
         const endDate = toMoment(dateRange[dateRange.length - 1]);
-        const calendar = <Calendar disabledDate={this.calendarDisabledDate} onChange={this.onSelect} />;
+        const calendar = (
+            <Calendar disabledDate={this.calendarDisabledDate}
+                      selectedValue={activeDate}
+                      onChange={this.onSelect}
+                      value={activeDate} />
+        );
         const freeRange = dateRange.length === 0;
         const prevDisabled = isLoading || (!freeRange && activeDate.clone().subtract(1, 'day').isBefore(startDate));
         const nextDisabled = isLoading || activeDate.clone().add(1, 'day').isAfter(endDate);
@@ -87,7 +92,8 @@ export default class TimelineHeader extends React.Component {
                     <Button icon="left arrow"
                             onClick={() => this.changeSelectedDate('prev')}
                             disabled={prevDisabled} />
-                    <DatePicker calendar={calendar} disabled={isLoading || (prevDisabled && nextDisabled)}>
+                    <DatePicker calendar={calendar} disabled={isLoading || (prevDisabled && nextDisabled)}
+                                value={activeDate}>
                         {
                             () => (
                                 <Button primary>

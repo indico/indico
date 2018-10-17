@@ -132,7 +132,6 @@ export default class DailyTimelineContent extends React.Component {
         const wrapperProps = lazyScroll || {};
         const hourSeries = _.range(minHour, maxHour + hourStep, hourStep);
 
-
         return (
             <>
                 <div styleName="timeline-header" className={!selectable && 'timeline-non-selectable'}>
