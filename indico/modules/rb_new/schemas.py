@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 from operator import itemgetter
+
 from flask import session
 from marshmallow import Schema, ValidationError, fields, post_dump, validate, validates_schema
 from marshmallow.fields import Boolean, Function, Nested, String
