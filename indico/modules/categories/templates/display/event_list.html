@@ -93,18 +93,20 @@
                         <span class="date {% if happening_now(event) %}today{% endif %}">
                             {{ format_event_date(event) }}
                         </span>
-                        <a href="{{ event.url }}">
-                            {{ event.get_verbose_title(show_speakers=is_lecture, show_series_pos=is_lecture) | striptags }}
-                        </a>
-                        <span class="protected">
-                            {% if event.is_self_protected %}
-                                <span data-type="restricted">({% trans %}protected{% endtrans %})</span>
-                            {% endif %}
+                        <div class="event-title">
+                            <a href="{{ event.url }}">
+                                {{ event.get_verbose_title(show_speakers=is_lecture, show_series_pos=is_lecture) | striptags }}
+                            </a>
+                            <span class="protected">
+                                {% if event.is_self_protected %}
+                                    <span data-type="restricted">({% trans %}protected{% endtrans %})</span>
+                                {% endif %}
 
-                            {% if is_recent(event.created_dt) %}
-                                <i class="icon-new new-label" title="{% trans %}This event is new.{% endtrans %}"></i>
-                            {% endif %}
-                        </span>
+                                {% if is_recent(event.created_dt) %}
+                                    <i class="icon-new new-label" title="{% trans %}This event is new.{% endtrans %}"></i>
+                                {% endif %}
+                            </span>
+                        </div>
                     </span>
                 </li>
             {% endfor %}
