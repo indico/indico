@@ -127,7 +127,7 @@ class BookingDetailsModal extends React.Component {
                 </List.Item>
             );
         });
-        return (
+        return !!items.length && (
             <div styleName="booking-logs">
                 <Header><Translate>Booking history</Translate></Header>
                 <List divided styleName="log-list">{items}</List>
