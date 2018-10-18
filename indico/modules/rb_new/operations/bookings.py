@@ -203,7 +203,6 @@ def get_room_details_availability(room, start_dt, end_dt):
 
 
 def get_booking_occurrences(booking):
-    candidates = booking.occurrences
-    date_range = sorted(set(cand.start_dt.date() for cand in candidates))
+    date_range = sorted(set(cand.start_dt.date() for cand in booking.occurrences))
     occurrences = group_by_occurrence_date(booking.occurrences)
     return date_range, occurrences

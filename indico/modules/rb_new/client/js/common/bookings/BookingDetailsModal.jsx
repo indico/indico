@@ -84,6 +84,14 @@ class BookingDetailsModal extends React.Component {
         });
     }
 
+    showOccurrences = () => {
+        this.setState({occurrencesVisible: true});
+    };
+
+    hideOccurrences = () => {
+        this.setState({occurrencesVisible: false});
+    };
+
     renderTimeline = (occurrences, dateRange) => {
         const hourSeries = _.range(6, 22, 2);
         const rows = dateRange.map((day) => this._getRowSerializer(day)(occurrences));
@@ -91,33 +99,20 @@ class BookingDetailsModal extends React.Component {
     };
 
     renderBookingHistory = (editLogs, createdOn, createdBy) => {
-        const createdDate = serializeDate(toMoment(createdOn), 'L');
-        const items = (editLogs.map((log, i) => {
-            const {timestamp, info, userName} = log;
+        editLogs = [...editLogs, {id: 'created', timestamp: createdOn, info: ['Booking created'], userName: createdBy}];
+        const items = (editLogs.map((log) => {
+            const {id, timestamp, info, userName} = log;
             const basicInfo = <strong>{info[0]}</strong>;
             const details = (info[1] ? info[1] : null);
             const logDate = serializeDate(toMoment(timestamp), 'L');
-            if (details) {
-                const popupContent = <span styleName="popup-center"> {details}</span>;
-                const wrapper = <PopupParam content={popupContent} />;
-                return (
-                    <List.Item key={i}>
-                        <Translate>
-                            <Param name="date" value={logDate} wrapper={<span styleName="log-date" />} />
-                            {' - '}
-                            <Param name="info" wrapper={wrapper} value={basicInfo} /> by
-                            {' '}
-                            <Param name="user" value={userName} />
-                        </Translate>
-                    </List.Item>
-                );
-            }
+            const popupContent = <span styleName="popup-center">{details}</span>;
+            const wrapper = (details ? <PopupParam content={popupContent} /> : <span />);
             return (
-                <List.Item key={i}>
+                <List.Item key={id}>
                     <Translate>
                         <Param name="date" value={logDate} wrapper={<span styleName="log-date" />} />
                         {' - '}
-                        <Param name="details" value={basicInfo} /> by
+                        <Param name="info" wrapper={wrapper} value={basicInfo} /> by
                         {' '}
                         <Param name="user" value={userName} />
                     </Translate>
@@ -127,34 +122,21 @@ class BookingDetailsModal extends React.Component {
         return (
             <div styleName="booking-logs">
                 <Header><Translate>Booking history</Translate></Header>
-                <List divided styleName="log-list">
-                    {items}
-                    <List.Item>
-                        <Translate>
-                            <Param name="date" value={createdDate} wrapper={<span styleName="log-date" />} />
-                            {' - '}
-                            <Param name="details" wrapper={<strong />}>Booking created</Param> by
-                            {' '}
-                            <Param name="created-by" value={createdBy} />
-                        </Translate>
-                    </List.Item>
-                </List>
+                <List divided styleName="log-list">{items}</List>
             </div>
         );
     };
 
     renderBookedFor = (bookedForUser) => {
-        if (bookedForUser) {
-            const {fullName: bookedForName, email: bookedForEmail, phone: bookedForPhone} = bookedForUser;
-            return (
-                <>
-                    <Header><Icon name="user" /><Translate>Booked for</Translate></Header>
-                    <div>{bookedForName}</div>
-                    {bookedForPhone && <div><Icon name="phone" />{bookedForPhone}</div>}
-                    {bookedForEmail && <div><Icon name="mail" />{bookedForEmail}</div>}
-                </ >
-            );
-        }
+        const {fullName: bookedForName, email: bookedForEmail, phone: bookedForPhone} = bookedForUser;
+        return (
+            <>
+                <Header><Icon name="user" /><Translate>Booked for</Translate></Header>
+                <div>{bookedForName}</div>
+                {bookedForPhone && <div><Icon name="phone" />{bookedForPhone}</div>}
+                {bookedForEmail && <div><Icon name="mail" />{bookedForEmail}</div>}
+            </>
+        );
     };
 
     renderReason = (reason) => (
@@ -162,7 +144,7 @@ class BookingDetailsModal extends React.Component {
             <Icon name="info" />
             <Message.Content>
                 <Message.Header>
-                    <Translate>Booking reason: </Translate>
+                    <Translate>Booking reason</Translate>
                 </Message.Header>
                 {reason}
             </Message.Content>
@@ -204,6 +186,7 @@ class BookingDetailsModal extends React.Component {
         } = this.props;
         const {occurrencesVisible} = this.state;
         const dates = {startDate: startDt, endDate: endDt};
+        const {fullName: createdBy} = createdByUser;
         const createdOn = serializeDate(toMoment(createdDt));
         const times = {startTime: moment(startDt).format('HH:mm'), endTime: moment(endDt).format('HH:mm')};
         const recurrence = this.getRecurrence(repetition);
@@ -228,27 +211,28 @@ class BookingDetailsModal extends React.Component {
                             <TimeInformation recurrence={recurrence}
                                              dates={dates}
                                              timeSlot={times}
-                                             onClickOccurrences={() => this.setState({occurrencesVisible: true})}
+                                             onClickOccurrences={this.showOccurrences}
                                              occurrencesNumber={dateRange.length} />
                         </Grid.Column>
                         <Grid.Column>
-                            {this.renderBookedFor(bookedForUser)}
+                            {bookedForUser && this.renderBookedFor(bookedForUser)}
                             {this.renderReason(bookingReason)}
-                            {this.renderBookingHistory(editLogs, createdOn, createdByUser)}
+                            {this.renderBookingHistory(editLogs, createdOn, createdBy)}
                             {showActionButtons && this.renderActionButtons(canAccept, canCancel, canReject, isAccepted)}
                         </Grid.Column>
                     </Grid>
                 </Modal.Content>
                 <Modal open={occurrencesVisible}
-                       onClose={() => this.setState({occurrencesVisible: false})}
-                       size="large" closeIcon>
+                       onClose={this.hideOccurrences}
+                       size="large"
+                       closeIcon>
                     <Modal.Header className="legend-header">
                         <Translate>Occurrences</Translate>
                         <Popup trigger={<Icon name="info circle" className="legend-info-icon" />}
                                content={<TimelineLegend labels={legendLabels} compact />} />
                     </Modal.Header>
                     <Modal.Content scrolling>
-                        {occurrences && this.renderTimeline(occurrences, dateRange)}
+                        {this.renderTimeline(occurrences, dateRange)}
                     </Modal.Content>
                 </Modal>
             </Modal>

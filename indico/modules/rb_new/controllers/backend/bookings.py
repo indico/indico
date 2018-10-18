@@ -34,7 +34,7 @@ from indico.modules.rb_new.controllers.backend.common import search_room_args
 from indico.modules.rb_new.operations.bookings import get_booking_occurrences, get_room_calendar, get_rooms_availability
 from indico.modules.rb_new.operations.suggestions import get_suggestions
 from indico.modules.rb_new.schemas import (create_booking_args, reservation_details_occurrences_schema,
-                                           reservation_details_schema, reservation_edit_log_schema, reservation_schema)
+                                           reservation_details_schema, reservation_schema)
 from indico.modules.rb_new.util import (group_by_occurrence_date, serialize_blockings, serialize_nonbookable_periods,
                                         serialize_occurrences, serialize_unbookable_hours)
 from indico.modules.users.models.users import User
@@ -148,9 +148,7 @@ class RHBookingDetails(RHRoomBookingBase):
         date_range = [dt.isoformat() for dt in date_range]
         occurrences = {dt.isoformat(): reservation_details_occurrences_schema.dump(data).data
                        for dt, data in occurrences.iteritems()}
-        edit_logs = reservation_edit_log_schema.dump(self.booking.edit_logs).data
         booking_details = dict(attributes)
         booking_details['occurrences'] = occurrences
         booking_details['date_range'] = date_range
-        booking_details['edit_logs'] = edit_logs
         return jsonify(booking_details)

@@ -18,7 +18,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Button, Icon, Segment, Label} from 'semantic-ui-react';
-import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
+import {Param, Translate} from 'indico/react/i18n';
 import {toMoment} from 'indico/utils/date';
 import {renderRecurrence} from '../util';
 
@@ -54,11 +54,9 @@ export default function TimeInformation({recurrence, dates: {startDate, endDate}
                         {(mEndDate && !mStartDate.isSame(mEndDate, 'day'))
                             ? (
                                 <Translate>
-                                    <Param name="startDate"
-                                           wrapper={<strong />}
-                                           value={mStartDate.format('L')} /> to <Param name="endDate"
-                                                                                       wrapper={<strong />}
-                                                                                       value={mEndDate.format('L')} />
+                                    <Param name="startDate" wrapper={<strong />} value={mStartDate.format('L')} /> to
+                                    {' '}
+                                    <Param name="endDate" wrapper={<strong />} value={mEndDate.format('L')} />
                                 </Translate>
                             ) : (
                                 <strong>{mStartDate.format('L')}</strong>
@@ -70,23 +68,9 @@ export default function TimeInformation({recurrence, dates: {startDate, endDate}
                             </Label>
                         )}
                     </div>
-                    {(occurrencesNumber) && (
-                        <Button color="blue" size="small" hovercontent="See timeline" styleName="hover-button"
-                                onClick={() => onClickOccurrences()}>
-                            <div styleName="content">
-                                <Icon name="list" />
-                                <PluralTranslate count={occurrencesNumber}>
-                                    <Singular>
-                                        1 occurrence
-                                    </Singular>
-                                    <Plural>
-                                        <Param name="count" value={occurrencesNumber} /> occurrences
-                                    </Plural>
-                                </PluralTranslate>
-                            </div>
-                            <div styleName="hover-content">
-                                <Icon name="list" /><Translate>See timeline</Translate>
-                            </div>
+                    {occurrencesNumber && (
+                        <Button color="blue" basic size="small" styleName="hover-button" onClick={onClickOccurrences}>
+                            <Translate>See all occurrences</Translate>
                         </Button>
                     )}
                 </div>

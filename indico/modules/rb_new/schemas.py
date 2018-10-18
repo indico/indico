@@ -96,9 +96,22 @@ class ReservationDetailsOccurrenceSchema(mm.ModelSchema):
         fields = ('start_dt', 'end_dt', 'is_valid')
 
 
+class ReservationEditLogSchema(UserSchema):
+    class Meta:
+        model = ReservationEditLog
+        fields = ('id', 'timestamp', 'info', 'user_name')
+
+    @post_dump(pass_many=True)
+    def sort_logs(self, data, many):
+        if many:
+            data = sorted(data, key=itemgetter('timestamp'), reverse=True)
+        return data
+
+
 class ReservationDetailsSchema(mm.ModelSchema):
     booked_for_user = Nested(UserSchema, only=('full_name', 'phone', 'email'))
-    created_by_user = Nested(UserSchema, only=('full_name'))
+    created_by_user = Nested(UserSchema, only=('full_name',))
+    edit_logs = Nested(ReservationEditLogSchema, many=True)
     can_accept = Function(lambda booking: booking.can_be_accepted(session.user))
     can_cancel = Function(lambda booking: booking.can_be_cancelled(session.user))
     can_delete = Function(lambda booking: booking.can_be_deleted(session.user))
@@ -110,8 +123,8 @@ class ReservationDetailsSchema(mm.ModelSchema):
     class Meta:
         model = Reservation
         fields = ('id', 'start_dt', 'end_dt', 'repetition', 'booking_reason', 'created_dt', 'booked_for_user',
-                  'room_id', 'created_by_user', 'can_accept', 'can_cancel', 'can_delete', 'can_modify', 'can_reject',
-                  'is_cancelled', 'is_rejected', 'is_accepted')
+                  'room_id', 'created_by_user', 'edit_logs', 'can_accept', 'can_cancel', 'can_delete', 'can_modify',
+                  'can_reject', 'is_cancelled', 'is_rejected', 'is_accepted')
 
 
 class BlockedRoomSchema(mm.ModelSchema):
@@ -202,24 +215,11 @@ class CreateBookingSchema(Schema):
             raise ValidationError(_('Booking cannot end before it starts'))
 
 
-class ReservationEditLogSchema(UserSchema):
-    class Meta:
-        model = ReservationEditLog
-        fields = ('timestamp', 'info', 'user_name')
-
-    @post_dump(pass_many=True)
-    def sort_logs(self, data, many):
-        if many:
-            data = sorted(data, key=itemgetter('timestamp'), reverse=True)
-        return data
-
-
 rb_user_schema = RBUserSchema()
 rooms_schema = RoomSchema(many=True, only=_room_fields)
 room_details_schema = RoomSchema()
 room_attributes_schema = RoomAttributesSchema(many=True)
 aspects_schema = AspectSchema(many=True)
-reservation_edit_log_schema = ReservationEditLogSchema(many=True)
 reservation_occurrences_schema = ReservationOccurrenceSchema(many=True)
 reservation_schema = ReservationSchema()
 reservation_details_schema = ReservationDetailsSchema()
