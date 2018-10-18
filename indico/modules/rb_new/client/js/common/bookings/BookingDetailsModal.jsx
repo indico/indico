@@ -101,10 +101,12 @@ class BookingDetailsModal extends React.Component {
     renderBookingHistory = (editLogs, createdOn, createdByUser) => {
         if (createdByUser) {
             const {fullName: createdBy} = createdByUser;
-            editLogs = [...editLogs, {id: 'created',
-                                      timestamp: createdOn,
-                                      info: ['Booking created'],
-                                      userName: createdBy}];
+            editLogs = [...editLogs, {
+                id: 'created',
+                timestamp: createdOn,
+                info: ['Booking created'],
+                userName: createdBy
+            }];
         }
         const items = editLogs.map((log) => {
             const {id, timestamp, info, userName} = log;
