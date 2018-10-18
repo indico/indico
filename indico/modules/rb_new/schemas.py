@@ -38,6 +38,7 @@ from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
 from indico.modules.rb.models.rooms import Room
 from indico.modules.users.schemas import UserSchema
 from indico.util.i18n import _
+from indico.util.marshmallow import NaiveDateTime
 from indico.util.string import natural_sort_key
 
 
@@ -78,6 +79,8 @@ class ReservationSchema(mm.ModelSchema):
 
 class ReservationOccurrenceSchema(mm.ModelSchema):
     reservation = Nested(ReservationSchema)
+    start_dt = NaiveDateTime()
+    end_dt = NaiveDateTime()
 
     class Meta:
         model = ReservationOccurrence
@@ -85,7 +88,8 @@ class ReservationOccurrenceSchema(mm.ModelSchema):
 
 
 class ReservationDetailsOccurrenceSchema(mm.ModelSchema):
-    reservation = Nested(ReservationSchema)
+    start_dt = NaiveDateTime()
+    end_dt = NaiveDateTime()
 
     class Meta:
         model = ReservationOccurrence
@@ -100,6 +104,8 @@ class ReservationDetailsSchema(mm.ModelSchema):
     can_delete = Function(lambda booking: booking.can_be_deleted(session.user))
     can_modify = Function(lambda booking: booking.can_be_modified(session.user))
     can_reject = Function(lambda booking: booking.can_be_rejected(session.user))
+    start_dt = NaiveDateTime()
+    end_dt = NaiveDateTime()
 
     class Meta:
         model = Reservation

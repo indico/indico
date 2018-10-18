@@ -205,7 +205,7 @@ class BookingDetailsModal extends React.Component {
         const {occurrencesVisible} = this.state;
         const dates = {startDate: startDt, endDate: endDt};
         const createdOn = serializeDate(toMoment(createdDt));
-        const times = {startTime: moment(startDt).utc().format('HH:mm'), endTime: moment(endDt).utc().format('HH:mm')};
+        const times = {startTime: moment(startDt).format('HH:mm'), endTime: moment(endDt).format('HH:mm')};
         const recurrence = this.getRecurrence(repetition);
         const legendLabels = [
             {label: Translate.string('Occurrence'), color: 'orange'},
