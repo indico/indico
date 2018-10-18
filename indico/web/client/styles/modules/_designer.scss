@@ -229,17 +229,17 @@
         margin: 1em 0;
         min-height: 37px;
 
-        &:not(:last-child) {
-            padding-right: 1em;
-            border-right: 1px solid $gray;
+        &:not(:first-child) {
+            padding-left: 1em;
+            border-left: 1px solid $gray;
         }
 
         &:first-child {
             margin-left: 1em;
         }
 
-        &:not(:first-child) {
-            padding-left: 1em;
+        &:not(:last-child) {
+            padding-right: 1em;
         }
 
         &:last-child {
