@@ -385,13 +385,20 @@ ul.category-resource-qtip {
     li {
         margin: 0 0 10px 60px;
         padding: 0;
-        display: block;
+        display: flex;
+        align-items: baseline;
+
+        .list-name {
+            display: flex;
+            align-items: baseline;
+        }
 
         .date {
             padding: 5px;
             margin-right: 10px;
             font-size: 13px;
             color: #444;
+            flex-shrink: 0;
         }
 
         .ical {
