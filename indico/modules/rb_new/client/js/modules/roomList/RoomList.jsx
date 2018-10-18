@@ -186,11 +186,12 @@ class RoomList extends React.Component {
                 <Grid.Column computer={showMap ? 11 : 16} mobile={16}>
                     <div className="ui" styleName="room-list" ref={this.contextRef}>
                         <Sticky context={this.contextRef.current} className="sticky-filters">
-                            <Grid>
-                                <Grid.Column width={12}>
+                            <div className="filter-row">
+                                <div className="filter-row-filters">
                                     <RoomFilterBar />
-                                </Grid.Column>
-                                <Grid.Column width={4} textAlign="right" verticalAlign="middle">
+                                    <SearchBar />
+                                </div>
+                                <div styleName="actions">
                                     {selectionMode ? (
                                         <>
                                             <Button icon="check"
@@ -206,14 +207,14 @@ class RoomList extends React.Component {
                                         </>
                                     ) : (
                                         <Dropdown text={Translate.string('Actions')}
+                                                  className="large"
                                                   options={menuOptions}
                                                   direction="left"
                                                   button
                                                   floating />
                                     )}
-                                </Grid.Column>
-                            </Grid>
-                            <SearchBar />
+                                </div>
+                            </div>
                         </Sticky>
                         <div styleName="results-count">
                             {results.length === 0 && !isSearching && Translate.string('There are no rooms matching the criteria')}

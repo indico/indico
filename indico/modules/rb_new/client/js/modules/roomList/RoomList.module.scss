@@ -31,6 +31,15 @@
         pointer-events: all;
         margin: 10px;
     }
+
+    .actions {
+        margin-left: auto;
+
+        :global(.ui.button.dropdown) {
+            display: flex;
+            align-items: baseline;
+        }
+    }
 }
 
 :global(.ui.inline.loader).rooms-loader {
