@@ -98,9 +98,15 @@ class BookingDetailsModal extends React.Component {
         return <DailyTimelineContent rows={rows} hourSeries={hourSeries} />;
     };
 
-    renderBookingHistory = (editLogs, createdOn, createdBy) => {
-        editLogs = [...editLogs, {id: 'created', timestamp: createdOn, info: ['Booking created'], userName: createdBy}];
-        const items = (editLogs.map((log) => {
+    renderBookingHistory = (editLogs, createdOn, createdByUser) => {
+        if (createdByUser) {
+            const {fullName: createdBy} = createdByUser;
+            editLogs = [...editLogs, {id: 'created',
+                                      timestamp: createdOn,
+                                      info: ['Booking created'],
+                                      userName: createdBy}];
+        }
+        const items = editLogs.map((log) => {
             const {id, timestamp, info, userName} = log;
             const basicInfo = <strong>{info[0]}</strong>;
             const details = (info[1] ? info[1] : null);
@@ -118,7 +124,7 @@ class BookingDetailsModal extends React.Component {
                     </Translate>
                 </List.Item>
             );
-        }));
+        });
         return (
             <div styleName="booking-logs">
                 <Header><Translate>Booking history</Translate></Header>
@@ -186,8 +192,6 @@ class BookingDetailsModal extends React.Component {
         } = this.props;
         const {occurrencesVisible} = this.state;
         const dates = {startDate: startDt, endDate: endDt};
-        const {fullName: createdBy} = createdByUser;
-        const createdOn = serializeDate(toMoment(createdDt));
         const times = {startTime: moment(startDt).format('HH:mm'), endTime: moment(endDt).format('HH:mm')};
         const recurrence = this.getRecurrence(repetition);
         const legendLabels = [
@@ -217,7 +221,7 @@ class BookingDetailsModal extends React.Component {
                         <Grid.Column>
                             {bookedForUser && this.renderBookedFor(bookedForUser)}
                             {this.renderReason(bookingReason)}
-                            {this.renderBookingHistory(editLogs, createdOn, createdBy)}
+                            {this.renderBookingHistory(editLogs, createdDt, createdByUser)}
                             {showActionButtons && this.renderActionButtons(canAccept, canCancel, canReject, isAccepted)}
                         </Grid.Column>
                     </Grid>

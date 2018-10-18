@@ -68,7 +68,7 @@ export default function TimeInformation({recurrence, dates: {startDate, endDate}
                             </Label>
                         )}
                     </div>
-                    {occurrencesNumber && (
+                    {!!occurrencesNumber && (
                         <Button color="blue" basic size="small" styleName="hover-button" onClick={onClickOccurrences}>
                             <Translate>See all occurrences</Translate>
                         </Button>
