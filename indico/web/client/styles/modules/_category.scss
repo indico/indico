@@ -388,7 +388,8 @@ ul.category-resource-qtip {
         display: block;
 
         .date {
-            padding: 0 10px 0 0;
+            padding: 5px;
+            margin-right: 10px;
             font-size: 13px;
             color: #444;
         }
@@ -407,8 +408,6 @@ ul.category-resource-qtip {
         }
 
         .today {
-            margin: 0 10px 0 0;
-            padding: 5px;
             font-size: 13px;
             color: #444;
             background-color: #F6E8BD;
