@@ -132,9 +132,9 @@ def get_rooms_availability(rooms, start_dt, end_dt, repeat_frequency, repeat_int
     return date_range, availability
 
 
-def get_room_calendar(day, room_ids):
-    start_dt = datetime.combine(day, time(hour=0, minute=0))
-    end_dt = datetime.combine(day, time(hour=23, minute=59))
+def get_room_calendar(start_date, end_date, room_ids):
+    start_dt = datetime.combine(start_date, time(hour=0, minute=0))
+    end_dt = datetime.combine(end_date, time(hour=23, minute=59))
     reservation_strategy = contains_eager('reservation')
     reservation_strategy.noload('room')
     reservation_strategy.noload('booked_for_user')
