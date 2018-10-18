@@ -33,6 +33,7 @@ class RoomBookingMap extends React.Component {
     static propTypes = {
         bounds: PropTypes.object.isRequired,
         onMove: PropTypes.func.isRequired,
+        onTouch: PropTypes.func.isRequired,
         mapRef: PropTypes.object.isRequired,
         rooms: PropTypes.array,
         onLoad: PropTypes.func,
@@ -53,9 +54,7 @@ class RoomBookingMap extends React.Component {
     }
 
     render() {
-        const {
-            bounds, onMove, mapRef, rooms, children, tileServerURL
-        } = this.props;
+        const {bounds, onMove, mapRef, rooms, children, tileServerURL, onTouch} = this.props;
         Leaflet.Marker.prototype.options.icon = Leaflet.divIcon({className: 'rb-map-marker', iconSize: [20, 20]});
 
         const markers = !!rooms.length && (
@@ -75,9 +74,15 @@ class RoomBookingMap extends React.Component {
             <div styleName="map-container">
                 <Map ref={mapRef}
                      bounds={Object.values(bounds)}
-                     onDragend={onMoveDebounced}
-                     onZoomend={onMoveDebounced}
-                     onMoveend={onMoveDebounced}>
+                     onMoveend={onMoveDebounced}
+                     onDragend={(e) => {
+                         onTouch();
+                         onMoveDebounced(e);
+                     }}
+                     onZoomend={(e) => {
+                         onTouch();
+                         onMoveDebounced(e);
+                     }}>
                     <TileLayer attribution='© <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
                                minZoom="14"
                                maxZoom="20"

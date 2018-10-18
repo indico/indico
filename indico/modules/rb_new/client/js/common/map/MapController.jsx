@@ -54,7 +54,8 @@ class MapController extends React.Component {
 
     state = {
         loading: true,
-        allRoomsVisible: false
+        allRoomsVisible: false,
+        searchVisible: false
     };
 
     static getDerivedStateFromProps(props, prevState) {
@@ -110,6 +111,10 @@ class MapController extends React.Component {
         updateLocation(getMapBounds(e.target), searchEnabled);
     };
 
+    onTouch = () => {
+        this.setState({searchVisible: true});
+    };
+
     onChangeAspect(aspectIdx) {
         const {aspects} = this.props;
         this.setState({
@@ -135,17 +140,19 @@ class MapController extends React.Component {
 
     render() {
         const {searchEnabled, rooms, aspects, mapData: {bounds}, actions: {toggleMapSearch}} = this.props;
-        const {aspectBounds, loading, allRoomsVisible} = this.state;
+        const {aspectBounds, loading, allRoomsVisible, searchVisible} = this.state;
         const aspectOptions = Object.entries(aspects).map(([key, val]) => ({
             text: val.name,
             value: Number(key)
         }));
 
         const searchControl = (
-            <RoomBookingMapControl position="topleft">
+            <RoomBookingMapControl position="topleft"
+                                   classes={`search-control ${searchVisible || searchEnabled ? 'visible' : ''}`}>
                 <Checkbox label={Translate.string('Search as I move the map')}
+                          checked={searchEnabled}
                           onChange={(e, data) => toggleMapSearch(data.checked, bounds)}
-                          checked={searchEnabled} styleName="map-control-content" />
+                          styleName="map-control-content" />
             </RoomBookingMapControl>
         );
 
@@ -185,7 +192,8 @@ class MapController extends React.Component {
                                             aspects={aspects}
                                             rooms={rooms}
                                             onLoad={this.onMapLoad}
-                                            onMove={this.onMove}>
+                                            onMove={this.onMove}
+                                            onTouch={this.onTouch}>
                                 {searchControl}
                                 {aspectsControl}
                                 {showAllControl}

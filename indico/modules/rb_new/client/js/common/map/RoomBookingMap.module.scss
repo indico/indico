@@ -58,4 +58,13 @@
         background-color: saturate(rgba($highlight-color, 0.9), 30%);
         border: 2px solid darken($highlight-color, 20%);
     }
+
+    :global(.search-control) {
+        opacity: 0;
+        transition: opacity 0.5s ease-in;
+
+        &:global(.visible) {
+            opacity: 1;
+        }
+    }
 }
