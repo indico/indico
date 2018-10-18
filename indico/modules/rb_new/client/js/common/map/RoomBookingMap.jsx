@@ -119,8 +119,12 @@ export class RoomBookingMapControl extends MapControl {
     }
 
     componentDidUpdate(prevProps) {
+        const {classes} = this.props;
         super.componentDidUpdate(prevProps);
         this.renderControl();
+        if (classes) {
+            this.leafletElement.getContainer().classList.add(...classes.trim().split(' '));
+        }
     }
 
     componentWillUnmount() {
