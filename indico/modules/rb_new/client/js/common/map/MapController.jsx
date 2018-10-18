@@ -149,7 +149,7 @@ class MapController extends React.Component {
         const searchControl = (
             <RoomBookingMapControl position="topleft"
                                    classes={`search-control ${searchVisible || searchEnabled ? 'visible' : ''}`}>
-                <Checkbox label={Translate.string('Search as I move the map')}
+                <Checkbox label={Translate.string('Update results with map')}
                           checked={searchEnabled}
                           onChange={(e, data) => toggleMapSearch(data.checked, bounds)}
                           styleName="map-control-content" />
