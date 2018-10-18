@@ -42,7 +42,7 @@ export const ajax = {
         serializer: filterDTHandler('start')
     },
     end_dt: {
-        onlyIf: (data) => data.dates && data.dates.endDate,
+        onlyIf: (data) => data.dates,
         serializer: filterDTHandler('end')
     },
     sw_lat: {
