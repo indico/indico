@@ -35,6 +35,19 @@ export function combineRootReducers(...reducers) {
 }
 
 
+/**
+ * Create a redux store that is connected to all necessary development
+ * middleware.
+ *
+ * @param {String} name - the name of this store
+ * @param {Object} reducers - a mapping of keys / reducers
+ * @param {Object} initialData - initial state
+ * @param {Array} additionalMiddleware - additional redux middleware
+ * @param {Array} postReducers - list of reducers that will be run after
+ * everything else
+ * @param {(reducer: Function) => Function} enhancer - function that will be
+ * applied on the final reducer function (incl. post reducers)
+ */
 export default function createReduxStore(
     name, reducers, initialData = {}, additionalMiddleware = [], postReducers = [], enhancer = r => r
 ) {
