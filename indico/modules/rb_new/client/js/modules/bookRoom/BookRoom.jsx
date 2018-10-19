@@ -29,7 +29,7 @@ import {Overridable, Slot, toClasses} from 'indico/react/util';
 import {PluralTranslate, Translate, Singular, Param, Plural} from 'indico/react/i18n';
 import {serializeTime, toMoment} from 'indico/utils/date';
 import searchBarFactory from '../../components/SearchBar';
-import Room from '../../containers/Room';
+import Room from '../../components/Room';
 import BookingFilterBar from './BookingFilterBar';
 import {roomFilterBarFactory} from '../../modules/roomList';
 import BookingTimeline from './BookingTimeline';

@@ -17,6 +17,8 @@
 
 import _ from 'lodash';
 import React from 'react';
+import {bindActionCreators} from 'redux';
+import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import {Card, Icon, Label, Popup, Button} from 'semantic-ui-react';
 import roomsSpriteURL from 'indico-url:rooms_new.sprite';
@@ -26,11 +28,13 @@ import {Slot} from 'indico/react/util';
 import {TooltipIfTruncated} from 'indico/react/components';
 import SpriteImage from './SpriteImage';
 import DimmableImage from './Dimmer.jsx';
+import {selectors as configSelectors} from '../common/config';
+import {actions as userActions, selectors as userSelectors} from '../common/user';
 
 import './Room.module.scss';
 
 
-export default class Room extends React.Component {
+class Room extends React.Component {
     static propTypes = {
         room: PropTypes.object.isRequired,
         children: PropTypes.node,
@@ -149,3 +153,17 @@ export default class Room extends React.Component {
         );
     }
 }
+
+export default connect(
+    () => {
+        const isFavoriteRoom = userSelectors.makeIsFavoriteRoom();
+        return (state, props) => ({
+            isFavorite: isFavoriteRoom(state, props),
+            roomsSpriteToken: configSelectors.getRoomsSpriteToken(state),
+        });
+    },
+    dispatch => bindActionCreators({
+        addFavoriteRoom: userActions.addFavoriteRoom,
+        delFavoriteRoom: userActions.delFavoriteRoom,
+    }, dispatch)
+)(Room);
