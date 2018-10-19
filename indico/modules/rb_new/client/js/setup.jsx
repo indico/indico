@@ -4,7 +4,7 @@ import {Provider} from 'react-redux';
 
 import Overridable from 'indico/react/util/Overridable';
 import setupUserMenu from 'indico/react/containers/UserMenu';
-import App from './containers/App';
+import App from './components/App';
 
 import createRBStore, {history} from './store';
 import {init} from './actions';

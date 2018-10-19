@@ -16,6 +16,7 @@
  */
 
 import React from 'react';
+import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import {Link, Redirect, Route, Switch} from 'react-router-dom';
 import {ConnectedRouter} from 'connected-react-router';
@@ -31,6 +32,12 @@ import RoomList from '../modules/roomList';
 import BlockingList from '../modules/blockings';
 import ModalController from '../modals';
 import Menu from './Menu';
+import {actions as configActions} from '../common/config';
+import {actions as mapActions} from '../common/map';
+import {actions as roomsActions} from '../common/rooms';
+import {actions as userActions} from '../common/user';
+import * as globalActions from '../actions';
+import * as globalSelectors from '../selectors';
 
 import './App.module.scss';
 
@@ -60,7 +67,7 @@ ConditionalRoute.defaultProps = {
 };
 
 
-export default class App extends React.Component {
+class App extends React.Component {
     static propTypes = {
         title: PropTypes.string,
         iconName: PropTypes.string,
@@ -134,3 +141,25 @@ export default class App extends React.Component {
         );
     }
 }
+
+export default connect(
+    (state, {history}) => ({
+        filtersSet: !!history.location.search || !!state.bookRoom.filters.recurrence.type,
+        isInitializing: globalSelectors.isInitializing(state),
+    }),
+    dispatch => ({
+        fetchInitialData() {
+            dispatch(configActions.fetchConfig()).then(() => {
+                // we only need map aspects if the map is enabled, which depends on the config
+                dispatch(mapActions.fetchAspects());
+            });
+            dispatch(userActions.fetchUserInfo());
+            dispatch(userActions.fetchFavoriteRooms());
+            dispatch(roomsActions.fetchEquipmentTypes());
+            dispatch(roomsActions.fetchRooms());
+        },
+        resetPageState(namespace) {
+            dispatch(globalActions.resetPageState(namespace));
+        }
+    })
+)(App);
