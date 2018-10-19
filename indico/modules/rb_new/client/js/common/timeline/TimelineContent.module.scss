@@ -98,17 +98,20 @@ $row-height: 50px;
     &:global(.timeline-non-selectable) {
         user-select: none;
     }
+}
 
-    & + .timeline-loader {
-        margin-top: 2em !important;
-        color: rgba(0, 0, 0, 0.87) !important;
+.timeline-loader:global(.ui.loader) {
+    margin-top: 2em !important;
+    color: rgba(0, 0, 0, 0.87) !important;
+    position: fixed;
+    bottom: 10px;
+    top: auto;
 
-        &::before {
-            border-color: rgba(0, 0, 0, 0.1) !important;
-        }
+    &::before {
+        border-color: rgba(0, 0, 0, 0.1) !important;
+    }
 
-        &::after {
-            border-color: $sui-grey transparent transparent !important;
-        }
+    &::after {
+        border-color: $sui-grey transparent transparent !important;
     }
 }

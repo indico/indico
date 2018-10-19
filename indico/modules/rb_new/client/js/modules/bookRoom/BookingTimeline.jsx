@@ -40,7 +40,7 @@ class _BookingTimelineComponent extends React.Component {
         ...timelinePropTypes,
         clickable: PropTypes.bool,
         lazyScroll: PropTypes.object,
-        isFetching: PropTypes.bool.isRequired,
+        isLoading: PropTypes.bool.isRequired,
         showEmptyMessage: PropTypes.bool,
         allowSingleRoom: PropTypes.bool,
         bookingAllowed: PropTypes.bool,
@@ -78,7 +78,7 @@ class _BookingTimelineComponent extends React.Component {
 
     render() {
         const {
-            isFetching, lazyScroll, showEmptyMessage, clickable, datePicker,
+            isLoading, lazyScroll, showEmptyMessage, clickable, datePicker,
             actions: {openBookingForm, openRoomDetails}, availability, bookingAllowed
         } = this.props;
         const emptyMessage = showEmptyMessage ? (
@@ -99,7 +99,8 @@ class _BookingTimelineComponent extends React.Component {
                                  onClickCandidate={clickable ? openBookingForm : null}
                                  onClickLabel={clickable ? openRoomDetails : null}
                                  extraContent={this.singleRoom && this.renderRoomSummary(this.singleRoom)}
-                                 isLoading={isFetching} />
+                                 isLoading={isLoading}
+                                 inlineLoader />
             )
         );
     }
@@ -119,7 +120,7 @@ export const BookingTimelineComponent = connect(
 class BookingTimeline extends React.Component {
     static propTypes = {
         ...timelinePropTypes,
-        fetchingTimeline: PropTypes.bool.isRequired,
+        isLoading: PropTypes.bool.isRequired,
         searchFinished: PropTypes.bool.isRequired,
         hasMoreTimelineData: PropTypes.bool.isRequired,
         filters: PropTypes.shape({
@@ -208,7 +209,7 @@ class BookingTimeline extends React.Component {
 
     render() {
         const {
-            fetchingTimeline,
+            isLoading,
             hasMoreTimelineData,
             availability,
             datePicker,
@@ -219,12 +220,12 @@ class BookingTimeline extends React.Component {
         const lazyScroll = {
             hasMore: hasMoreTimelineData,
             loadMore: fetchTimeline,
-            isFetching: fetchingTimeline,
+            isFetching: isLoading,
         };
 
         return (
             <BookingTimelineComponent lazyScroll={lazyScroll}
-                                      isFetching={fetchingTimeline}
+                                      isLoading={isLoading}
                                       availability={availability}
                                       datePicker={datePicker}
                                       defaultDate={startDate}
@@ -240,7 +241,7 @@ export default connect(
     state => ({
         availability: bookRoomSelectors.getTimelineAvailability(state),
         datePicker: bookRoomSelectors.getTimelineDatePicker(state),
-        fetchingTimeline: bookRoomSelectors.isFetchingTimeline(state),
+        isLoading: bookRoomSelectors.isFetchingTimeline(state),
         searchFinished: bookRoomSelectors.isSearchFinished(state),
         roomIds: bookRoomSelectors.getSearchResultIds(state),
         suggestedRoomIds: bookRoomSelectors.getSuggestedRoomIds(state),

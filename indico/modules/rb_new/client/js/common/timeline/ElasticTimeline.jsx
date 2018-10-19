@@ -38,8 +38,8 @@ export default class ElasticTimeline extends React.Component {
         availability: PropTypes.array.isRequired,
         datePicker: PropTypes.object.isRequired,
         bookingAllowed: PropTypes.bool,
-
         isLoading: PropTypes.bool,
+        inlineLoader: PropTypes.bool,
         itemClass: PropTypes.func,
         itemProps: PropTypes.object,
         onClickLabel: PropTypes.func,
@@ -65,6 +65,7 @@ export default class ElasticTimeline extends React.Component {
         bookingAllowed: false,
         extraContent: null,
         isLoading: false,
+        inlineLoader: false,
         itemClass: TimelineItem,
         itemProps: {},
         longLabel: false,
@@ -181,7 +182,7 @@ export default class ElasticTimeline extends React.Component {
         const {
             extraContent, onClickCandidate, onClickReservation, availability, isLoading, itemClass,
             itemProps, longLabel, onClickLabel, lazyScroll, datePicker: {minHour, maxHour, hourStep, mode},
-            showUnused
+            showUnused, inlineLoader
         } = this.props;
         let Component = DailyTimelineContent;
         let rows = this.calcDailyRows(availability);
@@ -213,6 +214,7 @@ export default class ElasticTimeline extends React.Component {
                                longLabel={longLabel}
                                onClickLabel={onClickLabel}
                                isLoading={isLoading}
+                               inlineLoader={inlineLoader}
                                lazyScroll={lazyScroll}
                                showUnused={showUnused} />
                 </div>

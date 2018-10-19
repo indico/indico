@@ -41,6 +41,7 @@ export default class DailyTimelineContent extends React.Component {
         itemClass: PropTypes.func,
         itemProps: PropTypes.object,
         isLoading: PropTypes.bool,
+        inlineLoader: PropTypes.bool,
         lazyScroll: PropTypes.object,
         minHour: PropTypes.number,
         maxHour: PropTypes.number,
@@ -57,6 +58,7 @@ export default class DailyTimelineContent extends React.Component {
         itemClass: TimelineItem,
         itemProps: {},
         isLoading: false,
+        inlineLoader: false,
         lazyScroll: null,
         minHour: 6,
         maxHour: 22,
@@ -138,7 +140,9 @@ export default class DailyTimelineContent extends React.Component {
     }
 
     render() {
-        const {rows, minHour, maxHour, hourStep, longLabel, lazyScroll, isLoading} = this.props;
+        const {
+            rows, minHour, maxHour, hourStep, longLabel, lazyScroll, isLoading, inlineLoader
+        } = this.props;
         const {selectable} = this.state;
         const labelWidth = longLabel ? 200 : 150;
         const WrapperComponent = lazyScroll ? LazyScroll : React.Fragment;
@@ -157,11 +161,7 @@ export default class DailyTimelineContent extends React.Component {
                                     <div styleName="timeline-content"
                                          className={!selectable && 'timeline-non-selectable'}
                                          style={{width}}>
-                                        {(wrapperProps.isFetching || isLoading) && (
-                                            <Dimmer active inverted>
-                                                <Loader active styleName="timeline-loader" />
-                                            </Dimmer>
-                                        )}
+
                                         <div style={{
                                             left: labelWidth,
                                             width: `calc(100% - ${labelWidth}px)`,
@@ -169,19 +169,27 @@ export default class DailyTimelineContent extends React.Component {
                                              styleName="timeline-lines">
                                             {this.renderDividers(hourSpan, hourStep)}
                                         </div>
-                                        <List width={width}
-                                              height={height}
-                                              autoHeight
-                                              rowCount={rows.length}
-                                              overscanRowCount={15}
-                                              rowHeight={50}
-                                              rowRenderer={({index, style, key}) => (
-                                                  this.renderTimelineRow(rows[index], key, style)
-                                              )}
-                                              isScrolling={isScrolling}
-                                              onScroll={onChildScroll}
-                                              scrollTop={scrollTop}
-                                              tabIndex={null} />
+                                        <div>
+                                            {isLoading && !inlineLoader && (
+                                                <Dimmer active inverted style={{zIndex: 1}}>
+                                                    <Loader active />
+                                                </Dimmer>
+                                            )}
+                                            <List width={width}
+                                                  height={height}
+                                                  autoHeight
+                                                  rowCount={rows.length}
+                                                  overscanRowCount={15}
+                                                  rowHeight={50}
+                                                  rowRenderer={({index, style, key}) => (
+                                                      this.renderTimelineRow(rows[index], key, style)
+                                                  )}
+                                                  isScrolling={isScrolling}
+                                                  onScroll={onChildScroll}
+                                                  scrollTop={scrollTop}
+                                                  tabIndex={null} />
+                                            {isLoading && inlineLoader && <Loader active styleName="timeline-loader" />}
+                                        </div>
                                     </div>
                                 )}
                             </AutoSizer>
