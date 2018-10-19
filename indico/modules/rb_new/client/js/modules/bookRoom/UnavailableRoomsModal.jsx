@@ -28,18 +28,17 @@ import {BookingTimelineComponent} from './BookingTimeline';
 
 class UnavailableRoomsModal extends React.Component {
     static propTypes = {
+        datePicker: PropTypes.object.isRequired,
         actions: PropTypes.object.isRequired,
         availability: PropTypes.array,
         filters: PropTypes.object.isRequired,
         isFetching: PropTypes.bool.isRequired,
-        dateRange: PropTypes.array,
         onClose: PropTypes.func
     };
 
     static defaultProps = {
         availability: [],
         onClose: null,
-        dateRange: null,
     };
 
     componentDidMount() {
@@ -48,8 +47,11 @@ class UnavailableRoomsModal extends React.Component {
     }
 
     render() {
-        const {availability, dateRange, isFetching, onClose} = this.props;
-        if (!dateRange || availability.length === 0) {
+        const {availability, isFetching, onClose, datePicker, filters: {dates: {startDate}}} = this.props;
+        // If we're in "timeline" mode, use the datepicker, otherwise the current starting day
+        const picker = datePicker.selectedDate ? datePicker : {...datePicker, selectedDate: startDate};
+
+        if (availability.length === 0) {
             return <Dimmer active page><Loader /></Dimmer>;
         }
 
@@ -58,11 +60,11 @@ class UnavailableRoomsModal extends React.Component {
                 <Modal.Header>
                     <Translate>Unavailable Rooms</Translate>
                 </Modal.Header>
-                <Modal.Content scrolling>
-                    <BookingTimelineComponent isFetching={isFetching}
-                                              isFetchingRooms={false}
+                <Modal.Content>
+                    <BookingTimelineComponent isLoading={isFetching}
                                               availability={availability}
-                                              dateRange={dateRange} />
+                                              datePicker={picker}
+                                              fixedHeight="70vh" />
                 </Modal.Content>
             </Modal>
         );
@@ -74,7 +76,7 @@ export default connect(
         availability: selectors.getUnavailableRoomInfo(state),
         filters: selectors.getFilters(state),
         isFetching: selectors.isFetchingUnavailableRooms(state),
-        dateRange: selectors.getAvailabilityDateRange(state),
+        datePicker: selectors.getTimelineDatePicker(state)
     }),
     dispatch => ({
         actions: bindActionCreators({
