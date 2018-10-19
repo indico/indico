@@ -15,8 +15,6 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint "react/forbid-component-props": "off" */
-
 import qs from 'qs';
 import React from 'react';
 import PropTypes from 'prop-types';

@@ -15,16 +15,19 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint "react/forbid-component-props": "off" */
-
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Dropdown, Icon} from 'semantic-ui-react';
-
+import {connect} from 'react-redux';
+import {push as pushRoute} from 'connected-react-router';
 import {Translate} from 'indico/react/i18n';
 
+import {selectors as userSelectors} from '../common/user';
+import {actions as blockingsActions} from '../modules/blockings';
+import {actions as filtersActions} from '../common/filters';
 
-export default function UserActions({isAdmin, hasOwnedRooms, gotoMyRoomsList, gotoMyBlockings}) {
+
+function UserActions({isAdmin, hasOwnedRooms, gotoMyRoomsList, gotoMyBlockings}) {
     const avatar = <Icon name="user" size="large" />;
     const options = [];
     options.push({
@@ -67,3 +70,21 @@ UserActions.propTypes = {
     gotoMyRoomsList: PropTypes.func.isRequired,
     gotoMyBlockings: PropTypes.func.isRequired,
 };
+
+
+export default connect(
+    state => ({
+        isAdmin: userSelectors.isUserAdmin(state),
+        hasOwnedRooms: userSelectors.hasOwnedRooms(state),
+    }),
+    dispatch => ({
+        gotoMyRoomsList() {
+            dispatch(filtersActions.setFilterParameter('roomList', 'onlyMine', true));
+            dispatch(pushRoute('/rooms?mine=true'));
+        },
+        gotoMyBlockings() {
+            dispatch(blockingsActions.setFilterParameter('myBlockings', true));
+            dispatch(pushRoute('/blockings?myBlockings=true'));
+        },
+    })
+)(UserActions);

@@ -23,7 +23,7 @@ import {Dimmer, Icon, Loader} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 import {Overridable, RouteAwareOverridable} from 'indico/react/util';
-import UserActions from '../containers/UserActions';
+import UserActions from '../components/UserActions';
 import Landing from '../modules/landing';
 import Calendar from '../modules/calendar';
 import BookRoom from '../modules/bookRoom';
