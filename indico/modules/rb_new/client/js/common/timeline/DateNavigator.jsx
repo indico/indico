@@ -21,9 +21,8 @@ import {Button} from 'semantic-ui-react';
 import RCCalendar from 'rc-calendar';
 import DatePicker from 'rc-calendar/lib/Picker';
 import {Translate} from 'indico/react/i18n';
-import {toMoment} from 'indico/utils/date';
+import {serializeDate, toMoment} from 'indico/utils/date';
 import {isDateWithinRange} from '../../util';
-
 
 /**
  * Component that renders a 'mode selector' (day/week/month) and a date picker.
@@ -93,14 +92,29 @@ export default class DateNavigator extends React.Component {
      * @param {Boolean} force - update even if the date didn't really change
      */
     setDateWithMode(date, mode, force = false) {
-        const {onDateChange} = this.props;
+        const {onDateChange, dateRange} = this.props;
         let expectedDate;
+
         if (mode === 'weeks') {
             expectedDate = date.clone().startOf('week');
         } else if (mode === 'months') {
             expectedDate = date.clone().startOf('month');
         } else {
             expectedDate = date.clone();
+            // check that we're not on a day that has no data
+            if (this.dateBounds && dateRange.indexOf(serializeDate(date)) === -1) {
+                expectedDate = toMoment(dateRange[0], 'YYYY-MM-DD');
+            }
+        }
+
+        // check that resulting date is within bounds
+        if (this.dateBounds) {
+            const [minDate, maxDate] = this.dateBounds;
+            if (expectedDate.isAfter(maxDate)) {
+                expectedDate = maxDate.clone();
+            } else if (expectedDate.isBefore(minDate)) {
+                expectedDate = minDate.clone();
+            }
         }
 
         if (force || !expectedDate.isSame(date)) {
@@ -170,23 +184,45 @@ export default class DateNavigator extends React.Component {
         );
     }
 
-    /**
-     * Render the DateNavigator, with its prev/next arrows.
+    /*
+     * Check whether a given date change (back/forward) would result
+     * in a valid situation or not.
      *
-     * @param {Boolean} disabled - whether to render the navigator as disabled
+     * @param {Number} num - the number of units to look forward
+     * @param {String} mode - the type of unit (days/weeks/months)
      */
+    isValidChange(num, mode) {
+        // if we're not limited, any date is valid
+        if (!this.dateBounds) {
+            return true;
+        }
+
+        const [minDate, maxDate] = this.dateBounds;
+        const targetDate = this.selectedDate.clone().add(num, mode);
+
+        if (targetDate.isAfter(maxDate)) {
+            return false;
+        } else if (targetDate.isBefore(minDate)) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+    * Render the DateNavigator, with its prev/next arrows.
+    *
+    * @param {Boolean} disabled - whether to render the navigator as disabled
+    */
     renderNavigator(disabled) {
-        const {dateRange, mode} = this.props;
-        const startDate = toMoment(dateRange[0]);
-        const endDate = toMoment(dateRange[dateRange.length - 1]);
+        const {mode} = this.props;
 
         const calendar = (
             <RCCalendar disabledDate={this.calendarDisabledDate}
                         onChange={this.onSelect}
                         value={this.selectedDate} />
         );
-        const prevDisabled = disabled || this.selectedDate.clone().subtract(1, mode).isBefore(startDate);
-        const nextDisabled = disabled || this.selectedDate.clone().add(1, mode).isAfter(endDate);
+        const prevDisabled = disabled || !this.isValidChange(-1, mode);
+        const nextDisabled = disabled || !this.isValidChange(1, mode);
 
         return (
             <Button.Group size="small">
