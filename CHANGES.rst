@@ -23,6 +23,10 @@ Improvements
   (:issue:`3446`)
 - Add edit button to custom conference pages (:issue:`3284`)
 - Support markdown in survey questions (:issue:`3366`)
+- Improve event list in case of long event titles (:issue:`3607`,
+  thanks :user:`nop33`)
+- Do not show border after last item in badge designer toolbar
+  (:issue:`3607`, thanks :user:`nop33`)
 
 Bugfixes
 ^^^^^^^^
