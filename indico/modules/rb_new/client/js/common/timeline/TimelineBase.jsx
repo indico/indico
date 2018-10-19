@@ -68,7 +68,7 @@ export default class TimelineBase extends React.Component {
         longLabel: false,
         onClickLabel: null,
         lazyScroll: null,
-        showUnused: false
+        showUnused: true
     };
 
     renderTimeline = () => {

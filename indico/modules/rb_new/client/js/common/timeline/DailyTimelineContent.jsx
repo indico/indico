@@ -75,7 +75,7 @@ export default class DailyTimelineContent extends React.Component {
     };
 
     hasUsage = (availability) => {
-        const fields = ['preBookings', 'blockings', 'bookings', 'nonbookablePeriods', 'unbookableHours'];
+        const fields = ['preBookings', 'blockings', 'bookings', 'nonbookablePeriods', 'unbookableHours', 'candidates'];
         return fields.some(field => !_.isEmpty(availability[field]));
     };
 
