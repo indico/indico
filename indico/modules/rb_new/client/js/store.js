@@ -44,8 +44,14 @@ export const history = createHistory({
     basename: `${Indico.Urls.BasePath}/rooms-new`
 });
 
-
-export default function createRBStore(overrides = {}) {
+/**
+ * Create the redux store of the RB module.
+ *
+ * @param {Object} overrides - overrides provided by e.g. a plugin
+ * @param {Array} additionalReducers - additional reducers provided by
+ * e.g. a plugin
+ */
+export default function createRBStore(overrides = {}, additionalReducers = []) {
     return createReduxStore(
         'rb-new',
         getReducers(),
@@ -59,6 +65,7 @@ export default function createRBStore(overrides = {}) {
             qsBookRoomReducer,
             qsCalendarReducer,
             qsBlockingsReducer,
+            ...additionalReducers
         ],
         rootReducer => connectRouter(history)(rootReducer));
 }
