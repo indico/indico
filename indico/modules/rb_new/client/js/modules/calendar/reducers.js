@@ -74,8 +74,6 @@ export default combineReducers({
         switch (action.type) {
             case calendarActions.ROWS_RECEIVED:
                 return {...state, rows: camelizeKeys(action.data)};
-            case calendarActions.SET_DATE:
-                return {...state, rows: []};
             case calendarActions.ROOM_IDS_RECEIVED:
                 return {...state, roomIds: action.data.slice()};
             case bookRoomActions.CREATE_BOOKING_SUCCESS: {
