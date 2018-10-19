@@ -25,7 +25,6 @@ import {Overridable} from 'indico/react/util';
 
 import {actions as filtersActions} from '../../common/filters';
 import BookingBootstrapForm from '../../components/BookingBootstrapForm';
-import {parseSearchBarText} from '../../util';
 import LandingStatistics from './LandingStatistics';
 import {selectors as userSelectors} from '../../common/user';
 
@@ -56,12 +55,11 @@ class Landing extends React.Component {
     doSearch = (formState) => {
         const {extraState, text} = this.state;
         const {actions: {setFilters}} = this.props;
-        const parsed = parseSearchBarText(text);
 
         setFilters({
             ...formState,
-            ...parsed,
             ...extraState,
+            text,
             equipment: []
         });
     };
@@ -96,7 +94,7 @@ class Landing extends React.Component {
                                 <Overridable id="BookingBootstrapForm">
                                     <BookingBootstrapForm onSearch={this.doSearch}>
                                         <Form.Group inline>
-                                            <Form.Input placeholder="bldg: 28" styleName="search-input"
+                                            <Form.Input placeholder="e.g. IT Amphitheatre" styleName="search-input"
                                                         onChange={(event, data) => this.updateText(data.value)} />
                                         </Form.Group>
                                         <Overridable id="Landing.bootstrapOptions"

@@ -30,7 +30,7 @@ import {Param, Plural, PluralTranslate, Translate, Singular} from 'indico/react/
 import camelizeKeys from 'indico/utils/camelize';
 import {pushStateMergeProps} from '../../util';
 import roomFilterBarFactory from './RoomFilterBar';
-import searchBarFactory from '../../containers/SearchBar';
+import searchBarFactory from '../../components/SearchBar';
 import Room from '../../containers/Room';
 import {BlockingModal} from '../blockings';
 import {queryStringRules as queryStringSerializer} from '../../common/roomSearch';

@@ -88,9 +88,6 @@ export const rules = {
     building: {
         stateField: 'filters.building'
     },
-    floor: {
-        stateField: 'filters.floor'
-    },
     text: {
         stateField: 'filters.text'
     },

@@ -25,28 +25,6 @@ import {serializeDate} from 'indico/utils/date';
 import {PluralTranslate, Translate, Singular, Plural, Param} from 'indico/react/i18n';
 
 
-export function parseSearchBarText(queryText) {
-    const resultMap = {bldg: 'building', floor: 'floor'};
-    const result = {text: null, building: null, floor: null};
-    if (!queryText) {
-        return result;
-    }
-
-    const parts = queryText.split(/\s+/).filter(x => !!x);
-    const textParts = [];
-    for (const item of parts) {
-        const [filter, value] = item.split(':');
-        if (value && resultMap.hasOwnProperty(filter)) {
-            result[resultMap[filter]] = value;
-        } else if (item) {
-            textParts.push(item);
-        }
-    }
-
-    result.text = textParts.join(' ').trim() || null;
-    return result;
-}
-
 export function preProcessParameters(params, rules) {
     return _pruneNullLeaves(
         Object.assign(...Object.entries(rules)
