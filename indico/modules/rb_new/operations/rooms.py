@@ -33,6 +33,7 @@ from indico.modules.rb.models.reservation_occurrences import ReservationOccurren
 from indico.modules.rb.models.room_features import RoomFeature
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.statistics import calculate_rooms_occupancy
+from indico.modules.rb_new.controllers.backend.common import room_args
 from indico.util.caching import memoize_redis
 
 
@@ -79,6 +80,29 @@ def _query_all_rooms_for_acl_check():
             .options(load_only('id', 'protection_mode', 'reservations_need_confirmation'),
                      raiseload('owner'),
                      joinedload('acl_entries')))
+
+
+# TODO
+@no_autoflush
+def _populate_room(room, properties):
+    basic_props = [prop for prop in room_args.keys() if prop not in ['available_equipment', 'unbookable_periods',
+                                                                     'bookable_periods']]
+    for prop in basic_props:
+        if prop in properties:
+            setattr(room, prop, properties[prop])
+
+    # Equipment
+    if 'available_equipment' in properties:
+        available_equipment_ids = properties['available_equipment']
+        available_equipment = {EquipmentType.get_one(equipment_id) for equipment_id in available_equipment_ids}
+        room.available_equipment = available_equipment
+
+    # TODO: Non bookable periods
+    # TODO: Bookable hours
+    # TODO: Photo
+
+    room.update_name()
+    return room
 
 
 @memoize_redis(900)
