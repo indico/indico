@@ -16,13 +16,15 @@
  */
 
 import React from 'react';
+import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import {Link, Route} from 'react-router-dom';
+import * as globalActions from '../actions';
 
 import './MenuItem.module.scss';
 
 
-export default function MenuItem({namespace, path, children, resetPageState}) {
+function MenuItem({namespace, path, children, resetPageState}) {
     return (
         <Route path={path}>
             {({match}) => (
@@ -46,3 +48,13 @@ MenuItem.propTypes = {
     children: PropTypes.node.isRequired,
     resetPageState: PropTypes.func.isRequired,
 };
+
+
+export default connect(
+    null,
+    dispatch => ({
+        resetPageState(namespace) {
+            dispatch(globalActions.resetPageState(namespace));
+        }
+    })
+)(MenuItem);
