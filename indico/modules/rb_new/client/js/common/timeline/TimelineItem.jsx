@@ -141,7 +141,7 @@ export default class TimelineItem extends React.Component {
         } else {
             let popupMessage;
             if (reservation) {
-                popupMessage = reservation.booking_reason;
+                popupMessage = reservation.bookingReason;
             } else if (bookable) {
                 popupMessage = Translate.string('Click to book it');
             }
@@ -169,7 +169,7 @@ export default class TimelineItem extends React.Component {
 
         return (
             <Popup trigger={segment} content={popupContent} position="bottom center"
-                   header={reservation && reservation.booked_for_name}
+                   header={reservation && reservation.bookedForName}
                    hideOnScroll />
         );
     };
