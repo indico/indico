@@ -15,7 +15,6 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
 import {createSelector} from 'reselect';
 
 import {RequestState} from 'indico/utils/redux';
@@ -44,21 +43,8 @@ export const hasDetails = createSelector(
 
 export const getBuildings = createSelector(
     getAllRooms,
-    (allRooms) => {
-        const roomsByBuilding = {};
-        Object.values(allRooms).forEach((room) => {
-            if (!roomsByBuilding.hasOwnProperty(room.building)) {
-                roomsByBuilding[room.building] = [];
-            }
-            roomsByBuilding[room.building].push(room);
-        });
-        return Object.entries(roomsByBuilding).reduce((obj, [building, rooms]) => {
-            const data = {
-                rooms,
-                floors: _.sortedUniq(rooms.map(r => r.floor).sort()),
-                number: building,
-            };
-            return {...obj, [building]: data};
-        }, {});
+    allRooms => {
+        const buildings = new Set(Object.values(allRooms).map(room => room.building));
+        return Array.from(buildings).sort((a, b) => parseInt(a, 10) - parseInt(b, 10));
     }
 );

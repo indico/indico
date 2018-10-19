@@ -149,7 +149,6 @@ class _BookingTimelineComponent extends React.Component {
                           emptyMessage={emptyMessage}
                           onClickCandidate={clickable ? openBookingForm : null}
                           onClickLabel={clickable ? openRoomDetails : null}
-
                           dateRange={dateRange}
                           extraContent={this.singleRoom && this.renderRoomSummary(this.singleRoom)}
                           isLoading={isFetching}
@@ -276,6 +275,7 @@ class BookingTimeline extends React.Component {
             loadMore: fetchTimeline,
             isFetching: fetchingTimeline,
         };
+
         return (
             <BookingTimelineComponent lazyScroll={lazyScroll}
                                       isFetching={fetchingTimeline}

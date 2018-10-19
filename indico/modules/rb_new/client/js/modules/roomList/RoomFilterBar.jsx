@@ -20,11 +20,12 @@ import {Button, Icon, Label, Popup} from 'semantic-ui-react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 
-import {Translate} from 'indico/react/i18n';
+import {Translate, Param} from 'indico/react/i18n';
 import {Overridable} from 'indico/react/util';
 
 import CapacityForm from './filters/CapacityForm';
 import EquipmentForm from './filters/EquipmentForm';
+import BuildingForm from './filters/BuildingForm';
 import {FilterBarController, FilterDropdownFactory} from '../../common/filters/FilterBar';
 import {actions as filtersActions} from '../../common/filters';
 import {selectors as roomsSelectors} from '../../common/rooms';
@@ -58,11 +59,29 @@ const equipmentRenderer = ({equipment}) => {
     }
 };
 
+// eslint-disable-next-line react/prop-types
+const renderBuilding = ({building}) => {
+    if (!building) {
+        return null;
+    }
+
+    return (
+        <>
+            <Icon name="building" />
+            <Translate>
+                Building <Param name="building" value={building} />
+            </Translate>
+        </>
+    );
+};
+
 export const equipmentType = PropTypes.array;
 
 class RoomFilterBarBase extends React.Component {
     static propTypes = {
         equipmentTypes: PropTypes.arrayOf(PropTypes.string).isRequired,
+        buildings: PropTypes.array.isRequired,
+        building: PropTypes.string,
         capacity: PropTypes.number,
         equipment: equipmentType,
         onlyFavorites: PropTypes.bool,
@@ -76,6 +95,7 @@ class RoomFilterBarBase extends React.Component {
 
     static defaultProps = {
         capacity: null,
+        building: null,
         onlyFavorites: false,
         onlyMine: false,
         hasFavoriteRooms: false,
@@ -86,10 +106,9 @@ class RoomFilterBarBase extends React.Component {
     render() {
         const {
             capacity, onlyFavorites, onlyMine, equipment, equipmentTypes,
-            hasOwnedRooms, hasFavoriteRooms, actions: {setFilterParameter},
+            hasOwnedRooms, hasFavoriteRooms, actions: {setFilterParameter}, building, buildings,
             ...extraProps
         } = this.props;
-
 
         const equipmentFilter = !!equipmentTypes.length && (
             <FilterDropdownFactory name="equipment"
@@ -109,6 +128,16 @@ class RoomFilterBarBase extends React.Component {
             <Button.Group size="large">
                 <Button icon="filter" as="div" disabled />
                 <FilterBarController>
+                    <FilterDropdownFactory name="building"
+                                           title={<Translate>Building</Translate>}
+                                           form={({building: selectedBuilding}, setParentField) => (
+                                               <BuildingForm setParentField={setParentField}
+                                                             buildings={buildings}
+                                                             building={selectedBuilding} />
+                                           )}
+                                           setGlobalState={data => setFilterParameter('building', data.building)}
+                                           initialValues={{building}}
+                                           renderValue={renderBuilding} />
                     <FilterDropdownFactory name="capacity"
                                            title={<Translate>Min. Capacity</Translate>}
                                            form={({capacity: selectedCapacity}, setParentField) => (
@@ -140,7 +169,8 @@ export default (namespace) => connect(
         ...state[namespace].filters,
         equipmentTypes: roomsSelectors.getEquipmentTypes(state),
         hasOwnedRooms: userSelectors.hasOwnedRooms(state),
-        hasFavoriteRooms: userSelectors.hasFavoriteRooms(state)
+        hasFavoriteRooms: userSelectors.hasFavoriteRooms(state),
+        buildings: roomsSelectors.getBuildings(state),
     }),
     dispatch => ({
         actions: {
