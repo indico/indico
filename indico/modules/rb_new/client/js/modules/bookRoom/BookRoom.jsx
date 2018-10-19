@@ -27,7 +27,7 @@ import LazyScroll from 'redux-lazy-scroll';
 
 import {Overridable, Slot, toClasses} from 'indico/react/util';
 import {PluralTranslate, Translate, Singular, Param, Plural} from 'indico/react/i18n';
-import {serializeTime, serializeDate, toMoment} from 'indico/utils/date';
+import {serializeTime, serializeDate} from 'indico/utils/date';
 import searchBarFactory from '../../components/SearchBar';
 import Room from '../../components/Room';
 import BookingFilterBar from './BookingFilterBar';
@@ -75,8 +75,7 @@ class BookRoom extends React.Component {
             setTimelineMode: PropTypes.func.isRequired
         }).isRequired,
         datePicker: PropTypes.object.isRequired,
-        showSuggestions: PropTypes.bool,
-        dateRange: PropTypes.array.isRequired
+        showSuggestions: PropTypes.bool
     };
 
     static defaultProps = {
@@ -168,10 +167,10 @@ class BookRoom extends React.Component {
             results,
             isTimelineVisible,
             actions,
-            dateRange,
-            datePicker: {selectedDate, mode}
+            datePicker
         } = this.props;
 
+        const {selectedDate} = datePicker;
         const legendLabels = [
             {label: Translate.string('Available'), color: 'green'},
             {label: Translate.string('Booked'), color: 'orange'},
@@ -197,12 +196,12 @@ class BookRoom extends React.Component {
                                    total={totalResultCount}
                                    isFetching={isSearching} />
                 {isTimelineVisible && selectedDate && (
-                    <TimelineHeader activeDate={toMoment(selectedDate)}
-                                    mode={mode}
+                    <TimelineHeader datePicker={datePicker}
+                                    disableDatePicker={isSearching}
                                     onDateChange={actions.setDate}
-                                    setMode={actions.setTimelineMode}
+                                    onModeChange={actions.setTimelineMode}
                                     legendLabels={legendLabels}
-                                    dateRange={dateRange} />
+                                    isLoading={isSearching} />
                 )}
             </Sticky>
         );
