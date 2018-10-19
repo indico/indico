@@ -47,6 +47,7 @@ export default class DailyTimelineContent extends React.Component {
         maxHour: PropTypes.number,
         hourStep: PropTypes.number,
         showUnused: PropTypes.bool,
+        fixedHeight: PropTypes.string
     };
 
     static defaultProps = {
@@ -63,7 +64,8 @@ export default class DailyTimelineContent extends React.Component {
         minHour: 6,
         maxHour: 22,
         hourStep: 2,
-        showUnused: true
+        showUnused: true,
+        fixedHeight: null
     };
 
     state = {
@@ -139,62 +141,91 @@ export default class DailyTimelineContent extends React.Component {
         );
     }
 
-    render() {
+    renderList(hourSpan, width, height, extraProps = {}) {
         const {
-            rows, minHour, maxHour, hourStep, longLabel, lazyScroll, isLoading, inlineLoader
+            rows, hourStep, longLabel, isLoading, inlineLoader
         } = this.props;
         const {selectable} = this.state;
         const labelWidth = longLabel ? 200 : 150;
+
+        return (
+            <div styleName="timeline-content"
+                 className={!selectable && 'timeline-non-selectable'}
+                 style={{width}}>
+                <div style={{
+                    left: labelWidth,
+                    width: `calc(100% - ${labelWidth}px)`,
+                }}
+                     styleName="timeline-lines">
+                    {this.renderDividers(hourSpan, hourStep)}
+                </div>
+                <div>
+                    {isLoading && !inlineLoader && (
+                        <Dimmer active inverted style={{zIndex: 1}}>
+                            <Loader active />
+                        </Dimmer>
+                    )}
+                    <List width={width}
+                          height={height}
+                          rowCount={rows.length}
+                          overscanRowCount={15}
+                          rowHeight={50}
+                          rowRenderer={({index, style, key}) => (
+                              this.renderTimelineRow(rows[index], key, style)
+                          )}
+                          {...extraProps}
+                          tabIndex={null} />
+                    {isLoading && inlineLoader && <Loader active styleName="timeline-loader" />}
+                </div>
+            </div>
+        );
+    }
+
+    render() {
+        const {
+            maxHour, minHour, rows, lazyScroll, hourStep, fixedHeight
+        } = this.props;
         const WrapperComponent = lazyScroll ? LazyScroll : React.Fragment;
         const wrapperProps = lazyScroll || {};
-        const hourSeries = _.range(minHour, maxHour + hourStep, hourStep);
         const hourSpan = maxHour - minHour;
+        const hourSeries = _.range(minHour, maxHour + hourStep, hourStep);
+
+        const windowScrollerWrapper = (
+            <WindowScroller>
+                {({height, isScrolling, onChildScroll, scrollTop}) => (
+                    <AutoSizer disableHeight>
+                        {({width}) => (
+                            this.renderList(hourSpan, width, height, {
+                                isScrolling,
+                                scrollTop,
+                                onScroll: onChildScroll,
+                                autoHeight: true
+                            })
+                        )}
+                    </AutoSizer>
+                )}
+            </WindowScroller>
+        );
+
+        const autoSizerWrapper = h => (
+            <div style={{height: h}}>
+                <AutoSizer>
+                    {({width, height}) => (
+                        this.renderList(hourSpan, width, height)
+                    )}
+                </AutoSizer>
+            </div>
+        );
 
         return (
             <>
                 {!!rows.length && this.renderHeader(hourSpan, hourSeries)}
                 <WrapperComponent {...wrapperProps}>
-                    <WindowScroller>
-                        {({height, isScrolling, onChildScroll, scrollTop}) => (
-                            <AutoSizer disableHeight>
-                                {({width}) => (
-                                    <div styleName="timeline-content"
-                                         className={!selectable && 'timeline-non-selectable'}
-                                         style={{width}}>
-
-                                        <div style={{
-                                            left: labelWidth,
-                                            width: `calc(100% - ${labelWidth}px)`,
-                                        }}
-                                             styleName="timeline-lines">
-                                            {this.renderDividers(hourSpan, hourStep)}
-                                        </div>
-                                        <div>
-                                            {isLoading && !inlineLoader && (
-                                                <Dimmer active inverted style={{zIndex: 1}}>
-                                                    <Loader active />
-                                                </Dimmer>
-                                            )}
-                                            <List width={width}
-                                                  height={height}
-                                                  autoHeight
-                                                  rowCount={rows.length}
-                                                  overscanRowCount={15}
-                                                  rowHeight={50}
-                                                  rowRenderer={({index, style, key}) => (
-                                                      this.renderTimelineRow(rows[index], key, style)
-                                                  )}
-                                                  isScrolling={isScrolling}
-                                                  onScroll={onChildScroll}
-                                                  scrollTop={scrollTop}
-                                                  tabIndex={null} />
-                                            {isLoading && inlineLoader && <Loader active styleName="timeline-loader" />}
-                                        </div>
-                                    </div>
-                                )}
-                            </AutoSizer>
-                        )}
-                    </WindowScroller>
+                    {(fixedHeight ? (
+                        autoSizerWrapper(fixedHeight)
+                    ) : (
+                        windowScrollerWrapper
+                    ))}
                 </WrapperComponent>
             </>
         );

@@ -48,6 +48,7 @@ class _BookingTimelineComponent extends React.Component {
             openRoomDetails: PropTypes.func.isRequired,
             openBookingForm: PropTypes.func.isRequired,
         }).isRequired,
+        fixedHeight: PropTypes.string
     };
 
     static defaultProps = {
@@ -56,6 +57,7 @@ class _BookingTimelineComponent extends React.Component {
         allowSingleRoom: true,
         showEmptyMessage: true,
         bookingAllowed: false,
+        fixedHeight: null
     };
 
     state = {};
@@ -78,7 +80,7 @@ class _BookingTimelineComponent extends React.Component {
 
     render() {
         const {
-            isLoading, lazyScroll, showEmptyMessage, clickable, datePicker,
+            isLoading, lazyScroll, showEmptyMessage, clickable, datePicker, fixedHeight,
             actions: {openBookingForm, openRoomDetails}, availability, bookingAllowed
         } = this.props;
         const emptyMessage = showEmptyMessage ? (
@@ -100,7 +102,8 @@ class _BookingTimelineComponent extends React.Component {
                                  onClickLabel={clickable ? openRoomDetails : null}
                                  extraContent={this.singleRoom && this.renderRoomSummary(this.singleRoom)}
                                  isLoading={isLoading}
-                                 inlineLoader />
+                                 inlineLoader
+                                 fixedHeight={fixedHeight} />
             )
         );
     }
