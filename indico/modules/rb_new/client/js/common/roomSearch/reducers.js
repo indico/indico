@@ -23,17 +23,12 @@ import {filterReducerFactory} from '../filters';
 import {mapSearchReducerFactory} from '../map';
 import {roomSearchActionsFactory} from './actions';
 import {actions as bookRoomActions} from '../../modules/bookRoom';
-import {parseSearchBarText, sanitizeRecurrence} from '../../util';
+import {sanitizeRecurrence} from '../../util';
 
 
 export function processRoomFilters(filters, param) {
     if (param === 'recurrence') {
         sanitizeRecurrence(filters);
-    } else if (param === 'text') {
-        const dd = parseSearchBarText(filters.text);
-        filters.text = dd.text || null;
-        filters.building = dd.building || null;
-        filters.floor = dd.floor || null;
     }
 
     return filters;
@@ -43,13 +38,12 @@ export function processRoomFilters(filters, param) {
 export function initialRoomFilterStateFactory(namespace) {
     const state = {
         text: null,
+        building: null,
         capacity: null,
         onlyFavorites: false,
         onlyMine: false,
         equipment: [],
         bounds: null,
-        building: null,
-        floor: null,
         division: null,
         error: false
     };

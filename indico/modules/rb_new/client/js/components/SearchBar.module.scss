@@ -17,23 +17,13 @@
 
 .room-filters {
     width: 450px;
-    margin: 25px 0 25px 0;
+    margin: 25px 0;
 
     .text-filter input {
         width: 300px;
-        border-radius: 0 4px 4px 0;
 
         & + i.icon.remove {
             cursor: pointer;
         }
-    }
-}
-
-.filters-trigger {
-    cursor: pointer;
-
-    .filters-down-arrow {
-        font-size: 12px;
-        margin-left: 10px;
     }
 }

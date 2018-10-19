@@ -24,7 +24,7 @@ import {Button, ButtonGroup, Container, Grid, Popup, Sticky} from 'semantic-ui-r
 import {connect} from 'react-redux';
 import {Translate} from 'indico/react/i18n';
 import {serializeDate} from 'indico/utils/date';
-import searchBarFactory from '../../containers/SearchBar';
+import searchBarFactory from '../../components/SearchBar';
 import * as calendarActions from './actions';
 import * as calendarSelectors from './selectors';
 import {actions as bookingsActions} from '../../common/bookings';
