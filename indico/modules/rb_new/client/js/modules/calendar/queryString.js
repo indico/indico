@@ -39,9 +39,6 @@ const rules = {
     building: {
         stateField: 'building'
     },
-    floor: {
-        stateField: 'floor'
-    },
     text: {
         stateField: 'text'
     },

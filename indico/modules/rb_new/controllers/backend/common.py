@@ -38,7 +38,6 @@ search_room_args = {
     'repeat_frequency': EnumField(RepeatFrequency),
     'repeat_interval': fields.Int(missing=0),
     'building': fields.Str(),
-    'floor': fields.Str(),
     'sw_lat': fields.Float(validate=lambda x: -90 <= x <= 90),
     'sw_lng': fields.Float(validate=lambda x: -180 <= x <= 180),
     'ne_lat': fields.Float(validate=lambda x: -90 <= x <= 90),

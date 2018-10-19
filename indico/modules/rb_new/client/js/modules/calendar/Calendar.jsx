@@ -80,9 +80,12 @@ class Calendar extends React.Component {
     }
 
     hasOnlyDateChanged = (prevFilters, filters) => {
-        return (prevFilters.text === filters.text && prevFilters.building === filters.building &&
-            prevFilters.floor === filters.floor && prevFilters.onlyFavorites === filters.onlyFavorites &&
-            prevFilters.date !== filters.date);
+        return (
+            prevFilters.text === filters.text &&
+            prevFilters.building === filters.building &&
+            prevFilters.onlyFavorites === filters.onlyFavorites &&
+            prevFilters.date !== filters.date
+        );
     };
 
     _getRowSerializer(day) {

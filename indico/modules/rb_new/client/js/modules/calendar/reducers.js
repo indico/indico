@@ -36,7 +36,6 @@ export const initialState = {
 export const initialFilterState = () => ({
     text: null,
     building: null,
-    floor: null,
     onlyFavorites: false,
     date: serializeDate(moment()),
 });
