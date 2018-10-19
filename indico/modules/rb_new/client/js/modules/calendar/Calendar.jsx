@@ -16,7 +16,6 @@
  */
 
 import _ from 'lodash';
-import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
 import {bindActionCreators} from 'redux';
@@ -132,7 +131,6 @@ class Calendar extends React.Component {
                 onlyFavorites
             }
         } = this.props;
-        const {selectedDate} = datePicker;
         const {showUnused} = this.state;
         const legendLabels = [
             {label: Translate.string('Booked'), color: 'orange'},
@@ -167,9 +165,9 @@ class Calendar extends React.Component {
                                         <SearchBar />
                                     </div>
                                 </Grid.Row>
-                                <TimelineHeader activeDate={selectedDate ? moment(selectedDate) : moment()}
-                                                setMode={setMode}
-                                                mode={datePicker.mode}
+                                <TimelineHeader datePicker={datePicker}
+                                                disableDatePicker={isFetching}
+                                                onModeChange={setMode}
                                                 onDateChange={setDate}
                                                 legendLabels={legendLabels} />
                             </Sticky>

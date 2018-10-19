@@ -99,8 +99,7 @@ class _BookingTimelineComponent extends React.Component {
                                  onClickCandidate={clickable ? openBookingForm : null}
                                  onClickLabel={clickable ? openRoomDetails : null}
                                  extraContent={this.singleRoom && this.renderRoomSummary(this.singleRoom)}
-                                 isLoading={isFetching}
-                                 disableDatePicker={!!this.singleRoom} />
+                                 isLoading={isFetching} />
             )
         );
     }
