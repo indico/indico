@@ -99,7 +99,7 @@ class Calendar extends React.Component {
         const {datePicker: {selectedDate}, actions: {openBookRoom}} = this.props;
         openBookRoom(id, {
             dates: {
-                startDate: moment(selectedDate, 'YYYY-MM-DD'),
+                startDate: selectedDate,
                 endDate: null,
             },
             timeSlot: {
@@ -178,8 +178,8 @@ class Calendar extends React.Component {
                                              onClickLabel={openRoomDetails}
                                              isLoading={isFetching}
                                              onClickReservation={openBookingDetails}
-                                             itemClass={datePicker.mode === 'day' ? EditableTimelineItem : TimelineItem}
-                                             itemProps={{onAddSlot: this.onAddSlot}}
+                                             itemClass={datePicker.mode === 'days' ? EditableTimelineItem : TimelineItem}
+                                             itemProps={datePicker.mode === 'days' ? {onAddSlot: this.onAddSlot} : {}}
                                              showUnused={showUnused}
                                              longLabel />
                         </div>
