@@ -20,9 +20,9 @@ import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
 import {Button, Form, Select} from 'semantic-ui-react';
-import RCCalendar from 'rc-calendar';
 import RangeCalendar from 'rc-calendar/lib/RangeCalendar';
 import DatePicker from 'rc-calendar/lib/Picker';
+import SingleDatePicker from 'indico/react/components/SingleDatePicker';
 import {Translate} from 'indico/react/i18n';
 import {serializeDate, serializeTime} from 'indico/utils/date';
 import TimeRangePicker from './TimeRangePicker';
@@ -170,13 +170,6 @@ export default class BookingBootstrapForm extends React.Component {
 
         const {buttonCaption, buttonDisabled, children, dayBased} = this.props;
 
-        const calendar = (
-            <RCCalendar selectedValue={startDate}
-                        onSelect={(date) => this.updateDates(date, null)}
-                        disabledDate={this.disabledDate}
-                        format="L" />
-        );
-
         const rangeCalendar = (
             <RangeCalendar onSelect={([start, end]) => this.updateDates(start, end)}
                            selectedValue={[startDate, endDate]}
@@ -234,15 +227,7 @@ export default class BookingBootstrapForm extends React.Component {
                     </DatePicker>
                 )}
                 {type === 'single' && (
-                    <DatePicker calendar={calendar}>
-                        {
-                            () => (
-                                <Form.Group inline>
-                                    <Form.Input icon="calendar" value={serializeDate(startDate, 'L') || ''} />
-                                </Form.Group>
-                            )
-                        }
-                    </DatePicker>
+                    <SingleDatePicker date={startDate} onDateChange={(date) => this.updateDates(date, null)} />
                 )}
                 {!dayBased && (
                     <Form.Group inline>
