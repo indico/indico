@@ -48,6 +48,7 @@
     "rc-calendar": "^9.7.10",
     "rc-time-picker": "^3.4.0",
     "react": "^16.6.0",
+    "react-dates": "^18.1.1",
     "react-debounce-input": "^3.2.0",
     "react-dom": "^16.6.0",
     "react-final-form": "^3.6.7",
