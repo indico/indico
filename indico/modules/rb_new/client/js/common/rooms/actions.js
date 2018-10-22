@@ -21,6 +21,7 @@ import fetchRoomAvailabilityURL from 'indico-url:rooms_new.room_availability';
 import fetchRoomAttributesURL from 'indico-url:rooms_new.room_attributes';
 
 import {indicoAxios} from 'indico/utils/axios';
+import camelizeKeys from 'indico/utils/camelize';
 import {ajaxAction} from 'indico/utils/redux';
 import {actions as modalActions} from '../../modals';
 
@@ -82,7 +83,7 @@ export function fetchAvailability(id) {
             FETCH_AVAILABILITY_REQUEST,
             [AVAILABILITY_RECEIVED, FETCH_AVAILABILITY_SUCCESS],
             FETCH_AVAILABILITY_ERROR,
-            data => ({id, availability: data}),
+            data => ({id, availability: camelizeKeys(data)}),
         )(dispatch);
     };
 }
