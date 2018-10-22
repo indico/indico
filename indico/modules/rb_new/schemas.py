@@ -158,10 +158,11 @@ class BlockingSchema(mm.ModelSchema):
     blocked_rooms = Nested(BlockedRoomSchema, many=True)
     allowed = Nested(BlockingPrincipalSchema, many=True)
     can_edit = Function(lambda blocking: blocking.can_be_modified(session.user))
+    created_by = Nested(UserSchema, attribute='created_by_user', only='full_name')
 
     class Meta:
         model = Blocking
-        fields = ('id', 'start_date', 'end_date', 'reason', 'blocked_rooms', 'allowed', 'created_by_id', 'can_edit')
+        fields = ('id', 'start_date', 'end_date', 'reason', 'blocked_rooms', 'allowed', 'created_by', 'can_edit')
 
 
 class NonBookablePeriodSchema(mm.ModelSchema):

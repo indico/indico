@@ -257,6 +257,14 @@ class BlockingModal extends React.Component {
                     <Form id="blocking-form" {...formProps}>
                         <Grid>
                             <Grid.Column width={8}>
+                                <Message icon info floating>
+                                    <Icon name="user" />
+                                    <Message.Content>
+                                        <Translate>
+                                            Blocking created by <Param name="createdBy" value={blocking.createdBy} />
+                                        </Translate>
+                                    </Message.Content>
+                                </Message>
                                 <Message icon info>
                                     <Icon name="lightbulb" />
                                     <Message.Content>
@@ -269,7 +277,7 @@ class BlockingModal extends React.Component {
                                         </Translate>
                                     </Message.Content>
                                 </Message>
-                                <Message color="red" icon>
+                                <Message negative icon>
                                     <Icon name="warning sign" />
                                     <Message.Content>
                                         <Translate>
