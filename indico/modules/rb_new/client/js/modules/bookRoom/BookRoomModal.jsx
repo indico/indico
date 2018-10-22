@@ -198,7 +198,7 @@ class BookRoomModal extends React.Component {
     renderRoomTimeline(availability) {
         const {availability: {dateRange}} = this.props;
         const rows = dateRange.map((day) => this._getRowSerializer(day)(availability));
-        return <DailyTimelineContent rows={rows} />;
+        return <DailyTimelineContent rows={rows} fixedHeight={rows.length > 1 ? '70vh' : null} />;
     }
 
     renderBookingConstraints(conflicts) {
@@ -360,7 +360,7 @@ class BookRoomModal extends React.Component {
                             <Popup trigger={<Icon name="info circle" className="legend-info-icon" />}
                                    content={<TimelineLegend labels={legendLabels} compact />} />
                         </Modal.Header>
-                        <Modal.Content scrolling>
+                        <Modal.Content>
                             {availability && this.renderRoomTimeline(availability)}
                         </Modal.Content>
                     </Modal>

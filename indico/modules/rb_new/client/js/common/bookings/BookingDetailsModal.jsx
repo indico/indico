@@ -95,7 +95,7 @@ class BookingDetailsModal extends React.Component {
         const rows = dateRange.map((day) => this._getRowSerializer(day)(occurrences));
         return (
             <DailyTimelineContent rows={rows}
-                                  fixedHeight="70vh" />
+                                  fixedHeight={rows.length > 1 ? '70vh' : null} />
         );
     };
 
