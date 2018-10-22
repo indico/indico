@@ -19,33 +19,8 @@
     margin-top: 10px;
 }
 
-.occurences-details {
+.occurrences-details {
     display: flex;
     justify-content: space-between;
-    align-items: baseline;
-
-    .hover-button {
-        min-width: 150px;
-
-        .content {
-            display: block;
-        }
-
-        .hover-content {
-            display: none;
-        }
-    }
-
-    :global(.icon) {
-        display: inline;
-        padding: 0 0.25em;
-    }
-
-    .hover-button:hover .content {
-        display: none;
-    }
-
-    .hover-button:hover .hover-content {
-        display: block;
-    }
+    align-items: center;
 }

@@ -197,7 +197,7 @@ class BookRoomModal extends React.Component {
     }
 
     renderRoomTimeline(availability) {
-        const hourSeries = _.range(6, 24, 2);
+        const hourSeries = _.range(6, 22, 2);
         const {availability: {dateRange}} = this.props;
         const rows = dateRange.map((day) => this._getRowSerializer(day)(availability));
         return <DailyTimelineContent rows={rows} hourSeries={hourSeries} />;
@@ -258,6 +258,14 @@ class BookRoomModal extends React.Component {
         onClose();
     };
 
+    showConflicts = () => {
+        this.setState({bookingConflictsVisible: true});
+    };
+
+    hideConflicts = () => {
+        this.setState({bookingConflictsVisible: false});
+    };
+
     render() {
         const {
             bookingData: {recurrence, dates, timeSlot},
@@ -269,12 +277,11 @@ class BookRoomModal extends React.Component {
         if (!room) {
             return null;
         }
-
+        const occurrencesNumber = availability && availability.dateRange.length;
         const conflictsExist = availability && !!Object.keys(availability.conflicts).length;
         const bookingBlocked = ({submitting, submitSucceeded}) => submitting || submitSucceeded;
         const buttonsBlocked = (fprops) => bookingBlocked(fprops) || (conflictsExist && !skipConflicts);
         const {is_auto_confirm: isDirectlyBookable} = room;
-        const link = <a onClick={() => this.setState({bookingConflictsVisible: true})} />;
         const legendLabels = [
             {label: Translate.string('Available'), color: 'green'},
             {label: Translate.string('Booked'), color: 'orange'},
@@ -294,16 +301,12 @@ class BookRoomModal extends React.Component {
                         <Grid.Column width={8}>
                             <RoomBasicDetails room={room} />
                             <Overridable id="TimeInformation">
-                                <TimeInformationComponent dates={dates} timeSlot={timeSlot} recurrence={recurrence} />
+                                <TimeInformationComponent dates={dates}
+                                                          timeSlot={timeSlot}
+                                                          recurrence={recurrence}
+                                                          onClickOccurrences={this.showConflicts}
+                                                          occurrencesNumber={occurrencesNumber} />
                             </Overridable>
-                            <Message attached="bottom">
-                                <Message.Content>
-                                    <Translate>
-                                        Consult the <Param name="bookings-link" wrapper={link}>timeline view </Param> to
-                                        see the other room bookings for the selected period.
-                                    </Translate>
-                                </Message.Content>
-                            </Message>
                         </Grid.Column>
                         <Grid.Column width={8}>
                             <Segment inverted color="blue">
