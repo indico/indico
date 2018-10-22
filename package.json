@@ -88,7 +88,7 @@
     "babel-loader": "^8.0.0",
     "babel-plugin-flask-urls": "*",
     "babel-plugin-lodash": "^3.3.4",
-    "copy-webpack-plugin": "^4.5.2",
+    "copy-webpack-plugin": "^4.5.4",
     "css-loader": "^1.0.0",
     "eslint": "^5.7.0",
     "eslint-cli": "^1.1.1",
@@ -112,7 +112,7 @@
     "script-loader": "^0.7.2",
     "style-loader": "^0.23.0",
     "uglify-js": "^3.4.8",
-    "webpack": "^4.21.0",
+    "webpack": "^4.22.0",
     "webpack-cli": "^3.1.1",
     "webpack-manifest-plugin": "^2.0.4",
     "webpack-merge": "^4.1.3"
