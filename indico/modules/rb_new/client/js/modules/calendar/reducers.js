@@ -22,7 +22,6 @@ import camelizeKeys from 'indico/utils/camelize';
 import {requestReducer} from 'indico/utils/redux';
 import {serializeDate} from 'indico/utils/date';
 import {actions as bookRoomActions} from '../../modules/bookRoom';
-import * as actions from '../../actions';
 import * as calendarActions from './actions';
 import {filterReducerFactory} from '../../common/filters';
 import {processRoomFilters} from '../../common/roomSearch/reducers';
@@ -45,8 +44,6 @@ export default combineReducers({
     filters: filterReducerFactory('calendar', initialFilterState, processRoomFilters),
     data: (state = initialState, action) => {
         switch (action.type) {
-            case actions.RESET_PAGE_STATE:
-                return action.namespace === 'calendar' ? initialState : state;
             case calendarActions.ROWS_RECEIVED:
                 return {...state, rows: camelizeKeys(action.data)};
             case calendarActions.ROOM_IDS_RECEIVED:

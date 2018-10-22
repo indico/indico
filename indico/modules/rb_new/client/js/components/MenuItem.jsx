@@ -29,13 +29,9 @@ function MenuItem({namespace, path, children, resetPageState}) {
         <Route path={path}>
             {({match}) => (
                 <li className={match ? 'selected' : ''} styleName="rb-menu-item">
-                    {match
-                        ? <span>{children}</span>
-                        : (
-                            <Link to={path} onClick={() => resetPageState(namespace)}>
-                                {children}
-                            </Link>
-                        )}
+                    <Link to={path} onClick={() => resetPageState(namespace)}>
+                        {children}
+                    </Link>
                 </li>
             )}
         </Route>
