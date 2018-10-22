@@ -19,7 +19,7 @@ import React from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
-import {Container, Grid, Loader, Message} from 'semantic-ui-react';
+import {Card, Container, Loader, Message} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
 import BlockingCard from './BlockingCard';
 import BlockingFilterBar from './BlockingFilterBar';
@@ -55,9 +55,9 @@ class BlockingList extends React.Component {
     renderBlocking = (blocking) => {
         const {actions: {openBlockingDetails}} = this.props;
         return (
-            <Grid.Column key={blocking.id}>
-                <BlockingCard blocking={blocking} onClick={() => openBlockingDetails(blocking.id)} />
-            </Grid.Column>
+            <BlockingCard key={blocking.id}
+                          blocking={blocking}
+                          onClick={() => openBlockingDetails(blocking.id)} />
         );
     };
 
@@ -66,13 +66,13 @@ class BlockingList extends React.Component {
         const blockingsList = Object.values(blockings);
         return (
             <>
-                <Container styleName="blockings-container">
+                <Container styleName="blockings-container" fluid>
                     <BlockingFilterBar />
                     {!isFetching && blockingsList.length !== 0 && (
                         <>
-                            <Grid columns={4} styleName="blockings-list" stackable>
+                            <Card.Group styleName="blockings-list" stackable>
                                 {blockingsList.map(this.renderBlocking)}
-                            </Grid>
+                            </Card.Group>
                         </>
                     )}
                     {isFetching && <Loader inline="centered" active />}

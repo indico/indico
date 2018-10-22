@@ -19,11 +19,6 @@
 .blocking-item {
     cursor: pointer;
 
-    :global(.image) {
-        width: 150px !important;
-        height: 100px;
-    }
-
     .blocking-reason {
         overflow: hidden;
         text-overflow: ellipsis;
