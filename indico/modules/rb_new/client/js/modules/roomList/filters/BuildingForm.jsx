@@ -60,13 +60,14 @@ export default class BuildingForm extends FilterFormComponent {
         return (
             <>
                 <Form.Group>
-                    <Form.Dropdown options={[{text: '', value: null}, ...options]}
+                    <Form.Dropdown options={options}
                                    value={building}
-                                   onChange={(__, {value}) => this.setBuilding(value)}
+                                   onChange={(__, {value}) => this.setBuilding(value || null)}
                                    closeOnChange
                                    closeOnBlur
                                    search
-                                   selection />
+                                   selection
+                                   clearable />
                 </Form.Group>
             </>
         );
