@@ -15,7 +15,6 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
 import moment from 'moment';
 import React from 'react';
 import {connect} from 'react-redux';
@@ -197,10 +196,9 @@ class BookRoomModal extends React.Component {
     }
 
     renderRoomTimeline(availability) {
-        const hourSeries = _.range(6, 22, 2);
         const {availability: {dateRange}} = this.props;
         const rows = dateRange.map((day) => this._getRowSerializer(day)(availability));
-        return <DailyTimelineContent rows={rows} hourSeries={hourSeries} />;
+        return <DailyTimelineContent rows={rows} />;
     }
 
     renderBookingConstraints(conflicts) {

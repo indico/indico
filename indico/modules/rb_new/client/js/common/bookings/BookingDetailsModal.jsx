@@ -15,7 +15,6 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
 import moment from 'moment';
 import React from 'react';
 import {connect} from 'react-redux';
@@ -93,9 +92,8 @@ class BookingDetailsModal extends React.Component {
     };
 
     renderTimeline = (occurrences, dateRange) => {
-        const hourSeries = _.range(6, 22, 2);
         const rows = dateRange.map((day) => this._getRowSerializer(day)(occurrences));
-        return <DailyTimelineContent rows={rows} hourSeries={hourSeries} />;
+        return <DailyTimelineContent rows={rows} />;
     };
 
     renderBookingHistory = (editLogs, createdOn, createdByUser) => {
