@@ -62,14 +62,6 @@ class _BookingTimelineComponent extends React.Component {
 
     state = {};
 
-    get singleRoom() {
-        const {availability, allowSingleRoom} = this.props;
-        if (!allowSingleRoom || availability.length !== 1) {
-            return null;
-        }
-        return availability[0][1];
-    }
-
     renderRoomSummary({room: {full_name: fullName}}) {
         return (
             <Segment>
@@ -100,7 +92,6 @@ class _BookingTimelineComponent extends React.Component {
                                  emptyMessage={emptyMessage}
                                  onClickCandidate={clickable ? openBookingForm : null}
                                  onClickLabel={clickable ? openRoomDetails : null}
-                                 extraContent={this.singleRoom && this.renderRoomSummary(this.singleRoom)}
                                  isLoading={isLoading}
                                  inlineLoader
                                  fixedHeight={fixedHeight} />

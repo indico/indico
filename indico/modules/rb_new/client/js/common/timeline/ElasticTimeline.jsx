@@ -97,16 +97,8 @@ export default class ElasticTimeline extends React.Component {
     }
 
     calcDailyRows() {
-        const {availability, datePicker: {selectedDate, dateRange}} = this.props;
+        const {availability, datePicker: {selectedDate}} = this.props;
 
-        if (this.singleRoom) {
-            const roomAvailability = this.singleRoom;
-            return dateRange.map(dt => ({
-                ...this._getRowSerializer(dt)(roomAvailability),
-                label: toMoment(dt).format('L'),
-                key: dt
-            }));
-        }
         return availability.map(([, data]) => data).map((data) => ({
             availability: this._getDayRowSerializer(selectedDate)(data),
             label: data.room.full_name,
