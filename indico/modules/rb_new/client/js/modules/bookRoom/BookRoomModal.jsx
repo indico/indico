@@ -277,7 +277,7 @@ class BookRoomModal extends React.Component {
         if (!room) {
             return null;
         }
-        const occurrencesNumber = availability && availability.dateRange.length;
+        const occurrenceCount = availability && availability.dateRange.length;
         const conflictsExist = availability && !!Object.keys(availability.conflicts).length;
         const bookingBlocked = ({submitting, submitSucceeded}) => submitting || submitSucceeded;
         const buttonsBlocked = (fprops) => bookingBlocked(fprops) || (conflictsExist && !skipConflicts);
@@ -305,7 +305,7 @@ class BookRoomModal extends React.Component {
                                                           timeSlot={timeSlot}
                                                           recurrence={recurrence}
                                                           onClickOccurrences={this.showConflicts}
-                                                          occurrencesNumber={occurrencesNumber} />
+                                                          occurrenceCount={occurrenceCount} />
                             </Overridable>
                         </Grid.Column>
                         <Grid.Column width={8}>
@@ -355,7 +355,7 @@ class BookRoomModal extends React.Component {
                         ? Translate.string('Close')
                         : Translate.string("I've changed my mind!"))} />
                     <Modal open={bookingConflictsVisible}
-                           onClose={() => this.setState({bookingConflictsVisible: false})}
+                           onClose={this.hideConflicts}
                            size="large" closeIcon>
                         <Modal.Header className="legend-header">
                             <Translate>Bookings</Translate>

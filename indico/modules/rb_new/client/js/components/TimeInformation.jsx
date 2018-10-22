@@ -26,7 +26,7 @@ import './TimeInformation.module.scss';
 
 
 export default function TimeInformation({recurrence, dates: {startDate, endDate}, timeSlot, onClickOccurrences,
-                                         occurrencesNumber}) {
+                                         occurrenceCount}) {
     const mStartDate = toMoment(startDate);
     const mEndDate = endDate ? toMoment(endDate) : null;
     let timeInfo = null;
@@ -70,11 +70,11 @@ export default function TimeInformation({recurrence, dates: {startDate, endDate}
                             <Icon name="list" />
                             <strong>
                                 {renderRecurrence(recurrence)}
-                                {(occurrencesNumber > 1) && (
+                                {(occurrenceCount > 1) && (
                                     <>
                                         {', '}
                                         <Translate>
-                                            <Param name="count" value={occurrencesNumber} /> occurrences
+                                            <Param name="count" value={occurrenceCount} /> occurrences
                                         </Translate>
                                     </>
                                 )}
@@ -101,10 +101,10 @@ TimeInformation.propTypes = {
         endTime: PropTypes.string
     }),
     onClickOccurrences: PropTypes.func.isRequired,
-    occurrencesNumber: PropTypes.number
+    occurrenceCount: PropTypes.number
 };
 
 TimeInformation.defaultProps = {
     timeSlot: null,
-    occurrencesNumber: 0
+    occurrenceCount: 0
 };

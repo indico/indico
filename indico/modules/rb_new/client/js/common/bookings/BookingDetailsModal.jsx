@@ -218,7 +218,7 @@ class BookingDetailsModal extends React.Component {
                                              dates={dates}
                                              timeSlot={times}
                                              onClickOccurrences={this.showOccurrences}
-                                             occurrencesNumber={dateRange.length} />
+                                             occurrenceCount={dateRange.length} />
                         </Grid.Column>
                         <Grid.Column>
                             {bookedForUser && this.renderBookedFor(bookedForUser)}
