@@ -93,7 +93,10 @@ class BookingDetailsModal extends React.Component {
 
     renderTimeline = (occurrences, dateRange) => {
         const rows = dateRange.map((day) => this._getRowSerializer(day)(occurrences));
-        return <DailyTimelineContent rows={rows} />;
+        return (
+            <DailyTimelineContent rows={rows}
+                                  fixedHeight="70vh" />
+        );
     };
 
     renderBookingHistory = (editLogs, createdOn, createdByUser) => {
@@ -235,7 +238,7 @@ class BookingDetailsModal extends React.Component {
                         <Popup trigger={<Icon name="info circle" className="legend-info-icon" />}
                                content={<TimelineLegend labels={legendLabels} compact />} />
                     </Modal.Header>
-                    <Modal.Content scrolling>
+                    <Modal.Content>
                         {this.renderTimeline(occurrences, dateRange)}
                     </Modal.Content>
                 </Modal>
