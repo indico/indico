@@ -36,8 +36,8 @@ import '../../common/rooms/RoomDetailsModal.module.scss';
 function ConflictIndicator(
     {
         availability: {
-            num_days_available: numDaysAvailable,
-            all_days_available: allDaysAvailable
+            numDaysAvailable,
+            allDaysAvailable
         }
     }
 ) {
@@ -104,7 +104,7 @@ class BookFromListModal extends React.Component {
 
     render() {
         const {room, refreshCollisions, availability, availabilityLoading, defaults} = this.props;
-        const buttonDisabled = availabilityLoading || !availability || availability.num_days_available === 0;
+        const buttonDisabled = availabilityLoading || !availability || availability.numDaysAvailable === 0;
         return (
             <Modal open onClose={this.handleCloseModal} size="large" closeIcon>
                 <Modal.Header styleName="room-details-header">
