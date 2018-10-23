@@ -98,6 +98,16 @@ $row-height: 50px;
     &:global(.timeline-non-selectable) {
         user-select: none;
     }
+
+    .timeline-item-placeholder {
+        position: relative;
+        z-index: 1000;
+
+        :global(.line) {
+            height: 1em !important;
+            background-color: unset !important;
+        }
+    }
 }
 
 .timeline-loader:global(.ui.loader) {

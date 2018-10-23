@@ -93,7 +93,6 @@ class _BookingTimelineComponent extends React.Component {
                                  onClickCandidate={clickable ? openBookingForm : null}
                                  onClickLabel={clickable ? openRoomDetails : null}
                                  isLoading={isLoading}
-                                 inlineLoader
                                  fixedHeight={fixedHeight} />
             )
         );
