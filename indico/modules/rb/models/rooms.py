@@ -54,6 +54,7 @@ _cache = GenericCache('Rooms')
 class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
     __tablename__ = 'rooms'
     __table_args__ = (db.UniqueConstraint('id', 'location_id'),  # useless but needed for the LocationMixin fkey
+                      db.CheckConstraint("verbose_name != ''", 'verbose_name_not_empty'),
                       {'schema': 'roombooking'})
 
     __public__ = [
@@ -95,9 +96,11 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         db.Integer,
         db.ForeignKey('roombooking.photos.id')
     )
-    name = db.Column(
+    #: Verbose name for the room (long)
+    verbose_name = db.Column(
         db.String,
-        nullable=False
+        nullable=True,
+        default=None
     )
     site = db.Column(
         db.String,
@@ -315,22 +318,29 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         return self.photo_id is not None
 
     @hybrid_property
+    def name(self):
+        return self.generate_name()
+
+    @name.expression
+    def name(cls):
+        q = (db.session.query(db.m.Location.room_name_format)
+             .filter(db.m.Location.id == cls.location_id)
+             .correlate(Room)
+             .as_scalar())
+        return db.func.format(q, cls.building, cls.floor, cls.number)
+
+    @hybrid_property
     def full_name(self):
-        if self.has_special_name:
-            return u'{} - {}'.format(self.generate_name(), self.name)
+        if self.verbose_name:
+            return u'{} - {}'.format(self.generate_name(), self.verbose_name)
         else:
             return u'{}'.format(self.generate_name())
 
     @full_name.expression
     def full_name(cls):
-        simple_name = cls.building + '-' + cls.floor + '-' + cls.number
         return db.case([
-            [((cls.name != '') & (cls.name != simple_name)), simple_name + ' - ' + cls.name]
-        ], else_=simple_name)
-
-    @property
-    def has_special_name(self):
-        return self.name and self.name != self.generate_name()
+            [cls.verbose_name.isnot(None), cls.name + ' - ' + cls.verbose_name]
+        ], else_=cls.name)
 
     @property
     @cached(_cache)
@@ -405,7 +415,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         return u'<Room({0}, {1}, {2})>'.format(
             self.id,
             self.location_id,
-            self.name
+            self.full_name
         )
 
     @cached(_cache)
@@ -457,15 +467,11 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         return {'roomLocation': self.location_name, 'roomID': self.id}
 
     def generate_name(self):
-        return u'{}-{}-{}'.format(
-            self.building,
-            self.floor,
-            self.number
+        return self.location.room_name_format.format(
+            building=self.building,
+            floor=self.floor,
+            number=self.number
         )
-
-    def update_name(self):
-        if not self.has_special_name and self.building and self.floor and self.number:
-            self.name = self.generate_name()
 
     @classmethod
     def find_all(cls, *args, **kwargs):
@@ -489,7 +495,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
 
         only_active = kwargs.pop('only_active', True)
         filters = kwargs.pop('filters', None)
-        order = kwargs.pop('order', [Location.name, Room.building, Room.floor, Room.number, Room.name])
+        order = kwargs.pop('order', [Location.name, Room.building, Room.floor, Room.number, Room.verbose_name])
         if kwargs:
             raise ValueError('Unexpected kwargs: {}'.format(kwargs))
 
@@ -641,7 +647,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
                 raise ValueError('Unexpected availability value')
 
         free_search_columns = (
-            'name', 'site', 'division', 'building', 'floor', 'number', 'telephone', 'key_location', 'comments'
+            'full_name', 'site', 'division', 'building', 'floor', 'number', 'telephone', 'key_location', 'comments'
         )
         if filters.get('details'):
             # Attributes are stored JSON-encoded, so we need to JSON-encode the provided string and remove the quotes

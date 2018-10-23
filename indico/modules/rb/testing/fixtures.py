@@ -108,11 +108,10 @@ def create_room(db, dummy_location, dummy_user):
         params.setdefault('building', u'1')
         params.setdefault('floor', u'2')
         params.setdefault('number', u'3')
-        params.setdefault('name', '')
         params.setdefault('owner', dummy_user)
         params.setdefault('location', dummy_location)
+        params.setdefault('verbose_name', None)
         room = Room(**params)
-        room.update_name()
         db.session.add(room)
         db.session.flush()
         return room

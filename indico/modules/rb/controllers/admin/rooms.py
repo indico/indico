@@ -65,7 +65,7 @@ class RHRoomBookingCreateModifyRoomBase(RHRoomBookingAdminBase):
         # Default values
         defaults = None
         if room.id is not None:
-            skip_name = set() if room.has_special_name else {'name'}
+            skip_name = set() if room.verbose_name else {'name'}
             defaults = FormDefaults(room, skip_attrs={'nonbookable_periods', 'bookable_hours'} | skip_name)
             for ra in room.attributes.all():
                 defaults['attribute_{}'.format(ra.attribute_id)] = ra.value

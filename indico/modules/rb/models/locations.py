@@ -14,10 +14,12 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+import re
 from collections import defaultdict
 from datetime import time
 
 from sqlalchemy import func
+from sqlalchemy.ext.hybrid import hybrid_property
 
 from indico.core.db import db
 from indico.modules.rb.models.aspects import Aspect
@@ -26,6 +28,9 @@ from indico.util.decorators import classproperty
 from indico.util.i18n import _
 from indico.util.locators import locator_property
 from indico.util.string import return_ascii
+
+
+ROOM_NAME_TPL_RE = re.compile(r'%(\d)\$s')
 
 
 class Location(db.Model):
@@ -75,6 +80,33 @@ class Location(db.Model):
         nullable=False,
         default=''
     )
+    _room_name_format = db.Column(
+        'room_name_format',
+        db.String,
+        nullable=False,
+        default=u'%1$s/%2$s-%3$s'
+    )
+
+    #: The format used to display room names (with placeholders)
+    @hybrid_property
+    def room_name_format(self):
+        """Translate Postgres' format syntax (e.g. `%1$s/%2$s-%3$s`) to Python's."""
+        placeholders = ['building', 'floor', 'number']
+        return ROOM_NAME_TPL_RE.sub(
+            lambda m: '{%s}' % placeholders[int(m.group(1)) - 1],
+            self._room_name_format
+        )
+    @room_name_format.expression
+    def room_name_format(cls):
+        return cls._room_name_format
+
+    @room_name_format.setter
+    def room_name_format(self, value):
+        self._room_name_format = value.format(
+            building='%1$s',
+            floor='%2$s',
+            number='%3$s'
+        )
 
     aspects = db.relationship(
         'Aspect',
