@@ -41,12 +41,14 @@ export function roomSearchSelectorFactory(namespace) {
 
     const getSearchResultsForMap = createSelector(
         getSearchResults,
-        rooms => rooms.map(room => ({
-            id: room.id,
-            name: room.full_name,
-            lat: room.latitude,
-            lng: room.longitude,
-        }))
+        rooms => rooms
+            .filter(room => room.latitude !== null && room.longitude !== null)
+            .map(room => ({
+                id: room.id,
+                name: room.full_name,
+                lat: room.latitude,
+                lng: room.longitude,
+            }))
     );
 
     return {
