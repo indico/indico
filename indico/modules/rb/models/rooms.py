@@ -161,11 +161,11 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
     surface_area = db.Column(
         db.Integer
     )
-    latitude = db.Column(
-        db.String
-    )
     longitude = db.Column(
-        db.String
+        db.Float
+    )
+    latitude = db.Column(
+        db.Float
     )
     comments = db.Column(
         db.String

@@ -42,10 +42,10 @@ def _filter_coordinates(query, filters):
     except KeyError:
         return query
 
-    return query.filter(db.cast(Room.latitude, db.Float) >= sw_lat,
-                        db.cast(Room.latitude, db.Float) <= ne_lat,
-                        db.cast(Room.longitude, db.Float) >= sw_lng,
-                        db.cast(Room.longitude, db.Float) <= ne_lng)
+    return query.filter(Room.latitude >= sw_lat,
+                        Room.latitude <= ne_lat,
+                        Room.longitude >= sw_lng,
+                        Room.longitude <= ne_lng)
 
 
 def _make_room_text_filter(text):

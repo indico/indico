@@ -44,8 +44,8 @@ export function roomSearchSelectorFactory(namespace) {
         rooms => rooms.map(room => ({
             id: room.id,
             name: room.full_name,
-            lat: parseFloat(room.latitude),
-            lng: parseFloat(room.longitude),
+            lat: room.latitude,
+            lng: room.longitude,
         }))
     );
 
