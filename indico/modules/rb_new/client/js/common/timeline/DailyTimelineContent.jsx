@@ -20,7 +20,7 @@ import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
 import {AutoSizer, List, WindowScroller} from 'react-virtualized';
-import {Dimmer, Icon, Loader, Popup} from 'semantic-ui-react';
+import {Icon, Placeholder, Popup} from 'semantic-ui-react';
 import LazyScroll from 'redux-lazy-scroll';
 import {Translate} from 'indico/react/i18n';
 import {TooltipIfTruncated} from 'indico/react/components';
@@ -41,7 +41,6 @@ export default class DailyTimelineContent extends React.Component {
         itemClass: PropTypes.func,
         itemProps: PropTypes.object,
         isLoading: PropTypes.bool,
-        inlineLoader: PropTypes.bool,
         lazyScroll: PropTypes.object,
         minHour: PropTypes.number,
         maxHour: PropTypes.number,
@@ -59,7 +58,6 @@ export default class DailyTimelineContent extends React.Component {
         itemClass: TimelineItem,
         itemProps: {},
         isLoading: false,
-        inlineLoader: false,
         lazyScroll: null,
         minHour: 6,
         maxHour: 22,
@@ -142,9 +140,7 @@ export default class DailyTimelineContent extends React.Component {
     }
 
     renderList(hourSpan, width, height, extraProps = {}) {
-        const {
-            rows, hourStep, longLabel, isLoading, inlineLoader
-        } = this.props;
+        const {rows, hourStep, longLabel, isLoading} = this.props;
         const {selectable} = this.state;
         const labelWidth = longLabel ? 200 : 150;
 
@@ -160,11 +156,6 @@ export default class DailyTimelineContent extends React.Component {
                     {this.renderDividers(hourSpan, hourStep)}
                 </div>
                 <div>
-                    {isLoading && !inlineLoader && (
-                        <Dimmer active inverted style={{zIndex: 1}}>
-                            <Loader active />
-                        </Dimmer>
-                    )}
                     <List width={width}
                           height={height}
                           rowCount={rows.length}
@@ -175,7 +166,15 @@ export default class DailyTimelineContent extends React.Component {
                           )}
                           {...extraProps}
                           tabIndex={null} />
-                    {isLoading && inlineLoader && <Loader active styleName="timeline-loader" />}
+                    {isLoading && (
+                        _.range(0, 10).map((i) => (
+                            <Placeholder key={i} styleName="timeline-item-placeholder" fluid>
+                                <Placeholder.Paragraph>
+                                    <Placeholder.Line />
+                                </Placeholder.Paragraph>
+                            </Placeholder>
+                        ))
+                    )}
                 </div>
             </div>
         );
