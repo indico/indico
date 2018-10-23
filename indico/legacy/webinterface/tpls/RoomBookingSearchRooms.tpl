@@ -285,22 +285,6 @@ ${ contextHelp('chooseButtonHelp') }
             isValid = false;
         }
 
-        // Holidays warning
-        if (isValid && !onSubmit) {
-            var lastDateInfo = searchForm.data('lastDateInfo');
-            var dateInfo = $('#sDay, #sMonth, #sYear, #eDay, #eMonth, #eYear').serialize();
-            if (dateInfo != lastDateInfo) {
-                searchForm.data('lastDateInfo', dateInfo);
-                var holidaysWarning = indicoSource('roomBooking.getDateWarning', searchForm.serializeObject());
-
-                holidaysWarning.state.observe(function(state) {
-                    if (state == SourceState.Loaded) {
-                        $E('holidays-warning').set(holidaysWarning.get());
-                    }
-                });
-            }
-        }
-
         if (!$('#sdate').val()) {
             $('#sdate').addClass('invalid');
             isValid = false;

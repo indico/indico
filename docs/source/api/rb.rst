@@ -46,10 +46,6 @@ Models
     :members:
     :undoc-members:
 
-.. automodule:: indico.modules.rb.models.holidays
-    :members:
-    :undoc-members:
-
 .. automodule:: indico.modules.rb.models.locations
     :members:
     :undoc-members:

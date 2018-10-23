@@ -58,7 +58,6 @@
                 <input name="start_time" id="start_time" maxlength="5" size="4" type="text" value="${ formatTime(default_start_dt, format='HH:mm') }"/>
                 &nbsp;&mdash;&nbsp;
                 <input name="end_time" id="end_time" maxlength="5" size="4" type="text" value="${ formatTime(default_end_dt, format='HH:mm') }"/>
-                <span id="holidays-warning" style="color: Red; font-weight:bold;"></span>
             </td>
         </tr>
         <tr id="repTypeTR" >

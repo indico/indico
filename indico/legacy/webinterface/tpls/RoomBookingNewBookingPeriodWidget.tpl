@@ -43,9 +43,6 @@
                 </div>
             </div>
         % endif
-        <div id="holidays-warning" class="info-message-box" style="display: none">
-            <div class="message-text"></div>
-        </div>
         % if past_date:
             <div class="highlight-message-box js-default-date-warning">
                 <div class="message-text">
@@ -110,27 +107,6 @@ ${ form.repeat_interval(type='hidden') }
             $('#end_dt').val('{0} {1}'.format(endDate, endTime));
         }
 
-        function checkHolidays() {
-            var data = {};
-            var repeat_frequency = $('input[name=repeat_frequency]:checked').val();
-
-            data.start_date = moment($('#start_dt').val(), 'D/MM/YYYY H:m').format('YYYY-MM-D');
-            if (repeat_frequency !== '0') {
-                data.end_date = moment($('#end_dt').val(), 'D/MM/YYYY H:m').format('YYYY-MM-D')
-            } else {
-                data.end_date = data.start_date;
-            }
-
-            var holidaysWarning = indicoSource('roomBooking.getDateWarning', data);
-            holidaysWarning.state.observe(function(state) {
-                if (state == SourceState.Loaded) {
-                    var msg = holidaysWarning.get();
-                    $('#holidays-warning .message-text').html(msg);
-                    $('#holidays-warning').toggle(!!msg);
-                }
-            });
-        }
-
         function disableInvalidDays() {
             var startDate = $('#sDatePlace').datepicker('getDate');
             var endMonth = +$('#eDatePlace .ui-datepicker-month').val();
@@ -172,7 +148,6 @@ ${ form.repeat_interval(type='hidden') }
         function commonOnSelect() {
             $('.js-default-date-warning').fadeOut();
             combineDatetime();
-            checkHolidays();
             validateForm();
         }
 
@@ -335,7 +310,6 @@ ${ form.repeat_interval(type='hidden') }
         });
 
         checkFrequency();
-        checkHolidays();
 
         % if not can_override:
             % if form.start_dt.data < datetime.now():

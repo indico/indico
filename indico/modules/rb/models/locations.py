@@ -142,13 +142,6 @@ class Location(db.Model):
         cascade='all, delete-orphan'
     )
 
-    holidays = db.relationship(
-        'Holiday',
-        backref='location',
-        cascade='all, delete-orphan',
-        lazy='dynamic'
-    )
-
     # relationship backrefs:
     # - breaks (Break.own_venue)
     # - contributions (Contribution.own_venue)

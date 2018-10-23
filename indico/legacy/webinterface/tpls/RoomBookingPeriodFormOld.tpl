@@ -22,7 +22,6 @@
         <td align="left" class="blacktext">
             <input name="sTime" id="sTime" maxlength="5" size="5" type="text" value="${ startT }"> &nbsp;&mdash;&nbsp;
             <input name="eTime" id="eTime" maxlength="5" size="5" type="text" value="${ endT }">
-            <span id="holidays-warning" style="color: Red; font-weight:bold;"></span>
         </td>
     </tr>
     <tr id="repTypeTR" >

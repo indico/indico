@@ -16,15 +16,12 @@
 
 from importlib import import_module
 
-from indico.modules.rb import services as rb_services
 from indico.modules.rb.services import aspects as rb_aspect_services
 from indico.modules.rb.services import blockings as rb_blocking_services
 from indico.modules.rb.services import rooms as rb_room_services
 
 
 methodMap = {
-    # rb base
-    'roomBooking.getDateWarning': rb_services.GetDateWarning,
     # rb rooms
     'roomBooking.rooms.availabilitySearch': rb_room_services.RoomBookingAvailabilitySearchRooms,
     'roomBooking.locationsAndRooms.listWithGuids': rb_room_services.RoomBookingListLocationsAndRoomsWithGuids,

@@ -362,10 +362,6 @@ def iterdays(start, end, skip_weekends=False, day_whitelist=None, day_blacklist=
         yield day
 
 
-def is_weekend(d):
-    return d.weekday() in [e.weekday for e in (SA, SU)]
-
-
 def get_datetime_from_request(prefix='', default=None, source=None):
     """Retrieves date and time from request data."""
     if source is None:
