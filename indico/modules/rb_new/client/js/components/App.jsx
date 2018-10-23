@@ -150,8 +150,8 @@ export default connect(
     dispatch => ({
         fetchInitialData() {
             dispatch(configActions.fetchConfig()).then(() => {
-                // we only need map aspects if the map is enabled, which depends on the config
-                dispatch(mapActions.fetchAspects());
+                // we only need map areas if the map is enabled, which depends on the config
+                dispatch(mapActions.fetchAreas());
             });
             dispatch(userActions.fetchUserInfo());
             dispatch(userActions.fetchFavoriteRooms());

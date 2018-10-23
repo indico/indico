@@ -19,10 +19,10 @@ import _ from 'lodash';
 import LatLon from 'geodesy/latlon-vectors';
 
 
-export function getAspectBounds(aspect) {
+export function getAreaBounds(area) {
     return {
-        SW: [aspect.top_left_latitude, aspect.top_left_longitude],
-        NE: [aspect.bottom_right_latitude, aspect.bottom_right_longitude]
+        SW: [area.top_left_latitude, area.top_left_longitude],
+        NE: [area.bottom_right_latitude, area.bottom_right_longitude]
     };
 }
 

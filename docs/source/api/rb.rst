@@ -26,10 +26,6 @@ Models
     :members:
     :undoc-members:
 
-.. automodule:: indico.modules.rb.models.aspects
-    :members:
-    :undoc-members:
-
 .. automodule:: indico.modules.rb.models.blockings
     :members:
     :undoc-members:
@@ -47,6 +43,10 @@ Models
     :undoc-members:
 
 .. automodule:: indico.modules.rb.models.locations
+    :members:
+    :undoc-members:
+
+.. automodule:: indico.modules.rb.models.map_areas
     :members:
     :undoc-members:
 

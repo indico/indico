@@ -22,7 +22,7 @@ import PropTypes from 'prop-types';
 import {Button, Checkbox, Dimmer, Dropdown, Loader, Popup, Sticky} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
 
-import {getAspectBounds, getMapBounds, getRoomListBounds, checkRoomsInBounds} from './util';
+import {getAreaBounds, getMapBounds, getRoomListBounds, checkRoomsInBounds} from './util';
 import RoomBookingMap, {RoomBookingMapControl} from './RoomBookingMap';
 import {actions as filtersActions} from '../filters';
 import * as mapActions from './actions';
@@ -33,7 +33,7 @@ import './MapController.module.scss';
 
 class MapController extends React.Component {
     static propTypes = {
-        aspects: PropTypes.array.isRequired,
+        areas: PropTypes.array.isRequired,
         rooms: PropTypes.arrayOf(PropTypes.object).isRequired,
         searchEnabled: PropTypes.bool.isRequired,
         mapData: PropTypes.shape({
@@ -60,17 +60,17 @@ class MapController extends React.Component {
 
     static getDerivedStateFromProps(props, prevState) {
         const {mapData: {bounds, filterBounds}} = props;
-        const aspectBounds = filterBounds || bounds;
+        const areaBounds = filterBounds || bounds;
         const prevProps = prevState.prevProps || props;
         if (!_.isEqual(prevProps, props)) {
             return {
                 ...prevState,
-                aspectBounds,
+                areaBounds,
                 prevProps: props
             };
         } else {
             return {
-                aspectBounds,
+                areaBounds,
                 ...prevState,
                 prevProps
             };
@@ -115,10 +115,10 @@ class MapController extends React.Component {
         this.setState({searchVisible: true});
     };
 
-    onChangeAspect(aspectIdx) {
-        const {aspects} = this.props;
+    onChangeArea(areaIndex) {
+        const {areas} = this.props;
         this.setState({
-            aspectBounds: getAspectBounds(aspects[aspectIdx])
+            areaBounds: getAreaBounds(areas[areaIndex])
         });
     }
 
@@ -133,15 +133,15 @@ class MapController extends React.Component {
     showAllRooms = () => {
         const {rooms} = this.props;
         this.setState({
-            aspectBounds: getRoomListBounds(rooms),
+            areaBounds: getRoomListBounds(rooms),
             allRoomsVisible: true
         });
     };
 
     render() {
-        const {searchEnabled, rooms, aspects, mapData: {bounds}, actions: {toggleMapSearch}} = this.props;
-        const {aspectBounds, loading, allRoomsVisible, searchVisible} = this.state;
-        const aspectOptions = Object.entries(aspects).map(([key, val]) => ({
+        const {searchEnabled, rooms, areas, mapData: {bounds}, actions: {toggleMapSearch}} = this.props;
+        const {areaBounds, loading, allRoomsVisible, searchVisible} = this.state;
+        const areaOptions = Object.entries(areas).map(([key, val]) => ({
             text: val.name,
             value: Number(key)
         }));
@@ -156,12 +156,12 @@ class MapController extends React.Component {
             </RoomBookingMapControl>
         );
 
-        const aspectsControl = !!aspects.length && (
+        const areasControl = !!areas.length && (
             <RoomBookingMapControl position="bottomleft">
-                <Dropdown placeholder={Translate.string('Select aspect')} selection upward
-                          options={aspectOptions} value={null}
-                          styleName="aspects-dropdown map-control-content"
-                          openOnFocus={false} onChange={(e, data) => this.onChangeAspect(data.value)} />
+                <Dropdown placeholder={Translate.string('Select area')} selection upward
+                          options={areaOptions} value={null}
+                          styleName="areas-dropdown map-control-content"
+                          openOnFocus={false} onChange={(e, data) => this.onChangeArea(data.value)} />
             </RoomBookingMapControl>
         );
 
@@ -186,16 +186,15 @@ class MapController extends React.Component {
                         <Dimmer inverted active={loading} styleName="map-dimmer">
                             <Loader />
                         </Dimmer>
-                        {!!aspectBounds && (
+                        {!!areaBounds && (
                             <RoomBookingMap mapRef={this.mapRef}
-                                            bounds={aspectBounds}
-                                            aspects={aspects}
+                                            bounds={areaBounds}
                                             rooms={rooms}
                                             onLoad={this.onMapLoad}
                                             onMove={this.onMove}
                                             onTouch={this.onTouch}>
                                 {searchControl}
-                                {aspectsControl}
+                                {areasControl}
                                 {showAllControl}
                             </RoomBookingMap>
                         )}
@@ -212,7 +211,7 @@ export default function mapControllerFactory(namespace, searchRoomSelectors) {
     const isMapSearchEnabled = mapSelectors.makeIsMapSearchEnabled(namespace);
     return connect(
         state => ({
-            aspects: mapSelectors.getMapAspects(state),
+            areas: mapSelectors.getMapAreas(state),
             rooms: searchRoomSelectors.getSearchResultsForMap(state),
             mapData: getMapData(state),
             searchEnabled: isMapSearchEnabled(state),

@@ -22,9 +22,9 @@ from sqlalchemy.orm import contains_eager
 from indico.core.db import db
 from indico.modules.rb import Location, Room
 from indico.modules.rb.controllers import RHRoomBookingBase
-from indico.modules.rb.models.aspects import Aspect
+from indico.modules.rb.models.map_areas import MapArea
 from indico.modules.rb_new.operations.locations import get_equipment_types
-from indico.modules.rb_new.schemas import aspects_schema, locations_schema
+from indico.modules.rb_new.schemas import locations_schema, map_areas_schema
 
 
 class RHLocations(RHRoomBookingBase):
@@ -40,9 +40,9 @@ class RHLocations(RHRoomBookingBase):
         return jsonify(locations_schema.dump(locations).data)
 
 
-class RHAspects(RHRoomBookingBase):
+class RHMapAreas(RHRoomBookingBase):
     def _process(self):
-        return jsonify(aspects_schema.dump(Aspect.query).data)
+        return jsonify(map_areas_schema.dump(MapArea.query).data)
 
 
 class RHEquipmentTypes(RHRoomBookingBase):

@@ -42,7 +42,7 @@ _bp.add_url_rule('/api/user/', 'user_info', misc.RHUserInfo)
 _bp.add_url_rule('/api/user/favorite-rooms/', 'favorite_rooms', rooms.RHRoomFavorites)
 _bp.add_url_rule('/api/user/favorite-rooms/<int:room_id>', 'favorite_rooms', rooms.RHRoomFavorites,
                  methods=('PUT', 'DELETE'))
-_bp.add_url_rule('/api/map/aspects', 'default_aspects', locations.RHAspects)
+_bp.add_url_rule('/api/map-areas', 'map_areas', locations.RHMapAreas)
 _bp.add_url_rule('/api/timeline', 'timeline', bookings.RHTimeline, methods=('GET', 'POST'))
 _bp.add_url_rule('/api/rooms/<int:room_id>/timeline', 'timeline', bookings.RHTimeline)
 _bp.add_url_rule('/api/calendar', 'calendar', bookings.RHCalendar, methods=('GET', 'POST'))

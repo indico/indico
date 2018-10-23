@@ -19,18 +19,18 @@ import {combineReducers} from 'redux';
 import {requestReducer} from 'indico/utils/redux';
 import * as mapActions from './actions';
 import * as globalActions from '../../actions';
-import {getAspectBounds} from './util';
+import {getAreaBounds} from './util';
 
 
 export default combineReducers({
     request: requestReducer(
-        mapActions.FETCH_ASPECTS_REQUEST,
-        mapActions.FETCH_ASPECTS_SUCCESS,
-        mapActions.FETCH_ASPECTS_ERROR
+        mapActions.FETCH_AREAS_REQUEST,
+        mapActions.FETCH_AREAS_SUCCESS,
+        mapActions.FETCH_AREAS_ERROR
     ),
-    aspects: (state = [], action) => {
+    areas: (state = [], action) => {
         switch (action.type) {
-            case mapActions.ASPECTS_RECEIVED:
+            case mapActions.AREAS_RECEIVED:
                 return action.data;
             default:
                 return state;
@@ -45,10 +45,10 @@ export function mapSearchReducerFactory(namespace) {
     };
 
     return (state = initialState, action) => {
-        // aspect updates are global and need to run regardless of the namespace
-        if (action.type === mapActions.ASPECTS_RECEIVED) {
-            const defaultAspect = action.data.find(aspect => aspect.is_default) || action.data[0];
-            return {...state, bounds: defaultAspect ? getAspectBounds(defaultAspect) : null};
+        // area updates are global and need to run regardless of the namespace
+        if (action.type === mapActions.AREAS_RECEIVED) {
+            const defaultArea = action.data.find(area => area.is_default) || action.data[0];
+            return {...state, bounds: defaultArea ? getAreaBounds(defaultArea) : null};
         }
 
         if (action.namespace !== namespace) {

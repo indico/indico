@@ -22,7 +22,7 @@ from sqlalchemy import func
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from indico.core.db import db
-from indico.modules.rb.models.aspects import Aspect
+from indico.modules.rb.models.map_areas import MapArea
 from indico.util.caching import memoize_request
 from indico.util.decorators import classproperty
 from indico.util.i18n import _

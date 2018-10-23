@@ -23,7 +23,7 @@
     height: calc(100vh - (#{$indico-top-bar-height} + #{$menu-height} + 2.5em*2));
 }
 
-.aspects-dropdown:global(.dropdown) {
+.areas-dropdown:global(.dropdown) {
     min-width: 10em;
 
     :global(.menu .item) {

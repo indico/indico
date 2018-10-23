@@ -24,11 +24,11 @@ from marshmallow.fields import Boolean, Function, Nested, String
 from marshmallow_enum import EnumField
 
 from indico.core.marshmallow import mm
-from indico.modules.rb.models.aspects import Aspect
 from indico.modules.rb.models.blocked_rooms import BlockedRoom, BlockedRoomState
 from indico.modules.rb.models.blocking_principals import BlockingPrincipal
 from indico.modules.rb.models.blockings import Blocking
 from indico.modules.rb.models.locations import Location
+from indico.modules.rb.models.map_areas import MapArea
 from indico.modules.rb.models.reservation_edit_logs import ReservationEditLog
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import RepeatFrequency, Reservation
@@ -64,9 +64,9 @@ class RoomSchema(mm.ModelSchema):
                                  'max_advance_days', 'owner_name')
 
 
-class AspectSchema(mm.ModelSchema):
+class MapAreaSchema(mm.ModelSchema):
     class Meta:
-        model = Aspect
+        model = MapArea
         fields = ('name', 'top_left_latitude', 'top_left_longitude', 'bottom_right_latitude', 'bottom_right_longitude',
                   'is_default')
 
@@ -220,7 +220,7 @@ rb_user_schema = RBUserSchema()
 rooms_schema = RoomSchema(many=True, only=_room_fields)
 room_details_schema = RoomSchema()
 room_attributes_schema = RoomAttributesSchema(many=True)
-aspects_schema = AspectSchema(many=True)
+map_areas_schema = MapAreaSchema(many=True)
 reservation_occurrences_schema = ReservationOccurrenceSchema(many=True)
 reservation_schema = ReservationSchema()
 reservation_details_schema = ReservationDetailsSchema()

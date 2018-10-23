@@ -20,8 +20,8 @@ from indico.core.db import db
 from indico.util.string import format_repr, return_ascii
 
 
-class Aspect(db.Model):
-    __tablename__ = 'aspects'
+class MapArea(db.Model):
+    __tablename__ = 'map_areas'
     __table_args__ = (db.Index(None, 'is_default', unique=True, postgresql_where=db.text('is_default')),
                       {'schema': 'roombooking'})
 
@@ -57,4 +57,4 @@ class Aspect(db.Model):
 
     @return_ascii
     def __repr__(self):
-        return format_repr(self, 'id', 'name')
+        return format_repr(self, 'id', 'name', is_default=False)

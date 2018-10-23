@@ -22,18 +22,18 @@ import {selectors as configSelectors} from '../config';
 
 const isFetching = ({map}) => map.request === RequestState.STARTED;
 
-export const getMapAspects = ({map}) => map.aspects;
+export const getMapAreas = ({map}) => map.areas;
 
 export const isMapEnabled = state => !!configSelectors.getTileServerURL(state);
 
-// the map is visible if it's enabled and we are fetching aspects OR actually have aspects
-// that way we don't have a larger room list for a moment while loading aspects, and the
-// map has its own loading indicator anyway while there are no aspects
+// the map is visible if it's enabled and we are fetching areas OR actually have areas
+// that way we don't have a larger room list for a moment while loading areas, and the
+// map has its own loading indicator anyway while there are no areas
 export const isMapVisible = createSelector(
     isMapEnabled,
     isFetching,
-    getMapAspects,
-    (mapEnabled, aspectsFetching, mapAspects) => mapEnabled && (aspectsFetching || !!mapAspects.length)
+    getMapAreas,
+    (mapEnabled, areasFetching, mapAreas) => mapEnabled && (areasFetching || !!mapAreas.length)
 );
 
 
