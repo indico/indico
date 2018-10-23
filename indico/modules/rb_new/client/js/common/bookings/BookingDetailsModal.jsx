@@ -160,8 +160,8 @@ class BookingDetailsModal extends React.Component {
         </Message>
     );
 
-    renderActionButtons = (canAccept, canCancel, canReject, isAccepted) => (
-        <div styleName="action-buttons">
+    renderActionButtons = (canCancel, canReject, showAccept) => (
+        <Modal.Actions>
             {canCancel && (
                 <Button type="button"
                         icon="remove circle"
@@ -175,14 +175,14 @@ class BookingDetailsModal extends React.Component {
                         size="small"
                         content={<Translate>Reject booking</Translate>} />
             )}
-            {!isAccepted && canAccept && (
+            {showAccept && (
                 <Button type="button"
                         icon="check circle"
                         color="green"
                         size="small"
                         content={<Translate>Accept booking</Translate>} />
             )}
-        </div>
+        </Modal.Actions>
     );
 
     render() {
@@ -200,7 +200,8 @@ class BookingDetailsModal extends React.Component {
         const legendLabels = [
             {label: Translate.string('Occurrence'), color: 'orange'},
         ];
-        const showActionButtons = (!isCancelled && !isRejected);
+        const showAccept = canAccept && !isAccepted;
+        const showActionButtons = (!isCancelled && !isRejected && (canCancel || canReject || showAccept));
         return (
             <Modal open onClose={this.handleCloseModal} size="large" closeIcon>
                 <Modal.Header styleName="booking-modal-header">
@@ -225,10 +226,10 @@ class BookingDetailsModal extends React.Component {
                             {bookedForUser && this.renderBookedFor(bookedForUser)}
                             {this.renderReason(bookingReason)}
                             {this.renderBookingHistory(editLogs, createdDt, createdByUser)}
-                            {showActionButtons && this.renderActionButtons(canAccept, canCancel, canReject, isAccepted)}
                         </Grid.Column>
                     </Grid>
                 </Modal.Content>
+                {showActionButtons && this.renderActionButtons(canCancel, canReject, showAccept)}
                 <Modal open={occurrencesVisible}
                        onClose={this.hideOccurrences}
                        size="large"
