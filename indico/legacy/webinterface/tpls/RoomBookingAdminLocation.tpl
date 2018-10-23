@@ -208,19 +208,6 @@
             </ul>
       </td>
     </tr>
-    <tr><td colspan="2"><hr /></td></tr>
-    <tr>
-      <td class="titleUpCellTD" style="width: 160px;">
-        <span class="titleCellFormat">
-          ${ _('Room map attributes') }
-        </span>
-      </td>
-      <td bgcolor="white" valign="top" class="blacktext" style="padding-left: 12px;">
-        <div id="AspectsListHolder">
-        </div>
-      </td>
-    </tr>
-
   </table>
   <br>
 
@@ -266,90 +253,6 @@
             }
         }).open();
     });
-
-
-var newAspectsHandler = function(newAspect, setResult) {
-    var killProgress = IndicoUI.Dialogs.Util.progress();
-    indicoRequest(
-        'roomBooking.mapaspects.create',
-        {
-            location: '${ location.name }',
-            aspect: newAspect
-        },
-        function(result, error) {
-            killProgress();
-            if (!error) {
-                setResult({ok: true, id: result});
-            } else {
-                showErrorDialog(error);
-                setResult(false);
-            }
-        }
-    );
-}
-
-var editAspectHandler = function(oldAspect, setResult, newAspect) {
-    var killProgress = IndicoUI.Dialogs.Util.progress();
-    indicoRequest(
-        'roomBooking.mapaspects.update',
-        {
-            location: '${ location.name }',
-            aspect: newAspect
-        },
-        function(result, error) {
-            killProgress();
-            if (!error) {
-                setResult(true);
-            } else {
-                showErrorDialog(error);
-                setResult(false);
-            }
-        }
-    );
-}
-
-var removeAspectHandler = function(aspect, setResult) {
-    var killProgress = IndicoUI.Dialogs.Util.progress();
-    indicoRequest(
-        'roomBooking.mapaspects.remove',
-        {
-            location: '${ location.name }',
-            aspectId: aspect.get('id')
-        },
-        function(result, error) {
-            killProgress();
-            if (!error) {
-                setResult(true);
-            } else {
-                showErrorDialog(error);
-                setResult(false);
-            }
-        }
-    );
-}
-
-indicoRequest(
-    'roomBooking.mapaspects.list',
-    {
-        location: '${ location.name }'
-    },
-    function(result, error) {
-        if (!error) {
-            var aspectsListField = new MapAspectListField(
-                'AspectsListDiv',
-                'user-list',
-                result,
-                newAspectsHandler,
-                editAspectHandler,
-                removeAspectHandler
-            );
-            $E('AspectsListHolder').set(aspectsListField.draw());
-        } else {
-            showErrorDialog(error);
-        }
-    }
-);
-
 </script>
 
 <!-- ============== Key Performance Indicators ================= -->

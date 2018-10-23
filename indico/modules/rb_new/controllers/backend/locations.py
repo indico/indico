@@ -22,6 +22,7 @@ from sqlalchemy.orm import contains_eager
 from indico.core.db import db
 from indico.modules.rb import Location, Room
 from indico.modules.rb.controllers import RHRoomBookingBase
+from indico.modules.rb.models.aspects import Aspect
 from indico.modules.rb_new.operations.locations import get_equipment_types
 from indico.modules.rb_new.schemas import aspects_schema, locations_schema
 
@@ -41,15 +42,7 @@ class RHLocations(RHRoomBookingBase):
 
 class RHAspects(RHRoomBookingBase):
     def _process(self):
-        if not Location.query.has_rows():
-            return jsonify([])
-
-        to_cast = ['top_left_latitude', 'top_left_longitude', 'bottom_right_latitude', 'bottom_right_longitude']
-        aspects = [
-            {k: float(v) if k in to_cast else v for k, v in aspect.viewitems()}
-            for aspect in aspects_schema.dump(Location.default_location.aspects).data
-        ]
-        return jsonify(aspects)
+        return jsonify(aspects_schema.dump(Aspect.query).data)
 
 
 class RHEquipmentTypes(RHRoomBookingBase):

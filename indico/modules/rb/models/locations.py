@@ -27,7 +27,7 @@ from indico.util.caching import memoize_request
 from indico.util.decorators import classproperty
 from indico.util.i18n import _
 from indico.util.locators import locator_property
-from indico.util.string import return_ascii
+from indico.util.string import format_repr, return_ascii
 
 
 class Location(db.Model):
@@ -61,16 +61,6 @@ class Location(db.Model):
         db.Boolean,
         nullable=False,
         default=False
-    )
-    default_aspect_id = db.Column(
-        db.Integer,
-        db.ForeignKey(
-            'roombooking.aspects.id',
-            use_alter=True,
-            name='fk_locations_default_aspect_id',
-            onupdate='CASCADE',
-            ondelete='SET NULL'
-        )
     )
     map_url_template = db.Column(
         db.String,
@@ -107,20 +97,6 @@ class Location(db.Model):
             number='%3$s'
         )
 
-    aspects = db.relationship(
-        'Aspect',
-        backref='location',
-        cascade='all, delete-orphan',
-        primaryjoin=(id == Aspect.location_id),
-        lazy='dynamic',
-    )
-
-    default_aspect = db.relationship(
-        'Aspect',
-        primaryjoin=default_aspect_id == Aspect.id,
-        post_update=True,
-    )
-
     rooms = db.relationship(
         'Room',
         backref='location',
@@ -151,11 +127,7 @@ class Location(db.Model):
 
     @return_ascii
     def __repr__(self):
-        return u'<Location({0}, {1}, {2})>'.format(
-            self.id,
-            self.default_aspect_id,
-            self.name
-        )
+        return format_repr(self, 'id', 'name')
 
     @locator_property
     def locator(self):
@@ -164,7 +136,8 @@ class Location(db.Model):
     @property
     @memoize_request
     def is_map_available(self):
-        return self.aspects.count() > 0
+        # XXX: Broken due to Aspect refactoring. Will be removed anyway.
+        return False
 
     @classproperty
     @classmethod

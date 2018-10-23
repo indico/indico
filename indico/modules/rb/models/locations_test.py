@@ -14,7 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from indico.modules.rb.models.aspects import Aspect
 from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.rooms import Room
 
@@ -24,15 +23,6 @@ pytest_plugins = 'indico.modules.rb.testing.fixtures'
 
 def test_locator(dummy_location):
     assert dummy_location.locator == {'locationId': dummy_location.name}
-
-
-def test_is_map_available(dummy_location, db):
-    assert not dummy_location.is_map_available
-    dummy_location.aspects.append(Aspect(name=u'Test', center_latitude=u'', center_longitude=u'', zoom_level=0,
-                                         top_left_latitude=0, top_left_longitude=0, bottom_right_latitude=0,
-                                         bottom_right_longitude=0))
-    db.session.flush()
-    assert dummy_location.is_map_available
 
 
 def test_default_location(create_location):

@@ -68,7 +68,7 @@ class AspectSchema(mm.ModelSchema):
     class Meta:
         model = Aspect
         fields = ('name', 'top_left_latitude', 'top_left_longitude', 'bottom_right_latitude', 'bottom_right_longitude',
-                  'default_on_startup')
+                  'is_default')
 
 
 class ReservationSchema(mm.ModelSchema):

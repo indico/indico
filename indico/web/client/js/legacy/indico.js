@@ -38,7 +38,6 @@ import './libs/indico/Core/Dragndrop.js';
 import './libs/indico/Core/keymap.js';
 
 import './libs/indico/Management/RoomBooking.js';
-import './libs/indico/Management/RoomBookingMapOfRooms.js';
 
 import './libs/indico/Legacy/Widgets.js';
 import './libs/indico/Legacy/Util.js';
