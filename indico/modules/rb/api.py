@@ -121,8 +121,8 @@ class RoomNameHook(RoomBookingHookBase):
         rooms_data = Room.get_with_data(
             'vc_equipment', 'non_vc_equipment', filters=[
                 Room.location_id == loc.id,
-                or_((Room.building + '-' + Room.floor + '-' + Room.number).ilike(search_str),
-                    Room.name.ilike(search_str))
+                or_(Room.name.ilike(search_str),
+                    Room.verbose_name.ilike(search_str))
             ])
 
         for result in rooms_data:

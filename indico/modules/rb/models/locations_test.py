@@ -16,6 +16,7 @@
 
 from indico.modules.rb.models.aspects import Aspect
 from indico.modules.rb.models.locations import Location
+from indico.modules.rb.models.rooms import Room
 
 
 pytest_plugins = 'indico.modules.rb.testing.fixtures'
@@ -40,6 +41,18 @@ def test_default_location(create_location):
     assert Location.default_location == location
     create_location(name=u'Bar')  # should not change the default
     assert Location.default_location == location
+
+
+def test_room_name_format(create_location, create_room, db, dummy_user):
+    location = create_location(u'Foo', is_default=True)
+    location.room_name_format = '{building}|{floor}|{number}'
+    assert location._room_name_format == '%1$s|%2$s|%3$s'
+
+    Room(building=1, floor=2, number=3, verbose_name='First amphitheater', location=location, owner=dummy_user)
+    Room(building=1, floor=3, number=4, verbose_name='Second amphitheater', location=location, owner=dummy_user)
+    Room(building=1, floor=2, number=4, verbose_name='Room 3', location=location, owner=dummy_user)
+    db.session.flush()
+    assert Room.query.filter(Room.full_name.contains('|3')).count() == 2
 
 
 def test_set_default(create_location):

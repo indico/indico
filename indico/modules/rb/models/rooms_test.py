@@ -64,27 +64,27 @@ def test_has_photo(db, dummy_room):
     assert dummy_room.has_photo
 
 
-@pytest.mark.parametrize(('building', 'floor', 'number', 'name', 'expected_name'), (
-    (u'1', u'2', u'3', u'',       u'1-2-3'),
-    (u'1', u'2', u'X', u'',       u'1-2-X'),
-    (u'1', u'X', u'3', u'',       u'1-X-3'),
-    (u'X', u'2', u'3', u'',       u'X-2-3'),
-    (u'1', u'2', u'3', u'Test',   u'1-2-3 - Test'),
-    (u'1', u'2', u'3', u'm\xf6p', u'1-2-3 - m\xf6p')
+@pytest.mark.parametrize(('building', 'floor', 'number', 'verbose_name', 'expected_name'), (
+    (u'1', u'2', u'3', None,      u'1/2-3'),
+    (u'1', u'2', u'X', None,      u'1/2-X'),
+    (u'1', u'X', u'3', None,      u'1/X-3'),
+    (u'X', u'2', u'3', None,      u'X/2-3'),
+    (u'1', u'2', u'3', u'Test',   u'1/2-3 - Test'),
+    (u'1', u'2', u'3', u'm\xf6p', u'1/2-3 - m\xf6p')
 ))
-def test_full_name(create_room, building, floor, number, name, expected_name):
-    room = create_room(building=building, floor=floor, number=number, name=name)
+def test_full_name(create_room, building, floor, number, verbose_name, expected_name):
+    room = create_room(building=building, floor=floor, number=number, verbose_name=verbose_name)
     assert room.full_name == expected_name
 
 
-@pytest.mark.parametrize(('name', 'expected'), (
-    (u'',      False),
-    (u'1-2-3', False),
-    (u'Test',  True),
+@pytest.mark.parametrize(('name',), (
+    (None,),
+    (u'1/2-3',),
+    (u'Test',)
 ))
-def test_has_special_name(create_room, name, expected):
-    room = create_room(name=name)
-    assert room.has_special_name == expected
+def test_name_stays_same(create_room, name):
+    room = create_room(verbose_name=name)
+    assert room.name == '1/2-3'
 
 
 @pytest.mark.parametrize(('value', 'expected'), (
@@ -270,34 +270,16 @@ def test_locator(dummy_location, dummy_room):
     assert dummy_room.locator == {'roomLocation': dummy_location.name, 'roomID': dummy_room.id}
 
 
-@pytest.mark.parametrize(('building', 'floor', 'number', 'name', 'expected_name'), (
-    (u'1', u'2', u'3', u'',       u'1-2-3'),
-    (u'1', u'2', u'X', u'',       u'1-2-X'),
-    (u'1', u'X', u'3', u'',       u'1-X-3'),
-    (u'X', u'2', u'3', u'',       u'X-2-3'),
-    (u'1', u'2', u'3', u'Test',   u'Test')
-))
-def test_update_name(create_room, building, floor, number, name, expected_name):
-    room = create_room()
-    room.building = building
-    room.floor = floor
-    room.number = number
-    room.name = name
-    assert room.name == name
-    room.update_name()
-    assert room.name == expected_name
-
-
 def test_find_all(create_location, create_room):
     # Here we just test if we get the rooms in natural sort order
     loc1 = create_location('Z')
     loc2 = create_location('A')
     data = [
-        (2, dict(location=loc1, building=u'1',   floor=u'2', number=u'3', name=u'')),
-        (3, dict(location=loc1, building=u'2',   floor=u'2', number=u'3', name=u'')),
-        (5, dict(location=loc1, building=u'100', floor=u'2', number=u'3', name=u'')),
-        (4, dict(location=loc1, building=u'10',  floor=u'2', number=u'3', name=u'')),
-        (1, dict(location=loc2, building=u'999', floor=u'2', number=u'3', name=u''))
+        (2, dict(location=loc1, building=u'1',   floor=u'2', number=u'3')),
+        (3, dict(location=loc1, building=u'2',   floor=u'2', number=u'3')),
+        (5, dict(location=loc1, building=u'100', floor=u'2', number=u'3')),
+        (4, dict(location=loc1, building=u'10',  floor=u'2', number=u'3')),
+        (1, dict(location=loc2, building=u'999', floor=u'2', number=u'3'))
     ]
     rooms = [(pos, create_room(**params)) for pos, params in data]
     sorted_rooms = map(itemgetter(1), sorted(rooms, key=itemgetter(0)))
@@ -534,7 +516,7 @@ def test_find_with_filters_availability_error():
         Room.find_with_filters(filters, None)
 
 
-@pytest.mark.parametrize('col', ('name', 'site', 'division', 'building', 'floor', 'number', 'telephone',
+@pytest.mark.parametrize('col', ('verbose_name', 'site', 'division', 'building', 'floor', 'number', 'telephone',
                                  'key_location', 'comments'))
 def test_find_with_filters_details_cols(db, dummy_room, create_room, col):
     create_room()  # some room we won't find!
