@@ -46,7 +46,7 @@ class SessionType(db.Model):
         db.String,
         nullable=False
     )
-    is_poster =db.Column(
+    is_poster = db.Column(
         db.Boolean,
         nullable=False,
         default=False
