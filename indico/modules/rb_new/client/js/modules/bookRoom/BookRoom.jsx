@@ -22,7 +22,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {bindActionCreators} from 'redux';
 import _ from 'lodash';
-import {Button, Card, Grid, Header, Icon, Label, Loader, Message, Popup, Sticky} from 'semantic-ui-react';
+import {Button, Card, Grid, Header, Icon, Label, Message, Popup, Sticky} from 'semantic-ui-react';
 import LazyScroll from 'redux-lazy-scroll';
 
 import {Overridable, Slot, toClasses} from 'indico/react/util';
@@ -30,6 +30,7 @@ import {PluralTranslate, Translate, Singular, Param, Plural} from 'indico/react/
 import {serializeTime, serializeDate} from 'indico/utils/date';
 import searchBarFactory from '../../components/SearchBar';
 import Room from '../../components/Room';
+import CardPlaceholder from '../../components/CardPlaceholder';
 import BookingFilterBar from './BookingFilterBar';
 import {roomFilterBarFactory} from '../../modules/roomList';
 import BookingTimeline from './BookingTimeline';
@@ -258,7 +259,9 @@ class BookRoom extends React.Component {
                 <>
                     <div className="ui" styleName="available-room-list" ref={ref => this.handleContextRef(ref, 'tileRef')}>
                         {this.renderFilters('tileRef')}
-                        {!isSearching && (
+                        {isSearching ? (
+                            <CardPlaceholder.Group count={20} />
+                        ) : (
                             <>
                                 <LazyScroll hasMore={this.hasMoreRooms()} loadMore={this.loadMoreRooms}>
                                     <Overridable id="RoomRenderer">
@@ -278,7 +281,6 @@ class BookRoom extends React.Component {
                                             )}
                                         </RoomRenderer>
                                     </Overridable>
-                                    <Loader active={isSearching} inline="centered" styleName="rooms-loader" />
                                 </LazyScroll>
                                 {this.renderSuggestions()}
                             </>

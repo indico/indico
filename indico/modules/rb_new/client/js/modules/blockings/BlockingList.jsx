@@ -19,9 +19,10 @@ import React from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
-import {Card, Container, Loader, Message} from 'semantic-ui-react';
+import {Card, Container, Message} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
 import BlockingCard from './BlockingCard';
+import CardPlaceholder from '../../components/CardPlaceholder';
 import BlockingFilterBar from './BlockingFilterBar';
 import * as blockingsActions from './actions';
 import * as blockingsSelectors from './selectors';
@@ -61,28 +62,35 @@ class BlockingList extends React.Component {
         );
     };
 
-    render() {
-        const {blockings, isFetching} = this.props;
+    renderContent = () => {
+        const {isFetching, blockings} = this.props;
         const blockingsList = Object.values(blockings);
+
+        if (isFetching) {
+            return <CardPlaceholder.Group count={10} className="blockings-placeholders" />;
+        } else if (blockingsList.length !== 0) {
+            return (
+                <Card.Group styleName="blockings-list" stackable>
+                    {blockingsList.map(this.renderBlocking)}
+                </Card.Group>
+            );
+        } else {
+            return (
+                <Message info>
+                    <Translate>
+                        There are no blockings.
+                    </Translate>
+                </Message>
+            );
+        }
+    };
+
+    render() {
         return (
             <>
                 <Container styleName="blockings-container" fluid>
                     <BlockingFilterBar />
-                    {!isFetching && blockingsList.length !== 0 && (
-                        <>
-                            <Card.Group styleName="blockings-list" stackable>
-                                {blockingsList.map(this.renderBlocking)}
-                            </Card.Group>
-                        </>
-                    )}
-                    {isFetching && <Loader inline="centered" active />}
-                    {!isFetching && blockingsList.length === 0 && (
-                        <Message info>
-                            <Translate>
-                                There are no blockings.
-                            </Translate>
-                        </Message>
-                    )}
+                    {this.renderContent()}
                 </Container>
             </>
         );

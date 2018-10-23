@@ -20,7 +20,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
-import {Button, Dropdown, Grid, Loader, Popup, Sticky} from 'semantic-ui-react';
+import {Button, Dropdown, Grid, Popup, Sticky} from 'semantic-ui-react';
 import {Route} from 'react-router-dom';
 import LazyScroll from 'redux-lazy-scroll';
 import {stateToQueryString} from 'redux-router-querystring';
@@ -31,6 +31,7 @@ import camelizeKeys from 'indico/utils/camelize';
 import {pushStateMergeProps} from '../../util';
 import roomFilterBarFactory from './RoomFilterBar';
 import searchBarFactory from '../../components/SearchBar';
+import CardPlaceholder from '../../components/CardPlaceholder';
 import {BlockingModal} from '../blockings';
 import {queryStringRules as queryStringSerializer} from '../../common/roomSearch';
 import {mapControllerFactory, selectors as mapSelectors} from '../../common/map';
@@ -191,7 +192,7 @@ class RoomList extends React.Component {
                             )}
                         </div>
                         {isSearching ? (
-                            <Loader active inline="centered" styleName="rooms-loader" />
+                            <CardPlaceholder.Group count={20} />
                         ) : (
                             <LazyScroll hasMore={this.hasMoreRooms()} loadMore={this.loadMoreRooms}>
                                 <Overridable id="RoomRenderer">

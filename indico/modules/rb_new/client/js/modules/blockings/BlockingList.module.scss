@@ -21,7 +21,7 @@
     height: 500px !important;
     width: 75% !important;
 
-    .blockings-list {
+    .blockings-list, :global(.blockings-placeholders) {
         margin-top: 10px;
     }
 }
