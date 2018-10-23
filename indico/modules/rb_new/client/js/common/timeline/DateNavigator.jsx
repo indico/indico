@@ -17,9 +17,8 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Button} from 'semantic-ui-react';
-import RCCalendar from 'rc-calendar';
-import DatePicker from 'rc-calendar/lib/Picker';
+import {Button, Popup} from 'semantic-ui-react';
+import CalendarSinglePicker from 'indico/react/components/CalendarSingleDatePicker.jsx';
 import {Translate} from 'indico/react/i18n';
 import {serializeDate, toMoment} from 'indico/utils/date';
 import {isDateWithinRange} from '../../util';
@@ -48,6 +47,10 @@ export default class DateNavigator extends React.Component {
         super(props);
         const {mode} = this.props;
         this.setDateWithMode(this.selectedDate, mode);
+
+        this.state = {
+            datePickerVisible: false
+        };
     }
 
     componentDidUpdate(prevProps) {
@@ -143,6 +146,7 @@ export default class DateNavigator extends React.Component {
             }
             this.setDateWithMode(date, mode, true);
         }
+        this.onClose();
     };
 
     changeSelectedDate = (direction) => {
@@ -184,7 +188,15 @@ export default class DateNavigator extends React.Component {
         );
     }
 
-    /*
+    onOpen = () => {
+        this.setState({datePickerVisible: true});
+    };
+
+    onClose = () => {
+        this.setState({datePickerVisible: false});
+    };
+
+    /**
      * Check whether a given date change (back/forward) would result
      * in a valid situation or not.
      *
@@ -215,11 +227,27 @@ export default class DateNavigator extends React.Component {
     */
     renderNavigator(disabled) {
         const {mode} = this.props;
+        const {datePickerVisible} = this.state;
 
-        const calendar = (
-            <RCCalendar disabledDate={this.calendarDisabledDate}
-                        onChange={this.onSelect}
-                        value={this.selectedDate} />
+        const calendarPicker = (
+            <Popup on="click"
+                   position="bottom left"
+                   open={datePickerVisible}
+                   onOpen={this.onOpen}
+                   onClose={this.onClose}
+                   keepInViewPort={false}
+                   trigger={
+                       <Button primary>
+                           {this.selectedDate.format('L')}
+                       </Button>
+                   }
+                   content={
+                       <CalendarSinglePicker date={this.selectedDate}
+                                             onDateChange={this.onSelect}
+                                             disabledDate={this.calendarDisabledDate}
+                                             noBorder />
+                   }
+                   hideOnScroll />
         );
         const prevDisabled = disabled || !this.isValidChange(-1, mode);
         const nextDisabled = disabled || !this.isValidChange(1, mode);
@@ -229,15 +257,7 @@ export default class DateNavigator extends React.Component {
                 <Button icon="left arrow"
                         onClick={() => this.changeSelectedDate('prev')}
                         disabled={prevDisabled} />
-                <DatePicker calendar={calendar} disabled={disabled}>
-                    {
-                        () => (
-                            <Button primary>
-                                {this.selectedDate.format('L')}
-                            </Button>
-                        )
-                    }
-                </DatePicker>
+                {calendarPicker}
                 <Button icon="right arrow"
                         onClick={() => this.changeSelectedDate('next')}
                         disabled={nextDisabled} />
