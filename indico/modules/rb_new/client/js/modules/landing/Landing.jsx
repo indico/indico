@@ -17,7 +17,6 @@
 
 import React from 'react';
 import {connect} from 'react-redux';
-import moment from 'moment';
 import PropTypes from 'prop-types';
 import {Card, Checkbox, Form, Grid} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
@@ -43,12 +42,6 @@ class Landing extends React.Component {
         text: null,
         extraState: {
             onlyFavorites: false
-        }
-    };
-
-    disabledDate = (current) => {
-        if (current) {
-            return current.isBefore(moment(), 'day');
         }
     };
 

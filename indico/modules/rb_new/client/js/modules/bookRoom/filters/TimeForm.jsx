@@ -17,7 +17,6 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import 'rc-time-picker/assets/index.css';
 
 import {serializeTime, toMoment} from 'indico/utils/date';
 import FilterFormComponent from '../../../common/filters/FilterFormComponent';
