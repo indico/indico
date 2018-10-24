@@ -20,9 +20,8 @@ import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
 import {Button, Form, Select} from 'semantic-ui-react';
-import RangeCalendar from 'rc-calendar/lib/RangeCalendar';
-import DatePicker from 'rc-calendar/lib/Picker';
 import SingleDatePicker from 'indico/react/components/SingleDatePicker';
+import DateRangePicker from 'indico/react/components/DateRangePicker';
 import {Translate} from 'indico/react/i18n';
 import {serializeDate, serializeTime} from 'indico/utils/date';
 import TimeRangePicker from './TimeRangePicker';
@@ -169,14 +168,6 @@ export default class BookingBootstrapForm extends React.Component {
         } = this.state;
 
         const {buttonCaption, buttonDisabled, children, dayBased} = this.props;
-
-        const rangeCalendar = (
-            <RangeCalendar onSelect={([start, end]) => this.updateDates(start, end)}
-                           selectedValue={[startDate, endDate]}
-                           disabledDate={this.disabledDate}
-                           format="L" />
-        );
-
         const recurrenceOptions = [
             {text: Translate.string('Weeks'), value: 'week'},
             {text: Translate.string('Months'), value: 'month'}
@@ -215,16 +206,10 @@ export default class BookingBootstrapForm extends React.Component {
                     </Form.Group>
                 )}
                 {['every', 'daily'].includes(type) && (
-                    <DatePicker calendar={rangeCalendar}>
-                        {
-                            () => (
-                                <Form.Group inline>
-                                    <Form.Input icon="calendar" value={moment(startDate).format('L') || ''} />
-                                    <Form.Input icon="calendar" value={moment(endDate).format('L') || ''} />
-                                </Form.Group>
-                            )
-                        }
-                    </DatePicker>
+                    <DateRangePicker startDate={startDate}
+                                     endDate={endDate}
+                                     onDatesChange={({startDate: sd, endDate: ed}) => this.updateDates(sd, ed)} />
+
                 )}
                 {type === 'single' && (
                     <SingleDatePicker date={startDate} onDateChange={(date) => this.updateDates(date, null)} />
