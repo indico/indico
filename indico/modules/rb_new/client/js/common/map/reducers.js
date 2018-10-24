@@ -18,6 +18,7 @@
 import {combineReducers} from 'redux';
 import {requestReducer} from 'indico/utils/redux';
 import * as mapActions from './actions';
+import * as globalActions from '../../actions';
 import {getAspectBounds} from './util';
 
 
@@ -59,6 +60,8 @@ export function mapSearchReducerFactory(namespace) {
                 return {...state, bounds: action.location};
             case mapActions.TOGGLE_MAP_SEARCH:
                 return {...state, search: action.search};
+            case globalActions.RESET_PAGE_STATE:
+                return {...state, search: false};
             default:
                 return state;
         }
