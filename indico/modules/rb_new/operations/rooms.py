@@ -50,7 +50,7 @@ def _filter_coordinates(query, filters):
 
 def _make_room_text_filter(text):
     text = '%{}%'.format(escape_like(text))
-    columns = ('name', 'site', 'division', 'building', 'floor', 'number', 'comments', 'full_name')
+    columns = ('site', 'division', 'building', 'floor', 'number', 'comments', 'full_name')
     return db.or_(getattr(Room, col).ilike(text) for col in columns)
 
 

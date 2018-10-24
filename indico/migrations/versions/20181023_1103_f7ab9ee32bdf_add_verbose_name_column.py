@@ -27,7 +27,7 @@ def upgrade():
 
 def downgrade():
     op.add_column('rooms',
-                  sa.Column('name', sa.VARCHAR(), autoincrement=False, nullable=True),
+                  sa.Column('name', sa.String(), nullable=True),
                   schema='roombooking')
     op.execute("UPDATE roombooking.rooms SET name = format('%s-%s-%s', building, floor, number) "
                "WHERE verbose_name IS NULL")

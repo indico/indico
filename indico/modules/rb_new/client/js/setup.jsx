@@ -15,10 +15,10 @@ import 'semantic-ui-css/semantic.css';
 import '../styles/main.scss';
 
 
-export default function setup(overrides = {}) {
+export default function setup(overrides = {}, postReducers = []) {
     document.addEventListener('DOMContentLoaded', () => {
         const appContainer = document.getElementById('rb-app-container');
-        const store = createRBStore(overrides);
+        const store = createRBStore(overrides, postReducers);
 
         store.dispatch(init());
         setupUserMenu(
