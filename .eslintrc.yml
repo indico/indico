@@ -15,6 +15,7 @@ settings:
   import/resolver:
     alias:
       map:
+        - ['indico/modules/rb_new', './indico/modules/rb_new/client/js']
         - ['indico', './indico/web/client/js']
       extensions: [.js, .jsx, .json]
   react:
