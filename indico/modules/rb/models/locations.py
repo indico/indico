@@ -30,9 +30,6 @@ from indico.util.locators import locator_property
 from indico.util.string import return_ascii
 
 
-ROOM_NAME_TPL_RE = re.compile(r'%(\d)\$s')
-
-
 class Location(db.Model):
     __tablename__ = 'locations'
     __table_args__ = {'schema': 'roombooking'}
@@ -92,10 +89,12 @@ class Location(db.Model):
     def room_name_format(self):
         """Translate Postgres' format syntax (e.g. `%1$s/%2$s-%3$s`) to Python's."""
         placeholders = ['building', 'floor', 'number']
-        return ROOM_NAME_TPL_RE.sub(
+        return re.sub(
+            r'%(\d)\$s',
             lambda m: '{%s}' % placeholders[int(m.group(1)) - 1],
             self._room_name_format
         )
+
     @room_name_format.expression
     def room_name_format(cls):
         return cls._room_name_format
