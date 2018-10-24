@@ -154,7 +154,7 @@ export default class FilterDropdown extends React.Component {
                    open={open}
                    onClose={onClose}
                    onOpen={this.handleOpen}
-                   hideOnScroll>
+                   closeOnTriggerBlur>
                 {form(fieldValues, this.setFieldValue, this.handleClose)}
                 <Button.Group size="small" floated="right" styleName="filter-dropdown-actions">
                     <Button content={Translate.string('Apply')}
