@@ -17,10 +17,9 @@
 
 import moment from 'moment';
 import React from 'react';
-import RangeCalendar from 'rc-calendar/lib/RangeCalendar';
 import PropTypes from 'prop-types';
 import CalendarSinglePicker from 'indico/react/components/CalendarSingleDatePicker.jsx';
-import 'rc-calendar/assets/index.css';
+import CalendarRangePicker from 'indico/react/components/CalendarRangeDatePicker.jsx';
 import {serializeDate, toMoment} from 'indico/utils/date';
 import FilterFormComponent from '../../../common/filters/FilterFormComponent';
 
@@ -74,17 +73,14 @@ export default class DateForm extends FilterFormComponent {
     render() {
         const {isRange, disabledDate} = this.props;
         const {startDate, endDate} = this.state;
-        const props = {
-            getPopupContainer: trigger => trigger.parentNode
-        };
         return isRange ? (
-            <RangeCalendar selectedValue={[startDate, endDate]}
-                           onSelect={async ([start, end]) => {
-                               await this.setDates(start, end);
-                           }}
-                           disabledDate={disabledDate || this.disabledDate}
-                           format="L"
-                           {...props} />
+            <CalendarRangePicker startDate={startDate}
+                                 endDate={endDate}
+                                 onDatesChange={async ({startDate: sd, endDate: ed}) => {
+                                     await this.setDates(sd, ed);
+                                 }}
+                                 disabledDate={disabledDate || this.disabledDate}
+                                 noBorder />
         ) : (
             <CalendarSinglePicker date={startDate}
                                   onDateChange={async (date) => {
