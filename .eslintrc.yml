@@ -13,7 +13,9 @@ settings:
   # but our custom resolver does the job just fine while still
   # being fast.
   import/resolver:
-    eslint-import-resolver-indico:
+    alias:
+      map:
+        - ['indico', './indico/web/client/js']
       extensions: [.js, .jsx, .json]
   react:
     version: '16.5.2'
