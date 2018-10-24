@@ -143,12 +143,12 @@ def create_room_attribute(db, dummy_location):
 
 
 @pytest.fixture
-def create_equipment_type(db, dummy_location):
+def create_equipment_type(db):
     """Returns a callable which let you create equipment types"""
 
-    def _create_equipment_type(name, **params):
-        params.setdefault('location', dummy_location)
-        eq = EquipmentType(name=name, **params)
+    def _create_equipment_type(name):
+        eq = EquipmentType(name=name)
+        db.session.add(eq)
         db.session.flush()
         return eq
 

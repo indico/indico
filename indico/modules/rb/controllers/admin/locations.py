@@ -102,7 +102,7 @@ class RHRoomBookingAdminLocation(RHRoomBookingAdminBase):
                                           location=self._location,
                                           rooms=rooms,
                                           action_succeeded=self._actionSucceeded,
-                                          equipment_types=self._location.equipment_types.all(),
+                                          equipment_types=EquipmentType.query.all(),
                                           attributes=self._location.attributes.all(),
                                           kpi=kpi).display()
 
@@ -161,7 +161,7 @@ class RHRoomBookingDeleteEquipment(RHRoomBookingEquipmentBase):
     PARAM = 'removeEquipmentName'
 
     def _process(self):
-        eq = self._location.equipment_types.filter_by(name=self._eq).one()
+        eq = EquipmentType.query.filter_by(name=self._eq).one()
         db.session.delete(eq)
         flash(_(u'Equipment deleted'), 'success')
         return redirect(url_for('rooms_admin.roomBooking-adminLocation', self._location))
@@ -172,6 +172,6 @@ class RHRoomBookingSaveEquipment(RHRoomBookingEquipmentBase):
 
     def _process(self):
         if self._eq:
-            self._location.equipment_types.append(EquipmentType(name=self._eq))
+            db.session.add(EquipmentType(name=self._eq))
             flash(_(u'Equipment added'), 'success')
         return redirect(url_for('rooms_admin.roomBooking-adminLocation', self._location))

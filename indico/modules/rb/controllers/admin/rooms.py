@@ -103,7 +103,7 @@ class RHRoomBookingCreateModifyRoomBase(RHRoomBookingAdminBase):
         form._attribute_fields = [field_ for name, field_ in form._fields.iteritems() if name.startswith('attribute_')]
 
         # Equipment
-        form.available_equipment.query = self._location.equipment_types.order_by(EquipmentType.name)
+        form.available_equipment.query = EquipmentType.query.order_by(EquipmentType.name)
 
         return form
 
