@@ -28,6 +28,7 @@ node_modules
 .idea/
 *.sublime-*
 .vscode/
+jsconfig.json
 
 # testing
 .coverage
