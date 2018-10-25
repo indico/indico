@@ -19,7 +19,7 @@ settings:
         - ['indico', './indico/web/client/js']
       extensions: [.js, .jsx, .json]
   react:
-    version: '16.5.2'
+    version: '16.6.0'
 
 rules:
   func-style:
