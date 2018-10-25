@@ -16,6 +16,7 @@
 
 import ast
 import json
+import warnings
 from datetime import date, time
 
 from sqlalchemy import and_, cast, func, or_
@@ -43,7 +44,7 @@ from indico.util.decorators import classproperty
 from indico.util.i18n import _
 from indico.util.locators import locator_property
 from indico.util.serializer import Serializer
-from indico.util.string import natural_sort_key, return_ascii
+from indico.util.string import format_repr, natural_sort_key, return_ascii
 from indico.util.user import unify_user_args
 from indico.web.flask.util import url_for
 
@@ -412,11 +413,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
 
     @return_ascii
     def __repr__(self):
-        return u'<Room({0}, {1}, {2})>'.format(
-            self.id,
-            self.location_id,
-            self.full_name
-        )
+        return format_repr(self, 'id', 'full_name')
 
     @cached(_cache)
     def has_equipment(self, *names):
@@ -467,6 +464,9 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         return {'roomLocation': self.location_name, 'roomID': self.id}
 
     def generate_name(self):
+        if self.location is None:
+            warnings.warn('Room has no location; using default name format')
+            return '{}/{}-{}'.format(self.building, self.floor, self.number)
         return self.location.room_name_format.format(
             building=self.building,
             floor=self.floor,
