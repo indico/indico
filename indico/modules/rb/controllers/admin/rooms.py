@@ -71,7 +71,7 @@ class RHRoomBookingCreateModifyRoomBase(RHRoomBookingAdminBase):
                 defaults['attribute_{}'.format(ra.attribute_id)] = ra.value
 
         # Custom attributes - new fields must be set on the class
-        for attribute in RoomAttribute.query.order_by(RoomAttribute.parent_id).all():
+        for attribute in RoomAttribute.query.all():
             validators = [DataRequired()] if attribute.is_required else []
             if attribute.name == 'notification-email':
                 validators.append(IndicoEmail(multi=True))

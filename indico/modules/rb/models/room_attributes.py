@@ -66,10 +66,6 @@ class RoomAttribute(db.Model):
         db.Integer,
         primary_key=True
     )
-    parent_id = db.Column(
-        db.Integer,
-        db.ForeignKey('roombooking.room_attributes.id')
-    )
     name = db.Column(
         db.String,
         nullable=False,
@@ -91,16 +87,7 @@ class RoomAttribute(db.Model):
         default=False
     )
 
-    children = db.relationship(
-        'RoomAttribute',
-        backref=db.backref(
-            'parent',
-            remote_side=[id]
-        )
-    )
-
     # relationship backrefs:
-    # - parent (RoomAttribute.children)
     # - room_associations (RoomAttributeAssociation.attribute)
 
     @return_ascii
