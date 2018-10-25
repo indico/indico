@@ -16,6 +16,7 @@
  */
 
 import fetchBookingDetailsURL from 'indico-url:rooms_new.booking_details';
+import bookingStateActionsURL from 'indico-url:rooms_new.booking_state_actions';
 
 import {indicoAxios} from 'indico/utils/axios';
 import {ajaxAction} from 'indico/utils/redux';
@@ -26,6 +27,11 @@ export const BOOKING_DETAILS_RECEIVED = 'bookings/BOOKING_DETAILS_RECEIVED';
 export const FETCH_BOOKING_DETAILS_REQUEST = 'bookings/FETCH_BOOKING_DETAILS_REQUEST';
 export const FETCH_BOOKING_DETAILS_SUCCESS = 'bookings/FETCH_BOOKING_DETAILS_SUCCESS';
 export const FETCH_BOOKING_DETAILS_ERROR = 'bookings/FETCH_BOOKING_DETAILS_ERROR';
+
+export const BOOKING_STATE_CHANGE_REQUEST = 'bookings/BOOKING_STATE_CHANGE_REQUEST';
+export const BOOKING_STATE_CHANGE_SUCCESS = 'bookings/BOOKING_STATE_CHANGE_SUCCESS';
+export const BOOKING_STATE_CHANGE_ERROR = 'bookings/BOOKING_STATE_CHANGE_ERROR';
+export const BOOKING_STATE_UPDATED = 'bookings/BOOKING_STATE_UPDATED';
 
 
 export function fetchBookingDetails(id) {
@@ -40,3 +46,14 @@ export function fetchBookingDetails(id) {
 }
 
 export const openBookingDetails = (bookingId) => modalActions.openModal('booking-details', bookingId);
+
+export function changeBookingStatus(id, action, params = {}) {
+    return async (dispatch) => {
+        return await ajaxAction(
+            () => indicoAxios.post(bookingStateActionsURL({booking_id: id, action}), params),
+            BOOKING_STATE_CHANGE_REQUEST,
+            [BOOKING_STATE_CHANGE_SUCCESS, BOOKING_STATE_UPDATED],
+            BOOKING_STATE_CHANGE_ERROR,
+        )(dispatch);
+    };
+}

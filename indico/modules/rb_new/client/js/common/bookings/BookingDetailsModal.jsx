@@ -17,15 +17,19 @@
 
 import moment from 'moment';
 import React from 'react';
-import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
-import {Button, Modal, Message, Grid, Header, Icon, Label, Popup, List} from 'semantic-ui-react';
+import {bindActionCreators} from 'redux';
+import {connect} from 'react-redux';
+import {Form as FinalForm, Field} from 'react-final-form';
+import {Button, Modal, Message, Form, Grid, Header, Icon, Label, Popup, List} from 'semantic-ui-react';
 import {Param, Translate} from 'indico/react/i18n';
 import {toMoment, serializeDate} from 'indico/utils/date';
+import {ReduxFormField, formatters} from 'indico/react/forms';
 import TimeInformation from '../../components/TimeInformation';
 import RoomBasicDetails from '../../components/RoomBasicDetails';
 import RoomKeyLocation from '../../components/RoomKeyLocation';
 import * as bookingsSelectors from './selectors';
+import * as bookRoomActions from './actions';
 import {DailyTimelineContent, TimelineLegend} from '../timeline';
 import {PopupParam} from '../../util';
 
@@ -35,7 +39,11 @@ import './BookingDetailsModal.module.scss';
 class BookingDetailsModal extends React.Component {
     static propTypes = {
         booking: PropTypes.object.isRequired,
+        bookingStateChangeInProgress: PropTypes.bool.isRequired,
         onClose: PropTypes.func,
+        actions: PropTypes.exact({
+            changeBookingStatus: PropTypes.func.isRequired,
+        }).isRequired,
     };
 
     static defaultProps = {
@@ -43,7 +51,8 @@ class BookingDetailsModal extends React.Component {
     };
 
     state = {
-        occurrencesVisible: false
+        occurrencesVisible: false,
+        actionInProgress: null,
     };
 
     handleCloseModal = () => {
@@ -160,52 +169,138 @@ class BookingDetailsModal extends React.Component {
         </Message>
     );
 
-    renderActionButtons = (canCancel, canReject, showAccept) => (
-        <Modal.Actions>
-            {canCancel && (
-                <Button type="button"
-                        icon="remove circle"
-                        size="small"
-                        content={<Translate>Cancel booking</Translate>} />
-            )}
-            {canReject && (
-                <Button type="button"
-                        icon="remove circle"
-                        color="red"
-                        size="small"
-                        content={<Translate>Reject booking</Translate>} />
-            )}
-            {showAccept && (
-                <Button type="button"
-                        icon="check circle"
-                        color="green"
-                        size="small"
-                        content={<Translate>Accept booking</Translate>} />
-            )}
-        </Modal.Actions>
-    );
+    renderActionButtons = (canCancel, canReject, showAccept) => {
+        const {bookingStateChangeInProgress} = this.props;
+        const {actionInProgress} = this.state;
+        const rejectButton = (
+            <Button type="button"
+                    icon="remove circle"
+                    color="red"
+                    size="small"
+                    loading={actionInProgress === 'reject' && bookingStateChangeInProgress}
+                    disabled={actionInProgress === 'approve' && bookingStateChangeInProgress}
+                    content={<Translate>Reject booking</Translate>} />
+        );
 
-    renderBookingStatus = ({isPending, isAccepted, isCancelled, isRejected}) => {
-        let color, status;
+        const validate = ({reason}) => {
+            const errors = {};
+            if (!reason) {
+                errors.reason = Translate.string('Rejection reason is required');
+            }
+            return errors;
+        };
 
-        if (isPending) {
-            color = 'yellow';
-            status = Translate.string('Pending Confirmation');
-        } else if (isCancelled) {
-            color = 'grey';
-            status = Translate.string('Cancelled');
-        } else if (isRejected) {
-            color = 'red';
-            status = Translate.string('Rejected');
-        } else if (isAccepted) {
-            color = 'green';
-            status = Translate.string('Valid');
-        }
+        const renderForm = ({handleSubmit, hasValidationErrors, submitSucceeded, submitting}) => {
+            return (
+                <Form styleName="rejection-form" onSubmit={handleSubmit}>
+                    <Field name="reason"
+                           component={ReduxFormField}
+                           as={Form.TextArea}
+                           format={formatters.trim}
+                           placeholder={Translate.string('Provide the rejection reason')}
+                           disabled={submitting}
+                           rows={2}
+                           autoFocus
+                           formatOnBlur />
+                    <Button type="submit"
+                            disabled={hasValidationErrors || submitSucceeded}
+                            loading={submitting}
+                            floated="right"
+                            primary>
+                        <Translate>Reject</Translate>
+                    </Button>
+                </Form>
+            );
+        };
 
         return (
+            <Modal.Actions>
+                {canCancel && (
+                    <Button type="button"
+                            icon="remove circle"
+                            size="small"
+                            content={<Translate>Cancel booking</Translate>}
+                            required />
+                )}
+                {canReject && (
+                    <Popup trigger={rejectButton}
+                           position="right center"
+                           on="click">
+                        <FinalForm onSubmit={(data) => this.changeState('reject', data)}
+                                   validate={validate}
+                                   render={renderForm}
+                                   initialValues={{reason: ''}} />
+                    </Popup>
+                )}
+                {showAccept && (
+                    <Button type="button"
+                            icon="check circle"
+                            color="green"
+                            size="small"
+                            onClick={() => this.changeState('approve')}
+                            loading={actionInProgress === 'approve' && bookingStateChangeInProgress}
+                            disabled={actionInProgress === 'reject' && bookingStateChangeInProgress}
+                            content={<Translate>Accept booking</Translate>} />
+                )}
+            </Modal.Actions>
+        );
+    };
+
+    changeState = (action, data = {}) => {
+        const {booking: {id}, actions: {changeBookingStatus}} = this.props;
+        this.setState({actionInProgress: action}, () => {
+            changeBookingStatus(id, action, data).then(() => {
+                this.setState({actionInProgress: null});
+            });
+        });
+    };
+
+    renderBookingStatus = ({isPending, isAccepted, isCancelled, isRejected, rejectionReason}) => {
+        let color, status, icon, message;
+
+        if (isPending) {
+            icon = <Icon name="wait" />;
+            color = 'yellow';
+            status = Translate.string('Pending Confirmation');
+            message = Translate.string('The booking is subject to acceptance by the room owner');
+        } else if (isCancelled) {
+            icon = <Icon name="cancel" />;
+            color = 'grey';
+            status = Translate.string('Cancelled');
+            message = Translate.string('The booking was cancelled');
+        } else if (isRejected) {
+            icon = <Icon name="calendar minus" />;
+            color = 'red';
+            status = Translate.string('Rejected');
+            message = (
+                <>
+                    <Translate>
+                        The booking was rejected.
+                    </Translate>
+                    <br />
+                    <Translate>
+                        Reason: <Param name="rejectionReason" value={rejectionReason} wrapper={<strong />} />
+                    </Translate>
+                </>
+            );
+        } else if (isAccepted) {
+            icon = <Icon name="checkmark" />;
+            color = 'green';
+            status = Translate.string('Accepted');
+            message = Translate.string('The booking was accepted');
+        }
+
+        const label = (
             <Label color={color}>
+                {icon}
                 {status}
             </Label>
+        );
+
+        return (
+            <Popup trigger={label}
+                   content={message}
+                   position="bottom center" />
         );
     };
 
@@ -280,6 +375,12 @@ class BookingDetailsModal extends React.Component {
 
 export default connect(
     (state, {bookingId}) => ({
-        booking: bookingsSelectors.getDetailsWithRoom(state, {bookingId})
-    })
+        booking: bookingsSelectors.getDetailsWithRoom(state, {bookingId}),
+        bookingStateChangeInProgress: bookingsSelectors.isBookingChangeInProgress(state),
+    }),
+    (dispatch) => ({
+        actions: bindActionCreators({
+            changeBookingStatus: bookRoomActions.changeBookingStatus,
+        }, dispatch),
+    }),
 )(BookingDetailsModal);
