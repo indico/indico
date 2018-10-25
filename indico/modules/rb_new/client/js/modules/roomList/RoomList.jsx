@@ -92,11 +92,11 @@ class RoomList extends React.Component {
     };
 
     clearSelectionMode = () => {
-        this.setState({selectionMode: null, selection: []});
+        this.setState({selectionMode: null, selection: {}});
     };
 
     setSelectionMode = (type) => () => {
-        this.setState({selectionMode: type, selection: []});
+        this.setState({selectionMode: type, selection: {}});
     };
 
     hasMoreRooms = () => {
@@ -198,7 +198,7 @@ class RoomList extends React.Component {
                                 <Overridable id="RoomRenderer">
                                     <RoomRenderer rooms={this.visibleRooms}
                                                   selectedRooms={selection}
-                                                  inSelectionMode={selectionMode}
+                                                  inSelectionMode={!!selectionMode}
                                                   onSelectRoom={this.onSelectRoom}>
                                         {({id}) => (
                                             <Slot name="actions">

@@ -59,7 +59,7 @@ class BlockingModal extends React.Component {
             startDate: PropTypes.string,
             endDate: PropTypes.string,
             reason: PropTypes.string,
-            createdById: PropTypes.number
+            createdBy: PropTypes.string
         }),
         actions: PropTypes.exact({
             createBlocking: PropTypes.func.isRequired,
@@ -257,14 +257,16 @@ class BlockingModal extends React.Component {
                     <Form id="blocking-form" {...formProps}>
                         <Grid>
                             <Grid.Column width={8}>
-                                <Message icon info floating>
-                                    <Icon name="user" />
-                                    <Message.Content>
-                                        <Translate>
-                                            Blocking created by <Param name="createdBy" value={blocking.createdBy} />
-                                        </Translate>
-                                    </Message.Content>
-                                </Message>
+                                {mode !== 'create' && (
+                                    <Message icon info floating>
+                                        <Icon name="user" />
+                                        <Message.Content>
+                                            <Translate>
+                                                Blocking created by <Param name="createdBy" value={blocking.createdBy} />
+                                            </Translate>
+                                        </Message.Content>
+                                    </Message>
+                                )}
                                 <Message icon info>
                                     <Icon name="lightbulb" />
                                     <Message.Content>
