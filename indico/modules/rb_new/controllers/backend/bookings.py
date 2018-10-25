@@ -22,7 +22,7 @@ from flask import jsonify, request, session
 from marshmallow import fields
 from marshmallow_enum import EnumField
 from webargs.flaskparser import use_args, use_kwargs
-from werkzeug.exceptions import NotFound
+from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.core.db import db
 from indico.core.errors import NoReportError
@@ -153,3 +153,26 @@ class RHBookingDetails(RHRoomBookingBase):
         booking_details['occurrences'] = occurrences
         booking_details['date_range'] = date_range
         return jsonify(booking_details)
+
+
+class RHBookingStateActions(RHRoomBookingBase):
+    def _check_access(self):
+        RHRoomBookingBase._check_access(self)
+        if self.action == 'approve':
+            if not self.booking.can_be_accepted(session.user):
+                raise Forbidden
+        elif self.action == 'reject':
+            if not self.booking.can_be_rejected(session.user):
+                raise Forbidden
+
+    def _process_args(self):
+        self.booking = Reservation.get_one(request.view_args['booking_id'])
+        self.action = request.view_args['action']
+
+    def _process(self):
+        if self.action == 'approve':
+            self.booking.accept(session.user)
+        elif self.action == 'reject':
+            reason = request.json['reason']
+            self.booking.reject(session.user, reason)
+        return jsonify(booking=reservation_details_schema.dump(self.booking).data)

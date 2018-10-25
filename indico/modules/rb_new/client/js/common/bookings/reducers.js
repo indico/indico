@@ -27,13 +27,22 @@ export default combineReducers({
             bookingsActions.FETCH_BOOKING_DETAILS_REQUEST,
             bookingsActions.FETCH_BOOKING_DETAILS_SUCCESS,
             bookingsActions.FETCH_BOOKING_DETAILS_ERROR
-        )
+        ),
+        changePreBookingState: requestReducer(
+            bookingsActions.BOOKING_STATE_CHANGE_REQUEST,
+            bookingsActions.BOOKING_STATE_CHANGE_SUCCESS,
+            bookingsActions.BOOKING_STATE_CHANGE_ERROR
+        ),
     }),
     details: (state = {}, action) => {
         switch (action.type) {
             case bookingsActions.BOOKING_DETAILS_RECEIVED: {
-                const {id, ...data} = camelizeKeys(action.data);
-                return {...state, [id]: data};
+                const data = camelizeKeys(action.data);
+                return {...state, [data.id]: data};
+            }
+            case bookingsActions.BOOKING_STATE_UPDATED: {
+                const data = camelizeKeys(action.data.booking);
+                return {...state, [data.id]: {...state[data.id], ...data}};
             }
             default:
                 return state;

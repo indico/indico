@@ -125,7 +125,7 @@ class ReservationDetailsSchema(mm.ModelSchema):
         model = Reservation
         fields = ('id', 'start_dt', 'end_dt', 'repetition', 'booking_reason', 'created_dt', 'booked_for_user',
                   'room_id', 'created_by_user', 'edit_logs', 'can_accept', 'can_cancel', 'can_delete', 'can_modify',
-                  'can_reject', 'is_cancelled', 'is_rejected', 'is_accepted', 'is_pending')
+                  'can_reject', 'is_cancelled', 'is_rejected', 'is_accepted', 'is_pending', 'rejection_reason')
 
 
 class BlockedRoomSchema(mm.ModelSchema):

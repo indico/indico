@@ -14,7 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
+
 import {createSelector} from 'reselect';
+import {RequestState} from 'indico/utils/redux';
 import {selectors as roomsSelectors} from '../../common/rooms';
 
 
@@ -28,3 +30,6 @@ export const getDetailsWithRoom = createSelector(
     }
 );
 export const hasDetails = (state, {bookingId}) => getDetails(state, {bookingId}) !== undefined;
+export const isBookingChangeInProgress = ({bookings}) => (
+    bookings.requests.changePreBookingState.state === RequestState.STARTED
+);
