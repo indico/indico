@@ -17,7 +17,7 @@
 from sqlalchemy.dialects.postgresql import JSON
 
 from indico.core.db import db
-from indico.util.string import return_ascii
+from indico.util.string import format_repr, return_ascii
 
 
 class RoomAttributeAssociation(db.Model):
@@ -60,8 +60,7 @@ class RoomAttributeAssociation(db.Model):
 
 class RoomAttribute(db.Model):
     __tablename__ = 'room_attributes'
-    __table_args__ = (db.UniqueConstraint('name', 'location_id'),
-                      {'schema': 'roombooking'})
+    __table_args__ = {'schema': 'roombooking'}
 
     id = db.Column(
         db.Integer,
@@ -74,28 +73,22 @@ class RoomAttribute(db.Model):
     name = db.Column(
         db.String,
         nullable=False,
-        index=True
+        index=True,
+        unique=True
     )
     title = db.Column(
         db.String,
         nullable=False
     )
-    location_id = db.Column(
-        db.Integer,
-        db.ForeignKey('roombooking.locations.id'),
-        nullable=False
-    )
-    type = db.Column(
-        db.String,
-        nullable=False
-    )
     is_required = db.Column(
         db.Boolean,
-        nullable=False
+        nullable=False,
+        default=False
     )
     is_hidden = db.Column(
         db.Boolean,
-        nullable=False
+        nullable=False,
+        default=False
     )
 
     children = db.relationship(
@@ -107,10 +100,9 @@ class RoomAttribute(db.Model):
     )
 
     # relationship backrefs:
-    # - location (Location.attributes)
     # - parent (RoomAttribute.children)
     # - room_associations (RoomAttributeAssociation.attribute)
 
     @return_ascii
     def __repr__(self):
-        return u'<RoomAttribute({}, {}, {})>'.format(self.id, self.name, self.location.name)
+        return format_repr(self, 'id', 'name')

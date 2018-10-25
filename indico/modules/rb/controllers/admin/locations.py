@@ -103,7 +103,7 @@ class RHRoomBookingAdminLocation(RHRoomBookingAdminBase):
                                           rooms=rooms,
                                           action_succeeded=self._actionSucceeded,
                                           equipment_types=EquipmentType.query.all(),
-                                          attributes=self._location.attributes.all(),
+                                          attributes=RoomAttribute.query.all(),
                                           kpi=kpi).display()
 
 
@@ -114,7 +114,7 @@ class RHRoomBookingDeleteCustomAttribute(RHRoomBookingAdminBase):
         self._attr = request.args.get('removeCustomAttributeName', '')
 
     def _process(self):
-        attr = self._location.attributes.filter_by(name=self._attr).one()
+        attr = RoomAttribute.query.filter_by(name=self._attr).one()
         db.session.delete(attr)
         flash(_(u'Custom attribute deleted'), 'success')
         return redirect(url_for('rooms_admin.roomBooking-adminLocation', self._location))
@@ -132,16 +132,16 @@ class RHRoomBookingSaveCustomAttribute(RHRoomBookingAdminBase):
             if self._location.get_attribute_by_name(attr_name):
                 raise BadRequest(_('There is already an attribute named: {0}').format(attr_name))
 
-            self._new_attr = RoomAttribute(name=attr_name, title=attr_title, type='str',
+            self._new_attr = RoomAttribute(name=attr_name, title=attr_title,
                                            is_required=request.form.get('newCustomAttributeIsRequired') == 'on',
                                            is_hidden=request.form.get('newCustomAttributeIsHidden') == 'on')
 
     def _process(self):
-        for attr in self._location.attributes:
+        for attr in RoomAttribute.query.all():
             attr.is_required = request.form.get('cattr_req_{}'.format(attr.name), '') == 'on'
             attr.is_hidden = request.form.get('cattr_hid_{}'.format(attr.name), '') == 'on'
         if self._new_attr:
-            self._location.attributes.append(self._new_attr)
+            db.session.add(self._new_attr)
             flash(_(u'Custom attribute added'), 'success')
 
         flash(_(u'Custom attributes updated'), 'success')

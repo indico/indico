@@ -71,7 +71,7 @@ class RHRoomBookingCreateModifyRoomBase(RHRoomBookingAdminBase):
                 defaults['attribute_{}'.format(ra.attribute_id)] = ra.value
 
         # Custom attributes - new fields must be set on the class
-        for attribute in self._location.attributes.order_by(RoomAttribute.parent_id).all():
+        for attribute in RoomAttribute.query.order_by(RoomAttribute.parent_id).all():
             validators = [DataRequired()] if attribute.is_required else []
             if attribute.name == 'notification-email':
                 validators.append(IndicoEmail(multi=True))
@@ -125,7 +125,7 @@ class RHRoomBookingCreateModifyRoomBase(RHRoomBookingAdminBase):
         # Custom attributes
         room.attributes = [RoomAttributeAssociation(value=form['attribute_{}'.format(attr.id)].data,
                                                     attribute_id=attr.id)
-                           for attr in self._location.attributes.all()
+                           for attr in RoomAttribute.query.all()
                            if form['attribute_{}'.format(attr.id)].data]
         # Bookable times
         room.bookable_hours = [BookableHours(start_time=bt['start'], end_time=bt['end'])

@@ -23,6 +23,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 
 from indico.core.db import db
 from indico.modules.rb.models.equipment import EquipmentType
+from indico.modules.rb.models.room_attributes import RoomAttribute
 from indico.util.caching import memoize_request
 from indico.util.decorators import classproperty
 from indico.util.i18n import _
@@ -104,13 +105,6 @@ class Location(db.Model):
         lazy=True
     )
 
-    attributes = db.relationship(
-        'RoomAttribute',
-        backref='location',
-        cascade='all, delete-orphan',
-        lazy='dynamic'
-    )
-
     # relationship backrefs:
     # - breaks (Break.own_venue)
     # - contributions (Contribution.own_venue)
@@ -146,7 +140,8 @@ class Location(db.Model):
          .update({'is_default': func.not_(Location.is_default)}, synchronize_session='fetch'))
 
     def get_attribute_by_name(self, name):
-        return self.attributes.filter_by(name=name).first()
+        # TODO: remove this
+        return RoomAttribute.query.filter_by(name=name).first()
 
     def get_equipment_by_name(self, name):
         # TODO: remove this

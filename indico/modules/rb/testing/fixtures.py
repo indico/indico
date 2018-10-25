@@ -126,16 +126,12 @@ def dummy_room(create_room):
 
 
 @pytest.fixture
-def create_room_attribute(db, dummy_location):
+def create_room_attribute(db):
     """Returns a callable which let you create room attributes"""
 
-    def _create_attribute(name, **params):
-        params.setdefault('location', dummy_location)
-        params.setdefault('title', name)
-        params.setdefault('type', u'str')
-        params.setdefault('is_required', False)
-        params.setdefault('is_hidden', False)
-        attr = RoomAttribute(name=name, **params)
+    def _create_attribute(name):
+        attr = RoomAttribute(name=name, title=name)
+        db.session.add(attr)
         db.session.flush()
         return attr
 
