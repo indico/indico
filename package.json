@@ -45,8 +45,6 @@
     "pagedown-editor": "0.0.10",
     "qs": "^6.5.2",
     "qtip2": "^3.0.3",
-    "rc-calendar": "^9.7.10",
-    "rc-time-picker": "^3.4.0",
     "react": "^16.6.0",
     "react-dates": "^18.1.1",
     "react-debounce-input": "^3.2.0",
