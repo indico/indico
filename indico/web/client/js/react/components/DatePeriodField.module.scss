@@ -15,28 +15,8 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-.date-period-field {
-    &:global(.rc-calendar) {
-        width: 100%;
-
-        :global(.rc-calendar-range-part) {
-            width: 50%;
-        }
-
-        :global(.rc-calendar-date-input-wrap) {
-            :global(.rc-calendar-input) {
-                border: none !important;
-            }
-        }
-
-        :global(.rc-calendar-range-middle) {
-            margin-left: -10px;
-        }
-    }
-
-    &:global(.disabled) {
-        :global(.rc-calendar-date-panel) {
-            pointer-events: none;
-        }
+:global(.ui.form) .date-period-field {
+    :global(.DateInput_input) {
+        background: inherit;
     }
 }

@@ -19,7 +19,7 @@ import _ from 'lodash';
 import moment from 'moment';
 import React from 'react';
 import PropTypes from 'prop-types';
-import RangeCalendar from 'rc-calendar/lib/RangeCalendar';
+import DateRangePicker from 'indico/react/components/DateRangePicker';
 import {serializeDate} from 'indico/utils/date';
 
 import './DatePeriodField.module.scss';
@@ -29,19 +29,15 @@ export default class DatePeriodField extends React.Component {
     static propTypes = {
         onChange: PropTypes.func.isRequired,
         disabled: PropTypes.bool,
-        disabledDate: PropTypes.func,
         value: PropTypes.shape({
             startDate: PropTypes.string,
             endDate: PropTypes.string,
-        }),
-        format: PropTypes.string,
+        })
     };
 
     static defaultProps = {
         disabled: false,
-        disabledDate: null,
-        value: null,
-        format: 'L',
+        value: null
     };
 
     shouldComponentUpdate(nextProps, nextState) {
@@ -50,32 +46,33 @@ export default class DatePeriodField extends React.Component {
         return nextState !== this.state || disabled !== prevDisabled || !_.isEqual(prevValue, value);
     }
 
-    get momentValue() {
+    getMomentValue(type) {
         const {value} = this.props;
-        if (!value) {
+        if (!value || !value[type]) {
             return null;
         }
-        return [moment(value.startDate, 'YYYY-MM-DD'), moment(value.endDate, 'YYYY-MM-DD')];
+        return moment(value[type], 'YYYY-MM-DD');
     }
 
-    notifyChange = (values) => {
+    notifyChange = ({startDate, endDate}) => {
         const {onChange} = this.props;
         onChange({
-            startDate: serializeDate(values[0]),
-            endDate: serializeDate(values[1]),
+            startDate: serializeDate(startDate),
+            endDate: serializeDate(endDate),
         });
     };
 
     render() {
-        const {disabledDate, disabled, format} = this.props;
+        const {disabled} = this.props;
         return (
-            <RangeCalendar styleName="date-period-field"
-                           className={disabled ? 'disabled' : ''}
-                           format={format}
-                           onSelect={this.notifyChange}
-                           selectedValue={this.momentValue}
-                           disabledDate={(date) => (disabledDate ? disabledDate(date) : null)}
-                           showToday={!disabled} />
+            <div styleName="date-period-field">
+                <DateRangePicker startDate={this.getMomentValue('startDate')}
+                                 endDate={this.getMomentValue('endDate')}
+                                 onDatesChange={this.notifyChange}
+                                 disabled={disabled}
+                                 inputIconPosition="before"
+                                 block />
+            </div>
         );
     }
 }

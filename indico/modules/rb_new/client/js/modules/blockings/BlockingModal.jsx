@@ -20,7 +20,7 @@ import React from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
-import {Button, Divider, Form, Grid, Message, Icon, Modal, Popup} from 'semantic-ui-react';
+import {Button, Form, Grid, Message, Icon, Modal, Popup} from 'semantic-ui-react';
 import {Form as FinalForm, Field} from 'react-final-form';
 import {Param, Translate} from 'indico/react/i18n';
 import {ReduxFormField, formatters} from 'indico/react/forms';
@@ -123,7 +123,6 @@ class BlockingModal extends React.Component {
                             input={input}
                             as={DatePeriodField}
                             label={Translate.string('Period')}
-                            showToday={mode !== 'view'}
                             required={mode !== 'view'} />
         );
     };
@@ -289,17 +288,6 @@ class BlockingModal extends React.Component {
                                         </Translate>
                                     </Message.Content>
                                 </Message>
-                                <Divider hidden section />
-                                <Field name="rooms"
-                                       isEqual={(a, b) => _.isEqual(a, b)}
-                                       component={this.renderRoomSearchField}
-                                       disabled={mode === 'view' || submitting || submitSucceeded} />
-                            </Grid.Column>
-                            <Grid.Column width={8}>
-                                <Field name="allowed"
-                                       isEqual={(a, b) => !this.hasAllowedFieldChanged(a, b)}
-                                       component={this.renderPrincipalSearchField}
-                                       disabled={mode === 'view' || submitting || submitSucceeded} />
                                 <Field name="dates"
                                        component={this.renderBlockingPeriodField}
                                        disabled={mode !== 'create' || submitting || submitSucceeded}
@@ -326,6 +314,16 @@ class BlockingModal extends React.Component {
                                            );
                                        }}
                                        formatOnBlur />
+                            </Grid.Column>
+                            <Grid.Column width={8}>
+                                <Field name="allowed"
+                                       isEqual={(a, b) => !this.hasAllowedFieldChanged(a, b)}
+                                       component={this.renderPrincipalSearchField}
+                                       disabled={mode === 'view' || submitting || submitSucceeded} />
+                                <Field name="rooms"
+                                       isEqual={(a, b) => _.isEqual(a, b)}
+                                       component={this.renderRoomSearchField}
+                                       disabled={mode === 'view' || submitting || submitSucceeded} />
                                 <Message success>
                                     {mode === 'edit' ? (
                                         <Translate>The blocking has been successfully updated.</Translate>
