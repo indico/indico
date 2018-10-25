@@ -28,9 +28,12 @@ from indico.modules.rb_new.schemas import aspects_schema, locations_schema
 
 class RHLocations(RHRoomBookingBase):
     def _process(self):
+        rooms_strategy = contains_eager('rooms')
+        rooms_strategy.noload('*')
+        rooms_strategy.joinedload('location').load_only('room_name_format')
         locations = (Location.query
                      .join(Room, (Location.id == Room.location_id) & Room.is_active)
-                     .options(contains_eager('rooms').noload('*'))
+                     .options(rooms_strategy)
                      .order_by(Location.name, db.func.indico.natsort(Room.full_name))
                      .all())
         return jsonify(locations_schema.dump(locations).data)
