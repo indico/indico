@@ -38,24 +38,6 @@ RoomEquipmentAssociation = db.Table(
     schema='roombooking'
 )
 
-ReservationEquipmentAssociation = db.Table(
-    'reservation_equipment',
-    db.metadata,
-    db.Column(
-        'equipment_id',
-        db.Integer,
-        db.ForeignKey('roombooking.equipment_types.id'),
-        primary_key=True,
-    ),
-    db.Column(
-        'reservation_id',
-        db.Integer,
-        db.ForeignKey('roombooking.reservations.id'),
-        primary_key=True
-    ),
-    schema='roombooking'
-)
-
 
 class EquipmentType(db.Model):
     __tablename__ = 'equipment_types'
@@ -73,7 +55,6 @@ class EquipmentType(db.Model):
     )
 
     # relationship backrefs:
-    # - reservations (Reservation.used_equipment)
     # - rooms (Room.available_equipment)
 
     @return_ascii

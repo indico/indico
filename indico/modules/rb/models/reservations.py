@@ -31,7 +31,6 @@ from indico.core.db.sqlalchemy.custom import PyIntEnum
 from indico.core.db.sqlalchemy.custom.utcdatetime import UTCDateTime
 from indico.core.db.sqlalchemy.util.queries import limit_groups
 from indico.core.errors import NoReportError
-from indico.modules.rb.models.equipment import ReservationEquipmentAssociation
 from indico.modules.rb.models.reservation_edit_logs import ReservationEditLog
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
@@ -220,12 +219,6 @@ class Reservation(Serializer, db.Model):
         'ReservationOccurrence',
         backref='reservation',
         cascade='all, delete-orphan',
-        lazy='dynamic'
-    )
-    used_equipment = db.relationship(
-        'EquipmentType',
-        secondary=ReservationEquipmentAssociation,
-        backref='reservations',
         lazy='dynamic'
     )
     #: The user this booking was made for.
@@ -604,7 +597,6 @@ class Reservation(Serializer, db.Model):
             'contact_email': u"contact email",
             'contact_phone': u"contact phone number",
             'booking_reason': u"booking reason",
-            'used_equipment': u"list of equipment",
             'needs_assistance': u"option 'General Assistance'",
             'uses_vc': u"option 'Uses Videoconference'",
             'needs_vc_assistance': u"option 'Videoconference Setup Assistance'"
