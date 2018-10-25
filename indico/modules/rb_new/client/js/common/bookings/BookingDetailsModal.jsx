@@ -19,7 +19,7 @@ import moment from 'moment';
 import React from 'react';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
-import {Button, Modal, Message, Grid, Header, Icon, Popup, List} from 'semantic-ui-react';
+import {Button, Modal, Message, Grid, Header, Icon, Label, Popup, List} from 'semantic-ui-react';
 import {Param, Translate} from 'indico/react/i18n';
 import {toMoment, serializeDate} from 'indico/utils/date';
 import TimeInformation from '../../components/TimeInformation';
@@ -185,6 +185,30 @@ class BookingDetailsModal extends React.Component {
         </Modal.Actions>
     );
 
+    renderBookingStatus = ({isPending, isAccepted, isCancelled, isRejected}) => {
+        let color, status;
+
+        if (isPending) {
+            color = 'yellow';
+            status = Translate.string('Pending Confirmation');
+        } else if (isCancelled) {
+            color = 'grey';
+            status = Translate.string('Cancelled');
+        } else if (isRejected) {
+            color = 'red';
+            status = Translate.string('Rejected');
+        } else if (isAccepted) {
+            color = 'green';
+            status = Translate.string('Valid');
+        }
+
+        return (
+            <Label color={color}>
+                {status}
+            </Label>
+        );
+    };
+
     render() {
         const {
             booking: {
@@ -205,7 +229,13 @@ class BookingDetailsModal extends React.Component {
         return (
             <Modal open onClose={this.handleCloseModal} size="large" closeIcon>
                 <Modal.Header styleName="booking-modal-header">
-                    <Translate>Booking Details</Translate>
+                    <span styleName="header-text">
+                        <Translate>Booking Details</Translate>
+                    </span>
+                    <span styleName="booking-status">
+                        {/* eslint-disable-next-line react/destructuring-assignment */}
+                        {this.renderBookingStatus(this.props.booking)}
+                    </span>
                     <span>
                         {canModify && <Button icon="pencil" circular />}
                         {canDelete && <Button icon="trash" circular />}
