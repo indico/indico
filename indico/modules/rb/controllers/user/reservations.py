@@ -251,7 +251,6 @@ class RHRoomBookingNewBookingBase(RHRoomBookingBase):
         # Step 3
         # If we come from a successful step 2 we take default values from that step once again
         if step == 2:
-            defaults.used_equipment = []  # wtforms bug; avoid `foo in None` check
             form = form_class(formdata=MultiDict(), obj=defaults)
         else:
             form = form_class(obj=defaults)
@@ -269,7 +268,6 @@ class RHRoomBookingNewBookingBase(RHRoomBookingBase):
             # User can only prebook
             del form.submit_book
 
-        form.used_equipment.query = room.find_available_vc_equipment()
         return form
 
     def _get_all_conflicts(self, room, form, reservation_id=None):
@@ -631,7 +629,6 @@ class RHRoomBookingModifyBooking(RHRoomBookingBookingMixin, RHRoomBookingNewBook
         room = self._reservation.room
         form = ModifyBookingForm(obj=self._reservation,
                                  old_start_dt=self._reservation.start_dt, old_end_dt=self._reservation.end_dt)
-        form.used_equipment.query = room.find_available_vc_equipment()
 
         if not room.notification_for_assistance and not self._reservation.needs_assistance:
             del form.needs_assistance

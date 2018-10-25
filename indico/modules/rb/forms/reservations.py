@@ -29,7 +29,7 @@ from wtforms_components import TimeField
 from indico.modules.rb.models.reservations import RepeatFrequency, RepeatMapping
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm, generated_data
-from indico.web.forms.fields import IndicoDateField, IndicoQuerySelectMultipleCheckboxField, PrincipalField
+from indico.web.forms.fields import IndicoDateField, PrincipalField
 from indico.web.forms.validators import HiddenUnless, UsedIf
 
 
@@ -118,18 +118,11 @@ class NewBookingConfirmForm(NewBookingPeriodForm):
                                                  DataRequired()], allow_external=True)
     booking_reason = TextAreaField(_('Reason'), [DataRequired()])
     uses_vc = BooleanField(_('I will use videoconference equipment'))
-    used_equipment = IndicoQuerySelectMultipleCheckboxField(_('VC equipment'), get_label=lambda x: x.name)
     needs_vc_assistance = BooleanField(_('Request assistance for the startup of the videoconference session. '
                                          'This support is usually performed remotely.'))
     needs_assistance = BooleanField(_('Request personal assistance for meeting startup'))
     submit_book = SubmitField(_('Create booking'))
     submit_prebook = SubmitField(_('Create pre-booking'))
-
-    def validate_used_equipment(self, field):
-        if field.data and not self.uses_vc.data:
-            raise ValidationError(_('Videoconference equipment is not used.'))
-        elif not field.data and self.uses_vc.data:
-            raise ValidationError(_('Please select the type of videoconference that you will use.'))
 
     def validate_needs_vc_assistance(self, field):
         if field.data and not self.uses_vc.data:

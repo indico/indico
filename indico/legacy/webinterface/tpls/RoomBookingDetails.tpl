@@ -333,9 +333,6 @@
                           </td>
                           <td align="left" class="blacktext">
                             ${ _('yes') if reservation.uses_vc else _('no') }
-                            % if vc_equipment:
-                              <span style="color: grey;">(${ vc_equipment })</span>
-                            % endif
                             ${ contextHelp('iWillUseVideoConferencing') }
                           </td>
                         </tr>

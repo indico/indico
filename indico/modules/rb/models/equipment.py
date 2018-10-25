@@ -65,10 +65,6 @@ class EquipmentType(db.Model):
         db.Integer,
         primary_key=True
     )
-    parent_id = db.Column(
-        db.Integer,
-        db.ForeignKey('roombooking.equipment_types.id')
-    )
     name = db.Column(
         db.String,
         nullable=False,
@@ -76,16 +72,7 @@ class EquipmentType(db.Model):
         unique=True
     )
 
-    children = db.relationship(
-        'EquipmentType',
-        backref=db.backref(
-            'parent',
-            remote_side=[id]
-        )
-    )
-
     # relationship backrefs:
-    # - parent (EquipmentType.children)
     # - reservations (Reservation.used_equipment)
     # - rooms (Room.available_equipment)
 

@@ -300,10 +300,7 @@
                                 ${ _('Room has') }:&nbsp;&nbsp;
                               </td>
                               <td align="left" class="blacktext">
-                                <%
-                                from indico.util.struct.iterables import render_nested
-                                %>
-                                ${ render_nested(sorted(room.available_equipment, key=lambda x: x.name)) }
+                                ${ ', '.join(sorted(x.name for x in room.available_equipment)) }
                               </td>
                             </tr>
                           </table>

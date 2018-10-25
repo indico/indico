@@ -77,8 +77,7 @@ class RoomHook(RoomBookingHookBase):
             return
 
         # Retrieve rooms
-        rooms_data = list(Room.get_with_data('vc_equipment', 'non_vc_equipment',
-                                             filters=[Room.id.in_(self._ids), Room.location_id == loc.id]))
+        rooms_data = list(Room.get_with_data(filters=[Room.id.in_(self._ids), Room.location_id == loc.id]))
 
         # Retrieve reservations
         reservations = None
@@ -119,7 +118,7 @@ class RoomNameHook(RoomBookingHookBase):
 
         search_str = '%{}%'.format(self._room_name)
         rooms_data = Room.get_with_data(
-            'vc_equipment', 'non_vc_equipment', filters=[
+            filters=[
                 Room.location_id == loc.id,
                 or_(Room.name.ilike(search_str),
                     Room.verbose_name.ilike(search_str))
@@ -254,7 +253,7 @@ def _export_reservations(hook, limit_per_room, include_rooms, extra_filters=None
     filters += _get_reservation_state_filter(hook._queryParams)
     occurs = [datetime.strptime(x, '%Y-%m-%d').date()
               for x in filter(None, get_query_parameter(hook._queryParams, ['occurs'], '').split(','))]
-    data = ['vc_equipment']
+    data = []
     if hook._occurrences:
         data.append('occurrences')
     order = {
@@ -277,9 +276,6 @@ def _serializable_room(room_data, reservations=None):
     """
     data = room_data['room'].to_serializable('__api_public__')
     data['_type'] = 'Room'
-    data['avc'] = bool(room_data['vc_equipment'])
-    data['vcList'] = room_data['vc_equipment']
-    data['equipment'] = room_data['non_vc_equipment']
     if reservations is not None:
         data['reservations'] = reservations.getlist(room_data['room'].id)
     return data
@@ -307,7 +303,6 @@ def _serializable_reservation(reservation_data, include_room=False):
     data['repeatability'] = None
     if reservation.repeat_frequency:
         data['repeatability'] = RepeatMapping.get_short_name(*reservation.repetition)
-    data['vcList'] = reservation_data['vc_equipment']
     if include_room:
         data['room'] = _serializable_room_minimal(reservation_data['reservation'].room)
     if 'occurrences' in reservation_data:

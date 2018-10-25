@@ -191,16 +191,6 @@ def test_status_string(create_reservation, is_accepted, is_rejected, is_cancelle
 # ======================================================================================================================
 
 
-@pytest.mark.xfail
-def test_create_from_data():
-    raise NotImplementedError
-
-
-@pytest.mark.xfail
-def test_get_with_data():
-    raise NotImplementedError
-
-
 def test_find_overlapping_with_different_room(overlapping_reservation, create_room):
     reservation, occurrence = overlapping_reservation
     assert reservation in Reservation.find_overlapping_with(room=reservation.room, occurrences=[occurrence]).all()
@@ -227,11 +217,6 @@ def test_find_overlapping_with_skip_reservation(overlapping_reservation):
 # ======================================================================================================================
 # method tests
 # ======================================================================================================================
-
-
-@pytest.mark.xfail
-def test_accept():
-    raise NotImplementedError
 
 
 @pytest.mark.parametrize('silent', (True, False))
@@ -346,11 +331,6 @@ def test_can_be_action_with_no_user(dummy_reservation):
     assert not dummy_reservation.can_be_rejected(None)
 
 
-@pytest.mark.xfail
-def test_create_occurrences():
-    raise NotImplementedError
-
-
 def test_find_excluded_days(db, create_reservation):
     reservation = create_reservation(start_dt=date.today() + relativedelta(hour=8),
                                      end_dt=date.today() + relativedelta(days=5, hour=10),
@@ -372,22 +352,6 @@ def test_locator(dummy_reservation, dummy_location):
     assert dummy_reservation.locator == {'roomLocation': dummy_location.name, 'resvID': dummy_reservation.id}
 
 
-@pytest.mark.xfail
-def test_get_conflicting_occurrences():
-    raise NotImplementedError
-
-
-def test_get_vc_equipment(db, dummy_reservation, create_equipment_type):
-    foo = create_equipment_type(u'foo')
-    vc = create_equipment_type(u'Video conference')
-    vc_items = [create_equipment_type(u'vc1'), create_equipment_type(u'vc2')]
-    vc.children += vc_items
-    dummy_reservation.room.available_equipment.extend(vc_items + [vc, foo])
-    dummy_reservation.used_equipment = [vc_items[0]]
-    db.session.flush()
-    assert set(dummy_reservation.get_vc_equipment().all()) == {vc_items[0]}
-
-
 @pytest.mark.parametrize(('is_booked_for', 'expected'), (
     (True, True),
     (False, False),
@@ -404,8 +368,3 @@ def test_is_booked_for_no_user(dummy_reservation):
 
 def test_is_created_by(dummy_reservation, dummy_user):
     assert dummy_reservation.is_owned_by(dummy_user)
-
-
-@pytest.mark.xfail
-def test_modify():
-    raise NotImplementedError

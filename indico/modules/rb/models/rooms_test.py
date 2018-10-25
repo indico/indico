@@ -29,7 +29,6 @@ from indico.modules.rb.models.room_bookable_hours import BookableHours
 from indico.modules.rb.models.rooms import Room
 from indico.testing.util import bool_matrix
 from indico.util.date_time import get_day_end, get_day_start
-from indico.util.struct.iterables import powerset
 
 
 pytest_plugins = 'indico.modules.rb.testing.fixtures'
@@ -205,16 +204,6 @@ def test_has_equipment(create_equipment_type, dummy_room, name, expected):
     assert dummy_room.has_equipment(name) == expected
 
 
-def test_find_available_vc_equipment(db, dummy_room, create_equipment_type):
-    foo = create_equipment_type(u'foo')
-    vc = create_equipment_type(u'Video conference')
-    vc_items = [create_equipment_type(u'vc1'), create_equipment_type(u'vc2')]
-    vc.children += vc_items
-    dummy_room.available_equipment.extend(vc_items + [vc, foo])
-    db.session.flush()
-    assert set(dummy_room.find_available_vc_equipment()) == set(vc_items)
-
-
 def test_get_attribute_by_name(create_room_attribute, dummy_room):
     attr = create_room_attribute(u'foo')
     assert dummy_room.get_attribute_by_name(u'foo') is None
@@ -304,54 +293,29 @@ def test_get_with_data_errors():
         Room.get_with_data(foo='bar')
 
 
-@pytest.mark.parametrize(('only_active', 'data'), list(itertools.product(
-    (True, False),
-    powerset(('equipment', 'vc_equipment', 'non_vc_equipment'))
-)))
-def test_get_with_data(db, create_room, create_equipment_type, only_active, data):
+@pytest.mark.parametrize('only_active', (True, False))
+def test_get_with_data(db, create_room, create_equipment_type, only_active):
     eq = create_equipment_type(u'eq')
-    vc = create_equipment_type(u'Video conference')
-    vc1 = create_equipment_type(u'vc1')
-    vc2 = create_equipment_type(u'vc2')
-    vc.children.append(vc1)
-    vc.children.append(vc2)
 
     rooms = {
         'inactive': {'room': create_room(is_active=False),
-                     'equipment': set(),
-                     'vc_equipment': set(),
-                     'non_vc_equipment': set()},
+                     'equipment': set()},
         'no_eq': {'room': create_room(),
-                  'equipment': set(),
-                  'vc_equipment': set(),
-                  'non_vc_equipment': set()},
-        'non_vc_eq': {'room': create_room(),
-                      'equipment': {eq},
-                      'vc_equipment': set(),
-                      'non_vc_equipment': {eq}},
-        'vc_eq': {'room': create_room(),
-                  'equipment': {vc, vc1, vc2},
-                  'vc_equipment': {vc1, vc2},
-                  'non_vc_equipment': {vc}},
+                  'equipment': set()},
         'all_eq': {'room': create_room(),
-                   'equipment': {eq, vc, vc1, vc2},
-                   'vc_equipment': {vc1, vc2},
-                   'non_vc_equipment': {vc, eq}}
+                   'equipment': {eq}}
     }
     room_types = {room_data['room']: type_ for type_, room_data in rooms.iteritems()}
     for room in rooms.itervalues():
         room['room'].available_equipment = room['equipment']
     db.session.flush()
-    results = list(Room.get_with_data(*data, only_active=only_active))
+    results = list(Room.get_with_data(only_active=only_active))
     assert len(results) == len(rooms) - only_active
     for row in results:
         room = row.pop('room')
-        assert set(row.viewkeys()) == set(data)
         room_type = room_types[room]
         if room_type == 'inactive':
             assert not only_active
-        for key in data:
-            assert set(row[key]) == {x.name for x in rooms[room_type][key]}
 
 
 def test_max_capacity(create_room):

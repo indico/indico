@@ -419,14 +419,6 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
     def has_equipment(self, *names):
         return self.available_equipment.filter(EquipmentType.name.in_(names)).count() > 0
 
-    def find_available_vc_equipment(self):
-        vc_equipment = (self.available_equipment
-                        .correlate(Room)
-                        .with_entities(EquipmentType.id)
-                        .filter_by(name='Video conference')
-                        .as_scalar())
-        return self.available_equipment.filter(EquipmentType.parent_id == vc_equipment)
-
     def get_attribute_by_name(self, attribute_name):
         return (self.attributes
                 .join(RoomAttribute)
@@ -505,38 +497,6 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         if 'equipment' in args:
             entities.append(static_array.array_agg(EquipmentType.name))
             query = query.outerjoin(RoomEquipmentAssociation).outerjoin(EquipmentType)
-        if 'vc_equipment' in args or 'non_vc_equipment' in args:
-            vc_id_subquery = db.session.query(EquipmentType.id) \
-                                       .correlate(Room) \
-                                       .filter_by(name='Video conference') \
-                                       .join(RoomEquipmentAssociation) \
-                                       .filter(RoomEquipmentAssociation.c.room_id == Room.id) \
-                                       .as_scalar()
-
-            if 'vc_equipment' in args:
-                # noinspection PyTypeChecker
-                entities.append(static_array.array(
-                    db.session.query(EquipmentType.name)
-                    .join(RoomEquipmentAssociation)
-                    .filter(
-                        RoomEquipmentAssociation.c.room_id == Room.id,
-                        EquipmentType.parent_id == vc_id_subquery
-                    )
-                    .order_by(EquipmentType.name)
-                    .as_scalar()
-                ))
-            if 'non_vc_equipment' in args:
-                # noinspection PyTypeChecker
-                entities.append(static_array.array(
-                    db.session.query(EquipmentType.name)
-                    .join(RoomEquipmentAssociation)
-                    .filter(
-                        RoomEquipmentAssociation.c.room_id == Room.id,
-                        (EquipmentType.parent_id == None) | (EquipmentType.parent_id != vc_id_subquery)
-                    )
-                    .order_by(EquipmentType.name)
-                    .as_scalar()
-                ))
 
         query = (query.with_entities(*entities)
                  .outerjoin(Location, Location.id == Room.location_id)

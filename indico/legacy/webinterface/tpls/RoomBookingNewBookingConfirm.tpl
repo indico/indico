@@ -83,7 +83,7 @@
     </h2>
     <%include file="RoomBookingNewBookingInfoWidget.tpl" args="form=form"/>
 
-    % if list(form.used_equipment) or form.needs_assistance:
+    % if form.needs_assistance:
         <h2 class="group-title">
             <i class="icon-projector"></i>
             ${ _('Collaboration & Assistance') }

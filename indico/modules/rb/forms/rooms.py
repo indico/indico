@@ -16,7 +16,6 @@
 
 import itertools
 from datetime import datetime
-from operator import itemgetter
 
 from wtforms import Form
 from wtforms.ext.dateutil.fields import DateTimeField
@@ -30,7 +29,6 @@ from wtforms_components import TimeField
 from indico.modules.rb.models.equipment import EquipmentType
 from indico.modules.rb.models.locations import Location
 from indico.util.i18n import _
-from indico.util.struct.iterables import group_nested
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import IndicoDateField, IndicoQuerySelectMultipleCheckboxField, PrincipalField
 from indico.web.forms.validators import UsedIf
@@ -46,11 +44,6 @@ def _get_equipment_label(eq):
     return ': '.join(itertools.chain(reversed(parents), [eq.name]))
 
 
-def _group_equipment(objects):
-    """Groups the equipment list so children follow their their parents"""
-    return group_nested(objects, itemgetter(1))
-
-
 class SearchRoomsForm(IndicoForm):
     location = QuerySelectField(_(u'Location'), get_label=lambda x: x.name, query_factory=Location.find,
                                 allow_blank=True)
@@ -59,7 +52,6 @@ class SearchRoomsForm(IndicoForm):
                            choices=[(1, _(u'Available')), (0, _(u'Booked')), (-1, _(u"Don't care"))])
     capacity = IntegerField(_(u'Capacity'), validators=[Optional(), NumberRange(min=0)])
     available_equipment = IndicoQuerySelectMultipleCheckboxField(_(u'Equipment'), get_label=_get_equipment_label,
-                                                                 modify_object_list=_group_equipment,
                                                                  query_factory=lambda: EquipmentType.find().order_by(
                                                                      EquipmentType.name))
     is_only_public = BooleanField(_(u'Only public rooms'), default=True)
@@ -147,8 +139,7 @@ class RoomForm(IndicoForm):
     comments = TextAreaField(_(u'Comments'))
     delete_photos = BooleanField(_(u'Delete photos'))
     large_photo = FileField(_(u'Large photo'))
-    available_equipment = IndicoQuerySelectMultipleCheckboxField(_(u'Equipment'), get_label=_get_equipment_label,
-                                                                 modify_object_list=_group_equipment)
+    available_equipment = IndicoQuerySelectMultipleCheckboxField(_(u'Equipment'), get_label=_get_equipment_label)
     # attribute_* - set at runtime
     bookable_hours = FieldList(FormField(_TimePair), min_entries=1)
     nonbookable_periods = FieldList(FormField(_DateTimePair), min_entries=1)

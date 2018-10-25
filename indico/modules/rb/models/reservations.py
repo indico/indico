@@ -27,11 +27,11 @@ from sqlalchemy.sql import cast
 from werkzeug.datastructures import OrderedMultiDict
 
 from indico.core.db import db
-from indico.core.db.sqlalchemy.custom import PyIntEnum, static_array
+from indico.core.db.sqlalchemy.custom import PyIntEnum
 from indico.core.db.sqlalchemy.custom.utcdatetime import UTCDateTime
 from indico.core.db.sqlalchemy.util.queries import limit_groups
 from indico.core.errors import NoReportError
-from indico.modules.rb.models.equipment import EquipmentType, ReservationEquipmentAssociation, RoomEquipmentAssociation
+from indico.modules.rb.models.equipment import ReservationEquipmentAssociation
 from indico.modules.rb.models.reservation_edit_logs import ReservationEditLog
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
@@ -346,7 +346,7 @@ class Reservation(Serializer, db.Model):
         """
 
         populate_fields = ('start_dt', 'end_dt', 'repeat_frequency', 'repeat_interval', 'room_id', 'contact_email',
-                           'contact_phone', 'booking_reason', 'used_equipment', 'needs_assistance', 'uses_vc',
+                           'contact_phone', 'booking_reason', 'needs_assistance', 'uses_vc',
                            'needs_vc_assistance')
 
         if data['repeat_frequency'] == RepeatFrequency.NEVER and data['start_dt'].date() != data['end_dt'].date():
@@ -408,24 +408,6 @@ class Reservation(Serializer, db.Model):
                 query = query.offset(offset)
 
         result = OrderedDict((r.id, {'reservation': r}) for r in query)
-
-        if 'vc_equipment' in args:
-            vc_id_subquery = db.session.query(EquipmentType.id) \
-                .correlate(Reservation) \
-                .filter_by(name='Video conference') \
-                .join(RoomEquipmentAssociation) \
-                .filter(RoomEquipmentAssociation.c.room_id == Reservation.room_id) \
-                .as_scalar()
-
-            # noinspection PyTypeChecker
-            vc_equipment_data = dict(db.session.query(Reservation.id, static_array.array_agg(EquipmentType.name))
-                                     .join(ReservationEquipmentAssociation, EquipmentType)
-                                     .filter(Reservation.id.in_(result.iterkeys()))
-                                     .filter(EquipmentType.parent_id == vc_id_subquery)
-                                     .group_by(Reservation.id))
-
-            for id_, data in result.iteritems():
-                data['vc_equipment'] = vc_equipment_data.get(id_, ())
 
         if 'occurrences' in args:
             occurrence_data = OrderedMultiDict(db.session.query(ReservationOccurrence.reservation_id,
@@ -588,14 +570,6 @@ class Reservation(Serializer, db.Model):
                     conflicts[occurrence][key].append(colliding)
         return conflicts
 
-    def get_vc_equipment(self):
-        vc_equipment = self.room.available_equipment \
-                           .correlate(ReservationOccurrence) \
-                           .with_entities(EquipmentType.id) \
-                           .filter_by(name='Video conference') \
-                           .as_scalar()
-        return self.used_equipment.filter(EquipmentType.parent_id == vc_equipment)
-
     def is_booked_for(self, user):
         return user is not None and self.booked_for_user == user
 
@@ -611,7 +585,7 @@ class Reservation(Serializer, db.Model):
         """
 
         populate_fields = ('start_dt', 'end_dt', 'repeat_frequency', 'repeat_interval', 'booked_for_user',
-                           'contact_email', 'contact_phone', 'booking_reason', 'used_equipment',
+                           'contact_email', 'contact_phone', 'booking_reason',
                            'needs_assistance', 'uses_vc', 'needs_vc_assistance')
         # fields affecting occurrences
         occurrence_fields = {'start_dt', 'end_dt', 'repeat_frequency', 'repeat_interval'}
@@ -651,10 +625,6 @@ class Reservation(Serializer, db.Model):
             old = getattr(self, field)
             new = data[field]
             converter = unicode
-            if field == 'used_equipment':
-                # Dynamic relationship
-                old = sorted(old.all())
-                converter = lambda x: u', '.join(x.name for x in x)
             if old != new:
                 # Booked for user updates the (redundant) name
                 if field == 'booked_for_user':

@@ -41,7 +41,6 @@ class WPRoomBookingBookingDetails(WPRoomBookingLegacyBase):
         reservation = params['reservation']
         params['endpoints'] = self.endpoints
         params['assistance_emails'] = rb_settings.get('assistance_emails')
-        params['vc_equipment'] = ', '.join(eq.name for eq in reservation.get_vc_equipment())
         params['repetition'] = RepeatMapping.get_message(*reservation.repetition)
         params['edit_logs'] = reservation.edit_logs.order_by(ReservationEditLog.timestamp.desc()).all()
         params['excluded_days'] = reservation.find_excluded_days().all()
