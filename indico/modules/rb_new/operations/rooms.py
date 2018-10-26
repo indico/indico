@@ -29,6 +29,7 @@ from indico.modules.rb import rb_is_admin, rb_settings
 from indico.modules.rb.models.equipment import EquipmentType, RoomEquipmentAssociation
 from indico.modules.rb.models.favorites import favorite_room_table
 from indico.modules.rb.models.room_attributes import RoomAttributeAssociation
+from indico.modules.rb.models.room_features import RoomFeature
 from indico.modules.rb.models.rooms import Room
 from indico.util.caching import memoize_redis
 
@@ -125,6 +126,9 @@ def search_for_rooms(filters, availability=None):
                     .correlate(Room)
                     .as_scalar())
         query = query.filter(subquery == len(filters['equipment']))
+    if filters.get('feature'):
+        for feature in filters['feature']:
+            query = query.filter(Room.available_equipment.any(EquipmentType.features.any(RoomFeature.name == feature)))
     if filters.get('favorite'):
         query = query.filter(favorite_room_table.c.user_id.isnot(None))
     if filters.get('mine'):
