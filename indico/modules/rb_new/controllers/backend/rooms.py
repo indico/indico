@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 from datetime import date, datetime, time, timedelta
 
 from flask import jsonify, request, session
+from sqlalchemy.orm import subqueryload
 from webargs import fields
 from webargs.flaskparser import use_args
 from werkzeug.exceptions import NotFound, UnprocessableEntity
@@ -36,7 +37,10 @@ from indico.modules.rb_new.schemas import room_attributes_schema, room_details_s
 
 class RHRooms(RHRoomBookingBase):
     def _process(self):
-        rooms = Room.query.filter_by(is_active=True).all()
+        rooms = (Room.query
+                 .filter_by(is_active=True)
+                 .options(subqueryload('available_equipment').load_only('id'))
+                 .all())
         return jsonify(room_details_schema.dump(rooms, many=True).data)
 
 

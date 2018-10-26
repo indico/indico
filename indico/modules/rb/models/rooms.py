@@ -220,7 +220,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         'EquipmentType',
         secondary=RoomEquipmentAssociation,
         backref='rooms',
-        lazy='dynamic'
+        lazy=True
     )
 
     nonbookable_periods = db.relationship(
@@ -417,7 +417,8 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
 
     @cached(_cache)
     def has_equipment(self, *names):
-        return self.available_equipment.filter(EquipmentType.name.in_(names)).count() > 0
+        available = {x.name for x in self.available_equipment}
+        return bool(available & set(names))
 
     def get_attribute_by_name(self, attribute_name):
         return (self.attributes

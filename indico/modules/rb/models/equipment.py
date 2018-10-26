@@ -39,6 +39,25 @@ RoomEquipmentAssociation = db.Table(
 )
 
 
+equipment_features_table = db.Table(
+    'equipment_features',
+    db.metadata,
+    db.Column(
+        'equipment_id',
+        db.Integer,
+        db.ForeignKey('roombooking.equipment_types.id'),
+        primary_key=True,
+    ),
+    db.Column(
+        'feature_id',
+        db.Integer,
+        db.ForeignKey('roombooking.features.id'),
+        primary_key=True
+    ),
+    schema='roombooking'
+)
+
+
 class EquipmentType(db.Model):
     __tablename__ = 'equipment_types'
     __table_args__ = {'schema': 'roombooking'}
@@ -52,6 +71,13 @@ class EquipmentType(db.Model):
         nullable=False,
         index=True,
         unique=True
+    )
+
+    features = db.relationship(
+        'RoomFeature',
+        secondary=equipment_features_table,
+        backref='equipment_types',
+        lazy=True
     )
 
     # relationship backrefs:

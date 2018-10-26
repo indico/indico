@@ -298,12 +298,9 @@ def test_get_with_data(db, create_room, create_equipment_type, only_active):
     eq = create_equipment_type(u'eq')
 
     rooms = {
-        'inactive': {'room': create_room(is_active=False),
-                     'equipment': set()},
-        'no_eq': {'room': create_room(),
-                  'equipment': set()},
-        'all_eq': {'room': create_room(),
-                   'equipment': {eq}}
+        'inactive': {'room': create_room(is_active=False), 'equipment': []},
+        'no_eq': {'room': create_room(), 'equipment': []},
+        'all_eq': {'room': create_room(), 'equipment': [eq]}
     }
     room_types = {room_data['room']: type_ for type_, room_data in rooms.iteritems()}
     for room in rooms.itervalues():

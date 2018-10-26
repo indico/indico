@@ -30,6 +30,7 @@ import SpriteImage from './SpriteImage';
 import DimmableImage from './Dimmer.jsx';
 import {selectors as configSelectors} from '../common/config';
 import {actions as userActions, selectors as userSelectors} from '../common/user';
+import RoomFeatureEntry from './RoomFeatureEntry';
 
 import './Room.module.scss';
 
@@ -140,7 +141,9 @@ class Room extends React.Component {
                                    position="bottom center"
                                    hideOnScroll />
                         )}
-                        {room.has_webcast_recording && <Icon name="video camera" color="green" />}
+                        {room.features.map(feature => (
+                            <RoomFeatureEntry key={feature.name} feature={feature} color="green" />
+                        ))}
                         {!room.is_public && (
                             <Popup trigger={<Icon name="lock" color="red" />}
                                    content={Translate.string('This room is not publicly available')}
