@@ -43,6 +43,7 @@ export function initialRoomFilterStateFactory(namespace) {
         onlyFavorites: false,
         onlyMine: false,
         equipment: [],
+        features: [],
         bounds: null,
         division: null,
         error: false

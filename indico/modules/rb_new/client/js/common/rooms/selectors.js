@@ -41,6 +41,10 @@ export const getFeatures = createSelector(
         return _.sortBy(Object.values(features), 'title');
     }
 );
+export const getFeaturesForFilterButtons = createSelector(
+    getFeatures,
+    features => features.filter(f => f.showFilterButton).map(f => _.pick(f, ['icon', 'name', 'title']))
+);
 
 export const getAllRooms = createSelector(
     ({rooms}) => rooms.rooms,

@@ -30,6 +30,10 @@ export const ajax = {
         onlyIf: ({equipment}) => equipment && equipment.length,
         serializer: ({equipment}) => equipment
     },
+    feature: {
+        onlyIf: ({features}) => features && features.length,
+        serializer: ({features}) => features
+    },
     mine: {
         onlyIf: ({onlyMine}) => onlyMine,
         serializer: ({onlyMine}) => onlyMine,

@@ -44,7 +44,7 @@ import './RoomList.module.scss';
 
 const SearchBar = searchBarFactory('roomList', roomsListSelectors);
 const MapController = mapControllerFactory('roomList', roomsListSelectors);
-const RoomFilterBar = roomFilterBarFactory('roomList');
+const RoomFilterBar = roomFilterBarFactory('roomList', roomsListSelectors);
 
 
 class RoomList extends React.Component {

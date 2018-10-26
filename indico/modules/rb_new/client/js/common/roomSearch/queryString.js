@@ -85,6 +85,21 @@ export const rules = {
             }
         }
     },
+    feat: {
+        validator: () => true,
+        stateField: {
+            serialize: ({filters: {features}}) => features,
+            parse: (value, state) => {
+                if (!Array.isArray(value)) {
+                    value = [value];
+                }
+                if (!state.filters) {
+                    state.filters = {};
+                }
+                state.filters.features = value;
+            }
+        }
+    },
     building: {
         stateField: 'filters.building'
     },
