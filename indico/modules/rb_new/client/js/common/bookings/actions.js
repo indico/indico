@@ -17,6 +17,7 @@
 
 import fetchBookingDetailsURL from 'indico-url:rooms_new.booking_details';
 import bookingStateActionsURL from 'indico-url:rooms_new.booking_state_actions';
+import bookingDeleteURL from 'indico-url:rooms_new.booking_delete';
 
 import {indicoAxios} from 'indico/utils/axios';
 import {ajaxAction} from 'indico/utils/redux';
@@ -33,6 +34,10 @@ export const BOOKING_STATE_CHANGE_SUCCESS = 'bookings/BOOKING_STATE_CHANGE_SUCCE
 export const BOOKING_STATE_CHANGE_ERROR = 'bookings/BOOKING_STATE_CHANGE_ERROR';
 export const BOOKING_STATE_UPDATED = 'bookings/BOOKING_STATE_UPDATED';
 
+export const BOOKING_DELETE_REQUEST = 'bookings/BOOKING_DELETE_REQUEST';
+export const BOOKING_DELETE_SUCCESS = 'bookings/BOOKING_DELETE_SUCCESS';
+export const BOOKING_DELETE_ERROR = 'bookings/BOOKING_DELETE_ERROR';
+
 
 export function fetchBookingDetails(id) {
     return async (dispatch) => {
@@ -47,13 +52,24 @@ export function fetchBookingDetails(id) {
 
 export const openBookingDetails = (bookingId) => modalActions.openModal('booking-details', bookingId);
 
-export function changeBookingStatus(id, action, params = {}) {
+export function changeBookingState(id, action, params = {}) {
     return async (dispatch) => {
         return await ajaxAction(
             () => indicoAxios.post(bookingStateActionsURL({booking_id: id, action}), params),
             BOOKING_STATE_CHANGE_REQUEST,
             [BOOKING_STATE_CHANGE_SUCCESS, BOOKING_STATE_UPDATED],
             BOOKING_STATE_CHANGE_ERROR,
+        )(dispatch);
+    };
+}
+
+export function deleteBooking(id) {
+    return async (dispatch) => {
+        return await ajaxAction(
+            () => indicoAxios.delete(bookingDeleteURL({booking_id: id})),
+            BOOKING_DELETE_REQUEST,
+            BOOKING_DELETE_SUCCESS,
+            BOOKING_DELETE_ERROR,
         )(dispatch);
     };
 }

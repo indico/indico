@@ -55,3 +55,9 @@
 .rejection-form {
     width: 350px;
 }
+
+.delete-popup {
+    :global(.ui.message) {
+        width: 300px;
+    }
+}

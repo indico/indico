@@ -169,6 +169,9 @@ class RHBookingStateActions(RHRoomBookingBase):
         elif self.action == 'reject':
             if not self.booking.can_be_rejected(session.user):
                 raise Forbidden
+        elif self.action == 'cancel':
+            if not self.booking.can_be_cancelled(session.user):
+                raise Forbidden
 
     def _process_args(self):
         self.booking = Reservation.get_one(request.view_args['booking_id'])
@@ -177,7 +180,28 @@ class RHBookingStateActions(RHRoomBookingBase):
     def _process(self):
         if self.action == 'approve':
             self.booking.accept(session.user)
+            state = 'approved'
         elif self.action == 'reject':
             reason = request.json['reason']
             self.booking.reject(session.user, reason)
-        return jsonify(booking=reservation_details_schema.dump(self.booking).data)
+            state = 'rejected'
+        elif self.action == 'cancel':
+            reason = request.json['reason']
+            self.booking.cancel(session.user, reason)
+            state = 'cancelled'
+        return jsonify(booking=reservation_details_schema.dump(self.booking).data, booking_state=state)
+
+
+class RHBookingDelete(RHRoomBookingBase):
+    def _check_access(self):
+        RHRoomBookingBase._check_access(self)
+        if not self.booking.can_be_deleted(session.user):
+            raise Forbidden
+
+    def _process_args(self):
+        self.booking = Reservation.get_one(request.view_args['booking_id'])
+
+    def _process(self):
+        booking_id, room_id = self.booking.id, self.booking.room.id
+        db.session.delete(self.booking)
+        return jsonify(booking_id=booking_id, room_id=room_id)
