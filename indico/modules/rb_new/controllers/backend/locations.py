@@ -17,14 +17,12 @@
 from __future__ import unicode_literals
 
 from flask import jsonify
-from sqlalchemy.orm import contains_eager, joinedload
+from sqlalchemy.orm import contains_eager
 
 from indico.core.db import db
 from indico.modules.rb import Location, Room
 from indico.modules.rb.controllers import RHRoomBookingBase
-from indico.modules.rb.models.equipment import EquipmentType
-from indico.modules.rb.models.map_areas import MapArea
-from indico.modules.rb_new.schemas import equipment_type_schema, locations_schema, map_areas_schema
+from indico.modules.rb_new.schemas import locations_schema
 
 
 class RHLocations(RHRoomBookingBase):
@@ -38,20 +36,3 @@ class RHLocations(RHRoomBookingBase):
                      .order_by(Location.name, db.func.indico.natsort(Room.full_name))
                      .all())
         return jsonify(locations_schema.dump(locations).data)
-
-
-class RHMapAreas(RHRoomBookingBase):
-    def _process(self):
-        return jsonify(map_areas_schema.dump(MapArea.query).data)
-
-
-class RHEquipmentTypes(RHRoomBookingBase):
-    def _get_equipment_types(self):
-        query = (EquipmentType.query
-                 .filter(EquipmentType.rooms.any(Room.is_active))
-                 .options(joinedload('features'))
-                 .order_by(EquipmentType.name))
-        return equipment_type_schema.dump(query, many=True).data
-
-    def _process(self):
-        return jsonify(self._get_equipment_types())
