@@ -139,14 +139,6 @@ class Location(db.Model):
          .filter(Location.is_default | (Location.id == self.id))
          .update({'is_default': func.not_(Location.is_default)}, synchronize_session='fetch'))
 
-    def get_attribute_by_name(self, name):
-        # TODO: remove this
-        return RoomAttribute.query.filter_by(name=name).first()
-
-    def get_equipment_by_name(self, name):
-        # TODO: remove this
-        return EquipmentType.query.filter_by(name=name).first()
-
     def get_buildings(self):
         building_rooms = defaultdict(list)
         for room in self.rooms:

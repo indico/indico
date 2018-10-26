@@ -442,9 +442,9 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
                 self.attributes.filter(RoomAttributeAssociation.attribute_id == attr.attribute_id) \
                     .delete(synchronize_session='fetch')
         elif value:
-            attr = self.location.get_attribute_by_name(name)
+            attr = RoomAttribute.query.filter_by(name=name).first()
             if not attr:
-                raise ValueError("Attribute {} not supported in location {}".format(name, self.location_name))
+                raise ValueError("Attribute {} does not exist".format(name))
             attr_assoc = RoomAttributeAssociation()
             attr_assoc.value = value
             attr_assoc.attribute = attr

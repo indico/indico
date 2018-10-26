@@ -64,20 +64,6 @@ def test_set_default(create_location):
     assert other_location.is_default
 
 
-def test_get_attribute_by_name(dummy_location, create_room_attribute):
-    assert dummy_location.get_attribute_by_name(u'foo') is None
-    attr = create_room_attribute(u'foo')
-    assert dummy_location.get_attribute_by_name(u'foo') == attr
-    assert dummy_location.get_attribute_by_name(u'bar') is None
-
-
-def test_get_equipment_by_name(dummy_location, create_equipment_type):
-    assert dummy_location.get_equipment_by_name(u'foo') is None
-    eq = create_equipment_type(u'foo')
-    assert dummy_location.get_equipment_by_name(u'foo') == eq
-    assert dummy_location.get_equipment_by_name(u'bar') is None
-
-
 def test_get_buildings(db, dummy_location, create_room):
     room = create_room()
     assert len(dummy_location.rooms) == 1

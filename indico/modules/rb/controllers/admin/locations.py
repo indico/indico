@@ -129,7 +129,7 @@ class RHRoomBookingSaveCustomAttribute(RHRoomBookingAdminBase):
         attr_title = request.form.get('newCustomAttributeName', default='').strip()
         if attr_title:
             attr_name = attr_title.replace(' ', '-').lower()
-            if self._location.get_attribute_by_name(attr_name):
+            if RoomAttribute.query.filter_by(name=attr_name).first():
                 raise BadRequest(_('There is already an attribute named: {0}').format(attr_name))
 
             self._new_attr = RoomAttribute(name=attr_name, title=attr_title,
