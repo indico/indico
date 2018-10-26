@@ -172,11 +172,6 @@ class RoomFilterBarBase extends React.Component {
                                            initialValues={{capacity}}
                                            renderValue={capacityRenderer} />
                     {equipmentFilter}
-                    {(hasOwnedRooms || onlyMine) && (
-                        <Popup trigger={<Button icon="user" primary={onlyMine}
-                                                onClick={() => setFilterParameter('onlyMine', !onlyMine)} />}
-                               content={Translate.string('Show only rooms I manage')} />
-                    )}
                     <Overridable id="RoomFilterBar.extraFilters"
                                  setFilter={setFilterParameter}
                                  filters={extraFilters} />
@@ -185,6 +180,11 @@ class RoomFilterBarBase extends React.Component {
                                             disabled={!onlyFavorites && !hasFavoriteRooms}
                                             onClick={() => setFilterParameter('onlyFavorites', !onlyFavorites)} />}
                            content={Translate.string('Show only my favorite rooms')} />
+                    {(hasOwnedRooms || onlyMine) && (
+                        <Popup trigger={<Button icon="user" primary={onlyMine}
+                                                onClick={() => setFilterParameter('onlyMine', !onlyMine)} />}
+                               content={Translate.string('Show only rooms I manage')} />
+                    )}
                 </FilterBarController>
             </Button.Group>
         );
