@@ -15,15 +15,61 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import _ from 'lodash';
 import {createSelector} from 'reselect';
 
 import {RequestState} from 'indico/utils/redux';
 
 
 export const hasLoadedEquipmentTypes = ({rooms}) => rooms.requests.equipmentTypes.state === RequestState.SUCCESS;
-export const getEquipmentTypes = ({rooms}) => rooms.equipmentTypes;
+const getEquipmentTypes = ({rooms}) => rooms.equipmentTypes;
+export const getEquipmentTypeNames = createSelector(
+    getEquipmentTypes,
+    equipmentTypes => Object.values(equipmentTypes).map(x => x.name)
+);
+export const getFeatures = createSelector(
+    getEquipmentTypes,
+    equipmentTypes => {
+        const features = {};
+        Object.values(equipmentTypes)
+            .map(eq => eq.features)
+            .forEach(eqFeatures => {
+                eqFeatures.forEach(feature => {
+                    features[feature.id] = feature;
+                });
+            });
+        return _.sortBy(Object.values(features), 'title');
+    }
+);
 
-export const getAllRooms = ({rooms}) => rooms.rooms;
+export const getAllRooms = createSelector(
+    ({rooms}) => rooms.rooms,
+    getEquipmentTypes,
+    (rawRooms, equipmentTypes) => {
+        return _.fromPairs(rawRooms.map(room => {
+            const {available_equipment: equipment, ...roomData} = room;
+            // gather a list of features the room has based on its equipment
+            const features = {};
+            equipment.map(id => equipmentTypes[id]).forEach(equipmentType => {
+                equipmentType.features.forEach(({id, ...feature}) => {
+                    if (!(id in features)) {
+                        features[id] = {
+                            ...feature,
+                            equipment: [],
+                        };
+                    }
+                    features[id].equipment.push(equipmentType.name);
+                });
+            });
+            return [room.id, {
+                ...roomData,
+                equipment: equipment.map(id => equipmentTypes[id].name).sort(),
+                features: _.sortBy(Object.values(features), 'title'),
+            }];
+        }));
+    }
+);
+
 export const hasLoadedRooms = ({rooms}) => rooms.requests.rooms.state === RequestState.SUCCESS;
 export const getRoom = (state, {roomId}) => getAllRooms(state)[roomId];
 

@@ -27,6 +27,7 @@ from indico.core.marshmallow import mm
 from indico.modules.rb.models.blocked_rooms import BlockedRoom, BlockedRoomState
 from indico.modules.rb.models.blocking_principals import BlockingPrincipal
 from indico.modules.rb.models.blockings import Blocking
+from indico.modules.rb.models.equipment import EquipmentType
 from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.map_areas import MapArea
 from indico.modules.rb.models.reservation_edit_logs import ReservationEditLog
@@ -34,6 +35,7 @@ from indico.modules.rb.models.reservation_occurrences import ReservationOccurren
 from indico.modules.rb.models.reservations import RepeatFrequency, Reservation
 from indico.modules.rb.models.room_attributes import RoomAttributeAssociation
 from indico.modules.rb.models.room_bookable_hours import BookableHours
+from indico.modules.rb.models.room_features import RoomFeature
 from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
 from indico.modules.rb.models.rooms import Room
 from indico.modules.users.schemas import UserSchema
@@ -42,9 +44,8 @@ from indico.util.marshmallow import NaiveDateTime
 from indico.util.string import natural_sort_key
 
 
-_room_fields = ('id', 'name', 'capacity', 'building', 'floor', 'number', 'is_public', 'location_name', 'has_vc',
-                'has_projector', 'has_webcast_recording', 'full_name', 'comments', 'division', 'is_reservable',
-                'is_auto_confirm', 'sprite_position')
+_room_fields = ('id', 'name', 'capacity', 'building', 'floor', 'number', 'is_public', 'location_name', 'full_name',
+                'comments', 'division', 'is_reservable', 'is_auto_confirm', 'sprite_position')
 
 
 class RoomAttributesSchema(mm.ModelSchema):
@@ -61,7 +62,7 @@ class RoomSchema(mm.ModelSchema):
     class Meta:
         model = Room
         fields = _room_fields + ('surface_area', 'latitude', 'longitude', 'telephone', 'key_location',
-                                 'max_advance_days', 'owner_name')
+                                 'max_advance_days', 'owner_name', 'available_equipment')
 
 
 class MapAreaSchema(mm.ModelSchema):
@@ -216,6 +217,20 @@ class CreateBookingSchema(Schema):
             raise ValidationError(_('Booking cannot end before it starts'))
 
 
+class RoomFeatureSchema(mm.ModelSchema):
+    class Meta:
+        model = RoomFeature
+        fields = ('id', 'name', 'title', 'icon', 'show_filter_button')
+
+
+class EquipmentTypeSchema(mm.ModelSchema):
+    features = Nested(RoomFeatureSchema, many=True)
+
+    class Meta:
+        model = EquipmentType
+        fields = ('id', 'name', 'features')
+
+
 rb_user_schema = RBUserSchema()
 rooms_schema = RoomSchema(many=True, only=_room_fields)
 room_details_schema = RoomSchema()
@@ -231,3 +246,4 @@ nonbookable_periods_schema = NonBookablePeriodSchema(many=True)
 bookable_hours_schema = BookableHoursSchema()
 locations_schema = LocationsSchema(many=True)
 create_booking_args = CreateBookingSchema()
+equipment_type_schema = EquipmentTypeSchema()

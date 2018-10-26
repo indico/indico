@@ -17,6 +17,7 @@
 
 import {combineReducers} from 'redux';
 
+import camelizeKeys from 'indico/utils/camelize';
 import {requestReducer} from 'indico/utils/redux';
 import * as roomsActions from './actions';
 
@@ -49,7 +50,7 @@ export default combineReducers({
     equipmentTypes: (state = [], action) => {
         switch (action.type) {
             case roomsActions.EQUIPMENT_TYPES_RECEIVED:
-                return action.data;
+                return action.data.map(x => camelizeKeys(x)).reduce((obj, r) => ({...obj, [r.id]: r}), {});
             default:
                 return state;
         }
@@ -57,7 +58,7 @@ export default combineReducers({
     rooms: (state = {}, action) => {
         switch (action.type) {
             case roomsActions.ROOMS_RECEIVED:
-                return action.data.reduce((obj, r) => ({...obj, [r.id]: r}), {});
+                return action.data;
             default:
                 return state;
         }

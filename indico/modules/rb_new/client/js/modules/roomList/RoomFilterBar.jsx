@@ -167,7 +167,7 @@ class RoomFilterBarBase extends React.Component {
 export default (namespace) => connect(
     state => ({
         ...state[namespace].filters,
-        equipmentTypes: roomsSelectors.getEquipmentTypes(state),
+        equipmentTypes: roomsSelectors.getEquipmentTypeNames(state),
         hasOwnedRooms: userSelectors.hasOwnedRooms(state),
         hasFavoriteRooms: userSelectors.hasFavoriteRooms(state),
         buildings: roomsSelectors.getBuildings(state),

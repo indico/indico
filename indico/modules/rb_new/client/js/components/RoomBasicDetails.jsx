@@ -19,36 +19,33 @@ import React from 'react';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import roomsSpriteURL from 'indico-url:rooms_new.sprite';
-import {Grid, Header, Icon, Popup} from 'semantic-ui-react';
+import {Grid, Header, Icon} from 'semantic-ui-react';
 import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
 
+import RoomFeatureEntry from './RoomFeatureEntry';
 import SpriteImage from './SpriteImage';
 import {selectors as configSelectors} from '../common/config';
 
 import './RoomBasicDetails.module.scss';
 
 
-function RoomEquipmentBox({room}) {
+function RoomFeaturesBox({room: {features}}) {
+    if (!features.length) {
+        return null;
+    }
     return (
         <div styleName="equipment-box">
-            {room.has_vc && (
-                <Popup trigger={<Icon name="video camera" color="teal" size="large" />}
-                       content={Translate.string('Videoconference available')} />
-            )}
-            {room.has_webcast_recording && (
-                <Popup trigger={<Icon name="podcast" color="teal" size="large" />}
-                       content={Translate.string('Webcast recording available')} />
-            )}
-            {room.has_projector && (
-                <Popup trigger={<Icon name="film" color="teal" size="large" />}
-                       content={Translate.string('Projector available')} />
-            )}
+            {features.map(feature => (
+                <RoomFeatureEntry key={feature.name} feature={feature} color="teal" size="large" />
+            ))}
         </div>
     );
 }
 
-RoomEquipmentBox.propTypes = {
-    room: PropTypes.object.isRequired,
+RoomFeaturesBox.propTypes = {
+    room: PropTypes.shape({
+        features: PropTypes.array.isRequired,
+    }).isRequired,
 };
 
 function RoomBasicDetails({room, roomsSpriteToken}) {
@@ -62,7 +59,7 @@ function RoomBasicDetails({room, roomsSpriteToken}) {
                 <SpriteImage src={roomsSpriteURL({version: roomsSpriteToken})} pos={room.sprite_position}
                              origin="0"
                              scale="0.85" />
-                <RoomEquipmentBox room={room} />
+                <RoomFeaturesBox room={room} />
             </Grid.Column>
             <Grid.Column>
                 <Header>
