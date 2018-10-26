@@ -53,6 +53,7 @@ _bp.add_url_rule('/api/bookings/<int:booking_id>', 'booking_details', bookings.R
 _bp.add_url_rule('/api/bookings/<int:booking_id>', 'booking_delete', bookings.RHBookingDelete, methods=('DELETE',))
 _bp.add_url_rule('/api/bookings/<int:booking_id>/<any(approve,reject,cancel):action>', 'booking_state_actions',
                  bookings.RHBookingStateActions, methods=('POST',))
+_bp.add_url_rule('/api/bookings/<int:booking_id>/event', 'booking_event_data', bookings.RHBookingEventData)
 _bp.add_url_rule('/api/suggestions', 'suggestions', bookings.RHRoomSuggestions)
 _bp.add_url_rule('/api/locations', 'locations', locations.RHLocations)
 _bp.add_url_rule('/api/blockings/', 'blockings', blockings.RHRoomBlockings)

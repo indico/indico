@@ -34,7 +34,8 @@ from indico.modules.rb_new.controllers.backend.common import search_room_args
 from indico.modules.rb_new.operations.bookings import get_booking_occurrences, get_room_calendar, get_rooms_availability
 from indico.modules.rb_new.operations.suggestions import get_suggestions
 from indico.modules.rb_new.schemas import (create_booking_args, reservation_details_occurrences_schema,
-                                           reservation_details_schema, reservation_schema)
+                                           reservation_details_schema, reservation_event_data_schema,
+                                           reservation_schema)
 from indico.modules.rb_new.util import (group_by_occurrence_date, serialize_blockings, serialize_nonbookable_periods,
                                         serialize_occurrences, serialize_unbookable_hours)
 from indico.modules.users.models.users import User
@@ -144,10 +145,12 @@ class RHRoomSuggestions(RHRoomBookingBase):
         return jsonify(get_suggestions(args, limit=NUM_SUGGESTIONS))
 
 
-class RHBookingDetails(RHRoomBookingBase):
+class RHBookingBase(RHRoomBookingBase):
     def _process_args(self):
         self.booking = Reservation.get_one(request.view_args['booking_id'])
 
+
+class RHBookingDetails(RHBookingBase):
     def _process(self):
         attributes = reservation_details_schema.dump(self.booking).data
         date_range, occurrences = get_booking_occurrences(self.booking)
@@ -207,3 +210,12 @@ class RHBookingDelete(RHRoomBookingBase):
         room_id = self.booking.room.id
         db.session.delete(self.booking)
         return jsonify(booking_id=booking_id, room_id=room_id)
+
+
+class RHBookingEventData(RHBookingBase):
+    def _process(self):
+        if self.booking.event is None:
+            raise NotFound
+        if not self.booking.event.can_access(session.user):
+            return jsonify(can_access=False)
+        return jsonify(reservation_event_data_schema.dump(self.booking.event).data)

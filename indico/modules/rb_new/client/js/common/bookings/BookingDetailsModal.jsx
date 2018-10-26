@@ -28,6 +28,7 @@ import {ReduxFormField, formatters, validators} from 'indico/react/forms';
 import TimeInformation from '../../components/TimeInformation';
 import RoomBasicDetails from '../../components/RoomBasicDetails';
 import RoomKeyLocation from '../../components/RoomKeyLocation';
+import BookingEventLink from './BookingEventLink';
 import * as bookingsSelectors from './selectors';
 import * as bookRoomActions from './actions';
 import {DailyTimelineContent, TimelineLegend} from '../timeline';
@@ -40,6 +41,7 @@ class BookingDetailsModal extends React.Component {
     static propTypes = {
         booking: PropTypes.object.isRequired,
         bookingStateChangeInProgress: PropTypes.bool.isRequired,
+        bookingId: PropTypes.number.isRequired,
         onClose: PropTypes.func,
         actions: PropTypes.exact({
             changeBookingState: PropTypes.func.isRequired,
@@ -354,8 +356,9 @@ class BookingDetailsModal extends React.Component {
             booking: {
                 room, bookedForUser, startDt, endDt, repetition, createdByUser, createdDt, bookingReason,
                 occurrences, dateRange, editLogs, canAccept, canCancel, canDelete, canModify, canReject, isCancelled,
-                isRejected, isAccepted
-            }
+                isRejected, isAccepted, isLinkedToEvent
+            },
+            bookingId
         } = this.props;
         const {occurrencesVisible} = this.state;
         const dates = {startDate: startDt, endDate: endDt};
@@ -393,6 +396,7 @@ class BookingDetailsModal extends React.Component {
                         <Grid.Column>
                             {bookedForUser && this.renderBookedFor(bookedForUser)}
                             {this.renderReason(bookingReason)}
+                            {isLinkedToEvent && <BookingEventLink bookingId={bookingId} />}
                             {this.renderBookingHistory(editLogs, createdDt, createdByUser)}
                         </Grid.Column>
                     </Grid>

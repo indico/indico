@@ -20,7 +20,7 @@ from operator import itemgetter
 
 from flask import session
 from marshmallow import Schema, ValidationError, fields, post_dump, validate, validates_schema
-from marshmallow.fields import Boolean, Function, Nested, String
+from marshmallow.fields import Boolean, Function, Nested, Number, String
 from marshmallow_enum import EnumField
 
 from indico.core.marshmallow import mm
@@ -78,6 +78,13 @@ class ReservationSchema(mm.ModelSchema):
         fields = ('id', 'booking_reason', 'booked_for_name')
 
 
+class ReservationEventDataSchema(Schema):
+    id = Number()
+    title = String()
+    url = String()
+    can_access = Function(lambda event: event.can_access(session.user))
+
+
 class ReservationOccurrenceSchema(mm.ModelSchema):
     reservation = Nested(ReservationSchema)
     start_dt = NaiveDateTime()
@@ -118,6 +125,7 @@ class ReservationDetailsSchema(mm.ModelSchema):
     can_delete = Function(lambda booking: booking.can_be_deleted(session.user))
     can_modify = Function(lambda booking: booking.can_be_modified(session.user))
     can_reject = Function(lambda booking: booking.can_be_rejected(session.user))
+    is_linked_to_event = Function(lambda booking: booking.event is not None)
     start_dt = NaiveDateTime()
     end_dt = NaiveDateTime()
 
@@ -125,7 +133,8 @@ class ReservationDetailsSchema(mm.ModelSchema):
         model = Reservation
         fields = ('id', 'start_dt', 'end_dt', 'repetition', 'booking_reason', 'created_dt', 'booked_for_user',
                   'room_id', 'created_by_user', 'edit_logs', 'can_accept', 'can_cancel', 'can_delete', 'can_modify',
-                  'can_reject', 'is_cancelled', 'is_rejected', 'is_accepted', 'is_pending', 'rejection_reason')
+                  'can_reject', 'is_cancelled', 'is_rejected', 'is_accepted', 'is_pending', 'rejection_reason',
+                  'is_linked_to_event')
 
 
 class BlockedRoomSchema(mm.ModelSchema):
@@ -239,6 +248,7 @@ map_areas_schema = MapAreaSchema(many=True)
 reservation_occurrences_schema = ReservationOccurrenceSchema(many=True)
 reservation_schema = ReservationSchema()
 reservation_details_schema = ReservationDetailsSchema()
+reservation_event_data_schema = ReservationEventDataSchema()
 reservation_details_occurrences_schema = ReservationDetailsOccurrenceSchema(many=True)
 blockings_schema = BlockingSchema(many=True)
 simple_blockings_schema = BlockingSchema(many=True, only=('id', 'reason'))
