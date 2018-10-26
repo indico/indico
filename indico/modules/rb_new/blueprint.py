@@ -50,7 +50,9 @@ _bp.add_url_rule('/api/equipment', 'equipment_types', misc.RHEquipmentTypes)
 _bp.add_url_rule('/api/booking/create', 'create_booking', bookings.RHCreateBooking,
                  methods=('POST',))
 _bp.add_url_rule('/api/bookings/<int:booking_id>', 'booking_details', bookings.RHBookingDetails)
-_bp.add_url_rule('/api/bookings/<int:booking_id>/<any(approve,reject):action>', 'booking_state_actions',
+_bp.add_url_rule('/api/bookings/<int:booking_id>/delete', 'booking_delete', bookings.RHBookingDelete,
+                 methods=('DELETE',))
+_bp.add_url_rule('/api/bookings/<int:booking_id>/<any(approve,reject,cancel):action>', 'booking_state_actions',
                  bookings.RHBookingStateActions, methods=('POST',))
 _bp.add_url_rule('/api/suggestions', 'suggestions', bookings.RHRoomSuggestions)
 _bp.add_url_rule('/api/locations', 'locations', locations.RHLocations)
