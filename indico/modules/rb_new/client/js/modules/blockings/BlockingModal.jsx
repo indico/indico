@@ -123,7 +123,7 @@ class BlockingModal extends React.Component {
                             input={input}
                             as={DatePeriodField}
                             label={Translate.string('Period')}
-                            required={mode !== 'view'} />
+                            required={mode === 'create'} />
         );
     };
 
