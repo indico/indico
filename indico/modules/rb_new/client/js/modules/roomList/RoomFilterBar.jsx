@@ -75,19 +75,25 @@ const renderBuilding = ({building}) => {
     );
 };
 
-export const equipmentType = PropTypes.array;
-
 class RoomFilterBarBase extends React.Component {
     static propTypes = {
         equipmentTypes: PropTypes.arrayOf(PropTypes.string).isRequired,
+        features: PropTypes.arrayOf(PropTypes.shape({
+            icon: PropTypes.string.isRequired,
+            name: PropTypes.string.isRequired,
+            title: PropTypes.string.isRequired,
+        })).isRequired,
         buildings: PropTypes.array.isRequired,
-        building: PropTypes.string,
-        capacity: PropTypes.number,
-        equipment: equipmentType,
-        onlyFavorites: PropTypes.bool,
-        onlyMine: PropTypes.bool,
         hasFavoriteRooms: PropTypes.bool,
         hasOwnedRooms: PropTypes.bool,
+        filters: PropTypes.shape({
+            building: PropTypes.string,
+            capacity: PropTypes.number,
+            equipment: PropTypes.array,
+            onlyFavorites: PropTypes.bool,
+            onlyMine: PropTypes.bool,
+            features: PropTypes.arrayOf(PropTypes.string).isRequired,
+        }).isRequired,
         actions: PropTypes.shape({
             setFilterParameter: PropTypes.func
         }).isRequired
@@ -103,11 +109,29 @@ class RoomFilterBarBase extends React.Component {
         equipment: [],
     };
 
+    renderFeatureFilters() {
+        const {features, filters: {features: featuresFilter}, actions: {setFilterParameter}} = this.props;
+        return features.map(feature => {
+            const isActive = featuresFilter.includes(feature.name);
+            const onClick = () => {
+                if (isActive) {
+                    setFilterParameter('features', featuresFilter.filter(f => f !== feature.name));
+                } else {
+                    setFilterParameter('features', [...featuresFilter, feature.name]);
+                }
+            };
+            const trigger = (
+                <Button icon={feature.icon} primary={isActive} onClick={onClick} />
+            );
+            return <Popup key={feature.name} trigger={trigger} content={feature.title} />;
+        });
+    }
+
     render() {
         const {
-            capacity, onlyFavorites, onlyMine, equipment, equipmentTypes,
-            hasOwnedRooms, hasFavoriteRooms, actions: {setFilterParameter}, building, buildings,
-            ...extraProps
+            equipmentTypes, hasOwnedRooms, hasFavoriteRooms, buildings,
+            filters: {capacity, onlyFavorites, onlyMine, equipment, building, ...extraFilters},
+            actions: {setFilterParameter}
         } = this.props;
 
         const equipmentFilter = !!equipmentTypes.length && (
@@ -153,7 +177,10 @@ class RoomFilterBarBase extends React.Component {
                                                 onClick={() => setFilterParameter('onlyMine', !onlyMine)} />}
                                content={Translate.string('Show only rooms I manage')} />
                     )}
-                    <Overridable id="RoomFilterBar.extraFilters" setFilter={setFilterParameter} filters={extraProps} />
+                    <Overridable id="RoomFilterBar.extraFilters"
+                                 setFilter={setFilterParameter}
+                                 filters={extraFilters} />
+                    {this.renderFeatureFilters()}
                     <Popup trigger={<Button icon="star" primary={onlyFavorites}
                                             disabled={!onlyFavorites && !hasFavoriteRooms}
                                             onClick={() => setFilterParameter('onlyFavorites', !onlyFavorites)} />}
@@ -164,10 +191,11 @@ class RoomFilterBarBase extends React.Component {
     }
 }
 
-export default (namespace) => connect(
+export default (namespace, searchRoomsSelectors) => connect(
     state => ({
-        ...state[namespace].filters,
+        filters: searchRoomsSelectors.getFilters(state),
         equipmentTypes: roomsSelectors.getEquipmentTypeNames(state),
+        features: roomsSelectors.getFeaturesForFilterButtons(state),
         hasOwnedRooms: userSelectors.hasOwnedRooms(state),
         hasFavoriteRooms: userSelectors.hasFavoriteRooms(state),
         buildings: roomsSelectors.getBuildings(state),

@@ -49,7 +49,7 @@ import './BookRoom.module.scss';
 
 const SearchBar = searchBarFactory('bookRoom', bookRoomSelectors);
 const MapController = mapControllerFactory('bookRoom', bookRoomSelectors);
-const RoomFilterBar = roomFilterBarFactory('bookRoom');
+const RoomFilterBar = roomFilterBarFactory('bookRoom', bookRoomSelectors);
 
 /* eslint-disable react/no-unused-state */
 class BookRoom extends React.Component {
