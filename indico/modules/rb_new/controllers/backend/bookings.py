@@ -50,7 +50,7 @@ def _serialize_availability(availability):
         data['blockings'] = serialize_blockings(data['blockings'])
         data['nonbookable_periods'] = serialize_nonbookable_periods(data['nonbookable_periods'])
         data['unbookable_hours'] = serialize_unbookable_hours(data['unbookable_hours'])
-        data.update({k: serialize_occurrences(data[k]) if k in data else []
+        data.update({k: serialize_occurrences(data[k]) if k in data else {}
                      for k in ['candidates', 'pre_bookings', 'bookings', 'conflicts', 'pre_conflicts']})
     return availability
 
@@ -129,8 +129,13 @@ class RHCreateBooking(RHRoomBookingBase):
         except NoReportError as e:
             db.session.rollback()
             raise ExpectedError(unicode(e))
-        return jsonify(room_id=room.id, booking=reservation_schema.dump(resv).data,
-                       occurrences=serialize_occurrences(group_by_occurrence_date(resv.occurrences.all())))
+
+        serialized_occurrences = serialize_occurrences(group_by_occurrence_date(resv.occurrences.all()))
+        if is_prebooking:
+            data = {'pre_bookings': serialized_occurrences}
+        else:
+            data = {'bookings': serialized_occurrences}
+        return jsonify(room_id=room.id, **data)
 
 
 class RHRoomSuggestions(RHRoomBookingBase):
