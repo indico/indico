@@ -250,11 +250,6 @@ def test_find_overlapping_with_skip_reservation(overlapping_occurrences):
                                                                      skip_reservation_id=db_occ.reservation.id).all()
 
 
-@pytest.mark.xfail
-def test_find_with_filters():
-    raise NotImplementedError
-
-
 # ======================================================================================================================
 # method tests
 # ======================================================================================================================
