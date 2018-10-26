@@ -237,7 +237,7 @@ export default class DateNavigator extends React.Component {
                    onClose={this.onClose}
                    keepInViewPort={false}
                    trigger={
-                       <Button primary>
+                       <Button primary disabled={disabled}>
                            {this.selectedDate.format('L')}
                        </Button>
                    }
@@ -266,11 +266,11 @@ export default class DateNavigator extends React.Component {
     }
 
     render = () => {
-        const {disabled, isLoading} = this.props;
+        const {dateRange, disabled, isLoading} = this.props;
         return (
             <div>
                 {this.renderModeSwitcher(disabled || isLoading)}
-                {this.renderNavigator(disabled || isLoading)}
+                {this.renderNavigator(disabled || isLoading || dateRange.length === 1)}
             </div>
         );
     };
