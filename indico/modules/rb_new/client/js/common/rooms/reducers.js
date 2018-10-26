@@ -50,7 +50,7 @@ export default combineReducers({
     equipmentTypes: (state = [], action) => {
         switch (action.type) {
             case roomsActions.EQUIPMENT_TYPES_RECEIVED:
-                return action.data.map(x => camelizeKeys(x)).reduce((obj, r) => ({...obj, [r.id]: r}), {});
+                return action.data.map(x => camelizeKeys(x));
             default:
                 return state;
         }

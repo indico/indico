@@ -25,13 +25,13 @@ export const hasLoadedEquipmentTypes = ({rooms}) => rooms.requests.equipmentType
 const getEquipmentTypes = ({rooms}) => rooms.equipmentTypes;
 export const getEquipmentTypeNames = createSelector(
     getEquipmentTypes,
-    equipmentTypes => Object.values(equipmentTypes).map(x => x.name)
+    equipmentTypes => equipmentTypes.map(x => x.name)
 );
 export const getFeatures = createSelector(
     getEquipmentTypes,
     equipmentTypes => {
         const features = {};
-        Object.values(equipmentTypes)
+        equipmentTypes
             .map(eq => eq.features)
             .forEach(eqFeatures => {
                 eqFeatures.forEach(feature => {
@@ -46,6 +46,7 @@ export const getAllRooms = createSelector(
     ({rooms}) => rooms.rooms,
     getEquipmentTypes,
     (rawRooms, equipmentTypes) => {
+        equipmentTypes = equipmentTypes.reduce((obj, eq) => ({...obj, [eq.id]: eq}), {});
         return _.fromPairs(rawRooms.map(room => {
             const {available_equipment: equipment, ...roomData} = room;
             // gather a list of features the room has based on its equipment
@@ -61,10 +62,12 @@ export const getAllRooms = createSelector(
                     features[id].equipment.push(equipmentType.name);
                 });
             });
+            const sortedFeatures = _.sortBy(Object.values(features), 'title');
+            sortedFeatures.forEach(f => f.equipment.sort());
             return [room.id, {
                 ...roomData,
                 equipment: equipment.map(id => equipmentTypes[id].name).sort(),
-                features: _.sortBy(Object.values(features), 'title'),
+                features: sortedFeatures,
             }];
         }));
     }
