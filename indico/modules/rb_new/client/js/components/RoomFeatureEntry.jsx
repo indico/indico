@@ -28,7 +28,7 @@ export default function RoomFeatureEntry({feature, color, size}) {
     }
     return (
         <Popup trigger={trigger}>
-            {title} ({equipment.filter(eq => eq !== title).sort().join(', ')})
+            {title} ({equipment.filter(eq => eq !== title).join(', ')})
         </Popup>
     );
 }
