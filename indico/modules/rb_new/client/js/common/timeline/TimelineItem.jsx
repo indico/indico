@@ -41,6 +41,7 @@ const types = {
     bookings: 'booking',
     nonbookablePeriods: 'unbookable-periods',
     unbookableHours: 'unbookable-hours',
+    preBookings: 'pre-booking',
 };
 
 function getKeyForOccurrence({reservation, startDt, endDt}) {
@@ -159,7 +160,7 @@ export default class TimelineItem extends React.Component {
             <div className={additionalClasses} onClick={() => {
                 if (onClickCandidate && bookable && type === 'candidate') {
                     onClickCandidate(room.id);
-                } else if (onClickReservation && type === 'booking') {
+                } else if (onClickReservation && (type === 'booking' || type === 'pre-booking')) {
                     onClickReservation(reservation.id);
                 }
             }}
