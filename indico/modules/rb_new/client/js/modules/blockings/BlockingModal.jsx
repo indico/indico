@@ -289,7 +289,7 @@ class BlockingModal extends React.Component {
                                     </Message.Content>
                                 </Message>
                                 <Field name="dates"
-                                       component={this.renderBlockingPeriodField}
+                                       render={this.renderBlockingPeriodField}
                                        disabled={mode !== 'create' || submitting || submitSucceeded}
                                        allowNull />
                                 <Field name="reason"
@@ -318,11 +318,11 @@ class BlockingModal extends React.Component {
                             <Grid.Column width={8}>
                                 <Field name="allowed"
                                        isEqual={(a, b) => !this.hasAllowedFieldChanged(a, b)}
-                                       component={this.renderPrincipalSearchField}
+                                       render={this.renderPrincipalSearchField}
                                        disabled={mode === 'view' || submitting || submitSucceeded} />
                                 <Field name="rooms"
-                                       isEqual={(a, b) => _.isEqual(a, b)}
-                                       component={this.renderRoomSearchField}
+                                       isEqual={_.isEqual}
+                                       render={this.renderRoomSearchField}
                                        disabled={mode === 'view' || submitting || submitSucceeded} />
                                 <Message success>
                                     {mode === 'edit' ? (
