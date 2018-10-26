@@ -133,8 +133,7 @@ def search_for_rooms(filters, availability=None):
         query = query.filter(favorite_room_table.c.user_id.isnot(None))
     if filters.get('mine'):
         ids = get_managed_room_ids(session.user)
-        if ids:
-            query = query.filter(Room.id.in_(ids))
+        query = query.filter(Room.id.in_(ids))
     query = _filter_coordinates(query, filters)
 
     if availability is None:
