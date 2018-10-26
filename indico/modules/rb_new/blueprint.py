@@ -42,11 +42,11 @@ _bp.add_url_rule('/api/user/', 'user_info', misc.RHUserInfo)
 _bp.add_url_rule('/api/user/favorite-rooms/', 'favorite_rooms', rooms.RHRoomFavorites)
 _bp.add_url_rule('/api/user/favorite-rooms/<int:room_id>', 'favorite_rooms', rooms.RHRoomFavorites,
                  methods=('PUT', 'DELETE'))
-_bp.add_url_rule('/api/map-areas', 'map_areas', locations.RHMapAreas)
+_bp.add_url_rule('/api/map-areas', 'map_areas', misc.RHMapAreas)
 _bp.add_url_rule('/api/timeline', 'timeline', bookings.RHTimeline, methods=('GET', 'POST'))
 _bp.add_url_rule('/api/rooms/<int:room_id>/timeline', 'timeline', bookings.RHTimeline)
 _bp.add_url_rule('/api/calendar', 'calendar', bookings.RHCalendar, methods=('GET', 'POST'))
-_bp.add_url_rule('/api/equipment', 'equipment_types', locations.RHEquipmentTypes)
+_bp.add_url_rule('/api/equipment', 'equipment_types', misc.RHEquipmentTypes)
 _bp.add_url_rule('/api/booking/create', 'create_booking', bookings.RHCreateBooking,
                  methods=('POST',))
 _bp.add_url_rule('/api/bookings/<int:booking_id>', 'booking_details', bookings.RHBookingDetails)

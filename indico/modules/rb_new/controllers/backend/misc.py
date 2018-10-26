@@ -20,15 +20,18 @@ from datetime import date, datetime, time, timedelta
 from io import BytesIO
 
 from flask import jsonify, redirect, request, session
+from sqlalchemy.orm import joinedload
 
 from indico.core.db.sqlalchemy.util.queries import db_dates_overlap
 from indico.modules.rb import rb_settings
 from indico.modules.rb.controllers import RHRoomBookingBase
+from indico.modules.rb.models.equipment import EquipmentType
+from indico.modules.rb.models.map_areas import MapArea
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import Reservation
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb_new.controllers.backend.common import _cache
-from indico.modules.rb_new.schemas import rb_user_schema
+from indico.modules.rb_new.schemas import equipment_type_schema, map_areas_schema, rb_user_schema
 from indico.modules.rb_new.util import build_rooms_spritesheet
 from indico.util.caching import memoize_redis
 from indico.util.i18n import get_all_locales
@@ -80,3 +83,20 @@ class RHStats(RHRoomBookingBase):
             pending_bookings=Reservation.query.filter(Reservation.is_pending, ~Reservation.is_archived).count(),
             bookings_today=bookings_today
         )
+
+
+class RHMapAreas(RHRoomBookingBase):
+    def _process(self):
+        return jsonify(map_areas_schema.dump(MapArea.query).data)
+
+
+class RHEquipmentTypes(RHRoomBookingBase):
+    def _get_equipment_types(self):
+        query = (EquipmentType.query
+                 .filter(EquipmentType.rooms.any(Room.is_active))
+                 .options(joinedload('features'))
+                 .order_by(EquipmentType.name))
+        return equipment_type_schema.dump(query, many=True).data
+
+    def _process(self):
+        return jsonify(self._get_equipment_types())
