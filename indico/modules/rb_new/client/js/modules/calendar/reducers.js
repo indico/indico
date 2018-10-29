@@ -24,7 +24,7 @@ import {requestReducer} from 'indico/utils/redux';
 import {actions as bookRoomActions} from '../../modules/bookRoom';
 import * as actions from '../../actions';
 import * as calendarActions from './actions';
-import * as bookingActions from '../../common/bookings/actions';
+import {actions as bookingActions} from '../../common/bookings';
 import {filterReducerFactory} from '../../common/filters';
 import {processRoomFilters} from '../../common/roomSearch/reducers';
 import {initialDatePickerState} from '../../common/timeline/reducers';
@@ -126,7 +126,7 @@ export default combineReducers({
                 return {...state, rows: camelizeKeys(action.data)};
             case calendarActions.ROOM_IDS_RECEIVED:
                 return {...state, roomIds: action.data.slice()};
-            case bookingActions.BOOKING_DELETE_SUCCESS: {
+            case bookingActions.DELETE_BOOKING_SUCCESS: {
                 const {bookingId, roomId} = camelizeKeys(action.data);
                 const {rows} = state;
                 return {...state, rows: filterDeletedBooking(rows, bookingId, roomId)};
@@ -136,7 +136,7 @@ export default combineReducers({
                 const {rows} = state;
                 let newRows;
 
-                if (['rejected', 'cancelled'].indexOf(bookingState) !== -1) {
+                if (bookingState === 'rejected' || bookingState === 'cancelled') {
                     newRows = filterDeletedBooking(rows, id, roomId);
                 } else if (bookingState === 'approved') {
                     newRows = acceptPrebooking(rows, id, roomId);

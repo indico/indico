@@ -21,7 +21,7 @@ import PropTypes from 'prop-types';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import {Form as FinalForm, Field} from 'react-final-form';
-import {Button, Confirm, Modal, Message, Form, Grid, Header, Icon, Label, Popup, List} from 'semantic-ui-react';
+import {Button, Confirm, Modal, Message, Form, Grid, Header, Icon, Label, Popup, List, TextArea} from 'semantic-ui-react';
 import {Param, Translate} from 'indico/react/i18n';
 import {toMoment, serializeDate} from 'indico/utils/date';
 import {ReduxFormField, formatters, validators} from 'indico/react/forms';
@@ -54,7 +54,7 @@ class BookingDetailsModal extends React.Component {
     state = {
         occurrencesVisible: false,
         actionInProgress: null,
-        isDeletionConfirmOpen: false,
+        openConfirm: null,
     };
 
     handleCloseModal = () => {
@@ -173,7 +173,7 @@ class BookingDetailsModal extends React.Component {
 
     renderActionButtons = (canCancel, canReject, showAccept) => {
         const {bookingStateChangeInProgress} = this.props;
-        const {actionInProgress} = this.state;
+        const {actionInProgress, openConfirm} = this.state;
         const rejectButton = (
             <Button type="button"
                     icon="remove circle"
@@ -184,64 +184,60 @@ class BookingDetailsModal extends React.Component {
                     content={<Translate>Reject booking</Translate>} />
         );
 
-        const cancelButton = (
-            <Button type="button"
-                    icon="remove circle"
-                    size="small"
-                    loading={actionInProgress === 'cancel' && bookingStateChangeInProgress}
-                    disabled={actionInProgress !== 'cancel' && bookingStateChangeInProgress}
-                    content={<Translate>Cancel booking</Translate>} />
-        );
-
-        const renderForm = (placeholder, buttonText) => {
-            return ({handleSubmit, hasValidationErrors, submitSucceeded, submitting, pristine}) => {
-                return (
-                    <Form styleName="rejection-form" onSubmit={handleSubmit}>
-                        <Field name="reason"
-                               component={ReduxFormField}
-                               as={Form.TextArea}
-                               format={formatters.trim}
-                               placeholder={placeholder}
-                               disabled={submitting}
-                               rows={2}
-                               formatOnBlur />
-                        <Button type="submit"
-                                disabled={submitting || pristine || hasValidationErrors || submitSucceeded}
-                                loading={submitting}
-                                floated="right"
-                                primary>
-                            {buttonText}
-                        </Button>
-                    </Form>
-                );
-            };
+        const renderForm = ({handleSubmit, hasValidationErrors, submitSucceeded, submitting, pristine}) => {
+            return (
+                <Form styleName="rejection-form" onSubmit={handleSubmit}>
+                    <Field name="reason"
+                           component={ReduxFormField}
+                           as={TextArea}
+                           format={formatters.trim}
+                           placeholder={Translate.string('Provide the rejection reason')}
+                           rows={2}
+                           validate={validators.required}
+                           disabled={submitting}
+                           required
+                           formatOnBlur />
+                    <Button type="submit"
+                            disabled={submitting || pristine || hasValidationErrors || submitSucceeded}
+                            loading={submitting}
+                            floated="right"
+                            primary>
+                        <Translate>Reject</Translate>
+                    </Button>
+                </Form>
+            );
         };
 
         return (
             <Modal.Actions>
                 {canCancel && (
-                    <Popup trigger={cancelButton}
-                           position="bottom center"
-                           on="click">
-                        <FinalForm onSubmit={(data) => this.changeState('cancel', data)}
-                                   validate={validators.required}
-                                   render={renderForm(
-                                       Translate.string('Provide the cancellation reason'),
-                                       Translate.string('Cancel the booking')
-                                   )} />
-                    </Popup>
+                    <>
+                        <Button type="button"
+                                icon="cancel"
+                                size="small"
+                                onClick={() => this.showConfirm('cancel')}
+                                loading={actionInProgress === 'cancel' && bookingStateChangeInProgress}
+                                disabled={actionInProgress !== 'cancel' && bookingStateChangeInProgress}
+                                content={<Translate>Cancel booking</Translate>} />
+                        <Confirm header={Translate.string('Confirm cancellation')}
+                                 content={Translate.string('Are you sure you want to cancel this booking?' +
+                                                           ' This will cancel all occurrences of this booking.')}
+                                 confirmButton={<Button content={Translate.string('Cancel booking')} negative />}
+                                 cancelButton={Translate.string('Close')}
+                                 open={openConfirm === 'cancel'}
+                                 onCancel={this.hideConfirm}
+                                 onConfirm={() => {
+                                     this.changeState('cancel');
+                                     this.hideConfirm();
+                                 }} />
+                    </>
                 )}
                 {canReject && (
                     <Popup trigger={rejectButton}
                            position="bottom center"
                            on="click">
                         <FinalForm onSubmit={(data) => this.changeState('reject', data)}
-                                   validate={validators.required}
-                                   render={renderForm(
-                                       Translate.string('Provide the rejection reason'),
-                                       Translate.string('Reject')
-                                   )}
-                                   initialValues={{reason: ''}} />
+                                   render={renderForm} />
                     </Popup>
                 )}
                 {showAccept && (
@@ -260,10 +256,9 @@ class BookingDetailsModal extends React.Component {
 
     changeState = (action, data = {}) => {
         const {booking: {id}, actions: {changeBookingState}} = this.props;
-        this.setState({actionInProgress: action}, () => {
-            changeBookingState(id, action, data).then(() => {
-                this.setState({actionInProgress: null});
-            });
+        this.setState({actionInProgress: action});
+        return changeBookingState(id, action, data).then(() => {
+            this.setState({actionInProgress: null});
         });
     };
 
@@ -321,20 +316,33 @@ class BookingDetailsModal extends React.Component {
         const {actions: {deleteBooking}, booking: {id}} = this.props;
         deleteBooking(id);
         this.handleCloseModal();
-        this.setState({isDeletionConfirmOpen: false});
+        this.hideConfirm();
+    };
+
+    hideConfirm = () => {
+        this.setState({openConfirm: null});
+    };
+
+    showConfirm = (type) => {
+        this.setState({openConfirm: type});
     };
 
     renderDeleteButton = () => {
-        const {isDeletionConfirmOpen} = this.state;
+        const {openConfirm} = this.state;
+        const {bookingStateChangeInProgress} = this.props;
         return (
             <>
-                <Button icon="trash" onClick={() => this.setState({isDeletionConfirmOpen: true})} negative circular />
+                <Button icon="trash"
+                        onClick={() => this.showConfirm('delete')}
+                        disabled={bookingStateChangeInProgress}
+                        negative
+                        circular />
                 <Confirm header={Translate.string('Confirm deletion')}
-                         content={Translate.string('Are you sure you want to delete this reservation?')}
-                         confirmButton={Translate.string('Delete')}
+                         content={Translate.string('Are you sure you want to delete this booking?')}
+                         confirmButton={<Button content={Translate.string('Delete')} negative />}
                          cancelButton={Translate.string('Cancel')}
-                         open={isDeletionConfirmOpen}
-                         onCancel={() => this.setState({isDeletionConfirmOpen: false})}
+                         open={openConfirm === 'delete'}
+                         onCancel={this.hideConfirm}
                          onConfirm={this.deleteBooking} />
             </>
         );
@@ -342,6 +350,7 @@ class BookingDetailsModal extends React.Component {
 
     render() {
         const {
+            bookingStateChangeInProgress,
             booking: {
                 room, bookedForUser, startDt, endDt, repetition, createdByUser, createdDt, bookingReason,
                 occurrences, dateRange, editLogs, canAccept, canCancel, canDelete, canModify, canReject, isCancelled,
@@ -355,6 +364,7 @@ class BookingDetailsModal extends React.Component {
         const legendLabels = [{label: Translate.string('Occurrence'), color: 'orange'}];
         const showAccept = canAccept && !isAccepted;
         const showActionButtons = (!isCancelled && !isRejected && (canCancel || canReject || showAccept));
+
         return (
             <Modal open onClose={this.handleCloseModal} size="large" closeIcon>
                 <Modal.Header styleName="booking-modal-header">
@@ -365,7 +375,7 @@ class BookingDetailsModal extends React.Component {
                         {this.renderBookingStatus()}
                     </span>
                     <span>
-                        {canModify && <Button icon="pencil" circular />}
+                        {canModify && <Button icon="pencil" disabled={bookingStateChangeInProgress} circular />}
                         {canDelete && this.renderDeleteButton()}
                     </span>
                 </Modal.Header>

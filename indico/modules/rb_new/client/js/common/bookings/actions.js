@@ -34,42 +34,36 @@ export const BOOKING_STATE_CHANGE_SUCCESS = 'bookings/BOOKING_STATE_CHANGE_SUCCE
 export const BOOKING_STATE_CHANGE_ERROR = 'bookings/BOOKING_STATE_CHANGE_ERROR';
 export const BOOKING_STATE_UPDATED = 'bookings/BOOKING_STATE_UPDATED';
 
-export const BOOKING_DELETE_REQUEST = 'bookings/BOOKING_DELETE_REQUEST';
-export const BOOKING_DELETE_SUCCESS = 'bookings/BOOKING_DELETE_SUCCESS';
-export const BOOKING_DELETE_ERROR = 'bookings/BOOKING_DELETE_ERROR';
+export const DELETE_BOOKING_REQUEST = 'bookings/DELETE_BOOKING_REQUEST';
+export const DELETE_BOOKING_SUCCESS = 'bookings/DELETE_BOOKING_SUCCESS';
+export const DELETE_BOOKING_ERROR = 'bookings/DELETE_BOOKING_ERROR';
 
 
 export function fetchBookingDetails(id) {
-    return async (dispatch) => {
-        return await ajaxAction(
-            () => indicoAxios.get(fetchBookingDetailsURL({booking_id: id})),
-            FETCH_BOOKING_DETAILS_REQUEST,
-            [BOOKING_DETAILS_RECEIVED, FETCH_BOOKING_DETAILS_SUCCESS],
-            FETCH_BOOKING_DETAILS_ERROR,
-        )(dispatch);
-    };
+    return ajaxAction(
+        () => indicoAxios.get(fetchBookingDetailsURL({booking_id: id})),
+        FETCH_BOOKING_DETAILS_REQUEST,
+        [BOOKING_DETAILS_RECEIVED, FETCH_BOOKING_DETAILS_SUCCESS],
+        FETCH_BOOKING_DETAILS_ERROR,
+    );
 }
 
 export const openBookingDetails = (bookingId) => modalActions.openModal('booking-details', bookingId);
 
 export function changeBookingState(id, action, params = {}) {
-    return async (dispatch) => {
-        return await ajaxAction(
-            () => indicoAxios.post(bookingStateActionsURL({booking_id: id, action}), params),
-            BOOKING_STATE_CHANGE_REQUEST,
-            [BOOKING_STATE_CHANGE_SUCCESS, BOOKING_STATE_UPDATED],
-            BOOKING_STATE_CHANGE_ERROR,
-        )(dispatch);
-    };
+    return ajaxAction(
+        () => indicoAxios.post(bookingStateActionsURL({booking_id: id, action}), params),
+        BOOKING_STATE_CHANGE_REQUEST,
+        [BOOKING_STATE_CHANGE_SUCCESS, BOOKING_STATE_UPDATED],
+        BOOKING_STATE_CHANGE_ERROR,
+    );
 }
 
 export function deleteBooking(id) {
-    return async (dispatch) => {
-        return await ajaxAction(
-            () => indicoAxios.delete(bookingDeleteURL({booking_id: id})),
-            BOOKING_DELETE_REQUEST,
-            BOOKING_DELETE_SUCCESS,
-            BOOKING_DELETE_ERROR,
-        )(dispatch);
-    };
+    return ajaxAction(
+        () => indicoAxios.delete(bookingDeleteURL({booking_id: id})),
+        DELETE_BOOKING_REQUEST,
+        DELETE_BOOKING_SUCCESS,
+        DELETE_BOOKING_ERROR,
+    );
 }
