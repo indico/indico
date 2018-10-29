@@ -44,7 +44,7 @@ export default combineReducers({
                 const data = camelizeKeys(action.data.booking);
                 return {...state, [data.id]: {...state[data.id], ...data}};
             }
-            case bookingsActions.BOOKING_DELETE_SUCCESS: {
+            case bookingsActions.DELETE_BOOKING_SUCCESS: {
                 const {bookingId} = camelizeKeys(action.data);
                 const newState = {...state};
                 delete newState[bookingId];
