@@ -21,10 +21,10 @@ import PropTypes from 'prop-types';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import {Form as FinalForm, Field} from 'react-final-form';
-import {Button, Modal, Message, Form, Grid, Header, Icon, Label, Popup, List} from 'semantic-ui-react';
+import {Button, Confirm, Modal, Message, Form, Grid, Header, Icon, Label, Popup, List} from 'semantic-ui-react';
 import {Param, Translate} from 'indico/react/i18n';
 import {toMoment, serializeDate} from 'indico/utils/date';
-import {ReduxFormField, formatters} from 'indico/react/forms';
+import {ReduxFormField, formatters, validators} from 'indico/react/forms';
 import TimeInformation from '../../components/TimeInformation';
 import RoomBasicDetails from '../../components/RoomBasicDetails';
 import RoomKeyLocation from '../../components/RoomKeyLocation';
@@ -54,6 +54,7 @@ class BookingDetailsModal extends React.Component {
     state = {
         occurrencesVisible: false,
         actionInProgress: null,
+        isDeletionConfirmOpen: false,
     };
 
     handleCloseModal = () => {
@@ -192,16 +193,8 @@ class BookingDetailsModal extends React.Component {
                     content={<Translate>Cancel booking</Translate>} />
         );
 
-        const validate = ({reason}) => {
-            const errors = {};
-            if (!reason) {
-                errors.reason = Translate.string('Rejection reason is required');
-            }
-            return errors;
-        };
-
         const renderForm = (placeholder, buttonText) => {
-            return ({handleSubmit, hasValidationErrors, submitSucceeded, submitting}) => {
+            return ({handleSubmit, hasValidationErrors, submitSucceeded, submitting, pristine}) => {
                 return (
                     <Form styleName="rejection-form" onSubmit={handleSubmit}>
                         <Field name="reason"
@@ -213,7 +206,7 @@ class BookingDetailsModal extends React.Component {
                                rows={2}
                                formatOnBlur />
                         <Button type="submit"
-                                disabled={hasValidationErrors || submitSucceeded}
+                                disabled={submitting || pristine || hasValidationErrors || submitSucceeded}
                                 loading={submitting}
                                 floated="right"
                                 primary>
@@ -228,23 +221,22 @@ class BookingDetailsModal extends React.Component {
             <Modal.Actions>
                 {canCancel && (
                     <Popup trigger={cancelButton}
-                           position="right center"
+                           position="bottom center"
                            on="click">
                         <FinalForm onSubmit={(data) => this.changeState('cancel', data)}
-                                   validate={validate}
+                                   validate={validators.required}
                                    render={renderForm(
                                        Translate.string('Provide the cancellation reason'),
                                        Translate.string('Cancel the booking')
-                                   )}
-                                   initialValues={{reason: ''}} />
+                                   )} />
                     </Popup>
                 )}
                 {canReject && (
                     <Popup trigger={rejectButton}
-                           position="right center"
+                           position="bottom center"
                            on="click">
                         <FinalForm onSubmit={(data) => this.changeState('reject', data)}
-                                   validate={validate}
+                                   validate={validators.required}
                                    render={renderForm(
                                        Translate.string('Provide the rejection reason'),
                                        Translate.string('Reject')
@@ -275,19 +267,20 @@ class BookingDetailsModal extends React.Component {
         });
     };
 
-    renderBookingStatus = ({isPending, isAccepted, isCancelled, isRejected, rejectionReason}) => {
+    renderBookingStatus = () => {
+        const {booking: {isPending, isAccepted, isCancelled, isRejected, rejectionReason}} = this.props;
         let color, status, icon, message;
 
         if (isPending) {
             icon = <Icon name="wait" />;
             color = 'yellow';
             status = Translate.string('Pending Confirmation');
-            message = Translate.string('The booking is subject to acceptance by the room owner');
+            message = Translate.string('This booking is subject to acceptance by the room owner');
         } else if (isCancelled) {
             icon = <Icon name="cancel" />;
             color = 'grey';
             status = Translate.string('Cancelled');
-            message = Translate.string('The booking was cancelled');
+            message = Translate.string('This booking was cancelled');
         } else if (isRejected) {
             icon = <Icon name="calendar minus" />;
             color = 'red';
@@ -324,28 +317,26 @@ class BookingDetailsModal extends React.Component {
         );
     };
 
-    renderDeleteButton = () => {
-        const content = (
-            <>
-                <Message icon="exclamation triangle"
-                         header={Translate.string('Are you sure you want to delete this reservation?')} />
-                <Button content={Translate.string('Delete')}
-                        onClick={() => {
-                            const {actions: {deleteBooking}, booking: {id}} = this.props;
-                            deleteBooking(id);
-                            this.handleCloseModal();
-                        }}
-                        floated="right"
-                        negative />
-            </>
-        );
+    deleteBooking = () => {
+        const {actions: {deleteBooking}, booking: {id}} = this.props;
+        deleteBooking(id);
+        this.handleCloseModal();
+        this.setState({isDeletionConfirmOpen: false});
+    };
 
+    renderDeleteButton = () => {
+        const {isDeletionConfirmOpen} = this.state;
         return (
-            <Popup trigger={<Button icon="trash" negative circular />}
-                   styleName="delete-popup"
-                   position="bottom center"
-                   content={content}
-                   on="click" />
+            <>
+                <Button icon="trash" onClick={() => this.setState({isDeletionConfirmOpen: true})} negative circular />
+                <Confirm header={Translate.string('Confirm deletion')}
+                         content={Translate.string('Are you sure you want to delete this reservation?')}
+                         confirmButton={Translate.string('Delete')}
+                         cancelButton={Translate.string('Cancel')}
+                         open={isDeletionConfirmOpen}
+                         onCancel={() => this.setState({isDeletionConfirmOpen: false})}
+                         onConfirm={this.deleteBooking} />
+            </>
         );
     };
 
@@ -371,8 +362,7 @@ class BookingDetailsModal extends React.Component {
                         <Translate>Booking Details</Translate>
                     </span>
                     <span styleName="booking-status">
-                        {/* eslint-disable-next-line react/destructuring-assignment */}
-                        {this.renderBookingStatus(this.props.booking)}
+                        {this.renderBookingStatus()}
                     </span>
                     <span>
                         {canModify && <Button icon="pencil" circular />}
