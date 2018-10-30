@@ -220,7 +220,7 @@ class CreateBookingSchema(Schema):
 class RoomFeatureSchema(mm.ModelSchema):
     class Meta:
         model = RoomFeature
-        fields = ('id', 'name', 'title', 'icon', 'show_filter_button')
+        fields = ('id', 'name', 'title', 'icon')
 
 
 class EquipmentTypeSchema(mm.ModelSchema):

@@ -23,8 +23,6 @@ def upgrade():
         sa.Column('name', sa.String(), nullable=False, index=True, unique=True),
         sa.Column('title', sa.String(), nullable=False),
         sa.Column('icon', sa.String(), nullable=False),
-        sa.Column('show_filter_button', sa.Boolean(), nullable=False),
-        sa.CheckConstraint("icon != '' OR NOT show_filter_button", name='icon_if_filter_button'),
         sa.PrimaryKeyConstraint('id'),
         schema='roombooking'
     )
