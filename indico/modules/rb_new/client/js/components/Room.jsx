@@ -135,15 +135,15 @@ class Room extends React.Component {
                         <Icon name="user" /> {room.capacity || Translate.string('Not specified')}
                     </>
                     <span styleName="room-details">
+                        {room.features.map(feature => (
+                            <RoomFeatureEntry key={feature.name} feature={feature} color="green" />
+                        ))}
                         {!room.is_reservable && (
                             <Popup trigger={<Icon name="dont" color="grey" />}
                                    content={Translate.string('This room is not bookable')}
                                    position="bottom center"
                                    hideOnScroll />
                         )}
-                        {room.features.map(feature => (
-                            <RoomFeatureEntry key={feature.name} feature={feature} color="green" />
-                        ))}
                         {!room.is_public && (
                             <Popup trigger={<Icon name="lock" color="red" />}
                                    content={Translate.string('This room is not publicly available')}
