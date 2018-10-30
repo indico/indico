@@ -23,27 +23,43 @@ import {RequestState} from 'indico/utils/redux';
 
 export const hasLoadedEquipmentTypes = ({rooms}) => rooms.requests.equipmentTypes.state === RequestState.SUCCESS;
 const getEquipmentTypes = ({rooms}) => rooms.equipmentTypes;
-export const getEquipmentTypeNames = createSelector(
-    getEquipmentTypes,
-    equipmentTypes => equipmentTypes.map(x => x.name)
-);
-export const getFeatures = createSelector(
+const getFeatures = createSelector(
     getEquipmentTypes,
     equipmentTypes => {
         const features = {};
         equipmentTypes
-            .map(eq => eq.features)
-            .forEach(eqFeatures => {
+            .forEach(({name: eqName, features: eqFeatures}) => {
                 eqFeatures.forEach(feature => {
-                    features[feature.id] = feature;
+                    if (!(feature.name in features)) {
+                        features[feature.name] = {
+                            ...feature,
+                            equipment: []
+                        };
+                    }
+                    features[feature.name].equipment.push(eqName);
                 });
             });
-        return _.sortBy(Object.values(features), 'title');
+        return features;
+    }
+);
+/** Get equipment type names except those with an 1:1 mapping to a feature */
+export const getEquipmentTypeNamesWithoutFeatures = createSelector(
+    getEquipmentTypes,
+    getFeatures,
+    (equipmentTypes, features) => {
+        return equipmentTypes
+            .filter(eq => eq.features.every(f => features[f.name].equipment.length > 1))
+            .map(eq => eq.name);
     }
 );
 export const getFeaturesForFilterButtons = createSelector(
     getFeatures,
-    features => features.filter(f => f.showFilterButton).map(f => _.pick(f, ['icon', 'name', 'title']))
+    features => {
+        features = Object.values(features)
+            .filter(f => f.showFilterButton)
+            .map(f => _.pick(f, ['icon', 'name', 'title', 'equipment']));
+        return _.sortBy(features, 'title');
+    }
 );
 
 export const getAllRooms = createSelector(
