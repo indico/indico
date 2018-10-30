@@ -19,28 +19,30 @@ import _ from 'lodash';
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Form} from 'semantic-ui-react';
+import {Form, Icon} from 'semantic-ui-react';
 
 import FilterFormComponent from '../../../common/filters/FilterFormComponent';
 
 
 export default class EquipmentForm extends FilterFormComponent {
     static propTypes = {
-        possibleEquipment: PropTypes.arrayOf(PropTypes.string).isRequired,
-        selectedEquipment: PropTypes.arrayOf(PropTypes.string),
+        selectedEquipment: PropTypes.arrayOf(PropTypes.string).isRequired,
+        selectedFeatures: PropTypes.arrayOf(PropTypes.string).isRequired,
+        availableEquipment: PropTypes.arrayOf(PropTypes.string).isRequired,
+        availableFeatures: PropTypes.arrayOf(PropTypes.shape({
+            name: PropTypes.string.isRequired,
+            title: PropTypes.string.isRequired,
+        })).isRequired,
         ...FilterFormComponent.propTypes
     };
 
     constructor(props) {
         super(props);
-        const {possibleEquipment, selectedEquipment} = props;
+        const {availableEquipment, availableFeatures, selectedEquipment, selectedFeatures} = props;
         this.state = {
-            equipment: possibleEquipment.filter(eq => selectedEquipment.indexOf(eq) >= 0)
+            equipment: availableEquipment.filter(eq => selectedEquipment.includes(eq)),
+            features: availableFeatures.map(f => f.name).filter(f => selectedFeatures.includes(f)),
         };
-    }
-
-    static getDerivedStateFromProps({selectedEquipment}, prevState) {
-        return {equipment: selectedEquipment, ...prevState};
     }
 
     setEquipment(eqName, value) {
@@ -59,14 +61,42 @@ export default class EquipmentForm extends FilterFormComponent {
         });
     }
 
+    setFeature(featName, value) {
+        const {setParentField} = this.props;
+
+        this.setState((oldState) => {
+            const featureList = _.without(oldState.features, featName);
+            if (value) {
+                featureList.push(featName);
+            }
+            return {features: featureList};
+        }, () => {
+            setParentField('features', this.state.features);
+        });
+    }
+
     render() {
-        const {possibleEquipment} = this.props;
-        const {equipment} = this.state;
+        const {availableEquipment, availableFeatures} = this.props;
+        const {equipment, features} = this.state;
         return (
             <>
                 <Form.Group>
-                    {possibleEquipment.map(equip => (
-                        <Form.Checkbox checked={equipment.indexOf(equip) >= 0}
+                    {availableFeatures.map(feat => (
+                        <Form.Checkbox checked={features.includes(feat.name)}
+                                       key={feat.name}
+                                       label={
+                                           <label>
+                                               <Icon name={feat.icon} />
+                                               <strong>{feat.title}</strong>
+                                           </label>
+                                       }
+                                       onChange={(__, {checked}) => {
+                                           this.setFeature(feat.name, checked);
+                                       }} />
+                    ))}
+                    {!!availableFeatures.length && !!availableEquipment.length && <br />}
+                    {availableEquipment.map(equip => (
+                        <Form.Checkbox checked={equipment.includes(equip)}
                                        key={equip}
                                        label={equip}
                                        onChange={(__, {checked}) => {
