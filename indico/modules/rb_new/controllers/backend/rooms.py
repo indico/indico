@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 
 from datetime import date, datetime, time, timedelta
 
+import dateutil
 from flask import jsonify, request, session
 from sqlalchemy.orm import subqueryload
 from webargs import fields
@@ -30,8 +31,9 @@ from indico.modules.rb.models.favorites import favorite_room_table
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb_new.controllers.backend.common import search_room_args
-from indico.modules.rb_new.operations.bookings import get_room_details_availability
+from indico.modules.rb_new.operations.bookings import check_room_available, get_room_details_availability
 from indico.modules.rb_new.operations.rooms import get_room_statistics, search_for_rooms
+
 from indico.modules.rb_new.schemas import room_attribute_values_schema, rooms_schema
 
 
@@ -115,3 +117,14 @@ class RHRoomFavorites(RHRoomBookingBase):
     def _process_DELETE(self):
         session.user.favorite_rooms.discard(self.room)
         return '', 204
+
+
+class RHCheckRoomAvailable(RHRoomBase):
+    @use_args({
+        'start_dt': fields.String(),
+        'end_dt': fields.String(),
+    })
+    def _process(self, args):
+        start_dt = dateutil.parser.parse(args['start_dt'])
+        end_dt = dateutil.parser.parse(args['end_dt'])
+        return jsonify(check_room_available(self.room, start_dt, end_dt))
