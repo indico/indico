@@ -98,4 +98,27 @@ purely client-side and are worded for event creation instead of being generic.
     _.defer(function() {
         $('#{{ form.title.id }}').focus();
     });
+
+    $("#event-creation-location_data").change(function() {
+        var roomData = JSON.parse($(this).val());
+        if ('room_id' in roomData) {
+            var roomId = roomData['room_id'];
+            var startDate = $('#event-creation-start_dt-date').val();
+            var startTime = $('#event-creation-start_dt-time').val();
+            var endDate = $('#event-creation-end_dt-date').val();
+            var endTime = $('#event-creation-end_dt-time').val();
+            var startDt = moment(startDate + " " + startTime, "DD/MM/YYYY HH:mm").format("DD/MM/YYYY HH:mm:ss");
+            var endDt = moment(endDate + " " + endTime, "DD/MM/YYYY HH:mm").format("DD/MM/YYYY HH:mm:ss");
+            var requestParams = {room_id: roomId, start_dt: startDt, end_dt: endDt};
+            $.ajax({
+                url: build_url(Indico.Urls.RoomBooking.room.check_available, requestParams),
+                method: 'GET',
+                dataType: 'json',
+                contentType: 'application/json',
+                error: handleAjaxError,
+                success: function(data) {
+                }
+            });
+        }
+    });
 </script>

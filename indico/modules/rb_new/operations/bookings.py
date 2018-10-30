@@ -210,3 +210,19 @@ def get_booking_occurrences(booking):
     date_range = sorted(set(cand.start_dt.date() for cand in booking.occurrences))
     occurrences = group_by_occurrence_date(booking.occurrences)
     return date_range, occurrences
+
+
+def check_room_available(room, start_dt, end_dt):
+    occurrences = get_existing_room_occurrences(room, start_dt, end_dt, allow_overlapping=True)
+    prebookings = [occ for occ in occurrences if not occ.reservation.is_accepted]
+    bookings = [occ for occ in occurrences if occ.reservation.is_accepted]
+
+    conflict_booking = True if bookings else False
+    conflict_prebooking = True if prebookings else False
+
+    result = {}
+    result.update({
+        'conflict_booking': conflict_booking,
+        'conflict_prebooking': conflict_prebooking,
+    })
+    return result

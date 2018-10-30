@@ -116,6 +116,11 @@ def generate_global_file():
             'AttachmentManager': url_rule_to_js('attachments.management'),
             'ManagementAttachmentInfoColumn': url_rule_to_js('attachments.management_info_column'),
 
+            'RoomBooking': {
+                'room': {
+                    'check_available': url_rule_to_js('rooms_new.check_room_available'),
+                },
+            },
             'RoomBookingBookRoom': url_rule_to_js('rooms.room_book'),
             'RoomBookingBook': url_rule_to_js('rooms.book'),
             'RoomBookingDetails': url_rule_to_js('rooms.roomBooking-roomDetails'),
