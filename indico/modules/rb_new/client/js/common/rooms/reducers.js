@@ -20,7 +20,19 @@ import {combineReducers} from 'redux';
 import camelizeKeys from 'indico/utils/camelize';
 import {requestReducer} from 'indico/utils/redux';
 import * as roomsActions from './actions';
+import {actions as bookingActions} from '../bookings';
+import {actions as bookRoomActions} from '../../modules/bookRoom';
 
+
+function filterAvailability(roomAvailability, bookingId) {
+    return roomAvailability.map((availability) => {
+        const bookings = availability.bookings || [];
+        const newBookings = bookings.filter((booking) => {
+            return booking.reservation.id !== bookingId;
+        });
+        return {...availability, bookings: newBookings};
+    });
+}
 
 export default combineReducers({
     requests: combineReducers({
@@ -68,6 +80,41 @@ export default combineReducers({
             case roomsActions.AVAILABILITY_RECEIVED: {
                 const {id, availability} = action.data;
                 return {...state, [id]: availability};
+            }
+            case bookRoomActions.CREATE_BOOKING_SUCCESS: {
+                const {bookings, roomId} = camelizeKeys(action.data);
+                const {[roomId]: roomAvailability} = state;
+
+                const av = roomAvailability.map((roomAv) => {
+                    if (!(roomAv.day in bookings)) {
+                        return roomAv;
+                    }
+
+                    const oldBookings = roomAv.bookings || [];
+                    return {...roomAv, bookings: [...oldBookings, ...bookings[roomAv.day]]};
+                });
+
+                return {...state, [roomId]: av};
+            }
+            case bookingActions.BOOKING_STATE_UPDATED: {
+                const {booking: {id, roomId}, bookingState} = camelizeKeys(action.data);
+                if (bookingState === 'rejected' || bookingState === 'cancelled') {
+                    const {[roomId]: roomAvailability} = state;
+                    if (!roomAvailability) {
+                        return state;
+                    }
+                    return {...state, [roomId]: filterAvailability(roomAvailability, id)};
+                }
+
+                return state;
+            }
+            case bookingActions.DELETE_BOOKING_SUCCESS: {
+                const {roomId, bookingId} = camelizeKeys(action.data);
+                const {[roomId]: roomAvailability} = state;
+                if (!roomAvailability) {
+                    return state;
+                }
+                return {...state, [roomId]: filterAvailability(roomAvailability, bookingId)};
             }
             default:
                 return state;
