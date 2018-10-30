@@ -31,6 +31,7 @@ import * as roomsSelectors from './selectors';
 import {actions as bookRoomActions} from '../../modules/bookRoom';
 
 import './RoomDetailsModal.module.scss';
+import RoomEditModal from './RoomEditModal';
 
 
 class RoomDetailsModal extends React.Component {
@@ -44,12 +45,25 @@ class RoomDetailsModal extends React.Component {
         actions: PropTypes.exact({
             openBookRoom: PropTypes.func.isRequired,
             openBookingForm: PropTypes.func.isRequired,
+            openRoomEdit: PropTypes.func.isRequired,
         }).isRequired,
     };
 
     static defaultProps = {
         promptDatesOnBook: false,
         title: <Translate>Room Details</Translate>,
+    };
+
+    state = {
+        roomEditVisible: false
+    };
+
+    showRoomEditModal = () => {
+        this.setState({roomEditVisible: true});
+    };
+
+    handleCloseRoomEditModal = () => {
+        this.setState({roomEditVisible: false});
     };
 
     handleCloseModal = () => {
@@ -62,18 +76,28 @@ class RoomDetailsModal extends React.Component {
             room, availability, attributes, promptDatesOnBook, title,
             actions: {openBookRoom, openBookingForm}
         } = this.props;
+        const {roomEditVisible} = this.state;
         return (
-            <Modal open onClose={this.handleCloseModal} size="large" closeIcon>
-                <Modal.Header styleName="room-details-header">
-                    {title}
-                </Modal.Header>
-                <Modal.Content>
-                    <RoomDetails room={room}
-                                 attributes={attributes}
-                                 availability={availability}
-                                 bookRoom={promptDatesOnBook ? openBookRoom : openBookingForm} />
-                </Modal.Content>
-            </Modal>
+            <>
+                <Modal open onClose={this.handleCloseModal} size="large" closeIcon>
+                    <Modal.Header styleName="room-details-header">
+                        {title}
+                        <span>
+                            <Button icon="pencil" circular onClick={this.showRoomEditModal} />
+                        </span>
+                    </Modal.Header>
+                    <Modal.Content>
+                        <RoomDetails room={room}
+                                     attributes={attributes}
+                                     availability={availability}
+                                     bookRoom={promptDatesOnBook ? openBookRoom : openBookingForm} />
+                    </Modal.Content>
+                </Modal>
+                {roomEditVisible && (
+                    <RoomEditModal roomId={room.id}
+                                   onClose={this.handleCloseRoomEditModal} />
+                )}
+            </>
         );
     }
 }

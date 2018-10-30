@@ -58,7 +58,6 @@ _bp.add_url_rule('/api/rooms/<int:room_id>/availability/simple', 'check_room_ava
 _bp.add_url_rule('/api/suggestions', 'suggestions', bookings.RHRoomSuggestions)
 
 # User
-
 _bp.add_url_rule('/api/user/', 'user_info', misc.RHUserInfo)
 _bp.add_url_rule('/api/user/favorite-rooms/', 'favorite_rooms', rooms.RHRoomFavorites)
 _bp.add_url_rule('/api/user/favorite-rooms/<int:room_id>', 'favorite_rooms', rooms.RHRoomFavorites,
