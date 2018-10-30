@@ -179,7 +179,7 @@ export default (namespace, searchRoomsSelectors) => connect(
     state => ({
         filters: searchRoomsSelectors.getFilters(state),
         equipmentTypes: roomsSelectors.getEquipmentTypeNamesWithoutFeatures(state),
-        features: roomsSelectors.getFeaturesForFilterButtons(state),
+        features: roomsSelectors.getFeatures(state),
         hasOwnedRooms: userSelectors.hasOwnedRooms(state),
         hasFavoriteRooms: userSelectors.hasFavoriteRooms(state),
         buildings: roomsSelectors.getBuildings(state),

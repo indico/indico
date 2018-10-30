@@ -22,8 +22,7 @@ from indico.util.string import format_repr, return_ascii
 
 class RoomFeature(db.Model):
     __tablename__ = 'features'
-    __table_args__ = (db.CheckConstraint("icon != '' OR NOT show_filter_button", 'icon_if_filter_button'),
-                      {'schema': 'roombooking'})
+    __table_args__ = {'schema': 'roombooking'}
 
     id = db.Column(
         db.Integer,
@@ -43,11 +42,6 @@ class RoomFeature(db.Model):
         db.String,
         nullable=False,
         default=''
-    )
-    show_filter_button = db.Column(
-        db.Boolean,
-        nullable=False,
-        default=False
     )
 
     # relationship backrefs:

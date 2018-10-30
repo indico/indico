@@ -23,7 +23,7 @@ import {RequestState} from 'indico/utils/redux';
 
 export const hasLoadedEquipmentTypes = ({rooms}) => rooms.requests.equipmentTypes.state === RequestState.SUCCESS;
 const getEquipmentTypes = ({rooms}) => rooms.equipmentTypes;
-const getFeatures = createSelector(
+const getFeaturesMapping = createSelector(
     getEquipmentTypes,
     equipmentTypes => {
         const features = {};
@@ -45,19 +45,19 @@ const getFeatures = createSelector(
 /** Get equipment type names except those with an 1:1 mapping to a feature */
 export const getEquipmentTypeNamesWithoutFeatures = createSelector(
     getEquipmentTypes,
-    getFeatures,
+    getFeaturesMapping,
     (equipmentTypes, features) => {
         return equipmentTypes
             .filter(eq => eq.features.every(f => features[f.name].equipment.length > 1))
-            .map(eq => eq.name);
+            .map(eq => eq.name)
+            .sort();
     }
 );
-export const getFeaturesForFilterButtons = createSelector(
-    getFeatures,
+/** Get all available room features */
+export const getFeatures = createSelector(
+    getFeaturesMapping,
     features => {
-        features = Object.values(features)
-            .filter(f => f.showFilterButton)
-            .map(f => _.pick(f, ['icon', 'name', 'title', 'equipment']));
+        features = Object.values(features).map(f => _.pick(f, ['icon', 'name', 'title']));
         return _.sortBy(features, 'title');
     }
 );
