@@ -54,7 +54,7 @@ class BookingDetailsModal extends React.Component {
     state = {
         occurrencesVisible: false,
         actionInProgress: null,
-        openConfirm: null,
+        activeConfirmation: null,
     };
 
     handleCloseModal = () => {
@@ -173,7 +173,7 @@ class BookingDetailsModal extends React.Component {
 
     renderActionButtons = (canCancel, canReject, showAccept) => {
         const {bookingStateChangeInProgress} = this.props;
-        const {actionInProgress, openConfirm} = this.state;
+        const {actionInProgress, activeConfirmation} = this.state;
         const rejectButton = (
             <Button type="button"
                     icon="remove circle"
@@ -181,7 +181,7 @@ class BookingDetailsModal extends React.Component {
                     size="small"
                     loading={actionInProgress === 'reject' && bookingStateChangeInProgress}
                     disabled={bookingStateChangeInProgress}
-                    content={<Translate>Reject booking</Translate>} />
+                    content={Translate.string('Reject booking')} />
         );
 
         const renderForm = ({handleSubmit, hasValidationErrors, submitSucceeded, submitting, pristine}) => {
@@ -218,13 +218,13 @@ class BookingDetailsModal extends React.Component {
                                 onClick={() => this.showConfirm('cancel')}
                                 loading={actionInProgress === 'cancel' && bookingStateChangeInProgress}
                                 disabled={bookingStateChangeInProgress}
-                                content={<Translate>Cancel booking</Translate>} />
+                                content={Translate.string('Cancel booking')} />
                         <Confirm header={Translate.string('Confirm cancellation')}
-                                 content={Translate.string('Are you sure you want to cancel this booking?' +
-                                                           ' This will cancel all occurrences of this booking.')}
+                                 content={Translate.string('Are you sure you want to cancel this booking? ' +
+                                                           'This will cancel all occurrences of this booking.')}
                                  confirmButton={<Button content={Translate.string('Cancel booking')} negative />}
                                  cancelButton={Translate.string('Close')}
-                                 open={openConfirm === 'cancel'}
+                                 open={activeConfirmation === 'cancel'}
                                  onCancel={this.hideConfirm}
                                  onConfirm={() => {
                                      this.changeState('cancel');
@@ -248,7 +248,7 @@ class BookingDetailsModal extends React.Component {
                             onClick={() => this.changeState('approve')}
                             loading={actionInProgress === 'approve' && bookingStateChangeInProgress}
                             disabled={bookingStateChangeInProgress}
-                            content={<Translate>Accept booking</Translate>} />
+                            content={Translate.string('Accept booking')} />
                 )}
             </Modal.Actions>
         );
@@ -320,15 +320,15 @@ class BookingDetailsModal extends React.Component {
     };
 
     hideConfirm = () => {
-        this.setState({openConfirm: null});
+        this.setState({activeConfirmation: null});
     };
 
     showConfirm = (type) => {
-        this.setState({openConfirm: type});
+        this.setState({activeConfirmation: type});
     };
 
     renderDeleteButton = () => {
-        const {openConfirm} = this.state;
+        const {activeConfirmation} = this.state;
         const {bookingStateChangeInProgress} = this.props;
         return (
             <>
@@ -341,7 +341,7 @@ class BookingDetailsModal extends React.Component {
                          content={Translate.string('Are you sure you want to delete this booking?')}
                          confirmButton={<Button content={Translate.string('Delete')} negative />}
                          cancelButton={Translate.string('Cancel')}
-                         open={openConfirm === 'delete'}
+                         open={activeConfirmation === 'delete'}
                          onCancel={this.hideConfirm}
                          onConfirm={this.deleteBooking} />
             </>

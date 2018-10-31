@@ -54,7 +54,7 @@ export function changeBookingState(id, action, params = {}) {
     return ajaxAction(
         () => indicoAxios.post(bookingStateActionsURL({booking_id: id, action}), params),
         BOOKING_STATE_CHANGE_REQUEST,
-        [BOOKING_STATE_CHANGE_SUCCESS, BOOKING_STATE_UPDATED],
+        [BOOKING_STATE_UPDATED, BOOKING_STATE_CHANGE_SUCCESS],
         BOOKING_STATE_CHANGE_ERROR,
     );
 }
