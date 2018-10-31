@@ -35,15 +35,6 @@ from indico.web.forms.validators import UsedIf
 from indico.web.forms.widgets import ConcatWidget
 
 
-def _get_equipment_label(eq):
-    parents = []
-    parent = eq.parent
-    while parent:
-        parents.append(parent.name)
-        parent = parent.parent
-    return ': '.join(itertools.chain(reversed(parents), [eq.name]))
-
-
 class SearchRoomsForm(IndicoForm):
     location = QuerySelectField(_(u'Location'), get_label=lambda x: x.name, query_factory=Location.find,
                                 allow_blank=True)
@@ -51,7 +42,7 @@ class SearchRoomsForm(IndicoForm):
     available = RadioField(_(u'Availability'), coerce=int, default=-1, widget=ConcatWidget(prefix_label=False),
                            choices=[(1, _(u'Available')), (0, _(u'Booked')), (-1, _(u"Don't care"))])
     capacity = IntegerField(_(u'Capacity'), validators=[Optional(), NumberRange(min=0)])
-    available_equipment = IndicoQuerySelectMultipleCheckboxField(_(u'Equipment'), get_label=_get_equipment_label,
+    available_equipment = IndicoQuerySelectMultipleCheckboxField(_(u'Equipment'), get_label=u'name',
                                                                  query_factory=lambda: EquipmentType.find().order_by(
                                                                      EquipmentType.name))
     is_only_public = BooleanField(_(u'Only public rooms'), default=True)
@@ -139,7 +130,7 @@ class RoomForm(IndicoForm):
     comments = TextAreaField(_(u'Comments'))
     delete_photos = BooleanField(_(u'Delete photos'))
     large_photo = FileField(_(u'Large photo'))
-    available_equipment = IndicoQuerySelectMultipleCheckboxField(_(u'Equipment'), get_label=_get_equipment_label)
+    available_equipment = IndicoQuerySelectMultipleCheckboxField(_(u'Equipment'), get_label=u'name')
     # attribute_* - set at runtime
     bookable_hours = FieldList(FormField(_TimePair), min_entries=1)
     nonbookable_periods = FieldList(FormField(_DateTimePair), min_entries=1)

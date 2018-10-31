@@ -31,7 +31,6 @@ _cache = GenericCache('Rooms')
 
 class WPRoomBookingEventBase(WPEventManagementLegacy):
     sidemenu_option = 'room_booking'
-    bundles = ('module_rb.js',)
 
     def _createTabCtrl(self):
         self._tabCtrl = TabControl()
