@@ -27,18 +27,17 @@ const getFeaturesMapping = createSelector(
     getEquipmentTypes,
     equipmentTypes => {
         const features = {};
-        equipmentTypes
-            .forEach(({name: eqName, features: eqFeatures}) => {
-                eqFeatures.forEach(feature => {
-                    if (!(feature.name in features)) {
-                        features[feature.name] = {
-                            ...feature,
-                            equipment: []
-                        };
-                    }
-                    features[feature.name].equipment.push(eqName);
-                });
+        equipmentTypes.forEach(({name: eqName, features: eqFeatures}) => {
+            eqFeatures.forEach(feature => {
+                if (!(feature.name in features)) {
+                    features[feature.name] = {
+                        ...feature,
+                        equipment: []
+                    };
+                }
+                features[feature.name].equipment.push(eqName);
             });
+        });
         return features;
     }
 );
