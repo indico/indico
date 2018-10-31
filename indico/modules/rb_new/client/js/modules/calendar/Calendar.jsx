@@ -160,7 +160,7 @@ class Calendar extends React.Component {
                                     </div>
                                 </Grid.Row>
                                 <TimelineHeader datePicker={datePicker}
-                                                disableDatePicker={isFetching}
+                                                disableDatePicker={isFetching || !rows.length}
                                                 onModeChange={setMode}
                                                 onDateChange={setDate}
                                                 legendLabels={legendLabels} />
