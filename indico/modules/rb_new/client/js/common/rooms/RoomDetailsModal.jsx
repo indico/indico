@@ -45,7 +45,6 @@ class RoomDetailsModal extends React.Component {
         actions: PropTypes.exact({
             openBookRoom: PropTypes.func.isRequired,
             openBookingForm: PropTypes.func.isRequired,
-            openRoomEdit: PropTypes.func.isRequired,
         }).isRequired,
     };
 

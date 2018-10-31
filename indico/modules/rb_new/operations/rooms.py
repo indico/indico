@@ -92,16 +92,11 @@ def _populate_room(room, properties):
             setattr(room, prop, properties[prop])
 
     # Equipment
-    if 'available_equipment' in properties:
-        available_equipment_ids = properties['available_equipment']
-        available_equipment = {EquipmentType.get_one(equipment_id) for equipment_id in available_equipment_ids}
-        room.available_equipment = available_equipment
+    # if 'available_equipment' in properties:
+    #     available_equipment_ids = properties['available_equipment']
+    #     available_equipment = {EquipmentType.get_one(equipment_id) for equipment_id in available_equipment_ids}
+    #     room.available_equipment = available_equipment
 
-    # TODO: Non bookable periods
-    # TODO: Bookable hours
-    # TODO: Photo
-
-    room.update_name()
     return room
 
 

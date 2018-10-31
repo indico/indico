@@ -145,6 +145,17 @@ export function ReduxDropdownField({input, required, clearable, onChange, ...pro
     );
 }
 
+export function ReduxCheckboxField({input, input: {value}, ...props}) {
+    return (
+        <ReduxFormField input={input}
+                        {...props}
+                        checked={value}
+                        onChange={(__, {checked}) => {
+                            input.onChange(checked);
+                        }} />
+    );
+}
+
 ReduxDropdownField.propTypes = {
     input: PropTypes.object.isRequired,
     required: PropTypes.bool,
@@ -156,4 +167,8 @@ ReduxDropdownField.defaultProps = {
     required: false,
     clearable: false,
     onChange: () => {},
+};
+
+ReduxCheckboxField.propTypes = {
+    input: PropTypes.object.isRequired,
 };

@@ -33,6 +33,7 @@ from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb_new.schemas import (bookable_hours_schema, nonbookable_periods_schema,
                                            reservation_occurrences_schema, simple_blockings_schema)
+
 from indico.util.string import crc32
 from indico.util.struct.iterables import group_list
 

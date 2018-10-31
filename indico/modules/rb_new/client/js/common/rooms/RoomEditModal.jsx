@@ -16,24 +16,80 @@
  */
 
 import React from 'react';
+import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
-import {Button, Form, Grid, Header, Modal} from 'semantic-ui-react';
+import {Button, Checkbox, Form, Grid, Header, Modal} from 'semantic-ui-react';
+import fetchRoomURL from 'indico-url:rooms_new.room';
 import {Form as FinalForm, Field} from 'react-final-form';
-import {ReduxFormField} from 'indico/react/forms';
+import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
+import camelizeKeys from 'indico/utils/camelize';
+import {ReduxCheckboxField, ReduxFormField} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 
 import './RoomEditModal.module.scss';
 
 
+const contactDetails = [
+    {name: 'ownerName',
+     label: Translate.string('Owner')},
+    {name: 'keyLocation',
+     label: Translate.string('Where is the key?')},
+    {name: 'telephone',
+     label: Translate.string('Telephone')}];
+
+const informationDetails = [
+    {name: 'capacity',
+     label: Translate.string('Capacity(seats)')},
+    {name: 'division',
+     label: Translate.string('Division')}];
+
+const locationDetails = [
+    {name: 'name',
+     label: Translate.string('Name')},
+    {name: 'site',
+     label: Translate.string('Site')}];
+
+const roomDetails = [
+    {name: 'building',
+     label: Translate.string('Building')},
+    {name: 'floor',
+     label: Translate.string('Floor')},
+    {name: 'number',
+     label: Translate.string('Number')}];
+
 class RoomEditModal extends React.Component {
     static propTypes = {
-        onClose: PropTypes.func.isRequired
+        onClose: PropTypes.func.isRequired,
+        roomId: PropTypes.number.isRequired,
+
     };
+
+    state = {
+        room: {}
+    };
+
+    componentDidMount() {
+        this.fetchDetailedRoom();
+    }
+
+
+    async fetchDetailedRoom() {
+        const {roomId} = this.props;
+        let response;
+        try {
+            response = await indicoAxios.get(fetchRoomURL({room_id: roomId}));
+        } catch (error) {
+            handleAxiosError(error);
+            return;
+        }
+        this.setState({room: camelizeKeys(response.data)});
+    }
 
     handleCloseModal = () => {
         const {onClose} = this.props;
         onClose();
     };
+
 
     renderModalContent = (fprops) => {
         const formProps = {onSubmit: fprops.onSubmit};
@@ -49,56 +105,43 @@ class RoomEditModal extends React.Component {
                                 <Header>
                                     <Translate>Contact</Translate>
                                 </Header>
-                                <Field name="owner"
-                                       component={ReduxFormField}
-                                       label={Translate.string('Owner')}
-                                       as="input" />
-                                <Field name="key"
-                                       component={ReduxFormField}
-                                       label={Translate.string('Where is the key?')}
-                                       as="input" />
-                                <Field name="telephone"
-                                       component={ReduxFormField}
-                                       label={Translate.string('Telephone')}
-                                       as="input" />
+                                {contactDetails.map(contactDetail => (
+                                    <Field key={contactDetail.name}
+                                           name={contactDetail.name}
+                                           component={ReduxFormField}
+                                           label={contactDetail.label}
+                                           as="input" />
+                                ))}
                                 <Header>
                                     <Translate>Information</Translate>
                                 </Header>
-                                <Field name="capacity"
-                                       component={ReduxFormField}
-
-                                       label={Translate.string('Capacity (seats)')}
-                                       as="input" />
-                                <Field name="Division"
-                                       component={ReduxFormField}
-                                       label={Translate.string('Division')}
-                                       as="input" />
+                                <Form.Group widths="equal">
+                                    {informationDetails.map(informationDetail => (
+                                        <Field key={informationDetail.name}
+                                               name={informationDetail.name}
+                                               component={ReduxFormField}
+                                               label={informationDetail.label}
+                                               as="input" />
+                                    ))}
+                                </Form.Group>
                             </Grid.Column>
                             <Grid.Column>
                                 <Header>
                                     <Translate>Location</Translate>
                                 </Header>
-                                <Field name="name"
-                                       component={ReduxFormField}
-                                       as="input"
-                                       label={Translate.string('Name')} />
-                                <Field name="site"
-                                       component={ReduxFormField}
-                                       label={Translate.string('Site')}
-                                       as="input" />
+                                {locationDetails.map(locationDetail => (
+                                    <Field key={locationDetail.name}
+                                           name={locationDetail.name}
+                                           component={ReduxFormField}
+                                           label={locationDetail.label}
+                                           as="input" />))}
                                 <Form.Group widths="equal">
-                                    <Field name="building"
-                                           component={ReduxFormField}
-                                           label={Translate.string('Building')}
-                                           as="input" />
-                                    <Field name="floor"
-                                           component={ReduxFormField}
-                                           label={Translate.string('Floor')}
-                                           as="input" />
-                                    <Field name="number"
-                                           component={ReduxFormField}
-                                           label={Translate.string('Number')}
-                                           as="input" />
+                                    {roomDetails.map(roomDetail => (
+                                        <Field key={roomDetail.name}
+                                               name={roomDetail.name}
+                                               component={ReduxFormField}
+                                               label={roomDetail.label}
+                                               as="input" />))}
                                 </Form.Group>
                                 <Form.Group widths="equal">
                                     <Field name="longitude"
@@ -110,11 +153,11 @@ class RoomEditModal extends React.Component {
                                            label={Translate.string('Latitude')}
                                            as="input" />
                                 </Form.Group>
-                                <Field name="surface"
+                                <Field name="surfaceArea"
                                        component={ReduxFormField}
                                        label={Translate.string('Surface Area (m2)')}
                                        as="input" />
-                                <Field name="maxAdvanceTime"
+                                <Field name="maxAdvanceDays"
                                        component={ReduxFormField}
                                        label={Translate.string('Maximum advance time for bookings (days)')}
                                        as="input" />
@@ -123,22 +166,23 @@ class RoomEditModal extends React.Component {
                                 <Header>
                                     <Translate>Options</Translate>
                                 </Header>
-                                <Field name="active"
-                                       component={ReduxFormField}
+                                <Field name="isActive"
+                                       component={ReduxCheckboxField}
                                        componentLabel={Translate.string('Active')}
-                                       as={Form.Checkbox} />
-                                <Field name="public"
+                                       checkBoxInput
+                                       as={Checkbox} />
+                                <Field name="isPublic"
                                        component={ReduxFormField}
                                        componentLabel={Translate.string('Public')}
-                                       as={Form.Checkbox} />
-                                <Field name="confirmations"
+                                       as={Checkbox} />
+                                <Field name="isAutoConfirm"
                                        component={ReduxFormField}
                                        componentLabel={Translate.string('Confirmations')}
-                                       as={Form.Checkbox} />
+                                       as={Checkbox} />
                                 <Field name="reminders"
                                        component={ReduxFormField}
                                        componentLabel={Translate.string('Reminders Enabled')}
-                                       as={Form.Checkbox} />
+                                       as={Checkbox} />
                                 <Field name="dayReminder"
                                        component={ReduxFormField}
                                        label={Translate.string('Send Booking reminders X days before (single/day)')}
@@ -168,15 +212,17 @@ class RoomEditModal extends React.Component {
     };
 
     render() {
-        const name = 'test_name';
+        const {room} = this.state;
         return (
             <Modal open onClose={this.handleCloseModal} size="large" closeIcon>
                 <FinalForm render={this.renderModalContent}
                            onSubmit={() => null}
-                           initialValues={{name}} />
+                           initialValues={room} />
             </Modal>
         );
     }
 }
 
-export default RoomEditModal;
+export default connect(
+    null, null
+)(RoomEditModal);

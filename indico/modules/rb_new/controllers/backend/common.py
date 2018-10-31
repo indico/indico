@@ -47,7 +47,7 @@ search_room_args = {
 
 # Follows field format of WTForms class of old rb
 room_args = {
-    'name': fields.Str(),
+    'verbose_name': fields.Str(),
     'site': fields.Str(),
     'building': fields.String(required=True),
     'floor': fields.String(required=True),
@@ -62,16 +62,14 @@ room_args = {
     'notification_before_days_weekly': fields.Int(validate=lambda x: 1 <= x <= 30),
     'notification_before_monthly': fields.Int(validate=lambda x: 1 <= x <= 30),
     'notifications_enabled': fields.Bool(missing=True),
-    'booking_limit_days': fields.Int(validate=lambda x: 1 <= x),
-    'owner_id': fields.Int(validate=lambda x: 1 <= x),
+    'booking_limit_days': fields.Int(validate=lambda x: x >= 1),
+    'owner_id': fields.Int(validate=lambda x: x >= 0),
     'key_location': fields.Str(),
     'telephone': fields.Str(),
-    'capacity': fields.Int(validate=lambda x: 1 <= x, missing=20),
+    'capacity': fields.Int(validate=lambda x: x >= 1),
     'division': fields.Str(),
-    'surface_area': fields.Int(validate=lambda x: 0 <= x),
-    'max_advance_days': fields.Int(validate=lambda x: 1 <= x),
+    'surface_area': fields.Int(validate=lambda x: x >= 0),
+    'max_advance_days': fields.Int(validate=lambda x: x >= 1),
     'comments': fields.Str(),
-    'delete_photos': fields.Bool(),
-    # TODO: 'large_photo'
     'available_equipment': fields.List(fields.Int()),
 }

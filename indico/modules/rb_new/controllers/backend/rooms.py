@@ -40,6 +40,8 @@ from indico.modules.rb_new.schemas import room_attribute_values_schema, rooms_sc
 from indico.util.caching import memoize_redis
 from indico.util.marshmallow import NaiveDateTime
 from indico.web.flask.util import send_file
+from indico.modules.rb_new.operations.rooms import get_room_statistics, search_for_rooms
+from indico.modules.rb_new.schemas import room_attribute_values_schema, rooms_schema
 
 
 class RHRooms(RHRoomBookingBase):
