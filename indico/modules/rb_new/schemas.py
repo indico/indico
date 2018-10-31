@@ -44,10 +44,6 @@ from indico.util.marshmallow import NaiveDateTime
 from indico.util.string import natural_sort_key
 
 
-_room_fields = ('id', 'name', 'capacity', 'building', 'floor', 'number', 'is_public', 'location_name', 'full_name',
-                'comments', 'division', 'is_reservable', 'is_auto_confirm', 'sprite_position')
-
-
 class RoomAttributesSchema(mm.ModelSchema):
     title = String(attribute='attribute.title')
 
@@ -61,8 +57,10 @@ class RoomSchema(mm.ModelSchema):
 
     class Meta:
         model = Room
-        fields = _room_fields + ('surface_area', 'latitude', 'longitude', 'telephone', 'key_location',
-                                 'max_advance_days', 'owner_name', 'available_equipment')
+        fields = ('id', 'name', 'capacity', 'building', 'floor', 'number', 'is_public', 'location_name', 'full_name',
+                  'comments', 'division', 'is_reservable', 'is_auto_confirm', 'sprite_position', 'surface_area',
+                  'latitude', 'longitude', 'telephone', 'key_location', 'max_advance_days', 'owner_name',
+                  'available_equipment')
 
 
 class MapAreaSchema(mm.ModelSchema):
@@ -241,8 +239,7 @@ class EquipmentTypeSchema(mm.ModelSchema):
 
 
 rb_user_schema = RBUserSchema()
-rooms_schema = RoomSchema(many=True, only=_room_fields)
-room_details_schema = RoomSchema()
+rooms_schema = RoomSchema(many=True)
 room_attributes_schema = RoomAttributesSchema(many=True)
 map_areas_schema = MapAreaSchema(many=True)
 reservation_occurrences_schema = ReservationOccurrenceSchema(many=True)
