@@ -25,8 +25,6 @@ def _make_names_unique():
             raise Exception('Please set a default location or remove attributes whose names are not unique '
                             'across locations')
         return
-    res = conn.execute('SELECT name FROM roombooking.room_attributes WHERE location_id = %s', (default_location_id,))
-    default_attributes = {name for name, in res}
     res = conn.execute('''
         SELECT attr.id, attr.name, loc.name AS location
         FROM roombooking.room_attributes attr
@@ -34,7 +32,9 @@ def _make_names_unique():
         WHERE attr.location_id != %s
     ''', (default_location_id,))
     for row in res:
-        if row.name in default_attributes:
+        conflict = conn.execute("SELECT COUNT(*) FROM roombooking.room_attributes WHERE id != %s AND name = %s",
+                                (row.id, row.name)).scalar()
+        if conflict:
             new_name = '{} ({})'.format(row.name, row.location)
             conn.execute('UPDATE roombooking.room_attributes SET name = %s WHERE id = %s', (new_name, row.id))
 

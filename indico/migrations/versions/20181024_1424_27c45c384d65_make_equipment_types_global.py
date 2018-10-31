@@ -25,8 +25,6 @@ def _make_names_unique():
             raise Exception('Please set a default location or remove equipment types whose names are not unique '
                             'across locations')
         return
-    res = conn.execute('SELECT name FROM roombooking.equipment_types WHERE location_id = %s', (default_location_id,))
-    default_equipment = {name for name, in res}
     res = conn.execute('''
         SELECT eq.id, eq.name, loc.name AS location
         FROM roombooking.equipment_types eq
@@ -34,7 +32,9 @@ def _make_names_unique():
         WHERE eq.location_id != %s
     ''', (default_location_id,))
     for row in res:
-        if row.name in default_equipment:
+        conflict = conn.execute("SELECT COUNT(*) FROM roombooking.equipment_types WHERE id != %s AND name = %s",
+                                (row.id, row.name)).scalar()
+        if conflict:
             new_name = '{} ({})'.format(row.name, row.location)
             conn.execute('UPDATE roombooking.equipment_types SET name = %s WHERE id = %s', (new_name, row.id))
 
