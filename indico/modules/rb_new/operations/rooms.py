@@ -126,8 +126,8 @@ def search_for_rooms(filters, availability=None):
                     .correlate(Room)
                     .as_scalar())
         query = query.filter(subquery == len(filters['equipment']))
-    if filters.get('feature'):
-        for feature in filters['feature']:
+    if filters.get('features'):
+        for feature in filters['features']:
             query = query.filter(Room.available_equipment.any(EquipmentType.features.any(RoomFeature.name == feature)))
     if filters.get('favorite'):
         query = query.filter(favorite_room_table.c.user_id.isnot(None))
