@@ -519,5 +519,7 @@
             /* Focus will trigger the results dropdown to open */
             $(this).parent().find('.i-location-input-field').eq(0).trigger('focus.typeahead');
         });
+
+        $('#availability-container').hide();
     };
 })(window);
