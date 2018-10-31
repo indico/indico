@@ -119,8 +119,11 @@ class Calendar extends React.Component {
             <Popup trigger={<Button size="large"
                                     primary={!showUnused}
                                     icon={showUnused ? 'minus square outline' : 'plus square outline'}
-                                    onClick={this.toggleShowUnused} />}
-                   content={showUnused ? 'Hide unused rooms' : 'Show unused rooms'} />
+                                    onClick={this.toggleShowUnused} />}>
+                {showUnused
+                    ? <Translate>Hide unused rooms</Translate>
+                    : <Translate>Show unused rooms</Translate>}
+            </Popup>
         );
     };
 
