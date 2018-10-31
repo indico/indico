@@ -83,8 +83,11 @@ export default combineReducers({
             }
             case bookRoomActions.CREATE_BOOKING_SUCCESS: {
                 const {bookings, roomId} = camelizeKeys(action.data);
-                const {[roomId]: roomAvailability} = state;
+                if (!bookings) {
+                    return state;
+                }
 
+                const {[roomId]: roomAvailability} = state;
                 const av = roomAvailability.map((roomAv) => {
                     if (!(roomAv.day in bookings)) {
                         return roomAv;
