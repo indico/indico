@@ -86,6 +86,7 @@ class RoomFilterBarBase extends React.Component {
         buildings: PropTypes.array.isRequired,
         hasFavoriteRooms: PropTypes.bool,
         hasOwnedRooms: PropTypes.bool,
+        extraButtons: PropTypes.node,
         filters: PropTypes.shape({
             building: PropTypes.string,
             capacity: PropTypes.number,
@@ -108,11 +109,13 @@ class RoomFilterBarBase extends React.Component {
         hasFavoriteRooms: false,
         hasOwnedRooms: false,
         equipment: [],
+        extraButtons: null,
     };
 
     render() {
         const {
             equipmentTypes, features: availableFeatures, hasOwnedRooms, hasFavoriteRooms, buildings,
+            extraButtons,
             filters: {capacity, onlyFavorites, onlyMine, equipment, features, building, ...extraFilters},
             actions: {setFilterParameter, setFilters}
         } = this.props;
@@ -169,6 +172,7 @@ class RoomFilterBarBase extends React.Component {
                                                 onClick={() => setFilterParameter('onlyMine', !onlyMine)} />}
                                content={Translate.string('Show only rooms I manage')} />
                     )}
+                    {extraButtons}
                 </FilterBarController>
             </Button.Group>
         );

@@ -19,7 +19,7 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
 import {bindActionCreators} from 'redux';
-import {Button, ButtonGroup, Container, Grid, Popup, Sticky} from 'semantic-ui-react';
+import {Button, Container, Grid, Popup, Sticky} from 'semantic-ui-react';
 import {connect} from 'react-redux';
 import {Translate} from 'indico/react/i18n';
 import {serializeDate} from 'indico/utils/date';
@@ -29,14 +29,13 @@ import * as calendarSelectors from './selectors';
 import {actions as bookingsActions} from '../../common/bookings';
 import {selectors as roomsSelectors, actions as roomsActions} from '../../common/rooms';
 import {EditableTimelineItem, ElasticTimeline, TimelineHeader, TimelineItem} from '../../common/timeline';
-import {actions as bookRoomActions} from '../../modules/bookRoom';
-import {actions as filtersActions} from '../../common/filters';
-import {selectors as userSelectors} from '../../common/user';
-
-import './Calendar.module.scss';
+import {actions as bookRoomActions} from '../bookRoom';
+import {roomFilterBarFactory} from '../roomList';
 
 
 const SearchBar = searchBarFactory('calendar', calendarSelectors);
+const RoomFilterBar = roomFilterBarFactory('calendar', calendarSelectors);
+
 
 class Calendar extends React.Component {
     static propTypes = {
@@ -49,11 +48,9 @@ class Calendar extends React.Component {
             setMode: PropTypes.func.isRequired,
             openRoomDetails: PropTypes.func.isRequired,
             openBookRoom: PropTypes.func.isRequired,
-            setFilterParameter: PropTypes.func.isRequired,
             openBookingDetails: PropTypes.func.isRequired,
         }).isRequired,
         filters: PropTypes.object.isRequired,
-        hasFavoriteRooms: PropTypes.bool.isRequired,
     };
 
 
@@ -116,6 +113,17 @@ class Calendar extends React.Component {
         this.setState({showUnused: !showUnused});
     };
 
+    renderExtraButtons = () => {
+        const {showUnused} = this.state;
+        return (
+            <Popup trigger={<Button size="large"
+                                    primary={!showUnused}
+                                    icon={showUnused ? 'minus square outline' : 'plus square outline'}
+                                    onClick={this.toggleShowUnused} />}
+                   content={showUnused ? 'Hide unused rooms' : 'Show unused rooms'} />
+        );
+    };
+
     render() {
         const {
             isFetching,
@@ -123,13 +131,9 @@ class Calendar extends React.Component {
                 rows
             },
             actions: {
-                openRoomDetails, setDate, setFilterParameter, openBookingDetails, setMode
+                openRoomDetails, setDate, openBookingDetails, setMode
             },
             datePicker,
-            hasFavoriteRooms,
-            filters: {
-                onlyFavorites
-            }
         } = this.props;
         const {showUnused} = this.state;
         const legendLabels = [
@@ -146,23 +150,10 @@ class Calendar extends React.Component {
                             <Sticky context={this.contextRef.current} className="sticky-filters">
                                 <Grid.Row>
                                     <div className="filter-row">
-                                        <div styleName="calendar-filters">
-                                            <ButtonGroup size="large">
-                                                <Button size="large" icon="filter" disabled />
-                                                <Popup trigger={<Button size="large"
-                                                                        primary={!showUnused}
-                                                                        icon={showUnused ? 'minus square outline' : 'plus square outline'}
-                                                                        onClick={this.toggleShowUnused} />}
-                                                       content={showUnused ? 'Hide unused rooms' : 'Show unused rooms'} />
-                                                <Popup trigger={<Button size="large"
-                                                                        icon="star"
-                                                                        primary={onlyFavorites}
-                                                                        disabled={!onlyFavorites && !hasFavoriteRooms}
-                                                                        onClick={() => setFilterParameter('onlyFavorites', !onlyFavorites)} />}
-                                                       content={Translate.string('Show only my favorite rooms')} />
-                                            </ButtonGroup>
+                                        <div className="filter-row-filters">
+                                            <RoomFilterBar extraButtons={this.renderExtraButtons()} />
+                                            <SearchBar />
                                         </div>
-                                        <SearchBar />
                                     </div>
                                 </Grid.Row>
                                 <TimelineHeader datePicker={datePicker}
@@ -195,7 +186,6 @@ export default connect(
         calendarData: calendarSelectors.getCalendarData(state),
         filters: calendarSelectors.getFilters(state),
         rooms: roomsSelectors.getAllRooms(state),
-        hasFavoriteRooms: userSelectors.hasFavoriteRooms(state),
         datePicker: calendarSelectors.getDatePickerInfo(state)
     }),
     dispatch => ({
@@ -205,7 +195,6 @@ export default connect(
             setMode: calendarActions.setMode,
             openRoomDetails: roomsActions.openRoomDetails,
             openBookRoom: bookRoomActions.openBookRoom,
-            setFilterParameter: (param, value) => filtersActions.setFilterParameter('calendar', param, value),
             openBookingDetails: bookingsActions.openBookingDetails,
         }, dispatch),
     }),

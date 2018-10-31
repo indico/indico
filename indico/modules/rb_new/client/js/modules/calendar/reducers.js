@@ -26,7 +26,7 @@ import * as actions from '../../actions';
 import * as calendarActions from './actions';
 import {actions as bookingActions} from '../../common/bookings';
 import {filterReducerFactory} from '../../common/filters';
-import {processRoomFilters} from '../../common/roomSearch/reducers';
+import {initialRoomFilterStateFactory, processRoomFilters} from '../../common/roomSearch/reducers';
 import {initialDatePickerState} from '../../common/timeline/reducers';
 
 
@@ -56,14 +56,8 @@ export const initialDataState = {
     roomIds: null
 };
 
-export const initialFilterState = {
-    text: null,
-    building: null,
-    onlyFavorites: false
-};
-
 export const initialState = () => ({
-    filters: initialFilterState,
+    filters: initialRoomFilterStateFactory('calendar'),
     data: initialDataState,
     datePicker: datePickerState()
 });
@@ -119,7 +113,7 @@ function acceptPrebooking(calendar, bookingId, roomId) {
 
 export default combineReducers({
     request: requestReducer(calendarActions.FETCH_REQUEST, calendarActions.FETCH_SUCCESS, calendarActions.FETCH_ERROR),
-    filters: filterReducerFactory('calendar', initialFilterState, processRoomFilters),
+    filters: filterReducerFactory('calendar', initialRoomFilterStateFactory, processRoomFilters),
     data: (state = initialDataState, action) => {
         switch (action.type) {
             case calendarActions.ROWS_RECEIVED:

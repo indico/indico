@@ -23,25 +23,15 @@ import * as actions from '../../actions';
 import {history} from '../../store';
 import {initialState} from './reducers';
 import {actions as filtersActions} from '../../common/filters';
-import {boolStateField} from '../../util';
+import {queryStringRules as roomSearchQueryStringRules} from '../../common/roomSearch';
 import * as calendarActions from './actions';
 
 
 const rules = {
+    ...roomSearchQueryStringRules,
     date: {
         validator: (date) => v.isDate(date) && moment(date).isBetween('1970-01-01', '2999-12-31'),
         stateField: 'datePicker.selectedDate'
-    },
-    favorite: {
-        validator: v.isBoolean(),
-        sanitizer: v.toBoolean(),
-        stateField: boolStateField('filters.onlyFavorites')
-    },
-    building: {
-        stateField: 'filters.building'
-    },
-    text: {
-        stateField: 'filters.text'
     },
     mode: {
         validator: v.isIn(['days', 'weeks', 'months']),
