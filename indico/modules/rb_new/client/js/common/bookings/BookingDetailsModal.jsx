@@ -180,7 +180,7 @@ class BookingDetailsModal extends React.Component {
                     color="red"
                     size="small"
                     loading={actionInProgress === 'reject' && bookingStateChangeInProgress}
-                    disabled={actionInProgress !== 'reject' && bookingStateChangeInProgress}
+                    disabled={bookingStateChangeInProgress}
                     content={<Translate>Reject booking</Translate>} />
         );
 
@@ -217,7 +217,7 @@ class BookingDetailsModal extends React.Component {
                                 size="small"
                                 onClick={() => this.showConfirm('cancel')}
                                 loading={actionInProgress === 'cancel' && bookingStateChangeInProgress}
-                                disabled={actionInProgress !== 'cancel' && bookingStateChangeInProgress}
+                                disabled={bookingStateChangeInProgress}
                                 content={<Translate>Cancel booking</Translate>} />
                         <Confirm header={Translate.string('Confirm cancellation')}
                                  content={Translate.string('Are you sure you want to cancel this booking?' +
@@ -247,7 +247,7 @@ class BookingDetailsModal extends React.Component {
                             size="small"
                             onClick={() => this.changeState('approve')}
                             loading={actionInProgress === 'approve' && bookingStateChangeInProgress}
-                            disabled={actionInProgress !== 'approve' && bookingStateChangeInProgress}
+                            disabled={bookingStateChangeInProgress}
                             content={<Translate>Accept booking</Translate>} />
                 )}
             </Modal.Actions>
