@@ -31,9 +31,8 @@ parent object. The key features and expected behaviour is the following:
       the current venue. This is to avoid clearing the venue field by accident
       (see actions after selecting a room option).
 #}
-
 {% extends 'forms/base_widget.html' %}
-
+{% from '_switch.html' import switch %}
 {% block html %}
     <div class="i-location-field" id="{{ field.id }}-wrapper">
         <input type="hidden" id="{{ field.id }}" name="{{ field.name }}"
@@ -79,7 +78,19 @@ parent object. The key features and expected behaviour is the following:
                     </div>
                 </div>
             {%- endif %}
-            <div id="availability-container"></div>
+            <div id="room-available">
+                <i class="icon icon-checkmark color-green"></i>
+                <span>{% trans %}This room is available. Would you like to book it?{% endtrans %}</span>
+                {{ switch(id='create-booking', on_label=_('Yes'), off_label=_('No')) }}
+            </div>
+             <div id="room-conflict-booking">
+                <i class="icon icon-cross"></i>
+                <span>{% trans %}This room is already booked at selected times{% endtrans %}</span>
+            </div>
+             <div id="room-conflict-prebooking">
+                <i class="icon icon-warning"></i>
+                <span>{% trans %}This room is already prebooked at selected times{% endtrans %}</span>
+            </div>
         </div>
     </div>
     <div class="clearfix"></div>

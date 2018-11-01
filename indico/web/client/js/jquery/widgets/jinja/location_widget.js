@@ -455,6 +455,7 @@
             postSelectionActions(roomInput, data.name);
             highlightOption(roomInput, data.name);
             roomInput.attr('title', data.name);
+            hiddenData.create_booking = $('#create-booking').val();
         }).on('typeahead:click-on-custom-option', function(e, data) {
             delete hiddenData.room_id;
             hiddenData.room_name = data.item_name;
@@ -519,7 +520,8 @@
             /* Focus will trigger the results dropdown to open */
             $(this).parent().find('.i-location-input-field').eq(0).trigger('focus.typeahead');
         });
-
-        $('#availability-container').hide();
+        $('#room-available').hide();
+        $('#room-conflict-booking').hide();
+        $('#room-conflict-prebooking').hide();
     };
 })(window);
