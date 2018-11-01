@@ -103,9 +103,32 @@ export const pushStateMergeProps = (stateProps, dispatchProps, ownProps) => {
     };
 };
 
+/**
+ * Defines a query string state field for a boolean that is only added
+ * to the query string if it's true.
+ * @param {string} name - Name of the state field.
+ */
 export function boolStateField(name) {
     return {
         serialize: state => _.get(state, name) || null,
+        parse: (value, state) => {
+            _.set(state, name, value);
+        }
+    };
+}
+
+/**
+ * Defines a query string state field that is only added to the query
+ * string if the value doesn't match the default.
+ * @param {string} name - Name of the state field.
+ * @param defaultValue - The default value that will not go to the query string.
+ */
+export function defaultStateField(name, defaultValue) {
+    return {
+        serialize: state => {
+            const value = _.get(state, name, null);
+            return value === defaultValue ? null : value;
+        },
         parse: (value, state) => {
             _.set(state, name, value);
         }
