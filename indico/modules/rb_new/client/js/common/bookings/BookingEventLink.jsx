@@ -33,6 +33,7 @@ export default class BookingEventLink extends React.PureComponent {
 
     state = {
         loaded: false,
+        data: {},
     };
 
     componentDidMount() {
@@ -41,15 +42,17 @@ export default class BookingEventLink extends React.PureComponent {
     }
 
     async fetchEventData(bookingId) {
+        let response;
         try {
-            const {data} = await indicoAxios.get(getBookingEventDataURL({booking_id: bookingId}));
-            this.setState({
-                loaded: true,
-                data: camelizeKeys(data)
-            });
+            response = await indicoAxios.get(getBookingEventDataURL({booking_id: bookingId}));
         } catch (error) {
             handleAxiosError(error);
+            return;
         }
+        this.setState({
+            loaded: true,
+            data: camelizeKeys(response.data)
+        });
     }
 
     renderEventInfo(data) {
