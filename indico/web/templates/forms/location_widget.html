@@ -66,8 +66,10 @@ parent object. The key features and expected behaviour is the following:
                     </div>
                 </div>
             </div>
-            <textarea id="location-address-{{ field.id }}"
-                      placeholder="{% trans %}Address{% endtrans %}"></textarea>
+            {% if field.edit_address -%}
+                <textarea id="location-address-{{ field.id }}"
+                          placeholder="{% trans %}Address{% endtrans %}"></textarea>
+            {%- endif %}
             {% if field.allow_location_inheritance -%}
                 <div class="location-inheritance-field">
                     <div class="checkbox-container">
