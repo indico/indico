@@ -154,6 +154,48 @@
             }
         }
 
+        .availabiity-message {
+            display: none;
+            padding-top: 50px;
+
+            .content {
+                display: flex;
+                align-items: center;
+
+                &.available {
+                    justify-content: space-between;
+
+                    .icon {
+                        color: $green;
+                        font-size: 1.4em;
+                    }
+
+                    span {
+                        padding-right: 10px;
+                    }
+                }
+
+                &.conflict-booking {
+                    justify-content: flex-start;
+
+                    .icon {
+                        color: $red;
+                        font-size: 1.4em;
+                    }
+                }
+
+                &.conflict-prebooking {
+                    justify-content: flex-start;
+
+                    .icon {
+                        color: $orange;
+                        font-size: 1.4em;
+                    }
+                }
+            }
+        }
+
+
         > textarea {
             width: 100%;
             margin-top: 0.4em;
