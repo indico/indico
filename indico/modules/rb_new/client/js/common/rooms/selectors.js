@@ -67,7 +67,7 @@ export const getAllRooms = createSelector(
     (rawRooms, equipmentTypes) => {
         equipmentTypes = equipmentTypes.reduce((obj, eq) => ({...obj, [eq.id]: eq}), {});
         return _.fromPairs(rawRooms.map(room => {
-            const {available_equipment: equipment, ...roomData} = room;
+            const {availableEquipment: equipment, ...roomData} = room;
             // gather a list of features the room has based on its equipment
             const features = {};
             equipment.map(id => equipmentTypes[id]).forEach(equipmentType => {

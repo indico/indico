@@ -23,9 +23,9 @@ import './RoomKeyLocation.module.scss';
 
 
 export default function RoomKeyLocation({room}) {
-    return room.key_location && (
+    return room.keyLocation && (
         <Message styleName="message-icon" icon="key"
-                 content={room.key_location} />
+                 content={room.keyLocation} />
     );
 }
 

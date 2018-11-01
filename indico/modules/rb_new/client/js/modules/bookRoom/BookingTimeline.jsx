@@ -62,10 +62,12 @@ class _BookingTimelineComponent extends React.Component {
 
     state = {};
 
-    renderRoomSummary({room: {full_name: fullName}}) {
+    renderRoomSummary({room: {fullName}}) {
         return (
             <Segment>
-                <Translate>Availability for room <Param name="roomName" value={<strong>{fullName}</strong>} /></Translate>
+                <Translate>
+                    Availability for room <Param name="roomName" value={<strong>{fullName}</strong>} />
+                </Translate>
             </Segment>
         );
     }

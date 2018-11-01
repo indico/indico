@@ -89,7 +89,7 @@ class Room extends React.Component {
                 <DimmableImage src={roomsSpriteURL({version: roomsSpriteToken})}
                                content={content}
                                hoverContent={dimmerContent}
-                               spritePos={room.sprite_position} />
+                               spritePos={room.spritePosition} />
             );
         } else {
             return (
@@ -97,7 +97,7 @@ class Room extends React.Component {
                     <div styleName="room-extra-info">
                         {content}
                     </div>
-                    <SpriteImage src={roomsSpriteURL({version: roomsSpriteToken})} pos={room.sprite_position} />
+                    <SpriteImage src={roomsSpriteURL({version: roomsSpriteToken})} pos={room.spritePosition} />
                 </div>
             );
         }
@@ -114,7 +114,7 @@ class Room extends React.Component {
                 <Card.Content>
                     <TooltipIfTruncated>
                         <Card.Header styleName="room-title">
-                            {room.full_name}
+                            {room.fullName}
                         </Card.Header>
                     </TooltipIfTruncated>
                     <Card.Meta style={{fontSize: '0.8em'}}>
@@ -138,13 +138,13 @@ class Room extends React.Component {
                         {room.features.map(feature => (
                             <RoomFeatureEntry key={feature.name} feature={feature} color="green" />
                         ))}
-                        {!room.is_reservable && (
+                        {!room.isReservable && (
                             <Popup trigger={<Icon name="dont" color="grey" />}
                                    content={Translate.string('This room is not bookable')}
                                    position="bottom center"
                                    hideOnScroll />
                         )}
-                        {!room.is_public && (
+                        {!room.isPublic && (
                             <Popup trigger={<Icon name="lock" color="red" />}
                                    content={Translate.string('This room is not publicly available')}
                                    position="bottom center"

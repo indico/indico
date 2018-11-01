@@ -50,13 +50,13 @@ RoomFeaturesBox.propTypes = {
 
 function RoomBasicDetails({room, roomsSpriteToken}) {
     const {
-        owner_name: owner, latitude, longitude, division, location_name: location, surface_area: surface, capacity,
-        telephone, full_name: name
+        ownerName: owner, latitude, longitude, division, locationName: location, surfaceArea: surface, capacity,
+        telephone, fullName: name
     } = room;
     return (
         <Grid columns={2}>
             <Grid.Column textAlign="center">
-                <SpriteImage src={roomsSpriteURL({version: roomsSpriteToken})} pos={room.sprite_position}
+                <SpriteImage src={roomsSpriteURL({version: roomsSpriteToken})} pos={room.spritePosition}
                              origin="0"
                              scale="0.85" />
                 <RoomFeaturesBox room={room} />

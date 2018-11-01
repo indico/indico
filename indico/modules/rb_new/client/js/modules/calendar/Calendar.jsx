@@ -85,7 +85,7 @@ class Calendar extends React.Component {
                 unbookableHours: unbookableHours || [],
                 blockings: blockings[day] || []
             },
-            label: room.full_name,
+            label: room.fullName,
             key: room.id,
             room
         });

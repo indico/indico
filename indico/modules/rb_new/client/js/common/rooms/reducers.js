@@ -62,7 +62,7 @@ export default combineReducers({
     equipmentTypes: (state = [], action) => {
         switch (action.type) {
             case roomsActions.EQUIPMENT_TYPES_RECEIVED:
-                return action.data.map(x => camelizeKeys(x));
+                return camelizeKeys(action.data);
             default:
                 return state;
         }
@@ -70,7 +70,7 @@ export default combineReducers({
     rooms: (state = {}, action) => {
         switch (action.type) {
             case roomsActions.ROOMS_RECEIVED:
-                return action.data;
+                return camelizeKeys(action.data);
             default:
                 return state;
         }

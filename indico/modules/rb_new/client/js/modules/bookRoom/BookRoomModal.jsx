@@ -279,7 +279,7 @@ class BookRoomModal extends React.Component {
         const conflictsExist = availability && !!Object.keys(availability.conflicts).length;
         const bookingBlocked = ({submitting, submitSucceeded}) => submitting || submitSucceeded;
         const buttonsBlocked = (fprops) => bookingBlocked(fprops) || (conflictsExist && !skipConflicts);
-        const {is_auto_confirm: isDirectlyBookable} = room;
+        const {isAutoConfirm: isDirectlyBookable} = room;
         const legendLabels = [
             {label: Translate.string('Available'), color: 'green'},
             {label: Translate.string('Booked'), color: 'orange'},

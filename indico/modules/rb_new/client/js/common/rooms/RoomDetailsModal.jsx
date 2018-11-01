@@ -161,14 +161,14 @@ RoomDetails.propTypes = {
 
 function RoomAvailabilityBox({room}) {
     return (
-        room.is_public ? (
+        room.isPublic ? (
             <Message positive styleName="message-icon" icon="unlock" content={
                 <>
                     <p><Translate>Anyone can book this room.</Translate></p>
-                    {room.max_advance_days && (
+                    {room.maxAdvanceDays && (
                         <p>
                             <Translate>
-                                Max. <Param name="max_advance_days" value={room.max_advance_days} /> days in advance
+                                Max. <Param name="max_advance_days" value={room.maxAdvanceDays} /> days in advance
                             </Translate>
                         </p>
                     )}
