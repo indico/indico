@@ -98,32 +98,18 @@ purely client-side and are worded for event creation instead of being generic.
     _.defer(function() {
         $('#{{ form.title.id }}').focus();
     });
-
+    var previousRoomId;
     $("#event-creation-location_data").change(function() {
         var roomData = JSON.parse($(this).val());
-        if ('room_id' in roomData) {
-            var $container = $('#availability-container').empty().removeClass();
-            var $messageContent = $('<div>', {
-                class: 'message-box-content'
-            });
-            var $messageIcon = $('<span>', {
-                class: 'icon'
-            });
-            $messageIcon.appendTo($messageContent);
-            $messageContent.appendTo($container);
-
-            var $availableMessage = $('<div>', {
-                class: 'message-text',
-                text: 'This room is available. Would you like to book it?'
-            });
-            var $conflictBookingMessage = $('<div>', {
-                class: 'message-text',
-                text: 'There are conflicting bookings'
-            });
-            var $conflictPrebookingMessage = $('<div>', {
-                class: 'message-text',
-                text: 'There are conflicting prebookings'
-            });
+        var $availableMessage = $('#room-available');
+        var $conflictBookingMessage = $('#room-conflict-booking');
+        var $conflictPrebookingMessage = $('#room-conflict-prebooking');
+        if (!('room_id' in roomData)) {
+            $availableMessage.hide();
+            $conflictBookingMessage.hide();
+            $conflictPrebookingMessage.hide();
+        } else if (previousRoomId !== roomData['room_id']) {
+            var roomId = roomData['room_id'];
             var roomId = roomData['room_id'];
             var startDate = $('#event-creation-start_dt-date').val();
             var startTime = $('#event-creation-start_dt-time').val();
@@ -132,6 +118,12 @@ purely client-side and are worded for event creation instead of being generic.
             var startDt = moment(startDate + " " + startTime, 'DD/MM/YYYY HH:mm').format('DD/MM/YYYY HH:mm:ss');
             var endDt = moment(endDate + " " + endTime, 'DD/MM/YYYY HH:mm').format('DD/MM/YYYY HH:mm:ss');
             var requestParams = {room_id: roomId, start_dt: startDt, end_dt: endDt};
+
+            previousRoomId = roomId;
+            $availableMessage.hide();
+            $conflictBookingMessage.hide();
+            $conflictPrebookingMessage.hide();
+
             $.ajax({
                 url: build_url(Indico.Urls.RoomBooking.room.check_available, requestParams),
                 method: 'GET',
@@ -140,18 +132,12 @@ purely client-side and are worded for event creation instead of being generic.
                 error: handleAjaxError,
                 success: function(data) {
                     if (data['conflict_booking']){
-                        $container.addClass('error-message-box')
-                        $conflictBookingMessage.appendTo($messageContent);
+                        $conflictBookingMessage.show();
                     } else if (data['conflict_prebooking']){
-                        $container.addClass('warning-message-box')
-                        $conflictPrebookingMessage.appendTo($messageContent);
+                        $conflictPrebookingMessage.show();
                     } else {
-                        var $switch = $('<input>', {type: 'checkbox'});
-                        $container.addClass('success-message-box')
-                        $availableMessage.appendTo($messageContent);
-                        $switch.appendTo($messageContent);
+                        $availableMessage.show();
                     }
-                    $container.show();
                 }
             });
         }
