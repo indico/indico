@@ -163,13 +163,13 @@ class RHBookingDetails(RHBookingBase):
         return jsonify(booking_details)
 
 
-class RHBookingStateActions(RHRoomBookingBase):
+class RHBookingStateActions(RHBookingBase):
     def _process_args(self):
-        self.booking = Reservation.get_one(request.view_args['booking_id'])
+        RHBookingBase._process_args(self)
         self.action = request.view_args['action']
 
     def _check_access(self):
-        RHRoomBookingBase._check_access(self)
+        RHBookingBase._check_access(self)
         funcs = {'approve': self.booking.can_be_accepted,
                  'reject': self.booking.can_be_rejected,
                  'cancel': self.booking.can_be_cancelled}
@@ -196,12 +196,9 @@ class RHBookingStateActions(RHRoomBookingBase):
         return jsonify(booking=reservation_details_schema.dump(self.booking).data, booking_state=state)
 
 
-class RHBookingDelete(RHRoomBookingBase):
-    def _process_args(self):
-        self.booking = Reservation.get_one(request.view_args['booking_id'])
-
+class RHBookingDelete(RHBookingBase):
     def _check_access(self):
-        RHRoomBookingBase._check_access(self)
+        RHBookingBase._check_access(self)
         if not self.booking.can_be_deleted(session.user):
             raise Forbidden
 
