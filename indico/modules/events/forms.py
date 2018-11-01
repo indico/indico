@@ -64,7 +64,8 @@ class EventCreationFormBase(IndicoForm):
     category = CategoryField(_('Category'), [DataRequired()], allow_subcats=False, require_event_creation_rights=True)
     title = StringField(_('Event title'), [DataRequired()])
     timezone = IndicoTimezoneSelectField(_('Timezone'), [DataRequired()])
-    location_data = IndicoLocationField(_('Location'), allow_location_inheritance=False, edit_address=False)
+    location_data = IndicoLocationField(_('Location'), allow_location_inheritance=False, edit_address=False,
+                                        check_room_availability=True)
     protection_mode = IndicoEnumRadioField(_('Protection mode'), enum=ProtectionMode)
 
     def validate_category(self, field):

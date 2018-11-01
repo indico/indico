@@ -520,8 +520,5 @@
             /* Focus will trigger the results dropdown to open */
             $(this).parent().find('.i-location-input-field').eq(0).trigger('focus.typeahead');
         });
-        $('#room-available').hide();
-        $('#room-conflict-booking').hide();
-        $('#room-conflict-prebooking').hide();
     };
 })(window);
