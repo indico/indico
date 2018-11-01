@@ -64,7 +64,12 @@ export default class WeeklyTimelineContent extends DailyTimelineContent {
     }
 
     renderDividers(hourSpan, hourStep) {
+        const {rows} = this.props;
         const daySize = (100 / 7);
+
+        if (!rows.length) {
+            return null;
+        }
 
         return (
             _.times(7, n => (
@@ -80,7 +85,7 @@ export default class WeeklyTimelineContent extends DailyTimelineContent {
     renderHeader() {
         const {longLabel, selectable, rows} = this.props;
         const labelWidth = longLabel ? 200 : 150;
-        const dates = rows[0].availability.map(([dt]) => dt);
+        const dates = rows.length ? rows[0].availability.map(([dt]) => dt) : [];
         return (
             <>
                 <div styleName="baseStyle.timeline-header" className={!selectable && 'timeline-non-selectable'}>

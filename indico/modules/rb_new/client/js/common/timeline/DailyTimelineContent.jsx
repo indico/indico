@@ -182,7 +182,7 @@ export default class DailyTimelineContent extends React.Component {
 
     render() {
         const {
-            maxHour, minHour, rows, lazyScroll, hourStep, fixedHeight
+            maxHour, minHour, rows, lazyScroll, hourStep, fixedHeight, isLoading
         } = this.props;
         const WrapperComponent = lazyScroll ? LazyScroll : React.Fragment;
         const wrapperProps = lazyScroll || {};
@@ -218,7 +218,7 @@ export default class DailyTimelineContent extends React.Component {
 
         return (
             <>
-                {!!rows.length && this.renderHeader(hourSpan, hourSeries)}
+                {(isLoading || !!rows.length) && this.renderHeader(hourSpan, hourSeries)}
                 <WrapperComponent {...wrapperProps}>
                     {(fixedHeight ? (
                         autoSizerWrapper(fixedHeight)

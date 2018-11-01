@@ -116,6 +116,8 @@ export default combineReducers({
     filters: filterReducerFactory('calendar', initialRoomFilterStateFactory, processRoomFilters),
     data: (state = initialDataState, action) => {
         switch (action.type) {
+            case calendarActions.FETCH_REQUEST:
+                return {...state, rows: []};
             case calendarActions.ROWS_RECEIVED:
                 return {...state, rows: camelizeKeys(action.data)};
             case calendarActions.ROOM_IDS_RECEIVED:
