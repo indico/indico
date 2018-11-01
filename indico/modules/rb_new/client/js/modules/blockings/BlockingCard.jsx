@@ -17,23 +17,19 @@
 
 import moment from 'moment';
 import React from 'react';
-import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import {Card} from 'semantic-ui-react';
-import roomsSpriteURL from 'indico-url:rooms_new.sprite';
 import {TooltipIfTruncated} from 'indico/react/components';
 import {Translate, Param, PluralTranslate} from 'indico/react/i18n';
 import SpriteImage from '../../components/SpriteImage';
-import * as configSelectors from '../../common/config/selectors';
 
 import './BlockingCard.module.scss';
 
 
-class BlockingCard extends React.Component {
+export default class BlockingCard extends React.Component {
     static propTypes = {
         blocking: PropTypes.object.isRequired,
-        onClick: PropTypes.func.isRequired,
-        roomsSpriteToken: PropTypes.string.isRequired
+        onClick: PropTypes.func.isRequired
     };
 
     renderCardHeader() {
@@ -61,14 +57,13 @@ class BlockingCard extends React.Component {
     }
 
     render() {
-        const {blocking, onClick, roomsSpriteToken} = this.props;
+        const {blocking, onClick} = this.props;
         const {blockedRooms} = blocking;
 
         return (
             <Card onClick={onClick} styleName="blocking-item" key={blocking.id}>
                 <div className="image">
                     <SpriteImage key={blockedRooms[0].room.id}
-                                 src={roomsSpriteURL({version: roomsSpriteToken})}
                                  pos={blockedRooms[0].room.spritePosition} />
                 </div>
                 <Card.Content>
@@ -91,9 +86,3 @@ class BlockingCard extends React.Component {
         );
     }
 }
-
-export default connect(
-    (state) => ({
-        roomsSpriteToken: configSelectors.getRoomsSpriteToken(state)
-    })
-)(BlockingCard);

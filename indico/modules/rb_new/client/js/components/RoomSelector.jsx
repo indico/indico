@@ -17,16 +17,13 @@
 
 import _ from 'lodash';
 import React from 'react';
-import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import {Button, Dropdown, Grid, Icon, List, Message, Segment} from 'semantic-ui-react';
 import getLocationsURL from 'indico-url:rooms_new.locations';
-import roomsSpriteURL from 'indico-url:rooms_new.sprite';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {Translate} from 'indico/react/i18n';
 import camelizeKeys from 'indico/utils/camelize';
 import SpriteImage from './SpriteImage';
-import * as configSelectors from '../common/config/selectors';
 
 import './RoomSelector.module.scss';
 
@@ -44,14 +41,13 @@ const fetchLocations = async () => {
 };
 
 
-class RoomSelector extends React.Component {
+export default class RoomSelector extends React.Component {
     static propTypes = {
         onChange: PropTypes.func.isRequired,
         onFocus: PropTypes.func.isRequired,
         onBlur: PropTypes.func.isRequired,
         value: PropTypes.array.isRequired,
         disabled: PropTypes.bool,
-        roomsSpriteToken: PropTypes.string.isRequired,
         renderRoomActions: PropTypes.func,
     };
 
@@ -97,13 +93,12 @@ class RoomSelector extends React.Component {
     };
 
     renderRoomItem = (room) => {
-        const {disabled, roomsSpriteToken, renderRoomActions} = this.props;
+        const {disabled, renderRoomActions} = this.props;
 
         return (
             <List.Item key={room.id}>
                 <div className="image-wrapper" style={{width: 55, height: 25}}>
-                    <SpriteImage src={roomsSpriteURL({version: roomsSpriteToken})}
-                                 pos={room.spritePosition}
+                    <SpriteImage pos={room.spritePosition}
                                  origin="0 0"
                                  scale="0.15" />
                 </div>
@@ -213,9 +208,3 @@ class RoomSelector extends React.Component {
         );
     }
 }
-
-export default connect(
-    (state) => ({
-        roomsSpriteToken: configSelectors.getRoomsSpriteToken(state)
-    })
-)(RoomSelector);
