@@ -125,7 +125,7 @@ class ReservationDetailsSchema(mm.ModelSchema):
     can_delete = Function(lambda booking: booking.can_be_deleted(session.user))
     can_modify = Function(lambda booking: booking.can_be_modified(session.user))
     can_reject = Function(lambda booking: booking.can_be_rejected(session.user))
-    is_linked_to_event = Function(lambda booking: booking.event is not None)
+    is_linked_to_event = Function(lambda booking: booking.event_id is not None)
     start_dt = NaiveDateTime()
     end_dt = NaiveDateTime()
 
