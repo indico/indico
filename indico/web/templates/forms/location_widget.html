@@ -80,19 +80,21 @@ parent object. The key features and expected behaviour is the following:
                     </div>
                 </div>
             {%- endif %}
-            <div id="room-available">
-                <i class="icon icon-checkmark color-green"></i>
-                <span>{% trans %}This room is available. Would you like to book it?{% endtrans %}</span>
-                {{ switch(id='create-booking', on_label=_('Yes'), off_label=_('No')) }}
-            </div>
-             <div id="room-conflict-booking">
-                <i class="icon icon-cross"></i>
-                <span>{% trans %}This room is already booked at selected times{% endtrans %}</span>
-            </div>
-             <div id="room-conflict-prebooking">
-                <i class="icon icon-warning"></i>
-                <span>{% trans %}This room is already prebooked at selected times{% endtrans %}</span>
-            </div>
+            {% if field.check_room_availability -%}
+                <div id="room-available">
+                    <i class="icon icon-checkmark color-green"></i>
+                    <span>{% trans %}This room is available. Would you like to book it?{% endtrans %}</span>
+                    {{ switch(id='create-booking', on_label=_('Yes'), off_label=_('No')) }}
+                </div>
+                <div id="room-conflict-booking">
+                    <i class="icon icon-cross"></i>
+                    <span>{% trans %}This room is already booked at selected times{% endtrans %}</span>
+                </div>
+                <div id="room-conflict-prebooking">
+                    <i class="icon icon-warning"></i>
+                    <span>{% trans %}This room is already prebooked at selected times{% endtrans %}</span>
+                </div>
+            {%- endif %}
         </div>
     </div>
     <div class="clearfix"></div>

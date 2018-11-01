@@ -31,6 +31,7 @@ class IndicoLocationField(JSONField):
     def __init__(self, *args, **kwargs):
         self.edit_address = kwargs.pop('edit_address', True)
         self.allow_location_inheritance = kwargs.pop('allow_location_inheritance', True)
+        self.check_room_availability = kwargs.pop('check_room_availability', False)
         self.locations = Location.query.options(joinedload('rooms')).order_by(db.func.lower(Location.name)).all()
         super(IndicoLocationField, self).__init__(*args, **kwargs)
 
