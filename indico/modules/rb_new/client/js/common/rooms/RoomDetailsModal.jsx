@@ -100,9 +100,7 @@ function RoomDetails({bookRoom, room, availability, attributes}) {
         {label: Translate.string('Not bookable'), style: 'unbookable'}
     ];
 
-    const rowSerializer = ({
-        bookings, nonbookable_periods: nonbookablePeriods, unbookable_hours: unbookableHours, blockings, day
-    }) => ({
+    const rowSerializer = ({bookings, nonbookablePeriods, unbookableHours, blockings, day}) => ({
         availability: {
             bookings: bookings || [],
             nonbookablePeriods: nonbookablePeriods || [],
