@@ -21,14 +21,12 @@ import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import {Card, Icon, Label, Popup, Button} from 'semantic-ui-react';
-import roomsSpriteURL from 'indico-url:rooms_new.sprite';
 
 import {Translate} from 'indico/react/i18n';
 import {Slot} from 'indico/react/util';
 import {TooltipIfTruncated} from 'indico/react/components';
 import SpriteImage from './SpriteImage';
-import DimmableImage from './Dimmer.jsx';
-import {selectors as configSelectors} from '../common/config';
+import DimmableImage from './DimmableImage.jsx';
 import {actions as userActions, selectors as userSelectors} from '../common/user';
 import RoomFeatureEntry from './RoomFeatureEntry';
 
@@ -41,7 +39,6 @@ class Room extends React.Component {
         children: PropTypes.node,
         showFavoriteButton: PropTypes.bool,
         isFavorite: PropTypes.bool.isRequired,
-        roomsSpriteToken: PropTypes.string.isRequired,
         addFavoriteRoom: PropTypes.func.isRequired,
         delFavoriteRoom: PropTypes.func.isRequired,
     };
@@ -77,7 +74,12 @@ class Room extends React.Component {
     }
 
     renderCardImage = (room, content, actions) => {
-        const {showFavoriteButton, roomsSpriteToken} = this.props;
+        const {showFavoriteButton} = this.props;
+
+        const sprite = (
+            <SpriteImage pos={room.spritePosition} />
+        );
+
         if ((actions !== undefined && actions.length !== 0) || showFavoriteButton) {
             const dimmerContent = (
                 <div>
@@ -86,10 +88,10 @@ class Room extends React.Component {
                 </div>
             );
             return (
-                <DimmableImage src={roomsSpriteURL({version: roomsSpriteToken})}
-                               content={content}
-                               hoverContent={dimmerContent}
-                               spritePos={room.spritePosition} />
+                <DimmableImage content={content}
+                               hoverContent={dimmerContent}>
+                    {sprite}
+                </DimmableImage>
             );
         } else {
             return (
@@ -97,7 +99,7 @@ class Room extends React.Component {
                     <div styleName="room-extra-info">
                         {content}
                     </div>
-                    <SpriteImage src={roomsSpriteURL({version: roomsSpriteToken})} pos={room.spritePosition} />
+                    {sprite}
                 </div>
             );
         }
@@ -161,8 +163,7 @@ export default connect(
     () => {
         const isFavoriteRoom = userSelectors.makeIsFavoriteRoom();
         return (state, props) => ({
-            isFavorite: isFavoriteRoom(state, props),
-            roomsSpriteToken: configSelectors.getRoomsSpriteToken(state),
+            isFavorite: isFavoriteRoom(state, props)
         });
     },
     dispatch => bindActionCreators({

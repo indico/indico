@@ -17,6 +17,7 @@
 
 import {combineReducers} from 'redux';
 
+import camelizeKeys from 'indico/utils/camelize';
 import {requestReducer} from 'indico/utils/redux';
 import * as configActions from './actions';
 
@@ -32,11 +33,11 @@ export default combineReducers({
     data: (state = initialState, action) => {
         switch (action.type) {
             case configActions.CONFIG_RECEIVED: {
-                const config = action.data;
+                const {roomsSpriteToken, languages, tileserverUrl: tileServerURL} = camelizeKeys(action.data);
                 return {
-                    roomsSpriteToken: config.rooms_sprite_token,
-                    languages: config.languages,
-                    tileServerURL: config.tileserver_url,
+                    roomsSpriteToken,
+                    languages,
+                    tileServerURL,
                 };
             }
             default:

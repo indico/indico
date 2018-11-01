@@ -16,15 +16,12 @@
  */
 
 import React from 'react';
-import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
-import roomsSpriteURL from 'indico-url:rooms_new.sprite';
 import {Grid, Header, Icon} from 'semantic-ui-react';
 import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
 
 import RoomFeatureEntry from './RoomFeatureEntry';
 import SpriteImage from './SpriteImage';
-import {selectors as configSelectors} from '../common/config';
 
 import './RoomBasicDetails.module.scss';
 
@@ -48,7 +45,7 @@ RoomFeaturesBox.propTypes = {
     }).isRequired,
 };
 
-function RoomBasicDetails({room, roomsSpriteToken}) {
+export default function RoomBasicDetails({room}) {
     const {
         ownerName: owner, latitude, longitude, division, locationName: location, surfaceArea: surface, capacity,
         telephone, fullName: name
@@ -56,9 +53,8 @@ function RoomBasicDetails({room, roomsSpriteToken}) {
     return (
         <Grid columns={2}>
             <Grid.Column textAlign="center">
-                <SpriteImage src={roomsSpriteURL({version: roomsSpriteToken})} pos={room.spritePosition}
-                             origin="0"
-                             scale="0.85" />
+                <SpriteImage pos={room.sprite_position}
+                             origin="0" />
                 <RoomFeaturesBox room={room} />
             </Grid.Column>
             <Grid.Column>
@@ -93,13 +89,5 @@ function RoomBasicDetails({room, roomsSpriteToken}) {
 }
 
 RoomBasicDetails.propTypes = {
-    room: PropTypes.object.isRequired,
-    roomsSpriteToken: PropTypes.string.isRequired,
+    room: PropTypes.object.isRequired
 };
-
-
-export default connect(
-    state => ({
-        roomsSpriteToken: configSelectors.getRoomsSpriteToken(state),
-    })
-)(RoomBasicDetails);

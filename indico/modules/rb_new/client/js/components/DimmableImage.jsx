@@ -17,36 +17,28 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Image} from 'semantic-ui-react';
 
-import SpriteImage from './SpriteImage';
-
-import './Dimmer.module.scss';
+import './DimmableImage.module.scss';
 
 
 export default class DimmableImage extends React.Component {
     static propTypes = {
-        src: PropTypes.string.isRequired,
+        children: PropTypes.node.isRequired,
         content: PropTypes.node,
         hoverContent: PropTypes.node,
-        spritePos: PropTypes.number
     };
 
     static defaultProps = {
         content: null,
         hoverContent: null,
-        spritePos: null
     };
 
     render() {
-        const {src, content, hoverContent, spritePos} = this.props;
+        const {children, content, hoverContent} = this.props;
 
         return (
             <div styleName="dimmable-image">
-                {spritePos === null
-                    ? <Image src={src} className="img" />
-                    : <SpriteImage src={src} pos={spritePos} />
-                }
+                {children}
                 <div styleName="content">
                     {content}
                 </div>
