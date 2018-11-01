@@ -17,7 +17,6 @@
 
 import 'react-dates/initialize';
 import React from 'react';
-import PropTypes from 'prop-types';
 import {SingleDatePicker as ReactDatesSinglePicker} from 'react-dates';
 
 import 'react-dates/lib/css/_datepicker.css';
@@ -25,14 +24,6 @@ import './style/dates.scss';
 
 
 export default class SingleDatePicker extends React.Component {
-    static propTypes = {
-        date: PropTypes.object,
-    };
-
-    static defaultProps = {
-        date: null
-    };
-
     state = {
         focused: false,
     };
@@ -44,8 +35,7 @@ export default class SingleDatePicker extends React.Component {
     render() {
         const {focused} = this.state;
         return (
-            <ReactDatesSinglePicker id="date_input"
-                                    focused={focused}
+            <ReactDatesSinglePicker focused={focused}
                                     onFocusChange={this.onFocusChange}
                                     showDefaultInputIcon
                                     inputIconPosition="after"

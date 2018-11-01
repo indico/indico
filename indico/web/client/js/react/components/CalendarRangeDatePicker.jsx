@@ -26,14 +26,10 @@ import './style/dates.scss';
 
 export default class CalendarRangeDatePicker extends React.Component {
     static propTypes = {
-        startDate: PropTypes.object,
-        endDate: PropTypes.object,
         disabledDate: PropTypes.func
     };
 
     static defaultProps = {
-        startDate: null,
-        endDate: null,
         disabledDate: () => false
     };
 

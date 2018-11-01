@@ -18,8 +18,8 @@
 import moment from 'moment';
 import React from 'react';
 import PropTypes from 'prop-types';
-import CalendarSinglePicker from 'indico/react/components/CalendarSingleDatePicker.jsx';
-import CalendarRangePicker from 'indico/react/components/CalendarRangeDatePicker.jsx';
+import CalendarSingleDatePicker from 'indico/react/components/CalendarSingleDatePicker';
+import CalendarRangeDatePicker from 'indico/react/components/CalendarRangeDatePicker';
 import {serializeDate, toMoment} from 'indico/utils/date';
 import FilterFormComponent from '../../../common/filters/FilterFormComponent';
 
@@ -74,20 +74,20 @@ export default class DateForm extends FilterFormComponent {
         const {isRange, disabledDate} = this.props;
         const {startDate, endDate} = this.state;
         return isRange ? (
-            <CalendarRangePicker startDate={startDate}
-                                 endDate={endDate}
-                                 onDatesChange={async ({startDate: sd, endDate: ed}) => {
-                                     await this.setDates(sd, ed);
-                                 }}
-                                 disabledDate={disabledDate || this.disabledDate}
-                                 noBorder />
+            <CalendarRangeDatePicker startDate={startDate}
+                                     endDate={endDate}
+                                     onDatesChange={async ({startDate: sd, endDate: ed}) => {
+                                         await this.setDates(sd, ed);
+                                     }}
+                                     disabledDate={disabledDate || this.disabledDate}
+                                     noBorder />
         ) : (
-            <CalendarSinglePicker date={startDate}
-                                  onDateChange={async (date) => {
-                                      await this.setDates(date, null);
-                                  }}
-                                  disabledDate={disabledDate || this.disabledDate}
-                                  noBorder />
+            <CalendarSingleDatePicker date={startDate}
+                                      onDateChange={async (date) => {
+                                          await this.setDates(date, null);
+                                      }}
+                                      disabledDate={disabledDate || this.disabledDate}
+                                      noBorder />
         );
     }
 }

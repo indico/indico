@@ -17,7 +17,6 @@
 
 import 'react-dates/initialize';
 import React from 'react';
-import PropTypes from 'prop-types';
 import {DateRangePicker as ReactDatesRangePicker} from 'react-dates';
 
 import 'react-dates/lib/css/_datepicker.css';
@@ -25,16 +24,6 @@ import './style/dates.scss';
 
 
 export default class DateRangePicker extends React.Component {
-    static propTypes = {
-        startDate: PropTypes.object,
-        endDate: PropTypes.object,
-    };
-
-    static defaultProps = {
-        startDate: null,
-        endDate: null
-    };
-
     state = {
         focusedInput: null,
     };

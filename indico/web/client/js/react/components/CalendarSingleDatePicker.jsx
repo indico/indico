@@ -26,12 +26,10 @@ import './style/dates.scss';
 
 export default class CalendarSingleDatePicker extends React.Component {
     static propTypes = {
-        date: PropTypes.object,
         disabledDate: PropTypes.func
     };
 
     static defaultProps = {
-        date: null,
         disabledDate: () => false
     };
 

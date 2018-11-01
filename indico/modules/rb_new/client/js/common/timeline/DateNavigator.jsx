@@ -18,7 +18,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Button, Popup} from 'semantic-ui-react';
-import CalendarSinglePicker from 'indico/react/components/CalendarSingleDatePicker.jsx';
+import CalendarSingleDatePicker from 'indico/react/components/CalendarSingleDatePicker';
 import {Translate} from 'indico/react/i18n';
 import {serializeDate, toMoment} from 'indico/utils/date';
 import {isDateWithinRange} from '../../util';
@@ -47,11 +47,11 @@ export default class DateNavigator extends React.Component {
         super(props);
         const {mode} = this.props;
         this.setDateWithMode(this.selectedDate, mode);
-
-        this.state = {
-            datePickerVisible: false
-        };
     }
+
+    state = {
+        datePickerVisible: false
+    };
 
     componentDidUpdate(prevProps) {
         const {mode, selectedDate} = this.props;
@@ -242,10 +242,10 @@ export default class DateNavigator extends React.Component {
                        </Button>
                    }
                    content={
-                       <CalendarSinglePicker date={this.selectedDate}
-                                             onDateChange={this.onSelect}
-                                             disabledDate={this.calendarDisabledDate}
-                                             noBorder />
+                       <CalendarSingleDatePicker date={this.selectedDate}
+                                                 onDateChange={this.onSelect}
+                                                 disabledDate={this.calendarDisabledDate}
+                                                 noBorder />
                    }
                    hideOnScroll />
         );
