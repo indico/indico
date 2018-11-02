@@ -99,8 +99,9 @@ export default class RoomSelector extends React.Component {
             <List.Item key={room.id}>
                 <div className="image-wrapper" style={{width: 55, height: 25}}>
                     <SpriteImage pos={room.spritePosition}
-                                 origin="0 0"
-                                 scale="0.15" />
+                                 width="100%"
+                                 height="100%"
+                                 fillVertical />
                 </div>
                 <List.Content>
                     <List.Header>{room.fullName}</List.Header>
