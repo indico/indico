@@ -15,26 +15,8 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import {RequestState} from 'indico/utils/redux';
 
-.admin-area {
-    margin-top: 20px;
 
-    .admin-menu {
-        .locations-header {
-            display: flex;
-            justify-content: space-between;
-        }
-    }
-
-    .room-item {
-        .room-item-image {
-            height: 90px !important;
-        }
-
-        .room-item-header {
-            display: flex !important;
-            justify-content: space-between;
-            align-items: center;
-        }
-    }
-}
+export const getAllLocations = ({admin}) => admin.locations;
+export const isFetchingLocations = ({admin}) => admin.requests.locations.state === RequestState.STARTED;

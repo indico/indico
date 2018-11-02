@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 from flask import jsonify
 
-from indico.modules.rb_new.controllers.backend import blockings, bookings, locations, misc, rooms
+from indico.modules.rb_new.controllers.backend import admin, blockings, bookings, locations, misc, rooms
 from indico.modules.rb_new.controllers.frontend import RHLanding
 from indico.web.flask.wrappers import IndicoBlueprint
 
@@ -61,5 +61,6 @@ _bp.add_url_rule('/api/blockings/', 'create_blocking', blockings.RHCreateRoomBlo
 _bp.add_url_rule('/api/blockings/<int:blocking_id>', 'blocking', blockings.RHRoomBlocking)
 _bp.add_url_rule('/api/blockings/<int:blocking_id>', 'update_blocking', blockings.RHUpdateRoomBlocking,
                  methods=('PATCH',))
+_bp.add_url_rule('/api/admin/locations', 'admin_locations', admin.RHLocations)
 _bp.add_url_rule('/rooms-sprite-<version>.jpg', 'sprite', misc.RHRoomsSprite)
 _bp.add_url_rule('/rooms-sprite.jpg', 'sprite', misc.RHRoomsSprite)

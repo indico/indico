@@ -16,3 +16,4 @@
  */
 
 export {default} from './AdminArea';
+export {default as reducer} from './reducers';

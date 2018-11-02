@@ -15,72 +15,87 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import _ from 'lodash';
 import React from 'react';
 import PropTypes from 'prop-types';
 import roomsSpriteURL from 'indico-url:rooms_new.sprite';
+import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
-import {Button, Container, Grid, Item, Menu} from 'semantic-ui-react';
+import {Button, Container, Grid, Icon, Item, Menu, Placeholder} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
 import SpriteImage from '../../components/SpriteImage';
-import {selectors as roomSelectors} from '../../common/rooms/';
 import {selectors as configSelectors} from '../../common/config';
+import * as adminSelectors from './selectors';
+import * as adminActions from './actions';
 
 import './AdminArea.module.scss';
 
 
 class AdminArea extends React.Component {
     static propTypes = {
-        locations: PropTypes.object.isRequired,
+        locations: PropTypes.array.isRequired,
         roomsSpriteToken: PropTypes.string.isRequired,
+        isFetchingLocations: PropTypes.bool.isRequired,
+        actions: PropTypes.exact({
+            fetchLocations: PropTypes.func.isRequired,
+        }).isRequired,
     };
 
-    constructor(props) {
-        super(props);
+    state = {
+        activeItem: null,
+        locations: [],
+    };
 
-        const {locations} = this.props;
-        const locationNames = Object.keys(locations);
-        this.state = {
-            activeItem: locationNames.length ? locationNames[0] : null,
-            renderContent: () => {
-                return locationNames.length ? this.renderLocationRooms(locationNames[0]) : null;
-            }
-        };
+    static getDerivedStateFromProps(props, prevState) {
+        const {locations} = props;
+        if (locations.length && !prevState.activeItem) {
+            return {
+                activeItem: `location-${locations[0].name}`,
+            };
+        }
+
+        return {...prevState};
+    }
+
+    componentDidMount() {
+        const {actions: {fetchLocations}} = this.props;
+        fetchLocations();
     }
 
     renderMenu = () => {
         const {locations} = this.props;
         const {activeItem} = this.state;
+        const hasLocations = locations.length !== 0;
+
         return (
-            <Menu size="large" vertical>
+            <Menu size="large" styleName="admin-menu" vertical>
                 <Menu.Item>
-                    <Menu.Header>
+                    <Menu.Header styleName="locations-header">
                         <Translate>Locations</Translate>
+                        <Icon name="setting" />
                     </Menu.Header>
-                    <Menu.Menu>
-                        {Object.keys(locations).map((locationName) => (
-                            <Menu.Item key={`location-${locationName}`}
-                                       name={locationName}
-                                       active={locationName === activeItem}
-                                       onClick={() => {
-                                           this.setState({
-                                               renderContent: () => this.renderLocationRooms(locationName),
-                                               activeItem: locationName
-                                           });
-                                       }}>
-                                {locationName}
-                            </Menu.Item>
-                        ))}
-                    </Menu.Menu>
-                </Menu.Item>
-                <Menu.Item name="manage-locations"
-                           active={activeItem === 'manage-locations'}
-                           onClick={() => {
-                               this.setState({
-                                   renderContent: () => 'Manage Locations',
-                                   activeItem: 'manage-locations'
-                               });
-                           }}>
-                    <Translate>Manage Locations</Translate>
+                    {!hasLocations && (
+                        <p>
+                            <Translate>There are no Locations. Click 'Manage Locations' to add one.</Translate>
+                        </p>
+                    )}
+                    {hasLocations && (
+                        <Menu.Menu>
+                            {locations.map((location) => (
+                                <Menu.Item key={`location-${location.name}`}
+                                           active={activeItem === `location-${location.name}`}
+                                           name={location.name}
+                                           onClick={() => {
+                                               this.setState({
+                                                   renderContent: () => this.renderLocationRooms(location.name),
+                                                   activeItem: `location-${location.name}`
+                                               });
+                                           }}>
+                                    {location.name}
+                                </Menu.Item>
+                            ))}
+                        </Menu.Menu>
+                    )}
                 </Menu.Item>
                 <Menu.Item>
                     <Menu.Header>
@@ -103,19 +118,53 @@ class AdminArea extends React.Component {
         );
     };
 
+    renderItemPlaceholders = () => {
+        return (
+            <Item.Group>
+                {_.range(0, 10).map((i) => (
+                    <Item key={i}>
+                        <Item.Image>
+                            <Placeholder>
+                                <Placeholder.Image />
+                            </Placeholder>
+                        </Item.Image>
+                        <Item.Content>
+                            <Placeholder>
+                                <Placeholder.Line length="very short" />
+                            </Placeholder>
+                            <Item.Meta>
+                                <Placeholder>
+                                    <Placeholder.Line length="short" />
+                                </Placeholder>
+                            </Item.Meta>
+                            <Item.Description>
+                                <Placeholder>
+                                    <Placeholder.Line length="full" />
+                                    <Placeholder.Line length="full" />
+                                </Placeholder>
+                            </Item.Description>
+                        </Item.Content>
+                    </Item>
+                ))}
+            </Item.Group>
+        );
+    };
+
     renderLocationRooms = (locationName) => {
         const {locations} = this.props;
         let rooms;
 
-        if (!locationName) {
-            rooms = Object.entries(locations)[0][1];
+        if (!locations.length) {
+            rooms = [];
+        } else if (!locationName) {
+            rooms = locations[0].rooms;
         } else {
-            rooms = locations[locationName];
+            rooms = locations.find((location) => location.name === locationName).rooms; // TODO: change to id
         }
 
         return (
             <Item.Group divided>
-                {rooms.map(this.renderRoomItem)}
+                {rooms.sort((a, b) => a.fullName.localeCompare(b.fullName)).map(this.renderRoomItem)}
             </Item.Group>
         );
     };
@@ -126,19 +175,19 @@ class AdminArea extends React.Component {
             <Item key={room.id} styleName="room-item">
                 <Item.Image size="small" styleName="room-item-image">
                     <SpriteImage src={roomsSpriteURL({version: roomsSpriteToken})}
-                                 pos={room.sprite_position}
+                                 pos={room.spritePosition}
                                  origin="0 0"
                                  scale="0.5" />
                 </Item.Image>
                 <Item.Content>
                     <Item.Header styleName="room-item-header">
-                        {room.name}
+                        {room.fullName}
                         <div>
                             <Button size="mini" icon="pencil" circular />
                             <Button size="mini" icon="trash" negative circular />
                         </div>
                     </Item.Header>
-                    <Item.Meta>{room.owner_name}</Item.Meta>
+                    <Item.Meta>{room.ownerName}</Item.Meta>
                     <Item.Description>
                         {room.comments}
                     </Item.Description>
@@ -149,6 +198,7 @@ class AdminArea extends React.Component {
 
     render() {
         const {renderContent} = this.state;
+        const {isFetchingLocations} = this.props;
         return (
             <Container styleName="admin-area">
                 <Grid columns={2}>
@@ -156,7 +206,11 @@ class AdminArea extends React.Component {
                         {this.renderMenu()}
                     </Grid.Column>
                     <Grid.Column width={12}>
-                        {renderContent()}
+                        {isFetchingLocations ? (
+                            this.renderItemPlaceholders()
+                        ) : (
+                            renderContent ? renderContent() : this.renderLocationRooms()
+                        )}
                     </Grid.Column>
                 </Grid>
             </Container>
@@ -165,8 +219,14 @@ class AdminArea extends React.Component {
 }
 
 export default connect(
-    (state) => ({
-        locations: roomSelectors.getGroupedRoomsByLocation(state),
+    state => ({
         roomsSpriteToken: configSelectors.getRoomsSpriteToken(state),
+        locations: adminSelectors.getAllLocations(state),
+        isFetchingLocations: adminSelectors.isFetchingLocations(state),
+    }),
+    dispatch => ({
+        actions: bindActionCreators({
+            fetchLocations: adminActions.fetchLocations,
+        }, dispatch),
     })
 )(AdminArea);

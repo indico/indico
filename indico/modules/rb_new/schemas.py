@@ -186,7 +186,7 @@ class BookableHoursSchema(mm.ModelSchema):
 
 
 class LocationsSchema(mm.ModelSchema):
-    rooms = Nested(RoomSchema, many=True, only=('id', 'name', 'full_name', 'sprite_position'))
+    rooms = Nested(RoomSchema, many=True, only=('id', 'name', 'full_name', 'sprite_position', 'owner_name', 'comments'))
 
     class Meta:
         model = Location
