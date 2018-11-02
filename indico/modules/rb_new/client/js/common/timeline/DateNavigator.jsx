@@ -18,7 +18,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Button, Popup} from 'semantic-ui-react';
-import CalendarSingleDatePicker from 'indico/react/components/CalendarSingleDatePicker';
+import {CalendarSingleDatePicker} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
 import {serializeDate, toMoment} from 'indico/utils/date';
 import {isDateWithinRange} from '../../util';

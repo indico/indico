@@ -23,5 +23,5 @@ from indico.web.views import WPNewBase
 class WPRoomBookingBase(WPNewBase):
     template_prefix = 'rb_new/'
     title = _('New Room Booking')  # XXX: Modify when getting rid of old RB
-    bundles = ('common.js', 'react.js', 'react.css', 'semantic-ui.js', 'semantic-ui.css', 'module_rb_new.js',
-               'module_rb_new.css')
+    bundles = ('common.js', 'common.css', 'react.js', 'react.css', 'semantic-ui.js', 'semantic-ui.css',
+               'module_rb_new.js', 'module_rb_new.css')

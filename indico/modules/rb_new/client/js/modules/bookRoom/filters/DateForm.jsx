@@ -18,8 +18,7 @@
 import moment from 'moment';
 import React from 'react';
 import PropTypes from 'prop-types';
-import CalendarSingleDatePicker from 'indico/react/components/CalendarSingleDatePicker';
-import CalendarRangeDatePicker from 'indico/react/components/CalendarRangeDatePicker';
+import {CalendarSingleDatePicker, CalendarRangeDatePicker} from 'indico/react/components';
 import {serializeDate, toMoment} from 'indico/utils/date';
 import FilterFormComponent from '../../../common/filters/FilterFormComponent';
 

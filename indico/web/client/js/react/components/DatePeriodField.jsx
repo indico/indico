@@ -19,7 +19,7 @@ import _ from 'lodash';
 import moment from 'moment';
 import React from 'react';
 import PropTypes from 'prop-types';
-import DateRangePicker from 'indico/react/components/DateRangePicker';
+import {DateRangePicker} from 'indico/react/components';
 import {serializeDate} from 'indico/utils/date';
 
 import './DatePeriodField.module.scss';
