@@ -36,10 +36,7 @@ export function getMapBounds(map) {
 }
 
 
-/*
-Calculate a bounding box that encompasses all the rooms provided in
-an array.
-*/
+/** Calculate a bounding box that encompasses all the rooms provided in an array. */
 export function checkRoomsInBounds(rooms, bounds) {
     if (!rooms.length) {
         return null;
@@ -68,4 +65,9 @@ export function getRoomListBounds(rooms) {
         SW: [sw.lat, sw.lon],
         NE: [ne.lat, ne.lon]
     };
+}
+
+/** Return something like xx°yy′zz″N, ... */
+export function formatLatLon(lat, lon) {
+    return new LatLon(lat, lon).toString('dms', 2);
 }

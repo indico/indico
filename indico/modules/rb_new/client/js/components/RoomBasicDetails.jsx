@@ -17,13 +17,14 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Grid, Header, Icon} from 'semantic-ui-react';
+import {Grid, Header, Icon, Popup} from 'semantic-ui-react';
 import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
+import {formatLatLon} from '../common/map/util';
 
 import RoomFeatureEntry from './RoomFeatureEntry';
 import SpriteImage from './SpriteImage';
 
-import './RoomBasicDetails.module.scss';
+import styles from './RoomBasicDetails.module.scss';
 
 
 function RoomFeaturesBox({room: {features}}) {
@@ -31,10 +32,16 @@ function RoomFeaturesBox({room: {features}}) {
         return null;
     }
     return (
-        <div styleName="equipment-box">
-            {features.map(feature => (
-                <RoomFeatureEntry key={feature.name} feature={feature} color="teal" size="large" />
-            ))}
+        <div styleName="feature-box">
+            <div styleName="feature-entries">
+                {features.map(feature => (
+                    <RoomFeatureEntry key={feature.name}
+                                      feature={feature}
+                                      color="teal"
+                                      size="large"
+                                      classes={styles['feature-entry']} />
+                ))}
+            </div>
         </div>
     );
 }
@@ -45,6 +52,19 @@ RoomFeaturesBox.propTypes = {
     }).isRequired,
 };
 
+function AnnotatedIcon({name, text}) {
+    return (
+        <Popup content={text}
+               trigger={<Icon name={name} />} />
+
+    );
+}
+
+AnnotatedIcon.propTypes = {
+    name: PropTypes.string.isRequired,
+    text: PropTypes.string.isRequired
+};
+
 export default function RoomBasicDetails({room}) {
     const {
         ownerName: owner, latitude, longitude, division, locationName: location, surfaceArea: surface, capacity,
@@ -52,37 +72,70 @@ export default function RoomBasicDetails({room}) {
     } = room;
     return (
         <Grid columns={2}>
-            <Grid.Column textAlign="center">
-                <SpriteImage pos={room.sprite_position}
-                             origin="0" />
-                <RoomFeaturesBox room={room} />
+            <Grid.Column textAlign="center" styleName="photo-column">
+                <div styleName="image-container">
+                    <SpriteImage pos={room.spritePosition}
+                                 height="100%"
+                                 width="100%"
+                                 fillVertical />
+                    <RoomFeaturesBox room={room} />
+                </div>
             </Grid.Column>
-            <Grid.Column>
+            <Grid.Column styleName="data-column">
                 <Header>
                     {name}
                     <Header.Subheader>{division}</Header.Subheader>
                 </Header>
-                <div>{location}</div>
-                {owner && (<><Translate>Owner</Translate>: {owner}</>)}
-                {latitude && (
-                    <div>
-                        <Icon name="location arrow" /> {latitude}, {longitude}
-                    </div>
-                )}
-                {telephone && <div><Icon name="phone" /> {room.telephone}</div>}
-                {capacity && (
-                    <div>
-                        <PluralTranslate count={capacity}>
-                            <Singular>
-                                1 seat
-                            </Singular>
-                            <Plural>
-                                <Param name="count" value={capacity} /> seats
-                            </Plural>
-                        </PluralTranslate>
-                    </div>
-                )}
-                {surface && <div>{surface}m²</div>}
+                <ul styleName="room-basic-details">
+                    <li>{location}</li>
+                    <li className="has-icon">
+                        <AnnotatedIcon name="id badge outline"
+                                       text={Translate.string('Room Owner')} />
+                        {owner}
+                    </li>
+                    <li className="has-icon">
+                        {telephone && (
+                            <>
+                                <AnnotatedIcon name="phone"
+                                               text={Translate.string('Phone number')} />
+                                {room.telephone}
+                            </>
+                        )}
+                    </li>
+                    <li className="has-icon">
+                        {capacity && (
+                            <>
+                                <AnnotatedIcon name="users" text={Translate.string('Capacity')} />
+                                <PluralTranslate count={capacity}>
+                                    <Singular>
+                                        1 <Param name="label" wrapper={<label />}>seat</Param>
+                                    </Singular>
+                                    <Plural>
+                                        <Param name="count" value={capacity} />
+                                        {' '}
+                                        <Param name="label" wrapper={<label />}>seats</Param>
+                                    </Plural>
+                                </PluralTranslate>
+                            </>
+                        )}
+                    </li>
+                    <li className="has-icon">
+                        {surface && (
+                            <>
+                                <AnnotatedIcon name="cube" text={Translate.string('Surface Area')} />
+                                {surface} <label>m²</label>
+                            </>
+                        )}
+                    </li>
+                    <li className="has-icon">
+                        {latitude && (
+                            <>
+                                <AnnotatedIcon name="location arrow" text={Translate.string('Geographical Coordinates')} />
+                                {formatLatLon(latitude, longitude)}
+                            </>
+                        )}
+                    </li>
+                </ul>
             </Grid.Column>
         </Grid>
     );

@@ -40,9 +40,9 @@ RoomFeatureEntry.propTypes = {
         equipment: PropTypes.arrayOf(PropTypes.string).isRequired,
     }).isRequired,
     color: PropTypes.string.isRequired,
-    size: PropTypes.string,
+    size: PropTypes.string
 };
 
 RoomFeatureEntry.defaultProps = {
-    size: undefined,
+    size: undefined
 };

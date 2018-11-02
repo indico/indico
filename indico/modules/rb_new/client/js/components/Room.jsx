@@ -26,7 +26,7 @@ import {Translate} from 'indico/react/i18n';
 import {Slot} from 'indico/react/util';
 import {TooltipIfTruncated} from 'indico/react/components';
 import SpriteImage from './SpriteImage';
-import DimmableImage from './DimmableImage.jsx';
+import DimmableImage from './DimmableImage';
 import {actions as userActions, selectors as userSelectors} from '../common/user';
 import RoomFeatureEntry from './RoomFeatureEntry';
 
@@ -75,10 +75,7 @@ class Room extends React.Component {
 
     renderCardImage = (room, content, actions) => {
         const {showFavoriteButton} = this.props;
-
-        const sprite = (
-            <SpriteImage pos={room.spritePosition} />
-        );
+        const sprite = <SpriteImage pos={room.spritePosition} />;
 
         if ((actions !== undefined && actions.length !== 0) || showFavoriteButton) {
             const dimmerContent = (
