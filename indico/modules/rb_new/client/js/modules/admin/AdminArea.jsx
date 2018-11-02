@@ -15,14 +15,14 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
 import React from 'react';
 import PropTypes from 'prop-types';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
-import {Container, Grid, Icon, Item, Menu, Placeholder} from 'semantic-ui-react';
+import {Container, Grid, Icon, Item, Menu} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
 import AdminRoomItem from './AdminRoomItem';
+import ItemPlaceholder from '../../components/ItemPlaceholder';
 import * as adminSelectors from './selectors';
 import * as adminActions from './actions';
 
@@ -115,38 +115,6 @@ class AdminArea extends React.Component {
         );
     };
 
-    renderItemPlaceholders = () => {
-        return (
-            <Item.Group>
-                {_.range(0, 10).map((i) => (
-                    <Item key={i}>
-                        <Item.Image>
-                            <Placeholder>
-                                <Placeholder.Image />
-                            </Placeholder>
-                        </Item.Image>
-                        <Item.Content>
-                            <Placeholder>
-                                <Placeholder.Line length="very short" />
-                            </Placeholder>
-                            <Item.Meta>
-                                <Placeholder>
-                                    <Placeholder.Line length="short" />
-                                </Placeholder>
-                            </Item.Meta>
-                            <Item.Description>
-                                <Placeholder>
-                                    <Placeholder.Line length="full" />
-                                    <Placeholder.Line length="full" />
-                                </Placeholder>
-                            </Item.Description>
-                        </Item.Content>
-                    </Item>
-                ))}
-            </Item.Group>
-        );
-    };
-
     renderLocationRooms = (locationName) => {
         const {locations} = this.props;
         let rooms;
@@ -178,7 +146,7 @@ class AdminArea extends React.Component {
                     </Grid.Column>
                     <Grid.Column width={12}>
                         {isFetchingLocations ? (
-                            this.renderItemPlaceholders()
+                            <ItemPlaceholder.Group count={10} />
                         ) : (
                             renderContent ? renderContent() : this.renderLocationRooms()
                         )}
