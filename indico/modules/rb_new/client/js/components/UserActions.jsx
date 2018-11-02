@@ -27,7 +27,7 @@ import {actions as blockingsActions} from '../modules/blockings';
 import {actions as filtersActions} from '../common/filters';
 
 
-function UserActions({isAdmin, hasOwnedRooms, gotoMyRoomsList, gotoMyBlockings}) {
+function UserActions({isAdmin, hasOwnedRooms, gotoMyRoomsList, gotoMyBlockings, gotoRBAdminArea}) {
     const avatar = <Icon name="user" size="large" />;
     const options = [];
     options.push({
@@ -56,7 +56,7 @@ function UserActions({isAdmin, hasOwnedRooms, gotoMyRoomsList, gotoMyBlockings})
         options.push({
             key: 'isAdmin',
             text: Translate.string('Administration'),
-            disabled: true,
+            onClick: gotoRBAdminArea,
         });
     }
     return (
@@ -69,6 +69,7 @@ UserActions.propTypes = {
     hasOwnedRooms: PropTypes.bool.isRequired,
     gotoMyRoomsList: PropTypes.func.isRequired,
     gotoMyBlockings: PropTypes.func.isRequired,
+    gotoRBAdminArea: PropTypes.func.isRequired,
 };
 
 
@@ -85,6 +86,9 @@ export default connect(
         gotoMyBlockings() {
             dispatch(blockingsActions.setFilterParameter('myBlockings', true));
             dispatch(pushRoute('/blockings?myBlockings=true'));
+        },
+        gotoRBAdminArea() {
+            dispatch(pushRoute('/admin'));
         },
     })
 )(UserActions);
