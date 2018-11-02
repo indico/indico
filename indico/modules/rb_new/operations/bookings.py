@@ -26,6 +26,8 @@ from sqlalchemy.orm import contains_eager, joinedload
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.queries import db_dates_overlap
+from indico.core.errors import NoReportError
+from indico.modules.rb import rb_settings
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import RepeatFrequency, Reservation
 from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
@@ -37,6 +39,7 @@ from indico.modules.rb_new.util import (group_by_occurrence_date, serialize_bloc
                                         serialize_occurrences, serialize_unbookable_hours)
 from indico.util.date_time import iterdays
 from indico.util.struct.iterables import group_list
+from indico.web.util import ExpectedError
 
 
 def group_blockings(blocked_rooms, dates):
@@ -226,3 +229,17 @@ def check_room_available(room, start_dt, end_dt):
         'conflict_prebooking': conflict_prebooking,
     })
     return result
+
+
+def create_booking(room_id, start_dt, end_dt, booked_for, reason, repeat_frequency=RepeatFrequency.NEVER,
+                   repeat_interval=0):
+    try:
+        room = Room.get_one(room_id)
+        data = dict(start_dt=start_dt, end_dt=end_dt, booked_for_user=booked_for, booking_reason=reason,
+                    repeat_frequency=repeat_frequency)
+        resv = Reservation.create_from_data(room, data, session.user)
+        db.session.flush()
+    except NoReportError as e:
+        db.session.rollback()
+        raise ExpectedError(unicode(e))
+    return resv

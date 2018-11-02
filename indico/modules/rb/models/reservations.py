@@ -341,7 +341,6 @@ class Reservation(Serializer, db.Model):
         populate_fields = ('start_dt', 'end_dt', 'repeat_frequency', 'repeat_interval', 'room_id', 'contact_email',
                            'contact_phone', 'booking_reason', 'needs_assistance', 'uses_vc',
                            'needs_vc_assistance')
-
         if data['repeat_frequency'] == RepeatFrequency.NEVER and data['start_dt'].date() != data['end_dt'].date():
             raise ValueError('end_dt != start_dt for non-repeating booking')
 
