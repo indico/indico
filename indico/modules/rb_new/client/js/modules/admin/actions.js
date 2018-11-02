@@ -15,26 +15,25 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import fetchLocationsURL from 'indico-url:rooms_new.admin_locations';
 
-.admin-area {
-    margin-top: 20px;
+import {ajaxAction} from 'indico/utils/redux';
+import {indicoAxios} from 'indico/utils/axios';
 
-    .admin-menu {
-        .locations-header {
-            display: flex;
-            justify-content: space-between;
-        }
-    }
 
-    .room-item {
-        .room-item-image {
-            height: 90px !important;
-        }
+export const FETCH_LOCATIONS_REQUEST = 'admin/FETCH_LOCATIONS_REQUEST';
+export const FETCH_LOCATIONS_SUCCESS = 'admin/FETCH_LOCATIONS_SUCCESS';
+export const FETCH_LOCATIONS_ERROR = 'admin/FETCH_LOCATIONS_ERROR';
+export const LOCATIONS_RECEIVED = 'admin/LOCATIONS_RECEIVED';
 
-        .room-item-header {
-            display: flex !important;
-            justify-content: space-between;
-            align-items: center;
-        }
-    }
+export const FILTER_NAMESPACE = 'admin';
+
+
+export function fetchLocations() {
+    return ajaxAction(
+        () => indicoAxios.get(fetchLocationsURL()),
+        FETCH_LOCATIONS_REQUEST,
+        [LOCATIONS_RECEIVED, FETCH_LOCATIONS_SUCCESS],
+        FETCH_LOCATIONS_ERROR
+    );
 }

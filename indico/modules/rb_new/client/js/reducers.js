@@ -26,6 +26,7 @@ import {reducer as calendarReducer} from './modules/calendar';
 import {reducer as landingReducer} from './modules/landing';
 import {reducer as roomListReducer} from './modules/roomList';
 import {reducer as bookingReducer} from './common/bookings';
+import {reducer as adminReducer} from './modules/admin';
 
 
 export default () => ({
@@ -39,4 +40,5 @@ export default () => ({
     calendar: calendarReducer,
     landing: landingReducer,
     bookings: bookingReducer,
+    admin: adminReducer,
 });
