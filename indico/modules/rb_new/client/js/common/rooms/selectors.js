@@ -92,6 +92,21 @@ export const getAllRooms = createSelector(
     }
 );
 
+export const getGroupedRoomsByLocation = createSelector(
+    getAllRooms,
+    (rooms) => {
+        const locations = {};
+        Object.values(rooms).forEach((room) => {
+            if (!(room.location_name in locations)) {
+                locations[room.location_name] = [];
+            }
+
+            locations[room.location_name].push(room);
+        });
+        return locations;
+    }
+);
+
 export const hasLoadedRooms = ({rooms}) => rooms.requests.rooms.state === RequestState.SUCCESS;
 export const getRoom = (state, {roomId}) => getAllRooms(state)[roomId];
 

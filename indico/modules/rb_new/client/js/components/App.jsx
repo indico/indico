@@ -25,6 +25,7 @@ import {Dimmer, Icon, Loader} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
 import {Overridable, RouteAwareOverridable} from 'indico/react/util';
 import UserActions from '../components/UserActions';
+import AdminArea from '../modules/admin';
 import Landing from '../modules/landing';
 import Calendar from '../modules/calendar';
 import BookRoom from '../modules/bookRoom';
@@ -128,6 +129,7 @@ class App extends React.Component {
                             <ConditionalRoute path="/rooms" component={RoomList} active={!isInitializing} />
                             <ConditionalRoute path="/blockings" component={BlockingList} active={!isInitializing} />
                             <ConditionalRoute path="/calendar" component={Calendar} active={!isInitializing} />
+                            <ConditionalRoute path="/admin" component={AdminArea} active={!isInitializing} />
                         </Switch>
                         <ModalController />
                     </div>
