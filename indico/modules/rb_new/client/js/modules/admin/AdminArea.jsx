@@ -18,13 +18,11 @@
 import _ from 'lodash';
 import React from 'react';
 import PropTypes from 'prop-types';
-import roomsSpriteURL from 'indico-url:rooms_new.sprite';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
-import {Button, Container, Grid, Icon, Item, Menu, Placeholder} from 'semantic-ui-react';
+import {Container, Grid, Icon, Item, Menu, Placeholder} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
-import SpriteImage from '../../components/SpriteImage';
-import {selectors as configSelectors} from '../../common/config';
+import AdminRoomItem from './AdminRoomItem';
 import * as adminSelectors from './selectors';
 import * as adminActions from './actions';
 
@@ -34,7 +32,6 @@ import './AdminArea.module.scss';
 class AdminArea extends React.Component {
     static propTypes = {
         locations: PropTypes.array.isRequired,
-        roomsSpriteToken: PropTypes.string.isRequired,
         isFetchingLocations: PropTypes.bool.isRequired,
         actions: PropTypes.exact({
             fetchLocations: PropTypes.func.isRequired,
@@ -162,37 +159,11 @@ class AdminArea extends React.Component {
             rooms = locations.find((location) => location.name === locationName).rooms; // TODO: change to id
         }
 
+        rooms = rooms.sort((a, b) => a.fullName.localeCompare(b.fullName));
         return (
             <Item.Group divided>
-                {rooms.sort((a, b) => a.fullName.localeCompare(b.fullName)).map(this.renderRoomItem)}
+                {rooms.map((room) => <AdminRoomItem key={room.id} room={room} />)}
             </Item.Group>
-        );
-    };
-
-    renderRoomItem = (room) => {
-        const {roomsSpriteToken} = this.props;
-        return (
-            <Item key={room.id} styleName="room-item">
-                <Item.Image size="small" styleName="room-item-image">
-                    <SpriteImage src={roomsSpriteURL({version: roomsSpriteToken})}
-                                 pos={room.spritePosition}
-                                 origin="0 0"
-                                 scale="0.5" />
-                </Item.Image>
-                <Item.Content>
-                    <Item.Header styleName="room-item-header">
-                        {room.fullName}
-                        <div>
-                            <Button size="mini" icon="pencil" circular />
-                            <Button size="mini" icon="trash" negative circular />
-                        </div>
-                    </Item.Header>
-                    <Item.Meta>{room.ownerName}</Item.Meta>
-                    <Item.Description>
-                        {room.comments}
-                    </Item.Description>
-                </Item.Content>
-            </Item>
         );
     };
 
@@ -220,7 +191,6 @@ class AdminArea extends React.Component {
 
 export default connect(
     state => ({
-        roomsSpriteToken: configSelectors.getRoomsSpriteToken(state),
         locations: adminSelectors.getAllLocations(state),
         isFetchingLocations: adminSelectors.isFetchingLocations(state),
     }),

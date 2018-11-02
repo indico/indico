@@ -16,13 +16,15 @@
  */
 
 
-.admin-area {
-    margin-top: 20px;
 
-    .admin-menu {
-        .locations-header {
-            display: flex;
-            justify-content: space-between;
-        }
+.room-item {
+    .room-item-image {
+        height: 90px !important;
+    }
+
+    .room-item-header {
+        display: flex !important;
+        justify-content: space-between;
+        align-items: center;
     }
 }
