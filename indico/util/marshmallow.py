@@ -33,7 +33,14 @@ def _naive_from_iso(value):
     return dt
 
 
-class NaiveDateTime(DateTime):
+class UnicodeDateTime(DateTime):
+    """Unicode-producing/parsing DateTime."""
+
+    def _serialize(self, value, attr, obj, **kwargs):
+        return super(UnicodeDateTime, self)._serialize(value, attr, obj, **kwargs).decode('utf-8')
+
+
+class NaiveDateTime(UnicodeDateTime):
     DATEFORMAT_SERIALIZATION_FUNCS = {
         'iso': _naive_isoformat,
     }
