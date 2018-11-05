@@ -14,16 +14,13 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-import itertools
 from datetime import datetime
 
 from wtforms import Form
-from wtforms.ext.dateutil.fields import DateTimeField
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.fields.core import BooleanField, FieldList, FloatField, FormField, IntegerField, RadioField, StringField
 from wtforms.fields.simple import FileField, TextAreaField
 from wtforms.validators import DataRequired, NumberRange, Optional, ValidationError
-from wtforms.widgets.core import HiddenInput
 from wtforms_components import TimeField
 
 from indico.modules.rb.models.equipment import EquipmentType
@@ -39,8 +36,6 @@ class SearchRoomsForm(IndicoForm):
     location = QuerySelectField(_(u'Location'), get_label=lambda x: x.name, query_factory=Location.find,
                                 allow_blank=True)
     details = StringField()
-    available = RadioField(_(u'Availability'), coerce=int, default=-1, widget=ConcatWidget(prefix_label=False),
-                           choices=[(1, _(u'Available')), (0, _(u'Booked')), (-1, _(u"Don't care"))])
     capacity = IntegerField(_(u'Capacity'), validators=[Optional(), NumberRange(min=0)])
     available_equipment = IndicoQuerySelectMultipleCheckboxField(_(u'Equipment'), get_label=u'name',
                                                                  query_factory=lambda: EquipmentType.find().order_by(
@@ -49,11 +44,6 @@ class SearchRoomsForm(IndicoForm):
     is_auto_confirm = BooleanField(_(u'Only rooms not requiring confirmation'), default=True)
     is_only_active = BooleanField(_(u'Only active rooms'), default=True)
     is_only_my_rooms = BooleanField(_(u'Only my rooms'))
-    # Period details when searching for (un-)availability
-    start_dt = DateTimeField(_(u'Start date'), validators=[Optional()], parse_kwargs={'dayfirst': True},
-                             display_format='%d/%m/%Y %H:%M', widget=HiddenInput())
-    end_dt = DateTimeField(_(u'End date'), validators=[Optional()], parse_kwargs={'dayfirst': True},
-                           display_format='%d/%m/%Y %H:%M', widget=HiddenInput())
     repeatability = StringField()  # TODO: use repeat_frequency/interval with new UI
     include_pending_blockings = BooleanField(_(u'Check conflicts against pending blockings'), default=True)
     include_pre_bookings = BooleanField(_(u'Check conflicts against pre-bookings'), default=True)

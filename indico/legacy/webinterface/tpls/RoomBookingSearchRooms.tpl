@@ -46,21 +46,6 @@
            return rooms with capacity greater than 1.""") }
     </p>
   </div>
-  <!-- Availability -->
-  <div id="availabilityHelp" class="tip">
-    <ul>
-      <li class="tip-no-borders">
-        ${ _('Available - the room must be available in the <b>whole</b> period') }
-      </li>
-      <li class="tip-no-borders">
-        ${ _('Booked - the room must be booked <b>any time</b> in the period') }
-      </li>
-      <li class="tip-no-borders">
-        ${ _('Don\'t care - room\'s availability is not checked') }
-      </li>
-    </ul>
-  </div>
-  <%include file="CHBookingRepetition.tpl"/>
 </div>
 <!-- END OF CONTEXT HELP DIVS -->
 
@@ -91,8 +76,6 @@ ${ contextHelp('chooseButtonHelp') }
 <div id="searchRooms">
     <form id="searchRoomsForm" method="post" action="">
         ${ form.csrf_token() if form.meta.csrf else '' }
-        ${ form.start_dt() }
-        ${ form.end_dt() }
         <h2 class="group-title">
             <i class="icon-search"></i>
             ${ _('Search for a room') }
@@ -132,44 +115,6 @@ ${ contextHelp('chooseButtonHelp') }
                 </td>
             </tr>
 
-            <!-- AVAILABILITY -->
-            <tr>
-                <td class="titleCellTD" style="width: 125px;">
-                    <span class="titleCellFormat"> ${ _('Availability') }</span>
-                </td>
-                <td>
-                    <table width="100%" cellspacing="4px">
-                        <tr>
-                            <td align="left" class="blacktext">
-                                ${ form.available(label_args={'style': 'font-weight: normal;'}) }
-                                ${ contextHelp('availabilityHelp') }
-                            </td>
-                        </tr>
-                        <%include file="RoomBookingPeriodFormOld.tpl"/>
-                        <tr id='includePrebookingsTR'>
-                            <td class="subFieldWidth" align="right" >
-                                <small> ${ _('PRE-Bookings') }</small>
-                            </td>
-                            <td align="left" class="blacktext">
-                                ${ form.include_pre_bookings() }
-                                ${ form.include_pre_bookings.label(style='font-weight: normal;') }
-                                ${ inlineContextHelp(_('Check if you want to avoid conflicts with PRE-bookings. By default conflicts are checked only against confirmed bookings.')) }
-                            </td>
-                        </tr>
-                        <tr id='includePendingBlockingsTR'>
-                            <td class="subFieldWidth" align="right" >
-                                <small>${ _('Blockings') }</small>
-                            </td>
-                            <td align="left" class="blacktext">
-                                ${ form.include_pending_blockings() }
-                                ${ form.include_pending_blockings.label(style='font-weight: normal;') }
-                                ${ inlineContextHelp(_('Check if you want to avoid conflicts with pending blockings. By default conflicts are checked only against confirmed blockings.')) }
-                            </td>
-                        </tr>
-                    </table>
-                </td>
-            </tr>
-
             <!-- CAPACITY -->
             <tr>
                 <td class="titleCellTD" style="width: 125px;">
@@ -198,7 +143,7 @@ ${ contextHelp('chooseButtonHelp') }
                         <tr>
                             <td align="left" class="blacktext">
                                 % for eq in form.available_equipment:
-                                    <div class="${ 'js-location js-location-{}'.format(equipment_locations[int(eq.data)]) }">
+                                    <div>
                                         ${ eq() }
                                         ${ eq.label(style='font-weight: normal;') }
                                     </div>
@@ -255,11 +200,6 @@ ${ contextHelp('chooseButtonHelp') }
 </div>
 
 <script type="text/javascript">
-
-    // Displays div with dates and hours
-    function display_availability(bool) {
-        $('#sdatesTR, #edatesTR, #hoursTR, #repTypeTR, #includePrebookingsTR, #includePendingBlockingsTR').toggle(bool);
-    }
     // Reds out the invalid textboxes and returns false if something is invalid.
     // Returns true if form may be submited.
     function forms_are_valid(onSubmit) {
@@ -272,26 +212,9 @@ ${ contextHelp('chooseButtonHelp') }
         $(':input', searchForm).removeClass('invalid');
         // Init
         var isValid = true;
-
-        // Simple search -------------------------------------
-        // Availability
-        if ($('input[name="available"]:checked', searchForm).val() != '-1') { // only if NOT "Don't care"
-            // validate_period is not defined, wth, apparently the old if condition was never net
-            // isValid = validate_period();
-        }
         // capacity
         if ($('#capacity').val().length > 0 && parseInt($('#capacity').val(), 10).toString() == 'NaN') {
             $('#capacity').addClass('invalid');
-            isValid = false;
-        }
-
-        if (!$('#sdate').val()) {
-            $('#sdate').addClass('invalid');
-            isValid = false;
-        }
-
-        if (!$('#edate').val()) {
-            $('#edate').addClass('invalid');
             isValid = false;
         }
 
@@ -312,18 +235,6 @@ ${ contextHelp('chooseButtonHelp') }
         if (forms_are_valid()) {
             set_repeatition_comment();
         }
-        $('#searchRoomsForm input[name="available"]').change(function() {
-            display_availability(this.value != '-1');
-        });
-        display_availability($('input[name="available"]:checked').val() != '-1');
         $('#freeSearch').focus();
     });
-
-    $('#location').on('change', function() {
-        var locationId = $(this).val();
-        $('#equipment-search').toggle(locationId != '__None')
-        $('.js-location').hide().find('input:checkbox').prop('checked', false);
-        $('.js-location-' + locationId).show();
-    }).trigger('change');
-
 </script>

@@ -43,9 +43,9 @@
                                     </div>
                                   </td>
                                   <td ${ on_click_details_url }>
-                                    ${ room.building }-${ room.floor }-${ room.number }
-                                    % if room.has_special_name:
-                                      <small>(${ room.name })</small>
+                                    ${ room.name }
+                                    % if room.verbose_name:
+                                      <small>(${ room.verbose_name })</small>
                                     % endif
                                   </td>
                                   <td ${ on_click_details_url } align='center'>

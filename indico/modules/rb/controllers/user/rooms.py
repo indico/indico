@@ -27,7 +27,6 @@ from indico.core.errors import IndicoError
 from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.controllers.decorators import requires_location, requires_room
 from indico.modules.rb.forms.rooms import SearchRoomsForm
-from indico.modules.rb.models.equipment import EquipmentType
 from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import Reservation
@@ -79,9 +78,8 @@ class RHRoomBookingSearchRooms(RHRoomBookingBase):
         if self._is_submitted() and form.validate():
             rooms = Room.find_with_filters(form.data, session.user)
             return WPRoomBookingSearchRoomsResults(self, self.menu_item, rooms=rooms).display()
-        equipment_locations = {eq.id: eq.location_id for eq in EquipmentType.find()}
-        return WPRoomBookingSearchRooms(self, form=form, errors=form.error_list, rooms=Room.find_all(is_active=True),
-                                        equipment_locations=equipment_locations).display()
+        return WPRoomBookingSearchRooms(self, form=form, errors=form.error_list,
+                                        rooms=Room.find_all(is_active=True)).display()
 
 
 class RHRoomBookingSearchRoomsShortcutBase(RHRoomBookingSearchRooms):
