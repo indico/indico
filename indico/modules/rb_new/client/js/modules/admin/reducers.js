@@ -39,7 +39,10 @@ export default combineReducers({
         switch (action.type) {
             case adminActions.LOCATIONS_RECEIVED: {
                 const data = camelizeKeys(action.data);
-                return [...state, ...data.sort((a, b) => a.name.localeCompare(b.name))];
+                if (!data.length) {
+                    return state;
+                }
+                return [...data.sort((a, b) => a.name.localeCompare(b.name))];
             }
             default:
                 return state;
