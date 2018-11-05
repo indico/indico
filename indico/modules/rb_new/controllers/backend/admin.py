@@ -34,5 +34,5 @@ class RHRoomBookingAdminBase(RHRoomBookingBase):
 
 class RHLocations(RHRoomBookingAdminBase):
     def _process(self):
-        locations = Location.query.all()
-        return jsonify(locations_schema.dump(locations).data)
+        query = Location.query
+        return jsonify(locations_schema.dump(query.all()).data)

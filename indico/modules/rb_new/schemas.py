@@ -192,6 +192,11 @@ class LocationsSchema(mm.ModelSchema):
         model = Location
         fields = ('id', 'name', 'rooms')
 
+    @post_dump()
+    def sort_rooms(self, location):
+        location['rooms'] = sorted(location['rooms'], key=lambda x: natural_sort_key(x['full_name']))
+        return location
+
 
 class RBUserSchema(UserSchema):
     has_owned_rooms = mm.Method('has_managed_rooms')
