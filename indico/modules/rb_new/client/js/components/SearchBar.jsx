@@ -34,27 +34,16 @@ class SearchBar extends React.Component {
         }).isRequired,
     };
 
-    constructor(props) {
-        super(props);
-
-        const {filters: {text}} = this.props;
-        this.state = {
-            inputTextValue: text,
-        };
-    }
-
     updateTextFilter = (filterValue) => {
         const {actions: {setFilterParameter}} = this.props;
-
-        this.setState({inputTextValue: filterValue}, () => {
-            setFilterParameter('text', filterValue || null);
-        });
+        setFilterParameter('text', filterValue || null);
     };
 
     render() {
-        const {inputTextValue} = this.state;
+        const {filters: {text}} = this.props;
         let inputIcon;
-        if (inputTextValue) {
+
+        if (text) {
             inputIcon = <Icon link name="remove" onClick={() => this.updateTextFilter(null)} />;
         } else {
             inputIcon = <Icon name="search" />;
@@ -68,7 +57,7 @@ class SearchBar extends React.Component {
                                icon={inputIcon}
                                debounceTimeout={300}
                                onChange={(event) => this.updateTextFilter(event.target.value)}
-                               value={inputTextValue || ''} />
+                               value={text || ''} />
             </div>
         );
     }
