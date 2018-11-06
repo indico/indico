@@ -18,10 +18,9 @@
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
-import ReactDOM from 'react-dom';
 import {connect} from 'react-redux';
 import Leaflet from 'leaflet';
-import {Map, TileLayer, MapControl, Marker, Tooltip, withLeaflet} from 'react-leaflet';
+import {Map, TileLayer, Marker, Tooltip} from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-markercluster';
 import {selectors as configSelectors} from '../config';
 
@@ -94,55 +93,6 @@ class RoomBookingMap extends React.Component {
         );
     }
 }
-
-
-class _RoomBookingMapControl extends MapControl {
-    static propTypes = {
-        position: PropTypes.string.isRequired,
-        classes: PropTypes.string,
-    };
-
-    static defaultProps = {
-        classes: '',
-    };
-
-    componentDidMount() {
-        super.componentDidMount();
-        this.renderControl();
-    }
-
-    componentDidUpdate(prevProps) {
-        const {classes} = this.props;
-        super.componentDidUpdate(prevProps);
-        this.renderControl();
-        if (classes) {
-            this.leafletElement.getContainer().classList.add(...classes.trim().split(' '));
-        }
-    }
-
-    componentWillUnmount() {
-        ReactDOM.unmountComponentAtNode(this.leafletElement.getContainer());
-    }
-
-    createLeafletElement(props) {
-        const {position, classes} = props;
-        const mapControl = Leaflet.control({position});
-        mapControl.onAdd = () => {
-            const div = Leaflet.DomUtil.create('div', classes);
-            Leaflet.DomEvent.disableClickPropagation(div);
-            Leaflet.DomEvent.disableScrollPropagation(div);
-            return div;
-        };
-        return mapControl;
-    }
-
-    renderControl() {
-        const container = this.leafletElement.getContainer();
-        ReactDOM.render(React.Children.only(this.props.children), container);
-    }
-}
-
-export const RoomBookingMapControl = withLeaflet(_RoomBookingMapControl);
 
 export default connect(
     state => ({

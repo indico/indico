@@ -23,7 +23,8 @@ import {Button, Checkbox, Dimmer, Dropdown, Loader, Popup, Sticky} from 'semanti
 import {Translate} from 'indico/react/i18n';
 
 import {getAreaBounds, getMapBounds, getRoomListBounds, checkRoomsInBounds} from './util';
-import RoomBookingMap, {RoomBookingMapControl} from './RoomBookingMap';
+import RoomBookingMap from './RoomBookingMap';
+import RoomBookingMapControl from './RoomBookingMapControl';
 import {actions as filtersActions} from '../filters';
 import * as mapActions from './actions';
 import * as mapSelectors from './selectors';
