@@ -138,6 +138,11 @@ class Registration(db.Model):
         db.String,
         nullable=False
     )
+    #: Base registration fee information (used by PayPal)
+    base_price_info = db.Column(
+        db.String,
+        nullable=True
+    )
     #: The date/time when the registration was recorded
     submitted_dt = db.Column(
         UTCDateTime,
