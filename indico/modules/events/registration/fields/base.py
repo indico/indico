@@ -13,7 +13,6 @@ from wtforms.validators import DataRequired, Optional
 
 from indico.modules.events.registration.models.registrations import RegistrationData
 
-
 class RegistrationFormFieldBase(object):
     """Base class for a registration form field definition"""
 
@@ -28,7 +27,7 @@ class RegistrationFormFieldBase(object):
     #: the validator to use when the field is not required
     not_required_validator = Optional
     #: the data fields that need to be versioned
-    versioned_data_fields = frozenset({'is_billable', 'price'})
+    versioned_data_fields = frozenset({'is_billable', 'price','price_info'})
 
     def __init__(self, form_item):
         self.form_item = form_item
@@ -163,6 +162,7 @@ class RegistrationFormBillableItemsField(RegistrationFormBillableField):
         # we don't have field-level billing data here
         del versioned_data['is_billable']
         del versioned_data['price']
+        #del versioned_data['price_info']
         return unversioned_data, versioned_data
 
     def calculate_price(self, reg_data, versioned_data):
