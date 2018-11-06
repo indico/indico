@@ -20,7 +20,7 @@ def _make_names_unique():
     conn = op.get_bind()
     default_location_id = conn.execute('SELECT id FROM roombooking.locations WHERE is_default').scalar()
     if default_location_id is None:
-        has_dupes = conn.execute('SELECT COUNT(DISTINCT name) = COUNT(name) FROM roombooking.room_attributes').scalar()
+        has_dupes = conn.execute('SELECT COUNT(DISTINCT name) != COUNT(name) FROM roombooking.room_attributes').scalar()
         if has_dupes:
             raise Exception('Please set a default location or remove attributes whose names are not unique '
                             'across locations')
@@ -56,9 +56,11 @@ def downgrade():
     conn = op.get_bind()
     default_location_id = conn.execute('SELECT id FROM roombooking.locations WHERE is_default').scalar()
     if default_location_id is None:
-        raise Exception('Please set a default location')
+        if conn.execute('SELECT COUNT(*) FROM roombooking.locations').scalar():
+            raise Exception('Please set a default location')
+    default_location = unicode(default_location_id) if default_location_id is not None else None
     op.add_column('room_attributes', sa.Column('location_id', sa.Integer(), nullable=False,
-                                               server_default=unicode(default_location_id)),
+                                               server_default=default_location),
                   schema='roombooking')
     op.alter_column('room_attributes', 'location_id', server_default=None, schema='roombooking')
     op.add_column('room_attributes', sa.Column('type', sa.String(), nullable=False, server_default='str'),

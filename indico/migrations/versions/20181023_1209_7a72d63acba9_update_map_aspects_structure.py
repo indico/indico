@@ -51,6 +51,7 @@ def downgrade():
     if default_location_id is None:
         # We have some aspects that cannot be associated with a location since there is none
         conn.execute('DELETE FROM roombooking.aspects')
+    default_location = unicode(default_location_id) if default_location_id is not None else None
     default_aspect_id = conn.execute('SELECT id FROM roombooking.aspects WHERE is_default').scalar()
     op.add_column('locations', sa.Column('default_aspect_id', sa.Integer, nullable=True), schema='roombooking')
     op.create_foreign_key(op.f('fk_locations_default_aspect_id'), 'locations', 'aspects',
@@ -70,8 +71,8 @@ def downgrade():
     op.add_column('aspects', sa.Column('zoom_level', sa.SmallInteger, nullable=False, server_default='0'),
                   schema='roombooking')
     op.alter_column('aspects', 'zoom_level', server_default=None, schema='roombooking')
-    op.add_column('aspects', sa.Column('location_id', sa.Integer, nullable=False,
-                                       server_default=unicode(default_location_id)), schema='roombooking')
+    op.add_column('aspects', sa.Column('location_id', sa.Integer, nullable=False, server_default=default_location),
+                  schema='roombooking')
     op.alter_column('aspects', 'location_id', server_default=None, schema='roombooking')
     op.create_foreign_key(None, 'aspects', 'locations', ['location_id'], ['id'],
                           source_schema='roombooking', referent_schema='roombooking')
