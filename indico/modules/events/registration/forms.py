@@ -51,9 +51,8 @@ def _check_if_payment_required(form, field):
     if not is_feature_enabled(form.event, 'payment'):
         raise ValidationError(_('You have to enable the payment feature in order to set a registration fee.'))
 
-
 class RegistrationFormForm(IndicoForm):
-    _price_fields = ('currency', 'base_price')
+    _price_fields = ('currency', 'base_price',  'base_price_info')
     _registrant_notification_fields = ('notification_sender_address',
                                        'message_pending', 'message_unpaid', 'message_complete')
     _manager_notification_fields = ('manager_notifications_enabled', 'manager_notification_recipients')
@@ -89,6 +88,8 @@ class RegistrationFormForm(IndicoForm):
                               _check_if_payment_required], filters=[lambda x: x if x is not None else 0],
                               widget=NumberInput(step='0.01'),
                               description=_("A fixed fee all users have to pay when registering."))
+    base_price_info = StringField(_("Registration fee info"),
+                               description=_("Used by the PayPal itemized cart."))
     currency = SelectField(_('Currency'), [DataRequired()], description=_('The currency for new registrations'))
     notification_sender_address = StringField(_('Notification sender address'), [IndicoEmail()],
                                               filters=[lambda x: (x or None)])
