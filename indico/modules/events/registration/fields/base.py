@@ -16,6 +16,7 @@ from indico.modules.events.registration.models.registrations import Registration
 class RegistrationFormFieldBase(object):
     """Base class for a registration form field definition"""
 
+    
     #: unique name of the field type
     name = None
     #: wtform field class
@@ -27,7 +28,7 @@ class RegistrationFormFieldBase(object):
     #: the validator to use when the field is not required
     not_required_validator = Optional
     #: the data fields that need to be versioned
-    versioned_data_fields = frozenset({'is_billable', 'price','price_info'})
+    versioned_data_fields = frozenset({'is_billable', 'price', 'price_info'})
 
     def __init__(self, form_item):
         self.form_item = form_item
