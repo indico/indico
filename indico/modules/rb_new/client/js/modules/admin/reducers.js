@@ -23,7 +23,6 @@ import * as adminActions from './actions';
 
 
 export const initialFilterStateFactory = () => ({
-    showInactive: true,
     text: null,
 });
 

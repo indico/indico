@@ -24,6 +24,7 @@ import {Container, Grid, Icon, Item, Menu, Message, Placeholder} from 'semantic-
 import {Translate} from 'indico/react/i18n';
 import AdminRoomItem from './AdminRoomItem';
 import ItemPlaceholder from '../../components/ItemPlaceholder';
+import searchBarFactory from '../../components/SearchBar';
 import {selectors as userSelectors} from '../../common/user';
 import * as adminSelectors from './selectors';
 import * as adminActions from './actions';
@@ -31,13 +32,20 @@ import * as adminActions from './actions';
 import './AdminArea.module.scss';
 
 
+const SearchBar = searchBarFactory('admin', adminSelectors);
+
+
 class AdminArea extends React.Component {
     static propTypes = {
         locations: PropTypes.array.isRequired,
         isFetchingLocations: PropTypes.bool.isRequired,
         isAdmin: PropTypes.bool.isRequired,
+        filters: PropTypes.exact({
+            text: PropTypes.string,
+        }).isRequired,
         actions: PropTypes.exact({
             fetchLocations: PropTypes.func.isRequired,
+            clearTextFilter: PropTypes.func.isRequired,
         }).isRequired,
     };
 
@@ -71,7 +79,7 @@ class AdminArea extends React.Component {
     };
 
     renderMenu = () => {
-        const {locations} = this.props;
+        const {locations, actions: {clearTextFilter}} = this.props;
         const hasLocations = locations.length !== 0;
 
         return (
@@ -84,9 +92,9 @@ class AdminArea extends React.Component {
                     {hasLocations && (
                         <Menu.Menu>
                             {locations.map((location) => (
-                                <Route path={`/admin/location/${location.id}`} key={`location-${location.id}`}>
+                                <Route exact path={`/admin/location/${location.id}`} key={`location-${location.id}`}>
                                     {({match}) => (
-                                        <Link to={`/admin/location/${location.id}`}>
+                                        <Link to={`/admin/location/${location.id}`} onClick={clearTextFilter}>
                                             <Menu.Item active={!!match}>
                                                 {location.name}
                                             </Menu.Item>
@@ -118,7 +126,7 @@ class AdminArea extends React.Component {
     };
 
     renderLocationRooms = (locationId) => {
-        const {locations} = this.props;
+        const {locations, filters: {text}} = this.props;
         let rooms;
 
         if (!locations.length) {
@@ -132,10 +140,29 @@ class AdminArea extends React.Component {
             }
         }
 
+        if (text) {
+            rooms = rooms.filter((room) => {
+                return room.fullName.toLowerCase().includes(text.toLowerCase());
+            });
+        }
+
         return (
-            <Item.Group divided>
-                {rooms.map((room) => <AdminRoomItem key={room.id} room={room} />)}
-            </Item.Group>
+            <>
+                <SearchBar />
+                {rooms.length ? (
+                    <>
+                        <Item.Group divided>
+                            {rooms.map((room) => <AdminRoomItem key={room.id} room={room} />)}
+                        </Item.Group>
+                    </>
+                ) : (
+                    <Message info>
+                        <Translate>
+                            There are no rooms for the specified location.
+                        </Translate>
+                    </Message>
+                )}
+            </>
         );
     };
 
@@ -146,6 +173,14 @@ class AdminArea extends React.Component {
         if (!isAdmin) {
             return null;
         }
+
+        const missingLocationsMessage = (
+            <Message info>
+                <Translate>
+                    There are no locations defined.
+                </Translate>
+            </Message>
+        );
 
         return (
             <Container styleName="admin-area">
@@ -158,22 +193,27 @@ class AdminArea extends React.Component {
                             <ItemPlaceholder.Group count={10} />
                         ) : (
                             <>
-                                <Route exact path="/admin" render={() => {
-                                    if (!locations.length) {
-                                        return (
-                                            <Message>
-                                                <Translate>
-                                                    No room locations have been defined.
-                                                </Translate>
-                                            </Message>
-                                        );
-                                    }
+                                <Route exact path="/admin"
+                                       render={() => {
+                                           if (!locations.length) {
+                                               return missingLocationsMessage;
+                                           }
 
-                                    return <Redirect to={`/admin/location/${locations[0].id}`} />;
-                                }} />
-                                <Route exact path="/admin/location/:locationId"
+                                           return (
+                                               <Redirect to={`/admin/location/${locations[0].id}`} />
+                                           );
+                                       }} />
+                                <Route path="/admin/location/:locationId"
                                        render={({match: {params: {locationId}}}) => {
-                                           return this.renderLocationRooms(locationId);
+                                           if (locations.length) {
+                                               if (locationId) {
+                                                   return this.renderLocationRooms(locationId);
+                                               } else {
+                                                   return <Redirect to={`/admin/location/${locations[0].id}`} />;
+                                               }
+                                           } else {
+                                               return missingLocationsMessage;
+                                           }
                                        }} />
                                 <Route exact path="/admin/equipment-types"
                                        render={() => (
@@ -197,10 +237,12 @@ export default connect(
         locations: adminSelectors.getAllLocations(state),
         isFetchingLocations: adminSelectors.isFetchingLocations(state),
         isAdmin: userSelectors.isUserAdmin(state),
+        filters: adminSelectors.getFilters(state),
     }),
     dispatch => ({
         actions: bindActionCreators({
             fetchLocations: adminActions.fetchLocations,
+            clearTextFilter: adminActions.clearTextFilter,
         }, dispatch),
     })
 )(AdminArea);

@@ -19,6 +19,7 @@ import fetchLocationsURL from 'indico-url:rooms_new.admin_locations';
 
 import {ajaxAction} from 'indico/utils/redux';
 import {indicoAxios} from 'indico/utils/axios';
+import {actions as filtersActions} from '../../common/filters';
 
 
 export const FETCH_LOCATIONS_REQUEST = 'admin/FETCH_LOCATIONS_REQUEST';
@@ -36,4 +37,8 @@ export function fetchLocations() {
         [LOCATIONS_RECEIVED, FETCH_LOCATIONS_SUCCESS],
         FETCH_LOCATIONS_ERROR
     );
+}
+
+export function clearTextFilter() {
+    return filtersActions.setFilterParameter(FILTER_NAMESPACE, 'text', null);
 }

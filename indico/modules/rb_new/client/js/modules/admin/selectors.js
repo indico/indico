@@ -20,3 +20,4 @@ import {RequestState} from 'indico/utils/redux';
 
 export const getAllLocations = ({admin}) => admin.locations;
 export const isFetchingLocations = ({admin}) => admin.requests.locations.state === RequestState.STARTED;
+export const getFilters = ({admin}) => admin.filters;

@@ -17,10 +17,12 @@
 from __future__ import unicode_literals
 
 from flask import jsonify, session
+from sqlalchemy.orm import joinedload
 from werkzeug.exceptions import Forbidden
 
 from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.models.locations import Location
+from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.util import rb_is_admin
 from indico.modules.rb_new.schemas import locations_schema
 
@@ -34,5 +36,5 @@ class RHRoomBookingAdminBase(RHRoomBookingBase):
 
 class RHLocations(RHRoomBookingAdminBase):
     def _process(self):
-        query = Location.query
+        query = Location.query.options(joinedload('rooms'))
         return jsonify(locations_schema.dump(query.all()).data)
