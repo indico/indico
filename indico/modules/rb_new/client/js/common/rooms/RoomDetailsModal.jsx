@@ -136,7 +136,6 @@ function RoomDetails({bookRoom, room, availability, attributes}) {
                                content={<TimelineLegend labels={legendLabels} compact />} />
                     </Header>
                     <DailyTimelineContent rows={availability.map(rowSerializer)} />
-                    <Header><Translate>Statistics</Translate></Header>
                     <RoomStats roomId={room.id} />
                     <Message attached info>
                         <Icon name="info" />

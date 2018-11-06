@@ -122,8 +122,9 @@ def get_room_statistics(room):
                                           'end_dt', datetime.combine(end_date, time.max)))
                  .count())
         percentage = calculate_rooms_occupancy([room], start_date, end_date) * 100
-        data['count']['values'].append({'days': days, 'value': count})
-        data['percentage']['values'].append({'days': days, 'value': percentage})
+        if count > 0 or percentage > 0:
+            data['count']['values'].append({'days': days, 'value': count})
+            data['percentage']['values'].append({'days': days, 'value': percentage})
     return data
 
 

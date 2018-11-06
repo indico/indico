@@ -18,7 +18,7 @@
 import _ from 'lodash';
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Grid, Placeholder} from 'semantic-ui-react';
+import {Header, Grid, Placeholder} from 'semantic-ui-react';
 import getRoomStatsDataURL from 'indico-url:rooms_new.room_stats';
 import {Translate, Param, PluralTranslate, Singular, Plural} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
@@ -82,29 +82,36 @@ export default class RoomStats extends React.PureComponent {
             times_booked: Translate.string('Times booked'),
             occupancy: Translate.string('Occupancy'),
         };
+        const hasStats = Object.entries(data)
+            .map(([, {values}]) => values)
+            .some(values => !!values.length);
+
         if (!loaded) {
             return this.renderPlaceholder();
         }
-        return (
-            <div styleName="room-stats">
-                {Object.entries(data).map(([key, {id, values, note}]) => (
-                    <div key={key} styleName="stats-box">
-                        <div styleName="title">{mapping[id]}{!!note && '*'}</div>
-                        {values.map(({days, value}) => (
-                            <div styleName="value-box" key={value}>
-                                <div styleName="days">
-                                    <PluralTranslate count={days}>
-                                        <Singular>Last day</Singular>
-                                        <Plural>Last <Param name="days" value={days} /> days</Plural>
-                                    </PluralTranslate>
+        return hasStats && (
+            <>
+                <Header><Translate>Statistics</Translate></Header>
+                <div styleName="room-stats">
+                    {Object.entries(data).map(([key, {id, values, note}]) => (
+                        <div key={key} styleName="stats-box">
+                            <div styleName="title">{mapping[id]}{!!note && '*'}</div>
+                            {values.map(({days, value}) => (
+                                <div styleName="value-box" key={`${days}-${value}`}>
+                                    <div styleName="days">
+                                        <PluralTranslate count={days}>
+                                            <Singular>Last day</Singular>
+                                            <Plural>Last <Param name="days" value={days} /> days</Plural>
+                                        </PluralTranslate>
+                                    </div>
+                                    <div styleName="value">{Math.round(value)}{key === 'percentage' ? '%' : ''}</div>
                                 </div>
-                                <div styleName="value">{Math.round(value)}{key === 'percentage' ? '%' : ''}</div>
-                            </div>
-                        ))}
-                        {!!note && <div styleName="note">* <Param name="note" value={note} /></div>}
-                    </div>
-                ))}
-            </div>
+                            ))}
+                            {!!note && <div styleName="note">* <Param name="note" value={note} /></div>}
+                        </div>
+                    ))}
+                </div>
+            </>
         );
     }
 }
