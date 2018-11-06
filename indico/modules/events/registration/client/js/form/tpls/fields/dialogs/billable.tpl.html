@@ -19,4 +19,15 @@
         class="info-helper"
         title="{{ 'This price will be multiplied times the number entered by the user' | i18n }}">
     </i>
+    <br>
+    <label class="regFormDialogCaption">
+        {{ 'Price info' | i18n }}
+    </label>
+    <input type="text" name="priceInfo"
+        ng-model="formData.priceInfo"
+        ng-init="formData.priceInfo = formData.priceInfo || ''"
+        size="20">
+    <i class="info-helper"
+        title="{{ 'Used by the PayPal itemized cart.' | i18n }}">
+    </i>
 </div>
