@@ -155,6 +155,11 @@ class RegistrationForm(db.Model):
         nullable=False,
         default=0
     )
+    #: Base registration fee information (used by PayPal)
+    base_price_info = db.Column(
+        db.String, 
+        nullable=True
+)
     #: Currency for prices in the registration form
     currency = db.Column(
         db.String,
