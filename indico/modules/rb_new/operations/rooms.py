@@ -16,21 +16,25 @@
 
 from __future__ import unicode_literals
 
+from datetime import date, datetime, time
 from itertools import chain
 
+from dateutil.relativedelta import relativedelta
 from flask import session
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import raiseload
 
 from indico.core.auth import multipass
 from indico.core.db import db
-from indico.core.db.sqlalchemy.util.queries import escape_like
-from indico.modules.rb import rb_is_admin, rb_settings
+from indico.core.db.sqlalchemy.util.queries import db_dates_overlap, escape_like
+from indico.modules.rb import Reservation, rb_is_admin, rb_settings
 from indico.modules.rb.models.equipment import EquipmentType, RoomEquipmentAssociation
 from indico.modules.rb.models.favorites import favorite_room_table
+from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.room_attributes import RoomAttributeAssociation
 from indico.modules.rb.models.room_features import RoomFeature
 from indico.modules.rb.models.rooms import Room
+from indico.modules.rb.statistics import calculate_rooms_occupancy
 from indico.util.caching import memoize_redis
 
 
@@ -88,6 +92,39 @@ def get_managed_room_ids(user):
         return {id_ for id_, in _query_managed_rooms(user).with_entities(Room.id)}
     else:
         return {r.id for r in Room.get_owned_by(user)}
+
+
+@memoize_redis(3600)
+def get_room_statistics(room):
+    data = {
+        'count': {
+            'id': 'times_booked',
+            'values': [],
+            'note': None
+        },
+        'percentage': {
+            'id': 'occupancy',
+            'values': [],
+            'note': 'excluding weekends'
+        }
+    }
+    ranges = [7, 30, 365]
+    end_date = date.today()
+    for days in ranges:
+        start_date = date.today() - relativedelta(days=days)
+        count = (ReservationOccurrence.query
+                 .join(ReservationOccurrence.reservation)
+                 .join(Reservation.room)
+                 .filter(Room.id == room.id,
+                         ReservationOccurrence.is_valid,
+                         db_dates_overlap(ReservationOccurrence,
+                                          'start_dt', start_date,
+                                          'end_dt', datetime.combine(end_date, time.max)))
+                 .count())
+        percentage = calculate_rooms_occupancy([room], start_date, end_date) * 100
+        data['count']['values'].append({'days': days, 'value': count})
+        data['percentage']['values'].append({'days': days, 'value': percentage})
+    return data
 
 
 def search_for_rooms(filters, availability=None):

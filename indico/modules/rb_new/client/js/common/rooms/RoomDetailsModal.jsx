@@ -25,6 +25,7 @@ import {Translate, Param} from 'indico/react/i18n';
 import {Overridable, IndicoPropTypes} from 'indico/react/util';
 import RoomBasicDetails from '../../components/RoomBasicDetails';
 import RoomKeyLocation from '../../components/RoomKeyLocation';
+import RoomStats from './RoomStats';
 import {DailyTimelineContent, TimelineLegend} from '../timeline';
 import * as roomsSelectors from './selectors';
 import {actions as bookRoomActions} from '../../modules/bookRoom';
@@ -136,6 +137,7 @@ function RoomDetails({bookRoom, room, availability, attributes}) {
                     </Header>
                     <DailyTimelineContent rows={availability.map(rowSerializer)} />
                     <Header><Translate>Statistics</Translate></Header>
+                    <RoomStats roomId={room.id} />
                     <Message attached info>
                         <Icon name="info" />
                         <Translate>Would you like to use this space?</Translate>
