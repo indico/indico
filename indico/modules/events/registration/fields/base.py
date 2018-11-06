@@ -16,7 +16,7 @@ from indico.modules.events.registration.models.registrations import Registration
 class RegistrationFormFieldBase(object):
     """Base class for a registration form field definition"""
 
-    
+
     #: unique name of the field type
     name = None
     #: wtform field class
