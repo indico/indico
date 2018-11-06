@@ -42,8 +42,9 @@ def _check_if_payment_required(form, field):
     if not is_feature_enabled(form.event, 'payment'):
         raise ValidationError(_('You have to enable the payment feature in order to set a registration fee.'))
 
+
 class RegistrationFormForm(IndicoForm):
-    _price_fields = ('currency', 'base_price',  'base_price_info')
+    _price_fields = ('currency', 'base_price', 'base_price_info')
     _registrant_notification_fields = ('notification_sender_address',
                                        'message_pending', 'message_unpaid', 'message_complete')
     _manager_notification_fields = ('manager_notifications_enabled', 'manager_notification_recipients')
