@@ -150,7 +150,7 @@ class Registration(db.Model):
     #: Base registration fee information
     base_price_info = db.Column(
         db.String,
-        nullable=False
+        nullable=False,
         default=''
     )
     #: The date/time when the registration was recorded
