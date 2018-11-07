@@ -170,7 +170,7 @@ class AttachmentPackageGeneratorMixin(ZipGeneratorMixin):
                     paths.append(secure_filename('{}_{}'.format(to_unicode(time), obj.title), ''))
             else:
                 if isinstance(obj, SubContribution):
-                    paths.append(secure_filename('{}){}'.format(obj.position, obj.title), unicode(obj.id)))
+                    paths.append(secure_filename('{}_{}'.format(obj.position, obj.title), unicode(obj.id)))
                 else:
                     paths.append(secure_filename(obj.title, unicode(obj.id)))
             obj = _get_obj_parent(obj)
