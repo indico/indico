@@ -40,7 +40,7 @@ class Room extends React.Component {
         showFavoriteButton: PropTypes.bool,
         isFavorite: PropTypes.bool.isRequired,
         addFavoriteRoom: PropTypes.func.isRequired,
-        delFavoriteRoom: PropTypes.func.isRequired,
+        delFavoriteRoom: PropTypes.func.isRequired
     };
 
     static defaultProps = {
@@ -103,11 +103,14 @@ class Room extends React.Component {
     };
 
     render() {
-        const {room, children, isFavorite} = this.props;
+        const {
+            room, children, isFavorite, showFavoriteButton, addFavoriteRoom, delFavoriteRoom,
+            ...restProps
+        } = this.props;
         const {content, actions} = Slot.split(children);
 
         return (
-            <Card styleName="room-card">
+            <Card styleName="room-card" {...restProps}>
                 {isFavorite && <Label corner="right" icon="star" color="yellow" />}
                 {this.renderCardImage(room, content, actions)}
                 <Card.Content>

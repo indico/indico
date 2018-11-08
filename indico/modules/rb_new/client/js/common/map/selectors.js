@@ -44,3 +44,5 @@ export const makeGetMapData = (namespace) => ({[namespace]: stateSlice}) => ({
 });
 
 export const makeIsMapSearchEnabled = (namespace) => ({[namespace]: stateSlice}) => stateSlice.map.search;
+
+export const getHoveredRoom = ({map}) => map.ui.hoveredRoom;

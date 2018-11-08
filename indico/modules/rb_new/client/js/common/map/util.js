@@ -16,7 +16,15 @@
  */
 
 import _ from 'lodash';
+import React from 'react';
+import PropTypes from 'prop-types';
+import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
+
 import LatLon from 'geodesy/latlon-vectors';
+
+import * as mapSelectors from './selectors';
+import * as mapActions from './actions';
 
 
 export function getAreaBounds(area) {
@@ -70,4 +78,49 @@ export function getRoomListBounds(rooms) {
 /** Return something like xx°yy′zz″N, ... */
 export function formatLatLon(lat, lon) {
     return new LatLon(lat, lon).toString('dms', 2);
+}
+
+/** This is a HOC that adds mouse hover behaviour to Rooms */
+export function withHoverListener(RoomComponent) {
+    const refCache = {};
+
+    const RoomHoverWrapper = ({hoveredRoomId, actions, room}) => {
+        if (!refCache[room.id]) {
+            refCache[room.id] = React.createRef();
+        }
+        return React.createElement(RoomComponent, {
+            room,
+            onMouseEnter: () => {
+                if (room.id !== hoveredRoomId) {
+                    actions.setRoomHover(room.id);
+                }
+            },
+            onMouseLeave: () => {
+                if (hoveredRoomId !== null) {
+                    actions.setRoomHover(null);
+                }
+            }
+        });
+    };
+
+    RoomHoverWrapper.propTypes = {
+        hoveredRoomId: PropTypes.number,
+        actions: PropTypes.object.isRequired,
+        room: PropTypes.object.isRequired,
+    };
+
+    RoomHoverWrapper.defaultProps = {
+        hoveredRoomId: null,
+    };
+
+    return connect(
+        state => ({
+            hoveredRoomId: mapSelectors.getHoveredRoom(state),
+        }),
+        dispatch => ({
+            actions: bindActionCreators({
+                setRoomHover: mapActions.setRoomHover,
+            }, dispatch)
+        })
+    )(RoomHoverWrapper);
 }

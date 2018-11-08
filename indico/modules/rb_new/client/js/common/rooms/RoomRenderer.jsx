@@ -20,6 +20,8 @@ import PropTypes from 'prop-types';
 import {Button, Card} from 'semantic-ui-react';
 import {Slot} from 'indico/react/util';
 import Room from '../../components/Room';
+import {withHoverListener} from '../map/util';
+
 
 import './RoomRenderer.module.scss';
 
@@ -44,7 +46,7 @@ export default class RoomRenderer extends React.Component {
         children: null
     };
 
-    renderRoom = (room) => {
+    RoomComponent = withHoverListener(({room, ...restProps}) => {
         const {onSelectRoom, selectedRooms, inSelectionMode, children} = this.props;
 
         if (inSelectionMode) {
@@ -59,7 +61,7 @@ export default class RoomRenderer extends React.Component {
             }
 
             return (
-                <Room key={room.id} room={room}>
+                <Room key={room.id} room={room} {...restProps}>
                     <Slot>
                         <Button styleName="selection-add-btn"
                                 onClick={() => !!onSelectRoom && onSelectRoom(room)}
@@ -69,18 +71,18 @@ export default class RoomRenderer extends React.Component {
             );
         } else {
             return (
-                <Room key={room.id} room={room} showFavoriteButton>
+                <Room key={room.id} room={room} showFavoriteButton {...restProps}>
                     {children ? children(room) : null}
                 </Room>
             );
         }
-    };
+    });
 
     render() {
         const {rooms} = this.props;
         return (
             <Card.Group stackable>
-                {rooms.map(this.renderRoom)}
+                {rooms.map(room => <this.RoomComponent key={room.id} room={room} />)}
             </Card.Group>);
     }
 }

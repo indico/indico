@@ -40,7 +40,7 @@
         border-radius: 50%;
     }
 
-    :global(.marker-cluster) {
+    :global(.rb-map-cluster) {
         background-color: rgba($highlight-color, 0.8);
         border: 2px solid darken($highlight-color, 10%);
         color: $light-gray;
@@ -52,11 +52,22 @@
         font-size: 1.1em;
         font-family: $sui-font-family;
         text-shadow: 1px 1px $light-black;
+
+        &:global(.highlight) {
+            background-color: rgba($sui-orange, 0.9);
+            border: 2px solid darken($sui-orange, 10%);
+        }
+
     }
 
     :global(.rb-map-marker) {
         background-color: saturate(rgba($highlight-color, 0.9), 30%);
         border: 2px solid darken($highlight-color, 20%);
+
+        &:global(.highlight) {
+            background-color: saturate(rgba($sui-orange, 0.9), 30%);
+            border: 2px solid darken($sui-orange, 10%);
+        }
     }
 
     :global(.search-control) {

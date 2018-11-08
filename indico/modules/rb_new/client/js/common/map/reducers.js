@@ -22,6 +22,10 @@ import * as globalActions from '../../actions';
 import {getAreaBounds} from './util';
 
 
+const initialUiState = {
+    hoveredRoom: null
+};
+
 export default combineReducers({
     request: requestReducer(
         mapActions.FETCH_AREAS_REQUEST,
@@ -32,6 +36,14 @@ export default combineReducers({
         switch (action.type) {
             case mapActions.AREAS_RECEIVED:
                 return action.data;
+            default:
+                return state;
+        }
+    },
+    ui: (state = initialUiState, action) => {
+        switch (action.type) {
+            case mapActions.SET_ROOM_HOVER:
+                return {hoveredRoom: action.roomId};
             default:
                 return state;
         }

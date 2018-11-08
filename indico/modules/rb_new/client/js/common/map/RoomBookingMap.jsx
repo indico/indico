@@ -23,6 +23,7 @@ import Leaflet from 'leaflet';
 import {Map, TileLayer, Marker, Tooltip} from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-markercluster';
 import {selectors as configSelectors} from '../config';
+import * as mapSelectors from './selectors';
 
 import 'leaflet/dist/leaflet.css';
 import './RoomBookingMap.module.scss';
@@ -37,14 +38,16 @@ class RoomBookingMap extends React.Component {
         rooms: PropTypes.array,
         onLoad: PropTypes.func,
         children: PropTypes.node,
-        tileServerURL: PropTypes.string
+        tileServerURL: PropTypes.string,
+        hoveredRoomId: PropTypes.number
     };
 
     static defaultProps = {
         rooms: [],
         onLoad: () => {},
         children: null,
-        tileServerURL: ''
+        tileServerURL: '',
+        hoveredRoomId: null
     };
 
     componentDidMount() {
@@ -52,14 +55,36 @@ class RoomBookingMap extends React.Component {
         onLoad();
     }
 
+    groupIconCreateFunction(cluster) {
+        const highlight = cluster.getAllChildMarkers().some(m => m.options.highlight);
+        return Leaflet.divIcon({
+            html: `<span>${cluster.getChildCount()}</span>`,
+            className: `marker-cluster marker-cluster-small rb-map-cluster ${highlight ? 'highlight' : ''}`,
+            iconSize: Leaflet.point(40, 40, true),
+        });
+    }
+
     render() {
-        const {bounds, onMove, mapRef, rooms, children, tileServerURL, onTouch} = this.props;
-        Leaflet.Marker.prototype.options.icon = Leaflet.divIcon({className: 'rb-map-marker', iconSize: [20, 20]});
+        const {
+            bounds, onMove, mapRef, rooms, children, tileServerURL, onTouch, hoveredRoomId
+        } = this.props;
+        const icon = Leaflet.divIcon({className: 'rb-map-marker', iconSize: [20, 20]});
+        const hoveredIcon = Leaflet.divIcon({className: 'rb-map-marker highlight', iconSize: [20, 20]});
+        const highlight = rooms.some(r => r.id === hoveredRoomId);
 
         const markers = !!rooms.length && (
-            <MarkerClusterGroup showCoverageOnHover={false}>
+            <MarkerClusterGroup showCoverageOnHover={false}
+                                iconCreateFunction={this.groupIconCreateFunction}
+                                // key is used here as a way to force a re-rendering
+                                // of the MarkerClusterGroup
+                                key={highlight}>
                 {rooms.filter(({lat, lng}) => !!(lat && lng)).map(({id, name, lat, lng}) => (
-                    <Marker key={id} position={[lat, lng]}>
+                    // we have to make the key depend on the highlighted state, otherwise
+                    // the component won't properly refresh (for some strange reason)
+                    <Marker key={`${id}-${id === hoveredRoomId ? 'highlight' : 'normal'}`}
+                            position={[lat, lng]}
+                            icon={id === hoveredRoomId ? hoveredIcon : icon}
+                            highlight={id === hoveredRoomId}>
                         <Tooltip direction="top">
                             <span>{name}</span>
                         </Tooltip>
@@ -97,5 +122,6 @@ class RoomBookingMap extends React.Component {
 export default connect(
     state => ({
         tileServerURL: configSelectors.getTileServerURL(state),
+        hoveredRoomId: mapSelectors.getHoveredRoom(state)
     }),
 )(RoomBookingMap);

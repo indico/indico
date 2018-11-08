@@ -29,6 +29,7 @@ export const FETCH_AREAS_REQUEST = 'map/FETCH_AREAS_REQUEST';
 export const FETCH_AREAS_SUCCESS = 'map/FETCH_AREAS_SUCCESS';
 export const FETCH_AREAS_ERROR = 'map/FETCH_AREAS_ERROR';
 export const AREAS_RECEIVED = 'map/AREAS_RECEIVED';
+export const SET_ROOM_HOVER = `map/SET_ROOM_HOVER`;
 
 
 export function updateLocation(namespace, location) {
@@ -37,6 +38,10 @@ export function updateLocation(namespace, location) {
 
 export function toggleMapSearch(namespace, search) {
     return {type: TOGGLE_MAP_SEARCH, search, namespace};
+}
+
+export function setRoomHover(roomId) {
+    return {type: SET_ROOM_HOVER, roomId};
 }
 
 export function fetchAreas() {
