@@ -39,7 +39,8 @@ class RoomBookingMap extends React.Component {
         onLoad: PropTypes.func,
         children: PropTypes.node,
         tileServerURL: PropTypes.string,
-        hoveredRoomId: PropTypes.number
+        hoveredRoomId: PropTypes.number,
+        clusterProps: PropTypes.object,
     };
 
     static defaultProps = {
@@ -47,7 +48,8 @@ class RoomBookingMap extends React.Component {
         onLoad: () => {},
         children: null,
         tileServerURL: '',
-        hoveredRoomId: null
+        hoveredRoomId: null,
+        clusterProps: {}
     };
 
     componentDidMount() {
@@ -66,7 +68,7 @@ class RoomBookingMap extends React.Component {
 
     render() {
         const {
-            bounds, onMove, mapRef, rooms, children, tileServerURL, onTouch, hoveredRoomId
+            bounds, onMove, mapRef, rooms, children, tileServerURL, onTouch, clusterProps, hoveredRoomId
         } = this.props;
         const icon = Leaflet.divIcon({className: 'rb-map-marker', iconSize: [20, 20]});
         const hoveredIcon = Leaflet.divIcon({className: 'rb-map-marker highlight', iconSize: [20, 20]});
@@ -77,7 +79,8 @@ class RoomBookingMap extends React.Component {
                                 iconCreateFunction={this.groupIconCreateFunction}
                                 // key is used here as a way to force a re-rendering
                                 // of the MarkerClusterGroup
-                                key={highlight}>
+                                key={highlight}
+                                {...clusterProps}>
                 {rooms.filter(({lat, lng}) => !!(lat && lng)).map(({id, name, lat, lng}) => (
                     // we have to make the key depend on the highlighted state, otherwise
                     // the component won't properly refresh (for some strange reason)
