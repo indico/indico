@@ -32,12 +32,14 @@ export default class DatePeriodField extends React.Component {
         value: PropTypes.shape({
             startDate: PropTypes.string,
             endDate: PropTypes.string,
-        })
+        }),
+        minimumDays: PropTypes.number,
     };
 
     static defaultProps = {
         disabled: false,
-        value: null
+        value: null,
+        minimumDays: 1,
     };
 
     shouldComponentUpdate(nextProps, nextState) {
@@ -63,7 +65,7 @@ export default class DatePeriodField extends React.Component {
     };
 
     render() {
-        const {disabled} = this.props;
+        const {disabled, minimumDays} = this.props;
         return (
             <div styleName="date-period-field">
                 <DateRangePicker startDate={this.getMomentValue('startDate')}
@@ -71,6 +73,7 @@ export default class DatePeriodField extends React.Component {
                                  onDatesChange={this.notifyChange}
                                  disabled={disabled}
                                  inputIconPosition="before"
+                                 minimumNights={minimumDays - 1}
                                  block />
             </div>
         );
