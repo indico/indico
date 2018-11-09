@@ -172,7 +172,8 @@ class RegistrationFormBillableItemsField(RegistrationFormBillableField):
         # we don't have field-level billing data here
         del versioned_data['is_billable']
         del versioned_data['price']
-        #del versioned_data['price_info']
+        if 'price_info' in versioned_data:
+            del versioned_data['price_info']
         return unversioned_data, versioned_data
 
     def calculate_price(self, reg_data, versioned_data):
