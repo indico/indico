@@ -363,7 +363,13 @@ class BlockingModal extends React.Component {
             <Modal open onClose={onClose} size="large" closeIcon>
                 <FinalForm {...props}
                            render={this.renderModalContent}
-                           initialValues={{rooms, dates, allowed: allowed || [], reason}} />
+                           initialValues={{rooms, dates, allowed: allowed || [], reason}}
+                           subscription={{
+                               submitting: true,
+                               hasValidationErrors: true,
+                               pristine: true,
+                               submitSucceeded: true
+                           }} />
             </Modal>
         );
     }
