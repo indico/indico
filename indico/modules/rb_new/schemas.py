@@ -66,6 +66,12 @@ class RoomSchema(mm.ModelSchema):
                   'available_equipment', 'has_photo')
 
 
+class RoomUpdateSchema(RoomSchema):
+    class Meta(RoomSchema.Meta):
+        fields = RoomSchema.Meta.fields + ('notification_before_days', 'notification_before_days_weekly',
+                                           'notification_before_days_monthly')
+
+
 class MapAreaSchema(mm.ModelSchema):
     class Meta:
         model = MapArea
@@ -329,6 +335,7 @@ class RoomAttributeSchema(mm.ModelSchema):
 rb_user_schema = RBUserSchema()
 rooms_schema = RoomSchema(many=True)
 room_attribute_values_schema = RoomAttributeValuesSchema(many=True)
+room_update_schema = RoomUpdateSchema()
 map_areas_schema = MapAreaSchema(many=True)
 reservation_occurrences_schema = ReservationOccurrenceSchema(many=True)
 reservation_occurrences_schema_with_permissions = ReservationOccurrenceSchemaWithPermissions(many=True)

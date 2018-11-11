@@ -28,15 +28,129 @@ import {Translate} from 'indico/react/i18n';
 import * as roomActions from './actions';
 
 import './RoomEditModal.module.scss';
+import {bindActionCreators} from "redux";
 
 function validate({}) {
 };
+
+const columns = [[
+    {
+        type: 'header',
+        label: Translate.string('Contact')
+    }, {
+        type: 'input',
+        name: 'ownerName',
+        label: Translate.string('Owner')
+    }, {
+        type: 'input',
+        name: 'keyLocation',
+        label: Translate.string('Where is the key?')
+    }, {
+        type: 'input',
+        name: 'telephone',
+        label: Translate.string('Telephone')
+    }, {
+        type: 'header',
+        label: Translate.string('Information')
+    }, {
+        type: 'formgroup',
+        key: 'information',
+        content: [{
+            type: 'input',
+            name: 'capacity',
+            label: Translate.string('Capacity(seats)')
+        }, {
+            type: 'input',
+            name: 'division',
+            label: Translate.string('Division')
+        }]
+    }], [{
+        type: 'header',
+        label: Translate.string('Location')
+    }, {
+        type: 'input',
+        name: 'name',
+        label: Translate.string('Name')
+    }, {
+        type: 'input',
+        name: 'site',
+        label: Translate.string('Site')
+    }, {
+        type: 'formgroup',
+        key: 'details',
+        content: [{
+            type: 'input',
+            name: 'building',
+            label: Translate.string('Building')
+        }, {
+            type: 'input',
+            name: 'floor',
+            label: Translate.string('Floor')
+        }, {
+            type: 'input',
+            name: 'number',
+            label: Translate.string('Number')
+        }]
+    }, {
+        type: 'formgroup',
+        key: 'coordinates',
+        content: [{
+            type: 'input',
+            name: 'longitude',
+            label: Translate.string('longitude')
+        }, {
+            type: 'input',
+            name: 'latitude',
+            label: Translate.string('latitude')
+        }]
+    }, {
+        type: 'input',
+        name: 'surfaceArea',
+        label: Translate.string('Surface Area (m2)')
+    }, {
+        type: 'input',
+        name: 'maxAdvanceDays',
+        label: Translate.string('Maximum advance time for bookings (days)')
+    }], [{
+        type: 'header',
+        label: 'Options',
+    }, {
+        type: 'checkbox',
+        name: 'isActive',
+        label: Translate.string('Active')
+    }, {
+        type: 'checkbox',
+        name: 'isPublic',
+        label: Translate.string('Public')
+    }, {
+        type: 'checkbox',
+        name: 'isAutoConfirm',
+        label: Translate.string('Confirmation')
+    }, {
+        type: 'checkbox',
+        name: 'reminders',
+        label: Translate.string('Reminders Enabled')
+    }, {
+        type: 'input',
+        name: 'dayReminder',
+        label: Translate.string('Send Booking reminders X days before (single/day)')
+    }, {
+        type: 'input',
+        name: 'weekReminder',
+        label: Translate.string('Send Booking reminders X days before (weekly)')
+    }, {
+        type: 'input',
+        name: 'monthReminder',
+        label: Translate.string('Send Booking reminders X days before (monthly)')
+    }]];
 
 class RoomEditModal extends React.Component {
     static propTypes = {
         onClose: PropTypes.func.isRequired,
         roomId: PropTypes.number.isRequired,
-
+        actions: PropTypes.exact({
+            updateRoom: PropTypes.func.isRequired,
+        }).isRequired,
     };
 
     state = {
@@ -45,7 +159,7 @@ class RoomEditModal extends React.Component {
 
     componentDidMount() {
         this.fetchDetailedRoom();
-    };
+    }
 
     async fetchDetailedRoom() {
         const {roomId} = this.props;
@@ -72,136 +186,37 @@ class RoomEditModal extends React.Component {
         }
     };
 
-    renderHeader = (title) => (
-        <Header key={title}>
-            <Translate>{title}</Translate>
-        </Header>
+    renderColumn = (column, key) => (
+        <Grid.Column key={key}>{column.map(this.renderContent)}</Grid.Column>
     );
 
-    renderCheckboxField = (name, label) => (
-        <Field key={name}
-               name={name}
-               component={ReduxCheckboxField}
-               componentLabel={Translate.string(label)}
-               as={Checkbox} />
-    );
+    renderContent = (content) => {
+        switch (content.type) {
+            case 'header':
+                return (
+                    <Header key={content.label}>{content.label}</Header>);
+            case 'input':
+                return (
+                    <Field key={content.name}
+                           name={content.name}
+                           component={ReduxFormField}
+                           label={content.label}
+                           as="input" />);
+            case 'formgroup':
+                return (
+                    <Form.Group key={content.key}>
+                        {content.content.map(this.renderContent)}
+                    </Form.Group>);
+            case 'checkbox':
+                return (
+                    <Field key={content.name}
+                           name={content.name}
+                           component={ReduxCheckboxField}
+                           componentLabel={content.label}
+                           as={Checkbox} />);
+        }
+    };
 
-    renderFormField = (name, label) => (
-        <Field key={name}
-               name={name}
-               component={ReduxFormField}
-               label={Translate.string(label)}
-               as="input" />
-    );
-
-    renderFieldList = (fields) => fields.map(({name, label}) => this.renderFormField(name, label));
-
-    renderCheckboxList = (checkboxes) => checkboxes.map(({name, label}) => this.renderCheckboxField(name, label));
-
-    renderFormGroup = (children, key) => (
-        <Form.Group widths="equal" key={key}>
-            {children}
-        </Form.Group>
-    );
-
-    renderGridColumn = (children, key) => (
-        <Grid.Column key={key}>
-            {children}
-        </Grid.Column>
-    );
-
-    formDetails = [
-        this.renderGridColumn([
-            this.renderHeader('Contact'),
-            ...this.renderFieldList([{
-                name: 'ownerName',
-                label: 'Owner'
-            }, {
-                name: 'keyLocation',
-                label: 'Where is the key?'
-            }, {
-                name: 'telephone',
-                label: 'Telephone'
-            }]),
-            this.renderHeader('Information'),
-            this.renderFormGroup(
-                this.renderFieldList([{
-                    name: 'capacity',
-                    label: 'Capacity (seats)'
-                }, {
-                    name: 'division',
-                    label: 'Division'
-                }]),
-                'information'
-            )
-        ], 'col1'),
-        this.renderGridColumn([
-            this.renderHeader('Location'),
-            ...this.renderFieldList([{
-                name: 'name',
-                label: 'Name'
-            }, {
-                name: 'site',
-                label: 'Site'
-            }]),
-            this.renderFormGroup(
-                this.renderFieldList([{
-                    name: 'building',
-                    label: 'Building'
-                }, {
-                    name: 'floor',
-                    label: 'Floor',
-                }, {
-                    name: 'number',
-                    label: 'Number'
-                }]),
-                'location_building'
-            ),
-            this.renderFormGroup(
-                this.renderFieldList([{
-                    name: 'longitude',
-                    label: 'Longitute',
-                }, {
-                    name: 'latitude',
-                    label: 'Latitude'
-                }]),
-                'location_coordinates'
-            ),
-            ...this.renderFieldList([{
-                name: 'surfaceArea',
-                label: 'Surface Area (m2)'
-            }, {
-                name: 'maxAdvanceDays',
-                label: 'Maximum advance time for bookings (days)'
-            }])
-        ], 'col2'),
-        this.renderGridColumn([
-            this.renderHeader('Options'),
-            ...this.renderCheckboxList([{
-                name: 'isActive',
-                label: 'Active'
-            }, {
-                name: 'isPublic',
-                label: 'Public'
-            }, {
-                name: 'isAutoConfirm',
-                label: 'Confirmations'
-            }, {
-                name: 'notificationsEnabled',
-                label: 'Reminders Enabled'
-            }]),
-            ...this.renderFieldList([{
-                name: 'dayReminder',
-                label: 'Send Booking reminders X days before (single/day)'
-            }, {
-                name: 'weekReminder',
-                label: 'Send Booking reminders X days before (weekly)'
-            }, {
-                name: 'monthReminder',
-                label: 'Send Booking reminders X days before (monthly)'
-            }])
-        ], 'col3')
-    ];
 
     renderModalContent = (fprops) => {
         const formProps = {onSubmit: fprops.handleSubmit};
@@ -213,7 +228,7 @@ class RoomEditModal extends React.Component {
                 <Modal.Content>
                     <Form id="room-form" {...formProps}>
                         <Grid columns={3}>
-                            {this.formDetails}
+                            {columns.map(this.renderColumn)}
                         </Grid>
                     </Form>
                 </Modal.Content>
@@ -245,7 +260,8 @@ class RoomEditModal extends React.Component {
 }
 
 export default connect(
-    null, dispatch => ({
+    null,
+    dispatch => ({
         actions: bindActionCreators({
             updateRoom: roomActions.updateRoom,
         }, dispatch)
