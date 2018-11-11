@@ -145,7 +145,8 @@ export function ReduxDropdownField({input, required, clearable, onChange, ...pro
     );
 }
 
-export function ReduxCheckboxField({input, input: {value}, ...props}) {
+
+export function ReduxCheckboxField({input: {value, ...input}, ...props}) {
     return (
         <ReduxFormField input={input}
                         {...props}

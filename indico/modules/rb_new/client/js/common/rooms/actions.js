@@ -104,5 +104,9 @@ export function fetchAttributes(id) {
     };
 }
 
+export function updateRoom(roomId, formData) {
+
+}
+
 export const openRoomDetails = (roomId) => modalActions.openModal('room-details', roomId);
 export const openRoomDetailsBook = (roomId) => modalActions.openModal('room-details-book', roomId);

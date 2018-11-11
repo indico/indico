@@ -18,44 +18,19 @@
 import React from 'react';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
-import {Button, Checkbox, Form, Grid, Header, Modal} from 'semantic-ui-react';
+import {Button, Checkbox, Dimmer, Form, Grid, Header, Loader, Modal} from 'semantic-ui-react';
 import fetchRoomURL from 'indico-url:rooms_new.room';
 import {Form as FinalForm, Field} from 'react-final-form';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import camelizeKeys from 'indico/utils/camelize';
 import {ReduxCheckboxField, ReduxFormField} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
+import * as roomActions from './actions';
 
 import './RoomEditModal.module.scss';
 
-
-const contactDetails = [
-    {name: 'ownerName',
-     label: Translate.string('Owner')},
-    {name: 'keyLocation',
-     label: Translate.string('Where is the key?')},
-    {name: 'telephone',
-     label: Translate.string('Telephone')}];
-
-const informationDetails = [
-    {name: 'capacity',
-     label: Translate.string('Capacity(seats)')},
-    {name: 'division',
-     label: Translate.string('Division')}];
-
-const locationDetails = [
-    {name: 'name',
-     label: Translate.string('Name')},
-    {name: 'site',
-     label: Translate.string('Site')}];
-
-const roomDetails = [
-    {name: 'building',
-     label: Translate.string('Building')},
-    {name: 'floor',
-     label: Translate.string('Floor')},
-    {name: 'number',
-     label: Translate.string('Number')}];
+function validate({}) {
+};
 
 class RoomEditModal extends React.Component {
     static propTypes = {
@@ -65,13 +40,12 @@ class RoomEditModal extends React.Component {
     };
 
     state = {
-        room: {}
+        room: null
     };
 
     componentDidMount() {
         this.fetchDetailedRoom();
-    }
-
+    };
 
     async fetchDetailedRoom() {
         const {roomId} = this.props;
@@ -90,9 +64,147 @@ class RoomEditModal extends React.Component {
         onClose();
     };
 
+    handleSubmit = async (formData) => {
+        const {actions: {updateRoom}, room: {id}} = this.props;
+        let rv = await updateRoom(id, formData);
+        if(rv.error){
+            return rv.error;
+        }
+    };
+
+    renderHeader = (title) => (
+        <Header key={title}>
+            <Translate>{title}</Translate>
+        </Header>
+    );
+
+    renderCheckboxField = (name, label) => (
+        <Field key={name}
+               name={name}
+               component={ReduxCheckboxField}
+               componentLabel={Translate.string(label)}
+               as={Checkbox} />
+    );
+
+    renderFormField = (name, label) => (
+        <Field key={name}
+               name={name}
+               component={ReduxFormField}
+               label={Translate.string(label)}
+               as="input" />
+    );
+
+    renderFieldList = (fields) => fields.map(({name, label}) => this.renderFormField(name, label));
+
+    renderCheckboxList = (checkboxes) => checkboxes.map(({name, label}) => this.renderCheckboxField(name, label));
+
+    renderFormGroup = (children, key) => (
+        <Form.Group widths="equal" key={key}>
+            {children}
+        </Form.Group>
+    );
+
+    renderGridColumn = (children, key) => (
+        <Grid.Column key={key}>
+            {children}
+        </Grid.Column>
+    );
+
+    formDetails = [
+        this.renderGridColumn([
+            this.renderHeader('Contact'),
+            ...this.renderFieldList([{
+                name: 'ownerName',
+                label: 'Owner'
+            }, {
+                name: 'keyLocation',
+                label: 'Where is the key?'
+            }, {
+                name: 'telephone',
+                label: 'Telephone'
+            }]),
+            this.renderHeader('Information'),
+            this.renderFormGroup(
+                this.renderFieldList([{
+                    name: 'capacity',
+                    label: 'Capacity (seats)'
+                }, {
+                    name: 'division',
+                    label: 'Division'
+                }]),
+                'information'
+            )
+        ], 'col1'),
+        this.renderGridColumn([
+            this.renderHeader('Location'),
+            ...this.renderFieldList([{
+                name: 'name',
+                label: 'Name'
+            }, {
+                name: 'site',
+                label: 'Site'
+            }]),
+            this.renderFormGroup(
+                this.renderFieldList([{
+                    name: 'building',
+                    label: 'Building'
+                }, {
+                    name: 'floor',
+                    label: 'Floor',
+                }, {
+                    name: 'number',
+                    label: 'Number'
+                }]),
+                'location_building'
+            ),
+            this.renderFormGroup(
+                this.renderFieldList([{
+                    name: 'longitude',
+                    label: 'Longitute',
+                }, {
+                    name: 'latitude',
+                    label: 'Latitude'
+                }]),
+                'location_coordinates'
+            ),
+            ...this.renderFieldList([{
+                name: 'surfaceArea',
+                label: 'Surface Area (m2)'
+            }, {
+                name: 'maxAdvanceDays',
+                label: 'Maximum advance time for bookings (days)'
+            }])
+        ], 'col2'),
+        this.renderGridColumn([
+            this.renderHeader('Options'),
+            ...this.renderCheckboxList([{
+                name: 'isActive',
+                label: 'Active'
+            }, {
+                name: 'isPublic',
+                label: 'Public'
+            }, {
+                name: 'isAutoConfirm',
+                label: 'Confirmations'
+            }, {
+                name: 'notificationsEnabled',
+                label: 'Reminders Enabled'
+            }]),
+            ...this.renderFieldList([{
+                name: 'dayReminder',
+                label: 'Send Booking reminders X days before (single/day)'
+            }, {
+                name: 'weekReminder',
+                label: 'Send Booking reminders X days before (weekly)'
+            }, {
+                name: 'monthReminder',
+                label: 'Send Booking reminders X days before (monthly)'
+            }])
+        ], 'col3')
+    ];
 
     renderModalContent = (fprops) => {
-        const formProps = {onSubmit: fprops.onSubmit};
+        const formProps = {onSubmit: fprops.handleSubmit};
         return (
             <>
                 <Modal.Header>
@@ -101,102 +213,7 @@ class RoomEditModal extends React.Component {
                 <Modal.Content>
                     <Form id="room-form" {...formProps}>
                         <Grid columns={3}>
-                            <Grid.Column styleName="room-edit">
-                                <Header>
-                                    <Translate>Contact</Translate>
-                                </Header>
-                                {contactDetails.map(contactDetail => (
-                                    <Field key={contactDetail.name}
-                                           name={contactDetail.name}
-                                           component={ReduxFormField}
-                                           label={contactDetail.label}
-                                           as="input" />
-                                ))}
-                                <Header>
-                                    <Translate>Information</Translate>
-                                </Header>
-                                <Form.Group widths="equal">
-                                    {informationDetails.map(informationDetail => (
-                                        <Field key={informationDetail.name}
-                                               name={informationDetail.name}
-                                               component={ReduxFormField}
-                                               label={informationDetail.label}
-                                               as="input" />
-                                    ))}
-                                </Form.Group>
-                            </Grid.Column>
-                            <Grid.Column>
-                                <Header>
-                                    <Translate>Location</Translate>
-                                </Header>
-                                {locationDetails.map(locationDetail => (
-                                    <Field key={locationDetail.name}
-                                           name={locationDetail.name}
-                                           component={ReduxFormField}
-                                           label={locationDetail.label}
-                                           as="input" />))}
-                                <Form.Group widths="equal">
-                                    {roomDetails.map(roomDetail => (
-                                        <Field key={roomDetail.name}
-                                               name={roomDetail.name}
-                                               component={ReduxFormField}
-                                               label={roomDetail.label}
-                                               as="input" />))}
-                                </Form.Group>
-                                <Form.Group widths="equal">
-                                    <Field name="longitude"
-                                           component={ReduxFormField}
-                                           label={Translate.string('Longitude')}
-                                           as="input" />
-                                    <Field name="latitude"
-                                           component={ReduxFormField}
-                                           label={Translate.string('Latitude')}
-                                           as="input" />
-                                </Form.Group>
-                                <Field name="surfaceArea"
-                                       component={ReduxFormField}
-                                       label={Translate.string('Surface Area (m2)')}
-                                       as="input" />
-                                <Field name="maxAdvanceDays"
-                                       component={ReduxFormField}
-                                       label={Translate.string('Maximum advance time for bookings (days)')}
-                                       as="input" />
-                            </Grid.Column>
-                            <Grid.Column>
-                                <Header>
-                                    <Translate>Options</Translate>
-                                </Header>
-                                <Field name="isActive"
-                                       component={ReduxCheckboxField}
-                                       componentLabel={Translate.string('Active')}
-                                       checkBoxInput
-                                       as={Checkbox} />
-                                <Field name="isPublic"
-                                       component={ReduxFormField}
-                                       componentLabel={Translate.string('Public')}
-                                       as={Checkbox} />
-                                <Field name="isAutoConfirm"
-                                       component={ReduxFormField}
-                                       componentLabel={Translate.string('Confirmations')}
-                                       as={Checkbox} />
-                                <Field name="reminders"
-                                       component={ReduxFormField}
-                                       componentLabel={Translate.string('Reminders Enabled')}
-                                       as={Checkbox} />
-                                <Field name="dayReminder"
-                                       component={ReduxFormField}
-                                       label={Translate.string('Send Booking reminders X days before (single/day)')}
-                                       as="input" />
-                                <Field name="weekReminder"
-                                       component={ReduxFormField}
-                                       label={Translate.string('Send Booking reminders X days before (weekly)')}
-                                       as="input" />
-                                <Field name="monthReminder"
-                                       component={ReduxFormField}
-                                       label={Translate.string('Send Booking reminders X days before (monthly)')}
-                                       as="input" />
-                            </Grid.Column>
-
+                            {this.formDetails}
                         </Grid>
                     </Form>
                 </Modal.Content>
@@ -213,10 +230,14 @@ class RoomEditModal extends React.Component {
 
     render() {
         const {room} = this.state;
+        const props = {validate, onSubmit: this.handleSubmit};
+        if (!room) {
+            return <Dimmer active page><Loader /></Dimmer>;
+        }
         return (
             <Modal open onClose={this.handleCloseModal} size="large" closeIcon>
-                <FinalForm render={this.renderModalContent}
-                           onSubmit={() => null}
+                <FinalForm {...props}
+                           render={this.renderModalContent}
                            initialValues={room} />
             </Modal>
         );
@@ -224,5 +245,9 @@ class RoomEditModal extends React.Component {
 }
 
 export default connect(
-    null, null
+    null, dispatch => ({
+        actions: bindActionCreators({
+            updateRoom: roomActions.updateRoom,
+        }, dispatch)
+    })
 )(RoomEditModal);
