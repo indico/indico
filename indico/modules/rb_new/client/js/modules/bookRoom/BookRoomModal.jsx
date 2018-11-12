@@ -32,6 +32,7 @@ import {selectors as roomsSelectors} from '../../common/rooms';
 import RoomBasicDetails from '../../components/RoomBasicDetails';
 import {DailyTimelineContent, TimelineLegend} from '../../common/timeline';
 import * as actions from './actions';
+import {actions as modalActions} from '../../modals';
 import {selectors as userSelectors} from '../../common/user';
 
 
@@ -73,6 +74,7 @@ class BookRoomModal extends React.Component {
             createBooking: PropTypes.func.isRequired,
             fetchAvailability: PropTypes.func.isRequired,
             resetAvailability: PropTypes.func.isRequired,
+            openBookingDetails: PropTypes.func.isRequired
         }).isRequired,
     };
 
@@ -112,12 +114,13 @@ class BookRoomModal extends React.Component {
     };
 
     renderBookingState({submitSucceeded, submitError, submitFailed, values}) {
+        const {actions: {openBookingDetails}} = this.props;
         if (submitSucceeded) {
             const {booking} = this.state;
             const bookingLink = (
                 // TODO: add link to view booking details
                 // eslint-disable-next-line no-alert
-                <a onClick={() => alert(`TODO: View booking ${booking.id}`)} />
+                <a onClick={() => openBookingDetails(booking.id)} />
             );
             return (
                 <Message color={values.isPrebooking ? 'orange' : 'green'}>
@@ -403,6 +406,7 @@ export default connect(
                     isPrebooking
                 });
             },
+            openBookingDetails: bookingId => modalActions.openModal('booking-details', bookingId, null, true)
         }, dispatch)
     })
 )(BookRoomModal);
