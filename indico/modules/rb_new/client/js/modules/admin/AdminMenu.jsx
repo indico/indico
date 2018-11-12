@@ -18,7 +18,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {bindActionCreators} from 'redux';
-import {NavLink} from 'react-router-dom';
+import {NavLink, withRouter} from 'react-router-dom';
 import {Icon, Menu, Placeholder} from 'semantic-ui-react';
 import {connect} from 'react-redux';
 import {Translate} from 'indico/react/i18n';
@@ -103,15 +103,14 @@ AdminMenu.propTypes = {
 };
 
 
-export default connect(
+export default withRouter(connect(
     (state) => ({
         locations: adminSelectors.getAllLocations(state),
         isFetchingLocations: adminSelectors.isFetchingLocations(state),
-        router: state.router
     }),
     (dispatch) => ({
         actions: bindActionCreators({
             clearTextFilter: adminActions.clearTextFilter,
         }, dispatch),
     })
-)(AdminMenu);
+)(AdminMenu));
