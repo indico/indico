@@ -33,7 +33,7 @@ from indico.modules.events.layout import layout_settings
 from indico.modules.events.logs.util import make_diff_log
 from indico.modules.events.models.events import EventType
 from indico.modules.events.models.references import ReferenceType
-from indico.modules.rb_new.operations.bookings import create_booking
+from indico.modules.rb_new.operations.bookings import create_booking_for_event
 from indico.util.user import principal_from_fossil
 
 
@@ -101,7 +101,7 @@ def create_event(category, event_type, data, add_creator_as_manager=True, featur
     if data['location_data'].pop('create_booking', False):
         room_id = data['location_data'].pop('room_id', None)
         if room_id:
-            booking = create_booking(room_id, data['start_dt'], data['end_dt'], data['creator'], data['title'])
+            create_booking_for_event(room_id, event)
     return event
 
 
