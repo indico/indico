@@ -16,6 +16,15 @@
  */
 
 
-.admin-area {
-    margin-top: 20px;
+.admin-menu {
+    .locations-header {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    :global(.active .item) {
+        background-color: rgba(0, 0, 0, 0) !important;
+        font-weight: 700;
+        color: rgba(0, 0, 0, 0.95) !important;
+    }
 }
