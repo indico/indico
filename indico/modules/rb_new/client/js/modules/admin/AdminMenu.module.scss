@@ -22,9 +22,13 @@
         justify-content: space-between;
     }
 
-    :global(.active .item) {
-        background-color: rgba(0, 0, 0, 0) !important;
-        font-weight: 700;
-        color: rgba(0, 0, 0, 0.95) !important;
+    :global(.item a) {
+        color: rgba(0, 0, 0, 0.87) !important;
+
+        &:global(.active) {
+            background-color: rgba(0, 0, 0, 0) !important;
+            font-weight: 700;
+            color: rgba(0, 0, 0, 0.95) !important;
+        }
     }
 }
