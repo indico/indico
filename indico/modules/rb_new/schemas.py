@@ -186,11 +186,16 @@ class BookableHoursSchema(mm.ModelSchema):
 
 
 class LocationsSchema(mm.ModelSchema):
-    rooms = Nested(RoomSchema, many=True, only=('id', 'name', 'full_name', 'sprite_position', 'owner_name', 'comments'))
+    rooms = Nested(RoomSchema, many=True, only=('id', 'name', 'full_name', 'sprite_position'))
 
     class Meta:
         model = Location
         fields = ('id', 'name', 'rooms')
+
+
+class AdminLocationsSchema(LocationsSchema):
+    rooms = Nested(RoomSchema, only=LocationsSchema._declared_fields['rooms'].only + ('owner_name', 'comments'),
+                   many=True)
 
     @post_dump
     def sort_rooms(self, location):
@@ -257,5 +262,6 @@ simple_blockings_schema = BlockingSchema(many=True, only=('id', 'reason'))
 nonbookable_periods_schema = NonBookablePeriodSchema(many=True)
 bookable_hours_schema = BookableHoursSchema()
 locations_schema = LocationsSchema(many=True)
+admin_locations_schema = AdminLocationsSchema(many=True)
 create_booking_args = CreateBookingSchema()
 equipment_type_schema = EquipmentTypeSchema()
