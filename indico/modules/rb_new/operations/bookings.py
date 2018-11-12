@@ -231,12 +231,11 @@ def check_room_available(room, start_dt, end_dt):
     return result
 
 
-def create_booking(room_id, start_dt, end_dt, booked_for, reason, repeat_frequency=RepeatFrequency.NEVER,
-                   repeat_interval=0):
+def create_booking_for_event(room_id, event):
     try:
         room = Room.get_one(room_id)
-        data = dict(start_dt=start_dt, end_dt=end_dt, booked_for_user=booked_for, booking_reason=reason,
-                    repeat_frequency=repeat_frequency)
+        data = dict(start_dt=event.start_dt, end_dt=event.end_dt, booked_for_user=event.creator,
+                    booking_reason=event.title, repeat_frequency=RepeatFrequency.NEVER, event_id=event.id)
         resv = Reservation.create_from_data(room, data, session.user)
         db.session.flush()
     except NoReportError as e:
