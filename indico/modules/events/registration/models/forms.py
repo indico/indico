@@ -169,7 +169,7 @@ class RegistrationForm(db.Model):
         db.String, 
         nullable=False,
         default=''
-)
+    )
     #: Currency for prices in the registration form
     currency = db.Column(
         db.String,
