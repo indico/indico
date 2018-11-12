@@ -142,7 +142,7 @@ export default combineReducers({
             }
             case bookRoomActions.CREATE_BOOKING_SUCCESS: {
                 const bookingData = camelizeKeys(action.data);
-                const {roomId} = bookingData;
+                const {roomId, calendarData} = bookingData;
                 const {rows} = state;
                 const newRows = rows.map((row) => {
                     if (row.roomId !== roomId) {
@@ -151,11 +151,11 @@ export default combineReducers({
 
                     const newRow = {...row};
                     for (const type of ['bookings', 'preBookings']) {
-                        if (!(type in bookingData)) {
+                        if (!(type in calendarData)) {
                             continue;
                         }
 
-                        const values = bookingData[type];
+                        const values = calendarData[type];
                         for (const dt of Object.keys(values)) {
                             const previousValues = newRow[type][dt] || [];
                             newRow[type][dt] = [...previousValues, ...values[dt]];

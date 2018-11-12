@@ -136,7 +136,7 @@ class RHCreateBooking(RHRoomBookingBase):
             data = {'pre_bookings': serialized_occurrences}
         else:
             data = {'bookings': serialized_occurrences}
-        return jsonify(room_id=room.id, **data)
+        return jsonify(room_id=room.id, booking=reservation_details_schema.dump(resv).data, calendar_data=data)
 
 
 class RHRoomSuggestions(RHRoomBookingBase):
