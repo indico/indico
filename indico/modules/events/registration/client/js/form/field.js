@@ -685,7 +685,7 @@ ndRegForm.directive('ndRadioField', function(url) {
                     width: 50,
                     editable: true,
                     edittype: "text",
-                    editoptions: {size: "30", }
+                    editoptions: {size: "30"}
                 }, {
                     name: 'price',
                     index: 'price',
