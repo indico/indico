@@ -16,11 +16,19 @@
  */
 
 import {push} from 'connected-react-router';
+import qs from 'qs';
 
 import {history} from '../store';
 
-
-export function openModal(name, value = null, payload = null) {
+/**
+ * Open a history-friendly modal, by setting the corresponding query string.
+ *
+ * @param {String} name - the name of the modal (e.g. 'room-details')
+ * @param {String} value - a value to pass (normally an ID, e.g. room ID)
+ * @param {Object} payload - additional information to pass as JSON
+ * @param {Boolean} resetHistory - whether to erase any previous 'modal' path segments
+ */
+export function openModal(name, value = null, payload = null, resetHistory = false) {
     const {location: {pathname: path, search: queryString}} = history;
     let data = name;
     if (value !== null) {
@@ -29,6 +37,16 @@ export function openModal(name, value = null, payload = null) {
             data += `:${JSON.stringify(payload)}`;
         }
     }
-    // eslint-disable-next-line prefer-template
-    return push(path + (queryString ? `${queryString}&` : '?') + `modal=${encodeURIComponent(data)}`);
+    const qsData = queryString ? qs.parse(queryString.slice(1)) : {};
+
+    if (resetHistory || !qsData.modal) {
+        // if resetHistory was set, erase other 'modal' path segments
+        qsData.modal = [];
+    } else if (typeof qsData.modal === 'string') {
+        qsData.modal = [qsData.modal];
+    }
+    qsData.modal.push(data);
+
+    const serializedQs = qs.stringify(qsData, {allowDots: true, arrayFormat: 'repeat'});
+    return push(path + (qsData ? `?${serializedQs}` : ''));
 }
