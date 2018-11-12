@@ -69,38 +69,22 @@ class AdminArea extends React.Component {
                         <AdminMenu />
                     </Grid.Column>
                     <Grid.Column width={12}>
-                        <>
-                            <Route exact path="/admin"
-                                   render={() => {
-                                       if (!locations.length) {
-                                           return missingLocationsMessage;
-                                       }
-
-                                       return (
-                                           <Redirect to={locationURL(locations[0].id)} />
-                                       );
-                                   }} />
-                            <Route path="/admin/location/:locationId"
-                                   render={({match: {params: {locationId}}}) => {
-                                       if (locations.length) {
-                                           if (locationId) {
-                                               return <AdminLocationRooms locationId={parseInt(locationId, 10)} />;
-                                           } else {
-                                               return <Redirect to={locationURL(locations[0].id)} />;
-                                           }
+                        <Route exact path="/admin"
+                               render={() => <Translate>General settings</Translate>} />
+                        <Route exact path="/admin/equipment-types"
+                               render={() => <Translate>Equipment Types</Translate>} />
+                        <Route path="/admin/location/:locationId"
+                               render={({match: {params: {locationId}}}) => {
+                                   if (locations.length) {
+                                       if (locationId) {
+                                           return <AdminLocationRooms locationId={parseInt(locationId, 10)} />;
                                        } else {
-                                           return missingLocationsMessage;
+                                           return <Redirect to={locationURL(locations[0].id)} />;
                                        }
-                                   }} />
-                            <Route exact path="/admin/equipment-types"
-                                   render={() => (
-                                       <div>
-                                           <Translate>
-                                               Equipment Types
-                                           </Translate>
-                                       </div>
-                                   )} />
-                        </>
+                                   } else {
+                                       return missingLocationsMessage;
+                                   }
+                               }} />
                     </Grid.Column>
                 </Grid>
             </Container>

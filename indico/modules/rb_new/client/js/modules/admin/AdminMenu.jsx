@@ -62,6 +62,16 @@ function AdminMenu({locations, isFetchingLocations, actions: {clearTextFilter}})
     return (
         <Menu size="large" styleName="admin-menu" vertical>
             <Menu.Item>
+                <NavLink exact to="/admin">
+                    <Translate>General settings</Translate>
+                </NavLink>
+            </Menu.Item>
+            <Menu.Item>
+                <NavLink exact to="/admin/equipment-types">
+                    <Translate>Equipment types</Translate>
+                </NavLink>
+            </Menu.Item>
+            <Menu.Item>
                 <Menu.Header styleName="locations-header">
                     <Translate>Locations</Translate>
                     <Icon name="setting" />
@@ -69,28 +79,16 @@ function AdminMenu({locations, isFetchingLocations, actions: {clearTextFilter}})
                 {hasLocations && (
                     <Menu.Menu>
                         {locations.map((location) => (
-                            <NavLink key={location.id}
-                                     to={locationURL(location.id)}
-                                     onClick={clearTextFilter}>
-                                <Menu.Item>
+                            <Menu.Item key={location.id}>
+                                <NavLink to={locationURL(location.id)}
+                                         onClick={clearTextFilter}
+                                         exact>
                                     {location.name}
-                                </Menu.Item>
-                            </NavLink>
+                                </NavLink>
+                            </Menu.Item>
                         ))}
                     </Menu.Menu>
                 )}
-            </Menu.Item>
-            <Menu.Item>
-                <Menu.Header>
-                    <Translate>General Settings</Translate>
-                </Menu.Header>
-                <Menu.Menu>
-                    <NavLink to="/admin/equipment-types">
-                        <Menu.Item>
-                            <Translate>Equipment types</Translate>
-                        </Menu.Item>
-                    </NavLink>
-                </Menu.Menu>
             </Menu.Item>
         </Menu>
     );
