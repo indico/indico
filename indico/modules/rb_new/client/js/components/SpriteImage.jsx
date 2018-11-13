@@ -69,10 +69,6 @@ class SpriteImage extends React.Component {
         });
     }
 
-    componentDidUpdate() {
-
-    }
-
     render() {
         const {pos, width, height, styles, roomsSpriteToken, fillVertical} = this.props;
         const {contWidth, contHeight} = this.state;
