@@ -20,12 +20,11 @@ import PropTypes from 'prop-types';
 import {Route} from 'react-router-dom';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
-import {Container, Grid, Message} from 'semantic-ui-react';
+import {Container, Grid} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
 import {selectors as userSelectors} from '../../common/user';
 import AdminMenu from './AdminMenu';
 import AdminLocationRooms from './AdminLocationRooms';
-import * as adminSelectors from './selectors';
 import * as adminActions from './actions';
 
 import './AdminArea.module.scss';
@@ -33,7 +32,6 @@ import './AdminArea.module.scss';
 
 class AdminArea extends React.Component {
     static propTypes = {
-        locations: PropTypes.array.isRequired,
         isAdmin: PropTypes.bool.isRequired,
         actions: PropTypes.exact({
             fetchLocations: PropTypes.func.isRequired,
@@ -47,19 +45,10 @@ class AdminArea extends React.Component {
 
     render() {
         const {isAdmin} = this.props;
-        const {locations} = this.props;
 
         if (!isAdmin) {
             return null;
         }
-
-        const missingLocationsMessage = (
-            <Message info>
-                <Translate>
-                    There are no locations defined.
-                </Translate>
-            </Message>
-        );
 
         return (
             <Container styleName="admin-area">
@@ -72,14 +61,10 @@ class AdminArea extends React.Component {
                                render={() => <Translate>General settings</Translate>} />
                         <Route exact path="/admin/equipment-types"
                                render={() => <Translate>Equipment Types</Translate>} />
-                        <Route path="/admin/location/:locationId"
-                               render={({match: {params: {locationId}}}) => {
-                                   if (locations.length) {
-                                       return <AdminLocationRooms locationId={parseInt(locationId, 10)} />;
-                                   } else {
-                                       return missingLocationsMessage;
-                                   }
-                               }} />
+                        <Route exact path="/admin/location/:locationId"
+                               render={({match: {params: {locationId}}}) => (
+                                   <AdminLocationRooms locationId={parseInt(locationId, 10)} />
+                               )} />
                     </Grid.Column>
                 </Grid>
             </Container>
@@ -89,7 +74,6 @@ class AdminArea extends React.Component {
 
 export default connect(
     state => ({
-        locations: adminSelectors.getAllLocations(state),
         isAdmin: userSelectors.isUserAdmin(state),
     }),
     dispatch => ({
