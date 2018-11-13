@@ -17,23 +17,19 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import {connect} from 'react-redux';
 import {Button, Item} from 'semantic-ui-react';
-import roomsSpriteURL from 'indico-url:rooms_new.sprite';
 import SpriteImage from '../../components/SpriteImage';
-import {selectors as configSelectors} from '../../common/config';
 
 import './AdminRoomItem.module.scss';
 
 
-function AdminRoomItem({roomsSpriteToken, room}) {
+export default function AdminRoomItem({room}) {
     return (
         <Item key={room.id} styleName="room-item">
             <Item.Image size="small" styleName="room-item-image">
-                <SpriteImage src={roomsSpriteURL({version: roomsSpriteToken})}
-                             pos={room.spritePosition}
-                             origin="0 0"
-                             scale="0.5" />
+                <SpriteImage pos={room.spritePosition}
+                             width="100%"
+                             height="100%" />
             </Item.Image>
             <Item.Content>
                 <Item.Header styleName="room-item-header">
@@ -53,12 +49,5 @@ function AdminRoomItem({roomsSpriteToken, room}) {
 }
 
 AdminRoomItem.propTypes = {
-    roomsSpriteToken: PropTypes.string.isRequired,
     room: PropTypes.object.isRequired,
 };
-
-export default connect(
-    state => ({
-        roomsSpriteToken: configSelectors.getRoomsSpriteToken(state),
-    }),
-)(AdminRoomItem);
