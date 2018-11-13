@@ -74,7 +74,7 @@ class SpriteImage extends React.Component {
         const {contWidth, contHeight} = this.state;
 
         const imgStyle = {
-            backgroundImage: `url(${roomsSpriteURL({token: roomsSpriteToken})})`,
+            backgroundImage: `url(${roomsSpriteURL({version: roomsSpriteToken})})`,
             backgroundPosition: `${DEFAULT_WIDTH * pos}px 0`,
             width: DEFAULT_WIDTH,
             height: DEFAULT_HEIGHT,
