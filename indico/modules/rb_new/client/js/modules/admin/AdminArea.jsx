@@ -17,7 +17,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Redirect, Route} from 'react-router-dom';
+import {Route} from 'react-router-dom';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import {Container, Grid, Message} from 'semantic-ui-react';
@@ -53,7 +53,6 @@ class AdminArea extends React.Component {
             return null;
         }
 
-        const locationURL = (locationId) => `/admin/location/${locationId}`;
         const missingLocationsMessage = (
             <Message info>
                 <Translate>
@@ -76,11 +75,7 @@ class AdminArea extends React.Component {
                         <Route path="/admin/location/:locationId"
                                render={({match: {params: {locationId}}}) => {
                                    if (locations.length) {
-                                       if (locationId) {
-                                           return <AdminLocationRooms locationId={parseInt(locationId, 10)} />;
-                                       } else {
-                                           return <Redirect to={locationURL(locations[0].id)} />;
-                                       }
+                                       return <AdminLocationRooms locationId={parseInt(locationId, 10)} />;
                                    } else {
                                        return missingLocationsMessage;
                                    }
