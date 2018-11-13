@@ -102,6 +102,7 @@ def create_event(category, event_type, data, add_creator_as_manager=True, featur
         room_id = data['location_data'].pop('room_id', None)
         if room_id:
             create_booking_for_event(room_id, event)
+            db.session.flush()
     return event
 
 

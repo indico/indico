@@ -234,8 +234,10 @@ def check_room_available(room, start_dt, end_dt):
 def create_booking_for_event(room_id, event):
     try:
         room = Room.get_one(room_id)
-        data = dict(start_dt=event.start_dt, end_dt=event.end_dt, booked_for_user=event.creator,
-                    booking_reason=event.title, repeat_frequency=RepeatFrequency.NEVER, event_id=event.id)
+        start_dt = event.start_dt.replace(tzinfo=None)
+        end_dt = event.end_dt.replace(tzinfo=None)
+        data = dict(start_dt=start_dt, end_dt=end_dt, booked_for_user=event.creator, booking_reason=event.title,
+                    repeat_frequency=RepeatFrequency.NEVER, event_id=event.id)
         resv = Reservation.create_from_data(room, data, session.user)
         db.session.flush()
     except NoReportError as e:
