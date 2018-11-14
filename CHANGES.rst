@@ -25,8 +25,6 @@ Improvements
 - Support markdown in survey questions (:issue:`3366`)
 - Improve event list in case of long event titles (:issue:`3607`,
   thanks :user:`nop33`)
-- Do not show border after last item in badge designer toolbar
-  (:issue:`3607`, thanks :user:`nop33`)
 
 Bugfixes
 ^^^^^^^^
@@ -34,6 +32,8 @@ Bugfixes
 - Fix incorrect order of session blocks inside timetable (:issue:`2999`)
 - Add missing email validation to contribution CSV import (:issue:`3568`,
   thanks :user:`Kush22`)
+- Do not show border after last item in badge designer toolbar
+  (:issue:`3607`, thanks :user:`nop33`)
 - Correctly align centered footer links (:issue:`3599`, thanks :user:`nop33`)
 
 Internal Changes
