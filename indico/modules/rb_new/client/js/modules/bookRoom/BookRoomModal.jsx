@@ -35,6 +35,8 @@ import * as actions from './actions';
 import {actions as modalActions} from '../../modals';
 import {selectors as userSelectors} from '../../common/user';
 
+import './BookRoomModal.module.scss';
+
 
 function validate({usage, user, reason}) {
     const errors = {};
@@ -267,6 +269,26 @@ class BookRoomModal extends React.Component {
         this.setState({bookingConflictsVisible: false});
     };
 
+    renderPrebookingMessage() {
+        const wrapper = <strong styleName="pre-booking-color" />;
+        return (
+            <Message icon>
+                <Icon name="warning circle" />
+                <Message.Content>
+                    <Message.Header>
+                        <Translate>
+                            You are creating a <Param name="highlight" wrapper={wrapper}>Pre-Booking</Param>
+                        </Translate>
+                    </Message.Header>
+                    <Translate>
+                        A Pre-Booking has to be approved by the room managers before you
+                        can use the room.
+                    </Translate>
+                </Message.Content>
+            </Message>
+        );
+    }
+
     render() {
         const {
             bookingData: {recurrence, dates, timeSlot},
@@ -295,7 +317,11 @@ class BookRoomModal extends React.Component {
         const renderModalContent = (fprops) => (
             <>
                 <Modal.Header>
-                    <Translate>Book a Room</Translate>
+                    {isDirectlyBookable ? (
+                        <Translate>Book a Room</Translate>
+                    ) : (
+                        <Translate>Pre-book Room</Translate>
+                    )}
                 </Modal.Header>
                 <Modal.Content>
                     <Grid>
@@ -310,6 +336,7 @@ class BookRoomModal extends React.Component {
                             </Overridable>
                         </Grid.Column>
                         <Grid.Column width={8}>
+                            {!isDirectlyBookable && this.renderPrebookingMessage()}
                             <Segment inverted color="blue">
                                 <Form inverted id="book-room-form" onSubmit={fprops.handleSubmit}>
                                     <h2><Icon name="user" />Usage</h2>
