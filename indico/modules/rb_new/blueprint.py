@@ -101,6 +101,16 @@ _bp.add_url_rule('/api/admin/features/<int:feature_id>', 'admin_features', admin
 _bp.add_url_rule('/api/admin/attributes', 'admin_attributes', admin.RHAttributes, methods=('GET', 'POST'))
 _bp.add_url_rule('/api/admin/attributes/<int:attribute_id>', 'admin_attributes', admin.RHAttributes,
                  methods=('GET', 'DELETE', 'PATCH'))
+_bp.add_url_rule('/api/admin/rooms/<int:room_id>', 'admin_room', admin.RHRoom)
+_bp.add_url_rule('/api/admin/rooms/<int:room_id>', 'admin_update_room', admin.RHRoomUpdate, methods=('PATCH',))
+_bp.add_url_rule('/api/admin/rooms/<int:room_id>/equipment', 'admin_room_equipment', admin.RHRoomEquipment)
+_bp.add_url_rule('/api/admin/rooms/<int:room_id>/equipment', 'admin_update_room_equipment', admin.RHRoomEquipmentUpdate,
+                 methods=('POST',))
+_bp.add_url_rule('/api/admin/rooms/<int:room_id>/attributes', 'admin_room_attributes', admin.RHRoomAttributes)
+_bp.add_url_rule('/api/admin/rooms/<int:room_id>/attributes', 'admin_update_room_attributes',
+                 admin.RHRoomAttributesUpdate, methods=('POST',))
+_bp.add_url_rule('/api/admin/rooms/<int:room_id>/image', 'admin_room_image', admin.RHRoomImage)
+
 
 # Event linking
 _bp.add_url_rule('!/event/<confId>/manage/rooms/', 'event_booking_list', event.RHEventBookingList)

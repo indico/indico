@@ -104,8 +104,8 @@ export function fetchAttributes(id) {
     };
 }
 
-export function updateRoom(roomId, formData) {
-
+export function updateRoom() {
+    return null;
 }
 
 export const openRoomDetails = (roomId) => modalActions.openModal('room-details', roomId);

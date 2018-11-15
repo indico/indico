@@ -29,7 +29,7 @@ from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.rb.models.blocked_rooms import BlockedRoom, BlockedRoomState
 from indico.modules.rb.models.blocking_principals import BlockingPrincipal
 from indico.modules.rb.models.blockings import Blocking
-from indico.modules.rb.models.equipment import EquipmentType
+from indico.modules.rb.models.equipment import EquipmentType, RoomEquipmentAssociation
 from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.map_areas import MapArea
 from indico.modules.rb.models.reservation_edit_logs import ReservationEditLog
@@ -55,6 +55,20 @@ class RoomAttributeValuesSchema(mm.ModelSchema):
         fields = ('value', 'title')
 
 
+class AdminRoomAttributesSchema(mm.ModelSchema):
+    attribute_object = {'attribute.name': 'attribute.value'}
+
+    class Meta:
+        model = RoomAttributeAssociation
+        fields = ('attribute_object', )
+
+
+class AttributesSchema(mm.ModelSchema):
+    class Meta:
+        model = RoomAttribute
+        fields = ('name', 'title', 'is_required', 'is_hidden')
+
+
 class RoomSchema(mm.ModelSchema):
     owner_name = String(attribute='owner.full_name')
 
@@ -70,6 +84,12 @@ class RoomUpdateSchema(RoomSchema):
     class Meta(RoomSchema.Meta):
         fields = RoomSchema.Meta.fields + ('notification_before_days', 'notification_before_days_weekly',
                                            'notification_before_days_monthly')
+
+
+class RoomEquipmentSchema(mm.ModelSchema):
+    class Meta:
+        model = Room
+        fields = ('available_equipment',)
 
 
 class MapAreaSchema(mm.ModelSchema):
@@ -332,10 +352,14 @@ class RoomAttributeSchema(mm.ModelSchema):
         fields = ('id', 'name', 'title', 'hidden')
 
 
+attributes_schema = AttributesSchema(many=True)
 rb_user_schema = RBUserSchema()
 rooms_schema = RoomSchema(many=True)
 room_attribute_values_schema = RoomAttributeValuesSchema(many=True)
 room_update_schema = RoomUpdateSchema()
+
+room_equipment_schema = RoomEquipmentSchema()
+admin_room_attributes_schema = AdminRoomAttributesSchema(many=True)
 map_areas_schema = MapAreaSchema(many=True)
 reservation_occurrences_schema = ReservationOccurrenceSchema(many=True)
 reservation_occurrences_schema_with_permissions = ReservationOccurrenceSchemaWithPermissions(many=True)

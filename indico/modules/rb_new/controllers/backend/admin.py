@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 from flask import jsonify, request, session
 from marshmallow import fields, validate
 from sqlalchemy.orm import joinedload
-from webargs.flaskparser import abort, use_kwargs
+from webargs.flaskparser import abort, use_kwargs, use_args
 from werkzeug.exceptions import Forbidden
 
 from indico.core.db import db
@@ -29,8 +29,10 @@ from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.room_attributes import RoomAttribute, RoomAttributeAssociation
 from indico.modules.rb.models.room_features import RoomFeature
 from indico.modules.rb.util import rb_is_admin
+from indico.modules.rb_new.controllers.backend.common import room_args
+from indico.modules.rb_new.operations.admin import update_room, update_room_equipment
 from indico.modules.rb_new.schemas import (admin_equipment_type_schema, admin_locations_schema, room_attribute_schema,
-                                           room_feature_schema)
+                                           room_feature_schema, room_update_schema)
 from indico.util.i18n import _
 from indico.util.marshmallow import ModelList
 
@@ -252,3 +254,65 @@ class RHAttributes(RHRoomBookingAdminBase):
             query = query.filter(RoomAttribute.id != self.attribute.id)
         if query.has_rows():
             abort(422, messages={'name': [_('Name must be unique')]})
+
+class RHRoomAdminBase(RHRoomBookingBase):
+    def _process_args(self):
+        self.room = Room.get_one(request.view_args['room_id'])
+
+
+# Returns all currently existing room attributes
+class RHRoomAttributesAll(RHRoomBookingBase):
+    def _process_args(self):
+        attributes = RoomAttribute.query.all()
+        return jsonify(attributes_schema.dump(attributes).data)
+
+
+class RHRoomAttributes(RHRoomAdminBase):
+    def _process(self):
+        return jsonify(get_room_attributes(self.room.id))
+
+
+class RHRoomAttributesUpdate(RHRoomAdminBase):
+    def _process(self):
+        return ""
+
+
+class RHRoomEquipment(RHRoomAdminBase):
+    def _process(self):
+        return jsonify(room_equipment_schema.dump(self.room).data)
+
+
+class RHRoomEquipmentUpdate(RHRoomAdminBase):
+    def _check_access(self):
+        RHRoomAdminBase._check_access(self)
+        if not rb_is_admin(session.user):
+            raise Forbidden
+
+    @use_args({
+        'available_equipment': fields.List(fields.Int(), required=True)
+    })
+    def _process(self, args):
+        update_room_equipment(self.room, args)
+        return jsonify(room_update_schema.dump(self.room, many=False).data)
+
+
+class RHRoomImage(RHRoomAdminBase):
+    def _process(self):
+        return ""
+
+
+class RHRoom(RHRoomAdminBase):
+    def _process(self):
+        return jsonify(room_update_schema.dump(self.room).data)
+
+
+class RHRoomUpdate(RHRoomAdminBase):
+    def _check_access(self):
+        RHRoomAdminBase._check_access(self)
+        if not rb_is_admin(session.user):
+            raise Forbidden
+
+    @use_args(room_args)
+    def _process(self, args):
+        update_room(self.room, args)
+        return jsonify(room_update_schema.dump(self.room, many=False).data)

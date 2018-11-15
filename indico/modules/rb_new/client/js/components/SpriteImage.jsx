@@ -20,6 +20,7 @@ import roomsSpriteURL from 'indico-url:rooms_new.sprite';
 import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
+
 import * as configSelectors from '../common/config/selectors';
 
 
@@ -96,7 +97,6 @@ class SpriteImage extends React.Component {
                 transform: `translateY(${-((DEFAULT_HEIGHT * scale) - contHeight) / 2}px) scale(${scale})`
             });
         }
-
         const containerStyle = {
             overflow: 'hidden',
             width,

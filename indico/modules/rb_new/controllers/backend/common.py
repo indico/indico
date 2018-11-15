@@ -16,14 +16,24 @@
 
 from __future__ import unicode_literals
 
+from marshmallow import fields as mmfields
 from marshmallow_enum import EnumField
 from webargs import fields
 
 from indico.legacy.common.cache import GenericCache
 from indico.modules.rb.models.reservations import RepeatFrequency
+from indico.modules.users import User
 
 
 _cache = GenericCache('Rooms')
+
+
+class UserField(mmfields.Field):
+    def _deserialize(self, value, attr, data, **kwargs):
+        print value
+        user = User.get(value, is_deleted=False)
+        print user
+        return user
 
 
 search_room_args = {
@@ -63,13 +73,12 @@ room_args = {
     'notification_before_monthly': fields.Int(validate=lambda x: 1 <= x <= 30),
     'notifications_enabled': fields.Bool(missing=True),
     'booking_limit_days': fields.Int(validate=lambda x: x >= 1),
-    'owner_id': fields.Int(validate=lambda x: x >= 0),
+    'owner': UserField(load_from='owner_id', validate=lambda x: x is not None),
     'key_location': fields.Str(),
     'telephone': fields.Str(),
-    'capacity': fields.Int(validate=lambda x: x >= 1),
+    'capacity': fields.Int(required=True, validate=lambda x: x >= 1),
     'division': fields.Str(),
     'surface_area': fields.Int(validate=lambda x: x >= 0),
     'max_advance_days': fields.Int(validate=lambda x: x >= 1),
     'comments': fields.Str(),
-    'available_equipment': fields.List(fields.Int()),
 }

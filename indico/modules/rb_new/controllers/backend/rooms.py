@@ -26,7 +26,6 @@ from webargs.flaskparser import use_args, use_kwargs
 from werkzeug.exceptions import NotFound, UnprocessableEntity
 
 from indico.core.db import db
-from indico.modules.rb import rb_is_admin
 from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.models.favorites import favorite_room_table
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
