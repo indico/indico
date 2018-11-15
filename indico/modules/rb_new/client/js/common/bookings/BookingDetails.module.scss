@@ -17,19 +17,23 @@
 
 @import 'rb_new:styles/palette';
 
-:global(.ui.modal .header).booking-modal-header {
-    display: flex;
-
-    .header-text {
-        flex: 1;
-        align-self: center;
-    }
-
-    .booking-status {
-        flex: 4;
-    }
+:global(.ui.icon.message).message-icon :global(.icon) {
+    font-size: 2em;
 }
 
-.rejection-form {
-    width: 350px;
+.popup-center {
+    text-align: center;
+}
+
+.log-list {
+    max-height: 140px;
+    overflow: auto;
+}
+
+.log-date {
+    color: $sui-grey;
+}
+
+.booking-logs {
+    margin-top: 20px;
 }

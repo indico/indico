@@ -15,24 +15,17 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import moment from 'moment';
 import React from 'react';
 import PropTypes from 'prop-types';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import {Form as FinalForm, Field} from 'react-final-form';
-import {Button, Confirm, Modal, Message, Form, Grid, Header, Icon, Label, Popup, List, TextArea} from 'semantic-ui-react';
+import {Button, Confirm, Modal, Form, Icon, Label, Popup, TextArea} from 'semantic-ui-react';
 import {Param, Translate} from 'indico/react/i18n';
-import {toMoment, serializeDate} from 'indico/utils/date';
 import {ReduxFormField, formatters, validators} from 'indico/react/forms';
-import TimeInformation from '../../components/TimeInformation';
-import RoomBasicDetails from '../../components/RoomBasicDetails';
-import RoomKeyLocation from '../../components/RoomKeyLocation';
-import BookingEventLink from './BookingEventLink';
+import BookingDetails from './BookingDetails';
 import * as bookingsSelectors from './selectors';
 import * as bookRoomActions from './actions';
-import {DailyTimelineContent, TimelineLegend} from '../timeline';
-import {PopupParam} from '../../util';
 
 import './BookingDetailsModal.module.scss';
 
@@ -41,7 +34,6 @@ class BookingDetailsModal extends React.Component {
     static propTypes = {
         booking: PropTypes.object.isRequired,
         bookingStateChangeInProgress: PropTypes.bool.isRequired,
-        bookingId: PropTypes.number.isRequired,
         onClose: PropTypes.func,
         actions: PropTypes.exact({
             changeBookingState: PropTypes.func.isRequired,
@@ -50,128 +42,19 @@ class BookingDetailsModal extends React.Component {
     };
 
     static defaultProps = {
-        onClose: () => {}
+        onClose: () => {},
     };
 
     state = {
-        occurrencesVisible: false,
         actionInProgress: null,
         activeConfirmation: null,
+        mode: 'view',
     };
 
     handleCloseModal = () => {
         const {onClose} = this.props;
         onClose();
     };
-
-    getRecurrence = (repetition) => {
-        const repeatFrequency = repetition[0];
-        const repeatInterval = repetition[1];
-        let type = 'single';
-        let number = null;
-        let interval = null;
-        if (repeatFrequency === 1) {
-            type = 'daily';
-        } else if (repeatFrequency === 2) {
-            type = 'every';
-            interval = 'week';
-            number = repeatInterval;
-        } else if (repeatFrequency === 3) {
-            type = 'every';
-            interval = 'month';
-            number = repeatInterval;
-        }
-        return ({type, number, interval});
-    };
-
-    _getRowSerializer(day) {
-        const {booking: {room}} = this.props;
-        return (occurrences) => ({
-            availability: {
-                bookings: occurrences[day].map((candidate) => ({...candidate, bookable: false})) || [],
-            },
-            label: moment(day).format('L'),
-            key: day,
-            room
-        });
-    }
-
-    showOccurrences = () => {
-        this.setState({occurrencesVisible: true});
-    };
-
-    hideOccurrences = () => {
-        this.setState({occurrencesVisible: false});
-    };
-
-    renderTimeline = (occurrences, dateRange) => {
-        const rows = dateRange.map((day) => this._getRowSerializer(day)(occurrences));
-        return (
-            <DailyTimelineContent rows={rows}
-                                  fixedHeight={rows.length > 1 ? '70vh' : null} />
-        );
-    };
-
-    renderBookingHistory = (editLogs, createdOn, createdByUser) => {
-        if (createdByUser) {
-            const {fullName: createdBy} = createdByUser;
-            editLogs = [...editLogs, {
-                id: 'created',
-                timestamp: createdOn,
-                info: ['Booking created'],
-                userName: createdBy
-            }];
-        }
-        const items = editLogs.map((log) => {
-            const {id, timestamp, info, userName} = log;
-            const basicInfo = <strong>{info[0]}</strong>;
-            const details = (info[1] ? info[1] : null);
-            const logDate = serializeDate(toMoment(timestamp), 'L');
-            const popupContent = <span styleName="popup-center">{details}</span>;
-            const wrapper = (details ? <PopupParam content={popupContent} /> : <span />);
-            return (
-                <List.Item key={id}>
-                    <Translate>
-                        <Param name="date" value={logDate} wrapper={<span styleName="log-date" />} />
-                        {' - '}
-                        <Param name="info" wrapper={wrapper} value={basicInfo} /> by
-                        {' '}
-                        <Param name="user" value={userName} />
-                    </Translate>
-                </List.Item>
-            );
-        });
-        return !!items.length && (
-            <div styleName="booking-logs">
-                <Header><Translate>Booking history</Translate></Header>
-                <List divided styleName="log-list">{items}</List>
-            </div>
-        );
-    };
-
-    renderBookedFor = (bookedForUser) => {
-        const {fullName: bookedForName, email: bookedForEmail, phone: bookedForPhone} = bookedForUser;
-        return (
-            <>
-                <Header><Icon name="user" /><Translate>Booked for</Translate></Header>
-                <div>{bookedForName}</div>
-                {bookedForPhone && <div><Icon name="phone" />{bookedForPhone}</div>}
-                {bookedForEmail && <div><Icon name="mail" />{bookedForEmail}</div>}
-            </>
-        );
-    };
-
-    renderReason = (reason) => (
-        <Message info icon styleName="message-icon">
-            <Icon name="info" />
-            <Message.Content>
-                <Message.Header>
-                    <Translate>Booking reason</Translate>
-                </Message.Header>
-                {reason}
-            </Message.Content>
-        </Message>
-    );
 
     renderActionButtons = (canCancel, canReject, showAccept) => {
         const {bookingStateChangeInProgress} = this.props;
@@ -350,23 +233,23 @@ class BookingDetailsModal extends React.Component {
         );
     };
 
+    renderEditButton = () => {
+        const {bookingStateChangeInProgress} = this.props;
+        return (
+            <Button icon="pencil"
+                    onClick={() => this.setState({mode: 'edit'})}
+                    disabled={bookingStateChangeInProgress}
+                    circular />
+        );
+    };
+
     render() {
-        const {
-            bookingStateChangeInProgress,
-            booking: {
-                room, bookedForUser, startDt, endDt, repetition, createdByUser, createdDt, bookingReason,
-                occurrences, dateRange, editLogs, canAccept, canCancel, canDelete, canModify, canReject, isCancelled,
-                isRejected, isAccepted, isLinkedToEvent
-            },
-            bookingId
-        } = this.props;
-        const {occurrencesVisible} = this.state;
-        const dates = {startDate: startDt, endDate: endDt};
-        const times = {startTime: moment(startDt).format('HH:mm'), endTime: moment(endDt).format('HH:mm')};
-        const recurrence = this.getRecurrence(repetition);
-        const legendLabels = [{label: Translate.string('Occurrence'), color: 'orange'}];
+        const {booking} = this.props;
+        const {canAccept, canCancel, canDelete, canModify, canReject, isCancelled, isRejected, isAccepted} = booking;
+        const {mode} = this.state;
         const showAccept = canAccept && !isAccepted;
         const showActionButtons = (!isCancelled && !isRejected && (canCancel || canReject || showAccept));
+        const isBeingEdited = mode === 'edit';
 
         return (
             <Modal open onClose={this.handleCloseModal} size="large" closeIcon>
@@ -378,43 +261,18 @@ class BookingDetailsModal extends React.Component {
                         {this.renderBookingStatus()}
                     </span>
                     <span>
-                        {canModify && <Button icon="pencil" disabled={bookingStateChangeInProgress} circular />}
+                        {canModify && this.renderEditButton()}
                         {canDelete && this.renderDeleteButton()}
                     </span>
                 </Modal.Header>
                 <Modal.Content>
-                    <Grid columns={2}>
-                        <Grid.Column>
-                            <RoomBasicDetails room={room} />
-                            <RoomKeyLocation room={room} />
-                            <TimeInformation recurrence={recurrence}
-                                             dates={dates}
-                                             timeSlot={times}
-                                             onClickOccurrences={this.showOccurrences}
-                                             occurrenceCount={dateRange.length} />
-                        </Grid.Column>
-                        <Grid.Column>
-                            {bookedForUser && this.renderBookedFor(bookedForUser)}
-                            {this.renderReason(bookingReason)}
-                            {isLinkedToEvent && <BookingEventLink bookingId={bookingId} />}
-                            {this.renderBookingHistory(editLogs, createdDt, createdByUser)}
-                        </Grid.Column>
-                    </Grid>
+                    {isBeingEdited ? (
+                        <></>
+                    ) : (
+                        <BookingDetails booking={booking} />
+                    )}
                 </Modal.Content>
                 {showActionButtons && this.renderActionButtons(canCancel, canReject, showAccept)}
-                <Modal open={occurrencesVisible}
-                       onClose={this.hideOccurrences}
-                       size="large"
-                       closeIcon>
-                    <Modal.Header className="legend-header">
-                        <Translate>Occurrences</Translate>
-                        <Popup trigger={<Icon name="info circle" className="legend-info-icon" />}
-                               content={<TimelineLegend labels={legendLabels} compact />} />
-                    </Modal.Header>
-                    <Modal.Content>
-                        {this.renderTimeline(occurrences, dateRange)}
-                    </Modal.Content>
-                </Modal>
             </Modal>
         );
     }
