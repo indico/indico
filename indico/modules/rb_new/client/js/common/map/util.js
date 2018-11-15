@@ -84,34 +84,44 @@ export function formatLatLon(lat, lon) {
 export function withHoverListener(RoomComponent) {
     const refCache = {};
 
-    const RoomHoverWrapper = ({hoveredRoomId, actions, room}) => {
-        if (!refCache[room.id]) {
-            refCache[room.id] = React.createRef();
+    class RoomHoverWrapper extends React.Component {
+        static propTypes = {
+            hoveredRoomId: PropTypes.number,
+            actions: PropTypes.object.isRequired,
+            room: PropTypes.object.isRequired,
+        };
+
+        static defaultProps = {
+            hoveredRoomId: null,
+        };
+
+        shouldComponentUpdate({hoveredRoomId: newId, room: {id}}) {
+            const {hoveredRoomId: currentId} = this.props;
+            // we only want to update the room that was previously hovered
+            // as well as that which is now hovered (if any)
+            return newId === id || currentId === id;
         }
-        return React.createElement(RoomComponent, {
-            room,
-            onMouseEnter: () => {
-                if (room.id !== hoveredRoomId) {
-                    actions.setRoomHover(room.id);
-                }
-            },
-            onMouseLeave: () => {
-                if (hoveredRoomId !== null) {
-                    actions.setRoomHover(null);
-                }
+
+        render() {
+            const {hoveredRoomId, actions, room} = this.props;
+            if (!refCache[room.id]) {
+                refCache[room.id] = React.createRef();
             }
-        });
-    };
-
-    RoomHoverWrapper.propTypes = {
-        hoveredRoomId: PropTypes.number,
-        actions: PropTypes.object.isRequired,
-        room: PropTypes.object.isRequired,
-    };
-
-    RoomHoverWrapper.defaultProps = {
-        hoveredRoomId: null,
-    };
+            return React.createElement(RoomComponent, {
+                room,
+                onMouseEnter: () => {
+                    if (room.id !== hoveredRoomId) {
+                        actions.setRoomHover(room.id);
+                    }
+                },
+                onMouseLeave: () => {
+                    if (hoveredRoomId !== null) {
+                        actions.setRoomHover(null);
+                    }
+                }
+            });
+        }
+    }
 
     return connect(
         state => ({
