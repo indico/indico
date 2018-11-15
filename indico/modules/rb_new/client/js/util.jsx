@@ -186,3 +186,22 @@ export function renderRecurrence({type, number, interval}) {
         );
     }
 }
+
+export function getRecurrenceInfo(repetition) {
+    const [repeatFrequency, repeatInterval] = repetition;
+    let type = 'single';
+    let number = '1';
+    let interval = 'week';
+    if (repeatFrequency === 1) {
+        type = 'daily';
+    } else if (repeatFrequency === 2) {
+        type = 'every';
+        interval = 'week';
+        number = repeatInterval;
+    } else if (repeatFrequency === 3) {
+        type = 'every';
+        interval = 'month';
+        number = repeatInterval;
+    }
+    return {type, number, interval};
+}
