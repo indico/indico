@@ -17,7 +17,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Form, Label} from 'semantic-ui-react';
+import {Form, Label, Dropdown} from 'semantic-ui-react';
 
 
 export function ReduxFormField(
@@ -96,4 +96,19 @@ export function ReduxRadioField({input, input: {value}, radioValue, ...props}) {
 ReduxRadioField.propTypes = {
     input: PropTypes.object.isRequired,
     radioValue: PropTypes.string.isRequired
+};
+
+export function ReduxDropdownField({input, ...props}) {
+    return (
+        <ReduxFormField input={input}
+                        {...props}
+                        as={Dropdown}
+                        onChange={(__, {value}) => {
+                            input.onChange(value);
+                        }} />
+    );
+}
+
+ReduxDropdownField.propTypes = {
+    input: PropTypes.object.isRequired,
 };

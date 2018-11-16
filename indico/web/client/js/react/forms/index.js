@@ -16,6 +16,6 @@
  */
 
 export {handleSubmissionError} from './errors';
-export {ReduxFormField, ReduxRadioField} from './fields';
+export {ReduxFormField, ReduxRadioField, ReduxDropdownField} from './fields';
 export {default as validators} from './validators';
 export {default as formatters} from './formatters';
