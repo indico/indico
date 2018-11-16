@@ -22,7 +22,7 @@ import {Form, Label} from 'semantic-ui-react';
 
 export function ReduxFormField(
     {
-        input, label, placeholder, required, children, disabled, componentLabel, defaultValue,
+        input, label, placeholder, required, children, disabled, componentLabel, defaultValue, fieldProps,
         meta: {touched, error, submitError, submitting, dirty, dirtySinceLastSubmit},
         as: Component,
         ...props
@@ -42,7 +42,7 @@ export function ReduxFormField(
     }
 
     return (
-        <Form.Field required={required} error={!!errorLabel} defaultValue={defaultValue}>
+        <Form.Field required={required} error={!!errorLabel} defaultValue={defaultValue} {...fieldProps}>
             {label && <label>{label}</label>}
             <Component {...input}
                        {...props}
@@ -66,6 +66,7 @@ ReduxFormField.propTypes = {
     as: PropTypes.oneOfType([PropTypes.string, PropTypes.object, PropTypes.func]).isRequired,
     children: PropTypes.node,
     defaultValue: PropTypes.any,
+    fieldProps: PropTypes.object,
 };
 
 ReduxFormField.defaultProps = {
@@ -76,6 +77,7 @@ ReduxFormField.defaultProps = {
     componentLabel: null,
     children: null,
     defaultValue: null,
+    fieldProps: {},
 };
 
 export function ReduxRadioField({input, input: {value}, radioValue, ...props}) {
