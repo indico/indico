@@ -156,7 +156,7 @@ function dispatcher(dispatch, actions, data = {}) {
         actions.forEach(action => {
             dispatch({type: action, ...data});
         });
-    } else {
+    } else if (actions) {
         dispatch({type: actions, ...data});
     }
 }
