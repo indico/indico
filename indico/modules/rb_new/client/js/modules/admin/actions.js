@@ -93,3 +93,10 @@ export function updateEquipmentType(id, data) {
         null, EQUIPMENT_TYPE_RECEIVED
     );
 }
+
+export function createEquipmentType(data) {
+    return submitFormAction(
+        () => indicoAxios.post(equipmentTypesURL(), data),
+        null, EQUIPMENT_TYPE_RECEIVED
+    );
+}

@@ -32,13 +32,26 @@ import './AdminEquipmentTypes.module.scss';
 
 class EquipmentType extends React.PureComponent {
     static propTypes = {
-        id: PropTypes.number.isRequired,
-        name: PropTypes.string.isRequired,
-        features: PropTypes.array.isRequired,
+        isNew: PropTypes.bool,
+        id: PropTypes.number,
+        name: PropTypes.string,
+        features: PropTypes.array,
+        numRooms: PropTypes.number,
         availableFeatures: PropTypes.array.isRequired,
-        numRooms: PropTypes.number.isRequired,
-        deleteEquipmentType: PropTypes.func.isRequired,
-        updateEquipmentType: PropTypes.func.isRequired,
+        deleteEquipmentType: PropTypes.func,
+        updateEquipmentType: PropTypes.func,
+        createEquipmentType: PropTypes.func,
+    };
+
+    static defaultProps = {
+        isNew: false,
+        id: null,
+        name: undefined,
+        features: [],
+        numRooms: 0,
+        deleteEquipmentType: null,
+        updateEquipmentType: null,
+        createEquipmentType: null,
     };
 
     state = {
@@ -70,9 +83,14 @@ class EquipmentType extends React.PureComponent {
     };
 
     handleSubmit = async (data) => {
-        const {id, updateEquipmentType} = this.props;
+        const {isNew, id, updateEquipmentType, createEquipmentType} = this.props;
         this.setState({saving: true});
-        const rv = await updateEquipmentType(id, data);
+        let rv;
+        if (isNew) {
+            rv = await createEquipmentType(data);
+        } else {
+            rv = await updateEquipmentType(id, data);
+        }
         if (rv.error) {
             this.setState({saving: false});
             return rv.error;
@@ -82,7 +100,7 @@ class EquipmentType extends React.PureComponent {
 
     render() {
         const {confirming, editing, deleting, saving} = this.state;
-        const {name, numRooms, features, availableFeatures} = this.props;
+        const {isNew, name, numRooms, features, availableFeatures} = this.props;
 
         const confirmDeleteMessage = (
             <>
@@ -119,7 +137,7 @@ class EquipmentType extends React.PureComponent {
         return (
             <List.Item>
                 <div styleName="item">
-                    {editing ? (
+                    {(editing || isNew) ? (
                         <FinalForm onSubmit={this.handleSubmit}
                                    initialValues={{name, features: features.map(x => x.name)}}
                                    initialValuesEqual={_.isEqual}
@@ -144,7 +162,7 @@ class EquipmentType extends React.PureComponent {
                                                          fprops.submitting
                                                      )}
                                                      loading={fprops.submitting} primary
-                                                     content={Translate.string('Save')} />
+                                                     content={isNew ? Translate.string('Add') : Translate.string('Save')} />
                                     </Form.Group>
                                 </Form>
                             )}
@@ -189,19 +207,21 @@ class EquipmentType extends React.PureComponent {
                             </List.Content>
                         </>
                     )}
-                    <List.Content>
-                        <Button icon="pencil" size="mini" circular onClick={this.handleEditClick}
-                                disabled={saving || deleting} primary={editing} />
-                        <Button icon="trash" size="mini" circular negative onClick={this.handleDeleteClick}
-                                loading={deleting} disabled={saving || deleting} />
-                        <Confirm header={Translate.string('Confirm deletion')}
-                                 content={{content: confirmDeleteMessage}}
-                                 confirmButton={<Button content={Translate.string('Delete')} negative />}
-                                 cancelButton={Translate.string('Cancel')}
-                                 open={confirming}
-                                 onCancel={this.cancelDelete}
-                                 onConfirm={this.confirmDelete} />
-                    </List.Content>
+                    {!isNew && (
+                        <List.Content>
+                            <Button icon="pencil" size="mini" circular onClick={this.handleEditClick}
+                                    disabled={saving || deleting} primary={editing} />
+                            <Button icon="trash" size="mini" circular negative onClick={this.handleDeleteClick}
+                                    loading={deleting} disabled={saving || deleting} />
+                            <Confirm header={Translate.string('Confirm deletion')}
+                                     content={{content: confirmDeleteMessage}}
+                                     confirmButton={<Button content={Translate.string('Delete')} negative />}
+                                     cancelButton={Translate.string('Cancel')}
+                                     open={confirming}
+                                     onCancel={this.cancelDelete}
+                                     onConfirm={this.confirmDelete} />
+                        </List.Content>
+                    )}
                 </div>
             </List.Item>
         );
@@ -218,8 +238,13 @@ class AdminEquipmentTypes extends React.PureComponent {
             fetchEquipmentTypes: PropTypes.func.isRequired,
             deleteEquipmentType: PropTypes.func.isRequired,
             updateEquipmentType: PropTypes.func.isRequired,
+            createEquipmentType: PropTypes.func.isRequired,
             fetchFeatures: PropTypes.func.isRequired,
         }).isRequired,
+    };
+
+    state = {
+        adding: false,
     };
 
     componentDidMount() {
@@ -228,11 +253,25 @@ class AdminEquipmentTypes extends React.PureComponent {
         fetchFeatures();
     }
 
+    handleAddClick = () => {
+        this.setState({adding: true});
+    };
+
+    handleCreate = async (data) => {
+        const {actions: {createEquipmentType}} = this.props;
+        const rv = await createEquipmentType(data);
+        if (!rv.error) {
+            this.setState({adding: false});
+        }
+        return rv;
+    };
+
     render() {
         const {
             isFetching, equipmentTypes, features,
-            actions: {deleteEquipmentType, updateEquipmentType}
+            actions: {deleteEquipmentType, updateEquipmentType},
         } = this.props;
+        const {adding} = this.state;
 
         return (
             <>
@@ -246,15 +285,26 @@ class AdminEquipmentTypes extends React.PureComponent {
                         ))}
                     </Placeholder>
                 ) : (
-                    <List divided relaxed>
-                        {equipmentTypes.map(eq => (
-                            <EquipmentType key={eq.id}
-                                           {...eq}
-                                           availableFeatures={features}
-                                           deleteEquipmentType={deleteEquipmentType}
-                                           updateEquipmentType={updateEquipmentType} />
-                        ))}
-                    </List>
+                    <>
+                        <List divided relaxed>
+                            {equipmentTypes.map(eq => (
+                                <EquipmentType key={eq.id}
+                                               {...eq}
+                                               availableFeatures={features}
+                                               deleteEquipmentType={deleteEquipmentType}
+                                               updateEquipmentType={updateEquipmentType} />
+                            ))}
+                            {adding && (
+                                <EquipmentType key="new"
+                                               isNew
+                                               availableFeatures={features}
+                                               createEquipmentType={this.handleCreate} />
+                            )}
+                        </List>
+                        {!adding && (
+                            <Button content={Translate.string('Add equipment type')} onClick={this.handleAddClick} />
+                        )}
+                    </>
                 )}
             </>
         );
@@ -272,6 +322,7 @@ export default connect(
             fetchEquipmentTypes: adminActions.fetchEquipmentTypes,
             deleteEquipmentType: adminActions.deleteEquipmentType,
             updateEquipmentType: adminActions.updateEquipmentType,
+            createEquipmentType: adminActions.createEquipmentType,
             fetchFeatures: adminActions.fetchFeatures,
         }, dispatch),
     })
