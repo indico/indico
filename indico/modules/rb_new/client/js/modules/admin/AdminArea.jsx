@@ -25,6 +25,7 @@ import {Translate} from 'indico/react/i18n';
 import {selectors as userSelectors} from '../../common/user';
 import AdminMenu from './AdminMenu';
 import AdminLocationRooms from './AdminLocationRooms';
+import AdminEquipmentTypes from './AdminEquipmentTypes';
 import * as adminActions from './actions';
 
 import './AdminArea.module.scss';
@@ -59,8 +60,7 @@ class AdminArea extends React.Component {
                     <Grid.Column width={12}>
                         <Route exact path="/admin"
                                render={() => <Translate>General settings</Translate>} />
-                        <Route exact path="/admin/equipment-types"
-                               render={() => <Translate>Equipment Types</Translate>} />
+                        <Route exact path="/admin/equipment-types" component={AdminEquipmentTypes} />
                         <Route exact path="/admin/location/:locationId"
                                render={({match: {params: {locationId}}}) => (
                                    <AdminLocationRooms locationId={parseInt(locationId, 10)} />
