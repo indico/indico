@@ -15,9 +15,34 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import {createSelector} from 'reselect';
 import {RequestState} from 'indico/utils/redux';
 
 
 export const getAllLocations = ({admin}) => admin.locations;
 export const isFetchingLocations = ({admin}) => admin.requests.locations.state === RequestState.STARTED;
 export const getFilters = ({admin}) => admin.filters;
+
+export const _getEquipmentTypes = ({admin}) => admin.equipmentTypes;
+export const _getFeatures = ({admin}) => admin.features;
+
+const makeSorter = attr => (a, b) => a[attr].localeCompare(b[attr]);
+export const getEquipmentTypes = createSelector(
+    _getEquipmentTypes,
+    equipmentTypes => {
+        return equipmentTypes.map(eq => ({
+            ...eq,
+            features: eq.features.slice().sort(makeSorter('title'))
+        })).sort(makeSorter('name'));
+    }
+);
+
+export const getFeatures = createSelector(
+    _getFeatures,
+    features => features.sort(makeSorter('title'))
+);
+
+export const isFetchingFeaturesOrEquipmentTypes = ({admin}) => (
+    admin.requests.equipmentTypes.state === RequestState.STARTED ||
+    admin.requests.features.state === RequestState.STARTED
+);

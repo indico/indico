@@ -16,14 +16,21 @@
 
 from __future__ import unicode_literals
 
-from flask import jsonify, session
+from flask import jsonify, request, session
+from marshmallow import fields, missing, validate
 from sqlalchemy.orm import joinedload
+from webargs.flaskparser import abort, use_kwargs
 from werkzeug.exceptions import Forbidden
 
+from indico.core.db import db
 from indico.modules.rb.controllers import RHRoomBookingBase
+from indico.modules.rb.models.equipment import EquipmentType, RoomEquipmentAssociation
 from indico.modules.rb.models.locations import Location
+from indico.modules.rb.models.room_features import RoomFeature
 from indico.modules.rb.util import rb_is_admin
-from indico.modules.rb_new.schemas import admin_locations_schema
+from indico.modules.rb_new.schemas import admin_locations_schema, equipment_type_schema, room_features_schema
+from indico.util.i18n import _
+from indico.util.marshmallow import ModelList
 
 
 class RHRoomBookingAdminBase(RHRoomBookingBase):
@@ -37,3 +44,82 @@ class RHLocations(RHRoomBookingAdminBase):
     def _process(self):
         query = Location.query.options(joinedload('rooms'))
         return jsonify(admin_locations_schema.dump(query.all()).data)
+
+
+class RHFeatures(RHRoomBookingAdminBase):
+    def _get_features(self):
+        query = RoomFeature.query.order_by(RoomFeature.title)
+        return room_features_schema.dump(query).data
+
+    def _process(self):
+        return jsonify(self._get_features())
+
+
+class RHEquipmentTypes(RHRoomBookingAdminBase):
+    def _process_args(self):
+        id_ = request.view_args.get('equipment_type_id')
+        self.equipment_type = EquipmentType.get_one(id_) if id_ is not None else None
+
+    def _dump_equipment_types(self):
+        query = EquipmentType.query.options(joinedload('features')).order_by(EquipmentType.name)
+        return equipment_type_schema.dump(query, many=True).data
+
+    def _get_room_counts(self):
+        query = (db.session.query(RoomEquipmentAssociation.c.equipment_id, db.func.count())
+                 .group_by(RoomEquipmentAssociation.c.equipment_id))
+        return dict(query)
+
+    def _jsonify_one(self, equipment_type):
+        counts = self._get_room_counts()
+        eq = equipment_type_schema.dump(equipment_type).data
+        eq['num_rooms'] = counts.get(eq['id'], 0)
+        return jsonify(eq)
+
+    def _jsonify_many(self):
+        counts = self._get_room_counts()
+        equipment_types = self._dump_equipment_types()
+        for eq in equipment_types:
+            eq['num_rooms'] = counts.get(eq['id'], 0)
+        return jsonify(equipment_types)
+
+    def _process_GET(self):
+        if self.equipment_type:
+            return self._jsonify_one(self.equipment_type)
+        else:
+            return self._jsonify_many()
+
+    def _process_DELETE(self):
+        db.session.delete(self.equipment_type)
+        db.session.flush()
+        return '', 204
+
+    @use_kwargs({
+        'name': fields.String(validate=validate.Length(min=2), required=True),
+        'features': ModelList(RoomFeature, column='name', missing=[])
+    })
+    def _process_POST(self, name, features):
+        self._check_conflict(name)
+        equipment_type = EquipmentType(name=name, features=features)
+        db.session.add(equipment_type)
+        db.session.flush()
+        return self._jsonify_one(equipment_type), 201
+
+    @use_kwargs({
+        'name': fields.String(validate=validate.Length(min=2)),
+        'features': ModelList(RoomFeature, column='name')
+    })
+    def _process_PATCH(self, name, features):
+        if name is not missing:
+            self._check_conflict(name)
+            self.equipment_type.name = name
+        if features is not missing:
+            self.equipment_type.features = features
+        db.session.flush()
+        return self._jsonify_one(self.equipment_type)
+
+    def _check_conflict(self, name):
+        query = EquipmentType.query.filter(db.func.lower(EquipmentType.name) == name.lower())
+        if self.equipment_type:
+            query = query.filter(EquipmentType.id != self.equipment_type.id)
+        if query.has_rows():
+            abort(422, messages={'name': [_('Name must be unique')]})
