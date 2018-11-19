@@ -18,27 +18,15 @@
 import _ from 'lodash';
 import React from 'react';
 import PropTypes from 'prop-types';
-import {bindActionCreators} from 'redux';
-import {connect} from 'react-redux';
-import {Form as FinalForm, Field} from 'react-final-form';
-import {Button, Confirm, Header, Icon, List, Modal, Placeholder, Popup, Form} from 'semantic-ui-react';
-import {ReduxFormField, ReduxDropdownField, formatters} from 'indico/react/forms';
+import {Field, Form as FinalForm} from 'react-final-form';
+import {Button, Confirm, Form, Icon, List, Popup} from 'semantic-ui-react';
+import {formatters, ReduxDropdownField, ReduxFormField} from 'indico/react/forms';
 import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
-import * as adminActions from './actions';
-import * as adminSelectors from './selectors';
 
-import './AdminEquipmentTypes.module.scss';
+import './EquipmentTypesPage.module.scss';
 
 
-const makeFeatureOptions = availableFeatures => availableFeatures.map(feat => ({
-    key: feat.name,
-    value: feat.name,
-    text: feat.title,
-    icon: feat.icon,
-}));
-
-
-class EquipmentType extends React.PureComponent {
+export default class EquipmentType extends React.PureComponent {
     static propTypes = {
         id: PropTypes.number.isRequired,
         name: PropTypes.string.isRequired,
@@ -122,6 +110,13 @@ class EquipmentType extends React.PureComponent {
             </>
         );
 
+        const featureOptions = availableFeatures.map(feat => ({
+            key: feat.name,
+            value: feat.name,
+            text: feat.title,
+            icon: feat.icon,
+        }));
+
         return (
             <List.Item>
                 <div styleName="item">
@@ -138,7 +133,7 @@ class EquipmentType extends React.PureComponent {
                                                placeholder={Translate.string('Name')}
                                                disabled={fprops.submitting} />
                                         <Field name="features" component={ReduxDropdownField}
-                                               multiple selection options={makeFeatureOptions(availableFeatures)}
+                                               multiple selection options={featureOptions}
                                                placeholder={Translate.string('Features')}
                                                disabled={fprops.submitting} />
                                     </Form.Group>
@@ -210,165 +205,3 @@ class EquipmentType extends React.PureComponent {
         );
     }
 }
-
-
-class AddEquipmentTypeModal extends React.PureComponent {
-    static propTypes = {
-        features: PropTypes.array.isRequired,
-        onClose: PropTypes.func.isRequired,
-        onSubmit: PropTypes.func.isRequired,
-    };
-
-    handleSubmit = async (data) => {
-        const {onSubmit} = this.props;
-        const rv = await onSubmit(data);
-        if (rv.error) {
-            return rv.error;
-        }
-    };
-
-    render() {
-        const {features, onClose} = this.props;
-
-        return (
-            <Modal open size="mini" closeIcon onClose={onClose}>
-                <Modal.Header>
-                    <Translate>
-                        Add equipment type
-                    </Translate>
-                </Modal.Header>
-                <Modal.Content>
-                    <FinalForm onSubmit={this.handleSubmit}
-                               initialValues={{features: []}}
-                               initialValuesEqual={_.isEqual}
-                               subscription={{submitting: true, hasValidationErrors: true, pristine: true}}>
-                        {(fprops) => (
-                            <Form onSubmit={fprops.handleSubmit}>
-                                <Field name="name" component={ReduxFormField} as="input"
-                                       format={formatters.trim} formatOnBlur
-                                       label={Translate.string('Name')}
-                                       disabled={fprops.submitting}
-                                       autoFocus />
-                                <Field name="features" component={ReduxDropdownField}
-                                       multiple selection options={makeFeatureOptions(features)}
-                                       label={Translate.string('Features')}
-                                       disabled={fprops.submitting} />
-                                <Form.Button type="submit"
-                                             disabled={(
-                                                 fprops.hasValidationErrors ||
-                                                 fprops.pristine ||
-                                                 fprops.submitting
-                                             )}
-                                             loading={fprops.submitting} primary
-                                             content={Translate.string('Add')} />
-                            </Form>
-                        )}
-                    </FinalForm>
-                </Modal.Content>
-            </Modal>
-        );
-    }
-}
-
-
-class AdminEquipmentTypes extends React.PureComponent {
-    static propTypes = {
-        isFetching: PropTypes.bool.isRequired,
-        features: PropTypes.array.isRequired,
-        equipmentTypes: PropTypes.array.isRequired,
-        actions: PropTypes.exact({
-            fetchEquipmentTypes: PropTypes.func.isRequired,
-            deleteEquipmentType: PropTypes.func.isRequired,
-            updateEquipmentType: PropTypes.func.isRequired,
-            createEquipmentType: PropTypes.func.isRequired,
-            fetchFeatures: PropTypes.func.isRequired,
-        }).isRequired,
-    };
-
-    state = {
-        adding: false,
-    };
-
-    componentDidMount() {
-        const {actions: {fetchEquipmentTypes, fetchFeatures}} = this.props;
-        fetchEquipmentTypes();
-        fetchFeatures();
-    }
-
-    handleAddClick = () => {
-        this.setState({adding: true});
-    };
-
-    handleAddClose = () => {
-        this.setState({adding: false});
-    };
-
-    handleCreate = async (data) => {
-        const {actions: {createEquipmentType}} = this.props;
-        const rv = await createEquipmentType(data);
-        if (!rv.error) {
-            this.setState({adding: false});
-        }
-        return rv;
-    };
-
-    render() {
-        const {
-            isFetching, equipmentTypes, features,
-            actions: {deleteEquipmentType, updateEquipmentType},
-        } = this.props;
-        const {adding} = this.state;
-
-        return (
-            <>
-                <Header as="h2" styleName="page-header">
-                    <Translate>
-                        Equipment types
-                    </Translate>
-                    <Button size="small" content={Translate.string('Add')} onClick={this.handleAddClick} />
-                </Header>
-                {isFetching ? (
-                    <Placeholder fluid>
-                        {_.range(20).map(i => (
-                            <Placeholder.Line key={i} length="full" />
-                        ))}
-                    </Placeholder>
-                ) : (
-                    <>
-                        <List divided relaxed>
-                            {equipmentTypes.map(eq => (
-                                <EquipmentType key={eq.id}
-                                               {...eq}
-                                               availableFeatures={features}
-                                               deleteEquipmentType={deleteEquipmentType}
-                                               updateEquipmentType={updateEquipmentType} />
-                            ))}
-                        </List>
-                        {adding && (
-                            <AddEquipmentTypeModal onSubmit={this.handleCreate}
-                                                   onClose={this.handleAddClose}
-                                                   features={features} />
-                        )}
-                    </>
-                )}
-            </>
-        );
-    }
-}
-
-export default connect(
-    state => ({
-        isFetching: adminSelectors.isFetchingFeaturesOrEquipmentTypes(state),
-        equipmentTypes: adminSelectors.getEquipmentTypes(state),
-        features: adminSelectors.getFeatures(state),
-    }),
-    dispatch => ({
-        actions: bindActionCreators({
-            fetchEquipmentTypes: adminActions.fetchEquipmentTypes,
-            deleteEquipmentType: adminActions.deleteEquipmentType,
-            updateEquipmentType: adminActions.updateEquipmentType,
-            createEquipmentType: adminActions.createEquipmentType,
-            fetchFeatures: adminActions.fetchFeatures,
-        }, dispatch),
-    })
-)(AdminEquipmentTypes);
