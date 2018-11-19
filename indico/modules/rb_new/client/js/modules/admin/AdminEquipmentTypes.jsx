@@ -21,7 +21,7 @@ import PropTypes from 'prop-types';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import {Form as FinalForm, Field} from 'react-final-form';
-import {Button, Confirm, Header, Icon, List, Placeholder, Popup, Form} from 'semantic-ui-react';
+import {Button, Confirm, Icon, List, Placeholder, Popup, Form} from 'semantic-ui-react';
 import {ReduxFormField, ReduxDropdownField, formatters} from 'indico/react/forms';
 import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
 import * as adminActions from './actions';
@@ -172,6 +172,17 @@ class EquipmentType extends React.PureComponent {
                             <List.Content styleName="info">
                                 <List.Header>
                                     {name}
+                                    {features.map(feat => (
+                                        <Popup key={feat.name}
+                                               trigger={<Icon name={feat.icon || 'cog'} color="blue"
+                                                              styleName="feature" />}>
+                                            <Translate>
+                                                This equipment type provides the
+                                                {' '}
+                                                <Param name="name" wrapper={<strong />} value={feat.title} /> feature.
+                                            </Translate>
+                                        </Popup>
+                                    ))}
                                 </List.Header>
                                 <List.Description>
                                     {!numRooms ? (
@@ -192,26 +203,13 @@ class EquipmentType extends React.PureComponent {
                                     )}
                                 </List.Description>
                             </List.Content>
-                            <List.Content>
-                                {features.map(feat => (
-                                    <Popup key={feat.name}
-                                           trigger={<Icon name={feat.icon || 'cog'} color="blue" circular
-                                                          styleName="feature" />}>
-                                        <Translate>
-                                            This equipment type provides the
-                                            {' '}
-                                            <Param name="name" wrapper={<strong />} value={feat.title} /> feature.
-                                        </Translate>
-                                    </Popup>
-                                ))}
-                            </List.Content>
                         </>
                     )}
                     {!isNew && (
-                        <List.Content>
-                            <Button icon="pencil" size="mini" circular onClick={this.handleEditClick}
+                        <List.Content styleName="actions">
+                            <Button icon="pencil" basic onClick={this.handleEditClick}
                                     disabled={saving || deleting} primary={editing} />
-                            <Button icon="trash" size="mini" circular negative onClick={this.handleDeleteClick}
+                            <Button icon="trash" basic negative onClick={this.handleDeleteClick}
                                     loading={deleting} disabled={saving || deleting} />
                             <Confirm header={Translate.string('Confirm deletion')}
                                      content={{content: confirmDeleteMessage}}
@@ -275,9 +273,6 @@ class AdminEquipmentTypes extends React.PureComponent {
 
         return (
             <>
-                <Header as="h2">
-                    <Translate>Equipment types</Translate>
-                </Header>
                 {isFetching ? (
                     <Placeholder fluid>
                         {_.range(20).map(i => (
