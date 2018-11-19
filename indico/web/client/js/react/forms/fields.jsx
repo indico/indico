@@ -17,7 +17,9 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Form, Label, Dropdown} from 'semantic-ui-react';
+import {Dropdown, Form, Popup} from 'semantic-ui-react';
+
+import './ReduxFormField.module.scss';
 
 
 export function ReduxFormField(
@@ -34,24 +36,33 @@ export function ReduxFormField(
     //   ...and does not have the initial value
     // - there was an error during submission
     //   ...and the field has not been modified since the failed submission
-    let errorLabel = null;
+    let errorMessage = null;
     if (touched && error && (dirty || required)) {
-        errorLabel = <Label basic color="red" pointing="above" content={error} />;
+        errorMessage = error;
     } else if (submitError && !dirtySinceLastSubmit) {
-        errorLabel = <Label basic color="red" pointing="above" content={submitError} />;
+        errorMessage = submitError;
     }
 
-    return (
-        <Form.Field required={required} error={!!errorLabel} defaultValue={defaultValue} {...fieldProps}>
+    const field = (
+        <Form.Field required={required} error={!!errorMessage} defaultValue={defaultValue} {...fieldProps}>
             {label && <label>{label}</label>}
             <Component {...input}
                        {...props}
                        label={componentLabel}
                        placeholder={placeholder}
                        disabled={disabled || submitting} />
-            {errorLabel}
             {children}
         </Form.Field>
+    );
+
+    return (
+        <Popup trigger={field}
+               position="left center"
+               open={!!errorMessage}>
+            <div styleName="field-error">
+                {errorMessage}
+            </div>
+        </Popup>
     );
 }
 
