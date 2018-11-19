@@ -53,6 +53,7 @@ const searchGroups = async (data) => {
 export default class PrincipalSearchField extends React.Component {
     static propTypes = {
         multiple: PropTypes.bool,
+        initialCache: PropTypes.array,
         value: PropTypes.oneOfType([
             PropTypes.object,
             PropTypes.array
@@ -68,6 +69,7 @@ export default class PrincipalSearchField extends React.Component {
 
     static defaultProps = {
         multiple: false,
+        initialCache: [],
         value: null,
         disabled: false,
         withGroups: false,
@@ -78,12 +80,18 @@ export default class PrincipalSearchField extends React.Component {
     constructor(props) {
         super(props);
 
-        const {multiple, value} = this.props;
+        const {multiple, initialCache, value} = this.props;
 
         if (multiple) {
             this.userCache = Object.assign({}, ...(value || []).map((val) => ({[val.identifier]: val})));
         } else {
             this.userCache = value ? {[value.identifier]: value} : {};
+        }
+
+        if (initialCache.length) {
+            initialCache.forEach((option) => {
+                this.userCache[option.identifier] = option;
+            });
         }
     }
 
