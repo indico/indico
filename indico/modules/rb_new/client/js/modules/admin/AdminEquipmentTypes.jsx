@@ -21,7 +21,7 @@ import PropTypes from 'prop-types';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import {Form as FinalForm, Field} from 'react-final-form';
-import {Button, Confirm, Icon, List, Modal, Placeholder, Popup, Form} from 'semantic-ui-react';
+import {Button, Confirm, Header, Icon, List, Modal, Placeholder, Popup, Form} from 'semantic-ui-react';
 import {ReduxFormField, ReduxDropdownField, formatters} from 'indico/react/forms';
 import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
 import * as adminActions from './actions';
@@ -159,11 +159,10 @@ class EquipmentType extends React.PureComponent {
                         <>
                             <List.Content styleName="info">
                                 <List.Header>
-                                    {name}
+                                    <span styleName="name">{name}</span>
                                     {features.map(feat => (
                                         <Popup key={feat.name}
-                                               trigger={<Icon name={feat.icon || 'cog'} color="blue"
-                                                              styleName="feature" />}>
+                                               trigger={<Icon name={feat.icon || 'cog'} color="blue" />}>
                                             <Translate>
                                                 This equipment type provides the
                                                 {' '}
@@ -178,7 +177,7 @@ class EquipmentType extends React.PureComponent {
                                     ) : (
                                         <PluralTranslate count={numRooms}>
                                             <Singular>
-                                                Available in <Param name="count" wrapper={<strong />}>one</Param> room
+                                                Available in <Param name="count" wrapper={<strong />}>1</Param> room
                                             </Singular>
                                             <Plural>
                                                 Available in
@@ -233,6 +232,11 @@ class AddEquipmentTypeModal extends React.PureComponent {
 
         return (
             <Modal open size="mini" closeIcon onClose={onClose}>
+                <Modal.Header>
+                    <Translate>
+                        Add equipment type
+                    </Translate>
+                </Modal.Header>
                 <Modal.Content>
                     <FinalForm onSubmit={this.handleSubmit}
                                initialValues={{features: []}}
@@ -317,6 +321,12 @@ class AdminEquipmentTypes extends React.PureComponent {
 
         return (
             <>
+                <Header as="h2" styleName="page-header">
+                    <Translate>
+                        Equipment types
+                    </Translate>
+                    <Button size="small" content={Translate.string('Add')} onClick={this.handleAddClick} />
+                </Header>
                 {isFetching ? (
                     <Placeholder fluid>
                         {_.range(20).map(i => (
@@ -334,7 +344,6 @@ class AdminEquipmentTypes extends React.PureComponent {
                                                updateEquipmentType={updateEquipmentType} />
                             ))}
                         </List>
-                        <Button content={Translate.string('Add equipment type')} onClick={this.handleAddClick} />
                         {adding && (
                             <AddEquipmentTypeModal onSubmit={this.handleCreate}
                                                    onClose={this.handleAddClose}
