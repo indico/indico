@@ -21,7 +21,7 @@ import PropTypes from 'prop-types';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import {Form as FinalForm, Field} from 'react-final-form';
-import {Button, Card, Confirm, Icon, List, Placeholder, Popup, Form} from 'semantic-ui-react';
+import {Button, Confirm, Icon, List, Modal, Placeholder, Popup, Form} from 'semantic-ui-react';
 import {ReduxFormField, ReduxDropdownField, formatters} from 'indico/react/forms';
 import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
 import * as adminActions from './actions';
@@ -30,53 +30,28 @@ import * as adminSelectors from './selectors';
 import './AdminEquipmentTypes.module.scss';
 
 
-const ConditionalCardWrapper = ({asCard, header, children}) => {
-    if (!asCard) {
-        return children;
-    }
-    return (
-        <Card fluid>
-            <Card.Content>
-                <Card.Header>
-                    {header}
-                </Card.Header>
-            </Card.Content>
-            <Card.Content>
-                {children}
-            </Card.Content>
-        </Card>
-    );
-};
-
-ConditionalCardWrapper.propTypes = {
-    asCard: PropTypes.bool.isRequired,
-    header: PropTypes.string.isRequired,
-    children: PropTypes.node.isRequired,
-};
+const makeFeatureOptions = availableFeatures => availableFeatures.map(feat => ({
+    key: feat.name,
+    value: feat.name,
+    text: feat.title,
+    icon: feat.icon,
+}));
 
 
 class EquipmentType extends React.PureComponent {
     static propTypes = {
-        isNew: PropTypes.bool,
-        id: PropTypes.number,
-        name: PropTypes.string,
-        features: PropTypes.array,
-        numRooms: PropTypes.number,
+        id: PropTypes.number.isRequired,
+        name: PropTypes.string.isRequired,
+        features: PropTypes.array.isRequired,
+        numRooms: PropTypes.number.isRequired,
         availableFeatures: PropTypes.array.isRequired,
         deleteEquipmentType: PropTypes.func,
         updateEquipmentType: PropTypes.func,
-        createEquipmentType: PropTypes.func,
     };
 
     static defaultProps = {
-        isNew: false,
-        id: null,
-        name: undefined,
-        features: [],
-        numRooms: 0,
         deleteEquipmentType: null,
         updateEquipmentType: null,
-        createEquipmentType: null,
     };
 
     state = {
@@ -108,14 +83,9 @@ class EquipmentType extends React.PureComponent {
     };
 
     handleSubmit = async (data) => {
-        const {isNew, id, updateEquipmentType, createEquipmentType} = this.props;
+        const {id, updateEquipmentType} = this.props;
         this.setState({saving: true});
-        let rv;
-        if (isNew) {
-            rv = await createEquipmentType(data);
-        } else {
-            rv = await updateEquipmentType(id, data);
-        }
+        const rv = await updateEquipmentType(id, data);
         if (rv.error) {
             this.setState({saving: false});
             return rv.error;
@@ -125,7 +95,7 @@ class EquipmentType extends React.PureComponent {
 
     render() {
         const {confirming, editing, deleting, saving} = this.state;
-        const {isNew, name, numRooms, features, availableFeatures} = this.props;
+        const {name, numRooms, features, availableFeatures} = this.props;
 
         const confirmDeleteMessage = (
             <>
@@ -152,50 +122,39 @@ class EquipmentType extends React.PureComponent {
             </>
         );
 
-        const featureOptions = availableFeatures.map(feat => ({
-            key: feat.name,
-            value: feat.name,
-            text: feat.title,
-            icon: feat.icon,
-        }));
-
         return (
             <List.Item>
                 <div styleName="item">
-                    {(editing || isNew) ? (
-                        <ConditionalCardWrapper asCard={isNew} header={Translate.string('Add new equipment type')}>
-                            <FinalForm onSubmit={this.handleSubmit}
-                                       initialValues={{name, features: features.map(x => x.name)}}
-                                       initialValuesEqual={_.isEqual}
-                                       subscription={{submitting: true, hasValidationErrors: true, pristine: true}}>
-                                {(fprops) => (
-                                    <Form onSubmit={fprops.handleSubmit}>
-                                        <Form.Group widths="equal">
-                                            <Field name="name" component={ReduxFormField} as="input"
-                                                   format={formatters.trim} formatOnBlur
-                                                   placeholder={Translate.string('Name')}
-                                                   disabled={fprops.submitting} />
-                                            <Field name="features" component={ReduxDropdownField}
-                                                   multiple selection options={featureOptions}
-                                                   placeholder={Translate.string('Features')}
-                                                   disabled={fprops.submitting} />
-                                        </Form.Group>
-                                        <Form.Group>
-                                            <Form.Button type="submit"
-                                                         disabled={(
-                                                             fprops.hasValidationErrors ||
-                                                             fprops.pristine ||
-                                                             fprops.submitting
-                                                         )}
-                                                         loading={fprops.submitting} primary
-                                                         content={isNew
-                                                             ? Translate.string('Add')
-                                                             : Translate.string('Save')} />
-                                        </Form.Group>
-                                    </Form>
-                                )}
-                            </FinalForm>
-                        </ConditionalCardWrapper>
+                    {editing ? (
+                        <FinalForm onSubmit={this.handleSubmit}
+                                   initialValues={{name, features: features.map(x => x.name)}}
+                                   initialValuesEqual={_.isEqual}
+                                   subscription={{submitting: true, hasValidationErrors: true, pristine: true}}>
+                            {(fprops) => (
+                                <Form onSubmit={fprops.handleSubmit}>
+                                    <Form.Group widths="equal">
+                                        <Field name="name" component={ReduxFormField} as="input"
+                                               format={formatters.trim} formatOnBlur
+                                               placeholder={Translate.string('Name')}
+                                               disabled={fprops.submitting} />
+                                        <Field name="features" component={ReduxDropdownField}
+                                               multiple selection options={makeFeatureOptions(availableFeatures)}
+                                               placeholder={Translate.string('Features')}
+                                               disabled={fprops.submitting} />
+                                    </Form.Group>
+                                    <Form.Group>
+                                        <Form.Button type="submit"
+                                                     disabled={(
+                                                         fprops.hasValidationErrors ||
+                                                         fprops.pristine ||
+                                                         fprops.submitting
+                                                     )}
+                                                     loading={fprops.submitting} primary
+                                                     content={Translate.string('Save')} />
+                                    </Form.Group>
+                                </Form>
+                            )}
+                        </FinalForm>
                     ) : (
                         <>
                             <List.Content styleName="info">
@@ -234,23 +193,75 @@ class EquipmentType extends React.PureComponent {
                             </List.Content>
                         </>
                     )}
-                    {!isNew && (
-                        <List.Content styleName="actions">
-                            <Button icon="pencil" basic onClick={this.handleEditClick}
-                                    disabled={saving || deleting} primary={editing} />
-                            <Button icon="trash" basic negative onClick={this.handleDeleteClick}
-                                    loading={deleting} disabled={saving || deleting} />
-                            <Confirm header={Translate.string('Confirm deletion')}
-                                     content={{content: confirmDeleteMessage}}
-                                     confirmButton={<Button content={Translate.string('Delete')} negative />}
-                                     cancelButton={Translate.string('Cancel')}
-                                     open={confirming}
-                                     onCancel={this.cancelDelete}
-                                     onConfirm={this.confirmDelete} />
-                        </List.Content>
-                    )}
+                    <List.Content styleName="actions">
+                        <Button icon="pencil" basic onClick={this.handleEditClick}
+                                disabled={saving || deleting} primary={editing} />
+                        <Button icon="trash" basic negative onClick={this.handleDeleteClick}
+                                loading={deleting} disabled={saving || deleting} />
+                        <Confirm header={Translate.string('Confirm deletion')}
+                                 content={{content: confirmDeleteMessage}}
+                                 confirmButton={<Button content={Translate.string('Delete')} negative />}
+                                 cancelButton={Translate.string('Cancel')}
+                                 open={confirming}
+                                 onCancel={this.cancelDelete}
+                                 onConfirm={this.confirmDelete} />
+                    </List.Content>
                 </div>
             </List.Item>
+        );
+    }
+}
+
+
+class AddEquipmentTypeModal extends React.PureComponent {
+    static propTypes = {
+        features: PropTypes.array.isRequired,
+        onClose: PropTypes.func.isRequired,
+        onSubmit: PropTypes.func.isRequired,
+    };
+
+    handleSubmit = async (data) => {
+        const {onSubmit} = this.props;
+        const rv = await onSubmit(data);
+        if (rv.error) {
+            return rv.error;
+        }
+    };
+
+    render() {
+        const {features, onClose} = this.props;
+
+        return (
+            <Modal open size="mini" closeIcon onClose={onClose}>
+                <Modal.Content>
+                    <FinalForm onSubmit={this.handleSubmit}
+                               initialValues={{features: []}}
+                               initialValuesEqual={_.isEqual}
+                               subscription={{submitting: true, hasValidationErrors: true, pristine: true}}>
+                        {(fprops) => (
+                            <Form onSubmit={fprops.handleSubmit}>
+                                <Field name="name" component={ReduxFormField} as="input"
+                                       format={formatters.trim} formatOnBlur
+                                       label={Translate.string('Name')}
+                                       disabled={fprops.submitting}
+                                       autoFocus />
+                                <Field name="features" component={ReduxDropdownField}
+                                       multiple selection options={makeFeatureOptions(features)}
+                                       label={Translate.string('Features')}
+                                       disabled={fprops.submitting} />
+                                <Form.Button type="submit"
+                                             disabled={(
+                                                 fprops.hasValidationErrors ||
+                                                 fprops.pristine ||
+                                                 fprops.submitting
+                                             )}
+                                             loading={fprops.submitting} primary
+                                             content={Translate.string('Add')} />
+                            </Form>
+                        )}
+                    </FinalForm>
+                </Modal.Content>
+            </Modal>
         );
     }
 }
@@ -282,6 +293,10 @@ class AdminEquipmentTypes extends React.PureComponent {
 
     handleAddClick = () => {
         this.setState({adding: true});
+    };
+
+    handleAddClose = () => {
+        this.setState({adding: false});
     };
 
     handleCreate = async (data) => {
@@ -318,15 +333,12 @@ class AdminEquipmentTypes extends React.PureComponent {
                                                deleteEquipmentType={deleteEquipmentType}
                                                updateEquipmentType={updateEquipmentType} />
                             ))}
-                            {adding && (
-                                <EquipmentType key="new"
-                                               isNew
-                                               availableFeatures={features}
-                                               createEquipmentType={this.handleCreate} />
-                            )}
                         </List>
-                        {!adding && (
-                            <Button content={Translate.string('Add equipment type')} onClick={this.handleAddClick} />
+                        <Button content={Translate.string('Add equipment type')} onClick={this.handleAddClick} />
+                        {adding && (
+                            <AddEquipmentTypeModal onSubmit={this.handleCreate}
+                                                   onClose={this.handleAddClose}
+                                                   features={features} />
                         )}
                     </>
                 )}
