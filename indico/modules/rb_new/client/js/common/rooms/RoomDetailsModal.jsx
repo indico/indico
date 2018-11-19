@@ -29,9 +29,9 @@ import RoomStats from './RoomStats';
 import {DailyTimelineContent, TimelineLegend} from '../timeline';
 import * as roomsSelectors from './selectors';
 import {actions as bookRoomActions} from '../../modules/bookRoom';
+import RoomEditModal from './RoomEditModal';
 
 import './RoomDetailsModal.module.scss';
-import RoomEditModal from './RoomEditModal';
 
 
 class RoomDetailsModal extends React.Component {

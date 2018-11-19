@@ -60,7 +60,7 @@ class AdminRoomAttributesSchema(mm.ModelSchema):
 
     class Meta:
         model = RoomAttributeAssociation
-        fields = ('attribute_object', )
+        fields = ('attribute_object',)
 
 
 class AttributesSchema(mm.ModelSchema):

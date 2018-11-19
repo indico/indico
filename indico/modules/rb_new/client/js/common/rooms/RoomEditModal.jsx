@@ -14,16 +14,17 @@
  * You should have received a copy of the GNU General Public License
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
-import _ from 'lodash';
 
+import fetchRoomURL from 'indico-url:rooms_new.admin_room';
+import fetchRoomAttributesURL from 'indico-url:rooms_new.admin_room_attributes';
+import fetchAttributesURL from 'indico-url:rooms_new.admin_attributes';
+import fetchAvailabilityURL from 'indico-url:rooms_new.admin_room_availability';
+import _ from 'lodash';
 import React from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import PropTypes from 'prop-types';
 import {Button, Checkbox, Dimmer, Dropdown, Form, Grid, Header, Input, Loader, Modal} from 'semantic-ui-react';
-import fetchRoomURL from 'indico-url:rooms_new.admin_room';
-import fetchRoomAttributesURL from 'indico-url:rooms_new.admin_room_attributes';
-import fetchAttributesURL from 'indico-url:rooms_new.admin_attributes';
 // import Dropzone from 'react-dropzone';
 import {Form as FinalForm, Field} from 'react-final-form';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
@@ -178,13 +179,15 @@ class RoomEditModal extends React.Component {
         attributes: null,
         room: null,
         roomAttributes: null,
-        newAttributes: []
+        newAttributes: [],
+        availability: null,
     };
 
     componentDidMount() {
         this.fetchDetailedRoom();
         this.fetchRoomAttributes();
         this.fetchAttributes();
+        this.fetchRoomAvailability();
     }
     //
     // onDrop = (acceptedFiles, rejectedFiles) => {
@@ -232,6 +235,18 @@ class RoomEditModal extends React.Component {
             return;
         }
         this.setState({attributes: response.data});
+    }
+
+
+    async fetchRoomAvailability() {
+        let response;
+        try {
+            response = await indicoAxios.get(fetchAvailabilityURL());
+        } catch (error) {
+            handleAxiosError(error);
+            return;
+        }
+        this.setState({availability: response.data});
     }
 
     handleCloseModal = () => {
@@ -302,26 +317,30 @@ class RoomEditModal extends React.Component {
         switch (content.type) {
             case 'header':
                 return (
-                    <Header key={content.label}>{content.label}</Header>);
+                    <Header key={content.label}>{content.label}</Header>
+                );
             case 'input':
                 return (
                     <Field key={content.name}
                            name={content.name}
                            component={ReduxFormField}
                            label={content.label}
-                           as="input" />);
+                           as="input" />
+                );
             case 'formgroup':
                 return (
                     <Form.Group key={content.key}>
                         {content.content.map(this.renderContent)}
-                    </Form.Group>);
+                    </Form.Group>
+                );
             case 'checkbox':
                 return (
                     <Field key={content.name}
                            name={content.name}
                            component={ReduxCheckboxField}
                            componentLabel={content.label}
-                           as={Checkbox} />);
+                           as={Checkbox} />
+                );
             case 'image':
                 return this.renderImage(room.spritePosition);
             case 'attributes':

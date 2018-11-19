@@ -109,6 +109,10 @@ _bp.add_url_rule('/api/admin/rooms/<int:room_id>/equipment', 'admin_update_room_
 _bp.add_url_rule('/api/admin/rooms/<int:room_id>/attributes', 'admin_room_attributes', admin.RHRoomAttributes)
 _bp.add_url_rule('/api/admin/rooms/<int:room_id>/attributes', 'admin_update_room_attributes',
                  admin.RHRoomAttributesUpdate, methods=('POST',))
+_bp.add_url_rule('/api/admin/rooms/<int:room_id>/availability', 'admin_room_availability', admin.RHRoomAvailability)
+_bp.add_url_rule('/api/admin/rooms/<int:room_id>/availability', 'admin_update_room_availability', admin.RHRoomAvailabilityUpdate,
+                 methods=('POST',))
+
 _bp.add_url_rule('/api/admin/rooms/<int:room_id>/image', 'admin_room_image', admin.RHRoomImage)
 
 

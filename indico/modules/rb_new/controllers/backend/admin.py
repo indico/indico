@@ -23,18 +23,23 @@ from webargs.flaskparser import abort, use_kwargs, use_args
 from werkzeug.exceptions import Forbidden
 
 from indico.core.db import db
+from indico.modules.rb import Room
 from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.models.equipment import EquipmentType, RoomEquipmentAssociation
 from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.room_attributes import RoomAttribute, RoomAttributeAssociation
 from indico.modules.rb.models.room_features import RoomFeature
 from indico.modules.rb.util import rb_is_admin
-from indico.modules.rb_new.controllers.backend.common import room_args
-from indico.modules.rb_new.operations.admin import update_room, update_room_equipment
-from indico.modules.rb_new.schemas import (admin_equipment_type_schema, admin_locations_schema, room_attribute_schema,
-                                           room_feature_schema, room_update_schema)
+from indico.modules.rb_new.schemas import (admin_equipment_type_schema, room_attribute_schema,
+                                           room_feature_schema)
+
 from indico.util.i18n import _
 from indico.util.marshmallow import ModelList
+from indico.modules.rb_new.controllers.backend.common import room_args
+from indico.modules.rb_new.operations.admin import get_room_attributes, update_room, update_room_equipment, \
+    update_room_attributes, update_room_availability
+from indico.modules.rb_new.schemas import (admin_locations_schema, attributes_schema, room_equipment_schema,
+                                           room_update_schema, nonbookable_periods_schema, bookable_hours_schema)
 
 
 class RHRoomBookingAdminBase(RHRoomBookingBase):
@@ -255,6 +260,7 @@ class RHAttributes(RHRoomBookingAdminBase):
         if query.has_rows():
             abort(422, messages={'name': [_('Name must be unique')]})
 
+
 class RHRoomAdminBase(RHRoomBookingBase):
     def _process_args(self):
         self.room = Room.get_one(request.view_args['room_id'])
@@ -274,7 +280,23 @@ class RHRoomAttributes(RHRoomAdminBase):
 
 class RHRoomAttributesUpdate(RHRoomAdminBase):
     def _process(self):
-        return ""
+        update_room_attributes(self.room, request.get_json())
+        return jsonify(get_room_attributes(self.room.id))
+
+
+class RHRoomAvailability(RHRoomAdminBase):
+    def _process(self):
+        return jsonify({'nonbookable_periods': nonbookable_periods_schema.dump(self.room.nonbookable_periods, many=True).data,
+                       'bookable_hours': bookable_hours_schema.dump(self.room.bookable_hours, many=True).data})
+
+
+class RHRoomAvailabilityUpdate(RHRoomAdminBase):
+    @use_args({'bookable_hours': fields.Nested({'start_time': fields.Time(), 'end_time': fields.Time()}, many=True),
+               'nonbookable_periods': fields.Nested({'start_dt': fields.DateTime(), 'end_dt': fields.DateTime()}, many=True)})
+    def _process(self, args):
+        update_room_availability(self.room, args)
+        return jsonify({'nonbookable_periods': nonbookable_periods_schema.dump(self.room.nonbookable_periods, many=True).data,
+                       'bookable_hours': bookable_hours_schema.dump(self.room.bookable_hours, many=True).data})
 
 
 class RHRoomEquipment(RHRoomAdminBase):

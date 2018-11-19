@@ -20,11 +20,13 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.rb.models.equipment import EquipmentType
 from indico.modules.rb.models.room_attributes import RoomAttribute, RoomAttributeAssociation
+from indico.modules.rb.models.room_bookable_hours import BookableHours
+from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
 
 
 @no_autoflush
 def _populate_room(room, properties):
-    basic_props = [prop for prop in properties.keys() if prop not in ['available_equipment', 'unbookable_periods',
+    basic_props = [prop for prop in properties if prop not in ['available_equipment', 'unbookable_periods',
                                                                       'bookable_periods']]
     for prop in basic_props:
         if prop in properties:
@@ -33,7 +35,7 @@ def _populate_room(room, properties):
 
 
 def get_room_attributes(room_id):
-    attributes = RoomAttributeAssociation.query.filter(RoomAttributeAssociation.room_id.in_([room_id])).all()
+    attributes = RoomAttributeAssociation.query.filter(RoomAttributeAssociation.room_id == room_id).all()
     custom_attributes = {}
     for attribute in attributes:
         custom_attributes[attribute.attribute.name] = attribute.value
@@ -46,6 +48,32 @@ def update_room_equipment(room, properties):
         available_equipment = EquipmentType.query.filter(EquipmentType.id.in_(available_equipment_ids)).all()
         room.available_equipment = available_equipment
         db.session.flush()
+
+
+def update_room_attributes(room, attributes):
+    current_associations = {association.attribute.name: association for association in room.attributes}
+    for attribute, value in attributes.items():
+        if attribute in current_associations:
+            current_associations[attribute].value = value
+        else:
+            room_attr = RoomAttribute.query.filter_by(name=attribute).first()
+            if room_attr is not None:
+                room.attributes.append(RoomAttributeAssociation(room=room, attribute=room_attr, value=value))
+    db.session.flush()
+
+
+def update_room_availability(room, availability):
+    if 'bookable_hours' in availability:
+        new_bookable_hours = {BookableHours(room=room, **hours) for hours in availability['bookable_hours']}
+        del room.bookable_hours[:]
+        db.session.flush()
+        room.bookable_hours = new_bookable_hours
+    if 'nonbookable_periods' in availability:
+        new_nonbookable_periods = {NonBookablePeriod(room=room, **periods) for periods in availability['nonbookable_periods']}
+        del room.nonbookable_periods[:]
+        db.session.flush()
+        room.nonbookable_periods = new_nonbookable_periods
+    db.session.flush()
 
 
 def update_room(room, args):
