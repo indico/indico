@@ -21,13 +21,38 @@ import PropTypes from 'prop-types';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import {Form as FinalForm, Field} from 'react-final-form';
-import {Button, Confirm, Icon, List, Placeholder, Popup, Form} from 'semantic-ui-react';
+import {Button, Card, Confirm, Icon, List, Placeholder, Popup, Form} from 'semantic-ui-react';
 import {ReduxFormField, ReduxDropdownField, formatters} from 'indico/react/forms';
 import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
 import * as adminActions from './actions';
 import * as adminSelectors from './selectors';
 
 import './AdminEquipmentTypes.module.scss';
+
+
+const ConditionalCardWrapper = ({asCard, header, children}) => {
+    if (!asCard) {
+        return children;
+    }
+    return (
+        <Card fluid>
+            <Card.Content>
+                <Card.Header>
+                    {header}
+                </Card.Header>
+            </Card.Content>
+            <Card.Content>
+                {children}
+            </Card.Content>
+        </Card>
+    );
+};
+
+ConditionalCardWrapper.propTypes = {
+    asCard: PropTypes.bool.isRequired,
+    header: PropTypes.string.isRequired,
+    children: PropTypes.node.isRequired,
+};
 
 
 class EquipmentType extends React.PureComponent {
@@ -138,35 +163,39 @@ class EquipmentType extends React.PureComponent {
             <List.Item>
                 <div styleName="item">
                     {(editing || isNew) ? (
-                        <FinalForm onSubmit={this.handleSubmit}
-                                   initialValues={{name, features: features.map(x => x.name)}}
-                                   initialValuesEqual={_.isEqual}
-                                   subscription={{submitting: true, hasValidationErrors: true, pristine: true}}>
-                            {(fprops) => (
-                                <Form onSubmit={fprops.handleSubmit}>
-                                    <Form.Group widths="equal">
-                                        <Field name="name" component={ReduxFormField} as="input"
-                                               format={formatters.trim} formatOnBlur
-                                               placeholder={Translate.string('Name')}
-                                               disabled={fprops.submitting} />
-                                        <Field name="features" component={ReduxDropdownField}
-                                               multiple selection options={featureOptions}
-                                               placeholder={Translate.string('Features')}
-                                               disabled={fprops.submitting} />
-                                    </Form.Group>
-                                    <Form.Group>
-                                        <Form.Button type="submit"
-                                                     disabled={(
-                                                         fprops.hasValidationErrors ||
-                                                         fprops.pristine ||
-                                                         fprops.submitting
-                                                     )}
-                                                     loading={fprops.submitting} primary
-                                                     content={isNew ? Translate.string('Add') : Translate.string('Save')} />
-                                    </Form.Group>
-                                </Form>
-                            )}
-                        </FinalForm>
+                        <ConditionalCardWrapper asCard={isNew} header={Translate.string('Add new equipment type')}>
+                            <FinalForm onSubmit={this.handleSubmit}
+                                       initialValues={{name, features: features.map(x => x.name)}}
+                                       initialValuesEqual={_.isEqual}
+                                       subscription={{submitting: true, hasValidationErrors: true, pristine: true}}>
+                                {(fprops) => (
+                                    <Form onSubmit={fprops.handleSubmit}>
+                                        <Form.Group widths="equal">
+                                            <Field name="name" component={ReduxFormField} as="input"
+                                                   format={formatters.trim} formatOnBlur
+                                                   placeholder={Translate.string('Name')}
+                                                   disabled={fprops.submitting} />
+                                            <Field name="features" component={ReduxDropdownField}
+                                                   multiple selection options={featureOptions}
+                                                   placeholder={Translate.string('Features')}
+                                                   disabled={fprops.submitting} />
+                                        </Form.Group>
+                                        <Form.Group>
+                                            <Form.Button type="submit"
+                                                         disabled={(
+                                                             fprops.hasValidationErrors ||
+                                                             fprops.pristine ||
+                                                             fprops.submitting
+                                                         )}
+                                                         loading={fprops.submitting} primary
+                                                         content={isNew
+                                                             ? Translate.string('Add')
+                                                             : Translate.string('Save')} />
+                                        </Form.Group>
+                                    </Form>
+                                )}
+                            </FinalForm>
+                        </ConditionalCardWrapper>
                     ) : (
                         <>
                             <List.Content styleName="info">
