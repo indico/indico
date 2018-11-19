@@ -155,10 +155,12 @@ purely client-side and are worded for event creation instead of being generic.
     $('#event-creation-start_dt-date').change(function() {
         startDate = $('#event-creation-start_dt-date').val();
         endDate = $('#event-creation-end_dt-date').val();
-        roomData = JSON.parse($("#event-creation-location_data").val());
-        console.log(startDate," ",  endDate, roomData);
         var startDt = moment(startDate + " " + startTime, 'DD/MM/YYYY HH:mm');
         var endDt = moment(endDate + " " + endTime, 'DD/MM/YYYY HH:mm');
+        // workaround for automatic end date update if start date is after end date
+        if endDt.isBefore(startDt) {
+            endDt = moment(startDate + " " + endTime, 'DD/MM/YYYY HH:mm');)
+        }
         checkAvailability(roomData, startDt, endDt);
     });
 
