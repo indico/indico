@@ -104,14 +104,19 @@ purely client-side and are worded for event creation instead of being generic.
     var startTime = $('#event-creation-start_dt-time').val();
     var endDate = $('#event-creation-end_dt-date').val();
     var endTime = $('#event-creation-end_dt-time').val();
+    var occurrences = $('#event-creation-occurrences').val();
+    var $availableMessage = $('#room-available');
+    var $conflictBookingMessage = $('#room-conflict-booking');
+    var $conflictPrebookingMessage = $('#room-conflict-prebooking');
 
-    function checkAvailability(roomData, startDt, endDt) {
-        var $availableMessage = $('#room-available');
-        var $conflictBookingMessage = $('#room-conflict-booking');
-        var $conflictPrebookingMessage = $('#room-conflict-prebooking');
+    function hideAvailability() {
         $availableMessage.hide();
         $conflictBookingMessage.hide();
         $conflictPrebookingMessage.hide();
+    }
+
+    function checkAvailability(startDt, endDt) {
+        hideAvailability();
 
         if (!startDt.isSame(endDt, 'day')) { return; }
         if (!('room_id' in roomData)) { return; }
@@ -143,12 +148,28 @@ purely client-side and are worded for event creation instead of being generic.
         });
     }
 
+    function checkLectureAvailability(occurrences){
+        if (occurrences.length === 1) {
+            var occurrence = occurrences[0];
+            var startDt = moment(occurrence['date'] + " " + occurrence['time'], 'DD-MM-YYYY HH:mm');
+            var endDt = moment(startDt).add(occurrence['duration'], 'minutes');
+            checkAvailability(startDt, endDt);
+        } else {
+            hideAvailability();
+        }
+    }
+
     $("#event-creation-location_data").change(function() {
-        roomData = JSON.parse($("#event-creation-location_data").val());
-        var startDt = moment(startDate + " " + startTime, 'DD/MM/YYYY HH:mm');
-        var endDt = moment(endDate + " " + endTime, 'DD/MM/YYYY HH:mm');
-        if (previousRoomId !== roomData['room_id']) {
-            checkAvailability(roomData, startDt, endDt);
+        roomData = JSON.parse($(this).val());
+        var lectureOccurrences = $('#event-creation-occurrences').val();
+        if (lectureOccurrences) {
+            checkLectureAvailability(JSON.parse(lectureOccurrences));
+        } else {
+            var startDt = moment(startDate + " " + startTime, 'DD/MM/YYYY HH:mm');
+            var endDt = moment(endDate + " " + endTime, 'DD/MM/YYYY HH:mm');
+            if (previousRoomId !== roomData['room_id']) {
+                checkAvailability(startDt, endDt);
+            }
         }
     });
 
@@ -158,30 +179,35 @@ purely client-side and are worded for event creation instead of being generic.
         var startDt = moment(startDate + " " + startTime, 'DD/MM/YYYY HH:mm');
         var endDt = moment(endDate + " " + endTime, 'DD/MM/YYYY HH:mm');
         // workaround for automatic end date update if start date is after end date
-        if endDt.isBefore(startDt) {
-            endDt = moment(startDate + " " + endTime, 'DD/MM/YYYY HH:mm');)
+        if (endDt.isBefore(startDt)) {
+            endDt = moment(startDate + " " + endTime, 'DD/MM/YYYY HH:mm');
         }
-        checkAvailability(roomData, startDt, endDt);
+        checkAvailability(startDt, endDt);
     });
 
     $('#event-creation-start_dt-time').change(function() {
         startTime = $('#event-creation-start_dt-time').val();
         var startDt = moment(startDate + " " + startTime, 'DD/MM/YYYY HH:mm');
         var endDt = moment(endDate + " " + endTime, 'DD/MM/YYYY HH:mm');
-        checkAvailability(roomData, startDt, endDt);
+        checkAvailability(startDt, endDt);
     });
 
     $('#event-creation-end_dt-date').change(function() {
         endDate = $('#event-creation-end_dt-date').val();
         var startDt = moment(startDate + " " + startTime, 'DD/MM/YYYY HH:mm');
         var endDt = moment(endDate + " " + endTime, 'DD/MM/YYYY HH:mm');
-        checkAvailability(roomData, startDt, endDt);
+        checkAvailability(startDt, endDt);
     });
 
     $('#event-creation-end_dt-time').change(function() {
-        var endTime = $('#event-creation-end_dt-time').val();
+        endTime = $('#event-creation-end_dt-time').val();
         var startDt = moment(startDate + " " + startTime, 'DD/MM/YYYY HH:mm');
         var endDt = moment(endDate + " " + endTime, 'DD/MM/YYYY HH:mm');
-        checkAvailability(roomData, startDt, endDt);
+        checkAvailability(startDt, endDt);
     });
+
+    $('#event-creation-occurrences').change(function() {
+        occurrences = JSON.parse($(this).val());
+        checkLectureAvailability(occurrences);
+    })
 </script>
