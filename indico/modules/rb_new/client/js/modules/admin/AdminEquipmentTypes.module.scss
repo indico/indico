@@ -15,19 +15,27 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+.page-header {
+    display: flex;
+    justify-content: space-between;
+}
+
 .item {
     display: flex;
 
-    .info, form {
+    .info {
         flex-grow: 1;
+
+        .name {
+            font-size: 1.1em;
+            margin-right: 0.5em;
+        }
     }
 
     form {
+        flex-grow: 1;
         padding-right: 2em;
-    }
 
-    .feature:first-child {
-        margin-left: 0.5em;
     }
 
     .actions {
