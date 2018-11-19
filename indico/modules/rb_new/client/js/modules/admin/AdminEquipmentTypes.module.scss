@@ -23,11 +23,22 @@
     }
 
     form {
-        flex-grow: 1;
         padding-right: 2em;
     }
 
-    .feature {
-        box-shadow: none !important;
+    .feature:first-child {
+        margin-left: 0.5em;
     }
+
+    .actions {
+        white-space: nowrap;
+
+        button:global(.basic) {
+            &, &:global(.negative), &:global(.negative):hover {
+                // remove the border of the buttons
+                box-shadow: none !important;
+            }
+        }
+    }
+
 }
