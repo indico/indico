@@ -139,6 +139,16 @@ export default class DailyTimelineContent extends React.Component {
         );
     }
 
+    renderTimelineItemPlaceholders = (props) => (
+        _.range(0, 10).map((i) => (
+            <Placeholder {...props} key={i} styleName="timeline-item-placeholder" fluid>
+                <Placeholder.Paragraph>
+                    <Placeholder.Line />
+                </Placeholder.Paragraph>
+            </Placeholder>
+        ))
+    );
+
     renderList(hourSpan, width, height, extraProps = {}) {
         const {rows, hourStep, longLabel, isLoading} = this.props;
         const {selectable} = this.state;
@@ -160,6 +170,7 @@ export default class DailyTimelineContent extends React.Component {
                               rowCount={rows.length}
                               overscanRowCount={15}
                               rowHeight={50}
+                              noRowsRenderer={this.renderTimelineItemPlaceholders}
                               rowRenderer={({index, style, key}) => (
                                   this.renderTimelineRow(rows[index], key, style)
                               )}
@@ -167,17 +178,7 @@ export default class DailyTimelineContent extends React.Component {
                               tabIndex={null} />
                     </div>
                 </div>
-                {isLoading && (
-                    <div style={{marginTop: 10}}>
-                        {_.range(0, 10).map((i) => (
-                            <Placeholder key={i} styleName="timeline-item-placeholder" style={{width}} fluid>
-                                <Placeholder.Paragraph>
-                                    <Placeholder.Line />
-                                </Placeholder.Paragraph>
-                            </Placeholder>
-                        ))}
-                    </div>
-                )}
+                {rows.length !== 0 && isLoading && this.renderTimelineItemPlaceholders({style: {width}})}
             </>
         );
     }
