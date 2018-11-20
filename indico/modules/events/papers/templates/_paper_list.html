@@ -1,6 +1,21 @@
 {% from 'message_box.html' import message_box %}
 {% from 'events/management/_lists.html' import render_displayed_entries_fragment %}
 
+{% macro _render_paper_state(paper) %}
+    {% set paper_css_class = paper.state.css_class %}
+    <div class="i-tag outline semantic-text state-badge {{ paper_css_class }}">
+        {% if paper.state.name == 'submitted' and paper.can_judge(session.user) %}
+            {% trans count=paper.last_revision.reviews|length -%}
+                {{- count }} review
+            {%- pluralize -%}
+                {{- count }} reviews
+            {%- endtrans %}
+        {% else %}
+            {{- paper.state.title -}}
+        {% endif %}
+    </div>
+{% endmacro %}
+
 {% macro render_paper_assignment_list(event, total_entries, contribs, static_columns, management=false) %}
     {% if not contribs %}
         {%- call message_box('info') %}
@@ -87,7 +102,15 @@
                                 {% if item.id == 'state' %}
                                     <td class="i-table"
                                         data-searchable="{{ last_revision_state | lower }}">
-                                        <span class="vertical-aligner">{{ last_revision_state }}</span>
+                                        {% if contrib.paper %}
+                                            <span class="vertical-aligner">
+                                                {{ _render_paper_state(contrib.paper) }}
+                                            </span>
+                                        {% else %}
+                                            <span class="i-tag outline semantic-text state-badge">
+                                                {% trans %}No submission{% endtrans %}
+                                            </span>
+                                        {% endif %}
                                     </td>
                                 {% elif item.id == 'track' %}
                                     <td class="i-table"
