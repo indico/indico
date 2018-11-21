@@ -239,7 +239,8 @@ def create_booking_for_event(room_id, event):
         default_timezone = timezone(config.DEFAULT_TIMEZONE)
         start_dt = event.start_dt.astimezone(default_timezone).replace(tzinfo=None)
         end_dt = event.end_dt.astimezone(default_timezone).replace(tzinfo=None)
-        data = dict(start_dt=start_dt, end_dt=end_dt, booked_for_user=event.creator, booking_reason=event.title,
+        booking_reason = "Event '%s'" % (event.title)
+        data = dict(start_dt=start_dt, end_dt=end_dt, booked_for_user=event.creator, booking_reason=booking_reason,
                     repeat_frequency=RepeatFrequency.NEVER, event_id=event.id)
         resv = Reservation.create_from_data(room, data, session.user)
         db.session.flush()
