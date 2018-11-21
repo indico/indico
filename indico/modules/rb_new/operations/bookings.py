@@ -21,6 +21,7 @@ from datetime import datetime, time
 from itertools import groupby
 from operator import attrgetter, itemgetter
 
+from flask import session
 from sqlalchemy.orm import contains_eager, joinedload
 
 from indico.core.db import db

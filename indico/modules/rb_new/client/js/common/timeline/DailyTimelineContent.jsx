@@ -69,21 +69,7 @@ export default class DailyTimelineContent extends React.Component {
     };
 
     shouldComponentUpdate(nextProps, nextState) {
-        const {
-            rows: prevRows, isLoading: prevIsLoading, hourStep: prevHourStep, minHour: prevMinHour, maxHour: prevMaxHour
-        } = this.props;
-        const {rows, isLoading, hourStep, minHour, maxHour} = nextProps;
-        const stepChanged = hourStep !== prevHourStep;
-        const minHourChanged = minHour !== prevMinHour;
-        const maxHourChanged = maxHour !== prevMaxHour;
-        return (
-            !_.isEqual(rows, prevRows) ||
-            isLoading !== prevIsLoading ||
-            stepChanged ||
-            minHourChanged ||
-            maxHourChanged ||
-            !_.isEqual(nextState, this.state)
-        );
+        return !_.isEqual(this.props, nextProps) || !_.isEqual(this.state, nextState);
     }
 
     onClickLabel = (id) => {

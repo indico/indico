@@ -166,6 +166,19 @@ export default combineReducers({
 
                 return {...state, rows: newRows};
             }
+            case bookingActions.UPDATED_BOOKING_RECEIVED: {
+                const {roomCalendar} = camelizeKeys(action.data);
+                const {rows} = state;
+                const newRows = rows.map((row) => {
+                    if (row.roomId === roomCalendar[0].roomId) {
+                        return roomCalendar[0];
+                    }
+
+                    return row;
+                });
+
+                return {...state, rows: newRows};
+            }
             default:
                 return state;
         }

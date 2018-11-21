@@ -115,8 +115,8 @@ class ReservationEditLogSchema(UserSchema):
 
 
 class ReservationDetailsSchema(mm.ModelSchema):
-    booked_for_user = Nested(UserSchema, only=('full_name', 'phone', 'email'))
-    created_by_user = Nested(UserSchema, only=('full_name',))
+    booked_for_user = Nested(UserSchema, only=('id', 'identifier', 'full_name', 'phone', 'email'))
+    created_by_user = Nested(UserSchema, only=('id', 'identifier', 'full_name', 'email'))
     edit_logs = Nested(ReservationEditLogSchema, many=True)
     can_accept = Function(lambda booking: booking.can_be_accepted(session.user))
     can_cancel = Function(lambda booking: booking.can_be_cancelled(session.user))
@@ -208,7 +208,7 @@ class RBUserSchema(UserSchema):
     favorite_users = Nested(UserSchema, many=True)
 
     class Meta:
-        fields = UserSchema.Meta.fields + ('has_owned_rooms', 'favorite_users', 'is_admin')
+        fields = UserSchema.Meta.fields + ('has_owned_rooms', 'favorite_users', 'is_admin', 'identifier', 'full_name')
 
     def has_managed_rooms(self, user):
         from indico.modules.rb_new.operations.rooms import has_managed_rooms

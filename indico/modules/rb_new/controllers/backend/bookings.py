@@ -55,6 +55,18 @@ def _serialize_availability(availability):
     return availability
 
 
+def _serialize_booking_details(booking):
+    attributes = reservation_details_schema.dump(booking).data
+    date_range, occurrences = get_booking_occurrences(booking)
+    date_range = [dt.isoformat() for dt in date_range]
+    occurrences = {dt.isoformat(): reservation_details_occurrences_schema.dump(data).data
+                   for dt, data in occurrences.iteritems()}
+    booking_details = dict(attributes)
+    booking_details['occurrences'] = occurrences
+    booking_details['date_range'] = date_range
+    return booking_details
+
+
 class RHTimeline(RHRoomBookingBase):
     def _process_args(self):
         self.room = None
@@ -154,15 +166,7 @@ class RHBookingBase(RHRoomBookingBase):
 
 class RHBookingDetails(RHBookingBase):
     def _process(self):
-        attributes = reservation_details_schema.dump(self.booking).data
-        date_range, occurrences = get_booking_occurrences(self.booking)
-        date_range = [dt.isoformat() for dt in date_range]
-        occurrences = {dt.isoformat(): reservation_details_occurrences_schema.dump(data).data
-                       for dt, data in occurrences.iteritems()}
-        booking_details = dict(attributes)
-        booking_details['occurrences'] = occurrences
-        booking_details['date_range'] = date_range
-        return jsonify(booking_details)
+        return jsonify(_serialize_booking_details(self.booking))
 
 
 class RHBookingStateActions(RHBookingBase):
@@ -218,3 +222,26 @@ class RHBookingEventData(RHBookingBase):
         if not self.booking.event.can_access(session.user):
             return jsonify(can_access=False)
         return jsonify(reservation_event_data_schema.dump(self.booking.event).data)
+
+
+class RHUpdateBooking(RHBookingBase):
+    @use_args(create_booking_args)
+    def _process(self, args):
+        data = {
+            'booking_reason': args['booking_reason'],
+            'room_usage': 'current_user' if args.get('user_id', None) is None else 'someone',
+            'booked_for_user': User.get(args.get('user_id', session.user.id)),
+            'start_dt': args['start_dt'],
+            'end_dt': args['end_dt'],
+            'repeat_frequency': args['repeat_frequency'],
+            'repeat_interval': args['repeat_interval'],
+        }
+
+        self.booking.modify(data, session.user)
+        db.session.flush()
+
+        start_date = args['start_dt']
+        end_date = args['end_dt']
+        calendar = get_room_calendar(start_date or date.today(), end_date or date.today(), [args['room_id']])
+        return jsonify(booking=_serialize_booking_details(self.booking),
+                       room_calendar=_serialize_availability(calendar).values())

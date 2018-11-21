@@ -18,6 +18,7 @@
 import fetchBookingDetailsURL from 'indico-url:rooms_new.booking_details';
 import bookingStateActionsURL from 'indico-url:rooms_new.booking_state_actions';
 import bookingDeleteURL from 'indico-url:rooms_new.booking_delete';
+import bookingUpdateURL from 'indico-url:rooms_new.update_booking';
 
 import {indicoAxios} from 'indico/utils/axios';
 import {ajaxAction} from 'indico/utils/redux';
@@ -37,6 +38,11 @@ export const BOOKING_STATE_UPDATED = 'bookings/BOOKING_STATE_UPDATED';
 export const DELETE_BOOKING_REQUEST = 'bookings/DELETE_BOOKING_REQUEST';
 export const DELETE_BOOKING_SUCCESS = 'bookings/DELETE_BOOKING_SUCCESS';
 export const DELETE_BOOKING_ERROR = 'bookings/DELETE_BOOKING_ERROR';
+
+export const UPDATE_BOOKING_REQUEST = 'bookings/UPDATE_BOOKING_REQUEST';
+export const UPDATE_BOOKING_SUCCESS = 'bookings/UPDATE_BOOKING_SUCCESS';
+export const UPDATE_BOOKING_ERROR = 'bookings/UPDATE_BOOKING_ERROR';
+export const UPDATED_BOOKING_RECEIVED = 'bookings/UPDATED_BOOKING_RECEIVED';
 
 
 export function fetchBookingDetails(id) {
@@ -65,5 +71,14 @@ export function deleteBooking(id) {
         DELETE_BOOKING_REQUEST,
         DELETE_BOOKING_SUCCESS,
         DELETE_BOOKING_ERROR,
+    );
+}
+
+export function updateBooking(id, params) {
+    return ajaxAction(
+        () => indicoAxios.patch(bookingUpdateURL({booking_id: id}), params),
+        UPDATE_BOOKING_REQUEST,
+        [UPDATE_BOOKING_SUCCESS, UPDATED_BOOKING_RECEIVED],
+        UPDATE_BOOKING_ERROR,
     );
 }

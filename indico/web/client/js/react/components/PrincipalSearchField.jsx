@@ -53,7 +53,6 @@ const searchGroups = async (data) => {
 export default class PrincipalSearchField extends React.Component {
     static propTypes = {
         multiple: PropTypes.bool,
-        initialCache: PropTypes.array,
         value: PropTypes.oneOfType([
             PropTypes.object,
             PropTypes.array
@@ -69,7 +68,6 @@ export default class PrincipalSearchField extends React.Component {
 
     static defaultProps = {
         multiple: false,
-        initialCache: [],
         value: null,
         disabled: false,
         withGroups: false,
@@ -80,18 +78,12 @@ export default class PrincipalSearchField extends React.Component {
     constructor(props) {
         super(props);
 
-        const {multiple, initialCache, value} = this.props;
+        const {multiple, value} = this.props;
 
         if (multiple) {
             this.userCache = Object.assign({}, ...(value || []).map((val) => ({[val.identifier]: val})));
         } else {
             this.userCache = value ? {[value.identifier]: value} : {};
-        }
-
-        if (initialCache.length) {
-            initialCache.forEach((option) => {
-                this.userCache[option.identifier] = option;
-            });
         }
     }
 
@@ -100,6 +92,7 @@ export default class PrincipalSearchField extends React.Component {
         options: [],
         searchQuery: ''
     };
+
 
     shouldComponentUpdate(nextProps, nextState) {
         const {value: prevValue, disabled: prevDisabled, placeholder: prevPlaceholder} = this.props;
@@ -112,8 +105,22 @@ export default class PrincipalSearchField extends React.Component {
         );
     }
 
+    refreshUserCache = () => {
+        const {value, multiple} = this.props;
+        if (!value) {
+            return;
+        }
+
+        const fieldValue = multiple ? value : [value];
+        fieldValue.forEach((val) => {
+            this.userCache[val.identifier] = val;
+        });
+    };
+
     get identifierValue() {
         const {value, multiple} = this.props;
+
+        this.refreshUserCache();
         if (multiple) {
             return (value || []).sort(this.sortPrincipals).map(val => val.identifier);
         } else {

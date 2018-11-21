@@ -27,6 +27,7 @@ import './DatePeriodField.module.scss';
 
 export default class DatePeriodField extends React.Component {
     static propTypes = {
+        disabledDate: PropTypes.func,
         onChange: PropTypes.func.isRequired,
         disabled: PropTypes.bool,
         value: PropTypes.shape({
@@ -37,6 +38,7 @@ export default class DatePeriodField extends React.Component {
     };
 
     static defaultProps = {
+        disabledDate: null,
         disabled: false,
         value: null,
         minimumDays: 1,
@@ -65,10 +67,17 @@ export default class DatePeriodField extends React.Component {
     };
 
     render() {
-        const {disabled, minimumDays} = this.props;
+        const {disabled, minimumDays, disabledDate} = this.props;
+        const props = {};
+
+        if (disabledDate) {
+            props.isOutsideRange = disabledDate;
+        }
+
         return (
             <div styleName="date-period-field">
-                <DateRangePicker startDate={this.getMomentValue('startDate')}
+                <DateRangePicker {...props}
+                                 startDate={this.getMomentValue('startDate')}
                                  endDate={this.getMomentValue('endDate')}
                                  onDatesChange={this.notifyChange}
                                  disabled={disabled}
