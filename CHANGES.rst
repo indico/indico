@@ -54,6 +54,12 @@ Version 2.1.5
 
 *Unreleased*
 
+Improvements
+^^^^^^^^^^^^
+
+- Render the reviewing state of papers in the same way as abstracts
+  (:issue:`3665`)
+
 Bugfixes
 ^^^^^^^^
 

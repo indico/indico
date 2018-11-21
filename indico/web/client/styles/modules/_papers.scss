@@ -62,6 +62,10 @@
     .revision-column {
         width: 4rem;
     }
+
+    table > tbody > tr > td {
+        vertical-align: baseline;
+    }
 }
 
 .paper-contribution-list {
