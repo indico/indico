@@ -78,12 +78,15 @@ export default class RoomStats extends React.PureComponent {
 
     render() {
         const {loaded, data} = this.state;
-        const mapping = {
-            times_booked: Translate.string('Times booked'),
-            occupancy: Translate.string('Occupancy'),
+        const sections = {
+            times_booked: {title: Translate.string('Times booked')},
+            occupancy: {
+                title: Translate.string('Occupancy'),
+                note: Translate.string('excluding weekends')
+            }
         };
-        const hasStats = Object.entries(data)
-            .map(([, {values}]) => values)
+        const hasStats = Object.values(data)
+            .map(({values}) => values)
             .some(values => !!values.length);
 
         if (!loaded) {
@@ -95,7 +98,7 @@ export default class RoomStats extends React.PureComponent {
                 <div styleName="room-stats">
                     {Object.entries(data).map(([key, {id, values, note}]) => (
                         <div key={key} styleName="stats-box">
-                            <div styleName="title">{mapping[id]}{!!note && '*'}</div>
+                            <div styleName="title">{sections[id].title}{note && '*'}</div>
                             {values.map(({days, value}) => (
                                 <div styleName="value-box" key={`${days}-${value}`}>
                                     <div styleName="days">
@@ -107,7 +110,7 @@ export default class RoomStats extends React.PureComponent {
                                     <div styleName="value">{Math.round(value)}{key === 'percentage' ? '%' : ''}</div>
                                 </div>
                             ))}
-                            {!!note && <div styleName="note">* <Param name="note" value={note} /></div>}
+                            {note && <div styleName="note">* {sections[id].note}</div>}
                         </div>
                     ))}
                 </div>
