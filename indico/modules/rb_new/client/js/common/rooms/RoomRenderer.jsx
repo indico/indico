@@ -79,10 +79,15 @@ export default class RoomRenderer extends React.Component {
     });
 
     render() {
-        const {rooms} = this.props;
+        const {rooms, inSelectionMode, selectedRooms} = this.props;
         return (
             <Card.Group stackable>
-                {rooms.map(room => <this.RoomComponent key={room.id} room={room} />)}
+                {rooms.map(room => (
+                    <this.RoomComponent key={room.id}
+                                        room={room}
+                                        inSelectionMode={inSelectionMode}
+                                        selectedRooms={selectedRooms} />
+                ))}
             </Card.Group>);
     }
 }

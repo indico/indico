@@ -89,17 +89,23 @@ export function withHoverListener(RoomComponent) {
             hoveredRoomId: PropTypes.number,
             actions: PropTypes.object.isRequired,
             room: PropTypes.object.isRequired,
+            inSelectionMode: PropTypes.bool,
+            selectedRooms: PropTypes.object
         };
 
         static defaultProps = {
             hoveredRoomId: null,
+            inSelectionMode: false,
+            selectedRooms: {}
         };
 
-        shouldComponentUpdate({hoveredRoomId: newId, room: {id}}) {
-            const {hoveredRoomId: currentId} = this.props;
-            // we only want to update the room that was previously hovered
-            // as well as that which is now hovered (if any)
-            return newId === id || currentId === id;
+        shouldComponentUpdate({hoveredRoomId: newId, room: {id}, actions, ...restProps}) {
+            const {hoveredRoomId: currentId, room, actions: __, ...oldRestProps} = this.props;
+            // IMPORTANT: we only want this update to occurr when really needed
+            // - whenever this room is going from hovered -> non-hovered
+            // - whenever this room is going from non-hovered -> hovered
+            // - whenever any of the other props change (selection)
+            return newId === id || currentId === id || !_.isEqual(restProps, oldRestProps);
         }
 
         render() {
