@@ -52,8 +52,10 @@ export default combineReducers({
                 const user = action.data;
                 return {
                     id: user.id,
+                    identifier: user.identifier,
                     firstName: user.first_name,
                     lastName: user.last_name,
+                    fullName: user.full_name,
                     email: user.email,
                     avatarBgColor: user.avatar_bg_color,
                     language: user.language,

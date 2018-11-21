@@ -205,3 +205,15 @@ export function getRecurrenceInfo(repetition) {
     }
     return {type, number, interval};
 }
+
+export function serializeRecurrenceInfo({type, number, interval}) {
+    if (type === 'single') {
+        return ['NEVER', 0];
+    } else if (type === 'daily') {
+        return ['DAY', 1];
+    } else if (interval === 'week') {
+        return ['WEEK', number];
+    } else if (interval === 'month') {
+        return ['MONTH', number];
+    }
+}

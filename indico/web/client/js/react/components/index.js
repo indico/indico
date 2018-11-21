@@ -24,3 +24,4 @@ export {default as SingleDatePicker} from './SingleDatePicker';
 export {default as DateRangePicker} from './DateRangePicker';
 export {default as CalendarSingleDatePicker} from './CalendarSingleDatePicker';
 export {default as CalendarRangeDatePicker} from './CalendarRangeDatePicker';
+export {default as DatePeriodField} from './DatePeriodField';

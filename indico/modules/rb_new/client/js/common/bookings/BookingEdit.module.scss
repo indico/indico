@@ -15,21 +15,26 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-@import 'rb_new:styles/palette';
+.booking-edit-modal-header {
+    display: flex !important;
+    justify-content: space-between;
+    align-items: center;
+}
 
-:global(.ui.modal .header).booking-modal-header {
+.booking-calendar {
     display: flex;
+    flex-direction: column;
+    flex: 1;
 
-    .header-text {
-        flex: 1;
-        align-self: center;
-    }
-
-    .booking-status {
-        flex: 4;
+    :global(.legend-header) {
+        .occurrence-count {
+            display: flex;
+            margin-left: auto !important;
+        }
     }
 }
 
-.rejection-form {
-    width: 350px;
+.booking-conflicts-info {
+    flex-grow: unset !important;
+    margin-top: 20px;
 }

@@ -17,7 +17,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Checkbox, Dropdown, Form, Popup} from 'semantic-ui-react';
+import {Checkbox, Dropdown, Form, Popup, Radio} from 'semantic-ui-react';
 
 import './ReduxFormField.module.scss';
 
@@ -97,6 +97,7 @@ export function ReduxRadioField({input, input: {value}, radioValue, ...props}) {
     return (
         <ReduxFormField input={input}
                         {...props}
+                        as={Radio}
                         checked={radioValue === value}
                         onChange={(__, {checked}) => {
                             if (checked) {

@@ -50,6 +50,10 @@ export default combineReducers({
                 delete newState[bookingId];
                 return {...newState};
             }
+            case bookingsActions.UPDATED_BOOKING_RECEIVED: {
+                const {booking} = camelizeKeys(action.data);
+                return {...state, [booking.id]: booking};
+            }
             default:
                 return state;
         }
