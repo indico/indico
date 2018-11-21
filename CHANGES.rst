@@ -7,18 +7,18 @@ Version 2.1.5
 
 *Unreleased*
 
+Improvements
+^^^^^^^^^^^^
+
+- Render the reviewing state of papers in the same way as abstracts
+  (:issue:`3665`)
+
 Bugfixes
 ^^^^^^^^
 
 - Use correct speaker name when exporting contributions to spreadsheets
 - Use friendly IDs in abstract attachment package folder names
 - Fix typo in material package subcontribution folder names
-
-Improvements
-^^^^^^^^^^^^
-
-- Render the reviewing state of papers in the same way as abstracts
-  (:issue:`3665`);
 
 Version 2.1.4
 -------------
