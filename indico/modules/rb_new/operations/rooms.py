@@ -100,12 +100,12 @@ def get_room_statistics(room):
         'count': {
             'id': 'times_booked',
             'values': [],
-            'note': None
+            'note': False
         },
         'percentage': {
             'id': 'occupancy',
             'values': [],
-            'note': 'excluding weekends'
+            'note': True
         }
     }
     ranges = [7, 30, 365]
