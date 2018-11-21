@@ -98,6 +98,7 @@ purely client-side and are worded for event creation instead of being generic.
     _.defer(function() {
         $('#{{ form.title.id }}').focus();
     });
+    var serverDefaultTimezone = '{{ indico_config.DEFAULT_TIMEZONE }}'
     var previousRoomId;
     var roomData = JSON.parse($("#event-creation-location_data").val());
     var startDate = $('#event-creation-start_dt-date').val();
@@ -109,14 +110,14 @@ purely client-side and are worded for event creation instead of being generic.
     var $conflictBookingMessage = $('#room-conflict-booking');
     var $conflictPrebookingMessage = $('#room-conflict-prebooking');
 
-    function hideAvailability() {
+    function hideAllMessages() {
         $availableMessage.hide();
         $conflictBookingMessage.hide();
         $conflictPrebookingMessage.hide();
     }
 
     function checkAvailability(startDt, endDt) {
-        hideAvailability();
+        hideAllMessages();
 
         if (!startDt.isSame(endDt, 'day')) { return; }
         if (!('room_id' in roomData)) { return; }
@@ -155,7 +156,7 @@ purely client-side and are worded for event creation instead of being generic.
             var endDt = moment(startDt).add(occurrence['duration'], 'minutes');
             checkAvailability(startDt, endDt);
         } else {
-            hideAvailability();
+            hideAllMessages();
         }
     }
 
@@ -209,5 +210,12 @@ purely client-side and are worded for event creation instead of being generic.
     $('#event-creation-occurrences').change(function() {
         occurrences = JSON.parse($(this).val());
         checkLectureAvailability(occurrences);
+    });
+
+    $('#event-creation-timezone').change(function() {
+        var timezone = ($(this).val());
+        if (timezone !== serverDefaultTimezone) {
+            hideAllMessages();
+        }
     });
 </script>
