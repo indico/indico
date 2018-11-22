@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 from datetime import datetime, time
 
 from dateutil.relativedelta import relativedelta
-from flask import flash, redirect, render_template, request
+from flask import flash, redirect, render_template, request, session
 from markupsafe import Markup
 from pytz import timezone
 from werkzeug.utils import cached_property
@@ -33,6 +33,7 @@ from indico.modules.events.models.persons import EventPerson, EventPersonLink
 from indico.modules.events.models.series import EventSeries
 from indico.modules.events.notifications import notify_event_creation
 from indico.modules.events.operations import create_event
+from indico.modules.rb.util import rb_check_user_access
 from indico.util.date_time import now_utc
 from indico.util.struct.iterables import materialize_iterable
 from indico.web.flask.util import url_for
@@ -123,5 +124,7 @@ class RHCreateEvent(RHProtected):
                 event = self._create_event(form.data)
                 notify_event_creation(event)
             return jsonify_data(flash=False, redirect=url_for('event_management.settings', event))
+        check_room_availability = rb_check_user_access(session.user) and config.ENABLE_ROOMBOOKING
         return jsonify_template('events/forms/event_creation_form.html', form=form, fields=form._field_order,
-                                event_type=self.event_type.name, single_category=self.single_category)
+                                event_type=self.event_type.name, single_category=self.single_category,
+                                check_room_availability=check_room_availability)
