@@ -101,7 +101,12 @@ def create_event(category, event_type, data, add_creator_as_manager=True, featur
     if data['location_data'].pop('create_booking', False):
         room_id = data['location_data'].pop('room_id', None)
         if room_id:
-            create_booking_for_event(room_id, event)
+            booking = create_booking_for_event(room_id, event)
+            logger.info('Booking %r created for event %r', booking, event)
+            log_data = {'Date': booking.start_dt.strftime('%d/%m/%Y'),
+                        'Times': '%s - %s' % (booking.start_dt.strftime('%H:%M'), booking.end_dt.strftime('%H:%M'))}
+            event.log(EventLogRealm.event, EventLogKind.positive, 'Event', 'Room booked for the event', session.user,
+                      data=log_data)
             db.session.flush()
     return event
 
