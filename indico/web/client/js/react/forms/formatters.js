@@ -15,11 +15,20 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import _slugify from 'slugify';
+
+
 function trim(value) {
     return value === undefined ? undefined : value.trim();
 }
 
 
+function slugify(value) {
+    return value === undefined ? undefined : _slugify(value, {lower: true});
+}
+
+
 export default {
     trim,
+    slugify,
 };

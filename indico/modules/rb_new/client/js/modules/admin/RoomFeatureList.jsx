@@ -84,7 +84,7 @@ class RoomFeatureList extends React.PureComponent {
         return (
             <>
                 <Field name="name" component={ReduxFormField} as="input"
-                       format={formatters.trim} formatOnBlur
+                       format={formatters.slugify} formatOnBlur
                        label={Translate.string('Name')}
                        disabled={fprops.submitting} />
                 <Field name="title" component={ReduxFormField} as="input"
