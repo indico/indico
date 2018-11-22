@@ -33,6 +33,8 @@ export const FETCH_FEATURES_REQUEST = 'admin/FETCH_FEATURES_REQUEST';
 export const FETCH_FEATURES_SUCCESS = 'admin/FETCH_FEATURES_SUCCESS';
 export const FETCH_FEATURES_ERROR = 'admin/FETCH_FEATURES_ERROR';
 export const FEATURES_RECEIVED = 'admin/FEATURES_RECEIVED';
+export const FEATURE_RECEIVED = 'admin/FEATURE_RECEIVED';
+export const FEATURE_DELETED = 'admin/FEATURE_DELETED';
 
 export const FETCH_EQUIPMENT_TYPES_REQUEST = 'admin/FETCH_EQUIPMENT_TYPES_REQUEST';
 export const FETCH_EQUIPMENT_TYPES_SUCCESS = 'admin/FETCH_EQUIPMENT_TYPES_SUCCESS';
@@ -98,5 +100,31 @@ export function createEquipmentType(data) {
     return submitFormAction(
         () => indicoAxios.post(equipmentTypesURL(), data),
         null, EQUIPMENT_TYPE_RECEIVED
+    );
+}
+
+export function deleteFeature(id) {
+    return async (dispatch) => {
+        try {
+            await indicoAxios.delete(featuresURL({feature_id: id}));
+        } catch (error) {
+            handleAxiosError(error, true);
+            return;
+        }
+        dispatch({type: FEATURE_DELETED, id});
+    };
+}
+
+export function updateFeature(id, data) {
+    return submitFormAction(
+        () => indicoAxios.patch(featuresURL({feature_id: id}), data),
+        null, FEATURE_RECEIVED
+    );
+}
+
+export function createFeature(data) {
+    return submitFormAction(
+        () => indicoAxios.post(featuresURL(), data),
+        null, FEATURE_RECEIVED
     );
 }

@@ -24,11 +24,11 @@ from werkzeug.exceptions import Forbidden
 
 from indico.core.db import db
 from indico.modules.rb.controllers import RHRoomBookingBase
-from indico.modules.rb.models.equipment import EquipmentType, RoomEquipmentAssociation
+from indico.modules.rb.models.equipment import EquipmentType, RoomEquipmentAssociation, equipment_features_table
 from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.room_features import RoomFeature
 from indico.modules.rb.util import rb_is_admin
-from indico.modules.rb_new.schemas import admin_locations_schema, equipment_type_schema, room_features_schema
+from indico.modules.rb_new.schemas import admin_locations_schema, equipment_type_schema, room_feature_schema
 from indico.util.i18n import _
 from indico.util.marshmallow import ModelList
 
@@ -47,12 +47,70 @@ class RHLocations(RHRoomBookingAdminBase):
 
 
 class RHFeatures(RHRoomBookingAdminBase):
-    def _get_features(self):
-        query = RoomFeature.query.order_by(RoomFeature.title)
-        return room_features_schema.dump(query).data
+    def _process_args(self):
+        id_ = request.view_args.get('feature_id')
+        self.feature = RoomFeature.get_one(id_) if id_ is not None else None
 
-    def _process(self):
-        return jsonify(self._get_features())
+    def _dump_features(self):
+        query = RoomFeature.query.order_by(RoomFeature.title)
+        return room_feature_schema.dump(query, many=True).data
+
+    def _get_equipment_counts(self):
+        query = (db.session.query(equipment_features_table.c.feature_id, db.func.count())
+                 .group_by(equipment_features_table.c.feature_id))
+        return dict(query)
+
+    def _jsonify_one(self, equipment_type):
+        return jsonify(room_feature_schema.dump(equipment_type).data)
+
+    def _jsonify_many(self):
+        return jsonify(self._dump_features())
+
+    def _process_GET(self):
+        if self.feature:
+            return self._jsonify_one(self.feature)
+        else:
+            return self._jsonify_many()
+
+    def _process_DELETE(self):
+        db.session.delete(self.feature)
+        db.session.flush()
+        return '', 204
+
+    @use_kwargs({
+        'name': fields.String(validate=validate.Length(min=2), required=True),
+        'title': fields.String(validate=validate.Length(min=2), required=True),
+        'icon': fields.String(missing=''),
+    })
+    def _process_POST(self, name, title, icon):
+        self._check_conflict(name)
+        feature = RoomFeature(name=name, title=title, icon=icon)
+        db.session.add(feature)
+        db.session.flush()
+        return self._jsonify_one(feature), 201
+
+    @use_kwargs({
+        'name': fields.String(validate=validate.Length(min=2)),
+        'title': fields.String(validate=validate.Length(min=2)),
+        'icon': fields.String(),
+    })
+    def _process_PATCH(self, name, title, icon):
+        if name is not missing:
+            self._check_conflict(name)
+            self.feature.name = name
+        if title is not missing:
+            self.feature.title = title
+        if icon is not missing:
+            self.feature.icon = icon
+        db.session.flush()
+        return self._jsonify_one(self.feature)
+
+    def _check_conflict(self, name):
+        query = RoomFeature.query.filter(db.func.lower(RoomFeature.name) == name.lower())
+        if self.feature:
+            query = query.filter(RoomFeature.id != self.feature.id)
+        if query.has_rows():
+            abort(422, messages={'name': [_('Name must be unique')]})
 
 
 class RHEquipmentTypes(RHRoomBookingAdminBase):

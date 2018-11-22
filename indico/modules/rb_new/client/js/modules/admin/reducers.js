@@ -63,6 +63,11 @@ export default combineReducers({
                 ];
             case adminActions.EQUIPMENT_TYPE_DELETED:
                 return state.filter(eq => eq.id !== action.id);
+            case adminActions.FEATURE_DELETED:
+                return state.map(eq => ({
+                    ...eq,
+                    features: eq.features.filter(feat => feat.id !== action.id)
+                }));
             default:
                 return state;
         }
@@ -71,6 +76,13 @@ export default combineReducers({
         switch (action.type) {
             case adminActions.FEATURES_RECEIVED:
                 return action.data;
+            case adminActions.FEATURE_RECEIVED:
+                return [
+                    ...state.filter(feat => feat.id !== action.data.id),
+                    action.data,
+                ];
+            case adminActions.FEATURE_DELETED:
+                return state.filter(feat => feat.id !== action.id);
             default:
                 return state;
         }

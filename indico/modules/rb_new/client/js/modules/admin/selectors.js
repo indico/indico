@@ -44,8 +44,16 @@ export const getEquipmentTypes = createSelector(
 );
 
 export const getFeatures = createSelector(
+    _getEquipmentTypes,
     _getFeatures,
-    features => features.sort(makeSorter('title'))
+    (equipmentTypes, features) => {
+        return features
+            .map(feat => ({
+                ...feat,
+                numEquipmentTypes: equipmentTypes.filter(eq => eq.features.some(f => f.name === feat.name)).length,
+            }))
+            .sort(makeSorter('title'));
+    }
 );
 
 export const isFetchingFeaturesOrEquipmentTypes = ({admin}) => (

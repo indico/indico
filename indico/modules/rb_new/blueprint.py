@@ -78,4 +78,6 @@ _bp.add_url_rule('/api/admin/locations', 'admin_locations', admin.RHLocations)
 _bp.add_url_rule('/api/admin/equipment-types', 'admin_equipment_types', admin.RHEquipmentTypes, methods=('GET', 'POST'))
 _bp.add_url_rule('/api/admin/equipment-types/<int:equipment_type_id>', 'admin_equipment_types', admin.RHEquipmentTypes,
                  methods=('GET', 'DELETE', 'PATCH'))
-_bp.add_url_rule('/api/admin/features', 'admin_features', admin.RHFeatures)
+_bp.add_url_rule('/api/admin/features', 'admin_features', admin.RHFeatures, methods=('GET', 'POST'))
+_bp.add_url_rule('/api/admin/features/<int:feature_id>', 'admin_features', admin.RHFeatures,
+                 methods=('GET', 'DELETE', 'PATCH'))

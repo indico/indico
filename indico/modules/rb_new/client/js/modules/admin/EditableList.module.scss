@@ -15,13 +15,18 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-.page-header {
+.header {
     display: flex;
     justify-content: space-between;
 }
 
 .item {
     display: flex;
+    align-items: center;
+
+    &.editing {
+        align-items: normal;
+    }
 
     .info {
         flex-grow: 1;
