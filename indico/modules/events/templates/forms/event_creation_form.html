@@ -98,124 +98,129 @@ purely client-side and are worded for event creation instead of being generic.
     _.defer(function() {
         $('#{{ form.title.id }}').focus();
     });
-    var serverDefaultTimezone = '{{ indico_config.DEFAULT_TIMEZONE }}'
-    var previousRoomId;
-    var roomData = JSON.parse($("#event-creation-location_data").val());
-    var startDate = $('#event-creation-start_dt-date').val();
-    var startTime = $('#event-creation-start_dt-time').val();
-    var endDate = $('#event-creation-end_dt-date').val();
-    var endTime = $('#event-creation-end_dt-time').val();
-    var occurrences = $('#event-creation-occurrences').val();
-    var $availableMessage = $('#room-available');
-    var $conflictBookingMessage = $('#room-conflict-booking');
-    var $conflictPrebookingMessage = $('#room-conflict-prebooking');
+</script>
 
-    function hideAllMessages() {
-        $availableMessage.hide();
-        $conflictBookingMessage.hide();
-        $conflictPrebookingMessage.hide();
-    }
+{% if check_room_availability %}
+    <script>
+        var serverDefaultTimezone = '{{ indico_config.DEFAULT_TIMEZONE }}';
+        var previousRoomId;
+        var roomData = JSON.parse($("#event-creation-location_data").val());
+        var startDate = $('#event-creation-start_dt-date').val();
+        var startTime = $('#event-creation-start_dt-time').val();
+        var endDate = $('#event-creation-end_dt-date').val();
+        var endTime = $('#event-creation-end_dt-time').val();
+        var occurrences = $('#event-creation-occurrences').val();
+        var $availableMessage = $('#room-available');
+        var $conflictBookingMessage = $('#room-conflict-booking');
+        var $conflictPrebookingMessage = $('#room-conflict-prebooking');
 
-    function checkAvailability(startDt, endDt) {
-        hideAllMessages();
+        function hideAllMessages() {
+            $availableMessage.hide();
+            $conflictBookingMessage.hide();
+            $conflictPrebookingMessage.hide();
+        }
 
-        if (!startDt.isSame(endDt, 'day')) { return; }
-        if (!('room_id' in roomData)) { return; }
+        function checkAvailability(startDt, endDt) {
+            hideAllMessages();
 
-        var roomId = roomData['room_id'];
-        previousRoomId = roomId;
+            if (!startDt.isSame(endDt, 'day')) { return; }
+            if (!('room_id' in roomData)) { return; }
 
-        var requestParams = {
-            room_id: roomId,
-            start_dt: startDt.format('DD/MM/YYYY HH:mm:ss'),
-            end_dt: endDt.format('DD/MM/YYYY HH:mm:ss')
-        };
+            var roomId = roomData['room_id'];
+            previousRoomId = roomId;
 
-        $.ajax({
-            url: build_url(Indico.Urls.RoomBooking.room.check_available, requestParams),
-            method: 'GET',
-            dataType: 'json',
-            contentType: 'application/json',
-            error: handleAjaxError,
-            success: function(data) {
-                if (data['conflict_booking']){
-                    $conflictBookingMessage.show();
-                } else if (data['conflict_prebooking']){
-                    $conflictPrebookingMessage.show();
-                } else {
-                    $availableMessage.show();
+            var requestParams = {
+                room_id: roomId,
+                start_dt: startDt.format('DD/MM/YYYY HH:mm:ss'),
+                end_dt: endDt.format('DD/MM/YYYY HH:mm:ss')
+            };
+
+            $.ajax({
+                url: build_url(Indico.Urls.RoomBooking.room.check_available, requestParams),
+                method: 'GET',
+                dataType: 'json',
+                contentType: 'application/json',
+                error: handleAjaxError,
+                success: function(data) {
+                    if (data['conflict_booking']){
+                        $conflictBookingMessage.show();
+                    } else if (data['conflict_prebooking']){
+                        $conflictPrebookingMessage.show();
+                    } else {
+                        $availableMessage.show();
+                    }
+                }
+            });
+        }
+
+        function checkLectureAvailability(occurrences){
+            if (occurrences.length === 1) {
+                var occurrence = occurrences[0];
+                var startDt = moment(occurrence['date'] + " " + occurrence['time'], 'DD-MM-YYYY HH:mm');
+                var endDt = moment(startDt).add(occurrence['duration'], 'minutes');
+                checkAvailability(startDt, endDt);
+            } else {
+                hideAllMessages();
+            }
+        }
+
+        $("#event-creation-location_data").change(function() {
+            roomData = JSON.parse($(this).val());
+            var lectureOccurrences = $('#event-creation-occurrences').val();
+            if (lectureOccurrences) {
+                checkLectureAvailability(JSON.parse(lectureOccurrences));
+            } else {
+                var startDt = moment(startDate + " " + startTime, 'DD/MM/YYYY HH:mm');
+                var endDt = moment(endDate + " " + endTime, 'DD/MM/YYYY HH:mm');
+                if (previousRoomId !== roomData['room_id']) {
+                    checkAvailability(startDt, endDt);
                 }
             }
         });
-    }
 
-    function checkLectureAvailability(occurrences){
-        if (occurrences.length === 1) {
-            var occurrence = occurrences[0];
-            var startDt = moment(occurrence['date'] + " " + occurrence['time'], 'DD-MM-YYYY HH:mm');
-            var endDt = moment(startDt).add(occurrence['duration'], 'minutes');
-            checkAvailability(startDt, endDt);
-        } else {
-            hideAllMessages();
-        }
-    }
-
-    $("#event-creation-location_data").change(function() {
-        roomData = JSON.parse($(this).val());
-        var lectureOccurrences = $('#event-creation-occurrences').val();
-        if (lectureOccurrences) {
-            checkLectureAvailability(JSON.parse(lectureOccurrences));
-        } else {
+        $('#event-creation-start_dt-date').change(function() {
+            startDate = $('#event-creation-start_dt-date').val();
+            endDate = $('#event-creation-end_dt-date').val();
             var startDt = moment(startDate + " " + startTime, 'DD/MM/YYYY HH:mm');
             var endDt = moment(endDate + " " + endTime, 'DD/MM/YYYY HH:mm');
-            if (previousRoomId !== roomData['room_id']) {
-                checkAvailability(startDt, endDt);
+            // workaround for automatic end date update if start date is after end date
+            if (endDt.isBefore(startDt)) {
+                endDt = moment(startDate + " " + endTime, 'DD/MM/YYYY HH:mm');
             }
-        }
-    });
+            checkAvailability(startDt, endDt);
+        });
 
-    $('#event-creation-start_dt-date').change(function() {
-        startDate = $('#event-creation-start_dt-date').val();
-        endDate = $('#event-creation-end_dt-date').val();
-        var startDt = moment(startDate + " " + startTime, 'DD/MM/YYYY HH:mm');
-        var endDt = moment(endDate + " " + endTime, 'DD/MM/YYYY HH:mm');
-        // workaround for automatic end date update if start date is after end date
-        if (endDt.isBefore(startDt)) {
-            endDt = moment(startDate + " " + endTime, 'DD/MM/YYYY HH:mm');
-        }
-        checkAvailability(startDt, endDt);
-    });
+        $('#event-creation-start_dt-time').change(function() {
+            startTime = $('#event-creation-start_dt-time').val();
+            var startDt = moment(startDate + " " + startTime, 'DD/MM/YYYY HH:mm');
+            var endDt = moment(endDate + " " + endTime, 'DD/MM/YYYY HH:mm');
+            checkAvailability(startDt, endDt);
+        });
 
-    $('#event-creation-start_dt-time').change(function() {
-        startTime = $('#event-creation-start_dt-time').val();
-        var startDt = moment(startDate + " " + startTime, 'DD/MM/YYYY HH:mm');
-        var endDt = moment(endDate + " " + endTime, 'DD/MM/YYYY HH:mm');
-        checkAvailability(startDt, endDt);
-    });
+        $('#event-creation-end_dt-date').change(function() {
+            endDate = $('#event-creation-end_dt-date').val();
+            var startDt = moment(startDate + " " + startTime, 'DD/MM/YYYY HH:mm');
+            var endDt = moment(endDate + " " + endTime, 'DD/MM/YYYY HH:mm');
+            checkAvailability(startDt, endDt);
+        });
 
-    $('#event-creation-end_dt-date').change(function() {
-        endDate = $('#event-creation-end_dt-date').val();
-        var startDt = moment(startDate + " " + startTime, 'DD/MM/YYYY HH:mm');
-        var endDt = moment(endDate + " " + endTime, 'DD/MM/YYYY HH:mm');
-        checkAvailability(startDt, endDt);
-    });
+        $('#event-creation-end_dt-time').change(function() {
+            endTime = $('#event-creation-end_dt-time').val();
+            var startDt = moment(startDate + " " + startTime, 'DD/MM/YYYY HH:mm');
+            var endDt = moment(endDate + " " + endTime, 'DD/MM/YYYY HH:mm');
+            checkAvailability(startDt, endDt);
+        });
 
-    $('#event-creation-end_dt-time').change(function() {
-        endTime = $('#event-creation-end_dt-time').val();
-        var startDt = moment(startDate + " " + startTime, 'DD/MM/YYYY HH:mm');
-        var endDt = moment(endDate + " " + endTime, 'DD/MM/YYYY HH:mm');
-        checkAvailability(startDt, endDt);
-    });
+        $('#event-creation-occurrences').change(function() {
+            occurrences = JSON.parse($(this).val());
+            checkLectureAvailability(occurrences);
+        });
 
-    $('#event-creation-occurrences').change(function() {
-        occurrences = JSON.parse($(this).val());
-        checkLectureAvailability(occurrences);
-    });
-
-    $('#event-creation-timezone').change(function() {
-        var timezone = ($(this).val());
-        if (timezone !== serverDefaultTimezone) {
-            hideAllMessages();
-        }
-    });
-</script>
+        $('#event-creation-timezone').change(function() {
+            var timezone = ($(this).val());
+            if (timezone !== serverDefaultTimezone) {
+                hideAllMessages();
+            }
+        });
+    </script>
+{% endif %}
