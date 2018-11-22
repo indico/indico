@@ -18,13 +18,14 @@
 import fetchRoomURL from 'indico-url:rooms_new.admin_room';
 import fetchRoomAttributesURL from 'indico-url:rooms_new.admin_room_attributes';
 import fetchAttributesURL from 'indico-url:rooms_new.admin_attributes';
-import fetchAvailabilityURL from 'indico-url:rooms_new.admin_room_availability';
+import fetchRoomAvailabilityURL from 'indico-url:rooms_new.admin_room_availability';
+import fetchRoomEquipmentURL from 'indico-url:rooms_new.admin_room_equipment';
 import _ from 'lodash';
 import React from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import PropTypes from 'prop-types';
-import {Button, Checkbox, Dimmer, Dropdown, Form, Grid, Header, Input, Loader, Modal} from 'semantic-ui-react';
+import {Button, Checkbox, Dimmer, Dropdown, Form, Grid, Header, Icon, Input, List, Loader, Modal} from 'semantic-ui-react';
 // import Dropzone from 'react-dropzone';
 import {Form as FinalForm, Field} from 'react-final-form';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
@@ -32,8 +33,10 @@ import camelizeKeys from 'indico/utils/camelize';
 import {ReduxCheckboxField, ReduxFormField} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 import SpriteImage from '../../components/SpriteImage';
+import * as roomsSelectors from './selectors';
 import * as roomActions from './actions';
 
+import './RoomEditModal.module.scss';
 
 function validate() {
 }
@@ -121,6 +124,14 @@ const columns = [
         type: 'input',
         name: 'maxAdvanceDays',
         label: Translate.string('Maximum advance time for bookings (days)')
+    }, {
+        type: 'header',
+        label: Translate.string('Equipment Available')
+    }, {
+        type: 'equipmentDropdown',
+        placeholder: Translate.string('Add new equipment')
+    }, {
+        type: 'equipment',
     }], [{
         type: 'header',
         label: 'Options',
@@ -156,11 +167,8 @@ const columns = [
         type: 'header',
         label: 'Custom Attributes'
     }, {
-        type: 'dropdown',
-        version: 'attributes',
-    }, {
-        type: 'addButton',
-        editType: 'attributes',
+        type: 'attributeDropdown',
+        placeholder: Translate.string('Add new attributes'),
     }, {
         type: 'attributes'
     }]];
@@ -168,6 +176,7 @@ const columns = [
 
 class RoomEditModal extends React.Component {
     static propTypes = {
+        equipmentTypes: PropTypes.arrayOf(PropTypes.object).isRequired,
         onClose: PropTypes.func.isRequired,
         roomId: PropTypes.number.isRequired,
         actions: PropTypes.exact({
@@ -179,8 +188,8 @@ class RoomEditModal extends React.Component {
         attributes: null,
         room: null,
         roomAttributes: null,
-        newAttributes: [],
-        availability: null,
+        roomAvailability: null,
+        roomEquipment: null,
     };
 
     componentDidMount() {
@@ -188,6 +197,7 @@ class RoomEditModal extends React.Component {
         this.fetchRoomAttributes();
         this.fetchAttributes();
         this.fetchRoomAvailability();
+        this.fetchRoomEquipment();
     }
     //
     // onDrop = (acceptedFiles, rejectedFiles) => {
@@ -198,8 +208,13 @@ class RoomEditModal extends React.Component {
     onEditHours = () => {
     };
 
-    onEditAttributes = () => {
-        this.addAttributes();
+    onEditAttributes = (newAttributeName) => {
+        this.addAttribute(newAttributeName);
+    };
+
+    onEditEquipment = (newEquipment) => {
+        const {roomEquipment} = this.state;
+        this.setState({roomEquipment: [...roomEquipment, newEquipment]});
     };
 
     async fetchDetailedRoom() {
@@ -239,14 +254,27 @@ class RoomEditModal extends React.Component {
 
 
     async fetchRoomAvailability() {
+        const {roomId} = this.props;
         let response;
         try {
-            response = await indicoAxios.get(fetchAvailabilityURL());
+            response = await indicoAxios.get(fetchRoomAvailabilityURL({room_id: roomId}));
         } catch (error) {
             handleAxiosError(error);
             return;
         }
-        this.setState({availability: response.data});
+        this.setState({roomAvailability: response.data});
+    }
+
+    async fetchRoomEquipment() {
+        const {roomId} = this.props;
+        let response;
+        try {
+            response = await indicoAxios.get(fetchRoomEquipmentURL({room_id: roomId}));
+        } catch (error) {
+            handleAxiosError(error);
+            return;
+        }
+        this.setState({roomEquipment: response.data.available_equipment});
     }
 
     handleCloseModal = () => {
@@ -276,6 +304,14 @@ class RoomEditModal extends React.Component {
         this.setState({roomAttributes: _.omit(roomAttributes, attribute)});
     };
 
+    removeEquipment = (equipmentId) => {
+        const {roomEquipment} = this.state;
+        _.remove(roomEquipment, (n) => {
+            return n === equipmentId;
+        });
+        this.setState({roomEquipment});
+    };
+
     renderAttributes = () => {
         const {attributes, roomAttributes} = this.state;
         if (!attributes) {
@@ -288,7 +324,7 @@ class RoomEditModal extends React.Component {
                            component={ReduxFormField}
                            label={attribute.name}
                            as={Input}
-                           icon={{name: 'remove', color: 'red', circular: true, link: true, onClick: () => this.removeAttribute(attribute.name)}} />
+                           icon={{name: 'trash', color: 'red', link: true, onClick: () => this.removeAttribute(attribute.name)}} />
                 )} </>
 
         ));
@@ -312,8 +348,13 @@ class RoomEditModal extends React.Component {
     );
 
     renderContent = (content) => {
-        const {room, attributes} = this.state;
-        let options;
+        const {room, attributes, roomEquipment, roomAttributes} = this.state;
+        const {equipmentTypes} = this.props;
+        if (!equipmentTypes) {
+            return;
+        }
+        const equipmentTypesMapped = _.mapKeys(equipmentTypes, 'id');
+        let options = [];
         switch (content.type) {
             case 'header':
                 return (
@@ -347,18 +388,60 @@ class RoomEditModal extends React.Component {
                 return this.renderAttributes();
             case 'addButton':
                 return this.renderAddButton(content.editType);
-            case 'dropdown':
-                if (!attributes) {
+            case 'attributeDropdown':
+                if (!attributes && !roomAttributes) {
                     return;
                 }
-                options = this.generateOptions(attributes);
+                options = this.generateAttributeOptions(attributes);
                 return (
-                    <Dropdown placeholder="Add new attributes"
-                              fluid
-                              multiple
-                              selection
+                    <Dropdown button
+                              text={content.placeholder}
+                              className="icon"
+                              floating
+                              labeled
+                              icon="add"
                               options={options}
-                              onChange={(event, values) => this.setState({newAttributes: values.value})} />
+                              search
+                              disabled={options.length === 0}
+                              selectOnBlur={false}
+                              onChange={(event, values) => this.onEditAttributes(values.value)} />
+                );
+            case 'equipmentDropdown':
+                if (!roomEquipment && equipmentTypes) {
+                    return;
+                }
+                options = this.generateEquipmentOptions();
+                return (
+                    <Dropdown button
+                              text={content.placeholder}
+                              className="icon"
+                              floating
+                              labeled
+                              icon="add"
+                              options={options}
+                              search
+                              disabled={options.length === 0}
+                              selectOnBlur={false}
+                              onChange={(event, values) => this.onEditEquipment(values.value)} />
+                );
+            case 'equipment':
+                if (!roomEquipment || !equipmentTypes || !equipmentTypesMapped) {
+                    return;
+                }
+                return (
+                    <List key="equipment" divided>
+                        {roomEquipment.map((equipmentId) => {
+                            return (
+                                <List.Item key={equipmentTypesMapped[equipmentId].id}>
+                                    <List.Content floated="right">
+                                        <Icon styleName="equipment-button" name="trash" onClick={() => this.removeEquipment(equipmentId)} />
+                                    </List.Content>
+                                    <List.Content>{equipmentTypesMapped[equipmentId].name}
+                                    </List.Content>
+                                </List.Item>
+                            );
+                        })}
+                    </List>
                 );
         }
     };
@@ -371,7 +454,7 @@ class RoomEditModal extends React.Component {
                 <Modal.Header>
                     <Translate>Edit Room Details</Translate>
                 </Modal.Header>
-                <Modal.Content>
+                <Modal.Content scrolling>
                     <Form id="room-form" {...formProps}>
                         <Grid columns={3}>
                             {columns.map(this.renderColumn)}
@@ -389,19 +472,15 @@ class RoomEditModal extends React.Component {
         );
     };
 
-    addAttributes = () => {
-        const {roomAttributes, attributes, newAttributes} = this.state;
-
-        const attributesObj = _.keyBy(attributes, 'name');
-        let newRoomAttributes = {};
-        newAttributes.map((attr) => {
-            newRoomAttributes = {...{[attributesObj[attr].name]: null}, ...newRoomAttributes};
-            return newRoomAttributes;
-        });
-        this.setState({roomAttributes: {...roomAttributes, ...newRoomAttributes}});
+    addAttribute = (newAttributeName) => {
+        const {roomAttributes} = this.state;
+        const newAttribute = {
+            [newAttributeName]: null
+        };
+        this.setState({roomAttributes: {...roomAttributes, ...newAttribute}});
     };
 
-    generateOptions = (attributes) => {
+    generateAttributeOptions = (attributes) => {
         const {roomAttributes} = this.state;
         const options = [];
         attributes.map((key) => (!roomAttributes.hasOwnProperty(key.name)
@@ -409,6 +488,15 @@ class RoomEditModal extends React.Component {
         return options;
     };
 
+
+    generateEquipmentOptions = () => {
+        const {roomEquipment} = this.state;
+        const {equipmentTypes} = this.props;
+        const options = [];
+        equipmentTypes.map((equipmentType) => (roomEquipment.indexOf(equipmentType.id) < 0
+            ? options.push({key: equipmentType.id, text: equipmentType.name, value: equipmentType.id}) : null));
+        return options;
+    };
 
     render() {
         const {room, roomAttributes, attributes} = this.state;
@@ -429,7 +517,9 @@ class RoomEditModal extends React.Component {
 }
 
 export default connect(
-    null,
+    (state) => ({
+        equipmentTypes: roomsSelectors.getEquipmentTypes(state)
+    }),
     dispatch => ({
         actions: bindActionCreators({
             updateRoom: roomActions.updateRoom,

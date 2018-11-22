@@ -23,7 +23,7 @@ import {getAllUserRoomPermissions} from '../user/selectors';
 
 
 export const hasLoadedEquipmentTypes = ({rooms}) => rooms.requests.equipmentTypes.state === RequestState.SUCCESS;
-const getEquipmentTypes = ({rooms}) => rooms.equipmentTypes;
+export const getEquipmentTypes = ({rooms}) => rooms.equipmentTypes;
 const getFeaturesMapping = createSelector(
     getEquipmentTypes,
     equipmentTypes => {
