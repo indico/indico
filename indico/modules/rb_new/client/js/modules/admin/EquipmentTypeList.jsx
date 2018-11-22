@@ -83,7 +83,7 @@ class EquipmentTypeList extends React.PureComponent {
 
         const featureOptions = features.map(feat => ({
             key: feat.name,
-            value: feat.name,
+            value: feat.id,
             text: feat.title,
             icon: feat.icon,
         }));
@@ -147,7 +147,7 @@ class EquipmentTypeList extends React.PureComponent {
                           renderEditForm={this.renderForm}
                           renderDeleteMessage={this.renderDeleteMessage}
                           initialAddValues={{name: '', features: []}}
-                          initialEditValues={item => ({name: item.name, features: item.features.map(x => x.name)})}
+                          initialEditValues={item => ({name: item.name, features: item.features.map(x => x.id)})}
                           onCreate={createEquipmentType}
                           onUpdate={updateEquipmentType}
                           onDelete={deleteEquipmentType} />

@@ -248,6 +248,12 @@ class EquipmentTypeSchema(mm.ModelSchema):
         fields = ('id', 'name', 'features')
 
 
+class AdminEquipmentTypeSchema(mm.ModelSchema):
+    class Meta:
+        model = EquipmentType
+        fields = ('id', 'name', 'features')
+
+
 rb_user_schema = RBUserSchema()
 rooms_schema = RoomSchema(many=True)
 room_attributes_schema = RoomAttributesSchema(many=True)
@@ -265,4 +271,5 @@ locations_schema = LocationsSchema(many=True)
 admin_locations_schema = AdminLocationsSchema(many=True)
 create_booking_args = CreateBookingSchema()
 equipment_type_schema = EquipmentTypeSchema()
+admin_equipment_type_schema = AdminEquipmentTypeSchema()
 room_feature_schema = RoomFeatureSchema()

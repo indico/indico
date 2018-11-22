@@ -15,6 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import _ from 'lodash';
 import {createSelector} from 'reselect';
 import {RequestState} from 'indico/utils/redux';
 
@@ -32,13 +33,18 @@ export const getFilters = ({admin}) => admin.filters;
 
 export const _getEquipmentTypes = ({admin}) => admin.equipmentTypes;
 export const _getFeatures = ({admin}) => admin.features;
+const _getFeaturesMap = createSelector(
+    _getFeatures,
+    features => _.fromPairs(features.map(feat => [feat.id, feat])),
+);
 
 export const getEquipmentTypes = createSelector(
     _getEquipmentTypes,
-    equipmentTypes => {
+    _getFeaturesMap,
+    (equipmentTypes, featuresMap) => {
         return equipmentTypes.map(eq => ({
             ...eq,
-            features: eq.features.slice().sort(makeSorter('title'))
+            features: eq.features.map(id => featuresMap[id]).sort(makeSorter('title'))
         })).sort(makeSorter('name'));
     }
 );
@@ -50,7 +56,7 @@ export const getFeatures = createSelector(
         return features
             .map(feat => ({
                 ...feat,
-                numEquipmentTypes: equipmentTypes.filter(eq => eq.features.some(f => f.name === feat.name)).length,
+                numEquipmentTypes: equipmentTypes.filter(eq => eq.features.includes(feat.id)).length,
             }))
             .sort(makeSorter('title'));
     }

@@ -66,7 +66,7 @@ export default combineReducers({
             case adminActions.FEATURE_DELETED:
                 return state.map(eq => ({
                     ...eq,
-                    features: eq.features.filter(feat => feat.id !== action.id)
+                    features: eq.features.filter(id => id !== action.id)
                 }));
             default:
                 return state;

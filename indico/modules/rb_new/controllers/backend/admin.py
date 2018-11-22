@@ -28,7 +28,7 @@ from indico.modules.rb.models.equipment import EquipmentType, RoomEquipmentAssoc
 from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.room_features import RoomFeature
 from indico.modules.rb.util import rb_is_admin
-from indico.modules.rb_new.schemas import admin_locations_schema, equipment_type_schema, room_feature_schema
+from indico.modules.rb_new.schemas import admin_equipment_type_schema, admin_locations_schema, room_feature_schema
 from indico.util.i18n import _
 from indico.util.marshmallow import ModelList
 
@@ -120,7 +120,7 @@ class RHEquipmentTypes(RHRoomBookingAdminBase):
 
     def _dump_equipment_types(self):
         query = EquipmentType.query.options(joinedload('features')).order_by(EquipmentType.name)
-        return equipment_type_schema.dump(query, many=True).data
+        return admin_equipment_type_schema.dump(query, many=True).data
 
     def _get_room_counts(self):
         query = (db.session.query(RoomEquipmentAssociation.c.equipment_id, db.func.count())
@@ -129,7 +129,7 @@ class RHEquipmentTypes(RHRoomBookingAdminBase):
 
     def _jsonify_one(self, equipment_type):
         counts = self._get_room_counts()
-        eq = equipment_type_schema.dump(equipment_type).data
+        eq = admin_equipment_type_schema.dump(equipment_type).data
         eq['num_rooms'] = counts.get(eq['id'], 0)
         return jsonify(eq)
 
@@ -153,7 +153,7 @@ class RHEquipmentTypes(RHRoomBookingAdminBase):
 
     @use_kwargs({
         'name': fields.String(validate=validate.Length(min=2), required=True),
-        'features': ModelList(RoomFeature, column='name', missing=[])
+        'features': ModelList(RoomFeature, missing=[])
     })
     def _process_POST(self, name, features):
         self._check_conflict(name)
@@ -164,7 +164,7 @@ class RHEquipmentTypes(RHRoomBookingAdminBase):
 
     @use_kwargs({
         'name': fields.String(validate=validate.Length(min=2)),
-        'features': ModelList(RoomFeature, column='name')
+        'features': ModelList(RoomFeature)
     })
     def _process_PATCH(self, name, features):
         if name is not missing:
