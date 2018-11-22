@@ -25,7 +25,7 @@ import RoomFeatureList from './RoomFeatureList';
 import EquipmentTypeList from './EquipmentTypeList';
 
 
-class EquipmentTypesPage extends React.PureComponent {
+class EquipmentPage extends React.PureComponent {
     static propTypes = {
         actions: PropTypes.exact({
             fetchEquipmentTypes: PropTypes.func.isRequired,
@@ -61,4 +61,4 @@ export default connect(
             fetchFeatures: adminActions.fetchFeatures,
         }, dispatch),
     })
-)(EquipmentTypesPage);
+)(EquipmentPage);

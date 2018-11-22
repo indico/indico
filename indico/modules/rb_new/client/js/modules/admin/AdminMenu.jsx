@@ -67,7 +67,7 @@ function AdminMenu({locations, isFetchingLocations, actions: {clearTextFilter}})
                 </NavLink>
             </Menu.Item>
             <Menu.Item>
-                <NavLink exact to="/admin/equipment-types">
+                <NavLink exact to="/admin/equipment">
                     <Translate>Equipment & Features</Translate>
                 </NavLink>
             </Menu.Item>
