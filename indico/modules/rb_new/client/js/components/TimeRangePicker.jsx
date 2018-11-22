@@ -45,6 +45,11 @@ export default class TimeRangePicker extends React.Component {
         startTime: PropTypes.object,
         endTime: PropTypes.object,
         onChange: PropTypes.func.isRequired,
+        disabled: PropTypes.bool,
+    };
+
+    static defaultProps = {
+        disabled: false,
     };
 
     static defaultProps = {
@@ -206,6 +211,7 @@ export default class TimeRangePicker extends React.Component {
 
     render() {
         const {startTime, endTime, startOptions, endOptions, duration, startSearchQuery, endSearchQuery} = this.state;
+        const {disabled} = this.props;
         return (
             <div styleName="time-range-picker">
                 <Dropdown options={startOptions}
@@ -216,6 +222,7 @@ export default class TimeRangePicker extends React.Component {
                           searchQuery={startSearchQuery}
                           onSearchChange={this.onStartSearchChange}
                           value={serializeTime(startTime)}
+                          disabled={disabled}
                           onChange={(event, {value}) => {
                               this.updateStartTime(event, value, startTime, endTime, duration, startSearchQuery);
                           }} />
@@ -227,6 +234,7 @@ export default class TimeRangePicker extends React.Component {
                           searchQuery={endSearchQuery}
                           onSearchChange={this.onEndSearchChange}
                           value={serializeTime(endTime)}
+                          disabled={disabled}
                           onChange={(event, {value}) => {
                               this.updateEndTime(event, value, endTime, startTime, duration, endSearchQuery);
                           }} />
