@@ -21,7 +21,7 @@ from wtforms.validators import InputRequired, NumberRange
 
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
-from indico.web.forms.fields import EmailListField, PrincipalListField
+from indico.web.forms.fields import EmailListField, MultipleItemsField, PrincipalListField
 
 
 GOOGLE_API_KEY_DOCS = 'https://developers.google.com/maps/documentation/javascript/get-api-key'
@@ -32,6 +32,7 @@ GOOGLE_API_KEY_DESC = _('When using the "map of rooms" widget, you need to regis
 class SettingsForm(IndicoForm):
     admin_principals = PrincipalListField(_('Administrators'), groups=True)
     authorized_principals = PrincipalListField(_('Authorized users/groups'), groups=True)
+    excluded_categories = MultipleItemsField('Excluded categories', fields=[{'id': 'id', 'caption': 'Category ID'}])
     assistance_emails = EmailListField(_('Assistance email addresses (one per line)'))
     notification_before_days = IntegerField(_('Send booking reminders X days before (single/daily)'),
                                             [InputRequired(), NumberRange(min=1, max=30)])

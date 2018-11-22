@@ -102,6 +102,7 @@ purely client-side and are worded for event creation instead of being generic.
 
 {% if check_room_availability %}
     <script>
+        var rbExcludedCategories = {{ rb_excluded_categories | tojson }}
         var serverDefaultTimezone = '{{ indico_config.DEFAULT_TIMEZONE }}';
         var previousRoomId;
         var roomData = JSON.parse($("#event-creation-location_data").val());
@@ -110,9 +111,20 @@ purely client-side and are worded for event creation instead of being generic.
         var endDate = $('#event-creation-end_dt-date').val();
         var endTime = $('#event-creation-end_dt-time').val();
         var occurrences = $('#event-creation-occurrences').val();
+        var category = JSON.parse($("#event-creation-category").val());
         var $availableMessage = $('#room-available');
         var $conflictBookingMessage = $('#room-conflict-booking');
         var $conflictPrebookingMessage = $('#room-conflict-prebooking');
+
+        function isCategoryExcluded(categoryId) {
+            var isExcluded = false;
+            rbExcludedCategories.forEach( function (excludedCategory) {
+                if (parseInt(excludedCategory.id) === categoryId) {
+                    isExcluded = true;
+                }
+            });
+            return isExcluded;
+        }
 
         function hideAllMessages() {
             $availableMessage.hide();
@@ -122,7 +134,7 @@ purely client-side and are worded for event creation instead of being generic.
 
         function checkAvailability(startDt, endDt) {
             hideAllMessages();
-
+            if (isCategoryExcluded(category['id'])) { return; }
             if (!startDt.isSame(endDt, 'day')) { return; }
             if (!('room_id' in roomData)) { return; }
 
@@ -222,5 +234,12 @@ purely client-side and are worded for event creation instead of being generic.
                 hideAllMessages();
             }
         });
+
+        $('#event-creation-category').change(function() {
+            category = JSON.parse($(this).val());
+            var startDt = moment(startDate + " " + startTime, 'DD/MM/YYYY HH:mm');
+            var endDt = moment(endDate + " " + endTime, 'DD/MM/YYYY HH:mm');
+            checkAvailability(startDt, endDt);
+        })
     </script>
 {% endif %}

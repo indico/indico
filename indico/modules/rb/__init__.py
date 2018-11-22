@@ -40,6 +40,7 @@ rb_settings = SettingsProxy('roombooking', {
     'google_maps_api_key': '',
     'assistance_emails': [],
     'vc_support_emails': [],
+    'excluded_categories': [],
     'notification_before_days': 2,
     'notification_before_days_weekly': 5,
     'notification_before_days_monthly': 7,
