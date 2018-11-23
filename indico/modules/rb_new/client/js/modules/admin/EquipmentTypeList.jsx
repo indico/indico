@@ -95,7 +95,7 @@ class EquipmentTypeList extends React.PureComponent {
                        label={Translate.string('Name')}
                        disabled={fprops.submitting}
                        autoFocus />
-                {!!featureOptions.length && (
+                {featureOptions.length > 0 && (
                     <Field name="features" component={ReduxDropdownField}
                            multiple selection closeOnChange
                            options={featureOptions}

@@ -126,8 +126,7 @@ export default class EditableList extends React.PureComponent {
     render() {
         const {
             title, addModalTitle, renderAddForm, renderEditForm, renderDeleteMessage, renderItem, initialEditValues,
-            isFetching, items,
-            initialAddValues, onDelete, onUpdate,
+            initialAddValues, isFetching, items, onDelete, onUpdate,
         } = this.props;
         const {adding} = this.state;
 
