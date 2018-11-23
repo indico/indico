@@ -76,11 +76,6 @@ class RoomAttribute(db.Model):
         db.String,
         nullable=False
     )
-    is_required = db.Column(
-        db.Boolean,
-        nullable=False,
-        default=False
-    )
     is_hidden = db.Column(
         db.Boolean,
         nullable=False,

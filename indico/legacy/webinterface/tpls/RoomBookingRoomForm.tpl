@@ -362,13 +362,7 @@
                                             <td align="left" class="blacktext">
                                                 ${ field() }
                                                 % if field.label.text.lower() == 'notification email':
-                                                    % if field.flags.required:
-                                                        ${ inlineContextHelp('<b>Required.</b> You can specify more than one email address separated by commas.') }
-                                                    % else:
-                                                        ${ inlineContextHelp('You can specify more than one email address separated by commas.') }
-                                                    % endif
-                                                % elif field.flags.required:
-                                                    ${ inlineContextHelp('<b>Required.</b>') }
+                                                    ${ inlineContextHelp('You can specify more than one email address separated by commas.') }
                                                 % endif
                                             </td>
                                         </tr>

@@ -72,7 +72,7 @@ class RHRoomBookingCreateModifyRoomBase(RHRoomBookingAdminBase):
 
         # Custom attributes - new fields must be set on the class
         for attribute in RoomAttribute.query.all():
-            validators = [DataRequired()] if attribute.is_required else []
+            validators = []
             if attribute.name == 'notification-email':
                 validators.append(IndicoEmail(multi=True))
             field_name = 'attribute_{}'.format(attribute.id)

@@ -133,12 +133,10 @@ class RHRoomBookingSaveCustomAttribute(RHRoomBookingAdminBase):
                 raise BadRequest(_('There is already an attribute named: {0}').format(attr_name))
 
             self._new_attr = RoomAttribute(name=attr_name, title=attr_title,
-                                           is_required=request.form.get('newCustomAttributeIsRequired') == 'on',
                                            is_hidden=request.form.get('newCustomAttributeIsHidden') == 'on')
 
     def _process(self):
         for attr in RoomAttribute.query.all():
-            attr.is_required = request.form.get('cattr_req_{}'.format(attr.name), '') == 'on'
             attr.is_hidden = request.form.get('cattr_hid_{}'.format(attr.name), '') == 'on'
         if self._new_attr:
             db.session.add(self._new_attr)

@@ -145,9 +145,6 @@
                       <b>${ _('Name') }</b>
                     </td>
                     <td style="width: 70px;">
-                      <b>${ _('Required') }</b>
-                    </td>
-                    <td style="width: 70px;">
                       <b>${ _('Hidden') }</b>
                     </td>
                     <td style="width: 260px;">
@@ -158,9 +155,6 @@
                   <tr>
                     <td>${ attr.title }</td>
                     <td>${ attr.name }</td>
-                    <td>
-                      <input type="checkbox" name="${ 'cattr_req_' + attr.name }" ${ 'checked' if attr.is_required else '' }>
-                    </td>
                     <td>
                       <input type="checkbox" name="${ 'cattr_hid_' + attr.name }" ${ 'checked' if attr.is_hidden else '' }>
                     </td>
@@ -179,9 +173,6 @@
                   </td>
                   <td></td>
                   <td>
-                    <input type="checkbox" name="newCustomAttributeIsRequired" id="newCustomAttributeIsRequired">
-                  </td>
-                  <td>
                     <input type="checkbox" name="newCustomAttributeIsHidden" id="newCustomAttributeIsHidden">
                   </td>
                   <td>
@@ -189,7 +180,7 @@
                   </td>
                 </tr>
                 <tr>
-                  <td colspan="4"></td>
+                  <td colspan="3"></td>
                   <td>
                     <input type="submit" class="i-button" value="Save">
                       ${ inlineContextHelp('Updates `required` and `hidden` for all existing attributes.' ) }
