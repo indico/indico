@@ -104,17 +104,50 @@ purely client-side and are worded for event creation instead of being generic.
     <script>
         var rbExcludedCategories = {{ rb_excluded_categories | tojson }}
         var serverDefaultTimezone = '{{ indico_config.DEFAULT_TIMEZONE }}';
+        var availabilityDisplayed = false;
         var previousRoomId;
-        var roomData = JSON.parse($("#event-creation-location_data").val());
-        var startDate = $('#event-creation-start_dt-date').val();
-        var startTime = $('#event-creation-start_dt-time').val();
-        var endDate = $('#event-creation-end_dt-date').val();
-        var endTime = $('#event-creation-end_dt-time').val();
-        var occurrences = $('#event-creation-occurrences').val();
-        var category = JSON.parse($("#event-creation-category").val());
+        var $currentMessage;
+
+        var startDt;
+        var endDt;
+        var category;
+        var roomData;
+        var timezone;
+        var category;
+
+        var $createBookingSwitch = $('#create-booking');
         var $availableMessage = $('#room-available');
         var $conflictBookingMessage = $('#room-conflict-booking');
         var $conflictPrebookingMessage = $('#room-conflict-prebooking');
+
+        function setLectureTimes(occurrences){
+            if (occurrences.length === 1) {
+                var occurrence = occurrences[0];
+                startDt = moment(occurrence['date'] + " " + occurrence['time'], 'DD-MM-YYYY HH:mm');
+                endDt = moment(startDt).add(occurrence['duration'], 'minutes');
+            }
+        }
+
+        function initValues() {
+            var startDate = $('#event-creation-start_dt-date').val();
+            var startTime = $('#event-creation-start_dt-time').val();
+            var endDate = $('#event-creation-end_dt-date').val();
+            var endTime = $('#event-creation-end_dt-time').val();
+            var occurrences = $('#event-creation-occurrences').val();
+
+            roomData = JSON.parse($("#event-creation-location_data").val());
+            timezone = $('#event-creation-timezone').val();
+            category = JSON.parse($("#event-creation-category").val());
+
+            if (occurrences) {
+                setLectureTimes(JSON.parse(occurrences));
+            } else {
+                startDt = moment(startDate + " " + startTime, 'DD/MM/YYYY HH:mm');
+                endDt = moment(endDate + " " + endTime, 'DD/MM/YYYY HH:mm');
+            }
+        }
+
+        initValues();
 
         function isCategoryExcluded(categoryId) {
             var isExcluded = false;
@@ -126,17 +159,14 @@ purely client-side and are worded for event creation instead of being generic.
             return isExcluded;
         }
 
-        function hideAllMessages() {
-            $availableMessage.hide();
-            $conflictBookingMessage.hide();
-            $conflictPrebookingMessage.hide();
-        }
-
-        function checkAvailability(startDt, endDt) {
-            hideAllMessages();
+        function updateAvailability() {
+            if ($currentMessage) {
+                $currentMessage.hide();
+            }
             if (isCategoryExcluded(category['id'])) { return; }
             if (!startDt.isSame(endDt, 'day')) { return; }
             if (!('room_id' in roomData)) { return; }
+            if (timezone !== serverDefaultTimezone) {return; }
 
             var roomId = roomData['room_id'];
             previousRoomId = roomId;
@@ -155,91 +185,73 @@ purely client-side and are worded for event creation instead of being generic.
                 error: handleAjaxError,
                 success: function(data) {
                     if (data['conflict_booking']){
-                        $conflictBookingMessage.show();
+                        $currentMessage = $conflictBookingMessage;
                     } else if (data['conflict_prebooking']){
-                        $conflictPrebookingMessage.show();
+                        $currentMessage = $conflictPrebookingMessage;
                     } else {
-                        $availableMessage.show();
+                        $currentMessage = $availableMessage;
                     }
+                    $currentMessage.show();
                 }
             });
         }
 
-        function checkLectureAvailability(occurrences){
-            if (occurrences.length === 1) {
-                var occurrence = occurrences[0];
-                var startDt = moment(occurrence['date'] + " " + occurrence['time'], 'DD-MM-YYYY HH:mm');
-                var endDt = moment(startDt).add(occurrence['duration'], 'minutes');
-                checkAvailability(startDt, endDt);
-            } else {
-                hideAllMessages();
-            }
-        }
-
         $("#event-creation-location_data").change(function() {
             roomData = JSON.parse($(this).val());
-            var lectureOccurrences = $('#event-creation-occurrences').val();
-            if (lectureOccurrences) {
-                checkLectureAvailability(JSON.parse(lectureOccurrences));
-            } else {
-                var startDt = moment(startDate + " " + startTime, 'DD/MM/YYYY HH:mm');
-                var endDt = moment(endDate + " " + endTime, 'DD/MM/YYYY HH:mm');
-                if (previousRoomId !== roomData['room_id']) {
-                    checkAvailability(startDt, endDt);
-                }
+            if (previousRoomId !== roomData['room_id']) {
+                updateAvailability();
             }
         });
 
         $('#event-creation-start_dt-date').change(function() {
-            startDate = $('#event-creation-start_dt-date').val();
-            endDate = $('#event-creation-end_dt-date').val();
-            var startDt = moment(startDate + " " + startTime, 'DD/MM/YYYY HH:mm');
-            var endDt = moment(endDate + " " + endTime, 'DD/MM/YYYY HH:mm');
+            var startDate = $(this).val();
+            var startTime = $('#event-creation-start_dt-time').val();
+            var endDate = $('#event-creation-end_dt-date').val();
+            var endTime = $('#event-creation-end_dt-time').val();
+            startDt = moment(startDate + " " + startTime, 'DD/MM/YYYY HH:mm');
+            endDt = moment(endDate + " " + endTime, 'DD/MM/YYYY HH:mm');
             // workaround for automatic end date update if start date is after end date
             if (endDt.isBefore(startDt)) {
                 endDt = moment(startDate + " " + endTime, 'DD/MM/YYYY HH:mm');
             }
-            checkAvailability(startDt, endDt);
+            updateAvailability();
         });
 
         $('#event-creation-start_dt-time').change(function() {
-            startTime = $('#event-creation-start_dt-time').val();
-            var startDt = moment(startDate + " " + startTime, 'DD/MM/YYYY HH:mm');
-            var endDt = moment(endDate + " " + endTime, 'DD/MM/YYYY HH:mm');
-            checkAvailability(startDt, endDt);
+            var startDate = $('#event-creation-start_dt-date').val();
+            var startTime = $('#event-creation-start_dt-time').val();
+            startDt = moment(startDate + " " + startTime, 'DD/MM/YYYY HH:mm');
+            updateAvailability();
         });
 
         $('#event-creation-end_dt-date').change(function() {
-            endDate = $('#event-creation-end_dt-date').val();
-            var startDt = moment(startDate + " " + startTime, 'DD/MM/YYYY HH:mm');
-            var endDt = moment(endDate + " " + endTime, 'DD/MM/YYYY HH:mm');
-            checkAvailability(startDt, endDt);
+            var endDate = $(this).val();
+            var endTime = $('#event-creation-end_dt-time').val();
+            endDt = moment(endDate + " " + endTime, 'DD/MM/YYYY HH:mm');
+            updateAvailability();
         });
 
         $('#event-creation-end_dt-time').change(function() {
-            endTime = $('#event-creation-end_dt-time').val();
-            var startDt = moment(startDate + " " + startTime, 'DD/MM/YYYY HH:mm');
-            var endDt = moment(endDate + " " + endTime, 'DD/MM/YYYY HH:mm');
-            checkAvailability(startDt, endDt);
+            var endDate = $('#event-creation-end_dt-date').val();
+            var endTime = $(this).val()
+            endDt = moment(endDate + " " + endTime, 'DD/MM/YYYY HH:mm');
+            updateAvailability();
         });
 
         $('#event-creation-occurrences').change(function() {
             occurrences = JSON.parse($(this).val());
-            checkLectureAvailability(occurrences);
+            setLectureTimes(JSON.parse(occurrences));
+            updateAvailability();
         });
 
         $('#event-creation-timezone').change(function() {
-            var timezone = ($(this).val());
-            if (timezone !== serverDefaultTimezone) {
-                hideAllMessages();
-            }
+            timezone = ($(this).val());
+            updateAvailability();
         });
 
         $('#event-creation-category').change(function() {
             category = JSON.parse($(this).val());
-            var startDt = moment(startDate + " " + startTime, 'DD/MM/YYYY HH:mm');
-            var endDt = moment(endDate + " " + endTime, 'DD/MM/YYYY HH:mm');
-            checkAvailability(startDt, endDt);
+            updateAvailability();
         })
     </script>
 {% endif %}

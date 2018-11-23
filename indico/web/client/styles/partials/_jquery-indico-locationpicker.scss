@@ -158,6 +158,13 @@
             display: none;
             padding-top: 50px;
 
+            .disabled {
+
+                .icon {
+                    color: $gray;
+                }
+            }
+
             .content {
                 display: flex;
                 align-items: center;
@@ -168,10 +175,6 @@
                     .icon {
                         color: $green;
                         font-size: 1.4em;
-                    }
-
-                    span {
-                        padding-right: 10px;
                     }
                 }
 
