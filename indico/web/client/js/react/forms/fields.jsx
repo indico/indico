@@ -17,7 +17,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Dropdown, Form, Popup} from 'semantic-ui-react';
+import {Checkbox, Dropdown, Form, Popup} from 'semantic-ui-react';
 
 import './ReduxFormField.module.scss';
 
@@ -91,6 +91,7 @@ ReduxFormField.defaultProps = {
     fieldProps: {},
 };
 
+
 export function ReduxRadioField({input, input: {value}, radioValue, ...props}) {
     return (
         <ReduxFormField input={input}
@@ -108,6 +109,24 @@ ReduxRadioField.propTypes = {
     input: PropTypes.object.isRequired,
     radioValue: PropTypes.string.isRequired
 };
+
+
+export function ReduxCheckboxField({input: {value, ...input}, ...props}) {
+    return (
+        <ReduxFormField input={input}
+                        {...props}
+                        checked={value}
+                        as={Checkbox}
+                        onChange={(__, {checked}) => {
+                            input.onChange(checked);
+                        }} />
+    );
+}
+
+ReduxCheckboxField.propTypes = {
+    input: PropTypes.object.isRequired,
+};
+
 
 export function ReduxDropdownField({input, ...props}) {
     return (
