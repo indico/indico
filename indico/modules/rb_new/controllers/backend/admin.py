@@ -26,9 +26,11 @@ from indico.core.db import db
 from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.models.equipment import EquipmentType, RoomEquipmentAssociation
 from indico.modules.rb.models.locations import Location
+from indico.modules.rb.models.room_attributes import RoomAttribute, RoomAttributeAssociation
 from indico.modules.rb.models.room_features import RoomFeature
 from indico.modules.rb.util import rb_is_admin
-from indico.modules.rb_new.schemas import admin_equipment_type_schema, admin_locations_schema, room_feature_schema
+from indico.modules.rb_new.schemas import (admin_equipment_type_schema, admin_locations_schema, room_attribute_schema,
+                                           room_feature_schema)
 from indico.util.i18n import _
 from indico.util.marshmallow import ModelList
 
@@ -174,5 +176,79 @@ class RHEquipmentTypes(RHRoomBookingAdminBase):
         query = EquipmentType.query.filter(db.func.lower(EquipmentType.name) == name.lower())
         if self.equipment_type:
             query = query.filter(EquipmentType.id != self.equipment_type.id)
+        if query.has_rows():
+            abort(422, messages={'name': [_('Name must be unique')]})
+
+
+class RHAttributes(RHRoomBookingAdminBase):
+    def _process_args(self):
+        id_ = request.view_args.get('attribute_id')
+        self.attribute = RoomAttribute.get_one(id_) if id_ is not None else None
+
+    def _dump_attributes(self):
+        query = RoomAttribute.query.order_by(RoomAttribute.title)
+        return room_attribute_schema.dump(query, many=True).data
+
+    def _get_room_counts(self):
+        query = (db.session.query(RoomAttributeAssociation.attribute_id, db.func.count())
+                 .group_by(RoomAttributeAssociation.attribute_id))
+        return dict(query)
+
+    def _jsonify_one(self, attribute):
+        counts = self._get_room_counts()
+        attr = room_attribute_schema.dump(attribute).data
+        attr['num_rooms'] = counts.get(attr['id'], 0)
+        return jsonify(attr)
+
+    def _jsonify_many(self):
+        counts = self._get_room_counts()
+        attributes = self._dump_attributes()
+        for attr in attributes:
+            attr['num_rooms'] = counts.get(attr['id'], 0)
+        return jsonify(attributes)
+
+    def _process_GET(self):
+        if self.attribute:
+            return self._jsonify_one(self.attribute)
+        else:
+            return self._jsonify_many()
+
+    def _process_DELETE(self):
+        db.session.delete(self.attribute)
+        db.session.flush()
+        return '', 204
+
+    @use_kwargs({
+        'name': fields.String(validate=validate.Length(min=2), required=True),
+        'title': fields.String(validate=validate.Length(min=2), required=True),
+        'hidden': fields.Bool(missing=False),
+    })
+    def _process_POST(self, name, title, hidden):
+        self._check_conflict(name)
+        attribute = RoomAttribute(name=name, title=title, is_hidden=hidden)
+        db.session.add(attribute)
+        db.session.flush()
+        return self._jsonify_one(attribute), 201
+
+    @use_kwargs({
+        'name': fields.String(validate=validate.Length(min=2)),
+        'title': fields.String(validate=validate.Length(min=2)),
+        'hidden': fields.Bool(),
+    })
+    def _process_PATCH(self, name, title, hidden):
+        if name is not missing:
+            self._check_conflict(name)
+            self.attribute.name = name
+        if title is not missing:
+            self.attribute.title = title
+        if hidden is not missing:
+            self.attribute.is_hidden = hidden
+        db.session.flush()
+        return self._jsonify_one(self.attribute)
+
+    def _check_conflict(self, name):
+        query = RoomAttribute.query.filter(db.func.lower(RoomAttribute.name) == name.lower())
+        if self.attribute:
+            query = query.filter(RoomAttribute.id != self.attribute.id)
         if query.has_rows():
             abort(422, messages={'name': [_('Name must be unique')]})

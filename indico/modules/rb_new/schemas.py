@@ -33,7 +33,7 @@ from indico.modules.rb.models.map_areas import MapArea
 from indico.modules.rb.models.reservation_edit_logs import ReservationEditLog
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import RepeatFrequency, Reservation
-from indico.modules.rb.models.room_attributes import RoomAttributeAssociation
+from indico.modules.rb.models.room_attributes import RoomAttribute, RoomAttributeAssociation
 from indico.modules.rb.models.room_bookable_hours import BookableHours
 from indico.modules.rb.models.room_features import RoomFeature
 from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
@@ -254,6 +254,14 @@ class AdminEquipmentTypeSchema(mm.ModelSchema):
         fields = ('id', 'name', 'features')
 
 
+class RoomAttributeSchema(mm.ModelSchema):
+    hidden = Boolean(attribute='is_hidden')
+
+    class Meta:
+        model = RoomAttribute
+        fields = ('id', 'name', 'title', 'hidden')
+
+
 rb_user_schema = RBUserSchema()
 rooms_schema = RoomSchema(many=True)
 room_attribute_values_schema = RoomAttributeValuesSchema(many=True)
@@ -273,3 +281,4 @@ create_booking_args = CreateBookingSchema()
 equipment_type_schema = EquipmentTypeSchema()
 admin_equipment_type_schema = AdminEquipmentTypeSchema()
 room_feature_schema = RoomFeatureSchema()
+room_attribute_schema = RoomAttributeSchema()
