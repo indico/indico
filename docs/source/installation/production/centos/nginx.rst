@@ -30,7 +30,7 @@ to the ``[base]`` and ``[updates]`` sections, as described in the
 
     yum install -y https://download.postgresql.org/pub/repos/yum/9.6/redhat/rhel-7-x86_64/pgdg-centos96-9.6-3.noarch.rpm
     yum install -y postgresql96 postgresql96-server postgresql96-libs postgresql96-devel postgresql96-contrib
-    yum install -y gcc redis nginx uwsgi uwsgi-plugin-python
+    yum install -y gcc redis nginx uwsgi uwsgi-plugin-python2
     yum install -y python-devel python-virtualenv libjpeg-turbo-devel libxslt-devel libxml2-devel libffi-devel pcre-devel libyaml-devel
     /usr/pgsql-9.6/bin/postgresql96-setup initdb
     systemctl start postgresql-9.6.service redis.service
