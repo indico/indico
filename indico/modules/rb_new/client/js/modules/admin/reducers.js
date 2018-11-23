@@ -43,6 +43,11 @@ export default combineReducers({
             adminActions.FETCH_FEATURES_SUCCESS,
             adminActions.FETCH_FEATURES_ERROR
         ),
+        attributes: requestReducer(
+            adminActions.FETCH_ATTRIBUTES_REQUEST,
+            adminActions.FETCH_ATTRIBUTES_SUCCESS,
+            adminActions.FETCH_ATTRIBUTES_ERROR
+        ),
     }),
     locations: (state = [], action) => {
         switch (action.type) {
@@ -83,6 +88,21 @@ export default combineReducers({
                 ];
             case adminActions.FEATURE_DELETED:
                 return state.filter(feat => feat.id !== action.id);
+            default:
+                return state;
+        }
+    },
+    attributes: (state = [], action) => {
+        switch (action.type) {
+            case adminActions.ATTRIBUTES_RECEIVED:
+                return camelizeKeys(action.data);
+            case adminActions.ATTRIBUTE_RECEIVED:
+                return [
+                    ...state.filter(attr => attr.id !== action.data.id),
+                    camelizeKeys(action.data),
+                ];
+            case adminActions.ATTRIBUTE_DELETED:
+                return state.filter(attr => attr.id !== action.id);
             default:
                 return state;
         }

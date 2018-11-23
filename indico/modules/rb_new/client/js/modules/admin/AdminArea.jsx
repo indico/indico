@@ -26,6 +26,7 @@ import {selectors as userSelectors} from '../../common/user';
 import AdminMenu from './AdminMenu';
 import AdminLocationRooms from './AdminLocationRooms';
 import EquipmentPage from './EquipmentPage';
+import AttributesPage from './AttributesPage';
 import * as adminActions from './actions';
 
 import './AdminArea.module.scss';
@@ -61,6 +62,7 @@ class AdminArea extends React.Component {
                         <Route exact path="/admin"
                                render={() => <Translate>General settings</Translate>} />
                         <Route exact path="/admin/equipment" component={EquipmentPage} />
+                        <Route exact path="/admin/attributes" component={AttributesPage} />
                         <Route exact path="/admin/location/:locationId"
                                render={({match: {params: {locationId}}}) => (
                                    <AdminLocationRooms locationId={parseInt(locationId, 10)} />

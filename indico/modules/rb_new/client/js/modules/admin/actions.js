@@ -18,6 +18,7 @@
 import fetchLocationsURL from 'indico-url:rooms_new.admin_locations';
 import equipmentTypesURL from 'indico-url:rooms_new.admin_equipment_types';
 import featuresURL from 'indico-url:rooms_new.admin_features';
+import attributesURL from 'indico-url:rooms_new.admin_attributes';
 
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {ajaxAction, submitFormAction} from 'indico/utils/redux';
@@ -42,6 +43,13 @@ export const FETCH_EQUIPMENT_TYPES_ERROR = 'admin/FETCH_EQUIPMENT_TYPES_ERROR';
 export const EQUIPMENT_TYPES_RECEIVED = 'admin/EQUIPMENT_TYPES_RECEIVED';
 export const EQUIPMENT_TYPE_RECEIVED = 'admin/EQUIPMENT_TYPE_RECEIVED';
 export const EQUIPMENT_TYPE_DELETED = 'admin/EQUIPMENT_TYPE_DELETED';
+
+export const FETCH_ATTRIBUTES_REQUEST = 'admin/FETCH_ATTRIBUTES_REQUEST';
+export const FETCH_ATTRIBUTES_SUCCESS = 'admin/FETCH_ATTRIBUTES_SUCCESS';
+export const FETCH_ATTRIBUTES_ERROR = 'admin/FETCH_ATTRIBUTES_ERROR';
+export const ATTRIBUTES_RECEIVED = 'admin/ATTRIBUTES_RECEIVED';
+export const ATTRIBUTE_RECEIVED = 'admin/ATTRIBUTE_RECEIVED';
+export const ATTRIBUTE_DELETED = 'admin/ATTRIBUTE_DELETED';
 
 export const FILTER_NAMESPACE = 'admin';
 
@@ -70,6 +78,15 @@ export function fetchFeatures() {
         FETCH_FEATURES_REQUEST,
         [FEATURES_RECEIVED, FETCH_FEATURES_SUCCESS],
         FETCH_FEATURES_ERROR
+    );
+}
+
+export function fetchAttributes() {
+    return ajaxAction(
+        () => indicoAxios.get(attributesURL()),
+        FETCH_ATTRIBUTES_REQUEST,
+        [ATTRIBUTES_RECEIVED, FETCH_ATTRIBUTES_SUCCESS],
+        FETCH_ATTRIBUTES_ERROR
     );
 }
 
@@ -126,5 +143,31 @@ export function createFeature(data) {
     return submitFormAction(
         () => indicoAxios.post(featuresURL(), data),
         null, FEATURE_RECEIVED
+    );
+}
+
+export function deleteAttribute(id) {
+    return async (dispatch) => {
+        try {
+            await indicoAxios.delete(attributesURL({attribute_id: id}));
+        } catch (error) {
+            handleAxiosError(error, true);
+            return;
+        }
+        dispatch({type: ATTRIBUTE_DELETED, id});
+    };
+}
+
+export function updateAttribute(id, data) {
+    return submitFormAction(
+        () => indicoAxios.patch(attributesURL({attribute_id: id}), data),
+        null, ATTRIBUTE_RECEIVED
+    );
+}
+
+export function createAttribute(data) {
+    return submitFormAction(
+        () => indicoAxios.post(attributesURL(), data),
+        null, ATTRIBUTE_RECEIVED
     );
 }

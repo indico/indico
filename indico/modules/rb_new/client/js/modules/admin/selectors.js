@@ -66,3 +66,11 @@ export const isFetchingFeaturesOrEquipmentTypes = ({admin}) => (
     admin.requests.equipmentTypes.state === RequestState.STARTED ||
     admin.requests.features.state === RequestState.STARTED
 );
+
+export const isFetchingAttributes = ({admin}) => admin.requests.attributes.state === RequestState.STARTED;
+
+export const _getAttributes = ({admin}) => admin.attributes;
+export const getAttributes = createSelector(
+    _getAttributes,
+    attributes => attributes.slice().sort(makeSorter('title'))
+);

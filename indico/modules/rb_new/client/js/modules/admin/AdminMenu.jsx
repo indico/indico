@@ -67,9 +67,21 @@ function AdminMenu({locations, isFetchingLocations, actions: {clearTextFilter}})
                 </NavLink>
             </Menu.Item>
             <Menu.Item>
-                <NavLink exact to="/admin/equipment">
-                    <Translate>Equipment & Features</Translate>
-                </NavLink>
+                <Menu.Header>
+                    <Translate>Room Metadata</Translate>
+                </Menu.Header>
+                <Menu.Menu>
+                    <Menu.Item>
+                        <NavLink exact to="/admin/attributes">
+                            <Translate>Attributes</Translate>
+                        </NavLink>
+                    </Menu.Item>
+                    <Menu.Item>
+                        <NavLink exact to="/admin/equipment">
+                            <Translate>Equipment & Features</Translate>
+                        </NavLink>
+                    </Menu.Item>
+                </Menu.Menu>
             </Menu.Item>
             <Menu.Item>
                 <Menu.Header styleName="locations-header">
