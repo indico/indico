@@ -34,6 +34,13 @@ export default class SingleDatePicker extends React.Component {
 
     render() {
         const {focused} = this.state;
+        const filteredProps = Object.entries(this.props).filter(([name]) => {
+            return !['name', 'value', 'onBlur', 'onChange', 'onFocus', 'label', 'disabledDate'].includes(name);
+        }).reduce((acc, curr) => {
+            const [key, value] = curr;
+            return {...acc, [key]: value};
+        }, {});
+
         return (
             <ReactDatesSinglePicker focused={focused}
                                     onFocusChange={this.onFocusChange}
@@ -41,7 +48,7 @@ export default class SingleDatePicker extends React.Component {
                                     inputIconPosition="after"
                                     hideKeyboardShortcutsPanel
                                     numberOfMonths={1}
-                                    {...this.props} />
+                                    {...filteredProps} />
         );
     }
 }
