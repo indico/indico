@@ -44,7 +44,7 @@ from indico.util.marshmallow import NaiveDateTime
 from indico.util.string import natural_sort_key
 
 
-class RoomAttributesSchema(mm.ModelSchema):
+class RoomAttributeValuesSchema(mm.ModelSchema):
     title = String(attribute='attribute.title')
 
     class Meta:
@@ -256,7 +256,7 @@ class AdminEquipmentTypeSchema(mm.ModelSchema):
 
 rb_user_schema = RBUserSchema()
 rooms_schema = RoomSchema(many=True)
-room_attributes_schema = RoomAttributesSchema(many=True)
+room_attribute_values_schema = RoomAttributeValuesSchema(many=True)
 map_areas_schema = MapAreaSchema(many=True)
 reservation_occurrences_schema = ReservationOccurrenceSchema(many=True)
 reservation_schema = ReservationSchema()
