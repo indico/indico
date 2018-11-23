@@ -81,21 +81,26 @@ parent object. The key features and expected behaviour is the following:
                 </div>
             {%- endif %}
             <div id="room-available" class="availabiity-message">
-                <div class="content available">
-                    <i class="icon icon-checkmark color-green"></i>
-                    <span>{% trans %}This room is available. Would you like to book it?{% endtrans %}</span>
-                    {{ switch(id='create-booking', on_label=_('Yes'), off_label=_('No')) }}
+                <div id="room-available-content" class="success-message-box">
+                    <div class="message-box-content content available">
+                        <i class="icon"></i>
+                        <span>{% trans %}This room is available. Would you like to book it?{% endtrans %}</span>
+                        {{ switch(id='create-booking', on_label=_('Yes'), off_label=_('No')) }}
+                    </div>
                 </div>
             </div>
             <div id="room-conflict-booking" class="availabiity-message">
-                <div class="content conflict-booking">
-                    <i class="icon icon-cross"></i>
-                    <span>{% trans %}This room is already booked at selected times{% endtrans %}</span>
+                <div class="danger-message-box">
+                    <div class="message-box-content content conflict-booking">
+                        <i class="icon"></i>
+                        <span>{% trans %}This room is already booked at selected times{% endtrans %}</span>
+                    </div>
                 </div>
             </div>
             <div id="room-conflict-prebooking" class="availabiity-message">
-                <div class="content conflict-prebooking">
-                    <i class="icon icon-warning"></i>
+                <div class="warning-message-box">
+                <div class="message-box-content content conflict-prebooking">
+                    <i class="icon"></i>
                     <span>{% trans %}This room is already prebooked at selected times{% endtrans %}</span>
                 </div>
             </div>
