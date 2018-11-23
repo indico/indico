@@ -24,7 +24,7 @@ from werkzeug.exceptions import Forbidden
 
 from indico.core.db import db
 from indico.modules.rb.controllers import RHRoomBookingBase
-from indico.modules.rb.models.equipment import EquipmentType, RoomEquipmentAssociation, equipment_features_table
+from indico.modules.rb.models.equipment import EquipmentType, RoomEquipmentAssociation
 from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.room_features import RoomFeature
 from indico.modules.rb.util import rb_is_admin
@@ -54,11 +54,6 @@ class RHFeatures(RHRoomBookingAdminBase):
     def _dump_features(self):
         query = RoomFeature.query.order_by(RoomFeature.title)
         return room_feature_schema.dump(query, many=True).data
-
-    def _get_equipment_counts(self):
-        query = (db.session.query(equipment_features_table.c.feature_id, db.func.count())
-                 .group_by(equipment_features_table.c.feature_id))
-        return dict(query)
 
     def _jsonify_one(self, equipment_type):
         return jsonify(room_feature_schema.dump(equipment_type).data)
