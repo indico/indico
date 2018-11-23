@@ -68,11 +68,15 @@ a {
 }
 
 .header.legend-header {
+    display: flex !important;
+    align-items: center;
+
     .icon.legend-info-icon {
+        display: flex;
+        align-items: center;
         color: $gray;
-        padding-left: 0.5em;
+        margin-left: 0.5em;
         font-size: 0.9em;
-        vertical-align: baseline;
     }
 }
 
