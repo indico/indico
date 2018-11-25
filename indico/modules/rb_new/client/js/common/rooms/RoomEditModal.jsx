@@ -32,12 +32,13 @@ import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import camelizeKeys from 'indico/utils/camelize';
 import {ReduxCheckboxField, ReduxFormField} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
+import EquipmentList from './EquipmentList';
 import SpriteImage from '../../components/SpriteImage';
+import TimeRangePicker from '../../components/TimeRangePicker';
 import * as roomsSelectors from './selectors';
 import * as roomActions from './actions';
 
-import './RoomEditModal.module.scss';
-import TimeRangePicker from '../../components/TimeRangePicker';
+
 
 
 function validate() {
@@ -178,10 +179,8 @@ const columns = [
         type: 'header',
         label: Translate.string('Equipment Available')
     }, {
-        type: 'equipmentDropdown',
-        placeholder: Translate.string('Add new equipment')
-    }, {
         type: 'equipment',
+        placeholder: Translate.string('Add new equipment')
     }]];
 
 
@@ -280,7 +279,7 @@ class RoomEditModal extends React.Component {
             handleAxiosError(error);
             return;
         }
-        this.setState({roomEquipment: camelizeKeys(response.data.available_equipment)});
+        this.setState({roomEquipment: camelizeKeys(response.data)});
     }
 
     handleCloseModal = () => {
@@ -305,13 +304,6 @@ class RoomEditModal extends React.Component {
         this.setState({roomAttributes: _.omit(roomAttributes, attribute)});
     };
 
-    removeEquipment = (equipmentId) => {
-        const {roomEquipment} = this.state;
-        _.remove(roomEquipment, (n) => {
-            return n === equipmentId;
-        });
-        this.setState({roomEquipment});
-    };
 
     renderAttributes = () => {
         const {attributes, roomAttributes} = this.state;
@@ -341,6 +333,17 @@ class RoomEditModal extends React.Component {
                     onClick={type === 'attributes' ? this.onEditAttributes : this.onEditHours}>
                 Add
             </Button>
+        );
+    };
+
+    renderEquipmentList = ({input, ...props}) => {
+        let label = Translate.string('Add new equipment');
+        return (
+            <ReduxFormField {...props}
+                            input={input}
+                            as={EquipmentList}
+                            label={label}
+                            />
         );
     };
 
@@ -395,8 +398,6 @@ class RoomEditModal extends React.Component {
                 return this.renderImage(room.spritePosition);
             case 'attributes':
                 return this.renderAttributes();
-            case 'addButton':
-                return this.renderAddButton(content.editType);
             case 'attributeDropdown':
                 if (!attributes && !roomAttributes) {
                     return;
@@ -415,42 +416,14 @@ class RoomEditModal extends React.Component {
                               selectOnBlur={false}
                               onChange={(event, values) => this.onEditAttributes(values.value)} />
                 );
-            case 'equipmentDropdown':
+            case 'equipment':
                 if (!roomEquipment && equipmentTypes) {
                     return;
                 }
-                options = this.generateEquipmentOptions();
                 return (
-                    <Dropdown button
-                              text={content.placeholder}
-                              className="icon"
-                              floating
-                              labeled
-                              icon="add"
-                              options={options}
-                              search
-                              disabled={options.length === 0}
-                              selectOnBlur={false}
-                              onChange={(event, values) => this.onEditEquipment(values.value)} />
-                );
-            case 'equipment':
-                if (!roomEquipment || !equipmentTypes || !equipmentTypesMapped) {
-                    return;
-                }
-                return (
-                    <List key="equipment" divided>
-                        {roomEquipment.map((equipmentId) => {
-                            return (
-                                <List.Item key={equipmentTypesMapped[equipmentId].id}>
-                                    <List.Content floated="right">
-                                        <Icon styleName="equipment-button" name="trash" onClick={() => this.removeEquipment(equipmentId)} />
-                                    </List.Content>
-                                    <List.Content>{equipmentTypesMapped[equipmentId].name}
-                                    </List.Content>
-                                </List.Item>
-                            );
-                        })}
-                    </List>
+                    <Field name="availableEquipment"
+                           isEqual={_.isEqual}
+                           render={this.renderEquipmentList} />
                 );
             case 'dateRange':
                 if (!roomAvailability || !roomAvailability.bookable_hours.length) {
@@ -511,19 +484,12 @@ class RoomEditModal extends React.Component {
     };
 
 
-    generateEquipmentOptions = () => {
-        const {roomEquipment} = this.state;
-        const {equipmentTypes} = this.props;
-        const options = [];
-        equipmentTypes.map((equipmentType) => (roomEquipment.indexOf(equipmentType.id) < 0
-            ? options.push({key: equipmentType.id, text: equipmentType.name, value: equipmentType.id}) : null));
-        return options;
-    };
+
 
     render() {
-        const {room, roomAttributes, attributes} = this.state;
+        const {room, roomAttributes, attributes, roomEquipment} = this.state;
         const props = {validate, onSubmit: this.handleSubmit};
-        if (!room || !attributes || !roomAttributes) {
+        if (!room || !attributes || !roomAttributes || !roomEquipment) {
             return <Dimmer active page><Loader /></Dimmer>;
         }
         return (
@@ -531,7 +497,7 @@ class RoomEditModal extends React.Component {
                 <Modal open onClose={this.handleCloseModal} size="large" closeIcon>
                     <FinalForm {...props}
                                render={this.renderModalContent}
-                               initialValues={{...room, ...roomAttributes}} />
+                               initialValues={{...room, ...roomAttributes, ...roomEquipment}} />
                 </Modal>
             </>
         );
