@@ -17,8 +17,9 @@
 from __future__ import unicode_literals
 
 from flask import jsonify, request, session
-from marshmallow import fields, validate
+from marshmallow import validate
 from sqlalchemy.orm import joinedload
+from webargs import fields
 from webargs.flaskparser import abort, use_kwargs, use_args
 from werkzeug.exceptions import Forbidden
 
@@ -291,8 +292,10 @@ class RHRoomAvailability(RHRoomAdminBase):
 
 
 class RHRoomAvailabilityUpdate(RHRoomAdminBase):
-    @use_args({'bookable_hours': fields.Nested({'start_time': fields.Time(), 'end_time': fields.Time()}, many=True),
-               'nonbookable_periods': fields.Nested({'start_dt': fields.DateTime(), 'end_dt': fields.DateTime()}, many=True)})
+    @use_args({'bookable_hours': fields.Nested({'start_time': fields.Time(),
+                                                'end_time': fields.Time()}, many=True),
+               'nonbookable_periods': fields.Nested({'start_dt': fields.DateTime(),
+                                                     'end_dt': fields.DateTime()}, many=True)})
     def _process(self, args):
         update_room_availability(self.room, args)
         return jsonify({'nonbookable_periods': nonbookable_periods_schema.dump(self.room.nonbookable_periods, many=True).data,

@@ -64,16 +64,11 @@ def update_room_attributes(room, attributes):
 
 def update_room_availability(room, availability):
     if 'bookable_hours' in availability:
-        new_bookable_hours = {BookableHours(room=room, **hours) for hours in availability['bookable_hours']}
-        del room.bookable_hours[:]
-        db.session.flush()
-        room.bookable_hours = new_bookable_hours
+        room.bookable_hours.order_by(False).delete()
+        db.session.add_all([BookableHours(room=room, **hours) for hours in availability['bookable_hours']])
     if 'nonbookable_periods' in availability:
-        new_nonbookable_periods = {NonBookablePeriod(room=room, **periods) for periods in availability['nonbookable_periods']}
-        del room.nonbookable_periods[:]
-        db.session.flush()
-        room.nonbookable_periods = new_nonbookable_periods
-    db.session.flush()
+        room.nonbookable_periods.order_by(False).delete()
+        db.session.add_all([NonBookablePeriod(room=room, **periods) for periods in availability['nonbookable_periods']])
 
 
 def update_room(room, args):

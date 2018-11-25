@@ -21,12 +21,12 @@ import fetchAttributesURL from 'indico-url:rooms_new.admin_attributes';
 import fetchRoomAvailabilityURL from 'indico-url:rooms_new.admin_room_availability';
 import fetchRoomEquipmentURL from 'indico-url:rooms_new.admin_room_equipment';
 import _ from 'lodash';
+import moment from 'moment';
 import React from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import PropTypes from 'prop-types';
-import {Button, Checkbox, Dimmer, Dropdown, Form, Grid, Header, Icon, Input, List, Loader, Modal} from 'semantic-ui-react';
-// import Dropzone from 'react-dropzone';
+import {Button, Checkbox, Dimmer, Dropdown, Form, Grid, Header, Icon, Input, List, Loader, Modal, TextArea} from 'semantic-ui-react';
 import {Form as FinalForm, Field} from 'react-final-form';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import camelizeKeys from 'indico/utils/camelize';
@@ -37,6 +37,8 @@ import * as roomsSelectors from './selectors';
 import * as roomActions from './actions';
 
 import './RoomEditModal.module.scss';
+import TimeRangePicker from '../../components/TimeRangePicker';
+
 
 function validate() {
 }
@@ -77,6 +79,15 @@ const columns = [
             name: 'division',
             label: Translate.string('Division')
         }]
+    }, {
+        type: 'textarea',
+        name: 'comments',
+        label: Translate.string('Comments'),
+    }, {
+        type: 'header',
+        label: Translate.string('Daily availability')
+    }, {
+        type: 'dateRange',
     }], [{
         type: 'header',
         label: Translate.string('Location')
@@ -126,14 +137,6 @@ const columns = [
         label: Translate.string('Maximum advance time for bookings (days)')
     }, {
         type: 'header',
-        label: Translate.string('Equipment Available')
-    }, {
-        type: 'equipmentDropdown',
-        placeholder: Translate.string('Add new equipment')
-    }, {
-        type: 'equipment',
-    }], [{
-        type: 'header',
         label: 'Options',
     }, {
         type: 'checkbox',
@@ -163,7 +166,7 @@ const columns = [
         type: 'input',
         name: 'monthReminder',
         label: Translate.string('Send Booking reminders X days before (monthly)')
-    }, {
+    }], [{
         type: 'header',
         label: 'Custom Attributes'
     }, {
@@ -171,6 +174,14 @@ const columns = [
         placeholder: Translate.string('Add new attributes'),
     }, {
         type: 'attributes'
+    }, {
+        type: 'header',
+        label: Translate.string('Equipment Available')
+    }, {
+        type: 'equipmentDropdown',
+        placeholder: Translate.string('Add new equipment')
+    }, {
+        type: 'equipment',
     }]];
 
 
@@ -199,11 +210,6 @@ class RoomEditModal extends React.Component {
         this.fetchRoomAvailability();
         this.fetchRoomEquipment();
     }
-    //
-    // onDrop = (acceptedFiles, rejectedFiles) => {
-    //     console.warn(acceptedFiles);
-    //     console.warn(rejectedFiles);
-    // };
 
     onEditHours = () => {
     };
@@ -274,7 +280,7 @@ class RoomEditModal extends React.Component {
             handleAxiosError(error);
             return;
         }
-        this.setState({roomEquipment: response.data.available_equipment});
+        this.setState({roomEquipment: camelizeKeys(response.data.available_equipment)});
     }
 
     handleCloseModal = () => {
@@ -291,12 +297,7 @@ class RoomEditModal extends React.Component {
     };
 
     renderImage = (position) => {
-        return (
-            <>
-                {/* <Dropzone key={position} onDrop={this.onDrop}> */}
-                <SpriteImage pos={position} />
-                {/* </Dropzone> */}
-            </>);
+        return <SpriteImage pos={position} />;
     };
 
     removeAttribute = (attribute) => {
@@ -348,7 +349,7 @@ class RoomEditModal extends React.Component {
     );
 
     renderContent = (content) => {
-        const {room, attributes, roomEquipment, roomAttributes} = this.state;
+        const {room, attributes, roomEquipment, roomAttributes, roomAvailability} = this.state;
         const {equipmentTypes} = this.props;
         if (!equipmentTypes) {
             return;
@@ -381,6 +382,14 @@ class RoomEditModal extends React.Component {
                            component={ReduxCheckboxField}
                            componentLabel={content.label}
                            as={Checkbox} />
+                );
+            case 'textarea':
+                return (
+                    <Field key={content.name}
+                           name={content.name}
+                           component={ReduxFormField}
+                           label={content.label}
+                           as={TextArea} />
                 );
             case 'image':
                 return this.renderImage(room.spritePosition);
@@ -443,6 +452,19 @@ class RoomEditModal extends React.Component {
                         })}
                     </List>
                 );
+            case 'dateRange':
+                if (!roomAvailability || !roomAvailability.bookable_hours.length) {
+                    return <div key={1}>No bookable hours found</div>;
+                }
+
+                return roomAvailability.bookable_hours.map((index, bookableHour) => {
+                    return (
+                        <TimeRangePicker key={index}
+                                         starTime={bookableHour.start_time}
+                                         endTime={moment(bookableHour.end_time)}
+                                         onChange={() => null} />
+                    );
+                });
         }
     };
 
