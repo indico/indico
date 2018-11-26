@@ -81,7 +81,7 @@ parent object. The key features and expected behaviour is the following:
                 </div>
             {%- endif %}
             <div id="room-available" class="availabiity-message">
-                <div id="room-available-content" class="success-message-box">
+                <div class="success-message-box">
                     <div class="message-box-content content available">
                         <i class="icon"></i>
                         <span>{% trans %}This room is available. Would you like to book it?{% endtrans %}</span>
@@ -89,19 +89,47 @@ parent object. The key features and expected behaviour is the following:
                     </div>
                 </div>
             </div>
+            <div id="room-available-disabled" class="availabiity-message">
+                <div class="success-message-box disabled">
+                    <div class="message-box-content content available">
+                        <i class="icon"></i>
+                        <span>{% trans %}This room is available. Would you like to book it?{% endtrans %}</span>
+                        {{ switch(id='create-booking', on_label=_('Yes'), off_label=_('No'), disabled=true) }}
+                    </div>
+                    <div id="available-disabled-message" class="message-box-content"></div>
+                </div>
+            </div>
             <div id="room-conflict-booking" class="availabiity-message">
                 <div class="danger-message-box">
                     <div class="message-box-content content conflict-booking">
                         <i class="icon"></i>
-                        <span>{% trans %}This room is already booked at selected times{% endtrans %}</span>
+                        <span>{% trans %}This room is not available at selected times{% endtrans %}</span>
                     </div>
                 </div>
             </div>
             <div id="room-conflict-prebooking" class="availabiity-message">
                 <div class="warning-message-box">
-                <div class="message-box-content content conflict-prebooking">
-                    <i class="icon"></i>
-                    <span>{% trans %}This room is already prebooked at selected times{% endtrans %}</span>
+                    <div class="message-box-content content conflict-prebooking">
+                        <i class="icon"></i>
+                        {% trans %}
+                                This room is already prebooked at selected times. Would you like to book it anyways?
+                        {% endtrans %}
+                        {{ switch(id='create-booking', on_label=_('Yes'), off_label=_('No'), disabled=true) }}
+                    </div>
+                </div>
+            </div>
+            <div id="room-conflict-prebooking-disabled" class="availabiity-message">
+                <div class="warning-message-box disabled">
+                    <div class="message-box-content content conflict-prebooking">
+                        <i class="icon"></i>
+                        <span>
+                            {% trans %}
+                                This room is already prebooked at selected times. Would you like to book it anyways?
+                            {% endtrans %}
+                            {{ switch(id='create-booking', on_label=_('Yes'), off_label=_('No'), disabled=true) }}
+                        </span>
+                    </div>
+                    <div id="conflict-prebooking-disabled-message" class="message-box-content"></div>
                 </div>
             </div>
         </div>

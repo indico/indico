@@ -119,13 +119,16 @@ purely client-side and are worded for event creation instead of being generic.
         var $availableMessage = $('#room-available');
         var $conflictBookingMessage = $('#room-conflict-booking');
         var $conflictPrebookingMessage = $('#room-conflict-prebooking');
+        var $availableDisabled = $('#room-available-disabled');
+        var $availableDisabledContent = $('#available-disabled-message');
+        var $conflictPrebookingDisabled = $('#conflict-prebooking-disabled');
+        var $conflictPrebookingDisabledContent = $('#conflict-prebooking-disabled-message');
+        var $blacklistedCategoryContent = $('<strong></strong>').text("You can't book a room for an event in this category");
+        var $differentTimezoneContent = $('<strong></strong>').text("You can't book a room for an event in a different timezone than: " + serverDefaultTimezone);
 
-        function setLectureTimes(occurrences){
-            if (occurrences.length === 1) {
-                var occurrence = occurrences[0];
-                startDt = moment(occurrence['date'] + " " + occurrence['time'], 'DD-MM-YYYY HH:mm');
-                endDt = moment(startDt).add(occurrence['duration'], 'minutes');
-            }
+        function setLectureTimes(occurrence){
+            startDt = moment(occurrence['date'] + " " + occurrence['time'], 'DD-MM-YYYY HH:mm');
+            endDt = moment(startDt).add(occurrence['duration'], 'minutes');
         }
 
         function initValues() {
@@ -139,8 +142,8 @@ purely client-side and are worded for event creation instead of being generic.
             timezone = $('#event-creation-timezone').val();
             category = JSON.parse($("#event-creation-category").val());
 
-            if (occurrences) {
-                setLectureTimes(JSON.parse(occurrences));
+            if (occurrences && occurrences.length === 1) {
+                setLectureTimes(JSON.parse(occurrences[0]));
             } else {
                 startDt = moment(startDate + " " + startTime, 'DD/MM/YYYY HH:mm');
                 endDt = moment(endDate + " " + endTime, 'DD/MM/YYYY HH:mm');
@@ -159,14 +162,23 @@ purely client-side and are worded for event creation instead of being generic.
             return isExcluded;
         }
 
-        function updateAvailability() {
+        function checkConditions() {
+            if (isCategoryExcluded(category['id'])) { return $blacklistedCategoryContent; }
+            if (timezone !== serverDefaultTimezone) {return $differentTimezoneContent; }
+            return false;
+        }
+
+        function hideAvailability() {
             if ($currentMessage) {
                 $currentMessage.hide();
             }
-            if (isCategoryExcluded(category['id'])) { return; }
-            if (!startDt.isSame(endDt, 'day')) { return; }
+        }
+
+        function updateAvailability() {
+            hideAvailability();
+
             if (!('room_id' in roomData)) { return; }
-            if (timezone !== serverDefaultTimezone) {return; }
+            if (!startDt.isSame(endDt, 'day')) { return;}
 
             var roomId = roomData['room_id'];
             previousRoomId = roomId;
@@ -186,10 +198,30 @@ purely client-side and are worded for event creation instead of being generic.
                 success: function(data) {
                     if (data['conflict_booking']){
                         $currentMessage = $conflictBookingMessage;
+                        availabilityDisplayed = true;
                     } else if (data['conflict_prebooking']){
+                        var message = checkConditions();
+                        if (message) {
+                            if (availabilityDisplayed) {
+                                $conflictPrebookingDisabledContent.empty();
+                                $conflictPrebookingDisabledContent.append(message);
+                                $currentMessage = $conflictPrebookingDisabled;
+                            }
+                        }
                         $currentMessage = $conflictPrebookingMessage;
+                        availabilityDisplayed = true;
                     } else {
-                        $currentMessage = $availableMessage;
+                        var message = checkConditions();
+                        if (message) {
+                            if (availabilityDisplayed) {
+                                $availableDisabledContent.empty();
+                                $availableDisabledContent.append(message);
+                                $currentMessage = $availableDisabled;
+                            }
+                        } else {
+                            $currentMessage = $availableMessage;
+                            availabilityDisplayed = true;
+                        }
                     }
                     $currentMessage.show();
                 }
@@ -239,9 +271,13 @@ purely client-side and are worded for event creation instead of being generic.
         });
 
         $('#event-creation-occurrences').change(function() {
-            occurrences = JSON.parse($(this).val());
-            setLectureTimes(JSON.parse(occurrences));
-            updateAvailability();
+            var occurrences = JSON.parse($(this).val());
+            if (occurrences.length === 1) {
+                setLectureTimes(occurrences[0]);
+                updateAvailability();
+            } else {
+                hideAvailability();
+            }
         });
 
         $('#event-creation-timezone').change(function() {
