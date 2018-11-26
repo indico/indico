@@ -9,7 +9,7 @@
                     {% set filename = 'indico_small_white.png' if dark else 'indico_small.png' %}
                     <img src="{{ url_for('assets.image', filename=filename) }}" class="footer-logo" alt="Indico">
                 {% endblock %}
-                <div style="margin-left: 1em;">
+                <div class="f-self-no-shrink" style="margin-left: 1em;">
                     <span>{% trans %}Powered by {{ indico }}{% endtrans %}</span>
                 </div>
             </div>
