@@ -263,9 +263,12 @@ class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):
         if self.invitation and self.invitation.state == InvitationState.accepted and self.invitation.registration:
             return redirect(url_for('.display_regform', self.invitation.registration.locator.registrant))
 
+    def _can_register(self):
+        return not self.regform.limit_reached and (self.regform.is_active or self.invitation)
+
     def _process(self):
         form = make_registration_form(self.regform)()
-        if form.validate_on_submit() and not self.regform.limit_reached:
+        if self._can_register() and form.validate_on_submit():
             registration = create_registration(self.regform, form.data, self.invitation)
             return redirect(url_for('.display_regform', registration.locator.registrant))
         elif form.is_submitted():
