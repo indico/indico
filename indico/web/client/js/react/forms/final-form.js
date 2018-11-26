@@ -15,8 +15,10 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-export {handleSubmissionError} from './errors';
-export {ReduxFormField, ReduxRadioField, ReduxCheckboxField, ReduxDropdownField} from './fields';
-export {default as validators} from './validators';
-export {default as formatters} from './formatters';
-export {getChangedValues} from './final-form';
+import _ from 'lodash';
+
+
+export function getChangedValues(data, form) {
+    const fields = form.getRegisteredFields();
+    return _.fromPairs(fields.filter(name => form.getFieldState(name).dirty).map(name => [name, data[name]]));
+}

@@ -21,6 +21,7 @@ import PropTypes from 'prop-types';
 import {Form as FinalForm} from 'react-final-form';
 import {Button, Confirm, Form, List} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
+import {getChangedValues} from 'indico/react/forms';
 
 import './EditableList.module.scss';
 
@@ -71,10 +72,10 @@ export default class EditableListItem extends React.PureComponent {
         this.setState({editing: !editing});
     };
 
-    handleSubmit = async (data) => {
+    handleSubmit = async (data, form) => {
         const {item, onUpdate} = this.props;
         this.setState({saving: true});
-        const rv = await onUpdate(item, data);
+        const rv = await onUpdate(item, getChangedValues(data, form));
         if (rv.error) {
             this.setState({saving: false});
             return rv.error;
