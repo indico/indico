@@ -32,13 +32,14 @@ import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import camelizeKeys from 'indico/utils/camelize';
 import {ReduxCheckboxField, ReduxFormField} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
+import PrincipalSearchField from 'indico/react/components/PrincipalSearchField';
 import EquipmentList from './EquipmentList';
 import SpriteImage from '../../components/SpriteImage';
 import TimeRangePicker from '../../components/TimeRangePicker';
+
 import * as roomsSelectors from './selectors';
 import * as roomActions from './actions';
-
-
+import {selectors as userSelectors} from '../user';
 
 
 function validate() {
@@ -54,7 +55,7 @@ const columns = [
         type: 'header',
         label: Translate.string('Contact')
     }, {
-        type: 'input',
+        type: 'principal',
         name: 'ownerName',
         label: Translate.string('Owner')
     }, {
@@ -94,7 +95,7 @@ const columns = [
         label: Translate.string('Location')
     }, {
         type: 'input',
-        name: 'name',
+        name: 'verboseName',
         label: Translate.string('Name')
     }, {
         type: 'input',
@@ -187,6 +188,7 @@ const columns = [
 class RoomEditModal extends React.Component {
     static propTypes = {
         equipmentTypes: PropTypes.arrayOf(PropTypes.object).isRequired,
+        favoriteUsers: PropTypes.array.isRequired,
         onClose: PropTypes.func.isRequired,
         roomId: PropTypes.number.isRequired,
         actions: PropTypes.exact({
@@ -210,17 +212,11 @@ class RoomEditModal extends React.Component {
         this.fetchRoomEquipment();
     }
 
-    onEditHours = () => {
-    };
 
     onEditAttributes = (newAttributeName) => {
         this.addAttribute(newAttributeName);
     };
 
-    onEditEquipment = (newEquipment) => {
-        const {roomEquipment} = this.state;
-        this.setState({roomEquipment: [...roomEquipment, newEquipment]});
-    };
 
     async fetchDetailedRoom() {
         const {roomId} = this.props;
@@ -267,7 +263,7 @@ class RoomEditModal extends React.Component {
             handleAxiosError(error);
             return;
         }
-        this.setState({roomAvailability: response.data});
+        this.setState({roomAvailability: camelizeKeys(response.data)});
     }
 
     async fetchRoomEquipment() {
@@ -317,33 +313,30 @@ class RoomEditModal extends React.Component {
                            component={ReduxFormField}
                            label={attribute.name}
                            as={Input}
+                           isEqual={_.isEqual}
                            icon={{name: 'trash', color: 'red', link: true, onClick: () => this.removeAttribute(attribute.name)}} />
-                )} </>
+                )}
+            </>
 
         ));
     };
 
-    renderAddButton = (type) => {
-        const {attributes} = this.state;
-        return (
-            <Button disabled={attributes.length === 0}
-                    default
-                    size="tiny"
-                    floated="right"
-                    onClick={type === 'attributes' ? this.onEditAttributes : this.onEditHours}>
-                Add
-            </Button>
-        );
-    };
-
     renderEquipmentList = ({input, ...props}) => {
-        let label = Translate.string('Add new equipment');
         return (
             <ReduxFormField {...props}
                             input={input}
                             as={EquipmentList}
-                            label={label}
-                            />
+                            componentLabel={Translate.string('Add new equipment')} />
+        );
+    };
+
+    renderPrincipalSearchField = (props) => {
+        const {favoriteUsers} = this.props;
+        return (
+            <ReduxFormField {...props}
+                            favoriteUsers={favoriteUsers}
+                            as={PrincipalSearchField}
+                            label={Translate.string('Owner')} />
         );
     };
 
@@ -357,7 +350,6 @@ class RoomEditModal extends React.Component {
         if (!equipmentTypes) {
             return;
         }
-        const equipmentTypesMapped = _.mapKeys(equipmentTypes, 'id');
         let options = [];
         switch (content.type) {
             case 'header':
@@ -371,6 +363,11 @@ class RoomEditModal extends React.Component {
                            component={ReduxFormField}
                            label={content.label}
                            as="input" />
+                );
+            case 'principal':
+                return (
+                    <Field name="owner"
+                           render={this.renderPrincipalSearchField} />
                 );
             case 'formgroup':
                 return (
@@ -426,15 +423,15 @@ class RoomEditModal extends React.Component {
                            render={this.renderEquipmentList} />
                 );
             case 'dateRange':
-                if (!roomAvailability || !roomAvailability.bookable_hours.length) {
+                if (!roomAvailability || !roomAvailability.bookableHours.length) {
                     return <div key={1}>No bookable hours found</div>;
                 }
 
-                return roomAvailability.bookable_hours.map((index, bookableHour) => {
+                return roomAvailability.bookableHours.map((index, bookableHour) => {
                     return (
                         <TimeRangePicker key={index}
-                                         starTime={bookableHour.start_time}
-                                         endTime={moment(bookableHour.end_time)}
+                                         starTime={bookableHour.startTime}
+                                         endTime={moment(bookableHour.endTime)}
                                          onChange={() => null} />
                     );
                 });
@@ -457,6 +454,9 @@ class RoomEditModal extends React.Component {
                     </Form>
                 </Modal.Content>
                 <Modal.Actions>
+                    <Button>
+                        Cancel
+                    </Button>
                     <Button type="submit"
                             form="room-form"
                             primary>
@@ -484,8 +484,6 @@ class RoomEditModal extends React.Component {
     };
 
 
-
-
     render() {
         const {room, roomAttributes, attributes, roomEquipment} = this.state;
         const props = {validate, onSubmit: this.handleSubmit};
@@ -497,7 +495,16 @@ class RoomEditModal extends React.Component {
                 <Modal open onClose={this.handleCloseModal} size="large" closeIcon>
                     <FinalForm {...props}
                                render={this.renderModalContent}
-                               initialValues={{...room, ...roomAttributes, ...roomEquipment}} />
+                               initialValues={{...room, roomAttributes, ...roomEquipment}}
+                               keepDirtyOnReinitialize
+                               initialValuesEqual={(a, b) => {
+                                   const equal = _.isEqual(a, b);
+                                   console.warn(equal);
+                                   if (!equal) {
+                                       console.warn(a, b);
+                                   }
+                                   return equal;
+                               }} />
                 </Modal>
             </>
         );
@@ -506,7 +513,8 @@ class RoomEditModal extends React.Component {
 
 export default connect(
     (state) => ({
-        equipmentTypes: roomsSelectors.getEquipmentTypes(state)
+        equipmentTypes: roomsSelectors.getEquipmentTypes(state),
+        favoriteUsers: userSelectors.getFavoriteUsers(state),
     }),
     dispatch => ({
         actions: bindActionCreators({

@@ -81,9 +81,11 @@ class RoomSchema(mm.ModelSchema):
 
 
 class RoomUpdateSchema(RoomSchema):
+    owner = Nested(UserSchema)
+
     class Meta(RoomSchema.Meta):
-        fields = RoomSchema.Meta.fields + ('notification_before_days', 'notification_before_days_weekly',
-                                           'notification_before_days_monthly')
+        fields = RoomSchema.Meta.fields + ('notification_before_days', 'notification_before_days_weekly', 'owner',
+                                           'notification_before_days_monthly', 'verbose_name')
 
 
 class RoomEquipmentSchema(mm.ModelSchema):

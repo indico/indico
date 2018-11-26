@@ -79,7 +79,6 @@ export default class PrincipalSearchField extends React.Component {
         super(props);
 
         const {multiple, value} = this.props;
-
         if (multiple) {
             this.userCache = Object.assign({}, ...(value || []).map((val) => ({[val.identifier]: val})));
         } else {

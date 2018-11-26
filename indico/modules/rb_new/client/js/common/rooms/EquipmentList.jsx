@@ -18,16 +18,16 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import connect from "react-redux/es/connect/connect";
-import _ from "lodash";
-import * as roomsSelectors from "./selectors";
+import {connect} from 'react-redux';
+import _ from 'lodash';
+import {Dropdown, Icon, List} from 'semantic-ui-react';
+import * as roomsSelectors from './selectors';
 
-import {Dropdown, Icon, List} from "semantic-ui-react";
 
 import './RoomEditModal.module.scss';
 
 
-class EquipmentList extends React.Component{
+class EquipmentList extends React.Component {
     static propTypes = {
         onChange: PropTypes.func.isRequired,
         onFocus: PropTypes.func.isRequired,
@@ -52,7 +52,7 @@ class EquipmentList extends React.Component{
     };
 
     render() {
-        const {onChange, onFocus, onBlur, value, disabled, equipmentTypes, label} = this.props;
+        const {onChange, onFocus, onBlur, value, equipmentTypes, label} = this.props;
         if (!equipmentTypes || !value) {
             return;
         }
@@ -61,21 +61,21 @@ class EquipmentList extends React.Component{
 
         return (
             <>
-                 <Dropdown button
-                              text={label}
-                              className="icon"
-                              floating
-                              labeled
-                              icon="add"
-                              options={options}
-                              search
-                              onFocus={onFocus}
-                              onBlur={onBlur}
-                              disabled={options.length === 0}
-                              selectOnBlur={false}
-                              onChange={(event, values) => {
-                                  onChange([...value, values.value]);
-                              }} />
+                <Dropdown button
+                          text={label}
+                          className="icon"
+                          floating
+                          labeled
+                          icon="add"
+                          options={options}
+                          search
+                          onFocus={onFocus}
+                          onBlur={onBlur}
+                          disabled={options.length === 0}
+                          selectOnBlur={false}
+                          onChange={(event, values) => {
+                              onChange([...value, values.value]);
+                          }} />
                 <List key="equipment" divided>
                     {value.map((equipmentId) => {
                         return (
@@ -93,10 +93,9 @@ class EquipmentList extends React.Component{
                             </List.Item>
                         );
                     })}
-                    </List>
+                </List>
                 </>
         );
-
     }
 }
 
