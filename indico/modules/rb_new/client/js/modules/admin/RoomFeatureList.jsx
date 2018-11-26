@@ -94,7 +94,7 @@ class RoomFeatureList extends React.PureComponent {
                        format={formatters.trim} formatOnBlur
                        label={Translate.string('Title')}
                        disabled={fprops.submitting} />
-                <Field name="icon" component={ReduxDropdownField}
+                <Field name="icon" component={ReduxDropdownField} parse={null}
                        search selection options={iconOptions}
                        label={Translate.string('Icon')}
                        disabled={fprops.submitting} />
