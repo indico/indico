@@ -66,6 +66,7 @@ Bugfixes
 - Use correct speaker name when exporting contributions to spreadsheets
 - Use friendly IDs in abstract attachment package folder names
 - Fix typo in material package subcontribution folder names
+- Fix check on whether registering for an event is possible
 
 Version 2.1.4
 -------------
