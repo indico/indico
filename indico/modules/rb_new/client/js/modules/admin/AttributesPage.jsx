@@ -83,11 +83,13 @@ class AttributesPage extends React.PureComponent {
     renderForm = fprops => (
         <>
             <Field name="name" component={ReduxFormField} as="input"
+                   required
                    format={formatters.slugify} formatOnBlur
                    label={Translate.string('Name')}
                    disabled={fprops.submitting}
                    autoFocus />
             <Field name="title" component={ReduxFormField} as="input"
+                   required
                    format={formatters.trim} formatOnBlur
                    label={Translate.string('Title')}
                    disabled={fprops.submitting} />

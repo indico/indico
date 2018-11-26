@@ -91,6 +91,7 @@ class EquipmentTypeList extends React.PureComponent {
         return (
             <>
                 <Field name="name" component={ReduxFormField} as="input"
+                       required
                        format={formatters.trim} formatOnBlur
                        label={Translate.string('Name')}
                        disabled={fprops.submitting}

@@ -50,6 +50,7 @@ export function ReduxFormField(
                        {...props}
                        label={componentLabel}
                        placeholder={placeholder}
+                       required={required}
                        disabled={disabled || submitting} />
             {children}
         </Form.Field>
@@ -128,10 +129,11 @@ ReduxCheckboxField.propTypes = {
 };
 
 
-export function ReduxDropdownField({input, ...props}) {
+export function ReduxDropdownField({input, required, ...props}) {
     return (
         <ReduxFormField input={input}
                         {...props}
+                        required={required}
                         as={Dropdown}
                         onChange={(__, {value}) => {
                             input.onChange(value);
