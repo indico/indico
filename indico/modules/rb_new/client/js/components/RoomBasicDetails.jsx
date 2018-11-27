@@ -65,82 +65,86 @@ AnnotatedIcon.propTypes = {
     text: PropTypes.string.isRequired
 };
 
-export default function RoomBasicDetails({room}) {
-    const {
-        ownerName: owner, latitude, longitude, division, locationName: location, surfaceArea: surface, capacity,
-        telephone, fullName: name
-    } = room;
-    return (
-        <Grid columns={2}>
-            <Grid.Column textAlign="center" styleName="photo-column">
-                <div styleName="image-container">
-                    <SpriteImage pos={room.spritePosition}
-                                 height="100%"
-                                 width="100%"
-                                 fillVertical />
-                    <RoomFeaturesBox room={room} />
-                </div>
-            </Grid.Column>
-            <Grid.Column styleName="data-column">
-                <Header>
-                    {name}
-                    <Header.Subheader>{division}</Header.Subheader>
-                </Header>
-                <ul styleName="room-basic-details">
-                    <li>{location}</li>
-                    <li className="has-icon">
-                        <AnnotatedIcon name="id badge outline"
-                                       text={Translate.string('Room Owner')} />
-                        {owner}
-                    </li>
-                    <li className="has-icon">
-                        {telephone && (
-                            <>
-                                <AnnotatedIcon name="phone"
-                                               text={Translate.string('Phone number')} />
-                                {room.telephone}
-                            </>
-                        )}
-                    </li>
-                    <li className="has-icon">
-                        {capacity && (
-                            <>
-                                <AnnotatedIcon name="users" text={Translate.string('Capacity')} />
-                                <PluralTranslate count={capacity}>
-                                    <Singular>
-                                        1 <Param name="label" wrapper={<label />}>seat</Param>
-                                    </Singular>
-                                    <Plural>
-                                        <Param name="count" value={capacity} />
-                                        {' '}
-                                        <Param name="label" wrapper={<label />}>seats</Param>
-                                    </Plural>
-                                </PluralTranslate>
-                            </>
-                        )}
-                    </li>
-                    <li className="has-icon">
-                        {surface && (
-                            <>
-                                <AnnotatedIcon name="cube" text={Translate.string('Surface Area')} />
-                                {surface} <label>m²</label>
-                            </>
-                        )}
-                    </li>
-                    <li className="has-icon">
-                        {latitude && (
-                            <>
-                                <AnnotatedIcon name="location arrow" text={Translate.string('Geographical Coordinates')} />
-                                {formatLatLon(latitude, longitude)}
-                            </>
-                        )}
-                    </li>
-                </ul>
-            </Grid.Column>
-        </Grid>
-    );
-}
+export default class RoomBasicDetails extends React.PureComponent {
+    static propTypes = {
+        room: PropTypes.object.isRequired
+    };
 
-RoomBasicDetails.propTypes = {
-    room: PropTypes.object.isRequired
-};
+    render() {
+        const {room} = this.props;
+        const {
+            ownerName: owner, latitude, longitude, division, locationName: location, surfaceArea: surface, capacity,
+            telephone, fullName: name
+        } = room;
+
+        return (
+            <Grid columns={2}>
+                <Grid.Column textAlign="center" styleName="photo-column">
+                    <div styleName="image-container">
+                        <SpriteImage pos={room.spritePosition}
+                                     height="100%"
+                                     width="100%"
+                                     fillVertical />
+                        <RoomFeaturesBox room={room} />
+                    </div>
+                </Grid.Column>
+                <Grid.Column styleName="data-column">
+                    <Header>
+                        {name}
+                        <Header.Subheader>{division}</Header.Subheader>
+                    </Header>
+                    <ul styleName="room-basic-details">
+                        <li>{location}</li>
+                        <li className="has-icon">
+                            <AnnotatedIcon name="id badge outline"
+                                           text={Translate.string('Room Owner')} />
+                            {owner}
+                        </li>
+                        <li className="has-icon">
+                            {telephone && (
+                                <>
+                                    <AnnotatedIcon name="phone"
+                                                   text={Translate.string('Phone number')} />
+                                    {room.telephone}
+                                </>
+                            )}
+                        </li>
+                        <li className="has-icon">
+                            {capacity && (
+                                <>
+                                    <AnnotatedIcon name="users" text={Translate.string('Capacity')} />
+                                    <PluralTranslate count={capacity}>
+                                        <Singular>
+                                            1 <Param name="label" wrapper={<label />}>seat</Param>
+                                        </Singular>
+                                        <Plural>
+                                            <Param name="count" value={capacity} />
+                                            {' '}
+                                            <Param name="label" wrapper={<label />}>seats</Param>
+                                        </Plural>
+                                    </PluralTranslate>
+                                </>
+                            )}
+                        </li>
+                        <li className="has-icon">
+                            {surface && (
+                                <>
+                                    <AnnotatedIcon name="cube" text={Translate.string('Surface Area')} />
+                                    {surface} <label>m²</label>
+                                </>
+                            )}
+                        </li>
+                        <li className="has-icon">
+                            {latitude && (
+                                <>
+                                    <AnnotatedIcon name="location arrow" text={Translate.string('Geographical Coordinates')} />
+                                    {formatLatLon(latitude, longitude)}
+                                </>
+                            )}
+                        </li>
+                    </ul>
+                </Grid.Column>
+            </Grid>
+        );
+    }
+}
