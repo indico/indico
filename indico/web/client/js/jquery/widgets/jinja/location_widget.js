@@ -452,26 +452,18 @@
             updateVenueOnRoomChange(data);
             hiddenData.room_id = data.id;
             delete hiddenData.room_name;
-            hiddenData.create_booking = false;
-            $('#create-booking').prop("checked", false );
             postSelectionActions(roomInput, data.name);
             highlightOption(roomInput, data.name);
             roomInput.attr('title', data.name);
         }).on('typeahead:click-on-custom-option', function(e, data) {
             delete hiddenData.room_id;
             hiddenData.room_name = data.item_name;
-            delete hiddenData.create_booking;
             postSelectionActions(roomInput, data.item_name);
             roomInput.val(data.item_name);
             validRoom = true;
             roomInput.attr('title', data.item_name);
             roomInput.focus();
             roomInput.trigger('typeahead:close-results-list');
-        });
-
-        $('#create-booking').change (function() {
-            hiddenData.create_booking = this.checked;
-            field.val(JSON.stringify(hiddenData)).trigger('change');
         });
 
         $('#' + options.fieldId + '-wrapper .i-location-input-field').on('typeahead:close-results-list', function() {

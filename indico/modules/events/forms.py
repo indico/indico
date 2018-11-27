@@ -32,7 +32,7 @@ from indico.modules.events.models.references import ReferenceType
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import (IndicoDateTimeField, IndicoEnumRadioField, IndicoLocationField,
-                                     IndicoTimezoneSelectField, OccurrencesField)
+                                     IndicoTimezoneSelectField, JSONField, OccurrencesField)
 from indico.web.forms.validators import LinkedDateTime
 from indico.web.forms.widgets import CKEditorWidget
 
@@ -66,6 +66,7 @@ class EventCreationFormBase(IndicoForm):
     timezone = IndicoTimezoneSelectField(_('Timezone'), [DataRequired()])
     location_data = IndicoLocationField(_('Location'), allow_location_inheritance=False, edit_address=False)
     protection_mode = IndicoEnumRadioField(_('Protection mode'), enum=ProtectionMode)
+    create_booking = JSONField()
 
     def validate_category(self, field):
         if not field.data.can_create_events(session.user):

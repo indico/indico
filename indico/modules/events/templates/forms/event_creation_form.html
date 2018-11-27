@@ -115,7 +115,7 @@ purely client-side and are worded for event creation instead of being generic.
         var timezone;
         var category;
 
-        var $createBookingSwitch = $('#create-booking');
+        var $createBooking = $('#event-creation-create_booking');
         var $availableMessage = $('#room-available');
         var $conflictBookingMessage = $('#room-conflict-booking');
         var $conflictPrebookingMessage = $('#room-conflict-prebooking');
@@ -177,8 +177,10 @@ purely client-side and are worded for event creation instead of being generic.
         function updateAvailability() {
             hideAvailability();
 
-            if (!('room_id' in roomData)) { return; }
-            if (!startDt.isSame(endDt, 'day')) { return;}
+            if (!('room_id' in roomData) || !(startDt.isSame(endDt, 'day'))) {
+                $createBooking.val(false);
+                return;
+             }
 
             var roomId = roomData['room_id'];
             previousRoomId = roomId;
@@ -198,6 +200,7 @@ purely client-side and are worded for event creation instead of being generic.
                 success: function(data) {
                     if (data['conflict_booking']){
                         $currentMessage = $conflictBookingMessage;
+                        $createBooking.val(false);
                         availabilityDisplayed = true;
                     } else if (data['conflict_prebooking']){
                         var message = checkConditions();
@@ -207,6 +210,7 @@ purely client-side and are worded for event creation instead of being generic.
                                 $conflictPrebookingDisabledContent.append(message);
                                 $currentMessage = $conflictPrebookingDisabled;
                             }
+                            $createBooking.val(false);
                         }
                         $currentMessage = $conflictPrebookingMessage;
                         availabilityDisplayed = true;
@@ -218,6 +222,7 @@ purely client-side and are worded for event creation instead of being generic.
                                 $availableDisabledContent.append(message);
                                 $currentMessage = $availableDisabled;
                             }
+                            $createBooking.val(false);
                         } else {
                             $currentMessage = $availableMessage;
                             availabilityDisplayed = true;
@@ -289,5 +294,10 @@ purely client-side and are worded for event creation instead of being generic.
             category = JSON.parse($(this).val());
             updateAvailability();
         })
+
+        $('#create-booking').change (function() {
+            $createBooking.val(this.checked);
+        });
+
     </script>
 {% endif %}
