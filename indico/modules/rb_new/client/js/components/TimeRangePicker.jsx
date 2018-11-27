@@ -15,6 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import _ from 'lodash';
 import moment from 'moment';
 import React from 'react';
 import PropTypes from 'prop-types';
@@ -75,6 +76,10 @@ export default class TimeRangePicker extends React.Component {
             startSearchQuery,
             endSearchQuery
         };
+    }
+
+    shouldComponentUpdate(nextProps) {
+        return !_.isEqual(this.props, nextProps);
     }
 
     generateStartTimeOptions = () => {
