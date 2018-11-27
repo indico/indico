@@ -94,7 +94,7 @@ parent object. The key features and expected behaviour is the following:
                     <div class="message-box-content content available">
                         <i class="icon"></i>
                         <span>{% trans %}This room is available. Would you like to book it?{% endtrans %}</span>
-                        {{ switch(id='create-booking', on_label=_('Yes'), off_label=_('No'), disabled=true) }}
+                        {{ switch(on_label=_('Yes'), off_label=_('No'), disabled=true) }}
                     </div>
                     <div id="available-disabled-message" class="message-box-content"></div>
                 </div>
@@ -114,7 +114,7 @@ parent object. The key features and expected behaviour is the following:
                         {% trans %}
                                 This room is already prebooked at selected times. Would you like to book it anyways?
                         {% endtrans %}
-                        {{ switch(id='create-booking', on_label=_('Yes'), off_label=_('No'), disabled=true) }}
+                        {{ switch(on_label=_('Yes'), off_label=_('No')) }}
                     </div>
                 </div>
             </div>
@@ -126,7 +126,7 @@ parent object. The key features and expected behaviour is the following:
                             {% trans %}
                                 This room is already prebooked at selected times. Would you like to book it anyways?
                             {% endtrans %}
-                            {{ switch(id='create-booking', on_label=_('Yes'), off_label=_('No'), disabled=true) }}
+                            {{ switch(on_label=_('Yes'), off_label=_('No'), disabled=true) }}
                         </span>
                     </div>
                     <div id="conflict-prebooking-disabled-message" class="message-box-content"></div>

@@ -82,6 +82,7 @@ def create_event(category, event_type, data, add_creator_as_manager=True, featur
     event = Event(category=category, type_=event_type)
     data.setdefault('creator', session.user)
     theme = data.pop('theme', None)
+    create_booking = data.pop('create_booking', False)
     person_link_data = data.pop('person_link_data', {})
     event.populate_from_dict(data)
     db.session.flush()
@@ -98,7 +99,7 @@ def create_event(category, event_type, data, add_creator_as_manager=True, featur
     logger.info('Event %r created in %r by %r ', event, category, session.user)
     event.log(EventLogRealm.event, EventLogKind.positive, 'Event', 'Event created', session.user)
     db.session.flush()
-    if data['location_data'].pop('create_booking', False):
+    if create_booking:
         room_id = data['location_data'].pop('room_id', None)
         if room_id:
             booking = create_booking_for_event(room_id, event)
