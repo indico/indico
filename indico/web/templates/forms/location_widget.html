@@ -112,9 +112,9 @@ parent object. The key features and expected behaviour is the following:
                     <div class="message-box-content content conflict-prebooking">
                         <i class="icon"></i>
                         {% trans %}
-                                This room is already prebooked at selected times. Would you like to book it anyways?
+                            This room is already prebooked at selected times. Would you like to book it anyways?
                         {% endtrans %}
-                        {{ switch(on_label=_('Yes'), off_label=_('No')) }}
+                        {{ switch(id='create-booking-over-prebooking', on_label=_('Yes'), off_label=_('No')) }}
                     </div>
                 </div>
             </div>
