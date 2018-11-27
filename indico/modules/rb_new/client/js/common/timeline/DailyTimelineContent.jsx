@@ -32,7 +32,6 @@ import './TimelineContent.module.scss';
 
 export default class DailyTimelineContent extends React.Component {
     static propTypes = {
-        step: PropTypes.number,
         rows: PropTypes.array.isRequired,
         onClickCandidate: PropTypes.func,
         onClickReservation: PropTypes.func,
@@ -50,7 +49,6 @@ export default class DailyTimelineContent extends React.Component {
     };
 
     static defaultProps = {
-        step: 2,
         onClickCandidate: null,
         onClickReservation: null,
         longLabel: false,
@@ -69,6 +67,24 @@ export default class DailyTimelineContent extends React.Component {
     state = {
         selectable: true
     };
+
+    shouldComponentUpdate(nextProps, nextState) {
+        const {
+            rows: prevRows, isLoading: prevIsLoading, hourStep: prevHourStep, minHour: prevMinHour, maxHour: prevMaxHour
+        } = this.props;
+        const {rows, isLoading, hourStep, minHour, maxHour} = nextProps;
+        const stepChanged = hourStep !== prevHourStep;
+        const minHourChanged = minHour !== prevMinHour;
+        const maxHourChanged = maxHour !== prevMaxHour;
+        return (
+            !_.isEqual(rows, prevRows) ||
+            isLoading !== prevIsLoading ||
+            stepChanged ||
+            minHourChanged ||
+            maxHourChanged ||
+            !_.isEqual(nextState, this.state)
+        );
+    }
 
     onClickLabel = (id) => {
         const {onClickLabel} = this.props;
