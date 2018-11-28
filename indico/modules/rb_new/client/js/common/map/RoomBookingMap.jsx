@@ -72,7 +72,9 @@ function _MapMarkers({rooms, clusterProps, hoveredRoomId}) {
 _MapMarkers.propTypes = {
     rooms: PropTypes.array,
     clusterProps: PropTypes.object,
-    hoveredRoomId: PropTypes.number
+    hoveredRoomId: PropTypes.number,
+    /** 'actions' may be used by plugins */
+    actions: PropTypes.objectOf(PropTypes.func).isRequired
 };
 
 _MapMarkers.defaultProps = {
@@ -99,6 +101,8 @@ class RoomBookingMap extends React.Component {
         children: PropTypes.node,
         tileServerURL: PropTypes.string,
         clusterProps: PropTypes.object,
+        markerComponent: PropTypes.func,
+        actions: PropTypes.objectOf(PropTypes.func).isRequired
     };
 
     static defaultProps = {
@@ -106,7 +110,8 @@ class RoomBookingMap extends React.Component {
         onLoad: () => {},
         children: null,
         tileServerURL: '',
-        clusterProps: {}
+        clusterProps: {},
+        markerComponent: MapMarkers
     };
 
     componentDidMount() {
@@ -116,7 +121,8 @@ class RoomBookingMap extends React.Component {
 
     render() {
         const {
-            bounds, onMove, mapRef, rooms, children, tileServerURL, onTouch, clusterProps
+            bounds, onMove, mapRef, rooms, children, tileServerURL, onTouch, clusterProps, actions,
+            markerComponent: MarkerComponent
         } = this.props;
 
         const onMoveDebounced = _.debounce(onMove, 750);
@@ -137,7 +143,7 @@ class RoomBookingMap extends React.Component {
                                minZoom="14"
                                maxZoom="20"
                                url={tileServerURL} />
-                    <MapMarkers rooms={rooms} clusterProps={clusterProps} />
+                    <MarkerComponent rooms={rooms} clusterProps={clusterProps} actions={actions} />
                     {children}
                 </Map>
             </div>
