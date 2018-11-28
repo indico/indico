@@ -44,7 +44,8 @@ class MapController extends React.Component {
         }).isRequired,
         actions: PropTypes.exact({
             toggleMapSearch: PropTypes.func.isRequired,
-            updateLocation: PropTypes.func.isRequired
+            updateLocation: PropTypes.func.isRequired,
+            setFilterParameter: PropTypes.func.isRequired
         }).isRequired,
     };
 
@@ -141,7 +142,7 @@ class MapController extends React.Component {
     };
 
     render() {
-        const {searchEnabled, rooms, areas, mapData: {bounds}, actions: {toggleMapSearch}} = this.props;
+        const {searchEnabled, rooms, areas, mapData: {bounds}, actions: {toggleMapSearch}, actions} = this.props;
         const {areaBounds, loading, allRoomsVisible, searchVisible} = this.state;
         const areaOptions = Object.entries(areas).map(([key, val]) => ({
             text: val.name,
@@ -195,7 +196,8 @@ class MapController extends React.Component {
                                                 rooms={rooms}
                                                 onLoad={this.onMapLoad}
                                                 onMove={this.onMove}
-                                                onTouch={this.onTouch}>
+                                                onTouch={this.onTouch}
+                                                actions={actions}>
                                     {searchControl}
                                     {areasControl}
                                     {showAllControl}
@@ -232,6 +234,9 @@ export default function mapControllerFactory(namespace, searchRoomSelectors) {
                     dispatch(mapActions.toggleMapSearch(namespace, search));
                     dispatch(filtersActions.setFilterParameter(namespace, 'bounds', search ? location : null));
                 },
+                setFilterParameter: (name, value) => {
+                    dispatch(filtersActions.setFilterParameter(namespace, name, value));
+                }
             }
         })
     )(MapController);

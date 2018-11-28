@@ -45,7 +45,11 @@ export function roomSearchSelectorFactory(namespace) {
             .filter(room => room.latitude !== null && room.longitude !== null)
             .map(room => ({
                 id: room.id,
-                name: room.fullName,
+                name: room.name,
+                building: room.building,
+                floor: room.floor,
+                number: room.number,
+                fullName: room.fullName,
                 lat: room.latitude,
                 lng: room.longitude,
             }))
