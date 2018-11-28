@@ -135,7 +135,7 @@ function RoomDetails({bookRoom, room, availability, attributes}) {
                     <Header><Translate>Statistics</Translate></Header>
                     <Message attached info>
                         <Icon name="info" />
-                        <Translate>Would you like to use this room?</Translate>
+                        <Translate>Would you like to use this space?</Translate>
                     </Message>
                     <Segment attached="bottom">
                         <Button color="green" onClick={() => bookRoom(room.id)}>
@@ -162,7 +162,7 @@ function RoomAvailabilityBox({room}) {
         room.isPublic ? (
             <Message positive styleName="message-icon" icon="unlock" content={
                 <>
-                    <p><Translate>Anyone can book this room.</Translate></p>
+                    <p><Translate>Anyone can book this space.</Translate></p>
                     {room.maxAdvanceDays && (
                         <p>
                             <Translate>
@@ -174,7 +174,7 @@ function RoomAvailabilityBox({room}) {
             } />
         ) : (
             <Message negative styleName="message-icon" icon="lock"
-                     content={Translate.string('This room is not publicly available.')} />
+                     content={Translate.string('This space is not publicly available.')} />
         )
     );
 }

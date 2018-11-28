@@ -206,7 +206,7 @@ class RoomList extends React.Component {
                                                                         onClick={() => openRoomDetails(id)}
                                                                         primary
                                                                         circular />}
-                                                       content={Translate.string('Room details')}
+                                                       content={Translate.string('See details')}
                                                        position="top center" />
                                             </Slot>
                                         )}
