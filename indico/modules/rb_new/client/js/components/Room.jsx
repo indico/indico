@@ -142,13 +142,13 @@ class Room extends React.Component {
                         ))}
                         {!room.isReservable && (
                             <Popup trigger={<Icon name="dont" color="grey" />}
-                                   content={Translate.string('This room is not bookable')}
+                                   content={Translate.string('This space is not bookable')}
                                    position="bottom center"
                                    hideOnScroll />
                         )}
                         {!room.isPublic && (
                             <Popup trigger={<Icon name="lock" color="red" />}
-                                   content={Translate.string('This room is not publicly available')}
+                                   content={Translate.string('This space is not publicly available')}
                                    position="bottom center"
                                    hideOnScroll />
                         )}

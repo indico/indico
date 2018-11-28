@@ -128,9 +128,9 @@ class BookRoomModal extends React.Component {
                 <Message color={values.isPrebooking ? 'orange' : 'green'}>
                     <Message.Header>
                         {values.isPrebooking ? (
-                            <Translate>The room has been pre-booked!</Translate>
+                            <Translate>The space has been successfully pre-booked!</Translate>
                         ) : (
-                            <Translate>The room has been booked!</Translate>
+                            <Translate>The space has been successfully booked!</Translate>
                         )}
                     </Message.Header>
                     {values.isPrebooking ? (
@@ -282,7 +282,7 @@ class BookRoomModal extends React.Component {
                     </Message.Header>
                     <Translate>
                         A Pre-Booking has to be approved by the room managers before you
-                        can use the room.
+                        can use the space in question.
                     </Translate>
                 </Message.Content>
             </Message>

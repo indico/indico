@@ -152,7 +152,7 @@ class BookRoom extends React.Component {
                            position="top center"
                            hideOnScroll />
                     <Popup trigger={showDetailsBtn}
-                           content={Translate.string('Room details')}
+                           content={Translate.string('See details')}
                            position="top center"
                            hideOnScroll />
                 </Slot>
@@ -273,7 +273,7 @@ class BookRoom extends React.Component {
                                                            position="top center"
                                                            hideOnScroll />
                                                     <Popup trigger={showDetailsBtn(room)}
-                                                           content={Translate.string('Room details')}
+                                                           content={Translate.string('See details')}
                                                            position="top center"
                                                            hideOnScroll />
                                                 </Slot>

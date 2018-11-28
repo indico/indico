@@ -56,7 +56,7 @@ class SearchResultCount extends React.Component {
         return (
             <Popup trigger={trigger}>
                 <Translate>
-                    Number of rooms matching your filtering criteria.
+                    Number of spaces that match your filtering criteria.
                 </Translate>
             </Popup>
         );
@@ -78,7 +78,7 @@ class SearchResultCount extends React.Component {
         return (
             <Popup trigger={trigger}>
                 <Translate>
-                    Rooms that are free on that time slot.
+                    Spaces that are free on that time slot.
                 </Translate>
             </Popup>
         );
@@ -100,7 +100,7 @@ class SearchResultCount extends React.Component {
         return (
             <Popup trigger={trigger}>
                 <Translate>
-                    Rooms unavailable during that time slot (click for details).
+                    Spaces unavailable during that time slot (click for details).
                 </Translate>
             </Popup>
         );
@@ -110,7 +110,7 @@ class SearchResultCount extends React.Component {
         return (
             <Message icon="times circle outline"
                      error
-                     content={Translate.string('No rooms match your query')} />
+                     content={Translate.string('No known spaces match your query')} />
         );
     }
 
@@ -118,7 +118,7 @@ class SearchResultCount extends React.Component {
         return (
             <Message icon="warning sign"
                      warning
-                     content={Translate.string('No rooms are available during that timeslot')} />
+                     content={Translate.string('No spaces are available during that timeslot')} />
         );
     }
 

@@ -198,7 +198,7 @@ class BlockingModal extends React.Component {
                 {mode === 'edit' ? (
                     <Translate>Update blocking</Translate>
                 ) : (
-                    <Translate>Block these rooms</Translate>
+                    <Translate>Block selected spaces</Translate>
                 )}
             </Button>
         );
@@ -211,7 +211,7 @@ class BlockingModal extends React.Component {
         } else if (mode === 'edit') {
             return <Translate>Update blocking</Translate>;
         } else {
-            return <Translate>Block these rooms</Translate>;
+            return <Translate>Block selected spaces</Translate>;
         }
     };
 

@@ -46,19 +46,19 @@ function ConflictIndicator(
         allDaysAvailable ? (
             <Message color="green">
                 <Icon name="check" />
-                <Translate>The room will be free on the selected time slot(s)</Translate>
+                <Translate>The space will be free on the selected time slot(s)</Translate>
             </Message>
         ) : (
             numDaysAvailable ? (
                 <Message color="yellow">
                     <Icon name="warning sign" />
-                    <Translate>The room won't be available on one or more days</Translate>
+                    <Translate>The space won't be available on one or more days</Translate>
                 </Message>
             ) : (
                 <Message color="red">
                     <Message.Header>
                         <Icon name="remove" />
-                        <Translate>Room cannot be booked.</Translate>
+                        <Translate>Space cannot be booked.</Translate>
                     </Message.Header>
                     <Translate>One or more bookings would conflict with yours.</Translate>
                 </Message>
