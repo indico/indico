@@ -104,7 +104,6 @@ purely client-side and are worded for event creation instead of being generic.
     <script>
         var rbExcludedCategories = {{ rb_excluded_categories | tojson }}
         var serverDefaultTimezone = '{{ indico_config.DEFAULT_TIMEZONE }}';
-        var availabilityDisplayed = false;
         var previousRoomId;
         var $currentMessage;
 
@@ -119,12 +118,6 @@ purely client-side and are worded for event creation instead of being generic.
         var $availableMessage = $('#room-available');
         var $conflictBookingMessage = $('#room-conflict-booking');
         var $conflictPrebookingMessage = $('#room-conflict-prebooking');
-        var $availableDisabled = $('#room-available-disabled');
-        var $availableDisabledContent = $('#available-disabled-message');
-        var $conflictPrebookingDisabled = $('#conflict-prebooking-disabled');
-        var $conflictPrebookingDisabledContent = $('#conflict-prebooking-disabled-message');
-        var $blacklistedCategoryContent = $('<strong></strong>').text("You can't book a room for an event in this category");
-        var $differentTimezoneContent = $('<strong></strong>').text("You can't book a room for an event in a different timezone than: " + serverDefaultTimezone);
 
         function setLectureTimes(occurrence){
             startDt = moment(occurrence['date'] + " " + occurrence['time'], 'DD-MM-YYYY HH:mm');
@@ -162,12 +155,6 @@ purely client-side and are worded for event creation instead of being generic.
             return isExcluded;
         }
 
-        function checkConditions() {
-            if (isCategoryExcluded(category['id'])) { return $blacklistedCategoryContent; }
-            if (timezone !== serverDefaultTimezone) {return $differentTimezoneContent; }
-            return false;
-        }
-
         function hideAvailability() {
             if ($currentMessage) {
                 $currentMessage.hide();
@@ -177,7 +164,11 @@ purely client-side and are worded for event creation instead of being generic.
         function updateAvailability() {
             hideAvailability();
 
-            if (!('room_id' in roomData) || !(startDt.isSame(endDt, 'day'))) {
+            if (!('room_id' in roomData)
+                || !(startDt.isSame(endDt, 'day'))
+                || isCategoryExcluded(category['id'])
+                || timezone !== serverDefaultTimezone) {
+
                 $createBooking.val(false);
                 return;
              }
@@ -201,32 +192,10 @@ purely client-side and are worded for event creation instead of being generic.
                     if (data['conflict_booking']){
                         $currentMessage = $conflictBookingMessage;
                         $createBooking.val(false);
-                        availabilityDisplayed = true;
                     } else if (data['conflict_prebooking']){
-                        var message = checkConditions();
-                        if (message) {
-                            if (availabilityDisplayed) {
-                                $conflictPrebookingDisabledContent.empty();
-                                $conflictPrebookingDisabledContent.append(message);
-                                $currentMessage = $conflictPrebookingDisabled;
-                            }
-                            $createBooking.val(false);
-                        }
                         $currentMessage = $conflictPrebookingMessage;
-                        availabilityDisplayed = true;
                     } else {
-                        var message = checkConditions();
-                        if (message) {
-                            if (availabilityDisplayed) {
-                                $availableDisabledContent.empty();
-                                $availableDisabledContent.append(message);
-                                $currentMessage = $availableDisabled;
-                            }
-                            $createBooking.val(false);
-                        } else {
-                            $currentMessage = $availableMessage;
-                            availabilityDisplayed = true;
-                        }
+                        $currentMessage = $availableMessage;
                     }
                     $currentMessage.show();
                 }

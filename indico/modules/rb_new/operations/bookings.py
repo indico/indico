@@ -39,7 +39,7 @@ from indico.modules.rb_new.operations.conflicts import get_rooms_conflicts
 from indico.modules.rb_new.operations.misc import get_rooms_nonbookable_periods, get_rooms_unbookable_hours
 from indico.modules.rb_new.util import (group_by_occurrence_date, serialize_blockings, serialize_nonbookable_periods,
                                         serialize_occurrences, serialize_unbookable_hours)
-from indico.util.date_time import iterdays
+from indico.util.date_time import iterdays, overlaps
 from indico.util.struct.iterables import group_list
 from indico.web.util import ExpectedError
 
@@ -221,16 +221,34 @@ def check_room_available(room, start_dt, end_dt):
     occurrences = get_existing_room_occurrences(room, start_dt, end_dt, allow_overlapping=True)
     prebookings = [occ for occ in occurrences if not occ.reservation.is_accepted]
     bookings = [occ for occ in occurrences if occ.reservation.is_accepted]
+    unbookable_hours = get_rooms_unbookable_hours([room])
+    hours_overlap = [hours for hours in unbookable_hours
+                     if overlaps((start_dt.time(), end_dt.time()), (hours.start_time, hours.end_time))]
+    nonbookable_periods = get_rooms_nonbookable_periods([room], start_dt, end_dt)
+    blockings = get_rooms_blockings([room], start_dt, end_dt).get(room.id, [])
+    blocked_for_user = [blocking for blocking in blockings
+                        if not blocking.blocking.can_be_overridden(session.user, room)]
+    user_bookings = [booking for booking in bookings if booking.reservation.booked_for_id == session.user.id]
+    user_prebookings = [prebooking for prebooking in prebookings
+                        if prebooking.reservation.booked_for_id == session.user.id]
 
     conflict_booking = True if bookings else False
     conflict_prebooking = True if prebookings else False
+    can_book = room.can_be_booked(session.user)
+    can_prebook = room.can_be_prebooked(session.user)
+    user_booking = True if user_bookings else False
+    user_prebooking = True if user_prebookings else False
+    unbookable = True if (hours_overlap or nonbookable_periods or blocked_for_user) else False
 
-    result = {}
-    result.update({
+    return {
+        'can_book': can_book,
+        'can_prebook': can_prebook,
         'conflict_booking': conflict_booking,
         'conflict_prebooking': conflict_prebooking,
-    })
-    return result
+        'unbookable': unbookable,
+        'user_booking': user_booking,
+        'user_prebooking': user_prebooking,
+    }
 
 
 def create_booking_for_event(room_id, event):
