@@ -75,7 +75,7 @@ const renderBuilding = ({building}) => {
     );
 };
 
-class RoomFilterBarBase extends React.Component {
+export class RoomFilterBarBase extends React.Component {
     static propTypes = {
         equipmentTypes: PropTypes.arrayOf(PropTypes.string).isRequired,
         features: PropTypes.arrayOf(PropTypes.shape({
@@ -98,7 +98,8 @@ class RoomFilterBarBase extends React.Component {
         actions: PropTypes.shape({
             setFilterParameter: PropTypes.func,
             setFilters: PropTypes.func,
-        }).isRequired
+        }).isRequired,
+        hideOptions: PropTypes.objectOf(PropTypes.bool)
     };
 
     static defaultProps = {
@@ -110,12 +111,13 @@ class RoomFilterBarBase extends React.Component {
         hasOwnedRooms: false,
         equipment: [],
         extraButtons: null,
+        hideOptions: {}
     };
 
     render() {
         const {
             equipmentTypes, features: availableFeatures, hasOwnedRooms, hasFavoriteRooms, buildings,
-            extraButtons,
+            extraButtons, hideOptions,
             filters: {capacity, onlyFavorites, onlyMine, equipment, features, building, ...extraFilters},
             actions: {setFilterParameter, setFilters}
         } = this.props;
@@ -140,26 +142,30 @@ class RoomFilterBarBase extends React.Component {
             <Button.Group size="large">
                 <Button icon="filter" as="div" disabled />
                 <FilterBarController>
-                    <FilterDropdownFactory name="building"
-                                           title={<Translate>Building</Translate>}
-                                           form={({building: selectedBuilding}, setParentField) => (
-                                               <BuildingForm setParentField={setParentField}
-                                                             buildings={buildings}
-                                                             building={selectedBuilding} />
-                                           )}
-                                           setGlobalState={data => setFilterParameter('building', data.building)}
-                                           initialValues={{building}}
-                                           renderValue={renderBuilding} />
-                    <FilterDropdownFactory name="capacity"
-                                           title={<Translate>Min. Capacity</Translate>}
-                                           form={({capacity: selectedCapacity}, setParentField) => (
-                                               <CapacityForm setParentField={setParentField}
-                                                             capacity={selectedCapacity} />
-                                           )}
-                                           setGlobalState={data => setFilterParameter('capacity', data.capacity)}
-                                           initialValues={{capacity}}
-                                           renderValue={renderCapacity} />
-                    {equipmentFilter}
+                    {!hideOptions.building && (
+                        <FilterDropdownFactory name="building"
+                                               title={<Translate>Building</Translate>}
+                                               form={({building: selectedBuilding}, setParentField) => (
+                                                   <BuildingForm setParentField={setParentField}
+                                                                 buildings={buildings}
+                                                                 building={selectedBuilding} />
+                                               )}
+                                               setGlobalState={data => setFilterParameter('building', data.building)}
+                                               initialValues={{building}}
+                                               renderValue={renderBuilding} />
+                    )}
+                    {!hideOptions.capacity && (
+                        <FilterDropdownFactory name="capacity"
+                                               title={<Translate>Min. Capacity</Translate>}
+                                               form={({capacity: selectedCapacity}, setParentField) => (
+                                                   <CapacityForm setParentField={setParentField}
+                                                                 capacity={selectedCapacity} />
+                                               )}
+                                               setGlobalState={data => setFilterParameter('capacity', data.capacity)}
+                                               initialValues={{capacity}}
+                                               renderValue={renderCapacity} />
+                    )}
+                    {!hideOptions.equipment && equipmentFilter}
                     <Overridable id="RoomFilterBar.extraFilters"
                                  setFilter={setFilterParameter}
                                  filters={extraFilters} />
@@ -194,4 +200,4 @@ export default (namespace, searchRoomsSelectors) => connect(
             setFilters: (params) => filtersActions.setFilters(namespace, params),
         }, dispatch)
     })
-)(RoomFilterBarBase);
+)(Overridable.component('RoomFilterBar', RoomFilterBarBase));

@@ -22,7 +22,7 @@ import {connect} from 'react-redux';
 import {Grid, Icon, Modal, Message} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
-import {Overridable} from 'indico/react/util';
+import {Overridable, IndicoPropTypes} from 'indico/react/util';
 
 import RoomBasicDetails from '../../components/RoomBasicDetails';
 import BookingBootstrapForm from '../../components/BookingBootstrapForm';
@@ -83,12 +83,14 @@ class BookFromListModal extends React.Component {
             resetCollisions: PropTypes.func.isRequired,
             openBookingForm: PropTypes.func.isRequired,
         }).isRequired,
+        title: IndicoPropTypes.i18n
     };
 
     static defaultProps = {
         onClose: () => {},
         availability: null,
-        defaults: undefined
+        defaults: undefined,
+        title: <Translate>Book Room</Translate>
     };
 
     handleCloseModal = () => {
@@ -103,12 +105,12 @@ class BookFromListModal extends React.Component {
     };
 
     render() {
-        const {room, refreshCollisions, availability, availabilityLoading, defaults} = this.props;
+        const {room, refreshCollisions, availability, availabilityLoading, defaults, title} = this.props;
         const buttonDisabled = availabilityLoading || !availability || availability.numDaysAvailable === 0;
         return (
             <Modal open onClose={this.handleCloseModal} size="large" closeIcon>
                 <Modal.Header styleName="room-details-header">
-                    <Translate>Book Room</Translate>
+                    {title}
                 </Modal.Header>
                 <Modal.Content>
                     <Grid>

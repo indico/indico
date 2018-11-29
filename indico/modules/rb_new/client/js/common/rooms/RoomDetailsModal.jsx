@@ -22,6 +22,7 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {Button, Grid, Icon, Modal, Header, Message, List, Segment, Popup} from 'semantic-ui-react';
 import {Translate, Param} from 'indico/react/i18n';
+import {Overridable, IndicoPropTypes} from 'indico/react/util';
 import RoomBasicDetails from '../../components/RoomBasicDetails';
 import RoomKeyLocation from '../../components/RoomKeyLocation';
 import {DailyTimelineContent, TimelineLegend} from '../timeline';
@@ -42,10 +43,12 @@ class RoomDetailsModal extends React.Component {
             openBookRoom: PropTypes.func.isRequired,
             openBookingForm: PropTypes.func.isRequired,
         }).isRequired,
+        title: IndicoPropTypes.i18n
     };
 
     static defaultProps = {
         promptDatesOnBook: false,
+        title: <Translate>Room Details</Translate>
     };
 
     handleCloseModal = () => {
@@ -56,12 +59,12 @@ class RoomDetailsModal extends React.Component {
     render() {
         const {
             room, availability, attributes, promptDatesOnBook,
-            actions: {openBookRoom, openBookingForm},
+            actions: {openBookRoom, openBookingForm}, title
         } = this.props;
         return (
             <Modal open onClose={this.handleCloseModal} size="large" closeIcon>
                 <Modal.Header styleName="room-details-header">
-                    <Translate>Room Details</Translate>
+                    {title}
                     <span>
                         <Button icon="pencil" circular />
                     </span>
@@ -89,7 +92,7 @@ export default connect(
             openBookingForm: bookRoomActions.openBookingForm,
         }, dispatch),
     }),
-)(RoomDetailsModal);
+)(Overridable.component('RoomDetailsModal', RoomDetailsModal));
 
 
 function RoomDetails({bookRoom, room, availability, attributes}) {

@@ -26,7 +26,7 @@ import createDecorator from 'final-form-calculate';
 import {ReduxFormField, ReduxRadioField, formatters} from 'indico/react/forms';
 import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
 import PrincipalSearchField from 'indico/react/components/PrincipalSearchField';
-import {Overridable} from 'indico/react/util';
+import {Overridable, IndicoPropTypes} from 'indico/react/util';
 import TimeInformation from '../../components/TimeInformation';
 import {selectors as roomsSelectors} from '../../common/rooms';
 import RoomBasicDetails from '../../components/RoomBasicDetails';
@@ -78,12 +78,20 @@ class BookRoomModal extends React.Component {
             resetAvailability: PropTypes.func.isRequired,
             openBookingDetails: PropTypes.func.isRequired
         }).isRequired,
+        defaultTitles: PropTypes.shape({
+            booking: IndicoPropTypes.i18n,
+            preBooking: IndicoPropTypes.i18n
+        })
     };
 
     static defaultProps = {
         room: null,
         availability: null,
-        timeInformationComponent: TimeInformation
+        timeInformationComponent: TimeInformation,
+        defaultTitles: {
+            booking: <Translate>Create Booking</Translate>,
+            preBooking: <Translate>Create Pre-booking</Translate>
+        }
     };
 
     state = {
@@ -166,13 +174,7 @@ class BookRoomModal extends React.Component {
                     loading={submitting && values.isPrebooking === isPrebooking}
                     type="submit"
                     form="book-room-form"
-                    content={(
-                        isPrebooking ? (
-                            Translate.string('Create Pre-booking')
-                        ) : (
-                            Translate.string('Create Booking')
-                        )
-                    )}
+                    content={isPrebooking ? Translate.string('Create Pre-booking') : Translate.string('Create Booking')}
                     onClick={() => {
                         form.change('isPrebooking', isPrebooking);
                     }} />
@@ -293,7 +295,8 @@ class BookRoomModal extends React.Component {
         const {
             bookingData: {recurrence, dates, timeSlot},
             room, isAdmin, availability,
-            timeInformationComponent: TimeInformationComponent
+            timeInformationComponent: TimeInformationComponent,
+            defaultTitles
         } = this.props;
         const {skipConflicts, bookingConflictsVisible} = this.state;
 
@@ -317,11 +320,7 @@ class BookRoomModal extends React.Component {
         const renderModalContent = (fprops) => (
             <>
                 <Modal.Header>
-                    {isDirectlyBookable ? (
-                        <Translate>Book a Room</Translate>
-                    ) : (
-                        <Translate>Pre-book Room</Translate>
-                    )}
+                    {isDirectlyBookable ? defaultTitles.booking : defaultTitles.preBooking}
                 </Modal.Header>
                 <Modal.Content>
                     <Grid>
@@ -436,4 +435,4 @@ export default connect(
             openBookingDetails: bookingId => modalActions.openModal('booking-details', bookingId, null, true)
         }, dispatch)
     })
-)(BookRoomModal);
+)(Overridable.component('BookRoomModal', BookRoomModal));
