@@ -2,7 +2,6 @@ import ReactDOM from 'react-dom';
 import React from 'react';
 import {Provider} from 'react-redux';
 
-import Overridable from 'indico/react/util/Overridable';
 import setupUserMenu from 'indico/react/containers/UserMenu';
 import App from './components/App';
 
@@ -40,9 +39,7 @@ export default function setup(overrides = {}, postReducers = []) {
 
         ReactDOM.render(
             <Provider store={store}>
-                <Overridable id="App">
-                    <App history={history} />
-                </Overridable>
+                <App history={history} />
             </Provider>,
             appContainer
         );

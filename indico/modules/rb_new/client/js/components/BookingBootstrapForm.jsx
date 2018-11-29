@@ -22,12 +22,13 @@ import React from 'react';
 import {Button, Form, Select} from 'semantic-ui-react';
 import {SingleDatePicker, DateRangePicker} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
+import {Overridable} from 'indico/react/util';
 import {serializeDate, serializeTime} from 'indico/utils/date';
 import TimeRangePicker from './TimeRangePicker';
 import {sanitizeRecurrence} from '../util';
 
 
-export default class BookingBootstrapForm extends React.Component {
+class BookingBootstrapForm extends React.Component {
     static propTypes = {
         onSearch: PropTypes.func.isRequired,
         onChange: PropTypes.func,
@@ -228,3 +229,5 @@ export default class BookingBootstrapForm extends React.Component {
         );
     }
 }
+
+export default Overridable.component('BookingBootstrapForm', BookingBootstrapForm);

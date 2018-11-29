@@ -326,13 +326,11 @@ class BookRoomModal extends React.Component {
                     <Grid>
                         <Grid.Column width={8}>
                             <RoomBasicDetails room={room} />
-                            <Overridable id="TimeInformation">
-                                <TimeInformationComponent dates={dates}
-                                                          timeSlot={timeSlot}
-                                                          recurrence={recurrence}
-                                                          onClickOccurrences={this.showConflicts}
-                                                          occurrenceCount={occurrenceCount} />
-                            </Overridable>
+                            <TimeInformationComponent dates={dates}
+                                                      timeSlot={timeSlot}
+                                                      recurrence={recurrence}
+                                                      onClickOccurrences={this.showConflicts}
+                                                      occurrenceCount={occurrenceCount} />
                         </Grid.Column>
                         <Grid.Column width={8}>
                             {!isDirectlyBookable && this.renderPrebookingMessage()}

@@ -23,7 +23,7 @@ import {ConnectedRouter} from 'connected-react-router';
 import {Dimmer, Icon, Loader} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
-import {Overridable, RouteAwareOverridable} from 'indico/react/util';
+import {RouteAwareOverridable, Overridable} from 'indico/react/util';
 import UserActions from '../components/UserActions';
 import AdminArea from '../modules/admin';
 import Landing from '../modules/landing';
@@ -119,9 +119,7 @@ class App extends React.Component {
                             <ConditionalRoute path="/book" render={({location, match: {isExact}}) => (
                                 filtersSet
                                     ? (
-                                        <Overridable id="BookRoom">
-                                            <BookRoom location={location} />
-                                        </Overridable>
+                                        <BookRoom location={location} />
                                     ) : (
                                         isExact ? <Landing /> : <Redirect to="/book" />
                                     )
@@ -164,4 +162,4 @@ export default connect(
             dispatch(globalActions.resetPageState(namespace));
         }
     })
-)(App);
+)(Overridable.component('App', App));

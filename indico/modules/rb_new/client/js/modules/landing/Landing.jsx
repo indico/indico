@@ -84,32 +84,28 @@ class Landing extends React.Component {
                                 </Card.Header>
                             </Card.Content>
                             <Card.Content styleName="landing-page-card-content">
-                                <Overridable id="BookingBootstrapForm">
-                                    <BookingBootstrapForm onSearch={this.doSearch}>
-                                        <Form.Group inline>
-                                            <Form.Input placeholder="e.g. IT Amphitheatre" styleName="search-input"
-                                                        onChange={(event, data) => this.updateText(data.value)} />
-                                        </Form.Group>
-                                        <Overridable id="Landing.bootstrapOptions"
-                                                     setOptions={this.setExtraState}
-                                                     options={extraState}>
-                                            {userHasFavorites && (
-                                                <Form.Field>
-                                                    <Checkbox label={Translate.string('Search only my favourites')}
-                                                              onClick={this.toggleFavorites} />
-                                                </Form.Field>
-                                            )}
-                                        </Overridable>
-                                    </BookingBootstrapForm>
-                                </Overridable>
+                                <BookingBootstrapForm onSearch={this.doSearch}>
+                                    <Form.Group inline>
+                                        <Form.Input placeholder="e.g. IT Amphitheatre" styleName="search-input"
+                                                    onChange={(event, data) => this.updateText(data.value)} />
+                                    </Form.Group>
+                                    <Overridable id="Landing.bootstrapOptions"
+                                                 setOptions={this.setExtraState}
+                                                 options={extraState}>
+                                        {userHasFavorites && (
+                                            <Form.Field>
+                                                <Checkbox label={Translate.string('Search only my favourites')}
+                                                          onClick={this.toggleFavorites} />
+                                            </Form.Field>
+                                        )}
+                                    </Overridable>
+                                </BookingBootstrapForm>
                             </Card.Content>
                         </Card>
                     </Grid.Row>
                     <Grid.Row styleName="landing-page-statistics">
                         <div styleName="statistics">
-                            <Overridable id="LandingStatistics">
-                                <LandingStatistics />
-                            </Overridable>
+                            <LandingStatistics />
                         </div>
                     </Grid.Row>
                 </Grid>

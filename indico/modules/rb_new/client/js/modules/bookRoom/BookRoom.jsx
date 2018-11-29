@@ -185,9 +185,7 @@ class BookRoom extends React.Component {
             <Sticky context={ref} className="sticky-filters">
                 <div className="filter-row">
                     <div className="filter-row-filters">
-                        <Overridable id="BookingFilterBar">
-                            <BookingFilterBar />
-                        </Overridable>
+                        <BookingFilterBar />
                         <RoomFilterBar />
                         <SearchBar />
                     </div>
@@ -264,23 +262,20 @@ class BookRoom extends React.Component {
                         ) : (
                             <>
                                 <LazyScroll hasMore={this.hasMoreRooms()} loadMore={this.loadMoreRooms}>
-                                    <Overridable id="RoomRenderer">
-                                        <RoomRenderer rooms={this.visibleRooms}>
-                                            {room => (
-                                                <Slot name="actions">
-                                                    <Popup trigger={bookingModalBtn(room)}
-                                                           content={Translate.string('Book room')}
-                                                           position="top center"
-                                                           hideOnScroll />
-                                                    <Popup trigger={showDetailsBtn(room)}
-                                                           content={Translate.string('See details')}
-                                                           position="top center"
-                                                           hideOnScroll />
-                                                </Slot>
-
-                                            )}
-                                        </RoomRenderer>
-                                    </Overridable>
+                                    <RoomRenderer rooms={this.visibleRooms}>
+                                        {room => (
+                                            <Slot name="actions">
+                                                <Popup trigger={bookingModalBtn(room)}
+                                                       content={Translate.string('Book room')}
+                                                       position="top center"
+                                                       hideOnScroll />
+                                                <Popup trigger={showDetailsBtn(room)}
+                                                       content={Translate.string('See details')}
+                                                       position="top center"
+                                                       hideOnScroll />
+                                            </Slot>
+                                        )}
+                                    </RoomRenderer>
                                 </LazyScroll>
                                 {this.renderSuggestions()}
                             </>
@@ -490,4 +485,4 @@ const mapDispatchToProps = dispatch => ({
 export default connect(
     mapStateToProps,
     mapDispatchToProps,
-)(BookRoom);
+)(Overridable.component('BookRoom', BookRoom));

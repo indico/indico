@@ -19,14 +19,15 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {Button, Icon, Segment} from 'semantic-ui-react';
 import {Param, Translate} from 'indico/react/i18n';
+import {Overridable} from 'indico/react/util';
 import {toMoment} from 'indico/utils/date';
 import {renderRecurrence} from '../util';
 
 import './TimeInformation.module.scss';
 
 
-export default function TimeInformation({recurrence, dates: {startDate, endDate}, timeSlot, onClickOccurrences,
-                                         occurrenceCount}) {
+function TimeInformation({recurrence, dates: {startDate, endDate}, timeSlot, onClickOccurrences,
+                          occurrenceCount}) {
     const mStartDate = toMoment(startDate);
     const mEndDate = endDate ? toMoment(endDate) : null;
     let timeInfo = null;
@@ -108,3 +109,5 @@ TimeInformation.defaultProps = {
     timeSlot: null,
     occurrenceCount: 0
 };
+
+export default Overridable.component('TimeInformation', TimeInformation);
