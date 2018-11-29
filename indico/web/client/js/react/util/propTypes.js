@@ -15,8 +15,11 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-export {default as Preloader} from './Preloader';
-export {default as Slot} from './Slot';
-export {default as Overridable, RouteAwareOverridable, parametrize} from './Overridable';
-export {toClasses} from './html';
-export {default as IndicoPropTypes} from './propTypes';
+import PropTypes from 'prop-types';
+
+/**
+ * A set of Indico-specific prop-types shorthands
+ */
+export default {
+    i18n: PropTypes.oneOfType([PropTypes.string, PropTypes.node])
+};
