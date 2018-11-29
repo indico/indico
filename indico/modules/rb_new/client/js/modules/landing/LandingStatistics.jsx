@@ -21,6 +21,7 @@ import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import {Loader, Statistic} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
+import {Overridable} from 'indico/react/util';
 
 import * as landingActions from './actions';
 import * as landingSelectors from './selectors';
@@ -114,4 +115,4 @@ export default connect(
             fetchStatistics: landingActions.fetchStatistics,
         }, dispatch)
     })
-)(LandingStatistics);
+)(Overridable.component('LandingStatistics', LandingStatistics));

@@ -18,10 +18,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Button, Card} from 'semantic-ui-react';
-import {Slot} from 'indico/react/util';
+import {Slot, Overridable} from 'indico/react/util';
 import Room from '../../components/Room';
 import {withHoverListener} from '../map/util';
-
 
 import './RoomRenderer.module.scss';
 
@@ -30,7 +29,7 @@ import './RoomRenderer.module.scss';
  * `RoomRenderer` encapsulates the rendering of rooms in both
  * the List of Rooms and the "Book a Room" page.
  */
-export default class RoomRenderer extends React.Component {
+class RoomRenderer extends React.Component {
     static propTypes = {
         rooms: PropTypes.array.isRequired,
         onSelectRoom: PropTypes.func,
@@ -91,3 +90,5 @@ export default class RoomRenderer extends React.Component {
             </Card.Group>);
     }
 }
+
+export default Overridable.component('RoomRenderer', RoomRenderer);

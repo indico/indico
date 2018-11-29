@@ -21,6 +21,7 @@ import {Button} from 'semantic-ui-react';
 import {connect} from 'react-redux';
 
 import {Translate} from 'indico/react/i18n';
+import {Overridable} from 'indico/react/util';
 import {FilterBarController, FilterDropdownFactory} from '../../common/filters/FilterBar';
 
 import RecurrenceForm from './filters/RecurrenceForm';
@@ -125,4 +126,4 @@ export default connect(
             }
         }
     })
-)(BookingFilterBar);
+)(Overridable.component('BookingFilterBar', BookingFilterBar));

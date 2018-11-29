@@ -22,6 +22,7 @@ import {connect} from 'react-redux';
 import Leaflet from 'leaflet';
 import {Map, TileLayer, Marker, Tooltip} from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-markercluster';
+import {Overridable} from 'indico/react/util';
 import {selectors as configSelectors} from '../config';
 import * as mapSelectors from './selectors';
 
@@ -156,4 +157,4 @@ export default connect(
     state => ({
         tileServerURL: configSelectors.getTileServerURL(state)
     }),
-)(RoomBookingMap);
+)(Overridable.component('RoomBookingMap', RoomBookingMap));

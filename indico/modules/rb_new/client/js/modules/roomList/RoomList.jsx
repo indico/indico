@@ -25,7 +25,7 @@ import {Route} from 'react-router-dom';
 import LazyScroll from 'redux-lazy-scroll';
 import {stateToQueryString} from 'redux-router-querystring';
 
-import {Overridable, Slot} from 'indico/react/util';
+import {Slot} from 'indico/react/util';
 import {Param, Plural, PluralTranslate, Translate, Singular} from 'indico/react/i18n';
 import camelizeKeys from 'indico/utils/camelize';
 import {pushStateMergeProps} from '../../util';
@@ -195,23 +195,21 @@ class RoomList extends React.Component {
                             <CardPlaceholder.Group count={20} />
                         ) : (
                             <LazyScroll hasMore={this.hasMoreRooms()} loadMore={this.loadMoreRooms}>
-                                <Overridable id="RoomRenderer">
-                                    <RoomRenderer rooms={this.visibleRooms}
-                                                  selectedRooms={selection}
-                                                  inSelectionMode={!!selectionMode}
-                                                  onSelectRoom={this.onSelectRoom}>
-                                        {({id}) => (
-                                            <Slot name="actions">
-                                                <Popup trigger={<Button icon="search"
-                                                                        onClick={() => openRoomDetails(id)}
-                                                                        primary
-                                                                        circular />}
-                                                       content={Translate.string('See details')}
-                                                       position="top center" />
-                                            </Slot>
-                                        )}
-                                    </RoomRenderer>
-                                </Overridable>
+                                <RoomRenderer rooms={this.visibleRooms}
+                                              selectedRooms={selection}
+                                              inSelectionMode={!!selectionMode}
+                                              onSelectRoom={this.onSelectRoom}>
+                                    {({id}) => (
+                                        <Slot name="actions">
+                                            <Popup trigger={<Button icon="search"
+                                                                    onClick={() => openRoomDetails(id)}
+                                                                    primary
+                                                                    circular />}
+                                                   content={Translate.string('See details')}
+                                                   position="top center" />
+                                        </Slot>
+                                    )}
+                                </RoomRenderer>
                             </LazyScroll>
                         )}
                     </div>

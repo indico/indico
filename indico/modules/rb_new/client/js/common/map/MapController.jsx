@@ -21,7 +21,6 @@ import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import {Button, Checkbox, Dimmer, Dropdown, Loader, Popup, Sticky} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
-import Overridable from 'indico/react/util/Overridable';
 
 import {getAreaBounds, getMapBounds, getRoomListBounds, checkRoomsInBounds} from './util';
 import RoomBookingMap from './RoomBookingMap';
@@ -190,19 +189,19 @@ class MapController extends React.Component {
                             <Loader />
                         </Dimmer>
                         {!!areaBounds && (
-                            <Overridable id="RoomBookingMap">
-                                <RoomBookingMap mapRef={this.mapRef}
-                                                bounds={areaBounds}
-                                                rooms={rooms}
-                                                onLoad={this.onMapLoad}
-                                                onMove={this.onMove}
-                                                onTouch={this.onTouch}
-                                                actions={actions}>
+                            <RoomBookingMap mapRef={this.mapRef}
+                                            bounds={areaBounds}
+                                            rooms={rooms}
+                                            onLoad={this.onMapLoad}
+                                            onMove={this.onMove}
+                                            onTouch={this.onTouch}
+                                            actions={actions}>
+                                <>
                                     {searchControl}
                                     {areasControl}
                                     {showAllControl}
-                                </RoomBookingMap>
-                            </Overridable>
+                                </>
+                            </RoomBookingMap>
                         )}
                     </Dimmer.Dimmable>
                 </Sticky>

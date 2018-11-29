@@ -22,7 +22,7 @@ import {connect} from 'react-redux';
 import {Grid, Icon, Modal, Message} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
-import {Overridable, IndicoPropTypes} from 'indico/react/util';
+import {IndicoPropTypes} from 'indico/react/util';
 
 import RoomBasicDetails from '../../components/RoomBasicDetails';
 import BookingBootstrapForm from '../../components/BookingBootstrapForm';
@@ -118,15 +118,13 @@ class BookFromListModal extends React.Component {
                             <RoomBasicDetails room={room} />
                         </Grid.Column>
                         <Grid.Column width={8}>
-                            <Overridable id="BookingBootstrapForm">
-                                <BookingBootstrapForm buttonCaption={<Translate>Book</Translate>}
-                                                      buttonDisabled={buttonDisabled}
-                                                      onChange={refreshCollisions}
-                                                      onSearch={this.handleBook}
-                                                      defaults={defaults}>
-                                    {availability && <ConflictIndicator availability={availability} />}
-                                </BookingBootstrapForm>
-                            </Overridable>
+                            <BookingBootstrapForm buttonCaption={<Translate>Book</Translate>}
+                                                  buttonDisabled={buttonDisabled}
+                                                  onChange={refreshCollisions}
+                                                  onSearch={this.handleBook}
+                                                  defaults={defaults}>
+                                {availability && <ConflictIndicator availability={availability} />}
+                            </BookingBootstrapForm>
                         </Grid.Column>
                     </Grid>
                 </Modal.Content>
