@@ -116,8 +116,14 @@ purely client-side and are worded for event creation instead of being generic.
 
         var $createBooking = $('#event-creation-create_booking');
         var $availableMessage = $('#room-available');
+        var $availablePrebookMessage = $('#room-available-prebook');
         var $conflictBookingMessage = $('#room-conflict-booking');
         var $conflictPrebookingMessage = $('#room-conflict-prebooking');
+        var $conflictPrebookingPrebookMessage = $('#room-conflict-prebooking-prebook');
+        var $userBookingMessage = $('#room-user-booking');
+        var $userPrebookingMessage = $('#room-user-prebooking');
+        var $unbookableMessage = $('#room-unbookable');
+        var $cantBookMessage = $('#room-cant-book');
 
         function setLectureTimes(occurrence){
             startDt = moment(occurrence['date'] + " " + occurrence['time'], 'DD-MM-YYYY HH:mm');
@@ -189,13 +195,36 @@ purely client-side and are worded for event creation instead of being generic.
                 contentType: 'application/json',
                 error: handleAjaxError,
                 success: function(data) {
-                    if (data['conflict_booking']){
-                        $currentMessage = $conflictBookingMessage;
+                    if (data['user_booking']){
                         $createBooking.val(false);
+                        $currentMessage = $userBookingMessage;
+                    } else if (data['user_prebooking']) {
+                        $createBooking.val(false);
+                        $currentMessage = $userPrebookingMessage;
+                    } else if (data['conflict_booking']){
+                        $createBooking.val(false);
+                        $currentMessage = $conflictBookingMessage;
+                    } else if (data['unbookable']) {
+                        $createBooking.val(false);
+                        $currentMessage = $unbookableMessage;
                     } else if (data['conflict_prebooking']){
-                        $currentMessage = $conflictPrebookingMessage;
+                        if (data['can_book']) {
+                            $currentMessage = $conflictPrebookingMessage;
+                        } else if (data['can_prebook']) {
+                            $currentMessage = $conflictPrebookingPrebookMessage;
+                        } else {
+                            $currentMessage = $cantBookMessage;
+                            $createBooking.val(false);
+                        }
                     } else {
-                        $currentMessage = $availableMessage;
+                        if (data['can_book']) {
+                            $currentMessage = $availableMessage;
+                        } else if (data['can_prebook']) {
+                            $currentMessage = $availablePrebookMessage;
+                        } else {
+                            $currentMessage = $cantBookMessage;
+                            $createBooking.val(false);
+                        }
                     }
                     $currentMessage.show();
                 }
@@ -250,6 +279,7 @@ purely client-side and are worded for event creation instead of being generic.
                 setLectureTimes(occurrences[0]);
                 updateAvailability();
             } else {
+                $createBooking.val(false);
                 hideAvailability();
             }
         });
@@ -268,7 +298,15 @@ purely client-side and are worded for event creation instead of being generic.
             $createBooking.val(this.checked);
         });
 
+        $('#create-prebooking').change (function() {
+            $createBooking.val(this.checked);
+        });
+
         $('#create-booking-over-prebooking').change (function() {
+            $createBooking.val(this.checked);
+        });
+
+        $('#create-prebooking-over-prebooking').change (function() {
             $createBooking.val(this.checked);
         });
     </script>
