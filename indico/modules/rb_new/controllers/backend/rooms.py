@@ -22,7 +22,7 @@ import dateutil
 from flask import jsonify, request, session
 from sqlalchemy.orm import subqueryload
 from webargs import fields
-from webargs.flaskparser import use_args
+from webargs.flaskparser import use_args, use_kwargs
 from werkzeug.exceptions import NotFound, UnprocessableEntity
 
 from indico.core.db import db
@@ -120,11 +120,9 @@ class RHRoomFavorites(RHRoomBookingBase):
 
 
 class RHCheckRoomAvailable(RHRoomBase):
-    @use_args({
-        'start_dt': fields.String(),
-        'end_dt': fields.String(),
+    @use_kwargs({
+        'start_dt': fields.DateTime(),
+        'end_dt': fields.DateTime(),
     })
-    def _process(self, args):
-        start_dt = dateutil.parser.parse(args['start_dt'])
-        end_dt = dateutil.parser.parse(args['end_dt'])
+    def _process(self, start_dt, end_dt):
         return jsonify(check_room_available(self.room, start_dt, end_dt))
