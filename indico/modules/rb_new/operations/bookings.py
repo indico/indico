@@ -232,22 +232,14 @@ def check_room_available(room, start_dt, end_dt):
     user_prebookings = [prebooking for prebooking in prebookings
                         if prebooking.reservation.booked_for_id == session.user.id]
 
-    conflict_booking = True if bookings else False
-    conflict_prebooking = True if prebookings else False
-    can_book = room.can_be_booked(session.user)
-    can_prebook = room.can_be_prebooked(session.user)
-    user_booking = True if user_bookings else False
-    user_prebooking = True if user_prebookings else False
-    unbookable = True if (hours_overlap or nonbookable_periods or blocked_for_user) else False
-
     return {
-        'can_book': can_book,
-        'can_prebook': can_prebook,
-        'conflict_booking': conflict_booking,
-        'conflict_prebooking': conflict_prebooking,
-        'unbookable': unbookable,
-        'user_booking': user_booking,
-        'user_prebooking': user_prebooking,
+        'can_book': room.can_be_booked(session.user),
+        'can_prebook': room.can_be_prebooked(session.user),
+        'conflict_booking': bool(bookings),
+        'conflict_prebooking': bool(prebookings),
+        'unbookable': bool(hours_overlap or nonbookable_periods or blocked_for_user),
+        'user_booking': bool(user_bookings),
+        'user_prebooking': bool(user_prebookings),
     }
 
 

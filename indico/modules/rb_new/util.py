@@ -24,7 +24,6 @@ from flask import current_app
 from PIL import Image
 
 from indico.legacy.common.cache import GenericCache
-from indico.modules.rb import rb_settings
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb_new.schemas import (bookable_hours_schema, nonbookable_periods_schema,
                                            reservation_occurrences_min_schema, simple_blockings_schema)
