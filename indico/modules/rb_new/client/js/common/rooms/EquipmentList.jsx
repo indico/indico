@@ -23,9 +23,7 @@ import _ from 'lodash';
 import {Dropdown, Icon, List} from 'semantic-ui-react';
 import * as roomsSelectors from './selectors';
 
-
-import './RoomEditModal.module.scss';
-
+import './EquipmentList.module.scss';
 
 class EquipmentList extends React.Component {
     static propTypes = {

@@ -15,10 +15,5 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-.button-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    paddding-bottom: 10px;
-}
-
+export {default} from './Landing';
+export {default as reducer} from './reducers';

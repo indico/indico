@@ -21,25 +21,28 @@ import fetchAttributesURL from 'indico-url:rooms_new.admin_attributes';
 import fetchRoomAvailabilityURL from 'indico-url:rooms_new.admin_room_availability';
 import fetchRoomEquipmentURL from 'indico-url:rooms_new.admin_room_equipment';
 import _ from 'lodash';
-import moment from 'moment';
 import React from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import PropTypes from 'prop-types';
-import {Button, Checkbox, Dimmer, Dropdown, Form, Grid, Header, Icon, Input, List, Loader, Modal, TextArea} from 'semantic-ui-react';
+import {Button, Checkbox, Dimmer, Dropdown, Form, Grid, Header, Input, Loader, Modal, TextArea} from 'semantic-ui-react';
 import {Form as FinalForm, Field} from 'react-final-form';
+import {FieldArray} from 'react-final-form-arrays';
+import arrayMutators from "final-form-arrays";
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import camelizeKeys from 'indico/utils/camelize';
 import {ReduxCheckboxField, ReduxFormField} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 import PrincipalSearchField from 'indico/react/components/PrincipalSearchField';
 import EquipmentList from './EquipmentList';
+import DailyAvailability from './DailyAvailability';
+import NonBookablePeriods from './NonBookablePeriods';
 import SpriteImage from '../../components/SpriteImage';
-import TimeRangePicker from '../../components/TimeRangePicker';
-
 import * as roomsSelectors from './selectors';
 import * as roomActions from './actions';
 import {selectors as userSelectors} from '../user';
+
+import './RoomEditModal.module.scss';
 
 
 function validate() {
@@ -86,10 +89,11 @@ const columns = [
         name: 'comments',
         label: Translate.string('Comments'),
     }, {
-        type: 'header',
-        label: Translate.string('Daily availability')
+        type: 'headerWithButton',
+        label: Translate.string('Daily availability'),
+        action: 'dailyHours'
     }, {
-        type: 'dateRange',
+        type: 'timeRange',
     }], [{
         type: 'header',
         label: Translate.string('Location')
@@ -172,16 +176,20 @@ const columns = [
         type: 'header',
         label: 'Custom Attributes'
     }, {
-        type: 'attributeDropdown',
+        type: 'attributes',
         placeholder: Translate.string('Add new attributes'),
-    }, {
-        type: 'attributes'
     }, {
         type: 'header',
         label: Translate.string('Equipment Available')
     }, {
         type: 'equipment',
         placeholder: Translate.string('Add new equipment')
+    }, {
+        type: 'headerWithButton',
+        label: Translate.string('Nonbookable Hours'),
+        action: 'nonBookableHours'
+    }, {
+        type: 'dateRange'
     }]];
 
 
@@ -211,12 +219,6 @@ class RoomEditModal extends React.Component {
         this.fetchRoomAvailability();
         this.fetchRoomEquipment();
     }
-
-
-    onEditAttributes = (newAttributeName) => {
-        this.addAttribute(newAttributeName);
-    };
-
 
     async fetchDetailedRoom() {
         const {roomId} = this.props;
@@ -263,6 +265,7 @@ class RoomEditModal extends React.Component {
             handleAxiosError(error);
             return;
         }
+        console.warn(camelizeKeys(response.data));
         this.setState({roomAvailability: camelizeKeys(response.data)});
     }
 
@@ -295,30 +298,42 @@ class RoomEditModal extends React.Component {
         return <SpriteImage pos={position} />;
     };
 
-    removeAttribute = (attribute) => {
-        const {roomAttributes} = this.state;
-        this.setState({roomAttributes: _.omit(roomAttributes, attribute)});
-    };
-
-
-    renderAttributes = () => {
-        const {attributes, roomAttributes} = this.state;
+    renderAttributes = (content) => {
+        const {attributes} = this.state;
         if (!attributes) {
             return;
         }
-        return attributes.map(attribute => (
-            <>
-                {_.has(roomAttributes, attribute.name) && (
-                    <Field name={attribute.name}
-                           component={ReduxFormField}
-                           label={attribute.name}
-                           as={Input}
-                           isEqual={_.isEqual}
-                           icon={{name: 'trash', color: 'red', link: true, onClick: () => this.removeAttribute(attribute.name)}} />
-                )}
-            </>
-
-        ));
+        return (
+            <FieldArray name="attributes">
+                {({fields}) => {
+                    const options = this.generateAttributeOptions(attributes, fields.value);
+                    return (
+                        <div>
+                            <Dropdown button
+                                    text={content.placeholder}
+                                    className="icon"
+                                    floating
+                                    labeled
+                                    icon="add"
+                                    options={options}
+                                    search
+                                    disabled={options.length === 0}
+                                    selectOnBlur={false}
+                                    onChange={(event, values) => fields.push({title: values.value, value: null})} />
+                            {fields.map((attribute, index) => (
+                                <div key={attribute}>
+                                    <Field label={fields.value[index].title}
+                                        name={`${attribute}.value`}
+                                        component={ReduxFormField}
+                                        as={Input}
+                                        isEqual={_.isEqual}
+                                        icon={{name: 'trash', color: 'red', link: true, onClick: () => fields.remove(index)}} />
+                                </div>
+                            ))}
+                        </div>
+                )}}
+            </FieldArray>
+        );
     };
 
     renderEquipmentList = ({input, ...props}) => {
@@ -327,6 +342,22 @@ class RoomEditModal extends React.Component {
                             input={input}
                             as={EquipmentList}
                             componentLabel={Translate.string('Add new equipment')} />
+        );
+    };
+
+    renderHours = ({input, ...props}) => {
+        return (
+            <ReduxFormField {...props}
+                            input={input}
+                            as={DailyAvailability} />
+        );
+    };
+
+    renderPeriods = ({input, ...props}) => {
+        return (
+            <ReduxFormField {...props}
+                            input={input}
+                            as={NonBookablePeriods} />
         );
     };
 
@@ -345,12 +376,11 @@ class RoomEditModal extends React.Component {
     );
 
     renderContent = (content) => {
-        const {room, attributes, roomEquipment, roomAttributes, roomAvailability} = this.state;
+        const {room, roomEquipment, roomAvailability} = this.state;
         const {equipmentTypes} = this.props;
         if (!equipmentTypes) {
             return;
         }
-        let options = [];
         switch (content.type) {
             case 'header':
                 return (
@@ -394,25 +424,7 @@ class RoomEditModal extends React.Component {
             case 'image':
                 return this.renderImage(room.spritePosition);
             case 'attributes':
-                return this.renderAttributes();
-            case 'attributeDropdown':
-                if (!attributes && !roomAttributes) {
-                    return;
-                }
-                options = this.generateAttributeOptions(attributes);
-                return (
-                    <Dropdown button
-                              text={content.placeholder}
-                              className="icon"
-                              floating
-                              labeled
-                              icon="add"
-                              options={options}
-                              search
-                              disabled={options.length === 0}
-                              selectOnBlur={false}
-                              onChange={(event, values) => this.onEditAttributes(values.value)} />
-                );
+                return this.renderAttributes(content);
             case 'equipment':
                 if (!roomEquipment && equipmentTypes) {
                     return;
@@ -422,25 +434,40 @@ class RoomEditModal extends React.Component {
                            isEqual={_.isEqual}
                            render={this.renderEquipmentList} />
                 );
-            case 'dateRange':
+            case 'headerWithButton':
+                return (
+                    <Header key={content.label} styleName="button-header">
+                        {content.label}
+                        <Button size="small" onClick={content.action === 'dailyHours' ? null : null}>Add</Button>
+                    </Header>
+                );
+            case 'timeRange':
                 if (!roomAvailability || !roomAvailability.bookableHours.length) {
                     return <div key={1}>No bookable hours found</div>;
                 }
 
-                return roomAvailability.bookableHours.map((index, bookableHour) => {
-                    return (
-                        <TimeRangePicker key={index}
-                                         starTime={bookableHour.startTime}
-                                         endTime={moment(bookableHour.endTime)}
-                                         onChange={() => null} />
-                    );
-                });
+                return (
+                    <Field name="bookableHours"
+                           isEqual={_.isEqual}
+                           render={this.renderHours} />
+                );
+            case 'dateRange':
+                if (!roomAvailability || !roomAvailability.nonbookablePeriods.length) {
+                    return <div key={2}>No non bookable periods found </div>;
+                }
+
+                return (
+                    <Field name="nonbookablePeriods"
+                           isEqual={_.isEqual}
+                           render={this.renderPeriods} />
+                );
         }
     };
 
 
     renderModalContent = (fprops) => {
         const formProps = {onSubmit: fprops.handleSubmit};
+        const {onClose} = this.props;
         return (
             <>
                 <Modal.Header>
@@ -454,7 +481,7 @@ class RoomEditModal extends React.Component {
                     </Form>
                 </Modal.Content>
                 <Modal.Actions>
-                    <Button>
+                    <Button onClick={onClose}>
                         Cancel
                     </Button>
                     <Button type="submit"
@@ -475,17 +502,15 @@ class RoomEditModal extends React.Component {
         this.setState({roomAttributes: {...roomAttributes, ...newAttribute}});
     };
 
-    generateAttributeOptions = (attributes) => {
-        const {roomAttributes} = this.state;
-        const options = [];
-        attributes.map((key) => (!roomAttributes.hasOwnProperty(key.name)
-            ? options.push({key: key.name, text: key.title, value: key.name}) : null));
+    generateAttributeOptions = (attributes, arrayFields) => {
+        const fieldNames = arrayFields.map(field => field.title);
+        const options = attributes.map((key) => ({key: key.name, text: key.title, value: key.name})).filter(attr => !fieldNames.includes(attr.key));
         return options;
     };
 
 
     render() {
-        const {room, roomAttributes, attributes, roomEquipment} = this.state;
+        const {room, roomAttributes, attributes, roomEquipment, roomAvailability} = this.state;
         const props = {validate, onSubmit: this.handleSubmit};
         if (!room || !attributes || !roomAttributes || !roomEquipment) {
             return <Dimmer active page><Loader /></Dimmer>;
@@ -495,15 +520,9 @@ class RoomEditModal extends React.Component {
                 <Modal open onClose={this.handleCloseModal} size="large" closeIcon>
                     <FinalForm {...props}
                                render={this.renderModalContent}
-                               initialValues={{...room, roomAttributes, ...roomEquipment}}
-                               keepDirtyOnReinitialize
-                               initialValuesEqual={(a, b) => {
-                                   const equal = _.isEqual(a, b);
-                                   console.warn(equal);
-                                   if (!equal) {
-                                       console.warn(a, b);
-                                   }
-                                   return equal;
+                               initialValues={{...room, attributes: roomAttributes, ...roomEquipment, ...roomAvailability}}
+                               mutators={{
+                                   ...arrayMutators
                                }} />
                 </Modal>
             </>

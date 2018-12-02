@@ -56,7 +56,7 @@ class RoomAttributeValuesSchema(mm.ModelSchema):
 
 
 class AdminRoomAttributesSchema(mm.ModelSchema):
-    attribute_object = {'attribute.name': 'attribute.value'}
+    attribute_object = Nested(dict(name=String(attribute='attribute.name'), value=String(attribute='attribute.value')), many=True)# {'attribute.name': 'attribute.value'}
 
     class Meta:
         model = RoomAttributeAssociation
