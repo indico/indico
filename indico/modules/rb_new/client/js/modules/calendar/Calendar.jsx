@@ -22,6 +22,7 @@ import {bindActionCreators} from 'redux';
 import {Button, Container, Grid, Popup, Sticky} from 'semantic-ui-react';
 import {connect} from 'react-redux';
 import {Translate} from 'indico/react/i18n';
+import {Overridable} from 'indico/react/util';
 import {serializeDate} from 'indico/utils/date';
 import searchBarFactory from '../../components/SearchBar';
 import * as calendarActions from './actions';
@@ -53,8 +54,12 @@ class Calendar extends React.Component {
             setFilterParameter: PropTypes.func.isRequired,
         }).isRequired,
         filters: PropTypes.object.isRequired,
+        allowDragDrop: PropTypes.bool
     };
 
+    static defaultProps = {
+        allowDragDrop: true
+    };
 
     constructor(props) {
         super(props);
@@ -159,6 +164,7 @@ class Calendar extends React.Component {
                 openRoomDetails, setDate, openBookingDetails, setMode
             },
             datePicker,
+            allowDragDrop
         } = this.props;
         const {showUnused} = this.state;
         const legendLabels = [
@@ -167,6 +173,7 @@ class Calendar extends React.Component {
             {label: Translate.string('Blocked'), style: 'blocking'},
             {label: Translate.string('Not bookable'), style: 'unbookable'}
         ];
+        const editable = datePicker.mode === 'days' && allowDragDrop;
         return (
             <Grid>
                 <Grid.Row>
@@ -192,8 +199,8 @@ class Calendar extends React.Component {
                                              onClickLabel={openRoomDetails}
                                              isLoading={isFetching}
                                              onClickReservation={openBookingDetails}
-                                             itemClass={datePicker.mode === 'days' ? EditableTimelineItem : TimelineItem}
-                                             itemProps={datePicker.mode === 'days' ? {onAddSlot: this.onAddSlot} : {}}
+                                             itemClass={editable ? EditableTimelineItem : TimelineItem}
+                                             itemProps={editable ? {onAddSlot: this.onAddSlot} : {}}
                                              showUnused={showUnused}
                                              longLabel />
                         </div>
@@ -224,4 +231,4 @@ export default connect(
             setFilterParameter: (name, value) => filtersActions.setFilterParameter('calendar', name, value),
         }, dispatch),
     }),
-)(Calendar);
+)(Overridable.component('Calendar', Calendar));

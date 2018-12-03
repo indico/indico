@@ -25,9 +25,10 @@ import _ from 'lodash';
 import {Button, Card, Grid, Header, Icon, Label, Message, Popup, Sticky} from 'semantic-ui-react';
 import LazyScroll from 'redux-lazy-scroll';
 
-import {Overridable, Slot, toClasses} from 'indico/react/util';
 import {PluralTranslate, Translate, Singular, Param, Plural} from 'indico/react/i18n';
+import {Overridable, Slot, toClasses, IndicoPropTypes} from 'indico/react/util';
 import {serializeTime, serializeDate} from 'indico/utils/date';
+
 import searchBarFactory from '../../components/SearchBar';
 import Room from '../../components/Room';
 import CardPlaceholder from '../../components/CardPlaceholder';
@@ -76,11 +77,19 @@ class BookRoom extends React.Component {
             setTimelineMode: PropTypes.func.isRequired
         }).isRequired,
         datePicker: PropTypes.object.isRequired,
-        showSuggestions: PropTypes.bool
+        showSuggestions: PropTypes.bool,
+        labels: PropTypes.shape({
+            bookButton: IndicoPropTypes.i18n,
+            detailsButton: IndicoPropTypes.i18n
+        })
     };
 
     static defaultProps = {
-        showSuggestions: true
+        showSuggestions: true,
+        labels: {
+            bookButton: <Translate>Book Room</Translate>,
+            detailsButton: <Translate>See details</Translate>
+        }
     };
 
     state = {
@@ -241,7 +250,8 @@ class BookRoom extends React.Component {
         const {
             isSearching,
             isTimelineVisible,
-            showSuggestions
+            showSuggestions,
+            labels
         } = this.props;
         const {actions: {openRoomDetails}} = this.props;
 
@@ -266,11 +276,11 @@ class BookRoom extends React.Component {
                                         {room => (
                                             <Slot name="actions">
                                                 <Popup trigger={bookingModalBtn(room)}
-                                                       content={Translate.string('Book room')}
+                                                       content={labels.bookButton}
                                                        position="top center"
                                                        hideOnScroll />
                                                 <Popup trigger={showDetailsBtn(room)}
-                                                       content={Translate.string('See details')}
+                                                       content={labels.detailsButton}
                                                        position="top center"
                                                        hideOnScroll />
                                             </Slot>

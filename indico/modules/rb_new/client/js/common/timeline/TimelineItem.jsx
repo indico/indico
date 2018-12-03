@@ -20,6 +20,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {Popup} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
+import {Overridable} from 'indico/react/util';
 
 import './TimelineItem.module.scss';
 
@@ -52,7 +53,7 @@ function getKeyForOccurrence({reservation, startDt, endDt}) {
     return `${name}-${key}${startDt}-${endDt}`;
 }
 
-export default class TimelineItem extends React.Component {
+class TimelineItem extends React.Component {
     static propTypes = {
         startHour: PropTypes.number.isRequired,
         endHour: PropTypes.number.isRequired,
@@ -60,14 +61,16 @@ export default class TimelineItem extends React.Component {
         onClickCandidate: PropTypes.func,
         onClickReservation: PropTypes.func,
         children: PropTypes.node,
-        setSelectable: PropTypes.func
+        setSelectable: PropTypes.func,
+        dayBased: PropTypes.bool
     };
 
     static defaultProps = {
         onClickCandidate: null,
         onClickReservation: null,
         children: [],
-        setSelectable: null
+        setSelectable: null,
+        dayBased: false
     };
 
     calculateWidth = (startDt, endDt) => {
@@ -110,7 +113,7 @@ export default class TimelineItem extends React.Component {
             reason,
             bookable
         } = occurrence;
-        const {startHour, endHour, onClickCandidate, onClickReservation, room} = this.props;
+        const {startHour, endHour, onClickCandidate, onClickReservation, room, dayBased} = this.props;
         if (type === 'blocking') {
             segmentStartDt = moment(startHour, 'HH:mm');
             segmentEndDt = moment(endHour, 'HH:mm');
@@ -126,7 +129,7 @@ export default class TimelineItem extends React.Component {
 
         if (type === 'blocking') {
             popupContent = (
-                <div styleName="popup-center">{Translate.string('Room blocked: {reason}', {reason})}</div>
+                <div styleName="popup-center">{Translate.string('Space blocked: {reason}', {reason})}</div>
             );
         } else if (type === 'unbookable-periods') {
             popupContent = (
@@ -148,9 +151,11 @@ export default class TimelineItem extends React.Component {
             }
             popupContent = (
                 <div styleName="popup-center">
-                    <div>
-                        {segmentStartDt.format('LT')} - {segmentEndDt.format('LT')}
-                    </div>
+                    {!dayBased && (
+                        <div>
+                            {segmentStartDt.format('LT')} - {segmentEndDt.format('LT')}
+                        </div>
+                    )}
                     <div>{popupMessage}</div>
                 </div>
             );
@@ -197,3 +202,5 @@ export default class TimelineItem extends React.Component {
         );
     }
 }
+
+export default Overridable.component('TimelineItem', TimelineItem);
