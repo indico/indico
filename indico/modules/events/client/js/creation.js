@@ -40,6 +40,7 @@
         const $userPrebookingMessage = $('#room-user-prebooking');
         const $unbookableMessage = $('#room-unbookable');
         const $cantBookMessage = $('#room-cant-book');
+        const calendarUrl = Indico.Urls.RoomBooking.calendar;
 
         let currentCategory = null;
         let previousRoomId, $currentMessage, startDt, endDt, category, roomData, timezone;
@@ -106,6 +107,15 @@
             });
         }
 
+        function addCalendarLink($message) {
+            const params = {
+                date: startDt.format('YYYY-MM-DD'),
+                text: roomData['room_name']
+            };
+            const url = build_url(calendarUrl, params);
+            $message.find('a').prop('href', url);
+        }
+
         function hideAvailability() {
             if ($currentMessage) {
                 $currentMessage.hide();
@@ -142,20 +152,26 @@
                     if (data['user_booking']) {
                         $createBooking.val(false);
                         $currentMessage = $userBookingMessage;
+                        addCalendarLink($currentMessage);
                     } else if (data['user_prebooking']) {
                         $createBooking.val(false);
                         $currentMessage = $userPrebookingMessage;
+                        addCalendarLink($currentMessage);
                     } else if (data['conflict_booking']) {
                         $createBooking.val(false);
                         $currentMessage = $conflictBookingMessage;
+                        addCalendarLink($currentMessage);
                     } else if (data['unbookable']) {
                         $createBooking.val(false);
                         $currentMessage = $unbookableMessage;
+                        addCalendarLink($currentMessage);
                     } else if (data['conflict_prebooking']) {
                         if (data['can_book']) {
                             $currentMessage = $conflictPrebookingMessage;
+                            addCalendarLink($currentMessage);
                         } else if (data['can_prebook']) {
                             $currentMessage = $conflictPrebookingPrebookMessage;
+                            addCalendarLink($currentMessage);
                         } else {
                             $currentMessage = $cantBookMessage;
                             $createBooking.val(false);

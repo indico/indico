@@ -98,6 +98,7 @@ parent object. The key features and expected behaviour is the following:
                 <div class="error-message">
                     <i class="icon icon-cross"></i>
                     {% trans %}This room is already booked.{% endtrans %}
+                    <a target="_blank">{% trans %}See on calendar{% endtrans %}</a>
                 </div>
             </div>
             <div id="room-conflict-prebooking" class="availabiity-message">
@@ -106,6 +107,7 @@ parent object. The key features and expected behaviour is the following:
                     {% trans %}
                         This room is already prebooked at selected times. Would you like to book it anyways?
                     {% endtrans %}
+                    <a target="_blank">{% trans %}See on calendar{% endtrans %}</a>
                     {{ switch(id='create-booking-over-prebooking', on_label=_('Yes'), off_label=_('No')) }}
                 </div>
             </div>
@@ -115,6 +117,7 @@ parent object. The key features and expected behaviour is the following:
                     {% trans %}
                         This room is already prebooked at selected times. Would you like to request a booking anyways?
                     {% endtrans %}
+                    <a target="_blank">{% trans %}See on calendar{% endtrans %}</a>
                     {{ switch(id='create-prebooking-over-prebooking', on_label=_('Yes'), off_label=_('No')) }}
                 </div>
             </div>
@@ -122,18 +125,21 @@ parent object. The key features and expected behaviour is the following:
                 <div class="info-message">
                     <i class="icon icon-info"></i>
                     {% trans %}You already have a booking in this room.{% endtrans %}
+                    <a target="_blank">{% trans %}See on calendar{% endtrans %}</a>
                 </div>
             </div>
             <div id="room-user-prebooking" class="availabiity-message">
                 <div class="info-message">
                     <i class="icon icon-info"></i>
                     {% trans %}You already have a prebooking in this room.{% endtrans %}
+                    <a target="_blank">{% trans %}See on calendar{% endtrans %}</a>
                 </div>
             </div>
             <div id="room-unbookable" class="availabiity-message">
                 <div class="error-message">
                     <i class="icon icon-cross"></i>
                     {% trans %}This room is not bookable at selected times.{% endtrans %}
+                    <a target="_blank">{% trans %}See on calendar{% endtrans %}</a>
                 </div>
             </div>
             <div id="room-cant-book" class="availabiity-message">

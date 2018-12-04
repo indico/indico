@@ -451,7 +451,7 @@
         roomInput.on('typeahead:click-on-option', function(e, data) {
             updateVenueOnRoomChange(data);
             hiddenData.room_id = data.id;
-            delete hiddenData.room_name;
+            hiddenData.room_name = data.name;
             postSelectionActions(roomInput, data.name);
             highlightOption(roomInput, data.name);
             roomInput.attr('title', data.name);
