@@ -45,12 +45,14 @@ const types = {
     preBookings: 'pre-booking',
 };
 
-function getKeyForOccurrence({reservation, startDt, endDt}) {
+function getKeyForOccurrence(name, {reservation, startTime, endTime, startDt, endDt}) {
     let key = '';
     if (reservation) {
         key += `${reservation.id}-`;
     }
-    return `${name}-${key}${startDt}-${endDt}`;
+    // startDt ? startDt : startTime: this handles unbookableHours which
+    // don't have start/end dates only start/end times
+    return `${name}-${key}${startDt || startTime}-${endDt || endTime}`;
 }
 
 class TimelineItem extends React.Component {
@@ -184,7 +186,7 @@ class TimelineItem extends React.Component {
         const {data} = this.props;
         return Object.entries(data).map(([name, occurrences]) => (
             occurrences.map(occurrence => (
-                <React.Fragment key={getKeyForOccurrence(occurrence)}>
+                <React.Fragment key={getKeyForOccurrence(name, occurrence)}>
                     {this.renderOccurrence(occurrence, classes[name] || 'default', types[name])}
                 </React.Fragment>
             ))));
