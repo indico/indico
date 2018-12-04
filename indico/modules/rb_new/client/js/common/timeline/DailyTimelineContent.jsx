@@ -122,7 +122,7 @@ export default class DailyTimelineContent extends React.Component {
         const labelWidth = longLabel ? 200 : 150;
 
         return (
-            <div styleName="timeline-header" className={!selectable && 'timeline-non-selectable'}>
+            <div styleName="timeline-header" className={!selectable ? 'timeline-non-selectable' : ''}>
                 <div style={{width: labelWidth}} />
                 <div styleName="timeline-header-labels">
                     {_.range(0, hourSpan, hourStep).map((i, n) => (

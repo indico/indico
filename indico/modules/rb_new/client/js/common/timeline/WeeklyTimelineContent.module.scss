@@ -23,6 +23,15 @@
     top: 0;
     height: 100%;
     border-left: 1px solid $pastel-gray;
+
+    &:global(.hidden) {
+        opacity: 0.35;
+        background-color: $pastel-gray;
+    }
+
+    &:global(.hidden) + :global(.visible) {
+        border-left: none;
+    }
 }
 
 .timeline-row-content {

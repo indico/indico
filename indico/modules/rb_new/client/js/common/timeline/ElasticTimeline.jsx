@@ -110,6 +110,7 @@ export default class ElasticTimeline extends React.Component {
         const {availability, datePicker: {selectedDate}} = this.props;
         const weekStart = toMoment(selectedDate, 'YYYY-MM-DD').startOf('week');
         const weekRange = [...Array(7).keys()].map(n => serializeDate(weekStart.clone().add(n, 'days')));
+
         if (!availability.length) {
             return [];
         }
@@ -169,11 +170,12 @@ export default class ElasticTimeline extends React.Component {
     renderTimeline = () => {
         const {
             extraContent, onClickCandidate, onClickReservation, availability, isLoading, itemClass,
-            itemProps, longLabel, onClickLabel, lazyScroll, datePicker: {minHour, maxHour, hourStep, mode},
+            itemProps, longLabel, onClickLabel, lazyScroll, datePicker: {minHour, maxHour, hourStep, mode, dateRange},
             showUnused, fixedHeight, emptyMessage
         } = this.props;
         let Component = DailyTimelineContent;
         let rows = this.calcDailyRows(availability);
+        const componentProps = {};
 
         if (mode === 'weeks') {
             Component = WeeklyTimelineContent;
@@ -181,6 +183,10 @@ export default class ElasticTimeline extends React.Component {
         } else if (mode === 'months') {
             Component = MonthlyTimelineContent;
             rows = this.calcMonthlyRows(availability);
+        }
+
+        if (mode === 'weeks' || mode === 'months') {
+            componentProps.dateRange = dateRange;
         }
 
         if (!showUnused) {
@@ -195,7 +201,8 @@ export default class ElasticTimeline extends React.Component {
             <div styleName="timeline">
                 <>
                     {extraContent}
-                    <Component rows={rows}
+                    <Component {...componentProps}
+                               rows={rows}
                                minHour={minHour}
                                maxHour={maxHour}
                                hourStep={hourStep}
