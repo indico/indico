@@ -154,39 +154,59 @@
             }
         }
 
-        .availabiity-message {
+        .availability-message-container {
             display: none;
             padding-top: 50px;
 
-            .content {
-                display: flex;
+            .availability-message {
                 align-items: center;
+                justify-content: flex-start;
+                display: flex;
+                padding: 0.6em;
 
-                &.available {
-                    justify-content: space-between;
-
-                    .icon {
-                        color: $green;
-                        font-size: 1.4em;
-                    }
-                }
-
-                &.conflict-booking {
-                    justify-content: flex-start;
+                &.error {
+                    @include border-all($red);
+                    background-color: $light-red;
 
                     .icon {
                         color: $red;
-                        font-size: 1.4em;
                     }
                 }
 
-                &.conflict-prebooking {
-                    justify-content: flex-start;
+                &.info {
+                    @include border-all($blue);
+                    background-color: $light-blue;
 
                     .icon {
-                        color: $orange;
-                        font-size: 1.4em;
+                        color: $blue;
                     }
+                }
+
+                &.success {
+                    @include border-all($green);
+                    background-color: $light-green;
+
+                    .icon {
+                        color: $green;
+                    }
+                }
+
+                &.warning {
+                    @include border-all($yellow);
+                    background-color: $light-yellow;
+
+                    .icon {
+                        color: $yellow;
+                    }
+                }
+
+                .icon {
+                    font-size: 1.4em;
+                    margin: 0.2em 0.6em;
+                }
+
+                a, .switch {
+                    margin-left: auto;
                 }
             }
         }
