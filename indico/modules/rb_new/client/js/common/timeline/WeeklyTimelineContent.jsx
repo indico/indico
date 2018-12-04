@@ -16,8 +16,10 @@
  */
 
 import _ from 'lodash';
+import PropTypes from 'prop-types';
 import React from 'react';
 import {toMoment} from 'indico/utils/date';
+import {toClasses} from 'indico/react/util';
 import DailyTimelineContent, {TimelineRowLabel} from './DailyTimelineContent';
 
 /* eslint-disable no-unused-vars */
@@ -26,6 +28,17 @@ import style from './WeeklyTimelineContent.module.scss';
 /* eslint-enable no-unused-vars */
 
 export default class WeeklyTimelineContent extends DailyTimelineContent {
+    static propTypes = {
+        ...DailyTimelineContent.propTypes,
+        dateRange: PropTypes.array.isRequired,
+    };
+
+    get dates() {
+        const {rows} = this.props;
+        const [row] = rows;
+        return row ? row.availability.map(([dt]) => dt) : [];
+    }
+
     renderTimelineRow({availability, room, label, conflictIndicator}, key, rowStyle = null) {
         const {
             minHour, maxHour, itemClass: ItemClass, itemProps, longLabel,
@@ -34,6 +47,7 @@ export default class WeeklyTimelineContent extends DailyTimelineContent {
         const hasConflicts = availability.some(([, {conflicts}]) => (
             !!conflicts.length
         ));
+
         return (
             <div styleName="baseStyle.timeline-row" key={key} style={rowStyle}>
                 <TimelineRowLabel label={label}
@@ -71,27 +85,32 @@ export default class WeeklyTimelineContent extends DailyTimelineContent {
             return null;
         }
 
+        const {dateRange} = this.props;
+        const emptyDays = this.dates
+            .filter(day => dateRange.length !== 0 && !dateRange.includes(day))
+            .map(day => this.dates.findIndex((el) => el === day));
+
         return (
             _.times(7, n => (
                 <div styleName="style.timeline-day-divider"
+                     className={toClasses({hidden: emptyDays.includes(n), visible: !emptyDays.includes(n)})}
                      style={{left: `${n * daySize}%`, width: `${daySize}%`}}
                      key={`day-divider-${n}`}>
-                    {super.renderDividers(hourSpan, hourStep)}
+                    {emptyDays.includes(n) || super.renderDividers(hourSpan, hourStep)}
                 </div>
             ))
         );
     }
 
     renderHeader() {
-        const {longLabel, selectable, rows} = this.props;
+        const {longLabel, selectable} = this.props;
         const labelWidth = longLabel ? 200 : 150;
-        const dates = rows.length ? rows[0].availability.map(([dt]) => dt) : [];
         return (
             <>
                 <div styleName="baseStyle.timeline-header" className={!selectable ? 'timeline-non-selectable' : ''}>
                     <div style={{minWidth: labelWidth}} />
                     <div styleName="style.timeline-header-labels">
-                        {_.map(dates, (dt, n) => (
+                        {_.map(this.dates, (dt, n) => (
                             <div styleName="style.timeline-header-label"
                                  key={`timeline-header-${n}`}>
                                 <span styleName="style.timeline-label-text">

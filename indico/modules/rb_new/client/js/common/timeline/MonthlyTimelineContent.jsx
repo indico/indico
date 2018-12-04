@@ -18,6 +18,7 @@
 import _ from 'lodash';
 import React from 'react';
 import {toMoment} from 'indico/utils/date';
+import {toClasses} from 'indico/react/util';
 import WeeklyTimelineContent, {TimelineRowLabel} from './DailyTimelineContent';
 
 /* eslint-disable no-unused-vars */
@@ -75,9 +76,15 @@ export default class MonthlyTimelineContent extends WeeklyTimelineContent {
         const nDays = this.dates.length;
         const daySize = (100 / nDays);
 
+        const {dateRange} = this.props;
+        const emptyDays = this.dates
+            .filter(day => dateRange.length !== 0 && !dateRange.includes(day))
+            .map(day => this.dates.findIndex((el) => el === day));
+
         return (
             _.times(nDays, n => (
                 <div styleName="style.timeline-day-divider"
+                     className={toClasses({hidden: emptyDays.includes(n), visible: !emptyDays.includes(n)})}
                      style={{left: `${n * daySize}%`, width: `${daySize}%`}}
                      key={`day-divider-${n}`} />
             ))
