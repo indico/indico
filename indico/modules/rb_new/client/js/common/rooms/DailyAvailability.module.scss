@@ -18,15 +18,5 @@
 .availability-container {
     display: flex;
     align-items: center;
-    justify-content: space-around;
     padding-bottom: 5px;
-}
-
-.availability-delete-button {
-    &:hover {
-        opacity: 1 !important;
-    }
-    cursor: pointer;
-    color: #DB2828;
-    opacity: 0.5 !important;
 }

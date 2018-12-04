@@ -34,14 +34,6 @@ def _populate_room(room, properties):
     return room
 
 
-def get_room_attributes(room_id):
-    attributes = RoomAttributeAssociation.query.filter(RoomAttributeAssociation.room_id == room_id).all()
-    custom_attributes = {}
-    for attribute in attributes:
-        custom_attributes[attribute.attribute.name] = attribute.value
-    return custom_attributes
-
-
 def update_room_equipment(room, properties):
     if 'available_equipment' in properties:
         available_equipment_ids = properties['available_equipment']

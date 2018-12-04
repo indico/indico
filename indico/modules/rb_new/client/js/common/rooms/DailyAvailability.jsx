@@ -18,34 +18,50 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
-import {Icon} from 'semantic-ui-react';
+import shortid from 'shortid';
+import {Button, Icon} from 'semantic-ui-react';
+import {serializeTime} from 'indico/utils/date';
 import TimeRangePicker from '../../components/TimeRangePicker';
 
 import './DailyAvailability.module.scss';
 
-export default class RoomEditModal extends React.Component {
+
+export default class DailyAvailability extends React.Component {
     static propTypes = {
         onChange: PropTypes.func.isRequired,
-        onFocus: PropTypes.func.isRequired,
-        onBlur: PropTypes.func.isRequired,
         value: PropTypes.arrayOf(PropTypes.object).isRequired,
     };
 
 
     render() {
-        const {value, onChange, onFocus, onBlur} = this.props;
-        if (!value) {
-            return;
-        }
-        return value.map((bookableHour) => {
-            return (
-                <div key={`${bookableHour.startTime}_${bookableHour.endTime}`} styleName="availability-container">
-                    <TimeRangePicker startTime={moment(bookableHour.startTime, 'HH:mm:ss')}
-                                     endTime={moment(bookableHour.endTime, 'HH:mm:ss')}
-                                     onChange={(startTime, endTime) => onChange([...value, {startTime, endTime}])} />
-                    <Icon floated="right" name="trash" styleName="availability-delete-button" />
-                </div>
-            );
-        });
+        const {value, onChange} = this.props;
+        return (
+            <>
+                <Button type="button"
+                        className="room-edit-modal-add-btn"
+                        icon labelPosition="left"
+                        onClick={() => onChange([...value, {startTime: '08:00', endTime: '17:00', key: shortid.generate()}])}>
+                    <Icon name="plus" />
+                    Add new Daily Availibity
+                </Button>
+                {value && value.map((bookableHour) => {
+                    const {startTime: startT, endTime: endT, key} = bookableHour;
+                    return (
+                        <div key={key} className="flex-container">
+                            <TimeRangePicker startTime={moment(startT, 'HH:mm')}
+                                             endTime={moment(endT, 'HH:mm')}
+                                             onChange={(startTime, endTime) => onChange([...value.map(v => (v.key === key ? {...v,
+                                                                                                                             startTime: serializeTime(startTime),
+                                                                                                                             endTime: serializeTime(endTime)} : v))])
+                                             } />
+                            <Icon floated="right" name="trash" className="trash-button" onClick={() => {
+                                onChange([...value.filter((bH) => bH.key !== key)]);
+                            }} />
+                        </div>
+                    );
+                })}
+                {!value && <div>No daily availability found</div>}
+            </>
+        );
     }
 }

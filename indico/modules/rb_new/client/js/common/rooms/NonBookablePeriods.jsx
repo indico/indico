@@ -16,10 +16,13 @@
  */
 
 import React from 'react';
-import PropTypes from 'prop-types';
 import moment from 'moment';
-import {SingleDatePicker} from 'indico/react/components';
-import TimeRangePicker from '../../components/TimeRangePicker';
+import PropTypes from 'prop-types';
+import shortid from 'shortid';
+import {Icon, Button} from 'semantic-ui-react';
+import {ANCHOR_RIGHT} from 'react-dates/constants';
+import {DateRangePicker} from 'indico/react/components';
+import {serializeDate} from 'indico/utils/date';
 
 import './NonBookablePeriods.module.scss';
 
@@ -27,38 +30,38 @@ import './NonBookablePeriods.module.scss';
 export default class NonBookablePeriods extends React.Component {
     static propTypes = {
         onChange: PropTypes.func.isRequired,
-        onFocus: PropTypes.func.isRequired,
-        onBlur: PropTypes.func.isRequired,
         value: PropTypes.array.isRequired,
-        disabled: PropTypes.bool,
-    };
-
-    static defaultProps = {
-        disabled: false,
     };
 
     render() {
-        const {onChange, onFocus, onBlur, value} = this.props;
+        const {onChange, value} = this.props;
         return (
             <>
-                {value.map((dateRangeItem) => {
-                    const {startDt, endDt} = dateRangeItem;
+                <Button type="button"
+                        className="room-edit-modal-add-btn"
+                        icon labelPosition="left"
+                        onClick={() => onChange([...value, {startDt: null, endDt: null, key: shortid.generate()}])}>
+                    <Icon name="plus" />
+                    Add new Nonbookable Periods
+                </Button>
+                {value && value.map((dateRangeItem) => {
+                    const {startDt, endDt, key} = dateRangeItem;
                     return (
-                        <>
-                            <div styleName="periods-container">
-                                <SingleDatePicker key={`${startDt}_${endDt}`}
-                                                  date={moment(startDt)}
-                                                  DatesChange={({startDate}) => null} />
-                                <SingleDatePicker key={`${startDt}_${endDt}`}
-                                                  date={moment(endDt)}
-                                                  DatesChange={({startDate}) => null} />
-                            </div>
-                            <TimeRangePicker startTime={moment(startDt)}
-                                             endTime={moment(endDt)}
-                                             onChange={(startTime, endTime) => null} />
-                        </>
+                        <div key={key} className="flex-container">
+                            <DateRangePicker small
+                                             anchorDirection={ANCHOR_RIGHT}
+                                             startDate={startDt === null ? null : moment(startDt)}
+                                             endDate={endDt === null ? null : moment(endDt)}
+                                             onDatesChange={({startDate, endDate}) => onChange([...value.map(v => (v.key === key ? {...v,
+                                                                                                                                    startDt: serializeDate(startDate),
+                                                                                                                                    endDt: serializeDate(endDate)} : v))])
+                                             } />
+
+                            <Icon floated="right" name="trash" className="trash-button" onClick={() => onChange([...value.filter((dA) => dA.key !== key)])} />
+                        </div>
                     );
                 })}
+                {!value && <div>No non bookable periods found</div>}
             </>
 
         );

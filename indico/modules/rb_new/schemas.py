@@ -55,14 +55,6 @@ class RoomAttributeValuesSchema(mm.ModelSchema):
         fields = ('value', 'title')
 
 
-class AdminRoomAttributesSchema(mm.ModelSchema):
-    attribute_object = Nested(dict(name=String(attribute='attribute.name'), value=String(attribute='attribute.value')), many=True)# {'attribute.name': 'attribute.value'}
-
-    class Meta:
-        model = RoomAttributeAssociation
-        fields = ('attribute_object',)
-
-
 class AttributesSchema(mm.ModelSchema):
     class Meta:
         model = RoomAttribute
@@ -359,9 +351,7 @@ rb_user_schema = RBUserSchema()
 rooms_schema = RoomSchema(many=True)
 room_attribute_values_schema = RoomAttributeValuesSchema(many=True)
 room_update_schema = RoomUpdateSchema()
-
 room_equipment_schema = RoomEquipmentSchema()
-admin_room_attributes_schema = AdminRoomAttributesSchema(many=True)
 map_areas_schema = MapAreaSchema(many=True)
 reservation_occurrences_schema = ReservationOccurrenceSchema(many=True)
 reservation_occurrences_schema_with_permissions = ReservationOccurrenceSchemaWithPermissions(many=True)

@@ -16,6 +16,7 @@
  */
 
 @import 'base/palette';
+@import 'rb_new:styles/palette';
 
 $indico-top-bar-height: 50px;
 
@@ -47,6 +48,31 @@ a {
 
     .indico-user-menu {
         margin-left: auto;
+    }
+}
+
+.room-edit-modal-add-btn {
+    margin-bottom: 15px !important;
+}
+
+.flex-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+
+    .DateRangePicker {
+        padding-bottom: 0 !important;
+    }
+}
+
+.trash-button {
+    cursor: pointer;
+    color: $sui-red;
+    opacity: 0.5 !important;
+    padding-left: 15px;
+
+    &:hover {
+        opacity: 1 !important;
     }
 }
 

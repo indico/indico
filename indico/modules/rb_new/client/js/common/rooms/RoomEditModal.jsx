@@ -28,7 +28,8 @@ import PropTypes from 'prop-types';
 import {Button, Checkbox, Dimmer, Dropdown, Form, Grid, Header, Input, Loader, Modal, TextArea} from 'semantic-ui-react';
 import {Form as FinalForm, Field} from 'react-final-form';
 import {FieldArray} from 'react-final-form-arrays';
-import arrayMutators from "final-form-arrays";
+import arrayMutators from 'final-form-arrays';
+import shortid from 'shortid';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import camelizeKeys from 'indico/utils/camelize';
 import {ReduxCheckboxField, ReduxFormField} from 'indico/react/forms';
@@ -89,9 +90,8 @@ const columns = [
         name: 'comments',
         label: Translate.string('Comments'),
     }, {
-        type: 'headerWithButton',
+        type: 'header',
         label: Translate.string('Daily availability'),
-        action: 'dailyHours'
     }, {
         type: 'timeRange',
     }], [{
@@ -185,9 +185,8 @@ const columns = [
         type: 'equipment',
         placeholder: Translate.string('Add new equipment')
     }, {
-        type: 'headerWithButton',
-        label: Translate.string('Nonbookable Hours'),
-        action: 'nonBookableHours'
+        type: 'header',
+        label: Translate.string('Nonbookable Periods'),
     }, {
         type: 'dateRange'
     }]];
@@ -265,8 +264,17 @@ class RoomEditModal extends React.Component {
             handleAxiosError(error);
             return;
         }
-        console.warn(camelizeKeys(response.data));
-        this.setState({roomAvailability: camelizeKeys(response.data)});
+        const roomAvailability = camelizeKeys(response.data);
+        roomAvailability.nonbookablePeriods.map(o => {
+            o.key = shortid.generate();
+            return o;
+        });
+        roomAvailability.bookableHours.map(o => {
+            o.key = shortid.generate();
+            return o;
+        });
+
+        this.setState({roomAvailability});
     }
 
     async fetchRoomEquipment() {
@@ -287,6 +295,7 @@ class RoomEditModal extends React.Component {
     };
 
     handleSubmit = async (formData) => {
+        console.warn(formData);
         const {actions: {updateRoom}, room: {id}} = this.props;
         const rv = await updateRoom(id, formData);
         if (rv.error) {
@@ -301,7 +310,7 @@ class RoomEditModal extends React.Component {
     renderAttributes = (content) => {
         const {attributes} = this.state;
         if (!attributes) {
-            return;
+            return null;
         }
         return (
             <FieldArray name="attributes">
@@ -309,29 +318,30 @@ class RoomEditModal extends React.Component {
                     const options = this.generateAttributeOptions(attributes, fields.value);
                     return (
                         <div>
-                            <Dropdown button
-                                    text={content.placeholder}
-                                    className="icon"
-                                    floating
-                                    labeled
-                                    icon="add"
-                                    options={options}
-                                    search
-                                    disabled={options.length === 0}
-                                    selectOnBlur={false}
-                                    onChange={(event, values) => fields.push({title: values.value, value: null})} />
+                            <Dropdown className="icon room-edit-modal-add-btn"
+                                      button
+                                      text={content.placeholder}
+                                      floating
+                                      labeled
+                                      icon="add"
+                                      options={options}
+                                      search
+                                      disabled={options.length === 0}
+                                      selectOnBlur={false}
+                                      onChange={(event, values) => fields.push({title: values.value, value: null})} />
                             {fields.map((attribute, index) => (
                                 <div key={attribute}>
                                     <Field label={fields.value[index].title}
-                                        name={`${attribute}.value`}
-                                        component={ReduxFormField}
-                                        as={Input}
-                                        isEqual={_.isEqual}
-                                        icon={{name: 'trash', color: 'red', link: true, onClick: () => fields.remove(index)}} />
+                                           name={`${attribute}.value`}
+                                           component={ReduxFormField}
+                                           as={Input}
+                                           isEqual={_.isEqual}
+                                           icon={{name: 'trash', color: 'red', link: true, onClick: () => fields.remove(index)}} />
                                 </div>
                             ))}
                         </div>
-                )}}
+                    );
+                }}
             </FieldArray>
         );
     };
@@ -376,7 +386,7 @@ class RoomEditModal extends React.Component {
     );
 
     renderContent = (content) => {
-        const {room, roomEquipment, roomAvailability} = this.state;
+        const {room, roomEquipment} = this.state;
         const {equipmentTypes} = this.props;
         if (!equipmentTypes) {
             return;
@@ -434,28 +444,13 @@ class RoomEditModal extends React.Component {
                            isEqual={_.isEqual}
                            render={this.renderEquipmentList} />
                 );
-            case 'headerWithButton':
-                return (
-                    <Header key={content.label} styleName="button-header">
-                        {content.label}
-                        <Button size="small" onClick={content.action === 'dailyHours' ? null : null}>Add</Button>
-                    </Header>
-                );
             case 'timeRange':
-                if (!roomAvailability || !roomAvailability.bookableHours.length) {
-                    return <div key={1}>No bookable hours found</div>;
-                }
-
                 return (
                     <Field name="bookableHours"
                            isEqual={_.isEqual}
                            render={this.renderHours} />
                 );
             case 'dateRange':
-                if (!roomAvailability || !roomAvailability.nonbookablePeriods.length) {
-                    return <div key={2}>No non bookable periods found </div>;
-                }
-
                 return (
                     <Field name="nonbookablePeriods"
                            isEqual={_.isEqual}
@@ -494,13 +489,6 @@ class RoomEditModal extends React.Component {
         );
     };
 
-    addAttribute = (newAttributeName) => {
-        const {roomAttributes} = this.state;
-        const newAttribute = {
-            [newAttributeName]: null
-        };
-        this.setState({roomAttributes: {...roomAttributes, ...newAttribute}});
-    };
 
     generateAttributeOptions = (attributes, arrayFields) => {
         const fieldNames = arrayFields.map(field => field.title);

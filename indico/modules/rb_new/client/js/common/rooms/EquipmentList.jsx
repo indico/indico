@@ -25,6 +25,7 @@ import * as roomsSelectors from './selectors';
 
 import './EquipmentList.module.scss';
 
+
 class EquipmentList extends React.Component {
     static propTypes = {
         onChange: PropTypes.func.isRequired,
@@ -32,12 +33,7 @@ class EquipmentList extends React.Component {
         onBlur: PropTypes.func.isRequired,
         value: PropTypes.array.isRequired,
         label: PropTypes.string.isRequired,
-        disabled: PropTypes.bool,
         equipmentTypes: PropTypes.arrayOf(PropTypes.object).isRequired,
-    };
-
-    static defaultProps = {
-        disabled: false,
     };
 
     generateEquipmentOptions = () => {
@@ -56,7 +52,6 @@ class EquipmentList extends React.Component {
         }
         const equipmentTypesMapped = _.mapKeys(equipmentTypes, 'id');
         const options = this.generateEquipmentOptions();
-
         return (
             <>
                 <Dropdown button
