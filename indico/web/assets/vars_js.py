@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 import os
 
 from flask import current_app, json, render_template, session
-from werkzeug.urls import url_parse
+from werkzeug.urls import url_join, url_parse
 
 from indico.core.auth import multipass
 from indico.core.config import config
@@ -120,6 +120,7 @@ def generate_global_file():
                 'room': {
                     'check_available': url_rule_to_js('rooms_new.check_room_available'),
                 },
+                'calendar': url_join(url_for('rooms_new.roombooking'), 'calendar')
             },
             'RoomBookingBookRoom': url_rule_to_js('rooms.room_book'),
             'RoomBookingBook': url_rule_to_js('rooms.book'),
