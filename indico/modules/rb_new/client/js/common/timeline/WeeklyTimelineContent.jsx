@@ -88,7 +88,7 @@ export default class WeeklyTimelineContent extends DailyTimelineContent {
         const dates = rows.length ? rows[0].availability.map(([dt]) => dt) : [];
         return (
             <>
-                <div styleName="baseStyle.timeline-header" className={!selectable && 'timeline-non-selectable'}>
+                <div styleName="baseStyle.timeline-header" className={!selectable ? 'timeline-non-selectable' : ''}>
                     <div style={{minWidth: labelWidth}} />
                     <div styleName="style.timeline-header-labels">
                         {_.map(dates, (dt, n) => (

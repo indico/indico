@@ -145,38 +145,39 @@ export default class DailyTimelineContent extends React.Component {
         const labelWidth = longLabel ? 200 : 150;
 
         return (
-            <div styleName="timeline-content"
-                 className={!selectable && 'timeline-non-selectable'}
-                 style={{width}}>
-                <div style={{
-                    left: labelWidth,
-                    width: `calc(100% - ${labelWidth}px)`,
-                }}
-                     styleName="timeline-lines">
-                    {this.renderDividers(hourSpan, hourStep)}
+            <>
+                <div styleName="timeline-content"
+                     className={!selectable ? 'timeline-non-selectable' : ''}
+                     style={{width}}>
+                    <div style={{left: labelWidth, width: `calc(100% - ${labelWidth}px)`}}
+                         styleName="timeline-lines">
+                        {this.renderDividers(hourSpan, hourStep)}
+                    </div>
+                    <div>
+                        <List width={width}
+                              height={height}
+                              rowCount={rows.length}
+                              overscanRowCount={15}
+                              rowHeight={50}
+                              rowRenderer={({index, style, key}) => (
+                                  this.renderTimelineRow(rows[index], key, style)
+                              )}
+                              {...extraProps}
+                              tabIndex={null} />
+                    </div>
                 </div>
-                <div>
-                    <List width={width}
-                          height={height}
-                          rowCount={rows.length}
-                          overscanRowCount={15}
-                          rowHeight={50}
-                          rowRenderer={({index, style, key}) => (
-                              this.renderTimelineRow(rows[index], key, style)
-                          )}
-                          {...extraProps}
-                          tabIndex={null} />
-                    {isLoading && (
-                        _.range(0, 10).map((i) => (
-                            <Placeholder key={i} styleName="timeline-item-placeholder" fluid>
+                {isLoading && (
+                    <div style={{marginTop: 10}}>
+                        {_.range(0, 10).map((i) => (
+                            <Placeholder key={i} styleName="timeline-item-placeholder" style={{width}} fluid>
                                 <Placeholder.Paragraph>
                                     <Placeholder.Line />
                                 </Placeholder.Paragraph>
                             </Placeholder>
-                        ))
-                    )}
-                </div>
-            </div>
+                        ))}
+                    </div>
+                )}
+            </>
         );
     }
 
