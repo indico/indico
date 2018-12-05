@@ -18,7 +18,6 @@ from __future__ import unicode_literals
 
 from datetime import date, datetime, time, timedelta
 
-import dateutil
 from flask import jsonify, request, session
 from sqlalchemy.orm import subqueryload
 from webargs import fields

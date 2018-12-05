@@ -33,7 +33,6 @@ from indico.modules.events.layout import layout_settings
 from indico.modules.events.logs.util import make_diff_log
 from indico.modules.events.models.events import EventType
 from indico.modules.events.models.references import ReferenceType
-from indico.modules.rb_new.operations.bookings import create_booking_for_event
 from indico.util.user import principal_from_fossil
 
 
@@ -67,6 +66,7 @@ def create_event_references(event, data):
 
 @no_autoflush
 def create_event(category, event_type, data, add_creator_as_manager=True, features=None):
+    from indico.modules.rb_new.operations.bookings import create_booking_for_event
     """Create a new event.
 
     :param category: The category in which to create the event
