@@ -102,7 +102,7 @@
         }
 
         function isCategoryExcluded(categoryId) {
-            options.rbExcludedCategories.some((excludedCategory) => {
+            return options.rbExcludedCategories.some((excludedCategory) => {
                 return (parseInt(excludedCategory.id, 10) === categoryId);
             });
         }
