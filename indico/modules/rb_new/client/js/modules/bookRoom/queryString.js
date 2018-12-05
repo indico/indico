@@ -17,7 +17,7 @@
 
 import _ from 'lodash';
 import {createQueryStringReducer, validator as v} from 'redux-router-querystring';
-import {boolStateField} from '../../util';
+import {boolStateField, defaultStateField} from '../../util';
 
 import * as globalActions from '../../actions';
 import * as actions from './actions';
@@ -32,7 +32,11 @@ export const rules = {
         validator: v.isBoolean(),
         sanitizer: v.toBoolean(),
         stateField: boolStateField('timeline.data.isVisible')
-    }
+    },
+    mode: {
+        validator: v.isIn(['days', 'weeks', 'months']),
+        stateField: defaultStateField('timeline.datePicker.mode', 'days'),
+    },
 };
 
 export const routeConfig = {
@@ -43,10 +47,13 @@ export const routeConfig = {
             serialize: queryFilterRules
         },
         {
-            listen: actions.TOGGLE_TIMELINE_VIEW,
+            listen: [
+                actions.TOGGLE_TIMELINE_VIEW,
+                actions.SET_TIMELINE_MODE
+            ],
             select: ({bookRoom: {timeline}}) => ({timeline}),
             serialize: rules
-        }
+        },
     ]
 };
 
