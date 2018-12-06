@@ -94,13 +94,14 @@ Overridable.defaultProps = {
  * @param {React.Component} Component - the react component to be wrapped
  */
 Overridable.component = (id, Component) => {
-    const _Overridable = ({children, overrides, ...props}) => {
+    const _Overridable = ({children, overrides, dispatch, ...props}) => {
         // the logic here is simpler: the wrapped component is itself the content
         return React.createElement(overrides[id] ? overrides[id] : Component, props, children);
     };
     _Overridable.propTypes = {
         children: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
-        overrides: PropTypes.object.isRequired
+        overrides: PropTypes.object.isRequired,
+        dispatch: PropTypes.func.isRequired
     };
     _Overridable.defaultProps = {
         children: null
