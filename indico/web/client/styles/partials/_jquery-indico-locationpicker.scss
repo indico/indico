@@ -134,7 +134,7 @@
         .toggle-results-list {
             position: absolute;
             padding: 0.5em 0.6em;
-            top: 0;
+            top: 0.3em;
             right: 0;
             line-height: 1.5;
             cursor: pointer;
@@ -247,7 +247,7 @@
     background-color: $pastel-blue;
     padding: 2px;
     position: absolute;
-    top: 0.5em;
+    top: 0.6em;
     left: 0.95em;
     max-width: 84%;
     color: transparent;
