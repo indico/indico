@@ -78,7 +78,7 @@
         }
 
         function setLectureTimes(occurrence) {
-            startDt = moment(`${occurrence['date']} ${occurrence['time']}`, 'DD-MM-YYYY HH:mm');
+            startDt = moment(`${occurrence['date']} ${occurrence['time']}`, 'YYYY-MM-DD HH:mm');
             endDt = moment(startDt).add(occurrence['duration'], 'minutes');
         }
 
