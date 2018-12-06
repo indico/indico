@@ -49,10 +49,6 @@ export default function Menu({labels}) {
                 <Icon name="calendar" />
                 {finalLabels.calendar}
             </MenuItem>
-            <MenuItem key="blockings" path="/blockings" namespace="blockings">
-                <Icon name="window close" />
-                {finalLabels.blockings}
-            </MenuItem>
         </ul>
     );
 }
