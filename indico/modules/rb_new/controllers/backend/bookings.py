@@ -34,8 +34,7 @@ from indico.modules.rb_new.controllers.backend.common import search_room_args
 from indico.modules.rb_new.operations.bookings import get_booking_occurrences, get_room_calendar, get_rooms_availability
 from indico.modules.rb_new.operations.suggestions import get_suggestions
 from indico.modules.rb_new.schemas import (create_booking_args, reservation_details_occurrences_schema,
-                                           reservation_details_schema, reservation_event_data_schema,
-                                           reservation_schema)
+                                           reservation_details_schema, reservation_event_data_schema)
 from indico.modules.rb_new.util import (group_by_occurrence_date, serialize_blockings, serialize_nonbookable_periods,
                                         serialize_occurrences, serialize_unbookable_hours)
 from indico.modules.users.models.users import User
@@ -95,10 +94,13 @@ class RHCalendar(RHRoomBookingBase):
     @use_kwargs({
         'start_date': fields.Date(),
         'end_date': fields.Date(),
+        'my_bookings': fields.Bool(missing=False),
         'room_ids': fields.List(fields.Int(), missing=None)
     })
-    def _process(self, start_date, end_date, room_ids):
-        calendar = get_room_calendar(start_date or date.today(), end_date or date.today(), room_ids)
+    def _process(self, start_date, end_date, room_ids, my_bookings):
+        booked_for_user = session.user if my_bookings else None
+        calendar = get_room_calendar(start_date or date.today(), end_date or date.today(), room_ids,
+                                     booked_for_user=booked_for_user)
         return jsonify(_serialize_availability(calendar).values())
 
 

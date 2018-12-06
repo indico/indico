@@ -24,5 +24,9 @@ export const ajax = {
     ),
     end_date: ({selectedDate, mode}) => (
         serializeDate(toMoment(selectedDate).endOf(mode))
-    )
+    ),
+    my_bookings: {
+        onlyIf: ({myBookings}) => myBookings,
+        serializer: ({myBookings}) => myBookings,
+    },
 };

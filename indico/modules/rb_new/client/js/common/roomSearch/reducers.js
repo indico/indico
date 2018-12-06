@@ -65,6 +65,10 @@ export function initialRoomFilterStateFactory(namespace) {
                 endTime: null
             },
         });
+    } else if (namespace === 'calendar') {
+        Object.assign(state, {
+            myBookings: false,
+        });
     }
 
     return state;

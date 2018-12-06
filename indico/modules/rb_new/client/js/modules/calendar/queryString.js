@@ -22,7 +22,7 @@ import {createQueryStringReducer, validator as v} from 'redux-router-querystring
 import * as actions from '../../actions';
 import {history} from '../../store';
 import {initialState} from './reducers';
-import {defaultStateField} from '../../util';
+import {defaultStateField, boolStateField} from '../../util';
 import {actions as filtersActions} from '../../common/filters';
 import {queryStringRules as roomSearchQueryStringRules} from '../../common/roomSearch';
 import * as calendarActions from './actions';
@@ -37,7 +37,12 @@ const rules = {
     mode: {
         validator: v.isIn(['days', 'weeks', 'months']),
         stateField: defaultStateField('datePicker.mode', 'days'),
-    }
+    },
+    my_bookings: {
+        validator: v.isBoolean(),
+        sanitizer: v.toBoolean(),
+        stateField: boolStateField('filters.myBookings'),
+    },
 };
 
 

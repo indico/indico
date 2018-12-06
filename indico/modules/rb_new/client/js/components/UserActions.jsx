@@ -27,13 +27,13 @@ import {actions as blockingsActions} from '../modules/blockings';
 import {actions as filtersActions} from '../common/filters';
 
 
-function UserActions({isAdmin, hasOwnedRooms, gotoMyRoomsList, gotoMyBlockings, gotoRBAdminArea}) {
+function UserActions({isAdmin, hasOwnedRooms, gotoMyRoomsList, gotoMyBlockings, gotoRBAdminArea, gotoMyBookings}) {
     const avatar = <Icon name="user" size="large" />;
     const options = [];
     options.push({
         key: 'my_bookings',
         text: Translate.string('My Bookings'),
-        disabled: true,
+        onClick: gotoMyBookings,
     });
     if (hasOwnedRooms) {
         options.push({
@@ -70,6 +70,7 @@ UserActions.propTypes = {
     gotoMyRoomsList: PropTypes.func.isRequired,
     gotoMyBlockings: PropTypes.func.isRequired,
     gotoRBAdminArea: PropTypes.func.isRequired,
+    gotoMyBookings: PropTypes.func.isRequired,
 };
 
 
@@ -90,5 +91,9 @@ export default connect(
         gotoRBAdminArea() {
             dispatch(pushRoute('/admin'));
         },
+        gotoMyBookings() {
+            dispatch(filtersActions.setFilterParameter('calendar', 'myBookings', true));
+            dispatch(pushRoute('/calendar?my_bookings=true'));
+        }
     })
 )(UserActions);

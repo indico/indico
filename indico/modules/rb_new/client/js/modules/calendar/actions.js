@@ -46,13 +46,19 @@ export function setMode(mode) {
 export function fetchCalendar(fetchRooms = true) {
     return async (dispatch, getState) => {
         dispatch({type: FETCH_REQUEST});
-        const {calendar: {filters, data: {roomIds}, datePicker}} = getState();
+        const {
+            calendar: {
+                filters: {myBookings, ...roomFilters},
+                data: {roomIds},
+                datePicker
+            }
+        } = getState();
         let newRoomIds = roomIds;
 
         if (fetchRooms) {
             newRoomIds = null;
-            if (!_.isEmpty(filters)) {
-                const searchParams = preProcessParameters({...filters}, roomSearchAjaxRules);
+            if (!_.isEmpty(roomFilters)) {
+                const searchParams = preProcessParameters({...roomFilters}, roomSearchAjaxRules);
                 let response;
                 try {
                     response = await indicoAxios.get(searchRoomsURL(), {params: searchParams});
@@ -71,7 +77,7 @@ export function fetchCalendar(fetchRooms = true) {
             }
         }
 
-        const params = preProcessParameters(datePicker, ajaxRules);
+        const params = preProcessParameters({...datePicker, myBookings}, ajaxRules);
         return await ajaxAction(
             () => indicoAxios.post(fetchCalendarURL(), {room_ids: newRoomIds}, {params}),
             null,

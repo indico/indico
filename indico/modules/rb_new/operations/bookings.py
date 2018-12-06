@@ -17,7 +17,7 @@
 from __future__ import unicode_literals
 
 from collections import OrderedDict, defaultdict
-from datetime import datetime, time, timedelta
+from datetime import datetime, time
 from itertools import groupby
 from operator import attrgetter, itemgetter
 
@@ -25,7 +25,6 @@ from sqlalchemy.orm import contains_eager, joinedload
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.queries import db_dates_overlap
-from indico.modules.rb import rb_settings
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import RepeatFrequency, Reservation
 from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
@@ -98,7 +97,6 @@ def get_existing_rooms_occurrences(rooms, start_dt, end_dt, repeat_frequency, re
 
 
 def get_rooms_availability(rooms, start_dt, end_dt, repeat_frequency, repeat_interval):
-    period_days = (end_dt - start_dt).days
     availability = OrderedDict()
     candidates = ReservationOccurrence.create_series(start_dt, end_dt, (repeat_frequency, repeat_interval))
     date_range = sorted(set(cand.start_dt.date() for cand in candidates))
@@ -132,7 +130,7 @@ def get_rooms_availability(rooms, start_dt, end_dt, repeat_frequency, repeat_int
     return date_range, availability
 
 
-def get_room_calendar(start_date, end_date, room_ids):
+def get_room_calendar(start_date, end_date, room_ids, **filters):
     start_dt = datetime.combine(start_date, time(hour=0, minute=0))
     end_dt = datetime.combine(end_date, time(hour=23, minute=59))
     reservation_strategy = contains_eager('reservation')
@@ -147,6 +145,11 @@ def get_room_calendar(start_date, end_date, room_ids):
              .filter(Room.is_active, Room.id.in_(room_ids) if room_ids else True)
              .order_by(db.func.indico.natsort(Room.full_name))
              .options(reservation_strategy))
+
+    booked_for_user = filters.get('booked_for_user')
+    if booked_for_user:
+        query = query.filter(db.or_(Reservation.booked_for_user == booked_for_user,
+                                    Reservation.created_by_user == booked_for_user))
 
     rooms = (Room.query
              .filter(Room.is_active, Room.id.in_(room_ids) if room_ids else True)

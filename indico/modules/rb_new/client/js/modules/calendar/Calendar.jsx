@@ -27,6 +27,7 @@ import searchBarFactory from '../../components/SearchBar';
 import * as calendarActions from './actions';
 import * as calendarSelectors from './selectors';
 import {actions as bookingsActions} from '../../common/bookings';
+import {actions as filtersActions} from '../../common/filters';
 import {selectors as roomsSelectors, actions as roomsActions} from '../../common/rooms';
 import {EditableTimelineItem, ElasticTimeline, TimelineHeader, TimelineItem} from '../../common/timeline';
 import {actions as bookRoomActions} from '../bookRoom';
@@ -49,6 +50,7 @@ class Calendar extends React.Component {
             openRoomDetails: PropTypes.func.isRequired,
             openBookRoom: PropTypes.func.isRequired,
             openBookingDetails: PropTypes.func.isRequired,
+            setFilterParameter: PropTypes.func.isRequired,
         }).isRequired,
         filters: PropTypes.object.isRequired,
     };
@@ -115,15 +117,27 @@ class Calendar extends React.Component {
 
     renderExtraButtons = () => {
         const {showUnused} = this.state;
+        const {filters: {myBookings}, actions: {setFilterParameter}} = this.props;
+
         return (
-            <Popup trigger={<Button size="large"
-                                    primary={!showUnused}
-                                    icon={showUnused ? 'minus square outline' : 'plus square outline'}
-                                    onClick={this.toggleShowUnused} />}>
-                {showUnused
-                    ? <Translate>Hide unused rooms</Translate>
-                    : <Translate>Show unused rooms</Translate>}
-            </Popup>
+            <>
+                <Popup trigger={<Button size="large"
+                                        primary={myBookings}
+                                        icon="user circle"
+                                        onClick={() => setFilterParameter('myBookings', !myBookings || null)} />}>
+                    <Translate>
+                        Show only my bookings
+                    </Translate>
+                </Popup>
+                <Popup trigger={<Button size="large"
+                                        primary={!showUnused}
+                                        icon={showUnused ? 'minus square outline' : 'plus square outline'}
+                                        onClick={this.toggleShowUnused} />}>
+                    {showUnused
+                        ? <Translate>Hide unused rooms</Translate>
+                        : <Translate>Show unused rooms</Translate>}
+                </Popup>
+            </>
         );
     };
 
@@ -199,6 +213,7 @@ export default connect(
             openRoomDetails: roomsActions.openRoomDetails,
             openBookRoom: bookRoomActions.openBookRoom,
             openBookingDetails: bookingsActions.openBookingDetails,
+            setFilterParameter: (name, value) => filtersActions.setFilterParameter('calendar', name, value),
         }, dispatch),
     }),
 )(Calendar);
