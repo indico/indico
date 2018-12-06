@@ -131,7 +131,10 @@
             hideAvailability(resetCheckbox);
 
             if (!('room_id' in roomData) ||
+                !startDt.isValid() ||
+                !endDt.isValid() ||
                 !startDt.isSame(endDt, 'day') ||
+                startDt.isSameOrAfter(endDt) ||
                 isCategoryExcluded(category['id']) ||
                 timezone !== options.serverDefaultTimezone ||
                 multipleOccurrences) {
