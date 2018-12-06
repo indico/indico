@@ -116,14 +116,18 @@
             $message.find('a').prop('href', url);
         }
 
-        function hideAvailability() {
+        function hideAvailability(resetCheckbox) {
             if ($currentMessage) {
+                if (resetCheckbox) {
+                    $('#availability-messages').find("input[id^='create']").prop('checked', false);
+                    $createBooking.val(false);
+                }
                 $currentMessage.hide();
             }
         }
 
-        function updateAvailability() {
-            hideAvailability();
+        function updateAvailability(resetCheckbox = false) {
+            hideAvailability(resetCheckbox);
 
             if (!('room_id' in roomData) ||
                 !startDt.isSame(endDt, 'day') ||
@@ -195,7 +199,7 @@
             $('#event-creation-location_data').on('change', function() {
                 roomData = JSON.parse($(this).val());
                 if (previousRoomId !== roomData['room_id']) {
-                    updateAvailability();
+                    updateAvailability(true);
                 }
             });
 
@@ -241,7 +245,7 @@
                     updateAvailability();
                 } else {
                     $createBooking.val(false);
-                    hideAvailability();
+                    hideAvailability(false);
                 }
             });
 
