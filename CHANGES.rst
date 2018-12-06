@@ -20,6 +20,7 @@ Bugfixes
 - Use friendly IDs in abstract attachment package folder names
 - Fix typo in material package subcontribution folder names
 - Fix check on whether registering for an event is possible
+- Show static text while editing registrations (:issue:`3682`)
 
 Version 2.1.4
 -------------
