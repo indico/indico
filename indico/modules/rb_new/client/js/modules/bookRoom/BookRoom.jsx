@@ -80,6 +80,7 @@ class BookRoom extends React.Component {
         showSuggestions: PropTypes.bool,
         labels: PropTypes.shape({
             bookButton: IndicoPropTypes.i18n,
+            preBookButton: IndicoPropTypes.i18n,
             detailsButton: IndicoPropTypes.i18n
         })
     };
@@ -88,6 +89,7 @@ class BookRoom extends React.Component {
         showSuggestions: true,
         labels: {
             bookButton: <Translate>Book Room</Translate>,
+            preBookButton: <Translate>Pre-Book Room</Translate>,
             detailsButton: <Translate>See details</Translate>
         }
     };
@@ -232,10 +234,15 @@ class BookRoom extends React.Component {
         const {actions: {openRoomDetails}} = this.props;
 
         const bookingModalBtn = room => (
-            <Button positive icon="check" circular onClick={() => this.openBookingForm(room)} />
+            <Button circular
+                    icon="check"
+                    color={room.isAutoConfirm ? 'green' : 'orange'}
+                    onClick={() => this.openBookingForm(room)} />
         );
         const showDetailsBtn = ({id}) => (
-            <Button primary icon="search" circular onClick={() => openRoomDetails(id)} />
+            <Button primary circular
+                    icon="search"
+                    onClick={() => openRoomDetails(id)} />
         );
 
         if (!isTimelineVisible) {
@@ -252,7 +259,9 @@ class BookRoom extends React.Component {
                                         {room => (
                                             <Slot name="actions">
                                                 <Popup trigger={bookingModalBtn(room)}
-                                                       content={labels.bookButton}
+                                                       content={room.isAutoConfirm
+                                                           ? labels.bookButton
+                                                           : labels.preBookButton}
                                                        position="top center"
                                                        hideOnScroll />
                                                 <Popup trigger={showDetailsBtn(room)}
