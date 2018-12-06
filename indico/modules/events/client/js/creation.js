@@ -44,6 +44,7 @@
 
         let currentCategory = null;
         let previousRoomId, $currentMessage, startDt, endDt, category, roomData, timezone;
+        let multipleOccurrences = false;
 
         protectionMessage.appendTo(options.protectionModeFields.closest('.form-field'));
 
@@ -132,7 +133,8 @@
             if (!('room_id' in roomData) ||
                 !startDt.isSame(endDt, 'day') ||
                 isCategoryExcluded(category['id']) ||
-                timezone !== options.serverDefaultTimezone) {
+                timezone !== options.serverDefaultTimezone ||
+                multipleOccurrences) {
                 $createBooking.val(false);
                 return;
             }
@@ -242,11 +244,11 @@
                 const occurrences = JSON.parse($(this).val());
                 if (occurrences.length === 1) {
                     setLectureTimes(occurrences[0]);
-                    updateAvailability();
+                    multipleOccurrences = false;
                 } else {
-                    $createBooking.val(false);
-                    hideAvailability(false);
+                    multipleOccurrences = true;
                 }
+                updateAvailability();
             });
 
             $('#event-creation-timezone').on('change', function() {
