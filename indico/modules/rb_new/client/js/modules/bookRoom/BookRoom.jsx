@@ -145,30 +145,6 @@ class BookRoom extends React.Component {
         openBookingForm(room.id, bookingData);
     }
 
-    renderRoom = (room) => {
-        const {actions: {openRoomDetails}} = this.props;
-        const bookingModalBtn = (
-            <Button positive icon="check" circular onClick={() => this.openBookingForm(room)} />
-        );
-        const showDetailsBtn = (
-            <Button primary icon="search" circular onClick={() => openRoomDetails(room.id)} />
-        );
-        return (
-            <Room key={room.id} room={room} showFavoriteButton>
-                <Slot name="actions">
-                    <Popup trigger={bookingModalBtn}
-                           content={Translate.string('Book room')}
-                           position="top center"
-                           hideOnScroll />
-                    <Popup trigger={showDetailsBtn}
-                           content={Translate.string('See details')}
-                           position="top center"
-                           hideOnScroll />
-                </Slot>
-            </Room>
-        );
-    };
-
     renderFilters(refName) {
         const {[refName]: ref} = this.state;
         const {
