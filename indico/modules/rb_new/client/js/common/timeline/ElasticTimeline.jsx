@@ -151,10 +151,7 @@ export default class ElasticTimeline extends React.Component {
     hasUsage = (availability) => {
         const fields = [
             'preBookings',
-            'blockings',
             'bookings',
-            'nonbookablePeriods',
-            'unbookableHours',
             'candidates'
         ];
         return fields.some(field => !_.isEmpty(availability[field]));
@@ -173,7 +170,7 @@ export default class ElasticTimeline extends React.Component {
         const {
             extraContent, onClickCandidate, onClickReservation, availability, isLoading, itemClass,
             itemProps, longLabel, onClickLabel, lazyScroll, datePicker: {minHour, maxHour, hourStep, mode},
-            showUnused, fixedHeight
+            showUnused, fixedHeight, emptyMessage
         } = this.props;
         let Component = DailyTimelineContent;
         let rows = this.calcDailyRows(availability);
@@ -188,6 +185,10 @@ export default class ElasticTimeline extends React.Component {
 
         if (!showUnused) {
             rows = this.filterUnused(rows, mode);
+        }
+
+        if (!rows.length && !isLoading) {
+            return emptyMessage;
         }
 
         return (
