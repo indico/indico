@@ -20,11 +20,11 @@ import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import {Link, Redirect, Route, Switch} from 'react-router-dom';
 import {ConnectedRouter} from 'connected-react-router';
-import {Dimmer, Icon, Loader} from 'semantic-ui-react';
+import {Dimmer, Icon, Loader, Sidebar} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 import {RouteAwareOverridable, Overridable} from 'indico/react/util';
-import UserActions from '../components/UserActions';
+import SidebarMenu, {SidebarTrigger} from './SidebarMenu';
 import AdminArea from '../modules/admin';
 import Landing from '../modules/landing';
 import Calendar from '../modules/calendar';
@@ -84,13 +84,53 @@ class App extends React.Component {
         iconName: 'home'
     };
 
+    state = {
+        userActionsVisible: false
+    };
+
     componentDidMount() {
         const {fetchInitialData} = this.props;
         fetchInitialData();
     }
 
+    onSidebarHide = () => {
+        this.setState({userActionsVisible: false});
+    };
+
+    renderContent() {
+        const {filtersSet, isInitializing} = this.props;
+        const {userActionsVisible} = this.state;
+        return (
+            <Sidebar.Pushable styleName="rb-pushable">
+                <SidebarMenu visible={userActionsVisible}
+                             onClickOption={this.onSidebarHide} />
+                <Sidebar.Pusher dimmed={userActionsVisible}>
+                    <div styleName="rb-content">
+                        <Switch>
+                            <Route exact path="/" render={() => <Redirect to="/book" />} />
+                            <ConditionalRoute path="/book" render={({location, match: {isExact}}) => (
+                                filtersSet
+                                    ? (
+                                        <BookRoom location={location} />
+                                    ) : (
+                                        isExact ? <Landing /> : <Redirect to="/book" />
+                                    )
+                            )} active={!isInitializing} />
+                            <ConditionalRoute path="/rooms" component={RoomList} active={!isInitializing} />
+                            <ConditionalRoute path="/blockings" component={BlockingList} active={!isInitializing} />
+                            <ConditionalRoute path="/calendar" component={Calendar} active={!isInitializing} />
+                            <ConditionalRoute path="/admin" component={AdminArea} active={!isInitializing} />
+                        </Switch>
+                        <ModalController />
+                    </div>
+                </Sidebar.Pusher>
+            </Sidebar.Pushable>
+        );
+    }
+
     render() {
-        const {title, history, iconName, filtersSet, resetPageState, isInitializing} = this.props;
+        const {title, history, iconName, resetPageState, isInitializing} = this.props;
+        const {userActionsVisible} = this.state;
 
         return (
             <ConnectedRouter history={history}>
@@ -110,27 +150,14 @@ class App extends React.Component {
                             </RouteAwareOverridable>
                         </div>
                         <div styleName="rb-menu-bar-side-right">
-                            <UserActions />
+                            <SidebarTrigger onClick={() => {
+                                this.setState({
+                                    userActionsVisible: true
+                                });
+                            }} active={userActionsVisible} />
                         </div>
                     </header>
-                    <div styleName="rb-content">
-                        <Switch>
-                            <Route exact path="/" render={() => <Redirect to="/book" />} />
-                            <ConditionalRoute path="/book" render={({location, match: {isExact}}) => (
-                                filtersSet
-                                    ? (
-                                        <BookRoom location={location} />
-                                    ) : (
-                                        isExact ? <Landing /> : <Redirect to="/book" />
-                                    )
-                            )} active={!isInitializing} />
-                            <ConditionalRoute path="/rooms" component={RoomList} active={!isInitializing} />
-                            <ConditionalRoute path="/blockings" component={BlockingList} active={!isInitializing} />
-                            <ConditionalRoute path="/calendar" component={Calendar} active={!isInitializing} />
-                            <ConditionalRoute path="/admin" component={AdminArea} active={!isInitializing} />
-                        </Switch>
-                        <ModalController />
-                    </div>
+                    {this.renderContent()}
                     <Dimmer.Dimmable>
                         <Dimmer active={isInitializing} page>
                             <Loader />

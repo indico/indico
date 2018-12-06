@@ -95,3 +95,8 @@
         padding: $rb-content-padding;
     }
 }
+
+.rb-pushable {
+    // make sure that side bar takes the whole remaining height of the page
+    min-height: calc(100vh - #{$menu-height} - 50px);
+}
