@@ -192,7 +192,8 @@ class TimelineItem extends React.Component {
 
     render() {
         const {
-            children, startHour, endHour, data, onClickCandidate, onClickReservation, setSelectable, ...restProps
+            children, startHour, endHour, data, onClickCandidate, onClickReservation,
+            setSelectable, dayBased, ...restProps
         } = this.props;
         return (
             <div styleName="timeline-item" {...restProps}>
