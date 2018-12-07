@@ -21,7 +21,7 @@ from datetime import datetime, time
 from itertools import groupby
 from operator import attrgetter, itemgetter
 
-from flask import session
+from flask import flash, session
 from pytz import timezone
 from sqlalchemy.orm import contains_eager, joinedload
 
@@ -29,7 +29,6 @@ from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.queries import db_dates_overlap
 from indico.core.errors import NoReportError
-from indico.modules.rb import rb_settings
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import RepeatFrequency, Reservation
 from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
@@ -40,8 +39,8 @@ from indico.modules.rb_new.operations.misc import get_rooms_nonbookable_periods,
 from indico.modules.rb_new.util import (group_by_occurrence_date, serialize_blockings, serialize_nonbookable_periods,
                                         serialize_occurrences, serialize_unbookable_hours)
 from indico.util.date_time import iterdays, overlaps
+from indico.util.i18n import _
 from indico.util.struct.iterables import group_list
-from indico.web.util import ExpectedError
 
 
 def group_blockings(blocked_rooms, dates):
@@ -253,8 +252,9 @@ def create_booking_for_event(room_id, event):
         data = dict(start_dt=start_dt, end_dt=end_dt, booked_for_user=event.creator, booking_reason=booking_reason,
                     repeat_frequency=RepeatFrequency.NEVER, event_id=event.id)
         resv = Reservation.create_from_data(room, data, session.user)
-        db.session.flush()
+        return resv
     except NoReportError as e:
-        db.session.rollback()
-        raise ExpectedError(unicode(e))
-    return resv
+        if 'Reservation has no valid occurrences' == e:
+            flash(_("Couldn't create the booking. Probably somebody else booked the room in the meantime."), 'error')
+        else:
+            raise e
