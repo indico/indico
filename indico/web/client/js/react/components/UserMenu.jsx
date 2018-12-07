@@ -58,6 +58,7 @@ export default function UserMenu({userData, languages}) {
 
     const languageSelector = (
         <Dropdown value={language}
+                  selectOnBlur={false}
                   onChange={(_, {value}) => {
                       if (value !== language) {
                           postAndReload(value);
