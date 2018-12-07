@@ -70,10 +70,18 @@ class Calendar extends React.Component {
         fetchCalendar();
     }
 
-    componentDidUpdate({datePicker: {selectedDate: prevDate, mode: prevMode}, filters: prevFilters}) {
-        const {datePicker: {selectedDate, mode}, actions: {fetchCalendar}, filters} = this.props;
-        const filtersChanged = !_.isEqual(prevFilters, filters);
-        if (prevDate !== selectedDate || mode !== prevMode || filtersChanged) {
+    componentDidUpdate(prevProps) {
+        const {
+            datePicker: {selectedDate: prevDate, mode: prevMode},
+            filters: {myBookings: prevMyBookings, ...prevRoomFilters},
+        } = prevProps;
+        const {
+            datePicker: {selectedDate, mode},
+            filters: {myBookings, ...roomFilters},
+            actions: {fetchCalendar},
+        } = this.props;
+        const filtersChanged = !_.isEqual(prevRoomFilters, roomFilters);
+        if (prevDate !== selectedDate || mode !== prevMode || myBookings !== prevMyBookings || filtersChanged) {
             fetchCalendar(filtersChanged);
         }
     }
