@@ -89,10 +89,10 @@ def get_event_section_data(regform, management=False, registration=None):
         section_data = section.own_data
         section_data['items'] = []
 
-        for child in section.fields:
+        for child in section.children:
             if child.is_deleted:
                 continue
-            if isinstance(child.field_impl, ChoiceBaseField) or isinstance(child.field_impl, AccommodationField):
+            if child.is_field and isinstance(child.field_impl, (ChoiceBaseField, AccommodationField)):
                 field_data = get_field_merged_options(child, registration_data)
             else:
                 field_data = child.view_data
