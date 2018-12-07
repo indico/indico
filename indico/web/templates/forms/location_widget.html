@@ -31,6 +31,7 @@ parent object. The key features and expected behaviour is the following:
       the current venue. This is to avoid clearing the venue field by accident
       (see actions after selecting a room option).
 #}
+
 {% extends 'forms/base_widget.html' %}
 {% from '_switch.html' import switch %}
 {% block html %}
@@ -157,7 +158,7 @@ parent object. The key features and expected behaviour is the following:
                         <a target="_blank">{% trans %}See on calendar{% endtrans %}</a>
                     </div>
                 </div>
-                <div id="room-cant-book" class="availability-message-container">
+                <div id="room-cannot-book" class="availability-message-container">
                     <div class="availability-message error">
                         <i class="icon icon-cross"></i>
                         <div>{% trans %}You are not authorized to book this room.{% endtrans %}</div>

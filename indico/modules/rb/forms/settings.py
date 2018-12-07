@@ -32,7 +32,8 @@ GOOGLE_API_KEY_DESC = _('When using the "map of rooms" widget, you need to regis
 class SettingsForm(IndicoForm):
     admin_principals = PrincipalListField(_('Administrators'), groups=True)
     authorized_principals = PrincipalListField(_('Authorized users/groups'), groups=True)
-    excluded_categories = MultipleItemsField('Excluded categories', fields=[{'id': 'id', 'caption': 'Category ID'}])
+    excluded_categories = MultipleItemsField(_('Excluded categories'), fields=[{'id': 'id', 'caption': 'Category ID'}],
+                                             description='Disable quick-book on event creation in these categories')
     assistance_emails = EmailListField(_('Assistance email addresses (one per line)'))
     notification_before_days = IntegerField(_('Send booking reminders X days before (single/daily)'),
                                             [InputRequired(), NumberRange(min=1, max=30)])
