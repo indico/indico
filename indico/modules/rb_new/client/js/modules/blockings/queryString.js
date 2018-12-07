@@ -26,12 +26,12 @@ import {actions as filtersActions} from '../../common/filters';
 
 
 const rules = {
-    myRooms: {
+    my_rooms: {
         stateField: boolStateField('myRooms'),
         validator: v.isBoolean(),
         sanitizer: v.toBoolean()
     },
-    myBlockings: {
+    my_blockings: {
         stateField: boolStateField('myBlockings'),
         validator: v.isBoolean(),
         sanitizer: v.toBoolean()

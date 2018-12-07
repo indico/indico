@@ -86,7 +86,7 @@ export default connect(
         },
         gotoMyBlockings() {
             dispatch(blockingsActions.setFilterParameter('myBlockings', true));
-            dispatch(pushRoute('/blockings?myBlockings=true'));
+            dispatch(pushRoute('/blockings?my_blockings=true'));
         },
         gotoRBAdminArea() {
             dispatch(pushRoute('/admin'));
