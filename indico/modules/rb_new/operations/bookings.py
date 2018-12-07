@@ -253,8 +253,5 @@ def create_booking_for_event(room_id, event):
                     repeat_frequency=RepeatFrequency.NEVER, event_id=event.id)
         resv = Reservation.create_from_data(room, data, session.user)
         return resv
-    except NoReportError as e:
-        if 'Reservation has no valid occurrences' == e:
-            flash(_("Couldn't create the booking. Probably somebody else booked the room in the meantime."), 'error')
-        else:
-            raise e
+    except NoReportError:
+        flash(_("Couldn't create the booking. Probably somebody else booked the room in the meantime."), 'error')

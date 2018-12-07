@@ -15,6 +15,8 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import camelizeKeys from 'indico/utils/camelize';
+
 /* eslint-disable import/unambiguous */
 (function(global) {
     global.setupEventCreationDialog = function setupEventCreationDialog(options) {
@@ -39,7 +41,7 @@
         const $userBookingMessage = $('#room-user-booking');
         const $userPrebookingMessage = $('#room-user-prebooking');
         const $unbookableMessage = $('#room-unbookable');
-        const $cantBookMessage = $('#room-cant-book');
+        const $cannotBookMessage = $('#room-cannot-book');
         const calendarUrl = Indico.Urls.RoomBooking.calendar;
 
         let currentCategory = null;
@@ -147,8 +149,8 @@
 
             const requestParams = {
                 room_id: roomId,
-                start_dt: startDt.format('YYYY-MM-DDTHH:mm:ss'),
-                end_dt: endDt.format('YYYY-MM-DDTHH:mm:ss')
+                start_dt: startDt.format(moment.HTML5_FMT.DATETIME_LOCAL),
+                end_dt: endDt.format(moment.HTML5_FMT.DATETIME_LOCAL)
             };
 
             $.ajax({
@@ -158,39 +160,40 @@
                 contentType: 'application/json',
                 error: handleAjaxError,
                 success(data) {
-                    if (data['user_booking']) {
+                    data = camelizeKeys(data);
+                    if (data.userBooking) {
                         $createBooking.val(false);
                         $currentMessage = $userBookingMessage;
                         addCalendarLink($currentMessage);
-                    } else if (data['user_prebooking']) {
+                    } else if (data.userPrebooking) {
                         $createBooking.val(false);
                         $currentMessage = $userPrebookingMessage;
                         addCalendarLink($currentMessage);
-                    } else if (data['conflict_booking']) {
+                    } else if (data.conflictBooking) {
                         $createBooking.val(false);
                         $currentMessage = $conflictBookingMessage;
                         addCalendarLink($currentMessage);
-                    } else if (data['unbookable']) {
+                    } else if (data.unbookable) {
                         $createBooking.val(false);
                         $currentMessage = $unbookableMessage;
                         addCalendarLink($currentMessage);
-                    } else if (data['conflict_prebooking']) {
-                        if (data['can_book']) {
+                    } else if (data.conflictPrebooking) {
+                        if (data.canBook) {
                             $currentMessage = $conflictPrebookingMessage;
                             addCalendarLink($currentMessage);
-                        } else if (data['can_prebook']) {
+                        } else if (data.canPrebook) {
                             $currentMessage = $conflictPrebookingPrebookMessage;
                             addCalendarLink($currentMessage);
                         } else {
-                            $currentMessage = $cantBookMessage;
+                            $currentMessage = $cannotBookMessage;
                             $createBooking.val(false);
                         }
-                    } else if (data['can_book']) {
+                    } else if (data.canBook) {
                         $currentMessage = $availableMessage;
-                    } else if (data['can_prebook']) {
+                    } else if (data.canPrebook) {
                         $currentMessage = $availablePrebookMessage;
                     } else {
-                        $currentMessage = $cantBookMessage;
+                        $currentMessage = $cannotBookMessage;
                         $createBooking.val(false);
                     }
                     $currentMessage.show();
@@ -264,19 +267,8 @@
                 updateAvailability();
             });
 
-            $('#create-booking').on('change', function() {
-                $createBooking.val(this.checked);
-            });
-
-            $('#create-prebooking').on('change', function() {
-                $createBooking.val(this.checked);
-            });
-
-            $('#create-booking-over-prebooking').on('change', function() {
-                $createBooking.val(this.checked);
-            });
-
-            $('#create-prebooking-over-prebooking').on('change', function() {
+            const bookingSwitchSelectors = '#create-booking, #create-prebooking, #create-booking-over-prebooking, #create-prebooking-over-prebooking';
+            $(bookingSwitchSelectors).on('change', function() {
                 $createBooking.val(this.checked);
             });
         }

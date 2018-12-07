@@ -33,6 +33,7 @@ from indico.modules.rb_new.controllers.backend.common import search_room_args
 from indico.modules.rb_new.operations.bookings import check_room_available, get_room_details_availability
 from indico.modules.rb_new.operations.rooms import get_room_statistics, search_for_rooms
 from indico.modules.rb_new.schemas import room_attribute_values_schema, rooms_schema
+from indico.util.marshmallow import NaiveDateTime
 
 
 class RHRooms(RHRoomBookingBase):
@@ -119,8 +120,8 @@ class RHRoomFavorites(RHRoomBookingBase):
 
 class RHCheckRoomAvailable(RHRoomBase):
     @use_kwargs({
-        'start_dt': fields.DateTime(),
-        'end_dt': fields.DateTime(),
+        'start_dt': NaiveDateTime(),
+        'end_dt': NaiveDateTime(),
     })
     def _process(self, start_dt, end_dt):
         return jsonify(check_room_available(self.room, start_dt, end_dt))

@@ -105,7 +105,8 @@ def create_event(category, event_type, data, add_creator_as_manager=True, featur
             booking = create_booking_for_event(room_id, event)
             if booking:
                 logger.info('Booking %r created for event %r', booking, event)
-                log_data = {'Date': booking.start_dt.strftime('%d/%m/%Y'),
+                log_data = {'Room': booking.room.full_name,
+                            'Date': booking.start_dt.strftime('%d/%m/%Y'),
                             'Times': '%s - %s' % (booking.start_dt.strftime('%H:%M'), booking.end_dt.strftime('%H:%M'))}
                 event.log(EventLogRealm.event, EventLogKind.positive, 'Event', 'Room booked for the event',
                           session.user, data=log_data)
