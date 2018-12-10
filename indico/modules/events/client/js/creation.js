@@ -148,11 +148,8 @@ import camelizeKeys from 'indico/utils/camelize';
                 return;
             }
 
-            const roomId = roomData['room_id'];
-            previousRoomId = roomId;
-
             const requestParams = {
-                room_id: roomId,
+                room_id: roomData['room_id'],
                 start_dt: startDt.format(moment.HTML5_FMT.DATETIME_LOCAL),
                 end_dt: endDt.format(moment.HTML5_FMT.DATETIME_LOCAL)
             };
@@ -215,6 +212,7 @@ import camelizeKeys from 'indico/utils/camelize';
             $('#event-creation-location_data').on('change', function() {
                 roomData = JSON.parse($(this).val());
                 if (previousRoomId !== roomData['room_id']) {
+                    previousRoomId = roomData['room_id'];
                     updateAvailability(true);
                 }
             });
