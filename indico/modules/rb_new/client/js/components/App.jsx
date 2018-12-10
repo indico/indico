@@ -104,7 +104,7 @@ class App extends React.Component {
             <Sidebar.Pushable styleName="rb-pushable">
                 <SidebarMenu visible={userActionsVisible}
                              onClickOption={this.onSidebarHide} />
-                <Sidebar.Pusher dimmed={userActionsVisible}>
+                <Sidebar.Pusher dimmed={userActionsVisible} styleName="rb-pusher">
                     <div styleName="rb-content">
                         <Switch>
                             <Route exact path="/" render={() => <Redirect to="/book" />} />
