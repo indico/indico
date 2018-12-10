@@ -65,7 +65,6 @@ const formDecorator = createDecorator({
 class BookRoomModal extends React.Component {
     static propTypes = {
         room: PropTypes.object,
-        isAdmin: PropTypes.bool.isRequired,
         userFullName: PropTypes.string.isRequired,
         bookingData: PropTypes.object.isRequired,
         onClose: PropTypes.func.isRequired,
@@ -101,8 +100,8 @@ class BookRoomModal extends React.Component {
     };
 
     componentDidMount() {
-        const {actions: {fetchAvailability}, room, bookingData} = this.props;
-        fetchAvailability(room, bookingData);
+        const {actions: {fetchAvailability}, room, bookingData: {isPrebooking, ...data}} = this.props;
+        fetchAvailability(room, data);
     }
 
     componentWillUnmount() {
@@ -293,8 +292,8 @@ class BookRoomModal extends React.Component {
 
     render() {
         const {
-            bookingData: {recurrence, dates, timeSlot},
-            room, isAdmin, availability,
+            bookingData: {recurrence, dates, timeSlot, isPrebooking},
+            room, availability,
             timeInformationComponent: TimeInformationComponent,
             defaultTitles
         } = this.props;
@@ -307,7 +306,6 @@ class BookRoomModal extends React.Component {
         const conflictsExist = availability && !!Object.keys(availability.conflicts).length;
         const bookingBlocked = ({submitting, submitSucceeded}) => submitting || submitSucceeded;
         const buttonsBlocked = (fprops) => bookingBlocked(fprops) || (conflictsExist && !skipConflicts);
-        const {isAutoConfirm: isDirectlyBookable} = room;
         const legendLabels = [
             {label: Translate.string('Available'), color: 'green'},
             {label: Translate.string('Booked'), color: 'orange'},
@@ -320,7 +318,7 @@ class BookRoomModal extends React.Component {
         const renderModalContent = (fprops) => (
             <>
                 <Modal.Header>
-                    {isDirectlyBookable ? defaultTitles.booking : defaultTitles.preBooking}
+                    {isPrebooking ? defaultTitles.preBooking : defaultTitles.booking }
                 </Modal.Header>
                 <Modal.Content>
                     <Grid>
@@ -333,7 +331,7 @@ class BookRoomModal extends React.Component {
                                                       occurrenceCount={occurrenceCount} />
                         </Grid.Column>
                         <Grid.Column width={8}>
-                            {!isDirectlyBookable && this.renderPrebookingMessage()}
+                            {isPrebooking && this.renderPrebookingMessage()}
                             <Segment inverted color="blue">
                                 <Form inverted id="book-room-form" onSubmit={fprops.handleSubmit}>
                                     <h2><Icon name="user" />Usage</h2>
@@ -372,10 +370,7 @@ class BookRoomModal extends React.Component {
                     </Grid>
                 </Modal.Content>
                 <Modal.Actions>
-                    {(isDirectlyBookable || isAdmin) && (
-                        this.renderBookingButton(false, buttonsBlocked(fprops), fprops)
-                    )}
-                    {!isDirectlyBookable && this.renderBookingButton(true, buttonsBlocked(fprops), fprops)}
+                    {this.renderBookingButton(isPrebooking, buttonsBlocked(fprops), fprops)}
                     <Button type="button" onClick={this.onClose} content={(fprops.submitSucceeded
                         ? Translate.string('Close')
                         : Translate.string("I've changed my mind!"))} />
@@ -407,7 +402,6 @@ class BookRoomModal extends React.Component {
 export default connect(
     (state, {roomId}) => ({
         favoriteUsers: userSelectors.getFavoriteUsers(state),
-        isAdmin: userSelectors.isUserAdmin(state),
         userFullName: userSelectors.getUserFullName(state),
         availability: state.bookRoom.bookingForm.availability,
         room: roomsSelectors.getRoom(state, {roomId}),
