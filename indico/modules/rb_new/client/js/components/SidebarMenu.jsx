@@ -52,7 +52,8 @@ SidebarTrigger.propTypes = {
 };
 
 function SidebarMenu({
-    isAdmin, hasOwnedRooms, gotoMyBookings, gotoMyRoomsList, gotoMyBlockings, gotoRBAdminArea, visible, onClickOption
+    isAdmin, hasOwnedRooms, gotoMyBookings, gotoBookingsInMyRooms, gotoMyRoomsList, gotoMyBlockings, gotoRBAdminArea,
+    visible, onClickOption
 }) {
     const options = [
         {
@@ -65,7 +66,7 @@ function SidebarMenu({
             key: 'bookings_my_rooms',
             icon: 'checkmark',
             text: Translate.string('Bookings in My Rooms'),
-            disabled: true,
+            onClick: gotoBookingsInMyRooms,
             onlyIf: hasOwnedRooms
         },
         {
@@ -120,6 +121,7 @@ SidebarMenu.propTypes = {
     isAdmin: PropTypes.bool.isRequired,
     hasOwnedRooms: PropTypes.bool.isRequired,
     gotoMyBookings: PropTypes.func.isRequired,
+    gotoBookingsInMyRooms: PropTypes.func.isRequired,
     gotoMyRoomsList: PropTypes.func.isRequired,
     gotoMyBlockings: PropTypes.func.isRequired,
     gotoRBAdminArea: PropTypes.func.isRequired,
@@ -146,6 +148,14 @@ export default connect(
                 hideUnused: true,
             }, false));
             dispatch(pushRoute('/calendar?my_bookings=true&hide_unused=true'));
+        },
+        gotoBookingsInMyRooms() {
+            dispatch(globalActions.resetPageState('calendar'));
+            dispatch(filtersActions.setFilters('calendar', {
+                onlyMine: true,
+                hideUnused: true,
+            }, false));
+            dispatch(pushRoute('/calendar?mine=true&hide_unused=true'));
         },
         gotoMyRoomsList() {
             dispatch(globalActions.resetPageState('roomList'));
