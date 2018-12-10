@@ -139,8 +139,11 @@ export default connect(
     }),
     dispatch => ({
         gotoMyBookings() {
-            dispatch(filtersActions.setFilterParameter('calendar', 'myBookings', true));
-            dispatch(pushRoute('/calendar?my_bookings=true'));
+            dispatch(filtersActions.setFilters('calendar', {
+                myBookings: true,
+                hideUnused: true,
+            }));
+            dispatch(pushRoute('/calendar?my_bookings=true&hide_unused=true'));
         },
         gotoMyRoomsList() {
             dispatch(filtersActions.setFilterParameter('roomList', 'onlyMine', true));
