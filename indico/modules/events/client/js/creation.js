@@ -42,6 +42,10 @@ import camelizeKeys from 'indico/utils/camelize';
         const $userPrebookingMessage = $('#room-user-prebooking');
         const $unbookableMessage = $('#room-unbookable');
         const $cannotBookMessage = $('#room-cannot-book');
+        const $bookingSwitch = $('#create-booking');
+        const $prebookingSwitch = $('#create-prebooking');
+        const $bookingSwitchPrebooking = $('#create-booking-over-prebooking');
+        const $prebookingSwitchPrebooking = $('#create-prebooking-over-prebooking');
         const calendarUrl = Indico.Urls.RoomBooking.calendar;
 
         let currentCategory = null;
@@ -179,22 +183,26 @@ import camelizeKeys from 'indico/utils/camelize';
                         addCalendarLink($currentMessage);
                     } else if (data.conflictPrebooking) {
                         if (data.canBook) {
+                            $createBooking.val($bookingSwitchPrebooking[0].checked);
                             $currentMessage = $conflictPrebookingMessage;
                             addCalendarLink($currentMessage);
                         } else if (data.canPrebook) {
+                            $createBooking.val($prebookingSwitchPrebooking[0].checked);
                             $currentMessage = $conflictPrebookingPrebookMessage;
                             addCalendarLink($currentMessage);
                         } else {
-                            $currentMessage = $cannotBookMessage;
                             $createBooking.val(false);
+                            $currentMessage = $cannotBookMessage;
                         }
                     } else if (data.canBook) {
+                        $createBooking.val($bookingSwitch[0].checked);
                         $currentMessage = $availableMessage;
                     } else if (data.canPrebook) {
+                        $createBooking.val($prebookingSwitch[0].checked);
                         $currentMessage = $availablePrebookMessage;
                     } else {
-                        $currentMessage = $cannotBookMessage;
                         $createBooking.val(false);
+                        $currentMessage = $cannotBookMessage;
                     }
                     $currentMessage.show();
                 }
@@ -267,8 +275,7 @@ import camelizeKeys from 'indico/utils/camelize';
                 updateAvailability();
             });
 
-            const bookingSwitchSelectors = '#create-booking, #create-prebooking, #create-booking-over-prebooking, #create-prebooking-over-prebooking';
-            $(bookingSwitchSelectors).on('change', function() {
+            $bookingSwitch.add($prebookingSwitch).add($bookingSwitchPrebooking).add($prebookingSwitchPrebooking).on('change', function() {
                 $createBooking.val(this.checked);
             });
         }
