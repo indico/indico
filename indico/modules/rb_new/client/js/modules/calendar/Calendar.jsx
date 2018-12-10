@@ -53,7 +53,8 @@ class Calendar extends React.Component {
             openBookingDetails: PropTypes.func.isRequired,
             setFilterParameter: PropTypes.func.isRequired,
         }).isRequired,
-        filters: PropTypes.object.isRequired,
+        roomFilters: PropTypes.object.isRequired,
+        calendarFilters: PropTypes.object.isRequired,
         allowDragDrop: PropTypes.bool
     };
 
@@ -78,16 +79,19 @@ class Calendar extends React.Component {
     componentDidUpdate(prevProps) {
         const {
             datePicker: {selectedDate: prevDate, mode: prevMode},
-            filters: {myBookings: prevMyBookings, ...prevRoomFilters},
+            roomFilters: prevRoomFilters,
+            calendarFilters: prevCalendarFilters,
         } = prevProps;
         const {
             datePicker: {selectedDate, mode},
-            filters: {myBookings, ...roomFilters},
+            roomFilters,
+            calendarFilters,
             actions: {fetchCalendar},
         } = this.props;
-        const filtersChanged = !_.isEqual(prevRoomFilters, roomFilters);
-        if (prevDate !== selectedDate || mode !== prevMode || myBookings !== prevMyBookings || filtersChanged) {
-            fetchCalendar(filtersChanged);
+        const roomFiltersChanged = !_.isEqual(prevRoomFilters, roomFilters);
+        const calendarFiltersChanged = !_.isEqual(prevCalendarFilters, calendarFilters);
+        if (prevDate !== selectedDate || mode !== prevMode || roomFiltersChanged || calendarFiltersChanged) {
+            fetchCalendar(roomFiltersChanged);
         }
     }
 
@@ -130,7 +134,7 @@ class Calendar extends React.Component {
 
     renderExtraButtons = () => {
         const {showUnused} = this.state;
-        const {filters: {myBookings}, actions: {setFilterParameter}} = this.props;
+        const {calendarFilters: {myBookings}, actions: {setFilterParameter}} = this.props;
 
         return (
             <>
@@ -216,7 +220,8 @@ export default connect(
     state => ({
         isFetching: calendarSelectors.isFetching(state),
         calendarData: calendarSelectors.getCalendarData(state),
-        filters: calendarSelectors.getFilters(state),
+        roomFilters: calendarSelectors.getRoomFilters(state),
+        calendarFilters: calendarSelectors.getCalendarFilters(state),
         rooms: roomsSelectors.getAllRooms(state),
         datePicker: calendarSelectors.getDatePickerInfo(state)
     }),

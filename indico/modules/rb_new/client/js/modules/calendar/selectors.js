@@ -15,6 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import _ from 'lodash';
 import {createSelector} from 'reselect';
 import {RequestState} from 'indico/utils/redux';
 import {selectors as roomsSelectors} from '../../common/rooms';
@@ -36,4 +37,15 @@ export const getCalendarData = createSelector(
         })
     })
 );
-export const getFilters = ({calendar}) => calendar.filters;
+
+const CALENDAR_FILTERS = ['myBookings'];
+const getFilters = ({calendar}) => calendar.filters;
+
+export const getRoomFilters = createSelector(
+    getFilters,
+    filters => _.omit(filters, CALENDAR_FILTERS)
+);
+export const getCalendarFilters = createSelector(
+    getFilters,
+    filters => _.pick(filters, CALENDAR_FILTERS)
+);

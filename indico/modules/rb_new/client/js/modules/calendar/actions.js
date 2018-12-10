@@ -24,6 +24,7 @@ import {ajaxAction} from 'indico/utils/redux';
 import {preProcessParameters} from '../../util';
 import {ajaxRules as roomSearchAjaxRules} from '../../common/roomSearch';
 import {ajax as ajaxRules} from './serializers';
+import {getRoomFilters, getCalendarFilters} from './selectors';
 
 
 export const SET_DATE = 'calendar/SET_DATE';
@@ -46,13 +47,10 @@ export function setMode(mode) {
 export function fetchCalendar(fetchRooms = true) {
     return async (dispatch, getState) => {
         dispatch({type: FETCH_REQUEST});
-        const {
-            calendar: {
-                filters: {myBookings, ...roomFilters},
-                data: {roomIds},
-                datePicker
-            }
-        } = getState();
+        const state = getState();
+        const roomFilters = getRoomFilters(state);
+        const {myBookings} = getCalendarFilters(state);
+        const {data: {roomIds}, datePicker} = state.calendar;
         let newRoomIds = roomIds;
 
         if (fetchRooms) {
