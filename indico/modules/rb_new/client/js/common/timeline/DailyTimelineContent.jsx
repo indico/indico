@@ -156,6 +156,7 @@ export default class DailyTimelineContent extends React.Component {
                     <div>
                         <List width={width}
                               height={height}
+                              style={{overflowY: 'overlay'}}
                               rowCount={rows.length}
                               overscanRowCount={15}
                               rowHeight={50}
