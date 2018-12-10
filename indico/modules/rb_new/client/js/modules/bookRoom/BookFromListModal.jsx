@@ -83,14 +83,26 @@ class BookFromListModal extends React.Component {
             resetCollisions: PropTypes.func.isRequired,
             openBookingForm: PropTypes.func.isRequired,
         }).isRequired,
-        title: IndicoPropTypes.i18n
+        isPrebooking: PropTypes.bool,
+        labels: PropTypes.shape({
+            bookTitle: IndicoPropTypes.i18n,
+            preBookTitle: IndicoPropTypes.i18n,
+            bookBtn: IndicoPropTypes.i18n,
+            preBookBtn: IndicoPropTypes.i18n,
+        }),
     };
 
     static defaultProps = {
         onClose: () => {},
         availability: null,
         defaults: undefined,
-        title: <Translate>Book Room</Translate>
+        isPrebooking: false,
+        labels: {
+            bookTitle: <Translate>Book Room</Translate>,
+            preBookTitle: <Translate>Pre-Book Room</Translate>,
+            bookBtn: <Translate>Book</Translate>,
+            preBookBtn: <Translate>Pre-Book</Translate>,
+        }
     };
 
     handleCloseModal = () => {
@@ -100,17 +112,17 @@ class BookFromListModal extends React.Component {
     };
 
     handleBook = (data) => {
-        const {room, actions: {openBookingForm}} = this.props;
-        openBookingForm(room.id, data);
+        const {room, actions: {openBookingForm}, isPrebooking} = this.props;
+        openBookingForm(room.id, {...data, isPrebooking});
     };
 
     render() {
-        const {room, refreshCollisions, availability, availabilityLoading, defaults, title} = this.props;
+        const {room, refreshCollisions, availability, availabilityLoading, defaults, isPrebooking, labels} = this.props;
         const buttonDisabled = availabilityLoading || !availability || availability.numDaysAvailable === 0;
         return (
             <Modal open onClose={this.handleCloseModal} size="large" closeIcon>
                 <Modal.Header styleName="room-details-header">
-                    {title}
+                    {isPrebooking ? labels.preBookTitle : labels.bookTitle}
                 </Modal.Header>
                 <Modal.Content>
                     <Grid>
@@ -118,7 +130,7 @@ class BookFromListModal extends React.Component {
                             <RoomBasicDetails room={room} />
                         </Grid.Column>
                         <Grid.Column width={8}>
-                            <BookingBootstrapForm buttonCaption={<Translate>Book</Translate>}
+                            <BookingBootstrapForm buttonCaption={isPrebooking ? labels.preBookBtn : labels.bookBtn}
                                                   buttonDisabled={buttonDisabled}
                                                   onChange={refreshCollisions}
                                                   onSearch={this.handleBook}

@@ -43,6 +43,7 @@ import * as bookRoomActions from './actions';
 import {actions as filtersActions} from '../../common/filters';
 import {actions as roomsActions, RoomRenderer} from '../../common/rooms';
 import * as bookRoomSelectors from './selectors';
+import {selectors as userSelectors} from '../../common/user';
 import {mapControllerFactory, selectors as mapSelectors} from '../../common/map';
 
 import './BookRoom.module.scss';
@@ -59,6 +60,7 @@ class BookRoom extends React.Component {
         isSearching: PropTypes.bool.isRequired,
         searchFinished: PropTypes.bool.isRequired,
         isTimelineVisible: PropTypes.bool.isRequired,
+        isAdmin: PropTypes.bool.isRequired,
         hasConflicts: PropTypes.bool.isRequired,
         totalResultCount: PropTypes.number.isRequired,
         filters: PropTypes.object.isRequired,
@@ -123,10 +125,10 @@ class BookRoom extends React.Component {
         this.setState({maxVisibleRooms: 20, suggestionsRequested: false});
     }
 
-    openBookingForm(room, overrides = null) {
+    openBookingForm(room, overrides = null, isPrebooking = false) {
         const {actions: {openBookingForm}, filters: {dates, timeSlot, recurrence}} = this.props;
         if (!overrides) {
-            openBookingForm(room.id);
+            openBookingForm(room.id, {isPrebooking});
             return;
         }
         // if we have overrides, we need to pass the data explicitly
@@ -144,7 +146,7 @@ class BookRoom extends React.Component {
                 endTime: serializeTime(moment(endTime, 'HH:mm').subtract(overrides.duration, 'minutes'))
             };
         }
-        openBookingForm(room.id, bookingData);
+        openBookingForm(room.id, {...bookingData, isPrebooking});
     }
 
     renderFilters(refName) {
@@ -231,14 +233,15 @@ class BookRoom extends React.Component {
             showSuggestions,
             labels
         } = this.props;
-        const {actions: {openRoomDetails}} = this.props;
+        const {actions: {openRoomDetails}, isAdmin} = this.props;
 
-        const bookingModalBtn = room => (
+        const bookingModalBtn = (room, isPrebooking = false) => (
             <Button circular
                     icon="check"
-                    color={room.isAutoConfirm ? 'green' : 'orange'}
-                    onClick={() => this.openBookingForm(room)} />
+                    color={isPrebooking ? 'orange' : 'green'}
+                    onClick={() => this.openBookingForm(room, null, isPrebooking)} />
         );
+
         const showDetailsBtn = ({id}) => (
             <Button primary circular
                     icon="search"
@@ -258,7 +261,13 @@ class BookRoom extends React.Component {
                                     <RoomRenderer rooms={this.visibleRooms}>
                                         {room => (
                                             <Slot name="actions">
-                                                <Popup trigger={bookingModalBtn(room)}
+                                                {isAdmin && !room.isAutoConfirm && (
+                                                    <Popup trigger={bookingModalBtn(room)}
+                                                           content={labels.bookButton}
+                                                           position="top center"
+                                                           hideOnScroll />
+                                                )}
+                                                <Popup trigger={bookingModalBtn(room, !room.isAutoConfirm)}
                                                        content={room.isAutoConfirm
                                                            ? labels.bookButton
                                                            : labels.preBookButton}
@@ -324,7 +333,8 @@ class BookRoom extends React.Component {
         return (
             <>
                 {time && (
-                    <Message styleName="suggestion-text" size="mini" onClick={() => this.openBookingForm(room, {time})}
+                    <Message styleName="suggestion-text" size="mini"
+                             onClick={() => this.openBookingForm(room, {time}, !room.isAutoConfirm)}
                              warning compact>
                         <Message.Header>
                             <Icon name="clock" />
@@ -346,7 +356,8 @@ class BookRoom extends React.Component {
                     </div>
                 )}
                 {duration && (
-                    <Message styleName="suggestion-text" size="mini" onClick={() => this.openBookingForm(room, {duration})}
+                    <Message styleName="suggestion-text" size="mini"
+                             onClick={() => this.openBookingForm(room, {duration}, !room.isAutoConfirm)}
                              warning compact>
                         <Message.Header>
                             <Icon name="hourglass full" /> {PluralTranslate.string('One minute shorter', '{duration} minutes shorter', duration, {duration})}
@@ -354,7 +365,8 @@ class BookRoom extends React.Component {
                     </Message>
                 )}
                 {skip && (
-                    <Message styleName="suggestion-text" size="mini" onClick={() => this.openBookingForm(room)}
+                    <Message styleName="suggestion-text" size="mini"
+                             onClick={() => this.openBookingForm(room, null, !room.isAutoConfirm)}
                              warning compact>
                         <Message.Header>
                             <Icon name="calendar times" /> {PluralTranslate.string('Skip one day', 'Skip {skip} days', skip, {skip})}
@@ -447,6 +459,7 @@ class BookRoom extends React.Component {
 const mapStateToProps = (state) => {
     return {
         isTimelineVisible: bookRoomSelectors.isTimelineVisible(state),
+        isAdmin: userSelectors.isUserAdmin(state),
         filters: bookRoomSelectors.getFilters(state),
         results: bookRoomSelectors.getSearchResults(state),
         suggestions: bookRoomSelectors.getSuggestions(state),

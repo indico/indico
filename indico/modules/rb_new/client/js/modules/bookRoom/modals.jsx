@@ -15,6 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import _ from 'lodash';
 import React from 'react';
 import {connect} from 'react-redux';
 import moment from 'moment';
@@ -32,12 +33,12 @@ const BookingDataProvider = connect(
         bookRoomFilters: bookRoomSelectors.getFilters(state),
     })
 )(
-    ({bookRoomFilters: {dates, timeSlot, recurrence}, ...restProps}) => (
-        <BookRoomModal {...restProps} bookingData={{dates, timeSlot, recurrence}} />
+    ({bookRoomFilters: {dates, timeSlot, recurrence}, bookingData: {isPrebooking}, ...restProps}) => (
+        <BookRoomModal {...restProps} bookingData={{dates, timeSlot, recurrence, isPrebooking}} />
     )
 );
 
-const momentizeBookRoomDefaults = (defaults) => (defaults ? {
+const momentizeBookRoomDefaults = (defaults) => (!_.isEmpty(defaults) ? {
     ...defaults,
     dates: {
         startDate: toMoment(defaults.dates.startDate, moment.HTML5_FMT.DATE),
@@ -52,16 +53,25 @@ const momentizeBookRoomDefaults = (defaults) => (defaults ? {
 
 export default {
     /* eslint-disable react/display-name */
-    'booking-form': (onClose, roomId, bookingData) => (
-        <RoomDetailsPreloader roomId={roomId}>
-            {() => (bookingData
-                ? <BookRoomModal roomId={roomId} onClose={onClose} bookingData={bookingData} />
-                : <BookingDataProvider roomId={roomId} onClose={onClose} />)}
-        </RoomDetailsPreloader>
-    ),
-    'book-room': (onClose, roomId, defaults) => (
-        <BookFromListModal roomId={roomId} onClose={onClose} defaults={momentizeBookRoomDefaults(defaults)} />
-    ),
+    'booking-form': (onClose, roomId, data) => {
+        const {isPrebooking, ...bookingData} = data;
+        return (
+            <RoomDetailsPreloader roomId={roomId}>
+                {() => (!_.isEmpty(bookingData)
+                    ? <BookRoomModal roomId={roomId} onClose={onClose} bookingData={data} />
+                    : <BookingDataProvider roomId={roomId} onClose={onClose} bookingData={data} />)}
+            </RoomDetailsPreloader>
+        );
+    },
+    'book-room': (onClose, roomId, data) => {
+        const {isPrebooking, ...defaults} = data;
+        return (
+            <BookFromListModal roomId={roomId}
+                               onClose={onClose}
+                               defaults={momentizeBookRoomDefaults(defaults)}
+                               isPrebooking={isPrebooking} />
+        );
+    },
     'unavailable-rooms': (onClose) => (
         <UnavailableRoomsModal onClose={onClose} />
     ),
