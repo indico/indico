@@ -77,6 +77,10 @@ export function setFilterParameter(param, value) {
     return filtersActions.setFilterParameter(FILTER_NAMESPACE, param, value);
 }
 
+export function setFilters(params, merge = true) {
+    return filtersActions.setFilters(FILTER_NAMESPACE, params, merge);
+}
+
 export function createBlocking(formData) {
     const data = preProcessParameters(formData, ajaxRules);
     return submitFormAction(

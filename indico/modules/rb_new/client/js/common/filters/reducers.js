@@ -33,7 +33,13 @@ export function filterReducerFactory(namespace, initialState, postprocess = x =>
                     ? postprocess({...state, [action.param]: action.data}, action.param)
                     : state;
             case filtersActions.SET_FILTERS:
-                return action.namespace === namespace ? {...state, ...action.params} : state;
+                if (action.namespace !== namespace) {
+                    return state;
+                } else if (action.merge) {
+                    return {...state, ...action.params};
+                } else {
+                    return {...factory(namespace), ...action.params};
+                }
             case globalActions.RESET_PAGE_STATE:
                 return (!action.namespace || action.namespace === namespace) ? factory(namespace) : state;
             default:

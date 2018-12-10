@@ -142,15 +142,15 @@ export default connect(
             dispatch(filtersActions.setFilters('calendar', {
                 myBookings: true,
                 hideUnused: true,
-            }));
+            }, false));
             dispatch(pushRoute('/calendar?my_bookings=true&hide_unused=true'));
         },
         gotoMyRoomsList() {
-            dispatch(filtersActions.setFilterParameter('roomList', 'onlyMine', true));
+            dispatch(filtersActions.setFilters('roomList', {onlyMine: true}, false));
             dispatch(pushRoute('/rooms?mine=true'));
         },
         gotoMyBlockings() {
-            dispatch(blockingsActions.setFilterParameter('myBlockings', true));
+            dispatch(blockingsActions.setFilters({myBlockings: true}, false));
             dispatch(pushRoute('/blockings?myBlockings=true'));
         },
         gotoRBAdminArea() {

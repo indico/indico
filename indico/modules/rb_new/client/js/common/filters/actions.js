@@ -23,6 +23,6 @@ export function setFilterParameter(namespace, param, data) {
     return {type: SET_FILTER_PARAMETER, namespace, param, data};
 }
 
-export function setFilters(namespace, params) {
-    return {type: SET_FILTERS, namespace, params};
+export function setFilters(namespace, params, merge = true) {
+    return {type: SET_FILTERS, namespace, params, merge};
 }
