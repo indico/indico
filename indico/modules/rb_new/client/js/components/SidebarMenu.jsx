@@ -25,6 +25,7 @@ import {Translate} from 'indico/react/i18n';
 import {selectors as userSelectors} from '../common/user';
 import {actions as blockingsActions} from '../modules/blockings';
 import {actions as filtersActions} from '../common/filters';
+import * as globalActions from '../actions';
 
 import './SidebarMenu.module.scss';
 
@@ -139,6 +140,7 @@ export default connect(
     }),
     dispatch => ({
         gotoMyBookings() {
+            dispatch(globalActions.resetPageState('calendar'));
             dispatch(filtersActions.setFilters('calendar', {
                 myBookings: true,
                 hideUnused: true,
@@ -146,12 +148,14 @@ export default connect(
             dispatch(pushRoute('/calendar?my_bookings=true&hide_unused=true'));
         },
         gotoMyRoomsList() {
+            dispatch(globalActions.resetPageState('roomList'));
             dispatch(filtersActions.setFilters('roomList', {onlyMine: true}, false));
             dispatch(pushRoute('/rooms?mine=true'));
         },
         gotoMyBlockings() {
+            dispatch(globalActions.resetPageState('blockings'));
             dispatch(blockingsActions.setFilters({myBlockings: true}, false));
-            dispatch(pushRoute('/blockings?myBlockings=true'));
+            dispatch(pushRoute('/blockings?my_blockings=true'));
         },
         gotoRBAdminArea() {
             dispatch(pushRoute('/admin'));
