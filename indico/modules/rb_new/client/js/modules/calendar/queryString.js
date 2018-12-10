@@ -43,6 +43,11 @@ const rules = {
         sanitizer: v.toBoolean(),
         stateField: boolStateField('filters.myBookings'),
     },
+    hide_unused: {
+        validator: v.isBoolean(),
+        sanitizer: v.toBoolean(),
+        stateField: boolStateField('filters.hideUnused'),
+    },
 };
 
 

@@ -39,13 +39,18 @@ export const getCalendarData = createSelector(
 );
 
 const CALENDAR_FILTERS = ['myBookings'];
-const getFilters = ({calendar}) => calendar.filters;
+const LOCAL_FILTERS = ['hideUnused'];
+export const getFilters = ({calendar}) => calendar.filters;
 
 export const getRoomFilters = createSelector(
     getFilters,
-    filters => _.omit(filters, CALENDAR_FILTERS)
+    filters => _.omit(filters, [...CALENDAR_FILTERS, ...LOCAL_FILTERS])
 );
 export const getCalendarFilters = createSelector(
     getFilters,
     filters => _.pick(filters, CALENDAR_FILTERS)
+);
+export const getLocalFilters = createSelector(
+    getFilters,
+    filters => _.pick(filters, LOCAL_FILTERS)
 );

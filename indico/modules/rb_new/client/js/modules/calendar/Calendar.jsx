@@ -55,6 +55,7 @@ class Calendar extends React.Component {
         }).isRequired,
         roomFilters: PropTypes.object.isRequired,
         calendarFilters: PropTypes.object.isRequired,
+        localFilters: PropTypes.object.isRequired,
         allowDragDrop: PropTypes.bool
     };
 
@@ -66,10 +67,6 @@ class Calendar extends React.Component {
         super(props);
         this.contextRef = React.createRef();
     }
-
-    state = {
-        showUnused: true,
-    };
 
     componentDidMount() {
         const {actions: {fetchCalendar}} = this.props;
@@ -127,14 +124,17 @@ class Calendar extends React.Component {
         });
     };
 
-    toggleShowUnused = () => {
-        const {showUnused} = this.state;
-        this.setState({showUnused: !showUnused});
+    toggleHideUnused = () => {
+        const {localFilters: {hideUnused}, actions: {setFilterParameter}} = this.props;
+        setFilterParameter('hideUnused', !hideUnused);
     };
 
     renderExtraButtons = () => {
-        const {showUnused} = this.state;
-        const {calendarFilters: {myBookings}, actions: {setFilterParameter}} = this.props;
+        const {
+            calendarFilters: {myBookings},
+            localFilters: {hideUnused},
+            actions: {setFilterParameter}
+        } = this.props;
 
         return (
             <>
@@ -147,12 +147,12 @@ class Calendar extends React.Component {
                     </Translate>
                 </Popup>
                 <Popup trigger={<Button size="large"
-                                        primary={!showUnused}
-                                        icon={showUnused ? 'minus square outline' : 'plus square outline'}
-                                        onClick={this.toggleShowUnused} />}>
-                    {showUnused
-                        ? <Translate>Hide unused rooms</Translate>
-                        : <Translate>Show unused rooms</Translate>}
+                                        primary={hideUnused}
+                                        icon={hideUnused ? 'plus square outline' : 'minus square outline'}
+                                        onClick={this.toggleHideUnused} />}>
+                    {hideUnused
+                        ? <Translate>Show unused rooms</Translate>
+                        : <Translate>Hide unused rooms</Translate>}
                 </Popup>
             </>
         );
@@ -164,13 +164,15 @@ class Calendar extends React.Component {
             calendarData: {
                 rows
             },
+            localFilters: {
+                hideUnused,
+            },
             actions: {
                 openRoomDetails, setDate, openBookingDetails, setMode
             },
             datePicker,
             allowDragDrop
         } = this.props;
-        const {showUnused} = this.state;
         const legendLabels = [
             {label: Translate.string('Booked'), color: 'orange'},
             {label: Translate.string('Pre-Booking'), style: 'pre-booking'},
@@ -205,7 +207,7 @@ class Calendar extends React.Component {
                                              onClickReservation={openBookingDetails}
                                              itemClass={editable ? EditableTimelineItem : TimelineItem}
                                              itemProps={editable ? {onAddSlot: this.onAddSlot} : {}}
-                                             showUnused={showUnused}
+                                             showUnused={!hideUnused}
                                              longLabel />
                         </div>
                     </Container>
@@ -222,6 +224,7 @@ export default connect(
         calendarData: calendarSelectors.getCalendarData(state),
         roomFilters: calendarSelectors.getRoomFilters(state),
         calendarFilters: calendarSelectors.getCalendarFilters(state),
+        localFilters: calendarSelectors.getLocalFilters(state),
         rooms: roomsSelectors.getAllRooms(state),
         datePicker: calendarSelectors.getDatePickerInfo(state)
     }),
