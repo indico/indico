@@ -26,8 +26,8 @@ from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
 
 @no_autoflush
 def _populate_room(room, properties):
-    basic_props = [prop for prop in properties if prop not in ['available_equipment', 'unbookable_periods',
-                                                                      'bookable_periods']]
+    basic_props = [prop for prop in properties if prop not in ['available_equipment', 'bookable_hours',
+                                                               'bookable_periods']]
     for prop in basic_props:
         if prop in properties:
             setattr(room, prop, properties[prop])
@@ -43,14 +43,13 @@ def update_room_equipment(room, properties):
 
 
 def update_room_attributes(room, attributes):
-    current_associations = {association.attribute.name: association for association in room.attributes}
-    for attribute, value in attributes.items():
-        if attribute in current_associations:
-            current_associations[attribute].value = value
-        else:
-            room_attr = RoomAttribute.query.filter_by(name=attribute).first()
-            if room_attr is not None:
-                room.attributes.append(RoomAttributeAssociation(room=room, attribute=room_attr, value=value))
+    current_attributes = {x.attribute.name for x in room.attributes}
+    new_attributes = {attribute['name'] for attribute in attributes}
+    deleted_attributes = current_attributes - new_attributes
+    for attribute in attributes:
+        room.set_attribute_value(attribute['name'], attribute['value'])
+    for deleted_attribute in deleted_attributes:
+        room.set_attribute_value(deleted_attribute, None)
     db.session.flush()
 
 

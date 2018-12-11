@@ -280,9 +280,13 @@ class RHRoomAttributes(RHRoomAdminBase):
 
 
 class RHRoomAttributesUpdate(RHRoomAdminBase):
-    def _process(self):
-        update_room_attributes(self.room, request.get_json())
-        return jsonify(room_attribute_values_schema(self.room.attributes))
+    @use_args({'attributes': fields.Nested({'title': fields.Str(),
+                                            'value': fields.Str(),
+                                            'name': fields.Str()}, many=True)})
+    def _process(self, args):
+        print args
+        update_room_attributes(self.room, args['attributes'])
+        return jsonify(room_attribute_values_schema.dump(self.room.attributes).data)
 
 
 class RHRoomAvailability(RHRoomAdminBase):
@@ -294,8 +298,8 @@ class RHRoomAvailability(RHRoomAdminBase):
 class RHRoomAvailabilityUpdate(RHRoomAdminBase):
     @use_args({'bookable_hours': fields.Nested({'start_time': fields.Time(),
                                                 'end_time': fields.Time()}, many=True),
-               'nonbookable_periods': fields.Nested({'start_dt': fields.DateTime(),
-                                                     'end_dt': fields.DateTime()}, many=True)})
+               'nonbookable_periods': fields.Nested({'start_dt': fields.Date(),
+                                                     'end_dt': fields.Date()}, many=True)})
     def _process(self, args):
         update_room_availability(self.room, args)
         return jsonify({'nonbookable_periods': nonbookable_periods_schema.dump(self.room.nonbookable_periods, many=True).data,

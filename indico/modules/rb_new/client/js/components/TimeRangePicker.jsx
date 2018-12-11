@@ -214,6 +214,7 @@ export default class TimeRangePicker extends React.Component {
         });
     };
 
+
     render() {
         const {startTime, endTime, startOptions, endOptions, duration, startSearchQuery, endSearchQuery} = this.state;
         const {disabled} = this.props;

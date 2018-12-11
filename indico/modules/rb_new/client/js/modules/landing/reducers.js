@@ -16,7 +16,7 @@
  */
 
 import {combineReducers} from 'redux';
-import camelizeKeys from 'indico/utils/camelize';
+import {camelizeKeys} from 'indico/utils/case';
 import {requestReducer} from 'indico/utils/redux';
 
 import * as landingActions from './actions';

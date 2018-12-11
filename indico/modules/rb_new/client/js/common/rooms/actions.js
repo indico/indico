@@ -21,7 +21,7 @@ import fetchRoomAvailabilityURL from 'indico-url:rooms_new.room_availability';
 import fetchRoomAttributesURL from 'indico-url:rooms_new.room_attributes';
 
 import {indicoAxios} from 'indico/utils/axios';
-import camelizeKeys from 'indico/utils/camelize';
+import {camelizeKeys} from 'indico/utils/case';
 import {ajaxAction} from 'indico/utils/redux';
 import {actions as modalActions} from '../../modals';
 
@@ -104,9 +104,6 @@ export function fetchAttributes(id) {
     };
 }
 
-export function updateRoom() {
-    return null;
-}
 
 export const openRoomDetails = (roomId) => modalActions.openModal('room-details', roomId);
 export const openRoomDetailsBook = (roomId) => modalActions.openModal('room-details-book', roomId);

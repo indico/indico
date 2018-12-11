@@ -19,7 +19,7 @@ import _ from 'lodash';
 import {combineReducers} from 'redux';
 
 import {requestReducer} from 'indico/utils/redux';
-import camelizeKeys from 'indico/utils/camelize';
+import {camelizeKeys} from 'indico/utils/case';
 import {filterReducerFactory} from '../../common/filters';
 import * as blockingsActions from './actions';
 

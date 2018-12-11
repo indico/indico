@@ -24,7 +24,7 @@ import searchUsersURL from 'indico-url:users.user_search';
 import searchGroupsURL from 'indico-url:groups.group_search';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {Translate} from 'indico/react/i18n';
-import camelizeKeys from 'indico/utils/camelize';
+import {camelizeKeys} from 'indico/utils/case';
 
 
 const searchUsers = async (data) => {

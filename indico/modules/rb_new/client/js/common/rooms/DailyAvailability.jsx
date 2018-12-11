@@ -32,7 +32,6 @@ export default class DailyAvailability extends React.Component {
         value: PropTypes.arrayOf(PropTypes.object).isRequired,
     };
 
-
     render() {
         const {value, onChange} = this.props;
         return (
@@ -42,7 +41,7 @@ export default class DailyAvailability extends React.Component {
                         icon labelPosition="left"
                         onClick={() => onChange([...value, {startTime: '08:00', endTime: '17:00', key: shortid.generate()}])}>
                     <Icon name="plus" />
-                    Add new Daily Availibity
+                    Add new Daily Availability
                 </Button>
                 {value && value.map((bookableHour) => {
                     const {startTime: startT, endTime: endT, key} = bookableHour;

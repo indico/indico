@@ -19,6 +19,6 @@ import _ from 'lodash';
 
 
 export function getChangedValues(data, form) {
-    const fields = form.getRegisteredFields();
+    const fields = form.getRegisteredFields().filter(x => !x.includes('['));
     return _.fromPairs(fields.filter(name => form.getFieldState(name).dirty).map(name => [name, data[name]]));
 }

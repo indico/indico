@@ -164,9 +164,8 @@ def search_for_rooms(filters, allow_admin=False, availability=None):
     if filters.get('equipment'):
         subquery = (db.session.query(RoomEquipmentAssociation)
                     .with_entities(db.func.count(RoomEquipmentAssociation.c.room_id))
-                    .filter(
-                        RoomEquipmentAssociation.c.room_id == Room.id,
-                        EquipmentType.name.in_(filters['equipment']))
+                    .filter(RoomEquipmentAssociation.c.room_id == Room.id,
+                            EquipmentType.name.in_(filters['equipment']))
                     .join(EquipmentType, RoomEquipmentAssociation.c.equipment_id == EquipmentType.id)
                     .correlate(Room)
                     .as_scalar())

@@ -32,6 +32,7 @@ class UserField(mmfields.Field):
     def _deserialize(self, value, attr, data, **kwargs):
         print value
         user = User.get(value, is_deleted=False)
+        print "here"
         print user
         return user
 
@@ -59,11 +60,11 @@ search_room_args = {
 room_args = {
     'verbose_name': fields.Str(),
     'site': fields.Str(),
-    'building': fields.String(required=True),
-    'floor': fields.String(required=True),
-    'number': fields.String(required=True),
-    'longitude': fields.String(),
-    'latitude': fields.String(),
+    'building': fields.String(validate=lambda x: x is not None),
+    'floor': fields.String(validate=lambda x: x is not None),
+    'number': fields.String(validate=lambda x: x is not None),
+    'longitude': fields.Float(),
+    'latitude': fields.Float(),
     'is_active': fields.Bool(missing=True),
     'is_reservable': fields.Bool(missing=True),
     'reservations_need_confirmation': fields.Bool(),
@@ -76,7 +77,7 @@ room_args = {
     'owner': UserField(load_from='owner_id', validate=lambda x: x is not None),
     'key_location': fields.Str(),
     'telephone': fields.Str(),
-    'capacity': fields.Int(required=True, validate=lambda x: x >= 1),
+    'capacity': fields.Int(validate=lambda x: x >= 1),
     'division': fields.Str(),
     'surface_area': fields.Int(validate=lambda x: x >= 0),
     'max_advance_days': fields.Int(validate=lambda x: x >= 1),

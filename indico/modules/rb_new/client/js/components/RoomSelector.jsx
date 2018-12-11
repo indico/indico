@@ -22,7 +22,7 @@ import {Button, Dropdown, Grid, Icon, List, Message, Segment} from 'semantic-ui-
 import getLocationsURL from 'indico-url:rooms_new.locations';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {Translate} from 'indico/react/i18n';
-import camelizeKeys from 'indico/utils/camelize';
+import {camelizeKeys} from 'indico/utils/case';
 import SpriteImage from './SpriteImage';
 
 import './RoomSelector.module.scss';

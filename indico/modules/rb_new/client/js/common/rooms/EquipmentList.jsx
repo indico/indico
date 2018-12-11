@@ -39,10 +39,9 @@ class EquipmentList extends React.Component {
     generateEquipmentOptions = () => {
         const {value} = this.props;
         const {equipmentTypes} = this.props;
-        const options = [];
-        equipmentTypes.map((equipmentType) => (value.indexOf(equipmentType.id) < 0
-            ? options.push({key: equipmentType.id, text: equipmentType.name, value: equipmentType.id}) : null));
-        return options;
+        return equipmentTypes
+            .filter(eq => value.includes(eq.id))
+            .map(eq => ({key: eq.id, text: eq.name, value: eq.id}));
     };
 
     render() {
@@ -70,22 +69,19 @@ class EquipmentList extends React.Component {
                               onChange([...value, values.value]);
                           }} />
                 <List key="equipment" divided>
-                    {value.map((equipmentId) => {
-                        return (
-                            <List.Item key={equipmentTypesMapped[equipmentId].id}>
-                                <List.Content floated="right">
-                                    <Icon styleName="equipment-button" name="trash" onClick={() => {
-                                        _.remove(value, (n) => {
-                                            return n === equipmentId;
-                                        });
-                                        onChange([...value]);
-                                    }} />
-                                </List.Content>
-                                <List.Content>{equipmentTypesMapped[equipmentId].name}
-                                </List.Content>
-                            </List.Item>
-                        );
-                    })}
+                    {value.map((equipmentId) => (
+                        <List.Item key={equipmentTypesMapped[equipmentId].id}>
+                            <List.Content floated="right">
+                                <Icon styleName="equipment-button" name="trash" onClick={() => {
+                                    _.remove(value, (n) => {
+                                        return n === equipmentId;
+                                    });
+                                    onChange([...value]);
+                                }} />
+                            </List.Content>
+                            <List.Content>{equipmentTypesMapped[equipmentId].name}</List.Content>
+                        </List.Item>
+                    ))}
                 </List>
                 </>
         );
@@ -95,6 +91,5 @@ class EquipmentList extends React.Component {
 export default connect(
     (state) => ({
         equipmentTypes: roomsSelectors.getEquipmentTypes(state)
-    }),
-    null
+    })
 )(EquipmentList);

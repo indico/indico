@@ -49,10 +49,11 @@ from indico.util.string import natural_sort_key
 
 class RoomAttributeValuesSchema(mm.ModelSchema):
     title = String(attribute='attribute.title')
+    name = String(attribute='attribute.name')
 
     class Meta:
         model = RoomAttributeAssociation
-        fields = ('value', 'title')
+        fields = ('value', 'title', 'name')
 
 
 class AttributesSchema(mm.ModelSchema):
@@ -77,7 +78,8 @@ class RoomUpdateSchema(RoomSchema):
 
     class Meta(RoomSchema.Meta):
         fields = RoomSchema.Meta.fields + ('notification_before_days', 'notification_before_days_weekly', 'owner',
-                                           'notification_before_days_monthly', 'verbose_name')
+                                           'notification_before_days_monthly', 'notifications_enabled',
+                                           'verbose_name', 'is_active')
 
 
 class RoomEquipmentSchema(mm.ModelSchema):

@@ -35,7 +35,7 @@ export default class SingleDatePicker extends React.Component {
 
     state = {
         focused: false,
-    };f
+    };
 
     onFocusChange = ({focused}) => {
         this.setState({focused});

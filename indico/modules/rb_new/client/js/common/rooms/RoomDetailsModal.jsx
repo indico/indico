@@ -54,7 +54,7 @@ class RoomDetailsModal extends React.Component {
     };
 
     state = {
-        roomEditVisible: false
+        roomEditVisible: true
     };
 
     showRoomEditModal = () => {

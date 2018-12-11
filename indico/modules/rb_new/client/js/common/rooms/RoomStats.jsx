@@ -22,7 +22,7 @@ import {Header, Grid, Placeholder} from 'semantic-ui-react';
 import getRoomStatsDataURL from 'indico-url:rooms_new.room_stats';
 import {Translate, Param, PluralTranslate, Singular, Plural} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
-import camelizeKeys from 'indico/utils/camelize';
+import {camelizeKeys} from 'indico/utils/case';
 
 import './RoomStats.module.scss';
 

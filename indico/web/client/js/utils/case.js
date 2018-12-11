@@ -22,8 +22,7 @@ function smartCamelCase(string) {
     return _.camelCase(string).replace(/Url/g, 'URL');
 }
 
-
-export default function camelizeKeys(obj) {
+export function camelizeKeys(obj) {
     if (!_.isPlainObject(obj) && !_.isArray(obj)) {
         return obj;
     }
@@ -37,6 +36,24 @@ export default function camelizeKeys(obj) {
             return {...accum, [smartCamelCase(key)]: camelizeKeys(value)};
         } else {
             return {...accum, [key]: camelizeKeys(value)};
+        }
+    }, {});
+}
+
+export function snakifyKeys(obj) {
+    if (!_.isPlainObject(obj) && !_.isArray(obj)) {
+        return obj;
+    }
+
+    if (_.isArray(obj)) {
+        return obj.map(snakifyKeys);
+    }
+
+    return Object.entries(obj).reduce((accum, [key, value]) => {
+        if (key.match(/^[A-Za-z_]+$/)) {
+            return {...accum, [_.snakeCase(key)]: snakifyKeys(value)};
+        } else {
+            return {...accum, [key]: snakifyKeys(value)};
         }
     }, {});
 }

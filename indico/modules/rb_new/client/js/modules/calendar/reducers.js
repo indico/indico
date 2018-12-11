@@ -19,7 +19,7 @@ import _ from 'lodash';
 import moment from 'moment';
 import {combineReducers} from 'redux';
 
-import camelizeKeys from 'indico/utils/camelize';
+import {camelizeKeys} from 'indico/utils/case';
 import {serializeDate, serializeTime} from 'indico/utils/date';
 import {requestReducer} from 'indico/utils/redux';
 import {actions as bookRoomActions} from '../../modules/bookRoom';

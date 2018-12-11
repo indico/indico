@@ -27,7 +27,7 @@ import {Form as FinalForm} from 'react-final-form';
 import {Button, Checkbox, Grid, Icon, Message, Modal, Segment} from 'semantic-ui-react';
 
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
-import camelizeKeys from 'indico/utils/camelize';
+import {camelizeKeys} from 'indico/utils/case';
 import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
 import {serializeDate, serializeTime} from 'indico/utils/date';
 import {ajax as ajaxFilterRules} from '../roomSearch/serializers';

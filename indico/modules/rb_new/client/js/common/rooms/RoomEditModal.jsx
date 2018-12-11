@@ -20,19 +20,22 @@ import fetchRoomAttributesURL from 'indico-url:rooms_new.admin_room_attributes';
 import fetchAttributesURL from 'indico-url:rooms_new.admin_attributes';
 import fetchRoomAvailabilityURL from 'indico-url:rooms_new.admin_room_availability';
 import fetchRoomEquipmentURL from 'indico-url:rooms_new.admin_room_equipment';
+import updateRoomBasicDetailsURL from 'indico-url:rooms_new.admin_update_room';
+import updateRoomEquipmentURL from 'indico-url:rooms_new.admin_update_room_equipment';
+import updateRoomAttributesURL from 'indico-url:rooms_new.admin_update_room_attributes';
+import updateRoomAvailabilityURL from 'indico-url:rooms_new.admin_update_room_availability';
 import _ from 'lodash';
 import React from 'react';
 import {connect} from 'react-redux';
-import {bindActionCreators} from 'redux';
 import PropTypes from 'prop-types';
-import {Button, Checkbox, Dimmer, Dropdown, Form, Grid, Header, Input, Loader, Modal, TextArea} from 'semantic-ui-react';
+import {Button, Checkbox, Dimmer, Dropdown, Form, Grid, Header, Input, Loader, Message, Modal, TextArea} from 'semantic-ui-react';
 import {Form as FinalForm, Field} from 'react-final-form';
 import {FieldArray} from 'react-final-form-arrays';
 import arrayMutators from 'final-form-arrays';
 import shortid from 'shortid';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
-import camelizeKeys from 'indico/utils/camelize';
-import {ReduxCheckboxField, ReduxFormField} from 'indico/react/forms';
+import {snakifyKeys, camelizeKeys} from 'indico/utils/case';
+import {getChangedValues, ReduxCheckboxField, ReduxFormField} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 import PrincipalSearchField from 'indico/react/components/PrincipalSearchField';
 import EquipmentList from './EquipmentList';
@@ -40,13 +43,32 @@ import DailyAvailability from './DailyAvailability';
 import NonBookablePeriods from './NonBookablePeriods';
 import SpriteImage from '../../components/SpriteImage';
 import * as roomsSelectors from './selectors';
-import * as roomActions from './actions';
 import {selectors as userSelectors} from '../user';
 
 import './RoomEditModal.module.scss';
 
 
-function validate() {
+function validate({building, floor, number, capacity, attributes, nonbookablePeriods}) {
+    const errors = {};
+    if (!building) {
+        errors.building = Translate.string('Please provide a building.');
+    }
+    if (!floor) {
+        errors.floor = Translate.string('Please provide a floor.');
+    }
+    if (!number) {
+        errors.number = Translate.string('Please provide a number.');
+    }
+    if (!capacity) {
+        errors.capacity = Translate.string('Please provide capacity.');
+    }
+    if (!attributes) {
+        errors.attributes = Translate.string('Please provide an attribute value.');
+    }
+    if (nonbookablePeriods.length > 0) {
+        errors.nonbookablePeriods = Translate.string('Please provide valid nonbookable periods.');
+    }
+    return errors;
 }
 
 const columns = [
@@ -59,17 +81,19 @@ const columns = [
         type: 'header',
         label: Translate.string('Contact')
     }, {
-        type: 'principal',
+        type: 'owner',
         name: 'ownerName',
         label: Translate.string('Owner')
     }, {
         type: 'input',
         name: 'keyLocation',
-        label: Translate.string('Where is the key?')
+        label: Translate.string('Where is the key?'),
+        required: false
     }, {
         type: 'input',
         name: 'telephone',
-        label: Translate.string('Telephone')
+        label: Translate.string('Telephone'),
+        required: false
     }, {
         type: 'header',
         label: Translate.string('Information')
@@ -79,47 +103,55 @@ const columns = [
         content: [{
             type: 'input',
             name: 'capacity',
-            label: Translate.string('Capacity(seats)')
+            label: Translate.string('Capacity(seats)'),
+            required: true
         }, {
             type: 'input',
             name: 'division',
-            label: Translate.string('Division')
+            label: Translate.string('Division'),
+            required: false
         }]
     }, {
         type: 'textarea',
         name: 'comments',
         label: Translate.string('Comments'),
+        required: false
     }, {
         type: 'header',
         label: Translate.string('Daily availability'),
     }, {
-        type: 'timeRange',
+        type: 'bookableHours',
     }], [{
         type: 'header',
         label: Translate.string('Location')
     }, {
         type: 'input',
         name: 'verboseName',
-        label: Translate.string('Name')
+        label: Translate.string('Name'),
+        required: false
     }, {
         type: 'input',
         name: 'site',
-        label: Translate.string('Site')
+        label: Translate.string('Site'),
+        required: false
     }, {
         type: 'formgroup',
         key: 'details',
         content: [{
             type: 'input',
             name: 'building',
-            label: Translate.string('Building')
+            label: Translate.string('Building'),
+            required: true
         }, {
             type: 'input',
             name: 'floor',
-            label: Translate.string('Floor')
+            label: Translate.string('Floor'),
+            required: true
         }, {
             type: 'input',
             name: 'number',
-            label: Translate.string('Number')
+            label: Translate.string('Number'),
+            required: true
         }]
     }, {
         type: 'formgroup',
@@ -127,20 +159,24 @@ const columns = [
         content: [{
             type: 'input',
             name: 'longitude',
-            label: Translate.string('longitude')
+            label: Translate.string('longitude'),
+            required: false
         }, {
             type: 'input',
             name: 'latitude',
-            label: Translate.string('latitude')
+            label: Translate.string('latitude'),
+            required: false
         }]
     }, {
         type: 'input',
         name: 'surfaceArea',
-        label: Translate.string('Surface Area (m2)')
+        label: Translate.string('Surface Area (m2)'),
+        required: false
     }, {
         type: 'input',
         name: 'maxAdvanceDays',
-        label: Translate.string('Maximum advance time for bookings (days)')
+        label: Translate.string('Maximum advance time for bookings (days)'),
+        required: false
     }, {
         type: 'header',
         label: 'Options',
@@ -150,28 +186,31 @@ const columns = [
         label: Translate.string('Active')
     }, {
         type: 'checkbox',
-        name: 'isPublic',
-        label: Translate.string('Public')
+        name: 'isReservable',
+        label: Translate.string('Bookable')
     }, {
         type: 'checkbox',
         name: 'isAutoConfirm',
         label: Translate.string('Confirmation')
     }, {
         type: 'checkbox',
-        name: 'reminders',
+        name: 'notificationsEnabled',
         label: Translate.string('Reminders Enabled')
     }, {
         type: 'input',
         name: 'dayReminder',
-        label: Translate.string('Send Booking reminders X days before (single/day)')
+        label: Translate.string('Send Booking reminders X days before (single/day)'),
+        required: false
     }, {
         type: 'input',
         name: 'weekReminder',
-        label: Translate.string('Send Booking reminders X days before (weekly)')
+        label: Translate.string('Send Booking reminders X days before (weekly)'),
+        required: false
     }, {
         type: 'input',
         name: 'monthReminder',
-        label: Translate.string('Send Booking reminders X days before (monthly)')
+        label: Translate.string('Send Booking reminders X days before (monthly)'),
+        required: false
     }], [{
         type: 'header',
         label: 'Custom Attributes'
@@ -188,8 +227,12 @@ const columns = [
         type: 'header',
         label: Translate.string('Nonbookable Periods'),
     }, {
-        type: 'dateRange'
-    }]];
+        type: 'nonBookablePeriods'
+    }, {
+        type: 'message',
+        content: Translate.string('Room has been successfully edited.')
+    }]
+];
 
 
 class RoomEditModal extends React.Component {
@@ -198,9 +241,6 @@ class RoomEditModal extends React.Component {
         favoriteUsers: PropTypes.array.isRequired,
         onClose: PropTypes.func.isRequired,
         roomId: PropTypes.number.isRequired,
-        actions: PropTypes.exact({
-            updateRoom: PropTypes.func.isRequired,
-        }).isRequired,
     };
 
     state = {
@@ -209,6 +249,7 @@ class RoomEditModal extends React.Component {
         roomAttributes: null,
         roomAvailability: null,
         roomEquipment: null,
+        submitSucceeded: false,
     };
 
     componentDidMount() {
@@ -294,17 +335,37 @@ class RoomEditModal extends React.Component {
         onClose();
     };
 
-    handleSubmit = async (formData) => {
-        console.warn(formData);
-        const {actions: {updateRoom}, room: {id}} = this.props;
-        const rv = await updateRoom(id, formData);
-        if (rv.error) {
-            return rv.error;
+    handleSubmit = async (data, form) => {
+        const {roomId} = this.props;
+        const changedValues = getChangedValues(data, form);
+        const basicDetails = _.omit(changedValues, ['attributes', 'bookableHours', 'nonbookablePeriods', 'availableEquipment']);
+        if ('owner' in changedValues) {
+            basicDetails.owner_id = changedValues.owner.id;
         }
+        const {availableEquipment, nonbookablePeriods, bookableHours, attributes} = changedValues;
+
+        const requests = [];
+        if (!_.isEmpty(basicDetails)) {
+            requests.push(indicoAxios.patch(updateRoomBasicDetailsURL({room_id: roomId}), snakifyKeys(basicDetails)));
+        }
+        if (availableEquipment) {
+            requests.push(indicoAxios.post(updateRoomEquipmentURL({room_id: roomId}), {available_equipment: availableEquipment}));
+        }
+        if (attributes) {
+            requests.push(indicoAxios.post(updateRoomAttributesURL({room_id: roomId}), {attributes}));
+        }
+        if (nonbookablePeriods || bookableHours) {
+            requests.push(indicoAxios.post(updateRoomAvailabilityURL({room_id: roomId}), snakifyKeys(_.pick(changedValues, ['bookableHours', 'nonbookablePeriods']))));
+        }
+
+        Promise.all(requests.map(request => request.catch(e => e)))
+            .then(() => this.setState({submitSucceeded: true}))
+            .catch(e => handleAxiosError(e));
     };
 
+
     renderImage = (position) => {
-        return <SpriteImage pos={position} />;
+        return <SpriteImage key="image" pos={position} />;
     };
 
     renderAttributes = (content) => {
@@ -313,7 +374,7 @@ class RoomEditModal extends React.Component {
             return null;
         }
         return (
-            <FieldArray name="attributes">
+            <FieldArray key="attributes" name="attributes" isEqual={_.isEqual}>
                 {({fields}) => {
                     const options = this.generateAttributeOptions(attributes, fields.value);
                     return (
@@ -328,7 +389,12 @@ class RoomEditModal extends React.Component {
                                       search
                                       disabled={options.length === 0}
                                       selectOnBlur={false}
-                                      onChange={(event, values) => fields.push({title: values.value, value: null})} />
+                                      onChange={(event, values) => {
+                                          // console.warn(name);
+                                          //       fields.push({
+                                          //       title: values.text, value: null, name: values.key
+                                          //   })
+                                      }} />
                             {fields.map((attribute, index) => (
                                 <div key={attribute}>
                                     <Field label={fields.value[index].title}
@@ -336,6 +402,7 @@ class RoomEditModal extends React.Component {
                                            component={ReduxFormField}
                                            as={Input}
                                            isEqual={_.isEqual}
+                                           required
                                            icon={{name: 'trash', color: 'red', link: true, onClick: () => fields.remove(index)}} />
                                 </div>
                             ))}
@@ -346,78 +413,48 @@ class RoomEditModal extends React.Component {
         );
     };
 
-    renderEquipmentList = ({input, ...props}) => {
-        return (
-            <ReduxFormField {...props}
-                            input={input}
-                            as={EquipmentList}
-                            componentLabel={Translate.string('Add new equipment')} />
-        );
-    };
-
-    renderHours = ({input, ...props}) => {
-        return (
-            <ReduxFormField {...props}
-                            input={input}
-                            as={DailyAvailability} />
-        );
-    };
-
-    renderPeriods = ({input, ...props}) => {
-        return (
-            <ReduxFormField {...props}
-                            input={input}
-                            as={NonBookablePeriods} />
-        );
-    };
-
-    renderPrincipalSearchField = (props) => {
-        const {favoriteUsers} = this.props;
-        return (
-            <ReduxFormField {...props}
-                            favoriteUsers={favoriteUsers}
-                            as={PrincipalSearchField}
-                            label={Translate.string('Owner')} />
-        );
-    };
-
     renderColumn = (column, key) => (
         <Grid.Column key={key}>{column.map(this.renderContent)}</Grid.Column>
     );
 
-    renderContent = (content) => {
-        const {room, roomEquipment} = this.state;
-        const {equipmentTypes} = this.props;
+    renderContent = (content, key) => {
+        const {room, roomEquipment, submitSucceeded} = this.state;
+        const {equipmentTypes, favoriteUsers} = this.props;
         if (!equipmentTypes) {
             return;
         }
         switch (content.type) {
             case 'header':
                 return (
-                    <Header key={content.label}>{content.label}</Header>
+                    <Header key={key}>{content.label}</Header>
                 );
             case 'input':
                 return (
-                    <Field key={content.name}
+                    <Field key={key}
                            name={content.name}
                            component={ReduxFormField}
                            label={content.label}
+                           required={content.required}
                            as="input" />
                 );
-            case 'principal':
+            case 'owner':
                 return (
-                    <Field name="owner"
-                           render={this.renderPrincipalSearchField} />
+                    <Field key={key}
+                           name="owner"
+                           component={ReduxFormField}
+                           as={PrincipalSearchField}
+                           favoriteUsers={favoriteUsers}
+                           label={content.label} />
                 );
             case 'formgroup':
                 return (
-                    <Form.Group key={content.key}>
+                    <Form.Group key={key}>
                         {content.content.map(this.renderContent)}
                     </Form.Group>
                 );
             case 'checkbox':
                 return (
-                    <Field key={content.name}
+                    <Field key={key}
                            name={content.name}
                            component={ReduxCheckboxField}
                            componentLabel={content.label}
@@ -425,7 +462,7 @@ class RoomEditModal extends React.Component {
                 );
             case 'textarea':
                 return (
-                    <Field key={content.name}
+                    <Field key={key}
                            name={content.name}
                            component={ReduxFormField}
                            label={content.label}
@@ -440,21 +477,37 @@ class RoomEditModal extends React.Component {
                     return;
                 }
                 return (
-                    <Field name="availableEquipment"
+                    <Field key={key}
+                           name="availableEquipment"
+                           component={ReduxFormField}
+                           as={EquipmentList}
                            isEqual={_.isEqual}
-                           render={this.renderEquipmentList} />
+                           componentLabel={Translate.string('Add new equipment')} />
                 );
-            case 'timeRange':
+            case 'bookableHours':
                 return (
-                    <Field name="bookableHours"
-                           isEqual={_.isEqual}
-                           render={this.renderHours} />
+                    <Field key={key}
+                           name="bookableHours"
+                           component={ReduxFormField}
+                           as={DailyAvailability}
+                           isEqual={_.isEqual} />
                 );
-            case 'dateRange':
+            case 'nonBookablePeriods':
                 return (
-                    <Field name="nonbookablePeriods"
-                           isEqual={_.isEqual}
-                           render={this.renderPeriods} />
+                    <Field key={key}
+                           name="nonbookablePeriods"
+                           component={ReduxFormField}
+                           as={NonBookablePeriods}
+                           isEqual={_.isEqual} />
+                );
+            case 'message':
+                return (
+                    <Message key={key}
+                             styleName="success-message"
+                             positive
+                             hidden={!submitSucceeded}>
+                        {content.content}
+                    </Message>
                 );
         }
     };
@@ -462,11 +515,12 @@ class RoomEditModal extends React.Component {
 
     renderModalContent = (fprops) => {
         const formProps = {onSubmit: fprops.handleSubmit};
+        const {hasValidationErrors, pristine, submitting, submitSucceeded} = fprops;
         const {onClose} = this.props;
         return (
             <>
                 <Modal.Header>
-                    <Translate>Edit Room Details</Translate>
+                    {Translate.string('Edit Room Details')}
                 </Modal.Header>
                 <Modal.Content scrolling>
                     <Form id="room-form" {...formProps}>
@@ -481,21 +535,21 @@ class RoomEditModal extends React.Component {
                     </Button>
                     <Button type="submit"
                             form="room-form"
-                            primary>
-                        <Translate>Save</Translate>
+                            primary
+                            disabled={pristine || submitting || submitSucceeded || hasValidationErrors}
+                            loading={submitting}>
+                        {Translate.string('Save')}
                     </Button>
                 </Modal.Actions>
             </>
         );
     };
 
-
     generateAttributeOptions = (attributes, arrayFields) => {
-        const fieldNames = arrayFields.map(field => field.title);
-        const options = attributes.map((key) => ({key: key.name, text: key.title, value: key.name})).filter(attr => !fieldNames.includes(attr.key));
+        const fieldNames = arrayFields.map(field => field.name);
+        const options = attributes.map((key) => ({key: key.name, text: key.title, value: key.value})).filter(attr => !fieldNames.includes(attr.key));
         return options;
     };
-
 
     render() {
         const {room, roomAttributes, attributes, roomEquipment, roomAvailability} = this.state;
@@ -503,12 +557,18 @@ class RoomEditModal extends React.Component {
         if (!room || !attributes || !roomAttributes || !roomEquipment) {
             return <Dimmer active page><Loader /></Dimmer>;
         }
+        const initialValues = {
+            ...room,
+            attributes: roomAttributes,
+            ...roomEquipment,
+            ...roomAvailability,
+        };
         return (
             <>
                 <Modal open onClose={this.handleCloseModal} size="large" closeIcon>
                     <FinalForm {...props}
                                render={this.renderModalContent}
-                               initialValues={{...room, attributes: roomAttributes, ...roomEquipment, ...roomAvailability}}
+                               initialValues={initialValues}
                                mutators={{
                                    ...arrayMutators
                                }} />
@@ -522,10 +582,5 @@ export default connect(
     (state) => ({
         equipmentTypes: roomsSelectors.getEquipmentTypes(state),
         favoriteUsers: userSelectors.getFavoriteUsers(state),
-    }),
-    dispatch => ({
-        actions: bindActionCreators({
-            updateRoom: roomActions.updateRoom,
-        }, dispatch)
     })
 )(RoomEditModal);
