@@ -97,9 +97,9 @@ class Calendar extends React.Component {
         }
     }
 
-    onAddSlot = ({room: {id, isAutoConfirm}, slotStartTime, slotEndTime}) => {
+    onAddSlot = ({room, slotStartTime, slotEndTime}) => {
         const {datePicker: {selectedDate}, actions: {openBookRoom}} = this.props;
-        openBookRoom(id, {
+        openBookRoom(room.id, {
             dates: {
                 startDate: selectedDate,
                 endDate: null,
@@ -111,7 +111,7 @@ class Calendar extends React.Component {
             recurrence: {
                 type: 'single',
             },
-            isPrebooking: !isAutoConfirm,
+            isPrebooking: !room.canUserBook,
         });
     };
 

@@ -28,7 +28,6 @@ import RoomKeyLocation from '../../components/RoomKeyLocation';
 import RoomStats from './RoomStats';
 import {DailyTimelineContent, TimelineLegend} from '../timeline';
 import * as roomsSelectors from './selectors';
-import {selectors as userSelectors} from '../user';
 import {actions as bookRoomActions} from '../../modules/bookRoom';
 
 import './RoomDetailsModal.module.scss';
@@ -42,7 +41,6 @@ class RoomDetailsModal extends React.Component {
         onClose: PropTypes.func.isRequired,
         promptDatesOnBook: PropTypes.bool,
         title: IndicoPropTypes.i18n,
-        isAdmin: PropTypes.bool,
         actions: PropTypes.exact({
             openBookRoom: PropTypes.func.isRequired,
             openBookingForm: PropTypes.func.isRequired,
@@ -52,7 +50,6 @@ class RoomDetailsModal extends React.Component {
     static defaultProps = {
         promptDatesOnBook: false,
         title: <Translate>Room Details</Translate>,
-        isAdmin: false,
     };
 
     handleCloseModal = () => {
@@ -62,7 +59,7 @@ class RoomDetailsModal extends React.Component {
 
     render() {
         const {
-            room, availability, attributes, promptDatesOnBook, title, isAdmin,
+            room, availability, attributes, promptDatesOnBook, title,
             actions: {openBookRoom, openBookingForm}
         } = this.props;
         return (
@@ -77,8 +74,7 @@ class RoomDetailsModal extends React.Component {
                     <RoomDetails room={room}
                                  attributes={attributes}
                                  availability={availability}
-                                 bookRoom={promptDatesOnBook ? openBookRoom : openBookingForm}
-                                 isAdmin={isAdmin} />
+                                 bookRoom={promptDatesOnBook ? openBookRoom : openBookingForm} />
                 </Modal.Content>
             </Modal>
         );
@@ -90,7 +86,6 @@ export default connect(
         room: roomsSelectors.getRoom(state, {roomId}),
         availability: roomsSelectors.getAvailability(state, {roomId}),
         attributes: roomsSelectors.getAttributes(state, {roomId}),
-        isAdmin: userSelectors.isUserAdmin(state),
     }),
     dispatch => ({
         actions: bindActionCreators({
@@ -101,7 +96,7 @@ export default connect(
 )(Overridable.component('RoomDetailsModal', RoomDetailsModal));
 
 
-function RoomDetails({bookRoom, room, availability, attributes, isAdmin}) {
+function RoomDetails({bookRoom, room, availability, attributes}) {
     const legendLabels = [
         {label: Translate.string('Booked'), color: 'orange'},
         {label: Translate.string('Pre-Booking'), style: 'pre-booking'},
@@ -147,20 +142,18 @@ function RoomDetails({bookRoom, room, availability, attributes, isAdmin}) {
                         <Translate>Would you like to use this space?</Translate>
                     </Message>
                     <Segment attached="bottom">
-                        {isAdmin && !room.isAutoConfirm && (
+                        {room.canUserBook && (
                             <Button color="green" onClick={() => bookRoom(room.id, {isPrebooking: false})}>
                                 <Icon name="check circle" />
                                 <Translate>Start booking</Translate>
                             </Button>
                         )}
-                        <Button color={room.isAutoConfirm ? 'green' : 'orange'}
-                                onClick={() => bookRoom(room.id, {isPrebooking: !room.isAutoConfirm})}>
-                            <Icon name="check circle" />
-                            {room.isAutoConfirm
-                                ? <Translate>Start booking</Translate>
-                                : <Translate>Start pre-booking</Translate>
-                            }
-                        </Button>
+                        {room.canUserPreBook && (
+                            <Button color="orange" onClick={() => bookRoom(room.id, {isPrebooking: true})}>
+                                <Icon name="check circle" />
+                                <Translate>Start pre-booking</Translate>
+                            </Button>
+                        )}
                     </Segment>
                 </Grid.Column>
             </Grid>
@@ -173,11 +166,6 @@ RoomDetails.propTypes = {
     room: PropTypes.object.isRequired,
     availability: PropTypes.array.isRequired,
     attributes: PropTypes.array.isRequired,
-    isAdmin: PropTypes.bool,
-};
-
-RoomDetails.defaultProps = {
-    isAdmin: false,
 };
 
 
