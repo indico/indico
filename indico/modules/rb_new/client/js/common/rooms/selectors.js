@@ -19,6 +19,7 @@ import _ from 'lodash';
 import {createSelector} from 'reselect';
 
 import {RequestState} from 'indico/utils/redux';
+import {isUserAdmin} from '../user/selectors';
 
 
 export const hasLoadedEquipmentTypes = ({rooms}) => rooms.requests.equipmentTypes.state === RequestState.SUCCESS;
@@ -64,7 +65,8 @@ export const getFeatures = createSelector(
 export const getAllRooms = createSelector(
     ({rooms}) => rooms.rooms,
     getEquipmentTypes,
-    (rawRooms, equipmentTypes) => {
+    isUserAdmin,
+    (rawRooms, equipmentTypes, isAdmin) => {
         equipmentTypes = equipmentTypes.reduce((obj, eq) => ({...obj, [eq.id]: eq}), {});
         return _.fromPairs(rawRooms.map(room => {
             const {availableEquipment: equipment, ...roomData} = room;
@@ -87,6 +89,8 @@ export const getAllRooms = createSelector(
                 ...roomData,
                 equipment: equipment.map(id => equipmentTypes[id].name).sort(),
                 features: sortedFeatures,
+                canUserBook: isAdmin || room.isAutoConfirm,
+                canUserPreBook: !room.isAutoConfirm,
             }];
         }));
     }

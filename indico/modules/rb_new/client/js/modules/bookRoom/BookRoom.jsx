@@ -43,7 +43,6 @@ import * as bookRoomActions from './actions';
 import {actions as filtersActions} from '../../common/filters';
 import {actions as roomsActions, RoomRenderer} from '../../common/rooms';
 import * as bookRoomSelectors from './selectors';
-import {selectors as userSelectors} from '../../common/user';
 import {mapControllerFactory, selectors as mapSelectors} from '../../common/map';
 
 import './BookRoom.module.scss';
@@ -60,7 +59,6 @@ class BookRoom extends React.Component {
         isSearching: PropTypes.bool.isRequired,
         searchFinished: PropTypes.bool.isRequired,
         isTimelineVisible: PropTypes.bool.isRequired,
-        isAdmin: PropTypes.bool.isRequired,
         hasConflicts: PropTypes.bool.isRequired,
         totalResultCount: PropTypes.number.isRequired,
         filters: PropTypes.object.isRequired,
@@ -233,7 +231,7 @@ class BookRoom extends React.Component {
             showSuggestions,
             labels
         } = this.props;
-        const {actions: {openRoomDetails}, isAdmin} = this.props;
+        const {actions: {openRoomDetails}} = this.props;
 
         const bookingModalBtn = (room, isPrebooking = false) => (
             <Button circular
@@ -261,18 +259,18 @@ class BookRoom extends React.Component {
                                     <RoomRenderer rooms={this.visibleRooms}>
                                         {room => (
                                             <Slot name="actions">
-                                                {isAdmin && !room.isAutoConfirm && (
+                                                {room.canUserBook && (
                                                     <Popup trigger={bookingModalBtn(room)}
                                                            content={labels.bookButton}
                                                            position="top center"
                                                            hideOnScroll />
                                                 )}
-                                                <Popup trigger={bookingModalBtn(room, !room.isAutoConfirm)}
-                                                       content={room.isAutoConfirm
-                                                           ? labels.bookButton
-                                                           : labels.preBookButton}
-                                                       position="top center"
-                                                       hideOnScroll />
+                                                {room.canUserPreBook && (
+                                                    <Popup trigger={bookingModalBtn(room, true)}
+                                                           content={labels.preBookButton}
+                                                           position="top center"
+                                                           hideOnScroll />
+                                                )}
                                                 <Popup trigger={showDetailsBtn(room)}
                                                        content={labels.detailsButton}
                                                        position="top center"
@@ -334,7 +332,7 @@ class BookRoom extends React.Component {
             <>
                 {time && (
                     <Message styleName="suggestion-text" size="mini"
-                             onClick={() => this.openBookingForm(room, {time}, !room.isAutoConfirm)}
+                             onClick={() => this.openBookingForm(room, {time}, !room.canUserBook)}
                              warning compact>
                         <Message.Header>
                             <Icon name="clock" />
@@ -357,7 +355,7 @@ class BookRoom extends React.Component {
                 )}
                 {duration && (
                     <Message styleName="suggestion-text" size="mini"
-                             onClick={() => this.openBookingForm(room, {duration}, !room.isAutoConfirm)}
+                             onClick={() => this.openBookingForm(room, {duration}, !room.canUserBook)}
                              warning compact>
                         <Message.Header>
                             <Icon name="hourglass full" /> {PluralTranslate.string('One minute shorter', '{duration} minutes shorter', duration, {duration})}
@@ -366,7 +364,7 @@ class BookRoom extends React.Component {
                 )}
                 {skip && (
                     <Message styleName="suggestion-text" size="mini"
-                             onClick={() => this.openBookingForm(room, null, !room.isAutoConfirm)}
+                             onClick={() => this.openBookingForm(room, null, !room.canUserBook)}
                              warning compact>
                         <Message.Header>
                             <Icon name="calendar times" /> {PluralTranslate.string('Skip one day', 'Skip {skip} days', skip, {skip})}
@@ -459,7 +457,6 @@ class BookRoom extends React.Component {
 const mapStateToProps = (state) => {
     return {
         isTimelineVisible: bookRoomSelectors.isTimelineVisible(state),
-        isAdmin: userSelectors.isUserAdmin(state),
         filters: bookRoomSelectors.getFilters(state),
         results: bookRoomSelectors.getSearchResults(state),
         suggestions: bookRoomSelectors.getSuggestions(state),
