@@ -28,16 +28,19 @@ from indico.core.db import db
 from indico.core.errors import NoReportError
 from indico.modules.rb import rb_settings
 from indico.modules.rb.controllers import RHRoomBookingBase
+from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import RepeatFrequency, Reservation
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb_new.controllers.backend.common import search_room_args
 from indico.modules.rb_new.operations.bookings import get_booking_occurrences, get_room_calendar, get_rooms_availability
 from indico.modules.rb_new.operations.suggestions import get_suggestions
 from indico.modules.rb_new.schemas import (create_booking_args, reservation_details_occurrences_schema,
-                                           reservation_details_schema, reservation_event_data_schema)
+                                           reservation_details_schema, reservation_event_data_schema,
+                                           reservation_occurrences_full_schema)
 from indico.modules.rb_new.util import (group_by_occurrence_date, serialize_blockings, serialize_nonbookable_periods,
                                         serialize_occurrences, serialize_unbookable_hours)
 from indico.modules.users.models.users import User
+from indico.util.date_time import now_utc, utc_to_server
 from indico.util.i18n import _
 from indico.web.util import ExpectedError
 
@@ -223,7 +226,6 @@ class RHBookingEventData(RHBookingBase):
             return jsonify(can_access=False)
         return jsonify(reservation_event_data_schema.dump(self.booking.event).data)
 
-
 class RHUpdateBooking(RHBookingBase):
     @use_args(create_booking_args)
     def _process(self, args):
@@ -245,3 +247,15 @@ class RHUpdateBooking(RHBookingBase):
         calendar = get_room_calendar(start_date or date.today(), end_date or date.today(), [args['room_id']])
         return jsonify(booking=_serialize_booking_details(self.booking),
                        room_calendar=_serialize_availability(calendar).values())
+
+class RHMyUpcomingBookings(RHRoomBookingBase):
+    def _process(self):
+        q = (ReservationOccurrence.query
+             .filter(ReservationOccurrence.start_dt > utc_to_server(now_utc()),
+                     db.or_(
+                         Reservation.booked_for_user == session.user,
+                         Reservation.created_by_user == session.user))
+             .join(Reservation)
+             .order_by(ReservationOccurrence.start_dt.asc())
+             .limit(5))
+        return jsonify(reservation_occurrences_full_schema.dump(q).data)
