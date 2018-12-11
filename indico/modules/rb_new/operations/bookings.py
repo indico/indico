@@ -221,24 +221,24 @@ def check_room_available(room, start_dt, end_dt):
     prebookings = [occ for occ in occurrences if not occ.reservation.is_accepted]
     bookings = [occ for occ in occurrences if occ.reservation.is_accepted]
     unbookable_hours = get_rooms_unbookable_hours([room])
-    hours_overlap = [hours for hours in unbookable_hours
-                     if overlaps((start_dt.time(), end_dt.time()), (hours.start_time, hours.end_time))]
-    nonbookable_periods = get_rooms_nonbookable_periods([room], start_dt, end_dt)
+    hours_overlap = any(hours for hours in unbookable_hours
+                        if overlaps((start_dt.time(), end_dt.time()), (hours.start_time, hours.end_time)))
+    nonbookable_periods = any(get_rooms_nonbookable_periods([room], start_dt, end_dt))
     blockings = get_rooms_blockings([room], start_dt, end_dt).get(room.id, [])
-    blocked_for_user = [blocking for blocking in blockings
-                        if not blocking.blocking.can_be_overridden(session.user, room)]
-    user_bookings = [booking for booking in bookings if booking.reservation.booked_for_id == session.user.id]
-    user_prebookings = [prebooking for prebooking in prebookings
-                        if prebooking.reservation.booked_for_id == session.user.id]
+    blocked_for_user = any(blocking for blocking in blockings
+                           if not blocking.blocking.can_be_overridden(session.user, room, explicit_only=True))
+    user_booking = any(booking for booking in bookings if booking.reservation.booked_for_id == session.user.id)
+    user_prebooking = any(prebooking for prebooking in prebookings
+                          if prebooking.reservation.booked_for_id == session.user.id)
 
     return {
-        'can_book': room.can_be_booked(session.user),
-        'can_prebook': room.can_be_prebooked(session.user),
-        'conflict_booking': bool(bookings),
-        'conflict_prebooking': bool(prebookings),
-        'unbookable': bool(hours_overlap or nonbookable_periods or blocked_for_user),
-        'user_booking': bool(user_bookings),
-        'user_prebooking': bool(user_prebookings),
+        'can_book': room.can_be_booked(session.user, ignore_admin=True),
+        'can_prebook': room.can_be_prebooked(session.user, ignore_admin=True),
+        'conflict_booking': any(bookings),
+        'conflict_prebooking': any(prebookings),
+        'unbookable': (hours_overlap or nonbookable_periods or blocked_for_user),
+        'user_booking': user_booking,
+        'user_prebooking': user_prebooking,
     }
 
 
@@ -251,7 +251,7 @@ def create_booking_for_event(room_id, event):
         booking_reason = "Event '%s'" % (event.title)
         data = dict(start_dt=start_dt, end_dt=end_dt, booked_for_user=event.creator, booking_reason=booking_reason,
                     repeat_frequency=RepeatFrequency.NEVER, event_id=event.id)
-        resv = Reservation.create_from_data(room, data, session.user)
+        resv = Reservation.create_from_data(room, data, session.user, ignore_admin=True)
         return resv
     except NoReportError:
         flash(_("Couldn't create the booking. Probably somebody else booked the room in the meantime."), 'error')
