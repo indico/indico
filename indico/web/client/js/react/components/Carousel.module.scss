@@ -1,0 +1,81 @@
+/* This file is part of Indico.
+ * Copyright (C) 2002 - 2018 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
+@import 'rb_new:styles/palette';
+
+.carousel {
+    padding: 1em 0 0 0;
+
+    .pane-container {
+        display: flex;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+    }
+}
+
+.carousel-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 100%;
+    min-height: 100%;
+    transition: margin-left 1s ease-out;
+}
+
+.progress-indicator {
+    transition: background-color 0.25s ease-in;
+    background-color: $pastel-gray;
+    width: 100px;
+    height: 2px;
+    margin: 10px auto;
+
+    &:global(.disabled), &:global(.disabled) .progress-bar {
+        background-color: $light-gray;
+    }
+
+    .progress-bar {
+        height: 100%;
+        background-color: $primary-color;
+        transition: width 0.25s linear;
+        width: 0;
+    }
+}
+
+.pane-switcher {
+    list-style-type: none;
+    padding: 0;
+    margin: 0.5em 0 0 0;
+
+    .pane-switcher-item {
+        display: inline-block;
+        border: 1px solid $primary-color;
+        width: 15px;
+        height: 15px;
+        border-radius: 100%;
+        cursor: pointer;
+        transition: background-color 0.25s ease-in;
+
+        &:not(:last-child) {
+            margin-right: 0.5em;
+        }
+
+        &:global(.active) {
+            background-color: $primary-color;
+        }
+    }
+}
