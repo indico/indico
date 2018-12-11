@@ -28,27 +28,34 @@ import './Menu.module.scss';
 const defaultLabels = {
     bookRoom: <Translate>Book a Room</Translate>,
     roomList: <Translate>List of Rooms</Translate>,
-    calendar: <Translate>Calendar</Translate>,
-    blockings: <Translate>Blockings</Translate>
+    calendar: <Translate>Calendar</Translate>
 };
 
+const menuItems = [
+    ['bookRoom', {
+        path: '/book',
+        icon: 'add square'
+    }],
+    ['roomList', {
+        path: '/rooms',
+        icon: 'list'
+    }],
+    ['calendar', {
+        path: '/calendar',
+        icon: 'calendar'
+    }]
+];
 
 export default function Menu({labels}) {
     const finalLabels = {...defaultLabels, ...labels};
     return (
         <ul styleName="rb-menu">
-            <MenuItem key="book" path="/book" namespace="bookRoom">
-                <Icon name="add square" />
-                {finalLabels.bookRoom}
-            </MenuItem>
-            <MenuItem key="rooms" path="/rooms" namespace="roomList">
-                <Icon name="list" />
-                {finalLabels.roomList}
-            </MenuItem>
-            <MenuItem key="calendar" path="/calendar" namespace="calendar">
-                <Icon name="calendar" />
-                {finalLabels.calendar}
-            </MenuItem>
+            {menuItems.map(([key, {path, icon}]) => (
+                <MenuItem key={key} path={path} namespace={key}>
+                    <Icon name={icon} />
+                    {finalLabels[key]}
+                </MenuItem>
+            ))}
         </ul>
     );
 }
