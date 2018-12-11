@@ -15,8 +15,40 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-export const getStatistics = ({landing}) => landing.stats.data;
-export const hasStatistics = (state) => getStatistics(state) !== null;
-export const getUpcomingBookings = ({landing}) => landing.upcomingBookings.data;
-export const hasUpcomingBookings = ({landing: {upcomingBookings: {data}}}) => !!(data && data.length);
-export const hasFetchedUpcomingBookings = ({landing: {upcomingBookings: {request}}}) => request.state === 'success';
+@import 'rb_new:styles/palette';
+
+:global(.ui.list) > .upcoming-bookings-item:global(.item) {
+    cursor: pointer;
+
+    :global(.description) {
+        margin: 0.5em 0;
+    }
+
+    .booking-reason {
+        font-style: italic;
+        color: $dark-gray;
+    }
+}
+
+.upcoming-bookings-list {
+    overflow: hidden;
+    max-height: 150px;
+}
+
+.upcoming-item-img-container {
+    position: relative;
+    width: 80%;
+    margin: auto;
+
+    .upcoming-item-room-notch {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+
+        .upcoming-item-room-name {
+            background: $white;
+            padding: 0.2em 0.5em;
+            border-radius: 2px 0 0 2px;
+        }
+    }
+}

@@ -16,6 +16,7 @@
  */
 
 import fetchStatsURL from 'indico-url:rooms_new.stats';
+import fetchUpcomingBookingsURL from 'indico-url:rooms_new.my_bookings';
 import {indicoAxios} from 'indico/utils/axios';
 import {ajaxAction} from 'indico/utils/redux';
 
@@ -25,6 +26,11 @@ export const FETCH_STATS_REQUEST = 'landing/FETCH_STATS_REQUEST';
 export const FETCH_STATS_SUCCESS = 'landing/FETCH_STATS_SUCCESS';
 export const FETCH_STATS_ERROR = 'landing/FETCH_STATS_ERROR';
 
+export const BOOKINGS_RECEIVED = 'landing/BOOKINGS_RECEIVED';
+export const FETCH_BOOKINGS_REQUEST = 'landing/FETCH_BOOKINGS_REQUEST';
+export const FETCH_BOOKINGS_SUCCESS = 'landing/FETCH_BOOKINGS_SUCCESS';
+export const FETCH_BOOKINGS_ERROR = 'landing/FETCH_BOOKINGS_ERROR';
+
 
 export function fetchStatistics() {
     return ajaxAction(
@@ -32,5 +38,14 @@ export function fetchStatistics() {
         FETCH_STATS_REQUEST,
         [STATS_RECEIVED, FETCH_STATS_SUCCESS],
         FETCH_STATS_ERROR
+    );
+}
+
+export function fetchUpcomingBookings() {
+    return ajaxAction(
+        () => indicoAxios.get(fetchUpcomingBookingsURL()),
+        FETCH_BOOKINGS_REQUEST,
+        [BOOKINGS_RECEIVED, FETCH_BOOKINGS_SUCCESS],
+        FETCH_BOOKINGS_ERROR
     );
 }

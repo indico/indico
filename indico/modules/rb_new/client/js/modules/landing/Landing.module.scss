@@ -102,15 +102,16 @@
         }
     }
 
-    .landing-page-statistics {
-        max-height: 200px;
+    .landing-page-lower-row {
+        min-height: 200px;
+        max-height: 300px;
         background-color: #fff;
+        padding: 1em 0 0 0;
+        // to compensate margin from SUI containers
+        margin-bottom: -1rem;
 
-        .statistics {
-            margin-top: 25px;
-
-            :global(.ui.statistic) {
-
+        .lower-row {
+            :global(.statistics) {
                 :global(.value), :global(.label) {
                     color: $highlight-color;
                 }

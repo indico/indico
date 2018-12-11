@@ -67,7 +67,7 @@ class LandingStatistics extends React.Component {
         const {statistics: {activeRooms, bookingsToday, buildings, pendingBookings}, labels} = this.props;
         const finalLabels = {...defaultLabels, ...labels};
         return (
-            <>
+            <div className="statistics">
                 <Statistic size="huge">
                     <Statistic.Value>
                         {activeRooms}
@@ -100,7 +100,7 @@ class LandingStatistics extends React.Component {
                         {finalLabels.pendingBookings}
                     </Statistic.Label>
                 </Statistic>
-            </>
+            </div>
         );
     }
 }

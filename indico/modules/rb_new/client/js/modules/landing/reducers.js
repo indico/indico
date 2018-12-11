@@ -38,4 +38,19 @@ export default combineReducers({
             }
         }
     }),
+    upcomingBookings: combineReducers({
+        request: requestReducer(
+            landingActions.FETCH_BOOKINGS_REQUEST,
+            landingActions.FETCH_BOOKINGS_SUCCESS,
+            landingActions.FETCH_BOOKINGS_ERROR
+        ),
+        data: (state = null, action) => {
+            switch (action.type) {
+                case landingActions.BOOKINGS_RECEIVED:
+                    return camelizeKeys(action.data);
+                default:
+                    return state;
+            }
+        }
+    })
 });

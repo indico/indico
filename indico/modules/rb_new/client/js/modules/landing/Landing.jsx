@@ -20,12 +20,16 @@ import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import {Card, Checkbox, Form, Grid} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
+import {Carousel} from 'indico/react/components';
 import {Overridable} from 'indico/react/util';
 
 import {actions as filtersActions} from '../../common/filters';
 import BookingBootstrapForm from '../../components/BookingBootstrapForm';
 import LandingStatistics from './LandingStatistics';
+import UpcomingBookings from './UpcomingBookings';
 import {selectors as userSelectors} from '../../common/user';
+import * as landingActions from './actions';
+import * as landingSelectors from './selectors';
 
 import './Landing.module.scss';
 
@@ -34,8 +38,18 @@ class Landing extends React.Component {
     static propTypes = {
         actions: PropTypes.exact({
             setFilters: PropTypes.func.isRequired,
+            fetchUpcomingBookings: PropTypes.func.isRequired
         }).isRequired,
-        userHasFavorites: PropTypes.bool.isRequired
+        userHasFavorites: PropTypes.bool.isRequired,
+        showUpcomingBookings: PropTypes.bool,
+        fetchedUpcomingBookings: PropTypes.bool.isRequired,
+        hasUpcomingBookings: PropTypes.bool.isRequired,
+        upcomingBookings: PropTypes.arrayOf(PropTypes.object)
+    };
+
+    static defaultProps = {
+        upcomingBookings: null,
+        showUpcomingBookings: true
     };
 
     state = {
@@ -44,6 +58,13 @@ class Landing extends React.Component {
             onlyFavorites: false
         }
     };
+
+    componentDidMount() {
+        const {actions: {fetchUpcomingBookings}, showUpcomingBookings} = this.props;
+        if (showUpcomingBookings) {
+            fetchUpcomingBookings();
+        }
+    }
 
     doSearch = (formState) => {
         const {extraState, text} = this.state;
@@ -70,8 +91,19 @@ class Landing extends React.Component {
         this.setState({extraState: {...extraState, ...attrs}});
     };
 
+    renderCarousel() {
+        const {upcomingBookings} = this.props;
+        const panes = [
+            {key: 'upcoming', content: <UpcomingBookings bookings={upcomingBookings} />, delay: 20},
+            {key: 'stats', content: <LandingStatistics />}
+        ];
+        return (
+            <Carousel panes={panes} />
+        );
+    }
+
     render() {
-        const {userHasFavorites} = this.props;
+        const {userHasFavorites, showUpcomingBookings, hasUpcomingBookings, fetchedUpcomingBookings} = this.props;
         const {extraState} = this.state;
         return (
             <div className="landing-wrapper">
@@ -103,11 +135,17 @@ class Landing extends React.Component {
                             </Card.Content>
                         </Card>
                     </Grid.Row>
-                    <Grid.Row styleName="landing-page-statistics">
-                        <div styleName="statistics">
-                            <LandingStatistics />
-                        </div>
-                    </Grid.Row>
+                    {(!showUpcomingBookings || fetchedUpcomingBookings) && (
+                        <Grid.Row styleName="landing-page-lower-row">
+                            <div styleName="lower-row">
+                                {hasUpcomingBookings ? (
+                                    this.renderCarousel()
+                                ) : (
+                                    <LandingStatistics />
+                                )}
+                            </div>
+                        </Grid.Row>
+                    )}
                 </Grid>
             </div>
         );
@@ -117,13 +155,19 @@ class Landing extends React.Component {
 
 export default connect(
     state => ({
-        userHasFavorites: userSelectors.hasFavoriteRooms(state)
+        userHasFavorites: userSelectors.hasFavoriteRooms(state),
+        fetchedUpcomingBookings: landingSelectors.hasFetchedUpcomingBookings(state),
+        hasUpcomingBookings: landingSelectors.hasUpcomingBookings(state),
+        upcomingBookings: landingSelectors.getUpcomingBookings(state)
     }),
     dispatch => ({
         actions: {
             setFilters(data) {
                 dispatch(filtersActions.setFilters('bookRoom', data));
+            },
+            fetchUpcomingBookings() {
+                dispatch(landingActions.fetchUpcomingBookings());
             }
         }
     })
-)(Landing);
+)(Overridable.component('Landing', Landing));
