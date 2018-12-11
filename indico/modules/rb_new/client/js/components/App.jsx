@@ -20,7 +20,7 @@ import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import {Link, Redirect, Route, Switch} from 'react-router-dom';
 import {ConnectedRouter} from 'connected-react-router';
-import {Dimmer, Icon, Loader, Sidebar} from 'semantic-ui-react';
+import {Dimmer, Icon, Loader, Responsive, Sidebar} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 import {RouteAwareOverridable, Overridable} from 'indico/react/util';
@@ -138,9 +138,11 @@ class App extends React.Component {
                     <header styleName="rb-menu-bar">
                         <div styleName="rb-menu-bar-side-left">
                             <h1>
-                                <Icon name={iconName} />
                                 <Link to="/" onClick={() => resetPageState('bookRoom')}>
-                                    {title}
+                                    <Icon name={iconName} />
+                                    <Responsive as="span" minWidth={500}>
+                                        {title}
+                                    </Responsive>
                                 </Link>
                             </h1>
                         </div>
