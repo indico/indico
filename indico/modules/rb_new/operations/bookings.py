@@ -254,4 +254,4 @@ def create_booking_for_event(room_id, event):
         resv = Reservation.create_from_data(room, data, session.user, ignore_admin=True)
         return resv
     except NoReportError:
-        flash(_("Couldn't create the booking. Probably somebody else booked the room in the meantime."), 'error')
+        flash(_("Booking could not be created. Probably somebody else booked the room in the meantime."), 'error')
