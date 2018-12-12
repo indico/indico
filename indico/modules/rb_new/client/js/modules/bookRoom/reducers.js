@@ -107,6 +107,22 @@ const timelineReducer = combineReducers({
     }
 });
 
+const unavailableDatePickerReducer = (state = initialDatePickerState, action) => {
+    switch (action.type) {
+        case actions.SET_UNAVAILABLE_MODE:
+            return {
+                ...state,
+                mode: action.mode
+            };
+        case actions.SET_UNAVAILABLE_DATE:
+            return {
+                ...state,
+                selectedDate: action.date
+            };
+        default:
+            return state;
+    }
+};
 
 const unavailableReducer = combineReducers({
     request: requestReducer(
@@ -114,6 +130,7 @@ const unavailableReducer = combineReducers({
         actions.GET_UNAVAILABLE_TIMELINE_SUCCESS,
         actions.GET_UNAVAILABLE_TIMELINE_ERROR
     ),
+    datePicker: unavailableDatePickerReducer,
     data: (state = [], action) => {
         switch (action.type) {
             case actions.GET_UNAVAILABLE_TIMELINE_REQUEST:

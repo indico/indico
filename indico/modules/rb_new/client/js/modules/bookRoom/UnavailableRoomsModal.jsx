@@ -21,15 +21,21 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {Dimmer, Loader, Modal} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
+import {serializeDate} from 'indico/utils/date';
 import * as selectors from './selectors';
-import * as actions from './actions';
+import * as unavailableRoomsActions from './actions';
 import {BookingTimelineComponent} from './BookingTimeline';
+import {TimelineHeader} from '../../common/timeline';
 
 
 class UnavailableRoomsModal extends React.Component {
     static propTypes = {
         datePicker: PropTypes.object.isRequired,
-        actions: PropTypes.object.isRequired,
+        actions: PropTypes.exact({
+            fetchUnavailableRooms: PropTypes.func.isRequired,
+            setDate: PropTypes.func.isRequired,
+            setMode: PropTypes.func.isRequired
+        }).isRequired,
         availability: PropTypes.array,
         filters: PropTypes.object.isRequired,
         isFetching: PropTypes.bool.isRequired,
@@ -47,7 +53,7 @@ class UnavailableRoomsModal extends React.Component {
     }
 
     render() {
-        const {availability, isFetching, onClose, datePicker, filters: {dates: {startDate}}} = this.props;
+        const {availability, actions, isFetching, onClose, datePicker, filters: {dates: {startDate}}} = this.props;
         // If we're in "timeline" mode, use the datepicker, otherwise the current starting day
         const picker = datePicker.selectedDate ? datePicker : {...datePicker, selectedDate: startDate};
 
@@ -55,12 +61,27 @@ class UnavailableRoomsModal extends React.Component {
             return <Dimmer active page><Loader /></Dimmer>;
         }
 
+        const legendLabels = [
+            {label: Translate.string('Available'), color: 'green'},
+            {label: Translate.string('Booked'), color: 'orange'},
+            {label: Translate.string('Pre-Booking'), style: 'pre-booking'},
+            {label: Translate.string('Conflict'), color: 'red'},
+            {label: Translate.string('Conflict with Pre-Booking'), style: 'pre-booking-conflict'},
+            {label: Translate.string('Blocked'), style: 'blocking'},
+            {label: Translate.string('Not bookable'), style: 'unbookable'}
+        ];
+
         return (
             <Modal open onClose={onClose} size="large" closeIcon>
                 <Modal.Header>
                     <Translate>Unavailable Rooms</Translate>
                 </Modal.Header>
                 <Modal.Content>
+                    <TimelineHeader datePicker={datePicker}
+                                    disableDatePicker={isFetching || !availability.length}
+                                    onModeChange={actions.setMode}
+                                    onDateChange={actions.setDate}
+                                    legendLabels={legendLabels} />
                     <BookingTimelineComponent isLoading={isFetching}
                                               availability={availability}
                                               datePicker={picker}
@@ -80,7 +101,9 @@ export default connect(
     }),
     dispatch => ({
         actions: bindActionCreators({
-            fetchUnavailableRooms: actions.fetchUnavailableRooms
+            fetchUnavailableRooms: unavailableRoomsActions.fetchUnavailableRooms,
+            setDate: date => unavailableRoomsActions.setUnavailableDate(serializeDate(date)),
+            setMode: unavailableRoomsActions.setUnavailableMode
         }, dispatch)
     })
 )(UnavailableRoomsModal);

@@ -487,7 +487,7 @@ const mapDispatchToProps = dispatch => ({
         toggleTimelineView: bookRoomActions.toggleTimelineView,
         openRoomDetails: roomsActions.openRoomDetailsBook,
         openBookingForm: bookRoomActions.openBookingForm,
-        setDate: date => bookRoomActions.setDate(serializeDate(date)),
+        setDate: date => bookRoomActions.setTimelineDate(serializeDate(date)),
         setTimelineMode: bookRoomActions.setTimelineMode
     }, dispatch),
 });
