@@ -29,3 +29,9 @@ export const isInitializing = createSelector(
     roomsSelectors.hasLoadedEquipmentTypes,
     (...ready) => ready.some(x => !x)
 );
+
+export function filtersAreSet(state) {
+    // check that recurrence + start date + start/end time are set
+    const {filters: {recurrence, dates: {startDate}}} = state.bookRoom;
+    return !!(recurrence.type && startDate);
+}

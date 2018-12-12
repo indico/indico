@@ -172,8 +172,8 @@ class App extends React.Component {
 }
 
 export default connect(
-    (state, {history}) => ({
-        filtersSet: !!history.location.search || !!state.bookRoom.filters.recurrence.type,
+    state => ({
+        filtersSet: globalSelectors.filtersAreSet(state),
         isInitializing: globalSelectors.isInitializing(state),
     }),
     dispatch => ({
