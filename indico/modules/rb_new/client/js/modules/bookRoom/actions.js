@@ -57,6 +57,8 @@ export const GET_UNAVAILABLE_TIMELINE_REQUEST = 'bookRoom/GET_UNAVAILABLE_TIMELI
 export const GET_UNAVAILABLE_TIMELINE_SUCCESS = 'bookRoom/GET_UNAVAILABLE_TIMELINE_SUCCESS';
 export const GET_UNAVAILABLE_TIMELINE_ERROR = 'bookRoom/GET_UNAVAILABLE_TIMELINE_ERROR';
 export const UNAVAILABLE_TIMELINE_RECEIVED = 'bookRoom/UNAVAILABLE_TIMELINE_RECEIVED';
+export const SET_UNAVAILABLE_MODE = 'bookRoom/SET_TIMELINE_MODE';
+export const SET_UNAVAILABLE_DATE = 'bookRoom/SET_TIMELINE_DATE';
 
 // Suggestions
 export const FETCH_SUGGESTIONS_REQUEST = 'bookRoom/FETCH_SUGGESTIONS_REQUEST';
@@ -192,10 +194,18 @@ export const {searchRooms} = roomSearchActionsFactory('bookRoom');
 export const openBookRoom = (roomId, data = null) => modalActions.openModal('book-room', roomId, data);
 export const openUnavailableRooms = () => modalActions.openModal('unavailable-rooms');
 export const openBookingForm = (roomId, data) => modalActions.openModal('booking-form', roomId, data);
-export function setDate(date) {
+export function setTimelineDate(date) {
     return {type: SET_TIMELINE_DATE, date};
 }
 
 export function setTimelineMode(mode) {
     return {type: SET_TIMELINE_MODE, mode};
+}
+
+export function setUnavailableDate(date) {
+    return {type: SET_UNAVAILABLE_DATE, date};
+}
+
+export function setUnavailableMode(mode) {
+    return {type: SET_UNAVAILABLE_MODE, mode};
 }
