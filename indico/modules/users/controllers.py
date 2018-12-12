@@ -393,7 +393,7 @@ class RHUsersAdmin(RHAdminBase):
 
 
 class RHUsersAdminSettings(RHAdminBase):
-    """Manage global suer-related settings."""
+    """Manage global user-related settings."""
 
     def _process(self):
         form = AdminUserSettingsForm(obj=FormDefaults(**user_management_settings.get_all()))
