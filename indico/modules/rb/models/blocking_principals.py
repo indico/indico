@@ -16,16 +16,22 @@
 
 from __future__ import unicode_literals
 
+from sqlalchemy.ext.declarative import declared_attr
+
 from indico.core.db import db
 from indico.core.db.sqlalchemy.principals import PrincipalMixin
+from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.util.string import return_ascii
 
 
 class BlockingPrincipal(PrincipalMixin, db.Model):
     __tablename__ = 'blocking_principals'
-    __table_args__ = {'schema': 'roombooking'}
     principal_backref_name = 'in_blocking_acls'
     unique_columns = ('blocking_id',)
+
+    @declared_attr
+    def __table_args__(cls):
+        return auto_table_args(cls, schema='roombooking')
 
     id = db.Column(
         db.Integer,
