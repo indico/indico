@@ -51,6 +51,8 @@ class ProtectionMixin(object):
     #: not make much sense in most cases to make something public even
     #: though its parent object is private (or inheriting).
     disallowed_protection_modes = frozenset({ProtectionMode.public})
+    #: The default protection mode a new object has
+    default_protection_mode = ProtectionMode.inheriting
     #: Whether objects with inheriting protection may have their own
     #: ACL entries (which will grant access even if the user cannot
     #: access the parent object).
@@ -80,7 +82,7 @@ class ProtectionMixin(object):
         return db.Column(
             PyIntEnum(ProtectionMode, exclude_values=cls.disallowed_protection_modes),
             nullable=False,
-            default=ProtectionMode.inheriting
+            default=cls.default_protection_mode
         )
 
     @declared_attr
