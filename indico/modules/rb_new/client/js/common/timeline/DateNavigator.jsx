@@ -268,7 +268,7 @@ export default class DateNavigator extends React.Component {
     render = () => {
         const {dateRange, disabled, isLoading} = this.props;
         return (
-            <div>
+            <div className="date-navigator">
                 {this.renderModeSwitcher(disabled || isLoading)}
                 {this.renderNavigator(disabled || isLoading || dateRange.length === 1)}
             </div>

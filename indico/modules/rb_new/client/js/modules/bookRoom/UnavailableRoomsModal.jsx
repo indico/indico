@@ -19,13 +19,13 @@ import React from 'react';
 import {bindActionCreators} from 'redux';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import {Dimmer, Loader, Modal} from 'semantic-ui-react';
+import {Dimmer, Icon, Loader, Modal, Popup} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
 import {serializeDate} from 'indico/utils/date';
 import * as selectors from './selectors';
 import * as unavailableRoomsActions from './actions';
 import {BookingTimelineComponent} from './BookingTimeline';
-import {TimelineHeader} from '../../common/timeline';
+import {DateNavigator, TimelineLegend} from '../../common/timeline';
 
 
 class UnavailableRoomsModal extends React.Component {
@@ -73,15 +73,16 @@ class UnavailableRoomsModal extends React.Component {
 
         return (
             <Modal open onClose={onClose} size="large" closeIcon>
-                <Modal.Header>
+                <Modal.Header className="legend-header">
                     <Translate>Unavailable Rooms</Translate>
+                    <Popup trigger={<Icon name="info circle" className="legend-info-icon" />}
+                           content={<TimelineLegend labels={legendLabels} compact />} />
+                    <DateNavigator {...datePicker}
+                                   disabled={isFetching || !availability.length}
+                                   onModeChange={actions.setMode}
+                                   onDateChange={actions.setDate} />
                 </Modal.Header>
                 <Modal.Content>
-                    <TimelineHeader datePicker={datePicker}
-                                    disableDatePicker={isFetching || !availability.length}
-                                    onModeChange={actions.setMode}
-                                    onDateChange={actions.setDate}
-                                    legendLabels={legendLabels} />
                     <BookingTimelineComponent isLoading={isFetching}
                                               availability={availability}
                                               datePicker={picker}
