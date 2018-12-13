@@ -40,6 +40,7 @@ class ProgressIndicator extends React.PureComponent {
     constructor(props) {
         super(props);
         this.divRef = React.createRef();
+        this.frame = null;
     }
 
     componentDidMount() {
@@ -52,18 +53,23 @@ class ProgressIndicator extends React.PureComponent {
          * This will trigger the CSS animation.
          * I've written worse things in my career.
          */
-        requestAnimationFrame(() => {
+        this.frame = requestAnimationFrame(() => {
             this.divRef.current.style.width = 0;
             this.divRef.current.style.transition = `width ${duration}ms linear`;
 
-            requestAnimationFrame(() => {
+            this.frame = requestAnimationFrame(() => {
                 this.divRef.current.style.width = '100%';
+                this.frame = null;
             });
         });
     }
 
     componentWillUnmount() {
         this.divRef.current.style.transition = null;
+        if (this.frame !== null) {
+            cancelAnimationFrame(this.frame);
+            this.frame = null;
+        }
     }
 
     render() {
