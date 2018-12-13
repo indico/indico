@@ -21,3 +21,4 @@ export {default as DailyTimelineContent} from './DailyTimelineContent';
 export {default as TimelineHeader} from './TimelineHeader';
 export {default as TimelineItem} from './TimelineItem';
 export {default as TimelineLegend} from './TimelineLegend';
+export {default as DateNavigator} from './DateNavigator';
