@@ -25,6 +25,7 @@ from sqlalchemy.orm import contains_eager
 
 from indico.core.db.sqlalchemy import db
 from indico.core.db.sqlalchemy.custom import static_array
+from indico.core.db.sqlalchemy.protection import ProtectionManagersMixin, ProtectionMode
 from indico.core.db.sqlalchemy.util.cache import cached, versioned_cache
 from indico.core.db.sqlalchemy.util.queries import db_dates_overlap, escape_like
 from indico.core.errors import NoReportError
@@ -52,11 +53,14 @@ from indico.web.flask.util import url_for
 _cache = GenericCache('Rooms')
 
 
-class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
+class Room(versioned_cache(_cache, 'id'), ProtectionManagersMixin, db.Model, Serializer):
     __tablename__ = 'rooms'
     __table_args__ = (db.UniqueConstraint('id', 'location_id'),  # useless but needed for the LocationMixin fkey
                       db.CheckConstraint("verbose_name != ''", 'verbose_name_not_empty'),
                       {'schema': 'roombooking'})
+
+    default_protection_mode = ProtectionMode.public
+    disallowed_protection_modes = frozenset({ProtectionMode.inheriting})
 
     __public__ = [
         'id', 'name', 'location_name', 'floor', 'number', 'building',
@@ -182,16 +186,19 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         default=True,
         index=True
     )
-    is_reservable = db.Column(
-        db.Boolean,
-        nullable=False,
-        default=True
-    )
     max_advance_days = db.Column(
         db.Integer
     )
     booking_limit_days = db.Column(
         db.Integer
+    )
+
+    acl_entries = db.relationship(
+        'RoomPrincipal',
+        lazy=True,
+        backref='room',
+        cascade='all, delete-orphan',
+        collection_class=set
     )
 
     attributes = db.relationship(
@@ -587,7 +594,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
             .filter(
                 Location.id == filters['location'].id if filters.get('location') else True,
                 ((Room.capacity >= (capacity * 0.8)) | (Room.capacity == None)) if capacity else True,
-                Room.is_reservable if filters.get('is_only_public') else True,
+                # Room.is_reservable if filters.get('is_only_public') else True,
                 Room.is_auto_confirm if filters.get('is_auto_confirm') else True,
                 Room.is_active if filters.get('is_only_active', False) else True,
                 (equipment_subquery == equipment_count) if equipment_subquery is not None else True)
@@ -699,6 +706,35 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
     def can_be_deleted(self, user):
         return self.can_be_modified(user)
 
+    @property
+    def is_reservable(self):
+        # XXX: let's get rid of this in favor of proper acl checks
+        return self.protection_mode == ProtectionMode.public or any(p.full_access for p in self.acl_entries)
+
+    @property
+    def protection_parent(self):
+        return None
+
+    @staticmethod
+    def is_user_admin(user):
+        return rb_is_admin(user)
+
+    def can_access(self, user, allow_admin=True):
+        # rooms are never access-restricted
+        raise NotImplementedError
+
+    def can_book(self, user, allow_admin=True):
+        return self.can_manage(user, permission='book', allow_admin=allow_admin)
+
+    def can_prebook(self, user, allow_admin=True):
+        return self.can_manage(user, permission='prebook', allow_admin=allow_admin)
+
+    def can_override(self, user, allow_admin=True):
+        return self.can_manage(user, permission='override', allow_admin=allow_admin)
+
+    def can_moderate(self, user, allow_admin=True):
+        return self.can_manage(user, permission='moderate', allow_admin=allow_admin)
+
     @unify_user_args
     @cached(_cache)
     def is_owned_by(self, user):
@@ -743,3 +779,6 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         if quiet:
             return False
         raise NoReportError(u'Room cannot be booked at this time')
+
+
+Room.register_protection_events()

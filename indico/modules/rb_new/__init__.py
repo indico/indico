@@ -18,6 +18,8 @@ from __future__ import unicode_literals
 
 from indico.core import signals
 from indico.core.config import config
+from indico.core.permissions import ManagementPermission
+from indico.modules.rb import Room
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.menu import TopMenuItem
@@ -27,3 +29,39 @@ from indico.web.menu import TopMenuItem
 def _topmenu_items(sender, **kwargs):
     if config.ENABLE_ROOMBOOKING:
         yield TopMenuItem('rb_new', _('Room booking (new)'), url_for('rooms_new.roombooking'), 80)
+
+
+class BookPermission(ManagementPermission):
+    name = 'book'
+    friendly_name = _('Book')
+    description = _('Allows booking the room')
+    user_selectable = True
+
+
+class PrebookPermission(ManagementPermission):
+    name = 'prebook'
+    friendly_name = _('Prebook')
+    description = _('Allows prebooking the room')
+    user_selectable = True
+
+
+class OverridePermission(ManagementPermission):
+    name = 'override'
+    friendly_name = _('Override')
+    description = _('Allows overriding restrictions when booking the room')
+    user_selectable = True
+
+
+class ModeratePermission(ManagementPermission):
+    name = 'moderate'
+    friendly_name = _('Moderate')
+    description = _('Allows moderating bookings (approving/rejecting/editing)')
+    user_selectable = True
+
+
+@signals.acl.get_management_permissions.connect_via(Room)
+def _get_management_permissions(sender, **kwargs):
+    yield BookPermission
+    yield PrebookPermission
+    yield OverridePermission
+    yield ModeratePermission
