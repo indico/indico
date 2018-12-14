@@ -19,7 +19,7 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
 import {bindActionCreators} from 'redux';
-import {Button, Container, Grid, Popup, Sticky} from 'semantic-ui-react';
+import {Button, Container, Grid, Icon, Popup, Sticky} from 'semantic-ui-react';
 import {connect} from 'react-redux';
 import {Translate} from 'indico/react/i18n';
 import {Overridable} from 'indico/react/util';
@@ -31,8 +31,11 @@ import {actions as bookingsActions} from '../../common/bookings';
 import {actions as filtersActions} from '../../common/filters';
 import {selectors as roomsSelectors, actions as roomsActions} from '../../common/rooms';
 import {EditableTimelineItem, ElasticTimeline, TimelineHeader, TimelineItem} from '../../common/timeline';
+import CalendarListView from './CalendarListView';
 import {actions as bookRoomActions} from '../bookRoom';
 import {roomFilterBarFactory} from '../roomList';
+
+import './Calendar.module.scss';
 
 
 const SearchBar = searchBarFactory('calendar', calendarSelectors);
@@ -67,6 +70,10 @@ class Calendar extends React.Component {
         super(props);
         this.contextRef = React.createRef();
     }
+
+    state = {
+        view: 'timeline',
+    };
 
     componentDidMount() {
         const {actions: {fetchCalendar}} = this.props;
@@ -120,6 +127,7 @@ class Calendar extends React.Component {
             localFilters: {hideUnused},
             actions: {setFilterParameter}
         } = this.props;
+        const {view} = this.state;
 
         return (
             <>
@@ -131,15 +139,43 @@ class Calendar extends React.Component {
                         Show only my bookings
                     </Translate>
                 </Popup>
-                <Popup trigger={<Button size="large"
-                                        primary={hideUnused}
-                                        icon={hideUnused ? 'plus square outline' : 'minus square outline'}
-                                        onClick={this.toggleHideUnused} />}>
-                    {hideUnused
-                        ? <Translate>Show unused rooms</Translate>
-                        : <Translate>Hide unused rooms</Translate>}
-                </Popup>
+                {view === 'timeline' && (
+                    <Popup trigger={<Button size="large"
+                                            primary={hideUnused}
+                                            icon={hideUnused ? 'plus square outline' : 'minus square outline'}
+                                            onClick={this.toggleHideUnused} />}>
+                        {hideUnused
+                            ? <Translate>Show unused rooms</Translate>
+                            : <Translate>Hide unused rooms</Translate>}
+                    </Popup>
+                )}
             </>
+        );
+    };
+
+    renderModeSwitch = () => {
+        const {view} = this.state;
+        return (
+            <div>
+                <Popup trigger={<Button icon={<Icon name="calendar" />}
+                                        primary={view === 'timeline'}
+                                        onClick={() => this.setState({view: 'timeline'})}
+                                        circular />}
+                       position="bottom center">
+                    <Translate>
+                        Show calendar view
+                    </Translate>
+                </Popup>
+                <Popup trigger={<Button icon={<Icon name="list" />}
+                                        primary={view === 'list'}
+                                        onClick={() => this.setState({view: 'list'})}
+                                        circular />}
+                       position="bottom center">
+                    <Translate>
+                        Show a list of all upcoming bookings
+                    </Translate>
+                </Popup>
+            </div>
         );
     };
 
@@ -158,6 +194,7 @@ class Calendar extends React.Component {
             datePicker,
             allowDragDrop
         } = this.props;
+        const {view} = this.state;
         const legendLabels = [
             {label: Translate.string('Booked'), color: 'orange'},
             {label: Translate.string('Pre-Booking'), style: 'pre-booking'},
@@ -165,36 +202,44 @@ class Calendar extends React.Component {
             {label: Translate.string('Not bookable'), style: 'unbookable'}
         ];
         const editable = datePicker.mode === 'days' && allowDragDrop;
+        const isTimelineVisible = view === 'timeline';
         return (
             <Grid>
                 <Grid.Row>
                     <Container>
                         <div ref={this.contextRef}>
                             <Sticky context={this.contextRef.current} className="sticky-filters">
-                                <Grid.Row>
+                                <Grid.Row styleName="calendar-filters">
                                     <div className="filter-row">
                                         <div className="filter-row-filters">
                                             <RoomFilterBar extraButtons={this.renderExtraButtons()} />
                                             <SearchBar />
                                         </div>
                                     </div>
+                                    {this.renderModeSwitch()}
                                 </Grid.Row>
-                                <TimelineHeader datePicker={datePicker}
-                                                disableDatePicker={isFetching || !rows.length}
-                                                onModeChange={setMode}
-                                                onDateChange={setDate}
-                                                legendLabels={legendLabels} />
+                                {isTimelineVisible && (
+                                    <TimelineHeader datePicker={datePicker}
+                                                    disableDatePicker={isFetching || !rows.length}
+                                                    onModeChange={setMode}
+                                                    onDateChange={setDate}
+                                                    legendLabels={legendLabels} />
+                                )}
                             </Sticky>
-                            <ElasticTimeline availability={rows}
-                                             datePicker={datePicker}
-                                             onClickLabel={openRoomDetails}
-                                             isLoading={isFetching}
-                                             onClickReservation={openBookingDetails}
-                                             itemClass={editable ? EditableTimelineItem : TimelineItem}
-                                             itemProps={editable ? {onAddSlot: this.onAddSlot} : {}}
-                                             showUnused={!hideUnused}
-                                             conflictIndicator={false}
-                                             longLabel />
+                            {isTimelineVisible ? (
+                                <ElasticTimeline availability={rows}
+                                                 datePicker={datePicker}
+                                                 onClickLabel={openRoomDetails}
+                                                 isLoading={isFetching}
+                                                 onClickReservation={openBookingDetails}
+                                                 itemClass={editable ? EditableTimelineItem : TimelineItem}
+                                                 itemProps={editable ? {onAddSlot: this.onAddSlot} : {}}
+                                                 showUnused={!hideUnused}
+                                                 conflictIndicator={false}
+                                                 longLabel />
+                            ) : (
+                                <CalendarListView />
+                            )}
                         </div>
                     </Container>
                 </Grid.Row>
@@ -206,7 +251,7 @@ class Calendar extends React.Component {
 
 export default connect(
     state => ({
-        isFetching: calendarSelectors.isFetching(state),
+        isFetching: calendarSelectors.isFetchingCalendar(state),
         calendarData: calendarSelectors.getCalendarData(state),
         roomFilters: calendarSelectors.getRoomFilters(state),
         calendarFilters: calendarSelectors.getCalendarFilters(state),

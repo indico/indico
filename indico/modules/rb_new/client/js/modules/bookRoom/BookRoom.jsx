@@ -402,10 +402,9 @@ class BookRoom extends React.Component {
                         : listBtn
                     }
                     <Icon.Group onClick={this.switchToTimeline}>
-                        {!isTimelineVisible
-                            ? <Popup trigger={timelineBtn} content={Translate.string('Timeline view')} />
-                            : timelineBtn
-                        }
+                        {!isTimelineVisible ? (
+                            <Popup trigger={timelineBtn} content={Translate.string('Timeline view')} />
+                        ) : timelineBtn}
                         {hasConflicts && (
                             <Icon name="exclamation triangle" styleName="conflicts-icon" color="red" corner />
                         )}

@@ -21,7 +21,7 @@ import {RequestState} from 'indico/utils/redux';
 import {selectors as roomsSelectors} from '../../common/rooms';
 
 
-export const isFetching = ({calendar}) => calendar.request.state === RequestState.STARTED;
+export const isFetchingCalendar = ({calendar}) => calendar.requests.calendar.state === RequestState.STARTED;
 export const getDatePickerInfo = ({calendar}) => calendar.datePicker;
 export const getCalendarData = createSelector(
     ({calendar: {data}}) => data,
@@ -36,6 +36,23 @@ export const getCalendarData = createSelector(
             ];
         })
     })
+);
+
+export const getNumberOfRowsLeft = ({calendar}) => calendar.activeBookings.rowsLeft;
+export const isFetchingActiveBookings = ({calendar}) => calendar.requests.activeBookings.state === RequestState.STARTED;
+export const getActiveBookings = createSelector(
+    ({calendar}) => calendar.activeBookings.data,
+    roomsSelectors.getAllRooms,
+    (activeBookings, rooms) => {
+        return _.fromPairs(Object.entries(activeBookings).map(([day, dayActiveBookings]) => {
+            const bookingsWithRooms = dayActiveBookings.map((dayActiveBooking) => {
+                const roomId = dayActiveBooking.reservation.roomId;
+                const {reservation} = dayActiveBooking;
+                return {...dayActiveBooking, reservation: {...reservation, room: rooms[roomId]}};
+            });
+            return [day, bookingsWithRooms];
+        }));
+    },
 );
 
 const CALENDAR_FILTERS = ['myBookings'];

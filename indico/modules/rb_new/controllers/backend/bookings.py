@@ -32,7 +32,8 @@ from indico.modules.rb.models.reservation_occurrences import ReservationOccurren
 from indico.modules.rb.models.reservations import RepeatFrequency, Reservation
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb_new.controllers.backend.common import search_room_args
-from indico.modules.rb_new.operations.bookings import get_booking_occurrences, get_room_calendar, get_rooms_availability
+from indico.modules.rb_new.operations.bookings import (get_active_bookings, get_booking_occurrences, get_room_calendar,
+                                                       get_rooms_availability)
 from indico.modules.rb_new.operations.suggestions import get_suggestions
 from indico.modules.rb_new.schemas import (create_booking_args, reservation_details_occurrences_schema,
                                            reservation_details_schema, reservation_event_data_schema,
@@ -50,9 +51,9 @@ NUM_SUGGESTIONS = 5
 
 def _serialize_availability(availability):
     for data in availability.viewvalues():
-        data['blockings'] = serialize_blockings(data['blockings'])
-        data['nonbookable_periods'] = serialize_nonbookable_periods(data['nonbookable_periods'])
-        data['unbookable_hours'] = serialize_unbookable_hours(data['unbookable_hours'])
+        data['blockings'] = serialize_blockings(data.get('blockings', {}))
+        data['nonbookable_periods'] = serialize_nonbookable_periods(data.get('nonbookable_periods', {}))
+        data['unbookable_hours'] = serialize_unbookable_hours(data.get('unbookable_hours', {}))
         data.update({k: serialize_occurrences(data[k]) if k in data else {}
                      for k in ['candidates', 'pre_bookings', 'bookings', 'conflicts', 'pre_conflicts']})
     return availability
@@ -117,6 +118,25 @@ class RHCalendar(RHRoomBookingBase):
         calendar = get_room_calendar(start_date or date.today(), end_date or date.today(), room_ids,
                                      booked_for_user=booked_for_user)
         return jsonify(_serialize_availability(calendar).values())
+
+
+class RHActiveBookings(RHRoomBookingBase):
+    @use_kwargs({
+        'room_ids': fields.List(fields.Int(), missing=None),
+        'start_dt': fields.DateTime(),
+        'last_reservation_id': fields.Int(missing=None),
+        'my_bookings': fields.Bool(missing=False),
+        'limit': fields.Int(missing=40),
+    })
+    def _process(self, room_ids, start_dt, last_reservation_id, my_bookings, limit):
+        start_dt = start_dt or datetime.combine(date.today(), time(0, 0))
+        booked_for_user = session.user if my_bookings else None
+        bookings, rows_left = get_active_bookings(limit=limit,
+                                                  start_dt=start_dt,
+                                                  last_reservation_id=last_reservation_id,
+                                                  room_ids=room_ids,
+                                                  booked_for_user=booked_for_user)
+        return jsonify(bookings=serialize_occurrences(bookings), rows_left=rows_left)
 
 
 class RHCreateBooking(RHRoomBookingBase):

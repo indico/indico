@@ -269,14 +269,11 @@ def create_booking_for_event(room_id, event):
         flash(_("Booking could not be created. Probably somebody else booked the room in the meantime."), 'error')
 
 
-def get_active_bookings(limit=20, **filters):
-    start_date = filters.pop('start_dt')
-    last_reservation_id = filters.get('last_reservation_id')
-
-    criteria = [ReservationOccurrence.start_dt > start_date]
+def get_active_bookings(limit, start_dt, last_reservation_id=None, **filters):
+    criteria = [ReservationOccurrence.start_dt > start_dt]
     if last_reservation_id is not None:
-        criteria.append(db.and_(db.cast(ReservationOccurrence.start_dt, db.Date) >= start_date,
-                        ReservationOccurrence.reservation_id > last_reservation_id))
+        criteria.append(db.and_(db.cast(ReservationOccurrence.start_dt, db.Date) >= start_dt,
+                                ReservationOccurrence.reservation_id > last_reservation_id))
 
     query = (_bookings_query(filters)
              .filter(db.or_(*criteria))
@@ -286,4 +283,5 @@ def get_active_bookings(limit=20, **filters):
              .limit(limit))
 
     bookings, total = with_total_rows(query)
-    return group_by_occurrence_date(query, sort_by=lambda obj: (obj.start_dt, obj.reservation_id)), total
+    rows_left = total - limit if total > limit else total
+    return group_by_occurrence_date(query, sort_by=lambda obj: (obj.start_dt, obj.reservation_id)), rows_left

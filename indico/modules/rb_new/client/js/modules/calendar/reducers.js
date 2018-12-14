@@ -53,13 +53,19 @@ const datePickerReducer = (state = datePickerState(), action) => {
 
 export const initialDataState = {
     rows: [],
-    roomIds: null
+    roomIds: null,
+};
+
+const initialActiveBookingsState = {
+    rowsLeft: 0,
+    data: {},
 };
 
 export const initialState = () => ({
     filters: initialRoomFilterStateFactory('calendar'),
     data: initialDataState,
-    datePicker: datePickerState()
+    datePicker: datePickerState(),
+    activeBookings: initialActiveBookingsState,
 });
 
 function filterDeletedBooking(calendar, bookingId, roomId) {
@@ -71,6 +77,10 @@ function filterDeletedBooking(calendar, bookingId, roomId) {
         const newRow = {...row};
         for (const type of Object.keys(row)) {
             const bookingData = row[type];
+            if (!Object.keys(bookingData).length) {
+                continue;
+            }
+
             for (const dt of Object.keys(bookingData)) {
                 const dayBookingData = bookingData[dt];
                 newRow[type][dt] = dayBookingData.filter((data) => {
@@ -112,11 +122,89 @@ function acceptPrebooking(calendar, bookingId, roomId) {
 }
 
 export default combineReducers({
-    request: requestReducer(calendarActions.FETCH_REQUEST, calendarActions.FETCH_SUCCESS, calendarActions.FETCH_ERROR),
+    requests: combineReducers({
+        calendar: requestReducer(
+            calendarActions.FETCH_CALENDAR_REQUEST,
+            calendarActions.FETCH_CALENDAR_SUCCESS,
+            calendarActions.FETCH_CALENDAR_ERROR
+        ),
+        activeBookings: requestReducer(
+            calendarActions.FETCH_ACTIVE_BOOKINGS_REQUEST,
+            calendarActions.FETCH_ACTIVE_BOOKINGS_SUCCESS,
+            calendarActions.FETCH_ACTIVE_BOOKINGS_ERROR,
+        )
+    }),
     filters: filterReducerFactory('calendar', initialRoomFilterStateFactory, processRoomFilters),
+    activeBookings: (state = initialActiveBookingsState, action) => {
+        switch (action.type) {
+            case calendarActions.ACTIVE_BOOKINGS_RECEIVED: {
+                const {bookings: newBookings, rowsLeft} = camelizeKeys(action.data);
+                const {data} = state;
+                const newData = {...data};
+
+                Object.entries(newBookings).forEach(([date, bookings]) => {
+                    if (!(date in newData)) {
+                        newData[date] = bookings;
+                    } else {
+                        newData[date] = [...newData[date], ...bookings];
+                    }
+                });
+
+                return {...state, data: newData, rowsLeft};
+            }
+            case calendarActions.CLEAR_ACTIVE_BOOKINGS:
+                return {...state, data: {}, rowsLeft: 0};
+            case bookingActions.DELETE_BOOKING_SUCCESS: {
+                const {bookingId} = camelizeKeys(action.data);
+                const {data} = state;
+                const newData = {};
+
+                Object.entries(data).forEach(([day, bookings]) => {
+                    const newBookings = bookings.filter(({reservation: {id}}) => id !== bookingId);
+                    if (newBookings.length) {
+                        newData[day] = newBookings;
+                    }
+                });
+
+                return {...state, data: newData};
+            }
+            case bookingActions.BOOKING_STATE_UPDATED: {
+                const {booking: {id: bookingId}, bookingState} = camelizeKeys(action.data);
+                const {data} = state;
+                const newData = {};
+
+                if (bookingState === 'rejected' || bookingState === 'cancelled') {
+                    Object.entries(data).forEach(([day, bookings]) => {
+                        const newBookings = bookings.filter(({reservation: {id}}) => id !== bookingId);
+                        if (newBookings.length) {
+                            newData[day] = bookings.filter(({reservation: {id}}) => id !== bookingId);
+                        }
+                    });
+                } else {
+                    Object.entries(data).forEach(([day, bookings]) => {
+                        newData[day] = bookings.map((booking) => {
+                            const {reservation} = booking;
+                            const reservationId = reservation.id;
+                            const newReservation = {...reservation};
+
+                            if (reservationId === bookingId) {
+                                newReservation.isAccepted = true;
+                            }
+
+                            return {...booking, reservation: newReservation};
+                        });
+                    });
+                }
+
+                return {...state, data: newData};
+            }
+            default:
+                return state;
+        }
+    },
     data: (state = initialDataState, action) => {
         switch (action.type) {
-            case calendarActions.FETCH_REQUEST:
+            case calendarActions.FETCH_CALENDAR_REQUEST:
                 return {...state, rows: []};
             case calendarActions.ROWS_RECEIVED:
                 return {...state, rows: camelizeKeys(action.data)};
