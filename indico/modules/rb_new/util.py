@@ -63,8 +63,8 @@ def build_rooms_spritesheet():
     _cache.set('rooms-sprite-token', crc32(value))
 
 
-def group_by_occurrence_date(occurrences):
-    return group_list(occurrences, key=lambda obj: obj.start_dt.date())
+def group_by_occurrence_date(occurrences, sort_by=None):
+    return group_list(occurrences, key=lambda obj: obj.start_dt.date(), sort_by=sort_by)
 
 
 def serialize_occurrences(data):
