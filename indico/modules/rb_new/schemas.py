@@ -70,18 +70,10 @@ class MapAreaSchema(mm.ModelSchema):
                   'is_default')
 
 
-class ReservationMinSchema(mm.ModelSchema):
+class ReservationSchema(mm.ModelSchema):
     class Meta:
         model = Reservation
-        fields = ('id', 'booking_reason', 'booked_for_name')
-
-
-class ReservationFullSchema(mm.ModelSchema):
-    room = Nested(RoomSchema)
-
-    class Meta:
-        model = Reservation
-        fields = ('id', 'booking_reason', 'booked_for_name', 'room', 'is_accepted')
+        fields = ('id', 'booking_reason', 'booked_for_name', 'room_id', 'is_accepted')
 
 
 class ReservationEventDataSchema(Schema):
@@ -91,18 +83,8 @@ class ReservationEventDataSchema(Schema):
     can_access = Function(lambda event: event.can_access(session.user))
 
 
-class ReservationOccurrenceMinSchema(mm.ModelSchema):
-    reservation = Nested(ReservationMinSchema)
-    start_dt = NaiveDateTime()
-    end_dt = NaiveDateTime()
-
-    class Meta:
-        model = ReservationOccurrence
-        fields = ('start_dt', 'end_dt', 'is_valid', 'reservation')
-
-
-class ReservationOccurrenceFullSchema(mm.ModelSchema):
-    reservation = Nested(ReservationFullSchema)
+class ReservationOccurrenceSchema(mm.ModelSchema):
+    reservation = Nested(ReservationSchema)
     start_dt = NaiveDateTime()
     end_dt = NaiveDateTime()
 
@@ -284,9 +266,8 @@ rb_user_schema = RBUserSchema()
 rooms_schema = RoomSchema(many=True)
 room_attribute_values_schema = RoomAttributeValuesSchema(many=True)
 map_areas_schema = MapAreaSchema(many=True)
-reservation_occurrences_min_schema = ReservationOccurrenceMinSchema(many=True)
-reservation_occurrences_full_schema = ReservationOccurrenceFullSchema(many=True)
-reservation_schema = ReservationFullSchema()
+reservation_occurrences_schema = ReservationOccurrenceSchema(many=True)
+reservation_schema = ReservationSchema()
 reservation_details_schema = ReservationDetailsSchema()
 reservation_event_data_schema = ReservationEventDataSchema()
 reservation_details_occurrences_schema = ReservationDetailsOccurrenceSchema(many=True)

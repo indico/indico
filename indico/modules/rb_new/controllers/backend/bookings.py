@@ -36,7 +36,7 @@ from indico.modules.rb_new.operations.bookings import get_booking_occurrences, g
 from indico.modules.rb_new.operations.suggestions import get_suggestions
 from indico.modules.rb_new.schemas import (create_booking_args, reservation_details_occurrences_schema,
                                            reservation_details_schema, reservation_event_data_schema,
-                                           reservation_occurrences_full_schema)
+                                           reservation_occurrences_schema)
 from indico.modules.rb_new.util import (group_by_occurrence_date, serialize_blockings, serialize_nonbookable_periods,
                                         serialize_occurrences, serialize_unbookable_hours)
 from indico.modules.users.models.users import User
@@ -226,6 +226,7 @@ class RHBookingEventData(RHBookingBase):
             return jsonify(can_access=False)
         return jsonify(reservation_event_data_schema.dump(self.booking.event).data)
 
+
 class RHUpdateBooking(RHBookingBase):
     @use_args(create_booking_args)
     def _process(self, args):
@@ -248,6 +249,7 @@ class RHUpdateBooking(RHBookingBase):
         return jsonify(booking=_serialize_booking_details(self.booking),
                        room_calendar=_serialize_availability(calendar).values())
 
+
 class RHMyUpcomingBookings(RHRoomBookingBase):
     def _process(self):
         q = (ReservationOccurrence.query
@@ -258,4 +260,4 @@ class RHMyUpcomingBookings(RHRoomBookingBase):
              .join(Reservation)
              .order_by(ReservationOccurrence.start_dt.asc())
              .limit(5))
-        return jsonify(reservation_occurrences_full_schema.dump(q).data)
+        return jsonify(reservation_occurrences_schema.dump(q).data)
