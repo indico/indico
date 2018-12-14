@@ -15,20 +15,34 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import {serializeDate, toMoment} from 'indico/utils/date';
+.active-bookings {
+    margin-top: 15px;
 
+    :global(.redux-lazy-scroll) {
+        overflow: unset !important;
+    }
 
-export const ajax = {
-    start_date: {
-        onlyIf: ({selectedDate}) => selectedDate,
-        serializer: ({selectedDate, mode}) => serializeDate(toMoment(selectedDate).startOf(mode)),
-    },
-    end_date: {
-        onlyIf: ({selectedDate, mode}) => selectedDate && mode !== 'days',
-        serializer: ({selectedDate, mode}) => serializeDate(toMoment(selectedDate).endOf(mode)),
-    },
-    my_bookings: {
-        onlyIf: ({myBookings}) => myBookings,
-        serializer: ({myBookings}) => myBookings,
-    },
-};
+    .day-cards {
+        .day-cards-header {
+            display: flex;
+            align-items: center;
+            height: 50px;
+        }
+
+        :global(.icon.calendar.outline) {
+            font-size: 1.2em;
+        }
+
+        :global(.cards) {
+            margin-top: 0;
+        }
+
+        .booking-card {
+            .booking-card-header {
+                text-overflow: ellipsis;
+                overflow: hidden;
+                white-space: nowrap;
+            }
+        }
+    }
+}

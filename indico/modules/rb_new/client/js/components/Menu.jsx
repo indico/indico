@@ -28,7 +28,7 @@ import './Menu.module.scss';
 const defaultLabels = {
     bookRoom: <Translate>Book a Room</Translate>,
     roomList: <Translate>List of Rooms</Translate>,
-    calendar: <Translate>Calendar</Translate>
+    calendar: <Translate>Bookings</Translate>,
 };
 
 const menuItems = [
