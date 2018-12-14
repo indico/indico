@@ -27,7 +27,7 @@ from sqlalchemy.orm import contains_eager, joinedload
 
 from indico.core.config import config
 from indico.core.db import db
-from indico.core.db.sqlalchemy.util.queries import db_dates_overlap
+from indico.core.db.sqlalchemy.util.queries import db_dates_overlap, with_total_rows
 from indico.core.errors import NoReportError
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import RepeatFrequency, Reservation
@@ -135,27 +135,39 @@ def get_rooms_availability(rooms, start_dt, end_dt, repeat_frequency, repeat_int
     return date_range, availability
 
 
-def get_room_calendar(start_date, end_date, room_ids, **filters):
-    start_dt = datetime.combine(start_date, time(hour=0, minute=0))
-    end_dt = datetime.combine(end_date, time(hour=23, minute=59))
+def _bookings_query(filters):
     reservation_strategy = contains_eager('reservation')
     reservation_strategy.noload('room')
     reservation_strategy.noload('booked_for_user')
     reservation_strategy.noload('created_by_user')
+
     query = (ReservationOccurrence.query
              .filter(ReservationOccurrence.is_valid)
-             .filter(ReservationOccurrence.start_dt >= start_dt, ReservationOccurrence.end_dt <= end_dt)
              .join(Reservation)
              .join(Room)
-             .filter(Room.is_active, Room.id.in_(room_ids) if room_ids else True)
-             .order_by(db.func.indico.natsort(Room.full_name))
+             .filter(Room.is_active)
              .options(reservation_strategy))
+
+    if filters.get('room_ids'):
+        query = query.filter(Room.id.in_(filters['room_ids']))
+    if filters.get('start_date'):
+        query = query.filter(ReservationOccurrence.start_dt >= filters['start_date'])
+    if filters.get('end_date'):
+        query = query.filter(ReservationOccurrence.end_dt <= filters['end_date'])
 
     booked_for_user = filters.get('booked_for_user')
     if booked_for_user:
         query = query.filter(db.or_(Reservation.booked_for_user == booked_for_user,
                                     Reservation.created_by_user == booked_for_user))
 
+    return query
+
+
+def get_room_calendar(start_date, end_date, room_ids, **filters):
+    start_dt = datetime.combine(start_date, time(hour=0, minute=0))
+    end_dt = datetime.combine(end_date, time(hour=23, minute=59))
+    query = _bookings_query(dict(filters, **{'start_date': start_dt, 'end_date': end_dt, 'room_ids': room_ids}))
+    query = query.order_by(db.func.indico.natsort(Room.full_name))
     rooms = (Room.query
              .filter(Room.is_active, Room.id.in_(room_ids) if room_ids else True)
              .options(joinedload('location'))
@@ -199,11 +211,11 @@ def get_room_details_availability(room, start_dt, end_dt):
     availability = []
     for day in dates:
         iso_day = day.isoformat()
+        nb_periods = serialize_nonbookable_periods(group_nonbookable_periods(nonbookable_periods, dates)).get(iso_day)
         availability.append({
             'bookings': serialize_occurrences(group_by_occurrence_date(bookings)).get(iso_day),
             'blockings': serialize_blockings(group_blockings(blockings, dates)).get(iso_day),
-            'nonbookable_periods': serialize_nonbookable_periods(
-                group_nonbookable_periods(nonbookable_periods, dates)).get(iso_day),
+            'nonbookable_periods': nb_periods,
             'unbookable_hours': serialize_unbookable_hours(unbookable_hours),
             'day': iso_day,
         })
@@ -255,3 +267,23 @@ def create_booking_for_event(room_id, event):
         return resv
     except NoReportError:
         flash(_("Booking could not be created. Probably somebody else booked the room in the meantime."), 'error')
+
+
+def get_active_bookings(limit=20, **filters):
+    start_date = filters.pop('start_dt')
+    last_reservation_id = filters.get('last_reservation_id')
+
+    criteria = [ReservationOccurrence.start_dt > start_date]
+    if last_reservation_id is not None:
+        criteria.append(db.and_(db.cast(ReservationOccurrence.start_dt, db.Date) >= start_date,
+                        ReservationOccurrence.reservation_id > last_reservation_id))
+
+    query = (_bookings_query(filters)
+             .filter(db.or_(*criteria))
+             .order_by(ReservationOccurrence.start_dt,
+                       ReservationOccurrence.reservation_id,
+                       db.func.indico.natsort(Room.full_name))
+             .limit(limit))
+
+    bookings, total = with_total_rows(query)
+    return group_by_occurrence_date(query, sort_by=lambda obj: (obj.start_dt, obj.reservation_id)), total
