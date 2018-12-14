@@ -25,6 +25,11 @@
     text-align: center;
 }
 
+.ui.form input[type='text'].DateInput_input__small {
+    padding-left: 0.2em;
+    padding-right: 0.2em;
+}
+
 .CalendarMonth_caption {
     padding-bottom: 42px !important;
 }

@@ -29,18 +29,55 @@ import './NonBookablePeriods.module.scss';
 
 export default class NonBookablePeriods extends React.Component {
     static propTypes = {
+        onFocus: PropTypes.func.isRequired,
+        onBlur: PropTypes.func.isRequired,
         onChange: PropTypes.func.isRequired,
         value: PropTypes.array.isRequired,
     };
 
+    handleAddDates = () => {
+        const {value, onChange} = this.props;
+        onChange([
+            ...value,
+            {
+                startDt: serializeDate(moment()),
+                endDt: serializeDate(moment()),
+                key: shortid.generate()
+            }
+        ]);
+        this.setTouched();
+    };
+
+    handleRemoveDates = (key) => {
+        const {value, onChange} = this.props;
+        onChange([...value.filter((dA) => dA.key !== key)]);
+        this.setTouched();
+    };
+
+    handleDatesChange = ({startDate, endDate}, key) => {
+        const {value, onChange} = this.props;
+        onChange([...value.map(v => (v.key === key ? {...v,
+                                                      startDt: serializeDate(startDate),
+                                                      endDt: serializeDate(endDate)} : v))]);
+        this.setTouched();
+    };
+
+    setTouched = () => {
+        // pretend focus+blur to mark the field as touched in case an action changes
+        // the data without actually involving focus and blur of a form element
+        const {onFocus, onBlur} = this.props;
+        onFocus();
+        onBlur();
+    };
+
     render() {
-        const {onChange, value} = this.props;
+        const {value} = this.props;
         return (
             <>
                 <Button type="button"
                         className="room-edit-modal-add-btn"
                         icon labelPosition="left"
-                        onClick={() => onChange([...value, {startDt: null, endDt: null, key: shortid.generate()}])}>
+                        onClick={this.handleAddDates}>
                     <Icon name="plus" />
                     Add new Nonbookable Periods
                 </Button>
@@ -52,12 +89,8 @@ export default class NonBookablePeriods extends React.Component {
                                              anchorDirection={ANCHOR_RIGHT}
                                              startDate={startDt === null ? null : moment(startDt)}
                                              endDate={endDt === null ? null : moment(endDt)}
-                                             onDatesChange={({startDate, endDate}) => onChange([...value.map(v => (v.key === key ? {...v,
-                                                                                                                                    startDt: serializeDate(startDate),
-                                                                                                                                    endDt: serializeDate(endDate)} : v))])
-                                             } />
-
-                            <Icon floated="right" name="trash" className="trash-button" onClick={() => onChange([...value.filter((dA) => dA.key !== key)])} />
+                                             onDatesChange={(dates) => this.handleDatesChange(dates, key)} />
+                            <Icon floated="right" name="trash" className="trash-button" onClick={() => this.handleRemoveDates(key)} />
                         </div>
                     );
                 })}

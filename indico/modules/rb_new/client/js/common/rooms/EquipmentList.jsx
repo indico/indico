@@ -40,7 +40,7 @@ class EquipmentList extends React.Component {
         const {value} = this.props;
         const {equipmentTypes} = this.props;
         return equipmentTypes
-            .filter(eq => value.includes(eq.id))
+            .filter(eq => !value.includes(eq.id))
             .map(eq => ({key: eq.id, text: eq.name, value: eq.id}));
     };
 

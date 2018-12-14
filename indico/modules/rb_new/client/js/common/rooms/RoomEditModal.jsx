@@ -65,7 +65,7 @@ function validate({building, floor, number, capacity, attributes, nonbookablePer
     if (!attributes) {
         errors.attributes = Translate.string('Please provide an attribute value.');
     }
-    if (nonbookablePeriods.length > 0) {
+    if (nonbookablePeriods && nonbookablePeriods.some(x => !x.startDt || !x.endDt)) {
         errors.nonbookablePeriods = Translate.string('Please provide valid nonbookable periods.');
     }
     return errors;
@@ -199,7 +199,7 @@ const columns = [
     }, {
         type: 'input',
         name: 'dayReminder',
-        label: Translate.string('Send Booking reminders X days before (single/day)'),
+        label: Translate.string('Send Booking reminders X days before (single/daily)'),
         required: false
     }, {
         type: 'input',
@@ -358,9 +358,14 @@ class RoomEditModal extends React.Component {
             requests.push(indicoAxios.post(updateRoomAvailabilityURL({room_id: roomId}), snakifyKeys(_.pick(changedValues, ['bookableHours', 'nonbookablePeriods']))));
         }
 
-        Promise.all(requests.map(request => request.catch(e => e)))
-            .then(() => this.setState({submitSucceeded: true}))
-            .catch(e => handleAxiosError(e));
+        Promise.all(requests)
+            .then(() => {
+                this.setState({submitSucceeded: true});
+            })
+            .catch(e => {
+                handleAxiosError(e);
+                this.setState({submitSucceeded: false});
+            });
     };
 
 
@@ -369,14 +374,17 @@ class RoomEditModal extends React.Component {
     };
 
     renderAttributes = (content) => {
-        const {attributes} = this.state;
-        if (!attributes) {
+        const {attributes, roomAttributes} = this.state;
+        if (!attributes || !roomAttributes) {
             return null;
         }
         const titles = _.fromPairs(attributes.map(x => [x.name, x.title]));
         return (
             <FieldArray key="attributes" name="attributes" isEqual={_.isEqual}>
                 {({fields}) => {
+                    if (!fields.value) {
+                        return null;
+                    }
                     const options = this.generateAttributeOptions(attributes, fields.value);
                     return (
                         <div>
