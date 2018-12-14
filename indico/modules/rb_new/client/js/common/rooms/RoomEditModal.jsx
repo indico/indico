@@ -373,6 +373,7 @@ class RoomEditModal extends React.Component {
         if (!attributes) {
             return null;
         }
+        const titles = _.fromPairs(attributes.map(x => [x.name, x.title]));
         return (
             <FieldArray key="attributes" name="attributes" isEqual={_.isEqual}>
                 {({fields}) => {
@@ -389,15 +390,12 @@ class RoomEditModal extends React.Component {
                                       search
                                       disabled={options.length === 0}
                                       selectOnBlur={false}
-                                      onChange={(event, values) => {
-                                          // console.warn(name);
-                                          //       fields.push({
-                                          //       title: values.text, value: null, name: values.key
-                                          //   })
+                                      onChange={(__, {value: name}) => {
+                                          fields.push({value: null, name});
                                       }} />
                             {fields.map((attribute, index) => (
                                 <div key={attribute}>
-                                    <Field label={fields.value[index].title}
+                                    <Field label={titles[fields.value[index].name]}
                                            name={`${attribute}.value`}
                                            component={ReduxFormField}
                                            as={Input}
@@ -547,8 +545,9 @@ class RoomEditModal extends React.Component {
 
     generateAttributeOptions = (attributes, arrayFields) => {
         const fieldNames = arrayFields.map(field => field.name);
-        const options = attributes.map((key) => ({key: key.name, text: key.title, value: key.value})).filter(attr => !fieldNames.includes(attr.key));
-        return options;
+        return attributes
+            .map(attr => ({key: attr.name, text: attr.title, value: attr.name}))
+            .filter(attr => !fieldNames.includes(attr.key));
     };
 
     render() {
