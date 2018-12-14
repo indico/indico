@@ -15,7 +15,7 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from functools import wraps
-from itertools import chain, combinations, groupby, islice, izip_longest
+from itertools import groupby, islice, izip_longest
 
 
 def group_list(data, key=None, sort_by=None, sort_reverse=False):
