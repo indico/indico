@@ -44,7 +44,7 @@ export default combineReducers({
             landingActions.FETCH_BOOKINGS_SUCCESS,
             landingActions.FETCH_BOOKINGS_ERROR
         ),
-        data: (state = null, action) => {
+        data: (state = [], action) => {
             switch (action.type) {
                 case landingActions.BOOKINGS_RECEIVED:
                     return camelizeKeys(action.data);
