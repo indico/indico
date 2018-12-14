@@ -78,8 +78,8 @@ export default class TimeRangePicker extends React.Component {
         };
     }
 
-    shouldComponentUpdate(nextProps) {
-        return !_.isEqual(this.props, nextProps);
+    shouldComponentUpdate(nextProps, nextState) {
+        return (nextState !== this.state || !_.isEqual(this.props, nextProps));
     }
 
     generateStartTimeOptions = () => {
