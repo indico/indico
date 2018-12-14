@@ -21,12 +21,14 @@ import PropTypes from 'prop-types';
 import {Card, Placeholder} from 'semantic-ui-react';
 
 
-export default function CardPlaceholder() {
+export default function CardPlaceholder({withImage}) {
     return (
         <Card>
-            <Placeholder>
-                <Placeholder.Image />
-            </Placeholder>
+            {withImage && (
+                <Placeholder>
+                    <Placeholder.Image />
+                </Placeholder>
+            )}
             <Card.Content>
                 <Placeholder>
                     <Placeholder.Header>
@@ -47,12 +49,20 @@ export default function CardPlaceholder() {
     );
 }
 
-function CardPlaceholderGroup({count, className}) {
+CardPlaceholder.propTypes = {
+    withImage: PropTypes.bool,
+};
+
+CardPlaceholder.defaultProps = {
+    withImage: true,
+};
+
+function CardPlaceholderGroup({count, className, itemsPerRow, withImage}) {
     const props = className ? {className} : {};
     return (
-        <Card.Group {...props} stackable>
+        <Card.Group {...props} itemsPerRow={itemsPerRow} stackable>
             {_.range(0, count).map((i) => (
-                <CardPlaceholder key={i} />
+                <CardPlaceholder key={i} withImage={withImage} />
             ))}
         </Card.Group>
     );
@@ -60,11 +70,15 @@ function CardPlaceholderGroup({count, className}) {
 
 CardPlaceholderGroup.propTypes = {
     count: PropTypes.number.isRequired,
-    className: PropTypes.string
+    className: PropTypes.string,
+    itemsPerRow: PropTypes.number,
+    withImage: PropTypes.bool,
 };
 
 CardPlaceholderGroup.defaultProps = {
-    className: null
+    className: null,
+    itemsPerRow: null,
+    withImage: true,
 };
 
 CardPlaceholder.Group = CardPlaceholderGroup;
