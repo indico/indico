@@ -26,7 +26,7 @@ from PIL import Image
 from indico.legacy.common.cache import GenericCache
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb_new.schemas import (bookable_hours_schema, nonbookable_periods_schema,
-                                           reservation_occurrences_min_schema, simple_blockings_schema)
+                                           reservation_occurrences_schema, simple_blockings_schema)
 from indico.util.string import crc32
 from indico.util.struct.iterables import group_list
 
@@ -68,7 +68,7 @@ def group_by_occurrence_date(occurrences):
 
 
 def serialize_occurrences(data):
-    return {dt.isoformat(): reservation_occurrences_min_schema.dump(data).data for dt, data in data.iteritems()}
+    return {dt.isoformat(): reservation_occurrences_schema.dump(data).data for dt, data in data.iteritems()}
 
 
 def serialize_blockings(data):
