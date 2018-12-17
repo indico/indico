@@ -119,6 +119,17 @@ const unavailableDatePickerReducer = (state = initialDatePickerState, action) =>
                 ...state,
                 selectedDate: action.date
             };
+        case actions.INIT_UNAVAILABLE_TIMELINE:
+            return {
+                ...state,
+                selectedDate: action.selectedDate,
+                mode: action.mode
+            };
+        case actions.UNAVAILABLE_TIMELINE_RECEIVED:
+            return {
+                ...state,
+                dateRange: action.data.date_range
+            };
         default:
             return state;
     }

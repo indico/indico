@@ -57,8 +57,9 @@ export const GET_UNAVAILABLE_TIMELINE_REQUEST = 'bookRoom/GET_UNAVAILABLE_TIMELI
 export const GET_UNAVAILABLE_TIMELINE_SUCCESS = 'bookRoom/GET_UNAVAILABLE_TIMELINE_SUCCESS';
 export const GET_UNAVAILABLE_TIMELINE_ERROR = 'bookRoom/GET_UNAVAILABLE_TIMELINE_ERROR';
 export const UNAVAILABLE_TIMELINE_RECEIVED = 'bookRoom/UNAVAILABLE_TIMELINE_RECEIVED';
-export const SET_UNAVAILABLE_MODE = 'bookRoom/SET_TIMELINE_MODE';
-export const SET_UNAVAILABLE_DATE = 'bookRoom/SET_TIMELINE_DATE';
+export const SET_UNAVAILABLE_MODE = 'bookRoom/SET_UNAVAILABLE_MODE';
+export const SET_UNAVAILABLE_DATE = 'bookRoom/SET_UNAVAILABLE_DATE';
+export const INIT_UNAVAILABLE_TIMELINE = 'bookRoom/INIT_UNAVAILABLE_TIMELINE';
 
 // Suggestions
 export const FETCH_SUGGESTIONS_REQUEST = 'bookRoom/FETCH_SUGGESTIONS_REQUEST';
@@ -208,4 +209,8 @@ export function setUnavailableDate(date) {
 
 export function setUnavailableMode(mode) {
     return {type: SET_UNAVAILABLE_MODE, mode};
+}
+
+export function initUnavailableTimeline(selectedDate, mode) {
+    return {type: INIT_UNAVAILABLE_TIMELINE, selectedDate, mode};
 }
