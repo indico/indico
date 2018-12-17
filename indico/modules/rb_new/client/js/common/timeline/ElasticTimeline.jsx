@@ -49,7 +49,8 @@ export default class ElasticTimeline extends React.Component {
         lazyScroll: PropTypes.object,
         extraContent: PropTypes.node,
         showUnused: PropTypes.bool,
-        fixedHeight: PropTypes.string
+        fixedHeight: PropTypes.string,
+        conflictIndicator: PropTypes.bool
     };
 
     static defaultProps = {
@@ -71,7 +72,8 @@ export default class ElasticTimeline extends React.Component {
         onClickLabel: null,
         lazyScroll: null,
         showUnused: true,
-        fixedHeight: null
+        fixedHeight: null,
+        conflictIndicator: true
     };
 
     _getDayRowSerializer(dt) {
@@ -95,19 +97,19 @@ export default class ElasticTimeline extends React.Component {
     }
 
     calcDailyRows() {
-        const {availability, datePicker: {selectedDate}} = this.props;
+        const {availability, datePicker: {selectedDate}, conflictIndicator} = this.props;
 
         return availability.map(([, data]) => data).map((data) => ({
             availability: this._getDayRowSerializer(selectedDate)(data),
             label: data.room.fullName,
             key: data.room.id,
-            conflictIndicator: true,
+            conflictIndicator,
             room: data.room
         }));
     }
 
     calcWeeklyRows() {
-        const {availability, datePicker: {selectedDate}} = this.props;
+        const {availability, datePicker: {selectedDate}, conflictIndicator} = this.props;
         const weekStart = toMoment(selectedDate, 'YYYY-MM-DD').startOf('week');
         const weekRange = [...Array(7).keys()].map(n => serializeDate(weekStart.clone().add(n, 'days')));
 
@@ -121,14 +123,14 @@ export default class ElasticTimeline extends React.Component {
                 availability: weekRange.map(dt => [dt, this._getDayRowSerializer(dt)(data)]),
                 label: room.fullName,
                 key: room.id,
-                conflictIndicator: true,
+                conflictIndicator,
                 room
             };
         });
     }
 
     calcMonthlyRows() {
-        const {availability, datePicker: {selectedDate}} = this.props;
+        const {availability, datePicker: {selectedDate}, conflictIndicator} = this.props;
         const date = toMoment(selectedDate, 'YYYY-MM-DD');
         const monthStart = date.clone().startOf('month');
         const monthEnd = date.clone().endOf('month');
@@ -143,7 +145,7 @@ export default class ElasticTimeline extends React.Component {
                 availability: monthRange.map(dt => [dt, this._getDayRowSerializer(dt)(data)]),
                 label: room.fullName,
                 key: room.id,
-                conflictIndicator: true,
+                conflictIndicator,
                 room
             };
         });

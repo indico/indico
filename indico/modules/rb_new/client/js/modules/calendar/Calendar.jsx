@@ -92,21 +92,6 @@ class Calendar extends React.Component {
         }
     }
 
-    _getRowSerializer(day) {
-        return ({bookings, preBookings, nonbookablePeriods, unbookableHours, blockings, room}) => ({
-            availability: {
-                preBookings: preBookings[day] || [],
-                bookings: bookings[day] || [],
-                nonbookablePeriods: nonbookablePeriods[day] || [],
-                unbookableHours: unbookableHours || [],
-                blockings: blockings[day] || []
-            },
-            label: room.fullName,
-            key: room.id,
-            room
-        });
-    }
-
     onAddSlot = ({room: {id}, slotStartTime, slotEndTime}) => {
         const {datePicker: {selectedDate}, actions: {openBookRoom}} = this.props;
         openBookRoom(id, {
@@ -208,6 +193,7 @@ class Calendar extends React.Component {
                                              itemClass={editable ? EditableTimelineItem : TimelineItem}
                                              itemProps={editable ? {onAddSlot: this.onAddSlot} : {}}
                                              showUnused={!hideUnused}
+                                             conflictIndicator={false}
                                              longLabel />
                         </div>
                     </Container>
