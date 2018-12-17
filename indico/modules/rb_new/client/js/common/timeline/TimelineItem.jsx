@@ -34,6 +34,8 @@ const classes = {
     blockings: 'blocking',
     nonbookablePeriods: 'unbookable-periods',
     unbookableHours: 'unbookable-hours',
+    cancellations: 'cancellation',
+    rejections: 'rejection',
 };
 
 const types = {
@@ -43,6 +45,8 @@ const types = {
     nonbookablePeriods: 'unbookable-periods',
     unbookableHours: 'unbookable-hours',
     preBookings: 'pre-booking',
+    cancellations: 'cancellation',
+    rejections: 'rejection'
 };
 
 function getKeyForOccurrence(name, {reservation, startTime, endTime, startDt, endDt}) {
@@ -114,6 +118,7 @@ class TimelineItem extends React.Component {
             endTime,
             reservation,
             reason,
+            rejectionReason,
             bookable
         } = occurrence;
         const {startHour, endHour, onClickCandidate, onClickReservation, room, dayBased} = this.props;
@@ -143,6 +148,15 @@ class TimelineItem extends React.Component {
                 <div styleName="popup-center">
                     <div>{Translate.string('Not possible to book between:')}</div>
                     <div>{segmentStartDt.format('LT')} - {segmentEndDt.format('LT')}</div>
+                </div>
+            );
+        } else if (type === 'cancellation') {
+            popupContent = <div styleName="popup-center"><strong>{Translate.string('Cancelled')}</strong></div>;
+        } else if (type === 'rejection') {
+            popupContent = (
+                <div styleName="popup-center">
+                    <strong><Translate>Rejected</Translate></strong>
+                    <div>{Translate.string('Reason: {reason}', {reason: rejectionReason})}</div>
                 </div>
             );
         } else {

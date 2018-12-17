@@ -67,7 +67,9 @@ class BookingEdit extends React.Component {
             calendar: {
                 isFetching: false,
                 data: {
-                    bookings: occurrences,
+                    bookings: occurrences.bookings,
+                    cancellations: occurrences.cancellations,
+                    rejections: occurrences.rejections,
                     candidates: {},
                     conflicts: {}
                 },
@@ -166,6 +168,11 @@ class BookingEdit extends React.Component {
             candidates = availabilityData.candidates;
         }
 
+        /* Filter out rejections and cancellations from candidates */
+        const {data: {cancellations, rejections}} = calendar;
+        const candidatesDateRange = newDateRange.filter(date => !(date in rejections) && !(date in cancellations));
+        candidates = _.pick(candidates, candidatesDateRange);
+
         this.setState({
             calendar: {
                 isFetching: false,
@@ -229,6 +236,8 @@ class BookingEdit extends React.Component {
         const {booking: {room}} = this.props;
         const legendLabels = [
             {label: Translate.string('Current booking'), color: 'orange'},
+            {label: Translate.string('Cancelled occurrences'), style: 'cancellation'},
+            {label: Translate.string('Rejected occurrences'), style: 'rejection'},
             {label: Translate.string('New booking'), color: 'green'},
             {label: Translate.string('Conflicts with new booking'), color: 'red'},
         ];
@@ -236,7 +245,9 @@ class BookingEdit extends React.Component {
             return {
                 availability: {
                     bookings: av.bookings[day] || [],
-                    candidates: (av.candidates[day] || []).map((candidate) => ({...candidate, bookable: false})),
+                    cancellations: av.cancellations[day] || [],
+                    rejections: av.rejections[day] || [],
+                    candidates: (av.candidates[day] || []).map(candidate => ({...candidate, bookable: false})),
                     conflicts: av.conflicts[day] || [],
                 },
                 label: moment(day).format('L'),
