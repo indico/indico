@@ -98,9 +98,11 @@ class BookingDetails extends React.Component {
 
     _getRowSerializer = (day) => {
         const {booking: {room}} = this.props;
-        return (occurrences) => ({
+        return ({bookings, cancellations, rejections}) => ({
             availability: {
-                bookings: occurrences[day].map((candidate) => ({...candidate, bookable: false})) || [],
+                bookings: bookings[day].map((candidate) => ({...candidate, bookable: false})) || [],
+                cancellations: cancellations[day] || [],
+                rejections: rejections[day] || [],
             },
             label: moment(day).format('L'),
             key: day,
@@ -339,7 +341,11 @@ class BookingDetails extends React.Component {
                 canReject, canAccept, isAccepted
             }
         } = this.props;
-        const legendLabels = [{label: Translate.string('Occurrence'), color: 'orange'}];
+        const legendLabels = [
+            {label: Translate.string('Current'), color: 'orange'},
+            {label: Translate.string('Cancelled'), style: 'cancellation'},
+            {label: Translate.string('Rejected'), style: 'rejection'},
+        ];
         const dates = {startDate: startDt, endDate: endDt};
         const times = {startTime: moment(startDt).format('HH:mm'), endTime: moment(endDt).format('HH:mm')};
         const recurrence = getRecurrenceInfo(repetition);

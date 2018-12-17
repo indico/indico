@@ -99,7 +99,7 @@ class ReservationDetailsOccurrenceSchema(mm.ModelSchema):
 
     class Meta:
         model = ReservationOccurrence
-        fields = ('start_dt', 'end_dt', 'is_valid')
+        fields = ('start_dt', 'end_dt', 'is_valid', 'rejection_reason')
 
 
 class ReservationEditLogSchema(UserSchema):
