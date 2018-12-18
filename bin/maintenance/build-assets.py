@@ -126,11 +126,7 @@ def _get_plugin_webpack_build_config(plugin_dir, url_root='/'):
 
 
 def _get_webpack_args(dev, watch):
-    args = []
-    if dev:
-        args.append('--env.NODE_ENV=development')
-    else:
-        args += ['-p', '--env.NODE_ENV=production']
+    args = ['--env.NODE_ENV={}'.format('development' if dev else 'production')]
     if watch:
         args.append('--watch')
     return args
