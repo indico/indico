@@ -141,6 +141,9 @@ export default (env) => {
         ],
         resolve: {
             alias: extraResolveAliases
+        },
+        output: {
+            jsonpFunction: 'coreJsonp'
         }
     });
 };

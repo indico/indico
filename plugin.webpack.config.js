@@ -68,6 +68,9 @@ module.exports = (env) => {
         },
         resolve: {
             alias: generateModuleAliases()
+        },
+        output: {
+            jsonpFunction: 'pluginJsonp'
         }
     });
 };
