@@ -16,6 +16,7 @@
  */
 
 import fetchEquipmentTypesURL from 'indico-url:rooms_new.equipment_types';
+import fetchRoomURL from 'indico-url:rooms_new.room';
 import fetchRoomsURL from 'indico-url:rooms_new.rooms';
 import fetchRoomAvailabilityURL from 'indico-url:rooms_new.room_availability';
 import fetchRoomAttributesURL from 'indico-url:rooms_new.room_attributes';
@@ -30,6 +31,11 @@ export const FETCH_EQUIPMENT_TYPES_REQUEST = 'rooms/FETCH_EQUIPMENT_TYPES_REQUES
 export const FETCH_EQUIPMENT_TYPES_SUCCESS = 'rooms/FETCH_EQUIPMENT_TYPES_SUCCESS';
 export const FETCH_EQUIPMENT_TYPES_ERROR = 'rooms/FETCH_EQUIPMENT_TYPES_ERROR';
 export const EQUIPMENT_TYPES_RECEIVED = 'rooms/EQUIPMENT_TYPES_RECEIVED';
+
+export const ROOM_RECEIVED = 'rooms/ROOM_RECEIVED';
+export const FETCH_ROOM_REQUEST = 'rooms/FETCH_ROOM_REQUEST';
+export const FETCH_ROOM_SUCCESS = 'rooms/FETCH_ROOM_SUCCESS';
+export const FETCH_ROOM_ERROR = 'rooms/FETCH_ROOM_ERROR';
 
 export const ROOMS_RECEIVED = 'rooms/ROOMS_RECEIVED';
 export const FETCH_ROOMS_REQUEST = 'rooms/FETCH_ROOMS_REQUEST';
@@ -53,6 +59,15 @@ export function fetchEquipmentTypes() {
         FETCH_EQUIPMENT_TYPES_REQUEST,
         [EQUIPMENT_TYPES_RECEIVED, FETCH_EQUIPMENT_TYPES_SUCCESS],
         FETCH_EQUIPMENT_TYPES_ERROR,
+    );
+}
+
+export function fetchRoom(id) {
+    return ajaxAction(
+        () => indicoAxios.get(fetchRoomURL({room_id: id})),
+        FETCH_ROOM_REQUEST,
+        [ROOM_RECEIVED, FETCH_ROOM_SUCCESS],
+        FETCH_ROOM_ERROR
     );
 }
 

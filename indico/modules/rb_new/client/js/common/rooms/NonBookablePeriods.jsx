@@ -21,6 +21,7 @@ import PropTypes from 'prop-types';
 import shortid from 'shortid';
 import {Icon, Button} from 'semantic-ui-react';
 import {ANCHOR_RIGHT} from 'react-dates/constants';
+import {Translate} from 'indico/react/i18n';
 import {DateRangePicker} from 'indico/react/components';
 import {serializeDate} from 'indico/utils/date';
 
@@ -94,7 +95,7 @@ export default class NonBookablePeriods extends React.Component {
                         </div>
                     );
                 })}
-                {!value && <div>No non bookable periods found</div>}
+                {!value && <Translate>No non bookable periods found</Translate>}
             </>
 
         );

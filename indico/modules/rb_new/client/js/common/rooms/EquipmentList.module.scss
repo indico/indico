@@ -15,11 +15,14 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+@import 'rb_new:styles/palette';
+
 .equipment-button {
+    cursor: pointer;
+    color: $sui-red;
+    opacity: 0.5 !important;
+
     &:hover {
         opacity: 1 !important;
     }
-    cursor: pointer;
-    color: #DB2828;
-    opacity: 0.5 !important;
 }

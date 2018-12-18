@@ -300,7 +300,8 @@ class RHRoomAvailabilityUpdate(RHRoomAdminBase):
                'nonbookable_periods': fields.Nested({'start_dt': fields.Date(),
                                                      'end_dt': fields.Date()}, many=True)})
     def _process(self, args):
-        self._check_invalid_times(args)
+        if 'bookable_hours' in args:
+            self._check_invalid_times(args)
         update_room_availability(self.room, args)
         return jsonify({'nonbookable_periods': nonbookable_periods_schema.dump(self.room.nonbookable_periods, many=True).data,
                        'bookable_hours': bookable_hours_schema.dump(self.room.bookable_hours, many=True).data})

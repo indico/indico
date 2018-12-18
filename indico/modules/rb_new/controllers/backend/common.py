@@ -30,10 +30,7 @@ _cache = GenericCache('Rooms')
 
 class UserField(mmfields.Field):
     def _deserialize(self, value, attr, data, **kwargs):
-        print value
         user = User.get(value, is_deleted=False)
-        print "here"
-        print user
         return user
 
 
@@ -56,30 +53,30 @@ search_room_args = {
     'ne_lng': fields.Float(validate=lambda x: -180 <= x <= 180)
 }
 
-# Follows field format of WTForms class of old rb
+
 room_args = {
-    'verbose_name': fields.Str(),
-    'site': fields.Str(),
+    'verbose_name': fields.Str(allow_none=True),
+    'site': fields.Str(allow_none=True),
     'building': fields.String(validate=lambda x: x is not None),
     'floor': fields.String(validate=lambda x: x is not None),
     'number': fields.String(validate=lambda x: x is not None),
-    'longitude': fields.Float(),
-    'latitude': fields.Float(),
-    'is_active': fields.Bool(missing=True),
-    'is_reservable': fields.Bool(missing=True),
-    'reservations_need_confirmation': fields.Bool(),
-    'notification_for_assistance': fields.Bool(),
-    'notification_before_days': fields.Int(validate=lambda x: 1 <= x <= 30),
-    'notification_before_days_weekly': fields.Int(validate=lambda x: 1 <= x <= 30),
-    'notification_before_monthly': fields.Int(validate=lambda x: 1 <= x <= 30),
-    'notifications_enabled': fields.Bool(missing=True),
-    'booking_limit_days': fields.Int(validate=lambda x: x >= 1),
-    'owner': UserField(load_from='owner_id', validate=lambda x: x is not None),
-    'key_location': fields.Str(),
-    'telephone': fields.Str(),
+    'longitude': fields.Float(allow_none=True),
+    'latitude': fields.Float(allow_none=True),
+    'is_active': fields.Bool(allow_none=True),
+    'is_reservable': fields.Bool(allow_none=True),
+    'reservations_need_confirmation': fields.Bool(allow_none=True),
+    'notification_for_assistance': fields.Bool(allow_none=True),
+    'notification_before_days': fields.Int(validate=lambda x: 1 <= x <= 30, aallow_none=True),
+    'notification_before_days_weekly': fields.Int(validate=lambda x: 1 <= x <= 30, allow_none=True),
+    'notification_before_monthly': fields.Int(validate=lambda x: 1 <= x <= 30, allow_none=True),
+    'notifications_enabled': fields.Bool(missing=True, allow_missing=True),
+    'booking_limit_days': fields.Int(validate=lambda x: x >= 1, allow_none=True),
+    'owner': UserField(load_from='owner_id', validate=lambda x: x is not None, allow_none=True),
+    'key_location': fields.Str(allow_none=True),
+    'telephone': fields.Str(allow_none=True),
     'capacity': fields.Int(validate=lambda x: x >= 1),
-    'division': fields.Str(),
-    'surface_area': fields.Int(validate=lambda x: x >= 0),
-    'max_advance_days': fields.Int(validate=lambda x: x >= 1),
-    'comments': fields.Str(),
+    'division': fields.Str(allow_none=True),
+    'surface_area': fields.Int(validate=lambda x: x >= 0, allow_none=True),
+    'max_advance_days': fields.Int(validate=lambda x: x >= 1, allow_none=True),
+    'comments': fields.Str(allow_none=True),
 }

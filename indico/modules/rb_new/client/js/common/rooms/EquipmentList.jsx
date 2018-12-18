@@ -83,7 +83,7 @@ class EquipmentList extends React.Component {
                         </List.Item>
                     ))}
                 </List>
-                </>
+            </>
         );
     }
 }

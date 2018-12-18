@@ -20,6 +20,7 @@ import PropTypes from 'prop-types';
 import moment from 'moment';
 import shortid from 'shortid';
 import {Button, Icon} from 'semantic-ui-react';
+import {Translate} from 'indico/react/i18n';
 import {serializeTime} from 'indico/utils/date';
 import TimeRangePicker from '../../components/TimeRangePicker';
 
@@ -32,6 +33,13 @@ export default class DailyAvailability extends React.Component {
         value: PropTypes.arrayOf(PropTypes.object).isRequired,
     };
 
+    handleTimesChange = ({startTime, endTime}, key) => {
+        const {value, onChange} = this.props;
+        onChange([...value.map(v => (v.key === key ? {...v,
+                                                      startTime: serializeTime(startTime),
+                                                      endTime: serializeTime(endTime)} : v))]);
+    };
+
     render() {
         const {value, onChange} = this.props;
         return (
@@ -41,7 +49,7 @@ export default class DailyAvailability extends React.Component {
                         icon labelPosition="left"
                         onClick={() => onChange([...value, {startTime: '08:00', endTime: '17:00', key: shortid.generate()}])}>
                     <Icon name="plus" />
-                    Add new Daily Availability
+                    <Translate>Add new Daily Availability</Translate>
                 </Button>
                 {value && value.map((bookableHour) => {
                     const {startTime: startT, endTime: endT, key} = bookableHour;
@@ -49,17 +57,14 @@ export default class DailyAvailability extends React.Component {
                         <div key={key} className="flex-container">
                             <TimeRangePicker startTime={moment(startT, 'HH:mm')}
                                              endTime={moment(endT, 'HH:mm')}
-                                             onChange={(startTime, endTime) => onChange([...value.map(v => (v.key === key ? {...v,
-                                                                                                                             startTime: serializeTime(startTime),
-                                                                                                                             endTime: serializeTime(endTime)} : v))])
-                                             } />
+                                             onChange={(startTime, endTime) => this.handleTimesChange({startTime, endTime}, key)} />
                             <Icon floated="right" name="trash" className="trash-button" onClick={() => {
                                 onChange([...value.filter((bH) => bH.key !== key)]);
                             }} />
                         </div>
                     );
                 })}
-                {!value && <div>No daily availability found</div>}
+                {!value && <Translate>No daily availability found</Translate>}
             </>
         );
     }
