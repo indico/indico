@@ -248,9 +248,6 @@ export function webpackDefaults(env, config, bundles) {
             new ExtractTextPlugin({
                 filename: 'css/[name].[md5:contenthash:hex:8].css'
             }),
-            new webpack.EnvironmentPlugin({
-                NODE_ENV: currentEnv
-            }),
             new ProgressBarPlugin({
                 format:
                     // eslint-disable-next-line prefer-template
