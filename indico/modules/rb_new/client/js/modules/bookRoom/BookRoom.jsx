@@ -266,10 +266,13 @@ class BookRoom extends React.Component {
                                                            hideOnScroll />
                                                 )}
                                                 {room.canUserPreBook && (
-                                                    <Popup trigger={bookingModalBtn(room, true)}
-                                                           content={labels.preBookButton}
-                                                           position="top center"
-                                                           hideOnScroll />
+                                                    <Icon.Group onClick={() => this.openBookingForm(room, null, true)}>
+                                                        <Popup trigger={bookingModalBtn(room, true)}
+                                                               content={labels.preBookButton}
+                                                               position="top center"
+                                                               hideOnScroll />
+                                                        <Icon corner name="wait" styleName="prebooking-corner-icon" />
+                                                    </Icon.Group>
                                                 )}
                                                 <Popup trigger={showDetailsBtn(room)}
                                                        content={labels.detailsButton}

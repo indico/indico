@@ -79,7 +79,7 @@ class Room extends React.Component {
 
         if ((actions !== undefined && actions.length !== 0) || showFavoriteButton) {
             const dimmerContent = (
-                <div>
+                <div styleName="icons-wrapper">
                     {actions}
                     {showFavoriteButton && this.renderFavoriteButton()}
                 </div>
