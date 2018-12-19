@@ -80,17 +80,17 @@ export function fetchRooms() {
     );
 }
 
-export function fetchDetails(id) {
+export function fetchDetails(id, force = false) {
     return async (dispatch) => {
-        dispatch(fetchAvailability(id));
-        dispatch(fetchAttributes(id));
+        dispatch(fetchAvailability(id, force));
+        dispatch(fetchAttributes(id, force));
     };
 }
 
-export function fetchAvailability(id) {
+export function fetchAvailability(id, force = false) {
     return async (dispatch, getStore) => {
         const {rooms: {availability: rooms}} = getStore();
-        if (id in rooms) {
+        if (!force && (id in rooms)) {
             return;
         }
         return await ajaxAction(
@@ -103,10 +103,10 @@ export function fetchAvailability(id) {
     };
 }
 
-export function fetchAttributes(id) {
+export function fetchAttributes(id, force = false) {
     return async (dispatch, getStore) => {
         const {rooms: {attributes: rooms}} = getStore();
-        if (id in rooms) {
+        if (!force && (id in rooms)) {
             return;
         }
         return await ajaxAction(

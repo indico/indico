@@ -373,7 +373,7 @@ class RoomEditModal extends React.Component {
     };
 
     handleSubmit = async (data, form) => {
-        const {roomId, actions: {fetchRoom}} = this.props;
+        const {roomId, actions: {fetchRoom, fetchRoomDetails}} = this.props;
         const changedValues = getChangedValues(data, form);
         const basicDetails = _.omit(changedValues, ['attributes', 'bookableHours', 'nonbookablePeriods', 'availableEquipment']);
         if ('owner' in changedValues) {
@@ -399,6 +399,7 @@ class RoomEditModal extends React.Component {
             await Promise.all(requests);
             this.setState({submitSucceeded: true});
             fetchRoom(roomId);
+            fetchRoomDetails(roomId, true);
         } catch (e) {
             handleAxiosError(e);
             this.setState({submitSucceeded: false});
@@ -636,6 +637,7 @@ export default connect(
     dispatch => ({
         actions: bindActionCreators({
             fetchRoom: roomsActions.fetchRoom,
+            fetchRoomDetails: roomsActions.fetchDetails,
         }, dispatch),
     }),
 )(RoomEditModal);
