@@ -108,4 +108,14 @@
         overflow: visible !important;
         margin: 0.15em;
     }
+
+
+    :global(.corner.icon).prebooking-corner-icon {
+        cursor: pointer;
+        color: $white;
+        font-size: 0.8em;
+        right: 4px;
+        bottom: 2px;
+        text-shadow: none;
+    }
 }
