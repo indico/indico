@@ -50,8 +50,8 @@ import {selectors as userSelectors} from '../user';
 import './RoomEditModal.module.scss';
 
 
-function isNumberInvalid(number) {
-    return number !== null && (number > 30 || number < 1);
+function isInvalidNotificationPeriod(days) {
+    return days !== null && (days > 30 || days < 1);
 }
 
 function validate(fields) {
@@ -76,13 +76,13 @@ function validate(fields) {
     if (surfaceArea !== null && surfaceArea < 1) {
         errors.surfaceArea = Translate.string('Please provide a valid surface area number.');
     }
-    if (isNumberInvalid(notificationBeforeDays)) {
+    if (isInvalidNotificationPeriod(notificationBeforeDays)) {
         errors.notificationBeforeDays = Translate.string('Number of days must be between [1, 30]');
     }
-    if (isNumberInvalid(notificationBeforeDaysWeekly)) {
+    if (isInvalidNotificationPeriod(notificationBeforeDaysWeekly)) {
         errors.notificationBeforeDaysWeekly = Translate.string('Number of days must be between [1, 30]');
     }
-    if (isNumberInvalid(notificationBeforeDaysMonthly)) {
+    if (isInvalidNotificationPeriod(notificationBeforeDaysMonthly)) {
         errors.notificationBeforeDaysMonthly = Translate.string('Number of days must be between [1, 30]');
     }
     if (!attributes) {
@@ -111,13 +111,11 @@ const columns = [
         type: 'input',
         name: 'keyLocation',
         label: Translate.string('Where is the key?'),
-        inputType: 'text',
         required: false
     }, {
         type: 'input',
         name: 'telephone',
         label: Translate.string('Telephone'),
-        inputType: 'text',
         required: false
     }, {
         type: 'header',
@@ -135,7 +133,6 @@ const columns = [
             type: 'input',
             name: 'division',
             label: Translate.string('Division'),
-            inputType: 'text',
             required: false
         }]
     }, {
@@ -155,13 +152,11 @@ const columns = [
         type: 'input',
         name: 'verboseName',
         label: Translate.string('Name'),
-        inputType: 'text',
         required: false
     }, {
         type: 'input',
         name: 'site',
         label: Translate.string('Site'),
-        inputType: 'text',
         required: false
     }, {
         type: 'formgroup',
@@ -170,19 +165,16 @@ const columns = [
             type: 'input',
             name: 'building',
             label: Translate.string('Building'),
-            inputType: 'text',
             required: true
         }, {
             type: 'input',
             name: 'floor',
             label: Translate.string('Floor'),
-            inputType: 'text',
             required: true
         }, {
             type: 'input',
             name: 'number',
             label: Translate.string('Number'),
-            inputType: 'text',
             required: true
         }]
     }, {
@@ -480,7 +472,7 @@ class RoomEditModal extends React.Component {
                            label={content.label}
                            required={content.required}
                            as="input"
-                           type={content.inputType}
+                           type={content.inputType || 'text'}
                            parse={(value) => {
                                return value === '' ? null : value;
                            }} />

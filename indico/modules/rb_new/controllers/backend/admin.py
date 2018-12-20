@@ -266,7 +266,6 @@ class RHRoomAdminBase(RHRoomBookingBase):
         self.room = Room.get_one(request.view_args['room_id'])
 
 
-# Returns all currently existing room attributes
 class RHRoomAttributesAll(RHRoomBookingBase):
     def _process_args(self):
         attributes = RoomAttribute.query.all()
@@ -279,22 +278,21 @@ class RHRoomAttributes(RHRoomAdminBase):
 
 
 class RHRoomAttributesUpdate(RHRoomAdminBase):
-    @use_args({'attributes': fields.Nested({'title': fields.Str(),
-                                            'value': fields.Str(),
-                                            'name': fields.Str()}, many=True)})
-    def _process(self, args):
-        update_room_attributes(self.room, args['attributes'])
+    @use_kwargs({'attributes': fields.Nested({'title': fields.Str(),
+                                              'value': fields.Str(),
+                                              'name': fields.Str()}, many=True)})
+    def _process(self, attributes):
+        update_room_attributes(self.room, attributes)
         return jsonify(room_attribute_values_schema.dump(self.room.attributes).data)
 
 
 class RHRoomAvailability(RHRoomAdminBase):
     def _process(self):
-        return jsonify({'nonbookable_periods': nonbookable_periods_schema.dump(self.room.nonbookable_periods, many=True).data,
-                       'bookable_hours': bookable_hours_schema.dump(self.room.bookable_hours, many=True).data})
+        return jsonify(nonbookable_periods=nonbookable_periods_schema.dump(self.room.nonbookable_periods, many=True).data,
+                       bookable_hours=bookable_hours_schema.dump(self.room.bookable_hours, many=True).data)
 
 
 class RHRoomAvailabilityUpdate(RHRoomAdminBase):
-
     @use_args({'bookable_hours': fields.Nested({'start_time': fields.Time(),
                                                 'end_time': fields.Time()}, many=True),
                'nonbookable_periods': fields.Nested({'start_dt': fields.Date(),
@@ -328,11 +326,6 @@ class RHRoomEquipmentUpdate(RHRoomAdminBase):
     def _process(self, args):
         update_room_equipment(self.room, args)
         return jsonify(room_update_schema.dump(self.room, many=False).data)
-
-
-class RHRoomImage(RHRoomAdminBase):
-    def _process(self):
-        return ""
 
 
 class RHRoom(RHRoomAdminBase):

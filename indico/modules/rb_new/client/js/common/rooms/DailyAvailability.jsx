@@ -35,9 +35,13 @@ export default class DailyAvailability extends React.Component {
 
     handleTimesChange = ({startTime, endTime}, key) => {
         const {value, onChange} = this.props;
-        onChange([...value.map(v => (v.key === key ? {...v,
-                                                      startTime: serializeTime(startTime),
-                                                      endTime: serializeTime(endTime)} : v))]);
+        onChange(value.map(v => {
+            if (v.key === key) {
+                return {...v, startTime: serializeTime(startTime), endTime: serializeTime(endTime)};
+            } else {
+                return v;
+            }
+        }));
     };
 
     render() {

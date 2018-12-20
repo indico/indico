@@ -95,7 +95,7 @@ export default class NonBookablePeriods extends React.Component {
                         </div>
                     );
                 })}
-                {!value && <Translate>No non bookable periods found</Translate>}
+                {!value && <Translate>No nonbookable periods found</Translate>}
             </>
 
         );
