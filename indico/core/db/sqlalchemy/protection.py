@@ -157,6 +157,10 @@ class ProtectionMixin(object):
         # we stay on the safe side and deny access
         return all(rv) if rv else None
 
+    @staticmethod
+    def is_user_admin(user):
+        return user.is_admin
+
     @memoize_request
     def can_access(self, user, allow_admin=True):
         """Checks if the user can access the object.
@@ -171,7 +175,7 @@ class ProtectionMixin(object):
             return override
 
         # Usually admins can access everything, so no need for checks
-        if allow_admin and user and user.is_admin:
+        if allow_admin and user and type(self).is_user_admin(user):
             rv = True
         # If there's a valid access key we can skip all other ACL checks
         elif self.allow_access_key and self.check_access_key():
@@ -367,7 +371,7 @@ class ProtectionManagersMixin(ProtectionMixin):
             return all(rv)
 
         # Usually admins can access everything, so no need for checks
-        if not explicit_permission and allow_admin and user.is_admin:
+        if not explicit_permission and allow_admin and type(self).is_user_admin(user):
             return True
 
         if any(user in entry.principal
