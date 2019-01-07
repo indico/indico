@@ -42,6 +42,7 @@ _bp.add_url_rule('/api/locations', 'locations', locations.RHLocations)
 
 # Rooms
 _bp.add_url_rule('/api/rooms/', 'rooms', rooms.RHRooms)
+_bp.add_url_rule('/api/rooms/permissions', 'rooms_permissions', rooms.RHRoomsPermissions)
 _bp.add_url_rule('/api/rooms/search', 'search_rooms', rooms.RHSearchRooms)
 _bp.add_url_rule('/api/rooms/<int:room_id>/availability', 'room_availability', rooms.RHRoomAvailability)
 _bp.add_url_rule('/api/rooms/<int:room_id>/attributes', 'room_attributes', rooms.RHRoomAttributes)

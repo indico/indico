@@ -371,11 +371,6 @@ class Room(versioned_cache(_cache, 'id'), ProtectionManagersMixin, db.Model, Ser
         return self.has_equipment('Video conference')
 
     @property
-    @cached(_cache)
-    def is_public(self):
-        return self.is_reservable and not self.has_booking_groups
-
-    @property
     def kind(self):
         if not self.is_reservable or self.has_booking_groups:
             return 'privateRoom'
@@ -724,9 +719,13 @@ class Room(versioned_cache(_cache, 'id'), ProtectionManagersMixin, db.Model, Ser
         raise NotImplementedError
 
     def can_book(self, user, allow_admin=True):
+        if self.is_public and not self.reservations_need_confirmation:
+            return True
         return self.can_manage(user, permission='book', allow_admin=allow_admin)
 
     def can_prebook(self, user, allow_admin=True):
+        if self.is_public and self.reservations_need_confirmation:
+            return True
         return self.can_manage(user, permission='prebook', allow_admin=allow_admin)
 
     def can_override(self, user, allow_admin=True):

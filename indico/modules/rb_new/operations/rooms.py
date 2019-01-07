@@ -21,8 +21,7 @@ from itertools import chain
 
 from dateutil.relativedelta import relativedelta
 from flask import session
-from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.orm import raiseload
+from sqlalchemy.orm import joinedload, load_only, raiseload
 
 from indico.core.auth import multipass
 from indico.core.config import config
@@ -34,8 +33,8 @@ from indico.modules.events.models.principals import EventPrincipal
 from indico.modules.rb import Reservation, rb_is_admin, rb_settings
 from indico.modules.rb.models.equipment import EquipmentType, RoomEquipmentAssociation
 from indico.modules.rb.models.favorites import favorite_room_table
+from indico.modules.rb.models.principals import RoomPrincipal
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
-from indico.modules.rb.models.room_attributes import RoomAttributeAssociation
 from indico.modules.rb.models.room_features import RoomFeature
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.statistics import calculate_rooms_occupancy
@@ -72,15 +71,27 @@ def _query_managed_rooms(user):
     # We can get a list of all groups for the user
     iterator = chain.from_iterable(multipass.identity_providers[x.provider].get_identity_groups(x.identifier)
                                    for x in user.identities)
-    groups = {(g.provider.name, g.name) for g in iterator}
-    # XXX: refactor this once we have a proper ACL for rooms
-    if multipass.default_group_provider:
-        groups = {name for provider, name in groups if provider == multipass.default_group_provider.name}
-    else:
-        groups = {unicode(group.id) for group in user.local_groups}
-    attrs = [db.cast(x, JSONB) for x in groups]
-    is_manager = Room.attributes.any(db.cast(RoomAttributeAssociation.value, JSONB).in_(attrs))
-    return Room.query.filter(Room.is_active, db.or_(Room.owner == user, is_manager))
+    criteria = [db.and_(RoomPrincipal.type == PrincipalType.user,
+                        RoomPrincipal.user_id == user.id,
+                        RoomPrincipal.has_management_permission())]
+    for group in user.local_groups:
+        criteria.append(db.and_(RoomPrincipal.type == PrincipalType.local_group,
+                                RoomPrincipal.local_group_id == group.id,
+                                RoomPrincipal.has_management_permission()))
+    for group in iterator:
+        criteria.append(db.and_(RoomPrincipal.type == PrincipalType.multipass_group,
+                                RoomPrincipal.multipass_group_provider == group.provider.name,
+                                db.func.lower(RoomPrincipal.multipass_group_name) == group.name.lower(),
+                                RoomPrincipal.has_management_permission()))
+    return Room.query.filter(Room.is_active, Room.acl_entries.any(db.or_(*criteria)))
+
+
+def _query_all_rooms_for_acl_check():
+    return (Room.query
+            .filter(Room.is_active)
+            .options(load_only('id', 'protection_mode', 'reservations_need_confirmation'),
+                     raiseload('owner'),
+                     joinedload('acl_entries')))
 
 
 @memoize_redis(900)
@@ -88,7 +99,8 @@ def has_managed_rooms(user):
     if _can_get_all_groups(user):
         return _query_managed_rooms(user).has_rows()
     else:
-        return Room.user_owns_rooms(user)
+        query = _query_all_rooms_for_acl_check()
+        return any(r.can_manage(user, allow_admin=False) for r in query)
 
 
 @memoize_redis(900)
@@ -96,7 +108,54 @@ def get_managed_room_ids(user):
     if _can_get_all_groups(user):
         return {id_ for id_, in _query_managed_rooms(user).with_entities(Room.id)}
     else:
-        return {r.id for r in Room.get_owned_by(user)}
+        query = _query_all_rooms_for_acl_check()
+        return {r.id for r in query if r.can_manage(user, allow_admin=False)}
+
+
+@memoize_redis(900)
+def get_room_permissions(user):
+    if _can_get_all_groups(user):
+        iterator = chain.from_iterable(multipass.identity_providers[x.provider].get_identity_groups(x.identifier)
+                                       for x in user.identities)
+        criteria = [db.and_(RoomPrincipal.type == PrincipalType.user, RoomPrincipal.user_id == user.id)]
+        for group in user.local_groups:
+            criteria.append(db.and_(RoomPrincipal.type == PrincipalType.local_group,
+                                    RoomPrincipal.local_group_id == group.id))
+        for group in iterator:
+            criteria.append(db.and_(RoomPrincipal.type == PrincipalType.multipass_group,
+                                    RoomPrincipal.multipass_group_provider == group.provider.name,
+                                    db.func.lower(RoomPrincipal.multipass_group_name) == group.name.lower()))
+
+        data = {}
+        for room in _query_all_rooms_for_acl_check():
+            data[room.id] = {x: False for x in ('book', 'prebook', 'override', 'moderate')}
+            if room.is_public:
+                if not room.reservations_need_confirmation:
+                    data[room.id]['book'] = True
+                elif room.reservations_need_confirmation:
+                    data[room.id]['prebook'] = True
+        query = (RoomPrincipal.query
+                 .join(Room)
+                 .filter(Room.is_active, db.or_(*criteria))
+                 .options(load_only('room_id', 'full_access', 'permissions')))
+        for principal in query:
+            if principal.has_management_permission('book'):
+                data[principal.room_id]['book'] = True
+            if principal.has_management_permission('prebook'):
+                data[principal.room_id]['prebook'] = True
+            if principal.has_management_permission('override'):
+                data[principal.room_id]['override'] = True
+            if principal.has_management_permission('moderate'):
+                data[principal.room_id]['moderate'] = True
+        return data
+    else:
+        query = _query_all_rooms_for_acl_check()
+        return {r.id: {
+            'book': r.can_book(user),
+            'prebook': r.can_prebook(user),
+            'override': r.can_override(user),
+            'moderate': r.can_moderate(user),
+        } for r in query}
 
 
 @memoize_redis(3600)

@@ -35,6 +35,7 @@ def rb_check_user_access(user):
 
 
 @unify_user_args
+@memoize_request
 def rb_is_admin(user):
     """Checks if the user is a room booking admin"""
     from indico.modules.rb import rb_settings
