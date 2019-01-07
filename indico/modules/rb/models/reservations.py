@@ -35,8 +35,8 @@ from indico.modules.rb.models.reservation_edit_logs import ReservationEditLog
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence, ReservationOccurrenceState
 from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
 from indico.modules.rb.models.util import unimplemented
-from indico.modules.rb.notifications.reservations import (notify_cancellation, notify_confirmation, notify_creation,
-                                                          notify_modification, notify_rejection)
+from indico.modules.rb.notifications.reservations import (notify_cancellation, notify_change_state, notify_confirmation,
+                                                          notify_creation, notify_modification, notify_rejection)
 from indico.modules.rb.util import rb_is_admin
 from indico.util.date_time import format_date, format_time, now_utc
 from indico.util.i18n import N_, _
@@ -423,6 +423,10 @@ class Reservation(Serializer, db.Model):
             if not occurrence.is_valid:
                 continue
             occurrence.reject(user, u'Rejected due to collision with a confirmed reservation')
+
+    def change_state(self, user):
+        notify_change_state(self)
+        self.add_edit_log(ReservationEditLog(user_name=user.full_name, info=['Reservation requires approval']))
 
     def cancel(self, user, reason=None, silent=False):
         self.state = ReservationState.cancelled

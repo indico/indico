@@ -65,6 +65,27 @@ class ReservationNotification(object):
 
 
 @email_sender
+def notify_change_state(reservation):
+    if reservation.is_accepted:
+        raise ValueError('Reservation has not changed state')
+    notification = ReservationNotification(reservation)
+    return filter(None, [
+        notification.compose_email_to_user(
+            subject='Booking approval changed state on',
+            template_name='change_state_email_to_user'
+        ),
+        notification.compose_email_to_manager(
+            subject='Booking approval changed state on',
+            template_name='change_state_email_to_manager'
+        ),
+        notification.compose_email_to_vc_support(
+            subject='Booking approval changed state on',
+            template_name='change_state_email_to_vc_support'
+        )
+    ])
+
+
+@email_sender
 def notify_cancellation(reservation):
     if not reservation.is_cancelled:
         raise ValueError('Reservation is not cancelled')
