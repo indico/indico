@@ -287,9 +287,10 @@ class RHUpdateBooking(RHBookingBase):
 
         self.booking.modify(data, session.user)
 
-        room = Room.get_one(args['room_id'])
-        if not room.is_auto_confirm and self.booking.is_accepted:
-            self.booking.change_state(session.user)
+        room = self.booking.room
+        if (room.reservations_need_confirmation and self.booking.is_accepted and
+                not room.can_be_booked(session.user, ignore_admin=True)):
+            self.booking.reset_approval(session.user)
         db.session.flush()
 
         start_date = args['start_dt']

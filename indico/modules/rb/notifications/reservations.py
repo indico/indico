@@ -65,9 +65,7 @@ class ReservationNotification(object):
 
 
 @email_sender
-def notify_change_state(reservation):
-    if reservation.is_accepted:
-        raise ValueError('Reservation has not changed state')
+def notify_reset_approval(reservation):
     notification = ReservationNotification(reservation)
     return filter(None, [
         notification.compose_email_to_user(
