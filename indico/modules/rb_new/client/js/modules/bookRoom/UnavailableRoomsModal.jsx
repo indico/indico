@@ -31,18 +31,18 @@ import {DateNavigator, TimelineLegend} from '../../common/timeline';
 class UnavailableRoomsModal extends React.Component {
     static propTypes = {
         datePicker: PropTypes.object.isRequired,
+        availability: PropTypes.array,
+        filters: PropTypes.object.isRequired,
+        isFetching: PropTypes.bool.isRequired,
+        timelineDatePicker: PropTypes.object.isRequired,
+        isTimelineVisible: PropTypes.bool.isRequired,
+        onClose: PropTypes.func,
         actions: PropTypes.exact({
             fetchUnavailableRooms: PropTypes.func.isRequired,
             setDate: PropTypes.func.isRequired,
             setMode: PropTypes.func.isRequired,
             initTimeline: PropTypes.func.isRequired,
         }).isRequired,
-        availability: PropTypes.array,
-        filters: PropTypes.object.isRequired,
-        isFetching: PropTypes.bool.isRequired,
-        timelineDatePicker: PropTypes.object.isRequired,
-        isTimelineVisible: PropTypes.bool.isRequired,
-        onClose: PropTypes.func
     };
 
     static defaultProps = {
@@ -115,8 +115,8 @@ export default connect(
     dispatch => ({
         actions: bindActionCreators({
             fetchUnavailableRooms: unavailableRoomsActions.fetchUnavailableRooms,
-            setDate: (date) => unavailableRoomsActions.setUnavailableDate(serializeDate(date)),
-            setMode: unavailableRoomsActions.setUnavailableMode,
+            setDate: (date) => unavailableRoomsActions.setUnavailableNavDate(serializeDate(date)),
+            setMode: unavailableRoomsActions.setUnavailableNavMode,
             initTimeline: unavailableRoomsActions.initUnavailableTimeline,
         }, dispatch)
     })

@@ -23,6 +23,9 @@ import {Translate} from 'indico/react/i18n';
 import {serializeDate, toMoment} from 'indico/utils/date';
 import {isDateWithinRange} from '../../util';
 
+import './DateNavigator.module.scss';
+
+
 /**
  * Component that renders a 'mode selector' (day/week/month) and a date picker.
  * This is used in timeline-style views (e.g. 'Book a Room' or 'Calendar').
@@ -268,7 +271,7 @@ export default class DateNavigator extends React.Component {
     render = () => {
         const {dateRange, disabled, isLoading} = this.props;
         return (
-            <div className="date-navigator">
+            <div styleName="date-navigator">
                 {this.renderModeSwitcher(disabled || isLoading)}
                 {this.renderNavigator(disabled || isLoading || dateRange.length === 1)}
             </div>

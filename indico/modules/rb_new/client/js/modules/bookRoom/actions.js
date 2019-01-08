@@ -57,8 +57,8 @@ export const GET_UNAVAILABLE_TIMELINE_REQUEST = 'bookRoom/GET_UNAVAILABLE_TIMELI
 export const GET_UNAVAILABLE_TIMELINE_SUCCESS = 'bookRoom/GET_UNAVAILABLE_TIMELINE_SUCCESS';
 export const GET_UNAVAILABLE_TIMELINE_ERROR = 'bookRoom/GET_UNAVAILABLE_TIMELINE_ERROR';
 export const UNAVAILABLE_TIMELINE_RECEIVED = 'bookRoom/UNAVAILABLE_TIMELINE_RECEIVED';
-export const SET_UNAVAILABLE_MODE = 'bookRoom/SET_UNAVAILABLE_MODE';
-export const SET_UNAVAILABLE_DATE = 'bookRoom/SET_UNAVAILABLE_DATE';
+export const SET_UNAVAILABLE_NAV_MODE = 'bookRoom/SET_UNAVAILABLE_NAV_MODE';
+export const SET_UNAVAILABLE_NAV_DATE = 'bookRoom/SET_UNAVAILABLE_NAV_DATE';
 export const INIT_UNAVAILABLE_TIMELINE = 'bookRoom/INIT_UNAVAILABLE_TIMELINE';
 
 // Suggestions
@@ -203,12 +203,12 @@ export function setTimelineMode(mode) {
     return {type: SET_TIMELINE_MODE, mode};
 }
 
-export function setUnavailableDate(date) {
-    return {type: SET_UNAVAILABLE_DATE, date};
+export function setUnavailableNavDate(date) {
+    return {type: SET_UNAVAILABLE_NAV_DATE, date};
 }
 
-export function setUnavailableMode(mode) {
-    return {type: SET_UNAVAILABLE_MODE, mode};
+export function setUnavailableNavMode(mode) {
+    return {type: SET_UNAVAILABLE_NAV_MODE, mode};
 }
 
 export function initUnavailableTimeline(selectedDate, mode) {
