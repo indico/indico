@@ -67,10 +67,12 @@ def _can_get_all_groups(user):
     return all(multipass.identity_providers[x.provider].supports_get_identity_groups for x in user.identities)
 
 
+def _iter_all_multipass_groups(user):
+    return chain.from_iterable(multipass.identity_providers[x.provider].get_identity_groups(x.identifier)
+                               for x in user.identities)
+
+
 def _query_managed_rooms(user):
-    # We can get a list of all groups for the user
-    iterator = chain.from_iterable(multipass.identity_providers[x.provider].get_identity_groups(x.identifier)
-                                   for x in user.identities)
     criteria = [db.and_(RoomPrincipal.type == PrincipalType.user,
                         RoomPrincipal.user_id == user.id,
                         RoomPrincipal.has_management_permission())]
@@ -78,7 +80,7 @@ def _query_managed_rooms(user):
         criteria.append(db.and_(RoomPrincipal.type == PrincipalType.local_group,
                                 RoomPrincipal.local_group_id == group.id,
                                 RoomPrincipal.has_management_permission()))
-    for group in iterator:
+    for group in _iter_all_multipass_groups(user):
         criteria.append(db.and_(RoomPrincipal.type == PrincipalType.multipass_group,
                                 RoomPrincipal.multipass_group_provider == group.provider.name,
                                 db.func.lower(RoomPrincipal.multipass_group_name) == group.name.lower(),
@@ -110,52 +112,6 @@ def get_managed_room_ids(user):
     else:
         query = _query_all_rooms_for_acl_check()
         return {r.id for r in query if r.can_manage(user, allow_admin=False)}
-
-
-@memoize_redis(900)
-def get_room_permissions(user):
-    if _can_get_all_groups(user):
-        iterator = chain.from_iterable(multipass.identity_providers[x.provider].get_identity_groups(x.identifier)
-                                       for x in user.identities)
-        criteria = [db.and_(RoomPrincipal.type == PrincipalType.user, RoomPrincipal.user_id == user.id)]
-        for group in user.local_groups:
-            criteria.append(db.and_(RoomPrincipal.type == PrincipalType.local_group,
-                                    RoomPrincipal.local_group_id == group.id))
-        for group in iterator:
-            criteria.append(db.and_(RoomPrincipal.type == PrincipalType.multipass_group,
-                                    RoomPrincipal.multipass_group_provider == group.provider.name,
-                                    db.func.lower(RoomPrincipal.multipass_group_name) == group.name.lower()))
-
-        data = {}
-        for room in _query_all_rooms_for_acl_check():
-            data[room.id] = {x: False for x in ('book', 'prebook', 'override', 'moderate')}
-            if room.is_public:
-                if not room.reservations_need_confirmation:
-                    data[room.id]['book'] = True
-                elif room.reservations_need_confirmation:
-                    data[room.id]['prebook'] = True
-        query = (RoomPrincipal.query
-                 .join(Room)
-                 .filter(Room.is_active, db.or_(*criteria))
-                 .options(load_only('room_id', 'full_access', 'permissions')))
-        for principal in query:
-            if principal.has_management_permission('book'):
-                data[principal.room_id]['book'] = True
-            if principal.has_management_permission('prebook'):
-                data[principal.room_id]['prebook'] = True
-            if principal.has_management_permission('override'):
-                data[principal.room_id]['override'] = True
-            if principal.has_management_permission('moderate'):
-                data[principal.room_id]['moderate'] = True
-        return data
-    else:
-        query = _query_all_rooms_for_acl_check()
-        return {r.id: {
-            'book': r.can_book(user),
-            'prebook': r.can_prebook(user),
-            'override': r.can_override(user),
-            'moderate': r.can_moderate(user),
-        } for r in query}
 
 
 @memoize_redis(3600)

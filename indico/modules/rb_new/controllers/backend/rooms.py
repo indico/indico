@@ -33,9 +33,9 @@ from indico.modules.rb.models.reservations import RepeatFrequency
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb_new.controllers.backend.common import search_room_args
 from indico.modules.rb_new.operations.bookings import check_room_available, get_room_details_availability
-from indico.modules.rb_new.operations.rooms import (get_room_events, get_room_permissions, get_room_statistics,
-                                                    search_for_rooms)
+from indico.modules.rb_new.operations.rooms import get_room_events, get_room_statistics, search_for_rooms
 from indico.modules.rb_new.schemas import reservation_user_event_schema, room_attribute_values_schema, rooms_schema
+from indico.util.caching import memoize_redis
 from indico.util.marshmallow import NaiveDateTime
 
 
@@ -49,8 +49,13 @@ class RHRooms(RHRoomBookingBase):
 
 
 class RHRoomsPermissions(RHRoomBookingBase):
+    @staticmethod
+    @memoize_redis(900)
+    def _jsonify_user_permissions(user):
+        return jsonify(Room.get_permissions_for_user(user))
+
     def _process(self):
-        return jsonify(get_room_permissions(session.user))
+        return self._jsonify_user_permissions(session.user)
 
 
 class RHSearchRooms(RHRoomBookingBase):

@@ -15,16 +15,19 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import ast
+import itertools
 import json
 import warnings
 from datetime import date, time
 
 from sqlalchemy import and_, cast, func, or_
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import contains_eager
+from sqlalchemy.orm import contains_eager, joinedload, load_only, raiseload
 
+from indico.core.auth import multipass
 from indico.core.db.sqlalchemy import db
 from indico.core.db.sqlalchemy.custom import static_array
+from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.db.sqlalchemy.protection import ProtectionManagersMixin, ProtectionMode
 from indico.core.db.sqlalchemy.util.cache import cached, versioned_cache
 from indico.core.db.sqlalchemy.util.queries import db_dates_overlap, escape_like
@@ -35,6 +38,7 @@ from indico.modules.rb.models.blocked_rooms import BlockedRoom
 from indico.modules.rb.models.blockings import Blocking
 from indico.modules.rb.models.equipment import EquipmentType, RoomEquipmentAssociation
 from indico.modules.rb.models.favorites import favorite_room_table
+from indico.modules.rb.models.principals import RoomPrincipal
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import RepeatMapping, Reservation
 from indico.modules.rb.models.room_attributes import RoomAttribute, RoomAttributeAssociation
@@ -714,24 +718,90 @@ class Room(versioned_cache(_cache, 'id'), ProtectionManagersMixin, db.Model, Ser
     def is_user_admin(user):
         return rb_is_admin(user)
 
+    @classmethod
+    def get_permissions_for_user(cls, user):
+        """Get the permissions for all rooms for a user.
+
+        In case of multipass-based groups it will try to get a list of
+        all groups the user is in, and if that's not possible check the
+        permissions one by one for each room (which may result in many
+        group membership lookups).
+
+        It is recommended to not call this in any place where performance
+        matters and to memoize the result.
+        """
+        # XXX: When changing the logic in here, make sure to update can_* as well!
+        all_rooms_query = (Room.query
+                           .filter(Room.is_active)
+                           .options(load_only('id', 'protection_mode', 'reservations_need_confirmation'),
+                                    raiseload('owner'),
+                                    joinedload('acl_entries')))
+        is_admin = cls.is_user_admin(user)
+        if is_admin or not all(multipass.identity_providers[x.provider].supports_get_identity_groups
+                               for x in user.identities):
+            # check one by one if we can't get a list of all groups the user is in
+            # also for admins who can do everything anyway...
+            return {r.id: {
+                'book': is_admin or r.can_book(user),
+                'prebook': is_admin or r.can_prebook(user),
+                'override': is_admin or r.can_override(user),
+                'moderate': is_admin or r.can_moderate(user),
+            } for r in all_rooms_query}
+
+        multipass_group_iter = itertools.chain.from_iterable(
+            multipass.identity_providers[x.provider].get_identity_groups(x.identifier)
+            for x in user.identities
+        )
+        criteria = [db.and_(RoomPrincipal.type == PrincipalType.user, RoomPrincipal.user_id == user.id)]
+        for group in user.local_groups:
+            criteria.append(db.and_(RoomPrincipal.type == PrincipalType.local_group,
+                                    RoomPrincipal.local_group_id == group.id))
+        for group in multipass_group_iter:
+            criteria.append(db.and_(RoomPrincipal.type == PrincipalType.multipass_group,
+                                    RoomPrincipal.multipass_group_provider == group.provider.name,
+                                    db.func.lower(RoomPrincipal.multipass_group_name) == group.name.lower()))
+
+        data = {}
+        permissions = {'book', 'prebook', 'override', 'moderate'}
+        for room in all_rooms_query:
+            data[room.id] = {x: False for x in permissions}
+            if room.is_public:
+                if not room.reservations_need_confirmation:
+                    data[room.id]['book'] = True
+                elif room.reservations_need_confirmation:
+                    data[room.id]['prebook'] = True
+        query = (RoomPrincipal.query
+                 .join(Room)
+                 .filter(Room.is_active, db.or_(*criteria))
+                 .options(load_only('room_id', 'full_access', 'permissions')))
+        for principal in query:
+            for permission in permissions:
+                if principal.has_management_permission(permission):
+                    data[principal.room_id][permission] = True
+        return data
+
     def can_access(self, user, allow_admin=True):
         # rooms are never access-restricted
         raise NotImplementedError
 
     def can_book(self, user, allow_admin=True):
+        # XXX: When changing the logic in here, make sure to update get_permissions_for_user as well!
         if self.is_public and not self.reservations_need_confirmation:
             return True
         return self.can_manage(user, permission='book', allow_admin=allow_admin)
 
     def can_prebook(self, user, allow_admin=True):
+        # XXX: When changing the logic in here, make sure to update get_permissions_for_user as well!
         if self.is_public and self.reservations_need_confirmation:
             return True
         return self.can_manage(user, permission='prebook', allow_admin=allow_admin)
 
     def can_override(self, user, allow_admin=True):
+        # XXX: When changing the logic in here, make sure to update get_permissions_for_user as well!
         return self.can_manage(user, permission='override', allow_admin=allow_admin)
 
     def can_moderate(self, user, allow_admin=True):
+        # XXX: When changing the logic in here, make sure to update get_permissions_for_user as well!
         return self.can_manage(user, permission='moderate', allow_admin=allow_admin)
 
     @unify_user_args
