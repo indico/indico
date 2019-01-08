@@ -109,12 +109,12 @@ const timelineReducer = combineReducers({
 
 const unavailableDatePickerReducer = (state = initialDatePickerState, action) => {
     switch (action.type) {
-        case actions.SET_UNAVAILABLE_MODE:
+        case actions.SET_UNAVAILABLE_NAV_MODE:
             return {
                 ...state,
                 mode: action.mode
             };
-        case actions.SET_UNAVAILABLE_DATE:
+        case actions.SET_UNAVAILABLE_NAV_DATE:
             return {
                 ...state,
                 selectedDate: action.date
