@@ -22,11 +22,13 @@ from itertools import chain
 from dateutil.relativedelta import relativedelta
 from flask import session
 from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.orm import raiseload
+from sqlalchemy.orm import raiseload, subqueryload
 
 from indico.core.auth import multipass
+from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.queries import db_dates_overlap, escape_like
+from indico.modules.events.models.events import Event
 from indico.modules.rb import Reservation, rb_is_admin, rb_settings
 from indico.modules.rb.models.equipment import EquipmentType, RoomEquipmentAssociation
 from indico.modules.rb.models.favorites import favorite_room_table
@@ -36,6 +38,7 @@ from indico.modules.rb.models.room_features import RoomFeature
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.statistics import calculate_rooms_occupancy
 from indico.util.caching import memoize_redis
+from indico.util.date_time import as_utc
 
 
 def _filter_coordinates(query, filters):
@@ -118,7 +121,7 @@ def get_room_statistics(room):
                  .filter(Room.id == room.id,
                          ReservationOccurrence.is_valid,
                          db_dates_overlap(ReservationOccurrence,
-                                          'start_dt', start_date,
+                                          'start_dt', datetime.combine(start_date, time()),
                                           'end_dt', datetime.combine(end_date, time.max)))
                  .count())
         percentage = calculate_rooms_occupancy([room], start_date, end_date) * 100
@@ -198,3 +201,18 @@ def search_for_rooms(filters, availability=None):
     if availability is False:
         availability_criterion = ~availability_criterion
     return query.filter(availability_criterion)
+
+
+def get_room_events(room, start_dt, end_dt, repeat_frequency, repeat_interval):
+    occurrences = ReservationOccurrence.create_series(start_dt, end_dt, (repeat_frequency, repeat_interval))
+    excluded_categories = rb_settings.get('excluded_categories')
+    events = (Event.query
+              .filter(~Event.is_deleted,
+                      Event.own_room == room,
+                      db.or_(Event.happens_between(as_utc(occ.start_dt), as_utc(occ.end_dt)) for occ in occurrences),
+                      Event.timezone == config.DEFAULT_TIMEZONE,
+                      db.and_(Event.category_id != cat['id'] for cat in excluded_categories))
+              .options(subqueryload('acl_entries'))).all()
+    user_events = [event for event in events if [entry for entry in event.acl_entries
+                                                 if (entry.user_id == session.user.id and entry.full_access is True)]]
+    return user_events

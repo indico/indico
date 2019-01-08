@@ -20,7 +20,7 @@ from operator import itemgetter
 
 from flask import session
 from marshmallow import Schema, ValidationError, fields, post_dump, validate, validates_schema
-from marshmallow.fields import Boolean, Function, Nested, Number, String
+from marshmallow.fields import Boolean, DateTime, Function, Nested, Number, String
 from marshmallow_enum import EnumField
 
 from indico.core.marshmallow import mm
@@ -81,6 +81,14 @@ class ReservationEventDataSchema(Schema):
     title = String()
     url = String()
     can_access = Function(lambda event: event.can_access(session.user))
+
+
+class ReservationUserEventsSchema(Schema):
+    id = Number()
+    title = String()
+    url = String()
+    start_dt = DateTime()
+    end_dt = DateTime()
 
 
 class ReservationOccurrenceSchema(mm.ModelSchema):
@@ -270,6 +278,7 @@ reservation_occurrences_schema = ReservationOccurrenceSchema(many=True)
 reservation_schema = ReservationSchema()
 reservation_details_schema = ReservationDetailsSchema()
 reservation_event_data_schema = ReservationEventDataSchema()
+reservation_user_events_schema = ReservationUserEventsSchema(many=True)
 reservation_details_occurrences_schema = ReservationDetailsOccurrenceSchema(many=True)
 blockings_schema = BlockingSchema(many=True)
 simple_blockings_schema = BlockingSchema(many=True, only=('id', 'reason'))
