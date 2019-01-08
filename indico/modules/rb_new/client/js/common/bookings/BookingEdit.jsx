@@ -102,6 +102,8 @@ class BookingEdit extends React.Component {
         const {calendar: {data}} = this.state;
         if (!(type in data)) {
             return 0;
+        } else if (type === 'conflicts') {
+            return Object.values(data.conflicts).filter(conflicts => conflicts.length !== 0).length;
         }
         return Object.values(data[type]).reduce((acc, cur) => acc + (cur.length ? 1 : 0), 0);
     };
