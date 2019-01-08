@@ -146,7 +146,7 @@ class BookingEdit extends React.Component {
             if (day in calendar.data.cancellations || day in calendar.data.rejections) {
                 return [day, []];
             }
-            return [day, allConflicts.filter((c) => c.reservation.id !== bookingId)];
+            return [day, allConflicts.filter((c) => !c.reservation || c.reservation.id !== bookingId)];
         }));
 
         if (_.isEqual(newDateRange, dateRange)) {
