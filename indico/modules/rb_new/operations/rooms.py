@@ -33,8 +33,6 @@ from indico.modules.rb.models.reservation_occurrences import ReservationOccurren
 from indico.modules.rb.models.room_features import RoomFeature
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.statistics import calculate_rooms_occupancy
-from indico.modules.rb_new.controllers.backend.common import room_args
-
 from indico.util.caching import memoize_redis
 
 

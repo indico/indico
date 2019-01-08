@@ -272,6 +272,10 @@ class RoomEditModal extends React.Component {
         favoriteUsers: PropTypes.array.isRequired,
         onClose: PropTypes.func.isRequired,
         roomId: PropTypes.number.isRequired,
+        actions: PropTypes.exact({
+            fetchRoom: PropTypes.func.isRequired,
+            fetchRoomDetails: PropTypes.func.isRequired,
+        }).isRequired,
     };
 
     state = {
@@ -360,12 +364,14 @@ class RoomEditModal extends React.Component {
     }
 
     handleCloseModal = () => {
-        const {onClose} = this.props;
+        const {onClose, roomId, actions: {fetchRoom, fetchRoomDetails}} = this.props;
+        fetchRoom(roomId);
+        fetchRoomDetails(roomId, true);
         onClose();
     };
 
     handleSubmit = async (data, form) => {
-        const {roomId, actions: {fetchRoom, fetchRoomDetails}} = this.props;
+        const {roomId} = this.props;
         const changedValues = getChangedValues(data, form);
         const basicDetails = _.omit(changedValues, ['attributes', 'bookableHours', 'nonbookablePeriods', 'availableEquipment']);
         if ('owner' in changedValues) {
@@ -373,31 +379,50 @@ class RoomEditModal extends React.Component {
         }
         const {availableEquipment, nonbookablePeriods, bookableHours, attributes} = changedValues;
 
-        const requests = [];
-        if (!_.isEmpty(basicDetails)) {
-            requests.push(indicoAxios.patch(updateRoomBasicDetailsURL({room_id: roomId}), snakifyKeys(basicDetails)));
-        }
-        if (availableEquipment) {
-            requests.push(indicoAxios.post(updateRoomEquipmentURL({room_id: roomId}), {available_equipment: availableEquipment}));
-        }
-        if (attributes) {
-            requests.push(indicoAxios.post(updateRoomAttributesURL({room_id: roomId}), {attributes}));
-        }
-        if (nonbookablePeriods || bookableHours) {
-            requests.push(indicoAxios.post(updateRoomAvailabilityURL({room_id: roomId}), snakifyKeys(_.pick(changedValues, ['bookableHours', 'nonbookablePeriods']))));
-        }
-
         try {
-            await Promise.all(requests);
+            await this.saveBasicDetails(roomId, basicDetails);
+            await this.saveEquipment(roomId, availableEquipment);
+            await this.saveAttributes(roomId, attributes);
+            await this.saveAvailability(roomId, changedValues, nonbookablePeriods, bookableHours);
             this.setState({submitSucceeded: true});
-            fetchRoom(roomId);
-            fetchRoomDetails(roomId, true);
         } catch (e) {
             handleAxiosError(e);
             this.setState({submitSucceeded: false});
         }
     };
 
+    saveBasicDetails = (roomId, basicDetails) => {
+        if (!_.isEmpty(basicDetails)) {
+            return indicoAxios.patch(updateRoomBasicDetailsURL({room_id: roomId}), snakifyKeys(basicDetails));
+        } else {
+            return Promise.resolve();
+        }
+    };
+
+    saveEquipment = (roomId, availableEquipment) => {
+        if (availableEquipment) {
+            return indicoAxios.post(updateRoomEquipmentURL({room_id: roomId}),
+                                    {available_equipment: availableEquipment});
+        } else {
+            return Promise.resolve();
+        }
+    };
+
+    saveAttributes = (roomId, attributes) => {
+        if (attributes) {
+            return indicoAxios.post(updateRoomAttributesURL({room_id: roomId}), {attributes});
+        } else {
+            return Promise.resolve();
+        }
+    };
+
+    saveAvailability = (roomId, changedValues, nonbookablePeriods, bookableHours) => {
+        if (nonbookablePeriods || bookableHours) {
+            return indicoAxios.post(updateRoomAvailabilityURL({room_id: roomId}), snakifyKeys(_.pick(changedValues, ['bookableHours', 'nonbookablePeriods'])));
+        } else {
+            return Promise.resolve();
+        }
+    };
 
     renderImage = (position) => {
         return <SpriteImage key="image" pos={position} />;
@@ -553,7 +578,6 @@ class RoomEditModal extends React.Component {
                 );
         }
     };
-
 
     renderModalContent = (fprops) => {
         const formProps = {onSubmit: fprops.handleSubmit};
