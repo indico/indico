@@ -146,4 +146,11 @@ export function ReduxDropdownField({input, required, clearable, ...props}) {
 
 ReduxDropdownField.propTypes = {
     input: PropTypes.object.isRequired,
+    required: PropTypes.bool,
+    clearable: PropTypes.bool,
+};
+
+ReduxDropdownField.defaultProps = {
+    required: false,
+    clearable: false,
 };

@@ -66,7 +66,8 @@ export default function UserMenu({userData, languages}) {
                   }}
                   options={Object.entries(languages).map(([key, name]) => ({
                       key, text: name, value: key
-                  }))} />);
+                  }))} />
+    );
 
     const headerContent = (
         <div>

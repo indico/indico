@@ -87,7 +87,8 @@ class RoomRenderer extends React.Component {
                                         inSelectionMode={inSelectionMode}
                                         selectedRooms={selectedRooms} />
                 ))}
-            </Card.Group>);
+            </Card.Group>
+        );
     }
 }
 

@@ -42,7 +42,6 @@ class _BookingTimelineComponent extends React.Component {
         lazyScroll: PropTypes.object,
         isLoading: PropTypes.bool.isRequired,
         showEmptyMessage: PropTypes.bool,
-        allowSingleRoom: PropTypes.bool,
         bookingAllowed: PropTypes.bool,
         actions: PropTypes.exact({
             openRoomDetails: PropTypes.func.isRequired,
@@ -54,7 +53,6 @@ class _BookingTimelineComponent extends React.Component {
     static defaultProps = {
         clickable: false,
         lazyScroll: null,
-        allowSingleRoom: true,
         showEmptyMessage: true,
         bookingAllowed: false,
         fixedHeight: null
@@ -210,7 +208,6 @@ class BookingTimeline extends React.Component {
             datePicker,
             actions: {fetchTimeline},
             filters: {dates: {startDate}},
-            suggestedRoomIds,
         } = this.props;
         const lazyScroll = {
             hasMore: hasMoreTimelineData,
@@ -224,7 +221,6 @@ class BookingTimeline extends React.Component {
                                       availability={availability}
                                       datePicker={datePicker}
                                       defaultDate={startDate}
-                                      allowSingleRoom={!suggestedRoomIds.length}
                                       showEmptyMessage={false}
                                       bookingAllowed
                                       clickable />

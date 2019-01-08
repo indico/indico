@@ -60,11 +60,12 @@ class TimelineItem extends React.Component {
         startHour: PropTypes.number.isRequired,
         endHour: PropTypes.number.isRequired,
         data: PropTypes.object.isRequired,
+        room: PropTypes.object.isRequired,
         onClickCandidate: PropTypes.func,
         onClickReservation: PropTypes.func,
         children: PropTypes.node,
         setSelectable: PropTypes.func,
-        dayBased: PropTypes.bool
+        dayBased: PropTypes.bool,
     };
 
     static defaultProps = {

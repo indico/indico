@@ -45,6 +45,7 @@ const renderCapacity = ({capacity}) => (
             </span>
         ));
 
+// eslint-disable-next-line react/prop-types
 const renderEquipment = ({equipment, features}) => {
     const count = equipment.length + features.length;
     if (!count) {
@@ -60,6 +61,7 @@ const renderEquipment = ({equipment, features}) => {
     );
 };
 
+// eslint-disable-next-line react/prop-types
 const renderBuilding = ({building}) => {
     if (!building) {
         return null;
@@ -103,13 +105,8 @@ export class RoomFilterBarBase extends React.Component {
     };
 
     static defaultProps = {
-        capacity: null,
-        building: null,
-        onlyFavorites: false,
-        onlyMine: false,
         hasFavoriteRooms: false,
         hasOwnedRooms: false,
-        equipment: [],
         extraButtons: null,
         hideOptions: {}
     };

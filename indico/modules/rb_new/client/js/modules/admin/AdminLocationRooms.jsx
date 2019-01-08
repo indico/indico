@@ -80,6 +80,7 @@ function AdminLocationRooms({locations, isFetchingLocations, locationId, filters
 
 AdminLocationRooms.propTypes = {
     locations: PropTypes.array.isRequired,
+    isFetchingLocations: PropTypes.bool.isRequired,
     locationId: PropTypes.number.isRequired,
     filters: PropTypes.exact({
         text: PropTypes.string,
