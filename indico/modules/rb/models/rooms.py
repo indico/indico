@@ -190,6 +190,11 @@ class Room(versioned_cache(_cache, 'id'), ProtectionManagersMixin, db.Model, Ser
         default=True,
         index=True
     )
+    is_reservable = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=True
+    )
     max_advance_days = db.Column(
         db.Integer
     )
@@ -593,7 +598,7 @@ class Room(versioned_cache(_cache, 'id'), ProtectionManagersMixin, db.Model, Ser
             .filter(
                 Location.id == filters['location'].id if filters.get('location') else True,
                 ((Room.capacity >= (capacity * 0.8)) | (Room.capacity == None)) if capacity else True,
-                # Room.is_reservable if filters.get('is_only_public') else True,
+                Room.is_reservable if filters.get('is_only_public') else True,
                 Room.is_auto_confirm if filters.get('is_auto_confirm') else True,
                 Room.is_active if filters.get('is_only_active', False) else True,
                 (equipment_subquery == equipment_count) if equipment_subquery is not None else True)
@@ -704,11 +709,6 @@ class Room(versioned_cache(_cache, 'id'), ProtectionManagersMixin, db.Model, Ser
 
     def can_be_deleted(self, user):
         return self.can_be_modified(user)
-
-    @property
-    def is_reservable(self):
-        # XXX: let's get rid of this in favor of proper acl checks
-        return self.protection_mode == ProtectionMode.public or any(p.full_access for p in self.acl_entries)
 
     @property
     def protection_parent(self):

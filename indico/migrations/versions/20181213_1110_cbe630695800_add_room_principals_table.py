@@ -69,22 +69,19 @@ def _upgrade_permissions():
                                          ('allowed-booking-group',)).scalar()
     manager_group_attr_id = conn.execute('SELECT id FROM roombooking.room_attributes WHERE name = %s',
                                          ('manager-group',)).scalar()
-    query = 'SELECT id, owner_id, reservations_need_confirmation, is_reservable from roombooking.rooms'
-    for room_id, owner_id, reservations_need_confirmation, is_reservable in conn.execute(query):
+    query = 'SELECT id, owner_id, reservations_need_confirmation from roombooking.rooms'
+    for room_id, owner_id, reservations_need_confirmation in conn.execute(query):
         booking_group = manager_group = None
         if booking_group_attr_id is not None:
             booking_group = _get_attr_value(conn, room_id, booking_group_attr_id)
         if manager_group_attr_id is not None:
             manager_group = _get_attr_value(conn, room_id, manager_group_attr_id)
 
-        if not booking_group and is_reservable:
+        if not booking_group:
             conn.execute('UPDATE roombooking.rooms SET protection_mode = %s WHERE id = %s',
                          (ProtectionMode.public.value, room_id))
         _create_acl_entry(conn, room_id, user_id=owner_id, full_access=True)
-        if booking_group and is_reservable:
-            # XXX: we lose booking group information here if a room is not reservable
-            # since that flag is now represented by the room being protected without
-            # anyone authorized to book it
+        if booking_group:
             group_kwargs = _group_to_kwargs(booking_group)
             if group_kwargs is None:
                 print 'WARNING: Invalid booking group: {}'.format(booking_group)
@@ -139,23 +136,18 @@ def _downgrade_permissions():
     query = 'SELECT id, owner_id, reservations_need_confirmation, protection_mode from roombooking.rooms'
     for room_id, owner_id, reservations_need_confirmation, protection_mode in conn.execute(query):
         query = conn.execute('SELECT * FROM roombooking.room_principals WHERE room_id = %s', (room_id,))
-        has_booking_group = False
         for row in query:
             if row.type == PrincipalType.local_group and not multipass.default_group_provider:
                 if row.full_access:
                     _set_attribute_value(conn, room_id, manager_group_attr_id, unicode(row.local_group_id))
                 if 'book' in row.permissions or 'prebook' in row.permissions:
                     _set_attribute_value(conn, room_id, booking_group_attr_id, unicode(row.local_group_id))
-                    has_booking_group = True
             elif (row.type == PrincipalType.multipass_group and multipass.default_group_provider and
                     row.mp_group_provider == multipass.default_group_provider.name):
                 if row.full_access:
                     _set_attribute_value(conn, room_id, manager_group_attr_id, row.mp_group_name)
                 if 'book' in row.permissions or 'prebook' in row.permissions:
                     _set_attribute_value(conn, room_id, booking_group_attr_id, row.mp_group_name)
-                    has_booking_group = True
-            if protection_mode == ProtectionMode.public or has_booking_group:
-                conn.execute("UPDATE roombooking.rooms SET is_reservable = true WHERE id = %s", (room_id,))
 
 
 def upgrade():
@@ -202,15 +194,11 @@ def upgrade():
                   schema='roombooking')
     _upgrade_permissions()
     op.alter_column('rooms', 'protection_mode', server_default=None, schema='roombooking')
-    op.drop_column('rooms', 'is_reservable', schema='roombooking')
 
 
 def downgrade():
     if context.is_offline_mode():
         raise Exception('This downgrade is only possible in online mode')
-    op.add_column('rooms', sa.Column('is_reservable', sa.Boolean, nullable=False, server_default='false'),
-                  schema='roombooking')
     _downgrade_permissions()
-    op.alter_column('rooms', 'is_reservable', server_default=None, schema='roombooking')
     op.drop_column('rooms', 'protection_mode', schema='roombooking')
     op.drop_table('room_principals', schema='roombooking')
