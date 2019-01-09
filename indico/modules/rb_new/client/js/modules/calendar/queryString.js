@@ -48,6 +48,10 @@ const rules = {
         sanitizer: v.toBoolean(),
         stateField: boolStateField('filters.hideUnused'),
     },
+    view: {
+        validator: v.isIn(['timeline', 'list']),
+        stateField: defaultStateField('view', 'calendar'),
+    }
 };
 
 
@@ -57,7 +61,8 @@ export const routeConfig = {
             filtersActions.SET_FILTER_PARAMETER,
             filtersActions.SET_FILTERS,
             calendarActions.SET_DATE,
-            calendarActions.SET_MODE
+            calendarActions.SET_MODE,
+            calendarActions.CHANGE_VIEW,
         ],
         select: ({calendar}) => calendar,
         serialize: rules

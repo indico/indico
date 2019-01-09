@@ -66,6 +66,7 @@ export const initialState = () => ({
     data: initialDataState,
     datePicker: datePickerState(),
     activeBookings: initialActiveBookingsState,
+    view: 'timeline',
 });
 
 function filterDeletedBooking(calendar, bookingId, roomId) {
@@ -271,5 +272,13 @@ export default combineReducers({
                 return state;
         }
     },
-    datePicker: datePickerReducer
+    datePicker: datePickerReducer,
+    view: (state = 'timeline', action) => {
+        switch (action.type) {
+            case calendarActions.CHANGE_VIEW:
+                return action.view;
+            default:
+                return state;
+        }
+    }
 });

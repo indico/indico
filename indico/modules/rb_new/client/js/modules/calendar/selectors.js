@@ -71,3 +71,5 @@ export const getLocalFilters = createSelector(
     getFilters,
     filters => _.pick(filters, LOCAL_FILTERS)
 );
+
+export const getCalendarView = ({calendar}) => calendar.view;
