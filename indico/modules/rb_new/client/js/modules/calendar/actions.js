@@ -78,7 +78,6 @@ async function fetchCalendarRooms(dispatch, state) {
     dispatch({type: ROOM_IDS_RECEIVED, data: newRoomIds});
     if (!newRoomIds.length) {
         dispatch({type: ROWS_RECEIVED, data: []});
-        dispatch({type: FETCH_CALENDAR_SUCCESS});
     }
 
     return newRoomIds;
