@@ -38,7 +38,7 @@
         }
 
         .booking-card {
-            .booking-card-header {
+            .booking-card-header, .booking-booked-for {
                 text-overflow: ellipsis;
                 overflow: hidden;
                 white-space: nowrap;
