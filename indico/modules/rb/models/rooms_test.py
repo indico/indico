@@ -14,12 +14,12 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-import itertools
 from datetime import date, datetime, time, timedelta
 from operator import itemgetter
 
 import pytest
 
+from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.core.errors import IndicoError
 from indico.modules.rb import rb_settings
 from indico.modules.rb.models.blocked_rooms import BlockedRoom
@@ -119,16 +119,12 @@ def test_has_vc(create_equipment_type, dummy_room, db):
     assert dummy_room.has_vc
 
 
-@pytest.mark.parametrize(('reservable', 'booking_group', 'expected'), (
-    (True,  u'',    True),
-    (True,  u'foo', False),
-    (False, u'',    False),
-    (False, u'foo', False)
+@pytest.mark.parametrize(('protection_mode', 'expected'), (
+    (ProtectionMode.protected, False),
+    (ProtectionMode.public, True),
 ))
-def test_is_public(create_room_attribute, dummy_room, reservable, booking_group, expected):
-    create_room_attribute(u'allowed-booking-group')
-    dummy_room.set_attribute_value(u'allowed-booking-group', booking_group)
-    dummy_room.is_reservable = reservable
+def test_is_public(dummy_room, protection_mode, expected):
+    dummy_room.protection_mode = protection_mode
     assert dummy_room.is_public == expected
 
 
@@ -152,23 +148,6 @@ def test_kind(create_room, create_room_attribute,
 
 def test_location_name(dummy_room, dummy_location):
     assert dummy_room.location_name == dummy_location.name
-
-
-@pytest.mark.parametrize(('capacity', 'is_reservable', 'reservations_need_confirmation', 'has_vc', 'expected'), (
-    (1, False, True,  False, u'1 person, private, needs confirmation'),
-    (2, False, True,  False, u'2 people, private, needs confirmation'),
-    (2, True,  True,  False, u'2 people, public, needs confirmation'),
-    (2, False, False, False, u'2 people, private, auto-confirmation'),
-    (2, False, True,  True,  u'2 people, private, needs confirmation, videoconference')
-))
-def test_marker_description(db, create_room, create_equipment_type,
-                            capacity, is_reservable, reservations_need_confirmation, has_vc, expected):
-    room = create_room(capacity=capacity, is_reservable=is_reservable,
-                       reservations_need_confirmation=reservations_need_confirmation)
-    if has_vc:
-        room.available_equipment.append(create_equipment_type(u'Video conference'))
-        db.session.flush()
-    assert room.marker_description == expected
 
 
 def test_owner(dummy_room, dummy_user):
@@ -424,17 +403,12 @@ def test_find_with_filters_capacity(db, dummy_room, create_room,
     assert set(Room.find_with_filters({'capacity': search_capacity}, None)) == expected
 
 
-@pytest.mark.parametrize(('is_reservable', 'booking_group', 'match'), (
-    (True,  None,   True),
-    (True,  u'foo', False),
-    (False, None,   False),
-    (False, u'foo', False)
+@pytest.mark.parametrize(('protection_mode', 'match'), (
+    (ProtectionMode.public, True),
+    (ProtectionMode.protected, False),
 ))
-def test_find_with_filters_only_public(dummy_room, create_room_attribute,
-                                       is_reservable, booking_group, match):
-    create_room_attribute(u'allowed-booking-group')
-    dummy_room.is_reservable = is_reservable
-    dummy_room.set_attribute_value(u'allowed-booking-group', booking_group)
+def test_find_with_filters_only_public(dummy_room, protection_mode, match):
+    dummy_room.protection_mode = protection_mode
     if match:
         assert set(Room.find_with_filters({'is_only_public': True}, None)) == {dummy_room}
     else:
