@@ -17,13 +17,11 @@
 from __future__ import unicode_literals
 
 from datetime import date, datetime, time
-from itertools import chain
 
 from dateutil.relativedelta import relativedelta
 from flask import session
 from sqlalchemy.orm import joinedload, load_only, raiseload
 
-from indico.core.auth import multipass
 from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.principals import PrincipalType
@@ -63,15 +61,6 @@ def _make_room_text_filter(text):
     return db.or_(getattr(Room, col).ilike(text) for col in columns)
 
 
-def _can_get_all_groups(user):
-    return all(multipass.identity_providers[x.provider].supports_get_identity_groups for x in user.identities)
-
-
-def _iter_all_multipass_groups(user):
-    return chain.from_iterable(multipass.identity_providers[x.provider].get_identity_groups(x.identifier)
-                               for x in user.identities)
-
-
 def _query_managed_rooms(user):
     criteria = [db.and_(RoomPrincipal.type == PrincipalType.user,
                         RoomPrincipal.user_id == user.id,
@@ -80,7 +69,7 @@ def _query_managed_rooms(user):
         criteria.append(db.and_(RoomPrincipal.type == PrincipalType.local_group,
                                 RoomPrincipal.local_group_id == group.id,
                                 RoomPrincipal.has_management_permission()))
-    for group in _iter_all_multipass_groups(user):
+    for group in user.iter_all_multipass_groups():
         criteria.append(db.and_(RoomPrincipal.type == PrincipalType.multipass_group,
                                 RoomPrincipal.multipass_group_provider == group.provider.name,
                                 db.func.lower(RoomPrincipal.multipass_group_name) == group.name.lower(),
@@ -98,7 +87,7 @@ def _query_all_rooms_for_acl_check():
 
 @memoize_redis(900)
 def has_managed_rooms(user):
-    if _can_get_all_groups(user):
+    if user.can_get_all_multipass_groups:
         return _query_managed_rooms(user).has_rows()
     else:
         query = _query_all_rooms_for_acl_check()
@@ -107,7 +96,7 @@ def has_managed_rooms(user):
 
 @memoize_redis(900)
 def get_managed_room_ids(user):
-    if _can_get_all_groups(user):
+    if user.can_get_all_multipass_groups:
         return {id_ for id_, in _query_managed_rooms(user).with_entities(Room.id)}
     else:
         query = _query_all_rooms_for_acl_check()

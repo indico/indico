@@ -15,7 +15,6 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import ast
-import itertools
 import json
 import warnings
 from datetime import date, time
@@ -24,7 +23,6 @@ from sqlalchemy import and_, cast, func, or_
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import contains_eager, joinedload, load_only, raiseload
 
-from indico.core.auth import multipass
 from indico.core.db.sqlalchemy import db
 from indico.core.db.sqlalchemy.custom import static_array
 from indico.core.db.sqlalchemy.principals import PrincipalType
@@ -737,46 +735,47 @@ class Room(versioned_cache(_cache, 'id'), ProtectionManagersMixin, db.Model, Ser
                                     raiseload('owner'),
                                     joinedload('acl_entries')))
         is_admin = cls.is_user_admin(user)
-        if is_admin or not all(multipass.identity_providers[x.provider].supports_get_identity_groups
-                               for x in user.identities):
+        if not user.can_get_all_multipass_groups:
             # check one by one if we can't get a list of all groups the user is in
-            # also for admins who can do everything anyway...
             return {r.id: {
-                'book': is_admin or r.can_book(user),
-                'prebook': is_admin or r.can_prebook(user),
-                'override': is_admin or r.can_override(user),
-                'moderate': is_admin or r.can_moderate(user),
+                'book': r.can_book(user),
+                'prebook': r.can_prebook(user),
+                'override': r.can_override(user),
+                'moderate': r.can_moderate(user),
             } for r in all_rooms_query}
 
-        multipass_group_iter = itertools.chain.from_iterable(
-            multipass.identity_providers[x.provider].get_identity_groups(x.identifier)
-            for x in user.identities
-        )
         criteria = [db.and_(RoomPrincipal.type == PrincipalType.user, RoomPrincipal.user_id == user.id)]
         for group in user.local_groups:
             criteria.append(db.and_(RoomPrincipal.type == PrincipalType.local_group,
                                     RoomPrincipal.local_group_id == group.id))
-        for group in multipass_group_iter:
+        for group in user.iter_all_multipass_groups():
             criteria.append(db.and_(RoomPrincipal.type == PrincipalType.multipass_group,
                                     RoomPrincipal.multipass_group_provider == group.provider.name,
                                     db.func.lower(RoomPrincipal.multipass_group_name) == group.name.lower()))
 
         data = {}
         permissions = {'book', 'prebook', 'override', 'moderate'}
+        prebooking_required_rooms = set()
         for room in all_rooms_query:
+            if room.reservations_need_confirmation:
+                prebooking_required_rooms.add(room.id)
             data[room.id] = {x: False for x in permissions}
-            if room.is_public:
-                if not room.reservations_need_confirmation:
+            if room.is_public or is_admin:
+                if not room.reservations_need_confirmation or is_admin:
                     data[room.id]['book'] = True
-                elif room.reservations_need_confirmation:
+                if room.reservations_need_confirmation:
                     data[room.id]['prebook'] = True
+            if is_admin:
+                data[room.id]['override'] = True
+                data[room.id]['moderate'] = True
         query = (RoomPrincipal.query
                  .join(Room)
                  .filter(Room.is_active, db.or_(*criteria))
                  .options(load_only('room_id', 'full_access', 'permissions')))
         for principal in query:
             for permission in permissions:
-                if principal.has_management_permission(permission):
+                explicit = permission == 'prebook' and principal.room_id not in prebooking_required_rooms
+                if principal.has_management_permission(permission, explicit=explicit):
                     data[principal.room_id][permission] = True
         return data
 
@@ -794,7 +793,11 @@ class Room(versioned_cache(_cache, 'id'), ProtectionManagersMixin, db.Model, Ser
         # XXX: When changing the logic in here, make sure to update get_permissions_for_user as well!
         if self.is_public and self.reservations_need_confirmation:
             return True
-        return self.can_manage(user, permission='prebook', allow_admin=allow_admin)
+        # When the room does not use prebookings, we do not want the prebook option to show
+        # up for admins or room members unless they are actually in the ACL with the prebook
+        # permission.
+        explicit = not self.reservations_need_confirmation
+        return self.can_manage(user, permission='prebook', allow_admin=allow_admin, explicit_permission=explicit)
 
     def can_override(self, user, allow_admin=True):
         # XXX: When changing the logic in here, make sure to update get_permissions_for_user as well!

@@ -16,6 +16,7 @@
 
 from __future__ import unicode_literals
 
+import itertools
 from operator import attrgetter
 
 from flask import flash, has_request_context, session
@@ -540,6 +541,19 @@ class User(PersonMixin, db.Model):
             item = (identity_info.provider.name, identity_info.identifier)
             if item not in done:
                 yield item
+
+    @property
+    def can_get_all_multipass_groups(self):
+        """Check whether it is possible to get all multipass groups the user is in."""
+        return all(multipass.identity_providers[x.provider].supports_get_identity_groups
+                   for x in self.identities
+                   if x.provider != 'indico')
+
+    def iter_all_multipass_groups(self):
+        """Iterate over all multipass groups the user is in"""
+        return itertools.chain.from_iterable(multipass.identity_providers[x.provider].get_identity_groups(x.identifier)
+                                             for x in self.identities
+                                             if x.provider != 'indico')
 
     def get_full_name(self, *args, **kwargs):
         kwargs['_show_empty_names'] = True

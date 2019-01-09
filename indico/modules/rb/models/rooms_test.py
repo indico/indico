@@ -27,6 +27,7 @@ from indico.modules.rb.models.photos import Photo
 from indico.modules.rb.models.reservations import RepeatFrequency
 from indico.modules.rb.models.room_bookable_hours import BookableHours
 from indico.modules.rb.models.rooms import Room
+from indico.modules.users import User
 from indico.testing.util import bool_matrix
 from indico.util.date_time import get_day_end, get_day_start
 
@@ -669,3 +670,65 @@ def test_check_bookable_hours_no_user(db, dummy_room):
     dummy_room.bookable_hours = [BookableHours(start_time=time(12), end_time=time(14))]
     db.session.flush()
     assert not dummy_room.check_bookable_hours(time(8), time(9), quiet=True)
+
+
+@pytest.mark.parametrize('reservations_need_confirmation', (True, False))
+def test_permissions_manager(dummy_room, dummy_user, reservations_need_confirmation):
+    dummy_room.protection_mode = ProtectionMode.public
+    dummy_room.reservations_need_confirmation = reservations_need_confirmation
+    dummy_room.update_principal(dummy_user, full_access=True)
+    assert dummy_room.can_book(dummy_user)
+    assert dummy_room.can_prebook(dummy_user) == reservations_need_confirmation
+    assert dummy_room.can_override(dummy_user)
+    assert dummy_room.can_moderate(dummy_user)
+
+
+@pytest.mark.parametrize('reservations_need_confirmation', (True, False))
+def test_permissions_public_room(dummy_room, dummy_user, reservations_need_confirmation):
+    dummy_room.protection_mode = ProtectionMode.public
+    dummy_room.reservations_need_confirmation = reservations_need_confirmation
+    assert dummy_room.can_book(dummy_user) == (not reservations_need_confirmation)
+    assert dummy_room.can_prebook(dummy_user) == reservations_need_confirmation
+    assert not dummy_room.can_override(dummy_user)
+    assert not dummy_room.can_moderate(dummy_user)
+
+
+def test_permissions_protected_room(dummy_room, dummy_user):
+    dummy_room.protection_mode = ProtectionMode.protected
+    assert not dummy_room.can_book(dummy_user)
+    assert not dummy_room.can_prebook(dummy_user)
+    assert not dummy_room.can_override(dummy_user)
+    assert not dummy_room.can_moderate(dummy_user)
+
+
+@pytest.mark.parametrize('permission', ('book', 'prebook', 'override', 'moderate'))
+def test_permissions_protected_room_acl(dummy_room, dummy_user, permission):
+    dummy_room.protection_mode = ProtectionMode.protected
+    dummy_room.update_principal(dummy_user, permissions={permission})
+    for p in ('book', 'prebook', 'override', 'moderate'):
+        granted = p == permission
+        assert getattr(dummy_room, 'can_' + p)(dummy_user) == granted
+
+
+@pytest.mark.parametrize('acl_perm', (None, 'book', 'prebook', 'override', 'moderate', '*'))
+@pytest.mark.parametrize('protection_mode', (ProtectionMode.public, ProtectionMode.protected))
+@pytest.mark.parametrize('reservations_need_confirmation', (True, False))
+@pytest.mark.parametrize('is_admin', (True, False))
+@pytest.mark.parametrize('bulk_possible', (True, False))
+def test_get_permissions_for_user(is_admin, dummy_room, dummy_user, monkeypatch, bulk_possible,
+                                  reservations_need_confirmation, protection_mode, acl_perm):
+    monkeypatch.setattr(User, 'can_get_all_multipass_groups', bulk_possible)
+    dummy_user.is_admin = is_admin
+    dummy_room.protection_mode = protection_mode
+    dummy_room.reservations_need_confirmation = reservations_need_confirmation
+    if acl_perm == '*':
+        dummy_room.update_principal(dummy_user, full_access=True)
+    elif acl_perm:
+        dummy_room.update_principal(dummy_user, permissions={acl_perm})
+    perms = Room.get_permissions_for_user(dummy_user)
+    assert perms[dummy_room.id] == {
+        'book': dummy_room.can_book(dummy_user),
+        'prebook': dummy_room.can_prebook(dummy_user),
+        'override': dummy_room.can_override(dummy_user),
+        'moderate': dummy_room.can_moderate(dummy_user),
+    }
