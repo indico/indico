@@ -199,6 +199,7 @@
                         }
                         location.href = data.redirect;
                     }
+                    handleFlashes(data);
                 } else if (data.html) {
                     showForm(data);
                     // restore files in dropzone fields
