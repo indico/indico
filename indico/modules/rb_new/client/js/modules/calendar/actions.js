@@ -29,6 +29,7 @@ import {ajax as ajaxRules} from './serializers';
 import {getRoomFilters, getCalendarFilters} from './selectors';
 
 
+export const CHANGE_VIEW = 'calendar/CHANGE_VIEW';
 export const SET_DATE = 'calendar/SET_DATE';
 export const SET_MODE = 'calendar/SET_MODE';
 export const ROWS_RECEIVED = 'calendar/ROWS_RECEIVED';
@@ -43,6 +44,10 @@ export const FETCH_ACTIVE_BOOKINGS_ERROR = 'calendar/FETCH_ACTIVE_BOOKINGS_ERROR
 export const ACTIVE_BOOKINGS_RECEIVED = 'calendar/ACTIVE_BOOKINGS_RECEIVED';
 export const CLEAR_ACTIVE_BOOKINGS = 'calendar/CLEAR_ACTIVE_BOOKINGS';
 
+
+export function changeView(view) {
+    return {type: CHANGE_VIEW, view};
+}
 
 export function setDate(date) {
     return {type: SET_DATE, date};

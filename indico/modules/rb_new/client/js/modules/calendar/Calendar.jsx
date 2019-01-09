@@ -47,6 +47,11 @@ class Calendar extends React.Component {
         calendarData: PropTypes.object.isRequired,
         datePicker: PropTypes.object.isRequired,
         isFetching: PropTypes.bool.isRequired,
+        roomFilters: PropTypes.object.isRequired,
+        calendarFilters: PropTypes.object.isRequired,
+        localFilters: PropTypes.object.isRequired,
+        allowDragDrop: PropTypes.bool,
+        view: PropTypes.oneOf(['timeline', 'list']).isRequired,
         actions: PropTypes.exact({
             fetchCalendar: PropTypes.func.isRequired,
             setDate: PropTypes.func.isRequired,
@@ -55,11 +60,8 @@ class Calendar extends React.Component {
             openBookRoom: PropTypes.func.isRequired,
             openBookingDetails: PropTypes.func.isRequired,
             setFilterParameter: PropTypes.func.isRequired,
+            changeView: PropTypes.func.isRequired,
         }).isRequired,
-        roomFilters: PropTypes.object.isRequired,
-        calendarFilters: PropTypes.object.isRequired,
-        localFilters: PropTypes.object.isRequired,
-        allowDragDrop: PropTypes.bool
     };
 
     static defaultProps = {
@@ -70,10 +72,6 @@ class Calendar extends React.Component {
         super(props);
         this.contextRef = React.createRef();
     }
-
-    state = {
-        view: 'timeline',
-    };
 
     componentDidMount() {
         const {actions: {fetchCalendar}} = this.props;
@@ -127,7 +125,7 @@ class Calendar extends React.Component {
             localFilters: {hideUnused},
             actions: {setFilterParameter}
         } = this.props;
-        const {view} = this.state;
+        const {view} = this.props;
 
         return (
             <>
@@ -153,13 +151,13 @@ class Calendar extends React.Component {
         );
     };
 
-    renderModeSwitch = () => {
-        const {view} = this.state;
+    renderViewSwitch = () => {
+        const {view, actions: {changeView}} = this.props;
         return (
             <div>
                 <Popup trigger={<Button icon={<Icon name="calendar" />}
                                         primary={view === 'timeline'}
-                                        onClick={() => this.setState({view: 'timeline'})}
+                                        onClick={() => changeView('timeline')}
                                         circular />}
                        position="bottom center">
                     <Translate>
@@ -168,7 +166,7 @@ class Calendar extends React.Component {
                 </Popup>
                 <Popup trigger={<Button icon={<Icon name="list" />}
                                         primary={view === 'list'}
-                                        onClick={() => this.setState({view: 'list'})}
+                                        onClick={() => changeView('list')}
                                         circular />}
                        position="bottom center">
                     <Translate>
@@ -181,6 +179,7 @@ class Calendar extends React.Component {
 
     render() {
         const {
+            view,
             isFetching,
             calendarData: {
                 rows
@@ -194,7 +193,6 @@ class Calendar extends React.Component {
             datePicker,
             allowDragDrop
         } = this.props;
-        const {view} = this.state;
         const legendLabels = [
             {label: Translate.string('Booked'), color: 'orange'},
             {label: Translate.string('Pre-Booking'), style: 'pre-booking'},
@@ -216,7 +214,7 @@ class Calendar extends React.Component {
                                             <SearchBar />
                                         </div>
                                     </div>
-                                    {this.renderModeSwitch()}
+                                    {this.renderViewSwitch()}
                                 </Grid.Row>
                                 {isTimelineVisible && (
                                     <TimelineHeader datePicker={datePicker}
@@ -257,7 +255,8 @@ export default connect(
         calendarFilters: calendarSelectors.getCalendarFilters(state),
         localFilters: calendarSelectors.getLocalFilters(state),
         rooms: roomsSelectors.getAllRooms(state),
-        datePicker: calendarSelectors.getDatePickerInfo(state)
+        datePicker: calendarSelectors.getDatePickerInfo(state),
+        view: calendarSelectors.getCalendarView(state),
     }),
     dispatch => ({
         actions: bindActionCreators({
@@ -268,6 +267,7 @@ export default connect(
             openBookRoom: bookRoomActions.openBookRoom,
             openBookingDetails: bookingsActions.openBookingDetails,
             setFilterParameter: (name, value) => filtersActions.setFilterParameter('calendar', name, value),
+            changeView: calendarActions.changeView,
         }, dispatch),
     }),
 )(Overridable.component('Calendar', Calendar));
