@@ -59,13 +59,9 @@ export function setMode(mode) {
 
 async function fetchCalendarRooms(dispatch, state) {
     const roomFilters = getRoomFilters(state);
-
-    if (_.isEmpty(roomFilters)) {
-        return [];
-    }
-
     const searchParams = preProcessParameters({...roomFilters}, roomSearchAjaxRules);
     let response;
+
     try {
         response = await indicoAxios.get(searchRoomsURL(), {params: searchParams});
     } catch (error) {
