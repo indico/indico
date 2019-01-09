@@ -30,10 +30,6 @@
         display: block;
     }
 
-    span {
-        cursor: default;
-    }
-
     &:hover {
         background: darken($highlight-color, 5%);
     }
