@@ -25,7 +25,7 @@ import {Card, Divider, Header, Icon, Label, Message, Popup} from 'semantic-ui-re
 import LazyScroll from 'redux-lazy-scroll';
 
 import {TooltipIfTruncated} from 'indico/react/components';
-import {Translate} from 'indico/react/i18n';
+import {Param, Translate} from 'indico/react/i18n';
 import {actions as bookingsActions} from '../../common/bookings';
 import CardPlaceholder from '../../components/CardPlaceholder';
 import * as calendarSelectors from './selectors';
@@ -97,7 +97,7 @@ class CalendarListView extends React.Component {
             <div styleName="day-cards" key={day}>
                 <Header styleName="day-cards-header" dividing>
                     <Icon name="calendar outline" />
-                    {moment(day, 'YYYY-MM-DD').format('L')}
+                    {moment(day, 'YYYY-MM-DD').format('dddd, LL')}
                 </Header>
                 <Card.Group itemsPerRow={4} stackable>
                     {bookings.map(this.renderBooking)}
@@ -112,6 +112,8 @@ class CalendarListView extends React.Component {
         const {reservation} = booking;
         const {room, isAccepted} = reservation;
         const key = `${reservation.id}-${booking.startDt}-${booking.endDt}`;
+        const startTime = moment(booking.startDt, 'YYYY-MM-DD HH:mm').format('LT');
+        const endTime = moment(booking.endDt, 'YYYY-MM-DD HH:mm').format('LT');
 
         return (
             <Card styleName="booking-card" key={key} onClick={() => openBookingDetails(reservation.id)}>
@@ -119,7 +121,7 @@ class CalendarListView extends React.Component {
                     <Card.Header>
                         {!isAccepted && (
                             <Popup trigger={<Label color="yellow" icon="clock" corner="right" size="tiny" />}
-                                   content={Translate.string('This is a pre-booking')}
+                                   content={Translate.string('This booking is pending confirmation by the room owner')}
                                    position="right center" />
                         )}
                         <TooltipIfTruncated>
@@ -128,8 +130,19 @@ class CalendarListView extends React.Component {
                             </div>
                         </TooltipIfTruncated>
                     </Card.Header>
-                    <Card.Meta>{reservation.bookedForName}</Card.Meta>
+                    <Card.Meta>
+                        {startTime} - {endTime}
+                    </Card.Meta>
                     <Card.Description>{reservation.bookingReason}</Card.Description>
+                </Card.Content>
+                <Card.Content extra>
+                    <TooltipIfTruncated>
+                        <div styleName="booking-booked-for">
+                            <Translate>
+                                Booked for <Param name="bookedFor" value={reservation.bookedForName} />
+                            </Translate>
+                        </div>
+                    </TooltipIfTruncated>
                 </Card.Content>
             </Card>
         );
