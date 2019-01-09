@@ -277,6 +277,8 @@ export default combineReducers({
         switch (action.type) {
             case calendarActions.CHANGE_VIEW:
                 return action.view;
+            case actions.RESET_PAGE_STATE:
+                return 'timeline';
             default:
                 return state;
         }
