@@ -33,7 +33,8 @@ export default combineReducers({
     data: (state = initialState, action) => {
         switch (action.type) {
             case configActions.CONFIG_RECEIVED: {
-                const {roomsSpriteToken, languages, tileserverUrl: tileServerURL} = camelizeKeys(action.data);
+                const {roomsSpriteToken, tileserverUrl: tileServerURL} = camelizeKeys(action.data);
+                const {languages} = action.data;
                 return {
                     roomsSpriteToken,
                     languages,
