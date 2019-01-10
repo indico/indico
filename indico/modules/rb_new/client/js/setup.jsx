@@ -8,7 +8,7 @@ import App from './components/App';
 import createRBStore, {history} from './store';
 import {init} from './actions';
 import {selectors as configSelectors} from './common/config';
-import {selectors as userSelectors} from './common/user';
+import {selectors as userSelectors, actions as userActions} from './common/user';
 import {actions as roomsActions} from './common/rooms';
 
 import 'semantic-ui-css/semantic.css';
@@ -27,6 +27,7 @@ export default function setup(overrides = {}, postReducers = []) {
                 // TODO: add more things here once admins can change them (e.g. map areas)
                 store.dispatch(roomsActions.fetchEquipmentTypes());
                 store.dispatch(roomsActions.fetchRooms());
+                store.dispatch(userActions.fetchAllRoomPermissions());
             }
             oldPath = newPath;
         });

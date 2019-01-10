@@ -45,6 +45,11 @@ export default combineReducers({
             actions.FETCH_FAVORITES_SUCCESS,
             actions.FETCH_FAVORITES_ERROR
         ),
+        roomPermissions: requestReducer(
+            actions.FETCH_ROOM_PERMISSIONS_REQUEST,
+            actions.FETCH_ROOM_PERMISSIONS_SUCCESS,
+            actions.FETCH_ROOM_PERMISSIONS_ERROR
+        ),
     }),
     info: (state = initialUserInfoState, action) => {
         switch (action.type) {
@@ -79,5 +84,13 @@ export default combineReducers({
             default:
                 return state;
         }
-    }
+    },
+    roomPermissions: (state = {}, action) => {
+        switch (action.type) {
+            case actions.ROOM_PERMISSIONS_RECEIVED:
+                return action.data;
+            default:
+                return state;
+        }
+    },
 });

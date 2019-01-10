@@ -184,6 +184,7 @@ export default connect(
             });
             dispatch(userActions.fetchUserInfo());
             dispatch(userActions.fetchFavoriteRooms());
+            dispatch(userActions.fetchAllRoomPermissions());
             dispatch(roomsActions.fetchEquipmentTypes());
             dispatch(roomsActions.fetchRooms());
         },

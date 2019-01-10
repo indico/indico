@@ -17,6 +17,7 @@
 
 import fetchUserInfoURL from 'indico-url:rooms_new.user_info';
 import favoriteRoomsURL from 'indico-url:rooms_new.favorite_rooms';
+import roomsPermissionsURL from 'indico-url:rooms_new.rooms_permissions';
 
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {setMomentLocale} from 'indico/utils/date';
@@ -32,9 +33,13 @@ export const FETCH_FAVORITES_REQUEST = 'user/FETCH_FAVORITES_REQUEST';
 export const FETCH_FAVORITES_SUCCESS = 'user/FETCH_FAVORITES_SUCCESS';
 export const FETCH_FAVORITES_ERROR = 'user/FETCH_FAVORITES_ERROR';
 export const FAVORITES_RECEIVED = 'user/FAVORITES_RECEIVED';
-
 export const ADD_FAVORITE_ROOM = 'user/ADD_FAVORITE_ROOM';
 export const DEL_FAVORITE_ROOM = 'user/DEL_FAVORITE_ROOM';
+
+export const ROOM_PERMISSIONS_RECEIVED = 'user/ROOM_PERMISSIONS_RECEIVED';
+export const FETCH_ROOM_PERMISSIONS_REQUEST = 'user/FETCH_ROOM_PERMISSIONS_REQUEST';
+export const FETCH_ROOM_PERMISSIONS_SUCCESS = 'user/FETCH_ROOM_PERMISSIONS_SUCCESS';
+export const FETCH_ROOM_PERMISSIONS_ERROR = 'user/FETCH_ROOM_PERMISSIONS_ERROR';
 
 
 export function fetchUserInfo() {
@@ -92,4 +97,13 @@ export function delFavoriteRoom(id) {
             dispatch({type: ADD_FAVORITE_ROOM, id});
         }
     };
+}
+
+export function fetchAllRoomPermissions() {
+    return ajaxAction(
+        () => indicoAxios.get(roomsPermissionsURL()),
+        FETCH_ROOM_PERMISSIONS_REQUEST,
+        [ROOM_PERMISSIONS_RECEIVED, FETCH_ROOM_PERMISSIONS_SUCCESS],
+        FETCH_ROOM_PERMISSIONS_ERROR
+    );
 }

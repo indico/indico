@@ -26,6 +26,7 @@ export const getUserFullName = createSelector(getUserInfo, ({firstName, lastName
 export const isUserAdmin = state => getUserInfo(state).isAdmin;
 export const hasOwnedRooms = state => getUserInfo(state).hasOwnedRooms;
 export const getFavoriteUsers = state => getUserInfo(state).favoriteUsers;
+export const getAllUserRoomPermissions = ({user}) => user.roomPermissions;
 
 const getFavoriteRooms = ({user}) => user.favorites;
 export const hasFavoriteRooms = createSelector(

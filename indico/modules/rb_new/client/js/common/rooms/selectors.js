@@ -19,7 +19,7 @@ import _ from 'lodash';
 import {createSelector} from 'reselect';
 
 import {RequestState} from 'indico/utils/redux';
-import {isUserAdmin} from '../user/selectors';
+import {getAllUserRoomPermissions} from '../user/selectors';
 
 
 export const hasLoadedEquipmentTypes = ({rooms}) => rooms.requests.equipmentTypes.state === RequestState.SUCCESS;
@@ -65,8 +65,8 @@ export const getFeatures = createSelector(
 export const getAllRooms = createSelector(
     ({rooms}) => rooms.rooms,
     getEquipmentTypes,
-    isUserAdmin,
-    (rawRooms, equipmentTypes, isAdmin) => {
+    getAllUserRoomPermissions,
+    (rawRooms, equipmentTypes, allUserPermissions) => {
         equipmentTypes = equipmentTypes.reduce((obj, eq) => ({...obj, [eq.id]: eq}), {});
         return _.fromPairs(rawRooms.map(room => {
             const {availableEquipment: equipment, ...roomData} = room;
@@ -85,12 +85,13 @@ export const getAllRooms = createSelector(
             });
             const sortedFeatures = _.sortBy(Object.values(features), 'title');
             sortedFeatures.forEach(f => f.equipment.sort());
+            const permissions = allUserPermissions[room.id] || {book: false, prebook: false};
             return [room.id, {
                 ...roomData,
                 equipment: equipment.map(id => equipmentTypes[id].name).sort(),
                 features: sortedFeatures,
-                canUserBook: isAdmin || room.isAutoConfirm,
-                canUserPreBook: !room.isAutoConfirm,
+                canUserBook: permissions.book,
+                canUserPreBook: permissions.prebook,
             }];
         }));
     }
