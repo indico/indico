@@ -36,6 +36,7 @@ const classes = {
     unbookableHours: 'unbookable-hours',
     cancellations: 'cancellation',
     rejections: 'rejection',
+    other: 'other',
 };
 
 const types = {
@@ -46,7 +47,8 @@ const types = {
     unbookableHours: 'unbookable-hours',
     preBookings: 'pre-booking',
     cancellations: 'cancellation',
-    rejections: 'rejection'
+    rejections: 'rejection',
+    other: 'other',
 };
 
 function getKeyForOccurrence(name, {reservation, startTime, endTime, startDt, endDt}) {

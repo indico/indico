@@ -72,13 +72,13 @@ def group_nonbookable_periods(periods, dates):
 
 
 def get_existing_room_occurrences(room, start_dt, end_dt, repeat_frequency=RepeatFrequency.NEVER, repeat_interval=None,
-                                  allow_overlapping=False, only_accepted=False):
+                                  allow_overlapping=False, only_accepted=False, skip_booking_id=None):
     return get_existing_rooms_occurrences([room], start_dt, end_dt, repeat_frequency, repeat_interval,
-                                          allow_overlapping, only_accepted).get(room.id, [])
+                                          allow_overlapping, only_accepted, skip_booking_id).get(room.id, [])
 
 
 def get_existing_rooms_occurrences(rooms, start_dt, end_dt, repeat_frequency, repeat_interval, allow_overlapping=False,
-                                   only_accepted=False):
+                                   only_accepted=False, skip_booking_id=None):
     room_ids = [room.id for room in rooms]
     query = (ReservationOccurrence.query
              .filter(ReservationOccurrence.is_valid, Reservation.room_id.in_(room_ids))
@@ -96,8 +96,10 @@ def get_existing_rooms_occurrences(rooms, start_dt, end_dt, repeat_frequency, re
         candidates = ReservationOccurrence.create_series(start_dt, end_dt, (repeat_frequency, repeat_interval))
         dates = [candidate.start_dt for candidate in candidates]
         query = query.filter(db.cast(ReservationOccurrence.start_dt, db.Date).in_(dates))
+    if skip_booking_id is not None:
+        query = query.filter(ReservationOccurrence.reservation_id != skip_booking_id)
 
-    return group_list(query, key=lambda obj: obj.reservation.room.id,
+    return group_list(query, key=lambda obj: obj.reservation.room_id,
                       sort_by=lambda obj: (obj.reservation.room_id, obj.start_dt))
 
 
@@ -220,6 +222,12 @@ def get_room_details_availability(room, start_dt, end_dt):
             'day': iso_day,
         })
     return sorted(availability, key=itemgetter('day'))
+
+
+def get_room_bookings(room, start_dt, end_dt, skip_booking_id=None):
+    bookings = get_existing_room_occurrences(room, start_dt, end_dt, RepeatFrequency.DAY, 1, only_accepted=True,
+                                             skip_booking_id=skip_booking_id)
+    return serialize_occurrences(group_by_occurrence_date(bookings))
 
 
 def get_booking_occurrences(booking):
