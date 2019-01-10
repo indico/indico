@@ -70,6 +70,7 @@ class BookingEdit extends React.Component {
                     bookings: occurrences.bookings,
                     cancellations: occurrences.cancellations,
                     rejections: occurrences.rejections,
+                    other: occurrences.otherBookings,
                     candidates: {},
                     conflicts: {}
                 },
@@ -142,6 +143,9 @@ class BookingEdit extends React.Component {
         const availabilityData = availability[0][1];
         const conflicts = _.fromPairs(newDateRange.map((day) => {
             const allConflicts = availabilityData.conflicts[day] || [];
+            if (day in calendar.data.cancellations || day in calendar.data.rejections) {
+                return [day, []];
+            }
             return [day, allConflicts.filter((c) => c.reservation.id !== bookingId)];
         }));
 
@@ -238,6 +242,7 @@ class BookingEdit extends React.Component {
             {label: Translate.string('Current booking'), color: 'orange'},
             {label: Translate.string('Cancelled occurrences'), style: 'cancellation'},
             {label: Translate.string('Rejected occurrences'), style: 'rejection'},
+            {label: Translate.string('Other bookings'), style: 'other'},
             {label: Translate.string('New booking'), color: 'green'},
             {label: Translate.string('Conflicts with new booking'), color: 'red'},
         ];
@@ -247,6 +252,7 @@ class BookingEdit extends React.Component {
                     bookings: av.bookings[day] || [],
                     cancellations: av.cancellations[day] || [],
                     rejections: av.rejections[day] || [],
+                    other: av.other[day] || [],
                     candidates: (av.candidates[day] || []).map(candidate => ({...candidate, bookable: false})),
                     conflicts: av.conflicts[day] || [],
                 },

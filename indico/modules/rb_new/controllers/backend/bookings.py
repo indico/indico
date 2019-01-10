@@ -32,8 +32,8 @@ from indico.modules.rb.models.reservation_occurrences import ReservationOccurren
 from indico.modules.rb.models.reservations import RepeatFrequency, Reservation
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb_new.controllers.backend.common import search_room_args
-from indico.modules.rb_new.operations.bookings import (get_active_bookings, get_booking_occurrences, get_room_calendar,
-                                                       get_rooms_availability)
+from indico.modules.rb_new.operations.bookings import (get_active_bookings, get_booking_occurrences, get_room_bookings,
+                                                       get_room_calendar, get_rooms_availability)
 from indico.modules.rb_new.operations.suggestions import get_suggestions
 from indico.modules.rb_new.schemas import (create_booking_args, reservation_details_occurrences_schema,
                                            reservation_details_schema, reservation_event_data_schema,
@@ -64,16 +64,20 @@ def _serialize_booking_details(booking):
     date_range, occurrences = get_booking_occurrences(booking)
     date_range = [dt.isoformat() for dt in date_range]
     booking_details = dict(attributes)
-    occurrences_dict = dict(bookings={}, cancellations={}, rejections={})
-    booking_details['occurrences'] = occurrences_dict
+    occurrences_by_type = dict(bookings={}, cancellations={}, rejections={}, other_bookings={})
+    booking_details['occurrences'] = occurrences_by_type
     booking_details['date_range'] = date_range
-    for dt, data in occurrences.iteritems():
-        occ = reservation_details_occurrences_schema.dump(data).data
-        if data[0].is_cancelled:
-            occurrences_dict['cancellations'][dt.isoformat()] = occ
-        elif data[0].is_rejected:
-            occurrences_dict['rejections'][dt.isoformat()] = occ
-        occurrences_dict['bookings'][dt.isoformat()] = occ if data[0].is_valid else []
+    for dt, [occ] in occurrences.iteritems():
+        serialized_occ = reservation_details_occurrences_schema.dump([occ]).data
+        if occ.is_cancelled:
+            occurrences_by_type['cancelations'][dt.isoformat()] = serialized_occ
+        elif occ.is_rejected:
+            occurrences_by_type['rejections'][dt.isoformat()] = serialized_occ
+        occurrences_by_type['bookings'][dt.isoformat()] = serialized_occ if occ.is_valid else []
+    start_dt = datetime.combine(booking.start_dt, time.min)
+    end_dt = datetime.combine(booking.end_dt, time.max)
+    occurrences_by_type['other_bookings'] = get_room_bookings(booking.room, start_dt, end_dt,
+                                                              skip_booking_id=booking.id)
     return booking_details
 
 
