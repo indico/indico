@@ -448,7 +448,7 @@ export default connect(
             fetchRelatedEvents: actions.fetchRelatedEvents,
             resetRelatedEvents: actions.resetRelatedEvents,
             createBooking: (data, props) => {
-                const {reason, usage, user, isPrebooking} = data;
+                const {reason, usage, user, isPrebooking, event} = data;
                 const {bookingData: {recurrence, dates, timeSlot}, room} = props;
                 return actions.createBooking({
                     reason,
@@ -458,6 +458,7 @@ export default connect(
                     dates,
                     timeSlot,
                     room,
+                    event,
                     isPrebooking
                 });
             },

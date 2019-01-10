@@ -230,6 +230,7 @@ class CreateBookingSchema(Schema):
     repeat_interval = fields.Int(missing=0, validate=lambda x: x >= 0)
     room_id = fields.Int(required=True)
     user_id = fields.Int()
+    event_id = fields.Int()
     booking_reason = fields.String(load_from='reason', validate=validate.Length(min=3))
     is_prebooking = fields.Bool(missing=False)
 
