@@ -607,7 +607,7 @@ def set_custom_fields(obj, custom_fields_data):
 def check_permissions(event, field, allow_networks=False):
     for principal_fossil, permissions in field.data:
         principal = principal_from_fossil(principal_fossil, allow_emails=True, allow_networks=allow_networks,
-                                          event=event)
+                                          allow_pending=True, event=event)
         if allow_networks and isinstance(principal, IPNetworkGroup) and set(permissions) - {READ_ACCESS_PERMISSION}:
             msg = _('IP networks cannot have management permissions: {}').format(principal.name)
             return msg
