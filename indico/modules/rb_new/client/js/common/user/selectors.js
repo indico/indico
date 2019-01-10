@@ -27,6 +27,7 @@ export const isUserAdmin = state => getUserInfo(state).isAdmin;
 export const hasOwnedRooms = state => getUserInfo(state).hasOwnedRooms;
 export const getFavoriteUsers = state => getUserInfo(state).favoriteUsers;
 export const getAllUserRoomPermissions = ({user}) => user.roomPermissions;
+export const isCheckingUserRoomPermissions = ({user}) => user.requests.roomPermissions.state === RequestState.STARTED;
 
 const getFavoriteRooms = ({user}) => user.favorites;
 export const hasFavoriteRooms = createSelector(

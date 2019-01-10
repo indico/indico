@@ -137,24 +137,28 @@ function RoomDetails({bookRoom, room, availability, attributes}) {
                     </Header>
                     <DailyTimelineContent rows={availability.map(rowSerializer)} />
                     <RoomStats roomId={room.id} />
-                    <Message attached info>
-                        <Icon name="info" />
-                        <Translate>Would you like to use this space?</Translate>
-                    </Message>
-                    <Segment attached="bottom">
-                        {room.canUserBook && (
-                            <Button color="green" onClick={() => bookRoom(room.id, {isPrebooking: false})}>
-                                <Icon name="check circle" />
-                                <Translate>Start booking</Translate>
-                            </Button>
-                        )}
-                        {room.canUserPreBook && (
-                            <Button color="orange" onClick={() => bookRoom(room.id, {isPrebooking: true})}>
-                                <Icon name="check circle" />
-                                <Translate>Start pre-booking</Translate>
-                            </Button>
-                        )}
-                    </Segment>
+                    {(room.canUserBook || room.canUserPreBook) && (
+                        <>
+                            <Message attached info>
+                                <Icon name="info" />
+                                <Translate>Would you like to use this space?</Translate>
+                            </Message>
+                            <Segment attached="bottom">
+                                {room.canUserBook && (
+                                    <Button color="green" onClick={() => bookRoom(room.id, {isPrebooking: false})}>
+                                        <Icon name="check circle" />
+                                        <Translate>Start booking</Translate>
+                                    </Button>
+                                )}
+                                {room.canUserPreBook && (
+                                    <Button color="orange" onClick={() => bookRoom(room.id, {isPrebooking: true})}>
+                                        <Icon name="check circle" />
+                                        <Translate>Start pre-booking</Translate>
+                                    </Button>
+                                )}
+                            </Segment>
+                        </>
+                    )}
                 </Grid.Column>
             </Grid>
         </div>
@@ -171,7 +175,7 @@ RoomDetails.propTypes = {
 
 function RoomAvailabilityBox({room}) {
     return (
-        room.isPublic ? (
+        (room.canUserBook || room.canUserPreBook) ? (
             <Message positive styleName="message-icon" icon="unlock" content={
                 <>
                     <p><Translate>Anyone can book this space.</Translate></p>

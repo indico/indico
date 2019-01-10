@@ -20,7 +20,7 @@ import React from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
-import {Card, Icon, Label, Popup, Button} from 'semantic-ui-react';
+import {Card, Icon, Label, Loader, Popup, Button} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 import {Slot} from 'indico/react/util';
@@ -39,6 +39,7 @@ class Room extends React.Component {
         children: PropTypes.node,
         showFavoriteButton: PropTypes.bool,
         isFavorite: PropTypes.bool.isRequired,
+        isCheckingUserRoomPermissions: PropTypes.bool.isRequired,
         addFavoriteRoom: PropTypes.func.isRequired,
         delFavoriteRoom: PropTypes.func.isRequired
     };
@@ -49,14 +50,19 @@ class Room extends React.Component {
     };
 
     shouldComponentUpdate(nextProps) {
-        const {isFavorite: nextIsFavorite, room: nextRoom} = nextProps;
-        const {room, isFavorite} = this.props;
+        const {
+            isFavorite: nextIsFavorite,
+            isCheckingUserRoomPermissions: nextIsCheckingUserRoomPermissions,
+            room: nextRoom
+        } = nextProps;
+        const {room, isFavorite, isCheckingUserRoomPermissions} = this.props;
         const {children} = this.props;
         const {children: nextChildren} = nextProps;
 
         return (
             !_.isEqual(room, nextRoom) ||
             nextIsFavorite !== isFavorite ||
+            nextIsCheckingUserRoomPermissions !== isCheckingUserRoomPermissions ||
             !_.isEqual(nextChildren, children)
         );
     }
@@ -102,9 +108,45 @@ class Room extends React.Component {
         }
     };
 
+    renderRoomStatus = () => {
+        const {
+            room: {isReservable, canUserBook, canUserPreBook},
+            isCheckingUserRoomPermissions,
+        } = this.props;
+        if (!isReservable) {
+            return (
+                <Popup key="not-bookable"
+                       trigger={<Icon name="dont" color="red" />}
+                       content={Translate.string('This space is not bookable')}
+                       position="bottom center"
+                       hideOnScroll />
+            );
+        } else if (isCheckingUserRoomPermissions) {
+            return (
+                <Popup key="check-pending"
+                       trigger={<Loader active inline size="tiny" />}
+                       content={Translate.string('Checking permissions...')}
+                       position="bottom center"
+                       hideOnScroll />
+            );
+        } else if (!canUserBook && !canUserPreBook) {
+            return (
+                <Popup key="not-authorized"
+                       trigger={<Icon name="lock" color="red" />}
+                       content={Translate.string('This space is not publicly available')}
+                       position="bottom center"
+                       hideOnScroll />
+            );
+        } else {
+            return null;
+        }
+    };
+
     render() {
         const {
-            room, children, isFavorite, showFavoriteButton, addFavoriteRoom, delFavoriteRoom,
+            room, children, isFavorite,
+            // XXX: don't remove the unused ones below, they should not end up in restProps!
+            showFavoriteButton, addFavoriteRoom, delFavoriteRoom, isCheckingUserRoomPermissions,
             ...restProps
         } = this.props;
         const {content, actions} = Slot.split(children);
@@ -140,18 +182,7 @@ class Room extends React.Component {
                         {room.features.map(feature => (
                             <RoomFeatureEntry key={feature.name} feature={feature} color="green" />
                         ))}
-                        {!room.isReservable && (
-                            <Popup trigger={<Icon name="dont" color="grey" />}
-                                   content={Translate.string('This space is not bookable')}
-                                   position="bottom center"
-                                   hideOnScroll />
-                        )}
-                        {!room.isPublic && (
-                            <Popup trigger={<Icon name="lock" color="red" />}
-                                   content={Translate.string('This space is not publicly available')}
-                                   position="bottom center"
-                                   hideOnScroll />
-                        )}
+                        {this.renderRoomStatus()}
                     </span>
                 </Card.Content>
             </Card>
@@ -163,7 +194,8 @@ export default connect(
     () => {
         const isFavoriteRoom = userSelectors.makeIsFavoriteRoom();
         return (state, props) => ({
-            isFavorite: isFavoriteRoom(state, props)
+            isFavorite: isFavoriteRoom(state, props),
+            isCheckingUserRoomPermissions: userSelectors.isCheckingUserRoomPermissions(state),
         });
     },
     dispatch => bindActionCreators({
