@@ -101,20 +101,22 @@ export class RoomFilterBarBase extends React.Component {
             setFilterParameter: PropTypes.func,
             setFilters: PropTypes.func,
         }).isRequired,
-        hideOptions: PropTypes.objectOf(PropTypes.bool)
+        hideOptions: PropTypes.objectOf(PropTypes.bool),
+        disabled: PropTypes.bool,
     };
 
     static defaultProps = {
         hasFavoriteRooms: false,
         hasOwnedRooms: false,
         extraButtons: null,
-        hideOptions: {}
+        hideOptions: {},
+        disabled: false,
     };
 
     render() {
         const {
             equipmentTypes, features: availableFeatures, hasOwnedRooms, hasFavoriteRooms, buildings,
-            extraButtons, hideOptions,
+            extraButtons, hideOptions, disabled,
             filters: {capacity, onlyFavorites, onlyMine, equipment, features, building, ...extraFilters},
             actions: {setFilterParameter, setFilters}
         } = this.props;
@@ -132,7 +134,8 @@ export class RoomFilterBarBase extends React.Component {
                                    counter
                                    setGlobalState={setFilters}
                                    initialValues={{equipment, features}}
-                                   renderValue={renderEquipment} />
+                                   renderValue={renderEquipment}
+                                   disabled={disabled} />
         );
 
         return (
@@ -149,7 +152,8 @@ export class RoomFilterBarBase extends React.Component {
                                                )}
                                                setGlobalState={data => setFilterParameter('building', data.building)}
                                                initialValues={{building}}
-                                               renderValue={renderBuilding} />
+                                               renderValue={renderBuilding}
+                                               disabled={disabled} />
                     )}
                     {!hideOptions.capacity && (
                         <FilterDropdownFactory name="capacity"
@@ -160,19 +164,21 @@ export class RoomFilterBarBase extends React.Component {
                                                )}
                                                setGlobalState={data => setFilterParameter('capacity', data.capacity)}
                                                initialValues={{capacity}}
-                                               renderValue={renderCapacity} />
+                                               renderValue={renderCapacity}
+                                               disabled={disabled} />
                     )}
                     {!hideOptions.equipment && equipmentFilter}
                     <Overridable id="RoomFilterBar.extraFilters"
                                  setFilter={setFilterParameter}
                                  filters={extraFilters} />
                     <Popup trigger={<Button icon="star" primary={onlyFavorites}
-                                            disabled={!onlyFavorites && !hasFavoriteRooms}
+                                            disabled={(!onlyFavorites && !hasFavoriteRooms) || disabled}
                                             onClick={() => setFilterParameter('onlyFavorites', !onlyFavorites)} />}
                            content={Translate.string('Show only my favorite rooms')} />
                     {(hasOwnedRooms || onlyMine) && (
                         <Popup trigger={<Button icon="user" primary={onlyMine}
-                                                onClick={() => setFilterParameter('onlyMine', !onlyMine)} />}
+                                                onClick={() => setFilterParameter('onlyMine', !onlyMine)}
+                                                disabled={disabled} />}
                                content={Translate.string('Show only rooms I manage')} />
                     )}
                     {extraButtons}

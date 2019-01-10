@@ -47,6 +47,7 @@ class Calendar extends React.Component {
         calendarData: PropTypes.object.isRequired,
         datePicker: PropTypes.object.isRequired,
         isFetching: PropTypes.bool.isRequired,
+        isFetchingActiveBookings: PropTypes.bool.isRequired,
         roomFilters: PropTypes.object.isRequired,
         calendarFilters: PropTypes.object.isRequired,
         localFilters: PropTypes.object.isRequired,
@@ -124,7 +125,8 @@ class Calendar extends React.Component {
         const {
             calendarFilters: {myBookings},
             localFilters: {hideUnused},
-            actions: {setFilterParameter}
+            actions: {setFilterParameter},
+            isFetching, isFetchingActiveBookings
         } = this.props;
         const {view} = this.props;
 
@@ -133,6 +135,7 @@ class Calendar extends React.Component {
                 <Popup trigger={<Button size="large"
                                         primary={myBookings}
                                         icon="user circle"
+                                        disabled={isFetching || isFetchingActiveBookings}
                                         onClick={() => setFilterParameter('myBookings', !myBookings || null)} />}>
                     <Translate>
                         Show only my bookings
@@ -142,6 +145,7 @@ class Calendar extends React.Component {
                     <Popup trigger={<Button size="large"
                                             primary={hideUnused}
                                             icon={hideUnused ? 'plus square outline' : 'minus square outline'}
+                                            disabled={isFetching}
                                             onClick={this.toggleHideUnused} />}>
                         {hideUnused
                             ? <Translate>Show unused rooms</Translate>
@@ -153,12 +157,13 @@ class Calendar extends React.Component {
     };
 
     renderViewSwitch = () => {
-        const {view, actions: {changeView}} = this.props;
+        const {view, actions: {changeView}, isFetching, isFetchingActiveBookings} = this.props;
         return (
             <div>
                 <Popup trigger={<Button icon={<Icon name="calendar" />}
                                         primary={view === 'timeline'}
                                         onClick={() => changeView('timeline')}
+                                        disabled={isFetching || isFetchingActiveBookings}
                                         circular />}
                        position="bottom center">
                     <Translate>
@@ -168,6 +173,7 @@ class Calendar extends React.Component {
                 <Popup trigger={<Button icon={<Icon name="list" />}
                                         primary={view === 'list'}
                                         onClick={() => changeView('list')}
+                                        disabled={isFetching || isFetchingActiveBookings}
                                         circular />}
                        position="bottom center">
                     <Translate>
@@ -182,6 +188,7 @@ class Calendar extends React.Component {
         const {
             view,
             isFetching,
+            isFetchingActiveBookings,
             calendarData: {
                 rows
             },
@@ -211,8 +218,9 @@ class Calendar extends React.Component {
                                 <Grid.Row styleName="calendar-filters">
                                     <div className="filter-row">
                                         <div className="filter-row-filters">
-                                            <RoomFilterBar extraButtons={this.renderExtraButtons()} />
-                                            <SearchBar />
+                                            <RoomFilterBar disabled={isFetching || isFetchingActiveBookings}
+                                                           extraButtons={this.renderExtraButtons()} />
+                                            <SearchBar disabled={isFetching || isFetchingActiveBookings} />
                                         </div>
                                     </div>
                                     {this.renderViewSwitch()}
@@ -251,6 +259,7 @@ class Calendar extends React.Component {
 export default connect(
     state => ({
         isFetching: calendarSelectors.isFetchingCalendar(state),
+        isFetchingActiveBookings: calendarSelectors.isFetchingActiveBookings(state),
         calendarData: calendarSelectors.getCalendarData(state),
         roomFilters: calendarSelectors.getRoomFilters(state),
         calendarFilters: calendarSelectors.getCalendarFilters(state),

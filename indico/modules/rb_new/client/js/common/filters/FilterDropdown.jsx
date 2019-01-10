@@ -33,9 +33,10 @@ function _mergeDefaults(defaults, values) {
     }).map(([k, v]) => ({[k]: v})));
 }
 
-const defaultTriggerRenderer = (title, renderedValue, counter) => (
+const defaultTriggerRenderer = (title, renderedValue, counter, disabled) => (
     <Button primary={renderedValue !== null}
-            styleName={counter ? 'filter-dropdown-button-counter' : 'filter-dropdown-button'}>
+            styleName={counter ? 'filter-dropdown-button-counter' : 'filter-dropdown-button'}
+            disabled={disabled}>
         {renderedValue === null ? title : renderedValue}
         <Icon name="angle down" />
     </Button>
@@ -53,7 +54,8 @@ export default class FilterDropdown extends React.Component {
         counter: PropTypes.bool,
         open: PropTypes.bool,
         onOpen: PropTypes.func.isRequired,
-        onClose: PropTypes.func.isRequired
+        onClose: PropTypes.func.isRequired,
+        disabled: PropTypes.bool,
     };
 
     static defaultProps = {
@@ -61,7 +63,8 @@ export default class FilterDropdown extends React.Component {
         defaults: {},
         renderTrigger: defaultTriggerRenderer,
         counter: false,
-        open: false
+        open: false,
+        disabled: false,
     };
 
     state = {};
@@ -143,13 +146,13 @@ export default class FilterDropdown extends React.Component {
     };
 
     render() {
-        const {title, form, renderTrigger, counter, open, onClose} = this.props;
+        const {title, form, renderTrigger, counter, open, onClose, disabled} = this.props;
         const {renderedValue, fieldValues} = this.state;
 
         return (
             <Popup position="bottom left"
                    styleName="filter-dropdown"
-                   trigger={renderTrigger(title, renderedValue, counter)}
+                   trigger={renderTrigger(title, renderedValue, counter, disabled)}
                    on="click"
                    open={open}
                    onClose={onClose}

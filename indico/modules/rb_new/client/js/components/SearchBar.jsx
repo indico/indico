@@ -29,9 +29,14 @@ import './SearchBar.module.scss';
 class SearchBar extends React.Component {
     static propTypes = {
         filters: PropTypes.object.isRequired,
+        disabled: PropTypes.bool,
         actions: PropTypes.exact({
             setFilterParameter: PropTypes.func.isRequired,
         }).isRequired,
+    };
+
+    static defaultProps = {
+        disabled: false,
     };
 
     updateTextFilter = (filterValue) => {
@@ -40,7 +45,7 @@ class SearchBar extends React.Component {
     };
 
     render() {
-        const {filters: {text}} = this.props;
+        const {filters: {text}, disabled} = this.props;
         let inputIcon;
 
         if (text) {
@@ -57,7 +62,8 @@ class SearchBar extends React.Component {
                                icon={inputIcon}
                                debounceTimeout={300}
                                onChange={(event) => this.updateTextFilter(event.target.value)}
-                               value={text || ''} />
+                               value={text || ''}
+                               disabled={disabled} />
             </div>
         );
     }
