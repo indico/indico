@@ -143,7 +143,8 @@ class PersonLinkListFieldBase(EventPersonListField):
     @no_autoflush
     def _get_person_link(self, data, extra_data=None):
         extra_data = extra_data or {}
-        person = get_event_person(self.event, data, create_untrusted_persons=self.create_untrusted_persons)
+        person = get_event_person(self.event, data, create_untrusted_persons=self.create_untrusted_persons,
+                                  allow_external=True)
         person_data = {'title': next((x.value for x in UserTitle if data.get('title') == orig_string(x.title)),
                                      UserTitle.none),
                        'first_name': data.get('firstName', ''), 'last_name': data['familyName'],

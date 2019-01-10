@@ -2,6 +2,16 @@ Changelog
 =========
 
 
+Version 2.1.6
+-------------
+
+*Unreleased*
+
+Bugfixes
+^^^^^^^^
+
+- Allow adding external users as speakers/chairpersons (:issue:`3562`)
+
 Version 2.1.5
 -------------
 
