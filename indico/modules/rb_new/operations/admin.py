@@ -16,6 +16,8 @@
 
 from __future__ import unicode_literals
 
+from datetime import datetime, time, timedelta
+
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.rb.models.equipment import EquipmentType
@@ -63,7 +65,8 @@ def update_room_availability(room, availability):
         room.nonbookable_periods.order_by(False).delete()
         unique_nbp = set((period['start_dt'], period['end_dt']) for period in availability['nonbookable_periods'])
         db.session.add_all(
-            [NonBookablePeriod(room=room, start_dt=period[0], end_dt=period[1]) for period in unique_nbp])
+            [NonBookablePeriod(room=room, start_dt=datetime.combine(period[0], time(0, 0)),
+                               end_dt=datetime.combine(period[1], time(23, 59))) for period in unique_nbp])
 
 
 def update_room(room, args):

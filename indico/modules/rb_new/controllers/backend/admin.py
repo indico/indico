@@ -261,7 +261,7 @@ class RHAttributes(RHRoomBookingAdminBase):
             abort(422, messages={'name': [_('Name must be unique')]})
 
 
-class RHRoomAdminBase(RHRoomBookingBase):
+class RHRoomAdminBase(RHRoomBookingAdminBase):
     def _process_args(self):
         self.room = Room.get_one(request.view_args['room_id'])
 
@@ -301,11 +301,11 @@ class RHRoomAvailabilityUpdate(RHRoomAdminBase):
         if 'bookable_hours' in args:
             self._check_invalid_times(args)
         update_room_availability(self.room, args)
-        return jsonify({'nonbookable_periods': nonbookable_periods_schema.dump(self.room.nonbookable_periods, many=True).data,
-                       'bookable_hours': bookable_hours_schema.dump(self.room.bookable_hours, many=True).data})
+        return jsonify(nonbookable_periods=nonbookable_periods_schema.dump(self.room.nonbookable_periods, many=True).data,
+                       bookable_hours=bookable_hours_schema.dump(self.room.bookable_hours, many=True).data)
 
     def _check_invalid_times(self, availability):
-        if any([bh['start_time'] >= bh['end_time'] for bh in availability['bookable_hours']]):
+        if any(bh['start_time'] >= bh['end_time'] for bh in availability['bookable_hours']):
             abort(422, messages={'bookable_hours': [_('Start time should not be later than end time')]})
 
 
@@ -315,11 +315,6 @@ class RHRoomEquipment(RHRoomAdminBase):
 
 
 class RHRoomEquipmentUpdate(RHRoomAdminBase):
-    def _check_access(self):
-        RHRoomAdminBase._check_access(self)
-        if not rb_is_admin(session.user):
-            raise Forbidden
-
     @use_args({
         'available_equipment': fields.List(fields.Int(), required=True)
     })
@@ -334,11 +329,6 @@ class RHRoom(RHRoomAdminBase):
 
 
 class RHRoomUpdate(RHRoomAdminBase):
-    def _check_access(self):
-        RHRoomAdminBase._check_access(self)
-        if not rb_is_admin(session.user):
-            raise Forbidden
-
     @use_args(room_args)
     def _process(self, args):
         update_room(self.room, args)

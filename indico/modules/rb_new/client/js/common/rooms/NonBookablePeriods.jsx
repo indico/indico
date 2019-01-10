@@ -87,6 +87,7 @@ export default class NonBookablePeriods extends React.Component {
                     return (
                         <div key={key} className="flex-container">
                             <DateRangePicker small
+                                             minimumNights={0}
                                              anchorDirection={ANCHOR_RIGHT}
                                              startDate={startDt === null ? null : moment(startDt)}
                                              endDate={endDt === null ? null : moment(endDt)}

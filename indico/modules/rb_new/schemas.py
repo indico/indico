@@ -255,6 +255,9 @@ class BlockingSchema(mm.ModelSchema):
 
 
 class NonBookablePeriodSchema(mm.ModelSchema):
+    start_dt = NaiveDateTime()
+    end_dt = NaiveDateTime()
+
     class Meta:
         model = NonBookablePeriod
         fields = ('start_dt', 'end_dt')
