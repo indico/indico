@@ -805,7 +805,7 @@ class Room(versioned_cache(_cache, 'id'), ProtectionManagersMixin, db.Model, Ser
         if self.is_public and self.reservations_need_confirmation:
             return True
         # When the room does not use prebookings, we do not want the prebook option to show
-        # up for admins or room members unless they are actually in the ACL with the prebook
+        # up for admins or room managers unless they are actually in the ACL with the prebook
         # permission.
         explicit = not self.reservations_need_confirmation
         return self.can_manage(user, permission='prebook', allow_admin=allow_admin, explicit_permission=explicit)

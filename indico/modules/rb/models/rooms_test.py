@@ -685,6 +685,12 @@ def test_permissions_manager(dummy_room, dummy_user, reservations_need_confirmat
     assert dummy_room.can_moderate(dummy_user)
 
 
+def test_permissions_manager_explicit_prebook(dummy_room, dummy_user):
+    dummy_room.protection_mode = ProtectionMode.public
+    dummy_room.update_principal(dummy_user, full_access=True, permissions={'prebook'})
+    assert dummy_room.can_prebook(dummy_user)
+
+
 @pytest.mark.parametrize('reservations_need_confirmation', (True, False))
 def test_permissions_public_room(dummy_room, dummy_user, reservations_need_confirmation):
     dummy_room.protection_mode = ProtectionMode.public
@@ -701,6 +707,17 @@ def test_permissions_protected_room(dummy_room, dummy_user):
     assert not dummy_room.can_prebook(dummy_user)
     assert not dummy_room.can_override(dummy_user)
     assert not dummy_room.can_moderate(dummy_user)
+
+
+@pytest.mark.parametrize('reservations_need_confirmation', (True, False))
+def test_permissions_protected_room_admin(dummy_room, dummy_user, reservations_need_confirmation):
+    dummy_user.is_admin = True
+    dummy_room.protection_mode = ProtectionMode.protected
+    dummy_room.reservations_need_confirmation = reservations_need_confirmation
+    assert dummy_room.can_book(dummy_user)
+    assert dummy_room.can_prebook(dummy_user) == reservations_need_confirmation
+    assert dummy_room.can_override(dummy_user)
+    assert dummy_room.can_moderate(dummy_user)
 
 
 @pytest.mark.parametrize('permission', ('book', 'prebook', 'override', 'moderate'))
