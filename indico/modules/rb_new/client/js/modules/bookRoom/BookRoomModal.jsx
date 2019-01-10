@@ -23,7 +23,7 @@ import PropTypes from 'prop-types';
 import {Button, Checkbox, Form, Grid, Icon, Message, Modal, Radio, Segment, Popup} from 'semantic-ui-react';
 import {Form as FinalForm, Field} from 'react-final-form';
 import createDecorator from 'final-form-calculate';
-import {ReduxFormField, ReduxRadioField, formatters} from 'indico/react/forms';
+import {ReduxDropdownField, ReduxFormField, ReduxRadioField, formatters} from 'indico/react/forms';
 import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
 import PrincipalSearchField from 'indico/react/components/PrincipalSearchField';
 import {Overridable, IndicoPropTypes} from 'indico/react/util';
@@ -71,11 +71,14 @@ class BookRoomModal extends React.Component {
         availability: PropTypes.object,
         favoriteUsers: PropTypes.array.isRequired,
         timeInformationComponent: PropTypes.func,
+        relatedEvents: PropTypes.array.isRequired,
         actions: PropTypes.exact({
             createBooking: PropTypes.func.isRequired,
             fetchAvailability: PropTypes.func.isRequired,
             resetAvailability: PropTypes.func.isRequired,
-            openBookingDetails: PropTypes.func.isRequired
+            openBookingDetails: PropTypes.func.isRequired,
+            fetchRelatedEvents: PropTypes.func.isRequired,
+            resetRelatedEvents: PropTypes.func.isRequired
         }).isRequired,
         defaultTitles: PropTypes.shape({
             booking: IndicoPropTypes.i18n,
@@ -100,13 +103,19 @@ class BookRoomModal extends React.Component {
     };
 
     componentDidMount() {
-        const {actions: {fetchAvailability}, room, bookingData: {isPrebooking, ...data}} = this.props;
+        const {
+            actions: {fetchAvailability, fetchRelatedEvents},
+            room,
+            bookingData: {isPrebooking, ...data}
+        } = this.props;
         fetchAvailability(room, data);
+        fetchRelatedEvents(room, data);
     }
 
     componentWillUnmount() {
-        const {actions: {resetAvailability}} = this.props;
+        const {actions: {resetAvailability, resetRelatedEvents}} = this.props;
         resetAvailability();
+        resetRelatedEvents();
     }
 
     renderPrincipalSearchField = ({input, showCurrentUserPlaceholder, ...fieldProps}) => {
@@ -290,6 +299,28 @@ class BookRoomModal extends React.Component {
         );
     }
 
+    renderRelatedEventsDropdown(disabled) {
+        const {relatedEvents} = this.props;
+        const options = relatedEvents.map((event) => ({text: event.title, value: event.id}));
+
+        if (!relatedEvents.length) {
+            return;
+        }
+
+        return (
+            <Segment>
+                <h3>{Translate.string('Event')}</h3>
+                <Field name="event"
+                       component={ReduxDropdownField}
+                       options={options}
+                       selection
+                       placeholder={Translate.string('Choose event you want to link with the booking')}
+                       clearable
+                       disabled={disabled} />
+            </Segment>
+        );
+    }
+
     render() {
         const {
             bookingData: {recurrence, dates, timeSlot, isPrebooking},
@@ -298,7 +329,6 @@ class BookRoomModal extends React.Component {
             defaultTitles
         } = this.props;
         const {skipConflicts, bookingConflictsVisible} = this.state;
-
         if (!room) {
             return null;
         }
@@ -332,9 +362,12 @@ class BookRoomModal extends React.Component {
                         </Grid.Column>
                         <Grid.Column width={8}>
                             {isPrebooking && this.renderPrebookingMessage()}
-                            <Segment inverted color="blue">
-                                <Form inverted id="book-room-form" onSubmit={fprops.handleSubmit}>
-                                    <h2><Icon name="user" />Usage</h2>
+                            <Form id="book-room-form" onSubmit={fprops.handleSubmit}>
+                                <Segment inverted color="blue">
+                                    <h3>
+                                        <Icon name="user" />
+                                        <Translate>Usage</Translate>
+                                    </h3>
                                     <Form.Group>
                                         <Field name="usage"
                                                radioValue="myself"
@@ -362,8 +395,9 @@ class BookRoomModal extends React.Component {
                                            placeholder={Translate.string('Reason for booking')}
                                            disabled={bookingBlocked(fprops)}
                                            required />
-                                </Form>
-                            </Segment>
+                                </Segment>
+                                {this.renderRelatedEventsDropdown(bookingBlocked(fprops))}
+                            </Form>
                             {conflictsExist && this.renderBookingConstraints(Object.values(availability.conflicts))}
                             {this.renderBookingState(fprops)}
                         </Grid.Column>
@@ -404,12 +438,15 @@ export default connect(
         favoriteUsers: userSelectors.getFavoriteUsers(state),
         userFullName: userSelectors.getUserFullName(state),
         availability: state.bookRoom.bookingForm.availability,
+        relatedEvents: state.bookRoom.bookingForm.relatedEvents,
         room: roomsSelectors.getRoom(state, {roomId}),
     }),
     dispatch => ({
         actions: bindActionCreators({
             fetchAvailability: actions.fetchBookingAvailability,
             resetAvailability: actions.resetBookingAvailability,
+            fetchRelatedEvents: actions.fetchRelatedEvents,
+            resetRelatedEvents: actions.resetRelatedEvents,
             createBooking: (data, props) => {
                 const {reason, usage, user, isPrebooking} = data;
                 const {bookingData: {recurrence, dates, timeSlot}, room} = props;

@@ -184,6 +184,11 @@ const bookingFormReducer = combineReducers({
             actions.GET_BOOKING_AVAILABILITY_SUCCESS,
             actions.GET_BOOKING_AVAILABILITY_ERROR
         ),
+        relatedEvents: requestReducer(
+            actions.FETCH_RELATED_EVENTS_REQUEST,
+            actions.FETCH_RELATED_EVENTS_SUCCESS,
+            actions.FETCH_RELATED_EVENTS_ERROR
+        ),
     }),
     availability: (state = null, action) => {
         switch (action.type) {
@@ -194,6 +199,16 @@ const bookingFormReducer = combineReducers({
             default:
                 return state;
         }
+    },
+    relatedEvents: (state = [], action) => {
+        switch (action.type) {
+            case actions.RELATED_EVENTS_RECEIVED:
+                return camelizeKeys(action.data);
+            case actions.RESET_RELATED_EVENTS:
+                return [];
+            default:
+                return state;
+        }
     }
 });
 
@@ -201,5 +216,5 @@ export default roomSearchReducerFactory('bookRoom', {
     timeline: timelineReducer,
     unavailableRooms: unavailableReducer,
     suggestions: suggestionsReducer,
-    bookingForm: bookingFormReducer
+    bookingForm: bookingFormReducer,
 });

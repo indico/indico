@@ -19,6 +19,7 @@ import createBookingURL from 'indico-url:rooms_new.create_booking';
 import fetchTimelineURL from 'indico-url:rooms_new.timeline';
 import fetchSuggestionsURL from 'indico-url:rooms_new.suggestions';
 import searchRoomsURL from 'indico-url:rooms_new.search_rooms';
+import fetchEventsURL from 'indico-url:rooms_new.room_events';
 
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {ajaxAction, submitFormAction} from 'indico/utils/redux';
@@ -67,6 +68,13 @@ export const FETCH_SUGGESTIONS_SUCCESS = 'bookRoom/FETCH_SUGGESTIONS_SUCCESS';
 export const FETCH_SUGGESTIONS_ERROR = 'bookRoom/FETCH_SUGGESTIONS_ERROR';
 export const SUGGESTIONS_RECEIVED = 'bookRoom/SUGGESTIONS_RECEIVED';
 export const RESET_SUGGESTIONS = 'bookRoom/RESET_SUGGESTIONS';
+
+// Related events
+export const FETCH_RELATED_EVENTS_REQUEST = 'bookRoom/FETCH_RELATED_EVENTS_REQUEST';
+export const FETCH_RELATED_EVENTS_SUCCESS = 'bookRoom/FETCH_RELATED_EVENTS_SUCCESS';
+export const FETCH_RELATED_EVENTS_ERROR = 'bookRoom/FETCH_RELATED_EVENTS_ERROR';
+export const RELATED_EVENTS_RECEIVED = 'bookRoom/RELATED_EVENTS_RECEIVED';
+export const RESET_RELATED_EVENTS = 'bookRoom/REST_RELATED_EVENTS';
 
 export function createBooking(args) {
     const params = preProcessParameters(args, ajaxRules);
@@ -213,4 +221,19 @@ export function setUnavailableNavMode(mode) {
 
 export function initUnavailableTimeline(selectedDate, mode) {
     return {type: INIT_UNAVAILABLE_TIMELINE, selectedDate, mode};
+}
+
+export function fetchRelatedEvents(room, filters) {
+    const {dates, timeSlot, recurrence} = filters;
+    const params = preProcessParameters({dates, timeSlot, recurrence}, ajaxFilterRules);
+    return ajaxAction(
+        () => indicoAxios.get(fetchEventsURL({room_id: room.id}), {params}),
+        FETCH_RELATED_EVENTS_REQUEST,
+        [RELATED_EVENTS_RECEIVED, FETCH_RELATED_EVENTS_SUCCESS],
+        FETCH_RELATED_EVENTS_ERROR
+    );
+}
+
+export function resetRelatedEvents() {
+    return {type: RESET_RELATED_EVENTS};
 }

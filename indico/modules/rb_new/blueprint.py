@@ -48,8 +48,9 @@ _bp.add_url_rule('/api/rooms/<int:room_id>/attributes', 'room_attributes', rooms
 _bp.add_url_rule('/api/rooms/<int:room_id>/timeline', 'timeline', bookings.RHTimeline)
 _bp.add_url_rule('/api/rooms/<int:room_id>/stats', 'room_stats', rooms.RHRoomStats)
 _bp.add_url_rule('/api/rooms/<int:room_id>/availability/simple', 'check_room_available', rooms.RHCheckRoomAvailable)
-_bp.add_url_rule('/api/suggestions', 'suggestions', bookings.RHRoomSuggestions)
 _bp.add_url_rule('/api/rooms/<int:room_id>/events', 'room_events', rooms.RHRoomEvents)
+_bp.add_url_rule('/api/suggestions', 'suggestions', bookings.RHRoomSuggestions)
+
 
 # User
 _bp.add_url_rule('/api/user/', 'user_info', misc.RHUserInfo)
