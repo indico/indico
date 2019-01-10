@@ -673,12 +673,14 @@ def test_check_bookable_hours_no_user(db, dummy_room):
 
 
 @pytest.mark.parametrize('reservations_need_confirmation', (True, False))
-def test_permissions_manager(dummy_room, dummy_user, reservations_need_confirmation):
+@pytest.mark.parametrize('is_reservable', (True, False))
+def test_permissions_manager(dummy_room, dummy_user, reservations_need_confirmation, is_reservable):
     dummy_room.protection_mode = ProtectionMode.public
     dummy_room.reservations_need_confirmation = reservations_need_confirmation
+    dummy_room.is_reservable = is_reservable
     dummy_room.update_principal(dummy_user, full_access=True)
-    assert dummy_room.can_book(dummy_user)
-    assert dummy_room.can_prebook(dummy_user) == reservations_need_confirmation
+    assert dummy_room.can_book(dummy_user) == is_reservable
+    assert dummy_room.can_prebook(dummy_user) == (reservations_need_confirmation and is_reservable)
     assert dummy_room.can_override(dummy_user)
     assert dummy_room.can_moderate(dummy_user)
 
@@ -713,13 +715,15 @@ def test_permissions_protected_room_acl(dummy_room, dummy_user, permission):
 @pytest.mark.parametrize('acl_perm', (None, 'book', 'prebook', 'override', 'moderate', '*'))
 @pytest.mark.parametrize('protection_mode', (ProtectionMode.public, ProtectionMode.protected))
 @pytest.mark.parametrize('reservations_need_confirmation', (True, False))
+@pytest.mark.parametrize('is_reservable', (True, False))
 @pytest.mark.parametrize('is_admin', (True, False))
 @pytest.mark.parametrize('bulk_possible', (True, False))
-def test_get_permissions_for_user(is_admin, dummy_room, dummy_user, monkeypatch, bulk_possible,
+def test_get_permissions_for_user(dummy_room, dummy_user, monkeypatch, bulk_possible, is_admin, is_reservable,
                                   reservations_need_confirmation, protection_mode, acl_perm):
     monkeypatch.setattr(User, 'can_get_all_multipass_groups', bulk_possible)
     dummy_user.is_admin = is_admin
     dummy_room.protection_mode = protection_mode
+    dummy_room.is_reservable = is_reservable
     dummy_room.reservations_need_confirmation = reservations_need_confirmation
     if acl_perm == '*':
         dummy_room.update_principal(dummy_user, full_access=True)

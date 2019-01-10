@@ -731,7 +731,8 @@ class Room(versioned_cache(_cache, 'id'), ProtectionManagersMixin, db.Model, Ser
         # XXX: When changing the logic in here, make sure to update can_* as well!
         all_rooms_query = (Room.query
                            .filter(Room.is_active)
-                           .options(load_only('id', 'protection_mode', 'reservations_need_confirmation'),
+                           .options(load_only('id', 'protection_mode', 'reservations_need_confirmation',
+                                              'is_reservable'),
                                     raiseload('owner'),
                                     joinedload('acl_entries')))
         is_admin = cls.is_user_admin(user)
@@ -756,11 +757,14 @@ class Room(versioned_cache(_cache, 'id'), ProtectionManagersMixin, db.Model, Ser
         data = {}
         permissions = {'book', 'prebook', 'override', 'moderate'}
         prebooking_required_rooms = set()
+        non_reservable_rooms = set()
         for room in all_rooms_query:
+            data[room.id] = {x: False for x in permissions}
             if room.reservations_need_confirmation:
                 prebooking_required_rooms.add(room.id)
-            data[room.id] = {x: False for x in permissions}
-            if room.is_public or is_admin:
+            if not room.is_reservable:
+                non_reservable_rooms.add(room.id)
+            if (room.is_reservable and room.is_public) or is_admin:
                 if not room.reservations_need_confirmation or is_admin:
                     data[room.id]['book'] = True
                 if room.reservations_need_confirmation:
@@ -773,7 +777,10 @@ class Room(versioned_cache(_cache, 'id'), ProtectionManagersMixin, db.Model, Ser
                  .filter(Room.is_active, db.or_(*criteria))
                  .options(load_only('room_id', 'full_access', 'permissions')))
         for principal in query:
+            is_reservable = principal.room_id not in non_reservable_rooms
             for permission in permissions:
+                if not is_reservable and not is_admin and permission in ('book', 'prebook'):
+                    continue
                 explicit = permission == 'prebook' and principal.room_id not in prebooking_required_rooms
                 if principal.has_management_permission(permission, explicit=explicit):
                     data[principal.room_id][permission] = True
@@ -785,12 +792,16 @@ class Room(versioned_cache(_cache, 'id'), ProtectionManagersMixin, db.Model, Ser
 
     def can_book(self, user, allow_admin=True):
         # XXX: When changing the logic in here, make sure to update get_permissions_for_user as well!
+        if not self.is_reservable and not (allow_admin and self.is_user_admin(user)):
+            return False
         if self.is_public and not self.reservations_need_confirmation:
             return True
         return self.can_manage(user, permission='book', allow_admin=allow_admin)
 
     def can_prebook(self, user, allow_admin=True):
         # XXX: When changing the logic in here, make sure to update get_permissions_for_user as well!
+        if not self.is_reservable and not (allow_admin and self.is_user_admin(user)):
+            return False
         if self.is_public and self.reservations_need_confirmation:
             return True
         # When the room does not use prebookings, we do not want the prebook option to show
