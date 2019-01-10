@@ -174,11 +174,17 @@ RoomDetails.propTypes = {
 
 
 function RoomAvailabilityBox({room}) {
-    return (
-        (room.canUserBook || room.canUserPrebook) ? (
+    if (room.canUserBook || room.canUserPrebook) {
+        return (
             <Message positive styleName="message-icon" icon="unlock" content={
                 <>
-                    <p><Translate>Anyone can book this space.</Translate></p>
+                    <p>
+                        {room.isPublic ? (
+                            <Translate>Anyone can book this space.</Translate>
+                        ) : (
+                            <Translate>You can book this space.</Translate>
+                        )}
+                    </p>
                     {room.maxAdvanceDays && (
                         <p>
                             <Translate>
@@ -188,11 +194,18 @@ function RoomAvailabilityBox({room}) {
                     )}
                 </>
             } />
-        ) : (
+        );
+    } else if (!room.isReservable) {
+        return (
+            <Message negative styleName="message-icon" icon="exclamation triangle"
+                     content={Translate.string('This space cannot be booked at the moment.')} />
+        );
+    } else {
+        return (
             <Message negative styleName="message-icon" icon="lock"
-                     content={Translate.string('This space is not publicly available.')} />
-        )
-    );
+                     content={Translate.string('You are not authorized to book this space.')} />
+        );
+    }
 }
 
 RoomAvailabilityBox.propTypes = {
