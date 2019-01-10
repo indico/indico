@@ -103,7 +103,7 @@ class BookingEdit extends React.Component {
         if (!(type in data)) {
             return 0;
         }
-        return Object.values(data[type]).reduce((acc, cur) => acc + cur.length, 0);
+        return Object.values(data[type]).reduce((acc, cur) => acc + (cur.length ? 1 : 0), 0);
     };
 
     get numberOfConflicts() {
