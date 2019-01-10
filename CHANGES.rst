@@ -48,6 +48,16 @@ Internal Changes
 
 ----
 
+Version 2.1.6
+-------------
+
+*Unreleased*
+
+Bugfixes
+^^^^^^^^
+
+- Allow adding external users as speakers/chairpersons (:issue:`3562`)
+- Allow adding external users to event ACLs (:issue:`3562`)
 
 Version 2.1.5
 -------------

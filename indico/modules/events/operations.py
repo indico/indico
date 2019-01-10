@@ -342,7 +342,8 @@ def update_permissions(obj, form):
                                      for p in obj.acl_entries}
     current_principal_permissions = {k: v for k, v in current_principal_permissions.iteritems() if v}
     new_principal_permissions = {
-        principal_from_fossil(fossil, allow_emails=True, allow_networks=True, event=event): set(permissions)
+        principal_from_fossil(fossil, allow_emails=True, allow_networks=True, allow_pending=True, event=event):
+            set(permissions)
         for fossil, permissions in form.permissions.data
     }
     update_principals_permissions(obj, current_principal_permissions, new_principal_permissions)
