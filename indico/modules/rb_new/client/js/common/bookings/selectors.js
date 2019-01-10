@@ -31,5 +31,5 @@ export const getDetailsWithRoom = createSelector(
 );
 export const hasDetails = (state, {bookingId}) => getDetails(state, {bookingId}) !== undefined;
 export const isBookingChangeInProgress = ({bookings}) => (
-    bookings.requests.changePreBookingState.state === RequestState.STARTED
+    bookings.requests.changePrebookingState.state === RequestState.STARTED
 );

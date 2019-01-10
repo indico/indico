@@ -137,7 +137,7 @@ function RoomDetails({bookRoom, room, availability, attributes}) {
                     </Header>
                     <DailyTimelineContent rows={availability.map(rowSerializer)} />
                     <RoomStats roomId={room.id} />
-                    {(room.canUserBook || room.canUserPreBook) && (
+                    {(room.canUserBook || room.canUserPrebook) && (
                         <>
                             <Message attached info>
                                 <Icon name="info" />
@@ -150,7 +150,7 @@ function RoomDetails({bookRoom, room, availability, attributes}) {
                                         <Translate>Start booking</Translate>
                                     </Button>
                                 )}
-                                {room.canUserPreBook && (
+                                {room.canUserPrebook && (
                                     <Button color="orange" onClick={() => bookRoom(room.id, {isPrebooking: true})}>
                                         <Icon name="check circle" />
                                         <Translate>Start pre-booking</Translate>
@@ -175,7 +175,7 @@ RoomDetails.propTypes = {
 
 function RoomAvailabilityBox({room}) {
     return (
-        (room.canUserBook || room.canUserPreBook) ? (
+        (room.canUserBook || room.canUserPrebook) ? (
             <Message positive styleName="message-icon" icon="unlock" content={
                 <>
                     <p><Translate>Anyone can book this space.</Translate></p>

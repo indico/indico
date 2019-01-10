@@ -91,7 +91,7 @@ export const getAllRooms = createSelector(
                 equipment: equipment.map(id => equipmentTypes[id].name).sort(),
                 features: sortedFeatures,
                 canUserBook: permissions.book,
-                canUserPreBook: permissions.prebook,
+                canUserPrebook: permissions.prebook,
             }];
         }));
     }

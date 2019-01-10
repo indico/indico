@@ -28,7 +28,7 @@ export default combineReducers({
             bookingsActions.FETCH_BOOKING_DETAILS_SUCCESS,
             bookingsActions.FETCH_BOOKING_DETAILS_ERROR
         ),
-        changePreBookingState: requestReducer(
+        changePrebookingState: requestReducer(
             bookingsActions.BOOKING_STATE_CHANGE_REQUEST,
             bookingsActions.BOOKING_STATE_CHANGE_SUCCESS,
             bookingsActions.BOOKING_STATE_CHANGE_ERROR

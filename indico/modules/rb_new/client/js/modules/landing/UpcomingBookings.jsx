@@ -39,7 +39,7 @@ class UpcomingBookings extends React.PureComponent {
         }).isRequired
     };
 
-    renderPreBookingWarning() {
+    renderPrebookingWarning() {
         return (
             <Label corner="right"
                    icon="time"
@@ -62,7 +62,7 @@ class UpcomingBookings extends React.PureComponent {
                                      width="100%"
                                      height="100px"
                                      styles={{margin: 'auto'}} />
-                        {!isAccepted && this.renderPreBookingWarning()}
+                        {!isAccepted && this.renderPrebookingWarning()}
                         <List.Header as="h3" styleName="upcoming-item-room-notch">
                             <span styleName="upcoming-item-room-name">
                                 {room.name}

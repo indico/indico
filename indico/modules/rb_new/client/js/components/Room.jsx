@@ -110,7 +110,7 @@ class Room extends React.Component {
 
     renderRoomStatus = () => {
         const {
-            room: {isReservable, canUserBook, canUserPreBook},
+            room: {isReservable, canUserBook, canUserPrebook},
             isCheckingUserRoomPermissions,
         } = this.props;
         if (!isReservable) {
@@ -129,7 +129,7 @@ class Room extends React.Component {
                        position="bottom center"
                        hideOnScroll />
             );
-        } else if (!canUserBook && !canUserPreBook) {
+        } else if (!canUserBook && !canUserPrebook) {
             return (
                 <Popup key="not-authorized"
                        trigger={<Icon name="lock" color="red" />}
