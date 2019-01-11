@@ -23,15 +23,12 @@ import {selectors as roomsSelectors} from '../rooms';
 export function roomSearchSelectorFactory(namespace) {
     const getFilters = ({[namespace]: stateSlice}) => stateSlice.filters;
     const getSearchResultIds = ({[namespace]: stateSlice}) => stateSlice.search.results.rooms;
+    const getSearchResultIdsWithoutAvailabilityFilter =
+        ({[namespace]: stateSlice}) => stateSlice.search.results.roomsWithoutAvailabilityFilter;
     const getTotalResultCount = ({[namespace]: stateSlice}) => stateSlice.search.results.total;
     const getAvailabilityDateRange = ({[namespace]: stateSlice}) => stateSlice.search.results.availabilityDays;
     const isSearching = ({[namespace]: stateSlice}) => stateSlice.search.request.state === RequestState.STARTED;
     const isSearchFinished = ({[namespace]: stateSlice}) => stateSlice.search.request.state === RequestState.SUCCESS;
-    const hasUnavailableRooms = createSelector(
-        getSearchResultIds,
-        getTotalResultCount,
-        (available, totalCount) => available.length !== totalCount
-    );
 
     const getSearchResults = createSelector(
         getSearchResultIds,
@@ -61,9 +58,9 @@ export function roomSearchSelectorFactory(namespace) {
         isSearchFinished,
         getSearchResults,
         getSearchResultIds,
+        getSearchResultIdsWithoutAvailabilityFilter,
         getTotalResultCount,
         getSearchResultsForMap,
         getAvailabilityDateRange,
-        hasUnavailableRooms,
     };
 }

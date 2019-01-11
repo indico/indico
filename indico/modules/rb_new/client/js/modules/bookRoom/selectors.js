@@ -19,6 +19,7 @@ import {createSelector} from 'reselect';
 import {RequestState} from 'indico/utils/redux';
 import {roomSearchSelectorFactory} from '../../common/roomSearch';
 import {selectors as roomsSelectors} from '../../common/rooms';
+import {selectors as userSelectors} from '../../common/user';
 
 
 const {
@@ -27,10 +28,10 @@ const {
     isSearchFinished,
     getSearchResults,
     getSearchResultIds,
+    getSearchResultIdsWithoutAvailabilityFilter,
     getTotalResultCount,
     getSearchResultsForMap,
     getAvailabilityDateRange,
-    hasUnavailableRooms
 } = roomSearchSelectorFactory('bookRoom');
 
 export const isFetchingFormTimeline = ({bookRoom}) => {
@@ -72,8 +73,74 @@ export const getSuggestedRoomIds = createSelector(
     getRawSuggestions,
     suggestions => suggestions.map(x => x.room_id)
 );
+
 export const getBookingFormAvailability = ({bookRoom}) => bookRoom.bookingForm.availability;
 export const getBookingFormRelatedEvents = ({bookRoom}) => bookRoom.bookingForm.relatedEvents;
+
+export const isSearchingOrCheckingPermissions = createSelector(
+    isSearching,
+    userSelectors.isCheckingUserRoomPermissions,
+    (searching, checkingPermissions) => searching || checkingPermissions
+);
+export const isSearchAndPermissionCheckFinished = createSelector(
+    isSearchFinished,
+    userSelectors.isCheckingUserRoomPermissions,
+    (searchFinished, checkingPermissions) => searchFinished && !checkingPermissions
+);
+
+/**
+ * Get the rooms ids which are matching the filter criteria and bookable
+ * by the user during the selected time slot.
+ */
+export const getSearchResultIdsWithoutUnbookable = createSelector(
+    getSearchResultIds,
+    userSelectors.getUnbookableRoomIds,
+    (roomIds, unbookableRoomIds) => {
+        const unbookable = new Set(unbookableRoomIds);
+        return roomIds.filter(id => !unbookable.has(id));
+    }
+);
+
+/**
+ * Get the rooms which are matching the filter criteria and bookable by
+ * the user during the selected time slot.
+ */
+export const getSearchResultsWithoutUnbookable = createSelector(
+    getSearchResultIdsWithoutUnbookable,
+    roomsSelectors.getAllRooms,
+    (roomIds, allRooms) => roomIds.map(id => allRooms[id])
+);
+
+/**
+ * Get the total number of rooms matching the filter criteria except
+ * those the user is unauthorized to book.
+ */
+const getTotalResultCountWithoutUnbookable = createSelector(
+    getSearchResultIdsWithoutAvailabilityFilter,
+    userSelectors.getUnbookableRoomIds,
+    (roomIds, unbookableRoomIds) => {
+        const unbookable = new Set(unbookableRoomIds);
+        return roomIds.filter(id => !unbookable.has(id)).length;
+    }
+);
+
+/** Get the number of rooms the user is not authorized to book */
+export const getUnbookableResultCount = createSelector(
+    getSearchResultIdsWithoutAvailabilityFilter,
+    getTotalResultCountWithoutUnbookable,
+    (roomIds, bookableCount) => roomIds.length - bookableCount
+);
+
+/**
+ * Check whether there are rooms that the user cannot book at the
+ * moment even though they are authorized to book the room at another
+ * time.
+ */
+export const hasUnavailableRooms = createSelector(
+    getSearchResultsWithoutUnbookable,
+    getTotalResultCountWithoutUnbookable,
+    (available, total) => available.length !== total
+);
 
 export {
     getFilters,
@@ -84,5 +151,4 @@ export {
     getTotalResultCount,
     getSearchResultsForMap,
     getAvailabilityDateRange,
-    hasUnavailableRooms,
 };

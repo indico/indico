@@ -73,8 +73,12 @@ class RHSearchRooms(RHRoomBookingBase):
             availability = not only_unavailable
         search_query = search_for_rooms(args, availability=availability)
         room_ids = [id_ for id_, in search_query.with_entities(Room.id)]
-        total = len(room_ids) if not filter_availability else search_for_rooms(args).count()
-        return jsonify(rooms=room_ids, total=total, availability_days=self._get_date_range(args))
+        if filter_availability:
+            room_ids_without_availability_filter = [id_ for id_, in search_for_rooms(args).with_entities(Room.id)]
+        else:
+            room_ids_without_availability_filter = room_ids
+        return jsonify(rooms=room_ids, rooms_without_availability_filter=room_ids_without_availability_filter,
+                       total=len(room_ids_without_availability_filter), availability_days=self._get_date_range(args))
 
     def _get_date_range(self, filters):
         try:

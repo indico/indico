@@ -30,16 +30,18 @@ import './BookRoom.module.scss';
 class SearchResultCount extends React.Component {
     static propTypes = {
         isSearching: PropTypes.bool.isRequired,
-        matching: PropTypes.number,
-        total: PropTypes.number,
+        available: PropTypes.number,
+        totalMatchingFilters: PropTypes.number,
+        unbookable: PropTypes.number,
         actions: PropTypes.exact({
             openUnavailableRooms: PropTypes.func.isRequired,
         }).isRequired,
     };
 
     static defaultProps = {
-        matching: null,
-        total: null
+        available: null,
+        totalMatchingFilters: null,
+        unbookable: null,
     };
 
     renderRoomTotal(count) {
@@ -106,6 +108,26 @@ class SearchResultCount extends React.Component {
         );
     }
 
+    renderUnbookable(count) {
+        const label = <Label color="red" horizontal size="small">{count}</Label>;
+        const trigger = (
+            <Menu.Item as="span">
+                <Icon name="lock" />
+                <Translate>
+                    Unauthorized
+                    <Param name="count" value={label} />
+                </Translate>
+            </Menu.Item>
+        );
+        return (
+            <Popup trigger={trigger}>
+                <Translate>
+                    Spaces you are not authorized to book.
+                </Translate>
+            </Popup>
+        );
+    }
+
     renderNoRooms() {
         return (
             <Message icon="times circle outline"
@@ -123,9 +145,10 @@ class SearchResultCount extends React.Component {
     }
 
     render() {
-        const {isSearching, matching, total} = this.props;
+        const {isSearching, available, totalMatchingFilters, unbookable} = this.props;
+        const unavailable = totalMatchingFilters - available - unbookable;
         const style = {
-            display: (isSearching || (total > 0)) ? 'inline-flex' : 'none'
+            display: (isSearching || (totalMatchingFilters > 0)) ? 'inline-flex' : 'none'
         };
 
         return (
@@ -141,19 +164,20 @@ class SearchResultCount extends React.Component {
                             <div className="bar" />
                         </div>
                     ) : (
-                        !!total && (
+                        !!totalMatchingFilters && (
                             <>
-                                {this.renderRoomTotal(total)}
-                                {this.renderRoomAvailable(matching)}
-                                {(matching < total) && this.renderUnavailable(total - matching)}
+                                {this.renderRoomTotal(totalMatchingFilters)}
+                                {this.renderRoomAvailable(available)}
+                                {!!unavailable && this.renderUnavailable(unavailable)}
+                                {!!unbookable && this.renderUnbookable(unbookable)}
                             </>
                         )
                     )}
                 </Menu>
                 {!isSearching && (
                     <>
-                        {total > 0 && matching === 0 && this.renderNoMatching()}
-                        {total === 0 && this.renderNoRooms()}
+                        {totalMatchingFilters > 0 && available === 0 && this.renderNoMatching()}
+                        {totalMatchingFilters === 0 && this.renderNoRooms()}
                     </>
                 )}
             </div>

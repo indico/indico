@@ -61,6 +61,7 @@ class BookRoom extends React.Component {
         isTimelineVisible: PropTypes.bool.isRequired,
         hasConflicts: PropTypes.bool.isRequired,
         totalResultCount: PropTypes.number.isRequired,
+        unbookableResultCount: PropTypes.number.isRequired,
         filters: PropTypes.object.isRequired,
         suggestions: PropTypes.arrayOf(PropTypes.object).isRequired,
         showMap: PropTypes.bool.isRequired,
@@ -152,6 +153,7 @@ class BookRoom extends React.Component {
         const {
             isSearching,
             totalResultCount,
+            unbookableResultCount,
             results,
             isTimelineVisible,
             actions,
@@ -178,9 +180,10 @@ class BookRoom extends React.Component {
                     </div>
                     {this.renderViewSwitch()}
                 </div>
-                <SearchResultCount matching={results.length}
-                                   total={totalResultCount}
-                                   isFetching={isSearching} />
+                <SearchResultCount available={results.length}
+                                   totalMatchingFilters={totalResultCount}
+                                   isFetching={isSearching}
+                                   unbookable={unbookableResultCount} />
                 {isTimelineVisible && selectedDate && (
                     <TimelineHeader datePicker={datePicker}
                                     disableDatePicker={isSearching}
@@ -461,11 +464,12 @@ const mapStateToProps = (state) => {
     return {
         isTimelineVisible: bookRoomSelectors.isTimelineVisible(state),
         filters: bookRoomSelectors.getFilters(state),
-        results: bookRoomSelectors.getSearchResults(state),
+        results: bookRoomSelectors.getSearchResultsWithoutUnbookable(state),
         suggestions: bookRoomSelectors.getSuggestions(state),
         totalResultCount: bookRoomSelectors.getTotalResultCount(state),
-        isSearching: bookRoomSelectors.isSearching(state),
-        searchFinished: bookRoomSelectors.isSearchFinished(state),
+        unbookableResultCount: bookRoomSelectors.getUnbookableResultCount(state),
+        isSearching: bookRoomSelectors.isSearchingOrCheckingPermissions(state),
+        searchFinished: bookRoomSelectors.isSearchAndPermissionCheckFinished(state),
         hasConflicts: bookRoomSelectors.hasUnavailableRooms(state),
         queryString: stateToQueryString(state.bookRoom, qsFilterRules, qsBookRoomRules),
         showMap: mapSelectors.isMapVisible(state),

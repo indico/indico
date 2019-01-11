@@ -79,6 +79,7 @@ export function initialRoomFilterStateFactory(namespace) {
 export function roomSearchReducerFactory(namespace, extra = {}) {
     const initialSearchResultsState = {
         rooms: [],
+        roomsWithoutAvailabilityFilter: [],
         total: 0,
     };
     const actions = roomSearchActionsFactory(namespace);

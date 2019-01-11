@@ -29,6 +29,11 @@ export const getFavoriteUsers = state => getUserInfo(state).favoriteUsers;
 export const getAllUserRoomPermissions = ({user}) => user.roomPermissions;
 export const isCheckingUserRoomPermissions = ({user}) => user.requests.roomPermissions.state === RequestState.STARTED;
 
+export const getUnbookableRoomIds = createSelector(
+    getAllUserRoomPermissions,
+    permissions => Object.entries(permissions).filter(([, perms]) => !perms.book && !perms.prebook).map(([id]) => +id)
+);
+
 const getFavoriteRooms = ({user}) => user.favorites;
 export const hasFavoriteRooms = createSelector(
     getFavoriteRooms,
