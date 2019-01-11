@@ -546,6 +546,7 @@ class Room(versioned_cache(_cache, 'id'), ProtectionManagersMixin, db.Model, Ser
             valid_states = (BlockedRoom.State.accepted, BlockedRoom.State.pending)
         else:
             valid_states = (BlockedRoom.State.accepted,)
+        # TODO: only take blockings into account which the user cannot override
         blocking_criteria = [Room.id == BlockedRoom.room_id,
                              BlockedRoom.state.in_(valid_states),
                              db_dates_overlap(Blocking, 'start_date', end_dt.date(), 'end_date', start_dt.date(),
