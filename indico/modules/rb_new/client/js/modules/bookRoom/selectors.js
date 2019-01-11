@@ -67,11 +67,21 @@ const getRawSuggestions = ({bookRoom}) => bookRoom.suggestions.data;
 export const getSuggestions = createSelector(
     getRawSuggestions,
     roomsSelectors.getAllRooms,
-    (suggestions, allRooms) => suggestions.map(suggestion => ({...suggestion, room: allRooms[suggestion.room_id]}))
+    userSelectors.getUnbookableRoomIds,
+    (suggestions, allRooms, unbookableRoomIds) => {
+        const unbookable = new Set(unbookableRoomIds);
+        return suggestions
+            .filter(suggestion => !unbookable.has(suggestion.room_id))
+            .map(suggestion => ({...suggestion, room: allRooms[suggestion.room_id]}));
+    }
 );
 export const getSuggestedRoomIds = createSelector(
     getRawSuggestions,
-    suggestions => suggestions.map(x => x.room_id)
+    userSelectors.getUnbookableRoomIds,
+    (suggestions, unbookableRoomIds) => {
+        const unbookable = new Set(unbookableRoomIds);
+        return suggestions.filter(x => !unbookable.has(x.room_id)).map(x => x.room_id);
+    }
 );
 
 export const getBookingFormAvailability = ({bookRoom}) => bookRoom.bookingForm.availability;
@@ -89,7 +99,7 @@ export const isSearchAndPermissionCheckFinished = createSelector(
 );
 
 /**
- * Get the rooms ids which are matching the filter criteria and bookable
+ * Get the room ids which are matching the filter criteria and bookable
  * by the user during the selected time slot.
  */
 export const getSearchResultIdsWithoutUnbookable = createSelector(
