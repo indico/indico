@@ -68,7 +68,7 @@ class BookingEdit extends React.Component {
                 isFetching: false,
                 data: {
                     bookings: occurrences.bookings,
-                    cancellations: occurrences.cancellations,
+                    cancelations: occurrences.cancelations,
                     rejections: occurrences.rejections,
                     other: occurrences.otherBookings,
                     candidates: {},
@@ -143,7 +143,7 @@ class BookingEdit extends React.Component {
         const availabilityData = availability[0][1];
         const conflicts = _.fromPairs(newDateRange.map((day) => {
             const allConflicts = availabilityData.conflicts[day] || [];
-            if (day in calendar.data.cancellations || day in calendar.data.rejections) {
+            if (day in calendar.data.cancelations || day in calendar.data.rejections) {
                 return [day, []];
             }
             return [day, allConflicts.filter((c) => c.reservation.id !== bookingId)];
@@ -172,9 +172,9 @@ class BookingEdit extends React.Component {
             candidates = availabilityData.candidates;
         }
 
-        /* Filter out rejections and cancellations from candidates */
-        const {data: {cancellations, rejections}} = calendar;
-        const candidatesDateRange = newDateRange.filter(date => !(date in rejections) && !(date in cancellations));
+        /* Filter out rejections and cancelations from candidates */
+        const {data: {cancelations, rejections}} = calendar;
+        const candidatesDateRange = newDateRange.filter(date => !(date in rejections) && !(date in cancelations));
         candidates = _.pick(candidates, candidatesDateRange);
 
         this.setState({
@@ -240,7 +240,7 @@ class BookingEdit extends React.Component {
         const {booking: {room}} = this.props;
         const legendLabels = [
             {label: Translate.string('Current booking'), color: 'orange'},
-            {label: Translate.string('Cancelled occurrences'), style: 'cancellation'},
+            {label: Translate.string('Cancelled occurrences'), style: 'cancelation'},
             {label: Translate.string('Rejected occurrences'), style: 'rejection'},
             {label: Translate.string('Other bookings'), style: 'other'},
             {label: Translate.string('New booking'), color: 'green'},
@@ -250,7 +250,7 @@ class BookingEdit extends React.Component {
             return {
                 availability: {
                     bookings: av.bookings[day] || [],
-                    cancellations: av.cancellations[day] || [],
+                    cancelations: av.cancelations[day] || [],
                     rejections: av.rejections[day] || [],
                     other: av.other[day] || [],
                     candidates: (av.candidates[day] || []).map(candidate => ({...candidate, bookable: false})),

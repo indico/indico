@@ -98,10 +98,10 @@ class BookingDetails extends React.Component {
 
     _getRowSerializer = (day) => {
         const {booking: {room}} = this.props;
-        return ({bookings, cancellations, rejections, otherBookings}) => ({
+        return ({bookings, cancelations, rejections, otherBookings}) => ({
             availability: {
                 bookings: bookings[day].map((candidate) => ({...candidate, bookable: false})) || [],
-                cancellations: cancellations[day] || [],
+                cancelations: cancelations[day] || [],
                 rejections: rejections[day] || [],
                 other: otherBookings[day] || [],
             },
@@ -344,7 +344,7 @@ class BookingDetails extends React.Component {
         } = this.props;
         const legendLabels = [
             {label: Translate.string('Current'), color: 'orange'},
-            {label: Translate.string('Cancelled'), style: 'cancellation'},
+            {label: Translate.string('Cancelled'), style: 'cancelation'},
             {label: Translate.string('Rejected'), style: 'rejection'},
             {label: Translate.string('Other bookings'), style: 'other'},
         ];
