@@ -86,7 +86,6 @@ class ReservationEventDataSchema(Schema):
 class ReservationUserEventsSchema(Schema):
     id = Number()
     title = String()
-    url = String()
     start_dt = DateTime()
     end_dt = DateTime()
 

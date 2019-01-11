@@ -299,9 +299,21 @@ class BookRoomModal extends React.Component {
         );
     }
 
-    renderRelatedEventsDropdown(disabled) {
+    renderEventItem = (event) => {
+        const start = `${moment(event.startDt).format('L')} ${moment(event.startDt).format('LT')}`;
+        const sameDate = moment(event.startDt).isSame(event.endDt, 'date');
+        const endTime = moment(event.endDt).format('LT');
+        const end = sameDate ? `${endTime}` : `${moment(event.endDt).format('L')} ${endTime}`;
+        return {
+            text: event.title,
+            description: `${start} - ${end}`,
+            value: event.id
+        };
+    };
+
+    renderRelatedEventsDropdown = (disabled) => {
         const {relatedEvents} = this.props;
-        const options = relatedEvents.map((event) => ({text: event.title, value: event.id}));
+        const options = relatedEvents.map(this.renderEventItem);
 
         if (!relatedEvents.length) {
             return;
@@ -309,17 +321,23 @@ class BookRoomModal extends React.Component {
 
         return (
             <Segment>
-                <h3>{Translate.string('Event')}</h3>
+                <h3><Icon name="chain" />{Translate.string('Event')}</h3>
+                <div styleName="events-segment-description">
+                    <Translate>
+                        You have events taking place in this room overlapping with booking times.
+                        If you are booking this room for one of your events, please select it below.
+                    </Translate>
+                </div>
                 <Field name="event"
                        component={ReduxDropdownField}
                        options={options}
                        selection
-                       placeholder={Translate.string('Choose event you want to link with the booking')}
+                       placeholder={Translate.string('Choose an event')}
                        clearable
                        disabled={disabled} />
             </Segment>
         );
-    }
+    };
 
     render() {
         const {
