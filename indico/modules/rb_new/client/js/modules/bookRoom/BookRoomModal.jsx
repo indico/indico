@@ -323,10 +323,16 @@ class BookRoomModal extends React.Component {
             <Segment>
                 <h3><Icon name="chain" />{Translate.string('Event')}</h3>
                 <div styleName="events-segment-description">
-                    <Translate>
-                        You have events taking place in this room overlapping with booking times.
-                        If you are booking this room for one of your events, please select it below.
-                    </Translate>
+                    <PluralTranslate count={relatedEvents.length}>
+                        <Singular>
+                            You have an event taking place in this room overlapping with booking times.
+                            If you are booking this room for this event, please select it below.
+                        </Singular>
+                        <Plural>
+                            You have events taking place in this room overlapping with booking times.
+                            If you are booking this room for one of your events, please select it below.
+                        </Plural>
+                    </PluralTranslate>
                 </div>
                 <Field name="event"
                        component={ReduxDropdownField}
