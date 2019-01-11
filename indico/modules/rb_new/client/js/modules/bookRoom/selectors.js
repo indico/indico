@@ -30,7 +30,7 @@ const {
     getSearchResultIds,
     getSearchResultIdsWithoutAvailabilityFilter,
     getTotalResultCount,
-    getSearchResultsForMap,
+    getSearchResultsForMap: getAllSearchResultsForMap,
     getAvailabilityDateRange,
 } = roomSearchSelectorFactory('bookRoom');
 
@@ -152,6 +152,18 @@ export const hasUnavailableRooms = createSelector(
     (available, total) => available.length !== total
 );
 
+/**
+ * Get the map data for the current result list without unbookable ones.
+ */
+export const getSearchResultsForMap = createSelector(
+    getAllSearchResultsForMap,
+    userSelectors.getUnbookableRoomIds,
+    (mapResults, unbookableRoomIds) => {
+        const unbookable = new Set(unbookableRoomIds);
+        return mapResults.filter(x => !unbookable.has(x.id));
+    }
+);
+
 export {
     getFilters,
     isSearching,
@@ -159,6 +171,5 @@ export {
     getSearchResults,
     getSearchResultIds,
     getTotalResultCount,
-    getSearchResultsForMap,
     getAvailabilityDateRange,
 };
