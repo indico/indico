@@ -175,7 +175,7 @@ class BookRoom extends React.Component {
                 <div className="filter-row">
                     <div className="filter-row-filters">
                         <BookingFilterBar />
-                        <RoomFilterBar />
+                        <RoomFilterBar showOnlyAuthorizedFilter={false} />
                         <SearchBar />
                     </div>
                     {this.renderViewSwitch()}

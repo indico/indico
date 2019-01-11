@@ -87,6 +87,8 @@ export class RoomFilterBarBase extends React.Component {
         })).isRequired,
         buildings: PropTypes.array.isRequired,
         hasFavoriteRooms: PropTypes.bool,
+        showOnlyAuthorizedFilter: PropTypes.bool,
+        hasUnbookableRooms: PropTypes.bool.isRequired,
         hasOwnedRooms: PropTypes.bool,
         extraButtons: PropTypes.node,
         filters: PropTypes.shape({
@@ -95,6 +97,7 @@ export class RoomFilterBarBase extends React.Component {
             equipment: PropTypes.array,
             onlyFavorites: PropTypes.bool,
             onlyMine: PropTypes.bool,
+            onlyAuthorized: PropTypes.bool,
             features: PropTypes.arrayOf(PropTypes.string).isRequired,
         }).isRequired,
         actions: PropTypes.shape({
@@ -107,6 +110,7 @@ export class RoomFilterBarBase extends React.Component {
 
     static defaultProps = {
         hasFavoriteRooms: false,
+        showOnlyAuthorizedFilter: true,
         hasOwnedRooms: false,
         extraButtons: null,
         hideOptions: {},
@@ -116,8 +120,11 @@ export class RoomFilterBarBase extends React.Component {
     render() {
         const {
             equipmentTypes, features: availableFeatures, hasOwnedRooms, hasFavoriteRooms, buildings,
-            extraButtons, hideOptions, disabled,
-            filters: {capacity, onlyFavorites, onlyMine, equipment, features, building, ...extraFilters},
+            extraButtons, hideOptions, disabled, showOnlyAuthorizedFilter, hasUnbookableRooms,
+            filters: {
+                capacity, onlyFavorites, onlyMine, onlyAuthorized, equipment, features, building,
+                ...extraFilters
+            },
             actions: {setFilterParameter, setFilters}
         } = this.props;
 
@@ -181,6 +188,12 @@ export class RoomFilterBarBase extends React.Component {
                                                 disabled={disabled} />}
                                content={Translate.string('Show only rooms I manage')} />
                     )}
+                    {showOnlyAuthorizedFilter && (hasUnbookableRooms || onlyAuthorized) && (
+                        <Popup trigger={<Button icon="lock open" primary={onlyAuthorized}
+                                                onClick={() => setFilterParameter('onlyAuthorized', !onlyAuthorized)}
+                                                disabled={disabled} />}
+                               content={Translate.string('Show only rooms I am authorized to book')} />
+                    )}
                     {extraButtons}
                 </FilterBarController>
             </Button.Group>
@@ -195,6 +208,7 @@ export default (namespace, searchRoomsSelectors) => connect(
         features: roomsSelectors.getFeatures(state),
         hasOwnedRooms: userSelectors.hasOwnedRooms(state),
         hasFavoriteRooms: userSelectors.hasFavoriteRooms(state),
+        hasUnbookableRooms: userSelectors.hasUnbookableRooms(state),
         buildings: roomsSelectors.getBuildings(state),
     }),
     dispatch => ({

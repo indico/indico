@@ -34,6 +34,11 @@ export const getUnbookableRoomIds = createSelector(
     permissions => Object.entries(permissions).filter(([, perms]) => !perms.book && !perms.prebook).map(([id]) => +id)
 );
 
+export const hasUnbookableRooms = createSelector(
+    getUnbookableRoomIds,
+    unbookableRoomIds => !!unbookableRoomIds.length
+);
+
 const getFavoriteRooms = ({user}) => user.favorites;
 export const hasFavoriteRooms = createSelector(
     getFavoriteRooms,

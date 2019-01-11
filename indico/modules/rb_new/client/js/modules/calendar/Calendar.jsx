@@ -30,6 +30,7 @@ import * as calendarSelectors from './selectors';
 import {actions as bookingsActions} from '../../common/bookings';
 import {actions as filtersActions} from '../../common/filters';
 import {selectors as roomsSelectors, actions as roomsActions} from '../../common/rooms';
+import {selectors as userSelectors} from '../../common/user';
 import {EditableTimelineItem, ElasticTimeline, TimelineHeader, TimelineItem} from '../../common/timeline';
 import CalendarListView from './CalendarListView';
 import {actions as bookRoomActions} from '../bookRoom';
@@ -50,7 +51,10 @@ class Calendar extends React.Component {
         isFetchingActiveBookings: PropTypes.bool.isRequired,
         roomFilters: PropTypes.object.isRequired,
         calendarFilters: PropTypes.object.isRequired,
-        localFilters: PropTypes.object.isRequired,
+        localFilters: PropTypes.shape({
+            hideUnused: PropTypes.bool.isRequired,
+        }).isRequired,
+        unbookableRoomIds: PropTypes.arrayOf(PropTypes.number).isRequired,
         allowDragDrop: PropTypes.bool,
         view: PropTypes.oneOf(['timeline', 'list']).isRequired,
         actions: PropTypes.exact({
@@ -121,6 +125,23 @@ class Calendar extends React.Component {
         setFilterParameter('hideUnused', !hideUnused);
     };
 
+    getFilteredRows = () => {
+        const {
+            calendarData: {rows},
+            roomFilters: {onlyAuthorized},
+            unbookableRoomIds,
+        } = this.props;
+
+        if (!onlyAuthorized) {
+            return rows;
+        }
+
+        // We need to re-filter in case the page was loaded with this filter, since
+        // the initial request might not have the permission information yet
+        const unbookable = new Set(unbookableRoomIds);
+        return rows.filter(([id]) => !unbookable.has(id));
+    };
+
     renderExtraButtons = () => {
         const {
             calendarFilters: {myBookings},
@@ -189,9 +210,6 @@ class Calendar extends React.Component {
             view,
             isFetching,
             isFetchingActiveBookings,
-            calendarData: {
-                rows
-            },
             localFilters: {
                 hideUnused,
             },
@@ -207,6 +225,7 @@ class Calendar extends React.Component {
             {label: Translate.string('Blocked'), style: 'blocking'},
             {label: Translate.string('Not bookable'), style: 'unbookable'}
         ];
+        const rows = this.getFilteredRows();
         const editable = datePicker.mode === 'days' && allowDragDrop;
         const isTimelineVisible = view === 'timeline';
         return (
@@ -267,6 +286,7 @@ export default connect(
         rooms: roomsSelectors.getAllRooms(state),
         datePicker: calendarSelectors.getDatePickerInfo(state),
         view: calendarSelectors.getCalendarView(state),
+        unbookableRoomIds: userSelectors.getUnbookableRoomIds(state),
     }),
     dispatch => ({
         actions: bindActionCreators({

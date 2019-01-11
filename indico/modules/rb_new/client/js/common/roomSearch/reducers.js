@@ -72,6 +72,12 @@ export function initialRoomFilterStateFactory(namespace) {
         });
     }
 
+    if (namespace === 'roomList' || namespace === 'calendar') {
+        Object.assign(state, {
+            onlyAuthorized: false,
+        });
+    }
+
     return state;
 }
 

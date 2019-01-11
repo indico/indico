@@ -65,6 +65,11 @@ export const rules = {
         sanitizer: v.toBoolean(),
         stateField: boolStateField('filters.onlyMine')
     },
+    authorized: {
+        validator: v.isBoolean(),
+        sanitizer: v.toBoolean(),
+        stateField: boolStateField('filters.onlyAuthorized')
+    },
     capacity: {
         validator: v.isInt({min: 1}),
         sanitizer: v.toInt(),
