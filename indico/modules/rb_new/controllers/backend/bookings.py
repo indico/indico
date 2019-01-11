@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 from datetime import date, datetime, time
 
 from flask import jsonify, request, session
-from marshmallow import fields
+from marshmallow import fields, missing
 from marshmallow_enum import EnumField
 from webargs.flaskparser import use_args, use_kwargs
 from werkzeug.exceptions import Forbidden, NotFound
@@ -109,13 +109,14 @@ class RHTimeline(RHRoomBookingBase):
 class RHCalendar(RHRoomBookingBase):
     @use_kwargs({
         'start_date': fields.Date(missing=lambda: date.today().isoformat()),
-        'end_date': fields.Date(missing=lambda: date.today().isoformat()),
+        'end_date': fields.Date(),
         'my_bookings': fields.Bool(missing=False),
         'room_ids': fields.List(fields.Int(), missing=None)
     })
     def _process(self, start_date, end_date, room_ids, my_bookings):
         booked_for_user = session.user if my_bookings else None
-        end_date = max(start_date, end_date)
+        if end_date is missing:
+            end_date = start_date
         calendar = get_room_calendar(start_date, end_date, room_ids, booked_for_user=booked_for_user)
         return jsonify(_serialize_availability(calendar).values())
 
