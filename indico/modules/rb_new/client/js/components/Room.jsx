@@ -53,16 +53,15 @@ class Room extends React.Component {
         const {
             isFavorite: nextIsFavorite,
             isCheckingUserRoomPermissions: nextIsCheckingUserRoomPermissions,
-            room: nextRoom
+            room: nextRoom,
+            children: nextChildren,
         } = nextProps;
-        const {room, isFavorite, isCheckingUserRoomPermissions} = this.props;
-        const {children} = this.props;
-        const {children: nextChildren} = nextProps;
+        const {isFavorite, isCheckingUserRoomPermissions, room, children} = this.props;
 
         return (
-            !_.isEqual(room, nextRoom) ||
             nextIsFavorite !== isFavorite ||
             nextIsCheckingUserRoomPermissions !== isCheckingUserRoomPermissions ||
+            !_.isEqual(room, nextRoom) ||
             !_.isEqual(nextChildren, children)
         );
     }
