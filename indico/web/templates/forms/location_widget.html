@@ -87,7 +87,7 @@ parent object. The key features and expected behaviour is the following:
                         <i class="icon icon-checkmark"></i>
                         <div>
                             {% trans %}This room is available.{% endtrans %}
-                            </br>
+                            <br>
                             {% trans %}Would you like to book it?{% endtrans %}
                         </div>
                         {{ switch(id='create-booking', on_label=_('Yes'), off_label=_('No')) }}
@@ -98,7 +98,7 @@ parent object. The key features and expected behaviour is the following:
                         <i class="icon icon-checkmark"></i>
                         <div>
                             {% trans %}This room is available.{% endtrans %}
-                            </br>
+                            <br>
                             {% trans %}Would you like to request a booking?{% endtrans %}
                         </div>
                         {{ switch(id='create-prebooking', on_label=_('Yes'), off_label=_('No')) }}
@@ -116,9 +116,9 @@ parent object. The key features and expected behaviour is the following:
                         <i class="icon icon-warning"></i>
                         <div>
                             {% trans %}This room is already prebooked.{% endtrans %}
-                            </br>
+                            <br>
                             {% trans %}Would you like to book it anyway?{% endtrans %}
-                            </br>
+                            <br>
                             <a target="_blank">{% trans %}See on calendar{% endtrans %}</a>
                         </div>
                         {{ switch(id='create-booking-over-prebooking', on_label=_('Yes'), off_label=_('No')) }}
@@ -129,9 +129,9 @@ parent object. The key features and expected behaviour is the following:
                         <i class="icon icon-warning"></i>
                         <div>
                             {% trans %}This room is already prebooked.{% endtrans %}
-                            </br>
+                            <br>
                             {% trans %}Would you like to request a booking anyway?{% endtrans %}
-                            </br>
+                            <br>
                             <a target="_blank">{% trans %}See on calendar{% endtrans %}</a>
                         </div>
                         {{ switch(id='create-prebooking-over-prebooking', on_label=_('Yes'), off_label=_('No')) }}
