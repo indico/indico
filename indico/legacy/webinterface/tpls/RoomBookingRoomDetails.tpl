@@ -314,9 +314,9 @@
                         </td>
                         <td colspan="2">
                             <div style="float:left; padding-top: 15px;">
-                              % if room.can_be_booked(_session.user):
+                              % if room.can_book(_session.user):
                                 <a class="i-button" href="${ url_for(endpoints['room_book'], event, room) }">${ _('Book') }</a>
-                              % elif room.can_be_prebooked(_session.user):
+                              % elif room.can_prebook(_session.user):
                                 <a class="i-button" href="${ url_for(endpoints['room_book'], event, room) }">${ _('PRE-Book') }</a>
                               % endif
                               % if room.can_be_modified(_session.user):

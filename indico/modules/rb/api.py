@@ -204,9 +204,9 @@ class BookRoomHook(HTTPAPIHook):
     def _has_access(self, user):
         if not config.ENABLE_ROOMBOOKING or not rb_check_user_access(user):
             return False
-        if self._room.can_be_booked(user):
+        if self._room.can_book(user):
             return True
-        elif self._room.can_be_prebooked(user):
+        elif self._room.can_prebook(user):
             raise HTTPAPIError('The API only supports direct bookings but this room only allows pre-bookings.')
         return False
 

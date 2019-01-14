@@ -345,8 +345,8 @@ class Reservation(Serializer, db.Model):
             raise ValueError('end_dt != start_dt for non-repeating booking')
 
         if prebook is None:
-            prebook = not room.can_be_booked(user, ignore_admin=ignore_admin)
-            if prebook and not room.can_be_prebooked(user, ignore_admin=ignore_admin):
+            prebook = not room.can_book(user, allow_admin=(not ignore_admin))
+            if prebook and not room.can_prebook(user, allow_admin=(not ignore_admin)):
                 raise NoReportError(u'You cannot book this room')
 
         room.check_advance_days(data['end_dt'].date(), user)

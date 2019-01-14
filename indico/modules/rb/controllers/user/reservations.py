@@ -258,9 +258,9 @@ class RHRoomBookingNewBookingBase(RHRoomBookingBase):
         if not room.notification_for_assistance:
             del form.needs_assistance
 
-        can_book = room.can_be_booked(session.user)
-        can_prebook = room.can_be_prebooked(session.user)
-        if room.is_auto_confirm or (not can_prebook or (can_book and room.can_be_booked(session.user, True))):
+        can_book = room.can_book(session.user)
+        can_prebook = room.can_prebook(session.user)
+        if room.is_auto_confirm or (not can_prebook or (can_book and room.can_book(session.user, allow_admin=False))):
             # The user has actually the permission to book (not just because he's an admin)
             # Or he simply can't even prebook the room
             del form.submit_prebook
@@ -596,7 +596,7 @@ class RHRoomBookingNewBooking(RHRoomBookingNewBookingBase):
         # The form needs the room to create the equipment list, so we need to get it "manually"...
         room = Room.get(int(request.form['room_id']))
         form = self._make_confirm_form(room)
-        if not room.can_be_booked(session.user) and not room.can_be_prebooked(session.user):
+        if not room.can_book(session.user) and not room.can_prebook(session.user):
             raise Forbidden('You cannot book this room')
         if form.validate_on_submit():
             return self._create_booking_response(form, room)
@@ -616,6 +616,7 @@ class RHRoomBookingNewBooking(RHRoomBookingNewBookingBase):
 
 class RHRoomBookingModifyBooking(RHRoomBookingBookingMixin, RHRoomBookingNewBookingBase):
     def _check_access(self):
+        RHRoomBookingNewBookingBase._check_access(self)
         if not self._reservation.can_be_modified(session.user):
             raise Forbidden
 

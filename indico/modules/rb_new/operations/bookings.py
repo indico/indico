@@ -252,8 +252,8 @@ def check_room_available(room, start_dt, end_dt):
                           if prebooking.reservation.booked_for_id == session.user.id)
 
     return {
-        'can_book': room.can_be_booked(session.user, ignore_admin=True),
-        'can_prebook': room.can_be_prebooked(session.user, ignore_admin=True),
+        'can_book': room.can_book(session.user, ignore_admin=True),
+        'can_prebook': room.can_prebook(session.user, ignore_admin=True),
         'conflict_booking': any(bookings),
         'conflict_prebooking': any(prebookings),
         'unbookable': (hours_overlap or nonbookable_periods or blocked_for_user),
@@ -268,11 +268,10 @@ def create_booking_for_event(room_id, event):
         default_timezone = timezone(config.DEFAULT_TIMEZONE)
         start_dt = event.start_dt.astimezone(default_timezone).replace(tzinfo=None)
         end_dt = event.end_dt.astimezone(default_timezone).replace(tzinfo=None)
-        booking_reason = "Event '%s'" % (event.title)
+        booking_reason = "Event '{}'".format(event.title)
         data = dict(start_dt=start_dt, end_dt=end_dt, booked_for_user=event.creator, booking_reason=booking_reason,
                     repeat_frequency=RepeatFrequency.NEVER, event_id=event.id)
-        resv = Reservation.create_from_data(room, data, session.user, ignore_admin=True)
-        return resv
+        return Reservation.create_from_data(room, data, session.user, ignore_admin=True)
     except NoReportError:
         flash(_("Booking could not be created. Probably somebody else booked the room in the meantime."), 'error')
 

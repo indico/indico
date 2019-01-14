@@ -22,7 +22,7 @@ from flask import jsonify, request, session
 from marshmallow import fields, missing
 from marshmallow_enum import EnumField
 from webargs.flaskparser import use_args, use_kwargs
-from werkzeug.exceptions import Forbidden, NotFound
+from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from indico.core.db import db
 from indico.core.errors import NoReportError
@@ -151,40 +151,52 @@ class RHActiveBookings(RHRoomBookingBase):
 
 
 class RHCreateBooking(RHRoomBookingBase):
+    @use_args(create_booking_args)
+    def _process_args(self, args):
+        self.args = args
+        self.prebook = args.pop('is_prebooking')
+        self.room = Room.get_one(self.args.pop('room_id'))
+        if not self.room.is_active:
+            raise BadRequest
+
+    def _check_access(self):
+        RHRoomBookingBase._check_access(self)
+        if (self.prebook and not self.room.can_prebook(session.user) or
+                (not self.prebook and not self.room.can_book(session.user))):
+            raise Forbidden('Not authorized to book this room')
+
     def _validate_room_booking_limit(self, start_dt, end_dt, booking_limit_days):
         day_start_dt = datetime.combine(start_dt.date(), time())
         day_end_dt = datetime.combine(end_dt.date(), time(23, 59))
         selected_period_days = (day_end_dt - day_start_dt).days
         return selected_period_days <= booking_limit_days
 
-    @use_args(create_booking_args)
-    def _process(self, args):
-        room = Room.get_one(args.pop('room_id'))
+    def _process(self):
+        args = self.args
         user_id = args.pop('user_id', None)
-        booked_for = User.get_one(user_id) if user_id else session.user
-        is_prebooking = args.pop('is_prebooking')
+        booked_for = User.get_one(user_id, is_deleted=False) if user_id else session.user
 
         # Check that the booking is not longer than allowed
-        booking_limit_days = room.booking_limit_days or rb_settings.get('booking_limit')
+        booking_limit_days = self.room.booking_limit_days or rb_settings.get('booking_limit')
         if not self._validate_room_booking_limit(args['start_dt'], args['end_dt'], booking_limit_days):
             msg = (_('Bookings for the room "{}" may not be longer than {} days')
-                   .format(room.name, booking_limit_days))
+                   .format(self.room.name, booking_limit_days))
             raise ExpectedError(msg)
 
         try:
-            resv = Reservation.create_from_data(room, dict(args, booked_for_user=booked_for), session.user,
-                                                prebook=is_prebooking)
+            resv = Reservation.create_from_data(self.room, dict(args, booked_for_user=booked_for), session.user,
+                                                prebook=self.prebook)
             db.session.flush()
         except NoReportError as e:
             db.session.rollback()
             raise ExpectedError(unicode(e))
 
         serialized_occurrences = serialize_occurrences(group_by_occurrence_date(resv.occurrences.all()))
-        if is_prebooking:
+        if self.prebook:
             data = {'pre_bookings': serialized_occurrences}
         else:
             data = {'bookings': serialized_occurrences}
-        return jsonify(room_id=room.id, booking=reservation_details_schema.dump(resv).data, calendar_data=data)
+        return jsonify(room_id=self.room.id, booking=reservation_details_schema.dump(resv).data, calendar_data=data)
 
 
 class RHRoomSuggestions(RHRoomBookingBase):

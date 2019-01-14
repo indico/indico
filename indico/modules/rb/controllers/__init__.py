@@ -26,10 +26,10 @@ from indico.web.rh import RHProtected
 
 
 class RHRoomBookingProtected(RHProtected):
-    def _require_user(self):
+    def _check_access(self):
         if not config.ENABLE_ROOMBOOKING:
             raise NotFound(_('The room booking module is not enabled.'))
-        RHProtected._require_user(self)
+        RHProtected._check_access(self)
         if not rb_check_user_access(session.user):
             raise Forbidden(_('You are not authorized to access the room booking system.'))
 

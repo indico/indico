@@ -78,6 +78,6 @@ class BookingPermission(LoggedOnlyService):
             'blocked': not self._blocking.can_be_overridden(user, self._room) if self._blocking else self._nonbookable,
             'blocking_type': 'blocking' if self._blocking else 'nonbookable' if self._nonbookable else None,
             'is_reservable': self._room.is_reservable,
-            'can_book': self._room.can_be_booked(user) or self._room.can_be_prebooked(user),
+            'can_book': self._room.can_book(user) or self._room.can_prebook(user),
             'group': self._room.get_attribute_value('allowed-booking-group')
         }

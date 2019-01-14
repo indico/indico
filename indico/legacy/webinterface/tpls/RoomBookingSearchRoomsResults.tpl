@@ -56,9 +56,9 @@
                                   </td>
                                   <td>
                                     <a href="${ details_url }">${ _('view') }</a><br/>
-                                    % if room.can_be_booked(_session.user):
+                                    % if room.can_book(_session.user):
                                       <a href="${ booking_url }">${ _('book') }</a><br/>
-                                    % elif room.can_be_prebooked(_session.user):
+                                    % elif room.can_prebook(_session.user):
                                       <a href="${ booking_url }">${ _('PRE-book') }</a><br/>
                                     % endif
                                     % if room.can_be_modified(_session.user):
