@@ -26,6 +26,7 @@ import {Translate} from 'indico/react/i18n';
 import {TooltipIfTruncated} from 'indico/react/components';
 
 import TimelineItem from './TimelineItem';
+import EditableTimelineItem from './EditableTimelineItem';
 
 import './TimelineContent.module.scss';
 
@@ -37,15 +38,14 @@ export default class DailyTimelineContent extends React.Component {
         onClickReservation: PropTypes.func,
         longLabel: PropTypes.bool,
         onClickLabel: PropTypes.func,
-        itemClass: PropTypes.func,
-        itemProps: PropTypes.object,
         isLoading: PropTypes.bool,
         lazyScroll: PropTypes.object,
         minHour: PropTypes.number,
         maxHour: PropTypes.number,
         hourStep: PropTypes.number,
         showUnused: PropTypes.bool,
-        fixedHeight: PropTypes.string
+        fixedHeight: PropTypes.string,
+        onAddSlot: PropTypes.func,
     };
 
     static defaultProps = {
@@ -53,15 +53,14 @@ export default class DailyTimelineContent extends React.Component {
         onClickReservation: null,
         longLabel: false,
         onClickLabel: null,
-        itemClass: TimelineItem,
-        itemProps: {},
         isLoading: false,
         lazyScroll: null,
         minHour: 6,
         maxHour: 22,
         hourStep: 2,
         showUnused: true,
-        fixedHeight: null
+        fixedHeight: null,
+        onAddSlot: null,
     };
 
     state = {
@@ -77,13 +76,20 @@ export default class DailyTimelineContent extends React.Component {
         return onClickLabel ? () => onClickLabel(id) : false;
     };
 
+    getEditableItem = (room) => {
+        const {onAddSlot} = this.props;
+        const editable = onAddSlot && (room.canUserBook || room.canUserPrebook);
+        const ItemClass = editable ? EditableTimelineItem : TimelineItem;
+        const itemProps = editable ? {onAddSlot} : {};
+        return {ItemClass, itemProps};
+    };
+
     renderTimelineRow({availability, label, conflictIndicator, room}, key, rowStyle = null) {
-        const {
-            minHour, maxHour, hourStep, itemClass: ItemClass, itemProps, onClickCandidate,
-            onClickReservation, longLabel
-        } = this.props;
+        const {minHour, maxHour, hourStep, onClickCandidate, onClickReservation, longLabel} = this.props;
         const columns = ((maxHour - minHour) / hourStep) + 1;
         const hasConflicts = !(_.isEmpty(availability.conflicts) && _.isEmpty(availability.preConflicts));
+        const {ItemClass, itemProps} = this.getEditableItem(room);
+
         return (
             <div styleName="timeline-row" key={key} style={rowStyle}>
                 <TimelineRowLabel label={label}

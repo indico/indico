@@ -24,7 +24,6 @@ import {dayRange, serializeDate, toMoment} from 'indico/utils/date';
 import DailyTimelineContent from './DailyTimelineContent';
 import WeeklyTimelineContent from './WeeklyTimelineContent';
 import MonthlyTimelineContent from './MonthlyTimelineContent';
-import TimelineItem from './TimelineItem';
 
 import './Timeline.module.scss';
 
@@ -39,8 +38,7 @@ export default class ElasticTimeline extends React.Component {
         datePicker: PropTypes.object.isRequired,
         bookingAllowed: PropTypes.bool,
         isLoading: PropTypes.bool,
-        itemClass: PropTypes.func,
-        itemProps: PropTypes.object,
+        onAddSlot: PropTypes.func,
         onClickLabel: PropTypes.func,
         onClickCandidate: PropTypes.func,
         onClickReservation: PropTypes.func,
@@ -66,8 +64,7 @@ export default class ElasticTimeline extends React.Component {
         bookingAllowed: false,
         extraContent: null,
         isLoading: false,
-        itemClass: TimelineItem,
-        itemProps: {},
+        onAddSlot: null,
         longLabel: false,
         onClickLabel: null,
         lazyScroll: null,
@@ -171,8 +168,8 @@ export default class ElasticTimeline extends React.Component {
 
     renderTimeline = () => {
         const {
-            extraContent, onClickCandidate, onClickReservation, availability, isLoading, itemClass,
-            itemProps, longLabel, onClickLabel, lazyScroll, datePicker: {minHour, maxHour, hourStep, mode, dateRange},
+            extraContent, onClickCandidate, onClickReservation, availability, isLoading,
+            onAddSlot, longLabel, onClickLabel, lazyScroll, datePicker: {minHour, maxHour, hourStep, mode, dateRange},
             showUnused, fixedHeight, emptyMessage
         } = this.props;
         let Component = DailyTimelineContent;
@@ -210,8 +207,7 @@ export default class ElasticTimeline extends React.Component {
                                hourStep={hourStep}
                                onClickCandidate={onClickCandidate}
                                onClickReservation={onClickReservation}
-                               itemClass={itemClass}
-                               itemProps={itemProps}
+                               onAddSlot={onAddSlot}
                                longLabel={longLabel}
                                onClickLabel={onClickLabel}
                                isLoading={isLoading}

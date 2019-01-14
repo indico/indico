@@ -31,7 +31,7 @@ import {actions as bookingsActions} from '../../common/bookings';
 import {actions as filtersActions} from '../../common/filters';
 import {selectors as roomsSelectors, actions as roomsActions} from '../../common/rooms';
 import {selectors as userSelectors} from '../../common/user';
-import {EditableTimelineItem, ElasticTimeline, TimelineHeader, TimelineItem} from '../../common/timeline';
+import {ElasticTimeline, TimelineHeader} from '../../common/timeline';
 import CalendarListView from './CalendarListView';
 import {actions as bookRoomActions} from '../bookRoom';
 import {roomFilterBarFactory} from '../roomList';
@@ -258,8 +258,7 @@ class Calendar extends React.Component {
                                                  onClickLabel={openRoomDetails}
                                                  isLoading={isFetching}
                                                  onClickReservation={openBookingDetails}
-                                                 itemClass={editable ? EditableTimelineItem : TimelineItem}
-                                                 itemProps={editable ? {onAddSlot: this.onAddSlot} : {}}
+                                                 onAddSlot={editable ? this.onAddSlot : null}
                                                  showUnused={!hideUnused}
                                                  conflictIndicator={false}
                                                  longLabel />
