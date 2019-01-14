@@ -21,7 +21,6 @@ import pytest
 
 from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.core.errors import IndicoError
-from indico.modules.rb import rb_settings
 from indico.modules.rb.models.blocked_rooms import BlockedRoom
 from indico.modules.rb.models.photos import Photo
 from indico.modules.rb.models.reservations import RepeatFrequency
@@ -507,71 +506,6 @@ def test_has_live_reservations(dummy_room, create_reservation):
     assert dummy_room.has_live_reservations()
 
 
-@pytest.mark.parametrize(
-    ('is_admin', 'ignore_admin', 'is_active', 'is_owned_by', 'is_reservable', 'has_group', 'in_group', 'expected'),
-    set(bool_matrix('10.....',                 expect=True) +           # admin
-        bool_matrix('..0....', mask='10.....', expect=False, ) +        # inactive
-        bool_matrix('..11...',                 expect=True) +           # owned
-        bool_matrix('..100..', mask='10.....', expect=False) +          # not reservable
-        bool_matrix('..1010.',                 expect=True) +           # no group
-        bool_matrix('..1011.', mask='10.....', expect=lambda x: x[6]))  # user in group
-)
-def test_can_be_booked(dummy_room, create_user, create_room_attribute, create_group,
-                       is_admin, ignore_admin, is_active, is_owned_by, is_reservable, has_group, in_group, expected):
-    create_room_attribute(u'allowed-booking-group')
-    user = create_user(123, rb_admin=is_admin)
-    dummy_room.is_active = is_active
-    dummy_room.is_reservable = is_reservable
-    if in_group:
-        user.local_groups.add(create_group(123).group)
-    if is_owned_by:
-        dummy_room.owner = user
-    if has_group:
-        dummy_room.set_attribute_value(u'allowed-booking-group', u'123')
-    assert dummy_room.can_be_booked(user, ignore_admin=ignore_admin) == expected
-    assert dummy_room.can_be_prebooked(user, ignore_admin=ignore_admin) == expected
-
-
-@pytest.mark.parametrize(
-    ('is_admin', 'ignore_admin', 'is_active', 'is_owned_by', 'is_reservable', 'has_group', 'in_group', 'expected'),
-    set(bool_matrix('10.....',                 expect=True) +           # admin
-        bool_matrix('..0....', mask='10.....', expect=False, ) +        # inactive
-        bool_matrix('..11...',                 expect=True) +           # owned
-        bool_matrix('..100..', mask='10.....', expect=False) +          # not reservable
-        bool_matrix('..1010.',                 expect=True) +           # no group
-        bool_matrix('..1011.', mask='10.....', expect=lambda x: x[6]))  # user in group
-)
-def test_can_be_prebooked(dummy_room, create_user, create_room_attribute, create_group,
-                          is_admin, ignore_admin, is_active, is_owned_by, is_reservable, has_group, in_group, expected):
-    create_room_attribute(u'allowed-booking-group')
-    user = create_user(123, rb_admin=is_admin)
-    dummy_room.is_active = is_active
-    dummy_room.is_reservable = is_reservable
-    dummy_room.reservations_need_confirmation = True
-    if in_group:
-        user.local_groups.add(create_group(123).group)
-    if is_owned_by:
-        dummy_room.owner = user
-    if has_group:
-        dummy_room.set_attribute_value(u'allowed-booking-group', u'123')
-    assert dummy_room.can_be_prebooked(user, ignore_admin=ignore_admin) == expected
-
-
-@pytest.mark.parametrize(('has_acl', 'in_acl', 'expected'), (
-    (False, False, True),
-    (True,  True,  True),
-    (True,  False, False),
-))
-def test_can_be_booked_prebooked_no_rb_access(dummy_room, dummy_user, create_user, has_acl, in_acl, expected):
-    other_user = create_user(123)
-    if has_acl:
-        rb_settings.acls.add_principal('authorized_principals', dummy_user)
-        if in_acl:
-            rb_settings.acls.add_principal('authorized_principals', other_user)
-    assert dummy_room.can_be_booked(other_user) == expected
-    assert dummy_room.can_be_prebooked(other_user) == expected
-
-
 @pytest.mark.parametrize(('is_owner', 'is_admin', 'expected'), bool_matrix('..', expect=any))
 def test_can_be_overridden(dummy_room, create_user, is_owner, is_admin, expected):
     user = create_user(123, rb_admin=is_admin)
@@ -591,8 +525,6 @@ def test_can_be_modified_deleted(dummy_room, create_user, is_admin, expected):
 
 
 def test_can_be_no_user(dummy_room):
-    assert not dummy_room.can_be_booked(None)
-    assert not dummy_room.can_be_prebooked(None)
     assert not dummy_room.can_be_overridden(None)
     assert not dummy_room.can_be_modified(None)
     assert not dummy_room.can_be_deleted(None)

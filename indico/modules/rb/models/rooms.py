@@ -666,35 +666,6 @@ class Room(versioned_cache(_cache, 'id'), ProtectionManagersMixin, db.Model, Ser
                         BlockedRoom.state.in_(states))
                 .all())
 
-    @unify_user_args
-    def _can_be_booked(self, user, prebook=False, ignore_admin=False):
-        if not user or not rb_check_user_access(user):
-            return False
-
-        if (not ignore_admin and rb_is_admin(user)) or (self.is_owned_by(user) and self.is_active):
-            return True
-
-        if self.is_active and self.is_reservable and (prebook or not self.reservations_need_confirmation):
-            group_name = self.get_attribute_value('allowed-booking-group')
-            if not group_name or user in GroupProxy.get_named_default_group(group_name):
-                return True
-
-        return False
-
-    def can_be_booked(self, user, ignore_admin=False):
-        """
-        Reservable rooms which does not require pre-booking can be booked by anyone.
-        Other rooms - only by their responsibles.
-        """
-        return self._can_be_booked(user, ignore_admin=ignore_admin)
-
-    def can_be_prebooked(self, user, ignore_admin=False):
-        """
-        Reservable rooms can be pre-booked by anyone.
-        Other rooms - only by their responsibles.
-        """
-        return self._can_be_booked(user, prebook=True, ignore_admin=ignore_admin)
-
     def can_be_overridden(self, user):
         if not user:
             return False
