@@ -179,22 +179,22 @@ def search_for_rooms(filters, availability=None):
 
     start_dt, end_dt = filters['start_dt'], filters['end_dt']
     repeatability = (filters['repeat_frequency'], filters['repeat_interval'])
-    availability_query = Room.filter_available(start_dt, end_dt, repeatability, include_pre_bookings=True,
-                                               include_pending_blockings=True)
-
-    if availability is False:
-        availability_query = ~availability_query
-
-    query = query.filter(availability_query)
+    availability_filters = [Room.filter_available(start_dt, end_dt, repeatability, include_pre_bookings=True,
+                                                  include_pending_blockings=True)]
 
     if not rb_is_admin(session.user):
         selected_period_days = (filters['end_dt'] - filters['start_dt']).days
         booking_limit_days = db.func.coalesce(Room.booking_limit_days, rb_settings.get('booking_limit'))
 
         own_rooms = [r.id for r in Room.get_owned_by(session.user)]
-        query = query.filter(db.or_(Room.id.in_(own_rooms) if own_rooms else False,
-                                    db.and_(Room.filter_bookable_hours(start_dt.time(), end_dt.time()),
-                                            Room.filter_nonbookable_periods(start_dt, end_dt),
-                                            db.or_(booking_limit_days.is_(None),
-                                                   selected_period_days <= booking_limit_days))))
-    return query
+        criterion = db.or_(Room.id.in_(own_rooms) if own_rooms else False,
+                           db.and_(Room.filter_bookable_hours(start_dt.time(), end_dt.time()),
+                                   Room.filter_nonbookable_periods(start_dt, end_dt),
+                                   db.or_(booking_limit_days.is_(None),
+                                          selected_period_days <= booking_limit_days)))
+        availability_filters.append(criterion)
+
+    availability_criterion = db.and_(*availability_filters)
+    if availability is False:
+        availability_criterion = ~availability_criterion
+    return query.filter(availability_criterion)
