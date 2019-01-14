@@ -15,8 +15,43 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import {createSelector} from 'reselect';
+
 import {roomSearchSelectorFactory} from '../../common/roomSearch';
+import {selectors as userSelectors} from '../../common/user';
 
 
-const {getFilters, isSearching, getSearchResults, getSearchResultsForMap} = roomSearchSelectorFactory('roomList');
-export {getFilters, isSearching, getSearchResults, getSearchResultsForMap};
+const {
+    getFilters,
+    isSearching,
+    getSearchResults: getAllSearchResults,
+    getSearchResultsForMap: getAllSearchResultsForMap,
+} = roomSearchSelectorFactory('roomList');
+
+export const getSearchResults = createSelector(
+    getAllSearchResults,
+    getFilters,
+    userSelectors.getUnbookableRoomIds,
+    (results, {onlyAuthorized}, unbookableRoomIds) => {
+        if (!onlyAuthorized) {
+            return results;
+        }
+        const unbookable = new Set(unbookableRoomIds);
+        return results.filter(room => !unbookable.has(room.id));
+    }
+);
+
+export const getSearchResultsForMap = createSelector(
+    getAllSearchResultsForMap,
+    getFilters,
+    userSelectors.getUnbookableRoomIds,
+    (results, {onlyAuthorized}, unbookableRoomIds) => {
+        if (!onlyAuthorized) {
+            return results;
+        }
+        const unbookable = new Set(unbookableRoomIds);
+        return results.filter(room => !unbookable.has(room.id));
+    }
+);
+
+export {getFilters, isSearching};

@@ -76,10 +76,14 @@ class RoomList extends React.Component {
         searchRooms();
     }
 
-    componentDidUpdate({filters: prevFilters}) {
-        const {filters, actions: {searchRooms}} = this.props;
+    componentDidUpdate(prevProps) {
+        const {filters: {onlyAuthorized: prevOnlyAuthorized, ...prevFilters}} = prevProps;
+        const {filters: {onlyAuthorized, ...filters}, actions: {searchRooms}} = this.props;
         if (!_.isEqual(prevFilters, filters)) {
             searchRooms();
+            // eslint-disable-next-line react/no-did-update-set-state
+            this.setState({numVisibleRooms: 20});
+        } else if (prevOnlyAuthorized !== onlyAuthorized) {
             // eslint-disable-next-line react/no-did-update-set-state
             this.setState({numVisibleRooms: 20});
         }
