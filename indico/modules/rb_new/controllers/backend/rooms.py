@@ -34,7 +34,7 @@ from indico.modules.rb.models.rooms import Room
 from indico.modules.rb_new.controllers.backend.common import search_room_args
 from indico.modules.rb_new.operations.bookings import check_room_available, get_room_details_availability
 from indico.modules.rb_new.operations.rooms import get_room_events, get_room_statistics, search_for_rooms
-from indico.modules.rb_new.schemas import reservation_user_events_schema, room_attribute_values_schema, rooms_schema
+from indico.modules.rb_new.schemas import reservation_user_event_schema, room_attribute_values_schema, rooms_schema
 from indico.util.marshmallow import NaiveDateTime
 
 
@@ -138,4 +138,4 @@ class RHRoomEvents(RHRoomBase):
     })
     def _process(self, start_dt, end_dt, repeat_frequency, repeat_interval):
         events = get_room_events(self.room, start_dt, end_dt, repeat_frequency, repeat_interval)
-        return jsonify(reservation_user_events_schema.dump(events).data)
+        return jsonify(reservation_user_event_schema.dump(events).data)

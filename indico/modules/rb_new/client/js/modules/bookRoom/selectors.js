@@ -72,6 +72,8 @@ export const getSuggestedRoomIds = createSelector(
     getRawSuggestions,
     suggestions => suggestions.map(x => x.room_id)
 );
+export const getBookingFormAvailability = ({bookRoom}) => bookRoom.bookingForm.availability;
+export const getBookingFormRelatedEvents = ({bookRoom}) => bookRoom.bookingForm.relatedEvents;
 
 export {
     getFilters,

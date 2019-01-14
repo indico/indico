@@ -216,5 +216,5 @@ export default roomSearchReducerFactory('bookRoom', {
     timeline: timelineReducer,
     unavailableRooms: unavailableReducer,
     suggestions: suggestionsReducer,
-    bookingForm: bookingFormReducer,
+    bookingForm: bookingFormReducer
 });

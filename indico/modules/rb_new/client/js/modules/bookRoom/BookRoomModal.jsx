@@ -34,6 +34,7 @@ import {DailyTimelineContent, TimelineLegend} from '../../common/timeline';
 import * as actions from './actions';
 import {actions as modalActions} from '../../modals';
 import {selectors as userSelectors} from '../../common/user';
+import * as bookRoomSelectors from './selectors';
 
 import './BookRoomModal.module.scss';
 
@@ -299,8 +300,8 @@ class BookRoomModal extends React.Component {
         );
     }
 
-    renderEventItem = (event) => {
-        const start = `${moment(event.startDt).format('L')} ${moment(event.startDt).format('LT')}`;
+    getEventOption = (event) => {
+        const start = moment(event.startDt).format('L LT');
         const sameDate = moment(event.startDt).isSame(event.endDt, 'date');
         const endTime = moment(event.endDt).format('LT');
         const end = sameDate ? `${endTime}` : `${moment(event.endDt).format('L')} ${endTime}`;
@@ -313,7 +314,7 @@ class BookRoomModal extends React.Component {
 
     renderRelatedEventsDropdown = (disabled) => {
         const {relatedEvents} = this.props;
-        const options = relatedEvents.map(this.renderEventItem);
+        const options = relatedEvents.map(this.getEventOption);
 
         if (!relatedEvents.length) {
             return;
@@ -325,11 +326,11 @@ class BookRoomModal extends React.Component {
                 <div styleName="events-segment-description">
                     <PluralTranslate count={relatedEvents.length}>
                         <Singular>
-                            You have an event taking place in this room overlapping with booking times.
-                            If you are booking this room for this event, please select it below.
+                            You have an event taking place in this room.
+                            If you are booking the room for this event, please select it below.
                         </Singular>
                         <Plural>
-                            You have events taking place in this room overlapping with booking times.
+                            You have events taking place in this room.
                             If you are booking this room for one of your events, please select it below.
                         </Plural>
                     </PluralTranslate>
@@ -461,8 +462,8 @@ export default connect(
     (state, {roomId}) => ({
         favoriteUsers: userSelectors.getFavoriteUsers(state),
         userFullName: userSelectors.getUserFullName(state),
-        availability: state.bookRoom.bookingForm.availability,
-        relatedEvents: state.bookRoom.bookingForm.relatedEvents,
+        availability: bookRoomSelectors.getBookingFormAvailability(state),
+        relatedEvents: bookRoomSelectors.getBookingFormRelatedEvents(state),
         room: roomsSelectors.getRoom(state, {roomId}),
     }),
     dispatch => ({
