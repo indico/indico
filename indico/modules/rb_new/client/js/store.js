@@ -17,7 +17,7 @@
 
 import createHistory from 'history/createBrowserHistory';
 import {queryStringMiddleware} from 'redux-router-querystring';
-import {connectRouter, routerMiddleware} from 'connected-react-router';
+import {routerMiddleware} from 'connected-react-router';
 import createReduxStore from 'indico/utils/redux';
 
 import getReducers from './reducers';
@@ -54,7 +54,7 @@ export const history = createHistory({
 export default function createRBStore(overrides = {}, additionalReducers = []) {
     return createReduxStore(
         'rb-new',
-        getReducers(),
+        getReducers(history),
         {_overrides: overrides},
         [
             routerMiddleware(history),
@@ -66,6 +66,5 @@ export default function createRBStore(overrides = {}, additionalReducers = []) {
             qsCalendarReducer,
             qsBlockingsReducer,
             ...additionalReducers
-        ],
-        rootReducer => connectRouter(history)(rootReducer));
+        ]);
 }

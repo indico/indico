@@ -15,6 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import {connectRouter} from 'connected-react-router';
 
 import {reducer as configReducer} from './common/config';
 import {reducer as mapReducer} from './common/map';
@@ -29,7 +30,8 @@ import {reducer as bookingReducer} from './common/bookings';
 import {reducer as adminReducer} from './modules/admin';
 
 
-export default () => ({
+export default (history) => ({
+    router: connectRouter(history),
     config: configReducer,
     user: userReducer,
     bookRoom: bookRoomReducer,
