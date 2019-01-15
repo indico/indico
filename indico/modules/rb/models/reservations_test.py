@@ -262,68 +262,57 @@ def test_add_edit_log(db, dummy_reservation):
     assert dummy_reservation.edit_logs.count() == 1
 
 
-@pytest.mark.parametrize(('is_admin', 'is_owner', 'expected'), bool_matrix('..', expect=any))
-def test_can_be_accepted_rejected(dummy_reservation, create_user, is_admin, is_owner, expected):
+@pytest.mark.parametrize('can_moderate', (True, False))
+@pytest.mark.parametrize('is_pending', (True, False))
+def test_moderation(dummy_reservation, dummy_user, is_pending, can_moderate):
+    dummy_reservation.is_accepted = not is_pending
+    if can_moderate:
+        dummy_reservation.room.update_principal(dummy_user, permissions={'moderate'})
+    assert dummy_reservation.can_be_accepted(dummy_user) == (is_pending and can_moderate)
+    assert dummy_reservation.can_be_rejected(dummy_user) == can_moderate
+
+
+@pytest.mark.parametrize('is_manager', (True, False))
+@pytest.mark.parametrize('is_pending', (True, False))
+@pytest.mark.parametrize('is_past', (True, False))
+@pytest.mark.parametrize('is_cancelled', (True, False))
+@pytest.mark.parametrize('is_admin', (True, False))
+def test_room_manager_actions(create_reservation, create_user, is_manager, is_pending, is_past, is_cancelled, is_admin):
     user = create_user(123, rb_admin=is_admin)
-    if is_owner:
-        dummy_reservation.room.owner = user
-    assert dummy_reservation.can_be_accepted(user) == expected
-    assert dummy_reservation.can_be_rejected(user) == expected
+    day_offset = -1 if is_past else 1
+    reservation = create_reservation(start_dt=date.today() + relativedelta(days=day_offset, hour=8, minute=30),
+                                     end_dt=date.today() + relativedelta(days=day_offset, hour=8, minute=30))
+    reservation.is_accepted = not is_pending
+    reservation.is_cancelled = is_cancelled
+    if is_manager:
+        reservation.room.update_principal(user, full_access=True)
+    assert reservation.can_be_accepted(user) == (is_pending and (is_manager or is_admin) and not is_cancelled)
+    assert reservation.can_be_rejected(user) == (not is_cancelled and (is_manager or is_admin))
+    assert reservation.can_be_cancelled(user) == (not is_past and not is_cancelled and is_admin)
+    assert reservation.can_be_modified(user) == (((is_manager and not is_past) or is_admin) and not is_cancelled)
+    assert reservation.can_be_deleted(user) == (is_admin and is_cancelled)
 
 
-@pytest.mark.parametrize(('is_admin', 'is_created_by', 'is_booked_for', 'expected'),
-                         bool_matrix('...', expect=any))  # admin/creator/booked-for, one is enough
-def test_can_be_cancelled(dummy_reservation, create_user, is_admin, is_created_by, is_booked_for, expected):
-    user = create_user(123, rb_admin=is_admin)
-    if is_created_by:
-        dummy_reservation.created_by_user = user
-    if is_booked_for:
-        dummy_reservation.booked_for_user = user
-    assert dummy_reservation.can_be_cancelled(user) == expected
+@pytest.mark.parametrize('is_creator', (True, False))
+@pytest.mark.parametrize('is_bookee', (True, False))
+@pytest.mark.parametrize('is_past', (True, False))
+@pytest.mark.parametrize('is_rejected', (True, False))
+def test_user_actions(create_user, create_reservation, is_creator, is_bookee, is_past, is_rejected):
+    user = create_user(123)
+    day_offset = -1 if is_past else 1
+    reservation = create_reservation(start_dt=date.today() + relativedelta(days=day_offset, hour=8, minute=30),
+                                     end_dt=date.today() + relativedelta(days=day_offset, hour=8, minute=30))
+    if is_creator:
+        reservation.created_by_user = user
+    if is_bookee:
+        reservation.booked_for_user = user
+    if is_rejected:
+        reservation.is_rejected = True
+    assert reservation.can_be_cancelled(user) == ((is_creator or is_bookee) and not is_past and not is_rejected)
+    assert reservation.can_be_modified(user) == ((is_creator or is_bookee) and not is_past and not is_rejected)
 
 
-@pytest.mark.parametrize(('is_admin', 'expected'), (
-    (True,  True),
-    (False, False),
-))
-def test_can_be_deleted(dummy_reservation, dummy_user, is_admin, expected):
-    if is_admin:
-        rb_settings.acls.add_principal('admin_principals', dummy_user)
-    assert dummy_reservation.can_be_deleted(dummy_user) == expected
-
-
-@pytest.mark.parametrize(
-    ('is_rejected', 'is_cancelled', 'is_admin', 'is_created_by', 'is_booked_for', 'is_room_owner', 'expected'),
-    bool_matrix('!00....', expect=False) +                # rejected or cancelled
-    bool_matrix(' 001...', expect=True) +                 # admin
-    bool_matrix(' 000...', expect=lambda x: any(x[3:]))   # creator, booked for, room owner
-)
-def test_can_be_modified(dummy_reservation, create_user,
-                         is_rejected, is_cancelled, is_admin, is_created_by, is_booked_for, is_room_owner, expected):
-    user = create_user(123, rb_admin=is_admin)
-    if is_created_by:
-        dummy_reservation.created_by_user = user
-    if is_booked_for:
-        dummy_reservation.booked_for_user = user
-    if is_room_owner:
-        dummy_reservation.room.owner = user
-    dummy_reservation.is_rejected = is_rejected
-    dummy_reservation.is_cancelled = is_cancelled
-    assert dummy_reservation.can_be_modified(user) == expected
-
-
-@pytest.mark.parametrize(
-    ('is_admin', 'is_room_owner', 'expected'),
-    bool_matrix('..', expect=any)
-)
-def test_can_be_rejected(dummy_reservation, create_user, is_admin, is_room_owner, expected):
-    user = create_user(123, rb_admin=is_admin)
-    if is_room_owner:
-        dummy_reservation.room.owner = user
-    assert dummy_reservation.can_be_rejected(user) == expected
-
-
-def test_can_be_action_with_no_user(dummy_reservation):
+def test_actions_no_user(dummy_reservation):
     assert not dummy_reservation.can_be_accepted(None)
     assert not dummy_reservation.can_be_cancelled(None)
     assert not dummy_reservation.can_be_deleted(None)

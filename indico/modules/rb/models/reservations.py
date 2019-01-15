@@ -44,7 +44,6 @@ from indico.util.locators import locator_property
 from indico.util.serializer import Serializer
 from indico.util.string import return_ascii, to_unicode
 from indico.util.struct.enum import IndicoEnum
-from indico.util.user import unify_user_args
 from indico.web.flask.util import url_for
 
 
@@ -419,7 +418,6 @@ class Reservation(Serializer, db.Model):
                                 ReservationOccurrence.filter_overlap(occurrences),
                                 _join=ReservationOccurrence)
 
-    @unify_user_args
     def accept(self, user):
         self.is_accepted = True
         self.add_edit_log(ReservationEditLog(user_name=user.full_name, info=['Reservation accepted']))
@@ -432,7 +430,6 @@ class Reservation(Serializer, db.Model):
                 continue
             occurrence.reject(user, u'Rejected due to collision with a confirmed reservation')
 
-    @unify_user_args
     def cancel(self, user, reason=None, silent=False):
         self.is_cancelled = True
         self.rejection_reason = reason
@@ -443,7 +440,6 @@ class Reservation(Serializer, db.Model):
             log_msg = u'Reservation cancelled: {}'.format(reason) if reason else 'Reservation cancelled'
             self.add_edit_log(ReservationEditLog(user_name=user.full_name, info=[log_msg]))
 
-    @unify_user_args
     def reject(self, user, reason, silent=False):
         self.is_rejected = True
         self.rejection_reason = reason
@@ -458,39 +454,38 @@ class Reservation(Serializer, db.Model):
         self.edit_logs.append(edit_log)
         db.session.flush()
 
-    @unify_user_args
-    def can_be_accepted(self, user):
+    def can_be_accepted(self, user, allow_admin=True):
         if user is None:
             return False
-        return rb_is_admin(user) or self.room.is_owned_by(user)
+        return self.is_pending and self.room.can_moderate(user, allow_admin=allow_admin)
 
-    @unify_user_args
-    def can_be_cancelled(self, user):
-        if user is None:
-            return False
-        return self.is_owned_by(user) or rb_is_admin(user) or self.is_booked_for(user)
-
-    @unify_user_args
-    def can_be_deleted(self, user):
-        if user is None:
-            return False
-        return rb_is_admin(user)
-
-    @unify_user_args
-    def can_be_modified(self, user):
+    def can_be_rejected(self, user, allow_admin=True):
         if user is None:
             return False
         if self.is_rejected or self.is_cancelled:
             return False
-        if rb_is_admin(user):
-            return True
-        return self.created_by_user == user or self.is_booked_for(user) or self.room.is_owned_by(user)
+        return self.room.can_moderate(user, allow_admin=allow_admin)
 
-    @unify_user_args
-    def can_be_rejected(self, user):
+    def can_be_cancelled(self, user, allow_admin=True):
         if user is None:
             return False
-        return rb_is_admin(user) or self.room.is_owned_by(user)
+        if self.is_rejected or self.is_cancelled or self.is_archived:
+            return False
+        return self.is_owned_by(user) or self.is_booked_for(user) or (allow_admin and rb_is_admin(user))
+
+    def can_be_modified(self, user, allow_admin=True):
+        if user is None:
+            return False
+        if self.is_rejected or self.is_cancelled:
+            return False
+        if self.is_archived and not (allow_admin and rb_is_admin(user)):
+            return False
+        return self.is_owned_by(user) or self.is_booked_for(user) or self.room.can_manage(user, allow_admin=allow_admin)
+
+    def can_be_deleted(self, user):
+        if user is None:
+            return False
+        return rb_is_admin(user) and (self.is_cancelled or self.is_rejected)
 
     def create_occurrences(self, skip_conflicts, user=None):
         ReservationOccurrence.create_series_for_reservation(self)
@@ -565,7 +560,6 @@ class Reservation(Serializer, db.Model):
     def is_booked_for(self, user):
         return user is not None and self.booked_for_user == user
 
-    @unify_user_args
     def is_owned_by(self, user):
         return self.created_by_user == user
 
