@@ -51,13 +51,14 @@ Internal Changes
 Version 2.1.6
 -------------
 
-*Unreleased*
+*Released on January 15, 2019*
 
 Bugfixes
 ^^^^^^^^
 
 - Allow adding external users as speakers/chairpersons (:issue:`3562`)
 - Allow adding external users to event ACLs (:issue:`3562`)
+- Pin requests-oauthlib version to avoid dependency conflict
 
 Version 2.1.5
 -------------
