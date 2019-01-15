@@ -107,7 +107,10 @@ export function webpackDefaults(env, config, bundles) {
         return path.relative(root, info.absoluteResourcePath);
     }
 
-    function sassOverrider(url) {
+    /**
+     * This function resolves SASS files using a module:path syntax
+     */
+    function sassResolver(url) {
         const match = url.match(/^(\w+):([\w/-_]+)/);
         if (match) {
             if (config.isPlugin) {
@@ -120,6 +123,27 @@ export function webpackDefaults(env, config, bundles) {
             return {file: path.join(modPath, 'client', match[2])};
         }
         return null;
+    }
+
+    /**
+     * This function resolves url(...)s in CSS files using a plugin:path syntax
+     */
+    function postCSSURLResolver({url}) {
+        const m = url.match(/^(\w+):(.*)$/);
+
+        if (!m) {
+            return url;
+        }
+
+        const [name, relPath] = m.slice(1);
+        let prefix;
+
+        if (name === 'static') {
+            prefix = globalBuildConfig.staticURL;
+        } else {
+            prefix = path.join(globalBuildConfig.staticURL, 'static/plugins', name);
+        }
+        return path.join(prefix, relPath);
     }
 
     function buildSCSSLoader(cssLoaderOptions = {}) {
@@ -142,13 +166,8 @@ export function webpackDefaults(env, config, bundles) {
                             'postcss.config.js'
                         ),
                         ctx: {
-                            urlnamespaces: {
-                                namespacePaths: (name) => {
-                                    if (name === 'static') {
-                                        return globalBuildConfig.staticURL.replace(/\/$/, '');
-                                    }
-                                    return path.join(globalBuildConfig.staticURL, 'static/plugins', name);
-                                }
+                            postCSSURLOptions: {
+                                url: postCSSURLResolver
                             }
                         }
                     }
@@ -159,7 +178,7 @@ export function webpackDefaults(env, config, bundles) {
                     sourceMap: true,
                     includePaths: [scssIncludePath],
                     outputStyle: 'compact',
-                    importer: [sassOverrider, importOnce],
+                    importer: [sassResolver, importOnce],
                 }
             }],
         });

@@ -1,6 +1,6 @@
 module.exports = ({options}) => ({
     plugins: [
         require('autoprefixer'),
-        require('postcss-url-namespaces')(options.urlnamespaces || {})
+        require('postcss-url')(options.postCSSURLOptions || {})
     ]
 });
