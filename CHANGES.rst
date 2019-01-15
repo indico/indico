@@ -5,7 +5,7 @@ Changelog
 Version 2.1.6
 -------------
 
-*Unreleased*
+*Released on January 15, 2019*
 
 Bugfixes
 ^^^^^^^^
