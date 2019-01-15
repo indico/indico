@@ -92,8 +92,7 @@ export function webpackDefaults(env, config, bundles) {
     }
 
     const _cssLoaderOptions = {
-        root: globalBuildConfig.staticPath,
-        url: true
+        url: true,
     };
 
     const scssIncludePath = path.join(
@@ -129,7 +128,6 @@ export function webpackDefaults(env, config, bundles) {
             use: [{
                 loader: 'css-loader',
                 options: {
-                    root: globalBuildConfig.staticPath,
                     sourceMap: true,
                     url: !config.isPlugin, // FIXME: true breaks plugins, false breaks /indico/ in core
                     ...cssLoaderOptions
