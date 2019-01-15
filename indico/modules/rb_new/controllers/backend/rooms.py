@@ -73,6 +73,7 @@ class RHSearchRooms(RHRoomBookingBase):
                 raise UnprocessableEntity('Required data to filter by availability is not present')
         else:
             availability = not only_unavailable
+
         search_query = search_for_rooms(args, availability=availability)
         room_ids = [id_ for id_, in search_query.with_entities(Room.id)]
         if filter_availability:

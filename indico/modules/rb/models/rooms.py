@@ -528,7 +528,7 @@ class Room(versioned_cache(_cache, 'id'), ProtectionManagersMixin, db.Model, Ser
         return db.session.query(db.func.max(Room.capacity)).scalar() or 0
 
     @staticmethod
-    def filter_available(start_dt, end_dt, repetition, include_pre_bookings=True, include_pending_blockings=True):
+    def filter_available(start_dt, end_dt, repetition, include_blockings, include_pre_bookings=True, include_pending_blockings=False):
         """Returns a SQLAlchemy filter criterion ensuring that the room is available during the given time."""
         # Check availability against reservation occurrences
         dummy_occurrences = ReservationOccurrence.create_series(start_dt, end_dt, repetition)
@@ -542,19 +542,21 @@ class Room(versioned_cache(_cache, 'id'), ProtectionManagersMixin, db.Model, Ser
                               .join(ReservationOccurrence.reservation)
                               .filter(and_(*reservation_criteria)))
         # Check availability against blockings
-        if include_pending_blockings:
-            valid_states = (BlockedRoom.State.accepted, BlockedRoom.State.pending)
-        else:
-            valid_states = (BlockedRoom.State.accepted,)
-        # TODO: only take blockings into account which the user cannot override
-        blocking_criteria = [Room.id == BlockedRoom.room_id,
-                             BlockedRoom.state.in_(valid_states),
-                             db_dates_overlap(Blocking, 'start_date', end_dt.date(), 'end_date', start_dt.date(),
-                                              inclusive=True)]
-        blockings_filter = (BlockedRoom.query
-                            .join(Blocking.blocked_rooms)
-                            .filter(and_(*blocking_criteria)))
-        return ~occurrences_filter.exists() & ~blockings_filter.exists()
+        filters = ~occurrences_filter.exists()
+        if include_blockings:
+            if include_pending_blockings:
+                valid_states = (BlockedRoom.State.accepted, BlockedRoom.State.pending)
+            else:
+                valid_states = (BlockedRoom.State.accepted,)
+            blocking_criteria = [Room.id == BlockedRoom.room_id,
+                                 BlockedRoom.state.in_(valid_states),
+                                 db_dates_overlap(Blocking, 'start_date', end_dt.date(), 'end_date', start_dt.date(),
+                                                  inclusive=True)]
+            blockings_filter = (BlockedRoom.query
+                                .join(Blocking.blocked_rooms)
+                                .filter(and_(*blocking_criteria)))
+            return filters & ~blockings_filter.exists()
+        return filters
 
     @staticmethod
     def filter_bookable_hours(start_time, end_time):
