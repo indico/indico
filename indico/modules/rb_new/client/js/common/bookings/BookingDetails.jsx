@@ -377,9 +377,9 @@ class BookingDetails extends React.Component {
             editButton,
             bookingStateChangeInProgress,
             booking: {
-                id, startDt, endDt, occurrences, dateRange, repetition, room, bookedForUser, isLinkedToEvent,
+                startDt, endDt, occurrences, dateRange, repetition, room, bookedForUser, isLinkedToEvent,
                 bookingReason, editLogs, createdDt, createdByUser, isCancelled, isRejected, canDelete, canCancel,
-                canReject, canAccept, canEdit, isAccepted, newBookingId,
+                canReject, canAccept, canEdit, isAccepted, newBookingId, eventId
             },
         } = this.props;
         const legendLabels = [
@@ -424,7 +424,7 @@ class BookingDetails extends React.Component {
                                 <>
                                     {bookedForUser && this.renderBookedFor(bookedForUser)}
                                     {this.renderReason(bookingReason)}
-                                    {isLinkedToEvent && <BookingEventLink bookingId={id} />}
+                                    {isLinkedToEvent && <BookingEventLink eventId={eventId} />}
                                     {this.renderBookingHistory(editLogs, createdDt, createdByUser)}
                                     {this.renderMessageAfterSplitting(newBookingId)}
                                 </>

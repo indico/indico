@@ -39,6 +39,8 @@ _bp.add_url_rule('/api/stats', 'stats', misc.RHStats)
 _bp.add_url_rule('/api/map-areas', 'map_areas', misc.RHMapAreas)
 _bp.add_url_rule('/api/equipment', 'equipment_types', misc.RHEquipmentTypes)
 _bp.add_url_rule('/api/locations', 'locations', locations.RHLocations)
+_bp.add_url_rule('/api/data/<any(event,contrib,session_block):type>/<int:id>', 'linked_object_data',
+                 bookings.RHLinkedObjectData)
 
 # Rooms
 _bp.add_url_rule('/api/rooms/', 'rooms', rooms.RHRooms)
@@ -70,7 +72,6 @@ _bp.add_url_rule('/api/bookings/<int:booking_id>', 'delete_booking', bookings.RH
 _bp.add_url_rule('/api/bookings/<int:booking_id>', 'update_booking', bookings.RHUpdateBooking, methods=('PATCH',))
 _bp.add_url_rule('/api/bookings/<int:booking_id>/<any(approve,reject,cancel):action>', 'booking_state_actions',
                  bookings.RHBookingStateActions, methods=('POST',))
-_bp.add_url_rule('/api/bookings/<int:booking_id>/event', 'booking_event_data', bookings.RHBookingEventData)
 _bp.add_url_rule('/api/bookings/mine', 'my_bookings', bookings.RHMyUpcomingBookings)
 
 # Blockings

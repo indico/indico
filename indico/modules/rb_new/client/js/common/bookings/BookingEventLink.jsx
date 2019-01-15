@@ -18,7 +18,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Message, Placeholder, Segment, Icon} from 'semantic-ui-react';
-import getBookingEventDataURL from 'indico-url:rooms_new.booking_event_data';
+import getLinkedObjectDataURL from 'indico-url:rooms_new.linked_object_data';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import camelizeKeys from 'indico/utils/camelize';
@@ -28,7 +28,7 @@ import './BookingEventLink.module.scss';
 
 export default class BookingEventLink extends React.PureComponent {
     static propTypes = {
-        bookingId: PropTypes.number.isRequired,
+        eventId: PropTypes.number.isRequired,
     };
 
     state = {
@@ -37,14 +37,14 @@ export default class BookingEventLink extends React.PureComponent {
     };
 
     componentDidMount() {
-        const {bookingId} = this.props;
-        this.fetchEventData(bookingId);
+        const {eventId} = this.props;
+        this.fetchEventData(eventId);
     }
 
-    async fetchEventData(bookingId) {
+    async fetchEventData(eventId) {
         let response;
         try {
-            response = await indicoAxios.get(getBookingEventDataURL({booking_id: bookingId}));
+            response = await indicoAxios.get(getLinkedObjectDataURL({type: 'event', id: eventId}));
         } catch (error) {
             handleAxiosError(error);
             return;

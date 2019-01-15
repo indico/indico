@@ -26,6 +26,9 @@ from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from indico.core.db import db
 from indico.core.errors import NoReportError
+from indico.modules.events import Event
+from indico.modules.events.contributions import Contribution
+from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.rb import rb_settings
 from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
@@ -37,7 +40,7 @@ from indico.modules.rb_new.operations.bookings import (get_active_bookings, get_
                                                        should_split_booking, split_booking)
 from indico.modules.rb_new.operations.suggestions import get_suggestions
 from indico.modules.rb_new.schemas import (create_booking_args, reservation_details_occurrences_schema,
-                                           reservation_details_schema, reservation_event_data_schema,
+                                           reservation_details_schema, reservation_linked_object_data_schema,
                                            reservation_occurrences_schema)
 from indico.modules.rb_new.util import (group_by_occurrence_date, serialize_blockings, serialize_nonbookable_periods,
                                         serialize_occurrences, serialize_unbookable_hours)
@@ -261,13 +264,27 @@ class RHDeleteBooking(RHBookingBase):
         return jsonify(booking_id=booking_id, room_id=room_id)
 
 
-class RHBookingEventData(RHBookingBase):
+class RHLinkedObjectData(RHRoomBookingBase):
+    """Fetch data from event, contribution or session block"""
+    def _process_args(self):
+        type = request.view_args['type']
+        id = request.view_args['id']
+        self.linked_object = {
+            'event': lambda x: Event.get_one(x),
+            'contrib': lambda x: Contribution.get_one(x),
+            'session_block': lambda x: SessionBlock.get_one(x)
+        }[type](id)
+
     def _process(self):
-        if self.booking.event is None:
+        if self.linked_object is None:
             raise NotFound
-        if not self.booking.event.can_access(session.user):
+        if isinstance(self.linked_object, Event):
+            event = self.linked_object
+        else:
+            event = self.linked_object.event
+        if not event.can_access(session.user):
             return jsonify(can_access=False)
-        return jsonify(reservation_event_data_schema.dump(self.booking.event).data)
+        return jsonify(reservation_linked_object_data_schema.dump(self.linked_object).data)
 
 
 class RHUpdateBooking(RHBookingBase):

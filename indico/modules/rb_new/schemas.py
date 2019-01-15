@@ -77,11 +77,11 @@ class ReservationSchema(mm.ModelSchema):
         fields = ('id', 'booking_reason', 'booked_for_name', 'room_id', 'is_accepted')
 
 
-class ReservationEventDataSchema(Schema):
+class ReservationLinkedObjectDataSchema(Schema):
     id = Number()
     title = String()
     url = String()
-    can_access = Function(lambda event: event.can_access(session.user))
+    can_access = Function(lambda obj: obj.can_access(session.user))
 
 
 class ReservationUserEventSchema(Schema):
@@ -152,6 +152,7 @@ class ReservationDetailsSchema(mm.ModelSchema):
         if rb_is_admin(session.user):
             admin_permissions = {x: getattr(booking, x)(session.user) for x in methods}
         return {'user': user_permissions, 'admin': admin_permissions}
+
 
 
 class BlockedRoomSchema(mm.ModelSchema):
@@ -299,7 +300,7 @@ map_areas_schema = MapAreaSchema(many=True)
 reservation_occurrences_schema = ReservationOccurrenceSchema(many=True)
 reservation_schema = ReservationSchema()
 reservation_details_schema = ReservationDetailsSchema()
-reservation_event_data_schema = ReservationEventDataSchema()
+reservation_linked_object_data_schema = ReservationLinkedObjectDataSchema()
 reservation_user_event_schema = ReservationUserEventSchema(many=True)
 reservation_details_occurrences_schema = ReservationDetailsOccurrenceSchema(many=True)
 blockings_schema = BlockingSchema(many=True)
