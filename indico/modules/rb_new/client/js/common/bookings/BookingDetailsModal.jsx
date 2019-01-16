@@ -58,7 +58,7 @@ class BookingDetailsModal extends React.Component {
         ) : (
             <BookingDetails booking={booking}
                             onClose={onClose}
-                            actionButtons={editButton} />
+                            editButton={editButton} />
         );
     }
 }

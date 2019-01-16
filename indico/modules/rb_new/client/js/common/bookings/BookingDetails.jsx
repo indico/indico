@@ -43,7 +43,7 @@ import './BookingDetails.module.scss';
 class BookingDetails extends React.Component {
     static propTypes = {
         onClose: PropTypes.func,
-        actionButtons: PropTypes.func,
+        editButton: PropTypes.func.isRequired,
         booking: PropTypes.object.isRequired,
         bookingStateChangeInProgress: PropTypes.bool.isRequired,
         actions: PropTypes.exact({
@@ -54,7 +54,6 @@ class BookingDetails extends React.Component {
 
     static defaultProps = {
         onClose: () => {},
-        actionButtons: () => {},
     };
 
     state = {
@@ -334,12 +333,12 @@ class BookingDetails extends React.Component {
         const {occurrencesVisible} = this.state;
         const {
             onClose,
-            actionButtons,
+            editButton,
             bookingStateChangeInProgress,
             booking: {
                 id, startDt, endDt, occurrences, dateRange, repetition, room, bookedForUser, isLinkedToEvent,
                 bookingReason, editLogs, createdDt, createdByUser, isCancelled, isRejected, canDelete, canCancel,
-                canReject, canAccept, isAccepted
+                canReject, canAccept, canEdit, isAccepted
             }
         } = this.props;
         const legendLabels = [
@@ -365,7 +364,7 @@ class BookingDetails extends React.Component {
                             {this.renderBookingStatus()}
                         </span>
                         <span>
-                            {actionButtons({disabled: bookingStateChangeInProgress})}
+                            {canEdit && editButton({disabled: bookingStateChangeInProgress})}
                             {canDelete && this.renderDeleteButton()}
                         </span>
                     </Modal.Header>
