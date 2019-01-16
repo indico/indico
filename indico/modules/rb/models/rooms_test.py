@@ -21,6 +21,7 @@ import pytest
 
 from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.core.errors import IndicoError
+from indico.modules.rb import rb_settings
 from indico.modules.rb.models.blocked_rooms import BlockedRoom
 from indico.modules.rb.models.photos import Photo
 from indico.modules.rb.models.reservations import RepeatFrequency
@@ -506,30 +507,6 @@ def test_has_live_reservations(dummy_room, create_reservation):
     assert dummy_room.has_live_reservations()
 
 
-@pytest.mark.parametrize(('is_owner', 'is_admin', 'expected'), bool_matrix('..', expect=any))
-def test_can_be_overridden(dummy_room, create_user, is_owner, is_admin, expected):
-    user = create_user(123, rb_admin=is_admin)
-    if is_owner:
-        dummy_room.owner = user
-    assert dummy_room.can_be_overridden(user) == expected
-
-
-@pytest.mark.parametrize(('is_admin', 'expected'), (
-    (True,  True),
-    (False, False)
-))
-def test_can_be_modified_deleted(dummy_room, create_user, is_admin, expected):
-    user = create_user(123, rb_admin=is_admin, legacy=True)
-    assert dummy_room.can_be_modified(user) == expected
-    assert dummy_room.can_be_deleted(user) == expected
-
-
-def test_can_be_no_user(dummy_room):
-    assert not dummy_room.can_be_overridden(None)
-    assert not dummy_room.can_be_modified(None)
-    assert not dummy_room.can_be_deleted(None)
-
-
 @pytest.mark.parametrize(('is_owner', 'has_group', 'in_group', 'expected'),
                          bool_matrix('...', expect=lambda x: x[0] or all(x[1:])))
 def test_ownership_functions(dummy_room, create_user, create_room_attribute, create_group,
@@ -643,7 +620,7 @@ def test_permissions_protected_room(dummy_room, dummy_user):
 
 @pytest.mark.parametrize('reservations_need_confirmation', (True, False))
 def test_permissions_protected_room_admin(dummy_room, dummy_user, reservations_need_confirmation):
-    dummy_user.is_admin = True
+    rb_settings.acls.add_principal('admin_principals', dummy_user)
     dummy_room.protection_mode = ProtectionMode.protected
     dummy_room.reservations_need_confirmation = reservations_need_confirmation
     assert dummy_room.can_book(dummy_user)
@@ -666,6 +643,16 @@ def test_permissions_no_user(dummy_room):
     assert not dummy_room.can_prebook(None)
     assert not dummy_room.can_override(None)
     assert not dummy_room.can_moderate(None)
+    assert not dummy_room.can_edit(None)
+    assert not dummy_room.can_delete(None)
+
+
+@pytest.mark.parametrize('is_admin', (True, False))
+def test_admin_permissions(dummy_room, dummy_user, is_admin):
+    if is_admin:
+        rb_settings.acls.add_principal('admin_principals', dummy_user)
+    assert dummy_room.can_edit(dummy_user) == is_admin
+    assert dummy_room.can_delete(dummy_user) == is_admin
 
 
 @pytest.mark.parametrize('acl_perm', (None, 'book', 'prebook', 'override', 'moderate', '*'))
@@ -677,7 +664,8 @@ def test_permissions_no_user(dummy_room):
 def test_get_permissions_for_user(dummy_room, dummy_user, monkeypatch, bulk_possible, is_admin, is_reservable,
                                   reservations_need_confirmation, protection_mode, acl_perm):
     monkeypatch.setattr(User, 'can_get_all_multipass_groups', bulk_possible)
-    dummy_user.is_admin = is_admin
+    if is_admin:
+        rb_settings.acls.add_principal('admin_principals', dummy_user)
     dummy_room.protection_mode = protection_mode
     dummy_room.is_reservable = is_reservable
     dummy_room.reservations_need_confirmation = reservations_need_confirmation

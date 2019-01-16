@@ -418,7 +418,7 @@ class RHRoomBookingNewBookingSimple(RHRoomBookingNewBookingBase):
                 return jsonify(success=False, url=url_for('rooms.room_book', room), msg=msg)
             return self._create_booking_response(form, room)
 
-        can_override = room.can_be_overridden(session.user)
+        can_override = room.can_override(session.user)
         return self._get_view(form=form,
                               room=room,
                               rooms=rooms,
@@ -667,7 +667,7 @@ class RHRoomBookingModifyBooking(RHRoomBookingBookingMixin, RHRoomBookingNewBook
                               start_dt=form.start_dt.data, end_dt=form.end_dt.data, only_conflicts=False,
                               repeat_frequency=form.repeat_frequency.data, repeat_interval=form.repeat_interval.data,
                               reservation=self._reservation,
-                              can_override=room.can_be_overridden(session.user)).display()
+                              can_override=room.can_override(session.user)).display()
 
 
 class RHRoomBookingCalendar(RHRoomBookingBase):

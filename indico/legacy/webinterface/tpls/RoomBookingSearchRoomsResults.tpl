@@ -61,7 +61,7 @@
                                     % elif room.can_prebook(_session.user):
                                       <a href="${ booking_url }">${ _('PRE-book') }</a><br/>
                                     % endif
-                                    % if room.can_be_modified(_session.user):
+                                    % if room.can_edit(_session.user):
                                       <a href="${ modification_url }"> ${ _('modify') }</a><br/>
                                     % endif
                                     % if mapAvailable:

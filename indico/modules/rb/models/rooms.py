@@ -666,20 +666,6 @@ class Room(versioned_cache(_cache, 'id'), ProtectionManagersMixin, db.Model, Ser
                         BlockedRoom.state.in_(states))
                 .all())
 
-    def can_be_overridden(self, user):
-        if not user:
-            return False
-        return rb_is_admin(user) or self.is_owned_by(user)
-
-    def can_be_modified(self, user):
-        """Only admin can modify rooms."""
-        if not user:
-            return False
-        return rb_is_admin(user)
-
-    def can_be_deleted(self, user):
-        return self.can_be_modified(user)
-
     @property
     def protection_parent(self):
         return None
@@ -793,6 +779,16 @@ class Room(versioned_cache(_cache, 'id'), ProtectionManagersMixin, db.Model, Ser
     def can_moderate(self, user, allow_admin=True):
         # XXX: When changing the logic in here, make sure to update get_permissions_for_user as well!
         return self.can_manage(user, permission='moderate', allow_admin=allow_admin)
+
+    def can_edit(self, user):
+        if not user:
+            return False
+        return rb_is_admin(user)
+
+    def can_delete(self, user):
+        if not user:
+            return False
+        return rb_is_admin(user)
 
     @unify_user_args
     @cached(_cache)
