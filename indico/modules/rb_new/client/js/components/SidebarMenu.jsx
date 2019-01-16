@@ -137,7 +137,7 @@ SidebarMenu.defaultProps = {
 
 export default connect(
     state => ({
-        isAdmin: userSelectors.isUserAdmin(state),
+        isAdmin: userSelectors.isUserRBAdmin(state),
         hasOwnedRooms: userSelectors.hasOwnedRooms(state),
     }),
     dispatch => ({

@@ -76,7 +76,7 @@ class AdminArea extends React.Component {
 
 export default connect(
     state => ({
-        isAdmin: userSelectors.isUserAdmin(state),
+        isAdmin: userSelectors.isUserRBAdmin(state),
     }),
     dispatch => ({
         actions: bindActionCreators({

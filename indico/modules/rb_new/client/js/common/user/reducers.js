@@ -29,6 +29,7 @@ const initialUserInfoState = {
     avatarBgColor: '',
     language: '',
     isAdmin: false,
+    isRBAdmin: false,
     hasOwnedRooms: false,
     favoriteUsers: []
 };
@@ -65,6 +66,7 @@ export default combineReducers({
                     avatarBgColor: user.avatar_bg_color,
                     language: user.language,
                     isAdmin: user.is_admin,
+                    isRBAdmin: user.is_rb_admin,
                     hasOwnedRooms: user.has_owned_rooms,
                     favoriteUsers: camelizeKeys(user.favorite_users)
                 };

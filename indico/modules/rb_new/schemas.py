@@ -38,6 +38,7 @@ from indico.modules.rb.models.room_bookable_hours import BookableHours
 from indico.modules.rb.models.room_features import RoomFeature
 from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
 from indico.modules.rb.models.rooms import Room
+from indico.modules.rb.util import rb_is_admin
 from indico.modules.users.schemas import UserSchema
 from indico.util.i18n import _
 from indico.util.marshmallow import NaiveDateTime
@@ -212,10 +213,12 @@ class AdminLocationsSchema(LocationsSchema):
 
 class RBUserSchema(UserSchema):
     has_owned_rooms = mm.Method('has_managed_rooms')
+    is_rb_admin = mm.Function(lambda user: rb_is_admin(user))
     favorite_users = Nested(UserSchema, many=True)
 
     class Meta:
-        fields = UserSchema.Meta.fields + ('has_owned_rooms', 'favorite_users', 'is_admin', 'identifier', 'full_name')
+        fields = UserSchema.Meta.fields + ('has_owned_rooms', 'favorite_users', 'is_admin', 'is_rb_admin', 'identifier',
+                                           'full_name')
 
     def has_managed_rooms(self, user):
         from indico.modules.rb_new.operations.rooms import has_managed_rooms
