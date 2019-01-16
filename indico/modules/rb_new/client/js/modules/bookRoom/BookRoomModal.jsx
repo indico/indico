@@ -36,6 +36,8 @@ import * as actions from './actions';
 import {actions as modalActions} from '../../modals';
 import {selectors as userSelectors} from '../../common/user';
 import * as bookRoomSelectors from './selectors';
+import ObjectLink from './ObjectLink';
+
 
 import './BookRoomModal.module.scss';
 
@@ -404,7 +406,7 @@ class BookRoomModal extends React.Component {
 
     render() {
         const {
-            bookingData: {recurrence, dates, timeSlot, isPrebooking},
+            bookingData: {recurrence, dates, timeSlot, isPrebooking, link},
             room, availability,
             timeInformationComponent: TimeInformationComponent,
             defaultTitles
@@ -443,6 +445,7 @@ class BookRoomModal extends React.Component {
                         </Grid.Column>
                         <Grid.Column width={8}>
                             {isPrebooking && this.renderPrebookingMessage()}
+                            {link && <ObjectLink type={link.type} id={link.id} />}
                             <Form id="book-room-form" onSubmit={fprops.handleSubmit}>
                                 <Segment inverted color="blue">
                                     <h3>

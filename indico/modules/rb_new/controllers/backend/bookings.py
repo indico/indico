@@ -278,11 +278,8 @@ class RHLinkedObjectData(RHRoomBookingBase):
     def _process(self):
         if self.linked_object is None:
             raise NotFound
-        if isinstance(self.linked_object, Event):
-            event = self.linked_object
-        else:
-            event = self.linked_object.event
-        if not event.can_access(session.user):
+
+        if not self.linked_object.can_access(session.user) or not self.linked_object.event.can_access(session.user):
             return jsonify(can_access=False)
         return jsonify(reservation_linked_object_data_schema.dump(self.linked_object).data)
 

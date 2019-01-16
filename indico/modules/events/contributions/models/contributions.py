@@ -40,6 +40,7 @@ from indico.modules.events.papers.models.revisions import PaperRevision, PaperRe
 from indico.modules.events.sessions.util import session_coordinator_priv_enabled
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii
+from indico.web.flask.util import url_for
 
 
 def _get_next_friendly_id(context):
@@ -495,6 +496,10 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
     @property
     def paper(self):
         return Paper(self) if self._paper_last_revision else None
+
+    @property
+    def url(self):
+        return url_for('contributions.display_contribution', self)
 
     def is_paper_reviewer(self, user):
         return user in self.paper_content_reviewers or user in self.paper_layout_reviewers

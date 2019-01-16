@@ -33,8 +33,8 @@ const BookingDataProvider = connect(
         bookRoomFilters: bookRoomSelectors.getFilters(state),
     })
 )(
-    ({bookRoomFilters: {dates, timeSlot, recurrence}, bookingData: {isPrebooking}, ...restProps}) => (
-        <BookRoomModal {...restProps} bookingData={{dates, timeSlot, recurrence, isPrebooking}} />
+    ({bookRoomFilters: {dates, timeSlot, recurrence}, bookingData: {isPrebooking, link}, ...restProps}) => (
+        <BookRoomModal {...restProps} bookingData={{dates, timeSlot, recurrence, isPrebooking, link}} />
     )
 );
 
@@ -54,7 +54,7 @@ const momentizeBookRoomDefaults = (defaults) => (!_.isEmpty(defaults) ? {
 export default {
     /* eslint-disable react/display-name */
     'booking-form': (onClose, roomId, data) => {
-        const {isPrebooking, ...bookingData} = data;
+        const {isPrebooking, link, ...bookingData} = data;
         return (
             <RoomDetailsPreloader roomId={roomId}>
                 {() => (!_.isEmpty(bookingData)
