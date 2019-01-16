@@ -222,9 +222,9 @@ class RHBookingStateActions(RHBookingBase):
 
     def _check_access(self):
         RHBookingBase._check_access(self)
-        funcs = {'approve': self.booking.can_be_accepted,
-                 'reject': self.booking.can_be_rejected,
-                 'cancel': self.booking.can_be_cancelled}
+        funcs = {'approve': self.booking.can_accept,
+                 'reject': self.booking.can_reject,
+                 'cancel': self.booking.can_cancel}
 
         if self.action not in funcs or not funcs[self.action](session.user):
             raise Forbidden
@@ -251,7 +251,7 @@ class RHBookingStateActions(RHBookingBase):
 class RHBookingDelete(RHBookingBase):
     def _check_access(self):
         RHBookingBase._check_access(self)
-        if not self.booking.can_be_deleted(session.user):
+        if not self.booking.can_delete(session.user):
             raise Forbidden
 
     def _process(self):

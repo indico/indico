@@ -125,11 +125,11 @@ class ReservationDetailsSchema(mm.ModelSchema):
     booked_for_user = Nested(UserSchema, only=('id', 'identifier', 'full_name', 'phone', 'email'))
     created_by_user = Nested(UserSchema, only=('id', 'identifier', 'full_name', 'email'))
     edit_logs = Nested(ReservationEditLogSchema, many=True)
-    can_accept = Function(lambda booking: booking.can_be_accepted(session.user))
-    can_cancel = Function(lambda booking: booking.can_be_cancelled(session.user))
-    can_delete = Function(lambda booking: booking.can_be_deleted(session.user))
-    can_modify = Function(lambda booking: booking.can_be_modified(session.user))
-    can_reject = Function(lambda booking: booking.can_be_rejected(session.user))
+    can_accept = Function(lambda booking: booking.can_accept(session.user))
+    can_cancel = Function(lambda booking: booking.can_cancel(session.user))
+    can_delete = Function(lambda booking: booking.can_delete(session.user))
+    can_edit = Function(lambda booking: booking.can_edit(session.user))
+    can_reject = Function(lambda booking: booking.can_reject(session.user))
     is_linked_to_event = Function(lambda booking: booking.event_id is not None)
     start_dt = NaiveDateTime()
     end_dt = NaiveDateTime()
@@ -137,7 +137,7 @@ class ReservationDetailsSchema(mm.ModelSchema):
     class Meta:
         model = Reservation
         fields = ('id', 'start_dt', 'end_dt', 'repetition', 'booking_reason', 'created_dt', 'booked_for_user',
-                  'room_id', 'created_by_user', 'edit_logs', 'can_accept', 'can_cancel', 'can_delete', 'can_modify',
+                  'room_id', 'created_by_user', 'edit_logs', 'can_accept', 'can_cancel', 'can_delete', 'can_edit',
                   'can_reject', 'is_cancelled', 'is_rejected', 'is_accepted', 'is_pending', 'rejection_reason',
                   'is_linked_to_event')
 

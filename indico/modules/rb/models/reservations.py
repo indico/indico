@@ -454,26 +454,26 @@ class Reservation(Serializer, db.Model):
         self.edit_logs.append(edit_log)
         db.session.flush()
 
-    def can_be_accepted(self, user, allow_admin=True):
+    def can_accept(self, user, allow_admin=True):
         if user is None:
             return False
         return self.is_pending and self.room.can_moderate(user, allow_admin=allow_admin)
 
-    def can_be_rejected(self, user, allow_admin=True):
+    def can_reject(self, user, allow_admin=True):
         if user is None:
             return False
         if self.is_rejected or self.is_cancelled:
             return False
         return self.room.can_moderate(user, allow_admin=allow_admin)
 
-    def can_be_cancelled(self, user, allow_admin=True):
+    def can_cancel(self, user, allow_admin=True):
         if user is None:
             return False
         if self.is_rejected or self.is_cancelled or self.is_archived:
             return False
         return self.is_owned_by(user) or self.is_booked_for(user) or (allow_admin and rb_is_admin(user))
 
-    def can_be_modified(self, user, allow_admin=True):
+    def can_edit(self, user, allow_admin=True):
         if user is None:
             return False
         if self.is_rejected or self.is_cancelled:
@@ -482,7 +482,7 @@ class Reservation(Serializer, db.Model):
             return False
         return self.is_owned_by(user) or self.is_booked_for(user) or self.room.can_manage(user, allow_admin=allow_admin)
 
-    def can_be_deleted(self, user):
+    def can_delete(self, user):
         if user is None:
             return False
         return rb_is_admin(user) and (self.is_cancelled or self.is_rejected)

@@ -268,8 +268,8 @@ def test_moderation(dummy_reservation, dummy_user, is_pending, can_moderate):
     dummy_reservation.is_accepted = not is_pending
     if can_moderate:
         dummy_reservation.room.update_principal(dummy_user, permissions={'moderate'})
-    assert dummy_reservation.can_be_accepted(dummy_user) == (is_pending and can_moderate)
-    assert dummy_reservation.can_be_rejected(dummy_user) == can_moderate
+    assert dummy_reservation.can_accept(dummy_user) == (is_pending and can_moderate)
+    assert dummy_reservation.can_reject(dummy_user) == can_moderate
 
 
 @pytest.mark.parametrize('is_manager', (True, False))
@@ -286,11 +286,11 @@ def test_room_manager_actions(create_reservation, create_user, is_manager, is_pe
     reservation.is_cancelled = is_cancelled
     if is_manager:
         reservation.room.update_principal(user, full_access=True)
-    assert reservation.can_be_accepted(user) == (is_pending and (is_manager or is_admin) and not is_cancelled)
-    assert reservation.can_be_rejected(user) == (not is_cancelled and (is_manager or is_admin))
-    assert reservation.can_be_cancelled(user) == (not is_past and not is_cancelled and is_admin)
-    assert reservation.can_be_modified(user) == (((is_manager and not is_past) or is_admin) and not is_cancelled)
-    assert reservation.can_be_deleted(user) == (is_admin and is_cancelled)
+    assert reservation.can_accept(user) == (is_pending and (is_manager or is_admin) and not is_cancelled)
+    assert reservation.can_reject(user) == (not is_cancelled and (is_manager or is_admin))
+    assert reservation.can_cancel(user) == (not is_past and not is_cancelled and is_admin)
+    assert reservation.can_edit(user) == (((is_manager and not is_past) or is_admin) and not is_cancelled)
+    assert reservation.can_delete(user) == (is_admin and is_cancelled)
 
 
 @pytest.mark.parametrize('is_creator', (True, False))
@@ -308,16 +308,16 @@ def test_user_actions(create_user, create_reservation, is_creator, is_bookee, is
         reservation.booked_for_user = user
     if is_rejected:
         reservation.is_rejected = True
-    assert reservation.can_be_cancelled(user) == ((is_creator or is_bookee) and not is_past and not is_rejected)
-    assert reservation.can_be_modified(user) == ((is_creator or is_bookee) and not is_past and not is_rejected)
+    assert reservation.can_cancel(user) == ((is_creator or is_bookee) and not is_past and not is_rejected)
+    assert reservation.can_edit(user) == ((is_creator or is_bookee) and not is_past and not is_rejected)
 
 
 def test_actions_no_user(dummy_reservation):
-    assert not dummy_reservation.can_be_accepted(None)
-    assert not dummy_reservation.can_be_cancelled(None)
-    assert not dummy_reservation.can_be_deleted(None)
-    assert not dummy_reservation.can_be_modified(None)
-    assert not dummy_reservation.can_be_rejected(None)
+    assert not dummy_reservation.can_accept(None)
+    assert not dummy_reservation.can_cancel(None)
+    assert not dummy_reservation.can_delete(None)
+    assert not dummy_reservation.can_edit(None)
+    assert not dummy_reservation.can_reject(None)
 
 
 def test_find_excluded_days(db, create_reservation):

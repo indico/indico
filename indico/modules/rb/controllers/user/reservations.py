@@ -67,7 +67,7 @@ class _SuccessUrlDetailsMixin:
 class RHRoomBookingAcceptBooking(_SuccessUrlDetailsMixin, RHRoomBookingBookingMixin, RHRoomBookingBase):
     def _check_access(self):
         RHRoomBookingBase._check_access(self)
-        if not self._reservation.can_be_accepted(session.user):
+        if not self._reservation.can_accept(session.user):
             raise Forbidden("You are not authorized to perform this action")
 
     def _process(self):
@@ -82,7 +82,7 @@ class RHRoomBookingAcceptBooking(_SuccessUrlDetailsMixin, RHRoomBookingBookingMi
 class RHRoomBookingCancelBooking(_SuccessUrlDetailsMixin, RHRoomBookingBookingMixin, RHRoomBookingBase):
     def _check_access(self):
         RHRoomBookingBase._check_access(self)
-        if not self._reservation.can_be_cancelled(session.user):
+        if not self._reservation.can_cancel(session.user):
             raise Forbidden("You are not authorized to perform this action")
 
     def _process(self):
@@ -99,7 +99,7 @@ class RHRoomBookingRejectBooking(_SuccessUrlDetailsMixin, RHRoomBookingBookingMi
 
     def _check_access(self):
         RHRoomBookingBase._check_access(self)
-        if not self._reservation.can_be_rejected(session.user):
+        if not self._reservation.can_reject(session.user):
             raise Forbidden("You are not authorized to perform this action")
 
     def _process(self):
@@ -117,7 +117,7 @@ class RHRoomBookingCancelBookingOccurrence(_SuccessUrlDetailsMixin, RHRoomBookin
 
     def _check_access(self):
         RHRoomBookingBase._check_access(self)
-        if not self._reservation.can_be_cancelled(session.user):
+        if not self._reservation.can_cancel(session.user):
             raise Forbidden("You are not authorized to perform this action")
 
     def _process(self):
@@ -136,7 +136,7 @@ class RHRoomBookingRejectBookingOccurrence(_SuccessUrlDetailsMixin, RHRoomBookin
 
     def _check_access(self):
         RHRoomBookingBase._check_access(self)
-        if not self._reservation.can_be_rejected(session.user):
+        if not self._reservation.can_reject(session.user):
             raise Forbidden("You are not authorized to perform this action")
 
     def _process(self):
@@ -617,7 +617,7 @@ class RHRoomBookingNewBooking(RHRoomBookingNewBookingBase):
 class RHRoomBookingModifyBooking(RHRoomBookingBookingMixin, RHRoomBookingNewBookingBase):
     def _check_access(self):
         RHRoomBookingNewBookingBase._check_access(self)
-        if not self._reservation.can_be_modified(session.user):
+        if not self._reservation.can_edit(session.user):
             raise Forbidden
 
     def _get_view(self, **kwargs):
