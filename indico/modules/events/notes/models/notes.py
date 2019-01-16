@@ -35,7 +35,7 @@ from indico.util.string import render_markdown, return_ascii, text_to_repr
 
 class EventNote(LinkMixin, db.Model):
     __tablename__ = 'notes'
-    allowed_link_types = LinkMixin.allowed_link_types - {LinkType.category}
+    allowed_link_types = LinkMixin.allowed_link_types - {LinkType.category, LinkType.session_block}
     unique_links = True
     events_backref_name = 'all_notes'
     link_backref_name = 'note'

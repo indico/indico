@@ -35,15 +35,18 @@ class LinkType(int, IndicoEnum):
     contribution = 3
     subcontribution = 4
     session = 5
+    session_block = 6
 
 
-_all_columns = {'category_id', 'linked_event_id', 'contribution_id', 'subcontribution_id', 'session_id'}
+_all_columns = {'category_id', 'linked_event_id', 'contribution_id', 'subcontribution_id', 'session_id',
+                'session_block_id'}
 _columns_for_types = {
     LinkType.category: {'category_id'},
     LinkType.event: {'linked_event_id'},
     LinkType.contribution: {'contribution_id'},
     LinkType.subcontribution: {'subcontribution_id'},
     LinkType.session: {'session_id'},
+    LinkType.session_block: {'session_block_id'},
 }
 
 
@@ -103,6 +106,7 @@ class LinkMixin(object):
         this mixin class.
         """
         event_mapping = {cls.session: lambda x: x.event,
+                         cls.session_block: lambda x: x.event,
                          cls.contribution: lambda x: x.event,
                          cls.subcontribution: lambda x: x.contribution.event,
                          cls.linked_event: lambda x: x}
@@ -110,6 +114,7 @@ class LinkMixin(object):
         type_mapping = {cls.category: LinkType.category,
                         cls.linked_event: LinkType.event,
                         cls.session: LinkType.session,
+                        cls.session_block: LinkType.session_block,
                         cls.contribution: LinkType.contribution,
                         cls.subcontribution: LinkType.subcontribution}
 
@@ -173,6 +178,16 @@ class LinkMixin(object):
             return db.Column(
                 db.Integer,
                 db.ForeignKey('events.sessions.id'),
+                nullable=True,
+                index=True
+            )
+
+    @declared_attr
+    def session_block_id(cls):
+        if LinkType.session_block in cls.allowed_link_types:
+            return db.Column(
+                db.Integer,
+                db.ForeignKey('events.session_blocks.id'),
                 nullable=True,
                 index=True
             )
@@ -253,6 +268,20 @@ class LinkMixin(object):
             )
 
     @declared_attr
+    def session_block(cls):
+        if LinkType.session_block in cls.allowed_link_types:
+            return db.relationship(
+                'SessionBlock',
+                lazy=True,
+                backref=db.backref(
+                    cls.link_backref_name,
+                    cascade='all, delete-orphan',
+                    uselist=(cls.unique_links != True),  # noqa
+                    lazy=cls.link_backref_lazy
+                )
+            )
+
+    @declared_attr
     def contribution(cls):
         if LinkType.contribution in cls.allowed_link_types:
             return db.relationship(
@@ -288,6 +317,8 @@ class LinkMixin(object):
             return self.event
         elif self.link_type == LinkType.session:
             return self.session
+        elif self.link_type == LinkType.session_block:
+            return self.session_block
         elif self.link_type == LinkType.contribution:
             return self.contribution
         elif self.link_type == LinkType.subcontribution:
@@ -296,13 +327,16 @@ class LinkMixin(object):
     @object.setter
     def object(self, obj):
         self.category = None
-        self.linked_event = self.event = self.session = self.contribution = self.subcontribution = None
+        self.linked_event = self.event = self.session = self.session_block = None
+        self.contribution = self.subcontribution = None
         if isinstance(obj, db.m.Category):
             self.category = obj
         elif isinstance(obj, db.m.Event):
             self.linked_event = obj
         elif isinstance(obj, db.m.Session):
             self.session = obj
+        elif isinstance(obj, db.m.SessionBlock):
+            self.session_block = obj
         elif isinstance(obj, db.m.Contribution):
             self.contribution = obj
         elif isinstance(obj, db.m.SubContribution):
@@ -333,6 +367,8 @@ class LinkMixin(object):
         data = {}
         if self.link_type == LinkType.session:
             data['Session'] = self.session.title
+        if self.link_type == LinkType.session_block:
+            data['SessionBlock'] = self.session_block.title
         elif self.link_type == LinkType.contribution:
             data['Contribution'] = self.contribution.title
         elif self.link_type == LinkType.subcontribution:
@@ -359,6 +395,9 @@ class LinkedObjectComparator(Comparator):
         elif isinstance(other, db.m.Session):
             return db.and_(self.cls.link_type == LinkType.session,
                            self.cls.session_id == other.id)
+        elif isinstance(other, db.m.SessionBlock):
+            return db.and_(self.cls.link_type == LinkType.session_block,
+                           self.cls.session_block_id == other.id)
         elif isinstance(other, db.m.Contribution):
             return db.and_(self.cls.link_type == LinkType.contribution,
                            self.cls.contribution_id == other.id)
