@@ -528,7 +528,8 @@ class Room(versioned_cache(_cache, 'id'), ProtectionManagersMixin, db.Model, Ser
         return db.session.query(db.func.max(Room.capacity)).scalar() or 0
 
     @staticmethod
-    def filter_available(start_dt, end_dt, repetition, include_blockings, include_pre_bookings=True, include_pending_blockings=False):
+    def filter_available(start_dt, end_dt, repetition, include_blockings=True, include_pre_bookings=True,
+                         include_pending_blockings=False):
         """Returns a SQLAlchemy filter criterion ensuring that the room is available during the given time."""
         # Check availability against reservation occurrences
         dummy_occurrences = ReservationOccurrence.create_series(start_dt, end_dt, repetition)
@@ -548,6 +549,7 @@ class Room(versioned_cache(_cache, 'id'), ProtectionManagersMixin, db.Model, Ser
                 valid_states = (BlockedRoom.State.accepted, BlockedRoom.State.pending)
             else:
                 valid_states = (BlockedRoom.State.accepted,)
+            # TODO: only take blockings into account which the user cannot override
             blocking_criteria = [Room.id == BlockedRoom.room_id,
                                  BlockedRoom.state.in_(valid_states),
                                  db_dates_overlap(Blocking, 'start_date', end_dt.date(), 'end_date', start_dt.date(),
@@ -608,6 +610,7 @@ class Room(versioned_cache(_cache, 'id'), ProtectionManagersMixin, db.Model, Ser
         if filters.get('available', -1) != -1:
             repetition = RepeatMapping.convert_legacy_repeatability(ast.literal_eval(filters['repeatability']))
             is_available = Room.filter_available(filters['start_dt'], filters['end_dt'], repetition,
+                                                 include_blockings=True,
                                                  include_pre_bookings=filters.get('include_pre_bookings', True),
                                                  include_pending_blockings=filters.get('include_pending_blockings',
                                                                                        True))

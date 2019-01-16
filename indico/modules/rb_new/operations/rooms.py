@@ -189,7 +189,8 @@ def search_for_rooms(filters, availability=None):
     start_dt, end_dt = filters['start_dt'], filters['end_dt']
     repeatability = (filters['repeat_frequency'], filters['repeat_interval'])
     include_blockings = not rb_is_admin(session.user)
-    availability_filters = [Room.filter_available(start_dt, end_dt, repeatability, include_blockings, include_pre_bookings=True)]
+    availability_filters = [Room.filter_available(start_dt, end_dt, repeatability, include_blockings=include_blockings,
+                                                  include_pre_bookings=True)]
     if not rb_is_admin(session.user):
         # TODO: apply this filter for each room based on the ACL
         # only query whether the restriction is violated or not and return this

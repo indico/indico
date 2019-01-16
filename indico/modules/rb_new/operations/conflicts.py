@@ -21,6 +21,7 @@ from collections import defaultdict
 from flask import session
 from sqlalchemy.orm import contains_eager
 
+from indico.modules.rb import rb_is_admin
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import Reservation
 from indico.modules.rb.models.rooms import Room
@@ -51,11 +52,12 @@ def get_rooms_conflicts(rooms, start_dt, end_dt, repeat_frequency, repeat_interv
     for room_id, occurrences in blocked_rooms.iteritems():
         rooms_conflicts[room_id] += get_room_blockings_conflicts(room_id, candidates, occurrences)
 
-    for room_id, occurrences in nonbookable_periods.iteritems():
-        rooms_conflicts[room_id] += get_room_nonbookable_periods_conflicts(candidates, occurrences)
+    if not rb_is_admin(session.user):
+        for room_id, occurrences in nonbookable_periods.iteritems():
+            rooms_conflicts[room_id] += get_room_nonbookable_periods_conflicts(candidates, occurrences)
 
-    for room_id, occurrences in unbookable_hours.iteritems():
-        rooms_conflicts[room_id] += get_room_unbookable_hours_conflicts(candidates, occurrences)
+        for room_id, occurrences in unbookable_hours.iteritems():
+            rooms_conflicts[room_id] += get_room_unbookable_hours_conflicts(candidates, occurrences)
     return rooms_conflicts, rooms_pre_conflicts
 
 

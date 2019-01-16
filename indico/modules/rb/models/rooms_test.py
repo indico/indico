@@ -332,7 +332,7 @@ def test_filter_available(dummy_room, create_reservation, create_blocking,
     if has_pending_blocking:
         create_blocking(state=BlockedRoom.State.pending)
     availabilty_filter = Room.filter_available(get_day_start(date.today()), get_day_end(date.today()),
-                                               (RepeatFrequency.NEVER, 0),
+                                               (RepeatFrequency.NEVER, 0), include_blockings=True,
                                                include_pre_bookings=include_pre_bookings,
                                                include_pending_blockings=include_pending_blockings)
     assert set(Room.find_all(availabilty_filter)) == (set() if filtered else {dummy_room})

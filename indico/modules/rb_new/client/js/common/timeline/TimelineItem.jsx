@@ -208,7 +208,6 @@ class TimelineItem extends React.Component {
 
     renderOccurrences = () => {
         const {data} = this.props;
-        console.warn(data);
         return Object.entries(data).map(([name, occurrences]) => (
             occurrences.map(occurrence => (
                 <React.Fragment key={getKeyForOccurrence(name, occurrence)}>
