@@ -425,8 +425,9 @@ class Reservation(Serializer, db.Model):
             occurrence.reject(user, u'Rejected due to collision with a confirmed reservation')
 
     def reset_approval(self, user):
+        self.state = ReservationState.pending
         notify_reset_approval(self)
-        self.add_edit_log(ReservationEditLog(user_name=user.full_name, info=['Reservation requires approval']))
+        self.add_edit_log(ReservationEditLog(user_name=user.full_name, info=['Requiring new approval due to change']))
 
     def cancel(self, user, reason=None, silent=False):
         self.state = ReservationState.cancelled

@@ -33,7 +33,7 @@ from indico.modules.rb.models.reservations import RepeatFrequency, Reservation
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb_new.controllers.backend.common import search_room_args
 from indico.modules.rb_new.operations.bookings import (get_active_bookings, get_booking_occurrences, get_room_bookings,
-                                                       get_room_calendar, get_rooms_availability)
+                                                       get_room_calendar, get_rooms_availability, has_same_dates)
 from indico.modules.rb_new.operations.suggestions import get_suggestions
 from indico.modules.rb_new.schemas import (create_booking_args, reservation_details_occurrences_schema,
                                            reservation_details_schema, reservation_event_data_schema,
@@ -284,12 +284,12 @@ class RHUpdateBooking(RHBookingBase):
             'repeat_frequency': args['repeat_frequency'],
             'repeat_interval': args['repeat_interval'],
         }
-
+        has_date_changed = not has_same_dates(self.booking, data)
         self.booking.modify(data, session.user)
 
         room = self.booking.room
-        if (room.reservations_need_confirmation and self.booking.is_accepted and
-                not room.can_be_booked(session.user, ignore_admin=True)):
+        if (has_date_changed and not room.can_book(session.user, allow_admin=False) and
+                room.can_prebook(session.user, allow_admin=False) and self.booking.is_accepted):
             self.booking.reset_approval(session.user)
         db.session.flush()
 

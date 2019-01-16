@@ -292,3 +292,10 @@ def get_active_bookings(limit, start_dt, last_reservation_id=None, **filters):
     bookings, total = with_total_rows(query)
     rows_left = total - limit if total > limit else total
     return group_by_occurrence_date(query, sort_by=lambda obj: (obj.start_dt, obj.reservation_id)), rows_left
+
+
+def has_same_dates(old_booking, new_booking):
+    return (old_booking.start_dt == new_booking['start_dt'] and
+            old_booking.end_dt == new_booking['end_dt'] and
+            old_booking.repeat_interval == new_booking['repeat_interval'] and
+            old_booking.repeat_frequency == new_booking['repeat_frequency'])
