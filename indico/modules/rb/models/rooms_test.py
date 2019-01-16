@@ -661,6 +661,13 @@ def test_permissions_protected_room_acl(dummy_room, dummy_user, permission):
         assert getattr(dummy_room, 'can_' + p)(dummy_user) == granted
 
 
+def test_permissions_no_user(dummy_room):
+    assert not dummy_room.can_book(None)
+    assert not dummy_room.can_prebook(None)
+    assert not dummy_room.can_override(None)
+    assert not dummy_room.can_moderate(None)
+
+
 @pytest.mark.parametrize('acl_perm', (None, 'book', 'prebook', 'override', 'moderate', '*'))
 @pytest.mark.parametrize('protection_mode', (ProtectionMode.public, ProtectionMode.protected))
 @pytest.mark.parametrize('reservations_need_confirmation', (True, False))

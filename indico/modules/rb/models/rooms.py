@@ -764,6 +764,8 @@ class Room(versioned_cache(_cache, 'id'), ProtectionManagersMixin, db.Model, Ser
 
     def can_book(self, user, allow_admin=True):
         # XXX: When changing the logic in here, make sure to update get_permissions_for_user as well!
+        if not user:
+            return False
         if not self.is_reservable and not (allow_admin and self.is_user_admin(user)):
             return False
         if self.is_public and not self.reservations_need_confirmation:
@@ -772,6 +774,8 @@ class Room(versioned_cache(_cache, 'id'), ProtectionManagersMixin, db.Model, Ser
 
     def can_prebook(self, user, allow_admin=True):
         # XXX: When changing the logic in here, make sure to update get_permissions_for_user as well!
+        if not user:
+            return False
         if not self.is_reservable and not (allow_admin and self.is_user_admin(user)):
             return False
         if self.is_public and self.reservations_need_confirmation:
