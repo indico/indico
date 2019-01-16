@@ -248,7 +248,7 @@ class RHBookingStateActions(RHBookingBase):
         return jsonify(booking=reservation_details_schema.dump(self.booking).data, booking_state=state)
 
 
-class RHBookingDelete(RHBookingBase):
+class RHDeleteBooking(RHBookingBase):
     def _check_access(self):
         RHBookingBase._check_access(self)
         if not self.booking.can_delete(session.user):
@@ -271,6 +271,11 @@ class RHBookingEventData(RHBookingBase):
 
 
 class RHUpdateBooking(RHBookingBase):
+    def _check_access(self):
+        RHBookingBase._check_access(self)
+        if not self.booking.can_edit(session.user):
+            raise Forbidden
+
     @use_args(create_booking_args)
     def _process(self, args):
         data = {
