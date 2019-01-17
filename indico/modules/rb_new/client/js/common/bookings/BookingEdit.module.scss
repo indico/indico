@@ -21,15 +21,96 @@
     align-items: center;
 }
 
+.ongoing-booking-info {
+    font-size: 1.2em;
+}
+
 .booking-calendar {
     display: flex;
     flex-direction: column;
     flex: 1;
 
+    .legend-header {
+        flex: 1;
+    }
+
+    .original-booking-header, .new-booking-header {
+        align-self: center;
+    }
+
+    .calendars {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+
+        .original-booking {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .new-booking {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+        }
+    }
+
+    .ongoing-booking-explanation {
+        height: 130px;
+
+        :global(.content) {
+            padding-top: 10px;
+            padding-bottom: 10px;
+
+            :global(.ui.list) {
+                margin-top: 5px !important;
+            }
+        }
+    }
+
     :global(.legend-header) {
         .occurrence-count {
             display: flex;
             margin-left: auto !important;
+
+            :global(.label):first-child {
+                align-self: center;
+            }
+
+            :global(.new-occurrences-count) {
+                &:global(.single-arrow) {
+                    display: flex;
+                    align-items: center;
+
+                }
+
+                .arrow {
+                    display: inline-block;
+                }
+
+                &:not(:global(.single-arrow)) {
+                    :global(.label) {
+                        margin-top: 8px;
+                    }
+
+                    .arrow {
+                        transform: rotate(15deg) scale(1.4);
+                    }
+                }
+            }
+
+            .old-occurrences-count {
+                :global(.label) {
+                    margin-bottom: 8px;
+                }
+
+                .arrow {
+                    display: inline-block;
+                    transform: rotate(-15deg) scale(1.4);
+                }
+            }
         }
     }
 }

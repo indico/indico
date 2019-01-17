@@ -18,11 +18,11 @@
 @import 'rb_new:styles/palette';
 @import 'rb_new:styles/util';
 
-$row-height: 50px;
+$row-height: 40px;
 
 .timeline-header {
     display: flex;
-    height: $row-height;
+    min-height: $row-height;
 
     .timeline-header-labels {
         flex: 1;

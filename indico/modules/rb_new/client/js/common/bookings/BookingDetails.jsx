@@ -112,7 +112,7 @@ class BookingDetails extends React.Component {
 
     renderTimeline = (occurrences, dateRange) => {
         const rows = dateRange.map((day) => this._getRowSerializer(day)(occurrences));
-        return <DailyTimelineContent rows={rows} fixedHeight={rows.length > 1 ? '70vh' : null} />;
+        return <DailyTimelineContent rows={rows} fixedHeight={rows.length > 1 ? '70vh' : null} maxHour={24} />;
     };
 
     renderBookingHistory = (editLogs, createdOn, createdByUser) => {

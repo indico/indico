@@ -113,11 +113,15 @@ class BookingEditForm extends React.Component {
                 endDate: toMoment(endDate, 'YYYY-MM-DD')
             }
         };
+        const disabledDate = (dt) => {
+            const {booking: {startDt: start}} = this.props;
+            return !dt.isSameOrAfter(start, 'day');
+        };
 
         return (
             <ReduxFormField {...fieldProps}
                             {...props}
-                            disabledDate={() => false}
+                            disabledDate={disabledDate}
                             input={input}
                             as={component} />
         );

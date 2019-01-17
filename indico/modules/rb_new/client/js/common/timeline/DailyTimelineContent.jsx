@@ -46,6 +46,7 @@ export default class DailyTimelineContent extends React.Component {
         showUnused: PropTypes.bool,
         fixedHeight: PropTypes.string,
         onAddSlot: PropTypes.func,
+        renderHeader: PropTypes.func,
     };
 
     static defaultProps = {
@@ -61,6 +62,7 @@ export default class DailyTimelineContent extends React.Component {
         showUnused: true,
         fixedHeight: null,
         onAddSlot: null,
+        renderHeader: null,
     };
 
     state = {
@@ -124,13 +126,25 @@ export default class DailyTimelineContent extends React.Component {
         ));
     }
 
-    renderHeader(hourSpan, hourSeries) {
+    renderHeader() {
         const {selectable} = this.state;
-        const {longLabel, hourStep} = this.props;
-        const labelWidth = longLabel ? 200 : 150;
+        const {renderHeader, maxHour, minHour, hourStep} = this.props;
+        const hourSpan = maxHour - minHour;
+        const hourSeries = _.range(minHour, maxHour + hourStep, hourStep);
 
         return (
             <div styleName="timeline-header" className={!selectable ? 'timeline-non-selectable' : ''}>
+                {renderHeader ? renderHeader() : this.renderDefaultHeader(hourSpan, hourSeries)}
+            </div>
+        );
+    }
+
+    renderDefaultHeader = (hourSpan, hourSeries) => {
+        const {hourStep, longLabel} = this.props;
+        const labelWidth = longLabel ? 200 : 150;
+
+        return (
+            <>
                 <div style={{width: labelWidth}} />
                 <div styleName="timeline-header-labels">
                     {_.range(0, hourSpan, hourStep).map((i, n) => (
@@ -143,9 +157,9 @@ export default class DailyTimelineContent extends React.Component {
                         </div>
                     ))}
                 </div>
-            </div>
+            </>
         );
-    }
+    };
 
     renderTimelineItemPlaceholders = (props) => (
         _.range(0, 10).map((i) => (
@@ -193,12 +207,11 @@ export default class DailyTimelineContent extends React.Component {
 
     render() {
         const {
-            maxHour, minHour, rows, lazyScroll, hourStep, fixedHeight, isLoading
+            rows, lazyScroll, fixedHeight, isLoading, maxHour, minHour,
         } = this.props;
         const WrapperComponent = lazyScroll ? LazyScroll : React.Fragment;
         const wrapperProps = lazyScroll || {};
         const hourSpan = maxHour - minHour;
-        const hourSeries = _.range(minHour, maxHour + hourStep, hourStep);
 
         const windowScrollerWrapper = (
             <WindowScroller>
@@ -229,7 +242,7 @@ export default class DailyTimelineContent extends React.Component {
 
         return (
             <>
-                {(isLoading || !!rows.length) && this.renderHeader(hourSpan, hourSeries)}
+                {(isLoading || !!rows.length) && this.renderHeader()}
                 <WrapperComponent {...wrapperProps}>
                     {(fixedHeight ? (
                         autoSizerWrapper(fixedHeight)

@@ -273,9 +273,40 @@ class RHUpdateBooking(RHBookingBase):
         if not self.booking.can_edit(session.user):
             raise Forbidden
 
+    def _should_split(self, new_start_dt, new_end_dt):
+        today = date.today()
+        is_ongoing_booking = new_start_dt.date() < today
+        old_start_time, old_end_time = self.booking.start_dt.time(), self.booking.end_dt.time()
+        times_changed = new_start_dt.time() != old_start_time or new_end_dt.time() != old_end_time
+        return is_ongoing_booking and times_changed
+
+    def split_bookings(self, booking_data):
+        occurrences = self.booking.occurrences
+        room = self.booking.room
+        is_prebooking = not self.booking.is_accepted
+        occurrences_to_cancel = filter(lambda r: r.start_dt.date() >= date.today(), occurrences)
+        new_start_dt = datetime.combine(occurrences_to_cancel[0].start_dt.date(), booking_data['start_dt'].time())
+        for occurrence_to_cancel in occurrences_to_cancel:
+            occurrence_to_cancel.cancel(session.user, silent=True)
+
+        new_end_dt = [occ for occ in occurrences if occ.start_dt.date() < date.today()][-1].end_dt
+        old_booking_data = {
+            'booking_reason': self.booking.booking_reason,
+            'room_usage': 'current_user' if self.booking.booked_for_user == session.user else 'someone',
+            'booked_for_user': self.booking.booked_for_user,
+            'start_dt': self.booking.start_dt,
+            'end_dt': new_end_dt,
+            'repeat_frequency': self.booking.repeat_frequency,
+            'repeat_interval': self.booking.repeat_interval,
+        }
+
+        self.booking.modify(old_booking_data, session.user)
+        return Reservation.create_from_data(room, dict(booking_data, start_dt=new_start_dt), session.user,
+                                            prebook=is_prebooking)
+
     @use_args(create_booking_args)
     def _process(self, args):
-        data = {
+        booking_data = {
             'booking_reason': args['booking_reason'],
             'room_usage': 'current_user' if args.get('user_id', None) is None else 'someone',
             'booked_for_user': User.get(args.get('user_id', session.user.id)),
@@ -284,18 +315,20 @@ class RHUpdateBooking(RHBookingBase):
             'repeat_frequency': args['repeat_frequency'],
             'repeat_interval': args['repeat_interval'],
         }
-        has_date_changed = not has_same_dates(self.booking, data)
-        self.booking.modify(data, session.user)
 
-        room = self.booking.room
-        if (has_date_changed and not room.can_book(session.user, allow_admin=False) and
-                room.can_prebook(session.user, allow_admin=False) and self.booking.is_accepted):
-            self.booking.reset_approval(session.user)
+        if not self._should_split(args['start_dt'], args['end_dt']):
+            has_date_changed = not has_same_dates(self.booking, data)
+            room = self.booking.room
+            self.booking.modify(booking_data, session.user)
+            if (has_date_changed and not room.can_book(session.user, allow_admin=False) and
+                    room.can_prebook(session.user, allow_admin=False) and self.booking.is_accepted):
+                self.booking.reset_approval(session.user)
+        else:
+            self.split_bookings(booking_data)
+
         db.session.flush()
-
-        start_date = args['start_dt']
-        end_date = args['end_dt']
-        calendar = get_room_calendar(start_date or date.today(), end_date or date.today(), [args['room_id']])
+        today = date.today()
+        calendar = get_room_calendar(args['start_dt'] or today, args['end_dt'] or today, [args['room_id']])
         return jsonify(booking=_serialize_booking_details(self.booking),
                        room_calendar=_serialize_availability(calendar).values())
 
