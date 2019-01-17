@@ -153,12 +153,17 @@ class TimelineItem extends React.Component {
                 </div>
             );
         } else if (type === 'cancelation') {
-            popupContent = <div styleName="popup-center"><strong><Translate>Cancelled</Translate></strong></div>;
+            popupContent = (
+                <div styleName="popup-center">
+                    <strong><Translate>Cancelled</Translate></strong>
+                    {!!rejectionReason && <div>{Translate.string('Reason: {reason}', {reason: rejectionReason})}</div>}
+                </div>
+            );
         } else if (type === 'rejection') {
             popupContent = (
                 <div styleName="popup-center">
                     <strong><Translate>Rejected</Translate></strong>
-                    <div>{Translate.string('Reason: {reason}', {reason: rejectionReason})}</div>
+                    {!!rejectionReason && <div>{Translate.string('Reason: {reason}', {reason: rejectionReason})}</div>}
                 </div>
             );
         } else {

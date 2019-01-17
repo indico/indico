@@ -165,7 +165,21 @@ class BookingDetails extends React.Component {
             icon = <Icon name="cancel" />;
             color = 'grey';
             status = Translate.string('Cancelled');
-            message = Translate.string('This booking was cancelled');
+            message = (
+                <>
+                    <Translate>
+                        The booking was cancelled.
+                    </Translate>
+                    {!!rejectionReason && (
+                        <>
+                            <br />
+                            <Translate>
+                                Reason: <Param name="rejectionReason" value={rejectionReason} wrapper={<strong />} />
+                            </Translate>
+                        </>
+                    )}
+                </>
+            );
         } else if (isRejected) {
             icon = <Icon name="calendar minus" />;
             color = 'red';
@@ -175,10 +189,14 @@ class BookingDetails extends React.Component {
                     <Translate>
                         The booking was rejected.
                     </Translate>
-                    <br />
-                    <Translate>
-                        Reason: <Param name="rejectionReason" value={rejectionReason} wrapper={<strong />} />
-                    </Translate>
+                    {!!rejectionReason && (
+                        <>
+                            <br />
+                            <Translate>
+                                Reason: <Param name="rejectionReason" value={rejectionReason} wrapper={<strong />} />
+                            </Translate>
+                        </>
+                    )}
                 </>
             );
         } else if (isAccepted) {
