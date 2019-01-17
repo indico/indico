@@ -32,5 +32,7 @@ export const ajax = {
     },
     room_id: ({room: {id}}) => id,
     event_id: ({event}) => event,
+    contribution_id: ({contrib}) => contrib,
+    session_block_id: ({sessionBlock}) => sessionBlock,
     is_prebooking: ({isPrebooking}) => isPrebooking
 };

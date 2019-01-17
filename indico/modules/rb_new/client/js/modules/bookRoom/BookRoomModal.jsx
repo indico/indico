@@ -36,7 +36,7 @@ import * as actions from './actions';
 import {actions as modalActions} from '../../modals';
 import {selectors as userSelectors} from '../../common/user';
 import * as bookRoomSelectors from './selectors';
-import ObjectLink from './ObjectLink';
+import BookingObjectLink from '../../common/bookings/BookingObjectLink';
 
 
 import './BookRoomModal.module.scss';
@@ -256,7 +256,10 @@ class BookRoomModal extends React.Component {
     }
 
     submitBooking = async (data) => {
-        const {actions: {createBooking}} = this.props;
+        const {actions: {createBooking}, bookingData: {link}} = this.props;
+        if (link) {
+            data[link.type] = link.id;
+        }
         const rv = await createBooking(data, this.props);
         if (rv.error) {
             return rv.error;
@@ -445,7 +448,7 @@ class BookRoomModal extends React.Component {
                         </Grid.Column>
                         <Grid.Column width={8}>
                             {isPrebooking && this.renderPrebookingMessage()}
-                            {link && <ObjectLink type={link.type} id={link.id} />}
+                            {link && <BookingObjectLink type={link.type} id={link.id} pending />}
                             <Form id="book-room-form" onSubmit={fprops.handleSubmit}>
                                 <Segment inverted color="blue">
                                     <h3>
@@ -535,7 +538,7 @@ export default connect(
             fetchRelatedEvents: actions.fetchRelatedEvents,
             resetRelatedEvents: actions.resetRelatedEvents,
             createBooking: (data, props) => {
-                const {reason, usage, user, isPrebooking, event} = data;
+                const {reason, usage, user, isPrebooking, event, contrib, sessionBlock} = data;
                 const {bookingData: {recurrence, dates, timeSlot}, room} = props;
                 return actions.createBooking({
                     reason,
@@ -546,6 +549,8 @@ export default connect(
                     timeSlot,
                     room,
                     event,
+                    contrib,
+                    sessionBlock,
                     isPrebooking
                 });
             },

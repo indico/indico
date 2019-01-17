@@ -34,7 +34,7 @@ import RoomBasicDetails from '../../components/RoomBasicDetails';
 import RoomKeyLocation from '../../components/RoomKeyLocation';
 import TimeInformation from '../../components/TimeInformation';
 import {actions as modalActions} from '../../modals';
-import BookingEventLink from './BookingEventLink';
+import BookingObjectLink from './BookingObjectLink';
 import * as bookingsSelectors from './selectors';
 import * as bookRoomActions from './actions';
 
@@ -370,6 +370,17 @@ class BookingDetails extends React.Component {
         );
     };
 
+    get linkedObject() {
+        const {booking: {eventId, contributionId, sessionBlockId}} = this.props;
+        if (eventId) {
+            return {type: 'event', id: eventId};
+        } else if (contributionId) {
+            return {type: 'contrib', id: contributionId};
+        } else {
+            return {type: 'sessionBlock', id: sessionBlockId};
+        }
+    }
+
     render() {
         const {occurrencesVisible} = this.state;
         const {
@@ -377,9 +388,9 @@ class BookingDetails extends React.Component {
             editButton,
             bookingStateChangeInProgress,
             booking: {
-                startDt, endDt, occurrences, dateRange, repetition, room, bookedForUser, isLinkedToEvent,
+                startDt, endDt, occurrences, dateRange, repetition, room, bookedForUser, isLinkedToObject,
                 bookingReason, editLogs, createdDt, createdByUser, isCancelled, isRejected, canDelete, canCancel,
-                canReject, canAccept, canEdit, isAccepted, newBookingId, eventId
+                canReject, canAccept, canEdit, isAccepted, newBookingId
             },
         } = this.props;
         const legendLabels = [
@@ -424,7 +435,9 @@ class BookingDetails extends React.Component {
                                 <>
                                     {bookedForUser && this.renderBookedFor(bookedForUser)}
                                     {this.renderReason(bookingReason)}
-                                    {isLinkedToEvent && <BookingEventLink eventId={eventId} />}
+                                    {isLinkedToObject && (
+                                        <BookingObjectLink type={this.linkedObject.type} id={this.linkedObject.id} />
+                                    )}
                                     {this.renderBookingHistory(editLogs, createdDt, createdByUser)}
                                     {this.renderMessageAfterSplitting(newBookingId)}
                                 </>

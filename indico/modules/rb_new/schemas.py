@@ -136,7 +136,10 @@ class ReservationDetailsSchema(mm.ModelSchema):
     can_reject = Function(lambda booking: booking.can_reject(session.user))
     permissions = Method('_get_permissions')
     state = EnumField(ReservationState)
-    is_linked_to_event = Function(lambda booking: booking.event_id is not None)
+    is_linked_to_object = Function(lambda booking:
+                                   booking.event_id is not None or
+                                   booking.contribution_id is not None or
+                                   booking.session_block_id is not None)
     start_dt = NaiveDateTime()
     end_dt = NaiveDateTime()
 
@@ -145,7 +148,7 @@ class ReservationDetailsSchema(mm.ModelSchema):
         fields = ('id', 'start_dt', 'end_dt', 'repetition', 'booking_reason', 'created_dt', 'booked_for_user',
                   'room_id', 'created_by_user', 'edit_logs', 'permissions',
                   'is_cancelled', 'is_rejected', 'is_accepted', 'is_pending', 'rejection_reason',
-                  'is_linked_to_event', 'state')
+                  'is_linked_to_object', 'state')
 
     def _get_permissions(self, booking):
         methods = ('can_accept', 'can_cancel', 'can_delete', 'can_edit', 'can_reject')
@@ -255,6 +258,8 @@ class CreateBookingSchema(Schema):
     room_id = fields.Int(required=True)
     user_id = fields.Int()
     event_id = fields.Int()
+    contribution_id = fields.Int()
+    session_block_id = fields.Int()
     booking_reason = fields.String(load_from='reason', validate=validate.Length(min=3))
     is_prebooking = fields.Bool(missing=False)
 

@@ -20,17 +20,26 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {Message, Placeholder, Segment, Icon} from 'semantic-ui-react';
 import getLinkedObjectDataURL from 'indico-url:rooms_new.linked_object_data';
-import {Translate, Param} from 'indico/react/i18n';
+import {Translate} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import camelizeKeys from 'indico/utils/camelize';
 
-import './ObjectLink.module.scss';
+import './BookingObjectLink.module.scss';
 
-
-export default class BookingEventLink extends React.PureComponent {
+/**
+ * `BookingObjectLink` displays a message informing if the booking is
+ * linked or will be linked to an event, contribution or session block.
+ */
+export default class BookingObjectLink extends React.PureComponent {
     static propTypes = {
         type: PropTypes.oneOf(['event', 'contrib', 'sessionBlock']).isRequired,
         id: PropTypes.number.isRequired,
+        /** Whether it is a pending link or the booking is already linked */
+        pending: PropTypes.bool,
+    };
+
+    static defaultProps = {
+        pending: false
     };
 
     state = {
@@ -59,22 +68,24 @@ export default class BookingEventLink extends React.PureComponent {
     }
 
     renderLinkMessage(data) {
-        const {type} = this.props;
+        const {type, pending} = this.props;
         const {url, title, canAccess, eventTitle, eventUrl} = data;
-        const mapping = {
-            event: Translate.string('an event'),
-            contrib: Translate.string('a contribution'),
-            sessionBlock: Translate.string('a session block')
+        const pendingMessages = {
+            event: Translate.string('This booking will be linked to an event:'),
+            contribution: Translate.string('This booking will be linked to a contribution:'),
+            sessionBlock: Translate.string('This booking will be linked to a session block:'),
         };
-        return !!mapping[type] && canAccess && (
+        const linkedMessages = {
+            event: Translate.string('This booking is linked to an event:'),
+            contribution: Translate.string('This booking is linked to a contribution:'),
+            sessionBlock: Translate.string('This booking is linked to a session block:'),
+        };
+        return canAccess && (
             <Message icon color="teal">
                 <Icon name="linkify" />
                 <Message.Content>
                     <>
-                        <Translate>
-                            This booking will be linked to <Param name="type" wrapper={<strong />}
-                                                                  value={mapping[type]} />:
-                        </Translate>
+                        {pending ? pendingMessages[type] : linkedMessages[type]}
                         <div styleName="object-link">
                             {type === 'event'
                                 ? <a href={url}>{title}</a>
