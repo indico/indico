@@ -69,7 +69,7 @@ def _upgrade_permissions():
                                          ('allowed-booking-group',)).scalar()
     manager_group_attr_id = conn.execute('SELECT id FROM roombooking.room_attributes WHERE name = %s',
                                          ('manager-group',)).scalar()
-    query = 'SELECT id, owner_id, reservations_need_confirmation from roombooking.rooms'
+    query = 'SELECT id, owner_id, reservations_need_confirmation FROM roombooking.rooms'
     for room_id, owner_id, reservations_need_confirmation in conn.execute(query):
         booking_group = manager_group = None
         if booking_group_attr_id is not None:
@@ -133,7 +133,7 @@ def _downgrade_permissions():
     if manager_group_attr_id is None:
         manager_group_attr_id = _create_attribute(conn, 'manager-group', 'Manager Group')
 
-    query = 'SELECT id, owner_id, reservations_need_confirmation, protection_mode from roombooking.rooms'
+    query = 'SELECT id, owner_id, reservations_need_confirmation, protection_mode FROM roombooking.rooms'
     for room_id, owner_id, reservations_need_confirmation, protection_mode in conn.execute(query):
         query = conn.execute('SELECT * FROM roombooking.room_principals WHERE room_id = %s', (room_id,))
         for row in query:
