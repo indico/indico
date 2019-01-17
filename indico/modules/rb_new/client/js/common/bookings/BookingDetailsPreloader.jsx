@@ -27,7 +27,8 @@ import * as bookingsSelectors from './selectors';
 
 
 const BookingDetailsPreloader = ({bookingId, component: Component, fetchDetails, onClose}) => (
-    <Preloader checkCached={state => bookingsSelectors.hasDetails(state, {bookingId})}
+    <Preloader key={bookingId}
+               checkCached={state => bookingsSelectors.hasDetails(state, {bookingId})}
                action={() => fetchDetails(bookingId)}
                dimmer={<Dimmer active page><Loader /></Dimmer>}>
         {() => <Component bookingId={bookingId} onClose={onClose} />}
