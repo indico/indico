@@ -90,6 +90,13 @@ class RepeatMapping(object):
             raise KeyError('Undefined old repeat: {}'.format(repeat))
 
 
+class ReservationState(int, IndicoEnum):
+    pending = 1
+    accepted = 2
+    canceled = 3
+    rejected = 4
+
+
 class Reservation(Serializer, db.Model):
     __tablename__ = 'reservations'
     __public__ = []
@@ -110,6 +117,8 @@ class Reservation(Serializer, db.Model):
                 db.Index('ix_reservations_end_dt_date', cast(cls.end_dt, Date)),
                 db.Index('ix_reservations_start_dt_time', cast(cls.start_dt, Time)),
                 db.Index('ix_reservations_end_dt_time', cast(cls.end_dt, Time)),
+                db.CheckConstraint("(rejection_reason = '') = (state != {})".format(ReservationState.rejected.value),
+                                   'rejected_with_reason'),
                 {'schema': 'roombooking'})
 
     id = db.Column(
@@ -165,19 +174,10 @@ class Reservation(Serializer, db.Model):
         nullable=False,
         index=True
     )
-    is_accepted = db.Column(
-        db.Boolean,
-        nullable=False
-    )
-    is_cancelled = db.Column(
-        db.Boolean,
+    state = db.Column(
+        PyIntEnum(ReservationState),
         nullable=False,
-        default=False
-    )
-    is_rejected = db.Column(
-        db.Boolean,
-        nullable=False,
-        default=False
+        default=ReservationState.accepted
     )
     booking_reason = db.Column(
         db.Text,
@@ -255,28 +255,30 @@ class Reservation(Serializer, db.Model):
     # - room (Room.reservations)
 
     @hybrid_property
-    def is_archived(self):
-        return self.end_dt < datetime.now()
+    def is_pending(self):
+        return self.state == ReservationState.pending
 
     @hybrid_property
-    def is_pending(self):
-        return not (self.is_accepted or self.is_rejected or self.is_cancelled)
+    def is_accepted(self):
+        return self.state == ReservationState.accepted
 
-    @is_pending.expression
-    def is_pending(self):
-        return ~(Reservation.is_accepted | Reservation.is_rejected | Reservation.is_cancelled)
+    @hybrid_property
+    def is_cancelled(self):  # TODO: rename to is_canceled
+        return self.state == ReservationState.canceled
+
+    @hybrid_property
+    def is_rejected(self):
+        return self.state == ReservationState.rejected
+
+    @hybrid_property
+    def is_archived(self):
+        return self.end_dt < datetime.now()
 
     @hybrid_property
     def is_repeating(self):
         return self.repeat_frequency != RepeatFrequency.NEVER
 
-    @hybrid_property
-    def is_valid(self):
-        return self.is_accepted and not (self.is_rejected or self.is_cancelled)
-
-    @is_valid.expression
-    def is_valid(self):
-        return self.is_accepted & ~(self.is_rejected | self.is_cancelled)
+    is_valid = is_accepted  # TODO: remove
 
     @property
     def contact_email(self):
