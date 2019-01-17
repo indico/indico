@@ -117,8 +117,6 @@ class Reservation(Serializer, db.Model):
                 db.Index('ix_reservations_end_dt_date', cast(cls.end_dt, Date)),
                 db.Index('ix_reservations_start_dt_time', cast(cls.start_dt, Time)),
                 db.Index('ix_reservations_end_dt_time', cast(cls.end_dt, Time)),
-                db.CheckConstraint("(rejection_reason = '') = (state != {})".format(ReservationState.rejected.value),
-                                   'rejected_with_reason'),
                 {'schema': 'roombooking'})
 
     id = db.Column(

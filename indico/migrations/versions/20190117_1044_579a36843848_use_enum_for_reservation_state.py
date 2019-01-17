@@ -20,10 +20,6 @@ depends_on = None
 
 
 def upgrade():
-    op.execute('''
-        UPDATE roombooking.reservations SET rejection_reason = 'Rejected' WHERE is_rejected AND rejection_reason = '';
-        UPDATE roombooking.reservations SET rejection_reason = '' WHERE NOT is_rejected AND rejection_reason != '';
-    ''')
     op.add_column('reservations', sa.Column('state', PyIntEnum(ReservationState), nullable=True), schema='roombooking')
     op.execute('''
         UPDATE roombooking.reservations
@@ -35,15 +31,12 @@ def upgrade():
         END
     ''')
     op.alter_column('reservations', 'state', nullable=False, schema='roombooking')
-    op.create_check_constraint('rejected_with_reason', 'reservations', "(rejection_reason = '') = (state != 4)",
-                               schema='roombooking')
     op.drop_column('reservations', 'is_accepted', schema='roombooking')
     op.drop_column('reservations', 'is_cancelled', schema='roombooking')
     op.drop_column('reservations', 'is_rejected', schema='roombooking')
 
 
 def downgrade():
-    op.drop_constraint('ck_reservations_rejected_with_reason', 'reservations', schema='roombooking')
     op.add_column('reservations', sa.Column('is_rejected', sa.Boolean(), nullable=True), schema='roombooking')
     op.add_column('reservations', sa.Column('is_accepted', sa.Boolean(), nullable=True), schema='roombooking')
     op.add_column('reservations', sa.Column('is_cancelled', sa.Boolean(), nullable=True), schema='roombooking')
