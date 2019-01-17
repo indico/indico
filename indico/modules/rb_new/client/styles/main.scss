@@ -91,7 +91,7 @@ a {
         flex-direction: row;
         flex-wrap: wrap;
 
-        > :global(.ui.buttons), > .view-icons {
+        > .ui.buttons, > .view-icons {
             margin-bottom: 10px;
         }
 
