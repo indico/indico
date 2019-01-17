@@ -312,7 +312,33 @@ class BookRoomModal extends React.Component {
         };
     };
 
-    renderRelatedEventsDropdown = (disabled) => {
+    renderEventField = (options, disabled, mutators) => {
+        if (options.length > 1) {
+            return (
+                <Field name="event"
+                       component={ReduxDropdownField}
+                       options={options}
+                       selection
+                       placeholder={Translate.string('Choose an event')}
+                       clearable
+                       disabled={disabled} />
+            );
+        } else {
+            return (
+                <div styleName="event-checkbox">
+                    <span><strong>{options[0].text}</strong></span>
+                    <span styleName="description">{options[0].description}</span>
+                    <Checkbox toggle
+                              styleName="checkbox"
+                              onChange={(__, {checked}) => {
+                                  mutators.setEvent(checked ? options[0].value : undefined);
+                              }} />
+                </div>
+            );
+        }
+    };
+
+    renderRelatedEventsDropdown = (disabled, mutators) => {
         const {relatedEvents} = this.props;
         const options = relatedEvents.map(this.getEventOption);
 
@@ -335,13 +361,7 @@ class BookRoomModal extends React.Component {
                         </Plural>
                     </PluralTranslate>
                 </div>
-                <Field name="event"
-                       component={ReduxDropdownField}
-                       options={options}
-                       selection
-                       placeholder={Translate.string('Choose an event')}
-                       clearable
-                       disabled={disabled} />
+                {this.renderEventField(options, disabled, mutators)}
             </Segment>
         );
     };
@@ -421,7 +441,7 @@ class BookRoomModal extends React.Component {
                                            disabled={bookingBlocked(fprops)}
                                            required />
                                 </Segment>
-                                {this.renderRelatedEventsDropdown(bookingBlocked(fprops))}
+                                {this.renderRelatedEventsDropdown(bookingBlocked(fprops), fprops.form.mutators)}
                             </Form>
                             {conflictsExist && this.renderBookingConstraints(Object.values(availability.conflicts))}
                             {this.renderBookingState(fprops)}
@@ -452,7 +472,10 @@ class BookRoomModal extends React.Component {
         return (
             <Modal open onClose={this.onClose} size="large" closeIcon>
                 <FinalForm onSubmit={this.submitBooking} validate={validate} decorators={[formDecorator]}
-                           render={renderModalContent} initialValues={{user: null}} />
+                           render={renderModalContent} initialValues={{user: null}}
+                           mutators={{setEvent: (args, state, {changeValue}) => {
+                               changeValue(state, 'event', () => args[0]);
+                           }}} />
             </Modal>
         );
     }

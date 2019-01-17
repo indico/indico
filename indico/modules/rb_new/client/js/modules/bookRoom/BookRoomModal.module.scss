@@ -22,6 +22,20 @@
 }
 
 .events-segment-description {
-    color: $gray;
+    color: $sui-grey;
     padding-bottom: 1em;
+}
+
+.event-checkbox {
+    display: flex;
+    align-items: center;
+
+    .description {
+        margin-left: 1em;
+        color: $sui-grey;
+    }
+
+    .checkbox {
+        margin-left: auto;
+    }
 }
