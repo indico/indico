@@ -316,6 +316,7 @@ class RHUpdateBooking(RHBookingBase):
             'repeat_interval': args['repeat_interval'],
         }
 
+        additional_booking_attrs = {}
         if not self._should_split(args['start_dt'], args['end_dt']):
             has_date_changed = not has_same_dates(self.booking, data)
             room = self.booking.room
@@ -324,12 +325,13 @@ class RHUpdateBooking(RHBookingBase):
                     room.can_prebook(session.user, allow_admin=False) and self.booking.is_accepted):
                 self.booking.reset_approval(session.user)
         else:
-            self.split_bookings(booking_data)
+            new_booking = self.split_bookings(booking_data)
+            additional_booking_attrs['new_booking_id'] = new_booking.id
 
         db.session.flush()
         today = date.today()
         calendar = get_room_calendar(args['start_dt'] or today, args['end_dt'] or today, [args['room_id']])
-        return jsonify(booking=_serialize_booking_details(self.booking),
+        return jsonify(booking=dict(_serialize_booking_details(self.booking), **additional_booking_attrs),
                        room_calendar=_serialize_availability(calendar).values())
 
 

@@ -33,6 +33,7 @@ import {getRecurrenceInfo, PopupParam} from '../../util';
 import RoomBasicDetails from '../../components/RoomBasicDetails';
 import RoomKeyLocation from '../../components/RoomKeyLocation';
 import TimeInformation from '../../components/TimeInformation';
+import {actions as modalActions} from '../../modals';
 import BookingEventLink from './BookingEventLink';
 import * as bookingsSelectors from './selectors';
 import * as bookRoomActions from './actions';
@@ -49,6 +50,7 @@ class BookingDetails extends React.Component {
         actions: PropTypes.exact({
             deleteBooking: PropTypes.func.isRequired,
             changeBookingState: PropTypes.func.isRequired,
+            openBookingDetails: PropTypes.func.isRequired,
         }).isRequired,
     };
 
@@ -149,6 +151,27 @@ class BookingDetails extends React.Component {
                 <Header><Translate>Booking history</Translate></Header>
                 <List divided styleName="log-list">{items}</List>
             </div>
+        );
+    };
+
+    renderMessageAfterSplitting = (newBookingId) => {
+        if (newBookingId === undefined) {
+            return null;
+        }
+
+        const {actions: {openBookingDetails}} = this.props;
+        const link = <a onClick={() => openBookingDetails(newBookingId)} />;
+        return (
+            <Message color="green">
+                <Message.Header>
+                    <Translate>
+                        The booking has been successfully split.
+                    </Translate>
+                </Message.Header>
+                <Translate>
+                    You can consult your new booking <Param name="link" wrapper={link}>here</Param>.
+                </Translate>
+            </Message>
         );
     };
 
@@ -356,8 +379,8 @@ class BookingDetails extends React.Component {
             booking: {
                 id, startDt, endDt, occurrences, dateRange, repetition, room, bookedForUser, isLinkedToEvent,
                 bookingReason, editLogs, createdDt, createdByUser, isCancelled, isRejected, canDelete, canCancel,
-                canReject, canAccept, canEdit, isAccepted
-            }
+                canReject, canAccept, canEdit, isAccepted, newBookingId,
+            },
         } = this.props;
         const legendLabels = [
             {label: Translate.string('Current'), color: 'orange', style: 'booking'},
@@ -403,6 +426,7 @@ class BookingDetails extends React.Component {
                                     {this.renderReason(bookingReason)}
                                     {isLinkedToEvent && <BookingEventLink bookingId={id} />}
                                     {this.renderBookingHistory(editLogs, createdDt, createdByUser)}
+                                    {this.renderMessageAfterSplitting(newBookingId)}
                                 </>
                             </Grid.Column>
                         </Grid>
@@ -435,6 +459,7 @@ export default connect(
         actions: bindActionCreators({
             changeBookingState: bookRoomActions.changeBookingState,
             deleteBooking: bookRoomActions.deleteBooking,
+            openBookingDetails: bookingId => modalActions.openModal('booking-details', bookingId, null, true),
         }, dispatch)
     }),
 )(BookingDetails);
