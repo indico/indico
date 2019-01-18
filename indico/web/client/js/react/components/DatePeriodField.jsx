@@ -19,6 +19,7 @@ import _ from 'lodash';
 import moment from 'moment';
 import React from 'react';
 import PropTypes from 'prop-types';
+import {START_DATE, END_DATE} from 'react-dates/constants';
 import {DateRangePicker} from 'indico/react/components';
 import {serializeDate} from 'indico/utils/date';
 
@@ -30,6 +31,7 @@ export default class DatePeriodField extends React.Component {
         disabledDate: PropTypes.func,
         onChange: PropTypes.func.isRequired,
         disabled: PropTypes.bool,
+        disabledDateFields: PropTypes.oneOf([START_DATE, END_DATE]),
         value: PropTypes.shape({
             startDate: PropTypes.string,
             endDate: PropTypes.string,
@@ -40,6 +42,7 @@ export default class DatePeriodField extends React.Component {
     static defaultProps = {
         disabledDate: null,
         disabled: false,
+        disabledDateFields: null,
         value: null,
         minimumDays: 1,
     };
@@ -67,7 +70,7 @@ export default class DatePeriodField extends React.Component {
     };
 
     render() {
-        const {disabled, minimumDays, disabledDate} = this.props;
+        const {disabled, disabledDateFields, minimumDays, disabledDate} = this.props;
         const props = {};
 
         if (disabledDate) {
@@ -80,7 +83,7 @@ export default class DatePeriodField extends React.Component {
                                  startDate={this.getMomentValue('startDate')}
                                  endDate={this.getMomentValue('endDate')}
                                  onDatesChange={this.notifyChange}
-                                 disabled={disabled}
+                                 disabled={disabled || disabledDateFields}
                                  inputIconPosition="before"
                                  minimumNights={minimumDays - 1}
                                  block />
