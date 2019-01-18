@@ -24,6 +24,7 @@ from sqlalchemy.orm import defaultload
 from sqlalchemy.sql import cast
 
 from indico.core.db import db
+from indico.core.db.sqlalchemy import PyIntEnum
 from indico.core.db.sqlalchemy.util.queries import db_dates_overlap
 from indico.core.errors import IndicoError
 from indico.modules.rb.models.reservation_edit_logs import ReservationEditLog
@@ -32,7 +33,15 @@ from indico.util import date_time
 from indico.util.date_time import format_date, iterdays
 from indico.util.serializer import Serializer
 from indico.util.string import return_ascii
+from indico.util.struct.enum import IndicoEnum
 from indico.util.user import unify_user_args
+
+
+class ReservationOccurrenceState(int, IndicoEnum):
+    # XXX: 1 is omitted on purpose to keep the values in sync with ReservationState
+    valid = 2
+    canceled = 3
+    rejected = 4
 
 
 class ReservationOccurrence(db.Model, Serializer):
@@ -69,15 +78,10 @@ class ReservationOccurrence(db.Model, Serializer):
         nullable=False,
         default=False
     )
-    is_cancelled = db.Column(
-        db.Boolean,
+    state = db.Column(
+        PyIntEnum(ReservationOccurrenceState),
         nullable=False,
-        default=False
-    )
-    is_rejected = db.Column(
-        db.Boolean,
-        nullable=False,
-        default=False
+        default=ReservationOccurrenceState.valid
     )
     rejection_reason = db.Column(
         db.String
@@ -96,11 +100,17 @@ class ReservationOccurrence(db.Model, Serializer):
 
     @hybrid_property
     def is_valid(self):
-        return not self.is_rejected and not self.is_cancelled
+        return self.state == ReservationOccurrenceState.valid
 
-    @is_valid.expression
-    def is_valid(self):
-        return ~self.is_rejected & ~self.is_cancelled
+    @hybrid_property
+    def is_canceled(self):
+        return self.state == ReservationOccurrenceState.canceled
+
+    @hybrid_property
+    def is_rejected(self):
+        return self.state == ReservationOccurrenceState.rejected
+
+    is_cancelled = is_canceled  # TODO remove
 
     @return_ascii
     def __repr__(self):
