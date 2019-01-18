@@ -107,7 +107,7 @@ class Reservation(Serializer, db.Model):
         'id', ('start_dt', 'startDT'), ('end_dt', 'endDT'), 'repeat_frequency', 'repeat_interval',
         ('booked_for_name', 'bookedForName'), ('details_url', 'bookingUrl'), ('booking_reason', 'reason'),
         ('uses_vc', 'usesAVC'), ('needs_vc_assistance', 'needsAVCSupport'),
-        'needs_assistance', ('is_accepted', 'isConfirmed'), ('is_valid', 'isValid'), 'is_cancelled',
+        'needs_assistance', ('is_accepted', 'isConfirmed'), ('is_accepted', 'isValid'), 'is_cancelled',
         'is_rejected', ('location_name', 'location'), ('contact_email', 'booked_for_user_email')
     ]
 
@@ -276,8 +276,6 @@ class Reservation(Serializer, db.Model):
     def is_repeating(self):
         return self.repeat_frequency != RepeatFrequency.NEVER
 
-    is_valid = is_accepted  # TODO: remove
-
     @property
     def contact_email(self):
         return self.booked_for_user.email if self.booked_for_user else None
@@ -301,7 +299,7 @@ class Reservation(Serializer, db.Model):
     @property
     def status_string(self):
         parts = []
-        if self.is_valid:
+        if self.is_accepted:
             parts.append(_(u"Valid"))
         else:
             if self.is_cancelled:
@@ -359,7 +357,7 @@ class Reservation(Serializer, db.Model):
         # if 'room_usage' is not specified, we'll take whatever is passed in 'booked_for_user'
         reservation.booked_for_user = data['booked_for_user'] if data.get('room_usage') != 'current_user' else user
         reservation.booked_for_name = reservation.booked_for_user.full_name
-        reservation.is_accepted = not prebook
+        reservation.state = ReservationState.pending if prebook else ReservationState.accepted
         reservation.created_by_user = user
         reservation.create_occurrences(True)
         if not any(occ.is_valid for occ in reservation.occurrences):
@@ -419,7 +417,7 @@ class Reservation(Serializer, db.Model):
                                 _join=ReservationOccurrence)
 
     def accept(self, user):
-        self.is_accepted = True
+        self.state = ReservationState.accepted
         self.add_edit_log(ReservationEditLog(user_name=user.full_name, info=['Reservation accepted']))
         notify_confirmation(self)
 
@@ -431,7 +429,7 @@ class Reservation(Serializer, db.Model):
             occurrence.reject(user, u'Rejected due to collision with a confirmed reservation')
 
     def cancel(self, user, reason=None, silent=False):
-        self.is_cancelled = True
+        self.state = ReservationState.canceled
         self.rejection_reason = reason
         self.occurrences.filter_by(is_valid=True).update({'is_cancelled': True, 'rejection_reason': reason},
                                                          synchronize_session='fetch')
@@ -441,7 +439,7 @@ class Reservation(Serializer, db.Model):
             self.add_edit_log(ReservationEditLog(user_name=user.full_name, info=[log_msg]))
 
     def reject(self, user, reason, silent=False):
-        self.is_rejected = True
+        self.state = ReservationState.rejected
         self.rejection_reason = reason
         self.occurrences.filter_by(is_valid=True).update({'is_rejected': True, 'rejection_reason': reason},
                                                          synchronize_session='fetch')

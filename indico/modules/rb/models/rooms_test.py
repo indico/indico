@@ -24,7 +24,7 @@ from indico.core.errors import IndicoError
 from indico.modules.rb import rb_settings
 from indico.modules.rb.models.blocked_rooms import BlockedRoom
 from indico.modules.rb.models.photos import Photo
-from indico.modules.rb.models.reservations import RepeatFrequency
+from indico.modules.rb.models.reservations import RepeatFrequency, ReservationState
 from indico.modules.rb.models.room_bookable_hours import BookableHours
 from indico.modules.rb.models.rooms import Room
 from indico.modules.users import User
@@ -326,7 +326,7 @@ def test_filter_available(dummy_room, create_reservation, create_blocking,
     if has_pre_booking:
         create_reservation(start_dt=datetime.combine(date.today(), time(10)),
                            end_dt=datetime.combine(date.today(), time(12)),
-                           is_accepted=False)
+                           state=ReservationState.pending)
     if has_blocking:
         create_blocking(state=BlockedRoom.State.accepted)
     if has_pending_blocking:
