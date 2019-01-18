@@ -15,6 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import _ from 'lodash';
 import moment from 'moment';
 import React from 'react';
 import {connect} from 'react-redux';
@@ -101,6 +102,7 @@ class BookRoomModal extends React.Component {
         skipConflicts: false,
         bookingConflictsVisible: false,
         booking: null,
+        selectedEvent: null,
     };
 
     componentDidMount() {
@@ -137,7 +139,6 @@ class BookRoomModal extends React.Component {
         if (submitSucceeded) {
             const {booking} = this.state;
             const bookingLink = (
-                // TODO: add link to view booking details
                 // eslint-disable-next-line no-alert
                 <a onClick={() => openBookingDetails(booking.id)} />
             );
@@ -312,26 +313,55 @@ class BookRoomModal extends React.Component {
         };
     };
 
-    renderEventField = (options, disabled, mutators) => {
-        if (options.length > 1) {
+    renderLink = (link) => {
+        if (link) {
             return (
-                <Field name="event"
-                       component={ReduxDropdownField}
-                       options={options}
-                       selection
-                       placeholder={Translate.string('Choose an event')}
-                       clearable
-                       disabled={disabled} />
+                <span styleName="link-active">
+                    <a href={link} target="_blank" rel="noopener noreferrer">
+                        <Icon name="external" link />
+                    </a>
+                </span>
             );
         } else {
             return (
+                <span styleName="link-inactive">
+                    <Icon name="external" />
+                </span>
+            );
+        }
+    };
+
+    renderEventField = (options, links, disabled, mutators) => {
+        if (options.length > 1) {
+            const {selectedEvent} = this.state;
+            return (
+                <div styleName="event-dropdown">
+                    <Field name="event"
+                           component={ReduxDropdownField}
+                           options={options}
+                           placeholder={Translate.string('Choose an event')}
+                           disabled={disabled}
+                           selection
+                           clearable
+                           onChange={(value) => {
+                               this.setState({
+                                   selectedEvent: value
+                               });
+                           }} />
+                    {this.renderLink(links[selectedEvent])}
+                </div>
+            );
+        } else {
+            const [event] = options;
+            return (
                 <div styleName="event-checkbox">
-                    <span><strong>{options[0].text}</strong></span>
-                    <span styleName="description">{options[0].description}</span>
+                    <span><strong>{event.text}</strong></span>
+                    <span styleName="description">{event.description}</span>
+                    {this.renderLink(links[event.value])}
                     <Checkbox toggle
                               styleName="checkbox"
                               onChange={(__, {checked}) => {
-                                  mutators.setEvent(checked ? options[0].value : undefined);
+                                  mutators.setEvent(checked ? event.value : undefined);
                               }} />
                 </div>
             );
@@ -340,11 +370,16 @@ class BookRoomModal extends React.Component {
 
     renderRelatedEventsDropdown = (disabled, mutators) => {
         const {relatedEvents} = this.props;
-        const options = relatedEvents.map(this.getEventOption);
 
         if (!relatedEvents.length) {
             return;
         }
+
+        const options = relatedEvents.map(this.getEventOption);
+        const links = _.reduce(relatedEvents, (result, event) => {
+            result[event.id] = event.url;
+            return result;
+        }, {});
 
         return (
             <Segment>
@@ -361,7 +396,7 @@ class BookRoomModal extends React.Component {
                         </Plural>
                     </PluralTranslate>
                 </div>
-                {this.renderEventField(options, disabled, mutators)}
+                {this.renderEventField(options, links, disabled, mutators)}
             </Segment>
         );
     };
@@ -473,8 +508,8 @@ class BookRoomModal extends React.Component {
             <Modal open onClose={this.onClose} size="large" closeIcon>
                 <FinalForm onSubmit={this.submitBooking} validate={validate} decorators={[formDecorator]}
                            render={renderModalContent} initialValues={{user: null}}
-                           mutators={{setEvent: (args, state, {changeValue}) => {
-                               changeValue(state, 'event', () => args[0]);
+                           mutators={{setEvent: ([event], state, {changeValue}) => {
+                               changeValue(state, 'event', () => event);
                            }}} />
             </Modal>
         );
