@@ -26,7 +26,7 @@
                                 <%
                                     details_url = url_for('event_mgmt.rooms_booking_details', event, reservation)
                                     onclick = 'onclick="window.location=\'{}\'"'.format(details_url)
-                                    style = 'text-decoration: line-through;' if reservation.is_rejected or reservation.is_cancelled else ''
+                                    style = 'text-decoration: line-through;' if reservation.is_rejected or reservation.is_canceled else ''
                                 %>
 
                                 <tr style="height: 60px;">

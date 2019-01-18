@@ -388,7 +388,7 @@
                       <input type="hidden" name="csrf_token" value="${ _session.csrf_token }">
                       <input type="hidden" id="reason" name="reason">
                       <div style="float:left; padding-top: 15px;">
-                        % if not reservation.is_cancelled and not reservation.is_rejected:
+                        % if not reservation.is_canceled and not reservation.is_rejected:
                           % if reservation.can_cancel(user):
                             <a class="i-button" href="#" onclick="submit_cancel(); return false;">${ _('Cancel') }</a>
                           % endif

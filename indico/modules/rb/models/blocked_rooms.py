@@ -109,7 +109,7 @@ class BlockedRoom(db.Model):
         reservation_criteria = [
             Reservation.room_id == self.room_id,
             ~Reservation.is_rejected,
-            ~Reservation.is_cancelled
+            ~Reservation.is_canceled
         ]
 
         # Whole reservations to reject

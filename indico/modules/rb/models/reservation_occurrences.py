@@ -208,18 +208,18 @@ class ReservationOccurrence(db.Model, Serializer):
         elif not filters.get('is_only_confirmed_bookings') and filters.get('is_only_pending_bookings'):
             q = q.filter(~Reservation.is_accepted)
 
-        if filters.get('is_rejected') and filters.get('is_cancelled'):
+        if filters.get('is_rejected') and filters.get('is_canceled'):
             q = q.filter(Reservation.is_rejected | ReservationOccurrence.is_rejected
-                         | Reservation.is_cancelled | ReservationOccurrence.is_cancelled)
+                         | Reservation.is_canceled | ReservationOccurrence.is_cancelled)
         else:
             if filters.get('is_rejected'):
                 q = q.filter(Reservation.is_rejected | ReservationOccurrence.is_rejected)
             else:
                 q = q.filter(~Reservation.is_rejected & ~ReservationOccurrence.is_rejected)
-            if filters.get('is_cancelled'):
-                q = q.filter(Reservation.is_cancelled | ReservationOccurrence.is_cancelled)
+            if filters.get('is_canceled'):
+                q = q.filter(Reservation.is_canceled | ReservationOccurrence.is_cancelled)
             else:
-                q = q.filter(~Reservation.is_cancelled & ~ReservationOccurrence.is_cancelled)
+                q = q.filter(~Reservation.is_canceled & ~ReservationOccurrence.is_cancelled)
 
         if filters.get('is_archived'):
             q = q.filter(Reservation.is_archived)

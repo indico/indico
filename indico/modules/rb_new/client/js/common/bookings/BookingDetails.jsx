@@ -153,7 +153,7 @@ class BookingDetails extends React.Component {
     };
 
     renderBookingStatus = () => {
-        const {booking: {isPending, isAccepted, isCancelled, isRejected, rejectionReason}} = this.props;
+        const {booking: {isPending, isAccepted, isCanceled, isRejected, rejectionReason}} = this.props;
         let color, status, icon, message;
 
         if (isPending) {
@@ -161,7 +161,7 @@ class BookingDetails extends React.Component {
             color = 'yellow';
             status = Translate.string('Pending Confirmation');
             message = Translate.string('This booking is subject to acceptance by the room owner');
-        } else if (isCancelled) {
+        } else if (isCanceled) {
             icon = <Icon name="cancel" />;
             color = 'grey';
             status = Translate.string('Cancelled');
@@ -355,7 +355,7 @@ class BookingDetails extends React.Component {
             bookingStateChangeInProgress,
             booking: {
                 id, startDt, endDt, occurrences, dateRange, repetition, room, bookedForUser, isLinkedToEvent,
-                bookingReason, editLogs, createdDt, createdByUser, isCancelled, isRejected, canDelete, canCancel,
+                bookingReason, editLogs, createdDt, createdByUser, isCanceled, isRejected, canDelete, canCancel,
                 canReject, canAccept, canEdit, isAccepted
             }
         } = this.props;
@@ -369,7 +369,7 @@ class BookingDetails extends React.Component {
         const times = {startTime: moment(startDt).format('HH:mm'), endTime: moment(endDt).format('HH:mm')};
         const recurrence = getRecurrenceInfo(repetition);
         const showAccept = canAccept && !isAccepted;
-        const showActionButtons = (!isCancelled && !isRejected && (canCancel || canReject || showAccept));
+        const showActionButtons = (!isCanceled && !isRejected && (canCancel || canReject || showAccept));
 
         return (
             <>

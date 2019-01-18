@@ -107,7 +107,7 @@ class Reservation(Serializer, db.Model):
         'id', ('start_dt', 'startDT'), ('end_dt', 'endDT'), 'repeat_frequency', 'repeat_interval',
         ('booked_for_name', 'bookedForName'), ('details_url', 'bookingUrl'), ('booking_reason', 'reason'),
         ('uses_vc', 'usesAVC'), ('needs_vc_assistance', 'needsAVCSupport'),
-        'needs_assistance', ('is_accepted', 'isConfirmed'), ('is_accepted', 'isValid'), 'is_cancelled',
+        'needs_assistance', ('is_accepted', 'isConfirmed'), ('is_accepted', 'isValid'), ('is_canceled', 'is_cancelled'),
         'is_rejected', ('location_name', 'location'), ('contact_email', 'booked_for_user_email')
     ]
 
@@ -261,7 +261,7 @@ class Reservation(Serializer, db.Model):
         return self.state == ReservationState.accepted
 
     @hybrid_property
-    def is_cancelled(self):  # TODO: rename to is_canceled
+    def is_canceled(self):
         return self.state == ReservationState.canceled
 
     @hybrid_property
@@ -302,7 +302,7 @@ class Reservation(Serializer, db.Model):
         if self.is_accepted:
             parts.append(_(u"Valid"))
         else:
-            if self.is_cancelled:
+            if self.is_canceled:
                 parts.append(_(u"Cancelled"))
             if self.is_rejected:
                 parts.append(_(u"Rejected"))
@@ -460,21 +460,21 @@ class Reservation(Serializer, db.Model):
     def can_reject(self, user, allow_admin=True):
         if user is None:
             return False
-        if self.is_rejected or self.is_cancelled:
+        if self.is_rejected or self.is_canceled:
             return False
         return self.room.can_moderate(user, allow_admin=allow_admin)
 
     def can_cancel(self, user, allow_admin=True):
         if user is None:
             return False
-        if self.is_rejected or self.is_cancelled or self.is_archived:
+        if self.is_rejected or self.is_canceled or self.is_archived:
             return False
         return self.is_owned_by(user) or self.is_booked_for(user) or (allow_admin and rb_is_admin(user))
 
     def can_edit(self, user, allow_admin=True):
         if user is None:
             return False
-        if self.is_rejected or self.is_cancelled:
+        if self.is_rejected or self.is_canceled:
             return False
         if self.is_archived and not (allow_admin and rb_is_admin(user)):
             return False
@@ -483,7 +483,7 @@ class Reservation(Serializer, db.Model):
     def can_delete(self, user):
         if user is None:
             return False
-        return rb_is_admin(user) and (self.is_cancelled or self.is_rejected)
+        return rb_is_admin(user) and (self.is_canceled or self.is_rejected)
 
     def create_occurrences(self, skip_conflicts, user=None):
         ReservationOccurrence.create_series_for_reservation(self)

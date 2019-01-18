@@ -50,7 +50,7 @@ class BookingSearchForm(IndicoForm):
     is_only_pending_bookings = BooleanField('Only Prebookings')
 
     is_rejected = BooleanField('Is Rejected')
-    is_cancelled = BooleanField('Is Cancelled')
+    is_canceled = BooleanField('Is Cancelled')
     is_archived = BooleanField('Is Archived')
 
     uses_vc = BooleanField(_('Uses Videoconference'))

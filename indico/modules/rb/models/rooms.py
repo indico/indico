@@ -653,7 +653,7 @@ class Room(versioned_cache(_cache, 'id'), ProtectionManagersMixin, db.Model, Ser
     def has_live_reservations(self):
         return self.reservations.filter_by(
             is_archived=False,
-            is_cancelled=False,
+            is_canceled=False,
             is_rejected=False
         ).count() > 0
 

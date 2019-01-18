@@ -112,8 +112,8 @@
                     title="${ _('Filter by rejected bookings') }">
                     ${ _('Rejected') }
                 </label>
-                <input type="checkbox" id="is_cancelled" name="is_cancelled"/>
-                <label for="is_cancelled" class="i-button"
+                <input type="checkbox" id="is_canceled" name="is_canceled"/>
+                <label for="is_canceled" class="i-button"
                     title="${ _('Filter by cancelled bookings') }">
                     ${ _('Cancelled') }
                 </label>

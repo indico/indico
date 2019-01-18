@@ -360,19 +360,19 @@
                 ${ kpi['booking_stats']['active']['valid'] }
               </span>
             </td>
-            <td>${ kpi['booking_stats']['active']['cancelled'] }</td>
+            <td>${ kpi['booking_stats']['active']['canceled'] }</td>
             <td>${ kpi['booking_stats']['active']['rejected'] }</td>
           </tr>
           <tr>
             <td>${ _('Archived') }</td>
             <td>${ kpi['booking_stats']['archived']['valid'] }</td>
-            <td>${ kpi['booking_stats']['archived']['cancelled'] }</td>
+            <td>${ kpi['booking_stats']['archived']['canceled'] }</td>
             <td>${ kpi['booking_stats']['archived']['rejected'] }</td>
           </tr>
           <tr>
             <td>${ _('Total') }</td>
             <td>${ kpi['booking_stats']['active']['valid'] + kpi['booking_stats']['archived']['valid'] }</td>
-            <td>${ kpi['booking_stats']['active']['cancelled'] + kpi['booking_stats']['archived']['cancelled'] }</td>
+            <td>${ kpi['booking_stats']['active']['canceled'] + kpi['booking_stats']['archived']['canceled'] }</td>
             <td>${ kpi['booking_stats']['active']['rejected'] + kpi['booking_stats']['archived']['rejected'] }</td>
           </tr>
         </table>

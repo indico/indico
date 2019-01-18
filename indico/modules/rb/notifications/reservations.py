@@ -66,7 +66,7 @@ class ReservationNotification(object):
 
 @email_sender
 def notify_cancellation(reservation):
-    if not reservation.is_cancelled:
+    if not reservation.is_canceled:
         raise ValueError('Reservation is not cancelled')
     notification = ReservationNotification(reservation)
     return filter(None, [

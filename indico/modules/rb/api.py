@@ -357,7 +357,7 @@ def _yesno(value):
 
 
 def _get_reservation_state_filter(params):
-    cancelled = get_query_parameter(params, ['cxl', 'cancelled'])
+    canceled = get_query_parameter(params, ['cxl', 'cancelled'])
     rejected = get_query_parameter(params, ['rej', 'rejected'])
     confirmed = get_query_parameter(params, ['confirmed'])
     archived = get_query_parameter(params, ['arch', 'archived', 'archival'])
@@ -368,8 +368,8 @@ def _get_reservation_state_filter(params):
     booked_for = get_query_parameter(params, ['bf', 'bookedfor'])
 
     filters = []
-    if cancelled is not None:
-        filters.append(Reservation.is_cancelled == _yesno(cancelled))
+    if canceled is not None:
+        filters.append(Reservation.is_canceled == _yesno(canceled))
     if rejected is not None:
         filters.append(Reservation.is_rejected == _yesno(rejected))
     if confirmed is not None:
@@ -379,7 +379,7 @@ def _get_reservation_state_filter(params):
             filters.append(Reservation.is_accepted)
         else:
             filters.append(~Reservation.is_accepted)
-            filters.append(Reservation.is_rejected | Reservation.is_cancelled)
+            filters.append(Reservation.is_rejected | Reservation.is_canceled)
     if archived is not None:
         filters.append(Reservation.is_archived == _yesno(archived))
     if repeating is not None:
