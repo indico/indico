@@ -40,7 +40,7 @@ from indico.util.user import unify_user_args
 class ReservationOccurrenceState(int, IndicoEnum):
     # XXX: 1 is omitted on purpose to keep the values in sync with ReservationState
     valid = 2
-    canceled = 3
+    cancelled = 3
     rejected = 4
 
 
@@ -48,7 +48,7 @@ class ReservationOccurrence(db.Model, Serializer):
     __tablename__ = 'reservation_occurrences'
     __table_args__ = (db.CheckConstraint("rejection_reason != ''", 'rejection_reason_not_empty'),
                       {'schema': 'roombooking'})
-    __api_public__ = (('start_dt', 'startDT'), ('end_dt', 'endDT'), ('is_canceled', 'is_cancelled'), 'is_rejected')
+    __api_public__ = (('start_dt', 'startDT'), ('end_dt', 'endDT'), 'is_cancelled', 'is_rejected')
 
     #: A relationship loading strategy that will avoid loading the
     #: users linked to a reservation.  You want to use this in pretty
@@ -105,8 +105,8 @@ class ReservationOccurrence(db.Model, Serializer):
         return self.state == ReservationOccurrenceState.valid
 
     @hybrid_property
-    def is_canceled(self):
-        return self.state == ReservationOccurrenceState.canceled
+    def is_cancelled(self):
+        return self.state == ReservationOccurrenceState.cancelled
 
     @hybrid_property
     def is_rejected(self):
@@ -211,18 +211,18 @@ class ReservationOccurrence(db.Model, Serializer):
         elif not filters.get('is_only_confirmed_bookings') and filters.get('is_only_pending_bookings'):
             q = q.filter(~Reservation.is_accepted)
 
-        if filters.get('is_rejected') and filters.get('is_canceled'):
+        if filters.get('is_rejected') and filters.get('is_cancelled'):
             q = q.filter(Reservation.is_rejected | ReservationOccurrence.is_rejected
-                         | Reservation.is_canceled | ReservationOccurrence.is_canceled)
+                         | Reservation.is_cancelled | ReservationOccurrence.is_cancelled)
         else:
             if filters.get('is_rejected'):
                 q = q.filter(Reservation.is_rejected | ReservationOccurrence.is_rejected)
             else:
                 q = q.filter(~Reservation.is_rejected & ~ReservationOccurrence.is_rejected)
-            if filters.get('is_canceled'):
-                q = q.filter(Reservation.is_canceled | ReservationOccurrence.is_canceled)
+            if filters.get('is_cancelled'):
+                q = q.filter(Reservation.is_cancelled | ReservationOccurrence.is_cancelled)
             else:
-                q = q.filter(~Reservation.is_canceled & ~ReservationOccurrence.is_canceled)
+                q = q.filter(~Reservation.is_cancelled & ~ReservationOccurrence.is_cancelled)
 
         if filters.get('is_archived'):
             q = q.filter(Reservation.is_archived)
@@ -246,7 +246,7 @@ class ReservationOccurrence(db.Model, Serializer):
     @proxy_to_reservation_if_last_valid_occurrence
     @unify_user_args
     def cancel(self, user, reason=None, silent=False):
-        self.state = ReservationOccurrenceState.canceled
+        self.state = ReservationOccurrenceState.cancelled
         self.rejection_reason = reason or None
         if not silent:
             log = [u'Day cancelled: {}'.format(format_date(self.date).decode('utf-8'))]

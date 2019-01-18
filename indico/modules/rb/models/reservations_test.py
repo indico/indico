@@ -176,12 +176,12 @@ def test_cancel(smtp, create_reservation, dummy_user, silent):
     reservation = create_reservation(start_dt=date.today() + relativedelta(hour=8),
                                      end_dt=date.today() + relativedelta(days=10, hour=17),
                                      repeat_frequency=RepeatFrequency.DAY)
-    assert not reservation.is_canceled
-    assert not any(occ.is_canceled for occ in reservation.occurrences)
+    assert not reservation.is_cancelled
+    assert not any(occ.is_cancelled for occ in reservation.occurrences)
     reservation.cancel(user=dummy_user, reason='cancelled', silent=silent)
-    assert reservation.is_canceled
+    assert reservation.is_cancelled
     assert reservation.rejection_reason == 'cancelled'
-    assert all(occ.is_canceled for occ in reservation.occurrences)
+    assert all(occ.is_cancelled for occ in reservation.occurrences)
     if silent:
         assert not reservation.edit_logs.count()
         assert not smtp.outbox
@@ -237,7 +237,7 @@ def test_room_manager_actions(create_reservation, create_user, is_manager, is_pa
     reservation.state = state
     if is_manager:
         reservation.room.update_principal(user, full_access=True)
-    invalid_state = state in (ReservationState.canceled, ReservationState.rejected)
+    invalid_state = state in (ReservationState.cancelled, ReservationState.rejected)
     assert reservation.can_accept(user) == (reservation.is_pending and (is_manager or is_admin) and not invalid_state)
     assert reservation.can_reject(user) == (not invalid_state and (is_manager or is_admin))
     assert reservation.can_cancel(user) == (not is_past and not invalid_state and is_admin)
@@ -277,7 +277,7 @@ def test_find_excluded_days(db, create_reservation):
                                      end_dt=date.today() + relativedelta(days=5, hour=10),
                                      repeat_frequency=RepeatFrequency.DAY)
     for occ in reservation.occurrences[::2]:
-        occ.state = ReservationOccurrenceState.canceled
+        occ.state = ReservationOccurrenceState.cancelled
     db.session.flush()
     assert set(reservation.find_excluded_days().all()) == {occ for occ in reservation.occurrences if not occ.is_valid}
 

@@ -86,7 +86,7 @@ def test_create_series_for_reservation(dummy_reservation):
     for occ1, occ2 in izip(dummy_reservation.occurrences, occurrences):
         assert occ1.start_dt == occ2.start_dt
         assert occ1.end_dt == occ2.end_dt
-        assert occ1.is_canceled == dummy_reservation.is_canceled
+        assert occ1.is_cancelled == dummy_reservation.is_cancelled
         assert occ1.is_rejected == dummy_reservation.is_rejected
         assert occ1.rejection_reason == dummy_reservation.rejection_reason
 
@@ -226,7 +226,7 @@ def test_find_overlapping_with_is_not_valid(db, overlapping_occurrences):
     db_occ, occ = overlapping_occurrences
     assert db_occ in ReservationOccurrence.find_overlapping_with(room=db_occ.reservation.room,
                                                                  occurrences=[occ]).all()
-    db_occ.state = ReservationOccurrenceState.canceled
+    db_occ.state = ReservationOccurrenceState.cancelled
     db.session.flush()
     assert db_occ not in ReservationOccurrence.find_overlapping_with(room=db_occ.reservation.room,
                                                                      occurrences=[occ]).all()
@@ -258,9 +258,9 @@ def test_cancel(smtp, create_reservation, dummy_user, silent, reason):
     assert reservation.occurrences.count() > 1
     occurrence = reservation.occurrences[0]
     occurrence.cancel(user=dummy_user, reason=reason, silent=silent)
-    assert occurrence.is_canceled
+    assert occurrence.is_cancelled
     assert occurrence.rejection_reason == reason
-    assert not occurrence.reservation.is_canceled
+    assert not occurrence.reservation.is_cancelled
     if silent:
         assert not occurrence.reservation.edit_logs.count()
         assert not smtp.outbox
@@ -278,9 +278,9 @@ def test_cancel(smtp, create_reservation, dummy_user, silent, reason):
 @pytest.mark.parametrize('silent', (True, False))
 def test_cancel_single_occurrence(smtp, dummy_occurrence, dummy_user, silent):
     dummy_occurrence.cancel(user=dummy_user, reason='cancelled', silent=silent)
-    assert dummy_occurrence.is_canceled
+    assert dummy_occurrence.is_cancelled
     assert dummy_occurrence.rejection_reason == 'cancelled'
-    assert dummy_occurrence.reservation.is_canceled
+    assert dummy_occurrence.reservation.is_cancelled
     assert dummy_occurrence.reservation.rejection_reason == 'cancelled'
     if silent:
         assert not dummy_occurrence.reservation.edit_logs.count()

@@ -174,7 +174,7 @@ export default combineReducers({
                 const {data} = state;
                 const newData = {};
 
-                if (bookingState === 'rejected' || bookingState === 'canceled') {
+                if (bookingState === 'rejected' || bookingState === 'cancelled') {
                     Object.entries(data).forEach(([day, bookings]) => {
                         const newBookings = bookings.filter(({reservation: {id}}) => id !== bookingId);
                         if (newBookings.length) {
@@ -221,7 +221,7 @@ export default combineReducers({
                 const {rows} = state;
                 let newRows;
 
-                if (bookingState === 'rejected' || bookingState === 'canceled') {
+                if (bookingState === 'rejected' || bookingState === 'cancelled') {
                     newRows = filterDeletedBooking(rows, id, roomId);
                 } else if (bookingState === 'accepted') {
                     newRows = acceptPrebooking(rows, id, roomId);

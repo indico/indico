@@ -62,13 +62,13 @@ def compose_rooms_stats(rooms):
         'active': {
             'valid': reservations.filter(Reservation.is_accepted, ~Reservation.is_archived).count(),
             'pending': reservations.filter(Reservation.is_pending, ~Reservation.is_archived).count(),
-            'canceled': reservations.filter(Reservation.is_canceled, ~Reservation.is_archived).count(),
+            'cancelled': reservations.filter(Reservation.is_cancelled, ~Reservation.is_archived).count(),
             'rejected': reservations.filter(Reservation.is_rejected, ~Reservation.is_archived).count(),
         },
         'archived': {
             'valid': reservations.filter(Reservation.is_accepted, Reservation.is_archived).count(),
             'pending': reservations.filter(Reservation.is_pending, Reservation.is_archived).count(),
-            'canceled': reservations.filter(Reservation.is_canceled, Reservation.is_archived).count(),
+            'cancelled': reservations.filter(Reservation.is_cancelled, Reservation.is_archived).count(),
             'rejected': reservations.filter(Reservation.is_rejected, Reservation.is_archived).count()
         }
     }

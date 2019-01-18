@@ -55,7 +55,7 @@ def test_proxy_to_reservation_if_last_valid_occurrence(db, mock, create_reservat
                               repeat_frequency=RepeatFrequency.NEVER if not_repeating else RepeatFrequency.DAY)
     if only_one_valid:
         for occ in resv.occurrences[1:]:
-            occ.state = ReservationOccurrenceState.canceled
+            occ.state = ReservationOccurrenceState.cancelled
         db.session.flush()
 
     occ = resv.occurrences.first()

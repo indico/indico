@@ -79,11 +79,11 @@
                         ${ stats['active']['valid'] }
                     </td>
                     <td>${ stats['active']['pending'] }</td>
-                    <td>${ stats['active']['canceled'] }</td>
+                    <td>${ stats['active']['cancelled'] }</td>
                     <td>${ stats['active']['rejected'] }</td>
                     <td>
                         ${ stats['active']['valid'] + \
-                           stats['active']['canceled'] + \
+                           stats['active']['cancelled'] + \
                            stats['active']['rejected'] }
                     </td>
                 </tr>
@@ -91,11 +91,11 @@
                     <td>${ _('Archived') }</td>
                     <td>${ stats['archived']['valid'] }</td>
                     <td>${ stats['archived']['pending'] }</td>
-                    <td>${ stats['archived']['canceled'] }</td>
+                    <td>${ stats['archived']['cancelled'] }</td>
                     <td>${ stats['archived']['rejected'] }</td>
                     <td>
                         ${ stats['archived']['valid'] + \
-                           stats['archived']['canceled'] + \
+                           stats['archived']['cancelled'] + \
                            stats['archived']['rejected'] }
                     </td>
                 </tr>
@@ -103,12 +103,12 @@
                     <td>${ _('Total') }</td>
                     <td>${ stats['active']['valid'] + stats['archived']['valid'] }</td>
                     <td>${ stats['active']['pending'] + stats['archived']['pending'] }</td>
-                    <td>${ stats['active']['canceled'] + stats['archived']['canceled'] }</td>
+                    <td>${ stats['active']['cancelled'] + stats['archived']['cancelled'] }</td>
                     <td>${ stats['active']['rejected'] + stats['archived']['rejected'] }</td>
                     <td class="total-bookings">
                         ${ stats['active']['valid'] + stats['archived']['valid'] + \
                            stats['active']['pending'] + stats['archived']['pending'] + \
-                           stats['active']['canceled'] + stats['archived']['canceled'] + \
+                           stats['active']['cancelled'] + stats['archived']['cancelled'] + \
                            stats['active']['rejected'] + stats['archived']['rejected'] }
                     </td>
                 </tr>

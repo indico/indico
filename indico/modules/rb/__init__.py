@@ -92,7 +92,7 @@ def _merge_users(target, source, **kwargs):
 @signals.event.deleted.connect
 def _event_deleted(event, user, **kwargs):
     reservations = (Reservation.query.with_parent(event)
-                    .filter(~Reservation.is_canceled,
+                    .filter(~Reservation.is_cancelled,
                             ~Reservation.is_rejected)
                     .all())
     for resv in reservations:

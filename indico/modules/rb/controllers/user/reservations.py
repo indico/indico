@@ -86,7 +86,7 @@ class RHRoomBookingCancelBooking(_SuccessUrlDetailsMixin, RHRoomBookingBookingMi
             raise Forbidden("You are not authorized to perform this action")
 
     def _process(self):
-        if not self._reservation.is_canceled and not self._reservation.is_rejected:
+        if not self._reservation.is_cancelled and not self._reservation.is_rejected:
             self._reservation.cancel(session.user)
             flash(_(u'Booking cancelled'), 'success')
         return redirect(self._get_success_url())
@@ -103,7 +103,7 @@ class RHRoomBookingRejectBooking(_SuccessUrlDetailsMixin, RHRoomBookingBookingMi
             raise Forbidden("You are not authorized to perform this action")
 
     def _process(self):
-        if not self._reservation.is_canceled and not self._reservation.is_rejected:
+        if not self._reservation.is_cancelled and not self._reservation.is_rejected:
             self._reservation.reject(session.user, self._reason)
             flash(_(u'Booking rejected'), 'success')
         return redirect(self._get_success_url())
