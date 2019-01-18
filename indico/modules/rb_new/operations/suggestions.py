@@ -53,6 +53,12 @@ def get_single_booking_suggestions(rooms, start_dt, end_dt, limit=None):
     data = []
     new_start_dt = start_dt - timedelta(minutes=BOOKING_TIME_DIFF)
     new_end_dt = end_dt + timedelta(minutes=BOOKING_TIME_DIFF)
+    blocked_rooms = get_rooms_blockings(rooms, start_dt.date(), end_dt.date())
+    unbookable_hours = get_rooms_unbookable_hours(rooms)
+    nonbookable_periods = get_rooms_nonbookable_periods(rooms, start_dt, end_dt)
+    conflicts = set(get_rooms_conflicts(rooms, start_dt, end_dt, RepeatFrequency.NEVER, 0, blocked_rooms,
+                                        nonbookable_periods, unbookable_hours)[0])
+    rooms = [room for room in rooms if room.id not in conflicts]
     rooms_occurrences = get_existing_rooms_occurrences(rooms, new_start_dt, new_end_dt, RepeatFrequency.NEVER, None,
                                                        allow_overlapping=True)
 
