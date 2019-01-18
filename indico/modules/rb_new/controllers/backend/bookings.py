@@ -238,14 +238,11 @@ class RHBookingStateActions(RHBookingBase):
     def _process(self):
         if self.action == 'approve':
             self.booking.accept(session.user)
-            state = 'approved'
         elif self.action == 'reject':
             self.reject()
-            state = 'rejected'
         elif self.action == 'cancel':
             self.booking.cancel(session.user)
-            state = 'cancelled'
-        return jsonify(booking=reservation_details_schema.dump(self.booking).data, booking_state=state)
+        return jsonify(booking=reservation_details_schema.dump(self.booking).data)
 
 
 class RHDeleteBooking(RHBookingBase):

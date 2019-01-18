@@ -170,11 +170,11 @@ export default combineReducers({
                 return {...state, data: newData};
             }
             case bookingActions.BOOKING_STATE_UPDATED: {
-                const {booking: {id: bookingId}, bookingState} = camelizeKeys(action.data);
+                const {booking: {id: bookingId, state: bookingState}} = camelizeKeys(action.data);
                 const {data} = state;
                 const newData = {};
 
-                if (bookingState === 'rejected' || bookingState === 'cancelled') {
+                if (bookingState === 'rejected' || bookingState === 'canceled') {
                     Object.entries(data).forEach(([day, bookings]) => {
                         const newBookings = bookings.filter(({reservation: {id}}) => id !== bookingId);
                         if (newBookings.length) {
@@ -217,13 +217,13 @@ export default combineReducers({
                 return {...state, rows: filterDeletedBooking(rows, bookingId, roomId)};
             }
             case bookingActions.BOOKING_STATE_UPDATED: {
-                const {booking: {id, roomId}, bookingState} = camelizeKeys(action.data);
+                const {booking: {id, roomId, state: bookingState}} = camelizeKeys(action.data);
                 const {rows} = state;
                 let newRows;
 
-                if (bookingState === 'rejected' || bookingState === 'cancelled') {
+                if (bookingState === 'rejected' || bookingState === 'canceled') {
                     newRows = filterDeletedBooking(rows, id, roomId);
-                } else if (bookingState === 'approved') {
+                } else if (bookingState === 'accepted') {
                     newRows = acceptPrebooking(rows, id, roomId);
                 }
 

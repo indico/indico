@@ -32,7 +32,7 @@ from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.map_areas import MapArea
 from indico.modules.rb.models.reservation_edit_logs import ReservationEditLog
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
-from indico.modules.rb.models.reservations import RepeatFrequency, Reservation
+from indico.modules.rb.models.reservations import RepeatFrequency, Reservation, ReservationState
 from indico.modules.rb.models.room_attributes import RoomAttribute, RoomAttributeAssociation
 from indico.modules.rb.models.room_bookable_hours import BookableHours
 from indico.modules.rb.models.room_features import RoomFeature
@@ -132,6 +132,7 @@ class ReservationDetailsSchema(mm.ModelSchema):
     can_delete = Function(lambda booking: booking.can_delete(session.user))
     can_edit = Function(lambda booking: booking.can_edit(session.user))
     can_reject = Function(lambda booking: booking.can_reject(session.user))
+    state = EnumField(ReservationState)
     is_linked_to_event = Function(lambda booking: booking.event_id is not None)
     start_dt = NaiveDateTime()
     end_dt = NaiveDateTime()
@@ -141,7 +142,7 @@ class ReservationDetailsSchema(mm.ModelSchema):
         fields = ('id', 'start_dt', 'end_dt', 'repetition', 'booking_reason', 'created_dt', 'booked_for_user',
                   'room_id', 'created_by_user', 'edit_logs', 'can_accept', 'can_cancel', 'can_delete', 'can_edit',
                   'can_reject', 'is_canceled', 'is_rejected', 'is_accepted', 'is_pending', 'rejection_reason',
-                  'is_linked_to_event')
+                  'is_linked_to_event', 'state')
 
 
 class BlockedRoomSchema(mm.ModelSchema):

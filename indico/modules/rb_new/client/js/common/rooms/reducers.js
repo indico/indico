@@ -100,8 +100,8 @@ export default combineReducers({
                 return {...state, [roomId]: av};
             }
             case bookingActions.BOOKING_STATE_UPDATED: {
-                const {booking: {id, roomId}, bookingState} = camelizeKeys(action.data);
-                if (bookingState === 'rejected' || bookingState === 'cancelled') {
+                const {booking: {id, roomId, state: bookingState}} = camelizeKeys(action.data);
+                if (bookingState === 'rejected' || bookingState === 'canceled') {
                     const {[roomId]: roomAvailability} = state;
                     if (!roomAvailability) {
                         return state;
