@@ -177,11 +177,11 @@ def test_cancel(smtp, create_reservation, dummy_user, silent):
                                      end_dt=date.today() + relativedelta(days=10, hour=17),
                                      repeat_frequency=RepeatFrequency.DAY)
     assert not reservation.is_canceled
-    assert not any(occ.is_cancelled for occ in reservation.occurrences)
+    assert not any(occ.is_canceled for occ in reservation.occurrences)
     reservation.cancel(user=dummy_user, reason='cancelled', silent=silent)
     assert reservation.is_canceled
     assert reservation.rejection_reason == 'cancelled'
-    assert all(occ.is_cancelled for occ in reservation.occurrences)
+    assert all(occ.is_canceled for occ in reservation.occurrences)
     if silent:
         assert not reservation.edit_logs.count()
         assert not smtp.outbox

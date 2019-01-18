@@ -47,7 +47,7 @@ class ReservationOccurrenceState(int, IndicoEnum):
 class ReservationOccurrence(db.Model, Serializer):
     __tablename__ = 'reservation_occurrences'
     __table_args__ = {'schema': 'roombooking'}
-    __api_public__ = (('start_dt', 'startDT'), ('end_dt', 'endDT'), 'is_cancelled', 'is_rejected')
+    __api_public__ = (('start_dt', 'startDT'), ('end_dt', 'endDT'), ('is_canceled', 'is_cancelled'), 'is_rejected')
 
     #: A relationship loading strategy that will avoid loading the
     #: users linked to a reservation.  You want to use this in pretty
@@ -110,15 +110,13 @@ class ReservationOccurrence(db.Model, Serializer):
     def is_rejected(self):
         return self.state == ReservationOccurrenceState.rejected
 
-    is_cancelled = is_canceled  # TODO remove
-
     @return_ascii
     def __repr__(self):
         return u'<ReservationOccurrence({0}, {1}, {2}, {3}, {4}, {5})>'.format(
             self.reservation_id,
             self.start_dt,
             self.end_dt,
-            self.is_cancelled,
+            self.is_canceled,
             self.is_rejected,
             self.notification_sent
         )
@@ -220,16 +218,16 @@ class ReservationOccurrence(db.Model, Serializer):
 
         if filters.get('is_rejected') and filters.get('is_canceled'):
             q = q.filter(Reservation.is_rejected | ReservationOccurrence.is_rejected
-                         | Reservation.is_canceled | ReservationOccurrence.is_cancelled)
+                         | Reservation.is_canceled | ReservationOccurrence.is_canceled)
         else:
             if filters.get('is_rejected'):
                 q = q.filter(Reservation.is_rejected | ReservationOccurrence.is_rejected)
             else:
                 q = q.filter(~Reservation.is_rejected & ~ReservationOccurrence.is_rejected)
             if filters.get('is_canceled'):
-                q = q.filter(Reservation.is_canceled | ReservationOccurrence.is_cancelled)
+                q = q.filter(Reservation.is_canceled | ReservationOccurrence.is_canceled)
             else:
-                q = q.filter(~Reservation.is_canceled & ~ReservationOccurrence.is_cancelled)
+                q = q.filter(~Reservation.is_canceled & ~ReservationOccurrence.is_canceled)
 
         if filters.get('is_archived'):
             q = q.filter(Reservation.is_archived)

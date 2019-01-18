@@ -478,7 +478,7 @@
                           % for occurrence in excluded_days:
                             % if occurrence.is_rejected:
                               ${ formatDate(occurrence.date) } (${ _('Rejected') }${ u': {}'.format(occurrence.rejection_reason) if occurrence.rejection_reason else '' })<br />
-                            % elif occurrence.is_cancelled:
+                            % elif occurrence.is_canceled:
                               ${ formatDate(occurrence.date) } (${ _('Cancelled') }${ u': {}'.format(occurrence.rejection_reason) if occurrence.rejection_reason else '' })<br />
                             % endif
                           % endfor

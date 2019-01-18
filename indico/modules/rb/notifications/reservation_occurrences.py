@@ -37,7 +37,7 @@ class ReservationOccurrenceNotification(ReservationNotification):
 
 @email_sender
 def notify_cancellation(occurrence):
-    if not occurrence.is_cancelled:
+    if not occurrence.is_canceled:
         raise ValueError('Occurrence is not cancelled')
     notification = ReservationOccurrenceNotification(occurrence)
     return filter(None, [

@@ -69,7 +69,7 @@ def _serialize_booking_details(booking):
     booking_details['date_range'] = date_range
     for dt, [occ] in occurrences.iteritems():
         serialized_occ = reservation_details_occurrences_schema.dump([occ]).data
-        if occ.is_cancelled:
+        if occ.is_canceled:
             occurrences_by_type['cancelations'][dt.isoformat()] = serialized_occ
         elif occ.is_rejected:
             occurrences_by_type['rejections'][dt.isoformat()] = serialized_occ
