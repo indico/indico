@@ -27,6 +27,7 @@ from indico.modules.rb_new.operations.conflicts import get_rooms_conflicts
 from indico.modules.rb_new.operations.misc import get_rooms_nonbookable_periods, get_rooms_unbookable_hours
 from indico.modules.rb_new.operations.rooms import search_for_rooms
 from indico.modules.rb_new.util import group_by_occurrence_date
+from indico.util.date_time import overlaps
 
 
 BOOKING_TIME_DIFF = 20  # (minutes)
@@ -54,6 +55,7 @@ def get_single_booking_suggestions(rooms, start_dt, end_dt, limit=None):
     new_end_dt = end_dt + timedelta(minutes=BOOKING_TIME_DIFF)
     rooms_occurrences = get_existing_rooms_occurrences(rooms, new_start_dt, new_end_dt, RepeatFrequency.NEVER, None,
                                                        allow_overlapping=True)
+
     for room in rooms:
         if limit and len(data) == limit:
             break
@@ -121,6 +123,13 @@ def get_start_time_suggestion(occurrences, from_, to):
 def get_duration_suggestion(occurrences, from_, to):
     old_duration = (to - from_).total_seconds() / 60
     duration = old_duration
+    all_occurrences_overlap = all(overlaps((from_, to), (occ.start_dt, occ.end_dt)) for occ in occurrences)
+
+    # Don't calculate duration suggestion, if there are at least
+    # two existing bookings conflicting with the specified dates
+    if all_occurrences_overlap and len(occurrences) > 1:
+        return
+
     for occurrence in occurrences:
         start, end = occurrence.start_dt, occurrence.end_dt
         if start < from_:
