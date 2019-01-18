@@ -29,6 +29,7 @@ from werkzeug.datastructures import OrderedMultiDict
 from indico.core.db import db
 from indico.core.db.sqlalchemy.custom import PyIntEnum
 from indico.core.db.sqlalchemy.custom.utcdatetime import UTCDateTime
+from indico.core.db.sqlalchemy.links import LinkMixin, LinkType
 from indico.core.db.sqlalchemy.util.queries import limit_groups
 from indico.core.errors import NoReportError
 from indico.modules.rb.models.reservation_edit_logs import ReservationEditLog
@@ -95,6 +96,27 @@ class ReservationState(int, IndicoEnum):
     accepted = 2
     cancelled = 3
     rejected = 4
+
+
+class ReservationLink(LinkMixin, db.Model):
+    __tablename__ = 'reservation_links'
+    __table_args__ = {'schema': 'roombooking'}
+
+    allowed_link_types = {LinkType.event, LinkType.contribution, LinkType.session_block}
+    unique_links = True
+    events_backref_name = 'room_reservation_links'
+    link_backref_name = 'room_reservation_link'
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    # relationship backrefs:
+    # - reservation (Reservation.link)
+
+
+ReservationLink.register_link_events()
 
 
 class Reservation(Serializer, db.Model):
@@ -207,6 +229,12 @@ class Reservation(Serializer, db.Model):
         nullable=True,
         index=True
     )
+    link_id = db.Column(
+        db.Integer,
+        db.ForeignKey('roombooking.reservation_links.id'),
+        nullable=True,
+        index=True
+    )
 
     edit_logs = db.relationship(
         'ReservationEditLog',
@@ -248,6 +276,15 @@ class Reservation(Serializer, db.Model):
         backref=db.backref(
             'reservations',
             lazy='dynamic'
+        )
+    )
+
+    link = db.relationship(
+        'ReservationLink',
+        lazy=True,
+        backref=db.backref(
+            'reservation',
+            uselist=False
         )
     )
 
@@ -332,8 +369,7 @@ class Reservation(Serializer, db.Model):
         """
 
         populate_fields = ('start_dt', 'end_dt', 'repeat_frequency', 'repeat_interval', 'room_id', 'contact_email',
-                           'contact_phone', 'booking_reason', 'needs_assistance', 'uses_vc',
-                           'needs_vc_assistance', 'event_id', 'contribution_id', 'session_block_id')
+                           'contact_phone', 'booking_reason', 'needs_assistance', 'uses_vc', 'needs_vc_assistance')
         if data['repeat_frequency'] == RepeatFrequency.NEVER and data['start_dt'].date() != data['end_dt'].date():
             raise ValueError('end_dt != start_dt for non-repeating booking')
 

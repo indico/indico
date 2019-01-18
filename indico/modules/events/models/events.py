@@ -404,6 +404,8 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     # - requests (Request.event)
     # - reservations (Reservation.event)
     # - roles (EventRole.event)
+    # - room_reservation_link (ReservationLink.linked_event)
+    # - room_reservation_links (ReservationLink.event)
     # - session_types (SessionType.event)
     # - sessions (Session.event)
     # - settings (EventSetting.event)

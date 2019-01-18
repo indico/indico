@@ -380,6 +380,7 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
     # - attachment_folders (AttachmentFolder.contribution)
     # - legacy_mapping (LegacyContributionMapping.contribution)
     # - note (EventNote.contribution)
+    # - room_reservation_link (ReservationLink.contribution)
     # - timetable_entry (TimetableEntry.contribution)
     # - vc_room_associations (VCRoomEventAssociation.linked_contrib)
 
