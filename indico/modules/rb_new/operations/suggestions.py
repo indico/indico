@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 from indico.modules.rb.models.blocked_rooms import BlockedRoomState
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
@@ -53,27 +53,33 @@ def get_single_booking_suggestions(rooms, start_dt, end_dt, limit=None):
     data = []
     new_start_dt = start_dt - timedelta(minutes=BOOKING_TIME_DIFF)
     new_end_dt = end_dt + timedelta(minutes=BOOKING_TIME_DIFF)
-    blocked_rooms = get_rooms_blockings(rooms, start_dt.date(), end_dt.date())
-    unbookable_hours = get_rooms_unbookable_hours(rooms)
     nonbookable_periods = get_rooms_nonbookable_periods(rooms, start_dt, end_dt)
-    conflicts = set(get_rooms_conflicts(rooms, start_dt, end_dt, RepeatFrequency.NEVER, 0, blocked_rooms,
-                                        nonbookable_periods, unbookable_hours)[0])
-    rooms = [room for room in rooms if room.id not in conflicts]
+    rooms = [room for room in rooms if room.id not in nonbookable_periods]
+
+    if not rooms:
+        return data
+
+    unbookable_hours = get_rooms_unbookable_hours(rooms)
     rooms_occurrences = get_existing_rooms_occurrences(rooms, new_start_dt, new_end_dt, RepeatFrequency.NEVER, None,
                                                        allow_overlapping=True)
-
     for room in rooms:
         if limit and len(data) == limit:
             break
 
         suggestions = {}
-        suggested_time = get_start_time_suggestion(rooms_occurrences.get(room.id, []), start_dt, end_dt)
+        taken_periods = [(occ.start_dt, occ.end_dt) for occ in rooms_occurrences.get(room.id, [])]
+        if room.id in unbookable_hours:
+            taken_periods.extend((datetime.combine(start_dt, uh.start_time), datetime.combine(end_dt, uh.end_time))
+                                 for uh in unbookable_hours[room.id])
+
+        taken_periods = sorted(taken_periods)
+        suggested_time = get_start_time_suggestion(taken_periods, start_dt, end_dt)
         if suggested_time:
             suggested_time_change = (suggested_time - start_dt).total_seconds() / 60
-            if suggested_time_change:
+            if suggested_time_change and abs(suggested_time_change) <= BOOKING_TIME_DIFF:
                 suggestions['time'] = suggested_time_change
 
-        duration_suggestion = get_duration_suggestion(rooms_occurrences.get(room.id, []), start_dt, end_dt)
+        duration_suggestion = get_duration_suggestion(taken_periods, start_dt, end_dt)
         original_duration = (end_dt - start_dt).total_seconds() / 60
         if duration_suggestion and duration_suggestion <= DURATION_FACTOR * original_duration:
             suggestions['duration'] = duration_suggestion
@@ -110,8 +116,7 @@ def get_start_time_suggestion(occurrences, from_, to):
 
     candidates = []
     period_start = new_start_dt
-    for occurrence in occurrences:
-        occ_start, occ_end = occurrence.start_dt, occurrence.end_dt
+    for (occ_start, occ_end) in occurrences:
         if period_start < occ_start:
             candidates.append((period_start, occ_start))
         period_start = occ_end
@@ -129,16 +134,15 @@ def get_start_time_suggestion(occurrences, from_, to):
 def get_duration_suggestion(occurrences, from_, to):
     old_duration = (to - from_).total_seconds() / 60
     duration = old_duration
-    all_occurrences_overlap = all(overlaps((from_, to), (occ.start_dt, occ.end_dt)) for occ in occurrences)
+    all_occurrences_overlap = all(overlaps((from_, to), occ) for occ in occurrences)
 
     # Don't calculate duration suggestion, if there are at least
     # two existing bookings conflicting with the specified dates
     if all_occurrences_overlap and len(occurrences) > 1:
         return
 
-    for occurrence in occurrences:
-        start, end = occurrence.start_dt, occurrence.end_dt
-        if start < from_:
+    for (start, end) in occurrences:
+        if start <= from_:
             continue
         if from_ < end < to:
             if start > from_:
