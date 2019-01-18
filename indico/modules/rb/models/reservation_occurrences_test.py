@@ -247,9 +247,9 @@ def test_find_overlapping_with_skip_reservation(overlapping_occurrences):
 
 @pytest.mark.parametrize(('silent', 'reason'), (
     (True,  'cancelled'),
-    (True,  ''),
+    (True,  None),
     (False, 'cancelled'),
-    (False, ''),
+    (False, None),
 ))
 def test_cancel(smtp, create_reservation, dummy_user, silent, reason):
     reservation = create_reservation(start_dt=date.today() + relativedelta(hour=8),

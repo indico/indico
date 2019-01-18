@@ -117,6 +117,7 @@ class Reservation(Serializer, db.Model):
                 db.Index('ix_reservations_end_dt_date', cast(cls.end_dt, Date)),
                 db.Index('ix_reservations_start_dt_time', cast(cls.start_dt, Time)),
                 db.Index('ix_reservations_end_dt_time', cast(cls.end_dt, Time)),
+                db.CheckConstraint("rejection_reason != ''", 'rejection_reason_not_empty'),
                 {'schema': 'roombooking'})
 
     id = db.Column(
@@ -182,7 +183,8 @@ class Reservation(Serializer, db.Model):
         nullable=False
     )
     rejection_reason = db.Column(
-        db.String
+        db.String,
+        nullable=True
     )
     uses_vc = db.Column(
         db.Boolean,
@@ -424,7 +426,7 @@ class Reservation(Serializer, db.Model):
 
     def cancel(self, user, reason=None, silent=False):
         self.state = ReservationState.canceled
-        self.rejection_reason = reason
+        self.rejection_reason = reason or None
         self.occurrences.filter_by(is_valid=True).update({
             ReservationOccurrence.state: ReservationOccurrenceState.canceled,
             ReservationOccurrence.rejection_reason: reason
@@ -436,7 +438,7 @@ class Reservation(Serializer, db.Model):
 
     def reject(self, user, reason, silent=False):
         self.state = ReservationState.rejected
-        self.rejection_reason = reason
+        self.rejection_reason = reason or None
         self.occurrences.filter_by(is_valid=True).update({
             ReservationOccurrence.state: ReservationOccurrenceState.rejected,
             ReservationOccurrence.rejection_reason: reason

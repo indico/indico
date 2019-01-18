@@ -46,7 +46,8 @@ class ReservationOccurrenceState(int, IndicoEnum):
 
 class ReservationOccurrence(db.Model, Serializer):
     __tablename__ = 'reservation_occurrences'
-    __table_args__ = {'schema': 'roombooking'}
+    __table_args__ = (db.CheckConstraint("rejection_reason != ''", 'rejection_reason_not_empty'),
+                      {'schema': 'roombooking'})
     __api_public__ = (('start_dt', 'startDT'), ('end_dt', 'endDT'), ('is_canceled', 'is_cancelled'), 'is_rejected')
 
     #: A relationship loading strategy that will avoid loading the
@@ -84,7 +85,8 @@ class ReservationOccurrence(db.Model, Serializer):
         default=ReservationOccurrenceState.valid
     )
     rejection_reason = db.Column(
-        db.String
+        db.String,
+        nullable=True
     )
 
     # relationship backrefs:
@@ -245,7 +247,7 @@ class ReservationOccurrence(db.Model, Serializer):
     @unify_user_args
     def cancel(self, user, reason=None, silent=False):
         self.state = ReservationOccurrenceState.canceled
-        self.rejection_reason = reason
+        self.rejection_reason = reason or None
         if not silent:
             log = [u'Day cancelled: {}'.format(format_date(self.date).decode('utf-8'))]
             if reason:
@@ -258,7 +260,7 @@ class ReservationOccurrence(db.Model, Serializer):
     @unify_user_args
     def reject(self, user, reason, silent=False):
         self.state = ReservationOccurrenceState.rejected
-        self.rejection_reason = reason
+        self.rejection_reason = reason or None
         if not silent:
             log = [u'Day rejected: {}'.format(format_date(self.date).decode('utf-8')),
                    u'Reason: {}'.format(reason)]
