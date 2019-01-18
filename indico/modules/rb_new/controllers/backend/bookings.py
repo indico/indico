@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 from datetime import date, datetime, time
+from operator import attrgetter
 
 from flask import jsonify, request, session
 from marshmallow import fields, missing
@@ -273,18 +274,22 @@ class RHUpdateBooking(RHBookingBase):
         if not self.booking.can_edit(session.user):
             raise Forbidden
 
-    def _should_split(self, new_start_dt, new_end_dt):
+    def _should_split(self, new_start_dt, new_end_dt, repeat_frequency, repeat_interval):
         today = date.today()
-        is_ongoing_booking = new_start_dt.date() < today
-        old_start_time, old_end_time = self.booking.start_dt.time(), self.booking.end_dt.time()
+        is_ongoing_booking = self.booking.start_dt.date() < today < self.booking.end_dt.date()
+        old_start_time = self.booking.start_dt.time()
+        old_end_time = self.booking.end_dt.time()
+        old_repeat_frequency = self.booking.repeat_frequency
+        old_repeat_interval = self.booking.repeat_interval
         times_changed = new_start_dt.time() != old_start_time or new_end_dt.time() != old_end_time
-        return is_ongoing_booking and times_changed
+        repetition_changed = (repeat_frequency, repeat_interval) != (old_repeat_frequency, old_repeat_interval)
+        return is_ongoing_booking and (times_changed or repetition_changed)
 
     def split_bookings(self, booking_data):
-        occurrences = self.booking.occurrences
         room = self.booking.room
+        occurrences = sorted(self.booking.occurrences.all(), key=attrgetter('start_dt'))
         is_prebooking = not self.booking.is_accepted
-        occurrences_to_cancel = filter(lambda r: r.start_dt.date() >= date.today(), occurrences)
+        occurrences_to_cancel = [occ for occ in occurrences if occ.start_dt.date() >= date.today()]
         new_start_dt = datetime.combine(occurrences_to_cancel[0].start_dt.date(), booking_data['start_dt'].time())
         for occurrence_to_cancel in occurrences_to_cancel:
             occurrence_to_cancel.cancel(session.user, silent=True)
@@ -317,8 +322,8 @@ class RHUpdateBooking(RHBookingBase):
         }
 
         additional_booking_attrs = {}
-        if not self._should_split(args['start_dt'], args['end_dt']):
-            has_date_changed = not has_same_dates(self.booking, data)
+        if not self._should_split(args['start_dt'], args['end_dt'], args['repeat_frequency'], args['repeat_interval']):
+            has_date_changed = not has_same_dates(self.booking, booking_data)
             room = self.booking.room
             self.booking.modify(booking_data, session.user)
             if (has_date_changed and not room.can_book(session.user, allow_admin=False) and
