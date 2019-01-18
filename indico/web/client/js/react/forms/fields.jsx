@@ -155,5 +155,5 @@ ReduxDropdownField.propTypes = {
 ReduxDropdownField.defaultProps = {
     required: false,
     clearable: false,
-    onChange: () => {}
+    onChange: () => {},
 };

@@ -139,7 +139,6 @@ class BookRoomModal extends React.Component {
         if (submitSucceeded) {
             const {booking} = this.state;
             const bookingLink = (
-                // eslint-disable-next-line no-alert
                 <a onClick={() => openBookingDetails(booking.id)} />
             );
             return (
@@ -317,7 +316,8 @@ class BookRoomModal extends React.Component {
         if (link) {
             return (
                 <span styleName="link-active">
-                    <a href={link} target="_blank" rel="noopener noreferrer">
+                    {/* eslint-disable-next-line react/jsx-no-target-blank */}
+                    <a href={link} target="_blank">
                         <Icon name="external" link />
                     </a>
                 </span>
