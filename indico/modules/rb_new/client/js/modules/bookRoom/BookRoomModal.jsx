@@ -258,7 +258,8 @@ class BookRoomModal extends React.Component {
     submitBooking = async (data) => {
         const {actions: {createBooking}, bookingData: {link}} = this.props;
         if (link) {
-            data[link.type] = link.id;
+            data.linkType = _.snakeCase(link.type);
+            data.linkId = link.id;
         }
         const rv = await createBooking(data, this.props);
         if (rv.error) {
@@ -538,7 +539,7 @@ export default connect(
             fetchRelatedEvents: actions.fetchRelatedEvents,
             resetRelatedEvents: actions.resetRelatedEvents,
             createBooking: (data, props) => {
-                const {reason, usage, user, isPrebooking, event, contrib, sessionBlock} = data;
+                const {reason, usage, user, isPrebooking, linkType, linkId} = data;
                 const {bookingData: {recurrence, dates, timeSlot}, room} = props;
                 return actions.createBooking({
                     reason,
@@ -548,9 +549,8 @@ export default connect(
                     dates,
                     timeSlot,
                     room,
-                    event,
-                    contrib,
-                    sessionBlock,
+                    linkType,
+                    linkId,
                     isPrebooking
                 });
             },

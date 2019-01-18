@@ -39,7 +39,7 @@ _bp.add_url_rule('/api/stats', 'stats', misc.RHStats)
 _bp.add_url_rule('/api/map-areas', 'map_areas', misc.RHMapAreas)
 _bp.add_url_rule('/api/equipment', 'equipment_types', misc.RHEquipmentTypes)
 _bp.add_url_rule('/api/locations', 'locations', locations.RHLocations)
-_bp.add_url_rule('/api/data/<any(event,contrib,session_block):type>/<int:id>', 'linked_object_data',
+_bp.add_url_rule('/api/data/<any(event,contribution,session_block):type>/<int:id>', 'linked_object_data',
                  bookings.RHLinkedObjectData)
 
 # Rooms

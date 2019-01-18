@@ -23,6 +23,7 @@ from marshmallow import Schema, ValidationError, fields, post_dump, validate, va
 from marshmallow.fields import Boolean, DateTime, Function, Method, Nested, Number, String
 from marshmallow_enum import EnumField
 
+from indico.core.db.sqlalchemy.links import LinkType
 from indico.core.marshmallow import mm
 from indico.modules.rb.models.blocked_rooms import BlockedRoom, BlockedRoomState
 from indico.modules.rb.models.blocking_principals import BlockingPrincipal
@@ -136,10 +137,9 @@ class ReservationDetailsSchema(mm.ModelSchema):
     can_reject = Function(lambda booking: booking.can_reject(session.user))
     permissions = Method('_get_permissions')
     state = EnumField(ReservationState)
-    is_linked_to_object = Function(lambda booking:
-                                   booking.event_id is not None or
-                                   booking.contribution_id is not None or
-                                   booking.session_block_id is not None)
+    is_linked_to_object = Function(lambda booking: booking.link_id is not None)
+    link_type = Function(lambda booking: booking.link.link_type.name if booking.link_id else None)
+    link_id = Function(lambda booking: booking.linked_object.id if booking.link_id else None)
     start_dt = NaiveDateTime()
     end_dt = NaiveDateTime()
 
@@ -148,7 +148,7 @@ class ReservationDetailsSchema(mm.ModelSchema):
         fields = ('id', 'start_dt', 'end_dt', 'repetition', 'booking_reason', 'created_dt', 'booked_for_user',
                   'room_id', 'created_by_user', 'edit_logs', 'permissions',
                   'is_cancelled', 'is_rejected', 'is_accepted', 'is_pending', 'rejection_reason',
-                  'is_linked_to_object', 'state')
+                  'is_linked_to_object', 'link_type', 'link_id', 'state')
 
     def _get_permissions(self, booking):
         methods = ('can_accept', 'can_cancel', 'can_delete', 'can_edit', 'can_reject')
@@ -157,7 +157,6 @@ class ReservationDetailsSchema(mm.ModelSchema):
         if rb_is_admin(session.user):
             admin_permissions = {x: getattr(booking, x)(session.user) for x in methods}
         return {'user': user_permissions, 'admin': admin_permissions}
-
 
 
 class BlockedRoomSchema(mm.ModelSchema):
@@ -257,11 +256,10 @@ class CreateBookingSchema(Schema):
     repeat_interval = fields.Int(missing=0, validate=lambda x: x >= 0)
     room_id = fields.Int(required=True)
     user_id = fields.Int()
-    event_id = fields.Int()
-    contribution_id = fields.Int()
-    session_block_id = fields.Int()
     booking_reason = fields.String(load_from='reason', validate=validate.Length(min=3))
     is_prebooking = fields.Bool(missing=False)
+    link_type = EnumField(LinkType)
+    link_id = fields.Int()
 
     class Meta:
         strict = True

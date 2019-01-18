@@ -23,7 +23,13 @@ from io import BytesIO
 from flask import current_app
 from PIL import Image
 
+from indico.core.db import db
+from indico.core.db.sqlalchemy.links import LinkType
 from indico.legacy.common.cache import GenericCache
+from indico.modules.events import Event
+from indico.modules.events.contributions import Contribution
+from indico.modules.events.sessions import Session
+from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb_new.schemas import (bookable_hours_schema, nonbookable_periods_schema,
                                            reservation_occurrences_schema, simple_blockings_schema)
@@ -81,3 +87,22 @@ def serialize_nonbookable_periods(data):
 
 def serialize_unbookable_hours(data):
     return [bookable_hours_schema.dump(d).data for d in data]
+
+
+def get_linked_object(type_, id_):
+    obj = None
+    if type_ == LinkType.event:
+        obj = Event.get_one(id_, is_deleted=False)
+    elif type_ == LinkType.contribution:
+        obj = (Contribution.query
+               .filter(Contribution.id == id_,
+                       ~Contribution.is_deleted,
+                       Contribution.event.has(is_deleted=False))
+               .one())
+    elif type_ == LinkType.session_block:
+        obj = (SessionBlock.query
+               .filter(SessionBlock.id == id_,
+                       SessionBlock.session.has(db.and_(~Session.is_deleted,
+                                                        Session.event.has(is_deleted=False))))
+               .one())
+    return obj

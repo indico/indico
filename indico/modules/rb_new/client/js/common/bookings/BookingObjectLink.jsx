@@ -32,7 +32,7 @@ import './BookingObjectLink.module.scss';
  */
 export default class BookingObjectLink extends React.PureComponent {
     static propTypes = {
-        type: PropTypes.oneOf(['event', 'contrib', 'sessionBlock']).isRequired,
+        type: PropTypes.oneOf(['event', 'contribution', 'sessionBlock']).isRequired,
         id: PropTypes.number.isRequired,
         /** Whether it is a pending link or the booking is already linked */
         pending: PropTypes.bool,

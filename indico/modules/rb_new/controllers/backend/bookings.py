@@ -42,8 +42,9 @@ from indico.modules.rb_new.operations.suggestions import get_suggestions
 from indico.modules.rb_new.schemas import (create_booking_args, reservation_details_occurrences_schema,
                                            reservation_details_schema, reservation_linked_object_data_schema,
                                            reservation_occurrences_schema)
-from indico.modules.rb_new.util import (group_by_occurrence_date, serialize_blockings, serialize_nonbookable_periods,
-                                        serialize_occurrences, serialize_unbookable_hours)
+from indico.modules.rb_new.util import (get_linked_object, group_by_occurrence_date, serialize_blockings,
+                                        serialize_nonbookable_periods, serialize_occurrences,
+                                        serialize_unbookable_hours)
 from indico.modules.users.models.users import User
 from indico.util.date_time import now_utc, utc_to_server
 from indico.util.i18n import _
@@ -177,6 +178,13 @@ class RHCreateBooking(RHRoomBookingBase):
         selected_period_days = (day_end_dt - day_start_dt).days
         return selected_period_days <= booking_limit_days
 
+    def _link_booking(self, booking, type_, id_):
+        if id_ and type_:
+            obj = get_linked_object(type_, id_)
+
+            if obj is not None:
+                booking.linked_object = obj
+
     def _process(self):
         args = self.args
         user_id = args.pop('user_id', None)
@@ -192,6 +200,7 @@ class RHCreateBooking(RHRoomBookingBase):
         try:
             resv = Reservation.create_from_data(self.room, dict(args, booked_for_user=booked_for), session.user,
                                                 prebook=self.prebook)
+            self._link_booking(resv, args['link_type'], args['link_id'])
             db.session.flush()
         except NoReportError as e:
             db.session.rollback()
@@ -271,7 +280,7 @@ class RHLinkedObjectData(RHRoomBookingBase):
         id = request.view_args['id']
         self.linked_object = {
             'event': lambda x: Event.get_one(x),
-            'contrib': lambda x: Contribution.get_one(x),
+            'contribution': lambda x: Contribution.get_one(x),
             'session_block': lambda x: SessionBlock.get_one(x)
         }[type](id)
 

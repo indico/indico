@@ -15,6 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import _ from 'lodash';
 import moment from 'moment';
 import React from 'react';
 import PropTypes from 'prop-types';
@@ -370,17 +371,6 @@ class BookingDetails extends React.Component {
         );
     };
 
-    get linkedObject() {
-        const {booking: {eventId, contributionId, sessionBlockId}} = this.props;
-        if (eventId) {
-            return {type: 'event', id: eventId};
-        } else if (contributionId) {
-            return {type: 'contrib', id: contributionId};
-        } else {
-            return {type: 'sessionBlock', id: sessionBlockId};
-        }
-    }
-
     render() {
         const {occurrencesVisible} = this.state;
         const {
@@ -388,9 +378,9 @@ class BookingDetails extends React.Component {
             editButton,
             bookingStateChangeInProgress,
             booking: {
-                startDt, endDt, occurrences, dateRange, repetition, room, bookedForUser, isLinkedToObject,
-                bookingReason, editLogs, createdDt, createdByUser, isCancelled, isRejected, canDelete, canCancel,
-                canReject, canAccept, canEdit, isAccepted, newBookingId
+                startDt, endDt, occurrences, dateRange, repetition, room, bookedForUser, bookingReason, editLogs,
+                createdDt, createdByUser, isCancelled, isRejected, canDelete, canCancel, canReject, canAccept, canEdit,
+                isAccepted, newBookingId, isLinkedToObject, linkType, linkId
             },
         } = this.props;
         const legendLabels = [
@@ -436,7 +426,7 @@ class BookingDetails extends React.Component {
                                     {bookedForUser && this.renderBookedFor(bookedForUser)}
                                     {this.renderReason(bookingReason)}
                                     {isLinkedToObject && (
-                                        <BookingObjectLink type={this.linkedObject.type} id={this.linkedObject.id} />
+                                        <BookingObjectLink type={_.camelCase(linkType)} id={linkId} />
                                     )}
                                     {this.renderBookingHistory(editLogs, createdDt, createdByUser)}
                                     {this.renderMessageAfterSplitting(newBookingId)}
