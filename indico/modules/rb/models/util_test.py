@@ -19,6 +19,7 @@ from datetime import date, datetime, time, timedelta
 import pytest
 
 from indico.core.errors import IndicoError
+from indico.modules.rb.models.reservation_occurrences import ReservationOccurrenceState
 from indico.modules.rb.models.reservations import RepeatFrequency
 from indico.modules.rb.models.util import unimplemented
 from indico.testing.util import bool_matrix
@@ -54,7 +55,7 @@ def test_proxy_to_reservation_if_last_valid_occurrence(db, mock, create_reservat
                               repeat_frequency=RepeatFrequency.NEVER if not_repeating else RepeatFrequency.DAY)
     if only_one_valid:
         for occ in resv.occurrences[1:]:
-            occ.is_cancelled = True
+            occ.state = ReservationOccurrenceState.canceled
         db.session.flush()
 
     occ = resv.occurrences.first()

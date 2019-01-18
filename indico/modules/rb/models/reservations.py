@@ -32,7 +32,7 @@ from indico.core.db.sqlalchemy.custom.utcdatetime import UTCDateTime
 from indico.core.db.sqlalchemy.util.queries import limit_groups
 from indico.core.errors import NoReportError
 from indico.modules.rb.models.reservation_edit_logs import ReservationEditLog
-from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
+from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence, ReservationOccurrenceState
 from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
 from indico.modules.rb.models.util import unimplemented
 from indico.modules.rb.notifications.reservations import (notify_cancellation, notify_confirmation, notify_creation,
@@ -431,8 +431,10 @@ class Reservation(Serializer, db.Model):
     def cancel(self, user, reason=None, silent=False):
         self.state = ReservationState.canceled
         self.rejection_reason = reason
-        self.occurrences.filter_by(is_valid=True).update({'is_cancelled': True, 'rejection_reason': reason},
-                                                         synchronize_session='fetch')
+        self.occurrences.filter_by(is_valid=True).update({
+            ReservationOccurrence.state: ReservationOccurrenceState.canceled,
+            ReservationOccurrence.rejection_reason: reason
+        }, synchronize_session='fetch')
         if not silent:
             notify_cancellation(self)
             log_msg = u'Reservation cancelled: {}'.format(reason) if reason else 'Reservation cancelled'
@@ -441,8 +443,10 @@ class Reservation(Serializer, db.Model):
     def reject(self, user, reason, silent=False):
         self.state = ReservationState.rejected
         self.rejection_reason = reason
-        self.occurrences.filter_by(is_valid=True).update({'is_rejected': True, 'rejection_reason': reason},
-                                                         synchronize_session='fetch')
+        self.occurrences.filter_by(is_valid=True).update({
+            ReservationOccurrence.state: ReservationOccurrenceState.rejected,
+            ReservationOccurrence.rejection_reason: reason
+        }, synchronize_session='fetch')
         if not silent:
             notify_rejection(self)
             log_msg = u'Reservation rejected: {}'.format(reason)

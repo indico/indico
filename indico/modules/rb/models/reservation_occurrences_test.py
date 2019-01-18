@@ -21,9 +21,9 @@ import pytest
 from dateutil.relativedelta import relativedelta
 
 from indico.core.errors import IndicoError
-from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
+from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence, ReservationOccurrenceState
 from indico.modules.rb.models.reservations import RepeatFrequency
-from indico.testing.util import bool_matrix, extract_emails
+from indico.testing.util import extract_emails
 
 
 pytest_plugins = 'indico.modules.rb.testing.fixtures'
@@ -72,16 +72,6 @@ def overlapping_occurrences(create_occurrence):
 def test_date(dummy_occurrence):
     assert dummy_occurrence.date == date.today()
     assert ReservationOccurrence.find_first(date=date.today()) == dummy_occurrence
-
-
-@pytest.mark.parametrize(('is_rejected', 'is_cancelled', 'expected'),
-                         bool_matrix('..', expect=lambda x: not any(x)))
-def test_is_valid(db, dummy_occurrence, is_rejected, is_cancelled, expected):
-    dummy_occurrence.is_rejected = is_rejected
-    dummy_occurrence.is_cancelled = is_cancelled
-    db.session.flush()
-    assert dummy_occurrence.is_valid == expected
-    assert ReservationOccurrence.find_first(is_valid=expected) == dummy_occurrence
 
 
 # ======================================================================================================================
@@ -236,7 +226,7 @@ def test_find_overlapping_with_is_not_valid(db, overlapping_occurrences):
     db_occ, occ = overlapping_occurrences
     assert db_occ in ReservationOccurrence.find_overlapping_with(room=db_occ.reservation.room,
                                                                  occurrences=[occ]).all()
-    db_occ.is_cancelled = True
+    db_occ.state = ReservationOccurrenceState.canceled
     db.session.flush()
     assert db_occ not in ReservationOccurrence.find_overlapping_with(room=db_occ.reservation.room,
                                                                      occurrences=[occ]).all()

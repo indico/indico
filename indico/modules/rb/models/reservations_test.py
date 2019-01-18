@@ -21,7 +21,7 @@ from dateutil.relativedelta import relativedelta
 
 from indico.core.errors import IndicoError
 from indico.modules.rb.models.reservation_edit_logs import ReservationEditLog
-from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
+from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence, ReservationOccurrenceState
 from indico.modules.rb.models.reservations import RepeatFrequency, RepeatMapping, Reservation, ReservationState
 
 
@@ -277,7 +277,7 @@ def test_find_excluded_days(db, create_reservation):
                                      end_dt=date.today() + relativedelta(days=5, hour=10),
                                      repeat_frequency=RepeatFrequency.DAY)
     for occ in reservation.occurrences[::2]:
-        occ.is_cancelled = True
+        occ.state = ReservationOccurrenceState.canceled
     db.session.flush()
     assert set(reservation.find_excluded_days().all()) == {occ for occ in reservation.occurrences if not occ.is_valid}
 

@@ -253,7 +253,7 @@ class ReservationOccurrence(db.Model, Serializer):
     @proxy_to_reservation_if_last_valid_occurrence
     @unify_user_args
     def cancel(self, user, reason=None, silent=False):
-        self.is_cancelled = True
+        self.state = ReservationOccurrenceState.canceled
         self.rejection_reason = reason
         if not silent:
             log = [u'Day cancelled: {}'.format(format_date(self.date).decode('utf-8'))]
@@ -266,7 +266,7 @@ class ReservationOccurrence(db.Model, Serializer):
     @proxy_to_reservation_if_last_valid_occurrence
     @unify_user_args
     def reject(self, user, reason, silent=False):
-        self.is_rejected = True
+        self.state = ReservationOccurrenceState.rejected
         self.rejection_reason = reason
         if not silent:
             log = [u'Day rejected: {}'.format(format_date(self.date).decode('utf-8')),
