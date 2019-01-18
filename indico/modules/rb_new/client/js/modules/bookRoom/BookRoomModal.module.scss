@@ -38,4 +38,28 @@
     .checkbox {
         margin-left: auto;
     }
+
+    .link-active {
+        margin-left: 0.5em;
+        margin-bottom: 0.15em;
+    }
+}
+
+.event-dropdown {
+    display: flex;
+    align-items: center;
+
+    :global(.field) {
+        flex-grow: 1;
+        padding-right: 1em;
+        margin: 0 !important;
+    }
+
+    .link-active .link-inactive {
+        margin-left: auto;
+    }
+
+    .link-inactive :global(.icon) {
+        color: $gray;
+    }
 }
