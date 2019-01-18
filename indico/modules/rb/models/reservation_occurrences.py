@@ -32,7 +32,7 @@ from indico.modules.rb.models.util import proxy_to_reservation_if_last_valid_occ
 from indico.util import date_time
 from indico.util.date_time import format_date, iterdays
 from indico.util.serializer import Serializer
-from indico.util.string import return_ascii
+from indico.util.string import format_repr, return_ascii
 from indico.util.struct.enum import IndicoEnum
 from indico.util.user import unify_user_args
 
@@ -112,14 +112,7 @@ class ReservationOccurrence(db.Model, Serializer):
 
     @return_ascii
     def __repr__(self):
-        return u'<ReservationOccurrence({0}, {1}, {2}, {3}, {4}, {5})>'.format(
-            self.reservation_id,
-            self.start_dt,
-            self.end_dt,
-            self.is_canceled,
-            self.is_rejected,
-            self.notification_sent
-        )
+        return format_repr(self, 'reservation_id', 'start_dt', 'end_dt', 'state')
 
     @classmethod
     def create_series_for_reservation(cls, reservation):

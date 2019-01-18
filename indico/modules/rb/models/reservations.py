@@ -42,7 +42,7 @@ from indico.util.date_time import format_date, format_time, now_utc
 from indico.util.i18n import N_, _
 from indico.util.locators import locator_property
 from indico.util.serializer import Serializer
-from indico.util.string import return_ascii, to_unicode
+from indico.util.string import format_repr, return_ascii, to_unicode
 from indico.util.struct.enum import IndicoEnum
 from indico.web.flask.util import url_for
 
@@ -316,13 +316,7 @@ class Reservation(Serializer, db.Model):
 
     @return_ascii
     def __repr__(self):
-        return u'<Reservation({0}, {1}, {2}, {3}, {4})>'.format(
-            self.id,
-            self.room_id,
-            self.booked_for_name,
-            self.start_dt,
-            self.end_dt
-        )
+        return format_repr(self, 'id', 'room_id', 'start_dt', 'end_dt', 'state', _text=self.booking_reason)
 
     @classmethod
     def create_from_data(cls, room, data, user, prebook=None, ignore_admin=False):
