@@ -353,6 +353,15 @@ class Reservation(Serializer, db.Model):
             parts.append(_(u"Live"))
         return u', '.join(map(unicode, parts))
 
+    @property
+    def linked_object(self):
+        return self.link.object if self.link else None
+
+    @linked_object.setter
+    def linked_object(self, obj):
+        assert self.link is None
+        self.link = ReservationLink(object=obj)
+
     @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'room_id', 'start_dt', 'end_dt', 'state', _text=self.booking_reason)
