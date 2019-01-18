@@ -34,7 +34,7 @@ const classes = {
     blockings: 'blocking',
     nonbookablePeriods: 'unbookable-periods',
     unbookableHours: 'unbookable-hours',
-    cancelations: 'cancelation',
+    cancellations: 'cancellation',
     rejections: 'rejection',
     other: 'other',
 };
@@ -46,7 +46,7 @@ const types = {
     nonbookablePeriods: 'unbookable-periods',
     unbookableHours: 'unbookable-hours',
     preBookings: 'pre-booking',
-    cancelations: 'cancelation',
+    cancellations: 'cancellation',
     rejections: 'rejection',
     other: 'other',
 };
@@ -152,7 +152,7 @@ class TimelineItem extends React.Component {
                     <div>{segmentStartDt.format('LT')} - {segmentEndDt.format('LT')}</div>
                 </div>
             );
-        } else if (type === 'cancelation') {
+        } else if (type === 'cancellation') {
             popupContent = (
                 <div styleName="popup-center">
                     <strong><Translate>Cancelled</Translate></strong>
