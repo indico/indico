@@ -209,7 +209,7 @@ def test_reject(smtp, create_reservation, dummy_user, silent):
         assert smtp.outbox
 
 
-def test_add_edit_log(db, dummy_reservation):
+def test_add_edit_log(dummy_reservation):
     dummy_reservation.add_edit_log(ReservationEditLog(user_name='user', info='Some change'))
     assert dummy_reservation.edit_logs.count() == 1
 
@@ -227,7 +227,7 @@ def test_moderation(dummy_reservation, dummy_user, is_pending, can_moderate):
 
 @pytest.mark.parametrize('is_manager', (True, False))
 @pytest.mark.parametrize('is_past', (True, False))
-@pytest.mark.parametrize('state', (ReservationState.pending, ReservationState.canceled, ReservationState.accepted))
+@pytest.mark.parametrize('state', ReservationState)
 @pytest.mark.parametrize('is_admin', (True, False))
 def test_room_manager_actions(create_reservation, create_user, is_manager, is_past, state, is_admin):
     user = create_user(123, rb_admin=is_admin)
@@ -237,19 +237,18 @@ def test_room_manager_actions(create_reservation, create_user, is_manager, is_pa
     reservation.state = state
     if is_manager:
         reservation.room.update_principal(user, full_access=True)
-    is_pending = state == ReservationState.pending
-    is_canceled = state == ReservationState.canceled
-    assert reservation.can_accept(user) == (is_pending and (is_manager or is_admin) and not is_canceled)
-    assert reservation.can_reject(user) == (not is_canceled and (is_manager or is_admin))
-    assert reservation.can_cancel(user) == (not is_past and not is_canceled and is_admin)
-    assert reservation.can_edit(user) == (((is_manager and not is_past) or is_admin) and not is_canceled)
-    assert reservation.can_delete(user) == (is_admin and is_canceled)
+    invalid_state = state in (ReservationState.canceled, ReservationState.rejected)
+    assert reservation.can_accept(user) == (reservation.is_pending and (is_manager or is_admin) and not invalid_state)
+    assert reservation.can_reject(user) == (not invalid_state and (is_manager or is_admin))
+    assert reservation.can_cancel(user) == (not is_past and not invalid_state and is_admin)
+    assert reservation.can_edit(user) == (((is_manager and not is_past) or is_admin) and not invalid_state)
+    assert reservation.can_delete(user) == (is_admin and invalid_state)
 
 
 @pytest.mark.parametrize('is_creator', (True, False))
 @pytest.mark.parametrize('is_bookee', (True, False))
 @pytest.mark.parametrize('is_past', (True, False))
-@pytest.mark.parametrize('state', (ReservationState.rejected, ReservationState.accepted))
+@pytest.mark.parametrize('state', ReservationState)
 def test_user_actions(create_user, create_reservation, is_creator, is_bookee, is_past, state):
     user = create_user(123)
     day_offset = -1 if is_past else 1
@@ -260,8 +259,9 @@ def test_user_actions(create_user, create_reservation, is_creator, is_bookee, is
         reservation.created_by_user = user
     if is_bookee:
         reservation.booked_for_user = user
-    assert reservation.can_cancel(user) == ((is_creator or is_bookee) and not is_past and not reservation.is_rejected)
-    assert reservation.can_edit(user) == ((is_creator or is_bookee) and not is_past and not reservation.is_rejected)
+    valid_state = state in (ReservationState.pending, ReservationState.accepted)
+    assert reservation.can_cancel(user) == ((is_creator or is_bookee) and not is_past and valid_state)
+    assert reservation.can_edit(user) == ((is_creator or is_bookee) and not is_past and valid_state)
 
 
 def test_actions_no_user(dummy_reservation):
