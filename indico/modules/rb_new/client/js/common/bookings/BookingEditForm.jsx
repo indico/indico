@@ -16,11 +16,13 @@
  */
 
 import _ from 'lodash';
+import moment from 'moment';
 import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {Form, Input, Segment, Select, TextArea} from 'semantic-ui-react';
 import {Field} from 'react-final-form';
+import {START_DATE} from 'react-dates/constants';
 
 import PrincipalSearchField from 'indico/react/components/PrincipalSearchField';
 import {ReduxFormField, ReduxRadioField, formatters, validators as v} from 'indico/react/forms';
@@ -48,8 +50,16 @@ class BookingEditForm extends React.Component {
     };
 
     notifyRecurrenceTypeChange = (newType) => {
-        const {onBookingPeriodChange, formProps: {form, values: {recurrence, dates, timeSlot}}} = this.props;
+        const {
+            booking: {startDt},
+            onBookingPeriodChange,
+            formProps: {form, values: {recurrence, dates, timeSlot}}
+        } = this.props;
         const filters = {dates, recurrence: {...recurrence, type: newType}};
+
+        if (newType === 'daily' && moment().isAfter(startDt, 'day')) {
+            dates.startDate = serializeDate(startDt);
+        }
 
         sanitizeRecurrence(filters);
         form.change('recurrence', filters.recurrence);
@@ -94,6 +104,7 @@ class BookingEditForm extends React.Component {
     };
 
     renderDateForm = ({input, isSingleBooking, onChange, ...fieldProps}) => {
+        const {booking: {startDt: originalStartDt, endDt: originalEndDt}} = this.props;
         const {value: {startDate, endDate}} = input;
         const component = isSingleBooking ? SingleDatePicker : DatePeriodField;
         const props = isSingleBooking ? {
@@ -103,6 +114,7 @@ class BookingEditForm extends React.Component {
                 onChange(dates);
             },
             date: toMoment(startDate, 'YYYY-MM-DD'),
+            disabled: toMoment(originalEndDt, 'YYYY-MM-DD').isBefore(moment(), 'day'),
         } : {
             onChange: (dates) => {
                 input.onChange(dates);
@@ -111,11 +123,19 @@ class BookingEditForm extends React.Component {
             dates: {
                 startDate: toMoment(startDate, 'YYYY-MM-DD'),
                 endDate: toMoment(endDate, 'YYYY-MM-DD')
-            }
+            },
+            disabled: moment().isAfter(originalStartDt, 'day') && moment().isAfter(originalEndDt, 'day'),
+            disabledDateFields: moment().isAfter(startDate, 'day') ? START_DATE : null,
         };
+
         const disabledDate = (dt) => {
-            const {booking: {startDt: start}} = this.props;
-            return !dt.isSameOrAfter(start, 'day');
+            const today = moment();
+
+            if (today.isSameOrBefore(originalStartDt, 'day')) {
+                return !dt.isSameOrAfter(today, 'day');
+            }
+
+            return !dt.isSameOrAfter(originalStartDt, 'day');
         };
 
         return (
@@ -129,8 +149,13 @@ class BookingEditForm extends React.Component {
 
     renderTimeForm = ({input, onChange, ...fieldProps}) => {
         const {value: {startTime, endTime}} = input;
+        const {booking: {startDt, endDt}} = this.props;
+        const today = moment();
+        const disabled = today.isAfter(startDt, 'day') && (endDt && today.isAfter(endDt, 'day'));
+
         return (
             <ReduxFormField {...fieldProps}
+                            disabled={disabled}
                             input={input}
                             as={TimeRangePicker}
                             startTime={toMoment(startTime, 'HH:mm')}
@@ -164,7 +189,7 @@ class BookingEditForm extends React.Component {
     render() {
         const {
             user: sessionUser,
-            booking: {bookedForUser},
+            booking: {bookedForUser, startDt, endDt},
             onBookingPeriodChange,
             formProps
         } = this.props;
@@ -173,6 +198,8 @@ class BookingEditForm extends React.Component {
             submitting, submitSucceeded, form, handleSubmit
         } = formProps;
         const bookedByCurrentUser = sessionUser.id === bookedForUser.id;
+        const today = moment();
+        const bookingFinished = today.isAfter(startDt, 'day') && (endDt && today.isAfter(endDt, 'day'));
 
         return (
             <Form id="booking-edit-form" styleName="booking-edit-form" onSubmit={handleSubmit}>
@@ -182,19 +209,19 @@ class BookingEditForm extends React.Component {
                                component={ReduxRadioField}
                                componentLabel={Translate.string('Single booking')}
                                radioValue="single"
-                               disabled={submitting || submitSucceeded}
+                               disabled={submitting || submitSucceeded || bookingFinished}
                                onClick={() => this.notifyRecurrenceTypeChange('single')} />
                         <Field name="recurrence.type"
                                component={ReduxRadioField}
                                componentLabel={Translate.string('Daily booking')}
                                radioValue="daily"
-                               disabled={submitting || submitSucceeded}
+                               disabled={submitting || submitSucceeded || bookingFinished}
                                onClick={() => this.notifyRecurrenceTypeChange('daily')} />
                         <Field name="recurrence.type"
                                component={ReduxRadioField}
                                componentLabel={Translate.string('Recurring booking')}
                                radioValue="every"
-                               disabled={submitting || submitSucceeded}
+                               disabled={submitting || submitSucceeded || bookingFinished}
                                onClick={() => this.notifyRecurrenceTypeChange('every')} />
                     </Form.Group>
                     {recurrence.type === 'every' && (

@@ -87,6 +87,7 @@
 
         &:global(.pending-cancelations) {
             background-color: lighten($sui-green, 40%);
+            z-index: 4;
         }
 
         &:global(.rejection) {

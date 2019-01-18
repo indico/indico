@@ -122,8 +122,8 @@ class BookingEdit extends React.Component {
     }
 
     get isOngoingBooking() {
-        const {booking: {startDt}} = this.props;
-        return moment().isAfter(startDt, 'day');
+        const {booking: {startDt, endDt}} = this.props;
+        return moment().isBetween(startDt, endDt, 'day');
     }
 
     getNumberOfOccurrenceByType = (data, type) => {
@@ -221,21 +221,23 @@ class BookingEdit extends React.Component {
     };
 
     updateBookingCalendar = async (dates, timeSlot, recurrence) => {
-        const {booking: {room: {id}, dateRange, id: bookingId, startDt, endDt}} = this.props;
+        const {booking: {room: {id}, dateRange, id: bookingId, startDt, endDt, repetition}} = this.props;
         const {calendars: {currentBooking}} = this.state;
-        const preProcessedParams = {timeSlot, recurrence};
         const {startTime: newStartTime, endTime: newEndTime} = timeSlot;
-        const timeChanged = serializeTime(startDt) !== newStartTime || serializeTime(endDt) !== newEndTime;
+        const timeChanged = (
+            serializeTime(startDt) !== newStartTime ||
+            serializeTime(endDt) !== newEndTime ||
+            !_.isEqual(getRecurrenceInfo(repetition), recurrence)
+        );
 
         if (this.isOngoingBooking && timeChanged) {
-            preProcessedParams.dates = {...dates, startDate: serializeDate(moment())};
-        } else {
-            preProcessedParams.dates = dates;
+            const today = moment();
+            dates.startDate = today.isBefore(dates.startDate) ? serializeDate(dates.startDate) : serializeDate(today);
         }
 
         this.resetCalendarStateOnUpdate(timeChanged);
 
-        const params = preProcessParameters(preProcessedParams, ajaxFilterRules);
+        const params = preProcessParameters({timeSlot, recurrence, dates}, ajaxFilterRules);
         let response, candidates;
         try {
             response = await indicoAxios.post(fetchTimelineURL(), {room_ids: [id]}, {params});
@@ -524,7 +526,7 @@ class BookingEdit extends React.Component {
                             </Singular>
                             <Plural>
                                 <Param name="count" value={this.numberOfConflicts} /> occurrences of your
-                                new booking might conflict with existing bookings/unbookable periods.
+                                booking are unavailable due to conflicts.
                             </Plural>
                         </PluralTranslate>
                     </Message.Content>
