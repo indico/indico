@@ -24,12 +24,11 @@ import PropTypes from 'prop-types';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import {Form as FinalForm} from 'react-final-form';
-import {Button, Checkbox, Grid, Header, Icon, Label, List, Message, Modal, Popup, Segment} from 'semantic-ui-react';
+import {Button, Checkbox, Grid, Header, Icon, List, Message, Modal, Popup, Segment} from 'semantic-ui-react';
 
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import camelizeKeys from 'indico/utils/camelize';
 import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
-import {toClasses} from 'indico/react/util';
 import {serializeDate, serializeTime} from 'indico/utils/date';
 import {ajax as ajaxFilterRules} from '../roomSearch/serializers';
 import {DailyTimelineContent, TimelineLegend} from '../timeline';
@@ -37,6 +36,7 @@ import {selectors as userSelectors} from '../user';
 import {getRecurrenceInfo, preProcessParameters, serializeRecurrenceInfo} from '../../util';
 import RoomBasicDetails from '../../components/RoomBasicDetails';
 import BookingEditForm from './BookingEditForm';
+import OccurrencesCounter from './OccurrencesCounter';
 import * as bookRoomActions from './actions';
 
 import './BookingEdit.module.scss';
@@ -463,45 +463,9 @@ class BookingEdit extends React.Component {
         }
 
         return (
-            <div styleName="occurrence-count">
-                <Popup trigger={<Label color="blue" size="tiny" content={this.numberOfOccurrences} circular />}
-                       position="bottom center"
-                       on="hover">
-                    <Translate>
-                        Number of booking occurrences
-                    </Translate>
-                </Popup>
-                {numNewCandidates > 0 && (
-                    <div>
-                        {numBookingPastOccurrences > 0 && (
-                            <div styleName="old-occurrences-count">
-                                <div styleName="arrow">→</div>
-                                <Popup trigger={<Label size="tiny" content={numBookingPastOccurrences}
-                                                       color="orange"
-                                                       circular />}
-                                       position="bottom center"
-                                       on="hover">
-                                    <Translate>
-                                        Number of past occurrences that will not be modified
-                                    </Translate>
-                                </Popup>
-                            </div>
-                        )}
-                        <div className={toClasses({'new-occurrences-count': true, 'single-arrow': numBookingPastOccurrences === 0})}>
-                            <div styleName="arrow">→</div>
-                            <Popup trigger={<Label size="tiny" content={numNewCandidates}
-                                                   color="green"
-                                                   circular />}
-                                   position="bottom center"
-                                   on="hover">
-                                <Translate>
-                                    Number of new occurrences after changes
-                                </Translate>
-                            </Popup>
-                        </div>
-                    </div>
-                )}
-            </div>
+            <OccurrencesCounter bookingsCount={this.numberOfOccurrences}
+                                newBookingsCount={numNewCandidates}
+                                pastBookingsCount={numBookingPastOccurrences} />
         );
     };
 
