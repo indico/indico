@@ -17,7 +17,6 @@
 from __future__ import unicode_literals
 
 from datetime import date, datetime, time
-from operator import attrgetter
 
 from flask import jsonify, request, session
 from marshmallow import fields, missing
@@ -34,7 +33,8 @@ from indico.modules.rb.models.reservations import RepeatFrequency, Reservation
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb_new.controllers.backend.common import search_room_args
 from indico.modules.rb_new.operations.bookings import (get_active_bookings, get_booking_occurrences, get_room_bookings,
-                                                       get_room_calendar, get_rooms_availability, has_same_dates)
+                                                       get_room_calendar, get_rooms_availability, has_same_dates,
+                                                       should_split_booking, split_booking)
 from indico.modules.rb_new.operations.suggestions import get_suggestions
 from indico.modules.rb_new.schemas import (create_booking_args, reservation_details_occurrences_schema,
                                            reservation_details_schema, reservation_event_data_schema,
@@ -274,44 +274,9 @@ class RHUpdateBooking(RHBookingBase):
         if not self.booking.can_edit(session.user):
             raise Forbidden
 
-    def _should_split(self, new_start_dt, new_end_dt, repeat_frequency, repeat_interval):
-        today = date.today()
-        is_ongoing_booking = self.booking.start_dt.date() < today < self.booking.end_dt.date()
-        old_start_time = self.booking.start_dt.time()
-        old_end_time = self.booking.end_dt.time()
-        old_repeat_frequency = self.booking.repeat_frequency
-        old_repeat_interval = self.booking.repeat_interval
-        times_changed = new_start_dt.time() != old_start_time or new_end_dt.time() != old_end_time
-        repetition_changed = (repeat_frequency, repeat_interval) != (old_repeat_frequency, old_repeat_interval)
-        return is_ongoing_booking and (times_changed or repetition_changed)
-
-    def split_bookings(self, booking_data):
-        room = self.booking.room
-        occurrences = sorted(self.booking.occurrences.all(), key=attrgetter('start_dt'))
-        is_prebooking = not self.booking.is_accepted
-        occurrences_to_cancel = [occ for occ in occurrences if occ.start_dt.date() >= date.today()]
-        new_start_dt = datetime.combine(occurrences_to_cancel[0].start_dt.date(), booking_data['start_dt'].time())
-        for occurrence_to_cancel in occurrences_to_cancel:
-            occurrence_to_cancel.cancel(session.user, silent=True)
-
-        new_end_dt = [occ for occ in occurrences if occ.start_dt.date() < date.today()][-1].end_dt
-        old_booking_data = {
-            'booking_reason': self.booking.booking_reason,
-            'room_usage': 'current_user' if self.booking.booked_for_user == session.user else 'someone',
-            'booked_for_user': self.booking.booked_for_user,
-            'start_dt': self.booking.start_dt,
-            'end_dt': new_end_dt,
-            'repeat_frequency': self.booking.repeat_frequency,
-            'repeat_interval': self.booking.repeat_interval,
-        }
-
-        self.booking.modify(old_booking_data, session.user)
-        return Reservation.create_from_data(room, dict(booking_data, start_dt=new_start_dt), session.user,
-                                            prebook=is_prebooking)
-
     @use_args(create_booking_args)
     def _process(self, args):
-        booking_data = {
+        new_booking_data = {
             'booking_reason': args['booking_reason'],
             'room_usage': 'current_user' if args.get('user_id', None) is None else 'someone',
             'booked_for_user': User.get(args.get('user_id', session.user.id)),
@@ -322,15 +287,15 @@ class RHUpdateBooking(RHBookingBase):
         }
 
         additional_booking_attrs = {}
-        if not self._should_split(args['start_dt'], args['end_dt'], args['repeat_frequency'], args['repeat_interval']):
-            has_date_changed = not has_same_dates(self.booking, booking_data)
+        if not should_split_booking(self.booking, new_booking_data):
+            has_date_changed = not has_same_dates(self.booking, new_booking_data)
             room = self.booking.room
-            self.booking.modify(booking_data, session.user)
+            self.booking.modify(new_booking_data, session.user)
             if (has_date_changed and not room.can_book(session.user, allow_admin=False) and
                     room.can_prebook(session.user, allow_admin=False) and self.booking.is_accepted):
                 self.booking.reset_approval(session.user)
         else:
-            new_booking = self.split_bookings(booking_data)
+            new_booking = split_booking(self.booking, new_booking_data)
             additional_booking_attrs['new_booking_id'] = new_booking.id
 
         db.session.flush()

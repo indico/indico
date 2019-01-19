@@ -17,7 +17,7 @@
 from __future__ import unicode_literals
 
 from collections import OrderedDict, defaultdict
-from datetime import datetime, time
+from datetime import date, datetime, time
 from itertools import groupby
 from operator import attrgetter, itemgetter
 
@@ -299,3 +299,46 @@ def has_same_dates(old_booking, new_booking):
             old_booking.end_dt == new_booking['end_dt'] and
             old_booking.repeat_interval == new_booking['repeat_interval'] and
             old_booking.repeat_frequency == new_booking['repeat_frequency'])
+
+
+def should_split_booking(booking, new_data):
+    today = date.today()
+    is_ongoing_booking = booking.start_dt.date() < today < booking.end_dt.date()
+    old_start_time = booking.start_dt.time()
+    old_end_time = booking.end_dt.time()
+    old_repeat_frequency = booking.repeat_frequency
+    old_repeat_interval = booking.repeat_interval
+    times_changed = new_data['start_dt'].time() != old_start_time or new_data['end_dt'].time() != old_end_time
+    new_repeat_frequency = new_data['repeat_frequency']
+    new_repeat_interval = new_data['repeat_interval']
+    repetition_changed = (new_repeat_frequency, new_repeat_interval) != (old_repeat_frequency, old_repeat_interval)
+    return is_ongoing_booking and (times_changed or repetition_changed)
+
+
+def split_booking(booking, new_booking_data):
+    is_ongoing_booking = booking.start_dt.date() < date.today() < booking.end_dt.date()
+    if not is_ongoing_booking:
+        return
+
+    room = booking.room
+    occurrences = sorted(booking.occurrences.all(), key=attrgetter('start_dt'))
+    is_prebooking = not booking.is_accepted
+    occurrences_to_cancel = [occ for occ in occurrences if occ.start_dt.date() >= date.today()]
+    new_start_dt = datetime.combine(occurrences_to_cancel[0].start_dt.date(), new_booking_data['start_dt'].time())
+    for occurrence_to_cancel in occurrences_to_cancel:
+        occurrence_to_cancel.cancel(session.user, silent=True)
+
+    new_end_dt = [occ for occ in occurrences if occ.start_dt.date() < date.today()][-1].end_dt
+    old_booking_data = {
+        'booking_reason': booking.booking_reason,
+        'room_usage': 'current_user' if booking.booked_for_user == session.user else 'someone',
+        'booked_for_user': booking.booked_for_user,
+        'start_dt': booking.start_dt,
+        'end_dt': new_end_dt,
+        'repeat_frequency': booking.repeat_frequency,
+        'repeat_interval': booking.repeat_interval,
+    }
+
+    booking.modify(old_booking_data, session.user)
+    return Reservation.create_from_data(room, dict(new_booking_data, start_dt=new_start_dt), session.user,
+                                        prebook=is_prebooking)
