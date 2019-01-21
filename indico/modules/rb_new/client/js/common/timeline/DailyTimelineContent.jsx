@@ -101,7 +101,7 @@ export default class DailyTimelineContent extends React.Component {
                                onClickReservation={onClickReservation}
                                onClickCandidate={() => {
                                    if (onClickCandidate && !hasConflicts) {
-                                       onClickCandidate(room.id);
+                                       onClickCandidate(room);
                                    }
                                }}
                                setSelectable={selectable => {

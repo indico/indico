@@ -56,7 +56,7 @@ export default class MonthlyTimelineContent extends WeeklyTimelineContent {
                                    onClickReservation={onClickReservation}
                                    onClickCandidate={() => {
                                        if (onClickCandidate && !hasConflicts) {
-                                           onClickCandidate(room.id);
+                                           onClickCandidate(room);
                                        }
                                    }}
                                    setSelectable={selectable => {

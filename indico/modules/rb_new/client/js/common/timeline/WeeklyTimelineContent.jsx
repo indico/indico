@@ -60,7 +60,7 @@ export default class WeeklyTimelineContent extends DailyTimelineContent {
                                    onClickReservation={onClickReservation}
                                    onClickCandidate={() => {
                                        if (onClickCandidate && !hasConflicts) {
-                                           onClickCandidate(room.id);
+                                           onClickCandidate(room);
                                        }
                                    }}
                                    setSelectable={selectable => {

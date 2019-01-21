@@ -60,10 +60,15 @@ class _BookingTimelineComponent extends React.Component {
 
     state = {};
 
+    handleBook = ({id, canUserBook}) => {
+        const {actions: {openBookingForm}} = this.props;
+        openBookingForm(id, {isPrebooking: !canUserBook});
+    };
+
     render() {
         const {
             isLoading, lazyScroll, showEmptyMessage, clickable, datePicker, fixedHeight,
-            actions: {openBookingForm, openRoomDetails}, availability, bookingAllowed
+            actions: {openRoomDetails}, availability, bookingAllowed
         } = this.props;
         const emptyMessage = showEmptyMessage ? (
             <Message warning>
@@ -80,7 +85,7 @@ class _BookingTimelineComponent extends React.Component {
                                  bookingAllowed={bookingAllowed}
                                  datePicker={datePicker}
                                  emptyMessage={emptyMessage}
-                                 onClickCandidate={clickable ? openBookingForm : null}
+                                 onClickCandidate={clickable ? this.handleBook : null}
                                  onClickLabel={clickable ? openRoomDetails : null}
                                  isLoading={isLoading}
                                  fixedHeight={fixedHeight} />
