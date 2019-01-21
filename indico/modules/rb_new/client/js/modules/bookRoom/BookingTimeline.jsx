@@ -20,8 +20,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
-import {Message, Segment} from 'semantic-ui-react';
-import {Translate, Param} from 'indico/react/i18n';
+import {Message} from 'semantic-ui-react';
+import {Translate} from 'indico/react/i18n';
 import {ElasticTimeline} from '../../common/timeline';
 import {actions as roomsActions} from '../../common/rooms';
 import * as bookRoomActions from './actions';
@@ -59,16 +59,6 @@ class _BookingTimelineComponent extends React.Component {
     };
 
     state = {};
-
-    renderRoomSummary({room: {fullName}}) {
-        return (
-            <Segment>
-                <Translate>
-                    Availability for room <Param name="roomName" value={<strong>{fullName}</strong>} />
-                </Translate>
-            </Segment>
-        );
-    }
 
     render() {
         const {
