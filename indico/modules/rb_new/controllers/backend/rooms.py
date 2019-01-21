@@ -31,6 +31,7 @@ from indico.modules.rb.models.favorites import favorite_room_table
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import RepeatFrequency
 from indico.modules.rb.models.rooms import Room
+from indico.modules.rb.util import rb_is_admin
 from indico.modules.rb_new.controllers.backend.common import search_room_args
 from indico.modules.rb_new.operations.bookings import check_room_available, get_room_details_availability
 from indico.modules.rb_new.operations.rooms import get_room_events, get_room_statistics, search_for_rooms
@@ -52,7 +53,8 @@ class RHRoomsPermissions(RHRoomBookingBase):
     @staticmethod
     @memoize_redis(900)
     def _jsonify_user_permissions(user):
-        return jsonify(Room.get_permissions_for_user(user))
+        permissions = Room.get_permissions_for_user(user, allow_admin=False)
+        return jsonify(user=permissions, admin=(Room.get_permissions_for_user(user) if rb_is_admin(user) else None))
 
     def _process(self):
         return self._jsonify_user_permissions(session.user)

@@ -91,7 +91,7 @@ export default combineReducers({
                 return state;
         }
     },
-    roomPermissions: (state = {}, action) => {
+    roomPermissions: (state = {admin: null, user: {}}, action) => {
         switch (action.type) {
             case actions.ROOM_PERMISSIONS_RECEIVED:
                 return action.data;

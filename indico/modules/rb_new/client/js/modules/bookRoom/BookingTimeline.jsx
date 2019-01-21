@@ -24,6 +24,7 @@ import {Message} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
 import {ElasticTimeline} from '../../common/timeline';
 import {actions as roomsActions} from '../../common/rooms';
+import {selectors as userSelectors} from '../../common/user';
 import * as bookRoomActions from './actions';
 import * as bookRoomSelectors from './selectors';
 
@@ -111,6 +112,7 @@ class BookingTimeline extends React.Component {
         isLoading: PropTypes.bool.isRequired,
         searchFinished: PropTypes.bool.isRequired,
         hasMoreTimelineData: PropTypes.bool.isRequired,
+        isAdminOverrideEnabled: PropTypes.bool.isRequired,
         filters: PropTypes.shape({
             dates: PropTypes.object.isRequired,
             timeSlot: PropTypes.object.isRequired,
@@ -153,7 +155,8 @@ class BookingTimeline extends React.Component {
         const {
             suggestedRoomIds: prevSuggestedRoomIds,
             filters: prevFilters,
-            searchFinished: prevSearchFinished
+            searchFinished: prevSearchFinished,
+            isAdminOverrideEnabled: prevIsAdminOverrideEnabled,
         } = prevProps;
         const {
             actions: {initTimeline, fetchTimeline, fetchRoomSuggestions},
@@ -161,14 +164,15 @@ class BookingTimeline extends React.Component {
             roomIds,
             suggestedRoomIds,
             searchFinished,
-            showSuggestions
+            showSuggestions,
+            isAdminOverrideEnabled,
         } = this.props;
         const {dates, timeSlot, recurrence} = filters;
         // reset the timeline when filters changed
         if (!_.isEqual(prevFilters, filters)) {
             initTimeline([], dates, timeSlot, recurrence);
         }
-        if (!prevSearchFinished && searchFinished) {
+        if (prevIsAdminOverrideEnabled !== isAdminOverrideEnabled || (!prevSearchFinished && searchFinished)) {
             initTimeline(roomIds, dates, timeSlot, recurrence);
             if (roomIds.length) {
                 fetchTimeline();
@@ -232,6 +236,7 @@ export default connect(
         roomIds: bookRoomSelectors.getSearchResultIdsWithoutUnbookable(state),
         suggestedRoomIds: bookRoomSelectors.getSuggestedRoomIds(state),
         hasMoreTimelineData: bookRoomSelectors.hasMoreTimelineData(state),
+        isAdminOverrideEnabled: userSelectors.isUserAdminOverrideEnabled(state),
         filters: bookRoomSelectors.getFilters(state),
     }),
     dispatch => ({

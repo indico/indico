@@ -28,8 +28,20 @@ export const isUserAdmin = state => getUserInfo(state).isAdmin;
 export const isUserAdminOverrideEnabled = state => getUserInfo(state).isAdminOverrideEnabled;
 export const hasOwnedRooms = state => getUserInfo(state).hasOwnedRooms;
 export const getFavoriteUsers = state => getUserInfo(state).favoriteUsers;
-export const getAllUserRoomPermissions = ({user}) => user.roomPermissions;
+export const getRealUserRoomPermissions = ({user}) => user.roomPermissions;
 export const isCheckingUserRoomPermissions = ({user}) => user.requests.roomPermissions.state === RequestState.STARTED;
+
+export const getAllUserRoomPermissions = createSelector(
+    getRealUserRoomPermissions,
+    isUserAdminOverrideEnabled,
+    (permissions, override) => {
+        if (!permissions) {
+            // not loaded yet
+            return {};
+        }
+        return (override && permissions.admin) ? permissions.admin : permissions.user;
+    }
+);
 
 export const getUnbookableRoomIds = createSelector(
     getAllUserRoomPermissions,
