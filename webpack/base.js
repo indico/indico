@@ -322,7 +322,7 @@ export function webpackDefaults(env, config, bundles) {
                         priority: 10,
                     },
                     semanticui: {
-                        test: /node_modules\/semantic-ui/,
+                        test: /node_modules\/(semantic-ui|indico-sui-theme)/,
                         name: 'semantic-ui',
                         chunks: 'initial',
                         priority: 10,
