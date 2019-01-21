@@ -49,16 +49,19 @@ class BookingEditForm extends React.Component {
         onBookingPeriodChange: () => {},
     };
 
-    notifyRecurrenceTypeChange = (newType) => {
+    recurrenceTypeChanged = (newType) => {
         const {
             booking: {startDt},
             onBookingPeriodChange,
             formProps: {form, values: {recurrence, dates, timeSlot}}
         } = this.props;
         const filters = {dates, recurrence: {...recurrence, type: newType}};
+        const today = moment();
 
-        if (newType === 'daily' && moment().isAfter(startDt, 'day')) {
+        if (['daily', 'every'].includes(newType) && today.isAfter(startDt, 'day')) {
             dates.startDate = serializeDate(startDt);
+        } else if (newType === 'single' && today.isAfter(startDt, 'day')) {
+            dates.startDate = serializeDate(today);
         }
 
         sanitizeRecurrence(filters);
@@ -107,6 +110,7 @@ class BookingEditForm extends React.Component {
         const {booking: {startDt: originalStartDt, endDt: originalEndDt}} = this.props;
         const {value: {startDate, endDate}} = input;
         const component = isSingleBooking ? SingleDatePicker : DatePeriodField;
+        const today = moment();
         const props = isSingleBooking ? {
             onDateChange: (date) => {
                 const dates = {startDate: serializeDate(date), endDate: null};
@@ -114,7 +118,7 @@ class BookingEditForm extends React.Component {
                 onChange(dates);
             },
             date: toMoment(startDate, 'YYYY-MM-DD'),
-            disabled: toMoment(originalEndDt, 'YYYY-MM-DD').isBefore(moment(), 'day'),
+            disabled: toMoment(originalEndDt, 'YYYY-MM-DD').isBefore(today, 'day'),
         } : {
             onChange: (dates) => {
                 input.onChange(dates);
@@ -124,14 +128,12 @@ class BookingEditForm extends React.Component {
                 startDate: toMoment(startDate, 'YYYY-MM-DD'),
                 endDate: toMoment(endDate, 'YYYY-MM-DD')
             },
-            disabled: moment().isAfter(originalStartDt, 'day') && moment().isAfter(originalEndDt, 'day'),
-            disabledDateFields: moment().isAfter(startDate, 'day') ? START_DATE : null,
+            disabled: today.isAfter(originalStartDt, 'day') && today.isAfter(originalEndDt, 'day'),
+            disabledDateFields: today.isAfter(startDate, 'day') ? START_DATE : null,
         };
 
         const disabledDate = (dt) => {
-            const today = moment();
-
-            if (today.isSameOrBefore(originalStartDt, 'day')) {
+            if (today.isSameOrBefore(originalStartDt, 'day') || today.isAfter(originalStartDt, 'day')) {
                 return !dt.isSameOrAfter(today, 'day');
             }
 
@@ -210,19 +212,19 @@ class BookingEditForm extends React.Component {
                                componentLabel={Translate.string('Single booking')}
                                radioValue="single"
                                disabled={submitting || submitSucceeded || bookingFinished}
-                               onClick={() => this.notifyRecurrenceTypeChange('single')} />
+                               onClick={() => this.recurrenceTypeChanged('single')} />
                         <Field name="recurrence.type"
                                component={ReduxRadioField}
                                componentLabel={Translate.string('Daily booking')}
                                radioValue="daily"
                                disabled={submitting || submitSucceeded || bookingFinished}
-                               onClick={() => this.notifyRecurrenceTypeChange('daily')} />
+                               onClick={() => this.recurrenceTypeChanged('daily')} />
                         <Field name="recurrence.type"
                                component={ReduxRadioField}
                                componentLabel={Translate.string('Recurring booking')}
                                radioValue="every"
                                disabled={submitting || submitSucceeded || bookingFinished}
-                               onClick={() => this.notifyRecurrenceTypeChange('every')} />
+                               onClick={() => this.recurrenceTypeChanged('every')} />
                     </Form.Group>
                     {recurrence.type === 'every' && (
                         <Form.Group inline>

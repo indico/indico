@@ -15,6 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import moment from 'moment';
 import {createSelector} from 'reselect';
 import {RequestState} from 'indico/utils/redux';
 import {selectors as roomsSelectors} from '../../common/rooms';
@@ -48,4 +49,16 @@ export const getDetailsWithRoom = createSelector(
 export const hasDetails = (state, {bookingId}) => getDetails(state, {bookingId}) !== undefined;
 export const isBookingChangeInProgress = ({bookings}) => (
     bookings.requests.changePrebookingState.state === RequestState.STARTED
+);
+export const isOngoingBooking = createSelector(
+    getDetailsWithRoom,
+    ({startDt, endDt}) => {
+        return moment().isBetween(startDt, endDt, 'day');
+    },
+);
+export const getNumberOfBookingOccurrences = createSelector(
+    getDetailsWithRoom,
+    ({occurrences: {bookings}}) => {
+        return Object.values(bookings).reduce((acc, cur) => acc + (cur.length ? 1 : 0), 0);
+    },
 );

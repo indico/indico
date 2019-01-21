@@ -21,54 +21,8 @@
     align-items: center;
 }
 
-.ongoing-booking-info {
-    font-size: 1.2em;
-}
-
-.booking-calendar {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-
-    .legend-header {
-        flex: 1;
-    }
-
-    .original-booking-header, .new-booking-header {
-        align-self: center;
-    }
-
-    .calendars {
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-
-        .original-booking {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .new-booking {
-            flex: 2;
-            display: flex;
-            flex-direction: column;
-        }
-    }
-
-    .ongoing-booking-explanation {
-        height: 130px;
-
-        :global(.content) {
-            padding-top: 10px;
-            padding-bottom: 10px;
-
-            :global(.ui.list) {
-                margin-top: 5px !important;
-            }
-        }
-    }
+.ongoing-booking-info :global(.icon.play) {
+    font-size: 2em !important;
 }
 
 .booking-conflicts-info {

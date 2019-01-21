@@ -24,20 +24,20 @@ import PropTypes from 'prop-types';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import {Form as FinalForm} from 'react-final-form';
-import {Button, Checkbox, Grid, Header, Icon, List, Message, Modal, Popup, Segment} from 'semantic-ui-react';
+import {Button, Checkbox, Grid, Icon, Message, Modal, Segment} from 'semantic-ui-react';
 
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import camelizeKeys from 'indico/utils/camelize';
 import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
 import {serializeDate, serializeTime} from 'indico/utils/date';
 import {ajax as ajaxFilterRules} from '../roomSearch/serializers';
-import {DailyTimelineContent, TimelineLegend} from '../timeline';
 import {selectors as userSelectors} from '../user';
 import {getRecurrenceInfo, preProcessParameters, serializeRecurrenceInfo} from '../../util';
 import RoomBasicDetails from '../../components/RoomBasicDetails';
 import BookingEditForm from './BookingEditForm';
-import OccurrencesCounter from './OccurrencesCounter';
-import * as bookRoomActions from './actions';
+import BookingEditCalendar from './BookingEditCalendar';
+import * as bookingsActions from './actions';
+import * as bookingsSelectors from './selectors';
 
 import './BookingEdit.module.scss';
 
@@ -49,6 +49,7 @@ class BookingEdit extends React.Component {
         onSubmit: PropTypes.func.isRequired,
         onClose: PropTypes.func,
         booking: PropTypes.object.isRequired,
+        isOngoingBooking: PropTypes.bool.isRequired,
         actions: PropTypes.exact({
             updateBooking: PropTypes.func.isRequired,
         }).isRequired,
@@ -65,7 +66,9 @@ class BookingEdit extends React.Component {
         const {booking: {occurrences, dateRange}} = props;
         this.state = {
             skipConflicts: false,
-            timeChanged: false,
+            numberOfConflicts: 0,
+            numberOfCandidates: 0,
+            datePeriodChanged: false,
             calendars: {
                 currentBooking: {
                     isFetching: false,
@@ -104,28 +107,6 @@ class BookingEdit extends React.Component {
         };
     }
 
-    get numberOfConflicts() {
-        const {calendars: {currentBooking, newBooking}, timeChanged} = this.state;
-        const data = this.isOngoingBooking && timeChanged ? newBooking.data : currentBooking.data;
-        return this.getNumberOfOccurrenceByType(data, 'conflicts');
-    }
-
-    get numberOfCandidates() {
-        const {calendars: {currentBooking, newBooking}, timeChanged} = this.state;
-        const data = this.isOngoingBooking && timeChanged ? newBooking.data : currentBooking.data;
-        return this.getNumberOfOccurrenceByType(data, 'candidates');
-    }
-
-    get numberOfOccurrences() {
-        const {calendars: {currentBooking: {data}}} = this.state;
-        return this.getNumberOfOccurrenceByType(data, 'bookings');
-    }
-
-    get isOngoingBooking() {
-        const {booking: {startDt, endDt}} = this.props;
-        return moment().isBetween(startDt, endDt, 'day');
-    }
-
     getNumberOfOccurrenceByType = (data, type) => {
         if (!(type in data)) {
             return 0;
@@ -135,11 +116,18 @@ class BookingEdit extends React.Component {
         return Object.values(data[type]).reduce((acc, cur) => acc + (cur.length ? 1 : 0), 0);
     };
 
-    resetCalendarStateOnUpdate = (timeChanged) => {
+    resetCalendarStateOnUpdate = (datePeriodChanged) => {
+        const {isOngoingBooking} = this.props;
         const {calendars: {currentBooking, newBooking}} = this.state;
-        const newState = {timeChanged, calendars: {currentBooking}};
+        const newState = {
+            datePeriodChanged,
+            calendars: {currentBooking},
+            numberOfCandidates: 0,
+            numberOfConflicts: 0,
+            skipConflicts: false,
+        };
 
-        if (this.isOngoingBooking && timeChanged) {
+        if (isOngoingBooking && datePeriodChanged) {
             newState.calendars.newBooking = {
                 ...(newBooking || {}),
                 data: {
@@ -165,18 +153,16 @@ class BookingEdit extends React.Component {
         this.setState(newState);
     };
 
-    updateCalendarsState = (dateRange, newDateRange, candidates, conflicts) => {
-        const {timeChanged, calendars: {currentBooking}} = this.state;
+    getUpdatedCalendars = (dateRange, newDateRange, candidates, conflicts) => {
+        const {isOngoingBooking} = this.props;
+        const {datePeriodChanged, calendars: {currentBooking}} = this.state;
         let newCalendars;
 
-        if (this.isOngoingBooking && timeChanged) {
+        if (isOngoingBooking && datePeriodChanged) {
             const {data: {bookings}} = currentBooking;
-            const pendingCancelations = _.fromPairs(Object.entries(bookings).map(([day, data]) => {
-                if (moment().isAfter(day, 'day')) {
-                    return [day, data];
-                }
-                return [];
-            }));
+            const pendingCancelations = _.fromPairs(_.compact(Object.entries(bookings).map(([day, data]) => {
+                return moment().isAfter(day, 'day') ? [day, data] : null;
+            })));
 
             newCalendars = {
                 currentBooking: {
@@ -217,30 +203,39 @@ class BookingEdit extends React.Component {
             };
         }
 
-        this.setState({calendars: newCalendars});
+        return newCalendars;
     };
 
     updateBookingCalendar = async (dates, timeSlot, recurrence) => {
-        const {booking: {room: {id}, dateRange, id: bookingId, startDt, endDt, repetition}} = this.props;
+        const {
+            isOngoingBooking,
+            booking: {room: {id}, dateRange, id: bookingId, startDt, endDt, repetition}
+        } = this.props;
         const {calendars: {currentBooking}} = this.state;
         const {startTime: newStartTime, endTime: newEndTime} = timeSlot;
-        const timeChanged = (
+        const datePeriodChanged = (
             serializeTime(startDt) !== newStartTime ||
             serializeTime(endDt) !== newEndTime ||
             !_.isEqual(getRecurrenceInfo(repetition), recurrence)
         );
 
-        if (this.isOngoingBooking && timeChanged) {
+        const newDates = {...dates};
+        if (isOngoingBooking && datePeriodChanged) {
             const today = moment();
-            dates.startDate = today.isBefore(dates.startDate) ? serializeDate(dates.startDate) : serializeDate(today);
+            const {startDate} = dates;
+            newDates.startDate = today.isBefore(startDate, 'day') ? serializeDate(startDate) : serializeDate(today);
         }
 
-        this.resetCalendarStateOnUpdate(timeChanged);
+        this.resetCalendarStateOnUpdate(datePeriodChanged);
 
-        const params = preProcessParameters({timeSlot, recurrence, dates}, ajaxFilterRules);
+        const params = preProcessParameters({timeSlot, recurrence, dates: newDates}, ajaxFilterRules);
         let response, candidates;
         try {
-            response = await indicoAxios.post(fetchTimelineURL(), {room_ids: [id]}, {params});
+            response = await indicoAxios.post(
+                fetchTimelineURL(),
+                {room_ids: [id], skip_conflicts_with: bookingId},
+                {params},
+            );
         } catch (error) {
             handleAxiosError(error);
             return;
@@ -248,33 +243,13 @@ class BookingEdit extends React.Component {
 
         const {availability, dateRange: newDateRange} = camelizeKeys(response.data);
         const availabilityData = availability[0][1];
-        const conflicts = _.fromPairs(newDateRange.map((day) => {
-            const allConflicts = availabilityData.conflicts[day] || [];
-            if (day in currentBooking.data.cancellations || day in currentBooking.data.rejections) {
-                return [day, []];
-            }
-            return [day, allConflicts.filter((c) => !c.reservation || c.reservation.id !== bookingId)];
-        }));
 
         if (_.isEqual(newDateRange, dateRange)) {
-            candidates = newDateRange.reduce((accum, day) => {
-                if (!(day in currentBooking.data.bookings)) {
-                    accum[day] = availabilityData.candidates[day];
-                } else {
-                    const dayBookings = currentBooking.data.bookings[day];
-                    if (!dayBookings.length) {
-                        accum[day] = availabilityData.candidates[day];
-                    } else {
-                        accum[day] = availabilityData.candidates[day].filter((candidate, index) => {
-                            const booking = dayBookings[index];
-                            const isSameStart = moment(candidate.startDt).isSame(moment(booking.startDt));
-                            const isSameEnd = moment(candidate.endDt).isSame(moment(booking.endDt));
-                            return !isSameStart || !isSameEnd;
-                        });
-                    }
-                }
-                return accum;
-            }, {});
+            if (datePeriodChanged) {
+                candidates = availabilityData.candidates;
+            } else {
+                candidates = {};
+            }
         } else {
             candidates = availabilityData.candidates;
         }
@@ -283,19 +258,20 @@ class BookingEdit extends React.Component {
         const {data: {cancellations, rejections}} = currentBooking;
         candidates = _.pick(candidates, newDateRange.filter(date => !(date in rejections) && !(date in cancellations)));
 
-        this.updateCalendarsState(dateRange, newDateRange, candidates, conflicts);
+        this.setState({
+            calendars: this.getUpdatedCalendars(dateRange, newDateRange, candidates, availabilityData.conflicts),
+            numberOfConflicts: availabilityData.numConflicts,
+            numberOfCandidates: availabilityData.numDaysAvailable
+        });
     };
 
     renderBookingEditModal = (fprops) => {
         const {submitting, submitSucceeded, hasValidationErrors, pristine} = fprops;
-        const {booking, onClose, actionButtons} = this.props;
+        const {booking, onClose, actionButtons, isOngoingBooking} = this.props;
         const {room} = booking;
-        const {skipConflicts} = this.state;
-        const submitBlocked = submitting || submitSucceeded || hasValidationErrors || pristine;
-        const conflictingBooking = (
-            (this.numberOfCandidates !== 0 && this.numberOfCandidates === this.numberOfConflicts) ||
-            (this.numberOfConflicts > 0 && !skipConflicts)
-        );
+        const {skipConflicts, datePeriodChanged, calendars, numberOfConflicts, numberOfCandidates} = this.state;
+        const conflictingBooking = (numberOfCandidates === 0) || (numberOfConflicts > 0 && !skipConflicts);
+        const submitBlocked = submitting || submitSucceeded || hasValidationErrors || pristine || conflictingBooking;
 
         return (
             <Modal size="large" onClose={onClose} closeIcon open>
@@ -307,14 +283,12 @@ class BookingEdit extends React.Component {
                     <Grid columns={2}>
                         <Grid.Column>
                             <RoomBasicDetails room={room} />
-                            {this.isOngoingBooking && (
-                                <Message color="blue" size="mini" icon>
+                            {isOngoingBooking && (
+                                <Message color="blue" size="mini" styleName="ongoing-booking-info" icon>
                                     <Icon name="play" />
-                                    <div styleName="ongoing-booking-info">
-                                        <Translate>
-                                            This booking has already started.
-                                        </Translate>
-                                    </div>
+                                    <Translate>
+                                        This booking has already started.
+                                    </Translate>
                                 </Message>
                             )}
                             <BookingEditForm booking={booking}
@@ -322,7 +296,11 @@ class BookingEdit extends React.Component {
                                              onBookingPeriodChange={this.updateBookingCalendar} />
                         </Grid.Column>
                         <Grid.Column stretched>
-                            {this.renderBookingCalendar()}
+                            <BookingEditCalendar calendars={calendars}
+                                                 booking={booking}
+                                                 numberOfCandidates={datePeriodChanged ? numberOfCandidates : 0}
+                                                 numberOfConflicts={numberOfConflicts}
+                                                 datePeriodChanged={datePeriodChanged} />
                             {this.renderConflictsMessage()}
                         </Grid.Column>
                     </Grid>
@@ -330,7 +308,7 @@ class BookingEdit extends React.Component {
                 <Modal.Actions>
                     <Button type="submit"
                             form="booking-edit-form"
-                            disabled={submitBlocked || conflictingBooking}
+                            disabled={submitBlocked}
                             primary>
                         <Translate>Save changes</Translate>
                     </Button>
@@ -342,137 +320,10 @@ class BookingEdit extends React.Component {
         );
     };
 
-    renderBookingCalendar = () => {
-        const {calendars: {currentBooking, newBooking}, timeChanged} = this.state;
-        const {booking: {room}} = this.props;
-        const legendLabels = [
-            {label: Translate.string('Current booking'), color: 'orange', style: 'booking'},
-            {label: Translate.string('Cancelled occurrences'), style: 'cancellation'},
-            {label: Translate.string('Pending cancelations'), style: 'pending-cancelation'},
-            {label: Translate.string('Rejected occurrences'), style: 'rejection'},
-            {label: Translate.string('Other bookings'), style: 'other'},
-            {label: Translate.string('New booking'), color: 'green', style: 'new-booking'},
-            {label: Translate.string('Conflicts with new booking'), color: 'red', style: 'conflict'},
-        ];
-        const serializeRow = (av) => {
-            return (day) => {
-                return {
-                    availability: {
-                        bookings: av.bookings[day] || [],
-                        cancellations: av.cancellations[day] || [],
-                        rejections: av.rejections[day] || [],
-                        other: av.other[day] || [],
-                        candidates: (av.candidates[day] || []).map(candidate => ({...candidate, bookable: false})),
-                        conflicts: av.conflicts[day] || [],
-                        pendingCancelations: av.pendingCancelations[day] || [],
-                    },
-                    label: serializeDate(day, 'L'),
-                    key: day,
-                    room,
-                };
-            };
-        };
-
-        const getTimelineRows = (calendar) => {
-            const {isFetching, dateRange, data} = calendar;
-            return isFetching ? [] : dateRange.map(serializeRow(data));
-        };
-
-        return (
-            <div styleName="booking-calendar">
-                <Header className="legend-header">
-                    <span>
-                        <Translate>Occurrences</Translate>
-                    </span>
-                    <Popup trigger={<Icon name="info circle" className="legend-info-icon" />}
-                           position="right center"
-                           content={<TimelineLegend labels={legendLabels} compact />} />
-                    {this.renderNumberOfOccurrences()}
-                </Header>
-                {this.isOngoingBooking && timeChanged && (
-                    <Message styleName="ongoing-booking-explanation" color="green" icon>
-                        <Icon name="code branch" />
-                        <Message.Content>
-                            <Translate>
-                                Your booking has already started and will be split into:
-                            </Translate>
-                            <List bulleted>
-                                <List.Item>
-                                    <Translate>
-                                        the original booking, which will be shortened;
-                                    </Translate>
-                                </List.Item>
-                                <List.Item>
-                                    <Translate>
-                                        a new booking, which will take into account the updated time information.
-                                    </Translate>
-                                </List.Item>
-                            </List>
-                        </Message.Content>
-                    </Message>
-                )}
-                <div styleName="calendars">
-                    <div styleName="original-booking">
-                        <DailyTimelineContent rows={getTimelineRows(currentBooking)}
-                                              maxHour={24}
-                                              renderHeader={this.isOngoingBooking && timeChanged ? () => (
-                                                  <Header as="h3" color="orange" styleName="original-booking-header">
-                                                      <Translate>Original booking</Translate>
-                                                  </Header>
-                                              ) : null}
-                                              isLoading={currentBooking.isFetching}
-                                              fixedHeight={currentBooking.dateRange.length > 0 ? '100%' : null} />
-                    </div>
-                    {newBooking && (
-                        <div styleName="new-booking">
-                            <DailyTimelineContent rows={getTimelineRows(newBooking)}
-                                                  maxHour={24}
-                                                  renderHeader={() => (
-                                                      <Header as="h3" color="green" styleName="new-booking-header">
-                                                          <Translate>New booking</Translate>
-                                                      </Header>
-                                                  )}
-                                                  isLoading={newBooking.isFetching}
-                                                  fixedHeight={newBooking.dateRange.length > 0 ? '100%' : null} />
-                        </div>
-                    )}
-                </div>
-            </div>
-        );
-    };
-
-    renderNumberOfOccurrences = () => {
-        const {timeChanged, calendars: {currentBooking: {data: {bookings}}}} = this.state;
-        const today = moment();
-        let numNewCandidates = 0;
-        let numBookingPastOccurrences = 0;
-
-        if (this.numberOfConflicts) {
-            numNewCandidates = this.numberOfCandidates - this.numberOfConflicts;
-        } else {
-            numNewCandidates = this.numberOfCandidates;
-        }
-
-        if (this.isOngoingBooking && timeChanged) {
-            numBookingPastOccurrences = Object.entries(bookings).reduce((acc, [day, data]) => {
-                if (today.isAfter(day, 'day')) {
-                    return acc + data.length;
-                }
-                return acc;
-            }, 0);
-        }
-
-        return (
-            <OccurrencesCounter bookingsCount={this.numberOfOccurrences}
-                                newBookingsCount={numNewCandidates}
-                                pastBookingsCount={numBookingPastOccurrences} />
-        );
-    };
-
     renderConflictsMessage = () => {
-        const {skipConflicts} = this.state;
+        const {skipConflicts, numberOfConflicts, numberOfCandidates} = this.state;
 
-        if (!this.numberOfConflicts) {
+        if (!numberOfConflicts) {
             return null;
         }
 
@@ -484,18 +335,18 @@ class BookingEdit extends React.Component {
                         <Message.Header>
                             <Translate>Conflicts with new booking</Translate>
                         </Message.Header>
-                        <PluralTranslate count={this.numberOfConflicts}>
+                        <PluralTranslate count={numberOfConflicts}>
                             <Singular>
                                 Your new booking conflicts with another one.
                             </Singular>
                             <Plural>
-                                <Param name="count" value={this.numberOfConflicts} /> occurrences of your
+                                <Param name="count" value={numberOfConflicts} /> occurrences of your
                                 booking are unavailable due to conflicts.
                             </Plural>
                         </PluralTranslate>
                     </Message.Content>
                 </Message>
-                {this.numberOfCandidates > this.numberOfConflicts && (
+                {numberOfCandidates > 0 && numberOfConflicts > 0 && (
                     <Segment attached="bottom">
                         <Checkbox toggle
                                   defaultChecked={skipConflicts}
@@ -553,12 +404,13 @@ class BookingEdit extends React.Component {
 
 
 export default connect(
-    (state) => ({
+    (state, {booking: {id}}) => ({
         user: userSelectors.getUserInfo(state),
+        isOngoingBooking: bookingsSelectors.isOngoingBooking(state, {bookingId: id}),
     }),
     (dispatch) => ({
         actions: bindActionCreators({
-            updateBooking: bookRoomActions.updateBooking,
+            updateBooking: bookingsActions.updateBooking,
         }, dispatch),
     })
 )(BookingEdit);

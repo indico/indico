@@ -1,0 +1,62 @@
+/* This file is part of Indico.
+ * Copyright (C) 2002 - 2018 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
+.original-booking-header, .new-booking-header {
+    align-self: center;
+}
+
+.booking-calendar {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+
+    .legend-header {
+        flex: 1;
+    }
+
+    .calendars {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+
+        .original-booking {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .new-booking {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+        }
+    }
+
+    .ongoing-booking-explanation {
+        height: 130px;
+
+        :global(.content) {
+            padding-top: 10px;
+            padding-bottom: 10px;
+
+            :global(.ui.list) {
+                margin-top: 5px !important;
+            }
+        }
+    }
+}

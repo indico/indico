@@ -96,6 +96,7 @@ class RHTimeline(RHRoomBookingBase):
         'repeat_frequency': EnumField(RepeatFrequency, missing='NEVER'),
         'repeat_interval': fields.Int(missing=1),
         'room_ids': fields.List(fields.Int(), missing=[]),
+        'skip_conflicts_with': fields.List(fields.Int(), missing=None),
     })
     def _process(self, room_ids, **kwargs):
         rooms = [self.room] if self.room else Room.query.filter(Room.id.in_(room_ids), Room.is_active).all()
@@ -106,7 +107,8 @@ class RHTimeline(RHRoomBookingBase):
             # add additional helpful attributes
             data.update({
                 'num_days_available': len(date_range) - len(data['conflicts']),
-                'all_days_available': not data['conflicts']
+                'all_days_available': not data['conflicts'],
+                'num_conflicts': len(data['conflicts'])
             })
         serialized = _serialize_availability(availability)
         if self.room:
