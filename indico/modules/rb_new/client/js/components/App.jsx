@@ -33,6 +33,7 @@ import RoomList from '../modules/roomList';
 import BlockingList from '../modules/blockings';
 import ModalController from '../modals';
 import Menu from './Menu';
+import AdminOverrideBar from './AdminOverrideBar';
 import {actions as configActions} from '../common/config';
 import {actions as mapActions} from '../common/map';
 import {actions as roomsActions} from '../common/rooms';
@@ -159,6 +160,7 @@ class App extends React.Component {
                             }} active={userActionsVisible} />
                         </div>
                     </header>
+                    <AdminOverrideBar />
                     {this.renderContent()}
                     <Dimmer.Dimmable>
                         <Dimmer active={isInitializing} page>

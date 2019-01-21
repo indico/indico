@@ -30,8 +30,9 @@ const initialUserInfoState = {
     language: '',
     isAdmin: false,
     isRBAdmin: false,
+    isAdminOverrideEnabled: false,
     hasOwnedRooms: false,
-    favoriteUsers: []
+    favoriteUsers: [],
 };
 
 export default combineReducers({
@@ -57,6 +58,7 @@ export default combineReducers({
             case actions.USER_INFO_RECEIVED: {
                 const user = action.data;
                 return {
+                    ...state,
                     id: user.id,
                     identifier: user.identifier,
                     firstName: user.first_name,
@@ -71,6 +73,8 @@ export default combineReducers({
                     favoriteUsers: camelizeKeys(user.favorite_users)
                 };
             }
+            case actions.TOGGLE_ADMIN_OVERRIDE:
+                return {...state, isAdminOverrideEnabled: !state.isAdminOverrideEnabled};
             default:
                 return state;
         }

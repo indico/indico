@@ -25,6 +25,7 @@ export const getUserInfo = ({user}) => user.info;
 export const getUserFullName = createSelector(getUserInfo, ({firstName, lastName}) => `${firstName} ${lastName}`);
 export const isUserRBAdmin = state => getUserInfo(state).isRBAdmin;
 export const isUserAdmin = state => getUserInfo(state).isAdmin;
+export const isUserAdminOverrideEnabled = state => getUserInfo(state).isAdminOverrideEnabled;
 export const hasOwnedRooms = state => getUserInfo(state).hasOwnedRooms;
 export const getFavoriteUsers = state => getUserInfo(state).favoriteUsers;
 export const getAllUserRoomPermissions = ({user}) => user.roomPermissions;

@@ -22,7 +22,7 @@ import {connect} from 'react-redux';
 import {push as pushRoute} from 'connected-react-router';
 import {Translate} from 'indico/react/i18n';
 
-import {selectors as userSelectors} from '../common/user';
+import {selectors as userSelectors, actions as userActions} from '../common/user';
 import {actions as blockingsActions} from '../modules/blockings';
 import {actions as filtersActions} from '../common/filters';
 import * as globalActions from '../actions';
@@ -52,7 +52,9 @@ SidebarTrigger.propTypes = {
 };
 
 function SidebarMenu({
-    isAdmin, hasOwnedRooms, gotoMyBookings, gotoBookingsInMyRooms, gotoMyRoomsList, gotoMyBlockings, gotoRBAdminArea,
+    isAdmin, isAdminOverrideEnabled, hasOwnedRooms,
+    gotoMyBookings, gotoBookingsInMyRooms, gotoMyRoomsList, gotoMyBlockings, gotoRBAdminArea,
+    toggleAdminOverride,
     visible, onClickOption
 }) {
     const options = [
@@ -88,6 +90,15 @@ function SidebarMenu({
             text: Translate.string('Administration'),
             onClick: gotoRBAdminArea,
             onlyIf: isAdmin
+        },
+        {
+            key: 'adminOverride',
+            icon: 'unlock',
+            text: Translate.string('Admin Override'),
+            color: 'orange',
+            active: isAdminOverrideEnabled,
+            onClick: toggleAdminOverride,
+            onlyIf: isAdmin,
         }
     ].filter(({onlyIf}) => onlyIf === undefined || onlyIf);
 
@@ -102,8 +113,8 @@ function SidebarMenu({
                  inverted
                  visible={visible}
                  styleName="sidebar">
-            {options.map(({key, text, icon, onClick}) => (
-                <Menu.Item as="a" key={key} onClick={() => {
+            {options.map(({key, text, icon, onClick, color, active}) => (
+                <Menu.Item as="a" key={key} color={color} active={active} onClick={() => {
                     onClick();
                     if (onClickOption) {
                         onClickOption();
@@ -119,12 +130,14 @@ function SidebarMenu({
 
 SidebarMenu.propTypes = {
     isAdmin: PropTypes.bool.isRequired,
+    isAdminOverrideEnabled: PropTypes.bool.isRequired,
     hasOwnedRooms: PropTypes.bool.isRequired,
     gotoMyBookings: PropTypes.func.isRequired,
     gotoBookingsInMyRooms: PropTypes.func.isRequired,
     gotoMyRoomsList: PropTypes.func.isRequired,
     gotoMyBlockings: PropTypes.func.isRequired,
     gotoRBAdminArea: PropTypes.func.isRequired,
+    toggleAdminOverride: PropTypes.func.isRequired,
     visible: PropTypes.bool,
     onClickOption: PropTypes.func
 };
@@ -138,6 +151,7 @@ SidebarMenu.defaultProps = {
 export default connect(
     state => ({
         isAdmin: userSelectors.isUserRBAdmin(state),
+        isAdminOverrideEnabled: userSelectors.isUserAdminOverrideEnabled(state),
         hasOwnedRooms: userSelectors.hasOwnedRooms(state),
     }),
     dispatch => ({
@@ -170,5 +184,8 @@ export default connect(
         gotoRBAdminArea() {
             dispatch(pushRoute('/admin'));
         },
+        toggleAdminOverride() {
+            dispatch(userActions.toggleAdminOverride());
+        }
     })
 )(SidebarMenu);

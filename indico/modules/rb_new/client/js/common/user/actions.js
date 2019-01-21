@@ -41,6 +41,8 @@ export const FETCH_ROOM_PERMISSIONS_REQUEST = 'user/FETCH_ROOM_PERMISSIONS_REQUE
 export const FETCH_ROOM_PERMISSIONS_SUCCESS = 'user/FETCH_ROOM_PERMISSIONS_SUCCESS';
 export const FETCH_ROOM_PERMISSIONS_ERROR = 'user/FETCH_ROOM_PERMISSIONS_ERROR';
 
+export const TOGGLE_ADMIN_OVERRIDE = 'user/TOGGLE_ADMIN_OVERRIDE';
+
 
 export function fetchUserInfo() {
     return async (dispatch) => {
@@ -106,4 +108,8 @@ export function fetchAllRoomPermissions() {
         [ROOM_PERMISSIONS_RECEIVED, FETCH_ROOM_PERMISSIONS_SUCCESS],
         FETCH_ROOM_PERMISSIONS_ERROR
     );
+}
+
+export function toggleAdminOverride() {
+    return {type: TOGGLE_ADMIN_OVERRIDE};
 }
