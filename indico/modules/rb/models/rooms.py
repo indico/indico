@@ -42,7 +42,7 @@ from indico.modules.rb.models.reservations import RepeatMapping, Reservation
 from indico.modules.rb.models.room_attributes import RoomAttribute, RoomAttributeAssociation
 from indico.modules.rb.models.room_bookable_hours import BookableHours
 from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
-from indico.modules.rb.util import rb_check_user_access, rb_is_admin
+from indico.modules.rb.util import rb_is_admin
 from indico.util.decorators import classproperty
 from indico.util.i18n import _
 from indico.util.locators import locator_property
