@@ -498,10 +498,6 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
     def paper(self):
         return Paper(self) if self._paper_last_revision else None
 
-    @property
-    def url(self):
-        return url_for('contributions.display_contribution', self)
-
     def is_paper_reviewer(self, user):
         return user in self.paper_content_reviewers or user in self.paper_layout_reviewers
 

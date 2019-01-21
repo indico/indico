@@ -368,7 +368,7 @@ class LinkMixin(object):
         if self.link_type == LinkType.session:
             data['Session'] = self.session.title
         if self.link_type == LinkType.session_block:
-            data['SessionBlock'] = self.session_block.title
+            data['Session Block'] = self.session_block.title
         elif self.link_type == LinkType.contribution:
             data['Contribution'] = self.contribution.title
         elif self.link_type == LinkType.subcontribution:
