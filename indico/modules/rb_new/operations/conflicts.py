@@ -31,7 +31,7 @@ from indico.util.struct.iterables import group_list
 
 
 def get_rooms_conflicts(rooms, start_dt, end_dt, repeat_frequency, repeat_interval, blocked_rooms,
-                        nonbookable_periods, unbookable_hours):
+                        nonbookable_periods, unbookable_hours, skip_conflicts_with=None):
     rooms_conflicts = defaultdict(list)
     rooms_pre_conflicts = defaultdict(list)
 
@@ -45,9 +45,13 @@ def get_rooms_conflicts(rooms, start_dt, end_dt, repeat_frequency, repeat_interv
              .options(ReservationOccurrence.NO_RESERVATION_USER_STRATEGY,
                       contains_eager(ReservationOccurrence.reservation)))
 
+    if skip_conflicts_with:
+        query = query.filter(~Reservation.id.in_(skip_conflicts_with))
+
     overlapping_occurrences = group_list(query, key=lambda obj: obj.reservation.room.id)
     for room_id, occurrences in overlapping_occurrences.iteritems():
-        rooms_conflicts[room_id], rooms_pre_conflicts[room_id] = get_room_bookings_conflicts(candidates, occurrences)
+        rooms_conflicts[room_id], rooms_pre_conflicts[room_id] = get_room_bookings_conflicts(candidates, occurrences,
+                                                                                             skip_conflicts_with)
 
     for room_id, occurrences in blocked_rooms.iteritems():
         rooms_conflicts[room_id] += get_room_blockings_conflicts(room_id, candidates, occurrences)
@@ -62,11 +66,15 @@ def get_rooms_conflicts(rooms, start_dt, end_dt, repeat_frequency, repeat_interv
     return rooms_conflicts, rooms_pre_conflicts
 
 
-def get_room_bookings_conflicts(candidates, occurrences):
+def get_room_bookings_conflicts(candidates, occurrences, skip_conflicts_with=None):
     conflicts = []
     pre_conflicts = []
+    skip_conflicts_with = skip_conflicts_with or []
     for candidate in candidates:
         for occurrence in occurrences:
+            if occurrence.reservation.id in skip_conflicts_with:
+                continue
+
             if candidate.overlaps(occurrence):
                 overlap = candidate.get_overlap(occurrence)
                 obj = TempReservationOccurrence(*overlap, reservation=occurrence.reservation)
