@@ -660,9 +660,10 @@ def test_admin_permissions(dummy_room, dummy_user, is_admin):
 @pytest.mark.parametrize('reservations_need_confirmation', (True, False))
 @pytest.mark.parametrize('is_reservable', (True, False))
 @pytest.mark.parametrize('is_admin', (True, False))
+@pytest.mark.parametrize('allow_admin', (True, False))
 @pytest.mark.parametrize('bulk_possible', (True, False))
-def test_get_permissions_for_user(dummy_room, dummy_user, monkeypatch, bulk_possible, is_admin, is_reservable,
-                                  reservations_need_confirmation, protection_mode, acl_perm):
+def test_get_permissions_for_user(dummy_room, dummy_user, monkeypatch, bulk_possible, allow_admin, is_admin,
+                                  is_reservable, reservations_need_confirmation, protection_mode, acl_perm):
     monkeypatch.setattr(User, 'can_get_all_multipass_groups', bulk_possible)
     if is_admin:
         rb_settings.acls.add_principal('admin_principals', dummy_user)
@@ -673,10 +674,10 @@ def test_get_permissions_for_user(dummy_room, dummy_user, monkeypatch, bulk_poss
         dummy_room.update_principal(dummy_user, full_access=True)
     elif acl_perm:
         dummy_room.update_principal(dummy_user, permissions={acl_perm})
-    perms = Room.get_permissions_for_user(dummy_user)
+    perms = Room.get_permissions_for_user(dummy_user, allow_admin=allow_admin)
     assert perms[dummy_room.id] == {
-        'book': dummy_room.can_book(dummy_user),
-        'prebook': dummy_room.can_prebook(dummy_user),
-        'override': dummy_room.can_override(dummy_user),
-        'moderate': dummy_room.can_moderate(dummy_user),
+        'book': dummy_room.can_book(dummy_user, allow_admin=allow_admin),
+        'prebook': dummy_room.can_prebook(dummy_user, allow_admin=allow_admin),
+        'override': dummy_room.can_override(dummy_user, allow_admin=allow_admin),
+        'moderate': dummy_room.can_moderate(dummy_user, allow_admin=allow_admin),
     }

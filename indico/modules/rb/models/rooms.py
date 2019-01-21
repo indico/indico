@@ -675,7 +675,7 @@ class Room(versioned_cache(_cache, 'id'), ProtectionManagersMixin, db.Model, Ser
         return rb_is_admin(user)
 
     @classmethod
-    def get_permissions_for_user(cls, user):
+    def get_permissions_for_user(cls, user, allow_admin=True):
         """Get the permissions for all rooms for a user.
 
         In case of multipass-based groups it will try to get a list of
@@ -693,14 +693,14 @@ class Room(versioned_cache(_cache, 'id'), ProtectionManagersMixin, db.Model, Ser
                                               'is_reservable'),
                                     raiseload('owner'),
                                     joinedload('acl_entries')))
-        is_admin = cls.is_user_admin(user)
+        is_admin = allow_admin and cls.is_user_admin(user)
         if not user.can_get_all_multipass_groups:
             # check one by one if we can't get a list of all groups the user is in
             return {r.id: {
-                'book': r.can_book(user),
-                'prebook': r.can_prebook(user),
-                'override': r.can_override(user),
-                'moderate': r.can_moderate(user),
+                'book': r.can_book(user, allow_admin=allow_admin),
+                'prebook': r.can_prebook(user, allow_admin=allow_admin),
+                'override': r.can_override(user, allow_admin=allow_admin),
+                'moderate': r.can_moderate(user, allow_admin=allow_admin),
             } for r in all_rooms_query}
 
         criteria = [db.and_(RoomPrincipal.type == PrincipalType.user, RoomPrincipal.user_id == user.id)]
@@ -722,12 +722,12 @@ class Room(versioned_cache(_cache, 'id'), ProtectionManagersMixin, db.Model, Ser
                 prebooking_required_rooms.add(room.id)
             if not room.is_reservable:
                 non_reservable_rooms.add(room.id)
-            if (room.is_reservable and room.is_public) or is_admin:
-                if not room.reservations_need_confirmation or is_admin:
+            if (room.is_reservable and room.is_public) or (is_admin and allow_admin):
+                if not room.reservations_need_confirmation or (is_admin and allow_admin):
                     data[room.id]['book'] = True
                 if room.reservations_need_confirmation:
                     data[room.id]['prebook'] = True
-            if is_admin:
+            if is_admin and allow_admin:
                 data[room.id]['override'] = True
                 data[room.id]['moderate'] = True
         query = (RoomPrincipal.query
@@ -737,7 +737,7 @@ class Room(versioned_cache(_cache, 'id'), ProtectionManagersMixin, db.Model, Ser
         for principal in query:
             is_reservable = principal.room_id not in non_reservable_rooms
             for permission in permissions:
-                if not is_reservable and not is_admin and permission in ('book', 'prebook'):
+                if not is_reservable and not (is_admin and allow_admin) and permission in ('book', 'prebook'):
                     continue
                 explicit = permission == 'prebook' and principal.room_id not in prebooking_required_rooms
                 if principal.has_management_permission(permission, explicit=explicit):
