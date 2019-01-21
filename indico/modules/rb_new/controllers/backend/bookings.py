@@ -19,12 +19,13 @@ from __future__ import unicode_literals
 from datetime import date, datetime, time
 
 from flask import jsonify, request, session
-from marshmallow import fields, missing
+from marshmallow import ValidationError, fields, missing
 from marshmallow_enum import EnumField
 from webargs.flaskparser import use_args, use_kwargs
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from indico.core.db import db
+from indico.core.db.sqlalchemy.links import LinkType
 from indico.core.errors import NoReportError
 from indico.modules.events import Event
 from indico.modules.events.contributions import Contribution
@@ -276,13 +277,9 @@ class RHDeleteBooking(RHBookingBase):
 class RHLinkedObjectData(RHRoomBookingBase):
     """Fetch data from event, contribution or session block"""
     def _process_args(self):
-        type = request.view_args['type']
-        id = request.view_args['id']
-        self.linked_object = {
-            'event': lambda x: Event.get_one(x),
-            'contribution': lambda x: Contribution.get_one(x),
-            'session_block': lambda x: SessionBlock.get_one(x)
-        }[type](id)
+        type_ = LinkType[request.view_args['type']]
+        id_ = request.view_args['id']
+        self.linked_object = get_linked_object(type_, id_)
 
     def _process(self):
         if self.linked_object is None:
