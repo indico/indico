@@ -171,7 +171,9 @@ class TimelineItem extends React.Component {
             if (reservation) {
                 popupMessage = reservation.bookingReason;
             } else if (bookable) {
-                popupMessage = Translate.string('Click to book it');
+                popupMessage = room.canUserBook
+                    ? Translate.string('Click to book it')
+                    : Translate.string('Click to pre-book it');
             }
             popupContent = (
                 <div styleName="popup-center">
