@@ -140,7 +140,8 @@ class SearchResultCount extends React.Component {
         return (
             <Message icon="warning sign"
                      warning
-                     content={Translate.string('No spaces are available during that timeslot')} />
+                     content={Translate.string('No spaces are available during that timeslot')}
+                     styleName="message-nothing" />
         );
     }
 

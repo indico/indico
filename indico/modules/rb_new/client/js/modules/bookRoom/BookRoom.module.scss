@@ -119,3 +119,17 @@
         text-shadow: none;
     }
 }
+
+.message-nothing:global(.ui.message) {
+    margin-bottom: 3em;
+}
+
+.suggestions-container {
+    .divider-icon:global(.circular.icon) {
+        font-size: 2em;
+    }
+
+    .header {
+        margin: 0 0 2em 0;
+    }
+}

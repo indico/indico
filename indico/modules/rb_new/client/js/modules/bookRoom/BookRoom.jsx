@@ -22,7 +22,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {bindActionCreators} from 'redux';
 import _ from 'lodash';
-import {Button, Card, Grid, Header, Icon, Label, Message, Popup, Sticky} from 'semantic-ui-react';
+import {Button, Card, Grid, Header, Icon, Label, Message, Popup, Sticky, Divider} from 'semantic-ui-react';
 import LazyScroll from 'redux-lazy-scroll';
 
 import {PluralTranslate, Translate, Singular, Param, Plural} from 'indico/react/i18n';
@@ -308,14 +308,17 @@ class BookRoom extends React.Component {
         }
 
         return (
-            <>
-                <Header as="h2">
-                    <Translate>Rooms that you might be interested in</Translate>
+            <div styleName="suggestions-container">
+                <Divider horizontal>
+                    <Icon name="magic" styleName="divider-icon" circular />
+                </Divider>
+                <Header styleName="header">
+                    <Translate>Here are some alternatives we've found for you!</Translate>
                 </Header>
                 <Card.Group styleName="suggestions" stackable>
                     {suggestions.map((suggestion) => this.renderSuggestion(suggestion))}
                 </Card.Group>
-            </>
+            </div>
         );
     };
 
