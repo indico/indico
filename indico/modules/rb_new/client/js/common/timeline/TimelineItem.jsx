@@ -188,7 +188,7 @@ class TimelineItem extends React.Component {
         const segment = (
             <div className={additionalClasses} onClick={() => {
                 if (onClickCandidate && bookable && type === 'candidate') {
-                    onClickCandidate(room.id);
+                    onClickCandidate(room);
                 } else if (onClickReservation && (type === 'booking' || type === 'pre-booking')) {
                     onClickReservation(reservation.id);
                 }
