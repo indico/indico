@@ -27,6 +27,7 @@ import LazyScroll from 'redux-lazy-scroll';
 import {TooltipIfTruncated} from 'indico/react/components';
 import {Param, Translate} from 'indico/react/i18n';
 import {actions as bookingsActions} from '../../common/bookings';
+import {selectors as userSelectors} from '../../common/user';
 import CardPlaceholder from '../../components/CardPlaceholder';
 import * as calendarSelectors from './selectors';
 import * as calendarActions from './actions';
@@ -45,6 +46,7 @@ class CalendarListView extends React.Component {
         roomFilters: PropTypes.object.isRequired,
         calendarFilters: PropTypes.object.isRequired,
         datePicker: PropTypes.object.isRequired,
+        isAdminOverrideEnabled: PropTypes.bool.isRequired,
         actions: PropTypes.exact({
             openBookingDetails: PropTypes.func.isRequired,
             fetchActiveBookings: PropTypes.func.isRequired,
@@ -62,15 +64,20 @@ class CalendarListView extends React.Component {
             datePicker: {selectedDate: prevDate, mode: prevMode},
             roomFilters: prevRoomFilters,
             calendarFilters: prevCalendarFilters,
+            isAdminOverrideEnabled: prevIsAdminOverrideEnabled,
         } = prevProps;
         const {
             datePicker: {selectedDate, mode},
             roomFilters,
             calendarFilters,
+            isAdminOverrideEnabled,
             actions: {fetchActiveBookings, clearActiveBookings},
         } = this.props;
 
-        const roomFiltersChanged = !_.isEqual(prevRoomFilters, roomFilters);
+        const roomFiltersChanged = (
+            !_.isEqual(prevRoomFilters, roomFilters) ||
+            isAdminOverrideEnabled !== prevIsAdminOverrideEnabled
+        );
         const calendarFiltersChanged = !_.isEqual(prevCalendarFilters, calendarFilters);
         if (prevDate !== selectedDate || mode !== prevMode || roomFiltersChanged || calendarFiltersChanged) {
             clearActiveBookings();
@@ -185,6 +192,7 @@ export default connect(
         roomFilters: calendarSelectors.getRoomFilters(state),
         calendarFilters: calendarSelectors.getCalendarFilters(state),
         datePicker: calendarSelectors.getDatePickerInfo(state),
+        isAdminOverrideEnabled: userSelectors.isUserAdminOverrideEnabled(state),
     }),
     (dispatch) => ({
         actions: bindActionCreators({

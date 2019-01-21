@@ -55,6 +55,7 @@ class Calendar extends React.Component {
             hideUnused: PropTypes.bool.isRequired,
         }).isRequired,
         unbookableRoomIds: PropTypes.arrayOf(PropTypes.number).isRequired,
+        isAdminOverrideEnabled: PropTypes.bool.isRequired,
         allowDragDrop: PropTypes.bool,
         view: PropTypes.oneOf(['timeline', 'list']).isRequired,
         actions: PropTypes.exact({
@@ -88,14 +89,19 @@ class Calendar extends React.Component {
             datePicker: {selectedDate: prevDate, mode: prevMode},
             roomFilters: prevRoomFilters,
             calendarFilters: prevCalendarFilters,
+            isAdminOverrideEnabled: prevIsAdminOverrideEnabled,
         } = prevProps;
         const {
             datePicker: {selectedDate, mode},
             roomFilters,
             calendarFilters,
+            isAdminOverrideEnabled,
             actions: {fetchCalendar},
         } = this.props;
-        const roomFiltersChanged = !_.isEqual(prevRoomFilters, roomFilters);
+        const roomFiltersChanged = (
+            !_.isEqual(prevRoomFilters, roomFilters) ||
+            isAdminOverrideEnabled !== prevIsAdminOverrideEnabled
+        );
         const calendarFiltersChanged = !_.isEqual(prevCalendarFilters, calendarFilters);
         if (prevDate !== selectedDate || mode !== prevMode || roomFiltersChanged || calendarFiltersChanged) {
             fetchCalendar(roomFiltersChanged);
@@ -130,9 +136,10 @@ class Calendar extends React.Component {
             calendarData: {rows},
             roomFilters: {onlyAuthorized},
             unbookableRoomIds,
+            isAdminOverrideEnabled,
         } = this.props;
 
-        if (!onlyAuthorized) {
+        if (!onlyAuthorized || isAdminOverrideEnabled) {
             return rows;
         }
 
@@ -286,6 +293,7 @@ export default connect(
         datePicker: calendarSelectors.getDatePickerInfo(state),
         view: calendarSelectors.getCalendarView(state),
         unbookableRoomIds: userSelectors.getUnbookableRoomIds(state),
+        isAdminOverrideEnabled: userSelectors.isUserAdminOverrideEnabled(state),
     }),
     dispatch => ({
         actions: bindActionCreators({
