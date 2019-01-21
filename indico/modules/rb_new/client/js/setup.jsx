@@ -11,7 +11,7 @@ import {selectors as configSelectors} from './common/config';
 import {selectors as userSelectors, actions as userActions} from './common/user';
 import {actions as roomsActions} from './common/rooms';
 
-import 'semantic-ui-css/semantic.css';
+import 'indico-sui-theme/semantic.css';
 import '../styles/main.scss';
 
 

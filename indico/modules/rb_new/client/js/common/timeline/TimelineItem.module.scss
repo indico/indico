@@ -36,7 +36,7 @@
         border: 0.5px solid rgba(0, 0, 0, 0.2);
 
         &:global(.default) {
-            background-color: lighten($sui-green, 15%);
+            background-color: $sui-green;
         }
 
         &:hover:not(:global(.other)) {

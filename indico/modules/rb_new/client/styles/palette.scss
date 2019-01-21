@@ -22,12 +22,10 @@ $highlight-color: #7dcfb6;
 $dark-highlight-color: #45ba97;
 $primary-color: #2185d0;
 
-$sui-red: #db2828;
-$sui-orange: #f2711c;
-$sui-green: #21ba45;
-$sui-grey: #767676;
-
-$light-red: #ffbdbd;
+$sui-red: $red;
+$sui-orange: $orange;
+$sui-green: $green;
+$sui-grey: $gray;
 
 $pre-booking-stripe-colors: ($sui-orange, lighten($sui-orange, 14%));
 $pre-booking-conflict-stripe-colors: ($sui-red, lighten($sui-red, 14%));
