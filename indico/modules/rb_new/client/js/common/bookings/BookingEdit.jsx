@@ -270,7 +270,7 @@ class BookingEdit extends React.Component {
         const {booking, onClose, actionButtons, isOngoingBooking} = this.props;
         const {room} = booking;
         const {skipConflicts, datePeriodChanged, calendars, numberOfConflicts, numberOfCandidates} = this.state;
-        const conflictingBooking = (numberOfCandidates === 0) || (numberOfConflicts > 0 && !skipConflicts);
+        const conflictingBooking = numberOfConflicts > 0 && !skipConflicts;
         const submitBlocked = submitting || submitSucceeded || hasValidationErrors || pristine || conflictingBooking;
 
         return (
@@ -298,7 +298,7 @@ class BookingEdit extends React.Component {
                         <Grid.Column stretched>
                             <BookingEditCalendar calendars={calendars}
                                                  booking={booking}
-                                                 numberOfCandidates={datePeriodChanged ? numberOfCandidates : 0}
+                                                 numberOfCandidates={numberOfCandidates}
                                                  numberOfConflicts={numberOfConflicts}
                                                  datePeriodChanged={datePeriodChanged} />
                             {this.renderConflictsMessage()}

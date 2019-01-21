@@ -46,7 +46,7 @@ class BookingEditCalendar extends React.Component {
     static legendLabels = [
         {label: Translate.string('Current booking'), color: 'orange', style: 'booking'},
         {label: Translate.string('Cancelled occurrences'), style: 'cancellation'},
-        {label: Translate.string('Pending cancelations'), style: 'pending-cancelation'},
+        {label: Translate.string('Pending cancellations'), style: 'pending-cancellation'},
         {label: Translate.string('Rejected occurrences'), style: 'rejection'},
         {label: Translate.string('Other bookings'), style: 'other'},
         {label: Translate.string('New booking'), color: 'green', style: 'new-booking'},

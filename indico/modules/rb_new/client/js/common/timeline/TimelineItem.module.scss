@@ -85,7 +85,7 @@
             background-color: lighten($sui-grey, 40%);
         }
 
-        &:global(.pending-cancelations) {
+        &:global(.pending-cancellations) {
             background-color: lighten($sui-green, 40%);
             z-index: 4;
         }

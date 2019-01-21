@@ -35,7 +35,7 @@ const classes = {
     nonbookablePeriods: 'unbookable-periods',
     unbookableHours: 'unbookable-hours',
     cancellations: 'cancellation',
-    pendingCancelations: 'pending-cancelations',
+    pendingCancelations: 'pending-cancellations',
     rejections: 'rejection',
     other: 'other',
 };
@@ -48,7 +48,7 @@ const types = {
     unbookableHours: 'unbookable-hours',
     preBookings: 'pre-booking',
     cancellations: 'cancellation',
-    pendingCancelations: 'pending-cancelations',
+    pendingCancelations: 'pending-cancellations',
     rejections: 'rejection',
     other: 'other',
 };
@@ -161,7 +161,7 @@ class TimelineItem extends React.Component {
                     {!!rejectionReason && <div>{Translate.string('Reason: {reason}', {reason: rejectionReason})}</div>}
                 </div>
             );
-        } else if (type === 'pending-cancelations') {
+        } else if (type === 'pending-cancellations') {
             popupContent = (
                 <div styleName="popup-center">
                     <strong>
