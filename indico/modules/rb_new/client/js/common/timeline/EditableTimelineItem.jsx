@@ -255,7 +255,15 @@ export default class EditableTimelineItem extends React.Component {
             slotEndTime, canvasRef, hintPosition
         } = this.state;
         const {onAddSlot, setSelectable, ...restProps} = this.props;
+        const {room: {canUserBook}} = this.props;
         const width = slotEndPx - slotStartPx;
+
+        let tip;
+        if (canUserBook) {
+            tip = Translate.string('Tip: click and drag to book!');
+        } else {
+            tip = Translate.string('Tip: click and drag to pre-book!');
+        }
 
         return (
             <TimelineItem {...restProps}
@@ -272,7 +280,7 @@ export default class EditableTimelineItem extends React.Component {
                     )}
                     {!isEditing && canvasRef && hintPosition !== null && (
                         <Popup header={`${hintPosition.hours}:${hintPosition.minutes.toString().padStart(2, '0')}`}
-                               content={Translate.string('Tip: click and drag to book!')}
+                               content={tip}
                                position="top left"
                                horizontalOffset={-hintPosition.pixels}
                                context={canvasRef}
