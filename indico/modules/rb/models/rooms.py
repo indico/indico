@@ -694,7 +694,7 @@ class Room(versioned_cache(_cache, 'id'), ProtectionManagersMixin, db.Model, Ser
                                     raiseload('owner'),
                                     joinedload('acl_entries')))
         is_admin = allow_admin and cls.is_user_admin(user)
-        if not user.can_get_all_multipass_groups:
+        if (is_admin and allow_admin) or not user.can_get_all_multipass_groups:
             # check one by one if we can't get a list of all groups the user is in
             return {r.id: {
                 'book': r.can_book(user, allow_admin=allow_admin),
