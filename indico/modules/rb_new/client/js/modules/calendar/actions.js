@@ -27,7 +27,6 @@ import {preProcessParameters} from '../../util';
 import {ajaxRules as roomSearchAjaxRules} from '../../common/roomSearch';
 import {ajax as ajaxRules} from './serializers';
 import {getRoomFilters, getCalendarFilters} from './selectors';
-import {getUnbookableRoomIds, isUserAdminOverrideEnabled} from '../../common/user/selectors';
 
 
 export const CHANGE_VIEW = 'calendar/CHANGE_VIEW';
@@ -59,8 +58,7 @@ export function setMode(mode) {
 }
 
 async function fetchCalendarRooms(dispatch, state) {
-    const {onlyAuthorized, ...roomFilters} = getRoomFilters(state);
-    const isAdminOverrideEnabled = isUserAdminOverrideEnabled(state);
+    const roomFilters = getRoomFilters(state);
     const searchParams = preProcessParameters({...roomFilters}, roomSearchAjaxRules);
     let response;
 
@@ -72,13 +70,7 @@ async function fetchCalendarRooms(dispatch, state) {
         return [];
     }
 
-    let newRoomIds = response.data.rooms;
-
-    if (onlyAuthorized && !isAdminOverrideEnabled) {
-        const unbookable = new Set(getUnbookableRoomIds(state));
-        newRoomIds = newRoomIds.filter(id => !unbookable.has(id));
-    }
-
+    const newRoomIds = response.data.rooms;
     dispatch({type: ROOM_IDS_RECEIVED, data: newRoomIds});
     if (!newRoomIds.length) {
         dispatch({type: ROWS_RECEIVED, data: []});

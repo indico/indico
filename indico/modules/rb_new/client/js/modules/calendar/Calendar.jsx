@@ -30,7 +30,6 @@ import * as calendarSelectors from './selectors';
 import {actions as bookingsActions} from '../../common/bookings';
 import {actions as filtersActions} from '../../common/filters';
 import {selectors as roomsSelectors, actions as roomsActions} from '../../common/rooms';
-import {selectors as userSelectors} from '../../common/user';
 import {ElasticTimeline, TimelineHeader} from '../../common/timeline';
 import CalendarListView from './CalendarListView';
 import {actions as bookRoomActions} from '../bookRoom';
@@ -54,8 +53,6 @@ class Calendar extends React.Component {
         localFilters: PropTypes.shape({
             hideUnused: PropTypes.bool.isRequired,
         }).isRequired,
-        unbookableRoomIds: PropTypes.arrayOf(PropTypes.number).isRequired,
-        isAdminOverrideEnabled: PropTypes.bool.isRequired,
         allowDragDrop: PropTypes.bool,
         view: PropTypes.oneOf(['timeline', 'list']).isRequired,
         actions: PropTypes.exact({
@@ -89,19 +86,14 @@ class Calendar extends React.Component {
             datePicker: {selectedDate: prevDate, mode: prevMode},
             roomFilters: prevRoomFilters,
             calendarFilters: prevCalendarFilters,
-            isAdminOverrideEnabled: prevIsAdminOverrideEnabled,
         } = prevProps;
         const {
             datePicker: {selectedDate, mode},
             roomFilters,
             calendarFilters,
-            isAdminOverrideEnabled,
             actions: {fetchCalendar},
         } = this.props;
-        const roomFiltersChanged = (
-            !_.isEqual(prevRoomFilters, roomFilters) ||
-            isAdminOverrideEnabled !== prevIsAdminOverrideEnabled
-        );
+        const roomFiltersChanged = !_.isEqual(prevRoomFilters, roomFilters);
         const calendarFiltersChanged = !_.isEqual(prevCalendarFilters, calendarFilters);
         if (prevDate !== selectedDate || mode !== prevMode || roomFiltersChanged || calendarFiltersChanged) {
             fetchCalendar(roomFiltersChanged);
@@ -129,24 +121,6 @@ class Calendar extends React.Component {
     toggleHideUnused = () => {
         const {localFilters: {hideUnused}, actions: {setFilterParameter}} = this.props;
         setFilterParameter('hideUnused', !hideUnused);
-    };
-
-    getFilteredRows = () => {
-        const {
-            calendarData: {rows},
-            roomFilters: {onlyAuthorized},
-            unbookableRoomIds,
-            isAdminOverrideEnabled,
-        } = this.props;
-
-        if (!onlyAuthorized || isAdminOverrideEnabled) {
-            return rows;
-        }
-
-        // We need to re-filter in case the page was loaded with this filter, since
-        // the initial request might not have the permission information yet
-        const unbookable = new Set(unbookableRoomIds);
-        return rows.filter(([id]) => !unbookable.has(id));
     };
 
     renderExtraButtons = () => {
@@ -217,14 +191,11 @@ class Calendar extends React.Component {
             view,
             isFetching,
             isFetchingActiveBookings,
-            localFilters: {
-                hideUnused,
-            },
-            actions: {
-                openRoomDetails, setDate, openBookingDetails, setMode
-            },
+            localFilters: {hideUnused},
+            calendarData: {rows},
+            actions: {openRoomDetails, setDate, openBookingDetails, setMode},
             datePicker,
-            allowDragDrop
+            allowDragDrop,
         } = this.props;
         const legendLabels = [
             {label: Translate.string('Booked'), color: 'orange'},
@@ -232,7 +203,6 @@ class Calendar extends React.Component {
             {label: Translate.string('Blocked'), style: 'blocking'},
             {label: Translate.string('Not bookable'), style: 'unbookable'}
         ];
-        const rows = this.getFilteredRows();
         const editable = datePicker.mode === 'days' && allowDragDrop;
         const isTimelineVisible = view === 'timeline';
         return (
@@ -292,8 +262,6 @@ export default connect(
         rooms: roomsSelectors.getAllRooms(state),
         datePicker: calendarSelectors.getDatePickerInfo(state),
         view: calendarSelectors.getCalendarView(state),
-        unbookableRoomIds: userSelectors.getUnbookableRoomIds(state),
-        isAdminOverrideEnabled: userSelectors.isUserAdminOverrideEnabled(state),
     }),
     dispatch => ({
         actions: bindActionCreators({

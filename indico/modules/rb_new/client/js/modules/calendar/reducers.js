@@ -53,7 +53,7 @@ const datePickerReducer = (state = datePickerState(), action) => {
 
 export const initialDataState = {
     rows: [],
-    roomIds: null,
+    roomIds: [],
 };
 
 const initialActiveBookingsState = {
