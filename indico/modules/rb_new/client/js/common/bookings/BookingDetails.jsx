@@ -380,7 +380,7 @@ class BookingDetails extends React.Component {
             booking: {
                 startDt, endDt, occurrences, dateRange, repetition, room, bookedForUser, bookingReason, editLogs,
                 createdDt, createdByUser, isCancelled, isRejected, canDelete, canCancel, canReject, canAccept, canEdit,
-                isAccepted, newBookingId, isLinkedToObject, linkType, linkId
+                isAccepted, newBookingId, isLinkedToObject, link
             },
         } = this.props;
         const legendLabels = [
@@ -426,7 +426,7 @@ class BookingDetails extends React.Component {
                                     {bookedForUser && this.renderBookedFor(bookedForUser)}
                                     {this.renderReason(bookingReason)}
                                     {isLinkedToObject && (
-                                        <BookingObjectLink type={_.camelCase(linkType)} id={linkId} />
+                                        <BookingObjectLink type={_.camelCase(link.type)} id={link.id} />
                                     )}
                                     {this.renderBookingHistory(editLogs, createdDt, createdByUser)}
                                     {this.renderMessageAfterSplitting(newBookingId)}

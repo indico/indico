@@ -33,7 +33,7 @@ from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.map_areas import MapArea
 from indico.modules.rb.models.reservation_edit_logs import ReservationEditLog
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
-from indico.modules.rb.models.reservations import RepeatFrequency, Reservation, ReservationState
+from indico.modules.rb.models.reservations import RepeatFrequency, Reservation, ReservationLink, ReservationState
 from indico.modules.rb.models.room_attributes import RoomAttribute, RoomAttributeAssociation
 from indico.modules.rb.models.room_bookable_hours import BookableHours
 from indico.modules.rb.models.room_features import RoomFeature
@@ -125,6 +125,15 @@ class ReservationEditLogSchema(UserSchema):
         return data
 
 
+class ReservationLinkSchema(mm.ModelSchema):
+    type = EnumField(LinkType, attribute='link_type')
+    id = Function(lambda link: link.object.id)
+
+    class Meta:
+        model = ReservationLink
+        fields = ('type', 'id')
+
+
 class ReservationDetailsSchema(mm.ModelSchema):
     booked_for_user = Nested(UserSchema, only=('id', 'identifier', 'full_name', 'phone', 'email'))
     created_by_user = Nested(UserSchema, only=('id', 'identifier', 'full_name', 'email'))
@@ -136,9 +145,8 @@ class ReservationDetailsSchema(mm.ModelSchema):
     can_reject = Function(lambda booking: booking.can_reject(session.user))
     permissions = Method('_get_permissions')
     state = EnumField(ReservationState)
-    is_linked_to_object = Function(lambda booking: booking.link_id is not None)
-    link_type = Function(lambda booking: booking.link.link_type.name if booking.link_id else None)
-    link_id = Function(lambda booking: booking.linked_object.id if booking.link_id else None)
+    is_linked_to_object = Function(lambda booking: booking.link is not None)
+    link = Nested(ReservationLinkSchema)
     start_dt = NaiveDateTime()
     end_dt = NaiveDateTime()
 
@@ -147,7 +155,7 @@ class ReservationDetailsSchema(mm.ModelSchema):
         fields = ('id', 'start_dt', 'end_dt', 'repetition', 'booking_reason', 'created_dt', 'booked_for_user',
                   'room_id', 'created_by_user', 'edit_logs', 'permissions',
                   'is_cancelled', 'is_rejected', 'is_accepted', 'is_pending', 'rejection_reason',
-                  'is_linked_to_object', 'link_type', 'link_id', 'state')
+                  'is_linked_to_object', 'link', 'state')
 
     def _get_permissions(self, booking):
         methods = ('can_accept', 'can_cancel', 'can_delete', 'can_edit', 'can_reject')
