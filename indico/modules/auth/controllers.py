@@ -373,7 +373,10 @@ class RHRemoveAccount(RHUserBase):
         if self.user.local_identity == self.identity:
             raise BadRequest("The main local identity can't be removed")
         self.user.identities.remove(self.identity)
-        provider_title = multipass.identity_providers[self.identity.provider].title
+        try:
+            provider_title = multipass.identity_providers[self.identity.provider].title
+        except KeyError:
+            provider_title = self.identity.provider.title()
         flash(_("{provider} ({identifier}) successfully removed from your accounts"
               .format(provider=provider_title, identifier=self.identity.identifier)), 'success')
         return redirect(url_for('.accounts'))

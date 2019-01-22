@@ -547,13 +547,13 @@ class User(PersonMixin, db.Model):
         """Check whether it is possible to get all multipass groups the user is in."""
         return all(multipass.identity_providers[x.provider].supports_get_identity_groups
                    for x in self.identities
-                   if x.provider != 'indico')
+                   if x.provider != 'indico' and x.provider in multipass.identity_providers)
 
     def iter_all_multipass_groups(self):
         """Iterate over all multipass groups the user is in"""
         return itertools.chain.from_iterable(multipass.identity_providers[x.provider].get_identity_groups(x.identifier)
                                              for x in self.identities
-                                             if x.provider != 'indico')
+                                             if x.provider != 'indico' and x.provider in multipass.identity_providers)
 
     def get_full_name(self, *args, **kwargs):
         kwargs['_show_empty_names'] = True
