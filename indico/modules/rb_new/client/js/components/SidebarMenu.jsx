@@ -17,7 +17,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Icon, Sidebar, Menu} from 'semantic-ui-react';
+import {Icon, Popup, Sidebar, Menu} from 'semantic-ui-react';
 import {connect} from 'react-redux';
 import {push as pushRoute} from 'connected-react-router';
 import {Translate} from 'indico/react/i18n';
@@ -99,6 +99,7 @@ function SidebarMenu({
             active: isAdminOverrideEnabled,
             onClick: toggleAdminOverride,
             onlyIf: isAdmin,
+            tooltip: Translate.string('Admin Override gives you unrestricted access to all rooms and bookings.')
         }
     ].filter(({onlyIf}) => onlyIf === undefined || onlyIf);
 
@@ -113,17 +114,23 @@ function SidebarMenu({
                  inverted
                  visible={visible}
                  styleName="sidebar">
-            {options.map(({key, text, icon, onClick, iconColor, active}) => (
-                <Menu.Item as="a" key={key} active={active} onClick={() => {
-                    onClick();
-                    if (onClickOption) {
-                        onClickOption();
-                    }
-                }}>
-                    <Icon name={icon} color={iconColor} />
-                    {text}
-                </Menu.Item>
-            ))}
+            {options.map(({key, text, icon, onClick, iconColor, active, tooltip}) => {
+                const item = (
+                    <Menu.Item as="a" key={key} active={active} onClick={() => {
+                        onClick();
+                        if (onClickOption) {
+                            onClickOption();
+                        }
+                    }}>
+                        <Icon name={icon} color={iconColor} />
+                        {text}
+                    </Menu.Item>
+                );
+                if (!tooltip) {
+                    return item;
+                }
+                return <Popup trigger={item} content={tooltip} key={key} position="left center" />;
+            })}
         </Sidebar>
     );
 }

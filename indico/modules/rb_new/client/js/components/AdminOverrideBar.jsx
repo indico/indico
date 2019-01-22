@@ -44,7 +44,8 @@ const AdminOverrideBar = ({visible, disable}) => {
         <header styleName="admin-override-bar">
             <Popup trigger={trigger}>
                 <Translate>
-                    While in Admin Override mode, you can book any room regardless of restrictions.
+                    While in Admin Override mode, you can book any room regardless
+                    of restrictions and edit any booking.
                 </Translate>
             </Popup>
             <span styleName="disable" onClick={disable}>
