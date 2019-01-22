@@ -22,15 +22,14 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {bindActionCreators} from 'redux';
 import _ from 'lodash';
-import {Button, Card, Grid, Header, Icon, Label, Message, Popup, Sticky, Divider} from 'semantic-ui-react';
+import {Button, Card, Grid, Header, Icon, Popup, Sticky, Divider} from 'semantic-ui-react';
 import LazyScroll from 'redux-lazy-scroll';
 
-import {PluralTranslate, Translate, Singular, Param, Plural} from 'indico/react/i18n';
+import {Translate} from 'indico/react/i18n';
 import {Overridable, Slot, toClasses, IndicoPropTypes} from 'indico/react/util';
 import {serializeTime, serializeDate} from 'indico/utils/date';
 
 import searchBarFactory from '../../components/SearchBar';
-import Room from '../../components/Room';
 import CardPlaceholder from '../../components/CardPlaceholder';
 import BookingFilterBar from './BookingFilterBar';
 import {roomFilterBarFactory} from '../../modules/roomList';
@@ -44,6 +43,7 @@ import {actions as filtersActions} from '../../common/filters';
 import {actions as roomsActions, RoomRenderer} from '../../common/rooms';
 import * as bookRoomSelectors from './selectors';
 import {mapControllerFactory, selectors as mapSelectors} from '../../common/map';
+import BookingSuggestion from './BookingSuggestion';
 
 import './BookRoom.module.scss';
 
@@ -315,72 +315,17 @@ class BookRoom extends React.Component {
                 <Header styleName="header">
                     <Translate>Here are some alternatives we've found for you!</Translate>
                 </Header>
-                <Card.Group styleName="suggestions" stackable>
-                    {suggestions.map((suggestion) => this.renderSuggestion(suggestion))}
+                <Card.Group stackable>
+                    {suggestions.map(({room, suggestions: roomSuggestions}) => (
+                        <BookingSuggestion key={room.id}
+                                           room={room}
+                                           suggestions={roomSuggestions}
+                                           onClick={(overrides = null) => {
+                                               this.openBookingForm(room, overrides, !room.canUserBook);
+                                           }} />
+                    ))}
                 </Card.Group>
             </div>
-        );
-    };
-
-    renderSuggestion = ({room, suggestions}) => {
-        return (
-            <Room key={room.id} room={room}>
-                <Slot>
-                    <Grid centered styleName="suggestion" columns={3}>
-                        <Grid.Column verticalAlign="middle" width={14}>
-                            {this.renderSuggestionText(room, suggestions)}
-                        </Grid.Column>
-                    </Grid>
-                </Slot>
-            </Room>
-        );
-    };
-
-    renderSuggestionText = (room, {time, duration, skip}) => {
-        return (
-            <>
-                {time && (
-                    <Message styleName="suggestion-text" size="mini"
-                             onClick={() => this.openBookingForm(room, {time}, !room.canUserBook)}
-                             warning compact>
-                        <Message.Header>
-                            <Icon name="clock" />
-                            <PluralTranslate count={time}>
-                                <Singular>
-                                    One minute <Param name="modifier" value={time < 0 ? 'earlier' : 'later'} />
-                                </Singular>
-                                <Plural>
-                                    <Param name="count" value={Math.abs(time)} /> minutes{' '}
-                                    <Param name="modifier" value={time < 0 ? 'earlier' : 'later'} />
-                                </Plural>
-                            </PluralTranslate>
-                        </Message.Header>
-                    </Message>
-                )}
-                {duration && time && (
-                    <div>
-                        <Label color="brown" circular>{Translate.string('or')}</Label>
-                    </div>
-                )}
-                {duration && (
-                    <Message styleName="suggestion-text" size="mini"
-                             onClick={() => this.openBookingForm(room, {duration}, !room.canUserBook)}
-                             warning compact>
-                        <Message.Header>
-                            <Icon name="hourglass full" /> {PluralTranslate.string('One minute shorter', '{duration} minutes shorter', duration, {duration})}
-                        </Message.Header>
-                    </Message>
-                )}
-                {skip && (
-                    <Message styleName="suggestion-text" size="mini"
-                             onClick={() => this.openBookingForm(room, null, !room.canUserBook)}
-                             warning compact>
-                        <Message.Header>
-                            <Icon name="calendar times" /> {PluralTranslate.string('Skip one day', 'Skip {skip} days', skip, {skip})}
-                        </Message.Header>
-                    </Message>
-                )}
-            </>
         );
     };
 

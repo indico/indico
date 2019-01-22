@@ -55,19 +55,6 @@
     }
 }
 
-.suggestions {
-    .suggestion {
-        margin: 0 !important;
-        height: 100%;
-        opacity: 0.9;
-
-        .suggestion-text {
-            cursor: pointer;
-            pointer-events: all;
-        }
-    }
-}
-
 .available-room-list {
     .results-count {
         margin-bottom: 10px;
