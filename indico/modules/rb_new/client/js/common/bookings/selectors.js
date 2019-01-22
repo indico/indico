@@ -18,9 +18,25 @@
 import {createSelector} from 'reselect';
 import {RequestState} from 'indico/utils/redux';
 import {selectors as roomsSelectors} from '../../common/rooms';
+import {isUserAdminOverrideEnabled} from '../user/selectors';
 
 
-export const getDetails = (state, {bookingId}) => state.bookings.details[bookingId];
+const getRawDetails = (state, {bookingId}) => state.bookings.details[bookingId];
+
+export const getDetails = createSelector(
+    getRawDetails,
+    isUserAdminOverrideEnabled,
+    (allDetails, override) => {
+        if (!allDetails) {
+            // details not loaded yet, just keep the null/undefined
+            return allDetails;
+        }
+        const {permissions, ...details} = allDetails;
+        const activePermissions = (override && permissions.admin) ? permissions.admin : permissions.user;
+        return {...details, ...activePermissions};
+    }
+);
+
 
 export const getDetailsWithRoom = createSelector(
     getDetails,

@@ -20,7 +20,7 @@ from operator import itemgetter
 
 from flask import session
 from marshmallow import Schema, ValidationError, fields, post_dump, validate, validates_schema
-from marshmallow.fields import Boolean, DateTime, Function, Nested, Number, String
+from marshmallow.fields import Boolean, DateTime, Function, Method, Nested, Number, String
 from marshmallow_enum import EnumField
 
 from indico.core.marshmallow import mm
@@ -132,6 +132,7 @@ class ReservationDetailsSchema(mm.ModelSchema):
     can_delete = Function(lambda booking: booking.can_delete(session.user))
     can_edit = Function(lambda booking: booking.can_edit(session.user))
     can_reject = Function(lambda booking: booking.can_reject(session.user))
+    permissions = Method('_get_permissions')
     state = EnumField(ReservationState)
     is_linked_to_event = Function(lambda booking: booking.event_id is not None)
     start_dt = NaiveDateTime()
@@ -140,9 +141,17 @@ class ReservationDetailsSchema(mm.ModelSchema):
     class Meta:
         model = Reservation
         fields = ('id', 'start_dt', 'end_dt', 'repetition', 'booking_reason', 'created_dt', 'booked_for_user',
-                  'room_id', 'created_by_user', 'edit_logs', 'can_accept', 'can_cancel', 'can_delete', 'can_edit',
-                  'can_reject', 'is_cancelled', 'is_rejected', 'is_accepted', 'is_pending', 'rejection_reason',
+                  'room_id', 'created_by_user', 'edit_logs', 'permissions',
+                  'is_cancelled', 'is_rejected', 'is_accepted', 'is_pending', 'rejection_reason',
                   'is_linked_to_event', 'state')
+
+    def _get_permissions(self, booking):
+        methods = ('can_accept', 'can_cancel', 'can_delete', 'can_edit', 'can_reject')
+        admin_permissions = None
+        user_permissions = {x: getattr(booking, x)(session.user, allow_admin=False) for x in methods}
+        if rb_is_admin(session.user):
+            admin_permissions = {x: getattr(booking, x)(session.user) for x in methods}
+        return {'user': user_permissions, 'admin': admin_permissions}
 
 
 class BlockedRoomSchema(mm.ModelSchema):

@@ -480,10 +480,10 @@ class Reservation(Serializer, db.Model):
             return False
         return self.is_owned_by(user) or self.is_booked_for(user) or self.room.can_manage(user, allow_admin=allow_admin)
 
-    def can_delete(self, user):
+    def can_delete(self, user, allow_admin=True):
         if user is None:
             return False
-        return rb_is_admin(user) and (self.is_cancelled or self.is_rejected)
+        return allow_admin and rb_is_admin(user) and (self.is_cancelled or self.is_rejected)
 
     def create_occurrences(self, skip_conflicts, user=None):
         ReservationOccurrence.create_series_for_reservation(self)
