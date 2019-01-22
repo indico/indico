@@ -2,6 +2,17 @@ Changelog
 =========
 
 
+Version 2.1.7
+-------------
+
+*Unreleased*
+
+Improvements
+^^^^^^^^^^^^
+
+- Add option to copy abstract attachments to contributions when
+  accepting them (:issue:`3732`)
+
 Version 2.1.6
 -------------
 

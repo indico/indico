@@ -116,6 +116,8 @@ class AbstractSubmissionSettingsForm(IndicoForm):
                                          description=_("Make the selection of a contribution type mandatory"))
     allow_attachments = BooleanField(_('Allow attachments'), widget=SwitchWidget(),
                                      description=_("Allow files to be attached to the abstract"))
+    copy_attachments = BooleanField(_('Copy attachments'), [HiddenUnless('allow_attachments')], widget=SwitchWidget(),
+                                    description=_("Copy attachments to the contribution when accepting an abstract"))
     allow_speakers = BooleanField(_('Allow speakers'), widget=SwitchWidget(),
                                   description=_("Allow the selection of the abstract speakers"))
     speakers_required = BooleanField(_('Require a speaker'), [HiddenUnless('allow_speakers')], widget=SwitchWidget(),
