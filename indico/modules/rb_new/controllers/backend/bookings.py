@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 from datetime import date, datetime, time
 
 from flask import jsonify, request, session
-from marshmallow import ValidationError, fields, missing
+from marshmallow import fields, missing
 from marshmallow_enum import EnumField
 from webargs.flaskparser import use_args, use_kwargs
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
@@ -27,9 +27,6 @@ from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 from indico.core.db import db
 from indico.core.db.sqlalchemy.links import LinkType
 from indico.core.errors import NoReportError
-from indico.modules.events import Event
-from indico.modules.events.contributions import Contribution
-from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.rb import rb_settings
 from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
@@ -183,7 +180,7 @@ class RHCreateBooking(RHRoomBookingBase):
         if id_ and type_:
             obj = get_linked_object(type_, id_)
 
-            if obj is not None:
+            if obj is not None and obj.event.can_manage(session.user):
                 booking.linked_object = obj
 
     def _process(self):
@@ -285,9 +282,9 @@ class RHLinkedObjectData(RHRoomBookingBase):
         if self.linked_object is None:
             raise NotFound
 
-        if not self.linked_object.can_access(session.user) or not self.linked_object.event.can_access(session.user):
+        if not self.linked_object.can_access(session.user):
             return jsonify(can_access=False)
-        return jsonify(reservation_linked_object_data_schema.dump(self.linked_object).data)
+        return jsonify(can_access=True, **reservation_linked_object_data_schema.dump(self.linked_object).data)
 
 
 class RHUpdateBooking(RHBookingBase):

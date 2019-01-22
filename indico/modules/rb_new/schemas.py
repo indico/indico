@@ -84,7 +84,6 @@ class ReservationLinkedObjectDataSchema(Schema):
     url = String()
     event_title = Function(lambda obj: obj.event.title)
     event_url = Function(lambda obj: obj.event.url)
-    can_access = True
 
 
 class ReservationUserEventSchema(Schema):
