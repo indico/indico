@@ -17,7 +17,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Grid, Icon, Label, Message} from 'semantic-ui-react';
+import {Grid, Icon, Label, Message, Popup} from 'semantic-ui-react';
 import {PluralTranslate, Translate, Singular, Param, Plural} from 'indico/react/i18n';
 import {Slot, IndicoPropTypes} from 'indico/react/util';
 
@@ -26,8 +26,8 @@ import Room from '../../components/Room';
 import './BookingSuggestion.module.scss';
 
 
-function SuggestionOption({onClick, overrides, icon, text}) {
-    return (
+function SuggestionOption({onClick, overrides, icon, text, tooltip}) {
+    const message = (
         <Message styleName="suggestion-text" size="mini"
                  onClick={onClick.bind(undefined, overrides)}
                  warning compact>
@@ -36,13 +36,19 @@ function SuggestionOption({onClick, overrides, icon, text}) {
             </Message.Header>
         </Message>
     );
+    return (
+        <Popup trigger={message}
+               content={tooltip}
+               position="right center" />
+    );
 }
 
 SuggestionOption.propTypes = {
     onClick: PropTypes.func.isRequired,
     overrides: PropTypes.object,
     icon: PropTypes.string.isRequired,
-    text: IndicoPropTypes.i18n.isRequired
+    text: IndicoPropTypes.i18n.isRequired,
+    tooltip: IndicoPropTypes.i18n.isRequired
 };
 
 SuggestionOption.defaultProps = {
@@ -85,7 +91,8 @@ export default class BookingSuggestion extends React.PureComponent {
                                                   <Param name="modifier" value={time < 0 ? 'earlier' : 'later'} />
                                               </Plural>
                                           </PluralTranslate>
-                                      )} />
+                                      )}
+                                      tooltip={Translate.string("We'll change your booking's starting time to make it fit")} />
                 )}
                 {duration && time && (
                     <div>
@@ -96,12 +103,15 @@ export default class BookingSuggestion extends React.PureComponent {
                     <SuggestionOption onClick={onClick}
                                       overrides={{duration}}
                                       icon="hourglass full"
-                                      text={PluralTranslate.string('One minute shorter', '{duration} minutes shorter', duration, {duration})} />
+                                      text={PluralTranslate.string('One minute shorter', '{duration} minutes shorter', duration, {duration})}
+                                      tooltip={Translate.string("We'll shorten your booking to make it fit")} />
                 )}
                 {skip && (
                     <SuggestionOption onClick={onClick}
                                       icon="calendar times"
-                                      text={PluralTranslate.string('Skip one day', 'Skip {skip} days', skip, {skip})} />
+                                      text={PluralTranslate.string('Skip one day', 'Skip {skip} days', skip, {skip})}
+                                      tooltip={PluralTranslate.string("We'll skip one occurrence to avoid any conflicts",
+                                                                      "We'll skip {skip} occurrences to avoid any conflicts", skip, {skip})} />
                 )}
             </>
         );
