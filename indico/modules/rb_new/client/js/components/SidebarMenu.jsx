@@ -93,9 +93,9 @@ function SidebarMenu({
         },
         {
             key: 'adminOverride',
-            icon: 'unlock',
+            icon: isAdminOverrideEnabled ? 'unlock' : 'lock',
             text: Translate.string('Admin Override'),
-            color: 'orange',
+            iconColor: isAdminOverrideEnabled ? 'orange' : undefined,
             active: isAdminOverrideEnabled,
             onClick: toggleAdminOverride,
             onlyIf: isAdmin,
@@ -113,14 +113,14 @@ function SidebarMenu({
                  inverted
                  visible={visible}
                  styleName="sidebar">
-            {options.map(({key, text, icon, onClick, color, active}) => (
-                <Menu.Item as="a" key={key} color={color} active={active} onClick={() => {
+            {options.map(({key, text, icon, onClick, iconColor, active}) => (
+                <Menu.Item as="a" key={key} active={active} onClick={() => {
                     onClick();
                     if (onClickOption) {
                         onClickOption();
                     }
                 }}>
-                    <Icon name={icon} />
+                    <Icon name={icon} color={iconColor} />
                     {text}
                 </Menu.Item>
             ))}
