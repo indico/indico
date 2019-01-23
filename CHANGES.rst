@@ -19,8 +19,6 @@ Improvements
   whole browser when there are thousands of log entries
 - Add shortcut to next upcoming event in a category (:issue:`3388`)
 - Make registration period display less confusing (:issue:`3359`)
-- Add setting for the default contribution duration of an event
-  (:issue:`3446`)
 - Add edit button to custom conference pages (:issue:`3284`)
 - Support markdown in survey questions (:issue:`3366`)
 - Improve event list in case of long event titles (:issue:`3607`,
@@ -47,6 +45,19 @@ Internal Changes
 
 
 ----
+
+Version 2.1.7
+-------------
+
+*Unreleased*
+
+Improvements
+^^^^^^^^^^^^
+
+- Add setting for the default contribution duration of an event
+  (:issue:`3446`)
+- Add option to copy abstract attachments to contributions when
+  accepting them (:issue:`3732`)
 
 Version 2.1.6
 -------------
