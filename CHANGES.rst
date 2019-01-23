@@ -12,6 +12,8 @@ Improvements
 
 - Add setting for the default contribution duration of an event
   (:issue:`3446`)
+- Add option to copy abstract attachments to contributions when
+  accepting them (:issue:`3732`)
 
 Version 2.1.6
 -------------

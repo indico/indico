@@ -16,13 +16,13 @@
 
 from __future__ import unicode_literals
 
-from datetime import timedelta
-
 from flask import session
 
 from indico.core import signals
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
+from indico.modules.attachments.models.attachments import Attachment, AttachmentFile, AttachmentType
+from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.modules.events.contributions import contribution_settings, logger
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.persons import ContributionPersonLink
@@ -161,6 +161,8 @@ def delete_subcontribution(subcontrib):
 
 @no_autoflush
 def create_contribution_from_abstract(abstract, contrib_session=None):
+    from indico.modules.events.abstracts.settings import abstracts_settings
+
     event = abstract.event
     contrib_person_links = set()
     person_link_attrs = {'_title', 'address', 'affiliation', 'first_name', 'last_name', 'phone', 'author_type',
@@ -176,12 +178,23 @@ def create_contribution_from_abstract(abstract, contrib_session=None):
         duration = contribution_settings.get(event, 'default_duration')
     custom_fields_data = {'custom_{}'.format(field_value.contribution_field.id): field_value.data for
                           field_value in abstract.field_values}
-    return create_contribution(event, {'friendly_id': abstract.friendly_id,
-                                       'title': abstract.title,
-                                       'duration': duration,
-                                       'description': abstract.description,
-                                       'type': abstract.accepted_contrib_type,
-                                       'track': abstract.accepted_track,
-                                       'session': contrib_session,
-                                       'person_link_data': {link: True for link in contrib_person_links}},
-                               custom_fields_data=custom_fields_data)
+    contrib = create_contribution(event, {'friendly_id': abstract.friendly_id,
+                                          'title': abstract.title,
+                                          'duration': duration,
+                                          'description': abstract.description,
+                                          'type': abstract.accepted_contrib_type,
+                                          'track': abstract.accepted_track,
+                                          'session': contrib_session,
+                                          'person_link_data': {link: True for link in contrib_person_links}},
+                                  custom_fields_data=custom_fields_data)
+    if abstracts_settings.get(event, 'copy_attachments') and abstract.files:
+        folder = AttachmentFolder.get_or_create_default(contrib)
+        for abstract_file in abstract.files:
+            attachment = Attachment(user=abstract.submitter, type=AttachmentType.file, folder=folder,
+                                    title=abstract_file.filename)
+            attachment.file = AttachmentFile(user=abstract.submitter, filename=abstract_file.filename,
+                                             content_type=abstract_file.content_type)
+            with abstract_file.open() as fd:
+                attachment.file.save(fd)
+    db.session.flush()
+    return contrib
