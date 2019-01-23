@@ -66,9 +66,9 @@ class BookingEdit extends React.Component {
         const {booking: {occurrences, dateRange}} = props;
         this.state = {
             skipConflicts: false,
-            numberOfConflicts: 0,
-            numberOfCandidates: 0,
-            datePeriodChanged: false,
+            numberOfConflicts: null,
+            numberOfCandidates: null,
+            shouldSplit: false,
             calendars: {
                 currentBooking: {
                     isFetching: false,
@@ -77,7 +77,7 @@ class BookingEdit extends React.Component {
                         cancellations: {...occurrences.cancellations},
                         rejections: {...occurrences.rejections},
                         other: {...occurrences.otherBookings},
-                        pendingCancelations: {},
+                        pendingCancellations: {},
                         candidates: {},
                         conflicts: {}
                     },
@@ -107,27 +107,18 @@ class BookingEdit extends React.Component {
         };
     }
 
-    getNumberOfOccurrenceByType = (data, type) => {
-        if (!(type in data)) {
-            return 0;
-        } else if (type === 'conflicts') {
-            return Object.values(data.conflicts).filter(conflicts => conflicts.length !== 0).length;
-        }
-        return Object.values(data[type]).reduce((acc, cur) => acc + (cur.length ? 1 : 0), 0);
-    };
-
-    resetCalendarStateOnUpdate = (datePeriodChanged) => {
+    resetCalendarStateOnUpdate = (shouldSplit) => {
         const {isOngoingBooking} = this.props;
         const {calendars: {currentBooking, newBooking}} = this.state;
         const newState = {
-            datePeriodChanged,
+            shouldSplit,
             calendars: {currentBooking},
-            numberOfCandidates: 0,
-            numberOfConflicts: 0,
+            numberOfCandidates: null,
+            numberOfConflicts: null,
             skipConflicts: false,
         };
 
-        if (isOngoingBooking && datePeriodChanged) {
+        if (isOngoingBooking && shouldSplit) {
             newState.calendars.newBooking = {
                 ...(newBooking || {}),
                 data: {
@@ -155,13 +146,13 @@ class BookingEdit extends React.Component {
 
     getUpdatedCalendars = (dateRange, newDateRange, candidates, conflicts) => {
         const {isOngoingBooking} = this.props;
-        const {datePeriodChanged, calendars: {currentBooking}} = this.state;
+        const {shouldSplit, calendars: {currentBooking}} = this.state;
         let newCalendars;
 
-        if (isOngoingBooking && datePeriodChanged) {
+        if (isOngoingBooking && shouldSplit) {
             const {data: {bookings}} = currentBooking;
-            const pendingCancelations = _.fromPairs(_.compact(Object.entries(bookings).map(([day, data]) => {
-                return moment().isAfter(day, 'day') ? [day, data] : null;
+            const pendingCancellations = _.fromPairs(_.compact(Object.entries(bookings).map(([day, data]) => {
+                return moment().isSameOrBefore(day, 'day') ? [day, data] : null;
             })));
 
             newCalendars = {
@@ -170,7 +161,7 @@ class BookingEdit extends React.Component {
                     isFetching: false,
                     data: {
                         ...currentBooking.data,
-                        pendingCancelations,
+                        pendingCancellations,
                     },
                     dateRange: dateRange.filter((dt) => moment().isAfter(dt, 'day')),
                 },
@@ -179,7 +170,7 @@ class BookingEdit extends React.Component {
                     data: {
                         ...currentBooking.data,
                         bookings: {},
-                        pendingCancelations: {},
+                        pendingCancellations: {},
                         cancellations: {},
                         candidates,
                         conflicts,
@@ -196,7 +187,7 @@ class BookingEdit extends React.Component {
                         ...currentBooking.data,
                         candidates,
                         conflicts,
-                        pendingCancelations: {},
+                        pendingCancellations: {},
                     },
                     dateRange: _.uniq([...dateRange, ...newDateRange]).sort(),
                 }
@@ -208,25 +199,29 @@ class BookingEdit extends React.Component {
 
     updateBookingCalendar = async (dates, timeSlot, recurrence) => {
         const {
-            isOngoingBooking,
-            booking: {room: {id}, dateRange, id: bookingId, startDt, endDt, repetition}
+            isOngoingBooking, booking: {room: {id}, dateRange, id: bookingId, startDt, endDt, repetition}
         } = this.props;
         const {calendars: {currentBooking}} = this.state;
         const {startTime: newStartTime, endTime: newEndTime} = timeSlot;
-        const datePeriodChanged = (
+        const shouldSplit = (
             serializeTime(startDt) !== newStartTime ||
             serializeTime(endDt) !== newEndTime ||
             !_.isEqual(getRecurrenceInfo(repetition), recurrence)
         );
+        const datePeriodChanged = (
+            !_.isEqual(getRecurrenceInfo(repetition), recurrence) ||
+            !_.isEqual([serializeTime(startDt), serializeTime(endDt)], [newStartTime, newEndTime]) ||
+            !_.isEqual([serializeDate(startDt), serializeDate(endDt)], [dates.startDate, dates.endDate])
+        );
 
         const newDates = {...dates};
-        if (isOngoingBooking && datePeriodChanged) {
+        if (isOngoingBooking && shouldSplit) {
             const today = moment();
             const {startDate} = dates;
             newDates.startDate = today.isBefore(startDate, 'day') ? serializeDate(startDate) : serializeDate(today);
         }
 
-        this.resetCalendarStateOnUpdate(datePeriodChanged);
+        this.resetCalendarStateOnUpdate(shouldSplit);
 
         const params = preProcessParameters({timeSlot, recurrence, dates: newDates}, ajaxFilterRules);
         let response, candidates;
@@ -261,7 +256,7 @@ class BookingEdit extends React.Component {
         this.setState({
             calendars: this.getUpdatedCalendars(dateRange, newDateRange, candidates, availabilityData.conflicts),
             numberOfConflicts: availabilityData.numConflicts,
-            numberOfCandidates: availabilityData.numDaysAvailable
+            numberOfCandidates: datePeriodChanged ? availabilityData.numDaysAvailable : null,
         });
     };
 
@@ -269,7 +264,7 @@ class BookingEdit extends React.Component {
         const {submitting, submitSucceeded, hasValidationErrors, pristine} = fprops;
         const {booking, onClose, actionButtons, isOngoingBooking} = this.props;
         const {room} = booking;
-        const {skipConflicts, datePeriodChanged, calendars, numberOfConflicts, numberOfCandidates} = this.state;
+        const {skipConflicts, shouldSplit, calendars, numberOfConflicts, numberOfCandidates} = this.state;
         const conflictingBooking = numberOfConflicts > 0 && !skipConflicts;
         const submitBlocked = submitting || submitSucceeded || hasValidationErrors || pristine || conflictingBooking;
 
@@ -284,7 +279,7 @@ class BookingEdit extends React.Component {
                         <Grid.Column>
                             <RoomBasicDetails room={room} />
                             {isOngoingBooking && (
-                                <Message color="blue" size="mini" styleName="ongoing-booking-info" icon>
+                                <Message color="blue" styleName="ongoing-booking-info" icon>
                                     <Icon name="play" />
                                     <Translate>
                                         This booking has already started.
@@ -300,7 +295,7 @@ class BookingEdit extends React.Component {
                                                  booking={booking}
                                                  numberOfCandidates={numberOfCandidates}
                                                  numberOfConflicts={numberOfConflicts}
-                                                 datePeriodChanged={datePeriodChanged} />
+                                                 shouldSplit={shouldSplit && isOngoingBooking} />
                             {this.renderConflictsMessage()}
                         </Grid.Column>
                     </Grid>

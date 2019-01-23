@@ -35,9 +35,9 @@ export default function OccurrencesCounter({bookingsCount, newBookingsCount, pas
                     Number of booking occurrences
                 </Translate>
             </Popup>
-            {newBookingsCount > 0 && (
+            {newBookingsCount !== null && (
                 <div>
-                    {pastBookingsCount > 0 && (
+                    {pastBookingsCount !== null && (
                         <div styleName="old-occurrences-count">
                             <div styleName="arrow">→</div>
                             <Popup trigger={<Label size="tiny" content={pastBookingsCount} color="orange" circular />}
@@ -49,7 +49,7 @@ export default function OccurrencesCounter({bookingsCount, newBookingsCount, pas
                             </Popup>
                         </div>
                     )}
-                    <div className={toClasses({'new-occurrences-count': true, 'single-arrow': pastBookingsCount === 0})}>
+                    <div className={toClasses({'new-occurrences-count': true, 'single-arrow': pastBookingsCount === null})}>
                         <div styleName="arrow">→</div>
                         <Popup trigger={<Label size="tiny" content={newBookingsCount} color="green" circular />}
                                position="bottom center"

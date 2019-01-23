@@ -35,7 +35,7 @@ const classes = {
     nonbookablePeriods: 'unbookable-periods',
     unbookableHours: 'unbookable-hours',
     cancellations: 'cancellation',
-    pendingCancelations: 'pending-cancellations',
+    pendingCancellations: 'pending-cancellations',
     rejections: 'rejection',
     other: 'other',
 };
@@ -48,7 +48,7 @@ const types = {
     unbookableHours: 'unbookable-hours',
     preBookings: 'pre-booking',
     cancellations: 'cancellation',
-    pendingCancelations: 'pending-cancellations',
+    pendingCancellations: 'pending-cancellations',
     rejections: 'rejection',
     other: 'other',
 };

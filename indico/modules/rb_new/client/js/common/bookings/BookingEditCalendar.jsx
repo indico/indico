@@ -32,10 +32,9 @@ import './BookingEditCalendar.module.scss';
 class BookingEditCalendar extends React.Component {
     static propTypes = {
         booking: PropTypes.object.isRequired,
-        isOngoingBooking: PropTypes.bool.isRequired,
         numberOfBookingOccurrences: PropTypes.number.isRequired,
         numberOfCandidates: PropTypes.number,
-        datePeriodChanged: PropTypes.bool.isRequired,
+        shouldSplit: PropTypes.bool.isRequired,
         calendars: PropTypes.object.isRequired,
     };
 
@@ -63,7 +62,7 @@ class BookingEditCalendar extends React.Component {
                 other: data.other[day] || [],
                 candidates: (data.candidates[day] || []).map(candidate => ({...candidate, bookable: false})),
                 conflicts: data.conflicts[day] || [],
-                pendingCancelations: data.pendingCancelations[day] || [],
+                pendingCancellations: data.pendingCancellations[day] || [],
             },
             label: serializeDate(day, 'L'),
             key: day,
@@ -78,9 +77,14 @@ class BookingEditCalendar extends React.Component {
 
     renderNumberOfOccurrences = () => {
         const {
-            calendars: {currentBooking: {data: {pendingCancelations}}}, numberOfBookingOccurrences, numberOfCandidates,
+            calendars: {currentBooking: {data: {bookings, pendingCancellations}}}, numberOfBookingOccurrences,
+            numberOfCandidates, shouldSplit,
         } = this.props;
-        const numBookingPastOccurrences = Object.keys(pendingCancelations).length;
+        const numBookingPastOccurrences = (
+            shouldSplit
+                ? Object.keys(bookings).length - Object.keys(pendingCancellations).length
+                : null
+        );
 
         return (
             <OccurrencesCounter bookingsCount={numberOfBookingOccurrences}
@@ -90,7 +94,7 @@ class BookingEditCalendar extends React.Component {
     };
 
     render() {
-        const {datePeriodChanged, isOngoingBooking, calendars: {currentBooking, newBooking}} = this.props;
+        const {shouldSplit, calendars: {currentBooking, newBooking}} = this.props;
         return (
             <div styleName="booking-calendar">
                 <Header className="legend-header">
@@ -102,7 +106,7 @@ class BookingEditCalendar extends React.Component {
                            content={<TimelineLegend labels={BookingEditCalendar.legendLabels} compact />} />
                     {this.renderNumberOfOccurrences()}
                 </Header>
-                {isOngoingBooking && datePeriodChanged && (
+                {shouldSplit && (
                     <Message styleName="ongoing-booking-explanation" color="green" icon>
                         <Icon name="code branch" />
                         <Message.Content>
@@ -128,7 +132,7 @@ class BookingEditCalendar extends React.Component {
                     <div styleName="original-booking">
                         <DailyTimelineContent rows={this.getCalendarData(currentBooking)}
                                               maxHour={24}
-                                              renderHeader={isOngoingBooking && datePeriodChanged ? () => (
+                                              renderHeader={shouldSplit ? () => (
                                                   <Header as="h3" color="orange" styleName="original-booking-header">
                                                       <Translate>Original booking</Translate>
                                                   </Header>
@@ -157,7 +161,6 @@ class BookingEditCalendar extends React.Component {
 
 export default connect(
     (state, {booking: {id}}) => ({
-        isOngoingBooking: bookingsSelectors.isOngoingBooking(state, {bookingId: id}),
         numberOfBookingOccurrences: bookingsSelectors.getNumberOfBookingOccurrences(state, {bookingId: id}),
     }),
 )(BookingEditCalendar);
