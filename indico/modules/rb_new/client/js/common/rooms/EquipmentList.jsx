@@ -21,6 +21,7 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import _ from 'lodash';
 import {Dropdown, Icon, List} from 'semantic-ui-react';
+import {Translate} from 'indico/react/i18n';
 import * as roomsSelectors from './selectors';
 
 import './EquipmentList.module.scss';
@@ -36,21 +37,17 @@ class EquipmentList extends React.Component {
         equipmentTypes: PropTypes.arrayOf(PropTypes.object).isRequired,
     };
 
-    generateEquipmentOptions = () => {
-        const {value} = this.props;
-        const {equipmentTypes} = this.props;
+    get generateEquipmentOptions() {
+        const {value, equipmentTypes} = this.props;
         return equipmentTypes
             .filter(eq => !value.includes(eq.id))
             .map(eq => ({key: eq.id, text: eq.name, value: eq.id}));
-    };
+    }
 
     render() {
         const {onChange, onFocus, onBlur, value, equipmentTypes, label} = this.props;
-        if (!equipmentTypes || !value) {
-            return;
-        }
-        const equipmentTypesMapped = _.mapKeys(equipmentTypes, 'id');
-        const options = this.generateEquipmentOptions();
+        const equipmentTypesMap = _.mapKeys(equipmentTypes, 'id');
+        const options = this.generateEquipmentOptions;
         return (
             <>
                 <Dropdown button
@@ -69,20 +66,19 @@ class EquipmentList extends React.Component {
                               onChange([...value, values.value]);
                           }} />
                 <List key="equipment" divided>
-                    {value.map((equipmentId) => (
-                        <List.Item key={equipmentTypesMapped[equipmentId].id}>
+                    {value && value.map((equipmentId) => (
+                        <List.Item key={equipmentId}>
                             <List.Content floated="right">
                                 <Icon styleName="equipment-button" name="trash" onClick={() => {
-                                    _.remove(value, (n) => {
-                                        return n === equipmentId;
-                                    });
+                                    _.remove(value, (n) => n === equipmentId);
                                     onChange([...value]);
                                 }} />
                             </List.Content>
-                            <List.Content>{equipmentTypesMapped[equipmentId].name}</List.Content>
+                            <List.Content>{equipmentTypesMap[equipmentId].name}</List.Content>
                         </List.Item>
                     ))}
                 </List>
+                {value.length === 0 && <div><Translate>No equipment found</Translate></div>}
             </>
         );
     }

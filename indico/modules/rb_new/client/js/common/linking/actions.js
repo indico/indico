@@ -20,7 +20,7 @@ import getLinkedObjectDataURL from 'indico-url:rooms_new.linked_object_data';
 import _ from 'lodash';
 import qs from 'qs';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
-import camelizeKeys from 'indico/utils/camelize';
+import {camelizeKeys} from 'indico/utils/case';
 
 
 export const SET_OBJECT = 'linking/SET_OBJECT';

@@ -30,7 +30,11 @@ import './DailyAvailability.module.scss';
 export default class DailyAvailability extends React.Component {
     static propTypes = {
         onChange: PropTypes.func.isRequired,
-        value: PropTypes.arrayOf(PropTypes.object).isRequired,
+        value: PropTypes.arrayOf(PropTypes.object),
+    };
+
+    static defaultProps = {
+        value: []
     };
 
     handleTimesChange = ({startTime, endTime}, key) => {
@@ -44,6 +48,23 @@ export default class DailyAvailability extends React.Component {
         }));
     };
 
+    handleRemoveTimes = (key) => {
+        const {onChange, value} = this.props;
+        onChange([...value.filter((bH) => bH.key !== key)]);
+    };
+
+    renderEntry = (bookableHour) => {
+        const {startTime: startT, endTime: endT, key} = bookableHour;
+        return (
+            <div key={key} className="flex-container">
+                <TimeRangePicker startTime={moment(startT, 'HH:mm')}
+                                 endTime={moment(endT, 'HH:mm')}
+                                 onChange={(startTime, endTime) => this.handleTimesChange({startTime, endTime}, key)} />
+                <Icon floated="right" name="trash" className="trash-button" onClick={() => this.handleRemoveTimes(key)} />
+            </div>
+        );
+    };
+
     render() {
         const {value, onChange} = this.props;
         return (
@@ -55,20 +76,8 @@ export default class DailyAvailability extends React.Component {
                     <Icon name="plus" />
                     <Translate>Add new Daily Availability</Translate>
                 </Button>
-                {value && value.map((bookableHour) => {
-                    const {startTime: startT, endTime: endT, key} = bookableHour;
-                    return (
-                        <div key={key} className="flex-container">
-                            <TimeRangePicker startTime={moment(startT, 'HH:mm')}
-                                             endTime={moment(endT, 'HH:mm')}
-                                             onChange={(startTime, endTime) => this.handleTimesChange({startTime, endTime}, key)} />
-                            <Icon floated="right" name="trash" className="trash-button" onClick={() => {
-                                onChange([...value.filter((bH) => bH.key !== key)]);
-                            }} />
-                        </div>
-                    );
-                })}
-                {!value && <Translate>No daily availability found</Translate>}
+                {value && value.map((bookableHour) => this.renderEntry(bookableHour))}
+                {value.length === 0 && <div><Translate>No daily availability found</Translate></div>}
             </>
         );
     }

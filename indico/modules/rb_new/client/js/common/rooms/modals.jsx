@@ -19,7 +19,6 @@ import React from 'react';
 
 import RoomDetailsPreloader from './RoomDetailsPreloader';
 import RoomDetailsModal from './RoomDetailsModal';
-import RoomEditModal from './RoomEditModal';
 
 
 export default {
@@ -32,11 +31,6 @@ export default {
     'room-details-book': (onClose, roomId) => (
         <RoomDetailsPreloader roomId={roomId}>
             {() => <RoomDetailsModal roomId={roomId} onClose={onClose} />}
-        </RoomDetailsPreloader>
-    ),
-    'room-edit': (onClose, roomId) => (
-        <RoomDetailsPreloader roomId={roomId}>
-            {() => <RoomEditModal roomId={roomId} onClose={onClose} />}
         </RoomDetailsPreloader>
     )
 };

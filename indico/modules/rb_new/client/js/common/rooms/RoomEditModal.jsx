@@ -24,12 +24,14 @@ import updateRoomBasicDetailsURL from 'indico-url:rooms_new.admin_update_room';
 import updateRoomEquipmentURL from 'indico-url:rooms_new.admin_update_room_equipment';
 import updateRoomAttributesURL from 'indico-url:rooms_new.admin_update_room_attributes';
 import updateRoomAvailabilityURL from 'indico-url:rooms_new.admin_update_room_availability';
+
 import _ from 'lodash';
 import React from 'react';
 import {bindActionCreators} from 'redux';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import {Button, Checkbox, Dimmer, Dropdown, Form, Grid, Header, Input, Loader, Message, Modal, TextArea} from 'semantic-ui-react';
+import {Button, Checkbox, Dimmer, Dropdown, Form, Grid, Header, Input, Loader, Message, Modal,
+        TextArea} from 'semantic-ui-react';
 import {Form as FinalForm, Field} from 'react-final-form';
 import {FieldArray} from 'react-final-form-arrays';
 import arrayMutators from 'final-form-arrays';
@@ -55,7 +57,7 @@ function isInvalidNotificationPeriod(days) {
 }
 
 function validate(fields) {
-    const {building, floor, number, capacity, attributes, surfaceArea, nonbookablePeriods, notificationBeforeDays,
+    const {building, floor, number, capacity, surfaceArea, nonbookablePeriods, notificationBeforeDays,
            notificationBeforeDaysWeekly, notificationBeforeDaysMonthly} = fields;
     const errors = {};
     if (!building) {
@@ -70,26 +72,23 @@ function validate(fields) {
     if (!capacity) {
         errors.capacity = Translate.string('Please provide capacity.');
     }
-    if (capacity !== null && capacity < 1) {
+    if (capacity < 1) {
         errors.capacity = Translate.string('Please provide a valid capacity number.');
     }
-    if (surfaceArea !== null && surfaceArea < 1) {
+    if (surfaceArea < 1) {
         errors.surfaceArea = Translate.string('Please provide a valid surface area number.');
     }
     if (isInvalidNotificationPeriod(notificationBeforeDays)) {
-        errors.notificationBeforeDays = Translate.string('Number of days must be between [1, 30]');
+        errors.notificationBeforeDays = Translate.string('Number of days must be between 1 and 30');
     }
     if (isInvalidNotificationPeriod(notificationBeforeDaysWeekly)) {
-        errors.notificationBeforeDaysWeekly = Translate.string('Number of days must be between [1, 30]');
+        errors.notificationBeforeDaysWeekly = Translate.string('Number of days must be between 1 and 30');
     }
     if (isInvalidNotificationPeriod(notificationBeforeDaysMonthly)) {
-        errors.notificationBeforeDaysMonthly = Translate.string('Number of days must be between [1, 30]');
-    }
-    if (!attributes) {
-        errors.attributes = Translate.string('Please provide an attribute value.');
+        errors.notificationBeforeDaysMonthly = Translate.string('Number of days must be between 1 and 30');
     }
     if (nonbookablePeriods && nonbookablePeriods.some(x => !x.startDt || !x.endDt)) {
-        errors.nonbookablePeriods = Translate.string('Please provide valid nonbookable periods.');
+        errors.nonbookablePeriods = Translate.string('Please provide valid non-bookable periods.');
     }
     return errors;
 }
@@ -126,7 +125,7 @@ const columns = [
         content: [{
             type: 'input',
             name: 'capacity',
-            label: Translate.string('Capacity(seats)'),
+            label: Translate.string('Capacity'),
             inputType: 'number',
             required: true
         }, {
@@ -183,20 +182,20 @@ const columns = [
         content: [{
             type: 'input',
             name: 'longitude',
-            label: Translate.string('longitude'),
+            label: Translate.string('Longitude'),
             inputType: 'number',
             required: false
         }, {
             type: 'input',
             name: 'latitude',
-            label: Translate.string('latitude'),
+            label: Translate.string('Latitude'),
             inputType: 'number',
             required: false
         }]
     }, {
         type: 'input',
         name: 'surfaceArea',
-        label: Translate.string('Surface Area (m2)'),
+        label: Translate.string('Surface Area (m²)'),
         inputType: 'number',
         required: false
     }, {
@@ -210,10 +209,6 @@ const columns = [
         label: 'Options',
     }, {
         type: 'checkbox',
-        name: 'isActive',
-        label: Translate.string('Active')
-    }, {
-        type: 'checkbox',
         name: 'isReservable',
         label: Translate.string('Bookable')
     }, {
@@ -223,7 +218,7 @@ const columns = [
     }, {
         type: 'checkbox',
         name: 'notificationsEnabled',
-        label: Translate.string('Reminders Enabled')
+        label: Translate.string('Reminders enabled')
     }, {
         type: 'input',
         name: 'notificationBeforeDays',
@@ -244,19 +239,19 @@ const columns = [
         required: false
     }], [{
         type: 'header',
-        label: Translate.string('Custom Attributes')
+        label: Translate.string('Custom attributes')
     }, {
         type: 'attributes',
         placeholder: Translate.string('Add new attributes'),
     }, {
         type: 'header',
-        label: Translate.string('Equipment Available')
+        label: Translate.string('Equipment available')
     }, {
         type: 'equipment',
         placeholder: Translate.string('Add new equipment')
     }, {
         type: 'header',
-        label: Translate.string('Nonbookable Periods'),
+        label: Translate.string('Non-bookable periods'),
     }, {
         type: 'nonBookablePeriods'
     }, {
@@ -330,7 +325,6 @@ class RoomEditModal extends React.Component {
         this.setState({attributes: response.data});
     }
 
-
     async fetchRoomAvailability() {
         const {roomId} = this.props;
         let response;
@@ -373,17 +367,17 @@ class RoomEditModal extends React.Component {
     handleSubmit = async (data, form) => {
         const {roomId} = this.props;
         const changedValues = getChangedValues(data, form);
-        const basicDetails = _.omit(changedValues, ['attributes', 'bookableHours', 'nonbookablePeriods', 'availableEquipment']);
+        const basicDetails = _.omit(changedValues, ['attributes', 'bookableHours', 'nonbookablePeriods', 'availableEquipment', 'owner']);
         if ('owner' in changedValues) {
             basicDetails.owner_id = changedValues.owner.id;
         }
         const {availableEquipment, nonbookablePeriods, bookableHours, attributes} = changedValues;
 
         try {
-            await this.saveBasicDetails(roomId, basicDetails);
-            await this.saveEquipment(roomId, availableEquipment);
-            await this.saveAttributes(roomId, attributes);
-            await this.saveAvailability(roomId, changedValues, nonbookablePeriods, bookableHours);
+            this.saveBasicDetails(roomId, basicDetails);
+            this.saveEquipment(roomId, availableEquipment);
+            this.saveAttributes(roomId, attributes);
+            this.saveAvailability(roomId, changedValues, nonbookablePeriods, bookableHours);
             this.setState({submitSucceeded: true});
         } catch (e) {
             handleAxiosError(e);
@@ -391,38 +385,38 @@ class RoomEditModal extends React.Component {
         }
     };
 
-    saveBasicDetails = (roomId, basicDetails) => {
+    async saveBasicDetails(roomId, basicDetails) {
         if (!_.isEmpty(basicDetails)) {
-            return indicoAxios.patch(updateRoomBasicDetailsURL({room_id: roomId}), snakifyKeys(basicDetails));
+            return await indicoAxios.patch(updateRoomBasicDetailsURL({room_id: roomId}), snakifyKeys(basicDetails));
         } else {
-            return Promise.resolve();
+            return await Promise.resolve();
         }
-    };
+    }
 
-    saveEquipment = (roomId, availableEquipment) => {
+    async saveEquipment(roomId, availableEquipment) {
         if (availableEquipment) {
-            return indicoAxios.post(updateRoomEquipmentURL({room_id: roomId}),
-                                    {available_equipment: availableEquipment});
+            return await indicoAxios.post(updateRoomEquipmentURL({room_id: roomId}),
+                                          {available_equipment: availableEquipment});
         } else {
-            return Promise.resolve();
+            return await Promise.resolve();
         }
-    };
+    }
 
-    saveAttributes = (roomId, attributes) => {
+    async saveAttributes(roomId, attributes) {
         if (attributes) {
-            return indicoAxios.post(updateRoomAttributesURL({room_id: roomId}), {attributes});
+            return await indicoAxios.post(updateRoomAttributesURL({room_id: roomId}), {attributes});
         } else {
-            return Promise.resolve();
+            return await Promise.resolve();
         }
-    };
+    }
 
-    saveAvailability = (roomId, changedValues, nonbookablePeriods, bookableHours) => {
+    async saveAvailability(roomId, changedValues, nonbookablePeriods, bookableHours) {
         if (nonbookablePeriods || bookableHours) {
-            return indicoAxios.post(updateRoomAvailabilityURL({room_id: roomId}), snakifyKeys(_.pick(changedValues, ['bookableHours', 'nonbookablePeriods'])));
+            return await indicoAxios.post(updateRoomAvailabilityURL({room_id: roomId}), snakifyKeys(_.pick(changedValues, ['bookableHours', 'nonbookablePeriods'])));
         } else {
-            return Promise.resolve();
+            return await Promise.resolve();
         }
-    };
+    }
 
     renderImage = (position) => {
         return <SpriteImage key="image" pos={position} />;
@@ -467,6 +461,7 @@ class RoomEditModal extends React.Component {
                                            icon={{name: 'trash', color: 'red', link: true, onClick: () => fields.remove(index)}} />
                                 </div>
                             ))}
+                            {fields.length === 0 && <div><Translate>No custom attributes found</Translate></div>}
                         </div>
                     );
                 }}
@@ -498,9 +493,7 @@ class RoomEditModal extends React.Component {
                            required={content.required}
                            as="input"
                            type={content.inputType || 'text'}
-                           parse={(value) => {
-                               return value === '' ? null : value;
-                           }} />
+                           parse={(value) => value || null} />
                 );
             case 'owner':
                 return (
@@ -557,7 +550,10 @@ class RoomEditModal extends React.Component {
                            name="bookableHours"
                            component={ReduxFormField}
                            as={DailyAvailability}
-                           isEqual={_.isEqual} />
+                           isEqual={_.isEqual}
+                           format={(value) => {
+                               return value === null ? [] : value;
+                           }} />
                 );
             case 'nonBookablePeriods':
                 return (
@@ -565,7 +561,10 @@ class RoomEditModal extends React.Component {
                            name="nonbookablePeriods"
                            component={ReduxFormField}
                            as={NonBookablePeriods}
-                           isEqual={_.isEqual} />
+                           isEqual={_.isEqual}
+                           format={(value) => {
+                               return value === null ? [] : value;
+                           }} />
                 );
             case 'message':
                 return (
@@ -580,24 +579,23 @@ class RoomEditModal extends React.Component {
     };
 
     renderModalContent = (fprops) => {
-        const formProps = {onSubmit: fprops.handleSubmit};
         const {hasValidationErrors, pristine, submitting, submitSucceeded} = fprops;
-        const {onClose} = this.props;
         return (
             <>
                 <Modal.Header>
                     {Translate.string('Edit Room Details')}
                 </Modal.Header>
                 <Modal.Content scrolling>
-                    <Form id="room-form" {...formProps}>
+                    <Form id="room-form"
+                          onSubmit={fprops.handleSubmit}>
                         <Grid columns={3}>
                             {columns.map(this.renderColumn)}
                         </Grid>
                     </Form>
                 </Modal.Content>
                 <Modal.Actions>
-                    <Button onClick={onClose}>
-                        Cancel
+                    <Button onClick={this.handleCloseModal}>
+                        <Translate>Cancel</Translate>
                     </Button>
                     <Button type="submit"
                             form="room-form"
@@ -620,7 +618,6 @@ class RoomEditModal extends React.Component {
 
     render() {
         const {room, roomAttributes, attributes, roomEquipment, roomAvailability} = this.state;
-        const props = {validate, onSubmit: this.handleSubmit};
         if (!room || !attributes || !roomAttributes || !roomEquipment) {
             return <Dimmer active page><Loader /></Dimmer>;
         }
@@ -633,7 +630,8 @@ class RoomEditModal extends React.Component {
         return (
             <>
                 <Modal open onClose={this.handleCloseModal} size="large" closeIcon>
-                    <FinalForm {...props}
+                    <FinalForm validate={validate}
+                               onSubmit={this.handleSubmit}
                                render={this.renderModalContent}
                                initialValues={initialValues}
                                mutators={{

@@ -32,10 +32,10 @@ export const FETCH_EQUIPMENT_TYPES_SUCCESS = 'rooms/FETCH_EQUIPMENT_TYPES_SUCCES
 export const FETCH_EQUIPMENT_TYPES_ERROR = 'rooms/FETCH_EQUIPMENT_TYPES_ERROR';
 export const EQUIPMENT_TYPES_RECEIVED = 'rooms/EQUIPMENT_TYPES_RECEIVED';
 
-export const ROOM_RECEIVED = 'rooms/ROOM_RECEIVED';
-export const FETCH_ROOM_REQUEST = 'rooms/FETCH_ROOM_REQUEST';
-export const FETCH_ROOM_SUCCESS = 'rooms/FETCH_ROOM_SUCCESS';
-export const FETCH_ROOM_ERROR = 'rooms/FETCH_ROOM_ERROR';
+export const ROOM_DETAILS_RECEIVED = 'rooms/ROOM_DETAILS_RECEIVED';
+export const FETCH_ROOM_DETAILS_REQUEST = 'rooms/FETCH_ROOM_DETAILS_REQUEST';
+export const FETCH_ROOM_DETAILS_SUCCESS = 'rooms/FETCH_ROOM_DETAILS_SUCCESS';
+export const FETCH_ROOM_DETAILS_ERROR = 'rooms/FETCH_ROOM_DETAILS_ERROR';
 
 export const ROOMS_RECEIVED = 'rooms/ROOMS_RECEIVED';
 export const FETCH_ROOMS_REQUEST = 'rooms/FETCH_ROOMS_REQUEST';
@@ -65,9 +65,9 @@ export function fetchEquipmentTypes() {
 export function fetchRoom(id) {
     return ajaxAction(
         () => indicoAxios.get(fetchRoomURL({room_id: id})),
-        FETCH_ROOM_REQUEST,
-        [ROOM_RECEIVED, FETCH_ROOM_SUCCESS],
-        FETCH_ROOM_ERROR
+        FETCH_ROOM_DETAILS_REQUEST,
+        [ROOM_DETAILS_RECEIVED, FETCH_ROOM_DETAILS_SUCCESS],
+        FETCH_ROOM_DETAILS_ERROR
     );
 }
 

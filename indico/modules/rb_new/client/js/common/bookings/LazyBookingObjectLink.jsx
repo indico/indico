@@ -22,7 +22,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {Placeholder, Segment} from 'semantic-ui-react';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
-import camelizeKeys from 'indico/utils/camelize';
+import {camelizeKeys} from 'indico/utils/case';
 import BookingObjectLink from './BookingObjectLink';
 
 /**

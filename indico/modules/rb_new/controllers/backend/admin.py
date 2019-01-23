@@ -266,18 +266,12 @@ class RHRoomAdminBase(RHRoomBookingAdminBase):
         self.room = Room.get_one(request.view_args['room_id'])
 
 
-class RHRoomAttributesAll(RHRoomBookingBase):
-    def _process_args(self):
-        attributes = RoomAttribute.query.all()
-        return jsonify(attributes_schema.dump(attributes).data)
-
-
 class RHRoomAttributes(RHRoomAdminBase):
     def _process(self):
         return jsonify(room_attribute_values_schema.dump(self.room.attributes).data)
 
 
-class RHRoomAttributesUpdate(RHRoomAdminBase):
+class RHUpdateRoomAttributes(RHRoomAdminBase):
     @use_kwargs({'attributes': fields.Nested({'title': fields.Str(),
                                               'value': fields.Str(),
                                               'name': fields.Str()}, many=True)})
@@ -288,11 +282,13 @@ class RHRoomAttributesUpdate(RHRoomAdminBase):
 
 class RHRoomAvailability(RHRoomAdminBase):
     def _process(self):
-        return jsonify(nonbookable_periods=nonbookable_periods_schema.dump(self.room.nonbookable_periods, many=True).data,
-                       bookable_hours=bookable_hours_schema.dump(self.room.bookable_hours, many=True).data)
+        return jsonify(
+            nonbookable_periods=nonbookable_periods_schema.dump(self.room.nonbookable_periods, many=True).data,
+            bookable_hours=bookable_hours_schema.dump(self.room.bookable_hours, many=True).data
+        )
 
 
-class RHRoomAvailabilityUpdate(RHRoomAdminBase):
+class RHUpdateRoomAvailability(RHRoomAdminBase):
     @use_args({'bookable_hours': fields.Nested({'start_time': fields.Time(),
                                                 'end_time': fields.Time()}, many=True),
                'nonbookable_periods': fields.Nested({'start_dt': fields.Date(),
@@ -301,8 +297,10 @@ class RHRoomAvailabilityUpdate(RHRoomAdminBase):
         if 'bookable_hours' in args:
             self._check_invalid_times(args)
         update_room_availability(self.room, args)
-        return jsonify(nonbookable_periods=nonbookable_periods_schema.dump(self.room.nonbookable_periods, many=True).data,
-                       bookable_hours=bookable_hours_schema.dump(self.room.bookable_hours, many=True).data)
+        return jsonify(
+            nonbookable_periods=nonbookable_periods_schema.dump(self.room.nonbookable_periods, many=True).data,
+            bookable_hours=bookable_hours_schema.dump(self.room.bookable_hours, many=True).data
+        )
 
     def _check_invalid_times(self, availability):
         if any(bh['start_time'] >= bh['end_time'] for bh in availability['bookable_hours']):
@@ -314,12 +312,12 @@ class RHRoomEquipment(RHRoomAdminBase):
         return jsonify(room_equipment_schema.dump(self.room).data)
 
 
-class RHRoomEquipmentUpdate(RHRoomAdminBase):
+class RHUpdateRoomEquipment(RHRoomAdminBase):
     @use_args({
         'available_equipment': fields.List(fields.Int(), required=True)
     })
     def _process(self, args):
-        update_room_equipment(self.room, args)
+        update_room_equipment(self.room, args['available_equipment'])
         return jsonify(room_update_schema.dump(self.room, many=False).data)
 
 
@@ -328,7 +326,7 @@ class RHRoom(RHRoomAdminBase):
         return jsonify(room_update_schema.dump(self.room).data)
 
 
-class RHRoomUpdate(RHRoomAdminBase):
+class RHUpdateRoom(RHRoomAdminBase):
     @use_args(room_args)
     def _process(self, args):
         update_room(self.room, args)

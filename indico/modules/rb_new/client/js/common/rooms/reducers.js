@@ -71,7 +71,7 @@ export default combineReducers({
         switch (action.type) {
             case roomsActions.ROOMS_RECEIVED:
                 return camelizeKeys(action.data);
-            case roomsActions.ROOM_RECEIVED:
+            case roomsActions.ROOM_DETAILS_RECEIVED:
                 return [
                     ...state.filter(room => room.id !== action.data.id),
                     camelizeKeys(action.data),

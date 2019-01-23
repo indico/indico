@@ -36,12 +36,10 @@ def _populate_room(room, properties):
     return room
 
 
-def update_room_equipment(room, properties):
-    if 'available_equipment' in properties:
-        available_equipment_ids = properties['available_equipment']
-        available_equipment = EquipmentType.query.filter(EquipmentType.id.in_(available_equipment_ids)).all()
-        room.available_equipment = available_equipment
-        db.session.flush()
+def update_room_equipment(room, available_equipment_ids):
+    available_equipment = EquipmentType.query.filter(EquipmentType.id.in_(available_equipment_ids)).all()
+    room.available_equipment = available_equipment
+    db.session.flush()
 
 
 def update_room_attributes(room, attributes):

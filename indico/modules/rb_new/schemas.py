@@ -79,7 +79,7 @@ class RoomUpdateSchema(RoomSchema):
     class Meta(RoomSchema.Meta):
         fields = RoomSchema.Meta.fields + ('notification_before_days', 'notification_before_days_weekly', 'owner',
                                            'notification_before_days_monthly', 'notifications_enabled',
-                                           'verbose_name', 'is_active', 'site')
+                                           'verbose_name', 'site')
 
 
 class RoomEquipmentSchema(mm.ModelSchema):

@@ -16,7 +16,6 @@
 
 from __future__ import unicode_literals
 
-from marshmallow import fields as mmfields
 from marshmallow_enum import EnumField
 from webargs import fields
 
@@ -28,10 +27,9 @@ from indico.modules.users import User
 _cache = GenericCache('Rooms')
 
 
-class UserField(mmfields.Field):
+class UserField(fields.Field):
     def _deserialize(self, value, attr, data, **kwargs):
-        user = User.get(value, is_deleted=False)
-        return user
+        return User.get(value, is_deleted=False)
 
 
 search_room_args = {
@@ -62,13 +60,12 @@ room_args = {
     'number': fields.String(validate=lambda x: x is not None),
     'longitude': fields.Float(allow_none=True),
     'latitude': fields.Float(allow_none=True),
-    'is_active': fields.Bool(allow_none=True),
     'is_reservable': fields.Bool(allow_none=True),
     'reservations_need_confirmation': fields.Bool(allow_none=True),
     'notification_for_assistance': fields.Bool(allow_none=True),
     'notification_before_days': fields.Int(validate=lambda x: 1 <= x <= 30, aallow_none=True),
     'notification_before_days_weekly': fields.Int(validate=lambda x: 1 <= x <= 30, allow_none=True),
-    'notification_before_monthly': fields.Int(validate=lambda x: 1 <= x <= 30, allow_none=True),
+    'notification_before_days_monthly': fields.Int(validate=lambda x: 1 <= x <= 30, allow_none=True),
     'notifications_enabled': fields.Bool(missing=True, allow_missing=True),
     'booking_limit_days': fields.Int(validate=lambda x: x >= 1, allow_none=True),
     'owner': UserField(load_from='owner_id', validate=lambda x: x is not None, allow_none=True),

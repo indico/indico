@@ -25,15 +25,17 @@ import {Translate} from 'indico/react/i18n';
 import {DateRangePicker} from 'indico/react/components';
 import {serializeDate} from 'indico/utils/date';
 
-import './NonBookablePeriods.module.scss';
-
 
 export default class NonBookablePeriods extends React.Component {
     static propTypes = {
         onFocus: PropTypes.func.isRequired,
         onBlur: PropTypes.func.isRequired,
         onChange: PropTypes.func.isRequired,
-        value: PropTypes.array.isRequired,
+        value: PropTypes.array,
+    };
+
+    static defaultProps = {
+        value: []
     };
 
     handleAddDates = () => {
@@ -57,9 +59,13 @@ export default class NonBookablePeriods extends React.Component {
 
     handleDatesChange = ({startDate, endDate}, key) => {
         const {value, onChange} = this.props;
-        onChange([...value.map(v => (v.key === key ? {...v,
-                                                      startDt: serializeDate(startDate),
-                                                      endDt: serializeDate(endDate)} : v))]);
+        onChange(value.map(v => {
+            if (v.key === key) {
+                return {...v, startDt: serializeDate(startDate), endDt: serializeDate(endDate)};
+            } else {
+                return v;
+            }
+        }));
         this.setTouched();
     };
 
@@ -71,6 +77,21 @@ export default class NonBookablePeriods extends React.Component {
         onBlur();
     };
 
+    renderEntry = (dateRangeItem) => {
+        const {startDt, endDt, key} = dateRangeItem;
+        return (
+            <div key={key} className="flex-container">
+                <DateRangePicker small
+                                 minimumNights={0}
+                                 anchorDirection={ANCHOR_RIGHT}
+                                 startDate={startDt === null ? null : moment(startDt)}
+                                 endDate={endDt === null ? null : moment(endDt)}
+                                 onDatesChange={(dates) => this.handleDatesChange(dates, key)} />
+                <Icon floated="right" name="trash" className="trash-button" onClick={() => this.handleRemoveDates(key)} />
+            </div>
+        );
+    };
+
     render() {
         const {value} = this.props;
         return (
@@ -80,25 +101,11 @@ export default class NonBookablePeriods extends React.Component {
                         icon labelPosition="left"
                         onClick={this.handleAddDates}>
                     <Icon name="plus" />
-                    Add new Nonbookable Periods
+                    <Translate>Add new Nonbookable Periods</Translate>
                 </Button>
-                {value && value.map((dateRangeItem) => {
-                    const {startDt, endDt, key} = dateRangeItem;
-                    return (
-                        <div key={key} className="flex-container">
-                            <DateRangePicker small
-                                             minimumNights={0}
-                                             anchorDirection={ANCHOR_RIGHT}
-                                             startDate={startDt === null ? null : moment(startDt)}
-                                             endDate={endDt === null ? null : moment(endDt)}
-                                             onDatesChange={(dates) => this.handleDatesChange(dates, key)} />
-                            <Icon floated="right" name="trash" className="trash-button" onClick={() => this.handleRemoveDates(key)} />
-                        </div>
-                    );
-                })}
-                {!value && <Translate>No nonbookable periods found</Translate>}
+                {value && value.map((dateRangeItem) => this.renderEntry(dateRangeItem))}
+                {value.length === 0 && <div><Translate>No non-bookable periods found</Translate></div>}
             </>
-
         );
     }
 }
