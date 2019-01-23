@@ -73,6 +73,28 @@ export default class BookingSuggestion extends React.PureComponent {
         onClick: PropTypes.func.isRequired
     };
 
+    getStartTimeSuggestionText(time) {
+        return (time < 0 ? (
+            <PluralTranslate count={time}>
+                <Singular>
+                    One minute earlier
+                </Singular>
+                <Plural>
+                    <Param name="count" value={Math.abs(time)} /> minutes earlier
+                </Plural>
+            </PluralTranslate>
+        ) : (
+            <PluralTranslate count={time}>
+                <Singular>
+                  One minute later
+                </Singular>
+                <Plural>
+                    <Param name="count" value={time} /> minutes later
+                </Plural>
+            </PluralTranslate>
+        ));
+    }
+
     renderSuggestionText(room, {time, duration, skip}) {
         const {onClick} = this.props;
         return (
@@ -81,17 +103,7 @@ export default class BookingSuggestion extends React.PureComponent {
                     <SuggestionOption onClick={onClick}
                                       overrides={{time}}
                                       icon="clock"
-                                      text={(
-                                          <PluralTranslate count={time}>
-                                              <Singular>
-                                                  One minute <Param name="modifier" value={time < 0 ? 'earlier' : 'later'} />
-                                              </Singular>
-                                              <Plural>
-                                                  <Param name="count" value={Math.abs(time)} /> minutes{' '}
-                                                  <Param name="modifier" value={time < 0 ? 'earlier' : 'later'} />
-                                              </Plural>
-                                          </PluralTranslate>
-                                      )}
+                                      text={this.getStartTimeSuggestionText(time)}
                                       tooltip={Translate.string("We'll change your booking's starting time to make it fit")} />
                 )}
                 {duration && time && (
