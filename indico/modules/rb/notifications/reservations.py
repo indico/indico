@@ -75,10 +75,6 @@ def notify_reset_approval(reservation):
         notification.compose_email_to_manager(
             subject='Booking approval changed state on',
             template_name='change_state_email_to_manager'
-        ),
-        notification.compose_email_to_vc_support(
-            subject='Booking approval changed state on',
-            template_name='change_state_email_to_vc_support'
         )
     ])
 
