@@ -24,7 +24,7 @@ termcolor==1.1.0
 webassets==0.12.1
 wsgiref==0.1.2
 zope.interface==3.8.0
-requests==2.18.4
+requests==2.21.0
 pyScss==1.3.5
 Werkzeug==0.14.1
 Flask==0.12.4
