@@ -76,19 +76,22 @@ function filterDeletedBooking(calendar, bookingId, roomId) {
         }
 
         const newRow = {...row};
-        for (const type of Object.keys(row)) {
+
+        Object.keys(row).filter((type) => {
+            return !['unbookableHours', 'nonbookablePeriods'].includes(type);
+        }).forEach((type) => {
             const bookingData = row[type];
             if (!Object.keys(bookingData).length) {
-                continue;
+                return;
             }
 
             for (const dt of Object.keys(bookingData)) {
-                const dayBookingData = bookingData[dt];
+                const dayBookingData = bookingData[dt] || [];
                 newRow[type][dt] = dayBookingData.filter((data) => {
                     return data.reservation.id !== bookingId;
                 });
             }
-        }
+        });
 
         return newRow;
     });
