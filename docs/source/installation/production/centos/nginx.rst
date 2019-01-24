@@ -71,7 +71,6 @@ most cases.
     uid = indico
     gid = nginx
     umask = 027
-    pidfile = /run/uwsgi/uwsgi.pid
 
     processes = 4
     enable-threads = true
