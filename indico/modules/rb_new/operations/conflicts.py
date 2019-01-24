@@ -21,10 +21,10 @@ from collections import defaultdict
 from flask import session
 from sqlalchemy.orm import contains_eager
 
-from indico.modules.rb import rb_is_admin
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import Reservation
 from indico.modules.rb.models.rooms import Room
+from indico.modules.rb.util import rb_is_admin
 from indico.modules.rb_new.util import TempReservationOccurrence
 from indico.util.date_time import get_overlap
 from indico.util.struct.iterables import group_list
@@ -52,6 +52,7 @@ def get_rooms_conflicts(rooms, start_dt, end_dt, repeat_frequency, repeat_interv
     for room_id, occurrences in blocked_rooms.iteritems():
         rooms_conflicts[room_id] += get_room_blockings_conflicts(room_id, candidates, occurrences)
 
+    # TODO: do proper per-room override checks
     if not rb_is_admin(session.user):
         for room_id, occurrences in nonbookable_periods.iteritems():
             rooms_conflicts[room_id] += get_room_nonbookable_periods_conflicts(candidates, occurrences)
