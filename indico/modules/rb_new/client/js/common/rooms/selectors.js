@@ -85,13 +85,14 @@ export const getAllRooms = createSelector(
             });
             const sortedFeatures = _.sortBy(Object.values(features), 'title');
             sortedFeatures.forEach(f => f.equipment.sort());
-            const permissions = allUserPermissions[room.id] || {book: false, prebook: false};
+            const permissions = allUserPermissions[room.id] || {book: false, prebook: false, override: false};
             return [room.id, {
                 ...roomData,
                 equipment: equipment.map(id => equipmentTypes[id].name).sort(),
                 features: sortedFeatures,
                 canUserBook: permissions.book,
                 canUserPrebook: permissions.prebook,
+                canUserOverride: permissions.override,
             }];
         }));
     }
