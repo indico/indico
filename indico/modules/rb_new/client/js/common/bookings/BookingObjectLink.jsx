@@ -84,15 +84,13 @@ export default class BookingObjectLink extends React.PureComponent {
             <Message icon color="teal">
                 <Icon name="linkify" />
                 <Message.Content>
-                    <>
-                        {pending ? pendingMessages[type] : linkedMessages[type]}
-                        <div styleName="object-link">
-                            {type === 'event'
-                                ? <a href={url}>{title}</a>
-                                : <span>{title} (<a href={eventUrl}>{eventTitle}</a>)</span>
-                            }
-                        </div>
-                    </>
+                    {pending ? pendingMessages[type] : linkedMessages[type]}
+                    <div styleName="object-link">
+                        {type === 'event'
+                            ? <a href={url}>{title}</a>
+                            : <span>{title} (<a href={eventUrl}>{eventTitle}</a>)</span>
+                        }
+                    </div>
                 </Message.Content>
             </Message>
         );
