@@ -49,7 +49,7 @@ Internal Changes
 Version 2.1.7
 -------------
 
-*Unreleased*
+*Released on January 24, 2019*
 
 Improvements
 ^^^^^^^^^^^^
@@ -58,6 +58,11 @@ Improvements
   (:issue:`3446`)
 - Add option to copy abstract attachments to contributions when
   accepting them (:issue:`3732`)
+
+Bugfixes
+^^^^^^^^
+
+- Really fix the oauthlib conflict (was still breaking in some cases)
 
 Version 2.1.6
 -------------
