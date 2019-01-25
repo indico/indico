@@ -322,7 +322,6 @@ def split_booking(booking, new_booking_data):
 
     room = booking.room
     occurrences = sorted(booking.occurrences, key=attrgetter('start_dt'))
-    is_prebooking = booking.is_pending
     occurrences_to_cancel = [occ for occ in occurrences if occ.start_dt.date() >= date.today()]
     new_start_dt = datetime.combine(occurrences_to_cancel[0].start_dt.date(), new_booking_data['start_dt'].time())
     for occurrence_to_cancel in occurrences_to_cancel:
@@ -340,5 +339,6 @@ def split_booking(booking, new_booking_data):
     }
 
     booking.modify(old_booking_data, session.user)
+    prebook = not room.can_book(session.user, allow_admin=False) and room.can_prebook(session.user, allow_admin=False)
     return Reservation.create_from_data(room, dict(new_booking_data, start_dt=new_start_dt), session.user,
-                                        prebook=is_prebooking)
+                                        prebook=prebook)
