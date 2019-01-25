@@ -38,12 +38,50 @@ def upgrade():
         schema='roombooking'
     )
 
-    op.add_column('reservations', sa.Column('link_id', sa.Integer(), nullable=True), schema='roombooking')
-    op.create_index(None, 'reservations', ['link_id'], unique=False, schema='roombooking')
+    op.add_column('reservations', sa.Column('link_id', sa.Integer(), nullable=True, index=True), schema='roombooking')
     op.create_foreign_key(None, 'reservations', 'reservation_links', ['link_id'], ['id'], source_schema='roombooking',
                           referent_schema='roombooking')
 
+    # Migrate reservations.event_id to new reservation_links and set
+    # reservations.link_id based on the id of the newly created row.
+    op.execute('''
+        WITH reserv_data AS (
+            SELECT nextval(pg_get_serial_sequence('roombooking.reservation_links', 'id')) AS new_link_id,
+            id AS reserv_id, event_id
+            FROM roombooking.reservations
+            WHERE event_id IS NOT NULL
+        ), link_ids_data AS (
+            INSERT INTO roombooking.reservation_links (id, event_id, linked_event_id, link_type)
+            SELECT new_link_id, event_id, event_id, {}
+            FROM reserv_data
+            RETURNING id AS link_id
+        )
+        UPDATE roombooking.reservations
+        SET link_id = link_ids_data.link_id
+        FROM link_ids_data, reserv_data
+        WHERE id = reserv_data.reserv_id and link_ids_data.link_id = reserv_data.new_link_id;
+    '''.format(LinkType.event.value))
+
+    op.drop_column('reservations', 'event_id', schema='roombooking')
+
 
 def downgrade():
+    op.add_column('reservations', sa.Column('event_id', sa.Integer(), nullable=True), schema='roombooking')
+    op.create_foreign_key(None, 'reservations', 'events', ['event_id'], ['id'], source_schema='roombooking',
+                          referent_schema='events')
+    op.create_index(None, 'reservations', ['event_id'], unique=False, schema='roombooking')
+
+    # Move reservation_links.event_id back to reservation.event_id
+    op.execute('''
+        UPDATE roombooking.reservations
+        SET event_id = reserv_link.event_id
+        FROM (
+            SELECT id, event_id
+            FROM roombooking.reservation_links
+            WHERE event_id IS NOT NULL
+        ) reserv_link
+        WHERE link_id = reserv_link.id;
+    ''')
+
     op.drop_column('reservations', 'link_id', schema='roombooking')
     op.drop_table('reservation_links', schema='roombooking')

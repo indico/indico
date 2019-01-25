@@ -223,12 +223,6 @@ class Reservation(Serializer, db.Model):
         nullable=False,
         default=False
     )
-    event_id = db.Column(
-        db.Integer,
-        db.ForeignKey('events.events.id'),
-        nullable=True,
-        index=True
-    )
     link_id = db.Column(
         db.Integer,
         db.ForeignKey('roombooking.reservation_links.id'),
@@ -264,15 +258,6 @@ class Reservation(Serializer, db.Model):
         'User',
         lazy=False,
         foreign_keys=[created_by_id],
-        backref=db.backref(
-            'reservations',
-            lazy='dynamic'
-        )
-    )
-    #: The Event this reservation was made for
-    event = db.relationship(
-        'Event',
-        lazy=True,
         backref=db.backref(
             'reservations',
             lazy='dynamic'
@@ -361,6 +346,10 @@ class Reservation(Serializer, db.Model):
     def linked_object(self, obj):
         assert self.link is None
         self.link = ReservationLink(object=obj)
+
+    @property
+    def event(self):
+        return self.link.event if self.link else None
 
     @return_ascii
     def __repr__(self):

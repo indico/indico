@@ -402,7 +402,6 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     # - registrations (Registration.event)
     # - reminders (EventReminder.event)
     # - requests (Request.event)
-    # - reservations (Reservation.event)
     # - roles (EventRole.event)
     # - room_reservation_link (ReservationLink.linked_event)
     # - room_reservation_links (ReservationLink.event)
