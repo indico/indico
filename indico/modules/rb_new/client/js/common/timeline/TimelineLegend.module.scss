@@ -43,14 +43,28 @@
                 }
             }
 
+            &.conflict, &.booking, &.new-booking, &.available {
+                &.compact {
+                    border: 1px solid lighten($sui-grey, 20%);
+                }
+            }
+
             &.pre-booking {
                 @include stripes($pre-booking-stripe-colors...);
                 background-size: 35px 35px;
+
+                &.compact {
+                    border: 1px solid lighten($sui-grey, 20%);
+                }
             }
 
             &.pre-booking-conflict {
                 @include stripes($pre-booking-conflict-stripe-colors...);
                 background-size: 35px 35px;
+
+                &.compact {
+                    border: 1px solid lighten($sui-grey, 20%);
+                }
             }
 
             &.unbookable, &.cancellation {

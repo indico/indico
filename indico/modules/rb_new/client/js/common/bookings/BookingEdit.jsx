@@ -239,12 +239,12 @@ class BookingEdit extends React.Component {
         const {calendar: {isFetching, data: av, dateRange}} = this.state;
         const {booking: {room}} = this.props;
         const legendLabels = [
-            {label: Translate.string('Current booking'), color: 'orange'},
+            {label: Translate.string('Current booking'), color: 'orange', style: 'booking'},
             {label: Translate.string('Cancelled occurrences'), style: 'cancellation'},
             {label: Translate.string('Rejected occurrences'), style: 'rejection'},
             {label: Translate.string('Other bookings'), style: 'other'},
-            {label: Translate.string('New booking'), color: 'green'},
-            {label: Translate.string('Conflicts with new booking'), color: 'red'},
+            {label: Translate.string('New booking'), color: 'green', style: 'new-booking'},
+            {label: Translate.string('Conflicts with new booking'), color: 'red', style: 'conflict'},
         ];
         const serializeRow = (day) => {
             return {
