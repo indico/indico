@@ -360,7 +360,7 @@ class BookingDetails extends React.Component {
             }
         } = this.props;
         const legendLabels = [
-            {label: Translate.string('Current'), color: 'orange'},
+            {label: Translate.string('Current'), color: 'orange', style: 'booking'},
             {label: Translate.string('Cancelled'), style: 'cancellation'},
             {label: Translate.string('Rejected'), style: 'rejection'},
             {label: Translate.string('Other bookings'), style: 'other'},
