@@ -17,7 +17,7 @@
 
 import React from 'react';
 
-import {RoomDetailsPreloader} from '../../common/rooms';
+import RoomDetailsPreloader from './RoomDetailsPreloader';
 import RoomDetailsModal from './RoomDetailsModal';
 
 

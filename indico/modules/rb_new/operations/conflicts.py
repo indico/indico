@@ -34,6 +34,7 @@ def get_rooms_conflicts(rooms, start_dt, end_dt, repeat_frequency, repeat_interv
                         nonbookable_periods, unbookable_hours, skip_conflicts_with=None):
     rooms_conflicts = defaultdict(list)
     rooms_pre_conflicts = defaultdict(list)
+    skip_conflicts_with = skip_conflicts_with or []
 
     candidates = ReservationOccurrence.create_series(start_dt, end_dt, (repeat_frequency, repeat_interval))
     room_ids = [room.id for room in rooms]
@@ -66,10 +67,9 @@ def get_rooms_conflicts(rooms, start_dt, end_dt, repeat_frequency, repeat_interv
     return rooms_conflicts, rooms_pre_conflicts
 
 
-def get_room_bookings_conflicts(candidates, occurrences, skip_conflicts_with=None):
+def get_room_bookings_conflicts(candidates, occurrences, skip_conflicts_with=frozenset()):
     conflicts = []
     pre_conflicts = []
-    skip_conflicts_with = skip_conflicts_with or []
     for candidate in candidates:
         for occurrence in occurrences:
             if occurrence.reservation.id in skip_conflicts_with:

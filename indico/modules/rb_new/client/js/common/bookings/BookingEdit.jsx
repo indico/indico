@@ -147,7 +147,6 @@ class BookingEdit extends React.Component {
     getUpdatedCalendars = (dateRange, newDateRange, candidates, conflicts) => {
         const {isOngoingBooking} = this.props;
         const {shouldSplit, calendars: {currentBooking}} = this.state;
-        let newCalendars;
 
         if (isOngoingBooking && shouldSplit) {
             const {data: {bookings}} = currentBooking;
@@ -155,7 +154,7 @@ class BookingEdit extends React.Component {
                 return moment().isSameOrBefore(day, 'day') ? [day, data] : null;
             })));
 
-            newCalendars = {
+            return {
                 currentBooking: {
                     ...currentBooking,
                     isFetching: false,
@@ -179,7 +178,7 @@ class BookingEdit extends React.Component {
                 }
             };
         } else {
-            newCalendars = {
+            return {
                 currentBooking: {
                     ...currentBooking,
                     isFetching: false,
@@ -193,8 +192,6 @@ class BookingEdit extends React.Component {
                 }
             };
         }
-
-        return newCalendars;
     };
 
     updateBookingCalendar = async (dates, timeSlot, recurrence) => {
