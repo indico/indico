@@ -84,7 +84,7 @@ class RHRoomBookingEventBase(RHManageEventBase, RHRoomBookingBase):
 
 class RHRoomBookingEventBookingList(RHRoomBookingEventBase):
     def _process(self):
-        reservations = self.event.reservations.all()
+        reservations = self.event.reservations
         if not reservations:
             return redirect(url_for('event_mgmt.rooms_choose_event', self.event))
         return WPRoomBookingEventBookingList(self, self.event, reservations=reservations).display()

@@ -868,6 +868,10 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         from indico.modules.events.papers.models.call_for_papers import CallForPapers
         return CallForPapers(self)
 
+    @property
+    def reservations(self):
+        return [link.reservation for link in self.room_reservation_links]
+
     @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'start_dt', 'end_dt', is_deleted=False, is_locked=False,

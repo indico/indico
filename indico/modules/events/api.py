@@ -294,7 +294,7 @@ class SerializerBase(object):
             '_fossil': 'conference',
             'adjustedStartDate': self._serialize_date(event.start_dt_local),
             'adjustedEndDate': self._serialize_date(event.end_dt_local),
-            'bookedRooms': Conversion.reservationsList(event.reservations.all()),
+            'bookedRooms': Conversion.reservationsList(event.reservations),
             'supportInfo': {
                 '_fossil': 'supportInfo',
                 'caption': event.contact_title,

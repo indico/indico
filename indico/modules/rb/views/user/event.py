@@ -17,7 +17,6 @@
 from indico.legacy.common.cache import GenericCache
 from indico.legacy.webinterface.wcomponents import TabControl, WTabControl, WTemplated
 from indico.modules.events.management.views import WPEventManagementLegacy
-from indico.modules.rb.models.reservations import Reservation
 from indico.modules.rb.views.user.reservations import (WPRoomBookingBookingDetails, WPRoomBookingModifyBooking,
                                                        WPRoomBookingNewBookingConfirm,
                                                        WPRoomBookingNewBookingSelectPeriod,
@@ -38,7 +37,7 @@ class WPRoomBookingEventBase(WPEventManagementLegacy):
                                                       url_for('event_mgmt.rooms_booking_list', self.event))
         self._tabNewBooking = self._tabCtrl.newTab('new', 'New Booking',
                                                    url_for('event_mgmt.rooms_choose_event', self.event))
-        if not Reservation.query.with_parent(self.event).has_rows():
+        if not self.event.reservations:
             self._tabExistBookings.setEnabled(False)
         self._setActiveTab()
 
