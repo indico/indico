@@ -22,15 +22,10 @@ $highlight-color: #7dcfb6;
 $dark-highlight-color: #45ba97;
 $primary-color: #2185d0;
 
-$sui-red: $red;
-$sui-orange: $orange;
-$sui-green: $green;
-$sui-grey: $gray;
-
-$pre-booking-stripe-colors: ($sui-orange, lighten($sui-orange, 14%));
-$pre-booking-conflict-stripe-colors: ($sui-red, lighten($sui-red, 14%));
+$pre-booking-stripe-colors: ($orange, lighten($orange, 14%));
+$pre-booking-conflict-stripe-colors: ($red, lighten($red, 14%));
 $blocking-stripe-colors: (lighten($light-red, 10%), $light-red);
-$rejection-stripe-colors: (lighten($sui-grey, 30%), lighten($sui-grey, 40%));
+$rejection-stripe-colors: (lighten($gray, 30%), lighten($gray, 40%));
 
 %rb-splash-background {
     background-image: url('static:images/globe.png');
