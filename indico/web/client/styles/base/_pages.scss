@@ -107,7 +107,7 @@
     @extend .flexrow;
 
     $banner-color: #000;
-    $banner-title-color: $orange;
+    $banner-title-color: $dark-orange;
     $banner-subtitle-color: $dark-gray;
 
     color: $banner-color;
@@ -211,7 +211,7 @@
     @extend %indico-page;
 
     header h2 {
-        color: $orange;
+        color: $dark-orange;
         padding-right: 5px;
 
         .track-name {

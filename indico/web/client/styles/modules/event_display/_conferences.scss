@@ -32,7 +32,7 @@
 
     .header-data {
         &::before {
-            color: $orange;
+            color: $dark-orange;
             vertical-align: middle;
             margin-right: 0.2em;
         }
@@ -50,7 +50,7 @@
 
     .page-content h3 {
         margin: 1em 0 0.5em 0;
-        color: $orange;
+        color: $dark-orange;
 
         &:first-child {
             margin-top: 0;
@@ -68,7 +68,7 @@
         th {
             @include ellipsis();
 
-            color: $orange;
+            color: $dark-orange;
             text-align: right;
             vertical-align: top;
             max-width: 220px;
@@ -155,7 +155,7 @@
 
             h3 {
                 flex-grow: 1;
-                color: $orange;
+                color: $dark-orange;
                 font-size: 1.5em;
                 font-weight: normal;
 

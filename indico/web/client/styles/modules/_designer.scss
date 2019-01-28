@@ -90,7 +90,7 @@
         }
 
         &[data-type='fixed'] {
-            border-color: $orange;
+            border-color: $dark-orange;
         }
     }
 
@@ -178,7 +178,7 @@
 
     &.template-icon-poster {
         @include icon-before('icon-file-image');
-        color: $orange;
+        color: $dark-orange;
     }
 
     &.template-icon-badge {
