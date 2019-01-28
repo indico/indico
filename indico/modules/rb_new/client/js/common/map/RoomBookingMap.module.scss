@@ -54,8 +54,8 @@
         text-shadow: 1px 1px $light-black;
 
         &:global(.highlight) {
-            background-color: rgba($sui-orange, 0.9);
-            border: 2px solid darken($sui-orange, 10%);
+            background-color: rgba($orange, 0.9);
+            border: 2px solid darken($orange, 10%);
         }
 
     }
@@ -65,8 +65,8 @@
         border: 2px solid darken($highlight-color, 20%);
 
         &:global(.highlight) {
-            background-color: saturate(rgba($sui-orange, 0.9), 30%);
-            border: 2px solid darken($sui-orange, 10%);
+            background-color: saturate(rgba($orange, 0.9), 30%);
+            border: 2px solid darken($orange, 10%);
         }
     }
 

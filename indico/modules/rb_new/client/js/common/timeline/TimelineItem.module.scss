@@ -36,7 +36,7 @@
         border: 0.5px solid rgba(0, 0, 0, 0.2);
 
         &:global(.default) {
-            background-color: $sui-green;
+            background-color: $green;
         }
 
         &:hover:not(:global(.other)) {
@@ -49,11 +49,11 @@
         }
 
         &:global(.booking) {
-            background-color: $sui-orange;
+            background-color: $orange;
         }
 
         &:global(.conflict) {
-            background-color: $sui-red;
+            background-color: $red;
         }
 
         &:global(.pre-booking-conflict) {
@@ -62,13 +62,13 @@
         }
 
         &:global(.unbookable-periods) {
-            background-color: lighten($sui-grey, 40%);
+            background-color: lighten($gray, 40%);
             z-index: 2;
             height: 30px;
         }
 
         &:global(.unbookable-hours) {
-            background-color: lighten($sui-grey, 40%);
+            background-color: lighten($gray, 40%);
             z-index: 1;
             height: 30px;
         }
@@ -82,11 +82,11 @@
         }
 
         &:global(.cancellation) {
-            background-color: lighten($sui-grey, 40%);
+            background-color: lighten($gray, 40%);
         }
 
         &:global(.pending-cancellations) {
-            background-color: lighten($sui-green, 40%);
+            background-color: lighten($green, 40%);
             z-index: 4;
         }
 
@@ -96,12 +96,12 @@
         }
 
         &:global(.other) {
-            background-color: lighten($sui-grey, 50%);
-            border: 1px solid lighten($sui-grey, 40%);
+            background-color: lighten($gray, 50%);
+            border: 1px solid lighten($gray, 40%);
 
             &:hover {
-                background-color: lighten($sui-grey, 52%);
-                border: 1px solid lighten($sui-grey, 42%);
+                background-color: lighten($gray, 52%);
+                border: 1px solid lighten($gray, 42%);
             }
         }
     }
@@ -124,7 +124,7 @@
 .editable-timeline-slot {
     position: absolute;
     z-index: 2;
-    background-color: $sui-green;
+    background-color: $green;
     top: 0;
     height: 100%;
 }
