@@ -160,7 +160,7 @@ class BlockedRoomSchema(mm.ModelSchema):
 
     class Meta:
         model = BlockedRoom
-        fields = ('room', 'state', 'rejection_reason', 'rejected_by')
+        fields = ('id', 'room', 'state', 'rejection_reason', 'rejected_by')
 
     @post_dump(pass_many=True)
     def sort_rooms(self, data, many):
@@ -185,11 +185,13 @@ class BlockingSchema(mm.ModelSchema):
     blocked_rooms = Nested(BlockedRoomSchema, many=True)
     allowed = Nested(BlockingPrincipalSchema, many=True)
     can_edit = Function(lambda blocking: blocking.can_be_modified(session.user))
+    can_delete = Function(lambda blocking: blocking.can_be_deleted(session.user))
     created_by = Nested(UserSchema, attribute='created_by_user', only='full_name')
 
     class Meta:
         model = Blocking
-        fields = ('id', 'start_date', 'end_date', 'reason', 'blocked_rooms', 'allowed', 'created_by', 'can_edit')
+        fields = ('id', 'start_date', 'end_date', 'reason', 'blocked_rooms', 'allowed', 'created_by', 'can_edit',
+                  'can_delete')
 
 
 class NonBookablePeriodSchema(mm.ModelSchema):
