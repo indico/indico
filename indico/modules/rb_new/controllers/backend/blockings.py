@@ -85,7 +85,7 @@ class RHRoomBlocking(RHRoomBlockingBase):
         return jsonify(blockings_schema.dump(self.blocking, many=False).data)
 
 
-class RHBlockingAction(RHRoomBlockingBase):
+class RHBlockedRoomAction(RHRoomBlockingBase):
     def _check_access(self):
         RHRoomBlockingBase._check_access(self)
         if not self.blocked_room.room.can_manage(session.user):

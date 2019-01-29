@@ -80,7 +80,7 @@ _bp.add_url_rule('/api/blockings/<int:blocking_id>', 'blocking', blockings.RHRoo
 _bp.add_url_rule('/api/blockings/<int:blocking_id>', 'update_blocking', blockings.RHUpdateRoomBlocking,
                  methods=('PATCH',))
 _bp.add_url_rule('/api/blockings/<int:blocking_id>/rooms/<int:room_id>/<any(accept,reject):action>',
-                 'blocking_actions', blockings.RHBlockingAction, methods=('POST',))
+                 'blocking_actions', blockings.RHBlockedRoomAction, methods=('POST',))
 _bp.add_url_rule('/api/blockings/<int:blocking_id>', 'delete_blocking', blockings.RHDeleteBlocking, methods=('DELETE',))
 
 
