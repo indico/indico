@@ -680,4 +680,5 @@ def test_get_permissions_for_user(dummy_room, dummy_user, monkeypatch, bulk_poss
         'prebook': dummy_room.can_prebook(dummy_user, allow_admin=allow_admin),
         'override': dummy_room.can_override(dummy_user, allow_admin=allow_admin),
         'moderate': dummy_room.can_moderate(dummy_user, allow_admin=allow_admin),
+        'manage': dummy_room.can_manage(dummy_user, allow_admin=allow_admin),
     }

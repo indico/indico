@@ -706,6 +706,7 @@ class Room(versioned_cache(_cache, 'id'), ProtectionManagersMixin, db.Model, Ser
                 'prebook': r.can_prebook(user, allow_admin=allow_admin),
                 'override': r.can_override(user, allow_admin=allow_admin),
                 'moderate': r.can_moderate(user, allow_admin=allow_admin),
+                'manage': r.can_manage(user, allow_admin=allow_admin),
             } for r in all_rooms_query}
 
         criteria = [db.and_(RoomPrincipal.type == PrincipalType.user, RoomPrincipal.user_id == user.id)]
@@ -718,7 +719,7 @@ class Room(versioned_cache(_cache, 'id'), ProtectionManagersMixin, db.Model, Ser
                                     db.func.lower(RoomPrincipal.multipass_group_name) == group.name.lower()))
 
         data = {}
-        permissions = {'book', 'prebook', 'override', 'moderate'}
+        permissions = {'book', 'prebook', 'override', 'moderate', 'manage'}
         prebooking_required_rooms = set()
         non_reservable_rooms = set()
         for room in all_rooms_query:
@@ -735,6 +736,7 @@ class Room(versioned_cache(_cache, 'id'), ProtectionManagersMixin, db.Model, Ser
             if is_admin and allow_admin:
                 data[room.id]['override'] = True
                 data[room.id]['moderate'] = True
+                data[room.id]['manage'] = True
         query = (RoomPrincipal.query
                  .join(Room)
                  .filter(Room.is_active, db.or_(*criteria))
@@ -745,7 +747,8 @@ class Room(versioned_cache(_cache, 'id'), ProtectionManagersMixin, db.Model, Ser
                 if not is_reservable and not (is_admin and allow_admin) and permission in ('book', 'prebook'):
                     continue
                 explicit = permission == 'prebook' and principal.room_id not in prebooking_required_rooms
-                if principal.has_management_permission(permission, explicit=explicit):
+                check_permission = None if permission == 'manage' else permission
+                if principal.has_management_permission(check_permission, explicit=explicit):
                     data[principal.room_id][permission] = True
         return data
 
