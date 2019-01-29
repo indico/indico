@@ -48,6 +48,11 @@ export const getUnbookableRoomIds = createSelector(
     permissions => Object.entries(permissions).filter(([, perms]) => !perms.book && !perms.prebook).map(([id]) => +id)
 );
 
+export const getManagedRoomIds = createSelector(
+    getAllUserRoomPermissions,
+    permissions => Object.entries(permissions).filter(([, perms]) => perms.manage).map(([id]) => +id)
+);
+
 export const hasUnbookableRooms = createSelector(
     getUnbookableRoomIds,
     unbookableRoomIds => !!unbookableRoomIds.length

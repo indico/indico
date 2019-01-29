@@ -51,6 +51,7 @@ class BlockingModal extends React.Component {
     static propTypes = {
         onClose: PropTypes.func.isRequired,
         favoriteUsers: PropTypes.array.isRequired,
+        managedRoomIds: PropTypes.object.isRequired,
         mode: PropTypes.oneOf(['view', 'edit', 'create']),
         blocking: PropTypes.shape({
             id: PropTypes.number,
@@ -132,7 +133,11 @@ class BlockingModal extends React.Component {
     };
 
     renderRoomState = (room) => {
-        const {blocking: {canEdit, id}, actions: {acceptBlocking, rejectBlocking}} = this.props;
+        const {
+            managedRoomIds,
+            blocking: {id},
+            actions: {acceptBlocking, rejectBlocking},
+        } = this.props;
         const {state} = room;
         const {mode} = this.state;
         if (!room.state) {
@@ -150,7 +155,7 @@ class BlockingModal extends React.Component {
         if (state === 'accepted') {
             popupContent = Translate.string('Blocking has been accepted');
         } else if (state === 'pending') {
-            popupContent = Translate.string('Pending blocking');
+            popupContent = Translate.string('Pending approval by a room manager');
         } else {
             popupContent = (
                 <>
@@ -189,7 +194,7 @@ class BlockingModal extends React.Component {
 
         return (
             <div styleName="blocking-actions">
-                {mode === 'view' && state === 'pending' && canEdit && (
+                {mode === 'view' && state === 'pending' && managedRoomIds.has(room.id) && (
                     <>
                         <Popup trigger={<Icon name="check" color="green" size="large" styleName="action"
                                               onClick={() => acceptBlocking(id, room.id)} />}
@@ -255,7 +260,7 @@ class BlockingModal extends React.Component {
         if (mode === 'view') {
             return <Translate>Blocking details</Translate>;
         } else if (mode === 'edit') {
-            return <Translate>Update blocking</Translate>;
+            return <Translate>Edit blocking</Translate>;
         } else {
             return <Translate>Block selected spaces</Translate>;
         }
@@ -276,6 +281,11 @@ class BlockingModal extends React.Component {
         deleteBlocking(id);
         onClose();
     };
+
+    get hasManagedPendingRooms() {
+        const {managedRoomIds, blocking: {blockedRooms}} = this.props;
+        return blockedRooms.some(br => br.state === 'pending' && managedRoomIds.has(br.room.id));
+    }
 
     renderModalContent = (fprops) => {
         const {onClose, blocking} = this.props;
@@ -391,11 +401,11 @@ class BlockingModal extends React.Component {
                                        isEqual={_.isEqual}
                                        render={this.renderRoomSearchField}
                                        disabled={mode === 'view' || submitting || submitSucceeded} />
-                                {blocking.canEdit && blocking.blockedRooms.length !== 0 && (
+                                {mode === 'view' && this.hasManagedPendingRooms && (
                                     <Message icon info>
                                         <Icon name="info" />
                                         <Translate>
-                                            You can accept and reject blockings for the rooms on the list
+                                            You can accept and reject blockings for your rooms on the list
                                             by using the action buttons on the right side of the room name.
                                         </Translate>
                                     </Message>
@@ -454,6 +464,7 @@ class BlockingModal extends React.Component {
 export default connect(
     state => ({
         favoriteUsers: userSelectors.getFavoriteUsers(state),
+        managedRoomIds: new Set(userSelectors.getManagedRoomIds(state)),
     }),
     dispatch => ({
         actions: bindActionCreators({
