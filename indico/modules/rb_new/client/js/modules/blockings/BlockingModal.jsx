@@ -70,7 +70,7 @@ class BlockingModal extends React.Component {
     static defaultProps = {
         mode: 'view',
         blocking: {
-            blockingId: null,
+            id: null,
             blockedRooms: [],
             allowed: [],
             startDate: null,
