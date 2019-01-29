@@ -127,7 +127,7 @@ import camelizeKeys from 'indico/utils/camelize';
             if ($currentMessage) {
                 if (resetCheckbox) {
                     $('#availability-messages').find("input[id^='create']").prop('checked', false);
-                    $createBooking.val(false);
+                    $createBooking.val('false');
                 }
                 $currentMessage.hide();
             }
@@ -144,7 +144,7 @@ import camelizeKeys from 'indico/utils/camelize';
                 isCategoryExcluded(category['id']) ||
                 timezone !== options.serverDefaultTimezone ||
                 multipleOccurrences) {
-                $createBooking.val(false);
+                $createBooking.val('false');
                 return;
             }
 
@@ -163,42 +163,42 @@ import camelizeKeys from 'indico/utils/camelize';
                 success(data) {
                     data = camelizeKeys(data);
                     if (data.userBooking) {
-                        $createBooking.val(false);
+                        $createBooking.val('false');
                         $currentMessage = $userBookingMessage;
                         addCalendarLink($currentMessage);
                     } else if (data.userPrebooking) {
-                        $createBooking.val(false);
+                        $createBooking.val('false');
                         $currentMessage = $userPrebookingMessage;
                         addCalendarLink($currentMessage);
                     } else if (data.conflictBooking) {
-                        $createBooking.val(false);
+                        $createBooking.val('false');
                         $currentMessage = $conflictBookingMessage;
                         addCalendarLink($currentMessage);
                     } else if (data.unbookable) {
-                        $createBooking.val(false);
+                        $createBooking.val('false');
                         $currentMessage = $unbookableMessage;
                         addCalendarLink($currentMessage);
                     } else if (data.conflictPrebooking) {
                         if (data.canBook) {
-                            $createBooking.val($bookingSwitchPrebooking[0].checked);
+                            $createBooking.val(String($bookingSwitchPrebooking[0].checked));
                             $currentMessage = $conflictPrebookingMessage;
                             addCalendarLink($currentMessage);
                         } else if (data.canPrebook) {
-                            $createBooking.val($prebookingSwitchPrebooking[0].checked);
+                            $createBooking.val(String($prebookingSwitchPrebooking[0].checked));
                             $currentMessage = $conflictPrebookingPrebookMessage;
                             addCalendarLink($currentMessage);
                         } else {
-                            $createBooking.val(false);
+                            $createBooking.val('false');
                             $currentMessage = $cannotBookMessage;
                         }
                     } else if (data.canBook) {
-                        $createBooking.val($bookingSwitch[0].checked);
+                        $createBooking.val(String($bookingSwitch[0].checked));
                         $currentMessage = $availableMessage;
                     } else if (data.canPrebook) {
-                        $createBooking.val($prebookingSwitch[0].checked);
+                        $createBooking.val(String($prebookingSwitch[0].checked));
                         $currentMessage = $availablePrebookMessage;
                     } else {
-                        $createBooking.val(false);
+                        $createBooking.val('false');
                         $currentMessage = $cannotBookMessage;
                     }
                     $currentMessage.show();
@@ -274,7 +274,7 @@ import camelizeKeys from 'indico/utils/camelize';
             });
 
             $bookingSwitch.add($prebookingSwitch).add($bookingSwitchPrebooking).add($prebookingSwitchPrebooking).on('change', function() {
-                $createBooking.val(this.checked);
+                $createBooking.val(String(this.checked));
             });
         }
     };

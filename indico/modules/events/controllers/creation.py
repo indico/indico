@@ -78,7 +78,8 @@ class RHCreateEvent(RHProtected):
         return FormDefaults(category=category,
                             timezone=tzinfo.zone, start_dt=start_dt, end_dt=end_dt,
                             occurrences=[(start_dt, end_dt - start_dt)],
-                            location_data={'inheriting': False})
+                            location_data={'inheriting': False},
+                            create_booking=False)
 
     def _create_event(self, data):
         data = data.copy()
