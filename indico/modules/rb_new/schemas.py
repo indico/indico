@@ -160,7 +160,7 @@ class BlockedRoomSchema(mm.ModelSchema):
 
     class Meta:
         model = BlockedRoom
-        fields = ('id', 'room', 'state', 'rejection_reason', 'rejected_by')
+        fields = ('room', 'state', 'rejection_reason', 'rejected_by')
 
     @post_dump(pass_many=True)
     def sort_rooms(self, data, many):
