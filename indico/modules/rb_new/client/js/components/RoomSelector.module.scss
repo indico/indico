@@ -31,6 +31,12 @@
 
                 .room-actions {
                     margin-left: auto;
+                    display: flex;
+                    align-items: center;
+                }
+
+                .room-actions :global(.icon.remove) {
+                    cursor: pointer;
                 }
             }
         }

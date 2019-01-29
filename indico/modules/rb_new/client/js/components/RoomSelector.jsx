@@ -190,8 +190,7 @@ export default class RoomSelector extends React.Component {
                             <Segment>
                                 <List styleName="rooms-list"
                                       verticalAlign="middle"
-                                      relaxed
-                                      selection>
+                                      relaxed>
                                     {rooms.map(this.renderRoomItem)}
                                 </List>
                             </Segment>

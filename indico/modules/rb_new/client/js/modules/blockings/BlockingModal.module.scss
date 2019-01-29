@@ -19,3 +19,19 @@
     display: flex;
     justify-content: space-between;
 }
+
+.blocking-actions {
+    display: inline-block;
+
+    :global(.icon) {
+        font-size: 1em !important;
+
+        &.action {
+            cursor: pointer;
+        }
+    }
+}
+
+.rejection-form {
+    width: 350px;
+}

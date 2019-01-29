@@ -66,7 +66,7 @@ _bp.add_url_rule('/api/timeline', 'timeline', bookings.RHTimeline, methods=('GET
 _bp.add_url_rule('/api/booking/create', 'create_booking', bookings.RHCreateBooking, methods=('POST',))
 _bp.add_url_rule('/api/bookings/active', 'active_bookings', bookings.RHActiveBookings, methods=('POST',))
 _bp.add_url_rule('/api/bookings/<int:booking_id>', 'booking_details', bookings.RHBookingDetails)
-_bp.add_url_rule('/api/bookings/<int:booking_id>', 'booking_delete', bookings.RHDeleteBooking, methods=('DELETE',))
+_bp.add_url_rule('/api/bookings/<int:booking_id>', 'delete_booking', bookings.RHDeleteBooking, methods=('DELETE',))
 _bp.add_url_rule('/api/bookings/<int:booking_id>', 'update_booking', bookings.RHUpdateBooking, methods=('PATCH',))
 _bp.add_url_rule('/api/bookings/<int:booking_id>/<any(approve,reject,cancel):action>', 'booking_state_actions',
                  bookings.RHBookingStateActions, methods=('POST',))
@@ -79,6 +79,10 @@ _bp.add_url_rule('/api/blockings/', 'create_blocking', blockings.RHCreateRoomBlo
 _bp.add_url_rule('/api/blockings/<int:blocking_id>', 'blocking', blockings.RHRoomBlocking)
 _bp.add_url_rule('/api/blockings/<int:blocking_id>', 'update_blocking', blockings.RHUpdateRoomBlocking,
                  methods=('PATCH',))
+_bp.add_url_rule('/api/blockings/<int:blocking_id>/rooms/<int:room_id>/<any(accept,reject):action>',
+                 'blocking_actions', blockings.RHBlockingAction, methods=('POST',))
+_bp.add_url_rule('/api/blockings/<int:blocking_id>', 'delete_blocking', blockings.RHDeleteBlocking, methods=('DELETE',))
+
 
 # Administration
 _bp.add_url_rule('/api/admin/locations', 'admin_locations', admin.RHLocations)

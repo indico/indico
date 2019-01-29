@@ -20,10 +20,10 @@ import React from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
-import {Button, Form, Grid, Message, Icon, Modal, Popup} from 'semantic-ui-react';
+import {Button, Confirm, Form, Grid, Message, Icon, Modal, Popup, TextArea} from 'semantic-ui-react';
 import {Form as FinalForm, Field} from 'react-final-form';
 import {Param, Translate} from 'indico/react/i18n';
-import {ReduxFormField, formatters} from 'indico/react/forms';
+import {ReduxFormField, formatters, validators as v} from 'indico/react/forms';
 import PrincipalSearchField from 'indico/react/components/PrincipalSearchField';
 import DatePeriodField from 'indico/react/components/DatePeriodField';
 import RoomSelector from '../../components/RoomSelector';
@@ -64,6 +64,9 @@ class BlockingModal extends React.Component {
         actions: PropTypes.exact({
             createBlocking: PropTypes.func.isRequired,
             updateBlocking: PropTypes.func.isRequired,
+            acceptBlocking: PropTypes.func.isRequired,
+            rejectBlocking: PropTypes.func.isRequired,
+            deleteBlocking: PropTypes.func.isRequired,
         }).isRequired,
     };
 
@@ -84,7 +87,8 @@ class BlockingModal extends React.Component {
 
         const {mode} = this.props;
         this.state = {
-            mode
+            deletionConfirmOpen: false,
+            mode,
         };
     }
 
@@ -128,7 +132,9 @@ class BlockingModal extends React.Component {
     };
 
     renderRoomState = (room) => {
+        const {blocking: {canEdit, id}, actions: {acceptBlocking, rejectBlocking}} = this.props;
         const {state} = room;
+        const {mode} = this.state;
         if (!room.state) {
             return null;
         }
@@ -159,11 +165,51 @@ class BlockingModal extends React.Component {
             );
         }
 
+        const renderRejectionForm = ({handleSubmit, hasValidationErrors, submitSucceeded, submitting, pristine}) => (
+            <Form styleName="rejection-form" onSubmit={handleSubmit}>
+                <Field name="reason"
+                       component={ReduxFormField}
+                       as={TextArea}
+                       format={formatters.trim}
+                       placeholder={Translate.string('Provide the rejection reason')}
+                       rows={2}
+                       validate={v.required}
+                       disabled={submitting}
+                       required
+                       formatOnBlur />
+                <Button type="submit"
+                        disabled={submitting || pristine || hasValidationErrors || submitSucceeded}
+                        loading={submitting}
+                        floated="right"
+                        primary>
+                    <Translate>Reject</Translate>
+                </Button>
+            </Form>
+        );
+
         return (
-            <Popup trigger={<Icon {...stateIconProps} />}
-                   position="right center"
-                   content={popupContent}
-                   flowing />
+            <div styleName="blocking-actions">
+                {mode === 'view' && state === 'pending' && canEdit && (
+                    <>
+                        <Popup trigger={<Icon name="check" color="green" size="large" styleName="action"
+                                              onClick={() => acceptBlocking(id, room.id)} />}
+                               position="bottom center"
+                               content={Translate.string('Accept blocking')}
+                               flowing />
+                        <Popup trigger={<Icon name="dont" color="red" size="large" styleName="action" />}
+                               position="bottom center"
+                               on="click"
+                               flowing>
+                            <FinalForm onSubmit={({reason}) => rejectBlocking(id, room.id, reason)}
+                                       render={renderRejectionForm} />
+                        </Popup>
+                    </>
+                )}
+                <Popup trigger={<Icon size="large" {...stateIconProps} />}
+                       position="right center"
+                       content={popupContent}
+                       flowing />
+            </div>
         );
     };
 
@@ -225,19 +271,26 @@ class BlockingModal extends React.Component {
         return !_.every(nextValue, (val, index) => val.id === prevValue[index].id);
     };
 
+    deleteBlocking = () => {
+        const {blocking: {id}, actions: {deleteBlocking}, onClose} = this.props;
+        deleteBlocking(id);
+        onClose();
+    };
+
     renderModalContent = (fprops) => {
         const {onClose, blocking} = this.props;
         const {submitting, submitSucceeded} = fprops;
-        const {mode} = this.state;
+        const {mode, deletionConfirmOpen} = this.state;
         const formProps = mode === 'view' ? {} : {onSubmit: fprops.handleSubmit, success: submitSucceeded};
         const canEdit = !!blocking.id && blocking.canEdit;
+        const canDelete = !!blocking.id && blocking.canDelete;
 
         return (
             <>
                 <Modal.Header styleName="blocking-modal-header">
                     {this.renderHeaderText()}
-                    {canEdit && (
-                        <span>
+                    <span>
+                        {canEdit && (
                             <Button icon="pencil"
                                     primary={mode === 'edit'}
                                     onClick={() => {
@@ -249,8 +302,22 @@ class BlockingModal extends React.Component {
                                         }
                                     }}
                                     circular />
-                        </span>
-                    )}
+                        )}
+                        {canDelete && (
+                            <>
+                                <Button icon="trash" color="red"
+                                        onClick={() => this.setState({deletionConfirmOpen: true})}
+                                        circular />
+                                <Confirm header={Translate.string('Confirm deletion')}
+                                         content={Translate.string('Are you sure you want to delete this blocking?')}
+                                         confirmButton={<Button content={Translate.string('Delete')} negative />}
+                                         cancelButton={Translate.string('Cancel')}
+                                         open={deletionConfirmOpen}
+                                         onConfirm={this.deleteBlocking}
+                                         onCancel={() => this.setState({deletionConfirmOpen: false})} />
+                            </>
+                        )}
+                    </span>
                 </Modal.Header>
                 <Modal.Content>
                     <Form id="blocking-form" {...formProps}>
@@ -324,6 +391,15 @@ class BlockingModal extends React.Component {
                                        isEqual={_.isEqual}
                                        render={this.renderRoomSearchField}
                                        disabled={mode === 'view' || submitting || submitSucceeded} />
+                                {blocking.canEdit && blocking.blockedRooms.length !== 0 && (
+                                    <Message icon info>
+                                        <Icon name="info" />
+                                        <Translate>
+                                            You can accept and reject blockings for the rooms on the list
+                                            by using the action buttons on the right side of the room name.
+                                        </Translate>
+                                    </Message>
+                                )}
                                 <Message success>
                                     {mode === 'edit' ? (
                                         <Translate>The blocking has been successfully updated.</Translate>
@@ -383,6 +459,9 @@ export default connect(
         actions: bindActionCreators({
             createBlocking: blockingsActions.createBlocking,
             updateBlocking: blockingsActions.updateBlocking,
+            acceptBlocking: blockingsActions.acceptBlocking,
+            rejectBlocking: blockingsActions.rejectBlocking,
+            deleteBlocking: blockingsActions.deleteBlocking,
         }, dispatch),
     })
 )(BlockingModal);

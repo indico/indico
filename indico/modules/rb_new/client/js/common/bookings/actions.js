@@ -17,7 +17,7 @@
 
 import fetchBookingDetailsURL from 'indico-url:rooms_new.booking_details';
 import bookingStateActionsURL from 'indico-url:rooms_new.booking_state_actions';
-import bookingDeleteURL from 'indico-url:rooms_new.booking_delete';
+import bookingDeleteURL from 'indico-url:rooms_new.delete_booking';
 import bookingUpdateURL from 'indico-url:rooms_new.update_booking';
 
 import {indicoAxios} from 'indico/utils/axios';

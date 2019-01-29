@@ -21,7 +21,9 @@ from webargs import fields
 from webargs.flaskparser import use_args, use_kwargs
 from werkzeug.exceptions import Forbidden
 
+from indico.core.db import db
 from indico.modules.rb.controllers import RHRoomBookingBase
+from indico.modules.rb.models.blocked_rooms import BlockedRoom
 from indico.modules.rb.models.blockings import Blocking
 from indico.modules.rb_new.operations.blockings import create_blocking, get_room_blockings, update_blocking
 from indico.modules.rb_new.schemas import blockings_schema
@@ -73,9 +75,50 @@ class RHRoomBlockings(RHRoomBookingBase):
         return jsonify(blockings_schema.dump(blockings).data)
 
 
-class RHRoomBlocking(RHRoomBookingBase):
+class RHRoomBlockingBase(RHRoomBookingBase):
     def _process_args(self):
         self.blocking = Blocking.get_one(request.view_args['blocking_id'])
 
+
+class RHRoomBlocking(RHRoomBlockingBase):
     def _process(self):
         return jsonify(blockings_schema.dump(self.blocking, many=False).data)
+
+
+class RHBlockingAction(RHRoomBlockingBase):
+    def _check_access(self):
+        RHRoomBlockingBase._check_access(self)
+        if not self.blocked_room.room.can_manage(session.user):
+            raise Forbidden
+
+    def _process_args(self):
+        RHRoomBlockingBase._process_args(self)
+        self.action = request.view_args['action']
+        self.blocked_room = (BlockedRoom.query
+                             .with_parent(self.blocking)
+                             .filter_by(room_id=request.view_args['room_id'])
+                             .first_or_404())
+
+    def _process(self):
+        if self.action == 'accept':
+            self.blocked_room.approve()
+        elif self.action == 'reject':
+            self.reject()
+        return jsonify(blocking=blockings_schema.dump(self.blocking, many=False).data)
+
+    @use_kwargs({
+        'reason': fields.Str(required=True)
+    })
+    def reject(self, reason):
+        self.blocked_room.reject(session.user, reason)
+
+
+class RHDeleteBlocking(RHRoomBlockingBase):
+    def _check_access(self):
+        RHRoomBlockingBase._check_access(self)
+        if not self.blocking.can_be_deleted(session.user):
+            raise Forbidden
+
+    def _process(self):
+        db.session.delete(self.blocking)
+        return jsonify(blocking_id=self.blocking.id)
