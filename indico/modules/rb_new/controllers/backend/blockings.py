@@ -46,7 +46,7 @@ class RHCreateRoomBlocking(RHRoomBookingBase):
 class RHUpdateRoomBlocking(RHRoomBookingBase):
     def _check_access(self):
         RHRoomBookingBase._check_access(self)
-        if not self.blocking.can_be_modified(session.user):
+        if not self.blocking.can_edit(session.user):
             raise Forbidden
 
     def _process_args(self):
@@ -116,7 +116,7 @@ class RHBlockedRoomAction(RHRoomBlockingBase):
 class RHDeleteBlocking(RHRoomBlockingBase):
     def _check_access(self):
         RHRoomBlockingBase._check_access(self)
-        if not self.blocking.can_be_deleted(session.user):
+        if not self.blocking.can_delete(session.user):
             raise Forbidden
 
     def _process(self):

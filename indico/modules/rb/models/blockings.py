@@ -24,7 +24,7 @@ from indico.core.db.sqlalchemy.custom.utcdatetime import UTCDateTime
 from indico.modules.rb.models.blocking_principals import BlockingPrincipal
 from indico.modules.rb.util import rb_is_admin
 from indico.util.date_time import now_utc
-from indico.util.string import return_ascii
+from indico.util.string import format_repr, return_ascii
 from indico.util.user import iter_acl
 
 
@@ -92,16 +92,15 @@ class Blocking(db.Model):
     def is_active_at(self, d):
         return (self.start_date <= d) & (d <= self.end_date)
 
-    def can_be_modified(self, user):
-        """
-        The following persons are authorized to modify a blocking:
-        - owner (the one who created the blocking)
-        - admin (of course)
-        """
-        return user and (user == self.created_by_user or rb_is_admin(user))
+    def can_edit(self, user, allow_admin=True):
+        if not user:
+            return False
+        return user == self.created_by_user or (allow_admin and rb_is_admin(user))
 
-    def can_be_deleted(self, user):
-        return self.can_be_modified(user)
+    def can_delete(self, user, allow_admin=True):
+        if not user:
+            return False
+        return user == self.created_by_user or (allow_admin and rb_is_admin(user))
 
     def can_be_overridden(self, user, room=None, explicit_only=False):
         """Determines if a user can override the blocking
@@ -124,10 +123,4 @@ class Blocking(db.Model):
 
     @return_ascii
     def __repr__(self):
-        return '<Blocking({0}, {1}, {2}, {3}, {4})>'.format(
-            self.id,
-            self.created_by_user,
-            self.reason,
-            self.start_date,
-            self.end_date
-        )
+        return format_repr(self, 'id', 'start_date', 'end_date', _text=self.reason)

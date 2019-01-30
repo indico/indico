@@ -1,5 +1,5 @@
-    <% canModify = blocking.can_be_modified(_session.user) %>
-    <% canDelete = blocking.can_be_deleted(_session.user) %>
+    <% canModify = blocking.can_edit(_session.user) %>
+    <% canDelete = blocking.can_delete(_session.user) %>
     <span class="groupTitleNoBorder">Room Blocking</span><br />
     <table cellpadding="0" cellspacing="0" border="0" width="100%">
         <tr>

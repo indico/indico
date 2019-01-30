@@ -100,7 +100,7 @@ class RHRoomBookingModifyBlocking(RHRoomBookingCreateModifyBlockingBase):
 
     def _check_access(self):
         RHRoomBookingCreateModifyBlockingBase._check_access(self)
-        if not self._blocking.can_be_modified(session.user):
+        if not self._blocking.can_edit(session.user):
             raise Forbidden(_("You are not authorized to modify this blocking."))
 
     def _save(self):
@@ -136,7 +136,7 @@ class RHRoomBookingDeleteBlocking(RHRoomBookingBase):
 
     def _check_access(self):
         RHRoomBookingBase._check_access(self)
-        if not self._block.can_be_deleted(session.user):
+        if not self._block.can_delete(session.user):
             raise Forbidden('You are not authorized to delete this blocking.')
 
     def _process(self):

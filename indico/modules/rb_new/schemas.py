@@ -184,8 +184,8 @@ class BlockingPrincipalSchema(mm.ModelSchema):
 class BlockingSchema(mm.ModelSchema):
     blocked_rooms = Nested(BlockedRoomSchema, many=True)
     allowed = Nested(BlockingPrincipalSchema, many=True)
-    can_edit = Function(lambda blocking: blocking.can_be_modified(session.user))
-    can_delete = Function(lambda blocking: blocking.can_be_deleted(session.user))
+    can_edit = Function(lambda blocking: blocking.can_edit(session.user))
+    can_delete = Function(lambda blocking: blocking.can_delete(session.user))
     created_by = Nested(UserSchema, attribute='created_by_user', only='full_name')
 
     class Meta:
