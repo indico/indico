@@ -86,11 +86,6 @@ class RHRoomBlocking(RHRoomBlockingBase):
 
 
 class RHBlockedRoomAction(RHRoomBlockingBase):
-    def _check_access(self):
-        RHRoomBlockingBase._check_access(self)
-        if not self.blocked_room.room.can_manage(session.user):
-            raise Forbidden
-
     def _process_args(self):
         RHRoomBlockingBase._process_args(self)
         self.action = request.view_args['action']
@@ -98,6 +93,11 @@ class RHBlockedRoomAction(RHRoomBlockingBase):
                              .with_parent(self.blocking)
                              .filter_by(room_id=request.view_args['room_id'])
                              .first_or_404())
+
+    def _check_access(self):
+        RHRoomBlockingBase._check_access(self)
+        if not self.blocked_room.room.can_manage(session.user):
+            raise Forbidden
 
     def _process(self):
         if self.action == 'accept':
