@@ -15,10 +15,25 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import _ from 'lodash';
+import {createSelector} from 'reselect';
 import {RequestState} from 'indico/utils/redux';
+import {isUserAdminOverrideEnabled} from '../../common/user/selectors';
 
 
-export const getAllBlockings = ({blockings}) => blockings.blockings;
+const _getAllBlockings = ({blockings}) => blockings.blockings;
+export const getAllBlockings = createSelector(
+    _getAllBlockings,
+    isUserAdminOverrideEnabled,
+    (allBlockings, override) => {
+        return _.fromPairs(Object.entries(allBlockings).map(([id, allData]) => {
+            const {permissions, ...data} = allData;
+            const activePermissions = (override && permissions.admin) ? permissions.admin : permissions.user;
+            return [id, {...data, ...activePermissions}];
+        }));
+    }
+);
+
 export const getBlocking = (state, {blockingId}) => getAllBlockings(state)[blockingId];
 export const isFetchingBlockings = ({blockings}) => blockings.requests.blockings.state === RequestState.STARTED;
 export const getFilters = ({blockings}) => blockings.filters;

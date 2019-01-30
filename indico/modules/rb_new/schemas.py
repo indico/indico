@@ -184,14 +184,20 @@ class BlockingPrincipalSchema(mm.ModelSchema):
 class BlockingSchema(mm.ModelSchema):
     blocked_rooms = Nested(BlockedRoomSchema, many=True)
     allowed = Nested(BlockingPrincipalSchema, many=True)
-    can_edit = Function(lambda blocking: blocking.can_edit(session.user))
-    can_delete = Function(lambda blocking: blocking.can_delete(session.user))
+    permissions = Method('_get_permissions')
     created_by = Nested(UserSchema, attribute='created_by_user', only='full_name')
 
     class Meta:
         model = Blocking
-        fields = ('id', 'start_date', 'end_date', 'reason', 'blocked_rooms', 'allowed', 'created_by', 'can_edit',
-                  'can_delete')
+        fields = ('id', 'start_date', 'end_date', 'reason', 'blocked_rooms', 'allowed', 'created_by', 'permissions')
+
+    def _get_permissions(self, blocking):
+        methods = ('can_delete', 'can_edit')
+        admin_permissions = None
+        user_permissions = {x: getattr(blocking, x)(session.user, allow_admin=False) for x in methods}
+        if rb_is_admin(session.user):
+            admin_permissions = {x: getattr(blocking, x)(session.user) for x in methods}
+        return {'user': user_permissions, 'admin': admin_permissions}
 
 
 class NonBookablePeriodSchema(mm.ModelSchema):
