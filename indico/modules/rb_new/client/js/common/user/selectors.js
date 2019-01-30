@@ -15,8 +15,6 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import moment from 'moment';
-
 import {createSelector} from 'reselect';
 
 import {RequestState} from 'indico/utils/redux';
@@ -47,18 +45,7 @@ export const getAllUserRoomPermissions = createSelector(
 
 export const getUnbookableRoomIds = createSelector(
     getAllUserRoomPermissions,
-    ({rooms}) => rooms.rooms,
-    ({bookRoom}) => bookRoom.filters.dates.startDate,
-    (permissions, rooms, startDate) => {
-        const roomsMaxAdvanceDays = {};
-        rooms.forEach((room) => {
-            roomsMaxAdvanceDays[room.id] = room.maxAdvanceDays;
-        });
-        return Object.entries(permissions).filter(([id, perms]) => (
-            !perms.book && !perms.prebook) || (
-            roomsMaxAdvanceDays[id] && moment().add(roomsMaxAdvanceDays[id], 'days') < moment(startDate))
-        ).map(([id]) => +id);
-    }
+    permissions => Object.entries(permissions).filter(([, perms]) => !perms.book && !perms.prebook).map(([id]) => +id)
 );
 
 export const getManagedRoomIds = createSelector(
