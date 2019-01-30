@@ -62,13 +62,13 @@
         }
 
         &:global(.unbookable-periods) {
-            background-color: lighten($gray, 40%);
+            background-color: lighten($gray, 25%);
             z-index: 2;
             height: 30px;
         }
 
         &:global(.unbookable-hours) {
-            background-color: lighten($gray, 40%);
+            background-color: lighten($gray, 25%);
             z-index: 1;
             height: 30px;
         }
@@ -82,7 +82,7 @@
         }
 
         &:global(.cancellation) {
-            background-color: lighten($gray, 40%);
+            background-color: lighten($gray, 15%);
         }
 
         &:global(.pending-cancellations) {
@@ -96,12 +96,12 @@
         }
 
         &:global(.other) {
-            background-color: lighten($gray, 50%);
-            border: 1px solid lighten($gray, 40%);
+            background-color: lighten($gray, 20%);
+            border: 1px solid lighten($gray, 10%);
 
             &:hover {
-                background-color: lighten($gray, 52%);
-                border: 1px solid lighten($gray, 42%);
+                background-color: lighten($gray, 21%);
+                border: 1px solid lighten($gray, 11%);
             }
         }
     }

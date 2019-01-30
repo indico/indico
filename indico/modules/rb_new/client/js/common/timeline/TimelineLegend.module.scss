@@ -45,7 +45,7 @@
 
             &.conflict, &.booking, &.new-booking, &.available {
                 &.compact {
-                    border: 1px solid lighten($gray, 20%);
+                    border: 1px solid lighten($gray, 10%);
                 }
             }
 
@@ -54,7 +54,7 @@
                 background-size: 35px 35px;
 
                 &.compact {
-                    border: 1px solid lighten($gray, 20%);
+                    border: 1px solid lighten($gray, 10%);
                 }
             }
 
@@ -63,19 +63,19 @@
                 background-size: 35px 35px;
 
                 &.compact {
-                    border: 1px solid lighten($gray, 20%);
+                    border: 1px solid lighten($gray, 10%);
                 }
             }
 
             &.unbookable, &.cancellation {
-                background-color: lighten($gray, 40%);
-                border: 1px solid lighten($gray, 20%);
+                background-color: lighten($gray, 15%);
+                border: 1px solid lighten($gray, 10%);
                 color: $gray;
             }
 
             &.pending-cancellation {
                 background-color: lighten($green, 40%);
-                border: 1px solid lighten($gray, 20%);
+                border: 1px solid lighten($gray, 10%);
             }
 
             &.blocking {
@@ -88,12 +88,12 @@
             &.rejection {
                 @include stripes($rejection-stripe-colors...);
                 background-size: 35px 35px;
-                border: 1px solid lighten($gray, 20%);
+                border: 1px solid lighten($gray, 10%);
             }
 
             &.other {
-                background-color: lighten($gray, 50%);
-                border: 1px solid lighten($gray, 40%);
+                background-color: lighten($gray, 20%);
+                border: 1px solid lighten($gray, 10%);
             }
         }
     }
