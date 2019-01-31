@@ -25,6 +25,7 @@ from marshmallow_enum import EnumField
 
 from indico.core.db.sqlalchemy.links import LinkType
 from indico.core.marshmallow import mm
+from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.rb.models.blocked_rooms import BlockedRoom, BlockedRoomState
 from indico.modules.rb.models.blocking_principals import BlockingPrincipal
 from indico.modules.rb.models.blockings import Blocking
@@ -80,10 +81,15 @@ class ReservationSchema(mm.ModelSchema):
 
 class ReservationLinkedObjectDataSchema(Schema):
     id = Number()
-    title = String()
+    title = Method('_get_title')
     url = String()
     event_title = Function(lambda obj: obj.event.title)
     event_url = Function(lambda obj: obj.event.url)
+
+    def _get_title(self, object):
+        if isinstance(object, SessionBlock):
+            return object.full_title
+        return object.title
 
 
 class ReservationUserEventSchema(Schema):
