@@ -236,11 +236,11 @@ class BookRoom extends React.Component {
         } = this.props;
         const {actions: {openRoomDetails}} = this.props;
 
-        const bookingModalBtn = (room, isPrebooking = false) => (
+        const bookingModalBtn = (room) => (
             <Button circular
                     icon="check"
-                    color={isPrebooking ? 'orange' : 'green'}
-                    onClick={() => this.openBookingForm(room, null, isPrebooking)} />
+                    color="green"
+                    onClick={() => this.openBookingForm(room)} />
         );
 
         const showDetailsBtn = ({id}) => (
@@ -270,7 +270,7 @@ class BookRoom extends React.Component {
                                                 )}
                                                 {room.canUserPrebook && (
                                                     <Icon.Group onClick={() => this.openBookingForm(room, null, true)}>
-                                                        <Popup trigger={bookingModalBtn(room, true)}
+                                                        <Popup trigger={<Button circular icon="check" color="orange" />}
                                                                content={labels.preBookButton}
                                                                position="top center"
                                                                hideOnScroll />
