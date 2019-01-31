@@ -90,19 +90,17 @@ def serialize_unbookable_hours(data):
 
 
 def get_linked_object(type_, id_):
-    obj = None
     if type_ == LinkType.event:
-        obj = Event.get_one(id_, is_deleted=False)
+        return Event.get_one(id_, is_deleted=False)
     elif type_ == LinkType.contribution:
-        obj = (Contribution.query
-               .filter(Contribution.id == id_,
-                       ~Contribution.is_deleted,
-                       Contribution.event.has(is_deleted=False))
-               .one())
+        return (Contribution.query
+                .filter(Contribution.id == id_,
+                        ~Contribution.is_deleted,
+                        Contribution.event.has(is_deleted=False))
+                .one())
     elif type_ == LinkType.session_block:
-        obj = (SessionBlock.query
-               .filter(SessionBlock.id == id_,
-                       SessionBlock.session.has(db.and_(~Session.is_deleted,
-                                                        Session.event.has(is_deleted=False))))
-               .one())
-    return obj
+        return (SessionBlock.query
+                .filter(SessionBlock.id == id_,
+                        SessionBlock.session.has(db.and_(~Session.is_deleted,
+                                                         Session.event.has(is_deleted=False))))
+                .one())

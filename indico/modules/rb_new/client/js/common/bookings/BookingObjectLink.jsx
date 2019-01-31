@@ -15,11 +15,12 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import getLinkedObjectDataURL from 'indico-url:rooms_new.linked_object_data';
+
 import _ from 'lodash';
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Message, Placeholder, Segment, Icon} from 'semantic-ui-react';
-import getLinkedObjectDataURL from 'indico-url:rooms_new.linked_object_data';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import camelizeKeys from 'indico/utils/camelize';
@@ -39,7 +40,7 @@ export default class BookingObjectLink extends React.PureComponent {
     };
 
     static defaultProps = {
-        pending: false
+        pending: false,
     };
 
     state = {
@@ -87,8 +88,8 @@ export default class BookingObjectLink extends React.PureComponent {
                     {pending ? pendingMessages[type] : linkedMessages[type]}
                     <div styleName="object-link">
                         {type === 'event'
-                            ? <a href={url}>{title}</a>
-                            : <span>{title} (<a href={eventUrl}>{eventTitle}</a>)</span>
+                            ? <a href={url}><i>{title}</i></a>
+                            : <span><i>{title}</i> (<a href={eventUrl}>{eventTitle}</a>)</span>
                         }
                     </div>
                 </Message.Content>

@@ -177,11 +177,12 @@ class RHCreateBooking(RHRoomBookingBase):
         return selected_period_days <= booking_limit_days
 
     def _link_booking(self, booking, type_, id_):
-        if id_ and type_:
-            obj = get_linked_object(type_, id_)
+        if id_ is None or type_ is None:
+            return
+        obj = get_linked_object(type_, id_)
 
-            if obj is not None and obj.event.can_manage(session.user):
-                booking.linked_object = obj
+        if obj is not None and obj.event.can_manage(session.user):
+            booking.linked_object = obj
 
     def _process(self):
         args = self.args
@@ -273,6 +274,7 @@ class RHDeleteBooking(RHBookingBase):
 
 class RHLinkedObjectData(RHRoomBookingBase):
     """Fetch data from event, contribution or session block"""
+
     def _process_args(self):
         type_ = LinkType[request.view_args['type']]
         id_ = request.view_args['id']
