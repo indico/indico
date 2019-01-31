@@ -68,6 +68,7 @@ class BlockingModal extends React.Component {
             acceptBlocking: PropTypes.func.isRequired,
             rejectBlocking: PropTypes.func.isRequired,
             deleteBlocking: PropTypes.func.isRequired,
+            openBlockingDetails: PropTypes.func.isRequired,
         }).isRequired,
     };
 
@@ -89,6 +90,7 @@ class BlockingModal extends React.Component {
         const {mode} = this.props;
         this.state = {
             deletionConfirmOpen: false,
+            newBlocking: null,
             mode,
         };
     }
@@ -106,6 +108,8 @@ class BlockingModal extends React.Component {
 
         if (rv.error) {
             return rv.error;
+        } else {
+            this.setState({newBlocking: rv.data});
         }
     };
 
@@ -288,12 +292,13 @@ class BlockingModal extends React.Component {
     }
 
     renderModalContent = (fprops) => {
-        const {onClose, blocking} = this.props;
+        const {onClose, blocking, actions: {openBlockingDetails}} = this.props;
         const {submitting, submitSucceeded} = fprops;
-        const {mode, deletionConfirmOpen} = this.state;
+        const {mode, deletionConfirmOpen, newBlocking} = this.state;
         const formProps = mode === 'view' ? {} : {onSubmit: fprops.handleSubmit, success: submitSucceeded};
         const canEdit = !!blocking.id && blocking.canEdit;
         const canDelete = !!blocking.id && blocking.canDelete;
+        const newBlockingLink = <a onClick={() => openBlockingDetails(newBlocking.id)} />;
 
         return (
             <>
@@ -410,13 +415,21 @@ class BlockingModal extends React.Component {
                                         </Translate>
                                     </Message>
                                 )}
-                                <Message success>
-                                    {mode === 'edit' ? (
+                                {mode === 'edit' ? (
+                                    <Message success>
                                         <Translate>The blocking has been successfully updated.</Translate>
-                                    ) : (
-                                        <Translate>The blocking has been successfully created.</Translate>
-                                    )}
-                                </Message>
+                                    </Message>
+                                ) : (
+                                    <Message success>
+                                        <Message.Header>
+                                            <Translate>The blocking has been successfully created.</Translate>
+                                        </Message.Header>
+                                        <Translate>
+                                            You can consult your blocking{' '}
+                                            <Param name="link" wrapper={newBlockingLink}>here</Param>.
+                                        </Translate>
+                                    </Message>
+                                )}
                             </Grid.Column>
                         </Grid>
                     </Form>
@@ -473,6 +486,7 @@ export default connect(
             acceptBlocking: blockingsActions.acceptBlocking,
             rejectBlocking: blockingsActions.rejectBlocking,
             deleteBlocking: blockingsActions.deleteBlocking,
+            openBlockingDetails: blockingId => blockingsActions.openBlockingDetails(blockingId),
         }, dispatch),
     })
 )(BlockingModal);
