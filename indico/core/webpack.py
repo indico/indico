@@ -16,7 +16,8 @@
 
 from __future__ import unicode_literals
 
-from flask import current_app
+import os
+
 from flask_webpackext import FlaskWebpackExt
 from flask_webpackext.manifest import JinjaManifestLoader
 from pywebpack import ManifestLoader
@@ -25,11 +26,14 @@ from indico.web.assets.util import get_custom_assets
 
 
 class IndicoManifestLoader(JinjaManifestLoader):
+    cache = {}
+
     def load(self, filepath):
-        if current_app.debug or filepath not in JinjaManifestLoader.cache:
-            JinjaManifestLoader.cache[filepath] = manifest = ManifestLoader.load(self, filepath)
+        key = (filepath, os.path.getmtime(filepath))
+        if key not in IndicoManifestLoader.cache:
+            IndicoManifestLoader.cache[key] = manifest = ManifestLoader.load(self, filepath)
             self._add_custom_assets(manifest)
-        return JinjaManifestLoader.cache[filepath]
+        return IndicoManifestLoader.cache[key]
 
     def _add_custom_assets(self, manifest):
         # custom assets (from CUSTOMIZATION_DIR) are not part of the webpack manifest
