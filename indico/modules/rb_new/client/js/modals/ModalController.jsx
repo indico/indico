@@ -79,10 +79,17 @@ class ModalController extends React.PureComponent {
         return qs.stringify(params, {arrayFormat: 'repeat'});
     }
 
+    getQueryStringWithoutModals() {
+        const {queryString} = this.props;
+        const params = qs.parse(queryString);
+        delete params.modal;
+        return qs.stringify(params, {arrayFormat: 'repeat'});
+    }
+
     makeCloseHandler(qsArg) {
         const {actions: {pushState}, path} = this.props;
-        return () => {
-            const queryString = this.getQueryStringWithout(qsArg);
+        return (closeAll) => {
+            const queryString = closeAll ? this.getQueryStringWithoutModals() : this.getQueryStringWithout(qsArg);
             pushState(path + (queryString ? `?${queryString}` : ''));
         };
     }

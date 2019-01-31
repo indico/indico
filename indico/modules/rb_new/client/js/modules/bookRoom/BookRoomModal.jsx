@@ -265,11 +265,12 @@ class BookRoomModal extends React.Component {
 
     onClose = () => {
         const {onClose} = this.props;
+        const {booking} = this.state;
         // reset state when dialog is closed
         this.setState({
             skipConflicts: false
         });
-        onClose();
+        onClose(booking !== null);
     };
 
     showConflicts = () => {
