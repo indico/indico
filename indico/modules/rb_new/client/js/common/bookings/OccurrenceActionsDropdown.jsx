@@ -30,6 +30,7 @@ class OccurrenceActionsDropdown extends React.Component {
         date: PropTypes.string.isRequired,
         actions: PropTypes.exact({
             changeBookingOccurrenceState: PropTypes.func.isRequired,
+            fetchBookingDetails: PropTypes.func.isRequired
         }).isRequired,
     };
 
@@ -46,8 +47,9 @@ class OccurrenceActionsDropdown extends React.Component {
     };
 
     changeOccurrenceState = (date, action, data = {}) => {
-        const {booking: {id}, actions: {changeBookingOccurrenceState}} = this.props;
-        return changeBookingOccurrenceState(id, date, action, data).then(() => {
+        const {booking: {id}, actions: {changeBookingOccurrenceState, fetchBookingDetails}} = this.props;
+        changeBookingOccurrenceState(id, date, action, data).then(() => {
+            fetchBookingDetails(id);
         });
     };
 
@@ -84,6 +86,7 @@ export default connect(
     (dispatch) => ({
         actions: bindActionCreators({
             changeBookingOccurrenceState: bookingsActions.changeBookingOccurrenceState,
+            fetchBookingDetails: bookingsActions.fetchBookingDetails
         }, dispatch)
     }),
 )(OccurrenceActionsDropdown);
