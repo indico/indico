@@ -107,9 +107,10 @@ export const getUnbookableRoomIdsWithMaxAdvanceDays = createSelector(
     roomsSelectors.getAllRooms,
     getFilters,
     (unbookableRoomIds, rooms, {dates: {startDate}}) => {
-        const roomIds = Object.entries(rooms).filter(([, room]) => (
-            room.maxAdvanceDays && moment().add(room.maxAdvanceDays, 'days') < moment(startDate))
-        ).map(([id]) => +id);
+        const roomIds = Object.entries(rooms)
+            .filter(([, room]) => !room.canUserOverride && room.maxAdvanceDays)
+            .filter(([, room]) => moment(startDate) > moment().add(room.maxAdvanceDays, 'days'))
+            .map(([id]) => +id);
         return [...new Set([...roomIds, ...unbookableRoomIds])];
     }
 );
