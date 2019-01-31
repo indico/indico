@@ -22,9 +22,11 @@ import React from 'react';
 import {AutoSizer, List, WindowScroller} from 'react-virtualized';
 import {Icon, Placeholder, Popup} from 'semantic-ui-react';
 import LazyScroll from 'redux-lazy-scroll';
+import {serializeDate} from 'indico/utils/date';
 import {Translate} from 'indico/react/i18n';
 import {TooltipIfTruncated} from 'indico/react/components';
 
+import OccurrenceActionsDropdown from '../bookings/OccurrenceActionsDropdown';
 import TimelineItem from './TimelineItem';
 import EditableTimelineItem from './EditableTimelineItem';
 
@@ -47,6 +49,8 @@ export default class DailyTimelineContent extends React.Component {
         fixedHeight: PropTypes.string,
         onAddSlot: PropTypes.func,
         renderHeader: PropTypes.func,
+        showActions: PropTypes.bool,
+        booking: PropTypes.object,
     };
 
     static defaultProps = {
@@ -63,6 +67,8 @@ export default class DailyTimelineContent extends React.Component {
         fixedHeight: null,
         onAddSlot: null,
         renderHeader: null,
+        showActions: false,
+        booking: null
     };
 
     state = {
@@ -87,7 +93,7 @@ export default class DailyTimelineContent extends React.Component {
     };
 
     renderTimelineRow({availability, label, conflictIndicator, room}, key, rowStyle = null) {
-        const {minHour, maxHour, hourStep, onClickCandidate, onClickReservation, longLabel} = this.props;
+        const {minHour, maxHour, hourStep, onClickCandidate, onClickReservation, longLabel, showActions} = this.props;
         const columns = ((maxHour - minHour) / hourStep) + 1;
         const hasConflicts = !(_.isEmpty(availability.conflicts) && _.isEmpty(availability.preConflicts));
         const {ItemClass, itemProps} = this.getEditableItem(room);
@@ -111,6 +117,7 @@ export default class DailyTimelineContent extends React.Component {
                                }}
                                {...itemProps} />
                 </div>
+                {showActions && this.renderRowActions(availability)}
             </div>
         );
     }
@@ -138,6 +145,19 @@ export default class DailyTimelineContent extends React.Component {
             </div>
         );
     }
+
+    renderRowActions = (availability) => {
+        const {booking} = this.props;
+        if (!booking || !availability['bookings'].length) {
+            return;
+        }
+        const date = serializeDate(availability['bookings'][0].startDt);
+        return (
+            <div styleName="timeline-row-actions">
+                <OccurrenceActionsDropdown booking={booking} date={date} />
+            </div>
+        );
+    };
 
     renderDefaultHeader = (hourSpan, hourSeries) => {
         const {hourStep, longLabel} = this.props;

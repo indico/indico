@@ -37,7 +37,7 @@ import TimeInformation from '../../components/TimeInformation';
 import {actions as modalActions} from '../../modals';
 import LazyBookingObjectLink from './LazyBookingObjectLink';
 import * as bookingsSelectors from './selectors';
-import * as bookRoomActions from './actions';
+import * as bookingsActions from './actions';
 
 import './BookingDetails.module.scss';
 
@@ -114,8 +114,15 @@ class BookingDetails extends React.Component {
     };
 
     renderTimeline = (occurrences, dateRange) => {
+        const {booking} = this.props;
         const rows = dateRange.map((day) => this._getRowSerializer(day)(occurrences));
-        return <DailyTimelineContent rows={rows} fixedHeight={rows.length > 1 ? '70vh' : null} maxHour={24} />;
+        return (
+            <DailyTimelineContent rows={rows}
+                                  fixedHeight={rows.length > 1 ? '70vh' : null}
+                                  maxHour={24}
+                                  booking={booking}
+                                  showActions />
+        );
     };
 
     renderBookingHistory = (editLogs, createdOn, createdByUser) => {
@@ -460,8 +467,8 @@ export default connect(
     }),
     (dispatch) => ({
         actions: bindActionCreators({
-            changeBookingState: bookRoomActions.changeBookingState,
-            deleteBooking: bookRoomActions.deleteBooking,
+            changeBookingState: bookingsActions.changeBookingState,
+            deleteBooking: bookingsActions.deleteBooking,
             openBookingDetails: bookingId => modalActions.openModal('booking-details', bookingId, null, true),
         }, dispatch)
     }),

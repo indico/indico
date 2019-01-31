@@ -19,6 +19,7 @@ import fetchBookingDetailsURL from 'indico-url:rooms_new.booking_details';
 import bookingStateActionsURL from 'indico-url:rooms_new.booking_state_actions';
 import bookingDeleteURL from 'indico-url:rooms_new.delete_booking';
 import bookingUpdateURL from 'indico-url:rooms_new.update_booking';
+import bookingOccurrenceStateActionsURL from 'indico-url:rooms_new.booking_occurrence_state_actions';
 
 import {indicoAxios} from 'indico/utils/axios';
 import {ajaxAction} from 'indico/utils/redux';
@@ -44,6 +45,10 @@ export const UPDATE_BOOKING_SUCCESS = 'bookings/UPDATE_BOOKING_SUCCESS';
 export const UPDATE_BOOKING_ERROR = 'bookings/UPDATE_BOOKING_ERROR';
 export const UPDATED_BOOKING_RECEIVED = 'bookings/UPDATED_BOOKING_RECEIVED';
 
+export const BOOKING_OCCURRENCE_STATE_CHANGE_REQUEST = 'bookings/BOOKING_OCCURRENCE_STATE_CHANGE_REQUEST';
+export const BOOKING_OCCURRENCE_STATE_CHANGE_SUCCESS = 'bookings/BOOKING_OCCURRENCE_STATE_CHANGE_SUCCESS';
+export const BOOKING_OCCURRENCE_STATE_CHANGE_ERROR = 'bookings/BOOKING_OCCURRENCE_STATE_CHANGE_ERROR';
+export const BOOKING_OCCURRENCE_STATE_UPDATED = 'bookings/BOOKING_OCCURRENCE_STATE_UPDATED';
 
 export function fetchBookingDetails(id) {
     return ajaxAction(
@@ -80,5 +85,14 @@ export function updateBooking(id, params) {
         UPDATE_BOOKING_REQUEST,
         [UPDATE_BOOKING_SUCCESS, UPDATED_BOOKING_RECEIVED],
         UPDATE_BOOKING_ERROR,
+    );
+}
+
+export function changeBookingOccurrenceState(id, date, action, params = {}) {
+    return ajaxAction(
+        () => indicoAxios.post(bookingOccurrenceStateActionsURL({booking_id: id, date, action}), params),
+        BOOKING_OCCURRENCE_STATE_CHANGE_REQUEST,
+        [BOOKING_OCCURRENCE_STATE_UPDATED, BOOKING_OCCURRENCE_STATE_CHANGE_SUCCESS],
+        BOOKING_OCCURRENCE_STATE_CHANGE_ERROR,
     );
 }

@@ -93,6 +93,19 @@ $row-height: 40px;
             position: relative;
             height: $row-height;
         }
+
+        .timeline-row-actions {
+            color: $orange;
+            font-size: 1.8em;
+            display: none;
+            height: 100%;
+            line-height: $row-height;
+            z-index: 4;
+        }
+
+        &:hover .timeline-row-actions {
+            display: flex;
+        }
     }
 
     &:global(.timeline-non-selectable) {

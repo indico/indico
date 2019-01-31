@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 
 from datetime import date, datetime, time
 
+import dateutil
 from flask import jsonify, request, session
 from marshmallow import fields, missing
 from marshmallow_enum import EnumField
@@ -354,3 +355,34 @@ class RHMatchingEvents(RHRoomBookingBase):
     def _process(self, start_dt, end_dt, repeat_frequency, repeat_interval):
         events = get_matching_events(start_dt, end_dt, repeat_frequency, repeat_interval)
         return jsonify(reservation_user_event_schema.dump(events).data)
+
+
+class RHBookingOccurrenceStateActions(RHBookingBase):
+    """Reject or cancel booking occurrence."""
+
+    def _process_args(self):
+        RHBookingBase._process_args(self)
+        date = dateutil.parser.parse(request.view_args['date'], yearfirst=True).date()
+        self.occurrence = self.booking.occurrences.filter(ReservationOccurrence.date == date).one()
+        self.action = request.view_args['action']
+
+    def _check_access(self):
+        RHBookingBase._check_access(self)
+        funcs = {'reject': self.booking.can_reject,
+                 'cancel': self.booking.can_cancel}
+
+        if self.action not in funcs or not funcs[self.action](session.user):
+            raise Forbidden
+
+    @use_kwargs({
+        'reason': fields.String(required=True)
+    })
+    def reject(self, reason):
+        self.occurrence.reject(session.user, reason)
+
+    def _process(self):
+        if self.action == 'reject':
+            self.reject()
+        elif self.action == 'cancel':
+            self.occurrence.cancel(session.user)
+        return jsonify(booking=reservation_details_schema.dump(self.booking).data)
