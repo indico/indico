@@ -15,6 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import moment from 'moment';
 import {createSelector} from 'reselect';
 import {RequestState} from 'indico/utils/redux';
 import {roomSearchSelectorFactory} from '../../common/roomSearch';
@@ -98,13 +99,29 @@ export const isSearchAndPermissionCheckFinished = createSelector(
     (searchFinished, checkingPermissions) => searchFinished && !checkingPermissions
 );
 
+/** Get rooms ids that are unbookable by the user and also take into
+ *  account the maximum advance days property of the room
+ */
+export const getUnbookableRoomIdsWithMaxAdvanceDays = createSelector(
+    userSelectors.getUnbookableRoomIds,
+    roomsSelectors.getAllRooms,
+    getFilters,
+    (unbookableRoomIds, rooms, {dates: {startDate}}) => {
+        const roomIds = Object.entries(rooms)
+            .filter(([, room]) => !room.canUserOverride && room.maxAdvanceDays)
+            .filter(([, room]) => moment(startDate) > moment().add(room.maxAdvanceDays, 'days'))
+            .map(([id]) => +id);
+        return [...new Set([...roomIds, ...unbookableRoomIds])];
+    }
+);
+
 /**
  * Get the room ids which are matching the filter criteria and bookable
  * by the user during the selected time slot.
  */
 export const getSearchResultIdsWithoutUnbookable = createSelector(
     getSearchResultIds,
-    userSelectors.getUnbookableRoomIds,
+    getUnbookableRoomIdsWithMaxAdvanceDays,
     (roomIds, unbookableRoomIds) => {
         const unbookable = new Set(unbookableRoomIds);
         return roomIds.filter(id => !unbookable.has(id));
@@ -127,7 +144,7 @@ export const getSearchResultsWithoutUnbookable = createSelector(
  */
 const getTotalResultCountWithoutUnbookable = createSelector(
     getSearchResultIdsWithoutAvailabilityFilter,
-    userSelectors.getUnbookableRoomIds,
+    getUnbookableRoomIdsWithMaxAdvanceDays,
     (roomIds, unbookableRoomIds) => {
         const unbookable = new Set(unbookableRoomIds);
         return roomIds.filter(id => !unbookable.has(id)).length;
@@ -157,7 +174,7 @@ export const hasUnavailableRooms = createSelector(
  */
 export const getSearchResultsForMap = createSelector(
     getAllSearchResultsForMap,
-    userSelectors.getUnbookableRoomIds,
+    getUnbookableRoomIdsWithMaxAdvanceDays,
     (mapResults, unbookableRoomIds) => {
         const unbookable = new Set(unbookableRoomIds);
         return mapResults.filter(x => !unbookable.has(x.id));
