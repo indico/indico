@@ -112,6 +112,9 @@ class ReservationLink(LinkMixin, db.Model):
         primary_key=True
     )
 
+    def __repr__(self):
+        return format_repr(self, 'id', _rawtext=self.link_repr)
+
     # relationship backrefs:
     # - reservation (Reservation.link)
 
