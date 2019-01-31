@@ -130,6 +130,7 @@ class RHContributionDisplay(RHContributionDisplayBase):
                                                contribution=contrib,
                                                show_author_link=_author_page_active(self.event),
                                                field_values=field_values,
+                                               page_title=contrib.title,
                                                **ical_params)
 
 

@@ -79,7 +79,8 @@ class RHDisplaySession(RHDisplaySessionBase):
                 .filter_by(id=self.session.id)
                 .options(contributions_strategy, blocks_strategy)
                 .one())
-        return self.view_class.render_template('display/session_display.html', self.event, sess=sess, **ical_params)
+        return self.view_class.render_template('display/session_display.html', self.event,
+                                               sess=sess, page_title=sess.title, **ical_params)
 
 
 class RHExportSessionToICAL(RHDisplaySessionBase):

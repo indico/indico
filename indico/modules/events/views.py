@@ -226,7 +226,7 @@ class WPConferenceDisplayBase(WPJinjaMixin, MathjaxMixin, WPEventBase):
         assert event_ == kwargs.setdefault('event', event_)
         self.event = event_
         kwargs['conf_layout_params'] = self._get_layout_params()
-        kwargs['page_title'] = self.sidemenu_title
+        kwargs.setdefault('page_title', self.sidemenu_title)
         WPEventBase.__init__(self, rh, event_, **kwargs)
 
     def _get_layout_params(self):
