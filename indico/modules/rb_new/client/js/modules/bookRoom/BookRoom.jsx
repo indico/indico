@@ -336,12 +336,16 @@ class BookRoom extends React.Component {
         const listBtn = (
             <Button icon={<Icon name="grid layout" styleName="switcher-icon" />}
                     className={toClasses({active: !isTimelineVisible})}
-                    onClick={this.switchToRoomList} circular />
+                    onClick={this.switchToRoomList}
+                    size="small"
+                    circular />
         );
         const timelineBtn = (
             <Button icon={<Icon name="calendar outline" styleName="switcher-icon"
                                 disabled={!this.timelineButtonEnabled} />}
-                    className={classes} circular />
+                    className={classes}
+                    size="small"
+                    circular />
         );
         return (
             <div styleName="view-icons">

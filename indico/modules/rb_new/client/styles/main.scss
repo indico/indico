@@ -51,6 +51,8 @@ a {
 }
 
 .sticky-filters {
+    margin-bottom: 20px;
+
     > :nth-child(2) {
         z-index: 15;
         background-color: white;
@@ -84,16 +86,13 @@ a {
     display: flex;
     align-items: baseline;
     flex-direction: row;
+    margin-bottom: 10px;
 
     .filter-row-filters {
         display: flex;
         align-items: baseline;
         flex-direction: row;
         flex-wrap: wrap;
-
-        > .ui.buttons, > .view-icons {
-            margin-bottom: 10px;
-        }
 
         > :not(:last-child) {
             margin-right: 10px;

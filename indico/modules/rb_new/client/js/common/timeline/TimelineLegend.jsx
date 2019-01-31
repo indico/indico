@@ -38,7 +38,7 @@ export default function TimelineLegend({labels, aside, compact}) {
         </List>
     ) : (
         <Segment styleName="legend" basic>
-            <Label.Group as="span" size="large" styleName="labels">
+            <Label.Group as="span" size="medium" styleName="labels">
                 {labels.map(({label, color, style}) => (
                     <Label color={color} styleName={style || ''} key={label}>{label}</Label>
                 ))}

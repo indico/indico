@@ -70,7 +70,7 @@ class BookingFilterBar extends React.Component {
         } = this.props;
 
         return (
-            <Button.Group size="large">
+            <Button.Group size="small">
                 <Button icon="calendar alternate outline" as="div" disabled />
                 <FilterBarController>
                     <FilterDropdownFactory name="recurrence"

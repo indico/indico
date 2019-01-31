@@ -146,7 +146,7 @@ export class RoomFilterBarBase extends React.Component {
         );
 
         return (
-            <Button.Group size="large">
+            <Button.Group size="small">
                 <Button icon="filter" as="div" disabled />
                 <FilterBarController>
                     {!hideOptions.building && (

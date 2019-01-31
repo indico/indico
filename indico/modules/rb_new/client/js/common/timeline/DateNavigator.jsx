@@ -174,7 +174,7 @@ export default class DateNavigator extends React.Component {
     renderModeSwitcher(disabled) {
         const {mode} = this.props;
         return !!mode && (
-            <Button.Group size="small" style={{marginRight: 10}}>
+            <Button.Group size="tiny" style={{marginRight: 10}}>
                 <Button content={Translate.string('Day')}
                         onClick={() => this.handleModeChange('days')}
                         primary={mode === 'days'}
@@ -256,7 +256,7 @@ export default class DateNavigator extends React.Component {
         const nextDisabled = disabled || !this.isValidChange(1, mode);
 
         return (
-            <Button.Group size="small">
+            <Button.Group size="tiny">
                 <Button icon="left arrow"
                         onClick={() => this.changeSelectedDate('prev')}
                         disabled={prevDisabled} />

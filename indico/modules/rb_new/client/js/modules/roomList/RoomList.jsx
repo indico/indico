@@ -173,7 +173,7 @@ class RoomList extends React.Component {
                                         </>
                                     ) : (
                                         <Dropdown text={Translate.string('Actions')}
-                                                  className="large"
+                                                  className="small"
                                                   options={menuOptions}
                                                   direction="left"
                                                   button

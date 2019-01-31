@@ -166,6 +166,7 @@ class Calendar extends React.Component {
                                         primary={view === 'timeline'}
                                         onClick={() => changeView('timeline')}
                                         disabled={isFetching || isFetchingActiveBookings}
+                                        size="tiny"
                                         circular />}
                        position="bottom center">
                     <Translate>
@@ -176,6 +177,7 @@ class Calendar extends React.Component {
                                         primary={view === 'list'}
                                         onClick={() => changeView('list')}
                                         disabled={isFetching || isFetchingActiveBookings}
+                                        size="tiny"
                                         circular />}
                        position="bottom center">
                     <Translate>
@@ -198,7 +200,7 @@ class Calendar extends React.Component {
             allowDragDrop,
         } = this.props;
         const legendLabels = [
-            {label: Translate.string('Booked'), color: 'orange'},
+            {label: Translate.string('Booked'), color: 'orange', style: 'booking'},
             {label: Translate.string('Pre-Booking'), style: 'pre-booking'},
             {label: Translate.string('Blocked'), style: 'blocking'},
             {label: Translate.string('Not bookable'), style: 'unbookable'}
