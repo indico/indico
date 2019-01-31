@@ -144,7 +144,7 @@ export const getSearchResultsWithoutUnbookable = createSelector(
  */
 const getTotalResultCountWithoutUnbookable = createSelector(
     getSearchResultIdsWithoutAvailabilityFilter,
-    userSelectors.getUnbookableRoomIds,
+    getUnbookableRoomIdsWithMaxAdvanceDays,
     (roomIds, unbookableRoomIds) => {
         const unbookable = new Set(unbookableRoomIds);
         return roomIds.filter(id => !unbookable.has(id)).length;
@@ -174,7 +174,7 @@ export const hasUnavailableRooms = createSelector(
  */
 export const getSearchResultsForMap = createSelector(
     getAllSearchResultsForMap,
-    userSelectors.getUnbookableRoomIds,
+    getUnbookableRoomIdsWithMaxAdvanceDays,
     (mapResults, unbookableRoomIds) => {
         const unbookable = new Set(unbookableRoomIds);
         return mapResults.filter(x => !unbookable.has(x.id));
