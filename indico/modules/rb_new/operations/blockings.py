@@ -30,6 +30,7 @@ from indico.modules.rb.models.blocked_rooms import BlockedRoom, BlockedRoomState
 from indico.modules.rb.models.blockings import Blocking
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.notifications.blockings import notify_request
+from indico.modules.rb_new.operations.rooms import get_managed_room_ids
 from indico.modules.users.models.users import User
 from indico.util.struct.iterables import group_list
 
@@ -50,7 +51,7 @@ def get_room_blockings(timeframe=None, created_by=None, in_rooms_owned_by=None):
     if created_by:
         criteria.append(Blocking.created_by_user == created_by)
     if in_rooms_owned_by:
-        criteria.append(Room.owner == in_rooms_owned_by)
+        criteria.append(BlockedRoom.room_id.in_(get_managed_room_ids(in_rooms_owned_by)))
 
     query = query.filter(db.and_(*criteria))
     return query.all()
@@ -114,6 +115,7 @@ def _approve_or_request_rooms(blocking, blocked_rooms=None):
         if blocked_room.room.can_manage(session.user, allow_admin=False):
             blocked_room.approve(notify_blocker=False)
         else:
+            # TODO: notify all managers of a room?
             rooms_by_owner[blocked_room.room.owner].append(blocked_room)
     for owner, rooms in rooms_by_owner.iteritems():
         notify_request(owner, blocking, rooms)
