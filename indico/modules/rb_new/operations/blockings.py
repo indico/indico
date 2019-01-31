@@ -111,11 +111,10 @@ def _approve_or_request_rooms(blocking, blocked_rooms=None):
         blocked_rooms = set(blocking.blocked_rooms)
     rooms_by_owner = defaultdict(list)
     for blocked_room in blocked_rooms:
-        owner = blocked_room.room.owner
-        if owner == session.user:
+        if blocked_room.room.can_manage(session.user, allow_admin=False):
             blocked_room.approve(notify_blocker=False)
         else:
-            rooms_by_owner[owner].append(blocked_room)
+            rooms_by_owner[blocked_room.room.owner].append(blocked_room)
     for owner, rooms in rooms_by_owner.iteritems():
         notify_request(owner, blocking, rooms)
 
