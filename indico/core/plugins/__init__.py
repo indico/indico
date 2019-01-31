@@ -24,7 +24,6 @@ from flask import g, session
 from flask_babelex import Domain
 from flask_pluginengine import (Plugin, PluginBlueprintMixin, PluginBlueprintSetupStateMixin, PluginEngine,
                                 current_plugin, render_plugin_template, wrap_in_plugin_context)
-from flask_webpackext.manifest import JinjaManifestLoader
 from werkzeug.utils import cached_property
 
 from indico.core import signals
@@ -32,6 +31,7 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy.util.models import import_all_models
 from indico.core.logger import Logger
 from indico.core.settings import SettingsProxy
+from indico.core.webpack import IndicoManifestLoader
 from indico.modules.events.settings import EventSettingsProxy
 from indico.modules.events.static.util import RewrittenManifest
 from indico.modules.users import UserSettingsProxy
@@ -164,7 +164,8 @@ class IndicoPlugin(Plugin):
 
     def _get_manifest(self):
         try:
-            return JinjaManifestLoader().load(os.path.join(self.root_path, 'static', 'dist', 'manifest.json'))
+            loader = IndicoManifestLoader(custom=False)
+            return loader.load(os.path.join(self.root_path, 'static', 'dist', 'manifest.json'))
         except IOError as exc:
             if exc.errno != errno.ENOENT:
                 raise

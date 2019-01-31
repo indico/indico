@@ -28,11 +28,16 @@ from indico.web.assets.util import get_custom_assets
 class IndicoManifestLoader(JinjaManifestLoader):
     cache = {}
 
+    def __init__(self, *args, **kwargs):
+        self.custom = kwargs.pop('custom', True)
+        super(IndicoManifestLoader, self).__init__(*args, **kwargs)
+
     def load(self, filepath):
         key = (filepath, os.path.getmtime(filepath))
         if key not in IndicoManifestLoader.cache:
             IndicoManifestLoader.cache[key] = manifest = ManifestLoader.load(self, filepath)
-            self._add_custom_assets(manifest)
+            if self.custom:
+                self._add_custom_assets(manifest)
         return IndicoManifestLoader.cache[key]
 
     def _add_custom_assets(self, manifest):
