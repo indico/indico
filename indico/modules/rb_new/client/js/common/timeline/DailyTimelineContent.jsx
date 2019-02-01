@@ -171,10 +171,11 @@ export default class DailyTimelineContent extends React.Component {
         ))
     );
 
-    renderList(hourSpan, width, height, extraProps = {}) {
+    renderList(hourSpan, width, height = null, extraProps = {}) {
         const {rows, hourStep, longLabel, isLoading} = this.props;
         const {selectable} = this.state;
         const labelWidth = longLabel ? 200 : 150;
+        const rowHeight = 50;
 
         return (
             <>
@@ -187,7 +188,7 @@ export default class DailyTimelineContent extends React.Component {
                     </div>
                     <div>
                         <List width={width}
-                              height={height}
+                              height={height || rows.length * rowHeight}
                               rowCount={rows.length}
                               overscanRowCount={15}
                               rowHeight={50}
@@ -232,8 +233,8 @@ export default class DailyTimelineContent extends React.Component {
         const autoSizerWrapper = h => (
             <div style={{height: h}} styleName="auto-sizer-wrapper">
                 <AutoSizer>
-                    {({width, height}) => (
-                        this.renderList(hourSpan, width, height)
+                    {({width}) => (
+                        this.renderList(hourSpan, width)
                     )}
                 </AutoSizer>
             </div>
