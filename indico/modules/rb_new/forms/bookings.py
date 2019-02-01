@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 from wtforms.validators import DataRequired
 
 from indico.modules.events.contributions.fields import ContributionField
+from indico.modules.events.sessions.fields import SessionBlockField
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
 
@@ -26,6 +27,9 @@ from indico.web.forms.base import IndicoForm
 class BookingListForm(IndicoForm):
     contribution = ContributionField(_("Contribution"), [DataRequired()], description=_("Enter the contribution name."),
                                      ajax_endpoint='contributions.other_contributions')
+    session_block = SessionBlockField(_("Session block"), [DataRequired()],
+                                      description=_("Enter the session block name."),
+                                      ajax_endpoint='sessions.other_session_blocks')
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')

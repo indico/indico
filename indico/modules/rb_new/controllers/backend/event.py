@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 from indico.modules.events.contributions import Contribution
+from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.rb.controllers.user.event import RHRoomBookingEventBase
 from indico.modules.rb_new.forms.bookings import BookingListForm
 from indico.modules.rb_new.views.base import WPEventBookingList
@@ -29,5 +30,9 @@ class RHEventBookingList(RHRoomBookingEventBase):
         has_unlinked_contribs = (Contribution.query.with_parent(self.event)
                                  .filter(Contribution.is_scheduled)
                                  .filter(Contribution.room_reservation_link == None).has_rows())
+        has_unlinked_session_blocks = (SessionBlock.query
+                                       .filter(SessionBlock.session.has(event=self.event))
+                                       .filter(SessionBlock.room_reservation_link == None)).has_rows()
         return WPEventBookingList.render_template('booking_list.html', self.event, form=form, reservations=reservations,
-                                                  has_unlinked_contribs=has_unlinked_contribs)
+                                                  has_unlinked_contribs=has_unlinked_contribs,
+                                                  has_unlinked_session_blocks=has_unlinked_session_blocks)

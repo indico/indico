@@ -35,19 +35,21 @@
                 </div>
             </div>
         {% endif %}
-        <div class="section searchable-field">
-            <div class="text">
-                <div class="label">
-                    {%- trans %}Session block{% endtrans -%}
+        {% if has_unlinked_session_blocks %}
+            <div class="section searchable-field">
+                <div class="text">
+                    <div class="label">
+                        {%- trans %}Session block{% endtrans -%}
+                    </div>
+                    {{ form_row(form.session_block, skip_label=true, hide_description=true) }}
                 </div>
-{#                {{ form_row(form.session_block, skip_label=true, hide_description=true) }}#}
+                <div class="toolbar">
+                    <a href="#" class="i-button highlight">
+                        {%- trans %}Book{% endtrans -%}
+                    </a>
+                </div>
             </div>
-            <div class="toolbar">
-                <a href="#" class="i-button highlight">
-                    {%- trans %}Book{% endtrans -%}
-                </a>
-            </div>
-        </div>
+        {% endif %}
     </div>
     {{ reservations }}
     <script>
