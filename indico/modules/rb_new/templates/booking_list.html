@@ -6,7 +6,6 @@
 {% endblock %}
 
 {% block content %}
-    {# TODO: If there're no contribs or session block, don't show their sections at all#}
     <div class="action-box event-bookings">
         <div class="section">
             <div class="text">
@@ -41,7 +40,7 @@
                 <div class="label">
                     {%- trans %}Session block{% endtrans -%}
                 </div>
-{#                {{ form_row(form.session_block, skip_label=true) }}#}
+{#                {{ form_row(form.session_block, skip_label=true, hide_description=true) }}#}
             </div>
             <div class="toolbar">
                 <a href="#" class="i-button highlight">

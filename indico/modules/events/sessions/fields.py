@@ -16,6 +16,8 @@
 
 from __future__ import unicode_literals
 
+from wtforms.ext.sqlalchemy.fields import QuerySelectField
+
 from indico.modules.events.fields import PersonLinkListFieldBase
 from indico.modules.events.sessions.models.persons import SessionBlockPersonLink
 from indico.modules.events.util import serialize_person_link
@@ -33,3 +35,7 @@ class SessionBlockPersonLinkListField(PersonLinkListFieldBase):
 
     def _convert_data(self, data):
         return list({self._get_person_link(x) for x in data})
+
+
+class SessionBlockField(QuerySelectField):
+    pass  # TODO
