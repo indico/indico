@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 from flask import jsonify, request, session
 from sqlalchemy.orm import subqueryload, undefer
-from werkzeug.exceptions import BadRequest, Forbidden
+from werkzeug.exceptions import BadRequest
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.colors import ColorTuple
@@ -27,7 +27,6 @@ from indico.core.permissions import get_principal_permissions
 from indico.modules.events import EventLogKind, EventLogRealm
 from indico.modules.events.contributions import contribution_settings
 from indico.modules.events.contributions.models.contributions import Contribution
-from indico.modules.events.controllers.base import RHDisplayEventBase
 from indico.modules.events.management.controllers.base import RHContributionPersonListMixin
 from indico.modules.events.operations import update_permissions
 from indico.modules.events.sessions.controllers.management import (RHManageSessionBase, RHManageSessionsActionsBase,
@@ -42,7 +41,7 @@ from indico.modules.events.sessions.operations import (create_session, delete_se
 from indico.modules.events.sessions.util import (generate_pdf_from_sessions, generate_spreadsheet_from_sessions,
                                                  render_session_type_row)
 from indico.modules.events.sessions.views import WPManageSessions
-from indico.modules.events.util import check_event_locked, get_random_color, update_object_principals
+from indico.modules.events.util import get_random_color
 from indico.util.spreadsheets import send_csv, send_xlsx
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file
@@ -332,43 +331,3 @@ class RHDeleteSessionType(RHManageSessionTypeBase):
         self.event.log(EventLogRealm.management, EventLogKind.negative, 'Sessions',
                        'Deleted type: {}'.format(self.session_type.name), session.user)
         return jsonify_data(flash=False)
-
-
-class RHSessionBlocksBase(RHDisplayEventBase):
-    """Base class for all session blocks-related RHs"""
-
-    def _check_access(self):
-        RHDisplayEventBase._check_access(self)
-        # Only let event managers access the management versions.
-        if self.management and not self.event.can_manage(session.user):
-            raise Forbidden
-        check_event_locked(self, self.event)
-
-    @property
-    def management(self):
-        """Whether the RH is currently used in the management area"""
-        return request.view_args.get('management', False)
-
-
-class RHListOtherSessionBlocks(RHSessionBlocksBase):
-    """AJAX endpoint that lists all session blocks in the event (dict representation)."""
-
-    def _check_access(self):
-        if not session.user:
-            raise Forbidden
-        RHSessionBlocksBase._check_access(self)
-
-    def _process(self):
-
-        query = (SessionBlock.query
-                 .filter(SessionBlock.session.has(event=self.event))
-                 .filter(SessionBlock.room_reservation_link == None)
-                 .join(Session)
-                 .order_by(Session.friendly_id))
-
-        result = [{'id': session_block.id, 'friendly_id': session_block.session.friendly_id,
-                   'title': session_block.full_title,
-                   'full_title': '#{}: {}'.format(session_block.session.friendly_id, session_block.full_title)}
-                  for session_block in query
-                  if session_block.can_access(session.user)]
-        return jsonify(result)

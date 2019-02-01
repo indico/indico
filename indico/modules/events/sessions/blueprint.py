@@ -25,7 +25,6 @@ from indico.modules.events.sessions.controllers.management.sessions import (RHCr
                                                                             RHDeleteSessions, RHDeleteSessionType,
                                                                             RHEditSessionType, RHExportSessionsCSV,
                                                                             RHExportSessionsExcel, RHExportSessionsPDF,
-                                                                            RHListOtherSessionBlocks,
                                                                             RHManageSessionBlock, RHManageSessionTypes,
                                                                             RHModifySession, RHSessionACL,
                                                                             RHSessionACLMessage, RHSessionBlocks,
@@ -70,10 +69,6 @@ _bp.add_url_rule('/sessions/<int:session_id>/', 'display_session', RHDisplaySess
 _bp.add_url_rule('/sessions/<int:session_id>/session.ics', 'export_ics', RHExportSessionToICAL)
 _bp.add_url_rule('/sessions/<int:session_id>/session-timetable.pdf', 'export_session_timetable',
                  RHExportSessionTimetableToPDF)
-
-# Misc
-_bp.add_url_rule('/session-blocks/other-list', 'other_session_blocks', RHListOtherSessionBlocks,
-                 methods=('POST',))
 
 # Legacy URLs
 _compat_bp = IndicoBlueprint('compat_sessions', __name__, url_prefix='/event/<event_id>')

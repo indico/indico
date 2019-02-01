@@ -18,8 +18,9 @@ from __future__ import unicode_literals
 
 from flask import jsonify
 
-from indico.modules.rb_new.controllers.backend import admin, blockings, bookings, event, locations, misc, rooms
+from indico.modules.rb_new.controllers.backend import admin, blockings, bookings, locations, misc, rooms
 from indico.modules.rb_new.controllers.frontend import RHRoomBooking
+from indico.modules.rb_new.controllers.management import contributions, events, sessions
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -102,5 +103,9 @@ _bp.add_url_rule('/api/admin/attributes', 'admin_attributes', admin.RHAttributes
 _bp.add_url_rule('/api/admin/attributes/<int:attribute_id>', 'admin_attributes', admin.RHAttributes,
                  methods=('GET', 'DELETE', 'PATCH'))
 
-# Event
-_bp_event_mgmt.add_url_rule('/rooms/', 'booking_list', event.RHEventBookingList)
+# Event linking
+_bp_event_mgmt.add_url_rule('/rooms/', 'booking_list', events.RHEventBookingList)
+_bp_event_mgmt.add_url_rule('/contributions/other-list', 'other_contributions', contributions.RHListOtherContributions,
+                            methods=('POST',))
+_bp_event_mgmt.add_url_rule('/session-blocks/other-list', 'other_session_blocks', sessions.RHListOtherSessionBlocks,
+                            methods=('POST',))
