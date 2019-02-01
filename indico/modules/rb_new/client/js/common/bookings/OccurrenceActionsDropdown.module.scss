@@ -16,3 +16,9 @@
  */
 
 
+.actions-dropdown {
+
+    :global(.dropdown.icon) {
+        display: none;
+    }
+ }

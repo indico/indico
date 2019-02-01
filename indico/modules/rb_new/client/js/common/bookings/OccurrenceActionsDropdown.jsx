@@ -15,6 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import ReactDom from 'react-dom';
 import React from 'react';
 import PropTypes from 'prop-types';
 import {bindActionCreators} from 'redux';
@@ -38,6 +39,8 @@ class OccurrenceActionsDropdown extends React.Component {
 
     state = {
         activeConfirmation: null,
+        dropdownOpen: false,
+        dropdownUpward: false,
     };
 
     hideConfirm = () => {
@@ -55,18 +58,50 @@ class OccurrenceActionsDropdown extends React.Component {
         });
     };
 
+    findHeightRatio = () => {
+        const windowHeight = window.innerHeight;
+        const elementHeight = ReactDom.findDOMNode(this).getBoundingClientRect().top;
+        return elementHeight / windowHeight;
+    };
+
+    onClickButton = () => {
+        const {dropdownUpward, dropdownOpen} = this.state;
+        if (dropdownOpen) {
+            this.setState({dropdownOpen: false});
+        } else {
+            const ratio = this.findHeightRatio();
+            const setUpward = (ratio > 0.75 && !dropdownUpward);
+            const setDownward = (ratio < 0.75 && dropdownUpward);
+            if (setUpward) {
+                this.setState({
+                    dropdownOpen: true,
+                    dropdownUpward: true,
+                });
+            } else if (setDownward) {
+                this.setState({
+                    dropdownOpen: true,
+                    dropdownUpward: false,
+                });
+            } else {
+                this.setState({dropdownOpen: true});
+            }
+        }
+    };
+
     render() {
-        const {activeConfirmation} = this.state;
+        const {activeConfirmation, dropdownUpward, dropdownOpen} = this.state;
         const {date} = this.props;
         return (
-            <>
-                <Dropdown icon="ellipsis horizontal">
+            <div styleName="actions-dropdown">
+                <Button icon="ellipsis horizontal" onClick={this.onClickButton} />
+                <Dropdown upward={dropdownUpward} open={dropdownOpen}>
                     <Dropdown.Menu direction="left">
                         <Dropdown.Item icon="times"
                                        text="Cancel occurrence"
                                        onClick={() => this.showConfirm('cancel')} />
                         <Dropdown.Item icon="times"
-                                       text="Reject occurrence" />
+                                       text="Reject occurrence"
+                                       onClick={() => this.showConfirm('reject')} />
                     </Dropdown.Menu>
                 </Dropdown>
                 <Confirm header={Translate.string('Confirm cancellation')}
@@ -79,7 +114,7 @@ class OccurrenceActionsDropdown extends React.Component {
                              this.changeOccurrenceState(date, 'cancel');
                              this.hideConfirm();
                          }} />
-            </>
+            </div>
         );
     }
 }

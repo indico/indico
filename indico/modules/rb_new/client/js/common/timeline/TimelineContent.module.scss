@@ -97,16 +97,16 @@ $row-height: 40px;
         .timeline-row-actions {
             color: $orange;
             font-size: 1.8em;
-            display: none;
+            visibility: hidden;
             height: 100%;
             line-height: $row-height;
             z-index: 4;
+            position: absolute;
+            right: 2%;
         }
 
         &:hover .timeline-row-actions {
-            display: inline;
-            position: absolute;
-            right: 0;
+            visibility: visible;
         }
     }
 
