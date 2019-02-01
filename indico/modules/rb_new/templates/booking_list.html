@@ -15,7 +15,7 @@
                 {{ event.title }}
             </div>
             <div class="toolbar">
-                <a href="#" class="i-button highlight">
+                <a href="#" class="i-button highlight book-btn">
                     {%- trans %}Book{% endtrans -%}
                 </a>
             </div>
@@ -29,7 +29,7 @@
                     {{ form_row(form.contribution, skip_label=true, hide_description=true) }}
                 </div>
                 <div class="toolbar">
-                    <a href="#" class="i-button highlight">
+                    <a href="#" class="i-button highlight book-btn disabled">
                         {%- trans %}Book{% endtrans -%}
                     </a>
                 </div>
@@ -44,7 +44,7 @@
                     {{ form_row(form.session_block, skip_label=true, hide_description=true) }}
                 </div>
                 <div class="toolbar">
-                    <a href="#" class="i-button highlight">
+                    <a href="#" class="i-button highlight book-btn disabled">
                         {%- trans %}Book{% endtrans -%}
                     </a>
                 </div>
@@ -53,7 +53,19 @@
     </div>
     {{ reservations }}
     <script>
-        $('#contribution').on('change', () => alert('change!'));
+        (function() {
+            'use strict';
+
+            $('#contribution, #session_block').on('change', (e) => {
+                const $target = $(e.currentTarget);
+                $target.closest('.searchable-field').find('.book-btn').toggleClass('disabled', !$target.val());
+                const linkType = {contribution: 'contribution',
+                    session_block: 'sessionBlock',
+                }[$target.attr('id')];
+                const linkId = +$target.val();
+                // TODO: Change book link to inject object id
+            });
+        })();
     </script>
 {% endblock %}
 
