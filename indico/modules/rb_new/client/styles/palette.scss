@@ -25,7 +25,7 @@ $primary-color: #2185d0;
 $pre-booking-stripe-colors: ($orange, lighten($orange, 14%));
 $pre-booking-conflict-stripe-colors: ($red, lighten($red, 14%));
 $blocking-stripe-colors: (lighten($light-red, 10%), $light-red);
-$rejection-stripe-colors: (lighten($gray, 30%), lighten($gray, 40%));
+$rejection-stripe-colors: (lighten($red, 0%), lighten($red, 10%));
 
 %rb-splash-background {
     background-image: url('static:images/globe.png');

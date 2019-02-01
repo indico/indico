@@ -16,7 +16,7 @@
 */
 
 import React from 'react';
-import {Button, Icon, Label, Popup} from 'semantic-ui-react';
+import {Button, Icon, Label} from 'semantic-ui-react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
@@ -27,10 +27,10 @@ import {Overridable} from 'indico/react/util';
 import CapacityForm from './filters/CapacityForm';
 import EquipmentForm from './filters/EquipmentForm';
 import BuildingForm from './filters/BuildingForm';
+import ShowOnlyForm from './filters/ShowOnlyForm';
 import {FilterBarController, FilterDropdownFactory} from '../../common/filters/FilterBar';
 import {actions as filtersActions} from '../../common/filters';
 import {selectors as roomsSelectors} from '../../common/rooms';
-import {selectors as userSelectors} from '../../common/user';
 
 import './RoomFilterBar.module.scss';
 
@@ -86,10 +86,7 @@ export class RoomFilterBarBase extends React.Component {
             title: PropTypes.string.isRequired,
         })).isRequired,
         buildings: PropTypes.array.isRequired,
-        hasFavoriteRooms: PropTypes.bool,
         showOnlyAuthorizedFilter: PropTypes.bool,
-        hasUnbookableRooms: PropTypes.bool.isRequired,
-        hasOwnedRooms: PropTypes.bool,
         extraButtons: PropTypes.node,
         filters: PropTypes.shape({
             building: PropTypes.string,
@@ -109,9 +106,7 @@ export class RoomFilterBarBase extends React.Component {
     };
 
     static defaultProps = {
-        hasFavoriteRooms: false,
         showOnlyAuthorizedFilter: true,
-        hasOwnedRooms: false,
         extraButtons: null,
         hideOptions: {},
         disabled: false,
@@ -119,8 +114,8 @@ export class RoomFilterBarBase extends React.Component {
 
     render() {
         const {
-            equipmentTypes, features: availableFeatures, hasOwnedRooms, hasFavoriteRooms, buildings,
-            extraButtons, hideOptions, disabled, showOnlyAuthorizedFilter, hasUnbookableRooms,
+            equipmentTypes, features: availableFeatures, buildings,
+            extraButtons, hideOptions, disabled, showOnlyAuthorizedFilter,
             filters: {
                 capacity, onlyFavorites, onlyMine, onlyAuthorized, equipment, features, building,
                 ...extraFilters
@@ -178,22 +173,28 @@ export class RoomFilterBarBase extends React.Component {
                     <Overridable id="RoomFilterBar.extraFilters"
                                  setFilter={setFilterParameter}
                                  filters={extraFilters} />
-                    <Popup trigger={<Button icon="star" primary={onlyFavorites}
-                                            disabled={(!onlyFavorites && !hasFavoriteRooms) || disabled}
-                                            onClick={() => setFilterParameter('onlyFavorites', !onlyFavorites)} />}
-                           content={Translate.string('Show only my favorite rooms')} />
-                    {(hasOwnedRooms || onlyMine) && (
-                        <Popup trigger={<Button icon="user" primary={onlyMine}
-                                                onClick={() => setFilterParameter('onlyMine', !onlyMine)}
-                                                disabled={disabled} />}
-                               content={Translate.string('Show only rooms I manage')} />
-                    )}
-                    {showOnlyAuthorizedFilter && (hasUnbookableRooms || onlyAuthorized) && (
-                        <Popup trigger={<Button icon="lock open" primary={onlyAuthorized}
-                                                onClick={() => setFilterParameter('onlyAuthorized', !onlyAuthorized)}
-                                                disabled={disabled} />}
-                               content={Translate.string('Show only rooms I am authorized to book')} />
-                    )}
+                    <FilterDropdownFactory name="room-different"
+                                           title={<Translate>Show only...</Translate>}
+                                           form={(data, setParentField) => (
+                                               <ShowOnlyForm {...data}
+                                                             setParentField={setParentField}
+                                                             showOnlyAuthorizedFilter={showOnlyAuthorizedFilter}
+                                                             disabled={disabled} />
+                                           )}
+                                           setGlobalState={setFilters}
+                                           renderValue={(data) => {
+                                               const iconMap = {
+                                                   onlyFavorites: 'star',
+                                                   onlyMine: 'user',
+                                                   onlyAuthorized: 'lock open'
+                                               };
+                                               const icons = Object.entries(iconMap)
+                                                   .filter(([key]) => data[key])
+                                                   .map(([key, icon]) => <Icon key={key} name={icon} />);
+                                               return icons.length !== 0 ? icons : null;
+                                           }}
+                                           initialValues={{onlyFavorites, onlyMine, onlyAuthorized}}
+                                           disabled={disabled} />
                     {extraButtons}
                 </FilterBarController>
             </Button.Group>
@@ -206,9 +207,6 @@ export default (namespace, searchRoomsSelectors) => connect(
         filters: searchRoomsSelectors.getFilters(state),
         equipmentTypes: roomsSelectors.getEquipmentTypeNamesWithoutFeatures(state),
         features: roomsSelectors.getFeatures(state),
-        hasOwnedRooms: userSelectors.hasOwnedRooms(state),
-        hasFavoriteRooms: userSelectors.hasFavoriteRooms(state),
-        hasUnbookableRooms: userSelectors.hasUnbookableRooms(state),
         buildings: roomsSelectors.getBuildings(state),
     }),
     dispatch => ({

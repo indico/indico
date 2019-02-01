@@ -77,7 +77,7 @@ export default class ElasticTimeline extends React.Component {
         const {bookingAllowed} = this.props;
         return ({
             candidates, preBookings, bookings, preConflicts, conflicts, blockings, nonbookablePeriods,
-            unbookableHours
+            unbookableHours, cancellations, rejections
         }) => {
             const hasConflicts = !!(conflicts[dt] || []).length;
             return {
@@ -88,7 +88,9 @@ export default class ElasticTimeline extends React.Component {
                 preConflicts: preConflicts[dt] || [],
                 blockings: blockings[dt] || [],
                 nonbookablePeriods: nonbookablePeriods[dt] || [],
-                unbookableHours: unbookableHours || []
+                unbookableHours: unbookableHours || [],
+                cancellations: cancellations[dt] || [],
+                rejections: rejections[dt] || [],
             };
         };
     }

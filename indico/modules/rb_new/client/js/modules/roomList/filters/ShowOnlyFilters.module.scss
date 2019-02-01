@@ -15,24 +15,20 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import {serializeDate, toMoment} from 'indico/utils/date';
+.show-only-filter {
+    display: flex;
+    align-items: center;
+    width: 300px;
 
-
-export const ajax = {
-    start_date: {
-        onlyIf: ({selectedDate}) => selectedDate,
-        serializer: ({selectedDate, mode}) => serializeDate(toMoment(selectedDate).startOf(mode)),
-    },
-    end_date: {
-        onlyIf: ({selectedDate, mode}) => selectedDate && mode !== 'days',
-        serializer: ({selectedDate, mode}) => serializeDate(toMoment(selectedDate).endOf(mode)),
-    },
-    my_bookings: {
-        onlyIf: ({myBookings}) => myBookings,
-        serializer: ({myBookings}) => myBookings,
-    },
-    show_inactive: {
-        onlyIf: ({showInactive}) => showInactive,
-        serializer: ({showInactive}) => showInactive,
+    &:not(:nth-last-child(2)) {
+        margin-bottom: 10px;
     }
-};
+
+    :global(.toggle.checkbox) {
+        margin-right: 10px;
+    }
+
+    :global(.icon) {
+        height: 100%;
+    }
+}

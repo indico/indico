@@ -123,9 +123,14 @@ class Calendar extends React.Component {
         setFilterParameter('hideUnused', !hideUnused);
     };
 
+    toggleShowInactive = () => {
+        const {calendarFilters: {showInactive}, actions: {setFilterParameter}} = this.props;
+        setFilterParameter('showInactive', !showInactive);
+    };
+
     renderExtraButtons = () => {
         const {
-            calendarFilters: {myBookings},
+            calendarFilters: {myBookings, showInactive},
             localFilters: {hideUnused},
             actions: {setFilterParameter},
             isFetching, isFetchingActiveBookings
@@ -133,9 +138,8 @@ class Calendar extends React.Component {
         const {view} = this.props;
 
         return (
-            <>
-                <Popup trigger={<Button size="large"
-                                        primary={myBookings}
+            <Button.Group size="small">
+                <Popup trigger={<Button primary={myBookings}
                                         icon="user circle"
                                         disabled={isFetching || isFetchingActiveBookings}
                                         onClick={() => setFilterParameter('myBookings', !myBookings || null)} />}>
@@ -144,17 +148,26 @@ class Calendar extends React.Component {
                     </Translate>
                 </Popup>
                 {view === 'timeline' && (
-                    <Popup trigger={<Button size="large"
-                                            primary={hideUnused}
-                                            icon={hideUnused ? 'plus square outline' : 'minus square outline'}
-                                            disabled={isFetching}
-                                            onClick={this.toggleHideUnused} />}>
-                        {hideUnused
-                            ? <Translate>Show unused rooms</Translate>
-                            : <Translate>Hide unused rooms</Translate>}
-                    </Popup>
+                    <>
+                        <Popup trigger={<Button primary={showInactive}
+                                                icon="ban"
+                                                disabled={isFetching}
+                                                onClick={this.toggleShowInactive} />}>
+                            {showInactive
+                                ? <Translate>Hide rejected/cancelled bookings</Translate>
+                                : <Translate>Show rejected/cancelled bookings</Translate>}
+                        </Popup>
+                        <Popup trigger={<Button primary={hideUnused}
+                                                icon={hideUnused ? 'plus square outline' : 'minus square outline'}
+                                                disabled={isFetching}
+                                                onClick={this.toggleHideUnused} />}>
+                            {hideUnused
+                                ? <Translate>Show unused spaces</Translate>
+                                : <Translate>Hide unused spaces</Translate>}
+                        </Popup>
+                    </>
                 )}
-            </>
+            </Button.Group>
         );
     };
 
@@ -194,6 +207,7 @@ class Calendar extends React.Component {
             isFetching,
             isFetchingActiveBookings,
             localFilters: {hideUnused},
+            calendarFilters: {showInactive},
             calendarData: {rows},
             actions: {openRoomDetails, setDate, openBookingDetails, setMode},
             datePicker,
@@ -203,8 +217,16 @@ class Calendar extends React.Component {
             {label: Translate.string('Booked'), color: 'orange', style: 'booking'},
             {label: Translate.string('Pre-Booking'), style: 'pre-booking'},
             {label: Translate.string('Blocked'), style: 'blocking'},
-            {label: Translate.string('Not bookable'), style: 'unbookable'}
+            {label: Translate.string('Not bookable'), style: 'unbookable'},
         ];
+
+        if (showInactive) {
+            legendLabels.push(
+                {label: Translate.string('Cancelled'), style: 'cancellation'},
+                {label: Translate.string('Rejected'), style: 'rejection'},
+            );
+        }
+
         const editable = datePicker.mode === 'days' && allowDragDrop;
         const isTimelineVisible = view === 'timeline';
         return (
@@ -216,8 +238,8 @@ class Calendar extends React.Component {
                                 <Grid.Row styleName="calendar-filters">
                                     <div className="filter-row">
                                         <div className="filter-row-filters">
-                                            <RoomFilterBar disabled={isFetching || isFetchingActiveBookings}
-                                                           extraButtons={this.renderExtraButtons()} />
+                                            <RoomFilterBar disabled={isFetching || isFetchingActiveBookings} />
+                                            {this.renderExtraButtons()}
                                             <SearchBar disabled={isFetching || isFetchingActiveBookings} />
                                         </div>
                                     </div>

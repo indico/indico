@@ -58,7 +58,8 @@ def _serialize_availability(availability):
         data['nonbookable_periods'] = serialize_nonbookable_periods(data.get('nonbookable_periods', {}))
         data['unbookable_hours'] = serialize_unbookable_hours(data.get('unbookable_hours', {}))
         data.update({k: serialize_occurrences(data[k]) if k in data else {}
-                     for k in ['candidates', 'pre_bookings', 'bookings', 'conflicts', 'pre_conflicts']})
+                     for k in ('candidates', 'pre_bookings', 'bookings', 'conflicts', 'pre_conflicts',
+                               'cancellations', 'rejections')})
     return availability
 
 
@@ -126,13 +127,15 @@ class RHCalendar(RHRoomBookingBase):
         'start_date': fields.Date(missing=lambda: date.today().isoformat()),
         'end_date': fields.Date(),
         'my_bookings': fields.Bool(missing=False),
+        'show_inactive': fields.Bool(missing=False),
         'room_ids': fields.List(fields.Int(), missing=None)
     })
-    def _process(self, start_date, end_date, room_ids, my_bookings):
+    def _process(self, start_date, end_date, room_ids, my_bookings, show_inactive):
         booked_for_user = session.user if my_bookings else None
         if end_date is missing:
             end_date = start_date
-        calendar = get_room_calendar(start_date, end_date, room_ids, booked_for_user=booked_for_user)
+        calendar = get_room_calendar(start_date, end_date, room_ids, booked_for_user=booked_for_user,
+                                     include_cancellations=show_inactive)
         return jsonify(_serialize_availability(calendar).values())
 
 

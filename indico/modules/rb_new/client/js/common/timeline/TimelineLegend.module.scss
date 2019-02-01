@@ -73,10 +73,16 @@
                 }
             }
 
-            &.unbookable, &.cancellation {
+            &.cancellation {
+                background-color: lighten($gray, 5%);
+                border: 1px solid lighten($gray, 10%);
+                color: lighten($gray, 30%);
+            }
+
+            &.unbookable {
                 background-color: lighten($gray, 15%);
                 border: 1px solid lighten($gray, 10%);
-                color: $gray;
+                color: darken($gray, 20%);
             }
 
             &.pending-cancellation {

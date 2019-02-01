@@ -49,9 +49,9 @@ def group_blockings(blocked_rooms, dates):
     occurrences = {}
     for blocked_room in blocked_rooms:
         blocking = blocked_room.blocking
-        for date in dates:
-            if blocking.start_date <= date <= blocking.end_date:
-                occurrences[date] = [blocking]
+        for date_ in dates:
+            if blocking.start_date <= date_ <= blocking.end_date:
+                occurrences[date_] = [blocking]
     return occurrences
 
 
@@ -144,7 +144,6 @@ def _bookings_query(filters):
     reservation_strategy.noload('created_by_user')
 
     query = (ReservationOccurrence.query
-             .filter(ReservationOccurrence.is_valid)
              .join(Reservation)
              .join(Room)
              .filter(Room.is_active)
@@ -152,23 +151,28 @@ def _bookings_query(filters):
 
     if filters.get('room_ids'):
         query = query.filter(Room.id.in_(filters['room_ids']))
-    if filters.get('start_date'):
-        query = query.filter(ReservationOccurrence.start_dt >= filters['start_date'])
-    if filters.get('end_date'):
-        query = query.filter(ReservationOccurrence.end_dt <= filters['end_date'])
+    if filters.get('start_dt'):
+        query = query.filter(ReservationOccurrence.start_dt >= filters['start_dt'])
+    if filters.get('end_dt'):
+        query = query.filter(ReservationOccurrence.end_dt <= filters['end_dt'])
 
     booked_for_user = filters.get('booked_for_user')
     if booked_for_user:
         query = query.filter(db.or_(Reservation.booked_for_user == booked_for_user,
                                     Reservation.created_by_user == booked_for_user))
 
+    include_cancellations = filters.get('include_cancellations')
+    if not include_cancellations:
+        query = query.filter(ReservationOccurrence.is_valid)
+
     return query
 
 
-def get_room_calendar(start_date, end_date, room_ids, **filters):
+def get_room_calendar(start_date, end_date, room_ids, include_cancellations=False, **filters):
     start_dt = datetime.combine(start_date, time(hour=0, minute=0))
     end_dt = datetime.combine(end_date, time(hour=23, minute=59))
-    query = _bookings_query(dict(filters, **{'start_date': start_dt, 'end_date': end_dt, 'room_ids': room_ids}))
+    query = _bookings_query(dict(filters, start_dt=start_dt, end_dt=end_dt, room_ids=room_ids,
+                                 include_cancellations=include_cancellations))
     query = query.order_by(db.func.indico.natsort(Room.full_name))
     rooms = (Room.query
              .filter(Room.is_active, Room.id.in_(room_ids) if room_ids else True)
@@ -192,13 +196,21 @@ def get_room_calendar(start_date, end_date, room_ids, **filters):
 
     for room_id, occurrences in occurrences_by_room:
         occurrences = list(occurrences)
-        pre_bookings = [occ for occ in occurrences if not occ.reservation.is_accepted]
+        pre_bookings = [occ for occ in occurrences if occ.reservation.is_pending]
         existing_bookings = [occ for occ in occurrences if occ.reservation.is_accepted]
 
-        calendar[room_id].update({
+        additional_data = {
             'bookings': group_by_occurrence_date(existing_bookings),
             'pre_bookings': group_by_occurrence_date(pre_bookings)
-        })
+        }
+
+        if include_cancellations:
+            additional_data.update({
+                'cancellations': group_by_occurrence_date(occ for occ in occurrences if occ.reservation.is_cancelled),
+                'rejections': group_by_occurrence_date(occ for occ in occurrences if occ.reservation.is_rejected)
+            })
+
+        calendar[room_id].update(additional_data)
     return calendar
 
 

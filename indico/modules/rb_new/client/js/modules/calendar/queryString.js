@@ -48,6 +48,11 @@ const rules = {
         sanitizer: v.toBoolean(),
         stateField: boolStateField('filters.hideUnused'),
     },
+    show_inactive: {
+        validator: v.isBoolean(),
+        sanitizer: v.toBoolean(),
+        stateField: boolStateField('filters.showInactive'),
+    },
     view: {
         validator: v.isIn(['timeline', 'list']),
         stateField: defaultStateField('view', 'calendar'),

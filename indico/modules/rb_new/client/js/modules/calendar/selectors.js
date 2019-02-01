@@ -22,7 +22,7 @@ import {selectors as roomsSelectors} from '../../common/rooms';
 import {selectors as userSelectors} from '../../common/user';
 
 
-const CALENDAR_FILTERS = ['myBookings'];
+const CALENDAR_FILTERS = ['myBookings', 'showInactive'];
 const LOCAL_FILTERS = ['hideUnused', 'onlyAuthorized'];
 export const getFilters = ({calendar}) => calendar.filters;
 
