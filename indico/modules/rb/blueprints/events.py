@@ -24,7 +24,6 @@ event_mgmt = IndicoBlueprint('event_mgmt', __name__, url_prefix='/event/<confId>
 
 
 # Booking and event assignment list
-event_mgmt.add_url_rule('/rooms/', 'rooms_booking_list', event.RHRoomBookingEventBookingList)
 event_mgmt.add_url_rule('/rooms/choose-event', 'rooms_choose_event', event.RHRoomBookingEventChooseEvent)
 
 # View/modify booking

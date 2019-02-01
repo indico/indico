@@ -40,7 +40,7 @@ def _sidemenu_items(sender, event, **kwargs):
         yield SideMenuItem('settings', _('Settings'), url_for('event_management.settings', event), 100, icon='settings')
         if config.ENABLE_ROOMBOOKING:
             yield SideMenuItem('room_booking', _('Room Booking'),
-                               url_for('event_mgmt.rooms_booking_list', event),
+                               url_for('event_rb_mgmt.booking_list', event),
                                50,
                                icon='location')
         yield SideMenuItem('protection', _('Protection'), url_for('event_management.protection', event),

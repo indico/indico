@@ -17,6 +17,10 @@
 
 /* global setupSearchBox:false, strnatcmp:false */
 
+import 'selectize';
+import 'selectize/dist/css/selectize.css';
+import 'selectize/dist/css/selectize.default.css';
+
 import 'indico/modules/events/util/list_generator';
 import 'indico/modules/events/util/static_filters';
 

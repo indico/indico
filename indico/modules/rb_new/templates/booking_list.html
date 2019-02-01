@@ -1,0 +1,59 @@
+{% extends 'events/management/base.html' %}
+{% from 'forms/_form.html' import form_row %}
+
+{% block title %}
+    {% trans %}Event bookings{% endtrans %}
+{% endblock %}
+
+{% block content %}
+    {# TODO: If there're no contribs or session block, don't show their sections at all#}
+    <div class="action-box event-bookings">
+        <div class="section">
+            <div class="text">
+                <div class="label">
+                    {%- trans %}Event{% endtrans -%}
+                </div>
+                {{ event.title }}
+            </div>
+            <div class="toolbar">
+                <a href="#" class="i-button highlight">
+                    {%- trans %}Book{% endtrans -%}
+                </a>
+            </div>
+        </div>
+        {% if has_unlinked_contribs %}
+            <div class="section searchable-field">
+                <div class="text">
+                    <div class="label">
+                        {%- trans %}Contribution{% endtrans -%}
+                    </div>
+                    {{ form_row(form.contribution, skip_label=true, hide_description=true) }}
+                </div>
+                <div class="toolbar">
+                    <a href="#" class="i-button highlight">
+                        {%- trans %}Book{% endtrans -%}
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+        <div class="section searchable-field">
+            <div class="text">
+                <div class="label">
+                    {%- trans %}Session block{% endtrans -%}
+                </div>
+{#                {{ form_row(form.session_block, skip_label=true) }}#}
+            </div>
+            <div class="toolbar">
+                <a href="#" class="i-button highlight">
+                    {%- trans %}Book{% endtrans -%}
+                </a>
+            </div>
+        </div>
+    </div>
+    {{ reservations }}
+    <script>
+        $('#contribution').on('change', () => alert('change!'));
+    </script>
+{% endblock %}
+
+

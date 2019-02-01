@@ -138,6 +138,10 @@ _bp.add_url_rule('/contributions/<int:contrib_id>/contribution.ics', 'export_ics
 _bp.add_url_rule('/contributions/<int:contrib_id>/subcontributions/<int:subcontrib_id>', 'display_subcontribution',
                  display.RHSubcontributionDisplay)
 
+# Misc
+_bp.add_url_rule('/contributions/other-list', 'other_contributions', management.RHListOtherContributions,
+                 methods=('POST',))
+
 # Legacy URLs
 _compat_bp = IndicoBlueprint('compat_contributions', __name__, url_prefix='/event/<event_id>')
 

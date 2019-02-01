@@ -47,6 +47,7 @@ from indico.modules.events.contributions.operations import (create_contribution,
 from indico.modules.events.contributions.util import (contribution_type_row, generate_spreadsheet_from_contributions,
                                                       import_contributions_from_csv, make_contribution_form)
 from indico.modules.events.contributions.views import WPManageContributions
+from indico.modules.events.controllers.base import RHDisplayEventBase
 from indico.modules.events.logs import EventLogKind, EventLogRealm
 from indico.modules.events.management.controllers import RHManageEventBase
 from indico.modules.events.management.controllers.base import RHContributionPersonListMixin
@@ -720,3 +721,42 @@ class RHCloneContribution(RHManageContributionBase):
     def _process(self):
         ContributionCloner.clone_single_contribution(self.contrib)
         return jsonify_data(**self.list_generator.render_list())
+
+
+class RHContributionsBase(RHDisplayEventBase):
+    """Base class for all contribution-related RHs"""
+
+    def _check_access(self):
+        RHDisplayEventBase._check_access(self)
+        # Only let event managers access the management versions.
+        if self.management and not self.event.can_manage(session.user):
+            raise Forbidden
+        check_event_locked(self, self.event)
+
+    @property
+    def management(self):
+        """Whether the RH is currently used in the management area"""
+        return request.view_args.get('management', False)
+
+
+class RHListOtherContributions(RHContributionsBase):
+    """AJAX endpoint that lists all contributions in the event (dict representation)."""
+
+    def _check_access(self):
+        if not session.user:
+            raise Forbidden
+        RHContributionsBase._check_access(self)
+
+    def _process(self):
+
+        query = (Contribution.query
+                 .with_parent(self.event)
+                 .filter(Contribution.is_scheduled)
+                 .filter(Contribution.room_reservation_link == None)
+                 .order_by(Contribution.friendly_id))
+
+        result = [{'id': contrib.id, 'friendly_id': contrib.friendly_id, 'title': contrib.title,
+                   'full_title': '#{}: {}'.format(contrib.friendly_id, contrib.title)}
+                  for contrib in query
+                  if contrib.can_access(session.user)]
+        return jsonify(result)
