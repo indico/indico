@@ -37,6 +37,9 @@ export function preProcessParameters(params, rules) {
                     }
                 }
                 const value = rule(params);
+                if (value === undefined) {
+                    return {};
+                }
                 return {[k]: value};
             }))
     );
