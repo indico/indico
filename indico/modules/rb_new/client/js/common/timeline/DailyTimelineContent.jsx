@@ -188,7 +188,6 @@ export default class DailyTimelineContent extends React.Component {
                     <div>
                         <List width={width}
                               height={height}
-                              style={{overflowY: 'overlay'}}
                               rowCount={rows.length}
                               overscanRowCount={15}
                               rowHeight={50}
@@ -231,7 +230,7 @@ export default class DailyTimelineContent extends React.Component {
         );
 
         const autoSizerWrapper = h => (
-            <div style={{height: h}}>
+            <div style={{height: h}} styleName="auto-sizer-wrapper">
                 <AutoSizer>
                     {({width, height}) => (
                         this.renderList(hourSpan, width, height)

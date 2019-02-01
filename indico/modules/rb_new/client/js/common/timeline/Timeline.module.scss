@@ -19,6 +19,10 @@
 .timeline {
     position: relative;
 
+    :global(.ReactVirtualized__Grid.ReactVirtualized__List) {
+        overflow: unset !important;
+    }
+
     :global(.redux-lazy-scroll) {
         overflow: hidden !important;
     }

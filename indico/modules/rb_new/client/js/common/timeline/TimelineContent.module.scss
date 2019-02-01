@@ -125,3 +125,8 @@ $row-height: 40px;
         border-color: $gray transparent transparent !important;
     }
 }
+
+.auto-sizer-wrapper {
+    overflow-x: hidden;
+    overflow-y: auto;
+}
