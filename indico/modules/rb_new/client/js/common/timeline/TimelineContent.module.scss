@@ -104,7 +104,9 @@ $row-height: 40px;
         }
 
         &:hover .timeline-row-actions {
-            display: flex;
+            display: inline;
+            position: absolute;
+            right: 0;
         }
     }
 

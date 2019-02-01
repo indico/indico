@@ -23,6 +23,8 @@ import {Button, Confirm, Dropdown} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
 import * as bookingsActions from './actions';
 
+import './OccurrenceActionsDropdown.module.scss';
+
 
 class OccurrenceActionsDropdown extends React.Component {
     static propTypes = {
@@ -63,7 +65,8 @@ class OccurrenceActionsDropdown extends React.Component {
                         <Dropdown.Item icon="times"
                                        text="Cancel occurrence"
                                        onClick={() => this.showConfirm('cancel')} />
-                        <Dropdown.Item icon="times" text="Reject occurrence" />
+                        <Dropdown.Item icon="times"
+                                       text="Reject occurrence" />
                     </Dropdown.Menu>
                 </Dropdown>
                 <Confirm header={Translate.string('Confirm cancellation')}
