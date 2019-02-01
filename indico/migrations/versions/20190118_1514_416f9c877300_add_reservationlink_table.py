@@ -1,4 +1,4 @@
-"""Create ReservationLink model
+"""Add reservation link table
 
 Revision ID: 416f9c877300
 Revises: cbe630695800
@@ -30,6 +30,13 @@ def upgrade():
         sa.Column('link_type',
                   PyIntEnum(LinkType, exclude_values={LinkType.category, LinkType.subcontribution, LinkType.session}),
                   nullable=False),
+        sa.CheckConstraint('(event_id IS NULL) = (link_type = 1)', name='valid_event_id'),
+        sa.CheckConstraint('link_type != 2 OR (contribution_id IS NULL AND session_block_id IS NULL AND '
+                           'linked_event_id IS NOT NULL)', name='valid_event_link'),
+        sa.CheckConstraint('link_type != 3 OR (linked_event_id IS NULL AND session_block_id IS NULL AND '
+                           'contribution_id IS NOT NULL)', name='valid_contribution_link'),
+        sa.CheckConstraint('link_type != 6 OR (contribution_id IS NULL AND linked_event_id IS NULL AND '
+                           'session_block_id IS NOT NULL)', name='valid_session_block_link'),
         sa.ForeignKeyConstraint(['contribution_id'], ['events.contributions.id']),
         sa.ForeignKeyConstraint(['event_id'], ['events.events.id']),
         sa.ForeignKeyConstraint(['linked_event_id'], ['events.events.id']),

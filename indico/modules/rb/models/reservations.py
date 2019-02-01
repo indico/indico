@@ -30,6 +30,7 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy.custom import PyIntEnum
 from indico.core.db.sqlalchemy.custom.utcdatetime import UTCDateTime
 from indico.core.db.sqlalchemy.links import LinkMixin, LinkType
+from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.core.db.sqlalchemy.util.queries import limit_groups
 from indico.core.errors import NoReportError
 from indico.modules.rb.models.reservation_edit_logs import ReservationEditLog
@@ -100,10 +101,12 @@ class ReservationState(int, IndicoEnum):
 
 class ReservationLink(LinkMixin, db.Model):
     __tablename__ = 'reservation_links'
-    __table_args__ = {'schema': 'roombooking'}
+
+    @declared_attr
+    def __table_args__(cls):
+        return auto_table_args(cls, schema='roombooking')
 
     allowed_link_types = {LinkType.event, LinkType.contribution, LinkType.session_block}
-    unique_links = True
     events_backref_name = 'room_reservation_links'
     link_backref_name = 'room_reservation_link'
 
