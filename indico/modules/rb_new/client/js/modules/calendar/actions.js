@@ -27,6 +27,7 @@ import {preProcessParameters} from '../../util';
 import {ajaxRules as roomSearchAjaxRules} from '../../common/roomSearch';
 import {ajax as ajaxRules} from './serializers';
 import {getRoomFilters, getCalendarFilters} from './selectors';
+import {selectors as userSelectors} from '../../common/user';
 
 
 export const CHANGE_VIEW = 'calendar/CHANGE_VIEW';
@@ -60,6 +61,9 @@ export function setMode(mode) {
 async function fetchCalendarRooms(dispatch, state) {
     const roomFilters = getRoomFilters(state);
     const searchParams = preProcessParameters({...roomFilters}, roomSearchAjaxRules);
+    const isAdmin = userSelectors.isUserAdminOverrideEnabled(state);
+    searchParams.is_admin = isAdmin;
+
     let response;
 
     try {

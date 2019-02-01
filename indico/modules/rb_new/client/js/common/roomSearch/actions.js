@@ -21,6 +21,7 @@ import {ajaxAction} from 'indico/utils/redux';
 import {preProcessParameters} from '../../util';
 import {ajax as ajaxFilterRules} from './serializers';
 import {validateFilters} from '../filters';
+import {selectors as userSelectors} from '../../common/user';
 
 
 export function roomSearchActionsFactory(namespace) {
@@ -35,8 +36,9 @@ export function roomSearchActionsFactory(namespace) {
             if (!validateFilters(filters, namespace, dispatch)) {
                 return;
             }
+            const isAdmin = userSelectors.isUserAdminOverrideEnabled(getStore());
             const params = preProcessParameters(filters, ajaxFilterRules);
-
+            params.is_admin = isAdmin;
             return await ajaxAction(
                 () => indicoAxios.get(searchRoomsURL(), {params}),
                 SEARCH_ROOMS_REQUEST,

@@ -60,11 +60,13 @@ class RHRoomsPermissions(RHRoomBookingBase):
 
 class RHSearchRooms(RHRoomBookingBase):
     @use_args(dict(search_room_args, **{
-        'unavailable': fields.Bool(missing=False)
+        'unavailable': fields.Bool(missing=False),
+        'is_admin': fields.Bool()
     }))
     def _process(self, args):
         filter_availability = all(x in args for x in ('start_dt', 'end_dt', 'repeat_frequency', 'repeat_interval'))
         only_unavailable = args.pop('unavailable')
+        is_admin_override = args.pop('is_admin')
         if not filter_availability:
             availability = None
             if only_unavailable:
@@ -72,10 +74,12 @@ class RHSearchRooms(RHRoomBookingBase):
         else:
             availability = not only_unavailable
 
-        search_query = search_for_rooms(args, availability=availability)
+        search_query = search_for_rooms(args, is_admin_override, availability=availability)
         room_ids = [id_ for id_, in search_query.with_entities(Room.id)]
         if filter_availability:
-            room_ids_without_availability_filter = [id_ for id_, in search_for_rooms(args).with_entities(Room.id)]
+            room_ids_without_availability_filter = [
+                id_ for id_, in search_for_rooms(args, is_admin_override).with_entities(Room.id)
+            ]
         else:
             room_ids_without_availability_filter = room_ids
         return jsonify(rooms=room_ids, rooms_without_availability_filter=room_ids_without_availability_filter,

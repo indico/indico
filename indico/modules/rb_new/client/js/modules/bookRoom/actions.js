@@ -29,6 +29,7 @@ import {preProcessParameters} from '../../util';
 import {actions as modalActions} from '../../modals';
 
 import {roomSearchActionsFactory, ajaxRules as ajaxFilterRules} from '../../common/roomSearch';
+import {selectors as userSelectors} from '../../common/user';
 
 // Booking creation
 export const CREATE_BOOKING_REQUEST = 'bookRoom/CREATE_BOOKING_REQUEST';
@@ -100,11 +101,14 @@ export function fetchBookingAvailability(room, filters) {
 }
 
 export function fetchUnavailableRooms(filters) {
-    return async (dispatch) => {
+    return async (dispatch, getStore) => {
         dispatch({type: GET_UNAVAILABLE_TIMELINE_REQUEST});
 
         const searchParams = preProcessParameters(filters, ajaxFilterRules);
         searchParams.unavailable = true;
+        const isAdmin = userSelectors.isUserAdminOverrideEnabled(getStore());
+        searchParams.is_admin = isAdmin;
+
         let response;
         try {
             response = await indicoAxios.get(searchRoomsURL(), {params: searchParams});

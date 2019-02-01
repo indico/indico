@@ -133,7 +133,7 @@ def get_room_statistics(room):
     return data
 
 
-def search_for_rooms(filters, availability=None):
+def search_for_rooms(filters, is_admin_override, availability=None):
     """Search for a room, using the provided filters.
 
     :param filters: The filters, provided as a dictionary
@@ -187,7 +187,7 @@ def search_for_rooms(filters, availability=None):
     include_blockings = not rb_is_admin(session.user)
     availability_filters = [Room.filter_available(start_dt, end_dt, repeatability, include_blockings=include_blockings,
                                                   include_pre_bookings=True)]
-    if not rb_is_admin(session.user):
+    if not (is_admin_override and rb_is_admin(session.user)):
         # TODO: apply this filter for each room based on the ACL
         # only query whether the restriction is violated or not and return this
         # information to the client (or filter here based on can_override for each room)
@@ -195,13 +195,13 @@ def search_for_rooms(filters, availability=None):
         selected_period_days = (filters['end_dt'] - filters['start_dt']).days
         booking_limit_days = db.func.coalesce(Room.booking_limit_days, rb_settings.get('booking_limit'))
 
-        own_rooms = [r.id for r in Room.get_owned_by(session.user)]
-        criterion = db.or_(Room.id.in_(own_rooms) if own_rooms else False,
-                           db.and_(Room.filter_bookable_hours(start_dt.time(), end_dt.time()),
-                                   Room.filter_nonbookable_periods(start_dt, end_dt),
-                                   db.or_(booking_limit_days.is_(None),
-                                          selected_period_days <= booking_limit_days)))
-        availability_filters.append(criterion)
+        criterion = db.and_(Room.filter_bookable_hours(start_dt.time(), end_dt.time()),
+                            Room.filter_nonbookable_periods(start_dt, end_dt),
+                            db.or_(booking_limit_days.is_(None),
+                            selected_period_days <= booking_limit_days))
+        cant_book = [room.id for room in query.filter(db.and_(*availability_filters)).filter(~criterion).all() if
+                     not room.can_override(session.user, allow_admin=False)]
+        availability_filters.append(db.not_(Room.id.in_(cant_book)))
 
     availability_criterion = db.and_(*availability_filters)
     if availability is False:
