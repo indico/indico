@@ -28,6 +28,7 @@ import {reducer as landingReducer} from './modules/landing';
 import {reducer as roomListReducer} from './modules/roomList';
 import {reducer as bookingReducer} from './common/bookings';
 import {reducer as adminReducer} from './modules/admin';
+import {reducer as linkingReducer} from './common/linking';
 
 
 export default (history) => ({
@@ -43,4 +44,5 @@ export default (history) => ({
     landing: landingReducer,
     bookings: bookingReducer,
     admin: adminReducer,
+    linking: linkingReducer,
 });

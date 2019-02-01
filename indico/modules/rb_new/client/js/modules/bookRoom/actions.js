@@ -74,7 +74,7 @@ export const FETCH_RELATED_EVENTS_REQUEST = 'bookRoom/FETCH_RELATED_EVENTS_REQUE
 export const FETCH_RELATED_EVENTS_SUCCESS = 'bookRoom/FETCH_RELATED_EVENTS_SUCCESS';
 export const FETCH_RELATED_EVENTS_ERROR = 'bookRoom/FETCH_RELATED_EVENTS_ERROR';
 export const RELATED_EVENTS_RECEIVED = 'bookRoom/RELATED_EVENTS_RECEIVED';
-export const RESET_RELATED_EVENTS = 'bookRoom/REST_RELATED_EVENTS';
+export const RESET_RELATED_EVENTS = 'bookRoom/RESET_RELATED_EVENTS';
 
 export function createBooking(args) {
     const params = preProcessParameters(args, ajaxRules);

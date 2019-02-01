@@ -27,6 +27,7 @@ import {init} from './actions';
 import {selectors as configSelectors} from './common/config';
 import {selectors as userSelectors, actions as userActions} from './common/user';
 import {actions as roomsActions} from './common/rooms';
+import {actions as linkingActions} from './common/linking';
 
 import 'indico-sui-theme/semantic.css';
 import '../styles/main.scss';
@@ -50,6 +51,7 @@ export default function setup(overrides = {}, postReducers = []) {
         });
 
         store.dispatch(init());
+        store.dispatch(linkingActions.setObjectFromURL(history.location.search.slice(1)));
         setupUserMenu(
             document.getElementById('indico-user-menu-container'), store,
             userSelectors.getUserInfo, configSelectors.getLanguages

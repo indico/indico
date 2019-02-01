@@ -34,13 +34,14 @@ import BlockingList from '../modules/blockings';
 import ModalController from '../modals';
 import Menu from './Menu';
 import AdminOverrideBar from './AdminOverrideBar';
+import {LinkBar} from '../common/linking';
 import {actions as configActions} from '../common/config';
 import {actions as mapActions} from '../common/map';
 import {actions as roomsActions} from '../common/rooms';
 import {actions as userActions} from '../common/user';
 import * as globalActions from '../actions';
-import * as globalSelectors from '../selectors';
 
+import * as globalSelectors from '../selectors';
 import './App.module.scss';
 
 
@@ -161,6 +162,7 @@ class App extends React.Component {
                         </div>
                     </header>
                     <AdminOverrideBar />
+                    <LinkBar />
                     {this.renderContent()}
                     <Dimmer.Dimmable>
                         <Dimmer active={isInitializing} page>
