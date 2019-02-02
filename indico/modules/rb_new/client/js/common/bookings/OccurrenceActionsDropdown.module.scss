@@ -15,10 +15,13 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-
 .actions-dropdown {
 
     :global(.dropdown.icon) {
         display: none;
     }
  }
+
+.rejection-form {
+    width: 350px;
+}

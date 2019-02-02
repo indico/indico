@@ -20,7 +20,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
-import {Button, Confirm, Dropdown} from 'semantic-ui-react';
+import {Form as FinalForm, Field} from 'react-final-form';
+import {Button, Confirm, Dropdown, Form, Popup, TextArea} from 'semantic-ui-react';
+
+import {ReduxFormField, formatters, validators as v} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 import * as bookingsActions from './actions';
 
@@ -51,7 +54,8 @@ class OccurrenceActionsDropdown extends React.Component {
         this.setState({activeConfirmation: type});
     };
 
-    changeOccurrenceState = (date, action, data = {}) => {
+    changeOccurrenceState = (action, data = {}) => {
+        const {date} = this.props;
         const {booking: {id}, actions: {changeBookingOccurrenceState, fetchBookingDetails}} = this.props;
         changeBookingOccurrenceState(id, date, action, data).then(() => {
             fetchBookingDetails(id);
@@ -88,9 +92,34 @@ class OccurrenceActionsDropdown extends React.Component {
         }
     };
 
+    renderRejectionForm = ({handleSubmit, hasValidationErrors, submitSucceeded, submitting, pristine}) => {
+        return (
+            <Form styleName="rejection-form" onSubmit={handleSubmit}>
+                <Field name="reason"
+                       component={ReduxFormField}
+                       as={TextArea}
+                       format={formatters.trim}
+                       placeholder={Translate.string('Provide the rejection reason')}
+                       rows={2}
+                       validate={v.required}
+                       disabled={submitting}
+                       required
+                       formatOnBlur />
+                <Button type="submit"
+                        disabled={submitting || pristine || hasValidationErrors || submitSucceeded}
+                        loading={submitting}
+                        floated="right"
+                        primary>
+                    <Translate>Reject</Translate>
+                </Button>
+            </Form>
+        );
+    };
+
     render() {
         const {activeConfirmation, dropdownUpward, dropdownOpen} = this.state;
         const {date} = this.props;
+        const rejectButton = (<Dropdown.Item icon="times" text="Reject occurrence" />);
         return (
             <div styleName="actions-dropdown">
                 <Button icon="ellipsis horizontal" onClick={this.onClickButton} />
@@ -99,9 +128,12 @@ class OccurrenceActionsDropdown extends React.Component {
                         <Dropdown.Item icon="times"
                                        text="Cancel occurrence"
                                        onClick={() => this.showConfirm('cancel')} />
-                        <Dropdown.Item icon="times"
-                                       text="Reject occurrence"
-                                       onClick={() => this.showConfirm('reject')} />
+                        <Popup trigger={rejectButton}
+                               position="bottom center"
+                               on="click">
+                            <FinalForm onSubmit={(data) => this.changeOccurrenceState('reject', data)}
+                                       render={this.renderRejectionForm} />
+                        </Popup>
                     </Dropdown.Menu>
                 </Dropdown>
                 <Confirm header={Translate.string('Confirm cancellation')}
@@ -111,9 +143,10 @@ class OccurrenceActionsDropdown extends React.Component {
                          open={activeConfirmation === 'cancel'}
                          onCancel={this.hideConfirm}
                          onConfirm={() => {
-                             this.changeOccurrenceState(date, 'cancel');
+                             this.changeOccurrenceState('cancel');
                              this.hideConfirm();
                          }} />
+
             </div>
         );
     }
