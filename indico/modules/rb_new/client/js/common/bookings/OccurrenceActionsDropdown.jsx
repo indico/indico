@@ -118,22 +118,29 @@ class OccurrenceActionsDropdown extends React.Component {
 
     render() {
         const {activeConfirmation, dropdownUpward, dropdownOpen} = this.state;
-        const {date} = this.props;
+        const {booking: {canCancel, canReject}, date} = this.props;
         const rejectButton = (<Dropdown.Item icon="times" text="Reject occurrence" />);
+        if (!canCancel && !canReject) {
+            return (null);
+        }
         return (
             <div styleName="actions-dropdown">
                 <Button icon="ellipsis horizontal" onClick={this.onClickButton} />
                 <Dropdown upward={dropdownUpward} open={dropdownOpen}>
                     <Dropdown.Menu direction="left">
-                        <Dropdown.Item icon="times"
-                                       text="Cancel occurrence"
-                                       onClick={() => this.showConfirm('cancel')} />
-                        <Popup trigger={rejectButton}
-                               position="bottom center"
-                               on="click">
-                            <FinalForm onSubmit={(data) => this.changeOccurrenceState('reject', data)}
-                                       render={this.renderRejectionForm} />
-                        </Popup>
+                        {canCancel && (
+                            <Dropdown.Item icon="times"
+                                           text="Cancel occurrence"
+                                           onClick={() => this.showConfirm('cancel')} />
+                        )}
+                        {canReject && (
+                            <Popup trigger={rejectButton}
+                                   position="bottom center"
+                                   on="click">
+                                <FinalForm onSubmit={(data) => this.changeOccurrenceState('reject', data)}
+                                           render={this.renderRejectionForm} />
+                            </Popup>
+                        )}
                     </Dropdown.Menu>
                 </Dropdown>
                 <Confirm header={Translate.string('Confirm cancellation')}
