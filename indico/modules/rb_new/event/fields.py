@@ -23,9 +23,46 @@ from indico.web.flask.util import url_for
 from indico.web.forms.widgets import SelectizeWidget
 
 
+class ContributionField(QuerySelectField):
+    """A selectize-based field to select a contribution that has no reservation yet."""
+
+    widget = SelectizeWidget(allow_by_id=True, search_field='title', label_field='full_title', preload=True,
+                             search_method='POST', inline_js=True)
+
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault('allow_blank', True)
+        kwargs.setdefault('render_kw', {}).setdefault('placeholder', _('Enter contribution title or #id'))
+        kwargs['get_label'] = lambda a: '#{}: {}'.format(a.friendly_id, a.title)
+        self.ajax_endpoint = kwargs.pop('ajax_endpoint')
+        super(ContributionField, self).__init__(*args, **kwargs)
+
+    @classmethod
+    def _serialize_contrib(cls, contrib):
+        return {'id': contrib.id, 'friendly_id': contrib.friendly_id, 'title': contrib.title,
+                'full_title': '#{}: {}'.format(contrib.friendly_id, contrib.title)}
+
+    def _value(self):
+        return self._serialize_contrib(self.data) if self.data else None
+
+    def pre_validate(self, form):
+        super(ContributionField, self).pre_validate(form)
+        if self.data is not None:
+            raise ValueError(_('This contribution cannot be selected.'))
+
+    @property
+    def event(self):
+        # This cannot be accessed in __init__ since `get_form` is set
+        # afterwards (when the field gets bound to its form) so we
+        # need to access it through a property instead.
+        return self.get_form().event
+
+    @property
+    def search_url(self):
+        return url_for(self.ajax_endpoint, self.event)
+
+
 class SessionBlockField(QuerySelectField):
     """A selectize-based field to select a session block that has no reservation yet."""
-
     widget = SelectizeWidget(allow_by_id=True, search_field='title', label_field='full_title', preload=True,
                              search_method='POST', inline_js=True)
 
@@ -47,7 +84,7 @@ class SessionBlockField(QuerySelectField):
     def pre_validate(self, form):
         super(SessionBlockField, self).pre_validate(form)
         if self.data is not None:
-            raise ValueError(_('This contribution cannot be selected.'))
+            raise ValueError(_('This session block cannot be selected.'))
 
     @property
     def event(self):

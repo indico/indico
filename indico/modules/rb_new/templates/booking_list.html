@@ -59,7 +59,8 @@
             $('#contribution, #session_block').on('change', (e) => {
                 const $target = $(e.currentTarget);
                 $target.closest('.searchable-field').find('.book-btn').toggleClass('disabled', !$target.val());
-                const linkType = {contribution: 'contribution',
+                const linkType = {
+                    contribution: 'contribution',
                     session_block: 'sessionBlock',
                 }[$target.attr('id')];
                 const linkId = +$target.val();

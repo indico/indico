@@ -20,14 +20,12 @@ from flask import jsonify
 
 from indico.modules.rb_new.controllers.backend import admin, blockings, bookings, locations, misc, rooms
 from indico.modules.rb_new.controllers.frontend import RHRoomBooking
-from indico.modules.rb_new.controllers.management import contributions, events, sessions
+from indico.modules.rb_new.event import controllers as event
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
 _bp = IndicoBlueprint('rooms_new', __name__, template_folder='templates', virtual_template_folder='rb_new',
                       url_prefix='/rooms-new')
-_bp_event_mgmt = IndicoBlueprint('event_rb_mgmt', __name__, url_prefix='/event/<confId>/manage')
-
 
 # Frontend
 _bp.add_url_rule('/', 'roombooking', RHRoomBooking)
@@ -104,8 +102,8 @@ _bp.add_url_rule('/api/admin/attributes/<int:attribute_id>', 'admin_attributes',
                  methods=('GET', 'DELETE', 'PATCH'))
 
 # Event linking
-_bp_event_mgmt.add_url_rule('/rooms/', 'booking_list', events.RHEventBookingList)
-_bp_event_mgmt.add_url_rule('/contributions/other-list', 'other_contributions', contributions.RHListOtherContributions,
-                            methods=('POST',))
-_bp_event_mgmt.add_url_rule('/session-blocks/other-list', 'other_session_blocks', sessions.RHListOtherSessionBlocks,
-                            methods=('POST',))
+_bp.add_url_rule('!/event/<confId>/manage/rooms/', 'booking_list', event.RHEventBookingList)
+_bp.add_url_rule('!/event/<confId>/manage/rooms/linking/contributions', 'linkable_contributions',
+                 event.RHListOtherContributions, methods=('POST',))
+_bp.add_url_rule('!/event/<confId>/manage/rooms/linking/session-blocks', 'linkable_session_blocks',
+                 event.RHListOtherSessionBlocks, methods=('POST',))
