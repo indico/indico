@@ -43,14 +43,16 @@ class RHEventBookingList(RHRoomBookingEventBase):
                                        .filter(SessionBlock.session.has(event=self.event),
                                                SessionBlock.room_reservation_link == None)  # noqa
                                        .has_rows())
+        book_room_url = url_for('rooms_new.roombooking', path='book')
+        event_book_room_url = url_for('rooms_new.roombooking', path='book', linkType='event', linkId=self.event.id)
 
         def booking_details_url(reservation):
-            return '{}calendar?{}'.format(url_for('rooms_new.roombooking'),
-                                          urlencode({'modal': 'booking-details:{}'.format(reservation.id)}))
+            return url_for('rooms_new.roombooking', path='calendar', modal='booking-details:{}'.format(reservation.id))
 
         return WPEventBookingList.render_template('booking_list.html', self.event, form=form, reservations=reservations,
                                                   has_unlinked_contribs=has_unlinked_contribs,
                                                   has_unlinked_session_blocks=has_unlinked_session_blocks,
+                                                  book_room_url=book_room_url, event_book_room_url=event_book_room_url,
                                                   booking_details_url=booking_details_url)
 
 

@@ -16,7 +16,7 @@
                     {{ event.title }}
                 </div>
                 <div class="toolbar">
-                    <a href="#" class="i-button highlight book-btn">
+                    <a target="_blank" href="{{ event_book_room_url }}" class="i-button highlight book-btn">
                         {%- trans %}Book{% endtrans -%}
                     </a>
                 </div>
@@ -30,7 +30,8 @@
                         {{ form_row(form.contribution, skip_label=true, hide_description=true) }}
                     </div>
                     <div class="toolbar">
-                        <a href="#" class="i-button highlight book-btn disabled">
+                        <a target="_blank" href="#" data-href="{{ book_room_url }}"
+                           class="i-button highlight book-btn disabled">
                             {%- trans %}Book{% endtrans -%}
                         </a>
                     </div>
@@ -45,7 +46,8 @@
                         {{ form_row(form.session_block, skip_label=true, hide_description=true) }}
                     </div>
                     <div class="toolbar">
-                        <a href="#" class="i-button highlight book-btn disabled">
+                        <a target="_blank" href="#" data-href="{{ book_room_url }}"
+                           class="i-button highlight book-btn disabled">
                             {%- trans %}Book{% endtrans -%}
                         </a>
                     </div>
@@ -101,13 +103,17 @@
 
             $('#contribution, #session_block').on('change', (e) => {
                 const $target = $(e.currentTarget);
-                $target.closest('.searchable-field').find('.book-btn').toggleClass('disabled', !$target.val());
+                const $bookBtn = $target.closest('.searchable-field').find('.book-btn');
                 const linkType = {
                     contribution: 'contribution',
                     session_block: 'sessionBlock',
                 }[$target.attr('id')];
-                const linkId = +$target.val();
-                // TODO: Change book link to inject object id
+                const params = {
+                    linkType,
+                    linkId: +$target.val(),
+                };
+                $bookBtn.toggleClass('disabled', !$target.val())
+                    .attr('href', $bookBtn.data('href') + (params.linkId ? `?${$.param(params)}`: ''))
             });
         })();
     </script>
