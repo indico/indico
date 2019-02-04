@@ -19,7 +19,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import {serializeTime, toMoment} from 'indico/utils/date';
-import FilterFormComponent from '../../../common/filters/FilterFormComponent';
+import {FilterFormComponent} from '../../../common/filters';
 import TimeRangePicker from '../../../components/TimeRangePicker';
 
 import './TimeForm.module.scss';

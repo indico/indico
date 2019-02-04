@@ -21,7 +21,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {Form, Icon} from 'semantic-ui-react';
 
-import FilterFormComponent from '../../../common/filters/FilterFormComponent';
+import {FilterFormComponent} from '../../../common/filters';
 
 
 export default class EquipmentForm extends FilterFormComponent {

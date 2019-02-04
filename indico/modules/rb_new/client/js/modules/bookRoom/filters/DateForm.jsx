@@ -20,7 +20,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {CalendarSingleDatePicker, CalendarRangeDatePicker} from 'indico/react/components';
 import {serializeDate, toMoment} from 'indico/utils/date';
-import FilterFormComponent from '../../../common/filters/FilterFormComponent';
+import {FilterFormComponent} from '../../../common/filters';
 
 
 export default class DateForm extends FilterFormComponent {

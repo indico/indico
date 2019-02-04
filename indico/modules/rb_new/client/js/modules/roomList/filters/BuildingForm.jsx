@@ -20,7 +20,7 @@ import PropTypes from 'prop-types';
 import {Form} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
 
-import FilterFormComponent from '../../../common/filters/FilterFormComponent';
+import {FilterFormComponent} from '../../../common/filters';
 
 
 export default class BuildingForm extends FilterFormComponent {
