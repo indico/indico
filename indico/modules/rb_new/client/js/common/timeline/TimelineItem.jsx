@@ -53,6 +53,21 @@ const types = {
     other: 'other',
 };
 
+const renderOrder = [
+    'candidates',
+    'preBookings',
+    'preConflicts',
+    'cancellations',
+    'rejections',
+    'bookings',
+    'conflicts',
+    'blockings',
+    'nonbookablePeriods',
+    'unbookableHours',
+    'pendingCancellations',
+    'other',
+];
+
 function getKeyForOccurrence(name, {reservation, startTime, endTime, startDt, endDt}) {
     let key = '';
     if (reservation) {
@@ -218,12 +233,15 @@ class TimelineItem extends React.Component {
 
     renderOccurrences = () => {
         const {data} = this.props;
-        return Object.entries(data).map(([name, occurrences]) => (
-            occurrences.map(occurrence => (
+
+        return renderOrder.filter((name) => name in data).map((name) => {
+            const occurrences = data[name];
+            return occurrences.map(occurrence => (
                 <React.Fragment key={getKeyForOccurrence(name, occurrence)}>
                     {this.renderOccurrence(occurrence, classes[name] || 'default', types[name])}
                 </React.Fragment>
-            ))));
+            ));
+        });
     };
 
     render() {
