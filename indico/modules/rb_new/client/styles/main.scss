@@ -104,6 +104,21 @@ a {
     }
 }
 
-.section.searchable-field {
-    overflow: visible;
+.event-booking-page {
+    .section.searchable-field {
+        overflow: visible;
+    }
+
+    .time-column,
+    .link-column {
+        width: 8em;
+    }
+
+    .room-column {
+        width: 6em;
+    }
+
+    .link-data {
+        text-decoration: dotted underline $gray;
+    }
 }
