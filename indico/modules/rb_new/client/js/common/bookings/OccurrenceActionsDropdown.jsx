@@ -21,7 +21,7 @@ import PropTypes from 'prop-types';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import {Form as FinalForm, Field} from 'react-final-form';
-import {Button, Confirm, Dropdown, Form, Popup, TextArea} from 'semantic-ui-react';
+import {Button, Confirm, Dropdown, Form, Portal, TextArea} from 'semantic-ui-react';
 
 import {ReduxFormField, formatters, validators as v} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
@@ -43,7 +43,8 @@ class OccurrenceActionsDropdown extends React.Component {
     state = {
         activeConfirmation: null,
         dropdownOpen: false,
-        dropdownUpward: false,
+        top: 0,
+        left: 0,
     };
 
     hideConfirm = () => {
@@ -62,33 +63,29 @@ class OccurrenceActionsDropdown extends React.Component {
         });
     };
 
-    findHeightRatio = () => {
-        const windowHeight = window.innerHeight;
-        const elementHeight = ReactDom.findDOMNode(this).getBoundingClientRect().top;
-        return elementHeight / windowHeight;
+    findPositioning = () => {
+        const positioning = ReactDom.findDOMNode(this).getBoundingClientRect();
+        return {
+            top: positioning.top,
+            left: positioning.left
+        };
     };
 
     onClickButton = () => {
-        const {dropdownUpward, dropdownOpen} = this.state;
+        const {dropdownOpen} = this.state;
+        const {top, left} = this.findPositioning();
         if (dropdownOpen) {
-            this.setState({dropdownOpen: false});
+            this.setState({
+                dropdownOpen: false,
+                top,
+                left
+            });
         } else {
-            const ratio = this.findHeightRatio();
-            const setUpward = (ratio > 0.75 && !dropdownUpward);
-            const setDownward = (ratio < 0.75 && dropdownUpward);
-            if (setUpward) {
-                this.setState({
-                    dropdownOpen: true,
-                    dropdownUpward: true,
-                });
-            } else if (setDownward) {
-                this.setState({
-                    dropdownOpen: true,
-                    dropdownUpward: false,
-                });
-            } else {
-                this.setState({dropdownOpen: true});
-            }
+            this.setState({
+                dropdownOpen: true,
+                top,
+                left
+            });
         }
     };
 
@@ -105,7 +102,7 @@ class OccurrenceActionsDropdown extends React.Component {
                        disabled={submitting}
                        required
                        formatOnBlur />
-                <Button type="submit"
+                <Button type="negative"
                         disabled={submitting || pristine || hasValidationErrors || submitSucceeded}
                         loading={submitting}
                         floated="right"
@@ -117,32 +114,36 @@ class OccurrenceActionsDropdown extends React.Component {
     };
 
     render() {
-        const {activeConfirmation, dropdownUpward, dropdownOpen} = this.state;
+        const {activeConfirmation, dropdownOpen, top, left} = this.state;
         const {booking: {canCancel, canReject}, date} = this.props;
-        const rejectButton = (<Dropdown.Item icon="times" text="Reject occurrence" />);
+        const rejectionForm = (
+            <FinalForm onSubmit={(data) => this.changeOccurrenceState('reject', data)}
+                       render={this.renderRejectionForm} />
+        );
         if (!canCancel && !canReject) {
             return (null);
         }
         return (
             <div styleName="actions-dropdown">
                 <Button icon="ellipsis horizontal" onClick={this.onClickButton} />
-                <Dropdown upward={dropdownUpward} open={dropdownOpen}>
-                    <Dropdown.Menu direction="left">
-                        {canCancel && (
-                            <Dropdown.Item icon="times"
-                                           text="Cancel occurrence"
-                                           onClick={() => this.showConfirm('cancel')} />
-                        )}
-                        {canReject && (
-                            <Popup trigger={rejectButton}
-                                   position="bottom center"
-                                   on="click">
-                                <FinalForm onSubmit={(data) => this.changeOccurrenceState('reject', data)}
-                                           render={this.renderRejectionForm} />
-                            </Popup>
-                        )}
-                    </Dropdown.Menu>
-                </Dropdown>
+                <Portal open={dropdownOpen} onClose={() => this.setState({dropdownOpen: false})}>
+                    <Dropdown icon={null}
+                              open
+                              style={{left: `${left}px`, position: 'fixed', top: `${top}px`, zIndex: 1000}}>
+                        <Dropdown.Menu direction="left">
+                            {canCancel && (
+                                <Dropdown.Item icon="times"
+                                               text="Cancel occurrence"
+                                               onClick={() => this.showConfirm('cancel')} />
+                            )}
+                            {canReject && (
+                                <Dropdown.Item icon="times"
+                                               text="Reject occurrence"
+                                               onClick={() => this.showConfirm('reject')} />
+                            )}
+                        </Dropdown.Menu>
+                    </Dropdown>
+                </Portal>
                 <Confirm header={Translate.string('Confirm cancellation')}
                          content={Translate.string(`Are you sure you want to cancel this occurrence (${date})?`)}
                          confirmButton={<Button content={Translate.string('Cancel occurrence')} negative />}
@@ -153,7 +154,12 @@ class OccurrenceActionsDropdown extends React.Component {
                              this.changeOccurrenceState('cancel');
                              this.hideConfirm();
                          }} />
-
+                <Confirm header={Translate.string('Confirm rejection')}
+                         content={rejectionForm}
+                         confirmButton={null}
+                         cancelButton={Translate.string('Close')}
+                         open={activeConfirmation === 'reject'}
+                         onCancel={this.hideConfirm} />
             </div>
         );
     }
