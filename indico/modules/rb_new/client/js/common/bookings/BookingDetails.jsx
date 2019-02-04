@@ -401,7 +401,8 @@ class BookingDetails extends React.Component {
         const recurrence = getRecurrenceInfo(repetition);
         const showAccept = canAccept && !isAccepted;
         const showActionButtons = (!isCancelled && !isRejected && (canCancel || canReject || showAccept));
-
+        const activeBookings = _.omitBy(occurrences.bookings, (value) => _.isEmpty(value));
+        const occurrenceCount = _.keys(activeBookings).length;
         return (
             <>
                 <Modal onClose={onClose} size="large" closeIcon open>
@@ -426,7 +427,7 @@ class BookingDetails extends React.Component {
                                                  dates={dates}
                                                  timeSlot={times}
                                                  onClickOccurrences={this.showOccurrences}
-                                                 occurrenceCount={dateRange.length} />
+                                                 occurrenceCount={occurrenceCount} />
                             </Grid.Column>
                             <Grid.Column>
                                 <>
