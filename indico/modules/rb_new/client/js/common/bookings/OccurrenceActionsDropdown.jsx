@@ -21,7 +21,7 @@ import PropTypes from 'prop-types';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import {Form as FinalForm, Field} from 'react-final-form';
-import {Button, Confirm, Dropdown, Form, Portal, TextArea} from 'semantic-ui-react';
+import {Button, Icon, Confirm, Dropdown, Form, Portal, TextArea} from 'semantic-ui-react';
 
 import {ReduxFormField, formatters, validators as v} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
@@ -102,7 +102,7 @@ class OccurrenceActionsDropdown extends React.Component {
                        disabled={submitting}
                        required
                        formatOnBlur />
-                <Button type="negative"
+                <Button type="submit"
                         disabled={submitting || pristine || hasValidationErrors || submitSucceeded}
                         loading={submitting}
                         floated="right"
@@ -125,7 +125,11 @@ class OccurrenceActionsDropdown extends React.Component {
         }
         return (
             <div styleName="actions-dropdown">
-                <Button icon="ellipsis horizontal" onClick={this.onClickButton} />
+                <Button styleName="dropdown-button" onClick={this.onClickButton}>
+                    <Button.Content>
+                        <Icon name="ellipsis horizontal" size="big" />
+                    </Button.Content>
+                </Button>
                 <Portal open={dropdownOpen} onClose={() => this.setState({dropdownOpen: false})}>
                     <Dropdown icon={null}
                               open
