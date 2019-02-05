@@ -161,18 +161,17 @@ def _bookings_query(filters):
         query = query.filter(db.or_(Reservation.booked_for_user == booked_for_user,
                                     Reservation.created_by_user == booked_for_user))
 
-    include_cancellations = filters.get('include_cancellations')
-    if not include_cancellations:
+    if not filters.get('include_inactive'):
         query = query.filter(ReservationOccurrence.is_valid)
 
     return query
 
 
-def get_room_calendar(start_date, end_date, room_ids, include_cancellations=False, **filters):
+def get_room_calendar(start_date, end_date, room_ids, include_inactive=False, **filters):
     start_dt = datetime.combine(start_date, time(hour=0, minute=0))
     end_dt = datetime.combine(end_date, time(hour=23, minute=59))
     query = _bookings_query(dict(filters, start_dt=start_dt, end_dt=end_dt, room_ids=room_ids,
-                                 include_cancellations=include_cancellations))
+                                 include_inactive=include_inactive))
     query = query.order_by(db.func.indico.natsort(Room.full_name))
     rooms = (Room.query
              .filter(Room.is_active, Room.id.in_(room_ids) if room_ids else True)
@@ -204,7 +203,7 @@ def get_room_calendar(start_date, end_date, room_ids, include_cancellations=Fals
             'pre_bookings': group_by_occurrence_date(pre_bookings)
         }
 
-        if include_cancellations:
+        if include_inactive:
             additional_data.update({
                 'cancellations': group_by_occurrence_date(occ for occ in occurrences if occ.is_cancelled),
                 'rejections': group_by_occurrence_date(occ for occ in occurrences if occ.is_rejected)

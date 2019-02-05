@@ -134,7 +134,7 @@ class RHCalendar(RHRoomBookingBase):
         if end_date is missing:
             end_date = start_date
         calendar = get_room_calendar(start_date, end_date, room_ids, booked_for_user=booked_for_user,
-                                     include_cancellations=show_inactive)
+                                     include_inactive=show_inactive)
         return jsonify(_serialize_availability(calendar).values())
 
 
