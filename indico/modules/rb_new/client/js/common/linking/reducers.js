@@ -16,6 +16,7 @@
  */
 
 import * as linkingActions from './actions';
+import {actions as bookRoomActions} from '../../modules/bookRoom';
 
 
 const initialState = {
@@ -37,6 +38,7 @@ export default (state = initialState, action) => {
                 eventTitle: action.eventTitle,
             };
         case linkingActions.CLEAR_OBJECT:
+        case bookRoomActions.CREATE_BOOKING_SUCCESS:
             return initialState;
         default:
             return state;
