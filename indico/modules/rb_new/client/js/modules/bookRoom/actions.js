@@ -106,8 +106,8 @@ export function fetchUnavailableRooms(filters) {
 
         const searchParams = preProcessParameters(filters, ajaxFilterRules);
         searchParams.unavailable = true;
-        const isAdmin = userSelectors.isUserAdminOverrideEnabled(getStore());
-        searchParams.is_admin = isAdmin;
+        const isAdminOverrideEnabled = userSelectors.isUserAdminOverrideEnabled(getStore());
+        searchParams.admin_override_enabled = isAdminOverrideEnabled;
 
         let response;
         try {

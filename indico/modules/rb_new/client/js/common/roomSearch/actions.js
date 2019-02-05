@@ -32,13 +32,14 @@ export function roomSearchActionsFactory(namespace) {
 
     function searchRooms() {
         return async (dispatch, getStore) => {
-            const {[namespace]: {filters}} = getStore();
+            const store = getStore();
+            const {filters} = store[namespace];
             if (!validateFilters(filters, namespace, dispatch)) {
                 return;
             }
-            const isAdmin = userSelectors.isUserAdminOverrideEnabled(getStore());
+            const isAdminOverrideEnabled = userSelectors.isUserAdminOverrideEnabled(store);
             const params = preProcessParameters(filters, ajaxFilterRules);
-            params.is_admin = isAdmin;
+            params.admin_override_enabled = isAdminOverrideEnabled;
             return await ajaxAction(
                 () => indicoAxios.get(searchRoomsURL(), {params}),
                 SEARCH_ROOMS_REQUEST,

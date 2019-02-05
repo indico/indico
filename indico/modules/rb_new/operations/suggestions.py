@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 
 from datetime import datetime, timedelta
 
+from indico.modules.rb import rb_settings
 from indico.modules.rb.models.blocked_rooms import BlockedRoomState
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import RepeatFrequency
@@ -41,9 +42,9 @@ def get_suggestions(filters, limit=None):
         suggestions = sort_suggestions(get_single_booking_suggestions(rooms, filters['start_dt'], filters['end_dt'],
                                                                       limit=limit))
     else:
-        suggestions = get_number_of_skipped_days_for_rooms(rooms, filters['start_dt'], filters['end_dt'],
-                                                           filters['repeat_frequency'], filters['repeat_interval'],
-                                                           limit=limit)
+        suggestions = sort_suggestions(get_recurring_booking_suggestions(rooms, filters['start_dt'], filters['end_dt'],
+                                                                         filters['repeat_frequency'],
+                                                                         filters['repeat_interval'], limit=limit))
     for entry in suggestions:
         entry['room_id'] = entry.pop('room').id
     return suggestions
@@ -88,8 +89,10 @@ def get_single_booking_suggestions(rooms, start_dt, end_dt, limit=None):
     return data
 
 
-def get_number_of_skipped_days_for_rooms(rooms, start_dt, end_dt, repeat_frequency, repeat_interval, limit=None):
+def get_recurring_booking_suggestions(rooms, start_dt, end_dt, repeat_frequency, repeat_interval, limit=None):
     data = []
+    booking_days = end_dt - start_dt
+    booking_length = booking_days.days + 1
     candidates = ReservationOccurrence.create_series(start_dt, end_dt, (repeat_frequency, repeat_interval))
     blocked_rooms = get_rooms_blockings(rooms, start_dt.date(), end_dt.date())
     unbookable_hours = get_rooms_unbookable_hours(rooms)
@@ -100,10 +103,18 @@ def get_number_of_skipped_days_for_rooms(rooms, start_dt, end_dt, repeat_frequen
         if limit and len(data) == limit:
             break
 
+        suggestions = {}
+        booking_limit = room.booking_limit_days or rb_settings.get('booking_limit')
+        if booking_limit is not None and booking_limit < booking_length:
+            excess_days = booking_length - booking_limit
+            suggestions['shorten'] = excess_days
+
         number_of_conflicting_days = len(group_by_occurrence_date(conflicts.get(room.id, [])))
         if number_of_conflicting_days and number_of_conflicting_days < len(candidates):
-            data.append({'room': room, 'suggestions': {'skip': number_of_conflicting_days}})
-    return sorted(data, key=lambda item: item['suggestions']['skip'])
+            suggestions['skip'] = number_of_conflicting_days
+        if suggestions:
+            data.append({'room': room, 'suggestions': suggestions})
+    return data
 
 
 def get_start_time_suggestion(occurrences, from_, to):

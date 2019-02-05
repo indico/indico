@@ -67,7 +67,8 @@ export default class BookingSuggestion extends React.PureComponent {
         suggestions: PropTypes.shape({
             time: PropTypes.number,
             duration: PropTypes.number,
-            skip: PropTypes.number
+            skip: PropTypes.number,
+            shorten: PropTypes.number,
         }).isRequired,
         /** Will be called when a suggestion is chosen (clicked on) */
         onClick: PropTypes.func.isRequired
@@ -95,7 +96,7 @@ export default class BookingSuggestion extends React.PureComponent {
         ));
     }
 
-    renderSuggestionText(room, {time, duration, skip}) {
+    renderSuggestionText(room, {time, duration, skip, shorten}) {
         const {onClick} = this.props;
         return (
             <>
@@ -124,6 +125,13 @@ export default class BookingSuggestion extends React.PureComponent {
                                       text={PluralTranslate.string('Skip one day', 'Skip {skip} days', skip, {skip})}
                                       tooltip={PluralTranslate.string("We'll skip one occurrence to avoid any conflicts",
                                                                       "We'll skip {skip} occurrences to avoid any conflicts", skip, {skip})} />
+                )}
+                {shorten && (
+                    <SuggestionOption onClick={onClick}
+                                      overrides={{shorten}}
+                                      icon="calendar times"
+                                      text={PluralTranslate.string('Shorten by one day', 'Shorten by {shorten} days', shorten, {shorten})}
+                                      tooltip={Translate.string('Bookings in this room cannot last this long and will be shortened accordingly')} />
                 )}
             </>
         );

@@ -144,6 +144,12 @@ class BookRoom extends React.Component {
                 startTime,
                 endTime: serializeTime(moment(endTime, 'HH:mm').subtract(overrides.duration, 'minutes'))
             };
+        } else if (overrides.shorten) {
+            const {startDate, endDate} = dates;
+            bookingData.dates = {
+                startDate,
+                endDate: serializeDate(moment(endDate, 'YYYY-MM-DD').subtract(overrides.shorten, 'days'))
+            };
         }
         openBookingForm(room.id, {...bookingData, isPrebooking});
     }

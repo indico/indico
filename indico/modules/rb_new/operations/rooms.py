@@ -133,10 +133,11 @@ def get_room_statistics(room):
     return data
 
 
-def search_for_rooms(filters, is_admin_override, availability=None):
+def search_for_rooms(filters, allow_admin=False, availability=None):
     """Search for a room, using the provided filters.
 
     :param filters: The filters, provided as a dictionary
+    :param allow_admin: A boolean specifying whether admins have override privileges
     :param availability: A boolean specifying whether (un)available rooms should be provided,
                          or `None` in case all rooms should be returned.
     """
@@ -187,7 +188,7 @@ def search_for_rooms(filters, is_admin_override, availability=None):
     include_blockings = not rb_is_admin(session.user)
     availability_filters = [Room.filter_available(start_dt, end_dt, repeatability, include_blockings=include_blockings,
                                                   include_pre_bookings=True)]
-    if not (is_admin_override and rb_is_admin(session.user)):
+    if not (allow_admin and rb_is_admin(session.user)):
         # TODO: apply this filter for each room based on the ACL
         # only query whether the restriction is violated or not and return this
         # information to the client (or filter here based on can_override for each room)
@@ -199,10 +200,10 @@ def search_for_rooms(filters, is_admin_override, availability=None):
                             Room.filter_nonbookable_periods(start_dt, end_dt),
                             db.or_(booking_limit_days.is_(None),
                             selected_period_days <= booking_limit_days))
-        cant_book = [room.id for room in query.filter(db.and_(*availability_filters)).filter(~criterion).all() if
-                     not room.can_override(session.user, allow_admin=False)]
-        availability_filters.append(db.not_(Room.id.in_(cant_book)))
-
+        unbookable_ids = [room.id
+                          for room in query.filter(db.and_(*availability_filters), ~criterion)
+                          if not room.can_override(session.user, allow_admin=False)]
+        availability_filters.append(~Room.id.in_(unbookable_ids))
     availability_criterion = db.and_(*availability_filters)
     if availability is False:
         availability_criterion = ~availability_criterion
