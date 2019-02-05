@@ -21,5 +21,6 @@ import * as selectors from './selectors';
 
 export {default as reducer} from './reducers';
 export {default as BookingDetailsPreloader} from './BookingDetailsPreloader';
+export {default as BookingObjectLink} from './BookingObjectLink';
 export {default as modalHandlers} from './modals';
 export {actions, selectors};

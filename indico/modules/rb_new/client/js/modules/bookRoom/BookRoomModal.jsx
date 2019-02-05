@@ -30,14 +30,14 @@ import PrincipalSearchField from 'indico/react/components/PrincipalSearchField';
 import {Overridable, IndicoPropTypes} from 'indico/react/util';
 import TimeInformation from '../../components/TimeInformation';
 import {selectors as roomsSelectors} from '../../common/rooms';
+import {selectors as linkingSelectors, linkDataShape} from '../../common/linking';
 import RoomBasicDetails from '../../components/RoomBasicDetails';
 import {DailyTimelineContent, TimelineLegend} from '../../common/timeline';
 import * as actions from './actions';
 import {actions as modalActions} from '../../modals';
 import {selectors as userSelectors} from '../../common/user';
 import * as bookRoomSelectors from './selectors';
-import BookingObjectLink from '../../common/bookings/BookingObjectLink';
-
+import {BookingObjectLink} from '../../common/bookings';
 
 import './BookRoomModal.module.scss';
 
@@ -76,6 +76,7 @@ class BookRoomModal extends React.Component {
         favoriteUsers: PropTypes.array.isRequired,
         timeInformationComponent: PropTypes.func,
         relatedEvents: PropTypes.array.isRequired,
+        link: linkDataShape,
         actions: PropTypes.exact({
             createBooking: PropTypes.func.isRequired,
             fetchAvailability: PropTypes.func.isRequired,
@@ -94,6 +95,7 @@ class BookRoomModal extends React.Component {
         room: null,
         availability: null,
         timeInformationComponent: TimeInformation,
+        link: null,
         defaultTitles: {
             booking: <Translate>Create Booking</Translate>,
             preBooking: <Translate>Create Pre-booking</Translate>
@@ -256,7 +258,7 @@ class BookRoomModal extends React.Component {
     }
 
     submitBooking = async (data) => {
-        const {actions: {createBooking}, bookingData: {link}} = this.props;
+        const {actions: {createBooking}, link} = this.props;
         if (link) {
             data.linkType = _.snakeCase(link.type);
             data.linkId = link.id;
@@ -410,10 +412,11 @@ class BookRoomModal extends React.Component {
 
     render() {
         const {
-            bookingData: {recurrence, dates, timeSlot, isPrebooking, link},
+            bookingData: {recurrence, dates, timeSlot, isPrebooking},
             room, availability,
             timeInformationComponent: TimeInformationComponent,
-            defaultTitles
+            defaultTitles,
+            link,
         } = this.props;
         const {skipConflicts, bookingConflictsVisible} = this.state;
         if (!room) {
@@ -449,7 +452,7 @@ class BookRoomModal extends React.Component {
                         </Grid.Column>
                         <Grid.Column width={8}>
                             {isPrebooking && this.renderPrebookingMessage()}
-                            {link && <BookingObjectLink type={link.type} id={link.id} pending />}
+                            {link && <BookingObjectLink link={link} pending />}
                             <Form id="book-room-form" onSubmit={fprops.handleSubmit}>
                                 <Segment inverted color="blue">
                                     <h3>
@@ -533,6 +536,7 @@ export default connect(
         availability: bookRoomSelectors.getBookingFormAvailability(state),
         relatedEvents: bookRoomSelectors.getBookingFormRelatedEvents(state),
         room: roomsSelectors.getRoom(state, {roomId}),
+        link: linkingSelectors.getLinkObject(state),
     }),
     dispatch => ({
         actions: bindActionCreators({

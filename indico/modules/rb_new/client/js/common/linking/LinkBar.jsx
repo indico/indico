@@ -23,6 +23,7 @@ import {Icon, Popup} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
 import * as linkingActions from './actions';
 import * as linkingSelectors from './selectors';
+import {linkDataShape} from './props';
 
 import './LinkBar.module.scss';
 
@@ -33,11 +34,16 @@ const messages = {
     sessionBlock: Translate.string('Your booking will be linked to a session block:'),
 };
 
-const LinkBar = ({visible, clear, data: {type, title, eventURL, eventTitle}}) => {
+/**
+ * `LinkBar` shows an indicator in case the user's booking will be linked to
+ * an event, contribution or session block.
+ */
+const LinkBar = ({visible, clear, data}) => {
     if (!visible) {
         return null;
     }
 
+    const {type, title, eventURL, eventTitle} = data;
     return (
         <header styleName="link-bar">
             <Icon name="info circle" />
@@ -63,13 +69,11 @@ const LinkBar = ({visible, clear, data: {type, title, eventURL, eventTitle}}) =>
 LinkBar.propTypes = {
     visible: PropTypes.bool.isRequired,
     clear: PropTypes.func.isRequired,
-    data: PropTypes.shape({
-        type: PropTypes.string,
-        id: PropTypes.number,
-        title: PropTypes.string,
-        eventURL: PropTypes.string,
-        eventTitle: PropTypes.string,
-    }).isRequired,
+    data: linkDataShape,
+};
+
+LinkBar.defaultProps = {
+    data: null,
 };
 
 export default connect(

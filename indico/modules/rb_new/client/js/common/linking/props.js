@@ -15,5 +15,13 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-export const hasLinkObject = ({linking}) => linking.type !== null;
-export const getLinkObject = ({linking}) => (linking.type !== null ? linking : null);
+import PropTypes from 'prop-types';
+
+
+export const linkDataShape = PropTypes.shape({
+    type: PropTypes.oneOf(['event', 'contribution', 'sessionBlock']).isRequired,
+    id: PropTypes.number.isRequired,
+    title: PropTypes.string.isRequired,
+    eventURL: PropTypes.string.isRequired,
+    eventTitle: PropTypes.string.isRequired,
+});

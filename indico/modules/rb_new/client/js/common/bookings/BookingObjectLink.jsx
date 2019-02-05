@@ -15,15 +15,11 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import getLinkedObjectDataURL from 'indico-url:rooms_new.linked_object_data';
-
-import _ from 'lodash';
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Message, Placeholder, Segment, Icon} from 'semantic-ui-react';
+import {Message, Icon} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
-import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
-import camelizeKeys from 'indico/utils/camelize';
+import {linkDataShape} from '../linking';
 
 import './BookingObjectLink.module.scss';
 
@@ -33,8 +29,7 @@ import './BookingObjectLink.module.scss';
  */
 export default class BookingObjectLink extends React.PureComponent {
     static propTypes = {
-        type: PropTypes.oneOf(['event', 'contribution', 'sessionBlock']).isRequired,
-        id: PropTypes.number.isRequired,
+        link: linkDataShape.isRequired,
         /** Whether it is a pending link or the booking is already linked */
         pending: PropTypes.bool,
     };
@@ -43,34 +38,8 @@ export default class BookingObjectLink extends React.PureComponent {
         pending: false,
     };
 
-    state = {
-        loaded: false,
-        data: {},
-    };
-
-    componentDidMount() {
-        const {type, id} = this.props;
-        this.fetchLinkedObjectData(type, id);
-    }
-
-    async fetchLinkedObjectData(type, id) {
-        let response;
-        type = _.snakeCase(type);
-        try {
-            response = await indicoAxios.get(getLinkedObjectDataURL({type, id}));
-        } catch (error) {
-            handleAxiosError(error);
-            return;
-        }
-        this.setState({
-            loaded: true,
-            data: camelizeKeys(response.data)
-        });
-    }
-
-    renderLinkMessage(data) {
-        const {type, pending} = this.props;
-        const {url, title, canAccess, eventTitle, eventUrl} = data;
+    render() {
+        const {pending, link: {type, title, eventURL, eventTitle}} = this.props;
         const pendingMessages = {
             event: Translate.string('This booking will be linked to an event:'),
             contribution: Translate.string('This booking will be linked to a contribution:'),
@@ -81,37 +50,19 @@ export default class BookingObjectLink extends React.PureComponent {
             contribution: Translate.string('This booking is linked to a contribution:'),
             sessionBlock: Translate.string('This booking is linked to a session block:'),
         };
-        return canAccess && (
+        return (
             <Message icon color="teal">
                 <Icon name="linkify" />
                 <Message.Content>
                     {pending ? pendingMessages[type] : linkedMessages[type]}
                     <div styleName="object-link">
                         {type === 'event'
-                            ? <a href={url}><em>{title}</em></a>
-                            : <span><em>{title}</em> (<a href={eventUrl}>{eventTitle}</a>)</span>
+                            ? <a href={eventURL}><em>{title}</em></a>
+                            : <span><em>{title}</em> (<a href={eventURL}>{eventTitle}</a>)</span>
                         }
                     </div>
                 </Message.Content>
             </Message>
-        );
-    }
-
-    render() {
-        const {loaded, data} = this.state;
-        return (
-            loaded ? (
-                this.renderLinkMessage(data)
-            ) : (
-                <Segment>
-                    <Placeholder fluid>
-                        <Placeholder.Header image>
-                            <Placeholder.Line length="full" />
-                            <Placeholder.Line length="full" />
-                        </Placeholder.Header>
-                    </Placeholder>
-                </Segment>
-            )
         );
     }
 }

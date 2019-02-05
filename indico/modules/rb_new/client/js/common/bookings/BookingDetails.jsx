@@ -35,7 +35,7 @@ import RoomBasicDetails from '../../components/RoomBasicDetails';
 import RoomKeyLocation from '../../components/RoomKeyLocation';
 import TimeInformation from '../../components/TimeInformation';
 import {actions as modalActions} from '../../modals';
-import BookingObjectLink from './BookingObjectLink';
+import LazyBookingObjectLink from './LazyBookingObjectLink';
 import * as bookingsSelectors from './selectors';
 import * as bookRoomActions from './actions';
 
@@ -426,7 +426,7 @@ class BookingDetails extends React.Component {
                                     {bookedForUser && this.renderBookedFor(bookedForUser)}
                                     {this.renderReason(bookingReason)}
                                     {isLinkedToObject && (
-                                        <BookingObjectLink type={_.camelCase(link.type)} id={link.id} />
+                                        <LazyBookingObjectLink type={_.camelCase(link.type)} id={link.id} />
                                     )}
                                     {this.renderBookingHistory(editLogs, createdDt, createdByUser)}
                                     {this.renderMessageAfterSplitting(newBookingId)}

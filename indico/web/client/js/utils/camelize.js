@@ -18,6 +18,11 @@
 import _ from 'lodash';
 
 
+function smartCamelCase(string) {
+    return _.camelCase(string).replace(/Url/g, 'URL');
+}
+
+
 export default function camelizeKeys(obj) {
     if (!_.isPlainObject(obj) && !_.isArray(obj)) {
         return obj;
@@ -29,7 +34,7 @@ export default function camelizeKeys(obj) {
 
     return Object.entries(obj).reduce((accum, [key, value]) => {
         if (key.match(/^[A-Za-z_]+$/)) {
-            return {...accum, [_.camelCase(key)]: camelizeKeys(value)};
+            return {...accum, [smartCamelCase(key)]: camelizeKeys(value)};
         } else {
             return {...accum, [key]: camelizeKeys(value)};
         }

@@ -82,7 +82,6 @@ class ReservationSchema(mm.ModelSchema):
 class ReservationLinkedObjectDataSchema(Schema):
     id = Number()
     title = Method('_get_title')
-    url = String()
     event_title = Function(lambda obj: obj.event.title)
     event_url = Function(lambda obj: obj.event.url)
 

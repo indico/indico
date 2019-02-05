@@ -50,7 +50,7 @@ export function setObjectFromURL(queryString) {
             objectType: linkType,
             objectId: +linkId,
             objectTitle: data.title,
-            eventURL: data.eventUrl,
+            eventURL: data.eventURL,
             eventTitle: data.eventTitle,
         });
     };
