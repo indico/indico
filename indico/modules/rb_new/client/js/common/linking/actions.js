@@ -29,7 +29,7 @@ export const CLEAR_OBJECT = 'linking/CLEAR_OBJECT';
 
 export function setObjectFromURL(queryString) {
     return async (dispatch) => {
-        const {linkType, linkId} = qs.parse(queryString);
+        const {linkType, linkId} = camelizeKeys(qs.parse(queryString));
         if (linkType === undefined || linkId === undefined) {
             return;
         }
@@ -47,7 +47,7 @@ export function setObjectFromURL(queryString) {
         }
         dispatch({
             type: SET_OBJECT,
-            objectType: linkType,
+            objectType: _.camelCase(linkType),
             objectId: +linkId,
             objectTitle: data.title,
             eventURL: data.eventURL,
