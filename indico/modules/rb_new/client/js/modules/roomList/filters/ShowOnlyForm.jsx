@@ -25,7 +25,7 @@ import {selectors as userSelectors} from '../../../common/user';
 import {FilterFormComponent} from '../../../common/filters';
 import * as roomsSelectors from '../selectors';
 
-import './ShowOnlyFilters.module.scss';
+import './ShowOnlyForm.module.scss';
 
 
 class ShowOnlyForm extends FilterFormComponent {
