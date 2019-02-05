@@ -119,7 +119,7 @@ def _make_shell_context():
     add_to_context(current_app, 'app', doc='flask app')
     add_to_context(lambda *a, **kw: server_to_utc(datetime.datetime(*a, **kw)), 'dt',
                    doc='like datetime() but converted from localtime to utc')
-    add_to_context(Event.get, 'EE', doc='get event by id')
+    add_to_context(Event.get, 'E', doc='get event by id')
     # Stuff from plugins
     signals.plugin.shell_context.send(add_to_context=add_to_context, add_to_context_multi=add_to_context_multi)
     return context, info
