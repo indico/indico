@@ -216,7 +216,10 @@ class TimelineItem extends React.Component {
             <div className={additionalClasses} onClick={() => {
                 if (onClickCandidate && bookable && type === 'candidate') {
                     onClickCandidate(room);
-                } else if (onClickReservation && (type === 'booking' || type === 'pre-booking')) {
+                } else if (onClickReservation && (type === 'booking' ||
+                                                  type === 'pre-booking' ||
+                                                  type === 'cancellation' ||
+                                                  type === 'rejection')) {
                     onClickReservation(reservation.id);
                 }
             }}

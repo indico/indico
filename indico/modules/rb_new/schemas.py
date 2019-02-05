@@ -107,16 +107,7 @@ class ReservationOccurrenceSchema(mm.ModelSchema):
 
     class Meta:
         model = ReservationOccurrence
-        fields = ('start_dt', 'end_dt', 'is_valid', 'reservation')
-
-
-class ReservationDetailsOccurrenceSchema(mm.ModelSchema):
-    start_dt = NaiveDateTime()
-    end_dt = NaiveDateTime()
-
-    class Meta:
-        model = ReservationOccurrence
-        fields = ('start_dt', 'end_dt', 'is_valid', 'rejection_reason')
+        fields = ('start_dt', 'end_dt', 'is_valid', 'reservation', 'rejection_reason')
 
 
 class ReservationEditLogSchema(UserSchema):
@@ -320,7 +311,6 @@ reservation_schema = ReservationSchema()
 reservation_details_schema = ReservationDetailsSchema()
 reservation_linked_object_data_schema = ReservationLinkedObjectDataSchema()
 reservation_user_event_schema = ReservationUserEventSchema(many=True)
-reservation_details_occurrences_schema = ReservationDetailsOccurrenceSchema(many=True)
 blockings_schema = BlockingSchema(many=True)
 simple_blockings_schema = BlockingSchema(many=True, only=('id', 'reason'))
 nonbookable_periods_schema = NonBookablePeriodSchema(many=True)

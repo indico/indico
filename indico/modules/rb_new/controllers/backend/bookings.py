@@ -37,11 +37,10 @@ from indico.modules.rb_new.operations.bookings import (get_active_bookings, get_
                                                        get_room_calendar, get_rooms_availability, has_same_dates,
                                                        should_split_booking, split_booking)
 from indico.modules.rb_new.operations.suggestions import get_suggestions
-from indico.modules.rb_new.schemas import (create_booking_args, reservation_details_occurrences_schema,
-                                           reservation_details_schema, reservation_linked_object_data_schema,
-                                           reservation_occurrences_schema)
+from indico.modules.rb_new.schemas import (create_booking_args, reservation_details_schema,
+                                           reservation_linked_object_data_schema, reservation_occurrences_schema)
 from indico.modules.rb_new.util import (get_linked_object, group_by_occurrence_date, serialize_blockings,
-                                        serialize_inactive, serialize_nonbookable_periods, serialize_occurrences,
+                                        serialize_nonbookable_periods, serialize_occurrences,
                                         serialize_unbookable_hours)
 from indico.modules.users.models.users import User
 from indico.util.date_time import now_utc, utc_to_server
@@ -57,10 +56,9 @@ def _serialize_availability(availability):
         data['blockings'] = serialize_blockings(data.get('blockings', {}))
         data['nonbookable_periods'] = serialize_nonbookable_periods(data.get('nonbookable_periods', {}))
         data['unbookable_hours'] = serialize_unbookable_hours(data.get('unbookable_hours', {}))
-        data['rejections'] = serialize_inactive(data.get('rejections', {}))
-        data['cancellations'] = serialize_inactive(data.get('cancellations', {}))
         data.update({k: serialize_occurrences(data[k]) if k in data else {}
-                     for k in ('candidates', 'pre_bookings', 'bookings', 'conflicts', 'pre_conflicts')})
+                     for k in ('candidates', 'pre_bookings', 'bookings', 'conflicts', 'pre_conflicts',
+                               'rejections', 'cancellations')})
     return availability
 
 
@@ -73,7 +71,7 @@ def _serialize_booking_details(booking):
     booking_details['occurrences'] = occurrences_by_type
     booking_details['date_range'] = date_range
     for dt, [occ] in occurrences.iteritems():
-        serialized_occ = reservation_details_occurrences_schema.dump([occ]).data
+        serialized_occ = reservation_occurrences_schema.dump([occ]).data
         if occ.is_cancelled:
             occurrences_by_type['cancellations'][dt.isoformat()] = serialized_occ
         elif occ.is_rejected:
