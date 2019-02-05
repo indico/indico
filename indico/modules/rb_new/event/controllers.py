@@ -44,7 +44,7 @@ class RHEventBookingList(RHRoomBookingEventBase):
                                                SessionBlock.room_reservation_link == None)  # noqa
                                        .has_rows())
         book_room_url = url_for('rooms_new.roombooking', path='book')
-        event_book_room_url = url_for('rooms_new.roombooking', path='book', linkType='event', linkId=self.event.id)
+        event_book_room_url = url_for('rooms_new.roombooking', path='book', link_type='event', link_id=self.event.id)
 
         def booking_details_url(reservation):
             return url_for('rooms_new.roombooking', path='calendar', modal='booking-details:{}'.format(reservation.id))

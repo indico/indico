@@ -16,7 +16,7 @@
                     {{ event.title }}
                 </div>
                 <div class="toolbar">
-                    <a target="_blank" href="{{ event_book_room_url }}" class="i-button highlight book-btn">
+                    <a href="{{ event_book_room_url }}" target="_blank" class="i-button highlight book-btn">
                         {%- trans %}Book{% endtrans -%}
                     </a>
                 </div>
@@ -30,7 +30,7 @@
                         {{ form_row(form.contribution, skip_label=true, hide_description=true) }}
                     </div>
                     <div class="toolbar">
-                        <a target="_blank" href="#" data-href="{{ book_room_url }}"
+                        <a href="#" data-href="{{ book_room_url }}" target="_blank"
                            class="i-button highlight book-btn disabled">
                             {%- trans %}Book{% endtrans -%}
                         </a>
@@ -46,7 +46,7 @@
                         {{ form_row(form.session_block, skip_label=true, hide_description=true) }}
                     </div>
                     <div class="toolbar">
-                        <a target="_blank" href="#" data-href="{{ book_room_url }}"
+                        <a href="#" data-href="{{ book_room_url }}" target="_blank"
                            class="i-button highlight book-btn disabled">
                             {%- trans %}Book{% endtrans -%}
                         </a>
@@ -88,7 +88,7 @@
                                 </span>
                             </td>
                             <td class="action-column">
-                                <a target="_blank" href="{{ booking_details_url(reservation) }}"
+                                <a href="{{ booking_details_url(reservation) }}" target="_blank"
                                    title="{% trans %}See details{% endtrans %}" class="icon-info action-icon"></a>
                             </td>
                         </tr>
@@ -109,11 +109,11 @@
                     session_block: 'sessionBlock',
                 }[$target.attr('id')];
                 const params = {
-                    linkType,
-                    linkId: +$target.val(),
+                    link_type: linkType,
+                    link_id: +$target.val(),
                 };
                 $bookBtn.toggleClass('disabled', !$target.val())
-                    .attr('href', $bookBtn.data('href') + (params.linkId ? `?${$.param(params)}`: ''))
+                    .attr('href', $bookBtn.data('href') + (params.link_id ? `?${$.param(params)}`: ''))
             });
         })();
     </script>
