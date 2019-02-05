@@ -279,11 +279,9 @@ class RHLinkedObjectData(RHRoomBookingBase):
         type_ = LinkType[request.view_args['type']]
         id_ = request.view_args['id']
         self.linked_object = get_linked_object(type_, id_)
-        if self.linked_object is None:
-            raise NotFound
 
     def _process(self):
-        if not self.linked_object.can_access(session.user):
+        if not self.linked_object or not self.linked_object.can_access(session.user):
             return jsonify(can_access=False)
         return jsonify(can_access=True, **reservation_linked_object_data_schema.dump(self.linked_object).data)
 
