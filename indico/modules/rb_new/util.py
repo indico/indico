@@ -32,7 +32,8 @@ from indico.modules.events.sessions import Session
 from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb_new.schemas import (bookable_hours_schema, nonbookable_periods_schema,
-                                           reservation_occurrences_schema, simple_blockings_schema)
+                                           reservation_details_occurrences_schema, reservation_occurrences_schema,
+                                           simple_blockings_schema)
 from indico.util.string import crc32
 from indico.util.struct.iterables import group_list
 
@@ -87,6 +88,10 @@ def serialize_nonbookable_periods(data):
 
 def serialize_unbookable_hours(data):
     return [bookable_hours_schema.dump(d).data for d in data]
+
+
+def serialize_rejections(data):
+    return {dt.isoformat(): reservation_details_occurrences_schema.dump(data).data for dt, data in data.iteritems()}
 
 
 def get_linked_object(type_, id_):
