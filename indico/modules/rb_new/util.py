@@ -90,7 +90,7 @@ def serialize_unbookable_hours(data):
     return [bookable_hours_schema.dump(d).data for d in data]
 
 
-def serialize_rejections(data):
+def serialize_inactive(data):
     return {dt.isoformat(): reservation_details_occurrences_schema.dump(data).data for dt, data in data.iteritems()}
 
 

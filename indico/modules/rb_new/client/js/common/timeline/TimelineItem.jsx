@@ -54,6 +54,7 @@ const types = {
 };
 
 const renderOrder = [
+    'other',
     'candidates',
     'preBookings',
     'preConflicts',
@@ -65,7 +66,6 @@ const renderOrder = [
     'nonbookablePeriods',
     'unbookableHours',
     'pendingCancellations',
-    'other',
 ];
 
 function getKeyForOccurrence(name, {reservation, startTime, endTime, startDt, endDt}) {

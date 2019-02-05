@@ -41,7 +41,7 @@ from indico.modules.rb_new.schemas import (create_booking_args, reservation_deta
                                            reservation_details_schema, reservation_linked_object_data_schema,
                                            reservation_occurrences_schema)
 from indico.modules.rb_new.util import (get_linked_object, group_by_occurrence_date, serialize_blockings,
-                                        serialize_nonbookable_periods, serialize_occurrences, serialize_rejections,
+                                        serialize_inactive, serialize_nonbookable_periods, serialize_occurrences,
                                         serialize_unbookable_hours)
 from indico.modules.users.models.users import User
 from indico.util.date_time import now_utc, utc_to_server
@@ -57,10 +57,10 @@ def _serialize_availability(availability):
         data['blockings'] = serialize_blockings(data.get('blockings', {}))
         data['nonbookable_periods'] = serialize_nonbookable_periods(data.get('nonbookable_periods', {}))
         data['unbookable_hours'] = serialize_unbookable_hours(data.get('unbookable_hours', {}))
-        data['rejections'] = serialize_rejections(data.get('rejections', {}))
+        data['rejections'] = serialize_inactive(data.get('rejections', {}))
+        data['cancellations'] = serialize_inactive(data.get('cancellations', {}))
         data.update({k: serialize_occurrences(data[k]) if k in data else {}
-                     for k in ('candidates', 'pre_bookings', 'bookings', 'conflicts', 'pre_conflicts',
-                               'cancellations')})
+                     for k in ('candidates', 'pre_bookings', 'bookings', 'conflicts', 'pre_conflicts')})
     return availability
 
 
