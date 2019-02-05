@@ -53,6 +53,8 @@ const types = {
     other: 'other',
 };
 
+const reservationTypes = new Set(['booking', 'pre-booking', 'cancellation', 'rejection']);
+
 const renderOrder = [
     'other',
     'candidates',
@@ -216,10 +218,7 @@ class TimelineItem extends React.Component {
             <div className={additionalClasses} onClick={() => {
                 if (onClickCandidate && bookable && type === 'candidate') {
                     onClickCandidate(room);
-                } else if (onClickReservation && (type === 'booking' ||
-                                                  type === 'pre-booking' ||
-                                                  type === 'cancellation' ||
-                                                  type === 'rejection')) {
+                } else if (onClickReservation && reservationTypes.has(type)) {
                     onClickReservation(reservation.id);
                 }
             }}
