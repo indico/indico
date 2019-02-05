@@ -54,7 +54,7 @@ const renderEquipment = ({equipment, features}) => {
     return (
         <>
             <Translate>Equipment</Translate>
-            <Label circular horizontal className="white" size="medium" styleName="filter-bar-button-label">
+            <Label circular horizontal className="white" size="tiny" styleName="filter-bar-button-label">
                 {count}
             </Label>
         </>
