@@ -16,8 +16,6 @@
 
 from __future__ import unicode_literals
 
-from urllib import urlencode
-
 from flask import jsonify
 
 from indico.modules.events.contributions import Contribution

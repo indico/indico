@@ -24,7 +24,6 @@ from indico.web.forms.widgets import SelectizeWidget
 
 
 class LinkedObjectField(QuerySelectField):
-
     widget = SelectizeWidget(allow_by_id=True, search_field='title', label_field='full_title', preload=True,
                              search_method='POST', inline_js=True)
 
@@ -34,12 +33,8 @@ class LinkedObjectField(QuerySelectField):
         self.ajax_endpoint = kwargs.pop('ajax_endpoint')
         super(LinkedObjectField, self).__init__(*args, **kwargs)
 
-    @classmethod
-    def _serialize_linked_object(cls, obj):
-        raise NotImplementedError
-
     def _value(self):
-        return self._serialize_linked_object(self.data) if self.data else None
+        pass
 
     @property
     def event(self):
@@ -55,17 +50,9 @@ class LinkedObjectField(QuerySelectField):
 
 class ContributionField(LinkedObjectField):
     """A selectize-based field to select a contribution that has no reservation yet."""
-    widget = SelectizeWidget(allow_by_id=True, search_field='title', label_field='full_title', preload=True,
-                             search_method='POST', inline_js=True)
-
     def __init__(self, *args, **kwargs):
         kwargs.setdefault('render_kw', {}).setdefault('placeholder', _('Enter contribution title or #id'))
         super(ContributionField, self).__init__(*args, **kwargs)
-
-    @classmethod
-    def _serialize_linked_object(cls, contrib):
-        return {'id': contrib.id, 'friendly_id': contrib.friendly_id, 'title': contrib.title,
-                'full_title': '#{}: {}'.format(contrib.friendly_id, contrib.title)}
 
 
 class SessionBlockField(LinkedObjectField):
@@ -73,8 +60,3 @@ class SessionBlockField(LinkedObjectField):
     def __init__(self, *args, **kwargs):
         kwargs.setdefault('render_kw', {}).setdefault('placeholder', _('Enter session block title or #id'))
         super(SessionBlockField, self).__init__(*args, **kwargs)
-
-    @classmethod
-    def _serialize_linked_object(cls, session_block):
-        return {'id': session_block.id, 'friendly_id': session_block.friendly_id, 'title': session_block.title,
-                'full_title': '#{}: {}'.format(session_block.session.friendly_id, session_block.title)}
