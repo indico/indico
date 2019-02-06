@@ -18,4 +18,13 @@
 .calendar-filters {
     display: flex;
     justify-content: space-between;
+
+    > :not(:first-child) {
+        margin-bottom: 10px;
+    }
+
+    .view-switch {
+        display: flex;
+        align-items: flex-end;
+    }
 }

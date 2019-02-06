@@ -97,5 +97,9 @@ a {
         > :not(:last-child) {
             margin-right: 10px;
         }
+
+        > :not(:first-child) {
+            margin-top: 10px;
+        }
     }
 }
