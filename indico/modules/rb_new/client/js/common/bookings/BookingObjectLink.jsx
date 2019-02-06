@@ -57,8 +57,9 @@ export default class BookingObjectLink extends React.PureComponent {
                     {pending ? pendingMessages[type] : linkedMessages[type]}
                     <div styleName="object-link">
                         {type === 'event'
-                            ? <a href={eventURL}><em>{title}</em></a>
-                            : <span><em>{title}</em> (<a href={eventURL}>{eventTitle}</a>)</span>
+                            /* eslint-disable react/jsx-no-target-blank */
+                            ? <a href={eventURL} target="_blank"><em>{title}</em></a>
+                            : <span><em>{title}</em> (<a href={eventURL} target="_blank">{eventTitle}</a>)</span>
                         }
                     </div>
                 </Message.Content>
