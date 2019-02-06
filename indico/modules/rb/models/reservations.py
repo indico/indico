@@ -107,8 +107,8 @@ class ReservationLink(LinkMixin, db.Model):
         return auto_table_args(cls, schema='roombooking')
 
     allowed_link_types = {LinkType.event, LinkType.contribution, LinkType.session_block}
-    events_backref_name = 'room_reservation_links'
-    link_backref_name = 'room_reservation_link'
+    events_backref_name = 'all_room_reservation_links'
+    link_backref_name = 'room_reservation_links'
 
     id = db.Column(
         db.Integer,

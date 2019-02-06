@@ -377,6 +377,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     # - all_legacy_attachment_folder_mappings (LegacyAttachmentFolderMapping.event)
     # - all_legacy_attachment_mappings (LegacyAttachmentMapping.event)
     # - all_notes (EventNote.event)
+    # - all_room_reservation_links (ReservationLink.event)
     # - all_vc_room_associations (VCRoomEventAssociation.event)
     # - attachment_folders (AttachmentFolder.linked_event)
     # - clones (Event.cloned_from)
@@ -403,8 +404,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     # - reminders (EventReminder.event)
     # - requests (Request.event)
     # - roles (EventRole.event)
-    # - room_reservation_link (ReservationLink.linked_event)
-    # - room_reservation_links (ReservationLink.event)
+    # - room_reservation_links (ReservationLink.linked_event)
     # - session_types (SessionType.event)
     # - sessions (Session.event)
     # - settings (EventSetting.event)
@@ -870,7 +870,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
 
     @property
     def reservations(self):
-        return [link.reservation for link in self.room_reservation_links]
+        return [link.reservation for link in self.all_room_reservation_links]
 
     @return_ascii
     def __repr__(self):
