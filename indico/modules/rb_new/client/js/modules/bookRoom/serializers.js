@@ -31,8 +31,8 @@ export const ajax = {
         serializer: ({user: {id}}) => id
     },
     room_id: ({room: {id}}) => id,
-    event_id: ({event}) => event,
     is_prebooking: ({isPrebooking}) => isPrebooking,
     link_type: ({linkType}) => linkType,
-    link_id: ({linkId}) => linkId
+    link_id: ({linkId}) => linkId,
+    link_back: ({linkBack}) => linkBack,
 };

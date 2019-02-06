@@ -259,9 +259,16 @@ class BookRoomModal extends React.Component {
 
     submitBooking = async (data) => {
         const {actions: {createBooking}, link} = this.props;
-        if (link) {
+        if (data.event) {
+            // linking an event based on a matching event
+            data.linkType = 'event';
+            data.linkId = data.event;
+            data.linkBack = true;
+        } else if (link) {
+            // linking an event through linking mode
             data.linkType = _.snakeCase(link.type);
             data.linkId = link.id;
+            data.linkBack = false;  // TODO: let user choose
         }
         const rv = await createBooking(data, this.props);
         if (rv.error) {
@@ -385,10 +392,7 @@ class BookRoomModal extends React.Component {
         }
 
         const options = relatedEvents.map(this.getEventOption);
-        const links = _.reduce(relatedEvents, (result, event) => {
-            result[event.id] = event.url;
-            return result;
-        }, {});
+        const links = _.fromPairs(relatedEvents.map(event => [event.id, event.url]));
 
         return (
             <Segment>
@@ -396,12 +400,14 @@ class BookRoomModal extends React.Component {
                 <div styleName="events-segment-description">
                     <PluralTranslate count={relatedEvents.length}>
                         <Singular>
-                            You have an event taking place in this room.
+                            You have an event taking place during the selected time.
                             If you are booking the room for this event, please select it below.
+                            The room of the selected event will automatically be updated.
                         </Singular>
                         <Plural>
-                            You have events taking place in this room.
+                            You have events taking place during the selected time.
                             If you are booking this room for one of your events, please select it below.
+                            The room of the selected event will automatically be updated.
                         </Plural>
                     </PluralTranslate>
                 </div>
@@ -545,7 +551,7 @@ export default connect(
             fetchRelatedEvents: actions.fetchRelatedEvents,
             resetRelatedEvents: actions.resetRelatedEvents,
             createBooking: (data, props) => {
-                const {reason, usage, user, isPrebooking, linkType, linkId} = data;
+                const {reason, usage, user, isPrebooking, linkType, linkId, linkBack} = data;
                 const {bookingData: {recurrence, dates, timeSlot}, room} = props;
                 return actions.createBooking({
                     reason,
@@ -557,7 +563,8 @@ export default connect(
                     room,
                     linkType,
                     linkId,
-                    isPrebooking
+                    linkBack,
+                    isPrebooking,
                 });
             },
             openBookingDetails: bookingId => modalActions.openModal('booking-details', bookingId, null, true)

@@ -180,10 +180,14 @@ class RHCreateBooking(RHRoomBookingBase):
         selected_period_days = (day_end_dt - day_start_dt).days
         return selected_period_days <= booking_limit_days
 
-    def _link_booking(self, booking, type_, id_):
+    def _link_booking(self, booking, type_, id_, link_back):
         obj = get_linked_object(type_, id_)
-        if obj is not None and obj.event.can_manage(session.user):
-            booking.linked_object = obj
+        if obj is None or not obj.event.can_manage(session.user):
+            return
+        booking.linked_object = obj
+        if link_back:
+            obj.inherit_location = False
+            obj.room = self.room
 
     def _process(self):
         args = self.args
@@ -201,7 +205,7 @@ class RHCreateBooking(RHRoomBookingBase):
             resv = Reservation.create_from_data(self.room, dict(args, booked_for_user=booked_for), session.user,
                                                 prebook=self.prebook)
             if args.get('link_type') is not None and args.get('link_id') is not None:
-                self._link_booking(resv, args['link_type'], args['link_id'])
+                self._link_booking(resv, args['link_type'], args['link_id'], args['link_back'])
             db.session.flush()
         except NoReportError as e:
             db.session.rollback()

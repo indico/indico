@@ -263,6 +263,7 @@ class CreateBookingSchema(Schema):
     is_prebooking = fields.Bool(missing=False)
     link_type = EnumField(LinkType)
     link_id = fields.Int()
+    link_back = fields.Bool(missing=False)
 
     class Meta:
         strict = True
