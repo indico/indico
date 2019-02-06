@@ -16,7 +16,8 @@
                     {{ event.title }}
                 </div>
                 <div class="toolbar">
-                    <a href="{{ event_book_room_url }}" target="_blank" class="i-button highlight book-btn">
+                    <a href="{{ url_for('rooms_new.roombooking', path='book', link_type='event', link_id=event.id) }}"
+                       target="_blank" class="i-button highlight">
                         {%- trans %}Book{% endtrans -%}
                     </a>
                 </div>
@@ -30,8 +31,7 @@
                         {{ form_row(form.contribution, skip_label=true, hide_description=true) }}
                     </div>
                     <div class="toolbar">
-                        <a href="#" data-href="{{ book_room_url }}" target="_blank"
-                           class="i-button highlight book-btn disabled">
+                        <a href="#" target="_blank" class="i-button highlight js-book-btn disabled">
                             {%- trans %}Book{% endtrans -%}
                         </a>
                     </div>
@@ -46,8 +46,7 @@
                         {{ form_row(form.session_block, skip_label=true, hide_description=true) }}
                     </div>
                     <div class="toolbar">
-                        <a href="#" data-href="{{ book_room_url }}" target="_blank"
-                           class="i-button highlight book-btn disabled">
+                        <a href="#" target="_blank" class="i-button highlight js-book-btn disabled">
                             {%- trans %}Book{% endtrans -%}
                         </a>
                     </div>
@@ -88,8 +87,7 @@
                                 </span>
                             </td>
                             <td class="action-column">
-                                <a href="{{ booking_details_url(reservation) }}" target="_blank"
-                                   title="{% trans %}See details{% endtrans %}" class="icon-info action-icon"></a>
+                                {{ booking_details_link(reservation) }}
                             </td>
                         </tr>
                     {% endfor %}
@@ -97,26 +95,13 @@
             </table>
         </div>
     </div>
-    <script>
-        (function() {
-            'use strict';
-
-            $('#contribution, #session_block').on('change', (e) => {
-                const $target = $(e.currentTarget);
-                const $bookBtn = $target.closest('.searchable-field').find('.book-btn');
-                const linkType = {
-                    contribution: 'contribution',
-                    session_block: 'sessionBlock',
-                }[$target.attr('id')];
-                const params = {
-                    link_type: linkType,
-                    link_id: +$target.val(),
-                };
-                $bookBtn.toggleClass('disabled', !$target.val())
-                    .attr('href', $bookBtn.data('href') + (params.link_id ? `?${$.param(params)}`: ''))
-            });
-        })();
-    </script>
 {% endblock %}
+
+{% macro booking_details_link(reservation) %}
+    <a href="{{ url_for('rooms_new.roombooking', path='calendar', modal='booking-details:{}'.format(reservation.id)) }}"
+       target="_blank"
+       class="icon-arrow-right-sparse action-icon"
+       title="{% trans %}See details{% endtrans %}"></a>
+{% endmacro %}
 
 

@@ -31,4 +31,4 @@ class WPRoomBookingBase(WPNewBase):
 class WPEventBookingList(WPEventManagement):
     template_prefix = 'rb_new/'
     sidemenu_option = 'room_booking'
-    bundles = ('module_rb_new.js', 'module_rb_new.css')
+    bundles = ('module_rb_new.event.js', 'module_rb_new.css')

@@ -26,7 +26,6 @@ from indico.modules.rb.controllers.user.event import RHRoomBookingEventBase
 from indico.modules.rb_new.event.forms import BookingListForm
 from indico.modules.rb_new.views.base import WPEventBookingList
 from indico.util.date_time import format_datetime
-from indico.web.flask.util import url_for
 
 
 class RHEventBookingList(RHRoomBookingEventBase):
@@ -41,17 +40,10 @@ class RHEventBookingList(RHRoomBookingEventBase):
                                        .filter(SessionBlock.session.has(event=self.event),
                                                SessionBlock.room_reservation_link == None)  # noqa
                                        .has_rows())
-        book_room_url = url_for('rooms_new.roombooking', path='book')
-        event_book_room_url = url_for('rooms_new.roombooking', path='book', link_type='event', link_id=self.event.id)
-
-        def booking_details_url(reservation):
-            return url_for('rooms_new.roombooking', path='calendar', modal='booking-details:{}'.format(reservation.id))
 
         return WPEventBookingList.render_template('booking_list.html', self.event, form=form, reservations=reservations,
                                                   has_unlinked_contribs=has_unlinked_contribs,
-                                                  has_unlinked_session_blocks=has_unlinked_session_blocks,
-                                                  book_room_url=book_room_url, event_book_room_url=event_book_room_url,
-                                                  booking_details_url=booking_details_url)
+                                                  has_unlinked_session_blocks=has_unlinked_session_blocks)
 
 
 class RHListOtherContributions(RHManageEventBase):
