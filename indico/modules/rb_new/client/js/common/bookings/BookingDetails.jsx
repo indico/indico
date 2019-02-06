@@ -402,7 +402,7 @@ class BookingDetails extends React.Component {
         const showAccept = canAccept && !isAccepted;
         const showActionButtons = (!isCancelled && !isRejected && (canCancel || canReject || showAccept));
         const activeBookings = _.omitBy(occurrences.bookings, (value) => _.isEmpty(value));
-        const occurrenceCount = _.keys(activeBookings).length;
+        const occurrenceCount = Object.keys(activeBookings).length;
         return (
             <>
                 <Modal onClose={onClose} size="large" closeIcon open>

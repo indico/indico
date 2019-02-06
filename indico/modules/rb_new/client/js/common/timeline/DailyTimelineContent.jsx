@@ -22,7 +22,7 @@ import React from 'react';
 import {AutoSizer, List, WindowScroller} from 'react-virtualized';
 import {Icon, Placeholder, Popup} from 'semantic-ui-react';
 import LazyScroll from 'redux-lazy-scroll';
-import {serializeDate} from 'indico/utils/date';
+import {toMoment} from 'indico/utils/date';
 import {Translate} from 'indico/react/i18n';
 import {TooltipIfTruncated} from 'indico/react/components';
 
@@ -148,10 +148,10 @@ export default class DailyTimelineContent extends React.Component {
 
     renderRowActions = (availability) => {
         const {booking} = this.props;
-        if (!booking || !availability['bookings'].length) {
+        if (!booking || !availability.bookings.length) {
             return;
         }
-        const date = serializeDate(availability['bookings'][0].startDt);
+        const date = toMoment(availability.bookings[0].startDt);
         return (
             <div styleName="timeline-row-actions">
                 <OccurrenceActionsDropdown booking={booking} date={date} />

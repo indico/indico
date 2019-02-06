@@ -19,25 +19,50 @@
 
 .actions-dropdown {
 
+    position: relative;
+    height: 40px;
+
     :global(.dropdown.icon) {
         display: none;
     }
 
     .dropdown-button {
-        color: $orange;
+        color: $orange !important;
         background: none !important;
+        padding-bottom: 0.7em;
 
         &:hover {
             color: $dark-orange;
         }
     }
- }
+
+    .visible {
+        :global(.icon) {
+            visibility: visible !important;
+            color: $dark-orange;
+        }
+    }
+
+    .dropdown-button-hidden {
+        color: $orange;
+        background: none !important;
+        padding-bottom: 0.7em;
+
+        &:hover {
+            color: $dark-orange;
+        }
+    }
+}
 
 .rejection-form {
-    margin: 1em 4em;
+    margin: 1.25em;
 
     :global(.button) {
-        background-color: $red !important;
-        margin-top: 1.1em;
+        background-color: $dark-red !important;
+        margin-top: 1.25em;
+    }
+
+    .form-description {
+        padding-bottom: 1em;
     }
 }

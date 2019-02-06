@@ -15,7 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import ReactDom from 'react-dom';
+import ReactDOM from 'react-dom';
 import React from 'react';
 import PropTypes from 'prop-types';
 import {bindActionCreators} from 'redux';
@@ -23,8 +23,9 @@ import {connect} from 'react-redux';
 import {Form as FinalForm, Field} from 'react-final-form';
 import {Button, Icon, Confirm, Dropdown, Form, Portal, TextArea} from 'semantic-ui-react';
 
+import {serializeDate} from 'indico/utils/date';
 import {ReduxFormField, formatters, validators as v} from 'indico/react/forms';
-import {Translate} from 'indico/react/i18n';
+import {Param, Translate} from 'indico/react/i18n';
 import * as bookingsActions from './actions';
 
 import './OccurrenceActionsDropdown.module.scss';
@@ -33,7 +34,7 @@ import './OccurrenceActionsDropdown.module.scss';
 class OccurrenceActionsDropdown extends React.Component {
     static propTypes = {
         booking: PropTypes.object.isRequired,
-        date: PropTypes.string.isRequired,
+        date: PropTypes.object.isRequired,
         actions: PropTypes.exact({
             changeBookingOccurrenceState: PropTypes.func.isRequired,
             fetchBookingDetails: PropTypes.func.isRequired
@@ -47,6 +48,7 @@ class OccurrenceActionsDropdown extends React.Component {
         left: 0,
     };
 
+
     hideConfirm = () => {
         this.setState({activeConfirmation: null});
     };
@@ -56,42 +58,45 @@ class OccurrenceActionsDropdown extends React.Component {
     };
 
     changeOccurrenceState = (action, data = {}) => {
-        const {date} = this.props;
-        const {booking: {id}, actions: {changeBookingOccurrenceState, fetchBookingDetails}} = this.props;
-        changeBookingOccurrenceState(id, date, action, data).then(() => {
+        const {
+            date,
+            booking: {id},
+            actions: {changeBookingOccurrenceState, fetchBookingDetails}
+        } = this.props;
+        const serializedDate = serializeDate(date);
+        changeBookingOccurrenceState(id, serializedDate, action, data).then(() => {
             fetchBookingDetails(id);
         });
     };
 
     findPositioning = () => {
-        const positioning = ReactDom.findDOMNode(this).getBoundingClientRect();
+        const positioning = ReactDOM.findDOMNode(this).getBoundingClientRect();
         return {
-            top: positioning.top,
-            left: positioning.left
+            top: positioning.bottom,
+            left: positioning.right,
         };
     };
 
-    onClickButton = () => {
+    handleButtonClick = () => {
         const {dropdownOpen} = this.state;
         const {top, left} = this.findPositioning();
-        if (dropdownOpen) {
-            this.setState({
-                dropdownOpen: false,
-                top,
-                left
-            });
-        } else {
-            this.setState({
-                dropdownOpen: true,
-                top,
-                left
-            });
-        }
+        this.setState({
+            dropdownOpen: !dropdownOpen,
+            top,
+            left
+        });
     };
 
     renderRejectionForm = ({handleSubmit, hasValidationErrors, submitSucceeded, submitting, pristine}) => {
+        const {date} = this.props;
+        const serializedDate = serializeDate(date, 'L');
         return (
             <Form styleName="rejection-form" onSubmit={handleSubmit}>
+                <div styleName="form-description">
+                    <Translate>
+                        Are you sure you want to reject this occurrence (<Param name="date" value={serializedDate} />)?
+                    </Translate>
+                </div>
                 <Field name="reason"
                        component={ReduxFormField}
                        as={TextArea}
@@ -116,16 +121,20 @@ class OccurrenceActionsDropdown extends React.Component {
     render() {
         const {activeConfirmation, dropdownOpen, top, left} = this.state;
         const {booking: {canCancel, canReject}, date} = this.props;
+        const serializedDate = serializeDate(date, 'L');
         const rejectionForm = (
             <FinalForm onSubmit={(data) => this.changeOccurrenceState('reject', data)}
                        render={this.renderRejectionForm} />
         );
+
         if (!canCancel && !canReject) {
-            return (null);
+            return null;
         }
+
+        const styleName = (dropdownOpen ? 'dropdown-button visible' : 'dropdown-button');
         return (
             <div styleName="actions-dropdown">
-                <Button styleName="dropdown-button" onClick={this.onClickButton}>
+                <Button styleName={styleName} onClick={this.handleButtonClick}>
                     <Button.Content>
                         <Icon name="ellipsis horizontal" size="big" />
                     </Button.Content>
@@ -137,19 +146,24 @@ class OccurrenceActionsDropdown extends React.Component {
                         <Dropdown.Menu direction="left">
                             {canCancel && (
                                 <Dropdown.Item icon="times"
-                                               text="Cancel occurrence"
+                                               text={Translate.string('Cancel occurrence')}
                                                onClick={() => this.showConfirm('cancel')} />
                             )}
                             {canReject && (
-                                <Dropdown.Item icon="times"
-                                               text="Reject occurrence"
+                                <Dropdown.Item icon="times circle"
+                                               text={Translate.string('Reject occurrence')}
                                                onClick={() => this.showConfirm('reject')} />
                             )}
                         </Dropdown.Menu>
                     </Dropdown>
                 </Portal>
                 <Confirm header={Translate.string('Confirm cancellation')}
-                         content={Translate.string(`Are you sure you want to cancel this occurrence (${date})?`)}
+                         content={
+                             Translate.string(
+                                 'Are you sure you want to cancel this occurrence ({serializedDate})?',
+                                 {serializedDate}
+                             )
+                         }
                          confirmButton={<Button content={Translate.string('Cancel occurrence')} negative />}
                          cancelButton={Translate.string('Close')}
                          open={activeConfirmation === 'cancel'}
