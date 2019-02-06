@@ -27,10 +27,14 @@ from sqlalchemy.orm import contains_eager, joinedload
 
 from indico.core.config import config
 from indico.core.db import db
+from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.db.sqlalchemy.util.queries import db_dates_overlap, with_total_rows
 from indico.core.errors import NoReportError
+from indico.modules.events.models.events import Event
+from indico.modules.events.models.principals import EventPrincipal
+from indico.modules.rb import rb_settings
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
-from indico.modules.rb.models.reservations import RepeatFrequency, Reservation
+from indico.modules.rb.models.reservations import RepeatFrequency, Reservation, ReservationLink
 from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb_new.operations.blockings import get_rooms_blockings
@@ -38,7 +42,7 @@ from indico.modules.rb_new.operations.conflicts import get_rooms_conflicts
 from indico.modules.rb_new.operations.misc import get_rooms_nonbookable_periods, get_rooms_unbookable_hours
 from indico.modules.rb_new.util import (group_by_occurrence_date, serialize_blockings, serialize_nonbookable_periods,
                                         serialize_occurrences, serialize_unbookable_hours)
-from indico.util.date_time import iterdays, overlaps
+from indico.util.date_time import as_utc, iterdays, overlaps
 from indico.util.i18n import _
 from indico.util.struct.iterables import group_list
 
@@ -353,3 +357,23 @@ def split_booking(booking, new_booking_data):
     prebook = not room.can_book(session.user, allow_admin=False) and room.can_prebook(session.user, allow_admin=False)
     return Reservation.create_from_data(room, dict(new_booking_data, start_dt=new_start_dt), session.user,
                                         prebook=prebook)
+
+
+def get_matching_events(start_dt, end_dt, repeat_frequency, repeat_interval):
+    """Get events suitable for booking linking.
+
+    This finds events that overlap with an occurrence of a booking
+    with the given dates where the user is a manager.
+    """
+    occurrences = ReservationOccurrence.create_series(start_dt, end_dt, (repeat_frequency, repeat_interval))
+    excluded_categories = rb_settings.get('excluded_categories')
+    return (Event.query
+            .filter(~Event.is_deleted,
+                    ~Event.room_reservation_links.any(ReservationLink.reservation.has(Reservation.is_accepted)),
+                    db.or_(Event.happens_between(as_utc(occ.start_dt), as_utc(occ.end_dt)) for occ in occurrences),
+                    Event.timezone == config.DEFAULT_TIMEZONE,
+                    db.and_(Event.category_id != cat['id'] for cat in excluded_categories),
+                    Event.acl_entries.any(db.and_(EventPrincipal.type == PrincipalType.user,
+                                                  EventPrincipal.user_id == session.user.id,
+                                                  EventPrincipal.full_access)))
+            .all())

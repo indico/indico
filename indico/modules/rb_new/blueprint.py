@@ -41,6 +41,8 @@ _bp.add_url_rule('/api/equipment', 'equipment_types', misc.RHEquipmentTypes)
 _bp.add_url_rule('/api/locations', 'locations', locations.RHLocations)
 _bp.add_url_rule('/api/link-info/<any(event,contribution,session_block):type>/<int:id>', 'linked_object_data',
                  bookings.RHLinkedObjectData)
+_bp.add_url_rule('/api/events', 'events', bookings.RHMatchingEvents)
+
 
 # Rooms
 _bp.add_url_rule('/api/rooms/', 'rooms', rooms.RHRooms)
@@ -51,7 +53,6 @@ _bp.add_url_rule('/api/rooms/<int:room_id>/attributes', 'room_attributes', rooms
 _bp.add_url_rule('/api/rooms/<int:room_id>/timeline', 'timeline', bookings.RHTimeline)
 _bp.add_url_rule('/api/rooms/<int:room_id>/stats', 'room_stats', rooms.RHRoomStats)
 _bp.add_url_rule('/api/rooms/<int:room_id>/availability/simple', 'check_room_available', rooms.RHCheckRoomAvailable)
-_bp.add_url_rule('/api/rooms/<int:room_id>/events', 'room_events', rooms.RHRoomEvents)
 _bp.add_url_rule('/api/suggestions', 'suggestions', bookings.RHRoomSuggestions)
 
 # User

@@ -19,7 +19,7 @@ import createBookingURL from 'indico-url:rooms_new.create_booking';
 import fetchTimelineURL from 'indico-url:rooms_new.timeline';
 import fetchSuggestionsURL from 'indico-url:rooms_new.suggestions';
 import searchRoomsURL from 'indico-url:rooms_new.search_rooms';
-import fetchEventsURL from 'indico-url:rooms_new.room_events';
+import fetchEventsURL from 'indico-url:rooms_new.events';
 
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {ajaxAction, submitFormAction} from 'indico/utils/redux';

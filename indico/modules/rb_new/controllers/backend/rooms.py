@@ -19,7 +19,6 @@ from __future__ import unicode_literals
 from datetime import date, datetime, time, timedelta
 
 from flask import jsonify, request, session
-from marshmallow_enum import EnumField
 from sqlalchemy.orm import subqueryload
 from webargs import fields
 from webargs.flaskparser import use_args, use_kwargs
@@ -29,13 +28,12 @@ from indico.core.db import db
 from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.models.favorites import favorite_room_table
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
-from indico.modules.rb.models.reservations import RepeatFrequency
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.util import rb_is_admin
 from indico.modules.rb_new.controllers.backend.common import search_room_args
 from indico.modules.rb_new.operations.bookings import check_room_available, get_room_details_availability
-from indico.modules.rb_new.operations.rooms import get_room_events, get_room_statistics, search_for_rooms
-from indico.modules.rb_new.schemas import reservation_user_event_schema, room_attribute_values_schema, rooms_schema
+from indico.modules.rb_new.operations.rooms import get_room_statistics, search_for_rooms
+from indico.modules.rb_new.schemas import room_attribute_values_schema, rooms_schema
 from indico.util.caching import memoize_redis
 from indico.util.marshmallow import NaiveDateTime
 
@@ -145,15 +143,3 @@ class RHCheckRoomAvailable(RHRoomBase):
     })
     def _process(self, start_dt, end_dt):
         return jsonify(check_room_available(self.room, start_dt, end_dt))
-
-
-class RHRoomEvents(RHRoomBase):
-    @use_kwargs({
-        'start_dt': fields.DateTime(),
-        'end_dt': fields.DateTime(),
-        'repeat_frequency': EnumField(RepeatFrequency, missing='NEVER'),
-        'repeat_interval': fields.Int(missing=1),
-    })
-    def _process(self, start_dt, end_dt, repeat_frequency, repeat_interval):
-        events = get_room_events(self.room, start_dt, end_dt, repeat_frequency, repeat_interval)
-        return jsonify(reservation_user_event_schema.dump(events).data)

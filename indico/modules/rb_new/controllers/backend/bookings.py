@@ -33,12 +33,14 @@ from indico.modules.rb.models.reservation_occurrences import ReservationOccurren
 from indico.modules.rb.models.reservations import RepeatFrequency, Reservation
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb_new.controllers.backend.common import search_room_args
-from indico.modules.rb_new.operations.bookings import (get_active_bookings, get_booking_occurrences, get_room_bookings,
-                                                       get_room_calendar, get_rooms_availability, has_same_dates,
-                                                       should_split_booking, split_booking)
+from indico.modules.rb_new.operations.bookings import (get_active_bookings, get_booking_occurrences,
+                                                       get_matching_events, get_room_bookings, get_room_calendar,
+                                                       get_rooms_availability, has_same_dates, should_split_booking,
+                                                       split_booking)
 from indico.modules.rb_new.operations.suggestions import get_suggestions
 from indico.modules.rb_new.schemas import (create_booking_args, reservation_details_schema,
-                                           reservation_linked_object_data_schema, reservation_occurrences_schema)
+                                           reservation_linked_object_data_schema, reservation_occurrences_schema,
+                                           reservation_user_event_schema)
 from indico.modules.rb_new.util import (get_linked_object, group_by_occurrence_date, serialize_blockings,
                                         serialize_nonbookable_periods, serialize_occurrences,
                                         serialize_unbookable_hours)
@@ -334,3 +336,17 @@ class RHMyUpcomingBookings(RHRoomBookingBase):
              .order_by(ReservationOccurrence.start_dt.asc())
              .limit(5))
         return jsonify(reservation_occurrences_schema.dump(q).data)
+
+
+class RHMatchingEvents(RHRoomBookingBase):
+    """Get events suitable for booking linking."""
+
+    @use_kwargs({
+        'start_dt': fields.DateTime(),
+        'end_dt': fields.DateTime(),
+        'repeat_frequency': EnumField(RepeatFrequency, missing='NEVER'),
+        'repeat_interval': fields.Int(missing=1),
+    })
+    def _process(self, start_dt, end_dt, repeat_frequency, repeat_interval):
+        events = get_matching_events(start_dt, end_dt, repeat_frequency, repeat_interval)
+        return jsonify(reservation_user_event_schema.dump(events).data)
