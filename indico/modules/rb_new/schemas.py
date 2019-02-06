@@ -85,10 +85,10 @@ class ReservationLinkedObjectDataSchema(Schema):
     event_title = Function(lambda obj: obj.event.title)
     event_url = Function(lambda obj: obj.event.url)
 
-    def _get_title(self, object):
-        if isinstance(object, SessionBlock):
-            return object.full_title
-        return object.title
+    def _get_title(self, obj):
+        if isinstance(obj, SessionBlock):
+            return obj.full_title
+        return obj.title
 
 
 class ReservationUserEventSchema(Schema):
