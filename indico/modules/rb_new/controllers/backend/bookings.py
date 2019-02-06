@@ -327,9 +327,9 @@ class RHMyUpcomingBookings(RHRoomBookingBase):
     def _process(self):
         q = (ReservationOccurrence.query
              .filter(ReservationOccurrence.start_dt > utc_to_server(now_utc()),
-                     db.or_(
-                         Reservation.booked_for_user == session.user,
-                         Reservation.created_by_user == session.user))
+                     ReservationOccurrence.is_valid,
+                     db.or_(Reservation.booked_for_user == session.user,
+                            Reservation.created_by_user == session.user))
              .join(Reservation)
              .order_by(ReservationOccurrence.start_dt.asc())
              .limit(5))
