@@ -487,7 +487,7 @@ class BookRoomModal extends React.Component {
                                            disabled={bookingBlocked(fprops)}
                                            required />
                                 </Segment>
-                                {!link && (
+                                {!link && !fprops.submitSucceeded && (
                                     this.renderRelatedEventsDropdown(bookingBlocked(fprops), fprops.form.mutators)
                                 )}
                             </Form>
