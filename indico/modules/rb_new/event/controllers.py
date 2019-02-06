@@ -46,7 +46,7 @@ class RHEventBookingList(RHRoomBookingEventBase):
                                                   has_unlinked_session_blocks=has_unlinked_session_blocks)
 
 
-class RHListOtherContributions(RHManageEventBase):
+class RHListLinkableContributions(RHManageEventBase):
     """AJAX endpoint that lists all contributions in the event."""
 
     def _process(self):
@@ -61,7 +61,7 @@ class RHListOtherContributions(RHManageEventBase):
         return jsonify(result)
 
 
-class RHListOtherSessionBlocks(RHManageEventBase):
+class RHListLinkableSessionBlocks(RHManageEventBase):
     """AJAX endpoint that lists all session blocks in the event."""
 
     def _process(self):
