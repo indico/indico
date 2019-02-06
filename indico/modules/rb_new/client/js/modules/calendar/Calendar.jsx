@@ -174,7 +174,7 @@ class Calendar extends React.Component {
     renderViewSwitch = () => {
         const {view, actions: {changeView}, isFetching, isFetchingActiveBookings} = this.props;
         return (
-            <div>
+            <div styleName="view-switch">
                 <Popup trigger={<Button icon={<Icon name="calendar" />}
                                         primary={view === 'timeline'}
                                         onClick={() => changeView('timeline')}
