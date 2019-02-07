@@ -62,7 +62,7 @@ class OccurrenceActionsDropdown extends React.Component {
         this.setState({activeConfirmation: type});
     };
 
-    changeOccurrenceState = (action, data = {}) => {
+    changeOccurrenceState = async (action, data = {}) => {
         const {
             date,
             booking: {id},
@@ -70,11 +70,9 @@ class OccurrenceActionsDropdown extends React.Component {
         } = this.props;
         const serializedDate = serializeDate(date);
         this.setState({actionInProgress: true});
-        changeBookingOccurrenceState(id, serializedDate, action, data).then(() => {
-            fetchBookingDetails(id).then(() => {
-                this.setState({actionInProgress: false});
-            });
-        });
+        await changeBookingOccurrenceState(id, serializedDate, action, data);
+        await fetchBookingDetails(id);
+        this.setState({actionInProgress: false});
     };
 
     findPositioning = () => {
@@ -113,7 +111,8 @@ class OccurrenceActionsDropdown extends React.Component {
                        validate={v.required}
                        disabled={submitting}
                        required
-                       formatOnBlur />
+                       formatOnBlur
+                       autoFocus />
                 <Button type="submit"
                         disabled={submitting || pristine || hasValidationErrors || submitSucceeded}
                         loading={submitting}
