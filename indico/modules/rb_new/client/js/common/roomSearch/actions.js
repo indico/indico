@@ -37,9 +37,10 @@ export function roomSearchActionsFactory(namespace) {
             if (!validateFilters(filters, namespace, dispatch)) {
                 return;
             }
-            const isAdminOverrideEnabled = userSelectors.isUserAdminOverrideEnabled(store);
             const params = preProcessParameters(filters, ajaxFilterRules);
-            params.admin_override_enabled = isAdminOverrideEnabled;
+            if (namespace === 'bookRoom' && userSelectors.isUserAdminOverrideEnabled(store)) {
+                params.admin_override_enabled = true;
+            }
             return await ajaxAction(
                 () => indicoAxios.get(searchRoomsURL(), {params}),
                 SEARCH_ROOMS_REQUEST,
