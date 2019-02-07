@@ -46,6 +46,7 @@ class OccurrenceActionsDropdown extends React.Component {
     }
 
     state = {
+        actionInProgress: false,
         activeConfirmation: null,
         dropdownOpen: false,
         top: 0,
@@ -68,8 +69,11 @@ class OccurrenceActionsDropdown extends React.Component {
             actions: {changeBookingOccurrenceState, fetchBookingDetails}
         } = this.props;
         const serializedDate = serializeDate(date);
+        this.setState({actionInProgress: true});
         changeBookingOccurrenceState(id, serializedDate, action, data).then(() => {
-            fetchBookingDetails(id);
+            fetchBookingDetails(id).then(() => {
+                this.setState({actionInProgress: false});
+            });
         });
     };
 
@@ -122,7 +126,7 @@ class OccurrenceActionsDropdown extends React.Component {
     };
 
     render() {
-        const {activeConfirmation, dropdownOpen, top, left} = this.state;
+        const {activeConfirmation, actionInProgress, dropdownOpen, top, left} = this.state;
         const {booking: {canCancel, canReject}, date} = this.props;
         const serializedDate = serializeDate(date, 'L');
         const rejectionForm = (
@@ -142,7 +146,9 @@ class OccurrenceActionsDropdown extends React.Component {
                         onOpen={this.handleButtonClick}
                         onClose={() => this.setState({dropdownOpen: false})}
                         trigger={
-                            <Button styleName={styleName} onClick={this.handleButtonClick}>
+                            <Button styleName={styleName}
+                                    onClick={this.handleButtonClick}
+                                    loading={actionInProgress}>
                                 <Button.Content>
                                     <div ref={this.dropdownIconRef}>
                                         <Icon name="ellipsis horizontal" size="big" />
