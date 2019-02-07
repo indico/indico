@@ -41,6 +41,7 @@ import {rules as qsBookRoomRules} from './queryString';
 import * as bookRoomActions from './actions';
 import {actions as filtersActions} from '../../common/filters';
 import {actions as roomsActions, RoomRenderer} from '../../common/rooms';
+import {selectors as userSelectors} from '../../common/user';
 import * as bookRoomSelectors from './selectors';
 import {mapControllerFactory, selectors as mapSelectors} from '../../common/map';
 import BookingSuggestion from './BookingSuggestion';
@@ -65,6 +66,7 @@ class BookRoom extends React.Component {
         filters: PropTypes.object.isRequired,
         suggestions: PropTypes.arrayOf(PropTypes.object).isRequired,
         showMap: PropTypes.bool.isRequired,
+        isAdminOverrideEnabled: PropTypes.bool.isRequired,
         actions: PropTypes.exact({
             setFilterParameter: PropTypes.func.isRequired,
             clearTextFilter: PropTypes.func.isRequired,
@@ -105,9 +107,10 @@ class BookRoom extends React.Component {
         searchRooms();
     }
 
-    componentDidUpdate({filters: prevFilters}) {
-        const {filters} = this.props;
-        if (!_.isEqual(prevFilters, filters)) {
+    componentDidUpdate(prevProps) {
+        const {filters: prevFilters, isAdminOverrideEnabled: prevIsAdminOverrideEnabled} = prevProps;
+        const {filters, isAdminOverrideEnabled} = this.props;
+        if (prevIsAdminOverrideEnabled !== isAdminOverrideEnabled || !_.isEqual(prevFilters, filters)) {
             this.restartSearch();
         }
     }
@@ -432,7 +435,8 @@ const mapStateToProps = (state) => {
         queryString: stateToQueryString(state.bookRoom, qsFilterRules, qsBookRoomRules),
         showMap: mapSelectors.isMapVisible(state),
         dateRange: bookRoomSelectors.getTimelineDateRange(state),
-        datePicker: bookRoomSelectors.getTimelineDatePicker(state)
+        datePicker: bookRoomSelectors.getTimelineDatePicker(state),
+        isAdminOverrideEnabled: userSelectors.isUserAdminOverrideEnabled(state),
     };
 };
 
