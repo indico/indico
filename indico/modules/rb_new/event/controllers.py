@@ -27,7 +27,7 @@ from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.rb.controllers.user.event import RHRoomBookingEventBase
 from indico.modules.rb_new.event.forms import BookingListForm
 from indico.modules.rb_new.views.base import WPEventBookingList
-from indico.util.date_time import format_datetime, format_time
+from indico.util.date_time import format_datetime, format_time, now_utc
 from indico.util.string import to_unicode
 
 
@@ -44,6 +44,7 @@ class RHEventBookingList(RHRoomBookingEventBase):
                                                SessionBlock.room_reservation_links == None)  # noqa
                                        .has_rows())
 
+        is_past_event = self.event.end_dt < now_utc()
         is_single_day = self.event.start_dt.date() == self.event.end_dt.date()
         event_rb_params = {'link_type': 'event',
                            'link_id': self.event.id,
@@ -60,7 +61,7 @@ class RHEventBookingList(RHRoomBookingEventBase):
                                                   form=form, reservations=reservations,
                                                   has_unlinked_contribs=has_unlinked_contribs,
                                                   has_unlinked_session_blocks=has_unlinked_session_blocks,
-                                                  event_rb_params=event_rb_params)
+                                                  event_rb_params=event_rb_params, is_past_event=is_past_event)
 
 
 class RHListLinkableContributions(RHManageEventBase):

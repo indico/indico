@@ -17,7 +17,7 @@
                 </div>
                 <div class="toolbar">
                     <a href="{{ url_for('rooms_new.roombooking', path='book', **event_rb_params) }}"
-                       target="_blank" class="i-button highlight">
+                       target="_blank" class="i-button highlight {{ 'disabled' if is_past_event }}">
                         {%- trans %}Book{% endtrans -%}
                     </a>
                 </div>
