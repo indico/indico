@@ -53,47 +53,49 @@
                 </div>
             {% endif %}
         </div>
-        <div>
-            <h3>Current bookings</h3>
-            <table class="i-table-widget">
-                <thead>
-                    <tr>
-                        <th class="room-column">{% trans %}Room{% endtrans %}</th>
-                        <th>{% trans %}Reason{% endtrans %}</th>
-                        <th>{% trans %}For whom{% endtrans %}</th>
-                        <th>{% trans %}Date{% endtrans %}</th>
-                        <th class="time-column">{% trans %}Time{% endtrans %}</th>
-                        <th class="link-column">{% trans %}Linked to{% endtrans %}</th>
-                        <th class="action-column"></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for reservation in reservations %}
+        {% if reservations %}
+            <div>
+                <h3>Current bookings</h3>
+                <table class="i-table-widget">
+                    <thead>
                         <tr>
-                            <td>{{ reservation.room.full_name }}</td>
-                            <td>{{ reservation.booking_reason }}</td>
-                            <td>{{ reservation.booked_for_name }}</td>
-                            <td>
-                                {{ reservation.start_dt | format_date()}}
-                                {% if reservation.is_repeating %}
-                                    ({% trans %}recurring{% endtrans %})
-                                {% endif %}
-                            </td>
-                            <td>{{ reservation.start_dt | format_time() }} - {{ reservation.end_dt | format_time() }}</td>
-                            {% set link = reservation.link %}
-                            <td class="link-data">
+                            <th class="room-column">{% trans %}Room{% endtrans %}</th>
+                            <th>{% trans %}Reason{% endtrans %}</th>
+                            <th>{% trans %}For whom{% endtrans %}</th>
+                            <th>{% trans %}Date{% endtrans %}</th>
+                            <th class="time-column">{% trans %}Time{% endtrans %}</th>
+                            <th class="link-column">{% trans %}Linked to{% endtrans %}</th>
+                            <th class="action-column"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for reservation in reservations %}
+                            <tr>
+                                <td>{{ reservation.room.full_name }}</td>
+                                <td>{{ reservation.booking_reason }}</td>
+                                <td>{{ reservation.booked_for_name }}</td>
+                                <td>
+                                    {{ reservation.start_dt | format_date()}}
+                                    {% if reservation.is_repeating %}
+                                        ({% trans %}recurring{% endtrans %})
+                                    {% endif %}
+                                </td>
+                                <td>{{ reservation.start_dt | format_time() }} - {{ reservation.end_dt | format_time() }}</td>
+                                {% set link = reservation.link %}
+                                <td class="link-data">
                                 <span title="{{ link.object.full_title if link.link_type.name == 'session_block' else link.object.title }}">
                                     {{ link.link_type.name.replace('_', ' ') | capitalize }}
                                 </span>
-                            </td>
-                            <td class="action-column">
-                                {{ booking_details_link(reservation) }}
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+                                </td>
+                                <td class="action-column">
+                                    {{ booking_details_link(reservation) }}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
     </div>
 {% endblock %}
 
