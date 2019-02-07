@@ -134,7 +134,7 @@ class OccurrenceActionsDropdown extends React.Component {
             return null;
         }
 
-        const styleName = (dropdownOpen ? 'dropdown-button visible' : 'dropdown-button');
+        const styleName = (dropdownOpen ? 'dropdown-button open' : 'dropdown-button');
         return (
             <div styleName="actions-dropdown">
                 <Portal closeOnTriggerClick

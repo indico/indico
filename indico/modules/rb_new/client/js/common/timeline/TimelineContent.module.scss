@@ -95,9 +95,8 @@ $row-height: 40px;
         }
 
         .timeline-row-actions {
-            color: $orange;
+            color: $gray;
             font-size: 1.8em;
-            visibility: hidden;
             height: 100%;
             line-height: $row-height;
             z-index: 4;
@@ -106,8 +105,8 @@ $row-height: 40px;
             bottom: 12%;
         }
 
-        &:hover .timeline-row-actions {
-            visibility: visible;
+        &:hover .timeline-row-actions :global(.icon) {
+            color: $orange;
         }
     }
 

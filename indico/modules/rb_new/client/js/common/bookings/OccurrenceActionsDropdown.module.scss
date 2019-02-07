@@ -27,29 +27,18 @@
     }
 
     .dropdown-button {
-        color: $orange !important;
+        color: $gray;
         background: none !important;
         padding-bottom: 0.7em;
 
         &:hover {
-            color: $dark-orange;
+            color: $orange;
         }
     }
 
-    .visible {
+    .open {
         :global(.icon) {
-            visibility: visible !important;
-            color: $dark-orange;
-        }
-    }
-
-    .dropdown-button-hidden {
-        color: $orange;
-        background: none !important;
-        padding-bottom: 0.7em;
-
-        &:hover {
-            color: $dark-orange;
+            color: $dark-orange !important;
         }
     }
 }
