@@ -15,7 +15,6 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import ReactDOM from 'react-dom';
 import React from 'react';
 import PropTypes from 'prop-types';
 import {bindActionCreators} from 'redux';
@@ -40,6 +39,11 @@ class OccurrenceActionsDropdown extends React.Component {
             fetchBookingDetails: PropTypes.func.isRequired
         }).isRequired,
     };
+
+    constructor(props) {
+        super(props);
+        this.dropdownIconRef = React.createRef();
+    }
 
     state = {
         activeConfirmation: null,
@@ -70,9 +74,9 @@ class OccurrenceActionsDropdown extends React.Component {
     };
 
     findPositioning = () => {
-        const positioning = ReactDOM.findDOMNode(this).getBoundingClientRect();
+        const positioning = this.dropdownIconRef.current.getBoundingClientRect();
         return {
-            top: positioning.bottom,
+            top: positioning.bottom - (positioning.height / 2),
             left: positioning.right,
         };
     };
@@ -140,7 +144,9 @@ class OccurrenceActionsDropdown extends React.Component {
                         trigger={
                             <Button styleName={styleName} onClick={this.handleButtonClick}>
                                 <Button.Content>
-                                    <Icon name="ellipsis horizontal" size="big" />
+                                    <div ref={this.dropdownIconRef}>
+                                        <Icon name="ellipsis horizontal" size="big" />
+                                    </div>
                                 </Button.Content>
                             </Button>
                         }>
