@@ -28,6 +28,7 @@ from indico.modules.rb.controllers.user.event import RHRoomBookingEventBase
 from indico.modules.rb_new.event.forms import BookingListForm
 from indico.modules.rb_new.views.base import WPEventBookingList
 from indico.util.date_time import format_datetime, format_time
+from indico.util.string import to_unicode
 
 
 class RHEventBookingList(RHRoomBookingEventBase):
@@ -75,7 +76,7 @@ class RHListLinkableContributions(RHManageEventBase):
                                         'start_dt': contrib.start_dt.isoformat(),
                                         'end_dt': contrib.end_dt.isoformat()}),
                    'friendly_id': contrib.friendly_id, 'title': contrib.title,
-                   'full_title': '#{}: {}'.format(contrib.friendly_id, contrib.title)}
+                   'full_title': contrib.verbose_title}
                   for contrib in query]
         return jsonify(result)
 
@@ -93,7 +94,9 @@ class RHListLinkableSessionBlocks(RHManageEventBase):
                                         'start_dt': session_block.start_dt.isoformat(),
                                         'end_dt': session_block.end_dt.isoformat()}),
                    'friendly_id': session_block.session.friendly_id, 'title': session_block.full_title,
-                   'full_title': '#{}: {} ({})'.format(session_block.session.friendly_id, session_block.full_title,
-                                                       format_datetime(session_block.timetable_entry.start_dt))}
+                   'full_title': '#{}: {} ({})'.format(
+                       session_block.session.friendly_id, session_block.full_title,
+                       to_unicode(format_datetime(session_block.timetable_entry.start_dt))
+                   )}
                   for session_block in query]
         return jsonify(result)

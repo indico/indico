@@ -58,5 +58,5 @@ class ContributionField(LinkedObjectField):
 class SessionBlockField(LinkedObjectField):
     """A selectize-based field to select a session block that has no reservation yet."""
     def __init__(self, *args, **kwargs):
-        kwargs.setdefault('render_kw', {}).setdefault('placeholder', _('Enter session block title or #id'))
+        kwargs.setdefault('render_kw', {}).setdefault('placeholder', _('Enter session block title'))
         super(SessionBlockField, self).__init__(*args, **kwargs)
