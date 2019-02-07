@@ -17,7 +17,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Message, Icon} from 'semantic-ui-react';
+import {Message, Icon, Segment} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
 import {linkDataShape} from '../linking';
 
@@ -32,14 +32,16 @@ export default class BookingObjectLink extends React.PureComponent {
         link: linkDataShape.isRequired,
         /** Whether it is a pending link or the booking is already linked */
         pending: PropTypes.bool,
+        children: PropTypes.any,
     };
 
     static defaultProps = {
         pending: false,
+        children: null,
     };
 
     render() {
-        const {pending, link: {type, title, eventURL, eventTitle}} = this.props;
+        const {pending, children, link: {type, title, eventURL, eventTitle}} = this.props;
         const pendingMessages = {
             event: Translate.string('This booking will be linked to an event:'),
             contribution: Translate.string('This booking will be linked to a contribution:'),
@@ -51,19 +53,26 @@ export default class BookingObjectLink extends React.PureComponent {
             sessionBlock: Translate.string('This booking is linked to a session block:'),
         };
         return (
-            <Message icon color="teal">
-                <Icon name="linkify" />
-                <Message.Content>
-                    {pending ? pendingMessages[type] : linkedMessages[type]}
-                    <div styleName="object-link">
-                        {type === 'event'
-                            /* eslint-disable react/jsx-no-target-blank */
-                            ? <a href={eventURL} target="_blank"><em>{title}</em></a>
-                            : <span><em>{title}</em> (<a href={eventURL} target="_blank">{eventTitle}</a>)</span>
-                        }
-                    </div>
-                </Message.Content>
-            </Message>
+            <>
+                <Message icon attached={!!children} color="teal">
+                    <Icon name="linkify" />
+                    <Message.Content>
+                        {pending ? pendingMessages[type] : linkedMessages[type]}
+                        <div styleName="object-link">
+                            {type === 'event'
+                                /* eslint-disable react/jsx-no-target-blank */
+                                ? <a href={eventURL} target="_blank"><em>{title}</em></a>
+                                : <span><em>{title}</em> (<a href={eventURL} target="_blank">{eventTitle}</a>)</span>
+                            }
+                        </div>
+                    </Message.Content>
+                </Message>
+                {!!children && (
+                    <Segment attached="bottom">
+                        {children}
+                    </Segment>
+                )}
+            </>
         );
     }
 }

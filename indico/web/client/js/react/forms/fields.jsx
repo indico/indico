@@ -72,7 +72,7 @@ ReduxFormField.propTypes = {
     input: PropTypes.object.isRequired,
     required: PropTypes.bool,
     label: PropTypes.string,
-    componentLabel: PropTypes.string,
+    componentLabel: PropTypes.oneOfType([PropTypes.string, PropTypes.exact({children: PropTypes.node})]),
     placeholder: PropTypes.string,
     meta: PropTypes.object.isRequired,
     as: PropTypes.oneOfType([PropTypes.string, PropTypes.object, PropTypes.func]).isRequired,

@@ -24,4 +24,6 @@ export const linkDataShape = PropTypes.shape({
     title: PropTypes.string.isRequired,
     eventURL: PropTypes.string.isRequired,
     eventTitle: PropTypes.string.isRequired,
+    ownRoomId: PropTypes.number,
+    ownRoomName: PropTypes.string,
 });

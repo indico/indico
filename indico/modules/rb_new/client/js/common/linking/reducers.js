@@ -25,6 +25,8 @@ const initialState = {
     title: null,
     eventURL: null,
     eventTitle: null,
+    ownRoomId: null,
+    ownRoomName: null,
 };
 
 export default (state = initialState, action) => {
@@ -36,6 +38,8 @@ export default (state = initialState, action) => {
                 title: action.objectTitle,
                 eventURL: action.eventURL,
                 eventTitle: action.eventTitle,
+                ownRoomId: action.ownRoomId,
+                ownRoomName: action.ownRoomName,
             };
         case linkingActions.CLEAR_OBJECT:
         case bookRoomActions.CREATE_BOOKING_SUCCESS:

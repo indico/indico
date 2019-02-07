@@ -24,7 +24,7 @@ import PropTypes from 'prop-types';
 import {Button, Checkbox, Form, Grid, Icon, Message, Modal, Radio, Segment, Popup} from 'semantic-ui-react';
 import {Form as FinalForm, Field} from 'react-final-form';
 import createDecorator from 'final-form-calculate';
-import {ReduxDropdownField, ReduxFormField, ReduxRadioField, formatters} from 'indico/react/forms';
+import {ReduxCheckboxField, ReduxDropdownField, ReduxFormField, ReduxRadioField, formatters} from 'indico/react/forms';
 import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
 import PrincipalSearchField from 'indico/react/components/PrincipalSearchField';
 import {Overridable, IndicoPropTypes} from 'indico/react/util';
@@ -268,7 +268,6 @@ class BookRoomModal extends React.Component {
             // linking an event through linking mode
             data.linkType = _.snakeCase(link.type);
             data.linkId = link.id;
-            data.linkBack = false;  // TODO: let user choose
         }
         const rv = await createBooking(data, this.props);
         if (rv.error) {
@@ -295,6 +294,24 @@ class BookRoomModal extends React.Component {
     hideConflicts = () => {
         this.setState({bookingConflictsVisible: false});
     };
+
+    get hasLinkConflict() {
+        const {link, room} = this.props;
+        if (!link) {
+            return false;
+        } else if (link.ownRoomId !== null) {
+            // conflict if object is linked to another room
+            return link.ownRoomId !== room.id;
+        } else {
+            // conflict if object has a custom room set
+            return link.ownRoomName !== null;
+        }
+    }
+
+    get alreadyLinked() {
+        const {link, room} = this.props;
+        return link !== null && link.ownRoomId === room.id;
+    }
 
     renderPrebookingMessage() {
         const wrapper = <strong styleName="pre-booking-color" />;
@@ -328,7 +345,7 @@ class BookRoomModal extends React.Component {
         };
     };
 
-    renderLink = (link) => {
+    renderEventLink = (link) => {
         if (link) {
             return (
                 <span styleName="link-active">
@@ -364,7 +381,7 @@ class BookRoomModal extends React.Component {
                                    selectedEvent: value
                                });
                            }} />
-                    {this.renderLink(links[selectedEvent])}
+                    {this.renderEventLink(links[selectedEvent])}
                 </div>
             );
         } else {
@@ -373,7 +390,7 @@ class BookRoomModal extends React.Component {
                 <div styleName="event-checkbox">
                     <span><strong>{event.text}</strong></span>
                     <span styleName="description">{event.description}</span>
-                    {this.renderLink(links[event.value])}
+                    {this.renderEventLink(links[event.value])}
                     <Checkbox toggle
                               styleName="checkbox"
                               onChange={(__, {checked}) => {
@@ -416,6 +433,46 @@ class BookRoomModal extends React.Component {
         );
     };
 
+    renderLink(link, disabled) {
+        const {room} = this.props;
+        const assignMessages = {
+            event: Translate.string('Assign the room {room} to this event', {room: room.name}),
+            contribution: Translate.string('Assign the room {room} to this contribution', {room: room.name}),
+            sessionBlock: Translate.string('Assign the room {room} to this session block', {room: room.name}),
+        };
+        const replaceMessages = {
+            event: (
+                <Translate>
+                    Assign the room <Param name="room" wrapper={<em />} value={room.name} /> to this event
+                    (instead of <Param name="oldRoom" wrapper={<em />} value={link.ownRoomName} />)
+                </Translate>
+            ),
+            contribution: (
+                <Translate>
+                    Assign the room <Param name="room" wrapper={<em />} value={room.name} /> to this contribution
+                    (instead of <Param name="oldRoom" wrapper={<em />} value={link.ownRoomName} />)
+                </Translate>
+            ),
+            sessionBlock: (
+                <Translate>
+                    Assign the room <Param name="room" wrapper={<em />} value={room.name} /> to this session block
+                    (instead of <Param name="oldRoom" wrapper={<em />} value={link.ownRoomName} />)
+                </Translate>
+            ),
+        };
+        const label = this.hasLinkConflict ? {children: replaceMessages[link.type]} : assignMessages[link.type];
+        return (
+            <>
+                <BookingObjectLink link={link} pending>
+                    {!this.alreadyLinked && (
+                        <Field name="linkBack" component={ReduxCheckboxField} disabled={disabled} toggle
+                               componentLabel={label} />
+                    )}
+                </BookingObjectLink>
+            </>
+        );
+    }
+
     render() {
         const {
             bookingData: {recurrence, dates, timeSlot, isPrebooking},
@@ -428,6 +485,7 @@ class BookRoomModal extends React.Component {
         if (!room) {
             return null;
         }
+        const linkBack = !!link && !this.hasLinkConflict;
         const occurrenceCount = availability && availability.dateRange.length;
         const conflictsExist = availability && !!Object.keys(availability.conflicts).length;
         const bookingBlocked = ({submitting, submitSucceeded}) => submitting || submitSucceeded;
@@ -458,7 +516,7 @@ class BookRoomModal extends React.Component {
                         </Grid.Column>
                         <Grid.Column width={8}>
                             {isPrebooking && this.renderPrebookingMessage()}
-                            {link && <BookingObjectLink link={link} pending />}
+                            {link && this.renderLink(link, bookingBlocked(fprops))}
                             <Form id="book-room-form" onSubmit={fprops.handleSubmit}>
                                 <Segment inverted color="blue">
                                     <h3>
@@ -526,7 +584,7 @@ class BookRoomModal extends React.Component {
         return (
             <Modal open onClose={this.onClose} size="large" closeIcon>
                 <FinalForm onSubmit={this.submitBooking} validate={validate} decorators={[formDecorator]}
-                           render={renderModalContent} initialValues={{user: null}}
+                           render={renderModalContent} initialValues={{user: null, linkBack}}
                            mutators={{setEvent: ([event], state, {changeValue}) => {
                                changeValue(state, 'event', () => event);
                            }}} />

@@ -84,6 +84,8 @@ class ReservationLinkedObjectDataSchema(Schema):
     title = Method('_get_title')
     event_title = Function(lambda obj: obj.event.title)
     event_url = Function(lambda obj: obj.event.url)
+    own_room_id = Number()
+    own_room_name = Function(lambda obj: (obj.own_room.name if obj.own_room else obj.own_room_name) or None)
 
     def _get_title(self, obj):
         if isinstance(obj, SessionBlock):
