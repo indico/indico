@@ -113,10 +113,13 @@ class BookRoomModal extends React.Component {
         const {
             actions: {fetchAvailability, fetchRelatedEvents},
             room,
+            link,
             bookingData: {isPrebooking, ...data}
         } = this.props;
         fetchAvailability(room, data);
-        fetchRelatedEvents(room, data);
+        if (!link) {
+            fetchRelatedEvents(room, data);
+        }
     }
 
     componentWillUnmount() {
