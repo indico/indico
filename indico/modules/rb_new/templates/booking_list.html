@@ -16,8 +16,10 @@
                     {{ event.title }}
                 </div>
                 <div class="toolbar">
+                    {% set title = _('Event has already finished') %}
                     <a href="{{ url_for('rooms_new.roombooking', path='book', **event_rb_params) }}"
-                       target="_blank" class="i-button highlight {{ 'disabled' if is_past_event }}">
+                       target="_blank" class="i-button highlight {{ 'disabled' if is_past_event }}"
+                       title="{{ title if is_past_event }}">
                         {%- trans %}Book{% endtrans -%}
                     </a>
                 </div>
@@ -70,8 +72,17 @@
                     </thead>
                     <tbody>
                         {% for reservation in reservations %}
-                            <tr>
-                                <td>{{ reservation.room.full_name }}</td>
+                            <tr class="{{ 'disabled' if reservation.is_rejected }}">
+                                <td>
+                                    {{ reservation.room.full_name }}
+                                    {% if reservation.is_rejected %}
+                                        <span class="icon-disable booking-status"
+                                              title="{% trans %}Rejected:{% endtrans %} {{ reservation.rejection_reason }}"></span>
+                                    {% elif reservation.is_pending %}
+                                        <span class="icon-time booking-status"
+                                              title="{% trans %}Pre-booking{% endtrans %}"></span>
+                                    {% endif %}
+                                </td>
                                 <td>{{ reservation.booking_reason }}</td>
                                 <td>{{ reservation.booked_for_name }}</td>
                                 <td>

@@ -125,4 +125,24 @@ a {
     .link-data {
         text-decoration: dotted underline $gray;
     }
+
+    tr.disabled {
+        background-color: $light-gray;
+
+        td {
+            color: $dark-gray;
+        }
+    }
+
+    .booking-status {
+        padding-left: 0.5em;
+
+        &.icon-disable {
+            color: $pastel-red;
+        }
+
+        &.icon-time {
+            color: $dark-orange;
+        }
+    }
 }

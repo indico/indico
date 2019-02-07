@@ -24,6 +24,7 @@ from indico.modules.events.contributions import Contribution
 from indico.modules.events.management.controllers import RHManageEventBase
 from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.events.sessions.models.sessions import Session
+from indico.modules.events.timetable import TimetableEntry
 from indico.modules.rb.controllers.user.event import RHRoomBookingEventBase
 from indico.modules.rb_new.event.forms import BookingListForm
 from indico.modules.rb_new.views.base import WPEventBookingList
@@ -34,14 +35,16 @@ from indico.util.string import to_unicode
 class RHEventBookingList(RHRoomBookingEventBase):
     def _process(self):
         form = BookingListForm(event=self.event)
-        reservations = self.event.reservations
+        reservations = [r for r in self.event.reservations if not r.is_cancelled]
         has_unlinked_contribs = (Contribution.query.with_parent(self.event)
                                  .filter(Contribution.is_scheduled,
-                                         Contribution.room_reservation_links == None)  # noqa
+                                         Contribution.room_reservation_links == None,  # noqa
+                                         Contribution.timetable_entry.has(TimetableEntry.start_dt > now_utc()))
                                  .has_rows())
         has_unlinked_session_blocks = (SessionBlock.query
                                        .filter(SessionBlock.session.has(event=self.event),
-                                               SessionBlock.room_reservation_links == None)  # noqa
+                                               SessionBlock.room_reservation_links == None,  # noqa
+                                               SessionBlock.timetable_entry.has(TimetableEntry.start_dt > now_utc()))
                                        .has_rows())
 
         is_past_event = self.event.end_dt < now_utc()
@@ -70,7 +73,8 @@ class RHListLinkableContributions(RHManageEventBase):
     def _process(self):
         query = (Contribution.query
                  .with_parent(self.event)
-                 .filter(Contribution.is_scheduled, Contribution.room_reservation_links == None)  # noqa
+                 .filter(Contribution.is_scheduled, Contribution.room_reservation_links == None,  # noqa
+                         Contribution.timetable_entry.has(TimetableEntry.start_dt > now_utc()))
                  .order_by(Contribution.friendly_id))
 
         result = [{'value': json.dumps({'id': contrib.id,
@@ -87,7 +91,8 @@ class RHListLinkableSessionBlocks(RHManageEventBase):
 
     def _process(self):
         query = (SessionBlock.query
-                 .filter(SessionBlock.session.has(event=self.event), SessionBlock.room_reservation_links == None)  # noqa
+                 .filter(SessionBlock.session.has(event=self.event), SessionBlock.room_reservation_links == None,  # noqa
+                         SessionBlock.timetable_entry.has(TimetableEntry.start_dt > now_utc()))
                  .join(Session)
                  .order_by(Session.friendly_id))
 
