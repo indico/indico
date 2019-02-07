@@ -189,10 +189,6 @@ def search_for_rooms(filters, allow_admin=False, availability=None):
     availability_filters = [Room.filter_available(start_dt, end_dt, repeatability, include_blockings=include_blockings,
                                                   include_pre_bookings=True)]
     if not (allow_admin and rb_is_admin(session.user)):
-        # TODO: apply this filter for each room based on the ACL
-        # only query whether the restriction is violated or not and return this
-        # information to the client (or filter here based on can_override for each room)
-        # doing it on the client is probably better since it has all this information cached
         selected_period_days = (filters['end_dt'] - filters['start_dt']).days
         booking_limit_days = db.func.coalesce(Room.booking_limit_days, rb_settings.get('booking_limit'))
 
