@@ -78,10 +78,9 @@ class OccurrenceActionsDropdown extends React.Component {
     };
 
     handleButtonClick = () => {
-        const {dropdownOpen} = this.state;
         const {top, left} = this.findPositioning();
         this.setState({
-            dropdownOpen: !dropdownOpen,
+            dropdownOpen: true,
             top,
             left
         });
@@ -134,12 +133,17 @@ class OccurrenceActionsDropdown extends React.Component {
         const styleName = (dropdownOpen ? 'dropdown-button visible' : 'dropdown-button');
         return (
             <div styleName="actions-dropdown">
-                <Button styleName={styleName} onClick={this.handleButtonClick}>
-                    <Button.Content>
-                        <Icon name="ellipsis horizontal" size="big" />
-                    </Button.Content>
-                </Button>
-                <Portal open={dropdownOpen} onClose={() => this.setState({dropdownOpen: false})}>
+                <Portal closeOnTriggerClick
+                        openOnTriggerClick
+                        onOpen={this.handleButtonClick}
+                        onClose={() => this.setState({dropdownOpen: false})}
+                        trigger={
+                            <Button styleName={styleName} onClick={this.handleButtonClick}>
+                                <Button.Content>
+                                    <Icon name="ellipsis horizontal" size="big" />
+                                </Button.Content>
+                            </Button>
+                        }>
                     <Dropdown icon={null}
                               open
                               style={{left: `${left}px`, position: 'fixed', top: `${top}px`, zIndex: 1000}}>
