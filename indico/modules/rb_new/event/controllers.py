@@ -16,6 +16,8 @@
 
 from __future__ import unicode_literals
 
+import json
+
 from flask import jsonify
 
 from indico.modules.events.contributions import Contribution
@@ -25,7 +27,7 @@ from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.rb.controllers.user.event import RHRoomBookingEventBase
 from indico.modules.rb_new.event.forms import BookingListForm
 from indico.modules.rb_new.views.base import WPEventBookingList
-from indico.util.date_time import format_datetime
+from indico.util.date_time import format_datetime, format_time
 
 
 class RHEventBookingList(RHRoomBookingEventBase):
@@ -34,16 +36,30 @@ class RHEventBookingList(RHRoomBookingEventBase):
         reservations = self.event.reservations
         has_unlinked_contribs = (Contribution.query.with_parent(self.event)
                                  .filter(Contribution.is_scheduled,
-                                         Contribution.room_reservation_link == None)  # noqa
+                                         Contribution.room_reservation_links == None)  # noqa
                                  .has_rows())
         has_unlinked_session_blocks = (SessionBlock.query
                                        .filter(SessionBlock.session.has(event=self.event),
-                                               SessionBlock.room_reservation_link == None)  # noqa
+                                               SessionBlock.room_reservation_links == None)  # noqa
                                        .has_rows())
 
-        return WPEventBookingList.render_template('booking_list.html', self.event, form=form, reservations=reservations,
+        is_single_day = self.event.start_dt.date() == self.event.end_dt.date()
+        event_rb_params = {'link_type': 'event',
+                           'link_id': self.event.id,
+                           'recurrence': 'single' if is_single_day else 'daily',
+                           'number': 1,
+                           'interval': 'week',
+                           'sd': self.event.start_dt_local.date().isoformat(),
+                           'ed': None if is_single_day else self.event.end_dt_local.date().isoformat(),
+                           'st': format_time(self.event.start_dt_local.time()),
+                           'et': format_time(self.event.end_dt_local.time()),
+                           'text': self.event.room.name if self.event.room else None}
+
+        return WPEventBookingList.render_template('booking_list.html', self.event,
+                                                  form=form, reservations=reservations,
                                                   has_unlinked_contribs=has_unlinked_contribs,
-                                                  has_unlinked_session_blocks=has_unlinked_session_blocks)
+                                                  has_unlinked_session_blocks=has_unlinked_session_blocks,
+                                                  event_rb_params=event_rb_params)
 
 
 class RHListLinkableContributions(RHManageEventBase):
@@ -52,10 +68,13 @@ class RHListLinkableContributions(RHManageEventBase):
     def _process(self):
         query = (Contribution.query
                  .with_parent(self.event)
-                 .filter(Contribution.is_scheduled, Contribution.room_reservation_link == None)  # noqa
+                 .filter(Contribution.is_scheduled, Contribution.room_reservation_links == None)  # noqa
                  .order_by(Contribution.friendly_id))
 
-        result = [{'id': contrib.id, 'friendly_id': contrib.friendly_id, 'title': contrib.title,
+        result = [{'value': json.dumps({'id': contrib.id,
+                                        'start_dt': contrib.start_dt.isoformat(),
+                                        'end_dt': contrib.end_dt.isoformat()}),
+                   'friendly_id': contrib.friendly_id, 'title': contrib.title,
                    'full_title': '#{}: {}'.format(contrib.friendly_id, contrib.title)}
                   for contrib in query]
         return jsonify(result)
@@ -66,12 +85,14 @@ class RHListLinkableSessionBlocks(RHManageEventBase):
 
     def _process(self):
         query = (SessionBlock.query
-                 .filter(SessionBlock.session.has(event=self.event), SessionBlock.room_reservation_link == None)  # noqa
+                 .filter(SessionBlock.session.has(event=self.event), SessionBlock.room_reservation_links == None)  # noqa
                  .join(Session)
                  .order_by(Session.friendly_id))
 
-        result = [{'id': session_block.id, 'friendly_id': session_block.session.friendly_id,
-                   'title': session_block.full_title,
+        result = [{'value': json.dumps({'id': session_block.id,
+                                        'start_dt': session_block.start_dt.isoformat(),
+                                        'end_dt': session_block.end_dt.isoformat()}),
+                   'friendly_id': session_block.session.friendly_id, 'title': session_block.full_title,
                    'full_title': '#{}: {} ({})'.format(session_block.session.friendly_id, session_block.full_title,
                                                        format_datetime(session_block.timetable_entry.start_dt))}
                   for session_block in query]

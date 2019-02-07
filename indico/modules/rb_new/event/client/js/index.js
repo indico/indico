@@ -17,19 +17,31 @@
 
 import rbURL from 'indico-url:rooms_new.roombooking';
 
+import {serializeDate, serializeTime} from 'indico/utils/date';
+
 
 $(document).ready(() => {
     $('#contribution, #session_block').on('change', (e) => {
+        let params = {};
         const $target = $(e.currentTarget);
         const $bookBtn = $target.closest('.searchable-field').find('.js-book-btn');
         const linkType = {
             contribution: 'contribution',
             session_block: 'sessionBlock',
         }[$target.attr('id')];
-        const params = {
-            link_type: linkType,
-            link_id: $target.val(),
-        };
+        if ($target.val()) {
+            const values = JSON.parse($target.val());
+            params = {
+                link_type: linkType,
+                link_id: values.id,
+                recurrence: 'single',
+                number: 1,
+                interval: 'week',
+                sd: serializeDate(values.start_dt),
+                st: serializeTime(values.start_dt),
+                et: serializeTime(values.end_dt),
+            };
+        }
         $bookBtn
             .toggleClass('disabled', !$target.val())
             .attr('href', rbURL({path: 'book', ...params}));
