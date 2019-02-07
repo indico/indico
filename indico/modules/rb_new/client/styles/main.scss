@@ -107,6 +107,10 @@ a {
 .event-booking-page {
     .section.searchable-field {
         overflow: visible;
+
+        .selectize-control {
+            width: 500px;
+        }
     }
 
     .time-column,
