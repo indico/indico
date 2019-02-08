@@ -104,6 +104,6 @@ _bp.add_url_rule('/api/admin/attributes/<int:attribute_id>', 'admin_attributes',
 # Event linking
 _bp.add_url_rule('!/event/<confId>/manage/rooms/', 'event_booking_list', event.RHEventBookingList)
 _bp.add_url_rule('!/event/<confId>/manage/rooms/linking/contributions', 'event_linkable_contributions',
-                 event.RHListLinkableContributions, methods=('POST',))
+                 event.RHListLinkableContributions)
 _bp.add_url_rule('!/event/<confId>/manage/rooms/linking/session-blocks', 'event_linkable_session_blocks',
-                 event.RHListLinkableSessionBlocks, methods=('POST',))
+                 event.RHListLinkableSessionBlocks)
