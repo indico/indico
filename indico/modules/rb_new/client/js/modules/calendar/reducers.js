@@ -15,11 +15,12 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import _ from 'lodash';
 import moment from 'moment';
 import {combineReducers} from 'redux';
 
 import camelizeKeys from 'indico/utils/camelize';
-import {serializeDate} from 'indico/utils/date';
+import {serializeDate, serializeTime} from 'indico/utils/date';
 import {requestReducer} from 'indico/utils/redux';
 import {actions as bookRoomActions} from '../../modules/bookRoom';
 import * as actions from '../../actions';
@@ -76,7 +77,6 @@ function filterDeletedBooking(calendar, bookingId, roomId) {
         }
 
         const newRow = {...row};
-
         Object.keys(row).filter((type) => {
             return !['unbookableHours', 'nonbookablePeriods'].includes(type);
         }).forEach((type) => {
@@ -119,6 +119,33 @@ function acceptPrebooking(calendar, bookingId, roomId) {
             newRow['preBookings'][dt] = preBookingsData.filter((item) => {
                 return item.reservation.id !== bookingId;
             });
+        }
+
+        return newRow;
+    });
+}
+
+function moveToInactive(calendar, roomId, bookingState, rejectionReason, occurrencePredicate) {
+    return calendar.map((row) => {
+        if (row.roomId !== roomId) {
+            return row;
+        }
+
+        const newRow = _.cloneDeep(row);
+        const occurrenceType = bookingState === 'cancelled' ? 'cancellations' : 'rejections';
+
+        for (const type of ['bookings', 'preBookings']) {
+            const data = newRow[type];
+            for (const [dt, occurrences] of Object.entries(data)) {
+                const index = occurrences.findIndex(occurrencePredicate);
+                if (index !== -1) {
+                    newRow[occurrenceType][dt] = [
+                        ...(newRow[occurrenceType][dt] || []),
+                        {...occurrences[index], isValid: false, rejectionReason}
+                    ];
+                    newRow[type][dt].splice(index, 1);
+                }
+            }
         }
 
         return newRow;
@@ -220,15 +247,45 @@ export default combineReducers({
                 return {...state, rows: filterDeletedBooking(rows, bookingId, roomId)};
             }
             case bookingActions.BOOKING_STATE_UPDATED: {
-                const {booking: {id, roomId, state: bookingState}} = camelizeKeys(action.data);
+                const {booking} = camelizeKeys(action.data);
+                const {id, roomId, state: bookingState} = booking;
                 const {rows} = state;
                 let newRows;
 
                 if (bookingState === 'rejected' || bookingState === 'cancelled') {
-                    newRows = filterDeletedBooking(rows, id, roomId);
+                    newRows = moveToInactive(
+                        rows,
+                        roomId,
+                        bookingState,
+                        booking.rejectionReason,
+                        (occ) => occ.reservation.id === id,
+                    );
                 } else if (bookingState === 'accepted') {
                     newRows = acceptPrebooking(rows, id, roomId);
                 }
+
+                return {...state, rows: newRows};
+            }
+            case bookingActions.BOOKING_OCCURRENCE_STATE_UPDATED: {
+                const {occurrence} = camelizeKeys(action.data);
+                const {reservation, state: bookingState, startDt} = occurrence;
+                const {roomId, id: reservationId} = reservation;
+                const {rows} = state;
+                const newRows = moveToInactive(
+                    rows,
+                    roomId,
+                    bookingState,
+                    occurrence.rejectionReason,
+                    (occ) => {
+                        const {reservation: {id: occReservationId}, startDt: occStartDt} = occ;
+
+                        return (
+                            reservationId === occReservationId &&
+                            serializeTime(occStartDt) === serializeTime(startDt) &&
+                            serializeDate(occStartDt) === serializeDate(startDt)
+                        );
+                    },
+                );
 
                 return {...state, rows: newRows};
             }

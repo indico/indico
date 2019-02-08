@@ -45,8 +45,9 @@ export const getCalendarData = createSelector(
     ({calendar: {data}}) => data,
     roomsSelectors.getAllRooms,
     getLocalFilters,
+    getCalendarFilters,
     userSelectors.getUnbookableRoomIds,
-    ({roomIds, rows}, allRooms, {onlyAuthorized}, unbookableRoomIds) => {
+    ({roomIds, rows}, allRooms, {onlyAuthorized}, {showInactive}, unbookableRoomIds) => {
         if (onlyAuthorized) {
             const unbookable = new Set(unbookableRoomIds);
             roomIds = roomIds.filter(id => !unbookable.has(id));
@@ -56,9 +57,16 @@ export const getCalendarData = createSelector(
             roomIds,
             rows: rows.map(entry => {
                 const room = allRooms[entry.roomId];
+                const newEntry = {...entry};
+
+                if (!showInactive) {
+                    newEntry.cancellations = {};
+                    newEntry.rejections = {};
+                }
+
                 return [
                     room.id,
-                    {...entry, room}
+                    {...newEntry, room}
                 ];
             })
         };
