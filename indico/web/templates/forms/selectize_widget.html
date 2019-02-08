@@ -5,7 +5,7 @@
     <div class="i-form-field-fixed-width" data-tooltip-anchor>
         <input id="{{ field.id }}" class="typeahead" type="text" name="{{ field.name }}"
                {%- if field.data is not none -%}data-data="{{ field._value() | tojson | forceescape}}"{%- endif -%}
-               {{ input_args | html_params }}>
+               {{ input_args | html_params }} autocomplete="off">
         <span></span>
     </div>
 {% endblock %}
