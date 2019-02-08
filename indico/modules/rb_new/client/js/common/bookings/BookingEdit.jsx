@@ -162,7 +162,6 @@ class BookingEdit extends React.Component {
                         ...currentBooking.data,
                         pendingCancellations,
                     },
-                    dateRange: dateRange.filter((dt) => moment().isAfter(dt, 'day')),
                 },
                 newBooking: {
                     isFetching: false,
