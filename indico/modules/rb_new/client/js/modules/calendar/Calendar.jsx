@@ -172,7 +172,7 @@ class Calendar extends React.Component {
     };
 
     renderViewSwitch = () => {
-        const {view, actions: {changeView}, isFetching, isFetchingActiveBookings} = this.props;
+        const {view, actions: {changeView, setFilterParameter}, isFetching, isFetchingActiveBookings} = this.props;
         return (
             <div styleName="view-switch">
                 <Popup trigger={<Button icon={<Icon name="calendar" />}
@@ -188,7 +188,10 @@ class Calendar extends React.Component {
                 </Popup>
                 <Popup trigger={<Button icon={<Icon name="list" />}
                                         primary={view === 'list'}
-                                        onClick={() => changeView('list')}
+                                        onClick={() => {
+                                            setFilterParameter('showInactive', null);
+                                            changeView('list');
+                                        }}
                                         disabled={isFetching || isFetchingActiveBookings}
                                         size="tiny"
                                         circular />}
