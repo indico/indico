@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 import json
 
 from flask import jsonify
+from sqlalchemy.orm import joinedload
 
 from indico.modules.events.contributions import Contribution
 from indico.modules.events.management.controllers import RHManageEventBase
@@ -26,6 +27,7 @@ from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.timetable import TimetableEntry
 from indico.modules.rb.controllers.user.event import RHRoomBookingEventBase
+from indico.modules.rb.models.reservations import Reservation, ReservationLink
 from indico.modules.rb_new.event.forms import BookingListForm
 from indico.modules.rb_new.views.base import WPEventBookingList
 from indico.util.date_time import format_datetime, format_time, now_utc
@@ -37,6 +39,7 @@ def _contrib_query(event):
             .with_parent(event)
             .filter(Contribution.is_scheduled,
                     Contribution.timetable_entry.has(TimetableEntry.start_dt > now_utc()))
+            .options(joinedload('timetable_entry'))
             .order_by(Contribution.friendly_id))
 
 
@@ -44,16 +47,22 @@ def _session_block_query(event):
     return (SessionBlock.query
             .filter(SessionBlock.session.has(event=event),
                     SessionBlock.timetable_entry.has(TimetableEntry.start_dt > now_utc()))
+            .options(joinedload('timetable_entry'))
             .join(Session)
-            .order_by(Session.friendly_id))
+            .order_by(Session.friendly_id, Session.title, SessionBlock.title))
 
 
 class RHEventBookingList(RHRoomBookingEventBase):
     def _process(self):
         form = BookingListForm(event=self.event)
-        reservations = [r for r in self.event.reservations if not r.is_cancelled]
         has_contribs = _contrib_query(self.event).has_rows()
         has_session_blocks = _session_block_query(self.event).has_rows()
+
+        links = (ReservationLink.query.with_parent(self.event)
+                 .options(joinedload('reservation').joinedload('room'),
+                          joinedload('session_block'),
+                          joinedload('contribution'))
+                 .filter(~ReservationLink.reservation.has(Reservation.is_cancelled)))
 
         is_past_event = self.event.end_dt < now_utc()
         is_single_day = self.event.start_dt.date() == self.event.end_dt.date()
@@ -70,7 +79,7 @@ class RHEventBookingList(RHRoomBookingEventBase):
 
         return WPEventBookingList.render_template('booking_list.html', self.event,
                                                   form=form,
-                                                  reservations=reservations,
+                                                  links=links,
                                                   has_contribs=has_contribs,
                                                   has_session_blocks=has_session_blocks,
                                                   event_rb_params=event_rb_params,

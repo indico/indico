@@ -55,7 +55,7 @@
                 </div>
             {% endif %}
         </div>
-        {% if reservations %}
+        {% if links %}
             <div>
                 <h3>Room bookings</h3>
                 <table class="i-table-widget">
@@ -71,7 +71,8 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for reservation in reservations %}
+                        {% for link in links %}
+                            {% set reservation = link.reservation %}
                             <tr class="{{ 'disabled' if reservation.is_rejected }}">
                                 <td>
                                     {{ reservation.room.full_name }}
@@ -92,7 +93,6 @@
                                     {% endif %}
                                 </td>
                                 <td>{{ reservation.start_dt | format_time() }} - {{ reservation.end_dt | format_time() }}</td>
-                                {% set link = reservation.link %}
                                 <td class="link-data">
                                     <span title="{{ link.object.full_title if link.link_type.name == 'session_block' else link.object.title }}">
                                         {{ link.link_type.title }}
