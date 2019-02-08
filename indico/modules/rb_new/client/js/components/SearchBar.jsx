@@ -60,7 +60,7 @@ class SearchBar extends React.Component {
                                size="large"
                                styleName="text-filter"
                                icon={inputIcon}
-                               debounceTimeout={300}
+                               debounceTimeout={400}
                                onChange={(event) => this.updateTextFilter(event.target.value)}
                                value={text || ''}
                                disabled={disabled} />
