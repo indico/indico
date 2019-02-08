@@ -24,16 +24,17 @@ $(document).ready(() => {
     $('#contribution, #session_block').on('change', (e) => {
         let params = {};
         const $target = $(e.currentTarget);
+        const objectId = $target.val();
         const $bookBtn = $target.closest('.searchable-field').find('.js-book-btn');
         const linkType = {
             contribution: 'contribution',
             session_block: 'sessionBlock',
         }[$target.attr('id')];
-        if ($target.val()) {
-            const values = JSON.parse($target.val());
+        if (objectId) {
+            const values = $target.closest('.searchable-field').data('values')[objectId];
             params = {
                 link_type: linkType,
-                link_id: values.id,
+                link_id: objectId,
                 recurrence: 'single',
                 number: 1,
                 interval: 'week',
@@ -43,7 +44,7 @@ $(document).ready(() => {
             };
         }
         $bookBtn
-            .toggleClass('disabled', !$target.val())
+            .toggleClass('disabled', !objectId)
             .attr('href', rbURL({path: 'book', ...params}));
     });
 });

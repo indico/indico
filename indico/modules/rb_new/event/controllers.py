@@ -62,8 +62,12 @@ class RHEventBookingList(RHRoomBookingEventBase):
                  .options(joinedload('reservation').joinedload('room'),
                           joinedload('session_block'),
                           joinedload('contribution'))
-                 .filter(~ReservationLink.reservation.has(Reservation.is_cancelled)))
+                 .filter(~ReservationLink.reservation.has(Reservation.is_cancelled))).all()
 
+        contribs_data = {c.id: {'start_dt': c.start_dt.isoformat(), 'end_dt': c.end_dt.isoformat()}
+                         for c in _contrib_query(self.event)}
+        session_blocks_data = {sb.id: {'start_dt': sb.start_dt.isoformat(), 'end_dt': sb.end_dt.isoformat()}
+                               for sb in _session_block_query(self.event)}
         is_past_event = self.event.end_dt < now_utc()
         is_single_day = self.event.start_dt.date() == self.event.end_dt.date()
         event_rb_params = {'link_type': 'event',
@@ -76,12 +80,13 @@ class RHEventBookingList(RHRoomBookingEventBase):
                            'st': format_time(self.event.start_dt_local.time()),
                            'et': format_time(self.event.end_dt_local.time()),
                            'text': self.event.room.name if self.event.room else None}
-
         return WPEventBookingList.render_template('booking_list.html', self.event,
                                                   form=form,
                                                   links=links,
                                                   has_contribs=has_contribs,
+                                                  contribs_data=contribs_data,
                                                   has_session_blocks=has_session_blocks,
+                                                  session_blocks_data=session_blocks_data,
                                                   event_rb_params=event_rb_params,
                                                   is_past_event=is_past_event)
 
@@ -91,10 +96,9 @@ class RHListLinkableContributions(RHManageEventBase):
 
     def _process(self):
         query = _contrib_query(self.event)
-        result = [{'value': json.dumps({'id': contrib.id,
-                                        'start_dt': contrib.start_dt.isoformat(),
-                                        'end_dt': contrib.end_dt.isoformat()}),
-                   'friendly_id': contrib.friendly_id, 'title': contrib.title,
+        result = [{'id': contrib.id,
+                   'friendly_id': contrib.friendly_id,
+                   'title': contrib.title,
                    'full_title': contrib.verbose_title}
                   for contrib in query]
         return jsonify(result)
@@ -105,13 +109,11 @@ class RHListLinkableSessionBlocks(RHManageEventBase):
 
     def _process(self):
         query = _session_block_query(self.event)
-        result = [{'value': json.dumps({'id': session_block.id,
-                                        'start_dt': session_block.start_dt.isoformat(),
-                                        'end_dt': session_block.end_dt.isoformat()}),
-                   'friendly_id': session_block.session.friendly_id, 'title': session_block.full_title,
+        result = [{'id': session_block.id,
+                   'friendly_id': session_block.session.friendly_id,
+                   'title': session_block.full_title,
                    'full_title': '#{}: {} ({})'.format(
                        session_block.session.friendly_id, session_block.full_title,
-                       to_unicode(format_datetime(session_block.timetable_entry.start_dt))
-                   )}
+                       to_unicode(format_datetime(session_block.timetable_entry.start_dt)))}
                   for session_block in query]
         return jsonify(result)

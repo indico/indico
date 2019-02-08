@@ -25,7 +25,7 @@ from indico.web.forms.widgets import SelectizeWidget
 
 class LinkedObjectField(QuerySelectField):
     widget = SelectizeWidget(allow_by_id=True, search_field='title', label_field='full_title', preload=True,
-                             value_field='value', inline_js=True)
+                             inline_js=True)
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault('allow_blank', True)
