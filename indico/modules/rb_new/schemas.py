@@ -103,12 +103,13 @@ class ReservationUserEventSchema(Schema):
 
 class ReservationOccurrenceSchema(mm.ModelSchema):
     reservation = Nested(ReservationSchema)
+    state = EnumField(ReservationState)
     start_dt = NaiveDateTime()
     end_dt = NaiveDateTime()
 
     class Meta:
         model = ReservationOccurrence
-        fields = ('start_dt', 'end_dt', 'is_valid', 'reservation', 'rejection_reason')
+        fields = ('start_dt', 'end_dt', 'is_valid', 'reservation', 'rejection_reason', 'state')
 
 
 class ReservationEditLogSchema(UserSchema):
