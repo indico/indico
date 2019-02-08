@@ -105,13 +105,15 @@ def get_recurring_booking_suggestions(rooms, start_dt, end_dt, repeat_frequency,
 
         suggestions = {}
         booking_limit = room.booking_limit_days or rb_settings.get('booking_limit')
-        if booking_limit is not None and booking_limit < booking_length:
+        limit_exceeded = booking_limit is not None and booking_limit < booking_length
+        if limit_exceeded:
             excess_days = booking_length - booking_limit
             suggestions['shorten'] = excess_days
 
-        number_of_conflicting_days = len(group_by_occurrence_date(conflicts.get(room.id, [])))
-        if number_of_conflicting_days and number_of_conflicting_days < len(candidates):
-            suggestions['skip'] = number_of_conflicting_days
+        if not limit_exceeded:
+            number_of_conflicting_days = len(group_by_occurrence_date(conflicts.get(room.id, [])))
+            if number_of_conflicting_days and number_of_conflicting_days < len(candidates):
+                suggestions['skip'] = number_of_conflicting_days
         if suggestions:
             data.append({'room': room, 'suggestions': suggestions})
     return data
