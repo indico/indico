@@ -200,7 +200,7 @@ def get_room_calendar(start_date, end_date, room_ids, include_inactive=False, **
     for room_id, occurrences in occurrences_by_room:
         occurrences = list(occurrences)
         pre_bookings = [occ for occ in occurrences if occ.reservation.is_pending]
-        existing_bookings = [occ for occ in occurrences if occ.is_valid]
+        existing_bookings = [occ for occ in occurrences if not occ.reservation.is_pending and occ.is_valid]
 
         additional_data = {
             'bookings': group_by_occurrence_date(existing_bookings),
