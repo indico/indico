@@ -16,20 +16,18 @@
 
 from __future__ import unicode_literals
 
-from wtforms.ext.sqlalchemy.fields import QuerySelectField
+from wtforms import Field
 
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.widgets import SelectizeWidget
 
 
-class LinkedObjectField(QuerySelectField):
+class LinkedObjectField(Field):
     widget = SelectizeWidget(allow_by_id=True, search_field='title', label_field='full_title', preload=True,
                              inline_js=True)
 
     def __init__(self, *args, **kwargs):
-        kwargs.setdefault('allow_blank', True)
-        kwargs['get_label'] = lambda a: '#{}: {}'.format(a.friendly_id, a.title)
         self.ajax_endpoint = kwargs.pop('ajax_endpoint')
         super(LinkedObjectField, self).__init__(*args, **kwargs)
 
