@@ -82,7 +82,7 @@ export default combineReducers({
                 return {...state, [id]: availability};
             }
             case bookRoomActions.CREATE_BOOKING_SUCCESS: {
-                const {bookings, roomId} = camelizeKeys(action.data);
+                const {calendarData: {bookings}, roomId} = camelizeKeys(action.data);
                 if (!bookings) {
                     return state;
                 }
