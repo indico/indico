@@ -32,20 +32,28 @@ from indico.util.date_time import format_datetime, format_time, now_utc
 from indico.util.string import to_unicode
 
 
+def _contrib_query(event):
+    return (Contribution.query
+            .with_parent(event)
+            .filter(Contribution.is_scheduled,
+                    Contribution.timetable_entry.has(TimetableEntry.start_dt > now_utc()))
+            .order_by(Contribution.friendly_id))
+
+
+def _session_block_query(event):
+    return (SessionBlock.query
+            .filter(SessionBlock.session.has(event=event),
+                    SessionBlock.timetable_entry.has(TimetableEntry.start_dt > now_utc()))
+            .join(Session)
+            .order_by(Session.friendly_id))
+
+
 class RHEventBookingList(RHRoomBookingEventBase):
     def _process(self):
         form = BookingListForm(event=self.event)
         reservations = [r for r in self.event.reservations if not r.is_cancelled]
-        has_unlinked_contribs = (Contribution.query.with_parent(self.event)
-                                 .filter(Contribution.is_scheduled,
-                                         Contribution.room_reservation_links == None,  # noqa
-                                         Contribution.timetable_entry.has(TimetableEntry.start_dt > now_utc()))
-                                 .has_rows())
-        has_unlinked_session_blocks = (SessionBlock.query
-                                       .filter(SessionBlock.session.has(event=self.event),
-                                               SessionBlock.room_reservation_links == None,  # noqa
-                                               SessionBlock.timetable_entry.has(TimetableEntry.start_dt > now_utc()))
-                                       .has_rows())
+        has_contribs = _contrib_query(self.event).has_rows()
+        has_session_blocks = _session_block_query(self.event).has_rows()
 
         is_past_event = self.event.end_dt < now_utc()
         is_single_day = self.event.start_dt.date() == self.event.end_dt.date()
@@ -61,22 +69,19 @@ class RHEventBookingList(RHRoomBookingEventBase):
                            'text': self.event.room.name if self.event.room else None}
 
         return WPEventBookingList.render_template('booking_list.html', self.event,
-                                                  form=form, reservations=reservations,
-                                                  has_unlinked_contribs=has_unlinked_contribs,
-                                                  has_unlinked_session_blocks=has_unlinked_session_blocks,
-                                                  event_rb_params=event_rb_params, is_past_event=is_past_event)
+                                                  form=form,
+                                                  reservations=reservations,
+                                                  has_contribs=has_contribs,
+                                                  has_session_blocks=has_session_blocks,
+                                                  event_rb_params=event_rb_params,
+                                                  is_past_event=is_past_event)
 
 
 class RHListLinkableContributions(RHManageEventBase):
     """AJAX endpoint that lists all contributions in the event."""
 
     def _process(self):
-        query = (Contribution.query
-                 .with_parent(self.event)
-                 .filter(Contribution.is_scheduled, Contribution.room_reservation_links == None,  # noqa
-                         Contribution.timetable_entry.has(TimetableEntry.start_dt > now_utc()))
-                 .order_by(Contribution.friendly_id))
-
+        query = _contrib_query(self.event)
         result = [{'value': json.dumps({'id': contrib.id,
                                         'start_dt': contrib.start_dt.isoformat(),
                                         'end_dt': contrib.end_dt.isoformat()}),
@@ -90,12 +95,7 @@ class RHListLinkableSessionBlocks(RHManageEventBase):
     """AJAX endpoint that lists all session blocks in the event."""
 
     def _process(self):
-        query = (SessionBlock.query
-                 .filter(SessionBlock.session.has(event=self.event), SessionBlock.room_reservation_links == None,  # noqa
-                         SessionBlock.timetable_entry.has(TimetableEntry.start_dt > now_utc()))
-                 .join(Session)
-                 .order_by(Session.friendly_id))
-
+        query = _session_block_query(self.event)
         result = [{'value': json.dumps({'id': session_block.id,
                                         'start_dt': session_block.start_dt.isoformat(),
                                         'end_dt': session_block.end_dt.isoformat()}),
