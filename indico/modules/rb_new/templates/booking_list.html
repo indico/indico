@@ -94,9 +94,14 @@
                                 </td>
                                 <td>{{ reservation.start_dt | format_time() }} - {{ reservation.end_dt | format_time() }}</td>
                                 <td class="link-data">
-                                    <span title="{{ link.object.full_title if link.link_type.name == 'session_block' else link.object.title }}">
+                                    {% if link.link_type.name == 'event' %}
                                         {{ link.link_type.title }}
-                                    </span>
+                                    {% else %}
+                                        {% set title = link.object.full_title if link.link_type.name == 'session_block' else link.object.title %}
+                                        <span title="{{ title }}">
+                                            {{ link.link_type.title }}
+                                        </span>
+                                    {% endif %}
                                 </td>
                                 <td class="action-column">
                                     {{ booking_details_link(reservation) }}
