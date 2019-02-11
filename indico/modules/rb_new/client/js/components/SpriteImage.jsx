@@ -15,11 +15,11 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import roomsSpriteURL from 'indico-url:rooms_new.sprite';
+
 import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-
-import roomsSpriteURL from 'indico-url:rooms_new.sprite';
 import * as configSelectors from '../common/config/selectors';
 
 
@@ -42,14 +42,17 @@ class SpriteImage extends React.Component {
         /** Additional styles to be applied on the component */
         styles: PropTypes.object,
         /** Whether the image should try to fit vertically instead of horizontally */
-        fillVertical: PropTypes.bool
+        fillVertical: PropTypes.bool,
+        /** Whether the image is not missing and can be clicked for full view */
+        onClick: PropTypes.func
     };
 
     static defaultProps = {
         width: DEFAULT_WIDTH,
         height: DEFAULT_HEIGHT,
         styles: {},
-        fillVertical: false
+        fillVertical: false,
+        onClick: null
     };
 
     constructor(props) {
@@ -70,7 +73,7 @@ class SpriteImage extends React.Component {
     }
 
     render() {
-        const {pos, width, height, styles, roomsSpriteToken, fillVertical} = this.props;
+        const {pos, width, height, styles, roomsSpriteToken, fillVertical, onClick} = this.props;
         const {contWidth, contHeight} = this.state;
 
         const imgStyle = {
@@ -103,7 +106,7 @@ class SpriteImage extends React.Component {
 
         return (
             <div style={containerStyle} ref={this.containerRef}>
-                <div style={imgStyle} className="img" />
+                <div style={imgStyle} className="img" onClick={onClick} />
             </div>
         );
     }

@@ -15,9 +15,11 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import roomImageURL from 'indico-url:rooms_new.room_photo';
+
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Grid, Header, Icon, Popup} from 'semantic-ui-react';
+import {Dimmer, Grid, Header, Icon, Image, Loader, Modal, Popup} from 'semantic-ui-react';
 import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
 import {formatLatLon} from '../common/map/util';
 
@@ -67,8 +69,58 @@ AnnotatedIcon.propTypes = {
 
 export default class RoomBasicDetails extends React.PureComponent {
     static propTypes = {
-        room: PropTypes.object.isRequired
+        room: PropTypes.object.isRequired,
     };
+
+    state = {
+        imageModalOpen: false,
+        imageLoaded: false,
+    };
+
+    renderImage() {
+        const {room} = this.props;
+        const {imageModalOpen, imageLoaded} = this.state;
+        const isClickable = room.hasPhoto;
+        const spriteImage = (
+            <SpriteImage styleName="clickable"
+                         pos={room.spritePosition}
+                         height="100%"
+                         width="100%"
+                         fillVertical
+                         onClick={isClickable ? (() => this.setState({imageModalOpen: true})) : undefined} />
+        );
+        if (isClickable) {
+            return (
+                <>
+                    <Modal closeIcon open={imageModalOpen}
+                           onClose={() => this.setState({imageModalOpen: false, imageLoaded: false})}>
+                        <Modal.Content image styleName="photo-dimmer">
+                            <Dimmer.Dimmable styleName="photo-dimmable-width">
+                                <Dimmer active={!imageLoaded} inverted>
+                                    <Loader />
+                                </Dimmer>
+                                <Image styleName="photo-width"
+                                       wrapped
+                                       onLoad={() => this.setState({imageLoaded: true})}
+                                       src={roomImageURL({room_id: room.id})} />
+                            </Dimmer.Dimmable>
+                        </Modal.Content>
+                    </Modal>
+                    <div styleName="image-container clickable">
+                        {spriteImage}
+                        <RoomFeaturesBox room={room} />
+                    </div>
+                </>
+            );
+        } else {
+            return (
+                <div styleName="image-container">
+                    {spriteImage}
+                    <RoomFeaturesBox room={room} />
+                </div>
+            );
+        }
+    }
 
     render() {
         const {room} = this.props;
@@ -76,17 +128,10 @@ export default class RoomBasicDetails extends React.PureComponent {
             ownerName: owner, latitude, longitude, division, locationName: location, surfaceArea: surface, capacity,
             telephone, fullName: name
         } = room;
-
         return (
             <Grid columns={2}>
                 <Grid.Column textAlign="center" styleName="photo-column">
-                    <div styleName="image-container">
-                        <SpriteImage pos={room.spritePosition}
-                                     height="100%"
-                                     width="100%"
-                                     fillVertical />
-                        <RoomFeaturesBox room={room} />
-                    </div>
+                    {this.renderImage()}
                 </Grid.Column>
                 <Grid.Column styleName="data-column">
                     <Header>

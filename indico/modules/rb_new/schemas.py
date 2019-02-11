@@ -63,7 +63,7 @@ class RoomSchema(mm.ModelSchema):
         fields = ('id', 'name', 'capacity', 'building', 'floor', 'number', 'is_public', 'location_name', 'full_name',
                   'comments', 'division', 'is_reservable', 'is_auto_confirm', 'sprite_position', 'surface_area',
                   'latitude', 'longitude', 'telephone', 'key_location', 'max_advance_days', 'owner_name',
-                  'available_equipment')
+                  'available_equipment', 'has_photo')
 
 
 class MapAreaSchema(mm.ModelSchema):

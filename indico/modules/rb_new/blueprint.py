@@ -32,6 +32,7 @@ _bp.add_url_rule('/', 'roombooking', RHRoomBooking)
 _bp.add_url_rule('/<path:path>', 'roombooking', RHRoomBooking)
 _bp.add_url_rule('/rooms-sprite-<version>.jpg', 'sprite', misc.RHRoomsSprite)
 _bp.add_url_rule('/rooms-sprite.jpg', 'sprite', misc.RHRoomsSprite)
+_bp.add_url_rule('/rooms/<int:room_id>.jpg', 'room_photo', rooms.RHRoomPhoto)
 
 # General backend
 _bp.add_url_rule('/api/<path:path>', '404', lambda path: (jsonify(), 404))

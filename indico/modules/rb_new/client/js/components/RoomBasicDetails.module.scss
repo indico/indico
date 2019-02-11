@@ -17,6 +17,23 @@
 
 @import 'rb_new:styles/palette';
 
+.photo-dimmable-width {
+    width: 100%;
+
+    .photo-width {
+        width: 100%;
+
+        img {
+            width: 100%;
+        }
+    }
+}
+
+.photo-dimmer {
+    display: flex;
+    justify-content: center;
+}
+
 .feature-box {
     position: absolute;
     display: flex;
@@ -47,6 +64,10 @@
         position: relative;
         height: 100%;
         width: 100%;
+
+        &.clickable {
+            cursor: zoom-in !important;
+        }
     }
 }
 

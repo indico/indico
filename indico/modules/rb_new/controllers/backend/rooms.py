@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 from datetime import date, datetime, time, timedelta
+from io import BytesIO
 
 from flask import jsonify, request, session
 from sqlalchemy.orm import subqueryload
@@ -36,6 +37,7 @@ from indico.modules.rb_new.operations.rooms import get_room_statistics, search_f
 from indico.modules.rb_new.schemas import room_attribute_values_schema, rooms_schema
 from indico.util.caching import memoize_redis
 from indico.util.marshmallow import NaiveDateTime
+from indico.web.flask.util import send_file
 
 
 class RHRooms(RHRoomBookingBase):
@@ -147,3 +149,10 @@ class RHCheckRoomAvailable(RHRoomBase):
     })
     def _process(self, start_dt, end_dt):
         return jsonify(check_room_available(self.room, start_dt, end_dt))
+
+
+class RHRoomPhoto(RHRoomBase):
+    def _process(self):
+        if not self.room.has_photo:
+            raise NotFound
+        return send_file('room.jpg', BytesIO(self.room.photo.data), 'image/jpeg')
