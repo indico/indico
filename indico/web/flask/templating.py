@@ -183,7 +183,7 @@ def call_template_hook(*name, **kwargs):
     as_list = kwargs.pop('as_list', False)
     values = []
     for is_markup, priority, value in values_from_signal(signals.plugin.template_hook.send(unicode(name), **kwargs),
-                                                         single_value=True):
+                                                         single_value=True, as_list=as_list):
         if value:
             if is_markup:
                 value = Markup(value)
