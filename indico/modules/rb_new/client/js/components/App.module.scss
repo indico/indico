@@ -98,13 +98,13 @@
 
 .rb-pushable {
     // make sure that side bar takes the whole remaining height of the page
-    min-height: calc(100vh - #{$menu-height} - 50px);
+    min-height: calc(100vh - #{$menu-height} - var(--extra-bars, 0) * 50px - 50px);
     // unset `transform` which breaks the Sticky filter bar and set `position` here
     // so that rb-pusher positions itself correctly
     transform: unset !important;
     position: relative;
 
     .rb-pusher:global(.pusher) {
-        min-height: calc(100vh - #{$menu-height} - 50px);
+        min-height: calc(100vh - #{$menu-height} - var(--extra-bars, 0) * 50px - 50px);
     }
 }

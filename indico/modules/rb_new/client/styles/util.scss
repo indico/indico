@@ -50,3 +50,7 @@ $sui-font-family: Muli, 'Helvetica Neue', Arial, Helvetica, sans-serif;
         $first 78%
     );
 }
+
+@mixin remaining-screen-height() {
+    height: calc(100vh - (#{$indico-top-bar-height} + #{$menu-height} + var(--extra-bars, 0) * 50px));
+}

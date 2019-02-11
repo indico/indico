@@ -89,35 +89,50 @@ div.announcement-bar {
     display: flex;
     align-items: center;
     padding: 0.75em;
-    background-color: lighten($light-yellow, 5%);
-    color: $dark-black;
-    border-bottom: 2px solid $dark-yellow;
     font-size: 1.1em;
     text-align: center;
 
     .icon {
         margin-right: 0.25em;
         font-size: 1.1em;
-        color: $yellow;
     }
 
     .close-button {
         display: flex;
-        color: $dark-yellow;
         font-size: 1.5em;
         cursor: pointer;
     }
-}
 
-div.celery-error-bar {
-    @extend div.announcement-bar;
+    &.warning {
+        background-color: lighten($light-yellow, 5%);
+        color: $dark-black;
+        border-bottom: 2px solid $dark-yellow;
 
-    background-color: $red;
-    border-bottom: 2px solid $dark-red;
-    color: $light-red;
+        .icon {
+            color: $yellow;
+        }
 
-    .icon {
-        color: $red;
+        .close-button {
+            color: $dark-yellow;
+        }
+    }
+
+    &.error {
+        background-color: $red;
+        border-bottom: 2px solid $dark-red;
+        color: $light-red;
+
+        .icon {
+            color: $red;
+        }
+
+        .close-button {
+            color: $dark-red;
+        }
+    }
+
+    &.weak-hidden {
+        display: none;
     }
 }
 
@@ -191,7 +206,7 @@ div.session-bar {
         right: 0;
         margin-top: 0;
         padding: 0 0 5px 5px;
-        z-index:999;
+        z-index: 999;
     }
 }
 
@@ -214,28 +229,27 @@ div.tz-selector-widget {
 
 div.impersonation-header {
     padding: 0.5em;
-    background-color: #DB610F;
-    color: #ECCCB6;
+    background-color: $dark-black;
+    color: lighten($yellow, 15%);
     font-family: Verdana;
     font-size: 12px;
 
     .text {
         display: inline-block;
-        float: left;
 
         .logged-user-name {
-          font-weight: bold;
-          color: #eee;
-          margin: 0.1em;
-          line-height: 1em;
-          max-width: 200px;
+            font-weight: bold;
+            color: lighten($yellow, 30%);
+            margin: 0.1em;
+            line-height: 1em;
+            max-width: 200px;
         }
 
-        &:before {
-          margin-right: 0.4em;
-          font-size: 1.5em;
-          line-height: 1em;
-          vertical-align: middle;
+        &::before {
+            margin-right: 0.4em;
+            font-size: 1.5em;
+            line-height: 1em;
+            vertical-align: middle;
         }
 
     }

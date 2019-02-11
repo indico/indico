@@ -16,6 +16,7 @@
  */
 
 @import 'rb_new:styles/palette';
+@import 'rb_new:styles/util';
 
 @keyframes fade-slide-down {
     0% {
@@ -30,17 +31,17 @@
 }
 
 .landing-page:global(.ui.grid) {
-    height: calc(100vh - 125px);
+    @include remaining-screen-height();
     align-content: space-between;
     flex-direction: column;
 
     &::before {
         @extend %rb-splash-background;
+        @include remaining-screen-height();
         content: ' ';
         position: absolute;
         left: 0;
         box-sizing: border-box;
-        height: calc(100vh - 125px);
         width: 120%;
         animation: fade-slide-down 2s ease-out forwards;
     }
@@ -103,8 +104,7 @@
     }
 
     .landing-page-lower-row {
-        min-height: 200px;
-        max-height: 300px;
+        height: 300px;
         background-color: #fff;
         padding: 1em 0 0 0;
         // to compensate margin from SUI containers

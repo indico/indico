@@ -19,6 +19,8 @@ from __future__ import unicode_literals
 from flask import flash, jsonify, redirect, render_template, request, session
 from itsdangerous import BadData, BadSignature
 from markupsafe import Markup
+from webargs import fields
+from webargs.flaskparser import use_kwargs
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from indico.core import signals
@@ -601,12 +603,13 @@ class RHResetPassword(RH):
 
 
 class RHAdminImpersonate(RHAdminBase):
-    def _process_args(self):
+    @use_kwargs({
+        'undo': fields.Bool(missing=False),
+        'user_id': fields.Int(missing=None)
+    })
+    def _process_args(self, undo, user_id):
         RHAdminBase._process_args(self)
-        if request.form.get('undo') == '1':
-            self.user = None
-        else:
-            self.user = User.get_one(int(request.form['user_id']), is_deleted=False)
+        self.user = None if undo else User.get_one(user_id, is_deleted=False)
 
     def _check_access(self):
         if self.user:
@@ -616,5 +619,7 @@ class RHAdminImpersonate(RHAdminBase):
         if self.user:
             impersonate_user(self.user)
         else:
+            # no user? it means it's an undo
             undo_impersonate_user()
+
         return jsonify()

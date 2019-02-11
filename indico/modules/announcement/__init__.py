@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from flask import render_template, session
+from flask import session
 
 from indico.core import signals
 from indico.core.settings import SettingsProxy
@@ -32,13 +32,13 @@ announcement_settings = SettingsProxy('announcement', {
 })
 
 
-@template_hook('global-announcement')
+@template_hook('global-announcement', markup=False)
 def _inject_announcement_header(**kwargs):
     if not announcement_settings.get('enabled'):
         return
     message = announcement_settings.get('message')
     if message:
-        return render_template('announcement/display.html', message=message)
+        return ('warning', message)
 
 
 @signals.menu.items.connect_via('admin-sidemenu')

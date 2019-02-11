@@ -20,8 +20,8 @@
 
 .map-container {
     :global(.leaflet-container) {
+        @include remaining-screen-height();
         font-size: 14px;
-        height: calc(100vh - (#{$indico-top-bar-height} + #{$menu-height} + 2.5em*2));
     }
 
     // Overrides leaflet control styles to match Semantic-UI ones.

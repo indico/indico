@@ -146,3 +146,69 @@ a {
         }
     }
 }
+
+%banner-bar {
+    height: 50px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+
+    .content {
+        display: flex;
+        flex-grow: 1;
+        align-items: center;
+    }
+
+    .icon {
+        margin-right: 0.5em;
+    }
+
+    &.weak-hidden {
+        display: none;
+    }
+}
+
+.announcement-bar {
+    @extend %banner-bar;
+
+    &.warning {
+        background-color: lighten($light-yellow, 5%);
+        color: $dark-yellow;
+    }
+
+    &.error {
+        background-color: $red;
+        color: $light-red;
+    }
+
+    .close-button {
+        margin-left: auto;
+        cursor: pointer;
+        line-height: 1em;
+    }
+}
+
+$text-yellow: lighten($yellow, 15%);
+
+.impersonation-bar {
+    @extend %banner-bar;
+    height: 35px;
+    background-color: $dark-black;
+    color: $text-yellow;
+    box-shadow: 0 -5px 1px -2px rgba(#000, 0.2) inset;
+
+    strong {
+        color: lighten($yellow, 30%);
+    }
+
+    .icon {
+        color: $text-yellow;
+    }
+
+    .undo-login-as {
+        margin-left: auto;
+        cursor: pointer;
+        line-height: 1em;
+    }
+}

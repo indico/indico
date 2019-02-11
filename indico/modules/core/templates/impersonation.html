@@ -1,0 +1,36 @@
+{% macro  render_impersonation_legacy(original_name) %}
+    <div class="impersonation-header clearfix">
+        <span class="icon-eye text">
+            <small>{% trans %}Impersonating{% endtrans %}</small>
+            <span class="logged-user-name">{{ session.user.full_name }}</span>
+            <small>({{ original_name }})</small>
+        </span>
+        <a class="undo-login-as icon-close"
+           title="{% trans user=message %}Switch back to {{ original_name }}{% endtrans %}"></a>
+    </div>
+{% endmacro %}
+
+{% macro render_impersonation_new(original_name) %}
+    <div class="impersonation-bar">
+            <div class="content">
+                <i class="spy large icon"></i>
+                <div class="message">
+                    {% trans name='<strong>%s</strong>'|safe|format(session.user.full_name) %}Impersonating {{ name }}{% endtrans %}
+                    ({{ original_name }})
+                </div>
+                <i class="close icon inverted undo-login-as"
+                   title="{% trans user=message %}Switch back to {{ original_name }}{% endtrans %}"></i>
+            </div>
+        </div>
+        <script>
+    </script>
+{% endmacro %}
+
+
+{% macro render_impersonation(legacy=false) %}
+    {% set login_as_data = session.get('login_as_orig_user') %}
+    {% if login_as_data %}
+        {% set user_name = login_as_data['user_name'] %}
+        {{ render_impersonation_legacy(user_name) if legacy else render_impersonation_new(user_name) }}
+    {% endif %}
+{% endmacro %}

@@ -82,13 +82,6 @@ def _topmenu_items(sender, **kwargs):
         yield TopMenuItem('profile', _('My profile'), url_for('users.user_dashboard', user_id=None), 50)
 
 
-@template_hook('global-announcement', priority=-1)
-def _inject_login_as_header(**kwargs):
-    login_as_data = session.get('login_as_orig_user')
-    if login_as_data:
-        return render_template('users/login_as_header.html', login_as_data=login_as_data)
-
-
 @signals.users.registration_requested.connect
 def _registration_requested(req, **kwargs):
     from indico.modules.users.util import get_admin_emails

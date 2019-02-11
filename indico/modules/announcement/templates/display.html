@@ -1,23 +1,77 @@
-<div class="announcement-bar weak-hidden" id="announcement-bar">
-    <div class="flexrow f-self-stretch f-j-center f-a-center">
-        <i class="icon icon-warning"></i>
-        <div>{{- message | safe -}}</div>
-    </div>
-    <span class="icon-close close-button"></span>
-</div>
-<script>
-    (function() {
-        'use strict';
+{% macro render_announcement_legacy(type, message, persistent=false) %}
+    {% if type == 'html' %}
+        {{ message | safe }}
+    {% else %}
+        <div class="announcement-bar weak-hidden {{type}}" data-hash="{{message | crc32}}"">
+            <div class="flexrow f-self-stretch f-j-center f-a-center">
+                <i class="icon icon-warning"></i>
+                <div>
+                    {{ message }}
+                </div>
+            </div>
+            {% if not persistent %}
+                <span class="icon-close close-button"></span>
+            {% endif %}
+        </div>
+    {% endif %}
+{% endmacro %}
 
-        var hash = {{ message | crc32 | string | tojson }};
+{% macro render_announcement_new(type, message, persistent=false) %}
+    {% if type == 'html' %}
+        {{ message | safe }}
+    {% else %}
+        <div class="announcement-bar weak-hidden {{type}}" data-hash="{{message | crc32}}">
+            <div class="content">
+                <i class="warning sign large icon"></i>
+                <div class="message">
+                    {{ message }}
+                </div>
+                <i class="close icon close-button"></i>
+            </div>
+        </div>
+    {% endif %}
+{% endmacro %}
 
-        $('#announcement-bar .close-button').on('click', function() {
-            $.jStorage.set('hideAnnouncement', hash);
-            $('#announcement-bar').slideUp('fast');
-        });
+{% macro render_announcements(legacy=false) %}
+    {% set announcements = template_hook('global-announcement', as_list=true) %}
+    {% if announcements %}
+        {% for announcement in announcements %}
+            {% if legacy %}
+                {{ render_announcement_legacy(*announcement) }}
+            {% else %}
+                {{ render_announcement_new(*announcement) }}
+            {% endif %}
+        {% endfor %}
+        <script>
+            (() => {
+                function refreshPageHeight() {
+                    let numBars = Array.from(document.querySelectorAll('.announcement-bar'))
+                        .filter(function(e) { return e.style.display === 'flex'; })
+                        .length;
 
-        if ($.jStorage.get('hideAnnouncement') !== hash) {
-            $("#announcement-bar").show();
-        }
-    })();
-</script>
+                    if (document.querySelector('.impersonation-bar')) {
+                        numBars++;
+                    }
+
+                    document.body.style.setProperty('--extra-bars', numBars);
+                }
+
+                document.querySelectorAll('.announcement-bar .close-button').forEach(function(elem) {
+                    elem.addEventListener('click', function() {
+                        const bar = elem.closest('.announcement-bar');
+                        window.localStorage.setItem('hideAnnouncement', bar.dataset.hash);
+                        bar.style.display = 'none';
+                        refreshPageHeight();
+                    });
+                });
+
+                document.querySelectorAll('.announcement-bar').forEach(function(elem) {
+                    if (window.localStorage.getItem('hideAnnouncement') !== elem.dataset.hash) {
+                        elem.style.display = 'flex';
+                    }
+                });
+                refreshPageHeight();
+            })();
+        </script>
+    {% endif %}
+{% endmacro %}

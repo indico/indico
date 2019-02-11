@@ -1,6 +1,9 @@
 {% from 'events/management/_create_event_button.html' import create_event_link %}
+{% from 'announcement/display.html' import render_announcements %}
+{% from 'core/impersonation.html' import render_impersonation %}
 
-{{ template_hook('global-announcement') }}
+{{ render_impersonation(legacy=true) }}
+{{ render_announcements(legacy=true) }}
 
 <div class="page-header clearfix">
     <div class="flexrow f-j-space-between f-a-start">

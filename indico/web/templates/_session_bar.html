@@ -134,7 +134,7 @@
         </div>
         {% if session.user.is_admin %}
             <div class="settingsWidgetSection">
-                <a class="login-as" data-href="{{ url_for('auth.admin_impersonate') }}">
+                <a id="login-as" class="login-as" data-href="{{ url_for('auth.admin_impersonate') }}">
                     {%- trans %}Login as...{% endtrans -%}
                 </a>
             </div>

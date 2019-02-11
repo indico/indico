@@ -17,49 +17,51 @@
 
 /* global ChooseUsersPopup:false */
 
-(function() {
-    'use strict';
+import getImpersonateURL from 'indico-url:auth.admin_impersonate';
 
-    function sendRequest(url, payload) {
-        $.ajax({
-            url: url,
-            method: 'POST',
-            data: payload,
-            complete: IndicoUI.Dialogs.Util.progress(),
-            error: handleAjaxError,
-            success: function() {
-                IndicoUI.Dialogs.Util.progress();
-                location.reload();
-            }
-        });
+import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
+import {$T} from 'indico/utils/i18n';
+
+
+async function sendRequest(data) {
+    try {
+        await indicoAxios.post(getImpersonateURL(), data);
+    } catch (error) {
+        handleAxiosError(error);
+        return;
+    }
+    window.location.reload();
+}
+
+function impersonateUser() {
+    function _userSelected(users) {
+        sendRequest({user_id: users[0].id});
     }
 
-    function impersonateUser(url) {
-        function _userSelected(users) {
-            sendRequest(url, {user_id: users[0].id});
-        }
+    const dialog = new ChooseUsersPopup(
+        $T('Select user to impersonate'),
+        true, null, false, true, null, true, true, false, _userSelected, null, false
+    );
 
-        var dialog = new ChooseUsersPopup(
-            $T("Select user to impersonate"),
-            true, null, false, true, null, true, true, false, _userSelected, null, false
-        );
+    dialog.execute();
+}
 
-        dialog.execute();
-    }
+document.addEventListener('DOMContentLoaded', () => {
+    const undoLoginAs = document.querySelectorAll('.undo-login-as');
+    const loginAs = document.querySelector('#login-as');
 
-    function undoImpersonateUser(url) {
-        sendRequest(url, {undo: '1'});
-    }
-
-    $(document).ready(function() {
-        $('.login-as').on('click', function(evt) {
-            evt.preventDefault();
-            impersonateUser($(this).data('href'));
+    if (undoLoginAs.length) {
+        undoLoginAs.forEach(elem => {
+            elem.addEventListener('click', e => {
+                e.preventDefault();
+                sendRequest({undo: true});
+            });
         });
-
-        $('.undo-login-as').on('click', function(evt) {
-            evt.preventDefault();
-            undoImpersonateUser($(this).data('href'));
+    }
+    if (loginAs) {
+        loginAs.addEventListener('click', e => {
+            e.preventDefault();
+            impersonateUser();
         });
-    });
-})();
+    }
+});

@@ -20,7 +20,7 @@ from datetime import timedelta
 
 from celery.schedules import crontab
 from celery.signals import beat_init, import_modules
-from flask import render_template, session
+from flask import session
 
 import indico
 from indico.core import signals
@@ -74,7 +74,7 @@ def _extend_admin_menu(sender, **kwargs):
         return SideMenuItem('celery', _("Tasks"), url_for('celery.index'), 20, icon='time')
 
 
-@template_hook('global-announcement', priority=-100)
+@template_hook('global-announcement', priority=-100, markup=False)
 def _inject_announcement_header(**kwargs):
     if not session.user or not session.user.is_admin or config.DISABLE_CELERY_CHECK:
         return
@@ -82,8 +82,12 @@ def _inject_announcement_header(**kwargs):
     last_ping_version = celery_settings.get('last_ping_version')
     down = not last_ping or (now_utc() - last_ping) > timedelta(hours=1)
     mismatch = last_ping_version and last_ping_version != indico.__version__
-    if down or mismatch:
-        return render_template('celery/warning.html', down=down)
+    if down:
+        text = _("The Celery task scheduler does not seem to be running. This means that email sending and periodic "
+                 "tasks such as event reminders do not work.")
+    elif mismatch:
+        text = _("The Celery task scheduler is running a different Indico version.")
+    return ('warning', text, True)
 
 
 @celery.periodic_task(name='heartbeat', run_every=crontab(minute='*/30'))

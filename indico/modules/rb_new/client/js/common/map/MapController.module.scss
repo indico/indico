@@ -18,9 +18,8 @@
 @import 'rb_new:styles/palette';
 @import 'rb_new:styles/util';
 
-
 .map-dimmer:global(.ui.dimmer) {
-    height: calc(100vh - (#{$indico-top-bar-height} + #{$menu-height} + 2.5em*2));
+    @include remaining-screen-height();
 }
 
 .areas-dropdown:global(.dropdown) {
