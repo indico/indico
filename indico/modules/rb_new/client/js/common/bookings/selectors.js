@@ -15,6 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import _ from 'lodash';
 import moment from 'moment';
 import {createSelector} from 'reselect';
 import {RequestState} from 'indico/utils/redux';
@@ -24,6 +25,24 @@ import {isUserAdminOverrideEnabled} from '../user/selectors';
 
 const getRawDetails = (state, {bookingId}) => state.bookings.details[bookingId];
 
+
+function applyPermissionsToOccurrences(occurrences, override) {
+    return _.fromPairs(Object.entries(occurrences).map(([key, data]) => {
+        data = _.fromPairs(Object.entries(data).map(([day, dayData]) => {
+            dayData = dayData.map(rawOcc => {
+                const {permissions, ...occ} = rawOcc;
+                if (!permissions) {
+                    return occ;
+                }
+                const activePermissions = (override && permissions.admin) ? permissions.admin : permissions.user;
+                return {...occ, ...activePermissions};
+            });
+            return [day, dayData];
+        }));
+        return [key, data];
+    }));
+}
+
 export const getDetails = createSelector(
     getRawDetails,
     isUserAdminOverrideEnabled,
@@ -32,9 +51,10 @@ export const getDetails = createSelector(
             // details not loaded yet, just keep the null/undefined
             return allDetails;
         }
-        const {permissions, ...details} = allDetails;
+        const {permissions, occurrences, ...details} = allDetails;
         const activePermissions = (override && permissions.admin) ? permissions.admin : permissions.user;
-        return {...details, ...activePermissions};
+        const occurrencesWithPermissions = applyPermissionsToOccurrences(occurrences, override);
+        return {...details, ...activePermissions, occurrences: occurrencesWithPermissions};
     }
 );
 

@@ -243,6 +243,16 @@ class ReservationOccurrence(db.Model, Serializer):
 
         return q.order_by(Room.id)
 
+    def can_reject(self, user, allow_admin=True):
+        if not self.is_valid:
+            return False
+        return self.reservation.can_reject(user, allow_admin=allow_admin)
+
+    def can_cancel(self, user, allow_admin=True):
+        if not self.is_valid or self.end_dt < datetime.now():
+            return False
+        return self.reservation.can_cancel(user, allow_admin=allow_admin)
+
     @proxy_to_reservation_if_last_valid_occurrence
     @unify_user_args
     def cancel(self, user, reason=None, silent=False):

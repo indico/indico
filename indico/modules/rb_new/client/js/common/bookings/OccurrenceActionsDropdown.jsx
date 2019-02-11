@@ -126,13 +126,14 @@ class OccurrenceActionsDropdown extends React.Component {
 
     render() {
         const {activeConfirmation, actionInProgress, dropdownOpen, top, left} = this.state;
-        const {booking: {canCancel, canReject}, date} = this.props;
+        const {booking: {occurrences}, date} = this.props;
         const serializedDate = serializeDate(date, 'L');
         const rejectionForm = (
             <FinalForm onSubmit={(data) => this.changeOccurrenceState('reject', data)}
                        render={this.renderRejectionForm} />
         );
 
+        const {canCancel, canReject} = occurrences.bookings[serializeDate(date)][0];
         if (!canCancel && !canReject) {
             return null;
         }

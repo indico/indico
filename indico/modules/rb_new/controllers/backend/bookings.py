@@ -41,6 +41,7 @@ from indico.modules.rb_new.operations.bookings import (get_active_bookings, get_
 from indico.modules.rb_new.operations.suggestions import get_suggestions
 from indico.modules.rb_new.schemas import (create_booking_args, reservation_details_schema,
                                            reservation_linked_object_data_schema, reservation_occurrences_schema,
+                                           reservation_occurrences_schema_with_permissions,
                                            reservation_user_event_schema)
 from indico.modules.rb_new.util import (get_linked_object, group_by_occurrence_date, serialize_blockings,
                                         serialize_nonbookable_periods, serialize_occurrences,
@@ -74,7 +75,7 @@ def _serialize_booking_details(booking):
     booking_details['occurrences'] = occurrences_by_type
     booking_details['date_range'] = date_range
     for dt, [occ] in occurrences.iteritems():
-        serialized_occ = reservation_occurrences_schema.dump([occ]).data
+        serialized_occ = reservation_occurrences_schema_with_permissions.dump([occ]).data
         if occ.is_cancelled:
             occurrences_by_type['cancellations'][dt.isoformat()] = serialized_occ
         elif occ.is_rejected:
@@ -368,8 +369,8 @@ class RHBookingOccurrenceStateActions(RHBookingBase):
 
     def _check_access(self):
         RHBookingBase._check_access(self)
-        funcs = {'reject': self.booking.can_reject,
-                 'cancel': self.booking.can_cancel}
+        funcs = {'reject': self.occurrence.can_reject,
+                 'cancel': self.occurrence.can_cancel}
 
         if self.action not in funcs or not funcs[self.action](session.user):
             raise Forbidden

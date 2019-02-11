@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from datetime import date, time
+from datetime import date, datetime, time
 from itertools import izip
 
 import pytest
@@ -380,3 +380,24 @@ def test_overlaps_different_rooms(create_occurrence, create_room):
 @pytest.mark.parametrize('skip_self', (True, False))
 def test_overlaps_self(dummy_occurrence, skip_self):
     assert dummy_occurrence.overlaps(dummy_occurrence, skip_self=skip_self) == (not skip_self)
+
+
+@pytest.mark.parametrize('state', ReservationOccurrenceState)
+def test_can_reject(create_reservation, dummy_user, state):
+    reservation = create_reservation(start_dt=date.today() - relativedelta(days=1, hour=8),
+                                     end_dt=date.today() + relativedelta(days=1, hour=17),
+                                     repeat_frequency=RepeatFrequency.DAY)
+    reservation.room.update_principal(dummy_user, full_access=True)
+    occ = reservation.occurrences[0]
+    occ.state = state
+    assert occ.can_reject(dummy_user) == occ.is_valid
+
+
+def test_can_cancel(create_reservation, dummy_user, freeze_time):
+    reservation = create_reservation(start_dt=date.today() - relativedelta(days=1, hour=8),
+                                     end_dt=date.today() + relativedelta(days=1, hour=17),
+                                     repeat_frequency=RepeatFrequency.DAY)
+    freeze_time(datetime.combine(date.today(), time(18, 0)))
+    assert not reservation.occurrences[0].can_cancel(dummy_user)
+    assert not reservation.occurrences[1].can_cancel(dummy_user)
+    assert reservation.occurrences[-1].can_cancel(dummy_user)

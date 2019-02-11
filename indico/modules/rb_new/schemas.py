@@ -112,6 +112,21 @@ class ReservationOccurrenceSchema(mm.ModelSchema):
         fields = ('start_dt', 'end_dt', 'is_valid', 'reservation', 'rejection_reason', 'state')
 
 
+class ReservationOccurrenceSchemaWithPermissions(ReservationOccurrenceSchema):
+    permissions = Method('_get_permissions')
+
+    class Meta:
+        fields = ReservationOccurrenceSchema.Meta.fields + ('permissions',)
+
+    def _get_permissions(self, occurrence):
+        methods = ('can_cancel', 'can_reject')
+        admin_permissions = None
+        user_permissions = {x: getattr(occurrence, x)(session.user, allow_admin=False) for x in methods}
+        if rb_is_admin(session.user):
+            admin_permissions = {x: getattr(occurrence, x)(session.user) for x in methods}
+        return {'user': user_permissions, 'admin': admin_permissions}
+
+
 class ReservationEditLogSchema(UserSchema):
     class Meta:
         model = ReservationEditLog
@@ -310,6 +325,7 @@ rooms_schema = RoomSchema(many=True)
 room_attribute_values_schema = RoomAttributeValuesSchema(many=True)
 map_areas_schema = MapAreaSchema(many=True)
 reservation_occurrences_schema = ReservationOccurrenceSchema(many=True)
+reservation_occurrences_schema_with_permissions = ReservationOccurrenceSchemaWithPermissions(many=True)
 reservation_schema = ReservationSchema()
 reservation_details_schema = ReservationDetailsSchema()
 reservation_linked_object_data_schema = ReservationLinkedObjectDataSchema()
