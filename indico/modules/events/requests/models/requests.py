@@ -64,7 +64,7 @@ class Request(db.Model):
         nullable=False,
         default=RequestState.pending
     )
-    #: plugin-specific data of the payment
+    #: plugin-specific data of the request
     data = db.Column(
         JSON,
         nullable=False
