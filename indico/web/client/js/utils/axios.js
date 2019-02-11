@@ -22,7 +22,6 @@ import isURLSameOrigin from 'axios/lib/helpers/isURLSameOrigin';
 import qs from 'qs';
 
 import {$T} from 'indico/utils/i18n';
-import showReactErrorDialog from 'indico/react/errors';
 
 
 export const indicoAxios = axios.create({
@@ -56,7 +55,9 @@ export function handleAxiosError(error, strict = false) {
     if (window.showErrorDialog) {
         showErrorDialog(error);
     } else {
-        showReactErrorDialog(error);
+        import(/* webpackMode: "weak" */ 'indico/react/errors').then(({default: showReactErrorDialog}) => {
+            showReactErrorDialog(error);
+        });
     }
     return error.message;
 }
