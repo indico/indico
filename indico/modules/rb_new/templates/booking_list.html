@@ -25,7 +25,7 @@
                 </div>
             </div>
             {% if has_contribs %}
-                <div class="section searchable-field" data-values={{ contribs_data | tojson | forceescape }}>
+                <div class="section searchable-field" data-values="{{ contribs_data | tojson | forceescape }}">
                     <div class="text">
                         <div class="label">
                             {%- trans %}Contribution{% endtrans -%}
@@ -40,7 +40,7 @@
                 </div>
             {% endif %}
             {% if has_session_blocks %}
-                <div class="section searchable-field" data-values={{ session_blocks_data | tojson | forceescape }}>
+                <div class="section searchable-field" data-values="{{ session_blocks_data | tojson | forceescape }}">
                     <div class="text">
                         <div class="label">
                             {%- trans %}Session block{% endtrans -%}
