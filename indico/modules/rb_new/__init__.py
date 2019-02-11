@@ -16,19 +16,28 @@
 
 from __future__ import unicode_literals
 
+from flask import session
+
 from indico.core import signals
 from indico.core.config import config
 from indico.core.permissions import ManagementPermission
 from indico.modules.rb import Room
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
-from indico.web.menu import TopMenuItem
+from indico.web.menu import SideMenuItem, TopMenuItem
 
 
 @signals.menu.items.connect_via('top-menu')
 def _topmenu_items(sender, **kwargs):
     if config.ENABLE_ROOMBOOKING:
         yield TopMenuItem('rb_new', _('Room booking (new)'), url_for('rooms_new.roombooking'), 80)
+
+
+@signals.menu.items.connect_via('event-management-sidemenu')
+def _sidemenu_items(sender, event, **kwargs):
+    if config.ENABLE_ROOMBOOKING and event.can_manage(session.user):
+        yield SideMenuItem('room_booking', _('Room Booking'), url_for('rooms_new.event_booking_list', event), 50,
+                           icon='location')
 
 
 class BookPermission(ManagementPermission):
