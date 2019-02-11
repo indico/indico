@@ -22,14 +22,11 @@ import {serializeDate, serializeTime} from 'indico/utils/date';
 
 $(document).ready(() => {
     $('#contribution, #session_block').on('change', (e) => {
-        let params = {};
         const $target = $(e.currentTarget);
         const objectId = $target.val();
         const $bookBtn = $target.closest('.searchable-field').find('.js-book-btn');
-        const linkType = {
-            contribution: 'contribution',
-            session_block: 'sessionBlock',
-        }[$target.attr('id')];
+        const linkType = $target.data('link-type');
+        let params = {};
         if (objectId) {
             const values = $target.closest('.searchable-field').data('values')[objectId];
             params = {
