@@ -34,7 +34,7 @@
 
     border-color: darken($black, 10%);
     border-style: solid;
-    border-width: 1px 0 1px 0;
+    border-width: 1px 0;
 
     > a {
         @include transition(background-color);
@@ -44,7 +44,7 @@
         line-height: 3em;
 
         color: white;
-        padding: 0 20px 0 20px;
+        padding: 0 20px;
 
         &:first-child, &.arrow:last-of-type {
             border-radius: 0;
@@ -57,7 +57,7 @@
         &.arrow {
             @include icon-after('icon-arrow-down');
 
-            &:after {
+            &::after {
                 vertical-align: middle;
             }
         }
@@ -178,15 +178,13 @@ div.session-bar {
         margin: 0;
     }
 
-    .i-button {
-        font-weight: normal;
-    }
-
     .icon-shield {
         vertical-align: middle;
     }
 
     .i-button {
+        font-weight: normal;
+
         &.protection-public {
             @extend .i-button.accept;
         }
