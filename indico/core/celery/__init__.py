@@ -87,7 +87,9 @@ def _inject_announcement_header(**kwargs):
                  "tasks such as event reminders do not work.")
     elif mismatch:
         text = _("The Celery task scheduler is running a different Indico version.")
-    return ('warning', text, True)
+    else:
+        return
+    return 'warning', text, True
 
 
 @celery.periodic_task(name='heartbeat', run_every=crontab(minute='*/30'))
