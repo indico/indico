@@ -3,6 +3,9 @@ env:
   jquery: true
   es6: true
 
+plugins:
+  - react-hooks
+
 extends:
   - 'indico'
   - 'indico/babel'
@@ -37,6 +40,7 @@ rules:
     - ignoreRestSiblings: true
   prefer-template: warn
   react/forbid-component-props: off
+  react-hooks/rules-of-hooks: error
 
 globals:
   Indico: false
