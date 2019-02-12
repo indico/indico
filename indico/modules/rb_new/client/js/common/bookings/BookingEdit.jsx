@@ -50,6 +50,7 @@ class BookingEdit extends React.Component {
         onClose: PropTypes.func,
         booking: PropTypes.object.isRequired,
         isOngoingBooking: PropTypes.bool.isRequired,
+        isAdminOverrideEnabled: PropTypes.bool.isRequired,
         actions: PropTypes.exact({
             updateBooking: PropTypes.func.isRequired,
         }).isRequired,
@@ -195,7 +196,9 @@ class BookingEdit extends React.Component {
 
     updateBookingCalendar = async (dates, timeSlot, recurrence) => {
         const {
-            isOngoingBooking, booking: {room: {id}, dateRange, id: bookingId, startDt, endDt, repetition}
+            isOngoingBooking,
+            isAdminOverrideEnabled,
+            booking: {room: {id}, dateRange, id: bookingId, startDt, endDt, repetition},
         } = this.props;
         const {calendars: {currentBooking}} = this.state;
         const {startTime: newStartTime, endTime: newEndTime} = timeSlot;
@@ -220,6 +223,9 @@ class BookingEdit extends React.Component {
         this.resetCalendarStateOnUpdate(shouldSplit);
 
         const params = preProcessParameters({timeSlot, recurrence, dates: newDates}, ajaxFilterRules);
+        if (isAdminOverrideEnabled) {
+            params.admin_override_enabled = true;
+        }
         let response, candidates;
         try {
             response = await indicoAxios.post(
@@ -398,6 +404,7 @@ export default connect(
     (state, {booking: {id}}) => ({
         user: userSelectors.getUserInfo(state),
         isOngoingBooking: bookingsSelectors.isOngoingBooking(state, {bookingId: id}),
+        isAdminOverrideEnabled: userSelectors.isUserAdminOverrideEnabled(state),
     }),
     (dispatch) => ({
         actions: bindActionCreators({

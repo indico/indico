@@ -103,6 +103,7 @@ class RHTimeline(RHRoomBookingBase):
         'repeat_interval': fields.Int(missing=1),
         'room_ids': fields.List(fields.Int(), missing=[]),
         'skip_conflicts_with': fields.List(fields.Int(), missing=None),
+        'admin_override_enabled': fields.Bool(missing=False)
     })
     def _process(self, room_ids, **kwargs):
         rooms = [self.room] if self.room else Room.query.filter(Room.id.in_(room_ids), Room.is_active).all()

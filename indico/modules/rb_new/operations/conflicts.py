@@ -31,7 +31,7 @@ from indico.util.struct.iterables import group_list
 
 
 def get_rooms_conflicts(rooms, start_dt, end_dt, repeat_frequency, repeat_interval, blocked_rooms,
-                        nonbookable_periods, unbookable_hours, skip_conflicts_with=None):
+                        nonbookable_periods, unbookable_hours, skip_conflicts_with=None, allow_admin=False):
     rooms_conflicts = defaultdict(list)
     rooms_pre_conflicts = defaultdict(list)
     skip_conflicts_with = skip_conflicts_with or []
@@ -58,7 +58,7 @@ def get_rooms_conflicts(rooms, start_dt, end_dt, repeat_frequency, repeat_interv
         rooms_conflicts[room_id] += get_room_blockings_conflicts(room_id, candidates, occurrences)
 
     # TODO: do proper per-room override checks
-    if not rb_is_admin(session.user):
+    if not (allow_admin and rb_is_admin(session.user)):
         for room_id, occurrences in nonbookable_periods.iteritems():
             rooms_conflicts[room_id] += get_room_nonbookable_periods_conflicts(candidates, occurrences)
 

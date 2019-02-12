@@ -107,7 +107,8 @@ def get_existing_rooms_occurrences(rooms, start_dt, end_dt, repeat_frequency, re
                       sort_by=lambda obj: (obj.reservation.room_id, obj.start_dt))
 
 
-def get_rooms_availability(rooms, start_dt, end_dt, repeat_frequency, repeat_interval, skip_conflicts_with=None):
+def get_rooms_availability(rooms, start_dt, end_dt, repeat_frequency, repeat_interval, skip_conflicts_with=None,
+                           admin_override_enabled=False):
     availability = OrderedDict()
     candidates = ReservationOccurrence.create_series(start_dt, end_dt, (repeat_frequency, repeat_interval))
     date_range = sorted(set(cand.start_dt.date() for cand in candidates))
@@ -118,7 +119,8 @@ def get_rooms_availability(rooms, start_dt, end_dt, repeat_frequency, repeat_int
     nonbookable_periods = get_rooms_nonbookable_periods(rooms, start_dt, end_dt)
     conflicts, pre_conflicts = get_rooms_conflicts(rooms, start_dt.replace(tzinfo=None), end_dt.replace(tzinfo=None),
                                                    repeat_frequency, repeat_interval, blocked_rooms,
-                                                   nonbookable_periods, unbookable_hours, skip_conflicts_with)
+                                                   nonbookable_periods, unbookable_hours, skip_conflicts_with,
+                                                   allow_admin=admin_override_enabled)
     dates = list(candidate.start_dt.date() for candidate in candidates)
     for room in rooms:
         room_occurrences = occurrences.get(room.id, [])

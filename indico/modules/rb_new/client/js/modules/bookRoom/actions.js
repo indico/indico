@@ -90,23 +90,30 @@ export function resetBookingAvailability() {
 }
 
 export function fetchBookingAvailability(room, filters) {
-    const {dates, timeSlot, recurrence} = filters;
-    const params = preProcessParameters({dates, timeSlot, recurrence}, ajaxFilterRules);
-    return ajaxAction(
-        () => indicoAxios.get(fetchTimelineURL({room_id: room.id}), {params}),
-        GET_BOOKING_AVAILABILITY_REQUEST,
-        [SET_BOOKING_AVAILABILITY, GET_BOOKING_AVAILABILITY_SUCCESS],
-        GET_BOOKING_AVAILABILITY_ERROR
-    );
+    return async (dispatch, getStore) => {
+        const store = getStore();
+        const {dates, timeSlot, recurrence} = filters;
+        const params = preProcessParameters({dates, timeSlot, recurrence}, ajaxFilterRules);
+        if (userSelectors.isUserAdminOverrideEnabled(store)) {
+            params.admin_override_enabled = true;
+        }
+        return await ajaxAction(
+            () => indicoAxios.get(fetchTimelineURL({room_id: room.id}), {params}),
+            GET_BOOKING_AVAILABILITY_REQUEST,
+            [SET_BOOKING_AVAILABILITY, GET_BOOKING_AVAILABILITY_SUCCESS],
+            GET_BOOKING_AVAILABILITY_ERROR
+        )(dispatch);
+    };
 }
 
 export function fetchUnavailableRooms(filters) {
     return async (dispatch, getStore) => {
         dispatch({type: GET_UNAVAILABLE_TIMELINE_REQUEST});
-
+        const store = getStore();
+        const isAdminOverrideEnabled = userSelectors.isUserAdminOverrideEnabled(store);
         const searchParams = preProcessParameters(filters, ajaxFilterRules);
         searchParams.unavailable = true;
-        if (userSelectors.isUserAdminOverrideEnabled(getStore())) {
+        if (isAdminOverrideEnabled) {
             searchParams.admin_override_enabled = true;
         }
 
@@ -122,6 +129,9 @@ export function fetchUnavailableRooms(filters) {
         const roomIds = response.data.rooms;
         const {dates, timeSlot, recurrence} = filters;
         const timelineParams = preProcessParameters({dates, timeSlot, recurrence}, ajaxFilterRules);
+        if (isAdminOverrideEnabled) {
+            timelineParams.admin_override_enabled = true;
+        }
         return await ajaxAction(
             () => indicoAxios.post(fetchTimelineURL(), {room_ids: roomIds}, {params: timelineParams}),
             null,
@@ -150,6 +160,7 @@ export function fetchTimeline() {
     const PER_PAGE = 20;
 
     return async (dispatch, getStore) => {
+        const store = getStore();
         const {
             bookRoom: {
                 timeline: {
@@ -160,8 +171,11 @@ export function fetchTimeline() {
                     }
                 }
             }
-        } = getStore();
+        } = store;
         const params = preProcessParameters(stateParams, ajaxFilterRules);
+        if (userSelectors.isUserAdminOverrideEnabled(store)) {
+            params.admin_override_enabled = true;
+        }
         const numFetchedIds = stateAvailability.length;
         const roomIds = stateRoomIds.slice(numFetchedIds, numFetchedIds + PER_PAGE);
         if (!roomIds.length) {
