@@ -30,6 +30,8 @@ export default class DatePeriodField extends React.Component {
     static propTypes = {
         disabledDate: PropTypes.func,
         onChange: PropTypes.func.isRequired,
+        onFocus: PropTypes.func.isRequired,
+        onBlur: PropTypes.func.isRequired,
         disabled: PropTypes.bool,
         disabledDateFields: PropTypes.oneOf([START_DATE, END_DATE]),
         value: PropTypes.shape({
@@ -45,6 +47,10 @@ export default class DatePeriodField extends React.Component {
         disabledDateFields: null,
         value: null,
         minimumDays: 1,
+    };
+
+    state = {
+        focused: null,
     };
 
     shouldComponentUpdate(nextProps, nextState) {
@@ -69,8 +75,18 @@ export default class DatePeriodField extends React.Component {
         });
     };
 
+    handleFocusChange = (focused) => {
+        this.setState({focused});
+        if (!focused) {
+            const {onFocus, onBlur} = this.props;
+            onFocus();
+            onBlur();
+        }
+    };
+
     render() {
         const {disabled, disabledDateFields, minimumDays, disabledDate} = this.props;
+        const {focused} = this.state;
         const props = {};
 
         if (disabledDate) {
@@ -83,6 +99,8 @@ export default class DatePeriodField extends React.Component {
                                  startDate={this.getMomentValue('startDate')}
                                  endDate={this.getMomentValue('endDate')}
                                  onDatesChange={this.notifyChange}
+                                 onFocusChange={this.handleFocusChange}
+                                 focusedInput={focused}
                                  disabled={disabled || disabledDateFields}
                                  inputIconPosition="before"
                                  minimumNights={minimumDays - 1}
