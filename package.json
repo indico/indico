@@ -47,7 +47,7 @@
     "qs": "^6.6.0",
     "qtip2": "^3.0.3",
     "react": "^16.8.1",
-    "react-dates": "^18.5.0",
+    "react-dates": "^19.0.3",
     "react-debounce-input": "^3.2.0",
     "react-dom": "^16.8.1",
     "react-final-form": "^4.0.2",
