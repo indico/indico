@@ -2,7 +2,7 @@
     {% if type == 'html' %}
         {{ message | safe }}
     {% else %}
-        <div class="announcement-bar weak-hidden {{type}}" data-hash="{{message | crc32}}">
+        <div class="announcement-bar weak-hidden {{ type }}" data-hash="{{ message | crc32 }}">
             <div class="flexrow f-self-stretch f-j-center f-a-center">
                 <i class="icon icon-warning"></i>
                 <div>
@@ -20,7 +20,7 @@
     {% if type == 'html' %}
         {{ message | safe }}
     {% else %}
-        <div class="announcement-bar weak-hidden {{type}}" data-hash="{{message | crc32}}">
+        <div class="announcement-bar weak-hidden {{ type }}" data-hash="{{ message | crc32 }}">
             <div class="content">
                 <i class="warning sign large icon"></i>
                 <div class="message">
