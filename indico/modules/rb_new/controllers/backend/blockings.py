@@ -32,10 +32,10 @@ from indico.modules.rb_new.schemas import blockings_schema
 class RHCreateRoomBlocking(RHRoomBookingBase):
     @use_args({
         'room_ids': fields.List(fields.Int(), missing=[]),
-        'start_date': fields.Date(),
-        'end_date': fields.Date(),
-        'reason': fields.Str(),
-        'allowed_principals': fields.List(fields.Dict())
+        'start_date': fields.Date(required=True),
+        'end_date': fields.Date(required=True),
+        'reason': fields.Str(required=True),
+        'allowed_principals': fields.List(fields.Dict(), missing=[])
     })
     def _process(self, args):
         blocking = create_blocking(created_by=session.user, **args)

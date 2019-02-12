@@ -24,8 +24,7 @@ import {Button, Confirm, Form, Grid, Message, Icon, Modal, Popup, TextArea} from
 import {Form as FinalForm, Field} from 'react-final-form';
 import {Param, Translate} from 'indico/react/i18n';
 import {ReduxFormField, formatters, validators as v} from 'indico/react/forms';
-import PrincipalSearchField from 'indico/react/components/PrincipalSearchField';
-import DatePeriodField from 'indico/react/components/DatePeriodField';
+import {DatePeriodField, PrincipalSearchField} from 'indico/react/components';
 import RoomSelector from '../../components/RoomSelector';
 import {selectors as userSelectors} from '../../common/user';
 import * as blockingsActions from './actions';
@@ -35,7 +34,7 @@ import './BlockingModal.module.scss';
 
 function validate({dates, reason, rooms}) {
     const errors = {};
-    if (!dates) {
+    if (!dates || !Object.values(dates).every(x => x)) {
         errors.dates = Translate.string('Please choose a valid period.');
     }
     if (!reason) {
@@ -463,6 +462,7 @@ class BlockingModal extends React.Component {
                 <FinalForm {...props}
                            render={this.renderModalContent}
                            initialValues={{rooms, dates, allowed: allowed || [], reason}}
+                           initialValuesEqual={_.isEqual}
                            subscription={{
                                submitting: true,
                                hasValidationErrors: true,

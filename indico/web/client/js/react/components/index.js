@@ -26,3 +26,4 @@ export {default as CalendarSingleDatePicker} from './CalendarSingleDatePicker';
 export {default as CalendarRangeDatePicker} from './CalendarRangeDatePicker';
 export {default as DatePeriodField} from './DatePeriodField';
 export {default as Carousel} from './Carousel';
+export {default as PrincipalSearchField} from './PrincipalSearchField';
