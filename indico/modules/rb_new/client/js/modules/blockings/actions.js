@@ -96,7 +96,8 @@ export function createBlocking(formData) {
     const data = preProcessParameters(formData, ajaxRules);
     return submitFormAction(
         () => indicoAxios.post(createBlockingURL(), data),
-        CREATE_BLOCKING_REQUEST, CREATE_BLOCKING_SUCCESS, CREATE_BLOCKING_ERROR
+        CREATE_BLOCKING_REQUEST, CREATE_BLOCKING_SUCCESS, CREATE_BLOCKING_ERROR,
+        {start_date: 'dates', end_date: 'dates'}
     );
 }
 
