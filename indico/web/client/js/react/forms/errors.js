@@ -19,13 +19,13 @@ import _ from 'lodash';
 import {FORM_ERROR} from 'final-form';
 
 
-export function handleSubmissionError(error, defaultMessage = null) {
+export function handleSubmissionError(error, defaultMessage = null, fieldErrorMap = {}) {
     const webargsErrors = _.get(error, 'response.data.webargs_errors');
     if (webargsErrors && error.response.status === 422) {
         // flatten errors in case there's more than one
-        return Object.assign(...Object.entries(webargsErrors).map(([field, errors]) => ({
-            [field]: errors.join(' / ')
-        })));
+        return _.fromPairs(Object.entries(webargsErrors).map(([field, errors]) => {
+            return [fieldErrorMap[field] || field, errors.join(' / ')];
+        }));
     } else {
         return {[FORM_ERROR]: defaultMessage || error.message};
     }

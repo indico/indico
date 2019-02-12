@@ -90,7 +90,7 @@ export function requestReducer(requestAction, successAction, errorAction) {
 }
 
 
-export function submitFormAction(submitFunc, requestAction, successAction, errorAction) {
+export function submitFormAction(submitFunc, requestAction, successAction, errorAction, fieldErrorMap = {}) {
     return async (dispatch) => {
         dispatcher(dispatch, requestAction);
         let response;
@@ -99,8 +99,9 @@ export function submitFormAction(submitFunc, requestAction, successAction, error
         } catch (error) {
             if (_.get(error, 'response.status') === 422) {
                 // if it's 422 we assume it's from webargs validation
-                dispatcher(dispatch, errorAction, {error: handleSubmissionError(error)});
-                return {data: null, error: handleSubmissionError(error)};
+                const submissionError = handleSubmissionError(error, null, fieldErrorMap);
+                dispatcher(dispatch, errorAction, {error: submissionError});
+                return {data: null, error: submissionError};
             } else if (_.get(error, 'response.status') === 418) {
                 // this is an error that was expected, and will be handled by the app
                 dispatcher(dispatch, errorAction, {error: {[FORM_ERROR]: error.response.data.message}});
