@@ -98,7 +98,7 @@ export default connect(
 
 function RoomDetails({bookRoom, room, availability, attributes}) {
     const legendLabels = [
-        {label: Translate.string('Booked'), color: 'orange', style: 'booking'},
+        {label: Translate.string('Booked'), style: 'booking'},
         {label: Translate.string('Pre-Booking'), style: 'pre-booking'},
         {label: Translate.string('Blocked'), style: 'blocking'},
         {label: Translate.string('Not bookable'), style: 'unbookable'}

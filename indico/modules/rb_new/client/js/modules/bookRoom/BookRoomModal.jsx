@@ -494,10 +494,10 @@ class BookRoomModal extends React.Component {
         const bookingBlocked = ({submitting, submitSucceeded}) => submitting || submitSucceeded;
         const buttonsBlocked = (fprops) => bookingBlocked(fprops) || (conflictsExist && !skipConflicts);
         const legendLabels = [
-            {label: Translate.string('Available'), color: 'green'},
-            {label: Translate.string('Booked'), color: 'orange', style: 'booking'},
+            {label: Translate.string('Available'), style: 'available'},
+            {label: Translate.string('Booked'), style: 'booking'},
             {label: Translate.string('Pre-Booking'), style: 'pre-booking'},
-            {label: Translate.string('Conflict'), color: 'red', style: 'conflict'},
+            {label: Translate.string('Conflict'), style: 'conflict'},
             {label: Translate.string('Conflict with Pre-Booking'), style: 'pre-booking-conflict'},
             {label: Translate.string('Blocked'), style: 'blocking'},
             {label: Translate.string('Not bookable'), style: 'unbookable'}

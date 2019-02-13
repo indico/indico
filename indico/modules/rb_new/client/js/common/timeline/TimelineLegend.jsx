@@ -27,10 +27,10 @@ import './TimelineLegend.module.scss';
 export default function TimelineLegend({labels, aside, compact}) {
     return compact ? (
         <List styleName="legend compact">
-            {labels.map(({label, color, style}) => (
+            {labels.map(({label, style}) => (
                 <List.Item key={label}>
                     <List.Content styleName="labels">
-                        <Label color={color} styleName={`compact ${style || ''}`} />
+                        <Label styleName={`compact ${style || ''}`} />
                         <span styleName="text">{label}</span>
                     </List.Content>
                 </List.Item>
@@ -39,8 +39,8 @@ export default function TimelineLegend({labels, aside, compact}) {
     ) : (
         <Segment styleName="legend" basic>
             <Label.Group as="span" size="medium" styleName="labels">
-                {labels.map(({label, color, style}) => (
-                    <Label color={color} styleName={style || ''} key={label}>{label}</Label>
+                {labels.map(({label, style}) => (
+                    <Label styleName={style || ''} key={label}>{label}</Label>
                 ))}
             </Label.Group>
             {aside}
