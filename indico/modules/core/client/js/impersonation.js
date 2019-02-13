@@ -17,7 +17,7 @@
 
 /* global ChooseUsersPopup:false */
 
-import getImpersonateURL from 'indico-url:auth.admin_impersonate';
+import impersonateURL from 'indico-url:auth.admin_impersonate';
 
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {$T} from 'indico/utils/i18n';
@@ -25,7 +25,7 @@ import {$T} from 'indico/utils/i18n';
 
 async function sendRequest(data) {
     try {
-        await indicoAxios.post(getImpersonateURL(), data);
+        await indicoAxios.post(impersonateURL(), data);
     } catch (error) {
         handleAxiosError(error);
         return;
