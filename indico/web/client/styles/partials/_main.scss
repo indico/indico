@@ -106,7 +106,6 @@ div.announcement-bar {
     &.warning {
         background-color: lighten($light-yellow, 5%);
         color: $dark-black;
-        border-bottom: 2px solid $dark-yellow;
 
         .icon {
             color: $yellow;
@@ -118,16 +117,15 @@ div.announcement-bar {
     }
 
     &.error {
-        background-color: $red;
-        border-bottom: 2px solid $dark-red;
+        background-color: $dark-red;
         color: $light-red;
 
         .icon {
-            color: $red;
+            color: $light-red;
         }
 
         .close-button {
-            color: $dark-red;
+            color: $light-red;
         }
     }
 
