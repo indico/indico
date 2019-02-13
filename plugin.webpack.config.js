@@ -30,8 +30,12 @@ const base = require(path.join(config.build.indicoSourcePath, 'webpack'));
 
 
 const entry = bundles.entry || {};
+const allThemeFiles = [];
+
 if (!_.isEmpty(config.themes)) {
-    Object.assign(entry, base.getThemeEntryPoints(config, './themes/'));
+    const themeFiles = base.getThemeEntryPoints(config, './themes/');
+    Object.assign(entry, themeFiles);
+    allThemeFiles.push(...Object.values(themeFiles).reduce((acc, current) => acc.concat(current)));
 }
 
 
@@ -71,6 +75,20 @@ module.exports = (env) => {
         },
         output: {
             jsonpFunction: 'pluginJsonp'
+        },
+        optimization: {
+            splitChunks: {
+                cacheGroups: {
+                    common: module => {
+                        return ({
+                            name: 'common',
+                            chunks: 'initial',
+                            // exclude themes, like we do in the core webpack config
+                            minChunks: allThemeFiles.includes(module.resource) ? 9999 : 2
+                        });
+                    }
+                }
+            }
         }
     });
 };
