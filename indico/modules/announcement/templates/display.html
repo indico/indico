@@ -26,7 +26,9 @@
                 <div class="message">
                     {{ message | safe }}
                 </div>
-                <i class="close icon close-button"></i>
+                {% if not persistent %}
+                    <i class="close icon close-button"></i>
+                {% endif %}
             </div>
         </div>
     {% endif %}
