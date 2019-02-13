@@ -89,7 +89,7 @@ def _inject_announcement_header(**kwargs):
         text = _("The Celery task scheduler is running a different Indico version.")
     else:
         return
-    return 'warning', text, True
+    return 'error', text, True
 
 
 @celery.periodic_task(name='heartbeat', run_every=crontab(minute='*/30'))
