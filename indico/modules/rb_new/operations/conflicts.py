@@ -57,13 +57,16 @@ def get_rooms_conflicts(rooms, start_dt, end_dt, repeat_frequency, repeat_interv
     for room_id, occurrences in blocked_rooms.iteritems():
         rooms_conflicts[room_id] += get_room_blockings_conflicts(room_id, candidates, occurrences)
 
-    # TODO: do proper per-room override checks
     if not (allow_admin and rb_is_admin(session.user)):
         for room_id, occurrences in nonbookable_periods.iteritems():
-            rooms_conflicts[room_id] += get_room_nonbookable_periods_conflicts(candidates, occurrences)
+            room = Room.get_one(room_id)
+            if not room.can_override(session.user, allow_admin=allow_admin):
+                rooms_conflicts[room_id] += get_room_nonbookable_periods_conflicts(candidates, occurrences)
 
         for room_id, occurrences in unbookable_hours.iteritems():
-            rooms_conflicts[room_id] += get_room_unbookable_hours_conflicts(candidates, occurrences)
+            room = Room.get_one(room_id)
+            if not room.can_override(session.user, allow_admin=allow_admin):
+                rooms_conflicts[room_id] += get_room_unbookable_hours_conflicts(candidates, occurrences)
     return rooms_conflicts, rooms_pre_conflicts
 
 
