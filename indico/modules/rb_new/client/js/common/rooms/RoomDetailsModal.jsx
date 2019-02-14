@@ -66,9 +66,6 @@ class RoomDetailsModal extends React.Component {
             <Modal open onClose={this.handleCloseModal} size="large" closeIcon>
                 <Modal.Header styleName="room-details-header">
                     {title}
-                    <span>
-                        <Button icon="pencil" circular />
-                    </span>
                 </Modal.Header>
                 <Modal.Content>
                     <RoomDetails room={room}
