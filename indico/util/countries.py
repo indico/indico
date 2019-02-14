@@ -35,7 +35,5 @@ def get_country(code):
     try:
         return get_countries()[code]
     except KeyError:
-        try:
-            return pycountry.historic_countries.get(alpha_2=code).name
-        except KeyError:
-            return None
+        country = pycountry.historic_countries.get(alpha_2=code)
+        return country.name if country else None

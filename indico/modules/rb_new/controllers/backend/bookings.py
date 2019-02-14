@@ -20,7 +20,7 @@ from datetime import date, datetime, time
 
 import dateutil
 from flask import jsonify, request, session
-from marshmallow import fields, missing
+from marshmallow import fields
 from marshmallow_enum import EnumField
 from webargs.flaskparser import use_args, use_kwargs
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
@@ -129,14 +129,14 @@ class RHTimeline(RHRoomBookingBase):
 class RHCalendar(RHRoomBookingBase):
     @use_kwargs({
         'start_date': fields.Date(missing=lambda: date.today().isoformat()),
-        'end_date': fields.Date(),
+        'end_date': fields.Date(missing=None),
         'my_bookings': fields.Bool(missing=False),
         'show_inactive': fields.Bool(missing=False),
         'room_ids': fields.List(fields.Int(), missing=None)
     })
     def _process(self, start_date, end_date, room_ids, my_bookings, show_inactive):
         booked_for_user = session.user if my_bookings else None
-        if end_date is missing:
+        if end_date is None:
             end_date = start_date
         calendar = get_room_calendar(start_date, end_date, room_ids, booked_for_user=booked_for_user,
                                      include_inactive=show_inactive)
