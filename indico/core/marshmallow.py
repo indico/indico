@@ -79,5 +79,9 @@ class _IndicoSchemaOpts(SchemaOpts):
 class IndicoModelSchema(mm.ModelSchema):
     OPTIONS_CLASS = _IndicoSchemaOpts
 
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault('strict', True)
+        super(IndicoModelSchema, self).__init__(*args, **kwargs)
+
 
 mm.ModelSchema = IndicoModelSchema

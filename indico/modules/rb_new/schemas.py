@@ -87,6 +87,9 @@ class ReservationLinkedObjectDataSchema(Schema):
     own_room_id = Number()
     own_room_name = Function(lambda obj: (obj.own_room.name if obj.own_room else obj.own_room_name) or None)
 
+    class Meta:
+        strict = True  # TODO: remove with marshmallow 3
+
     def _get_title(self, obj):
         if isinstance(obj, SessionBlock):
             return obj.full_title
@@ -99,6 +102,9 @@ class ReservationUserEventSchema(Schema):
     url = String()
     start_dt = DateTime()
     end_dt = DateTime()
+
+    class Meta:
+        strict = True  # TODO: remove with marshmallow 3
 
 
 class ReservationOccurrenceSchema(mm.ModelSchema):
