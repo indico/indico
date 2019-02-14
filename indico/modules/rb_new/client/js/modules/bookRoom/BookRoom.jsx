@@ -173,7 +173,7 @@ class BookRoom extends React.Component {
         const legendLabels = [
             {label: Translate.string('Available'), style: 'available'},
             {label: Translate.string('Booked'), style: 'booking'},
-            {label: Translate.string('Pre-Booking'), style: 'pre-booking'},
+            {label: Translate.string('Pre-Booked'), style: 'pre-booking'},
             {label: Translate.string('Conflict'), style: 'conflict'},
             {label: Translate.string('Conflict with Pre-Booking'), style: 'pre-booking-conflict'},
             {label: Translate.string('Blocked'), style: 'blocking'},

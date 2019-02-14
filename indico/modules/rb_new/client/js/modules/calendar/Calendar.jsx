@@ -218,7 +218,7 @@ class Calendar extends React.Component {
         } = this.props;
         const legendLabels = [
             {label: Translate.string('Booked'), color: 'orange', style: 'booking'},
-            {label: Translate.string('Pre-Booking'), style: 'pre-booking'},
+            {label: Translate.string('Pre-Booked'), style: 'pre-booking'},
             {label: Translate.string('Blocked'), style: 'blocking'},
             {label: Translate.string('Not bookable'), style: 'unbookable'},
         ];
