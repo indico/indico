@@ -68,6 +68,6 @@ ipython<6,>=5.4.1
 prompt-toolkit<2.0.0,>=1.0.14
 packaging>=19.0,<20
 email-validator==1.0.3
-pywebpack==0.1.2
-flask-webpackext==0.1.0
+pywebpack==1.0.0
+flask-webpackext==1.0.0
 webargs==5.1.2

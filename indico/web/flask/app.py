@@ -135,7 +135,7 @@ def configure_multipass_local(app):
 
 def configure_webpack(app):
     pkg_path = os.path.dirname(get_root_path('indico'))
-    project = WebpackBundleProject(pkg_path)
+    project = WebpackBundleProject(pkg_path, None)
     app.config['WEBPACKEXT_PROJECT'] = project
     app.config['WEBPACKEXT_MANIFEST_LOADER'] = IndicoManifestLoader
     app.config['WEBPACKEXT_MANIFEST_PATH'] = os.path.join('dist', 'manifest.json')
