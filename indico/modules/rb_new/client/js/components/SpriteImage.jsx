@@ -43,7 +43,7 @@ class SpriteImage extends React.Component {
         styles: PropTypes.object,
         /** Whether the image should try to fit vertically instead of horizontally */
         fillVertical: PropTypes.bool,
-        /** Whether the image is not missing and can be clicked for full view */
+        /** A function to call when the image gets clicked */
         onClick: PropTypes.func
     };
 
