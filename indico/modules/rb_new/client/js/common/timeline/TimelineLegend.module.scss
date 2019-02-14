@@ -52,15 +52,15 @@
             }
 
             &.available {
-                background-color: $available;
+                background-color: $available-color;
             }
 
             &.booking {
-                background-color: $booking;
+                background-color: $booking-color;
             }
 
             &.conflict {
-                background-color: $conflict;
+                background-color: $conflict-color;
             }
 
             &.pre-booking {
@@ -74,38 +74,38 @@
             }
 
             &.cancellation {
-                background-color: $cancellation;
-                border: 1px solid darken($cancellation, 15%);
-                color: darken($cancellation, 40%);
+                background-color: $cancellation-color;
+                border: 1px solid darken($cancellation-color, 15%);
+                color: darken($cancellation-color, 40%);
             }
 
             &.unbookable {
                 @include thin-stripes($unbookable-stripe-colors...);
                 background-size: 35px 35px;
-                border: 1px solid $unbookable;
-                color: darken($unbookable, 40%);
+                border: 1px solid $unbookable-color;
+                color: darken($unbookable-color, 40%);
             }
 
             &.pending-cancellation {
-                background-color: $pending-cancellation;
+                background-color: $pending-cancellation-color;
             }
 
             &.blocking {
                 @include thin-stripes($blocking-stripe-colors...);
                 background-size: 35px 35px;
-                border: 1px solid lighten($conflict, 20%);
-                color: darken($conflict, 10%);
+                border: 1px solid lighten($conflict-color, 20%);
+                color: darken($conflict-color, 10%);
             }
 
             &.rejection {
-                background-color: $rejection;
-                border: 1px solid darken($rejection, 25%);
-                color: darken($rejection, 40%);
+                background-color: $rejection-color;
+                border: 1px solid darken($rejection-color, 25%);
+                color: darken($rejection-color, 40%);
             }
 
             &.other {
-                background-color: $other-booking;
-                border: 1px solid darken($other-booking, 25%);
+                background-color: $other-booking-color;
+                border: 1px solid darken($other-booking-color, 25%);
             }
         }
     }
