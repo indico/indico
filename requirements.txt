@@ -25,7 +25,6 @@ requests==2.21.0
 Werkzeug==0.14.1
 Flask==0.12.4
 bcrypt==3.1.4
-beautifulsoup4==4.6.3
 Pillow==5.1.0
 qrcode==6.0
 Markdown==2.3.1
