@@ -17,7 +17,7 @@
 from __future__ import unicode_literals
 
 from flask import jsonify, request, session
-from marshmallow import fields, missing, validate
+from marshmallow import fields, validate
 from sqlalchemy.orm import joinedload
 from webargs.flaskparser import abort, use_kwargs
 from werkzeug.exceptions import Forbidden
@@ -91,13 +91,13 @@ class RHFeatures(RHRoomBookingAdminBase):
         'title': fields.String(validate=validate.Length(min=2)),
         'icon': fields.String(),
     })
-    def _process_PATCH(self, name, title, icon):
-        if name is not missing:
+    def _process_PATCH(self, name=None, title=None, icon=None):
+        if name is not None:
             self._check_conflict(name)
             self.feature.name = name
-        if title is not missing:
+        if title is not None:
             self.feature.title = title
-        if icon is not missing:
+        if icon is not None:
             self.feature.icon = icon
         db.session.flush()
         return self._jsonify_one(self.feature)
@@ -163,11 +163,11 @@ class RHEquipmentTypes(RHRoomBookingAdminBase):
         'name': fields.String(validate=validate.Length(min=2)),
         'features': ModelList(RoomFeature)
     })
-    def _process_PATCH(self, name, features):
-        if name is not missing:
+    def _process_PATCH(self, name=None, features=None):
+        if name is not None:
             self._check_conflict(name)
             self.equipment_type.name = name
-        if features is not missing:
+        if features is not None:
             self.equipment_type.features = features
         db.session.flush()
         return self._jsonify_one(self.equipment_type)
@@ -235,13 +235,13 @@ class RHAttributes(RHRoomBookingAdminBase):
         'title': fields.String(validate=validate.Length(min=2)),
         'hidden': fields.Bool(),
     })
-    def _process_PATCH(self, name, title, hidden):
-        if name is not missing:
+    def _process_PATCH(self, name=None, title=None, hidden=None):
+        if name is not None:
             self._check_conflict(name)
             self.attribute.name = name
-        if title is not missing:
+        if title is not None:
             self.attribute.title = title
-        if hidden is not missing:
+        if hidden is not None:
             self.attribute.is_hidden = hidden
         db.session.flush()
         return self._jsonify_one(self.attribute)
