@@ -66,7 +66,7 @@ room_args = {
     'notification_before_days': fields.Int(validate=lambda x: 1 <= x <= 30, aallow_none=True),
     'notification_before_days_weekly': fields.Int(validate=lambda x: 1 <= x <= 30, allow_none=True),
     'notification_before_days_monthly': fields.Int(validate=lambda x: 1 <= x <= 30, allow_none=True),
-    'notifications_enabled': fields.Bool(missing=True, allow_missing=True),
+    'notifications_enabled': fields.Bool(),
     'booking_limit_days': fields.Int(validate=lambda x: x >= 1, allow_none=True),
     'owner': UserField(load_from='owner_id', validate=lambda x: x is not None, allow_none=True),
     'key_location': fields.Str(allow_none=True),

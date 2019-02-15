@@ -30,9 +30,10 @@ import React from 'react';
 import {bindActionCreators} from 'redux';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import {Button, Checkbox, Dimmer, Dropdown, Form, Grid, Header, Input, Loader, Message, Modal,
-        TextArea} from 'semantic-ui-react';
-import {Form as FinalForm, Field} from 'react-final-form';
+import {
+    Button, Checkbox, Dimmer, Dropdown, Form, Grid, Header, Input, Loader, Message, Modal, TextArea
+} from 'semantic-ui-react';
+import {Form as FinalForm, Field, FormSpy} from 'react-final-form';
 import {FieldArray} from 'react-final-form-arrays';
 import arrayMutators from 'final-form-arrays';
 import shortid from 'shortid';
@@ -94,6 +95,7 @@ function validate(fields) {
 }
 
 const columns = [
+    // left
     [{
         type: 'header',
         label: Translate.string('Image')
@@ -144,7 +146,9 @@ const columns = [
         label: Translate.string('Daily availability'),
     }, {
         type: 'bookableHours',
-    }], [{
+    }],
+    // center
+    [{
         type: 'header',
         label: Translate.string('Location')
     }, {
@@ -237,7 +241,9 @@ const columns = [
         label: Translate.string('Send Booking reminders X days before (monthly)'),
         inputType: 'number',
         required: false
-    }], [{
+    }],
+    // right
+    [{
         type: 'header',
         label: Translate.string('Custom attributes')
     }, {
@@ -254,9 +260,6 @@ const columns = [
         label: Translate.string('Non-bookable periods'),
     }, {
         type: 'nonBookablePeriods'
-    }, {
-        type: 'message',
-        content: Translate.string('Room has been successfully edited.')
     }]
 ];
 
@@ -279,39 +282,17 @@ class RoomEditModal extends React.Component {
         roomAttributes: null,
         roomAvailability: null,
         roomEquipment: null,
-        submitSucceeded: false,
+        submitted: false,
     };
 
     componentDidMount() {
-        this.fetchDetailedRoom();
-        this.fetchRoomAttributes();
         this.fetchAttributes();
-        this.fetchRoomAvailability();
-        this.fetchRoomEquipment();
+        this.fetchRoomData();
     }
 
-    async fetchDetailedRoom() {
-        const {roomId} = this.props;
-        let response;
-        try {
-            response = await indicoAxios.get(fetchRoomURL({room_id: roomId}));
-        } catch (error) {
-            handleAxiosError(error);
-            return;
-        }
-        this.setState({room: camelizeKeys(response.data)});
-    }
-
-    async fetchRoomAttributes() {
-        const {roomId} = this.props;
-        let response;
-        try {
-            response = await indicoAxios.get(fetchRoomAttributesURL({room_id: roomId}));
-        } catch (error) {
-            handleAxiosError(error);
-            return;
-        }
-        this.setState({roomAttributes: response.data});
+    get loadingInitialData() {
+        const {attributes, room, roomAttributes, roomEquipment, roomAvailability} = this.state;
+        return !attributes || !room || !roomAttributes || !roomEquipment || !roomAvailability;
     }
 
     async fetchAttributes() {
@@ -323,6 +304,40 @@ class RoomEditModal extends React.Component {
             return;
         }
         this.setState({attributes: response.data});
+    }
+
+    async fetchRoomData() {
+        const reqs = [
+            this.fetchDetailedRoom(),
+            this.fetchRoomAttributes(),
+            this.fetchRoomAvailability(),
+            this.fetchRoomEquipment(),
+        ];
+        this.setState(Object.assign(...await Promise.all(reqs)));
+    }
+
+    async fetchDetailedRoom() {
+        const {roomId} = this.props;
+        let response;
+        try {
+            response = await indicoAxios.get(fetchRoomURL({room_id: roomId}));
+        } catch (error) {
+            handleAxiosError(error);
+            return;
+        }
+        return {room: camelizeKeys(response.data)};
+    }
+
+    async fetchRoomAttributes() {
+        const {roomId} = this.props;
+        let response;
+        try {
+            response = await indicoAxios.get(fetchRoomAttributesURL({room_id: roomId}));
+        } catch (error) {
+            handleAxiosError(error);
+            return;
+        }
+        return {roomAttributes: response.data};
     }
 
     async fetchRoomAvailability() {
@@ -342,7 +357,7 @@ class RoomEditModal extends React.Component {
             hours.key = shortid.generate();
         });
 
-        this.setState({roomAvailability});
+        return {roomAvailability};
     }
 
     async fetchRoomEquipment() {
@@ -354,7 +369,7 @@ class RoomEditModal extends React.Component {
             handleAxiosError(error);
             return;
         }
-        this.setState({roomEquipment: camelizeKeys(response.data)});
+        return {roomEquipment: camelizeKeys(response.data)};
     }
 
     handleCloseModal = () => {
@@ -374,47 +389,41 @@ class RoomEditModal extends React.Component {
         const {availableEquipment, nonbookablePeriods, bookableHours, attributes} = changedValues;
 
         try {
-            this.saveBasicDetails(roomId, basicDetails);
-            this.saveEquipment(roomId, availableEquipment);
-            this.saveAttributes(roomId, attributes);
-            this.saveAvailability(roomId, changedValues, nonbookablePeriods, bookableHours);
-            this.setState({submitSucceeded: true});
+            await this.saveBasicDetails(roomId, basicDetails);
+            await this.saveEquipment(roomId, availableEquipment);
+            await this.saveAttributes(roomId, attributes);
+            await this.saveAvailability(roomId, changedValues, nonbookablePeriods, bookableHours);
         } catch (e) {
             handleAxiosError(e);
-            this.setState({submitSucceeded: false});
         }
+        // reload room so the form gets new initialValues
+        await this.fetchRoomData();
+        this.setState({submitted: true});
     };
 
     async saveBasicDetails(roomId, basicDetails) {
         if (!_.isEmpty(basicDetails)) {
-            return await indicoAxios.patch(updateRoomBasicDetailsURL({room_id: roomId}), snakifyKeys(basicDetails));
-        } else {
-            return await Promise.resolve();
+            await indicoAxios.patch(updateRoomBasicDetailsURL({room_id: roomId}), snakifyKeys(basicDetails));
         }
     }
 
     async saveEquipment(roomId, availableEquipment) {
         if (availableEquipment) {
-            return await indicoAxios.post(updateRoomEquipmentURL({room_id: roomId}),
-                                          {available_equipment: availableEquipment});
-        } else {
-            return await Promise.resolve();
+            const params = {available_equipment: availableEquipment};
+            await indicoAxios.post(updateRoomEquipmentURL({room_id: roomId}), params);
         }
     }
 
     async saveAttributes(roomId, attributes) {
         if (attributes) {
-            return await indicoAxios.post(updateRoomAttributesURL({room_id: roomId}), {attributes});
-        } else {
-            return await Promise.resolve();
+            await indicoAxios.post(updateRoomAttributesURL({room_id: roomId}), {attributes});
         }
     }
 
     async saveAvailability(roomId, changedValues, nonbookablePeriods, bookableHours) {
         if (nonbookablePeriods || bookableHours) {
-            return await indicoAxios.post(updateRoomAvailabilityURL({room_id: roomId}), snakifyKeys(_.pick(changedValues, ['bookableHours', 'nonbookablePeriods'])));
-        } else {
-            return await Promise.resolve();
+            const params = snakifyKeys(_.pick(changedValues, ['bookableHours', 'nonbookablePeriods']));
+            await indicoAxios.post(updateRoomAvailabilityURL({room_id: roomId}), params);
         }
     }
 
@@ -469,12 +478,8 @@ class RoomEditModal extends React.Component {
         );
     };
 
-    renderColumn = (column, key) => (
-        <Grid.Column key={key}>{column.map(this.renderContent)}</Grid.Column>
-    );
-
     renderContent = (content, key) => {
-        const {room, roomEquipment, submitSucceeded} = this.state;
+        const {room, roomEquipment} = this.state;
         const {equipmentTypes, favoriteUsers} = this.props;
         if (!equipmentTypes) {
             return;
@@ -566,20 +571,12 @@ class RoomEditModal extends React.Component {
                                return value === null ? [] : value;
                            }} />
                 );
-            case 'message':
-                return (
-                    <Message key={key}
-                             styleName="success-message"
-                             positive
-                             hidden={!submitSucceeded}>
-                        {content.content}
-                    </Message>
-                );
         }
     };
 
     renderModalContent = (fprops) => {
-        const {hasValidationErrors, pristine, submitting, submitSucceeded} = fprops;
+        const {hasValidationErrors, pristine, submitting} = fprops;
+        const {submitted} = this.state;
         return (
             <>
                 <Modal.Header>
@@ -589,7 +586,18 @@ class RoomEditModal extends React.Component {
                     <Form id="room-form"
                           onSubmit={fprops.handleSubmit}>
                         <Grid columns={3}>
-                            {columns.map(this.renderColumn)}
+                            <Grid.Column>{columns[0].map(this.renderContent)}</Grid.Column>
+                            <Grid.Column>{columns[1].map(this.renderContent)}</Grid.Column>
+                            <Grid.Column>
+                                {columns[2].map(this.renderContent)}
+                                <Message styleName="success-message"
+                                         positive
+                                         hidden={!submitted}>
+                                    <Translate>
+                                        Room has been successfully updated.
+                                    </Translate>
+                                </Message>
+                            </Grid.Column>
                         </Grid>
                     </Form>
                 </Modal.Content>
@@ -600,11 +608,17 @@ class RoomEditModal extends React.Component {
                     <Button type="submit"
                             form="room-form"
                             primary
-                            disabled={pristine || submitting || submitSucceeded || hasValidationErrors}
+                            disabled={pristine || submitting || hasValidationErrors}
                             loading={submitting}>
                         <Translate>Save</Translate>
                     </Button>
                 </Modal.Actions>
+                <FormSpy subscription={{dirty: true}}
+                         onChange={({dirty}) => {
+                             if (dirty) {
+                                 this.setState({submitted: false});
+                             }
+                         }} />
             </>
         );
     };
@@ -617,8 +631,8 @@ class RoomEditModal extends React.Component {
     };
 
     render() {
-        const {room, roomAttributes, attributes, roomEquipment, roomAvailability} = this.state;
-        if (!room || !attributes || !roomAttributes || !roomEquipment) {
+        const {room, roomAttributes, roomEquipment, roomAvailability} = this.state;
+        if (this.loadingInitialData) {
             return <Dimmer active page><Loader /></Dimmer>;
         }
         const initialValues = {
@@ -634,9 +648,7 @@ class RoomEditModal extends React.Component {
                                onSubmit={this.handleSubmit}
                                render={this.renderModalContent}
                                initialValues={initialValues}
-                               mutators={{
-                                   ...arrayMutators
-                               }} />
+                               mutators={{...arrayMutators}} />
                 </Modal>
             </>
         );

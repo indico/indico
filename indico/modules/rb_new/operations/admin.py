@@ -16,12 +16,11 @@
 
 from __future__ import unicode_literals
 
-from datetime import datetime, time, timedelta
+from datetime import datetime, time
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.rb.models.equipment import EquipmentType
-from indico.modules.rb.models.room_attributes import RoomAttribute, RoomAttributeAssociation
 from indico.modules.rb.models.room_bookable_hours import BookableHours
 from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
 
