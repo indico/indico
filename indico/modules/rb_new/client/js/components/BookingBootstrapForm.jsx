@@ -35,8 +35,9 @@ class BookingBootstrapForm extends React.Component {
         buttonCaption: PropTypes.object,
         children: PropTypes.node,
         buttonDisabled: PropTypes.bool,
+        dayBased: PropTypes.bool,
+        onlyDaily: PropTypes.bool,
         defaults: PropTypes.object,
-        dayBased: PropTypes.bool
     };
 
     static get defaultProps() {
@@ -46,7 +47,8 @@ class BookingBootstrapForm extends React.Component {
             onChange: () => {},
             buttonDisabled: false,
             dayBased: false,
-            defaults: {}
+            onlyDaily: false,
+            defaults: {},
         };
     }
 
@@ -167,7 +169,7 @@ class BookingBootstrapForm extends React.Component {
             dates: {startDate, endDate}
         } = this.state;
 
-        const {buttonCaption, buttonDisabled, children, dayBased} = this.props;
+        const {buttonCaption, buttonDisabled, children, dayBased, onlyDaily} = this.props;
         const recurrenceOptions = [
             {text: Translate.string('Weeks'), value: 'week'},
             {text: Translate.string('Months'), value: 'month'}
@@ -176,21 +178,25 @@ class BookingBootstrapForm extends React.Component {
         return (
             <Form>
                 <Form.Group inline>
-                    <Form.Radio label={Translate.string('Single booking')}
-                                name="type"
-                                value="single"
-                                checked={type === 'single'}
-                                onChange={(e, {value}) => this.updateBookingType(value)} />
+                    {!onlyDaily && (
+                        <Form.Radio label={Translate.string('Single booking')}
+                                    name="type"
+                                    value="single"
+                                    checked={type === 'single'}
+                                    onChange={(e, {value}) => this.updateBookingType(value)} />
+                    )}
                     <Form.Radio label={Translate.string('Daily booking')}
                                 name="type"
                                 value="daily"
                                 checked={type === 'daily'}
                                 onChange={(e, {value}) => this.updateBookingType(value)} />
-                    <Form.Radio label={Translate.string('Recurring booking')}
-                                name="type"
-                                value="every"
-                                checked={type === 'every'}
-                                onChange={(e, {value}) => this.updateBookingType(value)} />
+                    {!onlyDaily && (
+                        <Form.Radio label={Translate.string('Recurring booking')}
+                                    name="type"
+                                    value="every"
+                                    checked={type === 'every'}
+                                    onChange={(e, {value}) => this.updateBookingType(value)} />
+                    )}
                 </Form.Group>
                 {type === 'every' && (
                     <Form.Group inline>

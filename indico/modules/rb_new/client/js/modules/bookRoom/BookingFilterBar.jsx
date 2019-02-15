@@ -73,21 +73,23 @@ class BookingFilterBar extends React.Component {
             <Button.Group size="small">
                 <Button icon="calendar alternate outline" as="div" disabled />
                 <FilterBarController>
-                    <FilterDropdownFactory name="recurrence"
-                                           title={<Translate>Recurrence</Translate>}
-                                           form={(fieldValues, setParentField) => (
-                                               <RecurrenceForm setParentField={setParentField} {...fieldValues} />
-                                           )}
-                                           setGlobalState={({type, number, interval}) => {
-                                               setFilterParameter('recurrence', {type, number, interval});
-                                           }}
-                                           initialValues={recurrence}
-                                           defaults={{
-                                               type: 'single',
-                                               number: 1,
-                                               interval: 'week'
-                                           }}
-                                           renderValue={renderRecurrence} />
+                    <Overridable id="BookingFilterBar.recurrence">
+                        <FilterDropdownFactory name="recurrence"
+                                               title={<Translate>Recurrence</Translate>}
+                                               form={(fieldValues, setParentField) => (
+                                                   <RecurrenceForm setParentField={setParentField} {...fieldValues} />
+                                               )}
+                                               setGlobalState={({type, number, interval}) => {
+                                                   setFilterParameter('recurrence', {type, number, interval});
+                                               }}
+                                               initialValues={recurrence}
+                                               defaults={{
+                                                   type: 'single',
+                                                   number: 1,
+                                                   interval: 'week'
+                                               }}
+                                               renderValue={renderRecurrence} />
+                    </Overridable>
                     <FilterDropdownFactory name="dates"
                                            title={<Translate>Date</Translate>}
                                            form={(fieldValues, setParentField) => (

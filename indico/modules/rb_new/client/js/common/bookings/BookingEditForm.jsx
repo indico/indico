@@ -28,6 +28,7 @@ import PrincipalSearchField from 'indico/react/components/PrincipalSearchField';
 import {ReduxFormField, ReduxRadioField, formatters, validators as v} from 'indico/react/forms';
 import {SingleDatePicker, DatePeriodField} from 'indico/react/components';
 import {serializeDate, serializeTime, toMoment} from 'indico/utils/date';
+import {Overridable} from 'indico/react/util';
 import {Translate} from 'indico/react/i18n';
 import TimeRangePicker from '../../components/TimeRangePicker';
 import {selectors as userSelectors} from '../user';
@@ -43,10 +44,12 @@ class BookingEditForm extends React.Component {
         booking: PropTypes.object.isRequired,
         formProps: PropTypes.object.isRequired,
         onBookingPeriodChange: PropTypes.func,
+        hideOptions: PropTypes.objectOf(PropTypes.bool),
     };
 
     static defaultProps = {
         onBookingPeriodChange: () => {},
+        hideOptions: {},
     };
 
     recurrenceTypeChanged = (newType) => {
@@ -193,7 +196,8 @@ class BookingEditForm extends React.Component {
             user: sessionUser,
             booking: {bookedForUser, startDt, endDt},
             onBookingPeriodChange,
-            formProps
+            formProps,
+            hideOptions,
         } = this.props;
         const {
             values: {dates, recurrence, timeSlot, usage, user},
@@ -207,24 +211,30 @@ class BookingEditForm extends React.Component {
             <Form id="booking-edit-form" styleName="booking-edit-form" onSubmit={handleSubmit}>
                 <Segment>
                     <Form.Group inline>
-                        <Field name="recurrence.type"
-                               component={ReduxRadioField}
-                               componentLabel={Translate.string('Single booking')}
-                               radioValue="single"
-                               disabled={submitting || submitSucceeded || bookingFinished}
-                               onClick={() => this.recurrenceTypeChanged('single')} />
-                        <Field name="recurrence.type"
-                               component={ReduxRadioField}
-                               componentLabel={Translate.string('Daily booking')}
-                               radioValue="daily"
-                               disabled={submitting || submitSucceeded || bookingFinished}
-                               onClick={() => this.recurrenceTypeChanged('daily')} />
-                        <Field name="recurrence.type"
-                               component={ReduxRadioField}
-                               componentLabel={Translate.string('Recurring booking')}
-                               radioValue="every"
-                               disabled={submitting || submitSucceeded || bookingFinished}
-                               onClick={() => this.recurrenceTypeChanged('every')} />
+                        {!hideOptions.single && (
+                            <Field name="recurrence.type"
+                                   component={ReduxRadioField}
+                                   componentLabel={Translate.string('Single booking')}
+                                   radioValue="single"
+                                   disabled={submitting || submitSucceeded || bookingFinished}
+                                   onClick={() => this.recurrenceTypeChanged('single')} />
+                        )}
+                        {!hideOptions.daily && (
+                            <Field name="recurrence.type"
+                                   component={ReduxRadioField}
+                                   componentLabel={Translate.string('Daily booking')}
+                                   radioValue="daily"
+                                   disabled={submitting || submitSucceeded || bookingFinished}
+                                   onClick={() => this.recurrenceTypeChanged('daily')} />
+                        )}
+                        {!hideOptions.recurring && (
+                            <Field name="recurrence.type"
+                                   component={ReduxRadioField}
+                                   componentLabel={Translate.string('Recurring booking')}
+                                   radioValue="every"
+                                   disabled={submitting || submitSucceeded || bookingFinished}
+                                   onClick={() => this.recurrenceTypeChanged('every')} />
+                        )}
                     </Form.Group>
                     {recurrence.type === 'every' && (
                         <Form.Group inline>
@@ -307,4 +317,4 @@ export default connect(
         user: userSelectors.getUserInfo(state),
         favoriteUsers: userSelectors.getFavoriteUsers(state),
     }),
-)(BookingEditForm);
+)(Overridable.component('BookingEditForm', BookingEditForm));
