@@ -63,9 +63,9 @@ class RHUpdateRoomBlocking(RHRoomBookingBase):
 
 class RHRoomBlockings(RHRoomBookingBase):
     @use_kwargs({
-        'timeframe': fields.Str(),
-        'my_rooms': fields.Bool(),
-        'mine': fields.Bool()
+        'timeframe': fields.Str(missing=None),
+        'my_rooms': fields.Bool(missing=False),
+        'mine': fields.Bool(missing=False)
     })
     def _process(self, timeframe, my_rooms, mine):
         filters = {'timeframe': timeframe, 'created_by': session.user if mine else None,
