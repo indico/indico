@@ -19,7 +19,7 @@ import _ from 'lodash';
 import {createSelector} from 'reselect';
 
 import {RequestState} from 'indico/utils/redux';
-import {getAllUserRoomPermissions} from '../user/selectors';
+import {getAllUserRoomPermissions, isUserRBAdmin} from '../user/selectors';
 
 
 export const hasLoadedEquipmentTypes = ({rooms}) => rooms.requests.equipmentTypes.state === RequestState.SUCCESS;
@@ -66,7 +66,8 @@ export const getAllRooms = createSelector(
     ({rooms}) => rooms.rooms,
     getEquipmentTypes,
     getAllUserRoomPermissions,
-    (rawRooms, equipmentTypes, allUserPermissions) => {
+    isUserRBAdmin,
+    (rawRooms, equipmentTypes, allUserPermissions, isRBAdmin) => {
         equipmentTypes = equipmentTypes.reduce((obj, eq) => ({...obj, [eq.id]: eq}), {});
         return _.fromPairs(rawRooms.map(room => {
             const {availableEquipment: equipment, ...roomData} = room;
@@ -90,6 +91,7 @@ export const getAllRooms = createSelector(
                 ...roomData,
                 equipment: equipment.map(id => equipmentTypes[id].name).sort(),
                 features: sortedFeatures,
+                canUserEdit: isRBAdmin,
                 canUserBook: permissions.book,
                 canUserPrebook: permissions.prebook,
                 canUserOverride: permissions.override,
