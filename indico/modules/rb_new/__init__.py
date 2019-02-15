@@ -30,7 +30,7 @@ from indico.web.menu import SideMenuItem, TopMenuItem
 @signals.menu.items.connect_via('top-menu')
 def _topmenu_items(sender, **kwargs):
     if config.ENABLE_ROOMBOOKING:
-        yield TopMenuItem('rb_new', _('Room booking (new)'), url_for('rooms_new.roombooking'), 80)
+        yield TopMenuItem('rb_new', _('Room booking'), url_for('rooms_new.roombooking'), 80)
 
 
 @signals.menu.items.connect_via('event-management-sidemenu')
