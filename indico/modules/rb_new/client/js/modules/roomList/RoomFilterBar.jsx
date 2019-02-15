@@ -30,8 +30,9 @@ import BuildingForm from './filters/BuildingForm';
 import ShowOnlyForm from './filters/ShowOnlyForm';
 import {FilterBarController, FilterDropdownFactory} from '../../common/filters/FilterBar';
 import {actions as filtersActions} from '../../common/filters';
-import {selectors as roomsSelectors} from '../../common/rooms';
+import {selectors as userSelectors} from '../../common/user';
 
+import {selectors as roomsSelectors} from '../../common/rooms';
 import './RoomFilterBar.module.scss';
 
 
@@ -88,6 +89,7 @@ export class RoomFilterBarBase extends React.Component {
         buildings: PropTypes.array.isRequired,
         showOnlyAuthorizedFilter: PropTypes.bool,
         extraButtons: PropTypes.node,
+        hasOwnedRooms: PropTypes.bool.isRequired,
         filters: PropTypes.shape({
             building: PropTypes.string,
             capacity: PropTypes.number,
@@ -115,14 +117,14 @@ export class RoomFilterBarBase extends React.Component {
     render() {
         const {
             equipmentTypes, features: availableFeatures, buildings,
-            extraButtons, hideOptions, disabled, showOnlyAuthorizedFilter,
+            extraButtons, hideOptions, disabled, showOnlyAuthorizedFilter, hasOwnedRooms,
             filters: {
                 capacity, onlyFavorites, onlyMine, onlyAuthorized, equipment, features, building,
                 ...extraFilters
             },
             actions: {setFilterParameter, setFilters}
         } = this.props;
-
+        const hideShowOnlyForm = hideOptions.favorites && !hasOwnedRooms && !onlyMine && !showOnlyAuthorizedFilter;
         const equipmentFilter = (!!equipmentTypes.length || !!availableFeatures.length) && (
             <FilterDropdownFactory name="equipment"
                                    title={<Translate>Equipment</Translate>}
@@ -173,28 +175,32 @@ export class RoomFilterBarBase extends React.Component {
                     <Overridable id="RoomFilterBar.extraFilters"
                                  setFilter={setFilterParameter}
                                  filters={extraFilters} />
-                    <FilterDropdownFactory name="room-different"
-                                           title={<Translate>Show only...</Translate>}
-                                           form={(data, setParentField) => (
-                                               <ShowOnlyForm {...data}
-                                                             setParentField={setParentField}
-                                                             showOnlyAuthorizedFilter={showOnlyAuthorizedFilter}
-                                                             disabled={disabled} />
-                                           )}
-                                           setGlobalState={setFilters}
-                                           renderValue={(data) => {
-                                               const iconMap = {
-                                                   onlyFavorites: 'star',
-                                                   onlyMine: 'user',
-                                                   onlyAuthorized: 'lock open'
-                                               };
-                                               const icons = Object.entries(iconMap)
-                                                   .filter(([key]) => data[key])
-                                                   .map(([key, icon]) => <Icon key={key} name={icon} />);
-                                               return icons.length !== 0 ? icons : null;
-                                           }}
-                                           initialValues={{onlyFavorites, onlyMine, onlyAuthorized}}
-                                           disabled={disabled} />
+                    {!hideShowOnlyForm && (
+                        <FilterDropdownFactory name="room-different"
+                                               title={<Translate>Show only...</Translate>}
+                                               form={(data, setParentField) => (
+                                                   <ShowOnlyForm {...data}
+                                                                 setParentField={setParentField}
+                                                                 showOnlyAuthorizedFilter={showOnlyAuthorizedFilter}
+                                                                 hideFavoritesFilter={hideOptions.favorites}
+                                                                 disabled={disabled} />
+                                               )}
+                                               setGlobalState={setFilters}
+                                               renderValue={(data) => {
+                                                   const iconMap = {
+                                                       onlyFavorites: 'star',
+                                                       onlyMine: 'user',
+                                                       onlyAuthorized: 'lock open'
+                                                   };
+                                                   const icons = Object.entries(iconMap)
+                                                       .filter(([key]) => data[key])
+                                                       .map(([key, icon]) => <Icon key={key} name={icon} />);
+                                                   return icons.length !== 0 ? icons : null;
+                                               }}
+                                               initialValues={{onlyFavorites, onlyMine, onlyAuthorized}}
+                                               disabled={disabled} />
+
+                    )}
                     {extraButtons}
                 </FilterBarController>
             </Button.Group>
@@ -208,6 +214,7 @@ export default (namespace, searchRoomsSelectors) => connect(
         equipmentTypes: roomsSelectors.getEquipmentTypeNamesWithoutFeatures(state),
         features: roomsSelectors.getFeatures(state),
         buildings: roomsSelectors.getBuildings(state),
+        hasOwnedRooms: userSelectors.hasOwnedRooms(state),
     }),
     dispatch => ({
         actions: bindActionCreators({

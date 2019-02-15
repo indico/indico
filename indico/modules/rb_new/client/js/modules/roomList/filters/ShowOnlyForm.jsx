@@ -32,23 +32,32 @@ class ShowOnlyForm extends FilterFormComponent {
     render() {
         const {
             filters: {onlyFavorites, onlyMine, onlyAuthorized},
-            onlyFavorites: newOnlyFavorites, onlyMine: newOnlyMine, onlyAuthorized: newOnlyAuthorized,
-            hasFavoriteRooms, hasOwnedRooms, setParentField, showOnlyAuthorizedFilter, disabled,
+            onlyFavorites: newOnlyFavorites,
+            onlyMine: newOnlyMine,
+            onlyAuthorized: newOnlyAuthorized,
+            hasFavoriteRooms,
+            hasOwnedRooms,
+            setParentField,
+            showOnlyAuthorizedFilter,
+            disabled,
             hasUnbookableRooms,
+            hideFavoritesFilter,
         } = this.props;
 
         return (
             <>
-                <div styleName="show-only-filter">
-                    <Checkbox onChange={(__, {checked}) => setParentField('onlyFavorites', checked)}
-                              disabled={(!onlyFavorites && !hasFavoriteRooms) || disabled}
-                              checked={newOnlyFavorites}
-                              toggle />
-                    <Icon name="star" />
-                    <span>
-                        <Translate>My favorite rooms</Translate>
-                    </span>
-                </div>
+                {!hideFavoritesFilter && (
+                    <div styleName="show-only-filter">
+                        <Checkbox onChange={(__, {checked}) => setParentField('onlyFavorites', checked)}
+                                  disabled={(!onlyFavorites && !hasFavoriteRooms) || disabled}
+                                  checked={newOnlyFavorites}
+                                  toggle />
+                        <Icon name="star" />
+                        <span>
+                            <Translate>My favorite rooms</Translate>
+                        </span>
+                    </div>
+                )}
                 {(hasOwnedRooms || onlyMine) && (
                     <div styleName="show-only-filter">
                         <Checkbox onChange={(__, {checked}) => setParentField('onlyMine', checked)}
