@@ -37,7 +37,7 @@ DURATION_FACTOR = 0.25
 
 def get_suggestions(filters, limit=None):
     blocked_rooms = get_blocked_rooms(filters['start_dt'], filters['end_dt'], [BlockedRoomState.accepted])
-    rooms = [room for room in search_for_rooms(filters, False) if room not in blocked_rooms]
+    rooms = [room for room in search_for_rooms(filters, availability=False) if room not in blocked_rooms]
     if filters['repeat_frequency'] == RepeatFrequency.NEVER:
         suggestions = sort_suggestions(get_single_booking_suggestions(rooms, filters['start_dt'], filters['end_dt'],
                                                                       limit=limit))
