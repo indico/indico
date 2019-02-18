@@ -146,7 +146,7 @@ class RHCalendar(RHRoomBookingBase):
 class RHActiveBookings(RHRoomBookingBase):
     @use_kwargs({
         'room_ids': fields.List(fields.Int(), missing=None),
-        'start_dt': fields.DateTime(),
+        'start_dt': fields.DateTime(missing=None),
         'last_reservation_id': fields.Int(missing=None),
         'my_bookings': fields.Bool(missing=False),
         'limit': fields.Int(missing=40),
