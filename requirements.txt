@@ -3,7 +3,7 @@ Mako==1.0.7
 MarkupSafe==1.1.0
 indico-fonts==1.1
 icalendar==4.0.3
-lxml==4.3.1
+lxml[html5]==4.3.1
 pojson==0.7
 pyPdf==1.13
 pyatom==1.4
