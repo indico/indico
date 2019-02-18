@@ -127,10 +127,10 @@ class BookRoom extends React.Component {
         this.setState({maxVisibleRooms: 20, suggestionsRequested: false});
     }
 
-    openBookingForm(room, overrides = null, isPrebooking = false) {
+    openBookingForm(roomId, overrides = null, isPrebooking = false) {
         const {actions: {openBookingForm}, filters: {dates, timeSlot, recurrence}} = this.props;
         if (!overrides) {
-            openBookingForm(room.id, {isPrebooking});
+            openBookingForm(roomId, {isPrebooking});
             return;
         }
         // if we have overrides, we need to pass the data explicitly
@@ -154,7 +154,7 @@ class BookRoom extends React.Component {
                 endDate: serializeDate(moment(endDate, 'YYYY-MM-DD').subtract(overrides.shorten, 'days'))
             };
         }
-        openBookingForm(room.id, {...bookingData, isPrebooking});
+        openBookingForm(roomId, {...bookingData, isPrebooking});
     }
 
     renderFilters(refName) {
@@ -249,7 +249,7 @@ class BookRoom extends React.Component {
             <Button circular
                     icon="check"
                     color="green"
-                    onClick={() => this.openBookingForm(room)} />
+                    onClick={() => this.openBookingForm(room.id)} />
         );
 
         const showDetailsBtn = ({id}) => (
@@ -278,7 +278,8 @@ class BookRoom extends React.Component {
                                                            hideOnScroll />
                                                 )}
                                                 {room.canUserPrebook && (
-                                                    <Icon.Group onClick={() => this.openBookingForm(room, null, true)}>
+                                                    // eslint-disable-next-line max-len
+                                                    <Icon.Group onClick={() => this.openBookingForm(room.id, null, true)}>
                                                         <Popup trigger={<Button circular icon="check" color="orange" />}
                                                                content={labels.preBookButton}
                                                                position="top center"
@@ -330,7 +331,7 @@ class BookRoom extends React.Component {
                                            room={room}
                                            suggestions={roomSuggestions}
                                            onClick={(overrides = null) => {
-                                               this.openBookingForm(room, overrides, !room.canUserBook);
+                                               this.openBookingForm(room.id, overrides, !room.canUserBook);
                                            }} />
                     ))}
                 </Card.Group>
@@ -412,7 +413,9 @@ class BookRoom extends React.Component {
                 </Grid.Column>
                 {showMap && (
                     <Grid.Column computer={5} only="computer">
-                        <MapController />
+                        <MapController onRoomClick={
+                            ({id, canUserBook}) => this.openBookingForm(id, null, !canUserBook)
+                        } />
                     </Grid.Column>
                 )}
             </Grid>

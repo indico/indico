@@ -220,7 +220,7 @@ class RoomList extends React.Component {
                 </Grid.Column>
                 {showMap && (
                     <Grid.Column computer={5} only="computer">
-                        <MapController />
+                        <MapController onRoomClick={({id}) => openRoomDetails(id)} />
                     </Grid.Column>
                 )}
                 <Route exact path="/rooms/blocking/create" render={() => {

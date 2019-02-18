@@ -40,6 +40,7 @@ class RoomBookingMap extends React.Component {
         tileServerURL: PropTypes.string,
         clusterProps: PropTypes.object,
         markerComponent: PropTypes.func,
+        onRoomClick: PropTypes.func.isRequired,
         actions: PropTypes.objectOf(PropTypes.func).isRequired
     };
 
@@ -59,7 +60,7 @@ class RoomBookingMap extends React.Component {
 
     render() {
         const {
-            bounds, onMove, mapRef, rooms, children, tileServerURL, onTouch, clusterProps, actions,
+            bounds, onMove, mapRef, rooms, children, tileServerURL, onTouch, clusterProps, onRoomClick, actions,
             markerComponent: MarkerComponent
         } = this.props;
 
@@ -81,7 +82,8 @@ class RoomBookingMap extends React.Component {
                                minZoom="14"
                                maxZoom="20"
                                url={tileServerURL} />
-                    <MarkerComponent rooms={rooms} clusterProps={clusterProps} actions={actions} />
+                    <MarkerComponent rooms={rooms} clusterProps={clusterProps} actions={actions}
+                                     onRoomClick={onRoomClick} />
                     {children}
                 </Map>
             </div>

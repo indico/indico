@@ -70,6 +70,7 @@ class MapMarkers extends React.Component {
         rooms: PropTypes.array,
         clusterProps: PropTypes.object,
         hoveredRoomId: PropTypes.number,
+        onRoomClick: PropTypes.func.isRequired,
         /** 'actions' may be used by plugins */
         actions: PropTypes.objectOf(PropTypes.func).isRequired
     };
@@ -86,7 +87,7 @@ class MapMarkers extends React.Component {
     }
 
     render() {
-        const {rooms, clusterProps, hoveredRoomId} = this.props;
+        const {rooms, clusterProps, hoveredRoomId, onRoomClick} = this.props;
 
         if (!rooms.length) {
             return null;
@@ -96,19 +97,18 @@ class MapMarkers extends React.Component {
             <MarkerClusterGroup showCoverageOnHover={false}
                                 iconCreateFunction={groupIconCreateFunction}
                                 {...clusterProps}>
-                {rooms.filter(({lat, lng}) => !!(lat && lng)).map(({id, name, lat, lng}) => {
-                    return (
-                        <MarkerWrapper key={id}
-                                       id={id}
-                                       position={[lat, lng]}
-                                       icon={id === hoveredRoomId ? hoveredIcon : icon}
-                                       highlight={id === hoveredRoomId}>
-                            <Tooltip direction="top">
-                                <span>{name}</span>
-                            </Tooltip>
-                        </MarkerWrapper>
-                    );
-                })}
+                {rooms.filter(({lat, lng}) => !!(lat && lng)).map(room => (
+                    <MarkerWrapper key={room.id}
+                                   id={room.id}
+                                   position={[room.lat, room.lng]}
+                                   icon={room.id === hoveredRoomId ? hoveredIcon : icon}
+                                   highlight={room.id === hoveredRoomId}
+                                   onClick={() => onRoomClick(room)}>
+                        <Tooltip direction="top">
+                            <span>{room.name}</span>
+                        </Tooltip>
+                    </MarkerWrapper>
+                ))}
             </MarkerClusterGroup>
         );
     }

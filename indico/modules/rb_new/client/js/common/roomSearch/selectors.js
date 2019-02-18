@@ -49,6 +49,7 @@ export function roomSearchSelectorFactory(namespace) {
                 fullName: room.fullName,
                 lat: room.latitude,
                 lng: room.longitude,
+                canUserBook: room.canUserBook,
             }))
     );
 

@@ -37,6 +37,7 @@ class MapController extends React.Component {
         areas: PropTypes.array.isRequired,
         rooms: PropTypes.arrayOf(PropTypes.object).isRequired,
         searchEnabled: PropTypes.bool.isRequired,
+        onRoomClick: PropTypes.func.isRequired,
         mapData: PropTypes.shape({
             bounds: PropTypes.object,
             filterBounds: PropTypes.object,
@@ -141,7 +142,11 @@ class MapController extends React.Component {
     };
 
     render() {
-        const {searchEnabled, rooms, areas, mapData: {bounds}, actions: {toggleMapSearch}, actions} = this.props;
+        const {
+            searchEnabled, rooms, areas, actions, onRoomClick,
+            mapData: {bounds},
+            actions: {toggleMapSearch},
+        } = this.props;
         const {areaBounds, loading, allRoomsVisible, searchVisible} = this.state;
         const areaOptions = Object.entries(areas).map(([key, val]) => ({
             text: val.name,
@@ -195,6 +200,7 @@ class MapController extends React.Component {
                                             onLoad={this.onMapLoad}
                                             onMove={this.onMove}
                                             onTouch={this.onTouch}
+                                            onRoomClick={onRoomClick}
                                             actions={actions}>
                                 <>
                                     {searchControl}
