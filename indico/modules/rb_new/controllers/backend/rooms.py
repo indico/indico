@@ -29,6 +29,7 @@ from indico.core.db import db
 from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.models.favorites import favorite_room_table
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
+from indico.modules.rb.models.room_attributes import RoomAttribute, RoomAttributeAssociation
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.util import rb_is_admin
 from indico.modules.rb_new.controllers.backend.common import search_room_args
@@ -113,7 +114,8 @@ class RHRoomAvailability(RHRoomBase):
 
 class RHRoomAttributes(RHRoomBase):
     def _process(self):
-        return jsonify(room_attribute_values_schema.dump(self.room.attributes).data)
+        attributes = self.room.attributes.filter(RoomAttributeAssociation.attribute.has(~RoomAttribute.is_hidden)).all()
+        return jsonify(room_attribute_values_schema.dump(attributes).data)
 
 
 class RHRoomStats(RHRoomBase):
