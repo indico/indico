@@ -28,7 +28,6 @@
     .timeline-occurrence {
         box-sizing: border-box;
         margin: 0;
-        cursor: pointer;
         position: absolute;
         padding: 0.7em 0.2em;
         z-index: 3;
@@ -112,6 +111,10 @@
                 background-color: lighten($other-booking-color, 1%);
                 border: 1px solid darken($other-booking-color, 9%);
             }
+        }
+
+        &:global(.clickable) {
+            cursor: pointer;
         }
     }
 }
