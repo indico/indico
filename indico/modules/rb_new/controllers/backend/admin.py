@@ -32,10 +32,11 @@ from indico.modules.rb.models.room_attributes import RoomAttribute, RoomAttribut
 from indico.modules.rb.models.room_features import RoomFeature
 from indico.modules.rb.util import rb_is_admin
 from indico.modules.rb_new.controllers.backend.common import room_args
+from indico.modules.rb_new.controllers.backend.rooms import RHRoomsPermissions
 from indico.modules.rb_new.operations.admin import (update_room, update_room_attributes, update_room_availability,
                                                     update_room_equipment)
-from indico.modules.rb_new.schemas import (admin_equipment_type_schema, admin_locations_schema, attributes_schema,
-                                           bookable_hours_schema, nonbookable_periods_schema, room_attribute_schema,
+from indico.modules.rb_new.schemas import (admin_equipment_type_schema, admin_locations_schema, bookable_hours_schema,
+                                           nonbookable_periods_schema, room_attribute_schema,
                                            room_attribute_values_schema, room_equipment_schema, room_feature_schema,
                                            room_update_schema)
 from indico.util.i18n import _
@@ -330,4 +331,5 @@ class RHUpdateRoom(RHRoomAdminBase):
     @use_args(room_args)
     def _process(self, args):
         update_room(self.room, args)
+        RHRoomsPermissions._jsonify_user_permissions.clear_cached(session.user)
         return jsonify(room_update_schema.dump(self.room, many=False).data)

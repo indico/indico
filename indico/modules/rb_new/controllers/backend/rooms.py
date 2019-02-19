@@ -109,6 +109,21 @@ class RHRoom(RHRoomBase):
         return jsonify(rooms_schema.dump(self.room, many=False).data)
 
 
+class RHRoomPermissions(RHRoomBase):
+    def _get_permissions(self, allow_admin):
+        return {
+            'book': self.room.can_book(session.user, allow_admin=allow_admin),
+            'prebook': self.room.can_prebook(session.user, allow_admin=allow_admin),
+            'override': self.room.can_override(session.user, allow_admin=allow_admin),
+            'moderate': self.room.can_moderate(session.user, allow_admin=allow_admin),
+            'manage': self.room.can_manage(session.user, allow_admin=allow_admin),
+        }
+
+    def _process(self):
+        return jsonify(user=self._get_permissions(allow_admin=False),
+                       admin=(self._get_permissions(allow_admin=True) if rb_is_admin(session.user) else None))
+
+
 class RHRoomAvailability(RHRoomBase):
     def _process(self):
         today = date.today()

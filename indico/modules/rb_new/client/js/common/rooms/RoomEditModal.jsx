@@ -47,8 +47,8 @@ import DailyAvailability from './DailyAvailability';
 import NonBookablePeriods from './NonBookablePeriods';
 import SpriteImage from '../../components/SpriteImage';
 import {actions as roomsActions} from '../../common/rooms';
+import {actions as userActions, selectors as userSelectors} from '../../common/user';
 import * as roomsSelectors from './selectors';
-import {selectors as userSelectors} from '../user';
 
 import './RoomEditModal.module.scss';
 
@@ -311,6 +311,7 @@ class RoomEditModal extends React.Component {
         roomId: PropTypes.number.isRequired,
         actions: PropTypes.exact({
             fetchRoom: PropTypes.func.isRequired,
+            fetchRoomPermissions: PropTypes.func.isRequired,
             fetchRoomDetails: PropTypes.func.isRequired,
         }).isRequired,
     };
@@ -412,8 +413,9 @@ class RoomEditModal extends React.Component {
     }
 
     handleCloseModal = () => {
-        const {onClose, roomId, actions: {fetchRoom, fetchRoomDetails}} = this.props;
+        const {onClose, roomId, actions: {fetchRoom, fetchRoomDetails, fetchRoomPermissions}} = this.props;
         fetchRoom(roomId);
+        fetchRoomPermissions(roomId);
         fetchRoomDetails(roomId, true);
         onClose();
     };
@@ -702,6 +704,7 @@ export default connect(
     dispatch => ({
         actions: bindActionCreators({
             fetchRoom: roomsActions.fetchRoom,
+            fetchRoomPermissions: userActions.fetchRoomPermissions,
             fetchRoomDetails: roomsActions.fetchDetails,
         }, dispatch),
     }),
