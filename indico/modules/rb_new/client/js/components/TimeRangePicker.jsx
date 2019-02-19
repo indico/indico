@@ -199,7 +199,7 @@ export default class TimeRangePicker extends React.Component {
             endOptions,
         });
         const {onChange} = this.props;
-        onChange(start, end, true);
+        onChange(start, end);
     };
 
     onStartSearchChange = (event) => {
