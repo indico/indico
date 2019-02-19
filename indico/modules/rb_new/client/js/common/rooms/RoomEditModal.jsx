@@ -58,8 +58,10 @@ function isInvalidNotificationPeriod(days) {
 }
 
 function validate(fields) {
-    const {building, floor, number, capacity, surfaceArea, nonbookablePeriods, notificationBeforeDays,
-           notificationBeforeDaysWeekly, notificationBeforeDaysMonthly} = fields;
+    const {
+        building, floor, number, capacity, surfaceArea, maxAdvanceDays, nonbookablePeriods, notificationBeforeDays,
+        notificationBeforeDaysWeekly, notificationBeforeDaysMonthly,
+    } = fields;
     const errors = {};
     if (!building) {
         errors.building = Translate.string('Please provide a building.');
@@ -70,14 +72,14 @@ function validate(fields) {
     if (!number) {
         errors.number = Translate.string('Please provide a number.');
     }
-    if (!capacity) {
-        errors.capacity = Translate.string('Please provide capacity.');
-    }
     if (capacity < 1) {
         errors.capacity = Translate.string('Please provide a valid capacity number.');
     }
     if (surfaceArea < 1) {
-        errors.surfaceArea = Translate.string('Please provide a valid surface area number.');
+        errors.surfaceArea = Translate.string('Please provide a valid surface area.');
+    }
+    if (maxAdvanceDays !== null && maxAdvanceDays < 1) {
+        errors.maxAdvanceDays = Translate.string('The max. advance booking time must be at least 1 day or empty.');
     }
     if (isInvalidNotificationPeriod(notificationBeforeDays)) {
         errors.notificationBeforeDays = Translate.string('Number of days must be between 1 and 30');
@@ -98,9 +100,9 @@ const columns = [
     // left
     [{
         type: 'header',
-        label: Translate.string('Image')
+        label: Translate.string('Photo')
     }, {
-        type: 'image',
+        type: 'photo',
     }, {
         type: 'header',
         label: Translate.string('Contact')
@@ -128,7 +130,10 @@ const columns = [
             type: 'input',
             name: 'capacity',
             label: Translate.string('Capacity'),
-            inputType: 'number',
+            inputArgs: {
+                type: 'number',
+                min: 1,
+            },
             required: true
         }, {
             type: 'input',
@@ -187,26 +192,36 @@ const columns = [
             type: 'input',
             name: 'longitude',
             label: Translate.string('Longitude'),
-            inputType: 'number',
+            inputArgs: {
+                type: 'number',
+            },
             required: false
         }, {
             type: 'input',
             name: 'latitude',
             label: Translate.string('Latitude'),
-            inputType: 'number',
+            inputArgs: {
+                type: 'number',
+            },
             required: false
         }]
     }, {
         type: 'input',
         name: 'surfaceArea',
         label: Translate.string('Surface Area (m²)'),
-        inputType: 'number',
+        inputArgs: {
+            type: 'number',
+            min: 0,
+        },
         required: false
     }, {
         type: 'input',
         name: 'maxAdvanceDays',
         label: Translate.string('Maximum advance time for bookings (days)'),
-        inputType: 'number',
+        inputArgs: {
+            type: 'number',
+            min: 1,
+        },
         required: false
     }, {
         type: 'header',
@@ -227,19 +242,31 @@ const columns = [
         type: 'input',
         name: 'notificationBeforeDays',
         label: Translate.string('Send Booking reminders X days before (single/daily)'),
-        inputType: 'number',
+        inputArgs: {
+            type: 'number',
+            min: 1,
+            max: 30,
+        },
         required: false
     }, {
         type: 'input',
         name: 'notificationBeforeDaysWeekly',
         label: Translate.string('Send Booking reminders X days before (weekly)'),
-        inputType: 'number',
+        inputArgs: {
+            type: 'number',
+            min: 1,
+            max: 30,
+        },
         required: false
     }, {
         type: 'input',
         name: 'notificationBeforeDaysMonthly',
         label: Translate.string('Send Booking reminders X days before (monthly)'),
-        inputType: 'number',
+        inputArgs: {
+            type: 'number',
+            min: 1,
+            max: 30,
+        },
         required: false
     }],
     // right
@@ -427,7 +454,7 @@ class RoomEditModal extends React.Component {
         }
     }
 
-    renderImage = (position) => {
+    renderPhoto = (position) => {
         return <SpriteImage key="image" pos={position} />;
     };
 
@@ -497,8 +524,8 @@ class RoomEditModal extends React.Component {
                            label={content.label}
                            required={content.required}
                            as="input"
-                           type={content.inputType || 'text'}
-                           parse={(value) => value || null} />
+                           parse={(value) => value || null}
+                           {...(content.inputArgs || {type: 'text'})} />
                 );
             case 'owner':
                 return (
@@ -533,8 +560,8 @@ class RoomEditModal extends React.Component {
                            as={TextArea}
                            parse={null} />
                 );
-            case 'image':
-                return this.renderImage(room.spritePosition);
+            case 'photo':
+                return this.renderPhoto(room.spritePosition);
             case 'attributes':
                 return this.renderAttributes(content);
             case 'equipment':
