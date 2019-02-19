@@ -37,6 +37,8 @@ Bugfixes
 - Correctly align centered footer links (:issue:`3599`, thanks :user:`nop33`)
 - Fix top/right alignment of session bar in event display view (:issue:`3599`,
   thanks :user:`nop33`)
+- Fix error when trying to create a user with a mixed-case email
+  address in the admin area
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
