@@ -282,6 +282,7 @@ class BookRoomModal extends React.Component {
             data.linkType = _.snakeCase(link.type);
             data.linkId = link.id;
         }
+
         const rv = await createBooking(data, this.props);
         if (rv.error) {
             return rv.error;
@@ -565,6 +566,9 @@ class BookRoomModal extends React.Component {
                                            placeholder={Translate.string('Reason for booking')}
                                            disabled={bookingBlocked(fprops)}
                                            required={reasonRequired} />
+                                    <Overridable id="BookRoomModal.extraFields"
+                                                 disabled={bookingBlocked(fprops)}
+                                                 room={room} />
                                 </Segment>
                                 {!link && !fprops.submitSucceeded && (
                                     this.renderRelatedEventsDropdown(bookingBlocked(fprops), fprops.form.mutators)
@@ -625,7 +629,7 @@ export default connect(
             fetchRelatedEvents: actions.fetchRelatedEvents,
             resetRelatedEvents: actions.resetRelatedEvents,
             createBooking: (data, props) => {
-                const {reason, usage, user, isPrebooking, linkType, linkId, linkBack} = data;
+                const {reason, usage, user, isPrebooking, linkType, linkId, linkBack, ...extraFields} = data;
                 const {bookingData: {recurrence, dates, timeSlot}, room} = props;
                 return actions.createBooking({
                     reason,
@@ -639,6 +643,7 @@ export default connect(
                     linkId,
                     linkBack,
                     isPrebooking,
+                    extraFields,
                 });
             },
             openBookingDetails: bookingId => modalActions.openModal('booking-details', bookingId, null, true)
