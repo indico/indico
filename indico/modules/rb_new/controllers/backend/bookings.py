@@ -25,6 +25,7 @@ from marshmallow_enum import EnumField
 from webargs.flaskparser import use_args, use_kwargs
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
+from indico.core import signals
 from indico.core.db import db
 from indico.core.db.sqlalchemy.links import LinkType
 from indico.core.errors import NoReportError
@@ -214,6 +215,7 @@ class RHCreateBooking(RHRoomBookingBase):
             db.session.rollback()
             raise ExpectedError(unicode(e))
 
+        signals.rb.booking_created.send(resv, extra_fields=request.json.get('extra_fields'))
         serialized_occurrences = serialize_occurrences(group_by_occurrence_date(resv.occurrences.all()))
         if self.prebook:
             data = {'pre_bookings': serialized_occurrences}
@@ -277,6 +279,7 @@ class RHDeleteBooking(RHBookingBase):
     def _process(self):
         booking_id = self.booking.id
         room_id = self.booking.room.id
+        signals.rb.booking_deleted.send(self.booking)
         db.session.delete(self.booking)
         return jsonify(booking_id=booking_id, room_id=room_id)
 
