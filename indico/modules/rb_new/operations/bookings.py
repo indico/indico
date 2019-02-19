@@ -222,7 +222,9 @@ def get_room_calendar(start_date, end_date, room_ids, include_inactive=False, **
 def get_room_details_availability(room, start_dt, end_dt):
     dates = [d.date() for d in iterdays(start_dt, end_dt)]
 
-    bookings = get_existing_room_occurrences(room, start_dt, end_dt, RepeatFrequency.DAY, 1, only_accepted=True)
+    occurrences = get_existing_room_occurrences(room, start_dt, end_dt, RepeatFrequency.DAY, 1)
+    pre_bookings = [occ for occ in occurrences if not occ.reservation.is_accepted]
+    bookings = [occ for occ in occurrences if occ.reservation.is_accepted]
     blockings = get_rooms_blockings([room], start_dt.date(), end_dt.date()).get(room.id, [])
     unbookable_hours = get_rooms_unbookable_hours([room]).get(room.id, [])
     nonbookable_periods = get_rooms_nonbookable_periods([room], start_dt, end_dt).get(room.id, [])
@@ -233,6 +235,7 @@ def get_room_details_availability(room, start_dt, end_dt):
         nb_periods = serialize_nonbookable_periods(group_nonbookable_periods(nonbookable_periods, dates)).get(iso_day)
         availability.append({
             'bookings': serialize_occurrences(group_by_occurrence_date(bookings)).get(iso_day),
+            'pre_bookings': serialize_occurrences(group_by_occurrence_date(pre_bookings)).get(iso_day),
             'blockings': serialize_blockings(group_blockings(blockings, dates)).get(iso_day),
             'nonbookable_periods': nb_periods,
             'unbookable_hours': serialize_unbookable_hours(unbookable_hours),
