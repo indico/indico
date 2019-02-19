@@ -62,7 +62,6 @@ room_args = {
     'latitude': fields.Float(allow_none=True),
     'is_reservable': fields.Bool(allow_none=True),
     'reservations_need_confirmation': fields.Bool(allow_none=True),
-    'notification_for_assistance': fields.Bool(allow_none=True),
     'notification_before_days': fields.Int(validate=lambda x: 1 <= x <= 30, aallow_none=True),
     'notification_before_days_weekly': fields.Int(validate=lambda x: 1 <= x <= 30, allow_none=True),
     'notification_before_days_monthly': fields.Int(validate=lambda x: 1 <= x <= 30, allow_none=True),

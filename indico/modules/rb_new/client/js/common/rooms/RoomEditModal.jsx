@@ -244,8 +244,8 @@ const columns = [
         label: Translate.string('Bookable')
     }, {
         type: 'checkbox',
-        name: 'isAutoConfirm',
-        label: Translate.string('Confirmation')
+        name: 'reservationsNeedConfirmation',
+        label: Translate.string('Require confirmation (pre-bookings)')
     }, {
         type: 'checkbox',
         name: 'notificationsEnabled',
