@@ -323,6 +323,7 @@ class RoomEditModal extends React.Component {
         roomAvailability: null,
         roomEquipment: null,
         submitted: false,
+        closing: false,
     };
 
     componentDidMount() {
@@ -412,11 +413,14 @@ class RoomEditModal extends React.Component {
         return {roomEquipment: camelizeKeys(response.data)};
     }
 
-    handleCloseModal = () => {
+    handleCloseModal = async () => {
         const {onClose, roomId, actions: {fetchRoom, fetchRoomDetails, fetchRoomPermissions}} = this.props;
-        fetchRoom(roomId);
-        fetchRoomPermissions(roomId);
-        fetchRoomDetails(roomId, true);
+        this.setState({closing: true});
+        await Promise.all([
+            fetchRoom(roomId),
+            fetchRoomPermissions(roomId),
+            fetchRoomDetails(roomId, true)
+        ]);
         onClose();
     };
 
@@ -672,8 +676,8 @@ class RoomEditModal extends React.Component {
     };
 
     render() {
-        const {room, roomAttributes, roomEquipment, roomAvailability} = this.state;
-        if (this.loadingInitialData) {
+        const {room, roomAttributes, roomEquipment, roomAvailability, closing} = this.state;
+        if (this.loadingInitialData || closing) {
             return <Dimmer active page><Loader /></Dimmer>;
         }
         const initialValues = {
