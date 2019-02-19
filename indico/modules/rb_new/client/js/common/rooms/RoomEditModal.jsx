@@ -59,8 +59,8 @@ function isInvalidNotificationPeriod(days) {
 
 function validate(fields) {
     const {
-        building, floor, number, capacity, surfaceArea, maxAdvanceDays, nonbookablePeriods, notificationBeforeDays,
-        notificationBeforeDaysWeekly, notificationBeforeDaysMonthly,
+        building, floor, number, capacity, surfaceArea, maxAdvanceDays, bookingLimitDays, nonbookablePeriods,
+        notificationBeforeDays, notificationBeforeDaysWeekly, notificationBeforeDaysMonthly,
     } = fields;
     const errors = {};
     if (!building) {
@@ -80,6 +80,9 @@ function validate(fields) {
     }
     if (maxAdvanceDays !== null && maxAdvanceDays < 1) {
         errors.maxAdvanceDays = Translate.string('The max. advance booking time must be at least 1 day or empty.');
+    }
+    if (bookingLimitDays !== null && bookingLimitDays < 1) {
+        errors.bookingLimitDays = Translate.string('The max. booking duration must be at least 1 day or empty.');
     }
     if (isInvalidNotificationPeriod(notificationBeforeDays)) {
         errors.notificationBeforeDays = Translate.string('Number of days must be between 1 and 30');
@@ -218,6 +221,15 @@ const columns = [
         type: 'input',
         name: 'maxAdvanceDays',
         label: Translate.string('Maximum advance time for bookings (days)'),
+        inputArgs: {
+            type: 'number',
+            min: 1,
+        },
+        required: false
+    }, {
+        type: 'input',
+        name: 'bookingLimitDays',
+        label: Translate.string('Max duration of a booking (day)'),
         inputArgs: {
             type: 'number',
             min: 1,
