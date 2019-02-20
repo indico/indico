@@ -221,7 +221,7 @@ class BookingEdit extends React.Component {
             if (today.isBefore(startDate, 'day')) {
                 newDates.startDate = serializeDate(startDate);
             } else {
-                newDates.startDate = dateRange.find((dt) => today.isSameOrBefore(dt, 'day'));
+                newDates.startDate = dateRange.find((dt) => today.isBefore(dt, 'day'));
             }
         }
 
