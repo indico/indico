@@ -217,7 +217,12 @@ class BookingEdit extends React.Component {
         if (isOngoingBooking && shouldSplit) {
             const today = moment();
             const {startDate} = dates;
-            newDates.startDate = today.isBefore(startDate, 'day') ? serializeDate(startDate) : serializeDate(today);
+
+            if (today.isBefore(startDate, 'day')) {
+                newDates.startDate = serializeDate(startDate);
+            } else {
+                newDates.startDate = dateRange.find((dt) => today.isSameOrBefore(dt, 'day'));
+            }
         }
 
         this.resetCalendarStateOnUpdate(shouldSplit);
