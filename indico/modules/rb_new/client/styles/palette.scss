@@ -31,6 +31,7 @@ $other-booking-color: #dfdfdf;
 $rejection-color: #f9cebd;
 $unbookable-color: #bbb;
 $pending-cancellation-color: #e2cebc;
+$conflicting-candidate-color: #fbd1d6;
 $pre-booking-stripe-colors: ($booking-color, lighten($booking-color, 14%));
 $pre-booking-conflict-stripe-colors: ($conflict-color, lighten($conflict-color, 14%));
 $blocking-stripe-colors: (lighten($conflict-color, 50%), lighten($conflict-color, 20%));

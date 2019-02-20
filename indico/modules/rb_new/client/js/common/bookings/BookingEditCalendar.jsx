@@ -44,6 +44,7 @@ class BookingEditCalendar extends React.Component {
 
     static legendLabels = [
         {label: Translate.string('Current booking'), style: 'booking'},
+        {label: Translate.string('Invalid occurrence'), style: 'conflicting-candidate'},
         {label: Translate.string('Cancelled occurrences'), style: 'cancellation'},
         {label: Translate.string('Pending cancellations'), style: 'pending-cancellation'},
         {label: Translate.string('Rejected occurrences'), style: 'rejection'},
@@ -61,6 +62,9 @@ class BookingEditCalendar extends React.Component {
                 rejections: data.rejections[day] || [],
                 other: data.other[day] || [],
                 candidates: (data.candidates[day] || []).map(candidate => ({...candidate, bookable: false})),
+                conflictingCandidates: (data.conflictingCandidates[day] || []).map((candidate) => (
+                    {...candidate, bookable: false}
+                )),
                 conflicts: data.conflicts[day] || [],
                 pendingCancellations: data.pendingCancellations[day] || [],
             },

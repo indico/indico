@@ -55,6 +55,10 @@
                 background-color: $available-color;
             }
 
+            &.conflicting-candidate {
+                background-color: $conflicting-candidate-color;
+            }
+
             &.booking {
                 background-color: $booking-color;
             }

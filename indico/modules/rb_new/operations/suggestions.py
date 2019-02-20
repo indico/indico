@@ -97,8 +97,8 @@ def get_recurring_booking_suggestions(rooms, start_dt, end_dt, repeat_frequency,
     blocked_rooms = get_rooms_blockings(rooms, start_dt.date(), end_dt.date())
     unbookable_hours = get_rooms_unbookable_hours(rooms)
     nonbookable_periods = get_rooms_nonbookable_periods(rooms, start_dt, end_dt)
-    conflicts, _ = get_rooms_conflicts(rooms, start_dt, end_dt, repeat_frequency, repeat_interval, blocked_rooms,
-                                       nonbookable_periods, unbookable_hours)
+    conflicts = get_rooms_conflicts(rooms, start_dt, end_dt, repeat_frequency, repeat_interval, blocked_rooms,
+                                    nonbookable_periods, unbookable_hours)[0]
     for room in rooms:
         if limit and len(data) == limit:
             break

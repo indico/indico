@@ -66,7 +66,6 @@ class UnavailableRoomsModal extends React.Component {
 
     render() {
         const {availability, actions, isFetching, onClose, datePicker} = this.props;
-
         if (availability.length === 0) {
             return <Dimmer active page><Loader /></Dimmer>;
         }
@@ -75,6 +74,7 @@ class UnavailableRoomsModal extends React.Component {
             {label: Translate.string('Available'), style: 'available'},
             {label: Translate.string('Booked'), style: 'booking'},
             {label: Translate.string('Pre-Booked'), style: 'pre-booking'},
+            {label: Translate.string('Invalid occurrence'), style: 'conflicting-candidate'},
             {label: Translate.string('Conflict'), style: 'conflict'},
             {label: Translate.string('Conflict with Pre-Booking'), style: 'pre-booking-conflict'},
             {label: Translate.string('Blocked'), style: 'blocking'},

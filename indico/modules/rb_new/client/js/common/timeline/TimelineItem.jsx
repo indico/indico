@@ -37,6 +37,7 @@ const classes = {
     cancellations: 'cancellation',
     pendingCancellations: 'pending-cancellations',
     rejections: 'rejection',
+    conflictingCandidates: 'conflicting-candidates',
     other: 'other',
 };
 
@@ -50,6 +51,7 @@ const types = {
     cancellations: 'cancellation',
     pendingCancellations: 'pending-cancellations',
     rejections: 'rejection',
+    conflictingCandidates: 'conflicting-candidates',
     other: 'other',
 };
 
@@ -57,6 +59,7 @@ const reservationTypes = new Set(['booking', 'pre-booking', 'cancellation', 'rej
 
 const renderOrder = [
     'other',
+    'conflictingCandidates',
     'preBookings',
     'preConflicts',
     'cancellations',
@@ -193,6 +196,14 @@ class TimelineItem extends React.Component {
                     {!!rejectionReason && <div>{Translate.string('Reason: {reason}', {reason: rejectionReason})}</div>}
                 </div>
             );
+        } else if (type === 'conflicting-candidates') {
+            popupContent = (
+                <div styleName="popup-center">
+                    <strong>
+                        <Translate>This occurrence is conflicting with an existing booking</Translate>
+                    </strong>
+                </div>
+            );
         } else {
             let popupMessage;
             if (reservation) {
@@ -237,7 +248,6 @@ class TimelineItem extends React.Component {
 
     renderOccurrences = () => {
         const {data} = this.props;
-
         return renderOrder.filter((name) => name in data).map((name) => {
             const occurrences = data[name];
             return occurrences.map(occurrence => (
