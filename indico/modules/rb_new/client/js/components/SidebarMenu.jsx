@@ -20,6 +20,7 @@ import PropTypes from 'prop-types';
 import {Icon, Popup, Sidebar, Menu} from 'semantic-ui-react';
 import {connect} from 'react-redux';
 import {push as pushRoute} from 'connected-react-router';
+import {Overridable} from 'indico/react/util';
 import {Translate} from 'indico/react/i18n';
 
 import {selectors as userSelectors, actions as userActions} from '../common/user';
@@ -52,10 +53,18 @@ SidebarTrigger.propTypes = {
 };
 
 function SidebarMenu({
-    isAdmin, isAdminOverrideEnabled, hasOwnedRooms,
-    gotoMyBookings, gotoBookingsInMyRooms, gotoMyRoomsList, gotoMyBlockings, gotoRBAdminArea,
+    isAdmin,
+    isAdminOverrideEnabled,
+    hasOwnedRooms,
+    gotoMyBookings,
+    gotoBookingsInMyRooms,
+    gotoMyRoomsList,
+    gotoMyBlockings,
+    gotoRBAdminArea,
     toggleAdminOverride,
-    visible, onClickOption
+    visible,
+    onClickOption,
+    hideOptions,
 }) {
     const options = [
         {
@@ -83,6 +92,7 @@ function SidebarMenu({
             icon: 'window close outline',
             text: Translate.string('My Blockings'),
             onClick: gotoMyBlockings,
+            onlyIf: !hideOptions.myBlockings
         },
         {
             key: 'isAdmin',
@@ -146,12 +156,14 @@ SidebarMenu.propTypes = {
     gotoRBAdminArea: PropTypes.func.isRequired,
     toggleAdminOverride: PropTypes.func.isRequired,
     visible: PropTypes.bool,
-    onClickOption: PropTypes.func
+    onClickOption: PropTypes.func,
+    hideOptions: PropTypes.objectOf(PropTypes.bool),
 };
 
 SidebarMenu.defaultProps = {
     visible: false,
-    onClickOption: null
+    onClickOption: null,
+    hideOptions: {},
 };
 
 
@@ -195,4 +207,4 @@ export default connect(
             dispatch(userActions.toggleAdminOverride());
         }
     })
-)(SidebarMenu);
+)(Overridable.component('SidebarMenu', SidebarMenu));
