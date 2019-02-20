@@ -119,6 +119,14 @@
                 &:not(:last-child) {
                     margin-right: 70px;
                 }
+
+                :global(.statistic + .statistic) {
+                    margin-left: 3em;
+                }
+
+                :global(.statistic:nth-child(even)) > * {
+                    color: darken($highlight-color, 20%);
+                }
             }
         }
     }
