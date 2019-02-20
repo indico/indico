@@ -89,6 +89,7 @@ class BookingEdit extends React.Component {
                         other: {...occurrences.otherBookings},
                         pendingCancellations: {},
                         candidates: {},
+                        conflictingCandidates: {},
                         conflicts: {}
                     },
                     dateRange,
@@ -134,6 +135,7 @@ class BookingEdit extends React.Component {
                 data: {
                     candidates: {},
                     conflicts: {},
+                    conflictingCandidates: {},
                 },
                 isFetching: true,
                 dateRange: [],
@@ -145,6 +147,7 @@ class BookingEdit extends React.Component {
                     ...currentBooking.data,
                     candidates: {},
                     conflicts: {},
+                    conflictingCandidates: {},
                 },
                 isFetching: true,
             };
@@ -154,7 +157,7 @@ class BookingEdit extends React.Component {
         this.setState(newState);
     };
 
-    getUpdatedCalendars = (dateRange, newDateRange, candidates, conflicts) => {
+    getUpdatedCalendars = (dateRange, newDateRange, candidates, conflicts, conflictingCandidates) => {
         const {isOngoingBooking} = this.props;
         const {shouldSplit, calendars: {currentBooking}} = this.state;
 
@@ -182,6 +185,7 @@ class BookingEdit extends React.Component {
                         cancellations: {},
                         candidates,
                         conflicts,
+                        conflictingCandidates,
                     },
                     dateRange: newDateRange,
                 }
@@ -195,6 +199,7 @@ class BookingEdit extends React.Component {
                         ...currentBooking.data,
                         candidates,
                         conflicts,
+                        conflictingCandidates,
                         pendingCancellations: {},
                     },
                     dateRange: _.uniq([...dateRange, ...newDateRange]).sort(),
@@ -270,7 +275,8 @@ class BookingEdit extends React.Component {
         candidates = _.pick(candidates, newDateRange.filter(date => !(date in rejections) && !(date in cancellations)));
 
         this.setState({
-            calendars: this.getUpdatedCalendars(dateRange, newDateRange, candidates, availabilityData.conflicts),
+            calendars: this.getUpdatedCalendars(dateRange, newDateRange, candidates, availabilityData.conflicts,
+                                                availabilityData.conflictingCandidates),
             numberOfConflicts: availabilityData.numConflicts,
             numberOfCandidates: datePeriodChanged ? availabilityData.numDaysAvailable : null,
         });

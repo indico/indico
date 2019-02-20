@@ -64,6 +64,10 @@
             background-size: 35px 35px;
         }
 
+        &:global(.conflicting-candidates) {
+            background-color: $conflicting-candidate-color;
+        }
+
         &:global(.unbookable-periods) {
             @include thin-stripes($unbookable-stripe-colors...);
             background-size: 30px 30px;

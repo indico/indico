@@ -61,8 +61,8 @@ def _serialize_availability(availability):
         data['nonbookable_periods'] = serialize_nonbookable_periods(data.get('nonbookable_periods', {}))
         data['unbookable_hours'] = serialize_unbookable_hours(data.get('unbookable_hours', {}))
         data.update({k: serialize_occurrences(data[k]) if k in data else {}
-                     for k in ('candidates', 'pre_bookings', 'bookings', 'conflicts', 'pre_conflicts',
-                               'rejections', 'cancellations')})
+                     for k in ('candidates', 'conflicting_candidates', 'pre_bookings', 'bookings', 'conflicts',
+                               'pre_conflicts', 'rejections', 'cancellations')})
     return availability
 
 

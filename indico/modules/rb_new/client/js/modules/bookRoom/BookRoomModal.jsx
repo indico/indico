@@ -204,10 +204,15 @@ class BookRoomModal extends React.Component {
 
     _getRowSerializer(day) {
         const {room} = this.props;
-        return ({bookings, preBookings, candidates, nonbookablePeriods, unbookableHours, blockings, conflicts,
-                 preConflicts}) => ({
+        return ({bookings, preBookings, candidates, conflictingCandidates, nonbookablePeriods, unbookableHours,
+                 blockings, conflicts, preConflicts}) => ({
             availability: {
-                candidates: candidates[day].map((candidate) => ({...candidate, bookable: false})) || [],
+                candidates: (candidates[day] || []).map((candidate) => (
+                    {...candidate, bookable: false})
+                ) || [],
+                conflictingCandidates: (conflictingCandidates[day] || []).map((candidate) => (
+                    {...candidate, bookable: false}
+                )) || [],
                 preBookings: preBookings[day] || [],
                 bookings: bookings[day] || [],
                 conflicts: conflicts[day] || [],
@@ -503,6 +508,7 @@ class BookRoomModal extends React.Component {
             {label: Translate.string('Available'), style: 'available'},
             {label: Translate.string('Booked'), style: 'booking'},
             {label: Translate.string('Pre-Booked'), style: 'pre-booking'},
+            {label: Translate.string('Invalid occurrence'), style: 'conflicting-candidate'},
             {label: Translate.string('Conflict'), style: 'conflict'},
             {label: Translate.string('Conflict with Pre-Booking'), style: 'pre-booking-conflict'},
             {label: Translate.string('Blocked'), style: 'blocking'},
