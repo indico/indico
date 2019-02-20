@@ -53,8 +53,8 @@
 
 {% macro render_text_pending() %}
     {% if registration.state.name == 'pending' %}
-        Please notice it's not complete yet since it's awaiting manual approval by a manager.
-        You will be notified when that happens.
+        Please note that this event requires manual approval.
+        You will be notified when the registration process is complete.
     {% endif %}
 {% endmacro %}
 
