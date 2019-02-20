@@ -72,7 +72,7 @@ export default class ElasticTimeline extends React.Component {
     };
 
     _getDayRowSerializer(dt) {
-        const {bookingAllowed} = this.props;
+        const {bookingAllowed, datePicker: {dateRange}} = this.props;
         return ({
             candidates, conflictingCandidates, preBookings, bookings, preConflicts, conflicts, blockings,
             nonbookablePeriods, unbookableHours, cancellations, rejections
@@ -87,7 +87,7 @@ export default class ElasticTimeline extends React.Component {
                 preConflicts: preConflicts[dt] || [],
                 blockings: blockings[dt] || [],
                 nonbookablePeriods: nonbookablePeriods[dt] || [],
-                unbookableHours: unbookableHours || [],
+                unbookableHours: dateRange.length !== 0 && !_.includes(dateRange, dt) ? [] : unbookableHours || [],
                 cancellations: cancellations[dt] || [],
                 rejections: rejections[dt] || [],
             };
