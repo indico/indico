@@ -42,7 +42,7 @@ import {BookingObjectLink} from '../../common/bookings';
 import './BookRoomModal.module.scss';
 
 
-function validate({usage, user, reason}) {
+function validate({usage, user, reason}, optionalFields) {
     const errors = {};
     if (!usage) {
         errors.usage = Translate.string('Please choose an option!');
@@ -50,7 +50,7 @@ function validate({usage, user, reason}) {
     if (usage === 'someone' && !user) {
         errors.user = Translate.string('Please specify a user');
     }
-    if (!reason || reason.length < 3) {
+    if (!optionalFields.reason && (!reason || reason.length < 3)) {
         errors.reason = Translate.string('You need to provide a reason');
     }
     return errors;
@@ -88,7 +88,8 @@ class BookRoomModal extends React.Component {
         defaultTitles: PropTypes.shape({
             booking: IndicoPropTypes.i18n,
             preBooking: IndicoPropTypes.i18n
-        })
+        }),
+        optionalFields: PropTypes.objectOf(PropTypes.bool),
     };
 
     static defaultProps = {
@@ -99,7 +100,8 @@ class BookRoomModal extends React.Component {
         defaultTitles: {
             booking: <Translate>Create Booking</Translate>,
             preBooking: <Translate>Create Pre-booking</Translate>
-        }
+        },
+        optionalFields: {},
     };
 
     state = {
@@ -483,6 +485,7 @@ class BookRoomModal extends React.Component {
             timeInformationComponent: TimeInformationComponent,
             defaultTitles,
             link,
+            optionalFields,
         } = this.props;
         const {skipConflicts, bookingConflictsVisible} = this.state;
         if (!room) {
@@ -552,7 +555,7 @@ class BookRoomModal extends React.Component {
                                            formatOnBlur
                                            placeholder={Translate.string('Reason for booking')}
                                            disabled={bookingBlocked(fprops)}
-                                           required />
+                                           required={!optionalFields.reason} />
                                 </Segment>
                                 {!link && !fprops.submitSucceeded && (
                                     this.renderRelatedEventsDropdown(bookingBlocked(fprops), fprops.form.mutators)
@@ -586,8 +589,9 @@ class BookRoomModal extends React.Component {
 
         return (
             <Modal open onClose={this.onClose} size="large" closeIcon>
-                <FinalForm onSubmit={this.submitBooking} validate={validate} decorators={[formDecorator]}
-                           render={renderModalContent} initialValues={{user: null, linkBack}}
+                <FinalForm onSubmit={this.submitBooking} validate={(values) => validate(values, optionalFields)}
+                           decorators={[formDecorator]} render={renderModalContent}
+                           initialValues={{user: null, linkBack}}
                            mutators={{setEvent: ([event], state, {changeValue}) => {
                                changeValue(state, 'event', () => event);
                            }}} />

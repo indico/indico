@@ -45,11 +45,13 @@ class BookingEditForm extends React.Component {
         formProps: PropTypes.object.isRequired,
         onBookingPeriodChange: PropTypes.func,
         hideOptions: PropTypes.objectOf(PropTypes.bool),
+        optionalFields: PropTypes.objectOf(PropTypes.bool),
     };
 
     static defaultProps = {
         onBookingPeriodChange: () => {},
         hideOptions: {},
+        optionalFields: {},
     };
 
     recurrenceTypeChanged = (newType) => {
@@ -198,6 +200,7 @@ class BookingEditForm extends React.Component {
             onBookingPeriodChange,
             formProps,
             hideOptions,
+            optionalFields,
         } = this.props;
         const {
             values: {dates, recurrence, timeSlot, usage, user},
@@ -303,7 +306,7 @@ class BookingEditForm extends React.Component {
                            as={TextArea}
                            format={formatters.trim}
                            placeholder={Translate.string('Reason for booking')}
-                           validate={v.required}
+                           validate={!optionalFields.reason ? v.required : undefined}
                            disabled={submitting || submitSucceeded}
                            formatOnBlur />
                 </Segment>

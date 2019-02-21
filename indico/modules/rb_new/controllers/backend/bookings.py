@@ -304,7 +304,7 @@ class RHUpdateBooking(RHBookingBase):
     @use_args(create_booking_args)
     def _process(self, args):
         new_booking_data = {
-            'booking_reason': args['booking_reason'],
+            'booking_reason': args.get('booking_reason', ''),
             'room_usage': 'current_user' if args.get('user_id', None) is None else 'someone',
             'booked_for_user': User.get(args.get('user_id', session.user.id)),
             'start_dt': args['start_dt'],
