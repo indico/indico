@@ -155,10 +155,14 @@ class Room(versioned_cache(_cache, 'id'), ProtectionManagersMixin, db.Model, Ser
         default=True
     )
     telephone = db.Column(
-        db.String
+        db.String,
+        nullable=False,
+        default=''
     )
     key_location = db.Column(
-        db.String
+        db.String,
+        nullable=False,
+        default=''
     )
     capacity = db.Column(
         db.Integer,
@@ -174,7 +178,9 @@ class Room(versioned_cache(_cache, 'id'), ProtectionManagersMixin, db.Model, Ser
         db.Float
     )
     comments = db.Column(
-        db.String
+        db.String,
+        nullable=False,
+        default=''
     )
     owner_id = db.Column(
         db.Integer,
