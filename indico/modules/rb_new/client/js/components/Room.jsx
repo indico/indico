@@ -23,7 +23,7 @@ import PropTypes from 'prop-types';
 import {Card, Icon, Label, Loader, Popup, Button} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
-import {Slot} from 'indico/react/util';
+import {Markdown, Slot} from 'indico/react/util';
 import {TooltipIfTruncated} from 'indico/react/components';
 import SpriteImage from './SpriteImage';
 import DimmableImage from './DimmableImage';
@@ -167,7 +167,9 @@ class Room extends React.Component {
                         {room.comments && (
                             <TooltipIfTruncated>
                                 <div styleName="room-comments">
-                                    {room.comments}
+                                    <Markdown source={room.comments}
+                                              allowedTypes={['text', 'break']}
+                                              unwrapDisallowed />
                                 </div>
                             </TooltipIfTruncated>
                         )}
