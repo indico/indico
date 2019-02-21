@@ -23,14 +23,19 @@ import {connect} from 'react-redux';
 class Preloader extends React.Component {
     static propTypes = {
         isCached: PropTypes.bool.isRequired,
+        alwaysLoad: PropTypes.bool,
         action: PropTypes.func.isRequired,
         children: PropTypes.func.isRequired,
         dimmer: PropTypes.element.isRequired
     };
 
+    static defaultProps = {
+        alwaysLoad: false,
+    };
+
     componentDidMount() {
-        const {action, isCached} = this.props;
-        if (!isCached) {
+        const {action, isCached, alwaysLoad} = this.props;
+        if (!isCached || alwaysLoad) {
             action();
         }
     }

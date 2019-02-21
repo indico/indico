@@ -28,8 +28,9 @@ import * as roomsSelectors from './selectors';
 
 const RoomDetailsPreloader = ({roomId, fetchDetails, children}) => (
     <Preloader checkCached={state => roomsSelectors.hasDetails(state, {roomId})}
-               action={() => fetchDetails(roomId)}
-               dimmer={<Dimmer active page><Loader /></Dimmer>}>
+               action={() => fetchDetails(roomId, true)}
+               dimmer={<Dimmer active page><Loader /></Dimmer>}
+               alwaysLoad>
         {children}
     </Preloader>
 );
