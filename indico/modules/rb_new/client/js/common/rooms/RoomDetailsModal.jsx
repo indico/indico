@@ -22,7 +22,7 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {Button, Grid, Icon, Modal, Header, Message, List, Segment, Popup} from 'semantic-ui-react';
 import {Translate, Param} from 'indico/react/i18n';
-import {Overridable, IndicoPropTypes} from 'indico/react/util';
+import {Overridable, IndicoPropTypes, Markdown} from 'indico/react/util';
 import RoomBasicDetails from '../../components/RoomBasicDetails';
 import RoomKeyLocation from '../../components/RoomKeyLocation';
 import RoomStats from './RoomStats';
@@ -236,7 +236,14 @@ RoomAvailabilityBox.propTypes = {
 };
 
 function RoomCommentsBox({room}) {
-    return room.comments && (<Message styleName="message-icon" icon="info" content={room.comments} info />);
+    return room.comments && (
+        <Message styleName="message-icon" icon info>
+            <Icon name="info" />
+            <Message.Content>
+                <Markdown source={room.comments} targetBlank />
+            </Message.Content>
+        </Message>
+    );
 }
 
 RoomCommentsBox.propTypes = {

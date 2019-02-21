@@ -17,15 +17,20 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Message} from 'semantic-ui-react';
+import {Icon, Message} from 'semantic-ui-react';
+import {Markdown} from 'indico/react/util';
 
 import './RoomKeyLocation.module.scss';
 
 
 export default function RoomKeyLocation({room}) {
     return room.keyLocation && (
-        <Message styleName="message-icon" icon="key"
-                 content={room.keyLocation} />
+        <Message styleName="message-icon" icon>
+            <Icon name="key" />
+            <Message.Content>
+                <Markdown source={room.keyLocation} targetBlank />
+            </Message.Content>
+        </Message>
     );
 }
 
