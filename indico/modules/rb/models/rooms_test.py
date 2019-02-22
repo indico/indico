@@ -464,10 +464,10 @@ def test_find_with_filters_details_cols(db, dummy_room, create_room, col):
 
 
 find_with_filters_details = (
-    (u'meow',     u'meow',     None),
-    (u'meow',     u'MEOW',     None),
-    (u'foo"bar',  u'foo"bar',  None),
-    (ur'foo\bar', ur'foo\bar', None),
+    (u'meow',     u'meow',     ''),
+    (u'meow',     u'MEOW',     ''),
+    (u'foo"bar',  u'foo"bar',  ''),
+    (ur'foo\bar', ur'foo\bar', ''),
     (u'test%bla', u'test%bla', u'testXbla'),
     (u'test_bla', u'test_bla', u'testXbla')
 )
