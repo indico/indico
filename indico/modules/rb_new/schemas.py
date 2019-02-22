@@ -317,7 +317,7 @@ class CreateBookingSchema(Schema):
     class Meta:
         strict = True
 
-    @validates_schema
+    @validates_schema(skip_on_field_errors=True)
     def validate_dts(self, data):
         if data['start_dt'] >= data['end_dt']:
             raise ValidationError(_('Booking cannot end before it starts'))
