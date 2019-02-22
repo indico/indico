@@ -23,7 +23,7 @@ import setupUserMenu from 'indico/react/containers/UserMenu';
 import App from './components/App';
 
 import createRBStore, {history} from './store';
-import {init} from './actions';
+import {init, extendOverrides} from './actions';
 import {selectors as configSelectors} from './common/config';
 import {selectors as userSelectors, actions as userActions} from './common/user';
 import {actions as roomsActions} from './common/rooms';
@@ -37,6 +37,13 @@ export default function setup(overrides = {}, postReducers = []) {
     document.addEventListener('DOMContentLoaded', () => {
         const appContainer = document.getElementById('rb-app-container');
         const store = createRBStore(overrides, postReducers);
+
+        // Use this function whenever you would like to override
+        // a component e.g. from within a plugin without
+        // using the `setup` function
+        window.registerOverride = (externalOverrides) => {
+            store.dispatch(extendOverrides(externalOverrides));
+        };
 
         let oldPath = history.location.pathname;
         history.listen(({pathname: newPath}) => {
