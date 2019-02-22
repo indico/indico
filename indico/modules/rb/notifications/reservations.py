@@ -53,17 +53,6 @@ class ReservationNotification(object):
                 body = self._make_body(mail_params, reservation=self.reservation)
                 return make_email(to_list=to_list, subject=subject, body=body)
 
-    def compose_email_to_assistance(self, **mail_params):
-        from indico.modules.rb import rb_settings
-
-        if self.reservation.room.notification_for_assistance:
-            if self.reservation.needs_assistance or mail_params.get('assistance_cancelled'):
-                to_list = rb_settings.get('assistance_emails')
-                if to_list:
-                    subject = self._get_email_subject(**mail_params)
-                    body = self._make_body(mail_params, reservation=self.reservation)
-                    return make_email(to_list=to_list, subject=subject, body=body)
-
 
 @email_sender
 def notify_reset_approval(reservation):
@@ -97,11 +86,6 @@ def notify_cancellation(reservation):
         notification.compose_email_to_vc_support(
             subject='Booking cancelled on',
             template_name='cancellation_email_to_vc_support'
-        ),
-        notification.compose_email_to_assistance(
-            subject_prefix='[Support Request Cancellation]',
-            subject='Request cancelled for',
-            template_name='cancellation_email_to_assistance'
         )
     ])
 
@@ -123,11 +107,6 @@ def notify_confirmation(reservation):
         notification.compose_email_to_vc_support(
             subject='New Booking on',
             template_name='creation_email_to_vc_support'
-        ),
-        notification.compose_email_to_assistance(
-            subject_prefix='[Support Request]',
-            subject='New Support on',
-            template_name='creation_email_to_assistance'
         )
     ])
 
@@ -147,11 +126,6 @@ def notify_creation(reservation):
         notification.compose_email_to_vc_support(
             subject='New Booking on',
             template_name='creation_email_to_vc_support'
-        ),
-        notification.compose_email_to_assistance(
-            subject_prefix='[Support Request]',
-            subject='New Booking on',
-            template_name='creation_email_to_assistance'
         )
     ])
 
@@ -169,19 +143,12 @@ def notify_rejection(reservation):
         notification.compose_email_to_manager(
             subject='Booking rejected on',
             template_name='rejection_email_to_manager',
-        ),
-        notification.compose_email_to_assistance(
-            subject_prefix='[Support Request Cancellation]',
-            subject='Request cancelled for',
-            template_name='rejection_email_to_assistance',
         )
     ])
 
 
 @email_sender
 def notify_modification(reservation, changes):
-    assistance_change = changes.get('needs_assistance')
-    assistance_cancelled = assistance_change and assistance_change['old'] and not assistance_change['new']
     notification = ReservationNotification(reservation)
     return filter(None, [
         notification.compose_email_to_user(
@@ -195,12 +162,6 @@ def notify_modification(reservation, changes):
         notification.compose_email_to_vc_support(
             subject='Booking modified on',
             template_name='modification_email_to_vc_support'
-        ),
-        notification.compose_email_to_assistance(
-            subject_prefix='[Support Request {}]'.format('Cancelled' if assistance_cancelled else 'Modification'),
-            subject='Modified request on',
-            template_name='modification_email_to_assistance',
-            assistance_cancelled=assistance_cancelled
         )
     ])
 
