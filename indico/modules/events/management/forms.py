@@ -284,7 +284,7 @@ class PosterPrintingForm(IndicoForm):
     template = SelectField(_('Template'))
     margin_horizontal = FloatField(_('Horizontal margins'), [InputRequired()], default=0)
     margin_vertical = FloatField(_('Vertical margins'), [InputRequired()], default=0)
-    page_size = IndicoEnumSelectField(_('Page size'), enum=PageSize, default=PageSize.A4)
+    page_size = IndicoEnumSelectField(_('Page size'), enum=PageSize, default=PageSize.A4, sorted=True)
 
     def __init__(self, event, **kwargs):
         all_templates = set(event.designer_templates) | get_inherited_templates(event)
