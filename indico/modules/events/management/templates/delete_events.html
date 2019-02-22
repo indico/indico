@@ -3,10 +3,18 @@
 {% set ok_text=_("Delete events") %}
 
 {% set confirmation_message %}
-    {% trans -%}
-        Please note that if you delete the events you will lose all the information contained in them.
-        This operation is irreversible!
-    {%- endtrans %}
+    {% if num_bookings %}
+        {% trans strong='<strong>'|safe, endstrong='</strong>'|safe -%}
+            Please note that if you delete the events you will lose all the information contained in them,
+            {{ strong }}including {{ num_bookings }} Room Booking(s){{ endstrong }}.
+            This operation is irreversible!
+        {%- endtrans %}
+    {% else %}
+        {% trans -%}
+            Please note that if you delete the events you will lose all the information contained in them.
+            This operation is irreversible!
+        {%- endtrans %}
+    {% endif %}
 {% endset %}
 
 {% if events %}

@@ -35,6 +35,7 @@ from indico.modules.categories.util import get_image_data
 from indico.modules.categories.views import WPCategoryManagement
 from indico.modules.events import Event
 from indico.modules.events.util import update_object_principals
+from indico.modules.rb.models.reservations import Reservation, ReservationLink
 from indico.util.fs import secure_filename
 from indico.util.i18n import _, ngettext
 from indico.util.string import crc32
@@ -351,7 +352,15 @@ class RHDeleteEvents(RHManageCategorySelectedEventsBase):
     def _process(self):
         is_submitted = 'confirmed' in request.form
         if not is_submitted:
-            return jsonify_template('events/management/delete_events.html', events=self.events)
+            # find out which active bookings are linked to the events in question
+            num_bookings = (Reservation.query
+                            .join(ReservationLink)
+                            .join(Event, Event.id == ReservationLink.linked_event_id)
+                            .filter(Event.id.in_(e.id for e in self.events),
+                                    Reservation.is_pending | Reservation.is_accepted)
+                            .count())
+            return jsonify_template('events/management/delete_events.html',
+                                    events=self.events, num_bookings=num_bookings)
         for ev in self.events[:]:
             ev.delete('Bulk-deleted by category manager', session.user)
         flash(ngettext('You have deleted one event', 'You have deleted {} events', len(self.events))
