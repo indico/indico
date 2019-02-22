@@ -373,7 +373,7 @@ class BadgeSettingsForm(IndicoForm):
                                description=_("Save these values in the event settings"))
     dashed_border = BooleanField(_("Dashed border around each badge"), widget=SwitchWidget(),
                                  description=_("Display a dashed border around each badge"))
-    page_size = IndicoEnumSelectField(_('Page size'), enum=PageSize)
+    page_size = IndicoEnumSelectField(_('Page size'), enum=PageSize, sorted=True)
     page_orientation = IndicoEnumSelectField(_('Page orientation'), enum=PageOrientation)
     page_layout = IndicoEnumSelectField(_('Page layout'), enum=PageLayout,
                                         description=_('The single sided (foldable) option is only available if the '

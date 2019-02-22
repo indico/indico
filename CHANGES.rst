@@ -2,6 +2,16 @@ Changelog
 =========
 
 
+Version 2.1.8
+-------------
+
+*Unreleased*
+
+Improvements
+^^^^^^^^^^^^
+
+- Add A6 to page size options (:issue:`3793`)
+
 Version 2.1.7
 -------------
 

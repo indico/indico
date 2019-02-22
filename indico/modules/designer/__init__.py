@@ -38,7 +38,7 @@ class PageOrientation(RichIntEnum):
 
 
 class PageSize(RichIntEnum):
-    __titles__ = [None, 'A0', 'A1', 'A2', 'A3', 'A4', 'A5', 'Letter']
+    __titles__ = [None, 'A0', 'A1', 'A2', 'A3', 'A4', 'A5', 'Letter', 'A6']
     A0 = 1
     A1 = 2
     A2 = 3
@@ -46,6 +46,7 @@ class PageSize(RichIntEnum):
     A4 = 5
     A5 = 6
     letter = 7
+    A6 = 8
 
 
 class PageLayout(RichIntEnum):

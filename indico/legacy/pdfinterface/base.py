@@ -28,7 +28,7 @@ from PIL import Image as PILImage
 from reportlab import platypus
 from reportlab.lib.enums import TA_CENTER
 from reportlab.lib.fonts import addMapping
-from reportlab.lib.pagesizes import A0, A1, A2, A3, A4, A5, LETTER, landscape
+from reportlab.lib.pagesizes import A0, A1, A2, A3, A4, A5, A6, LETTER, landscape
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.units import cm, inch
 from reportlab.pdfbase import pdfmetrics
@@ -52,13 +52,16 @@ ratio = math.sqrt(math.sqrt(2.0))
 
 class PDFSizes:
     def __init__(self):
-        self.PDFpagesizes = {'Letter': LETTER,
-                             'A0': A3,
-                             'A1': A3,
-                             'A2': A3,
-                             'A3': A3,
-                             'A4': A4,
-                             'A5': A5}
+        self.PDFpagesizes = {
+            'Letter': LETTER,
+            'A0': A3,
+            'A1': A3,
+            'A2': A3,
+            'A3': A3,
+            'A4': A4,
+            'A5': A5,
+            'A6': A6
+        }
 
 
 def escape(text):
