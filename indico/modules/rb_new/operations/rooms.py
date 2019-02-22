@@ -25,11 +25,12 @@ from sqlalchemy.orm import joinedload, load_only, raiseload
 from indico.core.db import db
 from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.db.sqlalchemy.util.queries import db_dates_overlap, escape_like
-from indico.modules.rb import Reservation, rb_is_admin, rb_settings
+from indico.modules.rb import rb_is_admin, rb_settings
 from indico.modules.rb.models.equipment import EquipmentType, RoomEquipmentAssociation
 from indico.modules.rb.models.favorites import favorite_room_table
 from indico.modules.rb.models.principals import RoomPrincipal
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
+from indico.modules.rb.models.reservations import Reservation
 from indico.modules.rb.models.room_features import RoomFeature
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.statistics import calculate_rooms_occupancy

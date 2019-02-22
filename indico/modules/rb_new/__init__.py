@@ -21,7 +21,11 @@ from flask import session
 from indico.core import signals
 from indico.core.config import config
 from indico.core.permissions import ManagementPermission
-from indico.modules.rb import Room
+from indico.modules.rb import Room, rb_settings
+from indico.modules.rb.models.blocking_principals import BlockingPrincipal
+from indico.modules.rb.models.blockings import Blocking
+from indico.modules.rb.models.principals import RoomPrincipal
+from indico.modules.rb.models.reservations import Reservation, ReservationLink
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem, TopMenuItem
@@ -38,6 +42,27 @@ def _sidemenu_items(sender, event, **kwargs):
     if config.ENABLE_ROOMBOOKING and event.can_manage(session.user):
         yield SideMenuItem('room_booking', _('Room Booking'), url_for('rooms_new.event_booking_list', event), 50,
                            icon='location')
+
+
+@signals.users.merged.connect
+def _merge_users(target, source, **kwargs):
+    Blocking.query.filter_by(created_by_id=source.id).update({Blocking.created_by_id: target.id})
+    BlockingPrincipal.merge_users(target, source, 'blocking')
+    Reservation.query.filter_by(created_by_id=source.id).update({Reservation.created_by_id: target.id})
+    Reservation.query.filter_by(booked_for_id=source.id).update({Reservation.booked_for_id: target.id})
+    Room.query.filter_by(owner_id=source.id).update({Room.owner_id: target.id})
+    RoomPrincipal.merge_users(target, source, 'room')
+    rb_settings.acls.merge_users(target, source)
+
+
+@signals.event.deleted.connect
+def _event_deleted(event, user, **kwargs):
+    reservation_links = (event.all_room_reservation_links
+                         .join(Reservation)
+                         .filter(~ReservationLink.is_rejected, ~ReservationLink.is_cancelled)
+                         .all())
+    for link in reservation_links:
+        link.reservation.cancel(user or session.user, 'Associated event was deleted')
 
 
 class BookPermission(ManagementPermission):

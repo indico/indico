@@ -22,10 +22,7 @@ from indico.core import signals
 from indico.core.config import config
 from indico.core.logger import Logger
 from indico.core.settings import SettingsProxy
-from indico.modules.rb.models.blocking_principals import BlockingPrincipal
-from indico.modules.rb.models.blockings import Blocking
 from indico.modules.rb.models.locations import Location
-from indico.modules.rb.models.reservations import Reservation
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.util import rb_is_admin
 from indico.util.i18n import _
@@ -71,26 +68,6 @@ def _extend_admin_menu(sender, **kwargs):
 @signals.menu.sections.connect_via('admin-sidemenu')
 def _sidemenu_sections(sender, **kwargs):
     yield SideMenuSection('roombooking', _("Room Booking"), 70, icon='location')
-
-
-@signals.users.merged.connect
-def _merge_users(target, source, **kwargs):
-    BlockingPrincipal.merge_users(target, source, 'blocking')
-    Blocking.find(created_by_id=source.id).update({Blocking.created_by_id: target.id})
-    Reservation.find(created_by_id=source.id).update({Reservation.created_by_id: target.id})
-    Reservation.find(booked_for_id=source.id).update({Reservation.booked_for_id: target.id})
-    Room.find(owner_id=source.id).update({Room.owner_id: target.id})
-    rb_settings.acls.merge_users(target, source)
-
-
-@signals.event.deleted.connect
-def _event_deleted(event, user, **kwargs):
-    reservations = (Reservation.query.with_parent(event)
-                    .filter(~Reservation.is_cancelled,
-                            ~Reservation.is_rejected)
-                    .all())
-    for resv in reservations:
-        resv.cancel(user or session.user, 'Associated event was deleted')
 
 
 @signals.menu.sections.connect_via('rb-sidemenu')

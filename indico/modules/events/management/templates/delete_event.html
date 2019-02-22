@@ -1,10 +1,19 @@
 {% from 'confirmation_dialog.html' import confirmation_dialog %}
 
+{% set num_bookings = event.all_room_reservation_links.count() %}
 {% set confirmation_message %}
-    {% trans -%}
-        Please note that if you delete the event you will lose all the information contained in it.
-        This operation is irreversible!
-    {%- endtrans %}
+    {% if num_bookings %}
+        {% trans strong='<strong>'|safe, endstrong='</strong>'|safe -%}
+            Please note that if you delete the event you will lose all the information contained in it,
+            {{ strong }}including {{ num_bookings }} Room Booking(s){{ endstrong }} linked to it.
+            This operation is irreversible!
+        {%- endtrans %}
+    {% else %}
+        {% trans -%}
+            Please note that if you delete the event you will lose all the information contained in it.
+            This operation is irreversible!
+        {%- endtrans %}
+    {% endif %}
 {% endset %}
 
 {% call confirmation_dialog('danger', message=confirmation_message, ok_text=_('Delete event')) %}
