@@ -157,11 +157,6 @@ class Room(versioned_cache(_cache, 'id'), ProtectionManagersMixin, db.Model, Ser
         db.Integer,
         nullable=True
     )
-    notification_for_assistance = db.Column(
-        db.Boolean,
-        nullable=False,
-        default=False
-    )
     reservations_need_confirmation = db.Column(
         db.Boolean,
         nullable=False,

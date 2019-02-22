@@ -144,7 +144,7 @@ class Reservation(Serializer, db.Model):
         'id', ('start_dt', 'startDT'), ('end_dt', 'endDT'), 'repeat_frequency', 'repeat_interval',
         ('booked_for_name', 'bookedForName'), ('details_url', 'bookingUrl'), ('booking_reason', 'reason'),
         ('uses_vc', 'usesAVC'), ('needs_vc_assistance', 'needsAVCSupport'),
-        'needs_assistance', ('is_accepted', 'isConfirmed'), ('is_accepted', 'isValid'), 'is_cancelled',
+        ('is_accepted', 'isConfirmed'), ('is_accepted', 'isValid'), 'is_cancelled',
         'is_rejected', ('location_name', 'location'), ('contact_email', 'booked_for_user_email')
     ]
 
@@ -229,11 +229,6 @@ class Reservation(Serializer, db.Model):
         default=False
     )
     needs_vc_assistance = db.Column(
-        db.Boolean,
-        nullable=False,
-        default=False
-    )
-    needs_assistance = db.Column(
         db.Boolean,
         nullable=False,
         default=False
@@ -387,7 +382,7 @@ class Reservation(Serializer, db.Model):
         """
 
         populate_fields = ('start_dt', 'end_dt', 'repeat_frequency', 'repeat_interval', 'room_id', 'contact_email',
-                           'contact_phone', 'booking_reason', 'needs_assistance', 'uses_vc', 'needs_vc_assistance')
+                           'contact_phone', 'booking_reason', 'uses_vc', 'needs_vc_assistance')
         if data['repeat_frequency'] == RepeatFrequency.NEVER and data['start_dt'].date() != data['end_dt'].date():
             raise ValueError('end_dt != start_dt for non-repeating booking')
 
@@ -638,7 +633,7 @@ class Reservation(Serializer, db.Model):
 
         populate_fields = ('start_dt', 'end_dt', 'repeat_frequency', 'repeat_interval', 'booked_for_user',
                            'contact_email', 'contact_phone', 'booking_reason',
-                           'needs_assistance', 'uses_vc', 'needs_vc_assistance')
+                           'uses_vc', 'needs_vc_assistance')
         # fields affecting occurrences
         occurrence_fields = {'start_dt', 'end_dt', 'repeat_frequency', 'repeat_interval'}
         # fields where date and time are compared separately
@@ -656,7 +651,6 @@ class Reservation(Serializer, db.Model):
             'contact_email': u"contact email",
             'contact_phone': u"contact phone number",
             'booking_reason': u"booking reason",
-            'needs_assistance': u"option 'General Assistance'",
             'uses_vc': u"option 'Uses Videoconference'",
             'needs_vc_assistance': u"option 'Videoconference Setup Assistance'"
         }
