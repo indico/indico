@@ -59,7 +59,7 @@ def _merge_users(target, source, **kwargs):
 def _event_deleted(event, user, **kwargs):
     reservation_links = (event.all_room_reservation_links
                          .join(Reservation)
-                         .filter(~ReservationLink.is_rejected, ~ReservationLink.is_cancelled)
+                         .filter(~Reservation.is_rejected, ~Reservation.is_cancelled)
                          .all())
     for link in reservation_links:
         link.reservation.cancel(user or session.user, 'Associated event was deleted')
