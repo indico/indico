@@ -568,6 +568,7 @@ class BookRoomModal extends React.Component {
                                            required={reasonRequired} />
                                     <Overridable id="BookRoomModal.extraFields"
                                                  disabled={bookingBlocked(fprops)}
+                                                 form={fprops.form}
                                                  room={room} />
                                 </Segment>
                                 {!link && !fprops.submitSucceeded && (
