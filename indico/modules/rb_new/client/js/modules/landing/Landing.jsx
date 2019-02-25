@@ -34,7 +34,7 @@ import * as landingSelectors from './selectors';
 import './Landing.module.scss';
 
 
-class Landing extends React.Component {
+export class Landing extends React.Component {
     static propTypes = {
         actions: PropTypes.exact({
             setFilters: PropTypes.func.isRequired,
