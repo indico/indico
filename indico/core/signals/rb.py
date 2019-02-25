@@ -23,15 +23,20 @@ _signals = Namespace()
 
 
 booking_created = _signals.signal('booking-created', """
-Executed after a successful booking has been made. The *sender*
+Executed after a booking has been successfully created. The *sender*
 is the new `Reservation` object.
 """)
 
 booking_state_changed = _signals.signal('booking-state-changed', """
-Executed after a booking was cancelled/rejected/accepted. The *sender*
+Executed after a booking has been cancelled/rejected/accepted. The *sender*
 is the `Reservation` object.
 """)
 
 booking_deleted = _signals.signal('booking-deleted', """
-Executed after a booking was deleted. The *sender* is the `Reservation` object.
+Executed after a booking has been deleted. The *sender* is the `Reservation` object.
+""")
+
+booking_occurrence_state_changed = _signals.signal('booking-occurrence-state-changed', """
+Executed after the state of a booking occurrence changed.
+The *sender* is the `ReservationOccurrence` object.
 """)
