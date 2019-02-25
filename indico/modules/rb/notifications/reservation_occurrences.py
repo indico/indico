@@ -52,11 +52,6 @@ def notify_cancellation(occurrence):
         notification.compose_email_to_vc_support(
             subject='Booking cancelled on',
             template_name='occurrence_cancellation_email_to_vc_support'
-        ),
-        notification.compose_email_to_assistance(
-            subject_prefix='[Support Request Cancellation]',
-            subject='Request cancelled for',
-            template_name='occurrence_cancellation_email_to_assistance'
         )
     ])
 
@@ -74,11 +69,6 @@ def notify_rejection(occurrence):
         notification.compose_email_to_manager(
             subject='Booking rejected on',
             template_name='occurrence_rejection_email_to_manager'
-        ),
-        notification.compose_email_to_assistance(
-            subject_prefix='[Support Request Cancellation]',
-            subject='Request cancelled for',
-            template_name='occurrence_rejection_email_to_assistance'
         )
     ])
 
