@@ -267,11 +267,13 @@ class BookingEditForm extends React.Component {
                            disabled={submitting || submitSucceeded}
                            isEqual={_.isEqual}
                            render={this.renderDateForm} />
-                    <Field name="timeSlot"
-                           onChange={(newTimeSlot) => onBookingPeriodChange(dates, newTimeSlot, recurrence)}
-                           disabled={submitting || submitSucceeded}
-                           isEqual={_.isEqual}
-                           render={this.renderTimeForm} />
+                    {!hideOptions.timeSlot && (
+                        <Field name="timeSlot"
+                               onChange={(newTimeSlot) => onBookingPeriodChange(dates, newTimeSlot, recurrence)}
+                               disabled={submitting || submitSucceeded}
+                               isEqual={_.isEqual}
+                               render={this.renderTimeForm} />
+                    )}
                 </Segment>
                 <Segment color="blue" inverted>
                     <Form.Group>
