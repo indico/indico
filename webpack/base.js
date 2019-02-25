@@ -189,10 +189,9 @@ export function webpackDefaults(env, config, bundles) {
     }
 
     const indicoClientPath = globalBuildConfig.clientPath;
-    const urlMapPath = path.resolve(globalBuildConfig.rootPath, '..', 'url_map.json');
     const babelPlugins = [['flask-urls', {
         importPrefix: 'indico-url',
-        urlMap: require(urlMapPath).rules,
+        urlMap: require(config.build.urlMapPath).rules,
         basePath: globalBuildConfig.baseURLPath,
     }]];
 

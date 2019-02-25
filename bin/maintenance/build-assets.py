@@ -57,6 +57,7 @@ def _get_webpack_build_config(url_root='/'):
             'baseURLPath': url_root,
             'clientPath': os.path.join(root_path, 'web', 'client'),
             'rootPath': root_path,
+            'urlMapPath': os.path.normpath(os.path.join(root_path, '..', 'url_map.json')),
             'staticPath': os.path.join(root_path, 'web', 'static'),
             'staticURL': url_root.rstrip('/') + '/',
             'distPath': os.path.join(root_path, 'web', 'static', 'dist'),
@@ -109,6 +110,7 @@ def _get_plugin_webpack_build_config(plugin_dir, url_root='/'):
     plugin_name = packages[0].replace('indico_', '')  # XXX: find a better solution for this
     return {
         'isPlugin': True,
+        'plugin': plugin_name,
         'indico': {
             'build': core_config['build']
         },
@@ -116,6 +118,7 @@ def _get_plugin_webpack_build_config(plugin_dir, url_root='/'):
             'indicoSourcePath': os.path.abspath('.'),
             'clientPath': os.path.join(plugin_root_path, 'client'),
             'rootPath': plugin_root_path,
+            'urlMapPath': os.path.join(plugin_dir, 'url_map.json'),
             'staticPath': os.path.join(plugin_root_path, 'static'),
             'staticURL': os.path.join(url_root, 'static', 'plugins', plugin_name) + '/',
             'distPath': os.path.join(plugin_root_path, 'static', 'dist'),
@@ -170,7 +173,8 @@ def build_indico(dev, clean, watch, url_root):
     if clean:
         _clean(webpack_build_config)
     force_url_map = ['--force'] if clean or not dev else []
-    subprocess.check_call(['python', 'bin/maintenance/dump_url_map.py'] + force_url_map)
+    url_map_path = webpack_build_config['build']['urlMapPath']
+    subprocess.check_call(['python', 'bin/maintenance/dump_url_map.py', '--output', url_map_path] + force_url_map)
     args = _get_webpack_args(dev, watch)
     try:
         subprocess.check_call(['npx', 'webpack'] + args)
@@ -223,7 +227,10 @@ def build_plugin(plugin_dir, dev, clean, watch, url_root):
     if clean:
         _clean(webpack_build_config, plugin_dir)
     force_url_map = ['--force'] if clean or not dev else []
-    subprocess.check_call(['python', 'bin/maintenance/dump_url_map.py'] + force_url_map)
+    url_map_path = webpack_build_config['build']['urlMapPath']
+    subprocess.check_call(['python', 'bin/maintenance/dump_url_map.py',
+                           '--output', url_map_path,
+                           '--plugin', webpack_build_config['plugin']] + force_url_map)
     webpack_config_file = os.path.join(plugin_dir, 'webpack.config.js')
     if not os.path.exists(webpack_config_file):
         webpack_config_file = 'plugin.webpack.config.js'

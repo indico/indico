@@ -24,9 +24,6 @@ import click
 from flask_url_map_serializer import dump_url_map
 
 
-URL_MAP_FILE = 'url_map.json'
-
-
 def get_map_version():
     # build a version identifier that is very likely to be different
     # whenever something changed
@@ -38,32 +35,34 @@ def get_map_version():
     return h.hexdigest()
 
 
-def get_rules():
+def get_rules(plugin):
     from indico.web.flask.app import make_app
     app = make_app(set_path=True, testing=True, config_override={'BASE_URL': 'http://localhost/',
-                                                                 'SECRET_KEY': '*' * 16})
+                                                                 'SECRET_KEY': '*' * 16,
+                                                                 'PLUGINS': {plugin} if plugin else set()})
     return dump_url_map(app.url_map)
 
 
 @click.command()
 @click.option('-f', '--force', is_flag=True, help='Force rebuilding the URL map')
-def main(force):
+@click.option('-o', '--output', default='url_map.json', help='Output file for the URL map')
+@click.option('-p', '--plugin', help='Include URLs from the specified plugin')
+def main(force, output, plugin=None):
     """
     Dumps the URL routing map to JSON for use by the `babel-flask-url` babel plugin.
     """
-    os.chdir(os.path.join(os.path.dirname(__file__), '..', '..'))
     try:
-        with open(URL_MAP_FILE) as f:
+        with open(output) as f:
             data = json.load(f)
     except IOError:
         data = {}
     version = get_map_version()
     if not force and data.get('version') == version:
         return
-    rules = get_rules()
+    rules = get_rules(plugin)
     data['version'] = version
     data['rules'] = rules
-    with open(URL_MAP_FILE, 'w') as f:
+    with open(output, 'w') as f:
         json.dump(data, f, sort_keys=True, indent=2)
 
 
