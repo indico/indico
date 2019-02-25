@@ -2,8 +2,8 @@
 {% from 'events/display/indico/_common.html' import render_location %}
 {% from 'events/timetable/display/indico/_common.html' import render_description, render_time %}
 
-{% macro render_break(item, event, parent=none, timezone=none, show_notes=true, hide_end_time=false, nested=false,
-                      show_location=false) %}
+{% macro render_break(item, event, theme_settings, parent=none, timezone=none, show_notes=true,
+                      hide_end_time=false, nested=false, show_location=false) %}
     <li class="timetable-item timetable-break">
         <span class="timetable-time break {{ 'nested' if nested else 'top-level' }}">
             {{ render_time(item, timezone=timezone, hide_end_time=hide_end_time) }}
@@ -14,7 +14,7 @@
                 <span class="timetable-title {{ 'top-level' if not nested }} break">
                     {{- item.title -}}
                 </span>
-                {% if item.duration -%}
+                {% if item.duration and not theme_settings.hide_duration -%}
                     <span class="icon-time timetable-duration">
                         {{ item.duration | format_human_timedelta(narrow=true) }}
                     </span>

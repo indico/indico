@@ -4,7 +4,7 @@
 {% from 'events/timetable/display/indico/_common.html' import render_speakers, render_references, render_attachments,
                                                               render_notes, render_description, render_time %}
 
-{% macro render_contribution(contrib, event, parent=none, nested=false, hide_end_time=false, timezone=none,
+{% macro render_contribution(contrib, event, theme_settings, parent=none, nested=false, hide_end_time=false, timezone=none,
                              show_notes=false, show_location=false) -%}
     {% set anchor = slugify(contrib.friendly_id, contrib.title, maxlen=30) %}
     <li class="timetable-item timetable-contrib" id="{{ anchor }}">
@@ -17,7 +17,7 @@
                 <span class="timetable-title {{ 'nested' if nested }}" data-anchor="{{ anchor }}">
                     {{- contrib.title -}}
                 </span>
-                {% if contrib.duration -%}
+                {% if contrib.duration and not theme_settings.hide_duration -%}
                     <span class="icon-time timetable-duration">
                         {{- contrib.duration | format_human_timedelta(narrow=true) -}}
                     </span>
@@ -52,7 +52,7 @@
             {% if contrib.subcontributions %}
                 <ul class="subcontrib-list">
                     {% for subcont in contrib.subcontributions %}
-                        {{ render_subcontribution(subcont, event, show_notes=show_notes) }}
+                        {{ render_subcontribution(subcont, event, theme_settings, show_notes=show_notes) }}
                     {% endfor %}
                 </ul>
             {% endif %}

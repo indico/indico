@@ -3,7 +3,7 @@
                                                               render_notes, render_description, render_time %}
 
 
-{% macro render_subcontribution(subcontrib, event, show_notes=true) %}
+{% macro render_subcontribution(subcontrib, event, theme_settings, show_notes=true) %}
     {% set contrib = subcontrib.contribution %}
     {% set anchor = slugify('sc', contrib.friendly_id, subcontrib.friendly_id, subcontrib.title, maxlen=30) %}
     <li class="timetable-subcontrib timetable-item" id="{{ anchor }}">
@@ -12,7 +12,7 @@
                 <span class="timetable-title" data-anchor="{{ anchor }}">
                     {{- subcontrib.title -}}
                 </span>
-                {% if subcontrib.duration %}
+                {% if subcontrib.duration and not theme_settings.hide_duration %}
                     <span class="icon-time timetable-duration">
                         {{- subcontrib.duration | format_human_timedelta(narrow=true) -}}
                     </span>
