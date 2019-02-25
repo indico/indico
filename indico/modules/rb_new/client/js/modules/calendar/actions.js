@@ -61,8 +61,10 @@ export function setMode(mode) {
 async function fetchCalendarRooms(dispatch, state) {
     const roomFilters = getRoomFilters(state);
     const searchParams = preProcessParameters({...roomFilters}, roomSearchAjaxRules);
-    const isAdmin = userSelectors.isUserAdminOverrideEnabled(state);
-    searchParams.is_admin = isAdmin;
+
+    if (userSelectors.isUserAdminOverrideEnabled(state)) {
+        searchParams.is_admin = true;
+    }
 
     let response;
 
