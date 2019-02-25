@@ -5,8 +5,8 @@
 {% from 'events/timetable/display/indico/_contribution.html' import render_contribution %}
 {% from 'events/timetable/display/indico/_break.html' import render_break %}
 
-{% macro render_session_block(block, event, parent=none, timezone=none, show_notes=false, hide_contribs=false,
-                              show_location=false, show_children_location=false) %}
+{% macro render_session_block(block, event, theme_settings, parent=none, timezone=none, show_notes=false,
+                              hide_contribs=false, show_location=false, show_children_location=false) %}
     {% set session_ = block.session %}
     {% set entries = block.timetable_entry.children %}
 
@@ -61,12 +61,12 @@
                     {# It's impossible to sort by `lambda:` with Jinja, hence the double-sort #}
                     {% for entry in entries|sort(attribute='object.title')|sort(attribute='start_dt') %}
                         {% if entry.type.name == 'CONTRIBUTION' and entry.object.can_access(session.user) %}
-                            {{ render_contribution(entry.contribution, event, nested=true, hide_end_time=true,
-                                                   show_notes=show_notes, timezone=timezone, parent=block,
-                                                   show_location=show_children_location) }}
+                            {{ render_contribution(entry.contribution, event, theme_settings, nested=true,
+                                                   hide_end_time=true, show_notes=show_notes, timezone=timezone,
+                                                   parent=block, show_location=show_children_location) }}
                         {% elif entry.type.name == 'BREAK' %}
-                            {{ render_break(entry.break_, event, nested=true, hide_end_time=true, timezone=timezone,
-                                            show_location=show_children_location) }}
+                            {{ render_break(entry.break_, event, theme_settings, nested=true, hide_end_time=true,
+                                            timezone=timezone, show_location=show_children_location) }}
                         {% endif %}
                     {% endfor %}
                 </ul>

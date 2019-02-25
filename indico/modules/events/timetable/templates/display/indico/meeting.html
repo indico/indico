@@ -41,17 +41,18 @@
             {%- endif %}
 
             {% if item.type.name == 'CONTRIBUTION' -%}
-                {{ render_contribution(item.object, event, nested=false, timezone=timezone,
+                {{ render_contribution(item.object, event, theme_settings, nested=false, timezone=timezone,
                                        show_notes=theme_settings.show_notes, parent=event,
                                        show_location=show_siblings_location) }}
             {%- elif item.type.name == 'SESSION_BLOCK' -%}
-                {{ render_session_block(item.object, event, timezone=timezone, show_notes=theme_settings.show_notes,
-                                        parent=event, hide_contribs=hide_contribs,
+                {{ render_session_block(item.object, event, theme_settings, timezone=timezone,
+                                        show_notes=theme_settings.show_notes, parent=event, hide_contribs=hide_contribs,
                                         show_location=show_siblings_location,
                                         show_children_location=show_children_location[item.id]) }}
             {%- elif item.type.name == 'BREAK' -%}
-                {{ render_break(item.object, event, nested=false, timezone=timezone, show_notes=theme_settings.show_notes,
-                                parent=event, show_location=show_siblings_location) }}
+                {{ render_break(item.object, event, theme_settings, nested=false, timezone=timezone,
+                                show_notes=theme_settings.show_notes, parent=event,
+                                show_location=show_siblings_location) }}
             {%- endif %}
         {%- endfor %}
 
