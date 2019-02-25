@@ -470,7 +470,6 @@ class Reservation(Serializer, db.Model):
         self.state = ReservationState.accepted
         self.add_edit_log(ReservationEditLog(user_name=user.full_name, info=['Reservation accepted']))
 
-        signals.rb.booking_state_changed.send(self)
         notify_confirmation(self)
 
         valid_occurrences = self.occurrences.filter(ReservationOccurrence.is_valid).all()
@@ -484,7 +483,6 @@ class Reservation(Serializer, db.Model):
         self.state = ReservationState.pending
 
         notify_reset_approval(self)
-        signals.rb.booking_state_changed.send(self)
 
         self.add_edit_log(ReservationEditLog(user_name=user.full_name, info=['Requiring new approval due to change']))
 
@@ -496,7 +494,6 @@ class Reservation(Serializer, db.Model):
             ReservationOccurrence.rejection_reason: reason
         }, synchronize_session='fetch')
 
-        signals.rb.booking_state_changed.send(self)
         if not silent:
             notify_cancellation(self)
             log_msg = u'Reservation cancelled: {}'.format(reason) if reason else 'Reservation cancelled'
@@ -510,7 +507,6 @@ class Reservation(Serializer, db.Model):
             ReservationOccurrence.rejection_reason: reason
         }, synchronize_session='fetch')
 
-        signals.rb.booking_state_changed.send(self)
         if not silent:
             notify_rejection(self)
             log_msg = u'Reservation rejected: {}'.format(reason)
