@@ -107,7 +107,6 @@ class BookingEditForm extends React.Component {
                                 input.onChange(value);
                                 onChange(value);
                             }} />
-
         );
     };
 
