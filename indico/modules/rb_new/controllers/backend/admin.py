@@ -31,7 +31,6 @@ from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.room_attributes import RoomAttribute, RoomAttributeAssociation
 from indico.modules.rb.models.room_features import RoomFeature
 from indico.modules.rb.util import rb_is_admin
-from indico.modules.rb_new.controllers.backend.common import room_args
 from indico.modules.rb_new.controllers.backend.rooms import RHRoomsPermissions
 from indico.modules.rb_new.operations.admin import (update_room, update_room_attributes, update_room_availability,
                                                     update_room_equipment)
@@ -39,6 +38,7 @@ from indico.modules.rb_new.schemas import (admin_equipment_type_schema, admin_lo
                                            nonbookable_periods_schema, room_attribute_schema,
                                            room_attribute_values_schema, room_equipment_schema, room_feature_schema,
                                            room_update_schema)
+from indico.modules.users.models.users import User
 from indico.util.i18n import _
 from indico.util.marshmallow import ModelList
 
@@ -327,8 +327,36 @@ class RHRoom(RHRoomAdminBase):
         return jsonify(room_update_schema.dump(self.room).data)
 
 
+class _UserField(fields.Field):
+    def _deserialize(self, value, attr, data, **kwargs):
+        return User.get(value, is_deleted=False)
+
+
 class RHUpdateRoom(RHRoomAdminBase):
-    @use_args(room_args)
+    @use_args({
+        'verbose_name': fields.Str(allow_none=True),
+        'site': fields.Str(allow_none=True),
+        'building': fields.String(validate=lambda x: x is not None),
+        'floor': fields.String(validate=lambda x: x is not None),
+        'number': fields.String(validate=lambda x: x is not None),
+        'longitude': fields.Float(allow_none=True),
+        'latitude': fields.Float(allow_none=True),
+        'is_reservable': fields.Bool(allow_none=True),
+        'reservations_need_confirmation': fields.Bool(allow_none=True),
+        'notification_before_days': fields.Int(validate=lambda x: 1 <= x <= 30, allow_none=True),
+        'notification_before_days_weekly': fields.Int(validate=lambda x: 1 <= x <= 30, allow_none=True),
+        'notification_before_days_monthly': fields.Int(validate=lambda x: 1 <= x <= 30, allow_none=True),
+        'notifications_enabled': fields.Bool(),
+        'booking_limit_days': fields.Int(validate=lambda x: x >= 1, allow_none=True),
+        'owner': _UserField(load_from='owner_id', validate=lambda x: x is not None, allow_none=True),
+        'key_location': fields.Str(),
+        'telephone': fields.Str(),
+        'capacity': fields.Int(validate=lambda x: x >= 1),
+        'division': fields.Str(allow_none=True),
+        'surface_area': fields.Int(validate=lambda x: x >= 0, allow_none=True),
+        'max_advance_days': fields.Int(validate=lambda x: x >= 1, allow_none=True),
+        'comments': fields.Str(),
+    })
     def _process(self, args):
         update_room(self.room, args)
         RHRoomsPermissions._jsonify_user_permissions.clear_cached(session.user)
