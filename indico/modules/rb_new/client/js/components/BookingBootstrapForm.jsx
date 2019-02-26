@@ -21,7 +21,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {Button, Form, Select} from 'semantic-ui-react';
 import {SingleDatePicker, DateRangePicker} from 'indico/react/components';
-import {Translate} from 'indico/react/i18n';
+import {PluralTranslate, Translate} from 'indico/react/i18n';
 import {Overridable} from 'indico/react/util';
 import {serializeDate, serializeTime} from 'indico/utils/date';
 import TimeRangePicker from './TimeRangePicker';
@@ -171,8 +171,8 @@ class BookingBootstrapForm extends React.Component {
 
         const {buttonCaption, buttonDisabled, children, dayBased, onlyDaily} = this.props;
         const recurrenceOptions = [
-            {text: Translate.string('Weeks'), value: 'week'},
-            {text: Translate.string('Months'), value: 'month'}
+            {text: PluralTranslate.string('Week', 'Weeks', number), value: 'week'},
+            {text: PluralTranslate.string('Month', 'Months', number), value: 'month'}
         ];
 
         return (

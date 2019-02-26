@@ -29,7 +29,7 @@ import {ReduxFormField, ReduxRadioField, formatters, validators as v} from 'indi
 import {SingleDatePicker, DatePeriodField} from 'indico/react/components';
 import {serializeDate, serializeTime, toMoment} from 'indico/utils/date';
 import {Overridable} from 'indico/react/util';
-import {Translate} from 'indico/react/i18n';
+import {PluralTranslate, Translate} from 'indico/react/i18n';
 import TimeRangePicker from '../../components/TimeRangePicker';
 import {selectors as userSelectors} from '../user';
 import {sanitizeRecurrence} from '../../util';
@@ -91,9 +91,11 @@ class BookingEditForm extends React.Component {
 
 
     renderIntervalDropdown = ({input, onChange, ...fieldProps}) => {
+        const {formProps: {values: {recurrence: {number}}}} = this.props;
+
         const recurrenceOptions = [
-            {text: Translate.string('Weeks'), value: 'week'},
-            {text: Translate.string('Months'), value: 'month'}
+            {text: PluralTranslate.string('Week', 'Weeks', number), value: 'week'},
+            {text: PluralTranslate.string('Month', 'Months', number), value: 'month'}
         ];
 
         return (

@@ -19,7 +19,7 @@ import React from 'react';
 import {Form, Input, Radio, Select} from 'semantic-ui-react';
 import PropTypes from 'prop-types';
 
-import {Translate} from 'indico/react/i18n';
+import {PluralTranslate, Translate} from 'indico/react/i18n';
 
 import {FilterFormComponent} from '../../../common/filters';
 
@@ -67,11 +67,11 @@ export default class RecurrenceForm extends FilterFormComponent {
         const intervalOptions = [
             {
                 value: 'week',
-                text: Translate.string('Weeks')
+                text: PluralTranslate.string('Week', 'Weeks', number)
             },
             {
                 value: 'month',
-                text: Translate.string('Months')
+                text: PluralTranslate.string('Month', 'Months', number)
             }
         ];
 
