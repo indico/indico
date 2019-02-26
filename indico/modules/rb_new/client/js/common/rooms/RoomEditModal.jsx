@@ -322,7 +322,7 @@ class RoomEditModal extends React.Component {
         roomAttributes: null,
         roomAvailability: null,
         roomEquipment: null,
-        submitted: false,
+        submitState: '',
         closing: false,
     };
 
@@ -433,6 +433,7 @@ class RoomEditModal extends React.Component {
         }
         const {availableEquipment, nonbookablePeriods, bookableHours, attributes} = changedValues;
 
+        let submitState = 'success';
         try {
             await this.saveBasicDetails(roomId, basicDetails);
             await this.saveEquipment(roomId, availableEquipment);
@@ -440,10 +441,11 @@ class RoomEditModal extends React.Component {
             await this.saveAvailability(roomId, changedValues, nonbookablePeriods, bookableHours);
         } catch (e) {
             handleAxiosError(e);
+            submitState = 'error';
         }
         // reload room so the form gets new initialValues
         await this.fetchRoomData();
-        this.setState({submitted: true});
+        this.setState({submitState});
     };
 
     async saveBasicDetails(roomId, basicDetails) {
@@ -621,7 +623,7 @@ class RoomEditModal extends React.Component {
 
     renderModalContent = (fprops) => {
         const {hasValidationErrors, pristine, submitting} = fprops;
-        const {submitted} = this.state;
+        const {submitState} = this.state;
         return (
             <>
                 <Modal.Header>
@@ -635,11 +637,14 @@ class RoomEditModal extends React.Component {
                             <Grid.Column>{columns[1].map(this.renderContent)}</Grid.Column>
                             <Grid.Column>
                                 {columns[2].map(this.renderContent)}
-                                <Message styleName="success-message"
-                                         positive
-                                         hidden={!submitted}>
+                                <Message styleName="submit-message" positive hidden={submitState !== 'success'}>
                                     <Translate>
                                         Room has been successfully updated.
+                                    </Translate>
+                                </Message>
+                                <Message styleName="submit-message" negative hidden={submitState !== 'error'}>
+                                    <Translate>
+                                        Room could not be updated.
                                     </Translate>
                                 </Message>
                             </Grid.Column>
@@ -661,7 +666,7 @@ class RoomEditModal extends React.Component {
                 <FormSpy subscription={{dirty: true}}
                          onChange={({dirty}) => {
                              if (dirty) {
-                                 this.setState({submitted: false});
+                                 this.setState({submitState: ''});
                              }
                          }} />
             </>
