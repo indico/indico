@@ -60,7 +60,7 @@ function isInvalidNotificationPeriod(days) {
 function validate(fields) {
     const {
         building, floor, number, capacity, surfaceArea, maxAdvanceDays, bookingLimitDays, nonbookablePeriods,
-        notificationBeforeDays, notificationBeforeDaysWeekly, notificationBeforeDaysMonthly,
+        notificationBeforeDays, notificationBeforeDaysWeekly, notificationBeforeDaysMonthly, owner,
     } = fields;
     const errors = {};
     if (!building) {
@@ -95,6 +95,9 @@ function validate(fields) {
     }
     if (nonbookablePeriods && nonbookablePeriods.some(x => !x.startDt || !x.endDt)) {
         errors.nonbookablePeriods = Translate.string('Please provide valid non-bookable periods.');
+    }
+    if (!owner) {
+        errors.owner = Translate.string('You need to specify the owner of the toom.');
     }
     return errors;
 }
@@ -428,7 +431,7 @@ class RoomEditModal extends React.Component {
         const {roomId} = this.props;
         const changedValues = getChangedValues(data, form);
         const basicDetails = _.omit(changedValues, ['attributes', 'bookableHours', 'nonbookablePeriods', 'availableEquipment', 'owner']);
-        if ('owner' in changedValues) {
+        if (changedValues.owner) {
             basicDetails.owner_id = changedValues.owner.id;
         }
         const {availableEquipment, nonbookablePeriods, bookableHours, attributes} = changedValues;
@@ -561,6 +564,7 @@ class RoomEditModal extends React.Component {
                            as={PrincipalSearchField}
                            favoriteUsers={favoriteUsers}
                            label={content.label}
+                           allowNull
                            required />
                 );
             case 'formgroup':
