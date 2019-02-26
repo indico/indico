@@ -30,7 +30,9 @@ function min(minValue) {
         }
 
         const val = parseInt(value, 10);
-        return val >= minValue ? undefined : Translate.string(`Value should be greater than or equal to ${minValue}`);
+        if (val < minValue) {
+            return Translate.string('Value should be greater than or equal to {minValue}', {minValue});
+        }
     };
 }
 

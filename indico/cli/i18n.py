@@ -151,8 +151,7 @@ for cmd_name in cmd_list:
 
 @cli.command()
 def extract_messages_react():
-    output = subprocess.check_output(['npx', 'react-jsx-i18n', 'extract', '--ext', 'jsx',
-                                      'indico/web/client/', 'indico/modules/'])
+    output = subprocess.check_output(['npx', 'react-jsx-i18n', 'extract', 'indico/web/client/', 'indico/modules/'])
     with open(MESSAGES_REACT_POT, 'wb') as f:
         f.write(output)
 
