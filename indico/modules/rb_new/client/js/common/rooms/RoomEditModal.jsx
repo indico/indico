@@ -536,7 +536,12 @@ class RoomEditModal extends React.Component {
                 return (
                     <Header key={key}>{content.label}</Header>
                 );
-            case 'input':
+            case 'input': {
+                let parse = null;
+                if (content.inputArgs && content.inputArgs.type === 'number') {
+                    // number fields use null
+                    parse = (value) => (value ? +value : null);
+                }
                 return (
                     <Field key={key}
                            name={content.name}
@@ -544,9 +549,10 @@ class RoomEditModal extends React.Component {
                            label={content.label}
                            required={content.required}
                            as="input"
-                           parse={(value) => value || null}
+                           parse={parse}
                            {...(content.inputArgs || {type: 'text'})} />
                 );
+            }
             case 'owner':
                 return (
                     <Field key={key}
