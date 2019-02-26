@@ -28,6 +28,7 @@ import {ReduxCheckboxField, ReduxDropdownField, ReduxFormField, ReduxRadioField,
 import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
 import PrincipalSearchField from 'indico/react/components/PrincipalSearchField';
 import {Overridable, IndicoPropTypes} from 'indico/react/util';
+import {snakifyKeys} from 'indico/utils/case';
 import TimeInformation from '../../components/TimeInformation';
 import {selectors as roomsSelectors} from '../../common/rooms';
 import {selectors as linkingSelectors, linkDataShape} from '../../common/linking';
@@ -644,7 +645,7 @@ export default connect(
                     linkId,
                     linkBack,
                     isPrebooking,
-                    extraFields,
+                    extraFields: snakifyKeys(extraFields),
                 });
             },
             openBookingDetails: bookingId => modalActions.openModal('booking-details', bookingId, null, true)
