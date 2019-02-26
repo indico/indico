@@ -25,7 +25,7 @@ import {Route} from 'react-router-dom';
 import LazyScroll from 'redux-lazy-scroll';
 import {stateToQueryString} from 'redux-router-querystring';
 
-import {Slot} from 'indico/react/util';
+import {Overridable, Slot} from 'indico/react/util';
 import {Param, Plural, PluralTranslate, Translate, Singular} from 'indico/react/i18n';
 import {camelizeKeys} from 'indico/utils/case';
 import {pushStateMergeProps} from '../../util';
@@ -58,6 +58,11 @@ class RoomList extends React.Component {
             searchRooms: PropTypes.func.isRequired,
             openRoomDetails: PropTypes.func.isRequired,
         }).isRequired,
+        hideActionsDropdown: PropTypes.bool,
+    };
+
+    static defaultProps = {
+        hideActionsDropdown: false,
     };
 
     constructor(props) {
@@ -137,7 +142,8 @@ class RoomList extends React.Component {
             showMap,
             pushState,
             isSearching,
-            actions: {openRoomDetails}
+            actions: {openRoomDetails},
+            hideActionsDropdown,
         } = this.props;
         const {selectionMode, selection} = this.state;
         const menuOptions = [{
@@ -157,29 +163,31 @@ class RoomList extends React.Component {
                                     <RoomFilterBar />
                                     <SearchBar />
                                 </div>
-                                <div styleName="actions">
-                                    {selectionMode ? (
-                                        <>
-                                            <Button icon="check"
-                                                    disabled={Object.keys(selection).length === 0}
-                                                    onClick={() => {
-                                                        if (selectionMode === 'blocking') {
-                                                            pushState('/rooms/blocking/create');
-                                                        }
-                                                    }}
-                                                    primary
-                                                    circular />
-                                            <Button icon="cancel" onClick={this.clearSelectionMode} circular />
-                                        </>
-                                    ) : (
-                                        <Dropdown text={Translate.string('Actions')}
-                                                  className="small"
-                                                  options={menuOptions}
-                                                  direction="left"
-                                                  button
-                                                  floating />
-                                    )}
-                                </div>
+                                {!hideActionsDropdown && (
+                                    <div styleName="actions">
+                                        {selectionMode ? (
+                                            <>
+                                                <Button icon="check"
+                                                        disabled={Object.keys(selection).length === 0}
+                                                        onClick={() => {
+                                                            if (selectionMode === 'blocking') {
+                                                                pushState('/rooms/blocking/create');
+                                                            }
+                                                        }}
+                                                        primary
+                                                        circular />
+                                                <Button icon="cancel" onClick={this.clearSelectionMode} circular />
+                                            </>
+                                        ) : (
+                                            <Dropdown text={Translate.string('Actions')}
+                                                      className="small"
+                                                      options={menuOptions}
+                                                      direction="left"
+                                                      button
+                                                      floating />
+                                        )}
+                                    </div>
+                                )}
                             </div>
                         </Sticky>
                         <div styleName="results-count">
@@ -254,4 +262,4 @@ export default connect(
         }, dispatch)
     }),
     pushStateMergeProps,
-)(RoomList);
+)(Overridable.component('RoomList', RoomList));
