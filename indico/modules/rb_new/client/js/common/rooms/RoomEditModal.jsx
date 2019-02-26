@@ -75,7 +75,7 @@ function validate(fields) {
     if (capacity < 1) {
         errors.capacity = Translate.string('Please provide a valid capacity number.');
     }
-    if (surfaceArea < 1) {
+    if (surfaceArea && surfaceArea < 1) {
         errors.surfaceArea = Translate.string('Please provide a valid surface area.');
     }
     if (maxAdvanceDays !== null && maxAdvanceDays < 1) {
