@@ -71,9 +71,17 @@ class RepeatMapping(object):
     }
 
     @classmethod
-    @unimplemented(exceptions=(KeyError,), message=_('Unimplemented repetition pair'))
     def get_message(cls, repeat_frequency, repeat_interval):
-        return cls.mapping[(repeat_frequency, repeat_interval)][0]
+        # XXX: move this somewhere else
+        # not translated since it's only used in log messages now
+        if repeat_frequency == RepeatFrequency.NEVER:
+            return u'single booking'
+        elif repeat_frequency == RepeatFrequency.DAY:
+            return u'daily booking'
+        elif repeat_frequency == RepeatFrequency.WEEK:
+            return u'weekly' if repeat_interval == 1 else u'every {} weeks'.format(repeat_interval)
+        elif repeat_frequency == RepeatFrequency.MONTH:
+            return u'monthly' if repeat_interval == 1 else u'every {} months'.format(repeat_interval)
 
     @classmethod
     @unimplemented(exceptions=(KeyError,), message=_('Unimplemented repetition pair'))
