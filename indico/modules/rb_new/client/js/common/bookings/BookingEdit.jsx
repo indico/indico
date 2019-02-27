@@ -42,6 +42,15 @@ import * as bookingsSelectors from './selectors';
 import './BookingEdit.module.scss';
 
 
+function validate({reason}) {
+    const errors = {};
+    if (reason && reason.length < 3) {
+        errors.reason = Translate.string('Reason must be at least 3 characters');
+    }
+    return errors;
+}
+
+
 class BookingEdit extends React.Component {
     static propTypes = {
         user: PropTypes.object.isRequired,
@@ -399,6 +408,7 @@ class BookingEdit extends React.Component {
                            pristine: true,
                            values: true,
                        }}
+                       validate={validate}
                        keepDirtyOnReinitialize />
         );
     }
