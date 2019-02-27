@@ -22,7 +22,7 @@ import bookingUpdateURL from 'indico-url:rooms_new.update_booking';
 import bookingOccurrenceStateActionsURL from 'indico-url:rooms_new.booking_occurrence_state_actions';
 
 import {indicoAxios} from 'indico/utils/axios';
-import {ajaxAction} from 'indico/utils/redux';
+import {ajaxAction, submitFormAction} from 'indico/utils/redux';
 import {actions as modalActions} from '../../modals';
 
 
@@ -80,11 +80,12 @@ export function deleteBooking(id) {
 }
 
 export function updateBooking(id, params) {
-    return ajaxAction(
+    return submitFormAction(
         () => indicoAxios.patch(bookingUpdateURL({booking_id: id}), params),
         UPDATE_BOOKING_REQUEST,
         [UPDATE_BOOKING_SUCCESS, UPDATED_BOOKING_RECEIVED],
         UPDATE_BOOKING_ERROR,
+        {booking_reason: 'reason'}
     );
 }
 
