@@ -21,9 +21,12 @@ import React from 'react';
 import {bindActionCreators} from 'redux';
 import {Button, Container, Grid, Icon, Popup, Sticky} from 'semantic-ui-react';
 import {connect} from 'react-redux';
+
 import {Translate} from 'indico/react/i18n';
 import {Overridable} from 'indico/react/util';
+import {ScrollButton} from 'indico/react/components';
 import {serializeDate} from 'indico/utils/date';
+
 import searchBarFactory from '../../components/SearchBar';
 import * as calendarActions from './actions';
 import * as calendarSelectors from './selectors';
@@ -75,6 +78,10 @@ class Calendar extends React.Component {
         super(props);
         this.contextRef = React.createRef();
     }
+
+    state = {
+        scrollBtnVisible: false,
+    };
 
     componentDidMount() {
         const {actions: {fetchCalendar}} = this.props;
@@ -216,6 +223,7 @@ class Calendar extends React.Component {
             datePicker,
             allowDragDrop,
         } = this.props;
+        const {scrollBtnVisible} = this.state;
         const legendLabels = [
             {label: Translate.string('Booked'), color: 'orange', style: 'booking'},
             {label: Translate.string('Pre-Booked'), style: 'pre-booking'},
@@ -237,7 +245,9 @@ class Calendar extends React.Component {
                 <Grid.Row>
                     <Container>
                         <div ref={this.contextRef}>
-                            <Sticky context={this.contextRef.current} className="sticky-filters">
+                            <Sticky context={this.contextRef.current} className="sticky-filters"
+                                    onStick={() => this.setState({scrollBtnVisible: true})}
+                                    onUnstick={() => this.setState({scrollBtnVisible: false})}>
                                 <Grid.Row styleName="calendar-filters">
                                     <div className="filter-row">
                                         <div className="filter-row-filters">
@@ -255,6 +265,7 @@ class Calendar extends React.Component {
                                                     onDateChange={setDate}
                                                     legendLabels={legendLabels} />
                                 )}
+                                <ScrollButton visible={scrollBtnVisible} />
                             </Sticky>
                             {isTimelineVisible ? (
                                 <ElasticTimeline availability={rows}
