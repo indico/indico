@@ -28,6 +28,7 @@ import LazyScroll from 'redux-lazy-scroll';
 import {Translate} from 'indico/react/i18n';
 import {Overridable, Slot, toClasses, IndicoPropTypes} from 'indico/react/util';
 import {serializeTime, serializeDate} from 'indico/utils/date';
+import {ScrollButton} from 'indico/react/components';
 
 import searchBarFactory from '../../components/SearchBar';
 import CardPlaceholder from '../../components/CardPlaceholder';
@@ -100,6 +101,7 @@ class BookRoom extends React.Component {
     state = {
         maxVisibleRooms: 20,
         suggestionsRequested: false,
+        scrollBtnVisible: false,
     };
 
     componentDidMount() {
@@ -158,7 +160,7 @@ class BookRoom extends React.Component {
     }
 
     renderFilters(refName) {
-        const {[refName]: ref} = this.state;
+        const {[refName]: ref, scrollBtnVisible} = this.state;
         const {
             isSearching,
             totalResultCount,
@@ -180,7 +182,9 @@ class BookRoom extends React.Component {
             {label: Translate.string('Not bookable'), style: 'unbookable'}
         ];
         return (
-            <Sticky context={ref} className="sticky-filters">
+            <Sticky context={ref} className="sticky-filters"
+                    onStick={() => this.setState({scrollBtnVisible: true})}
+                    onUnstick={() => this.setState({scrollBtnVisible: false})}>
                 <div className="filter-row">
                     <div className="filter-row-filters">
                         <BookingFilterBar />
@@ -201,6 +205,7 @@ class BookRoom extends React.Component {
                                     legendLabels={legendLabels}
                                     isLoading={isSearching} />
                 )}
+                <ScrollButton visible={scrollBtnVisible} />
             </Sticky>
         );
     }
