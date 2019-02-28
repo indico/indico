@@ -19,7 +19,7 @@ import React from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
-import {Card, Container, Message} from 'semantic-ui-react';
+import {Card, Container, Message, Sticky} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
 import BlockingCard from './BlockingCard';
 import CardPlaceholder from '../../components/CardPlaceholder';
@@ -40,6 +40,11 @@ class BlockingList extends React.Component {
             openBlockingDetails: PropTypes.func.isRequired,
         }).isRequired,
     };
+
+    constructor(props) {
+        super(props);
+        this.contextRef = React.createRef();
+    }
 
     componentDidMount() {
         const {actions: {fetchBlockings}} = this.props;
@@ -87,12 +92,14 @@ class BlockingList extends React.Component {
 
     render() {
         return (
-            <>
+            <div ref={this.contextRef}>
                 <Container styleName="blockings-container" fluid>
-                    <BlockingFilterBar />
+                    <Sticky context={this.contextRef.current} className="sticky-filters">
+                        <BlockingFilterBar />
+                    </Sticky>
                     {this.renderContent()}
                 </Container>
-            </>
+            </div>
         );
     }
 }
