@@ -31,12 +31,36 @@ function min(minValue) {
 
         const val = parseInt(value, 10);
         if (val < minValue) {
-            return Translate.string('Value should be greater than or equal to {minValue}', {minValue});
+            return Translate.string('Value must be at least {minValue}', {minValue});
         }
     };
 }
 
+function max(maxValue) {
+    return (value) => {
+        const error = required(value);
+        if (error) {
+            return error;
+        }
+
+        const val = parseInt(value, 10);
+        if (val > maxValue) {
+            return Translate.string('Value must be at most {maxValue}', {maxValue});
+        }
+    };
+}
+
+
+function range(minValue, maxValue) {
+    const _min = min(minValue);
+    const _max = max(maxValue);
+    return value => _min(value) || _max(value);
+}
+
+
 export default {
     required,
-    min
+    min,
+    max,
+    range,
 };
