@@ -21,6 +21,10 @@
     width: 75% !important;
 
     .blockings-list, :global(.blockings-placeholders) {
-        margin-top: 10px;
+        margin: 10px 0 0 -5px;
+    }
+
+    :global(.sticky-filters.ui.stuck-container) + .blockings-list {
+        padding-top: 80px;
     }
 }

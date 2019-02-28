@@ -53,26 +53,28 @@ class BlockingFilterBar extends React.Component {
         }));
 
         return (
-            <>
-                <Dropdown text={timeframe ? timeframeOptions[timeframe] : Translate.string('Filter by date')}
-                          className={toClasses({primary: !!timeframe})}
-                          options={filterByDateOptions}
-                          direction="right"
-                          value={timeframe}
-                          onChange={(__, {value}) => setFilterParameter('timeframe', value)}
-                          button
-                          floating />
-                <Button.Group>
-                    <Popup trigger={<Button content={Translate.string('Blockings in my rooms')}
-                                            primary={myRooms}
-                                            onClick={() => setFilterParameter('myRooms', !myRooms)} />}
-                           content={Translate.string('Show only blockings in my rooms')} />
-                    <Popup trigger={<Button content={Translate.string('My blockings')}
-                                            primary={myBlockings}
-                                            onClick={() => setFilterParameter('myBlockings', !myBlockings)} />}
-                           content={Translate.string('Show only my blockings')} />
-                </Button.Group>
-            </>
+            <div className="filter-row">
+                <div className="filter-row-filters">
+                    <Dropdown text={timeframe ? timeframeOptions[timeframe] : Translate.string('Filter by date')}
+                              className={toClasses({primary: !!timeframe})}
+                              options={filterByDateOptions}
+                              direction="right"
+                              value={timeframe}
+                              onChange={(__, {value}) => setFilterParameter('timeframe', value)}
+                              button
+                              floating />
+                    <Button.Group>
+                        <Popup trigger={<Button content={Translate.string('Blockings in my rooms')}
+                                                primary={myRooms}
+                                                onClick={() => setFilterParameter('myRooms', !myRooms)} />}
+                               content={Translate.string('Show only blockings in my rooms')} />
+                        <Popup trigger={<Button content={Translate.string('My blockings')}
+                                                primary={myBlockings}
+                                                onClick={() => setFilterParameter('myBlockings', !myBlockings)} />}
+                               content={Translate.string('Show only my blockings')} />
+                    </Button.Group>
+                </div>
+            </div>
         );
     }
 }
