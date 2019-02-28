@@ -28,6 +28,11 @@ export const initialFilterStateFactory = () => ({
 
 export default combineReducers({
     requests: combineReducers({
+        settings: requestReducer(
+            adminActions.FETCH_SETTINGS_REQUEST,
+            adminActions.FETCH_SETTINGS_SUCCESS,
+            adminActions.FETCH_SETTINGS_ERROR
+        ),
         locations: requestReducer(
             adminActions.FETCH_LOCATIONS_REQUEST,
             adminActions.FETCH_LOCATIONS_SUCCESS,
@@ -53,6 +58,14 @@ export default combineReducers({
         switch (action.type) {
             case adminActions.LOCATIONS_RECEIVED:
                 return camelizeKeys(action.data);
+            default:
+                return state;
+        }
+    },
+    settings: (state = {}, action) => {
+        switch (action.type) {
+            case adminActions.SETTINGS_RECEIVED:
+                return action.data;
             default:
                 return state;
         }

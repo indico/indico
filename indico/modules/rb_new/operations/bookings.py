@@ -377,7 +377,7 @@ def get_matching_events(start_dt, end_dt, repeat_frequency, repeat_interval):
                     ~Event.room_reservation_links.any(ReservationLink.reservation.has(Reservation.is_accepted)),
                     db.or_(Event.happens_between(as_utc(occ.start_dt), as_utc(occ.end_dt)) for occ in occurrences),
                     Event.timezone == config.DEFAULT_TIMEZONE,
-                    db.and_(Event.category_id != cat['id'] for cat in excluded_categories),
+                    db.and_(Event.category_id != cat.id for cat in excluded_categories),
                     Event.acl_entries.any(db.and_(EventPrincipal.type == PrincipalType.user,
                                                   EventPrincipal.user_id == session.user.id,
                                                   EventPrincipal.full_access)))

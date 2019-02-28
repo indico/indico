@@ -1,0 +1,220 @@
+/* This file is part of Indico.
+ * Copyright (C) 2002 - 2019 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
+import _ from 'lodash';
+import React from 'react';
+import PropTypes from 'prop-types';
+import {bindActionCreators} from 'redux';
+import {connect} from 'react-redux';
+import {Field, Form as FinalForm} from 'react-final-form';
+import {Form, Header, Message, Placeholder} from 'semantic-ui-react';
+import {PluralTranslate, Translate} from 'indico/react/i18n';
+import {
+    formatters, getChangedValues, FieldCondition, ReduxFormField, ReduxCheckboxField,
+    validators as v
+} from 'indico/react/forms';
+import * as adminActions from './actions';
+import * as adminSelectors from './selectors';
+import CategoryList from './CategoryList';
+
+
+class SettingsPage extends React.PureComponent {
+    static propTypes = {
+        settingsLoaded: PropTypes.bool.isRequired,
+        settings: PropTypes.object.isRequired,
+        actions: PropTypes.exact({
+            fetchSettings: PropTypes.func.isRequired,
+            updateSettings: PropTypes.func.isRequired,
+        }).isRequired,
+    };
+
+    componentDidMount() {
+        const {actions: {fetchSettings}} = this.props;
+        fetchSettings();
+    }
+
+    handleSubmit = async (data, form) => {
+        const {actions: {updateSettings}} = this.props;
+        const changedValues = getChangedValues(data, form);
+        const rv = await updateSettings(changedValues);
+        if (rv.error) {
+            return rv.error;
+        }
+    };
+
+    render() {
+        const {settingsLoaded, settings} = this.props;
+        if (!settingsLoaded) {
+            return (
+                <Placeholder>
+                    <Placeholder.Line />
+                    <Placeholder.Line />
+                    <Placeholder.Line />
+                    <Placeholder.Line />
+                    <Placeholder.Line />
+                </Placeholder>
+            );
+        }
+
+        return (
+            <>
+                <Header as="h2">
+                    <Translate>General Settings</Translate>
+                </Header>
+                <FinalForm onSubmit={this.handleSubmit}
+                           initialValues={settings}
+                           initialValuesEqual={_.isEqual}
+                           subscription={{
+                               submitting: true,
+                               hasValidationErrors: true,
+                               pristine: true,
+                               submitSucceeded: true,
+                               dirtySinceLastSubmit: true,
+                           }}>
+                    {fprops => (
+                        <Form onSubmit={fprops.handleSubmit}
+                              success={fprops.submitSucceeded && !fprops.dirtySinceLastSubmit}>
+                            <Field name="tileserver_url" component={ReduxFormField} as="input"
+                                   format={formatters.trim} formatOnBlur
+                                   label={Translate.string('Tileserver URL')}
+                                   disabled={fprops.submitting}
+                                   validate={val => {
+                                       if (!val) {
+                                           return undefined;
+                                       } else if (!val.match(/https?:\/\/.+/)) {
+                                           return Translate.string('Please provide a valid URL');
+                                       } else {
+                                           const missing = ['{x}', '{y}', '{z}'].filter(x => !val.includes(x));
+                                           if (missing.length) {
+                                               return PluralTranslate.string(
+                                                   'Missing placeholder: {placeholders}',
+                                                   'Missing placeholders: {placeholders}',
+                                                   missing.length,
+                                                   {placeholders: missing.join(', ')}
+                                               );
+                                           }
+                                       }
+                                   }}>
+                                <p className="field-description">
+                                    <Translate>
+                                        If you want to use the map, specify the URL to a tileserver covering the
+                                        area in which your rooms are.
+                                    </Translate>
+                                </p>
+                            </Field>
+                            <Field name="booking_limit" component={ReduxFormField} as="input"
+                                   type="number"
+                                   min="1"
+                                   required
+                                   parse={value => (value ? +value : null)}
+                                   label={Translate.string('Max. booking length')}
+                                   validate={v.min(1)}
+                                   disabled={fprops.submitting}>
+                                <p className="field-description">
+                                    <Translate>The maximum length (in days) a booking may last.</Translate>
+                                </p>
+                            </Field>
+                            <Field name="notifications_enabled" component={ReduxCheckboxField}
+                                   componentLabel={Translate.string('Enable booking reminders')}
+                                   disabled={fprops.submitting}>
+                                <p className="field-description">
+                                    <Translate>Whether to send reminders for upcoming bookings.</Translate>
+                                </p>
+                            </Field>
+                            <FieldCondition when="notifications_enabled">
+                                <Message>
+                                    <Message.Header>
+                                        <Translate>
+                                            Specify how many days in advance booking reminders should be sent
+                                        </Translate>
+                                    </Message.Header>
+                                    <Form.Group widths="equal">
+                                        <Field name="notification_before_days" component={ReduxFormField}
+                                               as="input"
+                                               type="number"
+                                               min="1"
+                                               max="30"
+                                               required
+                                               parse={value => (value ? +value : null)}
+                                               label={Translate.string('Single/Daily')}
+                                               validate={v.range(1, 30)}
+                                               disabled={fprops.submitting} />
+                                        <Field name="notification_before_days_weekly" component={ReduxFormField}
+                                               as="input"
+                                               type="number"
+                                               min="1"
+                                               max="30"
+                                               required
+                                               parse={value => (value ? +value : null)}
+                                               label={Translate.string('Weekly')}
+                                               validate={v.range(1, 30)}
+                                               disabled={fprops.submitting} />
+                                        <Field name="notification_before_days_monthly" component={ReduxFormField}
+                                               as="input"
+                                               type="number"
+                                               min="1"
+                                               max="30"
+                                               required
+                                               parse={value => (value ? +value : null)}
+                                               label={Translate.string('Monthly')}
+                                               validate={v.range(1, 30)}
+                                               disabled={fprops.submitting} />
+                                    </Form.Group>
+                                </Message>
+                            </FieldCondition>
+                            <Field name="excluded_categories" component={ReduxFormField} as={CategoryList}
+                                   label={Translate.string('Disable booking during event creation')}
+                                   disabled={fprops.submitting}>
+                                <p className="field-description">
+                                    <Translate>
+                                        Specify the IDs of categories for which booking a room during event creation
+                                        will not be suggested.
+                                    </Translate>
+                                </p>
+                            </Field>
+                            <Form.Button type="submit"
+                                         disabled={(
+                                             fprops.hasValidationErrors ||
+                                             fprops.pristine ||
+                                             fprops.submitting
+                                         )}
+                                         loading={fprops.submitting}
+                                         primary
+                                         content={Translate.string('Save')} />
+                            <Message success>
+                                <Translate>Settings have been saved.</Translate>
+                            </Message>
+                        </Form>
+                    )}
+                </FinalForm>
+            </>
+        );
+    }
+}
+
+export default connect(
+    state => ({
+        settings: adminSelectors.getSettings(state),
+        settingsLoaded: adminSelectors.hasSettingsLoaded(state),
+    }),
+    dispatch => ({
+        actions: bindActionCreators({
+            fetchSettings: adminActions.fetchSettings,
+            updateSettings: adminActions.updateSettings,
+        }, dispatch),
+    })
+)(SettingsPage);

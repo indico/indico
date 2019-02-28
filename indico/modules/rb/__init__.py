@@ -22,6 +22,8 @@ from indico.core import signals
 from indico.core.config import config
 from indico.core.logger import Logger
 from indico.core.settings import SettingsProxy
+from indico.core.settings.converters import ModelListConverter
+from indico.modules.categories.models.categories import Category
 from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.util import rb_is_admin
@@ -44,7 +46,12 @@ rb_settings = SettingsProxy('roombooking', {
     'notifications_enabled': True,
     'booking_limit': 365,
     'tileserver_url': ''
-}, acls={'admin_principals', 'authorized_principals'})
+}, acls={
+    'admin_principals',
+    'authorized_principals'
+}, converters={
+    'excluded_categories': ModelListConverter(Category)
+})
 
 
 @signals.import_tasks.connect

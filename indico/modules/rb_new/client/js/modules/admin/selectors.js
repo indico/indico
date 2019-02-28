@@ -74,3 +74,7 @@ export const getAttributes = createSelector(
     _getAttributes,
     attributes => attributes.slice().sort(makeSorter('title'))
 );
+
+
+export const hasSettingsLoaded = ({admin}) => admin.requests.settings.state === RequestState.SUCCESS;
+export const getSettings = ({admin}) => admin.settings;

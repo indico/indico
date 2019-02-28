@@ -24,7 +24,9 @@ from webargs.flaskparser import abort, use_args, use_kwargs
 from werkzeug.exceptions import Forbidden
 
 from indico.core.db import db
-from indico.modules.rb import Room
+from indico.core.marshmallow import mm
+from indico.modules.categories.models.categories import Category
+from indico.modules.rb import Room, rb_settings
 from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.models.equipment import EquipmentType, RoomEquipmentAssociation
 from indico.modules.rb.models.locations import Location
@@ -48,6 +50,35 @@ class RHRoomBookingAdminBase(RHRoomBookingBase):
         RHRoomBookingBase._check_access(self)
         if not rb_is_admin(session.user):
             raise Forbidden
+
+
+class SettingsSchema(mm.Schema):
+    tileserver_url = fields.String(validate=[
+        validate.URL(schemes={'http', 'https'}),
+        lambda value: all(x in value for x in ('{x}', '{y}', '{z}'))
+    ])
+    booking_limit = fields.Int(validate=[validate.Range(min=1)])
+    notifications_enabled = fields.Bool()
+    notification_before_days = fields.Int(validate=[validate.Range(min=1, max=30)])
+    notification_before_days_weekly = fields.Int(validate=[validate.Range(min=1, max=30)])
+    notification_before_days_monthly = fields.Int(validate=[validate.Range(min=1, max=30)])
+    excluded_categories = ModelList(Category)
+
+    class Meta:
+        strict = True  # TODO: remove with marshmallow 3
+
+
+class RHSettings(RHRoomBookingAdminBase):
+    def _jsonify_settings(self):
+        return SettingsSchema().jsonify(rb_settings.get_all())
+
+    def _process_GET(self):
+        return self._jsonify_settings()
+
+    @use_args(SettingsSchema)
+    def _process_PATCH(self, args):
+        rb_settings.set_multi(args)
+        return self._jsonify_settings()
 
 
 class RHLocations(RHRoomBookingAdminBase):

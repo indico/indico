@@ -127,7 +127,7 @@ class RHCreateEvent(RHProtected):
                 notify_event_creation(event)
             return jsonify_data(flash=False, redirect=url_for('event_management.settings', event))
         check_room_availability = rb_check_user_access(session.user) and config.ENABLE_ROOMBOOKING
-        rb_excluded_categories = rb_settings.get('excluded_categories')
+        rb_excluded_categories = [c.id for c in rb_settings.get('excluded_categories')]
         return jsonify_template('events/forms/event_creation_form.html', form=form, fields=form._field_order,
                                 event_type=self.event_type.name, single_category=self.single_category,
                                 check_room_availability=check_room_availability,

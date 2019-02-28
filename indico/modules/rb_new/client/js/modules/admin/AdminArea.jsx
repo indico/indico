@@ -21,12 +21,12 @@ import {Route} from 'react-router-dom';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import {Container, Grid} from 'semantic-ui-react';
-import {Translate} from 'indico/react/i18n';
 import {selectors as userSelectors} from '../../common/user';
 import AdminMenu from './AdminMenu';
 import AdminLocationRooms from './AdminLocationRooms';
 import EquipmentPage from './EquipmentPage';
 import AttributesPage from './AttributesPage';
+import SettingsPage from './SettingsPage';
 import * as adminActions from './actions';
 
 import './AdminArea.module.scss';
@@ -59,8 +59,7 @@ class AdminArea extends React.Component {
                         <AdminMenu />
                     </Grid.Column>
                     <Grid.Column width={12}>
-                        <Route exact path="/admin"
-                               render={() => <Translate>General settings</Translate>} />
+                        <Route exact path="/admin" component={SettingsPage} />
                         <Route exact path="/admin/equipment" component={EquipmentPage} />
                         <Route exact path="/admin/attributes" component={AttributesPage} />
                         <Route exact path="/admin/location/:locationId"

@@ -15,6 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import settingsURL from 'indico-url:rooms_new.admin_settings';
 import fetchLocationsURL from 'indico-url:rooms_new.admin_locations';
 import equipmentTypesURL from 'indico-url:rooms_new.admin_equipment_types';
 import featuresURL from 'indico-url:rooms_new.admin_features';
@@ -24,6 +25,11 @@ import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {ajaxAction, submitFormAction} from 'indico/utils/redux';
 import {actions as filtersActions} from '../../common/filters';
 
+
+export const FETCH_SETTINGS_REQUEST = 'admin/FETCH_SETTINGS_REQUEST';
+export const FETCH_SETTINGS_SUCCESS = 'admin/FETCH_SETTINGS_SUCCESS';
+export const FETCH_SETTINGS_ERROR = 'admin/FETCH_SETTINGS_ERROR';
+export const SETTINGS_RECEIVED = 'admin/SETTINGS_RECEIVED';
 
 export const FETCH_LOCATIONS_REQUEST = 'admin/FETCH_LOCATIONS_REQUEST';
 export const FETCH_LOCATIONS_SUCCESS = 'admin/FETCH_LOCATIONS_SUCCESS';
@@ -52,6 +58,23 @@ export const ATTRIBUTE_RECEIVED = 'admin/ATTRIBUTE_RECEIVED';
 export const ATTRIBUTE_DELETED = 'admin/ATTRIBUTE_DELETED';
 
 export const FILTER_NAMESPACE = 'admin';
+
+
+export function fetchSettings() {
+    return ajaxAction(
+        () => indicoAxios.get(settingsURL()),
+        FETCH_SETTINGS_REQUEST,
+        [SETTINGS_RECEIVED, FETCH_SETTINGS_SUCCESS],
+        FETCH_SETTINGS_ERROR
+    );
+}
+
+export function updateSettings(data) {
+    return submitFormAction(
+        () => indicoAxios.patch(settingsURL(), data),
+        null, SETTINGS_RECEIVED
+    );
+}
 
 
 export function fetchLocations() {
