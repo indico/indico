@@ -42,18 +42,16 @@ def overlapping_reservation(create_reservation):
 # ======================================================================================================================
 
 
-@pytest.mark.parametrize(('repetition', 'legacy', 'short_name', 'message'), (
-    ((RepeatFrequency.NEVER, 0), None, 'none',            'Single reservation'),
-    ((RepeatFrequency.DAY,   1), 0,    'daily',           'Repeat daily'),
-    ((RepeatFrequency.WEEK,  1), 1,    'weekly',          'Repeat once a week'),
-    ((RepeatFrequency.WEEK,  2), 2,    'everyTwoWeeks',   'Repeat once every two weeks'),
-    ((RepeatFrequency.WEEK,  3), 3,    'everyThreeWeeks', 'Repeat once every three weeks'),
-    ((RepeatFrequency.MONTH, 1), 4,    'monthly',         'Repeat every month'),
+@pytest.mark.parametrize(('repetition', 'message'), (
+    ((RepeatFrequency.NEVER, 0), 'single booking'),
+    ((RepeatFrequency.DAY,   1), 'daily booking'),
+    ((RepeatFrequency.WEEK,  1), 'weekly'),
+    ((RepeatFrequency.WEEK,  2), 'every 2 weeks'),
+    ((RepeatFrequency.MONTH, 1), 'monthly'),
+    ((RepeatFrequency.MONTH, 2), 'every 2 months'),
 ))
-def test_repeat_mapping(repetition, legacy, short_name, message):
+def test_repeat_mapping(repetition, message):
     assert RepeatMapping.get_message(*repetition) == message
-    assert RepeatMapping.get_short_name(*repetition) == short_name
-    assert RepeatMapping.convert_legacy_repeatability(legacy) == repetition
 
 
 def test_repeat_mapping_invalid_legacy():
