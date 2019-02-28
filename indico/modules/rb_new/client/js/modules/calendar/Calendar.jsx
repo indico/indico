@@ -80,7 +80,7 @@ class Calendar extends React.Component {
     }
 
     state = {
-        scrollBtnVisible: false,
+        scrollButtonVisible: false,
     };
 
     componentDidMount() {
@@ -223,7 +223,7 @@ class Calendar extends React.Component {
             datePicker,
             allowDragDrop,
         } = this.props;
-        const {scrollBtnVisible} = this.state;
+        const {scrollButtonVisible} = this.state;
         const legendLabels = [
             {label: Translate.string('Booked'), color: 'orange', style: 'booking'},
             {label: Translate.string('Pre-Booked'), style: 'pre-booking'},
@@ -246,8 +246,8 @@ class Calendar extends React.Component {
                     <Container>
                         <div ref={this.contextRef}>
                             <Sticky context={this.contextRef.current} className="sticky-filters"
-                                    onStick={() => this.setState({scrollBtnVisible: true})}
-                                    onUnstick={() => this.setState({scrollBtnVisible: false})}>
+                                    onStick={() => this.setState({scrollButtonVisible: true})}
+                                    onUnstick={() => this.setState({scrollButtonVisible: false})}>
                                 <Grid.Row styleName="calendar-filters">
                                     <div className="filter-row">
                                         <div className="filter-row-filters">
@@ -265,7 +265,7 @@ class Calendar extends React.Component {
                                                     onDateChange={setDate}
                                                     legendLabels={legendLabels} />
                                 )}
-                                <ScrollButton visible={scrollBtnVisible} />
+                                <ScrollButton visible={scrollButtonVisible} />
                             </Sticky>
                             {isTimelineVisible ? (
                                 <ElasticTimeline availability={rows}

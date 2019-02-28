@@ -101,7 +101,7 @@ class BookRoom extends React.Component {
     state = {
         maxVisibleRooms: 20,
         suggestionsRequested: false,
-        scrollBtnVisible: false,
+        scrollButtonVisible: false,
     };
 
     componentDidMount() {
@@ -160,7 +160,7 @@ class BookRoom extends React.Component {
     }
 
     renderFilters(refName) {
-        const {[refName]: ref, scrollBtnVisible} = this.state;
+        const {[refName]: ref, scrollButtonVisible} = this.state;
         const {
             isSearching,
             totalResultCount,
@@ -183,8 +183,8 @@ class BookRoom extends React.Component {
         ];
         return (
             <Sticky context={ref} className="sticky-filters"
-                    onStick={() => this.setState({scrollBtnVisible: true})}
-                    onUnstick={() => this.setState({scrollBtnVisible: false})}>
+                    onStick={() => this.setState({scrollButtonVisible: true})}
+                    onUnstick={() => this.setState({scrollButtonVisible: false})}>
                 <div className="filter-row">
                     <div className="filter-row-filters">
                         <BookingFilterBar />
@@ -205,7 +205,7 @@ class BookRoom extends React.Component {
                                     legendLabels={legendLabels}
                                     isLoading={isSearching} />
                 )}
-                <ScrollButton visible={scrollBtnVisible} />
+                <ScrollButton visible={scrollButtonVisible} />
             </Sticky>
         );
     }
