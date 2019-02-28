@@ -16,9 +16,29 @@
  */
 
 import _ from 'lodash';
+import React from 'react';
+import PropTypes from 'prop-types';
+import {Field} from 'react-final-form';
 
 
 export function getChangedValues(data, form) {
     const fields = form.getRegisteredFields().filter(x => !x.includes('['));
     return _.fromPairs(fields.filter(name => form.getFieldState(name).dirty).map(name => [name, data[name]]));
 }
+
+/** Conditionally show content within a FinalForm depending on the value of another field */
+export const FieldCondition = ({when, is, children}) => (
+    <Field name={when}
+           subscription={{value: true}}
+           render={({input: {value}}) => (value === is ? children : null)} />
+);
+
+FieldCondition.propTypes = {
+    when: PropTypes.string.isRequired,
+    is: PropTypes.any,
+    children: PropTypes.node.isRequired,
+};
+
+FieldCondition.defaultProps = {
+    is: true,
+};
