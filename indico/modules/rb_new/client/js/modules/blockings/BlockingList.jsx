@@ -15,6 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import _ from 'lodash';
 import React from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
@@ -50,7 +51,7 @@ class BlockingList extends React.Component {
     }
 
     state = {
-        scrollBtnVisible: false,
+        scrollButtonVisible: false,
     };
 
     componentDidMount() {
@@ -97,16 +98,20 @@ class BlockingList extends React.Component {
         }
     };
 
+    toggleScrollButtonVisibility = (val) => {
+        _.debounce(() => this.setState({scrollButtonVisible: val}), 750);
+    };
+
     render() {
-        const {scrollBtnVisible} = this.state;
+        const {scrollButtonVisible} = this.state;
         return (
             <div ref={this.contextRef}>
                 <Container styleName="blockings-container" fluid>
                     <Sticky context={this.contextRef.current} className="sticky-filters"
-                            onStick={() => this.setState({scrollBtnVisible: true})}
-                            onUnstick={() => this.setState({scrollBtnVisible: false})}>
+                            onStick={() => this.toggleScrollButtonVisibility(true)}
+                            onUnstick={() => this.toggleScrollButtonVisibility(false)}>
                         <BlockingFilterBar />
-                        <ScrollButton visible={scrollBtnVisible} />
+                        <ScrollButton visible={scrollButtonVisible} />
                     </Sticky>
                     {this.renderContent()}
                 </Container>

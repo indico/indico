@@ -76,7 +76,7 @@ class RoomList extends React.Component {
         selectionMode: null,
         selection: {},
         numVisibleRooms: 20,
-        scrollBtnVisible: false,
+        scrollButtonVisible: false,
     };
 
     componentDidMount() {
@@ -148,7 +148,7 @@ class RoomList extends React.Component {
             actions: {openRoomDetails},
             hideActionsDropdown,
         } = this.props;
-        const {selectionMode, selection, scrollBtnVisible} = this.state;
+        const {selectionMode, selection, scrollButtonVisible} = this.state;
         const menuOptions = [{
             text: Translate.string('Block rooms'),
             value: 'block-rooms',
@@ -161,8 +161,8 @@ class RoomList extends React.Component {
                 <Grid.Column computer={showMap ? 11 : 16} mobile={16}>
                     <div className="ui" styleName="room-list" ref={this.contextRef}>
                         <Sticky context={this.contextRef.current} className="sticky-filters"
-                                onStick={() => this.setState({scrollBtnVisible: true})}
-                                onUnstick={() => this.setState({scrollBtnVisible: false})}>
+                                onStick={() => this.setState({scrollButtonVisible: true})}
+                                onUnstick={() => this.setState({scrollButtonVisible: false})}>
                             <div className="filter-row">
                                 <div className="filter-row-filters">
                                     <RoomFilterBar />
@@ -194,7 +194,7 @@ class RoomList extends React.Component {
                                     </div>
                                 )}
                             </div>
-                            <ScrollButton visible={scrollBtnVisible} />
+                            <ScrollButton visible={scrollButtonVisible} />
                         </Sticky>
                         <div styleName="results-count">
                             {results.length === 0 && !isSearching && Translate.string('There are no rooms matching the criteria')}
