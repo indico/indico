@@ -20,7 +20,10 @@ import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import {Card, Container, Message, Sticky} from 'semantic-ui-react';
+
 import {Translate} from 'indico/react/i18n';
+import {ScrollButton} from 'indico/react/components';
+
 import BlockingCard from './BlockingCard';
 import CardPlaceholder from '../../components/CardPlaceholder';
 import BlockingFilterBar from './BlockingFilterBar';
@@ -45,6 +48,10 @@ class BlockingList extends React.Component {
         super(props);
         this.contextRef = React.createRef();
     }
+
+    state = {
+        scrollBtnVisible: false,
+    };
 
     componentDidMount() {
         const {actions: {fetchBlockings}} = this.props;
@@ -91,11 +98,15 @@ class BlockingList extends React.Component {
     };
 
     render() {
+        const {scrollBtnVisible} = this.state;
         return (
             <div ref={this.contextRef}>
                 <Container styleName="blockings-container" fluid>
-                    <Sticky context={this.contextRef.current} className="sticky-filters">
+                    <Sticky context={this.contextRef.current} className="sticky-filters"
+                            onStick={() => this.setState({scrollBtnVisible: true})}
+                            onUnstick={() => this.setState({scrollBtnVisible: false})}>
                         <BlockingFilterBar />
+                        <ScrollButton visible={scrollBtnVisible} />
                     </Sticky>
                     {this.renderContent()}
                 </Container>
