@@ -44,6 +44,10 @@ rb_settings = SettingsProxy('roombooking', {
     'notification_before_days_weekly': 5,
     'notification_before_days_monthly': 7,
     'notifications_enabled': True,
+    'notification_before_end_daily': 1,
+    'notification_before_end_weekly': 3,
+    'notification_before_end_monthly': 7,
+    'notifications_before_end_enabled': True,
     'booking_limit': 365,
     'tileserver_url': ''
 }, acls={
@@ -52,7 +56,6 @@ rb_settings = SettingsProxy('roombooking', {
 }, converters={
     'excluded_categories': ModelListConverter(Category)
 })
-
 
 @signals.import_tasks.connect
 def _import_tasks(sender, **kwargs):

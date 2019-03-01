@@ -42,6 +42,17 @@ class SettingsForm(IndicoForm):
     notification_before_days_monthly = IntegerField(_('Send booking reminders X days before (monthly)'),
                                                     [InputRequired(), NumberRange(min=1, max=30)])
     notifications_enabled = BooleanField(_('Reminders enabled'))
+    notification_before_end_daily = IntegerField(_('Send reminders about ending bookings X days before their end date '
+                                                   '(daily)'),
+                                                 [InputRequired(), NumberRange(min=1, max=30)])
+    notification_before_end_weekly = IntegerField(_('Send reminders about ending bookings X days before their end date '
+                                                    '(weekly)'),
+                                                  [InputRequired(), NumberRange(min=1, max=30)])
+    notification_before_end_monthly = IntegerField(_('Send reminders about ending bookings X days before their end '
+                                                     'date (monthly)'),
+                                                   [InputRequired(), NumberRange(min=1, max=30)])
+    notifications_before_end_enabled = BooleanField(_('Reminders of ending bookings enabled'))
+
     vc_support_emails = EmailListField(_('Videoconference support email addresses (one per line)'))
     booking_limit = IntegerField(_('Maximum length of booking (days)'), [InputRequired(), NumberRange(min=1)])
     google_maps_api_key = StringField(_('Google Maps API key'), description=GOOGLE_API_KEY_DESC)
