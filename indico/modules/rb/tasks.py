@@ -31,22 +31,20 @@ from indico.modules.rb.models.reservation_occurrences import ReservationOccurren
 from indico.modules.rb.models.reservations import RepeatFrequency, Reservation
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.notifications.reservation_occurrences import notify_upcoming_occurrences
+from indico.modules.rb.notifications.reservations import notify_about_finishing_bookings
 from indico.util.console import cformat
 
 
-def _make_occurrence_date_filter():
-    _default = rb_settings.get('notification_before_days')
-    _default_weekly = rb_settings.get('notification_before_days_weekly')
-    _default_monthly = rb_settings.get('notification_before_days_monthly')
-    notification_before_days_room = db.case({RepeatFrequency.WEEK.value: Room.notification_before_days_weekly,
-                                             RepeatFrequency.MONTH.value: Room.notification_before_days_monthly},
-                                            else_=Room.notification_before_days, value=Reservation.repeat_frequency)
-    notification_before_days_default = db.case({RepeatFrequency.WEEK.value: _default_weekly,
-                                                RepeatFrequency.MONTH.value: _default_monthly},
-                                               else_=_default, value=Reservation.repeat_frequency)
-    notification_before_days = db.func.coalesce(notification_before_days_room, notification_before_days_default)
-    days_until_occurrence = db.cast(ReservationOccurrence.start_dt, db.Date) - date.today()
-    return days_until_occurrence == notification_before_days
+def _make_occurrence_date_filter(date_column, default_values, room_columns):
+    notification_before = db.case({RepeatFrequency.WEEK.value: room_columns['weekly'],
+                                   RepeatFrequency.MONTH.value: room_columns['monthly']},
+                                  else_=room_columns['default'], value=Reservation.repeat_frequency)
+    notification_before_default = db.case({RepeatFrequency.WEEK.value: default_values['weekly'],
+                                           RepeatFrequency.MONTH.value: default_values['monthly']},
+                                          else_=default_values['default'], value=Reservation.repeat_frequency)
+    notification_before_days = db.func.coalesce(notification_before, notification_before_default)
+    days_until = db.cast(date_column, db.Date) - date.today()
+    return days_until == notification_before_days
 
 
 def _print_occurrences(user, occurrences, _defaults={}, _overrides={}):
@@ -95,6 +93,18 @@ def roombooking_occurrences(debug=False):
         logger.info('Notifications not sent because they are globally disabled')
         return
 
+    defaults = {
+        'default': rb_settings.get('notification_before_days'),
+        'weekly': rb_settings.get('notification_before_days_weekly'),
+        'monthly': rb_settings.get('notification_before_days_monthly')
+    }
+
+    room_columns = {
+        'default': Room.notification_before_days,
+        'weekly': Room.notification_before_days_weekly,
+        'monthly': Room.notification_before_days_monthly
+    }
+
     occurrences = (ReservationOccurrence.query
                    .join(ReservationOccurrence.reservation)
                    .join(Reservation.room)
@@ -105,7 +115,7 @@ def roombooking_occurrences(debug=False):
                            ReservationOccurrence.is_valid,
                            ReservationOccurrence.start_dt >= datetime.now(),
                            ~ReservationOccurrence.notification_sent,
-                           _make_occurrence_date_filter())
+                           _make_occurrence_date_filter(ReservationOccurrence.start_dt, defaults, room_columns))
                    .order_by(Reservation.booked_for_id, ReservationOccurrence.start_dt, Room.id)
                    .options(contains_eager('reservation').contains_eager('room'))
                    .all())
@@ -118,3 +128,44 @@ def roombooking_occurrences(debug=False):
             _notify_occurrences(user, user_occurrences)
     if not debug:
         db.session.commit()
+
+
+@celery.periodic_task(name='notifications_about_finishing_bookings', run_every=crontab(minute='0', hour='8'))
+def notifications_about_finishing_bookings():
+    if not config.ENABLE_ROOMBOOKING:
+        logger.info('Notifications not sent because room booking is disabled')
+        return
+    if not rb_settings.get('notifications_before_end_enabled'):
+        logger.info('Notifications not sent because they are globally disabled')
+        return
+
+    defaults = {
+        'default': rb_settings.get('notification_before_end_daily'),
+        'weekly': rb_settings.get('notification_before_end_weekly'),
+        'monthly': rb_settings.get('notification_before_end_monthly')
+    }
+
+    room_columns = {
+        'default': Room.notification_before_end_daily,
+        'weekly': Room.notification_before_end_weekly,
+        'monthly': Room.notification_before_end_monthly
+    }
+
+    reservations = (Reservation.query
+                    .join(Reservation.room)
+                    .filter(Room.is_active,
+                            Room.notifications_before_end_enabled,
+                            Reservation.is_accepted,
+                            Reservation.end_dt >= datetime.now(),
+                            ~Reservation.notification_sent,
+                            _make_occurrence_date_filter(Reservation.end_dt, defaults, room_columns))
+                    .order_by(Reservation.booked_for_id, Reservation.start_dt, Room.id)
+                    .all())
+
+    for user, user_reservations in groupby(reservations, key=attrgetter('booked_for_user')):
+        user_reservations = list(user_reservations)
+        notify_about_finishing_bookings(user, list(user_reservations))
+        for user_reservation in user_reservations:
+            user_reservation.notification_sent = True
+
+    db.session.commit()

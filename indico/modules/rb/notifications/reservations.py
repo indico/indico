@@ -3,6 +3,7 @@ from flask import render_template
 from indico.core.notifications import email_sender, make_email
 from indico.util.date_time import format_datetime
 from indico.util.string import to_unicode
+from indico.web.flask.templating import get_template_module
 
 
 class ReservationNotification(object):
@@ -202,3 +203,10 @@ def notify_modification(reservation, changes):
             assistance_cancelled=assistance_cancelled
         )
     ])
+
+
+@email_sender
+def notify_about_finishing_bookings(user, reservations):
+    tpl = get_template_module('rb/emails/reservations/reminders/finishing_bookings.html',
+                              reservations=reservations, user=user)
+    return make_email(to_list={user.email}, template=tpl, html=True)

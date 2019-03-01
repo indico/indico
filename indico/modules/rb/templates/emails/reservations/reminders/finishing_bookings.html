@@ -1,0 +1,32 @@
+{% extends 'rb/emails/base_email.html' %}
+
+{% block header_recipient %}{{ user.first_name }}{% endblock %}
+{% block subject %}Some of your bookings will come to an end soon{% endblock %}
+
+
+{% block body -%}
+    {%- if reservations | length == 1 -%}
+        There is one booking under your name that will come to an end soon:<br>
+    {%- else -%}
+        There are bookings under your name that will soon come to an end:<br>
+    {%- endif %}
+    <ul>
+        {% for reservation in reservations %}
+            <li style="{{ 'margin-top: 2em;' if not loop.first }}">
+                {{ _render_finishing_reservation(reservation) }}
+            </li>
+        {%- endfor -%}
+    </ul>
+{%- endblock %}
+
+
+{% macro _render_dates(reservation) -%}
+    <strong>{{ reservation.start_dt | format_datetime(locale='en_GB') }}</strong> - <strong>{{ reservation.end_dt | format_datetime(locale='en_GB') }}</strong>
+{%- endmacro %}
+
+
+{% macro _render_finishing_reservation(reservation) -%}
+    Dates: {{_render_dates(reservation) }}<br>
+    Room: <strong>{{ reservation.room.full_name }}</strong><br>
+    Reason of the booking: <strong>{{ reservation.booking_reason }}</strong><br>
+{%- endmacro %}
