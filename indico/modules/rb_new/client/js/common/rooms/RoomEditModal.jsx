@@ -59,8 +59,7 @@ function isInvalidNotificationPeriod(days) {
 
 function validate(fields) {
     const {
-        building, floor, number, capacity, surfaceArea, maxAdvanceDays, bookingLimitDays, nonbookablePeriods,
-        notificationBeforeDays, notificationBeforeDaysWeekly, notificationBeforeDaysMonthly, owner,
+        building, floor, number, capacity, surfaceArea, maxAdvanceDays, bookingLimitDays, nonbookablePeriods, owner
     } = fields;
     const errors = {};
     if (!building) {
@@ -84,15 +83,22 @@ function validate(fields) {
     if (bookingLimitDays !== null && bookingLimitDays < 1) {
         errors.bookingLimitDays = Translate.string('The max. booking duration must be at least 1 day or empty.');
     }
-    if (isInvalidNotificationPeriod(notificationBeforeDays)) {
-        errors.notificationBeforeDays = Translate.string('Number of days must be between 1 and 30');
-    }
-    if (isInvalidNotificationPeriod(notificationBeforeDaysWeekly)) {
-        errors.notificationBeforeDaysWeekly = Translate.string('Number of days must be between 1 and 30');
-    }
-    if (isInvalidNotificationPeriod(notificationBeforeDaysMonthly)) {
-        errors.notificationBeforeDaysMonthly = Translate.string('Number of days must be between 1 and 30');
-    }
+    const notificationPeriodFields = [
+        'notificationBeforeDays',
+        'notificationBeforeDaysWeekly',
+        'notificationBeforeDaysMonthly',
+        'notificationBeforeEndDaily',
+        'notificationBeforeEndWeekly',
+        'notificationBeforeEndMonthly',
+    ];
+
+    notificationPeriodFields.forEach((field) => {
+        const value = fields[field];
+        if (isInvalidNotificationPeriod(value)) {
+            errors[field] = Translate.string('Number of days must be between 1 and 30');
+        }
+    });
+
     if (nonbookablePeriods && nonbookablePeriods.some(x => !x.startDt || !x.endDt)) {
         errors.nonbookablePeriods = Translate.string('Please provide valid non-bookable periods.');
     }
@@ -240,7 +246,7 @@ const columns = [
         required: false
     }, {
         type: 'header',
-        label: 'Options',
+        label: Translate.string('Options'),
     }, {
         type: 'checkbox',
         name: 'isReservable',
@@ -254,35 +260,82 @@ const columns = [
         name: 'notificationsEnabled',
         label: Translate.string('Reminders enabled')
     }, {
-        type: 'input',
-        name: 'notificationBeforeDays',
-        label: Translate.string('Send Booking reminders X days before (single/daily)'),
-        inputArgs: {
-            type: 'number',
-            min: 1,
-            max: 30,
-        },
-        required: false
+        type: 'checkbox',
+        name: 'notificationsBeforeEndEnabled',
+        label: Translate.string('Reminders of finishing bookings enabled')
     }, {
-        type: 'input',
-        name: 'notificationBeforeDaysWeekly',
-        label: Translate.string('Send Booking reminders X days before (weekly)'),
-        inputArgs: {
-            type: 'number',
-            min: 1,
-            max: 30,
-        },
-        required: false
+        type: 'header',
+        label: Translate.string('Notifications')
     }, {
-        type: 'input',
-        name: 'notificationBeforeDaysMonthly',
-        label: Translate.string('Send Booking reminders X days before (monthly)'),
-        inputArgs: {
-            type: 'number',
-            min: 1,
-            max: 30,
-        },
-        required: false
+        type: 'formgroup',
+        key: 'notifications',
+        label: Translate.string('How many days in advance booking reminders should be sent?'),
+        content: [{
+            type: 'input',
+            name: 'notificationBeforeDays',
+            label: Translate.string('Single/Daily'),
+            inputArgs: {
+                type: 'number',
+                min: 1,
+                max: 30,
+            },
+            required: false
+        }, {
+            type: 'input',
+            name: 'notificationBeforeDaysWeekly',
+            label: Translate.string('Weekly'),
+            inputArgs: {
+                type: 'number',
+                min: 1,
+                max: 30,
+            },
+            required: false
+        }, {
+            type: 'input',
+            name: 'notificationBeforeDaysMonthly',
+            label: Translate.string('Monthly'),
+            inputArgs: {
+                type: 'number',
+                min: 1,
+                max: 30,
+            },
+            required: false
+        }]
+    }, {
+        type: 'formgroup',
+        key: 'notificationsOfFinishingBookings',
+        label: Translate.string('How many days before the end of a booking should we send a reminder?'),
+        content: [{
+            type: 'input',
+            name: 'notificationBeforeEndDaily',
+            label: Translate.string('Daily'),
+            inputArgs: {
+                type: 'number',
+                min: 1,
+                max: 30,
+            },
+            required: false
+        }, {
+            type: 'input',
+            name: 'notificationBeforeEndWeekly',
+            label: Translate.string('Weekly'),
+            inputArgs: {
+                type: 'number',
+                min: 1,
+                max: 30,
+            },
+            required: false
+        }, {
+            type: 'input',
+            name: 'notificationBeforeEndMonthly',
+            label: Translate.string('Monthly'),
+            inputArgs: {
+                type: 'number',
+                min: 1,
+                max: 30,
+            },
+            required: false
+        }]
     }],
     // right
     [{
@@ -430,7 +483,8 @@ class RoomEditModal extends React.Component {
     handleSubmit = async (data, form) => {
         const {roomId} = this.props;
         const changedValues = getChangedValues(data, form);
-        const basicDetails = _.omit(changedValues, ['attributes', 'bookableHours', 'nonbookablePeriods', 'availableEquipment', 'owner']);
+        const basicDetailsKeys = ['attributes', 'bookableHours', 'nonbookablePeriods', 'availableEquipment', 'owner'];
+        const basicDetails = _.omit(changedValues, basicDetailsKeys);
         if (changedValues.owner) {
             basicDetails.owner_id = changedValues.owner.id;
         }
@@ -569,9 +623,12 @@ class RoomEditModal extends React.Component {
                 );
             case 'formgroup':
                 return (
-                    <Form.Group key={key}>
-                        {content.content.map(this.renderContent)}
-                    </Form.Group>
+                    <React.Fragment key={key}>
+                        {content.label && <Header as="h5">{content.label}</Header>}
+                        <Form.Group>
+                            {content.content.map(this.renderContent)}
+                        </Form.Group>
+                    </React.Fragment>
                 );
             case 'checkbox':
                 return (
@@ -641,6 +698,7 @@ class RoomEditModal extends React.Component {
                 </Modal.Header>
                 <Modal.Content scrolling>
                     <Form id="room-form"
+                          styleName="room-form"
                           onSubmit={fprops.handleSubmit}>
                         <Grid columns={3}>
                             <Grid.Column>{columns[0].map(this.renderContent)}</Grid.Column>

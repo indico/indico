@@ -27,3 +27,8 @@
     margin-bottom: 10px;
 }
 
+.room-form {
+    :global(.fields) > :global(.field) {
+        flex: 1 1 auto !important;
+    }
+}
