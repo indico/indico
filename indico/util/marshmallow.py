@@ -52,10 +52,11 @@ class NaiveDateTime(UnicodeDateTime):
 
 
 class ModelList(Field):
-    """Deserializer for a list of database objects.
+    """Marshmallow field for a list of database objects.
 
-    This is meant to be used in webargs, so serialization is not supported.
-    Use the normal types/ModelSchema if you need to serialize.
+    This serializes a list of SQLAlchemy objects to a list of
+    identifiers (usually the PK), and deserializes from the same
+    kind of list back to actual SQLAlchemy objects.
     """
 
     default_error_messages = {
@@ -78,7 +79,7 @@ class ModelList(Field):
         super(ModelList, self).__init__(**kwargs)
 
     def _serialize(self, value, attr, obj):
-        raise NotImplementedError
+        return [getattr(x, self.column.key) for x in value]
 
     def _deserialize(self, value, attr, data):
         if not value:
