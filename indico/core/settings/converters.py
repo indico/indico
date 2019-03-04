@@ -20,6 +20,7 @@ from datetime import timedelta
 
 import dateutil.parser
 import pytz
+from sqlalchemy import inspect
 
 
 class SettingConverter(object):
@@ -81,3 +82,53 @@ class EnumConverter(SettingConverter):
 
     def to_python(self, value):
         return self.enum[value]
+
+
+class ModelConverter(SettingConverter):
+    """Convert a SQLAlchemy object from/to its PK.
+
+    :param model: A SQLAlchemy model with a single-column PK.
+    """
+
+    def __init__(self, model):
+        self.model = model
+        assert len(inspect(model).primary_key) == 1
+
+    def from_python(self, value):
+        if value is None:
+            return None
+        assert isinstance(value, self.model)
+        return inspect(value).identity_key[1][0]
+
+    def to_python(self, value):
+        if value is None:
+            return None
+        return self.model.query.get(value)
+
+
+class ModelListConverter(SettingConverter):
+    """Convert a list of SQLAlchemy objects from/to a list of PKs.
+
+    :param model: A SQLAlchemy model with a single-column PK.
+    :param collection_class: The collection to use for the python-side
+                             value. Defaults to `list` but could also be
+                             `set` for example.
+    """
+
+    def __init__(self, model, collection_class=list):
+        self.model = model
+        self.collection_class = collection_class
+        pks = inspect(model).primary_key
+        assert len(pks) == 1
+        self.column = pks[0]
+
+    def from_python(self, value):
+        if not value:
+            return []
+        assert all(isinstance(x, self.model) for x in value)
+        return [inspect(x).identity_key[1][0] for x in value]
+
+    def to_python(self, value):
+        if not value:
+            return []
+        return self.collection_class(self.model.query.filter(self.column.in_(value)))
