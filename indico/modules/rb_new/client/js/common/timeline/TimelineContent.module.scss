@@ -19,6 +19,7 @@
 @import 'rb_new:styles/util';
 
 $row-height: 40px;
+$split-row-height: $row-height/2;
 
 .timeline-header {
     display: flex;
@@ -82,6 +83,16 @@ $row-height: 40px;
                 white-space: nowrap;
                 padding-right: 2em;
                 text-align: right;
+
+                .split-label {
+                    line-height: $split-row-height;
+                }
+
+                .sub-label {
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                }
 
                 .dot {
                     vertical-align: 0.5em;
