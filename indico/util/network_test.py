@@ -29,7 +29,6 @@ from indico.util.network import is_private_url
     ('https://indico.local', True),
     ('https://local', True),
     ('https://testing-instance', True),
-    ('https://indico.dev', True),
     ('https://indico', True)
 ))
 def test_is_private_url(url, expected):
