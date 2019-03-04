@@ -102,6 +102,8 @@ export default class ElasticTimeline extends React.Component {
             availability: this._getDayRowSerializer(selectedDate)(data),
             label: data.room.fullName,
             key: data.room.id,
+            name: data.room.name,
+            verboseName: data.room.verboseName,
             conflictIndicator,
             room: data.room
         }));
@@ -122,6 +124,8 @@ export default class ElasticTimeline extends React.Component {
                 availability: weekRange.map(dt => [dt, this._getDayRowSerializer(dt)(data)]),
                 label: room.fullName,
                 key: room.id,
+                name: room.name,
+                verboseName: room.verboseName,
                 conflictIndicator,
                 room
             };
@@ -144,6 +148,8 @@ export default class ElasticTimeline extends React.Component {
                 availability: monthRange.map(dt => [dt, this._getDayRowSerializer(dt)(data)]),
                 label: room.fullName,
                 key: room.id,
+                name: room.name,
+                verboseName: room.verboseName,
                 conflictIndicator,
                 room
             };

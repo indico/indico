@@ -92,7 +92,7 @@ export default class DailyTimelineContent extends React.Component {
         return {ItemClass, itemProps};
     };
 
-    renderTimelineRow({availability, label, conflictIndicator, room}, key, rowStyle = null) {
+    renderTimelineRow({availability, label, conflictIndicator, name, verboseName, room}, key, rowStyle = null) {
         const {minHour, maxHour, hourStep, onClickCandidate, onClickReservation, longLabel, showActions} = this.props;
         const columns = ((maxHour - minHour) / hourStep) + 1;
         const hasConflicts = !(_.isEmpty(availability.conflicts) && _.isEmpty(availability.preConflicts));
@@ -101,6 +101,8 @@ export default class DailyTimelineContent extends React.Component {
         return (
             <div styleName="timeline-row" key={key} style={rowStyle}>
                 <TimelineRowLabel label={label}
+                                  name={name}
+                                  verboseName={verboseName}
                                   availability={conflictIndicator ? (hasConflicts ? 'conflict' : 'available') : null}
                                   longLabel={longLabel}
                                   onClickLabel={this.onClickLabel(room.id)} />
@@ -275,7 +277,7 @@ export default class DailyTimelineContent extends React.Component {
     }
 }
 
-export function TimelineRowLabel({label, availability, longLabel, onClickLabel}) {
+export function TimelineRowLabel({label, name, verboseName, availability, longLabel, onClickLabel}) {
     let color, tooltip;
     switch (availability) {
         case 'conflict':
@@ -290,30 +292,45 @@ export function TimelineRowLabel({label, availability, longLabel, onClickLabel})
             color = 'green';
             tooltip = Translate.string('Room available');
     }
+
+    const icon = availability ? <Icon name="circle" size="tiny" color={color} styleName="dot" /> : null;
+    const labelContent = verboseName ? (
+        <span styleName="split-label">
+            <div>
+                {icon}
+                {name}
+            </div>
+            <TooltipIfTruncated>
+                <div styleName="sub-label">
+                    <small>{verboseName}</small>
+                </div>
+            </TooltipIfTruncated>
+        </span>
+    ) : (<span>{icon}{label}</span>);
+
     const roomLabel = (
         <span>
-            {availability && <Icon name="circle" size="tiny" color={color} styleName="dot" />}
-            {onClickLabel ? <a onClick={onClickLabel}>{label}</a> : <span>{label}</span>}
+            {onClickLabel ? <a onClick={onClickLabel}>{labelContent}</a> : labelContent}
         </span>
     );
     const width = longLabel ? 200 : 150;
 
     return (
-        <TooltipIfTruncated>
-            <div styleName="timeline-row-label" style={{
-                minWidth: width,
-                maxWidth: width
-            }}>
-                <div styleName="label">
-                    {availability ? <Popup trigger={roomLabel} content={tooltip} size="small" /> : roomLabel}
-                </div>
+        <div styleName="timeline-row-label" style={{
+            minWidth: width,
+            maxWidth: width
+        }}>
+            <div styleName="label">
+                {availability ? <Popup trigger={roomLabel} content={tooltip} size="small" /> : roomLabel}
             </div>
-        </TooltipIfTruncated>
+        </div>
     );
 }
 
 TimelineRowLabel.propTypes = {
     label: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    verboseName: PropTypes.string,
     availability: PropTypes.oneOf(['available', 'alternatives', 'conflict']),
     longLabel: PropTypes.bool,
     onClickLabel: PropTypes.oneOfType([
@@ -326,4 +343,5 @@ TimelineRowLabel.defaultProps = {
     availability: null,
     longLabel: false,
     onClickLabel: null,
+    verboseName: null,
 };
