@@ -99,7 +99,7 @@ class BlockingList extends React.Component {
     };
 
     toggleScrollButtonVisibility = (val) => {
-        _.debounce(() => this.setState({scrollButtonVisible: val}), 750);
+        return _.debounce(() => this.setState({scrollButtonVisible: val}), 300);
     };
 
     render() {
@@ -108,8 +108,8 @@ class BlockingList extends React.Component {
             <div ref={this.contextRef}>
                 <Container styleName="blockings-container" fluid>
                     <Sticky context={this.contextRef.current} className="sticky-filters"
-                            onStick={() => this.toggleScrollButtonVisibility(true)}
-                            onUnstick={() => this.toggleScrollButtonVisibility(false)}>
+                            onStick={this.toggleScrollButtonVisibility(true)}
+                            onUnstick={this.toggleScrollButtonVisibility(false)}>
                         <BlockingFilterBar />
                         <ScrollButton visible={scrollButtonVisible} />
                     </Sticky>
