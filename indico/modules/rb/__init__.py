@@ -44,10 +44,10 @@ rb_settings = SettingsProxy('roombooking', {
     'notification_before_days_weekly': 5,
     'notification_before_days_monthly': 7,
     'notifications_enabled': True,
-    'notification_before_end_daily': 1,
-    'notification_before_end_weekly': 3,
-    'notification_before_end_monthly': 7,
-    'notifications_before_end_enabled': True,
+    'end_notification_daily': 1,
+    'end_notification_weekly': 3,
+    'end_notification_monthly': 7,
+    'end_notifications_enabled': True,
     'booking_limit': 365,
     'tileserver_url': ''
 }, acls={

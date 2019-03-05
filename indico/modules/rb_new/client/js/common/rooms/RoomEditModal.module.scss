@@ -29,6 +29,6 @@
 
 .room-form {
     :global(.fields) > :global(.field) {
-        flex: 1 1 auto !important;
+        flex-grow: 1 !important;
     }
 }

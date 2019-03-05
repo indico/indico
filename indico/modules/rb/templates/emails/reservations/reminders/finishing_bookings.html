@@ -5,11 +5,13 @@
 
 
 {% block body -%}
-    {%- if reservations | length == 1 -%}
-        There is one booking under your name that will come to an end soon:<br>
-    {%- else -%}
-        There are bookings under your name that will soon come to an end:<br>
-    {%- endif %}
+    {% block message %}
+        {%- if reservations|length == 1 -%}
+            There is one booking under your name that will soon come to an end:<br>
+        {%- else -%}
+            There are bookings under your name that will soon come to an end:<br>
+        {%- endif %}
+    {% endblock %}
     <ul>
         {% for reservation in reservations %}
             <li style="{{ 'margin-top: 2em;' if not loop.first }}">
@@ -21,7 +23,7 @@
 
 
 {% macro _render_dates(reservation) -%}
-    <strong>{{ reservation.start_dt | format_datetime(locale='en_GB') }}</strong> - <strong>{{ reservation.end_dt | format_datetime(locale='en_GB') }}</strong>
+    <strong>{{ reservation.start_dt|format_datetime(locale='en_GB') }}</strong> - <strong>{{ reservation.end_dt|format_datetime(locale='en_GB') }}</strong>
 {%- endmacro %}
 
 

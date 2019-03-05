@@ -17,19 +17,22 @@ depends_on = None
 
 
 def upgrade():
-    op.add_column('reservations', sa.Column('notification_sent', sa.Boolean(), nullable=False, server_default='false'),
+    op.add_column('reservations',
+                  sa.Column('end_notification_sent', sa.Boolean(), nullable=False, server_default='false'),
                   schema='roombooking')
-    op.add_column('rooms', sa.Column('notification_before_end_daily', sa.Integer()), schema='roombooking')
-    op.add_column('rooms', sa.Column('notification_before_end_weekly', sa.Integer()), schema='roombooking')
-    op.add_column('rooms', sa.Column('notification_before_end_monthly', sa.Integer()), schema='roombooking')
+    op.alter_column('reservations', 'end_notification_sent', server_default=None, schema='roombooking')
+    op.add_column('rooms', sa.Column('end_notification_daily', sa.Integer()), schema='roombooking')
+    op.add_column('rooms', sa.Column('end_notification_weekly', sa.Integer()), schema='roombooking')
+    op.add_column('rooms', sa.Column('end_notification_monthly', sa.Integer()), schema='roombooking')
     op.add_column('rooms',
-                  sa.Column('notifications_before_end_enabled', sa.Boolean(), nullable=False, server_default='true'),
+                  sa.Column('end_notifications_enabled', sa.Boolean(), nullable=False, server_default='true'),
                   schema='roombooking')
+    op.alter_column('rooms', 'end_notifications_enabled', server_default=None, schema='roombooking')
 
 
 def downgrade():
-    op.drop_column('reservations', 'notification_sent', schema='roombooking')
-    op.drop_column('rooms', 'notification_before_end_daily', schema='roombooking')
-    op.drop_column('rooms', 'notification_before_end_weekly', schema='roombooking')
-    op.drop_column('rooms', 'notification_before_end_monthly', schema='roombooking')
-    op.drop_column('rooms', 'notifications_before_end_enabled', schema='roombooking')
+    op.drop_column('reservations', 'end_notification_sent', schema='roombooking')
+    op.drop_column('rooms', 'end_notification_daily', schema='roombooking')
+    op.drop_column('rooms', 'end_notification_weekly', schema='roombooking')
+    op.drop_column('rooms', 'end_notification_monthly', schema='roombooking')
+    op.drop_column('rooms', 'end_notifications_enabled', schema='roombooking')

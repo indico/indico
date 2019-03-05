@@ -261,7 +261,7 @@ const columns = [
         label: Translate.string('Reminders enabled')
     }, {
         type: 'checkbox',
-        name: 'notificationsBeforeEndEnabled',
+        name: 'endNotificationsEnabled',
         label: Translate.string('Reminders of finishing bookings enabled')
     }, {
         type: 'header',
@@ -304,10 +304,10 @@ const columns = [
     }, {
         type: 'formgroup',
         key: 'notificationsOfFinishingBookings',
-        label: Translate.string('How many days before the end of a booking should we send a reminder?'),
+        label: Translate.string('How many days before the end of a booking reminders should be sent?'),
         content: [{
             type: 'input',
-            name: 'notificationBeforeEndDaily',
+            name: 'endNotificationDaily',
             label: Translate.string('Daily'),
             inputArgs: {
                 type: 'number',
@@ -317,7 +317,7 @@ const columns = [
             required: false
         }, {
             type: 'input',
-            name: 'notificationBeforeEndWeekly',
+            name: 'endNotificationWeekly',
             label: Translate.string('Weekly'),
             inputArgs: {
                 type: 'number',
@@ -327,7 +327,7 @@ const columns = [
             required: false
         }, {
             type: 'input',
-            name: 'notificationBeforeEndMonthly',
+            name: 'endNotificationMonthly',
             label: Translate.string('Monthly'),
             inputArgs: {
                 type: 'number',

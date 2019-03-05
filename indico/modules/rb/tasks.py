@@ -131,33 +131,33 @@ def roombooking_occurrences(debug=False):
 
 
 @celery.periodic_task(name='notifications_about_finishing_bookings', run_every=crontab(minute='0', hour='8'))
-def notifications_about_finishing_bookings():
+def booking_end_notifications():
     if not config.ENABLE_ROOMBOOKING:
         logger.info('Notifications not sent because room booking is disabled')
         return
-    if not rb_settings.get('notifications_before_end_enabled'):
+    if not rb_settings.get('end_notifications_enabled'):
         logger.info('Notifications not sent because they are globally disabled')
         return
 
     defaults = {
-        'default': rb_settings.get('notification_before_end_daily'),
-        'weekly': rb_settings.get('notification_before_end_weekly'),
-        'monthly': rb_settings.get('notification_before_end_monthly')
+        'default': rb_settings.get('end_notification_daily'),
+        'weekly': rb_settings.get('end_notification_weekly'),
+        'monthly': rb_settings.get('end_notification_monthly')
     }
 
     room_columns = {
-        'default': Room.notification_before_end_daily,
-        'weekly': Room.notification_before_end_weekly,
-        'monthly': Room.notification_before_end_monthly
+        'default': Room.end_notification_daily,
+        'weekly': Room.end_notification_weekly,
+        'monthly': Room.end_notification_monthly
     }
 
     reservations = (Reservation.query
                     .join(Reservation.room)
                     .filter(Room.is_active,
-                            Room.notifications_before_end_enabled,
+                            Room.end_notifications_enabled,
                             Reservation.is_accepted,
                             Reservation.end_dt >= datetime.now(),
-                            ~Reservation.notification_sent,
+                            ~Reservation.end_notification_sent,
                             _make_occurrence_date_filter(Reservation.end_dt, defaults, room_columns))
                     .order_by(Reservation.booked_for_id, Reservation.start_dt, Room.id)
                     .all())

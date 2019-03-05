@@ -139,14 +139,17 @@ class Room(versioned_cache(_cache, 'id'), ProtectionManagersMixin, db.Model, Ser
     notification_before_days_monthly = db.Column(
         db.Integer
     )
-    notification_before_end_daily = db.Column(
-        db.Integer
+    end_notification_daily = db.Column(
+        db.Integer,
+        nullable=True
     )
-    notification_before_end_weekly = db.Column(
-        db.Integer
+    end_notification_weekly = db.Column(
+        db.Integer,
+        nullable=True
     )
-    notification_before_end_monthly = db.Column(
-        db.Integer
+    end_notification_monthly = db.Column(
+        db.Integer,
+        nullable=True
     )
     notification_for_assistance = db.Column(
         db.Boolean,
@@ -163,7 +166,7 @@ class Room(versioned_cache(_cache, 'id'), ProtectionManagersMixin, db.Model, Ser
         nullable=False,
         default=True
     )
-    notifications_before_end_enabled = db.Column(
+    end_notifications_enabled = db.Column(
         db.Boolean,
         nullable=False,
         default=True

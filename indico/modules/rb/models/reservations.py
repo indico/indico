@@ -243,7 +243,7 @@ class Reservation(Serializer, db.Model):
         nullable=True,
         index=True
     )
-    notification_sent = db.Column(
+    end_notification_sent = db.Column(
         db.Boolean,
         nullable=False,
         default=False
