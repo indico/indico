@@ -109,6 +109,50 @@ def principal_from_fossil(fossil, allow_pending=False, allow_groups=True, allow_
         raise ValueError('Unexpected fossil type: {}'.format(type_))
 
 
+def principal_from_identifier(identifier, allow_groups=False):
+    # XXX: this is currently only used in PrincipalList
+    # if we ever need to support more than just users and groups,
+    # make sure to add it in here as well
+    from indico.modules.groups import GroupProxy
+    from indico.modules.users import User
+
+    try:
+        type_, data = identifier.split(':', 1)
+    except ValueError:
+        raise ValueError('Invalid data')
+    if type_ == 'User':
+        try:
+            user_id = int(data)
+        except ValueError:
+            raise ValueError('Invalid data')
+        user = User.get(user_id, is_deleted=False)
+        if user is None:
+            raise ValueError('Invalid user: {}'.format(user_id))
+        return user
+    elif type_ == 'Group':
+        if not allow_groups:
+            raise ValueError('Groups are not allowed')
+        try:
+            provider, name = data.split(':', 1)
+        except ValueError:
+            raise ValueError('Invalid data')
+        if not provider:
+            # local group
+            try:
+                group_id = int(name)
+            except ValueError:
+                raise ValueError('Invalid data')
+            group = GroupProxy(group_id)
+        else:
+            # multipass group
+            group = GroupProxy(name, provider)
+        if group.group is None:
+            raise ValueError('Invalid group: {}'.format(data))
+        return group
+    else:
+        raise ValueError('Invalid data')
+
+
 def unify_user_args(fn):
     """Decorator that unifies new/legacy user arguments.
 

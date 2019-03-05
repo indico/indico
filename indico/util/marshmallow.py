@@ -21,6 +21,8 @@ from marshmallow.fields import DateTime, Field
 from marshmallow.utils import from_iso
 from sqlalchemy import inspect
 
+from indico.util.user import principal_from_identifier
+
 
 def _naive_isoformat(dt, **unused):
     assert dt.tzinfo is None, 'expected naive datetime'
@@ -96,3 +98,20 @@ class ModelList(Field):
             self.fail('not_found', value=next(iter(invalid)))
         assert found == requested, 'Unexpected objects found'
         return objs
+
+
+class PrincipalList(Field):
+    """Marshmallow field for a list of principals."""
+
+    def __init__(self, allow_groups=False, **kwargs):
+        self.allow_groups = allow_groups
+        super(PrincipalList, self).__init__(**kwargs)
+
+    def _serialize(self, value, attr, obj):
+        return [x.identifier for x in value]
+
+    def _deserialize(self, value, attr, data):
+        try:
+            return set(principal_from_identifier(x, allow_groups=self.allow_groups) for x in value)
+        except ValueError as exc:
+            raise ValidationError(unicode(exc))
