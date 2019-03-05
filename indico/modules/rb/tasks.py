@@ -166,6 +166,6 @@ def booking_end_notifications():
         user_reservations = list(user_reservations)
         notify_about_finishing_bookings(user, list(user_reservations))
         for user_reservation in user_reservations:
-            user_reservation.notification_sent = True
+            user_reservation.end_notification_sent = True
 
     db.session.commit()

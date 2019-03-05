@@ -62,6 +62,10 @@ class SettingsSchema(mm.Schema):
     notification_before_days = fields.Int(validate=[validate.Range(min=1, max=30)])
     notification_before_days_weekly = fields.Int(validate=[validate.Range(min=1, max=30)])
     notification_before_days_monthly = fields.Int(validate=[validate.Range(min=1, max=30)])
+    end_notifications_enabled = fields.Bool()
+    end_notification_daily = fields.Int(validate=[validate.Range(min=1, max=30)])
+    end_notification_weekly = fields.Int(validate=[validate.Range(min=1, max=30)])
+    end_notification_monthly = fields.Int(validate=[validate.Range(min=1, max=30)])
     excluded_categories = ModelList(Category)
 
     class Meta:
