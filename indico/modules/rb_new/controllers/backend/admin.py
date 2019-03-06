@@ -42,7 +42,7 @@ from indico.modules.rb_new.schemas import (admin_equipment_type_schema, admin_lo
                                            room_update_schema)
 from indico.modules.users.models.users import User
 from indico.util.i18n import _
-from indico.util.marshmallow import ModelList
+from indico.util.marshmallow import ModelList, PrincipalList
 
 
 class RHRoomBookingAdminBase(RHRoomBookingBase):
@@ -53,6 +53,8 @@ class RHRoomBookingAdminBase(RHRoomBookingBase):
 
 
 class SettingsSchema(mm.Schema):
+    admin_principals = PrincipalList(allow_groups=True)
+    authorized_principals = PrincipalList(allow_groups=True)
     tileserver_url = fields.String(validate=[
         validate.URL(schemes={'http', 'https'}),
         lambda value: all(x in value for x in ('{x}', '{y}', '{z}'))

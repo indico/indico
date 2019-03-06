@@ -23,6 +23,7 @@ import {connect} from 'react-redux';
 import {Field, Form as FinalForm} from 'react-final-form';
 import {Form, Header, Message, Placeholder} from 'semantic-ui-react';
 import {PluralTranslate, Translate} from 'indico/react/i18n';
+import {PrincipalListField} from 'indico/react/components';
 import {
     formatters, getChangedValues, FieldCondition, ReduxFormField, ReduxCheckboxField,
     validators as v
@@ -58,6 +59,7 @@ class SettingsPage extends React.PureComponent {
 
     render() {
         const {settingsLoaded, settings} = this.props;
+
         if (!settingsLoaded) {
             return (
                 <Placeholder>
@@ -88,6 +90,36 @@ class SettingsPage extends React.PureComponent {
                     {fprops => (
                         <Form onSubmit={fprops.handleSubmit}
                               success={fprops.submitSucceeded && !fprops.dirtySinceLastSubmit}>
+                            <Message>
+                                <Message.Header>
+                                    <Translate>
+                                        Specify who has access to the room booking system.
+                                    </Translate>
+                                </Message.Header>
+                                <Form.Group widths="equal">
+                                    <Field name="authorized_principals" component={ReduxFormField}
+                                           as={PrincipalListField}
+                                           isEqual={_.isEqual}
+                                           label={Translate.string('Authorized users')}>
+                                        <p className="field-description">
+                                            <Translate>
+                                                Restrict access to the room booking system to these users/groups.
+                                                If empty, all logged-in users have access.
+                                            </Translate>
+                                        </p>
+                                    </Field>
+                                    <Field name="admin_principals" component={ReduxFormField}
+                                           as={PrincipalListField}
+                                           isEqual={_.isEqual}
+                                           label={Translate.string('Administrators')}>
+                                        <p className="field-description">
+                                            <Translate>
+                                                Grant full room booking admin permissions to these users/groups.
+                                            </Translate>
+                                        </p>
+                                    </Field>
+                                </Form.Group>
+                            </Message>
                             <Field name="tileserver_url" component={ReduxFormField} as="input"
                                    format={formatters.trim} formatOnBlur
                                    label={Translate.string('Tileserver URL')}
