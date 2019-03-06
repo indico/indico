@@ -30,6 +30,7 @@ from werkzeug.urls import url_join, url_parse
 
 import indico
 from indico.core.config import config
+from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.errors import NoReportError, UserValueError
 from indico.core.logger import Logger
 from indico.core.notifications import make_email, send_email
@@ -40,11 +41,12 @@ from indico.modules.core.forms import ReportErrorForm, SettingsForm
 from indico.modules.core.settings import core_settings, social_settings
 from indico.modules.core.views import WPContact, WPSettings
 from indico.util.i18n import _, get_all_locales
+from indico.util.marshmallow import PrincipalList
 from indico.web.errors import load_error_data
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
-from indico.web.rh import RH
+from indico.web.rh import RH, RHProtected
 from indico.web.util import jsonify_data, jsonify_form
 
 
@@ -223,3 +225,34 @@ class RHVersionCheck(RHAdminBase):
     def _process(self):
         return jsonify(indico=self._check_version('indico', indico.__version__),
                        plugins=self._check_version('indico-plugins'))
+
+
+class RHPrincipals(RHProtected):
+    """Resolve principal identifiers to their actual objects.
+
+    This is intended for PrincipalListField which needs to be able
+    to resolve the identifiers provided to it to something more
+    human-friendly.
+    """
+
+    def _serialize_principal(self, principal):
+        if principal.principal_type == PrincipalType.user:
+            return {'identifier': principal.identifier,
+                    'group': False,
+                    'name': principal.display_full_name,
+                    'detail': principal.email}
+        elif principal.principal_type == PrincipalType.local_group:
+            return {'identifier': principal.identifier,
+                    'group': True,
+                    'name': principal.name}
+        elif principal.principal_type == PrincipalType.multipass_group:
+            return {'identifier': principal.identifier,
+                    'group': True,
+                    'name': principal.name,
+                    'detail': principal.provider_title}
+
+    @use_kwargs({
+        'values': PrincipalList(allow_groups=True, missing=[])
+    })
+    def _process(self, values):
+        return jsonify({x.identifier: self._serialize_principal(x) for x in values})
