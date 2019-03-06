@@ -436,7 +436,7 @@ class EventImporter(object):
             user = (User.query
                     .filter(User.all_emails.contains(db.func.any(userdata['all_emails'])),
                             ~User.is_deleted)
-                    .one_or_none())
+                    .first())
             if user is None:
                 missing[uuid] = userdata
             else:

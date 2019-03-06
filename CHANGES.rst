@@ -39,6 +39,8 @@ Bugfixes
   thanks :user:`nop33`)
 - Fix error when trying to create a user with a mixed-case email
   address in the admin area
+- Fix event import if a user in the exported data has multiple email
+  addresses and they match different users
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
