@@ -19,12 +19,12 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
 import {bindActionCreators} from 'redux';
-import {Button, Container, Grid, Icon, Popup, Sticky} from 'semantic-ui-react';
+import {Button, Container, Grid, Icon, Popup} from 'semantic-ui-react';
 import {connect} from 'react-redux';
 
 import {Translate} from 'indico/react/i18n';
 import {Overridable} from 'indico/react/util';
-import {ScrollButton} from 'indico/react/components';
+import {StickyWithScrollBack} from 'indico/react/components';
 import {serializeDate} from 'indico/utils/date';
 
 import searchBarFactory from '../../components/SearchBar';
@@ -78,10 +78,6 @@ class Calendar extends React.Component {
         super(props);
         this.contextRef = React.createRef();
     }
-
-    state = {
-        scrollButtonVisible: false,
-    };
 
     componentDidMount() {
         const {actions: {fetchCalendar}} = this.props;
@@ -223,7 +219,6 @@ class Calendar extends React.Component {
             datePicker,
             allowDragDrop,
         } = this.props;
-        const {scrollButtonVisible} = this.state;
         const legendLabels = [
             {label: Translate.string('Booked'), color: 'orange', style: 'booking'},
             {label: Translate.string('Pre-Booked'), style: 'pre-booking'},
@@ -245,9 +240,7 @@ class Calendar extends React.Component {
                 <Grid.Row>
                     <Container>
                         <div ref={this.contextRef}>
-                            <Sticky context={this.contextRef.current} className="sticky-filters"
-                                    onStick={() => this.setState({scrollButtonVisible: true})}
-                                    onUnstick={() => this.setState({scrollButtonVisible: false})}>
+                            <StickyWithScrollBack context={this.contextRef.current}>
                                 <Grid.Row styleName="calendar-filters">
                                     <div className="filter-row">
                                         <div className="filter-row-filters">
@@ -265,8 +258,7 @@ class Calendar extends React.Component {
                                                     onDateChange={setDate}
                                                     legendLabels={legendLabels} />
                                 )}
-                                <ScrollButton visible={scrollButtonVisible} />
-                            </Sticky>
+                            </StickyWithScrollBack>
                             {isTimelineVisible ? (
                                 <ElasticTimeline availability={rows}
                                                  datePicker={datePicker}
