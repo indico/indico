@@ -42,6 +42,7 @@ rules:
   prefer-template: warn
   react/forbid-component-props: off
   react-hooks/rules-of-hooks: error
+  react-hooks/exhaustive-deps: warn
 
 globals:
   Indico: false
