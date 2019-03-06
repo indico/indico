@@ -52,7 +52,7 @@
     "react-debounce-input": "^3.2.0",
     "react-dom": "^16.8.4",
     "react-final-form": "^4.1.0",
-    "react-final-form-arrays": "^2.0.2",
+    "react-final-form-arrays": "2.0.1",
     "react-jsx-i18n": ">=0.1.2",
     "react-leaflet": "^2.2.1",
     "react-leaflet-markercluster": "^2.0.0-rc3",
