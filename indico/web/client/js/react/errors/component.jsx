@@ -68,13 +68,12 @@ export default class ErrorDialog extends React.Component {
         }
     };
 
-    renderReportForm({handleSubmit, submitFailed, submitSucceeded, hasSubmitErrors, submitError, submitting}) {
+    renderReportForm({handleSubmit, submitFailed, submitSucceeded, hasSubmitErrors, submitError}) {
         return (
             <Form onSubmit={handleSubmit} error={submitFailed} success={submitSucceeded}>
                 {hasSubmitErrors && <Message error content={submitError} />}
                 <Field name="comment" component={ReduxFormField} as={TextArea}
                        label={Translate.string('Details')} autoFocus required
-                       disabled={submitting}
                        validate={v.required}>
                     <p style={{fontStyle: 'italic', fontSize: '0.9em', color: '#999'}}>
                         <Translate>
@@ -83,8 +82,7 @@ export default class ErrorDialog extends React.Component {
                     </p>
                 </Field>
                 <Field name="email" component={ReduxFormField} as="input" type="email"
-                       label={Translate.string('Email address')}
-                       disabled={submitting}>
+                       label={Translate.string('Email address')}>
                     <p style={{fontStyle: 'italic', fontSize: '0.9em', color: '#999'}}>
                         <Translate>
                             If you enter your email address we can contact you to follow-up

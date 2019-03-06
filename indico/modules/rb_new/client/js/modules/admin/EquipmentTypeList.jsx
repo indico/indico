@@ -78,7 +78,7 @@ class EquipmentTypeList extends React.PureComponent {
         </List.Content>
     );
 
-    renderForm = fprops => {
+    renderForm = () => {
         const {features} = this.props;
 
         const featureOptions = features.map(feat => ({
@@ -94,14 +94,12 @@ class EquipmentTypeList extends React.PureComponent {
                        required
                        format={formatters.trim} formatOnBlur
                        label={Translate.string('Name')}
-                       disabled={fprops.submitting}
                        autoFocus />
                 {featureOptions.length > 0 && (
                     <Field name="features" component={ReduxDropdownField}
                            multiple selection closeOnChange
                            options={featureOptions}
-                           label={Translate.string('Features')}
-                           disabled={fprops.submitting} />
+                           label={Translate.string('Features')} />
                 )}
             </>
         );

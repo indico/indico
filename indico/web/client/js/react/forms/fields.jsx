@@ -117,7 +117,7 @@ export function ReduxCheckboxField({input: {value, ...input}, ...props}) {
     return (
         <ReduxFormField input={input}
                         {...props}
-                        checked={value}
+                        checked={value === true}
                         as={Checkbox}
                         onChange={(__, {checked}) => {
                             input.onChange(checked);

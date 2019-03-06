@@ -91,7 +91,6 @@ class SettingsPage extends React.PureComponent {
                             <Field name="tileserver_url" component={ReduxFormField} as="input"
                                    format={formatters.trim} formatOnBlur
                                    label={Translate.string('Tileserver URL')}
-                                   disabled={fprops.submitting}
                                    validate={val => {
                                        if (!val) {
                                            return undefined;
@@ -122,15 +121,13 @@ class SettingsPage extends React.PureComponent {
                                    required
                                    parse={value => (value ? +value : null)}
                                    label={Translate.string('Max. booking length')}
-                                   validate={v.min(1)}
-                                   disabled={fprops.submitting}>
+                                   validate={v.min(1)}>
                                 <p className="field-description">
                                     <Translate>The maximum length (in days) a booking may last.</Translate>
                                 </p>
                             </Field>
                             <Field name="notifications_enabled" component={ReduxCheckboxField}
-                                   componentLabel={Translate.string('Send reminders for upcoming bookings')}
-                                   disabled={fprops.submitting} />
+                                   componentLabel={Translate.string('Send reminders for upcoming bookings')} />
                             <FieldCondition when="notifications_enabled">
                                 <Message>
                                     <Message.Header>
@@ -147,8 +144,7 @@ class SettingsPage extends React.PureComponent {
                                                required
                                                parse={value => (value ? +value : null)}
                                                label={Translate.string('Single/Daily bookings')}
-                                               validate={v.range(1, 30)}
-                                               disabled={fprops.submitting} />
+                                               validate={v.range(1, 30)} />
                                         <Field name="notification_before_days_weekly" component={ReduxFormField}
                                                as="input"
                                                type="number"
@@ -157,8 +153,7 @@ class SettingsPage extends React.PureComponent {
                                                required
                                                parse={value => (value ? +value : null)}
                                                label={Translate.string('Weekly bookings')}
-                                               validate={v.range(1, 30)}
-                                               disabled={fprops.submitting} />
+                                               validate={v.range(1, 30)} />
                                         <Field name="notification_before_days_monthly" component={ReduxFormField}
                                                as="input"
                                                type="number"
@@ -167,14 +162,12 @@ class SettingsPage extends React.PureComponent {
                                                required
                                                parse={value => (value ? +value : null)}
                                                label={Translate.string('Monthly bookings')}
-                                               validate={v.range(1, 30)}
-                                               disabled={fprops.submitting} />
+                                               validate={v.range(1, 30)} />
                                     </Form.Group>
                                 </Message>
                             </FieldCondition>
                             <Field name="end_notifications_enabled" component={ReduxCheckboxField}
-                                   componentLabel={Translate.string('Send reminders when bookings are about to end')}
-                                   disabled={fprops.submitting} />
+                                   componentLabel={Translate.string('Send reminders when bookings are about to end')} />
                             <FieldCondition when="end_notifications_enabled">
                                 <Message>
                                     <Message.Header>
@@ -191,8 +184,7 @@ class SettingsPage extends React.PureComponent {
                                                required
                                                parse={value => (value ? +value : null)}
                                                label={Translate.string('Daily bookings')}
-                                               validate={v.range(1, 30)}
-                                               disabled={fprops.submitting} />
+                                               validate={v.range(1, 30)} />
                                         <Field name="end_notification_weekly" component={ReduxFormField}
                                                as="input"
                                                type="number"
@@ -201,8 +193,7 @@ class SettingsPage extends React.PureComponent {
                                                required
                                                parse={value => (value ? +value : null)}
                                                label={Translate.string('Weekly bookings')}
-                                               validate={v.range(1, 30)}
-                                               disabled={fprops.submitting} />
+                                               validate={v.range(1, 30)} />
                                         <Field name="end_notification_monthly" component={ReduxFormField}
                                                as="input"
                                                type="number"
@@ -211,14 +202,12 @@ class SettingsPage extends React.PureComponent {
                                                required
                                                parse={value => (value ? +value : null)}
                                                label={Translate.string('Monthly bookings')}
-                                               validate={v.range(1, 30)}
-                                               disabled={fprops.submitting} />
+                                               validate={v.range(1, 30)} />
                                     </Form.Group>
                                 </Message>
                             </FieldCondition>
                             <Field name="excluded_categories" component={ReduxFormField} as={CategoryList}
-                                   label={Translate.string('Disable booking during event creation')}
-                                   disabled={fprops.submitting}>
+                                   label={Translate.string('Disable booking during event creation')}>
                                 <p className="field-description">
                                     <Translate>
                                         Specify the IDs of categories for which booking a room during event creation

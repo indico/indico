@@ -182,7 +182,6 @@ class BlockingModal extends React.Component {
                        placeholder={Translate.string('Provide the rejection reason')}
                        rows={2}
                        validate={v.required}
-                       disabled={submitting}
                        required
                        formatOnBlur />
                 <Button type="submit"
@@ -292,7 +291,7 @@ class BlockingModal extends React.Component {
 
     renderModalContent = (fprops) => {
         const {onClose, blocking, actions: {openBlockingDetails}} = this.props;
-        const {submitting, submitSucceeded} = fprops;
+        const {submitSucceeded} = fprops;
         const {mode, deletionConfirmOpen, newBlocking} = this.state;
         const formProps = mode === 'view' ? {} : {onSubmit: fprops.handleSubmit, success: submitSucceeded};
         const canEdit = !!blocking.id && blocking.canEdit;
@@ -371,7 +370,7 @@ class BlockingModal extends React.Component {
                                 </Message>
                                 <Field name="dates"
                                        render={this.renderBlockingPeriodField}
-                                       disabled={mode !== 'create' || submitting || submitSucceeded}
+                                       disabled={mode !== 'create' || submitSucceeded}
                                        allowNull />
                                 <Field name="reason"
                                        format={formatters.trim}
@@ -390,7 +389,7 @@ class BlockingModal extends React.Component {
                                                                as={Form.TextArea}
                                                                label={Translate.string('Reason')}
                                                                placeholder={Translate.string('Provide reason for blocking')}
-                                                               disabled={mode === 'view' || submitting || submitSucceeded}
+                                                               disabled={mode === 'view' || submitSucceeded}
                                                                required={mode !== 'view'} />
                                            );
                                        }}
@@ -400,11 +399,11 @@ class BlockingModal extends React.Component {
                                 <Field name="allowed"
                                        isEqual={(a, b) => !this.hasAllowedFieldChanged(a, b)}
                                        render={this.renderPrincipalSearchField}
-                                       disabled={mode === 'view' || submitting || submitSucceeded} />
+                                       disabled={mode === 'view' || submitSucceeded} />
                                 <Field name="rooms"
                                        isEqual={_.isEqual}
                                        render={this.renderRoomSearchField}
-                                       disabled={mode === 'view' || submitting || submitSucceeded} />
+                                       disabled={mode === 'view' || submitSucceeded} />
                                 {mode === 'view' && this.hasManagedPendingRooms && (
                                     <Message icon info>
                                         <Icon name="info" />

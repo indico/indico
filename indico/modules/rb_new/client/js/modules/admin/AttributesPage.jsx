@@ -80,23 +80,19 @@ class AttributesPage extends React.PureComponent {
         </List.Content>
     );
 
-    renderForm = fprops => (
+    renderForm = () => (
         <>
             <Field name="name" component={ReduxFormField} as="input"
                    required
                    format={formatters.slugify} formatOnBlur
                    label={Translate.string('Name')}
-                   disabled={fprops.submitting}
                    autoFocus />
             <Field name="title" component={ReduxFormField} as="input"
                    required
                    format={formatters.trim} formatOnBlur
-                   label={Translate.string('Title')}
-                   disabled={fprops.submitting} />
+                   label={Translate.string('Title')} />
             <Field name="hidden" component={ReduxCheckboxField}
-                   format={formatters.trim} formatOnBlur
-                   componentLabel={Translate.string('Hidden')}
-                   disabled={fprops.submitting} />
+                   componentLabel={Translate.string('Hidden')} />
         </>
     );
 

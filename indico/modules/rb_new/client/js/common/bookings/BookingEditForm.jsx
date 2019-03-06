@@ -202,7 +202,7 @@ class BookingEditForm extends React.Component {
         } = this.props;
         const {
             values: {dates, recurrence, timeSlot, usage, user},
-            submitting, submitSucceeded, form, handleSubmit
+            submitSucceeded, form, handleSubmit
         } = formProps;
         const bookedByCurrentUser = sessionUser.id === bookedForUser.id;
         const today = moment();
@@ -217,7 +217,7 @@ class BookingEditForm extends React.Component {
                                    component={ReduxRadioField}
                                    componentLabel={Translate.string('Single booking')}
                                    radioValue="single"
-                                   disabled={submitting || submitSucceeded || bookingFinished}
+                                   disabled={submitSucceeded || bookingFinished}
                                    onClick={() => this.recurrenceTypeChanged('single')} />
                         )}
                         {!hideOptions.daily && (
@@ -225,7 +225,7 @@ class BookingEditForm extends React.Component {
                                    component={ReduxRadioField}
                                    componentLabel={Translate.string('Daily booking')}
                                    radioValue="daily"
-                                   disabled={submitting || submitSucceeded || bookingFinished}
+                                   disabled={submitSucceeded || bookingFinished}
                                    onClick={() => this.recurrenceTypeChanged('daily')} />
                         )}
                         {!hideOptions.recurring && (
@@ -233,7 +233,7 @@ class BookingEditForm extends React.Component {
                                    component={ReduxRadioField}
                                    componentLabel={Translate.string('Recurring booking')}
                                    radioValue="every"
-                                   disabled={submitting || submitSucceeded || bookingFinished}
+                                   disabled={submitSucceeded || bookingFinished}
                                    onClick={() => this.recurrenceTypeChanged('every')} />
                         )}
                     </Form.Group>
@@ -245,7 +245,7 @@ class BookingEditForm extends React.Component {
                             <Field name="recurrence.number"
                                    as={Input}
                                    validate={v.min(1)}
-                                   disabled={submitting || submitSucceeded}
+                                   disabled={submitSucceeded}
                                    onChange={(newNumber) => {
                                        if (+newNumber > 0) {
                                            const newRecurrence = {...recurrence, number: newNumber};
@@ -254,7 +254,7 @@ class BookingEditForm extends React.Component {
                                    }}
                                    render={this.renderRecurrenceNumber} />
                             <Field name="recurrence.interval"
-                                   disabled={submitting || submitSucceeded}
+                                   disabled={submitSucceeded}
                                    onChange={(newInterval) => {
                                        const newRecurrence = {...recurrence, interval: newInterval};
                                        onBookingPeriodChange(dates, timeSlot, newRecurrence);
@@ -265,13 +265,13 @@ class BookingEditForm extends React.Component {
                     <Field name="dates"
                            isSingleBooking={recurrence.type === 'single'}
                            onChange={(newDates) => onBookingPeriodChange(newDates, timeSlot, recurrence)}
-                           disabled={submitting || submitSucceeded}
+                           disabled={submitSucceeded}
                            isEqual={_.isEqual}
                            render={this.renderDateForm} />
                     {!hideOptions.timeSlot && (
                         <Field name="timeSlot"
                                onChange={(newTimeSlot) => onBookingPeriodChange(dates, newTimeSlot, recurrence)}
-                               disabled={submitting || submitSucceeded}
+                               disabled={submitSucceeded}
                                isEqual={_.isEqual}
                                render={this.renderTimeForm} />
                     )}
@@ -283,21 +283,21 @@ class BookingEditForm extends React.Component {
                                component={ReduxRadioField}
                                onClick={() => form.change('user', {...sessionUser, isGroup: false})}
                                componentLabel={Translate.string("I'll be using it myself")}
-                               disabled={submitting || submitSucceeded}
+                               disabled={submitSucceeded}
                                checked={usage === 'myself'} />
                         <Field name="usage"
                                radioValue="someone"
                                component={ReduxRadioField}
                                onClick={() => form.change('user', bookedByCurrentUser ? null : bookedForUser)}
                                componentLabel={Translate.string("I'm booking it for someone else")}
-                               disabled={submitting || submitSucceeded}
+                               disabled={submitSucceeded}
                                checked={usage === 'someone'} />
                     </Form.Group>
                     <Field name="user"
                            render={this.renderPrincipalSearchField}
                            required={usage === 'someone'}
                            currentUser={user}
-                           disabled={usage === 'myself' || (submitting || submitSucceeded)}
+                           disabled={usage === 'myself' || submitSucceeded}
                            isEqual={(a, b) => a && b && a.identifier === b.identifier}
                            validate={v.required}
                            showCurrentUserPlaceholder={usage === 'myself'} />
@@ -307,7 +307,7 @@ class BookingEditForm extends React.Component {
                            format={formatters.trim}
                            placeholder={Translate.string('Reason for booking')}
                            validate={v.required}
-                           disabled={submitting || submitSucceeded}
+                           disabled={submitSucceeded}
                            formatOnBlur />
                 </Segment>
             </Form>

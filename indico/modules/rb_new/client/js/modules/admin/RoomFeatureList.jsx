@@ -73,7 +73,7 @@ class RoomFeatureList extends React.PureComponent {
         </>
     );
 
-    renderForm = fprops => {
+    renderForm = () => {
         const iconOptions = ICONS_AND_ALIASES.map(icon => ({
             key: icon,
             value: icon,
@@ -87,17 +87,14 @@ class RoomFeatureList extends React.PureComponent {
                        required
                        format={formatters.slugify} formatOnBlur
                        label={Translate.string('Name')}
-                       disabled={fprops.submitting}
                        autoFocus />
                 <Field name="title" component={ReduxFormField} as="input"
                        required
                        format={formatters.trim} formatOnBlur
-                       label={Translate.string('Title')}
-                       disabled={fprops.submitting} />
+                       label={Translate.string('Title')} />
                 <Field name="icon" component={ReduxDropdownField} parse={null}
                        search selection options={iconOptions}
-                       label={Translate.string('Icon')}
-                       disabled={fprops.submitting} />
+                       label={Translate.string('Icon')} />
             </>
         );
     };

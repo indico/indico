@@ -109,12 +109,11 @@ class OccurrenceActionsDropdown extends React.Component {
                        placeholder={Translate.string('Provide the rejection reason')}
                        rows={2}
                        validate={v.required}
-                       disabled={submitting}
                        required
                        formatOnBlur
                        autoFocus />
                 <Button type="submit"
-                        disabled={submitting || pristine || hasValidationErrors || submitSucceeded}
+                        disabled={pristine || hasValidationErrors || submitSucceeded}
                         loading={submitting}
                         floated="right"
                         primary>

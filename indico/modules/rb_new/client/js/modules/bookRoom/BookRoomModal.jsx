@@ -497,7 +497,7 @@ class BookRoomModal extends React.Component {
         const linkBack = !!link && !this.hasLinkConflict;
         const occurrenceCount = availability && availability.dateRange.length;
         const conflictsExist = availability && !!Object.keys(availability.conflicts).length;
-        const bookingBlocked = ({submitting, submitSucceeded}) => submitting || submitSucceeded;
+        const bookingBlocked = ({submitSucceeded}) => submitSucceeded;
         const buttonsBlocked = (fprops) => bookingBlocked(fprops) || (conflictsExist && !skipConflicts);
         const legendLabels = [
             {label: Translate.string('Available'), style: 'available'},
