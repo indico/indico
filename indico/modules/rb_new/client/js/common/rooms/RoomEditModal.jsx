@@ -269,7 +269,7 @@ const columns = [
     }, {
         type: 'formgroup',
         key: 'notifications',
-        label: Translate.string('How many days in advance booking reminders should be sent?'),
+        label: Translate.string('How many days in advance booking reminders should be sent'),
         content: [{
             type: 'input',
             name: 'notificationBeforeDays',
@@ -304,7 +304,7 @@ const columns = [
     }, {
         type: 'formgroup',
         key: 'notificationsOfFinishingBookings',
-        label: Translate.string('How many days before the end of a booking reminders should be sent?'),
+        label: Translate.string('How many days before the end of a booking should reminders be sent'),
         content: [{
             type: 'input',
             name: 'endNotificationDaily',

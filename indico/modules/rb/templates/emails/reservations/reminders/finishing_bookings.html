@@ -1,13 +1,19 @@
 {% extends 'rb/emails/base_email.html' %}
 
 {% block header_recipient %}{{ user.first_name }}{% endblock %}
-{% block subject %}Some of your bookings will come to an end soon{% endblock %}
+{% block subject -%}
+    {% if reservations|length == 1 -%}
+        One of your bookings will come to an end soon
+    {%- else -%}
+        Some of your bookings will come to an end soon
+    {%- endif %}
+{%- endblock %}
 
 
 {% block body -%}
     {% block message %}
         {%- if reservations|length == 1 -%}
-            There is one booking under your name that will soon come to an end:<br>
+            There is a booking under your name that will soon come to an end:<br>
         {%- else -%}
             There are bookings under your name that will soon come to an end:<br>
         {%- endif %}

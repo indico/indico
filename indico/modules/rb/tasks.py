@@ -130,8 +130,8 @@ def roombooking_occurrences(debug=False):
         db.session.commit()
 
 
-@celery.periodic_task(name='notifications_about_finishing_bookings', run_every=crontab(minute='0', hour='8'))
-def booking_end_notifications():
+@celery.periodic_task(name='roombooking_end_notifications', run_every=crontab(minute='0', hour='8'))
+def roombooking_end_notifications():
     if not config.ENABLE_ROOMBOOKING:
         logger.info('Notifications not sent because room booking is disabled')
         return
@@ -157,6 +157,7 @@ def booking_end_notifications():
                             Room.end_notifications_enabled,
                             Reservation.is_accepted,
                             Reservation.end_dt >= datetime.now(),
+                            Reservation.repeat_frequency != RepeatFrequency.NEVER,
                             ~Reservation.end_notification_sent,
                             _make_occurrence_date_filter(Reservation.end_dt, defaults, room_columns))
                     .order_by(Reservation.booked_for_id, Reservation.start_dt, Room.id)
