@@ -57,6 +57,7 @@ rb_settings = SettingsProxy('roombooking', {
     'excluded_categories': ModelListConverter(Category)
 })
 
+
 @signals.import_tasks.connect
 def _import_tasks(sender, **kwargs):
     import indico.modules.rb.tasks

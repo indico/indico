@@ -1,4 +1,4 @@
-"""Add notification_sent column to Reservation
+"""Add end notifications
 
 Revision ID: 081d4c97060a
 Revises: 7aabedfb5e3a
