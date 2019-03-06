@@ -42,7 +42,9 @@ rules:
   prefer-template: warn
   react/forbid-component-props: off
   react-hooks/rules-of-hooks: error
-  react-hooks/exhaustive-deps: warn
+  react-hooks/exhaustive-deps:
+    - warn
+    - additionalHooks: 'useAsyncEffect'
 
 globals:
   Indico: false
