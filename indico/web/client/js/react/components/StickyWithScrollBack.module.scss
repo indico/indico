@@ -1,5 +1,5 @@
 /* This file is part of Indico.
- * Copyright (C) 2002 - 2018 European Organization for Nuclear Research (CERN).
+ * Copyright (C) 2002 - 2019 European Organization for Nuclear Research (CERN).
  *
  * Indico is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -15,16 +15,23 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+@import 'rb_new:styles/palette';
 
-.blockings-container {
-    padding: 2em;
-    width: 75% !important;
+.sticky-content {
+    margin-bottom: 20px;
 
-    .blockings-list, :global(.blockings-placeholders) {
-        margin: 10px 0 0 -5px;
+    > :nth-child(2) {
+        z-index: 15;
+        background-color: white;
     }
 
-    :global(.ui.stuck-container) + .blockings-list {
-        padding-top: 60px;
+    &:global(.ui.stuck-container + div) {
+        padding-top: 130px;
+    }
+
+    :global(.ui.sticky.fixed.top) {
+        padding-top: 30px;
+        box-shadow: rgba($black, 0.2) 0 25px 30px -20px;
+        transition: all, 0.25s ease-in;
     }
 }

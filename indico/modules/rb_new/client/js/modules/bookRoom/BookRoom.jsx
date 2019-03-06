@@ -22,13 +22,13 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {bindActionCreators} from 'redux';
 import _ from 'lodash';
-import {Button, Card, Grid, Header, Icon, Popup, Sticky, Divider} from 'semantic-ui-react';
+import {Button, Card, Grid, Header, Icon, Popup, Divider} from 'semantic-ui-react';
 import LazyScroll from 'redux-lazy-scroll';
 
 import {Translate} from 'indico/react/i18n';
 import {Overridable, Slot, toClasses, IndicoPropTypes} from 'indico/react/util';
 import {serializeTime, serializeDate} from 'indico/utils/date';
-import {ScrollButton} from 'indico/react/components';
+import {StickyWithScrollBack} from 'indico/react/components';
 
 import searchBarFactory from '../../components/SearchBar';
 import CardPlaceholder from '../../components/CardPlaceholder';
@@ -101,7 +101,6 @@ class BookRoom extends React.Component {
     state = {
         maxVisibleRooms: 20,
         suggestionsRequested: false,
-        scrollButtonVisible: false,
     };
 
     componentDidMount() {
@@ -160,7 +159,7 @@ class BookRoom extends React.Component {
     }
 
     renderFilters(refName) {
-        const {[refName]: ref, scrollButtonVisible} = this.state;
+        const {[refName]: ref} = this.state;
         const {
             isSearching,
             totalResultCount,
@@ -182,9 +181,7 @@ class BookRoom extends React.Component {
             {label: Translate.string('Not bookable'), style: 'unbookable'}
         ];
         return (
-            <Sticky context={ref} className="sticky-filters"
-                    onStick={() => this.setState({scrollButtonVisible: true})}
-                    onUnstick={() => this.setState({scrollButtonVisible: false})}>
+            <StickyWithScrollBack context={ref}>
                 <div className="filter-row">
                     <div className="filter-row-filters">
                         <BookingFilterBar />
@@ -205,8 +202,7 @@ class BookRoom extends React.Component {
                                     legendLabels={legendLabels}
                                     isLoading={isSearching} />
                 )}
-                <ScrollButton visible={scrollButtonVisible} />
-            </Sticky>
+            </StickyWithScrollBack>
         );
     }
 

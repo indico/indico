@@ -77,25 +77,6 @@ a {
     }
 }
 
-.sticky-filters {
-    margin-bottom: 20px;
-
-    > :nth-child(2) {
-        z-index: 15;
-        background-color: white;
-    }
-
-    &.ui.stuck-container + div {
-        padding-top: 130px;
-    }
-
-    .ui.sticky.fixed.top {
-        padding-top: 30px;
-        box-shadow: rgba($black, 0.2) 0 25px 30px -20px;
-        transition: all, 0.25s ease-in;
-    }
-}
-
 .header.legend-header {
     display: flex !important;
     align-items: center;

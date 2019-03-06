@@ -15,15 +15,14 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
 import React from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
-import {Card, Container, Message, Sticky} from 'semantic-ui-react';
+import {Card, Container, Message} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
-import {ScrollButton} from 'indico/react/components';
+import {StickyWithScrollBack} from 'indico/react/components';
 
 import BlockingCard from './BlockingCard';
 import CardPlaceholder from '../../components/CardPlaceholder';
@@ -49,10 +48,6 @@ class BlockingList extends React.Component {
         super(props);
         this.contextRef = React.createRef();
     }
-
-    state = {
-        scrollButtonVisible: false,
-    };
 
     componentDidMount() {
         const {actions: {fetchBlockings}} = this.props;
@@ -98,21 +93,13 @@ class BlockingList extends React.Component {
         }
     };
 
-    toggleScrollButtonVisibility = (val) => {
-        return _.debounce(() => this.setState({scrollButtonVisible: val}), 300);
-    };
-
     render() {
-        const {scrollButtonVisible} = this.state;
         return (
             <div ref={this.contextRef}>
                 <Container styleName="blockings-container" fluid>
-                    <Sticky context={this.contextRef.current} className="sticky-filters"
-                            onStick={this.toggleScrollButtonVisibility(true)}
-                            onUnstick={this.toggleScrollButtonVisibility(false)}>
+                    <StickyWithScrollBack context={this.contextRef.current}>
                         <BlockingFilterBar />
-                        <ScrollButton visible={scrollButtonVisible} />
-                    </Sticky>
+                    </StickyWithScrollBack>
                     {this.renderContent()}
                 </Container>
             </div>

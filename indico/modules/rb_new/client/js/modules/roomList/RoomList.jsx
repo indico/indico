@@ -20,13 +20,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
-import {Button, Dropdown, Grid, Popup, Sticky} from 'semantic-ui-react';
+import {Button, Dropdown, Grid, Popup} from 'semantic-ui-react';
 import {Route} from 'react-router-dom';
 import LazyScroll from 'redux-lazy-scroll';
 import {stateToQueryString} from 'redux-router-querystring';
 
 import {Overridable, Slot} from 'indico/react/util';
-import {ScrollButton} from 'indico/react/components';
+import {StickyWithScrollBack} from 'indico/react/components';
 import {Param, Plural, PluralTranslate, Translate, Singular} from 'indico/react/i18n';
 import {camelizeKeys} from 'indico/utils/case';
 
@@ -76,7 +76,6 @@ class RoomList extends React.Component {
         selectionMode: null,
         selection: {},
         numVisibleRooms: 20,
-        scrollButtonVisible: false,
     };
 
     componentDidMount() {
@@ -148,7 +147,7 @@ class RoomList extends React.Component {
             actions: {openRoomDetails},
             hideActionsDropdown,
         } = this.props;
-        const {selectionMode, selection, scrollButtonVisible} = this.state;
+        const {selectionMode, selection} = this.state;
         const menuOptions = [{
             text: Translate.string('Block rooms'),
             value: 'block-rooms',
@@ -160,9 +159,7 @@ class RoomList extends React.Component {
             <Grid columns={2}>
                 <Grid.Column computer={showMap ? 11 : 16} mobile={16}>
                     <div className="ui" styleName="room-list" ref={this.contextRef}>
-                        <Sticky context={this.contextRef.current} className="sticky-filters"
-                                onStick={() => this.setState({scrollButtonVisible: true})}
-                                onUnstick={() => this.setState({scrollButtonVisible: false})}>
+                        <StickyWithScrollBack context={this.contextRef.current}>
                             <div className="filter-row">
                                 <div className="filter-row-filters">
                                     <RoomFilterBar />
@@ -194,8 +191,7 @@ class RoomList extends React.Component {
                                     </div>
                                 )}
                             </div>
-                            <ScrollButton visible={scrollButtonVisible} />
-                        </Sticky>
+                        </StickyWithScrollBack>
                         <div styleName="results-count">
                             {results.length === 0 && !isSearching && Translate.string('There are no rooms matching the criteria')}
                             {results.length !== 0 && (
