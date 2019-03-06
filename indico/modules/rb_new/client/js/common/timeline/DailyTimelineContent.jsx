@@ -20,10 +20,9 @@ import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
 import {AutoSizer, List, WindowScroller} from 'react-virtualized';
-import {Icon, Placeholder, Popup} from 'semantic-ui-react';
+import {Icon, Placeholder} from 'semantic-ui-react';
 import LazyScroll from 'redux-lazy-scroll';
 import {toMoment} from 'indico/utils/date';
-import {Translate} from 'indico/react/i18n';
 import {TooltipIfTruncated} from 'indico/react/components';
 
 import OccurrenceActionsDropdown from '../bookings/OccurrenceActionsDropdown';
@@ -278,27 +277,14 @@ export default class DailyTimelineContent extends React.Component {
 }
 
 export function TimelineRowLabel({label, name, verboseName, availability, longLabel, onClickLabel}) {
-    let color, tooltip;
-    switch (availability) {
-        case 'conflict':
-            color = 'red';
-            tooltip = Translate.string('Conflicts for the selected period');
-            break;
-        case 'alternatives':
-            color = 'orange';
-            tooltip = Translate.string('Room suggested based on the selected criteria');
-            break;
-        default:
-            color = 'green';
-            tooltip = Translate.string('Room available');
-    }
+    const colorMap = {conflict: 'red', alternatives: 'orange'};
+    const color = colorMap[availability] || 'green';
 
     const icon = availability ? <Icon name="circle" size="tiny" color={color} styleName="dot" /> : null;
     const labelContent = verboseName ? (
         <span styleName="split-label">
             <div>
-                {icon}
-                {name}
+                {icon}{name}
             </div>
             <TooltipIfTruncated>
                 <div styleName="sub-label">
@@ -306,7 +292,9 @@ export function TimelineRowLabel({label, name, verboseName, availability, longLa
                 </div>
             </TooltipIfTruncated>
         </span>
-    ) : (<span>{icon}{label}</span>);
+    ) : (
+        <span>{icon}{label}</span>
+    );
 
     const roomLabel = (
         <span>
@@ -321,7 +309,7 @@ export function TimelineRowLabel({label, name, verboseName, availability, longLa
             maxWidth: width
         }}>
             <div styleName="label">
-                {availability ? <Popup trigger={roomLabel} content={tooltip} size="small" /> : roomLabel}
+                {roomLabel}
             </div>
         </div>
     );
