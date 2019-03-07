@@ -148,7 +148,7 @@ class TimelineItem extends React.Component {
         const {startHour, endHour, onClickCandidate, onClickReservation, room, dayBased} = this.props;
         if (type === 'blocking') {
             segmentStartDt = moment(startHour, 'HH:mm');
-            segmentEndDt = moment(endHour, 'HH:mm');
+            segmentEndDt = (endHour === 24 ? moment('23:59', 'HH:mm') : moment(endHour, 'HH:mm'));
         } else if (type === 'unbookable-hours') {
             segmentStartDt = moment(startTime, 'HH:mm');
             segmentEndDt = moment(endTime, 'HH:mm');
