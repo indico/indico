@@ -36,7 +36,7 @@ class BookingBootstrapForm extends React.Component {
         children: PropTypes.node,
         buttonDisabled: PropTypes.bool,
         dayBased: PropTypes.bool,
-        onlyDaily: PropTypes.bool,
+        hideOptions: PropTypes.objectOf(PropTypes.bool),
         defaults: PropTypes.object,
     };
 
@@ -47,7 +47,7 @@ class BookingBootstrapForm extends React.Component {
             onChange: () => {},
             buttonDisabled: false,
             dayBased: false,
-            onlyDaily: false,
+            hideOptions: {},
             defaults: {},
         };
     }
@@ -170,35 +170,40 @@ class BookingBootstrapForm extends React.Component {
             dates: {startDate, endDate}
         } = this.state;
 
-        const {buttonCaption, buttonDisabled, children, dayBased, onlyDaily} = this.props;
+        const {buttonCaption, buttonDisabled, children, dayBased, hideOptions} = this.props;
         const recurrenceOptions = [
             {text: PluralTranslate.string('Week', 'Weeks', number), value: 'week'},
             {text: PluralTranslate.string('Month', 'Months', number), value: 'month'}
         ];
-
+        // all but one option are hidden
+        const showRecurrenceOptions = ['single', 'daily', 'recurring'].filter(x => hideOptions[x]).length !== 2;
         return (
             <Form>
-                <Form.Group inline>
-                    {!onlyDaily && (
-                        <Form.Radio label={Translate.string('Single booking')}
-                                    name="type"
-                                    value="single"
-                                    checked={type === 'single'}
-                                    onChange={(e, {value}) => this.updateBookingType(value)} />
-                    )}
-                    <Form.Radio label={Translate.string('Daily booking')}
-                                name="type"
-                                value="daily"
-                                checked={type === 'daily'}
-                                onChange={(e, {value}) => this.updateBookingType(value)} />
-                    {!onlyDaily && (
-                        <Form.Radio label={Translate.string('Recurring booking')}
-                                    name="type"
-                                    value="every"
-                                    checked={type === 'every'}
-                                    onChange={(e, {value}) => this.updateBookingType(value)} />
-                    )}
-                </Form.Group>
+                {showRecurrenceOptions && (
+                    <Form.Group inline>
+                        {!hideOptions.single && (
+                            <Form.Radio label={Translate.string('Single booking')}
+                                        name="type"
+                                        value="single"
+                                        checked={type === 'single'}
+                                        onChange={(e, {value}) => this.updateBookingType(value)} />
+                        )}
+                        {!hideOptions.daily && (
+                            <Form.Radio label={Translate.string('Daily booking')}
+                                        name="type"
+                                        value="daily"
+                                        checked={type === 'daily'}
+                                        onChange={(e, {value}) => this.updateBookingType(value)} />
+                        )}
+                        {!hideOptions.recurring && (
+                            <Form.Radio label={Translate.string('Recurring booking')}
+                                        name="type"
+                                        value="every"
+                                        checked={type === 'every'}
+                                        onChange={(e, {value}) => this.updateBookingType(value)} />
+                        )}
+                    </Form.Group>
+                )}
                 {type === 'every' && (
                     <Form.Group inline>
                         <label>{Translate.string('Every')}</label>
