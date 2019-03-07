@@ -208,35 +208,39 @@ class BookingEditForm extends React.Component {
         const today = moment();
         const bookingFinished = today.isAfter(startDt, 'day') && (endDt && today.isAfter(endDt, 'day'));
 
+        // all but one option are hidden
+        const showRecurrenceOptions = ['single', 'daily', 'recurring'].filter(x => hideOptions[x]).length !== 2;
         return (
             <Form id="booking-edit-form" styleName="booking-edit-form" onSubmit={handleSubmit}>
                 <Segment>
-                    <Form.Group inline>
-                        {!hideOptions.single && (
-                            <Field name="recurrence.type"
-                                   component={ReduxRadioField}
-                                   componentLabel={Translate.string('Single booking')}
-                                   radioValue="single"
-                                   disabled={submitSucceeded || bookingFinished}
-                                   onClick={() => this.recurrenceTypeChanged('single')} />
-                        )}
-                        {!hideOptions.daily && (
-                            <Field name="recurrence.type"
-                                   component={ReduxRadioField}
-                                   componentLabel={Translate.string('Daily booking')}
-                                   radioValue="daily"
-                                   disabled={submitSucceeded || bookingFinished}
-                                   onClick={() => this.recurrenceTypeChanged('daily')} />
-                        )}
-                        {!hideOptions.recurring && (
-                            <Field name="recurrence.type"
-                                   component={ReduxRadioField}
-                                   componentLabel={Translate.string('Recurring booking')}
-                                   radioValue="every"
-                                   disabled={submitSucceeded || bookingFinished}
-                                   onClick={() => this.recurrenceTypeChanged('every')} />
-                        )}
-                    </Form.Group>
+                    {showRecurrenceOptions && (
+                        <Form.Group inline>
+                            {!hideOptions.single && (
+                                <Field name="recurrence.type"
+                                       component={ReduxRadioField}
+                                       componentLabel={Translate.string('Single booking')}
+                                       radioValue="single"
+                                       disabled={submitSucceeded || bookingFinished}
+                                       onClick={() => this.recurrenceTypeChanged('single')} />
+                            )}
+                            {!hideOptions.daily && (
+                                <Field name="recurrence.type"
+                                       component={ReduxRadioField}
+                                       componentLabel={Translate.string('Daily booking')}
+                                       radioValue="daily"
+                                       disabled={submitSucceeded || bookingFinished}
+                                       onClick={() => this.recurrenceTypeChanged('daily')} />
+                            )}
+                            {!hideOptions.recurring && (
+                                <Field name="recurrence.type"
+                                       component={ReduxRadioField}
+                                       componentLabel={Translate.string('Recurring booking')}
+                                       radioValue="every"
+                                       disabled={submitSucceeded || bookingFinished}
+                                       onClick={() => this.recurrenceTypeChanged('every')} />
+                            )}
+                        </Form.Group>
+                    )}
                     {recurrence.type === 'every' && (
                         <Form.Group inline>
                             <label>
