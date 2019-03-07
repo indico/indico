@@ -51,6 +51,8 @@ class BookingEditCalendar extends React.Component {
         {label: Translate.string('Other bookings'), style: 'other'},
         {label: Translate.string('New booking'), style: 'available'},
         {label: Translate.string('Conflicts with new booking'), style: 'conflict'},
+        {label: Translate.string('Blocked'), style: 'blocking'},
+        {label: Translate.string('Not bookable'), style: 'unbookable'}
     ];
 
     serializeRow = (data) => {
@@ -67,6 +69,9 @@ class BookingEditCalendar extends React.Component {
                 )),
                 conflicts: data.conflicts[day] || [],
                 pendingCancellations: data.pendingCancellations[day] || [],
+                blockings: data.blockings[day] || [],
+                nonbookablePeriods: data.nonbookablePeriods[day] || [],
+                unbookableHours: data.unbookableHours || [],
             },
             label: serializeDate(day, 'L'),
             key: day,

@@ -27,8 +27,8 @@ const getRawDetails = (state, {bookingId}) => state.bookings.details[bookingId];
 
 
 function applyPermissionsToOccurrences(occurrences, override) {
-    return _.fromPairs(Object.entries(occurrences).map(([key, data]) => {
-        data = _.fromPairs(Object.entries(data).map(([day, dayData]) => {
+    return _.update(occurrences, 'bookings', (data) => {
+        return _.fromPairs(Object.entries(data).map(([day, dayData]) => {
             dayData = dayData.map(rawOcc => {
                 const {permissions, ...occ} = rawOcc;
                 if (!permissions) {
@@ -39,8 +39,7 @@ function applyPermissionsToOccurrences(occurrences, override) {
             });
             return [day, dayData];
         }));
-        return [key, data];
-    }));
+    });
 }
 
 export const getDetails = createSelector(
