@@ -140,7 +140,6 @@ class BookingEditCalendar extends React.Component {
                 <div styleName="calendars">
                     <div styleName="original-booking">
                         <DailyTimelineContent rows={this.getCalendarData(currentBooking)}
-                                              maxHour={24}
                                               renderHeader={shouldSplit ? () => (
                                                   <Header as="h3" color="orange" styleName="original-booking-header">
                                                       <Translate>Original booking</Translate>
@@ -152,7 +151,6 @@ class BookingEditCalendar extends React.Component {
                     {newBooking && (
                         <div styleName="new-booking">
                             <DailyTimelineContent rows={this.getCalendarData(newBooking)}
-                                                  maxHour={24}
                                                   renderHeader={() => (
                                                       <Header as="h3" color="green" styleName="new-booking-header">
                                                           <Translate>New booking</Translate>

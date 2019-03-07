@@ -119,7 +119,6 @@ class BookingDetails extends React.Component {
         return (
             <DailyTimelineContent rows={rows}
                                   fixedHeight={rows.length > 1 ? '70vh' : null}
-                                  maxHour={24}
                                   booking={booking}
                                   showActions />
         );
