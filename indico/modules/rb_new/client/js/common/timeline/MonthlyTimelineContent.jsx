@@ -72,38 +72,56 @@ export default class MonthlyTimelineContent extends WeeklyTimelineContent {
     renderDividers() {
         const nDays = this.dates.length;
         const daySize = (100 / nDays);
-
         const {dateRange} = this.props;
+
         const emptyDays = this.dates
             .filter(day => dateRange.length !== 0 && !dateRange.includes(day))
             .map(day => this.dates.findIndex((el) => el === day));
 
+        const weekendDays = this.dates
+            .filter(day => [0, 6].includes(toMoment(day, 'YYYY-MM-DD').weekday()))
+            .map(day => this.dates.findIndex((el) => el === day));
+
         return (
-            _.times(nDays, n => (
-                <div styleName="style.timeline-day-divider"
-                     className={toClasses({hidden: emptyDays.includes(n), visible: !emptyDays.includes(n)})}
-                     style={{left: `${n * daySize}%`, width: `${daySize}%`}}
-                     key={`day-divider-${n}`} />
-            ))
+            _.times(nDays, n => {
+                const indicateWeekend = weekendDays.includes(n) && !emptyDays.includes(n);
+                const dividerStyle = 'style.timeline-day-divider';
+                return (
+                    <div styleName={indicateWeekend ? `${dividerStyle} style.weekend` : dividerStyle}
+                         className={toClasses({hidden: emptyDays.includes(n), visible: !emptyDays.includes(n)})}
+                         style={{left: `${n * daySize}%`, width: `${daySize}%`}}
+                         key={`day-divider-${n}`} />
+                );
+            })
         );
     }
 
     renderHeader() {
         const {longLabel, selectable} = this.props;
         const labelWidth = longLabel ? 200 : 150;
+
+        const weekendDays = this.dates
+            .filter(day => [0, 6].includes(toMoment(day, 'YYYY-MM-DD').weekday()))
+            .map(day => this.dates.findIndex((el) => el === day));
+
         return (
             <>
-                <div styleName="baseStyle.timeline-header" className={!selectable ? 'timeline-non-selectable' : ''}>
+                <div styleName="baseStyle.timeline-header"
+                     className={!selectable ? 'timeline-non-selectable' : ''}>
                     <div style={{minWidth: labelWidth}} />
                     <div styleName="style.timeline-header-labels">
-                        {_.map(this.dates, (dt, n) => (
-                            <div styleName="style.timeline-header-label"
-                                 key={`timeline-header-${n}`}>
-                                <span styleName="style.timeline-label-text">
-                                    {toMoment(dt, 'YYYY-MM-DD').format('D')}
-                                </span>
-                            </div>
-                        ))}
+                        {_.map(this.dates, (dt, n) => {
+                            const indicateWeekend = weekendDays.includes(n);
+                            const labelStyle = 'style.timeline-header-label';
+                            return (
+                                <div styleName={indicateWeekend ? `${labelStyle} style.weekend` : labelStyle}
+                                     key={`timeline-header-${n}`}>
+                                    <span styleName="style.timeline-label-text">
+                                        {toMoment(dt, 'YYYY-MM-DD').format('D')}
+                                    </span>
+                                </div>
+                            );
+                        })}
                     </div>
                 </div>
             </>
