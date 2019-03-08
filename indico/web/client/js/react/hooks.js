@@ -15,7 +15,10 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useEffect} from 'react';
+import favoriteUsersURL from 'indico-url:users.favorites_api';
+
+import {useEffect, useState} from 'react';
+import {indicoAxios, handleAxiosError} from '../utils/axios';
 
 
 /**
@@ -31,4 +34,44 @@ export const useAsyncEffect = (fn, ...args) => {
     useEffect(() => {
         fn();
     }, ...args);
+};
+
+
+export const useFavoriteUsers = () => {
+    // XXX: this state should ideally be global so if this hook is used more than
+    // once on the same page we keep the favorites in sync and don't send multiple
+    // requests to load the initial list
+    const [favorites, setFavorites] = useState([]);
+
+    const apiCall = async (method, id = null) => {
+        let response;
+        try {
+            response = await indicoAxios.request({
+                method,
+                url: favoriteUsersURL(id !== null ? {user_id: id} : {})
+            });
+        } catch (error) {
+            handleAxiosError(error);
+            return null;
+        }
+        return response.data;
+    };
+
+    const del = async (id) => {
+        if (await apiCall('DELETE', id) !== null) {
+            setFavorites(values => values.filter(x => x !== id));
+        }
+    };
+    const add = async (id) => {
+        if (await apiCall('PUT', id) !== null) {
+            setFavorites(values => [...values, id]);
+        }
+    };
+
+    useAsyncEffect(async () => {
+        const data = await apiCall('GET');
+        setFavorites(data);
+    }, []);
+
+    return [favorites, [add, del]];
 };

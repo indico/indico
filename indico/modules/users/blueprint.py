@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 from flask import request
 
-from indico.modules.users.api import fetch_authenticated_user
+from indico.modules.users.api import RHUserFavoritesAPI, fetch_authenticated_user
 from indico.modules.users.controllers import (RHAcceptRegistrationRequest, RHAdmins, RHPersonalData,
                                               RHRegistrationRequestList, RHRejectRegistrationRequest, RHUserDashboard,
                                               RHUserEmails, RHUserEmailsDelete, RHUserEmailsSetPrimary,
@@ -72,6 +72,9 @@ _bp.add_url_rule('/search/', 'user_search', RHUserSearch)
 
 # Users API
 _bp.add_url_rule('!/api/user/', 'authenticated_user', fetch_authenticated_user)
+
+_bp.add_url_rule('/api/favorites/', 'favorites_api', RHUserFavoritesAPI)
+_bp.add_url_rule('/api/favorites/<int:user_id>', 'favorites_api', RHUserFavoritesAPI, methods=('PUT', 'DELETE'))
 
 
 @_bp.url_defaults

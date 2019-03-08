@@ -14,12 +14,15 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from flask import jsonify, session
+from __future__ import unicode_literals
+
+from flask import jsonify, request, session
 
 from indico.modules.oauth import oauth
 from indico.modules.users import User
 from indico.web.http_api.hooks.base import HTTPAPIHook
 from indico.web.http_api.responses import HTTPAPIError
+from indico.web.rh import RHProtected
 
 
 def fetch_authenticated_user():
@@ -50,3 +53,19 @@ class UserInfoHook(HTTPAPIHook):
         if not user.can_be_modified(user):
             raise HTTPAPIError('You do not have access to that info', 403)
         return [user.as_avatar.fossilize()]
+
+
+class RHUserFavoritesAPI(RHProtected):
+    def _process_args(self):
+        self.user = User.get_one(request.view_args['user_id']) if 'user_id' in request.view_args else None
+
+    def _process_GET(self):
+        return jsonify(sorted(u.id for u in session.user.favorite_users))
+
+    def _process_PUT(self):
+        session.user.favorite_users.add(self.user)
+        return jsonify(self.user.id), 201
+
+    def _process_DELETE(self):
+        session.user.favorite_users.discard(self.user)
+        return '', 204
