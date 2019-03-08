@@ -57,10 +57,24 @@ function range(minValue, maxValue) {
     return value => _min(value) || _max(value);
 }
 
+function minLength(length) {
+    return (value) => {
+        const error = required(value);
+        if (error) {
+            return error;
+        }
+
+        if (value.length < length) {
+            return Translate.string('Value must be at least {length} chars', {length});
+        }
+    };
+}
+
 
 export default {
     required,
     min,
     max,
     range,
+    minLength,
 };
