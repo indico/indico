@@ -70,6 +70,7 @@
             &.pre-booking {
                 @include stripes($pre-booking-stripe-colors...);
                 background-size: 35px 35px;
+                color: #c4930d;
             }
 
             &.pre-booking-conflict {
