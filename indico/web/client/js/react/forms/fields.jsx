@@ -25,6 +25,7 @@ import './ReduxFormField.module.scss';
 export function ReduxFormField(
     {
         input, label, placeholder, required, children, disabled, componentLabel, defaultValue, fieldProps,
+        hideValidationError,
         meta: {touched, error, submitError, submitting, dirty, dirtySinceLastSubmit},
         as: Component,
         ...props
@@ -38,8 +39,10 @@ export function ReduxFormField(
     //   ...and the field has not been modified since the failed submission
     let errorMessage = null;
     if (touched && error && (dirty || required)) {
-        errorMessage = error;
-    } else if (submitError && !dirtySinceLastSubmit) {
+        if (!hideValidationError) {
+            errorMessage = error;
+        }
+    } else if (submitError && !dirtySinceLastSubmit && !submitting) {
         errorMessage = submitError;
     }
 
@@ -71,6 +74,7 @@ ReduxFormField.propTypes = {
     disabled: PropTypes.bool,
     input: PropTypes.object.isRequired,
     required: PropTypes.bool,
+    hideValidationError: PropTypes.bool,
     label: PropTypes.string,
     componentLabel: PropTypes.oneOfType([PropTypes.string, PropTypes.exact({children: PropTypes.node})]),
     placeholder: PropTypes.string,
@@ -84,6 +88,7 @@ ReduxFormField.propTypes = {
 ReduxFormField.defaultProps = {
     disabled: false,
     required: false,
+    hideValidationError: false,
     placeholder: null,
     label: null,
     componentLabel: null,
