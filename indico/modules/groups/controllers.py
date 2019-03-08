@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 from operator import attrgetter
 
 from flask import flash, jsonify, redirect, request
+from marshmallow import validate
 from sqlalchemy.orm import joinedload
 from webargs import fields
 from webargs.flaskparser import use_kwargs
@@ -148,8 +149,10 @@ class RHGroupDeleteMember(RHLocalGroupBase):
 
 class RHGroupSearch(RHProtected):
     @use_kwargs({
-        'name': fields.Str()
+        'name': fields.Str(required=True),
+        'exact': fields.Bool(missing=False),
     })
-    def _process(self, name):
-        groups = GroupProxy.search(name)
-        return jsonify([serialize_group(group) for group in groups])
+    def _process(self, name, exact):
+        groups = GroupProxy.search(name, exact=exact)
+        total = len(groups)
+        return jsonify(groups=[serialize_group(group) for group in groups[:10]], total=total)

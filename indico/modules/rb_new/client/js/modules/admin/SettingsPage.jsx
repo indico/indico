@@ -98,7 +98,7 @@ class SettingsPage extends React.PureComponent {
                                 </Message.Header>
                                 <Form.Group widths="equal">
                                     <Field name="authorized_principals" component={ReduxFormField}
-                                           as={PrincipalListField}
+                                           as={PrincipalListField} withGroups
                                            isEqual={_.isEqual}
                                            label={Translate.string('Authorized users')}>
                                         <p className="field-description">
@@ -109,7 +109,7 @@ class SettingsPage extends React.PureComponent {
                                         </p>
                                     </Field>
                                     <Field name="admin_principals" component={ReduxFormField}
-                                           as={PrincipalListField}
+                                           as={PrincipalListField} withGroups
                                            isEqual={_.isEqual}
                                            label={Translate.string('Administrators')}>
                                         <p className="field-description">

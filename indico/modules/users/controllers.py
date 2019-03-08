@@ -536,4 +536,4 @@ class RHUserSearch(RHProtected):
 
         favorites_first = args.pop('favorites_first')
         query = build_user_search_query(args, favorites_first=favorites_first)
-        return jsonify(user_schema.dump(query.limit(10).all(), many=True))
+        return jsonify(users=user_schema.dump(query.limit(10).all(), many=True).data, total=query.count())

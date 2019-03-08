@@ -42,13 +42,28 @@
     margin-bottom: 5px;
 }
 
-.delete-button {
+.actions {
+    white-space: nowrap;
+}
+
+.button {
     cursor: pointer;
-    color: $red;
     opacity: 0.5 !important;
 
     &:hover {
         opacity: 1 !important;
+    }
+
+    &.delete {
+        color: $red;
+    }
+
+    &.favorite {
+        color: $gray;
+
+        &.active, &:hover {
+            color: $yellow;
+        }
     }
 }
 

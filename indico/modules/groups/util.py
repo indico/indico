@@ -23,6 +23,7 @@ def serialize_group(group):
         'id': group.id if group.is_local else group.name,
         'name': group.name,
         'provider': group.provider,
+        'provider_title': group.provider_title if not group.is_local else None,
         'identifier': group.identifier,
         '_type': 'LocalGroup' if group.is_local else 'MultipassGroup',
         'isGroup': True

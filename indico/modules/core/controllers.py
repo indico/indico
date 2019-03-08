@@ -238,9 +238,11 @@ class RHPrincipals(RHProtected):
     def _serialize_principal(self, principal):
         if principal.principal_type == PrincipalType.user:
             return {'identifier': principal.identifier,
+                    'user_id': principal.id,
                     'group': False,
                     'name': principal.display_full_name,
-                    'detail': principal.email}
+                    'detail': ('{} ({})'.format(principal.email, principal.affiliation)
+                               if principal.affiliation else principal.email)}
         elif principal.principal_type == PrincipalType.local_group:
             return {'identifier': principal.identifier,
                     'group': True,

@@ -35,7 +35,7 @@ const searchUsers = async (data) => {
         handleAxiosError(error);
         return;
     }
-    return camelizeKeys(response.data.data);
+    return camelizeKeys(response.data.users);
 };
 
 const searchGroups = async (data) => {
@@ -47,7 +47,7 @@ const searchGroups = async (data) => {
         return;
     }
 
-    return camelizeKeys(response.data);
+    return camelizeKeys(response.data.groups);
 };
 
 export default class PrincipalSearchField extends React.Component {

@@ -20,10 +20,13 @@ import principalsURL from 'indico-url:core.principals';
 import _ from 'lodash';
 import React, {useState} from 'react';
 import PropTypes from 'prop-types';
-import {Icon, List, Loader} from 'semantic-ui-react';
+import {Button, Icon, List, Loader, Modal} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
-import {useAsyncEffect} from '../hooks';
+import {camelizeKeys} from 'indico/utils/case';
+import {useAsyncEffect, useFavoriteUsers} from '../hooks';
+import GroupSearch from './GroupSearch';
+import UserSearch from './UserSearch';
 
 import './PrincipalListField.module.scss';
 
@@ -32,17 +35,27 @@ import './PrincipalListField.module.scss';
  * A field that lets the user select a list of users/groups
  */
 const PrincipalListField = (props) => {
-    const {value, disabled, onChange, onFocus, onBlur} = props;
-
-    const isGroup = identifier => identifier.startsWith('Group:');
-    const handleDelete = identifier => {
-        onChange(value.filter(x => x !== identifier));
-        onFocus();
-        onBlur();
-    };
+    const {value, disabled, onChange, onFocus, onBlur, withGroups} = props;
 
     // keep track of details for each entry
     const [identifierMap, setIdentifierMap] = useState({});
+
+    const [favoriteUsers, [handleAddFavorite, handleDelFavorite]] = useFavoriteUsers();
+
+    const isGroup = identifier => identifier.startsWith('Group:');
+    const markTouched = () => {
+        onFocus();
+        onBlur();
+    };
+    const handleDelete = identifier => {
+        onChange(value.filter(x => x !== identifier));
+        markTouched();
+    };
+    const handleAdd = data => {
+        setIdentifierMap(prev => ({...prev, [data.identifier]: data}));
+        onChange([...value, data.identifier]);
+        markTouched();
+    };
 
     // fetch missing details
     useAsyncEffect(async () => {
@@ -58,7 +71,7 @@ const PrincipalListField = (props) => {
             handleAxiosError(error);
             return;
         }
-        setIdentifierMap(prev => ({...prev, ...response.data}));
+        setIdentifierMap(prev => ({...prev, ...camelizeKeys(response.data)}));
     }, [identifierMap, value]);
 
     const entries = _.sortBy(
@@ -78,7 +91,10 @@ const PrincipalListField = (props) => {
                                        name={data.name}
                                        detail={data.detail}
                                        isGroup={data.group}
+                                       favorite={!data.group && favoriteUsers.includes(data.userId)}
                                        onDelete={() => !disabled && handleDelete(data.identifier)}
+                                       onAddFavorite={() => !disabled && handleAddFavorite(data.userId)}
+                                       onDelFavorite={() => !disabled && handleDelFavorite(data.userId)}
                                        disabled={disabled} />
                 ))}
                 {pendingEntries.map(data => (
@@ -92,6 +108,33 @@ const PrincipalListField = (props) => {
                     </List.Item>
                 )}
             </List>
+            <Button.Group>
+                <Button icon="add" as="div" disabled />
+                <Modal trigger={<Button type="button" disabled={disabled}><Translate>User</Translate></Button>}
+                       size="tiny"
+                       dimmer="inverted"
+                       closeIcon>
+                    <Modal.Header>
+                        <Translate>Add users</Translate>
+                    </Modal.Header>
+                    <Modal.Content>
+                        <UserSearch existing={value} onAdd={handleAdd} />
+                    </Modal.Content>
+                </Modal>
+                {withGroups && (
+                    <Modal trigger={<Button type="button" disabled={disabled}><Translate>Group</Translate></Button>}
+                           size="tiny"
+                           dimmer="inverted"
+                           closeIcon>
+                        <Modal.Header>
+                            <Translate>Add groups</Translate>
+                        </Modal.Header>
+                        <Modal.Content>
+                            <GroupSearch existing={value} onAdd={handleAdd} />
+                        </Modal.Content>
+                    </Modal>
+                )}
+            </Button.Group>
         </>
     );
 };
@@ -102,6 +145,11 @@ PrincipalListField.propTypes = {
     onChange: PropTypes.func.isRequired,
     onFocus: PropTypes.func.isRequired,
     onBlur: PropTypes.func.isRequired,
+    withGroups: PropTypes.bool,
+};
+
+PrincipalListField.defaultProps = {
+    withGroups: false,
 };
 
 // eslint-disable-next-line react/prop-types
@@ -126,7 +174,7 @@ const PendingPrincipalListItem = ({isGroup}) => (
 );
 
 // eslint-disable-next-line react/prop-types
-const PrincipalListItem = ({isGroup, name, detail, onDelete, disabled}) => (
+const PrincipalListItem = ({isGroup, name, detail, onDelete, onAddFavorite, onDelFavorite, disabled, favorite}) => (
     <List.Item>
         <div styleName="item">
             <div styleName="icon">
@@ -138,12 +186,18 @@ const PrincipalListItem = ({isGroup, name, detail, onDelete, disabled}) => (
                 </List.Header>
                 {detail && (
                     <List.Description>
-                        {detail}
+                        <small>{detail}</small>
                     </List.Description>
                 )}
             </div>
-            <div>
-                <Icon styleName="delete-button" name="remove" onClick={onDelete} size="large" disabled={disabled} />
+            <div styleName="actions">
+                {!isGroup && (
+                    favorite
+                        ? <Icon styleName="button favorite active" name="star" size="large" onClick={onDelFavorite} />
+                        : <Icon styleName="button favorite" name="star outline" size="large" onClick={onAddFavorite} />
+                )}
+                <Icon styleName="button delete" name="remove" size="large"
+                      onClick={onDelete} disabled={disabled} />
             </div>
         </div>
     </List.Item>
