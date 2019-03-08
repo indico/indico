@@ -531,7 +531,7 @@ class RHUserSearch(RHProtected):
         'favorites_first': fields.Bool(missing=False)
     })
     def _process(self, args):
-        if not args:
+        if not (args.get('email') or args.get('name')):
             raise BadRequest()
 
         favorites_first = args.pop('favorites_first')
