@@ -12,18 +12,16 @@
 
 {% macro render_impersonation_new(original_name) %}
     <div class="impersonation-bar">
-            <div class="content">
-                <i class="spy large icon"></i>
-                <div class="message">
-                    {% trans name='<strong>%s</strong>'|safe|format(session.user.full_name) %}Impersonating {{ name }}{% endtrans %}
-                    ({{ original_name }})
-                </div>
-                <i class="close icon inverted undo-login-as"
-                   title="{% trans user=message %}Switch back to {{ original_name }}{% endtrans %}"></i>
+        <div class="content">
+            <i class="spy large icon"></i>
+            <div class="message">
+                {% trans name='<strong>%s</strong>'|safe|format(session.user.full_name) %}Impersonating {{ name }}{% endtrans %}
+                ({{ original_name }})
             </div>
+            <i class="close icon inverted undo-login-as"
+                title="{% trans user=message %}Switch back to {{ original_name }}{% endtrans %}"></i>
         </div>
-        <script>
-    </script>
+    </div>
 {% endmacro %}
 
 
