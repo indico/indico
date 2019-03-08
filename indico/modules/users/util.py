@@ -185,7 +185,7 @@ def _build_name_search(name_list):
 def build_user_search_query(criteria, exact=False, include_deleted=False, include_pending=False,
                             favorites_first=False):
     unspecified = object()
-    query = User.query.options(db.joinedload(User._all_emails))
+    query = User.query.distinct(User.id).options(db.joinedload(User._all_emails))
 
     if not include_pending:
         query = query.filter(~User.is_pending)
@@ -212,11 +212,13 @@ def build_user_search_query(criteria, exact=False, include_deleted=False, includ
     for k, v in criteria.iteritems():
         query = query.filter(unaccent_match(getattr(User, k), v, exact))
 
+    # wrap as subquery so we can apply order regardless of distinct-by-id
+    query = query.from_self()
+
     if favorites_first:
         query = (query.outerjoin(favorite_user_table, db.and_(favorite_user_table.c.user_id == session.user.id,
                                                               favorite_user_table.c.target_id == User.id))
-                      .order_by(nullslast(favorite_user_table.c.user_id)))
-
+                 .order_by(nullslast(favorite_user_table.c.user_id)))
     query = query.order_by(db.func.lower(db.func.indico.indico_unaccent(User.first_name)),
                            db.func.lower(db.func.indico.indico_unaccent(User.last_name)),
                            User.id)
