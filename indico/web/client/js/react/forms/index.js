@@ -19,4 +19,4 @@ export {handleSubmissionError} from './errors';
 export {ReduxFormField, ReduxRadioField, ReduxCheckboxField, ReduxDropdownField} from './fields';
 export {default as validators} from './validators';
 export {default as formatters} from './formatters';
-export {getChangedValues, FieldCondition} from './final-form';
+export {getChangedValues, FieldCondition, handleSubmitError} from './final-form';
