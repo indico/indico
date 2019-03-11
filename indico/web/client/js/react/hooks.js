@@ -30,9 +30,9 @@ import {indicoAxios, handleAxiosError} from '../utils/axios';
  * but this should be used for simple AJAX calls where no cleanup is needed.
  */
 export const useAsyncEffect = (fn, ...args) => {
-    /* eslint-disable react-hooks/exhaustive-deps */
     useEffect(() => {
         fn();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, ...args);
 };
 
@@ -43,12 +43,13 @@ export const useFavoriteUsers = () => {
     // requests to load the initial list
     const [favorites, setFavorites] = useState([]);
 
-    const apiCall = async (method, id = null) => {
+    const apiCall = async (method, id = null, source = null) => {
         let response;
         try {
             response = await indicoAxios.request({
                 method,
-                url: favoriteUsersURL(id !== null ? {user_id: id} : {})
+                url: favoriteUsersURL(id !== null ? {user_id: id} : {}),
+                cancelToken: source ? source.token : null,
             });
         } catch (error) {
             handleAxiosError(error);
@@ -68,9 +69,17 @@ export const useFavoriteUsers = () => {
         }
     };
 
-    useAsyncEffect(async () => {
-        const data = await apiCall('GET');
-        setFavorites(data);
+    useEffect(() => {
+        const source = indicoAxios.CancelToken.source();
+
+        (async () => {
+            const data = await apiCall('GET', null, source);
+            setFavorites(data);
+        })();
+
+        return () => {
+            source.cancel();
+        };
     }, []);
 
     return [favorites, [add, del]];
