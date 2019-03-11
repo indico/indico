@@ -108,20 +108,26 @@ export function webpackDefaults(env, config, bundles) {
     }
 
     /**
-     * This function resolves SASS files using a module:path syntax
+     * This function resolves SASS files using a [~][module:]path syntax
      */
     function sassResolver(url) {
-        const match = url.match(/^(~?\w+):([\w/-_]+)/);
+        const match = url.match(/^(~?)(?:(\w+):)?([\w/-_]+)/);
         if (match) {
-            let mod = match[1];
-            const file = match[2];
+            const skipOverride = match[1] === '~';
+            const mod = match[2];
+            const file = match[3];
             if (config.isPlugin) {
                 const {sassOverrides} = bundles;
-                if (mod[0] === '~') {
-                    mod = mod.substr(1);
+                if (skipOverride) {
+                    if (!mod) {
+                        return {file: path.join(config.indico.build.clientPath, 'styles', file)};
+                    }
                 } else if (sassOverrides && sassOverrides[url]) {
                     return {file: path.join(config.build.clientPath, sassOverrides[url])};
                 }
+            }
+            if (!mod) {
+                return null;
             }
             const modPath = path.join(globalBuildConfig.rootPath, 'modules', mod);
             return {file: path.join(modPath, 'client', file)};
