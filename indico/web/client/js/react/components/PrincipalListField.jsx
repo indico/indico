@@ -18,7 +18,7 @@
 import principalsURL from 'indico-url:core.principals';
 
 import _ from 'lodash';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import PropTypes from 'prop-types';
 import {Button, Icon, List, Loader, Modal} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
@@ -56,20 +56,27 @@ const PrincipalListField = (props) => {
     };
 
     // fetch missing details
-    useAsyncEffect(async () => {
+    useEffect(() => {
         const missingData = _.difference(value, Object.keys(identifierMap));
         if (!missingData.length) {
             return;
         }
 
-        let response;
-        try {
-            response = await indicoAxios.post(principalsURL(), {values: missingData});
-        } catch (error) {
-            handleAxiosError(error);
-            return;
-        }
-        setIdentifierMap(prev => ({...prev, ...camelizeKeys(response.data)}));
+        const source = indicoAxios.CancelToken.source();
+        (async () => {
+            let response;
+            try {
+                response = await indicoAxios.post(principalsURL(), {values: missingData}, {cancelToken: source.token});
+            } catch (error) {
+                handleAxiosError(error);
+                return;
+            }
+            setIdentifierMap(prev => ({...prev, ...camelizeKeys(response.data)}));
+        })();
+
+        return () => {
+            source.cancel();
+        };
     }, [identifierMap, value]);
 
     const entries = _.sortBy(
