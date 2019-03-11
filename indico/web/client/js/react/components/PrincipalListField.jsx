@@ -24,7 +24,6 @@ import {Button, Icon, List, Loader, Modal} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {camelizeKeys} from 'indico/utils/case';
-import {useAsyncEffect, useFavoriteUsers} from '../hooks';
 import GroupSearch from './GroupSearch';
 import UserSearch from './UserSearch';
 
@@ -35,12 +34,11 @@ import './PrincipalListField.module.scss';
  * A field that lets the user select a list of users/groups
  */
 const PrincipalListField = (props) => {
-    const {value, disabled, onChange, onFocus, onBlur, withGroups} = props;
+    const {value, disabled, onChange, onFocus, onBlur, withGroups, favoriteUsersController} = props;
+    const [favoriteUsers, [handleAddFavorite, handleDelFavorite]] = favoriteUsersController;
 
     // keep track of details for each entry
     const [identifierMap, setIdentifierMap] = useState({});
-
-    const [favoriteUsers, [handleAddFavorite, handleDelFavorite]] = useFavoriteUsers();
 
     const isGroup = identifier => identifier.startsWith('Group:');
     const markTouched = () => {
@@ -145,6 +143,7 @@ PrincipalListField.propTypes = {
     onChange: PropTypes.func.isRequired,
     onFocus: PropTypes.func.isRequired,
     onBlur: PropTypes.func.isRequired,
+    favoriteUsersController: PropTypes.array.isRequired,
     withGroups: PropTypes.bool,
 };
 
@@ -192,9 +191,13 @@ const PrincipalListItem = ({isGroup, name, detail, onDelete, onAddFavorite, onDe
             </div>
             <div styleName="actions">
                 {!isGroup && (
-                    favorite
-                        ? <Icon styleName="button favorite active" name="star" size="large" onClick={onDelFavorite} />
-                        : <Icon styleName="button favorite" name="star outline" size="large" onClick={onAddFavorite} />
+                    favorite ? (
+                        <Icon styleName="button favorite active" name="star" size="large"
+                              onClick={onDelFavorite} disabled={disabled} />
+                    ) : (
+                        <Icon styleName="button favorite" name="star outline" size="large"
+                              onClick={onAddFavorite} disabled={disabled} />
+                    )
                 )}
                 <Icon styleName="button delete" name="remove" size="large"
                       onClick={onDelete} disabled={disabled} />

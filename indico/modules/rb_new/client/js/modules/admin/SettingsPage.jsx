@@ -28,6 +28,7 @@ import {
     formatters, getChangedValues, FieldCondition, ReduxFormField, ReduxCheckboxField,
     validators as v
 } from 'indico/react/forms';
+import {useFavoriteUsers} from 'indico/react/hooks';
 import * as adminActions from './actions';
 import * as adminSelectors from './selectors';
 import CategoryList from './CategoryList';
@@ -36,6 +37,7 @@ import CategoryList from './CategoryList';
 const SettingsPage = props => {
     const {settingsLoaded, settings, actions: {fetchSettings, updateSettings}} = props;
 
+    const favoriteUsersController = useFavoriteUsers();
     useEffect(() => {
         fetchSettings();
     }, [fetchSettings]);
@@ -87,6 +89,7 @@ const SettingsPage = props => {
                             <Form.Group widths="equal">
                                 <Field name="authorized_principals" component={ReduxFormField}
                                        as={PrincipalListField} withGroups
+                                       favoriteUsersController={favoriteUsersController}
                                        isEqual={_.isEqual}
                                        label={Translate.string('Authorized users')}>
                                     <p className="field-description">
@@ -98,6 +101,7 @@ const SettingsPage = props => {
                                 </Field>
                                 <Field name="admin_principals" component={ReduxFormField}
                                        as={PrincipalListField} withGroups
+                                       favoriteUsersController={favoriteUsersController}
                                        isEqual={_.isEqual}
                                        label={Translate.string('Administrators')}>
                                     <p className="field-description">
