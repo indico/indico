@@ -16,7 +16,7 @@
  */
 
 import _ from 'lodash';
-import React from 'react';
+import React, {useEffect} from 'react';
 import PropTypes from 'prop-types';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
@@ -33,23 +33,14 @@ import * as adminSelectors from './selectors';
 import CategoryList from './CategoryList';
 
 
-class SettingsPage extends React.PureComponent {
-    static propTypes = {
-        settingsLoaded: PropTypes.bool.isRequired,
-        settings: PropTypes.object.isRequired,
-        actions: PropTypes.exact({
-            fetchSettings: PropTypes.func.isRequired,
-            updateSettings: PropTypes.func.isRequired,
-        }).isRequired,
-    };
+const SettingsPage = props => {
+    const {settingsLoaded, settings, actions: {fetchSettings, updateSettings}} = props;
 
-    componentDidMount() {
-        const {actions: {fetchSettings}} = this.props;
+    useEffect(() => {
         fetchSettings();
-    }
+    }, [fetchSettings]);
 
-    handleSubmit = async (data, form) => {
-        const {actions: {updateSettings}} = this.props;
+    const handleSubmit = async (data, form) => {
         const changedValues = getChangedValues(data, form);
         const rv = await updateSettings(changedValues);
         if (rv.error) {
@@ -57,215 +48,220 @@ class SettingsPage extends React.PureComponent {
         }
     };
 
-    render() {
-        const {settingsLoaded, settings} = this.props;
-
-        if (!settingsLoaded) {
-            return (
-                <Placeholder>
-                    <Placeholder.Line />
-                    <Placeholder.Line />
-                    <Placeholder.Line />
-                    <Placeholder.Line />
-                    <Placeholder.Line />
-                </Placeholder>
-            );
-        }
-
+    if (!settingsLoaded) {
         return (
-            <>
-                <Header as="h2">
-                    <Translate>General Settings</Translate>
-                </Header>
-                <FinalForm onSubmit={this.handleSubmit}
-                           initialValues={settings}
-                           initialValuesEqual={_.isEqual}
-                           subscription={{
-                               submitting: true,
-                               hasValidationErrors: true,
-                               pristine: true,
-                               submitSucceeded: true,
-                               dirtySinceLastSubmit: true,
-                           }}>
-                    {fprops => (
-                        <Form onSubmit={fprops.handleSubmit}
-                              success={fprops.submitSucceeded && !fprops.dirtySinceLastSubmit}>
+            <Placeholder>
+                <Placeholder.Line />
+                <Placeholder.Line />
+                <Placeholder.Line />
+                <Placeholder.Line />
+                <Placeholder.Line />
+            </Placeholder>
+        );
+    }
+
+    return (
+        <>
+            <Header as="h2">
+                <Translate>General Settings</Translate>
+            </Header>
+            <FinalForm onSubmit={handleSubmit}
+                       initialValues={settings}
+                       initialValuesEqual={_.isEqual}
+                       subscription={{
+                           submitting: true,
+                           hasValidationErrors: true,
+                           pristine: true,
+                           submitSucceeded: true,
+                           dirtySinceLastSubmit: true,
+                       }}>
+                {fprops => (
+                    <Form onSubmit={fprops.handleSubmit}
+                          success={fprops.submitSucceeded && !fprops.dirtySinceLastSubmit}>
+                        <Message>
+                            <Message.Header>
+                                <Translate>
+                                    Specify who has access to the room booking system.
+                                </Translate>
+                            </Message.Header>
+                            <Form.Group widths="equal">
+                                <Field name="authorized_principals" component={ReduxFormField}
+                                       as={PrincipalListField} withGroups
+                                       isEqual={_.isEqual}
+                                       label={Translate.string('Authorized users')}>
+                                    <p className="field-description">
+                                        <Translate>
+                                            Restrict access to the room booking system to these users/groups.
+                                            If empty, all logged-in users have access.
+                                        </Translate>
+                                    </p>
+                                </Field>
+                                <Field name="admin_principals" component={ReduxFormField}
+                                       as={PrincipalListField} withGroups
+                                       isEqual={_.isEqual}
+                                       label={Translate.string('Administrators')}>
+                                    <p className="field-description">
+                                        <Translate>
+                                            Grant full room booking admin permissions to these users/groups.
+                                        </Translate>
+                                    </p>
+                                </Field>
+                            </Form.Group>
+                        </Message>
+                        <Field name="tileserver_url" component={ReduxFormField} as="input"
+                               format={formatters.trim} formatOnBlur
+                               label={Translate.string('Tileserver URL')}
+                               validate={val => {
+                                   if (!val) {
+                                       return undefined;
+                                   } else if (!val.match(/https?:\/\/.+/)) {
+                                       return Translate.string('Please provide a valid URL');
+                                   } else {
+                                       const missing = ['{x}', '{y}', '{z}'].filter(x => !val.includes(x));
+                                       if (missing.length) {
+                                           return PluralTranslate.string(
+                                               'Missing placeholder: {placeholders}',
+                                               'Missing placeholders: {placeholders}',
+                                               missing.length,
+                                               {placeholders: missing.join(', ')}
+                                           );
+                                       }
+                                   }
+                               }}>
+                            <p className="field-description">
+                                <Translate>
+                                    If you want to use the map, specify the URL to a tileserver covering the
+                                    area in which your rooms are located.
+                                </Translate>
+                            </p>
+                        </Field>
+                        <Field name="booking_limit" component={ReduxFormField} as="input"
+                               type="number"
+                               min="1"
+                               required
+                               parse={value => (value ? +value : null)}
+                               label={Translate.string('Max. booking length')}
+                               validate={v.min(1)}>
+                            <p className="field-description">
+                                <Translate>The maximum length (in days) a booking may last.</Translate>
+                            </p>
+                        </Field>
+                        <Field name="notifications_enabled" component={ReduxCheckboxField}
+                               componentLabel={Translate.string('Send reminders for upcoming bookings')} />
+                        <FieldCondition when="notifications_enabled">
                             <Message>
                                 <Message.Header>
                                     <Translate>
-                                        Specify who has access to the room booking system.
+                                        Specify how many days in advance booking reminders should be sent
                                     </Translate>
                                 </Message.Header>
                                 <Form.Group widths="equal">
-                                    <Field name="authorized_principals" component={ReduxFormField}
-                                           as={PrincipalListField} withGroups
-                                           isEqual={_.isEqual}
-                                           label={Translate.string('Authorized users')}>
-                                        <p className="field-description">
-                                            <Translate>
-                                                Restrict access to the room booking system to these users/groups.
-                                                If empty, all logged-in users have access.
-                                            </Translate>
-                                        </p>
-                                    </Field>
-                                    <Field name="admin_principals" component={ReduxFormField}
-                                           as={PrincipalListField} withGroups
-                                           isEqual={_.isEqual}
-                                           label={Translate.string('Administrators')}>
-                                        <p className="field-description">
-                                            <Translate>
-                                                Grant full room booking admin permissions to these users/groups.
-                                            </Translate>
-                                        </p>
-                                    </Field>
+                                    <Field name="notification_before_days" component={ReduxFormField}
+                                           as="input"
+                                           type="number"
+                                           min="1"
+                                           max="30"
+                                           required
+                                           parse={value => (value ? +value : null)}
+                                           label={Translate.string('Single/Daily bookings')}
+                                           validate={v.range(1, 30)} />
+                                    <Field name="notification_before_days_weekly" component={ReduxFormField}
+                                           as="input"
+                                           type="number"
+                                           min="1"
+                                           max="30"
+                                           required
+                                           parse={value => (value ? +value : null)}
+                                           label={Translate.string('Weekly bookings')}
+                                           validate={v.range(1, 30)} />
+                                    <Field name="notification_before_days_monthly" component={ReduxFormField}
+                                           as="input"
+                                           type="number"
+                                           min="1"
+                                           max="30"
+                                           required
+                                           parse={value => (value ? +value : null)}
+                                           label={Translate.string('Monthly bookings')}
+                                           validate={v.range(1, 30)} />
                                 </Form.Group>
                             </Message>
-                            <Field name="tileserver_url" component={ReduxFormField} as="input"
-                                   format={formatters.trim} formatOnBlur
-                                   label={Translate.string('Tileserver URL')}
-                                   validate={val => {
-                                       if (!val) {
-                                           return undefined;
-                                       } else if (!val.match(/https?:\/\/.+/)) {
-                                           return Translate.string('Please provide a valid URL');
-                                       } else {
-                                           const missing = ['{x}', '{y}', '{z}'].filter(x => !val.includes(x));
-                                           if (missing.length) {
-                                               return PluralTranslate.string(
-                                                   'Missing placeholder: {placeholders}',
-                                                   'Missing placeholders: {placeholders}',
-                                                   missing.length,
-                                                   {placeholders: missing.join(', ')}
-                                               );
-                                           }
-                                       }
-                                   }}>
-                                <p className="field-description">
+                        </FieldCondition>
+                        <Field name="end_notifications_enabled" component={ReduxCheckboxField}
+                               componentLabel={Translate.string('Send reminders when bookings are about to end')} />
+                        <FieldCondition when="end_notifications_enabled">
+                            <Message>
+                                <Message.Header>
                                     <Translate>
-                                        If you want to use the map, specify the URL to a tileserver covering the
-                                        area in which your rooms are located.
+                                        Specify how many days before the end of a booking reminders should be sent
                                     </Translate>
-                                </p>
-                            </Field>
-                            <Field name="booking_limit" component={ReduxFormField} as="input"
-                                   type="number"
-                                   min="1"
-                                   required
-                                   parse={value => (value ? +value : null)}
-                                   label={Translate.string('Max. booking length')}
-                                   validate={v.min(1)}>
-                                <p className="field-description">
-                                    <Translate>The maximum length (in days) a booking may last.</Translate>
-                                </p>
-                            </Field>
-                            <Field name="notifications_enabled" component={ReduxCheckboxField}
-                                   componentLabel={Translate.string('Send reminders for upcoming bookings')} />
-                            <FieldCondition when="notifications_enabled">
-                                <Message>
-                                    <Message.Header>
-                                        <Translate>
-                                            Specify how many days in advance booking reminders should be sent
-                                        </Translate>
-                                    </Message.Header>
-                                    <Form.Group widths="equal">
-                                        <Field name="notification_before_days" component={ReduxFormField}
-                                               as="input"
-                                               type="number"
-                                               min="1"
-                                               max="30"
-                                               required
-                                               parse={value => (value ? +value : null)}
-                                               label={Translate.string('Single/Daily bookings')}
-                                               validate={v.range(1, 30)} />
-                                        <Field name="notification_before_days_weekly" component={ReduxFormField}
-                                               as="input"
-                                               type="number"
-                                               min="1"
-                                               max="30"
-                                               required
-                                               parse={value => (value ? +value : null)}
-                                               label={Translate.string('Weekly bookings')}
-                                               validate={v.range(1, 30)} />
-                                        <Field name="notification_before_days_monthly" component={ReduxFormField}
-                                               as="input"
-                                               type="number"
-                                               min="1"
-                                               max="30"
-                                               required
-                                               parse={value => (value ? +value : null)}
-                                               label={Translate.string('Monthly bookings')}
-                                               validate={v.range(1, 30)} />
-                                    </Form.Group>
-                                </Message>
-                            </FieldCondition>
-                            <Field name="end_notifications_enabled" component={ReduxCheckboxField}
-                                   componentLabel={Translate.string('Send reminders when bookings are about to end')} />
-                            <FieldCondition when="end_notifications_enabled">
-                                <Message>
-                                    <Message.Header>
-                                        <Translate>
-                                            Specify how many days before the end of a booking reminders should be sent
-                                        </Translate>
-                                    </Message.Header>
-                                    <Form.Group widths="equal">
-                                        <Field name="end_notification_daily" component={ReduxFormField}
-                                               as="input"
-                                               type="number"
-                                               min="1"
-                                               max="30"
-                                               required
-                                               parse={value => (value ? +value : null)}
-                                               label={Translate.string('Daily bookings')}
-                                               validate={v.range(1, 30)} />
-                                        <Field name="end_notification_weekly" component={ReduxFormField}
-                                               as="input"
-                                               type="number"
-                                               min="1"
-                                               max="30"
-                                               required
-                                               parse={value => (value ? +value : null)}
-                                               label={Translate.string('Weekly bookings')}
-                                               validate={v.range(1, 30)} />
-                                        <Field name="end_notification_monthly" component={ReduxFormField}
-                                               as="input"
-                                               type="number"
-                                               min="1"
-                                               max="30"
-                                               required
-                                               parse={value => (value ? +value : null)}
-                                               label={Translate.string('Monthly bookings')}
-                                               validate={v.range(1, 30)} />
-                                    </Form.Group>
-                                </Message>
-                            </FieldCondition>
-                            <Field name="excluded_categories" component={ReduxFormField} as={CategoryList}
-                                   label={Translate.string('Disable booking during event creation')}>
-                                <p className="field-description">
-                                    <Translate>
-                                        Specify the IDs of categories for which booking a room during event creation
-                                        will not be suggested.
-                                    </Translate>
-                                </p>
-                            </Field>
-                            <Form.Button type="submit"
-                                         disabled={(
-                                             fprops.hasValidationErrors ||
-                                             fprops.pristine ||
-                                             fprops.submitting
-                                         )}
-                                         loading={fprops.submitting}
-                                         primary
-                                         content={Translate.string('Save')} />
-                            <Message success>
-                                <Translate>Settings have been saved.</Translate>
+                                </Message.Header>
+                                <Form.Group widths="equal">
+                                    <Field name="end_notification_daily" component={ReduxFormField}
+                                           as="input"
+                                           type="number"
+                                           min="1"
+                                           max="30"
+                                           required
+                                           parse={value => (value ? +value : null)}
+                                           label={Translate.string('Daily bookings')}
+                                           validate={v.range(1, 30)} />
+                                    <Field name="end_notification_weekly" component={ReduxFormField}
+                                           as="input"
+                                           type="number"
+                                           min="1"
+                                           max="30"
+                                           required
+                                           parse={value => (value ? +value : null)}
+                                           label={Translate.string('Weekly bookings')}
+                                           validate={v.range(1, 30)} />
+                                    <Field name="end_notification_monthly" component={ReduxFormField}
+                                           as="input"
+                                           type="number"
+                                           min="1"
+                                           max="30"
+                                           required
+                                           parse={value => (value ? +value : null)}
+                                           label={Translate.string('Monthly bookings')}
+                                           validate={v.range(1, 30)} />
+                                </Form.Group>
                             </Message>
-                        </Form>
-                    )}
-                </FinalForm>
-            </>
-        );
-    }
-}
+                        </FieldCondition>
+                        <Field name="excluded_categories" component={ReduxFormField} as={CategoryList}
+                               label={Translate.string('Disable booking during event creation')}>
+                            <p className="field-description">
+                                <Translate>
+                                    Specify the IDs of categories for which booking a room during event creation
+                                    will not be suggested.
+                                </Translate>
+                            </p>
+                        </Field>
+                        <Form.Button type="submit"
+                                     disabled={(
+                                         fprops.hasValidationErrors ||
+                                         fprops.pristine ||
+                                         fprops.submitting
+                                     )}
+                                     loading={fprops.submitting}
+                                     primary
+                                     content={Translate.string('Save')} />
+                        <Message success>
+                            <Translate>Settings have been saved.</Translate>
+                        </Message>
+                    </Form>
+                )}
+            </FinalForm>
+        </>
+    );
+};
+
+SettingsPage.propTypes = {
+    settingsLoaded: PropTypes.bool.isRequired,
+    settings: PropTypes.object.isRequired,
+    actions: PropTypes.exact({
+        fetchSettings: PropTypes.func.isRequired,
+        updateSettings: PropTypes.func.isRequired,
+    }).isRequired,
+};
 
 export default connect(
     state => ({
@@ -278,4 +274,4 @@ export default connect(
             updateSettings: adminActions.updateSettings,
         }, dispatch),
     })
-)(SettingsPage);
+)(React.memo(SettingsPage));
