@@ -15,11 +15,11 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-@import 'rb_new:styles/palette';
+@import 'base/palette';
 
 :global(.ui.button).scroll-btn {
     background-color: $highlight-color;
-    color: $white;
+    color: $light-gray;
     position: fixed;
     bottom: 10px;
     right: 10px;
@@ -34,6 +34,6 @@
     &:hover,
     &:focus {
         background-color: $dark-highlight-color;
-        color: $white;
+        color: $light-gray;
     }
 }
