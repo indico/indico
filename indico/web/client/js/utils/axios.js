@@ -30,6 +30,9 @@ export const indicoAxios = axios.create({
     xsrfHeaderName: null,
 });
 
+indicoAxios.isCancel = axios.isCancel;
+indicoAxios.CancelToken = axios.CancelToken;
+
 indicoAxios.interceptors.request.use((config) => {
     if (isURLSameOrigin(config.url)) {
         config.headers.common['X-Requested-With'] = 'XMLHttpRequest';  // needed for `request.is_xhr`
@@ -40,6 +43,9 @@ indicoAxios.interceptors.request.use((config) => {
 
 
 export function handleAxiosError(error, strict = false) {
+    if (axios.isCancel(error)) {
+        return;
+    }
     if (error.response && error.response.data && error.response.data.error) {
         error = error.response.data.error;
     } else {
