@@ -157,9 +157,10 @@ class BookingBootstrapForm extends React.Component {
         return state;
     }
 
-    onSearch = () => {
+    onSearch = e => {
         const {onSearch} = this.props;
         onSearch(this.serializedState);
+        e.preventDefault();
     };
 
     render() {
