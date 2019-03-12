@@ -19,7 +19,7 @@ export const initialDatePickerState = {
     selectedDate: null,
     dateRange: [],
     minHour: 6,
-    maxHour: 23,
+    maxHour: 22,
     hourStep: 2,
     mode: 'days'
 };

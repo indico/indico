@@ -124,7 +124,7 @@ export default class DailyTimelineContent extends React.Component {
     renderDividers(count, step) {
         const leftOffset = (100 / count);
 
-        return _.range(0, count, step).map(i => (
+        return _.range(0, count + step, step).map(i => (
             // eslint-disable-next-line react/no-array-index-key
             <div styleName="timeline-divider"
                  style={{left: `${(i * leftOffset)}%`}}
@@ -166,7 +166,7 @@ export default class DailyTimelineContent extends React.Component {
             <>
                 <div style={{width: labelWidth}} />
                 <div styleName="timeline-header-labels">
-                    {_.range(0, hourSpan, hourStep).map((i, n) => (
+                    {_.range(0, hourSpan + hourStep, hourStep).map((i, n) => (
                         <div styleName="timeline-header-label"
                              key={`timeline-header-${i}`}
                              style={{position: 'absolute', left: `${i / hourSpan * 100}%`}}>
