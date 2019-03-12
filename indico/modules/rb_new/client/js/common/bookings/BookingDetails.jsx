@@ -109,8 +109,6 @@ class BookingDetails extends React.Component {
             },
             label: moment(day).format('L'),
             key: day,
-            name: null,
-            verboseName: null,
             room
         });
     };

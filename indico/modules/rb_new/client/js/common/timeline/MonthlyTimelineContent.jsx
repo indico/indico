@@ -35,7 +35,7 @@ export default class MonthlyTimelineContent extends WeeklyTimelineContent {
         return [];
     }
 
-    renderTimelineRow({availability, room, label, name, verboseName, conflictIndicator}, key, rowStyle = null) {
+    renderTimelineRow({availability, room, label, verboseLabel, conflictIndicator}, key, rowStyle = null) {
         const {minHour, maxHour, longLabel, onClickCandidate, onClickReservation} = this.props;
         const hasConflicts = availability.some(([, {conflicts}]) => !!conflicts.length);
         const {ItemClass, itemProps} = this.getEditableItem(room);
@@ -43,8 +43,7 @@ export default class MonthlyTimelineContent extends WeeklyTimelineContent {
         return (
             <div styleName="baseStyle.timeline-row" key={key} style={rowStyle}>
                 <TimelineRowLabel label={label}
-                                  name={name}
-                                  verboseName={verboseName}
+                                  verboseLabel={verboseLabel}
                                   availability={conflictIndicator ? (hasConflicts ? 'conflict' : 'available') : null}
                                   longLabel={longLabel}
                                   onClickLabel={this.onClickLabel(room.id)} />
