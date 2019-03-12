@@ -24,8 +24,7 @@ import {Button, Icon, List, Loader, Modal} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {camelizeKeys} from 'indico/utils/case';
-import GroupSearch from './GroupSearch';
-import UserSearch from './UserSearch';
+import {UserSearch, GroupSearch} from './Search';
 
 import './PrincipalListField.module.scss';
 
@@ -123,7 +122,7 @@ const PrincipalListField = (props) => {
                         <Translate>Add users</Translate>
                     </Modal.Header>
                     <Modal.Content>
-                        <UserSearch existing={value} onAdd={handleAdd} />
+                        <UserSearch existing={value} onAdd={handleAdd} favorites={favoriteUsers} />
                     </Modal.Content>
                 </Modal>
                 {withGroups && (
