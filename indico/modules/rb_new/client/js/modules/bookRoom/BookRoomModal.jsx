@@ -282,7 +282,6 @@ class BookRoomModal extends React.Component {
             data.linkType = _.snakeCase(link.type);
             data.linkId = link.id;
         }
-
         const rv = await createBooking(data, this.props);
         if (rv.error) {
             return rv.error;

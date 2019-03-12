@@ -872,6 +872,10 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     def reservations(self):
         return [link.reservation for link in self.all_room_reservation_links]
 
+    @property
+    def has_ended(self):
+        return self.end_dt <= now_utc()
+
     @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'start_dt', 'end_dt', is_deleted=False, is_locked=False,
