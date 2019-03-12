@@ -41,8 +41,8 @@ SQLAlchemy==1.2.7
 WTForms==2.1
 WTForms-Components==0.10.3
 psycopg2==2.7.4
-redis==2.10.6
-hiredis==0.2.0
+redis==3.2.0
+hiredis==1.0.0
 enum34
 ipaddress
 blinker==1.4
@@ -54,6 +54,7 @@ click==6.7
 colorclass==2.2.0
 itsdangerous==0.24
 celery==4.1.1
+kombu>=4.4.0,<4.5
 PyYAML==3.12
 terminaltables==3.1.0
 contextlib2==0.5.5
