@@ -55,12 +55,17 @@ Internal Changes
 Version 2.1.8
 -------------
 
-*Unreleased*
+*Released on March 12, 2019*
 
 Improvements
 ^^^^^^^^^^^^
 
 - Add A6 to page size options (:issue:`3793`)
+
+Bugfixes
+^^^^^^^^
+
+- Fix celery/redis dependency issue (:issue:`3809`)
 
 Version 2.1.7
 -------------
