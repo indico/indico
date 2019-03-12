@@ -19,9 +19,12 @@ import _ from 'lodash';
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Form, Icon} from 'semantic-ui-react';
+import {Accordion, Form, Icon} from 'semantic-ui-react';
+import {Translate} from 'indico/react/i18n';
 
 import {FilterFormComponent} from '../../../common/filters';
+
+import './EquipmentForm.module.scss';
 
 
 export default class EquipmentForm extends FilterFormComponent {
@@ -42,6 +45,7 @@ export default class EquipmentForm extends FilterFormComponent {
         this.state = {
             equipment: availableEquipment.filter(eq => selectedEquipment.includes(eq)),
             features: availableFeatures.map(f => f.name).filter(f => selectedFeatures.includes(f)),
+            showEquipment: false,
         };
     }
 
@@ -75,9 +79,14 @@ export default class EquipmentForm extends FilterFormComponent {
         });
     }
 
+    handleClick = () => {
+        const {showEquipment} = this.state;
+        this.setState({showEquipment: !showEquipment});
+    };
+
     render() {
         const {availableEquipment, availableFeatures} = this.props;
-        const {equipment, features} = this.state;
+        const {equipment, features, showEquipment} = this.state;
         return (
             <>
                 <Form.Group>
@@ -94,8 +103,25 @@ export default class EquipmentForm extends FilterFormComponent {
                                            this.setFeature(feat.name, checked);
                                        }} />
                     ))}
-                    {!!availableFeatures.length && !!availableEquipment.length && <br />}
-                    {availableEquipment.map(equip => (
+                    {!!availableFeatures.length && !!availableEquipment.length && (
+                        <Accordion styleName="equipment-accordion">
+                            <Accordion.Title active={showEquipment} index={0} onClick={this.handleClick}>
+                                <Icon name="dropdown" />
+                                <Translate>See detailed equipment</Translate>
+                            </Accordion.Title>
+                            <Accordion.Content active={showEquipment}>
+                                {availableEquipment.map(equip => (
+                                    <Form.Checkbox checked={equipment.includes(equip)}
+                                                   key={equip}
+                                                   label={equip}
+                                                   onChange={(__, {checked}) => {
+                                                       this.setEquipment(equip, checked);
+                                                   }} />
+                                ))}
+                            </Accordion.Content>
+                        </Accordion>
+                    )}
+                    {!availableFeatures.length && availableEquipment.map(equip => (
                         <Form.Checkbox checked={equipment.includes(equip)}
                                        key={equip}
                                        label={equip}
