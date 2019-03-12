@@ -10,7 +10,7 @@ pyatom==1.4
 pycountry==18.12.8
 mock==2.0.0
 freezegun==0.3.11
-pytest==4.2.1
+pytest==4.3.0
 pytest-cov==2.6.1
 pytest-localserver==0.5.0
 pytest-mock==1.10.1
