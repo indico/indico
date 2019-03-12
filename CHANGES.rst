@@ -5,7 +5,7 @@ Changelog
 Version 2.1.8
 -------------
 
-*Unreleased*
+*Released on March 12, 2019*
 
 Improvements
 ^^^^^^^^^^^^
