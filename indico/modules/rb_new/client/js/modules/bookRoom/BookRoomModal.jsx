@@ -28,7 +28,6 @@ import {ReduxCheckboxField, ReduxDropdownField, ReduxFormField, ReduxRadioField,
 import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
 import PrincipalSearchField from 'indico/react/components/PrincipalSearchField';
 import {Overridable, IndicoPropTypes} from 'indico/react/util';
-import {snakifyKeys} from 'indico/utils/case';
 import TimeInformation from '../../components/TimeInformation';
 import {selectors as roomsSelectors} from '../../common/rooms';
 import {selectors as linkingSelectors, linkDataShape} from '../../common/linking';
@@ -567,10 +566,6 @@ class BookRoomModal extends React.Component {
                                            placeholder={Translate.string('Reason for booking')}
                                            disabled={bookingBlocked(fprops)}
                                            required={reasonRequired} />
-                                    <Overridable id="BookRoomModal.extraFields"
-                                                 disabled={bookingBlocked(fprops)}
-                                                 form={fprops.form}
-                                                 room={room} />
                                 </Segment>
                                 {!link && !fprops.submitSucceeded && (
                                     this.renderRelatedEventsDropdown(bookingBlocked(fprops), fprops.form.mutators)
@@ -631,7 +626,7 @@ export default connect(
             fetchRelatedEvents: actions.fetchRelatedEvents,
             resetRelatedEvents: actions.resetRelatedEvents,
             createBooking: (data, props) => {
-                const {reason, usage, user, isPrebooking, linkType, linkId, linkBack, ...extraFields} = data;
+                const {reason, usage, user, isPrebooking, linkType, linkId, linkBack} = data;
                 const {bookingData: {recurrence, dates, timeSlot}, room} = props;
                 return actions.createBooking({
                     reason,
@@ -645,7 +640,6 @@ export default connect(
                     linkId,
                     linkBack,
                     isPrebooking,
-                    extraFields: snakifyKeys(extraFields),
                 });
             },
             openBookingDetails: bookingId => modalActions.openModal('booking-details', bookingId, null, true)
