@@ -236,7 +236,7 @@ class TimelineItem extends React.Component {
                 }
             }}
                  styleName="timeline-occurrence"
-                 style={{left: `${segmentPosition}%`, width: `calc(${segmentWidth}% + 1px)`}} />
+                 style={{left: `${segmentPosition}%`, width: `${segmentWidth}%`}} />
         );
 
         return (
