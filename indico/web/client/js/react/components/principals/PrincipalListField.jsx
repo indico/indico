@@ -20,7 +20,7 @@ import principalsURL from 'indico-url:core.principals';
 import _ from 'lodash';
 import React, {useEffect, useState} from 'react';
 import PropTypes from 'prop-types';
-import {Button, Icon, List, Loader, Modal} from 'semantic-ui-react';
+import {Button, Icon, List, Loader} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {camelizeKeys} from 'indico/utils/case';
@@ -48,9 +48,9 @@ const PrincipalListField = (props) => {
         onChange(value.filter(x => x !== identifier));
         markTouched();
     };
-    const handleAdd = data => {
-        setIdentifierMap(prev => ({...prev, [data.identifier]: data}));
-        onChange([...value, data.identifier]);
+    const handleAddItems = data => {
+        setIdentifierMap(prev => ({...prev, ..._.keyBy(data, 'identifier')}));
+        onChange([...value, ...data.map(x => x.identifier)]);
         markTouched();
     };
 
@@ -114,30 +114,9 @@ const PrincipalListField = (props) => {
             </List>
             <Button.Group>
                 <Button icon="add" as="div" disabled />
-                <Modal trigger={<Button type="button" disabled={disabled}><Translate>User</Translate></Button>}
-                       size="tiny"
-                       dimmer="inverted"
-                       closeIcon>
-                    <Modal.Header>
-                        <Translate>Add users</Translate>
-                    </Modal.Header>
-                    <Modal.Content>
-                        <UserSearch existing={value} onAdd={handleAdd} favorites={favoriteUsers} />
-                    </Modal.Content>
-                </Modal>
-                {withGroups && (
-                    <Modal trigger={<Button type="button" disabled={disabled}><Translate>Group</Translate></Button>}
-                           size="tiny"
-                           dimmer="inverted"
-                           closeIcon>
-                        <Modal.Header>
-                            <Translate>Add groups</Translate>
-                        </Modal.Header>
-                        <Modal.Content>
-                            <GroupSearch existing={value} onAdd={handleAdd} />
-                        </Modal.Content>
-                    </Modal>
-                )}
+                <UserSearch existing={value} onAddItems={handleAddItems} favorites={favoriteUsers}
+                            disabled={disabled} />
+                {withGroups && <GroupSearch existing={value} onAddItems={handleAddItems} disabled={disabled} />}
             </Button.Group>
         </>
     );

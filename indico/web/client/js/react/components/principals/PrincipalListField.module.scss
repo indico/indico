@@ -72,3 +72,11 @@
     text-align: center;
     color: $light-black;
 }
+
+.favorite:global(.disabled) {
+    opacity: 1 !important;
+
+    .content {
+        opacity: 0.45;
+    }
+}

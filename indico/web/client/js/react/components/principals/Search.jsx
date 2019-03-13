@@ -21,7 +21,7 @@ import groupSearchURL from 'indico-url:groups.group_search';
 import _ from 'lodash';
 import React, {useState} from 'react';
 import PropTypes from 'prop-types';
-import {Button, Divider, Dropdown, Form, Icon, List, Message} from 'semantic-ui-react';
+import {Button, Divider, Dropdown, Form, Icon, Label, List, Message, Modal, Popup} from 'semantic-ui-react';
 import {Form as FinalForm, Field} from 'react-final-form';
 import {
     ReduxCheckboxField, ReduxFormField, formatters, getChangedValues, handleSubmitError, validators as v
@@ -36,6 +36,8 @@ import './PrincipalListField.module.scss';
 const searchFactory = config => {
     const {
         componentName,
+        buttonTitle,
+        modalTitle,
         searchFields,
         resultIcon,
         getResultsText,
@@ -46,7 +48,36 @@ const searchFactory = config => {
     } = config;
 
     // eslint-disable-next-line react/prop-types
-    const SearchForm = ({onSearch, favorites, onAdd}) => (
+    const FavoriteItem = ({name, detail, added, onAdd}) => (
+        <Dropdown.Item disabled={added} styleName="favorite"
+                       style={{pointerEvents: 'all'}}
+                       onClick={e => {
+                           e.stopPropagation();
+                           onAdd();
+                       }}>
+            <div styleName="item">
+                <div styleName="icon">
+                    <Icon.Group size="large">
+                        <Icon name={resultIcon} />
+                        {added && <Icon name="check" color="green" corner />}
+                    </Icon.Group>
+                </div>
+                <div styleName="content">
+                    <List.Content>
+                        {name}
+                    </List.Content>
+                    {detail && (
+                        <List.Description>
+                            <small>{detail}</small>
+                        </List.Description>
+                    )}
+                </div>
+            </div>
+        </Dropdown.Item>
+    );
+
+    // eslint-disable-next-line react/prop-types
+    const SearchForm = ({onSearch, favorites, isAdded, onAdd}) => (
         <FinalForm onSubmit={onSearch} subscription={{submitting: true, hasValidationErrors: true, pristine: true}}>
             {(fprops) => (
                 <Form onSubmit={fprops.handleSubmit}>
@@ -56,18 +87,16 @@ const searchFactory = config => {
                             loading={fprops.submitting}
                             primary
                             content={Translate.string('Search')} />
-                    {!!Object.keys(favorites).length && (
-                        <Dropdown text={Translate.string('Add favorite')}
-                                  icon="star" floating labeled button className="icon"
-                                  selectOnBlur={false}
-                                  options={_.sortBy(Object.values(favorites), 'name').map(x => ({
-                                      key: x.identifier,
-                                      value: x.userId,
-                                      text: x.name,
-                                  }))}
-                                  onChange={(e, {value}) => {
-                                      onAdd(favorites[value]);
-                                  }} />
+                    {favorites && (
+                        <Dropdown text={Translate.string('Select favorite')}
+                                  icon="star" floating labeled button className="icon">
+                            <Dropdown.Menu>
+                                {_.sortBy(Object.values(favorites), 'name').map(x => (
+                                    <FavoriteItem key={x.identifier} name={x.name} detail={x.detail}
+                                                  added={isAdded(x)} onAdd={() => onAdd(x)} />
+                                ))}
+                            </Dropdown.Menu>
+                        </Dropdown>
                     )}
                 </Form>
             )}
@@ -104,7 +133,7 @@ const searchFactory = config => {
     );
 
     // eslint-disable-next-line react/prop-types
-    const SearchResults = ({results, total, onAdd, existing, favorites}) => (
+    const SearchResults = ({results, total, onAdd, isAdded, favorites}) => (
         total !== 0 ? (
             <>
                 <Divider horizontal>
@@ -113,7 +142,7 @@ const searchFactory = config => {
                 <List divided relaxed>
                     {results.map(r => (
                         <ResultItem key={r.identifier} name={r.name} detail={r.detail}
-                                    added={existing.includes(r.identifier)}
+                                    added={isAdded(r)}
                                     favorite={(favorites && favoriteKey) ? (r[favoriteKey] in favorites) : false}
                                     onAdd={() => onAdd(r)} />
                     ))}
@@ -131,32 +160,102 @@ const searchFactory = config => {
         )
     );
 
-    const Search = (props) => {
-        const {existing, onAdd, favorites} = props;
+    // eslint-disable-next-line react/prop-types
+    const SearchContent = ({onAdd, isAdded, favorites}) => {
         const [result, setResult] = useState(null);
+
         const handleSearch = (data, form) => runSearch(data, form, setResult);
-        const availableFavorites = _.fromPairs(
-            Object.entries(favorites || {}).filter(([, x]) => !existing.includes(x.identifier))
-        );
         return (
             <>
-                <SearchForm onSearch={handleSearch} favorites={availableFavorites} onAdd={onAdd} />
+                <SearchForm onSearch={handleSearch} onAdd={onAdd} isAdded={isAdded} favorites={favorites} />
                 {result !== null && (
                     <SearchResults results={result.results} total={result.total} favorites={favorites}
-                                   onAdd={onAdd} existing={existing} />
+                                   onAdd={onAdd} isAdded={isAdded} />
                 )}
             </>
         );
     };
 
+    const Search = ({disabled, existing, onAddItems, favorites}) => {
+        const [open, setOpen] = useState(false);
+        const [staged, setStaged] = useState([]);
+
+        const isAdded = ({identifier}) => {
+            return existing.includes(identifier) || staged.some(x => x.identifier === identifier);
+        };
+
+        const handleAdd = item => {
+            if (!isAdded(item)) {
+                setStaged(prev => [...prev, item]);
+            }
+        };
+
+        const handleAddButtonClick = () => {
+            onAddItems(staged);
+            setStaged([]);
+            setOpen(false);
+        };
+
+        const handleCancelButtonClick = () => {
+            setStaged([]);
+            setOpen(false);
+        };
+
+        const trigger = (
+            <Button type="button"
+                    content={buttonTitle}
+                    disabled={disabled}
+                    onClick={() => setOpen(true)} />
+        );
+        return (
+            <Modal trigger={trigger}
+                   size="tiny"
+                   dimmer="inverted"
+                   centered={false}
+                   open={open}
+                   onClose={() => setOpen(false)}
+                   closeIcon>
+                <Modal.Header>
+                    {modalTitle}
+                    {!!staged.length && (
+                        <>
+                            {' '}
+                            <Popup trigger={<Label circular>{staged.length}</Label>}
+                                   position="bottom left">
+                                <List>
+                                    {_.sortBy(staged, 'name').map(x => (
+                                        <List.Item key={x.identifier}>{x.name}</List.Item>
+                                    ))}
+                                </List>
+                            </Popup>
+                        </>
+                    )}
+                </Modal.Header>
+                <Modal.Content>
+                    <SearchContent favorites={favorites} onAdd={handleAdd} isAdded={isAdded} />
+                </Modal.Content>
+                <Modal.Actions>
+                    <Button onClick={handleAddButtonClick} disabled={!staged.length} primary>
+                        <Translate>Confirm</Translate>
+                    </Button>
+                    <Button onClick={handleCancelButtonClick}>
+                        <Translate>Cancel</Translate>
+                    </Button>
+                </Modal.Actions>
+            </Modal>
+        );
+    };
+
     Search.propTypes = {
-        onAdd: PropTypes.func.isRequired,
+        onAddItems: PropTypes.func.isRequired,
         existing: PropTypes.arrayOf(PropTypes.string).isRequired,
+        disabled: PropTypes.bool,
         favorites: PropTypes.object,
     };
 
     Search.defaultProps = {
         favorites: null,
+        disabled: false,
     };
 
     const component = React.memo(Search);
@@ -167,6 +266,8 @@ const searchFactory = config => {
 
 export const UserSearch = searchFactory({
     componentName: 'UserSearch',
+    buttonTitle: Translate.string('User'),
+    modalTitle: Translate.string('Add users'),
     resultIcon: 'user',
     favoriteKey: 'userId',
     searchFields: (
@@ -219,6 +320,8 @@ export const UserSearch = searchFactory({
 
 export const GroupSearch = searchFactory({
     componentName: 'GroupSearch',
+    buttonTitle: Translate.string('Group'),
+    modalTitle: Translate.string('Add groups'),
     resultIcon: 'users',
     searchFields: (
         <>
