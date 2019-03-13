@@ -23,6 +23,7 @@ from marshmallow import Schema, ValidationError, fields, post_dump, validate, va
 from marshmallow.fields import Boolean, DateTime, Function, Method, Nested, Number, String
 from marshmallow_enum import EnumField
 
+from indico.core import signals
 from indico.core.db.sqlalchemy.links import LinkType
 from indico.core.marshmallow import mm
 from indico.modules.events.sessions.models.blocks import SessionBlock
@@ -71,6 +72,11 @@ class RoomSchema(mm.ModelSchema):
                   'comments', 'division', 'is_reservable', 'reservations_need_confirmation', 'sprite_position',
                   'surface_area', 'latitude', 'longitude', 'telephone', 'key_location', 'max_advance_days',
                   'owner_name', 'available_equipment', 'has_photo', 'verbose_name')
+
+    @post_dump(pass_many=True)
+    def inject_fields(self, data, many):
+        rooms = data if many else [data]
+        signals.rb.rooms_fetched.send(rooms)
 
 
 class RoomUpdateSchema(RoomSchema):

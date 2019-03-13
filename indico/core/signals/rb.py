@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2018 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2019 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -14,10 +14,14 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from indico.core.signals import (acl, agreements, attachments, category, event, event_management, menu, plugin, rb, rh,
-                                 users)
-from indico.core.signals.core import *
+from __future__ import unicode_literals
+
+from blinker import Namespace
 
 
-__all__ = ('acl', 'agreements', 'attachments', 'category', 'event', 'event_management', 'menu', 'plugin', 'rh', 'users',
-           'rb')
+_signals = Namespace()
+
+
+rooms_fetched = _signals.signal('rooms_fetched', """
+Called when all rooms are fetched.  The *sender* is the list of serialized rooms.
+""")
