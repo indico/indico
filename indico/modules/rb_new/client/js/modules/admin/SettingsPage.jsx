@@ -33,6 +33,8 @@ import * as adminActions from './actions';
 import * as adminSelectors from './selectors';
 import CategoryList from './CategoryList';
 
+import './SettingsPage.module.scss';
+
 
 const SettingsPage = props => {
     const {settingsLoaded, settings, actions: {fetchSettings, updateSettings}} = props;
@@ -86,7 +88,7 @@ const SettingsPage = props => {
                                     Specify who has access to the room booking system.
                                 </Translate>
                             </Message.Header>
-                            <Form.Group widths="equal" style={{marginTop: '5px'}}>
+                            <Form.Group widths="equal">
                                 <Field name="authorized_principals" component={ReduxFormField}
                                        as={PrincipalListField} withGroups
                                        favoriteUsersController={favoriteUsersController}
