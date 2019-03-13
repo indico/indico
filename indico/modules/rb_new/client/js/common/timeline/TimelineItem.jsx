@@ -126,7 +126,7 @@ class TimelineItem extends React.Component {
 
         if (segStartMins < 0) {
             segStartMins = 0;
-        } else if (segStartMins > ((endHour - startHour) * 60)) {
+        } else if (segStartMins >= ((endHour - startHour) * 60)) {
             segStartMins = ((endHour - startHour) * 60) - 5;
         }
 
