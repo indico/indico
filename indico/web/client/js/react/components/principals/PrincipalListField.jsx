@@ -165,11 +165,11 @@ const PendingPrincipalListItem = ({isGroup}) => (
                 <Icon name={isGroup ? 'users' : 'user'} size="large" />
             </div>
             <div styleName="content">
-                <List.Header>
+                <List.Content>
                     {isGroup
                         ? <Translate>Unknown group</Translate>
                         : <Translate>Unknown user</Translate>}
-                </List.Header>
+                </List.Content>
             </div>
             <div styleName="loader">
                 <Loader active inline size="small" />
@@ -186,9 +186,9 @@ const PrincipalListItem = ({isGroup, name, detail, onDelete, onAddFavorite, onDe
                 <Icon name={isGroup ? 'users' : 'user'} size="large" />
             </div>
             <div styleName="content">
-                <List.Header>
+                <List.Content>
                     {name}
-                </List.Header>
+                </List.Content>
                 {detail && (
                     <List.Description>
                         <small>{detail}</small>

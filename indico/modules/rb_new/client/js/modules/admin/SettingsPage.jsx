@@ -86,11 +86,11 @@ const SettingsPage = props => {
                                     Specify who has access to the room booking system.
                                 </Translate>
                             </Message.Header>
-                            <Form.Group widths="equal">
+                            <Form.Group widths="equal" style={{marginTop: '5px'}}>
                                 <Field name="authorized_principals" component={ReduxFormField}
                                        as={PrincipalListField} withGroups
                                        favoriteUsersController={favoriteUsersController}
-                                       isEqual={_.isEqual}
+                                       isEqual={(a, b) => _.isEqual(a.sort(), b.sort())}
                                        label={Translate.string('Authorized users')}>
                                     <p className="field-description">
                                         <Translate>
@@ -102,7 +102,7 @@ const SettingsPage = props => {
                                 <Field name="admin_principals" component={ReduxFormField}
                                        as={PrincipalListField} withGroups
                                        favoriteUsersController={favoriteUsersController}
-                                       isEqual={_.isEqual}
+                                       isEqual={(a, b) => _.isEqual(a.sort(), b.sort())}
                                        label={Translate.string('Administrators')}>
                                     <p className="field-description">
                                         <Translate>

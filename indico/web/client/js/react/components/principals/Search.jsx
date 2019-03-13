@@ -85,9 +85,9 @@ const searchFactory = config => {
                     </Icon.Group>
                 </div>
                 <div styleName="content">
-                    <List.Header>
+                    <List.Content>
                         {name}
-                    </List.Header>
+                    </List.Content>
                     {detail && (
                         <List.Description>
                             <small>{detail}</small>
