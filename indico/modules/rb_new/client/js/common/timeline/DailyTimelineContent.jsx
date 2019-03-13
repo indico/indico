@@ -260,7 +260,7 @@ export default class DailyTimelineContent extends React.Component {
         );
 
         return (
-            <>
+            <div styleName="daily-timeline">
                 {(isLoading || !!rows.length) && this.renderHeader()}
                 <WrapperComponent {...wrapperProps}>
                     {(fixedHeight ? (
@@ -269,7 +269,7 @@ export default class DailyTimelineContent extends React.Component {
                         windowScrollerWrapper
                     ))}
                 </WrapperComponent>
-            </>
+            </div>
         );
     }
 }
