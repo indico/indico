@@ -30,7 +30,7 @@ from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.rb.models.blocked_rooms import BlockedRoom, BlockedRoomState
 from indico.modules.rb.models.blocking_principals import BlockingPrincipal
 from indico.modules.rb.models.blockings import Blocking
-from indico.modules.rb.models.equipment import EquipmentType, RoomEquipmentAssociation
+from indico.modules.rb.models.equipment import EquipmentType
 from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.map_areas import MapArea
 from indico.modules.rb.models.reservation_edit_logs import ReservationEditLog
