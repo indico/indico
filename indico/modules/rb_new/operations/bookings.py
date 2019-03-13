@@ -303,9 +303,12 @@ def create_booking_for_event(room_id, event):
         booking_reason = "Event '{}'".format(event.title)
         data = dict(start_dt=start_dt, end_dt=end_dt, booked_for_user=event.creator, booking_reason=booking_reason,
                     repeat_frequency=RepeatFrequency.NEVER, event_id=event.id)
-        return Reservation.create_from_data(room, data, session.user, ignore_admin=True)
+        booking = Reservation.create_from_data(room, data, session.user, ignore_admin=True)
+        booking.linked_object = event
+        return booking
     except NoReportError:
         flash(_("Booking could not be created. Probably somebody else booked the room in the meantime."), 'error')
+        return None
 
 
 def get_active_bookings(limit, start_dt, last_reservation_id=None, **filters):
