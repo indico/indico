@@ -95,7 +95,7 @@ const PrincipalListField = (props) => {
                                        name={data.name}
                                        detail={data.detail}
                                        isGroup={data.group}
-                                       favorite={!data.group && favoriteUsers.includes(data.userId)}
+                                       favorite={!data.group && data.userId in favoriteUsers}
                                        onDelete={() => !disabled && handleDelete(data.identifier)}
                                        onAddFavorite={() => !disabled && handleAddFavorite(data.userId)}
                                        onDelFavorite={() => !disabled && handleDelFavorite(data.userId)}

@@ -18,9 +18,10 @@
 import userSearchURL from 'indico-url:users.user_search';
 import groupSearchURL from 'indico-url:groups.group_search';
 
+import _ from 'lodash';
 import React, {useState} from 'react';
 import PropTypes from 'prop-types';
-import {Divider, Form, Icon, List, Message} from 'semantic-ui-react';
+import {Button, Divider, Dropdown, Form, Icon, List, Message} from 'semantic-ui-react';
 import {Form as FinalForm, Field} from 'react-final-form';
 import {
     ReduxCheckboxField, ReduxFormField, formatters, getChangedValues, handleSubmitError, validators as v
@@ -45,16 +46,29 @@ const searchFactory = config => {
     } = config;
 
     // eslint-disable-next-line react/prop-types
-    const SearchForm = ({onSearch}) => (
+    const SearchForm = ({onSearch, favorites, onAdd}) => (
         <FinalForm onSubmit={onSearch} subscription={{submitting: true, hasValidationErrors: true, pristine: true}}>
             {(fprops) => (
                 <Form onSubmit={fprops.handleSubmit}>
                     {searchFields}
-                    <Form.Button type="submit"
-                                 disabled={fprops.hasValidationErrors || fprops.pristine || fprops.submitting}
-                                 loading={fprops.submitting}
-                                 primary
-                                 content={Translate.string('Search')} />
+                    <Button type="submit"
+                            disabled={fprops.hasValidationErrors || fprops.pristine || fprops.submitting}
+                            loading={fprops.submitting}
+                            primary
+                            content={Translate.string('Search')} />
+                    {!!Object.keys(favorites).length && (
+                        <Dropdown text={Translate.string('Add favorite')}
+                                  icon="star" floating labeled button className="icon"
+                                  selectOnBlur={false}
+                                  options={_.sortBy(Object.values(favorites), 'name').map(x => ({
+                                      key: x.identifier,
+                                      value: x.userId,
+                                      text: x.name,
+                                  }))}
+                                  onChange={(e, {value}) => {
+                                      onAdd(favorites[value]);
+                                  }} />
+                    )}
                 </Form>
             )}
         </FinalForm>
@@ -100,7 +114,7 @@ const searchFactory = config => {
                     {results.map(r => (
                         <ResultItem key={r.identifier} name={r.name} detail={r.detail}
                                     added={existing.includes(r.identifier)}
-                                    favorite={(favorites && favoriteKey) ? favorites.includes(r[favoriteKey]) : false}
+                                    favorite={(favorites && favoriteKey) ? (r[favoriteKey] in favorites) : false}
                                     onAdd={() => onAdd(r)} />
                     ))}
                 </List>
@@ -121,9 +135,12 @@ const searchFactory = config => {
         const {existing, onAdd, favorites} = props;
         const [result, setResult] = useState(null);
         const handleSearch = (data, form) => runSearch(data, form, setResult);
+        const availableFavorites = _.fromPairs(
+            Object.entries(favorites || {}).filter(([, x]) => !existing.includes(x.identifier))
+        );
         return (
             <>
-                <SearchForm onSearch={handleSearch} />
+                <SearchForm onSearch={handleSearch} favorites={availableFavorites} onAdd={onAdd} />
                 {result !== null && (
                     <SearchResults results={result.results} total={result.total} favorites={favorites}
                                    onAdd={onAdd} existing={existing} />
@@ -135,7 +152,7 @@ const searchFactory = config => {
     Search.propTypes = {
         onAdd: PropTypes.func.isRequired,
         existing: PropTypes.arrayOf(PropTypes.string).isRequired,
-        favorites: PropTypes.arrayOf(PropTypes.number),
+        favorites: PropTypes.object,
     };
 
     Search.defaultProps = {

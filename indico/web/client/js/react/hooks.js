@@ -16,9 +16,12 @@
  */
 
 import favoriteUsersURL from 'indico-url:users.favorites_api';
+import principalsURL from 'indico-url:core.principals';
 
+import _ from 'lodash';
 import {useEffect, useState} from 'react';
 import {indicoAxios, handleAxiosError} from '../utils/axios';
+import {camelizeKeys} from '../utils/case';
 
 
 /**
@@ -41,7 +44,7 @@ export const useFavoriteUsers = () => {
     // XXX: this state should ideally be global so if this hook is used more than
     // once on the same page we keep the favorites in sync and don't send multiple
     // requests to load the initial list
-    const [favorites, setFavorites] = useState([]);
+    const [favorites, setFavorites] = useState({});
 
     const apiCall = async (method, id = null, source = null) => {
         let response;
@@ -58,14 +61,30 @@ export const useFavoriteUsers = () => {
         return response.data;
     };
 
+    const fetchDetails = async (ids, source = null) => {
+        const values = ids.map(id => `User:${id}`);
+        let response;
+        try {
+            response = await indicoAxios.post(principalsURL(), {values}, {cancelToken: source ? source.token : null});
+        } catch (error) {
+            handleAxiosError(error);
+            return;
+        }
+        return _.fromPairs(Object.values(camelizeKeys(response.data)).map(x => [x.userId, x]));
+    };
+
     const del = async (id) => {
         if (await apiCall('DELETE', id) !== null) {
-            setFavorites(values => values.filter(x => x !== id));
+            setFavorites(values => _.omit(values, id));
         }
     };
+
     const add = async (id) => {
         if (await apiCall('PUT', id) !== null) {
-            setFavorites(values => [...values, id]);
+            const data = await fetchDetails([id]);
+            if (data !== null) {
+                setFavorites(values => ({...values, ...data}));
+            }
         }
     };
 
@@ -73,7 +92,11 @@ export const useFavoriteUsers = () => {
         const source = indicoAxios.CancelToken.source();
 
         (async () => {
-            const data = await apiCall('GET', null, source);
+            const ids = await apiCall('GET', null, source);
+            if (ids === null || !ids.length) {
+                return;
+            }
+            const data = await fetchDetails(ids, source);
             setFavorites(data);
         })();
 
