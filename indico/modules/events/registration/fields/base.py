@@ -22,6 +22,7 @@ from wtforms.validators import DataRequired, Optional
 
 from indico.modules.events.registration.models.registrations import RegistrationData
 
+
 class RegistrationFormFieldBase(object):
     """Base class for a registration form field definition"""
 
