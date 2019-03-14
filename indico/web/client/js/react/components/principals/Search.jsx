@@ -275,6 +275,7 @@ export const UserSearch = searchFactory({
                format={formatters.trim} formatOnBlur
                autoFocus hideValidationError
                required validate={v.minLength(3)}
+               autoComplete="off"
                label={Translate.string('Name or Email')} />
     ),
     runSearch: async (data, form, setResult) => {
@@ -329,6 +330,7 @@ export const GroupSearch = searchFactory({
                    format={formatters.trim} formatOnBlur
                    autoFocus hideValidationError
                    required validate={v.required}
+                   autoComplete="off"
                    label={Translate.string('Group name')} />
             <Field name="exact" component={ReduxCheckboxField}
                    componentLabel={Translate.string('Exact matches only')} />
