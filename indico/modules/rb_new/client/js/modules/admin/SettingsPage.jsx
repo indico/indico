@@ -25,7 +25,7 @@ import {Form, Header, Message, Placeholder} from 'semantic-ui-react';
 import {PluralTranslate, Translate} from 'indico/react/i18n';
 import {PrincipalListField} from 'indico/react/components';
 import {
-    formatters, getChangedValues, FieldCondition, ReduxFormField, ReduxCheckboxField,
+    formatters, getChangedValues, FieldCondition, ReduxFormField, ReduxCheckboxField, UnloadPrompt,
     validators as v
 } from 'indico/react/forms';
 import {useFavoriteUsers} from 'indico/react/hooks';
@@ -76,12 +76,14 @@ const SettingsPage = props => {
                            submitting: true,
                            hasValidationErrors: true,
                            pristine: true,
+                           dirty: true,
                            submitSucceeded: true,
                            dirtySinceLastSubmit: true,
                        }}>
                 {fprops => (
                     <Form onSubmit={fprops.handleSubmit}
                           success={fprops.submitSucceeded && !fprops.dirtySinceLastSubmit}>
+                        <UnloadPrompt active={fprops.dirty} />
                         <Message>
                             <Message.Header>
                                 <Translate>

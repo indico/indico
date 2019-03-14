@@ -16,7 +16,7 @@
     "chartist": "^0.11.0",
     "ckeditor": "github:indico/indico-ckeditor#build-4.7.3",
     "clipboard": "^2.0.4",
-    "connected-react-router": "^6.3.1",
+    "connected-react-router": "^6.3.2",
     "dropzone": "~5.5.1",
     "final-form": "^4.12.0",
     "final-form-arrays": "^1.1.2",

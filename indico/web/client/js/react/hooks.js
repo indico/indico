@@ -20,7 +20,7 @@ import principalsURL from 'indico-url:core.principals';
 
 import _ from 'lodash';
 import {useEffect, useState} from 'react';
-import {indicoAxios, handleAxiosError} from '../utils/axios';
+import {handleAxiosError, indicoAxios} from '../utils/axios';
 import {camelizeKeys} from '../utils/case';
 
 

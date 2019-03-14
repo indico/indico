@@ -20,3 +20,4 @@ export {ReduxFormField, ReduxRadioField, ReduxCheckboxField, ReduxDropdownField}
 export {default as validators} from './validators';
 export {default as formatters} from './formatters';
 export {getChangedValues, FieldCondition, handleSubmitError} from './final-form';
+export {default as UnloadPrompt} from './unload';
