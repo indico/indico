@@ -35,4 +35,4 @@ class RHLocations(RHRoomBookingBase):
                      .options(rooms_strategy)
                      .order_by(Location.name, db.func.indico.natsort(Room.full_name))
                      .all())
-        return jsonify(locations_schema.dump(locations).data)
+        return jsonify(locations_schema.dump(locations))

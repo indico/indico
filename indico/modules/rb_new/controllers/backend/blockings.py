@@ -39,7 +39,7 @@ class RHCreateRoomBlocking(RHRoomBookingBase):
     })
     def _process(self, args):
         blocking = create_blocking(created_by=session.user, **args)
-        return jsonify(blockings_schema.dump(blocking, many=False).data)
+        return jsonify(blockings_schema.dump(blocking, many=False))
 
 
 class RHUpdateRoomBlocking(RHRoomBookingBase):
@@ -58,7 +58,7 @@ class RHUpdateRoomBlocking(RHRoomBookingBase):
     })
     def _process(self, args):
         update_blocking(self.blocking, **args)
-        return jsonify(blockings_schema.dump(self.blocking, many=False).data)
+        return jsonify(blockings_schema.dump(self.blocking, many=False))
 
 
 class RHRoomBlockings(RHRoomBookingBase):
@@ -71,7 +71,7 @@ class RHRoomBlockings(RHRoomBookingBase):
         filters = {'timeframe': timeframe, 'created_by': session.user if mine else None,
                    'in_rooms_owned_by': session.user if my_rooms else None}
         blockings = get_room_blockings(**filters)
-        return jsonify(blockings_schema.dump(blockings).data)
+        return jsonify(blockings_schema.dump(blockings))
 
 
 class RHRoomBlockingBase(RHRoomBookingBase):
@@ -81,7 +81,7 @@ class RHRoomBlockingBase(RHRoomBookingBase):
 
 class RHRoomBlocking(RHRoomBlockingBase):
     def _process(self):
-        return jsonify(blockings_schema.dump(self.blocking, many=False).data)
+        return jsonify(blockings_schema.dump(self.blocking, many=False))
 
 
 class RHBlockedRoomAction(RHRoomBlockingBase):
@@ -103,7 +103,7 @@ class RHBlockedRoomAction(RHRoomBlockingBase):
             self.blocked_room.approve()
         elif self.action == 'reject':
             self.reject()
-        return jsonify(blocking=blockings_schema.dump(self.blocking, many=False).data)
+        return jsonify(blocking=blockings_schema.dump(self.blocking, many=False))
 
     @use_kwargs({
         'reason': fields.Str(required=True)

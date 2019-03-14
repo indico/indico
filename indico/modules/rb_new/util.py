@@ -74,19 +74,19 @@ def group_by_occurrence_date(occurrences, sort_by=None):
 
 
 def serialize_occurrences(data):
-    return {dt.isoformat(): reservation_occurrences_schema.dump(data).data for dt, data in data.iteritems()}
+    return {dt.isoformat(): reservation_occurrences_schema.dump(data) for dt, data in data.iteritems()}
 
 
 def serialize_blockings(data):
-    return {dt.isoformat(): simple_blockings_schema.dump(data).data for dt, data in data.iteritems()}
+    return {dt.isoformat(): simple_blockings_schema.dump(data) for dt, data in data.iteritems()}
 
 
 def serialize_nonbookable_periods(data):
-    return {dt.isoformat(): nonbookable_periods_schema.dump(data).data for dt, data in data.iteritems()}
+    return {dt.isoformat(): nonbookable_periods_schema.dump(data) for dt, data in data.iteritems()}
 
 
 def serialize_unbookable_hours(data):
-    return [bookable_hours_schema.dump(d).data for d in data]
+    return [bookable_hours_schema.dump(d) for d in data]
 
 
 def get_linked_object(type_, id_):

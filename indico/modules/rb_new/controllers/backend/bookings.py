@@ -67,7 +67,7 @@ def _serialize_availability(availability):
 
 
 def _serialize_booking_details(booking):
-    attributes = reservation_details_schema.dump(booking).data
+    attributes = reservation_details_schema.dump(booking)
     date_range, occurrences = get_booking_occurrences(booking)
     date_range = [dt.isoformat() for dt in date_range]
     booking_details = dict(attributes)
@@ -75,7 +75,7 @@ def _serialize_booking_details(booking):
     booking_details['occurrences'] = occurrences_by_type
     booking_details['date_range'] = date_range
     for dt, [occ] in occurrences.iteritems():
-        serialized_occ = reservation_occurrences_schema_with_permissions.dump([occ]).data
+        serialized_occ = reservation_occurrences_schema_with_permissions.dump([occ])
         if occ.is_cancelled:
             occurrences_by_type['cancellations'][dt.isoformat()] = serialized_occ
         elif occ.is_rejected:
@@ -219,7 +219,7 @@ class RHCreateBooking(RHRoomBookingBase):
             data = {'pre_bookings': serialized_occurrences}
         else:
             data = {'bookings': serialized_occurrences}
-        return jsonify(room_id=self.room.id, booking=reservation_details_schema.dump(resv).data, calendar_data=data)
+        return jsonify(room_id=self.room.id, booking=reservation_details_schema.dump(resv), calendar_data=data)
 
 
 class RHRoomSuggestions(RHRoomBookingBase):
@@ -265,7 +265,7 @@ class RHBookingStateActions(RHBookingBase):
             self.reject()
         elif self.action == 'cancel':
             self.booking.cancel(session.user)
-        return jsonify(booking=reservation_details_schema.dump(self.booking).data)
+        return jsonify(booking=reservation_details_schema.dump(self.booking))
 
 
 class RHDeleteBooking(RHBookingBase):
@@ -292,7 +292,7 @@ class RHLinkedObjectData(RHRoomBookingBase):
     def _process(self):
         if not self.linked_object or not self.linked_object.can_access(session.user):
             return jsonify(can_access=False)
-        return jsonify(can_access=True, **reservation_linked_object_data_schema.dump(self.linked_object).data)
+        return jsonify(can_access=True, **reservation_linked_object_data_schema.dump(self.linked_object))
 
 
 class RHUpdateBooking(RHBookingBase):
@@ -342,7 +342,7 @@ class RHMyUpcomingBookings(RHRoomBookingBase):
              .join(Reservation)
              .order_by(ReservationOccurrence.start_dt.asc())
              .limit(5))
-        return jsonify(reservation_occurrences_schema.dump(q).data)
+        return jsonify(reservation_occurrences_schema.dump(q))
 
 
 class RHMatchingEvents(RHRoomBookingBase):
@@ -356,7 +356,7 @@ class RHMatchingEvents(RHRoomBookingBase):
     })
     def _process(self, start_dt, end_dt, repeat_frequency, repeat_interval):
         events = get_matching_events(start_dt, end_dt, repeat_frequency, repeat_interval)
-        return jsonify(reservation_user_event_schema.dump(events).data)
+        return jsonify(reservation_user_event_schema.dump(events))
 
 
 class RHBookingOccurrenceStateActions(RHBookingBase):
@@ -387,4 +387,4 @@ class RHBookingOccurrenceStateActions(RHBookingBase):
             self.reject()
         elif self.action == 'cancel':
             self.occurrence.cancel(session.user)
-        return jsonify(occurrence=reservation_occurrences_schema.dump(self.occurrence, many=False).data)
+        return jsonify(occurrence=reservation_occurrences_schema.dump(self.occurrence, many=False))

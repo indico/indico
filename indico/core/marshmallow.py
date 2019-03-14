@@ -71,17 +71,13 @@ class IndicoModelConverter(ModelConverter):
 
 
 class _IndicoSchemaOpts(SchemaOpts):
-    def __init__(self, meta):
-        super(_IndicoSchemaOpts, self).__init__(meta)
+    def __init__(self, meta, **kwargs):
+        super(_IndicoSchemaOpts, self).__init__(meta, **kwargs)
         self.model_converter = getattr(meta, 'model_converter', IndicoModelConverter)
 
 
 class IndicoModelSchema(mm.ModelSchema):
     OPTIONS_CLASS = _IndicoSchemaOpts
-
-    def __init__(self, *args, **kwargs):
-        kwargs.setdefault('strict', True)
-        super(IndicoModelSchema, self).__init__(*args, **kwargs)
 
 
 mm.ModelSchema = IndicoModelSchema

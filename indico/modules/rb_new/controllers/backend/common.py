@@ -29,7 +29,7 @@ _cache = GenericCache('Rooms')
 search_room_args = {
     'capacity': fields.Int(),
     'equipment': fields.List(fields.Str()),
-    'features': fields.List(fields.Str(), load_from='feature'),
+    'features': fields.List(fields.Str(), data_key='feature'),
     'favorite': fields.Bool(),
     'mine': fields.Bool(),
     'text': fields.Str(),

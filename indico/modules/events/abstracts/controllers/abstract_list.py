@@ -209,8 +209,8 @@ class RHAbstractsExportJSON(RHManageAbstractsExportActionsBase):
                                subqueryload('reviews').joinedload('ratings').joinedload('question'))
 
     def _process(self):
-        abstracts = abstracts_schema.dump(sorted(self.abstracts, key=attrgetter('friendly_id'))).data
-        questions = abstract_review_questions_schema.dump(self.event.abstract_review_questions).data
+        abstracts = abstracts_schema.dump(sorted(self.abstracts, key=attrgetter('friendly_id')))
+        questions = abstract_review_questions_schema.dump(self.event.abstract_review_questions)
         response = jsonify(version=1, abstracts=abstracts, questions=questions)
         response.headers['Content-Disposition'] = 'attachment; filename="abstracts.json"'
         return response

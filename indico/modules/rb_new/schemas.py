@@ -20,7 +20,7 @@ from operator import itemgetter
 
 from flask import session
 from marshmallow import Schema, ValidationError, fields, post_dump, validate, validates_schema
-from marshmallow.fields import Boolean, DateTime, Function, Method, Nested, Number, String
+from marshmallow.fields import Boolean, DateTime, Function, Method, Nested, Number, Pluck, String
 from marshmallow_enum import EnumField
 
 from indico.core import signals
@@ -117,9 +117,6 @@ class ReservationLinkedObjectDataSchema(Schema):
     own_room_id = Number()
     own_room_name = Function(lambda obj: (obj.own_room.name if obj.own_room else obj.own_room_name) or None)
 
-    class Meta:
-        strict = True  # TODO: remove with marshmallow 3
-
     def _get_title(self, obj):
         if isinstance(obj, SessionBlock):
             return obj.full_title
@@ -132,9 +129,6 @@ class ReservationUserEventSchema(Schema):
     url = String()
     start_dt = DateTime()
     end_dt = DateTime()
-
-    class Meta:
-        strict = True  # TODO: remove with marshmallow 3
 
 
 class ReservationOccurrenceSchema(mm.ModelSchema):
@@ -247,7 +241,7 @@ class BlockingSchema(mm.ModelSchema):
     blocked_rooms = Nested(BlockedRoomSchema, many=True)
     allowed = Nested(BlockingPrincipalSchema, many=True)
     permissions = Method('_get_permissions')
-    created_by = Nested(UserSchema, attribute='created_by_user', only='full_name')
+    created_by = Pluck(UserSchema, 'full_name', attribute='created_by_user')
 
     class Meta:
         model = Blocking
@@ -316,14 +310,11 @@ class CreateBookingSchema(Schema):
     repeat_interval = fields.Int(missing=0, validate=lambda x: x >= 0)
     room_id = fields.Int(required=True)
     user_id = fields.Int()
-    booking_reason = fields.String(load_from='reason', validate=validate.Length(min=3))
+    booking_reason = fields.String(data_key='reason', validate=validate.Length(min=3))
     is_prebooking = fields.Bool(missing=False)
     link_type = EnumField(LinkType)
     link_id = fields.Int()
     link_back = fields.Bool(missing=False)
-
-    class Meta:
-        strict = True
 
     @validates_schema(skip_on_field_errors=True)
     def validate_dts(self, data):

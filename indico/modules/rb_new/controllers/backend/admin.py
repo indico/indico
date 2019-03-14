@@ -70,9 +70,6 @@ class SettingsSchema(mm.Schema):
     end_notification_monthly = fields.Int(validate=[validate.Range(min=1, max=30)])
     excluded_categories = ModelList(Category)
 
-    class Meta:
-        strict = True  # TODO: remove with marshmallow 3
-
 
 class RHSettings(RHRoomBookingAdminBase):
     def _jsonify_settings(self):
@@ -90,7 +87,7 @@ class RHSettings(RHRoomBookingAdminBase):
 class RHLocations(RHRoomBookingAdminBase):
     def _process(self):
         query = Location.query.options(joinedload('rooms'))
-        return jsonify(admin_locations_schema.dump(query.all()).data)
+        return jsonify(admin_locations_schema.dump(query.all()))
 
 
 class RHFeatures(RHRoomBookingAdminBase):
@@ -100,10 +97,10 @@ class RHFeatures(RHRoomBookingAdminBase):
 
     def _dump_features(self):
         query = RoomFeature.query.order_by(RoomFeature.title)
-        return room_feature_schema.dump(query, many=True).data
+        return room_feature_schema.dump(query, many=True)
 
     def _jsonify_one(self, equipment_type):
-        return jsonify(room_feature_schema.dump(equipment_type).data)
+        return jsonify(room_feature_schema.dump(equipment_type))
 
     def _jsonify_many(self):
         return jsonify(self._dump_features())
@@ -162,7 +159,7 @@ class RHEquipmentTypes(RHRoomBookingAdminBase):
 
     def _dump_equipment_types(self):
         query = EquipmentType.query.options(joinedload('features')).order_by(EquipmentType.name)
-        return admin_equipment_type_schema.dump(query, many=True).data
+        return admin_equipment_type_schema.dump(query, many=True)
 
     def _get_room_counts(self):
         query = (db.session.query(RoomEquipmentAssociation.c.equipment_id, db.func.count())
@@ -171,7 +168,7 @@ class RHEquipmentTypes(RHRoomBookingAdminBase):
 
     def _jsonify_one(self, equipment_type):
         counts = self._get_room_counts()
-        eq = admin_equipment_type_schema.dump(equipment_type).data
+        eq = admin_equipment_type_schema.dump(equipment_type)
         eq['num_rooms'] = counts.get(eq['id'], 0)
         return jsonify(eq)
 
@@ -232,7 +229,7 @@ class RHAttributes(RHRoomBookingAdminBase):
 
     def _dump_attributes(self):
         query = RoomAttribute.query.order_by(RoomAttribute.title)
-        return room_attribute_schema.dump(query, many=True).data
+        return room_attribute_schema.dump(query, many=True)
 
     def _get_room_counts(self):
         query = (db.session.query(RoomAttributeAssociation.attribute_id, db.func.count())
@@ -241,7 +238,7 @@ class RHAttributes(RHRoomBookingAdminBase):
 
     def _jsonify_one(self, attribute):
         counts = self._get_room_counts()
-        attr = room_attribute_schema.dump(attribute).data
+        attr = room_attribute_schema.dump(attribute)
         attr['num_rooms'] = counts.get(attr['id'], 0)
         return jsonify(attr)
 
@@ -306,7 +303,7 @@ class RHRoomAdminBase(RHRoomBookingAdminBase):
 
 class RHRoomAttributes(RHRoomAdminBase):
     def _process(self):
-        return jsonify(room_attribute_values_schema.dump(self.room.attributes).data)
+        return jsonify(room_attribute_values_schema.dump(self.room.attributes))
 
 
 class RHUpdateRoomAttributes(RHRoomAdminBase):
@@ -315,14 +312,14 @@ class RHUpdateRoomAttributes(RHRoomAdminBase):
                                               'name': fields.Str()}, many=True)})
     def _process(self, attributes):
         update_room_attributes(self.room, attributes)
-        return jsonify(room_attribute_values_schema.dump(self.room.attributes).data)
+        return jsonify(room_attribute_values_schema.dump(self.room.attributes))
 
 
 class RHRoomAvailability(RHRoomAdminBase):
     def _process(self):
         return jsonify(
-            nonbookable_periods=nonbookable_periods_schema.dump(self.room.nonbookable_periods, many=True).data,
-            bookable_hours=bookable_hours_schema.dump(self.room.bookable_hours, many=True).data
+            nonbookable_periods=nonbookable_periods_schema.dump(self.room.nonbookable_periods, many=True),
+            bookable_hours=bookable_hours_schema.dump(self.room.bookable_hours, many=True)
         )
 
 
@@ -336,8 +333,8 @@ class RHUpdateRoomAvailability(RHRoomAdminBase):
             self._check_invalid_times(args)
         update_room_availability(self.room, args)
         return jsonify(
-            nonbookable_periods=nonbookable_periods_schema.dump(self.room.nonbookable_periods, many=True).data,
-            bookable_hours=bookable_hours_schema.dump(self.room.bookable_hours, many=True).data
+            nonbookable_periods=nonbookable_periods_schema.dump(self.room.nonbookable_periods, many=True),
+            bookable_hours=bookable_hours_schema.dump(self.room.bookable_hours, many=True)
         )
 
     def _check_invalid_times(self, availability):
@@ -347,7 +344,7 @@ class RHUpdateRoomAvailability(RHRoomAdminBase):
 
 class RHRoomEquipment(RHRoomAdminBase):
     def _process(self):
-        return jsonify(room_equipment_schema.dump(self.room).data)
+        return jsonify(room_equipment_schema.dump(self.room))
 
 
 class RHUpdateRoomEquipment(RHRoomAdminBase):
@@ -356,12 +353,12 @@ class RHUpdateRoomEquipment(RHRoomAdminBase):
     })
     def _process(self, args):
         update_room_equipment(self.room, args['available_equipment'])
-        return jsonify(room_update_schema.dump(self.room, many=False).data)
+        return jsonify(room_update_schema.dump(self.room, many=False))
 
 
 class RHRoom(RHRoomAdminBase):
     def _process(self):
-        return jsonify(room_update_schema.dump(self.room).data)
+        return jsonify(room_update_schema.dump(self.room))
 
 
 class _UserField(fields.Field):
@@ -389,7 +386,7 @@ class RHUpdateRoom(RHRoomAdminBase):
         'end_notification_monthly': fields.Int(validate=lambda x: 1 <= x <= 30, allow_none=True),
         'end_notifications_enabled': fields.Bool(),
         'booking_limit_days': fields.Int(validate=lambda x: x >= 1, allow_none=True),
-        'owner': _UserField(load_from='owner_id', validate=lambda x: x is not None, allow_none=True),
+        'owner': _UserField(data_key='owner_id', validate=lambda x: x is not None, allow_none=True),
         'key_location': fields.Str(),
         'telephone': fields.Str(),
         'capacity': fields.Int(validate=lambda x: x >= 1),
@@ -401,4 +398,4 @@ class RHUpdateRoom(RHRoomAdminBase):
     def _process(self, args):
         update_room(self.room, args)
         RHRoomsPermissions._jsonify_user_permissions.clear_cached(session.user)
-        return jsonify(room_update_schema.dump(self.room, many=False).data)
+        return jsonify(room_update_schema.dump(self.room, many=False))

@@ -61,10 +61,10 @@ Jinja2==2.10
 xlsxwriter==1.1.4
 jsonschema==2.6.0
 html2text==2018.1.9
-marshmallow==2.18.0
-marshmallow-sqlalchemy==0.16.0
+marshmallow==3.0.0rc4
+marshmallow-sqlalchemy==0.16.1
 marshmallow-enum==1.4.1
-flask-marshmallow==0.9.0
+flask-marshmallow==0.10.0
 ipython<6,>=5.4.1
 prompt-toolkit<2.0.0,>=1.0.14
 packaging>=19.0,<20

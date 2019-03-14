@@ -47,7 +47,7 @@ class RHConfig(RHRoomBookingBase):
 
 class RHUserInfo(RHRoomBookingBase):
     def _process(self):
-        data = rb_user_schema.dump(session.user).data
+        data = rb_user_schema.dump(session.user)
         data['language'] = session.lang
         return jsonify(data)
 
@@ -87,7 +87,7 @@ class RHStats(RHRoomBookingBase):
 
 class RHMapAreas(RHRoomBookingBase):
     def _process(self):
-        return jsonify(map_areas_schema.dump(MapArea.query).data)
+        return jsonify(map_areas_schema.dump(MapArea.query))
 
 
 class RHEquipmentTypes(RHRoomBookingBase):
@@ -96,7 +96,7 @@ class RHEquipmentTypes(RHRoomBookingBase):
                  .filter(EquipmentType.rooms.any(Room.is_active))
                  .options(joinedload('features'))
                  .order_by(EquipmentType.name))
-        return equipment_type_schema.dump(query, many=True).data
+        return equipment_type_schema.dump(query, many=True)
 
     def _process(self):
         return jsonify(self._get_equipment_types())

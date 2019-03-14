@@ -38,7 +38,6 @@ class ContributionFieldValueSchema(mm.Schema):
     class Meta:
         model = ContributionFieldValue
         fields = ('id', 'name', 'value')
-        strict = True  # TODO: remove with marshmallow 3
 
 
 contribution_type_schema = ContributionTypeSchema()

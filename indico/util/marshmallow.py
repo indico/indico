@@ -18,7 +18,7 @@ from __future__ import absolute_import, unicode_literals
 
 from marshmallow import ValidationError
 from marshmallow.fields import DateTime, Field
-from marshmallow.utils import from_iso
+from marshmallow.utils import from_iso_datetime
 from sqlalchemy import inspect
 
 from indico.util.user import principal_from_identifier
@@ -30,7 +30,7 @@ def _naive_isoformat(dt, **unused):
 
 
 def _naive_from_iso(value):
-    dt = from_iso(value)
+    dt = from_iso_datetime(value)
     if dt.tzinfo is not None:
         raise ValidationError('expected naive datetime')
     return dt
@@ -44,11 +44,11 @@ class UnicodeDateTime(DateTime):
 
 
 class NaiveDateTime(UnicodeDateTime):
-    DATEFORMAT_SERIALIZATION_FUNCS = {
+    SERIALIZATION_FUNCS = {
         'iso': _naive_isoformat,
     }
 
-    DATEFORMAT_DESERIALIZATION_FUNCS = {
+    DESERIALIZATION_FUNCS = {
         'iso': _naive_from_iso,
     }
 

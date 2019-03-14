@@ -47,7 +47,7 @@ class RHRooms(RHRoomBookingBase):
                  .filter_by(is_active=True)
                  .options(subqueryload('available_equipment').load_only('id'))
                  .all())
-        return jsonify(rooms_schema.dump(rooms).data)
+        return jsonify(rooms_schema.dump(rooms))
 
 
 class RHRoomsPermissions(RHRoomBookingBase):
@@ -106,7 +106,7 @@ class RHRoomBase(RHRoomBookingBase):
 
 class RHRoom(RHRoomBase):
     def _process(self):
-        return jsonify(rooms_schema.dump(self.room, many=False).data)
+        return jsonify(rooms_schema.dump(self.room, many=False))
 
 
 class RHRoomPermissions(RHRoomBase):
@@ -135,7 +135,7 @@ class RHRoomAvailability(RHRoomBase):
 class RHRoomAttributes(RHRoomBase):
     def _process(self):
         attributes = self.room.attributes.filter(RoomAttributeAssociation.attribute.has(~RoomAttribute.is_hidden)).all()
-        return jsonify(room_attribute_values_schema.dump(attributes).data)
+        return jsonify(room_attribute_values_schema.dump(attributes))
 
 
 class RHRoomStats(RHRoomBase):
