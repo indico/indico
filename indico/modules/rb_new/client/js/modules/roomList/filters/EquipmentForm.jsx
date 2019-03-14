@@ -45,7 +45,7 @@ export default class EquipmentForm extends FilterFormComponent {
         this.state = {
             equipment: availableEquipment.filter(eq => selectedEquipment.includes(eq)),
             features: availableFeatures.map(f => f.name).filter(f => selectedFeatures.includes(f)),
-            showEquipment: false,
+            showEquipment: !!selectedEquipment.length,
         };
     }
 
