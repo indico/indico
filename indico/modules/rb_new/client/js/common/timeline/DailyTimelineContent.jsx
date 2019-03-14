@@ -148,7 +148,7 @@ export default class DailyTimelineContent extends React.Component {
     renderRowActions = (availability) => {
         const {booking} = this.props;
         if (!booking || !availability.bookings.length) {
-            return;
+            return <div styleName="timeline-row-actions" />;
         }
         const date = toMoment(availability.bookings[0].startDt);
         return (
@@ -159,8 +159,9 @@ export default class DailyTimelineContent extends React.Component {
     };
 
     renderDefaultHeader = (hourSpan, hourSeries) => {
-        const {hourStep, longLabel} = this.props;
+        const {hourStep, longLabel, showActions} = this.props;
         const labelWidth = longLabel ? 200 : 150;
+        const actionsWidth = showActions ? 70 : 0;
 
         return (
             <>
@@ -176,6 +177,7 @@ export default class DailyTimelineContent extends React.Component {
                         </div>
                     ))}
                 </div>
+                <div style={{width: actionsWidth}} />
             </>
         );
     };
@@ -191,9 +193,10 @@ export default class DailyTimelineContent extends React.Component {
     );
 
     renderList(hourSpan, width, height = null, extraProps = {}) {
-        const {rows, hourStep, longLabel, isLoading} = this.props;
+        const {rows, hourStep, longLabel, isLoading, showActions} = this.props;
         const {selectable} = this.state;
         const labelWidth = longLabel ? 200 : 150;
+        const actionsWidth = showActions ? 70 : 0;
         const rowHeight = 50;
 
         return (
@@ -201,7 +204,7 @@ export default class DailyTimelineContent extends React.Component {
                 <div styleName="timeline-content"
                      className={!selectable ? 'timeline-non-selectable' : ''}
                      style={{width}}>
-                    <div style={{left: labelWidth, width: `calc(100% - ${labelWidth}px - 2em)`}}
+                    <div style={{left: labelWidth, width: `calc(100% - ${labelWidth}px - ${actionsWidth}px - 2em)`}}
                          styleName="timeline-lines">
                         {this.renderDividers(hourSpan, hourStep)}
                     </div>

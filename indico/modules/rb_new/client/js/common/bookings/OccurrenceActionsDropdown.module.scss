@@ -19,9 +19,6 @@
 
 .actions-dropdown {
 
-    position: relative;
-    height: 40px;
-
     :global(.dropdown.icon) {
         display: none;
     }
@@ -29,10 +26,14 @@
     .dropdown-button {
         color: $gray;
         background: none !important;
-        padding-bottom: 0.7em;
+        padding-bottom: 1em;
 
         &:hover {
             color: $booking-color;
+        }
+
+        &:global(.button) {
+            padding: 0 !important;
         }
     }
 
@@ -48,7 +49,7 @@
 
     :global(.button) {
         background-color: $dark-red !important;
-        margin-top: 1.25em;
+        margin-top: 1.3em;
     }
 
     .form-description {
