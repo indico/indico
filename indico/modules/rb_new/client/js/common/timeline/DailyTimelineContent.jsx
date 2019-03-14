@@ -201,7 +201,7 @@ export default class DailyTimelineContent extends React.Component {
                 <div styleName="timeline-content"
                      className={!selectable ? 'timeline-non-selectable' : ''}
                      style={{width}}>
-                    <div style={{left: labelWidth, width: `calc(100% - ${labelWidth}px)`}}
+                    <div style={{left: labelWidth, width: `calc(100% - ${labelWidth}px - 2em)`}}
                          styleName="timeline-lines">
                         {this.renderDividers(hourSpan, hourStep)}
                     </div>
