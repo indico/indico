@@ -155,8 +155,16 @@ $split-row-height: $row-height/2;
 
 
 .daily-timeline {
-    margin-right: 3em;
+    margin-right: 2em;
     display: flex;
     flex-direction: column;
     flex: 1;
+
+    :global(.ReactVirtualized__Grid__innerScrollContainer) {
+        margin-right: 2em;
+    }
+
+    .timeline-header {
+        margin-right: 2em;
+    }
 }
