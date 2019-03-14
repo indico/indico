@@ -30,7 +30,8 @@ const BookingDetailsPreloader = ({bookingId, component: Component, fetchDetails,
     <Preloader key={bookingId}
                checkCached={state => bookingsSelectors.hasDetails(state, {bookingId})}
                action={() => fetchDetails(bookingId)}
-               dimmer={<Dimmer active page><Loader /></Dimmer>}>
+               dimmer={<Dimmer active page><Loader /></Dimmer>}
+               alwaysLoad>
         {() => <Component bookingId={bookingId} onClose={onClose} />}
     </Preloader>
 );
