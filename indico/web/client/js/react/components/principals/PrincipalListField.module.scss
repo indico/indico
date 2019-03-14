@@ -80,3 +80,7 @@
         opacity: 0.45;
     }
 }
+
+.search-buttons :global(.dropdown) {
+    margin-left: 1em;
+}

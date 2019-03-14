@@ -82,22 +82,23 @@ const searchFactory = config => {
             {(fprops) => (
                 <Form onSubmit={fprops.handleSubmit}>
                     {searchFields}
-                    <Button type="submit"
-                            disabled={fprops.hasValidationErrors || fprops.pristine || fprops.submitting}
-                            loading={fprops.submitting}
-                            primary
-                            content={Translate.string('Search')} />
-                    {favorites && (
-                        <Dropdown text={Translate.string('Select favorite')}
-                                  icon="star" floating labeled button className="icon">
-                            <Dropdown.Menu>
-                                {_.sortBy(Object.values(favorites), 'name').map(x => (
-                                    <FavoriteItem key={x.identifier} name={x.name} detail={x.detail}
-                                                  added={isAdded(x)} onAdd={() => onAdd(x)} />
-                                ))}
-                            </Dropdown.Menu>
-                        </Dropdown>
-                    )}
+                    <div styleName="search-buttons">
+                        <Button type="submit" icon="search"
+                                disabled={fprops.hasValidationErrors || fprops.pristine || fprops.submitting}
+                                loading={fprops.submitting}
+                                primary
+                                content={Translate.string('Search')} />
+                        {favorites && (
+                            <Dropdown floating labeled text={Translate.string('Select favorite')}>
+                                <Dropdown.Menu>
+                                    {_.sortBy(Object.values(favorites), 'name').map(x => (
+                                        <FavoriteItem key={x.identifier} name={x.name} detail={x.detail}
+                                                      added={isAdded(x)} onAdd={() => onAdd(x)} />
+                                    ))}
+                                </Dropdown.Menu>
+                            </Dropdown>
+                        )}
+                    </div>
                 </Form>
             )}
         </FinalForm>
