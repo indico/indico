@@ -233,7 +233,7 @@ def escape_html(text, escape_quotes=False):
                           " => &quot;
                           ' => &#34;
     """
-    if not isinstance(text, str):
+    if type(text) != str:
         text = str(text)
     text = text.replace('&', '&amp;')
     text = text.replace('<', '&lt;')

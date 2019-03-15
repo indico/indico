@@ -1,4 +1,3 @@
-from __future__ import print_function
 # This file is part of Indico.
 # Copyright (C) 2002 - 2018 European Organization for Nuclear Research (CERN).
 #
@@ -15,6 +14,8 @@ from __future__ import print_function
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import print_function
+
 import re
 import subprocess
 import sys
@@ -24,8 +25,6 @@ from itertools import chain, ifilter
 from xml.dom import minidom
 
 import click
-import html5lib
-from html2text import HTML2Text
 from pygments import highlight
 from pygments.formatters import Terminal256Formatter
 from pygments.lexers import HtmlLexer
@@ -33,6 +32,9 @@ from pygments.lexers import HtmlLexer
 from indico.core.db import db
 from indico.util.string import render_markdown
 from indico.web.flask.app import make_app
+
+import html5lib
+from html2text import HTML2Text
 
 
 EMPTY_OR_TRALING_WS_ONLY_REGEX = re.compile(r'()(\s*(?!.))', re.MULTILINE | re.DOTALL)

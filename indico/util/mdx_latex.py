@@ -73,11 +73,12 @@ from mimetypes import guess_extension
 from tempfile import NamedTemporaryFile
 from urlparse import urlparse
 
-import markdown
 import requests
 from lxml.html import html5parser
-from PIL import Image
 from requests.exceptions import ConnectionError, InvalidURL
+
+import markdown
+from PIL import Image
 
 
 __version__ = '2.1'

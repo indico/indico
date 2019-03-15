@@ -1,4 +1,3 @@
-from __future__ import print_function
 # This file is part of Indico.
 # Copyright (C) 2002 - 2018 European Organization for Nuclear Research (CERN).
 #
@@ -15,15 +14,18 @@ from __future__ import print_function
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import print_function
+
 from datetime import date
 
 import click
-from dateutil.relativedelta import relativedelta
 
-from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.models.locations import Location
+from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.statistics import calculate_rooms_occupancy
 from indico.web.flask.app import make_app
+
+from dateutil.relativedelta import relativedelta
 
 
 def _main(location):

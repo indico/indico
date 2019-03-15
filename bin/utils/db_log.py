@@ -14,8 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import unicode_literals
-from __future__ import print_function
+from __future__ import print_function, unicode_literals
 
 import cPickle
 import fcntl
@@ -31,11 +30,12 @@ import textwrap
 from threading import Lock
 
 import click
-import sqlparse
 from pygments import highlight
 from pygments.formatters.terminal256 import Terminal256Formatter
 from pygments.lexers.agile import PythonLexer, PythonTracebackLexer
 from pygments.lexers.sql import SqlLexer
+
+import sqlparse
 
 
 click.disable_unicode_literals_warning = True

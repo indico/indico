@@ -1,4 +1,3 @@
-from __future__ import print_function
 # This file is part of Indico.
 # Copyright (C) 2002 - 2018 European Organization for Nuclear Research (CERN).
 #
@@ -15,16 +14,19 @@ from __future__ import print_function
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import print_function
+
 import hashlib
 import hmac
 import optparse
-import requests
 import sys
 import time
 import urllib
 from contextlib import closing
 
-from flask import Flask, request, Response, abort
+import requests
+
+from flask import Flask, Response, abort, request
 from werkzeug.datastructures import MultiDict
 
 app = Flask(__name__)

@@ -14,20 +14,13 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import unicode_literals
-from __future__ import print_function
+from __future__ import print_function, unicode_literals
 
 import logging
 import os
 from operator import itemgetter
 
-from celery import Celery
-from celery.app.log import Logging
-from celery.beat import PersistentScheduler
-from contextlib2 import ExitStack
 from flask_pluginengine import current_plugin, plugin_context
-from sqlalchemy import inspect
-from terminaltables import AsciiTable
 
 from indico.core.celery.util import locked_task
 from indico.core.config import config
@@ -38,6 +31,13 @@ from indico.util.console import cformat
 from indico.util.fossilize import clearCache
 from indico.util.string import return_ascii
 from indico.web.flask.stats import request_stats_request_started
+
+from celery import Celery
+from celery.app.log import Logging
+from celery.beat import PersistentScheduler
+from contextlib2 import ExitStack
+from sqlalchemy import inspect
+from terminaltables import AsciiTable
 
 
 class IndicoCelery(Celery):

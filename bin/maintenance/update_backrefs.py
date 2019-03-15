@@ -14,19 +14,20 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import unicode_literals
-from __future__ import print_function
+from __future__ import print_function, unicode_literals
 
 import sys
 from collections import defaultdict
 from operator import itemgetter
 
 import click
-from sqlalchemy import inspect
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.models import import_all_models
 from indico.util.console import cformat
+
+from sqlalchemy import inspect
+
 
 click.disable_unicode_literals_warning = True
 

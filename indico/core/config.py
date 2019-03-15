@@ -24,17 +24,17 @@ import socket
 import warnings
 from datetime import timedelta
 
+from indico.util.caching import make_hashable
+from indico.util.fs import resolve_link
+from indico.util.packaging import package_is_editable
+from indico.util.string import crc32, snakify
+
 import pytz
 from celery.schedules import crontab
 from flask import current_app, g
 from flask.helpers import get_root_path
 from werkzeug.datastructures import ImmutableDict
 from werkzeug.urls import url_parse
-
-from indico.util.caching import make_hashable
-from indico.util.fs import resolve_link
-from indico.util.packaging import package_is_editable
-from indico.util.string import crc32, snakify
 
 
 DEFAULTS = {

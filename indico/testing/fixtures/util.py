@@ -17,8 +17,9 @@
 import inspect
 from datetime import datetime
 
-import freezegun
 import pytest
+
+import freezegun
 from sqlalchemy import DateTime, cast
 from sqlalchemy.sql.functions import _FunctionGenerator
 

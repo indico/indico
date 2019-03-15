@@ -14,15 +14,11 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import unicode_literals
-from __future__ import print_function
+from __future__ import print_function, unicode_literals
 
 from datetime import date, datetime
 from itertools import groupby
 from operator import attrgetter
-
-from celery.schedules import crontab
-from sqlalchemy.orm import contains_eager
 
 from indico.core.celery import celery
 from indico.core.config import config
@@ -34,6 +30,9 @@ from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.notifications.reservation_occurrences import notify_upcoming_occurrences
 from indico.modules.rb.notifications.reservations import notify_about_finishing_bookings
 from indico.util.console import cformat
+
+from celery.schedules import crontab
+from sqlalchemy.orm import contains_eager
 
 
 def _make_occurrence_date_filter(date_column, default_values, room_columns):

@@ -1,4 +1,3 @@
-from __future__ import print_function
 # This file is part of Indico.
 # Copyright (C) 2002 - 2018 European Organization for Nuclear Research (CERN).
 #
@@ -15,15 +14,18 @@ from __future__ import print_function
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import print_function
+
 import argparse
 import importlib
 import os
+
+from indico.core.db import db
 
 from flask import Flask
 from sqlalchemy import MetaData
 from sqlalchemy.orm import class_mapper
 
-from indico.core.db import db
 
 try:
     from sqlalchemy_schemadisplay import create_schema_graph, create_uml_graph

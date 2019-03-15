@@ -1,4 +1,3 @@
-from __future__ import print_function
 # This file is part of Indico.
 # Copyright (C) 2002 - 2018 European Organization for Nuclear Research (CERN).
 #
@@ -15,16 +14,18 @@ from __future__ import print_function
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-import os
+from __future__ import print_function
 
-from flask.json import htmlsafe_dumps
-from jinja2 import Environment, FileSystemLoader
-from sqlalchemy.orm import load_only
+import os
 
 from indico.modules.categories.models.categories import Category
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.web.flask.app import make_app
+
+from flask.json import htmlsafe_dumps
+from jinja2 import Environment, FileSystemLoader
+from sqlalchemy.orm import load_only
 
 
 def main():
