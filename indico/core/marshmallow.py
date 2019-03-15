@@ -20,11 +20,13 @@ from inspect import getmro
 
 from flask_marshmallow import Marshmallow
 from flask_marshmallow.sqla import SchemaOpts
-from marshmallow import fields
+from marshmallow import fields, post_dump
 from marshmallow_enum import EnumField
 from marshmallow_sqlalchemy import ModelConverter
+from marshmallow_sqlalchemy import ModelSchema as MSQLAModelSchema
 from sqlalchemy.orm import ColumnProperty
 
+from indico.core import signals
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 
 
@@ -70,14 +72,24 @@ class IndicoModelConverter(ModelConverter):
         return fields
 
 
-class _IndicoSchemaOpts(SchemaOpts):
+class IndicoSchema(mm.Schema):
+    @post_dump(pass_many=True, pass_original=True)
+    def _call_post_dump_signal(self, data, many, orig):
+        data_list = data if many else [data]
+        orig_list = orig if many else [orig]
+        signals.plugin.schema_post_dump.send(type(self), data=data_list, orig=orig_list, many=many)
+        return data_list if many else data_list[0]
+
+
+class _IndicoModelSchemaOpts(SchemaOpts):
     def __init__(self, meta, **kwargs):
-        super(_IndicoSchemaOpts, self).__init__(meta, **kwargs)
+        super(_IndicoModelSchemaOpts, self).__init__(meta, **kwargs)
         self.model_converter = getattr(meta, 'model_converter', IndicoModelConverter)
 
 
-class IndicoModelSchema(mm.ModelSchema):
-    OPTIONS_CLASS = _IndicoSchemaOpts
+class IndicoModelSchema(MSQLAModelSchema, IndicoSchema):
+    OPTIONS_CLASS = _IndicoModelSchemaOpts
 
 
+mm.Schema = IndicoSchema
 mm.ModelSchema = IndicoModelSchema

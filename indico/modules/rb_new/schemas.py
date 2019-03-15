@@ -110,7 +110,7 @@ class ReservationSchema(mm.ModelSchema):
         fields = ('id', 'booking_reason', 'booked_for_name', 'room_id', 'is_accepted')
 
 
-class ReservationLinkedObjectDataSchema(Schema):
+class ReservationLinkedObjectDataSchema(mm.Schema):
     id = Number()
     title = Method('_get_title')
     event_title = Function(lambda obj: obj.event.title)
@@ -124,7 +124,7 @@ class ReservationLinkedObjectDataSchema(Schema):
         return obj.title
 
 
-class ReservationUserEventSchema(Schema):
+class ReservationUserEventSchema(mm.Schema):
     id = Number()
     title = String()
     url = String()
@@ -304,7 +304,7 @@ class RBUserSchema(UserSchema):
         return has_managed_rooms(user)
 
 
-class CreateBookingSchema(Schema):
+class CreateBookingSchema(mm.Schema):
     start_dt = fields.DateTime(required=True)
     end_dt = fields.DateTime(required=True)
     repeat_frequency = EnumField(RepeatFrequency, required=True)
