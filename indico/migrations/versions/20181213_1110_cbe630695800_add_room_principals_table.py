@@ -4,6 +4,7 @@ Revision ID: cbe630695800
 Revises: 252c0015c9a0
 Create Date: 2018-12-13 11:10:12.684382
 """
+
 from __future__ import print_function
 
 import json
