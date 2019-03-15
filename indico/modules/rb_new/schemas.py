@@ -77,6 +77,7 @@ class RoomSchema(mm.ModelSchema):
     def inject_fields(self, data, many):
         rooms = data if many else [data]
         signals.rb.rooms_fetched.send(rooms)
+        return rooms if many else rooms[0]
 
 
 class RoomUpdateSchema(RoomSchema):
