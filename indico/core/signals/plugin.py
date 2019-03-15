@@ -79,3 +79,17 @@ data that may change at runtime.  The behavior of a customization path returned
 by this function is exactly like ``<CUSTOMIZATION_DIR>/templates``, but
 it has lower priority than the one from the global customization dir.
 """)
+
+schema_post_dump = _signals.signal('schema-post-dump', """
+Called when a marshmallow schema is dumped. The *sender* is the schema class
+and code using this signal should always specify it. The signal is called with
+the following arguments:
+
+- ``many`` -- bool indicating whether the data was dumped with ``many=True`` or not
+- ``data`` -- the dumped data. this is guaranteed to be a list; in case of ``many=False``
+              it is guaranteed to contain exactly one element
+- ``orig`` -- the original data before dumping. just like ``data`` it is always a list
+
+If a plugin wants to modify the data returned when dumping, it may do so by modifying
+the contents of ``data``.
+""")
