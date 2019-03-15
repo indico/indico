@@ -102,7 +102,7 @@ def test_proxy_preload(count_queries):
         assert proxy.get('foo', 'bar') == 'bar'
     assert cnt() == 0
     with count_queries() as cnt:
-        assert proxy.get('bar') is 'test'
+        assert proxy.get('bar') == 'test'
     assert cnt() == 0
 
 
