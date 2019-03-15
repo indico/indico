@@ -79,14 +79,14 @@ def reset_alembic():
         sys.exit(1)
     current_revs = [rev for rev, in db.session.execute('SELECT version_num FROM alembic_version').fetchall()]
     if current_revs != ['65c079b091bf']:
-        print ('Your database is not at the latest 1.9.11 revision (got [{}], expected [65c079b091bf]).'
-               .format(', '.join(current_revs)))
+        print('Your database is not at the latest 1.9.11 revision (got [{}], expected [65c079b091bf]).'
+              .format(', '.join(current_revs)))
         print('This can have multiple reasons:')
         print('1) You did not upgrade from 1.9.x, so you do not need this command')
         print('2) You have already executed the script')
         print('3) You did not fully upgrade to the latest 1.9.11 revision before upgrading to 2.x')
-        print ('In case of (3), you need to install v1.9.11 and then upgrade the database before updating Indico back '
-               'to {}'.format(indico.__version__))
+        print('In case of (3), you need to install v1.9.11 and then upgrade the database before updating Indico back '
+              'to {}'.format(indico.__version__))
         sys.exit(1)
     plugins = sorted(x[23:] for x in tables if x.startswith('alembic_version_plugin_'))
     print('Resetting core alembic state...')
