@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import unicode_literals
+from __future__ import print_function, unicode_literals
 
 import cPickle
 import fcntl
@@ -81,18 +81,18 @@ class LogRecordStreamHandler(SocketServer.StreamRequestHandler):
         sql_log_type = obj.get('sql_log_type')
         if sql_log_type == 'start_request':
             with output_lock:
-                print '\n' * 5
+                print('\n' * 5)
                 print_linesep(True, 10)
-                print '\x1b[38;5;70mBegin request\x1b[0m  {}'.format(self._format_request(obj))
+                print('\x1b[38;5;70mBegin request\x1b[0m  {}'.format(self._format_request(obj)))
                 print_linesep()
             return
         elif sql_log_type == 'end_request':
             with output_lock:
                 fmt = '\x1b[38;5;202mEnd request\x1b[0m    {} [{} queries ({}) | {}]'
-                print fmt.format(self._format_request(obj),
+                print(fmt.format(self._format_request(obj),
                                  prettify_count(obj['sql_query_count']),
                                  prettify_duration(obj['req_query_duration'], True),
-                                 prettify_duration(obj['req_duration'], True))
+                                 prettify_duration(obj['req_duration'], True)))
                 print_linesep(True, 196)
             return
         # XXX: `WITH` queries could be something different from SELECT but so far
@@ -103,8 +103,8 @@ class LogRecordStreamHandler(SocketServer.StreamRequestHandler):
         if ignored:
             if sql_log_type == 'end':
                 with output_lock:
-                    print '\x1b[38;5;216mIgnored query\x1b[0m   {} [{:.06f}s]'.format(ignored['file'],
-                                                                                      obj['sql_duration'])
+                    print('\x1b[38;5;216mIgnored query\x1b[0m   {} [{:.06f}s]'.format(ignored['file'],
+                                                                                      obj['sql_duration']))
                     print_linesep()
             return
         if sql_log_type == 'start':
@@ -113,20 +113,20 @@ class LogRecordStreamHandler(SocketServer.StreamRequestHandler):
             params = prettify_params(obj['sql_params']) if obj['sql_params'] else None
             with output_lock:
                 if source:
-                    print prettify_caption('Source')
-                    print source
-                    print
-                print prettify_caption('Statement')
-                print statement
+                    print(prettify_caption('Source'))
+                    print(source)
+                    print()
+                print(prettify_caption('Statement'))
+                print(statement)
                 if params:
-                    print
-                    print prettify_caption('Params')
-                    print params
+                    print()
+                    print(prettify_caption('Params'))
+                    print(params)
         elif sql_log_type == 'end':
             with output_lock:
-                print
-                print prettify_caption('Duration')
-                print '    {}'.format(prettify_duration(obj['sql_duration']))
+                print()
+                print(prettify_caption('Duration'))
+                print('    {}'.format(prettify_duration(obj['sql_duration'])))
                 print_linesep()
 
 
@@ -155,9 +155,9 @@ def print_linesep(double=False, color=None):
     char = u'\N{BOX DRAWINGS DOUBLE HORIZONTAL}' if double else u'\N{BOX DRAWINGS LIGHT HORIZONTAL}'
     sep = terminal_size()[0] * char
     if color is None:
-        print sep
+        print(sep)
     else:
-        print u'\x1b[38;5;{}m{}\x1b[0m'.format(color, sep)
+        print(u'\x1b[38;5;{}m{}\x1b[0m'.format(color, sep))
 
 
 def indent(msg, level=4):
@@ -209,7 +209,7 @@ def prettify_params(args):
 
 
 def sigint(*unused):
-    print '\rTerminating'
+    print('\rTerminating')
     os._exit(1)
 
 
@@ -227,14 +227,14 @@ def sigint(*unused):
                    '/assets/js-vars/user.js). Prefix with ~ to use a regex match instead of an exact string match.')
 def main(port, traceback_frames, ignore_selects, ignored_sources, ignored_request_paths):
     signal.signal(signal.SIGINT, sigint)
-    print 'Listening on 127.0.0.1:{}'.format(port)
+    print('Listening on 127.0.0.1:{}'.format(port))
     server = LogRecordSocketReceiver('localhost', port, traceback_frames=traceback_frames,
                                      ignore_selects=ignore_selects, ignored_sources=ignored_sources,
                                      ignored_request_paths=ignored_request_paths)
     try:
         server.serve_forever()
     except KeyboardInterrupt:
-        print
+        print()
 
 
 if __name__ == '__main__':

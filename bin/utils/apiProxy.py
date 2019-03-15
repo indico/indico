@@ -14,17 +14,20 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import print_function
+
 import hashlib
 import hmac
 import optparse
-import requests
 import sys
 import time
 import urllib
 from contextlib import closing
 
-from flask import Flask, request, Response, abort
+import requests
+from flask import Flask, Response, abort, request
 from werkzeug.datastructures import MultiDict
+
 
 app = Flask(__name__)
 
@@ -72,7 +75,7 @@ def indicoproxy(path):
         abort(403)
     content_type, resp = indico_request('/' + path)
     if not content_type:
-        print 'WARNING: Did not receive a content type, falling back to text/plain'
+        print('WARNING: Did not receive a content type, falling back to text/plain')
         content_type = 'text/plain'
     return Response(resp, mimetype=content_type)
 
@@ -98,15 +101,15 @@ def main():
     use_evalex = options.debug
     if options.host not in ('::1', '127.0.0.1'):
         if not options.allowed_ips:
-            print 'Listening on a non-loopback interface is not permitted without IP restriction!'
+            print('Listening on a non-loopback interface is not permitted without IP restriction!')
             sys.exit(1)
         if use_evalex:
             if options.evalex:
-                print 'Binding to non-loopback host with evalex enabled.'
-                print 'This means anyone with access to this app is able to execute arbitrary' \
-                      ' python code!'
+                print('Binding to non-loopback host with evalex enabled.')
+                print('This means anyone with access to this app is able to execute arbitrary' \
+                      ' python code!')
             else:
-                print 'Binding to non-loopback host; disabling evalex (aka remote code execution).'
+                print('Binding to non-loopback host; disabling evalex (aka remote code execution).')
                 use_evalex = False
 
     app.config['ALLOWED_IPS'] = options.allowed_ips
@@ -114,9 +117,9 @@ def main():
     app.config['INDICO_API_KEY'] = options.api_key
     app.config['INDICO_SECRET_KEY'] = options.secret_key
 
-    print ' * Using indico at {}'.format(app.config['INDICO_URL'])
-    print ' * To use this script, simply append a valid Indico HTTP API request to the URL shown' \
-          ' below. It MUST NOT contain an API key, secret key or timestamp!'
+    print(' * Using indico at {}'.format(app.config['INDICO_URL']))
+    print(' * To use this script, simply append a valid Indico HTTP API request to the URL shown' \
+          ' below. It MUST NOT contain an API key, secret key or timestamp!')
     app.debug = options.debug
     app.run(host=options.host, port=options.port, use_evalex=use_evalex)
 

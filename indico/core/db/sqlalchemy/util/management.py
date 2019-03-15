@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import unicode_literals
+from __future__ import print_function, unicode_literals
 
 from sqlalchemy import ForeignKeyConstraint, MetaData, Table
 from sqlalchemy.engine.reflection import Inspector
@@ -100,25 +100,25 @@ def create_all_tables(db, verbose=False, add_initial_data=True):
     from indico.modules.oauth.models.applications import OAuthApplication, SystemAppType
     from indico.modules.users import User
     if verbose:
-        print cformat('%{green}Creating tables')
+        print(cformat('%{green}Creating tables'))
     db.create_all()
     if add_initial_data:
         if verbose:
-            print cformat('%{green}Creating system user')
+            print(cformat('%{green}Creating system user'))
         db.session.add(User(id=0, is_system=True, first_name='Indico', last_name='System'))
         if verbose:
-            print cformat('%{green}Creating root category')
+            print(cformat('%{green}Creating root category'))
         cat = Category(id=0, title='Home', protection_mode=ProtectionMode.public)
         db.session.add(cat)
         db.session.flush()
         if verbose:
-            print cformat('%{green}Creating default ticket template for root category ')
+            print(cformat('%{green}Creating default ticket template for root category '))
         dt = DesignerTemplate(category_id=0, title='Default ticket', type=TemplateType.badge,
                               data=DEFAULT_TEMPLATE_DATA, is_system_template=True)
         cat.default_ticket_template = dt
         db.session.add(dt)
         if verbose:
-            print cformat('%{green}Creating system oauth apps')
+            print(cformat('%{green}Creating system oauth apps'))
         for sat in SystemAppType:
             if sat != SystemAppType.none:
                 db.session.add(OAuthApplication(system_app_type=sat, **sat.default_data))

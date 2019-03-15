@@ -83,13 +83,13 @@ class XMLSerializer(Serializer):
             if isinstance(v, dict) and set(v.viewkeys()) == {'date', 'time', 'tz'}:
                 v = _deserialize_date(v)
             if isinstance(v, (list, tuple)):
-                onlyDicts = all(type(subv) == dict for subv in v)
+                onlyDicts = all(isinstance(subv, dict) for subv in v)
                 if onlyDicts:
                     for subv in v:
                         elem.append(self._xmlForFossil(subv))
                 else:
                     for subv in v:
-                        if type(subv) == dict:
+                        if isinstance(subv, dict):
                             elem.append(self._xmlForFossil(subv))
                         else:
                             subelem = etree.SubElement(elem, 'item')
@@ -106,7 +106,7 @@ class XMLSerializer(Serializer):
         return felement
 
     def _execute(self, fossil, xml_declaration=True):
-        if type(fossil) == list:
+        if isinstance(fossil, list):
             # collection of fossils
             doc = etree.ElementTree(etree.Element("collection"))
             for elem in fossil:

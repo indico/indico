@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import unicode_literals
+from __future__ import print_function, unicode_literals
 
 from datetime import date, datetime
 from itertools import groupby
@@ -57,13 +57,13 @@ def _print_occurrences(user, occurrences, _defaults={}, _overrides={}):
                            RepeatFrequency.MONTH: lambda r: r.notification_before_days_monthly,
                            RepeatFrequency.NEVER: lambda r: r.notification_before_days,
                            RepeatFrequency.DAY: lambda r: r.notification_before_days})
-    print cformat('%{grey!}*** {} ({}) ***').format(user.full_name, user.email)
+    print(cformat('%{grey!}*** {} ({}) ***').format(user.full_name, user.email))
     for occ in occurrences:
         default = _defaults[occ.reservation.repeat_frequency]
         override = _overrides[occ.reservation.repeat_frequency](occ.reservation.room)
         days = default if override is None else override
         days_until = (occ.start_dt.date() - date.today()).days
-        print cformat('  * %{yellow}{}%{reset} %{green}{:5}%{reset} {} {} {} \t %{blue!}{}%{reset} {} ({})').format(
+        print(cformat('  * %{yellow}{}%{reset} %{green}{:5}%{reset} {} {} {} \t %{blue!}{}%{reset} {} ({})').format(
             occ.start_dt.date(), occ.reservation.repeat_frequency.name,
             days,
             default if override is not None and override != default else ' ',
@@ -71,7 +71,7 @@ def _print_occurrences(user, occurrences, _defaults={}, _overrides={}):
             occ.reservation.id,
             occ.reservation.room.full_name,
             occ.reservation.room.id
-        )
+        ))
 
 
 def _notify_occurrences(user, occurrences):

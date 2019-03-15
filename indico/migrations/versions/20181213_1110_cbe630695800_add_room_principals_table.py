@@ -5,6 +5,8 @@ Revises: 252c0015c9a0
 Create Date: 2018-12-13 11:10:12.684382
 """
 
+from __future__ import print_function
+
 import json
 
 import sqlalchemy as sa
@@ -84,14 +86,14 @@ def _upgrade_permissions():
         if booking_group:
             group_kwargs = _group_to_kwargs(booking_group)
             if group_kwargs is None:
-                print 'WARNING: Invalid booking group: {}'.format(booking_group)
+                print('WARNING: Invalid booking group: {}'.format(booking_group))
             else:
                 permission = 'prebook' if reservations_need_confirmation else 'book'
                 _create_acl_entry(conn, room_id, permissions={permission}, **group_kwargs)
         if manager_group:
             group_kwargs = _group_to_kwargs(manager_group)
             if group_kwargs is None:
-                print 'WARNING: Invalid manager group: {}'.format(manager_group)
+                print('WARNING: Invalid manager group: {}'.format(manager_group))
             else:
                 _create_acl_entry(conn, room_id, full_access=True, **group_kwargs)
 

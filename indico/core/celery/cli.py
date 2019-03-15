@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import unicode_literals
+from __future__ import print_function, unicode_literals
 
 import os
 import sys
@@ -42,17 +42,17 @@ def celery_cmd(args):
         try:
             import flower
         except ImportError:
-            print cformat('%{red!}Flower is not installed')
+            print(cformat('%{red!}Flower is not installed'))
             sys.exit(1)
 
         app = OAuthApplication.find_one(system_app_type=SystemAppType.flower)
         if not app.redirect_uris:
-            print cformat('%{yellow!}Authentication will fail unless you configure the redirect url for the {} OAuth '
-                          'application in the administration area.').format(app.name)
+            print(cformat('%{yellow!}Authentication will fail unless you configure the redirect url for the {} OAuth '
+                          'application in the administration area.').format(app.name))
 
-        print cformat('%{green!}Only Indico admins will have access to flower.')
-        print cformat('%{yellow}Note that revoking admin privileges will not revoke Flower access.')
-        print cformat('%{yellow}To force re-authentication, restart Flower.')
+        print(cformat('%{green!}Only Indico admins will have access to flower.'))
+        print(cformat('%{yellow}Note that revoking admin privileges will not revoke Flower access.'))
+        print(cformat('%{yellow}To force re-authentication, restart Flower.'))
         auth_args = ['--auth=^Indico Admin$', '--auth_provider=indico.core.celery.flower.FlowerAuthHandler']
         auth_env = {'INDICO_FLOWER_CLIENT_ID': app.client_id,
                     'INDICO_FLOWER_CLIENT_SECRET': app.client_secret,
@@ -65,7 +65,7 @@ def celery_cmd(args):
         env = dict(os.environ, **auth_env)
         os.execvpe('celery', args, env)
     elif args and args[0] == 'shell':
-        print cformat('%{red!}Please use `indico shell`.')
+        print(cformat('%{red!}Please use `indico shell`.'))
         sys.exit(1)
     else:
         CeleryCommand(celery).execute_from_commandline(['indico celery'] + args)
@@ -84,6 +84,6 @@ class UnlockCommand(Command):
 
     def run(self, name, **kwargs):
         if unlock_task(name):
-            print cformat('%{green!}Task {} unlocked').format(name)
+            print(cformat('%{green!}Task {} unlocked').format(name))
         else:
-            print cformat('%{yellow}Task {} is not locked').format(name)
+            print(cformat('%{yellow}Task {} is not locked').format(name))

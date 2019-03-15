@@ -14,6 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import print_function
+
 import argparse
 import importlib
 import os
@@ -24,10 +26,11 @@ from sqlalchemy.orm import class_mapper
 
 from indico.core.db import db
 
+
 try:
     from sqlalchemy_schemadisplay import create_schema_graph, create_uml_graph
 except ImportError:
-    print 'You need to install sqlalchemy-schemadisplay to create graphs'
+    print('You need to install sqlalchemy-schemadisplay to create graphs')
     import sys
     sys.exit(1)
 
@@ -67,8 +70,8 @@ def generate_uml_graph(package, output):
             if not attr.startswith('_'):
                 try:
                     mappers.append(class_mapper(getattr(module, attr)))
-                except Exception, e:
-                    print str(e)
+                except Exception as e:
+                    print(str(e))
 
     graph = create_uml_graph(mappers, show_operations=False, show_multiplicity_one=False)
     graph.write_png(output)
@@ -91,14 +94,14 @@ if __name__ == '__main__':
     if args.create and args.database:
         create_schema(args.database, args.create)
     elif args.create and not args.database:
-        print '-c and -d must be supplied together'
+        print('-c and -d must be supplied together')
 
     if args.database and args.schema_output:
         generate_schema_graph(args.database, args.schema_output)
     elif not (not args.database and not args.schema_output):
-        print '-d and -s must be supplied together'
+        print('-d and -s must be supplied together')
 
     if args.package and args.uml_output:
         generate_uml_graph(args.package, args.uml_output)
     elif not(not args.package and not args.uml_output):
-        print '-p and -u must be supplied together'
+        print('-p and -u must be supplied together')

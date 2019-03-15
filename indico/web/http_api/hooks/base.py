@@ -115,7 +115,7 @@ class HTTPAPIHook(object):
             tzName = config.DEFAULT_TIMEZONE
         try:
             self._tz = pytz.timezone(tzName)
-        except pytz.UnknownTimeZoneError, e:
+        except pytz.UnknownTimeZoneError as e:
             raise HTTPAPIError("Bad timezone: '%s'" % e.message, 400)
         max = self.MAX_RECORDS.get(self._detail, 1000)
         self._userLimit = get_query_parameter(self._queryParams, ['n', 'limit'], 0, integer=True)
@@ -261,12 +261,12 @@ class DataFetcher(object):
 
         try:
             rel, value = cls._parseDateTime(dateTime, ctx == 'from')
-        except ArgumentParseError, e:
+        except ArgumentParseError as e:
             raise HTTPAPIError(e.message, 400)
 
         if rel == 'abs':
             return tz.localize(value) if not value.tzinfo else value
-        elif rel == 'ctx' and type(value) == timedelta:
+        elif rel == 'ctx' and isinstance(value, timedelta):
             value = now_utc() + value
 
         # from here on, 'value' has to be a datetime

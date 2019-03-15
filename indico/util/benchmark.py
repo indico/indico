@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 import time
 from math import isinf
 
@@ -51,12 +53,12 @@ class Benchmark(object):
     def print_result(self, slow=float('inf'), veryslow=float('inf')):
         duration = float(self)
         if duration == float('-inf'):
-            print cformat('%{blue!}skipped')
+            print(cformat('%{blue!}skipped'))
         elif duration == float('inf'):
-            print cformat('%{red}running')
+            print(cformat('%{red}running'))
         elif duration >= veryslow:
-            print cformat('%{red!}{}').format(self)
+            print(cformat('%{red!}{}').format(self))
         elif duration >= slow:
-            print cformat('%{yellow!}{}').format(self)
+            print(cformat('%{yellow!}{}').format(self))
         else:
-            print cformat('%{green!}{}').format(self)
+            print(cformat('%{green!}{}').format(self))

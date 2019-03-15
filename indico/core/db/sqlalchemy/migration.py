@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import unicode_literals
+from __future__ import print_function, unicode_literals
 
 import os
 
@@ -61,10 +61,10 @@ def _require_extensions(*names):
     missing = sorted(name for name in names if not has_extension(db.engine, name))
     if not missing:
         return True
-    print cformat('%{red}Required Postgres extensions missing: {}').format(', '.join(missing))
-    print cformat('%{yellow}Create them using these SQL commands (as a Postgres superuser):')
+    print(cformat('%{red}Required Postgres extensions missing: {}').format(', '.join(missing)))
+    print(cformat('%{yellow}Create them using these SQL commands (as a Postgres superuser):'))
     for name in missing:
-        print cformat('%{white!}  CREATE EXTENSION {};').format(name)
+        print(cformat('%{white!}  CREATE EXTENSION {};').format(name))
     return False
 
 
@@ -75,7 +75,7 @@ def _require_pg_version(version):
     cur_version = db.engine.execute("SELECT current_setting('server_version_num')::int").scalar()
     if cur_version >= req_version:
         return True
-    print cformat('%{red}Postgres version too old; you need at least {} (or newer)').format(version)
+    print(cformat('%{red}Postgres version too old; you need at least {} (or newer)').format(version))
     return False
 
 
@@ -83,8 +83,8 @@ def _require_encoding(encoding):
     cur_encoding = db.engine.execute("SELECT current_setting('server_encoding')").scalar()
     if cur_encoding >= encoding:
         return True
-    print cformat('%{red}Database encoding must be {}; got {}').format(encoding, cur_encoding)
-    print cformat('%{yellow}Recreate your database using `createdb -E {} -T template0 ...`').format(encoding)
+    print(cformat('%{red}Database encoding must be {}; got {}').format(encoding, cur_encoding))
+    print(cformat('%{yellow}Recreate your database using `createdb -E {} -T template0 ...`').format(encoding))
     return False
 
 
@@ -100,7 +100,7 @@ def prepare_db(empty=False, root_path=None, verbose=True):
     tables = get_all_tables(db)
     if 'alembic_version' not in tables['public']:
         if verbose:
-            print cformat('%{green}Setting the alembic version to HEAD')
+            print(cformat('%{green}Setting the alembic version to HEAD'))
         stamp(directory=os.path.join(root_path, 'migrations'), revision='heads')
         PluginScriptDirectory.dir = os.path.join(root_path, 'core', 'plugins', 'alembic')
         alembic.command.ScriptDirectory = PluginScriptDirectory
@@ -110,7 +110,7 @@ def prepare_db(empty=False, root_path=None, verbose=True):
             if not os.path.exists(plugin.alembic_versions_path):
                 continue
             if verbose:
-                print plugin_msg.format(plugin.name)
+                print(plugin_msg.format(plugin.name))
             with plugin.plugin_context():
                 stamp(revision='heads')
         # Retrieve the table list again, just in case we created unexpected tables
@@ -119,12 +119,12 @@ def prepare_db(empty=False, root_path=None, verbose=True):
     tables['public'] = [t for t in tables['public'] if not t.startswith('alembic_version')]
     if any(tables.viewvalues()):
         if verbose:
-            print cformat('%{red}Your database is not empty!')
-            print cformat('%{yellow}If you just added a new table/model, create an alembic revision instead!')
-            print
-            print 'Tables in your database:'
+            print(cformat('%{red}Your database is not empty!'))
+            print(cformat('%{yellow}If you just added a new table/model, create an alembic revision instead!'))
+            print()
+            print('Tables in your database:')
             for schema, schema_tables in sorted(tables.items()):
                 for t in schema_tables:
-                    print cformat('  * %{cyan}{}%{reset}.%{cyan!}{}%{reset}').format(schema, t)
+                    print(cformat('  * %{cyan}{}%{reset}.%{cyan!}{}%{reset}').format(schema, t))
         return
     create_all_tables(db, verbose=verbose, add_initial_data=(not empty))

@@ -272,7 +272,7 @@ def latex_render_image(src, alt, strict=False):
                     raise ImageURLException("Cannot read image data. Maybe not an image file?")
             with NamedTemporaryFile(prefix='indico-latex-', suffix=extension, delete=False) as tempfile:
                 tempfile.write(resp.content)
-    except ImageURLException, e:
+    except ImageURLException as e:
         if strict:
             raise
         else:

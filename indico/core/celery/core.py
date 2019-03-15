@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import unicode_literals
+from __future__ import print_function, unicode_literals
 
 import logging
 import os
@@ -191,7 +191,7 @@ class IndicoPersistentScheduler(PersistentScheduler):
         for task_name in sorted(deleted):
             table_data.append([cformat('%{yellow}{}%{reset}').format(task_name),
                                cformat('%{red!}Disabled%{reset}')])
-        print AsciiTable(table_data, cformat('%{white!}Periodic Tasks%{reset}')).table
+        print(AsciiTable(table_data, cformat('%{white!}Periodic Tasks%{reset}')).table)
 
 
 class _CelerySAWrapper(object):

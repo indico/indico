@@ -14,6 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import print_function
+
 import os
 
 from flask.json import htmlsafe_dumps
@@ -56,7 +58,7 @@ def main():
     env = Environment(loader=FileSystemLoader(os.path.dirname(__file__)))
 
     template = env.get_template('fix_descriptions_template.html')
-    print template.render(object_descriptions=htmlsafe_dumps(object_descriptions))
+    print(template.render(object_descriptions=htmlsafe_dumps(object_descriptions)))
 
 
 if __name__ == '__main__':

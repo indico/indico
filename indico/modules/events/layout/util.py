@@ -137,7 +137,7 @@ def _get_split_signal_entries():
     signal_entries = get_menu_entries_from_signal()
     top_data = OrderedDict((name, data)
                            for name, data in sorted(signal_entries.iteritems(),
-                                                    key=lambda (name, data): _menu_entry_key(data))
+                                                    key=lambda name_data: _menu_entry_key(name_data[1]))
                            if not data.parent)
     child_data = defaultdict(list)
     for name, data in signal_entries.iteritems():
