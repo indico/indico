@@ -19,13 +19,12 @@ from __future__ import print_function
 from datetime import date
 
 import click
+from dateutil.relativedelta import relativedelta
 
 from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.statistics import calculate_rooms_occupancy
 from indico.web.flask.app import make_app
-
-from dateutil.relativedelta import relativedelta
 
 
 def _main(location):

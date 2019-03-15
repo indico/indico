@@ -16,18 +16,17 @@
 
 from datetime import datetime
 
+import dateutil.parser
+import icalendar as ical
 from lxml import html
 from lxml.etree import ParserError
+from pytz import timezone, utc
+from werkzeug.urls import url_parse
 
 from indico.core.config import config
 from indico.util.date_time import now_utc
 from indico.util.string import to_unicode
 from indico.web.http_api.metadata.serializer import Serializer
-
-import dateutil.parser
-import icalendar as ical
-from pytz import timezone, utc
-from werkzeug.urls import url_parse
 
 
 class vRecur(ical.vRecur):

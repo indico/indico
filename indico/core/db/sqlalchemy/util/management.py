@@ -16,12 +16,12 @@
 
 from __future__ import print_function, unicode_literals
 
-from indico.core.db.sqlalchemy.protection import ProtectionMode
-from indico.util.console import cformat
-
 from sqlalchemy import ForeignKeyConstraint, MetaData, Table
 from sqlalchemy.engine.reflection import Inspector
 from sqlalchemy.sql.ddl import DropConstraint, DropSchema, DropTable
+
+from indico.core.db.sqlalchemy.protection import ProtectionMode
+from indico.util.console import cformat
 
 
 DEFAULT_TEMPLATE_DATA = {

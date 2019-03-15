@@ -20,11 +20,11 @@ import argparse
 import importlib
 import os
 
-from indico.core.db import db
-
 from flask import Flask
 from sqlalchemy import MetaData
 from sqlalchemy.orm import class_mapper
+
+from indico.core.db import db
 
 
 try:

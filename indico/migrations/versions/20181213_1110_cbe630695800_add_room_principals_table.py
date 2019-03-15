@@ -8,14 +8,14 @@ from __future__ import print_function
 
 import json
 
+import sqlalchemy as sa
+from alembic import context, op
+from sqlalchemy.dialects import postgresql
+
 from indico.core.auth import multipass
 from indico.core.db.sqlalchemy import PyIntEnum
 from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.db.sqlalchemy.protection import ProtectionMode
-
-import sqlalchemy as sa
-from alembic import context, op
-from sqlalchemy.dialects import postgresql
 
 
 # revision identifiers, used by Alembic.

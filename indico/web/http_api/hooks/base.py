@@ -23,6 +23,9 @@ import urllib
 from datetime import datetime, time, timedelta
 from types import GeneratorType
 
+import pytz
+from flask import current_app, request
+
 from indico.core.config import config
 from indico.core.db import db
 from indico.core.logger import Logger
@@ -36,9 +39,6 @@ from indico.web.http_api.metadata.ical import ICalSerializer
 from indico.web.http_api.metadata.jsonp import JSONPSerializer
 from indico.web.http_api.responses import HTTPAPIError
 from indico.web.http_api.util import get_query_parameter
-
-import pytz
-from flask import current_app, request
 
 
 class HTTPAPIHook(object):

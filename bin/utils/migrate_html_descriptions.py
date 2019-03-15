@@ -25,6 +25,8 @@ from itertools import chain, ifilter
 from xml.dom import minidom
 
 import click
+import html5lib
+from html2text import HTML2Text
 from pygments import highlight
 from pygments.formatters import Terminal256Formatter
 from pygments.lexers import HtmlLexer
@@ -32,9 +34,6 @@ from pygments.lexers import HtmlLexer
 from indico.core.db import db
 from indico.util.string import render_markdown
 from indico.web.flask.app import make_app
-
-import html5lib
-from html2text import HTML2Text
 
 
 EMPTY_OR_TRALING_WS_ONLY_REGEX = re.compile(r'()(\s*(?!.))', re.MULTILINE | re.DOTALL)

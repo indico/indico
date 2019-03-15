@@ -20,6 +20,9 @@ from datetime import date, datetime
 from itertools import groupby
 from operator import attrgetter
 
+from celery.schedules import crontab
+from sqlalchemy.orm import contains_eager
+
 from indico.core.celery import celery
 from indico.core.config import config
 from indico.core.db import db
@@ -30,9 +33,6 @@ from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.notifications.reservation_occurrences import notify_upcoming_occurrences
 from indico.modules.rb.notifications.reservations import notify_about_finishing_bookings
 from indico.util.console import cformat
-
-from celery.schedules import crontab
-from sqlalchemy.orm import contains_eager
 
 
 def _make_occurrence_date_filter(date_column, default_values, room_columns):

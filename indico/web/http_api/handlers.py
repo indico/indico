@@ -27,6 +27,9 @@ import urllib
 from urlparse import parse_qs
 from uuid import UUID
 
+from flask import current_app, g, request, session
+from werkzeug.exceptions import BadRequest, NotFound
+
 from indico.core.db import db
 from indico.core.logger import Logger
 from indico.legacy.common.cache import GenericCache
@@ -42,9 +45,6 @@ from indico.web.http_api.fossils import IHTTPAPIExportResultFossil
 from indico.web.http_api.metadata.serializer import Serializer
 from indico.web.http_api.responses import HTTPAPIError, HTTPAPIResult
 from indico.web.http_api.util import get_query_parameter
-
-from flask import current_app, g, request, session
-from werkzeug.exceptions import BadRequest, NotFound
 
 
 # Remove the extension at the end or before the querystring

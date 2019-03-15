@@ -27,6 +27,11 @@ from operator import itemgetter
 from uuid import uuid4
 
 import click
+import dateutil.parser
+import yaml
+from flask import current_app
+from sqlalchemy import inspect
+from terminaltables import AsciiTable
 
 import indico
 from indico.core.config import config
@@ -46,12 +51,6 @@ from indico.modules.users.util import get_user_by_email
 from indico.util.console import cformat
 from indico.util.date_time import now_utc
 from indico.util.string import strict_unicode
-
-import dateutil.parser
-import yaml
-from flask import current_app
-from sqlalchemy import inspect
-from terminaltables import AsciiTable
 
 
 _notset = object()

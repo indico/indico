@@ -19,15 +19,15 @@ from __future__ import print_function, unicode_literals
 import os
 import sys
 
+from celery.bin.base import Command
+from celery.bin.celery import CeleryCommand, command_classes
+
 from indico.core.celery import celery
 from indico.core.celery.util import unlock_task
 from indico.core.config import config
 from indico.modules.oauth.models.applications import OAuthApplication, SystemAppType
 from indico.util.console import cformat
 from indico.web.flask.util import url_for
-
-from celery.bin.base import Command
-from celery.bin.celery import CeleryCommand, command_classes
 
 
 def celery_cmd(args):

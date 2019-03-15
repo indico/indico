@@ -18,6 +18,10 @@ from __future__ import print_function, unicode_literals
 
 import os
 
+import alembic.command
+from alembic.script import ScriptDirectory
+from flask import current_app
+from flask_migrate import Migrate, stamp
 from flask_pluginengine import current_plugin
 
 from indico.core.db import db
@@ -25,11 +29,6 @@ from indico.core.db.sqlalchemy.util.management import create_all_tables, get_all
 from indico.core.db.sqlalchemy.util.queries import has_extension
 from indico.core.plugins import plugin_engine
 from indico.util.console import cformat
-
-import alembic.command
-from alembic.script import ScriptDirectory
-from flask import current_app
-from flask_migrate import Migrate, stamp
 
 
 migrate = Migrate(db=db)

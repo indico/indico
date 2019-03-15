@@ -21,12 +21,11 @@ from collections import defaultdict
 from operator import itemgetter
 
 import click
+from sqlalchemy import inspect
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.models import import_all_models
 from indico.util.console import cformat
-
-from sqlalchemy import inspect
 
 
 click.disable_unicode_literals_warning = True

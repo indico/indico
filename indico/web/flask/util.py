@@ -21,12 +21,6 @@ import os
 import time
 from importlib import import_module
 
-from indico.core.config import config
-from indico.util.caching import memoize
-from indico.util.fs import secure_filename
-from indico.util.locators import get_locator
-from indico.web.util import jsonify_data
-
 from flask import Blueprint, current_app, g, redirect, request
 from flask import send_file as _send_file
 from flask import url_for as _url_for
@@ -36,6 +30,12 @@ from werkzeug.exceptions import HTTPException, NotFound
 from werkzeug.routing import BaseConverter, BuildError, RequestRedirect, UnicodeConverter
 from werkzeug.urls import url_parse
 from werkzeug.wrappers import Response as WerkzeugResponse
+
+from indico.core.config import config
+from indico.util.caching import memoize
+from indico.util.fs import secure_filename
+from indico.util.locators import get_locator
+from indico.web.util import jsonify_data
 
 
 def discover_blueprints():

@@ -20,7 +20,11 @@ import os
 import sys
 from functools import partial
 
+import alembic.command
 import click
+from flask import current_app
+from flask.cli import with_appcontext
+from flask_migrate.cli import db as flask_migrate_cli
 
 import indico
 from indico.cli.core import cli_group
@@ -29,11 +33,6 @@ from indico.core.db.sqlalchemy.migration import PluginScriptDirectory, migrate, 
 from indico.core.db.sqlalchemy.util.management import get_all_tables
 from indico.core.plugins import plugin_engine
 from indico.util.console import cformat
-
-import alembic.command
-from flask import current_app
-from flask.cli import with_appcontext
-from flask_migrate.cli import db as flask_migrate_cli
 
 
 @cli_group()

@@ -18,14 +18,14 @@ from __future__ import print_function
 
 import os
 
+from flask.json import htmlsafe_dumps
+from jinja2 import Environment, FileSystemLoader
+from sqlalchemy.orm import load_only
+
 from indico.modules.categories.models.categories import Category
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.web.flask.app import make_app
-
-from flask.json import htmlsafe_dumps
-from jinja2 import Environment, FileSystemLoader
-from sqlalchemy.orm import load_only
 
 
 def main():
