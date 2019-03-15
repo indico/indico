@@ -232,7 +232,7 @@ def handler(prefix, path):
             ttl = api_settings.get('cache_ttl')
             if ttl > 0:
                 cache.set(cacheKey, (result, extra, ts, complete, typeMap), ttl)
-    except HTTPAPIError, e:
+    except HTTPAPIError as e:
         error = e
         if e.getCode():
             responseUtil.status = e.getCode()

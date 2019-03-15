@@ -39,7 +39,7 @@ class AtomSerializer(Serializer):
 
     def _execute(self, fossils):
         results = fossils['results']
-        if type(results) != list:
+        if not isinstance(results, list):
             results = [results]
 
         feed = AtomFeed(

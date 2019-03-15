@@ -15,6 +15,7 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import unicode_literals
+from __future__ import print_function
 
 import sys
 from collections import defaultdict
@@ -90,10 +91,10 @@ def main(ci):
         if in_backrefs and not backrefs_written:
             _write_backrefs(rels, new_source)
         if not backrefs_written:
-            print cformat('%{yellow}Class {} has no comment for backref information').format(cls.__name__)
+            print(cformat('%{yellow}Class {} has no comment for backref information').format(cls.__name__))
             has_missing = True
         if source != new_source:
-            print cformat('%{green!}Updating backref info for {} in {}').format(cls.__name__, path)
+            print(cformat('%{green!}Updating backref info for {} in {}').format(cls.__name__, path))
             has_updates = True
             with open(path, 'w') as f:
                 f.writelines(line + '\n' for line in new_source)

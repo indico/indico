@@ -1,3 +1,4 @@
+from __future__ import print_function
 # This file is part of Indico.
 # Copyright (C) 2002 - 2018 European Organization for Nuclear Research (CERN).
 #
@@ -56,7 +57,7 @@ def main():
     env = Environment(loader=FileSystemLoader(os.path.dirname(__file__)))
 
     template = env.get_template('fix_descriptions_template.html')
-    print template.render(object_descriptions=htmlsafe_dumps(object_descriptions))
+    print(template.render(object_descriptions=htmlsafe_dumps(object_descriptions)))
 
 
 if __name__ == '__main__':

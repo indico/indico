@@ -92,7 +92,7 @@ def test_slugify_lower(input, lower, output):
 ))
 def test_strip_tags(input, output):
     assert strip_tags(input) == output
-    assert type(input) is type(output)
+    assert isinstance(input, type(output))
 
 
 @pytest.mark.parametrize(('input', 'html', 'max_length', 'output'), (

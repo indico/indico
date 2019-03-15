@@ -52,7 +52,7 @@ def addFossil(klazz, fossils):
     :type klass: class object
     :param fossils: a fossil class (or a list of fossil classes)
     """
-    if not type(fossils) is list:
+    if not isinstance(fossils, list):
         fossils = [fossils]
 
     for fossil in fossils:
@@ -168,7 +168,7 @@ class Fossilizable(object):
             else:
                 interface = implementedInterfaces[0]
 
-        elif type(interfaceArg) is dict:
+        elif isinstance(interfaceArg, dict):
 
             className = obj.__class__.__module__ + '.' + \
                         obj.__class__.__name__

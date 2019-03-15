@@ -238,7 +238,7 @@ def url_rule_to_js(endpoint):
                 ],
                 'converters': dict((key, type(converter).__name__)
                                    for key, converter in rule._converters.iteritems()
-                                   if type(converter) is not UnicodeConverter)
+                                   if not isinstance(converter, UnicodeConverter))
             } for rule in current_app.url_map.iter_rules(endpoint)
         ]
     }

@@ -1,3 +1,4 @@
+from __future__ import print_function
 # This file is part of Indico.
 # Copyright (C) 2002 - 2018 European Organization for Nuclear Research (CERN).
 #
@@ -189,7 +190,7 @@ def purify_html(input_html, obj):
 
             container = document.createElement('ul')
             li.parentNode.replaceChild(container, li)
-            print "!! Adding missing ul", obj
+            print("!! Adding missing ul", obj)
             container.appendChild(li)
             for child in sibling_items:
                 if child != li:
@@ -200,7 +201,7 @@ def purify_html(input_html, obj):
     for ul in document.getElementsByTagName('ul'):
         for child in ul.childNodes:
             if isinstance(child, minidom.Comment) or isinstance(child, minidom.Text) and not child.data.isspace():
-                print "!! Adding missing li", obj
+                print("!! Adding missing li", obj)
                 li = document.createElement('li')
                 ul.insertBefore(li, child)
                 ul.removeChild(child)
@@ -212,7 +213,7 @@ def purify_html(input_html, obj):
         for li in ul.childNodes:
             if not isinstance(li, (minidom.Text, minidom.Comment)):
                 if li.getElementsByTagName('p'):
-                    print "!! Cannot convert to markdown because a list contains a paragraph:", obj
+                    print("!! Cannot convert to markdown because a list contains a paragraph:", obj)
                     convert_to_markdown = False
 
     # Markdown doesn't like a bold or italic section to start or end with a whitespace
@@ -222,7 +223,7 @@ def purify_html(input_html, obj):
         if first_text_node is not None:
             whitespace, text = _split_leading_whitespace(first_text_node.data)
             if whitespace:
-                print "!! Moving leading whitespace outside of the element:", obj
+                print("!! Moving leading whitespace outside of the element:", obj)
                 first_text_node.data = text
                 element.parentNode.insertBefore(document.createTextNode(whitespace), element)
                 dom_modified = True
@@ -230,7 +231,7 @@ def purify_html(input_html, obj):
         if last_text_node is not None:
             text, whitespace = _split_trailing_whitespace(last_text_node.data)
             if whitespace:
-                print "!! Moving trailing whitespace outside of the element:", obj, whitespace.__repr__()
+                print("!! Moving trailing whitespace outside of the element:", obj, whitespace.__repr__())
                 last_text_node.data = text
                 _insertAfter(document.createTextNode(whitespace), element)
                 dom_modified = True
@@ -246,9 +247,9 @@ def purify_html(input_html, obj):
     # * c
     if _contains_problematic_space_near_delimiter("".join([x.toxml() for x
                                                            in document.getElementsByTagName('body')[0].childNodes])):
-        print "!! Cannot convert to markdown because the description contains '_ ' or '* ' " \
+        print("!! Cannot convert to markdown because the description contains '_ ' or '* ' " \
               "at a position which is very likely to trigger bugs in our markdown renderer." \
-              "(It is likely that this description is not being rendered properly in its current form.)", obj
+              "(It is likely that this description is not being rendered properly in its current form.)", obj)
         # I'm pretty sure that converting such descriptions now yields CommonMark-compliant Markdown but proper
         # testing with a compliant python parser has not been performed. I'm leaving those description as
         # HTML for now which should make it easier to find them when switching to a compliant Markdown renderer.
