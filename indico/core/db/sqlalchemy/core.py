@@ -63,7 +63,7 @@ def handle_sqlalchemy_database_error():
         msg += ': {}'.format(exc.orig.diag.message_detail)
     if exc.orig.diag.message_hint:
         msg += ' ({})'.format(exc.orig.diag.message_hint)
-    raise ConstraintViolated, (msg, exc.orig), tb  # raise with original traceback
+    raise ConstraintViolated(msg, exc.orig), None, tb  # raise with original traceback
 
 
 class IndicoSQLAlchemy(SQLAlchemy):
