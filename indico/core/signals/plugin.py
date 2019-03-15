@@ -93,3 +93,16 @@ the following arguments:
 If a plugin wants to modify the data returned when dumping, it may do so by modifying
 the contents of ``data``.
 """)
+
+schema_pre_load = _signals.signal('schema-pre-load', """
+Called when a marshmallow schema is loaded. The *sender* is the schema class
+and code using this signal should always specify it. The signal is called with
+the following arguments:
+
+- ``data`` -- the raw data passed to marshmallow; this is usually a dict of raw
+              json/form data coming from the user, so it can have all types valid
+              in JSON
+
+If a plugin wants to modify the data the schema will eventually load, it may do so by
+modifying the contents of ``data``.
+""")
