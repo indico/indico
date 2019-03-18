@@ -81,3 +81,15 @@ Expected to return `EventLogRenderer` classes.
 get_feature_definitions = _signals.signal('get-feature-definitions', """
 Expected to return `EventFeature` subclasses.
 """)
+
+metadata_postprocess = _signals.signal('metadata-postprocess', """
+Called right after a dict-like representation of an event is created,
+so that plugins can add their own fields.
+
+The *sender* is a string parameter specifying the source of the metadata.
+The *event* kwarg contains the event object. The metadata is passed in
+the `data` kwarg.
+
+The signal should return a dict that will be used to update the
+original representation (fields to add or override).
+""")
