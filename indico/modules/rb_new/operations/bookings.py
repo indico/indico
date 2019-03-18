@@ -114,7 +114,7 @@ def get_rooms_availability(rooms, start_dt, end_dt, repeat_frequency, repeat_int
     date_range = sorted(set(cand.start_dt.date() for cand in candidates))
     occurrences = get_existing_rooms_occurrences(rooms, start_dt.replace(hour=0, minute=0),
                                                  end_dt.replace(hour=23, minute=59), repeat_frequency, repeat_interval)
-    blocked_rooms = get_rooms_blockings(rooms, start_dt.date(), end_dt.date())
+    blocked_rooms, overridable_blocked_rooms = get_rooms_blockings(rooms, start_dt.date(), end_dt.date())
     unbookable_hours = get_rooms_unbookable_hours(rooms)
     nonbookable_periods = get_rooms_nonbookable_periods(rooms, start_dt, end_dt)
     conflicts, pre_conflicts, conflicting_candidates = get_rooms_conflicts(
@@ -132,6 +132,7 @@ def get_rooms_availability(rooms, start_dt, end_dt, repeat_frequency, repeat_int
         pre_bookings = [occ for occ in room_occurrences if not occ.reservation.is_accepted]
         existing_bookings = [occ for occ in room_occurrences if occ.reservation.is_accepted]
         room_blocked_rooms = blocked_rooms.get(room.id, [])
+        room_overridable_blocked_rooms = overridable_blocked_rooms.get(room.id, [])
         room_nonbookable_periods = nonbookable_periods.get(room.id, [])
         room_unbookable_hours = unbookable_hours.get(room.id, [])
 
@@ -144,6 +145,7 @@ def get_rooms_availability(rooms, start_dt, end_dt, repeat_frequency, repeat_int
                                  'conflicts': group_by_occurrence_date(room_conflicts),
                                  'pre_conflicts': group_by_occurrence_date(pre_room_conflicts),
                                  'blockings': group_blockings(room_blocked_rooms, dates),
+                                 'overridable_blockings': group_blockings(room_overridable_blocked_rooms, dates),
                                  'nonbookable_periods': group_nonbookable_periods(room_nonbookable_periods, dates),
                                  'unbookable_hours': room_unbookable_hours}
     return date_range, availability
