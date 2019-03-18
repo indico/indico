@@ -159,17 +159,6 @@ export const getUnbookableResultCount = createSelector(
 );
 
 /**
- * Check whether there are rooms that the user cannot book at the
- * moment even though they are authorized to book the room at another
- * time.
- */
-export const hasUnavailableRooms = createSelector(
-    getSearchResultsWithoutUnbookable,
-    getTotalResultCountWithoutUnbookable,
-    (available, total) => available.length !== total
-);
-
-/**
  * Get the map data for the current result list without unbookable ones.
  */
 export const getSearchResultsForMap = createSelector(

@@ -61,7 +61,6 @@ class BookRoom extends React.Component {
         isSearching: PropTypes.bool.isRequired,
         searchFinished: PropTypes.bool.isRequired,
         isTimelineVisible: PropTypes.bool.isRequired,
-        hasConflicts: PropTypes.bool.isRequired,
         totalResultCount: PropTypes.number.isRequired,
         unbookableResultCount: PropTypes.number.isRequired,
         filters: PropTypes.object.isRequired,
@@ -341,7 +340,7 @@ class BookRoom extends React.Component {
     };
 
     renderViewSwitch() {
-        const {isTimelineVisible, hasConflicts} = this.props;
+        const {isTimelineVisible} = this.props;
         const classes = toClasses({active: isTimelineVisible, disabled: !this.timelineButtonEnabled});
 
         const listBtn = (
@@ -369,9 +368,6 @@ class BookRoom extends React.Component {
                         {!isTimelineVisible ? (
                             <Popup trigger={timelineBtn} content={Translate.string('Timeline view')} />
                         ) : timelineBtn}
-                        {hasConflicts && (
-                            <Icon name="exclamation triangle" styleName="conflicts-icon" color="red" corner />
-                        )}
                     </Icon.Group>
                 </span>
             </div>
@@ -435,7 +431,6 @@ const mapStateToProps = (state) => {
         unbookableResultCount: bookRoomSelectors.getUnbookableResultCount(state),
         isSearching: bookRoomSelectors.isSearchingOrCheckingPermissions(state),
         searchFinished: bookRoomSelectors.isSearchAndPermissionCheckFinished(state),
-        hasConflicts: bookRoomSelectors.hasUnavailableRooms(state),
         queryString: stateToQueryString(state.bookRoom, qsFilterRules, qsBookRoomRules),
         showMap: mapSelectors.isMapVisible(state),
         dateRange: bookRoomSelectors.getTimelineDateRange(state),
