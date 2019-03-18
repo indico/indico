@@ -19,5 +19,5 @@ from indico.core.signals import (acl, agreements, attachments, category, event, 
 from indico.core.signals.core import *
 
 
-__all__ = ('acl', 'agreements', 'attachments', 'category', 'event', 'event_management', 'menu', 'plugin', 'rh', 'users',
-           'rb')
+__all__ = ('acl', 'agreements', 'attachments', 'category', 'event', 'event_management', 'menu', 'plugin', 'rb', 'rh',
+           'users')

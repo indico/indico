@@ -20,8 +20,3 @@ from blinker import Namespace
 
 
 _signals = Namespace()
-
-
-rooms_fetched = _signals.signal('rooms_fetched', """
-Called when all rooms are fetched.  The *sender* is the list of serialized rooms.
-""")
