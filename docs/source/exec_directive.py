@@ -19,7 +19,7 @@ class ExecDirective(Directive):
         old_stdout, sys.stdout = sys.stdout, StringIO()
 
         try:
-            exec('\n'.join(self.content))
+            exec '\n'.join(self.content)
             text = sys.stdout.getvalue()
             lines = string2lines(text, tab_width, convert_whitespace=True)
             self.state_machine.insert_input(lines, source)

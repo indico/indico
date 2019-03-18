@@ -104,7 +104,7 @@ def _exec_custom(code, **extra):
     """Execute a custom code snippet and return all non-underscored values."""
     globals_ = _make_globals(**extra)
     locals_ = {}
-    exec(code, globals_, locals_)
+    exec code in globals_, locals_
     return {unicode(k): v for k, v in locals_.iteritems() if k[0] != '_'}
 
 
