@@ -57,14 +57,16 @@ def get_room_blockings(timeframe=None, created_by=None, in_rooms_owned_by=None):
 
 def get_rooms_blockings(rooms, start_date, end_date):
     room_ids = [room.id for room in rooms]
-    query = (BlockedRoom.query
-             .filter(BlockedRoom.room_id.in_(room_ids),
-                     BlockedRoom.state == BlockedRoomState.accepted,
-                     Blocking.start_date <= end_date,
-                     Blocking.end_date >= start_date)
-             .join(BlockedRoom.blocking)
-             .options(contains_eager('blocking')))
-    return group_list(query, key=lambda obj: obj.room_id)
+    blocked_rooms = (BlockedRoom.query
+                     .filter(BlockedRoom.room_id.in_(room_ids),
+                             BlockedRoom.state == BlockedRoomState.accepted,
+                             Blocking.start_date <= end_date,
+                             Blocking.end_date >= start_date)
+                     .join(BlockedRoom.blocking)
+                     .options(contains_eager('blocking'))).all()
+    overridable = [room for room in blocked_rooms if session.user in room.blocking.allowed]
+    nonoverridable = [room for room in blocked_rooms if session.user not in room.blocking.allowed]
+    return group_list(nonoverridable, key=lambda obj: obj.room_id), group_list(overridable, key=lambda obj: obj.room_id)
 
 
 @no_autoflush
