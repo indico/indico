@@ -25,6 +25,7 @@ from marshmallow_enum import EnumField
 from marshmallow_sqlalchemy import ModelConverter
 from marshmallow_sqlalchemy import ModelSchema as MSQLAModelSchema
 from sqlalchemy.orm import ColumnProperty
+from webargs.flaskparser import parser as webargs_flask_parser
 
 from indico.core import signals
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
@@ -98,3 +99,4 @@ class IndicoModelSchema(MSQLAModelSchema, IndicoSchema):
 
 mm.Schema = IndicoSchema
 mm.ModelSchema = IndicoModelSchema
+webargs_flask_parser.schema_class = IndicoSchema
