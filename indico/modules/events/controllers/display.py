@@ -20,6 +20,7 @@ from io import BytesIO
 
 from flask import jsonify, redirect, request, session
 
+from indico.core import signals
 from indico.legacy.common.output import outputGenerator
 from indico.legacy.common.xmlGen import XMLGen
 from indico.modules.events.controllers.base import RHDisplayEventBase, RHEventBase
@@ -27,6 +28,7 @@ from indico.modules.events.layout.views import WPPage
 from indico.modules.events.models.events import EventType
 from indico.modules.events.util import get_theme, serialize_event_for_ical
 from indico.modules.events.views import WPConferenceDisplay, WPSimpleEventDisplay
+from indico.util.signals import values_from_signal
 from indico.web.flask.util import send_file, url_for
 from indico.web.http_api.metadata import Serializer
 
@@ -34,9 +36,16 @@ from indico.web.http_api.metadata import Serializer
 class RHExportEventICAL(RHDisplayEventBase):
     def _process(self):
         detail_level = request.args.get('detail', 'events')
-        data = {'results': serialize_event_for_ical(self.event, detail_level)}
+        data = serialize_event_for_ical(self.event, detail_level)
+
+        # check whether the plugins want to add/override any data
+        for update in values_from_signal(
+                signals.event.metadata_postprocess.send('ical-export', event=self.event, data=data), as_list=True):
+            data.update(update)
+
+        response = {'results': data}
         serializer = Serializer.create('ics')
-        return send_file('event.ics', BytesIO(serializer(data)), 'text/calendar')
+        return send_file('event.ics', BytesIO(serializer(response)), 'text/calendar')
 
 
 class RHDisplayEvent(RHDisplayEventBase):

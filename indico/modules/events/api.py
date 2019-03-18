@@ -26,6 +26,7 @@ from sqlalchemy import Date, cast
 from sqlalchemy.orm import joinedload, subqueryload, undefer
 from werkzeug.exceptions import ServiceUnavailable
 
+from indico.core import signals
 from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.principals import PrincipalType
@@ -42,6 +43,7 @@ from indico.modules.events.timetable.models.entries import TimetableEntry
 from indico.util.date_time import iterdays
 from indico.util.fossilize import fossilize
 from indico.util.fossilize.conversion import Conversion
+from indico.util.signals import values_from_signal
 from indico.util.string import to_unicode
 from indico.web.flask.util import send_file, url_for
 from indico.web.http_api.fossils import IPeriodFossil
@@ -614,6 +616,10 @@ class CategoryEventFetcher(IteratedDataFetcher, SerializerBase):
             data['occurrences'] = fossilize(self._calculate_occurrences(event, self._fromDT, self._toDT,
                                             pytz.timezone(config.DEFAULT_TIMEZONE)),
                                             {Period: IPeriodFossil}, tz=self._tz, naiveTZ=config.DEFAULT_TIMEZONE)
+        # check whether the plugins want to add/override any data
+        for update in values_from_signal(
+                signals.event.metadata_postprocess.send('http-api', event=event, data=data), as_list=True):
+            data.update(update)
         return data
 
 
