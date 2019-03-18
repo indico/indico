@@ -48,6 +48,7 @@ export default class ElasticTimeline extends React.Component {
         extraContent: PropTypes.node,
         showUnused: PropTypes.bool,
         fixedHeight: PropTypes.string,
+        roomTimelineAction: PropTypes.bool,
     };
 
     static defaultProps = {
@@ -69,6 +70,7 @@ export default class ElasticTimeline extends React.Component {
         lazyScroll: null,
         showUnused: true,
         fixedHeight: null,
+        roomTimelineAction: false,
     };
 
     _getDayRowSerializer(dt) {
@@ -171,7 +173,7 @@ export default class ElasticTimeline extends React.Component {
         const {
             extraContent, onClickCandidate, onClickReservation, availability, isLoading,
             onAddSlot, longLabel, onClickLabel, lazyScroll, datePicker: {minHour, maxHour, hourStep, mode, dateRange},
-            showUnused, fixedHeight, emptyMessage
+            showUnused, fixedHeight, emptyMessage, roomTimelineAction
         } = this.props;
         let Component = DailyTimelineContent;
         let rows = this.calcDailyRows(availability);
@@ -215,6 +217,7 @@ export default class ElasticTimeline extends React.Component {
                                lazyScroll={lazyScroll}
                                showUnused={showUnused}
                                fixedHeight={fixedHeight}
+                               rowActions={{roomTimeline: roomTimelineAction}}
                                gutterAllowed />
                 </>
             </div>

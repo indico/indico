@@ -120,7 +120,7 @@ class BookingDetails extends React.Component {
             <DailyTimelineContent rows={rows}
                                   fixedHeight={rows.length > 1 ? '70vh' : null}
                                   booking={booking}
-                                  showActions />
+                                  rowActions={{occurrence: true}} />
         );
     };
 

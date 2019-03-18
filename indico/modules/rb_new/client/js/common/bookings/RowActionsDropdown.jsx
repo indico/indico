@@ -20,24 +20,31 @@ import PropTypes from 'prop-types';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import {Form as FinalForm, Field} from 'react-final-form';
-import {Button, Icon, Confirm, Dropdown, Form, Portal, TextArea} from 'semantic-ui-react';
+import {Button, Icon, Confirm, Dropdown, Form, Portal, TextArea, Modal} from 'semantic-ui-react';
 
 import {serializeDate} from 'indico/utils/date';
 import {ReduxFormField, formatters, validators as v} from 'indico/react/forms';
 import {Param, Translate} from 'indico/react/i18n';
 import * as bookingsActions from './actions';
 
-import './OccurrenceActionsDropdown.module.scss';
+import './RowActionsDropdown.module.scss';
 
 
-class OccurrenceActionsDropdown extends React.Component {
+class RowActionsDropdown extends React.Component {
     static propTypes = {
-        booking: PropTypes.object.isRequired,
-        date: PropTypes.object.isRequired,
+        booking: PropTypes.object,
+        date: PropTypes.object,
+        room: PropTypes.object,
         actions: PropTypes.exact({
             changeBookingOccurrenceState: PropTypes.func.isRequired,
             fetchBookingDetails: PropTypes.func.isRequired
         }).isRequired,
+    };
+
+    static defaultProps = {
+        booking: null,
+        date: null,
+        room: null,
     };
 
     constructor(props) {
@@ -48,6 +55,7 @@ class OccurrenceActionsDropdown extends React.Component {
     state = {
         actionInProgress: false,
         activeConfirmation: null,
+        activeRoomTimeline: false,
         dropdownOpen: false,
         top: 0,
         left: 0,
@@ -60,6 +68,14 @@ class OccurrenceActionsDropdown extends React.Component {
 
     showConfirm = (type) => {
         this.setState({activeConfirmation: type});
+    };
+
+    showRoomTimeline = () => {
+        this.setState({activeRoomTimeline: true});
+    };
+
+    hideRoomTimeline = () => {
+        this.setState({activeRoomTimeline: false});
     };
 
     changeOccurrenceState = async (action, data = {}) => {
@@ -124,16 +140,20 @@ class OccurrenceActionsDropdown extends React.Component {
     };
 
     render() {
-        const {activeConfirmation, actionInProgress, dropdownOpen, top, left} = this.state;
-        const {booking: {occurrences}, date} = this.props;
+        const {activeConfirmation, activeRoomTimeline, actionInProgress, dropdownOpen, top, left} = this.state;
+        const {booking, date, room} = this.props;
         const serializedDate = serializeDate(date, 'L');
+        let canCancel, canReject;
         const rejectionForm = (
             <FinalForm onSubmit={(data) => this.changeOccurrenceState('reject', data)}
                        render={this.renderRejectionForm} />
         );
 
-        const {canCancel, canReject} = occurrences.bookings[serializeDate(date)][0];
-        if (!canCancel && !canReject) {
+        if (booking) {
+            ({canCancel, canReject} = booking.occurrences.bookings[serializeDate(date)][0]);
+        }
+
+        if (!canCancel && !canReject && !room) {
             return null;
         }
 
@@ -169,6 +189,11 @@ class OccurrenceActionsDropdown extends React.Component {
                                                text={Translate.string('Reject occurrence')}
                                                onClick={() => this.showConfirm('reject')} />
                             )}
+                            {room && (
+                                <Dropdown.Item icon="list"
+                                               text={Translate.string('Show room timeline')}
+                                               onClick={() => this.showRoomTimeline()} />
+                            )}
                         </Dropdown.Menu>
                     </Dropdown>
                 </Portal>
@@ -193,6 +218,9 @@ class OccurrenceActionsDropdown extends React.Component {
                          cancelButton={Translate.string('Close')}
                          open={activeConfirmation === 'reject'}
                          onCancel={this.hideConfirm} />
+                <Modal open={activeRoomTimeline} onClose={this.hideRoomTimeline} size="large" closeIcon>
+                    <div>Room timeline goes here</div>
+                </Modal>
             </div>
         );
     }
@@ -206,4 +234,4 @@ export default connect(
             fetchBookingDetails: bookingsActions.fetchBookingDetails
         }, dispatch)
     }),
-)(OccurrenceActionsDropdown);
+)(RowActionsDropdown);
