@@ -27,7 +27,7 @@ import {toMoment} from 'indico/utils/date';
 import {TooltipIfTruncated} from 'indico/react/components';
 import {Overridable} from 'indico/react/util';
 
-import OccurrenceActionsDropdown from '../bookings/OccurrenceActionsDropdown';
+import RowActionsDropdown from '../bookings/RowActionsDropdown';
 import TimelineItem from './TimelineItem';
 import EditableTimelineItem from './EditableTimelineItem';
 
@@ -50,7 +50,7 @@ export default class DailyTimelineContent extends React.Component {
         fixedHeight: PropTypes.string,
         onAddSlot: PropTypes.func,
         renderHeader: PropTypes.func,
-        showActions: PropTypes.bool,
+        rowActions: PropTypes.objectOf(PropTypes.bool),
         booking: PropTypes.object,
         gutterAllowed: PropTypes.bool,
     };
@@ -69,7 +69,10 @@ export default class DailyTimelineContent extends React.Component {
         fixedHeight: null,
         onAddSlot: null,
         renderHeader: null,
-        showActions: false,
+        rowActions: {
+            occurrence: false,
+            roomTimeline: false,
+        },
         booking: null,
         gutterAllowed: false,
     };
@@ -113,7 +116,7 @@ export default class DailyTimelineContent extends React.Component {
             onClickCandidate,
             onClickReservation,
             longLabel,
-            showActions,
+            rowActions,
             gutterAllowed,
         } = this.props;
         const columns = ((maxHour - minHour) / hourStep) + 1;
@@ -137,7 +140,9 @@ export default class DailyTimelineContent extends React.Component {
                                }}
                                {...itemProps} />
                 </div>
-                {showActions && this.renderRowActions(availability)}
+                <div styleName="timeline-row-actions">
+                    {Object.values(rowActions).includes(true) && this.renderRowActions(availability, room)}
+                </div>
             </div>
         );
     }
@@ -166,23 +171,22 @@ export default class DailyTimelineContent extends React.Component {
         );
     }
 
-    renderRowActions = (availability) => {
-        const {booking} = this.props;
-        if (!booking || !availability.bookings.length) {
-            return <div styleName="timeline-row-actions" />;
+    renderRowActions = (availability, room) => {
+        const {booking, rowActions} = this.props;
+        let props = {};
+        if (rowActions.occurrence && booking && availability.bookings.length) {
+            props = {date: toMoment(availability.bookings[0].startDt), booking};
         }
-        const date = toMoment(availability.bookings[0].startDt);
-        return (
-            <div styleName="timeline-row-actions">
-                <OccurrenceActionsDropdown booking={booking} date={date} />
-            </div>
-        );
+        if (rowActions.roomTimeline) {
+            props = {...props, room};
+        }
+        return <RowActionsDropdown {...props} />;
     };
 
     renderDefaultHeader = (hourSpan, hourSeries) => {
-        const {hourStep, longLabel, showActions} = this.props;
+        const {hourStep, longLabel, rowActions} = this.props;
         const labelWidth = longLabel ? 200 : 150;
-        const actionsWidth = showActions ? 70 : 0;
+        const actionsWidth = (Object.values(rowActions).includes(true)) ? 70 : 0;
 
         return (
             <>
@@ -214,10 +218,10 @@ export default class DailyTimelineContent extends React.Component {
     );
 
     renderList(hourSpan, width, height = null, extraProps = {}) {
-        const {rows, hourStep, longLabel, isLoading, showActions} = this.props;
+        const {rows, hourStep, longLabel, isLoading, rowActions} = this.props;
         const {selectable} = this.state;
         const labelWidth = longLabel ? 200 : 150;
-        const actionsWidth = showActions ? 70 : 0;
+        const actionsWidth = (Object.values(rowActions).includes(true)) ? 70 : 0;
         const rowHeight = 50;
 
         return (
