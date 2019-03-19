@@ -103,6 +103,7 @@ $split-row-height: $row-height/2;
         }
 
         .timeline-row-content {
+            flex: 1;
             position: relative;
             height: $row-height;
         }
