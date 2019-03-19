@@ -398,7 +398,7 @@ class EventImporter(object):
         self.verbose = verbose
         self.force = force
         self.archive = tarfile.open(fileobj=source_file)
-        self.data = yaml.load(self.archive.extractfile('data.yaml'))
+        self.data = yaml.unsafe_load(self.archive.extractfile('data.yaml'))
         self.id_map = {}
         self.user_map = {}
         self.event_id = None

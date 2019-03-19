@@ -98,7 +98,7 @@ def test_event_attachment_export(db, dummy_event, dummy_attachment):
 
     with tarfile.open(fileobj=f) as tarf:
         data_file = tarf.extractfile('data.yaml')
-        data = yaml.load(data_file)
+        data = yaml.unsafe_load(data_file)
         objs = data['objects']
         event_uid = objs[0][1]['id'][1]
 
