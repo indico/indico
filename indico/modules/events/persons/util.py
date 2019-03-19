@@ -47,7 +47,7 @@ def get_event_person(event, data, create_untrusted_persons=False, allow_external
     if person_type is None:
         if data.get('email'):
             email = data['email'].lower()
-            user = User.find_first(~User.is_deleted, User.all_emails.contains(email))
+            user = User.query.filter(~User.is_deleted, User.all_emails == email).first()
             if user:
                 return get_event_person_for_user(event, user, create_untrusted_persons=create_untrusted_persons)
             elif event:

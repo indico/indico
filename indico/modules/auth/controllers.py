@@ -260,8 +260,8 @@ class RHRegister(RH):
         # Check for pending users if we have verified emails
         pending = None
         if not handler.must_verify_email:
-            pending = User.find_first(~User.is_deleted, User.is_pending,
-                                      User.all_emails.contains(db.func.any(list(handler.get_all_emails(form)))))
+            pending = User.query.filter(~User.is_deleted, User.is_pending,
+                                        User.all_emails.in_(list(handler.get_all_emails(form)))).first()
         if form.validate_on_submit():
             if handler.must_verify_email:
                 return self._send_confirmation(form.email.data)
@@ -305,7 +305,7 @@ class RHRegister(RH):
     def _create_registration_request(self, form, handler):
         registration_data = self._prepare_registration_data(form, handler)
         email = registration_data['email']
-        req = RegistrationRequest.find_first(email=email) or RegistrationRequest(email=email)
+        req = RegistrationRequest.query.filter_by(email=email).first() or RegistrationRequest(email=email)
         req.comment = form.comment.data
         req.populate_from_dict(registration_data)
         db.session.add(req)

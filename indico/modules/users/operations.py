@@ -46,8 +46,8 @@ def create_user(email, data, identity=None, settings=None, other_emails=None, fr
     settings.setdefault('lang', config.DEFAULT_LOCALE)
     settings.setdefault('suggest_categories', False)
     # Get a pending user if there is one
-    user = User.find_first(~User.is_deleted, User.is_pending,
-                           User.all_emails.contains(db.func.any(list({email} | set(other_emails)))))
+    user = User.query.filter(~User.is_deleted, User.is_pending,
+                             User.all_emails.in_({email} | set(other_emails))).first()
     if not user:
         user = User()
 

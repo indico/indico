@@ -49,7 +49,7 @@ user_colors = ['#e06055', '#ff8a65', '#e91e63', '#f06292', '#673ab7', '#ba68c8',
 
 def get_admin_emails():
     """Get the email addresses of all Indico admins"""
-    return {u.email for u in User.find(is_admin=True, is_deleted=False)}
+    return {u.email for u in User.query.filter_by(is_admin=True, is_deleted=False)}
 
 
 def get_related_categories(user, detailed=True):
@@ -303,7 +303,7 @@ def get_user_by_email(email, create_pending=False):
     if not email:
         return None
     if not create_pending:
-        res = User.find_all(~User.is_deleted, User.all_emails.contains(email))
+        res = User.query.filter(~User.is_deleted, User.all_emails == email).all()
     else:
         res = search_users(exact=True, include_pending=True, external=True, email=email)
     if len(res) != 1:
@@ -340,7 +340,7 @@ def merge_users(source, target, force=False):
     primary_source_email = source.email
     logger.info("Target %s initial emails: %s", target, ', '.join(target.all_emails))
     logger.info("Source %s emails to be linked to target %s: %s", source, target, ', '.join(source.all_emails))
-    UserEmail.find(user_id=source.id).update({
+    UserEmail.query.filter_by(user_id=source.id).update({
         UserEmail.user_id: target.id,
         UserEmail.is_primary: False
     })

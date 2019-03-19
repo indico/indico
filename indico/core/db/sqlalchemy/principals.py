@@ -107,7 +107,7 @@ class EmailPrincipal(Fossilizable):
     @property
     def user(self):
         from indico.modules.users import User
-        return User.find_first(~User.is_deleted, User.all_emails.contains(self.email))
+        return User.query.filter(~User.is_deleted, User.all_emails == self.email).first()
 
     def __eq__(self, other):
         return isinstance(other, EmailPrincipal) and self.email == other.email

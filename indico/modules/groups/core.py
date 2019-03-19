@@ -271,7 +271,7 @@ class _MultipassGroupProxy(GroupProxy):
         return set(User.query.outerjoin(Identity).filter(
             ~User.is_deleted,
             db.or_(
-                User.all_emails.contains(db.func.any(list(emails))),
+                User.all_emails.in_(list(emails)),
                 db.and_(
                     Identity.provider == self.provider,
                     Identity.identifier.in_(identifiers)

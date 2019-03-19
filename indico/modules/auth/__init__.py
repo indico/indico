@@ -47,7 +47,7 @@ def process_identity(identity_info):
         emails = {email.lower() for email in identity_info.data.getlist('email') if email}
         if emails:
             identity_info.data.setlist('email', emails)
-            users = User.query.filter(~User.is_deleted, User.all_emails.contains(db.func.any(list(emails)))).all()
+            users = User.query.filter(~User.is_deleted, User.all_emails.in_(list(emails))).all()
             if len(users) == 1:
                 user = users[0]
             elif len(users) > 1:

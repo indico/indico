@@ -113,7 +113,7 @@ def create(grant_admin):
         if email is None:
             return
         email = email.lower()
-        if not User.find(User.all_emails.contains(email), ~User.is_deleted, ~User.is_pending).count():
+        if not User.query.filter(User.all_emails == email, ~User.is_deleted, ~User.is_pending).has_rows():
             break
         print(cformat('%{red}Email already exists'))
     first_name = click.prompt("First name").strip()

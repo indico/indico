@@ -58,7 +58,7 @@ class AvatarUserWrapper(Fossilizable):
             identifier = data[1]
             email = data[2]
             # You better have only one ldap provider or at least different identifiers ;)
-            identity = Identity.find_first(Identity.provider != 'indico', Identity.identifier == identifier)
+            identity = Identity.query.filter(Identity.provider != 'indico', Identity.identifier == identifier).first()
             if identity:
                 user = identity.user
         elif data[0] == 'Nice':
@@ -66,7 +66,7 @@ class AvatarUserWrapper(Fossilizable):
         else:
             return None
         if not user:
-            user = User.find_first(User.all_emails.contains(email))
+            user = User.query.filter(User.all_emails == email).first()
         if user:
             self._old_id = self.id
             self.id = str(user.id)

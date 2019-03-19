@@ -434,7 +434,7 @@ class EventImporter(object):
                 self.user_map[uuid] = self.system_user_id
                 continue
             user = (User.query
-                    .filter(User.all_emails.contains(db.func.any(userdata['all_emails'])),
+                    .filter(User.all_emails.in_(userdata['all_emails']),
                             ~User.is_deleted)
                     .first())
             if user is None:
@@ -510,7 +510,7 @@ class EventImporter(object):
         # link objects to users by email where possible
         # event principals
         emails = [p.email for p in EventPrincipal.query.with_parent(event).filter_by(type=PrincipalType.email)]
-        for user in User.query.filter(~User.is_deleted, User.all_emails.contains(db.func.any(emails))):
+        for user in User.query.filter(~User.is_deleted, User.all_emails.in_(emails)):
             EventPrincipal.replace_email_with_user(user, 'event')
 
         # session principals
@@ -518,7 +518,7 @@ class EventImporter(object):
                  .filter(SessionPrincipal.session.has(Session.event == event),
                          SessionPrincipal.type == PrincipalType.email))
         emails = [p.email for p in query]
-        for user in User.query.filter(~User.is_deleted, User.all_emails.contains(db.func.any(emails))):
+        for user in User.query.filter(~User.is_deleted, User.all_emails.in_(emails)):
             SessionPrincipal.replace_email_with_user(user, 'session')
 
         # contribution principals
@@ -526,7 +526,7 @@ class EventImporter(object):
                  .filter(ContributionPrincipal.contribution.has(Contribution.event == event),
                          ContributionPrincipal.type == PrincipalType.email))
         emails = [p.email for p in query]
-        for user in User.query.filter(~User.is_deleted, User.all_emails.contains(db.func.any(emails))):
+        for user in User.query.filter(~User.is_deleted, User.all_emails.in_(emails)):
             ContributionPrincipal.replace_email_with_user(user, 'contribution')
 
         # event persons

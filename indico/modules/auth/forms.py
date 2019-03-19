@@ -33,12 +33,12 @@ def _tolower(s):
 
 
 def _check_existing_email(form, field):
-    if User.find_all(~User.is_deleted, ~User.is_pending, User.all_emails.contains(field.data)):
+    if User.query.filter(~User.is_deleted, ~User.is_pending, User.all_emails == field.data).has_rows():
         raise ValidationError(_('This email address is already in use.'))
 
 
 def _check_existing_username(form, field):
-    if Identity.find(provider='indico', identifier=field.data).count():
+    if Identity.query.filter(provider='indico', identifier=field.data).has_rows():
         raise ValidationError(_('This username is already in use.'))
 
 
@@ -68,10 +68,10 @@ class EditLocalIdentityForm(IndicoForm):
             raise ValidationError(_("Wrong current password"))
 
     def validate_username(self, field):
-        query = Identity.find(Identity.provider == 'indico',
-                              Identity.identifier == field.data,
-                              Identity.identifier != self.identity.identifier)
-        if query.count():
+        query = Identity.query.filter(Identity.provider == 'indico',
+                                      Identity.identifier == field.data,
+                                      Identity.identifier != self.identity.identifier)
+        if query.has_rows():
             raise ValidationError(_('This username is already in use.'))
 
 
@@ -131,8 +131,9 @@ class ResetPasswordEmailForm(IndicoForm):
     def user(self):
         if not self.is_submitted() or not self.email.data:
             return None
-        return User.find_first(~User.is_deleted, ~User.is_blocked, ~User.is_pending,
-                               User.all_emails.contains(self.email.data))
+        return (User.query
+                .filter(~User.is_deleted, ~User.is_blocked, ~User.is_pending, User.all_emails == self.email.data)
+                .first())
 
 
 class ResetPasswordForm(IndicoForm):
