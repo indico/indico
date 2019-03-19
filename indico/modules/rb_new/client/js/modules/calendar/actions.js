@@ -71,7 +71,7 @@ async function fetchCalendarRooms(dispatch, state) {
     try {
         response = await indicoAxios.get(searchRoomsURL(), {params: searchParams});
     } catch (error) {
-        const message = handleAxiosError(error, true);
+        const message = handleAxiosError(error);
         dispatch({type: FETCH_CALENDAR_ERROR, error: message});
         return [];
     }

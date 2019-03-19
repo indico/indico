@@ -121,7 +121,7 @@ export function fetchUnavailableRooms(filters) {
         try {
             response = await indicoAxios.get(searchRoomsURL(), {params: searchParams});
         } catch (error) {
-            const message = handleAxiosError(error, true);
+            const message = handleAxiosError(error);
             dispatch({type: GET_UNAVAILABLE_TIMELINE_ERROR, error: message});
             return;
         }
