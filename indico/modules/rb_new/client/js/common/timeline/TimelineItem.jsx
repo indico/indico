@@ -32,6 +32,7 @@ const classes = {
     bookings: 'booking',
     conflicts: 'conflict',
     blockings: 'blocking',
+    overridableBlockings: 'overridable-blocking',
     nonbookablePeriods: 'unbookable-periods',
     unbookableHours: 'unbookable-hours',
     cancellations: 'cancellation',
@@ -44,6 +45,7 @@ const classes = {
 const types = {
     candidates: 'candidate',
     blockings: 'blocking',
+    overridableBlockings: 'overridable-blocking',
     bookings: 'booking',
     nonbookablePeriods: 'unbookable-periods',
     unbookableHours: 'unbookable-hours',
@@ -67,6 +69,7 @@ const renderOrder = [
     'bookings',
     'candidates',
     'conflicts',
+    'overridableBlockings',
     'blockings',
     'nonbookablePeriods',
     'unbookableHours',
@@ -146,7 +149,7 @@ class TimelineItem extends React.Component {
             bookable
         } = occurrence;
         const {startHour, endHour, onClickCandidate, onClickReservation, room, dayBased} = this.props;
-        if (type === 'blocking') {
+        if (type === 'blocking' || type === 'overridable-blocking') {
             segmentStartDt = moment(startHour, 'HH:mm');
             segmentEndDt = (endHour === 24 ? moment('23:59', 'HH:mm') : moment(endHour, 'HH:mm'));
         } else if (type === 'unbookable-hours') {
@@ -162,6 +165,13 @@ class TimelineItem extends React.Component {
         if (type === 'blocking') {
             popupContent = (
                 <div styleName="popup-center">{Translate.string('Space blocked: {reason}', {reason})}</div>
+            );
+        } else if (type === 'overridable-blocking') {
+            popupContent = (
+                <div styleName="popup-center">
+                    <div>{Translate.string('Space blocked: {reason}', {reason})}</div>
+                    <div styleName="allowed">{Translate.string('(You are allowed to make a booking)')}</div>
+                </div>
             );
         } else if (type === 'unbookable-periods') {
             popupContent = (

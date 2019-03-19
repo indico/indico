@@ -32,7 +32,7 @@ import './SingleRoomTimelineModal.module.scss';
 
 const _getRowSerializer = (day, room) => {
     return ({bookings, preBookings, candidates, conflictingCandidates, nonbookablePeriods, unbookableHours,
-             blockings, conflicts, preConflicts}) => ({
+             blockings, overridableBlockings, conflicts, preConflicts}) => ({
         availability: {
             candidates: (candidates[day] || []).map((candidate) => ({...candidate, bookable: false})) || [],
             conflictingCandidates: (conflictingCandidates[day] || []).map((candidate) => (
@@ -44,7 +44,8 @@ const _getRowSerializer = (day, room) => {
             preConflicts: preConflicts[day] || [],
             nonbookablePeriods: nonbookablePeriods[day] || [],
             unbookableHours: unbookableHours || [],
-            blockings: blockings[day] || []
+            blockings: blockings[day] || [],
+            overridableBlockings: overridableBlockings[day] || [],
         },
         label: serializeDate(day, 'L'),
         key: day,
