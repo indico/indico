@@ -24,6 +24,11 @@ export function handleSubmissionError(error, defaultMessage = null, fieldErrorMa
     if (webargsErrors && error.response.status === 422) {
         // flatten errors in case there's more than one
         return _.fromPairs(Object.entries(webargsErrors).map(([field, errors]) => {
+            if (_.isPlainObject(errors)) {
+                // marshmallow's List returns an object with the index as the key
+                // since we don't show details, just take the actual errors without duplicates
+                errors = _.uniq(Object.values(errors));
+            }
             return [fieldErrorMap[field] || field, errors.join(' / ')];
         }));
     } else {
