@@ -77,7 +77,7 @@ export default class ElasticTimeline extends React.Component {
         const {bookingAllowed, datePicker: {dateRange}} = this.props;
         return ({
             candidates, conflictingCandidates, preBookings, bookings, preConflicts, conflicts, blockings,
-            nonbookablePeriods, unbookableHours, cancellations, rejections
+            overridableBlockings, nonbookablePeriods, unbookableHours, cancellations, rejections
         }) => {
             const hasConflicts = !!(conflicts[dt] || []).length;
             return {
@@ -88,6 +88,7 @@ export default class ElasticTimeline extends React.Component {
                 conflicts: conflicts[dt] || [],
                 preConflicts: preConflicts[dt] || [],
                 blockings: blockings[dt] || [],
+                overridableBlockings: overridableBlockings[dt] || [],
                 nonbookablePeriods: nonbookablePeriods[dt] || [],
                 unbookableHours: (dateRange.length !== 0 && !dateRange.includes(dt)) ? [] : (unbookableHours || []),
                 cancellations: cancellations[dt] || [],

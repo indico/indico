@@ -102,6 +102,13 @@
                 color: darken($conflict-color, 10%);
             }
 
+            &.overridable-blocking {
+                @include thin-stripes($overridable-blocking-stripe-colors...);
+                background-size: 35px 35px;
+                border: 1px solid $overridable-blocking-color;
+                color: darken($overridable-blocking-color, 20%);
+            }
+
             &.rejection {
                 background-color: $rejection-color;
                 border: 1px solid darken($rejection-color, 25%);
