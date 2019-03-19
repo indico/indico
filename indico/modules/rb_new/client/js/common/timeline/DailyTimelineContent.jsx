@@ -119,7 +119,6 @@ export default class DailyTimelineContent extends React.Component {
             rowActions,
             gutterAllowed,
         } = this.props;
-        const columns = ((maxHour - minHour) / hourStep) + 1;
         const hasConflicts = !(_.isEmpty(availability.conflicts) && _.isEmpty(availability.preConflicts));
         const {ItemClass, itemProps} = this.getEditableItem(room);
         const rowLabelProps = {label, verboseLabel, longLabel, gutterAllowed, onClickLabel: this.onClickLabel(room.id)};
@@ -127,7 +126,7 @@ export default class DailyTimelineContent extends React.Component {
         return (
             <div styleName="timeline-row" key={key} style={rowStyle}>
                 {this.renderRowLabel(rowLabelProps, room)}
-                <div styleName="timeline-row-content" style={{flex: columns}}>
+                <div styleName="timeline-row-content">
                     <ItemClass startHour={minHour} endHour={maxHour} data={availability} room={room}
                                onClickReservation={onClickReservation}
                                onClickCandidate={() => {

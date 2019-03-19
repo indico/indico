@@ -40,7 +40,15 @@ export default class WeeklyTimelineContent extends DailyTimelineContent {
     }
 
     renderTimelineRow({availability, room, label, verboseLabel}, key, rowStyle = null) {
-        const {minHour, maxHour, longLabel, onClickReservation, gutterAllowed, onClickCandidate} = this.props;
+        const {
+            minHour,
+            maxHour,
+            longLabel,
+            onClickReservation,
+            gutterAllowed,
+            onClickCandidate,
+            rowActions
+        } = this.props;
         const hasConflicts = availability.some(([, {conflicts}]) => !!conflicts.length);
         const {ItemClass, itemProps} = this.getEditableItem(room);
         const rowLabelProps = {label, verboseLabel, longLabel, gutterAllowed, onClickLabel: this.onClickLabel(room.id)};
@@ -66,6 +74,9 @@ export default class WeeklyTimelineContent extends DailyTimelineContent {
                                    }}
                                    {...itemProps} />
                     ))}
+                </div>
+                <div styleName="baseStyle.timeline-row-actions">
+                    {rowActions.roomTimeline && this.renderRowActions(availability, room)}
                 </div>
             </div>
         );
@@ -97,8 +108,9 @@ export default class WeeklyTimelineContent extends DailyTimelineContent {
     }
 
     renderHeader() {
-        const {longLabel, selectable} = this.props;
+        const {longLabel, selectable, rowActions} = this.props;
         const labelWidth = longLabel ? 200 : 150;
+        const actionsWidth = rowActions.roomTimeline ? 70 : 0;
         return (
             <>
                 <div styleName="baseStyle.timeline-header" className={!selectable ? 'timeline-non-selectable' : ''}>
@@ -113,6 +125,7 @@ export default class WeeklyTimelineContent extends DailyTimelineContent {
                             </div>
                         ))}
                     </div>
+                    <div style={{width: actionsWidth}} />
                 </div>
             </>
         );
