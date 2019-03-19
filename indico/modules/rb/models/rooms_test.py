@@ -160,17 +160,6 @@ def test_owner_after_change(dummy_room, dummy_user):
     assert dummy_room.owner == dummy_user
 
 
-@pytest.mark.parametrize(('value', 'emails'), (
-    (u'', set()),
-    (u'example@example.com', {u'example@example.com'}),
-    (u'  example@example.com   ,m\xf6p@example.cm\xf6pm  ', {u'example@example.com', u'm\xf6p@example.cm\xf6pm'}),
-))
-def test_notification_emails(create_room_attribute, dummy_room, value, emails):
-    create_room_attribute(u'notification-email')
-    dummy_room.set_attribute_value(u'notification-email', value)
-    assert dummy_room.notification_emails == emails
-
-
 @pytest.mark.parametrize(('name', 'expected'), (
     (u'foo', True),
     (u'bar', True),

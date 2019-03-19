@@ -20,6 +20,7 @@ import warnings
 from datetime import date, time
 
 from sqlalchemy import and_, cast, func, or_
+from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import contains_eager, joinedload, load_only, raiseload
 
@@ -129,6 +130,11 @@ class Room(versioned_cache(_cache, 'id'), ProtectionManagersMixin, db.Model, Ser
         db.String,
         default='',
         nullable=False
+    )
+    notification_emails = db.Column(
+        ARRAY(db.String),
+        nullable=False,
+        default=[]
     )
     notification_before_days = db.Column(
         db.Integer
@@ -433,10 +439,6 @@ class Room(versioned_cache(_cache, 'id'), ProtectionManagersMixin, db.Model, Ser
             return set()
         group = GroupProxy.get_named_default_group(manager_group)
         return {u.email for u in group.get_members()}
-
-    @property
-    def notification_emails(self):
-        return set(filter(None, map(unicode.strip, self.get_attribute_value(u'notification-email', u'').split(u','))))
 
     @property
     def sprite_position(self):

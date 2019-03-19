@@ -81,7 +81,7 @@ class RoomUpdateSchema(RoomSchema):
                                            'notification_before_days_monthly', 'notifications_enabled',
                                            'end_notification_daily', 'end_notification_weekly',
                                            'end_notification_monthly', 'end_notifications_enabled',
-                                           'verbose_name', 'site')
+                                           'verbose_name', 'site', 'notification_emails')
 
 
 class RoomEquipmentSchema(mm.ModelSchema):

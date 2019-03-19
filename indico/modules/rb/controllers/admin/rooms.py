@@ -16,7 +16,6 @@
 
 from flask import flash, redirect, request
 from wtforms import StringField
-from wtforms.validators import DataRequired
 
 from indico.core.db import db
 from indico.legacy.common.cache import GenericCache
@@ -34,7 +33,6 @@ from indico.modules.rb_new.util import build_rooms_spritesheet
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
-from indico.web.forms.validators import IndicoEmail
 
 
 _cache = GenericCache('Rooms')
@@ -72,11 +70,8 @@ class RHRoomBookingCreateModifyRoomBase(RHRoomBookingAdminBase):
 
         # Custom attributes - new fields must be set on the class
         for attribute in RoomAttribute.query.all():
-            validators = []
-            if attribute.name == 'notification-email':
-                validators.append(IndicoEmail(multi=True))
             field_name = 'attribute_{}'.format(attribute.id)
-            field = StringField(attribute.title, validators)
+            field = StringField(attribute.title)
             setattr(form_class, field_name, field)
 
         # Create the form

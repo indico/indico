@@ -41,7 +41,7 @@ import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {snakifyKeys, camelizeKeys} from 'indico/utils/case';
 import {getChangedValues, ReduxCheckboxField, ReduxFormField} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
-import PrincipalSearchField from 'indico/react/components/PrincipalSearchField';
+import {EmailListField, PrincipalSearchField} from 'indico/react/components';
 import EquipmentList from './EquipmentList';
 import DailyAvailability from './DailyAvailability';
 import NonBookablePeriods from './NonBookablePeriods';
@@ -266,6 +266,10 @@ const columns = [
     }, {
         type: 'header',
         label: Translate.string('Notifications')
+    }, {
+        type: 'emails',
+        name: 'notificationEmails',
+        label: Translate.string('Notification emails'),
     }, {
         type: 'formgroup',
         key: 'notifications',
@@ -646,6 +650,15 @@ class RoomEditModal extends React.Component {
                            label={content.label}
                            as={TextArea}
                            parse={null} />
+                );
+            case 'emails':
+                return (
+                    <Field key={key}
+                           name={content.name}
+                           label={content.label}
+                           component={ReduxFormField}
+                           as={EmailListField}
+                           isEqual={_.isEqual} />
                 );
             case 'photo':
                 return this.renderPhoto(room.spritePosition);
