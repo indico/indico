@@ -39,7 +39,7 @@ import arrayMutators from 'final-form-arrays';
 import shortid from 'shortid';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {snakifyKeys, camelizeKeys} from 'indico/utils/case';
-import {getChangedValues, ReduxCheckboxField, ReduxFormField} from 'indico/react/forms';
+import {getChangedValues, handleSubmitError, ReduxCheckboxField, ReduxFormField} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 import {EmailListField, PrincipalSearchField} from 'indico/react/components';
 import EquipmentList from './EquipmentList';
@@ -495,18 +495,20 @@ class RoomEditModal extends React.Component {
         const {availableEquipment, nonbookablePeriods, bookableHours, attributes} = changedValues;
 
         let submitState = 'success';
+        let submitError;
         try {
             await this.saveBasicDetails(roomId, basicDetails);
             await this.saveEquipment(roomId, availableEquipment);
             await this.saveAttributes(roomId, attributes);
             await this.saveAvailability(roomId, changedValues, nonbookablePeriods, bookableHours);
         } catch (e) {
-            handleAxiosError(e);
+            submitError = handleSubmitError(e);
             submitState = 'error';
         }
         // reload room so the form gets new initialValues
         await this.fetchRoomData();
         this.setState({submitState});
+        return camelizeKeys(submitError);
     };
 
     async saveBasicDetails(roomId, basicDetails) {
@@ -779,6 +781,7 @@ class RoomEditModal extends React.Component {
                                onSubmit={this.handleSubmit}
                                render={this.renderModalContent}
                                initialValues={initialValues}
+                               initialValuesEqual={_.isEqual}
                                mutators={{...arrayMutators}} />
                 </Modal>
             </>
