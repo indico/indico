@@ -35,7 +35,7 @@ from indico.modules.rb.models.reservation_occurrences import ReservationOccurren
 from indico.modules.rb.models.reservations import RepeatFrequency, Reservation
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb_new.controllers.backend.common import search_room_args
-from indico.modules.rb_new.operations.blockings import get_rooms_blockings
+from indico.modules.rb_new.operations.blockings import filter_blocked_rooms, get_rooms_blockings, group_blocked_rooms
 from indico.modules.rb_new.operations.bookings import (get_active_bookings, get_booking_occurrences,
                                                        get_matching_events, get_room_bookings, get_room_calendar,
                                                        get_rooms_availability, group_blockings,
@@ -91,13 +91,21 @@ def _serialize_booking_details(booking):
     start_dt = datetime.combine(booking.start_dt, time.min)
     end_dt = datetime.combine(booking.end_dt, time.max)
     unbookable_hours = get_rooms_unbookable_hours([booking.room]).get(booking.room.id, [])
-    blockings = get_rooms_blockings([booking.room], start_dt.date(), end_dt.date()).get(booking.room.id, [])
+    blocked_rooms = get_rooms_blockings([booking.room], start_dt.date(), end_dt.date())
+    overridable_blockings = group_blocked_rooms(filter_blocked_rooms(blocked_rooms,
+                                                                     overridable_only=True,
+                                                                     explicit=True)).get(booking.room.id, [])
+    nonoverridable_blockings = group_blocked_rooms(filter_blocked_rooms(blocked_rooms,
+                                                                        nonoverridable_only=True,
+                                                                        explicit=True)).get(booking.room.id, [])
     nonbookable_periods = get_rooms_nonbookable_periods([booking.room], start_dt, end_dt).get(booking.room.id, [])
     nonbookable_periods_grouped = group_nonbookable_periods(nonbookable_periods, date_range)
 
     occurrences_by_type['other_bookings'] = get_room_bookings(booking.room, start_dt, end_dt,
                                                               skip_booking_id=booking.id)
-    occurrences_by_type['blockings'] = serialize_blockings(group_blockings(blockings, date_range))
+    occurrences_by_type['blockings'] = serialize_blockings(group_blockings(nonoverridable_blockings, date_range))
+    occurrences_by_type['overridable_blockings'] = serialize_blockings(group_blockings(overridable_blockings,
+                                                                                       date_range))
     occurrences_by_type['unbookable_hours'] = serialize_unbookable_hours(unbookable_hours)
     occurrences_by_type['nonbookable_periods'] = serialize_nonbookable_periods(nonbookable_periods_grouped)
     return booking_details

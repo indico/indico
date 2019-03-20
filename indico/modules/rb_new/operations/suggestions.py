@@ -22,7 +22,7 @@ from indico.modules.rb import rb_settings
 from indico.modules.rb.models.blocked_rooms import BlockedRoomState
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import RepeatFrequency
-from indico.modules.rb_new.operations.blockings import get_blocked_rooms, get_rooms_blockings
+from indico.modules.rb_new.operations.blockings import get_blocked_rooms, get_rooms_blockings, group_blocked_rooms
 from indico.modules.rb_new.operations.bookings import get_existing_rooms_occurrences
 from indico.modules.rb_new.operations.conflicts import get_rooms_conflicts
 from indico.modules.rb_new.operations.misc import get_rooms_nonbookable_periods, get_rooms_unbookable_hours
@@ -94,7 +94,7 @@ def get_recurring_booking_suggestions(rooms, start_dt, end_dt, repeat_frequency,
     booking_days = end_dt - start_dt
     booking_length = booking_days.days + 1
     candidates = ReservationOccurrence.create_series(start_dt, end_dt, (repeat_frequency, repeat_interval))
-    blocked_rooms = get_rooms_blockings(rooms, start_dt.date(), end_dt.date())
+    blocked_rooms = group_blocked_rooms(get_rooms_blockings(rooms, start_dt.date(), end_dt.date()))
     unbookable_hours = get_rooms_unbookable_hours(rooms)
     nonbookable_periods = get_rooms_nonbookable_periods(rooms, start_dt, end_dt)
     conflicts = get_rooms_conflicts(rooms, start_dt, end_dt, repeat_frequency, repeat_interval, blocked_rooms,
