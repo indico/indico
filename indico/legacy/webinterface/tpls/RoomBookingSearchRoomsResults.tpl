@@ -29,7 +29,6 @@
                               % for room in rooms:
                                 <% details_url = url_for('rooms.roomBooking-roomDetails', room) %>
                                 <% booking_url = url_for('rooms.room_book', room) %>
-                                <% modification_url = url_for('rooms_admin.modify_room', room) %>
                                 <% on_click_details_url = 'onclick="window.location=\'{}\'"'.format(details_url) %>
                                 % if mapAvailable:
                                   <% show_on_map = url_for('rooms.roomBooking-mapOfRooms', roomID=room.id) %>
@@ -60,9 +59,6 @@
                                       <a href="${ booking_url }">${ _('book') }</a><br/>
                                     % elif room.can_prebook(_session.user):
                                       <a href="${ booking_url }">${ _('PRE-book') }</a><br/>
-                                    % endif
-                                    % if room.can_edit(_session.user):
-                                      <a href="${ modification_url }"> ${ _('modify') }</a><br/>
                                     % endif
                                     % if mapAvailable:
                                       <a href="${ show_on_map }"> ${ _('show on map') }</a><br/>

@@ -118,8 +118,6 @@ class WRoomBookingRoomDetails(WTemplated):
 
         # URLs
         wvars['stats_url'] = url_for('rooms.roomBooking-roomStats', room)
-        wvars['delete_room_url'] = url_for('rooms_admin.delete_room', room)
-        wvars['modify_room_url'] = url_for('rooms_admin.modify_room', room)
 
         wvars['show_on_map'] = room.map_url if room.map_url else url_for('rooms.roomBooking-mapOfRooms', room)
         return wvars

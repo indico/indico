@@ -83,15 +83,6 @@
             }
         }, $T("Yes"), $T("No")).open();
     }
-    function submit_delete() {
-        var contentDiv = createContentDiv($T("This action is irreversible. Are you sure you want to <strong>delete</strong> the booking?"));
-        new ConfirmPopup($T("Delete booking"), contentDiv, function(confirmed) {
-            if(confirmed) {
-                $("#submits").attr("action", "${ url_for('rooms.roomBooking-deleteBooking', reservation ) }");
-                $("#submits").submit();
-            }
-        }, $T("Yes"), $T("No")).open();
-    }
 </script>
 
 <!-- CONTEXT HELP DIVS -->
@@ -401,9 +392,6 @@
                           % if reservation.can_edit(user):
                             <a class="i-button" href="${ url_for(endpoints['booking_modify'], event, reservation)}">${ _('Modify') }</a>
                           % endif
-                        % endif
-                        % if reservation.can_delete(user):
-                          <a class="i-button" href="#" onclick="submit_delete(); return false;">${ _('Delete') }</a>
                         % endif
                         <a class="i-button" href="${ url_for(endpoints['booking_clone'], event, reservation) }">${ _('Clone') }</a>
                       </div>

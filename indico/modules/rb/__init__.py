@@ -19,14 +19,12 @@ from __future__ import unicode_literals
 from flask import session
 
 from indico.core import signals
-from indico.core.config import config
 from indico.core.logger import Logger
 from indico.core.settings import SettingsProxy
 from indico.core.settings.converters import ModelListConverter
 from indico.modules.categories.models.categories import Category
 from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.rooms import Room
-from indico.modules.rb.util import rb_is_admin
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem, SideMenuSection
@@ -63,22 +61,6 @@ def _import_tasks(sender, **kwargs):
     import indico.modules.rb.tasks
 
 
-@signals.menu.items.connect_via('admin-sidemenu')
-def _extend_admin_menu(sender, **kwargs):
-    if not config.ENABLE_ROOMBOOKING:
-        return
-    if session.user.is_admin:
-        yield SideMenuItem('rb-rooms', _("Rooms"), url_for('rooms_admin.roomBooking-admin'),
-                           section='roombooking', icon='location')
-    else:
-        yield SideMenuItem('rb-rooms', _("Rooms"), url_for('rooms_admin.roomBooking-admin'), 70, icon='location')
-
-
-@signals.menu.sections.connect_via('admin-sidemenu')
-def _sidemenu_sections(sender, **kwargs):
-    yield SideMenuSection('roombooking', _("Room Booking"), 70, icon='location')
-
-
 @signals.menu.sections.connect_via('rb-sidemenu')
 def _sidemenu_sections(sender, **kwargs):
     user_has_rooms = session.user is not None and Room.user_owns_rooms(session.user)
@@ -91,7 +73,6 @@ def _sidemenu_sections(sender, **kwargs):
 
 @signals.menu.items.connect_via('rb-sidemenu')
 def _sidemenu_items(sender, **kwargs):
-    user_is_admin = session.user is not None and rb_is_admin(session.user)
     user_has_rooms = session.user is not None and Room.user_owns_rooms(session.user)
     map_available = Location.default_location is not None and Location.default_location.is_map_available
 
@@ -119,6 +100,3 @@ def _sidemenu_items(sender, **kwargs):
         yield SideMenuItem('blockings_my_rooms', _('Blockings for my rooms'), url_for('rooms.blocking_my_rooms'),
                            section='blocking')
     yield SideMenuItem('blocking_create', _('Block rooms'), url_for('rooms.create_blocking'), section='blocking')
-    if user_is_admin:
-        yield SideMenuItem('admin', _('Administration'), url_for('rooms_admin.roomBooking-admin'), 10,
-                           icon='user-chairperson')

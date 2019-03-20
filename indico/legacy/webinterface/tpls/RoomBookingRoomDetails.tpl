@@ -319,16 +319,6 @@
                               % elif room.can_prebook(_session.user):
                                 <a class="i-button" href="${ url_for(endpoints['room_book'], event, room) }">${ _('PRE-Book') }</a>
                               % endif
-                              % if room.can_edit(_session.user):
-                                <a class="i-button" href="${ modify_room_url }">${ _('Modify') }</a>
-                              % endif
-                              % if room.can_delete(_session.user):
-                                <button class="i-button" data-href="${ delete_room_url }" data-method="POST"
-                                   data-title="${ _('Delete Room?') }"
-                                   data-confirm="${ _('THIS ACTION IS IRREVERSIBLE. Please note that all archived BOOKINGS WILL BE DELETED with the room. Are you sure you want to DELETE the room?') }">
-                                    ${ _('Delete') }
-                                </button>
-                              % endif
                               <a class="i-button" href="${ stats_url }">${ _('Stats') }</a>
                             </div>
                         </td>
