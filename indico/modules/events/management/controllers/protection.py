@@ -71,8 +71,6 @@ class RHEventACLMessage(RHManageEventBase):
 class RHEventProtection(RHManageEventBase):
     """Show event protection"""
 
-    NOT_SANITIZED_FIELDS = {'access_key'}
-
     def _process(self):
         event = self.event
         form = EventProtectionForm(obj=FormDefaults(**self._get_defaults()), event=event)

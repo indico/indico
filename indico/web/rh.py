@@ -38,11 +38,10 @@ from indico.core.db.sqlalchemy.core import handle_sqlalchemy_database_error
 from indico.core.logger import Logger, sentry_set_tags
 from indico.core.notifications import flush_email_queue, init_email_queue
 from indico.legacy.common import fossilize
-from indico.legacy.common.security import Sanitization
 from indico.util.i18n import _
 from indico.util.locators import get_locator
 from indico.util.signals import values_from_signal
-from indico.web.flask.util import ResponseUtil, create_flat_args, url_for
+from indico.web.flask.util import ResponseUtil, url_for
 
 
 HTTP_VERBS = {'GET', 'PATCH', 'POST', 'PUT', 'DELETE'}
@@ -50,11 +49,9 @@ logger = Logger.get('rh')
 
 
 class RH(object):
-    NOT_SANITIZED_FIELDS = frozenset()
     CSRF_ENABLED = True  # require a csrf_token when accessing the RH with anything but GET
     EVENT_FEATURE = None  # require a certain event feature when accessing the RH. See `EventFeature` for details
     DENY_FRAMES = False  # whether to send an X-Frame-Options:DENY header
-    CHECK_HTML = False  # whether to run the legacy HTML sanitizer
 
     #: A dict specifying how the url should be normalized.
     #: `args` is a dictionary mapping view args keys to callables
@@ -240,8 +237,6 @@ class RH(object):
 
         self._check_access()
         signals.rh.check_access.send(type(self), rh=self)
-        if self.CHECK_HTML:
-            Sanitization.sanitizationCheck(create_flat_args(), self.NOT_SANITIZED_FIELDS)
 
         signal_rv = values_from_signal(signals.rh.before_process.send(type(self), rh=self),
                                        single_value=True, as_list=True)

@@ -77,8 +77,6 @@ class RHDisplayEvent(RHDisplayEventBase):
 
 
 class RHEventAccessKey(RHEventBase):
-    NOT_SANITIZED_FIELDS = {'access_key'}
-
     def _process(self):
         self.event.set_session_access_key(request.form['access_key'])
         return jsonify(valid=self.event.check_access_key())

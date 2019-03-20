@@ -58,8 +58,6 @@ class RHRegistrationFormInvitations(RHManageRegFormBase):
 class RHRegistrationFormInvite(RHManageRegFormBase):
     """Invite someone to register"""
 
-    NOT_SANITIZED_FIELDS = {'email_from'}
-
     def _create_invitation(self, user, skip_moderation, email_from, email_subject, email_body):
         invitation = RegistrationInvitation(
             skip_moderation=skip_moderation,

@@ -225,8 +225,6 @@ class RHPersonsList(RHPersonsBase):
 class RHEmailEventPersons(RHManageEventBase):
     """Send emails to selected EventPersons"""
 
-    NOT_SANITIZED_FIELDS = {'from_address'}
-
     def _process_args(self):
         self.no_account = request.args.get('no_account') == '1'
         RHManageEventBase._process_args(self)

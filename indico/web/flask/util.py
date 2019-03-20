@@ -25,7 +25,7 @@ from flask import Blueprint, current_app, g, redirect, request
 from flask import send_file as _send_file
 from flask import url_for as _url_for
 from flask.helpers import get_root_path
-from werkzeug.datastructures import FileStorage, Headers
+from werkzeug.datastructures import Headers
 from werkzeug.exceptions import HTTPException, NotFound
 from werkzeug.routing import BaseConverter, BuildError, RequestRedirect, UnicodeConverter
 from werkzeug.urls import url_parse
@@ -76,29 +76,6 @@ def discover_blueprints():
             else:
                 blueprints.add(obj)
     return blueprints, compat_blueprints
-
-
-def _convert_request_value(x):
-    if isinstance(x, unicode):
-        return x.encode('utf-8')
-    elif isinstance(x, FileStorage):
-        return x
-    raise TypeError('Unexpected item in request data: %s' % type(x))
-
-
-def create_flat_args():
-    """Creates a dict containing the GET/POST arguments in a style old indico code expects.
-
-    Do not use this for anything new - use request.* directly instead!"""
-    args = request.args.copy()
-    for key, values in request.form.iterlists():
-        args.setlist(key, values)
-    for key, values in request.files.iterlists():
-        args.setlist(key, values)
-    flat_args = {}
-    for key, item in args.iterlists():
-        flat_args[key] = map(_convert_request_value, item) if len(item) > 1 else _convert_request_value(item[0])
-    return flat_args
 
 
 @memoize

@@ -18,15 +18,12 @@ from flask import g, session
 from werkzeug.exceptions import Forbidden
 
 from indico.core.logger import sentry_set_tags
-from indico.legacy.common.security import Sanitization
 
 
 class ServiceBase(object):
     """
     The ServiceBase class is the basic class for services.
     """
-
-    CHECK_HTML = True
 
     def __init__(self, params):
         self._params = params
@@ -48,9 +45,6 @@ class ServiceBase(object):
 
         self._process_args()
         self._check_access()
-
-        if self.CHECK_HTML:
-            Sanitization.sanitizationCheck(self._params)
         return self._getAnswer()
 
     def _getAnswer(self):

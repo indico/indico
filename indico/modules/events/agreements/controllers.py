@@ -134,7 +134,6 @@ class RHAgreementManagerDetailsToggleNotifications(RHAgreementManagerDetails):
 
 
 class RHAgreementManagerDetailsEmailBase(RHAgreementManagerDetails):
-    NOT_SANITIZED_FIELDS = {'from_address'}
     dialog_template = None
 
     def _process_args(self):

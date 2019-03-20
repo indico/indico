@@ -36,8 +36,3 @@ class RHRoomBookingProtected(RHProtected):
 
 class RHRoomBookingBase(RHRoomBookingProtected):
     """Base class for room booking RHs"""
-
-    # legacy code might still show unsanitized content from the DB
-    # so we need to keep the sanitizer running until everything in
-    # roombooking has been moved to Jinja templates
-    CHECK_HTML = True

@@ -31,8 +31,6 @@ from indico.util.string import sanitize_email, to_unicode
 
 
 class SearchBase(LoggedOnlyService):
-    CHECK_HTML = False
-
     def _process_args(self):
         self._searchExt = self._params.get('search-ext', False)
 
