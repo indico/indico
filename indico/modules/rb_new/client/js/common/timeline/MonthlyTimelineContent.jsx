@@ -35,6 +35,14 @@ export default class MonthlyTimelineContent extends WeeklyTimelineContent {
         return [];
     }
 
+    get weekendDays() {
+        return (
+            this.dates
+                .filter(day => [5, 6].includes(toMoment(day, 'YYYY-MM-DD').weekday()))
+                .map(day => this.dates.findIndex((el) => el === day))
+        );
+    }
+
     renderTimelineRow({availability, room, label, verboseLabel}, key, rowStyle = null) {
         const {minHour, maxHour, longLabel, onClickCandidate, onClickReservation} = this.props;
         const hasConflicts = availability.some(([, {conflicts}]) => !!conflicts.length);
@@ -73,13 +81,9 @@ export default class MonthlyTimelineContent extends WeeklyTimelineContent {
         const nDays = this.dates.length;
         const daySize = (100 / nDays);
         const {dateRange} = this.props;
-
+        const weekendDays = this.getWeekendDays();
         const emptyDays = this.dates
             .filter(day => dateRange.length !== 0 && !dateRange.includes(day))
-            .map(day => this.dates.findIndex((el) => el === day));
-
-        const weekendDays = this.dates
-            .filter(day => [0, 6].includes(toMoment(day, 'YYYY-MM-DD').weekday()))
             .map(day => this.dates.findIndex((el) => el === day));
 
         return (
@@ -99,10 +103,7 @@ export default class MonthlyTimelineContent extends WeeklyTimelineContent {
     renderHeader() {
         const {longLabel, selectable} = this.props;
         const labelWidth = longLabel ? 200 : 150;
-
-        const weekendDays = this.dates
-            .filter(day => [0, 6].includes(toMoment(day, 'YYYY-MM-DD').weekday()))
-            .map(day => this.dates.findIndex((el) => el === day));
+        const weekendDays = this.getWeekendDays();
 
         return (
             <>
