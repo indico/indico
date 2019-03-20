@@ -109,7 +109,9 @@ class App extends React.Component {
                 <Sidebar.Pusher dimmed={userActionsVisible} styleName="rb-pusher">
                     <div styleName="rb-content">
                         <Switch>
-                            <Route exact path="/" render={() => <Redirect to="/book" />} />
+                            <Route exact path="/" render={({location}) => (
+                                <Redirect to={{pathname: '/book', search: location.search}} />
+                            )} />
                             <ConditionalRoute path="/book" render={({location, match: {isExact}}) => (
                                 filtersSet
                                     ? (
