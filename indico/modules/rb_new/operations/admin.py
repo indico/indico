@@ -28,7 +28,12 @@ from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
 @no_autoflush
 def _populate_room(room, properties):
     basic_props = [prop for prop in properties if prop not in ['available_equipment', 'bookable_hours',
-                                                               'bookable_periods']]
+                                                               'bookable_periods', 'owner']]
+    if 'owner' in properties and properties['owner'] != room.owner:
+        # TODO: remove this once we can edit room ACLs or make it clear that the owner is always set as a manager
+        room.update_principal(room.owner, full_access=False)
+        room.update_principal(properties['owner'], full_access=True)
+        room.owner = properties['owner']
     for prop in basic_props:
         if prop in properties:
             setattr(room, prop, properties[prop])
