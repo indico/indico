@@ -14,7 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from indico.modules.rb.controllers.admin import index as index_handler
 from indico.modules.rb.controllers.admin import locations as location_handlers
 from indico.modules.rb.controllers.admin import rooms as room_handlers
 from indico.web.flask.wrappers import IndicoBlueprint
@@ -22,13 +21,6 @@ from indico.web.flask.wrappers import IndicoBlueprint
 
 _bp = IndicoBlueprint('rooms_admin', __name__, template_folder='../templates', virtual_template_folder='rb',
                       url_prefix='/admin/rooms')
-
-
-# Main settings
-_bp.add_url_rule('/config/',
-                 'settings',
-                 index_handler.RHRoomBookingSettings,
-                 methods=('GET', 'POST'))
 
 
 # Locations

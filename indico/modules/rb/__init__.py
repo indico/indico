@@ -68,8 +68,6 @@ def _extend_admin_menu(sender, **kwargs):
     if not config.ENABLE_ROOMBOOKING:
         return
     if session.user.is_admin:
-        yield SideMenuItem('rb-settings', _("Settings"), url_for('rooms_admin.settings'),
-                           section='roombooking', icon='location')
         yield SideMenuItem('rb-rooms', _("Rooms"), url_for('rooms_admin.roomBooking-admin'),
                            section='roombooking', icon='location')
     else:
