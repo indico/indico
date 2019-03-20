@@ -170,7 +170,7 @@ class RowActionsDropdown extends React.Component {
                                     loading={actionInProgress}>
                                 <Button.Content>
                                     <div ref={this.dropdownIconRef}>
-                                        <Icon name="ellipsis horizontal" size="big" />
+                                        <Icon name="ellipsis horizontal" size="large" />
                                     </div>
                                 </Button.Content>
                             </Button>

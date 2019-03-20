@@ -44,15 +44,7 @@ export default class MonthlyTimelineContent extends WeeklyTimelineContent {
     }
 
     renderTimelineRow({availability, room, label, verboseLabel}, key, rowStyle = null) {
-        const {
-            minHour,
-            maxHour,
-            longLabel,
-            onClickCandidate,
-            gutterAllowed,
-            onClickReservation,
-            rowActions
-        } = this.props;
+        const {minHour, maxHour, longLabel, onClickCandidate, onClickReservation, gutterAllowed} = this.props;
         const hasConflicts = availability.some(([, {conflicts}]) => !!conflicts.length);
         const {ItemClass, itemProps} = this.getEditableItem(room);
         const rowLabelProps = {label, verboseLabel, longLabel, gutterAllowed, onClickLabel: this.onClickLabel(room.id)};
@@ -79,9 +71,11 @@ export default class MonthlyTimelineContent extends WeeklyTimelineContent {
                                    {...itemProps} />
                     ))}
                 </div>
-                <div styleName="baseStyle.timeline-row-actions">
-                    {rowActions.roomTimeline && this.renderRowActions(availability, room)}
-                </div>
+                {this.hasActions && (
+                    <div styleName="baseStyle.timeline-row-actions">
+                        {this.renderRowActions(availability, room)}
+                    </div>
+                )}
             </div>
         );
     }
@@ -109,9 +103,8 @@ export default class MonthlyTimelineContent extends WeeklyTimelineContent {
     }
 
     renderHeader() {
-        const {longLabel, selectable, rowActions} = this.props;
+        const {longLabel, selectable} = this.props;
         const labelWidth = longLabel ? 200 : 150;
-        const actionsWidth = rowActions.roomTimeline ? 70 : 0;
 
         return (
             <>
@@ -132,7 +125,7 @@ export default class MonthlyTimelineContent extends WeeklyTimelineContent {
                             );
                         })}
                     </div>
-                    <div style={{width: actionsWidth}} />
+                    {this.hasActions && <div styleName="baseStyle.timeline-header-actions" />}
                 </div>
             </>
         );
