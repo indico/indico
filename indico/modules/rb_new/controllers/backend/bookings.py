@@ -215,7 +215,6 @@ class RHCreateBooking(RHRoomBookingBase):
             db.session.rollback()
             raise ExpectedError(unicode(e))
 
-        signals.rb.booking_created.send(resv)
         serialized_occurrences = serialize_occurrences(group_by_occurrence_date(resv.occurrences.all()))
         if self.prebook:
             data = {'pre_bookings': serialized_occurrences}

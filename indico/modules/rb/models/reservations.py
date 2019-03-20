@@ -412,6 +412,8 @@ class Reservation(Serializer, db.Model):
         reservation.create_occurrences(True)
         if not any(occ.is_valid for occ in reservation.occurrences):
             raise NoReportError(_(u'Reservation has no valid occurrences'))
+        db.session.flush()
+        signals.rb.booking_created.send(reservation)
         notify_creation(reservation)
         return reservation
 
