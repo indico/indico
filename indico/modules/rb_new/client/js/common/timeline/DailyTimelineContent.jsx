@@ -108,17 +108,14 @@ export default class DailyTimelineContent extends React.Component {
         );
     };
 
+    get hasActions() {
+        const {rowActions} = this.props;
+        return Object.values(rowActions).includes(true);
+    }
+
     renderTimelineRow({availability, label, verboseLabel, room}, key, rowStyle = null) {
-        const {
-            minHour,
-            maxHour,
-            hourStep,
-            onClickCandidate,
-            onClickReservation,
-            longLabel,
-            rowActions,
-            gutterAllowed,
-        } = this.props;
+        const {minHour, maxHour, onClickCandidate, onClickReservation, longLabel, gutterAllowed} = this.props;
+
         const hasConflicts = !(_.isEmpty(availability.conflicts) && _.isEmpty(availability.preConflicts));
         const {ItemClass, itemProps} = this.getEditableItem(room);
         const rowLabelProps = {label, verboseLabel, longLabel, gutterAllowed, onClickLabel: this.onClickLabel(room.id)};
@@ -139,9 +136,11 @@ export default class DailyTimelineContent extends React.Component {
                                }}
                                {...itemProps} />
                 </div>
-                <div styleName="timeline-row-actions">
-                    {Object.values(rowActions).includes(true) && this.renderRowActions(availability, room)}
-                </div>
+                {this.hasActions && (
+                    <div styleName="timeline-row-actions">
+                        {this.renderRowActions(availability, room)}
+                    </div>
+                )}
             </div>
         );
     }
@@ -183,9 +182,8 @@ export default class DailyTimelineContent extends React.Component {
     };
 
     renderDefaultHeader = (hourSpan, hourSeries) => {
-        const {hourStep, longLabel, rowActions} = this.props;
+        const {hourStep, longLabel} = this.props;
         const labelWidth = longLabel ? 200 : 150;
-        const actionsWidth = (Object.values(rowActions).includes(true)) ? 70 : 0;
 
         return (
             <>
@@ -201,7 +199,7 @@ export default class DailyTimelineContent extends React.Component {
                         </div>
                     ))}
                 </div>
-                <div style={{width: actionsWidth}} />
+                {this.hasActions && <div styleName="timeline-header-actions" />}
             </>
         );
     };
@@ -217,10 +215,10 @@ export default class DailyTimelineContent extends React.Component {
     );
 
     renderList(hourSpan, width, height = null, extraProps = {}) {
-        const {rows, hourStep, longLabel, isLoading, rowActions} = this.props;
+        const {rows, hourStep, longLabel, isLoading} = this.props;
         const {selectable} = this.state;
         const labelWidth = longLabel ? 200 : 150;
-        const actionsWidth = (Object.values(rowActions).includes(true)) ? 70 : 0;
+        const actionsWidth = this.hasActions ? 70 : 0;
         const rowHeight = 50;
 
         return (

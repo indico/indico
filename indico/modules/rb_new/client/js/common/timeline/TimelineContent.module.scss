@@ -47,6 +47,10 @@ $split-row-height: $row-height/2;
     &:global(.timeline-non-selectable) {
         user-select: none;
     }
+
+    .timeline-header-actions {
+        width: 70px;
+    }
 }
 
 .timeline-lines {
