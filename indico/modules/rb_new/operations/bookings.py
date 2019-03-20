@@ -37,7 +37,7 @@ from indico.modules.rb.models.reservation_occurrences import ReservationOccurren
 from indico.modules.rb.models.reservations import RepeatFrequency, Reservation, ReservationLink
 from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
 from indico.modules.rb.models.rooms import Room
-from indico.modules.rb_new.operations.blockings import get_rooms_blockings
+from indico.modules.rb_new.operations.blockings import filter_blocked_rooms, get_rooms_blockings, group_blocked_rooms
 from indico.modules.rb_new.operations.conflicts import get_rooms_conflicts
 from indico.modules.rb_new.operations.misc import get_rooms_nonbookable_periods, get_rooms_unbookable_hours
 from indico.modules.rb_new.util import (group_by_occurrence_date, serialize_blockings, serialize_nonbookable_periods,
@@ -114,12 +114,18 @@ def get_rooms_availability(rooms, start_dt, end_dt, repeat_frequency, repeat_int
     date_range = sorted(set(cand.start_dt.date() for cand in candidates))
     occurrences = get_existing_rooms_occurrences(rooms, start_dt.replace(hour=0, minute=0),
                                                  end_dt.replace(hour=23, minute=59), repeat_frequency, repeat_interval)
-    blocked_rooms, overridable_blocked_rooms = get_rooms_blockings(rooms, start_dt.date(), end_dt.date())
+    blocked_rooms = get_rooms_blockings(rooms, start_dt.date(), end_dt.date())
+    nonoverridable_blocked_rooms = group_blocked_rooms(filter_blocked_rooms(blocked_rooms,
+                                                                            nonoverridable_only=True,
+                                                                            explicit=True))
+    overridable_blocked_rooms = group_blocked_rooms(filter_blocked_rooms(blocked_rooms,
+                                                                         overridable_only=True,
+                                                                         explicit=True))
     unbookable_hours = get_rooms_unbookable_hours(rooms)
     nonbookable_periods = get_rooms_nonbookable_periods(rooms, start_dt, end_dt)
     conflicts, pre_conflicts, conflicting_candidates = get_rooms_conflicts(
         rooms, start_dt.replace(tzinfo=None), end_dt.replace(tzinfo=None),
-        repeat_frequency, repeat_interval, blocked_rooms,
+        repeat_frequency, repeat_interval, nonoverridable_blocked_rooms,
         nonbookable_periods, unbookable_hours, skip_conflicts_with,
         allow_admin=admin_override_enabled
     )
@@ -131,7 +137,7 @@ def get_rooms_availability(rooms, start_dt, end_dt, repeat_frequency, repeat_int
         pre_room_conflicts = pre_conflicts.get(room.id, [])
         pre_bookings = [occ for occ in room_occurrences if not occ.reservation.is_accepted]
         existing_bookings = [occ for occ in room_occurrences if occ.reservation.is_accepted]
-        room_blocked_rooms = blocked_rooms.get(room.id, [])
+        room_nonoverridable_blocked_rooms = nonoverridable_blocked_rooms.get(room.id, [])
         room_overridable_blocked_rooms = overridable_blocked_rooms.get(room.id, [])
         room_nonbookable_periods = nonbookable_periods.get(room.id, [])
         room_unbookable_hours = unbookable_hours.get(room.id, [])
@@ -144,7 +150,7 @@ def get_rooms_availability(rooms, start_dt, end_dt, repeat_frequency, repeat_int
                                  'bookings': group_by_occurrence_date(existing_bookings),
                                  'conflicts': group_by_occurrence_date(room_conflicts),
                                  'pre_conflicts': group_by_occurrence_date(pre_room_conflicts),
-                                 'blockings': group_blockings(room_blocked_rooms, dates),
+                                 'blockings': group_blockings(room_nonoverridable_blocked_rooms, dates),
                                  'overridable_blockings': group_blockings(room_overridable_blocked_rooms, dates),
                                  'nonbookable_periods': group_nonbookable_periods(room_nonbookable_periods, dates),
                                  'unbookable_hours': room_unbookable_hours}
@@ -203,14 +209,20 @@ def get_room_calendar(start_date, end_date, room_ids, include_inactive=False, **
     nonbookable_periods = get_rooms_nonbookable_periods(rooms, start_dt, end_dt)
     occurrences_by_room = groupby(query, attrgetter('reservation.room_id'))
     blocked_rooms = get_rooms_blockings(rooms, start_dt, end_dt)
-
+    nonoverridable_blocked_rooms = group_blocked_rooms(filter_blocked_rooms(blocked_rooms,
+                                                                            nonoverridable_only=True,
+                                                                            explicit=True))
+    overridable_blocked_rooms = group_blocked_rooms(filter_blocked_rooms(blocked_rooms,
+                                                                         overridable_only=True,
+                                                                         explicit=True))
     dates = [d.date() for d in iterdays(start_dt, end_dt)]
 
     calendar = OrderedDict((room.id, {
         'room_id': room.id,
         'nonbookable_periods': group_nonbookable_periods(nonbookable_periods.get(room.id, []), dates),
         'unbookable_hours': unbookable_hours.get(room.id, []),
-        'blockings': group_blockings(blocked_rooms.get(room.id, []), dates),
+        'blockings': group_blockings(nonoverridable_blocked_rooms.get(room.id, []), dates),
+        'overridable_blockings': group_blockings(overridable_blocked_rooms.get(room.id, []), dates),
     }) for room in rooms)
 
     for room_id, occurrences in occurrences_by_room:
@@ -239,7 +251,13 @@ def get_room_details_availability(room, start_dt, end_dt):
     occurrences = get_existing_room_occurrences(room, start_dt, end_dt, RepeatFrequency.DAY, 1)
     pre_bookings = [occ for occ in occurrences if not occ.reservation.is_accepted]
     bookings = [occ for occ in occurrences if occ.reservation.is_accepted]
-    blockings = get_rooms_blockings([room], start_dt.date(), end_dt.date()).get(room.id, [])
+    blocked_rooms = get_rooms_blockings([room], start_dt.date(), end_dt.date())
+    nonoverridable_blocked_rooms = group_blocked_rooms(filter_blocked_rooms(blocked_rooms,
+                                                                            nonoverridable_only=True,
+                                                                            explicit=True)).get(room.id, [])
+    overridable_blocked_rooms = group_blocked_rooms(filter_blocked_rooms(blocked_rooms,
+                                                                         overridable_only=True,
+                                                                         explicit=True)).get(room.id, [])
     unbookable_hours = get_rooms_unbookable_hours([room]).get(room.id, [])
     nonbookable_periods = get_rooms_nonbookable_periods([room], start_dt, end_dt).get(room.id, [])
 
@@ -250,7 +268,9 @@ def get_room_details_availability(room, start_dt, end_dt):
         availability.append({
             'bookings': serialize_occurrences(group_by_occurrence_date(bookings)).get(iso_day),
             'pre_bookings': serialize_occurrences(group_by_occurrence_date(pre_bookings)).get(iso_day),
-            'blockings': serialize_blockings(group_blockings(blockings, dates)).get(iso_day),
+            'blockings': serialize_blockings(group_blockings(nonoverridable_blocked_rooms, dates)).get(iso_day),
+            'overridable_blockings': (serialize_blockings(group_blockings(overridable_blocked_rooms, dates))
+                                      .get(iso_day)),
             'nonbookable_periods': nb_periods,
             'unbookable_hours': serialize_unbookable_hours(unbookable_hours),
             'day': iso_day,
@@ -278,9 +298,9 @@ def check_room_available(room, start_dt, end_dt):
     hours_overlap = any(hours for hours in unbookable_hours
                         if overlaps((start_dt.time(), end_dt.time()), (hours.start_time, hours.end_time)))
     nonbookable_periods = any(get_rooms_nonbookable_periods([room], start_dt, end_dt))
-    blockings = get_rooms_blockings([room], start_dt, end_dt).get(room.id, [])
-    blocked_for_user = any(blocking for blocking in blockings
-                           if not blocking.blocking.can_override(session.user, room=room, explicit_only=True))
+    blocked_rooms = get_rooms_blockings([room], start_dt, end_dt)
+    nonoverridable_blocked_rooms = filter_blocked_rooms(blocked_rooms, nonoverridable_only=True, explicit=True)
+    blocked_for_user = any(nonoverridable_blocked_rooms)
     user_booking = any(booking for booking in bookings if booking.reservation.booked_for_id == session.user.id)
     user_prebooking = any(prebooking for prebooking in prebookings
                           if prebooking.reservation.booked_for_id == session.user.id)
