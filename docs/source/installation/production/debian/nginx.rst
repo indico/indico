@@ -76,7 +76,7 @@ most cases.
     cat > /etc/uwsgi/apps-available/indico.ini <<'EOF'
     [uwsgi]
     uid = indico
-    gid = nginx
+    gid = www-data
     umask = 027
 
     processes = 4
@@ -154,12 +154,12 @@ most cases.
       }
 
       location ~ ^/(images|fonts)(.*)/(.+?)(__v[0-9a-f]+)?\.([^.]+)$ {
-        alias /opt/indico/web/static/$1$2/$3.$5;
+        alias /opt/indico/web/htdocs/$1$2/$3.$5;
         access_log off;
       }
 
       location ~ ^/(css|dist|images|fonts)/(.*)$ {
-        alias /opt/indico/web/static/$1/$2;
+        alias /opt/indico/web/htdocs/$1/$2;
         access_log off;
       }
 
@@ -245,7 +245,7 @@ Celery runs as a background daemon. Add a systemd unit file for it:
     Restart=always
     SyslogIdentifier=indico-celery
     User=indico
-    Group=nginx
+    Group=www-data
     UMask=0027
     Type=simple
     KillMode=mixed
@@ -261,7 +261,7 @@ Now create a user that will be used to run Indico and switch to it:
 
 .. code-block:: shell
 
-    useradd -rm -g nginx -d /opt/indico -s /bin/bash indico
+    useradd -rm -g www-data -d /opt/indico -s /bin/bash indico
     su - indico
 
 
