@@ -164,10 +164,6 @@
     text-decoration: none;
 }
 
-.static-tabs .ui-tabs-nav li.ui-tabs-selected a {
-    cursor: pointer !important;
-}
-
 .ui-tabs .ui-tabs-nav li a.pendingTab {
     background-color: #FFFFBB;
     font-weight: bold;

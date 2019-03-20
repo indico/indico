@@ -16,8 +16,6 @@
 
 from __future__ import unicode_literals
 
-import json
-
 from flask import jsonify
 from sqlalchemy.orm import joinedload
 
@@ -26,7 +24,7 @@ from indico.modules.events.management.controllers import RHManageEventBase
 from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.timetable import TimetableEntry
-from indico.modules.rb.controllers.user.event import RHRoomBookingEventBase
+from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.models.reservations import Reservation, ReservationLink
 from indico.modules.rb_new.event.forms import BookingListForm
 from indico.modules.rb_new.views.base import WPEventBookingList
@@ -50,6 +48,12 @@ def _session_block_query(event):
             .options(joinedload('timetable_entry'))
             .join(Session)
             .order_by(Session.friendly_id, Session.title, SessionBlock.title))
+
+
+class RHRoomBookingEventBase(RHManageEventBase, RHRoomBookingBase):
+    def _check_access(self):
+        RHManageEventBase._check_access(self)
+        RHRoomBookingBase._check_access(self)
 
 
 class RHEventBookingList(RHRoomBookingEventBase):

@@ -20,23 +20,6 @@
 /* eslint-disable max-len */
 
 $(document).ready(function() {
-    // Create static tabs. They just load the target URL and use no ajax whatsoever
-    $('.static-tabs').each(function() {
-        var tabCtrl = $(this);
-        tabCtrl.tabs({
-            active: tabCtrl.data('active')
-        });
-        // Turn tabs into plain links and fix urls (needed for the active tab)
-        $('> .ui-tabs-nav a', this).each(function() {
-            var $this = $(this);
-            tabCtrl.data('ui-tabs')._off($this, 'click');
-            $this.attr('href', $this.data('href'));
-        });
-    });
-
-    // Remove ui-widget-content style from static tabs as it messes up e.g. link colors
-    $('.static-tabs').find('.ui-widget-content').addBack().removeClass('ui-widget-content');
-
     $('.main-breadcrumb a[href="#"]').css({cursor: 'default', outline: 'none'}).on('click', function(e) {
         e.preventDefault();
     });
