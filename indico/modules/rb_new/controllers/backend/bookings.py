@@ -267,7 +267,6 @@ class RHBookingStateActions(RHBookingBase):
             self.reject()
         elif self.action == 'cancel':
             self.booking.cancel(session.user)
-        signals.rb.booking_state_changed.send(self.booking)
         return jsonify(booking=reservation_details_schema.dump(self.booking))
 
 
@@ -391,5 +390,4 @@ class RHBookingOccurrenceStateActions(RHBookingBase):
             self.reject()
         elif self.action == 'cancel':
             self.occurrence.cancel(session.user)
-        signals.rb.booking_occurrence_state_changed.send(self.occurrence)
         return jsonify(occurrence=reservation_occurrences_schema.dump(self.occurrence, many=False))

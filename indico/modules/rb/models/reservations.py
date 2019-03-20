@@ -470,7 +470,7 @@ class Reservation(Serializer, db.Model):
         self.state = ReservationState.accepted
         self.add_edit_log(ReservationEditLog(user_name=user.full_name, info=['Reservation accepted']))
         notify_confirmation(self)
-
+        signals.rb.booking_state_changed.send(self)
         valid_occurrences = self.occurrences.filter(ReservationOccurrence.is_valid).all()
         pre_occurrences = ReservationOccurrence.find_overlapping_with(self.room, valid_occurrences, self.id).all()
         for occurrence in pre_occurrences:
@@ -490,6 +490,7 @@ class Reservation(Serializer, db.Model):
             ReservationOccurrence.state: ReservationOccurrenceState.cancelled,
             ReservationOccurrence.rejection_reason: reason
         }, synchronize_session='fetch')
+        signals.rb.booking_state_changed.send(self)
         if not silent:
             notify_cancellation(self)
             log_msg = u'Reservation cancelled: {}'.format(reason) if reason else 'Reservation cancelled'
@@ -502,6 +503,7 @@ class Reservation(Serializer, db.Model):
             ReservationOccurrence.state: ReservationOccurrenceState.rejected,
             ReservationOccurrence.rejection_reason: reason
         }, synchronize_session='fetch')
+        signals.rb.booking_state_changed.send(self)
         if not silent:
             notify_rejection(self)
             log_msg = u'Reservation rejected: {}'.format(reason)

@@ -23,6 +23,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import defaultload
 from sqlalchemy.sql import cast
 
+from indico.core import signals
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
 from indico.core.db.sqlalchemy.util.queries import db_dates_overlap
@@ -258,6 +259,7 @@ class ReservationOccurrence(db.Model, Serializer):
     def cancel(self, user, reason=None, silent=False):
         self.state = ReservationOccurrenceState.cancelled
         self.rejection_reason = reason or None
+        signals.rb.booking_occurrence_state_changed.send(self)
         if not silent:
             log = [u'Day cancelled: {}'.format(format_date(self.date).decode('utf-8'))]
             if reason:
@@ -271,6 +273,7 @@ class ReservationOccurrence(db.Model, Serializer):
     def reject(self, user, reason, silent=False):
         self.state = ReservationOccurrenceState.rejected
         self.rejection_reason = reason or None
+        signals.rb.booking_occurrence_state_changed.send(self)
         if not silent:
             log = [u'Day rejected: {}'.format(format_date(self.date).decode('utf-8')),
                    u'Reason: {}'.format(reason)]
