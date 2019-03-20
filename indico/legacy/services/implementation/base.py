@@ -19,7 +19,6 @@ from werkzeug.exceptions import Forbidden
 
 from indico.core.logger import sentry_set_tags
 from indico.legacy.common.security import Sanitization
-from indico.util.string import unicode_struct_to_utf8
 
 
 class ServiceBase(object):
@@ -27,12 +26,9 @@ class ServiceBase(object):
     The ServiceBase class is the basic class for services.
     """
 
-    UNICODE_PARAMS = False
     CHECK_HTML = True
 
     def __init__(self, params):
-        if not self.UNICODE_PARAMS:
-            params = unicode_struct_to_utf8(params)
         self._params = params
 
     def _process_args(self):

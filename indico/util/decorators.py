@@ -14,8 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from functools import wraps
-
 
 class classproperty(property):
     def __get__(self, obj, type=None):
@@ -85,42 +83,3 @@ def cached_writable_property(cache_attr, cache_on_set=True):
                 pass
 
     return _cached_writable_property
-
-
-def smart_decorator(f):
-    """Decorator to make decorators work both with and without arguments.
-
-    This decorator allows you to use a decorator both without arguments::
-
-        @fancy_decorator
-        def function():
-            pass
-
-    And also with arguments::
-
-        @fancy_decorator(123, foo='bar')
-        def function():
-            pass
-
-    The only limitation is that the decorator itself MUST NOT allow a callable object
-    as the first positional argument, unless there is at least one other mandatory argument.
-
-    The decorator decorated with `smart_decorator` obviously needs to have default values for
-    all arguments but the first one::
-
-        @smart_decorator
-        def requires_location(f, some='args', are='here'):
-            @wraps(f)
-            def wrapper(*args, **kwargs):
-                return f(*args, **kwargs)
-
-            return wrapper
-    """
-    @wraps(f)
-    def wrapper(*args, **kw):
-        if len(args) == 1 and not kw and callable(args[0]):
-            return f(args[0])
-        else:
-            return lambda original: f(original, *args, **kw)
-
-    return wrapper

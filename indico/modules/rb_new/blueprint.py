@@ -25,7 +25,7 @@ from indico.web.flask.util import url_for
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
-_bp = IndicoBlueprint('rooms_new', __name__, template_folder='templates', virtual_template_folder='rb_new',
+_bp = IndicoBlueprint('rooms_new', __name__, template_folder='../rb/templates', virtual_template_folder='rb',
                       url_prefix='/rooms-new')
 
 # Frontend

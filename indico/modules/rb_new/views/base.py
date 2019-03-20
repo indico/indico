@@ -22,13 +22,13 @@ from indico.web.views import WPNewBase
 
 
 class WPRoomBookingBase(WPNewBase):
-    template_prefix = 'rb_new/'
-    title = _('New Room Booking')  # XXX: Modify when getting rid of old RB
+    template_prefix = 'rb/'
+    title = _('Room Booking')
     bundles = ('common.js', 'common.css', 'react.js', 'react.css', 'semantic-ui.js', 'semantic-ui.css',
                'module_rb_new.js', 'module_rb_new.css')
 
 
 class WPEventBookingList(WPEventManagement):
-    template_prefix = 'rb_new/'
+    template_prefix = 'rb/'
     sidemenu_option = 'room_booking'
     bundles = ('module_rb_new.event.js', 'module_rb_new.css')

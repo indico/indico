@@ -62,27 +62,3 @@ def test_set_default(create_location):
     other_location.set_default()
     assert not location.is_default
     assert other_location.is_default
-
-
-def test_get_buildings(db, dummy_location, create_room):
-    room = create_room()
-    assert len(dummy_location.rooms) == 1
-    assert room.longitude is None
-    assert room.latitude is None
-    assert not dummy_location.get_buildings()  # no buildings with coordinates
-    create_room(building=u'111', longitude=1.23, latitude=4.56)
-    create_room(building=u'111', longitude=1.23, latitude=4.56)
-    create_room(building=u'222', longitude=1.3, latitude=3.7)
-    create_room(building=u'222')
-    db.session.flush()
-    buildings = dummy_location.get_buildings()
-    assert buildings
-    for building in buildings:
-        rooms = [r for r in dummy_location.rooms if r.building == building['number']]
-        assert {r['id'] for r in building['rooms']} == {r.id for r in rooms}
-        assert any(r.latitude and r.longitude for r in rooms)  # at least one room in the building needs coordinates
-        for room in rooms:
-            assert building['number'] == room.building
-            if room.longitude and room.latitude:
-                assert building['longitude'] == room.longitude
-                assert building['latitude'] == room.latitude

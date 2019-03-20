@@ -27,8 +27,8 @@ from babel.dates import format_timedelta as _format_timedelta
 from babel.dates import get_timezone
 from babel.numbers import format_number as _format_number
 from dateutil.relativedelta import relativedelta as _relativedelta
-from dateutil.rrule import DAILY, FR, MO, SA, SU, TH, TU, WE, rrule
-from flask import has_request_context, request, session
+from dateutil.rrule import DAILY, FR, MO, TH, TU, WE, rrule
+from flask import has_request_context, session
 
 from indico.core.config import config
 from indico.util.i18n import _, get_current_locale, ngettext, parse_locale
@@ -362,30 +362,6 @@ def iterdays(start, end, skip_weekends=False, day_whitelist=None, day_blacklist=
         yield day
 
 
-def get_datetime_from_request(prefix='', default=None, source=None):
-    """Retrieves date and time from request data."""
-    if source is None:
-        source = request.values
-
-    if default is None:
-        default = datetime.now()
-
-    date_str = source.get('{}date'.format(prefix), '')
-    time_str = source.get('{}time'.format(prefix), '')
-
-    try:
-        parsed_date = datetime.strptime(date_str, '%Y-%m-%d').date()
-    except ValueError:
-        parsed_date = default.date()
-
-    try:
-        parsed_time = datetime.strptime(time_str, '%H:%M').time()
-    except ValueError:
-        parsed_time = default.time()
-
-    return datetime.combine(parsed_date, parsed_time)
-
-
 def get_day_start(day, tzinfo=None):
     """Return the earliest datetime for a given day.
 
@@ -416,29 +392,6 @@ def get_day_end(day, tzinfo=None):
         day = day.date()
     end_dt = datetime.combine(day, dt_time(23, 59))
     return tzinfo.localize(end_dt) if tzinfo else end_dt
-
-
-def round_up_to_minutes(dt, precision=15):
-    """
-    Rounds up a date time object to the given precision in minutes.
-
-    :param dt: datetime -- the time to round up
-    :param precision: int -- the precision to round up by in minutes. Negative
-        values for the precision are allowed but will round down instead of up.
-    :returns: datetime -- the time rounded up by the given precision in minutes.
-    """
-    increment = precision * 60
-    secs_in_current_hour = (dt.minute * 60) + dt.second + (dt.microsecond * 1e-6)
-    delta = (secs_in_current_hour // increment) * increment + increment - secs_in_current_hour
-    return dt + timedelta(seconds=delta)
-
-
-def get_month_start(date):
-    return date + relativedelta(day=1)
-
-
-def get_month_end(date):
-    return date + relativedelta(day=1, months=+1, days=-1)
 
 
 def strftime_all_years(dt, fmt):

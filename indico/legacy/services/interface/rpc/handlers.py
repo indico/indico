@@ -16,21 +16,8 @@
 
 from importlib import import_module
 
-from indico.modules.rb.services import blockings as rb_blocking_services
-from indico.modules.rb.services import rooms as rb_room_services
 
-
-methodMap = {
-    # rb rooms
-    'roomBooking.rooms.availabilitySearch': rb_room_services.RoomBookingAvailabilitySearchRooms,
-    'roomBooking.locationsAndRooms.listWithGuids': rb_room_services.RoomBookingListLocationsAndRoomsWithGuids,
-    'roomBooking.room.bookingPermission': rb_room_services.BookingPermission,
-    # rb blockings
-    'roombooking.blocking.approve': rb_blocking_services.RoomBookingBlockingApprove,
-    'roombooking.blocking.reject': rb_blocking_services.RoomBookingBlockingReject,
-}
-
-
+methodMap = {}
 endpointMap = {
     "search": import_module('indico.legacy.services.implementation.search')
 }

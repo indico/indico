@@ -68,7 +68,6 @@
     "redux-router-querystring": ">=0.0.11",
     "redux-thunk": "^2.3.0",
     "reselect": "^4.0.0",
-    "rrule": "^2.6.0",
     "selectize": "^0.12.6",
     "semantic-ui-react": "^0.84.0",
     "shortid": "^2.2.14",

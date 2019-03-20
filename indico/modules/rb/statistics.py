@@ -1,4 +1,20 @@
-from __future__ import division
+# This file is part of Indico.
+# Copyright (C) 2002 - 2019 European Organization for Nuclear Research (CERN).
+#
+# Indico is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 3 of the
+# License, or (at your option) any later version.
+#
+# Indico is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Indico; if not, see <http://www.gnu.org/licenses/>.
+
+from __future__ import division, unicode_literals
 
 from datetime import date, datetime
 
@@ -54,21 +70,3 @@ def calculate_rooms_occupancy(rooms, start=None, end=None):
     bookable_time = calculate_rooms_bookable_time(rooms, start, end)
     booked_time = calculate_rooms_booked_time(rooms, start, end)
     return booked_time / bookable_time if bookable_time else 0
-
-
-def compose_rooms_stats(rooms):
-    reservations = Reservation.find(Reservation.room_id.in_(r.id for r in rooms))
-    return {
-        'active': {
-            'valid': reservations.filter(Reservation.is_accepted, ~Reservation.is_archived).count(),
-            'pending': reservations.filter(Reservation.is_pending, ~Reservation.is_archived).count(),
-            'cancelled': reservations.filter(Reservation.is_cancelled, ~Reservation.is_archived).count(),
-            'rejected': reservations.filter(Reservation.is_rejected, ~Reservation.is_archived).count(),
-        },
-        'archived': {
-            'valid': reservations.filter(Reservation.is_accepted, Reservation.is_archived).count(),
-            'pending': reservations.filter(Reservation.is_pending, Reservation.is_archived).count(),
-            'cancelled': reservations.filter(Reservation.is_cancelled, Reservation.is_archived).count(),
-            'rejected': reservations.filter(Reservation.is_rejected, Reservation.is_archived).count()
-        }
-    }

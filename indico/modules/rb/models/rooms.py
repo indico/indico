@@ -67,8 +67,8 @@ class Room(versioned_cache(_cache, 'id'), ProtectionManagersMixin, db.Model, Ser
 
     __public__ = [
         'id', 'name', 'location_name', 'floor', 'number', 'building',
-        'booking_url', 'capacity', 'comments', 'owner_id', 'details_url',
-        'large_photo_url', 'has_photo', 'sprite_position', 'is_active',
+        'capacity', 'comments', 'owner_id', 'details_url',
+        'has_photo', 'sprite_position', 'is_active',
         'is_reservable', 'is_auto_confirm', 'marker_description', 'kind',
         'booking_limit_days'
     ]
@@ -78,13 +78,13 @@ class Room(versioned_cache(_cache, 'id'), ProtectionManagersMixin, db.Model, Ser
     ]
 
     __calendar_public__ = [
-        'id', 'building', 'name', 'floor', 'number', 'kind', 'booking_url', 'details_url', 'location_name',
+        'id', 'building', 'name', 'floor', 'number', 'kind', 'details_url', 'location_name',
         'max_advance_days'
     ]
 
     __api_public__ = (
         'id', 'building', 'name', 'floor', 'longitude', 'latitude', ('number', 'roomNr'), ('location_name', 'location'),
-        ('full_name', 'fullName'), ('booking_url', 'bookingUrl')
+        ('full_name', 'fullName')
     )
 
     __api_minimal_public__ = (
@@ -329,22 +329,10 @@ class Room(versioned_cache(_cache, 'id'), ProtectionManagersMixin, db.Model, Ser
         return ~self.reservations_need_confirmation
 
     @property
-    def booking_url(self):
-        if self.id is None:
-            return None
-        return url_for('rooms.room_book', self)
-
-    @property
     def details_url(self):
         if self.id is None:
             return None
         return url_for('rooms_new.room_link', room_id=self.id)
-
-    @property
-    def large_photo_url(self):
-        if self.id is None:
-            return None
-        return url_for('rooms.photo', roomID=self.id)
 
     @property
     def map_url(self):

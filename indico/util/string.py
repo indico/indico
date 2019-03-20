@@ -172,16 +172,6 @@ def slugify(*args, **kwargs):
     return value
 
 
-def unicode_struct_to_utf8(obj):
-    if isinstance(obj, unicode):
-        return obj.encode('utf-8', 'replace')
-    elif isinstance(obj, list):
-        return map(unicode_struct_to_utf8, obj)
-    elif isinstance(obj, dict):
-        return {unicode_struct_to_utf8(k): unicode_struct_to_utf8(v) for k, v in obj.iteritems()}
-    return obj
-
-
 def return_ascii(f):
     """Decorator to normalize all unicode characters.
 

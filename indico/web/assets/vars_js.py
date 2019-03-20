@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 import os
 
 from flask import current_app, json, render_template, session
-from werkzeug.urls import url_join, url_parse
+from werkzeug.urls import url_parse
 
 from indico.core.auth import multipass
 from indico.core.config import config
@@ -116,17 +116,6 @@ def generate_global_file():
             'AttachmentManager': url_rule_to_js('attachments.management'),
             'ManagementAttachmentInfoColumn': url_rule_to_js('attachments.management_info_column'),
 
-            'RoomBooking': {
-                'room': {
-                    'check_available': url_rule_to_js('rooms_new.check_room_available'),
-                },
-                'calendar': url_join(url_for('rooms_new.roombooking'), 'calendar')
-            },
-            'RoomBookingBookRoom': url_rule_to_js('rooms.room_book'),
-            'RoomBookingBook': url_rule_to_js('rooms.book'),
-            'RoomBookingDetails': url_rule_to_js('rooms.roomBooking-roomDetails'),
-            'RoomBookingCloneBooking': url_rule_to_js('rooms.roomBooking-cloneBooking'),
-
             'APIKeyCreate': url_for('api.key_create'),
             'APIKeyTogglePersistent': url_for('api.key_toggle_persistent'),
             'FontSassBundle': current_app.manifest['fonts.css']._paths,
@@ -215,7 +204,6 @@ def generate_global_file():
 
         'Settings': {
             'ExtAuthenticators': ext_auths,
-            'RoomBookingModuleActive': config.ENABLE_ROOMBOOKING,
         },
 
         'FileRestrictions': {

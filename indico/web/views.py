@@ -367,18 +367,6 @@ class WPDecorated(WPBase):
         return ''
 
 
-class WPNotDecorated(WPBase):
-    def _display(self, params):
-        params = dict(params, **self._kwargs)
-        return self._getBody(params)
-
-    def _getBody(self, params):
-        pass
-
-    def _get_breadcrumbs(self):
-        return ''
-
-
 class WPError(WPDecorated, WPJinjaMixin):
     def __init__(self, message, description):
         WPDecorated.__init__(self, None)

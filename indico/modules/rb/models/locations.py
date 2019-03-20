@@ -15,7 +15,6 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import re
-from collections import defaultdict
 from datetime import time
 
 from sqlalchemy import func
@@ -24,7 +23,6 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from indico.core.db import db
 from indico.util.caching import memoize_request
 from indico.util.decorators import classproperty
-from indico.util.i18n import _
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii
 
@@ -136,20 +134,3 @@ class Location(db.Model):
         (Location.query
          .filter(Location.is_default | (Location.id == self.id))
          .update({'is_default': func.not_(Location.is_default)}, synchronize_session='fetch'))
-
-    def get_buildings(self):
-        building_rooms = defaultdict(list)
-        for room in self.rooms:
-            building_rooms[room.building].append(room)
-
-        buildings = []
-        for building_name, rooms in building_rooms.iteritems():
-            room_with_lat_lon = next((r for r in rooms if r.longitude and r.latitude), None)
-            if not room_with_lat_lon:
-                continue
-            buildings.append({'number': building_name,
-                              'title': _(u'Building {}'.format(building_name)),
-                              'longitude': room_with_lat_lon.longitude,
-                              'latitude': room_with_lat_lon.latitude,
-                              'rooms': [r.to_serializable('__public_exhaustive__') for r in rooms]})
-        return buildings

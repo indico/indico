@@ -21,7 +21,3 @@ import 'indico/legacy/libs/room_booking/map_of_rooms';
 import 'indico/legacy/libs/room_booking/room_selector';
 import 'indico/legacy/libs/room_booking/util';
 import 'indico/legacy/libs/room_booking/validation';
-
-import {RRule} from 'rrule';
-
-window.RRule = RRule;

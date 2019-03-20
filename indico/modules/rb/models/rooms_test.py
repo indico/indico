@@ -44,19 +44,6 @@ def test_is_auto_confirm(create_room, need_confirmation):
     assert Room.find_first(is_auto_confirm=not need_confirmation) == room
 
 
-def test_urls_transient_object():
-    room = Room()
-    assert room.booking_url is None
-    assert room.details_url is None
-    assert room.large_photo_url is None
-
-
-def test_urls(dummy_room):
-    assert dummy_room.booking_url is not None
-    assert dummy_room.details_url is not None
-    assert dummy_room.large_photo_url is not None
-
-
 def test_has_photo(db, dummy_room):
     assert not dummy_room.has_photo
     dummy_room.photo = Photo()
