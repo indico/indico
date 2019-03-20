@@ -7,5 +7,5 @@
 {% include 'rb/emails/reservations/reservation_info.txt' %}
 
 You can check the details of the booking here:
-{{ url_for('rooms.roomBooking-bookingDetails', roomLocation=reservation.location_name, resvID=reservation.id, _external=true) }}
+{{ reservation.details_url }}
 {%- endblock %}

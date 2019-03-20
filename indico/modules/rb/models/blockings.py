@@ -26,6 +26,7 @@ from indico.modules.rb.util import rb_is_admin
 from indico.util.date_time import now_utc
 from indico.util.string import format_repr, return_ascii
 from indico.util.user import iter_acl
+from indico.web.flask.util import url_for
 
 
 class Blocking(db.Model):
@@ -120,6 +121,10 @@ class Blocking(db.Model):
             elif room and room.is_owned_by(user):
                 return True
         return any(user in principal for principal in iter_acl(self.allowed))
+
+    @property
+    def details_url(self):
+        return url_for('rooms_new.blocking_link', blocking_id=self.id, _external=True)
 
     @return_ascii
     def __repr__(self):

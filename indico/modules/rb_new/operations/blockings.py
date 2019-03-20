@@ -104,6 +104,7 @@ def _update_blocked_rooms(blocking, room_ids):
         blocked_room = BlockedRoom(room=rooms[room_id])
         blocking.blocked_rooms.append(blocked_room)
         added_blocked_rooms.add(blocked_room)
+    db.session.flush()
     _approve_or_request_rooms(blocking, added_blocked_rooms)
 
 

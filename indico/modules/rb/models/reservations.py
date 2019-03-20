@@ -329,7 +329,7 @@ class Reservation(Serializer, db.Model):
 
     @property
     def details_url(self):
-        return url_for('rooms.roomBooking-bookingDetails', self, _external=True)
+        return url_for('rooms_new.booking_link', booking_id=self.id, _external=True)
 
     @property
     def location_name(self):

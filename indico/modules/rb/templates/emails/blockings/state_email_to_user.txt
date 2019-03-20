@@ -11,5 +11,5 @@ Reason: {{ blocked_room.rejection_reason or '(none)' }}
 {%- endif %}
 
 You can view the details of your blocking here:
-{{ url_for('rooms.blocking_details', blocking_id=blocking.id, _external=true) }}
+{{ blocking.details_url }}
 {%- endblock %}

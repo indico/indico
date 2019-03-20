@@ -16,11 +16,12 @@
 
 from __future__ import unicode_literals
 
-from flask import jsonify
+from flask import jsonify, redirect
 
 from indico.modules.rb_new.controllers.backend import admin, blockings, bookings, locations, misc, rooms
 from indico.modules.rb_new.controllers.frontend import RHRoomBooking
 from indico.modules.rb_new.event import controllers as event
+from indico.web.flask.util import url_for
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -123,3 +124,19 @@ _bp.add_url_rule('!/event/<confId>/manage/rooms/linking/contributions', 'event_l
                  event.RHListLinkableContributions)
 _bp.add_url_rule('!/event/<confId>/manage/rooms/linking/session-blocks', 'event_linkable_session_blocks',
                  event.RHListLinkableSessionBlocks)
+
+
+# Deep/quick links
+@_bp.route('/booking/<int:booking_id>')
+def booking_link(booking_id):
+    return redirect(url_for('rooms_new.roombooking', modal='booking-details:{}'.format(booking_id)))
+
+
+@_bp.route('/my-bookings')
+def my_bookings_link():
+    return redirect(url_for('rooms_new.roombooking', path='calendar', view='list', my_bookings='true'))
+
+
+@_bp.route('/blocking/<int:blocking_id>')
+def blocking_link(blocking_id):
+    return redirect(url_for('rooms_new.roombooking', path='blockings', modal='blocking-details:{}'.format(blocking_id)))
