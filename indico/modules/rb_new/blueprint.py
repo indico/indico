@@ -127,6 +127,11 @@ _bp.add_url_rule('!/event/<confId>/manage/rooms/linking/session-blocks', 'event_
 
 
 # Deep/quick links
+@_bp.route('/room/<int:room_id>')
+def room_link(room_id):
+    return redirect(url_for('rooms_new.roombooking', modal='room-details:{}'.format(room_id)))
+
+
 @_bp.route('/booking/<int:booking_id>')
 def booking_link(booking_id):
     return redirect(url_for('rooms_new.roombooking', modal='booking-details:{}'.format(booking_id)))

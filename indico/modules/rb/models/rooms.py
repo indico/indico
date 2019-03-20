@@ -338,7 +338,7 @@ class Room(versioned_cache(_cache, 'id'), ProtectionManagersMixin, db.Model, Ser
     def details_url(self):
         if self.id is None:
             return None
-        return url_for('rooms.roomBooking-roomDetails', self)
+        return url_for('rooms_new.room_link', room_id=self.id)
 
     @property
     def large_photo_url(self):
