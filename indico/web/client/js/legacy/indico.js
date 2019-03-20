@@ -27,17 +27,13 @@ import './libs/indico/Core/Widgets/Inline.js';
 import './libs/indico/Core/Widgets/Menu.js';
 import './libs/indico/Core/Widgets/RichText.js';
 import './libs/indico/Core/Dialogs/Popup.js';
-import './libs/indico/Core/Dialogs/PopupWidgets.js';
 import './libs/indico/Core/Dialogs/Base.js';
 import './libs/indico/Core/Dialogs/Util.js';
 import './libs/indico/Core/Dialogs/Users.js';
-import './libs/indico/Core/Dialogs/PopupWidgets.js';
 import './libs/indico/Core/Browser.js';
 import './libs/indico/Core/Util.js';
 import './libs/indico/Core/Dragndrop.js';
 import './libs/indico/Core/keymap.js';
-
-import './libs/indico/Management/RoomBooking.js';
 
 import './libs/indico/Legacy/Widgets.js';
 import './libs/indico/Legacy/Util.js';

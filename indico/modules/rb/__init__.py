@@ -29,7 +29,6 @@ logger = Logger.get('rb')
 
 
 rb_settings = SettingsProxy('roombooking', {
-    'google_maps_api_key': '',
     'assistance_emails': [],
     'vc_support_emails': [],
     'excluded_categories': [],
