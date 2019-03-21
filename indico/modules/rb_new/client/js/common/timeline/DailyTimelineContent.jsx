@@ -27,7 +27,7 @@ import {toMoment} from 'indico/utils/date';
 import {TooltipIfTruncated} from 'indico/react/components';
 import {Overridable} from 'indico/react/util';
 
-import RowActionsDropdown from '../bookings/RowActionsDropdown';
+import RowActionsDropdown from './RowActionsDropdown';
 import TimelineItem from './TimelineItem';
 import EditableTimelineItem from './EditableTimelineItem';
 
