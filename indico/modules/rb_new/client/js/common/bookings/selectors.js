@@ -27,19 +27,18 @@ const getRawDetails = (state, {bookingId}) => state.bookings.details[bookingId];
 
 
 function applyPermissionsToOccurrences(occurrences, override) {
-    return _.update(occurrences, 'bookings', (data) => {
-        return _.fromPairs(Object.entries(data).map(([day, dayData]) => {
-            dayData = dayData.map(rawOcc => {
-                const {permissions, ...occ} = rawOcc;
-                if (!permissions) {
-                    return occ;
-                }
-                const activePermissions = (override && permissions.admin) ? permissions.admin : permissions.user;
-                return {...occ, ...activePermissions};
-            });
-            return [day, dayData];
-        }));
-    });
+    const bookings = _.fromPairs(Object.entries(occurrences.bookings).map(([day, dayData]) => {
+        dayData = dayData.map(rawOcc => {
+            const {permissions, ...occ} = rawOcc;
+            if (!permissions) {
+                return occ;
+            }
+            const activePermissions = (override && permissions.admin) ? permissions.admin : permissions.user;
+            return {...occ, ...activePermissions};
+        });
+        return [day, dayData];
+    }));
+    return {...occurrences, bookings};
 }
 
 export const getDetails = createSelector(
