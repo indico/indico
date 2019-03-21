@@ -46,7 +46,7 @@
     "pagedown": "^1.1.0",
     "pagedown-editor": "0.0.10",
     "qs": "^6.6.0",
-    "qtip2": "^3.0.3",
+    "qtip2": "github:indico/qTip2",
     "react": "^16.8.4",
     "react-dates": "^20.0.0",
     "react-debounce-input": "^3.2.0",
