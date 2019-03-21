@@ -38,7 +38,7 @@ def _check_existing_email(form, field):
 
 
 def _check_existing_username(form, field):
-    if Identity.query.filter(provider='indico', identifier=field.data).has_rows():
+    if Identity.query.filter_by(provider='indico', identifier=field.data).has_rows():
         raise ValidationError(_('This username is already in use.'))
 
 
