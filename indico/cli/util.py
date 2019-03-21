@@ -36,7 +36,7 @@ class IndicoFlaskGroup(FlaskGroup):
 
     def __init__(self, **extra):
         super(IndicoFlaskGroup, self).__init__(create_app=_create_app, add_default_commands=False,
-                                               add_version_option=False, **extra)
+                                               add_version_option=False, set_debug_flag=False, **extra)
         self._indico_plugin_commands = None
 
     def _load_plugin_commands(self):
