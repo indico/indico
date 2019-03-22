@@ -15,7 +15,6 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import moment from 'moment';
 import React from 'react';
 import PropTypes from 'prop-types';
 import {bindActionCreators} from 'redux';
@@ -28,10 +27,8 @@ import {ReduxFormField, formatters, validators as v} from 'indico/react/forms';
 import {Param, Translate} from 'indico/react/i18n';
 
 import * as bookingsActions from '../bookings/actions';
-import {actions as bookRoomActions} from '../../modules/bookRoom';
-import * as bookRoomSelectors from '../../modules/bookRoom/selectors';
 import TimelineLegend from './TimelineLegend';
-import {DailyTimelineContent} from '.';
+import SingleRoomTimeline from './SingleRoomTimeline';
 
 import './RowActionsDropdown.module.scss';
 
@@ -41,19 +38,15 @@ class RowActionsDropdown extends React.Component {
         booking: PropTypes.object,
         date: PropTypes.object,
         room: PropTypes.object,
-        filters: PropTypes.object.isRequired,
-        availability: PropTypes.object,
         actions: PropTypes.exact({
             changeBookingOccurrenceState: PropTypes.func.isRequired,
             fetchBookingDetails: PropTypes.func.isRequired,
-            fetchAvailability: PropTypes.func.isRequired,
         }).isRequired,
     };
 
     static defaultProps = {
         booking: null,
         date: null,
-        availability: null,
         room: null,
     };
 
@@ -80,9 +73,7 @@ class RowActionsDropdown extends React.Component {
         this.setState({activeConfirmation: type});
     };
 
-    showRoomTimeline = (room) => {
-        const {actions: {fetchAvailability}, filters} = this.props;
-        fetchAvailability(room, filters);
+    showRoomTimeline = () => {
         this.setState({activeRoomTimeline: true});
     };
 
@@ -151,42 +142,9 @@ class RowActionsDropdown extends React.Component {
         );
     };
 
-    // todo: create single room timeline component
-    renderRoomTimeline(availability) {
-        const {availability: {dateRange}} = this.props;
-        const rows = dateRange.map((day) => this._getRowSerializer(day)(availability));
-        return <DailyTimelineContent rows={rows} fixedHeight={rows.length > 1 ? '70vh' : null} />;
-    }
-
-    _getRowSerializer(day) {
-        const {room} = this.props;
-        return ({bookings, preBookings, candidates, conflictingCandidates, nonbookablePeriods, unbookableHours,
-                 blockings, conflicts, preConflicts}) => ({
-            availability: {
-                candidates: (candidates[day] || []).map((candidate) => (
-                    {...candidate, bookable: false})
-                ) || [],
-                conflictingCandidates: (conflictingCandidates[day] || []).map((candidate) => (
-                    {...candidate, bookable: false}
-                )) || [],
-                preBookings: preBookings[day] || [],
-                bookings: bookings[day] || [],
-                conflicts: conflicts[day] || [],
-                preConflicts: preConflicts[day] || [],
-                nonbookablePeriods: nonbookablePeriods[day] || [],
-                unbookableHours: unbookableHours || [],
-                blockings: blockings[day] || []
-            },
-            label: moment(day).format('L'),
-            key: day,
-            conflictIndicator: true,
-            room
-        });
-    }
-
     render() {
         const {activeConfirmation, activeRoomTimeline, actionInProgress, dropdownOpen, top, left} = this.state;
-        const {availability, booking, date, room} = this.props;
+        const {booking, date, room} = this.props;
         const serializedDate = serializeDate(date, 'L');
         let canCancel, canReject;
         const rejectionForm = (
@@ -283,7 +241,7 @@ class RowActionsDropdown extends React.Component {
                                content={<TimelineLegend labels={legendLabels} compact />} />
                     </Modal.Header>
                     <Modal.Content>
-                        {availability && this.renderRoomTimeline(availability)}
+                        <SingleRoomTimeline room={room} />
                     </Modal.Content>
                 </Modal>
             </div>
@@ -292,15 +250,11 @@ class RowActionsDropdown extends React.Component {
 }
 
 export default connect(
-    state => ({
-        filters: bookRoomSelectors.getFilters(state),
-        availability: bookRoomSelectors.getBookingFormAvailability(state),
-    }),
+    null,
     (dispatch) => ({
         actions: bindActionCreators({
             changeBookingOccurrenceState: bookingsActions.changeBookingOccurrenceState,
             fetchBookingDetails: bookingsActions.fetchBookingDetails,
-            fetchAvailability: bookRoomActions.fetchBookingAvailability,
         }, dispatch)
     }),
 )(RowActionsDropdown);
