@@ -15,7 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import createHistory from 'history/createBrowserHistory';
+import {createBrowserHistory} from 'history';
 import {queryStringMiddleware} from 'redux-router-querystring';
 import {routerMiddleware} from 'connected-react-router';
 import createReduxStore from 'indico/utils/redux';
@@ -40,7 +40,7 @@ function getRouteConfig() {
     };
 }
 
-export const history = createHistory({
+export const history = createBrowserHistory({
     basename: `${Indico.Urls.BasePath}/rooms-new`
 });
 
