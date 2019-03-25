@@ -36,5 +36,5 @@ class WPAdmin(WPJinjaMixin, WPDecorated):
             items.append(menu_item.title)
         return render_breadcrumbs(*items)
 
-    def _getBody(self, params):
-        return self._getPageContent(params)
+    def _get_body(self, params):
+        return self._get_page_content(params)

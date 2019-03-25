@@ -26,8 +26,8 @@ class WPManageTracks(MathjaxMixin, WPEventManagement):
     sidemenu_option = 'program'
     bundles = ('markdown.js', 'module_events.tracks.js')
 
-    def _getHeadContent(self):
-        return WPEventManagement._getHeadContent(self) + MathjaxMixin._getHeadContent(self)
+    def _get_head_content(self):
+        return WPEventManagement._get_head_content(self) + MathjaxMixin._get_head_content(self)
 
 
 class WPDisplayTracks(WPConferenceDisplayBase):

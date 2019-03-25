@@ -154,7 +154,7 @@ class WPJinjaMixin(object):
                 templates.append(tpl[:pos] + cls.template_prefix + tpl[pos:])
             return templates
 
-    def _getPageContent(self, params):
+    def _get_page_content(self, params):
         html = params.pop('_html', None)
         if html is not None:
             return html
@@ -214,7 +214,7 @@ class WPBase(WPBundleMixin):
             _bundles += ('ckeditor.js',)
         return _bundles
 
-    def _getHeadContent(self):
+    def _get_head_content(self):
         """
         Returns _additional_ content between <head></head> tags.
         Please note that <title>, <meta> and standard CSS are always included.
@@ -265,7 +265,7 @@ class WPBase(WPBundleMixin):
                                site_name=core_settings.get('site_title'),
                                social=social_settings.get_all(),
                                page_title=' - '.join(unicode(x) for x in title_parts if x),
-                               head_content=to_unicode(self._getHeadContent()),
+                               head_content=to_unicode(self._get_head_content()),
                                body=body)
 
 
@@ -358,16 +358,16 @@ class WPDecorated(WPBase):
     def _get_footer(self):
         return render_template('footer.html')
 
-    def _applyDecoration(self, body):
+    def _apply_decoration(self, body):
         breadcrumbs = self._get_breadcrumbs()
         return '<div class="header">{}</div>\n<div class="main">{}<div>{}</div></div>\n{}'.format(
             self._get_header(), breadcrumbs, to_unicode(body), self._get_footer())
 
     def _display(self, params):
         params = dict(params, **self._kwargs)
-        return self._applyDecoration(self._getBody(params))
+        return self._apply_decoration(self._get_body(params))
 
-    def _getBody(self, params):
+    def _get_body(self, params):
         raise NotImplementedError
 
     def _get_breadcrumbs(self):
@@ -380,8 +380,8 @@ class WPError(WPDecorated, WPJinjaMixin):
         self._message = message
         self._description = description
 
-    def _getBody(self, params):
-        return self._getPageContent({
+    def _get_body(self, params):
+        return self._get_page_content({
             '_jinja_template': 'error.html',
             'error_message': self._message,
             'error_description': self._description

@@ -35,8 +35,8 @@ class DisplaySurveyMixin(WPJinjaMixin):
     template_prefix = 'events/surveys/'
     base_class = None
 
-    def _getBody(self, params):
-        return WPJinjaMixin._getPageContent(self, params)
+    def _get_body(self, params):
+        return WPJinjaMixin._get_page_content(self, params)
 
 
 class WPDisplaySurveyConference(DisplaySurveyMixin, WPConferenceDisplayBase):

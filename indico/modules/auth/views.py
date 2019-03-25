@@ -23,8 +23,8 @@ from indico.web.views import WPDecorated, WPJinjaMixin
 class WPAuth(WPJinjaMixin, WPDecorated):
     template_prefix = 'auth/'
 
-    def _getBody(self, params):
-        return self._getPageContent(params)
+    def _get_body(self, params):
+        return self._get_page_content(params)
 
 
 class WPAuthUser(WPUser):

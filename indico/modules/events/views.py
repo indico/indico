@@ -122,11 +122,11 @@ class WPEventBase(WPDecorated):
     def _get_header(self):
         raise NotImplementedError  # must be overridden by meeting/lecture and conference WPs
 
-    def _getHeadContent(self):
+    def _get_head_content(self):
         site_name = core_settings.get('site_title')
         meta = render_template('events/meta.html', event=self.event, site_name=site_name,
                                json_ld=serialize_event_for_json_ld(self.event, full=True))
-        return WPDecorated._getHeadContent(self) + meta
+        return WPDecorated._get_head_content(self) + meta
 
 
 class WPSimpleEventDisplayBase(MathjaxMixin, WPEventBase):
@@ -167,18 +167,18 @@ class WPSimpleEventDisplay(WPSimpleEventDisplayBase):
                       if print_stylesheet else ())
         }
 
-    def _getHeadContent(self):
-        return MathjaxMixin._getHeadContent(self) + WPEventBase._getHeadContent(self)
+    def _get_head_content(self):
+        return MathjaxMixin._get_head_content(self) + WPEventBase._get_head_content(self)
 
     def get_extra_css_files(self):
         custom_url = get_css_url(self.event)
         return [custom_url] if custom_url else []
 
-    def _applyDecoration(self, body):
+    def _apply_decoration(self, body):
         if request.args.get('frame') == 'no' or request.args.get('fr') == 'no' or request.args.get('print') == '1':
             return render_template('events/display/print.html', content=body)
         else:
-            return WPEventBase._applyDecoration(self, body)
+            return WPEventBase._apply_decoration(self, body)
 
     def _get_header(self):
         return render_event_header(self.event, theme=self.theme_id, theme_override=self.theme_override)
@@ -186,7 +186,7 @@ class WPSimpleEventDisplay(WPSimpleEventDisplayBase):
     def _get_footer(self):
         return render_event_footer(self.event, dark=True)
 
-    def _getBody(self, params):
+    def _get_body(self, params):
         attached_items = self.event.attached_items
         folders = [folder for folder in attached_items.get('folders', []) if folder.title != 'Internal Page Files']
         files = attached_items.get('files', [])
@@ -267,16 +267,16 @@ class WPConferenceDisplayBase(WPJinjaMixin, MathjaxMixin, WPEventBase):
         entry = self.sidemenu_entry
         return entry.localized_title if entry else ''
 
-    def _getHeadContent(self):
+    def _get_head_content(self):
         return '\n'.join([
-            MathjaxMixin._getHeadContent(self),
-            WPEventBase._getHeadContent(self)
+            MathjaxMixin._get_head_content(self),
+            WPEventBase._get_head_content(self)
         ])
 
-    def _getBody(self, params):
-        return WPJinjaMixin._getPageContent(self, params)
+    def _get_body(self, params):
+        return WPJinjaMixin._get_page_content(self, params)
 
-    def _applyDecoration(self, body):
+    def _apply_decoration(self, body):
         self.logo_url = self.event.logo_url if self.event.has_logo else None
         css_override_form = self._kwargs.get('css_override_form')
         if css_override_form:
@@ -284,13 +284,13 @@ class WPConferenceDisplayBase(WPJinjaMixin, MathjaxMixin, WPEventBase):
                                             event=self.event, form=css_override_form,
                                             download_url=self._kwargs['css_url_override'])
             body = override_html + body
-        return WPEventBase._applyDecoration(self, to_unicode(body))
+        return WPEventBase._apply_decoration(self, to_unicode(body))
 
 
 class WPConferenceDisplay(WPConferenceDisplayBase):
     menu_entry_name = 'overview'
 
-    def _getBody(self, params):
+    def _get_body(self, params):
         return render_template('events/display/conference.html', **self._kwargs)
 
     def _get_footer(self):
@@ -300,5 +300,5 @@ class WPConferenceDisplay(WPConferenceDisplayBase):
 class WPAccessKey(WPJinjaMixin, WPDecorated):
     template_prefix = 'events/'
 
-    def _getBody(self, params):
-        return self._getPageContent(params)
+    def _get_body(self, params):
+        return self._get_page_content(params)

@@ -63,8 +63,8 @@ class WPEventManagement(WPJinjaMixin, WPDecorated):
     def _get_header(self):
         return render_header(category=self.event.category, local_tz=self.event.timezone, force_local_tz=True)
 
-    def _getBody(self, params):
-        return self._getPageContent(params)
+    def _get_body(self, params):
+        return self._get_page_content(params)
 
     def _get_breadcrumbs(self):
         return render_breadcrumbs(event=self.event, management=True)

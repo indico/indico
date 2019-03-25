@@ -30,8 +30,8 @@ class WPManageAbstracts(MathjaxMixin, WPEventManagement):
     sidemenu_option = 'abstracts'
     bundles = ('module_events.abstracts.js', 'module_events.abstracts.css', 'markdown.js')
 
-    def _getHeadContent(self):
-        return WPEventManagement._getHeadContent(self) + MathjaxMixin._getHeadContent(self)
+    def _get_head_content(self):
+        return WPEventManagement._get_head_content(self) + MathjaxMixin._get_head_content(self)
 
 
 class WPDisplayAbstractsBase(WPConferenceDisplayBase):

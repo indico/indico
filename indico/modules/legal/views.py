@@ -34,13 +34,13 @@ class WPDisplayTOS(WPLegalMixin, WPJinjaMixin, WPDecorated):
     def _get_breadcrumbs(self):
         return render_breadcrumbs(_('Terms and Conditions'))
 
-    def _getBody(self, params):
-        return self._getPageContent(params)
+    def _get_body(self, params):
+        return self._get_page_content(params)
 
 
 class WPDisplayPrivacyPolicy(WPLegalMixin, WPJinjaMixin, WPDecorated):
     def _get_breadcrumbs(self):
         return render_breadcrumbs(_('Privacy Policy'))
 
-    def _getBody(self, params):
-        return self._getPageContent(params)
+    def _get_body(self, params):
+        return self._get_page_content(params)

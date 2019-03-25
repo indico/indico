@@ -50,17 +50,17 @@ class WPCategory(MathjaxMixin, WPJinjaMixin, WPDecorated):
         return render_header(category=self.category, protected_object=self.category,
                              local_tz=self.category.display_tzinfo.zone)
 
-    def _getBody(self, params):
-        return self._getPageContent(params)
+    def _get_body(self, params):
+        return self._get_page_content(params)
 
-    def _getHeadContent(self):
-        head_content = WPDecorated._getHeadContent(self)
+    def _get_head_content(self):
+        head_content = WPDecorated._get_head_content(self)
         if self.atom_feed_url:
             title = self.atom_feed_title or _("Indico Atom feed")
             head_content += ('<link rel="alternate" type="application/atom+xml" title="{}" href="{}">'
                              .format(escape(title), self.atom_feed_url))
         if self._mathjax:
-            head_content += MathjaxMixin._getHeadContent(self)
+            head_content += MathjaxMixin._get_head_content(self)
         return head_content
 
     def _get_breadcrumbs(self):

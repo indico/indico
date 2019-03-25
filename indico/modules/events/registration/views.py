@@ -55,8 +55,8 @@ class DisplayRegistrationFormMixin(WPJinjaMixin):
     template_prefix = 'events/registration/'
     base_class = None
 
-    def _getBody(self, params):
-        return WPJinjaMixin._getPageContent(self, params)
+    def _get_body(self, params):
+        return WPJinjaMixin._get_page_content(self, params)
 
 
 class WPDisplayRegistrationFormConference(DisplayRegistrationFormMixin, WPConferenceDisplayBase):

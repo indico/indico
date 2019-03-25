@@ -48,8 +48,8 @@ class WPUser(WPJinjaMixin, WPDecorated):
             profile_breadcrumb = _('My Profile')
         return render_breadcrumbs(profile_breadcrumb)
 
-    def _getBody(self, params):
-        return self._getPageContent(params)
+    def _get_body(self, params):
+        return self._get_page_content(params)
 
 
 class WPUsersAdmin(WPAdmin):

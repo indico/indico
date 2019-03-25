@@ -24,8 +24,8 @@ from indico.web.views import WPJinjaMixin
 class WPAgreementFormSimpleEvent(WPJinjaMixin, WPSimpleEventDisplayBase):
     template_prefix = 'events/agreements/'
 
-    def _getBody(self, params):
-        return self._getPageContent(params)
+    def _get_body(self, params):
+        return self._get_page_content(params)
 
 
 class WPAgreementFormConference(WPConferenceDisplayBase):

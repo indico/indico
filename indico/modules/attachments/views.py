@@ -25,8 +25,8 @@ class AttachmentsMixin(WPJinjaMixin):
     template_prefix = 'attachments/'
     base_wp = None
 
-    def _getPageContent(self, params):
-        return WPJinjaMixin._getPageContent(self, params)
+    def _get_page_content(self, params):
+        return WPJinjaMixin._get_page_content(self, params)
 
 
 class WPEventAttachments(AttachmentsMixin, WPEventManagement):
@@ -38,15 +38,15 @@ class WPEventAttachments(AttachmentsMixin, WPEventManagement):
 class WPEventFolderDisplay(WPSimpleEventDisplayBase, WPJinjaMixin):
     template_prefix = 'attachments/'
 
-    def _getBody(self, params):
-        return WPJinjaMixin._getPageContent(self, params)
+    def _get_body(self, params):
+        return WPJinjaMixin._get_page_content(self, params)
 
 
 class WPPackageEventAttachmentsManagement(WPEventAttachments, WPJinjaMixin):
     template_prefix = 'attachments/'
 
     def _getTabContent(self, params):
-        return WPJinjaMixin._getPageContent(self, params)
+        return WPJinjaMixin._get_page_content(self, params)
 
 
 class WPPackageEventAttachmentsDisplayConference(WPConferenceDisplayBase):
@@ -56,5 +56,5 @@ class WPPackageEventAttachmentsDisplayConference(WPConferenceDisplayBase):
 class WPPackageEventAttachmentsDisplay(WPSimpleEventDisplayBase, WPJinjaMixin):
     template_prefix = 'attachments/'
 
-    def _getBody(self, params):
-        return WPJinjaMixin._getPageContent(self, params)
+    def _get_body(self, params):
+        return WPJinjaMixin._get_page_content(self, params)
