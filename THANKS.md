@@ -19,15 +19,6 @@ CKEditor is used for the online creation of web pages. CKEditor is
 distributed under the GPL, LGPL and MPL open source licenses.
 <http://ckeditor.com/>.
 
-The DHTML / JavaScript Calendar is used by Indico and it is available
-under the terms of the GNU Lesser General Public License version 2.1 or
-above.
-<http://www.dynarch.com/projects/calendar/>
-
-HTMLParser/SimpleHtmlParser is a JS library that allows to parse HTML. It has been written
-originally by Erik Arvidsson and extended by John Resig. The original license is GPLv2 or later.
-Compatibility of GPLv3 with this library.
-
 jQuery is a fast and concise JavaScript Library that simplifies HTML document traversing,
 event handling, animating, and Ajax interactions for rapid web development.
 Dual licensed under the MIT or GPL Version 2 licenses.
@@ -60,8 +51,6 @@ jQuery TypeWatch <github.com/dennyferra/TypeWatch>: Dual licensed under the MIT 
 jQuery Extra Selectors <https://github.com/keithclark/JQuery-Extended-Selectors>: Released under MIT license.
 
 Werkzeug (http://werkzeug.pocoo.org) is a BSD-licensed WSGI utility library providing nice things like LocalProxy.
-
-jQuery placeholder (https://github.com/mathiasbynens/jquery-placeholder) is a MIT-licensed plugin for jQuery that provides a placeholder for objects.
 
 [WebHostingHub Glyphs](http://www.webhostinghub.com/glyphs/) is a huge gallery of free font icons licensed under Creative Commons.
 
