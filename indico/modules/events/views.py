@@ -119,7 +119,7 @@ class WPEventBase(WPDecorated):
         if page_title:
             self.title += ': {}'.format(strip_tags(page_title))
 
-    def _getHeader(self):
+    def _get_header(self):
         raise NotImplementedError  # must be overridden by meeting/lecture and conference WPs
 
     def _getHeadContent(self):
@@ -136,11 +136,11 @@ class WPSimpleEventDisplayBase(MathjaxMixin, WPEventBase):
         self.event = event_
         WPEventBase.__init__(self, rh, event_, **kwargs)
 
-    def _getHeader(self):
-        return render_event_header(self.event).encode('utf-8')
+    def _get_header(self):
+        return render_event_header(self.event)
 
-    def _getFooter(self):
-        return render_event_footer(self.event).encode('utf-8')
+    def _get_footer(self):
+        return render_event_footer(self.event)
 
 
 class WPSimpleEventDisplay(WPSimpleEventDisplayBase):
@@ -180,11 +180,11 @@ class WPSimpleEventDisplay(WPSimpleEventDisplayBase):
         else:
             return WPEventBase._applyDecoration(self, body)
 
-    def _getHeader(self):
-        return render_event_header(self.event, theme=self.theme_id, theme_override=self.theme_override).encode('utf-8')
+    def _get_header(self):
+        return render_event_header(self.event, theme=self.theme_id, theme_override=self.theme_override)
 
-    def _getFooter(self):
-        return render_event_footer(self.event, dark=True).encode('utf-8')
+    def _get_footer(self):
+        return render_event_footer(self.event, dark=True)
 
     def _getBody(self, params):
         attached_items = self.event.attached_items
@@ -247,8 +247,8 @@ class WPConferenceDisplayBase(WPJinjaMixin, MathjaxMixin, WPEventBase):
         theme_url = self._kwargs.get('css_url_override', get_css_url(self.event))
         return [theme_url] if theme_url else []
 
-    def _getHeader(self):
-        return render_event_header(self.event, conference_layout=True).encode('utf-8')
+    def _get_header(self):
+        return render_event_header(self.event, conference_layout=True)
 
     @cached_property
     def sidemenu_entry(self):
@@ -293,8 +293,8 @@ class WPConferenceDisplay(WPConferenceDisplayBase):
     def _getBody(self, params):
         return render_template('events/display/conference.html', **self._kwargs)
 
-    def _getFooter(self):
-        return render_event_footer(self.event).encode('utf-8')
+    def _get_footer(self):
+        return render_event_footer(self.event)
 
 
 class WPAccessKey(WPJinjaMixin, WPDecorated):

@@ -60,7 +60,7 @@ class WPEventManagement(WPJinjaMixin, WPDecorated):
         }
         WPDecorated.__init__(self, rh, **kwargs)
 
-    def _getHeader(self):
+    def _get_header(self):
         return render_header(category=self.event.category, local_tz=self.event.timezone, force_local_tz=True)
 
     def _getBody(self, params):

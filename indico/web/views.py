@@ -47,13 +47,12 @@ def _get_timezone_display(local_tz, timezone, force=False):
 
 def render_header(category=None, protected_object=None, local_tz=None, force_local_tz=False):
     top_menu_items = build_menu_structure('top-menu')
-    rv = render_template('header.html',
-                         category=category,
-                         top_menu_items=top_menu_items,
-                         protected_object=protected_object,
-                         local_tz=local_tz,
-                         force_local_tz=force_local_tz)
-    return rv.encode('utf-8')
+    return render_template('header.html',
+                           category=category,
+                           top_menu_items=top_menu_items,
+                           protected_object=protected_object,
+                           local_tz=local_tz,
+                           force_local_tz=force_local_tz)
 
 
 def render_session_bar(protected_object=None, local_tz=None, force_local_tz=False):
@@ -353,19 +352,16 @@ class WPNewBase(WPJinjaMixin):
 class WPDecorated(WPBase):
     sidemenu_option = None
 
-    def _getHeader(self):
+    def _get_header(self):
         return render_header()
 
-    def _getTabControl(self):
-        return None
-
-    def _getFooter(self):
-        return render_template('footer.html').encode('utf-8')
+    def _get_footer(self):
+        return render_template('footer.html')
 
     def _applyDecoration(self, body):
         breadcrumbs = self._get_breadcrumbs()
         return '<div class="header">{}</div>\n<div class="main">{}<div>{}</div></div>\n{}'.format(
-            to_unicode(self._getHeader()), breadcrumbs, to_unicode(body), to_unicode(self._getFooter()))
+            self._get_header(), breadcrumbs, to_unicode(body), self._get_footer())
 
     def _display(self, params):
         params = dict(params, **self._kwargs)

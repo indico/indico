@@ -46,7 +46,7 @@ class WPCategory(MathjaxMixin, WPJinjaMixin, WPDecorated):
         WPDecorated.__init__(self, rh, **kwargs)
         self._mathjax = kwargs.pop('mathjax', False)
 
-    def _getHeader(self):
+    def _get_header(self):
         return render_header(category=self.category, protected_object=self.category,
                              local_tz=self.category.display_tzinfo.zone)
 
@@ -85,7 +85,7 @@ class WPCategoryManagement(WPCategory):
         kwargs['active_menu_item'] = active_menu_item
         WPCategory.__init__(self, rh, category, **kwargs)
 
-    def _getHeader(self):
+    def _get_header(self):
         return render_header(category=self.category, protected_object=self.category,
                              local_tz=self.category.timezone, force_local_tz=True)
 

@@ -24,11 +24,11 @@ from indico.modules.events.views import WPConferenceDisplay, WPSimpleEventDispla
 
 
 class WPStaticEventBase:
-    def _getHeader(self):
-        return ""
+    def _get_header(self):
+        return u""
 
-    def _getFooter(self):
-        return ""
+    def _get_footer(self):
+        return u""
 
 
 class WPStaticSimpleEventDisplay(WPStaticEventBase, WPSimpleEventDisplay):
