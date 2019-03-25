@@ -45,9 +45,6 @@ class WPEventFolderDisplay(WPSimpleEventDisplayBase, WPJinjaMixin):
 class WPPackageEventAttachmentsManagement(WPEventAttachments, WPJinjaMixin):
     template_prefix = 'attachments/'
 
-    def _getTabContent(self, params):
-        return WPJinjaMixin._get_page_content(self, params)
-
 
 class WPPackageEventAttachmentsDisplayConference(WPConferenceDisplayBase):
     template_prefix = 'attachments/'
