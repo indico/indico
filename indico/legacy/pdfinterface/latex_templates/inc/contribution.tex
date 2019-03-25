@@ -1,0 +1,195 @@
+\JINJA{from 'inc/person_list.tex' import render_person_lists}
+
+
+\JINJA{macro render_contribution(contrib)}
+    {
+        \small
+        \sffamily
+        \noindent
+        \VAR{_('Contribution ID')}: \textbf{\VAR{contrib.friendly_id}}
+        \hfill
+        \VAR{_('Type')}: \textbf{\VAR{(contrib.type.name if contrib.type else _('not specified'))}}
+    }
+
+    \vspace{2em}
+
+    \begin{center}
+        \textbf {
+            \LARGE
+            \sffamily
+            \VAR{contrib.title}
+        }
+    \end{center}
+
+    \JINJA{if contrib.is_scheduled}
+        {
+            \hfill
+            \em
+            \small
+            \color{gray}
+            \VAR{contrib.start_dt | format_date(format='full', timezone=tz)}
+            \VAR{contrib.start_dt | format_time(format='short', timezone=tz)}
+            (\VAR{contrib.duration | format_duration})
+        }
+    \JINJA{endif}
+
+    \vspace{1em}
+
+    \begin{addmargin}[1em]{1em}
+        %% Markdown content
+        \rmfamily {
+            \allsectionsfont{\rmfamily}
+            \sectionfont{\normalsize\rmfamily}
+            \subsectionfont{\small\rmfamily}
+            \small
+            \VAR{contrib.description | markdown}
+        }
+        \vspace{1.5em}
+    \end{addmargin}
+
+
+    \JINJA{for field in contrib.event.contribution_fields if field.is_active}
+        {\bf
+            \noindent
+            \large
+            \VAR{field.title}
+        }
+
+        \begin{addmargin}[1em]{1em}
+            %% Markdown content
+            \rmfamily {
+                \allsectionsfont{\rmfamily}
+                \sectionfont{\normalsize\rmfamily}
+                \subsectionfont{\small\rmfamily}
+                \small
+                \VAR{contrib.get_field_value(field.id) | markdown}
+            }
+            \vspace{1.5em}
+        \end{addmargin}
+    \JINJA{endfor}
+
+    \vspace{1.5em}
+
+    \VAR{render_person_lists(contrib) | rawlatex}
+
+    \JINJA{if contrib.session}
+        {
+            {
+                \bf
+                \noindent \VAR{_("Session Classification")}:
+            }
+            \VAR{(contrib.session.title or _("not yet classified"))}
+        }
+    \JINJA{endif}
+
+    \vspace{1em}
+
+    \JINJA{if contrib.track}
+    {
+        {
+            \bf
+            \noindent \VAR{_("Track Classification")}:
+        }
+        \VAR{(contrib.track.title or _("not specified"))}
+    }
+    \JINJA{endif}
+\JINJA{endmacro}
+
+
+\JINJA{macro render_contribution_condensed(contrib, affiliation_contribs, corresp_authors)}
+    \noindent
+    \rmfamily
+    \JINJA{if contrib.session}
+    \small \textbf {\VAR{contrib.session.title}}
+    \JINJA{endif}
+    \JINJA{if contrib.board_number}
+        \JINJA{if contrib.session}
+            -
+        \JINJA{endif}
+        \VAR{_("Board:")} \verb|\VAR{contrib.board_number}|
+    \JINJA{endif}
+    \JINJA{if contrib.session or contrib.board_number}
+    /
+    \JINJA{endif}
+    \textbf{\VAR{contrib.friendly_id}}
+
+    \vspace{1em}
+
+    \textbf {\Large \VAR{contrib.title}
+    }
+
+    \vspace{0.5em}
+
+    \JINJA{if affiliation_contribs[contrib.id].authors_affil}
+        \footnotesize {
+            \JINJA{if affiliation_contribs[contrib.id].authors_affil}
+                \textbf {\VAR{ngettext('Author:', 'Authors:', affiliation_contribs[contrib.id].authors_affil|length)}}
+            \JINJA{endif}
+            \JINJA{for author, affil_id in affiliation_contribs[contrib.id].authors_affil}
+                \VAR{author.full_name}\textsuperscript{\VAR{affil_id}}
+                \JINJA{if not loop.last}
+                    ;
+                \JINJA{endif}
+            \JINJA{endfor}
+        }
+    \JINJA{endif}
+
+    \JINJA{if affiliation_contribs[contrib.id].coauthors_affil}
+        \footnotesize {
+            \textbf {\VAR{ngettext('Co-author:', 'Co-authors:', affiliation_contribs[contrib.id].coauthors_affil|length)}}
+            \JINJA{for author, affil_id in affiliation_contribs[contrib.id].coauthors_affil}
+                \VAR{author.full_name}
+                \JINJA{if affil_id is not none}
+                    \textsuperscript{\VAR{affil_id}}
+                \JINJA{endif}
+                \JINJA{if not loop.last}
+                    ;
+                \JINJA{endif}
+            \JINJA{endfor}
+        }
+    \JINJA{endif}
+
+    \JINJA{if affiliation_contribs[contrib.id].affiliations}
+        \vspace{0.5em}
+        \footnotesize \begin{description}
+            \JINJA{for affil, affil_id in affiliation_contribs[contrib.id].affiliations|dictsort(by='value')}
+                \item[]\textsuperscript{\VAR{affil_id}} {\em \VAR{affil}}
+            \JINJA{endfor}
+        \end{description}
+    \JINJA{endif}
+
+    \JINJA{if corresp_authors.get(contrib.id)}
+    \textbf {\VAR{ngettext('Corresponding Author:', 'Corresponding Authors:', corresp_authors[contrib.id]|length)}}
+            \VAR{', '.join(corresp_authors[contrib.id])}
+    \JINJA{endif}
+
+    \vspace{0.5em}
+
+    \JINJA{if contrib.description}
+        %% Markdown content
+        \setlength{\leftskip}{0.5cm}
+        \rmfamily {
+            \allsectionsfont{\rmfamily}
+            \sectionfont{\normalsize\rmfamily}
+            \subsectionfont{\small\rmfamily}
+            \small
+            \VAR{contrib.description|markdown}
+        }
+
+        \vspace{1em}
+        \setlength{\leftskip}{0pt}
+    \JINJA{endif}
+
+    \JINJA{for field_value in contrib.field_values}
+        \textbf{\VAR{ field_value.contribution_field.title}}:
+
+        %% Markdown content
+        \rmfamily {
+            \allsectionsfont{\rmfamily}
+            \sectionfont{\normalsize\rmfamily}
+            \subsectionfont{\small\rmfamily}
+            \small
+            \VAR{field_value.friendly_data|markdown}
+        }
+    \JINJA{endfor}
+\JINJA{endmacro}

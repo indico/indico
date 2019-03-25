@@ -1,0 +1,46 @@
+\JINJA{extends 'inc/document.tex'}
+\JINJA{from 'inc/contribution.tex' import render_contribution}
+\JINJA{from 'inc/abstract.tex' import render_abstract}
+
+
+\JINJA{block geometry}
+    \usepackage[a4paper, top=3em, bottom=10em]{geometry}
+\JINJA{endblock}
+
+
+\JINJA{block header_extra}
+    \usepackage{scrextend}
+    \pagenumbering{gobble}
+    \usepackage{fancyhdr}
+\JINJA{endblock}
+
+
+\JINJA{block content}
+    \fancyhead{}
+
+    \begin{center}
+        \large {
+            \sffamily {
+                \color{gray} \textbf{\VAR{event.title}}
+            }
+        }
+    \end{center}
+
+    \JINJA{if logo_img}
+        \begin{figure}[h!]
+            \includegraphics[max width=0.85\linewidth, min width=0.5\linewidth, max height=10em]{\VAR{logo_img}}
+            \centering
+        \end{figure}
+    \JINJA{endif}
+
+    \JINJA{if doc_type == 'abstract'}
+        \JINJA{if management}
+            \VAR{render_abstract(abstract, track_class, contrib_type, management=true,
+                                 status=status, track_judgments=track_judgments) | rawlatex}
+        \JINJA{else}
+            \VAR{render_abstract(abstract, track_class, contrib_type) | rawlatex}
+        \JINJA{endif}
+    \JINJA{elif doc_type == 'contribution'}
+        \VAR{render_contribution(contrib) | rawlatex}
+    \JINJA{endif}
+\JINJA{endblock}

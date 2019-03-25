@@ -1,0 +1,167 @@
+\JINJA{from 'inc/person_list.tex' import render_person_lists}
+
+
+\JINJA{macro render_abstract(abstract, track_class, contrib_type, management=false, status=none, track_judgments=none)}
+    %% header
+
+    \setlength{\headheight}{20pt}
+    \pagestyle{fancy}
+    \renewcommand{\headrulewidth}{0pt}
+
+
+    {
+        \small
+        \sffamily
+        \noindent
+        \VAR{_('Abstract ID')} : \textbf {\VAR{abstract.friendly_id}}
+    }
+
+    \vspace{2em}
+
+    \begin{center}
+        \textbf {
+            \LARGE
+            \sffamily
+            \VAR{abstract.title}
+        }
+    \end{center}
+
+    \vspace{1em}
+
+    {\bf
+        \noindent
+        \large
+        \VAR{_('Content')}
+    }
+
+    \begin{addmargin}[1em]{1em}
+        %% Markdown content
+        \rmfamily {
+            \allsectionsfont{\rmfamily}
+            \sectionfont{\normalsize\rmfamily}
+            \subsectionfont{\small\rmfamily}
+            \small
+            \VAR{abstract.description | markdown}
+        }
+        \vspace{1.5em}
+    \end{addmargin}
+
+    \JINJA{for field in abstract.event.contribution_fields if field.is_active}
+        {\bf
+            \noindent
+            \large
+            \VAR{field.title}
+        }
+
+        \begin{addmargin}[1em]{1em}
+            %% Markdown content
+            \rmfamily {
+                \allsectionsfont{\rmfamily}
+                \sectionfont{\normalsize\rmfamily}
+                \subsectionfont{\small\rmfamily}
+                \small
+                \VAR{
+                    abstract.data_by_field[field.id].friendly_data|markdown
+                    if field.id in abstract.data_by_field
+                    else ''
+                }
+            }
+            \vspace{1.5em}
+        \end{addmargin}
+    \JINJA{endfor}
+
+    \vspace{1.5em}
+
+    \VAR{render_person_lists(abstract) | rawlatex}
+
+    \JINJA{if track_class}
+    {
+        {
+            \bf
+            \noindent \VAR{_('Track Classification')}:
+        }
+        \VAR{track_class}
+    }
+    \JINJA{endif}
+
+    \JINJA{if contrib_type}
+    {
+        {
+            \bf
+            \noindent \VAR{_('Contribution Type')}:
+        }
+        \VAR{contrib_type.name}
+    }
+    \JINJA{endif}
+
+    \JINJA{if abstract.submission_comment}
+        \textbf{\VAR{_('Comments:')}}
+        \begin{addmargin}[1em]{1em}
+            \VAR{abstract.submission_comment}
+        \end{addmargin}
+    \JINJA{endif}
+
+    \JINJA{if management}
+        \vspace{1em}
+
+        \textbf{\VAR{_('Status:')}} \VAR{status}
+        \vspace{2em}
+
+        \setdescription{leftmargin=2em,labelindent=2em}
+
+        \JINJA{if track_judgments}
+            \textbf{\VAR{_('Track Reviews:')}}
+            \begin{addmargin}[1em]{1em}
+                \JINJA{for track_name, judgment, details in track_judgments if judgment}
+                    \small \textbf{\VAR{track_name}:}
+                    \begin{addmargin}[1em]{1em}
+                        \vspace{0.5em}
+
+                        \textbf{\VAR{_('Judgments:')}} \VAR{judgment}
+
+                        \JINJA{if details}
+                            \vspace{0.5em}
+                            \textbf{\VAR{_("Reviews:")}}
+                            \JINJA{for proposed_action, reviewer, comment, score, ratings in details}
+                                \vspace{0.5em}
+                                \begin{addmargin}[1em]{1em}
+                                    \rmfamily {
+                                        \allsectionsfont{\rmfamily}
+                                        \sectionfont{\normalsize\rmfamily}
+                                        \subsectionfont{\small\rmfamily}
+                                        \small
+                                        \VAR{reviewer}:
+                                        \textbf{ \VAR{proposed_action}
+                                            \JINJA{if score}
+                                                \textbullet\ \VAR{score}
+                                            \JINJA{endif}
+                                        }
+                                        \JINJA{if comment}
+                                            (\VAR{comment|markdown})
+                                        \JINJA{endif}
+                                        \JINJA{if ratings}
+                                            \JINJA{for question, rating in ratings}
+                                                \vspace{0.5em}
+                                                \begin{addmargin}[1em]{1em}
+                                                \textit{\VAR{question}} \VAR{rating}
+                                                \end{addmargin}
+                                            \JINJA{endfor}
+                                        \JINJA{endif}
+                                    }
+                                \end{addmargin}
+                            \JINJA{endfor}
+                        \JINJA{endif}
+                    \end{addmargin}
+                \JINJA{endfor}
+            \end{addmargin}
+        \JINJA{endif}
+    \JINJA{endif}
+
+    \VAR{(_('Submitted by {0} on {1}')|latex(true)).format(
+        '\\textbf{%s}'|rawlatex|format(abstract.submitter.get_full_name(abbrev_first_name=false, show_title=true)),
+        '\\textbf{%s}'|rawlatex|format(abstract.submitted_dt.strftime("%A %d %B %Y"))
+    )|rawlatex}
+    \JINJA{if abstract.modified_dt}
+        \fancyfoot[C]{\color{gray} \VAR{_('Last modified:')} \VAR{abstract.modified_dt.strftime('%A %d %B %Y')}}
+    \JINJA{endif}
+\JINJA{endmacro}

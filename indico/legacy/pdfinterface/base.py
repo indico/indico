@@ -17,13 +17,9 @@
 import cgi
 import math
 import os
-import subprocess
-import tempfile
 import xml.sax.saxutils as saxutils
 
-import markdown
 import pkg_resources
-from flask.helpers import get_root_path
 from PIL import Image as PILImage
 from reportlab import platypus
 from reportlab.lib.enums import TA_CENTER
@@ -37,14 +33,9 @@ from reportlab.pdfgen.canvas import Canvas
 from reportlab.platypus import PageTemplate, SimpleDocTemplate
 from reportlab.platypus.frames import Frame
 
-from indico.core.config import config
-from indico.core.logger import Logger
-from indico.legacy.common.TemplateExec import render as tpl_render
 from indico.legacy.common.utils import isStringHTML
-from indico.util import mdx_latex
-from indico.util.fs import chmod_umask
 from indico.util.i18n import _
-from indico.util.string import render_markdown, sanitize_for_platypus, to_unicode
+from indico.util.string import sanitize_for_platypus, to_unicode
 
 
 ratio = math.sqrt(math.sqrt(2.0))

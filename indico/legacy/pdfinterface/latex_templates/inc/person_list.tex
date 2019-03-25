@@ -1,0 +1,29 @@
+\JINJA{macro render_person_list(caption, list)}
+    \JINJA{if list}
+        {
+            \normalsize
+            { \bf
+              \noindent
+              \VAR{caption}:
+            }\begin{itemize*}[label=,itemjoin={{;}}]
+            \JINJA{for person in list}
+                \item {
+                    \small
+                    \rmfamily
+                    \VAR{person.get_full_name(abbrev_first_name=false, show_title=true)}
+                    \JINJA{if person.affiliation}
+                        (\VAR{person.affiliation})
+                    \JINJA{endif}
+                }
+            \JINJA{endfor}
+            \end{itemize*}
+        }
+    \JINJA{endif}
+\JINJA{endmacro}
+
+
+\JINJA{macro render_person_lists(obj)}
+    \VAR{render_person_list(ngettext('Primary author', 'Primary authors', obj.primary_authors|length), obj.primary_authors) | rawlatex}
+    \VAR{render_person_list(ngettext('Co-author', 'Co-authors', obj.secondary_authors|length), obj.secondary_authors) | rawlatex}
+    \VAR{render_person_list(ngettext('Presenter', 'Presenters', obj.speakers|length), obj.speakers) | rawlatex}
+\JINJA{endmacro}

@@ -292,7 +292,7 @@ class EnsureUnicodeExtension(Extension):
         # case we can simply remove the `variable_done` checks.
         # Due to the way Jinja works it is pretty much impossible to apply the filter to arguments
         # passed inside a {% trans foo=..., bar=... %} argument list - we have nothing to detect the
-        # end of an argument as the 'comma' token might be inside a function call. So in that case#
+        # end of an argument as the 'comma' token might be inside a function call. So in that case
         # people simply need to unicodify the strings manually. :(
 
         variable_done = False

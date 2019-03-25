@@ -1,0 +1,56 @@
+\JINJA{extends 'inc/document.tex'}
+\JINJA{from 'inc/first_page.tex' import render_first_page}
+\JINJA{from 'inc/contribution.tex' import render_contribution}
+\JINJA{from 'inc/abstract.tex' import render_abstract}
+
+
+\JINJA{block document_class}
+    \documentclass[a4paper, 11pt, oneside]{book}
+\JINJA{endblock}
+
+
+\JINJA{block geometry}
+    \usepackage[a4paper, top=5em, bottom=10em]{geometry}
+\JINJA{endblock}
+
+
+\JINJA{block header_extra}
+    \usepackage{fancyhdr}
+    \usepackage{scrextend}
+
+    \setlength{\headheight}{60pt}
+    \pagestyle{fancy}
+    \renewcommand{\headrulewidth}{0pt}
+\JINJA{endblock}
+
+\JINJA{block content}
+    %% first page
+    \frontmatter
+    \VAR{render_first_page(event, title, logo_img=logo_img, url=url)|rawlatex}
+
+    %% body
+    \mainmatter
+
+    \JINJA{for item in items}
+        \newpage
+        \fancyhead[L]{\small \rmfamily \color{gray} \truncateellipses{\VAR{event.title}}{80pt} / \VAR{title}}
+        \fancyhead[R]{\small \rmfamily \color{gray} \truncateellipses{\VAR{item.title}}{150pt}}
+        \phantomsection
+        \addcontentsline{toc}{section}{\VAR{item.title}}
+
+        \JINJA{if doc_type == 'abstract'}
+            \JINJA{if management}
+                \VAR{render_abstract(item, get_track_classification(item), get_contrib_type(item), management=true,
+                                     status=get_status(item), track_judgments=get_track_judgments(item)) | rawlatex}
+            \JINJA{else}
+                \VAR{render_abstract(item, get_track_classification(item), get_contrib_type(item)) | rawlatex}
+            \JINJA{endif}
+        \JINJA{elif doc_type == 'contribution'}
+            \VAR{render_contribution(item) | rawlatex}
+        \JINJA{endif}
+
+        \fancyfoot[L]{\small \rmfamily \color{gray} \today}
+        \fancyfoot[C]{}
+        \fancyfoot[R]{\small \rmfamily \color{gray} \VAR{(_('Page {}')|latex(true)).format('\\thepage')|rawlatex }}
+    \JINJA{endfor}
+\JINJA{endblock}

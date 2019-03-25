@@ -1,0 +1,71 @@
+\JINJA{extends 'contribution_list_book.tex'}
+\JINJA{from 'inc/first_page.tex' import render_first_page}
+
+
+\JINJA{block document_class}
+    \documentclass[a4paper, 11pt, twoside]{book} %% document type
+\JINJA{endblock}
+
+
+\JINJA{block header_extra}
+    \VAR{super()|rawlatex}
+    \makeatletter
+    \renewcommand\tableofcontents{%
+        \if@twocolumn
+          \@restonecoltrue\onecolumn
+        \else
+          \@restonecolfalse
+        \fi
+        \chapter*{\contentsname}%
+        \@starttoc{toc}%
+        \if@restonecol\twocolumn\fi
+    }
+    \renewcommand*\l@chapter[2]{%
+      \ifnum \c@tocdepth >\m@ne
+        \addpenalty{-\@highpenalty}%
+        \vskip 1.0em \@plus\p@
+        \setlength\@tempdima{1.5em}%
+        \begingroup
+          \parindent \z@ \rightskip \@pnumwidth
+          \parfillskip -\@pnumwidth
+          \leavevmode
+          \advance\leftskip\@tempdima
+          \hskip -\leftskip
+          #1\nobreak
+          \xleaders\hbox{$\m@th
+            \mkern \@dotsep mu\hbox{.}\mkern \@dotsep
+            mu$}\hfill%
+          \nobreak\hb@xt@\@pnumwidth{\hss #2}\par
+          \penalty\@highpenalty
+        \endgroup
+      \fi}
+    \makeatother
+\JINJA{endblock}
+
+
+\JINJA{block first_page}
+    \VAR{render_first_page(event, _('Book of Abstracts'), show_dates=true, logo_img=logo_img, url=url, tz=tz)|rawlatex}
+\JINJA{endblock}
+
+
+\JINJA{block table_of_contents}
+    %% TOC
+    \tableofcontents
+\JINJA{endblock}
+
+
+\JINJA{block book_body}
+    \JINJA{for contrib in contribs if contrib.can_access(session.user)}
+        \fancyhead[L]{\small \rmfamily \color{gray} \truncateellipses{\VAR{event.title}}{300pt} / \VAR{_('Book of Abstracts')}}
+        \fancyhead[R]{}
+
+        \phantomsection
+        \addcontentsline{toc}{chapter}{\VAR{contrib.title} \VAR{contrib.friendly_id if show_ids else ''}
+        }
+
+        \VAR{render_contribution_condensed(contrib, affiliation_contribs, corresp_authors)|rawlatex}
+        \vspace{3em}
+
+        \fancyfoot[C]{\small \rmfamily \color{gray} \VAR{(_('Page {}')|latex(true)).format('\\thepage')|rawlatex }}
+    \JINJA{endfor}
+\JINJA{endblock}

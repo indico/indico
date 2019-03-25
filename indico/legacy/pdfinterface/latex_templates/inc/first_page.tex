@@ -1,0 +1,53 @@
+\JINJA{macro render_first_page(event, title, show_dates=false, logo_img=none, url=none, tz=none)}
+    \begin{titlepage}
+
+    \thispagestyle{fancy}
+
+    \begin{center}
+        \fontsize{30}{36}\selectfont \textbf{\VAR{event.title}}
+    \end{center}
+
+    \vspace{2em}
+
+    \JINJA{if show_dates}
+        \begin{center}
+            \Large
+            \VAR{event.start_dt.astimezone(tz).strftime("%A %d %B %Y")} -
+            \VAR{event.end_dt.astimezone(tz).strftime("%A %d %B %Y")}
+        \end{center}
+
+        \JINJA{if event.venue_name}
+            \begin{center}
+                \Large
+                \VAR{event.venue_name}
+            \end{center}
+        \JINJA{endif}
+
+        \vspace{2em}
+    \JINJA{endif}
+
+    \JINJA{if logo_img}
+        \begin{figure}[h!]
+            \includegraphics[max width=0.85\linewidth, min width=0.5\linewidth]{\VAR{logo_img}}
+            \centering
+        \end{figure}
+
+        \vspace{4em}
+    \JINJA{else}
+        \vspace{2em}
+    \JINJA{endif}
+
+    \vspace{2em}
+
+    \begin{center}
+        {\fontsize{35}{42}\selectfont \sffamily \textbf{\VAR{title}}}
+    \end{center}
+
+    \JINJA{if url}
+        \fancyfoot[C]{\tt \VAR{url}}
+    \JINJA{else}
+        \fancyfoot[C]{}
+    \JINJA{endif}
+
+    \end{titlepage}
+\JINJA{endmacro}

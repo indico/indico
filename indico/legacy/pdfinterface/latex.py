@@ -16,31 +16,39 @@
 
 from __future__ import unicode_literals
 
+import codecs
 import os
 import subprocess
 import tempfile
 from operator import attrgetter
 
 import markdown
+import pkg_resources
+from flask import session
 from flask.helpers import get_root_path
+from jinja2 import Environment, FileSystemLoader, StrictUndefined
+from jinja2.ext import Extension
+from jinja2.lexer import Token
 from pytz import timezone
 
 from indico.core.config import config
 from indico.core.logger import Logger
-from indico.legacy.common.TemplateExec import render as tpl_render
 from indico.legacy.pdfinterface.base import escape
 from indico.modules.events.abstracts.models.abstracts import AbstractReviewingState, AbstractState
 from indico.modules.events.abstracts.models.reviews import AbstractAction
 from indico.modules.events.abstracts.settings import BOACorrespondingAuthorType, BOASortField, boa_settings
 from indico.modules.events.util import create_event_logo_tmp_file
 from indico.util import mdx_latex
+from indico.util.date_time import format_date, format_human_timedelta, format_time
 from indico.util.fs import chmod_umask
-from indico.util.i18n import _
+from indico.util.i18n import _, ngettext
 from indico.util.string import render_markdown
+from indico.web.flask.templating import EnsureUnicodeExtension
 
 
 class PDFLaTeXBase(object):
     _table_of_contents = False
+    LATEX_TEMPLATE = None
 
     def __init__(self):
         # Markdown -> LaTeX renderer
@@ -53,13 +61,13 @@ class PDFLaTeXBase(object):
             return mdx_latex.latex_escape(string, ignore_math=True)
 
         def _convert_markdown(text):
-            return render_markdown(text, md=md.convert, escape_latex_math=_escape_latex_math)
+            return RawLatex(render_markdown(text, md=md.convert, escape_latex_math=_escape_latex_math))
 
-        self._args = {'md_convert': _convert_markdown}
+        self._args = {'markdown': _convert_markdown}
 
     def generate(self):
         latex = LatexRunner(has_toc=self._table_of_contents)
-        return latex.run(self._tpl_filename, **self._args)
+        return latex.run(self.LATEX_TEMPLATE, **self._args)
 
 
 class LaTeXRuntimeException(Exception):
@@ -71,6 +79,45 @@ class LaTeXRuntimeException(Exception):
     @property
     def message(self):
         return "Could not compile '{}'. Read '{}' for details".format(self.source_file, self.log_file)
+
+
+class LatexEscapeExtension(Extension):
+    """Ensures all strings in Jinja are latex-escaped"""
+
+    def filter_stream(self, stream):
+        in_trans = False
+        in_variable = False
+        for token in stream:
+            # Check if we are inside a trans block - we cannot use filters there!
+            if token.type == 'block_begin':
+                block_name = stream.current.value
+                if block_name == 'trans':
+                    in_trans = True
+                elif block_name == 'endtrans':
+                    in_trans = False
+            elif token.type == 'variable_begin':
+                in_variable = True
+
+            if in_variable and not in_trans:
+                if token.type == 'variable_end' or (token.type == 'name' and token.value == 'if'):
+                    yield Token(token.lineno, 'pipe', '|')
+                    yield Token(token.lineno, 'name', 'latex')
+
+            if token.type == 'variable_end':
+                in_variable = False
+
+            # Original token
+            yield token
+
+
+class RawLatex(unicode):
+    pass
+
+
+def _latex_escape(s, ignore_braces=False):
+    if not isinstance(s, basestring) or isinstance(s, RawLatex):
+        return s
+    return RawLatex(mdx_latex.latex_escape(s, ignore_braces=ignore_braces))
 
 
 class LatexRunner(object):
@@ -99,20 +146,44 @@ class LatexRunner(object):
                     log_file.flush()
                 raise
 
-    def run(self, template_name, **kwargs):
-        template_dir = os.path.join(get_root_path('indico'), 'legacy/webinterface/tpls/latex')
-        template = tpl_render(os.path.join(template_dir, template_name), kwargs)
+    def _render_template(self, template_name, kwargs):
+        template_dir = os.path.join(get_root_path('indico'), 'legacy/pdfinterface/latex_templates')
+        env = Environment(loader=FileSystemLoader(template_dir),
+                          autoescape=False,
+                          trim_blocks=True,
+                          keep_trailing_newline=True,
+                          auto_reload=config.DEBUG,
+                          extensions=[LatexEscapeExtension],
+                          undefined=StrictUndefined,
+                          block_start_string=r'\JINJA{', block_end_string='}',
+                          variable_start_string=r'\VAR{', variable_end_string='}',
+                          comment_start_string=r'\#{', comment_end_string='}')
+        env.filters['format_date'] = EnsureUnicodeExtension.wrap_func(format_date)
+        env.filters['format_time'] = EnsureUnicodeExtension.wrap_func(format_time)
+        env.filters['format_duration'] = lambda delta: format_human_timedelta(delta, 'minutes')
+        env.filters['latex'] = _latex_escape
+        env.filters['rawlatex'] = RawLatex
+        env.filters['markdown'] = kwargs.pop('markdown')
+        env.globals['_'] = _
+        env.globals['ngettext'] = ngettext
+        env.globals['session'] = session
+        template = env.get_or_select_template(template_name)
+        distribution = pkg_resources.get_distribution('indico-fonts')
+        font_dir = os.path.join(distribution.location, 'indico_fonts', '')  # XXX: trailing slash required
+        return template.render(font_dir=font_dir, **kwargs)
 
+    def run(self, template_name, **kwargs):
         self._dir = tempfile.mkdtemp(prefix="indico-texgen-", dir=config.TEMP_DIR)
         chmod_umask(self._dir, execute=True)
         source_filename = os.path.join(self._dir, template_name + '.tex')
         target_filename = os.path.join(self._dir, template_name + '.pdf')
+
+        source = self._render_template(template_name + '.tex', kwargs)
+        with codecs.open(source_filename, 'wb', encoding='utf-8') as f:
+            f.write(source)
+
         log_filename = os.path.join(self._dir, 'output.log')
         log_file = open(log_filename, 'a+')
-
-        with open(source_filename, 'w') as f:
-            f.write(template)
-
         try:
             self.run_latex(source_filename, log_file)
             if self.has_toc:
@@ -146,7 +217,7 @@ def extract_affiliations(contrib):
 
 
 class AbstractToPDF(PDFLaTeXBase):
-    _tpl_filename = 'single_doc.tpl'
+    LATEX_TEMPLATE = 'single_doc'
 
     def __init__(self, abstract, tz=None):
         super(AbstractToPDF, self).__init__()
@@ -159,15 +230,14 @@ class AbstractToPDF(PDFLaTeXBase):
 
         self._args.update({
             'doc_type': 'abstract',
+            'management': False,
             'abstract': abstract,
             'event': event,
             'tz': timezone(tz),
             'track_class': self._get_track_classification(abstract),
             'contrib_type': self._get_contrib_type(abstract),
-            'fields': [f for f in event.contribution_fields if f.is_active]
         })
-        if event.logo:
-            self._args['logo_img'] = create_event_logo_tmp_file(event).name
+        self._args['logo_img'] = create_event_logo_tmp_file(event).name if event.logo else None
 
     @staticmethod
     def _get_track_classification(abstract):
@@ -185,7 +255,7 @@ class AbstractToPDF(PDFLaTeXBase):
 
 
 class AbstractsToPDF(PDFLaTeXBase):
-    _tpl_filename = "report.tpl"
+    LATEX_TEMPLATE = 'report'
 
     def __init__(self, event, abstracts, tz=None):
         super(AbstractsToPDF, self).__init__()
@@ -195,23 +265,25 @@ class AbstractsToPDF(PDFLaTeXBase):
         self._args.update({
             'event': event,
             'doc_type': 'abstract',
+            'management': False,
             'title': _("Report of Abstracts"),
             'get_track_classification': AbstractToPDF._get_track_classification,
             'get_contrib_type': AbstractToPDF._get_contrib_type,
             'items': abstracts,
-            'fields': [f for f in event.contribution_fields if f.is_active]
+            'url': event.short_external_url,
         })
+
+        self._args['logo_img'] = create_event_logo_tmp_file(event).name if event.logo else None
 
 
 class ConfManagerAbstractToPDF(AbstractToPDF):
-
     def __init__(self, abstract, tz=None):
         super(ConfManagerAbstractToPDF, self).__init__(abstract, tz)
 
         self._args.update({
-            'doc_type': 'abstract_manager',
+            'management': True,
             'status': self._get_status(abstract),
-            'track_judgements': self._get_track_reviewing_states(abstract)
+            'track_judgments': self._get_track_reviewing_states(abstract)
         })
 
     @staticmethod
@@ -270,19 +342,18 @@ class ConfManagerAbstractToPDF(AbstractToPDF):
 
 
 class ConfManagerAbstractsToPDF(AbstractsToPDF):
-
     def __init__(self, event, abstracts, tz=None):
         super(ConfManagerAbstractsToPDF, self).__init__(event, abstracts, tz)
 
         self._args.update({
-            'doc_type': 'abstract_manager',
+            'management': True,
             'get_status': ConfManagerAbstractToPDF._get_status,
-            'get_track_judgements': ConfManagerAbstractToPDF._get_track_reviewing_states
+            'get_track_judgments': ConfManagerAbstractToPDF._get_track_reviewing_states
         })
 
 
 class ContribToPDF(PDFLaTeXBase):
-    _tpl_filename = 'single_doc.tpl'
+    LATEX_TEMPLATE = 'single_doc'
 
     def __init__(self, contrib, tz=None):
         super(ContribToPDF, self).__init__()
@@ -298,17 +369,14 @@ class ContribToPDF(PDFLaTeXBase):
             'contrib': contrib,
             'event': event,
             'tz': timezone(tz or event.timezone),
-            'fields': [f for f in event.contribution_fields if f.is_active]
         })
 
-        if event.logo:
-            self.temp_file = create_event_logo_tmp_file(event)
-            self._args['logo_img'] = self.temp_file.name
+        self._args['logo_img'] = create_event_logo_tmp_file(event).name if event.logo else None
 
 
 class ContribsToPDF(PDFLaTeXBase):
     _table_of_contents = True
-    _tpl_filename = "report.tpl"
+    LATEX_TEMPLATE = 'report'
 
     def __init__(self, event, contribs, tz=None):
         super(ContribsToPDF, self).__init__()
@@ -318,18 +386,15 @@ class ContribsToPDF(PDFLaTeXBase):
             'title': _("Report of Contributions"),
             'event': event,
             'items': contribs,
-            'fields': [f for f in event.contribution_fields if f.is_active],
             'url': event.short_external_url,
             'tz': timezone(tz or event.timezone)
         })
 
-        if event.logo:
-            self.temp_file = create_event_logo_tmp_file(event)
-            self._args['logo_img'] = self.temp_file.name
+        self._args['logo_img'] = create_event_logo_tmp_file(event).name if event.logo else None
 
 
 class ContributionBook(PDFLaTeXBase):
-    _tpl_filename = "contribution_list_boa.tpl"
+    LATEX_TEMPLATE = 'contribution_list_book'
 
     def _sort_contribs(self, contribs, sort_by):
         mapping = {'number': 'id', 'name': 'title'}
@@ -382,19 +447,15 @@ class ContributionBook(PDFLaTeXBase):
             'boa_text': boa_settings.get(event, 'extra_text')
         })
 
-        if event.logo:
-            self.temp_file = create_event_logo_tmp_file(event)
-            self._args['logo_img'] = self.temp_file.name
+        self._args['logo_img'] = create_event_logo_tmp_file(event).name if event.logo else None
 
 
 class AbstractBook(ContributionBook):
-    _tpl_filename = "book_of_abstracts.tpl"
+    LATEX_TEMPLATE = 'book_of_abstracts'
     _table_of_contents = True
 
     def __init__(self, event, tz=None):
         sort_by = boa_settings.get(event, 'sort_by')
-
         super(AbstractBook, self).__init__(event, None, sort_by=sort_by)
         self._args['show_ids'] = boa_settings.get(event, 'show_abstract_ids')
-
-        del self._args["url"]
+        self._args['url'] = None

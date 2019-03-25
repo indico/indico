@@ -1,0 +1,53 @@
+\JINJA{block document_class}
+    \documentclass[a4paper, 15pt]{article}
+\JINJA{endblock}
+
+\JINJA{block geometry}
+    \usepackage[a4paper, top=1em, bottom=10em]{geometry}
+\JINJA{endblock}
+
+\usepackage{hyperref}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{fontspec}
+
+\usepackage[english]{babel}
+\usepackage[final, babel]{microtype}
+
+\usepackage{float}
+\usepackage[export]{adjustbox}
+\usepackage[usenames,dvipsnames]{xcolor}
+\usepackage{sectsty}
+\usepackage{xstring}
+\usepackage{tcolorbox}
+\usepackage[inline]{enumitem}
+\usepackage[breakall]{truncate}
+\usepackage[parfill]{parskip}
+
+
+\JINJA{block header_extra}
+\JINJA{endblock}
+
+
+\begin{document}
+    \setmainfont{LinLibertine_R.otf}[
+        BoldFont = LinLibertine_RB.otf,
+        ItalicFont = LinLibertine_RI.otf,
+        BoldItalicFont = LinLibertine_RBI.otf,
+        Path = \VAR{font_dir | rawlatex}]
+    \setsansfont{LinBiolinum_R.otf}[
+        BoldFont = LinBiolinum_RB.otf,
+        ItalicFont = LinBiolinum_RI.otf,
+        Path = \VAR{font_dir | rawlatex}]
+
+    \setlength{\parindent}{0cm}
+
+    \newcommand{\truncateellipses}[2]{
+       \truncate{#2}{#1}
+    }
+
+    \setcounter{secnumdepth}{0}
+
+    \JINJA{block content}
+    \JINJA{endblock}
+\end{document}
