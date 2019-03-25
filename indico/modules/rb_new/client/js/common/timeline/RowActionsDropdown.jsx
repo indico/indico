@@ -20,15 +20,14 @@ import PropTypes from 'prop-types';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import {Form as FinalForm, Field} from 'react-final-form';
-import {Button, Confirm, Dropdown, Form, Icon, Modal, Popup, Portal, TextArea} from 'semantic-ui-react';
+import {Button, Confirm, Dropdown, Form, Icon, Portal, TextArea} from 'semantic-ui-react';
 
 import {serializeDate} from 'indico/utils/date';
 import {ReduxFormField, formatters, validators as v} from 'indico/react/forms';
 import {Param, Translate} from 'indico/react/i18n';
 
 import * as bookingsActions from '../bookings/actions';
-import TimelineLegend from './TimelineLegend';
-import SingleRoomTimeline from './SingleRoomTimeline';
+import SingleRoomTimelineModal from './SingleRoomTimelineModal';
 
 import './RowActionsDropdown.module.scss';
 
@@ -160,7 +159,6 @@ class RowActionsDropdown extends React.Component {
             return null;
         }
         const legendLabels = [
-            // todo: adapt
             {label: Translate.string('Available'), style: 'available'},
             {label: Translate.string('Booked'), style: 'booking'},
             {label: Translate.string('Pre-Booked'), style: 'pre-booking'},
@@ -232,18 +230,12 @@ class RowActionsDropdown extends React.Component {
                          cancelButton={Translate.string('Close')}
                          open={activeConfirmation === 'reject'}
                          onCancel={this.hideConfirm} />
-                <Modal open={activeRoomTimeline}
-                       onClose={this.hideRoomTimeline}
-                       size="large" closeIcon>
-                    <Modal.Header className="legend-header">
-                        {room.name}
-                        <Popup trigger={<Icon name="info circle" className="legend-info-icon" />}
-                               content={<TimelineLegend labels={legendLabels} compact />} />
-                    </Modal.Header>
-                    <Modal.Content>
-                        <SingleRoomTimeline room={room} />
-                    </Modal.Content>
-                </Modal>
+                {room && (
+                    <SingleRoomTimelineModal open={activeRoomTimeline}
+                                             onClose={this.hideRoomTimeline}
+                                             room={room}
+                                             legendLabels={legendLabels} />
+                )}
             </div>
         );
     }
