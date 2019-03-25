@@ -26,13 +26,13 @@ from pytz import common_timezones, common_timezones_set
 
 from indico.core import signals
 from indico.core.config import config
-from indico.legacy.webinterface.wcomponents import render_header
 from indico.modules.legal import legal_settings
 from indico.util.decorators import classproperty
 from indico.util.i18n import _, get_all_locales
 from indico.util.signals import values_from_signal
 from indico.util.string import to_unicode
 from indico.web.flask.templating import get_template_module
+from indico.web.menu import build_menu_structure
 from indico.web.util import jsonify_template
 
 
@@ -43,6 +43,17 @@ def _get_timezone_display(local_tz, timezone, force=False):
         return local_tz or config.DEFAULT_TIMEZONE
     else:
         return timezone
+
+
+def render_header(category=None, protected_object=None, local_tz=None, force_local_tz=False):
+    top_menu_items = build_menu_structure('top-menu')
+    rv = render_template('header.html',
+                         category=category,
+                         top_menu_items=top_menu_items,
+                         protected_object=protected_object,
+                         local_tz=local_tz,
+                         force_local_tz=force_local_tz)
+    return rv.encode('utf-8')
 
 
 def render_session_bar(protected_object=None, local_tz=None, force_local_tz=False):

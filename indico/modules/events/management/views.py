@@ -16,12 +16,11 @@
 
 from __future__ import unicode_literals
 
-from indico.legacy.webinterface.wcomponents import render_header
 from indico.modules.events.models.events import EventType
 from indico.util.string import strip_tags
 from indico.web.breadcrumbs import render_breadcrumbs
 from indico.web.flask.templating import get_template_module
-from indico.web.views import WPDecorated, WPJinjaMixin
+from indico.web.views import WPDecorated, WPJinjaMixin, render_header
 
 
 class WPEventManagement(WPJinjaMixin, WPDecorated):
