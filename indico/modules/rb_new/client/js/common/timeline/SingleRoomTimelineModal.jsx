@@ -120,7 +120,7 @@ const SingleRoomTimelineModal = props => {
 
 SingleRoomTimelineModal.propTypes = {
     open: PropTypes.bool,
-    title: PropTypes.string,
+    title: PropTypes.node,
     onClose: PropTypes.func,
     legendLabels: PropTypes.array,
     room: PropTypes.object.isRequired,
