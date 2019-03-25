@@ -33,6 +33,6 @@
     Room: <strong>{{ reservation.room.full_name }}</strong><br>
     Reason: <strong>{{ reservation.booking_reason }}</strong><br>
     <br>
-    If you do not need to use the room, please <a href="{{ reservation.details_url }}">cancel the
+    If you do not need to use the room, please <a href="{{ reservation.external_details_url }}">cancel the
     {{ 'occurrence' if reservation.repeat_frequency.name != 'NEVER' else 'reservation' }} in Indico</a>.
 {%- endmacro %}

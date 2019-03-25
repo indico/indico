@@ -138,11 +138,11 @@ class Reservation(Serializer, db.Model):
     __tablename__ = 'reservations'
     __public__ = []
     __calendar_public__ = [
-        'id', ('booked_for_name', 'bookedForName'), ('booking_reason', 'reason'), ('details_url', 'bookingUrl')
+        'id', ('booked_for_name', 'bookedForName'), ('booking_reason', 'reason'), ('external_details_url', 'bookingUrl')
     ]
     __api_public__ = [
         'id', ('start_dt', 'startDT'), ('end_dt', 'endDT'), 'repeat_frequency', 'repeat_interval',
-        ('booked_for_name', 'bookedForName'), ('details_url', 'bookingUrl'), ('booking_reason', 'reason'),
+        ('booked_for_name', 'bookedForName'), ('external_details_url', 'bookingUrl'), ('booking_reason', 'reason'),
         ('uses_vc', 'usesAVC'), ('needs_vc_assistance', 'needsAVCSupport'),
         'needs_assistance', ('is_accepted', 'isConfirmed'), ('is_accepted', 'isValid'), 'is_cancelled',
         'is_rejected', ('location_name', 'location'), ('contact_email', 'booked_for_user_email')
@@ -329,7 +329,7 @@ class Reservation(Serializer, db.Model):
         return self.booked_for_user.phone if self.booked_for_user else None
 
     @property
-    def details_url(self):
+    def external_details_url(self):
         return url_for('rooms_new.booking_link', booking_id=self.id, _external=True)
 
     @property

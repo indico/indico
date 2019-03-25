@@ -124,8 +124,8 @@ def test_created_by_user_with_no_id(db, dummy_reservation):
     assert dummy_reservation.created_by_user is None
 
 
-def test_details_url(dummy_reservation):
-    assert dummy_reservation.details_url
+def test_external_details_url(dummy_reservation):
+    assert dummy_reservation.external_details_url
 
 
 def test_location_name(dummy_reservation, dummy_location):

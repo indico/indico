@@ -5,5 +5,5 @@
 {% block body %}{% endblock %}
 
 You can check the details of the booking here:
-{{ reservation.details_url }}
+{{ reservation.external_details_url }}
 {%- endblock %}

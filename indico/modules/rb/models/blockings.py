@@ -123,7 +123,7 @@ class Blocking(db.Model):
         return any(user in principal for principal in iter_acl(self.allowed))
 
     @property
-    def details_url(self):
+    def external_details_url(self):
         return url_for('rooms_new.blocking_link', blocking_id=self.id, _external=True)
 
     @return_ascii
