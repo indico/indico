@@ -24,11 +24,6 @@ under the terms of the GNU Lesser General Public License version 2.1 or
 above.
 <http://www.dynarch.com/projects/calendar/>
 
-strip_ml_tags is a routine by Micah D. Cochran submitted on 26 Aug 2005 that
-removes all HTML/XML-like tags from the input text.
-This routine is allowed to be put under any license Open Source (GPL, BSD, LGPL, etc.) License
-or any Propriety License. Effectively this routine is in public domain.
-
 HTMLParser/SimpleHtmlParser is a JS library that allows to parse HTML. It has been written
 originally by Erik Arvidsson and extended by John Resig. The original license is GPLv2 or later.
 Compatibility of GPLv3 with this library.

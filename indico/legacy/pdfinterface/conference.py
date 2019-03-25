@@ -35,7 +35,6 @@ from indico.core.db import db
 from indico.legacy.common import utils
 from indico.legacy.pdfinterface.base import (PageBreak, Paragraph, PDFBase, PDFLaTeXBase, PDFWithTOC, Spacer, escape,
                                              modifiedFontSize)
-from indico.legacy.webinterface.common.tools import strip_ml_tags
 from indico.modules.events.abstracts.models.abstracts import AbstractReviewingState, AbstractState
 from indico.modules.events.abstracts.models.reviews import AbstractAction
 from indico.modules.events.abstracts.settings import BOACorrespondingAuthorType, BOASortField, boa_settings
@@ -46,8 +45,8 @@ from indico.modules.events.tracks.settings import track_settings
 from indico.modules.events.util import create_event_logo_tmp_file
 from indico.util.date_time import format_date, format_datetime, format_human_timedelta, format_time, now_utc
 from indico.util.i18n import _, ngettext
-from indico.util.string import (format_full_name, html_color_to_rgb, render_markdown, sanitize_for_platypus, to_unicode,
-                                truncate)
+from indico.util.string import (format_full_name, html_color_to_rgb, render_markdown, sanitize_for_platypus, strip_tags,
+                                to_unicode, truncate)
 
 
 # Change reportlab default pdf font Helvetica to indico ttf font,
@@ -105,7 +104,7 @@ class ProgrammeToPDF(PDFBase):
         height = self._drawLogo(c)
 
         if not height:
-            height = self._drawWrappedString(c, escape(self.event.title.encode('utf-8')),
+            height = self._drawWrappedString(c, escape(strip_tags(self.event.title).encode('utf-8')),
                                              height=self._PAGE_HEIGHT - 2*inch)
 
         c.setFont('Times-Bold', 15)
@@ -120,14 +119,14 @@ class ProgrammeToPDF(PDFBase):
         c.setFont('Times-Bold', 30)
         height-=6*cm
         c.drawCentredString(self._PAGE_WIDTH/2.0, height, self._title)
-        self._drawWrappedString(c, "%s / %s" % (strip_ml_tags(self.event.title.encode('utf-8')), self._title),
+        self._drawWrappedString(c, "%s / %s" % (strip_tags(self.event.title).encode('utf-8'), self._title),
                                 width=inch, height=0.75*inch, font='Times-Roman', size=9, color=(0.5,0.5,0.5), align="left", maximumWidth=self._PAGE_WIDTH-3.5*inch, measurement=inch, lineSpacing=0.15)
         c.drawRightString(self._PAGE_WIDTH - inch, 0.75 * inch, now_utc().strftime("%A %d %B %Y"))
         c.restoreState()
 
     def laterPages(self, c, doc):
         c.saveState()
-        self._drawWrappedString(c, "%s / %s" % (escape(strip_ml_tags(self.event.title.encode('utf-8'))), self._title),
+        self._drawWrappedString(c, "%s / %s" % (escape(strip_tags(self.event.title).encode('utf-8')), self._title),
                                 width=inch, height=self._PAGE_HEIGHT-0.75*inch, font='Times-Roman', size=9,
                                 color=(0.5, 0.5, 0.5), align="left", maximumWidth=self._PAGE_WIDTH - 3.5*inch,
                                 measurement=inch, lineSpacing=0.15)
