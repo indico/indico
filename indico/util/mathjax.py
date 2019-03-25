@@ -16,11 +16,9 @@
 
 from __future__ import absolute_import
 
-from flask import current_app
-
-from indico.legacy.common.TemplateExec import render
+from flask import current_app, render_template
 
 
 class MathjaxMixin(object):
     def _getHeadContent(self):
-        return render('js/mathjax.config.js.tpl') + unicode(current_app.manifest['mathjax.js'])
+        return render_template('mathjax_config.html') + unicode(current_app.manifest['mathjax.js'])
