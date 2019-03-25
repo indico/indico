@@ -21,7 +21,7 @@ from operator import attrgetter
 
 from flask import redirect
 
-from indico.legacy.pdfinterface.conference import AbstractsToPDF, ConfManagerAbstractsToPDF
+from indico.legacy.pdfinterface.latex import AbstractsToPDF, ConfManagerAbstractsToPDF
 from indico.modules.events.abstracts.models.files import AbstractFile
 from indico.modules.events.abstracts.util import generate_spreadsheet_from_abstracts
 from indico.modules.events.util import ZipGeneratorMixin

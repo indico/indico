@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 from flask import flash, request, session
 from sqlalchemy.orm import defaultload, joinedload
 
-from indico.legacy.pdfinterface.conference import AbstractToPDF, ConfManagerAbstractToPDF
+from indico.legacy.pdfinterface.latex import AbstractToPDF, ConfManagerAbstractToPDF
 from indico.modules.events.abstracts.controllers.base import RHAbstractBase
 from indico.modules.events.abstracts.models.files import AbstractFile
 from indico.modules.events.abstracts.operations import update_abstract

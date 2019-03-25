@@ -26,7 +26,7 @@ from sqlalchemy.orm import joinedload, load_only
 from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
-from indico.legacy.pdfinterface.conference import AbstractBook
+from indico.legacy.pdfinterface.latex import AbstractBook
 from indico.modules.events import Event
 from indico.modules.events.abstracts.models.abstracts import Abstract, AbstractState
 from indico.modules.events.abstracts.models.email_templates import AbstractEmailTemplate

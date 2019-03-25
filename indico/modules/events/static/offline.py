@@ -28,7 +28,8 @@ from werkzeug.utils import secure_filename
 
 from indico.core.config import config
 from indico.core.plugins import plugin_engine
-from indico.legacy.pdfinterface.conference import AbstractBook, ContribsToPDF, ContribToPDF, ProgrammeToPDF
+from indico.legacy.pdfinterface.conference import ProgrammeToPDF
+from indico.legacy.pdfinterface.latex import AbstractBook, ContribsToPDF, ContribToPDF
 from indico.legacy.webinterface.pages.static import (WPStaticAuthorList, WPStaticConferenceDisplay,
                                                      WPStaticConferenceProgram, WPStaticContributionDisplay,
                                                      WPStaticContributionList, WPStaticCustomPage,

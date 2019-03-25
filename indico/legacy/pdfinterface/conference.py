@@ -20,7 +20,6 @@ from datetime import timedelta
 from itertools import takewhile
 from operator import attrgetter
 
-from pytz import timezone
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY, TA_LEFT, TA_RIGHT
 from reportlab.lib.pagesizes import A4, landscape
@@ -33,16 +32,11 @@ from speaklater import is_lazy_string
 
 from indico.core.db import db
 from indico.legacy.common import utils
-from indico.legacy.pdfinterface.base import (PageBreak, Paragraph, PDFBase, PDFLaTeXBase, PDFWithTOC, Spacer, escape,
-                                             modifiedFontSize)
-from indico.modules.events.abstracts.models.abstracts import AbstractReviewingState, AbstractState
-from indico.modules.events.abstracts.models.reviews import AbstractAction
-from indico.modules.events.abstracts.settings import BOACorrespondingAuthorType, BOASortField, boa_settings
+from indico.legacy.pdfinterface.base import PageBreak, Paragraph, PDFBase, PDFWithTOC, Spacer, escape, modifiedFontSize
 from indico.modules.events.layout.util import get_menu_entry_by_name
 from indico.modules.events.registration.models.items import PersonalDataType
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
 from indico.modules.events.tracks.settings import track_settings
-from indico.modules.events.util import create_event_logo_tmp_file
 from indico.util.date_time import format_date, format_datetime, format_human_timedelta, format_time, now_utc
 from indico.util.i18n import _, ngettext
 from indico.util.string import (format_full_name, html_color_to_rgb, render_markdown, sanitize_for_platypus, strip_tags,
@@ -70,24 +64,6 @@ def _get_sans_style_sheet():
         if hasattr(style, 'bulletFontName'):
             style.bulletFontName = _font_map.get(style.bulletFontName, style.bulletFontName)
     return styles
-
-
-def extract_affiliations(contrib):
-    affiliations = dict()
-
-    def enumerate_affil(person_links):
-        auth_list = []
-
-        for person_link in person_links:
-            affil = person_link.affiliation
-            if affil and affil not in affiliations:
-                affiliations[affil] = len(affiliations) + 1
-            auth_list.append((person_link, affiliations[affil] if affil else None))
-        return auth_list
-
-    authors = enumerate_affil(contrib.primary_authors)
-    coauthors = enumerate_affil(contrib.secondary_authors)
-    return affiliations, authors, coauthors
 
 
 class ProgrammeToPDF(PDFBase):
@@ -159,267 +135,6 @@ class ProgrammeToPDF(PDFBase):
             p = Paragraph(escape(bogustext), style)
             story.append(p)
             story.append(Spacer(1, 0.4*inch))
-
-
-class AbstractToPDF(PDFLaTeXBase):
-
-    _tpl_filename = 'single_doc.tpl'
-
-    def __init__(self, abstract, tz=None):
-        super(AbstractToPDF, self).__init__()
-
-        self._abstract = abstract
-        event = abstract.event
-
-        if tz is None:
-            tz = event.timezone
-
-        self._args.update({
-            'doc_type': 'abstract',
-            'abstract': abstract,
-            'event': event,
-            'tz': timezone(tz),
-            'track_class': self._get_track_classification(abstract),
-            'contrib_type': self._get_contrib_type(abstract),
-            'fields': [f for f in event.contribution_fields if f.is_active]
-        })
-        if event.logo:
-            self._args['logo_img'] = create_event_logo_tmp_file(event).name
-
-    @staticmethod
-    def _get_track_classification(abstract):
-        if abstract.state == AbstractState.accepted:
-            if abstract.accepted_track:
-                return escape(abstract.accepted_track.full_title)
-        else:
-            tracks = sorted(abstract.submitted_for_tracks | abstract.reviewed_for_tracks, key=attrgetter('position'))
-            return u'; '.join(escape(t.full_title) for t in tracks)
-
-    @staticmethod
-    def _get_contrib_type(abstract):
-        is_accepted = abstract.state == AbstractState.accepted
-        return abstract.accepted_contrib_type if is_accepted else abstract.submitted_contrib_type
-
-
-class AbstractsToPDF(PDFLaTeXBase):
-
-    _tpl_filename = "report.tpl"
-
-    def __init__(self, event, abstracts, tz=None):
-        super(AbstractsToPDF, self).__init__()
-        if tz is None:
-            self._tz = event.timezone
-
-        self._args.update({
-            'event': event,
-            'doc_type': 'abstract',
-            'title': _("Report of Abstracts"),
-            'get_track_classification': AbstractToPDF._get_track_classification,
-            'get_contrib_type': AbstractToPDF._get_contrib_type,
-            'items': abstracts,
-            'fields': [f for f in event.contribution_fields if f.is_active]
-        })
-
-
-class ConfManagerAbstractToPDF(AbstractToPDF):
-
-    def __init__(self, abstract, tz=None):
-        super(ConfManagerAbstractToPDF, self).__init__(abstract, tz)
-
-        self._args.update({
-            'doc_type': 'abstract_manager',
-            'status': self._get_status(abstract),
-            'track_judgements': self._get_track_reviewing_states(abstract)
-        })
-
-    @staticmethod
-    def _get_status(abstract):
-        state_title = abstract.state.title.upper()
-        if abstract.state == AbstractState.duplicate:
-            return _(u"{} (#{}: {})").format(state_title, abstract.duplicate_of.friendly_id,
-                                             abstract.duplicate_of.title)
-        elif abstract.state == AbstractState.merged:
-            return _(u"{} (#{}: {})").format(state_title, abstract.merged_into.friendly_id, abstract.merged_into.title)
-        else:
-            return abstract.state.title.upper()
-
-    @staticmethod
-    def _get_track_reviewing_states(abstract):
-        def _format_review_action(review):
-            action = unicode(review.proposed_action.title)
-            if review.proposed_action == AbstractAction.accept and review.proposed_contribution_type:
-                return u'{}: {}'.format(action, review.proposed_contribution_type.name)
-            else:
-                return action
-
-        reviews = []
-        for track in abstract.reviewed_for_tracks:
-            track_review_state = abstract.get_track_reviewing_state(track)
-            review_state = track_review_state.title
-            track_reviews = abstract.get_reviews(group=track)
-            review_details = [(_format_review_action(review),
-                               review.user.get_full_name(abbrev_first_name=False),
-                               review.comment,
-                               review.score,
-                               [(rating.question.title, rating.value) for rating in review.ratings])
-                              for review in track_reviews]
-            if track_review_state in {AbstractReviewingState.positive, AbstractReviewingState.conflicting}:
-                proposed_contrib_types = {r.proposed_contribution_type.name for r in track_reviews
-                                          if r.proposed_contribution_type}
-                if proposed_contrib_types:
-                    contrib_types = u', '.join(proposed_contrib_types)
-                    review_state = u'{}: {}'.format(review_state, contrib_types)
-            elif track_review_state == AbstractReviewingState.mixed:
-                other_tracks = {x.title for r in track_reviews for x in r.proposed_tracks}
-                proposed_actions = {x.proposed_action for x in track_reviews}
-                no_track_actions = proposed_actions - {AbstractAction.change_tracks}
-                other_info = []
-                if no_track_actions:
-                    other_info.append(u', '.join(unicode(a.title) for a in no_track_actions))
-                if other_tracks:
-                    other_info.append(_(u"Proposed for other tracks: {}").format(u', '.join(other_tracks)))
-                if other_info:
-                    review_state = u'{}: {}'.format(review_state, u'; '.join(other_info))
-
-            elif track_review_state not in {AbstractReviewingState.negative, AbstractReviewingState.conflicting}:
-                continue
-            reviews.append((track.title, review_state, review_details))
-        return reviews
-
-
-class ConfManagerAbstractsToPDF(AbstractsToPDF):
-
-    def __init__(self, event, abstracts, tz=None):
-        super(ConfManagerAbstractsToPDF, self).__init__(event, abstracts, tz)
-
-        self._args.update({
-            'doc_type': 'abstract_manager',
-            'get_status': ConfManagerAbstractToPDF._get_status,
-            'get_track_judgements': ConfManagerAbstractToPDF._get_track_reviewing_states
-        })
-
-
-class ContribToPDF(PDFLaTeXBase):
-
-    _tpl_filename = 'single_doc.tpl'
-
-    def __init__(self, contrib, tz=None):
-        super(ContribToPDF, self).__init__()
-
-        event = contrib.event
-        affiliations, author_mapping, coauthor_mapping = extract_affiliations(contrib)
-
-        self._args.update({
-            'doc_type': 'contribution',
-            'affiliations': affiliations,
-            'authors_affil': author_mapping,
-            'coauthors_affil': coauthor_mapping,
-            'contrib': contrib,
-            'event': event,
-            'tz': timezone(tz or event.timezone),
-            'fields': [f for f in event.contribution_fields if f.is_active]
-        })
-
-        if event.logo:
-            self.temp_file = create_event_logo_tmp_file(event)
-            self._args['logo_img'] = self.temp_file.name
-
-
-class ContribsToPDF(PDFLaTeXBase):
-
-    _table_of_contents = True
-    _tpl_filename = "report.tpl"
-
-    def __init__(self, event, contribs, tz=None):
-        super(ContribsToPDF, self).__init__()
-
-        self._args.update({
-            'doc_type': 'contribution',
-            'title': _("Report of Contributions"),
-            'event': event,
-            'items': contribs,
-            'fields': [f for f in event.contribution_fields if f.is_active],
-            'url': event.short_external_url,
-            'tz': timezone(tz or event.timezone)
-        })
-
-        if event.logo:
-            self.temp_file = create_event_logo_tmp_file(event)
-            self._args['logo_img'] = self.temp_file.name
-
-
-class ContributionBook(PDFLaTeXBase):
-
-    _tpl_filename = "contribution_list_boa.tpl"
-
-    def _sort_contribs(self, contribs, sort_by):
-        mapping = {'number': 'id', 'name': 'title'}
-        if sort_by == BOASortField.schedule:
-            key_func = lambda c: (c.start_dt is None, c.start_dt)
-        elif sort_by == BOASortField.session_title:
-            key_func = lambda c: (c.session is None, c.session.title.lower() if c.session else '')
-        elif sort_by == BOASortField.speaker:
-            def key_func(c):
-                speakers = c.speakers
-                if not c.speakers:
-                    return True, None
-                return False, speakers[0].get_full_name(last_name_upper=False, abbrev_first_name=False).lower()
-        else:
-            key_func = attrgetter(mapping.get(sort_by) or 'title')
-        return sorted(contribs, key=key_func)
-
-    def __init__(self, event, user, contribs=None, tz=None, sort_by=""):
-        super(ContributionBook, self).__init__()
-
-        tz = tz or event.timezone
-        contribs = self._sort_contribs(contribs or event.contributions, sort_by)
-        affiliation_contribs = {}
-        corresp_authors = {}
-
-        for contrib in contribs:
-            affiliations, author_mapping, coauthor_mapping = extract_affiliations(contrib)
-            affiliation_contribs[contrib.id] = {
-                'affiliations': affiliations,
-                'authors_affil': author_mapping,
-                'coauthors_affil': coauthor_mapping
-            }
-
-            # figure out "corresponding author(s)"
-            if boa_settings.get(event, 'corresponding_author') == BOACorrespondingAuthorType.submitter:
-                corresp_authors[contrib.id] = [pl.person.email for pl in contrib.person_links if pl.is_submitter]
-            if boa_settings.get(event, 'corresponding_author') == BOACorrespondingAuthorType.speakers:
-                corresp_authors[contrib.id] = [speaker.person.email for speaker in contrib.speakers]
-
-        self._args.update({
-            'affiliation_contribs': affiliation_contribs,
-            'corresp_authors': corresp_authors,
-            'contribs': contribs,
-            'event': event,
-            'tz': timezone(tz or event.timezone),
-            'url': event.url,
-            'fields': [f for f in event.contribution_fields if f.is_active],
-            'sorted_by': sort_by,
-            'user': user,
-            'boa_text': boa_settings.get(event, 'extra_text')
-        })
-
-        if event.logo:
-            self.temp_file = create_event_logo_tmp_file(event)
-            self._args['logo_img'] = self.temp_file.name
-
-
-class AbstractBook(ContributionBook):
-
-    _tpl_filename = "book_of_abstracts.tpl"
-    _table_of_contents = True
-
-    def __init__(self, event, tz=None):
-        sort_by = boa_settings.get(event, 'sort_by')
-
-        super(AbstractBook, self).__init__(event, None, sort_by=sort_by)
-        self._args['show_ids'] = boa_settings.get(event, 'show_abstract_ids')
-
-        del self._args["url"]
 
 
 class TimetablePDFFormat:

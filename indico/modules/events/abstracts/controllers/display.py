@@ -20,7 +20,7 @@ from flask import flash, session
 from werkzeug.exceptions import Forbidden
 
 from indico.core.errors import NoReportError
-from indico.legacy.pdfinterface.conference import AbstractsToPDF
+from indico.legacy.pdfinterface.latex import AbstractsToPDF
 from indico.modules.events.abstracts.controllers.base import RHAbstractsBase
 from indico.modules.events.abstracts.operations import create_abstract
 from indico.modules.events.abstracts.util import get_user_abstracts, make_abstract_form
