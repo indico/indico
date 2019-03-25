@@ -21,7 +21,7 @@ import React from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import PropTypes from 'prop-types';
-import {Button, Checkbox, Form, Grid, Icon, Message, Modal, Radio, Segment, Popup} from 'semantic-ui-react';
+import {Button, Checkbox, Form, Grid, Icon, Message, Modal, Radio, Segment} from 'semantic-ui-react';
 import {Form as FinalForm, Field} from 'react-final-form';
 import createDecorator from 'final-form-calculate';
 import {ReduxCheckboxField, ReduxDropdownField, ReduxFormField, ReduxRadioField, formatters} from 'indico/react/forms';
@@ -33,12 +33,12 @@ import TimeInformation from '../../components/TimeInformation';
 import {selectors as roomsSelectors} from '../../common/rooms';
 import {selectors as linkingSelectors, linkDataShape} from '../../common/linking';
 import RoomBasicDetails from '../../components/RoomBasicDetails';
-import {DailyTimelineContent, TimelineLegend} from '../../common/timeline';
 import * as actions from './actions';
 import {actions as modalActions} from '../../modals';
 import {selectors as userSelectors} from '../../common/user';
 import * as bookRoomSelectors from './selectors';
 import {BookingObjectLink} from '../../common/bookings';
+import SingleRoomTimelineModal from '../../common/timeline/SingleRoomTimelineModal';
 
 import './BookRoomModal.module.scss';
 
@@ -202,37 +202,6 @@ class BookRoomModal extends React.Component {
                         form.change('isPrebooking', isPrebooking);
                     }} />
         );
-    }
-
-    _getRowSerializer(day) {
-        const {room} = this.props;
-        return ({bookings, preBookings, candidates, conflictingCandidates, nonbookablePeriods, unbookableHours,
-                 blockings, conflicts, preConflicts}) => ({
-            availability: {
-                candidates: (candidates[day] || []).map((candidate) => (
-                    {...candidate, bookable: false})
-                ) || [],
-                conflictingCandidates: (conflictingCandidates[day] || []).map((candidate) => (
-                    {...candidate, bookable: false}
-                )) || [],
-                preBookings: preBookings[day] || [],
-                bookings: bookings[day] || [],
-                conflicts: conflicts[day] || [],
-                preConflicts: preConflicts[day] || [],
-                nonbookablePeriods: nonbookablePeriods[day] || [],
-                unbookableHours: unbookableHours || [],
-                blockings: blockings[day] || []
-            },
-            label: moment(day).format('L'),
-            key: day,
-            room
-        });
-    }
-
-    renderRoomTimeline(availability) {
-        const {availability: {dateRange}} = this.props;
-        const rows = dateRange.map((day) => this._getRowSerializer(day)(availability));
-        return <DailyTimelineContent rows={rows} fixedHeight={rows.length > 1 ? '70vh' : null} />;
     }
 
     renderBookingConstraints(conflicts) {
@@ -598,18 +567,11 @@ class BookRoomModal extends React.Component {
                     <Button type="button" onClick={this.onClose} content={(fprops.submitSucceeded
                         ? Translate.string('Close')
                         : Translate.string("I've changed my mind!"))} />
-                    <Modal open={bookingConflictsVisible}
-                           onClose={this.hideConflicts}
-                           size="large" closeIcon>
-                        <Modal.Header className="legend-header">
-                            <Translate>Bookings</Translate>
-                            <Popup trigger={<Icon name="info circle" className="legend-info-icon" />}
-                                   content={<TimelineLegend labels={legendLabels} compact />} />
-                        </Modal.Header>
-                        <Modal.Content>
-                            {availability && this.renderRoomTimeline(availability)}
-                        </Modal.Content>
-                    </Modal>
+                    <SingleRoomTimelineModal open={bookingConflictsVisible}
+                                             onClose={this.hideConflicts}
+                                             room={room}
+                                             title={<Translate>Bookings</Translate>}
+                                             legendLabels={legendLabels} />
                 </Modal.Actions>
             </>
         );
