@@ -26,7 +26,6 @@ from indico.core.config import config
 from indico.core.plugins import plugin_engine
 from indico.modules.auth.util import url_for_login
 from indico.modules.events.registration.util import url_rule_to_angular
-from indico.modules.rb.models.locations import Location
 from indico.modules.users.util import serialize_user
 from indico.util.i18n import po_to_json
 from indico.web.flask.util import url_for, url_rule_to_js
@@ -89,9 +88,6 @@ def generate_user_file(user=None):
 
 
 def generate_global_file():
-    locations = Location.find_all() if config.ENABLE_ROOMBOOKING else []
-    location_names = {loc.name: loc.name for loc in locations}
-    default_location = next((loc.name for loc in locations if loc.is_default), None)
     ext_auths = [{
         'name': auth.name,
         'title': auth.title,
@@ -198,8 +194,6 @@ def generate_global_file():
 
         'Data': {
             'WeekDays': ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
-            'DefaultLocation': default_location,
-            'Locations': location_names
         },
 
         'Settings': {
