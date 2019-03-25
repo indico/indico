@@ -235,7 +235,7 @@ class RowActionsDropdown extends React.Component {
                 <Modal open={activeRoomTimeline}
                        onClose={this.hideRoomTimeline}
                        size="large" closeIcon>
-                    <Modal.Header>
+                    <Modal.Header className="legend-header">
                         {room.name}
                         <Popup trigger={<Icon name="info circle" className="legend-info-icon" />}
                                content={<TimelineLegend labels={legendLabels} compact />} />
