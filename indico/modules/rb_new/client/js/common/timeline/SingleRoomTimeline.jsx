@@ -15,24 +15,29 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import _ from 'lodash';
 import React, {useEffect} from 'react';
 import moment from 'moment';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import PropTypes from 'prop-types';
+import {Dimmer, Loader} from 'semantic-ui-react';
 
 import * as bookRoomSelectors from '../../modules/bookRoom/selectors';
 import {actions as bookRoomActions} from '../../modules/bookRoom';
 import {DailyTimelineContent} from '.';
 
+import './SingleRoomTimeline.module.scss';
+
 
 const SingleRoomTimeline = props => {
     const {availability, availabilityLoading, room, filters, actions: {fetchAvailability}} = props;
     useEffect(() => {
-        console.log('useEffect');
         fetchAvailability(room, filters);
     }, [fetchAvailability, filters, room]);
 
+    const isLoaded = !_.isEmpty(availability) && !availabilityLoading;
+    const dimmer = <Dimmer active page styleName="dimmer"><Loader /></Dimmer>;
     const _getRowSerializer = (day) => {
         return ({bookings, preBookings, candidates, conflictingCandidates, nonbookablePeriods, unbookableHours,
                  blockings, conflicts, preConflicts}) => ({
@@ -63,20 +68,21 @@ const SingleRoomTimeline = props => {
         return <DailyTimelineContent rows={rows} fixedHeight={rows.length > 1 ? '70vh' : null} />;
     };
 
-    return availability && !availabilityLoading ? renderRoomTimeline() : 'loading...';
+    return isLoaded ? renderRoomTimeline() : dimmer;
 };
 
 SingleRoomTimeline.propTypes = {
     room: PropTypes.object.isRequired,
     availability: PropTypes.object,
     availabilityLoading: PropTypes.bool.isRequired,
+    filters: PropTypes.object.isRequired,
     actions: PropTypes.exact({
         fetchAvailability: PropTypes.func.isRequired,
-    })
+    }).isRequired,
 };
 
 SingleRoomTimeline.defaultProps = {
-    availability: null,
+    availability: {},
 };
 
 export default connect(
