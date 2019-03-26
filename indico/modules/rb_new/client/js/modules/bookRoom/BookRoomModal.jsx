@@ -223,7 +223,6 @@ class BookRoomModal extends React.Component {
             },
             label: moment(day).format('L'),
             key: day,
-            conflictIndicator: true,
             room
         });
     }

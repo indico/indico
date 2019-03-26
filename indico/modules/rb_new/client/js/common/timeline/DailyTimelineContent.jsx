@@ -20,7 +20,7 @@ import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
 import {AutoSizer, List, WindowScroller} from 'react-virtualized';
-import {Icon, Placeholder} from 'semantic-ui-react';
+import {Placeholder} from 'semantic-ui-react';
 import LazyScroll from 'redux-lazy-scroll';
 import {toMoment} from 'indico/utils/date';
 import {TooltipIfTruncated} from 'indico/react/components';
@@ -91,7 +91,7 @@ export default class DailyTimelineContent extends React.Component {
         return {ItemClass, itemProps};
     };
 
-    renderTimelineRow({availability, label, verboseLabel, conflictIndicator, room}, key, rowStyle = null) {
+    renderTimelineRow({availability, label, verboseLabel, room}, key, rowStyle = null) {
         const {minHour, maxHour, hourStep, onClickCandidate, onClickReservation, longLabel, showActions} = this.props;
         const columns = ((maxHour - minHour) / hourStep) + 1;
         const hasConflicts = !(_.isEmpty(availability.conflicts) && _.isEmpty(availability.preConflicts));
@@ -101,7 +101,6 @@ export default class DailyTimelineContent extends React.Component {
             <div styleName="timeline-row" key={key} style={rowStyle}>
                 <TimelineRowLabel label={label}
                                   verboseLabel={verboseLabel}
-                                  availability={conflictIndicator ? (hasConflicts ? 'conflict' : 'available') : null}
                                   longLabel={longLabel}
                                   onClickLabel={this.onClickLabel(room.id)} />
                 <div styleName="timeline-row-content" style={{flex: columns}}>
@@ -275,15 +274,11 @@ export default class DailyTimelineContent extends React.Component {
     }
 }
 
-export function TimelineRowLabel({label, verboseLabel, availability, longLabel, onClickLabel}) {
-    const colorMap = {conflict: 'red', alternatives: 'orange'};
-    const color = colorMap[availability] || 'green';
-
-    const icon = availability ? <Icon name="circle" size="tiny" color={color} styleName="dot" /> : null;
+export function TimelineRowLabel({label, verboseLabel, longLabel, onClickLabel}) {
     const labelContent = verboseLabel ? (
         <span styleName="split-label">
             <div>
-                {icon}{label}
+                {label}
             </div>
             <TooltipIfTruncated>
                 <div styleName="sub-label">
@@ -292,7 +287,7 @@ export function TimelineRowLabel({label, verboseLabel, availability, longLabel, 
             </TooltipIfTruncated>
         </span>
     ) : (
-        <span>{icon}{label}</span>
+        <span>{label}</span>
     );
 
     const roomLabel = (
@@ -317,7 +312,6 @@ export function TimelineRowLabel({label, verboseLabel, availability, longLabel, 
 TimelineRowLabel.propTypes = {
     label: PropTypes.string.isRequired,
     verboseLabel: PropTypes.string,
-    availability: PropTypes.oneOf(['available', 'alternatives', 'conflict']),
     longLabel: PropTypes.bool,
     onClickLabel: PropTypes.oneOfType([
         PropTypes.func,
@@ -326,7 +320,6 @@ TimelineRowLabel.propTypes = {
 };
 
 TimelineRowLabel.defaultProps = {
-    availability: null,
     longLabel: false,
     onClickLabel: null,
     verboseLabel: null,
