@@ -46,7 +46,6 @@ from indico.core.logger import Logger
 from indico.core.marshmallow import mm
 from indico.core.plugins import plugin_engine, url_for_plugin
 from indico.core.webpack import IndicoManifestLoader, webpack
-from indico.legacy.common.TemplateExec import mako
 from indico.modules.auth.providers import IndicoAuthProvider, IndicoIdentityProvider
 from indico.modules.auth.util import url_for_login, url_for_logout
 from indico.modules.oauth import oauth
@@ -159,10 +158,6 @@ def configure_xsendfile(app, method):
         app.wsgi_app = XAccelMiddleware(app.wsgi_app, args)
     else:
         raise ValueError('Invalid static file method: %s' % method)
-
-
-def setup_mako(app):
-    mako.template_args['module_directory'] = os.path.join(config.TEMP_DIR, 'mako_modules', indico.__version__)
 
 
 def setup_jinja(app):
@@ -350,7 +345,6 @@ def make_app(set_path=False, testing=False, config_override=None):
         multipass.init_app(app)
         oauth.init_app(app)
         webpack.init_app(app)
-        setup_mako(app)
         setup_jinja(app)
         configure_db(app)
         mm.init_app(app)  # must be called after `configure_db`!

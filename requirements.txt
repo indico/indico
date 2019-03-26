@@ -1,5 +1,4 @@
 Babel==2.6.0
-Mako==1.0.7
 MarkupSafe==1.1.1
 indico-fonts==1.1
 icalendar==4.0.3

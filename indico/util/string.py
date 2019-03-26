@@ -246,11 +246,6 @@ def render_markdown(text, escape_latex_math=True, md=None, **kwargs):
         return result
 
 
-def render_markdown_utf8(text):
-    """UTF-8 version for Mako usage (will be deprecated)"""
-    return render_markdown(text).encode('utf-8')
-
-
 def sanitize_for_platypus(text):
     """Sanitize HTML to be used in platypus"""
     tags = ['b', 'br', 'em', 'font', 'i', 'img', 'strike', 'strong', 'sub', 'sup', 'u', 'span', 'div', 'p']
