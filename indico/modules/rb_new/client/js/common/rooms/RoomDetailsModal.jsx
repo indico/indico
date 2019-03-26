@@ -135,7 +135,6 @@ function RoomDetails({bookRoom, room, availability, attributes}) {
             blockings: blockings || []
         },
         label: moment(day).format('L'),
-        conflictIndicator: false,
         key: day,
         room
     });

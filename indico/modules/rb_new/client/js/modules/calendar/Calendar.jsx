@@ -267,7 +267,6 @@ class Calendar extends React.Component {
                                                  onClickReservation={openBookingDetails}
                                                  onAddSlot={editable ? this.onAddSlot : null}
                                                  showUnused={!hideUnused}
-                                                 conflictIndicator={false}
                                                  longLabel />
                             ) : (
                                 <CalendarListView />

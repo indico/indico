@@ -48,7 +48,6 @@ export default class ElasticTimeline extends React.Component {
         extraContent: PropTypes.node,
         showUnused: PropTypes.bool,
         fixedHeight: PropTypes.string,
-        conflictIndicator: PropTypes.bool
     };
 
     static defaultProps = {
@@ -70,7 +69,6 @@ export default class ElasticTimeline extends React.Component {
         lazyScroll: null,
         showUnused: true,
         fixedHeight: null,
-        conflictIndicator: true
     };
 
     _getDayRowSerializer(dt) {
@@ -97,20 +95,19 @@ export default class ElasticTimeline extends React.Component {
     }
 
     calcDailyRows() {
-        const {availability, datePicker: {selectedDate}, conflictIndicator} = this.props;
+        const {availability, datePicker: {selectedDate}} = this.props;
 
         return availability.map(([, data]) => data).map((data) => ({
             availability: this._getDayRowSerializer(selectedDate)(data),
             label: data.room.name,
             verboseLabel: data.room.verboseName,
             key: data.room.id,
-            conflictIndicator,
             room: data.room
         }));
     }
 
     calcWeeklyRows() {
-        const {availability, datePicker: {selectedDate}, conflictIndicator} = this.props;
+        const {availability, datePicker: {selectedDate}} = this.props;
         const weekStart = toMoment(selectedDate, 'YYYY-MM-DD').startOf('week');
         const weekRange = [...Array(7).keys()].map(n => serializeDate(weekStart.clone().add(n, 'days')));
 
@@ -125,14 +122,13 @@ export default class ElasticTimeline extends React.Component {
                 label: room.name,
                 verboseLabel: room.verboseName,
                 key: room.id,
-                conflictIndicator,
                 room
             };
         });
     }
 
     calcMonthlyRows() {
-        const {availability, datePicker: {selectedDate}, conflictIndicator} = this.props;
+        const {availability, datePicker: {selectedDate}} = this.props;
         const date = toMoment(selectedDate, 'YYYY-MM-DD');
         const monthStart = date.clone().startOf('month');
         const monthEnd = date.clone().endOf('month');
@@ -148,7 +144,6 @@ export default class ElasticTimeline extends React.Component {
                 label: room.name,
                 verboseLabel: room.verboseName,
                 key: room.id,
-                conflictIndicator,
                 room
             };
         });
