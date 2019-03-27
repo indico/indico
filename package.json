@@ -25,7 +25,7 @@
     "fullcalendar": "^3.10.0",
     "geodesy": "^1.1.3",
     "history": "^4.7.2",
-    "indico-sui-theme": "github:indico/indico-sui-theme#master",
+    "indico-sui-theme": "^0.0.1",
     "jed": "^1.1.1",
     "jqplot": "github:jqplot/jqplot#d96a669fbb729f4f51e2214688e54320411219af",
     "jquery": "^3.3.1",
