@@ -181,7 +181,7 @@ export default class DailyTimelineContent extends React.Component {
         );
     };
 
-    renderTimelineItemPlaceholders = (props) => (
+    renderTimelineItemPlaceholders = (props = {}) => (
         _.range(0, 10).map((i) => (
             <Placeholder {...props} key={i} styleName="timeline-item-placeholder" fluid>
                 <Placeholder.Paragraph>
