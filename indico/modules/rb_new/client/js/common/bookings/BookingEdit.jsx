@@ -88,6 +88,7 @@ class BookingEdit extends React.Component {
                         rejections: {...occurrences.rejections},
                         other: {...occurrences.otherBookings},
                         blockings: {...occurrences.blockings},
+                        overridableBlockings: {...occurrences.overridableBlockings},
                         nonbookablePeriods: {...occurrences.nonbookablePeriods},
                         unbookableHours: occurrences.unbookableHours,
                         pendingCancellations: {},

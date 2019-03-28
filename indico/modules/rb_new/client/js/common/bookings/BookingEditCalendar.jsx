@@ -71,6 +71,7 @@ class BookingEditCalendar extends React.Component {
                 conflicts: data.conflicts[day] || [],
                 pendingCancellations: data.pendingCancellations[day] || [],
                 blockings: data.blockings[day] || [],
+                overridableBlockings: data.overridableBlockings[day] || [],
                 nonbookablePeriods: data.nonbookablePeriods[day] || [],
                 unbookableHours: data.unbookableHours || [],
             },
