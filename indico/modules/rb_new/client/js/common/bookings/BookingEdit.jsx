@@ -391,7 +391,7 @@ class BookingEdit extends React.Component {
             repeat_interval: repeatInterval,
             room_id: roomId,
             user_id: usage === 'myself' ? undefined : user.id,
-            booking_reason: reason,
+            reason,
         };
 
         const rv = await updateBooking(id, params);
