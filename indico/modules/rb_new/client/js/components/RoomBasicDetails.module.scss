@@ -35,12 +35,15 @@
 }
 
 .feature-box {
+    pointer-events: none;
     position: absolute;
     display: flex;
     bottom: -1px;
     width: 100%;
 
     .feature-entries {
+        cursor: default;
+        pointer-events: auto;
         background-color: $white;
         border-radius: 3px 3px 0 0;
         border-color: $pastel-gray $pastel-gray $white $pastel-gray;
