@@ -127,13 +127,16 @@ function RoomDetails({bookRoom, room, availability, attributes}) {
         {label: Translate.string('Not bookable'), style: 'unbookable'}
     ];
 
-    const rowSerializer = ({bookings, preBookings, nonbookablePeriods, unbookableHours, blockings, day}) => ({
+    const rowSerializer = ({
+        bookings, preBookings, nonbookablePeriods, unbookableHours, blockings, overridableBlockings, day
+    }) => ({
         availability: {
             bookings: bookings || [],
             preBookings: preBookings || [],
             nonbookablePeriods: nonbookablePeriods || [],
             unbookableHours: unbookableHours || [],
-            blockings: blockings || []
+            blockings: blockings || [],
+            overridableBlockings: overridableBlockings || []
         },
         label: moment(day).format('L'),
         key: day,
