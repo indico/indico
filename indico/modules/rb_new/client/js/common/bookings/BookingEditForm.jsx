@@ -20,8 +20,8 @@ import moment from 'moment';
 import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import {Form, Input, Segment, Select, TextArea} from 'semantic-ui-react';
-import {Field} from 'react-final-form';
+import {Form, Input, Message, Segment, Select, TextArea} from 'semantic-ui-react';
+import {Field, FormSpy} from 'react-final-form';
 import {START_DATE} from 'react-dates/constants';
 
 import PrincipalSearchField from 'indico/react/components/PrincipalSearchField';
@@ -195,7 +195,7 @@ class BookingEditForm extends React.Component {
     render() {
         const {
             user: sessionUser,
-            booking: {bookedForUser, startDt, endDt},
+            booking: {bookedForUser, startDt, endDt, room, isAccepted},
             onBookingPeriodChange,
             formProps,
             hideOptions,
@@ -278,6 +278,24 @@ class BookingEditForm extends React.Component {
                                disabled={submitSucceeded}
                                isEqual={_.isEqual}
                                render={this.renderTimeForm} />
+                    )}
+                    {!room.canUserBook && room.canUserPrebook && isAccepted && (
+                        <FormSpy subscription={{dirtyFields: true}}>
+                            {({dirtyFields}) => (
+                                Object.keys(dirtyFields).some(key => (
+                                    key === 'dates' || key === 'timeSlot' || key.startsWith('recurrence.')
+                                )) && (
+                                    <Message warning visible>
+                                        <Message.Header>
+                                            <Translate>This booking will require approval!</Translate>
+                                        </Message.Header>
+                                        <Translate>
+                                            Changing date or time will revert it back to a pre-booking.
+                                        </Translate>
+                                    </Message>
+                                )
+                            )}
+                        </FormSpy>
                     )}
                 </Segment>
                 <Segment color="blue" inverted>
