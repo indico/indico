@@ -87,7 +87,7 @@ export default class ElasticTimeline extends React.Component {
                 preConflicts: preConflicts[dt] || [],
                 blockings: blockings[dt] || [],
                 nonbookablePeriods: nonbookablePeriods[dt] || [],
-                unbookableHours: (dateRange.length !== 0 && !_.includes(dateRange, dt)) ? [] : (unbookableHours || []),
+                unbookableHours: (dateRange.length !== 0 && !dateRange.includes(dt)) ? [] : (unbookableHours || []),
                 cancellations: cancellations[dt] || [],
                 rejections: rejections[dt] || [],
             };
