@@ -109,12 +109,12 @@ export default class MonthlyTimelineContent extends WeeklyTimelineContent {
                      className={!selectable ? 'timeline-non-selectable' : ''}>
                     <div style={{minWidth: labelWidth}} />
                     <div styleName="style.timeline-header-labels">
-                        {_.map(this.dates, (dt, n) => {
+                        {this.dates.map((dt, n) => {
                             const indicateWeekend = this.weekendDays.includes(n);
                             const labelStyle = 'style.timeline-header-label';
                             return (
                                 <div styleName={indicateWeekend ? `${labelStyle} style.weekend` : labelStyle}
-                                     key={`timeline-header-${n}`}>
+                                     key={`timeline-header-${dt}`}>
                                     <span styleName="style.timeline-label-text">
                                         {toMoment(dt, 'YYYY-MM-DD').format('D')}
                                     </span>
