@@ -123,6 +123,7 @@ function RoomDetails({bookRoom, room, availability, attributes}) {
         {label: Translate.string('Booked'), style: 'booking'},
         {label: Translate.string('Pre-Booked'), style: 'pre-booking'},
         {label: Translate.string('Blocked'), style: 'blocking'},
+        {label: Translate.string('Blocked (allowed)'), style: 'overridable-blocking'},
         {label: Translate.string('Not bookable'), style: 'unbookable'}
     ];
 

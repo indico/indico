@@ -78,6 +78,7 @@ class UnavailableRoomsModal extends React.Component {
             {label: Translate.string('Conflict'), style: 'conflict'},
             {label: Translate.string('Conflict with Pre-Booking'), style: 'pre-booking-conflict'},
             {label: Translate.string('Blocked'), style: 'blocking'},
+            {label: Translate.string('Blocked (allowed)'), style: 'overridable-blocking'},
             {label: Translate.string('Not bookable'), style: 'unbookable'}
         ];
 

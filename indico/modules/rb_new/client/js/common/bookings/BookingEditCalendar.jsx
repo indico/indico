@@ -52,6 +52,7 @@ class BookingEditCalendar extends React.Component {
         {label: Translate.string('New booking'), style: 'available'},
         {label: Translate.string('Conflicts with new booking'), style: 'conflict'},
         {label: Translate.string('Blocked'), style: 'blocking'},
+        {label: Translate.string('Blocked (allowed)'), style: 'overridable-blocking'},
         {label: Translate.string('Not bookable'), style: 'unbookable'}
     ];
 
