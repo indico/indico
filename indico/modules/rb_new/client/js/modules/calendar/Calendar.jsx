@@ -223,6 +223,7 @@ class Calendar extends React.Component {
             {label: Translate.string('Booked'), color: 'orange', style: 'booking'},
             {label: Translate.string('Pre-Booked'), style: 'pre-booking'},
             {label: Translate.string('Blocked'), style: 'blocking'},
+            {label: Translate.string('Blocked (allowed)'), style: 'overridable-blocking'},
             {label: Translate.string('Not bookable'), style: 'unbookable'},
         ];
 
