@@ -64,12 +64,17 @@
                 cursor: default;
 
                 &:not(.selected) {
-                    color: $pastel-gray !important;
-                    border-color: $pastel-gray;
+                    color: $gray !important;
+                    border-color: $gray;
 
                     &:hover {
                         color: $dark-gray !important;
                     }
+                }
+
+                &.selected {
+                    color: $indico-blue !important;
+                    border-color: $indico-blue;
                 }
 
                 &:not(.other) {
