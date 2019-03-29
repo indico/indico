@@ -209,7 +209,7 @@ class IndicoModel(Model):
         changed = {}
         for key, value in data.iteritems():
             if keys and key not in keys:
-                return False
+                continue
             if skip and key in skip:
                 continue
             if not hasattr(cls, key):
