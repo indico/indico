@@ -57,13 +57,15 @@ def create_user(email, data, identity=None, settings=None, other_emails=None, fr
         user.make_email_primary(email)
     else:
         user.email = email
-    user.populate_from_dict(data)
+    user.populate_from_dict(data, skip={'synced_fields'})
     user.is_pending = False
     user.secondary_emails |= other_emails
     user.favorite_users.add(user)
     if identity is not None:
         user.identities.add(identity)
     db.session.add(user)
+    db.session.flush()
+    user.populate_from_dict(data, keys={'synced_fields'})  # this is a setting, so the user must have an ID
     user.settings.set_multi(settings)
     db.session.flush()
     signals.users.registered.send(user, from_moderation=from_moderation, identity=identity)

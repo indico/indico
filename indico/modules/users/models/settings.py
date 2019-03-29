@@ -60,9 +60,16 @@ def user_or_id(f):
     @wraps(f)
     def wrapper(self, user, *args, **kwargs):
         if isinstance(user, db.m.User):
-            user = {'user': user}
+            if user.id is None:
+                # SQLAlchemy 1.3 fails when filtering by a User with no ID, so we
+                # just use a filter that is known to not return any results...
+                user = {'user_id': None}
+            else:
+                user = {'user': user}
         else:
-            user = {'user_id': user.id}
+            # XXX: this appears to be unused, since the code
+            # was previously broken and did not fail anywhere
+            user = {'user_id': user}
         return f(self, user, *args, **kwargs)
 
     return wrapper
