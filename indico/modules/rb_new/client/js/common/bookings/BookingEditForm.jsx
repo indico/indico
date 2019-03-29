@@ -250,6 +250,7 @@ class BookingEditForm extends React.Component {
                                    as={Input}
                                    validate={v.min(1)}
                                    disabled={submitSucceeded}
+                                   parse={value => (value ? +value : null)}
                                    onChange={(newNumber) => {
                                        if (+newNumber > 0) {
                                            const newRecurrence = {...recurrence, number: newNumber};
