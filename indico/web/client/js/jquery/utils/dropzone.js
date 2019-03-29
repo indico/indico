@@ -27,6 +27,9 @@ import 'dropzone/dist/dropzone.css';
         Dropzone.autoDiscover = false;
     });
 
+    // Indicates whether default 'submit' handle was removed
+    let handlerRemoved = false;
+
     global.setupDropzone = function(element) {
         var $dz = $(element);
         var $form = $dz.closest('form');
@@ -74,8 +77,14 @@ import 'dropzone/dist/dropzone.css';
                     }
                 }
 
-                // We'll first remove the default 'submit' handler
-                $form.off('submit').on('submit', function(e) {
+                $form.on('ajaxForm:validateBeforeSubmit', (e) => {
+                    if (self.files.length && !handlerRemoved) {
+                         e.preventDefault();
+                         handlerRemoved = true;
+                    }
+                });
+
+                $form.on('submit', function(e) {
                     var evt = $.Event('ajaxForm:validateBeforeSubmit');
                     $(this).trigger(evt);
                     if (!evt.isDefaultPrevented()) {
@@ -89,6 +98,8 @@ import 'dropzone/dist/dropzone.css';
                             $dz.find('.dz-progress').show();
                             self.processQueue();
                         }
+                    } else {
+                        handlerRemoved = false;
                     }
                 });
 
