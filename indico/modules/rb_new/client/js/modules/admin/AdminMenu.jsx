@@ -18,7 +18,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {bindActionCreators} from 'redux';
-import {NavLink, withRouter} from 'react-router-dom';
+import {Link, NavLink, withRouter} from 'react-router-dom';
 import {Icon, Menu, Placeholder} from 'semantic-ui-react';
 import {connect} from 'react-redux';
 import {Translate} from 'indico/react/i18n';
@@ -58,7 +58,7 @@ function AdminMenu({locations, isFetchingLocations, actions: {clearTextFilter}})
     }
 
     const hasLocations = locations.length !== 0;
-    const locationURL = (locationId) => `/admin/location/${locationId}`;
+    const locationURL = (locationId) => `/admin/locations/${locationId}`;
     return (
         <Menu size="large" styleName="admin-menu" vertical>
             <Menu.Item>
@@ -86,7 +86,7 @@ function AdminMenu({locations, isFetchingLocations, actions: {clearTextFilter}})
             <Menu.Item>
                 <Menu.Header styleName="locations-header">
                     <Translate>Locations</Translate>
-                    <Icon name="setting" />
+                    <Link to="/admin/locations/"><Icon name="setting" /></Link>
                 </Menu.Header>
                 {hasLocations && (
                     <Menu.Menu>

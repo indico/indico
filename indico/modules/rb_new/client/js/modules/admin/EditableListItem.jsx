@@ -32,6 +32,7 @@ import './EditableList.module.scss';
 export default class EditableListItem extends React.PureComponent {
     static propTypes = {
         item: PropTypes.object.isRequired,
+        canDelete: PropTypes.func,
         renderDisplay: PropTypes.func.isRequired,
         renderEditForm: PropTypes.func.isRequired,
         confirmDeleteMessage: PropTypes.any.isRequired,
@@ -41,6 +42,7 @@ export default class EditableListItem extends React.PureComponent {
     };
 
     static defaultProps = {
+        canDelete: () => true,
         initialEditValues: item => item,
     };
 
@@ -61,10 +63,16 @@ export default class EditableListItem extends React.PureComponent {
         this.setState({confirming: false});
     };
 
-    confirmDelete = () => {
+    confirmDelete = async () => {
         const {item, onDelete} = this.props;
         this.setState({deleting: true, confirming: false});
-        onDelete(item);
+        const rv = await onDelete(item);
+        if (rv.error) {
+            // we could show the error but unless client-side validation
+            // failed or didn't work because of parallel changes, we should
+            // never end up here, so not worth doing this for now!
+            this.setState({deleting: false});
+        }
     };
 
     handleEditClick = () => {
@@ -85,7 +93,7 @@ export default class EditableListItem extends React.PureComponent {
 
     render() {
         const {confirming, editing, deleting, saving} = this.state;
-        const {confirmDeleteMessage, renderDisplay, renderEditForm, initialEditValues, item} = this.props;
+        const {confirmDeleteMessage, renderDisplay, renderEditForm, initialEditValues, item, canDelete} = this.props;
 
         return (
             <List.Item>
@@ -119,7 +127,7 @@ export default class EditableListItem extends React.PureComponent {
                         <Button icon="pencil" basic onClick={this.handleEditClick}
                                 disabled={saving || deleting} primary={editing} />
                         <Button icon="trash" basic negative onClick={this.handleDeleteClick}
-                                loading={deleting} disabled={saving || deleting} />
+                                loading={deleting} disabled={saving || deleting || !canDelete(item)} />
                         <Confirm header={Translate.string('Confirm deletion')}
                                  content={{content: confirmDeleteMessage}}
                                  confirmButton={<Button content={Translate.string('Delete')} negative />}

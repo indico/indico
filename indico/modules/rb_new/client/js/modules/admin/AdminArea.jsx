@@ -26,6 +26,7 @@ import AdminMenu from './AdminMenu';
 import AdminLocationRooms from './AdminLocationRooms';
 import EquipmentPage from './EquipmentPage';
 import AttributesPage from './AttributesPage';
+import LocationPage from './LocationPage';
 import SettingsPage from './SettingsPage';
 import * as adminActions from './actions';
 
@@ -62,7 +63,8 @@ class AdminArea extends React.Component {
                         <Route exact path="/admin" component={SettingsPage} />
                         <Route exact path="/admin/equipment" component={EquipmentPage} />
                         <Route exact path="/admin/attributes" component={AttributesPage} />
-                        <Route exact path="/admin/location/:locationId"
+                        <Route exact path="/admin/locations/" component={LocationPage} />
+                        <Route exact path="/admin/locations/:locationId"
                                render={({match: {params: {locationId}}}) => (
                                    <AdminLocationRooms locationId={parseInt(locationId, 10)} />
                                )} />

@@ -16,7 +16,7 @@
  */
 
 import settingsURL from 'indico-url:rooms_new.admin_settings';
-import fetchLocationsURL from 'indico-url:rooms_new.admin_locations';
+import locationsURL from 'indico-url:rooms_new.admin_locations';
 import equipmentTypesURL from 'indico-url:rooms_new.admin_equipment_types';
 import featuresURL from 'indico-url:rooms_new.admin_features';
 import attributesURL from 'indico-url:rooms_new.admin_attributes';
@@ -35,6 +35,8 @@ export const FETCH_LOCATIONS_REQUEST = 'admin/FETCH_LOCATIONS_REQUEST';
 export const FETCH_LOCATIONS_SUCCESS = 'admin/FETCH_LOCATIONS_SUCCESS';
 export const FETCH_LOCATIONS_ERROR = 'admin/FETCH_LOCATIONS_ERROR';
 export const LOCATIONS_RECEIVED = 'admin/LOCATIONS_RECEIVED';
+export const LOCATION_RECEIVED = 'admin/LOCATION_RECEIVED';
+export const LOCATION_DELETED = 'admin/LOCATION_DELETED';
 
 export const FETCH_FEATURES_REQUEST = 'admin/FETCH_FEATURES_REQUEST';
 export const FETCH_FEATURES_SUCCESS = 'admin/FETCH_FEATURES_SUCCESS';
@@ -79,7 +81,7 @@ export function updateSettings(data) {
 
 export function fetchLocations() {
     return ajaxAction(
-        () => indicoAxios.get(fetchLocationsURL()),
+        () => indicoAxios.get(locationsURL()),
         FETCH_LOCATIONS_REQUEST,
         [LOCATIONS_RECEIVED, FETCH_LOCATIONS_SUCCESS],
         FETCH_LOCATIONS_ERROR
@@ -192,5 +194,27 @@ export function createAttribute(data) {
     return submitFormAction(
         () => indicoAxios.post(attributesURL(), data),
         null, ATTRIBUTE_RECEIVED
+    );
+}
+
+export function deleteLocation(id) {
+    return ajaxAction(
+        () => indicoAxios.delete(locationsURL({location_id: id})),
+        null,
+        () => ({type: LOCATION_DELETED, id}),
+    );
+}
+
+export function updateLocation(id, data) {
+    return submitFormAction(
+        () => indicoAxios.patch(locationsURL({location_id: id}), data),
+        null, LOCATION_RECEIVED
+    );
+}
+
+export function createLocation(data) {
+    return submitFormAction(
+        () => indicoAxios.post(locationsURL(), data),
+        null, LOCATION_RECEIVED
     );
 }

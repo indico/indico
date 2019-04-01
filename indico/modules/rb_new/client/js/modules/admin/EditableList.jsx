@@ -89,6 +89,7 @@ export default class EditableList extends React.PureComponent {
         initialAddValues: PropTypes.object,
         initialEditValues: PropTypes.func,
         renderItem: PropTypes.func.isRequired,
+        canDeleteItem: PropTypes.func,
         renderAddForm: PropTypes.func.isRequired,
         renderEditForm: PropTypes.func.isRequired,
         renderDeleteMessage: PropTypes.func.isRequired,
@@ -100,6 +101,7 @@ export default class EditableList extends React.PureComponent {
     static defaultProps = {
         initialAddValues: {},
         initialEditValues: undefined,
+        canDeleteItem: undefined,
     };
 
     state = {
@@ -126,7 +128,7 @@ export default class EditableList extends React.PureComponent {
     render() {
         const {
             title, addModalTitle, renderAddForm, renderEditForm, renderDeleteMessage, renderItem, initialEditValues,
-            initialAddValues, isFetching, items, onDelete, onUpdate,
+            initialAddValues, canDeleteItem, isFetching, items, onDelete, onUpdate,
         } = this.props;
         const {adding} = this.state;
 
@@ -150,6 +152,7 @@ export default class EditableList extends React.PureComponent {
                                                   item={item}
                                                   onDelete={onDelete}
                                                   onUpdate={onUpdate}
+                                                  canDelete={canDeleteItem}
                                                   renderDisplay={renderItem}
                                                   renderAddForm={renderEditForm}
                                                   renderEditForm={renderEditForm}

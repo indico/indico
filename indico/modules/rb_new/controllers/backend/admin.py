@@ -43,6 +43,7 @@ from indico.modules.rb_new.schemas import (admin_equipment_type_schema, admin_lo
 from indico.modules.users.models.users import User
 from indico.util.i18n import _
 from indico.util.marshmallow import ModelList, PrincipalList
+from indico.web.util import ExpectedError
 
 
 class RHRoomBookingAdminBase(RHRoomBookingBase):
@@ -85,9 +86,68 @@ class RHSettings(RHRoomBookingAdminBase):
 
 
 class RHLocations(RHRoomBookingAdminBase):
-    def _process(self):
+    def _process_args(self):
+        id_ = request.view_args.get('location_id')
+        self.location = Location.get_one(id_) if id_ is not None else None
+
+    def _jsonify_one(self, location):
+        return jsonify(admin_locations_schema.dump(location, many=False))
+
+    def _jsonify_many(self):
         query = Location.query.options(joinedload('rooms'))
         return jsonify(admin_locations_schema.dump(query.all()))
+
+    def _process_GET(self):
+        if self.location:
+            return self._jsonify_one(self.location)
+        else:
+            return self._jsonify_many()
+
+    def _process_DELETE(self):
+        if Room.query.with_parent(self.location).filter_by(is_active=True).has_rows():
+            raise ExpectedError(_('Cannot delete location with active rooms'))
+        db.session.delete(self.location)
+        db.session.flush()
+        return '', 204
+
+    @use_kwargs({
+        'name': fields.String(required=True),
+        'room_name_format': fields.String(validate=[
+            lambda value: all(x in value for x in ('{building}', '{floor}', '{number}'))
+        ], required=True),
+        'map_url_template': fields.URL(schemes={'http', 'https'}, missing=''),
+    })
+    def _process_POST(self, name, room_name_format, map_url_template):
+        self._check_conflict(name)
+        loc = Location(name=name, room_name_format=room_name_format, map_url_template=map_url_template)
+        db.session.add(loc)
+        db.session.flush()
+        return self._jsonify_one(loc), 201
+
+    @use_kwargs({
+        'name': fields.String(),
+        'room_name_format': fields.String(validate=[
+            lambda value: all(x in value for x in ('{building}', '{floor}', '{number}'))
+        ]),
+        'map_url_template': fields.URL(schemes={'http', 'https'}),
+    })
+    def _process_PATCH(self, name=None, room_name_format=None, map_url_template=None):
+        if name is not None:
+            self._check_conflict(name)
+            self.location.name = name
+        if room_name_format is not None:
+            self.location.room_name_format = room_name_format
+        if map_url_template is not None:
+            self.location.map_url_template = map_url_template
+        db.session.flush()
+        return self._jsonify_one(self.location)
+
+    def _check_conflict(self, name):
+        query = Location.query.filter(db.func.lower(Location.name) == name.lower())
+        if self.location:
+            query = query.filter(Location.id != self.location.id)
+        if query.has_rows():
+            abort(422, messages={'name': [_('Name must be unique')]})
 
 
 class RHFeatures(RHRoomBookingAdminBase):
