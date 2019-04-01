@@ -14,27 +14,14 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.rooms import Room
 
 
 pytest_plugins = 'indico.modules.rb.testing.fixtures'
 
 
-def test_locator(dummy_location):
-    assert dummy_location.locator == {'locationId': dummy_location.name}
-
-
-def test_default_location(create_location):
-    assert Location.default_location is None
-    location = create_location(u'Foo', is_default=True)
-    assert Location.default_location == location
-    create_location(name=u'Bar')  # should not change the default
-    assert Location.default_location == location
-
-
-def test_room_name_format(create_location, create_room, db, dummy_user):
-    location = create_location(u'Foo', is_default=True)
+def test_room_name_format(create_location, db, dummy_user):
+    location = create_location(u'Foo')
     location.room_name_format = '{building}|{floor}|{number}'
     assert location._room_name_format == '%1$s|%2$s|%3$s'
 
@@ -43,22 +30,3 @@ def test_room_name_format(create_location, create_room, db, dummy_user):
     Room(building=1, floor=2, number=4, verbose_name='Room 3', location=location, owner=dummy_user)
     db.session.flush()
     assert Room.query.filter(Room.full_name.contains('|3')).count() == 2
-
-
-def test_set_default(create_location):
-    location = create_location(u'Foo')
-    other_location = create_location(u'Bar')
-    assert not location.is_default
-    assert not other_location.is_default
-    location.set_default()
-    assert location.is_default
-    assert not other_location.is_default
-    assert Location.default_location == location
-    # Make sure calling it again does not flip the default state
-    location.set_default()
-    assert location.is_default
-    assert not other_location.is_default
-    # Change the default
-    other_location.set_default()
-    assert not location.is_default
-    assert other_location.is_default
