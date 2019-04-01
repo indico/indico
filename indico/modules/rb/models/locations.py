@@ -15,34 +15,16 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import re
-from datetime import time
 
-from sqlalchemy import func
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from indico.core.db import db
-from indico.util.caching import memoize_request
-from indico.util.decorators import classproperty
-from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii
 
 
 class Location(db.Model):
     __tablename__ = 'locations'
     __table_args__ = {'schema': 'roombooking'}
-
-    # TODO: Turn this into a proper admin setting
-    working_time_periods = ((time(8, 30), time(12, 30)), (time(13, 30), time(17, 30)))
-
-    @classproperty
-    @classmethod
-    def working_time_start(cls):
-        return cls.working_time_periods[0][0]
-
-    @classproperty
-    @classmethod
-    def working_time_end(cls):
-        return cls.working_time_periods[-1][1]
 
     id = db.Column(
         db.Integer,
@@ -53,11 +35,6 @@ class Location(db.Model):
         nullable=False,
         unique=True,
         index=True
-    )
-    is_default = db.Column(
-        db.Boolean,
-        nullable=False,
-        default=False
     )
     map_url_template = db.Column(
         db.String,
@@ -111,26 +88,3 @@ class Location(db.Model):
     @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'name')
-
-    @locator_property
-    def locator(self):
-        return {'locationId': self.name}
-
-    @property
-    @memoize_request
-    def is_map_available(self):
-        # XXX: Broken due to Aspect refactoring. Will be removed anyway.
-        return False
-
-    @classproperty
-    @classmethod
-    @memoize_request
-    def default_location(cls):
-        return cls.query.filter_by(is_default=True).first()
-
-    def set_default(self):
-        if self.is_default:
-            return
-        (Location.query
-         .filter(Location.is_default | (Location.id == self.id))
-         .update({'is_default': func.not_(Location.is_default)}, synchronize_session='fetch'))

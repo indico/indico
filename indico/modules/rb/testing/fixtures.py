@@ -45,7 +45,6 @@ def create_location(db):
 def dummy_location(db, create_location):
     """Gives you a dummy default location"""
     loc = create_location(u'Test')
-    loc.set_default()
     db.session.flush()
     return loc
 

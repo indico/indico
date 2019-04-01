@@ -16,15 +16,17 @@
 
 from __future__ import division, unicode_literals
 
-from datetime import date, datetime
+from datetime import date, datetime, time
 
 from dateutil.relativedelta import relativedelta
 
 from indico.core.db import db
-from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import Reservation
 from indico.util.date_time import iterdays
+
+
+WORKING_TIME_PERIODS = ((time(8, 30), time(12, 30)), (time(13, 30), time(17, 30)))
 
 
 def calculate_rooms_bookable_time(rooms, start_date=None, end_date=None):
@@ -33,7 +35,7 @@ def calculate_rooms_bookable_time(rooms, start_date=None, end_date=None):
     if start_date is None:
         start_date = end_date - relativedelta(days=29)
     working_time_per_day = sum((datetime.combine(date.today(), end) - datetime.combine(date.today(), start)).seconds
-                               for start, end in Location.working_time_periods)
+                               for start, end in WORKING_TIME_PERIODS)
     working_days = sum(1 for __ in iterdays(start_date, end_date, skip_weekends=True))
     return working_days * working_time_per_day * len(rooms)
 
@@ -53,7 +55,7 @@ def calculate_rooms_booked_time(rooms, start_date=None, end_date=None):
 
     rsv_start = db.cast(ReservationOccurrence.start_dt, db.TIME)
     rsv_end = db.cast(ReservationOccurrence.end_dt, db.TIME)
-    slots = ((db.cast(start, db.TIME), db.cast(end, db.TIME)) for start, end in Location.working_time_periods)
+    slots = ((db.cast(start, db.TIME), db.cast(end, db.TIME)) for start, end in WORKING_TIME_PERIODS)
 
     # this basically handles all possible ways an occurrence overlaps with each one of the working time slots
     overlaps = sum(db.case([
