@@ -155,9 +155,9 @@ export function ajaxAction(requestFunc, requestAction, successAction, errorActio
 function dispatcher(dispatch, actions, data = {}) {
     if (Array.isArray(actions)) {
         actions.forEach(action => {
-            dispatch({type: action, ...data});
+            dispatch(_.isFunction(action) ? action(data) : {type: action, ...data});
         });
     } else if (actions) {
-        dispatch({type: actions, ...data});
+        dispatch(_.isFunction(actions) ? actions(data) : {type: actions, ...data});
     }
 }

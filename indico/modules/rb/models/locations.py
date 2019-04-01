@@ -14,6 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import unicode_literals
+
 import re
 
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -45,7 +47,7 @@ class Location(db.Model):
         'room_name_format',
         db.String,
         nullable=False,
-        default=u'%1$s/%2$s-%3$s'
+        default='%1$s/%2$s-%3$s'
     )
 
     #: The format used to display room names (with placeholders)

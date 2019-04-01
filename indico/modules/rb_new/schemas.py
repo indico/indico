@@ -276,6 +276,11 @@ class LocationsSchema(mm.ModelSchema):
 class AdminLocationsSchema(LocationsSchema):
     rooms = Nested(RoomSchema, only=LocationsSchema._declared_fields['rooms'].only + ('owner_name', 'comments'),
                    many=True)
+    can_delete = Function(lambda loc: not any(r.is_active for r in loc.rooms))
+
+    class Meta:
+        model = Location
+        fields = LocationsSchema.Meta.fields + ('can_delete', 'map_url_template', 'room_name_format')
 
     @post_dump
     def sort_rooms(self, location):

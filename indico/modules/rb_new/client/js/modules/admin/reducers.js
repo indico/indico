@@ -58,6 +58,13 @@ export default combineReducers({
         switch (action.type) {
             case adminActions.LOCATIONS_RECEIVED:
                 return camelizeKeys(action.data);
+            case adminActions.LOCATION_RECEIVED:
+                return [
+                    ...state.filter(loc => loc.id !== action.data.id),
+                    camelizeKeys(action.data),
+                ];
+            case adminActions.LOCATION_DELETED:
+                return state.filter(loc => loc.id !== action.id);
             default:
                 return state;
         }

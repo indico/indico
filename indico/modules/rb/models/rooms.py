@@ -336,14 +336,16 @@ class Room(versioned_cache(_cache, 'id'), ProtectionManagersMixin, db.Model, Ser
 
     @property
     def map_url(self):
-        if self.location.map_url_template:
-            return self.location.map_url_template.format(
-                building=self.building,
-                floor=self.floor,
-                number=self.number
-            )
-        else:
+        if not self.location.map_url_template:
             return None
+        return self.location.map_url_template.format(
+            id=self.id,
+            building=self.building,
+            floor=self.floor,
+            number=self.number,
+            lat=self.latitude,
+            lng=self.longitude,
+        )
 
     @property
     def has_photo(self):

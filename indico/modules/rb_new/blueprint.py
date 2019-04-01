@@ -95,7 +95,9 @@ _bp.add_url_rule('/api/blockings/<int:blocking_id>', 'delete_blocking', blocking
 
 # Administration
 _bp.add_url_rule('/api/admin/settings', 'admin_settings', admin.RHSettings, methods=('GET', 'PATCH'))
-_bp.add_url_rule('/api/admin/locations', 'admin_locations', admin.RHLocations)
+_bp.add_url_rule('/api/admin/locations', 'admin_locations', admin.RHLocations, methods=('GET', 'POST'))
+_bp.add_url_rule('/api/admin/locations/<int:location_id>', 'admin_locations', admin.RHLocations,
+                 methods=('GET', 'DELETE', 'PATCH'))
 _bp.add_url_rule('/api/admin/equipment-types', 'admin_equipment_types', admin.RHEquipmentTypes, methods=('GET', 'POST'))
 _bp.add_url_rule('/api/admin/equipment-types/<int:equipment_type_id>', 'admin_equipment_types', admin.RHEquipmentTypes,
                  methods=('GET', 'DELETE', 'PATCH'))
