@@ -23,13 +23,37 @@ import {bindActionCreators} from 'redux';
 import PropTypes from 'prop-types';
 import {Modal, Icon, Dimmer, Loader, Popup} from 'semantic-ui-react';
 
-import * as bookRoomSelectors from '../../modules/bookRoom/selectors';
-import {actions as bookRoomActions} from '../../modules/bookRoom';
+import {actions as bookRoomActions, selectors as bookRoomSelectors} from '../../modules/bookRoom';
 import TimelineLegend from './TimelineLegend';
-import {DailyTimelineContent} from '.';
+import DailyTimelineContent from './DailyTimelineContent';
 
 import './SingleRoomTimelineModal.module.scss';
 
+
+const _getRowSerializer = (day, room) => {
+    return ({bookings, preBookings, candidates, conflictingCandidates, nonbookablePeriods, unbookableHours,
+             blockings, conflicts, preConflicts}) => ({
+        availability: {
+            candidates: (candidates[day] || []).map((candidate) => (
+                {...candidate, bookable: false})
+            ) || [],
+            conflictingCandidates: (conflictingCandidates[day] || []).map((candidate) => (
+                {...candidate, bookable: false}
+            )) || [],
+            preBookings: preBookings[day] || [],
+            bookings: bookings[day] || [],
+            conflicts: conflicts[day] || [],
+            preConflicts: preConflicts[day] || [],
+            nonbookablePeriods: nonbookablePeriods[day] || [],
+            unbookableHours: unbookableHours || [],
+            blockings: blockings[day] || []
+        },
+        label: moment(day).format('L'),
+        key: day,
+        conflictIndicator: true,
+        room
+    });
+};
 
 const _SingleRoomTimelineContent = props => {
     const {availability, availabilityLoading, room, filters, actions: {fetchAvailability}} = props;
@@ -39,33 +63,10 @@ const _SingleRoomTimelineContent = props => {
 
     const isLoaded = !_.isEmpty(availability) && !availabilityLoading;
     const dimmer = <Dimmer active page styleName="dimmer"><Loader /></Dimmer>;
-    const _getRowSerializer = (day) => {
-        return ({bookings, preBookings, candidates, conflictingCandidates, nonbookablePeriods, unbookableHours,
-                 blockings, conflicts, preConflicts}) => ({
-            availability: {
-                candidates: (candidates[day] || []).map((candidate) => (
-                    {...candidate, bookable: false})
-                ) || [],
-                conflictingCandidates: (conflictingCandidates[day] || []).map((candidate) => (
-                    {...candidate, bookable: false}
-                )) || [],
-                preBookings: preBookings[day] || [],
-                bookings: bookings[day] || [],
-                conflicts: conflicts[day] || [],
-                preConflicts: preConflicts[day] || [],
-                nonbookablePeriods: nonbookablePeriods[day] || [],
-                unbookableHours: unbookableHours || [],
-                blockings: blockings[day] || []
-            },
-            label: moment(day).format('L'),
-            key: day,
-            conflictIndicator: true,
-            room
-        });
-    };
+
     const renderRoomTimeline = () => {
         const {dateRange} = availability;
-        const rows = dateRange.map((day) => _getRowSerializer(day)(availability));
+        const rows = dateRange.map((day) => _getRowSerializer(day, room)(availability));
         return <DailyTimelineContent rows={rows} fixedHeight={rows.length > 1 ? '70vh' : null} />;
     };
 
