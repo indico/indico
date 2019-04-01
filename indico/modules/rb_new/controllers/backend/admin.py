@@ -58,7 +58,7 @@ class SettingsSchema(mm.Schema):
     tileserver_url = fields.String(validate=[
         validate.URL(schemes={'http', 'https'}),
         lambda value: all(x in value for x in ('{x}', '{y}', '{z}'))
-    ])
+    ], allow_none=True)
     booking_limit = fields.Int(validate=[validate.Range(min=1)])
     notifications_enabled = fields.Bool()
     notification_before_days = fields.Int(validate=[validate.Range(min=1, max=30)])
