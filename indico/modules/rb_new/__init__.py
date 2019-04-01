@@ -25,10 +25,17 @@ from indico.modules.rb import Room, rb_settings
 from indico.modules.rb.models.blocking_principals import BlockingPrincipal
 from indico.modules.rb.models.blockings import Blocking
 from indico.modules.rb.models.principals import RoomPrincipal
-from indico.modules.rb.models.reservations import Reservation, ReservationLink
+from indico.modules.rb.models.reservations import Reservation
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem, TopMenuItem
+
+
+@signals.menu.items.connect_via('admin-sidemenu')
+def _extend_admin_menu(sender, **kwargs):
+    if config.ENABLE_ROOMBOOKING and session.user.is_admin:
+        url = url_for('rooms_new.roombooking', path='admin')
+        return SideMenuItem('rb', _('Room Booking'), url, 70, icon='location')
 
 
 @signals.menu.items.connect_via('top-menu')
