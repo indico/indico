@@ -78,7 +78,8 @@ import 'dropzone/dist/dropzone.css';
                 }
 
                 $form.on('ajaxForm:validateBeforeSubmit', (e) => {
-                    if (self.files.length && !handlerRemoved) {
+                    const isAjaxDialog = !!$(e.target).parent('.exclusivePopup').length;
+                    if (self.getQueuedFiles().length && !handlerRemoved && isAjaxDialog) {
                          e.preventDefault();
                          handlerRemoved = true;
                     }
