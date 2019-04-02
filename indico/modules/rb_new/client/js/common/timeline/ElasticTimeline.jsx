@@ -214,7 +214,8 @@ export default class ElasticTimeline extends React.Component {
                                isLoading={isLoading}
                                lazyScroll={lazyScroll}
                                showUnused={showUnused}
-                               fixedHeight={fixedHeight} />
+                               fixedHeight={fixedHeight}
+                               gutterAllowed />
                 </>
             </div>
         );

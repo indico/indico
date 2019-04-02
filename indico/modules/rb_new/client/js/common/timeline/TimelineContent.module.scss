@@ -81,8 +81,14 @@ $split-row-height: $row-height/2;
                 overflow: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;
-                padding-right: 2em;
+                margin-right: 1.5em;
+                padding-right: 0.5em;
                 text-align: right;
+
+                &.gutter {
+                    border-left: 5px solid lighten($highlight-color, 25%);
+                    background-color: lighten($highlight-color, 35%);
+                }
 
                 .split-label {
                     line-height: $split-row-height;

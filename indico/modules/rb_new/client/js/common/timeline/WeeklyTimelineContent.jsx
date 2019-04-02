@@ -20,7 +20,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {toMoment} from 'indico/utils/date';
 import {toClasses} from 'indico/react/util';
-import DailyTimelineContent, {TimelineRowLabel} from './DailyTimelineContent';
+import DailyTimelineContent from './DailyTimelineContent';
 
 /* eslint-disable no-unused-vars */
 import baseStyle from './TimelineContent.module.scss';
@@ -40,16 +40,14 @@ export default class WeeklyTimelineContent extends DailyTimelineContent {
     }
 
     renderTimelineRow({availability, room, label, verboseLabel}, key, rowStyle = null) {
-        const {minHour, maxHour, longLabel, onClickReservation, onClickCandidate} = this.props;
+        const {minHour, maxHour, longLabel, onClickReservation, gutterAllowed, onClickCandidate} = this.props;
         const hasConflicts = availability.some(([, {conflicts}]) => !!conflicts.length);
         const {ItemClass, itemProps} = this.getEditableItem(room);
+        const rowLabelProps = {label, verboseLabel, longLabel, gutterAllowed, onClickLabel: this.onClickLabel(room.id)};
 
         return (
             <div styleName="baseStyle.timeline-row" key={key} style={rowStyle}>
-                <TimelineRowLabel label={label}
-                                  verboseLabel={verboseLabel}
-                                  longLabel={longLabel}
-                                  onClickLabel={this.onClickLabel(room.id)} />
+                {this.renderRowLabel(rowLabelProps, room)}
                 <div styleName="style.timeline-row-content">
                     {availability.map(([dt, data]) => (
                         <ItemClass key={dt}
