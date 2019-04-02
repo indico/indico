@@ -20,10 +20,12 @@ import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
 import {AutoSizer, List, WindowScroller} from 'react-virtualized';
-import {Placeholder} from 'semantic-ui-react';
+import {Popup, Placeholder} from 'semantic-ui-react';
 import LazyScroll from 'redux-lazy-scroll';
+
 import {toMoment} from 'indico/utils/date';
 import {TooltipIfTruncated} from 'indico/react/components';
+import {Overridable} from 'indico/react/util';
 
 import OccurrenceActionsDropdown from '../bookings/OccurrenceActionsDropdown';
 import TimelineItem from './TimelineItem';
@@ -50,6 +52,7 @@ export default class DailyTimelineContent extends React.Component {
         renderHeader: PropTypes.func,
         showActions: PropTypes.bool,
         booking: PropTypes.object,
+        gutterAllowed: PropTypes.bool,
     };
 
     static defaultProps = {
@@ -67,7 +70,8 @@ export default class DailyTimelineContent extends React.Component {
         onAddSlot: null,
         renderHeader: null,
         showActions: false,
-        booking: null
+        booking: null,
+        gutterAllowed: false,
     };
 
     state = {
@@ -91,18 +95,35 @@ export default class DailyTimelineContent extends React.Component {
         return {ItemClass, itemProps};
     };
 
+    renderRowLabel = (rowLabelProps, room) => {
+        return (
+            <Overridable id="TimelineContent.rowLabel"
+                         room={room}
+                         {...rowLabelProps}>
+                <TimelineRowLabel {...rowLabelProps} />
+            </Overridable>
+        );
+    };
+
     renderTimelineRow({availability, label, verboseLabel, room}, key, rowStyle = null) {
-        const {minHour, maxHour, hourStep, onClickCandidate, onClickReservation, longLabel, showActions} = this.props;
+        const {
+            minHour,
+            maxHour,
+            hourStep,
+            onClickCandidate,
+            onClickReservation,
+            longLabel,
+            showActions,
+            gutterAllowed,
+        } = this.props;
         const columns = ((maxHour - minHour) / hourStep) + 1;
         const hasConflicts = !(_.isEmpty(availability.conflicts) && _.isEmpty(availability.preConflicts));
         const {ItemClass, itemProps} = this.getEditableItem(room);
+        const rowLabelProps = {label, verboseLabel, longLabel, gutterAllowed, onClickLabel: this.onClickLabel(room.id)};
 
         return (
             <div styleName="timeline-row" key={key} style={rowStyle}>
-                <TimelineRowLabel label={label}
-                                  verboseLabel={verboseLabel}
-                                  longLabel={longLabel}
-                                  onClickLabel={this.onClickLabel(room.id)} />
+                {this.renderRowLabel(rowLabelProps, room)}
                 <div styleName="timeline-row-content" style={{flex: columns}}>
                     <ItemClass startHour={minHour} endHour={maxHour} data={availability} room={room}
                                onClickReservation={onClickReservation}
@@ -277,7 +298,9 @@ export default class DailyTimelineContent extends React.Component {
     }
 }
 
-export function TimelineRowLabel({label, verboseLabel, longLabel, onClickLabel}) {
+export function TimelineRowLabel({label, verboseLabel, longLabel, onClickLabel, gutterAllowed, gutter, gutterTooltip}) {
+    const width = longLabel ? 200 : 150;
+    const hasGutter = gutterAllowed && gutter;
     const labelContent = verboseLabel ? (
         <span styleName="split-label">
             <div>
@@ -292,22 +315,20 @@ export function TimelineRowLabel({label, verboseLabel, longLabel, onClickLabel})
     ) : (
         <span>{label}</span>
     );
-
     const roomLabel = (
-        <span>
+        <div styleName={`label ${hasGutter ? 'gutter' : ''}`}>
             {onClickLabel ? <a onClick={onClickLabel}>{labelContent}</a> : labelContent}
-        </span>
+        </div>
     );
-    const width = longLabel ? 200 : 150;
 
     return (
         <div styleName="timeline-row-label" style={{
             minWidth: width,
             maxWidth: width
         }}>
-            <div styleName="label">
-                {roomLabel}
-            </div>
+            {hasGutter && gutterTooltip ? (
+                <Popup trigger={roomLabel} content={gutterTooltip} position="left center" />
+            ) : roomLabel}
         </div>
     );
 }
@@ -316,6 +337,9 @@ TimelineRowLabel.propTypes = {
     label: PropTypes.string.isRequired,
     verboseLabel: PropTypes.string,
     longLabel: PropTypes.bool,
+    gutterAllowed: PropTypes.bool,
+    gutter: PropTypes.bool,
+    gutterTooltip: PropTypes.string,
     onClickLabel: PropTypes.oneOfType([
         PropTypes.func,
         PropTypes.bool
@@ -324,6 +348,9 @@ TimelineRowLabel.propTypes = {
 
 TimelineRowLabel.defaultProps = {
     longLabel: false,
-    onClickLabel: null,
     verboseLabel: null,
+    gutterAllowed: false,
+    gutter: false,
+    gutterTooltip: '',
+    onClickLabel: null,
 };
