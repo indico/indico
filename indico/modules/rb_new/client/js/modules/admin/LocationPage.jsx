@@ -15,20 +15,47 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import _ from 'lodash';
 import React from 'react';
 import PropTypes from 'prop-types';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
+import createDecorator from 'final-form-calculate';
 import {Field} from 'react-final-form';
 import {List} from 'semantic-ui-react';
 import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
-import {formatters, validators as v, ReduxFormField} from 'indico/react/forms';
+import {formatters, validators as v, ReduxDropdownField, ReduxFormField} from 'indico/react/forms';
 import {snakifyKeys} from 'indico/utils/case';
 import * as adminActions from './actions';
 import * as adminSelectors from './selectors';
 import EditableList from './EditableList';
 
 import './EditableList.module.scss';
+
+
+const MAP_TEMPLATE_OPTIONS = [{
+    value: 'none',
+    text: Translate.string('None'),
+}, {
+    value: 'custom',
+    text: Translate.string('Custom'),
+}, {
+    value: 'https://www.google.com/maps/place/{lat},{lng}',
+    text: 'Google Maps',
+}, {
+    value: 'https://www.openstreetmap.org/?mlat={lat}&mlon={lng}&zoom=18',
+    text: 'OpenStreetMap',
+}];
+
+const formDecorator = createDecorator({
+    field: '_map_url_template_choice',
+    updates: (value) => {
+        if (value !== 'custom') {
+            return {map_url_template: value === 'none' ? null : value};
+        }
+        return {};
+    }
+});
 
 
 class LocationPage extends React.PureComponent {
@@ -100,23 +127,40 @@ class LocationPage extends React.PureComponent {
                            );
                        }
                    }} />
-            <Field name="map_url_template" component={ReduxFormField} as="input"
-                   format={formatters.trim} formatOnBlur
+            <Field name="_map_url_template_choice" component={ReduxDropdownField}
+                   parse={null}
                    label={Translate.string('Map URL template')}
-                   validate={val => {
-                       if (val && !val.match(/https?:\/\/.+/)) {
-                           return Translate.string('Please provide a valid URL');
-                       }
-                   }}>
+                   selection options={MAP_TEMPLATE_OPTIONS}>
                 <p className="field-description">
                     <Translate>
                         Indico can show a link to an external map when a room is associated to an event.
-                        Specify the template to generate those links, using any of the following placeholders:
-                        {' '}
-                        <Param name="placeholders" wrapper={<code />}
-                               value="{id}, {building}, {floor}, {number}, {lat}, {lng}" />
                     </Translate>
                 </p>
+            </Field>
+            <Field name="_map_url_template_choice" subscription={{value: true}}>
+                {({input: {value: selectedTemplate}}) => (
+                    <Field name="map_url_template" component={ReduxFormField} as="input"
+                           format={formatters.trim} formatOnBlur
+                           readOnly={selectedTemplate !== 'custom'}
+                           style={selectedTemplate === 'none' ? {display: 'none'} : {}}
+                           parse={val => val || null}
+                           validate={val => {
+                               if (val && !val.match(/https?:\/\/.+/)) {
+                                   return Translate.string('Please provide a valid URL');
+                               }
+                           }}>
+                        {selectedTemplate === 'custom' && (
+                            <p className="field-description">
+                                <Translate>
+                                    Specify a custom URL template using any of the following placeholders:
+                                    {' '}
+                                    <Param name="placeholders" wrapper={<code />}
+                                           value="{id}, {building}, {floor}, {number}, {lat}, {lng}" />
+                                </Translate>
+                            </p>
+                        )}
+                    </Field>
+                )}
             </Field>
         </>
     );
@@ -133,6 +177,17 @@ class LocationPage extends React.PureComponent {
         );
     };
 
+    getInitialEditValues = (loc) => {
+        loc = _.pick(snakifyKeys(loc), ['name', 'room_name_format', 'map_url_template', '_map_url_template_choice']);
+        if (!loc.map_url_template) {
+            loc.map_url_template = null;
+            loc._map_url_template_choice = 'none';
+        } else {
+            const template = MAP_TEMPLATE_OPTIONS.find(x => x.value === loc.map_url_template);
+            loc._map_url_template_choice = template ? template.value : 'custom';
+        }
+        return loc;
+    };
 
     render() {
         const {
@@ -145,11 +200,14 @@ class LocationPage extends React.PureComponent {
                           addModalTitle={Translate.string('Add location')}
                           isFetching={isFetching}
                           items={locations}
-                          initialEditValues={snakifyKeys}
+                          initialEditValues={this.getInitialEditValues}
                           initialAddValues={{
                               room_name_format: '{building}/{floor}-{number}',
-                              map_url_template: 'https://www.google.com/maps/place/{lat},{lng}',
+                              _map_url_template_choice: 'none',
+                              map_url_template: null,
                           }}
+                          addFormProps={{decorators: [formDecorator]}}
+                          editFormProps={{decorators: [formDecorator]}}
                           renderItem={this.renderItem}
                           canDeleteItem={loc => loc.canDelete}
                           renderAddForm={this.renderForm}
