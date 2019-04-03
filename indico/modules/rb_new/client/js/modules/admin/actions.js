@@ -21,6 +21,8 @@ import equipmentTypesURL from 'indico-url:rooms_new.admin_equipment_types';
 import featuresURL from 'indico-url:rooms_new.admin_features';
 import attributesURL from 'indico-url:rooms_new.admin_attributes';
 
+import _ from 'lodash';
+
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {ajaxAction, submitFormAction} from 'indico/utils/redux';
 import {actions as filtersActions} from '../../common/filters';
@@ -207,14 +209,14 @@ export function deleteLocation(id) {
 
 export function updateLocation(id, data) {
     return submitFormAction(
-        () => indicoAxios.patch(locationsURL({location_id: id}), data),
+        () => indicoAxios.patch(locationsURL({location_id: id}), _.omit(data, '_map_url_template_choice')),
         null, LOCATION_RECEIVED
     );
 }
 
 export function createLocation(data) {
     return submitFormAction(
-        () => indicoAxios.post(locationsURL(), data),
+        () => indicoAxios.post(locationsURL(), _.omit(data, '_map_url_template_choice')),
         null, LOCATION_RECEIVED
     );
 }

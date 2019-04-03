@@ -17,7 +17,7 @@
 from __future__ import unicode_literals
 
 from flask import jsonify, request, session
-from marshmallow import validate
+from marshmallow import missing, validate
 from sqlalchemy.orm import joinedload
 from webargs import fields
 from webargs.flaskparser import abort, use_args, use_kwargs
@@ -115,11 +115,11 @@ class RHLocations(RHRoomBookingAdminBase):
         'room_name_format': fields.String(validate=[
             lambda value: all(x in value for x in ('{building}', '{floor}', '{number}'))
         ], required=True),
-        'map_url_template': fields.URL(schemes={'http', 'https'}, missing=''),
+        'map_url_template': fields.URL(schemes={'http', 'https'}, allow_none=True, missing=''),
     })
     def _process_POST(self, name, room_name_format, map_url_template):
         self._check_conflict(name)
-        loc = Location(name=name, room_name_format=room_name_format, map_url_template=map_url_template)
+        loc = Location(name=name, room_name_format=room_name_format, map_url_template=(map_url_template or ''))
         db.session.add(loc)
         db.session.flush()
         return self._jsonify_one(loc), 201
@@ -129,16 +129,16 @@ class RHLocations(RHRoomBookingAdminBase):
         'room_name_format': fields.String(validate=[
             lambda value: all(x in value for x in ('{building}', '{floor}', '{number}'))
         ]),
-        'map_url_template': fields.URL(schemes={'http', 'https'}),
+        'map_url_template': fields.URL(schemes={'http', 'https'}, allow_none=True),
     })
-    def _process_PATCH(self, name=None, room_name_format=None, map_url_template=None):
+    def _process_PATCH(self, name=None, room_name_format=None, map_url_template=missing):
         if name is not None:
             self._check_conflict(name)
             self.location.name = name
         if room_name_format is not None:
             self.location.room_name_format = room_name_format
-        if map_url_template is not None:
-            self.location.map_url_template = map_url_template
+        if map_url_template is not missing:
+            self.location.map_url_template = map_url_template or ''
         db.session.flush()
         return self._jsonify_one(self.location)
 
