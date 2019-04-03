@@ -55,3 +55,28 @@ export function dayRange(start, end, step = 1) {
     }
     return result;
 }
+
+export function createDt(startDate, startTime) {
+    if (!startDate && !startTime) {
+        return null;
+    }
+    return moment(`${startDate} ${startTime}`, 'YYYY-MM-DD HH:mm');
+}
+
+function isBookingStartValid(dt, isAdminOverrideEnabled = false, granularity = 'minute') {
+    if (!dt || !dt.isValid()) {
+        return false;
+    } else if (isAdminOverrideEnabled) {
+        return true;
+    }
+    const gracePeriod = granularity === 'day' ? moment() : moment().subtract(1, 'hour');
+    return dt.isSameOrAfter(gracePeriod, granularity);
+}
+
+export function isBookingStartDateValid(date, isAdminOverrideEnabled) {
+    return isBookingStartValid(date, isAdminOverrideEnabled, 'day');
+}
+
+export function isBookingStartDtValid(dt, isAdminOverrideEnabled) {
+    return isBookingStartValid(dt, isAdminOverrideEnabled);
+}
