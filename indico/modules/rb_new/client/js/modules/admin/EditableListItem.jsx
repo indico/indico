@@ -37,6 +37,7 @@ export default class EditableListItem extends React.PureComponent {
         renderEditForm: PropTypes.func.isRequired,
         confirmDeleteMessage: PropTypes.any.isRequired,
         initialEditValues: PropTypes.func,
+        editFormProps: PropTypes.object,
         onDelete: PropTypes.func.isRequired,
         onUpdate: PropTypes.func.isRequired,
     };
@@ -44,6 +45,7 @@ export default class EditableListItem extends React.PureComponent {
     static defaultProps = {
         canDelete: () => true,
         initialEditValues: item => item,
+        editFormProps: {},
     };
 
     state = {
@@ -93,7 +95,9 @@ export default class EditableListItem extends React.PureComponent {
 
     render() {
         const {confirming, editing, deleting, saving} = this.state;
-        const {confirmDeleteMessage, renderDisplay, renderEditForm, initialEditValues, item, canDelete} = this.props;
+        const {
+            confirmDeleteMessage, renderDisplay, renderEditForm, initialEditValues, editFormProps, item, canDelete,
+        } = this.props;
 
         return (
             <List.Item>
@@ -102,7 +106,8 @@ export default class EditableListItem extends React.PureComponent {
                         <FinalForm onSubmit={this.handleSubmit}
                                    initialValues={initialEditValues(item)}
                                    initialValuesEqual={_.isEqual}
-                                   subscription={{submitting: true, hasValidationErrors: true, pristine: true}}>
+                                   subscription={{submitting: true, hasValidationErrors: true, pristine: true}}
+                                   {...editFormProps}>
                             {fprops => (
                                 <Form onSubmit={fprops.handleSubmit}>
                                     {renderEditForm(fprops)}
