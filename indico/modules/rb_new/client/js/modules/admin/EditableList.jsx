@@ -33,6 +33,7 @@ class AddItemModal extends React.PureComponent {
         renderForm: PropTypes.func.isRequired,
         onClose: PropTypes.func.isRequired,
         onSubmit: PropTypes.func.isRequired,
+        formProps: PropTypes.object.isRequired,
     };
 
     handleSubmit = async (data) => {
@@ -44,7 +45,7 @@ class AddItemModal extends React.PureComponent {
     };
 
     render() {
-        const {title, initialValues, onClose, renderForm} = this.props;
+        const {title, initialValues, onClose, renderForm, formProps} = this.props;
 
         return (
             <Modal open size="mini" closeIcon onClose={onClose}>
@@ -55,7 +56,8 @@ class AddItemModal extends React.PureComponent {
                     <FinalForm onSubmit={this.handleSubmit}
                                initialValues={initialValues}
                                initialValuesEqual={_.isEqual}
-                               subscription={{submitting: true, hasValidationErrors: true, pristine: true}}>
+                               subscription={{submitting: true, hasValidationErrors: true, pristine: true}}
+                               {...formProps}>
                         {fprops => (
                             <Form onSubmit={fprops.handleSubmit}>
                                 {renderForm(fprops)}
@@ -92,6 +94,8 @@ export default class EditableList extends React.PureComponent {
         canDeleteItem: PropTypes.func,
         renderAddForm: PropTypes.func.isRequired,
         renderEditForm: PropTypes.func.isRequired,
+        addFormProps: PropTypes.object,
+        editFormProps: PropTypes.object,
         renderDeleteMessage: PropTypes.func.isRequired,
         onDelete: PropTypes.func.isRequired,
         onUpdate: PropTypes.func.isRequired,
@@ -102,6 +106,8 @@ export default class EditableList extends React.PureComponent {
         initialAddValues: {},
         initialEditValues: undefined,
         canDeleteItem: undefined,
+        addFormProps: {},
+        editFormProps: {},
     };
 
     state = {
@@ -128,7 +134,7 @@ export default class EditableList extends React.PureComponent {
     render() {
         const {
             title, addModalTitle, renderAddForm, renderEditForm, renderDeleteMessage, renderItem, initialEditValues,
-            initialAddValues, canDeleteItem, isFetching, items, onDelete, onUpdate,
+            initialAddValues, addFormProps, editFormProps, canDeleteItem, isFetching, items, onDelete, onUpdate,
         } = this.props;
         const {adding} = this.state;
 
@@ -157,6 +163,7 @@ export default class EditableList extends React.PureComponent {
                                                   renderAddForm={renderEditForm}
                                                   renderEditForm={renderEditForm}
                                                   initialEditValues={initialEditValues}
+                                                  editFormProps={editFormProps}
                                                   confirmDeleteMessage={renderDeleteMessage(item)} />
                             ))}
                         </List>
@@ -165,7 +172,8 @@ export default class EditableList extends React.PureComponent {
                                           onClose={this.handleAddClose}
                                           title={addModalTitle}
                                           renderForm={renderAddForm}
-                                          initialValues={initialAddValues} />
+                                          initialValues={initialAddValues}
+                                          formProps={addFormProps} />
                         )}
                     </>
                 )}
