@@ -21,7 +21,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {Dropdown} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
-import {serializeTime, toMoment} from 'indico/utils/date';
+import {serializeTime, toMoment, isBookingStartDtValid} from 'indico/utils/date';
 
 import './TimeRangePicker.module.scss';
 
@@ -43,6 +43,7 @@ function _humanizeDuration(duration) {
 
 export default class TimeRangePicker extends React.Component {
     static propTypes = {
+        allowPastTimes: PropTypes.bool,
         startTime: PropTypes.object,
         endTime: PropTypes.object,
         onChange: PropTypes.func.isRequired,
@@ -50,53 +51,31 @@ export default class TimeRangePicker extends React.Component {
     };
 
     static defaultProps = {
+        allowPastTimes: false,
         disabled: false,
-    };
-
-    static defaultProps = {
         startTime: moment().startOf('hour').add(1, 'h'),
         endTime: moment().startOf('hour').add(2, 'h')
     };
 
-    constructor(props) {
-        super(props);
-
-        const {startTime, endTime} = this.props;
-        const startOptions = this.generateStartTimeOptions();
-        const endOptions = this.generateEndTimeOptions(startTime);
-        const duration = moment.duration(endTime.diff(startTime));
-        const startSearchQuery = serializeTime(moment(startTime));
-        const endSearchQuery = serializeTime(moment(endTime));
-        this.state = {
-            startTime,
-            endTime,
-            startOptions,
-            endOptions,
-            duration,
-            startSearchQuery,
-            endSearchQuery
-        };
-    }
-
-    shouldComponentUpdate(nextProps, nextState) {
-        return (nextState !== this.state || !_.isEqual(this.props, nextProps));
-    }
-
-    generateStartTimeOptions = () => {
+    static generateStartTimeOptions = (allowPastTimes) => {
         const options = [];
         const end = moment().endOf('day');
         const next = moment(START_HOUR, 'HH:mm');
         let serializedNext;
+
         // eslint-disable-next-line no-unmodified-loop-condition
         while (next < end) {
-            serializedNext = serializeTime(moment(next));
-            options.push({key: serializedNext, value: serializedNext, text: serializedNext});
+            const momentNext = moment(next);
+            if (isBookingStartDtValid(momentNext, allowPastTimes)) {
+                serializedNext = serializeTime(momentNext);
+                options.push({key: serializedNext, value: serializedNext, text: serializedNext});
+            }
             next.add(30, 'm');
         }
         return options;
     };
 
-    generateEndTimeOptions = (start) => {
+    static generateEndTimeOptions = (start) => {
         const options = [];
         const end = moment().endOf('day');
         const next = moment(start).add(30, 'm');
@@ -114,6 +93,38 @@ export default class TimeRangePicker extends React.Component {
         return options;
     };
 
+    constructor(props) {
+        super(props);
+
+        const {startTime, endTime, allowPastTimes} = this.props;
+        const startOptions = TimeRangePicker.generateStartTimeOptions(allowPastTimes);
+        const endOptions = TimeRangePicker.generateEndTimeOptions(startTime);
+        const duration = moment.duration(endTime.diff(startTime));
+        const startSearchQuery = serializeTime(moment(startTime));
+        const endSearchQuery = serializeTime(moment(endTime));
+        this.state = {
+            startTime,
+            endTime,
+            startOptions,
+            endOptions,
+            duration,
+            startSearchQuery,
+            endSearchQuery
+        };
+    }
+
+    static getDerivedStateFromProps({allowPastTimes, startTime}, prevState) {
+        return {
+            ...prevState,
+            startOptions: TimeRangePicker.generateStartTimeOptions(allowPastTimes),
+            endOptions: TimeRangePicker.generateEndTimeOptions(startTime)
+        };
+    }
+
+    shouldComponentUpdate(nextProps, nextState) {
+        return (nextState !== this.state || !_.isEqual(this.props, nextProps));
+    }
+
     updateStartTime = (event, currentStartTime, previousStartTime, endTime, duration, startSearchQuery) => {
         if (event.type === 'keydown' && ARROW_KEYS.includes(event.key)) {
             this.setState({
@@ -122,6 +133,7 @@ export default class TimeRangePicker extends React.Component {
             return;
         }
         let start;
+        const {allowPastTimes} = this.props;
         if (event.type === 'click') {
             start = moment(currentStartTime, ['HH:mm', 'Hmm']);
         } else {
@@ -132,7 +144,13 @@ export default class TimeRangePicker extends React.Component {
                 startSearchQuery: serializeTime(previousStartTime)
             });
             return;
+        } else if (!isBookingStartDtValid(start, allowPastTimes)) {
+            this.setState({
+                startSearchQuery: serializeTime(previousStartTime)
+            });
+            return;
         }
+
         let end = toMoment(endTime, 'HH:mm');
         if (end.isSameOrBefore(start, 'minute')) {
             end = moment(start).add(duration);
@@ -145,7 +163,7 @@ export default class TimeRangePicker extends React.Component {
         } else {
             duration = moment.duration(end.diff(start));
         }
-        const endOptions = this.generateEndTimeOptions(start);
+        const endOptions = TimeRangePicker.generateEndTimeOptions(start);
         this.setState({
             startTime: start,
             endTime: end,
@@ -178,18 +196,31 @@ export default class TimeRangePicker extends React.Component {
             return;
         }
         let start = toMoment(startTime, 'HH:mm');
-        if (end.isSameOrBefore(start, 'minute')) {
-            start = moment(end).subtract(duration);
-            if (start < moment().startOf('day')) {
-                start = moment().startOf('day');
-                if (end.isSame(start, 'minute')) {
-                    end = moment(start).add(duration);
+        const {allowPastTimes} = this.props;
+        if (isBookingStartDtValid(end, allowPastTimes)) {
+            if (end.isSameOrBefore(start, 'minute')) {
+                start = moment(end).subtract(duration);
+                if (start < moment().startOf('day')) {
+                    start = moment().startOf('day');
+                    if (end.isSame(start, 'minute')) {
+                        end = moment(start).add(duration);
+                    }
+                } else if (!isBookingStartDtValid(start, allowPastTimes)) {
+                    this.setState({
+                        endSearchQuery: serializeTime(previousEndTime)
+                    });
+                    return;
                 }
+            } else {
+                duration = moment.duration(end.diff(start));
             }
         } else {
-            duration = moment.duration(end.diff(start));
+            this.setState({
+                endSearchQuery: serializeTime(previousEndTime)
+            });
+            return;
         }
-        const endOptions = this.generateEndTimeOptions(start);
+        const endOptions = TimeRangePicker.generateEndTimeOptions(start);
         this.setState({
             startTime: start,
             endTime: end,
@@ -214,7 +245,6 @@ export default class TimeRangePicker extends React.Component {
         });
     };
 
-
     render() {
         const {startTime, endTime, startOptions, endOptions, duration, startSearchQuery, endSearchQuery} = this.state;
         const {disabled} = this.props;
@@ -233,7 +263,7 @@ export default class TimeRangePicker extends React.Component {
                               this.updateStartTime(event, value, startTime, endTime, duration, startSearchQuery);
                           }} />
                 <Dropdown options={endOptions}
-                          search={() => this.generateEndTimeOptions(startTime)}
+                          search={() => TimeRangePicker.generateEndTimeOptions(startTime)}
                           icon={null}
                           selection
                           styleName="end-time-dropdown"
