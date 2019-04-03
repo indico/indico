@@ -19,12 +19,16 @@ import _ from 'lodash';
 import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
+import {connect} from 'react-redux';
 import {Button, Form, Select} from 'semantic-ui-react';
 import {SingleDatePicker, DateRangePicker} from 'indico/react/components';
 import {PluralTranslate, Translate} from 'indico/react/i18n';
 import {Overridable} from 'indico/react/util';
-import {serializeDate, serializeTime} from 'indico/utils/date';
+import {
+    serializeDate, serializeTime, isBookingStartDtValid, createDt, isBookingStartDateValid
+} from 'indico/utils/date';
 import TimeRangePicker from './TimeRangePicker';
+import {selectors as userSelectors} from '../common/user';
 import {sanitizeRecurrence} from '../util';
 
 
@@ -38,6 +42,7 @@ class BookingBootstrapForm extends React.Component {
         dayBased: PropTypes.bool,
         hideOptions: PropTypes.objectOf(PropTypes.bool),
         defaults: PropTypes.object,
+        isAdminOverrideEnabled: PropTypes.bool.isRequired,
     };
 
     static get defaultProps() {
@@ -170,7 +175,11 @@ class BookingBootstrapForm extends React.Component {
             dates: {startDate, endDate}
         } = this.state;
 
-        const {buttonCaption, buttonDisabled, children, dayBased, hideOptions} = this.props;
+        const {buttonCaption, buttonDisabled, children, dayBased, hideOptions, isAdminOverrideEnabled} = this.props;
+        const isStartDtValid = isBookingStartDtValid(
+            createDt(moment(startDate).format('YYYY-MM-DD'), startTime.format('HH:mm')),
+            isAdminOverrideEnabled
+        );
         const recurrenceOptions = [
             {text: PluralTranslate.string('Week', 'Weeks', number), value: 'week'},
             {text: PluralTranslate.string('Month', 'Months', number), value: 'month'}
@@ -220,21 +229,24 @@ class BookingBootstrapForm extends React.Component {
                 {['every', 'daily'].includes(type) && (
                     <DateRangePicker startDate={startDate}
                                      endDate={endDate}
-                                     onDatesChange={({startDate: sd, endDate: ed}) => this.updateDates(sd, ed)} />
-
+                                     onDatesChange={({startDate: sd, endDate: ed}) => this.updateDates(sd, ed)}
+                                     isOutsideRange={(dt) => !isBookingStartDateValid(dt, isAdminOverrideEnabled)} />
                 )}
                 {type === 'single' && (
-                    <SingleDatePicker date={startDate} onDateChange={(date) => this.updateDates(date, null)} />
+                    <SingleDatePicker date={startDate} onDateChange={(date) => this.updateDates(date, null)}
+                                      disabledDate={(dt) => !isBookingStartDateValid(dt, isAdminOverrideEnabled)} />
                 )}
                 {!dayBased && (
                     <Form.Group inline>
                         <TimeRangePicker startTime={startTime}
                                          endTime={endTime}
-                                         onChange={this.updateTimes} />
+                                         onChange={this.updateTimes}
+                                         allowPastTimes={isAdminOverrideEnabled ||
+                                                         moment(startDate, 'YYYY-MM-DD').isAfter(moment(), 'day')} />
                     </Form.Group>
                 )}
                 {children}
-                <Button primary disabled={buttonDisabled} onClick={this.onSearch}>
+                <Button primary disabled={buttonDisabled || !isStartDtValid} onClick={this.onSearch}>
                     {buttonCaption}
                 </Button>
             </Form>
@@ -242,4 +254,8 @@ class BookingBootstrapForm extends React.Component {
     }
 }
 
-export default Overridable.component('BookingBootstrapForm', BookingBootstrapForm);
+export default connect(
+    (state) => ({
+        isAdminOverrideEnabled: userSelectors.isUserAdminOverrideEnabled(state),
+    }),
+)(Overridable.component('BookingBootstrapForm', BookingBootstrapForm));
