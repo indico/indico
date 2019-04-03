@@ -188,8 +188,7 @@ def search_for_rooms(filters, allow_admin=False, availability=None):
 
     start_dt, end_dt = filters['start_dt'], filters['end_dt']
     repeatability = (filters['repeat_frequency'], filters['repeat_interval'])
-    include_blockings = not rb_is_admin(session.user)
-    availability_filters = [Room.filter_available(start_dt, end_dt, repeatability, include_blockings=include_blockings,
+    availability_filters = [Room.filter_available(start_dt, end_dt, repeatability, include_blockings=False,
                                                   include_pre_bookings=True)]
     if not (allow_admin and rb_is_admin(session.user)):
         selected_period_days = (filters['end_dt'] - filters['start_dt']).days
