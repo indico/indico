@@ -145,10 +145,14 @@ function RoomDetails({bookRoom, room, availability, attributes}) {
                 <Grid.Column>
                     <div>
                         <RoomBasicDetails room={room} />
-                        <RoomAvailabilityBox room={room} />
-                        <RoomCommentsBox room={room} />
-                        <RoomKeyLocation room={room} />
-                        <RoomCustomAttributesBox attributes={attributes} />
+                        <Overridable id="RoomDetails.infoBoxes" room={room}>
+                            <>
+                                <RoomAvailabilityBox room={room} />
+                                <RoomCommentsBox room={room} />
+                                <RoomKeyLocation room={room} />
+                                <RoomCustomAttributesBox attributes={attributes} />
+                            </>
+                        </Overridable>
                     </div>
                 </Grid.Column>
                 <Grid.Column>
