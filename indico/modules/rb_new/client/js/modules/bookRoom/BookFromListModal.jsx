@@ -23,10 +23,12 @@ import {Grid, Icon, Modal, Message} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 import {IndicoPropTypes} from 'indico/react/util';
+import {createDt, isBookingStartDtValid} from 'indico/utils/date';
 
 import RoomBasicDetails from '../../components/RoomBasicDetails';
 import BookingBootstrapForm from '../../components/BookingBootstrapForm';
 import {selectors as roomsSelectors} from '../../common/rooms';
+import {selectors as userSelectors} from '../../common/user';
 import * as bookRoomActions from './actions';
 import * as bookRoomSelectors from './selectors';
 
@@ -78,6 +80,7 @@ class BookFromListModal extends React.Component {
         onClose: PropTypes.func,
         availability: PropTypes.object,
         availabilityLoading: PropTypes.bool.isRequired,
+        isAdminOverrideEnabled: PropTypes.bool.isRequired,
         defaults: PropTypes.object,
         actions: PropTypes.exact({
             resetCollisions: PropTypes.func.isRequired,
@@ -105,6 +108,10 @@ class BookFromListModal extends React.Component {
         }
     };
 
+    state = {
+        pastDtChosen: false,
+    };
+
     handleCloseModal = () => {
         const {onClose, actions: {resetCollisions}} = this.props;
         resetCollisions();
@@ -116,8 +123,28 @@ class BookFromListModal extends React.Component {
         openBookingForm(room.id, {...data, isPrebooking});
     };
 
+    onFiltersChange = (filters) => {
+        const {refreshCollisions, isAdminOverrideEnabled} = this.props;
+        const {dates: {startDate}, timeSlot: {startTime}} = filters;
+
+        refreshCollisions(filters);
+        if (!startDate) {
+            this.setState({pastDtChosen: true});
+            return;
+        }
+
+        const startDt = createDt(startDate, startTime);
+        this.setState({
+            pastDtChosen: !isBookingStartDtValid(startDt, isAdminOverrideEnabled)
+        });
+    };
+
     render() {
-        const {room, refreshCollisions, availability, availabilityLoading, defaults, isPrebooking, labels} = this.props;
+        const {
+            room, availability, availabilityLoading, defaults, isPrebooking, labels,
+            isAdminOverrideEnabled
+        } = this.props;
+        const {pastDtChosen} = this.state;
         const buttonDisabled = availabilityLoading || !availability || availability.numDaysAvailable === 0;
         return (
             <Modal open onClose={this.handleCloseModal} size="large" closeIcon>
@@ -132,10 +159,18 @@ class BookFromListModal extends React.Component {
                         <Grid.Column width={8}>
                             <BookingBootstrapForm buttonCaption={isPrebooking ? labels.preBookBtn : labels.bookBtn}
                                                   buttonDisabled={buttonDisabled}
-                                                  onChange={refreshCollisions}
+                                                  onChange={this.onFiltersChange}
                                                   onSearch={this.handleBook}
                                                   defaults={defaults}>
                                 {availability && <ConflictIndicator availability={availability} />}
+                                {pastDtChosen && !isAdminOverrideEnabled && (
+                                    <Message color="red">
+                                        <Icon name="dont" />
+                                        <Translate>
+                                            Bookings in the past are not allowed.
+                                        </Translate>
+                                    </Message>
+                                )}
                             </BookingBootstrapForm>
                         </Grid.Column>
                     </Grid>
@@ -150,6 +185,7 @@ export default connect(
         room: roomsSelectors.getRoom(state, {roomId}),
         availability: state.bookRoom.bookingForm.availability,
         availabilityLoading: bookRoomSelectors.isFetchingFormTimeline(state),
+        isAdminOverrideEnabled: userSelectors.isUserAdminOverrideEnabled(state),
     }),
     (dispatch) => ({
         actions: bindActionCreators({

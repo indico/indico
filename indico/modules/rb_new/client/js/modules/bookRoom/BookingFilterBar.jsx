@@ -15,6 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import moment from 'moment';
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Button} from 'semantic-ui-react';
@@ -22,6 +23,7 @@ import {connect} from 'react-redux';
 
 import {Translate} from 'indico/react/i18n';
 import {Overridable} from 'indico/react/util';
+import {isBookingStartDateValid} from 'indico/utils/date';
 import {FilterBarController, FilterDropdownFactory} from '../../common/filters/FilterBar';
 
 import RecurrenceForm from './filters/RecurrenceForm';
@@ -32,12 +34,14 @@ import {renderRecurrence} from '../../util';
 import dateRenderer from './filters/DateRenderer';
 import timeRenderer from './filters/TimeRenderer';
 import {actions as filtersActions} from '../../common/filters';
+import {selectors as userSelectors} from '../../common/user';
 import * as bookRoomSelectors from './selectors';
 
 
 class BookingFilterBar extends React.Component {
     static propTypes = {
         dayBased: PropTypes.bool,
+        isAdminOverrideEnabled: PropTypes.bool.isRequired,
         filters: PropTypes.shape({
             recurrence: PropTypes.shape({
                 number: PropTypes.number,
@@ -67,7 +71,9 @@ class BookingFilterBar extends React.Component {
             dayBased,
             filters: {recurrence, dates, timeSlot},
             actions: {setFilterParameter},
+            isAdminOverrideEnabled,
         } = this.props;
+        const isStartDateInFuture = moment(dates.startDate, 'YYYY-MM-DD').isAfter(moment(), 'day');
 
         return (
             <Button.Group size="small">
@@ -95,6 +101,9 @@ class BookingFilterBar extends React.Component {
                                            form={(fieldValues, setParentField) => (
                                                <DateForm setParentField={setParentField}
                                                          isRange={recurrence.type !== 'single'}
+                                                         disabledDate={(dt) => (
+                                                             !isBookingStartDateValid(dt, isAdminOverrideEnabled)
+                                                         )}
                                                          {...dates} />
                                            )}
                                            setGlobalState={setFilterParameter.bind(undefined, 'dates')}
@@ -105,6 +114,8 @@ class BookingFilterBar extends React.Component {
                                                title={<Translate>Time</Translate>}
                                                form={(fieldValues, setParentField) => (
                                                    <TimeForm setParentField={setParentField}
+                                                             allowPastTimes={isAdminOverrideEnabled ||
+                                                                             isStartDateInFuture}
                                                              {...fieldValues} />
                                                )}
                                                setGlobalState={setFilterParameter.bind(undefined, 'timeSlot')}
@@ -120,6 +131,7 @@ class BookingFilterBar extends React.Component {
 export default connect(
     state => ({
         filters: bookRoomSelectors.getFilters(state),
+        isAdminOverrideEnabled: userSelectors.isUserAdminOverrideEnabled(state),
     }),
     dispatch => ({
         actions: {

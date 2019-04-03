@@ -29,6 +29,7 @@ export default class TimeForm extends FilterFormComponent {
     static propTypes = {
         startTime: PropTypes.string,
         endTime: PropTypes.string,
+        allowPastTimes: PropTypes.bool.isRequired,
         ...FilterFormComponent.propTypes
     };
 
@@ -72,11 +73,13 @@ export default class TimeForm extends FilterFormComponent {
 
     render() {
         const {startTime, endTime} = this.state;
+        const {allowPastTimes} = this.props;
         return (
             <div ref={this.formRef}>
                 <TimeRangePicker startTime={startTime}
                                  endTime={endTime}
-                                 onChange={this.setTimes} />
+                                 onChange={this.setTimes}
+                                 allowPastTimes={allowPastTimes} />
             </div>
         );
     }
