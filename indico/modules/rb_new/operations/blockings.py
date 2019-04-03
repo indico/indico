@@ -70,8 +70,16 @@ def group_blocked_rooms(blocked_rooms):
     return group_list(blocked_rooms, key=lambda obj: obj.room_id)
 
 
-def get_rooms_blockings(rooms, start_date, end_date, overridable_only=False, nonoverridable_only=False,
-                        explicit_only=False):
+def get_blockings(start_date, end_date):
+    return (BlockedRoom.query
+            .filter(BlockedRoom.state == BlockedRoomState.accepted,
+                    Blocking.start_date <= end_date,
+                    Blocking.end_date >= start_date)
+            .join(BlockedRoom.blocking)
+            .options(contains_eager('blocking'))).all()
+
+
+def get_rooms_blockings(rooms, start_date, end_date):
     room_ids = [room.id for room in rooms]
     return (BlockedRoom.query
             .filter(BlockedRoom.room_id.in_(room_ids),

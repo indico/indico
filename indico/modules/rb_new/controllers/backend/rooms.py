@@ -33,6 +33,7 @@ from indico.modules.rb.models.room_attributes import RoomAttribute, RoomAttribut
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.util import rb_is_admin
 from indico.modules.rb_new.controllers.backend.common import search_room_args
+from indico.modules.rb_new.operations.blockings import filter_blocked_rooms, get_blockings, group_blocked_rooms
 from indico.modules.rb_new.operations.bookings import check_room_available, get_room_details_availability
 from indico.modules.rb_new.operations.rooms import get_room_statistics, search_for_rooms
 from indico.modules.rb_new.schemas import room_attribute_values_schema, rooms_schema
@@ -85,6 +86,15 @@ class RHSearchRooms(RHRoomBookingBase):
             ]
         else:
             room_ids_without_availability_filter = room_ids
+        if availability is not None:
+            blocked_rooms = get_blockings(args['start_dt'], args['end_dt'])
+            nonoverridable_blocked_rooms = filter_blocked_rooms(blocked_rooms, nonoverridable_only=True)
+            nonoverridable_blocked_rooms_ids = {room.room_id for room in nonoverridable_blocked_rooms}
+            if availability:
+                room_ids = [room_id for room_id in room_ids if room_id not in nonoverridable_blocked_rooms_ids]
+            else:
+                missing_rooms_ids = [room_id for room_id in nonoverridable_blocked_rooms_ids if room_id not in room_ids]
+                room_ids = room_ids + missing_rooms_ids
         return jsonify(rooms=room_ids, rooms_without_availability_filter=room_ids_without_availability_filter,
                        total=len(room_ids_without_availability_filter), availability_days=self._get_date_range(args))
 
