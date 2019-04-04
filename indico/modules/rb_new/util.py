@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 
 import os
 from collections import namedtuple
+from datetime import datetime, timedelta
 from io import BytesIO
 
 from flask import current_app
@@ -104,3 +105,9 @@ def get_linked_object(type_, id_):
                         SessionBlock.session.has(db.and_(~Session.is_deleted,
                                                          Session.event.has(is_deleted=False))))
                 .first())
+
+
+def is_booking_start_within_grace_period(start_dt, allow_admin=False):
+    if allow_admin:
+        return True
+    return start_dt >= datetime.now() - timedelta(hours=1)

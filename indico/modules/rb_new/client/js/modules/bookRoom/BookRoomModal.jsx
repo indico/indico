@@ -28,6 +28,7 @@ import {ReduxCheckboxField, ReduxDropdownField, ReduxFormField, ReduxRadioField,
 import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
 import PrincipalSearchField from 'indico/react/components/PrincipalSearchField';
 import {Overridable, IndicoPropTypes} from 'indico/react/util';
+import {createDt, isBookingStartDtValid} from 'indico/utils/date';
 import TimeInformation from '../../components/TimeInformation';
 import {selectors as roomsSelectors} from '../../common/rooms';
 import {selectors as linkingSelectors, linkDataShape} from '../../common/linking';
@@ -80,6 +81,7 @@ class BookRoomModal extends React.Component {
         timeInformationComponent: PropTypes.func,
         relatedEvents: PropTypes.array.isRequired,
         link: linkDataShape,
+        isAdminOverrideEnabled: PropTypes.bool.isRequired,
         actions: PropTypes.exact({
             createBooking: PropTypes.func.isRequired,
             fetchAvailability: PropTypes.func.isRequired,
@@ -493,6 +495,7 @@ class BookRoomModal extends React.Component {
             defaultTitles,
             link,
             reasonRequired,
+            isAdminOverrideEnabled,
         } = this.props;
         const {skipConflicts, bookingConflictsVisible} = this.state;
         if (!room) {
@@ -502,7 +505,15 @@ class BookRoomModal extends React.Component {
         const occurrenceCount = availability && availability.dateRange.length;
         const conflictsExist = availability && !!Object.keys(availability.conflicts).length;
         const bookingBlocked = ({submitSucceeded}) => submitSucceeded;
-        const buttonsBlocked = (fprops) => bookingBlocked(fprops) || (conflictsExist && !skipConflicts);
+        const isStartDtValid = isBookingStartDtValid(
+            createDt(dates.startDate, timeSlot.startTime),
+            isAdminOverrideEnabled
+        );
+        const buttonsBlocked = (fprops) => (
+            !isStartDtValid ||
+            bookingBlocked(fprops) ||
+            (conflictsExist && !skipConflicts)
+        );
         const legendLabels = [
             {label: Translate.string('Available'), style: 'available'},
             {label: Translate.string('Booked'), style: 'booking'},
@@ -571,6 +582,14 @@ class BookRoomModal extends React.Component {
                             </Form>
                             {conflictsExist && this.renderBookingConstraints(Object.values(availability.conflicts))}
                             {this.renderBookingState(fprops)}
+                            {!isStartDtValid && (
+                                <Message color="red">
+                                    <Icon name="dont" />
+                                    <Translate>
+                                        Bookings in the past are not allowed.
+                                    </Translate>
+                                </Message>
+                            )}
                         </Grid.Column>
                     </Grid>
                 </Modal.Content>
@@ -616,6 +635,7 @@ export default connect(
         relatedEvents: bookRoomSelectors.getBookingFormRelatedEvents(state),
         room: roomsSelectors.getRoom(state, {roomId}),
         link: linkingSelectors.getLinkObject(state),
+        isAdminOverrideEnabled: userSelectors.isUserAdminOverrideEnabled(state),
     }),
     dispatch => ({
         actions: bindActionCreators({
@@ -625,7 +645,7 @@ export default connect(
             resetRelatedEvents: actions.resetRelatedEvents,
             createBooking: (data, props) => {
                 const {reason, usage, user, isPrebooking, linkType, linkId, linkBack} = data;
-                const {bookingData: {recurrence, dates, timeSlot}, room} = props;
+                const {bookingData: {recurrence, dates, timeSlot}, room, isAdminOverrideEnabled} = props;
                 return actions.createBooking({
                     reason,
                     usage,
@@ -638,7 +658,7 @@ export default connect(
                     linkId,
                     linkBack,
                     isPrebooking,
-                });
+                }, isAdminOverrideEnabled);
             },
             openBookingDetails: bookingId => modalActions.openModal('booking-details', bookingId, null, true)
         }, dispatch)

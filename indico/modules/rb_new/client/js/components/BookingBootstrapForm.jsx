@@ -176,10 +176,7 @@ class BookingBootstrapForm extends React.Component {
         } = this.state;
 
         const {buttonCaption, buttonDisabled, children, dayBased, hideOptions, isAdminOverrideEnabled} = this.props;
-        const isStartDtValid = isBookingStartDtValid(
-            createDt(moment(startDate).format('YYYY-MM-DD'), startTime.format('HH:mm')),
-            isAdminOverrideEnabled
-        );
+        const isStartDtValid = isBookingStartDtValid(createDt(startDate, startTime), isAdminOverrideEnabled);
         const recurrenceOptions = [
             {text: PluralTranslate.string('Week', 'Weeks', number), value: 'week'},
             {text: PluralTranslate.string('Month', 'Months', number), value: 'month'}

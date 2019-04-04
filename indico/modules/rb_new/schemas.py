@@ -314,6 +314,7 @@ class CreateBookingSchema(mm.Schema):
     link_type = EnumField(LinkType)
     link_id = fields.Int()
     link_back = fields.Bool(missing=False)
+    admin_override_enabled = fields.Bool(missing=False)
 
     @validates_schema(skip_on_field_errors=True)
     def validate_dts(self, data):
