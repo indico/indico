@@ -56,11 +56,14 @@ export function dayRange(start, end, step = 1) {
     return result;
 }
 
-export function createDt(startDate, startTime) {
-    if (!startDate && !startTime) {
+export function createDt(date, time) {
+    const momentDate = moment(date, 'YYYY-MM-DD');
+    const momentTime = moment(time, 'HH:mm');
+    if (!momentDate.isValid() || !momentTime.isValid()) {
         return null;
     }
-    return moment(`${startDate} ${startTime}`, 'YYYY-MM-DD HH:mm');
+
+    return moment([...momentDate.toArray().splice(0, 3), ...momentTime.toArray().splice(3)]);
 }
 
 function isBookingStartValid(dt, isAdminOverrideEnabled = false, granularity = 'minute') {

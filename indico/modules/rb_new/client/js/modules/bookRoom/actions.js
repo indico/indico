@@ -77,8 +77,9 @@ export const FETCH_RELATED_EVENTS_ERROR = 'bookRoom/FETCH_RELATED_EVENTS_ERROR';
 export const RELATED_EVENTS_RECEIVED = 'bookRoom/RELATED_EVENTS_RECEIVED';
 export const RESET_RELATED_EVENTS = 'bookRoom/RESET_RELATED_EVENTS';
 
-export function createBooking(args) {
+export function createBooking(args, isAdminOverrideEnabled) {
     const params = preProcessParameters(args, ajaxRules);
+    params.admin_override_enabled = isAdminOverrideEnabled;
     return submitFormAction(
         () => indicoAxios.post(createBookingURL(), params),
         CREATE_BOOKING_REQUEST, CREATE_BOOKING_SUCCESS, CREATE_BOOKING_FAILED

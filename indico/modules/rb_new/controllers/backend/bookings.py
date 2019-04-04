@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from datetime import date, datetime, time
+from datetime import date, datetime, time, timedelta
 
 import dateutil
 from flask import jsonify, request, session
@@ -47,7 +47,8 @@ from indico.modules.rb_new.schemas import (create_booking_args, reservation_deta
                                            reservation_linked_object_data_schema, reservation_occurrences_schema,
                                            reservation_occurrences_schema_with_permissions,
                                            reservation_user_event_schema)
-from indico.modules.rb_new.util import (get_linked_object, group_by_occurrence_date, serialize_blockings,
+from indico.modules.rb_new.util import (get_linked_object, group_by_occurrence_date,
+                                        is_booking_start_within_grace_period, serialize_blockings,
                                         serialize_nonbookable_periods, serialize_occurrences,
                                         serialize_unbookable_hours)
 from indico.modules.users.models.users import User
@@ -207,6 +208,9 @@ class RHCreateBooking(RHRoomBookingBase):
 
     def _process(self):
         args = self.args
+        if not is_booking_start_within_grace_period(args['start_dt'], args['admin_override_enabled']):
+            raise ExpectedError(_('You cannot create a booking with start date in the past'))
+
         user_id = args.pop('user_id', None)
         booked_for = User.get_one(user_id, is_deleted=False) if user_id else session.user
 
