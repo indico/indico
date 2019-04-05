@@ -21,7 +21,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {Dropdown} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
-import {serializeTime, toMoment, isBookingStartDtValid} from 'indico/utils/date';
+import {serializeTime, toMoment, isBookingStartDTValid} from 'indico/utils/date';
 
 import './TimeRangePicker.module.scss';
 
@@ -45,13 +45,12 @@ function generateStartTimeOptions(allowPastTimes) {
     const options = [];
     const end = moment().endOf('day');
     const next = moment(START_HOUR, 'HH:mm');
-    let serializedNext;
 
     // eslint-disable-next-line no-unmodified-loop-condition
     while (next < end) {
         const momentNext = moment(next);
-        if (isBookingStartDtValid(momentNext, allowPastTimes)) {
-            serializedNext = serializeTime(momentNext);
+        if (isBookingStartDTValid(momentNext, allowPastTimes)) {
+            const serializedNext = serializeTime(momentNext);
             options.push({key: serializedNext, value: serializedNext, text: serializedNext});
         }
         next.add(30, 'm');
@@ -63,11 +62,11 @@ function generateEndTimeOptions(start) {
     const options = [];
     const end = moment().endOf('day');
     const next = moment(start).add(30, 'm');
-    let serializedNext, duration;
+    let duration;
     // eslint-disable-next-line no-unmodified-loop-condition
     while (next < end) {
         duration = _humanizeDuration(moment.duration(next.diff(start)));
-        serializedNext = serializeTime(moment(next));
+        const serializedNext = serializeTime(moment(next));
         const text = (
             <div styleName="end-time-item">{serializedNext} <span styleName="duration">({duration})</span></div>
         );
@@ -145,7 +144,7 @@ export default class TimeRangePicker extends React.Component {
                 startSearchQuery: serializeTime(previousStartTime)
             });
             return;
-        } else if (!isBookingStartDtValid(start, allowPastTimes)) {
+        } else if (!isBookingStartDTValid(start, allowPastTimes)) {
             this.setState({
                 startSearchQuery: serializeTime(previousStartTime)
             });
@@ -197,8 +196,8 @@ export default class TimeRangePicker extends React.Component {
             return;
         }
         let start = toMoment(startTime, 'HH:mm');
-        const {allowPastTimes} = this.props;
-        if (isBookingStartDtValid(end, allowPastTimes)) {
+        const {allowPastTimes, onChange} = this.props;
+        if (isBookingStartDTValid(end, allowPastTimes)) {
             if (end.isSameOrBefore(start, 'minute')) {
                 start = moment(end).subtract(duration);
                 if (start < moment().startOf('day')) {
@@ -206,7 +205,7 @@ export default class TimeRangePicker extends React.Component {
                     if (end.isSame(start, 'minute')) {
                         end = moment(start).add(duration);
                     }
-                } else if (!isBookingStartDtValid(start, allowPastTimes)) {
+                } else if (!isBookingStartDTValid(start, allowPastTimes)) {
                     this.setState({
                         endSearchQuery: serializeTime(previousEndTime)
                     });

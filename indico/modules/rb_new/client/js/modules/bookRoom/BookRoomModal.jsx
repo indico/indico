@@ -28,7 +28,7 @@ import {ReduxCheckboxField, ReduxDropdownField, ReduxFormField, ReduxRadioField,
 import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
 import PrincipalSearchField from 'indico/react/components/PrincipalSearchField';
 import {Overridable, IndicoPropTypes} from 'indico/react/util';
-import {createDt, isBookingStartDtValid} from 'indico/utils/date';
+import {createDT, isBookingStartDTValid} from 'indico/utils/date';
 import TimeInformation from '../../components/TimeInformation';
 import {selectors as roomsSelectors} from '../../common/rooms';
 import {selectors as linkingSelectors, linkDataShape} from '../../common/linking';
@@ -505,8 +505,8 @@ class BookRoomModal extends React.Component {
         const occurrenceCount = availability && availability.dateRange.length;
         const conflictsExist = availability && !!Object.keys(availability.conflicts).length;
         const bookingBlocked = ({submitSucceeded}) => submitSucceeded;
-        const isStartDtValid = isBookingStartDtValid(
-            createDt(dates.startDate, timeSlot.startTime),
+        const isStartDtValid = isBookingStartDTValid(
+            createDT(dates.startDate, timeSlot.startTime),
             isAdminOverrideEnabled
         );
         const buttonsBlocked = (fprops) => (

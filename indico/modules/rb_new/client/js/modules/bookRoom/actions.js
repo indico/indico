@@ -79,7 +79,9 @@ export const RESET_RELATED_EVENTS = 'bookRoom/RESET_RELATED_EVENTS';
 
 export function createBooking(args, isAdminOverrideEnabled) {
     const params = preProcessParameters(args, ajaxRules);
-    params.admin_override_enabled = isAdminOverrideEnabled;
+    if (isAdminOverrideEnabled) {
+        params.admin_override_enabled = true;
+    }
     return submitFormAction(
         () => indicoAxios.post(createBookingURL(), params),
         CREATE_BOOKING_REQUEST, CREATE_BOOKING_SUCCESS, CREATE_BOOKING_FAILED
