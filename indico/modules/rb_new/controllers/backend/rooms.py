@@ -82,11 +82,9 @@ class RHSearchRooms(RHRoomBookingBase):
         search_query = search_for_rooms(args, allow_admin=admin_override_enabled, availability=availability)
         rooms = [(id_, room_name) for id_, room_name, in search_query.with_entities(Room.id, Room.full_name)]
 
-        if filter_availability:
-            # We can't filter by blocking's acl in the search_query, so we need to adjust the results
-            rooms = self._adjust_blockings(rooms, args, availability)
+        # We can't filter by blocking's acl in the search_query, so we need to adjust the results
+        rooms = self._adjust_blockings(rooms, args, availability)
         room_ids = [room[0] for room in rooms]
-
         if filter_availability:
             room_ids_without_availability_filter = [
                 id_ for id_, in search_for_rooms(args, allow_admin=admin_override_enabled).with_entities(Room.id)
@@ -105,6 +103,8 @@ class RHSearchRooms(RHRoomBookingBase):
         return [dt.date().isoformat() for dt in ReservationOccurrence.iter_start_time(start_dt, end_dt, repetition)]
 
     def _adjust_blockings(self, rooms, filters, availability):
+        if availability is None:
+            return rooms
         blocked_rooms = get_blockings_with_rooms(filters['start_dt'], filters['end_dt'])
         nonoverridable_blocked_rooms = filter_blocked_rooms(blocked_rooms, nonoverridable_only=True)
         if availability:
