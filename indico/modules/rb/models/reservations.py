@@ -528,11 +528,14 @@ class Reservation(Serializer, db.Model):
         return self.room.can_moderate(user, allow_admin=allow_admin)
 
     def can_cancel(self, user, allow_admin=True):
+        from indico.modules.rb_new.util import is_booking_start_within_grace_period
         if user is None:
             return False
         if self.is_rejected or self.is_cancelled or self.is_archived:
             return False
-        return self.is_owned_by(user) or self.is_booked_for(user) or (allow_admin and rb_is_admin(user))
+        is_booked_or_owned_by_user = self.is_owned_by(user) or self.is_booked_for(user)
+        is_valid_start_dt = is_booking_start_within_grace_period(self.start_dt)
+        return (is_booked_or_owned_by_user and is_valid_start_dt) or (allow_admin and rb_is_admin(user))
 
     def can_edit(self, user, allow_admin=True):
         if user is None:
