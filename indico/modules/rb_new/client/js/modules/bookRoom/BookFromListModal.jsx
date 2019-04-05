@@ -23,7 +23,7 @@ import {Grid, Icon, Modal, Message} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 import {IndicoPropTypes} from 'indico/react/util';
-import {createDt, isBookingStartDtValid} from 'indico/utils/date';
+import {createDT, isBookingStartDTValid} from 'indico/utils/date';
 
 import RoomBasicDetails from '../../components/RoomBasicDetails';
 import BookingBootstrapForm from '../../components/BookingBootstrapForm';
@@ -109,7 +109,7 @@ class BookFromListModal extends React.Component {
     };
 
     state = {
-        pastDtChosen: false,
+        pastDTChosen: false,
     };
 
     handleCloseModal = () => {
@@ -129,13 +129,13 @@ class BookFromListModal extends React.Component {
 
         refreshCollisions(filters);
         if (!startDate) {
-            this.setState({pastDtChosen: true});
+            this.setState({pastDTChosen: true});
             return;
         }
 
-        const startDt = createDt(startDate, startTime);
+        const startDt = createDT(startDate, startTime);
         this.setState({
-            pastDtChosen: !isBookingStartDtValid(startDt, isAdminOverrideEnabled)
+            pastDTChosen: !isBookingStartDTValid(startDt, isAdminOverrideEnabled)
         });
     };
 
@@ -144,7 +144,7 @@ class BookFromListModal extends React.Component {
             room, availability, availabilityLoading, defaults, isPrebooking, labels,
             isAdminOverrideEnabled
         } = this.props;
-        const {pastDtChosen} = this.state;
+        const {pastDTChosen} = this.state;
         const buttonDisabled = availabilityLoading || !availability || availability.numDaysAvailable === 0;
         return (
             <Modal open onClose={this.handleCloseModal} size="large" closeIcon>
@@ -163,7 +163,7 @@ class BookFromListModal extends React.Component {
                                                   onSearch={this.handleBook}
                                                   defaults={defaults}>
                                 {availability && <ConflictIndicator availability={availability} />}
-                                {pastDtChosen && !isAdminOverrideEnabled && (
+                                {pastDTChosen && !isAdminOverrideEnabled && (
                                     <Message color="red">
                                         <Icon name="dont" />
                                         <Translate>

@@ -25,7 +25,7 @@ import {SingleDatePicker, DateRangePicker} from 'indico/react/components';
 import {PluralTranslate, Translate} from 'indico/react/i18n';
 import {Overridable} from 'indico/react/util';
 import {
-    serializeDate, serializeTime, isBookingStartDtValid, createDt, isBookingStartDateValid
+    serializeDate, serializeTime, isBookingStartDTValid, createDT, isBookingStartDateValid
 } from 'indico/utils/date';
 import TimeRangePicker from './TimeRangePicker';
 import {selectors as userSelectors} from '../common/user';
@@ -176,7 +176,7 @@ class BookingBootstrapForm extends React.Component {
         } = this.state;
 
         const {buttonCaption, buttonDisabled, children, dayBased, hideOptions, isAdminOverrideEnabled} = this.props;
-        const isStartDtValid = isBookingStartDtValid(createDt(startDate, startTime), isAdminOverrideEnabled);
+        const isStartDtValid = isBookingStartDTValid(createDT(startDate, startTime), isAdminOverrideEnabled);
         const recurrenceOptions = [
             {text: PluralTranslate.string('Week', 'Weeks', number), value: 'week'},
             {text: PluralTranslate.string('Month', 'Months', number), value: 'month'}

@@ -56,7 +56,7 @@ export function dayRange(start, end, step = 1) {
     return result;
 }
 
-export function createDt(date, time) {
+export function createDT(date, time) {
     const momentDate = moment(date, 'YYYY-MM-DD');
     const momentTime = moment(time, 'HH:mm');
     if (!momentDate.isValid() || !momentTime.isValid()) {
@@ -80,6 +80,6 @@ export function isBookingStartDateValid(date, isAdminOverrideEnabled) {
     return isBookingStartValid(date, isAdminOverrideEnabled, 'day');
 }
 
-export function isBookingStartDtValid(dt, isAdminOverrideEnabled) {
+export function isBookingStartDTValid(dt, isAdminOverrideEnabled) {
     return isBookingStartValid(dt, isAdminOverrideEnabled);
 }
