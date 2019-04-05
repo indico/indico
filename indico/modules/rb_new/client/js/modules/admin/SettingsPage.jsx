@@ -119,7 +119,7 @@ const SettingsPage = props => {
                         <Field name="tileserver_url" component={ReduxFormField} as="input"
                                format={formatters.trim} formatOnBlur
                                label={Translate.string('Tileserver URL')}
-                               parse={v => v || null}
+                               parse={val => val || null}
                                validate={val => {
                                    if (!val) {
                                        return undefined;
