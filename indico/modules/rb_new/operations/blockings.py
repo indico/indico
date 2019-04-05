@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 
 from collections import defaultdict
 from datetime import date
+from operator import attrgetter
 
 from flask import session
 from sqlalchemy.orm import contains_eager, selectinload
@@ -55,28 +56,29 @@ def get_room_blockings(timeframe=None, created_by=None, in_rooms_owned_by=None):
     return query.all()
 
 
-def filter_blocked_rooms(blocked_rooms, overridable_only=False, nonoverridable_only=False,
-                         explicit=False):
-        if overridable_only:
-            blocked_rooms = [room for room in blocked_rooms
-                             if room.blocking.can_be_overridden(session.user, room.room, explicit_only=explicit)]
-        if nonoverridable_only:
-            blocked_rooms = [room for room in blocked_rooms
-                             if not room.blocking.can_be_overridden(session.user, room.room, explicit_only=explicit)]
-        return blocked_rooms
+def filter_blocked_rooms(blocked_rooms, overridable_only=False, nonoverridable_only=False, explicit=False):
+    if overridable_only:
+        blocked_rooms = [room for room in blocked_rooms
+                         if room.blocking.can_be_overridden(session.user, room.room, explicit_only=explicit)]
+    if nonoverridable_only:
+        blocked_rooms = [room for room in blocked_rooms
+                         if not room.blocking.can_be_overridden(session.user, room.room, explicit_only=explicit)]
+    return blocked_rooms
 
 
 def group_blocked_rooms(blocked_rooms):
-    return group_list(blocked_rooms, key=lambda obj: obj.room_id)
+    return group_list(blocked_rooms, key=attrgetter('room_id'))
 
 
-def get_blockings(start_date, end_date):
+def get_blockings_with_rooms(start_date, end_date):
     return (BlockedRoom.query
             .filter(BlockedRoom.state == BlockedRoomState.accepted,
                     Blocking.start_date <= end_date,
                     Blocking.end_date >= start_date)
             .join(BlockedRoom.blocking)
-            .options(contains_eager('blocking'))).all()
+            .join(BlockedRoom.room)
+            .options(contains_eager('blocking'), contains_eager('room'))
+            .all())
 
 
 def get_rooms_blockings(rooms, start_date, end_date):
@@ -87,7 +89,8 @@ def get_rooms_blockings(rooms, start_date, end_date):
                     Blocking.start_date <= end_date,
                     Blocking.end_date >= start_date)
             .join(BlockedRoom.blocking)
-            .options(contains_eager('blocking'))).all()
+            .options(contains_eager('blocking'))
+            .all())
 
 
 @no_autoflush
