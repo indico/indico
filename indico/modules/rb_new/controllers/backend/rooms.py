@@ -33,12 +33,14 @@ from indico.modules.rb.models.room_attributes import RoomAttribute, RoomAttribut
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.util import rb_is_admin
 from indico.modules.rb_new.controllers.backend.common import search_room_args
-from indico.modules.rb_new.operations.blockings import filter_blocked_rooms, get_blockings, group_blocked_rooms
+from indico.modules.rb_new.operations.blockings import (filter_blocked_rooms, get_blockings_with_rooms,
+                                                        group_blocked_rooms)
 from indico.modules.rb_new.operations.bookings import check_room_available, get_room_details_availability
 from indico.modules.rb_new.operations.rooms import get_room_statistics, search_for_rooms
 from indico.modules.rb_new.schemas import room_attribute_values_schema, rooms_schema
 from indico.util.caching import memoize_redis
 from indico.util.marshmallow import NaiveDateTime
+from indico.util.string import natural_sort_key
 from indico.web.flask.util import send_file
 
 
@@ -77,24 +79,20 @@ class RHSearchRooms(RHRoomBookingBase):
                 raise UnprocessableEntity('Required data to filter by availability is not present')
         else:
             availability = not only_unavailable
-
         search_query = search_for_rooms(args, allow_admin=admin_override_enabled, availability=availability)
-        room_ids = [id_ for id_, in search_query.with_entities(Room.id)]
+        rooms = [(id_, room_name) for id_, room_name, in search_query.with_entities(Room.id, Room.full_name)]
+
+        if filter_availability:
+            # We can't filter by blocking's acl in the search_query, so we need to adjust the results
+            rooms = self._adjust_blockings(rooms, args, availability)
+        room_ids = [room[0] for room in rooms]
+
         if filter_availability:
             room_ids_without_availability_filter = [
                 id_ for id_, in search_for_rooms(args, allow_admin=admin_override_enabled).with_entities(Room.id)
             ]
         else:
             room_ids_without_availability_filter = room_ids
-        if availability is not None:
-            blocked_rooms = get_blockings(args['start_dt'], args['end_dt'])
-            nonoverridable_blocked_rooms = filter_blocked_rooms(blocked_rooms, nonoverridable_only=True)
-            nonoverridable_blocked_rooms_ids = {room.room_id for room in nonoverridable_blocked_rooms}
-            if availability:
-                room_ids = [room_id for room_id in room_ids if room_id not in nonoverridable_blocked_rooms_ids]
-            else:
-                missing_rooms_ids = [room_id for room_id in nonoverridable_blocked_rooms_ids if room_id not in room_ids]
-                room_ids = room_ids + missing_rooms_ids
         return jsonify(rooms=room_ids, rooms_without_availability_filter=room_ids_without_availability_filter,
                        total=len(room_ids_without_availability_filter), availability_days=self._get_date_range(args))
 
@@ -105,6 +103,21 @@ class RHSearchRooms(RHRoomBookingBase):
         except KeyError:
             return None
         return [dt.date().isoformat() for dt in ReservationOccurrence.iter_start_time(start_dt, end_dt, repetition)]
+
+    def _adjust_blockings(self, rooms, filters, availability):
+        blocked_rooms = get_blockings_with_rooms(filters['start_dt'], filters['end_dt'])
+        nonoverridable_blocked_rooms = filter_blocked_rooms(blocked_rooms, nonoverridable_only=True)
+        if availability:
+            # Remove nonoverridable blockings from available rooms
+            nonoverridable_blocked_rooms_ids = [room.room_id for room in nonoverridable_blocked_rooms]
+            rooms = [room for room in rooms if room[0] not in nonoverridable_blocked_rooms_ids]
+        else:
+            # Add nonoverridable blockings to unavailable rooms and re-sort results
+            rooms_ids = [room[0] for room in rooms]
+            missing_rooms = [(room.room_id, room.room.full_name) for room in nonoverridable_blocked_rooms
+                             if room.room_id not in rooms_ids]
+            rooms = sorted(rooms + missing_rooms, key=lambda room: natural_sort_key(room[1]))
+        return rooms
 
 
 class RHRoomBase(RHRoomBookingBase):
