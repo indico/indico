@@ -96,28 +96,16 @@ export default class TimeRangePicker extends React.Component {
     constructor(props) {
         super(props);
 
-        const {startTime, endTime, allowPastTimes} = this.props;
-        const startOptions = generateStartTimeOptions(allowPastTimes);
-        const endOptions = generateEndTimeOptions(startTime);
+        const {startTime, endTime} = this.props;
         const duration = moment.duration(endTime.diff(startTime));
         const startSearchQuery = serializeTime(moment(startTime));
         const endSearchQuery = serializeTime(moment(endTime));
         this.state = {
             startTime,
             endTime,
-            startOptions,
-            endOptions,
             duration,
             startSearchQuery,
             endSearchQuery
-        };
-    }
-
-    static getDerivedStateFromProps({allowPastTimes, startTime}, prevState) {
-        return {
-            ...prevState,
-            startOptions: generateStartTimeOptions(allowPastTimes),
-            endOptions: generateEndTimeOptions(startTime)
         };
     }
 
@@ -133,7 +121,7 @@ export default class TimeRangePicker extends React.Component {
             return;
         }
         let start;
-        const {allowPastTimes} = this.props;
+        const {allowPastTimes, onChange} = this.props;
         if (event.type === 'click') {
             start = moment(currentStartTime, ['HH:mm', 'Hmm']);
         } else {
@@ -163,16 +151,13 @@ export default class TimeRangePicker extends React.Component {
         } else {
             duration = moment.duration(end.diff(start));
         }
-        const endOptions = generateEndTimeOptions(start);
         this.setState({
             startTime: start,
             endTime: end,
             startSearchQuery: serializeTime(start),
             endSearchQuery: serializeTime(end),
             duration,
-            endOptions,
         });
-        const {onChange} = this.props;
         onChange(start, end);
     };
 
@@ -197,39 +182,35 @@ export default class TimeRangePicker extends React.Component {
         }
         let start = toMoment(startTime, 'HH:mm');
         const {allowPastTimes, onChange} = this.props;
-        if (isBookingStartDTValid(end, allowPastTimes)) {
-            if (end.isSameOrBefore(start, 'minute')) {
-                start = moment(end).subtract(duration);
-                if (start < moment().startOf('day')) {
-                    start = moment().startOf('day');
-                    if (end.isSame(start, 'minute')) {
-                        end = moment(start).add(duration);
-                    }
-                } else if (!isBookingStartDTValid(start, allowPastTimes)) {
-                    this.setState({
-                        endSearchQuery: serializeTime(previousEndTime)
-                    });
-                    return;
-                }
-            } else {
-                duration = moment.duration(end.diff(start));
-            }
-        } else {
+        if (!isBookingStartDTValid(end, allowPastTimes)) {
             this.setState({
                 endSearchQuery: serializeTime(previousEndTime)
             });
             return;
         }
-        const endOptions = generateEndTimeOptions(start);
+        if (end.isSameOrBefore(start, 'minute')) {
+            start = moment(end).subtract(duration);
+            if (start < moment().startOf('day')) {
+                start = moment().startOf('day');
+                if (end.isSame(start, 'minute')) {
+                    end = moment(start).add(duration);
+                }
+            } else if (!isBookingStartDTValid(start, allowPastTimes)) {
+                this.setState({
+                    endSearchQuery: serializeTime(previousEndTime)
+                });
+                return;
+            }
+        } else {
+            duration = moment.duration(end.diff(start));
+        }
         this.setState({
             startTime: start,
             endTime: end,
             startSearchQuery: serializeTime(start),
             endSearchQuery: serializeTime(end),
             duration,
-            endOptions,
         });
-        const {onChange} = this.props;
         onChange(start, end);
     };
 
@@ -246,8 +227,10 @@ export default class TimeRangePicker extends React.Component {
     };
 
     render() {
-        const {startTime, endTime, startOptions, endOptions, duration, startSearchQuery, endSearchQuery} = this.state;
-        const {disabled} = this.props;
+        const {startTime, endTime, duration, startSearchQuery, endSearchQuery} = this.state;
+        const {disabled, allowPastTimes} = this.props;
+        const startOptions = generateStartTimeOptions(allowPastTimes);
+        const endOptions = generateEndTimeOptions(startTime);
         return (
             <div styleName="time-range-picker">
                 <Dropdown options={startOptions}
@@ -263,7 +246,7 @@ export default class TimeRangePicker extends React.Component {
                               this.updateStartTime(event, value, startTime, endTime, duration, startSearchQuery);
                           }} />
                 <Dropdown options={endOptions}
-                          search={() => generateEndTimeOptions(startTime)}
+                          search={() => endOptions}
                           icon={null}
                           selection
                           styleName="end-time-dropdown"
