@@ -30,6 +30,7 @@ from indico.core.db.sqlalchemy.util.queries import db_dates_overlap
 from indico.core.errors import IndicoError
 from indico.modules.rb.models.reservation_edit_logs import ReservationEditLog
 from indico.modules.rb.models.util import proxy_to_reservation_if_last_valid_occurrence
+from indico.modules.rb.util import rb_is_admin
 from indico.util import date_time
 from indico.util.date_time import format_date, iterdays
 from indico.util.serializer import Serializer
@@ -250,9 +251,17 @@ class ReservationOccurrence(db.Model, Serializer):
         return self.reservation.can_reject(user, allow_admin=allow_admin)
 
     def can_cancel(self, user, allow_admin=True):
+        if user is None:
+            return False
         if not self.is_valid or self.end_dt < datetime.now():
             return False
-        return self.reservation.can_cancel(user, allow_admin=allow_admin)
+        booking = self.reservation
+        booked_or_owned_by_user = booking.is_owned_by(user) or booking.is_booked_for(user)
+        if booking.is_rejected or booking.is_cancelled or booking.is_archived:
+            return False
+        if booked_or_owned_by_user and self.start_dt >= datetime.now():
+            return True
+        return allow_admin and rb_is_admin(user)
 
     @proxy_to_reservation_if_last_valid_occurrence
     @unify_user_args
