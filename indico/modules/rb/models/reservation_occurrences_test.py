@@ -401,3 +401,18 @@ def test_can_cancel(create_reservation, dummy_user, freeze_time):
     assert not reservation.occurrences[0].can_cancel(dummy_user)
     assert not reservation.occurrences[1].can_cancel(dummy_user)
     assert reservation.occurrences[-1].can_cancel(dummy_user)
+
+
+def test_can_cancel_recent_reservation(create_reservation, dummy_user, freeze_time):
+    reservation = create_reservation(start_dt=datetime.combine(date.today(), time(11)),
+                                     end_dt=datetime.combine(date.today(), time(17)),
+                                     repeat_frequency=RepeatFrequency.NEVER)
+    freeze_time(datetime.combine(date.today(), time(12, 0)))
+    assert reservation.can_cancel(dummy_user)
+
+    reservation.start_dt = datetime.combine(date.today(), time(8))
+    assert not reservation.can_cancel(dummy_user)
+
+    reservation.start_dt = reservation.start_dt + relativedelta(days=1)
+    reservation.end_dt = reservation.end_dt + relativedelta(days=1)
+    assert reservation.can_cancel(dummy_user)
