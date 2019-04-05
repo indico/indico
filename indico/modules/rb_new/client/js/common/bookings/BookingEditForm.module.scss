@@ -20,5 +20,9 @@
 
     :global(.field .SingleDatePicker), :global(.field .DateRangePicker) {
         padding: 0;
+
+        :global(.DateRangePicker_picker) {
+            z-index: 1000;
+        }
     }
 }
