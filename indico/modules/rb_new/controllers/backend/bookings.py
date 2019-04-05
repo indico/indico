@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from datetime import date, datetime, time, timedelta
+from datetime import date, datetime, time
 
 import dateutil
 from flask import jsonify, request, session
@@ -208,8 +208,8 @@ class RHCreateBooking(RHRoomBookingBase):
 
     def _process(self):
         args = self.args
-        if not is_booking_start_within_grace_period(args['start_dt'], args['admin_override_enabled']):
-            raise ExpectedError(_('You cannot create a booking with start date in the past'))
+        if not is_booking_start_within_grace_period(args['start_dt'], session.user, args['admin_override_enabled']):
+            raise ExpectedError(_('You cannot create a booking which starts in the past'))
 
         user_id = args.pop('user_id', None)
         booked_for = User.get_one(user_id, is_deleted=False) if user_id else session.user
