@@ -160,7 +160,10 @@ class BookingEdit extends React.Component {
         this.setState(newState);
     };
 
-    getUpdatedCalendars = (dateRange, newDateRange, candidates, conflicts, conflictingCandidates) => {
+    getUpdatedCalendars = (dateRange, newDateRange, newAvailability) => {
+        const {
+            candidates, conflicts, conflictingCandidates, blockings, unbookableHours, unbookablePeriods,
+        } = newAvailability;
         const {isOngoingBooking} = this.props;
         const {shouldSplit, calendars: {currentBooking}} = this.state;
 
@@ -174,6 +177,7 @@ class BookingEdit extends React.Component {
                 currentBooking: {
                     ...currentBooking,
                     isFetching: false,
+                    dateRange: dateRange.filter((dt) => moment(dt, 'YYYY-MM-DD').isSameOrBefore(moment(), 'day')),
                     data: {
                         ...currentBooking.data,
                         pendingCancellations,
@@ -185,10 +189,12 @@ class BookingEdit extends React.Component {
                         ...currentBooking.data,
                         bookings: {},
                         pendingCancellations: {},
-                        cancellations: {},
                         candidates,
                         conflicts,
                         conflictingCandidates,
+                        blockings,
+                        unbookableHours,
+                        unbookablePeriods,
                     },
                     dateRange: newDateRange,
                 }
@@ -200,10 +206,13 @@ class BookingEdit extends React.Component {
                     isFetching: false,
                     data: {
                         ...currentBooking.data,
+                        pendingCancellations: {},
                         candidates,
                         conflicts,
                         conflictingCandidates,
-                        pendingCancellations: {},
+                        blockings,
+                        unbookableHours,
+                        unbookablePeriods,
                     },
                     dateRange: _.uniq([...dateRange, ...newDateRange]).sort(),
                 }
@@ -276,12 +285,12 @@ class BookingEdit extends React.Component {
         // Filter out rejections and cancellations from candidates
         const {data: {cancellations, rejections}} = currentBooking;
         candidates = _.pick(candidates, newDateRange.filter(date => !(date in rejections) && !(date in cancellations)));
+        const numberOfCandidates = Object.entries(candidates).filter((__, data) => data.length !== 0).length;
 
         this.setState({
-            calendars: this.getUpdatedCalendars(dateRange, newDateRange, candidates, availabilityData.conflicts,
-                                                availabilityData.conflictingCandidates),
+            calendars: this.getUpdatedCalendars(dateRange, newDateRange, {...availabilityData, candidates}),
             numberOfConflicts: availabilityData.numConflicts,
-            numberOfCandidates: datePeriodChanged ? availabilityData.numDaysAvailable : null,
+            numberOfCandidates: datePeriodChanged ? numberOfCandidates : null,
         });
     };
 
