@@ -32,6 +32,7 @@ from indico.modules.events.contributions import Contribution
 from indico.modules.events.sessions import Session
 from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.rb.models.rooms import Room
+from indico.modules.rb.util import rb_is_admin
 from indico.modules.rb_new.schemas import (bookable_hours_schema, nonbookable_periods_schema,
                                            reservation_occurrences_schema, simple_blockings_schema)
 from indico.util.string import crc32
@@ -107,7 +108,7 @@ def get_linked_object(type_, id_):
                 .first())
 
 
-def is_booking_start_within_grace_period(start_dt, allow_admin=False):
-    if allow_admin:
+def is_booking_start_within_grace_period(start_dt, user, allow_admin=False):
+    if allow_admin and rb_is_admin(user):
         return True
     return start_dt >= datetime.now() - timedelta(hours=1)
