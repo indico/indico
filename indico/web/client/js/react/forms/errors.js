@@ -19,17 +19,21 @@ import _ from 'lodash';
 import {FORM_ERROR} from 'final-form';
 
 
+function flatten(value) {
+    // marshmallow's List returns an object with the index as the key
+    if (_.isPlainObject(value)) {
+        value = Object.values(value);
+    }
+    // Nested returns an object mapping the inner field name to its error(s)
+    return _.uniq(_.flattenDeep(value.map(x => (_.isPlainObject(x) ? Object.values(x) : x))));
+}
+
 export function handleSubmissionError(error, defaultMessage = null, fieldErrorMap = {}) {
     const webargsErrors = _.get(error, 'response.data.webargs_errors');
     if (webargsErrors && error.response.status === 422) {
         // flatten errors in case there's more than one
         return _.fromPairs(Object.entries(webargsErrors).map(([field, errors]) => {
-            if (_.isPlainObject(errors)) {
-                // marshmallow's List returns an object with the index as the key
-                // since we don't show details, just take the actual errors without duplicates
-                errors = _.uniq(Object.values(errors));
-            }
-            return [fieldErrorMap[field] || field, errors.join(' / ')];
+            return [fieldErrorMap[field] || field, flatten(errors).join(' / ')];
         }));
     } else {
         return {[FORM_ERROR]: defaultMessage || error.message};
