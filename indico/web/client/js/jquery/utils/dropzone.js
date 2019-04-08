@@ -99,9 +99,8 @@ import 'dropzone/dist/dropzone.css';
                             $dz.find('.dz-progress').show();
                             self.processQueue();
                         }
-                    } else {
-                        handlerRemoved = false;
                     }
+                    handlerRemoved = false;
                 });
 
                 self.on('addedfile', function(file) {
