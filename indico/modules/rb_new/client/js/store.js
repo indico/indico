@@ -41,7 +41,7 @@ function getRouteConfig() {
 }
 
 export const history = createBrowserHistory({
-    basename: `${Indico.Urls.BasePath}/rooms-new`
+    basename: `${Indico.Urls.BasePath}/rooms`
 });
 
 /**
