@@ -29,5 +29,5 @@ def is_private_url(url):
     try:
         host_data = socket.getaddrinfo(hostname, None, 0, 0, socket.IPPROTO_TCP)
         return any(ipaddress.ip_address(unicode(item[4][0])).is_private for item in host_data)
-    except (socket.gaierror, ipaddress.AddressValueError):
+    except (socket.gaierror, ipaddress.AddressValueError, ValueError):
         return True
