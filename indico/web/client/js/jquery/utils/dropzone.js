@@ -131,7 +131,7 @@ import 'dropzone/dist/dropzone.css';
                     $form.trigger('ajaxForm:beforeSubmit');
                 });
 
-                self.on('success', function(e, response) {
+                self.on(options.uploadMultiple ? 'successmultiple' : 'success', function(e, response) {
                     if (options.handleFlashes) {
                         handleFlashes(response, true, $flashArea);
                     }
