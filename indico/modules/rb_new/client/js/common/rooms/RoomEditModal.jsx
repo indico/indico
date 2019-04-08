@@ -533,7 +533,10 @@ class RoomEditModal extends React.Component {
 
     async saveAvailability(roomId, changedValues, nonbookablePeriods, bookableHours) {
         if (nonbookablePeriods || bookableHours) {
-            const params = snakifyKeys(_.pick(changedValues, ['bookableHours', 'nonbookablePeriods']));
+            let params = snakifyKeys(_.pick(changedValues, ['bookableHours', 'nonbookablePeriods']));
+            params = _.fromPairs(Object.entries(params).map(([field, values]) => [
+                field, values.map(v => _.omit(v, 'key'))
+            ]));
             await indicoAxios.post(updateRoomAvailabilityURL({room_id: roomId}), params);
         }
     }
