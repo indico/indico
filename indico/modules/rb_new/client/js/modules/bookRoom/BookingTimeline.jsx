@@ -69,7 +69,7 @@ class _BookingTimelineComponent extends React.Component {
     render() {
         const {
             isLoading, lazyScroll, showEmptyMessage, clickable, datePicker, fixedHeight,
-            actions: {openRoomDetails}, availability, bookingAllowed
+            actions: {openRoomDetails}, availability, bookingAllowed, filters: {recurrence}
         } = this.props;
         const emptyMessage = showEmptyMessage ? (
             <Message warning>
@@ -90,14 +90,16 @@ class _BookingTimelineComponent extends React.Component {
                                  onClickLabel={clickable ? openRoomDetails : null}
                                  isLoading={isLoading}
                                  fixedHeight={fixedHeight}
-                                 roomTimelineAction />
+                                 roomTimelineAction={recurrence.type !== 'single'} />
             )
         );
     }
 }
 
 export const BookingTimelineComponent = connect(
-    null,
+    state => ({
+        filters: bookRoomSelectors.getFilters(state),
+    }),
     dispatch => ({
         actions: bindActionCreators({
             openRoomDetails: roomsActions.openRoomDetailsBook,
