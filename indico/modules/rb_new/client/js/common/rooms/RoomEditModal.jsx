@@ -172,7 +172,8 @@ const columns = [
         type: 'input',
         name: 'verboseName',
         label: Translate.string('Name'),
-        required: false
+        required: false,
+        parse: v => v || null,
     }, {
         type: 'input',
         name: 'site',
@@ -600,7 +601,7 @@ class RoomEditModal extends React.Component {
                     <Header key={key}>{content.label}</Header>
                 );
             case 'input': {
-                let parse = null;
+                let parse = content.parse !== undefined ? content.parse : null;
                 if (content.inputArgs && content.inputArgs.type === 'number') {
                     // number fields use null
                     parse = (value) => (value ? +value : null);
