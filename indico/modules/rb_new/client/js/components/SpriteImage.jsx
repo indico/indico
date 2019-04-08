@@ -77,8 +77,10 @@ class SpriteImage extends React.Component {
         const {pos, width, height, styles, roomsSpriteToken, fillVertical, onClick} = this.props;
         const {contWidth, contHeight} = this.state;
 
+        // Added random string generator to re-fetch sprite
+        const randomId = new Date().getTime();
         const imgStyle = {
-            backgroundImage: `url(${roomsSpriteURL({version: roomsSpriteToken})})`,
+            backgroundImage: `url(${roomsSpriteURL({version: roomsSpriteToken})}?random=${randomId})`,
             backgroundPosition: `-${DEFAULT_WIDTH * pos}px 0`,
             backgroundRepeat: 'no-repeat',
             width: DEFAULT_WIDTH,

@@ -46,7 +46,7 @@ import {EmailListField, PrincipalField} from 'indico/react/components';
 import EquipmentList from './EquipmentList';
 import DailyAvailability from './DailyAvailability';
 import NonBookablePeriods from './NonBookablePeriods';
-import SpriteImage from '../../components/SpriteImage';
+import RoomPhoto from './RoomPhoto';
 import {actions as roomsActions} from '../../common/rooms';
 import {actions as userActions} from '../../common/user';
 import * as roomsSelectors from './selectors';
@@ -113,6 +113,7 @@ const columns = [
     // left
     [{
         type: 'header',
+        key: 'photo',
         label: Translate.string('Photo')
     }, {
         type: 'photo',
@@ -496,7 +497,6 @@ class RoomEditModal extends React.Component {
         const basicDetailsKeys = ['attributes', 'bookableHours', 'nonbookablePeriods', 'availableEquipment'];
         const basicDetails = _.omit(changedValues, basicDetailsKeys);
         const {availableEquipment, nonbookablePeriods, bookableHours, attributes} = changedValues;
-
         let submitState = 'success';
         let submitError;
         try {
@@ -542,10 +542,6 @@ class RoomEditModal extends React.Component {
             await indicoAxios.post(updateRoomAvailabilityURL({room_id: roomId}), params);
         }
     }
-
-    renderPhoto = (position) => {
-        return <SpriteImage key="image" pos={position} />;
-    };
 
     renderAttributes = (content) => {
         const {attributes, roomAttributes} = this.state;
@@ -600,8 +596,8 @@ class RoomEditModal extends React.Component {
     };
 
     renderContent = (content, key) => {
-        const {room, roomEquipment} = this.state;
-        const {equipmentTypes} = this.props;
+        const {roomEquipment, room: {hasPhoto}} = this.state;
+        const {equipmentTypes, roomId} = this.props;
         if (!equipmentTypes) {
             return;
         }
@@ -677,7 +673,9 @@ class RoomEditModal extends React.Component {
                            isEqual={_.isEqual} />
                 );
             case 'photo':
-                return this.renderPhoto(room.spritePosition);
+                return (
+                    <RoomPhoto key={key} roomId={roomId} hasPhoto={hasPhoto} />
+                );
             case 'attributes':
                 return this.renderAttributes(content);
             case 'equipment':
