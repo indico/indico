@@ -17,12 +17,12 @@
 
 import _ from 'lodash';
 import React, {useEffect} from 'react';
-import moment from 'moment';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import PropTypes from 'prop-types';
 import {Modal, Icon, Dimmer, Loader, Popup} from 'semantic-ui-react';
 
+import {serializeDate} from 'indico/utils/date';
 import {actions as bookRoomActions, selectors as bookRoomSelectors} from '../../modules/bookRoom';
 import TimelineLegend from './TimelineLegend';
 import DailyTimelineContent from './DailyTimelineContent';
@@ -34,9 +34,7 @@ const _getRowSerializer = (day, room) => {
     return ({bookings, preBookings, candidates, conflictingCandidates, nonbookablePeriods, unbookableHours,
              blockings, conflicts, preConflicts}) => ({
         availability: {
-            candidates: (candidates[day] || []).map((candidate) => (
-                {...candidate, bookable: false})
-            ) || [],
+            candidates: (candidates[day] || []).map((candidate) => ({...candidate, bookable: false})) || [],
             conflictingCandidates: (conflictingCandidates[day] || []).map((candidate) => (
                 {...candidate, bookable: false}
             )) || [],
@@ -48,7 +46,7 @@ const _getRowSerializer = (day, room) => {
             unbookableHours: unbookableHours || [],
             blockings: blockings[day] || []
         },
-        label: moment(day).format('L'),
+        label: serializeDate(day, 'L'),
         key: day,
         conflictIndicator: true,
         room
@@ -62,7 +60,9 @@ const _SingleRoomTimelineContent = props => {
     }, [fetchAvailability, filters, room]);
 
     const isLoaded = !_.isEmpty(availability) && !availabilityLoading;
-    const dimmer = <Dimmer active page styleName="dimmer"><Loader /></Dimmer>;
+    if (!isLoaded) {
+        return <Dimmer active page styleName="dimmer"><Loader /></Dimmer>;
+    }
 
     const renderRoomTimeline = () => {
         const {dateRange} = availability;
@@ -70,7 +70,7 @@ const _SingleRoomTimelineContent = props => {
         return <DailyTimelineContent rows={rows} fixedHeight={rows.length > 1 ? '70vh' : null} />;
     };
 
-    return isLoaded ? renderRoomTimeline() : dimmer;
+    return renderRoomTimeline();
 };
 
 _SingleRoomTimelineContent.propTypes = {
@@ -108,7 +108,7 @@ const SingleRoomTimelineModal = props => {
                onClose={onClose}
                size="large" closeIcon>
             <Modal.Header className="legend-header">
-                {title ? title : room.name}
+                {title || room.name}
                 <Popup trigger={<Icon name="info circle" className="legend-info-icon" />}
                        content={<TimelineLegend labels={legendLabels} compact />} />
             </Modal.Header>

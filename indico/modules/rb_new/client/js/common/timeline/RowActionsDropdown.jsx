@@ -26,7 +26,7 @@ import {serializeDate} from 'indico/utils/date';
 import {ReduxFormField, formatters, validators as v} from 'indico/react/forms';
 import {Param, Translate} from 'indico/react/i18n';
 
-import * as bookingsActions from '../bookings/actions';
+import {actions as bookingsActions} from '../bookings';
 import SingleRoomTimelineModal from './SingleRoomTimelineModal';
 
 import './RowActionsDropdown.module.scss';
