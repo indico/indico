@@ -59,7 +59,8 @@ export default class DailyAvailability extends React.Component {
             <div key={key} className="flex-container">
                 <TimeRangePicker startTime={moment(startT, 'HH:mm')}
                                  endTime={moment(endT, 'HH:mm')}
-                                 onChange={(startTime, endTime) => this.handleTimesChange({startTime, endTime}, key)} />
+                                 onChange={(startTime, endTime) => this.handleTimesChange({startTime, endTime}, key)}
+                                 allowPastTimes />
                 <Icon floated="right" name="trash" className="trash-button" onClick={() => this.handleRemoveTimes(key)} />
             </div>
         );
