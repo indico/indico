@@ -21,9 +21,11 @@ from collections import namedtuple
 from datetime import datetime, timedelta
 from io import BytesIO
 
+import pytz
 from flask import current_app
 from PIL import Image
 
+from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.links import LinkType
 from indico.legacy.common.cache import GenericCache
@@ -35,6 +37,7 @@ from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.util import rb_is_admin
 from indico.modules.rb_new.schemas import (bookable_hours_schema, nonbookable_periods_schema,
                                            reservation_occurrences_schema, simple_blockings_schema)
+from indico.util.date_time import now_utc
 from indico.util.string import crc32
 from indico.util.struct.iterables import group_list
 
@@ -111,4 +114,6 @@ def get_linked_object(type_, id_):
 def is_booking_start_within_grace_period(start_dt, user, allow_admin=False):
     if allow_admin and rb_is_admin(user):
         return True
-    return start_dt >= datetime.now() - timedelta(hours=1)
+    default_tz = pytz.timezone(config.DEFAULT_TIMEZONE)
+    start_dt_utc = default_tz.localize(start_dt).astimezone(pytz.utc)
+    return start_dt_utc >= now_utc() - timedelta(hours=1)
