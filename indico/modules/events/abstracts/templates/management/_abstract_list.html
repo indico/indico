@@ -31,7 +31,8 @@
 
 {% macro _render_abstract_state(abstract) %}
     {% set abstract_css_class = abstract.reviewing_state.css_class if abstract.can_convene(session.user) else abstract.public_state.css_class %}
-    <div class="i-tag outline semantic-text state-badge {{ abstract_css_class }}" title="{{ _render_num_reviews_tooltip(abstract) }}">
+    <div class="i-tag outline semantic-text state-badge {{ abstract_css_class }}"
+         data-tooltip="{{ _render_num_reviews_tooltip(abstract)|trim}}">
         {% if abstract.public_state.name == 'under_review' and abstract.can_judge(session.user) %}
             {% trans count=abstract.reviews|length -%}
                 {{- count }} review
@@ -51,23 +52,50 @@
     </div>
 {% endmacro %}
 
-{% macro _render_num_reviews_tooltip(abstract) %}
-    {% set num_acceptances = abstract.reviews|selectattr('proposed_action', 'equalto', 1)|list|length %}
-    {% set num_rejections = abstract.reviews|selectattr('proposed_action', 'equalto', 2)|list|length %}
-    {% if num_acceptances%}
-        {% trans count=num_acceptances %}
-            {{ count }} acceptance
+{% macro _render_action_string(count, action) %}
+    {%- if action == 1 -%}
+        {% trans count=count %}
+            <strong>{{ count }}</strong> acceptance
         {% pluralize %}
-            {{ count }} acceptances
+            <strong>{{ count }}</strong> acceptances
         {% endtrans %}
-    {% endif %}
-    {% if num_rejections %}
-        {% trans count=num_rejections %}
-            {{ count }} rejection
+    {%- elif action == 2 -%}
+        {% trans count=count %}
+            <strong>{{ count }}</strong> rejection
         {% pluralize %}
-            {{ count }} rejections
+            <strong>{{ count }}</strong> rejections
         {% endtrans %}
-    {% endif %}
+    {%- elif action == 3 -%}
+        {% trans count=count %}
+            <strong>{{ count }}</strong> proposal to change track
+        {% pluralize %}
+            <strong>{{ count }}</strong> proposals to change track
+        {% endtrans %}
+    {%- elif action == 4 -%}
+        {% trans count=count %}
+            <strong>{{ count }}</strong> mark as duplicate
+        {% endtrans %}
+    {%- elif action == 5 -%}
+        {% trans count=count %}
+            <strong>{{ count }}</strong> proposal to merge
+        {% pluralize %}
+            <strong>{{ count }}</strong> proposals to merge
+        {% endtrans %}
+    {%- endif -%}
+{% endmacro %}
+
+{% macro _render_num_reviews_tooltip(abstract) -%}
+{#    TODO: add proposed contrib types #}
+        {% if abstract.reviews %}
+            <div class='num-reviews-tooltip'>
+                <div class='title'><strong>{% trans %}Reviews{% endtrans %}</strong></div>
+                {% for action, review_list in abstract.reviews|groupby('proposed_action') -%}
+                    <div class='semantic-text {{ action.css_class }}'>
+                        {{- _render_action_string(review_list|selectattr('proposed_action', 'equalto', action)|list|length, action) -}}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
 {% endmacro %}
 
 {% macro render_abstract_list(abstracts, dynamic_columns, static_columns, total_abstracts, context_track=none, reviewed_abstracts=none) %}
