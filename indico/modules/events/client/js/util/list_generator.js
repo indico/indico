@@ -202,6 +202,25 @@
             e.stopPropagation();
         });
 
+        const $stateBadges = $('.state-badge');
+        $stateBadges.qbubble({
+            show: {
+                event: 'mouseover'
+            },
+            hide: {
+                fixed: true,
+                delay: 100,
+                event: 'mouseleave'
+            },
+            position: {
+                my: 'bottom center',
+                at: 'top center'
+            },
+            content: {
+                attr: 'data-tooltip'
+            }
+        });
+
         return applySearchFilters;
     };
 

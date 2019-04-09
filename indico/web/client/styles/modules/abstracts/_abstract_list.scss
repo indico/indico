@@ -28,3 +28,13 @@
 .state-badge {
     display: inline-block;
 }
+
+.num-reviews-tooltip {
+    .title {
+        padding-bottom: 0.25em;
+    }
+
+    & > * {
+        line-height: 1.2em;
+    }
+}
