@@ -15,6 +15,9 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import rbURL from 'indico-url:rooms_new.roombooking';
+import checkRoomAvailabilityURL from 'indico-url:rooms_new.check_room_available';
+
 import {camelizeKeys} from 'indico/utils/case';
 
 /* eslint-disable import/unambiguous */
@@ -46,7 +49,6 @@ import {camelizeKeys} from 'indico/utils/case';
         const $prebookingSwitch = $('#create-prebooking');
         const $bookingSwitchPrebooking = $('#create-booking-over-prebooking');
         const $prebookingSwitchPrebooking = $('#create-prebooking-over-prebooking');
-        const calendarUrl = Indico.Urls.RoomBooking.calendar;
 
         let currentCategory = null;
         let previousRoomId, $currentMessage, startDt, endDt, category, roomData, timezone;
@@ -116,10 +118,11 @@ import {camelizeKeys} from 'indico/utils/case';
 
         function addCalendarLink($message) {
             const params = {
+                path: 'calendar',
                 date: startDt.format('YYYY-MM-DD'),
                 text: roomData['room_name']
             };
-            const url = build_url(calendarUrl, params);
+            const url = rbURL(params);
             $message.find('a').prop('href', url);
         }
 
@@ -155,7 +158,7 @@ import {camelizeKeys} from 'indico/utils/case';
             };
 
             $.ajax({
-                url: build_url(Indico.Urls.RoomBooking.room.check_available, requestParams),
+                url: checkRoomAvailabilityURL(requestParams),
                 method: 'GET',
                 dataType: 'json',
                 contentType: 'application/json',
