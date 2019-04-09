@@ -299,7 +299,8 @@
             resultContainer: '#' + venueInput.siblings('.typeahead__result').find('.results-list-container').attr('id'),
             template: '<span id="location-venue-{{id}}">{{name}}</span>',
             // Used to keep the dropdown list open while there are no results (required by the 'just-use' option)
-            emptyTemplate: function() { return ''; },
+            // It has to return a truthy value
+            emptyTemplate: function() { return ' '; },
             display: 'name',
             hint: true,
             cancelButton: false,
@@ -369,7 +370,9 @@
             maxItem: 0,
             resultContainer: '#' + roomInput.siblings('.typeahead__result').find('.results-list-container').attr('id'),
             template: '<span id="location-room-{{id}}">{{name}}</span>',
-            emptyTemplate: function() { return ''; },
+            // Used to keep the dropdown list open while there are no results (required by the 'just-use' option)
+            // It has to return a truthy value
+            emptyTemplate: function() { return ' '; },
             display: 'name',
             callback: {
                 onInit: function(node) {
