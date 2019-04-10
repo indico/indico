@@ -71,15 +71,15 @@ def _upgrade_permissions():
                                          ('allowed-booking-group',)).scalar()
     manager_group_attr_id = conn.execute('SELECT id FROM roombooking.room_attributes WHERE name = %s',
                                          ('manager-group',)).scalar()
-    query = 'SELECT id, owner_id, reservations_need_confirmation FROM roombooking.rooms'
-    for room_id, owner_id, reservations_need_confirmation in conn.execute(query):
+    query = 'SELECT id, owner_id, reservations_need_confirmation, is_reservable FROM roombooking.rooms'
+    for room_id, owner_id, reservations_need_confirmation, is_reservable in conn.execute(query):
         booking_group = manager_group = None
         if booking_group_attr_id is not None:
             booking_group = _get_attr_value(conn, room_id, booking_group_attr_id)
         if manager_group_attr_id is not None:
             manager_group = _get_attr_value(conn, room_id, manager_group_attr_id)
 
-        if not booking_group:
+        if not booking_group and is_reservable:
             conn.execute('UPDATE roombooking.rooms SET protection_mode = %s WHERE id = %s',
                          (ProtectionMode.public.value, room_id))
         _create_acl_entry(conn, room_id, user_id=owner_id, full_access=True)
@@ -96,6 +96,11 @@ def _upgrade_permissions():
                 print('WARNING: Invalid manager group: {}'.format(manager_group))
             else:
                 _create_acl_entry(conn, room_id, full_access=True, **group_kwargs)
+
+    # is_reservable==false used allow the room owner to book the room, which
+    # isn't the case anymore, so we mark all rooms as reservable.
+    # above we already kept non-reservable rooms as protected
+    conn.execute('UPDATE roombooking.rooms SET is_reservable = true')
 
 
 def _create_attribute(conn, name, title):
@@ -135,10 +140,14 @@ def _downgrade_permissions():
     if manager_group_attr_id is None:
         manager_group_attr_id = _create_attribute(conn, 'manager-group', 'Manager Group')
 
-    query = 'SELECT id, owner_id, reservations_need_confirmation, protection_mode FROM roombooking.rooms'
-    for room_id, owner_id, reservations_need_confirmation, protection_mode in conn.execute(query):
-        query = conn.execute('SELECT * FROM roombooking.room_principals WHERE room_id = %s', (room_id,))
-        for row in query:
+    query = 'SELECT id, owner_id, protection_mode FROM roombooking.rooms'
+    for room_id, owner_id, protection_mode in conn.execute(query):
+        res = conn.execute('SELECT * FROM roombooking.room_principals WHERE room_id = %s', (room_id,))
+        only_owner_in_acl = res.rowcount == 1
+        for row in res:
+            if row.type == PrincipalType.user and row.user_id == owner_id:
+                continue
+            only_owner_in_acl = False
             if row.type == PrincipalType.local_group and not multipass.default_group_provider:
                 if row.full_access:
                     _set_attribute_value(conn, room_id, manager_group_attr_id, unicode(row.local_group_id))
@@ -150,6 +159,8 @@ def _downgrade_permissions():
                     _set_attribute_value(conn, room_id, manager_group_attr_id, row.mp_group_name)
                 if 'book' in row.permissions or 'prebook' in row.permissions:
                     _set_attribute_value(conn, room_id, booking_group_attr_id, row.mp_group_name)
+        if only_owner_in_acl and protection_mode == ProtectionMode.protected:
+            conn.execute('UPDATE roombooking.rooms SET is_reservable = false WHERE id = %s', (room_id,))
 
 
 def upgrade():
