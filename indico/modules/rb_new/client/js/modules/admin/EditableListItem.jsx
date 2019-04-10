@@ -69,7 +69,7 @@ export default class EditableListItem extends React.PureComponent {
         const {item, onDelete} = this.props;
         this.setState({deleting: true, confirming: false});
         const rv = await onDelete(item);
-        if (rv.error) {
+        if (rv && rv.error) {
             // we could show the error but unless client-side validation
             // failed or didn't work because of parallel changes, we should
             // never end up here, so not worth doing this for now!
