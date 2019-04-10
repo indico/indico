@@ -27,8 +27,8 @@ import 'dropzone/dist/dropzone.css';
         Dropzone.autoDiscover = false;
     });
 
-    // Indicates whether default 'submit' handle was removed
-    let handlerRemoved = false;
+    // indicates whether default 'submit' handle was skipped
+    let handlerSkipped = false;
 
     global.setupDropzone = function(element) {
         var $dz = $(element);
@@ -77,11 +77,13 @@ import 'dropzone/dist/dropzone.css';
                     }
                 }
 
+                // skip default ajaxForm submission when there are attachments
+                // and it's ajax dialog to avoid double submission.
                 $form.on('ajaxForm:validateBeforeSubmit', (e) => {
-                    const isAjaxDialog = !!$(e.target).parent('.exclusivePopup').length;
-                    if (self.getQueuedFiles().length && !handlerRemoved && isAjaxDialog) {
+                    const isAjaxDialog = !!$(e.target).closest('.exclusivePopup').length;
+                    if (self.getQueuedFiles().length && !handlerSkipped && isAjaxDialog) {
                          e.preventDefault();
-                         handlerRemoved = true;
+                         handlerSkipped = true;
                     }
                 });
 
@@ -100,7 +102,7 @@ import 'dropzone/dist/dropzone.css';
                             self.processQueue();
                         }
                     }
-                    handlerRemoved = false;
+                    handlerSkipped = false;
                 });
 
                 self.on('addedfile', function(file) {
