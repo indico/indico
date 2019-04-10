@@ -21,11 +21,8 @@ import Dropzone from 'dropzone';
 import 'dropzone/dist/dropzone.css';
 
 (function(global) {
+    Dropzone.autoDiscover = false;
     global.Dropzone = Dropzone;
-
-    $(document).ready(function() {
-        Dropzone.autoDiscover = false;
-    });
 
     // indicates whether default 'submit' handle was skipped
     let handlerSkipped = false;
