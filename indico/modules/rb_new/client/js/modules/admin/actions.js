@@ -23,7 +23,7 @@ import attributesURL from 'indico-url:rooms_new.admin_attributes';
 
 import _ from 'lodash';
 
-import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
+import {indicoAxios} from 'indico/utils/axios';
 import {ajaxAction, submitFormAction} from 'indico/utils/redux';
 import {actions as filtersActions} from '../../common/filters';
 
@@ -122,15 +122,11 @@ export function clearTextFilter() {
 }
 
 export function deleteEquipmentType(id) {
-    return async (dispatch) => {
-        try {
-            await indicoAxios.delete(equipmentTypesURL({equipment_type_id: id}));
-        } catch (error) {
-            handleAxiosError(error, true);
-            return;
-        }
-        dispatch({type: EQUIPMENT_TYPE_DELETED, id});
-    };
+    return ajaxAction(
+        () => indicoAxios.delete(equipmentTypesURL({equipment_type_id: id})),
+        null,
+        () => ({type: EQUIPMENT_TYPE_DELETED, id}),
+    );
 }
 
 export function updateEquipmentType(id, data) {
@@ -148,15 +144,11 @@ export function createEquipmentType(data) {
 }
 
 export function deleteFeature(id) {
-    return async (dispatch) => {
-        try {
-            await indicoAxios.delete(featuresURL({feature_id: id}));
-        } catch (error) {
-            handleAxiosError(error, true);
-            return;
-        }
-        dispatch({type: FEATURE_DELETED, id});
-    };
+    return ajaxAction(
+        () => indicoAxios.delete(featuresURL({feature_id: id})),
+        null,
+        () => ({type: FEATURE_DELETED, id}),
+    );
 }
 
 export function updateFeature(id, data) {
@@ -174,15 +166,11 @@ export function createFeature(data) {
 }
 
 export function deleteAttribute(id) {
-    return async (dispatch) => {
-        try {
-            await indicoAxios.delete(attributesURL({attribute_id: id}));
-        } catch (error) {
-            handleAxiosError(error, true);
-            return;
-        }
-        dispatch({type: ATTRIBUTE_DELETED, id});
-    };
+    return ajaxAction(
+        () => indicoAxios.delete(attributesURL({attribute_id: id})),
+        null,
+        () => ({type: ATTRIBUTE_DELETED, id}),
+    );
 }
 
 export function updateAttribute(id, data) {
