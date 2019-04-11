@@ -214,7 +214,7 @@ const searchFactory = config => {
                    dimmer="inverted"
                    centered={false}
                    open={open}
-                   onClose={() => setOpen(false)}
+                   onClose={handleCancelButtonClick}
                    closeIcon>
                 <Modal.Header>
                     {modalTitle}
