@@ -23,6 +23,7 @@ import PropTypes from 'prop-types';
 import {Modal, Icon, Popup} from 'semantic-ui-react';
 
 import {serializeDate} from 'indico/utils/date';
+import {Translate} from 'indico/react/i18n';
 import {actions as bookRoomActions, selectors as bookRoomSelectors} from '../../modules/bookRoom';
 import TimelineLegend from './TimelineLegend';
 import DailyTimelineContent from './DailyTimelineContent';
@@ -110,7 +111,17 @@ const SingleRoomTimelineContent = connect(
  * @param {Array} props.legendLabels- Array containing timeline legend labels.
  */
 const SingleRoomTimelineModal = props => {
-    const {open, title, onClose, roomAvailability, room, legendLabels} = props;
+    const {open, title, onClose, roomAvailability, room} = props;
+    const legendLabels = [
+        {label: Translate.string('Available'), style: 'available'},
+        {label: Translate.string('Booked'), style: 'booking'},
+        {label: Translate.string('Pre-Booked'), style: 'pre-booking'},
+        {label: Translate.string('Invalid occurrence'), style: 'conflicting-candidate'},
+        {label: Translate.string('Conflict'), style: 'conflict'},
+        {label: Translate.string('Conflict with Pre-Booking'), style: 'pre-booking-conflict'},
+        {label: Translate.string('Blocked'), style: 'blocking'},
+        {label: Translate.string('Not bookable'), style: 'unbookable'}
+    ];
     return (
         <Modal open={open}
                onClose={onClose}
@@ -133,7 +144,6 @@ SingleRoomTimelineModal.propTypes = {
     onClose: PropTypes.func,
     roomAvailability: PropTypes.object,
     room: PropTypes.object.isRequired,
-    legendLabels: PropTypes.array,
 };
 
 SingleRoomTimelineModal.defaultProps = {
@@ -141,7 +151,6 @@ SingleRoomTimelineModal.defaultProps = {
     title: '',
     onClose: () => {},
     roomAvailability: {},
-    legendLabels: [],
 };
 
 export default SingleRoomTimelineModal;
