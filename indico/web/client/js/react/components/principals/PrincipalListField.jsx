@@ -30,10 +30,14 @@ import './PrincipalListField.module.scss';
 
 
 /**
- * A field that lets the user select a list of users/groups
+ * A field that lets the user select a list of users/groups.
+ *
+ * Setting the `readOnly` prop hides all UI elements used to modify
+ * the entries, so it can be used to just display the current contents
+ * outside editing mode.
  */
 const PrincipalListField = (props) => {
-    const {value, disabled, onChange, onFocus, onBlur, withGroups, favoriteUsersController} = props;
+    const {value, disabled, readOnly, onChange, onFocus, onBlur, withGroups, favoriteUsersController} = props;
     const [favoriteUsers, [handleAddFavorite, handleDelFavorite]] = favoriteUsersController;
 
     // keep track of details for each entry
@@ -99,7 +103,8 @@ const PrincipalListField = (props) => {
                                        onDelete={() => !disabled && handleDelete(data.identifier)}
                                        onAddFavorite={() => !disabled && handleAddFavorite(data.userId)}
                                        onDelFavorite={() => !disabled && handleDelFavorite(data.userId)}
-                                       disabled={disabled} />
+                                       disabled={disabled}
+                                       readOnly={readOnly} />
                 ))}
                 {pendingEntries.map(data => (
                     <PendingPrincipalListItem key={data.identifier} isGroup={data.group} />
@@ -112,12 +117,14 @@ const PrincipalListField = (props) => {
                     </List.Item>
                 )}
             </List>
-            <Button.Group>
-                <Button icon="add" as="div" disabled />
-                <UserSearch existing={value} onAddItems={handleAddItems} favorites={favoriteUsers}
-                            disabled={disabled} />
-                {withGroups && <GroupSearch existing={value} onAddItems={handleAddItems} disabled={disabled} />}
-            </Button.Group>
+            {!readOnly && (
+                <Button.Group>
+                    <Button icon="add" as="div" disabled />
+                    <UserSearch existing={value} onAddItems={handleAddItems} favorites={favoriteUsers}
+                                disabled={disabled} />
+                    {withGroups && <GroupSearch existing={value} onAddItems={handleAddItems} disabled={disabled} />}
+                </Button.Group>
+            )}
         </>
     );
 };
@@ -125,6 +132,7 @@ const PrincipalListField = (props) => {
 PrincipalListField.propTypes = {
     value: PropTypes.arrayOf(PropTypes.string).isRequired,
     disabled: PropTypes.bool.isRequired,
+    readOnly: PropTypes.bool,
     onChange: PropTypes.func.isRequired,
     onFocus: PropTypes.func.isRequired,
     onBlur: PropTypes.func.isRequired,
@@ -134,6 +142,7 @@ PrincipalListField.propTypes = {
 
 PrincipalListField.defaultProps = {
     withGroups: false,
+    readOnly: false,
 };
 
 // eslint-disable-next-line react/prop-types
@@ -157,8 +166,10 @@ const PendingPrincipalListItem = ({isGroup}) => (
     </List.Item>
 );
 
-// eslint-disable-next-line react/prop-types
-const PrincipalListItem = ({isGroup, name, detail, onDelete, onAddFavorite, onDelFavorite, disabled, favorite}) => (
+const PrincipalListItem = (
+    // eslint-disable-next-line react/prop-types
+    {isGroup, name, detail, onDelete, onAddFavorite, onDelFavorite, disabled, readOnly, favorite}
+) => (
     <List.Item>
         <div styleName="item">
             <div styleName="icon">
@@ -174,19 +185,21 @@ const PrincipalListItem = ({isGroup, name, detail, onDelete, onAddFavorite, onDe
                     </List.Description>
                 )}
             </div>
-            <div styleName="actions">
-                {!isGroup && (
-                    favorite ? (
-                        <Icon styleName="button favorite active" name="star" size="large"
-                              onClick={onDelFavorite} disabled={disabled} />
-                    ) : (
-                        <Icon styleName="button favorite" name="star outline" size="large"
-                              onClick={onAddFavorite} disabled={disabled} />
-                    )
-                )}
-                <Icon styleName="button delete" name="remove" size="large"
-                      onClick={onDelete} disabled={disabled} />
-            </div>
+            {!readOnly && (
+                <div styleName="actions">
+                    {!isGroup && (
+                        favorite ? (
+                            <Icon styleName="button favorite active" name="star" size="large"
+                                  onClick={onDelFavorite} disabled={disabled} />
+                        ) : (
+                            <Icon styleName="button favorite" name="star outline" size="large"
+                                  onClick={onAddFavorite} disabled={disabled} />
+                        )
+                    )}
+                    <Icon styleName="button delete" name="remove" size="large"
+                          onClick={onDelete} disabled={disabled} />
+                </div>
+            )}
         </div>
     </List.Item>
 );
