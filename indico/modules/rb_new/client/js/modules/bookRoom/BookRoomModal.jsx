@@ -480,17 +480,7 @@ class BookRoomModal extends React.Component {
             bookingBlocked(fprops) ||
             (conflictsExist && !skipConflicts)
         );
-        const legendLabels = [
-            {label: Translate.string('Available'), style: 'available'},
-            {label: Translate.string('Booked'), style: 'booking'},
-            {label: Translate.string('Pre-Booked'), style: 'pre-booking'},
-            {label: Translate.string('Invalid occurrence'), style: 'conflicting-candidate'},
-            {label: Translate.string('Conflict'), style: 'conflict'},
-            {label: Translate.string('Conflict with Pre-Booking'), style: 'pre-booking-conflict'},
-            {label: Translate.string('Blocked'), style: 'blocking'},
-            {label: Translate.string('Blocked (allowed)'), style: 'overridable-blocking'},
-            {label: Translate.string('Not bookable'), style: 'unbookable'}
-        ];
+
         const renderModalContent = (fprops) => (
             <>
                 <Modal.Header>
@@ -578,8 +568,7 @@ class BookRoomModal extends React.Component {
                                              onClose={this.hideConflicts}
                                              room={room}
                                              roomAvailability={availability}
-                                             title={<Translate>Bookings</Translate>}
-                                             legendLabels={legendLabels} />
+                                             title={<Translate>Bookings</Translate>} />
                 </Modal.Actions>
             </>
         );

@@ -158,16 +158,6 @@ class RowActionsDropdown extends React.Component {
         if (!canCancel && !canReject && !room) {
             return null;
         }
-        const legendLabels = [
-            {label: Translate.string('Available'), style: 'available'},
-            {label: Translate.string('Booked'), style: 'booking'},
-            {label: Translate.string('Pre-Booked'), style: 'pre-booking'},
-            {label: Translate.string('Invalid occurrence'), style: 'conflicting-candidate'},
-            {label: Translate.string('Conflict'), style: 'conflict'},
-            {label: Translate.string('Conflict with Pre-Booking'), style: 'pre-booking-conflict'},
-            {label: Translate.string('Blocked'), style: 'blocking'},
-            {label: Translate.string('Not bookable'), style: 'unbookable'}
-        ];
 
         const styleName = (dropdownOpen ? 'dropdown-button open' : 'dropdown-button');
         return (
@@ -233,8 +223,7 @@ class RowActionsDropdown extends React.Component {
                 {room && (
                     <SingleRoomTimelineModal open={activeRoomTimeline}
                                              onClose={this.hideRoomTimeline}
-                                             room={room}
-                                             legendLabels={legendLabels} />
+                                             room={room} />
                 )}
             </div>
         );
