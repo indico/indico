@@ -88,7 +88,7 @@ const searchFactory = config => {
                                 loading={fprops.submitting}
                                 primary
                                 content={Translate.string('Search')} />
-                        {favorites && (
+                        {!_.isEmpty(favorites) && (
                             <Dropdown floating labeled text={Translate.string('Select favorite')}>
                                 <Dropdown.Menu>
                                     {_.sortBy(Object.values(favorites), 'name').map(x => (
