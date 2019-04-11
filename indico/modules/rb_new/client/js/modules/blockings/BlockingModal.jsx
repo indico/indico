@@ -24,7 +24,8 @@ import {Button, Confirm, Form, Grid, Message, Icon, Modal, Popup, TextArea} from
 import {Form as FinalForm, Field} from 'react-final-form';
 import {Param, Translate} from 'indico/react/i18n';
 import {ReduxFormField, formatters, validators as v} from 'indico/react/forms';
-import {DatePeriodField, PrincipalSearchField} from 'indico/react/components';
+import {DatePeriodField, PrincipalListField} from 'indico/react/components';
+import {FavoritesProvider} from 'indico/react/hooks';
 import RoomSelector from '../../components/RoomSelector';
 import {selectors as userSelectors} from '../../common/user';
 import * as blockingsActions from './actions';
@@ -110,18 +111,6 @@ class BlockingModal extends React.Component {
         } else {
             this.setState({newBlocking: rv.data});
         }
-    };
-
-    renderPrincipalSearchField = (props) => {
-        const {favoriteUsers} = this.props;
-        return (
-            <ReduxFormField {...props}
-                            favoriteUsers={favoriteUsers}
-                            as={PrincipalSearchField}
-                            label={Translate.string('Allowed users / groups')}
-                            multiple
-                            withGroups />
-        );
     };
 
     renderBlockingPeriodField = ({input, ...props}) => {
@@ -268,16 +257,6 @@ class BlockingModal extends React.Component {
         }
     };
 
-    hasAllowedFieldChanged = (prevValue, nextValue) => {
-        if (!prevValue || prevValue.length !== nextValue.length) {
-            return true;
-        }
-
-        prevValue = _.sortBy(prevValue, 'id');
-        nextValue = _.sortBy(nextValue, 'id');
-        return !_.every(nextValue, (val, index) => val.id === prevValue[index].id);
-    };
-
     deleteBlocking = () => {
         const {blocking: {id}, actions: {deleteBlocking}, onClose} = this.props;
         deleteBlocking(id);
@@ -396,10 +375,17 @@ class BlockingModal extends React.Component {
                                        formatOnBlur />
                             </Grid.Column>
                             <Grid.Column width={8}>
-                                <Field name="allowed"
-                                       isEqual={(a, b) => !this.hasAllowedFieldChanged(a, b)}
-                                       render={this.renderPrincipalSearchField}
-                                       disabled={mode === 'view' || submitSucceeded} />
+                                <FavoritesProvider>
+                                    {favoriteUsersController => (
+                                        <Field name="allowed" component={ReduxFormField}
+                                               as={PrincipalListField} withGroups
+                                               favoriteUsersController={favoriteUsersController}
+                                               isEqual={(a, b) => _.isEqual(a.sort(), b.sort())}
+                                               label={Translate.string('Authorized users/groups')}
+                                               readOnly={mode === 'view'}
+                                               disabled={mode === 'view' || submitSucceeded} />
+                                    )}
+                                </FavoritesProvider>
                                 <Field name="rooms"
                                        isEqual={_.isEqual}
                                        render={this.renderRoomSearchField}

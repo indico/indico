@@ -35,14 +35,9 @@ export const ajax = {
         onlyIf: ({rooms}) => rooms && rooms.length,
         serializer: ({rooms}) => rooms.map((room) => room.id)
     },
-    allowed_principals: {
+    allowed: {
         onlyIf: ({allowed}) => !!allowed,
-        serializer: ({allowed}) => allowed.map((obj) => ({
-            id: obj.id,
-            is_group: obj.isGroup,
-            provider: obj.provider,
-            name: obj.name
-        }))
+        serializer: ({allowed}) => allowed,
     },
     reason: {
         onlyIf: ({reason}) => !!reason,

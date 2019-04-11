@@ -20,6 +20,7 @@ import principalsURL from 'indico-url:core.principals';
 
 import _ from 'lodash';
 import {useEffect, useState} from 'react';
+import PropTypes from 'prop-types';
 import {handleAxiosError, indicoAxios} from '../utils/axios';
 import {camelizeKeys} from '../utils/case';
 
@@ -106,4 +107,21 @@ export const useFavoriteUsers = () => {
     }, []);
 
     return [favorites, [add, del]];
+};
+
+
+/**
+ * FavoritesProvider can be used to get the favorite controller
+ * in a class-based component.
+ *
+ * Do not use this for new components; write them as functional
+ * components instead!
+ */
+export const FavoritesProvider = ({children}) => {
+    const favoriteUsersController = useFavoriteUsers();
+    return children(favoriteUsersController);
+};
+
+FavoritesProvider.propTypes = {
+    children: PropTypes.func.isRequired,
 };

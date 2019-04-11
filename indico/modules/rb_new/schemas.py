@@ -27,7 +27,6 @@ from indico.core.db.sqlalchemy.links import LinkType
 from indico.core.marshmallow import mm
 from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.rb.models.blocked_rooms import BlockedRoom, BlockedRoomState
-from indico.modules.rb.models.blocking_principals import BlockingPrincipal
 from indico.modules.rb.models.blockings import Blocking
 from indico.modules.rb.models.equipment import EquipmentType
 from indico.modules.rb.models.locations import Location
@@ -43,7 +42,7 @@ from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.util import rb_is_admin
 from indico.modules.users.schemas import UserSchema
 from indico.util.i18n import _
-from indico.util.marshmallow import NaiveDateTime
+from indico.util.marshmallow import NaiveDateTime, PrincipalList
 from indico.util.string import natural_sort_key
 
 
@@ -219,21 +218,9 @@ class BlockedRoomSchema(mm.ModelSchema):
         return data
 
 
-class BlockingPrincipalSchema(mm.ModelSchema):
-    identifier = Function(lambda blocking_principal: blocking_principal.identifier)
-    full_name = String()
-    provider = String(missing=None)
-    email = String(missing=None)
-    is_group = Boolean(missing=False)
-
-    class Meta:
-        model = BlockingPrincipal
-        fields = ('id', 'identifier', 'name', 'is_group', 'email', 'full_name', 'provider')
-
-
 class BlockingSchema(mm.ModelSchema):
     blocked_rooms = Nested(BlockedRoomSchema, many=True)
-    allowed = Nested(BlockingPrincipalSchema, many=True)
+    allowed = PrincipalList()
     permissions = Method('_get_permissions')
     created_by = Pluck(UserSchema, 'full_name', attribute='created_by_user')
 

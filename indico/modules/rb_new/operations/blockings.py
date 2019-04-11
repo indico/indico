@@ -25,13 +25,11 @@ from sqlalchemy.orm import contains_eager, selectinload
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.queries import db_dates_overlap
 from indico.core.db.sqlalchemy.util.session import no_autoflush
-from indico.modules.groups import GroupProxy
 from indico.modules.rb.models.blocked_rooms import BlockedRoom, BlockedRoomState
 from indico.modules.rb.models.blockings import Blocking
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.notifications.blockings import notify_request
 from indico.modules.rb_new.operations.rooms import get_managed_room_ids
-from indico.modules.users.models.users import User
 from indico.util.struct.iterables import group_list
 
 
@@ -69,24 +67,13 @@ def get_rooms_blockings(rooms, start_date, end_date):
     return group_list(query, key=lambda obj: obj.room_id)
 
 
-def _group_id_or_name(principal):
-    provider = principal['provider']
-    if provider is None or provider == 'indico':
-        return principal['id']
-    else:
-        return principal['name']
-
-
 @no_autoflush
-def _populate_blocking(blocking, room_ids, allowed_principals, reason):
+def _populate_blocking(blocking, room_ids, allowed, reason):
     blocking.reason = reason
-    principals = {GroupProxy(_group_id_or_name(pr), provider=pr['provider'])
-                  if pr.get('is_group')
-                  else User.get_one(pr['id'])
-                  for pr in allowed_principals}
+    blocking.allowed = allowed
     # We don't use `=` here to prevent SQLAlchemy from deleting and re-adding unchanged entries
-    blocking.allowed |= principals  # add new
-    blocking.allowed &= principals  # remove deleted
+    blocking.allowed |= allowed  # add new
+    blocking.allowed &= allowed  # remove deleted
     _update_blocked_rooms(blocking, room_ids)
 
 
@@ -122,19 +109,19 @@ def _approve_or_request_rooms(blocking, blocked_rooms=None):
         notify_request(owner, blocking, rooms)
 
 
-def create_blocking(room_ids, allowed_principals, start_date, end_date, reason, created_by):
+def create_blocking(room_ids, allowed, start_date, end_date, reason, created_by):
     blocking = Blocking()
     blocking.start_date = start_date
     blocking.end_date = end_date
     blocking.created_by_user = created_by
-    _populate_blocking(blocking, room_ids, allowed_principals, reason)
+    _populate_blocking(blocking, room_ids, allowed, reason)
     db.session.add(blocking)
     db.session.flush()
     return blocking
 
 
-def update_blocking(blocking, room_ids, allowed_principals, reason):
-    _populate_blocking(blocking, room_ids, allowed_principals, reason)
+def update_blocking(blocking, room_ids, allowed, reason):
+    _populate_blocking(blocking, room_ids, allowed, reason)
     db.session.flush()
 
 

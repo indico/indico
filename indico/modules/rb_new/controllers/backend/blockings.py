@@ -27,6 +27,7 @@ from indico.modules.rb.models.blocked_rooms import BlockedRoom
 from indico.modules.rb.models.blockings import Blocking
 from indico.modules.rb_new.operations.blockings import create_blocking, get_room_blockings, update_blocking
 from indico.modules.rb_new.schemas import blockings_schema
+from indico.util.marshmallow import PrincipalList
 
 
 class RHCreateRoomBlocking(RHRoomBookingBase):
@@ -35,7 +36,7 @@ class RHCreateRoomBlocking(RHRoomBookingBase):
         'start_date': fields.Date(required=True),
         'end_date': fields.Date(required=True),
         'reason': fields.Str(required=True),
-        'allowed_principals': fields.List(fields.Dict(), missing=[])
+        'allowed': PrincipalList(allow_groups=True, required=True),
     })
     def _process(self, args):
         blocking = create_blocking(created_by=session.user, **args)
@@ -54,7 +55,7 @@ class RHUpdateRoomBlocking(RHRoomBookingBase):
     @use_args({
         'room_ids': fields.List(fields.Int(), required=True),
         'reason': fields.Str(required=True),
-        'allowed_principals': fields.List(fields.Dict(), missing=[])
+        'allowed': PrincipalList(allow_groups=True, required=True),
     })
     def _process(self, args):
         update_blocking(self.blocking, **args)
