@@ -55,7 +55,7 @@
 {% macro _render_proposed_contrib_types(review_list) %}
     {%- for type, reviews in review_list|groupby('proposed_contribution_type') %}
         {%- if type %}
-            {{- reviews|selectattr('proposed_contribution_type', 'equalto', type)|list|length}}
+            {{- reviews|selectattr('proposed_contribution_type', 'equalto', type)|list|length }}
             {{ type.name -}}
             {{- ", " if not loop.last -}}
         {% endif -%}
@@ -149,7 +149,9 @@
                                 </td>
                                 {% for item in static_columns %}
                                     {% if item.id == 'state' %}
-                                        <td class="i-table" data-searchable="{{ abstract.public_state.title | lower }}">
+                                        {% set acceptances = abstract.reviews|selectattr('proposed_action.name', 'equalto', 'accept')|list|length %}
+                                        {% set sort_text = '{}-{}-{}'.format('1' if abstract.is_in_final_state else '0', abstract.state.name, acceptances) %}
+                                        <td class="i-table" data-searchable="{{ abstract.public_state.title | lower }}" data-text="{{ sort_text }}">
                                             {{ _render_abstract_state(abstract) }}
                                             {% if context_track is not none and abstract.state.name == 'accepted' and abstract.accepted_track != context_track  %}
                                                 <span class="icon-warning"></span>
