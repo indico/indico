@@ -108,12 +108,19 @@ export default class DailyTimelineContent extends React.Component {
         );
     };
 
+    hasOccurrenceActions = (booking) => {
+        return Object.values(booking.occurrences.bookings).some(([occ]) => {
+            return (occ && (occ.canCancel || occ.canReject));
+        });
+    };
+
     get hasActions() {
-        const {rowActions} = this.props;
-        return Object.values(rowActions).includes(true);
+        const {booking, rowActions} = this.props;
+        const hasOccurrenceActions = rowActions.occurrence ? this.hasOccurrenceActions(booking) : false;
+        return rowActions.roomTimeline || hasOccurrenceActions;
     }
 
-    renderTimelineRow({availability, label, verboseLabel, room}, key, rowStyle = null) {
+    renderTimelineRow({availability, label, verboseLabel, room}, key, hasActions, rowStyle = null) {
         const {minHour, maxHour, onClickCandidate, onClickReservation, longLabel, gutterAllowed} = this.props;
 
         const hasConflicts = !(_.isEmpty(availability.conflicts) && _.isEmpty(availability.preConflicts));
@@ -136,7 +143,7 @@ export default class DailyTimelineContent extends React.Component {
                                }}
                                {...itemProps} />
                 </div>
-                {this.hasActions && (
+                {hasActions && (
                     <div styleName="timeline-row-actions">
                         {this.renderRowActions(availability, room)}
                     </div>
@@ -164,7 +171,7 @@ export default class DailyTimelineContent extends React.Component {
 
         return (
             <div styleName="timeline-header" className={!selectable ? 'timeline-non-selectable' : ''}>
-                {renderHeader ? renderHeader() : this.renderDefaultHeader(hourSpan, hourSeries)}
+                {renderHeader ? renderHeader() : this.renderDefaultHeader(hourSpan, hourSeries, this.hasActions)}
             </div>
         );
     }
@@ -181,7 +188,7 @@ export default class DailyTimelineContent extends React.Component {
         return <RowActionsDropdown {...props} />;
     };
 
-    renderDefaultHeader = (hourSpan, hourSeries) => {
+    renderDefaultHeader = (hourSpan, hourSeries, hasActions) => {
         const {hourStep, longLabel} = this.props;
         const labelWidth = longLabel ? 200 : 150;
 
@@ -199,7 +206,7 @@ export default class DailyTimelineContent extends React.Component {
                         </div>
                     ))}
                 </div>
-                {this.hasActions && <div styleName="timeline-header-actions" />}
+                {hasActions && <div styleName="timeline-header-actions" />}
             </>
         );
     };
@@ -214,11 +221,11 @@ export default class DailyTimelineContent extends React.Component {
         ))
     );
 
-    renderList(hourSpan, width, height = null, extraProps = {}) {
+    renderList(hourSpan, hasActions, width, height = null, extraProps = {}) {
         const {rows, hourStep, longLabel, isLoading} = this.props;
         const {selectable} = this.state;
         const labelWidth = longLabel ? 200 : 150;
-        const actionsWidth = this.hasActions ? 70 : 0;
+        const actionsWidth = hasActions ? 70 : 0;
         const rowHeight = 50;
 
         return (
@@ -238,7 +245,7 @@ export default class DailyTimelineContent extends React.Component {
                               rowHeight={50}
                               noRowsRenderer={this.renderTimelineItemPlaceholders}
                               rowRenderer={({index, style, key}) => (
-                                  this.renderTimelineRow(rows[index], key, style)
+                                  this.renderTimelineRow(rows[index], key, hasActions, style)
                               )}
                               {...extraProps}
                               tabIndex={null} />
@@ -256,13 +263,14 @@ export default class DailyTimelineContent extends React.Component {
         const WrapperComponent = lazyScroll ? LazyScroll : React.Fragment;
         const wrapperProps = lazyScroll || {};
         const hourSpan = maxHour - minHour;
+        const hasActions = this.hasActions;
 
         const windowScrollerWrapper = (
             <WindowScroller>
                 {({height, isScrolling, onChildScroll, scrollTop}) => (
                     <AutoSizer disableHeight>
                         {({width}) => (
-                            this.renderList(hourSpan, width, height, {
+                            this.renderList(hourSpan, hasActions, width, height, {
                                 isScrolling,
                                 scrollTop,
                                 onScroll: onChildScroll,
@@ -278,7 +286,7 @@ export default class DailyTimelineContent extends React.Component {
             <div style={{height: h}} styleName="auto-sizer-wrapper">
                 <AutoSizer>
                     {({width}) => (
-                        this.renderList(hourSpan, width)
+                        this.renderList(hourSpan, hasActions, width)
                     )}
                 </AutoSizer>
             </div>
