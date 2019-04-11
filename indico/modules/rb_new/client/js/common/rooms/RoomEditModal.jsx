@@ -103,7 +103,7 @@ function validate(fields) {
         errors.nonbookablePeriods = Translate.string('Please provide valid non-bookable periods.');
     }
     if (!owner) {
-        errors.owner = Translate.string('You need to specify the owner of the toom.');
+        errors.owner = Translate.string('You need to specify the owner of the room.');
     }
     return errors;
 }
