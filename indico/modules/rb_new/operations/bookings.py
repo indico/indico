@@ -278,7 +278,7 @@ def check_room_available(room, start_dt, end_dt):
     nonbookable_periods = any(get_rooms_nonbookable_periods([room], start_dt, end_dt))
     blockings = get_rooms_blockings([room], start_dt, end_dt).get(room.id, [])
     blocked_for_user = any(blocking for blocking in blockings
-                           if not blocking.blocking.can_be_overridden(session.user, room, explicit_only=True))
+                           if not blocking.blocking.can_override(session.user, room=room, explicit_only=True))
     user_booking = any(booking for booking in bookings if booking.reservation.booked_for_id == session.user.id)
     user_prebooking = any(prebooking for prebooking in prebookings
                           if prebooking.reservation.booked_for_id == session.user.id)

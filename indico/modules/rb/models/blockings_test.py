@@ -62,14 +62,14 @@ def test_can_edit_delete(dummy_blocking, create_user, is_admin, is_creator, expe
     bool_matrix('!00..', expect=True) +         # creator or admin
     bool_matrix(' 00..', expect='all_dynamic')  # room owner
 )
-def test_can_be_overridden(dummy_room, dummy_blocking, create_user,
-                           is_creator, is_admin, has_room, is_room_owner, expected):
+def test_can_override(dummy_room, dummy_blocking, create_user,
+                      is_creator, is_admin, has_room, is_room_owner, expected):
     user = create_user(123, rb_admin=is_admin)
     if is_room_owner:
-        dummy_room.owner = user
+        dummy_room.update_principal(user, full_access=True)
     if is_creator:
         dummy_blocking.created_by_user = user
-    assert dummy_blocking.can_be_overridden(user, dummy_room if has_room else None) == expected
+    assert dummy_blocking.can_override(user, dummy_room if has_room else None) == expected
 
 
 @pytest.mark.parametrize(
@@ -77,14 +77,14 @@ def test_can_be_overridden(dummy_room, dummy_blocking, create_user,
     bool_matrix('1...', expect=True) +
     bool_matrix('0...', expect=False)
 )
-def test_can_be_overridden_explicit_only(dummy_room, dummy_blocking, create_user,
-                                         is_creator, is_admin, has_room, is_room_owner, expected):
+def test_can_override_explicit_only(dummy_room, dummy_blocking, create_user,
+                                    is_creator, is_admin, has_room, is_room_owner, expected):
     user = create_user(123, rb_admin=is_admin)
     if is_room_owner:
-        dummy_room.owner = user
+        dummy_room.update_principal(user, full_access=True)
     if is_creator:
         dummy_blocking.created_by_user = user
-    assert dummy_blocking.can_be_overridden(user, dummy_room if has_room else None, explicit_only=True) == expected
+    assert dummy_blocking.can_override(user, dummy_room if has_room else None, explicit_only=True) == expected
 
 
 @pytest.mark.parametrize(('in_acl', 'expected'), (
@@ -92,17 +92,17 @@ def test_can_be_overridden_explicit_only(dummy_room, dummy_blocking, create_user
     ('group', True),
     (False,   False)
 ))
-def test_can_be_overridden_acl(dummy_blocking, dummy_user, create_user, dummy_group, in_acl, expected):
+def test_can_override_acl(dummy_blocking, dummy_user, create_user, dummy_group, in_acl, expected):
     user = create_user(123, groups={dummy_group})
     dummy_blocking.allowed = {dummy_user}
     if in_acl == 'user':
         dummy_blocking.allowed.add(user)
     elif in_acl == 'group':
         dummy_blocking.allowed.add(dummy_group)
-    assert dummy_blocking.can_be_overridden(user) == expected
+    assert dummy_blocking.can_override(user) == expected
 
 
-def test_can_be_no_user(dummy_blocking):
+def test_can_no_user(dummy_blocking):
     assert not dummy_blocking.can_edit(None)
     assert not dummy_blocking.can_delete(None)
-    assert not dummy_blocking.can_be_overridden(None)
+    assert not dummy_blocking.can_override(None)

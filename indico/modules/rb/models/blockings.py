@@ -103,22 +103,22 @@ class Blocking(db.Model):
             return False
         return user == self.created_by_user or (allow_admin and rb_is_admin(user))
 
-    def can_be_overridden(self, user, room=None, explicit_only=False):
-        """Determines if a user can override the blocking
+    def can_override(self, user, room=None, explicit_only=False, allow_admin=True):
+        """Check if a user can override the blocking
 
         The following persons are authorized to override a blocking:
-        - owner (the one who created the blocking)
-        - any users on the blocking's ACL
-        - unless explicit_only is set: admins and room owners (if a room is given)
+        - the creator of the blocking
+        - anyone on the blocking's ACL
+        - unless explicit_only is set: rb admins and room managers (if a room is given)
         """
         if not user:
             return False
         if self.created_by_user == user:
             return True
         if not explicit_only:
-            if rb_is_admin(user):
+            if allow_admin and rb_is_admin(user):
                 return True
-            elif room and room.is_owned_by(user):
+            if room and room.can_manage(user):
                 return True
         return any(user in principal for principal in iter_acl(self.allowed))
 

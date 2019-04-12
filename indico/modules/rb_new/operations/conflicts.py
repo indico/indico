@@ -103,7 +103,7 @@ def get_room_blockings_conflicts(room_id, candidates, occurrences):
         for occurrence in occurrences:
             blocking = occurrence.blocking
             if blocking.start_date <= candidate.start_dt.date() <= blocking.end_date:
-                if blocking.can_be_overridden(session.user, room=Room.get(room_id)):
+                if blocking.can_override(session.user, room=Room.get(room_id)):
                     continue
                 conflicting_candidates.add(candidate)
                 obj = TempReservationOccurrence(candidate.start_dt, candidate.end_dt, None)

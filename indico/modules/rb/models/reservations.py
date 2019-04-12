@@ -539,7 +539,7 @@ class Reservation(Serializer, db.Model):
         blocked_rooms = self.room.get_blocked_rooms(*(occurrence.start_dt for occurrence in self.occurrences))
         for br in blocked_rooms:
             blocking = br.blocking
-            if blocking.can_be_overridden(user, self.room):
+            if blocking.can_override(user, room=self.room):
                 continue
             for occurrence in self.occurrences:
                 if occurrence.is_valid and blocking.is_active_at(occurrence.start_dt.date()):
