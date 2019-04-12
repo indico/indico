@@ -28,7 +28,6 @@ class _EnumIntWrapper(int):
 
     def __init__(self, enum_member):
         self.enum_member = enum_member
-        super(_EnumIntWrapper, self).__init__(enum_member.value)
 
     def __repr__(self):
         return repr(self.enum_member)
