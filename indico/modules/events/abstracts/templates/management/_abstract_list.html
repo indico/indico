@@ -71,12 +71,12 @@
                     <div class="semantic-text {{ action.css_class }}">
                         <strong>{{ review_list|selectattr('proposed_action', 'equalto', action)|list|length }}</strong>
                         {{ action.title }}
+                        {% if action.name == 'accept' %}
+                            <div class="contrib-types">
+                                ({{- _render_proposed_contrib_types(review_list) -}})
+                            </div>
+                        {% endif %}
                     </div>
-                    {% if action.name == 'accept' %}
-                        <div class="contrib-types">
-                            ({{- _render_proposed_contrib_types(review_list) -}})
-                        </div>
-                    {% endif %}
                 {% endfor %}
             </div>
         {% endif %}

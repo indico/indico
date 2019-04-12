@@ -33,11 +33,11 @@
     padding: 0.1em 0.25em;
 
     .title {
-        padding-bottom: 0.25em;
+        padding-bottom: 0.3em;
     }
 
-    & > * {
-        line-height: 1.2em;
+    .semantic-text {
+        padding: 0.15em 0;
     }
 
     .contrib-types {
