@@ -16,13 +16,13 @@
  */
 
 import React from 'react';
+import PropTypes from 'prop-types';
 import {Icon, List, Loader} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
 
 import './items.module.scss';
 
 
-// eslint-disable-next-line react/prop-types
 export const PendingPrincipalListItem = ({isGroup}) => (
     <List.Item>
         <div styleName="item">
@@ -43,8 +43,15 @@ export const PendingPrincipalListItem = ({isGroup}) => (
     </List.Item>
 );
 
+PendingPrincipalListItem.propTypes = {
+    isGroup: PropTypes.bool,
+};
+
+PendingPrincipalListItem.defaultProps = {
+    isGroup: false,
+};
+
 export const PrincipalListItem = (
-    // eslint-disable-next-line react/prop-types
     {isGroup, name, detail, onDelete, onAddFavorite, onDelFavorite, disabled, readOnly, favorite, search}
 ) => (
     <List.Item>
@@ -82,11 +89,27 @@ export const PrincipalListItem = (
     </List.Item>
 );
 
+PrincipalListItem.propTypes = {
+    isGroup: PropTypes.bool,
+    name: PropTypes.string.isRequired,
+    detail: PropTypes.string,
+    onDelete: PropTypes.func.isRequired,
+    onAddFavorite: PropTypes.func.isRequired,
+    onDelFavorite: PropTypes.func.isRequired,
+    disabled: PropTypes.bool,
+    readOnly: PropTypes.bool,
+    favorite: PropTypes.bool.isRequired,
+    search: PropTypes.node,
+};
+
 PrincipalListItem.defaultProps = {
+    disabled: false,
+    readOnly: false,
+    isGroup: false,
+    detail: null,
     search: null,
 };
 
-// eslint-disable-next-line react/prop-types
 export const EmptyPrincipalListItem = ({search}) => (
     <List.Item>
         <div styleName="item">
@@ -111,3 +134,11 @@ export const EmptyPrincipalListItem = ({search}) => (
         </div>
     </List.Item>
 );
+
+EmptyPrincipalListItem.propTypes = {
+    search: PropTypes.node,
+};
+
+EmptyPrincipalListItem.defaultProps = {
+    search: null,
+};

@@ -103,7 +103,6 @@ const PrincipalField = (props) => {
                         details ? (
                             <PrincipalListItem name={details.name}
                                                detail={details.detail}
-                                               isGroup={false}
                                                favorite={details.userId in favoriteUsers}
                                                onDelete={() => !disabled && handleClear()}
                                                onAddFavorite={() => !disabled && handleAddFavorite(details.userId)}
@@ -111,7 +110,7 @@ const PrincipalField = (props) => {
                                                disabled={disabled}
                                                search={userSearch} />
                         ) : (
-                            <PendingPrincipalListItem isGroup={false} />
+                            <PendingPrincipalListItem />
                         )
                     )}
                 </List>
