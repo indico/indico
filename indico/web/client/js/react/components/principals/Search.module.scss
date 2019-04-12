@@ -15,16 +15,6 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-@import 'base/palette';
-
-.list {
-    margin-top: 0 !important;
-    height: 200px;
-    overflow-y: scroll;
-}
-
-.empty {
-    padding-top: 20px !important;
-    text-align: center;
-    color: $light-black;
+.search-buttons :global(.dropdown) {
+    margin-left: 1em;
 }

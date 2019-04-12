@@ -20,11 +20,12 @@ import principalsURL from 'indico-url:core.principals';
 import _ from 'lodash';
 import React, {useEffect, useState} from 'react';
 import PropTypes from 'prop-types';
-import {Button, Icon, List, Loader} from 'semantic-ui-react';
+import {Button, List} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {camelizeKeys} from 'indico/utils/case';
 import {UserSearch, GroupSearch} from './Search';
+import {PendingPrincipalListItem, PrincipalListItem} from './items';
 
 import './PrincipalListField.module.scss';
 
@@ -144,64 +145,5 @@ PrincipalListField.defaultProps = {
     withGroups: false,
     readOnly: false,
 };
-
-// eslint-disable-next-line react/prop-types
-const PendingPrincipalListItem = ({isGroup}) => (
-    <List.Item>
-        <div styleName="item">
-            <div styleName="icon">
-                <Icon name={isGroup ? 'users' : 'user'} size="large" />
-            </div>
-            <div styleName="content">
-                <List.Content>
-                    {isGroup
-                        ? <Translate>Unknown group</Translate>
-                        : <Translate>Unknown user</Translate>}
-                </List.Content>
-            </div>
-            <div styleName="loader">
-                <Loader active inline size="small" />
-            </div>
-        </div>
-    </List.Item>
-);
-
-const PrincipalListItem = (
-    // eslint-disable-next-line react/prop-types
-    {isGroup, name, detail, onDelete, onAddFavorite, onDelFavorite, disabled, readOnly, favorite}
-) => (
-    <List.Item>
-        <div styleName="item">
-            <div styleName="icon">
-                <Icon name={isGroup ? 'users' : 'user'} size="large" />
-            </div>
-            <div styleName="content">
-                <List.Content>
-                    {name}
-                </List.Content>
-                {detail && (
-                    <List.Description>
-                        <small>{detail}</small>
-                    </List.Description>
-                )}
-            </div>
-            {!readOnly && (
-                <div styleName="actions">
-                    {!isGroup && (
-                        favorite ? (
-                            <Icon styleName="button favorite active" name="star" size="large"
-                                  onClick={onDelFavorite} disabled={disabled} />
-                        ) : (
-                            <Icon styleName="button favorite" name="star outline" size="large"
-                                  onClick={onAddFavorite} disabled={disabled} />
-                        )
-                    )}
-                    <Icon styleName="button delete" name="remove" size="large"
-                          onClick={onDelete} disabled={disabled} />
-                </div>
-            )}
-        </div>
-    </List.Item>
-);
 
 export default React.memo(PrincipalListField);

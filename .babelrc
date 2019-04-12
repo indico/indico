@@ -19,7 +19,8 @@
         ".scss": {
           "syntax": "postcss-scss"
         }
-      }
+      },
+      "autoResolveMultipleImports": true
     }]
   ]
 }

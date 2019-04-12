@@ -30,7 +30,8 @@ import {Translate, PluralTranslate, Singular, Plural, Param} from 'indico/react/
 import {indicoAxios} from 'indico/utils/axios';
 import {camelizeKeys} from 'indico/utils/case';
 
-import './PrincipalListField.module.scss';
+import './items.module.scss';
+import './Search.module.scss';
 
 
 const searchFactory = config => {
@@ -177,7 +178,7 @@ const searchFactory = config => {
         );
     };
 
-    const Search = ({disabled, existing, onAddItems, favorites}) => {
+    const Search = ({disabled, existing, onAddItems, favorites, triggerFactory, single, onClose}) => {
         const [open, setOpen] = useState(false);
         const [staged, setStaged] = useState([]);
 
@@ -186,7 +187,10 @@ const searchFactory = config => {
         };
 
         const handleAdd = item => {
-            if (!isAdded(item)) {
+            if (single) {
+                onAddItems(item);
+                setOpen(false);
+            } else if (!isAdded(item)) {
                 setStaged(prev => [...prev, item]);
             }
         };
@@ -197,27 +201,31 @@ const searchFactory = config => {
             setOpen(false);
         };
 
-        const handleCancelButtonClick = () => {
+        const handleClose = () => {
             setStaged([]);
             setOpen(false);
+            onClose();
         };
 
-        const trigger = (
+        const trigger = triggerFactory ? (
+            triggerFactory(() => setOpen(true))
+        ) : (
             <Button type="button"
                     content={buttonTitle}
                     disabled={disabled}
                     onClick={() => setOpen(true)} />
         );
+
         return (
             <Modal trigger={trigger}
                    size="tiny"
                    dimmer="inverted"
                    centered={false}
                    open={open}
-                   onClose={handleCancelButtonClick}
+                   onClose={handleClose}
                    closeIcon>
                 <Modal.Header>
-                    {modalTitle}
+                    {modalTitle(single)}
                     {!!staged.length && (
                         <>
                             {' '}
@@ -236,10 +244,12 @@ const searchFactory = config => {
                     <SearchContent favorites={favorites} onAdd={handleAdd} isAdded={isAdded} />
                 </Modal.Content>
                 <Modal.Actions>
-                    <Button onClick={handleAddButtonClick} disabled={!staged.length} primary>
-                        <Translate>Confirm</Translate>
-                    </Button>
-                    <Button onClick={handleCancelButtonClick}>
+                    {!single && (
+                        <Button onClick={handleAddButtonClick} disabled={!staged.length} primary>
+                            <Translate>Confirm</Translate>
+                        </Button>
+                    )}
+                    <Button onClick={handleClose}>
                         <Translate>Cancel</Translate>
                     </Button>
                 </Modal.Actions>
@@ -252,11 +262,17 @@ const searchFactory = config => {
         existing: PropTypes.arrayOf(PropTypes.string).isRequired,
         disabled: PropTypes.bool,
         favorites: PropTypes.object,
+        triggerFactory: PropTypes.func,
+        single: PropTypes.bool,
+        onClose: PropTypes.func,
     };
 
     Search.defaultProps = {
         favorites: null,
         disabled: false,
+        triggerFactory: null,
+        single: false,
+        onClose: () => {},
     };
 
     const component = React.memo(Search);
@@ -268,7 +284,7 @@ const searchFactory = config => {
 export const UserSearch = searchFactory({
     componentName: 'UserSearch',
     buttonTitle: Translate.string('User'),
-    modalTitle: Translate.string('Add users'),
+    modalTitle: single => (single ? Translate.string('Select user') : Translate.string('Add users')),
     resultIcon: 'user',
     favoriteKey: 'userId',
     searchFields: (
@@ -323,7 +339,7 @@ export const UserSearch = searchFactory({
 export const GroupSearch = searchFactory({
     componentName: 'GroupSearch',
     buttonTitle: Translate.string('Group'),
-    modalTitle: Translate.string('Add groups'),
+    modalTitle: single => (single ? Translate.string('Select group') : Translate.string('Add groups')),
     resultIcon: 'users',
     searchFields: (
         <>

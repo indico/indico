@@ -15,4 +15,5 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+export {default as PrincipalField} from './PrincipalField';
 export {default as PrincipalListField} from './PrincipalListField';
