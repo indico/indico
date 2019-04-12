@@ -151,22 +151,3 @@ def principal_from_identifier(identifier, allow_groups=False):
         return group
     else:
         raise ValueError('Invalid data')
-
-
-def unify_user_args(fn):
-    """Decorator that unifies new/legacy user arguments.
-
-    Any argument of the decorated function that contains a
-    :class:`AvatarUserWrapper` will be converted to a :class:`User`.
-    """
-    def _convert(arg):
-        from indico.modules.users.legacy import AvatarUserWrapper
-        return arg.user if isinstance(arg, AvatarUserWrapper) else arg
-
-    @wraps(fn)
-    def wrapper(*args, **kwargs):
-        args = map(_convert, args)
-        kwargs = {k: _convert(v) for k, v in kwargs.iteritems()}
-        return fn(*args, **kwargs)
-
-    return wrapper

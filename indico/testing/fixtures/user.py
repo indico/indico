@@ -53,12 +53,6 @@ def dummy_user(create_user):
 
 
 @pytest.fixture
-def dummy_avatar(dummy_user):
-    """Creates a mocked dummy legacy avatar"""
-    return dummy_user.as_avatar
-
-
-@pytest.fixture
 def create_group(db):
     """Returns a callable which lets you create dummy groups"""
     def _create_group(id_):

@@ -36,7 +36,6 @@ from indico.util.date_time import format_date, iterdays
 from indico.util.serializer import Serializer
 from indico.util.string import format_repr, return_ascii
 from indico.util.struct.enum import IndicoEnum
-from indico.util.user import unify_user_args
 
 
 class ReservationOccurrenceState(int, IndicoEnum):
@@ -264,7 +263,6 @@ class ReservationOccurrence(db.Model, Serializer):
         return allow_admin and rb_is_admin(user)
 
     @proxy_to_reservation_if_last_valid_occurrence
-    @unify_user_args
     def cancel(self, user, reason=None, silent=False):
         self.state = ReservationOccurrenceState.cancelled
         self.rejection_reason = reason or None
@@ -278,7 +276,6 @@ class ReservationOccurrence(db.Model, Serializer):
             notify_cancellation(self)
 
     @proxy_to_reservation_if_last_valid_occurrence
-    @unify_user_args
     def reject(self, user, reason, silent=False):
         self.state = ReservationOccurrenceState.rejected
         self.rejection_reason = reason or None

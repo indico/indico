@@ -19,7 +19,7 @@ from mock import MagicMock
 from indico.modules.groups import GroupProxy
 from indico.modules.networks.models.networks import IPNetworkGroup
 from indico.modules.users import User
-from indico.util.user import iter_acl, unify_user_args
+from indico.util.user import iter_acl
 
 
 def test_iter_acl():
@@ -36,21 +36,3 @@ def test_iter_acl():
                                          ipn, ipn_p,
                                          local_group_p, local_group,
                                          remote_group, remote_group_p]
-
-
-def test_unify_user_args(dummy_avatar):
-    avatar = dummy_avatar
-    user = dummy_avatar.user
-
-    @unify_user_args
-    def fn(a, b, c, d, e, f):
-        # posargs
-        assert a == 'foo'
-        assert b == user
-        assert c == user
-        # kwargs
-        assert d == 'bar'
-        assert e == user
-        assert f == user
-
-    fn('foo', user, avatar, d='bar', e=user, f=avatar)
