@@ -249,21 +249,6 @@ def test_filter_available(dummy_room, create_reservation, create_blocking,
     assert set(Room.find_all(availabilty_filter)) == (set() if filtered else {dummy_room})
 
 
-@pytest.mark.parametrize(('is_owner', 'has_group', 'in_group', 'expected'),
-                         bool_matrix('...', expect=lambda x: x[0] or all(x[1:])))
-def test_ownership_functions(dummy_room, create_user, create_room_attribute, create_group,
-                             is_owner, has_group, in_group, expected):
-    other_user = create_user(123)
-    create_room_attribute(u'manager-group')
-    if is_owner:
-        dummy_room.owner = other_user
-    if has_group:
-        dummy_room.set_attribute_value(u'manager-group', u'123')
-    if in_group:
-        other_user.local_groups.add(create_group(123).group)
-    assert dummy_room.is_owned_by(other_user) == expected
-
-
 @pytest.mark.parametrize(('is_admin', 'is_owner', 'max_advance_days', 'days_delta', 'success'), (
     (True,  False, 10,   15, True),
     (False, True,  10,   15, True),
@@ -278,7 +263,7 @@ def test_check_advance_days(create_user, dummy_room, is_admin, is_owner, max_adv
     dummy_room.max_advance_days = max_advance_days
     end_date = date.today() + timedelta(days=days_delta)
     if is_owner:
-        dummy_room.owner = user
+        dummy_room.update_principal(user, full_access=True)
     if success:
         assert dummy_room.check_advance_days(end_date, user, quiet=True)
         assert dummy_room.check_advance_days(end_date, user)
@@ -298,7 +283,7 @@ def test_check_advance_days_no_user(dummy_room):
 def test_check_bookable_hours(db, dummy_room, create_user, is_admin, is_owner, fits, success):
     user = create_user(123, rb_admin=is_admin)
     if is_owner:
-        dummy_room.owner = user
+        dummy_room.update_principal(user, full_access=True)
     dummy_room.bookable_hours = [BookableHours(start_time=time(12), end_time=time(14))]
     db.session.flush()
     booking_hours = (time(12), time(13)) if fits else (time(8), time(9))

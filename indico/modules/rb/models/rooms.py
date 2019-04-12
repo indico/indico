@@ -30,7 +30,6 @@ from indico.core.db.sqlalchemy.util.cache import cached, versioned_cache
 from indico.core.db.sqlalchemy.util.queries import db_dates_overlap
 from indico.core.errors import NoReportError
 from indico.legacy.common.cache import GenericCache
-from indico.modules.groups import GroupProxy
 from indico.modules.rb.models.blocked_rooms import BlockedRoom
 from indico.modules.rb.models.blockings import Blocking
 from indico.modules.rb.models.equipment import EquipmentType, RoomEquipmentAssociation
@@ -45,7 +44,6 @@ from indico.modules.rb.util import rb_is_admin
 from indico.util.i18n import _
 from indico.util.serializer import Serializer
 from indico.util.string import format_repr, natural_sort_key, return_ascii
-from indico.util.user import unify_user_args
 from indico.web.flask.util import url_for
 
 
@@ -276,11 +274,8 @@ class Room(versioned_cache(_cache, 'id'), ProtectionManagersMixin, db.Model, Ser
         backref=db.backref('favorite_rooms', lazy=True, collection_class=set),
     )
 
-    #: The owner of the room. If the room has the `manager-group`
-    #: attribute set, any users in that group are also considered
-    #: owners when it comes to management privileges.
-    #: Use :meth:`is_owned_by` for ownership checks that should
-    #: also check against the management group.
+    #: The owner of the room. This is purely informational and does not grant
+    #: any permissions on the room.
     owner = db.relationship(
         'User',
         # subquery load since a normal joinedload breaks `get_with_data`
@@ -361,11 +356,7 @@ class Room(versioned_cache(_cache, 'id'), ProtectionManagersMixin, db.Model, Ser
 
     @property
     def manager_emails(self):
-        manager_group = self.get_attribute_value('manager-group')
-        if not manager_group:
-            return set()
-        group = GroupProxy.get_named_default_group(manager_group)
-        return {u.email for u in group.get_members()}
+        return {p.principal.email for p in self.acl_entries if p.type == PrincipalType.user and p.full_access}
 
     @property
     def sprite_position(self):
@@ -655,21 +646,10 @@ class Room(versioned_cache(_cache, 'id'), ProtectionManagersMixin, db.Model, Ser
             return False
         return rb_is_admin(user)
 
-    @unify_user_args
-    @cached(_cache)
-    def is_owned_by(self, user):
-        """Checks if the user is managing the room (owner or manager)"""
-        if self.owner == user:
-            return True
-        manager_group = self.get_attribute_value('manager-group')
-        if not manager_group:
-            return False
-        return user in GroupProxy.get_named_default_group(manager_group)
-
     def check_advance_days(self, end_date, user=None, quiet=False):
         if not self.max_advance_days:
             return True
-        if user and (rb_is_admin(user) or self.is_owned_by(user)):
+        if user and (rb_is_admin(user) or self.can_manage(user)):
             return True
         advance_days = (end_date - date.today()).days
         ok = advance_days < self.max_advance_days
@@ -680,7 +660,7 @@ class Room(versioned_cache(_cache, 'id'), ProtectionManagersMixin, db.Model, Ser
             raise NoReportError(msg.format(self.max_advance_days))
 
     def check_bookable_hours(self, start_time, end_time, user=None, quiet=False):
-        if user and (rb_is_admin(user) or self.is_owned_by(user)):
+        if user and (rb_is_admin(user) or self.can_manage(user)):
             return True
         bookable_hours = self.bookable_hours.all()
         if not bookable_hours:
