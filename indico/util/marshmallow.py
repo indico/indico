@@ -100,6 +100,25 @@ class ModelList(Field):
         return objs
 
 
+class Principal(Field):
+    """Marshmallow field for a single principal."""
+
+    def __init__(self, allow_groups=False, **kwargs):
+        self.allow_groups = allow_groups
+        super(Principal, self).__init__(**kwargs)
+
+    def _serialize(self, value, attr, obj):
+        return value.identifier if value is not None else None
+
+    def _deserialize(self, value, attr, data):
+        if value is None:
+            return None
+        try:
+            return principal_from_identifier(value, allow_groups=self.allow_groups)
+        except ValueError as exc:
+            raise ValidationError(unicode(exc))
+
+
 class PrincipalList(Field):
     """Marshmallow field for a list of principals."""
 

@@ -40,14 +40,15 @@ import shortid from 'shortid';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {snakifyKeys, camelizeKeys} from 'indico/utils/case';
 import {getChangedValues, handleSubmitError, ReduxCheckboxField, ReduxFormField} from 'indico/react/forms';
+import {FavoritesProvider} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
-import {EmailListField, PrincipalSearchField} from 'indico/react/components';
+import {EmailListField, PrincipalField} from 'indico/react/components';
 import EquipmentList from './EquipmentList';
 import DailyAvailability from './DailyAvailability';
 import NonBookablePeriods from './NonBookablePeriods';
 import SpriteImage from '../../components/SpriteImage';
 import {actions as roomsActions} from '../../common/rooms';
-import {actions as userActions, selectors as userSelectors} from '../../common/user';
+import {actions as userActions} from '../../common/user';
 import * as roomsSelectors from './selectors';
 
 import './RoomEditModal.module.scss';
@@ -120,7 +121,7 @@ const columns = [
         label: Translate.string('Contact')
     }, {
         type: 'owner',
-        name: 'ownerName',
+        name: 'owner',
         label: Translate.string('Owner')
     }, {
         type: 'input',
@@ -367,7 +368,6 @@ const columns = [
 class RoomEditModal extends React.Component {
     static propTypes = {
         equipmentTypes: PropTypes.arrayOf(PropTypes.object).isRequired,
-        favoriteUsers: PropTypes.array.isRequired,
         onClose: PropTypes.func.isRequired,
         roomId: PropTypes.number.isRequired,
         actions: PropTypes.exact({
@@ -488,11 +488,8 @@ class RoomEditModal extends React.Component {
     handleSubmit = async (data, form) => {
         const {roomId} = this.props;
         const changedValues = getChangedValues(data, form);
-        const basicDetailsKeys = ['attributes', 'bookableHours', 'nonbookablePeriods', 'availableEquipment', 'owner'];
+        const basicDetailsKeys = ['attributes', 'bookableHours', 'nonbookablePeriods', 'availableEquipment'];
         const basicDetails = _.omit(changedValues, basicDetailsKeys);
-        if (changedValues.owner) {
-            basicDetails.owner_id = changedValues.owner.id;
-        }
         const {availableEquipment, nonbookablePeriods, bookableHours, attributes} = changedValues;
 
         let submitState = 'success';
@@ -599,7 +596,7 @@ class RoomEditModal extends React.Component {
 
     renderContent = (content, key) => {
         const {room, roomEquipment} = this.state;
-        const {equipmentTypes, favoriteUsers} = this.props;
+        const {equipmentTypes} = this.props;
         if (!equipmentTypes) {
             return;
         }
@@ -627,14 +624,16 @@ class RoomEditModal extends React.Component {
             }
             case 'owner':
                 return (
-                    <Field key={key}
-                           name="owner"
-                           component={ReduxFormField}
-                           as={PrincipalSearchField}
-                           favoriteUsers={favoriteUsers}
-                           label={content.label}
-                           allowNull
-                           required />
+                    <FavoritesProvider key={key}>
+                        {favoriteUsersController => (
+                            <Field name={content.name}
+                                   component={ReduxFormField}
+                                   as={PrincipalField}
+                                   favoriteUsersController={favoriteUsersController}
+                                   label={content.label}
+                                   allowNull />
+                        )}
+                    </FavoritesProvider>
                 );
             case 'formgroup':
                 return (
@@ -801,7 +800,6 @@ class RoomEditModal extends React.Component {
 export default connect(
     (state) => ({
         equipmentTypes: roomsSelectors.getEquipmentTypes(state),
-        favoriteUsers: userSelectors.getFavoriteUsers(state),
     }),
     dispatch => ({
         actions: bindActionCreators({

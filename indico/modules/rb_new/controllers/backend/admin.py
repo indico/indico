@@ -42,7 +42,7 @@ from indico.modules.rb_new.schemas import (admin_equipment_type_schema, admin_lo
                                            room_update_schema)
 from indico.modules.users.models.users import User
 from indico.util.i18n import _
-from indico.util.marshmallow import ModelList, PrincipalList
+from indico.util.marshmallow import ModelList, Principal, PrincipalList
 from indico.web.util import ExpectedError
 
 
@@ -421,11 +421,6 @@ class RHRoom(RHRoomAdminBase):
         return jsonify(room_update_schema.dump(self.room))
 
 
-class _UserField(fields.Field):
-    def _deserialize(self, value, attr, data, **kwargs):
-        return User.get(value, is_deleted=False)
-
-
 class RHUpdateRoom(RHRoomAdminBase):
     @use_args({
         'verbose_name': fields.Str(allow_none=True),
@@ -447,7 +442,7 @@ class RHUpdateRoom(RHRoomAdminBase):
         'end_notification_monthly': fields.Int(validate=lambda x: 1 <= x <= 30, allow_none=True),
         'end_notifications_enabled': fields.Bool(),
         'booking_limit_days': fields.Int(validate=lambda x: x >= 1, allow_none=True),
-        'owner': _UserField(data_key='owner_id', validate=lambda x: x is not None, allow_none=True),
+        'owner': Principal(validate=lambda x: x is not None, allow_none=True),
         'key_location': fields.Str(),
         'telephone': fields.Str(),
         'capacity': fields.Int(validate=lambda x: x >= 1),

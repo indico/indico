@@ -42,7 +42,7 @@ from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.util import rb_is_admin
 from indico.modules.users.schemas import UserSchema
 from indico.util.i18n import _
-from indico.util.marshmallow import NaiveDateTime, PrincipalList
+from indico.util.marshmallow import NaiveDateTime, Principal, PrincipalList
 from indico.util.string import natural_sort_key
 
 
@@ -73,7 +73,7 @@ class RoomSchema(mm.ModelSchema):
 
 
 class RoomUpdateSchema(RoomSchema):
-    owner = Nested(UserSchema)
+    owner = Principal()
 
     class Meta(RoomSchema.Meta):
         fields = RoomSchema.Meta.fields + ('notification_before_days', 'notification_before_days_weekly', 'owner',
