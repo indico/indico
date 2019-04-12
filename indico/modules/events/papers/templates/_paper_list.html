@@ -1,9 +1,10 @@
 {% from 'message_box.html' import message_box %}
-{% from 'events/management/_lists.html' import render_displayed_entries_fragment %}
+{% from 'events/management/_lists.html' import render_displayed_entries_fragment, render_num_reviews_tooltip %}
 
 {% macro _render_paper_state(paper) %}
     {% set paper_css_class = paper.state.css_class %}
-    <div class="i-tag outline semantic-text state-badge {{ paper_css_class }}">
+    <div class="i-tag outline semantic-text state-badge {{ paper_css_class }}"
+         data-tooltip="{{ render_num_reviews_tooltip(paper.last_revision)|trim|forceescape }}">
         {% if paper.state.name == 'submitted' and paper.can_judge(session.user) %}
             {% trans count=paper.last_revision.reviews|length -%}
                 {{- count }} review
@@ -100,8 +101,13 @@
                             </td>
                             {% for item in static_columns %}
                                 {% if item.id == 'state' %}
+                                    {% if contrib.paper %}
+                                        {% set acceptances = contrib.paper.last_revision.reviews|selectattr('proposed_action.name', 'equalto', 'accept')|list|length %}
+                                        {% set sort_text = '{}-{}-{}'.format('1' if contrib.paper.is_in_final_state else '0', contrib.paper.last_revision.state.name, acceptances) %}
+                                    {% endif %}
                                     <td class="i-table"
-                                        data-searchable="{{ last_revision_state | lower }}">
+                                        data-searchable="{{ last_revision_state|lower }}"
+                                        data-text="{{ sort_text }}">
                                         {% if contrib.paper %}
                                             <span class="vertical-aligner">
                                                 {{ _render_paper_state(contrib.paper) }}

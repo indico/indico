@@ -202,8 +202,7 @@
             e.stopPropagation();
         });
 
-        const $stateBadges = $('.state-badge');
-        $stateBadges.qbubble({
+        $('.state-badge').qbubble({
             show: {
                 event: 'mouseover'
             },
