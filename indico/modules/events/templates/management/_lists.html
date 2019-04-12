@@ -12,3 +12,22 @@
         <strong>{{ total_duration[0] | format_human_timedelta }}</strong>
     </span>
 {% endmacro %}
+
+{% macro render_num_reviews_tooltip(proposal, render_contrib_types=none) -%}
+    {% if proposal.reviews %}
+        <div class="num-reviews-tooltip">
+            <div class="title"><strong>{% trans %}Reviews{% endtrans %}</strong></div>
+            {% for action, review_list in proposal.reviews|groupby('proposed_action') -%}
+                <div class="semantic-text {{ action.css_class }}">
+                    <strong>{{ review_list|selectattr('proposed_action', 'equalto', action)|list|length }}</strong>
+                    {{ action.title }}
+                    {% if render_contrib_types and action.name == 'accept' %}
+                        <div class="contrib-types">
+                            ({{- render_contrib_types(review_list) -}})
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endmacro %}
