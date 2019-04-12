@@ -74,39 +74,6 @@ def test_name_stays_same(create_room, name):
     assert room.name == '1/2-3'
 
 
-@pytest.mark.parametrize(('value', 'expected'), (
-    (u'foo', True),
-    (u'',    False)
-))
-def test_has_booking_groups(create_room_attribute, dummy_room, value, expected):
-    create_room_attribute(u'allowed-booking-group')
-    assert not dummy_room.has_booking_groups
-    dummy_room.set_attribute_value(u'allowed-booking-group', value)
-    assert dummy_room.has_booking_groups == expected
-
-
-@pytest.mark.parametrize('eq_name', (u'Computer Projector', u'Video projector 4:3', u'Video projector 16:9'))
-def test_has_projector(create_equipment_type, dummy_room, db, eq_name):
-    assert not dummy_room.has_projector
-    dummy_room.available_equipment.append(create_equipment_type(eq_name))
-    db.session.flush()
-    assert dummy_room.has_projector
-
-
-def test_has_webcast_recording(create_equipment_type, dummy_room, db):
-    assert not dummy_room.has_webcast_recording
-    dummy_room.available_equipment.append(create_equipment_type(u'Webcast/Recording'))
-    db.session.flush()
-    assert dummy_room.has_webcast_recording
-
-
-def test_has_vc(create_equipment_type, dummy_room, db):
-    assert not dummy_room.has_vc
-    dummy_room.available_equipment.append(create_equipment_type(u'Video conference'))
-    db.session.flush()
-    assert dummy_room.has_vc
-
-
 @pytest.mark.parametrize(('protection_mode', 'expected'), (
     (ProtectionMode.protected, False),
     (ProtectionMode.public, True),
@@ -114,24 +81,6 @@ def test_has_vc(create_equipment_type, dummy_room, db):
 def test_is_public(dummy_room, protection_mode, expected):
     dummy_room.protection_mode = protection_mode
     assert dummy_room.is_public == expected
-
-
-@pytest.mark.parametrize(('is_reservable', 'reservations_need_confirmation', 'booking_group', 'expected_kind'), (
-    (False, False, u'foo', u'privateRoom'),
-    (False, True,  u'foo', u'privateRoom'),
-    (True,  False, u'foo', u'privateRoom'),
-    (True,  True,  u'foo', u'privateRoom'),
-    (False, False, u'',    u'privateRoom'),
-    (False, True,  u'',    u'privateRoom'),
-    (True,  False, u'',    u'basicRoom'),
-    (True,  True,  u'',    u'moderatedRoom')
-))
-def test_kind(create_room, create_room_attribute,
-              is_reservable, reservations_need_confirmation, booking_group, expected_kind):
-    room = create_room(is_reservable=is_reservable, reservations_need_confirmation=reservations_need_confirmation)
-    create_room_attribute(u'allowed-booking-group')
-    room.set_attribute_value(u'allowed-booking-group', booking_group)
-    assert room.kind == expected_kind
 
 
 def test_location_name(dummy_room, dummy_location):
@@ -211,10 +160,6 @@ def test_set_attribute_value(create_room_attribute, dummy_room):
     assert dummy_room.get_attribute_value(u'foo', _notset) is _notset
 
 
-def test_locator(dummy_location, dummy_room):
-    assert dummy_room.locator == {'roomLocation': dummy_location.name, 'roomID': dummy_room.id}
-
-
 def test_find_all(create_location, create_room):
     # Here we just test if we get the rooms in natural sort order
     loc1 = create_location('Z')
@@ -271,16 +216,6 @@ def test_get_with_data(db, create_room, create_equipment_type, only_active):
             assert not only_active
 
 
-def test_max_capacity(create_room):
-    assert not Room.query.count()
-    assert Room.max_capacity == 0
-    create_room(capacity=0)
-    assert Room.max_capacity == 0
-    create_room(capacity=10)
-    create_room(capacity=5)
-    assert Room.max_capacity == 10
-
-
 @pytest.mark.parametrize(
     ('has_booking', 'has_blocking',
      'has_pre_booking', 'include_pre_bookings',
@@ -314,175 +249,6 @@ def test_filter_available(dummy_room, create_reservation, create_blocking,
     assert set(Room.find_all(availabilty_filter)) == (set() if filtered else {dummy_room})
 
 
-def test_find_with_filters(db, dummy_room, create_room, dummy_user, create_equipment_type, create_room_attribute,
-                           dummy_reservation):
-    # Simple testcase that ensures we find the room when many filters are used
-    other_room = create_room()
-    assert set(Room.find_with_filters({}, dummy_user)) == {dummy_room, other_room}
-    create_room_attribute(u'attr')
-    eq = create_equipment_type(u'eq')
-    dummy_room.capacity = 100
-    dummy_room.is_reservable = True
-    dummy_room.available_equipment.append(eq)
-    dummy_room.set_attribute_value(u'attr', u'meowmeow')
-    db.session.flush()
-    filters = {'available_equipment': {eq},
-               'capacity': 90,
-               'only_public': True,
-               'is_only_my_rooms': True,
-               'details': u'meow',
-               'available': 0,
-               'repeatability': 'None',
-               'start_dt': dummy_reservation.start_dt,
-               'end_dt': dummy_reservation.end_dt}
-    assert set(Room.find_with_filters(filters, dummy_user)) == {dummy_room}
-
-
-def test_find_with_filters_equipment(db, dummy_room, create_room, create_equipment_type):
-    other_room = create_room()
-    assert set(Room.find_with_filters({}, None)) == set(Room.find_all())
-    eq1 = create_equipment_type(u'eq1')
-    eq2 = create_equipment_type(u'eq2')
-    assert not Room.find_with_filters({'available_equipment': {eq1}}, None)
-    dummy_room.available_equipment.append(eq1)
-    db.session.flush()
-    assert set(Room.find_with_filters({'available_equipment': {eq1}}, None)) == {dummy_room}
-    assert not Room.find_with_filters({'available_equipment': {eq1, eq2}}, None)
-    dummy_room.available_equipment.append(eq2)
-    other_room.available_equipment.append(eq2)
-    db.session.flush()
-    assert set(Room.find_with_filters({'available_equipment': {eq1}}, None)) == {dummy_room}
-    assert set(Room.find_with_filters({'available_equipment': {eq2}}, None)) == {dummy_room, other_room}
-    assert set(Room.find_with_filters({'available_equipment': {eq1, eq2}}, None)) == {dummy_room}
-
-
-@pytest.mark.parametrize(('capacity', 'other_capacity', 'search_capacity', 'match', 'match_other'), (
-    (100,  79,  100, True,  False),  # 79 outside 80..120
-    (110,  95,  100, True,  True),   # 110, 95 inside 80..120
-    (120,  80,  100, True,  True),   # 120, 80 exactly on the edges
-    (121,  80,  100, False, True),   # 121 outside range
-    (121,  50,  100, True,  False),  # 121 exceeds upper bound = match anyway to avoid getting no results
-    (79,   50,  100, False, False),  # 79 outside lower bound => hard limit
-    (None, 999, 999, True,  True),   # no capacity always matches
-))
-def test_find_with_filters_capacity(db, dummy_room, create_room,
-                                    capacity, other_capacity, search_capacity, match, match_other):
-    other_room = create_room()
-    assert set(Room.find_with_filters({}, None)) == set(Room.find_all())
-    dummy_room.capacity = capacity
-    other_room.capacity = other_capacity
-    db.session.flush()
-    expected = set()
-    if match:
-        expected.add(dummy_room)
-    if match_other:
-        expected.add(other_room)
-    assert set(Room.find_with_filters({'capacity': search_capacity}, None)) == expected
-
-
-@pytest.mark.parametrize(('protection_mode', 'match'), (
-    (ProtectionMode.public, True),
-    (ProtectionMode.protected, False),
-))
-def test_find_with_filters_only_public(dummy_room, protection_mode, match):
-    dummy_room.protection_mode = protection_mode
-    if match:
-        assert set(Room.find_with_filters({'is_only_public': True}, None)) == {dummy_room}
-    else:
-        assert not Room.find_with_filters({'is_only_public': True}, None)
-
-
-@pytest.mark.parametrize(('owner_id', 'match'), (
-    (1337, True),
-    (123,  False)
-))
-def test_find_with_filters_only_my_rooms(dummy_room, create_user, owner_id, match):
-    user = create_user(owner_id, legacy=True)
-    if match:
-        assert set(Room.find_with_filters({'is_only_my_rooms': True}, user)) == {dummy_room}
-    else:
-        assert not Room.find_with_filters({'is_only_my_rooms': True}, user)
-
-
-@pytest.mark.parametrize('available', (True, False))
-def test_find_with_filters_availability(dummy_room, dummy_reservation, available):
-    if available:
-        start_dt = dummy_reservation.end_dt + timedelta(days=1)
-        end_dt = start_dt + timedelta(days=1)
-    else:
-        start_dt = dummy_reservation.start_dt
-        end_dt = dummy_reservation.end_dt
-    filters = {'available': int(available),
-               'repeatability': 'None',
-               'start_dt': start_dt,
-               'end_dt': end_dt}
-    assert set(Room.find_with_filters(filters, None)) == {dummy_room}
-
-
-def test_find_with_filters_availability_error():
-    with pytest.raises(ValueError):
-        filters = {'available': 123,
-                   'repeatability': 'None',
-                   'start_dt': datetime.now(),
-                   'end_dt': datetime.now()}
-        Room.find_with_filters(filters, None)
-
-
-@pytest.mark.parametrize('col', ('verbose_name', 'site', 'division', 'building', 'floor', 'number', 'telephone',
-                                 'key_location', 'comments'))
-def test_find_with_filters_details_cols(db, dummy_room, create_room, col):
-    create_room()  # some room we won't find!
-    assert set(Room.find_with_filters({}, None)) == set(Room.find_all())
-    assert not Room.find_with_filters({'details': u'meow'}, None)
-    setattr(dummy_room, col, u'meow')
-    db.session.flush()
-    assert set(Room.find_with_filters({'details': u'meow'}, None)) == {dummy_room}
-
-
-find_with_filters_details = (
-    (u'meow',     u'meow',     ''),
-    (u'meow',     u'MEOW',     ''),
-    (u'foo"bar',  u'foo"bar',  ''),
-    (ur'foo\bar', ur'foo\bar', ''),
-    (u'test%bla', u'test%bla', u'testXbla'),
-    (u'test_bla', u'test_bla', u'testXbla')
-)
-
-
-@pytest.mark.parametrize(('value', 'search_value', 'other_value'), find_with_filters_details)
-def test_find_with_filters_details_values(db, dummy_room, create_room, value, search_value, other_value):
-    other_room = create_room()
-    assert set(Room.find_with_filters({}, None)) == set(Room.find_all())
-    assert not Room.find_with_filters({'details': search_value}, None)
-    dummy_room.comments = value
-    other_room.comments = other_value
-    db.session.flush()
-    assert set(Room.find_with_filters({'details': search_value}, None)) == {dummy_room}
-
-
-@pytest.mark.parametrize(('value', 'search_value', 'other_value'), find_with_filters_details)
-def test_find_with_filters_details_attrs(dummy_room, create_room, create_room_attribute,
-                                         value, search_value, other_value):
-    other_room = create_room()
-    assert set(Room.find_with_filters({}, None)) == set(Room.find_all())
-    assert not Room.find_with_filters({'details': search_value}, None)
-    create_room_attribute(u'foo')
-    assert not Room.find_with_filters({'details': search_value}, None)
-    dummy_room.set_attribute_value(u'foo', value)
-    other_room.set_attribute_value(u'foo', other_value)
-    assert set(Room.find_with_filters({'details': search_value}, None)) == {dummy_room}
-
-
-def test_has_live_reservations(dummy_room, create_reservation):
-    assert not dummy_room.has_live_reservations()
-    create_reservation(start_dt=datetime.combine(date.today() - timedelta(days=1), time(8)),
-                       end_dt=datetime.combine(date.today() - timedelta(days=1), time(10)))
-    assert not dummy_room.has_live_reservations()
-    create_reservation(start_dt=datetime.combine(date.today() + timedelta(days=1), time(8)),
-                       end_dt=datetime.combine(date.today() + timedelta(days=1), time(10)))
-    assert dummy_room.has_live_reservations()
-
-
 @pytest.mark.parametrize(('is_owner', 'has_group', 'in_group', 'expected'),
                          bool_matrix('...', expect=lambda x: x[0] or all(x[1:])))
 def test_ownership_functions(dummy_room, create_user, create_room_attribute, create_group,
@@ -496,8 +262,6 @@ def test_ownership_functions(dummy_room, create_user, create_room_attribute, cre
     if in_group:
         other_user.local_groups.add(create_group(123).group)
     assert dummy_room.is_owned_by(other_user) == expected
-    assert Room.user_owns_rooms(other_user) == expected
-    assert set(Room.get_owned_by(other_user)) == ({dummy_room} if expected else set())
 
 
 @pytest.mark.parametrize(('is_admin', 'is_owner', 'max_advance_days', 'days_delta', 'success'), (

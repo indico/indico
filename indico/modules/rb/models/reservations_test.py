@@ -19,7 +19,6 @@ from datetime import date
 import pytest
 from dateutil.relativedelta import relativedelta
 
-from indico.core.errors import IndicoError
 from indico.modules.rb.models.reservation_edit_logs import ReservationEditLog
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence, ReservationOccurrenceState
 from indico.modules.rb.models.reservations import RepeatFrequency, RepeatMapping, Reservation, ReservationState
@@ -52,11 +51,6 @@ def overlapping_reservation(create_reservation):
 ))
 def test_repeat_mapping(repetition, message):
     assert RepeatMapping.get_message(*repetition) == message
-
-
-def test_repeat_mapping_invalid_legacy():
-    with pytest.raises(IndicoError):
-        RepeatMapping.convert_legacy_repeatability(123)
 
 
 # ======================================================================================================================
@@ -285,10 +279,6 @@ def test_find_overlapping(create_reservation):
     assert not resv1.find_overlapping().count()
     resv2 = create_reservation(state=ReservationState.pending)
     assert resv1.find_overlapping().one() == resv2
-
-
-def test_locator(dummy_reservation, dummy_location):
-    assert dummy_reservation.locator == {'roomLocation': dummy_location.name, 'resvID': dummy_reservation.id}
 
 
 @pytest.mark.parametrize(('is_booked_for', 'expected'), (

@@ -109,7 +109,7 @@ class Blocking(db.Model):
         The following persons are authorized to override a blocking:
         - owner (the one who created the blocking)
         - any users on the blocking's ACL
-        - unless explicitOnly is set: admins and room owners (if a room is given)
+        - unless explicit_only is set: admins and room owners (if a room is given)
         """
         if not user:
             return False

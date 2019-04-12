@@ -43,7 +43,6 @@ from indico.modules.rb.notifications.reservations import (notify_cancellation, n
 from indico.modules.rb.util import rb_is_admin
 from indico.util.date_time import format_date, format_time, now_utc
 from indico.util.i18n import N_, _
-from indico.util.locators import locator_property
 from indico.util.serializer import Serializer
 from indico.util.string import format_repr, return_ascii, to_unicode
 from indico.util.struct.enum import IndicoEnum
@@ -90,16 +89,6 @@ class RepeatMapping(object):
         # for the API
         return cls.mapping[(repeat_frequency, repeat_interval)][2]
 
-    @classmethod
-    @unimplemented(exceptions=(KeyError,), message=_('Unknown old repeatability'))
-    def convert_legacy_repeatability(cls, repeat):
-        if repeat is None or repeat < 5:
-            for k, (_, v, _) in cls.mapping.iteritems():
-                if v == repeat:
-                    return k
-        else:
-            raise KeyError('Undefined old repeat: {}'.format(repeat))
-
 
 class ReservationState(int, IndicoEnum):
     pending = 1
@@ -136,10 +125,7 @@ ReservationLink.register_link_events()
 
 class Reservation(Serializer, db.Model):
     __tablename__ = 'reservations'
-    __public__ = []
-    __calendar_public__ = [
-        'id', ('booked_for_name', 'bookedForName'), ('booking_reason', 'reason'), ('external_details_url', 'bookingUrl')
-    ]
+
     __api_public__ = [
         'id', ('start_dt', 'startDT'), ('end_dt', 'endDT'), 'repeat_frequency', 'repeat_interval',
         ('booked_for_name', 'bookedForName'), ('external_details_url', 'bookingUrl'), ('booking_reason', 'reason'),
@@ -325,10 +311,6 @@ class Reservation(Serializer, db.Model):
         return self.booked_for_user.email if self.booked_for_user else None
 
     @property
-    def contact_phone(self):
-        return self.booked_for_user.phone if self.booked_for_user else None
-
-    @property
     def external_details_url(self):
         return url_for('rooms_new.booking_link', booking_id=self.id, _external=True)
 
@@ -339,24 +321,6 @@ class Reservation(Serializer, db.Model):
     @property
     def repetition(self):
         return self.repeat_frequency, self.repeat_interval
-
-    @property
-    def status_string(self):
-        parts = []
-        if self.is_accepted:
-            parts.append(_(u"Valid"))
-        else:
-            if self.is_cancelled:
-                parts.append(_(u"Cancelled"))
-            if self.is_rejected:
-                parts.append(_(u"Rejected"))
-            if not self.is_accepted:
-                parts.append(_(u"Not confirmed"))
-        if self.is_archived:
-            parts.append(_(u"Archived"))
-        else:
-            parts.append(_(u"Live"))
-        return u', '.join(map(unicode, parts))
 
     @property
     def linked_object(self):
@@ -605,10 +569,6 @@ class Reservation(Serializer, db.Model):
     def find_overlapping(self):
         occurrences = self.occurrences.filter(ReservationOccurrence.is_valid).all()
         return Reservation.find_overlapping_with(self.room, occurrences, self.id)
-
-    @locator_property
-    def locator(self):
-        return {'roomLocation': self.location_name, 'resvID': self.id}
 
     def get_conflicting_occurrences(self):
         valid_occurrences = self.occurrences.filter(ReservationOccurrence.is_valid).all()
