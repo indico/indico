@@ -581,7 +581,12 @@ class RoomEditModal extends React.Component {
                                            as={Input}
                                            isEqual={_.isEqual}
                                            required
-                                           icon={{name: 'trash', color: 'red', link: true, onClick: () => fields.remove(index)}} />
+                                           icon={{
+                                               name: 'remove',
+                                               color: 'red',
+                                               link: true,
+                                               onClick: () => fields.remove(index),
+                                           }} />
                                 </div>
                             ))}
                             {fields.length === 0 && <div><Translate>No custom attributes found</Translate></div>}

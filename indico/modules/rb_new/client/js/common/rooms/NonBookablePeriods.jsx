@@ -87,7 +87,7 @@ export default class NonBookablePeriods extends React.Component {
                                  startDate={startDt === null ? null : moment(startDt)}
                                  endDate={endDt === null ? null : moment(endDt)}
                                  onDatesChange={(dates) => this.handleDatesChange(dates, key)} />
-                <Icon floated="right" name="trash" className="trash-button" onClick={() => this.handleRemoveDates(key)} />
+                <Icon floated="right" name="remove" className="delete-button" onClick={() => this.handleRemoveDates(key)} />
             </div>
         );
     };

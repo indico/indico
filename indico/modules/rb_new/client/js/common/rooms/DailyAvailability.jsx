@@ -61,7 +61,7 @@ export default class DailyAvailability extends React.Component {
                                  endTime={moment(endT, 'HH:mm')}
                                  onChange={(startTime, endTime) => this.handleTimesChange({startTime, endTime}, key)}
                                  allowPastTimes />
-                <Icon floated="right" name="trash" className="trash-button" onClick={() => this.handleRemoveTimes(key)} />
+                <Icon floated="right" name="remove" className="delete-button" onClick={() => this.handleRemoveTimes(key)} />
             </div>
         );
     };

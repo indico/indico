@@ -69,7 +69,7 @@ class EquipmentList extends React.Component {
                     {value && value.map((equipmentId) => (
                         <List.Item key={equipmentId}>
                             <List.Content floated="right">
-                                <Icon styleName="equipment-button" name="trash" onClick={() => {
+                                <Icon styleName="equipment-button" name="remove" onClick={() => {
                                     onChange(value.filter(x => x !== equipmentId));
                                 }} />
                             </List.Content>
