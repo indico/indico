@@ -26,7 +26,6 @@ from indico.core.db.sqlalchemy import db
 from indico.core.db.sqlalchemy.custom import static_array
 from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.db.sqlalchemy.protection import ProtectionManagersMixin, ProtectionMode
-from indico.core.db.sqlalchemy.util.cache import cached, versioned_cache
 from indico.core.db.sqlalchemy.util.queries import db_dates_overlap
 from indico.core.errors import NoReportError
 from indico.legacy.common.cache import GenericCache
@@ -50,7 +49,7 @@ from indico.web.flask.util import url_for
 _cache = GenericCache('Rooms')
 
 
-class Room(versioned_cache(_cache, 'id'), ProtectionManagersMixin, db.Model, Serializer):
+class Room(ProtectionManagersMixin, db.Model, Serializer):
     __tablename__ = 'rooms'
     __table_args__ = (db.UniqueConstraint('id', 'location_id'),  # useless but needed for the LocationMixin fkey
                       db.CheckConstraint("verbose_name != ''", 'verbose_name_not_empty'),
@@ -367,7 +366,6 @@ class Room(versioned_cache(_cache, 'id'), ProtectionManagersMixin, db.Model, Ser
     def __repr__(self):
         return format_repr(self, 'id', 'full_name')
 
-    @cached(_cache)
     def has_equipment(self, *names):
         available = {x.name for x in self.available_equipment}
         return bool(available & set(names))
@@ -381,7 +379,6 @@ class Room(versioned_cache(_cache, 'id'), ProtectionManagersMixin, db.Model, Ser
     def has_attribute(self, attribute_name):
         return self.get_attribute_by_name(attribute_name) is not None
 
-    @cached(_cache)
     def get_attribute_value(self, name, default=None):
         attr = self.get_attribute_by_name(name)
         return attr.value if attr else default
