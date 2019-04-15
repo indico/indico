@@ -52,7 +52,7 @@ PendingPrincipalListItem.defaultProps = {
 };
 
 export const PrincipalListItem = (
-    {isGroup, name, detail, onDelete, onAddFavorite, onDelFavorite, disabled, readOnly, favorite, search}
+    {isGroup, name, detail, canDelete, onDelete, onAddFavorite, onDelFavorite, disabled, readOnly, favorite, search}
 ) => (
     <List.Item>
         <div styleName="item">
@@ -80,8 +80,10 @@ export const PrincipalListItem = (
                                   onClick={onAddFavorite} disabled={disabled} />
                         )
                     )}
-                    <Icon styleName="button delete" name="remove" size="large"
-                          onClick={onDelete} disabled={disabled} />
+                    {canDelete && (
+                        <Icon styleName="button delete" name="remove" size="large"
+                              onClick={onDelete} disabled={disabled} />
+                    )}
                     {search}
                 </div>
             )}
@@ -96,6 +98,7 @@ PrincipalListItem.propTypes = {
     onDelete: PropTypes.func.isRequired,
     onAddFavorite: PropTypes.func.isRequired,
     onDelFavorite: PropTypes.func.isRequired,
+    canDelete: PropTypes.bool,
     disabled: PropTypes.bool,
     readOnly: PropTypes.bool,
     favorite: PropTypes.bool.isRequired,
@@ -103,6 +106,7 @@ PrincipalListItem.propTypes = {
 };
 
 PrincipalListItem.defaultProps = {
+    canDelete: true,
     disabled: false,
     readOnly: false,
     isGroup: false,

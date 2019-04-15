@@ -32,7 +32,7 @@ import './items.module.scss';
  * A field that lets the user select a user.
  */
 const PrincipalField = (props) => {
-    const {value, disabled, onChange, onFocus, onBlur, favoriteUsersController} = props;
+    const {value, disabled, required, onChange, onFocus, onBlur, favoriteUsersController} = props;
     const [favoriteUsers, [handleAddFavorite, handleDelFavorite]] = favoriteUsersController;
 
     const [details, setDetails] = useState(null);
@@ -104,6 +104,7 @@ const PrincipalField = (props) => {
                             <PrincipalListItem name={details.name}
                                                detail={details.detail}
                                                favorite={details.userId in favoriteUsers}
+                                               canDelete={!required}
                                                onDelete={() => !disabled && handleClear()}
                                                onAddFavorite={() => !disabled && handleAddFavorite(details.userId)}
                                                onDelFavorite={() => !disabled && handleDelFavorite(details.userId)}
@@ -121,6 +122,7 @@ const PrincipalField = (props) => {
 
 PrincipalField.propTypes = {
     value: PropTypes.string,
+    required: PropTypes.bool,
     disabled: PropTypes.bool.isRequired,
     onChange: PropTypes.func.isRequired,
     onFocus: PropTypes.func.isRequired,
@@ -130,6 +132,7 @@ PrincipalField.propTypes = {
 
 PrincipalField.defaultProps = {
     value: null,
+    required: false,
 };
 
 export default React.memo(PrincipalField);
