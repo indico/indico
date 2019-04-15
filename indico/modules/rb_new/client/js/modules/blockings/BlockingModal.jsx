@@ -50,7 +50,6 @@ function validate({dates, reason, rooms}) {
 class BlockingModal extends React.Component {
     static propTypes = {
         onClose: PropTypes.func.isRequired,
-        favoriteUsers: PropTypes.array.isRequired,
         managedRoomIds: PropTypes.object.isRequired,
         mode: PropTypes.oneOf(['view', 'edit', 'create']),
         blocking: PropTypes.shape({
@@ -461,7 +460,6 @@ class BlockingModal extends React.Component {
 
 export default connect(
     state => ({
-        favoriteUsers: userSelectors.getFavoriteUsers(state),
         managedRoomIds: new Set(userSelectors.getManagedRoomIds(state)),
     }),
     dispatch => ({

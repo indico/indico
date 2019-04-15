@@ -26,7 +26,6 @@ export const isUserRBAdmin = state => getUserInfo(state).isRBAdmin;
 export const isUserAdmin = state => getUserInfo(state).isAdmin;
 export const isUserAdminOverrideEnabled = state => getUserInfo(state).isAdminOverrideEnabled;
 export const hasOwnedRooms = state => getUserInfo(state).hasOwnedRooms;
-export const getFavoriteUsers = state => getUserInfo(state).favoriteUsers;
 export const getRealUserRoomPermissions = ({user}) => user.roomPermissions;
 export const isCheckingUserRoomPermissions = ({user}) => user.requests.roomPermissions.state === RequestState.STARTED;
 

@@ -18,7 +18,6 @@
 import {combineReducers} from 'redux';
 
 import {requestReducer} from 'indico/utils/redux';
-import {camelizeKeys} from 'indico/utils/case';
 import * as actions from './actions';
 
 
@@ -32,7 +31,6 @@ const initialUserInfoState = {
     isRBAdmin: false,
     isAdminOverrideEnabled: false,
     hasOwnedRooms: false,
-    favoriteUsers: [],
 };
 
 export default combineReducers({
@@ -70,7 +68,6 @@ export default combineReducers({
                     isAdmin: user.is_admin,
                     isRBAdmin: user.is_rb_admin,
                     hasOwnedRooms: user.has_owned_rooms,
-                    favoriteUsers: camelizeKeys(user.favorite_users)
                 };
             }
             case actions.TOGGLE_ADMIN_OVERRIDE:
