@@ -59,10 +59,10 @@ def get_room_blockings(timeframe=None, created_by=None, in_rooms_owned_by=None):
 def filter_blocked_rooms(blocked_rooms, overridable_only=False, nonoverridable_only=False, explicit=False):
     if overridable_only:
         blocked_rooms = [room for room in blocked_rooms
-                         if room.blocking.can_be_overridden(session.user, room.room, explicit_only=explicit)]
+                         if room.blocking.can_override(session.user, room=room.room, explicit_only=explicit)]
     if nonoverridable_only:
         blocked_rooms = [room for room in blocked_rooms
-                         if not room.blocking.can_be_overridden(session.user, room.room, explicit_only=explicit)]
+                         if not room.blocking.can_override(session.user, room=room.room, explicit_only=explicit)]
     return blocked_rooms
 
 
