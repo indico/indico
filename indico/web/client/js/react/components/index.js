@@ -26,7 +26,6 @@ export {default as CalendarSingleDatePicker} from './CalendarSingleDatePicker';
 export {default as CalendarRangeDatePicker} from './CalendarRangeDatePicker';
 export {default as DatePeriodField} from './DatePeriodField';
 export {default as Carousel} from './Carousel';
-export {default as PrincipalSearchField} from './PrincipalSearchField';
 export {default as ScrollButton} from './ScrollButton';
 export {default as StickyWithScrollBack} from './StickyWithScrollBack';
 export {default as EmailListField} from './EmailListField';
