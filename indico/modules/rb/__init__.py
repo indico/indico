@@ -21,8 +21,6 @@ from indico.core.logger import Logger
 from indico.core.settings import SettingsProxy
 from indico.core.settings.converters import ModelListConverter
 from indico.modules.categories.models.categories import Category
-from indico.modules.rb.models.locations import Location
-from indico.modules.rb.models.rooms import Room
 
 
 logger = Logger.get('rb')

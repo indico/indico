@@ -19,7 +19,8 @@ from __future__ import absolute_import, unicode_literals
 from sqlalchemy.orm import joinedload
 
 from indico.core.db import db
-from indico.modules.rb import Location, Room
+from indico.modules.rb.models.locations import Location
+from indico.modules.rb.models.rooms import Room
 from indico.web.forms.fields import JSONField
 from indico.web.forms.widgets import LocationWidget
 

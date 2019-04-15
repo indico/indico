@@ -21,11 +21,12 @@ from flask import session
 from indico.core import signals
 from indico.core.config import config
 from indico.core.permissions import ManagementPermission
-from indico.modules.rb import Room, rb_settings
+from indico.modules.rb import rb_settings
 from indico.modules.rb.models.blocking_principals import BlockingPrincipal
 from indico.modules.rb.models.blockings import Blocking
 from indico.modules.rb.models.principals import RoomPrincipal
 from indico.modules.rb.models.reservations import Reservation
+from indico.modules.rb.models.rooms import Room
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem, TopMenuItem

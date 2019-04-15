@@ -20,8 +20,9 @@ from flask import jsonify
 from sqlalchemy.orm import contains_eager
 
 from indico.core.db import db
-from indico.modules.rb import Location, Room
 from indico.modules.rb.controllers import RHRoomBookingBase
+from indico.modules.rb.models.locations import Location
+from indico.modules.rb.models.rooms import Room
 from indico.modules.rb_new.schemas import locations_schema
 
 

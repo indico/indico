@@ -26,12 +26,13 @@ from werkzeug.exceptions import Forbidden
 from indico.core.db import db
 from indico.core.marshmallow import mm
 from indico.modules.categories.models.categories import Category
-from indico.modules.rb import Room, rb_settings
+from indico.modules.rb import rb_settings
 from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.models.equipment import EquipmentType, RoomEquipmentAssociation
 from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.room_attributes import RoomAttribute, RoomAttributeAssociation
 from indico.modules.rb.models.room_features import RoomFeature
+from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.util import rb_is_admin
 from indico.modules.rb_new.controllers.backend.rooms import RHRoomsPermissions
 from indico.modules.rb_new.operations.admin import (update_room, update_room_attributes, update_room_availability,
