@@ -80,8 +80,8 @@ const PrincipalField = (props) => {
         markTouched();
     };
 
-    const searchTrigger = handleClick => (
-        <Icon styleName="button" name="search" size="large" disabled={disabled} onClick={handleClick} />
+    const searchTrigger = triggerProps => (
+        <Icon styleName="button" name="search" size="large" {...triggerProps} />
     );
     const userSearch = (
         <UserSearch triggerFactory={searchTrigger}

@@ -208,7 +208,7 @@ const searchFactory = config => {
         };
 
         const trigger = triggerFactory ? (
-            triggerFactory(() => setOpen(true))
+            triggerFactory({disabled, onClick: () => !disabled && setOpen(true)})
         ) : (
             <Button type="button"
                     content={buttonTitle}
