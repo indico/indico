@@ -21,7 +21,7 @@ import React from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import PropTypes from 'prop-types';
-import {Button, Checkbox, Form, Grid, Icon, Message, Modal, Radio, Segment} from 'semantic-ui-react';
+import {Button, Checkbox, Form, Grid, Icon, Message, Modal, Radio, Segment, TextArea} from 'semantic-ui-react';
 import {Form as FinalForm, Field} from 'react-final-form';
 import createDecorator from 'final-form-calculate';
 import {
@@ -527,13 +527,14 @@ class BookRoomModal extends React.Component {
                                                        component={ReduxFormField}
                                                        as={PrincipalField}
                                                        favoriteUsersController={favoriteUsersController}
+                                                       disabled={bookingBlocked(fprops)}
                                                        required />
                                             )}
                                         </FavoritesProvider>
                                     </FieldCondition>
                                     <Field name="reason"
                                            component={ReduxFormField}
-                                           as={Form.TextArea}
+                                           as={TextArea}
                                            format={formatters.trim}
                                            formatOnBlur
                                            placeholder={Translate.string('Reason for booking')}

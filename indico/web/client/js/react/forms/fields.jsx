@@ -47,7 +47,11 @@ export function ReduxFormField(
     }
 
     const field = (
-        <Form.Field required={required} error={!!errorMessage} defaultValue={defaultValue} {...fieldProps}>
+        <Form.Field required={required}
+                    disabled={disabled || submitting}
+                    error={!!errorMessage}
+                    defaultValue={defaultValue}
+                    {...fieldProps}>
             {label && <label>{label}</label>}
             <Component {...input}
                        {...props}

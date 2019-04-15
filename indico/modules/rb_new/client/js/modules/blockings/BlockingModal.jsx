@@ -365,7 +365,7 @@ class BlockingModal extends React.Component {
                                            return (
                                                <ReduxFormField {...fieldProps}
                                                                {...props}
-                                                               as={Form.TextArea}
+                                                               as={TextArea}
                                                                label={Translate.string('Reason')}
                                                                placeholder={Translate.string('Provide reason for blocking')}
                                                                disabled={mode === 'view' || submitSucceeded}
