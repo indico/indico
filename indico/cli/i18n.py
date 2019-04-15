@@ -125,7 +125,7 @@ def wrap_distutils_command(command_class):
 
 def _make_command(cmd_name):
     cmd_class = getattr(frontend, re.sub(r'_(js|react)$', '', cmd_name))
-    cmd = click.command(cmd_name)(wrap_distutils_command(cmd_class))
+    cmd = click.command(cmd_name.replace('_', '-'))(wrap_distutils_command(cmd_class))
     for opt, short_opt, description in cmd_class.user_options:
         long_opt_name = opt.rstrip('=')
         var_name = long_opt_name.replace('-', '_')
