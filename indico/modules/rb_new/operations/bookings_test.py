@@ -60,7 +60,6 @@ def past_booking_occurrences_are_cancelled(dummy_user, create_reservation):
     reservation = create_reservation(start_dt=start_dt, end_dt=end_dt, repeat_frequency=RepeatFrequency.DAY)
     new_reservation = split_booking(reservation, {
         'booking_reason': 'test reason',
-        'room_usage': 'current_user',
         'booked_for_user': dummy_user,
         'start_dt': start_dt,
         'end_dt': end_dt,

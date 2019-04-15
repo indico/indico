@@ -368,8 +368,7 @@ class Reservation(Serializer, db.Model):
             if field in data:
                 setattr(reservation, field, data[field])
         reservation.room = room
-        # if 'room_usage' is not specified, we'll take whatever is passed in 'booked_for_user'
-        reservation.booked_for_user = data['booked_for_user'] if data.get('room_usage') != 'current_user' else user
+        reservation.booked_for_user = data.get('booked_for_user') or user
         reservation.booked_for_name = reservation.booked_for_user.full_name
         reservation.state = ReservationState.pending if prebook else ReservationState.accepted
         reservation.created_by_user = user
@@ -621,8 +620,6 @@ class Reservation(Serializer, db.Model):
 
         self.room.check_advance_days(data['end_dt'].date(), user)
         self.room.check_bookable_hours(data['start_dt'].time(), data['end_dt'].time(), user)
-        if data['room_usage'] == 'current_user':
-            data['booked_for_user'] = session.user
 
         changes = {}
         update_occurrences = False

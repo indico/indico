@@ -24,9 +24,9 @@ import {Form, Input, Message, Segment, Select, TextArea} from 'semantic-ui-react
 import {Field, FormSpy} from 'react-final-form';
 import {START_DATE} from 'react-dates/constants';
 
-import PrincipalSearchField from 'indico/react/components/PrincipalSearchField';
-import {ReduxFormField, ReduxRadioField, formatters, validators as v} from 'indico/react/forms';
-import {SingleDatePicker, DatePeriodField} from 'indico/react/components';
+import {FieldCondition, ReduxFormField, ReduxRadioField, formatters, validators as v} from 'indico/react/forms';
+import {FavoritesProvider} from 'indico/react/hooks';
+import {SingleDatePicker, DatePeriodField, PrincipalField} from 'indico/react/components';
 import {serializeDate, serializeTime, toMoment} from 'indico/utils/date';
 import {Overridable} from 'indico/react/util';
 import {PluralTranslate, Translate} from 'indico/react/i18n';
@@ -40,7 +40,6 @@ import './BookingEditForm.module.scss';
 class BookingEditForm extends React.Component {
     static propTypes = {
         user: PropTypes.object.isRequired,
-        favoriteUsers: PropTypes.array.isRequired,
         booking: PropTypes.object.isRequired,
         formProps: PropTypes.object.isRequired,
         onBookingPeriodChange: PropTypes.func,
@@ -178,20 +177,6 @@ class BookingEditForm extends React.Component {
         );
     };
 
-    renderPrincipalSearchField = ({input, currentUser, showCurrentUserPlaceholder, ...fieldProps}) => {
-        const {favoriteUsers} = this.props;
-        if (showCurrentUserPlaceholder && !_.isEmpty(currentUser)) {
-            fieldProps.placeholder = currentUser.fullName;
-        }
-        return (
-            <ReduxFormField {...fieldProps}
-                            input={{...input, value: input.value || null}}
-                            as={PrincipalSearchField}
-                            onChange={(value) => input.onChange(value)}
-                            favoriteUsers={favoriteUsers} />
-        );
-    };
-
     render() {
         const {
             user: sessionUser,
@@ -201,7 +186,7 @@ class BookingEditForm extends React.Component {
             hideOptions,
         } = this.props;
         const {
-            values: {dates, recurrence, timeSlot, usage, user},
+            values: {dates, recurrence, timeSlot, usage},
             submitSucceeded, form, handleSubmit
         } = formProps;
         const bookedByCurrentUser = sessionUser.id === bookedForUser.id;
@@ -304,26 +289,31 @@ class BookingEditForm extends React.Component {
                         <Field name="usage"
                                radioValue="myself"
                                component={ReduxRadioField}
-                               onClick={() => form.change('user', {...sessionUser, isGroup: false})}
+                               onClick={() => form.change('user', sessionUser.identifier)}
                                componentLabel={Translate.string("I'll be using it myself")}
                                disabled={submitSucceeded}
                                checked={usage === 'myself'} />
                         <Field name="usage"
                                radioValue="someone"
                                component={ReduxRadioField}
-                               onClick={() => form.change('user', bookedByCurrentUser ? null : bookedForUser)}
+                               onClick={() => form.change('user', bookedByCurrentUser ? null : bookedForUser.identifier)}
                                componentLabel={Translate.string("I'm booking it for someone else")}
                                disabled={submitSucceeded}
                                checked={usage === 'someone'} />
                     </Form.Group>
-                    <Field name="user"
-                           render={this.renderPrincipalSearchField}
-                           required={usage === 'someone'}
-                           currentUser={user}
-                           disabled={usage === 'myself' || submitSucceeded}
-                           isEqual={(a, b) => a && b && a.identifier === b.identifier}
-                           validate={v.required}
-                           showCurrentUserPlaceholder={usage === 'myself'} />
+                    <FieldCondition when="usage" is="someone">
+                        <FavoritesProvider>
+                            {favoriteUsersController => (
+                                <Field name="user"
+                                       component={ReduxFormField}
+                                       as={PrincipalField}
+                                       favoriteUsersController={favoriteUsersController}
+                                       validate={v.required}
+                                       disabled={submitSucceeded}
+                                       required />
+                            )}
+                        </FavoritesProvider>
+                    </FieldCondition>
                     <Field name="reason"
                            component={ReduxFormField}
                            as={TextArea}
@@ -341,6 +331,5 @@ class BookingEditForm extends React.Component {
 export default connect(
     (state) => ({
         user: userSelectors.getUserInfo(state),
-        favoriteUsers: userSelectors.getFavoriteUsers(state),
     }),
 )(Overridable.component('BookingEditForm', BookingEditForm));

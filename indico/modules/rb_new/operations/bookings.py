@@ -365,7 +365,6 @@ def split_booking(booking, new_booking_data):
     new_end_dt = [occ for occ in occurrences if occ.start_dt.date() < date.today()][-1].end_dt
     old_booking_data = {
         'booking_reason': booking.booking_reason,
-        'room_usage': 'current_user' if booking.booked_for_user == session.user else 'someone',
         'booked_for_user': booking.booked_for_user,
         'start_dt': booking.start_dt,
         'end_dt': new_end_dt,

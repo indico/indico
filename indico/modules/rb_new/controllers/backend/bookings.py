@@ -321,8 +321,7 @@ class RHUpdateBooking(RHBookingBase):
     def _process(self, args):
         new_booking_data = {
             'booking_reason': args['booking_reason'],
-            'room_usage': 'current_user' if args.get('user_id', None) is None else 'someone',
-            'booked_for_user': User.get(args.get('user_id', session.user.id)),
+            'booked_for_user': args.get('booked_for_user', self.booking.booked_for_user),
             'start_dt': args['start_dt'],
             'end_dt': args['end_dt'],
             'repeat_frequency': args['repeat_frequency'],
