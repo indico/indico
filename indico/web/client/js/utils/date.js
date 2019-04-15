@@ -114,3 +114,8 @@ export function getMinimumBookingStartTime(startDate, isAdminOverrideEnabled, gr
     }
     return minTime;
 }
+
+export function initialEndTime(end) {
+    const endOfDay = moment().endOf('day');
+    return end > endOfDay ? endOfDay : end;
+}

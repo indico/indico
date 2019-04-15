@@ -26,7 +26,7 @@ import {PluralTranslate, Translate} from 'indico/react/i18n';
 import {Overridable} from 'indico/react/util';
 import {
     serializeDate, serializeTime, isBookingStartDTValid, createDT, isBookingStartDateValid, getMinimumBookingStartTime,
-    toMoment
+    toMoment, initialEndTime,
 } from 'indico/utils/date';
 import TimeRangePicker from './TimeRangePicker';
 import {selectors as userSelectors} from '../common/user';
@@ -77,7 +77,7 @@ class BookingBootstrapForm extends React.Component {
             },
             timeSlot: {
                 startTime: moment().startOf('hour').add(1, 'h'),
-                endTime: moment().startOf('hour').add(2, 'h')
+                endTime: initialEndTime(moment().startOf('hour').add(2, 'h'))
             }
         }, defaults);
     }

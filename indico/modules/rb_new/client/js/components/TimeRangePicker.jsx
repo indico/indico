@@ -79,8 +79,8 @@ function generateEndTimeOptions(start) {
 
 export default class TimeRangePicker extends React.Component {
     static propTypes = {
-        startTime: PropTypes.object,
-        endTime: PropTypes.object,
+        startTime: PropTypes.object.isRequired,
+        endTime: PropTypes.object.isRequired,
         onChange: PropTypes.func.isRequired,
         disabled: PropTypes.bool,
         minTime: PropTypes.string,
@@ -88,8 +88,6 @@ export default class TimeRangePicker extends React.Component {
 
     static defaultProps = {
         disabled: false,
-        startTime: moment().startOf('hour').add(1, 'h'),
-        endTime: moment().startOf('hour').add(2, 'h'),
         minTime: '00:00',
     };
 
