@@ -40,6 +40,7 @@ import RoomBasicDetails from '../../components/RoomBasicDetails';
 import * as actions from './actions';
 import {actions as modalActions} from '../../modals';
 import {selectors as userSelectors} from '../../common/user';
+import {selectors as configSelectors} from '../../common/config';
 import * as bookRoomSelectors from './selectors';
 import {BookingObjectLink} from '../../common/bookings';
 import SingleRoomTimelineModal from '../../common/timeline/SingleRoomTimelineModal';
@@ -97,6 +98,7 @@ class BookRoomModal extends React.Component {
             preBooking: IndicoPropTypes.i18n
         }),
         reasonRequired: PropTypes.bool,
+        bookingGracePeriod: PropTypes.number.isRequired,
     };
 
     static defaultProps = {
@@ -454,6 +456,7 @@ class BookRoomModal extends React.Component {
             link,
             reasonRequired,
             isAdminOverrideEnabled,
+            bookingGracePeriod
         } = this.props;
         const {skipConflicts, bookingConflictsVisible} = this.state;
         if (!room) {
@@ -464,9 +467,11 @@ class BookRoomModal extends React.Component {
         const conflictsExist = availability && !!Object.keys(availability.conflicts).length;
         const bookingBlocked = ({submitSucceeded}) => submitSucceeded;
         const isStartDtValid = isBookingStartDTValid(
-            createDT(dates.startDate, timeSlot.startTime),
-            isAdminOverrideEnabled
+            createDT(dates.startDate, timeSlot && timeSlot.startTime ? timeSlot.startTime : '00:00'),
+            isAdminOverrideEnabled,
+            bookingGracePeriod,
         );
+
         const buttonsBlocked = (fprops) => (
             !isStartDtValid ||
             bookingBlocked(fprops) ||
@@ -596,6 +601,7 @@ export default connect(
         room: roomsSelectors.getRoom(state, {roomId}),
         link: linkingSelectors.getLinkObject(state),
         isAdminOverrideEnabled: userSelectors.isUserAdminOverrideEnabled(state),
+        bookingGracePeriod: configSelectors.getBookingGracePeriod(state),
     }),
     dispatch => ({
         actions: bindActionCreators({

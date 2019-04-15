@@ -66,20 +66,20 @@ export function createDT(date, time) {
     return moment([...momentDate.toArray().splice(0, 3), ...momentTime.toArray().splice(3)]);
 }
 
-function isBookingStartValid(dt, isAdminOverrideEnabled = false, granularity = 'minute') {
+export function isBookingStartDateValid(date, isAdminOverrideEnabled) {
+    if (!date || !date.isValid()) {
+        return false;
+    } else if (isAdminOverrideEnabled) {
+        return true;
+    }
+    return date.isSameOrAfter(moment(), 'day');
+}
+
+export function isBookingStartDTValid(dt, isAdminOverrideEnabled, gracePeriod) {
     if (!dt || !dt.isValid()) {
         return false;
     } else if (isAdminOverrideEnabled) {
         return true;
     }
-    const gracePeriod = granularity === 'day' ? moment() : moment().subtract(1, 'hour');
-    return dt.isSameOrAfter(gracePeriod, granularity);
-}
-
-export function isBookingStartDateValid(date, isAdminOverrideEnabled) {
-    return isBookingStartValid(date, isAdminOverrideEnabled, 'day');
-}
-
-export function isBookingStartDTValid(dt, isAdminOverrideEnabled) {
-    return isBookingStartValid(dt, isAdminOverrideEnabled);
+    return dt.isSameOrAfter(moment().subtract(gracePeriod, 'hour'), 'minute');
 }

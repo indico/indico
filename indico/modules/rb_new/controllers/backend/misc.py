@@ -42,7 +42,8 @@ class RHConfig(RHRoomBookingBase):
     def _process(self):
         return jsonify(rooms_sprite_token=unicode(_cache.get('rooms-sprite-token', '')),
                        languages=get_all_locales(),
-                       tileserver_url=rb_settings.get('tileserver_url'))
+                       tileserver_url=rb_settings.get('tileserver_url'),
+                       grace_period=rb_settings.get('grace_period'))
 
 
 class RHUserInfo(RHRoomBookingBase):

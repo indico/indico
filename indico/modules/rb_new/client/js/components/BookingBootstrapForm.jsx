@@ -29,6 +29,7 @@ import {
 } from 'indico/utils/date';
 import TimeRangePicker from './TimeRangePicker';
 import {selectors as userSelectors} from '../common/user';
+import {selectors as configSelectors} from '../common/config';
 import {sanitizeRecurrence} from '../util';
 
 
@@ -43,6 +44,7 @@ class BookingBootstrapForm extends React.Component {
         hideOptions: PropTypes.objectOf(PropTypes.bool),
         defaults: PropTypes.object,
         isAdminOverrideEnabled: PropTypes.bool.isRequired,
+        bookingGracePeriod: PropTypes.number.isRequired,
     };
 
     static get defaultProps() {
@@ -172,11 +174,17 @@ class BookingBootstrapForm extends React.Component {
         const {
             timeSlot: {startTime, endTime},
             recurrence: {type, number, interval},
-            dates: {startDate, endDate}
+            dates: {startDate, endDate},
         } = this.state;
 
-        const {buttonCaption, buttonDisabled, children, dayBased, hideOptions, isAdminOverrideEnabled} = this.props;
-        const isStartDtValid = isBookingStartDTValid(createDT(startDate, startTime), isAdminOverrideEnabled);
+        const {
+            buttonCaption, buttonDisabled, children, dayBased, hideOptions, isAdminOverrideEnabled, bookingGracePeriod
+        } = this.props;
+        const isStartDtValid = isBookingStartDTValid(
+            createDT(startDate, startTime),
+            isAdminOverrideEnabled,
+            bookingGracePeriod
+        );
         const recurrenceOptions = [
             {text: PluralTranslate.string('Week', 'Weeks', number), value: 'week'},
             {text: PluralTranslate.string('Month', 'Months', number), value: 'month'}
@@ -239,7 +247,8 @@ class BookingBootstrapForm extends React.Component {
                                          endTime={endTime}
                                          onChange={this.updateTimes}
                                          allowPastTimes={isAdminOverrideEnabled ||
-                                                         moment(startDate, 'YYYY-MM-DD').isAfter(moment(), 'day')} />
+                                                         moment(startDate, 'YYYY-MM-DD').isAfter(moment(), 'day')}
+                                         bookingGracePeriod={bookingGracePeriod} />
                     </Form.Group>
                 )}
                 {children}
@@ -254,5 +263,6 @@ class BookingBootstrapForm extends React.Component {
 export default connect(
     (state) => ({
         isAdminOverrideEnabled: userSelectors.isUserAdminOverrideEnabled(state),
+        bookingGracePeriod: configSelectors.getBookingGracePeriod(state),
     }),
 )(Overridable.component('BookingBootstrapForm', BookingBootstrapForm));

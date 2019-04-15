@@ -35,6 +35,7 @@ import dateRenderer from './filters/DateRenderer';
 import timeRenderer from './filters/TimeRenderer';
 import {actions as filtersActions} from '../../common/filters';
 import {selectors as userSelectors} from '../../common/user';
+import {selectors as configSelectors} from '../../common/config';
 import * as bookRoomSelectors from './selectors';
 
 
@@ -60,6 +61,7 @@ class BookingFilterBar extends React.Component {
         actions: PropTypes.shape({
             setFilterParameter: PropTypes.func
         }).isRequired,
+        bookingGracePeriod: PropTypes.number.isRequired,
     };
 
     static defaultProps = {
@@ -72,6 +74,7 @@ class BookingFilterBar extends React.Component {
             filters: {recurrence, dates, timeSlot},
             actions: {setFilterParameter},
             isAdminOverrideEnabled,
+            bookingGracePeriod,
         } = this.props;
         const isStartDateInFuture = moment(dates.startDate, 'YYYY-MM-DD').isAfter(moment(), 'day');
 
@@ -116,6 +119,7 @@ class BookingFilterBar extends React.Component {
                                                    <TimeForm setParentField={setParentField}
                                                              allowPastTimes={isAdminOverrideEnabled ||
                                                                              isStartDateInFuture}
+                                                             bookingGracePeriod={bookingGracePeriod}
                                                              {...fieldValues} />
                                                )}
                                                setGlobalState={setFilterParameter.bind(undefined, 'timeSlot')}
@@ -132,6 +136,7 @@ export default connect(
     state => ({
         filters: bookRoomSelectors.getFilters(state),
         isAdminOverrideEnabled: userSelectors.isUserAdminOverrideEnabled(state),
+        bookingGracePeriod: configSelectors.getBookingGracePeriod(state),
     }),
     dispatch => ({
         actions: {

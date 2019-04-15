@@ -30,12 +30,14 @@ export default class TimeForm extends FilterFormComponent {
         startTime: PropTypes.string,
         endTime: PropTypes.string,
         allowPastTimes: PropTypes.bool.isRequired,
+        bookingGracePeriod: PropTypes.number,
         ...FilterFormComponent.propTypes
     };
 
     static defaultProps = {
         startTime: null,
-        endTime: null
+        endTime: null,
+        bookingGracePeriod: 1,
     };
 
     static getDerivedStateFromProps({startTime, endTime}, prevState) {
@@ -73,13 +75,14 @@ export default class TimeForm extends FilterFormComponent {
 
     render() {
         const {startTime, endTime} = this.state;
-        const {allowPastTimes} = this.props;
+        const {allowPastTimes, bookingGracePeriod} = this.props;
         return (
             <div ref={this.formRef}>
                 <TimeRangePicker startTime={startTime}
                                  endTime={endTime}
                                  onChange={this.setTimes}
-                                 allowPastTimes={allowPastTimes} />
+                                 allowPastTimes={allowPastTimes}
+                                 bookingGracePeriod={bookingGracePeriod} />
             </div>
         );
     }

@@ -33,6 +33,7 @@ from indico.modules.events import Event
 from indico.modules.events.contributions import Contribution
 from indico.modules.events.sessions import Session
 from indico.modules.events.sessions.models.blocks import SessionBlock
+from indico.modules.rb import rb_settings
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.util import rb_is_admin
 from indico.modules.rb_new.schemas import (bookable_hours_schema, nonbookable_periods_schema,
@@ -114,6 +115,7 @@ def get_linked_object(type_, id_):
 def is_booking_start_within_grace_period(start_dt, user, allow_admin=False):
     if allow_admin and rb_is_admin(user):
         return True
+    grace_period = timedelta(hours=rb_settings.get('grace_period'))
     default_tz = pytz.timezone(config.DEFAULT_TIMEZONE)
     start_dt_utc = default_tz.localize(start_dt).astimezone(pytz.utc)
-    return start_dt_utc >= now_utc() - timedelta(hours=1)
+    return start_dt_utc >= now_utc() - grace_period

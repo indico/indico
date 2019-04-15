@@ -40,6 +40,7 @@ rb_settings = SettingsProxy('roombooking', {
     'end_notifications_enabled': True,
     'booking_limit': 365,
     'tileserver_url': None,
+    'grace_period': 1,
 }, acls={
     'admin_principals',
     'authorized_principals'

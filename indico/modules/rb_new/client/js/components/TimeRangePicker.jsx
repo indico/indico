@@ -41,7 +41,7 @@ function _humanizeDuration(duration) {
     }
 }
 
-function generateStartTimeOptions(allowPastTimes) {
+function generateStartTimeOptions(allowPastTimes, bookingGracePeriod) {
     const options = [];
     const end = moment().endOf('day');
     const next = moment(START_HOUR, 'HH:mm');
@@ -49,7 +49,7 @@ function generateStartTimeOptions(allowPastTimes) {
     // eslint-disable-next-line no-unmodified-loop-condition
     while (next < end) {
         const momentNext = moment(next);
-        if (isBookingStartDTValid(momentNext, allowPastTimes)) {
+        if (isBookingStartDTValid(momentNext, allowPastTimes, bookingGracePeriod)) {
             const serializedNext = serializeTime(momentNext);
             options.push({key: serializedNext, value: serializedNext, text: serializedNext});
         }
@@ -84,13 +84,15 @@ export default class TimeRangePicker extends React.Component {
         endTime: PropTypes.object,
         onChange: PropTypes.func.isRequired,
         disabled: PropTypes.bool,
+        bookingGracePeriod: PropTypes.number,
     };
 
     static defaultProps = {
         allowPastTimes: false,
         disabled: false,
         startTime: moment().startOf('hour').add(1, 'h'),
-        endTime: moment().startOf('hour').add(2, 'h')
+        endTime: moment().startOf('hour').add(2, 'h'),
+        bookingGracePeriod: 1,
     };
 
     constructor(props) {
@@ -121,7 +123,7 @@ export default class TimeRangePicker extends React.Component {
             return;
         }
         let start;
-        const {allowPastTimes, onChange} = this.props;
+        const {allowPastTimes, onChange, bookingGracePeriod} = this.props;
         if (event.type === 'click') {
             start = moment(currentStartTime, ['HH:mm', 'Hmm']);
         } else {
@@ -132,7 +134,7 @@ export default class TimeRangePicker extends React.Component {
                 startSearchQuery: serializeTime(previousStartTime)
             });
             return;
-        } else if (!isBookingStartDTValid(start, allowPastTimes)) {
+        } else if (!isBookingStartDTValid(start, allowPastTimes, bookingGracePeriod)) {
             this.setState({
                 startSearchQuery: serializeTime(previousStartTime)
             });
@@ -181,8 +183,8 @@ export default class TimeRangePicker extends React.Component {
             return;
         }
         let start = toMoment(startTime, 'HH:mm');
-        const {allowPastTimes, onChange} = this.props;
-        if (!isBookingStartDTValid(end, allowPastTimes)) {
+        const {allowPastTimes, onChange, bookingGracePeriod} = this.props;
+        if (!isBookingStartDTValid(end, allowPastTimes, bookingGracePeriod)) {
             this.setState({
                 endSearchQuery: serializeTime(previousEndTime)
             });
@@ -195,7 +197,7 @@ export default class TimeRangePicker extends React.Component {
                 if (end.isSame(start, 'minute')) {
                     end = moment(start).add(duration);
                 }
-            } else if (!isBookingStartDTValid(start, allowPastTimes)) {
+            } else if (!isBookingStartDTValid(start, allowPastTimes, bookingGracePeriod)) {
                 this.setState({
                     endSearchQuery: serializeTime(previousEndTime)
                 });
@@ -228,8 +230,8 @@ export default class TimeRangePicker extends React.Component {
 
     render() {
         const {startTime, endTime, duration, startSearchQuery, endSearchQuery} = this.state;
-        const {disabled, allowPastTimes} = this.props;
-        const startOptions = generateStartTimeOptions(allowPastTimes);
+        const {disabled, allowPastTimes, bookingGracePeriod} = this.props;
+        const startOptions = generateStartTimeOptions(allowPastTimes, bookingGracePeriod);
         const endOptions = generateEndTimeOptions(startTime);
         return (
             <div styleName="time-range-picker">

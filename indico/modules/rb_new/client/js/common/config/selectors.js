@@ -22,3 +22,4 @@ export const hasLoadedConfig = ({config}) => config.request.state === RequestSta
 export const getRoomsSpriteToken = ({config}) => config.data.roomsSpriteToken;
 export const getTileServerURL = ({config}) => config.data.tileServerURL;
 export const getLanguages = ({config}) => config.data.languages;
+export const getBookingGracePeriod = ({config}) => config.data.gracePeriod;

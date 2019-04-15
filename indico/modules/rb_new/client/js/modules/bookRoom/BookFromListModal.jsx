@@ -29,6 +29,7 @@ import RoomBasicDetails from '../../components/RoomBasicDetails';
 import BookingBootstrapForm from '../../components/BookingBootstrapForm';
 import {selectors as roomsSelectors} from '../../common/rooms';
 import {selectors as userSelectors} from '../../common/user';
+import {selectors as configSelectors} from '../../common/config';
 import * as bookRoomActions from './actions';
 import * as bookRoomSelectors from './selectors';
 
@@ -93,6 +94,7 @@ class BookFromListModal extends React.Component {
             bookBtn: IndicoPropTypes.i18n,
             preBookBtn: IndicoPropTypes.i18n,
         }),
+        bookingGracePeriod: PropTypes.number.isRequired,
     };
 
     static defaultProps = {
@@ -124,8 +126,8 @@ class BookFromListModal extends React.Component {
     };
 
     onFiltersChange = (filters) => {
-        const {refreshCollisions, isAdminOverrideEnabled} = this.props;
-        const {dates: {startDate}, timeSlot: {startTime}} = filters;
+        const {refreshCollisions, isAdminOverrideEnabled, bookingGracePeriod} = this.props;
+        const {dates: {startDate}, timeSlot} = filters;
 
         refreshCollisions(filters);
         if (!startDate) {
@@ -133,9 +135,10 @@ class BookFromListModal extends React.Component {
             return;
         }
 
+        const startTime = timeSlot && timeSlot.startTime ? timeSlot.startTime : '00:00';
         const startDt = createDT(startDate, startTime);
         this.setState({
-            pastDTChosen: !isBookingStartDTValid(startDt, isAdminOverrideEnabled)
+            pastDTChosen: !isBookingStartDTValid(startDt, isAdminOverrideEnabled, bookingGracePeriod)
         });
     };
 
@@ -186,6 +189,7 @@ export default connect(
         availability: state.bookRoom.bookingForm.availability,
         availabilityLoading: bookRoomSelectors.isFetchingFormTimeline(state),
         isAdminOverrideEnabled: userSelectors.isUserAdminOverrideEnabled(state),
+        bookingGracePeriod: configSelectors.getBookingGracePeriod(state),
     }),
     (dispatch) => ({
         actions: bindActionCreators({

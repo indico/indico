@@ -70,6 +70,7 @@ class SettingsSchema(mm.Schema):
     end_notification_weekly = fields.Int(validate=[validate.Range(min=1, max=30)])
     end_notification_monthly = fields.Int(validate=[validate.Range(min=1, max=30)])
     excluded_categories = ModelList(Category)
+    grace_period = fields.Int(validate=[validate.Range(min=0, max=24)])
 
 
 class RHSettings(RHRoomBookingAdminBase):
