@@ -208,11 +208,10 @@ class RHCreateBooking(RHRoomBookingBase):
 
     def _process(self):
         args = self.args
+        args.setdefault('booked_for_user', session.user)
+
         if not is_booking_start_within_grace_period(args['start_dt'], session.user, args['admin_override_enabled']):
             raise ExpectedError(_('You cannot create a booking which starts in the past'))
-
-        user_id = args.pop('user_id', None)
-        booked_for = User.get_one(user_id, is_deleted=False) if user_id else session.user
 
         # Check that the booking is not longer than allowed
         booking_limit_days = self.room.booking_limit_days or rb_settings.get('booking_limit')
@@ -222,8 +221,7 @@ class RHCreateBooking(RHRoomBookingBase):
             raise ExpectedError(msg)
 
         try:
-            resv = Reservation.create_from_data(self.room, dict(args, booked_for_user=booked_for), session.user,
-                                                prebook=self.prebook)
+            resv = Reservation.create_from_data(self.room, args, session.user, prebook=self.prebook)
             if args.get('link_type') is not None and args.get('link_id') is not None:
                 self._link_booking(resv, args['link_type'], args['link_id'], args['link_back'])
             db.session.flush()

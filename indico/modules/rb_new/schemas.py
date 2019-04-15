@@ -295,7 +295,7 @@ class CreateBookingSchema(mm.Schema):
     repeat_frequency = EnumField(RepeatFrequency, required=True)
     repeat_interval = fields.Int(missing=0, validate=lambda x: x >= 0)
     room_id = fields.Int(required=True)
-    user_id = fields.Int()
+    booked_for_user = Principal(data_key='user')
     booking_reason = fields.String(data_key='reason', validate=validate.Length(min=3), required=True)
     is_prebooking = fields.Bool(missing=False)
     link_type = EnumField(LinkType)

@@ -22,7 +22,6 @@ import {RequestState} from 'indico/utils/redux';
 
 export const hasLoadedUserInfo = ({user}) => user.requests.info.state === RequestState.SUCCESS;
 export const getUserInfo = ({user}) => user.info;
-export const getUserFullName = createSelector(getUserInfo, ({firstName, lastName}) => `${firstName} ${lastName}`);
 export const isUserRBAdmin = state => getUserInfo(state).isRBAdmin;
 export const isUserAdmin = state => getUserInfo(state).isAdmin;
 export const isUserAdminOverrideEnabled = state => getUserInfo(state).isAdminOverrideEnabled;

@@ -24,9 +24,13 @@ import PropTypes from 'prop-types';
 import {Button, Checkbox, Form, Grid, Icon, Message, Modal, Radio, Segment} from 'semantic-ui-react';
 import {Form as FinalForm, Field} from 'react-final-form';
 import createDecorator from 'final-form-calculate';
-import {ReduxCheckboxField, ReduxDropdownField, ReduxFormField, ReduxRadioField, formatters} from 'indico/react/forms';
+import {
+    FieldCondition, ReduxCheckboxField, ReduxDropdownField, ReduxFormField, ReduxRadioField,
+    formatters
+} from 'indico/react/forms';
 import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
-import PrincipalSearchField from 'indico/react/components/PrincipalSearchField';
+import {PrincipalField} from 'indico/react/components';
+import {FavoritesProvider} from 'indico/react/hooks';
 import {Overridable, IndicoPropTypes} from 'indico/react/util';
 import {createDT, isBookingStartDTValid} from 'indico/utils/date';
 import TimeInformation from '../../components/TimeInformation';
@@ -73,11 +77,9 @@ const formDecorator = createDecorator({
 class BookRoomModal extends React.Component {
     static propTypes = {
         room: PropTypes.object,
-        userFullName: PropTypes.string.isRequired,
         bookingData: PropTypes.object.isRequired,
         onClose: PropTypes.func.isRequired,
         availability: PropTypes.object,
-        favoriteUsers: PropTypes.array.isRequired,
         timeInformationComponent: PropTypes.func,
         relatedEvents: PropTypes.array.isRequired,
         link: linkDataShape,
@@ -134,19 +136,6 @@ class BookRoomModal extends React.Component {
         resetAvailability();
         resetRelatedEvents();
     }
-
-    renderPrincipalSearchField = ({input, showCurrentUserPlaceholder, ...fieldProps}) => {
-        const {favoriteUsers, userFullName} = this.props;
-        if (showCurrentUserPlaceholder) {
-            fieldProps.placeholder = userFullName;
-        }
-        return (
-            <ReduxFormField {...fieldProps}
-                            input={{...input, value: input.value || null}}
-                            favoriteUsers={favoriteUsers}
-                            as={PrincipalSearchField} />
-        );
-    };
 
     renderBookingState({submitSucceeded, submitError, submitFailed, values}) {
         const {actions: {openBookingDetails}} = this.props;
@@ -531,11 +520,17 @@ class BookRoomModal extends React.Component {
                                                componentLabel={Translate.string("I'm booking it for someone else")}
                                                disabled={bookingBlocked(fprops)} />
                                     </Form.Group>
-                                    <Field name="user"
-                                           render={this.renderPrincipalSearchField}
-                                           disabled={bookingBlocked(fprops) || fprops.values.usage !== 'someone'}
-                                           required={fprops.values.usage === 'someone'}
-                                           showCurrentUserPlaceholder={fprops.values.usage === 'myself'} />
+                                    <FieldCondition when="usage" is="someone">
+                                        <FavoritesProvider>
+                                            {favoriteUsersController => (
+                                                <Field name="user"
+                                                       component={ReduxFormField}
+                                                       as={PrincipalField}
+                                                       favoriteUsersController={favoriteUsersController}
+                                                       required />
+                                            )}
+                                        </FavoritesProvider>
+                                    </FieldCondition>
                                     <Field name="reason"
                                            component={ReduxFormField}
                                            as={Form.TextArea}
@@ -591,8 +586,6 @@ class BookRoomModal extends React.Component {
 
 export default connect(
     (state, {roomId}) => ({
-        favoriteUsers: userSelectors.getFavoriteUsers(state),
-        userFullName: userSelectors.getUserFullName(state),
         availability: bookRoomSelectors.getBookingFormAvailability(state),
         relatedEvents: bookRoomSelectors.getBookingFormRelatedEvents(state),
         room: roomsSelectors.getRoom(state, {roomId}),

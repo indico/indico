@@ -26,9 +26,9 @@ export const ajax = {
     repeat_frequency: recurrenceFrequencySerializer,
     repeat_interval: recurrenceIntervalSerializer,
     reason: ({reason}) => reason,
-    user_id: {
+    user: {
         onlyIf: ({usage}) => usage === 'someone',
-        serializer: ({user: {id}}) => id
+        serializer: ({user}) => user
     },
     room_id: ({room: {id}}) => id,
     is_prebooking: ({isPrebooking}) => isPrebooking,
