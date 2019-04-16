@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 import os
 from collections import namedtuple
-from datetime import datetime, timedelta
+from datetime import timedelta
 from io import BytesIO
 
 import pytz
