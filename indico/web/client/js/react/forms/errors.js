@@ -31,6 +31,10 @@ function flatten(value) {
 export function handleSubmissionError(error, defaultMessage = null, fieldErrorMap = {}) {
     const webargsErrors = _.get(error, 'response.data.webargs_errors');
     if (webargsErrors && error.response.status === 422) {
+        if (Array.isArray(webargsErrors)) {
+            // schema-level validation failed
+            return {[FORM_ERROR]: webargsErrors.join(' / ')};
+        }
         // flatten errors in case there's more than one
         return _.fromPairs(Object.entries(webargsErrors).map(([field, errors]) => {
             return [fieldErrorMap[field] || field, flatten(errors).join(' / ')];
