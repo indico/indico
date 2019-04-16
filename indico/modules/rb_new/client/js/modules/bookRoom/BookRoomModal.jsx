@@ -566,6 +566,7 @@ class BookRoomModal extends React.Component {
                     <SingleRoomTimelineModal open={bookingConflictsVisible}
                                              onClose={this.hideConflicts}
                                              room={room}
+                                             roomAvailability={availability}
                                              title={<Translate>Bookings</Translate>}
                                              legendLabels={legendLabels} />
                 </Modal.Actions>

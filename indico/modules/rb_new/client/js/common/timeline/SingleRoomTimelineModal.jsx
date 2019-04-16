@@ -48,16 +48,17 @@ const _getRowSerializer = (day, room) => {
         },
         label: serializeDate(day, 'L'),
         key: day,
-        conflictIndicator: true,
         room
     });
 };
 
 const _SingleRoomTimelineContent = props => {
-    const {availability, availabilityLoading, room, filters, actions: {fetchAvailability}} = props;
+    const {availability, availabilityLoading, room, filters, roomAvailability, actions: {fetchAvailability}} = props;
     useEffect(() => {
-        fetchAvailability(room, filters);
-    }, [fetchAvailability, filters, room]);
+        if (_.isEmpty(roomAvailability)) {
+            fetchAvailability(room, filters);
+        }
+    }, [fetchAvailability, filters, room, roomAvailability]);
 
     const isLoaded = !_.isEmpty(availability) && !availabilityLoading;
     if (!isLoaded) {
@@ -78,6 +79,7 @@ _SingleRoomTimelineContent.propTypes = {
     availability: PropTypes.object,
     availabilityLoading: PropTypes.bool.isRequired,
     filters: PropTypes.object.isRequired,
+    roomAvailability: PropTypes.object,
     actions: PropTypes.exact({
         fetchAvailability: PropTypes.func.isRequired,
     }).isRequired,
@@ -85,6 +87,7 @@ _SingleRoomTimelineContent.propTypes = {
 
 _SingleRoomTimelineContent.defaultProps = {
     availability: {},
+    roomAvailability: {},
 };
 
 const SingleRoomTimelineContent = connect(
@@ -101,8 +104,19 @@ const SingleRoomTimelineContent = connect(
 )(React.memo(_SingleRoomTimelineContent));
 
 
+/**
+ * Timeline modal for a single room
+ *
+ * @param {Boolean} props.open - Whether the modal should be visible.
+ * @param {String} props.title - Modal title.
+ * @param {Function} props.onClose - Function to execute when closing the modal.
+ * @param {Object} props.roomAvailability - Room availability if it was previously
+ * fetched, otherwise it'll be fetched here.
+ * @param {Object} props.room - Room whose timeline will be displayed.
+ * @param {Array} props.legendLabels- Array containing timeline legend labels.
+ */
 const SingleRoomTimelineModal = props => {
-    const {open, title, onClose, room, legendLabels} = props;
+    const {open, title, onClose, roomAvailability, room, legendLabels} = props;
     return (
         <Modal open={open}
                onClose={onClose}
@@ -113,7 +127,7 @@ const SingleRoomTimelineModal = props => {
                        content={<TimelineLegend labels={legendLabels} compact />} />
             </Modal.Header>
             <Modal.Content>
-                <SingleRoomTimelineContent room={room} />
+                <SingleRoomTimelineContent room={room} roomAvailability={roomAvailability} />
             </Modal.Content>
         </Modal>
     );
@@ -123,14 +137,16 @@ SingleRoomTimelineModal.propTypes = {
     open: PropTypes.bool,
     title: PropTypes.node,
     onClose: PropTypes.func,
-    legendLabels: PropTypes.array,
+    roomAvailability: PropTypes.object,
     room: PropTypes.object.isRequired,
+    legendLabels: PropTypes.array,
 };
 
 SingleRoomTimelineModal.defaultProps = {
     open: false,
     title: '',
     onClose: () => {},
+    roomAvailability: {},
     legendLabels: [],
 };
 
