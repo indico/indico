@@ -21,6 +21,7 @@ import pytest
 from dateutil.relativedelta import relativedelta
 
 from indico.core.errors import IndicoError
+from indico.modules.rb import rb_settings
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence, ReservationOccurrenceState
 from indico.modules.rb.models.reservations import RepeatFrequency
 from indico.testing.util import extract_emails
@@ -404,6 +405,7 @@ def test_can_cancel(create_reservation, dummy_user, freeze_time):
 
 
 def test_can_cancel_recent_reservation(create_reservation, dummy_user, freeze_time):
+    rb_settings.set('grace_period', 1)
     reservation = create_reservation(start_dt=datetime.combine(date.today(), time(11)),
                                      end_dt=datetime.combine(date.today(), time(17)),
                                      repeat_frequency=RepeatFrequency.NEVER)
@@ -412,6 +414,10 @@ def test_can_cancel_recent_reservation(create_reservation, dummy_user, freeze_ti
 
     reservation.start_dt = datetime.combine(date.today(), time(8))
     assert not reservation.can_cancel(dummy_user)
+
+    rb_settings.set('grace_period', 4)
+    reservation.start_dt = datetime.combine(date.today(), time(8))
+    assert reservation.can_cancel(dummy_user)
 
     reservation.start_dt = reservation.start_dt + relativedelta(days=1)
     reservation.end_dt = reservation.end_dt + relativedelta(days=1)

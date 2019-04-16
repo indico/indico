@@ -25,7 +25,8 @@ import {SingleDatePicker, DateRangePicker} from 'indico/react/components';
 import {PluralTranslate, Translate} from 'indico/react/i18n';
 import {Overridable} from 'indico/react/util';
 import {
-    serializeDate, serializeTime, isBookingStartDTValid, createDT, isBookingStartDateValid
+    serializeDate, serializeTime, isBookingStartDTValid, createDT, isBookingStartDateValid, getMinimumBookingStartTime,
+    toMoment
 } from 'indico/utils/date';
 import TimeRangePicker from './TimeRangePicker';
 import {selectors as userSelectors} from '../common/user';
@@ -44,7 +45,7 @@ class BookingBootstrapForm extends React.Component {
         hideOptions: PropTypes.objectOf(PropTypes.bool),
         defaults: PropTypes.object,
         isAdminOverrideEnabled: PropTypes.bool.isRequired,
-        bookingGracePeriod: PropTypes.number.isRequired,
+        bookingGracePeriod: PropTypes.number,
     };
 
     static get defaultProps() {
@@ -56,6 +57,7 @@ class BookingBootstrapForm extends React.Component {
             dayBased: false,
             hideOptions: {},
             defaults: {},
+            bookingGracePeriod: null,
         };
     }
 
@@ -191,6 +193,8 @@ class BookingBootstrapForm extends React.Component {
         ];
         // all but one option are hidden
         const showRecurrenceOptions = ['single', 'daily', 'recurring'].filter(x => hideOptions[x]).length !== 2;
+        const minTime = getMinimumBookingStartTime(toMoment(startDate), isAdminOverrideEnabled, bookingGracePeriod);
+
         return (
             <Form>
                 {showRecurrenceOptions && (
@@ -235,20 +239,30 @@ class BookingBootstrapForm extends React.Component {
                     <DateRangePicker startDate={startDate}
                                      endDate={endDate}
                                      onDatesChange={({startDate: sd, endDate: ed}) => this.updateDates(sd, ed)}
-                                     isOutsideRange={(dt) => !isBookingStartDateValid(dt, isAdminOverrideEnabled)} />
+                                     isOutsideRange={(dt) => {
+                                         return !isBookingStartDateValid(
+                                             dt,
+                                             isAdminOverrideEnabled,
+                                             bookingGracePeriod
+                                         );
+                                     }} />
                 )}
                 {type === 'single' && (
                     <SingleDatePicker date={startDate} onDateChange={(date) => this.updateDates(date, null)}
-                                      disabledDate={(dt) => !isBookingStartDateValid(dt, isAdminOverrideEnabled)} />
+                                      disabledDate={(dt) => {
+                                          return !isBookingStartDateValid(
+                                              dt,
+                                              isAdminOverrideEnabled,
+                                              bookingGracePeriod
+                                          );
+                                      }} />
                 )}
                 {!dayBased && (
                     <Form.Group inline>
                         <TimeRangePicker startTime={startTime}
                                          endTime={endTime}
                                          onChange={this.updateTimes}
-                                         allowPastTimes={isAdminOverrideEnabled ||
-                                                         moment(startDate, 'YYYY-MM-DD').isAfter(moment(), 'day')}
-                                         bookingGracePeriod={bookingGracePeriod} />
+                                         minTime={minTime} />
                     </Form.Group>
                 )}
                 {children}

@@ -98,7 +98,7 @@ class BookRoomModal extends React.Component {
             preBooking: IndicoPropTypes.i18n
         }),
         reasonRequired: PropTypes.bool,
-        bookingGracePeriod: PropTypes.number.isRequired,
+        bookingGracePeriod: PropTypes.number,
     };
 
     static defaultProps = {
@@ -111,6 +111,7 @@ class BookRoomModal extends React.Component {
             preBooking: <Translate>Create Pre-booking</Translate>
         },
         reasonRequired: true,
+        bookingGracePeriod: null,
     };
 
     state = {
@@ -458,10 +459,12 @@ class BookRoomModal extends React.Component {
             isAdminOverrideEnabled,
             bookingGracePeriod
         } = this.props;
-        const {skipConflicts, bookingConflictsVisible} = this.state;
+
         if (!room) {
             return null;
         }
+
+        const {skipConflicts, bookingConflictsVisible} = this.state;
         const linkBack = !!link && !this.hasLinkConflict;
         const occurrenceCount = availability && availability.dateRange.length;
         const conflictsExist = availability && !!Object.keys(availability.conflicts).length;

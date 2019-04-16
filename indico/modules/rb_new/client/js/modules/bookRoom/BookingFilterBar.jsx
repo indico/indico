@@ -15,7 +15,6 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import moment from 'moment';
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Button} from 'semantic-ui-react';
@@ -23,7 +22,7 @@ import {connect} from 'react-redux';
 
 import {Translate} from 'indico/react/i18n';
 import {Overridable} from 'indico/react/util';
-import {isBookingStartDateValid} from 'indico/utils/date';
+import {isBookingStartDateValid, getMinimumBookingStartTime, createDT} from 'indico/utils/date';
 import {FilterBarController, FilterDropdownFactory} from '../../common/filters/FilterBar';
 
 import RecurrenceForm from './filters/RecurrenceForm';
@@ -61,11 +60,12 @@ class BookingFilterBar extends React.Component {
         actions: PropTypes.shape({
             setFilterParameter: PropTypes.func
         }).isRequired,
-        bookingGracePeriod: PropTypes.number.isRequired,
+        bookingGracePeriod: PropTypes.number,
     };
 
     static defaultProps = {
         dayBased: false,
+        bookingGracePeriod: null,
     };
 
     render() {
@@ -76,7 +76,11 @@ class BookingFilterBar extends React.Component {
             isAdminOverrideEnabled,
             bookingGracePeriod,
         } = this.props;
-        const isStartDateInFuture = moment(dates.startDate, 'YYYY-MM-DD').isAfter(moment(), 'day');
+        const minTime = getMinimumBookingStartTime(
+            createDT(dates.startDate, '00:00'),
+            isAdminOverrideEnabled,
+            bookingGracePeriod
+        );
 
         return (
             <Button.Group size="small">
@@ -105,7 +109,11 @@ class BookingFilterBar extends React.Component {
                                                <DateForm setParentField={setParentField}
                                                          isRange={recurrence.type !== 'single'}
                                                          disabledDate={(dt) => (
-                                                             !isBookingStartDateValid(dt, isAdminOverrideEnabled)
+                                                             !isBookingStartDateValid(
+                                                                 dt,
+                                                                 isAdminOverrideEnabled,
+                                                                 bookingGracePeriod
+                                                             )
                                                          )}
                                                          {...dates} />
                                            )}
@@ -117,9 +125,7 @@ class BookingFilterBar extends React.Component {
                                                title={<Translate>Time</Translate>}
                                                form={(fieldValues, setParentField) => (
                                                    <TimeForm setParentField={setParentField}
-                                                             allowPastTimes={isAdminOverrideEnabled ||
-                                                                             isStartDateInFuture}
-                                                             bookingGracePeriod={bookingGracePeriod}
+                                                             minTime={minTime}
                                                              {...fieldValues} />
                                                )}
                                                setGlobalState={setFilterParameter.bind(undefined, 'timeSlot')}

@@ -496,8 +496,9 @@ class Reservation(Serializer, db.Model):
             return False
         if self.is_rejected or self.is_cancelled or self.is_archived:
             return False
+
         is_booked_or_owned_by_user = self.is_owned_by(user) or self.is_booked_for(user)
-        is_valid_start_dt = is_booking_start_within_grace_period(self.start_dt, user)
+        is_valid_start_dt = is_booking_start_within_grace_period(self.start_dt, user, allow_admin=allow_admin)
         return (is_booked_or_owned_by_user and is_valid_start_dt) or (allow_admin and rb_is_admin(user))
 
     def can_edit(self, user, allow_admin=True):

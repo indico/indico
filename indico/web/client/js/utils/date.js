@@ -66,13 +66,15 @@ export function createDT(date, time) {
     return moment([...momentDate.toArray().splice(0, 3), ...momentTime.toArray().splice(3)]);
 }
 
-export function isBookingStartDateValid(date, isAdminOverrideEnabled) {
+export function isBookingStartDateValid(date, isAdminOverrideEnabled, gracePeriod) {
     if (!date || !date.isValid()) {
         return false;
     } else if (isAdminOverrideEnabled) {
         return true;
+    } else if (gracePeriod === null) {
+        return date.isSameOrAfter(moment(), 'day');
     }
-    return date.isSameOrAfter(moment(), 'day');
+    return date.isSameOrAfter(moment().subtract(gracePeriod, 'hour'), 'day');
 }
 
 export function isBookingStartDTValid(dt, isAdminOverrideEnabled, gracePeriod) {
@@ -80,6 +82,35 @@ export function isBookingStartDTValid(dt, isAdminOverrideEnabled, gracePeriod) {
         return false;
     } else if (isAdminOverrideEnabled) {
         return true;
+    } else if (gracePeriod === null) {
+        return dt.isSameOrAfter(moment().startOf('day'));
     }
-    return dt.isSameOrAfter(moment().subtract(gracePeriod, 'hour'), 'minute');
+
+    return dt.isSameOrAfter(moment().subtract(gracePeriod || 0, 'hour'), 'minute');
+}
+
+export function getMinimumBookingStartTime(startDate, isAdminOverrideEnabled, gracePeriod) {
+    const today = moment();
+    if (
+        !moment(startDate).isValid() ||
+        isAdminOverrideEnabled ||
+        startDate.isAfter(today, 'day') ||
+        gracePeriod === null
+    ) {
+        return null;
+    }
+
+    let minTime = null;
+    if (startDate.isSame(today, 'day')) {
+        const withGracePeriod = moment(today).subtract(gracePeriod, 'hour');
+        if (withGracePeriod.date() === today.date()) {
+            minTime = serializeTime(withGracePeriod);
+        }
+    } else {
+        const withGracePeriod = moment(today).subtract(gracePeriod, 'hour');
+        if (withGracePeriod.date() === startDate.date()) {
+            minTime = serializeTime(withGracePeriod);
+        }
+    }
+    return minTime;
 }

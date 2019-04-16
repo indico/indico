@@ -94,7 +94,7 @@ class BookFromListModal extends React.Component {
             bookBtn: IndicoPropTypes.i18n,
             preBookBtn: IndicoPropTypes.i18n,
         }),
-        bookingGracePeriod: PropTypes.number.isRequired,
+        bookingGracePeriod: PropTypes.number,
     };
 
     static defaultProps = {
@@ -107,7 +107,8 @@ class BookFromListModal extends React.Component {
             preBookTitle: <Translate>Pre-Book Room</Translate>,
             bookBtn: <Translate>Book</Translate>,
             preBookBtn: <Translate>Pre-Book</Translate>,
-        }
+        },
+        bookingGracePeriod: null,
     };
 
     state = {

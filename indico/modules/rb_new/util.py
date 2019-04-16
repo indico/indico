@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 import os
 from collections import namedtuple
-from datetime import timedelta
+from datetime import datetime, timedelta
 from io import BytesIO
 
 import pytz
@@ -38,7 +38,7 @@ from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.util import rb_is_admin
 from indico.modules.rb_new.schemas import (bookable_hours_schema, nonbookable_periods_schema,
                                            reservation_occurrences_schema, simple_blockings_schema)
-from indico.util.date_time import now_utc
+from indico.util.date_time import now_utc, server_to_utc
 from indico.util.string import crc32
 from indico.util.struct.iterables import group_list
 
@@ -115,7 +115,14 @@ def get_linked_object(type_, id_):
 def is_booking_start_within_grace_period(start_dt, user, allow_admin=False):
     if allow_admin and rb_is_admin(user):
         return True
-    grace_period = timedelta(hours=rb_settings.get('grace_period'))
+
     default_tz = pytz.timezone(config.DEFAULT_TIMEZONE)
-    start_dt_utc = default_tz.localize(start_dt).astimezone(pytz.utc)
+    start_dt_localized = default_tz.localize(start_dt)
+    grace_period = rb_settings.get('grace_period')
+    if grace_period is None:
+        today = server_to_utc(datetime.now()).astimezone(default_tz).date()
+        return start_dt_localized.date() >= today
+
+    start_dt_utc = start_dt_localized.astimezone(pytz.utc)
+    grace_period = timedelta(hours=grace_period)
     return start_dt_utc >= now_utc() - grace_period

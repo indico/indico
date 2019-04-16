@@ -29,8 +29,7 @@ export default class TimeForm extends FilterFormComponent {
     static propTypes = {
         startTime: PropTypes.string,
         endTime: PropTypes.string,
-        allowPastTimes: PropTypes.bool.isRequired,
-        bookingGracePeriod: PropTypes.number,
+        minTime: PropTypes.string,
         ...FilterFormComponent.propTypes
     };
 
@@ -75,14 +74,13 @@ export default class TimeForm extends FilterFormComponent {
 
     render() {
         const {startTime, endTime} = this.state;
-        const {allowPastTimes, bookingGracePeriod} = this.props;
+        const {minTime} = this.props;
         return (
             <div ref={this.formRef}>
                 <TimeRangePicker startTime={startTime}
                                  endTime={endTime}
                                  onChange={this.setTimes}
-                                 allowPastTimes={allowPastTimes}
-                                 bookingGracePeriod={bookingGracePeriod} />
+                                 minTime={minTime} />
             </div>
         );
     }

@@ -248,10 +248,8 @@ const SettingsPage = props => {
                                component={ReduxFormField}
                                as="input"
                                type="number"
-                               min="0"
                                max="24"
-                               required
-                               parse={value => (value ? +value : null)}
+                               parse={value => (value.length !== 0 ? +value : null)}
                                label={Translate.string('Grace period')}>
                             <p className="field-description">
                                 <Translate>
