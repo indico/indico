@@ -40,7 +40,6 @@ from indico.modules.rb_new.schemas import (admin_equipment_type_schema, admin_lo
                                            nonbookable_periods_schema, room_attribute_schema,
                                            room_attribute_values_schema, room_equipment_schema, room_feature_schema,
                                            room_update_schema)
-from indico.modules.users.models.users import User
 from indico.util.i18n import _
 from indico.util.marshmallow import ModelList, Principal, PrincipalList
 from indico.web.util import ExpectedError
