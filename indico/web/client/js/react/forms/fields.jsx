@@ -25,8 +25,8 @@ import './ReduxFormField.module.scss';
 export function ReduxFormField(
     {
         input, label, placeholder, required, children, disabled, componentLabel, defaultValue, fieldProps,
-        hideValidationError,
-        meta: {touched, error, submitError, submitting, dirty, dirtySinceLastSubmit},
+        hideValidationError, hideErrorWhileActive,
+        meta: {touched, error, submitError, submitting, dirty, dirtySinceLastSubmit, active},
         as: Component,
         ...props
     }
@@ -45,6 +45,8 @@ export function ReduxFormField(
     } else if (submitError && !dirtySinceLastSubmit && !submitting) {
         errorMessage = submitError;
     }
+
+    const showErrorPopup = !!errorMessage && (!hideErrorWhileActive || !active);
 
     const field = (
         <Form.Field required={required}
@@ -66,7 +68,7 @@ export function ReduxFormField(
     return (
         <Popup trigger={field}
                position="left center"
-               open={!!errorMessage}>
+               open={showErrorPopup}>
             <div styleName="field-error">
                 {errorMessage}
             </div>
@@ -79,6 +81,7 @@ ReduxFormField.propTypes = {
     input: PropTypes.object.isRequired,
     required: PropTypes.bool,
     hideValidationError: PropTypes.bool,
+    hideErrorWhileActive: PropTypes.bool,
     label: PropTypes.string,
     componentLabel: PropTypes.oneOfType([PropTypes.string, PropTypes.exact({children: PropTypes.node})]),
     placeholder: PropTypes.string,
@@ -93,6 +96,7 @@ ReduxFormField.defaultProps = {
     disabled: false,
     required: false,
     hideValidationError: false,
+    hideErrorWhileActive: false,
     placeholder: null,
     label: null,
     componentLabel: null,

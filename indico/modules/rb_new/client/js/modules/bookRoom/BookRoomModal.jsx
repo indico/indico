@@ -528,6 +528,7 @@ class BookRoomModal extends React.Component {
                                                        as={PrincipalField}
                                                        favoriteUsersController={favoriteUsersController}
                                                        disabled={bookingBlocked(fprops)}
+                                                       hideErrorWhileActive
                                                        withExternalUsers
                                                        required />
                                             )}
