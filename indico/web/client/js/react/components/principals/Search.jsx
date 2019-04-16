@@ -16,18 +16,20 @@
  */
 
 import userSearchURL from 'indico-url:users.user_search';
+import userSearchInfoURL from 'indico-url:users.user_search_info';
 import groupSearchURL from 'indico-url:groups.group_search';
 
 import _ from 'lodash';
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 import PropTypes from 'prop-types';
 import {Button, Divider, Dropdown, Form, Icon, Label, List, Message, Modal, Popup} from 'semantic-ui-react';
+import {FORM_ERROR} from 'final-form';
 import {Form as FinalForm, Field} from 'react-final-form';
 import {
     ReduxCheckboxField, ReduxFormField, formatters, getChangedValues, handleSubmitError, validators as v
 } from 'indico/react/forms';
 import {Translate, PluralTranslate, Singular, Plural, Param} from 'indico/react/i18n';
-import {indicoAxios} from 'indico/utils/axios';
+import {indicoAxios, useIndicoAxios} from 'indico/utils/axios';
 import {camelizeKeys} from 'indico/utils/case';
 
 import './items.module.scss';
@@ -46,6 +48,7 @@ const searchFactory = config => {
         favoriteKey,
         noResultsText,
         runSearch,
+        validateForm,
     } = config;
 
     // eslint-disable-next-line react/prop-types
@@ -79,7 +82,9 @@ const searchFactory = config => {
 
     // eslint-disable-next-line react/prop-types
     const SearchForm = ({onSearch, favorites, isAdded, onAdd}) => (
-        <FinalForm onSubmit={onSearch} subscription={{submitting: true, hasValidationErrors: true, pristine: true}}>
+        <FinalForm onSubmit={onSearch}
+                   subscription={{submitting: true, hasValidationErrors: true, pristine: true}}
+                   validate={validateForm}>
             {(fprops) => (
                 <Form onSubmit={fprops.handleSubmit}>
                     {searchFields}
@@ -90,7 +95,8 @@ const searchFactory = config => {
                                 primary
                                 content={Translate.string('Search')} />
                         {!_.isEmpty(favorites) && (
-                            <Dropdown floating labeled text={Translate.string('Select favorite')}>
+                            <Dropdown floating labeled text={Translate.string('Select favorite')}
+                                      disabled={fprops.submitting}>
                                 <Dropdown.Menu>
                                     {_.sortBy(Object.values(favorites), 'name').map(x => (
                                         <FavoriteItem key={x.identifier} name={x.name} detail={x.detail}
@@ -281,33 +287,70 @@ const searchFactory = config => {
 };
 
 
-export const UserSearch = searchFactory({
+const WithExternalsContext = React.createContext(false);
+
+const UserSearchFields = () => {
+    const withExternals = useContext(WithExternalsContext);
+
+    const {data} = useIndicoAxios({
+        url: userSearchInfoURL(),
+        trigger: withExternals,
+        forceDispatchEffect: () => withExternals,
+        camelize: true,
+    });
+
+    const hasExternals = data && data.externalUsersAvailable;
+    return (
+        <>
+            <Field name="first_name" component={ReduxFormField} as="input"
+                   format={formatters.trim} formatOnBlur
+                   autoFocus hideValidationError
+                   autoComplete="off"
+                   label={Translate.string('First name')} />
+            <Field name="last_name" component={ReduxFormField} as="input"
+                   format={formatters.trim} formatOnBlur
+                   autoComplete="off"
+                   label={Translate.string('Last name')} />
+            <Field name="email" component={ReduxFormField} as="input" type="email"
+                   format={formatters.trim} formatOnBlur
+                   autoComplete="off"
+                   label={Translate.string('Email address')} />
+            <Field name="affiliation" component={ReduxFormField} as="input"
+                   format={formatters.trim} formatOnBlur
+                   autoComplete="off"
+                   label={Translate.string('Affiliation')} />
+            {hasExternals && (
+                <Field name="external" component={ReduxCheckboxField}
+                       componentLabel={Translate.string('Include users with no Indico account')} />
+            )}
+            <Field name="exact" component={ReduxCheckboxField}
+                   componentLabel={Translate.string('Exact matches only')} />
+        </>
+    );
+};
+
+const InnerUserSearch = searchFactory({
     componentName: 'UserSearch',
     buttonTitle: Translate.string('User'),
     modalTitle: single => (single ? Translate.string('Select user') : Translate.string('Add users')),
     resultIcon: 'user',
     favoriteKey: 'userId',
-    searchFields: (
-        <Field name="name" component={ReduxFormField} as="input"
-               format={formatters.trim} formatOnBlur
-               autoFocus hideValidationError
-               required validate={v.minLength(3)}
-               autoComplete="off"
-               label={Translate.string('Name or Email')} />
-    ),
+    searchFields: <UserSearchFields />,
+    validateForm: (values => {
+        if (!values.first_name && !values.last_name && !values.email && !values.affiliation) {
+            // no i18n needed, we do not show this error
+            return {[FORM_ERROR]: 'No criteria specified'};
+        }
+    }),
     runSearch: async (data, form, setResult) => {
         setResult(null);
         const values = getChangedValues(data, form);
-        if (values.name && values.name.includes('@')) {
-            values.email = values.name;
-            delete values.name;
-        }
         values.favorites_first = true;
         let response;
         try {
             response = await indicoAxios.get(userSearchURL(values));
         } catch (error) {
-            return handleSubmitError(error, {email: 'name'});
+            return handleSubmitError(error);
         }
         const resultData = camelizeKeys(response.data);
         resultData.results = resultData.users.map(({identifier, id, fullName, email, affiliation}) => ({
@@ -334,6 +377,22 @@ export const UserSearch = searchFactory({
         </PluralTranslate>
     ),
 });
+
+export const UserSearch = ({withExternalUsers, ...props}) => (
+    <WithExternalsContext.Provider value={withExternalUsers}>
+        <InnerUserSearch {...props} />
+    </WithExternalsContext.Provider>
+);
+
+UserSearch.propTypes = {
+    ...InnerUserSearch.propTypes,
+    withExternalUsers: PropTypes.bool,
+};
+
+UserSearch.defaultProps = {
+    ...InnerUserSearch.defaultProps,
+    withExternalUsers: false,
+};
 
 
 export const GroupSearch = searchFactory({

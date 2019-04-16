@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from functools import wraps
+from __future__ import unicode_literals
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.principals import EmailPrincipal
@@ -109,7 +109,7 @@ def principal_from_fossil(fossil, allow_pending=False, allow_groups=True, allow_
         raise ValueError('Unexpected fossil type: {}'.format(type_))
 
 
-def principal_from_identifier(identifier, allow_groups=False):
+def principal_from_identifier(identifier, allow_groups=False, allow_external_users=False):
     # XXX: this is currently only used in PrincipalList
     # if we ever need to support more than just users and groups,
     # make sure to add it in here as well
@@ -129,6 +129,23 @@ def principal_from_identifier(identifier, allow_groups=False):
         if user is None:
             raise ValueError('Invalid user: {}'.format(user_id))
         return user
+    elif type_ == 'ExternalUser':
+        if not allow_external_users:
+            raise ValueError('External users are not allowed')
+        cache = GenericCache('external-user')
+        external_user_data = cache.get(data)
+        if not external_user_data:
+            raise ValueError('Invalid data')
+        user = User.query.filter(User.all_emails == external_user_data['email'], ~User.is_deleted).first()
+        if user:
+            return user
+        # create a pending user. this user isn't sent to the DB unless it gets added
+        # to the sqlalchemy session somehow (e.g. by adding it to an ACL).
+        # like this processing form data does not result in something being stored in
+        # the database, which is good!
+        return User(first_name=external_user_data['first_name'], last_name=external_user_data['last_name'],
+                    email=external_user_data['email'], affiliation=external_user_data['affiliation'],
+                    address=external_user_data['address'], phone=external_user_data['phone'], is_pending=True)
     elif type_ == 'Group':
         if not allow_groups:
             raise ValueError('Groups are not allowed')

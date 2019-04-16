@@ -52,7 +52,13 @@ PendingPrincipalListItem.defaultProps = {
 };
 
 export const PrincipalListItem = (
-    {isGroup, name, detail, canDelete, onDelete, onAddFavorite, onDelFavorite, disabled, readOnly, favorite, search}
+    {
+        isPendingUser, isGroup,
+        name, detail, canDelete,
+        onDelete, onAddFavorite, onDelFavorite,
+        disabled, readOnly, favorite,
+        search
+    }
 ) => (
     <List.Item>
         <div styleName="item">
@@ -71,7 +77,7 @@ export const PrincipalListItem = (
             </div>
             {!readOnly && (
                 <div styleName="actions">
-                    {!isGroup && (
+                    {!isGroup && !isPendingUser && (
                         favorite ? (
                             <Icon styleName="button favorite active" name="star" size="large"
                                   onClick={onDelFavorite} disabled={disabled} />
@@ -93,6 +99,7 @@ export const PrincipalListItem = (
 
 PrincipalListItem.propTypes = {
     isGroup: PropTypes.bool,
+    isPendingUser: PropTypes.bool,
     name: PropTypes.string.isRequired,
     detail: PropTypes.string,
     onDelete: PropTypes.func.isRequired,
@@ -110,6 +117,7 @@ PrincipalListItem.defaultProps = {
     disabled: false,
     readOnly: false,
     isGroup: false,
+    isPendingUser: false,
     detail: null,
     search: null,
 };

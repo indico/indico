@@ -20,6 +20,7 @@ import re
 
 import requests
 from flask import flash, jsonify, redirect, request, session
+from marshmallow import ValidationError
 from packaging.version import Version
 from pkg_resources import DistributionNotFound, get_distribution
 from pytz import common_timezones_set
@@ -42,6 +43,7 @@ from indico.modules.core.settings import core_settings, social_settings
 from indico.modules.core.views import WPContact, WPSettings
 from indico.util.i18n import _, get_all_locales
 from indico.util.marshmallow import PrincipalList
+from indico.util.user import principal_from_identifier
 from indico.web.errors import load_error_data
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
@@ -227,6 +229,19 @@ class RHVersionCheck(RHAdminBase):
                        plugins=self._check_version('indico-plugins'))
 
 
+class _PrincipalListWithIdentifiers(PrincipalList):
+    # We need to keep identifiers separately since for pending users we
+    # can't get the correct one back from the user
+    def _deserialize(self, value, attr, data):
+        try:
+            return {identifier: principal_from_identifier(identifier,
+                                                          allow_groups=self.allow_groups,
+                                                          allow_external_users=self.allow_external_users)
+                    for identifier in value}
+        except ValueError as exc:
+            raise ValidationError(unicode(exc))
+
+
 class RHPrincipals(RHProtected):
     """Resolve principal identifiers to their actual objects.
 
@@ -235,26 +250,27 @@ class RHPrincipals(RHProtected):
     human-friendly.
     """
 
-    def _serialize_principal(self, principal):
+    def _serialize_principal(self, identifier, principal):
         if principal.principal_type == PrincipalType.user:
-            return {'identifier': principal.identifier,
+            return {'identifier': identifier,
                     'user_id': principal.id,
                     'group': False,
                     'name': principal.display_full_name,
                     'detail': ('{} ({})'.format(principal.email, principal.affiliation)
                                if principal.affiliation else principal.email)}
         elif principal.principal_type == PrincipalType.local_group:
-            return {'identifier': principal.identifier,
+            return {'identifier': identifier,
                     'group': True,
                     'name': principal.name}
         elif principal.principal_type == PrincipalType.multipass_group:
-            return {'identifier': principal.identifier,
+            return {'identifier': identifier,
                     'group': True,
                     'name': principal.name,
                     'detail': principal.provider_title}
 
     @use_kwargs({
-        'values': PrincipalList(allow_groups=True, missing=[])
+        'values': _PrincipalListWithIdentifiers(allow_groups=True, allow_external_users=True, missing=[])
     })
     def _process(self, values):
-        return jsonify({x.identifier: self._serialize_principal(x) for x in values})
+        return jsonify({identifier: self._serialize_principal(identifier, principal)
+                        for identifier, principal in values.viewitems()})

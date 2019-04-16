@@ -24,6 +24,16 @@ from sqlalchemy import inspect
 from indico.util.user import principal_from_identifier
 
 
+def validate_with_message(fn, reason):
+    """Create a validation function with a custom error message"""
+
+    def validate(args):
+        if not fn(args):
+            raise ValidationError(reason)
+
+    return validate
+
+
 def _naive_isoformat(dt, **unused):
     assert dt.tzinfo is None, 'expected naive datetime'
     return dt.isoformat()
@@ -103,8 +113,9 @@ class ModelList(Field):
 class Principal(Field):
     """Marshmallow field for a single principal."""
 
-    def __init__(self, allow_groups=False, **kwargs):
+    def __init__(self, allow_groups=False, allow_external_users=False, **kwargs):
         self.allow_groups = allow_groups
+        self.allow_external_users = allow_external_users
         super(Principal, self).__init__(**kwargs)
 
     def _serialize(self, value, attr, obj):
@@ -114,7 +125,9 @@ class Principal(Field):
         if value is None:
             return None
         try:
-            return principal_from_identifier(value, allow_groups=self.allow_groups)
+            return principal_from_identifier(value,
+                                             allow_groups=self.allow_groups,
+                                             allow_external_users=self.allow_external_users)
         except ValueError as exc:
             raise ValidationError(unicode(exc))
 
@@ -122,8 +135,9 @@ class Principal(Field):
 class PrincipalList(Field):
     """Marshmallow field for a list of principals."""
 
-    def __init__(self, allow_groups=False, **kwargs):
+    def __init__(self, allow_groups=False, allow_external_users=False, **kwargs):
         self.allow_groups = allow_groups
+        self.allow_external_users = allow_external_users
         super(PrincipalList, self).__init__(**kwargs)
 
     def _serialize(self, value, attr, obj):
@@ -131,6 +145,9 @@ class PrincipalList(Field):
 
     def _deserialize(self, value, attr, data):
         try:
-            return set(principal_from_identifier(x, allow_groups=self.allow_groups) for x in value)
+            return set(principal_from_identifier(identifier,
+                                                 allow_groups=self.allow_groups,
+                                                 allow_external_users=self.allow_external_users)
+                       for identifier in value)
         except ValueError as exc:
             raise ValidationError(unicode(exc))

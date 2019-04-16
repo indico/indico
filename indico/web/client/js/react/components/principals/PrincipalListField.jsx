@@ -38,7 +38,9 @@ import './PrincipalListField.module.scss';
  * outside editing mode.
  */
 const PrincipalListField = (props) => {
-    const {value, disabled, readOnly, onChange, onFocus, onBlur, withGroups, favoriteUsersController} = props;
+    const {
+        value, disabled, readOnly, onChange, onFocus, onBlur, withGroups, withExternalUsers, favoriteUsersController
+    } = props;
     const [favoriteUsers, [handleAddFavorite, handleDelFavorite]] = favoriteUsersController;
 
     // keep track of details for each entry
@@ -100,6 +102,7 @@ const PrincipalListField = (props) => {
                                        name={data.name}
                                        detail={data.detail}
                                        isGroup={data.group}
+                                       isPendingUser={!data.group && data.userId === null}
                                        favorite={!data.group && data.userId in favoriteUsers}
                                        onDelete={() => !disabled && handleDelete(data.identifier)}
                                        onAddFavorite={() => !disabled && handleAddFavorite(data.userId)}
@@ -122,7 +125,7 @@ const PrincipalListField = (props) => {
                 <Button.Group>
                     <Button icon="add" as="div" disabled />
                     <UserSearch existing={value} onAddItems={handleAddItems} favorites={favoriteUsers}
-                                disabled={disabled} />
+                                disabled={disabled} withExternalUsers={withExternalUsers} />
                     {withGroups && <GroupSearch existing={value} onAddItems={handleAddItems} disabled={disabled} />}
                 </Button.Group>
             )}
@@ -139,10 +142,12 @@ PrincipalListField.propTypes = {
     onBlur: PropTypes.func.isRequired,
     favoriteUsersController: PropTypes.array.isRequired,
     withGroups: PropTypes.bool,
+    withExternalUsers: PropTypes.bool,
 };
 
 PrincipalListField.defaultProps = {
     withGroups: false,
+    withExternalUsers: false,
     readOnly: false,
 };
 

@@ -18,20 +18,23 @@ from __future__ import unicode_literals
 
 from collections import namedtuple
 from datetime import datetime
-from operator import attrgetter
+from operator import attrgetter, itemgetter
 
 from dateutil.relativedelta import relativedelta
 from flask import flash, jsonify, redirect, request, session
 from markupsafe import Markup, escape
+from marshmallow import fields
 from sqlalchemy.orm import joinedload, load_only, subqueryload, undefer
 from sqlalchemy.orm.exc import StaleDataError
-from webargs import fields, validate
-from webargs.flaskparser import use_args
+from webargs import validate
+from webargs.flaskparser import use_kwargs
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from indico.core import signals
+from indico.core.auth import multipass
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.queries import get_n_matching
+from indico.core.marshmallow import mm
 from indico.core.notifications import make_email, send_email
 from indico.legacy.common.cache import GenericCache
 from indico.modules.admin import RHAdminBase
@@ -45,13 +48,13 @@ from indico.modules.users.forms import (AdminAccountRegistrationForm, AdminsForm
                                         SearchForm, UserDetailsForm, UserEmailsForm, UserPreferencesForm)
 from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.operations import create_user
-from indico.modules.users.schemas import user_schema
-from indico.modules.users.util import (build_user_search_query, get_linked_events, get_related_categories,
-                                       get_suggested_categories, merge_users, search_users, serialize_user)
+from indico.modules.users.util import (get_linked_events, get_related_categories, get_suggested_categories, merge_users,
+                                       search_users, serialize_user)
 from indico.modules.users.views import WPUser, WPUsersAdmin
 from indico.util.date_time import now_utc, timedelta_split
 from indico.util.event import truncate_path
 from indico.util.i18n import _
+from indico.util.marshmallow import validate_with_message
 from indico.util.signals import values_from_signal
 from indico.util.string import make_unique_token
 from indico.web.flask.templating import get_template_module
@@ -522,18 +525,83 @@ class RHRejectRegistrationRequest(RHRegistrationRequestBase):
         return jsonify_data()
 
 
+class UserSearchResultSchema(mm.ModelSchema):
+    class Meta:
+        model = User
+        fields = ('id', 'identifier', 'email', 'affiliation', 'full_name')
+
+
+search_result_schema = UserSearchResultSchema()
+
+
 class RHUserSearch(RHProtected):
     """Search for users based on given criteria"""
 
-    @use_args({
-        'email': fields.Str(validate=lambda s: len(s) > 3 and '@' in s),
-        'name': fields.Str(validate=validate.Length(min=3)),
-        'favorites_first': fields.Bool(missing=False)
-    })
-    def _process(self, args):
-        if not (args.get('email') or args.get('name')):
-            raise BadRequest()
+    def _serialize_pending_user(self, entry):
+        first_name = entry.data.get('first_name') or ''
+        last_name = entry.data.get('last_name') or ''
+        full_name = '{} {}'.format(first_name, last_name).strip() or 'Unknown'
+        affiliation = entry.data.get('affiliation') or ''
+        email = entry.data['email'].lower()
+        ext_id = '{}:{}'.format(entry.provider.name, entry.identifier)
+        # detailed data to put in redis to create a pending user if needed
+        self.externals[ext_id] = {
+            'first_name': first_name,
+            'last_name': last_name,
+            'email': email,
+            'affiliation': affiliation,
+            'phone': entry.data.get('phone') or '',
+            'address': entry.data.get('address') or '',
+        }
+        # simple data for the search results
+        return {
+            '_ext_id': ext_id,
+            'id': None,
+            'identifier': 'ExternalUser:{}'.format(ext_id),
+            'email': email,
+            'affiliation': affiliation,
+            'full_name': full_name,
+        }
 
-        favorites_first = args.pop('favorites_first')
-        query = build_user_search_query(args, favorites_first=favorites_first)
-        return jsonify(users=user_schema.dump(query.limit(10).all(), many=True), total=query.count())
+    def _serialize_entry(self, entry):
+        if isinstance(entry, User):
+            return search_result_schema.dump(entry)
+        else:
+            return self._serialize_pending_user(entry)
+
+    def _process_pending_users(self, results):
+        cache = GenericCache('external-user')
+        for entry in results:
+            ext_id = entry.pop('_ext_id', None)
+            if ext_id is not None:
+                cache.set(ext_id, self.externals[ext_id], 86400)
+
+    @use_kwargs({
+        'first_name': fields.Str(validate=validate.Length(min=1)),
+        'last_name': fields.Str(validate=validate.Length(min=1)),
+        'email': fields.Str(validate=lambda s: len(s) > 3 and '@' in s),
+        'affiliation': fields.Str(validate=validate.Length(min=1)),
+        'exact': fields.Bool(missing=False),
+        'external': fields.Bool(missing=False),
+        'favorites_first': fields.Bool(missing=False)
+    }, validate=validate_with_message(
+        lambda args: args.viewkeys() & {'first_name', 'last_name', 'email', 'affiliation'},
+        'No criteria provided'
+    ))
+    def _process(self, exact, external, favorites_first, **criteria):
+        matches = search_users(exact=exact, include_pending=True, external=external, **criteria)
+        self.externals = {}
+        results = sorted((self._serialize_entry(entry) for entry in matches), key=itemgetter('full_name'))
+        if favorites_first:
+            favorites = {u.id for u in session.user.favorite_users}
+            results.sort(key=lambda x: x['id'] not in favorites)
+        total = len(results)
+        results = results[:10]
+        self._process_pending_users(results)
+        return jsonify(users=results, total=total)
+
+
+class RHUserSearchInfo(RHProtected):
+    def _process(self):
+        external_users_available = any(auth.supports_search for auth in multipass.identity_providers.itervalues())
+        return jsonify(external_users_available=external_users_available)
