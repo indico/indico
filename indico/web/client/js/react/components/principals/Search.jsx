@@ -184,7 +184,7 @@ const searchFactory = config => {
         );
     };
 
-    const Search = ({disabled, existing, onAddItems, favorites, triggerFactory, single, onClose}) => {
+    const Search = ({disabled, existing, onAddItems, favorites, triggerFactory, single, onOpen, onClose}) => {
         const [open, setOpen] = useState(false);
         const [staged, setStaged] = useState([]);
 
@@ -207,6 +207,14 @@ const searchFactory = config => {
             setOpen(false);
         };
 
+        const handleOpenClick = () => {
+            if (disabled) {
+                return;
+            }
+            setOpen(true);
+            onOpen();
+        };
+
         const handleClose = () => {
             setStaged([]);
             setOpen(false);
@@ -214,12 +222,12 @@ const searchFactory = config => {
         };
 
         const trigger = triggerFactory ? (
-            triggerFactory({disabled, onClick: () => !disabled && setOpen(true)})
+            triggerFactory({disabled, onClick: handleOpenClick})
         ) : (
             <Button type="button"
                     content={buttonTitle}
                     disabled={disabled}
-                    onClick={() => setOpen(true)} />
+                    onClick={handleOpenClick} />
         );
 
         return (
@@ -270,6 +278,7 @@ const searchFactory = config => {
         favorites: PropTypes.object,
         triggerFactory: PropTypes.func,
         single: PropTypes.bool,
+        onOpen: PropTypes.func,
         onClose: PropTypes.func,
     };
 
@@ -278,6 +287,7 @@ const searchFactory = config => {
         disabled: false,
         triggerFactory: null,
         single: false,
+        onOpen: () => {},
         onClose: () => {},
     };
 

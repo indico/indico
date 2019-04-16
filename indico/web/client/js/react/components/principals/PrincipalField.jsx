@@ -87,7 +87,8 @@ const PrincipalField = (props) => {
         <UserSearch triggerFactory={searchTrigger}
                     existing={value ? [value] : []}
                     onAddItems={handleAddItem}
-                    onClose={markTouched}
+                    onOpen={onFocus}
+                    onClose={onBlur}
                     favorites={favoriteUsers}
                     disabled={disabled}
                     withExternalUsers={withExternalUsers}

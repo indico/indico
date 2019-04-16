@@ -125,8 +125,12 @@ const PrincipalListField = (props) => {
                 <Button.Group>
                     <Button icon="add" as="div" disabled />
                     <UserSearch existing={value} onAddItems={handleAddItems} favorites={favoriteUsers}
-                                disabled={disabled} withExternalUsers={withExternalUsers} />
-                    {withGroups && <GroupSearch existing={value} onAddItems={handleAddItems} disabled={disabled} />}
+                                disabled={disabled} withExternalUsers={withExternalUsers} onOpen={onFocus}
+                                onClose={onBlur} />
+                    {withGroups && (
+                        <GroupSearch existing={value} onAddItems={handleAddItems} disabled={disabled}
+                                     onOpen={onFocus} onClose={onBlur} />
+                    )}
                 </Button.Group>
             )}
         </>
