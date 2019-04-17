@@ -40,8 +40,9 @@ from indico.modules.rb.models.rooms import Room
 from indico.modules.rb_new.operations.blockings import filter_blocked_rooms, get_rooms_blockings, group_blocked_rooms
 from indico.modules.rb_new.operations.conflicts import get_rooms_conflicts
 from indico.modules.rb_new.operations.misc import get_rooms_nonbookable_periods, get_rooms_unbookable_hours
-from indico.modules.rb_new.util import (group_by_occurrence_date, serialize_blockings, serialize_nonbookable_periods,
-                                        serialize_occurrences, serialize_unbookable_hours)
+from indico.modules.rb_new.util import (group_by_occurrence_date, serialize_availability, serialize_blockings,
+                                        serialize_booking_details, serialize_nonbookable_periods, serialize_occurrences,
+                                        serialize_unbookable_hours)
 from indico.util.date_time import as_utc, iterdays, overlaps
 from indico.util.i18n import _
 from indico.util.struct.iterables import group_list
@@ -379,12 +380,14 @@ def split_booking(booking, new_booking_data):
 
     room = booking.room
     occurrences = sorted(booking.occurrences, key=attrgetter('start_dt'))
-    occurrences_to_cancel = [occ for occ in occurrences if occ.start_dt.date() >= date.today()]
+    cancelled_dates = [occ.start_dt.date() for occ in occurrences if occ.is_cancelled]
+    rejected_occs = {occ.start_dt.date(): occ.rejection_reason for occ in occurrences if occ.is_rejected}
+    occurrences_to_cancel = [occ for occ in occurrences if occ.start_dt >= datetime.now()]
     new_start_dt = datetime.combine(occurrences_to_cancel[0].start_dt.date(), new_booking_data['start_dt'].time())
     for occurrence_to_cancel in occurrences_to_cancel:
         occurrence_to_cancel.cancel(session.user, silent=True)
 
-    new_end_dt = [occ for occ in occurrences if occ.start_dt.date() < date.today()][-1].end_dt
+    new_end_dt = [occ for occ in occurrences if occ.start_dt < datetime.now()][-1].end_dt
     old_booking_data = {
         'booking_reason': booking.booking_reason,
         'booked_for_user': booking.booked_for_user,
@@ -396,8 +399,15 @@ def split_booking(booking, new_booking_data):
 
     booking.modify(old_booking_data, session.user)
     prebook = not room.can_book(session.user, allow_admin=False) and room.can_prebook(session.user, allow_admin=False)
-    return Reservation.create_from_data(room, dict(new_booking_data, start_dt=new_start_dt), session.user,
+    resv = Reservation.create_from_data(room, dict(new_booking_data, start_dt=new_start_dt), session.user,
                                         prebook=prebook)
+    for new_occ in resv.occurrences:
+        new_occ_start = new_occ.start_dt.date()
+        if new_occ_start in cancelled_dates:
+            new_occ.cancel(None, silent=True)
+        if new_occ_start in rejected_occs:
+            new_occ.reject(None, rejected_occs[new_occ_start], silent=True)
+    return resv
 
 
 def get_matching_events(start_dt, end_dt, repeat_frequency, repeat_interval):
@@ -418,3 +428,63 @@ def get_matching_events(start_dt, end_dt, repeat_frequency, repeat_interval):
                                                   EventPrincipal.user_id == session.user.id,
                                                   EventPrincipal.full_access)))
             .all())
+
+
+def get_booking_edit_calendar_data(booking, booking_changes):
+    """Return calendar-related data for the booking edit modal."""
+    room = booking.room
+    booking_details = serialize_booking_details(booking)
+    old_date_range = booking_details['date_range']
+    booking_availability = dict(booking_details['occurrences'], candidates={}, conflicts={}, conflicting_candidates={},
+                                pre_bookings={}, pre_conflicts={}, pending_cancellations={}, num_days_available=None,
+                                num_conflicts=None)
+    response = {
+        'will_be_split': False,
+        'calendars': [{'date_range': old_date_range, 'data': booking_availability}]
+    }
+
+    if should_split_booking(booking, booking_changes):
+        future_occurrences = [occ for occ in sorted(booking.occurrences, key=attrgetter('start_dt'))
+                              if occ.start_dt >= datetime.now()]
+        new_booking_start_dt = datetime.combine(future_occurrences[0].start_dt.date(),
+                                                booking_changes['start_dt'].time())
+        availability_filters = dict(booking_changes, start_dt=new_booking_start_dt)
+        new_date_range, data = get_rooms_availability([room], skip_conflicts_with=[booking.id], **availability_filters)
+
+        for occ in booking.occurrences:
+            serialized = serialize_occurrences({occ.start_dt.date(): [occ]})
+            if occ in future_occurrences:
+                booking_availability['pending_cancellations'].update(serialized)
+            else:
+                booking_availability['bookings'].update(serialized)
+
+        response['will_be_split'] = True
+    elif not has_same_dates(booking, booking_changes):
+        new_date_range, data = get_rooms_availability([room], skip_conflicts_with=[booking.id], **booking_changes)
+    else:
+        return response
+
+    room_availability = data[room.id]
+    room_availability['cancellations'] = {}
+    room_availability['rejections'] = {}
+    other_bookings = {dt: filter(lambda x: x.reservation.id != booking.id, other)
+                      for dt, other in room_availability['bookings'].iteritems()}
+    cancelled_dates = [occ.start_dt.date() for occ in booking.occurrences if occ.is_cancelled]
+    rejected_dates = [occ.start_dt.date() for occ in booking.occurrences if occ.is_rejected]
+    candidates = room_availability['candidates']
+
+    for dt, dt_candidates in candidates.iteritems():
+        if dt in cancelled_dates:
+            candidates[dt] = []
+            room_availability['cancellations'].update({dt: dt_candidates})
+        elif dt in rejected_dates:
+            candidates[dt] = []
+            room_availability['rejections'].update({dt: dt_candidates})
+
+    room_availability['num_days_available'] = len(new_date_range) - len(room_availability['conflicts'])
+    room_availability['num_conflicts'] = len(room_availability['conflicts'])
+    room_availability['bookings'] = {}
+    room_availability['other'] = serialize_occurrences(other_bookings)
+    room_availability['pending_cancellations'] = {}
+    response['calendars'].append({'date_range': new_date_range, 'data': serialize_availability(data)[room.id]})
+    return response

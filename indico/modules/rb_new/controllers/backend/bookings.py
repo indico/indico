@@ -35,80 +35,22 @@ from indico.modules.rb.models.reservation_occurrences import ReservationOccurren
 from indico.modules.rb.models.reservations import RepeatFrequency, Reservation
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb_new.controllers.backend.common import search_room_args
-from indico.modules.rb_new.operations.blockings import filter_blocked_rooms, get_rooms_blockings, group_blocked_rooms
-from indico.modules.rb_new.operations.bookings import (get_active_bookings, get_booking_occurrences,
-                                                       get_matching_events, get_room_bookings, get_room_calendar,
-                                                       get_rooms_availability, group_blockings,
-                                                       group_nonbookable_periods, has_same_dates, should_split_booking,
-                                                       split_booking)
-from indico.modules.rb_new.operations.misc import get_rooms_nonbookable_periods, get_rooms_unbookable_hours
+from indico.modules.rb_new.operations.bookings import (get_active_bookings, get_booking_edit_calendar_data,
+                                                       get_matching_events, get_room_calendar, get_rooms_availability,
+                                                       has_same_dates, should_split_booking, split_booking)
 from indico.modules.rb_new.operations.suggestions import get_suggestions
 from indico.modules.rb_new.schemas import (create_booking_args, reservation_details_schema,
                                            reservation_linked_object_data_schema, reservation_occurrences_schema,
-                                           reservation_occurrences_schema_with_permissions,
                                            reservation_user_event_schema)
 from indico.modules.rb_new.util import (get_linked_object, group_by_occurrence_date,
-                                        is_booking_start_within_grace_period, serialize_blockings,
-                                        serialize_nonbookable_periods, serialize_occurrences,
-                                        serialize_unbookable_hours)
-from indico.modules.users.models.users import User
+                                        is_booking_start_within_grace_period, serialize_availability,
+                                        serialize_booking_details, serialize_occurrences)
 from indico.util.date_time import now_utc, utc_to_server
 from indico.util.i18n import _
 from indico.web.util import ExpectedError
 
 
 NUM_SUGGESTIONS = 5
-
-
-def _serialize_availability(availability):
-    for data in availability.viewvalues():
-        data['blockings'] = serialize_blockings(data.get('blockings', {}))
-        data['overridable_blockings'] = serialize_blockings(data.get('overridable_blockings', {}))
-        data['nonbookable_periods'] = serialize_nonbookable_periods(data.get('nonbookable_periods', {}))
-        data['unbookable_hours'] = serialize_unbookable_hours(data.get('unbookable_hours', {}))
-        data.update({k: serialize_occurrences(data[k]) if k in data else {}
-                     for k in ('candidates', 'conflicting_candidates', 'pre_bookings', 'bookings', 'conflicts',
-                               'pre_conflicts', 'rejections', 'cancellations')})
-    return availability
-
-
-def _serialize_booking_details(booking):
-    attributes = reservation_details_schema.dump(booking)
-    date_range, occurrences = get_booking_occurrences(booking)
-    booking_details = dict(attributes)
-    occurrences_by_type = dict(bookings={}, cancellations={}, rejections={}, other_bookings={}, blockings={},
-                               unbookable_hours={}, nonbookable_periods={})
-    booking_details['occurrences'] = occurrences_by_type
-    booking_details['date_range'] = [dt.isoformat() for dt in date_range]
-    for dt, [occ] in occurrences.iteritems():
-        serialized_occ = reservation_occurrences_schema_with_permissions.dump([occ])
-        if occ.is_cancelled:
-            occurrences_by_type['cancellations'][dt.isoformat()] = serialized_occ
-        elif occ.is_rejected:
-            occurrences_by_type['rejections'][dt.isoformat()] = serialized_occ
-        occurrences_by_type['bookings'][dt.isoformat()] = serialized_occ if occ.is_valid else []
-
-    start_dt = datetime.combine(booking.start_dt, time.min)
-    end_dt = datetime.combine(booking.end_dt, time.max)
-    unbookable_hours = get_rooms_unbookable_hours([booking.room]).get(booking.room.id, [])
-    blocked_rooms = get_rooms_blockings([booking.room], start_dt.date(), end_dt.date())
-    overridable_blockings = group_blocked_rooms(filter_blocked_rooms(blocked_rooms,
-                                                                     overridable_only=True,
-                                                                     explicit=True)).get(booking.room.id, [])
-    nonoverridable_blockings = group_blocked_rooms(filter_blocked_rooms(blocked_rooms,
-                                                                        nonoverridable_only=True,
-                                                                        explicit=True)).get(booking.room.id, [])
-    nonbookable_periods = get_rooms_nonbookable_periods([booking.room], start_dt, end_dt).get(booking.room.id, [])
-    nonbookable_periods_grouped = group_nonbookable_periods(nonbookable_periods, date_range)
-
-    occurrences_by_type['other_bookings'] = get_room_bookings(booking.room, start_dt, end_dt,
-                                                              skip_booking_id=booking.id)
-    occurrences_by_type['blockings'] = serialize_blockings(group_blockings(nonoverridable_blockings, date_range))
-    occurrences_by_type['overridable_blockings'] = serialize_blockings(group_blockings(overridable_blockings,
-                                                                                       date_range))
-    occurrences_by_type['unbookable_hours'] = serialize_unbookable_hours(unbookable_hours)
-    occurrences_by_type['nonbookable_periods'] = serialize_nonbookable_periods(nonbookable_periods_grouped)
-    return booking_details
 
 
 class RHTimeline(RHRoomBookingBase):
@@ -140,7 +82,7 @@ class RHTimeline(RHRoomBookingBase):
                 'all_days_available': not data['conflicts'],
                 'num_conflicts': len(data['conflicts'])
             })
-        serialized = _serialize_availability(availability)
+        serialized = serialize_availability(availability)
         if self.room:
             availability = serialized[self.room.id]
         else:
@@ -163,7 +105,7 @@ class RHCalendar(RHRoomBookingBase):
             end_date = start_date
         calendar = get_room_calendar(start_date, end_date, room_ids, booked_for_user=booked_for_user,
                                      include_inactive=show_inactive)
-        return jsonify(_serialize_availability(calendar).values())
+        return jsonify(serialize_availability(calendar).values())
 
 
 class RHActiveBookings(RHRoomBookingBase):
@@ -259,7 +201,7 @@ class RHBookingBase(RHRoomBookingBase):
 
 class RHBookingDetails(RHBookingBase):
     def _process(self):
-        return jsonify(_serialize_booking_details(self.booking))
+        return jsonify(serialize_booking_details(self.booking))
 
 
 class RHBookingStateActions(RHBookingBase):
@@ -320,6 +262,17 @@ class RHLinkedObjectData(RHRoomBookingBase):
         return jsonify(can_access=True, **reservation_linked_object_data_schema.dump(self.linked_object))
 
 
+class RHBookingEditCalendars(RHBookingBase):
+    @use_kwargs({
+        'start_dt': fields.DateTime(required=True),
+        'end_dt': fields.DateTime(required=True),
+        'repeat_frequency': EnumField(RepeatFrequency, missing='NEVER'),
+        'repeat_interval': fields.Int(missing=1),
+    })
+    def _process(self, **kwargs):
+        return jsonify(get_booking_edit_calendar_data(self.booking, kwargs))
+
+
 class RHUpdateBooking(RHBookingBase):
     def _check_access(self):
         RHBookingBase._check_access(self)
@@ -352,8 +305,8 @@ class RHUpdateBooking(RHBookingBase):
         db.session.flush()
         today = date.today()
         calendar = get_room_calendar(args['start_dt'] or today, args['end_dt'] or today, [args['room_id']])
-        return jsonify(booking=dict(_serialize_booking_details(self.booking), **additional_booking_attrs),
-                       room_calendar=_serialize_availability(calendar).values())
+        return jsonify(booking=dict(serialize_booking_details(self.booking), **additional_booking_attrs),
+                       room_calendar=serialize_availability(calendar).values())
 
 
 class RHMyUpcomingBookings(RHRoomBookingBase):

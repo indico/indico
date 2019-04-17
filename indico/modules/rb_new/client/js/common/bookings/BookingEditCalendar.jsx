@@ -34,12 +34,14 @@ class BookingEditCalendar extends React.Component {
         booking: PropTypes.object.isRequired,
         numberOfBookingOccurrences: PropTypes.number.isRequired,
         numberOfCandidates: PropTypes.number,
-        shouldSplit: PropTypes.bool.isRequired,
+        willBookingSplit: PropTypes.bool.isRequired,
         calendars: PropTypes.object.isRequired,
+        isLoading: PropTypes.bool,
     };
 
     static defaultProps = {
         numberOfCandidates: 0,
+        isLoading: false,
     };
 
     static legendLabels = [
@@ -82,17 +84,18 @@ class BookingEditCalendar extends React.Component {
     };
 
     getCalendarData = (calendar) => {
-        const {isFetching, dateRange, data} = calendar;
-        return isFetching ? [] : dateRange.map(this.serializeRow(data));
+        const {isLoading} = this.props;
+        const {dateRange, data} = calendar;
+        return isLoading ? [] : dateRange.map(this.serializeRow(data));
     };
 
     renderNumberOfOccurrences = () => {
         const {
             calendars: {currentBooking: {data: {bookings, pendingCancellations}}}, numberOfBookingOccurrences,
-            numberOfCandidates, shouldSplit,
+            numberOfCandidates, willBookingSplit,
         } = this.props;
         const numBookingPastOccurrences = (
-            shouldSplit
+            willBookingSplit
                 ? Object.keys(bookings).length - Object.keys(pendingCancellations).length
                 : null
         );
@@ -105,7 +108,7 @@ class BookingEditCalendar extends React.Component {
     };
 
     render() {
-        const {shouldSplit, calendars: {currentBooking, newBooking}} = this.props;
+        const {willBookingSplit, calendars: {currentBooking, newBooking}, isLoading} = this.props;
         return (
             <div styleName="booking-calendar">
                 <Header className="legend-header">
@@ -117,7 +120,7 @@ class BookingEditCalendar extends React.Component {
                            content={<TimelineLegend labels={BookingEditCalendar.legendLabels} compact />} />
                     {this.renderNumberOfOccurrences()}
                 </Header>
-                {shouldSplit && (
+                {willBookingSplit && (
                     <Message styleName="ongoing-booking-explanation" color="green" icon>
                         <Icon name="code branch" />
                         <Message.Content>
@@ -142,23 +145,28 @@ class BookingEditCalendar extends React.Component {
                 <div styleName="calendars">
                     <div styleName="original-booking">
                         <DailyTimelineContent rows={this.getCalendarData(currentBooking)}
-                                              renderHeader={shouldSplit ? () => (
+                                              renderHeader={newBooking ? () => (
                                                   <Header as="h3" color="orange" styleName="original-booking-header">
                                                       <Translate>Original booking</Translate>
                                                   </Header>
                                               ) : null}
-                                              isLoading={currentBooking.isFetching}
+                                              isLoading={isLoading}
                                               fixedHeight={currentBooking.dateRange.length > 0 ? '100%' : null} />
                     </div>
                     {newBooking && (
                         <div styleName="new-booking">
                             <DailyTimelineContent rows={this.getCalendarData(newBooking)}
-                                                  renderHeader={() => (
-                                                      <Header as="h3" color="green" styleName="new-booking-header">
-                                                          <Translate>New booking</Translate>
-                                                      </Header>
-                                                  )}
-                                                  isLoading={newBooking.isFetching}
+                                                  renderHeader={() => {
+                                                      return (
+                                                          <Header as="h3" color="green" styleName="new-booking-header">
+                                                              {willBookingSplit ? (
+                                                                  <Translate>New booking</Translate>
+                                                              ) : (
+                                                                  <Translate>Booking after changes</Translate>
+                                                              )}
+                                                          </Header>
+                                                      );
+                                                  }}
                                                   fixedHeight={newBooking.dateRange.length > 0 ? '100%' : null} />
                         </div>
                     )}

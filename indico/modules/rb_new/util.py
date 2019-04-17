@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 import os
 from collections import namedtuple
-from datetime import datetime, timedelta
+from datetime import datetime, time, timedelta
 from io import BytesIO
 
 import pytz
@@ -36,8 +36,11 @@ from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.rb import rb_settings
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.util import rb_is_admin
+from indico.modules.rb_new.operations.blockings import filter_blocked_rooms, get_rooms_blockings, group_blocked_rooms
+from indico.modules.rb_new.operations.misc import get_rooms_nonbookable_periods, get_rooms_unbookable_hours
 from indico.modules.rb_new.schemas import (bookable_hours_schema, nonbookable_periods_schema,
-                                           reservation_occurrences_schema, simple_blockings_schema)
+                                           reservation_details_schema, reservation_occurrences_schema,
+                                           reservation_occurrences_schema_with_permissions, simple_blockings_schema)
 from indico.util.date_time import now_utc, server_to_utc
 from indico.util.string import crc32
 from indico.util.struct.iterables import group_list
@@ -126,3 +129,54 @@ def is_booking_start_within_grace_period(start_dt, user, allow_admin=False):
     start_dt_utc = start_dt_localized.astimezone(pytz.utc)
     grace_period = timedelta(hours=grace_period)
     return start_dt_utc >= now_utc() - grace_period
+
+
+def serialize_booking_details(booking):
+    from indico.modules.rb_new.operations.bookings import (get_booking_occurrences, group_blockings,
+                                                           group_nonbookable_periods, get_room_bookings)
+
+    attributes = reservation_details_schema.dump(booking)
+    date_range, occurrences = get_booking_occurrences(booking)
+    booking_details = dict(attributes)
+    occurrences_by_type = dict(bookings={}, cancellations={}, rejections={}, other={}, blockings={},
+                               unbookable_hours={}, nonbookable_periods={}, overridable_blockings={})
+    booking_details['occurrences'] = occurrences_by_type
+    booking_details['date_range'] = [dt.isoformat() for dt in date_range]
+    for dt, [occ] in occurrences.iteritems():
+        serialized_occ = reservation_occurrences_schema_with_permissions.dump([occ])
+        if occ.is_cancelled:
+            occurrences_by_type['cancellations'][dt.isoformat()] = serialized_occ
+        elif occ.is_rejected:
+            occurrences_by_type['rejections'][dt.isoformat()] = serialized_occ
+        occurrences_by_type['bookings'][dt.isoformat()] = serialized_occ if occ.is_valid else []
+
+    start_dt = datetime.combine(booking.start_dt, time.min)
+    end_dt = datetime.combine(booking.end_dt, time.max)
+    unbookable_hours = get_rooms_unbookable_hours([booking.room]).get(booking.room.id, [])
+    blocked_rooms = get_rooms_blockings([booking.room], start_dt.date(), end_dt.date())
+    overridable_blockings = group_blocked_rooms(filter_blocked_rooms(blocked_rooms,
+                                                                     overridable_only=True,
+                                                                     explicit=True)).get(booking.room.id, [])
+    nonoverridable_blockings = group_blocked_rooms(filter_blocked_rooms(blocked_rooms,
+                                                                        nonoverridable_only=True,
+                                                                        explicit=True)).get(booking.room.id, [])
+    nonbookable_periods = get_rooms_nonbookable_periods([booking.room], start_dt, end_dt).get(booking.room.id, [])
+    nonbookable_periods_grouped = group_nonbookable_periods(nonbookable_periods, date_range)
+    occurrences_by_type['other'] = get_room_bookings(booking.room, start_dt, end_dt, skip_booking_id=booking.id)
+    occurrences_by_type['blockings'] = serialize_blockings(group_blockings(nonoverridable_blockings, date_range))
+    occurrences_by_type['overridable_blockings'] = serialize_blockings(group_blockings(overridable_blockings,
+                                                                                       date_range))
+    occurrences_by_type['unbookable_hours'] = serialize_unbookable_hours(unbookable_hours)
+    occurrences_by_type['nonbookable_periods'] = serialize_nonbookable_periods(nonbookable_periods_grouped)
+    return booking_details
+
+
+def serialize_availability(availability):
+    for data in availability.viewvalues():
+        data['blockings'] = serialize_blockings(data.get('blockings', {}))
+        data['nonbookable_periods'] = serialize_nonbookable_periods(data.get('nonbookable_periods', {}))
+        data['unbookable_hours'] = serialize_unbookable_hours(data.get('unbookable_hours', {}))
+        data.update({k: serialize_occurrences(data[k]) if k in data else {}
+                     for k in ('candidates', 'conflicting_candidates', 'pre_bookings', 'bookings', 'conflicts',
+                               'pre_conflicts', 'rejections', 'cancellations')})
+    return availability

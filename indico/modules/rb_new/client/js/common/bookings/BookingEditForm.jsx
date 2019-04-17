@@ -66,8 +66,12 @@ class BookingEditForm extends React.Component {
 
         if (['daily', 'every'].includes(newType) && today.isAfter(startDt, 'day')) {
             dates.startDate = serializeDate(startDt);
-        } else if (newType === 'single' && today.isAfter(startDt, 'day')) {
-            dates.startDate = serializeDate(today);
+        } else if (newType === 'single') {
+            if (today.isAfter(startDt, 'minute')) {
+                dates.startDate = serializeDate(today.add(1, 'day'));
+            } else {
+                dates.startDate = serializeDate(today);
+            }
         }
 
         sanitizeRecurrence(filters);
@@ -151,6 +155,7 @@ class BookingEditForm extends React.Component {
             <ReduxFormField {...fieldProps}
                             {...props}
                             disabledDate={disabledDate}
+                            initialVisibleMonth={() => moment(originalEndDt)}
                             input={input}
                             as={component} />
         );
@@ -164,6 +169,7 @@ class BookingEditForm extends React.Component {
 
         return (
             <ReduxFormField {...fieldProps}
+                            allowPastTimes
                             disabled={disabled}
                             input={input}
                             as={TimeRangePicker}
