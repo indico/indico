@@ -15,7 +15,7 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from collections import OrderedDict, defaultdict
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from sqlalchemy import Date, Time
 from sqlalchemy.event import listens_for
@@ -40,7 +40,7 @@ from indico.modules.rb.models.util import unimplemented
 from indico.modules.rb.notifications.reservations import (notify_cancellation, notify_confirmation, notify_creation,
                                                           notify_modification, notify_rejection, notify_reset_approval)
 from indico.modules.rb.util import rb_is_admin
-from indico.util.date_time import format_date, format_time, now_utc
+from indico.util.date_time import format_date, format_time, now_utc, utc_to_server
 from indico.util.i18n import N_, _
 from indico.util.serializer import Serializer
 from indico.util.string import format_repr, return_ascii, to_unicode
@@ -433,7 +433,9 @@ class Reservation(Serializer, db.Model):
     def cancel(self, user, reason=None, silent=False):
         self.state = ReservationState.cancelled
         self.rejection_reason = reason or None
-        self.occurrences.filter_by(is_valid=True).update({
+        criteria = (ReservationOccurrence.is_valid,
+                    ReservationOccurrence.start_dt > utc_to_server(now_utc()) - timedelta(minutes=10))  # grace period
+        self.occurrences.filter(*criteria).update({
             ReservationOccurrence.state: ReservationOccurrenceState.cancelled,
             ReservationOccurrence.rejection_reason: reason
         }, synchronize_session='fetch')
@@ -473,15 +475,13 @@ class Reservation(Serializer, db.Model):
         return self.room.can_moderate(user, allow_admin=allow_admin)
 
     def can_cancel(self, user, allow_admin=True):
-        from indico.modules.rb_new.util import is_booking_start_within_grace_period
         if user is None:
             return False
         if self.is_rejected or self.is_cancelled or self.is_archived:
             return False
 
         is_booked_or_owned_by_user = self.is_owned_by(user) or self.is_booked_for(user)
-        is_valid_start_dt = is_booking_start_within_grace_period(self.start_dt, user, allow_admin=allow_admin)
-        return (is_booked_or_owned_by_user and is_valid_start_dt) or (allow_admin and rb_is_admin(user))
+        return is_booked_or_owned_by_user or (allow_admin and rb_is_admin(user))
 
     def can_edit(self, user, allow_admin=True):
         if user is None:

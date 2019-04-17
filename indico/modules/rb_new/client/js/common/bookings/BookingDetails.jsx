@@ -350,7 +350,7 @@ class BookingDetails extends React.Component {
                                 content={Translate.string('Cancel booking')} />
                         <Confirm header={Translate.string('Confirm cancellation')}
                                  content={Translate.string('Are you sure you want to cancel this booking? ' +
-                                                           'This will cancel all occurrences of this booking.')}
+                                                           'This will cancel future occurrences of this booking.')}
                                  confirmButton={<Button content={Translate.string('Cancel booking')} negative />}
                                  cancelButton={Translate.string('Close')}
                                  open={activeConfirmation === 'cancel'}
