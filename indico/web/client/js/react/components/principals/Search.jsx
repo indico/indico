@@ -29,12 +29,15 @@ import {
     ReduxCheckboxField, ReduxFormField, formatters, handleSubmitError, validators as v
 } from 'indico/react/forms';
 import {Translate, PluralTranslate, Singular, Plural, Param} from 'indico/react/i18n';
+import {Overridable} from 'indico/react/util';
 import {indicoAxios, useIndicoAxios} from 'indico/utils/axios';
 import {camelizeKeys} from 'indico/utils/case';
 
 import './items.module.scss';
 import './Search.module.scss';
 
+
+const InitialFormValuesContext = React.createContext({});
 
 const searchFactory = config => {
     const {
@@ -81,35 +84,40 @@ const searchFactory = config => {
     );
 
     // eslint-disable-next-line react/prop-types
-    const SearchForm = ({onSearch, favorites, isAdded, onAdd}) => (
-        <FinalForm onSubmit={onSearch}
-                   subscription={{submitting: true, hasValidationErrors: true, pristine: true}}
-                   validate={validateForm}>
-            {(fprops) => (
-                <Form onSubmit={fprops.handleSubmit}>
-                    {searchFields}
-                    <div styleName="search-buttons">
-                        <Button type="submit" icon="search"
-                                disabled={fprops.hasValidationErrors || fprops.pristine || fprops.submitting}
-                                loading={fprops.submitting}
-                                primary
-                                content={Translate.string('Search')} />
-                        {!_.isEmpty(favorites) && (
-                            <Dropdown floating labeled text={Translate.string('Select favorite')}
-                                      disabled={fprops.submitting}>
-                                <Dropdown.Menu>
-                                    {_.sortBy(Object.values(favorites), 'name').map(x => (
-                                        <FavoriteItem key={x.identifier} name={x.name} detail={x.detail}
-                                                      added={isAdded(x)} onAdd={() => onAdd(x)} />
-                                    ))}
-                                </Dropdown.Menu>
-                            </Dropdown>
-                        )}
-                    </div>
-                </Form>
-            )}
-        </FinalForm>
-    );
+    const SearchForm = ({onSearch, favorites, isAdded, onAdd}) => {
+        const initialFormValues = useContext(InitialFormValuesContext);
+        return (
+            <FinalForm onSubmit={onSearch}
+                       subscription={{submitting: true, hasValidationErrors: true, pristine: true}}
+                       validate={validateForm}
+                       initialValues={initialFormValues}
+                       initialValuesEqual={_.isEqual}>
+                {(fprops) => (
+                    <Form onSubmit={fprops.handleSubmit}>
+                        {searchFields}
+                        <div styleName="search-buttons">
+                            <Button type="submit" icon="search"
+                                    disabled={fprops.hasValidationErrors || fprops.pristine || fprops.submitting}
+                                    loading={fprops.submitting}
+                                    primary
+                                    content={Translate.string('Search')} />
+                            {!_.isEmpty(favorites) && (
+                                <Dropdown floating labeled text={Translate.string('Select favorite')}
+                                          disabled={fprops.submitting}>
+                                    <Dropdown.Menu>
+                                        {_.sortBy(Object.values(favorites), 'name').map(x => (
+                                            <FavoriteItem key={x.identifier} name={x.name} detail={x.detail}
+                                                          added={isAdded(x)} onAdd={() => onAdd(x)} />
+                                        ))}
+                                    </Dropdown.Menu>
+                                </Dropdown>
+                            )}
+                        </div>
+                    </Form>
+                )}
+            </FinalForm>
+        );
+    };
 
     // eslint-disable-next-line react/prop-types
     const ResultItem = ({name, detail, added, favorite, onAdd}) => (
@@ -340,7 +348,7 @@ const UserSearchFields = () => {
 };
 
 const InnerUserSearch = searchFactory({
-    componentName: 'UserSearch',
+    componentName: 'InnerUserSearch',
     buttonTitle: Translate.string('User'),
     modalTitle: single => (single ? Translate.string('Select user') : Translate.string('Add users')),
     resultIcon: 'user',
@@ -388,21 +396,33 @@ const InnerUserSearch = searchFactory({
     ),
 });
 
-export const UserSearch = ({withExternalUsers, ...props}) => (
-    <WithExternalsContext.Provider value={withExternalUsers}>
-        <InnerUserSearch {...props} />
-    </WithExternalsContext.Provider>
-);
+const _UserSearch = ({withExternalUsers, initialFormValues, ...props}) => {
+    if (!withExternalUsers) {
+        // ignore form defaults for a field that's hidden
+        delete initialFormValues.external;
+    }
+    return (
+        <WithExternalsContext.Provider value={withExternalUsers}>
+            <InitialFormValuesContext.Provider value={initialFormValues}>
+                <InnerUserSearch {...props} />
+            </InitialFormValuesContext.Provider>
+        </WithExternalsContext.Provider>
+    );
+};
 
-UserSearch.propTypes = {
+_UserSearch.propTypes = {
     ...InnerUserSearch.propTypes,
     withExternalUsers: PropTypes.bool,
+    initialFormValues: PropTypes.object,
 };
 
-UserSearch.defaultProps = {
+_UserSearch.defaultProps = {
     ...InnerUserSearch.defaultProps,
     withExternalUsers: false,
+    initialFormValues: {},
 };
+
+export const UserSearch = Overridable.component('UserSearch', _UserSearch);
 
 
 export const GroupSearch = searchFactory({
