@@ -26,7 +26,7 @@ import {Button, Divider, Dropdown, Form, Icon, Label, List, Message, Modal, Popu
 import {FORM_ERROR} from 'final-form';
 import {Form as FinalForm, Field} from 'react-final-form';
 import {
-    ReduxCheckboxField, ReduxFormField, formatters, getChangedValues, handleSubmitError, validators as v
+    ReduxCheckboxField, ReduxFormField, formatters, handleSubmitError, validators as v
 } from 'indico/react/forms';
 import {Translate, PluralTranslate, Singular, Plural, Param} from 'indico/react/i18n';
 import {indicoAxios, useIndicoAxios} from 'indico/utils/axios';
@@ -172,7 +172,7 @@ const searchFactory = config => {
     const SearchContent = ({onAdd, isAdded, favorites}) => {
         const [result, setResult] = useState(null);
 
-        const handleSearch = (data, form) => runSearch(data, form, setResult);
+        const handleSearch = data => runSearch(data, setResult);
         return (
             <>
                 <SearchForm onSearch={handleSearch} onAdd={onAdd} isAdded={isAdded} favorites={favorites} />
@@ -352,9 +352,9 @@ const InnerUserSearch = searchFactory({
             return {[FORM_ERROR]: 'No criteria specified'};
         }
     }),
-    runSearch: async (data, form, setResult) => {
+    runSearch: async (data, setResult) => {
         setResult(null);
-        const values = getChangedValues(data, form);
+        const values = _.fromPairs(Object.entries(data).filter(([, val]) => !!val));
         values.favorites_first = true;
         let response;
         try {
@@ -422,9 +422,9 @@ export const GroupSearch = searchFactory({
                    componentLabel={Translate.string('Exact matches only')} />
         </>
     ),
-    runSearch: async (data, form, setResult) => {
+    runSearch: async (data, setResult) => {
         setResult(null);
-        const values = getChangedValues(data, form);
+        const values = _.fromPairs(Object.entries(data).filter(([, val]) => !!val));
         let response;
         try {
             response = await indicoAxios.get(groupSearchURL(values));
