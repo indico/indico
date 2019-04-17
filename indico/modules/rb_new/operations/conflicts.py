@@ -32,8 +32,8 @@ from indico.util.struct.iterables import group_list
 
 def get_rooms_conflicts(rooms, start_dt, end_dt, repeat_frequency, repeat_interval, blocked_rooms,
                         nonbookable_periods, unbookable_hours, skip_conflicts_with=None, allow_admin=False):
-    rooms_conflicts = defaultdict(list)
-    rooms_pre_conflicts = defaultdict(list)
+    rooms_conflicts = defaultdict(set)
+    rooms_pre_conflicts = defaultdict(set)
     rooms_conflicting_candidates = defaultdict(set)
     skip_conflicts_with = skip_conflicts_with or []
 
@@ -56,7 +56,7 @@ def get_rooms_conflicts(rooms, start_dt, end_dt, repeat_frequency, repeat_interv
         rooms_conflicts[room_id], rooms_pre_conflicts[room_id], rooms_conflicting_candidates[room_id] = conflicts
     for room_id, occurrences in blocked_rooms.iteritems():
         conflicts, conflicting_candidates = get_room_blockings_conflicts(room_id, candidates, occurrences)
-        rooms_conflicts[room_id] += conflicts
+        rooms_conflicts[room_id] |= conflicts
         rooms_conflicting_candidates[room_id] |= conflicting_candidates
 
     if not (allow_admin and rb_is_admin(session.user)):
@@ -64,22 +64,22 @@ def get_rooms_conflicts(rooms, start_dt, end_dt, repeat_frequency, repeat_interv
             room = Room.get_one(room_id)
             if not room.can_override(session.user, allow_admin=allow_admin):
                 conflicts, conflicting_candidates = get_room_nonbookable_periods_conflicts(candidates, occurrences)
-                rooms_conflicts[room_id] += conflicts
+                rooms_conflicts[room_id] |= conflicts
                 rooms_conflicting_candidates[room_id] |= conflicting_candidates
 
         for room_id, occurrences in unbookable_hours.iteritems():
             room = Room.get_one(room_id)
             if not room.can_override(session.user, allow_admin=allow_admin):
                 conflicts, conflicting_candidates = get_room_unbookable_hours_conflicts(candidates, occurrences)
-                rooms_conflicts[room_id] += conflicts
+                rooms_conflicts[room_id] |= conflicts
                 rooms_conflicting_candidates[room_id] |= conflicting_candidates
     rooms_conflicting_candidates = defaultdict(list, ((k, list(v)) for k, v in rooms_conflicting_candidates.items()))
     return rooms_conflicts, rooms_pre_conflicts, rooms_conflicting_candidates
 
 
 def get_room_bookings_conflicts(candidates, occurrences, room_id, skip_conflicts_with=frozenset()):
-    conflicts = []
-    pre_conflicts = []
+    conflicts = set()
+    pre_conflicts = set()
     conflicting_candidates = set()
     for candidate in candidates:
         for occurrence in occurrences:
@@ -90,14 +90,14 @@ def get_room_bookings_conflicts(candidates, occurrences, room_id, skip_conflicts
                 overlap = candidate.get_overlap(occurrence)
                 obj = TempReservationOccurrence(*overlap, reservation=occurrence.reservation)
                 if occurrence.reservation.is_accepted:
-                    conflicts.append(obj)
+                    conflicts.add(obj)
                 else:
-                    pre_conflicts.append(obj)
+                    pre_conflicts.add(obj)
     return conflicts, pre_conflicts, conflicting_candidates
 
 
 def get_room_blockings_conflicts(room_id, candidates, occurrences):
-    conflicts = []
+    conflicts = set()
     conflicting_candidates = set()
     for candidate in candidates:
         for occurrence in occurrences:
@@ -107,12 +107,12 @@ def get_room_blockings_conflicts(room_id, candidates, occurrences):
                     continue
                 conflicting_candidates.add(candidate)
                 obj = TempReservationOccurrence(candidate.start_dt, candidate.end_dt, None)
-                conflicts.append(obj)
+                conflicts.add(obj)
     return conflicts, conflicting_candidates
 
 
 def get_room_nonbookable_periods_conflicts(candidates, occurrences):
-    conflicts = []
+    conflicts = set()
     conflicting_candidates = set()
     for candidate in candidates:
         for occurrence in occurrences:
@@ -120,12 +120,12 @@ def get_room_nonbookable_periods_conflicts(candidates, occurrences):
             if overlap.count(None) != len(overlap):
                 conflicting_candidates.add(candidate)
                 obj = TempReservationOccurrence(overlap[0], overlap[1], None)
-                conflicts.append(obj)
+                conflicts.add(obj)
     return conflicts, conflicting_candidates
 
 
 def get_room_unbookable_hours_conflicts(candidates, occurrences):
-    conflicts = []
+    conflicts = set()
     conflicting_candidates = set()
     for candidate in candidates:
         for occurrence in occurrences:
@@ -137,5 +137,5 @@ def get_room_unbookable_hours_conflicts(candidates, occurrences):
             if overlap.count(None) != len(overlap):
                 conflicting_candidates.add(candidate)
                 obj = TempReservationOccurrence(overlap[0], overlap[1], None)
-                conflicts.append(obj)
+                conflicts.add(obj)
     return conflicts, conflicting_candidates
