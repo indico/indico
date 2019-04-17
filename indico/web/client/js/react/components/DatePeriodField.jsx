@@ -39,6 +39,7 @@ export default class DatePeriodField extends React.Component {
             endDate: PropTypes.string,
         }),
         minimumDays: PropTypes.number,
+        initialVisibleMonth: PropTypes.func,
     };
 
     static defaultProps = {
@@ -47,6 +48,7 @@ export default class DatePeriodField extends React.Component {
         disabledDateFields: null,
         value: null,
         minimumDays: 1,
+        initialVisibleMonth: null,
     };
 
     state = {
@@ -85,7 +87,7 @@ export default class DatePeriodField extends React.Component {
     };
 
     render() {
-        const {disabled, disabledDateFields, minimumDays, disabledDate} = this.props;
+        const {disabled, disabledDateFields, minimumDays, disabledDate, initialVisibleMonth} = this.props;
         const {focused} = this.state;
         const props = {};
 
@@ -104,6 +106,7 @@ export default class DatePeriodField extends React.Component {
                                  disabled={disabled || disabledDateFields}
                                  inputIconPosition="before"
                                  minimumNights={minimumDays - 1}
+                                 initialVisibleMonth={initialVisibleMonth}
                                  block />
             </div>
         );
