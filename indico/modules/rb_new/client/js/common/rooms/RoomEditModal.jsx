@@ -631,6 +631,7 @@ class RoomEditModal extends React.Component {
                                    as={PrincipalField}
                                    favoriteUsersController={favoriteUsersController}
                                    label={content.label}
+                                   required
                                    allowNull />
                         )}
                     </FavoritesProvider>
