@@ -54,8 +54,36 @@ const _getRowSerializer = (day, room) => {
     });
 };
 
+const _transformToLabel = (type) => {
+    switch (type) {
+        case 'candidates': return {label: Translate.string('Available'), style: 'available'};
+        case 'bookings': return {label: Translate.string('Booked'), style: 'booking'};
+        case 'preBookings': return {label: Translate.string('Pre-Booked'), style: 'pre-booking'};
+        case 'conflictingCandidates': return {label: Translate.string('Invalid occurrence'), style: 'conflicting-candidate'};
+        case 'conflicts': return {label: Translate.string('Conflict'), style: 'conflict'};
+        case 'preConflicts': return {label: Translate.string('Conflict with Pre-Booking'), style: 'pre-booking-conflict'};
+        case 'blockings': return {label: Translate.string('Blocked'), style: 'blocking'};
+        case 'nonbookablePeriods':
+        case 'unbookableHours': return {label: Translate.string('Not bookable'), style: 'unbookable'};
+        default: return undefined;
+    }
+};
+
+const _getLegendLabels = (availability) => {
+    const legendLabels = [];
+    Object.entries(availability).forEach(([type, occurrences]) => {
+        if (Object.keys(occurrences).length > 0) {
+            const label = _transformToLabel(type);
+            label && !legendLabels.some(lab => _.isEqual(lab, label)) && legendLabels.push(label);
+        }
+    });
+    return legendLabels;
+};
+
 const _SingleRoomTimelineContent = props => {
-    const {availability, availabilityLoading, room, filters, roomAvailability, actions: {fetchAvailability}} = props;
+    const {
+        availability, availabilityLoading, room, title, filters, roomAvailability, actions: {fetchAvailability}
+    } = props;
     useEffect(() => {
         if (_.isEmpty(roomAvailability)) {
             fetchAvailability(room, filters);
@@ -65,8 +93,19 @@ const _SingleRoomTimelineContent = props => {
     const isLoaded = !_.isEmpty(availability) && !availabilityLoading;
     const dateRange = isLoaded ? availability.dateRange : [];
     const rows = isLoaded ? dateRange.map((day) => _getRowSerializer(day, room)(availability)) : [];
-
-    return <DailyTimelineContent rows={rows} fixedHeight={rows.length > 1 ? '70vh' : null} isLoading={!isLoaded} />;
+    const legendLabels = isLoaded ? _getLegendLabels(availability) : [];
+    return (
+        <>
+            <Modal.Header className="legend-header">
+                {title}
+                <Popup trigger={<Icon name="info circle" className="legend-info-icon" />}
+                       content={<TimelineLegend labels={legendLabels} compact />} />
+            </Modal.Header>
+            <Modal.Content>
+                <DailyTimelineContent rows={rows} fixedHeight={rows.length > 1 ? '70vh' : null} isLoading={!isLoaded}/>
+            </Modal.Content>
+        </>
+    );
 };
 
 _SingleRoomTimelineContent.propTypes = {
@@ -75,6 +114,7 @@ _SingleRoomTimelineContent.propTypes = {
     availabilityLoading: PropTypes.bool.isRequired,
     filters: PropTypes.object.isRequired,
     roomAvailability: PropTypes.object,
+    title: PropTypes.node.isRequired,
     actions: PropTypes.exact({
         fetchAvailability: PropTypes.func.isRequired,
     }).isRequired,
@@ -108,32 +148,14 @@ const SingleRoomTimelineContent = connect(
  * @param {Object} props.roomAvailability - Room availability if it was previously
  * fetched, otherwise it'll be fetched here.
  * @param {Object} props.room - Room whose timeline will be displayed.
- * @param {Array} props.legendLabels- Array containing timeline legend labels.
  */
 const SingleRoomTimelineModal = props => {
     const {open, title, onClose, roomAvailability, room} = props;
-    const legendLabels = [
-        {label: Translate.string('Available'), style: 'available'},
-        {label: Translate.string('Booked'), style: 'booking'},
-        {label: Translate.string('Pre-Booked'), style: 'pre-booking'},
-        {label: Translate.string('Invalid occurrence'), style: 'conflicting-candidate'},
-        {label: Translate.string('Conflict'), style: 'conflict'},
-        {label: Translate.string('Conflict with Pre-Booking'), style: 'pre-booking-conflict'},
-        {label: Translate.string('Blocked'), style: 'blocking'},
-        {label: Translate.string('Not bookable'), style: 'unbookable'}
-    ];
     return (
         <Modal open={open}
                onClose={onClose}
                size="large" closeIcon>
-            <Modal.Header className="legend-header">
-                {title || room.name}
-                <Popup trigger={<Icon name="info circle" className="legend-info-icon" />}
-                       content={<TimelineLegend labels={legendLabels} compact />} />
-            </Modal.Header>
-            <Modal.Content>
-                <SingleRoomTimelineContent room={room} roomAvailability={roomAvailability} />
-            </Modal.Content>
+            <SingleRoomTimelineContent room={room} roomAvailability={roomAvailability} title={title || room.name} />
         </Modal>
     );
 };
