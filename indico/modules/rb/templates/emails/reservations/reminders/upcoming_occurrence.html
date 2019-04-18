@@ -29,7 +29,7 @@
 {% macro _render_occurrence(occurrence) -%}
     {% set reservation = occurrence.reservation -%}
 
-    <strong>{{ occurrence.start_dt | format_date(locale='en_GB') }}</strong> (<strong>{{ _render_time(occurrence) }}</strong>)<br>
+    <strong>{{ occurrence.start_dt | format_date('EEEE dd/MM/yyyy', locale='en_GB') }}</strong> (<strong>{{ _render_time(occurrence) }}</strong>)<br>
     Room: <strong>{{ reservation.room.full_name }}</strong><br>
     Reason: <strong>{{ reservation.booking_reason }}</strong><br>
     <br>
