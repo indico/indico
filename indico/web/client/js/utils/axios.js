@@ -18,12 +18,10 @@
 /* global showErrorDialog:false */
 
 import axios from 'axios';
-import useAxios from '@use-hooks/axios';
 import isURLSameOrigin from 'axios/lib/helpers/isURLSameOrigin';
 import qs from 'qs';
 
 import {$T} from 'indico/utils/i18n';
-import {camelizeKeys} from './case';
 
 
 export const indicoAxios = axios.create({
@@ -68,23 +66,6 @@ export function handleAxiosError(error, strict = false) {
         });
     }
     return error.message;
-}
-
-export function useIndicoAxios({camelize, ...args}) {
-    const {response, error, loading, reFetch} = useAxios({
-        customHandler: err => err && handleAxiosError(err),
-        ...args,
-        axios: indicoAxios,
-    });
-
-    let data = null;
-    if (response) {
-        data = response.data;
-        if (camelize) {
-            data = camelizeKeys(data);
-        }
-    }
-    return {response, error, loading, reFetch, data};
 }
 
 export default indicoAxios;

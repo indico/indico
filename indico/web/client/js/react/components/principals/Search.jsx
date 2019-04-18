@@ -29,8 +29,9 @@ import {
     ReduxCheckboxField, ReduxFormField, formatters, handleSubmitError, validators as v
 } from 'indico/react/forms';
 import {Translate, PluralTranslate, Singular, Plural, Param} from 'indico/react/i18n';
+import {useIndicoAxios} from 'indico/react/hooks';
 import {Overridable} from 'indico/react/util';
-import {indicoAxios, useIndicoAxios} from 'indico/utils/axios';
+import {indicoAxios} from 'indico/utils/axios';
 import {camelizeKeys} from 'indico/utils/case';
 
 import './items.module.scss';

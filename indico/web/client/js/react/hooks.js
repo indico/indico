@@ -21,6 +21,7 @@ import principalsURL from 'indico-url:core.principals';
 import _ from 'lodash';
 import {useEffect, useState} from 'react';
 import PropTypes from 'prop-types';
+import useAxios from '@use-hooks/axios';
 import {handleAxiosError, indicoAxios} from '../utils/axios';
 import {camelizeKeys} from '../utils/case';
 
@@ -125,3 +126,21 @@ export const FavoritesProvider = ({children}) => {
 FavoritesProvider.propTypes = {
     children: PropTypes.func.isRequired,
 };
+
+
+export function useIndicoAxios({camelize, ...args}) {
+    const {response, error, loading, reFetch} = useAxios({
+        customHandler: err => err && handleAxiosError(err),
+        ...args,
+        axios: indicoAxios,
+    });
+
+    let data = null;
+    if (response) {
+        data = response.data;
+        if (camelize) {
+            data = camelizeKeys(data);
+        }
+    }
+    return {response, error, loading, reFetch, data};
+}
