@@ -72,7 +72,7 @@ const _transformToLabel = (type) => {
 const _getLegendLabels = (availability) => {
     const legendLabels = [];
     Object.entries(availability).forEach(([type, occurrences]) => {
-        if (Object.keys(occurrences).length > 0) {
+        if (occurrences && Object.keys(occurrences).length > 0) {
             const label = _transformToLabel(type);
             label && !legendLabels.some(lab => _.isEqual(lab, label)) && legendLabels.push(label);
         }

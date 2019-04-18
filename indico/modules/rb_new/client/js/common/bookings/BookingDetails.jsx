@@ -307,7 +307,7 @@ class BookingDetails extends React.Component {
     getLegendLabels = (availability) => {
         const legendLabels = [];
         Object.entries(availability).forEach(([type, occurrences]) => {
-            if (Object.keys(occurrences).length > 0) {
+            if (occurrences && Object.keys(occurrences).length > 0) {
                 const label = this.transformToLabel(type);
                 label && !legendLabels.some(lab => _.isEqual(lab, label)) && legendLabels.push(label);
             }

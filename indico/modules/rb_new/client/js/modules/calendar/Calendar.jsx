@@ -131,6 +131,32 @@ class Calendar extends React.Component {
         setFilterParameter('showInactive', !showInactive);
     };
 
+    transformToLabel = (type, showInactive) => {
+        switch (type) {
+            case 'bookings': return {label: Translate.string('Booked'), style: 'booking'};
+            case 'preBookings': return {label: Translate.string('Pre-Booked'), style: 'pre-booking'};
+            case 'blockings': return {label: Translate.string('Blocked'), style: 'blocking'};
+            case 'nonbookablePeriods':
+            case 'unbookableHours': return {label: Translate.string('Not bookable'), style: 'unbookable'};
+            case 'cancellations': return (showInactive ? {label: Translate.string('Cancelled'), style: 'cancellation'} : undefined);
+            case 'rejections': return (showInactive ? {label: Translate.string('Rejected'), style: 'rejection'} : undefined);
+            default: return undefined;
+        }
+    };
+
+    getLegendLabels = (availability, showInactive) => {
+        const legendLabels = [];
+        availability.forEach(([, day]) => {
+            Object.entries(day).forEach(([type, occurrences]) => {
+                if (occurrences && Object.keys(occurrences).length > 0) {
+                    const label = this.transformToLabel(type, showInactive);
+                    label && !legendLabels.some(lab => _.isEqual(lab, label)) && legendLabels.push(label);
+                }
+            });
+        });
+        return legendLabels;
+    };
+
     renderExtraButtons = () => {
         const {
             calendarFilters: {myBookings, showInactive},
@@ -219,20 +245,6 @@ class Calendar extends React.Component {
             datePicker,
             allowDragDrop,
         } = this.props;
-        const legendLabels = [
-            {label: Translate.string('Booked'), color: 'orange', style: 'booking'},
-            {label: Translate.string('Pre-Booked'), style: 'pre-booking'},
-            {label: Translate.string('Blocked'), style: 'blocking'},
-            {label: Translate.string('Blocked (allowed)'), style: 'overridable-blocking'},
-            {label: Translate.string('Not bookable'), style: 'unbookable'},
-        ];
-
-        if (showInactive) {
-            legendLabels.push(
-                {label: Translate.string('Cancelled'), style: 'cancellation'},
-                {label: Translate.string('Rejected'), style: 'rejection'},
-            );
-        }
 
         const editable = datePicker.mode === 'days' && allowDragDrop;
         const isTimelineVisible = view === 'timeline';
@@ -257,7 +269,7 @@ class Calendar extends React.Component {
                                                     disableDatePicker={isFetching || !rows.length}
                                                     onModeChange={setMode}
                                                     onDateChange={setDate}
-                                                    legendLabels={legendLabels} />
+                                                    legendLabels={this.getLegendLabels(rows, showInactive)} />
                                 )}
                             </StickyWithScrollBack>
                             {isTimelineVisible ? (
