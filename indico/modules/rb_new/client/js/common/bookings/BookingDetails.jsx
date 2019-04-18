@@ -294,6 +294,27 @@ class BookingDetails extends React.Component {
         });
     };
 
+    transformToLabel = (type) => {
+        switch (type) {
+            case 'bookings': return {label: Translate.string('Current'), style: 'booking'};
+            case 'cancellations': return {label: Translate.string('Cancelled'), style: 'cancellation'};
+            case 'rejections': return {label: Translate.string('Rejected'), style: 'rejection'};
+            case 'otherBookings': return {label: Translate.string('Other bookings'), style: 'other'};
+            default: return undefined;
+        }
+    };
+
+    getLegendLabels = (availability) => {
+        const legendLabels = [];
+        Object.entries(availability).forEach(([type, occurrences]) => {
+            if (Object.keys(occurrences).length > 0) {
+                const label = this.transformToLabel(type);
+                label && !legendLabels.some(lab => _.isEqual(lab, label)) && legendLabels.push(label);
+            }
+        });
+        return legendLabels;
+    };
+
     renderActionButtons = (canCancel, canReject, showAccept) => {
         const {bookingStateChangeInProgress} = this.props;
         const {actionInProgress, activeConfirmation} = this.state;
@@ -389,12 +410,6 @@ class BookingDetails extends React.Component {
                 isAccepted, newBookingId, isLinkedToObject, link
             },
         } = this.props;
-        const legendLabels = [
-            {label: Translate.string('Current'), color: 'orange', style: 'booking'},
-            {label: Translate.string('Cancelled'), style: 'cancellation'},
-            {label: Translate.string('Rejected'), style: 'rejection'},
-            {label: Translate.string('Other bookings'), style: 'other'},
-        ];
         const dates = {startDate: startDt, endDate: endDt};
         const times = {startTime: moment(startDt).format('HH:mm'), endTime: moment(endDt).format('HH:mm')};
         const recurrence = getRecurrenceInfo(repetition);
@@ -450,7 +465,7 @@ class BookingDetails extends React.Component {
                     <Modal.Header className="legend-header">
                         <Translate>Occurrences</Translate>
                         <Popup trigger={<Icon name="info circle" className="legend-info-icon" />}
-                               content={<TimelineLegend labels={legendLabels} compact />} />
+                               content={<TimelineLegend labels={this.getLegendLabels(occurrences)} compact />} />
                     </Modal.Header>
                     <Modal.Content>
                         {this.renderTimeline(occurrences, dateRange)}
