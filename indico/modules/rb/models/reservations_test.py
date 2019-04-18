@@ -208,13 +208,14 @@ def test_add_edit_log(dummy_reservation):
 
 @pytest.mark.parametrize('can_moderate', (True, False))
 @pytest.mark.parametrize('is_pending', (True, False))
-def test_moderation(dummy_reservation, dummy_user, is_pending, can_moderate):
+def test_moderation(dummy_reservation, create_user, is_pending, can_moderate):
+    user = create_user(123)
     if is_pending:
         dummy_reservation.state = ReservationState.pending
     if can_moderate:
-        dummy_reservation.room.update_principal(dummy_user, permissions={'moderate'})
-    assert dummy_reservation.can_accept(dummy_user) == (is_pending and can_moderate)
-    assert dummy_reservation.can_reject(dummy_user) == can_moderate
+        dummy_reservation.room.update_principal(user, permissions={'moderate'})
+    assert dummy_reservation.can_accept(user) == (is_pending and can_moderate)
+    assert dummy_reservation.can_reject(user) == can_moderate
 
 
 @pytest.mark.parametrize('is_manager', (True, False))

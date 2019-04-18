@@ -20,7 +20,7 @@ from datetime import date, time
 from sqlalchemy import and_, or_
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import contains_eager, joinedload, load_only, raiseload
+from sqlalchemy.orm import contains_eager, joinedload, load_only
 
 from indico.core.db.sqlalchemy import db
 from indico.core.db.sqlalchemy.custom import static_array
@@ -540,8 +540,8 @@ class Room(ProtectionManagersMixin, db.Model, Serializer):
         all_rooms_query = (Room.query
                            .filter(Room.is_active)
                            .options(load_only('id', 'protection_mode', 'reservations_need_confirmation',
-                                              'is_reservable'),
-                                    raiseload('owner'),
+                                              'is_reservable', 'owner_id'),
+                                    joinedload('owner').load_only('id'),
                                     joinedload('acl_entries')))
         is_admin = allow_admin and cls.is_user_admin(user)
         if (is_admin and allow_admin) or not user.can_get_all_multipass_groups:
@@ -568,17 +568,18 @@ class Room(ProtectionManagersMixin, db.Model, Serializer):
         prebooking_required_rooms = set()
         non_reservable_rooms = set()
         for room in all_rooms_query:
+            is_owner = user == room.owner
             data[room.id] = {x: False for x in permissions}
             if room.reservations_need_confirmation:
                 prebooking_required_rooms.add(room.id)
             if not room.is_reservable:
                 non_reservable_rooms.add(room.id)
-            if (room.is_reservable and room.is_public) or (is_admin and allow_admin):
-                if not room.reservations_need_confirmation or (is_admin and allow_admin):
+            if (room.is_reservable and (room.is_public or is_owner)) or (is_admin and allow_admin):
+                if not room.reservations_need_confirmation or is_owner or (is_admin and allow_admin):
                     data[room.id]['book'] = True
                 if room.reservations_need_confirmation:
                     data[room.id]['prebook'] = True
-            if is_admin and allow_admin:
+            if is_owner or (is_admin and allow_admin):
                 data[room.id]['override'] = True
                 data[room.id]['moderate'] = True
                 data[room.id]['manage'] = True
@@ -600,6 +601,12 @@ class Room(ProtectionManagersMixin, db.Model, Serializer):
     def can_access(self, user, allow_admin=True):
         # rooms are never access-restricted
         raise NotImplementedError
+
+    def can_manage(self, user, permission=None, allow_admin=True, check_parent=True, explicit_permission=False):
+        if user and user == self.owner and (permission is None or not explicit_permission):
+            return True
+        return super(Room, self).can_manage(user, permission=permission, allow_admin=allow_admin,
+                                            check_parent=check_parent, explicit_permission=explicit_permission)
 
     def can_book(self, user, allow_admin=True):
         # XXX: When changing the logic in here, make sure to update get_permissions_for_user as well!

@@ -79,7 +79,7 @@ def _query_all_rooms_for_acl_check():
     return (Room.query
             .filter(Room.is_active)
             .options(load_only('id', 'protection_mode', 'reservations_need_confirmation'),
-                     raiseload('owner'),
+                     joinedload('owner').load_only('id'),
                      joinedload('acl_entries')))
 
 
@@ -147,7 +147,7 @@ def search_for_rooms(filters, allow_admin=False, availability=None):
              .outerjoin(favorite_room_table, db.and_(favorite_room_table.c.user_id == session.user.id,
                                                      favorite_room_table.c.room_id == Room.id))
              .reset_joinpoint()  # otherwise filter_by() would apply to the favorite table
-             .options(raiseload('owner'))
+             .options(joinedload('owner').load_only('id'))
              .filter(Room.is_active)
              .order_by(favorite_room_table.c.user_id.is_(None), db.func.indico.natsort(Room.full_name)))
 

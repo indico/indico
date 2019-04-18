@@ -307,60 +307,70 @@ def test_check_bookable_hours_no_user(db, dummy_room):
 
 
 @pytest.mark.parametrize('reservations_need_confirmation', (True, False))
+@pytest.mark.parametrize('is_owner', (True, False))
 @pytest.mark.parametrize('is_reservable', (True, False))
-def test_permissions_manager(dummy_room, dummy_user, reservations_need_confirmation, is_reservable):
+def test_permissions_manager_owner(dummy_room, create_user, reservations_need_confirmation, is_owner, is_reservable):
+    user = create_user(123)
     dummy_room.protection_mode = ProtectionMode.public
     dummy_room.reservations_need_confirmation = reservations_need_confirmation
     dummy_room.is_reservable = is_reservable
-    dummy_room.update_principal(dummy_user, full_access=True)
-    assert dummy_room.can_book(dummy_user) == is_reservable
-    assert dummy_room.can_prebook(dummy_user) == (reservations_need_confirmation and is_reservable)
-    assert dummy_room.can_override(dummy_user)
-    assert dummy_room.can_moderate(dummy_user)
+    if is_owner:
+        dummy_room.owner = user
+    else:
+        dummy_room.update_principal(user, full_access=True)
+    assert dummy_room.can_book(user) == is_reservable
+    assert dummy_room.can_prebook(user) == (reservations_need_confirmation and is_reservable)
+    assert dummy_room.can_override(user)
+    assert dummy_room.can_moderate(user)
 
 
-def test_permissions_manager_explicit_prebook(dummy_room, dummy_user):
+def test_permissions_manager_explicit_prebook(dummy_room, create_user):
+    user = create_user(123)
     dummy_room.protection_mode = ProtectionMode.public
-    dummy_room.update_principal(dummy_user, full_access=True, permissions={'prebook'})
-    assert dummy_room.can_prebook(dummy_user)
+    dummy_room.update_principal(user, full_access=True, permissions={'prebook'})
+    assert dummy_room.can_prebook(user)
 
 
 @pytest.mark.parametrize('reservations_need_confirmation', (True, False))
-def test_permissions_public_room(dummy_room, dummy_user, reservations_need_confirmation):
+def test_permissions_public_room(dummy_room, create_user, reservations_need_confirmation):
+    user = create_user(123)
     dummy_room.protection_mode = ProtectionMode.public
     dummy_room.reservations_need_confirmation = reservations_need_confirmation
-    assert dummy_room.can_book(dummy_user) == (not reservations_need_confirmation)
-    assert dummy_room.can_prebook(dummy_user) == reservations_need_confirmation
-    assert not dummy_room.can_override(dummy_user)
-    assert not dummy_room.can_moderate(dummy_user)
+    assert dummy_room.can_book(user) == (not reservations_need_confirmation)
+    assert dummy_room.can_prebook(user) == reservations_need_confirmation
+    assert not dummy_room.can_override(user)
+    assert not dummy_room.can_moderate(user)
 
 
-def test_permissions_protected_room(dummy_room, dummy_user):
+def test_permissions_protected_room(dummy_room, create_user):
+    user = create_user(123)
     dummy_room.protection_mode = ProtectionMode.protected
-    assert not dummy_room.can_book(dummy_user)
-    assert not dummy_room.can_prebook(dummy_user)
-    assert not dummy_room.can_override(dummy_user)
-    assert not dummy_room.can_moderate(dummy_user)
+    assert not dummy_room.can_book(user)
+    assert not dummy_room.can_prebook(user)
+    assert not dummy_room.can_override(user)
+    assert not dummy_room.can_moderate(user)
 
 
 @pytest.mark.parametrize('reservations_need_confirmation', (True, False))
-def test_permissions_protected_room_admin(dummy_room, dummy_user, reservations_need_confirmation):
-    rb_settings.acls.add_principal('admin_principals', dummy_user)
+def test_permissions_protected_room_admin(dummy_room, create_user, reservations_need_confirmation):
+    user = create_user(123)
+    rb_settings.acls.add_principal('admin_principals', user)
     dummy_room.protection_mode = ProtectionMode.protected
     dummy_room.reservations_need_confirmation = reservations_need_confirmation
-    assert dummy_room.can_book(dummy_user)
-    assert dummy_room.can_prebook(dummy_user) == reservations_need_confirmation
-    assert dummy_room.can_override(dummy_user)
-    assert dummy_room.can_moderate(dummy_user)
+    assert dummy_room.can_book(user)
+    assert dummy_room.can_prebook(user) == reservations_need_confirmation
+    assert dummy_room.can_override(user)
+    assert dummy_room.can_moderate(user)
 
 
 @pytest.mark.parametrize('permission', ('book', 'prebook', 'override', 'moderate'))
-def test_permissions_protected_room_acl(dummy_room, dummy_user, permission):
+def test_permissions_protected_room_acl(dummy_room, create_user, permission):
+    user = create_user(123)
     dummy_room.protection_mode = ProtectionMode.protected
-    dummy_room.update_principal(dummy_user, permissions={permission})
+    dummy_room.update_principal(user, permissions={permission})
     for p in ('book', 'prebook', 'override', 'moderate'):
         granted = p == permission
-        assert getattr(dummy_room, 'can_' + p)(dummy_user) == granted
+        assert getattr(dummy_room, 'can_' + p)(user) == granted
 
 
 def test_permissions_no_user(dummy_room):
@@ -373,37 +383,42 @@ def test_permissions_no_user(dummy_room):
 
 
 @pytest.mark.parametrize('is_admin', (True, False))
-def test_admin_permissions(dummy_room, dummy_user, is_admin):
+def test_admin_permissions(dummy_room, create_user, is_admin):
+    user = create_user(123)
     if is_admin:
-        rb_settings.acls.add_principal('admin_principals', dummy_user)
-    assert dummy_room.can_edit(dummy_user) == is_admin
-    assert dummy_room.can_delete(dummy_user) == is_admin
+        rb_settings.acls.add_principal('admin_principals', user)
+    assert dummy_room.can_edit(user) == is_admin
+    assert dummy_room.can_delete(user) == is_admin
 
 
 @pytest.mark.parametrize('acl_perm', (None, 'book', 'prebook', 'override', 'moderate', '*'))
 @pytest.mark.parametrize('protection_mode', (ProtectionMode.public, ProtectionMode.protected))
 @pytest.mark.parametrize('reservations_need_confirmation', (True, False))
 @pytest.mark.parametrize('is_reservable', (True, False))
+@pytest.mark.parametrize('is_owner', (True, False))
 @pytest.mark.parametrize('is_admin', (True, False))
 @pytest.mark.parametrize('allow_admin', (True, False))
 @pytest.mark.parametrize('bulk_possible', (True, False))
-def test_get_permissions_for_user(dummy_room, dummy_user, monkeypatch, bulk_possible, allow_admin, is_admin,
+def test_get_permissions_for_user(dummy_room, create_user, monkeypatch, bulk_possible, allow_admin, is_admin, is_owner,
                                   is_reservable, reservations_need_confirmation, protection_mode, acl_perm):
     monkeypatch.setattr(User, 'can_get_all_multipass_groups', bulk_possible)
+    user = create_user(123)
+    if is_owner:
+        dummy_room.owner = user
     if is_admin:
-        rb_settings.acls.add_principal('admin_principals', dummy_user)
+        rb_settings.acls.add_principal('admin_principals', user)
     dummy_room.protection_mode = protection_mode
     dummy_room.is_reservable = is_reservable
     dummy_room.reservations_need_confirmation = reservations_need_confirmation
     if acl_perm == '*':
-        dummy_room.update_principal(dummy_user, full_access=True)
+        dummy_room.update_principal(user, full_access=True)
     elif acl_perm:
-        dummy_room.update_principal(dummy_user, permissions={acl_perm})
-    perms = Room.get_permissions_for_user(dummy_user, allow_admin=allow_admin)
+        dummy_room.update_principal(user, permissions={acl_perm})
+    perms = Room.get_permissions_for_user(user, allow_admin=allow_admin)
     assert perms[dummy_room.id] == {
-        'book': dummy_room.can_book(dummy_user, allow_admin=allow_admin),
-        'prebook': dummy_room.can_prebook(dummy_user, allow_admin=allow_admin),
-        'override': dummy_room.can_override(dummy_user, allow_admin=allow_admin),
-        'moderate': dummy_room.can_moderate(dummy_user, allow_admin=allow_admin),
-        'manage': dummy_room.can_manage(dummy_user, allow_admin=allow_admin),
+        'book': dummy_room.can_book(user, allow_admin=allow_admin),
+        'prebook': dummy_room.can_prebook(user, allow_admin=allow_admin),
+        'override': dummy_room.can_override(user, allow_admin=allow_admin),
+        'moderate': dummy_room.can_moderate(user, allow_admin=allow_admin),
+        'manage': dummy_room.can_manage(user, allow_admin=allow_admin),
     }
