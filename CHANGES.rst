@@ -41,6 +41,8 @@ Bugfixes
   address in the admin area
 - Fix event import if a user in the exported data has multiple email
   addresses and they match different users
+- Fix paper reviewers getting notifications even if their type of reviewing
+  has been disabled (:issue:`3852`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

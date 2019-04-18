@@ -34,9 +34,11 @@ def notify_paper_revision_submission(revision):
             send_email(email, event=event, module='Papers', user=session.user)
     reviewers = set()
     if PaperReviewingRole.layout_reviewer in roles_to_notify:
-        reviewers |= revision.paper.contribution.paper_layout_reviewers
+        if revision.paper.cfp.layout_reviewing_enabled:
+            reviewers |= revision.paper.contribution.paper_layout_reviewers
     if PaperReviewingRole.content_reviewer in roles_to_notify:
-        reviewers |= revision.paper.contribution.paper_content_reviewers
+        if revision.paper.cfp.content_reviewing_enabled:
+            reviewers |= revision.paper.contribution.paper_content_reviewers
     for reviewer in reviewers:
         template = get_template_module('events/papers/emails/revision_submission_to_reviewer.html', event=event,
                                        revision=revision, receiver=reviewer)
