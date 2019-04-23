@@ -85,6 +85,6 @@ class EquipmentList extends React.Component {
 
 export default connect(
     (state) => ({
-        equipmentTypes: roomsSelectors.getEquipmentTypes(state)
+        equipmentTypes: roomsSelectors.getAllEquipmentTypes(state)
     })
 )(EquipmentList);

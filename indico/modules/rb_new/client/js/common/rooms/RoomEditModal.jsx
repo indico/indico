@@ -371,6 +371,7 @@ class RoomEditModal extends React.Component {
         onClose: PropTypes.func.isRequired,
         roomId: PropTypes.number.isRequired,
         actions: PropTypes.exact({
+            fetchEquipmentTypes: PropTypes.func.isRequired,
             fetchRoom: PropTypes.func.isRequired,
             fetchRoomPermissions: PropTypes.func.isRequired,
             fetchRoomDetails: PropTypes.func.isRequired,
@@ -475,9 +476,13 @@ class RoomEditModal extends React.Component {
     }
 
     handleCloseModal = async () => {
-        const {onClose, roomId, actions: {fetchRoom, fetchRoomDetails, fetchRoomPermissions}} = this.props;
+        const {
+            onClose, roomId,
+            actions: {fetchEquipmentTypes, fetchRoom, fetchRoomDetails, fetchRoomPermissions}
+        } = this.props;
         this.setState({closing: true});
         await Promise.all([
+            fetchEquipmentTypes(),
             fetchRoom(roomId),
             fetchRoomPermissions(roomId),
             fetchRoomDetails(roomId, true)
@@ -800,10 +805,11 @@ class RoomEditModal extends React.Component {
 
 export default connect(
     (state) => ({
-        equipmentTypes: roomsSelectors.getEquipmentTypes(state),
+        equipmentTypes: roomsSelectors.getAllEquipmentTypes(state),
     }),
     dispatch => ({
         actions: bindActionCreators({
+            fetchEquipmentTypes: roomsActions.fetchEquipmentTypes,
             fetchRoom: roomsActions.fetchRoom,
             fetchRoomPermissions: userActions.fetchRoomPermissions,
             fetchRoomDetails: roomsActions.fetchDetails,

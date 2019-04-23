@@ -31,7 +31,7 @@ from indico.modules.rb.models.reservation_occurrences import ReservationOccurren
 from indico.modules.rb.models.reservations import Reservation
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb_new.controllers.backend.common import _cache
-from indico.modules.rb_new.schemas import equipment_type_schema, map_areas_schema, rb_user_schema
+from indico.modules.rb_new.schemas import EquipmentTypeSchema, map_areas_schema, rb_user_schema
 from indico.modules.rb_new.util import build_rooms_spritesheet
 from indico.util.caching import memoize_redis
 from indico.util.i18n import get_all_locales
@@ -93,11 +93,14 @@ class RHMapAreas(RHRoomBookingBase):
 
 class RHEquipmentTypes(RHRoomBookingBase):
     def _get_equipment_types(self):
-        query = (EquipmentType.query
-                 .filter(EquipmentType.rooms.any(~Room.is_deleted))
-                 .options(joinedload('features'))
-                 .order_by(EquipmentType.name))
-        return equipment_type_schema.dump(query, many=True)
+        res = (EquipmentType.query
+               .add_columns(EquipmentType.rooms.any(~Room.is_deleted))
+               .options(joinedload('features'))
+               .order_by(EquipmentType.name)
+               .all())
+        used_ids = {eq.id for eq, used in res if used}
+        schema = EquipmentTypeSchema(many=True, context={'used_ids': used_ids})
+        return schema.dump(eq for eq, __ in res)
 
     def _process(self):
         return jsonify(self._get_equipment_types())

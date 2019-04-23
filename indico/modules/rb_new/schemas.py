@@ -315,10 +315,11 @@ class RoomFeatureSchema(mm.ModelSchema):
 
 class EquipmentTypeSchema(mm.ModelSchema):
     features = Nested(RoomFeatureSchema, many=True)
+    used = Function(lambda eq, ctx: eq.id in ctx['used_ids'])
 
     class Meta:
         model = EquipmentType
-        fields = ('id', 'name', 'features')
+        fields = ('id', 'name', 'features', 'used')
 
 
 class AdminEquipmentTypeSchema(mm.ModelSchema):
@@ -355,7 +356,6 @@ bookable_hours_schema = BookableHoursSchema()
 locations_schema = LocationsSchema(many=True)
 admin_locations_schema = AdminLocationsSchema(many=True)
 create_booking_args = CreateBookingSchema()
-equipment_type_schema = EquipmentTypeSchema()
 admin_equipment_type_schema = AdminEquipmentTypeSchema()
 room_feature_schema = RoomFeatureSchema()
 room_attribute_schema = RoomAttributeSchema()

@@ -23,9 +23,13 @@ import {getAllUserRoomPermissions, isUserRBAdmin} from '../user/selectors';
 
 
 export const hasLoadedEquipmentTypes = ({rooms}) => rooms.requests.equipmentTypes.state === RequestState.SUCCESS;
-export const getEquipmentTypes = ({rooms}) => rooms.equipmentTypes;
+export const getAllEquipmentTypes = ({rooms}) => rooms.equipmentTypes;
+const getUsedEquipmentTypes = createSelector(
+    getAllEquipmentTypes,
+    equipmentTypes => equipmentTypes.filter(x => x.used)
+);
 const getFeaturesMapping = createSelector(
-    getEquipmentTypes,
+    getUsedEquipmentTypes,
     equipmentTypes => {
         const features = {};
         equipmentTypes.forEach(({name: eqName, features: eqFeatures}) => {
@@ -43,8 +47,8 @@ const getFeaturesMapping = createSelector(
     }
 );
 /** Get equipment type names except those with an 1:1 mapping to a feature */
-export const getEquipmentTypeNamesWithoutFeatures = createSelector(
-    getEquipmentTypes,
+export const getUsedEquipmentTypeNamesWithoutFeatures = createSelector(
+    getUsedEquipmentTypes,
     getFeaturesMapping,
     (equipmentTypes, features) => {
         return equipmentTypes
@@ -64,7 +68,7 @@ export const getFeatures = createSelector(
 
 export const getAllRooms = createSelector(
     ({rooms}) => rooms.rooms,
-    getEquipmentTypes,
+    getAllEquipmentTypes,
     getAllUserRoomPermissions,
     isUserRBAdmin,
     (rawRooms, equipmentTypes, allUserPermissions, isRBAdmin) => {
