@@ -204,6 +204,12 @@ class Room(ProtectionManagersMixin, db.Model, Serializer):
         db.Integer
     )
 
+    location = db.relationship(
+        'Location',
+        back_populates='rooms',
+        lazy=True
+    )
+
     acl_entries = db.relationship(
         'RoomPrincipal',
         lazy=True,
@@ -288,7 +294,6 @@ class Room(ProtectionManagersMixin, db.Model, Serializer):
     # - breaks (Break.own_room)
     # - contributions (Contribution.own_room)
     # - events (Event.own_room)
-    # - location (Location.rooms)
     # - session_blocks (SessionBlock.own_room)
     # - sessions (Session.own_room)
 

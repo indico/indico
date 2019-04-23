@@ -75,8 +75,9 @@ class Location(db.Model):
 
     rooms = db.relationship(
         'Room',
-        backref='location',
+        back_populates='location',
         cascade='all, delete-orphan',
+        primaryjoin='(Room.location_id == Location.id) & ~Room.is_deleted',
         lazy=True
     )
 

@@ -263,7 +263,7 @@ class LocationsSchema(mm.ModelSchema):
 class AdminLocationsSchema(LocationsSchema):
     rooms = Nested(RoomSchema, only=LocationsSchema._declared_fields['rooms'].only + ('owner_name', 'comments'),
                    many=True)
-    can_delete = Function(lambda loc: all(r.is_deleted for r in loc.rooms))
+    can_delete = Function(lambda loc: not loc.rooms)
 
     class Meta:
         model = Location
