@@ -1,5 +1,5 @@
 /* This file is part of Indico.
- * Copyright (C) 2002 - 2018 European Organization for Nuclear Research (CERN).
+ * Copyright (C) 2002 - 2019 European Organization for Nuclear Research (CERN).
  *
  * Indico is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -15,10 +15,27 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-export {handleSubmissionError} from './errors';
-export {ReduxFormField, ReduxRadioField, ReduxCheckboxField, ReduxDropdownField} from './fields';
-export {default as validators} from './validators';
-export {default as parsers} from './parsers';
-export {default as formatters} from './formatters';
-export {getChangedValues, FieldCondition, handleSubmitError} from './final-form';
-export {default as UnloadPrompt} from './unload';
+function number(value) {
+    if (typeof value === 'number') {
+        return value;
+    } else if (typeof value === 'string') {
+        if (value === '') {
+            return null;
+        } else if (!isNaN(+value)) {
+            return +value;
+        }
+    }
+    // keep whatever we have, maybe a validator can make sense of it
+    // and show a suitable error
+    return value;
+}
+
+function nullIfEmpty(value) {
+    return value === '' ? null : value;
+}
+
+
+export default {
+    number,
+    nullIfEmpty,
+};

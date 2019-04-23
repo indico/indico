@@ -24,7 +24,11 @@ import {Form, Input, Message, Segment, Select, TextArea} from 'semantic-ui-react
 import {Field, FormSpy} from 'react-final-form';
 import {START_DATE} from 'react-dates/constants';
 
-import {FieldCondition, ReduxFormField, ReduxRadioField, formatters, validators as v} from 'indico/react/forms';
+import {
+    FieldCondition, ReduxFormField, ReduxRadioField,
+    formatters,
+    parsers as p, validators as v
+} from 'indico/react/forms';
 import {FavoritesProvider} from 'indico/react/hooks';
 import {SingleDatePicker, DatePeriodField, PrincipalField} from 'indico/react/components';
 import {serializeDate, serializeTime, toMoment} from 'indico/utils/date';
@@ -93,8 +97,8 @@ class BookingEditForm extends React.Component {
         const {formProps: {values: {recurrence: {number}}}} = this.props;
 
         const recurrenceOptions = [
-            {text: PluralTranslate.string('Week', 'Weeks', number), value: 'week'},
-            {text: PluralTranslate.string('Month', 'Months', number), value: 'month'}
+            {text: PluralTranslate.string('Week', 'Weeks', number || 0), value: 'week'},
+            {text: PluralTranslate.string('Month', 'Months', number || 0), value: 'month'}
         ];
 
         return (
@@ -235,7 +239,7 @@ class BookingEditForm extends React.Component {
                                    as={Input}
                                    validate={v.min(1)}
                                    disabled={submitSucceeded}
-                                   parse={value => (value ? +value : null)}
+                                   parse={p.number}
                                    onChange={(newNumber) => {
                                        if (+newNumber > 0) {
                                            const newRecurrence = {...recurrence, number: newNumber};

@@ -26,7 +26,7 @@ import {PluralTranslate, Translate} from 'indico/react/i18n';
 import {PrincipalListField} from 'indico/react/components';
 import {
     formatters, getChangedValues, FieldCondition, ReduxFormField, ReduxCheckboxField, UnloadPrompt,
-    validators as v
+    validators as v, parsers as p
 } from 'indico/react/forms';
 import {useFavoriteUsers} from 'indico/react/hooks';
 import * as adminActions from './actions';
@@ -119,7 +119,7 @@ const SettingsPage = props => {
                         <Field name="tileserver_url" component={ReduxFormField} as="input"
                                format={formatters.trim} formatOnBlur
                                label={Translate.string('Tileserver URL')}
-                               parse={val => val || null}
+                               parse={p.nullIfEmpty}
                                validate={val => {
                                    if (!val) {
                                        return undefined;
@@ -148,7 +148,7 @@ const SettingsPage = props => {
                                type="number"
                                min="1"
                                required
-                               parse={value => (value ? +value : null)}
+                               parse={p.number}
                                label={Translate.string('Max. booking length')}
                                validate={v.min(1)}>
                             <p className="field-description">
@@ -171,7 +171,7 @@ const SettingsPage = props => {
                                            min="1"
                                            max="30"
                                            required
-                                           parse={value => (value ? +value : null)}
+                                           parse={p.number}
                                            label={Translate.string('Single/Daily bookings')}
                                            validate={v.range(1, 30)} />
                                     <Field name="notification_before_days_weekly" component={ReduxFormField}
@@ -180,7 +180,7 @@ const SettingsPage = props => {
                                            min="1"
                                            max="30"
                                            required
-                                           parse={value => (value ? +value : null)}
+                                           parse={p.number}
                                            label={Translate.string('Weekly bookings')}
                                            validate={v.range(1, 30)} />
                                     <Field name="notification_before_days_monthly" component={ReduxFormField}
@@ -189,7 +189,7 @@ const SettingsPage = props => {
                                            min="1"
                                            max="30"
                                            required
-                                           parse={value => (value ? +value : null)}
+                                           parse={p.number}
                                            label={Translate.string('Monthly bookings')}
                                            validate={v.range(1, 30)} />
                                 </Form.Group>
@@ -211,7 +211,7 @@ const SettingsPage = props => {
                                            min="1"
                                            max="30"
                                            required
-                                           parse={value => (value ? +value : null)}
+                                           parse={p.number}
                                            label={Translate.string('Daily bookings')}
                                            validate={v.range(1, 30)} />
                                     <Field name="end_notification_weekly" component={ReduxFormField}
@@ -220,7 +220,7 @@ const SettingsPage = props => {
                                            min="1"
                                            max="30"
                                            required
-                                           parse={value => (value ? +value : null)}
+                                           parse={p.number}
                                            label={Translate.string('Weekly bookings')}
                                            validate={v.range(1, 30)} />
                                     <Field name="end_notification_monthly" component={ReduxFormField}
@@ -229,7 +229,7 @@ const SettingsPage = props => {
                                            min="1"
                                            max="30"
                                            required
-                                           parse={value => (value ? +value : null)}
+                                           parse={p.number}
                                            label={Translate.string('Monthly bookings')}
                                            validate={v.range(1, 30)} />
                                 </Form.Group>
@@ -250,7 +250,8 @@ const SettingsPage = props => {
                                type="number"
                                min="0"
                                max="24"
-                               parse={value => (value !== '' ? +value : null)}
+                               parse={p.number}
+                               validate={v.optional(v.range(0, 24))}
                                label={Translate.string('Grace period')}>
                             <p className="field-description">
                                 <Translate>

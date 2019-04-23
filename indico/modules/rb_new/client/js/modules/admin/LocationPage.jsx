@@ -24,7 +24,7 @@ import createDecorator from 'final-form-calculate';
 import {Field} from 'react-final-form';
 import {List} from 'semantic-ui-react';
 import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
-import {formatters, validators as v, ReduxDropdownField, ReduxFormField} from 'indico/react/forms';
+import {formatters, validators as v, parsers as p, ReduxDropdownField, ReduxFormField} from 'indico/react/forms';
 import {snakifyKeys} from 'indico/utils/case';
 import * as adminActions from './actions';
 import * as adminSelectors from './selectors';
@@ -143,12 +143,8 @@ class LocationPage extends React.PureComponent {
                            format={formatters.trim} formatOnBlur
                            readOnly={selectedTemplate !== 'custom'}
                            style={selectedTemplate === 'none' ? {display: 'none'} : {}}
-                           parse={val => val || null}
-                           validate={val => {
-                               if (val && !val.match(/https?:\/\/.+/)) {
-                                   return Translate.string('Please provide a valid URL');
-                               }
-                           }}>
+                           parse={p.nullIfEmpty}
+                           validate={v.optional(v.url)}>
                         {selectedTemplate === 'custom' && (
                             <p className="field-description">
                                 <Translate>
