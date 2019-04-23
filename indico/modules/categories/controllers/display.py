@@ -608,6 +608,7 @@ class _EventProxy(object):
         assert date <= event.end_dt
         object.__setattr__(self, '_start_dt', start_dt)
         object.__setattr__(self, '_real_event', event)
+        object.__setattr__(self, '_event_tz_start_date', event.start_dt.astimezone(tzinfo).date())
         object.__setattr__(self, '_timetable_objects', timetable_objects)
 
     def __getattribute__(self, name):
@@ -617,7 +618,10 @@ class _EventProxy(object):
         if name == 'timetable_objects':
             return object.__getattribute__(self, '_timetable_objects')
         if name == 'ongoing':
-            return event.start_dt.date() != self.start_dt.date()
+            # the event is "ongoing" if the dates (in the tz of the category)
+            # of the event and the proxy (calendar entry) don't match
+            event_start_date = object.__getattribute__(self, '_event_tz_start_date')
+            return event_start_date != self.start_dt.date()
         if name == 'first_occurence_start_dt':
             return event.start_dt
         return getattr(event, name)
