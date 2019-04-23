@@ -67,6 +67,7 @@ class BookRoom extends React.Component {
         suggestions: PropTypes.arrayOf(PropTypes.object).isRequired,
         showMap: PropTypes.bool.isRequired,
         isAdminOverrideEnabled: PropTypes.bool.isRequired,
+        timelineAvailability: PropTypes.array.isRequired,
         actions: PropTypes.exact({
             setFilterParameter: PropTypes.func.isRequired,
             clearTextFilter: PropTypes.func.isRequired,
@@ -157,6 +158,47 @@ class BookRoom extends React.Component {
         openBookingForm(roomId, {...bookingData, isPrebooking});
     }
 
+    transformToLabel(type) {
+        switch (type) {
+            case 'candidates':
+                return {label: Translate.string('Available'), style: 'available'};
+            case 'bookings':
+                return {label: Translate.string('Booked'), style: 'booking'};
+            case 'preBookings':
+                return {label: Translate.string('Pre-Booked'), style: 'pre-booking'};
+            case 'conflictingCandidates':
+                return {label: Translate.string('Invalid occurrence'), style: 'conflicting-candidate'};
+            case 'conflicts':
+                return {label: Translate.string('Conflict'), style: 'conflict'};
+            case 'preConflicts':
+                return {label: Translate.string('Conflict with Pre-Booking'), style: 'pre-booking-conflict'};
+            case 'blockings':
+                return {label: Translate.string('Blocked'), style: 'blocking'};
+            case 'overridableBlockings':
+                return {label: Translate.string('Blocked (allowed)'), style: 'overridable-blocking'};
+            case 'nonbookablePeriods':
+            case 'unbookableHours':
+                return {label: Translate.string('Not bookable'), style: 'unbookable'};
+            default:
+                return undefined;
+        }
+    }
+
+    getLegendLabels(availability) {
+        const legendLabels = [];
+        availability.forEach(([, day]) => {
+            Object.entries(day).forEach(([type, occurrences]) => {
+                if (occurrences && Object.keys(occurrences).length > 0) {
+                    const label = this.transformToLabel(type);
+                    if (label && !legendLabels.some(lab => _.isEqual(lab, label))) {
+                        legendLabels.push(label);
+                    }
+                }
+            });
+        });
+        return legendLabels;
+    }
+
     renderFilters(refName) {
         const {[refName]: ref} = this.state;
         const {
@@ -166,20 +208,11 @@ class BookRoom extends React.Component {
             results,
             isTimelineVisible,
             actions,
-            datePicker
+            datePicker,
+            timelineAvailability
         } = this.props;
 
         const {selectedDate} = datePicker;
-        const legendLabels = [
-            {label: Translate.string('Available'), style: 'available'},
-            {label: Translate.string('Booked'), style: 'booking'},
-            {label: Translate.string('Pre-Booked'), style: 'pre-booking'},
-            {label: Translate.string('Conflict'), style: 'conflict'},
-            {label: Translate.string('Conflict with Pre-Booking'), style: 'pre-booking-conflict'},
-            {label: Translate.string('Blocked'), style: 'blocking'},
-            {label: Translate.string('Blocked (allowed)'), style: 'overridable-blocking'},
-            {label: Translate.string('Not bookable'), style: 'unbookable'}
-        ];
         return (
             <StickyWithScrollBack context={ref}>
                 <div className="filter-row">
@@ -199,7 +232,7 @@ class BookRoom extends React.Component {
                                     disableDatePicker={isSearching}
                                     onDateChange={actions.setDate}
                                     onModeChange={actions.setTimelineMode}
-                                    legendLabels={legendLabels}
+                                    legendLabels={this.getLegendLabels(timelineAvailability)}
                                     isLoading={isSearching} />
                 )}
             </StickyWithScrollBack>
@@ -437,6 +470,7 @@ const mapStateToProps = (state) => {
         dateRange: bookRoomSelectors.getTimelineDateRange(state),
         datePicker: bookRoomSelectors.getTimelineDatePicker(state),
         isAdminOverrideEnabled: userSelectors.isUserAdminOverrideEnabled(state),
+        timelineAvailability: bookRoomSelectors.getTimelineAvailability(state),
     };
 };
 
