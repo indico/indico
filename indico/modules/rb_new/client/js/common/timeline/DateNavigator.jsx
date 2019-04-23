@@ -243,7 +243,9 @@ export default class DateNavigator extends React.Component {
                        <Button primary disabled={disabled}>
                            {mode === 'days' && this.selectedDate.format('L')}
                            {mode === 'months' && this.selectedDate.format('MMMM YYYY')}
-                           {mode === 'weeks' && `Week of ${this.selectedDate.format('MMM Do YYYY')}`}
+                           {mode === 'weeks' && Translate.string('Week of {date}', {
+                               date: this.selectedDate.format('MMM Do YYYY')
+                           })}
                        </Button>
                    }
                    content={
