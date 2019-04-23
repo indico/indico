@@ -79,8 +79,8 @@ class RHStats(RHRoomBookingBase):
                                                    'end_dt', today_dt + timedelta(days=1)))
                           .count())
         return jsonify(
-            active_rooms=Room.query.filter_by(is_active=True).count(),
-            buildings=Room.query.distinct(Room.building).filter_by(is_active=True).count(),
+            active_rooms=Room.query.filter_by(is_deleted=False).count(),
+            buildings=Room.query.distinct(Room.building).filter_by(is_deleted=False).count(),
             pending_bookings=Reservation.query.filter(Reservation.is_pending, ~Reservation.is_archived).count(),
             bookings_today=bookings_today
         )
@@ -94,7 +94,7 @@ class RHMapAreas(RHRoomBookingBase):
 class RHEquipmentTypes(RHRoomBookingBase):
     def _get_equipment_types(self):
         query = (EquipmentType.query
-                 .filter(EquipmentType.rooms.any(Room.is_active))
+                 .filter(EquipmentType.rooms.any(~Room.is_deleted))
                  .options(joinedload('features'))
                  .order_by(EquipmentType.name))
         return equipment_type_schema.dump(query, many=True)

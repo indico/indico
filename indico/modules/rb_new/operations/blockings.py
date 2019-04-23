@@ -112,7 +112,7 @@ def _update_blocked_rooms(blocking, room_ids):
     for room_id in removed_blocks:
         blocking.blocked_rooms.remove(blocked_rooms_by_room[room_id])
     added_blocked_rooms = set()
-    rooms = {r.id: r for r in Room.query.filter(Room.is_active, Room.id.in_(added_blocks))}
+    rooms = {r.id: r for r in Room.query.filter(~Room.is_deleted, Room.id.in_(added_blocks))}
     for room_id in added_blocks:
         blocked_room = BlockedRoom(room=rooms[room_id])
         blocking.blocked_rooms.append(blocked_room)

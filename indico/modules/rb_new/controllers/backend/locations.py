@@ -32,7 +32,7 @@ class RHLocations(RHRoomBookingBase):
         rooms_strategy.noload('*')
         rooms_strategy.joinedload('location').load_only('room_name_format')
         locations = (Location.query
-                     .join(Room, (Location.id == Room.location_id) & Room.is_active)
+                     .join(Room, (Location.id == Room.location_id) & ~Room.is_deleted)
                      .options(rooms_strategy)
                      .order_by(Location.name, db.func.indico.natsort(Room.full_name))
                      .all())

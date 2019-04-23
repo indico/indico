@@ -57,9 +57,7 @@ class RHTimeline(RHRoomBookingBase):
     def _process_args(self):
         self.room = None
         if 'room_id' in request.view_args:
-            self.room = Room.get_one(request.view_args['room_id'])
-            if not self.room.is_active:
-                raise NotFound
+            self.room = Room.get_one(request.view_args['room_id'], is_deleted=False)
 
     @use_kwargs({
         'start_dt': fields.DateTime(required=True),
@@ -132,9 +130,7 @@ class RHCreateBooking(RHRoomBookingBase):
     def _process_args(self, args):
         self.args = args
         self.prebook = args.pop('is_prebooking')
-        self.room = Room.get_one(self.args.pop('room_id'))
-        if not self.room.is_active:
-            raise BadRequest
+        self.room = Room.get_one(self.args.pop('room_id'), is_deleted=False)
 
     def _check_access(self):
         RHRoomBookingBase._check_access(self)

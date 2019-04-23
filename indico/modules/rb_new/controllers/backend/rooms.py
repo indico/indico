@@ -47,7 +47,7 @@ from indico.web.flask.util import send_file
 class RHRooms(RHRoomBookingBase):
     def _process(self):
         rooms = (Room.query
-                 .filter_by(is_active=True)
+                 .filter_by(is_deleted=False)
                  .options(subqueryload('available_equipment').load_only('id'))
                  .all())
         return jsonify(rooms_schema.dump(rooms))
@@ -122,9 +122,7 @@ class RHSearchRooms(RHRoomBookingBase):
 
 class RHRoomBase(RHRoomBookingBase):
     def _process_args(self):
-        self.room = Room.get_one(request.view_args['room_id'])
-        if not self.room.is_active:
-            raise NotFound
+        self.room = Room.get_one(request.view_args['room_id'], is_deleted=False)
 
 
 class RHRoom(RHRoomBase):

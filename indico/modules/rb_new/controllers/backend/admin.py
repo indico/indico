@@ -105,7 +105,7 @@ class RHLocations(RHRoomBookingAdminBase):
             return self._jsonify_many()
 
     def _process_DELETE(self):
-        if Room.query.with_parent(self.location).filter_by(is_active=True).has_rows():
+        if Room.query.with_parent(self.location).filter_by(is_deleted=False).has_rows():
             raise ExpectedError(_('Cannot delete location with active rooms'))
         db.session.delete(self.location)
         db.session.flush()

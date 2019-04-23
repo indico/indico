@@ -173,7 +173,7 @@ def _bookings_query(filters):
     query = (ReservationOccurrence.query
              .join(Reservation)
              .join(Room)
-             .filter(Room.is_active)
+             .filter(~Room.is_deleted)
              .options(reservation_strategy))
 
     if filters.get('room_ids'):
@@ -201,7 +201,7 @@ def get_room_calendar(start_date, end_date, room_ids, include_inactive=False, **
                                  include_inactive=include_inactive))
     query = query.order_by(db.func.indico.natsort(Room.full_name))
     rooms = (Room.query
-             .filter(Room.is_active, Room.id.in_(room_ids) if room_ids else True)
+             .filter(~Room.is_deleted, Room.id.in_(room_ids) if room_ids else True)
              .options(joinedload('location'))
              .order_by(db.func.indico.natsort(Room.full_name))
              .all())

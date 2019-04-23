@@ -72,12 +72,12 @@ def _query_managed_rooms(user):
                                 RoomPrincipal.multipass_group_provider == group.provider.name,
                                 db.func.lower(RoomPrincipal.multipass_group_name) == group.name.lower(),
                                 RoomPrincipal.has_management_permission()))
-    return Room.query.filter(Room.is_active, Room.acl_entries.any(db.or_(*criteria)))
+    return Room.query.filter(~Room.is_deleted, Room.acl_entries.any(db.or_(*criteria)))
 
 
 def _query_all_rooms_for_acl_check():
     return (Room.query
-            .filter(Room.is_active)
+            .filter(~Room.is_deleted)
             .options(load_only('id', 'protection_mode', 'reservations_need_confirmation'),
                      joinedload('owner').load_only('id'),
                      joinedload('acl_entries')))
@@ -148,7 +148,7 @@ def search_for_rooms(filters, allow_admin=False, availability=None):
                                                      favorite_room_table.c.room_id == Room.id))
              .reset_joinpoint()  # otherwise filter_by() would apply to the favorite table
              .options(joinedload('owner').load_only('id'))
-             .filter(Room.is_active)
+             .filter(~Room.is_deleted)
              .order_by(favorite_room_table.c.user_id.is_(None), db.func.indico.natsort(Room.full_name)))
 
     criteria = {}

@@ -199,7 +199,7 @@ def test_get_with_data(db, create_room, create_equipment_type, only_active):
     eq = create_equipment_type(u'eq')
 
     rooms = {
-        'inactive': {'room': create_room(is_active=False), 'equipment': []},
+        'inactive': {'room': create_room(is_deleted=True), 'equipment': []},
         'no_eq': {'room': create_room(), 'equipment': []},
         'all_eq': {'room': create_room(), 'equipment': [eq]}
     }

@@ -187,11 +187,10 @@ class Room(ProtectionManagersMixin, db.Model, Serializer):
         index=True,
         nullable=False
     )
-    is_active = db.Column(
+    is_deleted = db.Column(
         db.Boolean,
         nullable=False,
-        default=True,
-        index=True
+        default=False,
     )
     is_reservable = db.Column(
         db.Boolean,
@@ -364,7 +363,7 @@ class Room(ProtectionManagersMixin, db.Model, Serializer):
 
     @return_ascii
     def __repr__(self):
-        return format_repr(self, 'id', 'full_name')
+        return format_repr(self, 'id', 'full_name', is_deleted=False)
 
     def has_equipment(self, *names):
         available = {x.name for x in self.available_equipment}
@@ -449,7 +448,7 @@ class Room(ProtectionManagersMixin, db.Model, Serializer):
                  .group_by(Location.name, Room.id))
 
         if only_active:
-            query = query.filter(Room.is_active)
+            query = query.filter(~Room.is_deleted)
         if filters:  # pragma: no cover
             query = query.filter(*filters)
         if order:  # pragma: no cover
@@ -538,7 +537,7 @@ class Room(ProtectionManagersMixin, db.Model, Serializer):
         """
         # XXX: When changing the logic in here, make sure to update can_* as well!
         all_rooms_query = (Room.query
-                           .filter(Room.is_active)
+                           .filter(~Room.is_deleted)
                            .options(load_only('id', 'protection_mode', 'reservations_need_confirmation',
                                               'is_reservable', 'owner_id'),
                                     joinedload('owner').load_only('id'),
@@ -585,7 +584,7 @@ class Room(ProtectionManagersMixin, db.Model, Serializer):
                 data[room.id]['manage'] = True
         query = (RoomPrincipal.query
                  .join(Room)
-                 .filter(Room.is_active, db.or_(*criteria))
+                 .filter(~Room.is_deleted, db.or_(*criteria))
                  .options(load_only('room_id', 'full_access', 'permissions')))
         for principal in query:
             is_reservable = principal.room_id not in non_reservable_rooms

@@ -187,7 +187,7 @@ class ReservationOccurrence(db.Model, Serializer):
         from indico.modules.rb.models.reservations import Reservation
 
         q = (ReservationOccurrence
-             .find(Room.is_active,
+             .find(~Room.is_deleted,
                    _join=[ReservationOccurrence.reservation, Room], _eager=ReservationOccurrence.reservation)
              .options(cls.NO_RESERVATION_USER_STRATEGY))
 

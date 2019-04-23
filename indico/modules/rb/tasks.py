@@ -108,7 +108,7 @@ def roombooking_occurrences(debug=False):
     occurrences = (ReservationOccurrence.query
                    .join(ReservationOccurrence.reservation)
                    .join(Reservation.room)
-                   .filter(Room.is_active,
+                   .filter(~Room.is_deleted,
                            Room.notifications_enabled,
                            Reservation.is_accepted,
                            Reservation.booked_for_id.isnot(None),
@@ -153,7 +153,7 @@ def roombooking_end_notifications():
 
     reservations = (Reservation.query
                     .join(Reservation.room)
-                    .filter(Room.is_active,
+                    .filter(~Room.is_deleted,
                             Room.end_notifications_enabled,
                             Reservation.is_accepted,
                             Reservation.end_dt >= datetime.now(),

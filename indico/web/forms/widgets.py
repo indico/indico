@@ -294,7 +294,7 @@ class LocationWidget(JinjaWidget):
     def get_sorted_rooms(self, location):
         result = [{'name': room.full_name, 'id': room.id, 'venue_id': room.location_id}
                   for room in location.rooms
-                  if room.is_active]
+                  if not room.is_deleted]
         return sorted(result, key=lambda x: natural_sort_key(x['name']))
 
 
