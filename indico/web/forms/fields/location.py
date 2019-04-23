@@ -32,13 +32,19 @@ class IndicoLocationField(JSONField):
     def __init__(self, *args, **kwargs):
         self.edit_address = kwargs.pop('edit_address', True)
         self.allow_location_inheritance = kwargs.pop('allow_location_inheritance', True)
-        self.locations = Location.query.options(joinedload('rooms')).order_by(db.func.lower(Location.name)).all()
+        self.locations = (Location.query
+                          .filter_by(is_deleted=False)
+                          .options(joinedload('rooms'))
+                          .order_by(db.func.lower(Location.name))
+                          .all())
         super(IndicoLocationField, self).__init__(*args, **kwargs)
 
     def process_formdata(self, valuelist):
         super(IndicoLocationField, self).process_formdata(valuelist)
         self.data['room'] = Room.get(int(self.data['room_id'])) if self.data.get('room_id') else None
-        self.data['venue'] = Location.get(int(self.data['venue_id'])) if self.data.get('venue_id') else None
+        self.data['venue'] = (Location.get(int(self.data['venue_id']), is_deleted=False)
+                              if self.data.get('venue_id')
+                              else None)
         self.data['source'] = self.object_data.get('source') if self.object_data else None
 
     def _value(self):

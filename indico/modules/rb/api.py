@@ -72,7 +72,7 @@ class RoomHook(RoomBookingHookBase):
             raise HTTPAPIError('Invalid detail level: %s' % self._detail, 400)
 
     def export_room(self, user):
-        loc = Location.find_first(name=self._location)
+        loc = Location.query.filter_by(name=self._location, is_deleted=False)
         if loc is None:
             return
 
@@ -112,7 +112,7 @@ class RoomNameHook(RoomBookingHookBase):
         return config.ENABLE_ROOMBOOKING
 
     def export_roomName(self, user):
-        loc = Location.find_first(name=self._location)
+        loc = Location.query.filter_by(name=self._location, is_deleted=False).first()
         if loc is None:
             return
 
@@ -148,7 +148,7 @@ class ReservationHook(RoomBookingHookBase):
         self._locations = self._pathParams['loclist'].split('-')
 
     def export_reservation(self, user):
-        locations = Location.find_all(Location.name.in_(self._locations))
+        locations = Location.query.filter(Location.name.in_(self._locations), ~Location.is_deleted).all()
         if not locations:
             return
 

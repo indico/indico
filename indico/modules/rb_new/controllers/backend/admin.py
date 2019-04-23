@@ -26,7 +26,7 @@ from werkzeug.exceptions import Forbidden
 from indico.core.db import db
 from indico.core.marshmallow import mm
 from indico.modules.categories.models.categories import Category
-from indico.modules.rb import rb_settings
+from indico.modules.rb import logger, rb_settings
 from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.models.equipment import EquipmentType, RoomEquipmentAssociation
 from indico.modules.rb.models.locations import Location
@@ -89,13 +89,13 @@ class RHSettings(RHRoomBookingAdminBase):
 class RHLocations(RHRoomBookingAdminBase):
     def _process_args(self):
         id_ = request.view_args.get('location_id')
-        self.location = Location.get_one(id_) if id_ is not None else None
+        self.location = Location.get_one(id_, is_deleted=False) if id_ is not None else None
 
     def _jsonify_one(self, location):
         return jsonify(admin_locations_schema.dump(location, many=False))
 
     def _jsonify_many(self):
-        query = Location.query.options(joinedload('rooms'))
+        query = Location.query.filter_by(is_deleted=False).options(joinedload('rooms'))
         return jsonify(admin_locations_schema.dump(query.all()))
 
     def _process_GET(self):
@@ -105,9 +105,18 @@ class RHLocations(RHRoomBookingAdminBase):
             return self._jsonify_many()
 
     def _process_DELETE(self):
+        # XXX: we could safely allow deleting any locations regardless of whether there
+        # are rooms now that we soft-delete them. but it's probably safer to disallow
+        # deletion of locations with rooms, simply to prevent accidental deletions.
         if self.location.rooms:
             raise ExpectedError(_('Cannot delete location with active rooms'))
-        db.session.delete(self.location)
+        self.location.is_deleted = True
+        logger.info('Location %r deleted by %r', self.location, session.user)
+        # this code currently doesn't do anything since we don't allow deleting locations
+        # that have non-deleted rooms, but if we change this in the future it's needed
+        for room in self.location.rooms:
+            logger.info('Deleting room %r', room)
+            room.is_deleted = True
         db.session.flush()
         return '', 204
 
@@ -144,7 +153,7 @@ class RHLocations(RHRoomBookingAdminBase):
         return self._jsonify_one(self.location)
 
     def _check_conflict(self, name):
-        query = Location.query.filter(db.func.lower(Location.name) == name.lower())
+        query = Location.query.filter(~Location.is_deleted, db.func.lower(Location.name) == name.lower())
         if self.location:
             query = query.filter(Location.id != self.location.id)
         if query.has_rows():

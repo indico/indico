@@ -26,7 +26,8 @@ from indico.util.string import format_repr, return_ascii
 
 class Location(db.Model):
     __tablename__ = 'locations'
-    __table_args__ = {'schema': 'roombooking'}
+    __table_args__ = (db.Index(None, 'name', unique=True, postgresql_where=db.text('NOT is_deleted')),
+                      {'schema': 'roombooking'})
 
     id = db.Column(
         db.Integer,
@@ -35,8 +36,6 @@ class Location(db.Model):
     name = db.Column(
         db.String,
         nullable=False,
-        unique=True,
-        index=True
     )
     map_url_template = db.Column(
         db.String,
@@ -48,6 +47,11 @@ class Location(db.Model):
         db.String,
         nullable=False,
         default='%1$s/%2$s-%3$s'
+    )
+    is_deleted = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False,
     )
 
     #: The format used to display room names (with placeholders)
@@ -90,4 +94,4 @@ class Location(db.Model):
 
     @return_ascii
     def __repr__(self):
-        return format_repr(self, 'id', 'name')
+        return format_repr(self, 'id', 'name', is_deleted=False)
