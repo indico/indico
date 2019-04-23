@@ -24,7 +24,7 @@ import App from './components/App';
 
 import createRBStore, {history} from './store';
 import {init, extendOverrides} from './actions';
-import {selectors as configSelectors} from './common/config';
+import {actions as configActions, selectors as configSelectors} from './common/config';
 import {selectors as userSelectors, actions as userActions} from './common/user';
 import {actions as roomsActions} from './common/rooms';
 import {actions as linkingActions} from './common/linking';
@@ -50,6 +50,7 @@ export default function setup(overrides = {}, postReducers = []) {
             if (oldPath.startsWith('/admin') && !newPath.startsWith('/admin')) {
                 // user left the admin area so we need to reload some data that might have been changed
                 // TODO: add more things here once admins can change them (e.g. map areas)
+                store.dispatch(configActions.fetchConfig());
                 store.dispatch(roomsActions.fetchEquipmentTypes());
                 store.dispatch(roomsActions.fetchRooms());
                 store.dispatch(userActions.fetchAllRoomPermissions());
