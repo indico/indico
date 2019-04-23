@@ -120,12 +120,19 @@ export default connect(
 
 const _transformToLabel = (type) => {
     switch (type) {
-        case 'bookings': return {label: Translate.string('Booked'), style: 'booking'};
-        case 'preBookings': return {label: Translate.string('Pre-Booked'), style: 'pre-booking'};
-        case 'blockings': return {label: Translate.string('Blocked'), style: 'blocking'};
+        case 'bookings':
+            return {label: Translate.string('Booked'), style: 'booking'};
+        case 'preBookings':
+            return {label: Translate.string('Pre-Booked'), style: 'pre-booking'};
+        case 'blockings':
+            return {label: Translate.string('Blocked'), style: 'blocking'};
+        case 'overridableBlockings':
+            return {label: Translate.string('Blocked (allowed)'), style: 'overridable-blocking'};
         case 'nonbookablePeriods':
-        case 'unbookableHours': return {label: Translate.string('Not bookable'), style: 'unbookable'};
-        default: return undefined;
+        case 'unbookableHours':
+            return {label: Translate.string('Not bookable'), style: 'unbookable'};
+        default:
+            return undefined;
     }
 };
 
@@ -135,7 +142,9 @@ const _getLegendLabels = (availability) => {
         Object.entries(day).forEach(([type, occurrences]) => {
             if (occurrences && Object.keys(occurrences).length > 0) {
                 const label = _transformToLabel(type);
-                label && !legendLabels.some(lab => _.isEqual(lab, label)) && legendLabels.push(label);
+                if (label && !legendLabels.some(lab => _.isEqual(lab, label))) {
+                    legendLabels.push(label);
+                }
             }
         });
     });

@@ -296,11 +296,16 @@ class BookingDetails extends React.Component {
 
     transformToLabel = (type) => {
         switch (type) {
-            case 'bookings': return {label: Translate.string('Current'), style: 'booking'};
-            case 'cancellations': return {label: Translate.string('Cancelled'), style: 'cancellation'};
-            case 'rejections': return {label: Translate.string('Rejected'), style: 'rejection'};
-            case 'otherBookings': return {label: Translate.string('Other bookings'), style: 'other'};
-            default: return undefined;
+            case 'bookings':
+                return {label: Translate.string('Current'), style: 'booking'};
+            case 'cancellations':
+                return {label: Translate.string('Cancelled'), style: 'cancellation'};
+            case 'rejections':
+                return {label: Translate.string('Rejected'), style: 'rejection'};
+            case 'otherBookings':
+                return {label: Translate.string('Other bookings'), style: 'other'};
+            default:
+                return undefined;
         }
     };
 
@@ -309,7 +314,9 @@ class BookingDetails extends React.Component {
         Object.entries(availability).forEach(([type, occurrences]) => {
             if (occurrences && Object.keys(occurrences).length > 0) {
                 const label = this.transformToLabel(type);
-                label && !legendLabels.some(lab => _.isEqual(lab, label)) && legendLabels.push(label);
+                if (label && !legendLabels.some(lab => _.isEqual(lab, label))) {
+                    legendLabels.push(label);
+                }
             }
         });
         return legendLabels;
