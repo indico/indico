@@ -15,6 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import _ from 'lodash';
 import React from 'react';
 import {bindActionCreators} from 'redux';
 import PropTypes from 'prop-types';
@@ -66,30 +67,59 @@ class UnavailableRoomsModal extends React.Component {
         initTimeline(initialDate, initialMode);
     }
 
+    transformToLabel = (type) => {
+        switch (type) {
+            case 'candidates':
+                return {label: Translate.string('Available'), style: 'available'};
+            case 'bookings':
+                return {label: Translate.string('Booked'), style: 'booking'};
+            case 'preBookings':
+                return {label: Translate.string('Pre-Booked'), style: 'pre-booking'};
+            case 'conflictingCandidates':
+                return {label: Translate.string('Invalid occurrence'), style: 'conflicting-candidate'};
+            case 'conflicts':
+                return {label: Translate.string('Conflict'), style: 'conflict'};
+            case 'preConflicts':
+                return {label: Translate.string('Conflict with Pre-Booking'), style: 'pre-booking-conflict'};
+            case 'blockings':
+                return {label: Translate.string('Blocked'), style: 'blocking'};
+            case 'overridableBlockings':
+                return {label: Translate.string('Blocked (allowed)'), style: 'overridable-blocking'};
+            case 'nonbookablePeriods':
+            case 'unbookableHours':
+                return {label: Translate.string('Not bookable'), style: 'unbookable'};
+            default:
+                return undefined;
+        }
+    };
+
+    getLegendLabels = (availability) => {
+        const legendLabels = [];
+        availability.forEach(([, day]) => {
+            Object.entries(day).forEach(([type, occurrences]) => {
+                if (occurrences && Object.keys(occurrences).length > 0) {
+                    const label = this.transformToLabel(type);
+                    if (label && !legendLabels.some(lab => _.isEqual(lab, label))) {
+                        legendLabels.push(label);
+                    }
+                }
+            });
+        });
+        return legendLabels;
+    };
+
     render() {
         const {availability, actions, isFetching, onClose, datePicker} = this.props;
         if (availability.length === 0) {
             return <Dimmer active page><Loader /></Dimmer>;
         }
 
-        const legendLabels = [
-            {label: Translate.string('Available'), style: 'available'},
-            {label: Translate.string('Booked'), style: 'booking'},
-            {label: Translate.string('Pre-Booked'), style: 'pre-booking'},
-            {label: Translate.string('Invalid occurrence'), style: 'conflicting-candidate'},
-            {label: Translate.string('Conflict'), style: 'conflict'},
-            {label: Translate.string('Conflict with Pre-Booking'), style: 'pre-booking-conflict'},
-            {label: Translate.string('Blocked'), style: 'blocking'},
-            {label: Translate.string('Blocked (allowed)'), style: 'overridable-blocking'},
-            {label: Translate.string('Not bookable'), style: 'unbookable'}
-        ];
-
         return (
             <Modal open onClose={onClose} size="large" closeIcon>
                 <Modal.Header className="legend-header">
                     <Translate>Unavailable Rooms</Translate>
                     <Popup trigger={<Icon name="info circle" className="legend-info-icon" />}
-                           content={<TimelineLegend labels={legendLabels} compact />} />
+                           content={<TimelineLegend labels={this.getLegendLabels(availability)} compact />} />
                     <DateNavigator {...datePicker}
                                    disabled={isFetching || !availability.length}
                                    onModeChange={actions.setMode}
