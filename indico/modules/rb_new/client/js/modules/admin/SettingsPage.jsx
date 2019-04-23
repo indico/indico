@@ -248,13 +248,16 @@ const SettingsPage = props => {
                                component={ReduxFormField}
                                as="input"
                                type="number"
+                               min="0"
                                max="24"
-                               parse={value => (value.length !== 0 ? +value : null)}
+                               parse={value => (value !== '' ? +value : null)}
                                label={Translate.string('Grace period')}>
                             <p className="field-description">
                                 <Translate>
                                     Usually booking a space in the past is not allowed. This setting will allow to
                                     book a room with a start date within a specified number of hours in the past.
+                                    Leaving the field empty will allow any start date that is not in the past
+                                    without restricting the start time as well.
                                 </Translate>
                             </p>
                         </Field>
