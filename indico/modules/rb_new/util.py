@@ -150,8 +150,8 @@ def is_booking_start_within_grace_period(start_dt, user, allow_admin=False):
 
 
 def serialize_booking_details(booking):
-    from indico.modules.rb_new.operations.bookings import (get_booking_occurrences, group_blockings,
-                                                           group_nonbookable_periods, get_room_bookings)
+    from indico.modules.rb_new.operations.bookings import (get_booking_occurrences, get_existing_room_occurrences,
+                                                           group_blockings, group_nonbookable_periods)
 
     attributes = reservation_details_schema.dump(booking)
     date_range, occurrences = get_booking_occurrences(booking)
@@ -171,6 +171,9 @@ def serialize_booking_details(booking):
     start_dt = datetime.combine(booking.start_dt, time.min)
     end_dt = datetime.combine(booking.end_dt, time.max)
     unbookable_hours = get_rooms_unbookable_hours([booking.room]).get(booking.room.id, [])
+    other_bookings = get_existing_room_occurrences(booking.room, start_dt, end_dt, booking.repeat_frequency,
+                                                   booking.repeat_interval, only_accepted=True,
+                                                   skip_booking_id=booking.id)
     blocked_rooms = get_rooms_blockings([booking.room], start_dt.date(), end_dt.date())
     overridable_blockings = group_blocked_rooms(filter_blocked_rooms(blocked_rooms,
                                                                      overridable_only=True,
@@ -180,7 +183,7 @@ def serialize_booking_details(booking):
                                                                         explicit=True)).get(booking.room.id, [])
     nonbookable_periods = get_rooms_nonbookable_periods([booking.room], start_dt, end_dt).get(booking.room.id, [])
     nonbookable_periods_grouped = group_nonbookable_periods(nonbookable_periods, date_range)
-    occurrences_by_type['other'] = get_room_bookings(booking.room, start_dt, end_dt, skip_booking_id=booking.id)
+    occurrences_by_type['other'] = serialize_occurrences(group_by_occurrence_date(other_bookings))
     occurrences_by_type['blockings'] = serialize_blockings(group_blockings(nonoverridable_blockings, date_range))
     occurrences_by_type['overridable_blockings'] = serialize_blockings(group_blockings(overridable_blockings,
                                                                                        date_range))

@@ -302,7 +302,7 @@ class BookingDetails extends React.Component {
                 return {label: Translate.string('Cancelled'), style: 'cancellation'};
             case 'rejections':
                 return {label: Translate.string('Rejected'), style: 'rejection'};
-            case 'otherBookings':
+            case 'other':
                 return {label: Translate.string('Other bookings'), style: 'other'};
             default:
                 return undefined;
