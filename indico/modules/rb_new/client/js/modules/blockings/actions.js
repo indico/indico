@@ -135,4 +135,6 @@ export function deleteBlocking(blockingId) {
     );
 }
 
-export const openBlockingDetails = (blockingId) => modalActions.openModal('blocking-details', blockingId);
+export function openBlockingDetails(blockingId, overridePath = null) {
+    return modalActions.openModal('blocking-details', blockingId, null, false, overridePath);
+}
