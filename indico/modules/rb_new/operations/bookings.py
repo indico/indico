@@ -279,12 +279,6 @@ def get_room_details_availability(room, start_dt, end_dt):
     return sorted(availability, key=itemgetter('day'))
 
 
-def get_room_bookings(room, start_dt, end_dt, skip_booking_id=None):
-    bookings = get_existing_room_occurrences(room, start_dt, end_dt, RepeatFrequency.DAY, 1, only_accepted=True,
-                                             skip_booking_id=skip_booking_id)
-    return serialize_occurrences(group_by_occurrence_date(bookings))
-
-
 def get_booking_occurrences(booking):
     date_range = sorted(set(cand.start_dt.date() for cand in booking.occurrences))
     occurrences = group_by_occurrence_date(booking.occurrences)
