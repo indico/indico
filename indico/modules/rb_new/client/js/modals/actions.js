@@ -28,8 +28,7 @@ import {history} from '../store';
  * @param {Object} payload - additional information to pass as JSON
  * @param {Boolean} resetHistory - whether to erase any previous 'modal' path segments
  */
-export function openModal(name, value = null, payload = null, resetHistory = false) {
-    const {location: {pathname: path, search: queryString}} = history;
+export function openModal(name, value = null, payload = null, resetHistory = false, overridePath = null) {
     let data = name;
     if (value !== null) {
         data += `:${value}`;
@@ -37,8 +36,9 @@ export function openModal(name, value = null, payload = null, resetHistory = fal
             data += `:${JSON.stringify(payload)}`;
         }
     }
-    const qsData = queryString ? qs.parse(queryString.slice(1)) : {};
 
+    const {location: {pathname: path, search: queryString}} = history;
+    const qsData = queryString ? qs.parse(queryString.slice(1)) : {};
     if (resetHistory || !qsData.modal) {
         // if resetHistory was set, erase other 'modal' path segments
         qsData.modal = [];
@@ -48,5 +48,5 @@ export function openModal(name, value = null, payload = null, resetHistory = fal
     qsData.modal.push(data);
 
     const serializedQs = qs.stringify(qsData, {allowDots: true, arrayFormat: 'repeat'});
-    return push(path + (qsData ? `?${serializedQs}` : ''));
+    return push((overridePath || path) + (qsData ? `?${serializedQs}` : ''));
 }

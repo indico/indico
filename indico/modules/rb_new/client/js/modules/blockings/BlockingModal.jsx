@@ -469,7 +469,9 @@ export default connect(
             acceptBlocking: blockingsActions.acceptBlocking,
             rejectBlocking: blockingsActions.rejectBlocking,
             deleteBlocking: blockingsActions.deleteBlocking,
-            openBlockingDetails: blockingId => blockingsActions.openBlockingDetails(blockingId),
+            openBlockingDetails: (blockingId) => {
+                return blockingsActions.openBlockingDetails(blockingId, '/blockings');
+            },
         }, dispatch),
     })
 )(BlockingModal);
