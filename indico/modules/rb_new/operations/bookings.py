@@ -455,7 +455,7 @@ def get_booking_edit_calendar_data(booking, booking_changes):
             serialized = serialize_occurrences({occ.start_dt.date(): [occ]})
             if occ in future_occurrences:
                 booking_availability['pending_cancellations'].update(serialized)
-            else:
+            elif not occ.is_rejected and not occ.is_cancelled:
                 booking_availability['bookings'].update(serialized)
 
         response['will_be_split'] = True

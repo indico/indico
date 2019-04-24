@@ -174,6 +174,7 @@ def serialize_booking_details(booking):
 def serialize_availability(availability):
     for data in availability.viewvalues():
         data['blockings'] = serialize_blockings(data.get('blockings', {}))
+        data['overridable_blockings'] = serialize_blockings(data.get('overridable_blockings', {}))
         data['nonbookable_periods'] = serialize_nonbookable_periods(data.get('nonbookable_periods', {}))
         data['unbookable_hours'] = serialize_unbookable_hours(data.get('unbookable_hours', {}))
         data.update({k: serialize_occurrences(data[k]) if k in data else {}
