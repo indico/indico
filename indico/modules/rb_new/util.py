@@ -24,6 +24,7 @@ from io import BytesIO
 import pytz
 from flask import current_app
 from PIL import Image
+from sqlalchemy.orm import joinedload
 
 from indico.core.config import config
 from indico.core.db import db
@@ -53,7 +54,7 @@ _cache = GenericCache('Rooms')
 
 def build_rooms_spritesheet():
     image_width, image_height = ROOM_PHOTO_DIMENSIONS
-    rooms = Room.query.filter(Room.photo).all()
+    rooms = Room.query.filter(Room.photo).options(joinedload('photo')).all()
     room_count = len(rooms)
     sprite_width = (image_width * (room_count + 1))  # +1 for the placeholder
     sprite_height = image_height
