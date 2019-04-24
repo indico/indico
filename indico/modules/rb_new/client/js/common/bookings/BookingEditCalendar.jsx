@@ -15,6 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
 import {connect} from 'react-redux';
@@ -44,19 +45,52 @@ class BookingEditCalendar extends React.Component {
         isLoading: false,
     };
 
-    static legendLabels = [
-        {label: Translate.string('Current booking'), style: 'booking'},
-        {label: Translate.string('Invalid occurrence'), style: 'conflicting-candidate'},
-        {label: Translate.string('Cancelled occurrences'), style: 'cancellation'},
-        {label: Translate.string('Pending cancellations'), style: 'pending-cancellation'},
-        {label: Translate.string('Rejected occurrences'), style: 'rejection'},
-        {label: Translate.string('Other bookings'), style: 'other'},
-        {label: Translate.string('New booking'), style: 'available'},
-        {label: Translate.string('Conflicts with new booking'), style: 'conflict'},
-        {label: Translate.string('Blocked'), style: 'blocking'},
-        {label: Translate.string('Blocked (allowed)'), style: 'overridable-blocking'},
-        {label: Translate.string('Not bookable'), style: 'unbookable'}
-    ];
+    transformToLabel = (type) => {
+        switch (type) {
+            case 'candidates':
+                return {label: Translate.string('New booking'), style: 'available'};
+            case 'conflictingCandidates':
+                return {label: Translate.string('Invalid occurrence'), style: 'conflicting-candidate'};
+            case 'conflicts':
+                return {label: Translate.string('Conflicts with new booking'), style: 'conflict'};
+            case 'bookings':
+                return {label: Translate.string('Current booking'), style: 'booking'};
+            case 'cancellations':
+                return {label: Translate.string('Cancelled occurrences'), style: 'cancellation'};
+            case 'rejections':
+                return {label: Translate.string('Rejected occurrences'), style: 'rejection'};
+            case 'pendingCancellations':
+                return {label: Translate.string('Pending cancellations'), style: 'pending-cancellation'};
+            case 'other':
+                return {label: Translate.string('Other bookings'), style: 'other'};
+            case 'blockings':
+                return {label: Translate.string('Blocked'), style: 'blocking'};
+            case 'overridableBlockings':
+                return {label: Translate.string('Blocked (allowed)'), style: 'overridable-blocking'};
+            case 'nonbookablePeriods':
+            case 'unbookableHours':
+                return {label: Translate.string('Not bookable'), style: 'unbookable'};
+            default:
+                return undefined;
+        }
+    };
+
+    getLegendLabels = (calendars) => {
+        const legendLabels = [];
+        calendars.forEach((calendar) => {
+            calendar.forEach(({availability}) => {
+                Object.entries(availability).forEach(([type, occurrences]) => {
+                    if (occurrences && Object.keys(occurrences).length > 0) {
+                        const label = this.transformToLabel(type);
+                        if (label && !legendLabels.some(lab => _.isEqual(lab, label))) {
+                            legendLabels.push(label);
+                        }
+                    }
+                });
+            });
+        });
+        return legendLabels;
+    };
 
     serializeRow = (data) => {
         const {booking: {room}} = this.props;
@@ -109,6 +143,10 @@ class BookingEditCalendar extends React.Component {
 
     render() {
         const {willBookingSplit, calendars: {currentBooking, newBooking}, isLoading} = this.props;
+        const currentBookingRows = this.getCalendarData(currentBooking);
+        const newBookingRows = (newBooking ? this.getCalendarData(newBooking) : []);
+        const legendLabels = this.getLegendLabels([currentBookingRows, newBookingRows]);
+
         return (
             <div styleName="booking-calendar">
                 <Header className="legend-header">
@@ -117,7 +155,7 @@ class BookingEditCalendar extends React.Component {
                     </span>
                     <Popup trigger={<Icon name="info circle" className="legend-info-icon" />}
                            position="right center"
-                           content={<TimelineLegend labels={BookingEditCalendar.legendLabels} compact />} />
+                           content={<TimelineLegend labels={legendLabels} compact />} />
                     {this.renderNumberOfOccurrences()}
                 </Header>
                 {willBookingSplit && (
@@ -144,7 +182,7 @@ class BookingEditCalendar extends React.Component {
                 )}
                 <div styleName="calendars">
                     <div styleName="original-booking">
-                        <DailyTimelineContent rows={this.getCalendarData(currentBooking)}
+                        <DailyTimelineContent rows={currentBookingRows}
                                               renderHeader={newBooking ? () => (
                                                   <Header as="h3" color="orange" styleName="original-booking-header">
                                                       <Translate>Original booking</Translate>
@@ -155,7 +193,7 @@ class BookingEditCalendar extends React.Component {
                     </div>
                     {newBooking && (
                         <div styleName="new-booking">
-                            <DailyTimelineContent rows={this.getCalendarData(newBooking)}
+                            <DailyTimelineContent rows={newBookingRows}
                                                   renderHeader={() => {
                                                       return (
                                                           <Header as="h3" color="green" styleName="new-booking-header">
