@@ -362,8 +362,6 @@ def _get_reservation_state_filter(params):
     confirmed = get_query_parameter(params, ['confirmed'])
     archived = get_query_parameter(params, ['arch', 'archived', 'archival'])
     repeating = get_query_parameter(params, ['rec', 'recurring', 'rep', 'repeating'])
-    avc = get_query_parameter(params, ['avc'])
-    avc_support = get_query_parameter(params, ['avcs', 'avcsupport'])
     booked_for = get_query_parameter(params, ['bf', 'bookedfor'])
 
     filters = []
@@ -386,10 +384,6 @@ def _get_reservation_state_filter(params):
             filters.append(Reservation.repeat_frequency != 0)
         else:
             filters.append(Reservation.repeat_frequency == 0)
-    if avc is not None:
-        filters.append(Reservation.uses_vc == _yesno(avc))
-    if avc_support is not None:
-        filters.append(Reservation.needs_vc_assistance == _yesno(avc_support))
     if booked_for:
         like_str = '%{}%'.format(booked_for.replace('?', '_').replace('*', '%'))
         filters.append(Reservation.booked_for_name.ilike(like_str))

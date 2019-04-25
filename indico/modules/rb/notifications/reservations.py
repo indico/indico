@@ -1,3 +1,19 @@
+# This file is part of Indico.
+# Copyright (C) 2002 - 2019 European Organization for Nuclear Research (CERN).
+#
+# Indico is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 3 of the
+# License, or (at your option) any later version.
+#
+# Indico is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Indico; if not, see <http://www.gnu.org/licenses/>.
+
 from flask import render_template
 
 from indico.core.notifications import email_sender, make_email
@@ -43,16 +59,6 @@ class ReservationNotification(object):
         body = self._make_body(mail_params, reservation=self.reservation)
         return make_email(to_list=to_list, subject=subject, body=body)
 
-    def compose_email_to_vc_support(self, **mail_params):
-        from indico.modules.rb import rb_settings
-
-        if self.reservation.is_accepted and self.reservation.uses_vc:
-            to_list = rb_settings.get('vc_support_emails')
-            if to_list:
-                subject = self._get_email_subject(**mail_params)
-                body = self._make_body(mail_params, reservation=self.reservation)
-                return make_email(to_list=to_list, subject=subject, body=body)
-
 
 @email_sender
 def notify_reset_approval(reservation):
@@ -83,10 +89,6 @@ def notify_cancellation(reservation):
             subject='Booking cancelled on',
             template_name='cancellation_email_to_manager'
         ),
-        notification.compose_email_to_vc_support(
-            subject='Booking cancelled on',
-            template_name='cancellation_email_to_vc_support'
-        )
     ])
 
 
@@ -104,10 +106,6 @@ def notify_confirmation(reservation):
             subject='Booking confirmed on',
             template_name='confirmation_email_to_manager'
         ),
-        notification.compose_email_to_vc_support(
-            subject='New Booking on',
-            template_name='creation_email_to_vc_support'
-        )
     ])
 
 
@@ -123,10 +121,6 @@ def notify_creation(reservation):
             subject='New booking on' if reservation.is_accepted else 'New Pre-Booking on',
             template_name='creation_email_to_manager' if reservation.is_accepted else 'creation_pre_email_to_manager'
         ),
-        notification.compose_email_to_vc_support(
-            subject='New Booking on',
-            template_name='creation_email_to_vc_support'
-        )
     ])
 
 
@@ -159,10 +153,6 @@ def notify_modification(reservation, changes):
             subject='Booking modified on',
             template_name='modification_email_to_manager'
         ),
-        notification.compose_email_to_vc_support(
-            subject='Booking modified on',
-            template_name='modification_email_to_vc_support'
-        )
     ])
 
 

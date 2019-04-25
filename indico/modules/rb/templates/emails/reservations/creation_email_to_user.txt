@@ -26,15 +26,4 @@ be instantly notified by e-mail.
 {%- include 'rb/emails/reservations/reservation_key_info.txt' %}
 
 {%- block prebooking_warning %}{% endblock %}
-
-{%- if reservation.uses_vc %}
-
-This room is equipped with remote collaboration features and you've specified that
-you intend to use them.  Please note that technical support will be provided only during
-CERN working hours (8:30 to 17:30 on week days): Please call 77777 or contact
-videoconference-support@cern.ch . After your meeting, you will be able to give IT service
-managers feedback about your video/phone conference by accessing this URL:
-https://cern.ch/go/MQ8Q
-Thanks in advance for your feedback.
-{%- endif %}
 {%- endblock %}

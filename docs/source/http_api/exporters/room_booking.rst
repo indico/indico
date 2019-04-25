@@ -130,10 +130,8 @@ For example, https://indico.server/export/reservation/CERN.json?ak=00000000-0000
                     "fullName": "500-1-001 - Main Auditorium",
                     "id": 57
                 },
-                "needs_general_assistance": false,
                 "isConfirmed": true,
                 "isValid": true,
-                "usesAVC": false,
                 "repeatability": "daily",
                 "repeat_step": 1,
                 "vcList": [],
@@ -141,7 +139,6 @@ For example, https://indico.server/export/reservation/CERN.json?ak=00000000-0000
                 "bookedForName": "DOE, John",
                 "is_rejected": false,
                 "is_cancelled": false,
-                "needsAVCSupport": false,
                 "startDT": {
                     "date": "2014-07-02",
                     "tz": "Europe/Zurich",
@@ -230,8 +227,7 @@ For example, https://indico.server/export/room/CERN/57.json?ak=00000000-0000-000
                 "latitude": "46.23141394580001",
                 "fullName": "500-1-001 - Main Auditorium",
                 "id": 57,
-                "bookingUrl": "/indico/rooms/room/CERN/57/book",
-                "avc": true
+                "bookingUrl": "/indico/rooms/room/CERN/57/book"
             }
         ],
         "ts": 1406729635
@@ -265,10 +261,8 @@ Output for https://indico.server/export/room/CERN/57.json?ak=00000000-0000-0000-
                             "tz": "Europe/Zurich",
                             "time": "12:30:00"
                         },
-                        "needs_general_assistance": false,
                         "isConfirmed": true,
                         "isValid": true,
-                        "usesAVC": false,
                         "repeatability": "daily",
                         "repeat_step": 1,
                         "vcList": [],
@@ -276,7 +270,6 @@ Output for https://indico.server/export/room/CERN/57.json?ak=00000000-0000-0000-
                         "bookedForName": "DOE, John",
                         "is_rejected": false,
                         "is_cancelled": false,
-                        "needsAVCSupport": false,
                         "startDT": {
                             "date": "2014-07-02",
                             "tz": "Europe/Zurich",
@@ -313,8 +306,7 @@ Output for https://indico.server/export/room/CERN/57.json?ak=00000000-0000-0000-
                 "latitude": "46.23141394580001",
                 "fullName": "500-1-001 - Main Auditorium",
                 "id": 57,
-                "bookingUrl": "/indico/rooms/room/CERN/57/book",
-                "avc": true
+                "bookingUrl": "/indico/rooms/room/CERN/57/book"
             }
         ],
         "ts": 1406731966
@@ -386,8 +378,7 @@ For example, https://indico.server/export/roomName/CERN/Main Auditorium.json?ak=
                 "latitude": "46.23141394580001",
                 "fullName": "500-1-001 - Main Auditorium",
                 "id": 57,
-                "bookingUrl": "/indico/rooms/room/CERN/57/book",
-                "avc": true
+                "bookingUrl": "/indico/rooms/room/CERN/57/book"
             }
         ],
         "ts": 1406732578

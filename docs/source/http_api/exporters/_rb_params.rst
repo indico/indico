@@ -11,9 +11,6 @@ confirmed       `-`    yes, no, pending  If specified only include bookings/pre-
 archival        arch   yes, no           If specified only include bookings (not) from the past.
 recurring       rec    yes, no           If specified only include bookings which are (not) recurring.
 repeating       rep    yes, no           Alias for *recurring*
-avc             `-`    yes, no           If specified only include bookings which (do not) use AVC.
-avcsupport      avcs   yes, no           If specified only include bookings which (do not) need AVC Support.
-startupsupport  sts    yes, no           If specified only include bookings which (do not) need Startup Support.
 bookedfor       bf     text (wildcards)  Only include bookings where the *booked for* field matches the
                                          given wildcard string.
 occurs          `-`    yyyy-mm-dd        Only include bookings which have a valid occurrence on the given date.

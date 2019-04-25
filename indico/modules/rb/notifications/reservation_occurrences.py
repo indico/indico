@@ -49,10 +49,6 @@ def notify_cancellation(occurrence):
             subject='Booking cancelled on',
             template_name='occurrence_cancellation_email_to_manager'
         ),
-        notification.compose_email_to_vc_support(
-            subject='Booking cancelled on',
-            template_name='occurrence_cancellation_email_to_vc_support'
-        )
     ])
 
 

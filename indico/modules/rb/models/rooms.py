@@ -133,11 +133,6 @@ class Room(ProtectionManagersMixin, db.Model, Serializer):
         db.Integer,
         nullable=True
     )
-    notification_for_assistance = db.Column(
-        db.Boolean,
-        nullable=False,
-        default=False
-    )
     reservations_need_confirmation = db.Column(
         db.Boolean,
         nullable=False,
