@@ -81,6 +81,14 @@ def build_rooms_spritesheet():
     return token
 
 
+def remove_room_spritesheet_photo(room):
+    mapping = _cache.get('rooms-sprite-mapping')
+    if not mapping or room.id not in mapping:
+        return
+    del mapping[room.id]
+    _cache.set('rooms-sprite-mapping', mapping)
+
+
 def group_by_occurrence_date(occurrences, sort_by=None):
     return group_list(occurrences, key=lambda obj: obj.start_dt.date(), sort_by=sort_by)
 

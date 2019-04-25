@@ -481,6 +481,7 @@ class RHRoomPhoto(RHRoomAdminBase):
 
     def _process_DELETE(self):
         self.room.photo = None
+        remove_room_spritesheet_photo(self.room)
         return '', 204
 
     def _process_POST(self):
