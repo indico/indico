@@ -41,6 +41,7 @@ from sqlalchemy.pool import NullPool
 from terminaltables import AsciiTable
 from werkzeug.urls import url_parse
 
+from indico.core.db.sqlalchemy.util.models import import_all_models
 from indico.util.console import cformat
 from indico.util.string import validate_email
 
@@ -189,6 +190,7 @@ def cli():
 @cli.command()
 def list_plugins():
     """Lists the available indico plugins."""
+    import_all_models()
     table_data = [['Name', 'Title']]
     for ep in sorted(iter_entry_points('indico.plugins'), key=attrgetter('name')):
         plugin = ep.load()
