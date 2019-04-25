@@ -333,8 +333,7 @@ class Reservation(Serializer, db.Model):
                         permissions, always use the given mode.
         """
 
-        populate_fields = ('start_dt', 'end_dt', 'repeat_frequency', 'repeat_interval', 'room_id', 'contact_email',
-                           'contact_phone', 'booking_reason')
+        populate_fields = ('start_dt', 'end_dt', 'repeat_frequency', 'repeat_interval', 'room_id', 'booking_reason')
         if data['repeat_frequency'] == RepeatFrequency.NEVER and data['start_dt'].date() != data['end_dt'].date():
             raise ValueError('end_dt != start_dt for non-repeating booking')
 
@@ -578,7 +577,7 @@ class Reservation(Serializer, db.Model):
         """
 
         populate_fields = ('start_dt', 'end_dt', 'repeat_frequency', 'repeat_interval', 'booked_for_user',
-                           'contact_email', 'contact_phone', 'booking_reason')
+                           'booking_reason')
         # fields affecting occurrences
         occurrence_fields = {'start_dt', 'end_dt', 'repeat_frequency', 'repeat_interval'}
         # fields where date and time are compared separately
@@ -593,8 +592,6 @@ class Reservation(Serializer, db.Model):
             'end_dt/time': u"end time",
             'repetition': u"booking type",
             'booked_for_user': u"'Booked for' user",
-            'contact_email': u"contact email",
-            'contact_phone': u"contact phone number",
             'booking_reason': u"booking reason",
         }
 
