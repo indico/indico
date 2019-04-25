@@ -21,7 +21,6 @@ from operator import attrgetter
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
-from indico.modules.rb.models.blockings import Blocking
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import Reservation
 from indico.modules.rb.notifications.blockings import notify_request_response
@@ -76,18 +75,6 @@ class BlockedRoom(db.Model):
     @property
     def state_name(self):
         return BlockedRoomState(self.state).title if self.state is not None else None
-
-    @classmethod
-    def find_with_filters(cls, filters):
-        q = cls.find(_eager=BlockedRoom.blocking, _join=BlockedRoom.blocking)
-        if filters.get('room_ids'):
-            q = q.filter(BlockedRoom.room_id.in_(filters['room_ids']))
-        if filters.get('start_date') and filters.get('end_date'):
-            q = q.filter(Blocking.start_date <= filters['end_date'],
-                         Blocking.end_date >= filters['start_date'])
-        if 'state' in filters:
-            q = q.filter(BlockedRoom.state == filters['state'])
-        return q
 
     def reject(self, user=None, reason=None):
         """Reject the room blocking."""

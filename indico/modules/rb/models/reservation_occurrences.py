@@ -32,7 +32,7 @@ from indico.modules.rb.models.reservation_edit_logs import ReservationEditLog
 from indico.modules.rb.models.util import proxy_to_reservation_if_last_valid_occurrence
 from indico.modules.rb.util import rb_is_admin
 from indico.util import date_time
-from indico.util.date_time import format_date, iterdays
+from indico.util.date_time import format_date
 from indico.util.serializer import Serializer
 from indico.util.string import format_repr, return_ascii
 from indico.util.struct.enum import IndicoEnum
@@ -180,69 +180,6 @@ class ReservationOccurrence(db.Model, Serializer):
                       _eager=ReservationOccurrence.reservation,
                       _join=ReservationOccurrence.reservation)
                 .options(cls.NO_RESERVATION_USER_STRATEGY))
-
-    @classmethod
-    def find_with_filters(cls, filters, user=None):
-        from indico.modules.rb.models.rooms import Room
-        from indico.modules.rb.models.reservations import Reservation
-
-        q = (ReservationOccurrence
-             .find(~Room.is_deleted,
-                   _join=[ReservationOccurrence.reservation, Room], _eager=ReservationOccurrence.reservation)
-             .options(cls.NO_RESERVATION_USER_STRATEGY))
-
-        if 'start_dt' in filters and 'end_dt' in filters:
-            start_dt = filters['start_dt']
-            end_dt = filters['end_dt']
-            criteria = []
-            # We have to check the time range for EACH DAY
-            for day_start_dt in iterdays(start_dt, end_dt):
-                # Same date, but the end time
-                day_end_dt = datetime.combine(day_start_dt.date(), end_dt.time())
-                criteria.append(db_dates_overlap(ReservationOccurrence, 'start_dt', day_start_dt, 'end_dt', day_end_dt))
-            q = q.filter(or_(*criteria))
-
-        if filters.get('is_only_mine') and user:
-            q = q.filter((Reservation.booked_for_id == user.id) | (Reservation.created_by_id == user.id))
-        if filters.get('room_ids'):
-            q = q.filter(Room.id.in_(filters['room_ids']))
-
-        if filters.get('is_only_confirmed_bookings') and not filters.get('is_only_pending_bookings'):
-            q = q.filter(Reservation.is_accepted)
-        elif not filters.get('is_only_confirmed_bookings') and filters.get('is_only_pending_bookings'):
-            q = q.filter(~Reservation.is_accepted)
-
-        if filters.get('is_rejected') and filters.get('is_cancelled'):
-            q = q.filter(Reservation.is_rejected | ReservationOccurrence.is_rejected
-                         | Reservation.is_cancelled | ReservationOccurrence.is_cancelled)
-        else:
-            if filters.get('is_rejected'):
-                q = q.filter(Reservation.is_rejected | ReservationOccurrence.is_rejected)
-            else:
-                q = q.filter(~Reservation.is_rejected & ~ReservationOccurrence.is_rejected)
-            if filters.get('is_cancelled'):
-                q = q.filter(Reservation.is_cancelled | ReservationOccurrence.is_cancelled)
-            else:
-                q = q.filter(~Reservation.is_cancelled & ~ReservationOccurrence.is_cancelled)
-
-        if filters.get('is_archived'):
-            q = q.filter(Reservation.is_archived)
-
-        if filters.get('uses_vc'):
-            q = q.filter(Reservation.uses_vc)
-        if filters.get('needs_vc_assistance'):
-            q = q.filter(Reservation.needs_vc_assistance)
-        if filters.get('needs_assistance'):
-            q = q.filter(Reservation.needs_assistance)
-
-        if filters.get('booked_for_name'):
-            qs = u'%{}%'.format(filters['booked_for_name'])
-            q = q.filter(Reservation.booked_for_name.ilike(qs))
-        if filters.get('reason'):
-            qs = u'%{}%'.format(filters['reason'])
-            q = q.filter(Reservation.booking_reason.ilike(qs))
-
-        return q.order_by(Room.id)
 
     def can_reject(self, user, allow_admin=True):
         if not self.is_valid:
