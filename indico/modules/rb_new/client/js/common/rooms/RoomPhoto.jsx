@@ -21,7 +21,7 @@ import React, {useCallback, useState, useEffect, useRef} from 'react';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import Dropzone from 'react-dropzone';
-import {Button, Dimmer, Icon, Image, Popup, Loader} from 'semantic-ui-react';
+import {Button, Dimmer, Image, Popup, Loader} from 'semantic-ui-react';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {Translate} from 'indico/react/i18n';
 import {actions as configActions} from '../config';
@@ -95,40 +95,44 @@ function RoomPhoto({roomId, hasPhoto, setRoomsSpriteToken}) {
     };
 
     const uploadBtn = (
-        <Button disabled={loading} type="button" styleName="upload-icon" size="small" onClick={openDialog}>
-            <Icon name="upload" /><Translate>Upload</Translate>
-        </Button>
+        <Button disabled={loading}
+                type="button"
+                icon="upload"
+                content={Translate.string('Upload')}
+                styleName="upload-icon"
+                size="small"
+                onClick={openDialog} />
     );
 
     const saveBtn = (
         <Button disabled={loading || !file}
                 loading={loading}
                 type="button"
+                icon="check"
+                content={Translate.string('Save')}
                 styleName="save-icon"
                 size="small"
-                onClick={savePhoto}>
-            <Icon name="check" /><Translate>Save</Translate>
-        </Button>
+                onClick={savePhoto} />
     );
 
     const deleteBtn = (
         <Button disabled={!hasPreview || loading}
                 loading={loading}
                 type="button"
+                icon="trash"
+                content={Translate.string('Delete')}
                 styleName="remove-icon"
                 size="small"
-                onClick={deletePhoto}>
-            <Icon name="trash" /><Translate>Delete</Translate>
-        </Button>
+                onClick={deletePhoto} />
     );
 
     const cancelBtn = (
         <Button disabled={loading}
                 type="button"
+                icon="dont"
+                content={Translate.string('Cancel')}
                 size="small"
-                onClick={cancelPhoto}>
-            <Icon name="dont" /><Translate>Cancel</Translate>
-        </Button>
+                onClick={cancelPhoto} />
     );
 
     const buttons = (
