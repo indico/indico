@@ -598,9 +598,6 @@ class RoomEditModal extends React.Component {
     renderContent = (content, key) => {
         const {roomEquipment, room: {hasPhoto}} = this.state;
         const {equipmentTypes, roomId} = this.props;
-        if (!equipmentTypes) {
-            return;
-        }
         switch (content.type) {
             case 'header':
                 return (
