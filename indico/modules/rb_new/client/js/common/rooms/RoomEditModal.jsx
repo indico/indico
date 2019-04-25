@@ -791,6 +791,7 @@ class RoomEditModal extends React.Component {
                                render={this.renderModalContent}
                                initialValues={initialValues}
                                initialValuesEqual={_.isEqual}
+                               subscription={{submitting: true, hasValidationErrors: true, pristine: true}}
                                mutators={{...arrayMutators}} />
                 </Modal>
             </>
