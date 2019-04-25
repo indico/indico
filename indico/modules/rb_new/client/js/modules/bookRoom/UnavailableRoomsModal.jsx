@@ -57,11 +57,13 @@ class UnavailableRoomsModal extends React.Component {
             timelineDatePicker,
             isTimelineVisible
         } = this.props;
-        const selectedDate = isTimelineVisible ? timelineDatePicker.selectedDate : filters.dates.startDate;
-        const mode = isTimelineVisible ? timelineDatePicker.mode : 'days';
+
+        const {selectedDate, mode} = timelineDatePicker;
+        const initialDate = isTimelineVisible && selectedDate ? selectedDate : filters.dates.startDate;
+        const initialMode = isTimelineVisible && mode ? mode : 'days';
 
         fetchUnavailableRooms(filters);
-        initTimeline(selectedDate, mode);
+        initTimeline(initialDate, initialMode);
     }
 
     render() {
