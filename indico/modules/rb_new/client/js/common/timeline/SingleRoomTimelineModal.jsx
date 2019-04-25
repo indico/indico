@@ -20,7 +20,7 @@ import React, {useEffect} from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import PropTypes from 'prop-types';
-import {Modal, Icon, Dimmer, Loader, Popup} from 'semantic-ui-react';
+import {Modal, Icon, Popup} from 'semantic-ui-react';
 
 import {serializeDate} from 'indico/utils/date';
 import {actions as bookRoomActions, selectors as bookRoomSelectors} from '../../modules/bookRoom';
@@ -62,17 +62,10 @@ const _SingleRoomTimelineContent = props => {
     }, [fetchAvailability, filters, room, roomAvailability]);
 
     const isLoaded = !_.isEmpty(availability) && !availabilityLoading;
-    if (!isLoaded) {
-        return <Dimmer active page styleName="dimmer"><Loader /></Dimmer>;
-    }
+    const dateRange = isLoaded ? availability.dateRange : [];
+    const rows = isLoaded ? dateRange.map((day) => _getRowSerializer(day, room)(availability)) : [];
 
-    const renderRoomTimeline = () => {
-        const {dateRange} = availability;
-        const rows = dateRange.map((day) => _getRowSerializer(day, room)(availability));
-        return <DailyTimelineContent rows={rows} fixedHeight={rows.length > 1 ? '70vh' : null} />;
-    };
-
-    return renderRoomTimeline();
+    return <DailyTimelineContent rows={rows} fixedHeight={rows.length > 1 ? '70vh' : null} isLoading={!isLoaded} />;
 };
 
 _SingleRoomTimelineContent.propTypes = {
