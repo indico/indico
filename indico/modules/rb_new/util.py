@@ -81,6 +81,13 @@ def build_rooms_spritesheet():
     return token
 
 
+def get_resized_room_photo(room):
+    photo = Image.open(BytesIO(room.photo.data)).resize(ROOM_PHOTO_DIMENSIONS, Image.ANTIALIAS)
+    output = BytesIO()
+    photo.save(output, 'JPEG')
+    return output.getvalue()
+
+
 def remove_room_spritesheet_photo(room):
     mapping = _cache.get('rooms-sprite-mapping')
     if not mapping or room.id not in mapping:

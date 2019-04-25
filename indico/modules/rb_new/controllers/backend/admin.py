@@ -44,7 +44,7 @@ from indico.modules.rb_new.schemas import (admin_equipment_type_schema, admin_lo
                                            nonbookable_periods_schema, room_attribute_schema,
                                            room_attribute_values_schema, room_equipment_schema, room_feature_schema,
                                            room_update_schema)
-from indico.modules.rb_new.util import build_rooms_spritesheet, remove_room_spritesheet_photo
+from indico.modules.rb_new.util import build_rooms_spritesheet, get_resized_room_photo, remove_room_spritesheet_photo
 from indico.util.i18n import _
 from indico.util.marshmallow import ModelList, Principal, PrincipalList
 from indico.web.flask.util import send_file
@@ -476,8 +476,7 @@ class RHRoomPhoto(RHRoomAdminBase):
     def _process_GET(self):
         if not self.room.has_photo:
             raise NotFound
-        build_rooms_spritesheet()
-        return send_file('room.jpg', BytesIO(self.room.photo.data), 'image/jpeg')
+        return send_file('room.jpg', BytesIO(get_resized_room_photo(self.room)), 'image/jpeg')
 
     def _process_DELETE(self):
         self.room.photo = None

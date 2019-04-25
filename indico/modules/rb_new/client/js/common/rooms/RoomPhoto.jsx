@@ -82,8 +82,7 @@ function RoomPhoto({roomId, hasPhoto, setRoomsSpriteToken}) {
     };
 
     const getPreview = () => {
-        const randomId = new Date().getTime();
-        return file ? URL.createObjectURL(file) : `${roomPhotoURL({room_id: roomId})}?random=${randomId}`;
+        return file ? URL.createObjectURL(file) : `${roomPhotoURL({room_id: roomId})}?_=${+Date.now()}`;
     };
 
     const dropzoneRef = useRef();
