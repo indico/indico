@@ -102,6 +102,7 @@ function RoomPhoto({roomId, hasPhoto, setRoomsSpriteToken}) {
 
     const saveBtn = (
         <Button disabled={loading || !file}
+                loading={loading}
                 type="button"
                 styleName="save-icon"
                 size="small"
@@ -112,6 +113,7 @@ function RoomPhoto({roomId, hasPhoto, setRoomsSpriteToken}) {
 
     const deleteBtn = (
         <Button disabled={!hasPreview || loading}
+                loading={loading}
                 type="button"
                 styleName="remove-icon"
                 size="small"
