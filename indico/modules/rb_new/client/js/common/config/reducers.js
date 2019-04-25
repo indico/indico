@@ -43,6 +43,8 @@ export default combineReducers({
                     gracePeriod
                 };
             }
+            case configActions.SET_ROOMS_SPRITE_TOKEN:
+                return {...state, roomsSpriteToken: action.token};
             default:
                 return state;
         }

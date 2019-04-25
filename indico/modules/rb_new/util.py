@@ -74,9 +74,11 @@ def build_rooms_spritesheet():
     output = BytesIO()
     sprite.save(output, 'JPEG')
     value = output.getvalue()
+    token = crc32(value)
     _cache.set('rooms-sprite', value)
     _cache.set('rooms-sprite-mapping', mapping)
-    _cache.set('rooms-sprite-token', crc32(value))
+    _cache.set('rooms-sprite-token', token)
+    return token
 
 
 def group_by_occurrence_date(occurrences, sort_by=None):

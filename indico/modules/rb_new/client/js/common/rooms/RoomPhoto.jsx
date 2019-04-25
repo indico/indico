@@ -18,16 +18,18 @@
 import roomPhotoURL from 'indico-url:rooms_new.admin_room_photo';
 
 import React, {useCallback, useState, useEffect, useRef} from 'react';
+import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import Dropzone from 'react-dropzone';
 import {Button, Dimmer, Icon, Image, Popup, Loader} from 'semantic-ui-react';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {Translate} from 'indico/react/i18n';
+import {actions as configActions} from '../config';
 
 import './RoomPhoto.module.scss';
 
 
-export default function RoomPhoto({roomId, hasPhoto}) {
+function RoomPhoto({roomId, hasPhoto, setRoomsSpriteToken}) {
     const [file, setFile] = useState(null);
     const [loading, setLoading] = useState(false);
     const [hasPreview, setHasPreview] = useState(false);
@@ -55,19 +57,23 @@ export default function RoomPhoto({roomId, hasPhoto}) {
 
     const savePhoto = async () => {
         setLoading(true);
+        const bodyFormData = new FormData();
+        bodyFormData.append('photo', file);
+        const config = {
+            headers: {'content-type': 'multipart/form-data'}
+        };
+        let response;
         try {
-            const bodyFormData = new FormData();
-            bodyFormData.append('photo', file);
-            const config = {
-                headers: {'content-type': 'multipart/form-data'}
-            };
-            await indicoAxios.post(roomPhotoURL({room_id: roomId}), bodyFormData, config);
+            response = await indicoAxios.post(roomPhotoURL({room_id: roomId}), bodyFormData, config);
         } catch (e) {
             handleAxiosError(e);
+            setLoading(false);
+            return;
         }
         setFile(null);
         setLoading(false);
         setHasPreview(true);
+        setRoomsSpriteToken(response.data.rooms_sprite_token);
     };
 
     const cancelPhoto = () => {
@@ -176,9 +182,16 @@ export default function RoomPhoto({roomId, hasPhoto}) {
 
 RoomPhoto.propTypes = {
     roomId: PropTypes.number.isRequired,
-    hasPhoto: PropTypes.bool
+    hasPhoto: PropTypes.bool,
+    setRoomsSpriteToken: PropTypes.func.isRequired,
 };
 
 RoomPhoto.defaultProps = {
     hasPhoto: false,
 };
+
+
+export default connect(
+    null,
+    {setRoomsSpriteToken: configActions.setRoomsSpriteToken}
+)(RoomPhoto);

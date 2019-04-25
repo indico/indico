@@ -44,7 +44,7 @@ from indico.modules.rb_new.schemas import (admin_equipment_type_schema, admin_lo
                                            nonbookable_periods_schema, room_attribute_schema,
                                            room_attribute_values_schema, room_equipment_schema, room_feature_schema,
                                            room_update_schema)
-from indico.modules.rb_new.util import build_rooms_spritesheet
+from indico.modules.rb_new.util import build_rooms_spritesheet, remove_room_spritesheet_photo
 from indico.util.i18n import _
 from indico.util.marshmallow import ModelList, Principal, PrincipalList
 from indico.web.flask.util import send_file
@@ -486,5 +486,5 @@ class RHRoomPhoto(RHRoomAdminBase):
     def _process_POST(self):
         photo = request.files['photo'].read()
         self.room.photo = Photo(data=photo)
-        build_rooms_spritesheet()
-        return send_file('room.jpg', BytesIO(self.room.photo.data), 'image/jpeg')
+        token = build_rooms_spritesheet()
+        return jsonify(rooms_sprite_token=unicode(token))

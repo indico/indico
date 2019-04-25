@@ -24,6 +24,7 @@ export const FETCH_REQUEST = 'config/FETCH_REQUEST';
 export const FETCH_SUCCESS = 'config/FETCH_SUCCESS';
 export const FETCH_ERROR = 'config/FETCH_ERROR';
 export const CONFIG_RECEIVED = 'config/CONFIG_RECEIVED';
+export const SET_ROOMS_SPRITE_TOKEN = 'config/SET_ROOMS_SPRITE_TOKEN';
 
 
 export function fetchConfig() {
@@ -33,4 +34,11 @@ export function fetchConfig() {
         [CONFIG_RECEIVED, FETCH_SUCCESS],
         [FETCH_ERROR]
     );
+}
+
+export function setRoomsSpriteToken(token) {
+    return {
+        type: SET_ROOMS_SPRITE_TOKEN,
+        token,
+    };
 }
