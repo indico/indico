@@ -69,7 +69,7 @@ class RHTimeline(RHRoomBookingBase):
         'admin_override_enabled': fields.Bool(missing=False)
     })
     def _process(self, room_ids, **kwargs):
-        rooms = [self.room] if self.room else Room.query.filter(Room.id.in_(room_ids), Room.is_active).all()
+        rooms = [self.room] if self.room else Room.query.filter(Room.id.in_(room_ids), ~Room.is_deleted).all()
         date_range, availability = get_rooms_availability(rooms, **kwargs)
         date_range = [dt.isoformat() for dt in date_range]
 
