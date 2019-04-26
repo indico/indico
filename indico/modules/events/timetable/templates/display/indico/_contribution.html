@@ -4,12 +4,18 @@
 {% from 'events/timetable/display/indico/_common.html' import render_speakers, render_references, render_attachments,
                                                               render_notes, render_description, render_time %}
 
-{% macro render_contribution(contrib, event, theme_settings, parent=none, nested=false, hide_end_time=false, timezone=none,
-                             show_notes=false, show_location=false) -%}
+{% macro render_contribution(contrib, event, theme_settings, theme_context, parent=none, nested=false, hide_end_time=false,
+                             timezone=none, show_notes=false, show_location=false) -%}
     {% set anchor = slugify(contrib.friendly_id, contrib.title, maxlen=30) %}
     <li class="timetable-item timetable-contrib" id="{{ anchor }}">
         <span class="timetable-time {{ 'nested' if nested else 'top-level' }}">
-            {{ render_time(contrib, timezone=timezone, hide_end_time=hide_end_time) }}
+            {% if theme_settings.number_contributions %}
+                <span class="start-time">
+                    {{ theme_context.num_contribution }}
+                </span>
+            {% else %}
+                {{ render_time(contrib, timezone=timezone, hide_end_time=hide_end_time) }}
+            {% endif %}
         </span>
 
         <div class="timetable-item-body flexcol">
@@ -52,7 +58,8 @@
             {% if contrib.subcontributions %}
                 <ul class="subcontrib-list">
                     {% for subcont in contrib.subcontributions %}
-                        {{ render_subcontribution(subcont, event, theme_settings, show_notes=show_notes) }}
+                        {% set theme_context.num_subcontribution = loop.index %}
+                        {{ render_subcontribution(subcont, event, theme_settings, theme_context, show_notes=show_notes) }}
                     {% endfor %}
                 </ul>
             {% endif %}

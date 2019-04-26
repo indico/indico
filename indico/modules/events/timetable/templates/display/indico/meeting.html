@@ -3,6 +3,7 @@
 {% from 'events/timetable/display/indico/_break.html' import render_break %}
 
 {% if entries %}
+    {% set theme_context = namespace(num_contribution=0) %}
     <ul class="dayList">
         {% for item in entries -%}
             {% set date = item.start_dt.astimezone(tz_object).date() %}
@@ -14,6 +15,8 @@
             {%- endif -%}
 
             {%- if date_changed -%}
+                {% set theme_context.num_contribution = 0 %}
+
                 {% set anchor -%}
                     day-{{ item.start_dt.date().isoformat() }}
                 {%- endset %}
@@ -41,16 +44,17 @@
             {%- endif %}
 
             {% if item.type.name == 'CONTRIBUTION' -%}
-                {{ render_contribution(item.object, event, theme_settings, nested=false, timezone=timezone,
-                                       show_notes=theme_settings.show_notes, parent=event,
+                {% set theme_context.num_contribution = theme_context.num_contribution + 1 %}
+                {{ render_contribution(item.object, event, theme_settings, theme_context, nested=false,
+                                       timezone=timezone, show_notes=theme_settings.show_notes, parent=event,
                                        show_location=show_siblings_location) }}
             {%- elif item.type.name == 'SESSION_BLOCK' -%}
-                {{ render_session_block(item.object, event, theme_settings, timezone=timezone,
+                {{ render_session_block(item.object, event, theme_settings, theme_context, timezone=timezone,
                                         show_notes=theme_settings.show_notes, parent=event, hide_contribs=hide_contribs,
                                         show_location=show_siblings_location,
                                         show_children_location=show_children_location[item.id]) }}
             {%- elif item.type.name == 'BREAK' -%}
-                {{ render_break(item.object, event, theme_settings, nested=false, timezone=timezone,
+                {{ render_break(item.object, event, theme_settings, theme_context, nested=false, timezone=timezone,
                                 show_notes=theme_settings.show_notes, parent=event,
                                 show_location=show_siblings_location) }}
             {%- endif %}
