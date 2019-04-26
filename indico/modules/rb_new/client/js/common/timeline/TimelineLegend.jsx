@@ -19,33 +19,40 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {Label, Segment, List} from 'semantic-ui-react';
 
+import {Translate} from 'indico/react/i18n';
 import {legendLabelShape} from '../../props';
 
 import './TimelineLegend.module.scss';
 
 
 export default function TimelineLegend({labels, aside, compact}) {
-    return compact ? (
-        <List styleName="legend compact">
-            {labels.map(({label, style}) => (
-                <List.Item key={label}>
-                    <List.Content styleName="labels">
-                        <Label styleName={`compact ${style || ''}`} />
-                        <span styleName="text">{label}</span>
-                    </List.Content>
-                </List.Item>
-            ))}
-        </List>
-    ) : (
-        <Segment styleName="legend" basic>
-            <Label.Group as="span" size="medium" styleName="labels">
+    if (compact) {
+        return labels.length ? (
+            <List styleName="legend compact">
                 {labels.map(({label, style}) => (
-                    <Label styleName={style || ''} key={label}>{label}</Label>
+                    <List.Item key={label}>
+                        <List.Content styleName="labels">
+                            <Label styleName={`compact ${style || ''}`} />
+                            <span styleName="text">{label}</span>
+                        </List.Content>
+                    </List.Item>
                 ))}
-            </Label.Group>
-            {aside}
-        </Segment>
-    );
+            </List>
+        ) : (
+            <Translate>No occurrences</Translate>
+        );
+    } else {
+        return (
+            <Segment styleName="legend" basic>
+                <Label.Group as="span" size="medium" styleName="labels">
+                    {labels.map(({label, style}) => (
+                        <Label styleName={style || ''} key={label}>{label}</Label>
+                    ))}
+                </Label.Group>
+                {aside}
+            </Segment>
+        );
+    }
 }
 
 TimelineLegend.propTypes = {
