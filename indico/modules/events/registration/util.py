@@ -436,6 +436,7 @@ def _build_personal_data(registration):
 def build_registration_api_data(registration):
     registration_info = _build_base_registration_info(registration)
     registration_info['amount_paid'] = registration.price if registration.is_paid else 0
+    registration_info['ticket_price'] = registration.price
     registration_info['registration_date'] = registration.submitted_dt.isoformat()
     registration_info['paid'] = registration.is_paid
     registration_info['checkin_date'] = registration.checked_in_dt.isoformat() if registration.checked_in_dt else ''
