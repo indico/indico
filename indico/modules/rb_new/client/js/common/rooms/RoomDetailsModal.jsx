@@ -121,16 +121,16 @@ export default connect(
 const _transformToLabel = (type) => {
     switch (type) {
         case 'bookings':
-            return {label: Translate.string('Booked'), style: 'booking'};
+            return {label: Translate.string('Booked'), style: 'booking', order: 1};
         case 'preBookings':
-            return {label: Translate.string('Pre-Booked'), style: 'pre-booking'};
+            return {label: Translate.string('Pre-Booked'), style: 'pre-booking', order: 2};
         case 'blockings':
-            return {label: Translate.string('Blocked'), style: 'blocking'};
+            return {label: Translate.string('Blocked'), style: 'blocking', order: 3};
         case 'overridableBlockings':
-            return {label: Translate.string('Blocked (allowed)'), style: 'overridable-blocking'};
+            return {label: Translate.string('Blocked (allowed)'), style: 'overridable-blocking', order: 4};
         case 'nonbookablePeriods':
         case 'unbookableHours':
-            return {label: Translate.string('Not bookable'), style: 'unbookable'};
+            return {label: Translate.string('Not bookable'), style: 'unbookable', order: 5};
         default:
             return undefined;
     }
@@ -148,7 +148,7 @@ const _getLegendLabels = (availability) => {
             }
         });
     });
-    return legendLabels;
+    return legendLabels.sort((a, b) => a.order - b.order);
 };
 
 function RoomDetails({bookRoom, room, availability, attributes}) {
