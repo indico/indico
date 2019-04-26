@@ -297,7 +297,7 @@ class BookingDetails extends React.Component {
     transformToLabel = (type) => {
         switch (type) {
             case 'bookings':
-                return {label: Translate.string('Current'), style: 'booking', order: 1};
+                return {label: Translate.string('Current booking'), style: 'booking', order: 1};
             case 'cancellations':
                 return {label: Translate.string('Cancelled'), style: 'cancellation', order: 2};
             case 'rejections':
