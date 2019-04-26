@@ -357,6 +357,12 @@
     .folder {
         display: inline-block;
 
+        // folder-root may be invisible. In that case, we should
+        // omit the margin in the element right next to it.
+        &:not(.folder-root-empty) + * {
+            margin-left: 0.2em;
+        }
+
         &.is-protected {
             .i-button.label {
                 @extend %protected-colors;

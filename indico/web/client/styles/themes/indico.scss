@@ -406,11 +406,11 @@ ul.day-list {
 
     &.nested {
         @include transition(border-color .5s linear);
-
         margin-right: 0.5em;
         border-right: 3px solid $tt-nested-time-color;
 
         .start-time {
+            padding: 0 5px 0 10px;
             background-color: $tt-nested-time-color;
         }
     }
