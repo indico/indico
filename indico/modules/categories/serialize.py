@@ -46,7 +46,7 @@ def serialize_categories_ical(category_ids, user, event_filter=True, event_filte
                          Must return the updated query object.
     """
     own_room_strategy = joinedload('own_room')
-    own_room_strategy.load_only('building', 'floor', 'number', 'name')
+    own_room_strategy.load_only('building', 'floor', 'number', 'verbose_name')
     own_room_strategy.lazyload('owner')
     own_venue_strategy = joinedload('own_venue').load_only('name')
     query = (Event.query
