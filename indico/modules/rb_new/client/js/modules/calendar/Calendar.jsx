@@ -134,20 +134,20 @@ class Calendar extends React.Component {
     transformToLabel = (type, showInactive) => {
         switch (type) {
             case 'bookings':
-                return {label: Translate.string('Booked'), style: 'booking'};
+                return {label: Translate.string('Booked'), style: 'booking', order: 1};
             case 'preBookings':
-                return {label: Translate.string('Pre-Booked'), style: 'pre-booking'};
+                return {label: Translate.string('Pre-Booked'), style: 'pre-booking', order: 2};
             case 'blockings':
-                return {label: Translate.string('Blocked'), style: 'blocking'};
+                return {label: Translate.string('Blocked'), style: 'blocking', order: 3};
             case 'overridableBlockings':
-                return {label: Translate.string('Blocked (allowed)'), style: 'overridable-blocking'};
+                return {label: Translate.string('Blocked (allowed)'), style: 'overridable-blocking', order: 4};
             case 'nonbookablePeriods':
             case 'unbookableHours':
-                return {label: Translate.string('Not bookable'), style: 'unbookable'};
+                return {label: Translate.string('Not bookable'), style: 'unbookable', order: 5};
             case 'cancellations':
-                return (showInactive ? {label: Translate.string('Cancelled'), style: 'cancellation'} : undefined);
+                return (showInactive ? {label: Translate.string('Cancelled'), style: 'cancellation', order: 6} : undefined);
             case 'rejections':
-                return (showInactive ? {label: Translate.string('Rejected'), style: 'rejection'} : undefined);
+                return (showInactive ? {label: Translate.string('Rejected'), style: 'rejection', order: 7} : undefined);
             default:
                 return undefined;
         }
@@ -165,7 +165,7 @@ class Calendar extends React.Component {
                 }
             });
         });
-        return legendLabels;
+        return legendLabels.sort((a, b) => a.order - b.order);
     };
 
     renderExtraButtons = () => {

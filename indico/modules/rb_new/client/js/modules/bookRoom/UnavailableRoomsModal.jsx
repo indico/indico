@@ -70,24 +70,24 @@ class UnavailableRoomsModal extends React.Component {
     transformToLabel = (type) => {
         switch (type) {
             case 'candidates':
-                return {label: Translate.string('Available'), style: 'available'};
+                return {label: Translate.string('Available'), style: 'available', order: 1};
             case 'bookings':
-                return {label: Translate.string('Booked'), style: 'booking'};
+                return {label: Translate.string('Booked'), style: 'booking', order: 2};
             case 'preBookings':
-                return {label: Translate.string('Pre-Booked'), style: 'pre-booking'};
-            case 'conflictingCandidates':
-                return {label: Translate.string('Invalid occurrence'), style: 'conflicting-candidate'};
+                return {label: Translate.string('Pre-Booked'), style: 'pre-booking', order: 3};
             case 'conflicts':
-                return {label: Translate.string('Conflict'), style: 'conflict'};
+                return {label: Translate.string('Conflict'), style: 'conflict', order: 4};
             case 'preConflicts':
-                return {label: Translate.string('Conflict with Pre-Booking'), style: 'pre-booking-conflict'};
+                return {label: Translate.string('Conflict with Pre-Booking'), style: 'pre-booking-conflict', order: 5};
+            case 'conflictingCandidates':
+                return {label: Translate.string('Invalid occurrence'), style: 'conflicting-candidate', order: 6};
             case 'blockings':
-                return {label: Translate.string('Blocked'), style: 'blocking'};
+                return {label: Translate.string('Blocked'), style: 'blocking', order: 7};
             case 'overridableBlockings':
-                return {label: Translate.string('Blocked (allowed)'), style: 'overridable-blocking'};
+                return {label: Translate.string('Blocked (allowed)'), style: 'overridable-blocking', order: 8};
             case 'nonbookablePeriods':
             case 'unbookableHours':
-                return {label: Translate.string('Not bookable'), style: 'unbookable'};
+                return {label: Translate.string('Not bookable'), style: 'unbookable', order: 9};
             default:
                 return undefined;
         }
@@ -105,7 +105,7 @@ class UnavailableRoomsModal extends React.Component {
                 }
             });
         });
-        return legendLabels;
+        return legendLabels.sort((a, b) => a.order - b.order);
     };
 
     render() {

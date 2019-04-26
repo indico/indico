@@ -297,13 +297,13 @@ class BookingDetails extends React.Component {
     transformToLabel = (type) => {
         switch (type) {
             case 'bookings':
-                return {label: Translate.string('Current'), style: 'booking'};
+                return {label: Translate.string('Current'), style: 'booking', order: 1};
             case 'cancellations':
-                return {label: Translate.string('Cancelled'), style: 'cancellation'};
+                return {label: Translate.string('Cancelled'), style: 'cancellation', order: 2};
             case 'rejections':
-                return {label: Translate.string('Rejected'), style: 'rejection'};
+                return {label: Translate.string('Rejected'), style: 'rejection', order: 3};
             case 'other':
-                return {label: Translate.string('Other bookings'), style: 'other'};
+                return {label: Translate.string('Other bookings'), style: 'other', order: 4};
             default:
                 return undefined;
         }
@@ -319,7 +319,7 @@ class BookingDetails extends React.Component {
                 }
             }
         });
-        return legendLabels;
+        return legendLabels.sort((a, b) => a.order - b.order);
     };
 
     renderActionButtons = (canCancel, canReject, showAccept) => {

@@ -48,28 +48,28 @@ class BookingEditCalendar extends React.Component {
     transformToLabel = (type) => {
         switch (type) {
             case 'candidates':
-                return {label: Translate.string('New booking'), style: 'available'};
-            case 'conflictingCandidates':
-                return {label: Translate.string('Invalid occurrence'), style: 'conflicting-candidate'};
-            case 'conflicts':
-                return {label: Translate.string('Conflicts with new booking'), style: 'conflict'};
+                return {label: Translate.string('New booking'), style: 'available', order: 1};
             case 'bookings':
-                return {label: Translate.string('Current booking'), style: 'booking'};
+                return {label: Translate.string('Current booking'), style: 'booking', order: 2};
+            case 'conflicts':
+                return {label: Translate.string('Conflicts with new booking'), style: 'conflict', order: 3};
+            case 'conflictingCandidates':
+                return {label: Translate.string('Invalid occurrence'), style: 'conflicting-candidate', order: 4};
             case 'cancellations':
-                return {label: Translate.string('Cancelled occurrences'), style: 'cancellation'};
+                return {label: Translate.string('Cancelled occurrences'), style: 'cancellation', order: 5};
             case 'rejections':
-                return {label: Translate.string('Rejected occurrences'), style: 'rejection'};
+                return {label: Translate.string('Rejected occurrences'), style: 'rejection', order: 6};
             case 'pendingCancellations':
-                return {label: Translate.string('Pending cancellations'), style: 'pending-cancellation'};
+                return {label: Translate.string('Pending cancellations'), style: 'pending-cancellation', order: 7};
             case 'other':
-                return {label: Translate.string('Other bookings'), style: 'other'};
+                return {label: Translate.string('Other bookings'), style: 'other', order: 8};
             case 'blockings':
-                return {label: Translate.string('Blocked'), style: 'blocking'};
+                return {label: Translate.string('Blocked'), style: 'blocking', order: 9};
             case 'overridableBlockings':
-                return {label: Translate.string('Blocked (allowed)'), style: 'overridable-blocking'};
+                return {label: Translate.string('Blocked (allowed)'), style: 'overridable-blocking', order: 10};
             case 'nonbookablePeriods':
             case 'unbookableHours':
-                return {label: Translate.string('Not bookable'), style: 'unbookable'};
+                return {label: Translate.string('Not bookable'), style: 'unbookable', order: 11};
             default:
                 return undefined;
         }
@@ -89,7 +89,7 @@ class BookingEditCalendar extends React.Component {
                 });
             });
         });
-        return legendLabels;
+        return legendLabels.sort((a, b) => a.order - b.order);
     };
 
     serializeRow = (data) => {
