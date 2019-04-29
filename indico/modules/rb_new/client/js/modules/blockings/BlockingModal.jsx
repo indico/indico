@@ -233,7 +233,7 @@ class BlockingModal extends React.Component {
         return (
             <Button type="submit"
                     form="blocking-form"
-                    disabled={hasValidationErrors || pristine || submitSucceeded}
+                    disabled={submitting || hasValidationErrors || pristine || submitSucceeded}
                     loading={submitting}
                     primary>
                 {mode === 'edit' ? (
@@ -348,7 +348,7 @@ class BlockingModal extends React.Component {
                                 </Message>
                                 <Field name="dates"
                                        render={this.renderBlockingPeriodField}
-                                       disabled={mode !== 'create' || submitSucceeded}
+                                       readOnly={mode !== 'create' || submitSucceeded}
                                        allowNull />
                                 <Field name="reason"
                                        format={formatters.trim}
@@ -367,7 +367,8 @@ class BlockingModal extends React.Component {
                                                                as={TextArea}
                                                                label={Translate.string('Reason')}
                                                                placeholder={Translate.string('Provide reason for blocking')}
-                                                               disabled={mode === 'view' || submitSucceeded}
+                                                               readOnly={mode === 'view'}
+                                                               disabled={submitSucceeded}
                                                                required={mode !== 'view'} />
                                            );
                                        }}
@@ -382,13 +383,14 @@ class BlockingModal extends React.Component {
                                                isEqual={(a, b) => _.isEqual(a.sort(), b.sort())}
                                                label={Translate.string('Authorized users/groups')}
                                                readOnly={mode === 'view'}
-                                               disabled={mode === 'view' || submitSucceeded} />
+                                               disabled={submitSucceeded} />
                                     )}
                                 </FavoritesProvider>
                                 <Field name="rooms"
                                        isEqual={_.isEqual}
                                        render={this.renderRoomSearchField}
-                                       disabled={mode === 'view' || submitSucceeded} />
+                                       disabled={submitSucceeded}
+                                       readOnly={mode === 'view'} />
                                 {mode === 'view' && this.hasManagedPendingRooms && (
                                     <Message icon info>
                                         <Icon name="info" />

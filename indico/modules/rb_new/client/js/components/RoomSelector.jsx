@@ -48,11 +48,13 @@ export default class RoomSelector extends React.Component {
         onBlur: PropTypes.func.isRequired,
         value: PropTypes.array.isRequired,
         disabled: PropTypes.bool,
+        readOnly: PropTypes.bool,
         renderRoomActions: PropTypes.func,
     };
 
     static defaultProps = {
         disabled: false,
+        readOnly: false,
         renderRoomActions: () => {},
     };
 
@@ -76,11 +78,12 @@ export default class RoomSelector extends React.Component {
     }
 
     shouldComponentUpdate(nextProps, nextState) {
-        const {disabled: prevDisabled, value: prevValue} = this.props;
-        const {disabled, value} = nextProps;
+        const {disabled: prevDisabled, readOnly: prevReadOnly, value: prevValue} = this.props;
+        const {disabled, readOnly, value} = nextProps;
         return (
             nextState !== this.state ||
             disabled !== prevDisabled ||
+            readOnly !== prevReadOnly ||
             !_.isEqual(value, prevValue)
         );
     }
@@ -93,7 +96,7 @@ export default class RoomSelector extends React.Component {
     };
 
     renderRoomItem = (room) => {
-        const {disabled, renderRoomActions} = this.props;
+        const {disabled, readOnly, renderRoomActions} = this.props;
 
         return (
             <List.Item key={room.id}>
@@ -108,7 +111,11 @@ export default class RoomSelector extends React.Component {
                 </List.Content>
                 <List.Content styleName="room-actions">
                     {renderRoomActions(room)}
-                    {!disabled && <Icon name="remove" onClick={() => this.removeItem(room)} />}
+                    {!readOnly && (
+                        <Icon name="remove"
+                              disabled={disabled}
+                              onClick={() => !disabled && this.removeItem(room)} />
+                    )}
                 </List.Content>
             </List.Item>
         );
@@ -123,7 +130,7 @@ export default class RoomSelector extends React.Component {
     };
 
     render() {
-        const {onChange, onFocus, onBlur, disabled, value: rooms} = this.props;
+        const {onChange, onFocus, onBlur, readOnly, value: rooms} = this.props;
         const {locations, selectedLocation, selectedRoom, isFetchingLocations} = this.state;
         const locationOptions = locations.map((location) => ({text: location.name, value: location.id}));
         let roomOptions = [];
@@ -136,7 +143,7 @@ export default class RoomSelector extends React.Component {
         return (
             <Grid styleName="room-selector">
                 <Grid.Row>
-                    {!disabled && (
+                    {!readOnly && (
                         <>
                             <Grid.Column width={5}>
                                 <Dropdown placeholder={Translate.string('Location')}

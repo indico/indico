@@ -32,6 +32,7 @@ export default class DatePeriodField extends React.Component {
         onChange: PropTypes.func.isRequired,
         onFocus: PropTypes.func.isRequired,
         onBlur: PropTypes.func.isRequired,
+        readOnly: PropTypes.bool,
         disabled: PropTypes.bool,
         disabledDateFields: PropTypes.oneOf([START_DATE, END_DATE]),
         value: PropTypes.shape({
@@ -43,6 +44,7 @@ export default class DatePeriodField extends React.Component {
     };
 
     static defaultProps = {
+        readOnly: false,
         disabledDate: null,
         disabled: false,
         disabledDateFields: null,
@@ -87,7 +89,7 @@ export default class DatePeriodField extends React.Component {
     };
 
     render() {
-        const {disabled, disabledDateFields, minimumDays, disabledDate, initialVisibleMonth} = this.props;
+        const {disabled, disabledDateFields, minimumDays, disabledDate, initialVisibleMonth, readOnly} = this.props;
         const {focused} = this.state;
         const props = {};
 
@@ -103,7 +105,7 @@ export default class DatePeriodField extends React.Component {
                                  onDatesChange={this.notifyChange}
                                  onFocusChange={this.handleFocusChange}
                                  focusedInput={focused}
-                                 disabled={disabled || disabledDateFields}
+                                 disabled={disabled || disabledDateFields || readOnly}
                                  inputIconPosition="before"
                                  minimumNights={minimumDays - 1}
                                  initialVisibleMonth={initialVisibleMonth}
