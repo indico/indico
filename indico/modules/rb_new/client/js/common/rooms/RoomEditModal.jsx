@@ -39,7 +39,9 @@ import arrayMutators from 'final-form-arrays';
 import shortid from 'shortid';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {snakifyKeys, camelizeKeys} from 'indico/utils/case';
-import {getChangedValues, handleSubmitError, ReduxCheckboxField, ReduxFormField} from 'indico/react/forms';
+import {
+    FieldCondition, getChangedValues, handleSubmitError, ReduxCheckboxField, ReduxFormField
+} from 'indico/react/forms';
 import {FavoritesProvider} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
 import {EmailListField, PrincipalField} from 'indico/react/components';
@@ -276,6 +278,7 @@ const columns = [
     }, {
         type: 'formgroup',
         key: 'notifications',
+        dependsOn: 'notificationsEnabled',
         label: Translate.string('How many days in advance booking reminders should be sent'),
         content: [{
             type: 'input',
@@ -311,6 +314,7 @@ const columns = [
     }, {
         type: 'formgroup',
         key: 'notificationsOfFinishingBookings',
+        dependsOn: 'endNotificationsEnabled',
         label: Translate.string('How many days before the end of a booking should reminders be sent'),
         content: [{
             type: 'input',
@@ -634,15 +638,25 @@ class RoomEditModal extends React.Component {
                         )}
                     </FavoritesProvider>
                 );
-            case 'formgroup':
+            case 'formgroup': {
+                const {dependsOn} = content;
+                const Wrapper = dependsOn ? FieldCondition : React.Fragment;
+                const props = {key: content.key};
+
+                if (dependsOn) {
+                    props.when = dependsOn;
+                }
+
                 return (
-                    <React.Fragment key={key}>
+                    <Wrapper {...props}>
                         {content.label && <Header as="h5">{content.label}</Header>}
                         <Form.Group>
                             {content.content.map(this.renderContent)}
                         </Form.Group>
-                    </React.Fragment>
+                    </Wrapper>
                 );
+            }
+
             case 'checkbox':
                 return (
                     <Field key={key}
