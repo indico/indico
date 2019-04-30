@@ -172,7 +172,9 @@ class RHRoomFavorites(RHRoomBookingBase):
 
     def _process_GET(self):
         query = (db.session.query(favorite_room_table.c.room_id)
-                 .filter(favorite_room_table.c.user_id == session.user.id))
+                 .filter(favorite_room_table.c.user_id == session.user.id)
+                 .join(Room)
+                 .filter(~Room.is_deleted))
         favorites = [id_ for id_, in query]
         return jsonify(favorites)
 
