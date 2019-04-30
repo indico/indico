@@ -15,15 +15,18 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
+import React, {useState} from 'react';
 import PropTypes from 'prop-types';
 import {Button, Item} from 'semantic-ui-react';
 import SpriteImage from '../../components/SpriteImage';
+import {RoomEditModal} from '../../common/rooms';
 
 import './AdminRoomItem.module.scss';
 
 
 export default function AdminRoomItem({room}) {
+    const [editing, setEditing] = useState(false);
+
     return (
         <Item key={room.id} styleName="room-item">
             <Item.Image size="small" styleName="room-item-image">
@@ -35,7 +38,7 @@ export default function AdminRoomItem({room}) {
                 <Item.Header styleName="room-item-header">
                     {room.fullName}
                     <div>
-                        <Button size="mini" icon="pencil" circular />
+                        <Button size="mini" icon="pencil" circular onClick={() => setEditing(true)} />
                         <Button size="mini" icon="trash" negative circular />
                     </div>
                 </Item.Header>
@@ -44,6 +47,9 @@ export default function AdminRoomItem({room}) {
                     {room.comments}
                 </Item.Description>
             </Item.Content>
+            {editing && (
+                <RoomEditModal roomId={room.id} onClose={() => setEditing(false)} />
+            )}
         </Item>
     );
 }
