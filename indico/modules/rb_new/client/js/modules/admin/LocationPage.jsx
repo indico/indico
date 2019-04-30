@@ -77,21 +77,21 @@ class LocationPage extends React.PureComponent {
         }
     }
 
-    renderItem = ({name, rooms}) => (
+    renderItem = ({name, numRooms}) => (
         <List.Content styleName="info">
             <List.Header>
                 <span styleName="name">{name}</span>
             </List.Header>
             <List.Description>
-                {!rooms.length ? (
+                {!numRooms ? (
                     <Translate>No rooms</Translate>
                 ) : (
-                    <PluralTranslate count={rooms.length}>
+                    <PluralTranslate count={numRooms}>
                         <Singular>
                             <Param name="count" wrapper={<strong />}>1</Param> room
                         </Singular>
                         <Plural>
-                            <Param name="count" wrapper={<strong />} value={rooms.length} />
+                            <Param name="count" wrapper={<strong />} value={numRooms} />
                             {' '}
                             rooms
                         </Plural>

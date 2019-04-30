@@ -38,6 +38,11 @@ export default combineReducers({
             adminActions.FETCH_LOCATIONS_SUCCESS,
             adminActions.FETCH_LOCATIONS_ERROR
         ),
+        rooms: requestReducer(
+            adminActions.FETCH_ROOMS_REQUEST,
+            adminActions.FETCH_ROOMS_SUCCESS,
+            adminActions.FETCH_ROOMS_ERROR
+        ),
         equipmentTypes: requestReducer(
             adminActions.FETCH_EQUIPMENT_TYPES_REQUEST,
             adminActions.FETCH_EQUIPMENT_TYPES_SUCCESS,
@@ -65,6 +70,16 @@ export default combineReducers({
                 ];
             case adminActions.LOCATION_DELETED:
                 return state.filter(loc => loc.id !== action.id);
+            default:
+                return state;
+        }
+    },
+    rooms: (state = [], action) => {
+        switch (action.type) {
+            case adminActions.ROOMS_RECEIVED:
+                return camelizeKeys(action.data);
+            case adminActions.ROOM_DELETED:
+                return state.filter(room => room.id !== action.id);
             default:
                 return state;
         }

@@ -40,8 +40,8 @@ from indico.modules.rb.util import rb_is_admin
 from indico.modules.rb_new.controllers.backend.rooms import RHRoomsPermissions
 from indico.modules.rb_new.operations.admin import (update_room, update_room_attributes, update_room_availability,
                                                     update_room_equipment)
-from indico.modules.rb_new.schemas import (admin_equipment_type_schema, admin_locations_schema, bookable_hours_schema,
-                                           nonbookable_periods_schema, room_attribute_schema,
+from indico.modules.rb_new.schemas import (AdminRoomSchema, admin_equipment_type_schema, admin_locations_schema,
+                                           bookable_hours_schema, nonbookable_periods_schema, room_attribute_schema,
                                            room_attribute_values_schema, room_equipment_schema, room_feature_schema,
                                            room_update_schema)
 from indico.modules.rb_new.util import build_rooms_spritesheet, get_resized_room_photo, remove_room_spritesheet_photo
@@ -100,7 +100,7 @@ class RHLocations(RHRoomBookingAdminBase):
         return jsonify(admin_locations_schema.dump(location, many=False))
 
     def _jsonify_many(self):
-        query = Location.query.filter_by(is_deleted=False).options(joinedload('rooms'))
+        query = Location.query.filter_by(is_deleted=False)
         return jsonify(admin_locations_schema.dump(query.all()))
 
     def _process_GET(self):
@@ -432,11 +432,9 @@ class RHUpdateRoomEquipment(RHRoomAdminBase):
 
 
 class RHRoom(RHRoomAdminBase):
-    def _process(self):
+    def _process_GET(self):
         return jsonify(room_update_schema.dump(self.room))
 
-
-class RHUpdateRoom(RHRoomAdminBase):
     @use_args({
         'verbose_name': fields.Str(allow_none=True),
         'site': fields.Str(allow_none=True),
@@ -466,10 +464,15 @@ class RHUpdateRoom(RHRoomAdminBase):
         'max_advance_days': fields.Int(validate=lambda x: x >= 1, allow_none=True),
         'comments': fields.Str(),
     })
-    def _process(self, args):
+    def _process_PATCH(self, args):
         update_room(self.room, args)
         RHRoomsPermissions._jsonify_user_permissions.clear_cached(session.user)
         return jsonify(room_update_schema.dump(self.room, many=False))
+
+    def _process_DELETE(self):
+        logger.info('Room %r deleted by %r', self.room, session.user)
+        self.room.is_deleted = True
+        return '', 204
 
 
 class RHRoomPhoto(RHRoomAdminBase):
@@ -488,3 +491,9 @@ class RHRoomPhoto(RHRoomAdminBase):
         self.room.photo = Photo(data=photo)
         token = build_rooms_spritesheet()
         return jsonify(rooms_sprite_token=unicode(token))
+
+
+class RHRooms(RHRoomBookingAdminBase):
+    def _process(self):
+        rooms = Room.query.filter_by(is_deleted=False).order_by(db.func.indico.natsort(Room.full_name)).all()
+        return AdminRoomSchema().jsonify(rooms, many=True)

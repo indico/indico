@@ -18,8 +18,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import {Item, Message} from 'semantic-ui-react';
-import {Translate} from 'indico/react/i18n';
+import {Header, Item, Message} from 'semantic-ui-react';
+import {Translate, Param} from 'indico/react/i18n';
 import ItemPlaceholder from '../../components/ItemPlaceholder';
 import AdminRoomItem from './AdminRoomItem';
 import searchBarFactory from '../../components/SearchBar';
@@ -29,37 +29,26 @@ import * as adminSelectors from './selectors';
 const SearchBar = searchBarFactory('admin', adminSelectors);
 
 
-function AdminLocationRooms({locations, isFetchingLocations, locationId, filters: {text}}) {
-    if (isFetchingLocations) {
+function AdminLocationRooms({location, isFetching, filters: {text}}) {
+    if (!location || isFetching) {
         return <ItemPlaceholder.Group count={10} />;
-    } else if (!locations.length) {
-        return (
-            <Message info>
-                <Translate>
-                    There are no locations defined.
-                </Translate>
-            </Message>
-        );
     }
 
-    let rooms = [];
-    if (locations.length) {
-        const location = locations.find((loc) => loc.id === locationId);
-        if (!location) {
-            rooms = [];
-        } else {
-            rooms = location.rooms;
-        }
-    }
-
+    let rooms = location.rooms;
     if (text) {
         rooms = rooms.filter((room) => {
-            return room.fullName.toLowerCase().includes(text.toLowerCase());
+            return room.fullName.toLowerCase().includes(text.trim().toLowerCase());
         });
     }
 
     return (
         <>
+            <Header as="h2">
+                <Translate>
+                    Location: <Param name="location" value={location.name} />
+                </Translate>
+            </Header>
+
             <SearchBar />
             {rooms.length ? (
                 <>
@@ -79,19 +68,22 @@ function AdminLocationRooms({locations, isFetchingLocations, locationId, filters
 }
 
 AdminLocationRooms.propTypes = {
-    locations: PropTypes.array.isRequired,
-    isFetchingLocations: PropTypes.bool.isRequired,
-    locationId: PropTypes.number.isRequired,
+    location: PropTypes.object,
+    isFetching: PropTypes.bool.isRequired,
     filters: PropTypes.exact({
         text: PropTypes.string,
     }).isRequired,
 };
 
+AdminLocationRooms.defaultProps = {
+    location: null,
+};
+
 
 export default connect(
-    (state) => ({
-        isFetchingLocations: adminSelectors.isFetchingLocations(state),
-        locations: adminSelectors.getAllLocations(state),
+    (state, {locationId}) => ({
+        isFetching: adminSelectors.isFetchingLocations(state),
+        location: adminSelectors.getLocation(state, {locationId}),
         filters: adminSelectors.getFilters(state),
     })
 )(AdminLocationRooms);
