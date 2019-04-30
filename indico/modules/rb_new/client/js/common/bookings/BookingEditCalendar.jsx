@@ -26,6 +26,7 @@ import {serializeDate} from 'indico/utils/date';
 import {DailyTimelineContent, TimelineLegend} from '../timeline';
 import OccurrencesCounter from './OccurrencesCounter';
 import * as bookingsSelectors from './selectors';
+import {getOccurrenceTypes, transformToLegendLabels} from '../../util';
 
 import './BookingEditCalendar.module.scss';
 
@@ -45,51 +46,28 @@ class BookingEditCalendar extends React.Component {
         isLoading: false,
     };
 
-    transformToLabel = (type) => {
-        switch (type) {
-            case 'candidates':
-                return {label: Translate.string('New booking'), style: 'available', order: 1};
-            case 'bookings':
-                return {label: Translate.string('Current booking'), style: 'booking', order: 2};
-            case 'conflicts':
-                return {label: Translate.string('Conflicts with new booking'), style: 'conflict', order: 3};
-            case 'conflictingCandidates':
-                return {label: Translate.string('Invalid occurrence'), style: 'conflicting-candidate', order: 4};
-            case 'cancellations':
-                return {label: Translate.string('Cancelled occurrences'), style: 'cancellation', order: 5};
-            case 'rejections':
-                return {label: Translate.string('Rejected occurrences'), style: 'rejection', order: 6};
-            case 'pendingCancellations':
-                return {label: Translate.string('Pending cancellations'), style: 'pending-cancellation', order: 7};
-            case 'other':
-                return {label: Translate.string('Other bookings'), style: 'other', order: 8};
-            case 'blockings':
-                return {label: Translate.string('Blocked'), style: 'blocking', order: 9};
-            case 'overridableBlockings':
-                return {label: Translate.string('Blocked (allowed)'), style: 'overridable-blocking', order: 10};
-            case 'nonbookablePeriods':
-            case 'unbookableHours':
-                return {label: Translate.string('Not bookable'), style: 'unbookable', order: 11};
-            default:
-                return undefined;
-        }
-    };
-
     getLegendLabels = (calendars) => {
-        const legendLabels = [];
-        calendars.forEach((calendar) => {
-            calendar.forEach(({availability}) => {
-                Object.entries(availability).forEach(([type, occurrences]) => {
-                    if (occurrences && Object.keys(occurrences).length > 0) {
-                        const label = this.transformToLabel(type);
-                        if (label && !legendLabels.some(lab => _.isEqual(lab, label))) {
-                            legendLabels.push(label);
-                        }
-                    }
-                });
-            });
-        });
-        return legendLabels.sort((a, b) => a.order - b.order);
+        const orderedLabels = [
+            'bookings',
+            'rejections',
+            'cancellations',
+            'pendingCancellations',
+            'other',
+            'blockings',
+            'overridableBlockings',
+            'nonbookablePeriods',
+            'unbookableHours',
+            'candidates',
+            'conflicts',
+            'conflictingCandidates',
+        ];
+        const occurrenceTypes = calendars.reduce((accumTypes, data) => {
+            const calendarTypes = data.reduce((types, {availability}) => {
+                return _.union(types, getOccurrenceTypes(availability));
+            }, []);
+            return _.union(accumTypes, calendarTypes);
+        }, []);
+        return transformToLegendLabels(orderedLabels, occurrenceTypes);
     };
 
     serializeRow = (data) => {

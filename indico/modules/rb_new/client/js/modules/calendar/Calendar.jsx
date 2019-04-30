@@ -37,6 +37,7 @@ import {ElasticTimeline, TimelineHeader} from '../../common/timeline';
 import CalendarListView from './CalendarListView';
 import {actions as bookRoomActions} from '../bookRoom';
 import {roomFilterBarFactory} from '../roomList';
+import {getOccurrenceTypes, transformToLegendLabels} from '../../util';
 
 import './Calendar.module.scss';
 
@@ -131,41 +132,18 @@ class Calendar extends React.Component {
         setFilterParameter('showInactive', !showInactive);
     };
 
-    transformToLabel = (type, showInactive) => {
-        switch (type) {
-            case 'bookings':
-                return {label: Translate.string('Booked'), style: 'booking', order: 1};
-            case 'preBookings':
-                return {label: Translate.string('Pre-Booked'), style: 'pre-booking', order: 2};
-            case 'blockings':
-                return {label: Translate.string('Blocked'), style: 'blocking', order: 3};
-            case 'overridableBlockings':
-                return {label: Translate.string('Blocked (allowed)'), style: 'overridable-blocking', order: 4};
-            case 'nonbookablePeriods':
-            case 'unbookableHours':
-                return {label: Translate.string('Not bookable'), style: 'unbookable', order: 5};
-            case 'cancellations':
-                return (showInactive ? {label: Translate.string('Cancelled'), style: 'cancellation', order: 6} : undefined);
-            case 'rejections':
-                return (showInactive ? {label: Translate.string('Rejected'), style: 'rejection', order: 7} : undefined);
-            default:
-                return undefined;
-        }
-    };
-
     getLegendLabels = (availability, showInactive) => {
-        const legendLabels = [];
-        availability.forEach(([, day]) => {
-            Object.entries(day).forEach(([type, occurrences]) => {
-                if (occurrences && Object.keys(occurrences).length > 0) {
-                    const label = this.transformToLabel(type, showInactive);
-                    if (label && !legendLabels.some(lab => _.isEqual(lab, label))) {
-                        legendLabels.push(label);
-                    }
-                }
-            });
-        });
-        return legendLabels.sort((a, b) => a.order - b.order);
+        const orderedLabels = [
+            'bookings',
+            'preBookings',
+            'blockings',
+            'overridableBlockings',
+            'nonbookablePeriods',
+            'unbookableHours',
+            ...showInactive ? ['rejections', 'cancellations'] : []
+        ];
+        const occurrenceTypes = availability.reduce((types, [, day]) => _.union(types, getOccurrenceTypes(day)), []);
+        return transformToLegendLabels(orderedLabels, occurrenceTypes);
     };
 
     renderExtraButtons = () => {

@@ -24,6 +24,7 @@ import {connect} from 'react-redux';
 import {Button, Grid, Icon, Modal, Header, Message, List, Segment, Popup} from 'semantic-ui-react';
 import {Translate, Param} from 'indico/react/i18n';
 import {Overridable, IndicoPropTypes, Markdown} from 'indico/react/util';
+import {getOccurrenceTypes, transformToLegendLabels} from '../../util';
 import RoomBasicDetails from '../../components/RoomBasicDetails';
 import RoomKeyLocation from '../../components/RoomKeyLocation';
 import RoomStats from './RoomStats';
@@ -118,37 +119,17 @@ export default connect(
     }),
 )(Overridable.component('RoomDetailsModal', RoomDetailsModal));
 
-const _transformToLabel = (type) => {
-    switch (type) {
-        case 'bookings':
-            return {label: Translate.string('Booked'), style: 'booking', order: 1};
-        case 'preBookings':
-            return {label: Translate.string('Pre-Booked'), style: 'pre-booking', order: 2};
-        case 'blockings':
-            return {label: Translate.string('Blocked'), style: 'blocking', order: 3};
-        case 'overridableBlockings':
-            return {label: Translate.string('Blocked (allowed)'), style: 'overridable-blocking', order: 4};
-        case 'nonbookablePeriods':
-        case 'unbookableHours':
-            return {label: Translate.string('Not bookable'), style: 'unbookable', order: 5};
-        default:
-            return undefined;
-    }
-};
-
 const _getLegendLabels = (availability) => {
-    const legendLabels = [];
-    availability.forEach((day) => {
-        Object.entries(day).forEach(([type, occurrences]) => {
-            if (occurrences && Object.keys(occurrences).length > 0) {
-                const label = _transformToLabel(type);
-                if (label && !legendLabels.some(lab => _.isEqual(lab, label))) {
-                    legendLabels.push(label);
-                }
-            }
-        });
-    });
-    return legendLabels.sort((a, b) => a.order - b.order);
+    const orderedLabels = [
+        'bookings',
+        'preBookings',
+        'blockings',
+        'overridableBlockings',
+        'nonbookablePeriods',
+        'unbookableHours'
+    ];
+    const occurrenceTypes = availability.reduce((types, day) => _.union(types, getOccurrenceTypes(day)), []);
+    return transformToLegendLabels(orderedLabels, occurrenceTypes);
 };
 
 function RoomDetails({bookRoom, room, availability, attributes}) {
