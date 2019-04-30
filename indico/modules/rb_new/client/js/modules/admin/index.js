@@ -15,5 +15,9 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import * as actions from './actions';
+
+
 export {default} from './AdminArea';
 export {default as reducer} from './reducers';
+export {actions};

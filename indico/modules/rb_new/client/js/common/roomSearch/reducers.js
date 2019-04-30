@@ -23,6 +23,7 @@ import {filterReducerFactory} from '../filters';
 import {mapSearchReducerFactory} from '../map';
 import {roomSearchActionsFactory} from './actions';
 import {actions as bookRoomActions} from '../../modules/bookRoom';
+import {actions as adminActions} from '../../modules/admin';
 import {sanitizeRecurrence} from '../../util';
 
 
@@ -102,6 +103,8 @@ export function roomSearchReducerFactory(namespace, extra = {}) {
                 switch (action.type) {
                     case actions.SEARCH_RESULTS_RECEIVED:
                         return camelizeKeys(action.data);
+                    case adminActions.ROOM_DELETED:
+                        return initialSearchResultsState;
                     case bookRoomActions.CREATE_BOOKING_SUCCESS: {
                         if (namespace !== 'bookRoom') {
                             return state;

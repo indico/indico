@@ -311,8 +311,10 @@ class RHMyUpcomingBookings(RHRoomBookingBase):
              .filter(ReservationOccurrence.start_dt > utc_to_server(now_utc()),
                      ReservationOccurrence.is_valid,
                      db.or_(Reservation.booked_for_user == session.user,
-                            Reservation.created_by_user == session.user))
+                            Reservation.created_by_user == session.user),
+                     ~Room.is_deleted)
              .join(Reservation)
+             .join(Room)
              .order_by(ReservationOccurrence.start_dt.asc())
              .limit(5))
         return jsonify(reservation_occurrences_schema.dump(q))

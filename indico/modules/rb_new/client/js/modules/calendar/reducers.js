@@ -29,6 +29,7 @@ import {actions as bookingActions} from '../../common/bookings';
 import {filterReducerFactory} from '../../common/filters';
 import {initialRoomFilterStateFactory, processRoomFilters} from '../../common/roomSearch/reducers';
 import {initialDatePickerState} from '../../common/timeline/reducers';
+import {actions as adminActions} from '../admin';
 
 
 const datePickerState = () => ({...initialDatePickerState, selectedDate: serializeDate(moment())});
@@ -235,6 +236,8 @@ export default combineReducers({
     },
     data: (state = initialDataState, action) => {
         switch (action.type) {
+            case adminActions.ROOM_DELETED:
+                return initialDataState;
             case calendarActions.FETCH_CALENDAR_REQUEST:
                 return {...state, rows: []};
             case calendarActions.ROWS_RECEIVED:
