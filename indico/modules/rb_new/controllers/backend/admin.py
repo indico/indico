@@ -373,7 +373,7 @@ class RHAttributes(RHRoomBookingAdminBase):
 
 class RHRoomAdminBase(RHRoomBookingAdminBase):
     def _process_args(self):
-        self.room = Room.get_one(request.view_args['room_id'])
+        self.room = Room.get_one(request.view_args['room_id'], is_deleted=False)
 
 
 class RHRoomAttributes(RHRoomAdminBase):
