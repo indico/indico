@@ -38,12 +38,14 @@ class AdminArea extends React.Component {
         isAdmin: PropTypes.bool.isRequired,
         actions: PropTypes.exact({
             fetchLocations: PropTypes.func.isRequired,
+            fetchRooms: PropTypes.func.isRequired,
         }).isRequired,
     };
 
     componentDidMount() {
-        const {actions: {fetchLocations}} = this.props;
+        const {actions: {fetchLocations, fetchRooms}} = this.props;
         fetchLocations();
+        fetchRooms();
     }
 
     render() {
@@ -82,6 +84,7 @@ export default connect(
     dispatch => ({
         actions: bindActionCreators({
             fetchLocations: adminActions.fetchLocations,
+            fetchRooms: adminActions.fetchRooms,
         }, dispatch),
     })
 )(AdminArea);

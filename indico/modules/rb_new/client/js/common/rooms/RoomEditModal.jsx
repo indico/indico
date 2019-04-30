@@ -15,12 +15,11 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import fetchRoomURL from 'indico-url:rooms_new.admin_room';
+import roomURL from 'indico-url:rooms_new.admin_room';
 import fetchRoomAttributesURL from 'indico-url:rooms_new.admin_room_attributes';
 import fetchAttributesURL from 'indico-url:rooms_new.admin_attributes';
 import fetchRoomAvailabilityURL from 'indico-url:rooms_new.admin_room_availability';
 import fetchRoomEquipmentURL from 'indico-url:rooms_new.admin_room_equipment';
-import updateRoomBasicDetailsURL from 'indico-url:rooms_new.admin_update_room';
 import updateRoomEquipmentURL from 'indico-url:rooms_new.admin_update_room_equipment';
 import updateRoomAttributesURL from 'indico-url:rooms_new.admin_update_room_attributes';
 import updateRoomAvailabilityURL from 'indico-url:rooms_new.admin_update_room_availability';
@@ -428,7 +427,7 @@ class RoomEditModal extends React.Component {
         const {roomId} = this.props;
         let response;
         try {
-            response = await indicoAxios.get(fetchRoomURL({room_id: roomId}));
+            response = await indicoAxios.get(roomURL({room_id: roomId}));
         } catch (error) {
             handleAxiosError(error);
             return;
@@ -520,7 +519,7 @@ class RoomEditModal extends React.Component {
 
     async saveBasicDetails(roomId, basicDetails) {
         if (!_.isEmpty(basicDetails)) {
-            await indicoAxios.patch(updateRoomBasicDetailsURL({room_id: roomId}), snakifyKeys(basicDetails));
+            await indicoAxios.patch(roomURL({room_id: roomId}), snakifyKeys(basicDetails));
         }
     }
 

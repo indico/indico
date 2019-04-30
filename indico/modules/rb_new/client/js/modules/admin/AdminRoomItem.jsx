@@ -16,16 +16,20 @@
  */
 
 import React, {useState} from 'react';
+import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
-import {Button, Item} from 'semantic-ui-react';
+import {Button, Confirm, Item} from 'semantic-ui-react';
+import {Translate} from 'indico/react/i18n';
 import SpriteImage from '../../components/SpriteImage';
 import {RoomEditModal} from '../../common/rooms';
+import * as adminActions from './actions';
 
 import './AdminRoomItem.module.scss';
 
 
-export default function AdminRoomItem({room}) {
+function AdminRoomItem({room, deleteRoom}) {
     const [editing, setEditing] = useState(false);
+    const [deleting, setDeleting] = useState(false);
 
     return (
         <Item key={room.id} styleName="room-item">
@@ -39,7 +43,7 @@ export default function AdminRoomItem({room}) {
                     {room.fullName}
                     <div>
                         <Button size="mini" icon="pencil" circular onClick={() => setEditing(true)} />
-                        <Button size="mini" icon="trash" negative circular />
+                        <Button size="mini" icon="trash" negative circular onClick={() => setDeleting(true)} />
                     </div>
                 </Item.Header>
                 <Item.Meta>{room.ownerName}</Item.Meta>
@@ -50,10 +54,24 @@ export default function AdminRoomItem({room}) {
             {editing && (
                 <RoomEditModal roomId={room.id} onClose={() => setEditing(false)} />
             )}
+            <Confirm header={Translate.string('Confirm deletion')}
+                     content={Translate.string('Are you sure you want to delete this room?')}
+                     confirmButton={<Button content={Translate.string('Delete')} negative />}
+                     cancelButton={Translate.string('Cancel')}
+                     open={deleting}
+                     onCancel={() => setDeleting(false)}
+                     onConfirm={() => deleteRoom(room.id)} />
+
         </Item>
     );
 }
 
 AdminRoomItem.propTypes = {
     room: PropTypes.object.isRequired,
+    deleteRoom: PropTypes.func.isRequired,
 };
+
+export default connect(
+    null,
+    {deleteRoom: adminActions.deleteRoom}
+)(AdminRoomItem);

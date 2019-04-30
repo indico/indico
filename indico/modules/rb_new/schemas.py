@@ -72,6 +72,12 @@ class RoomSchema(mm.ModelSchema):
                   'owner_name', 'available_equipment', 'has_photo', 'verbose_name')
 
 
+class AdminRoomSchema(mm.ModelSchema):
+    class Meta:
+        modal = Room
+        fields = ('id', 'location_id', 'name', 'full_name', 'sprite_position', 'owner_name', 'comments')
+
+
 class RoomUpdateSchema(RoomSchema):
     owner = Principal()
 
@@ -260,19 +266,12 @@ class LocationsSchema(mm.ModelSchema):
         fields = ('id', 'name', 'rooms')
 
 
-class AdminLocationsSchema(LocationsSchema):
-    rooms = Nested(RoomSchema, only=LocationsSchema._declared_fields['rooms'].only + ('owner_name', 'comments'),
-                   many=True)
+class AdminLocationsSchema(mm.ModelSchema):
     can_delete = Function(lambda loc: not loc.rooms)
 
     class Meta:
         model = Location
-        fields = LocationsSchema.Meta.fields + ('can_delete', 'map_url_template', 'room_name_format')
-
-    @post_dump
-    def sort_rooms(self, location):
-        location['rooms'] = sorted(location['rooms'], key=lambda x: natural_sort_key(x['full_name']))
-        return location
+        fields = ('id', 'name', 'can_delete', 'map_url_template', 'room_name_format')
 
 
 class RBUserSchema(UserSchema):

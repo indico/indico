@@ -17,6 +17,8 @@
 
 import settingsURL from 'indico-url:rooms_new.admin_settings';
 import locationsURL from 'indico-url:rooms_new.admin_locations';
+import roomsURL from 'indico-url:rooms_new.admin_rooms';
+import roomURL from 'indico-url:rooms_new.admin_room';
 import equipmentTypesURL from 'indico-url:rooms_new.admin_equipment_types';
 import featuresURL from 'indico-url:rooms_new.admin_features';
 import attributesURL from 'indico-url:rooms_new.admin_attributes';
@@ -39,6 +41,12 @@ export const FETCH_LOCATIONS_ERROR = 'admin/FETCH_LOCATIONS_ERROR';
 export const LOCATIONS_RECEIVED = 'admin/LOCATIONS_RECEIVED';
 export const LOCATION_RECEIVED = 'admin/LOCATION_RECEIVED';
 export const LOCATION_DELETED = 'admin/LOCATION_DELETED';
+
+export const FETCH_ROOMS_REQUEST = 'admin/FETCH_ROOMS_REQUEST';
+export const FETCH_ROOMS_SUCCESS = 'admin/FETCH_ROOMS_SUCCESS';
+export const FETCH_ROOMS_ERROR = 'admin/FETCH_ROOMS_ERROR';
+export const ROOMS_RECEIVED = 'admin/ROOMS_RECEIVED';
+export const ROOM_DELETED = 'admin/ROOM_DELETED';
 
 export const FETCH_FEATURES_REQUEST = 'admin/FETCH_FEATURES_REQUEST';
 export const FETCH_FEATURES_SUCCESS = 'admin/FETCH_FEATURES_SUCCESS';
@@ -87,6 +95,15 @@ export function fetchLocations() {
         FETCH_LOCATIONS_REQUEST,
         [LOCATIONS_RECEIVED, FETCH_LOCATIONS_SUCCESS],
         FETCH_LOCATIONS_ERROR
+    );
+}
+
+export function fetchRooms() {
+    return ajaxAction(
+        () => indicoAxios.get(roomsURL()),
+        FETCH_ROOMS_REQUEST,
+        [ROOMS_RECEIVED, FETCH_ROOMS_SUCCESS],
+        FETCH_ROOMS_ERROR
     );
 }
 
@@ -206,5 +223,13 @@ export function createLocation(data) {
     return submitFormAction(
         () => indicoAxios.post(locationsURL(), _.omit(data, '_map_url_template_choice')),
         null, LOCATION_RECEIVED
+    );
+}
+
+export function deleteRoom(id) {
+    return ajaxAction(
+        () => indicoAxios.delete(roomURL({room_id: id})),
+        null,
+        () => ({type: ROOM_DELETED, id}),
     );
 }

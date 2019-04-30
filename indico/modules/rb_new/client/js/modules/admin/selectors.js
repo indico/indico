@@ -24,11 +24,38 @@ const makeSorter = attr => (a, b) => a[attr].localeCompare(b[attr]);
 
 
 const _getAllLocations = ({admin}) => admin.locations;
+const _getAllRooms = ({admin}) => admin.rooms;
 export const getAllLocations = createSelector(
     _getAllLocations,
-    locations => locations.sort(makeSorter('name'))
+    _getAllRooms,
+    (locations, rooms) => {
+        return locations
+            .sort(makeSorter('name'))
+            .map(loc => ({
+                ...loc,
+                numRooms: rooms.filter(room => room.locationId === loc.id).length,
+            }));
+    }
 );
-export const isFetchingLocations = ({admin}) => admin.requests.locations.state === RequestState.STARTED;
+export const getLocation = createSelector(
+    _getAllLocations,
+    _getAllRooms,
+    (state, {locationId}) => locationId,
+    (locations, rooms, locationId) => {
+        const location = locations.find(x => x.id === locationId);
+        if (!location) {
+            return null;
+        }
+        return {
+            ...location,
+            rooms: rooms.filter(room => room.locationId === location.id),
+        };
+    }
+);
+
+const _isFetchingLocations = ({admin}) => admin.requests.locations.state === RequestState.STARTED;
+const _isFetchingRooms = ({admin}) => admin.requests.rooms.state === RequestState.STARTED;
+export const isFetchingLocations = state => _isFetchingLocations(state) || _isFetchingRooms(state);
 export const getFilters = ({admin}) => admin.filters;
 
 export const _getEquipmentTypes = ({admin}) => admin.equipmentTypes;
