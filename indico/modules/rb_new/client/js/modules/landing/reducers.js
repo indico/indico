@@ -20,6 +20,7 @@ import {camelizeKeys} from 'indico/utils/case';
 import {requestReducer} from 'indico/utils/redux';
 
 import * as landingActions from './actions';
+import {actions as adminActions} from '../admin';
 
 
 export default combineReducers({
@@ -48,6 +49,8 @@ export default combineReducers({
             switch (action.type) {
                 case landingActions.BOOKINGS_RECEIVED:
                     return camelizeKeys(action.data);
+                case adminActions.ROOM_DELETED:
+                    return [];
                 default:
                     return state;
             }
