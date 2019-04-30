@@ -46,6 +46,7 @@ import {selectors as userSelectors} from '../../common/user';
 import * as bookRoomSelectors from './selectors';
 import {mapControllerFactory, selectors as mapSelectors} from '../../common/map';
 import BookingSuggestion from './BookingSuggestion';
+import {getOccurrenceTypes, transformToLegendLabels} from '../../util';
 
 import './BookRoom.module.scss';
 
@@ -158,45 +159,21 @@ class BookRoom extends React.Component {
         openBookingForm(roomId, {...bookingData, isPrebooking});
     }
 
-    transformToLabel(type) {
-        switch (type) {
-            case 'candidates':
-                return {label: Translate.string('Available'), style: 'available', order: 1};
-            case 'bookings':
-                return {label: Translate.string('Booked'), style: 'booking', order: 2};
-            case 'preBookings':
-                return {label: Translate.string('Pre-Booked'), style: 'pre-booking', order: 3};
-            case 'conflicts':
-                return {label: Translate.string('Conflict'), style: 'conflict', order: 4};
-            case 'preConflicts':
-                return {label: Translate.string('Conflict with Pre-Booking'), style: 'pre-booking-conflict', order: 5};
-            case 'conflictingCandidates':
-                return {label: Translate.string('Invalid occurrence'), style: 'conflicting-candidate', order: 6};
-            case 'blockings':
-                return {label: Translate.string('Blocked'), style: 'blocking', order: 7};
-            case 'overridableBlockings':
-                return {label: Translate.string('Blocked (allowed)'), style: 'overridable-blocking', order: 8};
-            case 'nonbookablePeriods':
-            case 'unbookableHours':
-                return {label: Translate.string('Not bookable'), style: 'unbookable', order: 9};
-            default:
-                return undefined;
-        }
-    }
-
     getLegendLabels(availability) {
-        const legendLabels = [];
-        availability.forEach(([, day]) => {
-            Object.entries(day).forEach(([type, occurrences]) => {
-                if (occurrences && Object.keys(occurrences).length > 0) {
-                    const label = this.transformToLabel(type);
-                    if (label && !legendLabels.some(lab => _.isEqual(lab, label))) {
-                        legendLabels.push(label);
-                    }
-                }
-            });
-        });
-        return legendLabels.sort((a, b) => a.order - b.order);
+        const orderedLabels = [
+            'candidates',
+            'bookings',
+            'preBookings',
+            'conflicts',
+            'preConflicts',
+            'conflictingCandidates',
+            'blockings',
+            'overridableBlockings',
+            'nonbookablePeriods',
+            'unbookableHours'
+        ];
+        const occurrenceTypes = availability.reduce((types, [, day]) => _.union(types, getOccurrenceTypes(day)), []);
+        return transformToLegendLabels(orderedLabels, occurrenceTypes);
     }
 
     renderFilters(refName) {

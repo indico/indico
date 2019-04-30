@@ -30,7 +30,7 @@ import {toMoment, serializeDate} from 'indico/utils/date';
 import {Param, Translate} from 'indico/react/i18n';
 import {ReduxFormField, formatters, validators as v} from 'indico/react/forms';
 import {DailyTimelineContent, TimelineLegend} from '../timeline';
-import {getRecurrenceInfo, PopupParam} from '../../util';
+import {getRecurrenceInfo, PopupParam, getOccurrenceTypes, transformToLegendLabels} from '../../util';
 import RoomBasicDetails from '../../components/RoomBasicDetails';
 import RoomKeyLocation from '../../components/RoomKeyLocation';
 import TimeInformation from '../../components/TimeInformation';
@@ -294,32 +294,15 @@ class BookingDetails extends React.Component {
         });
     };
 
-    transformToLabel = (type) => {
-        switch (type) {
-            case 'bookings':
-                return {label: Translate.string('Current booking'), style: 'booking', order: 1};
-            case 'cancellations':
-                return {label: Translate.string('Cancelled'), style: 'cancellation', order: 2};
-            case 'rejections':
-                return {label: Translate.string('Rejected'), style: 'rejection', order: 3};
-            case 'other':
-                return {label: Translate.string('Other bookings'), style: 'other', order: 4};
-            default:
-                return undefined;
-        }
-    };
-
     getLegendLabels = (availability) => {
-        const legendLabels = [];
-        Object.entries(availability).forEach(([type, occurrences]) => {
-            if (occurrences && Object.keys(occurrences).length > 0) {
-                const label = this.transformToLabel(type);
-                if (label && !legendLabels.some(lab => _.isEqual(lab, label))) {
-                    legendLabels.push(label);
-                }
-            }
-        });
-        return legendLabels.sort((a, b) => a.order - b.order);
+        const orderedLabels = [
+            'bookings',
+            'rejections',
+            'cancellations',
+            'other'
+        ];
+        const occurrenceTypes = getOccurrenceTypes(availability);
+        return transformToLegendLabels(orderedLabels, occurrenceTypes);
     };
 
     renderActionButtons = (canCancel, canReject, showAccept) => {

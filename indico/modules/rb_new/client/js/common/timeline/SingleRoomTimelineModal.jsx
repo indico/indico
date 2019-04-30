@@ -23,7 +23,7 @@ import PropTypes from 'prop-types';
 import {Modal, Icon, Popup} from 'semantic-ui-react';
 
 import {serializeDate} from 'indico/utils/date';
-import {Translate} from 'indico/react/i18n';
+import {getOccurrenceTypes, transformToLegendLabels} from '../../util';
 import {actions as bookRoomActions, selectors as bookRoomSelectors} from '../../modules/bookRoom';
 import TimelineLegend from './TimelineLegend';
 import DailyTimelineContent from './DailyTimelineContent';
@@ -54,43 +54,21 @@ const _getRowSerializer = (day, room) => {
     });
 };
 
-const _transformToLabel = (type) => {
-    switch (type) {
-        case 'candidates':
-            return {label: Translate.string('Available'), style: 'available', order: 1};
-        case 'bookings':
-            return {label: Translate.string('Booked'), style: 'booking', order: 2};
-        case 'preBookings':
-            return {label: Translate.string('Pre-Booked'), style: 'pre-booking', order: 3};
-        case 'conflicts':
-            return {label: Translate.string('Conflict'), style: 'conflict', order: 4};
-        case 'preConflicts':
-            return {label: Translate.string('Conflict with Pre-Booking'), style: 'pre-booking-conflict', order: 5};
-        case 'conflictingCandidates':
-            return {label: Translate.string('Invalid occurrence'), style: 'conflicting-candidate', order: 6};
-        case 'blockings':
-            return {label: Translate.string('Blocked'), style: 'blocking', order: 7};
-        case 'overridableBlockings':
-            return {label: Translate.string('Blocked (allowed)'), style: 'overridable-blocking', order: 8};
-        case 'nonbookablePeriods':
-        case 'unbookableHours':
-            return {label: Translate.string('Not bookable'), style: 'unbookable', order: 9};
-        default:
-            return undefined;
-    }
-};
-
 const _getLegendLabels = (availability) => {
-    const legendLabels = [];
-    Object.entries(availability).forEach(([type, occurrences]) => {
-        if (occurrences && Object.keys(occurrences).length > 0) {
-            const label = _transformToLabel(type);
-            if (label && !legendLabels.some(lab => _.isEqual(lab, label))) {
-                legendLabels.push(label);
-            }
-        }
-    });
-    return legendLabels.sort((a, b) => a.order - b.order);
+    const orderedLabels = [
+        'candidates',
+        'bookings',
+        'preBookings',
+        'conflicts',
+        'preConflicts',
+        'conflictingCandidates',
+        'blockings',
+        'overridableBlockings',
+        'nonbookablePeriods',
+        'unbookableHours'
+    ];
+    const occurrenceTypes = getOccurrenceTypes(availability);
+    return transformToLegendLabels(orderedLabels, occurrenceTypes);
 };
 
 const _SingleRoomTimelineContent = props => {

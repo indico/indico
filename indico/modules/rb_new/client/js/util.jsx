@@ -220,3 +220,53 @@ export function serializeRecurrenceInfo({type, number, interval}) {
         return ['MONTH', number];
     }
 }
+
+const _legendLabels = {
+    candidates:
+        {label: Translate.string('Available'), style: 'available'},
+    bookings:
+        {label: Translate.string('Booking'), style: 'booking'},
+    preBookings:
+        {label: Translate.string('Pre-Booking'), style: 'pre-booking'},
+    conflicts:
+        {label: Translate.string('Conflict'), style: 'conflict'},
+    preConflicts:
+        {label: Translate.string('Conflict with Pre-Booking'), style: 'pre-booking-conflict'},
+    conflictingCandidates:
+        {label: Translate.string('Invalid occurrence'), style: 'conflicting-candidate'},
+    other:
+        {label: Translate.string('Other booking'), style: 'other'},
+    rejections:
+        {label: Translate.string('Rejection'), style: 'rejection'},
+    cancellations:
+        {label: Translate.string('Cancellation'), style: 'cancellation'},
+    pendingCancellations:
+        {label: Translate.string('Pending cancellation'), style: 'pending-cancellation'},
+    blockings:
+        {label: Translate.string('Blocking'), style: 'blocking'},
+    overridableBlockings:
+        {label: Translate.string('Blocking (allowed)'), style: 'overridable-blocking'},
+    nonbookablePeriods:
+        {label: Translate.string('Not bookable'), style: 'unbookable'},
+    unbookableHours:
+        {label: Translate.string('Not bookable'), style: 'unbookable'}
+};
+
+export function transformToLegendLabels(orderedLabels, occurrenceTypes) {
+    return orderedLabels.reduce((legend, type) => {
+        const label = _legendLabels[type];
+        if (occurrenceTypes.includes(type) && !legend.some(legendLabel => legendLabel.style === label.style)) {
+            legend.push(_legendLabels[type]);
+        }
+        return legend;
+    }, []);
+}
+
+export function getOccurrenceTypes(availability) {
+    return Object.entries(availability).reduce((occurrenceTypes, [type, occurrences]) => {
+        if (occurrences && Object.keys(occurrences).length > 0) {
+            occurrenceTypes.push(type);
+        }
+        return occurrenceTypes;
+    }, []);
+}
