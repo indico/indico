@@ -227,7 +227,7 @@ class RHBookingStateActions(RHBookingBase):
             self.reject()
         elif self.action == 'cancel':
             self.booking.cancel(session.user)
-        return jsonify(booking=reservation_details_schema.dump(self.booking))
+        return jsonify(booking=serialize_booking_details(self.booking))
 
 
 class RHDeleteBooking(RHBookingBase):
