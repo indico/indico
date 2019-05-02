@@ -55,20 +55,8 @@ const _getRowSerializer = (day, room) => {
 };
 
 const _getLegendLabels = (availability) => {
-    const orderedLabels = [
-        'candidates',
-        'bookings',
-        'preBookings',
-        'conflicts',
-        'preConflicts',
-        'conflictingCandidates',
-        'blockings',
-        'overridableBlockings',
-        'nonbookablePeriods',
-        'unbookableHours'
-    ];
     const occurrenceTypes = getOccurrenceTypes(availability);
-    return transformToLegendLabels(orderedLabels, occurrenceTypes);
+    return transformToLegendLabels(occurrenceTypes);
 };
 
 const _SingleRoomTimelineContent = props => {

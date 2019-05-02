@@ -160,20 +160,8 @@ class BookRoom extends React.Component {
     }
 
     getLegendLabels(availability) {
-        const orderedLabels = [
-            'candidates',
-            'bookings',
-            'preBookings',
-            'conflicts',
-            'preConflicts',
-            'conflictingCandidates',
-            'blockings',
-            'overridableBlockings',
-            'nonbookablePeriods',
-            'unbookableHours'
-        ];
         const occurrenceTypes = availability.reduce((types, [, day]) => _.union(types, getOccurrenceTypes(day)), []);
-        return transformToLegendLabels(orderedLabels, occurrenceTypes);
+        return transformToLegendLabels(occurrenceTypes);
     }
 
     renderFilters(refName) {
