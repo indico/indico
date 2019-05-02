@@ -43,6 +43,7 @@ Bugfixes
   addresses and they match different users
 - Fix paper reviewers getting notifications even if their type of reviewing
   has been disabled (:issue:`3852`)
+- Correctly handle merging users in the paper reviewing module (:issue:`3895`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

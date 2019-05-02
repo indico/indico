@@ -70,3 +70,15 @@ class PaperCompetence(db.Model):
     @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'user_id', 'event_id', _text=', '.join(self.competences))
+
+    @classmethod
+    def merge_users(cls, target, source):
+        source_competences = source.paper_competences.all()
+        target_competences_by_event = {x.event: x for x in target.paper_competences}
+        for comp in source_competences:
+            existing = target_competences_by_event.get(comp.event)
+            if existing is None:
+                comp.user_id = target.id
+            else:
+                existing.competences = list(set(existing.competences) | set(comp.competences))
+                db.session.delete(comp)

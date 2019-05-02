@@ -50,6 +50,26 @@ def _get_feature_definitions(sender, **kwargs):
     return PapersFeature
 
 
+@signals.users.merged.connect
+def _merge_users(target, source, **kwargs):
+    from indico.modules.events.papers.models.comments import PaperReviewComment
+    from indico.modules.events.papers.models.competences import PaperCompetence
+    from indico.modules.events.papers.models.reviews import PaperReview
+    from indico.modules.events.papers.models.revisions import PaperRevision
+    PaperReviewComment.query.filter_by(user_id=source.id).update({PaperReviewComment.user_id: target.id})
+    PaperReviewComment.query.filter_by(modified_by_id=source.id).update({PaperReviewComment.modified_by_id: target.id})
+    PaperReview.query.filter_by(user_id=source.id).update({PaperReview.user_id: target.id})
+    PaperRevision.query.filter_by(submitter_id=source.id).update({PaperRevision.submitter_id: target.id})
+    PaperRevision.query.filter_by(judge_id=source.id).update({PaperRevision.judge_id: target.id})
+    PaperCompetence.merge_users(target, source)
+    target.judge_for_contributions |= source.judge_for_contributions
+    source.judge_for_contributions.clear()
+    target.content_reviewer_for_contributions |= source.content_reviewer_for_contributions
+    source.content_reviewer_for_contributions.clear()
+    target.layout_reviewer_for_contributions |= source.layout_reviewer_for_contributions
+    source.layout_reviewer_for_contributions.clear()
+
+
 @signals.acl.get_management_permissions.connect_via(Event)
 def _get_management_permissions(sender, **kwargs):
     yield PaperManagerPermission
