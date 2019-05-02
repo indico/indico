@@ -120,16 +120,8 @@ export default connect(
 )(Overridable.component('RoomDetailsModal', RoomDetailsModal));
 
 const _getLegendLabels = (availability) => {
-    const orderedLabels = [
-        'bookings',
-        'preBookings',
-        'blockings',
-        'overridableBlockings',
-        'nonbookablePeriods',
-        'unbookableHours'
-    ];
     const occurrenceTypes = availability.reduce((types, day) => _.union(types, getOccurrenceTypes(day)), []);
-    return transformToLegendLabels(orderedLabels, occurrenceTypes);
+    return transformToLegendLabels(occurrenceTypes);
 };
 
 function RoomDetails({bookRoom, room, availability, attributes}) {

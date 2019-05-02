@@ -47,27 +47,13 @@ class BookingEditCalendar extends React.Component {
     };
 
     getLegendLabels = (calendars) => {
-        const orderedLabels = [
-            'bookings',
-            'rejections',
-            'cancellations',
-            'pendingCancellations',
-            'other',
-            'blockings',
-            'overridableBlockings',
-            'nonbookablePeriods',
-            'unbookableHours',
-            'candidates',
-            'conflicts',
-            'conflictingCandidates',
-        ];
         const occurrenceTypes = calendars.reduce((accumTypes, data) => {
             const calendarTypes = data.reduce((types, {availability}) => {
                 return _.union(types, getOccurrenceTypes(availability));
             }, []);
             return _.union(accumTypes, calendarTypes);
         }, []);
-        return transformToLegendLabels(orderedLabels, occurrenceTypes);
+        return transformToLegendLabels(occurrenceTypes);
     };
 
     serializeRow = (data) => {

@@ -252,8 +252,25 @@ const _legendLabels = {
         {label: Translate.string('Not bookable'), style: 'unbookable'}
 };
 
-export function transformToLegendLabels(orderedLabels, occurrenceTypes) {
-    return orderedLabels.reduce((legend, type) => {
+const _orderedLabels = [
+    'candidates',
+    'bookings',
+    'preBookings',
+    'conflicts',
+    'preConflicts',
+    'conflictingCandidates',
+    'rejections',
+    'cancellations',
+    'pendingCancellations',
+    'other',
+    'blockings',
+    'overridableBlockings',
+    'nonbookablePeriods',
+    'unbookableHours',
+];
+
+export function transformToLegendLabels(occurrenceTypes) {
+    return _orderedLabels.reduce((legend, type) => {
         const label = _legendLabels[type];
         if (occurrenceTypes.includes(type) && !legend.some(legendLabel => legendLabel.style === label.style)) {
             legend.push(_legendLabels[type]);

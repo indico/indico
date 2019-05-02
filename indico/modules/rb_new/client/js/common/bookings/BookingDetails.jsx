@@ -295,14 +295,8 @@ class BookingDetails extends React.Component {
     };
 
     getLegendLabels = (availability) => {
-        const orderedLabels = [
-            'bookings',
-            'rejections',
-            'cancellations',
-            'other'
-        ];
         const occurrenceTypes = getOccurrenceTypes(availability);
-        return transformToLegendLabels(orderedLabels, occurrenceTypes);
+        return transformToLegendLabels(occurrenceTypes);
     };
 
     renderActionButtons = (canCancel, canReject, showAccept) => {
