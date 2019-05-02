@@ -33,8 +33,7 @@ from indico.modules.rb.models.room_attributes import RoomAttribute, RoomAttribut
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.util import rb_is_admin
 from indico.modules.rb_new.controllers.backend.common import search_room_args
-from indico.modules.rb_new.operations.blockings import (filter_blocked_rooms, get_blockings_with_rooms,
-                                                        group_blocked_rooms)
+from indico.modules.rb_new.operations.blockings import filter_blocked_rooms, get_blockings_with_rooms
 from indico.modules.rb_new.operations.bookings import check_room_available, get_room_details_availability
 from indico.modules.rb_new.operations.rooms import get_room_statistics, search_for_rooms
 from indico.modules.rb_new.schemas import room_attribute_values_schema, rooms_schema

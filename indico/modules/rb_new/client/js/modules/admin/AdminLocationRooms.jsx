@@ -15,21 +15,26 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
+import React, {useState} from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import {Header, Item, Message} from 'semantic-ui-react';
+import {Button, Header, Item, Message} from 'semantic-ui-react';
 import {Translate, Param} from 'indico/react/i18n';
 import ItemPlaceholder from '../../components/ItemPlaceholder';
 import AdminRoomItem from './AdminRoomItem';
 import searchBarFactory from '../../components/SearchBar';
 import * as adminSelectors from './selectors';
+import {RoomEditModal} from '../../common/rooms';
+
+import './AdminLocationRooms.module.scss';
 
 
 const SearchBar = searchBarFactory('admin', adminSelectors);
 
 
 function AdminLocationRooms({location, isFetching, filters: {text}}) {
+    const [adding, setAdding] = useState(false);
+
     if (!location || isFetching) {
         return <ItemPlaceholder.Group count={10} />;
     }
@@ -43,10 +48,11 @@ function AdminLocationRooms({location, isFetching, filters: {text}}) {
 
     return (
         <>
-            <Header as="h2">
+            <Header as="h2" styleName="header">
                 <Translate>
                     Location: <Param name="location" value={location.name} />
                 </Translate>
+                <Button size="small" content={Translate.string('Add room')} onClick={() => setAdding(true)} />
             </Header>
 
             <SearchBar />
@@ -62,6 +68,9 @@ function AdminLocationRooms({location, isFetching, filters: {text}}) {
                         There are no rooms for the specified location.
                     </Translate>
                 </Message>
+            )}
+            {adding && (
+                <RoomEditModal locationId={location.id} onClose={() => setAdding(false)} />
             )}
         </>
     );

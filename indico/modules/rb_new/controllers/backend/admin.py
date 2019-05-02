@@ -431,43 +431,46 @@ class RHUpdateRoomEquipment(RHRoomAdminBase):
         return jsonify(room_update_schema.dump(self.room, many=False))
 
 
+room_update_args = {
+    'verbose_name': fields.Str(allow_none=True),
+    'site': fields.Str(allow_none=True),
+    'building': fields.String(validate=lambda x: x is not None),
+    'floor': fields.String(validate=lambda x: x is not None),
+    'number': fields.String(validate=lambda x: x is not None),
+    'longitude': fields.Float(allow_none=True),
+    'latitude': fields.Float(allow_none=True),
+    'is_reservable': fields.Bool(allow_none=True),
+    'reservations_need_confirmation': fields.Bool(allow_none=True),
+    'notification_emails': fields.List(fields.Email()),
+    'notification_before_days': fields.Int(validate=lambda x: 1 <= x <= 30, allow_none=True),
+    'notification_before_days_weekly': fields.Int(validate=lambda x: 1 <= x <= 30, allow_none=True),
+    'notification_before_days_monthly': fields.Int(validate=lambda x: 1 <= x <= 30, allow_none=True),
+    'notifications_enabled': fields.Bool(),
+    'end_notification_daily': fields.Int(validate=lambda x: 1 <= x <= 30, allow_none=True),
+    'end_notification_weekly': fields.Int(validate=lambda x: 1 <= x <= 30, allow_none=True),
+    'end_notification_monthly': fields.Int(validate=lambda x: 1 <= x <= 30, allow_none=True),
+    'end_notifications_enabled': fields.Bool(),
+    'booking_limit_days': fields.Int(validate=lambda x: x >= 1, allow_none=True),
+    'owner': Principal(validate=lambda x: x is not None, allow_none=True),
+    'key_location': fields.Str(),
+    'telephone': fields.Str(),
+    'capacity': fields.Int(validate=lambda x: x >= 1),
+    'division': fields.Str(allow_none=True),
+    'surface_area': fields.Int(validate=lambda x: x >= 0, allow_none=True),
+    'max_advance_days': fields.Int(validate=lambda x: x >= 1, allow_none=True),
+    'comments': fields.Str(),
+}
+
+
 class RHRoom(RHRoomAdminBase):
     def _process_GET(self):
         return jsonify(room_update_schema.dump(self.room))
 
-    @use_args({
-        'verbose_name': fields.Str(allow_none=True),
-        'site': fields.Str(allow_none=True),
-        'building': fields.String(validate=lambda x: x is not None),
-        'floor': fields.String(validate=lambda x: x is not None),
-        'number': fields.String(validate=lambda x: x is not None),
-        'longitude': fields.Float(allow_none=True),
-        'latitude': fields.Float(allow_none=True),
-        'is_reservable': fields.Bool(allow_none=True),
-        'reservations_need_confirmation': fields.Bool(allow_none=True),
-        'notification_emails': fields.List(fields.Email()),
-        'notification_before_days': fields.Int(validate=lambda x: 1 <= x <= 30, allow_none=True),
-        'notification_before_days_weekly': fields.Int(validate=lambda x: 1 <= x <= 30, allow_none=True),
-        'notification_before_days_monthly': fields.Int(validate=lambda x: 1 <= x <= 30, allow_none=True),
-        'notifications_enabled': fields.Bool(),
-        'end_notification_daily': fields.Int(validate=lambda x: 1 <= x <= 30, allow_none=True),
-        'end_notification_weekly': fields.Int(validate=lambda x: 1 <= x <= 30, allow_none=True),
-        'end_notification_monthly': fields.Int(validate=lambda x: 1 <= x <= 30, allow_none=True),
-        'end_notifications_enabled': fields.Bool(),
-        'booking_limit_days': fields.Int(validate=lambda x: x >= 1, allow_none=True),
-        'owner': Principal(validate=lambda x: x is not None, allow_none=True),
-        'key_location': fields.Str(),
-        'telephone': fields.Str(),
-        'capacity': fields.Int(validate=lambda x: x >= 1),
-        'division': fields.Str(allow_none=True),
-        'surface_area': fields.Int(validate=lambda x: x >= 0, allow_none=True),
-        'max_advance_days': fields.Int(validate=lambda x: x >= 1, allow_none=True),
-        'comments': fields.Str(),
-    })
+    @use_args(room_update_args)
     def _process_PATCH(self, args):
         update_room(self.room, args)
         RHRoomsPermissions._jsonify_user_permissions.clear_cached(session.user)
-        return jsonify(room_update_schema.dump(self.room, many=False))
+        return '', 204
 
     def _process_DELETE(self):
         logger.info('Room %r deleted by %r', self.room, session.user)
@@ -494,6 +497,17 @@ class RHRoomPhoto(RHRoomAdminBase):
 
 
 class RHRooms(RHRoomBookingAdminBase):
-    def _process(self):
+    def _process_GET(self):
         rooms = Room.query.filter_by(is_deleted=False).order_by(db.func.indico.natsort(Room.full_name)).all()
         return AdminRoomSchema().jsonify(rooms, many=True)
+
+    @use_args(dict(room_update_args, **{
+        'location_id': fields.Int(required=True),
+    }))
+    def _process_POST(self, args):
+        room = Room()
+        update_room(room, args)
+        db.session.add(room)
+        db.session.flush()
+        RHRoomsPermissions._jsonify_user_permissions.clear_cached(session.user)
+        return jsonify(id=room.id)

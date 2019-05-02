@@ -16,6 +16,7 @@
  */
 
 import roomURL from 'indico-url:rooms_new.admin_room';
+import roomsURL from 'indico-url:rooms_new.admin_rooms';
 import fetchRoomAttributesURL from 'indico-url:rooms_new.admin_room_attributes';
 import fetchAttributesURL from 'indico-url:rooms_new.admin_attributes';
 import fetchRoomAvailabilityURL from 'indico-url:rooms_new.admin_room_availability';
@@ -373,7 +374,9 @@ class RoomEditModal extends React.Component {
     static propTypes = {
         equipmentTypes: PropTypes.arrayOf(PropTypes.object).isRequired,
         onClose: PropTypes.func.isRequired,
-        roomId: PropTypes.number.isRequired,
+        roomId: PropTypes.number,
+        locationId: PropTypes.number,
+        afterCreation: PropTypes.bool,
         actions: PropTypes.exact({
             fetchEquipmentTypes: PropTypes.func.isRequired,
             fetchRoom: PropTypes.func.isRequired,
@@ -382,24 +385,52 @@ class RoomEditModal extends React.Component {
         }).isRequired,
     };
 
+    static defaultProps = {
+        roomId: null,
+        locationId: null,
+        afterCreation: false,
+    };
+
     state = {
+        newRoomId: null,
         attributes: null,
         room: null,
         roomAttributes: null,
         roomAvailability: null,
         roomEquipment: null,
         submitState: '',
+        wasEverDirty: false,
         closing: false,
     };
 
     componentDidMount() {
         this.fetchAttributes();
-        this.fetchRoomData();
+        if (this.newRoom) {
+            // eslint-disable-next-line react/no-did-mount-set-state
+            this.setState({
+                roomAttributes: [],
+                roomAvailability: {
+                    bookableHours: [],
+                    nonbookablePeriods: []
+                },
+                roomEquipment: {
+                    availableEquipment: [],
+                },
+            });
+        } else {
+            const {roomId} = this.props;
+            this.fetchRoomData(roomId);
+        }
+    }
+
+    get newRoom() {
+        const {roomId} = this.props;
+        return roomId === null;
     }
 
     get loadingInitialData() {
         const {attributes, room, roomAttributes, roomEquipment, roomAvailability} = this.state;
-        return !attributes || !room || !roomAttributes || !roomEquipment || !roomAvailability;
+        return !attributes || (!room && !this.newRoom) || !roomAttributes || !roomEquipment || !roomAvailability;
     }
 
     async fetchAttributes() {
@@ -413,18 +444,17 @@ class RoomEditModal extends React.Component {
         this.setState({attributes: response.data});
     }
 
-    async fetchRoomData() {
+    async fetchRoomData(roomId) {
         const reqs = [
-            this.fetchDetailedRoom(),
-            this.fetchRoomAttributes(),
-            this.fetchRoomAvailability(),
-            this.fetchRoomEquipment(),
+            this.fetchDetailedRoom(roomId),
+            this.fetchRoomAttributes(roomId),
+            this.fetchRoomAvailability(roomId),
+            this.fetchRoomEquipment(roomId),
         ];
         this.setState(Object.assign(...await Promise.all(reqs)));
     }
 
-    async fetchDetailedRoom() {
-        const {roomId} = this.props;
+    async fetchDetailedRoom(roomId) {
         let response;
         try {
             response = await indicoAxios.get(roomURL({room_id: roomId}));
@@ -435,8 +465,7 @@ class RoomEditModal extends React.Component {
         return {room: camelizeKeys(response.data)};
     }
 
-    async fetchRoomAttributes() {
-        const {roomId} = this.props;
+    async fetchRoomAttributes(roomId) {
         let response;
         try {
             response = await indicoAxios.get(fetchRoomAttributesURL({room_id: roomId}));
@@ -447,8 +476,7 @@ class RoomEditModal extends React.Component {
         return {roomAttributes: response.data};
     }
 
-    async fetchRoomAvailability() {
-        const {roomId} = this.props;
+    async fetchRoomAvailability(roomId) {
         let response;
         try {
             response = await indicoAxios.get(fetchRoomAvailabilityURL({room_id: roomId}));
@@ -467,8 +495,7 @@ class RoomEditModal extends React.Component {
         return {roomAvailability};
     }
 
-    async fetchRoomEquipment() {
-        const {roomId} = this.props;
+    async fetchRoomEquipment(roomId) {
         let response;
         try {
             response = await indicoAxios.get(fetchRoomEquipmentURL({room_id: roomId}));
@@ -481,21 +508,25 @@ class RoomEditModal extends React.Component {
 
     handleCloseModal = async () => {
         const {
-            onClose, roomId,
+            onClose,
             actions: {fetchEquipmentTypes, fetchRoom, fetchRoomDetails, fetchRoomPermissions}
         } = this.props;
+        // eslint-disable-next-line react/destructuring-assignment
+        const roomId = this.newRoom ? this.state.newRoomId : this.props.roomId;
         this.setState({closing: true});
-        await Promise.all([
-            fetchEquipmentTypes(),
-            fetchRoom(roomId),
-            fetchRoomPermissions(roomId),
-            fetchRoomDetails(roomId, true)
-        ]);
+        if (roomId !== null) {
+            await Promise.all([
+                fetchEquipmentTypes(),
+                fetchRoom(roomId),
+                fetchRoomPermissions(roomId),
+                fetchRoomDetails(roomId, true)
+            ]);
+        }
         onClose();
     };
 
     handleSubmit = async (data, form) => {
-        const {roomId} = this.props;
+        let {roomId} = this.props;
         const changedValues = getChangedValues(data, form);
         const basicDetailsKeys = ['attributes', 'bookableHours', 'nonbookablePeriods', 'availableEquipment'];
         const basicDetails = _.omit(changedValues, basicDetailsKeys);
@@ -503,7 +534,12 @@ class RoomEditModal extends React.Component {
         let submitState = 'success';
         let submitError;
         try {
-            await this.saveBasicDetails(roomId, basicDetails);
+            if (this.newRoom) {
+                roomId = await this.createRoom(basicDetails);
+                this.setState({newRoomId: roomId});
+            } else {
+                await this.saveBasicDetails(roomId, basicDetails);
+            }
             await this.saveEquipment(roomId, availableEquipment);
             await this.saveAttributes(roomId, attributes);
             await this.saveAvailability(roomId, changedValues, nonbookablePeriods, bookableHours);
@@ -511,11 +547,20 @@ class RoomEditModal extends React.Component {
             submitError = handleSubmitError(e);
             submitState = 'error';
         }
+
         // reload room so the form gets new initialValues
-        await this.fetchRoomData();
+        await this.fetchRoomData(roomId);
         this.setState({submitState});
         return camelizeKeys(submitError);
     };
+
+    async createRoom(basicDetails) {
+        const {locationId} = this.props;
+        const payload = snakifyKeys(basicDetails);
+        payload.location_id = locationId;
+        const response = await indicoAxios.post(roomsURL(), payload);
+        return response.data.id;
+    }
 
     async saveBasicDetails(roomId, basicDetails) {
         if (!_.isEmpty(basicDetails)) {
@@ -599,10 +644,15 @@ class RoomEditModal extends React.Component {
     };
 
     renderContent = (content, key) => {
-        const {roomEquipment, room: {hasPhoto}} = this.state;
+        const {roomEquipment, room} = this.state;
         const {equipmentTypes, roomId} = this.props;
+        const hasPhoto = this.newRoom ? false : room.hasPhoto;
         switch (content.type) {
             case 'header':
+                if (content.key === 'photo' && this.newRoom) {
+                    // XXX using the key for this is awful..
+                    return null;
+                }
                 return (
                     <Header key={key}>{content.label}</Header>
                 );
@@ -683,7 +733,7 @@ class RoomEditModal extends React.Component {
                            isEqual={_.isEqual} />
                 );
             case 'photo':
-                return (
+                return this.newRoom ? null : (
                     <RoomPhoto key={key} roomId={roomId} hasPhoto={hasPhoto} />
                 );
             case 'attributes':
@@ -726,12 +776,13 @@ class RoomEditModal extends React.Component {
     };
 
     renderModalContent = (fprops) => {
+        const {afterCreation} = this.props;
         const {hasValidationErrors, pristine, submitting} = fprops;
-        const {submitState} = this.state;
+        const {submitState, wasEverDirty} = this.state;
         return (
             <>
                 <Modal.Header>
-                    {Translate.string('Edit Room Details')}
+                    {this.newRoom ? Translate.string('Add Room') : Translate.string('Edit Room Details')}
                 </Modal.Header>
                 <Modal.Content scrolling>
                     <Form id="room-form"
@@ -742,6 +793,11 @@ class RoomEditModal extends React.Component {
                             <Grid.Column>{columns[1].map(this.renderContent)}</Grid.Column>
                             <Grid.Column>
                                 {columns[2].map(this.renderContent)}
+                                <Message styleName="submit-message" positive hidden={!afterCreation || wasEverDirty}>
+                                    <Translate>
+                                        Room has been successfully created.
+                                    </Translate>
+                                </Message>
                                 <Message styleName="submit-message" positive hidden={submitState !== 'success'}>
                                     <Translate>
                                         Room has been successfully updated.
@@ -758,7 +814,11 @@ class RoomEditModal extends React.Component {
                 </Modal.Content>
                 <Modal.Actions>
                     <Button onClick={this.handleCloseModal}>
-                        <Translate>Cancel</Translate>
+                        {submitState === 'success' ? (
+                            <Translate>Close</Translate>
+                        ) : (
+                            <Translate>Cancel</Translate>
+                        )}
                     </Button>
                     <Button type="submit"
                             form="room-form"
@@ -771,7 +831,7 @@ class RoomEditModal extends React.Component {
                 <FormSpy subscription={{dirty: true}}
                          onChange={({dirty}) => {
                              if (dirty) {
-                                 this.setState({submitState: ''});
+                                 this.setState({submitState: '', wasEverDirty: true});
                              }
                          }} />
             </>
@@ -786,11 +846,27 @@ class RoomEditModal extends React.Component {
     };
 
     render() {
-        const {room, roomAttributes, roomEquipment, roomAvailability, closing} = this.state;
+        const {onClose} = this.props;
+        const {room, roomAttributes, roomEquipment, roomAvailability, closing, newRoomId} = this.state;
+        if (this.newRoom && newRoomId !== null) {
+            // we just created a new room -> switch to the edit modal
+            return <ConnectedRoomEditModal roomId={newRoomId} onClose={onClose} afterCreation />;
+        }
         if (this.loadingInitialData || closing) {
             return <Dimmer active page><Loader /></Dimmer>;
         }
-        const initialValues = {
+        const initialValues = this.newRoom ? {
+            notificationEmails: [],
+            notificationsEnabled: true,
+            endNotificationsEnabled: true,
+            isReservable: true,
+            owner: null,
+            reservationsNeedConfirmation: false,
+            capacity: null,
+            attributes: roomAttributes,
+            ...roomEquipment,
+            ...roomAvailability,
+        } : {
             ...room,
             attributes: roomAttributes,
             ...roomEquipment,
@@ -812,7 +888,7 @@ class RoomEditModal extends React.Component {
     }
 }
 
-export default connect(
+const ConnectedRoomEditModal = connect(
     (state) => ({
         equipmentTypes: roomsSelectors.getAllEquipmentTypes(state),
     }),
@@ -825,3 +901,6 @@ export default connect(
         }, dispatch),
     }),
 )(RoomEditModal);
+
+
+export default ConnectedRoomEditModal;

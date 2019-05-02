@@ -109,7 +109,7 @@ _bp.add_url_rule('/api/admin/features/<int:feature_id>', 'admin_features', admin
 _bp.add_url_rule('/api/admin/attributes', 'admin_attributes', admin.RHAttributes, methods=('GET', 'POST'))
 _bp.add_url_rule('/api/admin/attributes/<int:attribute_id>', 'admin_attributes', admin.RHAttributes,
                  methods=('GET', 'DELETE', 'PATCH'))
-_bp.add_url_rule('/api/admin/rooms/', 'admin_rooms', admin.RHRooms)
+_bp.add_url_rule('/api/admin/rooms/', 'admin_rooms', admin.RHRooms, methods=('GET', 'POST'))
 _bp.add_url_rule('/api/admin/rooms/<int:room_id>', 'admin_room', admin.RHRoom, methods=('GET', 'PATCH', 'DELETE'))
 _bp.add_url_rule('/api/admin/rooms/<int:room_id>/equipment', 'admin_room_equipment', admin.RHRoomEquipment)
 _bp.add_url_rule('/api/admin/rooms/<int:room_id>/equipment', 'admin_update_room_equipment', admin.RHUpdateRoomEquipment,
