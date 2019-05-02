@@ -281,7 +281,7 @@ export function transformToLegendLabels(occurrenceTypes) {
 
 export function getOccurrenceTypes(availability) {
     return Object.entries(availability).reduce((occurrenceTypes, [type, occurrences]) => {
-        if (occurrences && Object.keys(occurrences).length > 0) {
+        if (occurrences && Object.keys(occurrences).length > 0 && _orderedLabels.includes(type)) {
             occurrenceTypes.push(type);
         }
         return occurrenceTypes;
