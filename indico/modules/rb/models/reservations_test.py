@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from datetime import date
+from datetime import date, datetime, time
 
 import pytest
 from dateutil.relativedelta import relativedelta
@@ -141,7 +141,8 @@ def test_find_overlapping_with_different_room(overlapping_reservation, create_ro
     assert reservation not in Reservation.find_overlapping_with(room=create_room(), occurrences=[occurrence]).all()
 
 
-def test_find_overlapping_with_is_not_valid(overlapping_reservation, dummy_user):
+def test_find_overlapping_with_is_not_valid(overlapping_reservation, dummy_user, freeze_time):
+    freeze_time(datetime.combine(date.today(), time(1)))
     reservation, occurrence = overlapping_reservation
     assert reservation in Reservation.find_overlapping_with(room=reservation.room,
                                                             occurrences=[occurrence]).all()
@@ -164,10 +165,11 @@ def test_find_overlapping_with_skip_reservation(overlapping_reservation):
 
 
 @pytest.mark.parametrize('silent', (True, False))
-def test_cancel(smtp, create_reservation, dummy_user, silent):
+def test_cancel(smtp, create_reservation, dummy_user, silent, freeze_time):
     reservation = create_reservation(start_dt=date.today() + relativedelta(hour=8),
                                      end_dt=date.today() + relativedelta(days=10, hour=17),
                                      repeat_frequency=RepeatFrequency.DAY)
+    freeze_time(datetime.combine(date.today(), time(7, 30)))
     assert not reservation.is_cancelled
     assert not any(occ.is_cancelled for occ in reservation.occurrences)
     reservation.cancel(user=dummy_user, reason='cancelled', silent=silent)

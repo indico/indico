@@ -40,7 +40,7 @@ from indico.modules.rb.models.util import unimplemented
 from indico.modules.rb.notifications.reservations import (notify_cancellation, notify_confirmation, notify_creation,
                                                           notify_modification, notify_rejection, notify_reset_approval)
 from indico.modules.rb.util import rb_is_admin
-from indico.util.date_time import format_date, format_time, now_utc, utc_to_server
+from indico.util.date_time import format_date, format_time, now_utc
 from indico.util.i18n import N_, _
 from indico.util.serializer import Serializer
 from indico.util.string import format_repr, return_ascii, to_unicode
@@ -434,7 +434,7 @@ class Reservation(Serializer, db.Model):
         self.state = ReservationState.cancelled
         self.rejection_reason = reason or None
         criteria = (ReservationOccurrence.is_valid,
-                    ReservationOccurrence.start_dt > utc_to_server(now_utc()) - timedelta(minutes=10))  # grace period
+                    ReservationOccurrence.start_dt >= datetime.now() - timedelta(minutes=10))  # grace period
         self.occurrences.filter(*criteria).update({
             ReservationOccurrence.state: ReservationOccurrenceState.cancelled,
             ReservationOccurrence.rejection_reason: reason

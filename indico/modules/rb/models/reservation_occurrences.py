@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from math import ceil
 
 from dateutil import rrule
@@ -195,7 +195,7 @@ class ReservationOccurrence(db.Model, Serializer):
         booked_or_owned_by_user = booking.is_owned_by(user) or booking.is_booked_for(user)
         if booking.is_rejected or booking.is_cancelled or booking.is_archived:
             return False
-        if booked_or_owned_by_user and self.start_dt >= datetime.now():
+        if booked_or_owned_by_user and self.start_dt >= datetime.now() - timedelta(minutes=10):  # grace period
             return True
         return allow_admin and rb_is_admin(user)
 
