@@ -14,6 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from datetime import datetime, timedelta
 from functools import wraps
 
 from indico.core.errors import IndicoError
@@ -37,12 +38,15 @@ def proxy_to_reservation_if_last_valid_occurrence(f):
     """Forwards a method call to `self.reservation` if there is only one occurrence."""
     @wraps(f)
     def wrapper(self, *args, **kwargs):
+        from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
         if not kwargs.pop('propagate', True):
             return f(self, *args, **kwargs)
         resv_func = getattr(self.reservation, f.__name__)
         if not self.reservation.is_repeating:
             return resv_func(*args, **kwargs)
-        valid_occurrences = self.reservation.occurrences.filter_by(is_valid=True).limit(2).all()
+        criteria = (ReservationOccurrence.is_valid,
+                    ReservationOccurrence.start_dt >= datetime.now() - timedelta(minutes=10))  # grace period
+        valid_occurrences = self.reservation.occurrences.filter(*criteria).limit(2).all()
         if len(valid_occurrences) == 1 and valid_occurrences[0] == self:
             # If we ever use this outside ReservationOccurrence we can probably get rid of the ==self check
             return resv_func(*args, **kwargs)

@@ -49,10 +49,11 @@ def test_unimplemented(raised, caught, message):
 )
 @pytest.mark.usefixtures('smtp')
 def test_proxy_to_reservation_if_last_valid_occurrence(db, mock, create_reservation, dummy_user,
-                                                       not_repeating, only_one_valid, propagate, proxied):
+                                                       not_repeating, only_one_valid, propagate, proxied, freeze_time):
     resv = create_reservation(start_dt=datetime.combine(date.today(), time(8)),
                               end_dt=datetime.combine(date.today() + timedelta(days=1), time(17)),
                               repeat_frequency=RepeatFrequency.NEVER if not_repeating else RepeatFrequency.DAY)
+    freeze_time(datetime.combine(date.today(), time(8)))
     if only_one_valid:
         for occ in resv.occurrences[1:]:
             occ.state = ReservationOccurrenceState.cancelled

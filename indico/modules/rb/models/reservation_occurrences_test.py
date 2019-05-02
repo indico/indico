@@ -21,7 +21,6 @@ import pytest
 from dateutil.relativedelta import relativedelta
 
 from indico.core.errors import IndicoError
-from indico.modules.rb import rb_settings
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence, ReservationOccurrenceState
 from indico.modules.rb.models.reservations import RepeatFrequency
 from indico.testing.util import extract_emails
@@ -277,16 +276,19 @@ def test_cancel(smtp, create_reservation, dummy_user, silent, reason):
 
 
 @pytest.mark.parametrize('silent', (True, False))
-def test_cancel_single_occurrence(smtp, dummy_occurrence, dummy_user, silent):
-    dummy_occurrence.cancel(user=dummy_user, reason='cancelled', silent=silent)
-    assert dummy_occurrence.is_cancelled
-    assert dummy_occurrence.rejection_reason == 'cancelled'
-    assert dummy_occurrence.reservation.is_cancelled
-    assert dummy_occurrence.reservation.rejection_reason == 'cancelled'
+def test_cancel_single_occurrence(smtp, create_occurrence, dummy_user, silent, freeze_time):
+    occ = create_occurrence(start_dt=datetime.combine(date.today(), time(11)),
+                            end_dt=datetime.combine(date.today(), time(12)))
+    freeze_time(datetime.combine(date.today(), time(11, 10)))
+    occ.cancel(user=dummy_user, reason='cancelled', silent=silent)
+    assert occ.is_cancelled
+    assert occ.rejection_reason == 'cancelled'
+    assert occ.reservation.is_cancelled
+    assert occ.reservation.rejection_reason == 'cancelled'
     if silent:
-        assert not dummy_occurrence.reservation.edit_logs.count()
+        assert not occ.reservation.edit_logs.count()
     else:
-        assert dummy_occurrence.reservation.edit_logs.count()
+        assert occ.reservation.edit_logs.count()
         mails = extract_emails(smtp, count=2, regex=True, subject=r'Booking cancelled on')
         assert not any('SINGLE OCCURRENCE' in mail['subject'] for mail in mails)
     assert not smtp.outbox
@@ -404,21 +406,18 @@ def test_can_cancel(create_reservation, dummy_user, freeze_time):
     assert reservation.occurrences[-1].can_cancel(dummy_user)
 
 
-def test_can_cancel_recent_reservation(create_reservation, dummy_user, freeze_time):
-    rb_settings.set('grace_period', 1)
+def test_cannot_cancel_archived_reservation(create_reservation, dummy_user, freeze_time):
     reservation = create_reservation(start_dt=datetime.combine(date.today(), time(11)),
                                      end_dt=datetime.combine(date.today(), time(17)),
                                      repeat_frequency=RepeatFrequency.NEVER)
-    freeze_time(datetime.combine(date.today(), time(12, 0)))
+    freeze_time(datetime.combine(date.today(), time(8)))
     assert reservation.can_cancel(dummy_user)
 
-    reservation.start_dt = datetime.combine(date.today(), time(8))
+    freeze_time(datetime.combine(date.today(), time(13)))
+    assert reservation.can_cancel(dummy_user)
+
+    freeze_time(datetime.combine(date.today(), time(17)))
+    assert reservation.can_cancel(dummy_user)
+
+    freeze_time(datetime.combine(date.today(), time(17, 1)))
     assert not reservation.can_cancel(dummy_user)
-
-    rb_settings.set('grace_period', 4)
-    reservation.start_dt = datetime.combine(date.today(), time(8))
-    assert reservation.can_cancel(dummy_user)
-
-    reservation.start_dt = reservation.start_dt + relativedelta(days=1)
-    reservation.end_dt = reservation.end_dt + relativedelta(days=1)
-    assert reservation.can_cancel(dummy_user)
