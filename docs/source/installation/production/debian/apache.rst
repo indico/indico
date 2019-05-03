@@ -283,7 +283,7 @@ Now finish setting up the directory structure and permissions:
 
     mkdir ~/log/apache
     chmod go-rwx ~/* ~/.[^.]*
-    chmod 710 ~/ ~/archive ~/assets ~/cache ~/log ~/tmp
+    chmod 710 ~/ ~/archive ~/cache ~/log ~/tmp
     chmod 750 ~/web ~/.venv
     chmod g+w ~/log/apache
     echo -e "\nSTATIC_FILE_METHOD = 'xsendfile'" >> ~/etc/indico.conf
