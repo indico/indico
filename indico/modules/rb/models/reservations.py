@@ -433,8 +433,7 @@ class Reservation(Serializer, db.Model):
     def cancel(self, user, reason=None, silent=False):
         self.state = ReservationState.cancelled
         self.rejection_reason = reason or None
-        criteria = (ReservationOccurrence.is_valid,
-                    ReservationOccurrence.start_dt >= datetime.now() - timedelta(minutes=10))  # grace period
+        criteria = (ReservationOccurrence.is_valid, ReservationOccurrence.is_within_cancel_grace_period)
         self.occurrences.filter(*criteria).update({
             ReservationOccurrence.state: ReservationOccurrenceState.cancelled,
             ReservationOccurrence.rejection_reason: reason

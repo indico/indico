@@ -44,8 +44,7 @@ def proxy_to_reservation_if_last_valid_occurrence(f):
         resv_func = getattr(self.reservation, f.__name__)
         if not self.reservation.is_repeating:
             return resv_func(*args, **kwargs)
-        criteria = (ReservationOccurrence.is_valid,
-                    ReservationOccurrence.start_dt >= datetime.now() - timedelta(minutes=10))  # grace period
+        criteria = (ReservationOccurrence.is_valid, ReservationOccurrence.is_within_cancel_grace_period)
         valid_occurrences = self.reservation.occurrences.filter(*criteria).limit(2).all()
         if len(valid_occurrences) == 1 and valid_occurrences[0] == self:
             # If we ever use this outside ReservationOccurrence we can probably get rid of the ==self check
