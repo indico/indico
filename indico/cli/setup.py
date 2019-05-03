@@ -356,6 +356,8 @@ class SetupWizard(object):
                 return False
             elif data.path not in ('', '/'):
                 _warn('It is recommended to run Indico on a subdomain instead of a subdirectory')
+                _warn('Unless you built your own indico package for the specified path, '
+                      'Indico will not work correctly!')
                 return False
             return True
 
