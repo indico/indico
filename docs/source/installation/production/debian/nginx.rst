@@ -159,7 +159,7 @@ most cases.
       }
 
       location /robots.txt {
-        alias /opt/indico/web/htdocs/robots.txt;
+        alias /opt/indico/web/static/robots.txt;
         access_log off;
       }
 

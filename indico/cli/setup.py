@@ -209,7 +209,7 @@ def create_symlinks(target_dir):
     updating Indico.
     """
     root_dir, target_dir = _get_dirs(target_dir)
-    _link(os.path.join(root_dir, 'htdocs'), os.path.join(target_dir, 'htdocs'))
+    _link(os.path.join(root_dir, 'web', 'static'), os.path.join(target_dir, 'static'))
     _copy(os.path.join(root_dir, 'web', 'indico.wsgi'), os.path.join(target_dir, 'indico.wsgi'), force=True)
 
 
@@ -605,7 +605,7 @@ class SetupWizard(object):
               os.path.join(self.config_dir_path, 'logging.yaml'))
 
         if not dev:
-            _link(os.path.join(package_root, 'htdocs'), os.path.join(self.data_root_path, 'web', 'htdocs'))
+            _link(os.path.join(package_root, 'web', 'static'), os.path.join(self.data_root_path, 'web', 'static'))
             _copy(os.path.join(package_root, 'web', 'indico.wsgi'),
                   os.path.join(self.data_root_path, 'web', 'indico.wsgi'),
                   force=True)

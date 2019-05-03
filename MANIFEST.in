@@ -3,7 +3,6 @@ recursive-include indico *.html *.tpl *.txt *.js *.yaml
 exclude indico/logging.yaml
 
 graft indico/core/plugins/alembic/
-graft indico/htdocs/
 graft indico/migrations/
 graft indico/translations/
 graft indico/web/static
