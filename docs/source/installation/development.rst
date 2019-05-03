@@ -268,9 +268,6 @@ Here is an example of a ``nginx.conf`` you can use. It assumes your username is 
 
             root /var/empty;
 
-            location ~ ^/static/assets/(core|(?:plugin|theme)-[^/]+)/(.*)$ {
-                alias /home/jdoe/dev/indico/data/assets/$1/$2;
-            }
 
             location ~ ^/(images|fonts)(.*)/(.+?)(__v[0-9a-f]+)?\.([^.]+)$ {
                 alias /home/jdoe/dev/indico/src/indico/web/static/$1$2/$3.$5;

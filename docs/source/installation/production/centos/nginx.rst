@@ -141,11 +141,6 @@ most cases.
         alias /opt/indico/;
       }
 
-      location ~ ^/static/assets/(core|(?:plugin|theme)-[^/]+)/(.*)$ {
-        alias /opt/indico/assets/$1/$2;
-        access_log off;
-      }
-
       location ~ ^/(images|fonts)(.*)/(.+?)(__v[0-9a-f]+)?\.([^.]+)$ {
         alias /opt/indico/web/static/$1$2/$3.$5;
         access_log off;

@@ -148,11 +148,6 @@ most cases.
         alias /opt/indico/;
       }
 
-      location ~ ^/static/assets/(core|(?:plugin|theme)-[^/]+)/(.*)$ {
-        alias /opt/indico/assets/$1/$2;
-        access_log off;
-      }
-
       location ~ ^/(images|fonts)(.*)/(.+?)(__v[0-9a-f]+)?\.([^.]+)$ {
         alias /opt/indico/web/static/$1$2/$3.$5;
         access_log off;
@@ -169,7 +164,7 @@ most cases.
       }
 
       location / {
-        root  /var/empty/nginx;
+        root /var/empty/nginx;
         include /etc/nginx/uwsgi_params;
         uwsgi_pass unix:/opt/indico/web/uwsgi.sock;
         uwsgi_param UWSGI_SCHEME $scheme;
