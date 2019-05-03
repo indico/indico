@@ -237,11 +237,11 @@ const _legendLabels = {
     other:
         {label: Translate.string('Other booking'), style: 'other'},
     rejections:
-        {label: Translate.string('Rejection'), style: 'rejection'},
+        {label: Translate.string('Rejected'), style: 'rejection'},
     cancellations:
-        {label: Translate.string('Cancellation'), style: 'cancellation'},
+        {label: Translate.string('Cancelled'), style: 'cancellation'},
     pendingCancellations:
-        {label: Translate.string('Pending cancellation'), style: 'pending-cancellation'},
+        {label: Translate.string('Will be cancelled'), style: 'pending-cancellation'},
     blockings:
         {label: Translate.string('Blocking'), style: 'blocking'},
     overridableBlockings:
