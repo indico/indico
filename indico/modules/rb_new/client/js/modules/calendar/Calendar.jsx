@@ -133,10 +133,9 @@ class Calendar extends React.Component {
     };
 
     getLegendLabels = (availability, showInactive) => {
-        const inactive = ['rejections', 'cancellations'];
+        const inactiveTypes = showInactive ? [] : ['rejections', 'cancellations'];
         const occurrenceTypes = availability.reduce((types, [, day]) => _.union(types, getOccurrenceTypes(day)), []);
-        const filtered = showInactive ? occurrenceTypes : occurrenceTypes.filter((type) => !inactive.includes(type));
-        return transformToLegendLabels(filtered);
+        return transformToLegendLabels(occurrenceTypes, inactiveTypes);
     };
 
     renderExtraButtons = () => {
