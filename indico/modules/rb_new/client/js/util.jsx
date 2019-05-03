@@ -269,10 +269,12 @@ const _orderedLabels = [
     'unbookableHours',
 ];
 
-export function transformToLegendLabels(occurrenceTypes) {
+export function transformToLegendLabels(occurrenceTypes, inactiveTypes = []) {
     return _orderedLabels.reduce((legend, type) => {
         const label = _legendLabels[type];
-        if (occurrenceTypes.includes(type) && !legend.some(legendLabel => legendLabel.style === label.style)) {
+        if (occurrenceTypes.includes(type) &&
+            !inactiveTypes.includes(type) &&
+            !legend.some(legendLabel => legendLabel.style === label.style)) {
             legend.push(_legendLabels[type]);
         }
         return legend;

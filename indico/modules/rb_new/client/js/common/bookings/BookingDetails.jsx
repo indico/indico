@@ -295,8 +295,9 @@ class BookingDetails extends React.Component {
     };
 
     getLegendLabels = (availability) => {
+        const inactiveTypes = ['blockings', 'overridableBlockings', 'nonbookablePeriods', 'unbookableHours'];
         const occurrenceTypes = getOccurrenceTypes(availability);
-        return transformToLegendLabels(occurrenceTypes);
+        return transformToLegendLabels(occurrenceTypes, inactiveTypes);
     };
 
     renderActionButtons = (canCancel, canReject, showAccept) => {
