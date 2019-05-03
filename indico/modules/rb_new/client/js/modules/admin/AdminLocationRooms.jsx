@@ -35,8 +35,14 @@ const SearchBar = searchBarFactory('admin', adminSelectors);
 function AdminLocationRooms({location, isFetching, filters: {text}}) {
     const [adding, setAdding] = useState(false);
 
-    if (!location || isFetching) {
+    if (isFetching) {
         return <ItemPlaceholder.Group count={10} />;
+    } else if (!location) {
+        return (
+            <Message error>
+                <Translate>This location does not exist.</Translate>
+            </Message>
+        );
     }
 
     let rooms = location.rooms;
