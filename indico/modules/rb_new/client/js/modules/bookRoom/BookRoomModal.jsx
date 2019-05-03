@@ -140,23 +140,23 @@ class BookRoomModal extends React.Component {
         resetRelatedEvents();
     }
 
-    renderBookingState({submitSucceeded, submitError, submitFailed, values}) {
-        const {actions: {openBookingDetails}} = this.props;
+    renderBookingState({submitSucceeded, submitError, submitFailed}) {
+        const {bookingData: {isPrebooking}, actions: {openBookingDetails}} = this.props;
         if (submitSucceeded) {
             const {booking} = this.state;
             const bookingLink = (
                 <a onClick={() => openBookingDetails(booking.id)} />
             );
             return (
-                <Message color={values.isPrebooking ? 'orange' : 'green'}>
+                <Message color={isPrebooking ? 'orange' : 'green'}>
                     <Message.Header>
-                        {values.isPrebooking ? (
+                        {isPrebooking ? (
                             <Translate>The space has been successfully pre-booked!</Translate>
                         ) : (
                             <Translate>The space has been successfully booked!</Translate>
                         )}
                     </Message.Header>
-                    {values.isPrebooking ? (
+                    {isPrebooking ? (
                         <Translate>
                             You can consult your pre-booking <Param name="link" wrapper={bookingLink}>here</Param>.
                         </Translate>
@@ -181,22 +181,7 @@ class BookRoomModal extends React.Component {
         }
     }
 
-    renderBookingButton(isPrebooking, bookingBlocked, {pristine, hasValidationErrors, form, submitting, values}) {
-        return (
-            <Button primary={!isPrebooking}
-                    color={isPrebooking ? 'orange' : null}
-                    disabled={bookingBlocked || pristine || hasValidationErrors}
-                    loading={submitting && values.isPrebooking === isPrebooking}
-                    type="submit"
-                    form="book-room-form"
-                    content={isPrebooking ? Translate.string('Create Pre-booking') : Translate.string('Create Booking')}
-                    onClick={() => {
-                        form.change('isPrebooking', isPrebooking);
-                    }} />
-        );
-    }
-
-    renderBookingConstraints(conflicts) {
+    renderBookingConstraints(conflicts, disabled) {
         const {skipConflicts} = this.state;
 
         return (
@@ -220,6 +205,7 @@ class BookRoomModal extends React.Component {
                 </Message>
                 <Segment attached="bottom">
                     <Checkbox toggle
+                              disabled={disabled}
                               defaultChecked={skipConflicts}
                               label={Translate.string('I understand, please skip any days with conflicting occurrences.')}
                               onChange={(__, {checked}) => {
@@ -367,6 +353,7 @@ class BookRoomModal extends React.Component {
                     <span styleName="description">{event.description}</span>
                     {this.renderEventLink(links[event.value])}
                     <Checkbox toggle
+                              disabled={disabled}
                               styleName="checkbox"
                               onChange={(__, {checked}) => {
                                   mutators.setEvent(checked ? event.value : undefined);
@@ -468,16 +455,15 @@ class BookRoomModal extends React.Component {
         const linkBack = !!link && !this.hasLinkConflict;
         const occurrenceCount = availability && availability.dateRange.length;
         const conflictsExist = availability && !!Object.keys(availability.conflicts).length;
-        const bookingBlocked = ({submitSucceeded}) => submitSucceeded;
         const isStartDtValid = isBookingStartDTValid(
             createDT(dates.startDate, timeSlot && timeSlot.startTime ? timeSlot.startTime : '00:00'),
             isAdminOverrideEnabled,
             bookingGracePeriod,
         );
 
-        const buttonsBlocked = (fprops) => (
+        const submitBlocked = (fprops) => (
             !isStartDtValid ||
-            bookingBlocked(fprops) ||
+            fprops.submitting || fprops.submitSucceeded || fprops.pristine || fprops.hasValidationErrors ||
             (conflictsExist && !skipConflicts)
         );
         const legendLabels = [
@@ -508,7 +494,7 @@ class BookRoomModal extends React.Component {
                         </Grid.Column>
                         <Grid.Column width={8}>
                             {isPrebooking && this.renderPrebookingMessage()}
-                            {link && this.renderLink(link, bookingBlocked(fprops))}
+                            {link && this.renderLink(link, fprops.submitSucceeded)}
                             <Form id="book-room-form" onSubmit={fprops.handleSubmit}>
                                 <Segment inverted color="blue">
                                     <h3>
@@ -521,13 +507,13 @@ class BookRoomModal extends React.Component {
                                                component={ReduxRadioField}
                                                as={Radio}
                                                componentLabel={Translate.string("I'll be using it myself")}
-                                               disabled={bookingBlocked(fprops)} />
+                                               disabled={fprops.submitSucceeded} />
                                         <Field name="usage"
                                                radioValue="someone"
                                                component={ReduxRadioField}
                                                as={Radio}
                                                componentLabel={Translate.string("I'm booking it for someone else")}
-                                               disabled={bookingBlocked(fprops)} />
+                                               disabled={fprops.submitSucceeded} />
                                     </Form.Group>
                                     <FieldCondition when="usage" is="someone">
                                         <FavoritesProvider>
@@ -536,7 +522,7 @@ class BookRoomModal extends React.Component {
                                                        component={ReduxFormField}
                                                        as={PrincipalField}
                                                        favoriteUsersController={favoriteUsersController}
-                                                       disabled={bookingBlocked(fprops)}
+                                                       disabled={fprops.submitSucceeded}
                                                        hideErrorWhileActive
                                                        withExternalUsers
                                                        required />
@@ -549,14 +535,20 @@ class BookRoomModal extends React.Component {
                                            format={formatters.trim}
                                            formatOnBlur
                                            placeholder={Translate.string('Reason for booking')}
-                                           disabled={bookingBlocked(fprops)}
+                                           disabled={fprops.submitSucceeded}
                                            required={reasonRequired} />
                                 </Segment>
                                 {!link && !fprops.submitSucceeded && (
-                                    this.renderRelatedEventsDropdown(bookingBlocked(fprops), fprops.form.mutators)
+                                    this.renderRelatedEventsDropdown(
+                                        fprops.submitSucceeded || fprops.submitting,
+                                        fprops.form.mutators
+                                    )
                                 )}
                             </Form>
-                            {conflictsExist && this.renderBookingConstraints(Object.values(availability.conflicts))}
+                            {conflictsExist && this.renderBookingConstraints(
+                                Object.values(availability.conflicts),
+                                fprops.submitting || fprops.submitSucceeded
+                            )}
                             {this.renderBookingState(fprops)}
                             {!isStartDtValid && (
                                 <Message color="red">
@@ -570,10 +562,21 @@ class BookRoomModal extends React.Component {
                     </Grid>
                 </Modal.Content>
                 <Modal.Actions>
-                    {this.renderBookingButton(isPrebooking, buttonsBlocked(fprops), fprops)}
-                    <Button type="button" onClick={this.onClose} content={(fprops.submitSucceeded
-                        ? Translate.string('Close')
-                        : Translate.string("I've changed my mind!"))} />
+                    <Button primary={!isPrebooking}
+                            color={isPrebooking ? 'orange' : null}
+                            disabled={submitBlocked(fprops)}
+                            loading={fprops.submitting}
+                            type="submit"
+                            form="book-room-form"
+                            content={
+                                isPrebooking
+                                    ? Translate.string('Create Pre-booking')
+                                    : Translate.string('Create Booking')} />
+                    <Button type="button" onClick={this.onClose}
+                            content={
+                                fprops.submitSucceeded
+                                    ? Translate.string('Close')
+                                    : Translate.string("I've changed my mind!")} />
                     <SingleRoomTimelineModal open={bookingConflictsVisible}
                                              onClose={this.hideConflicts}
                                              room={room}
@@ -586,9 +589,19 @@ class BookRoomModal extends React.Component {
 
         return (
             <Modal open onClose={this.onClose} size="large" closeIcon>
-                <FinalForm onSubmit={this.submitBooking} validate={(values) => validate(values, reasonRequired)}
-                           decorators={[formDecorator]} render={renderModalContent}
+                <FinalForm onSubmit={this.submitBooking}
+                           validate={(values) => validate(values, reasonRequired)}
+                           decorators={[formDecorator]}
+                           render={renderModalContent}
                            initialValues={{user: null, linkBack}}
+                           subscription={{
+                               submitSucceeded: true,
+                               submitError: true,
+                               submitFailed: true,
+                               submitting: true,
+                               hasValidationErrors: true,
+                               pristine: true,
+                           }}
                            mutators={{setEvent: ([event], state, {changeValue}) => {
                                changeValue(state, 'event', () => event);
                            }}} />
