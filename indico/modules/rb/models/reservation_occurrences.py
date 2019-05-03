@@ -113,6 +113,10 @@ class ReservationOccurrence(db.Model, Serializer):
     def is_rejected(self):
         return self.state == ReservationOccurrenceState.rejected
 
+    @hybrid_property
+    def is_within_cancel_grace_period(self):
+        return self.start_dt >= datetime.now() - timedelta(minutes=10)
+
     @return_ascii
     def __repr__(self):
         return format_repr(self, 'reservation_id', 'start_dt', 'end_dt', 'state')
@@ -195,7 +199,7 @@ class ReservationOccurrence(db.Model, Serializer):
         booked_or_owned_by_user = booking.is_owned_by(user) or booking.is_booked_for(user)
         if booking.is_rejected or booking.is_cancelled or booking.is_archived:
             return False
-        if booked_or_owned_by_user and self.start_dt >= datetime.now() - timedelta(minutes=10):  # grace period
+        if booked_or_owned_by_user and self.is_within_cancel_grace_period:
             return True
         return allow_admin and rb_is_admin(user)
 
