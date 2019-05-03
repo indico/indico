@@ -81,15 +81,3 @@ Utilities
 .. automodule:: indico.modules.rb.statistics
     :members:
     :undoc-members:
-
-
-Services
-++++++++
-
-.. automodule:: indico.modules.rb.services.rooms
-    :members:
-    :undoc-members:
-
-.. automodule:: indico.modules.rb.services.blockings
-    :members:
-    :undoc-members:

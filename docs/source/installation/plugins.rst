@@ -1,3 +1,4 @@
+.. _installation-plugins:
 Plugins
 =======
 
@@ -27,7 +28,7 @@ Now install the package which will automatically install our plugins:
     update all the plugins separately.
 
 
-You can use the ``indico setup list_plugins`` command to see which plugins
+You can use the ``indico setup list-plugins`` command to see which plugins
 are installed and which name to use in the config file to load them.
 
 To enable plugins, add a ``PLUGINS`` entry to ``/opt/indico/etc/indico.conf``.

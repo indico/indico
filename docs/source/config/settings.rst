@@ -720,10 +720,10 @@ System
 
 .. data:: PLUGINS
 
-    The list of :doc:`Indico plugins <plugins>` to enable.
+    The list of :ref:`Indico plugins <installation-plugins>` to enable.
 
     A list of all installed plugins can be displayed by the
-    ``indico setup list_plugins`` command; see the guide linked above
+    ``indico setup list-plugins`` command; see the guide linked above
     for details on how to enable plugins.
 
     Default: ``set()``

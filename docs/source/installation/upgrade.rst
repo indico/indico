@@ -116,7 +116,7 @@ SanitizationLevel    *removed*
 
 The format of the logging config changed. The old file ``/opt/indico/etc/logging.conf``
 is not used anymore and can be deleted.
-Run ``indico setup create_logging_config /opt/indico/etc/``  to create the new
+Run ``indico setup create-logging-config /opt/indico/etc/``  to create the new
 ``logging.yaml`` which can then be customized if needed.
 
 .. _in the code: https://github.com/indico/indico/blob/master/indico/core/config.py#L40
