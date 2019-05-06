@@ -54,6 +54,15 @@ Internal Changes
 
 
 ----
+Version 2.1.9
+-------------
+
+*Unreleased*
+
+Bugfixes
+^^^^^^^^
+
+- Fix bug in calendar view, due to timezones (:issue:`3903`)
 
 Version 2.1.8
 -------------
