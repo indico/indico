@@ -35,7 +35,8 @@ let entryPoints = {
     markdown: ['./js/jquery/markdown.js'],
     mathjax: ['./js/jquery/compat/mathjax.js'],
     statistics: ['./js/jquery/statistics.js'],
-    fonts: ['./styles/partials/_fonts.scss']
+    fonts: ['./styles/partials/_fonts.scss'],
+    outdatedbrowser: ['./js/outdatedbrowser.js']
 };
 
 const modulesDir = path.join(config.build.rootPath, '..', 'node_modules');

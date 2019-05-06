@@ -6,12 +6,12 @@
 </div>
 
 <script>
-    $(document).ready(function() {
+    window.addEventListener('load', function() {
         outdatedBrowser({
             bgColor: '#0b63a5',
             color: '#ffffff',
-            lowerThan: 'IE11',
+            lowerThan: 'object-fit', // Edge
             languagePath: ''
-        });
-    })
+        })
+    });
 </script>

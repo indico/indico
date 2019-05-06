@@ -25,7 +25,7 @@ class WPRoomBookingBase(WPNewBase):
     template_prefix = 'rb/'
     title = _('Room Booking')
     bundles = ('common.js', 'common.css', 'react.js', 'react.css', 'semantic-ui.js', 'semantic-ui.css',
-               'module_rb_new.js', 'module_rb_new.css')
+               'module_rb_new.js', 'module_rb_new.css', 'outdatedbrowser.js', 'outdatedbrowser.css')
 
 
 class WPEventBookingList(WPEventManagement):
