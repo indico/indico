@@ -1,5 +1,5 @@
 /* This file is part of Indico.
- * Copyright (C) 2002 - 2018 European Organization for Nuclear Research (CERN).
+ * Copyright (C) 2002 - 2019 European Organization for Nuclear Research (CERN).
  *
  * Indico is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -15,10 +15,9 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import '@babel/polyfill';
+import 'outdatedbrowser/outdatedbrowser/outdatedbrowser.css';
 
-import './legacy/presentation.js';
-import './legacy/indico.js';
-import './legacy/timetable.js';
 
-import '../styles/screen.scss';
+// outdatedbrowser has to be loaded with exports-loader
+// in order to be available from 'window.outdatedBrowser'
+window.outdatedBrowser = require('exports-loader?outdatedBrowser!outdatedbrowser');
