@@ -271,7 +271,7 @@ class WPBase(WPBundleMixin):
 
 class WPNewBase(WPJinjaMixin):
     title = ''
-    bundles = ()
+    bundles = ('outdatedbrowser.js', 'outdatedbrowser.css')
     print_bundles = tuple()
 
     @classproperty
