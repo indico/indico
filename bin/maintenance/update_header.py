@@ -18,9 +18,9 @@ from __future__ import print_function, unicode_literals
 
 import os
 import re
+import subprocess
 import sys
 from datetime import date
-from subprocess import CalledProcessError, check_output
 
 from indico.util.console import cformat
 
@@ -120,6 +120,7 @@ def gen_header(project, data, end_year):
 
 
 def _update_header(project, file_path, year, substring, regex, data):
+    found = False
     with open(file_path, 'rb') as file_read:
         content = orig_content = file_read.read()
         if not content.strip():
@@ -129,13 +130,16 @@ def _update_header(project, file_path, year, substring, regex, data):
             shebang_line, content = content.split('\n', 1)
         for match in regex.finditer(content):
             if substring in match.group():
+                found = True
                 content = content[:match.start()] + gen_header(project, data, year) + content[match.end():]
         if shebang_line:
             content = shebang_line + '\n' + content
     if content != orig_content:
-        print(cformat('%{green}Updating header of %{green!}{}').format(os.path.relpath(file_path)))
+        print(cformat('%{green!}Updating header of %{blue!}{}').format(os.path.relpath(file_path)))
         with open(file_path, 'wb') as file_write:
             file_write.write(content)
+    elif not found:
+        print(cformat('%{yellow}Missing header in %{yellow!}{}').format(os.path.relpath(file_path)))
 
 
 def update_header(project, file_path, year):
@@ -170,6 +174,18 @@ def _process_args(args):
         sys.exit(1)
 
 
+def blacklisted(root, path, _cache={}):
+    orig_path = path
+    if path not in _cache:
+        _cache[orig_path] = False
+        while (path + os.path.sep).startswith(root):
+            if os.path.exists(os.path.join(path, '.no-headers')):
+                _cache[orig_path] = True
+                break
+            path = os.path.normpath(os.path.join(path, '..'))
+    return _cache[orig_path]
+
+
 def main():
     if '-h' in sys.argv[1:] or '--help' in sys.argv[1:] or not sys.argv[1:]:
         print(USAGE)
@@ -182,7 +198,8 @@ def main():
                       "%{yellow!}{path}%{reset}...").format(year=year, path=path))
         for root, _, filenames in os.walk(path):
             for filename in filenames:
-                update_header(project, os.path.join(root, filename), year)
+                if not blacklisted(path, root):
+                    update_header(project, os.path.join(root, filename), year)
     elif file_ is not None:
         print(cformat("Updating headers to the year %{yellow!}{year}%{reset} for the file "
                       "%{yellow!}{file}%{reset}...").format(year=year, file=file_))
@@ -191,9 +208,11 @@ def main():
         print(cformat("Updating headers to the year %{yellow!}{year}%{reset} for all "
                       "git-tracked files...").format(year=year))
         try:
-            for path in check_output(['git', 'ls-files']).splitlines():
-                update_header(project, os.path.abspath(path), year)
-        except CalledProcessError:
+            for path in subprocess.check_output(['git', 'ls-files']).splitlines():
+                path = os.path.abspath(path)
+                if not blacklisted(os.getcwd(), os.path.dirname(path)):
+                    update_header(project, path, year)
+        except subprocess.CalledProcessError:
             print(cformat('%{red!}[ERROR] you must be within a git repository to run this script.'), file=sys.stderr)
             print(USAGE)
             sys.exit(1)
