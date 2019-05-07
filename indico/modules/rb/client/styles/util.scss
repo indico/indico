@@ -41,6 +41,39 @@ $sui-font-family: Muli, 'Helvetica Neue', Arial, Helvetica, sans-serif;
     );
 }
 
+@mixin left-fade-out($base, $fade) {
+    background-image: linear-gradient(to right, $fade, $base 30px);
+}
+
+@mixin right-fade-out($base, $fade) {
+    background-image: linear-gradient(to left, $fade, $base 30px);
+}
+
+@mixin fade-out($base, $fade) {
+    background-image:
+    linear-gradient(to left, $fade, $base 30px, $base 50%, rgba(1, 1, 1, 0) 51%),
+    linear-gradient(to right, $fade, $base 30px, $base 50%, rgba(1, 1, 1, 0) 51%);
+}
+
+@mixin right-fade-out-stripes($first, $second) {
+    background-image:
+    linear-gradient(to left, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0) 30px),
+    repeating-linear-gradient(45deg, $first, $first 10px, $second 10px, $second 20px);
+}
+
+@mixin left-fade-out-stripes($first, $second) {
+    background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0) 30px),
+    repeating-linear-gradient(45deg, $first, $first 10px, $second 10px, $second 20px);
+}
+
+@mixin fade-out-stripes($first, $second) {
+    background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0) 30px),
+    linear-gradient(to right, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0) 30px),
+    repeating-linear-gradient(45deg, $first, $first 10px, $second 10px, $second 20px);
+}
+
 @mixin remaining-screen-height() {
     height: calc(100vh - (#{$indico-top-bar-height} + #{$menu-height} + var(--extra-bars, 0) * 50px));
 }
