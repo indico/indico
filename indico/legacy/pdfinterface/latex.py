@@ -138,7 +138,7 @@ class LatexRunner(object):
             Logger.get('pdflatex').debug("PDF created successfully!")
 
         except subprocess.CalledProcessError:
-            Logger.get('pdflatex').warning('PDF creation possibly failed (non-zero exit code)!')
+            Logger.get('pdflatex').debug('PDF creation possibly failed (non-zero exit code)!')
             # Only fail if we are in strict mode
             if config.STRICT_LATEX:
                 # flush log, go to beginning and read it
