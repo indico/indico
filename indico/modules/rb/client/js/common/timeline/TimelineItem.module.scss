@@ -51,7 +51,6 @@
 
         &:global(.pre-booking-conflict) {
             @include stripes($pre-booking-conflict-stripe-colors...);
-            background-size: 35px 35px;
         }
 
         &:global(.conflicting-candidates) {
