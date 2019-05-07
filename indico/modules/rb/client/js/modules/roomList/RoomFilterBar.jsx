@@ -174,7 +174,8 @@ export class RoomFilterBarBase extends React.Component {
                     {!hideOptions.equipment && equipmentFilter}
                     <Overridable id="RoomFilterBar.extraFilters"
                                  setFilter={setFilterParameter}
-                                 filters={extraFilters} />
+                                 filters={extraFilters}
+                                 disabled={disabled} />
                     {!hideShowOnlyForm && (
                         <FilterDropdownFactory name="room-different"
                                                title={<Translate>Show only...</Translate>}
