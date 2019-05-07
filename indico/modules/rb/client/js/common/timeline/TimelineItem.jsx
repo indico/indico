@@ -224,9 +224,14 @@ class TimelineItem extends React.Component {
                 </div>
             );
         }
-
         const clickable = (onClickCandidate && bookable && type === 'candidate') ||
                           (onClickReservation && reservationTypes.has(type));
+        const notOverflowing = ['blocking', 'overridable-blocking', 'unbookable-periods', 'unbookable-hours'];
+        const overflowLeft = (!notOverflowing.includes(type) &&
+                                 ((segmentStartDt.hours() * 60) + segmentStartDt.minutes()) < (startHour * 60));
+        const overflowRight = (!notOverflowing.includes(type) &&
+                                 ((segmentEndDt.hours() * 60) + segmentEndDt.minutes()) > (endHour * 60));
+        const styleName = `timeline-occurrence ${overflowRight ? 'overflow-right' : ''} ${overflowLeft ? 'overflow-left' : ''}`;
         const segment = (
             <div className={`${additionalClasses} ${clickable ? 'clickable' : ''}`} onClick={() => {
                 if (onClickCandidate && bookable && type === 'candidate') {
@@ -235,7 +240,7 @@ class TimelineItem extends React.Component {
                     onClickReservation(reservation.id);
                 }
             }}
-                 styleName="timeline-occurrence"
+                 styleName={styleName}
                  style={{left: `${segmentPosition}%`, width: `${segmentWidth}%`}} />
         );
 
