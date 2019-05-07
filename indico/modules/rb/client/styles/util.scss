@@ -11,16 +11,7 @@ $rb-content-padding: 2em;
 $sui-font-family: Muli, 'Helvetica Neue', Arial, Helvetica, sans-serif;
 
 @mixin stripes($first, $second) {
-    background-image: linear-gradient(
-        45deg,
-        $first 25%,
-        $second 25%,
-        $second 50%,
-        $first 50%,
-        $first 75%,
-        $second 75%,
-        $second 100%
-    );
+    background-image: repeating-linear-gradient(45deg, $first, $first 15px, $second 15px, $second 30px);
 }
 
 @mixin thin-stripes($first, $second) {
@@ -58,20 +49,20 @@ $sui-font-family: Muli, 'Helvetica Neue', Arial, Helvetica, sans-serif;
 @mixin right-fade-out-stripes($first, $second) {
     background-image:
     linear-gradient(to left, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0) 30px),
-    repeating-linear-gradient(45deg, $first, $first 10px, $second 10px, $second 20px);
+    repeating-linear-gradient(45deg, $first, $first 15px, $second 15px, $second 30px);
 }
 
 @mixin left-fade-out-stripes($first, $second) {
     background-image:
     linear-gradient(to right, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0) 30px),
-    repeating-linear-gradient(45deg, $first, $first 10px, $second 10px, $second 20px);
+    repeating-linear-gradient(45deg, $first, $first 15px, $second 15px, $second 30px);
 }
 
 @mixin fade-out-stripes($first, $second) {
     background-image:
     linear-gradient(to right, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0) 30px),
-    linear-gradient(to right, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0) 30px),
-    repeating-linear-gradient(45deg, $first, $first 10px, $second 10px, $second 20px);
+    linear-gradient(to left, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0) 30px),
+    repeating-linear-gradient(45deg, $first, $first 15px, $second 15px, $second 30px);
 }
 
 @mixin remaining-screen-height() {
