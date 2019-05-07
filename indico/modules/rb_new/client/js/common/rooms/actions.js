@@ -15,11 +15,11 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import fetchEquipmentTypesURL from 'indico-url:rooms_new.equipment_types';
-import fetchRoomURL from 'indico-url:rooms_new.room';
-import fetchRoomsURL from 'indico-url:rooms_new.rooms';
-import fetchRoomAvailabilityURL from 'indico-url:rooms_new.room_availability';
-import fetchRoomAttributesURL from 'indico-url:rooms_new.room_attributes';
+import fetchEquipmentTypesURL from 'indico-url:rb.equipment_types';
+import fetchRoomURL from 'indico-url:rb.room';
+import fetchRoomsURL from 'indico-url:rb.rooms';
+import fetchRoomAvailabilityURL from 'indico-url:rb.room_availability';
+import fetchRoomAttributesURL from 'indico-url:rb.room_attributes';
 
 import {indicoAxios} from 'indico/utils/axios';
 import {camelizeKeys} from 'indico/utils/case';

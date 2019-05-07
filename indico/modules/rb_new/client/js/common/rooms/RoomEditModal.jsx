@@ -15,15 +15,15 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import roomURL from 'indico-url:rooms_new.admin_room';
-import roomsURL from 'indico-url:rooms_new.admin_rooms';
-import fetchRoomAttributesURL from 'indico-url:rooms_new.admin_room_attributes';
-import fetchAttributesURL from 'indico-url:rooms_new.admin_attributes';
-import fetchRoomAvailabilityURL from 'indico-url:rooms_new.admin_room_availability';
-import fetchRoomEquipmentURL from 'indico-url:rooms_new.admin_room_equipment';
-import updateRoomEquipmentURL from 'indico-url:rooms_new.admin_update_room_equipment';
-import updateRoomAttributesURL from 'indico-url:rooms_new.admin_update_room_attributes';
-import updateRoomAvailabilityURL from 'indico-url:rooms_new.admin_update_room_availability';
+import roomURL from 'indico-url:rb.admin_room';
+import roomsURL from 'indico-url:rb.admin_rooms';
+import fetchRoomAttributesURL from 'indico-url:rb.admin_room_attributes';
+import fetchAttributesURL from 'indico-url:rb.admin_attributes';
+import fetchRoomAvailabilityURL from 'indico-url:rb.admin_room_availability';
+import fetchRoomEquipmentURL from 'indico-url:rb.admin_room_equipment';
+import updateRoomEquipmentURL from 'indico-url:rb.admin_update_room_equipment';
+import updateRoomAttributesURL from 'indico-url:rb.admin_update_room_attributes';
+import updateRoomAvailabilityURL from 'indico-url:rb.admin_update_room_availability';
 
 import _ from 'lodash';
 import React from 'react';

@@ -15,12 +15,12 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import fetchBlockingsURL from 'indico-url:rooms_new.blockings';
-import fetchBlockingURL from 'indico-url:rooms_new.blocking';
-import createBlockingURL from 'indico-url:rooms_new.create_blocking';
-import updateBlockingURL from 'indico-url:rooms_new.update_blocking';
-import blockingActionsURL from 'indico-url:rooms_new.blocking_actions';
-import deleteBlockingURL from 'indico-url:rooms_new.delete_blocking';
+import fetchBlockingsURL from 'indico-url:rb.blockings';
+import fetchBlockingURL from 'indico-url:rb.blocking';
+import createBlockingURL from 'indico-url:rb.create_blocking';
+import updateBlockingURL from 'indico-url:rb.update_blocking';
+import blockingActionsURL from 'indico-url:rb.blocking_actions';
+import deleteBlockingURL from 'indico-url:rb.delete_blocking';
 
 import {indicoAxios} from 'indico/utils/axios';
 import {ajaxAction, submitFormAction} from 'indico/utils/redux';

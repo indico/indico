@@ -15,7 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import bookingEditTimelineURL from 'indico-url:rooms_new.booking_edit_calendars';
+import bookingEditTimelineURL from 'indico-url:rb.booking_edit_calendars';
 
 import React from 'react';
 import PropTypes from 'prop-types';

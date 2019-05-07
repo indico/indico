@@ -15,11 +15,11 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import createBookingURL from 'indico-url:rooms_new.create_booking';
-import fetchTimelineURL from 'indico-url:rooms_new.timeline';
-import fetchSuggestionsURL from 'indico-url:rooms_new.suggestions';
-import searchRoomsURL from 'indico-url:rooms_new.search_rooms';
-import fetchEventsURL from 'indico-url:rooms_new.events';
+import createBookingURL from 'indico-url:rb.create_booking';
+import fetchTimelineURL from 'indico-url:rb.timeline';
+import fetchSuggestionsURL from 'indico-url:rb.suggestions';
+import searchRoomsURL from 'indico-url:rb.search_rooms';
+import fetchEventsURL from 'indico-url:rb.events';
 
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {ajaxAction, submitFormAction} from 'indico/utils/redux';

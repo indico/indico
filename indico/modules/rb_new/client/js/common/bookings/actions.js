@@ -15,11 +15,11 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import fetchBookingDetailsURL from 'indico-url:rooms_new.booking_details';
-import bookingStateActionsURL from 'indico-url:rooms_new.booking_state_actions';
-import bookingDeleteURL from 'indico-url:rooms_new.delete_booking';
-import bookingUpdateURL from 'indico-url:rooms_new.update_booking';
-import bookingOccurrenceStateActionsURL from 'indico-url:rooms_new.booking_occurrence_state_actions';
+import fetchBookingDetailsURL from 'indico-url:rb.booking_details';
+import bookingStateActionsURL from 'indico-url:rb.booking_state_actions';
+import bookingDeleteURL from 'indico-url:rb.delete_booking';
+import bookingUpdateURL from 'indico-url:rb.update_booking';
+import bookingOccurrenceStateActionsURL from 'indico-url:rb.booking_occurrence_state_actions';
 
 import {indicoAxios} from 'indico/utils/axios';
 import {ajaxAction, submitFormAction} from 'indico/utils/redux';

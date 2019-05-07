@@ -35,20 +35,20 @@ from indico.web.menu import SideMenuItem, TopMenuItem
 @signals.menu.items.connect_via('admin-sidemenu')
 def _extend_admin_menu(sender, **kwargs):
     if config.ENABLE_ROOMBOOKING and session.user.is_admin:
-        url = url_for('rooms_new.roombooking', path='admin')
+        url = url_for('rb.roombooking', path='admin')
         return SideMenuItem('rb', _('Room Booking'), url, 70, icon='location')
 
 
 @signals.menu.items.connect_via('top-menu')
 def _topmenu_items(sender, **kwargs):
     if config.ENABLE_ROOMBOOKING:
-        yield TopMenuItem('rb_new', _('Room booking'), url_for('rooms_new.roombooking'), 80)
+        yield TopMenuItem('rb_new', _('Room booking'), url_for('rb.roombooking'), 80)
 
 
 @signals.menu.items.connect_via('event-management-sidemenu')
 def _sidemenu_items(sender, event, **kwargs):
     if config.ENABLE_ROOMBOOKING and event.can_manage(session.user):
-        yield SideMenuItem('room_booking', _('Room Booking'), url_for('rooms_new.event_booking_list', event), 50,
+        yield SideMenuItem('room_booking', _('Room Booking'), url_for('rb.event_booking_list', event), 50,
                            icon='location')
 
 

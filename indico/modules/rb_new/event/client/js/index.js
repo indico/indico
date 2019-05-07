@@ -15,7 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import rbURL from 'indico-url:rooms_new.roombooking';
+import rbURL from 'indico-url:rb.roombooking';
 
 import {serializeDate, serializeTime} from 'indico/utils/date';
 

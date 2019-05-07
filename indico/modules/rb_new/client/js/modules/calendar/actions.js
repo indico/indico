@@ -15,9 +15,9 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import fetchActiveBookingsURL from 'indico-url:rooms_new.active_bookings';
-import fetchCalendarURL from 'indico-url:rooms_new.calendar';
-import searchRoomsURL from 'indico-url:rooms_new.search_rooms';
+import fetchActiveBookingsURL from 'indico-url:rb.active_bookings';
+import fetchCalendarURL from 'indico-url:rb.calendar';
+import searchRoomsURL from 'indico-url:rb.search_rooms';
 
 import _ from 'lodash';
 import moment from 'moment';

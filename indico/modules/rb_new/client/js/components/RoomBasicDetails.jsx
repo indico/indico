@@ -15,7 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import roomImageURL from 'indico-url:rooms_new.room_photo';
+import roomImageURL from 'indico-url:rb.room_photo';
 
 import React from 'react';
 import PropTypes from 'prop-types';

@@ -3,4 +3,4 @@
 --
 Best regards,
 Indico :: Room Booking
-{{ url_for('rooms_new.roombooking', _external=true) }}
+{{ url_for('rb.roombooking', _external=true) }}

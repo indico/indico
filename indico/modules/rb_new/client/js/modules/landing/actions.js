@@ -15,8 +15,8 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import fetchStatsURL from 'indico-url:rooms_new.stats';
-import fetchUpcomingBookingsURL from 'indico-url:rooms_new.my_bookings';
+import fetchStatsURL from 'indico-url:rb.stats';
+import fetchUpcomingBookingsURL from 'indico-url:rb.my_bookings';
 import {indicoAxios} from 'indico/utils/axios';
 import {ajaxAction} from 'indico/utils/redux';
 

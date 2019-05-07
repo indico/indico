@@ -25,7 +25,7 @@ from indico.web.flask.util import url_for
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
-_bp = IndicoBlueprint('rooms_new', __name__, template_folder='../rb/templates', virtual_template_folder='rb',
+_bp = IndicoBlueprint('rb', __name__, template_folder='../rb/templates', virtual_template_folder='rb',
                       url_prefix='/rooms')
 
 # Frontend
@@ -134,19 +134,19 @@ _bp.add_url_rule('!/event/<confId>/manage/rooms/linking/session-blocks', 'event_
 # Deep/quick links
 @_bp.route('/room/<int:room_id>')
 def room_link(room_id):
-    return redirect(url_for('rooms_new.roombooking', modal='room-details:{}'.format(room_id)))
+    return redirect(url_for('rb.roombooking', modal='room-details:{}'.format(room_id)))
 
 
 @_bp.route('/booking/<int:booking_id>')
 def booking_link(booking_id):
-    return redirect(url_for('rooms_new.roombooking', modal='booking-details:{}'.format(booking_id)))
+    return redirect(url_for('rb.roombooking', modal='booking-details:{}'.format(booking_id)))
 
 
 @_bp.route('/my-bookings')
 def my_bookings_link():
-    return redirect(url_for('rooms_new.roombooking', path='calendar', view='list', my_bookings='true'))
+    return redirect(url_for('rb.roombooking', path='calendar', view='list', my_bookings='true'))
 
 
 @_bp.route('/blocking/<int:blocking_id>')
 def blocking_link(blocking_id):
-    return redirect(url_for('rooms_new.roombooking', path='blockings', modal='blocking-details:{}'.format(blocking_id)))
+    return redirect(url_for('rb.roombooking', path='blockings', modal='blocking-details:{}'.format(blocking_id)))

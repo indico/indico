@@ -15,7 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import getLinkedObjectDataURL from 'indico-url:rooms_new.linked_object_data';
+import getLinkedObjectDataURL from 'indico-url:rb.linked_object_data';
 
 import _ from 'lodash';
 import React from 'react';

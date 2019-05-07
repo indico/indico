@@ -15,7 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import getMapAreasURL from 'indico-url:rooms_new.map_areas';
+import getMapAreasURL from 'indico-url:rb.map_areas';
 
 import {indicoAxios} from 'indico/utils/axios';
 import {ajaxAction} from 'indico/utils/redux';

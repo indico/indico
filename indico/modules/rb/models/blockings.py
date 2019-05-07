@@ -124,7 +124,7 @@ class Blocking(db.Model):
 
     @property
     def external_details_url(self):
-        return url_for('rooms_new.blocking_link', blocking_id=self.id, _external=True)
+        return url_for('rb.blocking_link', blocking_id=self.id, _external=True)
 
     @return_ascii
     def __repr__(self):

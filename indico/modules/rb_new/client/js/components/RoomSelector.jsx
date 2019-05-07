@@ -19,7 +19,7 @@ import _ from 'lodash';
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Button, Dropdown, Grid, Icon, List, Message, Segment} from 'semantic-ui-react';
-import getLocationsURL from 'indico-url:rooms_new.locations';
+import getLocationsURL from 'indico-url:rb.locations';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {Translate} from 'indico/react/i18n';
 import {camelizeKeys} from 'indico/utils/case';

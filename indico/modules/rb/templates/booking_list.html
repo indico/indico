@@ -17,7 +17,7 @@
                 </div>
                 <div class="toolbar">
                     {% set title = _('Event has already finished') %}
-                    <a href="{{ url_for('rooms_new.roombooking', path='book', **event_rb_params) }}"
+                    <a href="{{ url_for('rb.roombooking', path='book', **event_rb_params) }}"
                        target="_blank" class="i-button highlight {{ 'disabled' if is_past_event }}"
                        title="{{ title if is_past_event }}">
                         {%- trans %}Book{% endtrans -%}
@@ -118,7 +118,7 @@
 {% endblock %}
 
 {% macro booking_details_link(reservation) %}
-    <a href="{{ url_for('rooms_new.roombooking', path='calendar', modal='booking-details:{}'.format(reservation.id)) }}"
+    <a href="{{ url_for('rb.roombooking', path='calendar', modal='booking-details:{}'.format(reservation.id)) }}"
        target="_blank"
        class="icon-arrow-right-sparse action-icon"
        title="{% trans %}See details{% endtrans %}"></a>

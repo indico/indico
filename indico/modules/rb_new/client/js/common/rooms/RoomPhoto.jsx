@@ -15,7 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import roomPhotoURL from 'indico-url:rooms_new.admin_room_photo';
+import roomPhotoURL from 'indico-url:rb.admin_room_photo';
 
 import React, {useCallback, useState, useEffect, useRef} from 'react';
 import {connect} from 'react-redux';

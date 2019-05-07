@@ -15,7 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import roomsSpriteURL from 'indico-url:rooms_new.sprite';
+import roomsSpriteURL from 'indico-url:rb.sprite';
 
 import React from 'react';
 import PropTypes from 'prop-types';

@@ -304,7 +304,7 @@ class Room(ProtectionManagersMixin, db.Model, Serializer):
     def details_url(self):
         if self.id is None:
             return None
-        return url_for('rooms_new.room_link', room_id=self.id)
+        return url_for('rb.room_link', room_id=self.id)
 
     @property
     def map_url(self):

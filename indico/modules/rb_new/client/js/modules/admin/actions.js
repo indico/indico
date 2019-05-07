@@ -15,13 +15,13 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import settingsURL from 'indico-url:rooms_new.admin_settings';
-import locationsURL from 'indico-url:rooms_new.admin_locations';
-import roomsURL from 'indico-url:rooms_new.admin_rooms';
-import roomURL from 'indico-url:rooms_new.admin_room';
-import equipmentTypesURL from 'indico-url:rooms_new.admin_equipment_types';
-import featuresURL from 'indico-url:rooms_new.admin_features';
-import attributesURL from 'indico-url:rooms_new.admin_attributes';
+import settingsURL from 'indico-url:rb.admin_settings';
+import locationsURL from 'indico-url:rb.admin_locations';
+import roomsURL from 'indico-url:rb.admin_rooms';
+import roomURL from 'indico-url:rb.admin_room';
+import equipmentTypesURL from 'indico-url:rb.admin_equipment_types';
+import featuresURL from 'indico-url:rb.admin_features';
+import attributesURL from 'indico-url:rb.admin_attributes';
 
 import _ from 'lodash';
 

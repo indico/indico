@@ -15,8 +15,8 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import rbURL from 'indico-url:rooms_new.roombooking';
-import checkRoomAvailabilityURL from 'indico-url:rooms_new.check_room_available';
+import rbURL from 'indico-url:rb.roombooking';
+import checkRoomAvailabilityURL from 'indico-url:rb.check_room_available';
 
 import {camelizeKeys} from 'indico/utils/case';
 

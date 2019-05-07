@@ -15,7 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import fetchConfigURL from 'indico-url:rooms_new.config';
+import fetchConfigURL from 'indico-url:rb.config';
 import {indicoAxios} from 'indico/utils/axios';
 import {ajaxAction} from 'indico/utils/redux';
 
