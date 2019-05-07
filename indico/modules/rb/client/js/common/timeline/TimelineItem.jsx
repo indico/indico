@@ -16,7 +16,7 @@ import './TimelineItem.module.scss';
 
 
 const classes = {
-    candidates: 'default',
+    candidates: 'available',
     preBookings: 'pre-booking',
     preConflicts: 'pre-booking-conflict',
     bookings: 'booking',

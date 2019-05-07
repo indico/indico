@@ -24,17 +24,12 @@
         border-radius: 0;
         border: 0.5px solid rgba(0, 0, 0, 0.2);
 
-        &:global(.default) {
-            background-color: $available-color;
-        }
-
         &:hover:not(:global(.other)) {
             opacity: 0.75;
         }
 
         &:global(.pre-booking) {
             @include stripes($pre-booking-stripe-colors...);
-            background-size: 35px 35px;
         }
 
         &:global(.available) {
