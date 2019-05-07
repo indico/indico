@@ -16,21 +16,19 @@
 
 from __future__ import unicode_literals
 
-from flask import session
-from werkzeug.exceptions import Forbidden, NotFound
-
-from indico.core.config import config
-from indico.modules.rb.util import rb_check_user_access
+from indico.modules.events.management.views import WPEventManagement
 from indico.util.i18n import _
-from indico.web.rh import RHProtected
+from indico.web.views import WPNewBase
 
 
-class RHRoomBookingBase(RHProtected):
-    """Base class for room booking RHs"""
+class WPRoomBookingBase(WPNewBase):
+    template_prefix = 'rb/'
+    title = _('Room Booking')
+    bundles = ('common.js', 'common.css', 'react.js', 'react.css', 'semantic-ui.js', 'semantic-ui.css',
+               'module_rb.js', 'module_rb.css')
 
-    def _check_access(self):
-        if not config.ENABLE_ROOMBOOKING:
-            raise NotFound(_('The room booking module is not enabled.'))
-        RHProtected._check_access(self)
-        if not rb_check_user_access(session.user):
-            raise Forbidden(_('You are not authorized to access the room booking system.'))
+
+class WPEventBookingList(WPEventManagement):
+    template_prefix = 'rb/'
+    sidemenu_option = 'room_booking'
+    bundles = ('module_rb.event.js', 'module_rb.css')

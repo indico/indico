@@ -17,8 +17,40 @@
 
 @import 'rb:styles/palette';
 
-.field-error {
-    color: $red !important;
-    border-color: $red !important;
-    font-weight: bold;
+:global(.ui.icon.message).message-icon :global(.icon) {
+    font-size: 2em;
+}
+
+.popup-center {
+    text-align: center;
+}
+
+.log-list {
+    max-height: 140px;
+    overflow: auto;
+}
+
+.log-date {
+    color: $gray;
+}
+
+.booking-logs {
+    margin-top: 20px;
+}
+
+:global(.ui.modal .header).booking-modal-header {
+    display: flex;
+
+    .header-text {
+        flex: 1;
+        align-self: center;
+    }
+
+    .booking-status {
+        flex: 4;
+    }
+}
+
+.rejection-form {
+    width: 350px;
 }

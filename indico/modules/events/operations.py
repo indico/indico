@@ -66,7 +66,7 @@ def create_event_references(event, data):
 
 @no_autoflush
 def create_event(category, event_type, data, add_creator_as_manager=True, features=None):
-    from indico.modules.rb_new.operations.bookings import create_booking_for_event
+    from indico.modules.rb.operations.bookings import create_booking_for_event
     """Create a new event.
 
     :param category: The category in which to create the event

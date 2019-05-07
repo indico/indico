@@ -17,8 +17,42 @@
 
 @import 'rb:styles/palette';
 
-.field-error {
-    color: $red !important;
-    border-color: $red !important;
-    font-weight: bold;
+.actions-dropdown {
+
+    :global(.dropdown.icon) {
+        display: none;
+    }
+
+    .dropdown-button {
+        color: $gray;
+        background: none !important;
+        padding-bottom: 1em;
+
+        &:hover {
+            color: $booking-color;
+        }
+
+        &:global(.button) {
+            padding: 0 !important;
+        }
+    }
+
+    .open {
+        :global(.icon) {
+            color: $dark-orange !important;
+        }
+    }
+}
+
+.rejection-form {
+    margin: 1.25em;
+
+    :global(.button) {
+        background-color: $dark-red !important;
+        margin-top: 1.3em;
+    }
+
+    .form-description {
+        padding-bottom: 1em;
+    }
 }

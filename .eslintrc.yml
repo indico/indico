@@ -19,7 +19,7 @@ settings:
     alias:
       map:
         - ['indico/modules/core', './indico/modules/core/client/js']
-        - ['indico/modules/rb_new', './indico/modules/rb_new/client/js']
+        - ['indico/modules/rb', './indico/modules/rb/client/js']
         - ['indico', './indico/web/client/js']
       extensions: [.js, .jsx, .json]
   react:

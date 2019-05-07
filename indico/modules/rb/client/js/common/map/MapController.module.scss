@@ -16,9 +16,32 @@
  */
 
 @import 'rb:styles/palette';
+@import 'rb:styles/util';
 
-.field-error {
-    color: $red !important;
-    border-color: $red !important;
-    font-weight: bold;
+.map-dimmer:global(.ui.dimmer) {
+    @include remaining-screen-height();
+}
+
+.areas-dropdown:global(.dropdown) {
+    min-width: 10em;
+
+    :global(.menu .item) {
+        font-size: 1em;
+    }
+}
+
+.map-control-content {
+    background-color: $white;
+    padding: 0.5em;
+    border-radius: 0.25em;
+    font-size: 0.85em;
+}
+
+.show-all-button:global(.ui.button) {
+    background-color: #fff;
+    margin: 0;
+}
+
+.map-context {
+    height: 100%;
 }

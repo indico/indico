@@ -1,0 +1,176 @@
+/* This file is part of Indico.
+ * Copyright (C) 2002 - 2018 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
+@import 'rb:styles/palette';
+@import 'rb:styles/util';
+
+$row-height: 40px;
+$split-row-height: $row-height/2;
+
+.timeline-header {
+    display: flex;
+    min-height: $row-height;
+
+    .timeline-header-labels {
+        flex: 1;
+        position: relative;
+    }
+
+    .timeline-header-label {
+        height: 100%;
+        line-height: $row-height;
+        text-align: left;
+
+        .timeline-label-text {
+            width: 5em;
+            margin-left: -2.5em;
+            display: inline-block;
+            text-align: center;
+            color: $gray;
+        }
+    }
+
+    &:global(.timeline-non-selectable) {
+        user-select: none;
+    }
+
+    .timeline-header-actions {
+        width: 70px;
+    }
+}
+
+.timeline-lines {
+    position: absolute;
+    height: 100%;
+    top: 0;
+
+    .timeline-divider {
+        position: absolute;
+        top: 0;
+        height: 100%;
+        border-left: 1px solid $light-gray;
+    }
+}
+
+.timeline-content {
+    position: relative;
+
+    .timeline-row {
+        height: $row-height;
+        width: 100%;
+        display: flex;
+
+        .timeline-row-label {
+            height: 100%;
+            line-height: $row-height;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+
+            .label {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                margin-right: 1.5em;
+                padding-right: 0.5em;
+                text-align: right;
+
+                &.gutter {
+                    border-left: 5px solid lighten($highlight-color, 25%);
+                    background-color: lighten($highlight-color, 35%);
+                }
+
+                .split-label {
+                    line-height: $split-row-height;
+                }
+
+                .sub-label {
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                }
+            }
+        }
+
+        .timeline-row-content {
+            flex: 1;
+            position: relative;
+            height: $row-height;
+        }
+
+        .timeline-row-actions {
+            color: $gray;
+            font-size: 1.8em;
+            z-index: 4;
+            text-align: right;
+            width: 70px;
+        }
+
+        &:hover .timeline-row-actions :global(.icon) {
+            color: $booking-color;
+        }
+    }
+
+    &:global(.timeline-non-selectable) {
+        user-select: none;
+    }
+}
+
+.timeline-item-placeholder {
+    position: relative;
+    z-index: 1000;
+
+    :global(.line) {
+        height: 1em !important;
+        background-color: unset !important;
+    }
+}
+
+.timeline-loader:global(.ui.loader) {
+    margin-top: 2em !important;
+    color: rgba(0, 0, 0, 0.87) !important;
+    position: fixed;
+    bottom: 10px;
+    top: auto;
+
+    &::before {
+        border-color: rgba(0, 0, 0, 0.1) !important;
+    }
+
+    &::after {
+        border-color: $gray transparent transparent !important;
+    }
+}
+
+.auto-sizer-wrapper {
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.daily-timeline {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+
+    :global(.ReactVirtualized__Grid__innerScrollContainer) {
+        margin-right: 2em;
+    }
+
+    .timeline-header {
+        margin-right: 2em;
+    }
+}

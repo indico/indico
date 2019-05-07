@@ -17,8 +17,25 @@
 
 @import 'rb:styles/palette';
 
-.field-error {
-    color: $red !important;
-    border-color: $red !important;
-    font-weight: bold;
+.sidebar:global(.inverted.menu) {
+    background-color: darken($primary-color, 10%);
+}
+
+.sidebar-button {
+    transition: color 0.25s ease-in, transform 0.25s ease-in;
+    color: $white;
+    cursor: pointer;
+
+    &:hover {
+        color: darken($highlight-color, 20%);
+    }
+
+    &:global(.active) {
+        color: darken($highlight-color, 30%);
+        transform: rotate(90deg);
+    }
+
+    i:global(.icon) {
+        margin: 0;
+    }
 }

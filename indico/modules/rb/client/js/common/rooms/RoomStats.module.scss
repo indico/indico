@@ -17,8 +17,44 @@
 
 @import 'rb:styles/palette';
 
-.field-error {
-    color: $red !important;
-    border-color: $red !important;
-    font-weight: bold;
+.room-stats {
+    display: flex;
+    justify-content: space-around;
+    color: $gray;
+    padding: 0 3em;
+
+    .stats-box {
+        text-transform: uppercase;
+        background-color: $light-gray;
+        width: 100%;
+
+        .title {
+            font-weight: bold;
+            padding: 0.5em 1em;
+            background-color: lighten($dark-highlight-color, 45%);
+        }
+
+        .value-box {
+            padding: 0.5em 1em;
+
+            .days {
+                font-size: 0.8em;
+            }
+
+            .value {
+                font-size: 1.25em;
+                font-weight: bold;
+            }
+        }
+
+        .note {
+            text-transform: none;
+            padding: 0 1em;
+            font-size: 0.85em;
+        }
+    }
+}
+
+.placeholder {
+    margin: 0 3em;
 }
