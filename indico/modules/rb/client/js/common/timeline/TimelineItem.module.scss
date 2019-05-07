@@ -30,26 +30,110 @@
 
         &:global(.pre-booking) {
             @include stripes($pre-booking-stripe-colors...);
+
+            &.overflow-right {
+                @include right-fade-out-stripes($pre-booking-stripe-colors...);
+                border-right-style: none;
+            }
+
+            &.overflow-left {
+                @include left-fade-out-stripes($pre-booking-stripe-colors...);
+                border-left-style: none;
+            }
+
+            &.overflow-right.overflow-left {
+                @include fade-out-stripes($pre-booking-stripe-colors...);
+            }
         }
 
         &:global(.available) {
             background-color: $available-color;
+
+            &.overflow-right {
+                @include right-fade-out($available-fadeout-colors...);
+                border-right-style: none;
+            }
+
+            &.overflow-left {
+                @include left-fade-out($available-fadeout-colors...);
+                border-left-style: none;
+            }
+
+            &.overflow-right.overflow-left {
+                @include fade-out($available-fadeout-colors...);
+            }
         }
 
         &:global(.booking) {
             background-color: $booking-color;
+
+            &.overflow-right {
+                @include right-fade-out($booking-fadeout-colors...);
+                border-right-style: none;
+            }
+
+            &.overflow-left {
+                @include left-fade-out($booking-fadeout-colors...);
+                border-left-style: none;
+            }
+
+            &.overflow-right.overflow-left {
+                @include fade-out($booking-fadeout-colors...);
+            }
         }
 
         &:global(.conflict) {
             background-color: $conflict-color;
+
+            &.overflow-right {
+                @include right-fade-out($conflict-fadeout-colors...);
+                border-right-style: none;
+            }
+
+            &.overflow-left {
+                @include left-fade-out($conflict-fadeout-colors...);
+                border-left-style: none;
+            }
+
+            &.overflow-right.overflow-left {
+                @include fade-out($conflict-fadeout-colors...);
+            }
         }
 
         &:global(.pre-booking-conflict) {
             @include stripes($pre-booking-conflict-stripe-colors...);
+
+            &.overflow-right {
+                @include right-fade-out-stripes($pre-booking-conflict-stripe-colors...);
+                border-right-style: none;
+            }
+
+            &.overflow-left {
+                @include left-fade-out-stripes($pre-booking-conflict-stripe-colors...);
+                border-left-style: none;
+            }
+
+            &.overflow-right.overflow-left {
+                @include fade-out-stripes($pre-booking-conflict-stripe-colors...);
+            }
         }
 
         &:global(.conflicting-candidates) {
             background-color: $conflicting-candidate-color;
+
+            &.overflow-right {
+                @include right-fade-out($conflicting-candidate-fadeout-colors...);
+                border-right-style: none;
+            }
+
+            &.overflow-left {
+                @include left-fade-out($conflicting-candidate-fadeout-colors...);
+                border-left-style: none;
+            }
+
+            &.overflow-right.overflow-left {
+                @include fade-out($conflicting-candidate-fadeout-colors...);
+            }
         }
 
         &:global(.unbookable-periods) {
@@ -87,21 +171,77 @@
         &:global(.cancellation) {
             background-color: $cancellation-color;
             border: 1px solid darken($cancellation-color, 15%);
+
+            &.overflow-right {
+                @include right-fade-out($conflicting-candidate-fadeout-colors...);
+                border-right-style: none;
+            }
+
+            &.overflow-left {
+                @include left-fade-out($conflicting-candidate-fadeout-colors...);
+                border-left-style: none;
+            }
+
+            &.overflow-right.overflow-left {
+                @include fade-out($conflicting-candidate-fadeout-colors...);
+            }
         }
 
         &:global(.pending-cancellations) {
             background-color: $pending-cancellation-color;
             z-index: 4;
+
+            &.overflow-right {
+                @include right-fade-out($pending-cancellation-fadeout-colors...);
+                border-right-style: none;
+            }
+
+            &.overflow-left {
+                @include left-fade-out($pending-cancellation-fadeout-colors...);
+                border-left-style: none;
+            }
+
+            &.overflow-right.overflow-left {
+                @include fade-out($pending-cancellation-fadeout-colors...);
+            }
         }
 
         &:global(.rejection) {
             background-color: $rejection-color;
             border: 1px solid darken($rejection-color, 25%);
+
+            &.overflow-right {
+                @include right-fade-out($rejection-fadeout-colors...);
+                border-right-style: none;
+            }
+
+            &.overflow-left {
+                @include left-fade-out($rejection-fadeout-colors...);
+                border-left-style: none;
+            }
+
+            &.overflow-right.overflow-left {
+                @include fade-out($rejection-fadeout-colors...);
+            }
         }
 
         &:global(.other) {
             background-color: $other-booking-color;
             border: 1px solid darken($other-booking-color, 10%);
+
+            &.overflow-right {
+                @include right-fade-out($other-booking-fadeout-colors...);
+                border-right-style: none;
+            }
+
+            &.overflow-left {
+                @include left-fade-out($other-booking-fadeout-colors...);
+                border-left-style: none;
+            }
+
+            &.overflow-right.overflow-left {
+                @include fade-out($other-booking-fadeout-colors...);
+            }
 
             &:hover {
                 background-color: lighten($other-booking-color, 1%);
