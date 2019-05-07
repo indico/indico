@@ -105,4 +105,4 @@ Contact
                    :target: https://pypi.python.org/pypi/indico/
 .. |license| image:: https://img.shields.io/github/license/indico/indico.png
                    :alt: License
-                   :target: https://github.com/indico/indico/blob/master/COPYING
+                   :target: https://github.com/indico/indico/blob/master/LICENSE

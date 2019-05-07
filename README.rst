@@ -8,7 +8,7 @@ Indico is a general-purpose event management web-based solution. It includes a f
 
 A list of features `can be found here <https://getindico.io/features/>`_. There is also a `video <https://www.youtube.com/watch?v=yo8rgg9dOcc>`_!
 
-Indico is free software, licensed under terms of the GNU General Public License (GPL) v3. It is currently in production `at CERN <http://indico.cern.ch>`_, as well as in many other scientific institutions around the world.
+Indico is free software, licensed under terms of the MIT License. It is currently in production `at CERN <http://indico.cern.ch>`_, as well as in many other scientific institutions around the world.
 
 
 Getting Indico
@@ -31,6 +31,12 @@ History
 
 Indico was created at CERN, originally as part of the European Union's InDiCo Project.
 
+Note
+----
+
+In applying the MIT license, CERN does not waive the privileges and immunities
+granted to it by virtue of its status as an Intergovernmental Organization
+or submit itself to any jurisdiction.
 
 .. |build-status| image:: https://travis-ci.org/indico/indico.svg?branch=master
                    :alt: Travis Build Status
@@ -40,4 +46,4 @@ Indico was created at CERN, originally as part of the European Union's InDiCo Pr
                    :target: https://pypi.python.org/pypi/indico/
 .. |license| image:: https://img.shields.io/github/license/indico/indico.svg
                    :alt: License
-                   :target: https://github.com/indico/indico/blob/master/COPYING
+                   :target: https://github.com/indico/indico/blob/master/LICENSE
