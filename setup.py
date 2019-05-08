@@ -75,6 +75,11 @@ if __name__ == '__main__':
         packages=find_packages(include=('indico', 'indico.*',)),
         include_package_data=True,
         install_requires=get_requirements(),
+        classifiers=[
+            'Environment :: Web Environment',
+            'License :: OSI Approved :: MIT License',
+            'Programming Language :: Python :: 2.7',
+        ],
         entry_points={
             'console_scripts': {'indico = indico.cli.core:cli'},
             'celery.commands': {'unlock = indico.core.celery.cli:UnlockCommand'},
