@@ -1,8 +1,7 @@
 Indico
 ======
-|build-status|
 
-|license|
+|build-status| |license| |pypi-ver|
 
 Indico is a general-purpose event management web-based solution. It includes a full-blown conference organization workflow as well as tools for meeting management and room booking. It provides as well integration with video-conferencing solutions.
 
@@ -13,8 +12,6 @@ Indico is free software, licensed under terms of the MIT License. It is currentl
 
 Getting Indico
 --------------
-
-|pypi-ver|
 
 Information on how to get the latest release can be found `at the project web site <https://getindico.io/getting-started/>`_.
 If you are interested in contributing to Indico, you can consult the `project documentation <https://docs.getindico.io>`_.
@@ -38,7 +35,7 @@ In applying the MIT license, CERN does not waive the privileges and immunities
 granted to it by virtue of its status as an Intergovernmental Organization
 or submit itself to any jurisdiction.
 
-.. |build-status| image:: https://travis-ci.org/indico/indico.svg?branch=master
+.. |build-status| image:: https://img.shields.io/travis/indico/indico/master.svg
                    :alt: Travis Build Status
                    :target: https://travis-ci.org/indico/indico
 .. |pypi-ver| image:: https://img.shields.io/pypi/v/indico.svg
