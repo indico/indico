@@ -1,6 +1,9 @@
-/**
- * @author Tom
- */
+// This file is part of Indico.
+// Copyright (C) 2002 - 2019 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
 
 
 /**
@@ -11,27 +14,27 @@
  * @return {Function} control builder
  */
 function WidgetControl(panelBuilder, itemTemplate, attributes) {
-	/**
-	 * Builds a control
-	 * @param {Object} source
-	 * @return {Element}
-	 */
-	var controlBuilder = function(source) {
-		// bind.element used because it should also bind the items to select field etc.
-		return bind.element(panelBuilder(attributes), source, itemTemplate);
-	};
+    /**
+     * Builds a control
+     * @param {Object} source
+     * @return {Element}
+     */
+    var controlBuilder = function(source) {
+        // bind.element used because it should also bind the items to select field etc.
+        return bind.element(panelBuilder(attributes), source, itemTemplate);
+    };
 
-	/**
-	 * @param {Object} attribs
-	 * @return {Function} control builder
-	 */
-	controlBuilder.customize = function(attribs) {
-		return WidgetControl(panelBuilder, itemTemplate, merge(attributes, attribs));
-	};
-	
-	extend(controlBuilder, WidgetBuilder);
-	
-	return controlBuilder;
+    /**
+     * @param {Object} attribs
+     * @return {Function} control builder
+     */
+    controlBuilder.customize = function(attribs) {
+        return WidgetControl(panelBuilder, itemTemplate, merge(attributes, attribs));
+    };
+
+    extend(controlBuilder, WidgetBuilder);
+
+    return controlBuilder;
 }
 
 

@@ -1,7 +1,9 @@
-/**
- * WatchObject
- * @author Tom
- */
+// This file is part of Indico.
+// Copyright (C) 2002 - 2019 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
 
 
 /**
@@ -11,128 +13,128 @@
  * @return {WatchObject}
  */
 function $O(source, template) {
-	return bind.toDictionary(new WatchObject(), source, template);
+    return bind.toDictionary(new WatchObject(), source, template);
 }
 
 /**
  * Observable object.
  */
 type("WatchObject", ["Dictionary", "Observable"], {
-	/**
-	 * Adds a new property, initializes it with the value, returns a key of the new property.
-	 * @param {Object} value
-	 * @return {String} key
-	 */
-	add: function(value) {},
+    /**
+     * Adds a new property, initializes it with the value, returns a key of the new property.
+     * @param {Object} value
+     * @return {String} key
+     */
+    add: function(value) {},
 
-	/**
-	 * Creates a new watch getter for the key.
-	 * @param {String} key
-	 * @return {WatchGetter}
-	 */
-	getter: function(key) {
-		var self = this;
-		return new WatchGetter(function() {
-			return self.get(key);
-		}, function(observer) {
-			return self.observe(function(value, key, self, old) {
-				return observer(value, old);
-			}, key);
-		}, function(observer) {
-			var value = self.get(key);
-			return observer(value, value);
-		});
-	},
+    /**
+     * Creates a new watch getter for the key.
+     * @param {String} key
+     * @return {WatchGetter}
+     */
+    getter: function(key) {
+        var self = this;
+        return new WatchGetter(function() {
+            return self.get(key);
+        }, function(observer) {
+            return self.observe(function(value, key, self, old) {
+                return observer(value, old);
+            }, key);
+        }, function(observer) {
+            var value = self.get(key);
+            return observer(value, value);
+        });
+    },
 
-	/**
-	 * Creates a new watch accessor for the key.
-	 * @param {String} key
-	 * @return {WatchAccessor}
-	 */
-	accessor: function(key) {
-		var self = this;
-		return new WatchAccessor(function() {
-			return self.get(key);
-		}, function(value) {
-			return self.set(key, value);
-		}, function(observer) {
-			return self.observe(function(value, key, self, old) {
-				return observer(value, old);
-			}, key);
-		}, function(observer) {
-			var value = self.get(key);
-			return observer(value, value);
-		});
-	}
+    /**
+     * Creates a new watch accessor for the key.
+     * @param {String} key
+     * @return {WatchAccessor}
+     */
+    accessor: function(key) {
+        var self = this;
+        return new WatchAccessor(function() {
+            return self.get(key);
+        }, function(value) {
+            return self.set(key, value);
+        }, function(observer) {
+            return self.observe(function(value, key, self, old) {
+                return observer(value, old);
+            }, key);
+        }, function(observer) {
+            var value = self.get(key);
+            return observer(value, value);
+        });
+    }
 },
-	/**
-	 * Initializes a new watch object and attaches watch accessors for the keys.
-	 * @param {String} ... keys
-	 */
-	function() {
-		var self = this;
-		var properties = {};
-		var propertyObservers = {};
-		var objectObservers = commands();
-		var notify = function(value, key, old) {
-			var propertyObserver = propertyObservers[key];
-			if (exists(propertyObserver)) {
-				propertyObserver(value, key, self, old);
-			}
-			objectObservers(value, key, self, old);
-		};
+    /**
+     * Initializes a new watch object and attaches watch accessors for the keys.
+     * @param {String} ... keys
+     */
+    function() {
+        var self = this;
+        var properties = {};
+        var propertyObservers = {};
+        var objectObservers = commands();
+        var notify = function(value, key, old) {
+            var propertyObserver = propertyObservers[key];
+            if (exists(propertyObserver)) {
+                propertyObserver(value, key, self, old);
+            }
+            objectObservers(value, key, self, old);
+        };
 
-		// Enumerable
-		this.each = function(iterator) {
-			return enumerate(properties, iterator);
-		};
-		this.isEmpty = function() {
-			return !hasProperties(properties);
-		};
+        // Enumerable
+        this.each = function(iterator) {
+            return enumerate(properties, iterator);
+        };
+        this.isEmpty = function() {
+            return !hasProperties(properties);
+        };
 
-		// Dictionary
-		this.get = function(key) {
-			return properties[key];
-		};
-		this.set = function(key, value) {
-			return changeProperty(properties, key, value, notify);
-		};
-		this.getAll = function() {
-			return clone(properties);
-		};
-		this.update = function(values) {
-			return changeProperties(properties, values, notify);
-		};
-		this.replace = function(values) {
-			return replaceProperties(properties, values, notify);
-		};
-		this.clear = function() {
-			var old = properties;
-			properties = {};
-			enumerate(old, function(value, key) {
-				notify(null, key, value);
-			});
-			return old;
-		};
-		// Observable
-		this.observe = function(observer, key) {
-			if (exists(key)) {
-				var propertyObserver = propertyObservers[key];
-				if (!exists(propertyObserver)) {
-					propertyObserver = commands();
-					propertyObservers[key] = propertyObserver;
-				}
-				return propertyObserver.attach(observer);
-			} else {
-				return objectObservers.attach(observer);
-			}
-		};
-		// WatchObject
-		this.add = function(value) {
-			return addProperty(properties, value, notify);
-		};
-		return mixWatchAccessors(this, arguments, this);
-	}
+        // Dictionary
+        this.get = function(key) {
+            return properties[key];
+        };
+        this.set = function(key, value) {
+            return changeProperty(properties, key, value, notify);
+        };
+        this.getAll = function() {
+            return clone(properties);
+        };
+        this.update = function(values) {
+            return changeProperties(properties, values, notify);
+        };
+        this.replace = function(values) {
+            return replaceProperties(properties, values, notify);
+        };
+        this.clear = function() {
+            var old = properties;
+            properties = {};
+            enumerate(old, function(value, key) {
+                notify(null, key, value);
+            });
+            return old;
+        };
+        // Observable
+        this.observe = function(observer, key) {
+            if (exists(key)) {
+                var propertyObserver = propertyObservers[key];
+                if (!exists(propertyObserver)) {
+                    propertyObserver = commands();
+                    propertyObservers[key] = propertyObserver;
+                }
+                return propertyObserver.attach(observer);
+            } else {
+                return objectObservers.attach(observer);
+            }
+        };
+        // WatchObject
+        this.add = function(value) {
+            return addProperty(properties, value, notify);
+        };
+        return mixWatchAccessors(this, arguments, this);
+    }
 );
 
 /**
@@ -143,20 +145,20 @@ type("WatchObject", ["Dictionary", "Observable"], {
  * @return {Function} constructor({Object} ... values)
  */
 function watchType(name, properties, mixins) {
-	var create = type(name, any(mixins, []), {}, function(source) {
-		if (this instanceof arguments.callee) {
-			var object = new WatchObject();
-			var self = this;
-			iterate(create.mixins, function(mixin) {
-				mixWatchAccessors(self, self[mixin].watchProperties, object);
-			});
-			watchType.init(this, arguments);
-		} else {
-			return watchType.load(new arguments.callee(), source);
-		}
-	});
-	create.watchProperties = properties;
-	return create;
+    var create = type(name, any(mixins, []), {}, function(source) {
+        if (this instanceof arguments.callee) {
+            var object = new WatchObject();
+            var self = this;
+            iterate(create.mixins, function(mixin) {
+                mixWatchAccessors(self, self[mixin].watchProperties, object);
+            });
+            watchType.init(this, arguments);
+        } else {
+            return watchType.load(new arguments.callee(), source);
+        }
+    });
+    create.watchProperties = properties;
+    return create;
 }
 
 /**
@@ -165,13 +167,13 @@ function watchType(name, properties, mixins) {
  * @param {Array} values
  */
 watchType.init = function(target, values) {
-	var counter = 0;
-	iterate(target.constructor.mixins, function(mixin) {
-		iterate(target[mixin].watchProperties, function(property) {
-			target[property].set(values[counter++]);
-		});
-	});
-	return target;
+    var counter = 0;
+    iterate(target.constructor.mixins, function(mixin) {
+        iterate(target[mixin].watchProperties, function(property) {
+            target[property].set(values[counter++]);
+        });
+    });
+    return target;
 };
 
 /**
@@ -180,23 +182,23 @@ watchType.init = function(target, values) {
  * @param {Object} object
  */
 watchType.load = function(target, object) {
-	if (object instanceof target.constructor) {
-		iterate(target.constructor.mixins, function(mixin) {
-			iterate(target[mixin].watchProperties, function(property) {
-				var value = object[property];
-				if (exists(value) && value.Getter) {
-					target[property].set(value.get());
-				}
-			});
-		});
-	} else {
-		iterate(target.constructor.mixins, function(mixin) {
-			iterate(target[mixin].watchProperties, function(property) {
-				target[property].set(object[property]);
-			});
-		});
-	}
-	return target;
+    if (object instanceof target.constructor) {
+        iterate(target.constructor.mixins, function(mixin) {
+            iterate(target[mixin].watchProperties, function(property) {
+                var value = object[property];
+                if (exists(value) && value.Getter) {
+                    target[property].set(value.get());
+                }
+            });
+        });
+    } else {
+        iterate(target.constructor.mixins, function(mixin) {
+            iterate(target[mixin].watchProperties, function(property) {
+                target[property].set(object[property]);
+            });
+        });
+    }
+    return target;
 };
 
 /**
@@ -207,13 +209,13 @@ watchType.load = function(target, object) {
  * @return {WatchObject}
  */
 function mixWatchGetters(target, properties, object) {
-	if (!exists(object)) {
-		object = new WatchObject();
-	}
-	iterate(properties, function(property) {
-		target[property] = object.getter(property);
-	});
-	return object;
+    if (!exists(object)) {
+        object = new WatchObject();
+    }
+    iterate(properties, function(property) {
+        target[property] = object.getter(property);
+    });
+    return object;
 }
 
 /**
@@ -224,11 +226,11 @@ function mixWatchGetters(target, properties, object) {
  * @return {WatchObject}
  */
 function mixWatchAccessors(target, properties, object) {
-	if (!exists(object)) {
-		object = new WatchObject();
-	}
-	iterate(properties, function(property) {
-		target[property] = object.accessor(property);
-	});
-	return object;
+    if (!exists(object)) {
+        object = new WatchObject();
+    }
+    iterate(properties, function(property) {
+        target[property] = object.accessor(property);
+    });
+    return object;
 }

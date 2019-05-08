@@ -1,20 +1,23 @@
-/**
- * @author Tom
- */
+// This file is part of Indico.
+// Copyright (C) 2002 - 2019 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
 
 extend(Html.prototype, {
-	isBody: function() {
-		return document.body === this.dom;
-	},
+    isBody: function() {
+        return document.body === this.dom;
+    },
 
-	getOffsetParent: function() {
-		return $E(this.getAttribute("offsetParent"));
-	}
+    getOffsetParent: function() {
+        return $E(this.getAttribute("offsetParent"));
+    }
 });
 
 // based on mootools
 delayedBind(Html.prototype, "getAbsolutePosition", function(dom) {
-	return (this.dom.getBoundingClientRect && !Browser.WebKit)
+    return (this.dom.getBoundingClientRect && !Browser.WebKit)
         ? function() {
             var bound = this.dom.getBoundingClientRect();
             var html = document.documentElement;
@@ -31,5 +34,5 @@ delayedBind(Html.prototype, "getAbsolutePosition", function(dom) {
                 element = element.getOffsetParent();
             }
             return position;
-		};
+        };
 });
