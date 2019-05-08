@@ -29,7 +29,7 @@ const BookingDetailsPreloader = ({bookingId, component: Component, fetchDetails,
 BookingDetailsPreloader.propTypes = {
     bookingId: PropTypes.number.isRequired,
     fetchDetails: PropTypes.func.isRequired,
-    component: PropTypes.func.isRequired,
+    component: PropTypes.elementType.isRequired,
     onClose: PropTypes.func.isRequired,
 };
 

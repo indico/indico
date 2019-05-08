@@ -50,7 +50,7 @@ function ConditionalRoute({active, component, render, ...props}) {
 
 ConditionalRoute.propTypes = {
     active: PropTypes.bool.isRequired,
-    component: PropTypes.oneOfType([PropTypes.func, PropTypes.element]),
+    component: PropTypes.elementType,
     render: PropTypes.func,
 };
 

@@ -17,7 +17,7 @@ import * as blockingsSelectors from './selectors';
 class BlockingPreloader extends React.Component {
     static propTypes = {
         blockingId: PropTypes.number.isRequired,
-        component: PropTypes.func.isRequired,
+        component: PropTypes.elementType.isRequired,
         componentProps: PropTypes.object,
         blocking: PropTypes.object,
         actions: PropTypes.exact({

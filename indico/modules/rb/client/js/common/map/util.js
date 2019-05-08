@@ -11,7 +11,7 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 
-import LatLon from 'geodesy/latlon-vectors';
+import LatLon from 'geodesy/latlon-nvector-spherical';
 
 import * as mapSelectors from './selectors';
 import * as mapActions from './actions';
@@ -46,7 +46,7 @@ export function checkRoomsInBounds(rooms, bounds) {
         new LatLon(bounds.SW[0], bounds.NE[1])
     ];
 
-    return rooms.every(({lat, lng}) => new LatLon(lat, lng).enclosedBy(polygon));
+    return rooms.every(({lat, lng}) => new LatLon(lat, lng).isEnclosedBy(polygon));
 }
 
 

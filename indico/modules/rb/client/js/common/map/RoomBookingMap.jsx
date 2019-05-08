@@ -29,7 +29,7 @@ class RoomBookingMap extends React.Component {
         children: PropTypes.node,
         tileServerURL: PropTypes.string,
         clusterProps: PropTypes.object,
-        markerComponent: PropTypes.func,
+        markerComponent: PropTypes.elementType,
         onRoomClick: PropTypes.func.isRequired,
         actions: PropTypes.objectOf(PropTypes.func).isRequired
     };

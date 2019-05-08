@@ -71,7 +71,7 @@ class BookRoomModal extends React.Component {
         bookingData: PropTypes.object.isRequired,
         onClose: PropTypes.func.isRequired,
         availability: PropTypes.object,
-        timeInformationComponent: PropTypes.func,
+        timeInformationComponent: PropTypes.elementType,
         relatedEvents: PropTypes.array.isRequired,
         link: linkDataShape,
         isAdminOverrideEnabled: PropTypes.bool.isRequired,
