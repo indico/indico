@@ -1,6 +1,9 @@
-/**
- * @author Tom
- */
+// This file is part of Indico.
+// Copyright (C) 2002 - 2019 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
 
 /**
  * Invokes the iterator for the number times and returns a result of the iterator.
@@ -134,13 +137,13 @@ function mapper(template) {
 }
 
 function where(match, action) {
-	function iterator(item, key) {
-		if (match(item, key)) {
-			action(item);
-		}
-	}
-	iterator.result = action.result;
-	return iterator;
+    function iterator(item, key) {
+        if (match(item, key)) {
+            action(item);
+        }
+    }
+    iterator.result = action.result;
+    return iterator;
 }
 
 /**

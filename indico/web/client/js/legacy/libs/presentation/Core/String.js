@@ -1,6 +1,9 @@
-/**
- * @author Tom
- */
+// This file is part of Indico.
+// Copyright (C) 2002 - 2019 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
 
 /**
  * Returns true if the text starts with the string.
@@ -9,7 +12,7 @@
  * @return {Boolean} result
  */
 function startsWith(text, string) {
-	return string == text.slice(0, string.length);
+    return string == text.slice(0, string.length);
 }
 
 var specialCharMap = {
@@ -19,7 +22,7 @@ var specialCharMap = {
   '\f': '\\f',
   '\r': '\\r',
   '\\': '\\\\',
-	'"': '\\"'
+  '"': '\\"'
 };
 
 /**
@@ -28,13 +31,13 @@ var specialCharMap = {
  * @return {String}
  */
 function escapeString(text) {
-	return "\"" + text.replace(/[\x00-\x1f\\\"]/g, function(value) {
-		if (value in specialCharMap) {
-			return specialCharMap[value]
-		} else {
-			return "\\u00" + zeroPad(value.charCodeAt(0).toString(16), 2);
-		}
-	}) + "\"";
+    return "\"" + text.replace(/[\x00-\x1f\\\"]/g, function(value) {
+        if (value in specialCharMap) {
+            return specialCharMap[value]
+        } else {
+            return "\\u00" + zeroPad(value.charCodeAt(0).toString(16), 2);
+        }
+    }) + "\"";
 }
 
 /**
@@ -46,37 +49,37 @@ function escapeString(text) {
 function format(text, args) {
   return text.replace(/(\{\{)|(\}\})|(\{[^\}]*\})/g, function(string) {
     switch (string) {
-			case "{{":
-				return "{";
-			case "}}":
-				return "}";
-		}
-		if (!exists(args)) {
-			return "";
-		}
-		return str(args[string.slice(1, -1)]);
+            case "{{":
+                return "{";
+            case "}}":
+                return "}";
+        }
+        if (!exists(args)) {
+            return "";
+        }
+        return str(args[string.slice(1, -1)]);
   });
 }
 
 function trim(text) {
-	return trimEnd(trimStart(text));
+    return trimEnd(trimStart(text));
 }
 
 function trimStart(text) {
-	return text.replace(/^\s+/, "");
+    return text.replace(/^\s+/, "");
 }
 
 function trimEnd(text) {
-	return text.replace(/\s+$/, "");
+    return text.replace(/\s+$/, "");
 }
 
 function padLeft(text, size, character) {
-	while (text.length < size) {
-		text = character + text;
-	}
-	return text;
+    while (text.length < size) {
+        text = character + text;
+    }
+    return text;
 }
 
 function zeroPad(text, size) {
-	return padLeft(text, size, "0");
+    return padLeft(text, size, "0");
 }

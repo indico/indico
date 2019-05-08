@@ -1,6 +1,9 @@
-/**
- * @author Tom
- */
+// This file is part of Indico.
+// Copyright (C) 2002 - 2019 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
 
 /**
  * Returns true if the object is an array or is listable.
@@ -8,7 +11,7 @@
  * @return {Boolean}
  */
 function isArrayOrListable(object) {
-	return isArray(object) || (object.Enumerable && !object.Dictionary);
+    return isArray(object) || (object.Enumerable && !object.Dictionary);
 }
 
 /**
@@ -19,22 +22,22 @@ function isArrayOrListable(object) {
  * @return {Array}
  */
 function $A(list, offset, template) {
-	return iterate(list, stacker(template), offset);
+    return iterate(list, stacker(template), offset);
 }
 
 function translate(source, template) {
-	return each(source, stacker(template));
+    return each(source, stacker(template));
 }
 
 function map(source, template) {
-	return each(source, mapper(template));
+    return each(source, mapper(template));
 }
 
 function dict(source, template) {
-	return each(source, builder(newObject, function(target, key, value) {
-		var pair = template(value, key);
-		target[pair[0]] = pair[1];
-	}));
+    return each(source, builder(newObject, function(target, key, value) {
+        var pair = template(value, key);
+        target[pair[0]] = pair[1];
+    }));
 }
 
 /**
@@ -45,7 +48,7 @@ function dict(source, template) {
  * @return {Array}
  */
 function compact(list, offset, template) {
-	return iterate(list, existing(stacker(template)), offset);
+    return iterate(list, existing(stacker(template)), offset);
 }
 
 /**
@@ -55,7 +58,7 @@ function compact(list, offset, template) {
  * @return {Boolean} result
  */
 function includes(collection, match) {
-	return exists(indexOf(collection, match));
+    return exists(indexOf(collection, match));
 }
 
 /**
@@ -64,15 +67,15 @@ function includes(collection, match) {
  * @return {Array}
  */
 function concat() {
-	var result = [];
-	iterate(arguments, function(arg) {
-		if (exists(arg)) {
-			iterate(arg, function(item) {
-				result.push(item);
-			});
-		}
-	});
-	return result;
+    var result = [];
+    iterate(arguments, function(arg) {
+        if (exists(arg)) {
+            iterate(arg, function(item) {
+                result.push(item);
+            });
+        }
+    });
+    return result;
 }
 
 /**
@@ -81,17 +84,17 @@ function concat() {
  * @return {Object}
  */
 function merge() {
-	var result = {};
-	iterate(arguments, function(arg) {
-		if (exists(arg)) {
-			extend(result, arg);
-		}
-	});
-	return result;
+    var result = {};
+    iterate(arguments, function(arg) {
+        if (exists(arg)) {
+            extend(result, arg);
+        }
+    });
+    return result;
 }
 
 function keys(source) {
-	return translate(source, keyGetter);
+    return translate(source, keyGetter);
 }
 
 /**
@@ -103,13 +106,13 @@ function keys(source) {
  * @return {String} key
  */
 function addProperty(object, value, observer) {
-	var key = 1;
-	while (key in object) {
-		key++;
-	}
-	object[key] = value;
-	observer(value, key, null);
-	return key;
+    var key = 1;
+    while (key in object) {
+        key++;
+    }
+    object[key] = value;
+    observer(value, key, null);
+    return key;
 }
 
 /**
@@ -123,16 +126,16 @@ function addProperty(object, value, observer) {
  * @return {Object} old
  */
 function changeProperty(object, key, value, observer) {
-	var old = object[key];
-	if (old !== value) {
-		if (exists(value)) {
-			object[key] = value;
-		} else {
-			delete object[key];
-		}
-		observer(value, key, old);
-	}
-	return old;
+    var old = object[key];
+    if (old !== value) {
+        if (exists(value)) {
+            object[key] = value;
+        } else {
+            delete object[key];
+        }
+        observer(value, key, old);
+    }
+    return old;
 }
 
 /**
@@ -145,18 +148,18 @@ function changeProperty(object, key, value, observer) {
  * @return {Object} changes
  */
 function changeProperties(object, values, observer) {
-	var changes = {};
-	enumerate(values, function(value, key) {
-		var old = object[key];
-		if (!equals(old, value)) {
-			changes[key] = old;
-			object[key] = value;
-		}
-	});
-	enumerate(changes, function(value, key) {
-		observer(object[key], key, value);
-	});
-	return changes;
+    var changes = {};
+    enumerate(values, function(value, key) {
+        var old = object[key];
+        if (!equals(old, value)) {
+            changes[key] = old;
+            object[key] = value;
+        }
+    });
+    enumerate(changes, function(value, key) {
+        observer(object[key], key, value);
+    });
+    return changes;
 }
 
 /**
@@ -169,13 +172,13 @@ function changeProperties(object, values, observer) {
  * @return {Object} changes
  */
 function replaceProperties(object, values, observer) {
-	var changes = clone(values);
-	enumerate(object, function(value, key) {
-		if (!(key in changes)) {
-			changes[key] = null;
-		}
-	});
-	return changeProperties(object, changes, observer);
+    var changes = clone(values);
+    enumerate(object, function(value, key) {
+        if (!(key in changes)) {
+            changes[key] = null;
+        }
+    });
+    return changeProperties(object, changes, observer);
 }
 
 /**
@@ -184,7 +187,7 @@ function replaceProperties(object, values, observer) {
  * @return {WatchGetter} getter
  */
 function getWatchGetter(accessor) {
-	return new WatchGetter(accessor.get, accessor.observe, accessor.invokeObserver);
+    return new WatchGetter(accessor.get, accessor.observe, accessor.invokeObserver);
 }
 
 /**
@@ -193,7 +196,7 @@ function getWatchGetter(accessor) {
  * @return {Boolean} result
  */
 function cannotGet(source) {
-	return source.CanGet ? !source.canGet() : false;
+    return source.CanGet ? !source.canGet() : false;
 }
 
 /**
@@ -203,7 +206,7 @@ function cannotGet(source) {
  * @return {Function} setter
  */
 function setter(accessor, value) {
-	return function() {
-		accessor.set(value);
-	};
+    return function() {
+        accessor.set(value);
+    };
 }

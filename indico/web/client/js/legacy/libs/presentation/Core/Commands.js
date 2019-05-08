@@ -1,6 +1,9 @@
-/**
- * @author Tom
- */
+// This file is part of Indico.
+// Copyright (C) 2002 - 2019 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
 
 /**
  * Curries the method with the args.
@@ -9,10 +12,10 @@
  * @return {Function}
  */
 function curry(method) {
-	var args = $A(arguments, 1);
-	return function() {
-		return method.apply(this, concat(args, arguments));
-	};
+    var args = $A(arguments, 1);
+    return function() {
+        return method.apply(this, concat(args, arguments));
+    };
 }
 
 /**
@@ -22,10 +25,10 @@ function curry(method) {
  * @return {Function} template
  */
 function invoker(object, args) {
-	args = any(args, []);
-	return function Invoke(func) {
-		return (arguments.callee.result = func.apply(object, args));
-	};
+    args = any(args, []);
+    return function Invoke(func) {
+        return (arguments.callee.result = func.apply(object, args));
+    };
 }
 
 /**
@@ -34,10 +37,10 @@ function invoker(object, args) {
  * @return {Function} sequence
  */
 function sequence() {
-	var functions = compact(arguments);
-	return function Sequence() {
-		iterate(functions, invoker(this, $A(arguments)));
-	};
+    var functions = compact(arguments);
+    return function Sequence() {
+        iterate(functions, invoker(this, $A(arguments)));
+    };
 }
 
 /**
@@ -45,10 +48,10 @@ function sequence() {
  * @return {Function} commands
  */
 function commands() {
-	var methods = new Bag();
-	return mixinInstance(function() {
-		return methods.each(invoker(this, $A(arguments)));
-	}, methods, Attachable);
+    var methods = new Bag();
+    return mixinInstance(function() {
+        return methods.each(invoker(this, $A(arguments)));
+    }, methods, Attachable);
 }
 
 /**
@@ -58,11 +61,11 @@ function commands() {
  * @return {Function} command
  */
 function command(method, caption) {
-	function Command() {
-		return method.apply(this, $A(arguments));
-	}
-	Command.caption = caption;
-	return Command;
+    function Command() {
+        return method.apply(this, $A(arguments));
+    }
+    Command.caption = caption;
+    return Command;
 }
 
 /**
@@ -70,9 +73,9 @@ function command(method, caption) {
  * @param {Function} command
  */
 function invoke(method) {
-	if (exists(method)) {
-		return method.apply(this, $A(arguments, 1));
-	}
+    if (exists(method)) {
+        return method.apply(this, $A(arguments, 1));
+    }
 }
 
 /**
@@ -82,10 +85,10 @@ function invoke(method) {
  * @return {Function} cancel
  */
 function delay(method, timeout) {
-	var id = setTimeout(method, timeout);
-	return function() {
-		clearTimeout(id);
-	};
+    var id = setTimeout(method, timeout);
+    return function() {
+        clearTimeout(id);
+    };
 }
 
 /**
@@ -94,7 +97,7 @@ function delay(method, timeout) {
  * @return {Function} cancel
  */
 function defer(method) {
-	return delay(method, 1);
+    return delay(method, 1);
 }
 
 /**
@@ -103,24 +106,24 @@ function defer(method) {
  * @return {Function} cancel
  */
 function schedule(method) {
-	if (exists(method.scheduled)) {
-		return method.scheduled;
-	} else {
-		method.scheduled = defer(function() {
-			delete method.scheduled;
-			method();
-		});
-		return method.scheduled;
-	}
+    if (exists(method.scheduled)) {
+        return method.scheduled;
+    } else {
+        method.scheduled = defer(function() {
+            delete method.scheduled;
+            method();
+        });
+        return method.scheduled;
+    }
 }
 
 function delayedBind(target, key, builder) {
-	target[key] = function() {
-		var args = $A(arguments);
-		var method = builder.apply(this, args);
-		target[key] = method;
-		return method.apply(this, args);
-	};
+    target[key] = function() {
+        var args = $A(arguments);
+        var method = builder.apply(this, args);
+        target[key] = method;
+        return method.apply(this, args);
+    };
 }
 
 

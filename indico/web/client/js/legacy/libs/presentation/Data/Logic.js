@@ -1,10 +1,12 @@
-/**
- * Logic
- * @author Tom
- */
+// This file is part of Indico.
+// Copyright (C) 2002 - 2019 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
 
 function callOrGet(source) {
-	return isFunction(source) ? source() : source;
+    return isFunction(source) ? source() : source;
 }
 
 
@@ -17,18 +19,18 @@ function callOrGet(source) {
  * @return {Function}
  */
 function obtainTemplate(template) {
-	if (!exists(template)) {
-		return pass;
-	}
-	if (isFunction(template)) {
-		return template;
-	}
-	return function(value) {
-		return exists(value) ? value[template] : null;
-	};
+    if (!exists(template)) {
+        return pass;
+    }
+    if (isFunction(template)) {
+        return template;
+    }
+    return function(value) {
+        return exists(value) ? value[template] : null;
+    };
 }
 
-/** 
+/**
  * If the template does not exist returns the setter,
  * if the template is a function returns a function
  * that applies the template on an input value and invokes the setter,
@@ -39,17 +41,17 @@ function obtainTemplate(template) {
  * @return {Function}
  */
 function templatedSetter(template, setter) {
-	if (!exists(template)) {
-		return setter;
-	}
-	if (isFunction(template)) {
-		return function(value) {
-			setter(template(value));
-		};
-	}
-	return function(value) {
-		setter(exists(value) ? value[template] : null);
-	};
+    if (!exists(template)) {
+        return setter;
+    }
+    if (isFunction(template)) {
+        return function(value) {
+            setter(template(value));
+        };
+    }
+    return function(value) {
+        setter(exists(value) ? value[template] : null);
+    };
 }
 
 /**
@@ -59,9 +61,9 @@ function templatedSetter(template, setter) {
  * @return {Function} template
  */
 function getNoneTemplate(substitution) {
-	return function(value) {
-		return exists(value) ? value : callOrGet(substitution);
-	};
+    return function(value) {
+        return exists(value) ? value : callOrGet(substitution);
+    };
 }
 
 /**
@@ -71,13 +73,13 @@ function getNoneTemplate(substitution) {
  * @return {Function} template
  */
 function getBlankTemplate(substitution) {
-	return function(value) {
-		return empty(value) ? callOrGet(substitution) : value;
-	};
+    return function(value) {
+        return empty(value) ? callOrGet(substitution) : value;
+    };
 }
 
 function replaceEmpty(value, substitution) {
-	return empty(value) ? callOrGet(substitution) : value;
+    return empty(value) ? callOrGet(substitution) : value;
 }
 
 /**
@@ -91,13 +93,13 @@ function replaceEmpty(value, substitution) {
  * @return {Function}
  */
 function existenceTemplator(template, noneSubstitution, emptySubstitution) {
-	return function(value) {
-		return exists(value)
-			? empty(value)
-				? emptySubstitution
-				: template(value)
-			: noneSubstitution;
-	};
+    return function(value) {
+        return exists(value)
+            ? empty(value)
+                ? emptySubstitution
+                : template(value)
+            : noneSubstitution;
+    };
 }
 
 /**
@@ -107,15 +109,15 @@ function existenceTemplator(template, noneSubstitution, emptySubstitution) {
  * @return {Function}
  */
 function templateSplitter(templates, otherwise) {
-	otherwise = obtainTemplate(otherwise);
-	return function(value) {
-		var template = templates[value];
-		if (exists(template)) {
-			return template(value);
-		} else {
-			return otherwise(value);
-		}
-	};
+    otherwise = obtainTemplate(otherwise);
+    return function(value) {
+        var template = templates[value];
+        if (exists(template)) {
+            return template(value);
+        } else {
+            return otherwise(value);
+        }
+    };
 }
 
 /**
@@ -124,42 +126,42 @@ function templateSplitter(templates, otherwise) {
  * @return {Function}
  */
 function splitter(values) {
-	if (values.Lookup) {
-		return function(key) {
-			return values.get(key);
-		};
-	} else {
-		return function(key) {
-			return values[key];
-		};
-	}
+    if (values.Lookup) {
+        return function(key) {
+            return values.get(key);
+        };
+    } else {
+        return function(key) {
+            return values[key];
+        };
+    }
 }
 
 /**
  * Selects a value from the options.
  */
 type("Chooser", ["WatchAccessor"], {
-	/**
-	 * Returns a setter that selects a value from the options according the key.
-	 * @param {String} key
-	 * @return {Function} setter
-	 */
-	option: function(key) {
-		var self = this;
-		return function() {
-			self.set(key);
-		};
-	}
+    /**
+     * Returns a setter that selects a value from the options according the key.
+     * @param {String} key
+     * @return {Function} setter
+     */
+    option: function(key) {
+        var self = this;
+        return function() {
+            self.set(key);
+        };
+    }
 },
-	/**
-	 * Initializes chooser with the options.
-	 * @param {Object} options
-	 */
-	function(options) {
-		var value = $V();
-		mixinInstance(this, value, WatchGetter);
-		this.set = templatedSetter(splitter(options), value.set);
-	}
+    /**
+     * Initializes chooser with the options.
+     * @param {Object} options
+     */
+    function(options) {
+        var value = $V();
+        mixinInstance(this, value, WatchGetter);
+        this.set = templatedSetter(splitter(options), value.set);
+    }
 );
 
 /**
@@ -167,47 +169,47 @@ type("Chooser", ["WatchAccessor"], {
  */
 type("Switch", ["WatchGetter"], {
 },
-	/**
-	 * Initializes switch with states (string) and transitions (array).
-	 * @param {Array, String} ... transitions, states
-	 */
-	function() {
-		var state = $V();
-		var self = this;
-		mixinInstance(this, state, WatchGetter);
-		iterate(arguments, function(value) {
-			if (isArray(value)) {
-				self[value[0]] = function() {
-					iterate(value, function(item) {
-						state.set(item);
-					});
-				};
-			} else {
-				self[value] = function() {
-					state.set(value);
-				};
-			}
-		});
-	}
+    /**
+     * Initializes switch with states (string) and transitions (array).
+     * @param {Array, String} ... transitions, states
+     */
+    function() {
+        var state = $V();
+        var self = this;
+        mixinInstance(this, state, WatchGetter);
+        iterate(arguments, function(value) {
+            if (isArray(value)) {
+                self[value[0]] = function() {
+                    iterate(value, function(item) {
+                        state.set(item);
+                    });
+                };
+            } else {
+                self[value] = function() {
+                    state.set(value);
+                };
+            }
+        });
+    }
 );
 
 var Logic = {
-	/**
-	 * Allows only one accessor to have other value than the default value.
-	 * @param {Array} accessors
-	 * @param {Object} defaultValue
-	 */
-	onlyOne: function(accessors, defaultValue) {
-		iterate(accessors, function(accessor) {
-			accessor.observe(function(value) {
-				if (value !== defaultValue) {
-					iterate(accessors, function(acc) {
-						if (acc !== accessor) {
-							acc.set(defaultValue);
-						}
-					});
-				}
-			});
-		});
-	}
+    /**
+     * Allows only one accessor to have other value than the default value.
+     * @param {Array} accessors
+     * @param {Object} defaultValue
+     */
+    onlyOne: function(accessors, defaultValue) {
+        iterate(accessors, function(accessor) {
+            accessor.observe(function(value) {
+                if (value !== defaultValue) {
+                    iterate(accessors, function(acc) {
+                        if (acc !== accessor) {
+                            acc.set(defaultValue);
+                        }
+                    });
+                }
+            });
+        });
+    }
 };
