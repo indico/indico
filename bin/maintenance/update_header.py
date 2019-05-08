@@ -72,9 +72,6 @@ SUPPORTED_FILES = {
     'wsgi': {
         'regex': re.compile(br'((^#|[\r\n]#).*)*'),
         'format': {'comment_start': b'#', 'comment_middle': b'#', 'comment_end': b''}},
-    'sh': {
-        'regex': re.compile(br'((^#|[\r\n]#).*)*'),
-        'format': {'comment_start': b'#', 'comment_middle': b'#', 'comment_end': b''}},
     'js': {
         'regex': re.compile(br'/\*(.|[\r\n])*?\*/'),
         'format': {'comment_start': b'/*', 'comment_middle': b' *', 'comment_end': b' */'}},
@@ -87,9 +84,6 @@ SUPPORTED_FILES = {
     'scss': {
         'regex': re.compile(br'/\*(.|[\r\n])*?\*/|((^//|[\r\n]//).*)*'),
         'format': {'comment_start': b'//', 'comment_middle': b'//', 'comment_end': b''}},
-    'xsl': {
-        'regex': re.compile(br'<!--(.|[\r\n])*?-->'),
-        'format': {'comment_start': b'<!--\n   ', 'comment_middle': b'   ', 'comment_end': b'-->'}},
 }
 
 
@@ -145,6 +139,8 @@ def _update_header(project, file_path, year, substring, regex, data):
 def update_header(project, file_path, year):
     ext = file_path.rsplit('.', 1)[-1]
     if ext not in SUPPORTED_FILES or not os.path.isfile(file_path):
+        return
+    if os.path.basename(file_path)[0] == '.':
         return
     _update_header(project, file_path, year, SUBSTRING, SUPPORTED_FILES[ext]['regex'], SUPPORTED_FILES[ext]['format'])
 
