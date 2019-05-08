@@ -79,7 +79,7 @@ if __name__ == '__main__':
         long_description="Indico allows you to schedule conferences, from single talks to complex meetings with "
                          "sessions and contributions. It also includes an advanced user delegation mechanism, "
                          "allows paper reviewing, archival of conference information and electronic proceedings",
-        license='https://www.gnu.org/licenses/gpl-3.0.txt',
+        license='MIT',
         zip_safe=False,
         packages=find_packages(include=('indico', 'indico.*',)),
         include_package_data=True,

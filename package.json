@@ -136,7 +136,7 @@
     "url": "git+https://github.com/indico/indico.git"
   },
   "author": "Indico Team",
-  "license": "GPL-3.0",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/indico/indico/issues"
   },
