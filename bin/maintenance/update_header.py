@@ -74,10 +74,10 @@ SUPPORTED_FILES = {
         'format': {'comment_start': b'#', 'comment_middle': b'#', 'comment_end': b''}},
     'js': {
         'regex': re.compile(br'/\*(.|[\r\n])*?\*/'),
-        'format': {'comment_start': b'/*', 'comment_middle': b' *', 'comment_end': b' */'}},
+        'format': {'comment_start': b'//', 'comment_middle': b'//', 'comment_end': b''}},
     'jsx': {
         'regex': re.compile(br'/\*(.|[\r\n])*?\*/'),
-        'format': {'comment_start': b'/*', 'comment_middle': b' *', 'comment_end': b' */'}},
+        'format': {'comment_start': b'//', 'comment_middle': b'//', 'comment_end': b''}},
     'css': {
         'regex': re.compile(br'/\*(.|[\r\n])*?\*/'),
         'format': {'comment_start': b'/*', 'comment_middle': b' *', 'comment_end': b' */'}},
@@ -88,7 +88,7 @@ SUPPORTED_FILES = {
 
 
 # The substring which must be part of a comment block in order for the comment to be updated by the header.
-SUBSTRING = b' under the terms of the '
+SUBSTRING = b'This file is part of'
 
 
 USAGE = """
