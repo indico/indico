@@ -19,8 +19,6 @@ from __future__ import absolute_import, unicode_literals
 from sqlalchemy.orm import joinedload
 
 from indico.core.db import db
-from indico.modules.rb.models.locations import Location
-from indico.modules.rb.models.rooms import Room
 from indico.web.forms.fields import JSONField
 from indico.web.forms.widgets import LocationWidget
 
@@ -30,6 +28,7 @@ class IndicoLocationField(JSONField):
     widget = LocationWidget()
 
     def __init__(self, *args, **kwargs):
+        from indico.modules.rb.models.locations import Location
         self.edit_address = kwargs.pop('edit_address', True)
         self.allow_location_inheritance = kwargs.pop('allow_location_inheritance', True)
         self.locations = (Location.query
@@ -40,6 +39,8 @@ class IndicoLocationField(JSONField):
         super(IndicoLocationField, self).__init__(*args, **kwargs)
 
     def process_formdata(self, valuelist):
+        from indico.modules.rb.models.locations import Location
+        from indico.modules.rb.models.rooms import Room
         super(IndicoLocationField, self).process_formdata(valuelist)
         self.data['room'] = Room.get(int(self.data['room_id'])) if self.data.get('room_id') else None
         self.data['venue'] = (Location.get(int(self.data['venue_id']), is_deleted=False)
