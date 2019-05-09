@@ -102,7 +102,7 @@ def cformat(string):
     """
     reset = colored(u'')
     string = string.replace(u'%{reset}', reset)
-    string = re.sub(ur'%\{(?P<fg>[a-z]+)(?P<fg_bold>!?)(?:,(?P<bg>[a-z]+))?}', _cformat_sub, string)
+    string = re.sub(r'%\{(?P<fg>[a-z]+)(?P<fg_bold>!?)(?:,(?P<bg>[a-z]+))?}', _cformat_sub, string)
     if not string.endswith(reset):
         string += reset
     return Color(string)

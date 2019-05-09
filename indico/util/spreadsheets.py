@@ -43,7 +43,7 @@ def _prepare_header(header, as_unicode=True):
 _prepare_header_utf8 = partial(_prepare_header, as_unicode=False)
 
 
-def _prepare_csv_data(data, _linebreak_re=re.compile(ur'(\r?\n)+')):
+def _prepare_csv_data(data, _linebreak_re=re.compile(r'(\r?\n)+')):
     if isinstance(data, (list, tuple)):
         data = '; '.join(data)
     elif isinstance(data, set):

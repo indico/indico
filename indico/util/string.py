@@ -152,11 +152,11 @@ def slugify(*args, **kwargs):
 
     value = u'-'.join(to_unicode(val) for val in args)
     value = value.encode('translit/long')
-    value = re.sub(ur'[^\w\s-]', u'', value).strip()
+    value = re.sub(r'[^\w\s-]', u'', value).strip()
 
     if lower:
         value = value.lower()
-    value = re.sub(ur'[-\s]+', u'-', value)
+    value = re.sub(r'[-\s]+', u'-', value)
     if maxlen:
         value = value[0:maxlen].rstrip(u'-')
 
@@ -279,7 +279,7 @@ def validate_email(email):
 def validate_emails(emails):
     """Validate a space/semicolon/comma-separated list of email addresses."""
     emails = to_unicode(emails)
-    emails = re.split(ur'[\s;,]+', emails)
+    emails = re.split(r'[\s;,]+', emails)
     return all(validate_email(email) for email in emails if email)
 
 
@@ -373,7 +373,7 @@ def text_to_repr(text, html=False, max_length=50):
         text = u''
     if html:
         text = bleach.clean(text, tags=[], strip=True)
-    text = re.sub(ur'\s+', u' ', text)
+    text = re.sub(r'\s+', u' ', text)
     if max_length is not None and len(text) > max_length:
         text = text[:max_length] + u'...'
     return text.strip()

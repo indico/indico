@@ -631,11 +631,11 @@ class Table2Latex:
 
 class LinkTextPostProcessor(markdown.postprocessors.Postprocessor):
     def run(self, instr):
-        new_blocks = [re.sub(ur'<a[^>]*>([^<]+)</a>', lambda m: convert_link_to_latex(m.group(0)).strip(), block)
+        new_blocks = [re.sub(r'<a[^>]*>([^<]+)</a>', lambda m: convert_link_to_latex(m.group(0)).strip(), block)
                       for block in instr.split("\n\n")]
         return '\n\n'.join(new_blocks)
 
 
 def convert_link_to_latex(instr):
     dom = html5parser.fragment_fromstring(instr)
-    return ur'\href{%s}{%s}' % (dom.get('href'), dom.text)
+    return u'\\href{%s}{%s}' % (dom.get('href'), dom.text)
