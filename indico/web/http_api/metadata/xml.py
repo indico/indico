@@ -35,7 +35,7 @@ class XMLSerializer(Serializer):
         self._typeMap = kwargs.pop('typeMap', {})
         super(XMLSerializer, self).__init__(query_params, pretty, **kwargs)
 
-    def _convert(self, value, _control_char_re=re.compile(ur'[\x00-\x08\x0b\x0c\x0e-\x1f]')):
+    def _convert(self, value, _control_char_re=re.compile(r'[\x00-\x08\x0b\x0c\x0e-\x1f]')):
         if isinstance(value, datetime):
             return value.isoformat()
         elif isinstance(value, (int, long, float, bool)):

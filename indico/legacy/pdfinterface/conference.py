@@ -111,7 +111,7 @@ class ProgrammeToPDF(PDFBase):
         event_program = sanitize_for_platypus(render_markdown(track_settings.get(self.event, 'program')))
         parts = []
         for i, part in enumerate(re.split(r'\n+', event_program)):
-            if i > 0 and re.match(ur'<(p|ul|ol)\b[^>]*>', part):
+            if i > 0 and re.match(r'<(p|ul|ol)\b[^>]*>', part):
                 # extra spacing before a block-level element
                 parts.append(u'<br/>')
             parts.append(part)
