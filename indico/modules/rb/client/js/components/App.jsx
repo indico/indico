@@ -10,7 +10,7 @@ import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import {Link, Redirect, Route, Switch} from 'react-router-dom';
 import {ConnectedRouter} from 'connected-react-router';
-import {Dimmer, Icon, Loader, Responsive, Sidebar} from 'semantic-ui-react';
+import {Dimmer, Header, Icon, Loader, Responsive, Segment, Sidebar} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 import {RouteAwareOverridable, Overridable} from 'indico/react/util';
@@ -114,6 +114,16 @@ class App extends React.Component {
                             <ConditionalRoute path="/blockings" component={BlockingList} active={!isInitializing} />
                             <ConditionalRoute path="/calendar" component={Calendar} active={!isInitializing} />
                             <ConditionalRoute path="/admin" component={AdminArea} active={!isInitializing} />
+                            <Route render={() => (
+                                <Segment placeholder>
+                                    <Header icon color="red">
+                                        <Icon name="exclamation triangle" />
+                                        <Translate>
+                                            This page does not exist.
+                                        </Translate>
+                                    </Header>
+                                </Segment>
+                            )} />
                         </Switch>
                         <ModalController />
                     </div>
