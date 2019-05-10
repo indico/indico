@@ -11,6 +11,7 @@ import sys
 from contextlib import contextmanager
 from functools import partial
 
+from flask import g
 from flask_sqlalchemy import SQLAlchemy
 from flask_sqlalchemy.model import BindMetaMixin
 from sqlalchemy.event import listen
@@ -57,10 +58,21 @@ def handle_sqlalchemy_database_error():
     raise ConstraintViolated(msg, exc.orig), None, tb  # raise with original traceback
 
 
+def _after_commit(*args, **kwargs):
+    signals.after_commit.send()
+    if hasattr(g, 'memoize_cache'):
+        del g.memoize_cache
+
+
 class IndicoSQLAlchemy(SQLAlchemy):
     def __init__(self, *args, **kwargs):
         super(IndicoSQLAlchemy, self).__init__(*args, **kwargs)
         self.m = type(b'_Models', (object,), {})
+
+    def create_session(self, *args, **kwargs):
+        session = super(IndicoSQLAlchemy, self).create_session(*args, **kwargs)
+        listen(session, 'after_commit', _after_commit)
+        return session
 
     def enforce_constraints(self):
         """Enables immedaite enforcing of deferred constraints.

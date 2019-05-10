@@ -27,6 +27,12 @@ Called after an Indico request has been processed.  This signal is
 executed for both RH classes and legacy JSON-RPC services.
 """)
 
+after_commit = _signals.signal('after-commit', """
+Called after an SQL transaction has been committed.  Note that the
+session is in 'committed' state when this signal is called, so no SQL
+can be emitted while this signal is being handled.
+""")
+
 get_storage_backends = _signals.signal('get-storage-backends', """
 Expected to return one or more Storage subclasses.
 """)
