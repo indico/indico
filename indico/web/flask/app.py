@@ -17,9 +17,9 @@ from flask_pluginengine import current_plugin, plugins_loaded
 from markupsafe import Markup
 from pywebpack import WebpackBundleProject
 from sqlalchemy.orm import configure_mappers
-from werkzeug.contrib.fixers import ProxyFix
 from werkzeug.exceptions import BadRequest
 from werkzeug.local import LocalProxy
+from werkzeug.middleware.proxy_fix import ProxyFix
 from werkzeug.urls import url_parse
 from wtforms.widgets import html_params
 
@@ -87,7 +87,7 @@ def configure_app(app, set_path=False):
             app.config['APPLICATION_ROOT'] = base.path
     configure_xsendfile(app, config.STATIC_FILE_METHOD)
     if config.USE_PROXY:
-        app.wsgi_app = ProxyFix(app.wsgi_app)
+        app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)
     configure_webpack(app)
 
 

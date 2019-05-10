@@ -10,12 +10,12 @@ from __future__ import print_function, unicode_literals
 import os
 
 from flask.cli import DispatchingApp
-from werkzeug.contrib.fixers import ProxyFix
 from werkzeug.debug import DebuggedApplication
 from werkzeug.exceptions import NotFound
+from werkzeug.middleware.dispatcher import DispatcherMiddleware
+from werkzeug.middleware.proxy_fix import ProxyFix
 from werkzeug.serving import WSGIRequestHandler, run_simple
 from werkzeug.urls import url_parse
-from werkzeug.wsgi import DispatcherMiddleware
 
 
 def run_cmd(info, host, port, url, ssl, ssl_key, ssl_cert, quiet, proxy, enable_evalex, evalex_from, reloader_type):
@@ -100,7 +100,7 @@ def _make_wsgi_app(info, url, evalex_whitelist, proxy):
     app = DebuggedIndico(app, evalex_whitelist)
     app = _make_indico_dispatcher(app, url_data.path)
     if proxy:
-        app = ProxyFix(app)
+        app = ProxyFix(app, x_for=1, x_proto=1, x_host=1)
     QuietWSGIRequestHandler.INDICO_URL_PREFIX = url_data.path.rstrip('/')
     return app
 
