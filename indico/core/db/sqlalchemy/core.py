@@ -121,11 +121,6 @@ class NoNameGenMeta(BindMetaMixin, DeclarativeMeta):
     pass
 
 
-def on_models_committed(sender, changes):
-    for obj, change in changes:
-        obj.__committed__(change)
-
-
 def _schema_exists(connection, name):
     sql = 'SELECT COUNT(*) FROM "information_schema"."schemata" WHERE "schema_name" = :name'
     count = connection.execute(db.text(sql), name=name).scalar()

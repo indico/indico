@@ -224,17 +224,6 @@ class IndicoModel(Model):
                 raise ValueError("{} has no attribute '{}'".format(cls.__name__, attr))
             setattr(self, attr, getattr(obj, attr))
 
-    def __committed__(self, change):
-        """Called after a commit for this object.
-
-        ALWAYS call super if you override this method!
-
-        :param change: The operation that has been committed (delete/insert/update)
-        """
-        if hasattr(g, 'memoize_cache'):
-            del g.memoize_cache
-        signals.model_committed.send(type(self), obj=self, change=change)
-
 
 @listens_for(orm.mapper, 'after_configured', once=True)
 def _mappers_configured():

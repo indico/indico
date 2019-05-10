@@ -14,7 +14,6 @@ from babel.numbers import format_currency, get_currency_name
 from flask import _app_ctx_stack, request
 from flask.helpers import get_root_path
 from flask_pluginengine import current_plugin, plugins_loaded
-from flask_sqlalchemy import models_committed
 from markupsafe import Markup
 from pywebpack import WebpackBundleProject
 from sqlalchemy.orm import configure_mappers
@@ -30,7 +29,6 @@ from indico.core.auth import multipass
 from indico.core.celery import celery
 from indico.core.config import IndicoConfig, config, load_config
 from indico.core.db.sqlalchemy import db
-from indico.core.db.sqlalchemy.core import on_models_committed
 from indico.core.db.sqlalchemy.logging import apply_db_loggers
 from indico.core.db.sqlalchemy.util.models import import_all_models
 from indico.core.logger import Logger
@@ -223,7 +221,7 @@ def setup_jinja_customization(app):
 
 
 def configure_db(app):
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     if app.config['TESTING']:
         # tests do not actually use sqlite but run a postgres instance and
@@ -248,7 +246,6 @@ def configure_db(app):
         apply_db_loggers(app)
 
     plugins_loaded.connect(lambda sender: configure_mappers(), app, weak=False)
-    models_committed.connect(on_models_committed, app)
 
 
 def extend_url_map(app):
