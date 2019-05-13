@@ -11,6 +11,7 @@ from datetime import datetime, time
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
+from indico.core.permissions import get_unified_permissions, update_principals_permissions
 from indico.modules.rb.models.equipment import EquipmentType
 from indico.modules.rb.models.room_bookable_hours import BookableHours
 from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
@@ -55,5 +56,9 @@ def update_room_availability(room, availability):
 
 
 def update_room(room, args):
+    acl_entries = args.pop('acl_entries')
+    if acl_entries:
+        current = {e.principal: get_unified_permissions(e) for e in room.acl_entries}
+        update_principals_permissions(room, current, acl_entries)
     _populate_room(room, args)
     db.session.flush()

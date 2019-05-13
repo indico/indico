@@ -22,6 +22,7 @@ from indico.modules.rb.models.blockings import Blocking
 from indico.modules.rb.models.equipment import EquipmentType
 from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.map_areas import MapArea
+from indico.modules.rb.models.principals import RoomPrincipal
 from indico.modules.rb.models.reservation_edit_logs import ReservationEditLog
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import RepeatFrequency, Reservation, ReservationLink, ReservationState
@@ -33,7 +34,7 @@ from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.util import rb_is_admin
 from indico.modules.users.schemas import UserSchema
 from indico.util.i18n import _
-from indico.util.marshmallow import NaiveDateTime, Principal, PrincipalList
+from indico.util.marshmallow import NaiveDateTime, Principal, PrincipalList, PrincipalPermissionList
 from indico.util.string import natural_sort_key
 
 
@@ -71,13 +72,15 @@ class AdminRoomSchema(mm.ModelSchema):
 
 class RoomUpdateSchema(RoomSchema):
     owner = Principal()
+    acl_entries = PrincipalPermissionList(RoomPrincipal)
 
     class Meta(RoomSchema.Meta):
         fields = RoomSchema.Meta.fields + ('notification_before_days', 'notification_before_days_weekly', 'owner',
                                            'notification_before_days_monthly', 'notifications_enabled',
                                            'end_notification_daily', 'end_notification_weekly',
                                            'end_notification_monthly', 'end_notifications_enabled',
-                                           'verbose_name', 'site', 'notification_emails', 'booking_limit_days')
+                                           'verbose_name', 'site', 'notification_emails', 'booking_limit_days',
+                                           'acl_entries')
 
 
 class RoomEquipmentSchema(mm.ModelSchema):

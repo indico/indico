@@ -220,7 +220,7 @@ class RHVersionCheck(RHAdminBase):
                        plugins=self._check_version('indico-plugins'))
 
 
-class _PrincipalListWithIdentifiers(PrincipalList):
+class _PrincipalDict(PrincipalList):
     # We need to keep identifiers separately since for pending users we
     # can't get the correct one back from the user
     def _deserialize(self, value, attr, data):
@@ -260,7 +260,7 @@ class RHPrincipals(RHProtected):
                     'detail': principal.provider_title}
 
     @use_kwargs({
-        'values': _PrincipalListWithIdentifiers(allow_groups=True, allow_external_users=True, missing=[])
+        'values': _PrincipalDict(allow_groups=True, allow_external_users=True, missing={})
     })
     def _process(self, values):
         return jsonify({identifier: self._serialize_principal(identifier, principal)

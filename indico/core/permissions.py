@@ -63,17 +63,20 @@ def get_permissions_info(_type):
     from indico.modules.events import Event
     from indico.modules.events.contributions import Contribution
     from indico.modules.events.sessions import Session
+    from indico.modules.rb.models.rooms import Room
 
     description_mapping = {
         FULL_ACCESS_PERMISSION: {
             Event: _('Unrestricted management access for the whole event'),
             Session: _('Unrestricted management access for the selected session'),
-            Contribution: _('Unrestricted management access for the selected contribution')
+            Contribution: _('Unrestricted management access for the selected contribution'),
+            Room: _('Full management access over the room')
         },
         READ_ACCESS_PERMISSION: {
             Event: _('Access the public areas of the event'),
             Session: _('Access the public areas of the selected session'),
-            Contribution: _('Access the public areas of the selected contribution')
+            Contribution: _('Access the public areas of the selected contribution'),
+            Room: None
         }
     }
 
@@ -134,11 +137,10 @@ def get_split_permissions(permissions):
 
 def update_permissions(obj, form):
     """Update the permissions of an object, based on the corresponding WTForm."""
-    from indico.modules.events import Event
     from indico.util.user import principal_from_fossil
 
-    event = obj if isinstance(obj, Event) else obj.event
-    current_principal_permissions = {p.principal: get_principal_permissions(p, obj.__class__)
+    event = obj.event
+    current_principal_permissions = {p.principal: get_principal_permissions(p, type(obj))
                                      for p in obj.acl_entries}
     current_principal_permissions = {k: v for k, v in current_principal_permissions.iteritems() if v}
     new_principal_permissions = {
@@ -156,7 +158,7 @@ def update_principals_permissions(obj, current, new):
     :param current: A dict mapping principals to a set with its current permissions
     :param new: A dict mapping principals to a set with its new permissions
     """
-    user_selectable_permissions = {v.name for k, v in get_available_permissions(obj.__class__).viewitems()
+    user_selectable_permissions = {v.name for k, v in get_available_permissions(type(obj)).viewitems()
                                    if v.user_selectable}
     for principal, permissions in current.viewitems():
         if principal not in new:
