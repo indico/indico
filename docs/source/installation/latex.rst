@@ -8,7 +8,7 @@ as the *Book of Abstracts* and the PDF versions of contributions.
 
 Since Indico requires quite a few LaTeX packages which are not always]
 installed by default when using the texlive packages of the various
-linux distrubtions, we recommend installing it manually.
+linux distributions, we recommend installing it manually.
 
 First of all, you will need to install some dependencies so that all TeX
 formats are generated successfully upon TeXLive installation.
