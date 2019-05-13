@@ -14,8 +14,6 @@ from flask import session
 from indico.core import signals
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
-from indico.core.permissions import (FULL_ACCESS_PERMISSION, READ_ACCESS_PERMISSION, get_available_permissions,
-                                     get_principal_permissions)
 from indico.modules.categories.util import get_visibility_options
 from indico.modules.events import Event, EventLogKind, EventLogRealm, logger
 from indico.modules.events.cloning import EventCloner
@@ -24,7 +22,6 @@ from indico.modules.events.layout import layout_settings
 from indico.modules.events.logs.util import make_diff_log
 from indico.modules.events.models.events import EventType
 from indico.modules.events.models.references import ReferenceType
-from indico.util.user import principal_from_fossil
 
 
 def create_reference_type(data):
@@ -325,60 +322,3 @@ def sort_reviewing_questions(questions, new_positions):
         field.position = index
     db.session.flush()
     logger.info("Reviewing questions of %r reordered by %r", questions[0].event, session.user)
-
-
-def update_permissions(obj, form):
-    event = obj if isinstance(obj, Event) else obj.event
-    current_principal_permissions = {p.principal: get_principal_permissions(p, obj.__class__)
-                                     for p in obj.acl_entries}
-    current_principal_permissions = {k: v for k, v in current_principal_permissions.iteritems() if v}
-    new_principal_permissions = {
-        principal_from_fossil(fossil, allow_emails=True, allow_networks=True, allow_pending=True, event=event):
-            set(permissions)
-        for fossil, permissions in form.permissions.data
-    }
-    update_principals_permissions(obj, current_principal_permissions, new_principal_permissions)
-
-
-def get_split_permissions(permissions):
-    full_access_permission = FULL_ACCESS_PERMISSION in permissions
-    read_access_permission = READ_ACCESS_PERMISSION in permissions
-    other_permissions = permissions - {FULL_ACCESS_PERMISSION, READ_ACCESS_PERMISSION}
-    return full_access_permission, read_access_permission, other_permissions
-
-
-def update_principals_permissions(obj, current, new):
-    """Handle the updates of permissions and creations/deletions of acl principals.
-    :param obj: The object to update. Must have ``acl_entries``
-    :param current: A dict mapping principals to a set with its current permissions
-    :param new: A dict mapping principals to a set with its new permissions
-    """
-    user_selectable_permissions = {v.name for k, v in get_available_permissions(obj.__class__).viewitems()
-                                   if v.user_selectable}
-    for principal, permissions in current.viewitems():
-        if principal not in new:
-            permissions_kwargs = {
-                'full_access': False,
-                'read_access': False,
-                'del_permissions': user_selectable_permissions
-            }
-            obj.update_principal(principal, **permissions_kwargs)
-        elif permissions != new[principal]:
-            full_access, read_access, permissions = get_split_permissions(new[principal])
-            all_user_permissions = [set(entry.permissions) for entry in obj.acl_entries
-                                    if entry.principal == principal][0]
-            permissions_kwargs = {
-                'full_access': full_access,
-                'read_access': read_access,
-                'permissions': (all_user_permissions - user_selectable_permissions) | permissions
-            }
-            obj.update_principal(principal, **permissions_kwargs)
-    new_principals = set(new) - set(current)
-    for p in new_principals:
-        full_access, read_access, permissions = get_split_permissions(new[p])
-        permissions_kwargs = {
-            'full_access': full_access,
-            'read_access': read_access,
-            'add_permissions': permissions & user_selectable_permissions
-        }
-        obj.update_principal(p, **permissions_kwargs)

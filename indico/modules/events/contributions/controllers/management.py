@@ -15,7 +15,7 @@ from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.protection import ProtectionMode, render_acl
-from indico.core.permissions import get_principal_permissions
+from indico.core.permissions import get_principal_permissions, update_permissions
 from indico.legacy.pdfinterface.latex import ContribsToPDF, ContributionBook
 from indico.modules.attachments.controllers.event_package import AttachmentPackageGeneratorMixin
 from indico.modules.events.abstracts.forms import AbstractContentSettingsForm
@@ -43,7 +43,6 @@ from indico.modules.events.management.controllers import RHManageEventBase
 from indico.modules.events.management.controllers.base import RHContributionPersonListMixin
 from indico.modules.events.management.util import flash_if_unregistered
 from indico.modules.events.models.references import ReferenceType
-from indico.modules.events.operations import update_permissions
 from indico.modules.events.sessions import Session
 from indico.modules.events.timetable.forms import ImportContributionsForm
 from indico.modules.events.timetable.operations import update_timetable_entry

@@ -11,12 +11,12 @@ from flask import flash, redirect, request
 from werkzeug.exceptions import NotFound
 
 from indico.core.db.sqlalchemy.protection import ProtectionMode, render_acl
-from indico.core.permissions import get_permissions_info, get_principal_permissions
+from indico.core.permissions import get_permissions_info, get_principal_permissions, update_permissions
 from indico.modules.events import Event
 from indico.modules.events.management.controllers.base import RHManageEventBase
 from indico.modules.events.management.forms import EventProtectionForm
 from indico.modules.events.management.views import WPEventProtection
-from indico.modules.events.operations import update_event_protection, update_permissions
+from indico.modules.events.operations import update_event_protection
 from indico.modules.events.sessions import COORDINATOR_PRIV_SETTINGS, session_settings
 from indico.modules.events.sessions.operations import update_session_coordinator_privs
 from indico.modules.events.util import get_object_from_args

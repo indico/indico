@@ -14,12 +14,11 @@ from werkzeug.exceptions import BadRequest
 from indico.core.db import db
 from indico.core.db.sqlalchemy.colors import ColorTuple
 from indico.core.db.sqlalchemy.protection import ProtectionMode, render_acl
-from indico.core.permissions import get_principal_permissions
+from indico.core.permissions import get_principal_permissions, update_permissions
 from indico.modules.events import EventLogKind, EventLogRealm
 from indico.modules.events.contributions import contribution_settings
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.management.controllers.base import RHContributionPersonListMixin
-from indico.modules.events.operations import update_permissions
 from indico.modules.events.sessions.controllers.management import (RHManageSessionBase, RHManageSessionsActionsBase,
                                                                    RHManageSessionsBase)
 from indico.modules.events.sessions.forms import (MeetingSessionBlockForm, SessionForm, SessionProtectionForm,
