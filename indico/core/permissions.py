@@ -115,3 +115,73 @@ def get_principal_permissions(principal, _type):
         permissions.add(READ_ACCESS_PERMISSION)
     available_permissions = get_permissions_info(_type)[0]
     return permissions | (set(principal.permissions) & set(available_permissions))
+
+
+def get_unified_permissions(principal):
+    """Convert principal's permissions into a list including read and full access."""
+    if principal.full_access:
+        return {FULL_ACCESS_PERMISSION}
+    return (set(principal.permissions) + {READ_ACCESS_PERMISSION}) if principal.read_access else principal.permissions
+
+
+def get_split_permissions(permissions):
+    """Split a list of permissions into a `has_full_access, has_read_access, list_with_others` tuple."""
+    full_access_permission = FULL_ACCESS_PERMISSION in permissions
+    read_access_permission = READ_ACCESS_PERMISSION in permissions
+    other_permissions = permissions - {FULL_ACCESS_PERMISSION, READ_ACCESS_PERMISSION}
+    return full_access_permission, read_access_permission, other_permissions
+
+
+def update_permissions(obj, form):
+    """Update the permissions of an object, based on the corresponding WTForm."""
+    from indico.modules.events import Event
+    from indico.util.user import principal_from_fossil
+
+    event = obj if isinstance(obj, Event) else obj.event
+    current_principal_permissions = {p.principal: get_principal_permissions(p, obj.__class__)
+                                     for p in obj.acl_entries}
+    current_principal_permissions = {k: v for k, v in current_principal_permissions.iteritems() if v}
+    new_principal_permissions = {
+        principal_from_fossil(fossil, allow_emails=True, allow_networks=True, allow_pending=True, event=event):
+            set(permissions)
+        for fossil, permissions in form.permissions.data
+    }
+    update_principals_permissions(obj, current_principal_permissions, new_principal_permissions)
+
+
+def update_principals_permissions(obj, current, new):
+    """Handle the updates of permissions and creations/deletions of acl principals.
+
+    :param obj: The object to update. Must have ``acl_entries``
+    :param current: A dict mapping principals to a set with its current permissions
+    :param new: A dict mapping principals to a set with its new permissions
+    """
+    user_selectable_permissions = {v.name for k, v in get_available_permissions(obj.__class__).viewitems()
+                                   if v.user_selectable}
+    for principal, permissions in current.viewitems():
+        if principal not in new:
+            permissions_kwargs = {
+                'full_access': False,
+                'read_access': False,
+                'del_permissions': user_selectable_permissions
+            }
+            obj.update_principal(principal, **permissions_kwargs)
+        elif permissions != new[principal]:
+            full_access, read_access, permissions = get_split_permissions(new[principal])
+            all_user_permissions = [set(entry.permissions) for entry in obj.acl_entries
+                                    if entry.principal == principal][0]
+            permissions_kwargs = {
+                'full_access': full_access,
+                'read_access': read_access,
+                'permissions': (all_user_permissions - user_selectable_permissions) | permissions
+            }
+            obj.update_principal(principal, **permissions_kwargs)
+    new_principals = set(new) - set(current)
+    for p in new_principals:
+        full_access, read_access, permissions = get_split_permissions(new[p])
+        permissions_kwargs = {
+            'full_access': full_access,
+            'read_access': read_access,
+            'add_permissions': permissions & user_selectable_permissions
+        }
+        obj.update_principal(p, **permissions_kwargs)
