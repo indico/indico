@@ -47,7 +47,7 @@ export const PrincipalListItem = (
         name, detail, canDelete,
         onDelete, onAddFavorite, onDelFavorite,
         disabled, readOnly, favorite,
-        search
+        search, actions
     }
 ) => (
     <List.Item>
@@ -63,6 +63,11 @@ export const PrincipalListItem = (
                     <List.Description>
                         <small>{detail}</small>
                     </List.Description>
+                )}
+                {actions && (
+                    <div>
+                        {actions}
+                    </div>
                 )}
             </div>
             {!readOnly && (
@@ -92,6 +97,7 @@ PrincipalListItem.propTypes = {
     isPendingUser: PropTypes.bool,
     name: PropTypes.string.isRequired,
     detail: PropTypes.string,
+    actions: PropTypes.node,
     onDelete: PropTypes.func.isRequired,
     onAddFavorite: PropTypes.func.isRequired,
     onDelFavorite: PropTypes.func.isRequired,
@@ -104,6 +110,7 @@ PrincipalListItem.propTypes = {
 
 PrincipalListItem.defaultProps = {
     canDelete: true,
+    actions: null,
     disabled: false,
     readOnly: false,
     isGroup: false,

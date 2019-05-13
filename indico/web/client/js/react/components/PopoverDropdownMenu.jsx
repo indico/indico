@@ -82,9 +82,11 @@ PopoverDropdownMenu.propTypes = {
     /** Gets called when the menu is closed */
     onClose: PropTypes.func,
     /** Placement of the menu, relative to the trigger */
-    placement: PropTypes.oneOf(['auto', 'top', 'right', 'bottom', 'left']
-        .map(e => [e, `${e}-start`, `${e}-end`])
-        .flat()),
+    placement: PropTypes.oneOf(
+        _.flatten(['auto', 'top', 'right', 'bottom', 'left']
+            .map(e => [e, `${e}-start`, `${e}-end`])
+        )
+    ),
     /** `true` means that the menu may overflow the container */
     overflow: PropTypes.bool
 };

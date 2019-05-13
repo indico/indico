@@ -5,21 +5,18 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import principalsURL from 'indico-url:core.principals';
-
 import _ from 'lodash';
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import {Button, List} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
-import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
-import {camelizeKeys} from 'indico/utils/case';
 import {UserSearch, GroupSearch} from './Search';
+import {useFetchPrincipals} from './hooks';
 import {PendingPrincipalListItem, PrincipalListItem} from './items';
 import {FinalField} from '../../forms';
+import {getPrincipalList} from '../principals/util';
 
 import './PrincipalListField.module.scss';
-
 
 /**
  * A field that lets the user select a list of users/groups.
@@ -34,10 +31,8 @@ const PrincipalListField = (props) => {
     } = props;
     const [favoriteUsers, [handleAddFavorite, handleDelFavorite]] = favoriteUsersController;
 
-    // keep track of details for each entry
-    const [identifierMap, setIdentifierMap] = useState({});
+    const informationMap = useFetchPrincipals(value);
 
-    const isGroup = identifier => identifier.startsWith('Group:');
     const markTouched = () => {
         onFocus();
         onBlur();
@@ -47,42 +42,17 @@ const PrincipalListField = (props) => {
         markTouched();
     };
     const handleAddItems = data => {
-        setIdentifierMap(prev => ({...prev, ..._.keyBy(data, 'identifier')}));
         onChange([...value, ...data.map(x => x.identifier)]);
         markTouched();
     };
 
-    // fetch missing details
-    useEffect(() => {
-        const missingData = _.difference(value, Object.keys(identifierMap));
-        if (!missingData.length) {
-            return;
-        }
-
-        const source = indicoAxios.CancelToken.source();
-        (async () => {
-            let response;
-            try {
-                response = await indicoAxios.post(principalsURL(), {values: missingData}, {cancelToken: source.token});
-            } catch (error) {
-                handleAxiosError(error);
-                return;
-            }
-            setIdentifierMap(prev => ({...prev, ...camelizeKeys(response.data)}));
-        })();
-
-        return () => {
-            source.cancel();
-        };
-    }, [identifierMap, value]);
-
-    const entries = _.sortBy(
-        value.filter(x => x in identifierMap).map(x => identifierMap[x]),
-        x => `${x.group ? 0 : 1}-${x.name.toLowerCase()}`
-    );
-    const pendingEntries = _.sortBy(
-        value.filter(x => !(x in identifierMap)).map(x => ({identifier: x, group: isGroup(x)})),
-        x => `${x.group ? 0 : 1}-${x.identifier.toLowerCase()}`
+    const isGroup = identifier => identifier.startsWith('Group:');
+    const [entries, pendingEntries] = getPrincipalList(
+        value,
+        informationMap,
+        id => ({identifier: id, group: isGroup(id)}),
+        entry => `${entry.group ? 0 : 1}-${entry.name.toLowerCase()}`,
+        entry => `${entry.group ? 0 : 1}-${entry.identifier.toLowerCase()}`
     );
 
     return (

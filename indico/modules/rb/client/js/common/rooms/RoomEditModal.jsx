@@ -32,7 +32,7 @@ import {
 } from 'indico/react/forms';
 import {FavoritesProvider} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
-import {FinalEmailList, FinalPrincipal} from 'indico/react/components';
+import {FinalEmailList, FinalPrincipal, ACLField} from 'indico/react/components';
 import EquipmentList from './EquipmentList';
 import DailyAvailability from './DailyAvailability';
 import NonBookablePeriods from './NonBookablePeriods';
@@ -159,6 +159,11 @@ const columns = [
         label: Translate.string('Daily availability'),
     }, {
         type: 'bookableHours',
+    }, {
+        type: 'header',
+        label: Translate.string('Permissions')
+    }, {
+        type: 'permissions'
     }],
     // center
     [{
@@ -760,6 +765,20 @@ class RoomEditModal extends React.Component {
                                 component={NonBookablePeriods}
                                 isEqual={_.isEqual}
                                 format={value => (value === null ? [] : value)} />
+                );
+            case 'permissions':
+                return (
+                    <FavoritesProvider key={key}>
+                        {favoriteUsersController => (
+                            <FinalField name="aclEntries"
+                                        component={ACLField}
+                                        favoriteUsersController={favoriteUsersController}
+                                        label={content.label}
+                                        readAccessAllowed={false}
+                                        isEqual={_.isEqual}
+                                        withGroups />
+                        )}
+                    </FavoritesProvider>
                 );
         }
     };

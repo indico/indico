@@ -1,0 +1,27 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2019 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@import 'base/palette';
+
+.permission-add-button:global(.circular.icon) {
+    margin: 0.2em 0 0.2em 0.2em;
+    cursor: pointer;
+
+    &:hover {
+        color: $gray;
+    }
+}
+
+.principal-permission {
+    :global(.ui.label) {
+        margin: 0.2em 0 0 0.2em;
+    }
+
+    :global(.ui.icon.button i) {
+        margin: 0;
+    }
+}
