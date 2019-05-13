@@ -12,4 +12,4 @@ from indico.modules.admin.views import WPAdmin
 
 class WPCephalopod(WPAdmin):
     template_prefix = 'cephalopod/'
-    bundles = ('cephalopod.js',)
+    bundles = ('module_cephalopod.js',)
