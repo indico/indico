@@ -14,6 +14,7 @@ from flask import jsonify, redirect, request, session
 from sqlalchemy.orm import joinedload
 
 from indico.core.db.sqlalchemy.util.queries import db_dates_overlap
+from indico.core.permissions import get_permissions_info
 from indico.modules.rb import rb_settings
 from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.controllers.backend.common import _cache
@@ -95,3 +96,9 @@ class RHEquipmentTypes(RHRoomBookingBase):
 
     def _process(self):
         return jsonify(self._get_equipment_types())
+
+
+class RHPermissionsInfo(RHRoomBookingBase):
+    def _process(self):
+        permissions, tree = get_permissions_info(Room)
+        return jsonify(permissions=permissions, tree=tree)

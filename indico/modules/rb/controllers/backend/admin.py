@@ -25,6 +25,7 @@ from indico.modules.rb.controllers.backend.rooms import RHRoomsPermissions
 from indico.modules.rb.models.equipment import EquipmentType, RoomEquipmentAssociation
 from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.photos import Photo
+from indico.modules.rb.models.principals import RoomPrincipal
 from indico.modules.rb.models.room_attributes import RoomAttribute, RoomAttributeAssociation
 from indico.modules.rb.models.room_features import RoomFeature
 from indico.modules.rb.models.rooms import Room
@@ -37,7 +38,7 @@ from indico.modules.rb.schemas import (AdminRoomSchema, RoomAttributeValuesSchem
 from indico.modules.rb.util import (build_rooms_spritesheet, get_resized_room_photo, rb_is_admin,
                                     remove_room_spritesheet_photo)
 from indico.util.i18n import _
-from indico.util.marshmallow import ModelList, Principal, PrincipalList
+from indico.util.marshmallow import ModelList, Principal, PrincipalList, PrincipalPermissionList
 from indico.web.flask.util import send_file
 from indico.web.util import ExpectedError
 
@@ -449,6 +450,7 @@ room_update_args = {
     'surface_area': fields.Int(validate=lambda x: x >= 0, allow_none=True),
     'max_advance_days': fields.Int(validate=lambda x: x >= 1, allow_none=True),
     'comments': fields.Str(),
+    'acl_entries': PrincipalPermissionList(RoomPrincipal)
 }
 
 

@@ -12,6 +12,7 @@ from marshmallow.fields import DateTime, Field
 from marshmallow.utils import from_iso_datetime
 from sqlalchemy import inspect
 
+from indico.core.permissions import get_split_permissions, get_unified_permissions
 from indico.util.user import principal_from_identifier
 
 
@@ -140,5 +141,25 @@ class PrincipalList(Field):
                                                  allow_groups=self.allow_groups,
                                                  allow_external_users=self.allow_external_users)
                        for identifier in value)
+        except ValueError as exc:
+            raise ValidationError(unicode(exc))
+
+
+class PrincipalPermissionList(Field):
+    """Marshmallow field for a list of principals and their permissions."""
+
+    def __init__(self, principal_class, **kwargs):
+        self.principal_class = principal_class
+        super(PrincipalPermissionList, self).__init__(**kwargs)
+
+    def _serialize(self, value, attr, obj):
+        return [(entry.principal.identifier, sorted(get_unified_permissions(entry))) for entry in value]
+
+    def _deserialize(self, value, attr, data):
+        try:
+            return {
+                principal_from_identifier(identifier, allow_groups=True): set(permissions)
+                for identifier, permissions in value
+            }
         except ValueError as exc:
             raise ValidationError(unicode(exc))
