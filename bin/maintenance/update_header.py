@@ -64,10 +64,10 @@ SUPPORTED_FILES = {
         'regex': re.compile(br'((^#|[\r\n]#).*)*'),
         'format': {'comment_start': b'#', 'comment_middle': b'#', 'comment_end': b''}},
     'js': {
-        'regex': re.compile(br'/\*(.|[\r\n])*?\*/'),
+        'regex': re.compile(br'/\*(.|[\r\n])*?\*/|((^//|[\r\n]//).*)*'),
         'format': {'comment_start': b'//', 'comment_middle': b'//', 'comment_end': b''}},
     'jsx': {
-        'regex': re.compile(br'/\*(.|[\r\n])*?\*/'),
+        'regex': re.compile(br'/\*(.|[\r\n])*?\*/|((^//|[\r\n]//).*)*'),
         'format': {'comment_start': b'//', 'comment_middle': b'//', 'comment_end': b''}},
     'css': {
         'regex': re.compile(br'/\*(.|[\r\n])*?\*/'),
