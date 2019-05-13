@@ -1006,15 +1006,6 @@ table.infoTable td.content {
     vertical-align: middle !important;
 }
 
-div#social a {
-    display: block;
-    overflow: auto;
-}
-
-div#social:hover {
-    opacity: 1;
-}
-
 .placesLeft {
     color:green;
     font-style:italic;
