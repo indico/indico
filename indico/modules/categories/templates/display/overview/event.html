@@ -11,7 +11,9 @@
                         Ongoing from {{ start }} until {{ end }}.
                     {%- endtrans %}
                 {% endset %}
-                <span title="{{ ongoing_message }}">ongoing</span>
+                <span title="{{ ongoing_message }}">
+                    {% trans %}ongoing{% endtrans %}
+                </span>
             {% else %}
                 {{ event.start_dt|format_time(format='HH:mm', timezone=timezone) }}
             {% endif %}
