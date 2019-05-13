@@ -19,4 +19,5 @@ export {default as Carousel} from './Carousel';
 export {default as ScrollButton} from './ScrollButton';
 export {default as StickyWithScrollBack} from './StickyWithScrollBack';
 export {default as EmailListField, FinalEmailList} from './EmailListField';
-export {FinalPrincipal, FinalPrincipalList, PrincipalField, PrincipalListField} from './principals';
+export {FinalPrincipal, FinalPrincipalList, PrincipalField, PrincipalListField, ACLField} from './principals';
+export {default as PopoverDropdownMenu} from './PopoverDropdownMenu';
