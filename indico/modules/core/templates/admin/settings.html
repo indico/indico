@@ -34,19 +34,6 @@
         {%- endcall %}
     {% endif %}
 
-    {% if request.script_root %}
-        {% call message_box('warning') -%}
-            {%- trans script_root=request.script_root -%}
-                You are currently running Indico in a subdirectory ({{ script_root }}).<br>
-                While using a URL subdirectory has been discouraged since the release of 2.0,
-                there will be further changes in the next release (2.2) which will require
-                you to <strong>build your own Indico packages</strong>. To avoid this, we
-                <strong>strongly</strong> recommend you to move your Indico instance to a
-                subdomain!
-            {%- endtrans -%}
-        {%- endcall %}
-    {% endif %}
-
     {% call message_box('highlight', classes='js-indico-version-message', style='display: none;') -%}
         {% trans -%}
             A new Indico version (<strong id="new-indico-version"></strong>) is available!
