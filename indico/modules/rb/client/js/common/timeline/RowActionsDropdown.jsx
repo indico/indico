@@ -10,9 +10,10 @@ import PropTypes from 'prop-types';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import {Form as FinalForm} from 'react-final-form';
-import {Button, Confirm, Dropdown, Form, Icon, Portal} from 'semantic-ui-react';
+import {Button, Confirm, Dropdown, Form, Icon} from 'semantic-ui-react';
 
 import {serializeDate} from 'indico/utils/date';
+import {PopoverDropdownMenu} from 'indico/react/components';
 import {FinalTextArea} from 'indico/react/forms';
 import {Param, Translate} from 'indico/react/i18n';
 
@@ -48,9 +49,7 @@ class RowActionsDropdown extends React.Component {
         actionInProgress: false,
         activeConfirmation: null,
         activeRoomTimeline: false,
-        dropdownOpen: false,
-        top: 0,
-        left: 0,
+        dropdownOpen: false
     };
 
 
@@ -83,20 +82,9 @@ class RowActionsDropdown extends React.Component {
         this.setState({actionInProgress: false});
     };
 
-    findPositioning = () => {
-        const positioning = this.dropdownIconRef.current.getBoundingClientRect();
-        return {
-            top: positioning.bottom - (positioning.height / 2),
-            left: positioning.right,
-        };
-    };
-
     handleButtonClick = () => {
-        const {top, left} = this.findPositioning();
         this.setState({
-            dropdownOpen: true,
-            top,
-            left
+            dropdownOpen: true
         });
     };
 
@@ -128,7 +116,7 @@ class RowActionsDropdown extends React.Component {
     };
 
     render() {
-        const {activeConfirmation, activeRoomTimeline, actionInProgress, dropdownOpen, top, left} = this.state;
+        const {activeConfirmation, activeRoomTimeline, actionInProgress, dropdownOpen} = this.state;
         const {booking, date, room} = this.props;
         const serializedDate = serializeDate(date, 'L');
         let canCancel, canReject;
@@ -146,45 +134,38 @@ class RowActionsDropdown extends React.Component {
         }
 
         const styleName = (dropdownOpen ? 'dropdown-button open' : 'dropdown-button');
+        const trigger = (
+            <Button styleName={styleName}
+                    loading={actionInProgress}>
+                <Button.Content>
+                    <Icon name="ellipsis horizontal" size="large" />
+                </Button.Content>
+            </Button>
+        );
+
         return (
             <div styleName="actions-dropdown">
-                <Portal closeOnTriggerClick
-                        openOnTriggerClick
-                        onOpen={this.handleButtonClick}
-                        onClose={() => this.setState({dropdownOpen: false})}
-                        trigger={
-                            <Button styleName={styleName}
-                                    onClick={this.handleButtonClick}
-                                    loading={actionInProgress}>
-                                <Button.Content>
-                                    <div ref={this.dropdownIconRef}>
-                                        <Icon name="ellipsis horizontal" size="large" />
-                                    </div>
-                                </Button.Content>
-                            </Button>
-                        }>
-                    <Dropdown icon={null}
-                              open
-                              style={{left: `${left}px`, position: 'fixed', top: `${top}px`, zIndex: 1000}}>
-                        <Dropdown.Menu direction="left">
-                            {canCancel && (
-                                <Dropdown.Item icon="times"
-                                               text={Translate.string('Cancel occurrence')}
-                                               onClick={() => this.showConfirm('cancel')} />
-                            )}
-                            {canReject && (
-                                <Dropdown.Item icon="times circle"
-                                               text={Translate.string('Reject occurrence')}
-                                               onClick={() => this.showConfirm('reject')} />
-                            )}
-                            {room && (
-                                <Dropdown.Item icon="list"
-                                               text={Translate.string('Show room timeline')}
-                                               onClick={() => this.showRoomTimeline(room)} />
-                            )}
-                        </Dropdown.Menu>
-                    </Dropdown>
-                </Portal>
+                <PopoverDropdownMenu onOpen={this.handleButtonClick}
+                                     onClose={() => this.setState({dropdownOpen: false})}
+                                     open={dropdownOpen}
+                                     trigger={trigger}
+                                     placement="bottom">
+                    {canCancel && (
+                        <Dropdown.Item icon="times"
+                                       text={Translate.string('Cancel occurrence')}
+                                       onClick={() => this.showConfirm('cancel')} />
+                    )}
+                    {canReject && (
+                        <Dropdown.Item icon="times circle"
+                                       text={Translate.string('Reject occurrence')}
+                                       onClick={() => this.showConfirm('reject')} />
+                    )}
+                    {room && (
+                        <Dropdown.Item icon="list"
+                                       text={Translate.string('Show room timeline')}
+                                       onClick={() => this.showRoomTimeline(room)} />
+                    )}
+                </PopoverDropdownMenu>
                 <Confirm header={Translate.string('Confirm cancellation')}
                          content={
                              Translate.string(
