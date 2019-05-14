@@ -16,6 +16,7 @@ import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {camelizeKeys} from 'indico/utils/case';
 import {UserSearch, GroupSearch} from './Search';
 import {PendingPrincipalListItem, PrincipalListItem} from './items';
+import {FinalField} from '../../forms';
 
 import './PrincipalListField.module.scss';
 
@@ -146,3 +147,31 @@ PrincipalListField.defaultProps = {
 };
 
 export default React.memo(PrincipalListField);
+
+
+/**
+ * Like `FinalField` but for a `PrincipalListField`.
+ */
+export function FinalPrincipalList({name, ...rest}) {
+    return (
+        <FinalField name={name}
+                    component={PrincipalListField}
+                    isEqual={(a, b) => _.isEqual(a.sort(), b.sort())}
+                    {...rest} />
+
+    );
+}
+
+FinalPrincipalList.propTypes = {
+    name: PropTypes.string.isRequired,
+    readOnly: PropTypes.bool,
+    withGroups: PropTypes.bool,
+    withExternalUsers: PropTypes.bool,
+    favoriteUsersController: PropTypes.array.isRequired,
+};
+
+FinalPrincipalList.defaultProps = {
+    withGroups: false,
+    withExternalUsers: false,
+    readOnly: false,
+};

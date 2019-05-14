@@ -5,5 +5,5 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-export {default as PrincipalField} from './PrincipalField';
-export {default as PrincipalListField} from './PrincipalListField';
+export {default as PrincipalField, FinalPrincipal} from './PrincipalField';
+export {default as PrincipalListField, FinalPrincipalList} from './PrincipalListField';

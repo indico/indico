@@ -9,16 +9,14 @@ import _ from 'lodash';
 import moment from 'moment';
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Form as FinalForm, Field} from 'react-final-form';
+import {Form as FinalForm} from 'react-final-form';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
-import {
-    Button, Confirm, Form, Grid, Header, Icon, Label, List, Message, Modal, Popup, TextArea
-} from 'semantic-ui-react';
+import {Button, Confirm, Form, Grid, Header, Icon, Label, List, Message, Modal, Popup} from 'semantic-ui-react';
 
 import {toMoment, serializeDate} from 'indico/utils/date';
 import {Param, Translate} from 'indico/react/i18n';
-import {ReduxFormField, formatters, validators as v} from 'indico/react/forms';
+import {FinalTextArea} from 'indico/react/forms';
 import {DailyTimelineContent, TimelineLegend} from '../timeline';
 import {getRecurrenceInfo, PopupParam, getOccurrenceTypes, transformToLegendLabels} from '../../util';
 import RoomBasicDetails from '../../components/RoomBasicDetails';
@@ -306,16 +304,10 @@ class BookingDetails extends React.Component {
         const renderForm = ({handleSubmit, hasValidationErrors, submitSucceeded, submitting, pristine}) => {
             return (
                 <Form styleName="rejection-form" onSubmit={handleSubmit}>
-                    <Field name="reason"
-                           component={ReduxFormField}
-                           as={TextArea}
-                           format={formatters.trim}
-                           placeholder={Translate.string('Provide the rejection reason')}
-                           rows={2}
-                           validate={v.required}
-                           disabled={submitting}
-                           required
-                           formatOnBlur />
+                    <FinalTextArea name="reason"
+                                   placeholder={Translate.string('Provide the rejection reason')}
+                                   rows={2}
+                                   required />
                     <Button type="submit"
                             disabled={submitting || pristine || hasValidationErrors || submitSucceeded}
                             loading={submitting}

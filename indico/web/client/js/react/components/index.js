@@ -19,4 +19,4 @@ export {default as Carousel} from './Carousel';
 export {default as ScrollButton} from './ScrollButton';
 export {default as StickyWithScrollBack} from './StickyWithScrollBack';
 export {default as EmailListField} from './EmailListField';
-export {PrincipalField, PrincipalListField} from './principals';
+export {FinalPrincipal, FinalPrincipalList, PrincipalField, PrincipalListField} from './principals';

@@ -14,7 +14,7 @@ import createDecorator from 'final-form-calculate';
 import {Field} from 'react-final-form';
 import {List} from 'semantic-ui-react';
 import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
-import {formatters, validators as v, parsers as p, ReduxDropdownField, ReduxFormField} from 'indico/react/forms';
+import {validators as v, FinalDropdown, FinalInput} from 'indico/react/forms';
 import {snakifyKeys} from 'indico/utils/case';
 import * as adminActions from './actions';
 import * as adminSelectors from './selectors';
@@ -93,59 +93,52 @@ class LocationPage extends React.PureComponent {
 
     renderForm = () => (
         <>
-            <Field name="name" component={ReduxFormField} as="input"
-                   required
-                   format={formatters.trim} formatOnBlur
-                   label={Translate.string('Name')}
-                   autoFocus />
-            <Field name="room_name_format" component={ReduxFormField} as="input"
-                   required
-                   format={formatters.trim} formatOnBlur
-                   label={Translate.string('Room name format')}
-                   validate={val => {
-                       const rv = v.required(val);
-                       if (rv) {
-                           return rv;
-                       }
-                       const missing = ['{building}', '{floor}', '{number}'].filter(x => !val.includes(x));
-                       if (missing.length) {
-                           return PluralTranslate.string(
-                               'Missing placeholder: {placeholders}',
-                               'Missing placeholders: {placeholders}',
-                               missing.length,
-                               {placeholders: missing.join(', ')}
-                           );
-                       }
-                   }} />
-            <Field name="_map_url_template_choice" component={ReduxDropdownField}
-                   parse={null}
-                   label={Translate.string('Map URL template')}
-                   selection options={MAP_TEMPLATE_OPTIONS}>
-                <p className="field-description">
-                    <Translate>
-                        Indico can show a link to an external map when a room is associated to an event.
-                    </Translate>
-                </p>
-            </Field>
+            <FinalInput name="name"
+                        required
+                        label={Translate.string('Name')}
+                        autoFocus />
+            <FinalInput name="room_name_format"
+                        required
+                        label={Translate.string('Room name format')}
+                        validate={val => {
+                            const rv = v.required(val);
+                            if (rv) {
+                                return rv;
+                            }
+                            const missing = ['{building}', '{floor}', '{number}'].filter(x => !val.includes(x));
+                            if (missing.length) {
+                                return PluralTranslate.string(
+                                    'Missing placeholder: {placeholders}',
+                                    'Missing placeholders: {placeholders}',
+                                    missing.length,
+                                    {placeholders: missing.join(', ')}
+                                );
+                            }
+                        }} />
+            <FinalDropdown name="_map_url_template_choice"
+                           label={Translate.string('Map URL template')}
+                           description={(
+                               <Translate>
+                                   Indico can show a link to an external map when a room is associated to an event.
+                               </Translate>
+                           )}
+                           selection options={MAP_TEMPLATE_OPTIONS} />
             <Field name="_map_url_template_choice" subscription={{value: true}}>
                 {({input: {value: selectedTemplate}}) => (
-                    <Field name="map_url_template" component={ReduxFormField} as="input"
-                           format={formatters.trim} formatOnBlur
-                           readOnly={selectedTemplate !== 'custom'}
-                           style={selectedTemplate === 'none' ? {display: 'none'} : {}}
-                           parse={p.nullIfEmpty}
-                           validate={v.optional(v.url)}>
-                        {selectedTemplate === 'custom' && (
-                            <p className="field-description">
-                                <Translate>
-                                    Specify a custom URL template using any of the following placeholders:
-                                    {' '}
-                                    <Param name="placeholders" wrapper={<code />}
-                                           value="{id}, {building}, {floor}, {number}, {lat}, {lng}" />
-                                </Translate>
-                            </p>
-                        )}
-                    </Field>
+                    <FinalInput name="map_url_template"
+                                label=""
+                                readOnly={selectedTemplate !== 'custom'}
+                                style={selectedTemplate === 'none' ? {display: 'none'} : {}}
+                                nullIfEmpty
+                                validate={v.optional(v.url)}
+                                description={selectedTemplate === 'custom' && (
+                                    <Translate>
+                                        Specify a custom URL template using any of the following placeholders:
+                                        {' '}
+                                        <Param name="placeholders" wrapper={<code />}
+                                               value="{id}, {building}, {floor}, {number}, {lat}, {lng}" />
+                                    </Translate>
+                                )} />
                 )}
             </Field>
         </>

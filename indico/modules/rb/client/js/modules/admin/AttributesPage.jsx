@@ -9,10 +9,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
-import {Field} from 'react-final-form';
 import {Icon, List, Popup} from 'semantic-ui-react';
 import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
-import {formatters, ReduxCheckboxField, ReduxFormField} from 'indico/react/forms';
+import {formatters, FinalCheckbox, FinalInput} from 'indico/react/forms';
 import * as adminActions from './actions';
 import * as adminSelectors from './selectors';
 import EditableList from './EditableList';
@@ -72,17 +71,15 @@ class AttributesPage extends React.PureComponent {
 
     renderForm = () => (
         <>
-            <Field name="name" component={ReduxFormField} as="input"
-                   required
-                   format={formatters.slugify} formatOnBlur
-                   label={Translate.string('Name')}
-                   autoFocus />
-            <Field name="title" component={ReduxFormField} as="input"
-                   required
-                   format={formatters.trim} formatOnBlur
-                   label={Translate.string('Title')} />
-            <Field name="hidden" component={ReduxCheckboxField}
-                   componentLabel={Translate.string('Hidden')} />
+            <FinalInput name="name"
+                        required
+                        format={formatters.slugify} formatOnBlur
+                        label={Translate.string('Name')}
+                        autoFocus />
+            <FinalInput name="title"
+                        required
+                        label={Translate.string('Title')} />
+            <FinalCheckbox name="hidden" label={Translate.string('Hidden')} />
         </>
     );
 

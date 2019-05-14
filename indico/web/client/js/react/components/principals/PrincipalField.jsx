@@ -16,6 +16,7 @@ import {UserSearch} from './Search';
 import {EmptyPrincipalListItem, PendingPrincipalListItem, PrincipalListItem} from './items';
 
 import './items.module.scss';
+import {FinalField} from '../../forms';
 
 
 /**
@@ -131,3 +132,21 @@ PrincipalField.defaultProps = {
 };
 
 export default React.memo(PrincipalField);
+
+
+/**
+ * Like `FinalField` but for a `PrincipalField`.
+ */
+export function FinalPrincipal({name, ...rest}) {
+    return <FinalField name={name} component={PrincipalField} {...rest} />;
+}
+
+FinalPrincipal.propTypes = {
+    name: PropTypes.string.isRequired,
+    withExternalUsers: PropTypes.bool,
+    favoriteUsersController: PropTypes.array.isRequired,
+};
+
+FinalPrincipal.defaultProps = {
+    withExternalUsers: false,
+};

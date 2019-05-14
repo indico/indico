@@ -14,10 +14,8 @@ import React, {useContext, useState} from 'react';
 import PropTypes from 'prop-types';
 import {Button, Divider, Dropdown, Form, Icon, Label, List, Message, Modal, Popup} from 'semantic-ui-react';
 import {FORM_ERROR} from 'final-form';
-import {Form as FinalForm, Field} from 'react-final-form';
-import {
-    ReduxCheckboxField, ReduxFormField, formatters, handleSubmitError, validators as v
-} from 'indico/react/forms';
+import {Form as FinalForm} from 'react-final-form';
+import {FinalCheckbox, FinalInput, handleSubmitError} from 'indico/react/forms';
 import {Translate, PluralTranslate, Singular, Plural, Param} from 'indico/react/i18n';
 import {useIndicoAxios} from 'indico/react/hooks';
 import {Overridable} from 'indico/react/util';
@@ -311,29 +309,22 @@ const UserSearchFields = () => {
     const hasExternals = data && data.externalUsersAvailable;
     return (
         <>
-            <Field name="first_name" component={ReduxFormField} as="input"
-                   format={formatters.trim} formatOnBlur
-                   autoFocus hideValidationError
-                   autoComplete="off"
-                   label={Translate.string('First name')} />
-            <Field name="last_name" component={ReduxFormField} as="input"
-                   format={formatters.trim} formatOnBlur
-                   autoComplete="off"
-                   label={Translate.string('Last name')} />
-            <Field name="email" component={ReduxFormField} as="input" type="email"
-                   format={formatters.trim} formatOnBlur
-                   autoComplete="off"
-                   label={Translate.string('Email address')} />
-            <Field name="affiliation" component={ReduxFormField} as="input"
-                   format={formatters.trim} formatOnBlur
-                   autoComplete="off"
-                   label={Translate.string('Affiliation')} />
+            <FinalInput name="first_name"
+                        autoFocus hideValidationError noAutoComplete
+                        label={Translate.string('First name')} />
+            <FinalInput name="last_name"
+                        noAutoComplete
+                        label={Translate.string('Last name')} />
+            <FinalInput name="email" type="email"
+                        noAutoComplete
+                        label={Translate.string('Email address')} />
+            <FinalInput name="affiliation"
+                        noAutoComplete
+                        label={Translate.string('Affiliation')} />
             {hasExternals && (
-                <Field name="external" component={ReduxCheckboxField}
-                       componentLabel={Translate.string('Include users with no Indico account')} />
+                <FinalCheckbox name="external" label={Translate.string('Include users with no Indico account')} />
             )}
-            <Field name="exact" component={ReduxCheckboxField}
-                   componentLabel={Translate.string('Exact matches only')} />
+            <FinalCheckbox name="exact" label={Translate.string('Exact matches only')} />
         </>
     );
 };
@@ -423,14 +414,12 @@ export const GroupSearch = searchFactory({
     resultIcon: 'users',
     searchFields: (
         <>
-            <Field name="name" component={ReduxFormField} as="input"
-                   format={formatters.trim} formatOnBlur
-                   autoFocus hideValidationError
-                   required validate={v.required}
-                   autoComplete="off"
-                   label={Translate.string('Group name')} />
-            <Field name="exact" component={ReduxCheckboxField}
-                   componentLabel={Translate.string('Exact matches only')} />
+            <FinalInput name="name"
+                        autoFocus hideValidationError
+                        required
+                        noAutoComplete
+                        label={Translate.string('Group name')} />
+            <FinalCheckbox name="exact" label={Translate.string('Exact matches only')} />
         </>
     ),
     runSearch: async (data, setResult) => {

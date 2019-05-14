@@ -21,7 +21,7 @@ import {bindActionCreators} from 'redux';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {
-    Button, Checkbox, Dimmer, Dropdown, Form, Grid, Header, Input, Loader, Message, Modal, TextArea
+    Button, Dimmer, Dropdown, Form, Grid, Header, Input, Loader, Message, Modal, TextArea
 } from 'semantic-ui-react';
 import {Form as FinalForm, Field, FormSpy} from 'react-final-form';
 import {FieldArray} from 'react-final-form-arrays';
@@ -30,11 +30,11 @@ import shortid from 'shortid';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {snakifyKeys, camelizeKeys} from 'indico/utils/case';
 import {
-    FieldCondition, getChangedValues, handleSubmitError, ReduxCheckboxField, ReduxFormField
+    FieldCondition, getChangedValues, handleSubmitError, FinalCheckbox, ReduxFormField
 } from 'indico/react/forms';
 import {FavoritesProvider} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
-import {EmailListField, PrincipalField} from 'indico/react/components';
+import {EmailListField, FinalPrincipal} from 'indico/react/components';
 import EquipmentList from './EquipmentList';
 import DailyAvailability from './DailyAvailability';
 import NonBookablePeriods from './NonBookablePeriods';
@@ -667,13 +667,11 @@ class RoomEditModal extends React.Component {
                 return (
                     <FavoritesProvider key={key}>
                         {favoriteUsersController => (
-                            <Field name={content.name}
-                                   component={ReduxFormField}
-                                   as={PrincipalField}
-                                   favoriteUsersController={favoriteUsersController}
-                                   label={content.label}
-                                   required
-                                   allowNull />
+                            <FinalPrincipal name={content.name}
+                                            favoriteUsersController={favoriteUsersController}
+                                            label={content.label}
+                                            required
+                                            allowNull />
                         )}
                     </FavoritesProvider>
                 );
@@ -698,11 +696,9 @@ class RoomEditModal extends React.Component {
 
             case 'checkbox':
                 return (
-                    <Field key={key}
-                           name={content.name}
-                           component={ReduxCheckboxField}
-                           componentLabel={content.label}
-                           as={Checkbox} />
+                    <FinalCheckbox key={key}
+                                   name={content.name}
+                                   label={content.label} />
                 );
             case 'textarea':
                 return (

@@ -6,9 +6,12 @@
 // LICENSE file for more details.
 
 export {handleSubmissionError} from './errors';
-export {ReduxFormField, ReduxRadioField, ReduxCheckboxField, ReduxDropdownField} from './fields';
+export {
+    ReduxFormField,
+    FinalCheckbox, FinalDropdown, FinalField, FinalInput, FinalRadio, FinalSubmitButton, FinalTextArea,
+} from './fields';
 export {default as validators} from './validators';
 export {default as parsers} from './parsers';
 export {default as formatters} from './formatters';
 export {getChangedValues, FieldCondition, handleSubmitError} from './final-form';
-export {default as UnloadPrompt} from './unload';
+export {default as UnloadPrompt, FinalUnloadPrompt} from './unload';

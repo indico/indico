@@ -10,17 +10,16 @@ import moment from 'moment';
 import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import {Form, Input, Message, Segment, Select, TextArea} from 'semantic-ui-react';
+import {Form, Input, Message, Segment, Select} from 'semantic-ui-react';
 import {Field, FormSpy} from 'react-final-form';
 import {START_DATE} from 'react-dates/constants';
 
 import {
-    FieldCondition, ReduxFormField, ReduxRadioField,
-    formatters,
+    FieldCondition, FinalRadio, FinalTextArea, ReduxFormField,
     parsers as p, validators as v
 } from 'indico/react/forms';
 import {FavoritesProvider} from 'indico/react/hooks';
-import {SingleDatePicker, DatePeriodField, PrincipalField} from 'indico/react/components';
+import {SingleDatePicker, DatePeriodField, FinalPrincipal} from 'indico/react/components';
 import {serializeDate, serializeTime, toMoment} from 'indico/utils/date';
 import {Overridable} from 'indico/react/util';
 import {PluralTranslate, Translate} from 'indico/react/i18n';
@@ -201,28 +200,25 @@ class BookingEditForm extends React.Component {
                     {showRecurrenceOptions && (
                         <Form.Group inline>
                             {!hideOptions.single && (
-                                <Field name="recurrence.type"
-                                       component={ReduxRadioField}
-                                       componentLabel={Translate.string('Single booking')}
-                                       radioValue="single"
-                                       disabled={submitSucceeded || bookingFinished}
-                                       onClick={() => this.recurrenceTypeChanged('single')} />
+                                <FinalRadio name="recurrence.type"
+                                            label={Translate.string('Single booking')}
+                                            value="single"
+                                            disabled={submitSucceeded || bookingFinished}
+                                            onClick={() => this.recurrenceTypeChanged('single')} />
                             )}
                             {!hideOptions.daily && (
-                                <Field name="recurrence.type"
-                                       component={ReduxRadioField}
-                                       componentLabel={Translate.string('Daily booking')}
-                                       radioValue="daily"
-                                       disabled={submitSucceeded || bookingFinished}
-                                       onClick={() => this.recurrenceTypeChanged('daily')} />
+                                <FinalRadio name="recurrence.type"
+                                            label={Translate.string('Daily booking')}
+                                            value="daily"
+                                            disabled={submitSucceeded || bookingFinished}
+                                            onClick={() => this.recurrenceTypeChanged('daily')} />
                             )}
                             {!hideOptions.recurring && (
-                                <Field name="recurrence.type"
-                                       component={ReduxRadioField}
-                                       componentLabel={Translate.string('Recurring booking')}
-                                       radioValue="every"
-                                       disabled={submitSucceeded || bookingFinished}
-                                       onClick={() => this.recurrenceTypeChanged('every')} />
+                                <FinalRadio name="recurrence.type"
+                                            label={Translate.string('Recurring booking')}
+                                            value="every"
+                                            disabled={submitSucceeded || bookingFinished}
+                                            onClick={() => this.recurrenceTypeChanged('every')} />
                             )}
                         </Form.Group>
                     )}
@@ -286,42 +282,33 @@ class BookingEditForm extends React.Component {
                 </Segment>
                 <Segment color="blue" inverted>
                     <Form.Group>
-                        <Field name="usage"
-                               radioValue="myself"
-                               component={ReduxRadioField}
-                               onClick={() => form.change('user', sessionUser.identifier)}
-                               componentLabel={Translate.string("I'll be using it myself")}
-                               disabled={submitSucceeded}
-                               checked={usage === 'myself'} />
-                        <Field name="usage"
-                               radioValue="someone"
-                               component={ReduxRadioField}
-                               onClick={() => form.change('user', bookedByCurrentUser ? null : bookedForUser.identifier)}
-                               componentLabel={Translate.string("I'm booking it for someone else")}
-                               disabled={submitSucceeded}
-                               checked={usage === 'someone'} />
+                        <FinalRadio name="usage"
+                                    value="myself"
+                                    onClick={() => form.change('user', sessionUser.identifier)}
+                                    label={Translate.string("I'll be using it myself")}
+                                    disabled={submitSucceeded}
+                                    checked={usage === 'myself'} />
+                        <FinalRadio name="usage"
+                                    value="someone"
+                                    onClick={() => form.change('user', bookedByCurrentUser ? null : bookedForUser.identifier)}
+                                    label={Translate.string("I'm booking it for someone else")}
+                                    disabled={submitSucceeded}
+                                    checked={usage === 'someone'} />
                     </Form.Group>
                     <FieldCondition when="usage" is="someone">
                         <FavoritesProvider>
                             {favoriteUsersController => (
-                                <Field name="user"
-                                       component={ReduxFormField}
-                                       as={PrincipalField}
-                                       favoriteUsersController={favoriteUsersController}
-                                       validate={v.required}
-                                       disabled={submitSucceeded}
-                                       required />
+                                <FinalPrincipal name="user"
+                                                favoriteUsersController={favoriteUsersController}
+                                                disabled={submitSucceeded}
+                                                required />
                             )}
                         </FavoritesProvider>
                     </FieldCondition>
-                    <Field name="reason"
-                           component={ReduxFormField}
-                           as={TextArea}
-                           format={formatters.trim}
-                           placeholder={Translate.string('Reason for booking')}
-                           validate={v.required}
-                           disabled={submitSucceeded}
-                           formatOnBlur />
+                    <FinalTextArea name="reason"
+                                   placeholder={Translate.string('Reason for booking')}
+                                   required
+                                   disabled={submitSucceeded} />
                 </Segment>
             </Form>
         );

@@ -9,10 +9,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
-import {Field} from 'react-final-form';
 import {List, Icon} from 'semantic-ui-react';
 import {ICONS_AND_ALIASES} from 'semantic-ui-react/dist/es/lib/SUI';
-import {formatters, ReduxDropdownField, ReduxFormField} from 'indico/react/forms';
+import {formatters, FinalDropdown, FinalInput} from 'indico/react/forms';
 import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
 import * as adminActions from './actions';
 import * as adminSelectors from './selectors';
@@ -73,18 +72,17 @@ class RoomFeatureList extends React.PureComponent {
 
         return (
             <>
-                <Field name="name" component={ReduxFormField} as="input"
-                       required
-                       format={formatters.slugify} formatOnBlur
-                       label={Translate.string('Name')}
-                       autoFocus />
-                <Field name="title" component={ReduxFormField} as="input"
-                       required
-                       format={formatters.trim} formatOnBlur
-                       label={Translate.string('Title')} />
-                <Field name="icon" component={ReduxDropdownField} parse={null}
-                       search selection options={iconOptions}
-                       label={Translate.string('Icon')} />
+                <FinalInput name="name"
+                            required
+                            format={formatters.slugify} formatOnBlur
+                            label={Translate.string('Name')}
+                            autoFocus />
+                <FinalInput name="title"
+                            required
+                            label={Translate.string('Title')} />
+                <FinalDropdown name="icon"
+                               search selection options={iconOptions}
+                               label={Translate.string('Icon')} />
             </>
         );
     };

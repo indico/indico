@@ -9,9 +9,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
-import {Field} from 'react-final-form';
 import {Icon, List, Popup} from 'semantic-ui-react';
-import {formatters, ReduxDropdownField, ReduxFormField} from 'indico/react/forms';
+import {FinalDropdown, FinalInput} from 'indico/react/forms';
 import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
 import * as adminActions from './actions';
 import * as adminSelectors from './selectors';
@@ -80,16 +79,15 @@ class EquipmentTypeList extends React.PureComponent {
 
         return (
             <>
-                <Field name="name" component={ReduxFormField} as="input"
-                       required
-                       format={formatters.trim} formatOnBlur
-                       label={Translate.string('Name')}
-                       autoFocus />
+                <FinalInput name="name"
+                            required
+                            label={Translate.string('Name')}
+                            autoFocus />
                 {featureOptions.length > 0 && (
-                    <Field name="features" component={ReduxDropdownField}
-                           multiple selection closeOnChange
-                           options={featureOptions}
-                           label={Translate.string('Features')} />
+                    <FinalDropdown name="features"
+                                   multiple selection closeOnChange
+                                   options={featureOptions}
+                                   label={Translate.string('Features')} />
                 )}
             </>
         );

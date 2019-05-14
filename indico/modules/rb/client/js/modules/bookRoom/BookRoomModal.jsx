@@ -11,15 +11,12 @@ import React from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import PropTypes from 'prop-types';
-import {Button, Checkbox, Form, Grid, Icon, Message, Modal, Radio, Segment, TextArea} from 'semantic-ui-react';
-import {Form as FinalForm, Field} from 'react-final-form';
+import {Button, Checkbox, Form, Grid, Icon, Message, Modal, Segment} from 'semantic-ui-react';
+import {Form as FinalForm} from 'react-final-form';
 import createDecorator from 'final-form-calculate';
-import {
-    FieldCondition, ReduxCheckboxField, ReduxDropdownField, ReduxFormField, ReduxRadioField,
-    formatters
-} from 'indico/react/forms';
+import {FinalCheckbox, FinalDropdown, FinalRadio, FinalTextArea, FieldCondition} from 'indico/react/forms';
 import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
-import {PrincipalField} from 'indico/react/components';
+import {FinalPrincipal} from 'indico/react/components';
 import {FavoritesProvider} from 'indico/react/hooks';
 import {Overridable, IndicoPropTypes} from 'indico/react/util';
 import {createDT, isBookingStartDTValid} from 'indico/utils/date';
@@ -320,18 +317,17 @@ class BookRoomModal extends React.Component {
             const {selectedEvent} = this.state;
             return (
                 <div styleName="event-dropdown">
-                    <Field name="event"
-                           component={ReduxDropdownField}
-                           options={options}
-                           placeholder={Translate.string('Choose an event')}
-                           disabled={disabled}
-                           selection
-                           clearable
-                           onChange={(value) => {
-                               this.setState({
-                                   selectedEvent: value
-                               });
-                           }} />
+                    <FinalDropdown name="event"
+                                   options={options}
+                                   placeholder={Translate.string('Choose an event')}
+                                   disabled={disabled}
+                                   selection
+                                   clearable
+                                   onChange={(value) => {
+                                       this.setState({
+                                           selectedEvent: value
+                                       });
+                                   }} />
                     {this.renderEventLink(links[selectedEvent])}
                 </div>
             );
@@ -417,8 +413,7 @@ class BookRoomModal extends React.Component {
             <>
                 <BookingObjectLink link={link} pending>
                     {!this.alreadyLinked && (
-                        <Field name="linkBack" component={ReduxCheckboxField} disabled={disabled} toggle
-                               componentLabel={label} />
+                        <FinalCheckbox name="linkBack" disabled={disabled} toggle label={label} />
                     )}
                 </BookingObjectLink>
             </>
@@ -482,41 +477,31 @@ class BookRoomModal extends React.Component {
                                         <Translate>Usage</Translate>
                                     </h3>
                                     <Form.Group>
-                                        <Field name="usage"
-                                               radioValue="myself"
-                                               component={ReduxRadioField}
-                                               as={Radio}
-                                               componentLabel={Translate.string("I'll be using it myself")}
-                                               disabled={fprops.submitSucceeded} />
-                                        <Field name="usage"
-                                               radioValue="someone"
-                                               component={ReduxRadioField}
-                                               as={Radio}
-                                               componentLabel={Translate.string("I'm booking it for someone else")}
-                                               disabled={fprops.submitSucceeded} />
+                                        <FinalRadio name="usage"
+                                                    value="myself"
+                                                    label={Translate.string("I'll be using it myself")}
+                                                    disabled={fprops.submitSucceeded} />
+                                        <FinalRadio name="usage"
+                                                    value="someone"
+                                                    label={Translate.string("I'm booking it for someone else")}
+                                                    disabled={fprops.submitSucceeded} />
                                     </Form.Group>
                                     <FieldCondition when="usage" is="someone">
                                         <FavoritesProvider>
                                             {favoriteUsersController => (
-                                                <Field name="user"
-                                                       component={ReduxFormField}
-                                                       as={PrincipalField}
-                                                       favoriteUsersController={favoriteUsersController}
-                                                       disabled={fprops.submitSucceeded}
-                                                       hideErrorWhileActive
-                                                       withExternalUsers
-                                                       required />
+                                                <FinalPrincipal name="user"
+                                                                favoriteUsersController={favoriteUsersController}
+                                                                disabled={fprops.submitSucceeded}
+                                                                hideErrorWhileActive
+                                                                withExternalUsers
+                                                                required />
                                             )}
                                         </FavoritesProvider>
                                     </FieldCondition>
-                                    <Field name="reason"
-                                           component={ReduxFormField}
-                                           as={TextArea}
-                                           format={formatters.trim}
-                                           formatOnBlur
-                                           placeholder={Translate.string('Reason for booking')}
-                                           disabled={fprops.submitSucceeded}
-                                           required={reasonRequired} />
+                                    <FinalTextArea name="reason"
+                                                   placeholder={Translate.string('Reason for booking')}
+                                                   disabled={fprops.submitSucceeded}
+                                                   required={reasonRequired} />
                                 </Segment>
                                 {!link && !fprops.submitSucceeded && (
                                     this.renderRelatedEventsDropdown(

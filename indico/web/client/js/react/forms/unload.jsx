@@ -8,6 +8,7 @@
 import React, {useEffect} from 'react';
 import PropTypes from 'prop-types';
 import {Prompt} from 'react-router';
+import {FormSpy} from 'react-final-form';
 import {Translate} from '../../react/i18n';
 
 
@@ -48,3 +49,22 @@ UnloadPrompt.defaultProps = {
 
 
 export default React.memo(UnloadPrompt);
+
+
+export const FinalUnloadPrompt = ({router, message}) => (
+    <FormSpy subscription={{dirty: true}}>
+        {({dirty}) => (
+            <UnloadPrompt active={dirty} router={router} message={message} />
+        )}
+    </FormSpy>
+);
+
+FinalUnloadPrompt.propTypes = {
+    router: PropTypes.bool,
+    message: PropTypes.string,
+};
+
+FinalUnloadPrompt.defaultProps = {
+    message: null,
+    router: true,
+};
