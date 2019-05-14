@@ -34,7 +34,7 @@ from indico.modules.rb.operations.misc import get_rooms_nonbookable_periods, get
 from indico.modules.rb.util import (group_by_occurrence_date, serialize_availability, serialize_blockings,
                                     serialize_booking_details, serialize_nonbookable_periods, serialize_occurrences,
                                     serialize_unbookable_hours)
-from indico.util.date_time import as_utc, iterdays, overlaps
+from indico.util.date_time import iterdays, overlaps, server_to_utc
 from indico.util.i18n import _
 from indico.util.struct.iterables import group_list
 
@@ -406,7 +406,8 @@ def get_matching_events(start_dt, end_dt, repeat_frequency, repeat_interval):
     return (Event.query
             .filter(~Event.is_deleted,
                     ~Event.room_reservation_links.any(ReservationLink.reservation.has(Reservation.is_accepted)),
-                    db.or_(Event.happens_between(as_utc(occ.start_dt), as_utc(occ.end_dt)) for occ in occurrences),
+                    db.or_(Event.happens_between(server_to_utc(occ.start_dt), server_to_utc(occ.end_dt))
+                           for occ in occurrences),
                     Event.timezone == config.DEFAULT_TIMEZONE,
                     db.and_(Event.category_id != cat.id for cat in excluded_categories),
                     Event.acl_entries.any(db.and_(EventPrincipal.type == PrincipalType.user,
