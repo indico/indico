@@ -38,9 +38,6 @@
         display: flex;
         justify-content: flex-end;
 
-        :global(.corner.icon).conflicts-icon {
-            font-size: 0.7em;
-            cursor: default;
         }
     }
 }
