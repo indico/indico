@@ -38,6 +38,8 @@
         display: flex;
         justify-content: flex-end;
 
+        :global(.icon:last-child) {
+            margin-right: 0.75em;
         }
     }
 }

@@ -16,5 +16,9 @@
     .view-switch {
         display: flex;
         align-items: flex-end;
+
+        :global(.icon:last-child) {
+            margin-right: 0.75em;
+        }
     }
 }
