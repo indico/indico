@@ -106,7 +106,7 @@ class RHReportError(RHReportErrorBase):
 
 class RHReportErrorAPI(RHReportErrorBase):
     @use_kwargs({
-        'email': fields.Email(),
+        'email': fields.Email(missing=None),
         'comment': fields.String(required=True),
     })
     def _process(self, email, comment):
