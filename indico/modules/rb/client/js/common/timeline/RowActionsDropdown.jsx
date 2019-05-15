@@ -9,11 +9,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
-import {Form as FinalForm, Field} from 'react-final-form';
-import {Button, Confirm, Dropdown, Form, Icon, Portal, TextArea} from 'semantic-ui-react';
+import {Form as FinalForm} from 'react-final-form';
+import {Button, Confirm, Dropdown, Form, Icon, Portal} from 'semantic-ui-react';
 
 import {serializeDate} from 'indico/utils/date';
-import {ReduxFormField, formatters, validators as v} from 'indico/react/forms';
+import {FinalTextArea} from 'indico/react/forms';
 import {Param, Translate} from 'indico/react/i18n';
 
 import {actions as bookingsActions} from '../bookings';
@@ -110,18 +110,14 @@ class RowActionsDropdown extends React.Component {
                         Are you sure you want to reject this occurrence (<Param name="date" value={serializedDate} />)?
                     </Translate>
                 </div>
-                <Field name="reason"
-                       component={ReduxFormField}
-                       as={TextArea}
-                       format={formatters.trim}
-                       placeholder={Translate.string('Provide the rejection reason')}
-                       rows={2}
-                       validate={v.required}
-                       required
-                       formatOnBlur
-                       autoFocus />
+                <FinalTextArea name="reason"
+                               placeholder={Translate.string('Provide the rejection reason')}
+                               disabled={submitSucceeded}
+                               rows={2}
+                               required
+                               autoFocus />
                 <Button type="submit"
-                        disabled={pristine || hasValidationErrors || submitSucceeded}
+                        disabled={submitting || pristine || hasValidationErrors || submitSucceeded}
                         loading={submitting}
                         floated="right"
                         primary>

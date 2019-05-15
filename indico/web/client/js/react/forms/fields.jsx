@@ -7,7 +7,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Checkbox, Dropdown, Form, Popup, Radio, TextArea} from 'semantic-ui-react';
+import {Checkbox, Dropdown, Form, Input, Popup, Radio, TextArea} from 'semantic-ui-react';
 import {Field, FormSpy} from 'react-final-form';
 import formatters from './formatters';
 import parsers from './parsers';
@@ -245,7 +245,7 @@ export function FinalInput({name, label, type, nullIfEmpty, noAutoComplete, ...r
     return (
         <FinalField name={name}
                     label={label}
-                    component="input"
+                    component={Input}
                     type={type}
                     {...extraProps}
                     {...rest} />
@@ -275,18 +275,13 @@ FinalInput.defaultProps = {
  * Like `FinalField` but with extra features for ``<textarea>`` fields.
  */
 export function FinalTextArea({name, label, nullIfEmpty, ...rest}) {
-    const extraProps = {};
-    if (nullIfEmpty) {
-        extraProps.parse = parsers.nullIfEmpty;
-    }
-
     return (
         <FinalField name={name}
                     label={label}
                     component={TextArea}
                     format={formatters.trim}
                     formatOnBlur
-                    {...extraProps}
+                    parse={nullIfEmpty ? parsers.nullIfEmpty : null}
                     {...rest} />
     );
 }

@@ -306,6 +306,7 @@ class BookingDetails extends React.Component {
                 <Form styleName="rejection-form" onSubmit={handleSubmit}>
                     <FinalTextArea name="reason"
                                    placeholder={Translate.string('Provide the rejection reason')}
+                                   disabled={submitSucceeded}
                                    rows={2}
                                    required />
                     <Button type="submit"

@@ -10,13 +10,13 @@ import React from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
-import {Button, Confirm, Form, Grid, Message, Icon, Modal, Popup, TextArea} from 'semantic-ui-react';
-import {Form as FinalForm, Field} from 'react-final-form';
+import {Button, Confirm, Form, Grid, Message, Icon, Modal, Popup} from 'semantic-ui-react';
+import {Form as FinalForm} from 'react-final-form';
 import {Param, Translate} from 'indico/react/i18n';
-import {ReduxFormField, formatters, validators as v} from 'indico/react/forms';
-import {DatePeriodField, PrincipalListField} from 'indico/react/components';
+import {FinalTextArea} from 'indico/react/forms';
+import {FinalDatePeriod, FinalPrincipalList} from 'indico/react/components';
 import {FavoritesProvider} from 'indico/react/hooks';
-import RoomSelector from '../../components/RoomSelector';
+import FinalRoomSelector from '../../components/RoomSelector';
 import {selectors as userSelectors} from '../../common/user';
 import * as blockingsActions from './actions';
 
@@ -102,17 +102,6 @@ class BlockingModal extends React.Component {
         }
     };
 
-    renderBlockingPeriodField = ({input, ...props}) => {
-        const {mode} = this.state;
-        return (
-            <ReduxFormField {...props}
-                            input={input}
-                            as={DatePeriodField}
-                            label={Translate.string('Period')}
-                            required={mode === 'create'} />
-        );
-    };
-
     renderRoomState = (room) => {
         const {
             managedRoomIds,
@@ -153,15 +142,11 @@ class BlockingModal extends React.Component {
 
         const renderRejectionForm = ({handleSubmit, hasValidationErrors, submitSucceeded, submitting, pristine}) => (
             <Form styleName="rejection-form" onSubmit={handleSubmit}>
-                <Field name="reason"
-                       component={ReduxFormField}
-                       as={TextArea}
-                       format={formatters.trim}
-                       placeholder={Translate.string('Provide the rejection reason')}
-                       rows={2}
-                       validate={v.required}
-                       required
-                       formatOnBlur />
+                <FinalTextArea name="reason"
+                               placeholder={Translate.string('Provide the rejection reason')}
+                               disabled={submitSucceeded}
+                               rows={2}
+                               required />
                 <Button type="submit"
                         disabled={submitting || pristine || hasValidationErrors || submitSucceeded}
                         loading={submitting}
@@ -195,26 +180,6 @@ class BlockingModal extends React.Component {
                        content={popupContent}
                        flowing />
             </div>
-        );
-    };
-
-    renderRoomSearchField = ({input, ...props}) => {
-        const {mode} = this.state;
-        let label;
-
-        if (mode === 'create') {
-            label = Translate.string('Rooms to block');
-        } else {
-            label = Translate.string('Blocked rooms');
-        }
-
-        return (
-            <ReduxFormField {...props}
-                            input={input}
-                            as={RoomSelector}
-                            label={label}
-                            required={mode !== 'view'}
-                            renderRoomActions={this.renderRoomState} />
         );
     };
 
@@ -336,51 +301,37 @@ class BlockingModal extends React.Component {
                                         </Translate>
                                     </Message.Content>
                                 </Message>
-                                <Field name="dates"
-                                       render={this.renderBlockingPeriodField}
-                                       readOnly={mode !== 'create' || submitSucceeded}
-                                       allowNull />
-                                <Field name="reason"
-                                       format={formatters.trim}
-                                       render={(fieldProps) => {
-                                           const props = {};
-                                           if (mode === 'edit') {
-                                               props.defaultValue = blocking.reason;
-                                               props.value = undefined;
-                                           } else if (mode === 'view') {
-                                               props.value = blocking.reason;
-                                           }
-
-                                           return (
-                                               <ReduxFormField {...fieldProps}
-                                                               {...props}
-                                                               as={TextArea}
-                                                               label={Translate.string('Reason')}
-                                                               placeholder={Translate.string('Provide reason for blocking')}
-                                                               readOnly={mode === 'view'}
-                                                               disabled={submitSucceeded}
-                                                               required={mode !== 'view'} />
-                                           );
-                                       }}
-                                       formatOnBlur />
+                                <FinalDatePeriod name="dates"
+                                                 label={Translate.string('Period')}
+                                                 required={mode === 'create'}
+                                                 readOnly={mode !== 'create' || submitSucceeded}
+                                                 allowNull />
+                                <FinalTextArea name="reason"
+                                               label={Translate.string('Reason')}
+                                               placeholder={Translate.string('Provide reason for blocking')}
+                                               readOnly={mode === 'view'}
+                                               disabled={submitSucceeded}
+                                               required={mode !== 'view'} />
                             </Grid.Column>
                             <Grid.Column width={8}>
                                 <FavoritesProvider>
                                     {favoriteUsersController => (
-                                        <Field name="allowed" component={ReduxFormField}
-                                               as={PrincipalListField} withGroups
-                                               favoriteUsersController={favoriteUsersController}
-                                               isEqual={(a, b) => _.isEqual(a.sort(), b.sort())}
-                                               label={Translate.string('Authorized users/groups')}
-                                               readOnly={mode === 'view'}
-                                               disabled={submitSucceeded} />
+                                        <FinalPrincipalList name="allowed"
+                                                            withGroups
+                                                            favoriteUsersController={favoriteUsersController}
+                                                            label={Translate.string('Authorized users/groups')}
+                                                            readOnly={mode === 'view'}
+                                                            disabled={submitSucceeded} />
                                     )}
                                 </FavoritesProvider>
-                                <Field name="rooms"
-                                       isEqual={_.isEqual}
-                                       render={this.renderRoomSearchField}
-                                       disabled={submitSucceeded}
-                                       readOnly={mode === 'view'} />
+                                <FinalRoomSelector name="rooms"
+                                                   label={(mode === 'create'
+                                                       ? Translate.string('Rooms to block')
+                                                       : Translate.string('Blocked rooms'))}
+                                                   required={mode !== 'view'}
+                                                   renderRoomActions={this.renderRoomState}
+                                                   disabled={submitSucceeded}
+                                                   readOnly={mode === 'view'} />
                                 {mode === 'view' && this.hasManagedPendingRooms && (
                                     <Message icon info>
                                         <Icon name="info" />

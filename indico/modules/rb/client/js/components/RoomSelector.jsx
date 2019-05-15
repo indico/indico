@@ -11,6 +11,7 @@ import PropTypes from 'prop-types';
 import {Button, Dropdown, Grid, Icon, List, Message, Segment} from 'semantic-ui-react';
 import getLocationsURL from 'indico-url:rb.locations';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
+import {FinalField} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 import {camelizeKeys} from 'indico/utils/case';
 import SpriteImage from './SpriteImage';
@@ -31,7 +32,7 @@ const fetchLocations = async () => {
 };
 
 
-export default class RoomSelector extends React.Component {
+class RoomSelector extends React.Component {
     static propTypes = {
         onChange: PropTypes.func.isRequired,
         onFocus: PropTypes.func.isRequired,
@@ -205,3 +206,26 @@ export default class RoomSelector extends React.Component {
         );
     }
 }
+
+
+/**
+ * Like `FinalField` but for a `RoomSelector`.
+ */
+export default function FinalRoomSelector({name, ...rest}) {
+    return (
+        <FinalField name={name}
+                    component={RoomSelector}
+                    isEqual={_.isEqual}
+                    {...rest} />
+
+    );
+}
+
+FinalRoomSelector.propTypes = {
+    name: PropTypes.string.isRequired,
+    readOnly: PropTypes.bool,
+};
+
+FinalRoomSelector.defaultProps = {
+    readOnly: false,
+};

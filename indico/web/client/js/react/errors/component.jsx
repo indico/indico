@@ -8,13 +8,13 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Button, Form, Icon, Message, Modal, TextArea} from 'semantic-ui-react';
-import {Form as FinalForm, Field} from 'react-final-form';
+import {Button, Form, Icon, Message, Modal} from 'semantic-ui-react';
+import {Form as FinalForm} from 'react-final-form';
 import reportErrorURL from 'indico-url:core.report_error_api';
 
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
-import {handleSubmissionError, ReduxFormField, validators as v} from 'indico/react/forms';
+import {handleSubmissionError, FinalInput, FinalTextArea} from 'indico/react/forms';
 
 
 export default class ErrorDialog extends React.Component {
@@ -62,24 +62,23 @@ export default class ErrorDialog extends React.Component {
         return (
             <Form onSubmit={handleSubmit} error={submitFailed} success={submitSucceeded}>
                 {hasSubmitErrors && <Message error content={submitError} />}
-                <Field name="comment" component={ReduxFormField} as={TextArea}
-                       label={Translate.string('Details')} autoFocus required
-                       validate={v.required}>
-                    <p style={{fontStyle: 'italic', fontSize: '0.9em', color: '#999'}}>
-                        <Translate>
-                            Please let us know what you were doing when the error showed up.
-                        </Translate>
-                    </p>
-                </Field>
-                <Field name="email" component={ReduxFormField} as="input" type="email"
-                       label={Translate.string('Email address')}>
-                    <p style={{fontStyle: 'italic', fontSize: '0.9em', color: '#999'}}>
-                        <Translate>
-                            If you enter your email address we can contact you to follow-up
-                            on your error report.
-                        </Translate>
-                    </p>
-                </Field>
+                <FinalTextArea name="comment"
+                               label={Translate.string('Details')}
+                               autoFocus required
+                               description={(
+                                   <Translate>
+                                       Please let us know what you were doing when the error showed up.
+                                   </Translate>
+                               )} />
+                <FinalInput name="email"
+                            type="email"
+                            label={Translate.string('Email address')}
+                            description={(
+                                <Translate>
+                                    If you enter your email address we can contact you to follow-up
+                                    on your error report.
+                                </Translate>
+                            )} />
             </Form>
         );
     }
@@ -110,8 +109,7 @@ export default class ErrorDialog extends React.Component {
         const {title, message, reportable} = errorData;
 
         const modal = (fprops) => (
-            <Modal size="tiny" dimmer="blurring" closeOnDimmerClick={false} closeOnEscape={false}
-                   open={dialogVisible}>
+            <Modal size="tiny" closeOnDimmerClick={false} closeOnEscape={false} open={dialogVisible}>
                 <Modal.Content>
                     <Message error icon>
                         <Icon name="exclamation triangle" />

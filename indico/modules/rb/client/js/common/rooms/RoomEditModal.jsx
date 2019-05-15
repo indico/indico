@@ -20,21 +20,19 @@ import React from 'react';
 import {bindActionCreators} from 'redux';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import {
-    Button, Dimmer, Dropdown, Form, Grid, Header, Input, Loader, Message, Modal, TextArea
-} from 'semantic-ui-react';
-import {Form as FinalForm, Field, FormSpy} from 'react-final-form';
+import {Button, Dimmer, Dropdown, Form, Grid, Header, Loader, Message, Modal} from 'semantic-ui-react';
+import {Form as FinalForm, FormSpy} from 'react-final-form';
 import {FieldArray} from 'react-final-form-arrays';
 import arrayMutators from 'final-form-arrays';
 import shortid from 'shortid';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {snakifyKeys, camelizeKeys} from 'indico/utils/case';
 import {
-    FieldCondition, getChangedValues, handleSubmitError, FinalCheckbox, ReduxFormField
+    FieldCondition, getChangedValues, handleSubmitError, FinalCheckbox, FinalField, FinalInput, FinalTextArea,
 } from 'indico/react/forms';
 import {FavoritesProvider} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
-import {EmailListField, FinalPrincipal} from 'indico/react/components';
+import {FinalEmailList, FinalPrincipal} from 'indico/react/components';
 import EquipmentList from './EquipmentList';
 import DailyAvailability from './DailyAvailability';
 import NonBookablePeriods from './NonBookablePeriods';
@@ -139,13 +137,17 @@ const columns = [
             inputArgs: {
                 type: 'number',
                 min: 1,
+                fluid: true,
             },
             required: true
         }, {
             type: 'input',
             name: 'division',
             label: Translate.string('Division'),
-            required: false
+            required: false,
+            inputArgs: {
+                fluid: true,
+            },
         }]
     }, {
         type: 'textarea',
@@ -167,7 +169,9 @@ const columns = [
         name: 'verboseName',
         label: Translate.string('Name'),
         required: false,
-        parse: v => v || null,
+        inputArgs: {
+            nullIfEmpty: true
+        },
     }, {
         type: 'input',
         name: 'site',
@@ -180,17 +184,26 @@ const columns = [
             type: 'input',
             name: 'building',
             label: Translate.string('Building'),
-            required: true
+            required: true,
+            inputArgs: {
+                fluid: true,
+            },
         }, {
             type: 'input',
             name: 'floor',
             label: Translate.string('Floor'),
-            required: true
+            required: true,
+            inputArgs: {
+                fluid: true,
+            },
         }, {
             type: 'input',
             name: 'number',
             label: Translate.string('Number'),
-            required: true
+            required: true,
+            inputArgs: {
+                fluid: true,
+            },
         }]
     }, {
         type: 'formgroup',
@@ -201,6 +214,7 @@ const columns = [
             label: Translate.string('Longitude'),
             inputArgs: {
                 type: 'number',
+                fluid: true,
             },
             required: false
         }, {
@@ -209,6 +223,7 @@ const columns = [
             label: Translate.string('Latitude'),
             inputArgs: {
                 type: 'number',
+                fluid: true,
             },
             required: false
         }]
@@ -278,6 +293,7 @@ const columns = [
                 type: 'number',
                 min: 1,
                 max: 30,
+                fluid: true,
             },
             required: false
         }, {
@@ -288,6 +304,7 @@ const columns = [
                 type: 'number',
                 min: 1,
                 max: 30,
+                fluid: true,
             },
             required: false
         }, {
@@ -298,6 +315,7 @@ const columns = [
                 type: 'number',
                 min: 1,
                 max: 30,
+                fluid: true,
             },
             required: false
         }]
@@ -314,6 +332,7 @@ const columns = [
                 type: 'number',
                 min: 1,
                 max: 30,
+                fluid: true,
             },
             required: false
         }, {
@@ -324,6 +343,7 @@ const columns = [
                 type: 'number',
                 min: 1,
                 max: 30,
+                fluid: true,
             },
             required: false
         }, {
@@ -334,6 +354,7 @@ const columns = [
                 type: 'number',
                 min: 1,
                 max: 30,
+                fluid: true,
             },
             required: false
         }]
@@ -611,18 +632,15 @@ class RoomEditModal extends React.Component {
                                       }} />
                             {fields.map((attribute, index) => (
                                 <div key={attribute}>
-                                    <Field label={titles[fields.value[index].name]}
-                                           name={`${attribute}.value`}
-                                           component={ReduxFormField}
-                                           as={Input}
-                                           isEqual={_.isEqual}
-                                           required
-                                           icon={{
-                                               name: 'remove',
-                                               color: 'red',
-                                               link: true,
-                                               onClick: () => fields.remove(index),
-                                           }} />
+                                    <FinalInput name={`${attribute}.value`}
+                                                label={titles[fields.value[index].name]}
+                                                required
+                                                icon={{
+                                                    name: 'remove',
+                                                    color: 'red',
+                                                    link: true,
+                                                    onClick: () => fields.remove(index),
+                                                }} />
                                 </div>
                             ))}
                             {fields.length === 0 && <div><Translate>No custom attributes found</Translate></div>}
@@ -647,20 +665,12 @@ class RoomEditModal extends React.Component {
                     <Header key={key}>{content.label}</Header>
                 );
             case 'input': {
-                let parse = content.parse !== undefined ? content.parse : null;
-                if (content.inputArgs && content.inputArgs.type === 'number') {
-                    // number fields use null
-                    parse = (value) => (value ? +value : null);
-                }
                 return (
-                    <Field key={key}
-                           name={content.name}
-                           component={ReduxFormField}
-                           label={content.label}
-                           required={content.required}
-                           as="input"
-                           parse={parse}
-                           {...(content.inputArgs || {type: 'text'})} />
+                    <FinalInput key={key}
+                                name={content.name}
+                                label={content.label}
+                                required={content.required}
+                                {...content.inputArgs} />
                 );
             }
             case 'owner':
@@ -687,7 +697,7 @@ class RoomEditModal extends React.Component {
                 return (
                     <Wrapper {...props}>
                         {content.label && <Header as="h5">{content.label}</Header>}
-                        <Form.Group>
+                        <Form.Group widths="equal">
                             {content.content.map(this.renderContent)}
                         </Form.Group>
                     </Wrapper>
@@ -702,21 +712,16 @@ class RoomEditModal extends React.Component {
                 );
             case 'textarea':
                 return (
-                    <Field key={key}
-                           name={content.name}
-                           component={ReduxFormField}
-                           label={content.label}
-                           as={TextArea}
-                           parse={null} />
+                    <FinalTextArea key={key}
+                                   name={content.name}
+                                   label={content.label}
+                                   parse={null} />
                 );
             case 'emails':
                 return (
-                    <Field key={key}
-                           name={content.name}
-                           label={content.label}
-                           component={ReduxFormField}
-                           as={EmailListField}
-                           isEqual={_.isEqual} />
+                    <FinalEmailList key={key}
+                                    name={content.name}
+                                    label={content.label} />
                 );
             case 'photo':
                 return this.newRoom ? null : (
@@ -729,34 +734,27 @@ class RoomEditModal extends React.Component {
                     return;
                 }
                 return (
-                    <Field key={key}
-                           name="availableEquipment"
-                           component={ReduxFormField}
-                           as={EquipmentList}
-                           isEqual={_.isEqual}
-                           componentLabel={Translate.string('Add new equipment')} />
+                    <FinalField key={key}
+                                name="availableEquipment"
+                                component={EquipmentList}
+                                isEqual={_.isEqual}
+                                componentLabel={Translate.string('Add new equipment')} />
                 );
             case 'bookableHours':
                 return (
-                    <Field key={key}
-                           name="bookableHours"
-                           component={ReduxFormField}
-                           as={DailyAvailability}
-                           isEqual={_.isEqual}
-                           format={(value) => {
-                               return value === null ? [] : value;
-                           }} />
+                    <FinalField key={key}
+                                name="bookableHours"
+                                component={DailyAvailability}
+                                isEqual={_.isEqual}
+                                format={value => (value === null ? [] : value)} />
                 );
             case 'nonBookablePeriods':
                 return (
-                    <Field key={key}
-                           name="nonbookablePeriods"
-                           component={ReduxFormField}
-                           as={NonBookablePeriods}
-                           isEqual={_.isEqual}
-                           format={(value) => {
-                               return value === null ? [] : value;
-                           }} />
+                    <FinalField key={key}
+                                name="nonbookablePeriods"
+                                component={NonBookablePeriods}
+                                isEqual={_.isEqual}
+                                format={value => (value === null ? [] : value)} />
                 );
         }
     };

@@ -10,6 +10,7 @@ import React, {useState} from 'react';
 import PropTypes from 'prop-types';
 import {Dropdown} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
+import {FinalField} from '../forms';
 
 
 const isValid = value => /^\S+@\S+\.\S+$/.test(value);
@@ -53,3 +54,15 @@ EmailListField.propTypes = {
 
 
 export default React.memo(EmailListField);
+
+
+/**
+ * Like `FinalField` but for a `EmailListField`.
+ */
+export function FinalEmailList({name, ...rest}) {
+    return <FinalField name={name} component={EmailListField} isEqual={_.isEqual} {...rest} />;
+}
+
+FinalEmailList.propTypes = {
+    name: PropTypes.string.isRequired,
+};

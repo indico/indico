@@ -12,6 +12,7 @@ import PropTypes from 'prop-types';
 import {START_DATE, END_DATE} from 'react-dates/constants';
 import {DateRangePicker} from 'indico/react/components';
 import {serializeDate} from 'indico/utils/date';
+import {FinalField} from '../forms';
 
 import './DatePeriodField.module.scss';
 
@@ -104,3 +105,26 @@ export default class DatePeriodField extends React.Component {
         );
     }
 }
+
+
+/**
+ * Like `FinalField` but for a `DatePeriodField`.
+ */
+export function FinalDatePeriod({name, ...rest}) {
+    return (
+        <FinalField name={name}
+                    component={DatePeriodField}
+                    isEqual={_.isEqual}
+                    {...rest} />
+
+    );
+}
+
+FinalDatePeriod.propTypes = {
+    name: PropTypes.string.isRequired,
+    readOnly: PropTypes.bool,
+};
+
+FinalDatePeriod.defaultProps = {
+    readOnly: false,
+};
