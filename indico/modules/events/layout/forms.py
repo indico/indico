@@ -15,9 +15,10 @@ from wtforms.validators import DataRequired, Optional, ValidationError
 from indico.core.config import config
 from indico.modules.events.layout import theme_settings
 from indico.modules.events.layout.util import get_css_file_data, get_logo_data, get_plugin_conference_themes
+from indico.modules.users import NameFormat
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
-from indico.web.forms.fields import EditableFileField, FileField
+from indico.web.forms.fields import EditableFileField, FileField, IndicoEnumSelectField
 from indico.web.forms.validators import HiddenUnless, UsedIf
 from indico.web.forms.widgets import CKEditorWidget, ColorPickerWidget, SwitchWidget
 
@@ -46,6 +47,8 @@ class ConferenceLayoutForm(IndicoForm):
     show_banner = BooleanField(_("\"Now happening\""), widget=SwitchWidget(on_label=_("ON"), off_label=_("OFF")),
                                description=_("Show a banner with the current entries from the timetable"))
     show_social_badges = BooleanField(_("Show social badges"), widget=SwitchWidget())
+    name_format = IndicoEnumSelectField(_('Name format'), enum=NameFormat, none=_('Inherit from user preferences'),
+                                        description=_('Format in which names are displayed'))
 
     # Style
     header_text_color = StringField(_("Text colour"), widget=ColorPickerWidget())
@@ -85,6 +88,8 @@ class ConferenceLayoutForm(IndicoForm):
 
 
 class LectureMeetingLayoutForm(IndicoForm):
+    name_format = IndicoEnumSelectField(_('Name format'), enum=NameFormat, none=_('Inherit from user preferences'),
+                                        description=_('Format in which names are displayed'))
     timetable_theme = SelectField(_('Timetable theme'), [DataRequired()])
 
     def __init__(self, *args, **kwargs):

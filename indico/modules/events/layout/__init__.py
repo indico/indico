@@ -12,10 +12,12 @@ from jinja2.filters import do_filesizeformat
 
 from indico.core import signals
 from indico.core.logger import Logger
+from indico.core.settings.converters import EnumConverter
 from indico.modules.events.features.base import EventFeature
 from indico.modules.events.logs import EventLogKind, EventLogRealm
 from indico.modules.events.models.events import EventType
 from indico.modules.events.settings import EventSettingsProxy, ThemeSettingsProxy
+from indico.modules.users import NameFormat
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
@@ -26,6 +28,7 @@ layout_settings = EventSettingsProxy('layout', {
     'is_searchable': True,
     'show_nav_bar': True,
     'show_social_badges': True,
+    'name_format': None,
     'show_banner': False,
     'header_text_color': '',
     'header_background_color': '',
@@ -38,6 +41,8 @@ layout_settings = EventSettingsProxy('layout', {
     'use_custom_menu': False,
     'timetable_by_room': False,
     'timetable_detailed': False,
+}, converters={
+    'name_format': EnumConverter(NameFormat)
 })
 
 theme_settings = ThemeSettingsProxy()
