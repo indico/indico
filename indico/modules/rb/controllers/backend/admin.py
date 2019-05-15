@@ -30,9 +30,9 @@ from indico.modules.rb.models.room_features import RoomFeature
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.operations.admin import (update_room, update_room_attributes, update_room_availability,
                                                 update_room_equipment)
-from indico.modules.rb.schemas import (AdminRoomSchema, admin_equipment_type_schema, admin_locations_schema,
-                                       bookable_hours_schema, nonbookable_periods_schema, room_attribute_schema,
-                                       room_attribute_values_schema, room_equipment_schema, room_feature_schema,
+from indico.modules.rb.schemas import (AdminRoomSchema, RoomAttributeValuesSchema, admin_equipment_type_schema,
+                                       admin_locations_schema, bookable_hours_schema, nonbookable_periods_schema,
+                                       room_attribute_schema, room_equipment_schema, room_feature_schema,
                                        room_update_schema)
 from indico.modules.rb.util import (build_rooms_spritesheet, get_resized_room_photo, rb_is_admin,
                                     remove_room_spritesheet_photo)
@@ -369,16 +369,15 @@ class RHRoomAdminBase(RHRoomBookingAdminBase):
 
 class RHRoomAttributes(RHRoomAdminBase):
     def _process(self):
-        return jsonify(room_attribute_values_schema.dump(self.room.attributes))
+        return RoomAttributeValuesSchema(many=True, only=('name', 'value')).jsonify(self.room.attributes)
 
 
 class RHUpdateRoomAttributes(RHRoomAdminBase):
-    @use_kwargs({'attributes': fields.Nested({'title': fields.Str(),
-                                              'value': fields.Str(),
+    @use_kwargs({'attributes': fields.Nested({'value': fields.Str(),
                                               'name': fields.Str()}, many=True)})
     def _process(self, attributes):
         update_room_attributes(self.room, attributes)
-        return jsonify(room_attribute_values_schema.dump(self.room.attributes))
+        return '', 204
 
 
 class RHRoomAvailability(RHRoomAdminBase):
