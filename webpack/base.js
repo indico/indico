@@ -157,6 +157,12 @@ export function webpackDefaults(env, config, bundles) {
                     ...cssLoaderOptions
                 }
             }, {
+                loader: 'resolve-url-loader',
+                options: {
+                    keepQuery: true,
+                    root: config.isPlugin ? false : config.build.staticPath
+                }
+            }, {
                 loader: 'postcss-loader',
                 options: {
                     sourceMap: true,
