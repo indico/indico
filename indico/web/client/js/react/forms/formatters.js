@@ -9,12 +9,12 @@ import _slugify from 'slugify';
 
 
 function trim(value) {
-    return value === undefined ? undefined : value.trim();
+    return typeof value === 'string' ? value.trim() : value;
 }
 
 
 function slugify(value) {
-    return value === undefined ? undefined : _slugify(value, {lower: true});
+    return typeof value === 'string' ? _slugify(value, {lower: true}) : value;
 }
 
 
