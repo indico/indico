@@ -10,7 +10,7 @@ from __future__ import unicode_literals
 import itertools
 from operator import attrgetter
 
-from flask import flash, has_request_context, session
+from flask import flash, g, has_request_context, session
 from flask_multipass import IdentityRetrievalFailed
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.associationproxy import association_proxy
@@ -131,7 +131,10 @@ syncable_fields = {
 
 
 def format_display_full_name(user, obj):
-    name_format = user.settings.get('name_format') if user else NameFormat.first_last
+    from indico.modules.events.layout import layout_settings
+    name_format = layout_settings.get(g.rh.event, 'name_format') if 'rh' in g and hasattr(g.rh, 'event') else None
+    if name_format is None:
+        name_format = user.settings.get('name_format') if user else NameFormat.first_last
     upper = name_format in (NameFormat.first_last_upper, NameFormat.f_last_upper, NameFormat.last_f_upper,
                             NameFormat.last_first_upper)
     if name_format in (NameFormat.first_last, NameFormat.first_last_upper):
