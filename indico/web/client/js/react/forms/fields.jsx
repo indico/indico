@@ -15,10 +15,10 @@ import formatters from './formatters';
 import parsers from './parsers';
 import validators from './validators';
 
-import './ReduxFormField.module.scss';
+import './fields.module.scss';
 
 
-export function ReduxFormField(
+export function FormFieldAdapter(
     {
         input, label, placeholder, required, children, disabled, componentLabel, defaultValue, fieldProps,
         hideValidationError, hideErrorWhileActive,
@@ -82,7 +82,7 @@ export function ReduxFormField(
     );
 }
 
-ReduxFormField.propTypes = {
+FormFieldAdapter.propTypes = {
     disabled: PropTypes.bool,
     input: PropTypes.object.isRequired,
     required: PropTypes.bool,
@@ -99,7 +99,7 @@ ReduxFormField.propTypes = {
     getValue: PropTypes.func,
 };
 
-ReduxFormField.defaultProps = {
+FormFieldAdapter.defaultProps = {
     disabled: false,
     required: false,
     hideValidationError: false,
@@ -114,7 +114,7 @@ ReduxFormField.defaultProps = {
 };
 
 
-export function ReduxRadioField(props) {
+export function RadioAdapter(props) {
     const {
         input,
         // eslint-disable-next-line react/prop-types
@@ -122,19 +122,19 @@ export function ReduxRadioField(props) {
         ...rest
     } = props;
     return (
-        <ReduxFormField input={input}
-                        {...rest}
-                        as={Radio}
-                        getValue={(__, {value}) => value} />
+        <FormFieldAdapter input={input}
+                          {...rest}
+                          as={Radio}
+                          getValue={(__, {value}) => value} />
     );
 }
 
-ReduxRadioField.propTypes = {
+RadioAdapter.propTypes = {
     input: PropTypes.object.isRequired,
 };
 
 
-function ReduxCheckboxField(props) {
+function CheckboxAdapter(props) {
     const {
         input: {value, ...input},
         // eslint-disable-next-line react/prop-types
@@ -142,38 +142,39 @@ function ReduxCheckboxField(props) {
         ...rest
     } = props;
     return (
-        <ReduxFormField input={input}
-                        {...rest}
-                        as={Checkbox}
-                        getValue={(__, {checked}) => checked} />
+        <FormFieldAdapter input={input}
+                          {...rest}
+                          as={Checkbox}
+                          getValue={(__, {checked}) => checked} />
     );
 }
 
-ReduxCheckboxField.propTypes = {
+CheckboxAdapter.propTypes = {
     input: PropTypes.object.isRequired,
 };
 
 
-function ReduxDropdownField({input, required, clearable, ...props}) {
+function DropdownAdapter(props) {
+    const {input, required, clearable, ...rest} = props;
     return (
-        <ReduxFormField input={input}
-                        {...props}
-                        required={required}
-                        as={Dropdown}
-                        clearable={clearable === undefined ? !required : clearable}
-                        selectOnBlur={false}
-                        getValue={(__, {value}) => value} />
+        <FormFieldAdapter input={input}
+                          {...rest}
+                          required={required}
+                          as={Dropdown}
+                          clearable={clearable === undefined ? !required : clearable}
+                          selectOnBlur={false}
+                          getValue={(__, {value}) => value} />
     );
 }
 
 
-ReduxDropdownField.propTypes = {
+DropdownAdapter.propTypes = {
     input: PropTypes.object.isRequired,
     required: PropTypes.bool,
     clearable: PropTypes.bool,
 };
 
-ReduxDropdownField.defaultProps = {
+DropdownAdapter.defaultProps = {
     required: false,
     clearable: undefined,
 };
@@ -188,7 +189,7 @@ export function FinalField({name, adapter, component, description, required, onC
 
     if (description) {
         extraProps.children = (
-            <p className="field-description">
+            <p styleName="field-description">
                 {description}
             </p>
         );
@@ -231,7 +232,7 @@ FinalField.propTypes = {
 };
 
 FinalField.defaultProps = {
-    adapter: ReduxFormField,
+    adapter: FormFieldAdapter,
     component: undefined,
     description: null,
     required: false,
@@ -320,7 +321,7 @@ FinalTextArea.defaultProps = {
  */
 export function FinalCheckbox({name, label, ...rest}) {
     return (
-        <FinalField name={name} adapter={ReduxCheckboxField} type="checkbox" componentLabel={label} {...rest} />
+        <FinalField name={name} adapter={CheckboxAdapter} type="checkbox" componentLabel={label} {...rest} />
     );
 }
 
@@ -335,7 +336,7 @@ FinalCheckbox.propTypes = {
  */
 export function FinalRadio({name, label, ...rest}) {
     return (
-        <FinalField name={name} adapter={ReduxRadioField} type="radio" componentLabel={label} {...rest} />
+        <FinalField name={name} adapter={RadioAdapter} type="radio" componentLabel={label} {...rest} />
     );
 }
 
@@ -350,7 +351,7 @@ FinalRadio.propTypes = {
  */
 export function FinalDropdown({name, label, ...rest}) {
     return (
-        <FinalField name={name} adapter={ReduxDropdownField} label={label} parse={null} {...rest} />
+        <FinalField name={name} adapter={DropdownAdapter} label={label} parse={null} {...rest} />
     );
 }
 
