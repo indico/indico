@@ -11,7 +11,7 @@ from datetime import date, datetime, time
 
 from dateutil.relativedelta import relativedelta
 from flask import session
-from sqlalchemy.orm import joinedload, load_only, raiseload
+from sqlalchemy.orm import joinedload, load_only
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.principals import PrincipalType
