@@ -12,6 +12,7 @@ import PropTypes from 'prop-types';
 import {Dropdown} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
 import {serializeTime, toMoment} from 'indico/utils/date';
+import {FinalField} from 'indico/react/forms';
 
 import './TimeRangePicker.module.scss';
 
@@ -249,3 +250,44 @@ export default class TimeRangePicker extends React.Component {
         );
     }
 }
+
+
+function ValuedTimeRangePicker({value, onChange, ...rest}) {
+    const startTime = toMoment(value.startTime, 'HH:mm');
+    const endTime = toMoment(value.endTime, 'HH:mm');
+    const handleChange = (start, end) => {
+        onChange({
+            startTime: serializeTime(start),
+            endTime: serializeTime(end),
+        });
+    };
+    return (
+        <TimeRangePicker startTime={startTime} endTime={endTime} onChange={handleChange} {...rest} />
+    );
+}
+
+ValuedTimeRangePicker.propTypes = {
+    value: PropTypes.exact({
+        startTime: PropTypes.string.isRequired,
+        endTime: PropTypes.string.isRequired,
+    }).isRequired,
+    onChange: PropTypes.func.isRequired,
+};
+
+
+/**
+ * Like `FinalField` but for a `TimeRangePicker`.
+ */
+export function FinalTimeRangePicker({name, ...rest}) {
+    return (
+        <FinalField name={name}
+                    component={ValuedTimeRangePicker}
+                    isEqual={_.isEqual}
+                    {...rest} />
+
+    );
+}
+
+FinalTimeRangePicker.propTypes = {
+    name: PropTypes.string.isRequired,
+};

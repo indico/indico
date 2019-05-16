@@ -7,7 +7,6 @@
 
 export {handleSubmissionError} from './errors';
 export {
-    ReduxFormField,
     FinalCheckbox, FinalDropdown, FinalField, FinalInput, FinalRadio, FinalSubmitButton, FinalTextArea,
 } from './fields';
 export {default as validators} from './validators';

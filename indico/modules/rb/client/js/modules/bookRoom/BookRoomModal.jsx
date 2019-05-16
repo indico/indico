@@ -323,9 +323,9 @@ class BookRoomModal extends React.Component {
                                    disabled={disabled}
                                    selection
                                    clearable
-                                   onChange={(value) => {
+                                   onChange={eventId => {
                                        this.setState({
-                                           selectedEvent: value
+                                           selectedEvent: eventId
                                        });
                                    }} />
                     {this.renderEventLink(links[selectedEvent])}

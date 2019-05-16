@@ -5,10 +5,12 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import _ from 'lodash';
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Checkbox, Dropdown, Form, Input, Popup, Radio, TextArea} from 'semantic-ui-react';
 import {Field, FormSpy} from 'react-final-form';
+import {OnChange} from 'react-final-form-listeners';
 import formatters from './formatters';
 import parsers from './parsers';
 import validators from './validators';
@@ -22,6 +24,7 @@ export function ReduxFormField(
         hideValidationError, hideErrorWhileActive,
         meta: {touched, error, submitError, submitting, dirty, dirtySinceLastSubmit, active},
         as: Component,
+        getValue,
         ...props
     }
 ) {
@@ -42,6 +45,14 @@ export function ReduxFormField(
 
     const showErrorPopup = !!errorMessage && (!hideErrorWhileActive || !active);
 
+    const handleChange = (...args) => {
+        if (getValue) {
+            input.onChange(getValue(...args));
+        } else {
+            input.onChange(...args);
+        }
+    };
+
     const field = (
         <Form.Field required={required}
                     disabled={disabled || submitting}
@@ -51,6 +62,7 @@ export function ReduxFormField(
             {label && <label>{label}</label>}
             <Component {...input}
                        {...props}
+                       onChange={handleChange}
                        label={componentLabel}
                        placeholder={placeholder}
                        required={required}
@@ -84,6 +96,7 @@ ReduxFormField.propTypes = {
     children: PropTypes.node,
     defaultValue: PropTypes.any,
     fieldProps: PropTypes.object,
+    getValue: PropTypes.func,
 };
 
 ReduxFormField.defaultProps = {
@@ -97,6 +110,7 @@ ReduxFormField.defaultProps = {
     children: null,
     defaultValue: null,
     fieldProps: {},
+    getValue: null,
 };
 
 
@@ -111,11 +125,7 @@ export function ReduxRadioField(props) {
         <ReduxFormField input={input}
                         {...rest}
                         as={Radio}
-                        onChange={(__, {checked, value}) => {
-                            if (checked) {
-                                input.onChange(value);
-                            }
-                        }} />
+                        getValue={(__, {value}) => value} />
     );
 }
 
@@ -135,9 +145,7 @@ function ReduxCheckboxField(props) {
         <ReduxFormField input={input}
                         {...rest}
                         as={Checkbox}
-                        onChange={(__, {checked}) => {
-                            input.onChange(checked);
-                        }} />
+                        getValue={(__, {checked}) => checked} />
     );
 }
 
@@ -146,7 +154,7 @@ ReduxCheckboxField.propTypes = {
 };
 
 
-function ReduxDropdownField({input, required, clearable, onChange, ...props}) {
+function ReduxDropdownField({input, required, clearable, ...props}) {
     return (
         <ReduxFormField input={input}
                         {...props}
@@ -154,10 +162,7 @@ function ReduxDropdownField({input, required, clearable, onChange, ...props}) {
                         as={Dropdown}
                         clearable={clearable === undefined ? !required : clearable}
                         selectOnBlur={false}
-                        onChange={(__, {value}) => {
-                            input.onChange(value);
-                            onChange(value);
-                        }} />
+                        getValue={(__, {value}) => value} />
     );
 }
 
@@ -166,13 +171,11 @@ ReduxDropdownField.propTypes = {
     input: PropTypes.object.isRequired,
     required: PropTypes.bool,
     clearable: PropTypes.bool,
-    onChange: PropTypes.func,
 };
 
 ReduxDropdownField.defaultProps = {
     required: false,
     clearable: undefined,
-    onChange: () => {},
 };
 
 
@@ -180,7 +183,7 @@ ReduxDropdownField.defaultProps = {
  * A wrapper for final-form's Field component that handles the markup
  * around the field.
  */
-export function FinalField({name, adapter, component, description, required, ...rest}) {
+export function FinalField({name, adapter, component, description, required, onChange, ...rest}) {
     const extraProps = {};
 
     if (description) {
@@ -202,7 +205,18 @@ export function FinalField({name, adapter, component, description, required, ...
     }
 
     return (
-        <Field name={name} component={adapter} as={component} {...extraProps} {...rest} />
+        <>
+            <Field name={name} component={adapter} as={component} {...extraProps} {...rest} />
+            {onChange && (
+                <OnChange name={name}>
+                    {(value, prev) => {
+                        if (!_.isEqual(value, prev)) {
+                            onChange(value, prev);
+                        }
+                    }}
+                </OnChange>
+            )}
+        </>
     );
 }
 
@@ -212,6 +226,8 @@ FinalField.propTypes = {
     component: PropTypes.elementType,
     description: PropTypes.node,
     required: PropTypes.bool,
+    /** A function that is called with the new and old value whenever the value changes. */
+    onChange: PropTypes.func,
 };
 
 FinalField.defaultProps = {
@@ -219,6 +235,7 @@ FinalField.defaultProps = {
     component: undefined,
     description: null,
     required: false,
+    onChange: null,
 };
 
 

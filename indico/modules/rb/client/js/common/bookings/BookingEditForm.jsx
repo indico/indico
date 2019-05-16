@@ -5,25 +5,24 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import _ from 'lodash';
 import moment from 'moment';
 import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import {Form, Input, Message, Segment, Select} from 'semantic-ui-react';
+import {Form, Message, Segment} from 'semantic-ui-react';
 import {Field, FormSpy} from 'react-final-form';
 import {START_DATE} from 'react-dates/constants';
 
 import {
-    FieldCondition, FinalRadio, FinalTextArea, ReduxFormField,
+    FieldCondition, FinalDropdown, FinalInput, FinalRadio, FinalTextArea,
     parsers as p, validators as v
 } from 'indico/react/forms';
 import {FavoritesProvider} from 'indico/react/hooks';
-import {SingleDatePicker, DatePeriodField, FinalPrincipal} from 'indico/react/components';
-import {serializeDate, serializeTime, toMoment} from 'indico/utils/date';
+import {FinalSingleDatePicker, FinalDatePeriod, FinalPrincipal} from 'indico/react/components';
+import {serializeDate} from 'indico/utils/date';
 import {Overridable} from 'indico/react/util';
 import {PluralTranslate, Translate} from 'indico/react/i18n';
-import TimeRangePicker from '../../components/TimeRangePicker';
+import {FinalTimeRangePicker} from '../../components/TimeRangePicker';
 import {selectors as userSelectors} from '../user';
 import {sanitizeRecurrence} from '../../util';
 
@@ -70,110 +69,14 @@ class BookingEditForm extends React.Component {
         onBookingPeriodChange(filters.dates, timeSlot, filters.recurrence);
     };
 
-    renderRecurrenceNumber = ({input, onChange, ...fieldProps}) => {
-        return (
-            <ReduxFormField {...fieldProps}
-                            input={input}
-                            onChange={(__, {value}) => {
-                                input.onChange(value);
-                                onChange(value);
-                            }}
-                            type="number"
-                            min="1"
-                            max="99"
-                            step="1" />
-        );
-    };
-
-
-    renderIntervalDropdown = ({input, onChange, ...fieldProps}) => {
-        const {formProps: {values: {recurrence: {number}}}} = this.props;
-
-        const recurrenceOptions = [
-            {text: PluralTranslate.string('Week', 'Weeks', number || 0), value: 'week'},
-            {text: PluralTranslate.string('Month', 'Months', number || 0), value: 'month'}
-        ];
-
-        return (
-            <ReduxFormField {...fieldProps}
-                            input={input}
-                            as={Select}
-                            options={recurrenceOptions}
-                            onChange={(__, {value}) => {
-                                input.onChange(value);
-                                onChange(value);
-                            }} />
-        );
-    };
-
-    renderDateForm = ({input, isSingleBooking, onChange, ...fieldProps}) => {
-        const {booking: {startDt: originalStartDt, endDt: originalEndDt}} = this.props;
-        const {value: {startDate, endDate}} = input;
-        const component = isSingleBooking ? SingleDatePicker : DatePeriodField;
+    isDateDisabled = (dt) => {
+        const {booking: {startDt}} = this.props;
         const today = moment();
-        const props = isSingleBooking ? {
-            onDateChange: (date) => {
-                const dates = {startDate: serializeDate(date), endDate: null};
-                input.onChange(dates);
-                onChange(dates);
-            },
-            date: toMoment(startDate, 'YYYY-MM-DD'),
-            disabled: toMoment(originalEndDt, 'YYYY-MM-DD').isBefore(today, 'day'),
-        } : {
-            onChange: (dates) => {
-                input.onChange(dates);
-                onChange(dates);
-            },
-            dates: {
-                startDate: toMoment(startDate, 'YYYY-MM-DD'),
-                endDate: toMoment(endDate, 'YYYY-MM-DD')
-            },
-            disabled: today.isAfter(originalStartDt, 'day') && today.isAfter(originalEndDt, 'day'),
-            disabledDateFields: today.isAfter(startDate, 'day') ? START_DATE : null,
-        };
+        if (today.isSameOrBefore(startDt, 'day') || today.isAfter(startDt, 'day')) {
+            return !dt.isSameOrAfter(today, 'day');
+        }
 
-        const disabledDate = (dt) => {
-            if (today.isSameOrBefore(originalStartDt, 'day') || today.isAfter(originalStartDt, 'day')) {
-                return !dt.isSameOrAfter(today, 'day');
-            }
-
-            return !dt.isSameOrAfter(originalStartDt, 'day');
-        };
-
-        return (
-            <ReduxFormField {...fieldProps}
-                            {...props}
-                            disabledDate={disabledDate}
-                            initialVisibleMonth={() => moment(originalEndDt)}
-                            input={input}
-                            as={component} />
-        );
-    };
-
-    renderTimeForm = ({input, onChange, ...fieldProps}) => {
-        const {value: {startTime, endTime}} = input;
-        const {booking: {startDt, endDt}} = this.props;
-        const today = moment();
-        const disabled = today.isAfter(startDt, 'day') && (endDt && today.isAfter(endDt, 'day'));
-
-        return (
-            <ReduxFormField {...fieldProps}
-                            allowPastTimes
-                            disabled={disabled}
-                            input={input}
-                            as={TimeRangePicker}
-                            startTime={toMoment(startTime, 'HH:mm')}
-                            endTime={toMoment(endTime, 'HH:mm')}
-                            onChange={(start, end) => {
-                                const newTimeSlot = {
-                                    startTime: serializeTime(start),
-                                    endTime: serializeTime(end),
-                                };
-
-                                input.onChange(newTimeSlot);
-                                onChange(newTimeSlot);
-                            }} />
-        );
+        return !dt.isSameOrAfter(startDt, 'day');
     };
 
     render() {
@@ -190,7 +93,8 @@ class BookingEditForm extends React.Component {
         } = formProps;
         const bookedByCurrentUser = sessionUser.id === bookedForUser.id;
         const today = moment();
-        const bookingFinished = today.isAfter(startDt, 'day') && (endDt && today.isAfter(endDt, 'day'));
+        const bookingStarted = today.isAfter(startDt, 'day');
+        const bookingFinished = today.isAfter(endDt, 'day');
 
         // all but one option are hidden
         const showRecurrenceOptions = ['single', 'daily', 'recurring'].filter(x => hideOptions[x]).length !== 2;
@@ -227,39 +131,68 @@ class BookingEditForm extends React.Component {
                             <label>
                                 <Translate>Every</Translate>
                             </label>
-                            <Field name="recurrence.number"
-                                   as={Input}
-                                   validate={v.min(1)}
-                                   disabled={submitSucceeded}
-                                   parse={p.number}
-                                   onChange={(newNumber) => {
-                                       if (+newNumber > 0) {
-                                           const newRecurrence = {...recurrence, number: newNumber};
-                                           onBookingPeriodChange(dates, timeSlot, newRecurrence);
-                                       }
-                                   }}
-                                   render={this.renderRecurrenceNumber} />
-                            <Field name="recurrence.interval"
-                                   disabled={submitSucceeded}
-                                   onChange={(newInterval) => {
-                                       const newRecurrence = {...recurrence, interval: newInterval};
-                                       onBookingPeriodChange(dates, timeSlot, newRecurrence);
-                                   }}
-                                   render={this.renderIntervalDropdown} />
+                            <FinalInput name="recurrence.number"
+                                        type="number"
+                                        min="1"
+                                        max="99"
+                                        step="1"
+                                        validate={v.min(1)}
+                                        disabled={submitSucceeded}
+                                        required
+                                        parse={p.number}
+                                        onChange={newNumber => {
+                                            if (newNumber > 0) {
+                                                const newRecurrence = {...recurrence, number: newNumber};
+                                                onBookingPeriodChange(dates, timeSlot, newRecurrence);
+                                            }
+                                        }} />
+                            <Field name="recurrence.number" subscription={{value: true}}>
+                                {({input: {value: number}}) => (
+                                    <FinalDropdown name="recurrence.interval"
+                                                   disabled={submitSucceeded}
+                                                   selection
+                                                   required
+                                                   options={[{
+                                                       value: 'week',
+                                                       text: PluralTranslate.string('Week', 'Weeks', number || 0),
+                                                   }, {
+                                                       value: 'month',
+                                                       text: PluralTranslate.string('Month', 'Months', number || 0),
+                                                   }]}
+                                                   onChange={newInterval => {
+                                                       const newRecurrence = {...recurrence, interval: newInterval};
+                                                       onBookingPeriodChange(dates, timeSlot, newRecurrence);
+                                                   }} />
+                                )}
+                            </Field>
                         </Form.Group>
                     )}
-                    <Field name="dates"
-                           isSingleBooking={recurrence.type === 'single'}
-                           onChange={(newDates) => onBookingPeriodChange(newDates, timeSlot, recurrence)}
-                           disabled={submitSucceeded}
-                           isEqual={_.isEqual}
-                           render={this.renderDateForm} />
+                    {recurrence.type === 'single' ? (
+                        <FinalSingleDatePicker name="dates"
+                                               asRange
+                                               onChange={newDates => {
+                                                   onBookingPeriodChange(newDates, timeSlot, recurrence);
+                                               }}
+                                               disabled={submitSucceeded || bookingFinished}
+                                               disabledDate={this.isDateDisabled}
+                                               initialVisibleMonth={() => moment(endDt)} />
+                    ) : (
+                        <FinalDatePeriod name="dates"
+                                         onChange={newDates => {
+                                             onBookingPeriodChange(newDates, timeSlot, recurrence);
+                                         }}
+                                         disabled={submitSucceeded || bookingFinished}
+                                         disabledDateFields={bookingStarted ? START_DATE : null}
+                                         disabledDate={this.isDateDisabled}
+                                         initialVisibleMonth={() => moment(endDt)} />
+                    )}
                     {!hideOptions.timeSlot && (
-                        <Field name="timeSlot"
-                               onChange={(newTimeSlot) => onBookingPeriodChange(dates, newTimeSlot, recurrence)}
-                               disabled={submitSucceeded}
-                               isEqual={_.isEqual}
-                               render={this.renderTimeForm} />
+                        <FinalTimeRangePicker name="timeSlot"
+                                              onChange={newTimeSlot => {
+                                                  onBookingPeriodChange(dates, newTimeSlot, recurrence);
+                                              }}
+                                              allowPastTimes
+                                              disabled={submitSucceeded || bookingFinished} />
                     )}
                     {!room.canUserBook && room.canUserPrebook && isAccepted && (
                         <FormSpy subscription={{dirtyFields: true}}>
