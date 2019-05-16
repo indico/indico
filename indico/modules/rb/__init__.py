@@ -12,7 +12,7 @@ from flask import session
 from indico.core import signals
 from indico.core.config import config
 from indico.core.logger import Logger
-from indico.core.permissions import ManagementPermission
+from indico.core.permissions import ManagementPermission, check_permissions
 from indico.core.settings import SettingsProxy
 from indico.core.settings.converters import ModelListConverter
 from indico.modules.categories.models.categories import Category
@@ -109,6 +109,7 @@ class PrebookPermission(ManagementPermission):
     friendly_name = _('Prebook')
     description = _('Allows prebooking the room')
     user_selectable = True
+    default = True
 
 
 class OverridePermission(ManagementPermission):
@@ -131,3 +132,8 @@ def _get_management_permissions(sender, **kwargs):
     yield PrebookPermission
     yield OverridePermission
     yield ModeratePermission
+
+
+@signals.app_created.connect
+def _check_permissions(app, **kwargs):
+    check_permissions(Room)
