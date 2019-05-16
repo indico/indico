@@ -235,11 +235,11 @@ export function initUnavailableTimeline(selectedDate, mode) {
     return {type: INIT_UNAVAILABLE_TIMELINE, selectedDate, mode};
 }
 
-export function fetchRelatedEvents(room, filters) {
+export function fetchRelatedEvents(filters) {
     const {dates, timeSlot, recurrence} = filters;
     const params = preProcessParameters({dates, timeSlot, recurrence}, ajaxFilterRules);
     return ajaxAction(
-        () => indicoAxios.get(fetchEventsURL({room_id: room.id}), {params}),
+        () => indicoAxios.get(fetchEventsURL(), {params}),
         FETCH_RELATED_EVENTS_REQUEST,
         [RELATED_EVENTS_RECEIVED, FETCH_RELATED_EVENTS_SUCCESS],
         FETCH_RELATED_EVENTS_ERROR

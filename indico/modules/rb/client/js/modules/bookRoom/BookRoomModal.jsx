@@ -120,7 +120,7 @@ class BookRoomModal extends React.Component {
         } = this.props;
         fetchAvailability(room, data);
         if (!link) {
-            fetchRelatedEvents(room, data);
+            fetchRelatedEvents(data);
         }
     }
 
