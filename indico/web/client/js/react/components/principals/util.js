@@ -11,8 +11,9 @@ import _ from 'lodash';
  * This class encapsulates the logic of a hierarchical permission system.
  */
 export class PermissionManager {
-    constructor(tree) {
+    constructor(tree, defaultPermission) {
         this.index = this._buildIndex(tree);
+        this.defaultPermission = defaultPermission;
     }
 
     _buildIndex(tree) {
@@ -55,7 +56,7 @@ export class PermissionManager {
 
         // don't allow the permissions to be empty
         if (!newPermissions.length) {
-            newPermissions.push('prebook');
+            newPermissions.push(this.defaultPermission);
         }
 
         return {

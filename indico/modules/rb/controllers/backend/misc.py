@@ -98,7 +98,7 @@ class RHEquipmentTypes(RHRoomBookingBase):
         return jsonify(self._get_equipment_types())
 
 
-class RHPermissionsInfo(RHRoomBookingBase):
+class RHPermissionTypes(RHRoomBookingBase):
     def _process(self):
-        permissions, tree = get_permissions_info(Room)
-        return jsonify(permissions=permissions, tree=tree)
+        permissions, tree, default = get_permissions_info(Room)
+        return jsonify(permissions=permissions, tree=tree, default=default)

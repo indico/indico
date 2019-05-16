@@ -65,7 +65,7 @@ export const usePermissionInfo = () => {
     }
 
     return [
-        loaded ? new PermissionManager(data.tree) : null,
+        loaded ? new PermissionManager(data.tree, data.default) : null,
         data
     ];
 };

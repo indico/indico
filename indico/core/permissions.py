@@ -33,6 +33,8 @@ class ManagementPermission(object):
     description = None
     #: whether the permission can be set in the permissions widget (protection page)
     user_selectable = False
+    #: whether the permission is the default (set when an ACL entry is created)
+    default = False
 
 
 @memoize_request
@@ -53,6 +55,8 @@ def check_permissions(type_):
     permissions = get_available_permissions(type_)
     if not all(x.islower() for x in permissions):
         raise RuntimeError('Management permissions must be all-lowercase')
+    if len(list(x for x in permissions.viewvalues() if x.default)) > 1:
+        raise RuntimeError('Only one permission can be the default')
 
 
 def get_permissions_info(_type):
@@ -104,9 +108,12 @@ def get_permissions_info(_type):
     available_permissions = dict({k: {
         'title': v.friendly_name,
         'css_class': 'permission-{}-{}'.format(_type.__name__.lower(), v.name),
-        'description': v.description
+        'description': v.description,
+        'default': v.default
     } for k, v in selectable_permissions.viewitems()}, **special_permissions)
-    return available_permissions, permissions_tree
+    default = next((k for k, v in available_permissions.viewitems() if v['default']), None)
+
+    return available_permissions, permissions_tree, default
 
 
 def get_principal_permissions(principal, _type):
