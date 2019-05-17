@@ -10,9 +10,9 @@ $i-label-vertical-padding: 4px;
 $i-label-color: $light-black;
 
 %label {
-    user-select: none;
     @extend %default-border-radius;
     @include border-all($gray);
+    user-select: none;
     box-sizing: border-box;
     display: inline-flex;
     color: $i-label-color;
@@ -60,7 +60,8 @@ $i-label-color: $light-black;
     }
 }
 
-@mixin _i-label-states($flavor-color, $border-color, $border-accent-color, $font-color, $font-accent-color, $with-modes: true) {
+@mixin _i-label-states($flavor-color, $border-color, $border-accent-color, $font-color,
+    $font-accent-color, $with-modes: true) {
     $no-modes: '';
 
     @if $with-modes == true {
@@ -107,7 +108,11 @@ $i-label-color: $light-black;
         @include i-label-flavor($green, $dark-green);
     }
 
-    &.danger {
+    &.color-teal {
+        @include i-label-flavor($teal, $dark-teal);
+    }
+
+    &.danger, &.color-red {
         @include i-label-flavor($red, $dark-red);
     }
 
