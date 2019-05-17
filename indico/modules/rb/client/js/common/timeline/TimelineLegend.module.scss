@@ -65,6 +65,7 @@
 
             &.pre-booking-conflict {
                 @include stripes($pre-booking-conflict-stripe-colors...);
+                color: darken($available-color, 20%);
             }
 
             &.cancellation {

@@ -26,7 +26,7 @@ $pending-cancellation-color: #e2cebc;
 $conflicting-candidate-color: #fbd1d6;
 $overridable-blocking-color: #749cc1;
 $pre-booking-stripe-colors: ($pre-booking-color, lighten($pre-booking-color, 20%));
-$pre-booking-conflict-stripe-colors: ($conflict-color, lighten($conflict-color, 14%));
+$pre-booking-conflict-stripe-colors: (lighten($available-color, 30%), lighten($pre-booking-color, 14%));
 $blocking-stripe-colors: (lighten($conflict-color, 50%), lighten($conflict-color, 20%));
 $overridable-blocking-stripe-colors: (lighten($overridable-blocking-color, 60%),
     lighten($overridable-blocking-color, 30%));

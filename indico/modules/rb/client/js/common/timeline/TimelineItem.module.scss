@@ -102,6 +102,7 @@
 
         &:global(.pre-booking-conflict) {
             @include stripes($pre-booking-conflict-stripe-colors...);
+            z-index: 4;
 
             &.overflow-right {
                 @include right-fade-out-stripes($pre-booking-conflict-stripe-colors...);

@@ -42,7 +42,7 @@ def get_rooms_conflicts(rooms, start_dt, end_dt, repeat_frequency, repeat_interv
 
     overlapping_occurrences = group_list(query, key=lambda obj: obj.reservation.room.id)
     for room_id, occurrences in overlapping_occurrences.iteritems():
-        conflicts = get_room_bookings_conflicts(candidates, occurrences, room_id, skip_conflicts_with)
+        conflicts = get_room_bookings_conflicts(candidates, occurrences, skip_conflicts_with)
         rooms_conflicts[room_id], rooms_pre_conflicts[room_id], rooms_conflicting_candidates[room_id] = conflicts
     for room_id, occurrences in blocked_rooms.iteritems():
         conflicts, conflicting_candidates = get_room_blockings_conflicts(room_id, candidates, occurrences)
@@ -67,7 +67,7 @@ def get_rooms_conflicts(rooms, start_dt, end_dt, repeat_frequency, repeat_interv
     return rooms_conflicts, rooms_pre_conflicts, rooms_conflicting_candidates
 
 
-def get_room_bookings_conflicts(candidates, occurrences, room_id, skip_conflicts_with=frozenset()):
+def get_room_bookings_conflicts(candidates, occurrences, skip_conflicts_with=frozenset()):
     conflicts = set()
     pre_conflicts = set()
     conflicting_candidates = set()
@@ -76,10 +76,10 @@ def get_room_bookings_conflicts(candidates, occurrences, room_id, skip_conflicts
             if occurrence.reservation.id in skip_conflicts_with:
                 continue
             if candidate.overlaps(occurrence):
-                conflicting_candidates.add(candidate)
                 overlap = candidate.get_overlap(occurrence)
                 obj = TempReservationOccurrence(*overlap, reservation=occurrence.reservation)
                 if occurrence.reservation.is_accepted:
+                    conflicting_candidates.add(candidate)
                     conflicts.add(obj)
                 else:
                     pre_conflicts.add(obj)

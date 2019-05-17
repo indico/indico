@@ -40,6 +40,7 @@ const types = {
     nonbookablePeriods: 'unbookable-periods',
     unbookableHours: 'unbookable-hours',
     preBookings: 'pre-booking',
+    preConflicts: 'pre-booking-conflict',
     cancellations: 'cancellation',
     pendingCancellations: 'pending-cancellations',
     rejections: 'rejection',
@@ -139,6 +140,7 @@ class TimelineItem extends React.Component {
             bookable
         } = occurrence;
         const {startHour, endHour, onClickCandidate, onClickReservation, room, dayBased} = this.props;
+        const isItemBookable = bookable && (type === 'candidate' || type === 'pre-booking-conflict');
         if (type === 'blocking' || type === 'overridable-blocking') {
             segmentStartDt = moment(startHour, 'HH:mm');
             segmentEndDt = (endHour === 24 ? moment('23:59', 'HH:mm') : moment(endHour, 'HH:mm'));
@@ -204,6 +206,18 @@ class TimelineItem extends React.Component {
                     </strong>
                 </div>
             );
+        } else if (type === 'pre-booking-conflict') {
+            popupContent = (
+                <div styleName="popup-center">
+                    <Translate>There is a conflict with a pre-booking</Translate>
+                    <div>
+                        {room.canUserBook
+                            ? Translate.string('Click to book it')
+                            : Translate.string('Click to pre-book it')
+                        }
+                    </div>
+                </div>
+            );
         } else {
             let popupMessage;
             if (reservation) {
@@ -224,7 +238,7 @@ class TimelineItem extends React.Component {
                 </div>
             );
         }
-        const clickable = (onClickCandidate && bookable && type === 'candidate') ||
+        const clickable = (onClickCandidate && isItemBookable) ||
                           (onClickReservation && reservationTypes.has(type));
         const notOverflowing = ['blocking', 'overridable-blocking', 'unbookable-periods', 'unbookable-hours'];
         const overflowLeft = (!notOverflowing.includes(type) &&
@@ -234,7 +248,7 @@ class TimelineItem extends React.Component {
         const styleName = `timeline-occurrence ${overflowRight ? 'overflow-right' : ''} ${overflowLeft ? 'overflow-left' : ''}`;
         const segment = (
             <div className={`${additionalClasses} ${clickable ? 'clickable' : ''}`} onClick={() => {
-                if (onClickCandidate && bookable && type === 'candidate') {
+                if (onClickCandidate && isItemBookable) {
                     onClickCandidate(room);
                 } else if (onClickReservation && reservationTypes.has(type)) {
                     onClickReservation(reservation.id);
@@ -246,7 +260,7 @@ class TimelineItem extends React.Component {
 
         return (
             <Popup trigger={segment} content={popupContent} position="bottom center"
-                   header={reservation && reservation.bookedForName}
+                   header={(reservation && !isItemBookable) && reservation.bookedForName}
                    hideOnScroll />
         );
     };
