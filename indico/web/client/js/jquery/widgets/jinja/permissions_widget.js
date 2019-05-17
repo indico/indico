@@ -106,7 +106,9 @@ import Palette from 'indico/utils/palette';
                 const applyOpacity = item === READ_ACCESS_PERMISSIONS &&
                     _.contains(permissions, FULL_ACCESS_PERMISSIONS) &&
                     principal._type !== 'DefaultEntry';
-                const cssClasses = (applyOpacity ? 'disabled ' : '') + permissionInfo.css_class;
+                const cssClasses = (applyOpacity ? 'disabled ' : '') +
+                    (permissionInfo.color ? `color-${permissionInfo.color} ` : '') +
+                    (permissionInfo.css_class ? `${permissionInfo.css_class} ` : '');
                 $permissionsList.append(
                     $('<li>', {class: `i-label bold ${cssClasses}`, title: permissionInfo.description})
                         .append(permissionInfo.title)

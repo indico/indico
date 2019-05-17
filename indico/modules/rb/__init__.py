@@ -102,6 +102,7 @@ class BookPermission(ManagementPermission):
     friendly_name = _('Book')
     description = _('Allows booking the room')
     user_selectable = True
+    color = 'green'
 
 
 class PrebookPermission(ManagementPermission):
@@ -110,6 +111,7 @@ class PrebookPermission(ManagementPermission):
     description = _('Allows prebooking the room')
     user_selectable = True
     default = True
+    color = 'orange'
 
 
 class OverridePermission(ManagementPermission):
@@ -117,6 +119,7 @@ class OverridePermission(ManagementPermission):
     friendly_name = _('Override')
     description = _('Allows overriding restrictions when booking the room')
     user_selectable = True
+    color = 'pink'
 
 
 class ModeratePermission(ManagementPermission):
@@ -124,6 +127,7 @@ class ModeratePermission(ManagementPermission):
     friendly_name = _('Moderate')
     description = _('Allows moderating bookings (approving/rejecting/editing)')
     user_selectable = True
+    color = 'purple'
 
 
 @signals.acl.get_management_permissions.connect_via(Room)

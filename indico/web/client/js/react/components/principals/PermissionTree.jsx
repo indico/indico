@@ -11,44 +11,35 @@ import {Button, Popup} from 'semantic-ui-react';
 
 import './PermissionTree.module.scss';
 
-// TODO: maybe move this to the backend?
-export const PERMISSION_COLORS = {
-    moderate: 'purple',
-    readAccess: 'teal',
-    fullAccess: 'red',
-    book: 'green',
-    prebook: 'orange',
-    override: 'pink'
-};
-
 /**
  * A component that displays a tree of permissions with clickable options
  */
-const PermissionTree = ({tree, exclude, hide, disabled, onSelect}) => {
-    const triggerFactory = (id, title, itemDisabled) => (
+const PermissionTree = ({tree, permissionMap, exclude, hide, disabled, onSelect}) => {
+    const triggerFactory = (id, itemDisabled) => (
         <Button size="mini"
                 basic
                 disabled={disabled || itemDisabled}
-                color={PERMISSION_COLORS[id]}
-                content={title}
+                color={permissionMap[id].color}
+                content={permissionMap[id].title}
                 onClick={() => onSelect(id)} />
     );
     const entries = Object.entries(tree).filter(([id]) => !hide.includes(id));
 
     return (
         <div styleName="permission-tree">
-            {entries.map(([id, {description, title, children}]) => {
+            {entries.map(([id, {description, children}]) => {
                 const itemDisabled = exclude.includes(id);
                 return (
                     <React.Fragment key={id}>
                         <div styleName="permission-option">
-                            <Popup trigger={triggerFactory(id, title, itemDisabled)}
+                            <Popup trigger={triggerFactory(id, itemDisabled)}
                                    content={description}
                                    position="right center"
                                    inverted />
                         </div>
                         {children && (
                             <PermissionTree tree={children}
+                                            permissionMap={permissionMap}
                                             disabled={itemDisabled}
                                             exclude={exclude}
                                             hide={hide}
@@ -69,6 +60,7 @@ const PermissionTreeData = PropTypes.objectOf(PropTypes.shape({
 
 PermissionTree.propTypes = {
     tree: PermissionTreeData.isRequired,
+    permissionMap: PropTypes.objectOf(PropTypes.object).isRequired,
     onSelect: PropTypes.func.isRequired,
     exclude: PropTypes.arrayOf(PropTypes.string),
     hide: PropTypes.arrayOf(PropTypes.string),
