@@ -13,7 +13,7 @@ import {Button, Dropdown, Icon, Label, Popup} from 'semantic-ui-react';
 import {PopoverDropdownMenu} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
 
-import PermissionTree, {PERMISSION_COLORS} from './PermissionTree';
+import PermissionTree from './PermissionTree';
 
 import './PrincipalPermissions.module.scss';
 
@@ -62,7 +62,7 @@ const PrincipalPermissions = ({
                        trigger={
                            <Label as="div"
                                   size="tiny"
-                                  color={PERMISSION_COLORS[permission]}>
+                                  color={permissionMap[permission].color}>
                                {permissionMap[permission].title}
                                <Icon name="close"
                                      onClick={() => !readOnly && onClickRemove(permission)} />
@@ -81,6 +81,7 @@ const PrincipalPermissions = ({
                         <Translate>Add permission</Translate>
                     </Dropdown.Header>
                     <PermissionTree tree={permissionTree}
+                                    permissionMap={permissionMap}
                                     exclude={permissions}
                                     hide={['readAccess']}
                                     onSelect={p => onClickAdd(p)} />

@@ -35,6 +35,8 @@ class ManagementPermission(object):
     user_selectable = False
     #: whether the permission is the default (set when an ACL entry is created)
     default = False
+    #: the color that will be associated with the permission on the UI
+    color = None
 
 
 @memoize_request
@@ -86,10 +88,20 @@ def get_permissions_info(_type):
 
     selectable_permissions = {k: v for k, v in get_available_permissions(_type).viewitems() if v.user_selectable}
     special_permissions = {
-        FULL_ACCESS_PERMISSION: {'title': _('Manage'), 'css_class': 'danger',
-                                 'description': description_mapping[FULL_ACCESS_PERMISSION][_type]},
-        READ_ACCESS_PERMISSION: {'title': _('Access'), 'css_class': 'accept',
-                                 'description': description_mapping[READ_ACCESS_PERMISSION][_type]}
+        FULL_ACCESS_PERMISSION: {
+            'title': _('Manage'),
+            'color': 'red',
+            'css_class': 'permission-full-access',
+            'description': description_mapping[FULL_ACCESS_PERMISSION][_type],
+            'default': False
+        },
+        READ_ACCESS_PERMISSION: {
+            'title': _('Access'),
+            'color': 'teal',
+            'css_class': 'permission-read-access',
+            'description': description_mapping[READ_ACCESS_PERMISSION][_type],
+            'default': False
+        }
     }
     permissions_tree = {
         FULL_ACCESS_PERMISSION: {
@@ -109,7 +121,8 @@ def get_permissions_info(_type):
         'title': v.friendly_name,
         'css_class': 'permission-{}-{}'.format(_type.__name__.lower(), v.name),
         'description': v.description,
-        'default': v.default
+        'default': v.default,
+        'color': v.color,
     } for k, v in selectable_permissions.viewitems()}, **special_permissions)
     default = next((k for k, v in available_permissions.viewitems() if v['default']), None)
 
