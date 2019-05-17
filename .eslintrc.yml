@@ -5,11 +5,15 @@ env:
 
 plugins:
   - react-hooks
+  - prettier
 
 extends:
   - 'indico'
   - 'indico/babel'
   - 'indico/react'
+  - 'plugin:prettier/recommended'
+  - 'prettier/babel'
+  - 'prettier/react'
 
 settings:
   # we don't use the webpack resolver because it is SLOW (~1s),
@@ -45,6 +49,8 @@ rules:
   react-hooks/exhaustive-deps:
     - warn
     - additionalHooks: 'useAsyncEffect'
+  # avoid conflicts with prettier
+  import/newline-after-import: off
 
 globals:
   Indico: false
