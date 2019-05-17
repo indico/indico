@@ -217,7 +217,6 @@ export default function FinalRoomSelector({name, ...rest}) {
                     component={RoomSelector}
                     isEqual={_.isEqual}
                     {...rest} />
-
     );
 }
 

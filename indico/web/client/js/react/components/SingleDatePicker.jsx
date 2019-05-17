@@ -106,7 +106,6 @@ export function FinalSingleDatePicker({name, ...rest}) {
                     component={ValuedSingleDatePicker}
                     isEqual={_.isEqual}
                     {...rest} />
-
     );
 }
 

@@ -158,7 +158,6 @@ export function FinalPrincipalList({name, ...rest}) {
                     component={PrincipalListField}
                     isEqual={(a, b) => _.isEqual(a.sort(), b.sort())}
                     {...rest} />
-
     );
 }
 
