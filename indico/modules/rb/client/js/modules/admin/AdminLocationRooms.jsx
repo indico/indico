@@ -17,12 +17,13 @@ import * as adminSelectors from './selectors';
 import {RoomEditModal} from '../../common/rooms';
 
 import './AdminLocationRooms.module.scss';
+import * as adminActions from './actions';
 
 
 const SearchBar = searchBarFactory('admin', adminSelectors);
 
 
-function AdminLocationRooms({location, isFetching, filters: {text}}) {
+function AdminLocationRooms({location, isFetching, fetchRooms, filters: {text}}) {
     const [adding, setAdding] = useState(false);
 
     if (isFetching) {
@@ -41,6 +42,13 @@ function AdminLocationRooms({location, isFetching, filters: {text}}) {
             return room.fullName.toLowerCase().includes(text.trim().toLowerCase());
         });
     }
+
+    const handleCloseModal = saved => {
+        if (saved) {
+            fetchRooms();
+        }
+        setAdding(false);
+    };
 
     return (
         <>
@@ -66,7 +74,7 @@ function AdminLocationRooms({location, isFetching, filters: {text}}) {
                 </Message>
             )}
             {adding && (
-                <RoomEditModal locationId={location.id} onClose={() => setAdding(false)} />
+                <RoomEditModal locationId={location.id} onClose={handleCloseModal} />
             )}
         </>
     );
@@ -75,6 +83,7 @@ function AdminLocationRooms({location, isFetching, filters: {text}}) {
 AdminLocationRooms.propTypes = {
     location: PropTypes.object,
     isFetching: PropTypes.bool.isRequired,
+    fetchRooms: PropTypes.func.isRequired,
     filters: PropTypes.exact({
         text: PropTypes.string,
     }).isRequired,
@@ -90,5 +99,8 @@ export default connect(
         isFetching: adminSelectors.isFetchingLocations(state),
         location: adminSelectors.getLocation(state, {locationId}),
         filters: adminSelectors.getFilters(state),
-    })
+    }),
+    {
+        fetchRooms: adminActions.fetchRooms,
+    }
 )(AdminLocationRooms);

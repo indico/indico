@@ -411,6 +411,7 @@ class RoomEditModal extends React.Component {
         roomEquipment: null,
         submitState: '',
         wasEverDirty: false,
+        wasEverSaved: false,
         closing: false,
     };
 
@@ -519,13 +520,14 @@ class RoomEditModal extends React.Component {
 
     handleCloseModal = async () => {
         const {
-            onClose,
+            afterCreation, onClose,
             actions: {fetchEquipmentTypes, fetchRoom, fetchRoomDetails, fetchRoomPermissions}
         } = this.props;
+        const {wasEverSaved} = this.state;
         // eslint-disable-next-line react/destructuring-assignment
         const roomId = this.newRoom ? this.state.newRoomId : this.props.roomId;
         this.setState({closing: true});
-        if (roomId !== null) {
+        if (roomId !== null && wasEverSaved) {
             await Promise.all([
                 fetchEquipmentTypes(),
                 fetchRoom(roomId),
@@ -533,7 +535,7 @@ class RoomEditModal extends React.Component {
                 fetchRoomDetails(roomId, true)
             ]);
         }
-        onClose();
+        onClose(wasEverSaved || afterCreation);
     };
 
     handleSubmit = async (data, form) => {
@@ -561,7 +563,10 @@ class RoomEditModal extends React.Component {
 
         // reload room so the form gets new initialValues
         await this.fetchRoomData(roomId);
-        this.setState({submitState});
+        this.setState({
+            wasEverSaved: true,
+            submitState,
+        });
         return camelizeKeys(submitError);
     };
 

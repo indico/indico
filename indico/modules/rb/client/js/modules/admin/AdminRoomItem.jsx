@@ -17,9 +17,16 @@ import * as adminActions from './actions';
 import './AdminRoomItem.module.scss';
 
 
-function AdminRoomItem({room, deleteRoom}) {
+function AdminRoomItem({room, deleteRoom, fetchRooms}) {
     const [editing, setEditing] = useState(false);
     const [deleting, setDeleting] = useState(false);
+
+    const handleCloseModal = saved => {
+        if (saved) {
+            fetchRooms();
+        }
+        setEditing(false);
+    };
 
     return (
         <Item key={room.id} styleName="room-item">
@@ -42,7 +49,7 @@ function AdminRoomItem({room, deleteRoom}) {
                 </Item.Description>
             </Item.Content>
             {editing && (
-                <RoomEditModal roomId={room.id} onClose={() => setEditing(false)} />
+                <RoomEditModal roomId={room.id} onClose={handleCloseModal} />
             )}
             <Confirm header={Translate.string('Confirm deletion')}
                      content={Translate.string('Are you sure you want to delete this room?')}
@@ -59,9 +66,13 @@ function AdminRoomItem({room, deleteRoom}) {
 AdminRoomItem.propTypes = {
     room: PropTypes.object.isRequired,
     deleteRoom: PropTypes.func.isRequired,
+    fetchRooms: PropTypes.func.isRequired,
 };
 
 export default connect(
     null,
-    {deleteRoom: adminActions.deleteRoom}
+    {
+        deleteRoom: adminActions.deleteRoom,
+        fetchRooms: adminActions.fetchRooms,
+    }
 )(AdminRoomItem);

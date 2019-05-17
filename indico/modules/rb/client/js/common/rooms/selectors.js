@@ -12,7 +12,9 @@ import {RequestState} from 'indico/utils/redux';
 import {getAllUserRoomPermissions, isUserRBAdmin} from '../user/selectors';
 
 
-export const hasLoadedEquipmentTypes = ({rooms}) => rooms.requests.equipmentTypes.state === RequestState.SUCCESS;
+export const hasLoadedEquipmentTypes = ({rooms}) => (
+    rooms.requests.equipmentTypes.state === RequestState.SUCCESS || rooms.requests.equipmentTypes.reloading
+);
 export const getAllEquipmentTypes = ({rooms}) => rooms.equipmentTypes;
 const getUsedEquipmentTypes = createSelector(
     getAllEquipmentTypes,
@@ -94,7 +96,9 @@ export const getAllRooms = createSelector(
     }
 );
 
-export const hasLoadedRooms = ({rooms}) => rooms.requests.rooms.state === RequestState.SUCCESS;
+export const hasLoadedRooms = ({rooms}) => (
+    rooms.requests.rooms.state === RequestState.SUCCESS || rooms.requests.rooms.reloading
+);
 export const getRoom = (state, {roomId}) => getAllRooms(state)[roomId];
 
 const getAllAvailabilities = ({rooms}) => rooms.availability;

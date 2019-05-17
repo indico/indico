@@ -43,8 +43,12 @@ export const getLocation = createSelector(
     }
 );
 
-const _isFetchingLocations = ({admin}) => admin.requests.locations.state === RequestState.STARTED;
-const _isFetchingRooms = ({admin}) => admin.requests.rooms.state === RequestState.STARTED;
+const _isFetchingLocations = ({admin}) => (
+    admin.requests.locations.state === RequestState.STARTED && !admin.requests.locations.reloading
+);
+const _isFetchingRooms = ({admin}) => (
+    admin.requests.rooms.state === RequestState.STARTED && !admin.requests.rooms.reloading
+);
 export const isFetchingLocations = state => _isFetchingLocations(state) || _isFetchingRooms(state);
 export const getFilters = ({admin}) => admin.filters;
 

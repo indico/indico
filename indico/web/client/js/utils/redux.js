@@ -64,15 +64,20 @@ export const RequestState = {
 
 
 export function requestReducer(requestAction, successAction, errorAction) {
-    const initialState = {state: RequestState.NOT_STARTED, error: null};
+    const initialState = {state: RequestState.NOT_STARTED, error: null, reloading: false};
     return (state = initialState, action) => {
         switch (action.type) {
             case requestAction:
-                return {...state, state: RequestState.STARTED, error: null};
+                return {
+                    ...state,
+                    state: RequestState.STARTED,
+                    error: null,
+                    reloading: state.state === RequestState.SUCCESS
+                };
             case successAction:
-                return {...state, state: RequestState.SUCCESS, error: null};
+                return {...state, state: RequestState.SUCCESS, error: null, reloading: false};
             case errorAction:
-                return {...state, state: RequestState.ERROR, error: action.error};
+                return {...state, state: RequestState.ERROR, error: action.error, reloading: false};
             default:
                 return state;
         }
