@@ -7,7 +7,7 @@
 
 from __future__ import unicode_literals
 
-from sqlalchemy.dialects.postgresql import JSON
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.hybrid import Comparator, hybrid_property
 
 from indico.core.db import db
@@ -54,7 +54,7 @@ class DesignerTemplate(db.Model):
         nullable=True
     )
     data = db.Column(
-        JSON,
+        JSONB,
         nullable=False
     )
     background_image_id = db.Column(

@@ -9,7 +9,7 @@ from __future__ import unicode_literals
 
 from datetime import datetime
 
-from sqlalchemy.dialects.postgresql import INET, JSON
+from sqlalchemy.dialects.postgresql import INET, JSONB
 from werkzeug.datastructures import MultiDict
 
 from indico.core.db import db
@@ -48,14 +48,14 @@ class Identity(db.Model):
     )
     #: internal data used by the flask-multipass system
     multipass_data = db.Column(
-        JSON,
+        JSONB,
         nullable=False,
         default=lambda: None
     )
     #: the user data from the user provider
     _data = db.Column(
         'data',
-        JSON,
+        JSONB,
         nullable=False,
         default={}
     )

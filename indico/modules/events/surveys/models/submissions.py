@@ -7,7 +7,7 @@
 
 from __future__ import unicode_literals
 
-from sqlalchemy.dialects.postgresql import JSON
+from sqlalchemy.dialects.postgresql import JSONB
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import UTCDateTime
@@ -76,7 +76,7 @@ class SurveySubmission(db.Model):
     )
     #: List of non-submitted answers
     pending_answers = db.Column(
-        JSON,
+        JSONB,
         default={}
     )
 
@@ -130,7 +130,7 @@ class SurveyAnswer(db.Model):
     )
     #: The user's answer (no, not 42!) to the question
     data = db.Column(
-        JSON,
+        JSONB,
         nullable=False
     )
 

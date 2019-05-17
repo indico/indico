@@ -7,6 +7,7 @@
 
 from __future__ import unicode_literals
 
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 
@@ -92,7 +93,7 @@ class ReviewQuestionMixin(object):
     @declared_attr
     def field_data(cls):
         return db.Column(
-            db.JSON,
+            JSONB,
             nullable=False,
             default={}
         )

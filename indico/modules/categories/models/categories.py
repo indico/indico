@@ -9,7 +9,7 @@ from __future__ import unicode_literals
 
 import pytz
 from sqlalchemy import DDL, orm
-from sqlalchemy.dialects.postgresql import ARRAY, JSON, array
+from sqlalchemy.dialects.postgresql import ARRAY, JSONB, array
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -109,7 +109,7 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
         default=None
     )
     icon_metadata = db.Column(
-        JSON,
+        JSONB,
         nullable=False,
         default=lambda: None
     )
@@ -118,7 +118,7 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
         nullable=True
     ))
     logo_metadata = db.Column(
-        JSON,
+        JSONB,
         nullable=False,
         default=lambda: None
     )
@@ -132,7 +132,7 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
         default=lambda: config.DEFAULT_TIMEZONE
     )
     default_event_themes = db.Column(
-        JSON,
+        JSONB,
         nullable=False,
         default=_get_default_event_themes
     )

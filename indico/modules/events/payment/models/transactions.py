@@ -8,7 +8,7 @@
 from __future__ import unicode_literals
 
 from flask import render_template
-from sqlalchemy.dialects.postgresql import JSON
+from sqlalchemy.dialects.postgresql import JSONB
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
@@ -177,7 +177,7 @@ class PaymentTransaction(db.Model):
     )
     #: plugin-specific data of the payment
     data = db.Column(
-        JSON,
+        JSONB,
         nullable=False
     )
 

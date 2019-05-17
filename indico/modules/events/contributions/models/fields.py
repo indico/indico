@@ -7,7 +7,7 @@
 
 from __future__ import unicode_literals
 
-from sqlalchemy.dialects.postgresql import JSON
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.declarative import declared_attr
 
 from indico.core.db import db
@@ -91,7 +91,7 @@ class ContributionField(db.Model):
         nullable=True
     )
     field_data = db.Column(
-        JSON,
+        JSONB,
         nullable=False,
         default={}
     )
@@ -146,7 +146,7 @@ class ContributionFieldValueBase(db.Model):
     contribution_field_backref_name = None
 
     data = db.Column(
-        JSON,
+        JSONB,
         nullable=False
     )
 

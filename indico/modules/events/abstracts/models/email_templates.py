@@ -7,7 +7,7 @@
 
 from __future__ import unicode_literals
 
-from sqlalchemy.dialects.postgresql import ARRAY, JSON
+from sqlalchemy.dialects.postgresql import ARRAY, JSONB
 
 from indico.core.db import db
 from indico.util.locators import locator_property
@@ -95,7 +95,7 @@ class AbstractEmailTemplate(db.Model):
     )
     #: Conditions need to be met to send the email
     rules = db.Column(
-        JSON,
+        JSONB,
         nullable=False
     )
 

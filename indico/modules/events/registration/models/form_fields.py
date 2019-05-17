@@ -7,7 +7,7 @@
 
 from __future__ import unicode_literals
 
-from sqlalchemy.dialects.postgresql import JSON
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.event import listens_for
 from werkzeug.datastructures import ImmutableDict
 
@@ -37,7 +37,7 @@ class RegistrationFormFieldData(db.Model):
     )
     #: Data describing the field
     versioned_data = db.Column(
-        JSON,
+        JSONB,
         nullable=False
     )
 

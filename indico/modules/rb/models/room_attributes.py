@@ -5,7 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from sqlalchemy.dialects.postgresql import JSON
+from sqlalchemy.dialects.postgresql import JSONB
 
 from indico.core.db import db
 from indico.util.string import format_repr, return_ascii
@@ -30,7 +30,7 @@ class RoomAttributeAssociation(db.Model):
         primary_key=True
     )
     value = db.Column(
-        JSON
+        JSONB
     )
 
     attribute = db.relationship(

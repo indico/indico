@@ -7,7 +7,7 @@
 
 from __future__ import unicode_literals
 
-from sqlalchemy.dialects.postgresql import ARRAY, JSON
+from sqlalchemy.dialects.postgresql import ARRAY, JSONB
 from werkzeug.datastructures import MultiDict
 
 from indico.core.db import db
@@ -43,16 +43,16 @@ class RegistrationRequest(db.Model):
         default=[]
     )
     user_data = db.Column(
-        JSON,
+        JSONB,
         nullable=False
     )
     _identity_data = db.Column(
         'identity_data',
-        JSON,
+        JSONB,
         nullable=False
     )
     settings = db.Column(
-        JSON,
+        JSONB,
         nullable=False
     )
 

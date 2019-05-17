@@ -7,7 +7,7 @@
 
 from __future__ import unicode_literals
 
-from sqlalchemy.dialects.postgresql import ARRAY, JSON
+from sqlalchemy.dialects.postgresql import ARRAY, JSONB
 
 from indico.core.db.sqlalchemy import UTCDateTime, db
 from indico.util.date_time import now_utc
@@ -58,7 +58,7 @@ class AbstractEmailLogEntry(db.Model):
         nullable=False
     )
     data = db.Column(
-        JSON,
+        JSONB,
         nullable=False
     )
 

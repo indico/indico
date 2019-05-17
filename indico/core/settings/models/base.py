@@ -11,7 +11,7 @@ from collections import defaultdict
 from enum import Enum
 
 from flask import g, has_request_context
-from sqlalchemy.dialects.postgresql import JSON
+from sqlalchemy.dialects.postgresql import JSONB
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.principals import PrincipalMixin, PrincipalType
@@ -91,7 +91,7 @@ class JSONSettingsBase(SettingsBase):
     __tablename__ = 'settings'
 
     value = db.Column(
-        JSON,
+        JSONB,
         nullable=False
     )
 

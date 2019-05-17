@@ -9,7 +9,7 @@ from __future__ import unicode_literals
 
 from uuid import uuid4
 
-from sqlalchemy.dialects.postgresql import JSON
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.hybrid import hybrid_property
 from werkzeug.exceptions import ServiceUnavailable
 
@@ -116,7 +116,7 @@ class Agreement(db.Model):
     )
     #: Definition-specific data of the agreement
     data = db.Column(
-        JSON
+        JSONB
     )
 
     #: The user this agreement is linked to

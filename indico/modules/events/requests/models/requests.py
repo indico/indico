@@ -7,7 +7,7 @@
 
 from __future__ import unicode_literals
 
-from sqlalchemy.dialects.postgresql import JSON
+from sqlalchemy.dialects.postgresql import JSONB
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
@@ -57,7 +57,7 @@ class Request(db.Model):
     )
     #: plugin-specific data of the request
     data = db.Column(
-        JSON,
+        JSONB,
         nullable=False
     )
     #: ID of the user creating the request

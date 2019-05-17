@@ -10,7 +10,7 @@ from __future__ import unicode_literals
 from uuid import uuid4
 
 from sqlalchemy import literal
-from sqlalchemy.dialects.postgresql import JSON
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import aliased
 
@@ -256,7 +256,7 @@ class RegistrationFormItem(db.Model):
     )
     #: unversioned field data
     data = db.Column(
-        JSON,
+        JSONB,
         nullable=False,
         default=lambda: None
     )

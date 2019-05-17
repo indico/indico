@@ -14,7 +14,7 @@ from datetime import timedelta
 import pytz
 from flask import has_request_context, session
 from sqlalchemy import DDL, orm
-from sqlalchemy.dialects.postgresql import ARRAY, JSON
+from sqlalchemy.dialects.postgresql import ARRAY, JSONB
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_method, hybrid_property
@@ -204,7 +204,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     )
     #: The metadata of the logo (hash, size, filename, content_type)
     logo_metadata = db.Column(
-        JSON,
+        JSONB,
         nullable=False,
         default=lambda: None
     )
@@ -215,7 +215,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     ))
     #: The metadata of the stylesheet (hash, size, filename)
     stylesheet_metadata = db.Column(
-        JSON,
+        JSONB,
         nullable=False,
         default=lambda: None
     )

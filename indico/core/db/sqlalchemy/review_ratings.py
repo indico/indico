@@ -7,6 +7,7 @@
 
 from __future__ import unicode_literals
 
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.declarative import declared_attr
 
 from indico.core.db import db
@@ -45,7 +46,7 @@ class ReviewRatingMixin(object):
     @declared_attr
     def value(cls):
         return db.Column(
-            db.JSON,
+            JSONB,
             nullable=False
         )
 
