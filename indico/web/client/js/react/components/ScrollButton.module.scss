@@ -8,7 +8,7 @@
 @import 'base/palette';
 
 :global(.ui.button).scroll-btn {
-    background-color: $highlight-color;
+    background-color: $teal;
     color: $light-gray;
     position: fixed;
     bottom: 10px;
@@ -23,7 +23,7 @@
 
     &:hover,
     &:focus {
-        background-color: $dark-highlight-color;
+        background-color: $dark-teal;
         color: $light-gray;
     }
 }
