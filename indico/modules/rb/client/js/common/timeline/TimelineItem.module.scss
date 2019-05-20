@@ -104,6 +104,10 @@
             @include stripes($pre-booking-conflict-stripe-colors...);
             z-index: 4;
 
+            &:hover ~ :global(.available) {
+                opacity: 0.75;
+            }
+
             &.overflow-right {
                 @include right-fade-out-stripes($pre-booking-conflict-stripe-colors...);
                 border-right-style: none;
