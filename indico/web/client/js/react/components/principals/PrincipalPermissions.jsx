@@ -24,7 +24,8 @@ const PrincipalPermissions = ({
     permissions,
     permissionInfo: {
         permissions: permissionMap,
-        tree: permissionTree
+        tree: permissionTree,
+        default: defaultPermission
     },
     onAddPermission,
     onRemovePermission,
@@ -50,6 +51,8 @@ const PrincipalPermissions = ({
         onRemovePermission(id);
     };
 
+    const onlyDefault = permissions.length === 1 && permissions[0] === defaultPermission;
+
     if (!readAccessAllowed) {
         permissions = _.without(permissions, 'readAccess');
     }
@@ -64,8 +67,10 @@ const PrincipalPermissions = ({
                                   size="tiny"
                                   color={permissionMap[permission].color}>
                                {permissionMap[permission].title}
-                               <Icon name="close"
-                                     onClick={() => !readOnly && onClickRemove(permission)} />
+                               {!onlyDefault && (
+                                   <Icon name="close"
+                                         onClick={() => !readOnly && onClickRemove(permission)} />
+                               )}
                            </Label>
                        }
                        content={permissionMap[permission].description} />
@@ -105,7 +110,8 @@ PrincipalPermissions.propTypes = {
     /** Object containing metadata about available permissions */
     permissionInfo: PropTypes.shape({
         permissions: PropTypes.object,
-        tree: PropTypes.object
+        tree: PropTypes.object,
+        default: PropTypes.bool
     }).isRequired,
     /** Whether the 'read_access' permission is used/allowed */
     readAccessAllowed: PropTypes.bool,
