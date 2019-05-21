@@ -603,7 +603,7 @@ class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFie
                  .join(AbstractReviewRating.question)
                  .filter(AbstractReview.abstract == self,
                          AbstractReviewQuestion.field_type == 'rating',
-                         db.func.json_typeof(AbstractReviewRating.value) == 'null',
+                         db.func.jsonb_typeof(AbstractReviewRating.value) == 'null',
                          ~AbstractReviewQuestion.is_deleted,
                          ~AbstractReviewQuestion.no_score)
                  .group_by(AbstractReview.track_id, AbstractReviewQuestion.id))

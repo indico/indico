@@ -358,9 +358,9 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
                      .cte(recursive=True))
         rec_query = (select([cat_alias.id,
                              db.case({'null': cte_query.c.source_id}, else_=cat_alias.id,
-                                     value=db.func.json_typeof(cat_alias.icon_metadata)),
+                                     value=db.func.jsonb_typeof(cat_alias.icon_metadata)),
                              db.case({'null': cte_query.c.icon_metadata}, else_=cat_alias.icon_metadata,
-                                     value=db.func.json_typeof(cat_alias.icon_metadata))])
+                                     value=db.func.jsonb_typeof(cat_alias.icon_metadata))])
                      .where(cat_alias.parent_id == cte_query.c.id))
         return cte_query.union_all(rec_query)
 
