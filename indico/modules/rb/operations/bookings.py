@@ -128,6 +128,7 @@ def get_rooms_availability(rooms, start_dt, end_dt, repeat_frequency, repeat_int
         room_conflicts = conflicts.get(room.id, [])
         pre_room_conflicts = pre_conflicts.get(room.id, [])
         pre_bookings = [occ for occ in room_occurrences if not occ.reservation.is_accepted]
+        concurrent_pre_bookings = get_concurrent_pre_bookings(pre_bookings) if pre_bookings else []
         existing_bookings = [occ for occ in room_occurrences if occ.reservation.is_accepted]
         room_nonoverridable_blocked_rooms = nonoverridable_blocked_rooms.get(room.id, [])
         room_overridable_blocked_rooms = overridable_blocked_rooms.get(room.id, [])
@@ -139,6 +140,7 @@ def get_rooms_availability(rooms, start_dt, end_dt, repeat_frequency, repeat_int
                                  'candidates': group_by_occurrence_date(room_candidates),
                                  'conflicting_candidates': group_by_occurrence_date(room_conflicting_candidates),
                                  'pre_bookings': group_by_occurrence_date(pre_bookings),
+                                 'concurrent_pre_bookings': group_by_occurrence_date(concurrent_pre_bookings),
                                  'bookings': group_by_occurrence_date(existing_bookings),
                                  'conflicts': group_by_occurrence_date(room_conflicts),
                                  'pre_conflicts': group_by_occurrence_date(pre_room_conflicts),
