@@ -102,7 +102,6 @@
 
         &:global(.pre-booking-conflict) {
             @include stripes($pre-booking-conflict-stripe-colors...);
-            z-index: 4;
 
             &:hover ~ :global(.available) {
                 opacity: 0.75;
@@ -121,6 +120,10 @@
             &.overflow-right.overflow-left {
                 @include fade-out-stripes($pre-booking-conflict-stripe-colors...);
             }
+        }
+
+        &:global(.concurrent-pre-booking) {
+            background-color: $indico-blue;
         }
 
         &:global(.conflicting-candidates) {

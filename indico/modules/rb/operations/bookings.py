@@ -29,7 +29,7 @@ from indico.modules.rb.models.reservations import RepeatFrequency, Reservation, 
 from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.operations.blockings import filter_blocked_rooms, get_rooms_blockings, group_blocked_rooms
-from indico.modules.rb.operations.conflicts import get_rooms_conflicts
+from indico.modules.rb.operations.conflicts import get_concurrent_pre_bookings, get_rooms_conflicts
 from indico.modules.rb.operations.misc import get_rooms_nonbookable_periods, get_rooms_unbookable_hours
 from indico.modules.rb.util import (group_by_occurrence_date, serialize_availability, serialize_blockings,
                                     serialize_booking_details, serialize_nonbookable_periods, serialize_occurrences,
@@ -220,10 +220,12 @@ def get_room_calendar(start_date, end_date, room_ids, include_inactive=False, **
         occurrences = list(occurrences)
         pre_bookings = [occ for occ in occurrences if occ.reservation.is_pending]
         existing_bookings = [occ for occ in occurrences if not occ.reservation.is_pending and occ.is_valid]
+        concurrent_pre_bookings = get_concurrent_pre_bookings(pre_bookings)
 
         additional_data = {
             'bookings': group_by_occurrence_date(existing_bookings),
-            'pre_bookings': group_by_occurrence_date(pre_bookings)
+            'pre_bookings': group_by_occurrence_date(pre_bookings),
+            'concurrent_pre_bookings': group_by_occurrence_date(concurrent_pre_bookings)
         }
 
         if include_inactive:

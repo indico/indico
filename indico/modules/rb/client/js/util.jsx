@@ -239,13 +239,16 @@ const _legendLabels = {
     nonbookablePeriods:
         {label: Translate.string('Not bookable'), style: 'unbookable'},
     unbookableHours:
-        {label: Translate.string('Not bookable'), style: 'unbookable'}
+        {label: Translate.string('Not bookable'), style: 'unbookable'},
+    concurrentPreBookings:
+        {label: Translate.string('Concurrent Pre-Bookings'), style: 'concurrent-pre-booking'},
 };
 
 const _orderedLabels = [
     'candidates',
     'bookings',
     'preBookings',
+    'concurrentPreBookings',
     'conflicts',
     'preConflicts',
     'conflictingCandidates',

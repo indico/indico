@@ -29,6 +29,7 @@ const classes = {
     pendingCancellations: 'pending-cancellations',
     rejections: 'rejection',
     conflictingCandidates: 'conflicting-candidates',
+    concurrentPreBookings: 'concurrent-pre-booking',
     other: 'other',
 };
 
@@ -45,6 +46,7 @@ const types = {
     pendingCancellations: 'pending-cancellations',
     rejections: 'rejection',
     conflictingCandidates: 'conflicting-candidates',
+    concurrentPreBookings: 'concurrent-pre-booking',
     other: 'other',
 };
 
@@ -54,11 +56,12 @@ const renderOrder = [
     'other',
     'conflictingCandidates',
     'preBookings',
-    'preConflicts',
+    'concurrentPreBookings',
     'cancellations',
     'rejections',
     'bookings',
     'candidates',
+    'preConflicts',
     'conflicts',
     'overridableBlockings',
     'blockings',

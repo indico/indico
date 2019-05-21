@@ -68,6 +68,10 @@
                 color: darken($available-color, 20%);
             }
 
+            &.concurrent-pre-booking {
+                background-color: $indico-blue;
+            }
+
             &.cancellation {
                 background-color: $cancellation-color;
                 border: 1px solid darken($cancellation-color, 15%);

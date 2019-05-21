@@ -129,3 +129,16 @@ def get_room_unbookable_hours_conflicts(candidates, occurrences):
                 obj = TempReservationOccurrence(overlap[0], overlap[1], None)
                 conflicts.add(obj)
     return conflicts, conflicting_candidates
+
+
+def get_concurrent_pre_bookings(pre_bookings, skip_conflicts_with=frozenset()):
+    concurrent_pre_bookings = set()
+    for x in pre_bookings:
+        for y in pre_bookings:
+            if y.reservation.id in skip_conflicts_with or x == y:
+                continue
+            if y.overlaps(x):
+                overlap = y.get_overlap(x)
+                obj = TempReservationOccurrence(*overlap, reservation=None)
+                concurrent_pre_bookings.add(obj)
+    return concurrent_pre_bookings
