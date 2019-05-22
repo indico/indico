@@ -47,6 +47,7 @@ Bugfixes
 - Fix paper reviewers getting notifications even if their type of reviewing
   has been disabled (:issue:`3852`)
 - Correctly handle merging users in the paper reviewing module (:issue:`3895`)
+- Show correct number of registrations in management area (:issue:`3935`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

@@ -415,3 +415,8 @@ def _mappers_configured():
              .where((Registration.registration_form_id == RegistrationForm.id) & Registration.is_active)
              .correlate_except(Registration))
     RegistrationForm.active_registration_count = column_property(query, deferred=True)
+
+    query = (select([db.func.count(Registration.id)])
+             .where((Registration.registration_form_id == RegistrationForm.id) & ~Registration.is_deleted)
+             .correlate_except(Registration))
+    RegistrationForm.existing_registrations_count = column_property(query, deferred=True)
