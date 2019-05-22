@@ -78,7 +78,7 @@ export default class ElasticTimeline extends React.Component {
                 bookings: bookings[dt] || [],
                 conflicts: conflicts[dt] || [],
                 preConflicts: preConflicts[dt]
-                    ? [{...preConflicts[dt][0], bookable: bookingAllowed && !hasConflicts}] : [],
+                    ? preConflicts[dt].map(item => ({...item, bookable: bookingAllowed && !hasConflicts})) : [],
                 blockings: blockings[dt] || [],
                 overridableBlockings: overridableBlockings[dt] || [],
                 nonbookablePeriods: nonbookablePeriods[dt] || [],
