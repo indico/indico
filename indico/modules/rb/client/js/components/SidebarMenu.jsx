@@ -5,15 +5,16 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React from 'react';
+import React, {useState} from 'react';
 import PropTypes from 'prop-types';
-import {Icon, Popup, Sidebar, Menu} from 'semantic-ui-react';
+import {Icon, Popup, Sidebar, Menu, Modal} from 'semantic-ui-react';
 import {connect} from 'react-redux';
 import {push as pushRoute} from 'connected-react-router';
 import {Overridable} from 'indico/react/util';
-import {Translate} from 'indico/react/i18n';
+import {Param, Translate} from 'indico/react/i18n';
 
 import {selectors as userSelectors, actions as userActions} from '../common/user';
+import {selectors as configSelectors} from '../common/config';
 import {actions as blockingsActions} from '../modules/blockings';
 import {actions as filtersActions} from '../common/filters';
 import * as globalActions from '../actions';
@@ -55,6 +56,10 @@ function SidebarMenu({
     visible,
     onClickOption,
     hideOptions,
+    tosURL,
+    tosHTML,
+    helpURL,
+    contactEmail,
 }) {
     const options = [
         {
@@ -103,35 +108,93 @@ function SidebarMenu({
         }
     ].filter(({onlyIf}) => onlyIf === undefined || onlyIf);
 
+    const [contactVisible, setContactVisible] = useState(false);
+    const [termsVisible, setTermsVisible] = useState(false);
+
     return (
-        <Sidebar as={Menu}
-                 animation="overlay"
-                 icon="labeled"
-                 vertical
-                 width="thin"
-                 direction="right"
-                 onHide={onClickOption}
-                 inverted
-                 visible={visible}
-                 styleName="sidebar">
-            {options.map(({key, text, icon, onClick, iconColor, active, tooltip}) => {
-                const item = (
-                    <Menu.Item as="a" key={key} active={active} onClick={() => {
-                        onClick();
-                        if (onClickOption) {
-                            onClickOption();
-                        }
-                    }}>
-                        <Icon name={icon} color={iconColor} />
-                        {text}
-                    </Menu.Item>
-                );
-                if (!tooltip) {
-                    return item;
-                }
-                return <Popup trigger={item} content={tooltip} key={key} position="left center" />;
-            })}
-        </Sidebar>
+        <>
+            <Sidebar as={Menu}
+                     animation="overlay"
+                     icon="labeled"
+                     vertical
+                     width="thin"
+                     direction="right"
+                     onHide={onClickOption}
+                     inverted
+                     visible={visible}
+                     styleName="sidebar">
+                {options.map(({key, text, icon, onClick, iconColor, active, tooltip}) => {
+                    const item = (
+                        <Menu.Item as="a" key={key} active={active} onClick={() => {
+                            onClick();
+                            if (onClickOption) {
+                                onClickOption();
+                            }
+                        }}>
+                            <Icon name={icon} color={iconColor} />
+                            {text}
+                        </Menu.Item>
+                    );
+                    if (!tooltip) {
+                        return item;
+                    }
+                    return <Popup trigger={item} content={tooltip} key={key} position="left center" />;
+                })}
+                <div styleName="bottom-align">
+                    {helpURL && (
+                        <Menu.Item as="a" href={helpURL}>
+                            <Translate>Help</Translate>
+                        </Menu.Item>
+                    )}
+                    {contactEmail && (
+                        <Menu.Item onClick={() => setContactVisible(true)}>
+                            <Translate>Contact</Translate>
+                        </Menu.Item>
+                    )}
+                    {(tosURL || tosHTML) && (
+                        <Menu.Item href={tosURL} onClick={(e) => {
+                            if (tosHTML) {
+                                e.preventDefault();
+                                setTermsVisible(true);
+                            }
+                        }}>
+                            <Translate>Terms and Conditions</Translate>
+                        </Menu.Item>
+                    )}
+                </div>
+            </Sidebar>
+            {contactEmail && (
+                <Modal open={contactVisible}
+                       closeIcon
+                       onClose={() => setContactVisible(false)}>
+                    <Modal.Header>
+                        <Translate>Contact</Translate>
+                    </Modal.Header>
+                    <Modal.Content>
+                        <div>
+                            <Translate>If you need support, you can contact the following email address:</Translate>
+                        </div>
+                        <div>
+                            <a href={`mailto:${contactEmail}`}>
+                                <Param name="contactEmail" value={contactEmail} />
+                            </a>
+                        </div>
+                    </Modal.Content>
+                </Modal>
+            )}
+            {tosHTML && (
+                <Modal open={termsVisible}
+                       closeIcon
+                       onClose={() => setTermsVisible(false)}>
+                    <Modal.Header>
+                        <Translate>Terms and Conditions</Translate>
+                    </Modal.Header>
+                    <Modal.Content>
+                        <div dangerouslySetInnerHTML={{__html: tosHTML}} />
+                    </Modal.Content>
+                </Modal>
+            )}
+        </>
     );
 }
 
@@ -148,12 +211,19 @@ SidebarMenu.propTypes = {
     visible: PropTypes.bool,
     onClickOption: PropTypes.func,
     hideOptions: PropTypes.objectOf(PropTypes.bool),
+    tosURL: PropTypes.string,
+    tosHTML: PropTypes.string,
+    helpURL: PropTypes.string.isRequired,
+    contactEmail: PropTypes.string,
 };
 
 SidebarMenu.defaultProps = {
     visible: false,
     onClickOption: null,
     hideOptions: {},
+    tosURL: null,
+    tosHTML: null,
+    contactEmail: null,
 };
 
 
@@ -162,6 +232,10 @@ export default connect(
         isAdmin: userSelectors.isUserRBAdmin(state),
         isAdminOverrideEnabled: userSelectors.isUserAdminOverrideEnabled(state),
         hasOwnedRooms: userSelectors.hasOwnedRooms(state),
+        contactEmail: configSelectors.getContactEmail(state),
+        helpURL: configSelectors.getHelpURL(state),
+        tosURL: configSelectors.getTosURL(state),
+        tosHTML: configSelectors.getTosHTML(state),
     }),
     dispatch => ({
         gotoMyBookings() {

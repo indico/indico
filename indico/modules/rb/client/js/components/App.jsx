@@ -86,6 +86,7 @@ class App extends React.Component {
     }
 
     onSidebarHide = () => {
+        document.body.classList.remove('scrolling-disabled');
         this.setState({userActionsVisible: false});
     };
 
@@ -157,6 +158,7 @@ class App extends React.Component {
                         </div>
                         <div styleName="rb-menu-bar-side-right">
                             <SidebarTrigger onClick={() => {
+                                document.body.classList.add('scrolling-disabled');
                                 this.setState({
                                     userActionsVisible: true
                                 });

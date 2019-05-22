@@ -210,3 +210,7 @@ $text-yellow: lighten($yellow, 15%);
         line-height: 1em;
     }
 }
+
+.scrolling-disabled {
+    overflow-y: hidden;
+}

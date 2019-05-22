@@ -92,7 +92,7 @@ class WPJinjaMixin(object):
     To avoid collisions between blueprint and application templates,
     your blueprint template folders should have a subfolder named like
     the blueprint. To avoid writing it all the time, you can store it
-    as `template_prefix` (with a trailing slash) in yor WP class.
+    as `template_prefix` (with a trailing slash) in your WP class.
     This only applies to the indico core as plugins always use a separate
     template namespace!
     """

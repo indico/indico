@@ -13,8 +13,10 @@ from io import BytesIO
 from flask import jsonify, redirect, request, session
 from sqlalchemy.orm import joinedload
 
+from indico.core.config import config
 from indico.core.db.sqlalchemy.util.queries import db_dates_overlap
 from indico.core.permissions import get_permissions_info
+from indico.modules.legal import legal_settings
 from indico.modules.rb import rb_settings
 from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.controllers.backend.common import _cache
@@ -27,15 +29,22 @@ from indico.modules.rb.schemas import EquipmentTypeSchema, map_areas_schema, rb_
 from indico.modules.rb.util import build_rooms_spritesheet
 from indico.util.caching import memoize_redis
 from indico.util.i18n import get_all_locales
+from indico.util.string import sanitize_html
 from indico.web.flask.util import send_file, url_for
 
 
 class RHConfig(RHRoomBookingBase):
     def _process(self):
+        tos_url = legal_settings.get('tos_url') or None
+        tos_html = sanitize_html(legal_settings.get('tos')) or None
         return jsonify(rooms_sprite_token=unicode(_cache.get('rooms-sprite-token', '')),
                        languages=get_all_locales(),
                        tileserver_url=rb_settings.get('tileserver_url'),
-                       grace_period=rb_settings.get('grace_period'))
+                       grace_period=rb_settings.get('grace_period'),
+                       help_url=config.HELP_URL,
+                       contact_email=config.PUBLIC_SUPPORT_EMAIL,
+                       tos_url=tos_url,
+                       tos_html=tos_html)
 
 
 class RHUserInfo(RHRoomBookingBase):

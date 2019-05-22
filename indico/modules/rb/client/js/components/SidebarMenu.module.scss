@@ -9,6 +9,15 @@
 
 .sidebar:global(.inverted.menu) {
     background-color: darken($primary-color, 10%);
+    top: 125px;
+    height: calc(100% - 125px) !important;
+    position: fixed !important;
+
+    .bottom-align {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+    }
 }
 
 .sidebar-button {

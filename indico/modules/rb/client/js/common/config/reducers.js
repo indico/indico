@@ -17,6 +17,10 @@ export const initialState = {
     languages: {},
     tileServerURL: '',
     gracePeriod: 1,
+    helpURL: '',
+    tosURL: null,
+    tosHTML: null,
+    contactEmail: null,
 };
 
 export default combineReducers({
@@ -24,13 +28,21 @@ export default combineReducers({
     data: (state = initialState, action) => {
         switch (action.type) {
             case configActions.CONFIG_RECEIVED: {
-                const {roomsSpriteToken, tileserverURL: tileServerURL, gracePeriod} = camelizeKeys(action.data);
+                const {
+                    roomsSpriteToken, gracePeriod, helpURL, contactEmail, tosURL,
+                    tosHtml: tosHTML,
+                    tileserverURL: tileServerURL,
+                } = camelizeKeys(action.data);
                 const {languages} = action.data;
                 return {
                     roomsSpriteToken,
                     languages,
                     tileServerURL,
-                    gracePeriod
+                    gracePeriod,
+                    helpURL,
+                    tosURL,
+                    tosHTML,
+                    contactEmail,
                 };
             }
             case configActions.SET_ROOMS_SPRITE_TOKEN:

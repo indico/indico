@@ -13,3 +13,7 @@ export const getRoomsSpriteToken = ({config}) => config.data.roomsSpriteToken;
 export const getTileServerURL = ({config}) => config.data.tileServerURL;
 export const getLanguages = ({config}) => config.data.languages;
 export const getBookingGracePeriod = ({config}) => config.data.gracePeriod;
+export const getHelpURL = ({config}) => config.data.helpURL;
+export const getTosURL = ({config}) => config.data.tosURL;
+export const getTosHTML = ({config}) => config.data.tosHTML;
+export const getContactEmail = ({config}) => config.data.contactEmail;
