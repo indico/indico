@@ -2,6 +2,7 @@
 {% set excluded_days = reservation.find_excluded_days().count() %}
 
 {% block body -%}
+{%- block booking_details -%}
 The conference room {{ reservation.room.full_name }}
 has been {% block prebooked_prefix %}{% endblock %}booked for {{ reservation.booked_for_name }}
 {% if reservation.repeat_frequency == RepeatFrequency.NEVER -%}
@@ -10,6 +11,7 @@ has been {% block prebooked_prefix %}{% endblock %}booked for {{ reservation.boo
     {{ RepeatMapping.get_short_name(reservation.repeat_frequency, reservation.repeat_interval) }} from {{ reservation.start_dt | format_date('EEEE dd/MM/yyyy', locale='en_GB') }} to {{ reservation.end_dt | format_date('EEEE dd/MM/yyyy', locale='en_GB') }} between {{ reservation.start_dt | format_time(locale='en_GB') }} and {{ reservation.end_dt | format_time(locale='en_GB') }}.
 {%- endif %}
 Reason: {{ reservation.booking_reason }}
+{%- endblock -%}
 {%- block confirmed_booking -%}
 {%- if excluded_days %}
     (Note that there are {{ excluded_days }} excluded days. For further info, check your reservation)
