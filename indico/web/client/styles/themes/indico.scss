@@ -371,6 +371,10 @@ ul.day-list {
         border-left: 2px dotted $gray;
         padding-left: 1em;
 
+        .timetable-title {
+            font-weight: normal;
+        }
+
         .speaker-list {
             padding-top: 0.5em;
         }
