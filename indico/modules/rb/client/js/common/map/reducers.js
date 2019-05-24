@@ -25,7 +25,13 @@ export default combineReducers({
     areas: (state = [], action) => {
         switch (action.type) {
             case mapActions.AREAS_RECEIVED:
+            case mapActions.MAP_AREA_UPDATED:
+            case mapActions.MAP_AREA_CREATED:
                 return action.data;
+            case mapActions.MAP_AREA_DELETED: {
+                const {ids: deletedAreaIds} = action;
+                return state.filter(area => !deletedAreaIds.includes(area.id));
+            }
             default:
                 return state;
         }

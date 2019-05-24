@@ -57,6 +57,11 @@ function AdminMenu({locations, isFetchingLocations, actions: {clearTextFilter}})
                 </NavLink>
             </Menu.Item>
             <Menu.Item>
+                <NavLink exact to="/admin/map-areas">
+                    <Translate>Map Areas</Translate>
+                </NavLink>
+            </Menu.Item>
+            <Menu.Item>
                 <Menu.Header>
                     <Translate>Room Metadata</Translate>
                 </Menu.Header>

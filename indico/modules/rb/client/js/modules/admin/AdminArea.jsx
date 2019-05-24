@@ -18,6 +18,7 @@ import EquipmentPage from './EquipmentPage';
 import AttributesPage from './AttributesPage';
 import LocationPage from './LocationPage';
 import SettingsPage from './SettingsPage';
+import MapAreasPage from './MapAreasPage';
 import * as adminActions from './actions';
 
 import './AdminArea.module.scss';
@@ -53,6 +54,7 @@ class AdminArea extends React.Component {
                     </Grid.Column>
                     <Grid.Column width={12}>
                         <Route exact path="/admin" component={SettingsPage} />
+                        <Route exact path="/admin/map-areas" component={MapAreasPage} />
                         <Route exact path="/admin/equipment" component={EquipmentPage} />
                         <Route exact path="/admin/attributes" component={AttributesPage} />
                         <Route exact path="/admin/locations/" component={LocationPage} />

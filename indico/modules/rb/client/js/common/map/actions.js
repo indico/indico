@@ -8,6 +8,7 @@
 import getMapAreasURL from 'indico-url:rb.map_areas';
 
 import {indicoAxios} from 'indico/utils/axios';
+import {snakifyKeys} from 'indico/utils/case';
 import {ajaxAction} from 'indico/utils/redux';
 import * as mapSelectors from './selectors';
 
@@ -20,6 +21,10 @@ export const FETCH_AREAS_SUCCESS = 'map/FETCH_AREAS_SUCCESS';
 export const FETCH_AREAS_ERROR = 'map/FETCH_AREAS_ERROR';
 export const AREAS_RECEIVED = 'map/AREAS_RECEIVED';
 export const SET_ROOM_HOVER = `map/SET_ROOM_HOVER`;
+
+export const MAP_AREA_CREATED = 'admin/MAP_AREA_CREATED';
+export const MAP_AREA_UPDATED = 'admin/MAP_AREA_UPDATED';
+export const MAP_AREA_DELETED = 'admin/MAP_AREA_DELETED';
 
 
 export function updateLocation(namespace, location) {
@@ -47,4 +52,28 @@ export function fetchAreas() {
             FETCH_AREAS_ERROR
         )(dispatch);
     };
+}
+
+export function createMapArea(areaData) {
+    return ajaxAction(
+        () => indicoAxios.post(getMapAreasURL(), snakifyKeys(areaData)),
+        null,
+        MAP_AREA_CREATED
+    );
+}
+
+export function updateMapAreas(areas) {
+    return ajaxAction(
+        () => indicoAxios.patch(getMapAreasURL(), {areas: snakifyKeys(areas)}),
+        null,
+        MAP_AREA_UPDATED
+    );
+}
+
+export function deleteMapAreas(deletedAreaIds) {
+    return ajaxAction(
+        () => indicoAxios.delete(getMapAreasURL(), {data: {area_ids: deletedAreaIds}}),
+        null,
+        () => ({type: MAP_AREA_DELETED, ids: deletedAreaIds})
+    );
 }

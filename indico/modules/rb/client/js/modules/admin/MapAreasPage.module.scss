@@ -1,0 +1,31 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2019 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@import 'rb:styles/util';
+
+.areas-map-container {
+    :global(.leaflet-container) {
+        height: 1000px;
+        font-size: 14px;
+    }
+
+    :global(.leaflet-draw-section) {
+        border: none;
+        font-family: $sui-font-family;
+    }
+}
+
+:global(.area-default) {
+    margin-left: 5px;
+    font-weight: bold;
+}
+
+:global(.actions) {
+    :global(.field) {
+        display: inline-block;
+    }
+}

@@ -12,8 +12,11 @@ from io import BytesIO
 
 from flask import jsonify, redirect, request, session
 from sqlalchemy.orm import joinedload
+from webargs import fields
+from webargs.flaskparser import use_args, use_kwargs
 
 from indico.core.config import config
+from indico.core.db import db
 from indico.core.db.sqlalchemy.util.queries import db_dates_overlap
 from indico.core.permissions import get_permissions_info
 from indico.modules.legal import legal_settings
@@ -25,6 +28,7 @@ from indico.modules.rb.models.map_areas import MapArea
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import Reservation
 from indico.modules.rb.models.rooms import Room
+from indico.modules.rb.operations.misc import create_area, delete_areas, update_area
 from indico.modules.rb.schemas import EquipmentTypeSchema, map_areas_schema, rb_user_schema
 from indico.modules.rb.util import build_rooms_spritesheet
 from indico.util.caching import memoize_redis
@@ -95,9 +99,39 @@ class RHStats(RHRoomBookingBase):
         )
 
 
+_area_schema = {
+    'name': fields.String(required=True),
+    'default': fields.Bool(missing=False),
+    'bounds': fields.Nested({
+        'north_east': fields.Nested({'lat': fields.Float(), 'lng': fields.Float()}, required=True),
+        'south_west': fields.Nested({'lat': fields.Float(), 'lng': fields.Float()}, required=True)
+    }, required=True)
+}
+
+
 class RHMapAreas(RHRoomBookingBase):
-    def _process(self):
-        return jsonify(map_areas_schema.dump(MapArea.query))
+    def _process_GET(self):
+        return map_areas_schema.jsonify(MapArea.query)
+
+    @use_args(_area_schema)
+    def _process_POST(self, args):
+        create_area(args)
+        return map_areas_schema.jsonify(MapArea.query)
+
+    @use_kwargs({
+        'areas': fields.List(fields.Nested(dict(_area_schema, id=fields.Int(required=True))), required=True)
+    })
+    def _process_PATCH(self, areas):
+        for area in areas:
+            update_area(area.pop('id'), area)
+        return map_areas_schema.jsonify(MapArea.query)
+
+    @use_kwargs({
+        'area_ids': fields.List(fields.Int(), required=True)
+    })
+    def _process_DELETE(self, area_ids):
+        delete_areas(area_ids)
+        return '', 204
 
 
 class RHEquipmentTypes(RHRoomBookingBase):
