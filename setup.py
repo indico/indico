@@ -63,6 +63,7 @@ if __name__ == '__main__':
         version=get_version(),
         cmdclass={'build': BuildWithTranslations},
         description='Indico is a full-featured conference lifecycle management and meeting/lecture scheduling tool',
+        long_description_content_type='text/markdown',
         author='Indico Team',
         author_email='indico-team@cern.ch',
         url='https://getindico.io',
