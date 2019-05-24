@@ -28,7 +28,8 @@ import shortid from 'shortid';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {snakifyKeys, camelizeKeys} from 'indico/utils/case';
 import {
-    FieldCondition, getChangedValues, handleSubmitError, FinalCheckbox, FinalField, FinalInput, FinalTextArea,
+    FieldCondition, getChangedValues, handleSubmitError, FinalCheckbox, FinalField, FinalInput, FinalRadio,
+    FinalTextArea,
 } from 'indico/react/forms';
 import {FavoritesProvider} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
@@ -163,7 +164,11 @@ const columns = [
         type: 'header',
         label: Translate.string('Permissions')
     }, {
-        type: 'permissions'
+        type: 'roomVisibility',
+        label: Translate.string('Room visibility')
+    }, {
+        type: 'permissions',
+        label: Translate.string('User and group permissions')
     }],
     // center
     [{
@@ -713,7 +718,6 @@ class RoomEditModal extends React.Component {
                     </Wrapper>
                 );
             }
-
             case 'checkbox':
                 return (
                     <FinalCheckbox key={key}
@@ -765,6 +769,20 @@ class RoomEditModal extends React.Component {
                                 component={NonBookablePeriods}
                                 isEqual={_.isEqual}
                                 format={value => (value === null ? [] : value)} />
+                );
+            case 'roomVisibility':
+                return (
+                    <>
+                        <h5>{content.label}</h5>
+                        <Form.Group key={key} label={Translate.string('General')}>
+                            <FinalRadio name="roomVisibility"
+                                        value="public"
+                                        label={Translate.string('Public')} />
+                            <FinalRadio name="roomVisibility"
+                                        value="protected"
+                                        label={Translate.string('Protected')} />
+                        </Form.Group>
+                    </>
                 );
             case 'permissions':
                 return (
