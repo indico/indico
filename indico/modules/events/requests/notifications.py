@@ -14,9 +14,15 @@ from indico.core.notifications import email_sender, make_email
 
 
 def _get_request_manager_emails(req):
-    """Get set of request manager emails"""
+    """Get set of request manager emails."""
     with plugin_context(req.definition.plugin):
         return req.definition.get_manager_notification_emails()
+
+
+def _get_notification_reply_email(req):
+    """Get the e-mail address that should be the `Reply-To:` of user notifications."""
+    with plugin_context(req.definition.plugin):
+        return req.definition.get_notification_reply_email()
 
 
 def _get_template_module(name, req, **context):
@@ -38,14 +44,14 @@ def notify_request_managers(req, template, **context):
     :param context: data passed to the template
     """
     event = req.event
-    from_addr = config.SUPPORT_EMAIL
+    reply_addr = config.SUPPORT_EMAIL
     request_manager_emails = _get_request_manager_emails(req)
     if not request_manager_emails:
         return
     context['event'] = event
     context['req'] = req
     tpl_request_managers = _get_template_module(template, **context)
-    return make_email(request_manager_emails, from_address=from_addr,
+    return make_email(request_manager_emails, from_address=config.NO_REPLY_EMAIL, reply_address=reply_addr,
                       subject=tpl_request_managers.get_subject(), body=tpl_request_managers.get_body())
 
 
@@ -57,12 +63,12 @@ def notify_event_managers(req, template, **context):
     :param context: data passed to the template
     """
     event = req.event
-    from_addr = config.SUPPORT_EMAIL
+    reply_addr = _get_notification_reply_email(req)
     context['event'] = event
     context['req'] = req
     tpl_event_managers = _get_template_module(template, **context)
-    return make_email(event.all_manager_emails, from_address=from_addr, subject=tpl_event_managers.get_subject(),
-                      body=tpl_event_managers.get_body())
+    return make_email(event.all_manager_emails, from_address=config.NO_REPLY_EMAIL, reply_address=reply_addr,
+                      subject=tpl_event_managers.get_subject(), body=tpl_event_managers.get_body())
 
 
 @email_sender

@@ -10,6 +10,7 @@ from __future__ import unicode_literals
 from flask_pluginengine import plugin_context
 from wtforms.fields import SubmitField, TextAreaField
 
+from indico.core.config import config
 from indico.core.db import db
 from indico.modules.events.requests.notifications import (notify_accepted_request, notify_new_modified_request,
                                                           notify_rejected_request, notify_withdrawn_request)
@@ -116,6 +117,11 @@ class RequestDefinitionBase(object):
         :return: set of email addresses
         """
         return set()
+
+    @classmethod
+    def get_notification_reply_email(cls):
+        """Return the `Reply-To:` e-mail address for notifications."""
+        return config.SUPPORT_EMAIL
 
     @classmethod
     def send(cls, req, data):
