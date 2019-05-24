@@ -53,3 +53,7 @@
         color: $gray;
     }
 }
+
+:global(.ui.segment).pre-conflicts-segment {
+    padding-left: 2em;
+}

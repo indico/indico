@@ -101,7 +101,7 @@ class MapAreaSchema(mm.ModelSchema):
 class ReservationSchema(mm.ModelSchema):
     class Meta:
         model = Reservation
-        fields = ('id', 'booking_reason', 'booked_for_name', 'room_id', 'is_accepted')
+        fields = ('id', 'booking_reason', 'booked_for_name', 'room_id', 'is_accepted', 'start_dt', 'end_dt')
 
 
 class ReservationLinkedObjectDataSchema(mm.Schema):

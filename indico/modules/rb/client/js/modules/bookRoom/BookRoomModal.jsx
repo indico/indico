@@ -11,7 +11,7 @@ import React from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import PropTypes from 'prop-types';
-import {Button, Checkbox, Form, Grid, Icon, Message, Modal, Segment} from 'semantic-ui-react';
+import {Button, Checkbox, Form, Grid, Icon, List, Message, Modal, Segment} from 'semantic-ui-react';
 import {Form as FinalForm} from 'react-final-form';
 import createDecorator from 'final-form-calculate';
 import {FinalCheckbox, FinalDropdown, FinalRadio, FinalTextArea, FieldCondition} from 'indico/react/forms';
@@ -19,7 +19,7 @@ import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/
 import {FinalPrincipal} from 'indico/react/components';
 import {FavoritesProvider} from 'indico/react/hooks';
 import {Overridable, IndicoPropTypes} from 'indico/react/util';
-import {createDT, isBookingStartDTValid} from 'indico/utils/date';
+import {createDT, isBookingStartDTValid, serializeTime} from 'indico/utils/date';
 import TimeInformation from '../../components/TimeInformation';
 import {selectors as roomsSelectors} from '../../common/rooms';
 import {selectors as linkingSelectors, linkDataShape} from '../../common/linking';
@@ -281,6 +281,63 @@ class BookRoomModal extends React.Component {
         );
     }
 
+    renderPreConflictMessage() {
+        const {bookingData: {isPrebooking}, availability: {preConflicts}, actions: {openBookingDetails}} = this.props;
+        const conflictingBookings = (
+            <Segment attached="bottom" styleName="pre-conflicts-segment">
+                <List>
+                    {Object.entries(preConflicts).map(([date, dayPreConflicts]) => (
+                        <List.Item key={date}>
+                            <List.Icon name="calendar" />
+                            <List.Content>
+                                <List.Header>{moment(date).format('dddd, D MMM YYYY')}</List.Header>
+                                <List.Description>
+                                    {dayPreConflicts.map(({reservation: {id, bookedForName, startDt, endDt}}) => (
+                                        <div key={id}>
+                                            <a onClick={() => openBookingDetails(id)}>
+                                                <Translate>
+                                                    <Param name="time" value={`${serializeTime(startDt)} - ${serializeTime(endDt)} `} />
+                                                    {' '}by <Param name="bookedForName" value={bookedForName} />
+                                                </Translate>
+                                            </a>
+                                        </div>
+                                    ))}
+                                </List.Description>
+                            </List.Content>
+                        </List.Item>
+                    ))}
+                </List>
+            </Segment>
+        );
+
+        return (
+            <>
+                <Message color={isPrebooking ? 'yellow' : 'red'} attached icon>
+                    <Icon name="warning circle" />
+                    <Message.Content>
+                        <Message.Header>
+                            <Translate>Pre-Booking conflicts</Translate>
+                        </Message.Header>
+                        {isPrebooking
+                            ? (
+                                <Translate>
+                                    If you create this pre-booking, some of your days may get rejected as they ovelap
+                                    with the following pre-bookings:
+                                </Translate>
+                            ) : (
+                                <Translate>
+                                    If you create this booking, the following overlapping days of existing pre-bookings
+                                    will automatically be rejected:
+                                </Translate>
+                            )
+                        }
+                    </Message.Content>
+                </Message>
+                {conflictingBookings}
+            </>
+        );
+    }
+
     getEventOption = (event) => {
         const start = moment(event.startDt).format('L LT');
         const sameDate = moment(event.startDt).isSame(event.endDt, 'date');
@@ -440,6 +497,7 @@ class BookRoomModal extends React.Component {
         const linkBack = !!link && !this.hasLinkConflict;
         const occurrenceCount = availability && availability.dateRange.length;
         const conflictsExist = availability && !!Object.keys(availability.conflicts).length;
+        const preConflictsExist = availability && !_.isEmpty(availability.preConflicts);
         const isStartDtValid = isBookingStartDTValid(
             createDT(dates.startDate, timeSlot && timeSlot.startTime ? timeSlot.startTime : '00:00'),
             isAdminOverrideEnabled,
@@ -510,6 +568,7 @@ class BookRoomModal extends React.Component {
                                     )
                                 )}
                             </Form>
+                            {preConflictsExist && this.renderPreConflictMessage()}
                             {conflictsExist && this.renderBookingConstraints(
                                 Object.values(availability.conflicts),
                                 fprops.submitting || fprops.submitSucceeded
