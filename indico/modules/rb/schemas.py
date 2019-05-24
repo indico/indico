@@ -95,7 +95,7 @@ class MapAreaSchema(mm.ModelSchema):
     class Meta:
         model = MapArea
         fields = ('name', 'top_left_latitude', 'top_left_longitude', 'bottom_right_latitude', 'bottom_right_longitude',
-                  'is_default')
+                  'is_default', 'id')
 
 
 class ReservationSchema(mm.ModelSchema):
