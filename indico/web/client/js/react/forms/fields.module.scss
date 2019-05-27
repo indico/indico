@@ -13,7 +13,7 @@
     font-weight: bold;
 }
 
-.field-description {
+.field-description, :global(.field-description) {
     font-style: italic;
     font-size: 0.9em;
     color: $dark-gray;

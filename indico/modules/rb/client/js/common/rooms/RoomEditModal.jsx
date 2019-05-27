@@ -164,8 +164,8 @@ const columns = [
         type: 'header',
         label: Translate.string('Permissions')
     }, {
-        type: 'roomVisibility',
-        label: Translate.string('Room visibility')
+        type: 'protectionMode',
+        label: Translate.string('Booking mode')
     }, {
         type: 'permissions',
         label: Translate.string('User and group permissions')
@@ -770,19 +770,24 @@ class RoomEditModal extends React.Component {
                                 isEqual={_.isEqual}
                                 format={value => (value === null ? [] : value)} />
                 );
-            case 'roomVisibility':
+            case 'protectionMode':
                 return (
-                    <>
+                    <React.Fragment key={key}>
                         <h5>{content.label}</h5>
-                        <Form.Group key={key} label={Translate.string('General')}>
-                            <FinalRadio name="roomVisibility"
+                        <p className="field-description">
+                            <Translate>
+                                Restricted rooms can only be booked by users defined in the room ACL
+                            </Translate>
+                        </p>
+                        <Form.Group>
+                            <FinalRadio name="protectionMode"
                                         value="public"
                                         label={Translate.string('Public')} />
-                            <FinalRadio name="roomVisibility"
+                            <FinalRadio name="protectionMode"
                                         value="protected"
-                                        label={Translate.string('Protected')} />
+                                        label={Translate.string('Restricted')} />
                         </Form.Group>
-                    </>
+                    </React.Fragment>
                 );
             case 'permissions':
                 return (
@@ -891,14 +896,17 @@ class RoomEditModal extends React.Component {
             reservationsNeedConfirmation: false,
             capacity: null,
             attributes: roomAttributes,
+            protectionMode: 'public',
             ...roomEquipment,
             ...roomAvailability,
         } : {
             ...room,
+            protectionMode: room.isPublic ? 'public' : 'protected',
             attributes: roomAttributes,
             ...roomEquipment,
             ...roomAvailability,
         };
+
         return (
             <>
                 <Modal open onClose={this.handleCloseModal} size="large" closeIcon>

@@ -11,12 +11,14 @@ from io import BytesIO
 
 from flask import jsonify, request, session
 from marshmallow import missing, validate
+from marshmallow_enum import EnumField
 from sqlalchemy.orm import joinedload
 from webargs import fields
 from webargs.flaskparser import abort, use_args, use_kwargs
 from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.core.db import db
+from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.core.marshmallow import mm
 from indico.modules.categories.models.categories import Category
 from indico.modules.rb import logger, rb_settings
@@ -450,7 +452,8 @@ room_update_args = {
     'surface_area': fields.Int(validate=lambda x: x >= 0, allow_none=True),
     'max_advance_days': fields.Int(validate=lambda x: x >= 1, allow_none=True),
     'comments': fields.Str(),
-    'acl_entries': PrincipalPermissionList(RoomPrincipal)
+    'acl_entries': PrincipalPermissionList(RoomPrincipal),
+    'protection_mode': EnumField(ProtectionMode)
 }
 
 
