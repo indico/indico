@@ -901,7 +901,6 @@ class RoomEditModal extends React.Component {
             ...roomAvailability,
         } : {
             ...room,
-            protectionMode: room.isPublic ? 'public' : 'protected',
             attributes: roomAttributes,
             ...roomEquipment,
             ...roomAvailability,

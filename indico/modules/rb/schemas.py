@@ -15,6 +15,7 @@ from marshmallow.fields import Boolean, DateTime, Function, Method, Nested, Numb
 from marshmallow_enum import EnumField
 
 from indico.core.db.sqlalchemy.links import LinkType
+from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.core.marshmallow import mm
 from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.rb.models.blocked_rooms import BlockedRoom, BlockedRoomState
@@ -73,6 +74,7 @@ class AdminRoomSchema(mm.ModelSchema):
 class RoomUpdateSchema(RoomSchema):
     owner = Principal()
     acl_entries = PrincipalPermissionList(RoomPrincipal)
+    protection_mode = EnumField(ProtectionMode)
 
     class Meta(RoomSchema.Meta):
         fields = RoomSchema.Meta.fields + ('notification_before_days', 'notification_before_days_weekly', 'owner',
@@ -80,7 +82,7 @@ class RoomUpdateSchema(RoomSchema):
                                            'end_notification_daily', 'end_notification_weekly',
                                            'end_notification_monthly', 'end_notifications_enabled',
                                            'verbose_name', 'site', 'notification_emails', 'booking_limit_days',
-                                           'acl_entries')
+                                           'acl_entries', 'protection_mode')
 
 
 class RoomEquipmentSchema(mm.ModelSchema):
