@@ -882,6 +882,7 @@ class RoomEditModal extends React.Component {
             return <Dimmer active page><Loader /></Dimmer>;
         }
         const initialValues = this.newRoom ? {
+            aclEntries: [],
             notificationEmails: [],
             notificationsEnabled: true,
             endNotificationsEnabled: true,
