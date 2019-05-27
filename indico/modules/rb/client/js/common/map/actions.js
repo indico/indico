@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 import getMapAreasURL from 'indico-url:rb.map_areas';
+import adminMapAreasActionsURL from 'indico-url:rb.admin_map_areas';
 
 import {indicoAxios} from 'indico/utils/axios';
 import {snakifyKeys} from 'indico/utils/case';
@@ -56,7 +57,7 @@ export function fetchAreas() {
 
 export function createMapArea(areaData) {
     return ajaxAction(
-        () => indicoAxios.post(getMapAreasURL(), snakifyKeys(areaData)),
+        () => indicoAxios.post(adminMapAreasActionsURL(), snakifyKeys(areaData)),
         null,
         MAP_AREA_CREATED
     );
@@ -64,7 +65,7 @@ export function createMapArea(areaData) {
 
 export function updateMapAreas(areas) {
     return ajaxAction(
-        () => indicoAxios.patch(getMapAreasURL(), {areas: snakifyKeys(areas)}),
+        () => indicoAxios.patch(adminMapAreasActionsURL(), {areas: snakifyKeys(areas)}),
         null,
         MAP_AREA_UPDATED
     );
@@ -72,7 +73,7 @@ export function updateMapAreas(areas) {
 
 export function deleteMapAreas(deletedAreaIds) {
     return ajaxAction(
-        () => indicoAxios.delete(getMapAreasURL(), {data: {area_ids: deletedAreaIds}}),
+        () => indicoAxios.delete(adminMapAreasActionsURL(), {data: {area_ids: deletedAreaIds}}),
         null,
         () => ({type: MAP_AREA_DELETED, ids: deletedAreaIds})
     );

@@ -9,8 +9,6 @@ from __future__ import unicode_literals
 
 from datetime import datetime
 
-from indico.core.db import db
-from indico.modules.rb.models.map_areas import MapArea
 from indico.modules.rb.models.room_bookable_hours import BookableHours
 from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
 from indico.util.struct.iterables import group_list
@@ -43,45 +41,3 @@ def get_rooms_nonbookable_periods(rooms, start_dt, end_dt):
                      NonBookablePeriod.start_dt <= end_dt.replace(hour=23, minute=59),
                      NonBookablePeriod.end_dt >= start_dt.replace(hour=0, minute=0)))
     return group_list(query, key=lambda obj: obj.room_id)
-
-
-def create_area(area_data):
-    bounds = area_data['bounds']
-    top, bottom = bounds['north_east'], bounds['south_west']
-    is_default = area_data.get('default', False)
-
-    if is_default:
-        MapArea.query.update({MapArea.is_default: False}, synchronize_session='fetch')
-
-    new_area = MapArea()
-    new_area.name = area_data['name']
-    new_area.is_default = is_default
-    new_area.top_left_latitude = top['lat']
-    new_area.top_left_longitude = top['lng']
-    new_area.bottom_right_latitude = bottom['lat']
-    new_area.bottom_right_longitude = bottom['lng']
-    db.session.add(new_area)
-    db.session.flush()
-    return new_area
-
-
-def update_area(area_id, area_data):
-    top = area_data['bounds']['north_east']
-    bottom = area_data['bounds']['south_west']
-    map_area = MapArea.get_one(area_id)
-    if 'name' in area_data:
-        map_area.name = area_data['name']
-    if 'default' in area_data:
-        if area_data['default']:
-            MapArea.query.update({MapArea.is_default: False}, synchronize_session='fetch')
-        map_area.is_default = area_data['default']
-    map_area.top_left_latitude = top['lat']
-    map_area.top_left_longitude = top['lng']
-    map_area.bottom_right_latitude = bottom['lat']
-    map_area.bottom_right_longitude = bottom['lng']
-    db.session.flush()
-
-
-def delete_areas(area_ids):
-    MapArea.query.filter(MapArea.id.in_(area_ids)).delete(synchronize_session='fetch')
-    db.session.flush()

@@ -90,7 +90,7 @@ class MapAreasPage extends React.Component {
             // the initial layer being still visible on the map
             this.featureGroup.leafletElement.eachLayer((layer) => {
                 const {options: {id}} = layer;
-                if (!id) {
+                if (id === undefined) {
                     this.featureGroup.leafletElement.removeLayer(layer);
                 }
             });
@@ -190,7 +190,7 @@ class MapAreasPage extends React.Component {
         const {actions: {createMapArea, updateMapAreas}} = this.props;
         const {areaProps: {id}} = this.state;
 
-        if (!id) {
+        if (id === undefined) {
             await createMapArea(data);
         } else {
             await updateMapAreas([{...data, id}]);
@@ -211,17 +211,16 @@ class MapAreasPage extends React.Component {
                        render={this.renderForm}
                        subscription={{}}
                        initialValues={{
-                           name: !id ? null : name,
+                           name: id === undefined ? null : name,
                            bounds,
                            default: isDefault
                        }} />
         );
     };
 
-    renderForm = (fprops) => {
-        const {handleSubmit} = fprops;
+    renderForm = ({handleSubmit}) => {
         const {areaProps: {id}} = this.state;
-        const isNewArea = !id;
+        const isNewArea = id === undefined;
 
         return (
             <Modal onClose={() => this.setState({areaProps: null})}

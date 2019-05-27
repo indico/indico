@@ -113,6 +113,7 @@ _bp.add_url_rule('/api/admin/rooms/<int:room_id>/availability', 'admin_update_ro
                  admin.RHUpdateRoomAvailability, methods=('POST',))
 _bp.add_url_rule('/api/admin/rooms/<int:room_id>/photo', 'admin_room_photo', admin.RHRoomPhoto,
                  methods=('GET', 'POST', 'DELETE'))
+_bp.add_url_rule('/api/admin/map-areas', 'admin_map_areas', admin.RHMapAreas, methods=('POST', 'PATCH', 'DELETE'))
 
 # Event linking
 _bp.add_url_rule('!/event/<confId>/manage/rooms/', 'event_booking_list', event.RHEventBookingList)

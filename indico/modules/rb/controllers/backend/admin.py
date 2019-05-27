@@ -26,17 +26,18 @@ from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.controllers.backend.rooms import RHRoomsPermissions
 from indico.modules.rb.models.equipment import EquipmentType, RoomEquipmentAssociation
 from indico.modules.rb.models.locations import Location
+from indico.modules.rb.models.map_areas import MapArea
 from indico.modules.rb.models.photos import Photo
 from indico.modules.rb.models.principals import RoomPrincipal
 from indico.modules.rb.models.room_attributes import RoomAttribute, RoomAttributeAssociation
 from indico.modules.rb.models.room_features import RoomFeature
 from indico.modules.rb.models.rooms import Room
-from indico.modules.rb.operations.admin import (update_room, update_room_attributes, update_room_availability,
-                                                update_room_equipment)
+from indico.modules.rb.operations.admin import (create_area, delete_areas, update_area, update_room,
+                                                update_room_attributes, update_room_availability, update_room_equipment)
 from indico.modules.rb.schemas import (AdminRoomSchema, RoomAttributeValuesSchema, admin_equipment_type_schema,
-                                       admin_locations_schema, bookable_hours_schema, nonbookable_periods_schema,
-                                       room_attribute_schema, room_equipment_schema, room_feature_schema,
-                                       room_update_schema)
+                                       admin_locations_schema, bookable_hours_schema, map_areas_schema,
+                                       nonbookable_periods_schema, room_attribute_schema, room_equipment_schema,
+                                       room_feature_schema, room_update_schema)
 from indico.modules.rb.util import (build_rooms_spritesheet, get_resized_room_photo, rb_is_admin,
                                     remove_room_spritesheet_photo)
 from indico.util.i18n import _
@@ -506,3 +507,45 @@ class RHRooms(RHRoomBookingAdminBase):
         db.session.flush()
         RHRoomsPermissions._jsonify_user_permissions.clear_cached(session.user)
         return jsonify(id=room.id)
+
+
+_base_args = {
+    'default': fields.Bool(),
+    'bounds': fields.Nested({
+        'north_east': fields.Nested({'lat': fields.Float(), 'lng': fields.Float()}, required=True),
+        'south_west': fields.Nested({'lat': fields.Float(), 'lng': fields.Float()}, required=True)
+    }, required=True)
+}
+
+_create_args = dict(_base_args, **{
+    'name': fields.String(required=True)
+})
+
+_update_args = {
+    'areas': fields.List(
+        fields.Nested(dict(_base_args, **{
+            'id': fields.Int(required=True),
+            'name': fields.String()
+        }), required=True)
+    )
+}
+
+
+class RHMapAreas(RHRoomBookingAdminBase):
+    @use_args(_create_args)
+    def _process_POST(self, args):
+        create_area(args)
+        return map_areas_schema.jsonify(MapArea.query)
+
+    @use_kwargs(_update_args)
+    def _process_PATCH(self, areas):
+        for area in areas:
+            update_area(area.pop('id'), area)
+        return map_areas_schema.jsonify(MapArea.query)
+
+    @use_kwargs({
+        'area_ids': fields.List(fields.Int(), required=True)
+    })
+    def _process_DELETE(self, area_ids):
+        delete_areas(area_ids)
+        return '', 204
