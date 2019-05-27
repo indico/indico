@@ -56,8 +56,8 @@ def update_room_availability(room, availability):
 
 
 def update_room(room, args):
-    if 'acl_entries' in args:
-        acl_entries = args.pop('acl_entries')
+    acl_entries = args.pop('acl_entries', None)
+    if acl_entries:
         current = {e.principal: get_unified_permissions(e) for e in room.acl_entries}
         update_principals_permissions(room, current, acl_entries)
     _populate_room(room, args)
