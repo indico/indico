@@ -31,6 +31,11 @@
         &:global(.pre-booking) {
             @include stripes($pre-booking-stripe-colors...);
 
+            &:hover {
+                z-index: 5;
+                border-color: rgba(0, 0, 0, 0.5);
+            }
+
             &.overflow-right {
                 @include right-fade-out-stripes($pre-booking-stripe-colors...);
                 border-right-style: none;
@@ -48,6 +53,10 @@
 
         &:global(.available) {
             background-color: $available-color;
+
+            &:hover {
+                z-index: 4;
+            }
 
             &.overflow-right {
                 @include right-fade-out($available-fadeout-colors...);
@@ -84,6 +93,7 @@
 
         &:global(.conflict) {
             background-color: $conflict-color;
+            z-index: 4;
 
             &.overflow-right {
                 @include right-fade-out($conflict-fadeout-colors...);
@@ -101,10 +111,11 @@
         }
 
         &:global(.pre-booking-conflict) {
-            @include stripes($pre-booking-conflict-stripe-colors...);
+            @include thiner-stripes($pre-booking-conflict-stripe-colors...);
+            z-index: 4;
 
             &:hover ~ :global(.available) {
-                opacity: 0.75;
+                z-index: 4;
             }
 
             &.overflow-right {
@@ -123,7 +134,7 @@
         }
 
         &:global(.concurrent-pre-booking) {
-            background-color: $indico-blue;
+            @include thiner-stripes($pre-booking-concurrent-stripe-colors...);
         }
 
         &:global(.conflicting-candidates) {

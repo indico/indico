@@ -64,12 +64,12 @@
             }
 
             &.pre-booking-conflict {
-                @include stripes($pre-booking-conflict-stripe-colors...);
-                color: darken($available-color, 20%);
+                @include thiner-stripes($pre-booking-conflict-stripe-colors...);
             }
 
             &.concurrent-pre-booking {
-                background-color: $indico-blue;
+                @include thiner-stripes($pre-booking-concurrent-stripe-colors...);
+                color: darken($pre-booking-color, 30%);
             }
 
             &.cancellation {
