@@ -8,6 +8,7 @@
 from __future__ import unicode_literals
 
 from collections import defaultdict
+from itertools import combinations
 
 from flask import session
 from sqlalchemy.orm import contains_eager
@@ -133,12 +134,11 @@ def get_room_unbookable_hours_conflicts(candidates, occurrences):
 
 def get_concurrent_pre_bookings(pre_bookings, skip_conflicts_with=frozenset()):
     concurrent_pre_bookings = set()
-    for x in pre_bookings:
-        for y in pre_bookings:
-            if y.reservation.id in skip_conflicts_with or x == y:
-                continue
-            if y.overlaps(x):
-                overlap = y.get_overlap(x)
-                obj = TempReservationOccurrence(*overlap, reservation=None)
-                concurrent_pre_bookings.add(obj)
+    for (x, y) in combinations(pre_bookings, 2):
+        if any(pre_booking.reservation.id in skip_conflicts_with for pre_booking in [x, y]):
+            continue
+        if x.overlaps(y):
+            overlap = x.get_overlap(y)
+            obj = TempReservationOccurrence(*overlap, reservation=None)
+            concurrent_pre_bookings.add(obj)
     return concurrent_pre_bookings
