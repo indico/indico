@@ -56,7 +56,7 @@
             {%- elif item.type.name == 'BREAK' -%}
                 {{ render_break(item.object, event, theme_settings, theme_context, nested=false, timezone=timezone,
                                 show_notes=theme_settings.show_notes, parent=event,
-                                show_location=show_siblings_location) }}
+                                show_location=show_siblings_location, hide_end_time=theme_settings.hide_end_time) }}
             {%- endif %}
         {%- endfor %}
 
