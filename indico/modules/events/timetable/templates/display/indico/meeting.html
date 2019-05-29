@@ -20,23 +20,25 @@
                 {%- endset %}
                 <li id="{{ anchor }}">
                     {% if multiple_days %}
-                        <div class="day-header" style="width: 100%;">
-                            <div class="day-title" data-anchor="{{ anchor }}">
-                                {{ item.start_dt | format_date(format='EEEE, d MMMM', timezone=timezone) }}
+                        {% block day_header scoped %}
+                            <div class="day-header" style="width: 100%;">
+                                <div class="day-title" data-anchor="{{ anchor }}">
+                                    {{ item.start_dt | format_date(format='EEEE, d MMMM', timezone=timezone) }}
+                                </div>
+                                {% if days %}
+                                    <a class="js-go-to-day icon-calendar arrow js-dropdown" data-toggle="dropdown"></a>
+                                    <ul class="dropdown days-dropdown">
+                                        {% for day, _ in days %}
+                                            <li>
+                                                <a href="#day-{{ day.isoformat() }}">
+                                                    {{ day | format_date(format='EEE, d MMM', timezone=timezone) }}
+                                                </a>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
                             </div>
-                            {% if days|length > 1 %}
-                                <a href="" class="js-go-to-day icon-calendar arrow js-dropdown" data-toggle="dropdown"></a>
-                                <ul class="dropdown days-dropdown">
-                                    {% for day, _ in days %}
-                                        <li>
-                                            <a href="#day-{{ day.isoformat() }}">
-                                                {{ day | format_date(format='EEE, d MMM', timezone=timezone) }}
-                                            </a>
-                                        </li>
-                                    {% endfor %}
-                                </ul>
-                            {% endif %}
-                        </div>
+                        {% endblock %}
                     {% endif %}
                     <ul class="meeting-timetable">
             {%- endif %}
