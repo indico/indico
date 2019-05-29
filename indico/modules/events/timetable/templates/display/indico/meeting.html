@@ -15,8 +15,6 @@
             {%- endif -%}
 
             {%- if date_changed -%}
-                {% set theme_context.num_contribution = 0 %}
-
                 {% set anchor -%}
                     day-{{ item.start_dt.date().isoformat() }}
                 {%- endset %}
