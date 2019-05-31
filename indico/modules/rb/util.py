@@ -33,6 +33,7 @@ from indico.util.struct.iterables import group_list
 
 ROOM_PHOTO_DIMENSIONS = (290, 170)
 TempReservationOccurrence = namedtuple('ReservationOccurrenceTmp', ('start_dt', 'end_dt', 'reservation'))
+TempReservationConcurrentOccurrence = namedtuple('ReservationOccurrenceTmp', ('start_dt', 'end_dt', 'reservations'))
 _cache = GenericCache('Rooms')
 
 
@@ -125,6 +126,11 @@ def serialize_unbookable_hours(data):
     return [bookable_hours_schema.dump(d) for d in data]
 
 
+def serialize_concurrent_pre_bookings(data):
+    from indico.modules.rb.schemas import (concurrent_pre_bookings_schema)
+    return {dt.isoformat(): concurrent_pre_bookings_schema.dump(data) for dt, data in data.iteritems()}
+
+
 def get_linked_object(type_, id_):
     if type_ == LinkType.event:
         return Event.get(id_, is_deleted=False)
@@ -212,7 +218,8 @@ def serialize_availability(availability):
         data['overridable_blockings'] = serialize_blockings(data.get('overridable_blockings', {}))
         data['nonbookable_periods'] = serialize_nonbookable_periods(data.get('nonbookable_periods', {}))
         data['unbookable_hours'] = serialize_unbookable_hours(data.get('unbookable_hours', {}))
+        data['concurrent_pre_bookings'] = serialize_concurrent_pre_bookings(data.get('concurrent_pre_bookings', {}))
         data.update({k: serialize_occurrences(data[k]) if k in data else {}
                      for k in ('candidates', 'conflicting_candidates', 'pre_bookings', 'bookings', 'conflicts',
-                               'pre_conflicts', 'rejections', 'cancellations', 'concurrent_pre_bookings')})
+                               'pre_conflicts', 'rejections', 'cancellations')})
     return availability

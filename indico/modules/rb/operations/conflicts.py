@@ -16,7 +16,7 @@ from sqlalchemy.orm import contains_eager
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import Reservation
 from indico.modules.rb.models.rooms import Room
-from indico.modules.rb.util import TempReservationOccurrence, rb_is_admin
+from indico.modules.rb.util import TempReservationConcurrentOccurrence, TempReservationOccurrence, rb_is_admin
 from indico.util.date_time import get_overlap
 from indico.util.struct.iterables import group_list
 
@@ -133,12 +133,12 @@ def get_room_unbookable_hours_conflicts(candidates, occurrences):
 
 
 def get_concurrent_pre_bookings(pre_bookings, skip_conflicts_with=frozenset()):
-    concurrent_pre_bookings = set()
+    concurrent_pre_bookings = []
     for (x, y) in combinations(pre_bookings, 2):
         if any(pre_booking.reservation.id in skip_conflicts_with for pre_booking in [x, y]):
             continue
         if x.overlaps(y):
             overlap = x.get_overlap(y)
-            obj = TempReservationOccurrence(*overlap, reservation=None)
-            concurrent_pre_bookings.add(obj)
+            obj = TempReservationConcurrentOccurrence(*overlap, reservations=[x.reservation, y.reservation])
+            concurrent_pre_bookings.append(obj)
     return concurrent_pre_bookings

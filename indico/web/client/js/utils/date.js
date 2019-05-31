@@ -5,6 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import _ from 'lodash';
 import moment from 'moment';
 
 
@@ -108,4 +109,26 @@ export function getMinimumBookingStartTime(startDate, isAdminOverrideEnabled, gr
 export function initialEndTime(end) {
     const endOfDay = moment().endOf('day');
     return end > endOfDay ? endOfDay : end;
+}
+
+/**
+ * Convert string date into date-agnostic datetime
+ * @param {String} dt - String datetime to transform
+ * @returns {moment.Moment} - Date-agnostic datetime
+ */
+export function getTime(dt) {
+    return moment(dt).set({year: 0, month: 0, day: 0});
+}
+
+/**
+ * Check whether there is a fully overlap between two pre-bookings
+ * @param {Array} preBookings - Array of two overlapping pre-bookings
+ * @returns {Boolean} - Whether any of the two pre-bookings is fully overlapped by the other
+ */
+export function fullyOverlaps(preBookings) {
+    return _.some([preBookings, [...preBookings].reverse()].map(([preBookingA, preBookingB]) => (
+        _.every([preBookingA.startDt, preBookingA.endDt].map(dt => (
+            getTime(dt).isBetween(getTime(preBookingB.startDt), getTime(preBookingB.endDt), null, '[]')
+        )))
+    )));
 }

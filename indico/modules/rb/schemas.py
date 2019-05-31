@@ -155,6 +155,14 @@ class ReservationOccurrenceSchemaWithPermissions(ReservationOccurrenceSchema):
         return {'user': user_permissions, 'admin': admin_permissions}
 
 
+class ReservationConcurrentOccurrenceSchema(ReservationOccurrenceSchema):
+    reservations = Nested(ReservationSchema, many=True)
+
+    class Meta:
+        fields = ReservationOccurrenceSchema.Meta.fields + ('reservations',)
+        exclude = ('reservation',)
+
+
 class ReservationEditLogSchema(UserSchema):
     class Meta:
         model = ReservationEditLog
@@ -343,6 +351,7 @@ room_equipment_schema = RoomEquipmentSchema()
 map_areas_schema = MapAreaSchema(many=True)
 reservation_occurrences_schema = ReservationOccurrenceSchema(many=True)
 reservation_occurrences_schema_with_permissions = ReservationOccurrenceSchemaWithPermissions(many=True)
+concurrent_pre_bookings_schema = ReservationConcurrentOccurrenceSchema(many=True)
 reservation_schema = ReservationSchema()
 reservation_details_schema = ReservationDetailsSchema()
 reservation_linked_object_data_schema = ReservationLinkedObjectDataSchema()

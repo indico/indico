@@ -308,3 +308,7 @@
         color: darken($available-color, 10%);
     }
 }
+
+:global(.ui.list).concurrent-pre-booking-list {
+    font-size: 0.9em;
+}

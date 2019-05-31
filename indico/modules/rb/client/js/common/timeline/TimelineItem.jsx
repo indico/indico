@@ -8,9 +8,13 @@
 import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
-import {Popup} from 'semantic-ui-react';
-import {Translate} from 'indico/react/i18n';
+import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
+import {List, Popup} from 'semantic-ui-react';
+import {Translate, Param} from 'indico/react/i18n';
 import {Overridable} from 'indico/react/util';
+import {fullyOverlaps, serializeTime} from 'indico/utils/date';
+import {actions as modalActions} from '../../modals';
 
 import './TimelineItem.module.scss';
 
@@ -90,6 +94,9 @@ class TimelineItem extends React.Component {
         children: PropTypes.node,
         setSelectable: PropTypes.func,
         dayBased: PropTypes.bool,
+        actions: PropTypes.exact({
+            openBookingDetails: PropTypes.func.isRequired,
+        }).isRequired,
     };
 
     static defaultProps = {
@@ -137,11 +144,20 @@ class TimelineItem extends React.Component {
             startTime,
             endTime,
             reservation,
+            reservations,
             reason,
             rejectionReason,
             bookable
         } = occurrence;
-        const {startHour, endHour, onClickCandidate, onClickReservation, room, dayBased} = this.props;
+        const {
+            startHour,
+            endHour,
+            onClickCandidate,
+            onClickReservation,
+            room,
+            dayBased,
+            actions: {openBookingDetails}
+        } = this.props;
         if (type === 'blocking' || type === 'overridable-blocking') {
             segmentStartDt = moment(startHour, 'HH:mm');
             segmentEndDt = (endHour === 24 ? moment('23:59', 'HH:mm') : moment(endHour, 'HH:mm'));
@@ -207,6 +223,38 @@ class TimelineItem extends React.Component {
                     </strong>
                 </div>
             );
+        } else if (type === 'concurrent-pre-booking') {
+            let popupMessage;
+            if (fullyOverlaps(reservations)) {
+                popupMessage = (
+                    <div>
+                        <Translate>Fully overlap between two pre-bookings:</Translate>
+                        <List styleName="concurrent-pre-booking-list">
+                            {reservations.map(({id, bookingReason, bookedForName, startDt: sDt, endDt: eDt}) => (
+                                <List.Item key={id}>
+                                    <a onClick={() => openBookingDetails(id)}>
+                                        <Translate>
+                                            <Param name="time" value={`${serializeTime(sDt)} - ${serializeTime(eDt)} `} />
+                                            {' '}by <Param name="bookedForName" value={bookedForName} />
+                                            {' '}(<Param name="bookingReason" value={bookingReason} wrapper={<em />} />)
+                                        </Translate>
+                                    </a>
+                                </List.Item>
+                            ))}
+                        </List>
+                    </div>
+                );
+            }
+            popupContent = (
+                <div styleName="popup-center">
+                    {!dayBased && (
+                        <div>
+                            {segmentStartDt.format('LT')} - {segmentEndDt.format('LT')}
+                        </div>
+                    )}
+                    <div>{popupMessage}</div>
+                </div>
+            );
         } else {
             let popupMessage;
             if (reservation) {
@@ -250,7 +298,7 @@ class TimelineItem extends React.Component {
         return (
             <Popup trigger={segment} content={popupContent} position="bottom center"
                    header={reservation && reservation.bookedForName}
-                   hideOnScroll />
+                   hideOnScroll hoverable />
         );
     };
 
@@ -280,4 +328,11 @@ class TimelineItem extends React.Component {
     }
 }
 
-export default Overridable.component('TimelineItem', TimelineItem);
+export default connect(
+    null,
+    dispatch => ({
+        actions: bindActionCreators({
+            openBookingDetails: bookingId => modalActions.openModal('booking-details', bookingId, null, true)
+        }, dispatch)
+    })
+)(Overridable.component('TimelineItem', TimelineItem));
