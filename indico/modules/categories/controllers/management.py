@@ -322,6 +322,7 @@ class RHSortSubcategories(RHManageCategoryBase):
         subcategories = {category.id: category for category in self.category.children}
         for position, id_ in enumerate(request.json['categories'], 1):
             subcategories[id_].position = position
+        return jsonify_data(flash=False)
 
 
 class RHManageCategorySelectedEventsBase(RHManageCategoryBase):
