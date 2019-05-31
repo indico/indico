@@ -83,8 +83,13 @@ const timelineReducer = combineReducers({
                     availability: state.availability.concat(camelizeKeys(action.data.availability)),
                 };
             case actions.CREATE_BOOKING_SUCCESS: {
-                const {data: {room_id: roomId}} = action;
+                const {data: {room_id: roomId, booking: {is_accepted: isAccepted}}} = action;
                 const {roomIds, availability} = state;
+                if (!isAccepted) {
+                    const [, roomAvailability] = availability.find(([id]) => id === roomId);
+                    roomAvailability.preConflicts = roomAvailability.candidates;
+                    return state;
+                }
                 return {
                     ...state,
                     roomIds: roomIds.filter((id) => id !== roomId),

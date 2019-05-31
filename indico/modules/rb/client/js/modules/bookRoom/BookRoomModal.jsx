@@ -513,7 +513,7 @@ class BookRoomModal extends React.Component {
         const renderModalContent = (fprops) => (
             <>
                 <Modal.Header>
-                    {isPrebooking ? defaultTitles.preBooking : defaultTitles.booking }
+                    {isPrebooking ? defaultTitles.preBooking : defaultTitles.booking}
                 </Modal.Header>
                 <Modal.Content>
                     <Grid>
@@ -594,8 +594,8 @@ class BookRoomModal extends React.Component {
                             form="book-room-form"
                             content={
                                 isPrebooking
-                                    ? Translate.string('Create Pre-booking')
-                                    : Translate.string('Create Booking')} />
+                                    ? defaultTitles.preBooking
+                                    : defaultTitles.booking} />
                     <Button type="button" onClick={this.onClose}
                             content={
                                 fprops.submitSucceeded

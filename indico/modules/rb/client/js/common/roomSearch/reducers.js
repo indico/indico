@@ -100,8 +100,11 @@ export function roomSearchReducerFactory(namespace, extra = {}) {
                             return state;
                         }
 
-                        const {data: {room_id: roomId}} = action;
+                        const {data: {room_id: roomId, booking: {is_accepted: isAccepted}}} = action;
                         const {rooms} = state;
+                        if (!isAccepted) {
+                            return state;
+                        }
                         return {
                             ...state,
                             rooms: rooms.filter((id) => id !== roomId)
