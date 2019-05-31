@@ -66,7 +66,7 @@
                     {%- trans %}Review{% endtrans -%}
                 {% endif %}
             </button>
-            <ul class="dropdown">
+            <ul class="i-dropdown">
                 {% for group in reviewer_data.groups|sort(attribute='title') %}
                     <li>
                         {% if group in reviewer_data.reviewed_groups %}

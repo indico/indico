@@ -18,7 +18,7 @@
             <div class="toolbar hide-if-locked">
                 <div class="group">
                     <a class="icon-checkbox-checked i-button arrow js-dropdown" href="#" data-toggle="dropdown"></a>
-                    <ul class="dropdown">
+                    <ul class="i-dropdown">
                         <li>
                             <a href="#" data-select-all="#event-participants-list input.select-row:visible:not(:disabled)">
                                 {% trans %}All{% endtrans %}
@@ -46,7 +46,7 @@
                     <div class="group i-selection">
                         <span class="i-button label">{% trans %}Privileges{% endtrans %}</span>
                         <a href="#" class="i-button icon-collapse arrow js-dropdown" data-toggle="dropdown"></a>
-                        <ul class="dropdown">
+                        <ul class="i-dropdown">
                             <li>
                                 <a href="#"
                                    title="{% trans %}Grant submission rights to all speakers{% endtrans %}"
@@ -67,7 +67,7 @@
                             </li>
                         </ul>
                         <a href="#" class="i-button icon-expand arrow js-dropdown" data-toggle="dropdown"></a>
-                        <ul class="dropdown">
+                        <ul class="i-dropdown">
                             <li>
                                 <a href="#"
                                    title="{% trans %}Revoke submission rights{% endtrans %}"
@@ -86,7 +86,7 @@
                        data-toggle="dropdown">
                         {% trans %}Send invitation{% endtrans %}
                     </a>
-                    <ul class="dropdown">
+                    <ul class="i-dropdown">
                         <li>
                             <a href="#"
                                title="{% trans %}Send an email to all users with no Indico account{% endtrans %}"
@@ -122,7 +122,7 @@
                 {{ render_displayed_entries_fragment(persons|length, persons|length) }}
                 <div id="person-filters" class="group list-filter">
                     <a class="i-button arrow highlight js-dropdown" data-toggle="dropdown">Filter role</a>
-                    <ul class="dropdown">
+                    <ul class="i-dropdown">
                         <li class="enabled">
                             <input type="checkbox" id="filter-chairpersons" data-filter="chairperson" checked>
                             <i class="icon-checkmark"></i>

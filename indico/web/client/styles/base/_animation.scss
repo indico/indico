@@ -78,7 +78,7 @@
     }
 }
 
-.open {
+:not(.ui) > .open {
     overflow: hidden;
     opacity: 1;
     transition-property: all;
@@ -86,7 +86,7 @@
     transition-timing-function: ease-out;
 }
 
-.close {
+:not(.ui) > .close {
     overflow: hidden;
     max-height: 0 !important;
     opacity: 0;

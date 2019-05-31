@@ -10,7 +10,7 @@
         {% if item.filter_choices %}
             <div class="i-label filter">
                 <a class="icon-filter" data-toggle="dropdown"></a>
-                <ul class="dropdown" style="display: none">
+                <ul class="i-dropdown" style="display: none">
                     {% for value, caption in item.filter_choices.iteritems() %}
                         <li>
                             <input type="checkbox" name="field_{{ item_id }}" value="{{ value }}"

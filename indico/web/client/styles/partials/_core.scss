@@ -120,6 +120,6 @@ img {
     border: 0;
 }
 
-label, .label {
+label:not(.ui.checkbox), .label:not(.ui.checkbox) {
     font-weight: bold;
 }

@@ -12,7 +12,7 @@
         <a id="contributions-settings-dropdown"
            class="i-button borderless icon-settings arrow js-dropdown"
            data-toggle="dropdown">{% trans %}Settings{% endtrans %}</a>
-        <ul class="dropdown">
+        <ul class="i-dropdown">
             <li>
                 <a href="#"
                    title="{% trans %}Manage session types{% endtrans %}"
@@ -40,7 +40,7 @@
             <div class="toolbar">
                 <div class="group">
                     <a class="icon-checkbox-checked i-button arrow js-dropdown" href="#" data-toggle="dropdown"></a>
-                    <ul class="dropdown">
+                    <ul class="i-dropdown">
                         <li>
                             <a href="#" data-select-all="#sessions-wrapper input.select-row">
                                 {% trans %}All{% endtrans %}
@@ -89,7 +89,7 @@
                        data-toggle="dropdown">
                         {%- trans %}Export{% endtrans -%}
                     </a>
-                    <ul class="dropdown">
+                    <ul class="i-dropdown">
                         <li>
                             <a data-href="{{ url_for('.export_pdf', event) }}"
                                class="icon-file-pdf js-requires-selected-row js-submit-session-form disabled">

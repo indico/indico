@@ -12,7 +12,7 @@
                 </a>
                 <a class="i-button js-add-user-group">{% trans %}User / Group{% endtrans %}</a>
                 <a class="i-button arrow js-dropdown" data-toggle="dropdown">{% trans %}Role{% endtrans %}</a>
-                <ul class="dropdown entry-role-dropdown" data-items='{{ field.roles|tojson|forceescape }}'>
+                <ul class="i-dropdown entry-role-dropdown" data-items='{{ field.roles|tojson|forceescape }}'>
                     <li class="separator default"></li>
                     <li class="entry-item new-role-btn default">
                         <a class="js-new-role"
@@ -28,7 +28,7 @@
                     <a class="i-button arrow js-dropdown" data-toggle="dropdown">
                         {%- trans %}IP Network{% endtrans -%}
                     </a>
-                    <ul class="dropdown entry-ip-network-dropdown"
+                    <ul class="i-dropdown entry-ip-network-dropdown"
                         data-items='{{ field.ip_networks|tojson|forceescape }}'></ul>
                 {% endif %}
             </div>

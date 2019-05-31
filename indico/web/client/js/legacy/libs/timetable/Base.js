@@ -1010,7 +1010,7 @@ type(
 
     _createAddMenu: function(elem) {
       var self = this;
-      var ul = $('<ul class="dropdown"/>');
+      var ul = $('<ul class="i-dropdown"/>');
 
       if (this._allowCreateHere('Session')) {
         var sessionAdd = $('<a href="#"/>')

@@ -15,7 +15,7 @@
         {% if filter_choices %}
             <div class="i-label filter" {{ 'data-only-filter' if item_id == 'unassigned' }}>
                 <a class="icon-filter" data-toggle="dropdown"></a>
-                <ul class="dropdown" style="display: none;">
+                <ul class="i-dropdown" style="display: none;">
                     {% for value, caption in filter_choices.iteritems() %}
                         <li>
                             {% set value = none if value is none else value|string %}
@@ -48,7 +48,7 @@
         <div class="toolbar">
             <a class="i-button icon-checkbox-checked arrow left icon-only" aria-hidden="true" href="#"
                data-toggle="dropdown"></a>
-            <ul class="dropdown">
+            <ul class="i-dropdown">
                 <li><a href="#" id="list-filter-select-all">{% trans %}All{% endtrans %}</a></li>
                 <li><a href="#" id="list-filter-select-none">{% trans %}None{% endtrans %}</a></li>
             </ul>

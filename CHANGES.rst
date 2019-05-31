@@ -20,7 +20,7 @@ Improvements
 Internal Changes
 ^^^^^^^^^^^^^^^^
 
-- TODO
+- Make React and SemanticUI usable everywhere (:issue:`3955`)
 
 
 ----

@@ -5,16 +5,17 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-.dropdown {
+.i-dropdown {
     @include border-all();
     @extend %default-border-radius;
     @include single-box-shadow();
     background: $light-gray;
-    margin-top: 1px;
+    margin-top: 0px;
     padding: 0;
     position: absolute;
     z-index: 1;
     display: none;
+    box-sizing: initial;
 
     > li {
         cursor: pointer;
@@ -27,7 +28,6 @@
         a {
             display: block;
             line-height: 1.7rem;
-            padding-top: 0.1em;
             width: 100%;
 
             &[class*='icon-']::before {

@@ -39,7 +39,7 @@
                         <a class="i-button arrow js-add-question-dropdown" data-toggle="dropdown">
                             {% trans %}Add question{% endtrans %}
                         </a>
-                        <ul class="dropdown">
+                        <ul class="i-dropdown">
                             {% for field_type in field_types.values()|sort(attribute='friendly_name') %}
                                 <li>
                                     <a href="#" data-href="{{ url_for('.add_question', section, type=field_type.name) }}"

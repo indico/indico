@@ -1537,7 +1537,7 @@ type(
           $T('Add IP Network')
         );
         var ipNetworksContainer = Html.span({className: 'group'});
-        var ipNetworksList = Html.ul({className: 'dropdown'});
+        var ipNetworksList = Html.ul({className: 'i-dropdown'});
 
         _.each(this.ipNetworks, function(network) {
           var li = Html.li();
