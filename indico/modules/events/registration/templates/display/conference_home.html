@@ -4,7 +4,7 @@
             <a class="i-button icon-file-download js-dropdown arrow" data-toggle="dropdown">
                 {% trans %}Get ticket{% endtrans %}
             </a>
-            <ul class="dropdown">
+            <ul class="i-dropdown">
                 {% for registration in registrations_with_tickets -%}
                     {% set regform = registration.registration_form %}
                     <li>

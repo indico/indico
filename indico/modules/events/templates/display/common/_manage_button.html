@@ -17,7 +17,7 @@
 {%- endmacro %}
 
 {% macro _render_dropdown(item, item_type, show_note_operations=false) -%}
-    <ul class="dropdown">
+    <ul class="i-dropdown">
         {% if item_type == 'EVENT' %}
             {% if item.can_manage(session.user) %}
                 <li>

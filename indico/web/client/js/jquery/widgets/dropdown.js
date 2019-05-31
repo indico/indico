@@ -44,7 +44,7 @@
 
     _open: function(elem) {
       var self = this;
-      var sibl = elem.next('ul.dropdown');
+      var sibl = elem.next('ul.i-dropdown');
       var positionReference = this.options.relative_to || elem;
 
       elem.addClass('open');
@@ -101,7 +101,7 @@
         }
       });
 
-      elem.find('ul.dropdown > li > a').each(function() {
+      elem.find('ul.i-dropdown > li > a').each(function() {
         var $this = $(this);
         if (
           !$this.attr('href') ||
@@ -122,7 +122,7 @@
         }
       });
 
-      elem.find('ul.dropdown > li.toggle').each(function() {
+      elem.find('ul.i-dropdown > li.toggle').each(function() {
         var li = $(this);
         var link = $('<a>', {
           href: '#',

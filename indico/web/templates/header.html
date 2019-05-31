@@ -37,7 +37,7 @@
                     <a href="{{ item.url }}">{{ item.title }}</a>
                 {% elif item.items %}
                     <a class="arrow js-dropdown" href="#" data-toggle="dropdown">{{ item.title }}</a>
-                    <ul class="dropdown">
+                    <ul class="i-dropdown">
                         {{ loop(item.items) }}
                     </ul>
                 {% endif %}

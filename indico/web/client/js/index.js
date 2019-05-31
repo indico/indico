@@ -12,3 +12,4 @@ import './legacy/indico.js';
 import './legacy/timetable.js';
 
 import '../styles/screen.scss';
+import 'indico-sui-theme/semantic.css';

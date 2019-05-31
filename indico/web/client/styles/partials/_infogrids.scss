@@ -29,6 +29,7 @@
     margin-top: 1em;
     display: flex;
     flex-flow: row nowrap;
+    line-height: initial;
 
     &, &:after, &:before {
         box-sizing: border-box;

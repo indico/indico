@@ -132,7 +132,7 @@
                 padding: $i-label-vertical-padding $i-label-horizontal-padding;
             }
 
-            .dropdown {
+            .i-dropdown {
                 z-index: 100;
             }
 
@@ -203,7 +203,7 @@
         }
     }
 
-    ul.dropdown {
+    ul.i-dropdown {
         line-height: auto;
         height: auto;
         z-index: 1;

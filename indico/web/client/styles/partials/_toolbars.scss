@@ -73,7 +73,7 @@ $i-button-spacing: 0.3rem;
         }
     }
 
-    input[type=text] {
+    :not(ui) > input[type=text] {
         color: $black;
         display: inline-block;
         float: left;
@@ -82,7 +82,7 @@ $i-button-spacing: 0.3rem;
         padding: 0.2em 0.7em 0.1em 0.7em;
     }
 
-    .dropdown {
+    .i-dropdown {
         z-index: 1;
 
         & > li {

@@ -22,10 +22,6 @@
     border: none;
     margin-bottom: 0;
 
-    border-color: darken($black, 10%);
-    border-style: solid;
-    border-width: 1px 0;
-
     > a {
         @include transition(background-color);
 

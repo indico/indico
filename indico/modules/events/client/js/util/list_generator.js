@@ -9,7 +9,7 @@
 
 (function(global) {
   function colorizeFilter(filter) {
-    var dropdown = filter.find('.dropdown');
+    var dropdown = filter.find('.i-dropdown');
     filter.toggleClass('active highlight', dropdown.find(':checked').length > 0);
   }
 

@@ -87,6 +87,8 @@
     text-align: center;
     box-shadow: 0 2px 1px 0 $gray;
     background-color: $dark-blue;
+    box-sizing: initial;
+    line-height: initial;
 
     &, & * {
         color: $light-blue;

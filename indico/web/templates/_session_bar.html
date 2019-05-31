@@ -173,7 +173,7 @@
             {{ lang }}
         </a>
     {% endif %}
-    <ul class="dropdown">
+    <ul class="i-dropdown">
         {% for name, (title, territory) in languages|dictsort(by='value') %}
             <li>
                 {% if name == session.lang %}

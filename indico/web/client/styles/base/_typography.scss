@@ -59,31 +59,38 @@ body {
 }
 
 body {
-    @extend %font-family-body;
-    @extend %font-size-body;
     background: #fff;
     padding: 0px;
     margin: 0px;
+}
+
+body > :not(.rb-app-container) {
+    @extend %font-family-body;
+    @extend %font-size-body;
 }
 
 h1, h2, h3, h4, h5, h6, td, dl, ol, blockquote {
     color: $black;
 }
 
-h1 {
+body > :not(.rb-app-container) h1 {
     @extend %font-family-title;
     font-size: 1.7em;
 }
 
-h2, h3, h4 {
+body > :not(.rb-app-container) h1.category-title {
+    font-size: 2em;
+}
+
+body > :not(.rb-app-container) h2, h3, h4 {
     @extend %font-family-title-light;
 }
 
-h2 {
+body > :not(.rb-app-container) h2 {
     font-size: 1.6em;
 }
 
-h3 {
+body > :not(.rb-app-container) h3 {
     font-size: 1.2em;
 }
 

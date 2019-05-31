@@ -25,7 +25,7 @@
                 <div class="group">
                     <a class="icon-checkbox-checked i-button arrow left icon-only" aria-hidden="true" href="#"
                        data-toggle="dropdown"></a>
-                    <ul class="dropdown">
+                    <ul class="i-dropdown">
                         <li><a href="#" id="select-all">{% trans %}All{% endtrans %}</a></li>
                         <li><a href="#" id="select-none">{% trans %}None{% endtrans %}</a></li>
                     </ul>
@@ -56,7 +56,7 @@
                        data-toggle="dropdown">
                         {%- trans %}Remove{% endtrans -%}
                     </a>
-                    <ul class="dropdown">
+                    <ul class="i-dropdown">
                         <li>
                             <a href="#" class="js-requires-selected-row"
                                data-href="{{ url_for('.manage_delete_abstracts', event) }}"
@@ -86,7 +86,7 @@
                        data-toggle="dropdown">
                         {%- trans %}Judge{% endtrans -%}
                     </a>
-                    <ul class="dropdown">
+                    <ul class="i-dropdown">
                         <li>
                             <a class="accept js-requires-selected-row"
                                data-href="{{ url_for('.manage_judge_abstracts', event) }}"
@@ -159,7 +159,7 @@
                     <a class="i-button arrow button js-requires-selected-row disabled" data-toggle="dropdown">
                         {%- trans %}Export{% endtrans -%}
                     </a>
-                    <ul class="dropdown">
+                    <ul class="i-dropdown">
                         <li>
                             <a href="#"
                                class="icon-file-pdf js-requires-selected-row disabled js-submit-list-form"

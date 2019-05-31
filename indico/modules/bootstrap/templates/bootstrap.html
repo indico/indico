@@ -17,7 +17,7 @@
             <a class="i-button transparent-button borderless icon-earth arrow js-dropdown" data-toggle="dropdown">
                 {{ languages[session.lang][0] }}
             </a>
-            <ul class="dropdown">
+            <ul class="i-dropdown">
                 {% for name, (title, territory) in languages|dictsort(by='value') %}
                     <li>
                         {% if name == session.lang %}

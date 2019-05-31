@@ -10,7 +10,7 @@
     <button class="i-button borderless icon-wrench arrow js-dropdown hide-if-locked" data-toggle="dropdown">
         {% trans %}Change type{% endtrans %}
     </button>
-    <ul class="dropdown">
+    <ul class="i-dropdown">
         {% for type, title in event_types %}
             <li>
                 {% if type == event.type_.name %}

@@ -67,6 +67,7 @@
     overflow: hidden;
     padding: 5px;
     z-index: 1;
+    box-sizing: initial;
 
     &.scrolling {
         @include single-box-shadow();

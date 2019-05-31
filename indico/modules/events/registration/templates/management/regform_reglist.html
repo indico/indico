@@ -16,7 +16,7 @@
                 <div class="group">
                     <a class="icon-checkbox-checked i-button arrow left icon-only" aria-hidden="true" href="#"
                        data-toggle="dropdown"></a>
-                    <ul class="dropdown">
+                    <ul class="i-dropdown">
                         <li><a href="#" id="select-all">{% trans %}All{% endtrans %}</a></li>
                         <li><a href="#" id="select-none">{% trans %}None{% endtrans %}</a></li>
                     </ul>
@@ -36,7 +36,7 @@
                     <a class="i-button arrow icon-plus" data-toggle="dropdown">
                         {% trans %}Register{% endtrans %}
                     </a>
-                    <ul class="dropdown">
+                    <ul class="i-dropdown">
                         <li>
                             <a href="{{ url_for('.create_registration', regform) }}"
                                data-title="{% trans %}Register a user that doesn't exist in Indico{% endtrans %}">
@@ -68,7 +68,7 @@
                     <a class="i-button arrow button js-requires-selected-row disabled" data-toggle="dropdown">
                         {%- trans %}Export{% endtrans -%}
                     </a>
-                    <ul class="dropdown">
+                    <ul class="i-dropdown">
                         <li>
                             <a href="#" class="icon-file-pdf js-requires-selected-row disabled js-submit-list-form"
                                data-href="{{ url_for('.registrations_pdf_export_table', regform) }}">
@@ -99,7 +99,7 @@
                     <a href="#" class="i-button arrow button js-requires-selected-row disabled" data-toggle="dropdown">
                         {%- trans %}Actions{% endtrans -%}
                     </a>
-                    <ul class="dropdown">
+                    <ul class="i-dropdown">
                         <li class="hide-if-locked">
                             <a href="#" class="icon-mail js-requires-selected-row disabled"
                                data-href="{{ url_for('.email_registrants', regform) }}"
@@ -147,7 +147,7 @@
                         <a class="i-button arrow button js-requires-selected-row disabled" data-toggle="dropdown">
                             {%- trans %}Moderation{% endtrans -%}
                         </a>
-                        <ul class="dropdown">
+                        <ul class="i-dropdown">
                             <li>
                                 <a href="#" class="icon-checkmark js-requires-selected-row disabled js-modify-status"
                                    data-href="{{ url_for('.registrations_modify_status', regform) }}"
@@ -172,7 +172,7 @@
                         <a class="i-button arrow button js-requires-selected-row disabled" data-toggle="dropdown">
                             {%- trans %}Check-in control{% endtrans -%}
                         </a>
-                        <ul class="dropdown">
+                        <ul class="i-dropdown">
                             <li>
                                 <a href="#" class="icon-location js-requires-selected-row disabled js-modify-status"
                                    data-method="POST"

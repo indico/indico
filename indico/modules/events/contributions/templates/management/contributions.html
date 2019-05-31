@@ -11,7 +11,7 @@
         <a id="contributions-settings-dropdown"
            class="i-button borderless icon-settings arrow js-dropdown"
            data-toggle="dropdown">{% trans %}Settings{% endtrans %}</a>
-        <ul class="dropdown">
+        <ul class="i-dropdown">
             <li>
                 <a href="#"
                    title="{% trans %}Manage contribution types{% endtrans %}"
@@ -57,7 +57,7 @@
         <div class="toolbars space-after">
             <div class="toolbar">
                 <a class="i-button icon-checkbox-checked arrow js-dropdown" data-toggle="dropdown"></a>
-                <ul class="dropdown">
+                <ul class="i-dropdown">
                     <li>
                         <a href="#" data-select-all="#contribution-list input:checkbox">{% trans %}All{% endtrans %}</a>
                     </li>
@@ -101,7 +101,7 @@
                        data-toggle="dropdown">
                         {%- trans %}Export{% endtrans -%}
                     </a>
-                    <ul class="dropdown">
+                    <ul class="i-dropdown">
                         <li>
                             <a href="#" class="icon-file-pdf js-submit-form js-enable-if-checked disabled"
                                data-href="{{ url_for('.contributions_pdf_export', event) }}">

@@ -18,7 +18,7 @@
     @extend %categorynav-sizing;
     @extend .flexcol;
 
-    input[type='search'] {
+   :not(.ui) >  input[type='search'] {
         @extend %form-field-input;
         width: 100%;
         flex-shrink: 0;
