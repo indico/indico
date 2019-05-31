@@ -79,12 +79,13 @@ def _log_email(email, event, module, user, meta=None):
                      user, type_='email', data=log_data, meta=meta)
 
 
-def init_email_queue():
+def init_notification_queues():
     """Enable email queueing for the current context."""
     g.setdefault('email_queue', [])
+    g.setdefault('webhook_queue', set())
 
 
-def flush_email_queue():
+def _flush_email_queue():
     """Send all the emails in the queue.
 
     Note: This function does a database commit to update states
@@ -94,7 +95,7 @@ def flush_email_queue():
     been pending.
     """
     from indico.core.emails import store_failed_email, update_email_log_state
-    queue = g.get('email_queue', [])
+    queue = g.get('email_queue')
     if not queue:
         return
     logger.debug('Sending %d queued emails', len(queue))
@@ -116,6 +117,31 @@ def flush_email_queue():
             time.sleep(0.25)
     del queue[:]
     db.session.commit()
+
+
+def _flush_webhook_queue():
+    """Send enqueued webhook notifications."""
+    from indico.modules.notifications.tasks import send_webhook_notification
+    queue = g.get('webhook_queue')
+    if not queue:
+        return
+    logger.debug('Sending %d queued webhook notifications', len(queue))
+
+    for notification in queue:
+        try:
+            send_webhook_notification.delay(notification)
+        except Exception:
+            logger.exception('Flushing queued webhook notification %d failed', notification.id)
+            # Wait for a short moment in case it's a very temporary issue
+            time.sleep(0.25)
+    queue.clear()
+    db.session.commit()
+
+
+def flush_notification_queues():
+    """Send enqueued notifications (e-mail and webhook)."""
+    _flush_email_queue()
+    _flush_webhook_queue()
 
 
 def make_email(to_list=None, cc_list=None, bcc_list=None, from_address=None, reply_address=None, attachments=None,

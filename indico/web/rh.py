@@ -26,7 +26,7 @@ from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.core import handle_sqlalchemy_database_error
 from indico.core.logger import Logger
-from indico.core.notifications import flush_email_queue, init_email_queue
+from indico.core.notifications import flush_notification_queues, init_notification_queues
 from indico.util.i18n import _
 from indico.util.locators import get_locator
 from indico.util.signals import values_from_signal
@@ -276,14 +276,14 @@ class RH:
                     request.method, request.relative_url, request.remote_addr, os.getpid())
 
         try:
-            init_email_queue()
+            init_notification_queues()
             self._check_csrf()
             res = self._do_process()
             signals.core.after_process.send()
 
             if self.commit:
                 db.session.commit()
-                flush_email_queue()
+                flush_notification_queues()
             else:
                 db.session.rollback()
         except DatabaseError:

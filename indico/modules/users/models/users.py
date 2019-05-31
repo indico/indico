@@ -430,6 +430,7 @@ class User(PersonMixin, db.Model):
     # - modified_abstract_comments (AbstractComment.modified_by)
     # - modified_abstracts (Abstract.modified_by)
     # - modified_review_comments (PaperReviewComment.modified_by)
+    # - notifications (Notification.user)
     # - oauth_app_links (OAuthApplicationUserLink.user)
     # - owned_rooms (Room.owner)
     # - paper_competences (PaperCompetence.user)

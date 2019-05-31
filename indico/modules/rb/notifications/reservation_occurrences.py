@@ -5,7 +5,8 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from indico.core.notifications import email_sender, make_email
+from indico.core.notifications import email_sender
+from indico.modules.notifications.util import make_notification, notification_sender
 from indico.modules.rb.notifications.reservations import ReservationNotification
 from indico.util.date_time import format_datetime
 from indico.web.flask.templating import get_template_module
@@ -59,8 +60,8 @@ def notify_rejection(occurrence):
     ] if _f]
 
 
-@email_sender
+@notification_sender
 def notify_upcoming_occurrences(user, occurrences):
     tpl = get_template_module('rb/emails/reservations/reminders/upcoming_occurrence.html',
                               occurrences=occurrences, user=user)
-    return make_email(to_list={user.email}, template=tpl, html=True)
+    return make_notification({user}, template=tpl, content_type='html')
