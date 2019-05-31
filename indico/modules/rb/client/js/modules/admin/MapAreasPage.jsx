@@ -27,6 +27,10 @@ import 'leaflet-draw/dist/leaflet.draw.css';
 import './MapAreasPage.module.scss';
 
 
+Leaflet.EditToolbar.Delete.include({
+    removeAllLayers: false
+});
+
 const DEFAULT_CENTER = [46.233832398, 6.053166454];
 
 class MapAreasPage extends React.Component {
@@ -137,53 +141,56 @@ class MapAreasPage extends React.Component {
         }
 
         const {areas} = this.props;
-        return areas.map((area) => {
-            const southWest = [area.top_left_latitude, area.top_left_longitude];
-            const northEast = [area.bottom_right_latitude, area.bottom_right_longitude];
-            const latLngBounds = new Leaflet.LatLngBounds([southWest, northEast]);
-            const center = this.map.leafletElement.latLngToContainerPoint(latLngBounds.getCenter());
-            const bottomRight = this.map.leafletElement.latLngToContainerPoint(latLngBounds.getSouthEast());
-            const onAreaClick = () => {
-                const {suppressClick} = this.state;
-                if (suppressClick) {
-                    return;
+        return areas.map(this._drawArea);
+    };
+
+    _drawArea = ({id, is_default: isDefault, name, top_left_latitude: topLeftLat, top_left_longitude: topLeftLng,
+                  bottom_right_latitude: bottomRightLat, bottom_right_longitude: bottomRightLng}) => {
+        const southWest = [topLeftLat, topLeftLng];
+        const northEast = [bottomRightLat, bottomRightLng];
+        const latLngBounds = new Leaflet.LatLngBounds([southWest, northEast]);
+        const center = this.map.leafletElement.latLngToContainerPoint(latLngBounds.getCenter());
+        const bottomRight = this.map.leafletElement.latLngToContainerPoint(latLngBounds.getSouthEast());
+        const onAreaClick = () => {
+            const {suppressClick} = this.state;
+            if (suppressClick) {
+                return;
+            }
+
+            this.setState({
+                areaProps: {
+                    bounds: {
+                        southWest: latLngBounds.getSouthWest(),
+                        northEast: latLngBounds.getNorthEast()
+                    },
+                    id,
+                    isDefault,
+                    name
                 }
+            });
+        };
 
-                this.setState({
-                    areaProps: {
-                        bounds: {
-                            southWest: latLngBounds.getSouthWest(),
-                            northEast: latLngBounds.getNorthEast()
-                        },
-                        id: area.id,
-                        isDefault: area.is_default,
-                        name: area.name
-                    }
-                });
-            };
-
-            return (
-                <Rectangle key={`${area.name}-${center.x}-${center.y}`}
-                           bounds={[southWest, northEast]}
-                           name={area.name}
-                           isDefault={area.is_default}
-                           onClick={onAreaClick}
-                           id={area.id}>
-                    <Tooltip offset={[bottomRight.x - center.x, bottomRight.y - center.y]}
-                             direction="bottom"
-                             sticky
-                             permanent
-                             interactive>
-                        <>
-                            {area.name}
-                            {area.is_default && (
-                                <span className="area-default">★</span>
-                            )}
-                        </>
-                    </Tooltip>
-                </Rectangle>
-            );
-        });
+        return (
+            <Rectangle key={`${name}-${center.x}-${center.y}`}
+                       bounds={[southWest, northEast]}
+                       name={name}
+                       isDefault={isDefault}
+                       onClick={onAreaClick}
+                       id={id}>
+                <Tooltip offset={[bottomRight.x - center.x, bottomRight.y - center.y]}
+                         direction="bottom"
+                         sticky
+                         permanent
+                         interactive>
+                    <>
+                        {name}
+                        {isDefault && (
+                            <span className="area-default">★</span>
+                        )}
+                    </>
+                </Tooltip>
+            </Rectangle>
+        );
     };
 
     onSubmit = async (data) => {
@@ -250,19 +257,23 @@ class MapAreasPage extends React.Component {
                             <FinalInput name="bounds.southWest.lat"
                                         type="number"
                                         label={Translate.string('SW Latitude')}
+                                        step="0.00000000000001"
                                         required />
                             <FinalInput name="bounds.southWest.lng"
                                         type="number"
                                         label={Translate.string('SW Longitude')}
+                                        step="0.00000000000001"
                                         required />
                         </Form.Group>
                         <Form.Group>
                             <FinalInput name="bounds.northEast.lat"
                                         label={Translate.string('NE Latitude')}
+                                        step="0.00000000000001"
                                         type="number"
                                         required />
                             <FinalInput name="bounds.northEast.lng"
                                         label={Translate.string('NE Longitude')}
+                                        step="0.00000000000001"
                                         type="number"
                                         required />
                         </Form.Group>

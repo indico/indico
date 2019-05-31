@@ -65,17 +65,15 @@ def update_room(room, args):
     db.session.flush()
 
 
-def create_area(area_data):
-    bounds = area_data['bounds']
+def create_area(bounds, name, default=False):
     top, bottom = bounds['north_east'], bounds['south_west']
-    is_default = area_data.get('default', False)
 
-    if is_default:
+    if default:
         MapArea.query.update({MapArea.is_default: False}, synchronize_session='fetch')
 
     new_area = MapArea()
-    new_area.name = area_data['name']
-    new_area.is_default = is_default
+    new_area.name = name
+    new_area.is_default = default
     new_area.top_left_latitude = top['lat']
     new_area.top_left_longitude = top['lng']
     new_area.bottom_right_latitude = bottom['lat']

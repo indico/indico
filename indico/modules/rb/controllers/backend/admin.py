@@ -532,9 +532,9 @@ _update_args = {
 
 
 class RHMapAreas(RHRoomBookingAdminBase):
-    @use_args(_create_args)
-    def _process_POST(self, args):
-        create_area(args)
+    @use_kwargs(_create_args)
+    def _process_POST(self, **kwargs):
+        create_area(**kwargs)
         return map_areas_schema.jsonify(MapArea.query)
 
     @use_kwargs(_update_args)
