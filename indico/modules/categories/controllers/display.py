@@ -681,7 +681,7 @@ class RHCategoryUpcomingEvent(RHDisplayCategoryBase):
 
     def _get_upcoming_event(self):
         query = (Event.query
-                 .filter(Event.is_visible_in(self.category),
+                 .filter(Event.is_visible_in(self.category.id),
                          Event.start_dt > now_utc(),
                          ~Event.is_deleted)
                  .options(subqueryload('acl_entries'))
