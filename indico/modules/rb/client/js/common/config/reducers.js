@@ -18,7 +18,7 @@ export const initialState = {
     tileServerURL: '',
     gracePeriod: 1,
     helpURL: '',
-    tosURL: null,
+    hasTOS: false,
     tosHTML: null,
     contactEmail: null,
 };
@@ -29,7 +29,8 @@ export default combineReducers({
         switch (action.type) {
             case configActions.CONFIG_RECEIVED: {
                 const {
-                    roomsSpriteToken, gracePeriod, helpURL, contactEmail, tosURL,
+                    roomsSpriteToken, gracePeriod, helpURL, contactEmail,
+                    hasTos: hasTOS,
                     tosHtml: tosHTML,
                     tileserverURL: tileServerURL,
                 } = camelizeKeys(action.data);
@@ -40,7 +41,7 @@ export default combineReducers({
                     tileServerURL,
                     gracePeriod,
                     helpURL,
-                    tosURL,
+                    hasTOS,
                     tosHTML,
                     contactEmail,
                 };

@@ -5,13 +5,16 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import contactURL from 'indico-url:core.contact';
+import tosURL from 'indico-url:legal.display_tos';
+
 import React, {useState} from 'react';
 import PropTypes from 'prop-types';
 import {Icon, Popup, Sidebar, Menu, Modal} from 'semantic-ui-react';
 import {connect} from 'react-redux';
 import {push as pushRoute} from 'connected-react-router';
 import {Overridable} from 'indico/react/util';
-import {Param, Translate} from 'indico/react/i18n';
+import {Translate} from 'indico/react/i18n';
 
 import {selectors as userSelectors, actions as userActions} from '../common/user';
 import {selectors as configSelectors} from '../common/config';
@@ -56,7 +59,7 @@ function SidebarMenu({
     visible,
     onClickOption,
     hideOptions,
-    tosURL,
+    hasTOS,
     tosHTML,
     helpURL,
     contactEmail,
@@ -147,14 +150,17 @@ function SidebarMenu({
                         </Menu.Item>
                     )}
                     {contactEmail && (
-                        <Menu.Item onClick={() => setContactVisible(true)}>
+                        <Menu.Item href={contactURL()} onClick={evt => {
+                            evt.preventDefault();
+                            setContactVisible(true);
+                        }}>
                             <Translate>Contact</Translate>
                         </Menu.Item>
                     )}
-                    {(tosURL || tosHTML) && (
-                        <Menu.Item href={tosURL} onClick={(e) => {
+                    {(hasTOS || tosHTML) && (
+                        <Menu.Item href={tosURL()} target="_blank" rel="noopener noreferrer" onClick={evt => {
                             if (tosHTML) {
-                                e.preventDefault();
+                                evt.preventDefault();
                                 setTermsVisible(true);
                             }
                         }}>
@@ -165,6 +171,7 @@ function SidebarMenu({
             </Sidebar>
             {contactEmail && (
                 <Modal open={contactVisible}
+                       size="tiny"
                        closeIcon
                        onClose={() => setContactVisible(false)}>
                     <Modal.Header>
@@ -176,7 +183,7 @@ function SidebarMenu({
                         </div>
                         <div>
                             <a href={`mailto:${contactEmail}`}>
-                                <Param name="contactEmail" value={contactEmail} />
+                                {contactEmail}
                             </a>
                         </div>
                     </Modal.Content>
@@ -211,7 +218,7 @@ SidebarMenu.propTypes = {
     visible: PropTypes.bool,
     onClickOption: PropTypes.func,
     hideOptions: PropTypes.objectOf(PropTypes.bool),
-    tosURL: PropTypes.string,
+    hasTOS: PropTypes.bool.isRequired,
     tosHTML: PropTypes.string,
     helpURL: PropTypes.string.isRequired,
     contactEmail: PropTypes.string,
@@ -221,7 +228,6 @@ SidebarMenu.defaultProps = {
     visible: false,
     onClickOption: null,
     hideOptions: {},
-    tosURL: null,
     tosHTML: null,
     contactEmail: null,
 };
@@ -234,8 +240,8 @@ export default connect(
         hasOwnedRooms: userSelectors.hasOwnedRooms(state),
         contactEmail: configSelectors.getContactEmail(state),
         helpURL: configSelectors.getHelpURL(state),
-        tosURL: configSelectors.getTosURL(state),
-        tosHTML: configSelectors.getTosHTML(state),
+        hasTOS: configSelectors.hasTOS(state),
+        tosHTML: configSelectors.getTOSHTML(state),
     }),
     dispatch => ({
         gotoMyBookings() {
