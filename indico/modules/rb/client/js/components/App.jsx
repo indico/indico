@@ -13,7 +13,7 @@ import {ConnectedRouter} from 'connected-react-router';
 import {Dimmer, Header, Icon, Loader, Responsive, Segment, Sidebar} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
-import {RouteAwareOverridable, Overridable} from 'indico/react/util';
+import {RouteAwareOverridable, Overridable, ConditionalRoute} from 'indico/react/util';
 import SidebarMenu, {SidebarTrigger} from './SidebarMenu';
 import AdminArea from '../modules/admin';
 import Landing from '../modules/landing';
@@ -33,31 +33,6 @@ import * as globalActions from '../actions';
 
 import * as globalSelectors from '../selectors';
 import './App.module.scss';
-
-
-function ConditionalRoute({active, component, render, ...props}) {
-    const routeProps = {};
-    if (component) {
-        routeProps.component = active ? component : null;
-    } else if (render) {
-        routeProps.render = active ? render : null;
-    } else {
-        throw new Error('either "component" or "render" should be provided as a prop');
-    }
-
-    return <Route {...props} {...routeProps} />;
-}
-
-ConditionalRoute.propTypes = {
-    active: PropTypes.bool.isRequired,
-    component: PropTypes.elementType,
-    render: PropTypes.func,
-};
-
-ConditionalRoute.defaultProps = {
-    component: null,
-    render: null,
-};
 
 
 class App extends React.Component {

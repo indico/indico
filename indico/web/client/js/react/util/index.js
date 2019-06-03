@@ -11,3 +11,4 @@ export {default as Overridable, RouteAwareOverridable, parametrize} from './Over
 export {toClasses} from './html';
 export {default as IndicoPropTypes} from './propTypes';
 export {default as Markdown} from './Markdown';
+export {default as ConditionalRoute} from './ConditionalRoute';

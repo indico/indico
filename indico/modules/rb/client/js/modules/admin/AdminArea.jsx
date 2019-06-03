@@ -11,7 +11,9 @@ import {Route} from 'react-router-dom';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import {Container, Grid} from 'semantic-ui-react';
+import {ConditionalRoute} from 'indico/react/util';
 import {selectors as userSelectors} from '../../common/user';
+import {selectors as mapSelectors} from '../../common/map';
 import AdminMenu from './AdminMenu';
 import AdminLocationRooms from './AdminLocationRooms';
 import EquipmentPage from './EquipmentPage';
@@ -27,6 +29,7 @@ import './AdminArea.module.scss';
 class AdminArea extends React.Component {
     static propTypes = {
         isAdmin: PropTypes.bool.isRequired,
+        isMapEnabled: PropTypes.bool.isRequired,
         actions: PropTypes.exact({
             fetchLocations: PropTypes.func.isRequired,
             fetchRooms: PropTypes.func.isRequired,
@@ -40,7 +43,7 @@ class AdminArea extends React.Component {
     }
 
     render() {
-        const {isAdmin} = this.props;
+        const {isAdmin, isMapEnabled} = this.props;
 
         if (!isAdmin) {
             return null;
@@ -54,7 +57,8 @@ class AdminArea extends React.Component {
                     </Grid.Column>
                     <Grid.Column width={12}>
                         <Route exact path="/admin" component={SettingsPage} />
-                        <Route exact path="/admin/map-areas" component={MapAreasPage} />
+                        <ConditionalRoute exact path="/admin/map-areas" component={MapAreasPage}
+                                          active={isMapEnabled} />
                         <Route exact path="/admin/equipment" component={EquipmentPage} />
                         <Route exact path="/admin/attributes" component={AttributesPage} />
                         <Route exact path="/admin/locations/" component={LocationPage} />
@@ -72,6 +76,7 @@ class AdminArea extends React.Component {
 export default connect(
     state => ({
         isAdmin: userSelectors.isUserRBAdmin(state),
+        isMapEnabled: mapSelectors.isMapEnabled(state),
     }),
     dispatch => ({
         actions: bindActionCreators({

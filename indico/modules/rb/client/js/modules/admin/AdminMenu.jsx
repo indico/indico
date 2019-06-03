@@ -12,6 +12,7 @@ import {Link, NavLink, withRouter} from 'react-router-dom';
 import {Icon, Menu, Placeholder} from 'semantic-ui-react';
 import {connect} from 'react-redux';
 import {Translate} from 'indico/react/i18n';
+import {selectors as mapSelectors} from '../../common/map';
 import * as adminSelectors from './selectors';
 import * as adminActions from './actions';
 
@@ -42,7 +43,7 @@ function renderMenuPlaceholder() {
     );
 }
 
-function AdminMenu({locations, isFetchingLocations, actions: {clearTextFilter}}) {
+function AdminMenu({locations, isFetchingLocations, isMapEnabled, actions: {clearTextFilter}}) {
     if (isFetchingLocations) {
         return renderMenuPlaceholder();
     }
@@ -56,11 +57,13 @@ function AdminMenu({locations, isFetchingLocations, actions: {clearTextFilter}})
                     <Translate>General settings</Translate>
                 </NavLink>
             </Menu.Item>
-            <Menu.Item>
-                <NavLink exact to="/admin/map-areas">
-                    <Translate>Map Areas</Translate>
-                </NavLink>
-            </Menu.Item>
+            {isMapEnabled && (
+                <Menu.Item>
+                    <NavLink exact to="/admin/map-areas">
+                        <Translate>Map Areas</Translate>
+                    </NavLink>
+                </Menu.Item>
+            )}
             <Menu.Item>
                 <Menu.Header>
                     <Translate>Room Metadata</Translate>
@@ -104,6 +107,7 @@ function AdminMenu({locations, isFetchingLocations, actions: {clearTextFilter}})
 AdminMenu.propTypes = {
     locations: PropTypes.array.isRequired,
     isFetchingLocations: PropTypes.bool.isRequired,
+    isMapEnabled: PropTypes.bool.isRequired,
     actions: PropTypes.exact({
         clearTextFilter: PropTypes.func.isRequired,
     }).isRequired,
@@ -113,6 +117,7 @@ AdminMenu.propTypes = {
 export default withRouter(connect(
     (state) => ({
         locations: adminSelectors.getAllLocations(state),
+        isMapEnabled: mapSelectors.isMapEnabled(state),
         isFetchingLocations: adminSelectors.isFetchingLocations(state),
     }),
     (dispatch) => ({
