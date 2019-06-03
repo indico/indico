@@ -39,7 +39,7 @@ class RequestManagerForm(IndicoForm):
 
 
 class RequestDefinitionBase(object):
-    """Defines a service request which can be sent by event managers."""
+    """A service request which can be sent by event managers."""
 
     #: the plugin containing this request definition - assigned automatically
     plugin = None
@@ -56,7 +56,7 @@ class RequestDefinitionBase(object):
 
     @classmethod
     def render_form(cls, event, **kwargs):
-        """Renders the request form
+        """Render the request form.
 
         :param event: the event the request is for
         :param kwargs: arguments passed to the template
@@ -66,7 +66,7 @@ class RequestDefinitionBase(object):
 
     @classmethod
     def create_form(cls, event, existing_request=None):
-        """Creates the request form
+        """Create the request form.
 
         :param event: the event the request is for
         :param existing_request: the :class:`Request` if there's an existing request of this type
@@ -78,7 +78,7 @@ class RequestDefinitionBase(object):
 
     @classmethod
     def create_manager_form(cls, req):
-        """Creates the request management form
+        """Create the request management form.
 
         :param req: the :class:`Request` of the request
         :return: an instance of an :class:`IndicoForm` subclass
@@ -89,7 +89,7 @@ class RequestDefinitionBase(object):
 
     @classmethod
     def get_notification_template(cls, name, **context):
-        """Gets the template module for a notification email
+        """Get the template module for a notification email.
 
         :param name: the template name
         :param context: data passed to the template
@@ -100,7 +100,7 @@ class RequestDefinitionBase(object):
 
     @classmethod
     def can_be_managed(cls, user):
-        """Checks whether the user is allowed to manage this request type
+        """Check whether the user is allowed to manage this request type.
 
         :param user: a :class:`.User`
         """
@@ -108,7 +108,7 @@ class RequestDefinitionBase(object):
 
     @classmethod
     def get_manager_notification_emails(cls):
-        """Returns the email addresses of users who manage requests of this type
+        """Return the email addresses of users who manage requests of this type.
 
         The email addresses are used only for notifications.
         It usually makes sense to return the email addresses of the users who
@@ -120,12 +120,12 @@ class RequestDefinitionBase(object):
 
     @classmethod
     def get_notification_reply_email(cls):
-        """Return the `Reply-To:` e-mail address for notifications."""
+        """Return the *Reply-To* e-mail address for notifications."""
         return config.SUPPORT_EMAIL
 
     @classmethod
     def send(cls, req, data):
-        """Sends a new/modified request
+        """Send a new/modified request.
 
         :param req: the :class:`Request` of the request
         :param data: the form data from the request form
@@ -139,7 +139,7 @@ class RequestDefinitionBase(object):
 
     @classmethod
     def withdraw(cls, req, notify_event_managers=True):
-        """Withdraws the request
+        """Withdraw the request.
 
         :param req: the :class:`Request` of the request
         :param notify_event_managers: if event managers should be notified
@@ -150,7 +150,7 @@ class RequestDefinitionBase(object):
 
     @classmethod
     def accept(cls, req, data, user):
-        """Accepts the request
+        """Accept the request.
 
         To ensure that additional data is saved, this method should
         call :method:`manager_save`.
@@ -168,7 +168,7 @@ class RequestDefinitionBase(object):
 
     @classmethod
     def reject(cls, req, data, user):
-        """Rejects the request
+        """Reject the request.
 
         To ensure that additional data is saved, this method should
         call :method:`manager_save`.
@@ -186,7 +186,7 @@ class RequestDefinitionBase(object):
 
     @classmethod
     def manager_save(cls, req, data):
-        """Saves management-specific data
+        """Save management-specific data.
 
         This method is called when the management form is submitted without
         accepting/rejecting the request (which is guaranteed to be already
