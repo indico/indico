@@ -5,23 +5,19 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import contactURL from 'indico-url:core.contact';
-import tosURL from 'indico-url:legal.display_tos';
-import privacyPolicyURL from 'indico-url:legal.display_privacy';
-
-import React, {useState} from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
-import {Icon, Popup, Sidebar, Menu, Modal} from 'semantic-ui-react';
+import {Icon, Popup, Sidebar, Menu} from 'semantic-ui-react';
 import {connect} from 'react-redux';
 import {push as pushRoute} from 'connected-react-router';
 import {Overridable} from 'indico/react/util';
 import {Translate} from 'indico/react/i18n';
 
 import {selectors as userSelectors, actions as userActions} from '../common/user';
-import {selectors as configSelectors} from '../common/config';
 import {actions as blockingsActions} from '../modules/blockings';
 import {actions as filtersActions} from '../common/filters';
 import * as globalActions from '../actions';
+import SidebarFooter from './SidebarFooter';
 
 import './SidebarMenu.module.scss';
 
@@ -60,12 +56,6 @@ function SidebarMenu({
     visible,
     onClickOption,
     hideOptions,
-    hasTOS,
-    tosHTML,
-    hasPrivacyPolicy,
-    privacyPolicyHTML,
-    helpURL,
-    contactEmail,
 }) {
     const options = [
         {
@@ -114,120 +104,38 @@ function SidebarMenu({
         }
     ].filter(({onlyIf}) => onlyIf === undefined || onlyIf);
 
-    const [contactVisible, setContactVisible] = useState(false);
-    const [termsVisible, setTermsVisible] = useState(false);
-    const [privacyPolicyVisible, setPrivacyPolicyVisible] = useState(false);
-
     return (
-        <>
-            <Sidebar as={Menu}
-                     animation="overlay"
-                     icon="labeled"
-                     vertical
-                     width="thin"
-                     direction="right"
-                     onHide={onClickOption}
-                     inverted
-                     visible={visible}
-                     styleName="sidebar">
-                {options.map(({key, text, icon, onClick, iconColor, active, tooltip}) => {
-                    const item = (
-                        <Menu.Item as="a" key={key} active={active} onClick={() => {
-                            onClick();
-                            if (onClickOption) {
-                                onClickOption();
-                            }
-                        }}>
-                            <Icon name={icon} color={iconColor} />
-                            {text}
-                        </Menu.Item>
-                    );
-                    if (!tooltip) {
-                        return item;
-                    }
-                    return <Popup trigger={item} content={tooltip} key={key} position="left center" />;
-                })}
-                <div styleName="bottom-align">
-                    {helpURL && (
-                        <Menu.Item as="a" href={helpURL}>
-                            <Translate>Help</Translate>
-                        </Menu.Item>
-                    )}
-                    {contactEmail && (
-                        <Menu.Item href={contactURL()} onClick={evt => {
-                            evt.preventDefault();
-                            setContactVisible(true);
-                        }}>
-                            <Translate>Contact</Translate>
-                        </Menu.Item>
-                    )}
-                    {(hasTOS || tosHTML) && (
-                        <Menu.Item href={tosURL()} target="_blank" rel="noopener noreferrer" onClick={evt => {
-                            if (tosHTML) {
-                                evt.preventDefault();
-                                setTermsVisible(true);
-                            }
-                        }}>
-                            <Translate>Terms and Conditions</Translate>
-                        </Menu.Item>
-                    )}
-                    {(hasPrivacyPolicy || privacyPolicyHTML) && (
-                        <Menu.Item href={privacyPolicyURL()} target="_blank" rel="noopener noreferrer" onClick={evt => {
-                            if (privacyPolicyHTML) {
-                                evt.preventDefault();
-                                setPrivacyPolicyVisible(true);
-                            }
-                        }}>
-                            <Translate>Privacy Policy</Translate>
-                        </Menu.Item>
-                    )}
-                </div>
-            </Sidebar>
-            {contactEmail && (
-                <Modal open={contactVisible}
-                       size="tiny"
-                       closeIcon
-                       onClose={() => setContactVisible(false)}>
-                    <Modal.Header>
-                        <Translate>Contact</Translate>
-                    </Modal.Header>
-                    <Modal.Content>
-                        <div>
-                            <Translate>If you need support, you can contact the following email address:</Translate>
-                        </div>
-                        <div>
-                            <a href={`mailto:${contactEmail}`}>
-                                {contactEmail}
-                            </a>
-                        </div>
-                    </Modal.Content>
-                </Modal>
-            )}
-            {tosHTML && (
-                <Modal open={termsVisible}
-                       closeIcon
-                       onClose={() => setTermsVisible(false)}>
-                    <Modal.Header>
-                        <Translate>Terms and Conditions</Translate>
-                    </Modal.Header>
-                    <Modal.Content>
-                        <div dangerouslySetInnerHTML={{__html: tosHTML}} />
-                    </Modal.Content>
-                </Modal>
-            )}
-            {privacyPolicyHTML && (
-                <Modal open={privacyPolicyVisible}
-                       closeIcon
-                       onClose={() => setPrivacyPolicyVisible(false)}>
-                    <Modal.Header>
-                        <Translate>Privacy Policy</Translate>
-                    </Modal.Header>
-                    <Modal.Content>
-                        <div dangerouslySetInnerHTML={{__html: privacyPolicyHTML}} />
-                    </Modal.Content>
-                </Modal>
-            )}
-        </>
+        <Sidebar as={Menu}
+                 animation="overlay"
+                 icon="labeled"
+                 vertical
+                 width="thin"
+                 direction="right"
+                 onHide={onClickOption}
+                 inverted
+                 visible={visible}
+                 styleName="sidebar">
+            {options.map(({key, text, icon, onClick, iconColor, active, tooltip}) => {
+                const item = (
+                    <Menu.Item as="a" key={key} active={active} onClick={() => {
+                        onClick();
+                        if (onClickOption) {
+                            onClickOption();
+                        }
+                    }}>
+                        <Icon name={icon} color={iconColor} />
+                        {text}
+                    </Menu.Item>
+                );
+                if (!tooltip) {
+                    return item;
+                }
+                return <Popup trigger={item} content={tooltip} key={key} position="left center" />;
+            })}
+            <div styleName="bottom-align">
+                <SidebarFooter />
+            </div>
+        </Sidebar>
     );
 }
 
@@ -244,21 +152,12 @@ SidebarMenu.propTypes = {
     visible: PropTypes.bool,
     onClickOption: PropTypes.func,
     hideOptions: PropTypes.objectOf(PropTypes.bool),
-    hasTOS: PropTypes.bool.isRequired,
-    tosHTML: PropTypes.string,
-    hasPrivacyPolicy: PropTypes.bool.isRequired,
-    privacyPolicyHTML: PropTypes.string,
-    helpURL: PropTypes.string.isRequired,
-    contactEmail: PropTypes.string,
 };
 
 SidebarMenu.defaultProps = {
     visible: false,
     onClickOption: null,
     hideOptions: {},
-    tosHTML: null,
-    privacyPolicyHTML: null,
-    contactEmail: null,
 };
 
 
@@ -267,12 +166,6 @@ export default connect(
         isAdmin: userSelectors.isUserRBAdmin(state),
         isAdminOverrideEnabled: userSelectors.isUserAdminOverrideEnabled(state),
         hasOwnedRooms: userSelectors.hasOwnedRooms(state),
-        contactEmail: configSelectors.getContactEmail(state),
-        helpURL: configSelectors.getHelpURL(state),
-        hasTOS: configSelectors.hasTOS(state),
-        tosHTML: configSelectors.getTOSHTML(state),
-        hasPrivacyPolicy: configSelectors.hasPrivacyPolicy(state),
-        privacyPolicyHTML: configSelectors.getPrivacyPolicyHTML(state),
     }),
     dispatch => ({
         gotoMyBookings() {
