@@ -86,9 +86,16 @@ const timelineReducer = combineReducers({
                 const {data: {room_id: roomId, booking: {is_accepted: isAccepted}}} = action;
                 const {roomIds, availability} = state;
                 if (!isAccepted) {
-                    const [, roomAvailability] = availability.find(([id]) => id === roomId);
-                    roomAvailability.preConflicts = roomAvailability.candidates;
-                    return state;
+                    const newAvailability = availability.map(([id, roomAvailability]) => {
+                        if (id === roomId) {
+                            return [id, {...roomAvailability, preConflicts: roomAvailability.candidates}];
+                        }
+                        return [id, roomAvailability];
+                    });
+                    return {
+                        ...state,
+                        availability: newAvailability,
+                    };
                 }
                 return {
                     ...state,
