@@ -7,6 +7,7 @@
 
 import contactURL from 'indico-url:core.contact';
 import tosURL from 'indico-url:legal.display_tos';
+import privacyPolicyURL from 'indico-url:legal.display_privacy';
 
 import React, {useState} from 'react';
 import PropTypes from 'prop-types';
@@ -61,6 +62,8 @@ function SidebarMenu({
     hideOptions,
     hasTOS,
     tosHTML,
+    hasPrivacyPolicy,
+    privacyPolicyHTML,
     helpURL,
     contactEmail,
 }) {
@@ -113,6 +116,7 @@ function SidebarMenu({
 
     const [contactVisible, setContactVisible] = useState(false);
     const [termsVisible, setTermsVisible] = useState(false);
+    const [privacyPolicyVisible, setPrivacyPolicyVisible] = useState(false);
 
     return (
         <>
@@ -167,6 +171,16 @@ function SidebarMenu({
                             <Translate>Terms and Conditions</Translate>
                         </Menu.Item>
                     )}
+                    {(hasPrivacyPolicy || privacyPolicyHTML) && (
+                        <Menu.Item href={privacyPolicyURL()} target="_blank" rel="noopener noreferrer" onClick={evt => {
+                            if (privacyPolicyHTML) {
+                                evt.preventDefault();
+                                setPrivacyPolicyVisible(true);
+                            }
+                        }}>
+                            <Translate>Privacy Policy</Translate>
+                        </Menu.Item>
+                    )}
                 </div>
             </Sidebar>
             {contactEmail && (
@@ -201,6 +215,18 @@ function SidebarMenu({
                     </Modal.Content>
                 </Modal>
             )}
+            {privacyPolicyHTML && (
+                <Modal open={privacyPolicyVisible}
+                       closeIcon
+                       onClose={() => setPrivacyPolicyVisible(false)}>
+                    <Modal.Header>
+                        <Translate>Privacy Policy</Translate>
+                    </Modal.Header>
+                    <Modal.Content>
+                        <div dangerouslySetInnerHTML={{__html: privacyPolicyHTML}} />
+                    </Modal.Content>
+                </Modal>
+            )}
         </>
     );
 }
@@ -220,6 +246,8 @@ SidebarMenu.propTypes = {
     hideOptions: PropTypes.objectOf(PropTypes.bool),
     hasTOS: PropTypes.bool.isRequired,
     tosHTML: PropTypes.string,
+    hasPrivacyPolicy: PropTypes.bool.isRequired,
+    privacyPolicyHTML: PropTypes.string,
     helpURL: PropTypes.string.isRequired,
     contactEmail: PropTypes.string,
 };
@@ -229,6 +257,7 @@ SidebarMenu.defaultProps = {
     onClickOption: null,
     hideOptions: {},
     tosHTML: null,
+    privacyPolicyHTML: null,
     contactEmail: null,
 };
 
@@ -242,6 +271,8 @@ export default connect(
         helpURL: configSelectors.getHelpURL(state),
         hasTOS: configSelectors.hasTOS(state),
         tosHTML: configSelectors.getTOSHTML(state),
+        hasPrivacyPolicy: configSelectors.hasPrivacyPolicy(state),
+        privacyPolicyHTML: configSelectors.getPrivacyPolicyHTML(state),
     }),
     dispatch => ({
         gotoMyBookings() {

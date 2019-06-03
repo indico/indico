@@ -16,4 +16,6 @@ export const getBookingGracePeriod = ({config}) => config.data.gracePeriod;
 export const getHelpURL = ({config}) => config.data.helpURL;
 export const hasTOS = ({config}) => config.data.hasTOS;
 export const getTOSHTML = ({config}) => config.data.tosHTML;
+export const hasPrivacyPolicy = ({config}) => config.data.hasPrivacyPolicy;
+export const getPrivacyPolicyHTML = ({config}) => config.data.privacyPolicyHTML;
 export const getContactEmail = ({config}) => config.data.contactEmail;

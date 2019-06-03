@@ -20,6 +20,8 @@ export const initialState = {
     helpURL: '',
     hasTOS: false,
     tosHTML: null,
+    hasPrivacyPolicy: false,
+    privacyPolicyHTML: null,
     contactEmail: null,
 };
 
@@ -29,9 +31,10 @@ export default combineReducers({
         switch (action.type) {
             case configActions.CONFIG_RECEIVED: {
                 const {
-                    roomsSpriteToken, gracePeriod, helpURL, contactEmail,
+                    roomsSpriteToken, gracePeriod, helpURL, contactEmail, hasPrivacyPolicy,
                     hasTos: hasTOS,
                     tosHtml: tosHTML,
+                    privacyPolicyHtml: privacyPolicyHTML,
                     tileserverURL: tileServerURL,
                 } = camelizeKeys(action.data);
                 const {languages} = action.data;
@@ -43,6 +46,8 @@ export default combineReducers({
                     helpURL,
                     hasTOS,
                     tosHTML,
+                    hasPrivacyPolicy,
+                    privacyPolicyHTML,
                     contactEmail,
                 };
             }

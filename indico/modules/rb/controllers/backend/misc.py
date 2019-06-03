@@ -35,19 +35,24 @@ from indico.web.flask.util import send_file, url_for
 
 class RHConfig(RHRoomBookingBase):
     def _process(self):
-        tos_html = None
         tos_url = legal_settings.get('tos_url')
-        if not tos_url:
-            tos_html = (sanitize_html(legal_settings.get('tos')) or None)
-        has_tos = bool(tos_url or tos_html)
+        tos_html = sanitize_html(legal_settings.get('tos')) or None
+        privacy_policy_url = legal_settings.get('privacy_policy_url')
+        privacy_policy_html = sanitize_html(legal_settings.get('privacy_policy')) or None
+        if tos_url:
+            tos_html = None
+        if privacy_policy_url:
+            privacy_policy_html = None
         return jsonify(rooms_sprite_token=unicode(_cache.get('rooms-sprite-token', '')),
                        languages=get_all_locales(),
                        tileserver_url=rb_settings.get('tileserver_url'),
                        grace_period=rb_settings.get('grace_period'),
                        help_url=config.HELP_URL,
                        contact_email=config.PUBLIC_SUPPORT_EMAIL,
-                       has_tos=has_tos,
-                       tos_html=tos_html)
+                       has_tos=bool(tos_url or tos_html),
+                       tos_html=tos_html,
+                       has_privacy_policy=bool(privacy_policy_url or privacy_policy_html),
+                       privacy_policy_html=privacy_policy_html)
 
 
 class RHUserInfo(RHRoomBookingBase):
