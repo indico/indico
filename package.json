@@ -37,7 +37,6 @@
     "jquery-ui": "^1.12.1",
     "jquery-ui-multiselect-widget": "^2.0.2",
     "jquery.typewatch": "github:dennyferra/typewatch#3.0.0",
-    "jstorage": "github:andris9/jStorage#c0285fa354a5060b97f5d7c4d03bf37841eee67e",
     "leaflet": "^1.5.1",
     "leaflet-draw": "^1.0.4",
     "leaflet.markercluster": "^1.4.1",

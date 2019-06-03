@@ -11,7 +11,6 @@ import 'jquery-colorbox';
 import 'jquery-colorbox/example1/colorbox.css';
 
 import 'jquery-form';
-import 'jstorage';
 
 // moment.js locales
 import 'moment/locale/en-gb';

@@ -62,16 +62,16 @@
             var section = $this.closest('.section');
             $this.next('ul').slideToggle(300);
             section.toggleClass('collapsed');
-            $.jStorage.set(getSectionKey(section), section.hasClass('collapsed'));
+            localStorage.setItem(getSectionKey(section), section.hasClass('collapsed'));
         });
 
         menu.find('.section').each(function() {
             var section = $(this);
-            var collapsed = $.jStorage.get(getSectionKey(section));
+            var collapsed = localStorage.getItem(getSectionKey(section));
             // if the active menu item is in the section, we don't touch it
             if (collapsed !== null && !section.find('.active').length) {
-                section.toggleClass('collapsed', collapsed);
-                section.children('ul').toggle(!collapsed);
+                section.toggleClass('collapsed', collapsed === 'true');
+                section.children('ul').toggle(collapsed === 'false');
             }
         });
     })();
