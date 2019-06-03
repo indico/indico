@@ -7,3 +7,4 @@
 
 import './impersonation';
 import './session_bar';
+import './top_bars';

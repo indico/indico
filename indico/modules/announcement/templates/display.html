@@ -36,44 +36,11 @@
 
 {% macro render_announcements(legacy=false) %}
     {% set announcements = template_hook('global-announcement', as_list=true) %}
-    {% if announcements %}
-        {% for announcement in announcements %}
-            {% if legacy %}
-                {{ render_announcement_legacy(*announcement) }}
-            {% else %}
-                {{ render_announcement_new(*announcement) }}
-            {% endif %}
-        {% endfor %}
-        <script>
-            (() => {
-                function refreshPageHeight() {
-                    let numBars = Array.from(document.querySelectorAll('.announcement-bar'))
-                        .filter(function(e) { return e.style.display === 'flex'; })
-                        .length;
-
-                    if (document.querySelector('.impersonation-bar')) {
-                        numBars++;
-                    }
-
-                    document.body.style.setProperty('--extra-bars', numBars);
-                }
-
-                document.querySelectorAll('.announcement-bar .close-button').forEach(function(elem) {
-                    elem.addEventListener('click', function() {
-                        const bar = elem.closest('.announcement-bar');
-                        window.localStorage.setItem('hideAnnouncement', bar.dataset.hash);
-                        bar.style.display = 'none';
-                        refreshPageHeight();
-                    });
-                });
-
-                document.querySelectorAll('.announcement-bar').forEach(function(elem) {
-                    if (window.localStorage.getItem('hideAnnouncement') !== elem.dataset.hash) {
-                        elem.style.display = 'flex';
-                    }
-                });
-                refreshPageHeight();
-            })();
-        </script>
-    {% endif %}
+    {% for announcement in announcements %}
+        {% if legacy %}
+            {{ render_announcement_legacy(*announcement) }}
+        {% else %}
+            {{ render_announcement_new(*announcement) }}
+        {% endif %}
+    {% endfor %}
 {% endmacro %}

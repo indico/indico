@@ -8,6 +8,7 @@
 import '@babel/polyfill';
 import setup from './setup';
 import 'indico/modules/core/impersonation';
+import 'indico/modules/core/top_bars';
 
 
 setup();

@@ -22,14 +22,6 @@
                 title="{% trans user=message %}Switch back to {{ original_name }}{% endtrans %}"></i>
         </div>
     </div>
-    <script>
-        (() => {
-            const numBars = Array.from(document.querySelectorAll('.announcement-bar'))
-                .filter((e) => e.style.display === 'flex')
-                .length;
-            document.body.style.setProperty('--extra-bars', numBars + 1);
-        })();
-    </script>
 {% endmacro %}
 
 
