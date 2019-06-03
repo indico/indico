@@ -20,9 +20,12 @@ from indico.util.i18n import _
 
 class EventLocationCloner(EventCloner):
     name = 'event_location'
-    friendly_name = _('Location')
-    is_internal = True
+    friendly_name = _('Venue/Room')
     is_default = True
+
+    @property
+    def is_available(self):
+        return self.old_event.has_location_info
 
     def run(self, new_event, cloners, shared_data):
         with db.session.no_autoflush:

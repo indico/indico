@@ -28,6 +28,7 @@ Improvements
 - Add option to include subcategories in upcoming events (:issue:`3449`)
 - Allow event managers to override the name format used in the event
   (:issue:`2455`)
+- Add option to not clone venue/room of an event
 
 Bugfixes
 ^^^^^^^^
