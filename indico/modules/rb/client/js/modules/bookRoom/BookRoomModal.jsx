@@ -292,12 +292,19 @@ class BookRoomModal extends React.Component {
                             <List.Content>
                                 <List.Header>{moment(date).format('dddd, D MMM YYYY')}</List.Header>
                                 <List.Description>
-                                    {dayPreConflicts.map(({reservation: {id, bookedForName, startDt, endDt}}) => (
+                                    {dayPreConflicts.map(({reservation: {
+                                        id,
+                                        bookedForName,
+                                        bookingReason,
+                                        startDt,
+                                        endDt
+                                    }}) => (
                                         <div key={id}>
                                             <a onClick={() => openBookingDetails(id)}>
                                                 <Translate>
                                                     <Param name="time" value={`${serializeTime(startDt)} - ${serializeTime(endDt)} `} />
                                                     {' '}by <Param name="bookedForName" value={bookedForName} />
+                                                    {' '}(<Param name="bookingReason" value={bookingReason} wrapper={<em />} />)
                                                 </Translate>
                                             </a>
                                         </div>
@@ -568,7 +575,7 @@ class BookRoomModal extends React.Component {
                                     )
                                 )}
                             </Form>
-                            {preConflictsExist && this.renderPreConflictMessage()}
+                            {preConflictsExist && !fprops.submitSucceeded && this.renderPreConflictMessage()}
                             {conflictsExist && this.renderBookingConstraints(
                                 Object.values(availability.conflicts),
                                 fprops.submitting || fprops.submitSucceeded
