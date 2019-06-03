@@ -12,7 +12,6 @@ from io import BytesIO
 
 from flask import jsonify, redirect, request, session
 from sqlalchemy.orm import joinedload
-from webargs import fields
 
 from indico.core.config import config
 from indico.core.db.sqlalchemy.util.queries import db_dates_overlap
