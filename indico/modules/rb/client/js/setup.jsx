@@ -5,6 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import _ from 'lodash';
 import ReactDOM from 'react-dom';
 import React from 'react';
 import {Provider} from 'react-redux';
@@ -24,6 +25,10 @@ import '../styles/main.scss';
 
 
 export default function setup(overrides = {}, postReducers = []) {
+    window.addEventListener('scroll', _.debounce(() => {
+        document.body.style.setProperty('--offset', window.pageYOffset);
+    }, 500));
+
     document.addEventListener('DOMContentLoaded', () => {
         const appContainer = document.getElementById('rb-app-container');
         const store = createRBStore(overrides, postReducers);

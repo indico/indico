@@ -9,8 +9,8 @@
 
 .sidebar:global(.inverted.menu) {
     background-color: darken($primary-color, 10%);
-    top: calc(125px + var(--extra-bars, 0) * 50px);
-    height: calc(100% - 125px - var(--extra-bars, 0) * 50px) !important;
+    top: calc(125px + var(--extra-bars, 0) * 50px - var(--offset, 0) * 1px);
+    height: calc(100% - 125px - var(--extra-bars, 0) * 50px + var(--offset, 0) * 1px) !important;
     position: fixed !important;
 
     .bottom-align {
