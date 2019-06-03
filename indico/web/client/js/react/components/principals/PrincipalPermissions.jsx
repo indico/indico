@@ -111,7 +111,7 @@ PrincipalPermissions.propTypes = {
     permissionInfo: PropTypes.shape({
         permissions: PropTypes.object,
         tree: PropTypes.object,
-        default: PropTypes.bool
+        default: PropTypes.string
     }).isRequired,
     /** Whether the 'read_access' permission is used/allowed */
     readAccessAllowed: PropTypes.bool,
