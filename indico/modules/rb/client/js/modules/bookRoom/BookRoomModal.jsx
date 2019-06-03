@@ -288,7 +288,6 @@ class BookRoomModal extends React.Component {
                 <List>
                     {Object.entries(preConflicts).map(([date, dayPreConflicts]) => (
                         <List.Item key={date}>
-                            <List.Icon name="calendar" />
                             <List.Content>
                                 <List.Header>{moment(date).format('dddd, D MMM YYYY')}</List.Header>
                                 <List.Description>
@@ -319,7 +318,7 @@ class BookRoomModal extends React.Component {
 
         return (
             <>
-                <Message color={isPrebooking ? 'yellow' : 'red'} attached icon>
+                <Message color={isPrebooking ? 'yellow' : 'orange'} attached icon>
                     <Icon name="warning circle" />
                     <Message.Content>
                         <Message.Header>

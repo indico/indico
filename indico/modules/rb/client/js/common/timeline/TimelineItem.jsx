@@ -228,7 +228,7 @@ class TimelineItem extends React.Component {
             if (fullyOverlaps(reservations)) {
                 popupMessage = (
                     <div>
-                        <Translate>Fully overlap between two pre-bookings:</Translate>
+                        <Translate>Full overlap between two pre-bookings:</Translate>
                         <List styleName="concurrent-pre-booking-list">
                             {reservations.map(({id, bookingReason, bookedForName, startDt: sDt, endDt: eDt}) => (
                                 <List.Item key={id}>

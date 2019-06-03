@@ -121,7 +121,7 @@ export function getTime(dt) {
 }
 
 /**
- * Check whether there is a fully overlap between two pre-bookings
+ * Check whether there is a full overlap between two pre-bookings
  * @param {Array} preBookings - Array of two overlapping pre-bookings
  * @returns {Boolean} - Whether any of the two pre-bookings is fully overlapped by the other
  */
