@@ -10,6 +10,7 @@ import {combineReducers} from 'redux';
 import {camelizeKeys} from 'indico/utils/case';
 import {requestReducer} from 'indico/utils/redux';
 import * as configActions from './actions';
+import {actions as adminActions} from '../../modules/admin';
 
 
 export const initialState = {
@@ -51,6 +52,8 @@ export default combineReducers({
                     contactEmail,
                 };
             }
+            case adminActions.SETTINGS_RECEIVED:
+                return {...state, tileServerURL: action.data.tileserver_url};
             case configActions.SET_ROOMS_SPRITE_TOKEN:
                 return {...state, roomsSpriteToken: action.token};
             default:
