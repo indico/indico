@@ -22,29 +22,28 @@ import {reducer as linkingReducer} from './common/linking';
 
 import {EXTEND_OVERRIDES} from './actions';
 
-
 function overridesReducer(state = {}, action) {
-    switch (action.type) {
-        case EXTEND_OVERRIDES:
-            return {...state, ...action.overrides};
-        default:
-            return state;
-    }
+  switch (action.type) {
+    case EXTEND_OVERRIDES:
+      return {...state, ...action.overrides};
+    default:
+      return state;
+  }
 }
 
-export default (history) => ({
-    _overrides: overridesReducer,
-    router: connectRouter(history),
-    config: configReducer,
-    user: userReducer,
-    bookRoom: bookRoomReducer,
-    roomList: roomListReducer,
-    map: mapReducer,
-    rooms: roomsReducer,
-    blockings: blockingsReducer,
-    calendar: calendarReducer,
-    landing: landingReducer,
-    bookings: bookingReducer,
-    admin: adminReducer,
-    linking: linkingReducer,
+export default history => ({
+  _overrides: overridesReducer,
+  router: connectRouter(history),
+  config: configReducer,
+  user: userReducer,
+  bookRoom: bookRoomReducer,
+  roomList: roomListReducer,
+  map: mapReducer,
+  rooms: roomsReducer,
+  blockings: blockingsReducer,
+  calendar: calendarReducer,
+  landing: landingReducer,
+  bookings: bookingReducer,
+  admin: adminReducer,
+  linking: linkingReducer,
 });

@@ -10,65 +10,64 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {Card, Placeholder} from 'semantic-ui-react';
 
-
 export default function CardPlaceholder({withImage}) {
-    return (
-        <Card>
-            {withImage && (
-                <Placeholder>
-                    <Placeholder.Image />
-                </Placeholder>
-            )}
-            <Card.Content>
-                <Placeholder>
-                    <Placeholder.Header>
-                        <Placeholder.Line length="very short" />
-                        <Placeholder.Line length="medium" />
-                    </Placeholder.Header>
-                    <Placeholder.Paragraph>
-                        <Placeholder.Line length="short" />
-                    </Placeholder.Paragraph>
-                </Placeholder>
-            </Card.Content>
-            <Card.Content extra>
-                <Placeholder>
-                    <Placeholder.Line length="short" />
-                </Placeholder>
-            </Card.Content>
-        </Card>
-    );
+  return (
+    <Card>
+      {withImage && (
+        <Placeholder>
+          <Placeholder.Image />
+        </Placeholder>
+      )}
+      <Card.Content>
+        <Placeholder>
+          <Placeholder.Header>
+            <Placeholder.Line length="very short" />
+            <Placeholder.Line length="medium" />
+          </Placeholder.Header>
+          <Placeholder.Paragraph>
+            <Placeholder.Line length="short" />
+          </Placeholder.Paragraph>
+        </Placeholder>
+      </Card.Content>
+      <Card.Content extra>
+        <Placeholder>
+          <Placeholder.Line length="short" />
+        </Placeholder>
+      </Card.Content>
+    </Card>
+  );
 }
 
 CardPlaceholder.propTypes = {
-    withImage: PropTypes.bool,
+  withImage: PropTypes.bool,
 };
 
 CardPlaceholder.defaultProps = {
-    withImage: true,
+  withImage: true,
 };
 
 function CardPlaceholderGroup({count, className, itemsPerRow, withImage}) {
-    const props = className ? {className} : {};
-    return (
-        <Card.Group {...props} itemsPerRow={itemsPerRow} stackable>
-            {_.range(0, count).map((i) => (
-                <CardPlaceholder key={i} withImage={withImage} />
-            ))}
-        </Card.Group>
-    );
+  const props = className ? {className} : {};
+  return (
+    <Card.Group {...props} itemsPerRow={itemsPerRow} stackable>
+      {_.range(0, count).map(i => (
+        <CardPlaceholder key={i} withImage={withImage} />
+      ))}
+    </Card.Group>
+  );
 }
 
 CardPlaceholderGroup.propTypes = {
-    count: PropTypes.number.isRequired,
-    className: PropTypes.string,
-    itemsPerRow: PropTypes.number,
-    withImage: PropTypes.bool,
+  count: PropTypes.number.isRequired,
+  className: PropTypes.string,
+  itemsPerRow: PropTypes.number,
+  withImage: PropTypes.bool,
 };
 
 CardPlaceholderGroup.defaultProps = {
-    className: null,
-    itemsPerRow: null,
-    withImage: true,
+  className: null,
+  itemsPerRow: null,
+  withImage: true,
 };
 
 CardPlaceholder.Group = CardPlaceholderGroup;

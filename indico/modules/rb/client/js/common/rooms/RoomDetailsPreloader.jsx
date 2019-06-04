@@ -15,25 +15,34 @@ import {Preloader} from 'indico/react/util';
 import * as roomsActions from './actions';
 import * as roomsSelectors from './selectors';
 
-
 const RoomDetailsPreloader = ({roomId, fetchDetails, children}) => (
-    <Preloader checkCached={state => roomsSelectors.hasDetails(state, {roomId})}
-               action={() => fetchDetails(roomId, true)}
-               dimmer={<Dimmer active page><Loader /></Dimmer>}
-               alwaysLoad>
-        {children}
-    </Preloader>
+  <Preloader
+    checkCached={state => roomsSelectors.hasDetails(state, {roomId})}
+    action={() => fetchDetails(roomId, true)}
+    dimmer={
+      <Dimmer active page>
+        <Loader />
+      </Dimmer>
+    }
+    alwaysLoad
+  >
+    {children}
+  </Preloader>
 );
 
 RoomDetailsPreloader.propTypes = {
-    roomId: PropTypes.number.isRequired,
-    fetchDetails: PropTypes.func.isRequired,
-    children: PropTypes.func.isRequired,
+  roomId: PropTypes.number.isRequired,
+  fetchDetails: PropTypes.func.isRequired,
+  children: PropTypes.func.isRequired,
 };
 
 export default connect(
-    null,
-    dispatch => bindActionCreators({
+  null,
+  dispatch =>
+    bindActionCreators(
+      {
         fetchDetails: roomsActions.fetchDetails,
-    }, dispatch)
+      },
+      dispatch
+    )
 )(RoomDetailsPreloader);

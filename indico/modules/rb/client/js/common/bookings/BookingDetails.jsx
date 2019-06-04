@@ -12,13 +12,30 @@ import PropTypes from 'prop-types';
 import {Form as FinalForm} from 'react-final-form';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
-import {Button, Confirm, Form, Grid, Header, Icon, Label, List, Message, Modal, Popup} from 'semantic-ui-react';
+import {
+  Button,
+  Confirm,
+  Form,
+  Grid,
+  Header,
+  Icon,
+  Label,
+  List,
+  Message,
+  Modal,
+  Popup,
+} from 'semantic-ui-react';
 
 import {toMoment, serializeDate} from 'indico/utils/date';
 import {Param, Translate} from 'indico/react/i18n';
 import {FinalTextArea} from 'indico/react/forms';
 import {DailyTimelineContent, TimelineLegend} from '../timeline';
-import {getRecurrenceInfo, PopupParam, getOccurrenceTypes, transformToLegendLabels} from '../../util';
+import {
+  getRecurrenceInfo,
+  PopupParam,
+  getOccurrenceTypes,
+  transformToLegendLabels,
+} from '../../util';
 import RoomBasicDetails from '../../components/RoomBasicDetails';
 import RoomKeyLocation from '../../components/RoomKeyLocation';
 import TimeInformation from '../../components/TimeInformation';
@@ -29,430 +46,508 @@ import * as bookingsActions from './actions';
 
 import './BookingDetails.module.scss';
 
-
 class BookingDetails extends React.Component {
-    static propTypes = {
-        onClose: PropTypes.func,
-        editButton: PropTypes.func.isRequired,
-        booking: PropTypes.object.isRequired,
-        bookingStateChangeInProgress: PropTypes.bool.isRequired,
-        actions: PropTypes.exact({
-            deleteBooking: PropTypes.func.isRequired,
-            changeBookingState: PropTypes.func.isRequired,
-            openBookingDetails: PropTypes.func.isRequired,
-        }).isRequired,
-    };
+  static propTypes = {
+    onClose: PropTypes.func,
+    editButton: PropTypes.func.isRequired,
+    booking: PropTypes.object.isRequired,
+    bookingStateChangeInProgress: PropTypes.bool.isRequired,
+    actions: PropTypes.exact({
+      deleteBooking: PropTypes.func.isRequired,
+      changeBookingState: PropTypes.func.isRequired,
+      openBookingDetails: PropTypes.func.isRequired,
+    }).isRequired,
+  };
 
-    static defaultProps = {
-        onClose: () => {},
-    };
+  static defaultProps = {
+    onClose: () => {},
+  };
 
-    state = {
-        occurrencesVisible: false,
-        activeConfirmation: null,
-    };
+  state = {
+    occurrencesVisible: false,
+    activeConfirmation: null,
+  };
 
-    showOccurrences = () => {
-        this.setState({occurrencesVisible: true});
-    };
+  showOccurrences = () => {
+    this.setState({occurrencesVisible: true});
+  };
 
-    hideOccurrences = () => {
-        this.setState({occurrencesVisible: false});
-    };
+  hideOccurrences = () => {
+    this.setState({occurrencesVisible: false});
+  };
 
-    renderBookedFor = (bookedForUser) => {
-        const {fullName: bookedForName, email: bookedForEmail, phone: bookedForPhone} = bookedForUser;
-        return (
+  renderBookedFor = bookedForUser => {
+    const {fullName: bookedForName, email: bookedForEmail, phone: bookedForPhone} = bookedForUser;
+    return (
+      <>
+        <Header>
+          <Icon name="user" />
+          <Translate>Booked for</Translate>
+        </Header>
+        <div>{bookedForName}</div>
+        {bookedForPhone && (
+          <div>
+            <Icon name="phone" />
+            {bookedForPhone}
+          </div>
+        )}
+        {bookedForEmail && (
+          <div>
+            <Icon name="mail" />
+            {bookedForEmail}
+          </div>
+        )}
+      </>
+    );
+  };
+
+  renderReason = reason => (
+    <Message info icon styleName="message-icon">
+      <Icon name="info" />
+      <Message.Content>
+        <Message.Header>
+          <Translate>Booking reason</Translate>
+        </Message.Header>
+        {reason}
+      </Message.Content>
+    </Message>
+  );
+
+  _getRowSerializer = day => {
+    const {
+      booking: {room},
+    } = this.props;
+    return ({bookings, cancellations, rejections, other}) => ({
+      availability: {
+        bookings: bookings[day].map(candidate => ({...candidate, bookable: false})) || [],
+        cancellations: cancellations[day] || [],
+        rejections: rejections[day] || [],
+        other: other[day] || [],
+      },
+      label: moment(day).format('L'),
+      key: day,
+      room,
+    });
+  };
+
+  renderTimeline = (occurrences, dateRange) => {
+    const {booking} = this.props;
+    const rows = dateRange.map(day => this._getRowSerializer(day)(occurrences));
+    return (
+      <DailyTimelineContent
+        rows={rows}
+        fixedHeight={rows.length > 1 ? '70vh' : null}
+        booking={booking}
+        rowActions={{occurrence: true}}
+      />
+    );
+  };
+
+  renderBookingHistory = (editLogs, createdOn, createdByUser) => {
+    if (createdByUser) {
+      const {fullName: createdBy} = createdByUser;
+      editLogs = [
+        ...editLogs,
+        {
+          id: 'created',
+          timestamp: createdOn,
+          info: ['Booking created'],
+          userName: createdBy,
+        },
+      ];
+    }
+    const items = editLogs.map(log => {
+      const {id, timestamp, info, userName} = log;
+      const basicInfo = <strong>{info[0]}</strong>;
+      const details = info[1] ? info[1] : null;
+      const logDate = serializeDate(toMoment(timestamp), 'L');
+      const popupContent = <span styleName="popup-center">{details}</span>;
+      const wrapper = details ? <PopupParam content={popupContent} /> : <span />;
+      return (
+        <List.Item key={id}>
+          <Translate>
+            <Param name="date" value={logDate} wrapper={<span styleName="log-date" />} />
+            {' - '}
+            <Param name="info" wrapper={wrapper} value={basicInfo} /> by{' '}
+            <Param name="user" value={userName} />
+          </Translate>
+        </List.Item>
+      );
+    });
+    return (
+      !!items.length && (
+        <div styleName="booking-logs">
+          <Header>
+            <Translate>Booking history</Translate>
+          </Header>
+          <List divided styleName="log-list">
+            {items}
+          </List>
+        </div>
+      )
+    );
+  };
+
+  renderMessageAfterSplitting = newBookingId => {
+    if (newBookingId === undefined) {
+      return null;
+    }
+
+    const {
+      actions: {openBookingDetails},
+    } = this.props;
+    const link = <a onClick={() => openBookingDetails(newBookingId)} />;
+    return (
+      <Message color="green">
+        <Message.Header>
+          <Translate>The booking has been successfully split.</Translate>
+        </Message.Header>
+        <Translate>
+          You can consult your new booking{' '}
+          <Param name="link" wrapper={link}>
+            here
+          </Param>
+          .
+        </Translate>
+      </Message>
+    );
+  };
+
+  renderBookingStatus = () => {
+    const {
+      booking: {isPending, isAccepted, isCancelled, isRejected, rejectionReason},
+    } = this.props;
+    let color, status, icon, message;
+
+    if (isPending) {
+      icon = <Icon name="wait" />;
+      color = 'yellow';
+      status = Translate.string('Pending Confirmation');
+      message = Translate.string('This booking is subject to acceptance by the room owner');
+    } else if (isCancelled) {
+      icon = <Icon name="cancel" />;
+      color = 'grey';
+      status = Translate.string('Cancelled');
+      message = (
+        <>
+          <Translate>The booking was cancelled.</Translate>
+          {!!rejectionReason && (
             <>
-                <Header>
-                    <Icon name="user" /><Translate>Booked for</Translate>
-                </Header>
-                <div>{bookedForName}</div>
-                {bookedForPhone && <div><Icon name="phone" />{bookedForPhone}</div>}
-                {bookedForEmail && <div><Icon name="mail" />{bookedForEmail}</div>}
+              <br />
+              <Translate>
+                Reason:{' '}
+                <Param name="rejectionReason" value={rejectionReason} wrapper={<strong />} />
+              </Translate>
             </>
-        );
-    };
+          )}
+        </>
+      );
+    } else if (isRejected) {
+      icon = <Icon name="calendar minus" />;
+      color = 'red';
+      status = Translate.string('Rejected');
+      message = (
+        <>
+          <Translate>The booking was rejected.</Translate>
+          {!!rejectionReason && (
+            <>
+              <br />
+              <Translate>
+                Reason:{' '}
+                <Param name="rejectionReason" value={rejectionReason} wrapper={<strong />} />
+              </Translate>
+            </>
+          )}
+        </>
+      );
+    } else if (isAccepted) {
+      icon = <Icon name="checkmark" />;
+      color = 'green';
+      status = Translate.string('Accepted');
+      message = Translate.string('The booking was accepted');
+    }
 
-    renderReason = (reason) => (
-        <Message info icon styleName="message-icon">
-            <Icon name="info" />
-            <Message.Content>
-                <Message.Header>
-                    <Translate>Booking reason</Translate>
-                </Message.Header>
-                {reason}
-            </Message.Content>
-        </Message>
+    const label = (
+      <Label color={color}>
+        {icon}
+        {status}
+      </Label>
     );
 
-    _getRowSerializer = (day) => {
-        const {booking: {room}} = this.props;
-        return ({bookings, cancellations, rejections, other}) => ({
-            availability: {
-                bookings: bookings[day].map((candidate) => ({...candidate, bookable: false})) || [],
-                cancellations: cancellations[day] || [],
-                rejections: rejections[day] || [],
-                other: other[day] || [],
-            },
-            label: moment(day).format('L'),
-            key: day,
-            room
-        });
+    return <Popup trigger={label} content={message} position="bottom center" />;
+  };
+
+  renderDeleteButton = () => {
+    const {activeConfirmation} = this.state;
+    const {bookingStateChangeInProgress} = this.props;
+    return (
+      <>
+        <Button
+          icon="trash"
+          onClick={() => this.showConfirm('delete')}
+          disabled={bookingStateChangeInProgress}
+          negative
+          circular
+        />
+        <Confirm
+          header={Translate.string('Confirm deletion')}
+          content={Translate.string('Are you sure you want to delete this booking?')}
+          confirmButton={<Button content={Translate.string('Delete')} negative />}
+          cancelButton={Translate.string('Cancel')}
+          open={activeConfirmation === 'delete'}
+          onCancel={this.hideConfirm}
+          onConfirm={this.deleteBooking}
+        />
+      </>
+    );
+  };
+
+  deleteBooking = () => {
+    const {
+      actions: {deleteBooking},
+      booking: {id},
+      onClose,
+    } = this.props;
+    deleteBooking(id);
+    onClose();
+    this.hideConfirm();
+  };
+
+  hideConfirm = () => {
+    this.setState({activeConfirmation: null});
+  };
+
+  showConfirm = type => {
+    this.setState({activeConfirmation: type});
+  };
+
+  changeState = (action, data = {}) => {
+    const {
+      booking: {id},
+      actions: {changeBookingState},
+    } = this.props;
+    this.setState({actionInProgress: action});
+    return changeBookingState(id, action, data).then(() => {
+      this.setState({actionInProgress: null});
+    });
+  };
+
+  getLegendLabels = availability => {
+    const inactiveTypes = [
+      'blockings',
+      'overridableBlockings',
+      'nonbookablePeriods',
+      'unbookableHours',
+    ];
+    const occurrenceTypes = getOccurrenceTypes(availability);
+    return transformToLegendLabels(occurrenceTypes, inactiveTypes);
+  };
+
+  renderActionButtons = (canCancel, canReject, showAccept) => {
+    const {bookingStateChangeInProgress} = this.props;
+    const {actionInProgress, activeConfirmation} = this.state;
+    const rejectButton = (
+      <Button
+        type="button"
+        icon="remove circle"
+        color="red"
+        size="small"
+        loading={actionInProgress === 'reject' && bookingStateChangeInProgress}
+        disabled={bookingStateChangeInProgress}
+        content={Translate.string('Reject booking')}
+      />
+    );
+
+    const renderForm = ({
+      handleSubmit,
+      hasValidationErrors,
+      submitSucceeded,
+      submitting,
+      pristine,
+    }) => {
+      return (
+        <Form styleName="rejection-form" onSubmit={handleSubmit}>
+          <FinalTextArea
+            name="reason"
+            placeholder={Translate.string('Provide the rejection reason')}
+            disabled={submitSucceeded}
+            rows={2}
+            required
+          />
+          <Button
+            type="submit"
+            disabled={submitting || pristine || hasValidationErrors || submitSucceeded}
+            loading={submitting}
+            floated="right"
+            primary
+          >
+            <Translate>Reject</Translate>
+          </Button>
+        </Form>
+      );
     };
 
-    renderTimeline = (occurrences, dateRange) => {
-        const {booking} = this.props;
-        const rows = dateRange.map((day) => this._getRowSerializer(day)(occurrences));
-        return (
-            <DailyTimelineContent rows={rows}
-                                  fixedHeight={rows.length > 1 ? '70vh' : null}
-                                  booking={booking}
-                                  rowActions={{occurrence: true}} />
-        );
+    return (
+      <Modal.Actions>
+        {canCancel && (
+          <>
+            <Button
+              type="button"
+              icon="cancel"
+              size="small"
+              onClick={() => this.showConfirm('cancel')}
+              loading={actionInProgress === 'cancel' && bookingStateChangeInProgress}
+              disabled={bookingStateChangeInProgress}
+              content={Translate.string('Cancel booking')}
+            />
+            <Confirm
+              header={Translate.string('Confirm cancellation')}
+              content={Translate.string(
+                'Are you sure you want to cancel this booking? ' +
+                  'This will cancel future occurrences of this booking.'
+              )}
+              confirmButton={<Button content={Translate.string('Cancel booking')} negative />}
+              cancelButton={Translate.string('Close')}
+              open={activeConfirmation === 'cancel'}
+              onCancel={this.hideConfirm}
+              onConfirm={() => {
+                this.changeState('cancel');
+                this.hideConfirm();
+              }}
+            />
+          </>
+        )}
+        {canReject && (
+          <Popup trigger={rejectButton} position="bottom center" on="click">
+            <FinalForm onSubmit={data => this.changeState('reject', data)} render={renderForm} />
+          </Popup>
+        )}
+        {showAccept && (
+          <Button
+            type="button"
+            icon="check circle"
+            color="green"
+            size="small"
+            onClick={() => this.changeState('approve')}
+            loading={actionInProgress === 'approve' && bookingStateChangeInProgress}
+            disabled={bookingStateChangeInProgress}
+            content={Translate.string('Accept booking')}
+          />
+        )}
+      </Modal.Actions>
+    );
+  };
+
+  render() {
+    const {occurrencesVisible} = this.state;
+    const {
+      onClose,
+      editButton,
+      bookingStateChangeInProgress,
+      booking: {
+        startDt,
+        endDt,
+        occurrences,
+        dateRange,
+        repetition,
+        room,
+        bookedForUser,
+        bookingReason,
+        editLogs,
+        createdDt,
+        createdByUser,
+        isCancelled,
+        isRejected,
+        canDelete,
+        canCancel,
+        canReject,
+        canAccept,
+        canEdit,
+        isAccepted,
+        newBookingId,
+        isLinkedToObject,
+        link,
+      },
+    } = this.props;
+    const dates = {startDate: startDt, endDate: endDt};
+    const times = {
+      startTime: moment(startDt).format('HH:mm'),
+      endTime: moment(endDt).format('HH:mm'),
     };
-
-    renderBookingHistory = (editLogs, createdOn, createdByUser) => {
-        if (createdByUser) {
-            const {fullName: createdBy} = createdByUser;
-            editLogs = [...editLogs, {
-                id: 'created',
-                timestamp: createdOn,
-                info: ['Booking created'],
-                userName: createdBy
-            }];
-        }
-        const items = editLogs.map((log) => {
-            const {id, timestamp, info, userName} = log;
-            const basicInfo = <strong>{info[0]}</strong>;
-            const details = (info[1] ? info[1] : null);
-            const logDate = serializeDate(toMoment(timestamp), 'L');
-            const popupContent = <span styleName="popup-center">{details}</span>;
-            const wrapper = (details ? <PopupParam content={popupContent} /> : <span />);
-            return (
-                <List.Item key={id}>
-                    <Translate>
-                        <Param name="date" value={logDate} wrapper={<span styleName="log-date" />} />
-                        {' - '}
-                        <Param name="info" wrapper={wrapper} value={basicInfo} /> by
-                        {' '}
-                        <Param name="user" value={userName} />
-                    </Translate>
-                </List.Item>
-            );
-        });
-        return !!items.length && (
-            <div styleName="booking-logs">
-                <Header><Translate>Booking history</Translate></Header>
-                <List divided styleName="log-list">{items}</List>
-            </div>
-        );
-    };
-
-    renderMessageAfterSplitting = (newBookingId) => {
-        if (newBookingId === undefined) {
-            return null;
-        }
-
-        const {actions: {openBookingDetails}} = this.props;
-        const link = <a onClick={() => openBookingDetails(newBookingId)} />;
-        return (
-            <Message color="green">
-                <Message.Header>
-                    <Translate>
-                        The booking has been successfully split.
-                    </Translate>
-                </Message.Header>
-                <Translate>
-                    You can consult your new booking <Param name="link" wrapper={link}>here</Param>.
-                </Translate>
-            </Message>
-        );
-    };
-
-    renderBookingStatus = () => {
-        const {booking: {isPending, isAccepted, isCancelled, isRejected, rejectionReason}} = this.props;
-        let color, status, icon, message;
-
-        if (isPending) {
-            icon = <Icon name="wait" />;
-            color = 'yellow';
-            status = Translate.string('Pending Confirmation');
-            message = Translate.string('This booking is subject to acceptance by the room owner');
-        } else if (isCancelled) {
-            icon = <Icon name="cancel" />;
-            color = 'grey';
-            status = Translate.string('Cancelled');
-            message = (
+    const recurrence = getRecurrenceInfo(repetition);
+    const showAccept = canAccept && !isAccepted;
+    const showActionButtons = !isCancelled && !isRejected && (canCancel || canReject || showAccept);
+    const activeBookings = _.omitBy(occurrences.bookings, value => _.isEmpty(value));
+    const occurrenceCount = Object.keys(activeBookings).length;
+    return (
+      <>
+        <Modal onClose={onClose} size="large" closeIcon open>
+          <Modal.Header styleName="booking-modal-header">
+            <span styleName="header-text">
+              <Translate>Booking Details</Translate>
+            </span>
+            <span styleName="booking-status">{this.renderBookingStatus()}</span>
+            <span>
+              {canEdit && editButton({disabled: bookingStateChangeInProgress})}
+              {canDelete && this.renderDeleteButton()}
+            </span>
+          </Modal.Header>
+          <Modal.Content>
+            <Grid columns={2}>
+              <Grid.Column>
+                <RoomBasicDetails room={room} />
+                <RoomKeyLocation room={room} />
+                <TimeInformation
+                  recurrence={recurrence}
+                  dates={dates}
+                  timeSlot={times}
+                  onClickOccurrences={this.showOccurrences}
+                  occurrenceCount={occurrenceCount}
+                />
+              </Grid.Column>
+              <Grid.Column>
                 <>
-                    <Translate>
-                        The booking was cancelled.
-                    </Translate>
-                    {!!rejectionReason && (
-                        <>
-                            <br />
-                            <Translate>
-                                Reason: <Param name="rejectionReason" value={rejectionReason} wrapper={<strong />} />
-                            </Translate>
-                        </>
-                    )}
+                  {bookedForUser && this.renderBookedFor(bookedForUser)}
+                  {this.renderReason(bookingReason)}
+                  {isLinkedToObject && (
+                    <LazyBookingObjectLink type={_.camelCase(link.type)} id={link.id} />
+                  )}
+                  {this.renderBookingHistory(editLogs, createdDt, createdByUser)}
+                  {this.renderMessageAfterSplitting(newBookingId)}
                 </>
-            );
-        } else if (isRejected) {
-            icon = <Icon name="calendar minus" />;
-            color = 'red';
-            status = Translate.string('Rejected');
-            message = (
-                <>
-                    <Translate>
-                        The booking was rejected.
-                    </Translate>
-                    {!!rejectionReason && (
-                        <>
-                            <br />
-                            <Translate>
-                                Reason: <Param name="rejectionReason" value={rejectionReason} wrapper={<strong />} />
-                            </Translate>
-                        </>
-                    )}
-                </>
-            );
-        } else if (isAccepted) {
-            icon = <Icon name="checkmark" />;
-            color = 'green';
-            status = Translate.string('Accepted');
-            message = Translate.string('The booking was accepted');
-        }
-
-        const label = (
-            <Label color={color}>
-                {icon}
-                {status}
-            </Label>
-        );
-
-        return (
-            <Popup trigger={label}
-                   content={message}
-                   position="bottom center" />
-        );
-    };
-
-    renderDeleteButton = () => {
-        const {activeConfirmation} = this.state;
-        const {bookingStateChangeInProgress} = this.props;
-        return (
-            <>
-                <Button icon="trash"
-                        onClick={() => this.showConfirm('delete')}
-                        disabled={bookingStateChangeInProgress}
-                        negative
-                        circular />
-                <Confirm header={Translate.string('Confirm deletion')}
-                         content={Translate.string('Are you sure you want to delete this booking?')}
-                         confirmButton={<Button content={Translate.string('Delete')} negative />}
-                         cancelButton={Translate.string('Cancel')}
-                         open={activeConfirmation === 'delete'}
-                         onCancel={this.hideConfirm}
-                         onConfirm={this.deleteBooking} />
-            </>
-        );
-    };
-
-    deleteBooking = () => {
-        const {actions: {deleteBooking}, booking: {id}, onClose} = this.props;
-        deleteBooking(id);
-        onClose();
-        this.hideConfirm();
-    };
-
-    hideConfirm = () => {
-        this.setState({activeConfirmation: null});
-    };
-
-    showConfirm = (type) => {
-        this.setState({activeConfirmation: type});
-    };
-
-    changeState = (action, data = {}) => {
-        const {booking: {id}, actions: {changeBookingState}} = this.props;
-        this.setState({actionInProgress: action});
-        return changeBookingState(id, action, data).then(() => {
-            this.setState({actionInProgress: null});
-        });
-    };
-
-    getLegendLabels = (availability) => {
-        const inactiveTypes = ['blockings', 'overridableBlockings', 'nonbookablePeriods', 'unbookableHours'];
-        const occurrenceTypes = getOccurrenceTypes(availability);
-        return transformToLegendLabels(occurrenceTypes, inactiveTypes);
-    };
-
-    renderActionButtons = (canCancel, canReject, showAccept) => {
-        const {bookingStateChangeInProgress} = this.props;
-        const {actionInProgress, activeConfirmation} = this.state;
-        const rejectButton = (
-            <Button type="button"
-                    icon="remove circle"
-                    color="red"
-                    size="small"
-                    loading={actionInProgress === 'reject' && bookingStateChangeInProgress}
-                    disabled={bookingStateChangeInProgress}
-                    content={Translate.string('Reject booking')} />
-        );
-
-        const renderForm = ({handleSubmit, hasValidationErrors, submitSucceeded, submitting, pristine}) => {
-            return (
-                <Form styleName="rejection-form" onSubmit={handleSubmit}>
-                    <FinalTextArea name="reason"
-                                   placeholder={Translate.string('Provide the rejection reason')}
-                                   disabled={submitSucceeded}
-                                   rows={2}
-                                   required />
-                    <Button type="submit"
-                            disabled={submitting || pristine || hasValidationErrors || submitSucceeded}
-                            loading={submitting}
-                            floated="right"
-                            primary>
-                        <Translate>Reject</Translate>
-                    </Button>
-                </Form>
-            );
-        };
-
-        return (
-            <Modal.Actions>
-                {canCancel && (
-                    <>
-                        <Button type="button"
-                                icon="cancel"
-                                size="small"
-                                onClick={() => this.showConfirm('cancel')}
-                                loading={actionInProgress === 'cancel' && bookingStateChangeInProgress}
-                                disabled={bookingStateChangeInProgress}
-                                content={Translate.string('Cancel booking')} />
-                        <Confirm header={Translate.string('Confirm cancellation')}
-                                 content={Translate.string('Are you sure you want to cancel this booking? ' +
-                                                           'This will cancel future occurrences of this booking.')}
-                                 confirmButton={<Button content={Translate.string('Cancel booking')} negative />}
-                                 cancelButton={Translate.string('Close')}
-                                 open={activeConfirmation === 'cancel'}
-                                 onCancel={this.hideConfirm}
-                                 onConfirm={() => {
-                                     this.changeState('cancel');
-                                     this.hideConfirm();
-                                 }} />
-                    </>
-                )}
-                {canReject && (
-                    <Popup trigger={rejectButton}
-                           position="bottom center"
-                           on="click">
-                        <FinalForm onSubmit={(data) => this.changeState('reject', data)}
-                                   render={renderForm} />
-                    </Popup>
-                )}
-                {showAccept && (
-                    <Button type="button"
-                            icon="check circle"
-                            color="green"
-                            size="small"
-                            onClick={() => this.changeState('approve')}
-                            loading={actionInProgress === 'approve' && bookingStateChangeInProgress}
-                            disabled={bookingStateChangeInProgress}
-                            content={Translate.string('Accept booking')} />
-                )}
-            </Modal.Actions>
-        );
-    };
-
-    render() {
-        const {occurrencesVisible} = this.state;
-        const {
-            onClose,
-            editButton,
-            bookingStateChangeInProgress,
-            booking: {
-                startDt, endDt, occurrences, dateRange, repetition, room, bookedForUser, bookingReason, editLogs,
-                createdDt, createdByUser, isCancelled, isRejected, canDelete, canCancel, canReject, canAccept, canEdit,
-                isAccepted, newBookingId, isLinkedToObject, link
-            },
-        } = this.props;
-        const dates = {startDate: startDt, endDate: endDt};
-        const times = {startTime: moment(startDt).format('HH:mm'), endTime: moment(endDt).format('HH:mm')};
-        const recurrence = getRecurrenceInfo(repetition);
-        const showAccept = canAccept && !isAccepted;
-        const showActionButtons = (!isCancelled && !isRejected && (canCancel || canReject || showAccept));
-        const activeBookings = _.omitBy(occurrences.bookings, (value) => _.isEmpty(value));
-        const occurrenceCount = Object.keys(activeBookings).length;
-        return (
-            <>
-                <Modal onClose={onClose} size="large" closeIcon open>
-                    <Modal.Header styleName="booking-modal-header">
-                        <span styleName="header-text">
-                            <Translate>Booking Details</Translate>
-                        </span>
-                        <span styleName="booking-status">
-                            {this.renderBookingStatus()}
-                        </span>
-                        <span>
-                            {canEdit && editButton({disabled: bookingStateChangeInProgress})}
-                            {canDelete && this.renderDeleteButton()}
-                        </span>
-                    </Modal.Header>
-                    <Modal.Content>
-                        <Grid columns={2}>
-                            <Grid.Column>
-                                <RoomBasicDetails room={room} />
-                                <RoomKeyLocation room={room} />
-                                <TimeInformation recurrence={recurrence}
-                                                 dates={dates}
-                                                 timeSlot={times}
-                                                 onClickOccurrences={this.showOccurrences}
-                                                 occurrenceCount={occurrenceCount} />
-                            </Grid.Column>
-                            <Grid.Column>
-                                <>
-                                    {bookedForUser && this.renderBookedFor(bookedForUser)}
-                                    {this.renderReason(bookingReason)}
-                                    {isLinkedToObject && (
-                                        <LazyBookingObjectLink type={_.camelCase(link.type)} id={link.id} />
-                                    )}
-                                    {this.renderBookingHistory(editLogs, createdDt, createdByUser)}
-                                    {this.renderMessageAfterSplitting(newBookingId)}
-                                </>
-                            </Grid.Column>
-                        </Grid>
-                    </Modal.Content>
-                    {showActionButtons && this.renderActionButtons(canCancel, canReject, showAccept)}
-                </Modal>
-                <Modal open={occurrencesVisible}
-                       onClose={this.hideOccurrences}
-                       size="large"
-                       closeIcon>
-                    <Modal.Header className="legend-header">
-                        <Translate>Occurrences</Translate>
-                        <Popup trigger={<Icon name="info circle" className="legend-info-icon" />}
-                               content={<TimelineLegend labels={this.getLegendLabels(occurrences)} compact />} />
-                    </Modal.Header>
-                    <Modal.Content>
-                        {this.renderTimeline(occurrences, dateRange)}
-                    </Modal.Content>
-                </Modal>
-            </>
-        );
-    }
+              </Grid.Column>
+            </Grid>
+          </Modal.Content>
+          {showActionButtons && this.renderActionButtons(canCancel, canReject, showAccept)}
+        </Modal>
+        <Modal open={occurrencesVisible} onClose={this.hideOccurrences} size="large" closeIcon>
+          <Modal.Header className="legend-header">
+            <Translate>Occurrences</Translate>
+            <Popup
+              trigger={<Icon name="info circle" className="legend-info-icon" />}
+              content={<TimelineLegend labels={this.getLegendLabels(occurrences)} compact />}
+            />
+          </Modal.Header>
+          <Modal.Content>{this.renderTimeline(occurrences, dateRange)}</Modal.Content>
+        </Modal>
+      </>
+    );
+  }
 }
 
 export default connect(
-    (state) => ({
-        bookingStateChangeInProgress: bookingsSelectors.isBookingChangeInProgress(state),
-    }),
-    (dispatch) => ({
-        actions: bindActionCreators({
-            changeBookingState: bookingsActions.changeBookingState,
-            deleteBooking: bookingsActions.deleteBooking,
-            openBookingDetails: bookingId => modalActions.openModal('booking-details', bookingId, null, true),
-        }, dispatch)
-    }),
+  state => ({
+    bookingStateChangeInProgress: bookingsSelectors.isBookingChangeInProgress(state),
+  }),
+  dispatch => ({
+    actions: bindActionCreators(
+      {
+        changeBookingState: bookingsActions.changeBookingState,
+        deleteBooking: bookingsActions.deleteBooking,
+        openBookingDetails: bookingId =>
+          modalActions.openModal('booking-details', bookingId, null, true),
+      },
+      dispatch
+    ),
+  })
 )(BookingDetails);

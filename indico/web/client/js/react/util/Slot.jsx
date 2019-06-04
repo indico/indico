@@ -8,28 +8,27 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-
 export default class Slot extends React.Component {
-    static split(children) {
-        if (React.Children.toArray(children).every((e) => (React.isValidElement(e) && e.type === Slot))) {
-            const result = {};
-            React.Children.forEach(children, (child) => {
-                result[child.props.name] = child.props.children;
-            });
-            return result;
-        } else {
-            return {
-                content: children
-            };
-        }
+  static split(children) {
+    if (React.Children.toArray(children).every(e => React.isValidElement(e) && e.type === Slot)) {
+      const result = {};
+      React.Children.forEach(children, child => {
+        result[child.props.name] = child.props.children;
+      });
+      return result;
+    } else {
+      return {
+        content: children,
+      };
     }
+  }
 
-    static propTypes = {
-        // eslint-disable-next-line react/no-unused-prop-types
-        name: PropTypes.string
-    };
+  static propTypes = {
+    // eslint-disable-next-line react/no-unused-prop-types
+    name: PropTypes.string,
+  };
 
-    static defaultProps = {
-        name: 'content'
-    };
+  static defaultProps = {
+    name: 'content',
+  };
 }

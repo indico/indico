@@ -6,10 +6,10 @@
 // LICENSE file for more details.
 
 export const initialDatePickerState = {
-    selectedDate: null,
-    dateRange: [],
-    minHour: 6,
-    maxHour: 22,
-    hourStep: 2,
-    mode: 'days'
+  selectedDate: null,
+  dateRange: [],
+  minHour: 6,
+  maxHour: 22,
+  hourStep: 2,
+  mode: 'days',
 };

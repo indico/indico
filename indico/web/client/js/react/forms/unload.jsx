@@ -11,60 +11,55 @@ import {Prompt} from 'react-router';
 import {FormSpy} from 'react-final-form';
 import {Translate} from '../../react/i18n';
 
-
 const UnloadPrompt = ({active, router, message}) => {
-    if (!message) {
-        message = Translate.string('Are you sure you want to leave this page without saving?');
+  if (!message) {
+    message = Translate.string('Are you sure you want to leave this page without saving?');
+  }
+
+  useEffect(() => {
+    if (!active) {
+      return;
     }
 
-    useEffect(() => {
-        if (!active) {
-            return;
-        }
+    const onBeforeUnload = e => {
+      e.preventDefault();
+      e.returnValue = message;
+    };
 
-        const onBeforeUnload = e => {
-            e.preventDefault();
-            e.returnValue = message;
-        };
+    window.addEventListener('beforeunload', onBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', onBeforeUnload);
+    };
+  }, [active, message]);
 
-        window.addEventListener('beforeunload', onBeforeUnload);
-        return () => {
-            window.removeEventListener('beforeunload', onBeforeUnload);
-        };
-    }, [active, message]);
-
-    return router ? <Prompt when={active} message={message} /> : null;
+  return router ? <Prompt when={active} message={message} /> : null;
 };
 
 UnloadPrompt.propTypes = {
-    active: PropTypes.bool.isRequired,
-    router: PropTypes.bool,
-    message: PropTypes.string,
+  active: PropTypes.bool.isRequired,
+  router: PropTypes.bool,
+  message: PropTypes.string,
 };
 
 UnloadPrompt.defaultProps = {
-    message: null,
-    router: true,
+  message: null,
+  router: true,
 };
-
 
 export default React.memo(UnloadPrompt);
 
-
 export const FinalUnloadPrompt = ({router, message}) => (
-    <FormSpy subscription={{dirty: true}}>
-        {({dirty}) => (
-            <UnloadPrompt active={dirty} router={router} message={message} />
-        )}
-    </FormSpy>
+  <FormSpy subscription={{dirty: true}}>
+    {({dirty}) => <UnloadPrompt active={dirty} router={router} message={message} />}
+  </FormSpy>
 );
 
 FinalUnloadPrompt.propTypes = {
-    router: PropTypes.bool,
-    message: PropTypes.string,
+  router: PropTypes.bool,
+  message: PropTypes.string,
 };
 
 FinalUnloadPrompt.defaultProps = {
-    message: null,
-    router: true,
+  message: null,
+  router: true,
 };

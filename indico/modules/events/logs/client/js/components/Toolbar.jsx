@@ -12,25 +12,24 @@ import PropTypes from 'prop-types';
 import Filter from '../containers/Filter';
 import SearchBox from '../containers/SearchBox';
 
-
 class Toolbar extends React.Component {
-    static propTypes = {
-        realms: PropTypes.object.isRequired,
-    };
+  static propTypes = {
+    realms: PropTypes.object.isRequired,
+  };
 
-    render() {
-        const {realms} = this.props;
-        return (
-            <div className="toolbars">
-                <Filter realms={realms} />
-                <SearchBox />
-            </div>
-        );
-    }
+  render() {
+    const {realms} = this.props;
+    return (
+      <div className="toolbars">
+        <Filter realms={realms} />
+        <SearchBox />
+      </div>
+    );
+  }
 }
 
 const mapStateToProps = ({staticData}) => ({
-    realms: staticData.realms,
+  realms: staticData.realms,
 });
 
 export default connect(mapStateToProps)(Toolbar);

@@ -16,49 +16,44 @@ import {initialTimelineState} from './reducers';
 import {actions as filtersActions} from '../../common/filters';
 import {queryStringRules as queryFilterRules} from '../../common/roomSearch';
 
-
 export const rules = {
-    timeline: {
-        validator: v.isBoolean(),
-        sanitizer: v.toBoolean(),
-        stateField: boolStateField('timeline.data.isVisible')
-    },
-    mode: {
-        validator: v.isIn(['days', 'weeks', 'months']),
-        stateField: defaultStateField('timeline.datePicker.mode', 'days'),
-    },
+  timeline: {
+    validator: v.isBoolean(),
+    sanitizer: v.toBoolean(),
+    stateField: boolStateField('timeline.data.isVisible'),
+  },
+  mode: {
+    validator: v.isIn(['days', 'weeks', 'months']),
+    stateField: defaultStateField('timeline.datePicker.mode', 'days'),
+  },
 };
 
 export const routeConfig = {
-    '/book': [
-        {
-            listen: [filtersActions.SET_FILTER_PARAMETER, filtersActions.SET_FILTERS],
-            select: ({bookRoom: {filters}}) => ({filters}),
-            serialize: queryFilterRules
-        },
-        {
-            listen: [
-                actions.TOGGLE_TIMELINE_VIEW,
-                actions.SET_TIMELINE_MODE
-            ],
-            select: ({bookRoom: {timeline}}) => ({timeline}),
-            serialize: rules
-        },
-    ]
+  '/book': [
+    {
+      listen: [filtersActions.SET_FILTER_PARAMETER, filtersActions.SET_FILTERS],
+      select: ({bookRoom: {filters}}) => ({filters}),
+      serialize: queryFilterRules,
+    },
+    {
+      listen: [actions.TOGGLE_TIMELINE_VIEW, actions.SET_TIMELINE_MODE],
+      select: ({bookRoom: {timeline}}) => ({timeline}),
+      serialize: rules,
+    },
+  ],
 };
 
 export const queryStringReducer = createQueryStringReducer(
-    rules,
-    (state, action) => {
-        if (action.type === globalActions.INIT) {
-            return {
-                namespace: 'bookRoom',
-                queryString: history.location.search.slice(1)
-            };
-        }
-        return null;
-    },
-    (state, namespace) => (namespace
-        ? _.merge({}, state, {[namespace]: {timeline: {data: initialTimelineState}}})
-        : state)
+  rules,
+  (state, action) => {
+    if (action.type === globalActions.INIT) {
+      return {
+        namespace: 'bookRoom',
+        queryString: history.location.search.slice(1),
+      };
+    }
+    return null;
+  },
+  (state, namespace) =>
+    namespace ? _.merge({}, state, {[namespace]: {timeline: {data: initialTimelineState}}}) : state
 );

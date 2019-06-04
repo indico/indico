@@ -11,19 +11,20 @@ import {Translate} from 'indico/react/i18n';
 import showReactErrorDialog from 'indico/react/errors';
 import {resetPageState} from '../../actions';
 
-
 /**
  * Performs more complex validation of the filter parameters, combining more than one value.
  * @param {Object} filters - Filters to validate.
  * @returns {boolean} Whether it's valid or not.
  */
-const mixedValidator = (filters) => {
-    if (!('timeSlot' in filters)) {
-        return true;
-    }
+const mixedValidator = filters => {
+  if (!('timeSlot' in filters)) {
+    return true;
+  }
 
-    const {timeSlot: {startTime: st, endTime: et}} = filters;
-    return !(st && et && toMoment(st, 'HH:mm').isSameOrAfter(toMoment(et, 'HH:mm')));
+  const {
+    timeSlot: {startTime: st, endTime: et},
+  } = filters;
+  return !(st && et && toMoment(st, 'HH:mm').isSameOrAfter(toMoment(et, 'HH:mm')));
 };
 
 /**
@@ -33,15 +34,15 @@ const mixedValidator = (filters) => {
  * @returns {boolean} Whether it's valid or not.
  */
 export const validateFilters = (filters, namespace, dispatch) => {
-    if (!filters.error && mixedValidator(filters)) {
-        return true;
-    }
-    const error = {
-        title: Translate.string('Something went wrong'),
-        message: Translate.string('The provided URL was not properly formatted.')
-    };
-    dispatch(resetPageState(namespace));
-    dispatch(push('/'));
-    showReactErrorDialog(error);
-    return false;
+  if (!filters.error && mixedValidator(filters)) {
+    return true;
+  }
+  const error = {
+    title: Translate.string('Something went wrong'),
+    message: Translate.string('The provided URL was not properly formatted.'),
+  };
+  dispatch(resetPageState(namespace));
+  dispatch(push('/'));
+  showReactErrorDialog(error);
+  return false;
 };

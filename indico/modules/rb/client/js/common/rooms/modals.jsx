@@ -10,17 +10,16 @@ import React from 'react';
 import RoomDetailsPreloader from './RoomDetailsPreloader';
 import RoomDetailsModal from './RoomDetailsModal';
 
-
 export default {
-    /* eslint-disable react/display-name */
-    'room-details': (onClose, roomId) => (
-        <RoomDetailsPreloader roomId={roomId}>
-            {() => <RoomDetailsModal roomId={roomId} onClose={onClose} promptDatesOnBook />}
-        </RoomDetailsPreloader>
-    ),
-    'room-details-book': (onClose, roomId) => (
-        <RoomDetailsPreloader roomId={roomId}>
-            {() => <RoomDetailsModal roomId={roomId} onClose={onClose} />}
-        </RoomDetailsPreloader>
-    )
+  /* eslint-disable react/display-name */
+  'room-details': (onClose, roomId) => (
+    <RoomDetailsPreloader roomId={roomId}>
+      {() => <RoomDetailsModal roomId={roomId} onClose={onClose} promptDatesOnBook />}
+    </RoomDetailsPreloader>
+  ),
+  'room-details-book': (onClose, roomId) => (
+    <RoomDetailsPreloader roomId={roomId}>
+      {() => <RoomDetailsModal roomId={roomId} onClose={onClose} />}
+    </RoomDetailsPreloader>
+  ),
 };

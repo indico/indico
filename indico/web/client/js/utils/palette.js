@@ -7,7 +7,7 @@
 
 // base colors (must match entries in _palette.scss)
 const Palette = {
-    blue: '#5d95ea'
+  blue: '#5d95ea',
 };
 
 // colors for specific purposes

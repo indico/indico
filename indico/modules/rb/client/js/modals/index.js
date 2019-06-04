@@ -7,6 +7,5 @@
 
 import * as actions from './actions';
 
-
 export {default} from './ModalController';
 export {actions};

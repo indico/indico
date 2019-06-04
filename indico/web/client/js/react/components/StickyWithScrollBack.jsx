@@ -13,26 +13,28 @@ import {ScrollButton} from 'indico/react/components';
 
 import './StickyWithScrollBack.module.scss';
 
-
 export default function StickyWithScrollBack({children, context}) {
-    const [scrollButtonVisible, setScrollButtonVisible] = useState(false);
+  const [scrollButtonVisible, setScrollButtonVisible] = useState(false);
 
-    return (
-        <Sticky context={context} styleName="sticky-content"
-                onStick={() => setScrollButtonVisible(true)}
-                onUnstick={() => setScrollButtonVisible(false)}>
-            {children}
-            <ScrollButton visible={scrollButtonVisible} />
-        </Sticky>
-    );
+  return (
+    <Sticky
+      context={context}
+      styleName="sticky-content"
+      onStick={() => setScrollButtonVisible(true)}
+      onUnstick={() => setScrollButtonVisible(false)}
+    >
+      {children}
+      <ScrollButton visible={scrollButtonVisible} />
+    </Sticky>
+  );
 }
 
 StickyWithScrollBack.propTypes = {
-    children: PropTypes.node,
-    context: PropTypes.object,
+  children: PropTypes.node,
+  context: PropTypes.object,
 };
 
 StickyWithScrollBack.defaultProps = {
-    children: null,
-    context: null,
+  children: null,
+  context: null,
 };

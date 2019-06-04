@@ -7,5 +7,4 @@
 
 import {roomSearchReducerFactory} from '../../common/roomSearch';
 
-
 export default roomSearchReducerFactory('roomList');

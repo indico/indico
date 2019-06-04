@@ -7,43 +7,42 @@
 
 import _ from 'lodash';
 
-
 function smartCamelCase(string) {
-    return _.camelCase(string).replace(/Url/g, 'URL');
+  return _.camelCase(string).replace(/Url/g, 'URL');
 }
 
 export function camelizeKeys(obj) {
-    if (!_.isPlainObject(obj) && !_.isArray(obj)) {
-        return obj;
-    }
+  if (!_.isPlainObject(obj) && !_.isArray(obj)) {
+    return obj;
+  }
 
-    if (_.isArray(obj)) {
-        return obj.map(camelizeKeys);
-    }
+  if (_.isArray(obj)) {
+    return obj.map(camelizeKeys);
+  }
 
-    return Object.entries(obj).reduce((accum, [key, value]) => {
-        if (key.match(/^[A-Za-z_]+$/)) {
-            return {...accum, [smartCamelCase(key)]: camelizeKeys(value)};
-        } else {
-            return {...accum, [key]: camelizeKeys(value)};
-        }
-    }, {});
+  return Object.entries(obj).reduce((accum, [key, value]) => {
+    if (key.match(/^[A-Za-z_]+$/)) {
+      return {...accum, [smartCamelCase(key)]: camelizeKeys(value)};
+    } else {
+      return {...accum, [key]: camelizeKeys(value)};
+    }
+  }, {});
 }
 
 export function snakifyKeys(obj) {
-    if (!_.isPlainObject(obj) && !_.isArray(obj)) {
-        return obj;
-    }
+  if (!_.isPlainObject(obj) && !_.isArray(obj)) {
+    return obj;
+  }
 
-    if (_.isArray(obj)) {
-        return obj.map(snakifyKeys);
-    }
+  if (_.isArray(obj)) {
+    return obj.map(snakifyKeys);
+  }
 
-    return Object.entries(obj).reduce((accum, [key, value]) => {
-        if (key.match(/^[A-Za-z_]+$/)) {
-            return {...accum, [_.snakeCase(key)]: snakifyKeys(value)};
-        } else {
-            return {...accum, [key]: snakifyKeys(value)};
-        }
-    }, {});
+  return Object.entries(obj).reduce((accum, [key, value]) => {
+    if (key.match(/^[A-Za-z_]+$/)) {
+      return {...accum, [_.snakeCase(key)]: snakifyKeys(value)};
+    } else {
+      return {...accum, [key]: snakifyKeys(value)};
+    }
+  }, {});
 }

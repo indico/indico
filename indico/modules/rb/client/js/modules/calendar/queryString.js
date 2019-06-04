@@ -17,66 +17,62 @@ import {actions as filtersActions} from '../../common/filters';
 import {queryStringRules as roomSearchQueryStringRules} from '../../common/roomSearch';
 import * as calendarActions from './actions';
 
-
 const rules = {
-    ...roomSearchQueryStringRules,
-    date: {
-        validator: (date) => v.isDate(date) && moment(date).isBetween('1970-01-01', '2999-12-31'),
-        stateField: 'datePicker.selectedDate'
-    },
-    mode: {
-        validator: v.isIn(['days', 'weeks', 'months']),
-        stateField: defaultStateField('datePicker.mode', 'days'),
-    },
-    my_bookings: {
-        validator: v.isBoolean(),
-        sanitizer: v.toBoolean(),
-        stateField: boolStateField('filters.myBookings'),
-    },
-    hide_unused: {
-        validator: v.isBoolean(),
-        sanitizer: v.toBoolean(),
-        stateField: boolStateField('filters.hideUnused'),
-    },
-    show_inactive: {
-        validator: v.isBoolean(),
-        sanitizer: v.toBoolean(),
-        stateField: boolStateField('filters.showInactive'),
-    },
-    view: {
-        validator: v.isIn(['timeline', 'list']),
-        stateField: defaultStateField('view', 'calendar'),
-    }
+  ...roomSearchQueryStringRules,
+  date: {
+    validator: date => v.isDate(date) && moment(date).isBetween('1970-01-01', '2999-12-31'),
+    stateField: 'datePicker.selectedDate',
+  },
+  mode: {
+    validator: v.isIn(['days', 'weeks', 'months']),
+    stateField: defaultStateField('datePicker.mode', 'days'),
+  },
+  my_bookings: {
+    validator: v.isBoolean(),
+    sanitizer: v.toBoolean(),
+    stateField: boolStateField('filters.myBookings'),
+  },
+  hide_unused: {
+    validator: v.isBoolean(),
+    sanitizer: v.toBoolean(),
+    stateField: boolStateField('filters.hideUnused'),
+  },
+  show_inactive: {
+    validator: v.isBoolean(),
+    sanitizer: v.toBoolean(),
+    stateField: boolStateField('filters.showInactive'),
+  },
+  view: {
+    validator: v.isIn(['timeline', 'list']),
+    stateField: defaultStateField('view', 'calendar'),
+  },
 };
-
 
 export const routeConfig = {
-    '/calendar': {
-        listen: [
-            filtersActions.SET_FILTER_PARAMETER,
-            filtersActions.SET_FILTERS,
-            calendarActions.SET_DATE,
-            calendarActions.SET_MODE,
-            calendarActions.CHANGE_VIEW,
-        ],
-        select: ({calendar}) => calendar,
-        serialize: rules
-    }
+  '/calendar': {
+    listen: [
+      filtersActions.SET_FILTER_PARAMETER,
+      filtersActions.SET_FILTERS,
+      calendarActions.SET_DATE,
+      calendarActions.SET_MODE,
+      calendarActions.CHANGE_VIEW,
+    ],
+    select: ({calendar}) => calendar,
+    serialize: rules,
+  },
 };
 
-
 export const queryStringReducer = createQueryStringReducer(
-    rules,
-    (state, action) => {
-        if (action.type === actions.INIT) {
-            return {
-                namespace: 'calendar',
-                queryString: history.location.search.slice(1)
-            };
-        }
-        return null;
-    },
-    (state, namespace) => (namespace
-        ? _.merge({}, state, _.set({}, namespace, initialState()))
-        : state)
+  rules,
+  (state, action) => {
+    if (action.type === actions.INIT) {
+      return {
+        namespace: 'calendar',
+        queryString: history.location.search.slice(1),
+      };
+    }
+    return null;
+  },
+  (state, namespace) =>
+    namespace ? _.merge({}, state, _.set({}, namespace, initialState())) : state
 );

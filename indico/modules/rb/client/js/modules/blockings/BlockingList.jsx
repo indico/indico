@@ -22,92 +22,100 @@ import * as blockingsSelectors from './selectors';
 
 import './BlockingList.module.scss';
 
-
 class BlockingList extends React.Component {
-    static propTypes = {
-        blockings: PropTypes.object.isRequired,
-        isFetching: PropTypes.bool.isRequired,
-        filters: PropTypes.object.isRequired,
-        actions: PropTypes.exact({
-            fetchBlockings: PropTypes.func.isRequired,
-            openBlockingDetails: PropTypes.func.isRequired,
-        }).isRequired,
-    };
+  static propTypes = {
+    blockings: PropTypes.object.isRequired,
+    isFetching: PropTypes.bool.isRequired,
+    filters: PropTypes.object.isRequired,
+    actions: PropTypes.exact({
+      fetchBlockings: PropTypes.func.isRequired,
+      openBlockingDetails: PropTypes.func.isRequired,
+    }).isRequired,
+  };
 
-    constructor(props) {
-        super(props);
-        this.contextRef = React.createRef();
+  constructor(props) {
+    super(props);
+    this.contextRef = React.createRef();
+  }
+
+  componentDidMount() {
+    const {
+      actions: {fetchBlockings},
+    } = this.props;
+    fetchBlockings();
+  }
+
+  componentDidUpdate({filters: prevFilters}) {
+    const {
+      filters,
+      actions: {fetchBlockings},
+    } = this.props;
+    if (prevFilters !== filters) {
+      fetchBlockings();
     }
+  }
 
-    componentDidMount() {
-        const {actions: {fetchBlockings}} = this.props;
-        fetchBlockings();
+  renderBlocking = blocking => {
+    const {
+      actions: {openBlockingDetails},
+    } = this.props;
+    return (
+      <BlockingCard
+        key={blocking.id}
+        blocking={blocking}
+        onClick={() => openBlockingDetails(blocking.id)}
+      />
+    );
+  };
+
+  renderContent = () => {
+    const {isFetching, blockings} = this.props;
+    const blockingsList = Object.values(blockings);
+
+    if (isFetching) {
+      return <CardPlaceholder.Group count={10} className="blockings-placeholders" />;
+    } else if (blockingsList.length !== 0) {
+      return (
+        <Card.Group styleName="blockings-list" stackable>
+          {blockingsList.map(this.renderBlocking)}
+        </Card.Group>
+      );
+    } else {
+      return (
+        <Message info>
+          <Translate>There are no blockings.</Translate>
+        </Message>
+      );
     }
+  };
 
-    componentDidUpdate({filters: prevFilters}) {
-        const {filters, actions: {fetchBlockings}} = this.props;
-        if (prevFilters !== filters) {
-            fetchBlockings();
-        }
-    }
-
-    renderBlocking = (blocking) => {
-        const {actions: {openBlockingDetails}} = this.props;
-        return (
-            <BlockingCard key={blocking.id}
-                          blocking={blocking}
-                          onClick={() => openBlockingDetails(blocking.id)} />
-        );
-    };
-
-    renderContent = () => {
-        const {isFetching, blockings} = this.props;
-        const blockingsList = Object.values(blockings);
-
-        if (isFetching) {
-            return <CardPlaceholder.Group count={10} className="blockings-placeholders" />;
-        } else if (blockingsList.length !== 0) {
-            return (
-                <Card.Group styleName="blockings-list" stackable>
-                    {blockingsList.map(this.renderBlocking)}
-                </Card.Group>
-            );
-        } else {
-            return (
-                <Message info>
-                    <Translate>
-                        There are no blockings.
-                    </Translate>
-                </Message>
-            );
-        }
-    };
-
-    render() {
-        return (
-            <div ref={this.contextRef}>
-                <Container styleName="blockings-container" fluid>
-                    <StickyWithScrollBack context={this.contextRef.current}>
-                        <BlockingFilterBar />
-                    </StickyWithScrollBack>
-                    {this.renderContent()}
-                </Container>
-            </div>
-        );
-    }
+  render() {
+    return (
+      <div ref={this.contextRef}>
+        <Container styleName="blockings-container" fluid>
+          <StickyWithScrollBack context={this.contextRef.current}>
+            <BlockingFilterBar />
+          </StickyWithScrollBack>
+          {this.renderContent()}
+        </Container>
+      </div>
+    );
+  }
 }
 
-
 export default connect(
-    state => ({
-        blockings: blockingsSelectors.getAllBlockings(state),
-        isFetching: blockingsSelectors.isFetchingBlockings(state),
-        filters: blockingsSelectors.getFilters(state),
-    }),
-    dispatch => ({
-        actions: bindActionCreators({
-            fetchBlockings: blockingsActions.fetchBlockings,
-            openBlockingDetails: blockingsActions.openBlockingDetails,
-        }, dispatch),
-    })
+  state => ({
+    blockings: blockingsSelectors.getAllBlockings(state),
+    isFetching: blockingsSelectors.isFetchingBlockings(state),
+    filters: blockingsSelectors.getFilters(state),
+  }),
+  dispatch => ({
+    actions: bindActionCreators(
+      {
+        fetchBlockings: blockingsActions.fetchBlockings,
+        openBlockingDetails: blockingsActions.openBlockingDetails,
+      },
+      dispatch
+    ),
+  })
 )(BlockingList);

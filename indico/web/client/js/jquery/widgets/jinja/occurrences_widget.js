@@ -6,127 +6,154 @@
 // LICENSE file for more details.
 
 (function(global) {
-    'use strict';
+  'use strict';
 
-    global.setupOccurrencesWidget = function setupOccurrencesWidget(options) {
-        options = $.extend(true, {
-            fieldId: null,
-            defaultTime: null,
-            defaultDuration: null
-        }, options);
+  global.setupOccurrencesWidget = function setupOccurrencesWidget(options) {
+    options = $.extend(
+      true,
+      {
+        fieldId: null,
+        defaultTime: null,
+        defaultDuration: null,
+      },
+      options
+    );
 
-        var rowTemplate = $($.parseHTML($('#' + options.fieldId + '-template').html())).filter('.occurrence');
-        var container = $('#' + options.fieldId + '-container');
-        var dataField = $('#' + options.fieldId + '');
+    var rowTemplate = $($.parseHTML($('#' + options.fieldId + '-template').html())).filter(
+      '.occurrence'
+    );
+    var container = $('#' + options.fieldId + '-container');
+    var dataField = $('#' + options.fieldId + '');
 
-        function createRow(data) {
-            var row = rowTemplate.clone().insertBefore(container.find('.add-occurrence'));
-            var prevRow = row.prev('.occurrence');
-            if (!prevRow.length) {
-                prevRow = null;
+    function createRow(data) {
+      var row = rowTemplate.clone().insertBefore(container.find('.add-occurrence'));
+      var prevRow = row.prev('.occurrence');
+      if (!prevRow.length) {
+        prevRow = null;
+      }
+      var prevOccurrence = (prevRow && prevRow.data('occurrence')) || null;
+      var dateField = row.find('.datepicker');
+      var timeField = row.find('.timepicker');
+      var durationField = row.find('.durationpicker');
+
+      row.find('.remove-occurrence').on('click', function() {
+        removeRow(row);
+      });
+
+      dateField
+        .datepicker({
+          onSelect: function() {
+            var $this = $(this);
+            $this.trigger('change');
+            if (timeField.val() === '') {
+              timeField.val(options.defaultTime);
             }
-            var prevOccurrence = prevRow && prevRow.data('occurrence') || null;
-            var dateField = row.find('.datepicker');
-            var timeField = row.find('.timepicker');
-            var durationField = row.find('.durationpicker');
-
-            row.find('.remove-occurrence').on('click', function() {
-                removeRow(row);
-            });
-
-            dateField.datepicker({
-                onSelect: function() {
-                    var $this = $(this);
-                    $this.trigger('change');
-                    if (timeField.val() === '') {
-                        timeField.val(options.defaultTime);
-                    }
-                    // ensure we de-focus the field; otherwise clicking it again might
-                    // not re-open the datepicker
-                    $this.blur();
-                    updateData();
-                }
-            }).on('change', function(evt) {
-                timeField.prop('required', !!evt.target.value);
-            }).on('keydown', function(evt) {
-                if (evt.which == K.BACKSPACE) {
-                    evt.preventDefault();
-                    dateField.datepicker('setDate', null);
-                    updateData();
-                } else if (evt.which == K.TAB) {
-                    if (!evt.shiftKey) {
-                        evt.preventDefault();
-                        $(this).nextAll('.timepicker').focus();
-                    }
-                }
-            });
-
-            timeField.on('change', function(evt) {
-                dateField.prop('required', !!evt.target.value);
-                updateData();
-            });
-
-            durationField.on('change', function() {
-                updateData();
-            });
-
-            if (data) {
-                dateField.datepicker('setDate', moment(data.date).format('DD/MM/YYYY'));
-                row.find('.timepicker').val(data.time);
-                row.find('.durationpicker').val(data.duration);
-                dateField.prop('required', true);
-                timeField.prop('required', true);
-            } else if (prevOccurrence) {
-                dateField.datepicker('setDate', moment(prevOccurrence.date).add(1, 'day').format('DD/MM/YYYY'));
-                row.find('.timepicker').val(prevOccurrence.time);
-                row.find('.durationpicker').val(prevOccurrence.duration);
-                dateField.prop('required', true);
-                timeField.prop('required', true);
-            } else {
-                row.find('.durationpicker').val(options.defaultDuration);
-            }
-
-            updateRemoveButtons();
+            // ensure we de-focus the field; otherwise clicking it again might
+            // not re-open the datepicker
+            $this.blur();
             updateData();
-        }
-
-        function createInitialRows() {
-            JSON.parse(dataField.val()).forEach(function(data) {
-                createRow(data);
-            });
-        }
-
-        function removeRow(row) {
-            row.remove();
-            updateRemoveButtons();
-            updateData();
-        }
-
-        function updateRemoveButtons() {
-            var rows = container.find('.occurrence');
-            rows.find('.remove-occurrence').toggle(rows.length > 1);
-        }
-
-        function updateData() {
-            var data = container.find('.occurrence').map(function() {
-                var $this = $(this);
-                var date = moment($(this).find('.datepicker').datepicker('getDate'));
-                var rv = {
-                    date: date.isValid() ? date.format('YYYY-MM-DD') : '',
-                    time: $(this).find('.timepicker').val(),
-                    duration: +$(this).find('.durationpicker').val()
-                };
-                $this.data('occurrence', (!!rv.date && !!rv.time && !!rv.duration) ? rv : null);
-                return rv;
-            }).get();
-            dataField.val(JSON.stringify(data)).trigger('change');
-        }
-
-        container.find('.add-occurrence').on('click', function(evt) {
+          },
+        })
+        .on('change', function(evt) {
+          timeField.prop('required', !!evt.target.value);
+        })
+        .on('keydown', function(evt) {
+          if (evt.which == K.BACKSPACE) {
             evt.preventDefault();
-            createRow();
+            dateField.datepicker('setDate', null);
+            updateData();
+          } else if (evt.which == K.TAB) {
+            if (!evt.shiftKey) {
+              evt.preventDefault();
+              $(this)
+                .nextAll('.timepicker')
+                .focus();
+            }
+          }
         });
 
-        createInitialRows();
-    };
+      timeField.on('change', function(evt) {
+        dateField.prop('required', !!evt.target.value);
+        updateData();
+      });
+
+      durationField.on('change', function() {
+        updateData();
+      });
+
+      if (data) {
+        dateField.datepicker('setDate', moment(data.date).format('DD/MM/YYYY'));
+        row.find('.timepicker').val(data.time);
+        row.find('.durationpicker').val(data.duration);
+        dateField.prop('required', true);
+        timeField.prop('required', true);
+      } else if (prevOccurrence) {
+        dateField.datepicker(
+          'setDate',
+          moment(prevOccurrence.date)
+            .add(1, 'day')
+            .format('DD/MM/YYYY')
+        );
+        row.find('.timepicker').val(prevOccurrence.time);
+        row.find('.durationpicker').val(prevOccurrence.duration);
+        dateField.prop('required', true);
+        timeField.prop('required', true);
+      } else {
+        row.find('.durationpicker').val(options.defaultDuration);
+      }
+
+      updateRemoveButtons();
+      updateData();
+    }
+
+    function createInitialRows() {
+      JSON.parse(dataField.val()).forEach(function(data) {
+        createRow(data);
+      });
+    }
+
+    function removeRow(row) {
+      row.remove();
+      updateRemoveButtons();
+      updateData();
+    }
+
+    function updateRemoveButtons() {
+      var rows = container.find('.occurrence');
+      rows.find('.remove-occurrence').toggle(rows.length > 1);
+    }
+
+    function updateData() {
+      var data = container
+        .find('.occurrence')
+        .map(function() {
+          var $this = $(this);
+          var date = moment(
+            $(this)
+              .find('.datepicker')
+              .datepicker('getDate')
+          );
+          var rv = {
+            date: date.isValid() ? date.format('YYYY-MM-DD') : '',
+            time: $(this)
+              .find('.timepicker')
+              .val(),
+            duration: +$(this)
+              .find('.durationpicker')
+              .val(),
+          };
+          $this.data('occurrence', !!rv.date && !!rv.time && !!rv.duration ? rv : null);
+          return rv;
+        })
+        .get();
+      dataField.val(JSON.stringify(data)).trigger('change');
+    }
+
+    container.find('.add-occurrence').on('click', function(evt) {
+      evt.preventDefault();
+      createRow();
+    });
+
+    createInitialRows();
+  };
 })(window);

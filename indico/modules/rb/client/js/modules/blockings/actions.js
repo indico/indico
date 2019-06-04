@@ -19,7 +19,6 @@ import {ajax as ajaxRules} from './serializers';
 import {actions as filtersActions} from '../../common/filters';
 import {actions as modalActions} from '../../modals';
 
-
 export const FETCH_BLOCKINGS_REQUEST = 'blockings/FETCH_BLOCKINGS_REQUEST';
 export const FETCH_BLOCKINGS_SUCCESS = 'blockings/FETCH_BLOCKINGS_SUCCESS';
 export const FETCH_BLOCKINGS_ERROR = 'blockings/FETCH_BLOCKINGS_ERROR';
@@ -46,85 +45,93 @@ export const DELETE_BLOCKING_REQUEST = 'blockings/DELETE_BLOCKING_REQUEST';
 export const DELETE_BLOCKING_SUCCESS = 'blockings/DELETE_BLOCKING_SUCCESS';
 export const DELETE_BLOCKING_ERROR = 'blockings/DELETE_BLOCKING_ERROR';
 
-
 export const FILTER_NAMESPACE = 'blockings';
 
-
 export function fetchBlockings() {
-    return async (dispatch, getStore) => {
-        const {blockings: {filters}} = getStore();
-        const params = preProcessParameters(filters, ajaxRules);
-        return await ajaxAction(
-            () => indicoAxios.get(fetchBlockingsURL(), {params}),
-            FETCH_BLOCKINGS_REQUEST,
-            [BLOCKINGS_RECEIVED, FETCH_BLOCKINGS_SUCCESS],
-            FETCH_BLOCKINGS_ERROR
-        )(dispatch);
-    };
+  return async (dispatch, getStore) => {
+    const {
+      blockings: {filters},
+    } = getStore();
+    const params = preProcessParameters(filters, ajaxRules);
+    return await ajaxAction(
+      () => indicoAxios.get(fetchBlockingsURL(), {params}),
+      FETCH_BLOCKINGS_REQUEST,
+      [BLOCKINGS_RECEIVED, FETCH_BLOCKINGS_SUCCESS],
+      FETCH_BLOCKINGS_ERROR
+    )(dispatch);
+  };
 }
 
 export function fetchBlocking(blockingId) {
-    return async (dispatch) => {
-        return await ajaxAction(
-            () => indicoAxios.get(fetchBlockingURL({blocking_id: blockingId})),
-            FETCH_BLOCKING_REQUEST,
-            [BLOCKING_RECEIVED, FETCH_BLOCKING_SUCCESS],
-            FETCH_BLOCKING_ERROR
-        )(dispatch);
-    };
+  return async dispatch => {
+    return await ajaxAction(
+      () => indicoAxios.get(fetchBlockingURL({blocking_id: blockingId})),
+      FETCH_BLOCKING_REQUEST,
+      [BLOCKING_RECEIVED, FETCH_BLOCKING_SUCCESS],
+      FETCH_BLOCKING_ERROR
+    )(dispatch);
+  };
 }
 
 export function setFilterParameter(param, value) {
-    return filtersActions.setFilterParameter(FILTER_NAMESPACE, param, value);
+  return filtersActions.setFilterParameter(FILTER_NAMESPACE, param, value);
 }
 
 export function setFilters(params, merge = true) {
-    return filtersActions.setFilters(FILTER_NAMESPACE, params, merge);
+  return filtersActions.setFilters(FILTER_NAMESPACE, params, merge);
 }
 
 export function createBlocking(formData) {
-    const data = preProcessParameters(formData, ajaxRules);
-    return submitFormAction(
-        () => indicoAxios.post(createBlockingURL(), data),
-        CREATE_BLOCKING_REQUEST, CREATE_BLOCKING_SUCCESS, CREATE_BLOCKING_ERROR,
-        {start_date: 'dates', end_date: 'dates'}
-    );
+  const data = preProcessParameters(formData, ajaxRules);
+  return submitFormAction(
+    () => indicoAxios.post(createBlockingURL(), data),
+    CREATE_BLOCKING_REQUEST,
+    CREATE_BLOCKING_SUCCESS,
+    CREATE_BLOCKING_ERROR,
+    {start_date: 'dates', end_date: 'dates'}
+  );
 }
 
 export function updateBlocking(blockingId, formData) {
-    delete formData.dates;
-    const data = preProcessParameters(formData, ajaxRules);
-    return submitFormAction(
-        () => indicoAxios.patch(updateBlockingURL({blocking_id: blockingId}), data),
-        UPDATE_BLOCKING_REQUEST,
-        [BLOCKING_RECEIVED, UPDATE_BLOCKING_SUCCESS],
-        UPDATE_BLOCKING_ERROR
-    );
+  delete formData.dates;
+  const data = preProcessParameters(formData, ajaxRules);
+  return submitFormAction(
+    () => indicoAxios.patch(updateBlockingURL({blocking_id: blockingId}), data),
+    UPDATE_BLOCKING_REQUEST,
+    [BLOCKING_RECEIVED, UPDATE_BLOCKING_SUCCESS],
+    UPDATE_BLOCKING_ERROR
+  );
 }
 
 export function acceptBlocking(blockingId, roomId) {
-    const urlArgs = {blocking_id: blockingId, room_id: roomId, action: 'accept'};
-    return submitFormAction(
-        () => indicoAxios.post(blockingActionsURL(urlArgs)),
-        CHANGE_BLOCKING_STATE_REQUEST, CHANGE_BLOCKING_STATE_SUCCESS, CHANGE_BLOCKING_STATE_ERROR
-    );
+  const urlArgs = {blocking_id: blockingId, room_id: roomId, action: 'accept'};
+  return submitFormAction(
+    () => indicoAxios.post(blockingActionsURL(urlArgs)),
+    CHANGE_BLOCKING_STATE_REQUEST,
+    CHANGE_BLOCKING_STATE_SUCCESS,
+    CHANGE_BLOCKING_STATE_ERROR
+  );
 }
 
 export function rejectBlocking(blockingId, roomId, reason) {
-    const urlArgs = {blocking_id: blockingId, room_id: roomId, action: 'reject'};
-    return submitFormAction(
-        () => indicoAxios.post(blockingActionsURL(urlArgs), {reason}),
-        CHANGE_BLOCKING_STATE_REQUEST, CHANGE_BLOCKING_STATE_SUCCESS, CHANGE_BLOCKING_STATE_ERROR
-    );
+  const urlArgs = {blocking_id: blockingId, room_id: roomId, action: 'reject'};
+  return submitFormAction(
+    () => indicoAxios.post(blockingActionsURL(urlArgs), {reason}),
+    CHANGE_BLOCKING_STATE_REQUEST,
+    CHANGE_BLOCKING_STATE_SUCCESS,
+    CHANGE_BLOCKING_STATE_ERROR
+  );
 }
 
 export function deleteBlocking(blockingId) {
-    return submitFormAction(
-        () => indicoAxios.delete(deleteBlockingURL({blocking_id: blockingId})),
-        DELETE_BLOCKING_REQUEST, DELETE_BLOCKING_SUCCESS, DELETE_BLOCKING_ERROR
-    );
+  return submitFormAction(
+    () => indicoAxios.delete(deleteBlockingURL({blocking_id: blockingId})),
+    DELETE_BLOCKING_REQUEST,
+    DELETE_BLOCKING_SUCCESS,
+    DELETE_BLOCKING_ERROR
+  );
 }
 
 export function openBlockingDetails(blockingId, overridePath = null) {
-    return modalActions.openModal('blocking-details', blockingId, null, false, overridePath);
+  return modalActions.openModal('blocking-details', blockingId, null, false, overridePath);
 }

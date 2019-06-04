@@ -9,7 +9,6 @@ import {createSelector} from 'reselect';
 import {RequestState} from 'indico/utils/redux';
 import {selectors as configSelectors} from '../config';
 
-
 const isFetching = ({map}) => map.request === RequestState.STARTED;
 
 export const getMapAreas = ({map}) => map.areas;
@@ -20,19 +19,19 @@ export const isMapEnabled = state => !!configSelectors.getTileServerURL(state);
 // that way we don't have a larger room list for a moment while loading areas, and the
 // map has its own loading indicator anyway while there are no areas
 export const isMapVisible = createSelector(
-    isMapEnabled,
-    isFetching,
-    getMapAreas,
-    (mapEnabled, areasFetching, mapAreas) => mapEnabled && (areasFetching || !!mapAreas.length)
+  isMapEnabled,
+  isFetching,
+  getMapAreas,
+  (mapEnabled, areasFetching, mapAreas) => mapEnabled && (areasFetching || !!mapAreas.length)
 );
 
-
-export const makeGetMapData = (namespace) => ({[namespace]: stateSlice}) => ({
-    bounds: stateSlice.map.bounds,
-    search: stateSlice.map.search,
-    filterBounds: stateSlice.filters.bounds,
+export const makeGetMapData = namespace => ({[namespace]: stateSlice}) => ({
+  bounds: stateSlice.map.bounds,
+  search: stateSlice.map.search,
+  filterBounds: stateSlice.filters.bounds,
 });
 
-export const makeIsMapSearchEnabled = (namespace) => ({[namespace]: stateSlice}) => stateSlice.map.search;
+export const makeIsMapSearchEnabled = namespace => ({[namespace]: stateSlice}) =>
+  stateSlice.map.search;
 
 export const getHoveredRoom = ({map}) => map.ui.hoveredRoom;

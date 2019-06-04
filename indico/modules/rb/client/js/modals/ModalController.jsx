@@ -18,97 +18,103 @@ import {modalHandlers as roomsModalHandlers} from '../common/rooms';
 import {modalHandlers as bookingsModalHandlers} from '../common/bookings';
 import * as globalSelectors from '../selectors';
 
-
 class ModalController extends React.PureComponent {
-    static propTypes = {
-        isInitializing: PropTypes.bool.isRequired,
-        path: PropTypes.string.isRequired,
-        queryString: PropTypes.string.isRequired,
-        actions: PropTypes.exact({
-            pushState: PropTypes.func.isRequired,
-        }).isRequired,
+  static propTypes = {
+    isInitializing: PropTypes.bool.isRequired,
+    path: PropTypes.string.isRequired,
+    queryString: PropTypes.string.isRequired,
+    actions: PropTypes.exact({
+      pushState: PropTypes.func.isRequired,
+    }).isRequired,
+  };
+
+  constructor(props) {
+    super(props);
+
+    this.modalHandlers = {
+      ...blockingModalHandlers,
+      ...bookRoomModalHandlers,
+      ...roomsModalHandlers,
+      ...bookingsModalHandlers,
     };
+  }
 
-    constructor(props) {
-        super(props);
-
-        this.modalHandlers = {
-            ...blockingModalHandlers,
-            ...bookRoomModalHandlers,
-            ...roomsModalHandlers,
-            ...bookingsModalHandlers,
-        };
+  getQueryData() {
+    const {queryString} = this.props;
+    let {modal: modalData} = qs.parse(queryString);
+    if (!modalData) {
+      return null;
     }
-
-
-    getQueryData() {
-        const {queryString} = this.props;
-        let {modal: modalData} = qs.parse(queryString);
-        if (!modalData) {
-            return null;
-        }
-        if (Array.isArray(modalData)) {
-            modalData = modalData[modalData.length - 1];
-        }
-        const match = modalData.match(/^([^:]+)(?::(\d+)(?::(.+))?)?$/); // foo[:123[:...]]
-        if (!match) {
-            return null;
-        }
-        const [orig, name, value, payload] = match;
-        return {orig, name, value: parseInt(value, 10), payload: JSON.parse(payload || 'null')};
+    if (Array.isArray(modalData)) {
+      modalData = modalData[modalData.length - 1];
     }
-
-    getQueryStringWithout(arg) {
-        const {queryString} = this.props;
-        const params = qs.parse(queryString);
-        if (Array.isArray(params.modal)) {
-            params.modal = params.modal.filter(x => x !== arg);
-        } else if (params.modal === arg) {
-            delete params.modal;
-        }
-        return qs.stringify(params, {arrayFormat: 'repeat'});
+    const match = modalData.match(/^([^:]+)(?::(\d+)(?::(.+))?)?$/); // foo[:123[:...]]
+    if (!match) {
+      return null;
     }
+    const [orig, name, value, payload] = match;
+    return {orig, name, value: parseInt(value, 10), payload: JSON.parse(payload || 'null')};
+  }
 
-    getQueryStringWithoutModals() {
-        const {queryString} = this.props;
-        const params = qs.parse(queryString);
-        delete params.modal;
-        return qs.stringify(params, {arrayFormat: 'repeat'});
+  getQueryStringWithout(arg) {
+    const {queryString} = this.props;
+    const params = qs.parse(queryString);
+    if (Array.isArray(params.modal)) {
+      params.modal = params.modal.filter(x => x !== arg);
+    } else if (params.modal === arg) {
+      delete params.modal;
     }
+    return qs.stringify(params, {arrayFormat: 'repeat'});
+  }
 
-    makeCloseHandler(qsArg) {
-        const {actions: {pushState}, path} = this.props;
-        return (closeAll) => {
-            const queryString = closeAll ? this.getQueryStringWithoutModals() : this.getQueryStringWithout(qsArg);
-            pushState(path + (queryString ? `?${queryString}` : ''));
-        };
-    }
+  getQueryStringWithoutModals() {
+    const {queryString} = this.props;
+    const params = qs.parse(queryString);
+    delete params.modal;
+    return qs.stringify(params, {arrayFormat: 'repeat'});
+  }
 
-    render() {
-        const {isInitializing} = this.props;
-        if (isInitializing) {
-            return null;
-        }
-        const queryData = this.getQueryData();
-        if (!queryData) {
-            return null;
-        }
-        const {orig, name, value, payload} = queryData;
-        const closeHandler = this.makeCloseHandler(orig);
-        const handler = this.modalHandlers[name];
-        return handler ? handler(closeHandler, value, payload) : null;
+  makeCloseHandler(qsArg) {
+    const {
+      actions: {pushState},
+      path,
+    } = this.props;
+    return closeAll => {
+      const queryString = closeAll
+        ? this.getQueryStringWithoutModals()
+        : this.getQueryStringWithout(qsArg);
+      pushState(path + (queryString ? `?${queryString}` : ''));
+    };
+  }
+
+  render() {
+    const {isInitializing} = this.props;
+    if (isInitializing) {
+      return null;
     }
+    const queryData = this.getQueryData();
+    if (!queryData) {
+      return null;
+    }
+    const {orig, name, value, payload} = queryData;
+    const closeHandler = this.makeCloseHandler(orig);
+    const handler = this.modalHandlers[name];
+    return handler ? handler(closeHandler, value, payload) : null;
+  }
 }
 
 export default connect(
-    state => ({
-        isInitializing: globalSelectors.isInitializing(state),
-        path: state.router.location.pathname,
-        queryString: state.router.location.search.substr(1),
-    }),
-    dispatch => ({
-        actions: bindActionCreators({
-            pushState: push,
-        }, dispatch),
-    }),
+  state => ({
+    isInitializing: globalSelectors.isInitializing(state),
+    path: state.router.location.pathname,
+    queryString: state.router.location.search.substr(1),
+  }),
+  dispatch => ({
+    actions: bindActionCreators(
+      {
+        pushState: push,
+      },
+      dispatch
+    ),
+  })
 )(ModalController);

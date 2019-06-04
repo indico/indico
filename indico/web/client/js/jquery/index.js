@@ -48,10 +48,9 @@ import './utils/misc';
 import './utils/routing';
 import './utils/sortablelist';
 
-
 // jQuery-migrate should be muted when in production
 if (process.env.NODE_ENV !== 'development') {
-    $.migrateMute = true;
+  $.migrateMute = true;
 }
 // explicit tracebacks are not needed
 $.migrateTrace = false;
@@ -60,8 +59,10 @@ require('jquery-migrate');
 // These global definitions are needed so that
 // legacy code can access them globally
 Object.assign(window, {
-    _, moment, $T,
-    i18n: defaultI18n
+  _,
+  moment,
+  $T,
+  i18n: defaultI18n,
 });
 
 window.Taggle = Taggle;

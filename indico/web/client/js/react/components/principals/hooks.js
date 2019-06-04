@@ -19,29 +19,29 @@ import {PermissionManager} from './util';
  * @param {Array} principalIds - list of principal IDs
  */
 export const useFetchPrincipals = principalIds => {
-    const [informationMap, setInformationMap] = useState({});
-    const missingPrincipalIds = _.difference(principalIds, Object.keys(informationMap));
+  const [informationMap, setInformationMap] = useState({});
+  const missingPrincipalIds = _.difference(principalIds, Object.keys(informationMap));
 
-    const {data} = useIndicoAxios({
-        url: principalsURL(),
-        forceDispatchEffect: () => !!missingPrincipalIds.length,
-        trigger: principalIds,
-        camelize: true,
-        method: 'POST',
-        options: {
-            data: {
-                values: missingPrincipalIds
-            }
-        }
-    });
+  const {data} = useIndicoAxios({
+    url: principalsURL(),
+    forceDispatchEffect: () => !!missingPrincipalIds.length,
+    trigger: principalIds,
+    camelize: true,
+    method: 'POST',
+    options: {
+      data: {
+        values: missingPrincipalIds,
+      },
+    },
+  });
 
-    useEffect(() => {
-        if (missingPrincipalIds.length && data) {
-            setInformationMap(prev => ({...prev, ...data}));
-        }
-    }, [data, missingPrincipalIds.length]);
+  useEffect(() => {
+    if (missingPrincipalIds.length && data) {
+      setInformationMap(prev => ({...prev, ...data}));
+    }
+  }, [data, missingPrincipalIds.length]);
 
-    return informationMap;
+  return informationMap;
 };
 
 /**
@@ -49,23 +49,20 @@ export const useFetchPrincipals = principalIds => {
  * and returning a `PermissionManager` that follows their structure.
  */
 export const usePermissionInfo = () => {
-    const [loaded, setLoaded] = useState(false);
-    const [data, setData] = useState(null);
+  const [loaded, setLoaded] = useState(false);
+  const [data, setData] = useState(null);
 
-    const {data: reqData} = useIndicoAxios({
-        url: permissionInfoURL(),
-        camelize: true,
-        // run only once
-        trigger: 'once'
-    });
+  const {data: reqData} = useIndicoAxios({
+    url: permissionInfoURL(),
+    camelize: true,
+    // run only once
+    trigger: 'once',
+  });
 
-    if (!loaded && reqData) {
-        setData({...reqData});
-        setLoaded(true);
-    }
+  if (!loaded && reqData) {
+    setData({...reqData});
+    setLoaded(true);
+  }
 
-    return [
-        loaded ? new PermissionManager(data.tree, data.default) : null,
-        data
-    ];
+  return [loaded ? new PermissionManager(data.tree, data.default) : null, data];
 };

@@ -11,32 +11,32 @@ import ReactMarkdown from 'react-markdown';
 
 // eslint-disable-next-line react/prop-types
 const ExternalLink = ({href, children}) => (
-    <a href={href} target="_blank" rel="noopener noreferrer">{children}</a>
+  <a href={href} target="_blank" rel="noopener noreferrer">
+    {children}
+  </a>
 );
-
 
 /**
  * This component wraps ReactMarkdown and provides some convenience props.
  */
 const Markdown = ({targetBlank, ...props}) => {
-    if (targetBlank) {
-        // XXX: not using linkTarget since that doesn't set noopener
-        props.renderers = {link: ExternalLink, linkReference: ExternalLink, ...props.renderers};
-    }
-    return <ReactMarkdown {...props} />;
+  if (targetBlank) {
+    // XXX: not using linkTarget since that doesn't set noopener
+    props.renderers = {link: ExternalLink, linkReference: ExternalLink, ...props.renderers};
+  }
+  return <ReactMarkdown {...props} />;
 };
 
 Markdown.propTypes = {
-    source: PropTypes.string.isRequired,
-    renderers: PropTypes.object,
-    targetBlank: PropTypes.bool,
-    // see https://github.com/rexxars/react-markdown#options for more props
+  source: PropTypes.string.isRequired,
+  renderers: PropTypes.object,
+  targetBlank: PropTypes.bool,
+  // see https://github.com/rexxars/react-markdown#options for more props
 };
 
 Markdown.defaultProps = {
-    targetBlank: false,
-    renderers: {},
+  targetBlank: false,
+  renderers: {},
 };
-
 
 export default Markdown;

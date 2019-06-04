@@ -17,26 +17,29 @@ import reducer from './reducers';
 
 import '../style/logs.scss';
 
-
 window.addEventListener('load', () => {
-    const rootElement = document.querySelector('.event-log');
-    const initialData = {
-        staticData: {
-            fetchLogsUrl: rootElement.dataset.fetchLogsUrl,
-            realms: JSON.parse(rootElement.dataset.realms),
-            pageSize: 15
-        }
-    };
-    const store = createReduxStore('event-logs', {
-        logs: reducer
-    }, initialData);
+  const rootElement = document.querySelector('.event-log');
+  const initialData = {
+    staticData: {
+      fetchLogsUrl: rootElement.dataset.fetchLogsUrl,
+      realms: JSON.parse(rootElement.dataset.realms),
+      pageSize: 15,
+    },
+  };
+  const store = createReduxStore(
+    'event-logs',
+    {
+      logs: reducer,
+    },
+    initialData
+  );
 
-    ReactDOM.render(
-        <Provider store={store}>
-            <EventLog />
-        </Provider>,
-        rootElement
-    );
+  ReactDOM.render(
+    <Provider store={store}>
+      <EventLog />
+    </Provider>,
+    rootElement
+  );
 
-    store.dispatch(fetchLogEntries());
+  store.dispatch(fetchLogEntries());
 });

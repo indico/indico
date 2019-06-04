@@ -7,9 +7,8 @@
 
 import PropTypes from 'prop-types';
 
-
 export const legendLabelShape = PropTypes.shape({
-    label: PropTypes.string.isRequired,
-    color: PropTypes.string,
-    style: PropTypes.string
+  label: PropTypes.string.isRequired,
+  color: PropTypes.string,
+  style: PropTypes.string,
 });

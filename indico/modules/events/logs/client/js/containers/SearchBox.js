@@ -10,16 +10,15 @@ import {connect} from 'react-redux';
 import SearchBox from '../components/SearchBox';
 import {setKeyword, fetchLogEntries, setPage} from '../actions';
 
-
-const mapDispatchToProps = (dispatch) => ({
-    setKeyword: debounce((keyword) => {
-        dispatch(setKeyword(keyword));
-        dispatch(setPage(1));
-        dispatch(fetchLogEntries());
-    }, 250)
+const mapDispatchToProps = dispatch => ({
+  setKeyword: debounce(keyword => {
+    dispatch(setKeyword(keyword));
+    dispatch(setPage(1));
+    dispatch(fetchLogEntries());
+  }, 250),
 });
 
 export default connect(
-    null,
-    mapDispatchToProps
+  null,
+  mapDispatchToProps
 )(SearchBox);

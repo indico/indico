@@ -7,7 +7,6 @@
 
 import * as actions from './actions';
 
-
 export {filterReducerFactory} from './reducers';
 export {validateFilters} from './validation';
 export {default as FilterFormComponent} from './FilterFormComponent';

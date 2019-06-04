@@ -8,11 +8,10 @@
 export const SET_FILTER_PARAMETER = 'filters/SET_PARAMETER';
 export const SET_FILTERS = 'filters/SET';
 
-
 export function setFilterParameter(namespace, param, data) {
-    return {type: SET_FILTER_PARAMETER, namespace, param, data};
+  return {type: SET_FILTER_PARAMETER, namespace, param, data};
 }
 
 export function setFilters(namespace, params, merge = true) {
-    return {type: SET_FILTERS, namespace, params, merge};
+  return {type: SET_FILTERS, namespace, params, merge};
 }

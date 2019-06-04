@@ -7,18 +7,15 @@
 
 import _slugify from 'slugify';
 
-
 function trim(value) {
-    return typeof value === 'string' ? value.trim() : value;
+  return typeof value === 'string' ? value.trim() : value;
 }
-
 
 function slugify(value) {
-    return typeof value === 'string' ? _slugify(value, {lower: true}) : value;
+  return typeof value === 'string' ? _slugify(value, {lower: true}) : value;
 }
 
-
 export default {
-    trim,
-    slugify,
+  trim,
+  slugify,
 };

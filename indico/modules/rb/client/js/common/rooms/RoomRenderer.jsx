@@ -14,72 +14,75 @@ import {withHoverListener} from '../map/util';
 
 import './RoomRenderer.module.scss';
 
-
 /**
  * `RoomRenderer` encapsulates the rendering of rooms in both
  * the List of Rooms and the "Book a Room" page.
  */
 class RoomRenderer extends React.Component {
-    static propTypes = {
-        rooms: PropTypes.array.isRequired,
-        onSelectRoom: PropTypes.func,
-        selectedRooms: PropTypes.object,
-        inSelectionMode: PropTypes.bool,
-        children: PropTypes.func
-    };
+  static propTypes = {
+    rooms: PropTypes.array.isRequired,
+    onSelectRoom: PropTypes.func,
+    selectedRooms: PropTypes.object,
+    inSelectionMode: PropTypes.bool,
+    children: PropTypes.func,
+  };
 
-    static defaultProps = {
-        onSelectRoom: null,
-        selectedRooms: {},
-        inSelectionMode: false,
-        children: null
-    };
+  static defaultProps = {
+    onSelectRoom: null,
+    selectedRooms: {},
+    inSelectionMode: false,
+    children: null,
+  };
 
-    RoomComponent = withHoverListener(({room, ...restProps}) => {
-        const {onSelectRoom, selectedRooms, inSelectionMode, children} = this.props;
+  RoomComponent = withHoverListener(({room, ...restProps}) => {
+    const {onSelectRoom, selectedRooms, inSelectionMode, children} = this.props;
 
-        if (inSelectionMode) {
-            const isRoomSelected = room.id in selectedRooms;
-            const buttonProps = {compact: true, size: 'tiny'};
+    if (inSelectionMode) {
+      const isRoomSelected = room.id in selectedRooms;
+      const buttonProps = {compact: true, size: 'tiny'};
 
-            if (!isRoomSelected) {
-                buttonProps.icon = 'check';
-            } else {
-                buttonProps.icon = 'check';
-                buttonProps.primary = true;
-            }
+      if (!isRoomSelected) {
+        buttonProps.icon = 'check';
+      } else {
+        buttonProps.icon = 'check';
+        buttonProps.primary = true;
+      }
 
-            return (
-                <Room key={room.id} room={room} {...restProps}>
-                    <Slot>
-                        <Button styleName="selection-add-btn"
-                                onClick={() => !!onSelectRoom && onSelectRoom(room)}
-                                {...buttonProps} />
-                    </Slot>
-                </Room>
-            );
-        } else {
-            return (
-                <Room key={room.id} room={room} showFavoriteButton {...restProps}>
-                    {children ? children(room) : null}
-                </Room>
-            );
-        }
-    });
-
-    render() {
-        const {rooms, inSelectionMode, selectedRooms} = this.props;
-        return (
-            <Card.Group stackable>
-                {rooms.map(room => (
-                    <this.RoomComponent key={room.id}
-                                        room={room}
-                                        inSelectionMode={inSelectionMode}
-                                        selectedRooms={selectedRooms} />
-                ))}
-            </Card.Group>
-        );
+      return (
+        <Room key={room.id} room={room} {...restProps}>
+          <Slot>
+            <Button
+              styleName="selection-add-btn"
+              onClick={() => !!onSelectRoom && onSelectRoom(room)}
+              {...buttonProps}
+            />
+          </Slot>
+        </Room>
+      );
+    } else {
+      return (
+        <Room key={room.id} room={room} showFavoriteButton {...restProps}>
+          {children ? children(room) : null}
+        </Room>
+      );
     }
+  });
+
+  render() {
+    const {rooms, inSelectionMode, selectedRooms} = this.props;
+    return (
+      <Card.Group stackable>
+        {rooms.map(room => (
+          <this.RoomComponent
+            key={room.id}
+            room={room}
+            inSelectionMode={inSelectionMode}
+            selectedRooms={selectedRooms}
+          />
+        ))}
+      </Card.Group>
+    );
+  }
 }
 
 export default Overridable.component('RoomRenderer', RoomRenderer);

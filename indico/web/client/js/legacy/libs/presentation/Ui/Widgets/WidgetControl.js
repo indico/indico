@@ -5,7 +5,6 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-
 /**
  * Widget control
  * @param {Function} panelBuilder
@@ -14,29 +13,28 @@
  * @return {Function} control builder
  */
 function WidgetControl(panelBuilder, itemTemplate, attributes) {
-    /**
-     * Builds a control
-     * @param {Object} source
-     * @return {Element}
-     */
-    var controlBuilder = function(source) {
-        // bind.element used because it should also bind the items to select field etc.
-        return bind.element(panelBuilder(attributes), source, itemTemplate);
-    };
+  /**
+   * Builds a control
+   * @param {Object} source
+   * @return {Element}
+   */
+  var controlBuilder = function(source) {
+    // bind.element used because it should also bind the items to select field etc.
+    return bind.element(panelBuilder(attributes), source, itemTemplate);
+  };
 
-    /**
-     * @param {Object} attribs
-     * @return {Function} control builder
-     */
-    controlBuilder.customize = function(attribs) {
-        return WidgetControl(panelBuilder, itemTemplate, merge(attributes, attribs));
-    };
+  /**
+   * @param {Object} attribs
+   * @return {Function} control builder
+   */
+  controlBuilder.customize = function(attribs) {
+    return WidgetControl(panelBuilder, itemTemplate, merge(attributes, attribs));
+  };
 
-    extend(controlBuilder, WidgetBuilder);
+  extend(controlBuilder, WidgetBuilder);
 
-    return controlBuilder;
+  return controlBuilder;
 }
-
 
 Widget.link = WidgetControl(Html.a, Widget.clickable);
 Widget.text = WidgetControl(Html.span);

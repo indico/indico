@@ -8,7 +8,6 @@
 import * as actions from './actions';
 import * as selectors from './selectors';
 
-
 export {default as mapControllerFactory} from './MapController';
 export {default as reducer, mapSearchReducerFactory} from './reducers';
 export {actions, selectors};

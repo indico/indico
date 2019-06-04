@@ -8,34 +8,37 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-
 export default class Filter extends React.Component {
-    static propTypes = {
-        realms: PropTypes.object.isRequired,
-        filters: PropTypes.object.isRequired,
-        setFilter: PropTypes.func.isRequired
-    };
+  static propTypes = {
+    realms: PropTypes.object.isRequired,
+    filters: PropTypes.object.isRequired,
+    setFilter: PropTypes.func.isRequired,
+  };
 
-    render() {
-        const {realms, filters, setFilter} = this.props;
-        return (
-            <div className="toolbar">
-                <div className={`group i-selection ${realms.length <= 1 ? 'hidden' : ''}`}>
-                    <span className="i-button label">Show</span>
-                    {Object.keys(realms).sort().map((name) => (
-                        <React.Fragment key={name}>
-                            <input type="checkbox"
-                                   id={`realm-${name}`}
-                                   data-realm={name}
-                                   defaultChecked={filters[name]}
-                                   onChange={(e) => setFilter({[name]: e.target.checked})} />
-                            <label htmlFor={`realm-${name}`} className="i-button">
-                                {realms[name]}
-                            </label>
-                        </React.Fragment>
-                    ))}
-                </div>
-            </div>
-        );
-    }
+  render() {
+    const {realms, filters, setFilter} = this.props;
+    return (
+      <div className="toolbar">
+        <div className={`group i-selection ${realms.length <= 1 ? 'hidden' : ''}`}>
+          <span className="i-button label">Show</span>
+          {Object.keys(realms)
+            .sort()
+            .map(name => (
+              <React.Fragment key={name}>
+                <input
+                  type="checkbox"
+                  id={`realm-${name}`}
+                  data-realm={name}
+                  defaultChecked={filters[name]}
+                  onChange={e => setFilter({[name]: e.target.checked})}
+                />
+                <label htmlFor={`realm-${name}`} className="i-button">
+                  {realms[name]}
+                </label>
+              </React.Fragment>
+            ))}
+        </div>
+      </div>
+    );
+  }
 }

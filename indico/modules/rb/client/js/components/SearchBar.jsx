@@ -15,59 +15,69 @@ import {actions as filtersActions} from '../common/filters';
 
 import './SearchBar.module.scss';
 
-
 class SearchBar extends React.Component {
-    static propTypes = {
-        filters: PropTypes.object.isRequired,
-        disabled: PropTypes.bool,
-        actions: PropTypes.exact({
-            setFilterParameter: PropTypes.func.isRequired,
-        }).isRequired,
-    };
+  static propTypes = {
+    filters: PropTypes.object.isRequired,
+    disabled: PropTypes.bool,
+    actions: PropTypes.exact({
+      setFilterParameter: PropTypes.func.isRequired,
+    }).isRequired,
+  };
 
-    static defaultProps = {
-        disabled: false,
-    };
+  static defaultProps = {
+    disabled: false,
+  };
 
-    updateTextFilter = (filterValue) => {
-        const {actions: {setFilterParameter}} = this.props;
-        setFilterParameter('text', filterValue || null);
-    };
+  updateTextFilter = filterValue => {
+    const {
+      actions: {setFilterParameter},
+    } = this.props;
+    setFilterParameter('text', filterValue || null);
+  };
 
-    render() {
-        const {filters: {text}, disabled} = this.props;
-        let inputIcon;
+  render() {
+    const {
+      filters: {text},
+      disabled,
+    } = this.props;
+    let inputIcon;
 
-        if (text) {
-            inputIcon = <Icon link name="remove" onClick={() => this.updateTextFilter(null)} />;
-        } else {
-            inputIcon = <Icon name="search" />;
-        }
-
-        return (
-            <div styleName="room-filters">
-                <DebounceInput element={Input}
-                               size="large"
-                               styleName="text-filter"
-                               icon={inputIcon}
-                               debounceTimeout={400}
-                               onChange={(event) => this.updateTextFilter(event.target.value)}
-                               value={text || ''}
-                               disabled={disabled} />
-            </div>
-        );
+    if (text) {
+      inputIcon = <Icon link name="remove" onClick={() => this.updateTextFilter(null)} />;
+    } else {
+      inputIcon = <Icon name="search" />;
     }
+
+    return (
+      <div styleName="room-filters">
+        <DebounceInput
+          element={Input}
+          size="large"
+          styleName="text-filter"
+          icon={inputIcon}
+          debounceTimeout={400}
+          onChange={event => this.updateTextFilter(event.target.value)}
+          value={text || ''}
+          disabled={disabled}
+        />
+      </div>
+    );
+  }
 }
 
 export default (namespace, searchRoomsSelectors) => {
-    return connect(
-        state => ({
-            filters: searchRoomsSelectors.getFilters(state),
-        }),
-        dispatch => ({
-            actions: bindActionCreators({
-                setFilterParameter: (param, value) => filtersActions.setFilterParameter(namespace, param, value),
-            }, dispatch)
-        })
-    )(SearchBar);
+  return connect(
+    state => ({
+      filters: searchRoomsSelectors.getFilters(state),
+    }),
+    dispatch => ({
+      actions: bindActionCreators(
+        {
+          setFilterParameter: (param, value) =>
+            filtersActions.setFilterParameter(namespace, param, value),
+        },
+        dispatch
+      ),
+    })
+  )(SearchBar);
 };

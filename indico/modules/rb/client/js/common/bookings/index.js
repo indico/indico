@@ -8,7 +8,6 @@
 import * as actions from './actions';
 import * as selectors from './selectors';
 
-
 export {default as reducer} from './reducers';
 export {default as BookingDetailsPreloader} from './BookingDetailsPreloader';
 export {default as BookingObjectLink} from './BookingObjectLink';

@@ -7,5 +7,4 @@
 
 import {roomSearchActionsFactory} from '../../common/roomSearch';
 
-
 export const {searchRooms} = roomSearchActionsFactory('roomList');

@@ -7,23 +7,21 @@
 
 /* eslint "react/no-unused-prop-types": "off" */
 
-
 import React from 'react';
 import PropTypes from 'prop-types';
 
-
 export default class FilterFormComponent extends React.Component {
-    static propTypes = {
-        setParentField: PropTypes.func.isRequired
-    };
+  static propTypes = {
+    setParentField: PropTypes.func.isRequired,
+  };
 
-    state = {};
+  state = {};
 
-    static getDerivedStateFromProps(props, prevState) {
-        // override internal state from props.
-        // this allows other widgets and reducers to perform
-        // corrections which will be reflected next time the
-        // component is rendered
-        return {...prevState, ...props};
-    }
+  static getDerivedStateFromProps(props, prevState) {
+    // override internal state from props.
+    // this allows other widgets and reducers to perform
+    // corrections which will be reflected next time the
+    // component is rendered
+    return {...prevState, ...props};
+  }
 }

@@ -12,18 +12,19 @@ import {Markdown} from 'indico/react/util';
 
 import './RoomKeyLocation.module.scss';
 
-
 export default function RoomKeyLocation({room}) {
-    return room.keyLocation && (
-        <Message styleName="message-icon" icon>
-            <Icon name="key" />
-            <Message.Content>
-                <Markdown source={room.keyLocation} targetBlank />
-            </Message.Content>
-        </Message>
-    );
+  return (
+    room.keyLocation && (
+      <Message styleName="message-icon" icon>
+        <Icon name="key" />
+        <Message.Content>
+          <Markdown source={room.keyLocation} targetBlank />
+        </Message.Content>
+      </Message>
+    )
+  );
 }
 
 RoomKeyLocation.propTypes = {
-    room: PropTypes.object.isRequired,
+  room: PropTypes.object.isRequired,
 };

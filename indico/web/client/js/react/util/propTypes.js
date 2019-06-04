@@ -11,5 +11,5 @@ import PropTypes from 'prop-types';
  * A set of Indico-specific prop-types shorthands
  */
 export default {
-    i18n: PropTypes.oneOfType([PropTypes.string, PropTypes.node])
+  i18n: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
 };

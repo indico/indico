@@ -34,145 +34,159 @@ import * as globalActions from '../actions';
 import * as globalSelectors from '../selectors';
 import './App.module.scss';
 
-
 class App extends React.Component {
-    static propTypes = {
-        title: PropTypes.string,
-        iconName: PropTypes.string,
-        history: PropTypes.object.isRequired,
-        filtersSet: PropTypes.bool.isRequired,
-        isInitializing: PropTypes.bool.isRequired,
-        fetchInitialData: PropTypes.func.isRequired,
-        resetPageState: PropTypes.func.isRequired
-    };
+  static propTypes = {
+    title: PropTypes.string,
+    iconName: PropTypes.string,
+    history: PropTypes.object.isRequired,
+    filtersSet: PropTypes.bool.isRequired,
+    isInitializing: PropTypes.bool.isRequired,
+    fetchInitialData: PropTypes.func.isRequired,
+    resetPageState: PropTypes.func.isRequired,
+  };
 
-    static defaultProps = {
-        title: Translate.string('Room Booking'),
-        iconName: 'home'
-    };
+  static defaultProps = {
+    title: Translate.string('Room Booking'),
+    iconName: 'home',
+  };
 
-    state = {
-        userActionsVisible: false
-    };
+  state = {
+    userActionsVisible: false,
+  };
 
-    componentDidMount() {
-        const {fetchInitialData} = this.props;
-        fetchInitialData();
-    }
+  componentDidMount() {
+    const {fetchInitialData} = this.props;
+    fetchInitialData();
+  }
 
-    onSidebarHide = () => {
-        document.body.classList.remove('scrolling-disabled');
-        this.setState({userActionsVisible: false});
-    };
+  onSidebarHide = () => {
+    document.body.classList.remove('scrolling-disabled');
+    this.setState({userActionsVisible: false});
+  };
 
-    renderContent() {
-        const {filtersSet, isInitializing} = this.props;
-        const {userActionsVisible} = this.state;
-        return (
-            <Sidebar.Pushable styleName="rb-pushable">
-                <SidebarMenu visible={userActionsVisible}
-                             onClickOption={this.onSidebarHide} />
-                <Sidebar.Pusher dimmed={userActionsVisible} styleName="rb-pusher">
-                    <div styleName="rb-content">
-                        <Switch>
-                            <Route exact path="/" render={({location}) => (
-                                <Redirect to={{pathname: '/book', search: location.search}} />
-                            )} />
-                            <ConditionalRoute path="/book" render={({location, match: {isExact}}) => (
-                                filtersSet
-                                    ? (
-                                        <BookRoom location={location} />
-                                    ) : (
-                                        isExact ? <Landing /> : <Redirect to="/book" />
-                                    )
-                            )} active={!isInitializing} />
-                            <ConditionalRoute path="/rooms" component={RoomList} active={!isInitializing} />
-                            <ConditionalRoute path="/blockings" component={BlockingList} active={!isInitializing} />
-                            <ConditionalRoute path="/calendar" component={Calendar} active={!isInitializing} />
-                            <ConditionalRoute path="/admin" component={AdminArea} active={!isInitializing} />
-                            <Route render={() => (
-                                <Segment placeholder>
-                                    <Header icon color="red">
-                                        <Icon name="exclamation triangle" />
-                                        <Translate>
-                                            This page does not exist.
-                                        </Translate>
-                                    </Header>
-                                </Segment>
-                            )} />
-                        </Switch>
-                        <ModalController />
-                    </div>
-                </Sidebar.Pusher>
-            </Sidebar.Pushable>
-        );
-    }
+  renderContent() {
+    const {filtersSet, isInitializing} = this.props;
+    const {userActionsVisible} = this.state;
+    return (
+      <Sidebar.Pushable styleName="rb-pushable">
+        <SidebarMenu visible={userActionsVisible} onClickOption={this.onSidebarHide} />
+        <Sidebar.Pusher dimmed={userActionsVisible} styleName="rb-pusher">
+          <div styleName="rb-content">
+            <Switch>
+              <Route
+                exact
+                path="/"
+                render={({location}) => (
+                  <Redirect to={{pathname: '/book', search: location.search}} />
+                )}
+              />
+              <ConditionalRoute
+                path="/book"
+                render={({location, match: {isExact}}) =>
+                  filtersSet ? (
+                    <BookRoom location={location} />
+                  ) : isExact ? (
+                    <Landing />
+                  ) : (
+                    <Redirect to="/book" />
+                  )
+                }
+                active={!isInitializing}
+              />
+              <ConditionalRoute path="/rooms" component={RoomList} active={!isInitializing} />
+              <ConditionalRoute
+                path="/blockings"
+                component={BlockingList}
+                active={!isInitializing}
+              />
+              <ConditionalRoute path="/calendar" component={Calendar} active={!isInitializing} />
+              <ConditionalRoute path="/admin" component={AdminArea} active={!isInitializing} />
+              <Route
+                render={() => (
+                  <Segment placeholder>
+                    <Header icon color="red">
+                      <Icon name="exclamation triangle" />
+                      <Translate>This page does not exist.</Translate>
+                    </Header>
+                  </Segment>
+                )}
+              />
+            </Switch>
+            <ModalController />
+          </div>
+        </Sidebar.Pusher>
+      </Sidebar.Pushable>
+    );
+  }
 
-    render() {
-        const {title, history, iconName, resetPageState, isInitializing} = this.props;
-        const {userActionsVisible} = this.state;
+  render() {
+    const {title, history, iconName, resetPageState, isInitializing} = this.props;
+    const {userActionsVisible} = this.state;
 
-        return (
-            <ConnectedRouter history={history}>
-                <div styleName="rb-layout">
-                    <header styleName="rb-menu-bar">
-                        <div styleName="rb-menu-bar-side-left">
-                            <h1>
-                                <Link to="/" onClick={() => resetPageState('bookRoom')}>
-                                    <Icon name={iconName} />
-                                    <Responsive as="span" minWidth={500}>
-                                        {title}
-                                    </Responsive>
-                                </Link>
-                            </h1>
-                        </div>
-                        <div styleName="rb-menu-bar-menu">
-                            <RouteAwareOverridable id="Menu">
-                                <Menu />
-                            </RouteAwareOverridable>
-                        </div>
-                        <div styleName="rb-menu-bar-side-right">
-                            <SidebarTrigger onClick={() => {
-                                document.body.classList.add('scrolling-disabled');
-                                this.setState({
-                                    userActionsVisible: true
-                                });
-                            }} active={userActionsVisible} />
-                        </div>
-                    </header>
-                    <AdminOverrideBar />
-                    <LinkBar />
-                    {this.renderContent()}
-                    <Dimmer.Dimmable>
-                        <Dimmer active={isInitializing} page>
-                            <Loader />
-                        </Dimmer>
-                    </Dimmer.Dimmable>
-                </div>
-            </ConnectedRouter>
-        );
-    }
+    return (
+      <ConnectedRouter history={history}>
+        <div styleName="rb-layout">
+          <header styleName="rb-menu-bar">
+            <div styleName="rb-menu-bar-side-left">
+              <h1>
+                <Link to="/" onClick={() => resetPageState('bookRoom')}>
+                  <Icon name={iconName} />
+                  <Responsive as="span" minWidth={500}>
+                    {title}
+                  </Responsive>
+                </Link>
+              </h1>
+            </div>
+            <div styleName="rb-menu-bar-menu">
+              <RouteAwareOverridable id="Menu">
+                <Menu />
+              </RouteAwareOverridable>
+            </div>
+            <div styleName="rb-menu-bar-side-right">
+              <SidebarTrigger
+                onClick={() => {
+                  document.body.classList.add('scrolling-disabled');
+                  this.setState({
+                    userActionsVisible: true,
+                  });
+                }}
+                active={userActionsVisible}
+              />
+            </div>
+          </header>
+          <AdminOverrideBar />
+          <LinkBar />
+          {this.renderContent()}
+          <Dimmer.Dimmable>
+            <Dimmer active={isInitializing} page>
+              <Loader />
+            </Dimmer>
+          </Dimmer.Dimmable>
+        </div>
+      </ConnectedRouter>
+    );
+  }
 }
 
 export default connect(
-    state => ({
-        filtersSet: globalSelectors.filtersAreSet(state),
-        isInitializing: globalSelectors.isInitializing(state),
-    }),
-    dispatch => ({
-        fetchInitialData() {
-            dispatch(configActions.fetchConfig()).then(() => {
-                // we only need map areas if the map is enabled, which depends on the config
-                dispatch(mapActions.fetchAreas());
-            });
-            dispatch(userActions.fetchUserInfo());
-            dispatch(userActions.fetchFavoriteRooms());
-            dispatch(userActions.fetchAllRoomPermissions());
-            dispatch(roomsActions.fetchEquipmentTypes());
-            dispatch(roomsActions.fetchRooms());
-        },
-        resetPageState(namespace) {
-            dispatch(globalActions.resetPageState(namespace));
-        }
-    })
+  state => ({
+    filtersSet: globalSelectors.filtersAreSet(state),
+    isInitializing: globalSelectors.isInitializing(state),
+  }),
+  dispatch => ({
+    fetchInitialData() {
+      dispatch(configActions.fetchConfig()).then(() => {
+        // we only need map areas if the map is enabled, which depends on the config
+        dispatch(mapActions.fetchAreas());
+      });
+      dispatch(userActions.fetchUserInfo());
+      dispatch(userActions.fetchFavoriteRooms());
+      dispatch(userActions.fetchAllRoomPermissions());
+      dispatch(roomsActions.fetchEquipmentTypes());
+      dispatch(roomsActions.fetchRooms());
+    },
+    resetPageState(namespace) {
+      dispatch(globalActions.resetPageState(namespace));
+    },
+  })
 )(Overridable.component('App', App));

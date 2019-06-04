@@ -8,7 +8,6 @@
 import * as actions from './actions';
 import * as selectors from './selectors';
 
-
 export {linkDataShape} from './props';
 export {default as reducer} from './reducers';
 export {default as LinkBar} from './LinkBar';

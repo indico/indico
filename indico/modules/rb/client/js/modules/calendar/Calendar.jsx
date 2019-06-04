@@ -31,261 +31,319 @@ import {getOccurrenceTypes, transformToLegendLabels} from '../../util';
 
 import './Calendar.module.scss';
 
-
 const SearchBar = searchBarFactory('calendar', calendarSelectors);
 const RoomFilterBar = roomFilterBarFactory('calendar', calendarSelectors);
 
-
 class Calendar extends React.Component {
-    static propTypes = {
-        calendarData: PropTypes.object.isRequired,
-        datePicker: PropTypes.object.isRequired,
-        isFetching: PropTypes.bool.isRequired,
-        isFetchingActiveBookings: PropTypes.bool.isRequired,
-        roomFilters: PropTypes.object.isRequired,
-        calendarFilters: PropTypes.object.isRequired,
-        localFilters: PropTypes.shape({
-            hideUnused: PropTypes.bool.isRequired,
-        }).isRequired,
-        allowDragDrop: PropTypes.bool,
-        view: PropTypes.oneOf(['timeline', 'list']).isRequired,
-        actions: PropTypes.exact({
-            fetchCalendar: PropTypes.func.isRequired,
-            setDate: PropTypes.func.isRequired,
-            setMode: PropTypes.func.isRequired,
-            openRoomDetails: PropTypes.func.isRequired,
-            openBookRoom: PropTypes.func.isRequired,
-            openBookingDetails: PropTypes.func.isRequired,
-            setFilterParameter: PropTypes.func.isRequired,
-            changeView: PropTypes.func.isRequired,
-        }).isRequired,
-    };
+  static propTypes = {
+    calendarData: PropTypes.object.isRequired,
+    datePicker: PropTypes.object.isRequired,
+    isFetching: PropTypes.bool.isRequired,
+    isFetchingActiveBookings: PropTypes.bool.isRequired,
+    roomFilters: PropTypes.object.isRequired,
+    calendarFilters: PropTypes.object.isRequired,
+    localFilters: PropTypes.shape({
+      hideUnused: PropTypes.bool.isRequired,
+    }).isRequired,
+    allowDragDrop: PropTypes.bool,
+    view: PropTypes.oneOf(['timeline', 'list']).isRequired,
+    actions: PropTypes.exact({
+      fetchCalendar: PropTypes.func.isRequired,
+      setDate: PropTypes.func.isRequired,
+      setMode: PropTypes.func.isRequired,
+      openRoomDetails: PropTypes.func.isRequired,
+      openBookRoom: PropTypes.func.isRequired,
+      openBookingDetails: PropTypes.func.isRequired,
+      setFilterParameter: PropTypes.func.isRequired,
+      changeView: PropTypes.func.isRequired,
+    }).isRequired,
+  };
 
-    static defaultProps = {
-        allowDragDrop: true
-    };
+  static defaultProps = {
+    allowDragDrop: true,
+  };
 
-    constructor(props) {
-        super(props);
-        this.contextRef = React.createRef();
+  constructor(props) {
+    super(props);
+    this.contextRef = React.createRef();
+  }
+
+  componentDidMount() {
+    const {
+      actions: {fetchCalendar},
+    } = this.props;
+    fetchCalendar();
+  }
+
+  componentDidUpdate(prevProps) {
+    const {
+      datePicker: {selectedDate: prevDate, mode: prevMode},
+      roomFilters: prevRoomFilters,
+      calendarFilters: prevCalendarFilters,
+    } = prevProps;
+    const {
+      datePicker: {selectedDate, mode},
+      roomFilters,
+      calendarFilters,
+      actions: {fetchCalendar},
+    } = this.props;
+    const roomFiltersChanged = !_.isEqual(prevRoomFilters, roomFilters);
+    const calendarFiltersChanged = !_.isEqual(prevCalendarFilters, calendarFilters);
+    if (
+      prevDate !== selectedDate ||
+      mode !== prevMode ||
+      roomFiltersChanged ||
+      calendarFiltersChanged
+    ) {
+      fetchCalendar(roomFiltersChanged);
     }
+  }
 
-    componentDidMount() {
-        const {actions: {fetchCalendar}} = this.props;
-        fetchCalendar();
-    }
+  onAddSlot = ({room, slotStartTime, slotEndTime}) => {
+    const {
+      datePicker: {selectedDate},
+      actions: {openBookRoom},
+    } = this.props;
+    openBookRoom(room.id, {
+      dates: {
+        startDate: selectedDate,
+        endDate: null,
+      },
+      timeSlot: {
+        startTime: slotStartTime,
+        endTime: slotEndTime,
+      },
+      recurrence: {
+        type: 'single',
+      },
+      isPrebooking: !room.canUserBook,
+    });
+  };
 
-    componentDidUpdate(prevProps) {
-        const {
-            datePicker: {selectedDate: prevDate, mode: prevMode},
-            roomFilters: prevRoomFilters,
-            calendarFilters: prevCalendarFilters,
-        } = prevProps;
-        const {
-            datePicker: {selectedDate, mode},
-            roomFilters,
-            calendarFilters,
-            actions: {fetchCalendar},
-        } = this.props;
-        const roomFiltersChanged = !_.isEqual(prevRoomFilters, roomFilters);
-        const calendarFiltersChanged = !_.isEqual(prevCalendarFilters, calendarFilters);
-        if (prevDate !== selectedDate || mode !== prevMode || roomFiltersChanged || calendarFiltersChanged) {
-            fetchCalendar(roomFiltersChanged);
-        }
-    }
+  toggleHideUnused = () => {
+    const {
+      localFilters: {hideUnused},
+      actions: {setFilterParameter},
+    } = this.props;
+    setFilterParameter('hideUnused', !hideUnused);
+  };
 
-    onAddSlot = ({room, slotStartTime, slotEndTime}) => {
-        const {datePicker: {selectedDate}, actions: {openBookRoom}} = this.props;
-        openBookRoom(room.id, {
-            dates: {
-                startDate: selectedDate,
-                endDate: null,
-            },
-            timeSlot: {
-                startTime: slotStartTime,
-                endTime: slotEndTime,
-            },
-            recurrence: {
-                type: 'single',
-            },
-            isPrebooking: !room.canUserBook,
-        });
-    };
+  toggleShowInactive = () => {
+    const {
+      calendarFilters: {showInactive},
+      actions: {setFilterParameter},
+    } = this.props;
+    setFilterParameter('showInactive', !showInactive);
+  };
 
-    toggleHideUnused = () => {
-        const {localFilters: {hideUnused}, actions: {setFilterParameter}} = this.props;
-        setFilterParameter('hideUnused', !hideUnused);
-    };
+  getLegendLabels = (availability, showInactive) => {
+    const inactiveTypes = showInactive ? [] : ['rejections', 'cancellations'];
+    const occurrenceTypes = availability.reduce(
+      (types, [, day]) => _.union(types, getOccurrenceTypes(day)),
+      []
+    );
+    return transformToLegendLabels(occurrenceTypes, inactiveTypes);
+  };
 
-    toggleShowInactive = () => {
-        const {calendarFilters: {showInactive}, actions: {setFilterParameter}} = this.props;
-        setFilterParameter('showInactive', !showInactive);
-    };
+  renderExtraButtons = () => {
+    const {
+      calendarFilters: {myBookings, showInactive},
+      localFilters: {hideUnused},
+      actions: {setFilterParameter},
+      isFetching,
+      isFetchingActiveBookings,
+    } = this.props;
+    const {view} = this.props;
 
-    getLegendLabels = (availability, showInactive) => {
-        const inactiveTypes = showInactive ? [] : ['rejections', 'cancellations'];
-        const occurrenceTypes = availability.reduce((types, [, day]) => _.union(types, getOccurrenceTypes(day)), []);
-        return transformToLegendLabels(occurrenceTypes, inactiveTypes);
-    };
+    return (
+      <Button.Group size="small">
+        <Popup
+          trigger={
+            <Button
+              primary={myBookings}
+              icon="user circle"
+              disabled={isFetching || isFetchingActiveBookings}
+              onClick={() => setFilterParameter('myBookings', !myBookings || null)}
+            />
+          }
+        >
+          <Translate>Show only my bookings</Translate>
+        </Popup>
+        {view === 'timeline' && (
+          <>
+            <Popup
+              trigger={
+                <Button
+                  primary={showInactive}
+                  icon="ban"
+                  disabled={isFetching}
+                  onClick={this.toggleShowInactive}
+                />
+              }
+            >
+              {showInactive ? (
+                <Translate>Hide rejected/cancelled bookings</Translate>
+              ) : (
+                <Translate>Show rejected/cancelled bookings</Translate>
+              )}
+            </Popup>
+            <Popup
+              trigger={
+                <Button
+                  primary={hideUnused}
+                  icon={hideUnused ? 'plus square outline' : 'minus square outline'}
+                  disabled={isFetching}
+                  onClick={this.toggleHideUnused}
+                />
+              }
+            >
+              {hideUnused ? (
+                <Translate>Show unused spaces</Translate>
+              ) : (
+                <Translate>Hide unused spaces</Translate>
+              )}
+            </Popup>
+          </>
+        )}
+      </Button.Group>
+    );
+  };
 
-    renderExtraButtons = () => {
-        const {
-            calendarFilters: {myBookings, showInactive},
-            localFilters: {hideUnused},
-            actions: {setFilterParameter},
-            isFetching, isFetchingActiveBookings
-        } = this.props;
-        const {view} = this.props;
+  renderViewSwitch = () => {
+    const {
+      view,
+      actions: {changeView, setFilterParameter},
+      isFetching,
+      isFetchingActiveBookings,
+    } = this.props;
+    return (
+      <div styleName="view-switch">
+        <Popup
+          trigger={
+            <Button
+              icon={<Icon name="calendar" />}
+              primary={view === 'timeline'}
+              onClick={() => changeView('timeline')}
+              disabled={isFetching || isFetchingActiveBookings}
+              size="tiny"
+              circular
+            />
+          }
+          position="bottom center"
+        >
+          <Translate>Show calendar view</Translate>
+        </Popup>
+        <Popup
+          trigger={
+            <Button
+              icon={<Icon name="list" />}
+              primary={view === 'list'}
+              onClick={() => {
+                setFilterParameter('showInactive', null);
+                changeView('list');
+              }}
+              disabled={isFetching || isFetchingActiveBookings}
+              size="tiny"
+              circular
+            />
+          }
+          position="bottom center"
+        >
+          <Translate>Show a list of all upcoming bookings</Translate>
+        </Popup>
+      </div>
+    );
+  };
 
-        return (
-            <Button.Group size="small">
-                <Popup trigger={<Button primary={myBookings}
-                                        icon="user circle"
-                                        disabled={isFetching || isFetchingActiveBookings}
-                                        onClick={() => setFilterParameter('myBookings', !myBookings || null)} />}>
-                    <Translate>
-                        Show only my bookings
-                    </Translate>
-                </Popup>
-                {view === 'timeline' && (
-                    <>
-                        <Popup trigger={<Button primary={showInactive}
-                                                icon="ban"
-                                                disabled={isFetching}
-                                                onClick={this.toggleShowInactive} />}>
-                            {showInactive
-                                ? <Translate>Hide rejected/cancelled bookings</Translate>
-                                : <Translate>Show rejected/cancelled bookings</Translate>}
-                        </Popup>
-                        <Popup trigger={<Button primary={hideUnused}
-                                                icon={hideUnused ? 'plus square outline' : 'minus square outline'}
-                                                disabled={isFetching}
-                                                onClick={this.toggleHideUnused} />}>
-                            {hideUnused
-                                ? <Translate>Show unused spaces</Translate>
-                                : <Translate>Hide unused spaces</Translate>}
-                        </Popup>
-                    </>
-                )}
-            </Button.Group>
-        );
-    };
+  render() {
+    const {
+      view,
+      isFetching,
+      isFetchingActiveBookings,
+      localFilters: {hideUnused},
+      calendarFilters: {showInactive},
+      calendarData: {rows},
+      actions: {openRoomDetails, setDate, openBookingDetails, setMode},
+      datePicker,
+      allowDragDrop,
+    } = this.props;
 
-    renderViewSwitch = () => {
-        const {view, actions: {changeView, setFilterParameter}, isFetching, isFetchingActiveBookings} = this.props;
-        return (
-            <div styleName="view-switch">
-                <Popup trigger={<Button icon={<Icon name="calendar" />}
-                                        primary={view === 'timeline'}
-                                        onClick={() => changeView('timeline')}
-                                        disabled={isFetching || isFetchingActiveBookings}
-                                        size="tiny"
-                                        circular />}
-                       position="bottom center">
-                    <Translate>
-                        Show calendar view
-                    </Translate>
-                </Popup>
-                <Popup trigger={<Button icon={<Icon name="list" />}
-                                        primary={view === 'list'}
-                                        onClick={() => {
-                                            setFilterParameter('showInactive', null);
-                                            changeView('list');
-                                        }}
-                                        disabled={isFetching || isFetchingActiveBookings}
-                                        size="tiny"
-                                        circular />}
-                       position="bottom center">
-                    <Translate>
-                        Show a list of all upcoming bookings
-                    </Translate>
-                </Popup>
-            </div>
-        );
-    };
-
-    render() {
-        const {
-            view,
-            isFetching,
-            isFetchingActiveBookings,
-            localFilters: {hideUnused},
-            calendarFilters: {showInactive},
-            calendarData: {rows},
-            actions: {openRoomDetails, setDate, openBookingDetails, setMode},
-            datePicker,
-            allowDragDrop,
-        } = this.props;
-
-        const editable = datePicker.mode === 'days' && allowDragDrop;
-        const isTimelineVisible = view === 'timeline';
-        return (
-            <Grid>
-                <Grid.Row>
-                    <Container>
-                        <div ref={this.contextRef}>
-                            <StickyWithScrollBack context={this.contextRef.current}>
-                                <Grid.Row styleName="calendar-filters">
-                                    <div className="filter-row">
-                                        <div className="filter-row-filters">
-                                            <RoomFilterBar disabled={isFetching || isFetchingActiveBookings} />
-                                            {this.renderExtraButtons()}
-                                            <SearchBar disabled={isFetching || isFetchingActiveBookings} />
-                                        </div>
-                                    </div>
-                                    {this.renderViewSwitch()}
-                                </Grid.Row>
-                                {isTimelineVisible && (
-                                    <TimelineHeader datePicker={datePicker}
-                                                    disableDatePicker={isFetching || !rows.length}
-                                                    onModeChange={setMode}
-                                                    onDateChange={setDate}
-                                                    legendLabels={this.getLegendLabels(rows, showInactive)} />
-                                )}
-                            </StickyWithScrollBack>
-                            {isTimelineVisible ? (
-                                <ElasticTimeline availability={rows}
-                                                 datePicker={datePicker}
-                                                 onClickLabel={openRoomDetails}
-                                                 isLoading={isFetching}
-                                                 onClickReservation={openBookingDetails}
-                                                 onAddSlot={editable ? this.onAddSlot : null}
-                                                 showUnused={!hideUnused}
-                                                 longLabel />
-                            ) : (
-                                <CalendarListView />
-                            )}
-                        </div>
-                    </Container>
+    const editable = datePicker.mode === 'days' && allowDragDrop;
+    const isTimelineVisible = view === 'timeline';
+    return (
+      <Grid>
+        <Grid.Row>
+          <Container>
+            <div ref={this.contextRef}>
+              <StickyWithScrollBack context={this.contextRef.current}>
+                <Grid.Row styleName="calendar-filters">
+                  <div className="filter-row">
+                    <div className="filter-row-filters">
+                      <RoomFilterBar disabled={isFetching || isFetchingActiveBookings} />
+                      {this.renderExtraButtons()}
+                      <SearchBar disabled={isFetching || isFetchingActiveBookings} />
+                    </div>
+                  </div>
+                  {this.renderViewSwitch()}
                 </Grid.Row>
-            </Grid>
-        );
-    }
+                {isTimelineVisible && (
+                  <TimelineHeader
+                    datePicker={datePicker}
+                    disableDatePicker={isFetching || !rows.length}
+                    onModeChange={setMode}
+                    onDateChange={setDate}
+                    legendLabels={this.getLegendLabels(rows, showInactive)}
+                  />
+                )}
+              </StickyWithScrollBack>
+              {isTimelineVisible ? (
+                <ElasticTimeline
+                  availability={rows}
+                  datePicker={datePicker}
+                  onClickLabel={openRoomDetails}
+                  isLoading={isFetching}
+                  onClickReservation={openBookingDetails}
+                  onAddSlot={editable ? this.onAddSlot : null}
+                  showUnused={!hideUnused}
+                  longLabel
+                />
+              ) : (
+                <CalendarListView />
+              )}
+            </div>
+          </Container>
+        </Grid.Row>
+      </Grid>
+    );
+  }
 }
 
-
 export default connect(
-    state => ({
-        isFetching: calendarSelectors.isFetchingCalendar(state),
-        isFetchingActiveBookings: calendarSelectors.isFetchingActiveBookings(state),
-        calendarData: calendarSelectors.getCalendarData(state),
-        roomFilters: calendarSelectors.getRoomFilters(state),
-        calendarFilters: calendarSelectors.getCalendarFilters(state),
-        localFilters: calendarSelectors.getLocalFilters(state),
-        rooms: roomsSelectors.getAllRooms(state),
-        datePicker: calendarSelectors.getDatePickerInfo(state),
-        view: calendarSelectors.getCalendarView(state),
-    }),
-    dispatch => ({
-        actions: bindActionCreators({
-            fetchCalendar: calendarActions.fetchCalendar,
-            setDate: (date) => calendarActions.setDate(serializeDate(date)),
-            setMode: calendarActions.setMode,
-            openRoomDetails: roomsActions.openRoomDetails,
-            openBookRoom: bookRoomActions.openBookRoom,
-            openBookingDetails: bookingsActions.openBookingDetails,
-            setFilterParameter: (name, value) => filtersActions.setFilterParameter('calendar', name, value),
-            changeView: calendarActions.changeView,
-        }, dispatch),
-    }),
+  state => ({
+    isFetching: calendarSelectors.isFetchingCalendar(state),
+    isFetchingActiveBookings: calendarSelectors.isFetchingActiveBookings(state),
+    calendarData: calendarSelectors.getCalendarData(state),
+    roomFilters: calendarSelectors.getRoomFilters(state),
+    calendarFilters: calendarSelectors.getCalendarFilters(state),
+    localFilters: calendarSelectors.getLocalFilters(state),
+    rooms: roomsSelectors.getAllRooms(state),
+    datePicker: calendarSelectors.getDatePickerInfo(state),
+    view: calendarSelectors.getCalendarView(state),
+  }),
+  dispatch => ({
+    actions: bindActionCreators(
+      {
+        fetchCalendar: calendarActions.fetchCalendar,
+        setDate: date => calendarActions.setDate(serializeDate(date)),
+        setMode: calendarActions.setMode,
+        openRoomDetails: roomsActions.openRoomDetails,
+        openBookRoom: bookRoomActions.openBookRoom,
+        openBookingDetails: bookingsActions.openBookingDetails,
+        setFilterParameter: (name, value) =>
+          filtersActions.setFilterParameter('calendar', name, value),
+        changeView: calendarActions.changeView,
+      },
+      dispatch
+    ),
+  })
 )(Overridable.component('Calendar', Calendar));

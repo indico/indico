@@ -13,31 +13,32 @@ import {FilterFormComponent} from '../../../common/filters';
 
 import './CapacityForm.module.scss';
 
-
 export default class CapacityForm extends FilterFormComponent {
-    setCapacity(capacity) {
-        const {setParentField} = this.props;
+  setCapacity(capacity) {
+    const {setParentField} = this.props;
 
-        setParentField('capacity', capacity);
-        this.setState({
-            capacity
-        });
-    }
+    setParentField('capacity', capacity);
+    this.setState({
+      capacity,
+    });
+  }
 
-    render() {
-        const {capacity} = this.state;
-        const icon = <Icon name="close" onClick={() => this.setCapacity(null)} link />;
-        return (
-            <div styleName="capacity-form">
-                <Input type="number"
-                       min="1"
-                       step="1"
-                       icon={capacity ? icon : null}
-                       value={capacity || ''}
-                       onChange={(__, {value}) => {
-                           this.setCapacity(!value ? null : Math.abs(+value));
-                       }} />
-            </div>
-        );
-    }
+  render() {
+    const {capacity} = this.state;
+    const icon = <Icon name="close" onClick={() => this.setCapacity(null)} link />;
+    return (
+      <div styleName="capacity-form">
+        <Input
+          type="number"
+          min="1"
+          step="1"
+          icon={capacity ? icon : null}
+          value={capacity || ''}
+          onChange={(__, {value}) => {
+            this.setCapacity(!value ? null : Math.abs(+value));
+          }}
+        />
+      </div>
+    );
+  }
 }

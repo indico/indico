@@ -7,7 +7,6 @@
 
 import {RequestState} from 'indico/utils/redux';
 
-
 export const hasLoadedConfig = ({config}) => config.request.state === RequestState.SUCCESS;
 export const getRoomsSpriteToken = ({config}) => config.data.roomsSpriteToken;
 export const getTileServerURL = ({config}) => config.data.tileServerURL;

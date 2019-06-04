@@ -7,7 +7,6 @@
 
 import 'outdatedbrowser/outdatedbrowser/outdatedbrowser.css';
 
-
 // outdatedbrowser has to be loaded with exports-loader
 // in order to be available from 'window.outdatedBrowser'
 window.outdatedBrowser = require('exports-loader?outdatedBrowser!outdatedbrowser');

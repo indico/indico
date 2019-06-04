@@ -13,25 +13,37 @@ import createReduxStore from 'indico/utils/redux';
 import getReducers from './reducers';
 import {queryStringReducer as qsRoomSearchReducer} from './common/roomSearch';
 import {routeConfig as roomListRouteConfig} from './modules/roomList';
-import {routeConfig as bookRoomRouteConfig, queryStringReducer as qsBookRoomReducer} from './modules/bookRoom';
-import {routeConfig as calendarRouteConfig, queryStringReducer as qsCalendarReducer} from './modules/calendar';
-import {routeConfig as blockingsRouteConfig, queryStringReducer as qsBlockingsReducer} from './modules/blockings';
-
+import {
+  routeConfig as bookRoomRouteConfig,
+  queryStringReducer as qsBookRoomReducer,
+} from './modules/bookRoom';
+import {
+  routeConfig as calendarRouteConfig,
+  queryStringReducer as qsCalendarReducer,
+} from './modules/calendar';
+import {
+  routeConfig as blockingsRouteConfig,
+  queryStringReducer as qsBlockingsReducer,
+} from './modules/blockings';
 
 function getRouteConfig() {
-    return {
-        reduxPathname: ({router: {location: {pathname}}}) => pathname,
-        routes: {
-            ...roomListRouteConfig,
-            ...bookRoomRouteConfig,
-            ...calendarRouteConfig,
-            ...blockingsRouteConfig,
-        }
-    };
+  return {
+    reduxPathname: ({
+      router: {
+        location: {pathname},
+      },
+    }) => pathname,
+    routes: {
+      ...roomListRouteConfig,
+      ...bookRoomRouteConfig,
+      ...calendarRouteConfig,
+      ...blockingsRouteConfig,
+    },
+  };
 }
 
 export const history = createBrowserHistory({
-    basename: `${Indico.Urls.BasePath}/rooms`
+  basename: `${Indico.Urls.BasePath}/rooms`,
 });
 
 /**
@@ -42,19 +54,17 @@ export const history = createBrowserHistory({
  * e.g. a plugin
  */
 export default function createRBStore(overrides = {}, additionalReducers = []) {
-    return createReduxStore(
-        'rb-new',
-        getReducers(history),
-        {_overrides: overrides},
-        [
-            routerMiddleware(history),
-            queryStringMiddleware(history, getRouteConfig(), {usePush: false})
-        ],
-        [
-            qsRoomSearchReducer,
-            qsBookRoomReducer,
-            qsCalendarReducer,
-            qsBlockingsReducer,
-            ...additionalReducers
-        ]);
+  return createReduxStore(
+    'rb-new',
+    getReducers(history),
+    {_overrides: overrides},
+    [routerMiddleware(history), queryStringMiddleware(history, getRouteConfig(), {usePush: false})],
+    [
+      qsRoomSearchReducer,
+      qsBookRoomReducer,
+      qsCalendarReducer,
+      qsBlockingsReducer,
+      ...additionalReducers,
+    ]
+  );
 }

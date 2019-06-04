@@ -10,12 +10,11 @@ import React from 'react';
 import LogEntryList from '../containers/LogEntryList';
 import Toolbar from './Toolbar';
 
-
 export default function EventLog() {
-    return (
-        <>
-            <Toolbar />
-            <LogEntryList />
-        </>
-    );
+  return (
+    <>
+      <Toolbar />
+      <LogEntryList />
+    </>
+  );
 }

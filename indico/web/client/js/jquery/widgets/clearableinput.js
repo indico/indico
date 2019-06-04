@@ -6,107 +6,113 @@
 // LICENSE file for more details.
 
 (function($) {
-    'use strict';
+  'use strict';
 
-    $.widget("indico.clearableinput", {
-        options: {
-            alwaysClearable: false,
-            clearClass: 'clearableinput',
-            clearOnEscape: true,
-            emptyvalue: '',
-            focusOnClear: true,
-            focusOnStart: false,
-            onClear: function() {},
-            onInput: function() {}
-        },
+  $.widget('indico.clearableinput', {
+    options: {
+      alwaysClearable: false,
+      clearClass: 'clearableinput',
+      clearOnEscape: true,
+      emptyvalue: '',
+      focusOnClear: true,
+      focusOnStart: false,
+      onClear: function() {},
+      onInput: function() {},
+    },
 
-        _create: function() {
-            var self = this;
+    _create: function() {
+      var self = this;
 
-            self.buttonBox = $('<span>').addClass('button-box');
-            self.clearIcon = $('<a>').addClass('i-link danger icon-close')
-                .click(function(evt) {
-                    self._clear();
-                    evt.stopPropagation();
-                });
+      self.buttonBox = $('<span>').addClass('button-box');
+      self.clearIcon = $('<a>')
+        .addClass('i-link danger icon-close')
+        .click(function(evt) {
+          self._clear();
+          evt.stopPropagation();
+        });
 
-            var wrapper = $('<span>').addClass(self.options.clearClass);
-            self.element.addClass('clearabletext').wrap(wrapper)
-                .on('input', function() {
-                    self._handleInput();
-                })
-                .on('keyup', function(e) {
-                    if (self.options.clearOnEscape) {
-                        if (e.which === K.ESCAPE) {
-                            self.element.val('value');
-                            self._clear();
-                        }
-                    }
-                });
-
-            self.buttonBox.append(self.clearIcon);
-            self.element.after(self.buttonBox);
-            self._refreshClearIcon();
-
-            if (self.options.focusOnStart) {
-                self.element.focus();
+      var wrapper = $('<span>').addClass(self.options.clearClass);
+      self.element
+        .addClass('clearabletext')
+        .wrap(wrapper)
+        .on('input', function() {
+          self._handleInput();
+        })
+        .on('keyup', function(e) {
+          if (self.options.clearOnEscape) {
+            if (e.which === K.ESCAPE) {
+              self.element.val('value');
+              self._clear();
             }
-        },
+          }
+        });
 
-        _clear: function() {
-            var self = this;
-            self.element.val(self.options.emptyvalue).trigger('propertychange').trigger('change');
-            self._refreshClearIcon();
-            self.options.onClear.call(self.element);
-            if (self.options.focusOnClear) {
-                self.element.focus();
-            } else {
-                self.element.blur();
-            }
-        },
+      self.buttonBox.append(self.clearIcon);
+      self.element.after(self.buttonBox);
+      self._refreshClearIcon();
 
-        _handleInput: function() {
-            var self = this;
-            self.options.onInput.call(self.element);
-            self._refreshClearIcon();
-        },
+      if (self.options.focusOnStart) {
+        self.element.focus();
+      }
+    },
 
-        _refreshClearIcon: function() {
-            var self = this;
-            if (self.element.val() === self.options.emptyvalue && !self.options.alwaysClearable) {
-                self.clearIcon.css('visibility', 'hidden');
-            } else {
-                self.clearIcon.css('visibility', 'visible');
-            }
-        },
+    _clear: function() {
+      var self = this;
+      self.element
+        .val(self.options.emptyvalue)
+        .trigger('propertychange')
+        .trigger('change');
+      self._refreshClearIcon();
+      self.options.onClear.call(self.element);
+      if (self.options.focusOnClear) {
+        self.element.focus();
+      } else {
+        self.element.blur();
+      }
+    },
 
-        initSize: function(fontSize, lineHeight) {
-            var self = this;
-            if (self.size === undefined) {
-                self.size = {
-                    fontSize: fontSize,
-                    lineHeight: lineHeight
-                };
-            }
-            self.clearIcon.css('font-size', self.size.fontSize);
-            self.clearIcon.css('line-height', self.size.lineHeight);
-            self.element.css('min-height', self.size.lineHeight);
-        },
+    _handleInput: function() {
+      var self = this;
+      self.options.onInput.call(self.element);
+      self._refreshClearIcon();
+    },
 
-        setEmptyValue: function(value) {
-            var self = this;
-            self.options.emptyvalue = value;
-        },
+    _refreshClearIcon: function() {
+      var self = this;
+      if (self.element.val() === self.options.emptyvalue && !self.options.alwaysClearable) {
+        self.clearIcon.css('visibility', 'hidden');
+      } else {
+        self.clearIcon.css('visibility', 'visible');
+      }
+    },
 
-        setValue: function(value) {
-            var self = this;
-            self.element.val(value);
-            self._refreshClearIcon();
-        },
+    initSize: function(fontSize, lineHeight) {
+      var self = this;
+      if (self.size === undefined) {
+        self.size = {
+          fontSize: fontSize,
+          lineHeight: lineHeight,
+        };
+      }
+      self.clearIcon.css('font-size', self.size.fontSize);
+      self.clearIcon.css('line-height', self.size.lineHeight);
+      self.element.css('min-height', self.size.lineHeight);
+    },
 
-        setIconsVisibility: function(visibility) {
-            var self = this;
-            self.clearIcon.css('visibility', visibility);
-        }
-    });
+    setEmptyValue: function(value) {
+      var self = this;
+      self.options.emptyvalue = value;
+    },
+
+    setValue: function(value) {
+      var self = this;
+      self.element.val(value);
+      self._refreshClearIcon();
+    },
+
+    setIconsVisibility: function(visibility) {
+      var self = this;
+      self.clearIcon.css('visibility', visibility);
+    },
+  });
 })(jQuery);

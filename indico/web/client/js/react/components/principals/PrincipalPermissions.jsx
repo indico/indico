@@ -21,107 +21,110 @@ import './PrincipalPermissions.module.scss';
  * A component that displays a list of permissions for a principal
  */
 const PrincipalPermissions = ({
-    permissions,
-    permissionInfo: {
-        permissions: permissionMap,
-        tree: permissionTree,
-        default: defaultPermission
-    },
-    onAddPermission,
-    onRemovePermission,
-    readAccessAllowed,
-    readOnly
+  permissions,
+  permissionInfo: {permissions: permissionMap, tree: permissionTree, default: defaultPermission},
+  onAddPermission,
+  onRemovePermission,
+  readAccessAllowed,
+  readOnly,
 }) => {
-    const [open, setOpen] = useState(false);
-    const trigger = (
-        <Icon size="small"
-              name="plus"
-              circular
-              styleName="permission-add-button"
-              color={open ? 'blue' : null} />
-    );
+  const [open, setOpen] = useState(false);
+  const trigger = (
+    <Icon
+      size="small"
+      name="plus"
+      circular
+      styleName="permission-add-button"
+      color={open ? 'blue' : null}
+    />
+  );
 
-    const onClickAdd = id => {
-        setOpen(false);
-        onAddPermission(id);
-    };
+  const onClickAdd = id => {
+    setOpen(false);
+    onAddPermission(id);
+  };
 
-    const onClickRemove = id => {
-        setOpen(false);
-        onRemovePermission(id);
-    };
+  const onClickRemove = id => {
+    setOpen(false);
+    onRemovePermission(id);
+  };
 
-    const onlyDefault = permissions.length === 1 && permissions[0] === defaultPermission;
+  const onlyDefault = permissions.length === 1 && permissions[0] === defaultPermission;
 
-    if (!readAccessAllowed) {
-        permissions = _.without(permissions, 'readAccess');
-    }
+  if (!readAccessAllowed) {
+    permissions = _.without(permissions, 'readAccess');
+  }
 
-    return (
-        <div styleName="principal-permission">
-            {permissions.map(permission => (
-                <Popup key={permission}
-                       position="right center"
-                       trigger={
-                           <Label as="div"
-                                  size="tiny"
-                                  color={permissionMap[permission].color}>
-                               {permissionMap[permission].title}
-                               {!onlyDefault && (
-                                   <Icon name="close"
-                                         onClick={() => !readOnly && onClickRemove(permission)} />
-                               )}
-                           </Label>
-                       }
-                       content={permissionMap[permission].description} />
-            ))}
-            {!readOnly && (
-                <PopoverDropdownMenu onOpen={() => setOpen(true)}
-                                     onClose={() => setOpen(false)}
-                                     trigger={trigger}
-                                     open={open}
-                                     placement="right-start"
-                                     overflow>
-                    <Dropdown.Header>
-                        <Translate>Add permission</Translate>
-                    </Dropdown.Header>
-                    <PermissionTree tree={permissionTree}
-                                    permissionMap={permissionMap}
-                                    exclude={permissions}
-                                    hide={['readAccess']}
-                                    onSelect={p => onClickAdd(p)} />
-                    <Button size="mini"
-                            fluid
-                            onClick={() => setOpen(false)}
-                            content={Translate.string('Cancel')} />
-                </PopoverDropdownMenu>
-            )}
-        </div>
-    );
+  return (
+    <div styleName="principal-permission">
+      {permissions.map(permission => (
+        <Popup
+          key={permission}
+          position="right center"
+          trigger={
+            <Label as="div" size="tiny" color={permissionMap[permission].color}>
+              {permissionMap[permission].title}
+              {!onlyDefault && (
+                <Icon name="close" onClick={() => !readOnly && onClickRemove(permission)} />
+              )}
+            </Label>
+          }
+          content={permissionMap[permission].description}
+        />
+      ))}
+      {!readOnly && (
+        <PopoverDropdownMenu
+          onOpen={() => setOpen(true)}
+          onClose={() => setOpen(false)}
+          trigger={trigger}
+          open={open}
+          placement="right-start"
+          overflow
+        >
+          <Dropdown.Header>
+            <Translate>Add permission</Translate>
+          </Dropdown.Header>
+          <PermissionTree
+            tree={permissionTree}
+            permissionMap={permissionMap}
+            exclude={permissions}
+            hide={['readAccess']}
+            onSelect={p => onClickAdd(p)}
+          />
+          <Button
+            size="mini"
+            fluid
+            onClick={() => setOpen(false)}
+            content={Translate.string('Cancel')}
+          />
+        </PopoverDropdownMenu>
+      )}
+    </div>
+  );
 };
 
 PrincipalPermissions.propTypes = {
-    /** The list of permissions, as an array of strings */
-    permissions: PropTypes.arrayOf(PropTypes.string).isRequired,
-    /** Called whenever a new permission is added */
-    onAddPermission: PropTypes.func.isRequired,
-    /** Called when a permission is deleted */
-    onRemovePermission: PropTypes.func.isRequired,
-    /** Object containing metadata about available permissions */
-    permissionInfo: PropTypes.shape({
-        permissions: PropTypes.object,
-        tree: PropTypes.object,
-        default: PropTypes.string
-    }).isRequired,
-    /** Whether the 'read_access' permission is used/allowed */
-    readAccessAllowed: PropTypes.bool,
-    /** Whether the field is read-only */
-    readOnly: PropTypes.bool
+  /** The list of permissions, as an array of strings */
+  permissions: PropTypes.arrayOf(PropTypes.string).isRequired,
+  /** Called whenever a new permission is added */
+  onAddPermission: PropTypes.func.isRequired,
+  /** Called when a permission is deleted */
+  onRemovePermission: PropTypes.func.isRequired,
+  /** Object containing metadata about available permissions */
+  permissionInfo: PropTypes.shape({
+    permissions: PropTypes.object,
+    tree: PropTypes.object,
+    default: PropTypes.string,
+  }).isRequired,
+  /** Whether the 'read_access' permission is used/allowed */
+  readAccessAllowed: PropTypes.bool,
+  /** Whether the field is read-only */
+  readOnly: PropTypes.bool,
 };
 
 PrincipalPermissions.defaultProps = {
-    readAccessAllowed: true,
-    readOnly: false
+  readAccessAllowed: true,
+  readOnly: false,
 };
 
 export default React.memo(PrincipalPermissions);

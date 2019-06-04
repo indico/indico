@@ -13,10 +13,10 @@
  * @return {Object}
  */
 function times(number, iterator) {
-        for (var i = 0; i < number; i++) {
-                iterator(i);
-        }
-        return iterator.result;
+  for (var i = 0; i < number; i++) {
+    iterator(i);
+  }
+  return iterator.result;
 }
 
 /**
@@ -32,10 +32,10 @@ function times(number, iterator) {
  * @return {Object}
  */
 function iterate(list, iterator, offset) {
-        for (var i = any(offset, 0), length = list.length; i < length; i++) {
-                iterator(list[i], i);
-        }
-        return iterator.result;
+  for (var i = any(offset, 0), length = list.length; i < length; i++) {
+    iterator(list[i], i);
+  }
+  return iterator.result;
 }
 
 /**
@@ -47,10 +47,10 @@ function iterate(list, iterator, offset) {
  * @return {Object}
  */
 function enumerate(object, iterator) {
-        for (var key in object) {
-                iterator(object[key], key);
-        }
-        return iterator.result;
+  for (var key in object) {
+    iterator(object[key], key);
+  }
+  return iterator.result;
 }
 
 /**
@@ -64,28 +64,28 @@ function enumerate(object, iterator) {
  * @return {Object}
  */
 function each(source, iterator) {
-        if (!exists(source)) {
-                return iterator.result;
-        }
-        if (source.Enumerable) {
-                return source.each(iterator);
-        }
-        if (isArray(source) || isNumber(source.length)) {
-                return iterate(source, iterator);
-        }
-        if (isNumber(source)) {
-                return times(source, iterator);
-        }
-        return enumerate(source, iterator);
+  if (!exists(source)) {
+    return iterator.result;
+  }
+  if (source.Enumerable) {
+    return source.each(iterator);
+  }
+  if (isArray(source) || isNumber(source.length)) {
+    return iterate(source, iterator);
+  }
+  if (isNumber(source)) {
+    return times(source, iterator);
+  }
+  return enumerate(source, iterator);
 }
 
 function builder(construct, build) {
-        var result = construct();
-        var iterator = function(value, key) {
-                build(result, key, value);
-        };
-        iterator.result = result;
-        return iterator;
+  var result = construct();
+  var iterator = function(value, key) {
+    build(result, key, value);
+  };
+  iterator.result = result;
+  return iterator;
 }
 
 /**
@@ -97,19 +97,19 @@ function builder(construct, build) {
  * @return {Function}
  */
 function stacker(template) {
-        var result = [];
-        var iterator;
-        if (exists(template)) {
-                iterator = function(value, key) {
-                        result.push(template(value, key));
-                };
-        } else {
-                iterator = function(value) {
-                        result.push(value);
-                };
-        }
-        iterator.result = result;
-        return iterator;
+  var result = [];
+  var iterator;
+  if (exists(template)) {
+    iterator = function(value, key) {
+      result.push(template(value, key));
+    };
+  } else {
+    iterator = function(value) {
+      result.push(value);
+    };
+  }
+  iterator.result = result;
+  return iterator;
 }
 
 /**
@@ -121,29 +121,29 @@ function stacker(template) {
  * @return {Function}
  */
 function mapper(template) {
-        var result = {};
-        var iterator;
-        if (exists(template)) {
-                iterator = function(value, key) {
-                        result[key] = template(value, key);
-                };
-        } else {
-                iterator = function(value, key) {
-                        result[key] = value;
-                };
-        }
-        iterator.result = result;
-        return iterator;
+  var result = {};
+  var iterator;
+  if (exists(template)) {
+    iterator = function(value, key) {
+      result[key] = template(value, key);
+    };
+  } else {
+    iterator = function(value, key) {
+      result[key] = value;
+    };
+  }
+  iterator.result = result;
+  return iterator;
 }
 
 function where(match, action) {
-    function iterator(item, key) {
-        if (match(item, key)) {
-            action(item);
-        }
+  function iterator(item, key) {
+    if (match(item, key)) {
+      action(item);
     }
-    iterator.result = action.result;
-    return iterator;
+  }
+  iterator.result = action.result;
+  return iterator;
 }
 
 /**
@@ -154,17 +154,17 @@ function where(match, action) {
  * @return {Function}
  */
 function existing(action) {
-   return where(exists, action);
+  return where(exists, action);
 }
 
 function keyGetter(value, key) {
-        return key;
+  return key;
 }
 
 /**
  * Specifies that item was found.
  */
-var $found = {type: "Found"};
+var $found = {type: 'Found'};
 
 /**
  * Returns an index of the first match. If no item matches returns null.
@@ -173,21 +173,21 @@ var $found = {type: "Found"};
  * @return {Number}
  */
 function indexOf(items, match) {
-        var index = 0;
-        try {
-                each(items, function(value, key) {
-                        if (match(value, key)) {
-                                throw $found;
-                        }
-                        index++;
-                });
-                return null;
-        } catch (e) {
-                if (e === $found) {
-                        return index;
-                }
-                throw e;
-        }
+  var index = 0;
+  try {
+    each(items, function(value, key) {
+      if (match(value, key)) {
+        throw $found;
+      }
+      index++;
+    });
+    return null;
+  } catch (e) {
+    if (e === $found) {
+      return index;
+    }
+    throw e;
+  }
 }
 
 /**
@@ -197,23 +197,22 @@ function indexOf(items, match) {
  * @return {Array}
  */
 function search(items, match) {
-        var result;
-        try {
-                each(items, function(value, key) {
-                        if (match(value, key)) {
-                                result = [value, key];
-                                throw $found;
-                        }
-                });
-                return null;
-        } catch (e) {
-                if (e === $found) {
-                        return result;
-                }
-                throw e;
-        }
+  var result;
+  try {
+    each(items, function(value, key) {
+      if (match(value, key)) {
+        result = [value, key];
+        throw $found;
+      }
+    });
+    return null;
+  } catch (e) {
+    if (e === $found) {
+      return result;
+    }
+    throw e;
+  }
 }
-
 
 /**
  * Returns template that return true if an input object (or its property with the given key) is equal to the value.
@@ -222,13 +221,13 @@ function search(items, match) {
  * @param {Function}
  */
 function match(value, key) {
-        if (exists(key)) {
-                return function(object) {
-                        return object[key] === value;
-                };
-        } else {
-                return function(object) {
-                        return object === value;
-                };
-        }
+  if (exists(key)) {
+    return function(object) {
+      return object[key] === value;
+    };
+  } else {
+    return function(object) {
+      return object === value;
+    };
+  }
 }

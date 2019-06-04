@@ -8,23 +8,22 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-
 export default class SearchBox extends React.Component {
-    static propTypes = {
-        setKeyword: PropTypes.func.isRequired,
-    };
+  static propTypes = {
+    setKeyword: PropTypes.func.isRequired,
+  };
 
-    render() {
-        const {setKeyword} = this.props;
-        return (
-            <div className="toolbar">
-                <div className="group">
-                    <span className="i-button label">
-                        <span className="icon-search" />
-                    </span>
-                    <input type="text" onChange={(e) => setKeyword(e.target.value.trim())} />
-                </div>
-            </div>
-        );
-    }
+  render() {
+    const {setKeyword} = this.props;
+    return (
+      <div className="toolbar">
+        <div className="group">
+          <span className="i-button label">
+            <span className="icon-search" />
+          </span>
+          <input type="text" onChange={e => setKeyword(e.target.value.trim())} />
+        </div>
+      </div>
+    );
+  }
 }

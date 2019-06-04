@@ -13,33 +13,34 @@ import {DayPickerSingleDateController as DayPicker} from 'react-dates';
 import 'react-dates/lib/css/_datepicker.css';
 import './style/dates.scss';
 
-
 export default class CalendarSingleDatePicker extends React.Component {
-    static propTypes = {
-        disabledDate: PropTypes.func
-    };
+  static propTypes = {
+    disabledDate: PropTypes.func,
+  };
 
-    static defaultProps = {
-        disabledDate: () => false
-    };
+  static defaultProps = {
+    disabledDate: () => false,
+  };
 
-    state = {
-        focused: true
-    };
+  state = {
+    focused: true,
+  };
 
-    onFocusChange = ({focused}) => {
-        this.setState({focused});
-    };
+  onFocusChange = ({focused}) => {
+    this.setState({focused});
+  };
 
-    render() {
-        const {focused} = this.state;
-        const {disabledDate, ...props} = this.props;
-        return (
-            <DayPicker focused={focused}
-                       onFocusChange={this.onFocusChange}
-                       isOutsideRange={disabledDate}
-                       hideKeyboardShortcutsPanel
-                       {...props} />
-        );
-    }
+  render() {
+    const {focused} = this.state;
+    const {disabledDate, ...props} = this.props;
+    return (
+      <DayPicker
+        focused={focused}
+        onFocusChange={this.onFocusChange}
+        isOutsideRange={disabledDate}
+        hideKeyboardShortcutsPanel
+        {...props}
+      />
+    );
+  }
 }

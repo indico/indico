@@ -14,21 +14,20 @@ import {addError} from './actions';
 import reducer from './reducers';
 import ErrorDialog from './container';
 
-
 let store;
 export default function showReactErrorDialog(error) {
-    if (!store) {
-        store = createReduxStore('errors', {
-            errors: reducer,
-        });
-        const container = document.createElement('div');
-        document.body.appendChild(container);
-        const jsx = (
-            <Provider store={store}>
-                <ErrorDialog initialValues={{email: Indico.User.email}} />
-            </Provider>
-        );
-        ReactDOM.render(jsx, container);
-    }
-    store.dispatch(addError(error));
+  if (!store) {
+    store = createReduxStore('errors', {
+      errors: reducer,
+    });
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const jsx = (
+      <Provider store={store}>
+        <ErrorDialog initialValues={{email: Indico.User.email}} />
+      </Provider>
+    );
+    ReactDOM.render(jsx, container);
+  }
+  store.dispatch(addError(error));
 }

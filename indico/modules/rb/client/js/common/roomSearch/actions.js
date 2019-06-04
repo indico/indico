@@ -13,38 +13,37 @@ import {ajax as ajaxFilterRules} from './serializers';
 import {validateFilters} from '../filters';
 import {selectors as userSelectors} from '../../common/user';
 
-
 export function roomSearchActionsFactory(namespace) {
-    const SEARCH_RESULTS_RECEIVED = `${namespace}/SEARCH_RESULTS_RECEIVED`;
-    const SEARCH_ROOMS_REQUEST = `${namespace}/SEARCH_ROOMS_REQUEST`;
-    const SEARCH_ROOMS_SUCCESS = `${namespace}/SEARCH_ROOMS_SUCCESS`;
-    const SEARCH_ROOMS_ERROR = `${namespace}/SEARCH_ROOMS_ERROR`;
+  const SEARCH_RESULTS_RECEIVED = `${namespace}/SEARCH_RESULTS_RECEIVED`;
+  const SEARCH_ROOMS_REQUEST = `${namespace}/SEARCH_ROOMS_REQUEST`;
+  const SEARCH_ROOMS_SUCCESS = `${namespace}/SEARCH_ROOMS_SUCCESS`;
+  const SEARCH_ROOMS_ERROR = `${namespace}/SEARCH_ROOMS_ERROR`;
 
-    function searchRooms() {
-        return async (dispatch, getStore) => {
-            const store = getStore();
-            const {filters} = store[namespace];
-            if (!validateFilters(filters, namespace, dispatch)) {
-                return;
-            }
-            const params = preProcessParameters(filters, ajaxFilterRules);
-            if (namespace === 'bookRoom' && userSelectors.isUserAdminOverrideEnabled(store)) {
-                params.admin_override_enabled = true;
-            }
-            return await ajaxAction(
-                () => indicoAxios.get(searchRoomsURL(), {params}),
-                SEARCH_ROOMS_REQUEST,
-                [SEARCH_RESULTS_RECEIVED, SEARCH_ROOMS_SUCCESS],
-                SEARCH_ROOMS_ERROR
-            )(dispatch);
-        };
-    }
-
-    return {
-        SEARCH_RESULTS_RECEIVED,
+  function searchRooms() {
+    return async (dispatch, getStore) => {
+      const store = getStore();
+      const {filters} = store[namespace];
+      if (!validateFilters(filters, namespace, dispatch)) {
+        return;
+      }
+      const params = preProcessParameters(filters, ajaxFilterRules);
+      if (namespace === 'bookRoom' && userSelectors.isUserAdminOverrideEnabled(store)) {
+        params.admin_override_enabled = true;
+      }
+      return await ajaxAction(
+        () => indicoAxios.get(searchRoomsURL(), {params}),
         SEARCH_ROOMS_REQUEST,
-        SEARCH_ROOMS_SUCCESS,
-        SEARCH_ROOMS_ERROR,
-        searchRooms,
+        [SEARCH_RESULTS_RECEIVED, SEARCH_ROOMS_SUCCESS],
+        SEARCH_ROOMS_ERROR
+      )(dispatch);
     };
+  }
+
+  return {
+    SEARCH_RESULTS_RECEIVED,
+    SEARCH_ROOMS_REQUEST,
+    SEARCH_ROOMS_SUCCESS,
+    SEARCH_ROOMS_ERROR,
+    searchRooms,
+  };
 }

@@ -6,11 +6,11 @@
 // LICENSE file for more details.
 
 export default function timeRenderer({startTime, endTime}) {
-    if (!startTime && !endTime) {
-        return null;
-    } else if (!endTime) {
-        return startTime;
-    } else {
-        return `${startTime} - ${endTime}`;
-    }
+  if (!startTime && !endTime) {
+    return null;
+  } else if (!endTime) {
+    return startTime;
+  } else {
+    return `${startTime} - ${endTime}`;
+  }
 }

@@ -10,32 +10,27 @@ import PropTypes from 'prop-types';
 
 import './DimmableImage.module.scss';
 
-
 export default class DimmableImage extends React.Component {
-    static propTypes = {
-        children: PropTypes.node.isRequired,
-        content: PropTypes.node,
-        hoverContent: PropTypes.node,
-    };
+  static propTypes = {
+    children: PropTypes.node.isRequired,
+    content: PropTypes.node,
+    hoverContent: PropTypes.node,
+  };
 
-    static defaultProps = {
-        content: null,
-        hoverContent: null,
-    };
+  static defaultProps = {
+    content: null,
+    hoverContent: null,
+  };
 
-    render() {
-        const {children, content, hoverContent} = this.props;
+  render() {
+    const {children, content, hoverContent} = this.props;
 
-        return (
-            <div styleName="dimmable-image">
-                {children}
-                <div styleName="content">
-                    {content}
-                </div>
-                <div styleName="hover-content">
-                    {hoverContent}
-                </div>
-            </div>
-        );
-    }
+    return (
+      <div styleName="dimmable-image">
+        {children}
+        <div styleName="content">{content}</div>
+        <div styleName="hover-content">{hoverContent}</div>
+      </div>
+    );
+  }
 }

@@ -12,61 +12,60 @@ import {RequestState} from 'indico/utils/redux';
 import {selectors as roomsSelectors} from '../rooms';
 import {isUserAdminOverrideEnabled} from '../user/selectors';
 
-
 const getRawDetails = (state, {bookingId}) => state.bookings.details[bookingId];
 
-
 function applyPermissionsToOccurrences(occurrences, override) {
-    const bookings = _.fromPairs(Object.entries(occurrences.bookings).map(([day, dayData]) => {
-        dayData = dayData.map(rawOcc => {
-            const {permissions, ...occ} = rawOcc;
-            if (!permissions) {
-                return occ;
-            }
-            const activePermissions = (override && permissions.admin) ? permissions.admin : permissions.user;
-            return {...occ, ...activePermissions};
-        });
-        return [day, dayData];
-    }));
-    return {...occurrences, bookings};
+  const bookings = _.fromPairs(
+    Object.entries(occurrences.bookings).map(([day, dayData]) => {
+      dayData = dayData.map(rawOcc => {
+        const {permissions, ...occ} = rawOcc;
+        if (!permissions) {
+          return occ;
+        }
+        const activePermissions =
+          override && permissions.admin ? permissions.admin : permissions.user;
+        return {...occ, ...activePermissions};
+      });
+      return [day, dayData];
+    })
+  );
+  return {...occurrences, bookings};
 }
 
 export const getDetails = createSelector(
-    getRawDetails,
-    isUserAdminOverrideEnabled,
-    (allDetails, override) => {
-        if (!allDetails) {
-            // details not loaded yet, just keep the null/undefined
-            return allDetails;
-        }
-        const {permissions, occurrences, ...details} = allDetails;
-        const activePermissions = (override && permissions.admin) ? permissions.admin : permissions.user;
-        const occurrencesWithPermissions = applyPermissionsToOccurrences(occurrences, override);
-        return {...details, ...activePermissions, occurrences: occurrencesWithPermissions};
+  getRawDetails,
+  isUserAdminOverrideEnabled,
+  (allDetails, override) => {
+    if (!allDetails) {
+      // details not loaded yet, just keep the null/undefined
+      return allDetails;
     }
+    const {permissions, occurrences, ...details} = allDetails;
+    const activePermissions = override && permissions.admin ? permissions.admin : permissions.user;
+    const occurrencesWithPermissions = applyPermissionsToOccurrences(occurrences, override);
+    return {...details, ...activePermissions, occurrences: occurrencesWithPermissions};
+  }
 );
-
 
 export const getDetailsWithRoom = createSelector(
-    getDetails,
-    roomsSelectors.getAllRooms,
-    (booking, allRooms) => {
-        return {...booking, room: allRooms[booking.roomId]};
-    }
+  getDetails,
+  roomsSelectors.getAllRooms,
+  (booking, allRooms) => {
+    return {...booking, room: allRooms[booking.roomId]};
+  }
 );
 export const hasDetails = (state, {bookingId}) => getDetails(state, {bookingId}) !== undefined;
-export const isBookingChangeInProgress = ({bookings}) => (
-    bookings.requests.changePrebookingState.state === RequestState.STARTED
-);
+export const isBookingChangeInProgress = ({bookings}) =>
+  bookings.requests.changePrebookingState.state === RequestState.STARTED;
 export const isOngoingBooking = createSelector(
-    getDetailsWithRoom,
-    ({startDt, endDt}) => {
-        return moment().isBetween(startDt, endDt, 'day');
-    },
+  getDetailsWithRoom,
+  ({startDt, endDt}) => {
+    return moment().isBetween(startDt, endDt, 'day');
+  }
 );
 export const getNumberOfBookingOccurrences = createSelector(
-    getDetailsWithRoom,
-    ({occurrences: {bookings}}) => {
-        return Object.values(bookings).reduce((acc, cur) => acc + (cur.length ? 1 : 0), 0);
-    },
+  getDetailsWithRoom,
+  ({occurrences: {bookings}}) => {
+    return Object.values(bookings).reduce((acc, cur) => acc + (cur.length ? 1 : 0), 0);
+  }
 );

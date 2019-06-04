@@ -7,16 +7,15 @@
 
 import moment from 'moment';
 
-
 export default function dateRenderer({startDate, endDate}) {
-    startDate = startDate ? moment(startDate) : null;
-    endDate = endDate ? moment(endDate) : null;
+  startDate = startDate ? moment(startDate) : null;
+  endDate = endDate ? moment(endDate) : null;
 
-    if (!startDate && !endDate) {
-        return null;
-    } else if (!endDate) {
-        return startDate.format('ddd D MMM');
-    } else {
-        return `${startDate.format('ddd D MMM')} - ${endDate.format('ddd D MMM')}`;
-    }
+  if (!startDate && !endDate) {
+    return null;
+  } else if (!endDate) {
+    return startDate.format('ddd D MMM');
+  } else {
+    return `${startDate.format('ddd D MMM')} - ${endDate.format('ddd D MMM')}`;
+  }
 }

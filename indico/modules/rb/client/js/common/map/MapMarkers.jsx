@@ -14,14 +14,13 @@ import Leaflet from 'leaflet';
 import MarkerClusterGroup from 'react-leaflet-markercluster';
 import * as mapSelectors from './selectors';
 
-
 function groupIconCreateFunction(cluster) {
-    const highlight = cluster.getAllChildMarkers().some(m => m.options.highlight);
-    return Leaflet.divIcon({
-        html: `<span>${cluster.getChildCount()}</span>`,
-        className: `marker-cluster marker-cluster-small rb-map-cluster ${highlight ? 'highlight' : ''}`,
-        iconSize: Leaflet.point(40, 40, true),
-    });
+  const highlight = cluster.getAllChildMarkers().some(m => m.options.highlight);
+  return Leaflet.divIcon({
+    html: `<span>${cluster.getChildCount()}</span>`,
+    className: `marker-cluster marker-cluster-small rb-map-cluster ${highlight ? 'highlight' : ''}`,
+    iconSize: Leaflet.point(40, 40, true),
+  });
 }
 
 const icon = Leaflet.divIcon({className: 'rb-map-marker', iconSize: [20, 20]});
@@ -33,22 +32,22 @@ const hoveredIcon = Leaflet.divIcon({className: 'rb-map-marker highlight', iconS
  * shouldComponentUpdate(...)
  */
 class MarkerWrapper extends React.Component {
-    static propTypes = {
-        highlight: PropTypes.bool.isRequired,
-        id: PropTypes.number.isRequired
-    };
+  static propTypes = {
+    highlight: PropTypes.bool.isRequired,
+    id: PropTypes.number.isRequired,
+  };
 
-    shouldComponentUpdate({highlight: newHighlight}) {
-        const {highlight: oldHighlight} = this.props;
-        return newHighlight !== oldHighlight;
-    }
+  shouldComponentUpdate({highlight: newHighlight}) {
+    const {highlight: oldHighlight} = this.props;
+    return newHighlight !== oldHighlight;
+  }
 
-    render() {
-        const {id, highlight} = this.props;
-        // HACK: 'highlight' is added since otherwise the marker is not re-rendered
-        // on the leaflet side (not sure why).
-        return <Marker key={`${id}-${highlight}`} {...this.props} />;
-    }
+  render() {
+    const {id, highlight} = this.props;
+    // HACK: 'highlight' is added since otherwise the marker is not re-rendered
+    // on the leaflet side (not sure why).
+    return <Marker key={`${id}-${highlight}`} {...this.props} />;
+  }
 }
 
 /**
@@ -56,57 +55,60 @@ class MarkerWrapper extends React.Component {
  * shown on the map and handles the highlighting of the hovered room.
  */
 class MapMarkers extends React.Component {
-    static propTypes = {
-        rooms: PropTypes.array,
-        clusterProps: PropTypes.object,
-        hoveredRoomId: PropTypes.number,
-        onRoomClick: PropTypes.func.isRequired,
-        /** 'actions' may be used by plugins */
-        actions: PropTypes.objectOf(PropTypes.func).isRequired
-    };
+  static propTypes = {
+    rooms: PropTypes.array,
+    clusterProps: PropTypes.object,
+    hoveredRoomId: PropTypes.number,
+    onRoomClick: PropTypes.func.isRequired,
+    /** 'actions' may be used by plugins */
+    actions: PropTypes.objectOf(PropTypes.func).isRequired,
+  };
 
-    static defaultProps = {
-        rooms: [],
-        clusterProps: {},
-        hoveredRoomId: null
-    };
+  static defaultProps = {
+    rooms: [],
+    clusterProps: {},
+    hoveredRoomId: null,
+  };
 
-    shouldComponentUpdate({rooms: newRooms, hoveredRoomId: newHovered}) {
-        const {rooms: oldRooms, hoveredRoomId: oldHovered} = this.props;
-        return !_.isEqual(oldRooms, newRooms) || newHovered !== oldHovered;
+  shouldComponentUpdate({rooms: newRooms, hoveredRoomId: newHovered}) {
+    const {rooms: oldRooms, hoveredRoomId: oldHovered} = this.props;
+    return !_.isEqual(oldRooms, newRooms) || newHovered !== oldHovered;
+  }
+
+  render() {
+    const {rooms, clusterProps, hoveredRoomId, onRoomClick} = this.props;
+
+    if (!rooms.length) {
+      return null;
     }
 
-    render() {
-        const {rooms, clusterProps, hoveredRoomId, onRoomClick} = this.props;
-
-        if (!rooms.length) {
-            return null;
-        }
-
-        return (
-            <MarkerClusterGroup showCoverageOnHover={false}
-                                iconCreateFunction={groupIconCreateFunction}
-                                {...clusterProps}>
-                {rooms.filter(({lat, lng}) => !!(lat && lng)).map(room => (
-                    <MarkerWrapper key={room.id}
-                                   id={room.id}
-                                   position={[room.lat, room.lng]}
-                                   icon={room.id === hoveredRoomId ? hoveredIcon : icon}
-                                   highlight={room.id === hoveredRoomId}
-                                   onClick={() => onRoomClick(room)}>
-                        <Tooltip direction="top">
-                            <span>{room.name}</span>
-                        </Tooltip>
-                    </MarkerWrapper>
-                ))}
-            </MarkerClusterGroup>
-        );
-    }
+    return (
+      <MarkerClusterGroup
+        showCoverageOnHover={false}
+        iconCreateFunction={groupIconCreateFunction}
+        {...clusterProps}
+      >
+        {rooms
+          .filter(({lat, lng}) => !!(lat && lng))
+          .map(room => (
+            <MarkerWrapper
+              key={room.id}
+              id={room.id}
+              position={[room.lat, room.lng]}
+              icon={room.id === hoveredRoomId ? hoveredIcon : icon}
+              highlight={room.id === hoveredRoomId}
+              onClick={() => onRoomClick(room)}
+            >
+              <Tooltip direction="top">
+                <span>{room.name}</span>
+              </Tooltip>
+            </MarkerWrapper>
+          ))}
+      </MarkerClusterGroup>
+    );
+  }
 }
 
-
-export default connect(
-    state => ({
-        hoveredRoomId: mapSelectors.getHoveredRoom(state)
-    })
-)(MapMarkers);
+export default connect(state => ({
+  hoveredRoomId: mapSelectors.getHoveredRoom(state),
+}))(MapMarkers);

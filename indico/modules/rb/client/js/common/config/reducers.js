@@ -12,52 +12,59 @@ import {requestReducer} from 'indico/utils/redux';
 import * as configActions from './actions';
 import {actions as adminActions} from '../../modules/admin';
 
-
 export const initialState = {
-    roomsSpriteToken: '',
-    languages: {},
-    tileServerURL: '',
-    gracePeriod: 1,
-    helpURL: '',
-    hasTOS: false,
-    tosHTML: null,
-    hasPrivacyPolicy: false,
-    privacyPolicyHTML: null,
-    contactEmail: null,
+  roomsSpriteToken: '',
+  languages: {},
+  tileServerURL: '',
+  gracePeriod: 1,
+  helpURL: '',
+  hasTOS: false,
+  tosHTML: null,
+  hasPrivacyPolicy: false,
+  privacyPolicyHTML: null,
+  contactEmail: null,
 };
 
 export default combineReducers({
-    request: requestReducer(configActions.FETCH_REQUEST, configActions.FETCH_SUCCESS, configActions.FETCH_ERROR),
-    data: (state = initialState, action) => {
-        switch (action.type) {
-            case configActions.CONFIG_RECEIVED: {
-                const {
-                    roomsSpriteToken, gracePeriod, helpURL, contactEmail, hasPrivacyPolicy,
-                    hasTos: hasTOS,
-                    tosHtml: tosHTML,
-                    privacyPolicyHtml: privacyPolicyHTML,
-                    tileserverURL: tileServerURL,
-                } = camelizeKeys(action.data);
-                const {languages} = action.data;
-                return {
-                    roomsSpriteToken,
-                    languages,
-                    tileServerURL,
-                    gracePeriod,
-                    helpURL,
-                    hasTOS,
-                    tosHTML,
-                    hasPrivacyPolicy,
-                    privacyPolicyHTML,
-                    contactEmail,
-                };
-            }
-            case adminActions.SETTINGS_RECEIVED:
-                return {...state, tileServerURL: action.data.tileserver_url};
-            case configActions.SET_ROOMS_SPRITE_TOKEN:
-                return {...state, roomsSpriteToken: action.token};
-            default:
-                return state;
-        }
+  request: requestReducer(
+    configActions.FETCH_REQUEST,
+    configActions.FETCH_SUCCESS,
+    configActions.FETCH_ERROR
+  ),
+  data: (state = initialState, action) => {
+    switch (action.type) {
+      case configActions.CONFIG_RECEIVED: {
+        const {
+          roomsSpriteToken,
+          gracePeriod,
+          helpURL,
+          contactEmail,
+          hasPrivacyPolicy,
+          hasTos: hasTOS,
+          tosHtml: tosHTML,
+          privacyPolicyHtml: privacyPolicyHTML,
+          tileserverURL: tileServerURL,
+        } = camelizeKeys(action.data);
+        const {languages} = action.data;
+        return {
+          roomsSpriteToken,
+          languages,
+          tileServerURL,
+          gracePeriod,
+          helpURL,
+          hasTOS,
+          tosHTML,
+          hasPrivacyPolicy,
+          privacyPolicyHTML,
+          contactEmail,
+        };
+      }
+      case adminActions.SETTINGS_RECEIVED:
+        return {...state, tileServerURL: action.data.tileserver_url};
+      case configActions.SET_ROOMS_SPRITE_TOKEN:
+        return {...state, roomsSpriteToken: action.token};
+      default:
+        return state;
     }
+  },
 });

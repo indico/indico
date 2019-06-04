@@ -11,279 +11,309 @@
 import 'indico/modules/events/util/types_dialog';
 
 (function(global) {
-    function setupTableSorter(selector) {
-        $(selector).tablesorter({
-            cssAsc: 'header-sort-asc',
-            cssDesc: 'header-sort-desc',
-            cssInfoBlock: 'avoid-sort',
-            headerTemplate: '',
-            sortList: [[1, 0]]
-        });
-    }
+  function setupTableSorter(selector) {
+    $(selector).tablesorter({
+      cssAsc: 'header-sort-asc',
+      cssDesc: 'header-sort-desc',
+      cssInfoBlock: 'avoid-sort',
+      headerTemplate: '',
+      sortList: [[1, 0]],
+    });
+  }
 
-    function patchObject(url, method, data) {
-        return $.ajax({
-            url: url,
-            method: method,
-            data: JSON.stringify(data),
-            dataType: 'json',
-            contentType: 'application/json',
-            error: handleAjaxError,
-            complete: IndicoUI.Dialogs.Util.progress()
-        });
-    }
+  function patchObject(url, method, data) {
+    return $.ajax({
+      url: url,
+      method: method,
+      data: JSON.stringify(data),
+      dataType: 'json',
+      contentType: 'application/json',
+      error: handleAjaxError,
+      complete: IndicoUI.Dialogs.Util.progress(),
+    });
+  }
 
-    function setupSessionPicker(createURL, timetableRESTURL) {
-        var $contributionList = $('#contribution-list');
-        $contributionList.on('click', '.session-item-picker', function() {
-            $(this).itempicker({
-                filterPlaceholder: $T.gettext('Filter sessions'),
-                containerClasses: 'session-item-container',
-                items: $contributionList.find('table').data('session-items'),
-                footerElements: [{
-                    title: $T.gettext('Assign new session'),
-                    onClick: function(itemPicker) {
-                        ajaxDialog({
-                            title: $T.gettext('Add new session'),
-                            url: createURL,
-                            onClose: function(data) {
-                                if (data) {
-                                    $('.session-item-picker').each(function() {
-                                        var $this = $(this);
-                                        if ($this.data('indicoItempicker')) {
-                                            $this.itempicker('updateItemList', data.sessions);
-                                        } else {
-                                            $contributionList.find('table').data('session-items', data.sessions);
-                                        }
-                                    });
-                                    itemPicker.itempicker('selectItem', data.new_session_id);
-                                }
-                            }
-                        });
-                    }
-                }],
-                onSelect: function(newSession, oldSession) {
-                    var $this = $(this);
-                    var styleObject = $this[0].style;
-                    var postData =  {session_id: newSession ? newSession.id : null};
-
-                    return patchObject($this.data('href'), $this.data('method'), postData).then(function(data) {
-                        var label = newSession ? newSession.title : $T.gettext('No session');
-                        $this.find('.label').text(label);
-
-                        if (!newSession) {
-                            styleObject.removeProperty('color');
-                            styleObject.removeProperty('background');
-                        } else {
-                            styleObject.setProperty('color', '#' + newSession.colors.text, 'important');
-                            styleObject.setProperty('background', '#' + newSession.colors.background, 'important');
-                        }
-
-                        if (data.unscheduled) {
-                            var row = $this.closest('tr');
-                            var startDateCol = row.find('td.start-date > .vertical-aligner');
-                            var oldLabelHtml = startDateCol.children().detach();
-
-                            startDateCol.html($('<em>', {text: $T.gettext('Not scheduled')}));
-                            /* eslint-disable max-len */
-                            showUndoWarning(
-                                $T.gettext("'{0}' has been unscheduled due to the session change.").format(row.data('title')),
-                                $T.gettext("Undo successful! Timetable entry and session have been restored."),
-                                function() {
-                                    return patchObject(timetableRESTURL, 'POST', data.undo_unschedule).then(function(data) {
-                                        oldLabelHtml.filter('.label').text(' ' + moment.utc(data.start_dt).format('DD/MM/YYYY HH:mm'));
-                                        startDateCol.html(oldLabelHtml);
-                                        $this.itempicker('selectItem', oldSession ? oldSession.id : null);
-                                    });
-                                }
-                            );
-                        }
+  function setupSessionPicker(createURL, timetableRESTURL) {
+    var $contributionList = $('#contribution-list');
+    $contributionList.on('click', '.session-item-picker', function() {
+      $(this).itempicker({
+        filterPlaceholder: $T.gettext('Filter sessions'),
+        containerClasses: 'session-item-container',
+        items: $contributionList.find('table').data('session-items'),
+        footerElements: [
+          {
+            title: $T.gettext('Assign new session'),
+            onClick: function(itemPicker) {
+              ajaxDialog({
+                title: $T.gettext('Add new session'),
+                url: createURL,
+                onClose: function(data) {
+                  if (data) {
+                    $('.session-item-picker').each(function() {
+                      var $this = $(this);
+                      if ($this.data('indicoItempicker')) {
+                        $this.itempicker('updateItemList', data.sessions);
+                      } else {
+                        $contributionList.find('table').data('session-items', data.sessions);
+                      }
                     });
+                    itemPicker.itempicker('selectItem', data.new_session_id);
+                  }
+                },
+              });
+            },
+          },
+        ],
+        onSelect: function(newSession, oldSession) {
+          var $this = $(this);
+          var styleObject = $this[0].style;
+          var postData = {session_id: newSession ? newSession.id : null};
+
+          return patchObject($this.data('href'), $this.data('method'), postData).then(function(
+            data
+          ) {
+            var label = newSession ? newSession.title : $T.gettext('No session');
+            $this.find('.label').text(label);
+
+            if (!newSession) {
+              styleObject.removeProperty('color');
+              styleObject.removeProperty('background');
+            } else {
+              styleObject.setProperty('color', '#' + newSession.colors.text, 'important');
+              styleObject.setProperty(
+                'background',
+                '#' + newSession.colors.background,
+                'important'
+              );
+            }
+
+            if (data.unscheduled) {
+              var row = $this.closest('tr');
+              var startDateCol = row.find('td.start-date > .vertical-aligner');
+              var oldLabelHtml = startDateCol.children().detach();
+
+              startDateCol.html($('<em>', {text: $T.gettext('Not scheduled')}));
+              /* eslint-disable max-len */
+              showUndoWarning(
+                $T
+                  .gettext("'{0}' has been unscheduled due to the session change.")
+                  .format(row.data('title')),
+                $T.gettext('Undo successful! Timetable entry and session have been restored.'),
+                function() {
+                  return patchObject(timetableRESTURL, 'POST', data.undo_unschedule).then(function(
+                    data
+                  ) {
+                    oldLabelHtml
+                      .filter('.label')
+                      .text(' ' + moment.utc(data.start_dt).format('DD/MM/YYYY HH:mm'));
+                    startDateCol.html(oldLabelHtml);
+                    $this.itempicker('selectItem', oldSession ? oldSession.id : null);
+                  });
                 }
-            });
-        });
-    }
+              );
+            }
+          });
+        },
+      });
+    });
+  }
 
-    function setupTrackPicker(createURL) {
-        var $contributionList = $('#contribution-list');
-        $contributionList.on('click', '.track-item-picker', function() {
-            $(this).itempicker({
-                filterPlaceholder: $T.gettext('Filter tracks'),
-                containerClasses: 'track-item-container',
-                uncheckedItemIcon: '',
-                items: $contributionList.find('table').data('track-items'),
-                footerElements: [{
-                    title: $T.gettext('Add new track'),
-                    onClick: function(trackItemPicker) {
-                        ajaxDialog({
-                            title: $T.gettext('Add new track'),
-                            url: createURL,
-                            onClose: function(data) {
-                                if (data) {
-                                    $('.track-item-picker').each(function() {
-                                        var $this = $(this);
-                                        if ($this.data('indicoItempicker')) {
-                                            $this.itempicker('updateItemList', data.tracks);
-                                        } else {
-                                            $contributionList.find('table').data('track-items', data.tracks);
-                                        }
-                                    });
-                                    trackItemPicker.itempicker('selectItem', data.new_track_id);
-                                }
-                            }
-                        });
-                    }
-                }],
-                onSelect: function(newTrack) {
-                    var $this = $(this);
-                    var postData = {track_id: newTrack ? newTrack.id : null};
-
-                    return patchObject($this.data('href'), $this.data('method'), postData).then(function() {
-                        var label = newTrack ? newTrack.title : $T.gettext('No track');
-                        $this.find('.label').text(label);
+  function setupTrackPicker(createURL) {
+    var $contributionList = $('#contribution-list');
+    $contributionList.on('click', '.track-item-picker', function() {
+      $(this).itempicker({
+        filterPlaceholder: $T.gettext('Filter tracks'),
+        containerClasses: 'track-item-container',
+        uncheckedItemIcon: '',
+        items: $contributionList.find('table').data('track-items'),
+        footerElements: [
+          {
+            title: $T.gettext('Add new track'),
+            onClick: function(trackItemPicker) {
+              ajaxDialog({
+                title: $T.gettext('Add new track'),
+                url: createURL,
+                onClose: function(data) {
+                  if (data) {
+                    $('.track-item-picker').each(function() {
+                      var $this = $(this);
+                      if ($this.data('indicoItempicker')) {
+                        $this.itempicker('updateItemList', data.tracks);
+                      } else {
+                        $contributionList.find('table').data('track-items', data.tracks);
+                      }
                     });
-                }
-            });
-        });
-    }
+                    trackItemPicker.itempicker('selectItem', data.new_track_id);
+                  }
+                },
+              });
+            },
+          },
+        ],
+        onSelect: function(newTrack) {
+          var $this = $(this);
+          var postData = {track_id: newTrack ? newTrack.id : null};
 
-    function setupStartDateQBubbles() {
-        $('.js-contrib-start-date').each(function() {
-            var $this = $(this);
+          return patchObject($this.data('href'), $this.data('method'), postData).then(function() {
+            var label = newTrack ? newTrack.title : $T.gettext('No track');
+            $this.find('.label').text(label);
+          });
+        },
+      });
+    });
+  }
 
-            $this.ajaxqbubble({
-                url: $this.data('href'),
-                qBubbleOptions: {
-                    style: {
-                        classes: 'qbubble-contrib-start-date'
-                    }
-                }
-            });
-        });
-    }
+  function setupStartDateQBubbles() {
+    $('.js-contrib-start-date').each(function() {
+      var $this = $(this);
 
-    function setupDurationQBubbles() {
-        $('.js-contrib-duration').each(function() {
-            var $this = $(this);
+      $this.ajaxqbubble({
+        url: $this.data('href'),
+        qBubbleOptions: {
+          style: {
+            classes: 'qbubble-contrib-start-date',
+          },
+        },
+      });
+    });
+  }
 
-            $this.ajaxqbubble({
-                url: $this.data('href'),
-                qBubbleOptions: {
-                    style: {
-                        classes: 'qbubble-contrib-duration'
-                    }
-                }
-            });
-        });
-    }
+  function setupDurationQBubbles() {
+    $('.js-contrib-duration').each(function() {
+      var $this = $(this);
 
-    global.setupContributionList = function setupContributionList(options) {
-        options = $.extend({
-            createSessionURL: null,
-            createTrackURL: null,
-            timetableRESTURL: null
-        }, options);
+      $this.ajaxqbubble({
+        url: $this.data('href'),
+        qBubbleOptions: {
+          style: {
+            classes: 'qbubble-contrib-duration',
+          },
+        },
+      });
+    });
+  }
 
-        var filterConfig = {
-            itemHandle: 'tr',
-            listItems: '#contribution-list tbody tr',
-            term: '#search-input',
-            state: '#filtering-state',
-            placeholder: '#filter-placeholder'
-        };
+  global.setupContributionList = function setupContributionList(options) {
+    options = $.extend(
+      {
+        createSessionURL: null,
+        createTrackURL: null,
+        timetableRESTURL: null,
+      },
+      options
+    );
 
-        $('.list-section [data-toggle=dropdown]').closest('.toolbar').dropdown();
+    var filterConfig = {
+      itemHandle: 'tr',
+      listItems: '#contribution-list tbody tr',
+      term: '#search-input',
+      state: '#filtering-state',
+      placeholder: '#filter-placeholder',
+    };
+
+    $('.list-section [data-toggle=dropdown]')
+      .closest('.toolbar')
+      .dropdown();
+    setupTableSorter('#contribution-list .tablesorter');
+    setupSessionPicker(options.createSessionURL, options.timetableRESTURL);
+    setupTrackPicker(options.createTrackURL);
+    setupStartDateQBubbles();
+    setupDurationQBubbles();
+    enableIfChecked('#contribution-list', 'input[name=contribution_id]', '.js-enable-if-checked');
+
+    var applySearchFilters = setupListGenerator(filterConfig);
+
+    $('#contribution-list')
+      .on('indico:htmlUpdated', function() {
         setupTableSorter('#contribution-list .tablesorter');
-        setupSessionPicker(options.createSessionURL, options.timetableRESTURL);
-        setupTrackPicker(options.createTrackURL);
         setupStartDateQBubbles();
         setupDurationQBubbles();
-        enableIfChecked('#contribution-list', 'input[name=contribution_id]', '.js-enable-if-checked');
+        _.defer(applySearchFilters);
+      })
+      .on('attachments:updated', function(evt) {
+        var target = $(evt.target);
+        reloadManagementAttachmentInfoColumn(target.data('locator'), target.closest('td'));
+      });
+    $('.js-submit-form').on('click', function(e) {
+      e.preventDefault();
+      var $this = $(this);
+      if (!$this.hasClass('disabled')) {
+        $('#contribution-list form')
+          .attr('action', $this.data('href'))
+          .submit();
+      }
+    });
+  };
 
-        var applySearchFilters = setupListGenerator(filterConfig);
+  global.setupSubContributionList = function setupSubContributionList() {
+    $('#subcontribution-list [data-toggle=dropdown]')
+      .closest('.toolbar')
+      .dropdown();
+    setupTableSorter('#subcontribution-list .tablesorter');
+    enableIfChecked(
+      '#subcontribution-list',
+      'input[name=subcontribution_id]',
+      '#subcontribution-list .js-enable-if-checked'
+    );
 
-        $('#contribution-list').on('indico:htmlUpdated', function() {
-            setupTableSorter('#contribution-list .tablesorter');
-            setupStartDateQBubbles();
-            setupDurationQBubbles();
-            _.defer(applySearchFilters);
-        }).on('attachments:updated', function(evt) {
-            var target = $(evt.target);
-            reloadManagementAttachmentInfoColumn(target.data('locator'), target.closest('td'));
+    $('#subcontribution-list td.subcontribution-title').on('mouseenter', function() {
+      var $this = $(this);
+      if (this.offsetWidth < this.scrollWidth && !$this.attr('title')) {
+        $this.attr('title', $this.text());
+      }
+    });
+    $('#subcontribution-list').on('attachments:updated', function(evt) {
+      var target = $(evt.target);
+      reloadManagementAttachmentInfoColumn(target.data('locator'), target.closest('td'));
+    });
+
+    $('#subcontribution-list table').sortable({
+      items: '.js-sortable-subcontribution-row',
+      handle: '.ui-sortable-handle',
+      placeholder: 'sortable-placeholder',
+      tolerance: 'pointer',
+      distance: 10,
+      axis: 'y',
+      containment: '#subcontribution-list table',
+      start: function(e, ui) {
+        ui.placeholder.height(ui.helper.outerHeight());
+      },
+      update: function(e, ui) {
+        var self = $(this);
+
+        $.ajax({
+          url: ui.item.data('sort-url'),
+          method: 'POST',
+          data: {subcontrib_ids: self.sortable('toArray')},
+          error: handleAjaxError,
         });
-        $('.js-submit-form').on('click', function(e) {
-            e.preventDefault();
-            var $this = $(this);
-            if (!$this.hasClass('disabled')) {
-                $('#contribution-list form').attr('action', $this.data('href')).submit();
-            }
-        });
+      },
+    });
+  };
+
+  global.setupEventDisplayContributionList = function setupEventDisplayContributionList() {
+    var filterConfig = {
+      itemHandle: 'div.contribution-row',
+      listItems: '#display-contribution-list div.contribution-row',
+      term: '#search-input',
+      state: '#filtering-state',
+      placeholder: '#filter-placeholder',
     };
 
-    global.setupSubContributionList = function setupSubContributionList() {
-        $('#subcontribution-list [data-toggle=dropdown]').closest('.toolbar').dropdown();
-        setupTableSorter('#subcontribution-list .tablesorter');
-        enableIfChecked('#subcontribution-list', 'input[name=subcontribution_id]', '#subcontribution-list .js-enable-if-checked');
+    var applySearchFilters = setupListGenerator(filterConfig);
+    applySearchFilters();
+  };
 
-        $('#subcontribution-list td.subcontribution-title').on('mouseenter', function() {
-            var $this = $(this);
-            if (this.offsetWidth < this.scrollWidth && !$this.attr('title')) {
-                $this.attr('title', $this.text());
-            }
-        });
-        $('#subcontribution-list').on('attachments:updated', function(evt) {
-            var target = $(evt.target);
-            reloadManagementAttachmentInfoColumn(target.data('locator'), target.closest('td'));
-        });
-
-
-        $('#subcontribution-list table').sortable({
-            items: '.js-sortable-subcontribution-row',
-            handle: '.ui-sortable-handle',
-            placeholder: 'sortable-placeholder',
-            tolerance: 'pointer',
-            distance: 10,
-            axis: 'y',
-            containment: '#subcontribution-list table',
-            start: function(e, ui) {
-                ui.placeholder.height(ui.helper.outerHeight());
-            },
-            update: function(e, ui) {
-                var self = $(this);
-
-                $.ajax({
-                    url: ui.item.data('sort-url'),
-                    method: 'POST',
-                    data: {subcontrib_ids: self.sortable('toArray')},
-                    error: handleAjaxError
-                });
-            }
-        });
+  global.setupEventDisplayAuthorList = function setupEventDisplayAuthorList() {
+    var filterConfig = {
+      itemHandle: '.author-list > li',
+      listItems: '.author-list > li',
+      term: '#search-input',
+      state: '#filtering-state',
+      placeholder: '#filter-placeholder',
     };
 
-    global.setupEventDisplayContributionList = function setupEventDisplayContributionList() {
-        var filterConfig = {
-            itemHandle: 'div.contribution-row',
-            listItems: '#display-contribution-list div.contribution-row',
-            term: '#search-input',
-            state: '#filtering-state',
-            placeholder: '#filter-placeholder'
-        };
-
-        var applySearchFilters = setupListGenerator(filterConfig);
-        applySearchFilters();
-    };
-
-    global.setupEventDisplayAuthorList = function setupEventDisplayAuthorList() {
-        var filterConfig = {
-            itemHandle: '.author-list > li',
-            listItems: '.author-list > li',
-            term: '#search-input',
-            state: '#filtering-state',
-            placeholder: '#filter-placeholder'
-        };
-
-        var applySearchFilters = setupSearchBox(filterConfig);
-        applySearchFilters();
-    };
+    var applySearchFilters = setupSearchBox(filterConfig);
+    applySearchFilters();
+  };
 })(window);

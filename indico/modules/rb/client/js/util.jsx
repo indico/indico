@@ -14,86 +14,94 @@ import React from 'react';
 import {serializeDate} from 'indico/utils/date';
 import {PluralTranslate, Translate, Singular, Plural, Param} from 'indico/react/i18n';
 
-
 export function preProcessParameters(params, rules) {
-    return _pruneNullLeaves(
-        Object.assign(...Object.entries(rules)
-            .map(([k, rule]) => {
-                if (typeof rule === 'object') {
-                    const {serializer, onlyIf} = rule;
-                    rule = serializer;
-                    if (!onlyIf(params)) {
-                        return {};
-                    }
-                }
-                const value = rule(params);
-                if (value === undefined) {
-                    return {};
-                }
-                return {[k]: value};
-            }))
-    );
+  return _pruneNullLeaves(
+    Object.assign(
+      ...Object.entries(rules).map(([k, rule]) => {
+        if (typeof rule === 'object') {
+          const {serializer, onlyIf} = rule;
+          rule = serializer;
+          if (!onlyIf(params)) {
+            return {};
+          }
+        }
+        const value = rule(params);
+        if (value === undefined) {
+          return {};
+        }
+        return {[k]: value};
+      })
+    )
+  );
 }
 
 function calculateDefaultEndDate(startDate, type, number, interval) {
-    const isMoment = moment.isMoment(startDate);
-    const dt = isMoment ? startDate.clone() : moment(startDate);
+  const isMoment = moment.isMoment(startDate);
+  const dt = isMoment ? startDate.clone() : moment(startDate);
 
-    if (type === 'daily') {
-        dt.add(1, 'weeks');
-    } else if (interval === 'week') {
-        // 5 occurrences
-        dt.add(4 * number, 'weeks');
-    } else {
-        // 7 occurences
-        dt.add(6 * number, 'months');
-    }
-    return isMoment ? dt : serializeDate(dt);
+  if (type === 'daily') {
+    dt.add(1, 'weeks');
+  } else if (interval === 'week') {
+    // 5 occurrences
+    dt.add(4 * number, 'weeks');
+  } else {
+    // 7 occurences
+    dt.add(6 * number, 'months');
+  }
+  return isMoment ? dt : serializeDate(dt);
 }
 
 export function sanitizeRecurrence(filters) {
-    const {dates: {endDate, startDate}, recurrence: {type, interval, number}} = filters;
+  const {
+    dates: {endDate, startDate},
+    recurrence: {type, interval, number},
+  } = filters;
 
-    if (type === 'single' && endDate) {
-        filters.dates = {...filters.dates, endDate: null};
-    } else if (type !== 'single' && startDate && !endDate) {
-        // if there's a start date already set, let's set a sensible
-        // default for the end date
-        filters.dates = {...filters.dates, endDate: calculateDefaultEndDate(startDate, type, number, interval)};
-    }
+  if (type === 'single' && endDate) {
+    filters.dates = {...filters.dates, endDate: null};
+  } else if (type !== 'single' && startDate && !endDate) {
+    // if there's a start date already set, let's set a sensible
+    // default for the end date
+    filters.dates = {
+      ...filters.dates,
+      endDate: calculateDefaultEndDate(startDate, type, number, interval),
+    };
+  }
 }
 
 function _pruneNullLeaves(obj) {
-    if (!Object.entries(obj).length) {
-        return {};
-    }
+  if (!Object.entries(obj).length) {
+    return {};
+  }
 
-    return Object.assign(...Object.entries(obj).map(([k, v]) => {
-        if (v === null) {
-            return {};
-        } else if (Array.isArray(v)) {
-            return {[k]: v.filter(e => e !== null)};
-        } else if (typeof v === 'object') {
-            return {[k]: _pruneNullLeaves(v)};
-        } else {
-            return {[k]: v};
-        }
-    }));
+  return Object.assign(
+    ...Object.entries(obj).map(([k, v]) => {
+      if (v === null) {
+        return {};
+      } else if (Array.isArray(v)) {
+        return {[k]: v.filter(e => e !== null)};
+      } else if (typeof v === 'object') {
+        return {[k]: _pruneNullLeaves(v)};
+      } else {
+        return {[k]: v};
+      }
+    })
+  );
 }
 
 export const pushStateMergeProps = (stateProps, dispatchProps, ownProps) => {
-    const {dispatch, ...realDispatchProps} = dispatchProps;
-    return {
-        ...ownProps,
-        ...stateProps,
-        ...realDispatchProps,
-        pushState(url, restoreQueryString = false) {
-            if (restoreQueryString) {
-                url += `?${stateProps.queryString}`;
-            }
-            dispatch(push(url));
-        }
-    };
+  const {dispatch, ...realDispatchProps} = dispatchProps;
+  return {
+    ...ownProps,
+    ...stateProps,
+    ...realDispatchProps,
+    pushState(url, restoreQueryString = false) {
+      if (restoreQueryString) {
+        url += `?${stateProps.queryString}`;
+      }
+      dispatch(push(url));
+    },
+  };
 };
 
 /**
@@ -102,12 +110,12 @@ export const pushStateMergeProps = (stateProps, dispatchProps, ownProps) => {
  * @param {string} name - Name of the state field.
  */
 export function boolStateField(name) {
-    return {
-        serialize: state => _.get(state, name) || null,
-        parse: (value, state) => {
-            _.set(state, name, value);
-        }
-    };
+  return {
+    serialize: state => _.get(state, name) || null,
+    parse: (value, state) => {
+      _.set(state, name, value);
+    },
+  };
 }
 
 /**
@@ -117,168 +125,165 @@ export function boolStateField(name) {
  * @param defaultValue - The default value that will not go to the query string.
  */
 export function defaultStateField(name, defaultValue) {
-    return {
-        serialize: state => {
-            const value = _.get(state, name, null);
-            return value === defaultValue ? null : value;
-        },
-        parse: (value, state) => {
-            _.set(state, name, value);
-        }
-    };
+  return {
+    serialize: state => {
+      const value = _.get(state, name, null);
+      return value === defaultValue ? null : value;
+    },
+    parse: (value, state) => {
+      _.set(state, name, value);
+    },
+  };
 }
 
 export function isDateWithinRange(date, dateRange, _toMoment) {
-    return date && dateRange.filter((dt) => _toMoment(dt).isSame(date, 'day')).length !== 0;
+  return date && dateRange.filter(dt => _toMoment(dt).isSame(date, 'day')).length !== 0;
 }
 
-
 export function PopupParam({content, children}) {
-    const trigger = <span>{children}</span>;
-    return <Popup trigger={trigger} content={content} />;
+  const trigger = <span>{children}</span>;
+  return <Popup trigger={trigger} content={content} />;
 }
 
 PopupParam.propTypes = {
-    content: PropTypes.object.isRequired,
-    children: PropTypes.object,
+  content: PropTypes.object.isRequired,
+  children: PropTypes.object,
 };
 
 PopupParam.defaultProps = {
-    children: null,
+  children: null,
 };
 
 export function renderRecurrence({type, number, interval}) {
-    if (!type) {
-        return null;
-    }
-    if (type === 'single') {
-        return <Translate>Once</Translate>;
-    } else if (type === 'daily') {
-        return <Translate>Daily</Translate>;
-    } else if (interval === 'week') {
-        return (
-            <PluralTranslate count={number}>
-                <Singular>
-                    Weekly
-                </Singular>
-                <Plural>
-                    Every <Param name="number" value={number} /> weeks
-                </Plural>
-            </PluralTranslate>
-        );
-    } else {
-        return (
-            <PluralTranslate count={number}>
-                <Singular>
-                    Monthly
-                </Singular>
-                <Plural>
-                    Every <Param name="number" value={number} /> months
-                </Plural>
-            </PluralTranslate>
-        );
-    }
+  if (!type) {
+    return null;
+  }
+  if (type === 'single') {
+    return <Translate>Once</Translate>;
+  } else if (type === 'daily') {
+    return <Translate>Daily</Translate>;
+  } else if (interval === 'week') {
+    return (
+      <PluralTranslate count={number}>
+        <Singular>Weekly</Singular>
+        <Plural>
+          Every <Param name="number" value={number} /> weeks
+        </Plural>
+      </PluralTranslate>
+    );
+  } else {
+    return (
+      <PluralTranslate count={number}>
+        <Singular>Monthly</Singular>
+        <Plural>
+          Every <Param name="number" value={number} /> months
+        </Plural>
+      </PluralTranslate>
+    );
+  }
 }
 
 export function getRecurrenceInfo(repetition) {
-    const [repeatFrequency, repeatInterval] = repetition;
-    let type = 'single';
-    let number = '1';
-    let interval = 'week';
-    if (repeatFrequency === 1) {
-        type = 'daily';
-    } else if (repeatFrequency === 2) {
-        type = 'every';
-        interval = 'week';
-        number = repeatInterval;
-    } else if (repeatFrequency === 3) {
-        type = 'every';
-        interval = 'month';
-        number = repeatInterval;
-    }
-    return {type, number, interval};
+  const [repeatFrequency, repeatInterval] = repetition;
+  let type = 'single';
+  let number = '1';
+  let interval = 'week';
+  if (repeatFrequency === 1) {
+    type = 'daily';
+  } else if (repeatFrequency === 2) {
+    type = 'every';
+    interval = 'week';
+    number = repeatInterval;
+  } else if (repeatFrequency === 3) {
+    type = 'every';
+    interval = 'month';
+    number = repeatInterval;
+  }
+  return {type, number, interval};
 }
 
 export function serializeRecurrenceInfo({type, number, interval}) {
-    if (type === 'single') {
-        return ['NEVER', 0];
-    } else if (type === 'daily') {
-        return ['DAY', 1];
-    } else if (interval === 'week') {
-        return ['WEEK', number];
-    } else if (interval === 'month') {
-        return ['MONTH', number];
-    }
+  if (type === 'single') {
+    return ['NEVER', 0];
+  } else if (type === 'daily') {
+    return ['DAY', 1];
+  } else if (interval === 'week') {
+    return ['WEEK', number];
+  } else if (interval === 'month') {
+    return ['MONTH', number];
+  }
 }
 
 const _legendLabels = {
-    candidates:
-        {label: Translate.string('Available'), style: 'available'},
-    bookings:
-        {label: Translate.string('Booking'), style: 'booking'},
-    preBookings:
-        {label: Translate.string('Pre-Booking'), style: 'pre-booking'},
-    conflicts:
-        {label: Translate.string('Conflict'), style: 'conflict'},
-    preConflicts:
-        {label: Translate.string('Conflict with Pre-Booking'), style: 'pre-booking-conflict'},
-    conflictingCandidates:
-        {label: Translate.string('Invalid occurrence'), style: 'conflicting-candidate'},
-    other:
-        {label: Translate.string('Other booking'), style: 'other'},
-    rejections:
-        {label: Translate.string('Rejected'), style: 'rejection'},
-    cancellations:
-        {label: Translate.string('Cancelled'), style: 'cancellation'},
-    pendingCancellations:
-        {label: Translate.string('Will be cancelled'), style: 'pending-cancellation'},
-    blockings:
-        {label: Translate.string('Blocking'), style: 'blocking'},
-    overridableBlockings:
-        {label: Translate.string('Blocking (allowed)'), style: 'overridable-blocking'},
-    nonbookablePeriods:
-        {label: Translate.string('Not bookable'), style: 'unbookable'},
-    unbookableHours:
-        {label: Translate.string('Not bookable'), style: 'unbookable'},
-    concurrentPreBookings:
-        {label: Translate.string('Concurrent Pre-Bookings'), style: 'concurrent-pre-booking'},
+  candidates: {label: Translate.string('Available'), style: 'available'},
+  bookings: {label: Translate.string('Booking'), style: 'booking'},
+  preBookings: {label: Translate.string('Pre-Booking'), style: 'pre-booking'},
+  conflicts: {label: Translate.string('Conflict'), style: 'conflict'},
+  preConflicts: {
+    label: Translate.string('Conflict with Pre-Booking'),
+    style: 'pre-booking-conflict',
+  },
+  conflictingCandidates: {
+    label: Translate.string('Invalid occurrence'),
+    style: 'conflicting-candidate',
+  },
+  other: {label: Translate.string('Other booking'), style: 'other'},
+  rejections: {label: Translate.string('Rejected'), style: 'rejection'},
+  cancellations: {label: Translate.string('Cancelled'), style: 'cancellation'},
+  pendingCancellations: {
+    label: Translate.string('Will be cancelled'),
+    style: 'pending-cancellation',
+  },
+  blockings: {label: Translate.string('Blocking'), style: 'blocking'},
+  overridableBlockings: {
+    label: Translate.string('Blocking (allowed)'),
+    style: 'overridable-blocking',
+  },
+  nonbookablePeriods: {label: Translate.string('Not bookable'), style: 'unbookable'},
+  unbookableHours: {label: Translate.string('Not bookable'), style: 'unbookable'},
+  concurrentPreBookings: {
+    label: Translate.string('Concurrent Pre-Bookings'),
+    style: 'concurrent-pre-booking',
+  },
 };
 
 const _orderedLabels = [
-    'candidates',
-    'bookings',
-    'preBookings',
-    'concurrentPreBookings',
-    'conflicts',
-    'preConflicts',
-    'conflictingCandidates',
-    'rejections',
-    'cancellations',
-    'pendingCancellations',
-    'other',
-    'blockings',
-    'overridableBlockings',
-    'nonbookablePeriods',
-    'unbookableHours',
+  'candidates',
+  'bookings',
+  'preBookings',
+  'concurrentPreBookings',
+  'conflicts',
+  'preConflicts',
+  'conflictingCandidates',
+  'rejections',
+  'cancellations',
+  'pendingCancellations',
+  'other',
+  'blockings',
+  'overridableBlockings',
+  'nonbookablePeriods',
+  'unbookableHours',
 ];
 
 export function transformToLegendLabels(occurrenceTypes, inactiveTypes = []) {
-    return _orderedLabels.reduce((legend, type) => {
-        const label = _legendLabels[type];
-        if (occurrenceTypes.includes(type) &&
-            !inactiveTypes.includes(type) &&
-            !legend.some(legendLabel => legendLabel.style === label.style)) {
-            legend.push(_legendLabels[type]);
-        }
-        return legend;
-    }, []);
+  return _orderedLabels.reduce((legend, type) => {
+    const label = _legendLabels[type];
+    if (
+      occurrenceTypes.includes(type) &&
+      !inactiveTypes.includes(type) &&
+      !legend.some(legendLabel => legendLabel.style === label.style)
+    ) {
+      legend.push(_legendLabels[type]);
+    }
+    return legend;
+  }, []);
 }
 
 export function getOccurrenceTypes(availability) {
-    return Object.entries(availability).reduce((occurrenceTypes, [type, occurrences]) => {
-        if (occurrences && Object.keys(occurrences).length > 0 && _orderedLabels.includes(type)) {
-            occurrenceTypes.push(type);
-        }
-        return occurrenceTypes;
-    }, []);
+  return Object.entries(availability).reduce((occurrenceTypes, [type, occurrences]) => {
+    if (occurrences && Object.keys(occurrences).length > 0 && _orderedLabels.includes(type)) {
+      occurrenceTypes.push(type);
+    }
+    return occurrenceTypes;
+  }, []);
 }

@@ -10,26 +10,25 @@ import {connect} from 'react-redux';
 import LogEntryModal from '../components/LogEntryModal';
 import {setDetailedView, viewPrevEntry, viewNextEntry} from '../actions';
 
-
 const mapStateToProps = ({logs}) => ({
-    currentViewIndex: logs.currentViewIndex,
-    currentPage: logs.currentPage,
-    totalPageCount: logs.totalPageCount
+  currentViewIndex: logs.currentViewIndex,
+  currentPage: logs.currentPage,
+  totalPageCount: logs.totalPageCount,
 });
 
-const mapDispatchToProps = (dispatch) => ({
-    setDetailedView: (entryIndex) => {
-        dispatch(setDetailedView(entryIndex));
-    },
-    prevEntry: () => {
-        dispatch(viewPrevEntry());
-    },
-    nextEntry: () => {
-        dispatch(viewNextEntry());
-    }
+const mapDispatchToProps = dispatch => ({
+  setDetailedView: entryIndex => {
+    dispatch(setDetailedView(entryIndex));
+  },
+  prevEntry: () => {
+    dispatch(viewPrevEntry());
+  },
+  nextEntry: () => {
+    dispatch(viewNextEntry());
+  },
 });
 
 export default connect(
-    mapStateToProps,
-    mapDispatchToProps
+  mapStateToProps,
+  mapDispatchToProps
 )(LogEntryModal);

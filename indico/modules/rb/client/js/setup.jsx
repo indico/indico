@@ -23,48 +23,52 @@ import {actions as linkingActions} from './common/linking';
 import 'indico-sui-theme/semantic.css';
 import '../styles/main.scss';
 
-
 export default function setup(overrides = {}, postReducers = []) {
-    window.addEventListener('scroll', _.debounce(() => {
-        document.body.style.setProperty('--offset', window.pageYOffset);
-    }, 500));
+  window.addEventListener(
+    'scroll',
+    _.debounce(() => {
+      document.body.style.setProperty('--offset', window.pageYOffset);
+    }, 500)
+  );
 
-    document.addEventListener('DOMContentLoaded', () => {
-        const appContainer = document.getElementById('rb-app-container');
-        const store = createRBStore(overrides, postReducers);
+  document.addEventListener('DOMContentLoaded', () => {
+    const appContainer = document.getElementById('rb-app-container');
+    const store = createRBStore(overrides, postReducers);
 
-        // Use this function whenever you would like to override
-        // a component e.g. from within a plugin without
-        // using the `setup` function
-        window.registerOverride = (externalOverrides) => {
-            store.dispatch(extendOverrides(externalOverrides));
-        };
+    // Use this function whenever you would like to override
+    // a component e.g. from within a plugin without
+    // using the `setup` function
+    window.registerOverride = externalOverrides => {
+      store.dispatch(extendOverrides(externalOverrides));
+    };
 
-        let oldPath = history.location.pathname;
-        history.listen(({pathname: newPath}) => {
-            if (oldPath.startsWith('/admin') && !newPath.startsWith('/admin')) {
-                // user left the admin area so we need to reload some data that might have been changed
-                // TODO: add more things here once admins can change them (e.g. map areas)
-                store.dispatch(configActions.fetchConfig());
-                store.dispatch(roomsActions.fetchEquipmentTypes());
-                store.dispatch(roomsActions.fetchRooms());
-                store.dispatch(userActions.fetchAllRoomPermissions());
-            }
-            oldPath = newPath;
-        });
-
-        store.dispatch(init());
-        store.dispatch(linkingActions.setObjectFromURL(history.location.search.slice(1)));
-        setupUserMenu(
-            document.getElementById('indico-user-menu-container'), store,
-            userSelectors.getUserInfo, configSelectors.getLanguages
-        );
-
-        ReactDOM.render(
-            <Provider store={store}>
-                <App history={history} />
-            </Provider>,
-            appContainer
-        );
+    let oldPath = history.location.pathname;
+    history.listen(({pathname: newPath}) => {
+      if (oldPath.startsWith('/admin') && !newPath.startsWith('/admin')) {
+        // user left the admin area so we need to reload some data that might have been changed
+        // TODO: add more things here once admins can change them (e.g. map areas)
+        store.dispatch(configActions.fetchConfig());
+        store.dispatch(roomsActions.fetchEquipmentTypes());
+        store.dispatch(roomsActions.fetchRooms());
+        store.dispatch(userActions.fetchAllRoomPermissions());
+      }
+      oldPath = newPath;
     });
+
+    store.dispatch(init());
+    store.dispatch(linkingActions.setObjectFromURL(history.location.search.slice(1)));
+    setupUserMenu(
+      document.getElementById('indico-user-menu-container'),
+      store,
+      userSelectors.getUserInfo,
+      configSelectors.getLanguages
+    );
+
+    ReactDOM.render(
+      <Provider store={store}>
+        <App history={history} />
+      </Provider>,
+      appContainer
+    );
+  });
 }

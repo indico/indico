@@ -14,41 +14,45 @@ import * as adminActions from './actions';
 import RoomFeatureList from './RoomFeatureList';
 import EquipmentTypeList from './EquipmentTypeList';
 
-
 class EquipmentPage extends React.PureComponent {
-    static propTypes = {
-        actions: PropTypes.exact({
-            fetchEquipmentTypes: PropTypes.func.isRequired,
-            fetchFeatures: PropTypes.func.isRequired,
-        }).isRequired,
-    };
+  static propTypes = {
+    actions: PropTypes.exact({
+      fetchEquipmentTypes: PropTypes.func.isRequired,
+      fetchFeatures: PropTypes.func.isRequired,
+    }).isRequired,
+  };
 
-    componentDidMount() {
-        const {actions: {fetchEquipmentTypes, fetchFeatures}} = this.props;
-        fetchEquipmentTypes();
-        fetchFeatures();
-    }
+  componentDidMount() {
+    const {
+      actions: {fetchEquipmentTypes, fetchFeatures},
+    } = this.props;
+    fetchEquipmentTypes();
+    fetchFeatures();
+  }
 
-    render() {
-        return (
-            <Grid columns={2}>
-                <Grid.Column width={8}>
-                    <EquipmentTypeList />
-                </Grid.Column>
-                <Grid.Column>
-                    <RoomFeatureList />
-                </Grid.Column>
-            </Grid>
-        );
-    }
+  render() {
+    return (
+      <Grid columns={2}>
+        <Grid.Column width={8}>
+          <EquipmentTypeList />
+        </Grid.Column>
+        <Grid.Column>
+          <RoomFeatureList />
+        </Grid.Column>
+      </Grid>
+    );
+  }
 }
 
 export default connect(
-    null,
-    dispatch => ({
-        actions: bindActionCreators({
-            fetchEquipmentTypes: adminActions.fetchEquipmentTypes,
-            fetchFeatures: adminActions.fetchFeatures,
-        }, dispatch),
-    })
+  null,
+  dispatch => ({
+    actions: bindActionCreators(
+      {
+        fetchEquipmentTypes: adminActions.fetchEquipmentTypes,
+        fetchFeatures: adminActions.fetchFeatures,
+      },
+      dispatch
+    ),
+  })
 )(EquipmentPage);

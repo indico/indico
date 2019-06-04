@@ -14,7 +14,6 @@ import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {setMomentLocale} from 'indico/utils/date';
 import {ajaxAction} from 'indico/utils/redux';
 
-
 export const FETCH_USER_INFO_REQUEST = 'user/FETCH_USER_INFO_REQUEST';
 export const FETCH_USER_INFO_SUCCESS = 'user/FETCH_USER_INFO_SUCCESS';
 export const FETCH_USER_INFO_ERROR = 'user/FETCH_USER_INFO_ERROR';
@@ -39,83 +38,82 @@ export const FETCH_ROOM_PERMISSIONS_ERROR = 'user/FETCH_ROOM_PERMISSIONS_ERROR';
 
 export const TOGGLE_ADMIN_OVERRIDE = 'user/TOGGLE_ADMIN_OVERRIDE';
 
-
 export function fetchUserInfo() {
-    return async (dispatch) => {
-        const result = await ajaxAction(
-            () => indicoAxios.get(fetchUserInfoURL()),
-            FETCH_USER_INFO_REQUEST,
-            [USER_INFO_RECEIVED, FETCH_USER_INFO_SUCCESS],
-            FETCH_USER_INFO_ERROR
-        )(dispatch);
+  return async dispatch => {
+    const result = await ajaxAction(
+      () => indicoAxios.get(fetchUserInfoURL()),
+      FETCH_USER_INFO_REQUEST,
+      [USER_INFO_RECEIVED, FETCH_USER_INFO_SUCCESS],
+      FETCH_USER_INFO_ERROR
+    )(dispatch);
 
-        await setMomentLocale(result.data.language);
-        return result;
-    };
+    await setMomentLocale(result.data.language);
+    return result;
+  };
 }
 
 async function _sendFavoriteRoomsRequest(method, id = null) {
-    let response;
-    try {
-        response = await indicoAxios.request({
-            method,
-            url: favoriteRoomsURL(id !== null ? {room_id: id} : {})
-        });
-    } catch (error) {
-        handleAxiosError(error);
-        return;
-    }
-    return response;
+  let response;
+  try {
+    response = await indicoAxios.request({
+      method,
+      url: favoriteRoomsURL(id !== null ? {room_id: id} : {}),
+    });
+  } catch (error) {
+    handleAxiosError(error);
+    return;
+  }
+  return response;
 }
 
 export function fetchFavoriteRooms() {
-    return ajaxAction(
-        () => indicoAxios.get(favoriteRoomsURL()),
-        FETCH_FAVORITES_REQUEST,
-        [FAVORITES_RECEIVED, FETCH_FAVORITES_SUCCESS],
-        FETCH_FAVORITES_ERROR
-    );
+  return ajaxAction(
+    () => indicoAxios.get(favoriteRoomsURL()),
+    FETCH_FAVORITES_REQUEST,
+    [FAVORITES_RECEIVED, FETCH_FAVORITES_SUCCESS],
+    FETCH_FAVORITES_ERROR
+  );
 }
 
 export function addFavoriteRoom(id) {
-    return async (dispatch) => {
-        dispatch({type: ADD_FAVORITE_ROOM, id});
-        const response = await _sendFavoriteRoomsRequest('PUT', id);
-        if (!response) {
-            dispatch({type: DEL_FAVORITE_ROOM, id});
-        }
-    };
+  return async dispatch => {
+    dispatch({type: ADD_FAVORITE_ROOM, id});
+    const response = await _sendFavoriteRoomsRequest('PUT', id);
+    if (!response) {
+      dispatch({type: DEL_FAVORITE_ROOM, id});
+    }
+  };
 }
 
 export function delFavoriteRoom(id) {
-    return async (dispatch) => {
-        dispatch({type: DEL_FAVORITE_ROOM, id});
-        const response = await _sendFavoriteRoomsRequest('DELETE', id);
-        if (!response) {
-            dispatch({type: ADD_FAVORITE_ROOM, id});
-        }
-    };
+  return async dispatch => {
+    dispatch({type: DEL_FAVORITE_ROOM, id});
+    const response = await _sendFavoriteRoomsRequest('DELETE', id);
+    if (!response) {
+      dispatch({type: ADD_FAVORITE_ROOM, id});
+    }
+  };
 }
 
 export function fetchRoomPermissions(id) {
-    return ajaxAction(
-        () => indicoAxios.get(roomPermissionsURL({room_id: id})),
-        FETCH_ROOM_PERMISSIONS_REQUEST,
-        [ROOM_PERMISSIONS_RECEIVED, FETCH_ROOM_PERMISSIONS_SUCCESS],
-        FETCH_ROOM_PERMISSIONS_ERROR,
-        data => ({...data, id})
-    );
+  return ajaxAction(
+    () => indicoAxios.get(roomPermissionsURL({room_id: id})),
+    FETCH_ROOM_PERMISSIONS_REQUEST,
+    [ROOM_PERMISSIONS_RECEIVED, FETCH_ROOM_PERMISSIONS_SUCCESS],
+    FETCH_ROOM_PERMISSIONS_ERROR,
+    data => ({...data, id})
+  );
 }
 
 export function fetchAllRoomPermissions() {
-    return ajaxAction(
-        () => indicoAxios.get(roomsPermissionsURL()),
-        FETCH_ALL_ROOM_PERMISSIONS_REQUEST,
-        [ALL_ROOM_PERMISSIONS_RECEIVED, FETCH_ALL_ROOM_PERMISSIONS_SUCCESS],
-        FETCH_ALL_ROOM_PERMISSIONS_ERROR
-    );
+  return ajaxAction(
+    () => indicoAxios.get(roomsPermissionsURL()),
+    FETCH_ALL_ROOM_PERMISSIONS_REQUEST,
+    [ALL_ROOM_PERMISSIONS_RECEIVED, FETCH_ALL_ROOM_PERMISSIONS_SUCCESS],
+    FETCH_ALL_ROOM_PERMISSIONS_ERROR
+  );
 }
 
 export function toggleAdminOverride() {
-    return {type: TOGGLE_ADMIN_OVERRIDE};
+  return {type: TOGGLE_ADMIN_OVERRIDE};
 }

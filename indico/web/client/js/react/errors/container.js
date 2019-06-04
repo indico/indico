@@ -10,21 +10,23 @@ import {connect} from 'react-redux';
 import ErrorDialog from './component';
 import {clearError, showReportForm} from './actions';
 
-
 const mapStateToProps = ({errors: {errorList, formVisible}}) => ({
-    errorData: errorList[0],
-    remainingErrors: errorList.length ? errorList.length - 1 : 0,
-    formVisible,
-    dialogVisible: !!errorList.length,
+  errorData: errorList[0],
+  remainingErrors: errorList.length ? errorList.length - 1 : 0,
+  formVisible,
+  dialogVisible: !!errorList.length,
 });
 
-const mapDispatchToProps = (dispatch) => ({
-    showReportForm() {
-        dispatch(showReportForm());
-    },
-    clearError() {
-        dispatch(clearError());
-    },
+const mapDispatchToProps = dispatch => ({
+  showReportForm() {
+    dispatch(showReportForm());
+  },
+  clearError() {
+    dispatch(clearError());
+  },
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(ErrorDialog);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(ErrorDialog);

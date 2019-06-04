@@ -9,20 +9,19 @@ import {connect} from 'react-redux';
 import Filter from '../components/Filter';
 import {setFilter, fetchLogEntries, setPage} from '../actions';
 
-
 const mapStateToProps = ({logs}) => ({
-    filters: logs.filters,
+  filters: logs.filters,
 });
 
-const mapDispatchToProps = (dispatch) => ({
-    setFilter: (filter) => {
-        dispatch(setFilter(filter));
-        dispatch(setPage(1));
-        dispatch(fetchLogEntries());
-    }
+const mapDispatchToProps = dispatch => ({
+  setFilter: filter => {
+    dispatch(setFilter(filter));
+    dispatch(setPage(1));
+    dispatch(fetchLogEntries());
+  },
 });
 
 export default connect(
-    mapStateToProps,
-    mapDispatchToProps
+  mapStateToProps,
+  mapDispatchToProps
 )(Filter);

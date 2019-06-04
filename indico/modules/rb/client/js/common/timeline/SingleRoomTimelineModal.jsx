@@ -20,94 +20,118 @@ import DailyTimelineContent from './DailyTimelineContent';
 
 import './SingleRoomTimelineModal.module.scss';
 
-
 const _getRowSerializer = (day, room) => {
-    return ({bookings, preBookings, candidates, conflictingCandidates, nonbookablePeriods, unbookableHours,
-             blockings, overridableBlockings, conflicts, preConflicts, concurrentPreBookings}) => ({
-        availability: {
-            candidates: (candidates[day] || []).map((candidate) => ({...candidate, bookable: false})) || [],
-            conflictingCandidates: (conflictingCandidates[day] || []).map((candidate) => (
-                {...candidate, bookable: false}
-            )) || [],
-            preBookings: preBookings[day] || [],
-            bookings: bookings[day] || [],
-            conflicts: conflicts[day] || [],
-            preConflicts: preConflicts[day] || [],
-            nonbookablePeriods: nonbookablePeriods[day] || [],
-            unbookableHours: unbookableHours || [],
-            blockings: blockings[day] || [],
-            overridableBlockings: overridableBlockings[day] || [],
-            concurrentPreBookings: concurrentPreBookings[day] || [],
-        },
-        label: serializeDate(day, 'L'),
-        key: day,
-        room
-    });
+  return ({
+    bookings,
+    preBookings,
+    candidates,
+    conflictingCandidates,
+    nonbookablePeriods,
+    unbookableHours,
+    blockings,
+    overridableBlockings,
+    conflicts,
+    preConflicts,
+    concurrentPreBookings,
+  }) => ({
+    availability: {
+      candidates: (candidates[day] || []).map(candidate => ({...candidate, bookable: false})) || [],
+      conflictingCandidates:
+        (conflictingCandidates[day] || []).map(candidate => ({...candidate, bookable: false})) ||
+        [],
+      preBookings: preBookings[day] || [],
+      bookings: bookings[day] || [],
+      conflicts: conflicts[day] || [],
+      preConflicts: preConflicts[day] || [],
+      nonbookablePeriods: nonbookablePeriods[day] || [],
+      unbookableHours: unbookableHours || [],
+      blockings: blockings[day] || [],
+      overridableBlockings: overridableBlockings[day] || [],
+      concurrentPreBookings: concurrentPreBookings[day] || [],
+    },
+    label: serializeDate(day, 'L'),
+    key: day,
+    room,
+  });
 };
 
-const _getLegendLabels = (availability) => {
-    const occurrenceTypes = getOccurrenceTypes(availability);
-    return transformToLegendLabels(occurrenceTypes);
+const _getLegendLabels = availability => {
+  const occurrenceTypes = getOccurrenceTypes(availability);
+  return transformToLegendLabels(occurrenceTypes);
 };
 
 const _SingleRoomTimelineContent = props => {
-    const {
-        availability, availabilityLoading, room, title, filters, roomAvailability, actions: {fetchAvailability}
-    } = props;
-    useEffect(() => {
-        if (_.isEmpty(roomAvailability)) {
-            fetchAvailability(room, filters);
-        }
-    }, [fetchAvailability, filters, room, roomAvailability]);
+  const {
+    availability,
+    availabilityLoading,
+    room,
+    title,
+    filters,
+    roomAvailability,
+    actions: {fetchAvailability},
+  } = props;
+  useEffect(() => {
+    if (_.isEmpty(roomAvailability)) {
+      fetchAvailability(room, filters);
+    }
+  }, [fetchAvailability, filters, room, roomAvailability]);
 
-    const isLoaded = !_.isEmpty(availability) && !availabilityLoading;
-    const dateRange = isLoaded ? availability.dateRange : [];
-    const rows = isLoaded ? dateRange.map((day) => _getRowSerializer(day, room)(availability)) : [];
-    const legendLabels = isLoaded ? _getLegendLabels(availability) : [];
-    return (
-        <>
-            <Modal.Header className="legend-header">
-                {title}
-                <Popup trigger={<Icon name="info circle" className="legend-info-icon" />}
-                       content={<TimelineLegend labels={legendLabels} compact />} />
-            </Modal.Header>
-            <Modal.Content>
-                <DailyTimelineContent rows={rows} fixedHeight={rows.length > 1 ? '70vh' : null} isLoading={!isLoaded} />
-            </Modal.Content>
-        </>
-    );
+  const isLoaded = !_.isEmpty(availability) && !availabilityLoading;
+  const dateRange = isLoaded ? availability.dateRange : [];
+  const rows = isLoaded ? dateRange.map(day => _getRowSerializer(day, room)(availability)) : [];
+  const legendLabels = isLoaded ? _getLegendLabels(availability) : [];
+  return (
+    <>
+      <Modal.Header className="legend-header">
+        {title}
+        <Popup
+          trigger={<Icon name="info circle" className="legend-info-icon" />}
+          content={<TimelineLegend labels={legendLabels} compact />}
+        />
+      </Modal.Header>
+      <Modal.Content>
+        <DailyTimelineContent
+          rows={rows}
+          fixedHeight={rows.length > 1 ? '70vh' : null}
+          isLoading={!isLoaded}
+        />
+      </Modal.Content>
+    </>
+  );
 };
 
 _SingleRoomTimelineContent.propTypes = {
-    room: PropTypes.object.isRequired,
-    availability: PropTypes.object,
-    availabilityLoading: PropTypes.bool.isRequired,
-    filters: PropTypes.object.isRequired,
-    roomAvailability: PropTypes.object,
-    title: PropTypes.node.isRequired,
-    actions: PropTypes.exact({
-        fetchAvailability: PropTypes.func.isRequired,
-    }).isRequired,
+  room: PropTypes.object.isRequired,
+  availability: PropTypes.object,
+  availabilityLoading: PropTypes.bool.isRequired,
+  filters: PropTypes.object.isRequired,
+  roomAvailability: PropTypes.object,
+  title: PropTypes.node.isRequired,
+  actions: PropTypes.exact({
+    fetchAvailability: PropTypes.func.isRequired,
+  }).isRequired,
 };
 
 _SingleRoomTimelineContent.defaultProps = {
-    availability: {},
-    roomAvailability: {},
+  availability: {},
+  roomAvailability: {},
 };
 
 const SingleRoomTimelineContent = connect(
-    state => ({
-        filters: bookRoomSelectors.getFilters(state),
-        availability: bookRoomSelectors.getBookingFormAvailability(state),
-        availabilityLoading: bookRoomSelectors.isFetchingFormTimeline(state),
-    }),
-    (dispatch) => ({
-        actions: bindActionCreators({
-            fetchAvailability: bookRoomActions.fetchBookingAvailability,
-        }, dispatch)
-    }),
+  state => ({
+    filters: bookRoomSelectors.getFilters(state),
+    availability: bookRoomSelectors.getBookingFormAvailability(state),
+    availabilityLoading: bookRoomSelectors.isFetchingFormTimeline(state),
+  }),
+  dispatch => ({
+    actions: bindActionCreators(
+      {
+        fetchAvailability: bookRoomActions.fetchBookingAvailability,
+      },
+      dispatch
+    ),
+  })
 )(React.memo(_SingleRoomTimelineContent));
-
 
 /**
  * Timeline modal for a single room
@@ -120,29 +144,31 @@ const SingleRoomTimelineContent = connect(
  * @param {Object} props.room - Room whose timeline will be displayed.
  */
 const SingleRoomTimelineModal = props => {
-    const {open, title, onClose, roomAvailability, room} = props;
-    return (
-        <Modal open={open}
-               onClose={onClose}
-               size="large" closeIcon>
-            <SingleRoomTimelineContent room={room} roomAvailability={roomAvailability} title={title || room.name} />
-        </Modal>
-    );
+  const {open, title, onClose, roomAvailability, room} = props;
+  return (
+    <Modal open={open} onClose={onClose} size="large" closeIcon>
+      <SingleRoomTimelineContent
+        room={room}
+        roomAvailability={roomAvailability}
+        title={title || room.name}
+      />
+    </Modal>
+  );
 };
 
 SingleRoomTimelineModal.propTypes = {
-    open: PropTypes.bool,
-    title: PropTypes.node,
-    onClose: PropTypes.func,
-    roomAvailability: PropTypes.object,
-    room: PropTypes.object.isRequired,
+  open: PropTypes.bool,
+  title: PropTypes.node,
+  onClose: PropTypes.func,
+  roomAvailability: PropTypes.object,
+  room: PropTypes.object.isRequired,
 };
 
 SingleRoomTimelineModal.defaultProps = {
-    open: false,
-    title: '',
-    onClose: () => {},
-    roomAvailability: {},
+  open: false,
+  title: '',
+  onClose: () => {},
+  roomAvailability: {},
 };
 
 export default SingleRoomTimelineModal;

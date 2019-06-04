@@ -68,184 +68,186 @@ export const RELATED_EVENTS_RECEIVED = 'bookRoom/RELATED_EVENTS_RECEIVED';
 export const RESET_RELATED_EVENTS = 'bookRoom/RESET_RELATED_EVENTS';
 
 export function createBooking(args, isAdminOverrideEnabled) {
-    const params = preProcessParameters(args, ajaxRules);
-    if (isAdminOverrideEnabled) {
-        params.admin_override_enabled = true;
-    }
-    return submitFormAction(
-        () => indicoAxios.post(createBookingURL(), params),
-        CREATE_BOOKING_REQUEST, CREATE_BOOKING_SUCCESS, CREATE_BOOKING_FAILED
-    );
+  const params = preProcessParameters(args, ajaxRules);
+  if (isAdminOverrideEnabled) {
+    params.admin_override_enabled = true;
+  }
+  return submitFormAction(
+    () => indicoAxios.post(createBookingURL(), params),
+    CREATE_BOOKING_REQUEST,
+    CREATE_BOOKING_SUCCESS,
+    CREATE_BOOKING_FAILED
+  );
 }
 
 export function resetBookingAvailability() {
-    return {type: RESET_BOOKING_AVAILABILITY};
+  return {type: RESET_BOOKING_AVAILABILITY};
 }
 
 export function fetchBookingAvailability(room, filters) {
-    return async (dispatch, getStore) => {
-        const store = getStore();
-        const {dates, timeSlot, recurrence} = filters;
-        const params = preProcessParameters({dates, timeSlot, recurrence}, ajaxFilterRules);
-        if (userSelectors.isUserAdminOverrideEnabled(store)) {
-            params.admin_override_enabled = true;
-        }
-        return await ajaxAction(
-            () => indicoAxios.get(fetchTimelineURL({room_id: room.id}), {params}),
-            GET_BOOKING_AVAILABILITY_REQUEST,
-            [SET_BOOKING_AVAILABILITY, GET_BOOKING_AVAILABILITY_SUCCESS],
-            GET_BOOKING_AVAILABILITY_ERROR
-        )(dispatch);
-    };
+  return async (dispatch, getStore) => {
+    const store = getStore();
+    const {dates, timeSlot, recurrence} = filters;
+    const params = preProcessParameters({dates, timeSlot, recurrence}, ajaxFilterRules);
+    if (userSelectors.isUserAdminOverrideEnabled(store)) {
+      params.admin_override_enabled = true;
+    }
+    return await ajaxAction(
+      () => indicoAxios.get(fetchTimelineURL({room_id: room.id}), {params}),
+      GET_BOOKING_AVAILABILITY_REQUEST,
+      [SET_BOOKING_AVAILABILITY, GET_BOOKING_AVAILABILITY_SUCCESS],
+      GET_BOOKING_AVAILABILITY_ERROR
+    )(dispatch);
+  };
 }
 
 export function fetchUnavailableRooms(filters) {
-    return async (dispatch, getStore) => {
-        dispatch({type: GET_UNAVAILABLE_TIMELINE_REQUEST});
-        const store = getStore();
-        const isAdminOverrideEnabled = userSelectors.isUserAdminOverrideEnabled(store);
-        const searchParams = preProcessParameters(filters, ajaxFilterRules);
-        searchParams.unavailable = true;
-        if (isAdminOverrideEnabled) {
-            searchParams.admin_override_enabled = true;
-        }
+  return async (dispatch, getStore) => {
+    dispatch({type: GET_UNAVAILABLE_TIMELINE_REQUEST});
+    const store = getStore();
+    const isAdminOverrideEnabled = userSelectors.isUserAdminOverrideEnabled(store);
+    const searchParams = preProcessParameters(filters, ajaxFilterRules);
+    searchParams.unavailable = true;
+    if (isAdminOverrideEnabled) {
+      searchParams.admin_override_enabled = true;
+    }
 
-        let response;
-        try {
-            response = await indicoAxios.get(searchRoomsURL(), {params: searchParams});
-        } catch (error) {
-            const message = handleAxiosError(error);
-            dispatch({type: GET_UNAVAILABLE_TIMELINE_ERROR, error: message});
-            return;
-        }
+    let response;
+    try {
+      response = await indicoAxios.get(searchRoomsURL(), {params: searchParams});
+    } catch (error) {
+      const message = handleAxiosError(error);
+      dispatch({type: GET_UNAVAILABLE_TIMELINE_ERROR, error: message});
+      return;
+    }
 
-        const roomIds = response.data.rooms;
-        const {dates, timeSlot, recurrence} = filters;
-        const timelineParams = preProcessParameters({dates, timeSlot, recurrence}, ajaxFilterRules);
-        if (isAdminOverrideEnabled) {
-            timelineParams.admin_override_enabled = true;
-        }
-        return await ajaxAction(
-            () => indicoAxios.post(fetchTimelineURL(), {room_ids: roomIds}, {params: timelineParams}),
-            null,
-            [UNAVAILABLE_TIMELINE_RECEIVED, GET_UNAVAILABLE_TIMELINE_SUCCESS],
-            GET_UNAVAILABLE_TIMELINE_ERROR
-        )(dispatch);
-    };
+    const roomIds = response.data.rooms;
+    const {dates, timeSlot, recurrence} = filters;
+    const timelineParams = preProcessParameters({dates, timeSlot, recurrence}, ajaxFilterRules);
+    if (isAdminOverrideEnabled) {
+      timelineParams.admin_override_enabled = true;
+    }
+    return await ajaxAction(
+      () => indicoAxios.post(fetchTimelineURL(), {room_ids: roomIds}, {params: timelineParams}),
+      null,
+      [UNAVAILABLE_TIMELINE_RECEIVED, GET_UNAVAILABLE_TIMELINE_SUCCESS],
+      GET_UNAVAILABLE_TIMELINE_ERROR
+    )(dispatch);
+  };
 }
 
 export function initTimeline(roomIds, dates, timeSlot, recurrence) {
-    return {
-        type: INIT_TIMELINE,
-        params: {dates, timeSlot, recurrence},
-        roomIds
-    };
+  return {
+    type: INIT_TIMELINE,
+    params: {dates, timeSlot, recurrence},
+    roomIds,
+  };
 }
 
 export function addTimelineRooms(roomIds) {
-    return {
-        type: ADD_TIMELINE_ROOMS,
-        roomIds
-    };
+  return {
+    type: ADD_TIMELINE_ROOMS,
+    roomIds,
+  };
 }
 
 export function fetchTimeline() {
-    const PER_PAGE = 20;
+  const PER_PAGE = 20;
 
-    return async (dispatch, getStore) => {
-        const store = getStore();
-        const {
-            bookRoom: {
-                timeline: {
-                    data: {
-                        params: stateParams,
-                        roomIds: stateRoomIds,
-                        availability: stateAvailability,
-                    }
-                }
-            }
-        } = store;
-        const params = preProcessParameters(stateParams, ajaxFilterRules);
-        if (userSelectors.isUserAdminOverrideEnabled(store)) {
-            params.admin_override_enabled = true;
-        }
-        const numFetchedIds = stateAvailability.length;
-        const roomIds = stateRoomIds.slice(numFetchedIds, numFetchedIds + PER_PAGE);
-        if (!roomIds.length) {
-            console.warn('Tried to fetch timeline for zero rooms');
-            return Promise.reject();
-        }
+  return async (dispatch, getStore) => {
+    const store = getStore();
+    const {
+      bookRoom: {
+        timeline: {
+          data: {params: stateParams, roomIds: stateRoomIds, availability: stateAvailability},
+        },
+      },
+    } = store;
+    const params = preProcessParameters(stateParams, ajaxFilterRules);
+    if (userSelectors.isUserAdminOverrideEnabled(store)) {
+      params.admin_override_enabled = true;
+    }
+    const numFetchedIds = stateAvailability.length;
+    const roomIds = stateRoomIds.slice(numFetchedIds, numFetchedIds + PER_PAGE);
+    if (!roomIds.length) {
+      console.warn('Tried to fetch timeline for zero rooms');
+      return Promise.reject();
+    }
 
-        return await ajaxAction(
-            () => indicoAxios.post(fetchTimelineURL(), {room_ids: roomIds}, {params}),
-            GET_TIMELINE_REQUEST,
-            [TIMELINE_RECEIVED, GET_TIMELINE_SUCCESS],
-            GET_TIMELINE_ERROR
-        )(dispatch);
-    };
+    return await ajaxAction(
+      () => indicoAxios.post(fetchTimelineURL(), {room_ids: roomIds}, {params}),
+      GET_TIMELINE_REQUEST,
+      [TIMELINE_RECEIVED, GET_TIMELINE_SUCCESS],
+      GET_TIMELINE_ERROR
+    )(dispatch);
+  };
 }
 
 export function toggleTimelineView(visible) {
-    return {type: TOGGLE_TIMELINE_VIEW, visible};
+  return {type: TOGGLE_TIMELINE_VIEW, visible};
 }
 
 export function fetchRoomSuggestions() {
-    return async (dispatch, getStore) => {
-        const {bookRoom: {filters}} = getStore();
-        if (!validateFilters(filters, 'bookRoom', dispatch)) {
-            return;
-        }
-        const params = preProcessParameters(filters, ajaxFilterRules);
+  return async (dispatch, getStore) => {
+    const {
+      bookRoom: {filters},
+    } = getStore();
+    if (!validateFilters(filters, 'bookRoom', dispatch)) {
+      return;
+    }
+    const params = preProcessParameters(filters, ajaxFilterRules);
 
-        return await ajaxAction(
-            () => indicoAxios.get(fetchSuggestionsURL(), {params}),
-            FETCH_SUGGESTIONS_REQUEST,
-            [SUGGESTIONS_RECEIVED, FETCH_SUGGESTIONS_SUCCESS],
-            FETCH_SUGGESTIONS_ERROR
-        )(dispatch);
-    };
+    return await ajaxAction(
+      () => indicoAxios.get(fetchSuggestionsURL(), {params}),
+      FETCH_SUGGESTIONS_REQUEST,
+      [SUGGESTIONS_RECEIVED, FETCH_SUGGESTIONS_SUCCESS],
+      FETCH_SUGGESTIONS_ERROR
+    )(dispatch);
+  };
 }
 
 export function resetRoomSuggestions() {
-    return {type: RESET_SUGGESTIONS};
+  return {type: RESET_SUGGESTIONS};
 }
 
 export const {searchRooms} = roomSearchActionsFactory('bookRoom');
 
-export const openBookRoom = (roomId, data = null) => modalActions.openModal('book-room', roomId, data);
+export const openBookRoom = (roomId, data = null) =>
+  modalActions.openModal('book-room', roomId, data);
 export const openUnavailableRooms = () => modalActions.openModal('unavailable-rooms');
-export const openBookingForm = (roomId, data) => modalActions.openModal('booking-form', roomId, data);
+export const openBookingForm = (roomId, data) =>
+  modalActions.openModal('booking-form', roomId, data);
 export function setTimelineDate(date) {
-    return {type: SET_TIMELINE_DATE, date};
+  return {type: SET_TIMELINE_DATE, date};
 }
 
 export function setTimelineMode(mode) {
-    return {type: SET_TIMELINE_MODE, mode};
+  return {type: SET_TIMELINE_MODE, mode};
 }
 
 export function setUnavailableNavDate(date) {
-    return {type: SET_UNAVAILABLE_NAV_DATE, date};
+  return {type: SET_UNAVAILABLE_NAV_DATE, date};
 }
 
 export function setUnavailableNavMode(mode) {
-    return {type: SET_UNAVAILABLE_NAV_MODE, mode};
+  return {type: SET_UNAVAILABLE_NAV_MODE, mode};
 }
 
 export function initUnavailableTimeline(selectedDate, mode) {
-    return {type: INIT_UNAVAILABLE_TIMELINE, selectedDate, mode};
+  return {type: INIT_UNAVAILABLE_TIMELINE, selectedDate, mode};
 }
 
 export function fetchRelatedEvents(filters) {
-    const {dates, timeSlot, recurrence} = filters;
-    const params = preProcessParameters({dates, timeSlot, recurrence}, ajaxFilterRules);
-    return ajaxAction(
-        () => indicoAxios.get(fetchEventsURL(), {params}),
-        FETCH_RELATED_EVENTS_REQUEST,
-        [RELATED_EVENTS_RECEIVED, FETCH_RELATED_EVENTS_SUCCESS],
-        FETCH_RELATED_EVENTS_ERROR
-    );
+  const {dates, timeSlot, recurrence} = filters;
+  const params = preProcessParameters({dates, timeSlot, recurrence}, ajaxFilterRules);
+  return ajaxAction(
+    () => indicoAxios.get(fetchEventsURL(), {params}),
+    FETCH_RELATED_EVENTS_REQUEST,
+    [RELATED_EVENTS_RECEIVED, FETCH_RELATED_EVENTS_SUCCESS],
+    FETCH_RELATED_EVENTS_ERROR
+  );
 }
 
 export function resetRelatedEvents() {
-    return {type: RESET_RELATED_EVENTS};
+  return {type: RESET_RELATED_EVENTS};
 }

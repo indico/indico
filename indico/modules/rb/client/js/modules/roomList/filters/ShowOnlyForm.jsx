@@ -17,71 +17,74 @@ import * as roomsSelectors from '../selectors';
 
 import './ShowOnlyForm.module.scss';
 
-
 class ShowOnlyForm extends FilterFormComponent {
-    render() {
-        const {
-            filters: {onlyFavorites, onlyMine, onlyAuthorized},
-            onlyFavorites: newOnlyFavorites,
-            onlyMine: newOnlyMine,
-            onlyAuthorized: newOnlyAuthorized,
-            hasFavoriteRooms,
-            hasOwnedRooms,
-            setParentField,
-            showOnlyAuthorizedFilter,
-            disabled,
-            hasUnbookableRooms,
-            hideFavoritesFilter,
-        } = this.props;
+  render() {
+    const {
+      filters: {onlyFavorites, onlyMine, onlyAuthorized},
+      onlyFavorites: newOnlyFavorites,
+      onlyMine: newOnlyMine,
+      onlyAuthorized: newOnlyAuthorized,
+      hasFavoriteRooms,
+      hasOwnedRooms,
+      setParentField,
+      showOnlyAuthorizedFilter,
+      disabled,
+      hasUnbookableRooms,
+      hideFavoritesFilter,
+    } = this.props;
 
-        return (
-            <>
-                {!hideFavoritesFilter && (
-                    <div styleName="show-only-filter">
-                        <Checkbox onChange={(__, {checked}) => setParentField('onlyFavorites', checked)}
-                                  disabled={(!onlyFavorites && !hasFavoriteRooms) || disabled}
-                                  checked={newOnlyFavorites}
-                                  toggle />
-                        <Icon name="star" />
-                        <span>
-                            <Translate>My favorite rooms</Translate>
-                        </span>
-                    </div>
-                )}
-                {(hasOwnedRooms || onlyMine) && (
-                    <div styleName="show-only-filter">
-                        <Checkbox onChange={(__, {checked}) => setParentField('onlyMine', checked)}
-                                  disabled={disabled}
-                                  checked={newOnlyMine}
-                                  toggle />
-                        <Icon name="user" />
-                        <span>
-                            <Translate>Rooms I manage</Translate>
-                        </span>
-                    </div>
-                )}
-                {showOnlyAuthorizedFilter && (hasUnbookableRooms || onlyAuthorized) && (
-                    <div styleName="show-only-filter">
-                        <Checkbox onChange={(__, {checked}) => setParentField('onlyAuthorized', checked)}
-                                  disabled={disabled}
-                                  checked={newOnlyAuthorized}
-                                  toggle />
-                        <Icon name="lock open" />
-                        <span>
-                            <Translate>Rooms I am authorized to book</Translate>
-                        </span>
-                    </div>
-                )}
-            </>
-        );
-    }
+    return (
+      <>
+        {!hideFavoritesFilter && (
+          <div styleName="show-only-filter">
+            <Checkbox
+              onChange={(__, {checked}) => setParentField('onlyFavorites', checked)}
+              disabled={(!onlyFavorites && !hasFavoriteRooms) || disabled}
+              checked={newOnlyFavorites}
+              toggle
+            />
+            <Icon name="star" />
+            <span>
+              <Translate>My favorite rooms</Translate>
+            </span>
+          </div>
+        )}
+        {(hasOwnedRooms || onlyMine) && (
+          <div styleName="show-only-filter">
+            <Checkbox
+              onChange={(__, {checked}) => setParentField('onlyMine', checked)}
+              disabled={disabled}
+              checked={newOnlyMine}
+              toggle
+            />
+            <Icon name="user" />
+            <span>
+              <Translate>Rooms I manage</Translate>
+            </span>
+          </div>
+        )}
+        {showOnlyAuthorizedFilter && (hasUnbookableRooms || onlyAuthorized) && (
+          <div styleName="show-only-filter">
+            <Checkbox
+              onChange={(__, {checked}) => setParentField('onlyAuthorized', checked)}
+              disabled={disabled}
+              checked={newOnlyAuthorized}
+              toggle
+            />
+            <Icon name="lock open" />
+            <span>
+              <Translate>Rooms I am authorized to book</Translate>
+            </span>
+          </div>
+        )}
+      </>
+    );
+  }
 }
 
-export default connect(
-    state => ({
-        filters: roomsSelectors.getFilters(state),
-        hasOwnedRooms: userSelectors.hasOwnedRooms(state),
-        hasFavoriteRooms: userSelectors.hasFavoriteRooms(state),
-        hasUnbookableRooms: userSelectors.hasUnbookableRooms(state),
-    })
-)(ShowOnlyForm);
+export default connect(state => ({
+  filters: roomsSelectors.getFilters(state),
+  hasOwnedRooms: userSelectors.hasOwnedRooms(state),
+  hasFavoriteRooms: userSelectors.hasFavoriteRooms(state),
+  hasUnbookableRooms: userSelectors.hasUnbookableRooms(state),
+}))(ShowOnlyForm);

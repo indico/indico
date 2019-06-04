@@ -18,62 +18,60 @@ import {withRouter} from 'react-router-dom';
  * @param {Object|Function} extraProps - additional properties passed to the final component
  */
 export function parametrize(Component, extraProps) {
-    const ParametrizedComponent = ({...props}) => {
-        // handle deferred prop calculation
-        if (typeof extraProps === 'function') {
-            extraProps = extraProps();
-        }
+  const ParametrizedComponent = ({...props}) => {
+    // handle deferred prop calculation
+    if (typeof extraProps === 'function') {
+      extraProps = extraProps();
+    }
 
-        // Overridables will store the original component in an attribute
-        if (Component.originalComponent) {
-            Component = Component.originalComponent;
-        }
+    // Overridables will store the original component in an attribute
+    if (Component.originalComponent) {
+      Component = Component.originalComponent;
+    }
 
-        // extraProps override props if there is a name collision
-        const {children, ...attrProps} = {...props, ...extraProps};
-        return React.createElement(Component, attrProps, children);
-    };
-    const name = Component.displayName || Component.name;
-    ParametrizedComponent.displayName = `Parametrized(${name})`;
-    return ParametrizedComponent;
+    // extraProps override props if there is a name collision
+    const {children, ...attrProps} = {...props, ...extraProps};
+    return React.createElement(Component, attrProps, children);
+  };
+  const name = Component.displayName || Component.name;
+  ParametrizedComponent.displayName = `Parametrized(${name})`;
+  return ParametrizedComponent;
 }
 
 /**
  * Component that implements <Overridable />.
  */
 function _OverridableComponent({id, children, overrides, ...restProps}) {
-    const child = children ? React.Children.only(children) : null;
-    const childProps = child ? child.props : {};
-    const Override = overrides[id];
+  const child = children ? React.Children.only(children) : null;
+  const childProps = child ? child.props : {};
+  const Override = overrides[id];
 
-    return (Override !== undefined) ? (
-        // If there's an override, we replace the component's content with
-        // the override + props
-        React.createElement(Override, {...childProps, ...restProps})
-    ) : (
-        // No override? Clone the Overridable component's original children
-        child ? React.cloneElement(child, childProps) : null
-    );
+  return Override !== undefined
+    ? // If there's an override, we replace the component's content with
+      // the override + props
+      React.createElement(Override, {...childProps, ...restProps})
+    : // No override? Clone the Overridable component's original children
+    child
+    ? React.cloneElement(child, childProps)
+    : null;
 }
 
 _OverridableComponent.displayName = `Overridable`;
 
-const Overridable = connect(
-    ({_overrides}) => ({
-        overrides: _overrides
-    })
-)(_OverridableComponent);
+const Overridable = connect(({_overrides}) => ({
+  overrides: _overrides,
+}))(_OverridableComponent);
 
 Overridable.propTypes = {
-    /** The children of the component */
-    children: PropTypes.node,
-    /** The id that the component will be bound to (normally component's name) */
-    id: PropTypes.string
+  /** The children of the component */
+  children: PropTypes.node,
+  /** The id that the component will be bound to (normally component's name) */
+  id: PropTypes.string,
 };
 
 Overridable.defaultProps = {
-    id: null,
-    children: null
+  id: null,
+  children: null,
 };
 
 /**
@@ -84,27 +82,24 @@ Overridable.defaultProps = {
  * @param {React.Component} Component - the react component to be wrapped
  */
 Overridable.component = (id, Component) => {
-    const _Overridable = ({children, overrides, dispatch, ...props}) => {
-        // the logic here is simpler: the wrapped component is itself the content
-        return React.createElement(overrides[id] ? overrides[id] : Component, props, children);
-    };
-    _Overridable.propTypes = {
-        children: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
-        overrides: PropTypes.object.isRequired,
-        dispatch: PropTypes.func.isRequired
-    };
-    _Overridable.defaultProps = {
-        children: null
-    };
-    _Overridable.displayName = `Overridable(${Component.displayName || Component.name})`;
-    _Overridable.originalComponent = Component;
-    return connect(
-        ({_overrides}) => ({
-            overrides: _overrides
-        })
-    )(_Overridable);
+  const _Overridable = ({children, overrides, dispatch, ...props}) => {
+    // the logic here is simpler: the wrapped component is itself the content
+    return React.createElement(overrides[id] ? overrides[id] : Component, props, children);
+  };
+  _Overridable.propTypes = {
+    children: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
+    overrides: PropTypes.object.isRequired,
+    dispatch: PropTypes.func.isRequired,
+  };
+  _Overridable.defaultProps = {
+    children: null,
+  };
+  _Overridable.displayName = `Overridable(${Component.displayName || Component.name})`;
+  _Overridable.originalComponent = Component;
+  return connect(({_overrides}) => ({
+    overrides: _overrides,
+  }))(_Overridable);
 };
-
 
 export default Overridable;
 export const RouteAwareOverridable = withRouter(Overridable);

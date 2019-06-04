@@ -15,7 +15,6 @@ import {indicoAxios} from 'indico/utils/axios';
 import {ajaxAction, submitFormAction} from 'indico/utils/redux';
 import {actions as modalActions} from '../../modals';
 
-
 export const BOOKING_DETAILS_RECEIVED = 'bookings/BOOKING_DETAILS_RECEIVED';
 export const FETCH_BOOKING_DETAILS_REQUEST = 'bookings/FETCH_BOOKING_DETAILS_REQUEST';
 export const FETCH_BOOKING_DETAILS_SUCCESS = 'bookings/FETCH_BOOKING_DETAILS_SUCCESS';
@@ -35,55 +34,59 @@ export const UPDATE_BOOKING_SUCCESS = 'bookings/UPDATE_BOOKING_SUCCESS';
 export const UPDATE_BOOKING_ERROR = 'bookings/UPDATE_BOOKING_ERROR';
 export const UPDATED_BOOKING_RECEIVED = 'bookings/UPDATED_BOOKING_RECEIVED';
 
-export const BOOKING_OCCURRENCE_STATE_CHANGE_REQUEST = 'bookings/BOOKING_OCCURRENCE_STATE_CHANGE_REQUEST';
-export const BOOKING_OCCURRENCE_STATE_CHANGE_SUCCESS = 'bookings/BOOKING_OCCURRENCE_STATE_CHANGE_SUCCESS';
-export const BOOKING_OCCURRENCE_STATE_CHANGE_ERROR = 'bookings/BOOKING_OCCURRENCE_STATE_CHANGE_ERROR';
+export const BOOKING_OCCURRENCE_STATE_CHANGE_REQUEST =
+  'bookings/BOOKING_OCCURRENCE_STATE_CHANGE_REQUEST';
+export const BOOKING_OCCURRENCE_STATE_CHANGE_SUCCESS =
+  'bookings/BOOKING_OCCURRENCE_STATE_CHANGE_SUCCESS';
+export const BOOKING_OCCURRENCE_STATE_CHANGE_ERROR =
+  'bookings/BOOKING_OCCURRENCE_STATE_CHANGE_ERROR';
 export const BOOKING_OCCURRENCE_STATE_UPDATED = 'bookings/BOOKING_OCCURRENCE_STATE_UPDATED';
 
 export function fetchBookingDetails(id) {
-    return ajaxAction(
-        () => indicoAxios.get(fetchBookingDetailsURL({booking_id: id})),
-        FETCH_BOOKING_DETAILS_REQUEST,
-        [BOOKING_DETAILS_RECEIVED, FETCH_BOOKING_DETAILS_SUCCESS],
-        FETCH_BOOKING_DETAILS_ERROR,
-    );
+  return ajaxAction(
+    () => indicoAxios.get(fetchBookingDetailsURL({booking_id: id})),
+    FETCH_BOOKING_DETAILS_REQUEST,
+    [BOOKING_DETAILS_RECEIVED, FETCH_BOOKING_DETAILS_SUCCESS],
+    FETCH_BOOKING_DETAILS_ERROR
+  );
 }
 
-export const openBookingDetails = (bookingId) => modalActions.openModal('booking-details', bookingId);
+export const openBookingDetails = bookingId => modalActions.openModal('booking-details', bookingId);
 
 export function changeBookingState(id, action, params = {}) {
-    return ajaxAction(
-        () => indicoAxios.post(bookingStateActionsURL({booking_id: id, action}), params),
-        BOOKING_STATE_CHANGE_REQUEST,
-        [BOOKING_STATE_UPDATED, BOOKING_STATE_CHANGE_SUCCESS],
-        BOOKING_STATE_CHANGE_ERROR,
-    );
+  return ajaxAction(
+    () => indicoAxios.post(bookingStateActionsURL({booking_id: id, action}), params),
+    BOOKING_STATE_CHANGE_REQUEST,
+    [BOOKING_STATE_UPDATED, BOOKING_STATE_CHANGE_SUCCESS],
+    BOOKING_STATE_CHANGE_ERROR
+  );
 }
 
 export function deleteBooking(id) {
-    return ajaxAction(
-        () => indicoAxios.delete(bookingDeleteURL({booking_id: id})),
-        DELETE_BOOKING_REQUEST,
-        DELETE_BOOKING_SUCCESS,
-        DELETE_BOOKING_ERROR,
-    );
+  return ajaxAction(
+    () => indicoAxios.delete(bookingDeleteURL({booking_id: id})),
+    DELETE_BOOKING_REQUEST,
+    DELETE_BOOKING_SUCCESS,
+    DELETE_BOOKING_ERROR
+  );
 }
 
 export function updateBooking(id, params) {
-    return submitFormAction(
-        () => indicoAxios.patch(bookingUpdateURL({booking_id: id}), params),
-        UPDATE_BOOKING_REQUEST,
-        [UPDATE_BOOKING_SUCCESS, UPDATED_BOOKING_RECEIVED],
-        UPDATE_BOOKING_ERROR,
-        {booking_reason: 'reason'}
-    );
+  return submitFormAction(
+    () => indicoAxios.patch(bookingUpdateURL({booking_id: id}), params),
+    UPDATE_BOOKING_REQUEST,
+    [UPDATE_BOOKING_SUCCESS, UPDATED_BOOKING_RECEIVED],
+    UPDATE_BOOKING_ERROR,
+    {booking_reason: 'reason'}
+  );
 }
 
 export function changeBookingOccurrenceState(id, date, action, params = {}) {
-    return ajaxAction(
-        () => indicoAxios.post(bookingOccurrenceStateActionsURL({booking_id: id, date, action}), params),
-        BOOKING_OCCURRENCE_STATE_CHANGE_REQUEST,
-        [BOOKING_OCCURRENCE_STATE_UPDATED, BOOKING_OCCURRENCE_STATE_CHANGE_SUCCESS],
-        BOOKING_OCCURRENCE_STATE_CHANGE_ERROR,
-    );
+  return ajaxAction(
+    () =>
+      indicoAxios.post(bookingOccurrenceStateActionsURL({booking_id: id, date, action}), params),
+    BOOKING_OCCURRENCE_STATE_CHANGE_REQUEST,
+    [BOOKING_OCCURRENCE_STATE_UPDATED, BOOKING_OCCURRENCE_STATE_CHANGE_SUCCESS],
+    BOOKING_OCCURRENCE_STATE_CHANGE_ERROR
+  );
 }

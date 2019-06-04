@@ -10,10 +10,9 @@ import React from 'react';
 import BlockingPreloader from './BlockingPreloader';
 import BlockingModal from './BlockingModal';
 
-
 export default {
-    /* eslint-disable react/display-name */
-    'blocking-details': (onClose, blockingId) => (
-        <BlockingPreloader blockingId={blockingId} component={BlockingModal} onClose={onClose} />
-    )
+  /* eslint-disable react/display-name */
+  'blocking-details': (onClose, blockingId) => (
+    <BlockingPreloader blockingId={blockingId} component={BlockingModal} onClose={onClose} />
+  ),
 };

@@ -16,7 +16,6 @@ import {camelizeKeys} from 'indico/utils/case';
 import {ajaxAction} from 'indico/utils/redux';
 import {actions as modalActions} from '../../modals';
 
-
 export const FETCH_EQUIPMENT_TYPES_REQUEST = 'rooms/FETCH_EQUIPMENT_TYPES_REQUEST';
 export const FETCH_EQUIPMENT_TYPES_SUCCESS = 'rooms/FETCH_EQUIPMENT_TYPES_SUCCESS';
 export const FETCH_EQUIPMENT_TYPES_ERROR = 'rooms/FETCH_EQUIPMENT_TYPES_ERROR';
@@ -42,73 +41,75 @@ export const FETCH_ATTRIBUTES_REQUEST = 'rooms/FETCH_ATTRIBUTES_REQUEST';
 export const FETCH_ATTRIBUTES_SUCCESS = 'rooms/FETCH_ATTRIBUTES_SUCCESS';
 export const FETCH_ATTRIBUTES_ERROR = 'rooms/FETCH_ATTRIBUTES_ERROR';
 
-
 export function fetchEquipmentTypes() {
-    return ajaxAction(
-        () => indicoAxios.get(fetchEquipmentTypesURL()),
-        FETCH_EQUIPMENT_TYPES_REQUEST,
-        [EQUIPMENT_TYPES_RECEIVED, FETCH_EQUIPMENT_TYPES_SUCCESS],
-        FETCH_EQUIPMENT_TYPES_ERROR,
-    );
+  return ajaxAction(
+    () => indicoAxios.get(fetchEquipmentTypesURL()),
+    FETCH_EQUIPMENT_TYPES_REQUEST,
+    [EQUIPMENT_TYPES_RECEIVED, FETCH_EQUIPMENT_TYPES_SUCCESS],
+    FETCH_EQUIPMENT_TYPES_ERROR
+  );
 }
 
 export function fetchRoom(id) {
-    return ajaxAction(
-        () => indicoAxios.get(fetchRoomURL({room_id: id})),
-        FETCH_ROOM_DETAILS_REQUEST,
-        [ROOM_DETAILS_RECEIVED, FETCH_ROOM_DETAILS_SUCCESS],
-        FETCH_ROOM_DETAILS_ERROR
-    );
+  return ajaxAction(
+    () => indicoAxios.get(fetchRoomURL({room_id: id})),
+    FETCH_ROOM_DETAILS_REQUEST,
+    [ROOM_DETAILS_RECEIVED, FETCH_ROOM_DETAILS_SUCCESS],
+    FETCH_ROOM_DETAILS_ERROR
+  );
 }
 
 export function fetchRooms() {
-    return ajaxAction(
-        () => indicoAxios.get(fetchRoomsURL()),
-        FETCH_ROOMS_REQUEST,
-        [ROOMS_RECEIVED, FETCH_ROOMS_SUCCESS],
-        FETCH_ROOMS_ERROR
-    );
+  return ajaxAction(
+    () => indicoAxios.get(fetchRoomsURL()),
+    FETCH_ROOMS_REQUEST,
+    [ROOMS_RECEIVED, FETCH_ROOMS_SUCCESS],
+    FETCH_ROOMS_ERROR
+  );
 }
 
 export function fetchDetails(id, force = false) {
-    return async (dispatch) => {
-        dispatch(fetchAvailability(id, force));
-        dispatch(fetchAttributes(id, force));
-    };
+  return async dispatch => {
+    dispatch(fetchAvailability(id, force));
+    dispatch(fetchAttributes(id, force));
+  };
 }
 
 export function fetchAvailability(id, force = false) {
-    return async (dispatch, getStore) => {
-        const {rooms: {availability: rooms}} = getStore();
-        if (!force && (id in rooms)) {
-            return;
-        }
-        return await ajaxAction(
-            () => indicoAxios.get(fetchRoomAvailabilityURL({room_id: id})),
-            FETCH_AVAILABILITY_REQUEST,
-            [AVAILABILITY_RECEIVED, FETCH_AVAILABILITY_SUCCESS],
-            FETCH_AVAILABILITY_ERROR,
-            data => ({id, availability: camelizeKeys(data)}),
-        )(dispatch);
-    };
+  return async (dispatch, getStore) => {
+    const {
+      rooms: {availability: rooms},
+    } = getStore();
+    if (!force && id in rooms) {
+      return;
+    }
+    return await ajaxAction(
+      () => indicoAxios.get(fetchRoomAvailabilityURL({room_id: id})),
+      FETCH_AVAILABILITY_REQUEST,
+      [AVAILABILITY_RECEIVED, FETCH_AVAILABILITY_SUCCESS],
+      FETCH_AVAILABILITY_ERROR,
+      data => ({id, availability: camelizeKeys(data)})
+    )(dispatch);
+  };
 }
 
 export function fetchAttributes(id, force = false) {
-    return async (dispatch, getStore) => {
-        const {rooms: {attributes: rooms}} = getStore();
-        if (!force && (id in rooms)) {
-            return;
-        }
-        return await ajaxAction(
-            () => indicoAxios.get(fetchRoomAttributesURL({room_id: id})),
-            FETCH_ATTRIBUTES_REQUEST,
-            [ATTRIBUTES_RECEIVED, FETCH_ATTRIBUTES_SUCCESS],
-            FETCH_ATTRIBUTES_ERROR,
-            data => ({id, attributes: data}),
-        )(dispatch);
-    };
+  return async (dispatch, getStore) => {
+    const {
+      rooms: {attributes: rooms},
+    } = getStore();
+    if (!force && id in rooms) {
+      return;
+    }
+    return await ajaxAction(
+      () => indicoAxios.get(fetchRoomAttributesURL({room_id: id})),
+      FETCH_ATTRIBUTES_REQUEST,
+      [ATTRIBUTES_RECEIVED, FETCH_ATTRIBUTES_SUCCESS],
+      FETCH_ATTRIBUTES_ERROR,
+      data => ({id, attributes: data})
+    )(dispatch);
+  };
 }
 
-
-export const openRoomDetails = (roomId) => modalActions.openModal('room-details', roomId);
-export const openRoomDetailsBook = (roomId) => modalActions.openModal('room-details-book', roomId);
+export const openRoomDetails = roomId => modalActions.openModal('room-details', roomId);
+export const openRoomDetailsBook = roomId => modalActions.openModal('room-details-book', roomId);

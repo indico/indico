@@ -19,93 +19,108 @@ import {BookingTimelineComponent} from './BookingTimeline';
 import {DateNavigator, TimelineLegend} from '../../common/timeline';
 import {getOccurrenceTypes, transformToLegendLabels} from '../../util';
 
-
 class UnavailableRoomsModal extends React.Component {
-    static propTypes = {
-        datePicker: PropTypes.object.isRequired,
-        availability: PropTypes.array,
-        filters: PropTypes.object.isRequired,
-        isFetching: PropTypes.bool.isRequired,
-        timelineDatePicker: PropTypes.object.isRequired,
-        isTimelineVisible: PropTypes.bool.isRequired,
-        onClose: PropTypes.func,
-        actions: PropTypes.exact({
-            fetchUnavailableRooms: PropTypes.func.isRequired,
-            setDate: PropTypes.func.isRequired,
-            setMode: PropTypes.func.isRequired,
-            initTimeline: PropTypes.func.isRequired,
-        }).isRequired,
-    };
+  static propTypes = {
+    datePicker: PropTypes.object.isRequired,
+    availability: PropTypes.array,
+    filters: PropTypes.object.isRequired,
+    isFetching: PropTypes.bool.isRequired,
+    timelineDatePicker: PropTypes.object.isRequired,
+    isTimelineVisible: PropTypes.bool.isRequired,
+    onClose: PropTypes.func,
+    actions: PropTypes.exact({
+      fetchUnavailableRooms: PropTypes.func.isRequired,
+      setDate: PropTypes.func.isRequired,
+      setMode: PropTypes.func.isRequired,
+      initTimeline: PropTypes.func.isRequired,
+    }).isRequired,
+  };
 
-    static defaultProps = {
-        availability: [],
-        onClose: null,
-    };
+  static defaultProps = {
+    availability: [],
+    onClose: null,
+  };
 
-    componentDidMount() {
-        const {
-            actions: {fetchUnavailableRooms, initTimeline},
-            filters,
-            timelineDatePicker,
-            isTimelineVisible
-        } = this.props;
+  componentDidMount() {
+    const {
+      actions: {fetchUnavailableRooms, initTimeline},
+      filters,
+      timelineDatePicker,
+      isTimelineVisible,
+    } = this.props;
 
-        const {selectedDate, mode} = timelineDatePicker;
-        const initialDate = isTimelineVisible && selectedDate ? selectedDate : filters.dates.startDate;
-        const initialMode = isTimelineVisible && mode ? mode : 'days';
+    const {selectedDate, mode} = timelineDatePicker;
+    const initialDate = isTimelineVisible && selectedDate ? selectedDate : filters.dates.startDate;
+    const initialMode = isTimelineVisible && mode ? mode : 'days';
 
-        fetchUnavailableRooms(filters);
-        initTimeline(initialDate, initialMode);
+    fetchUnavailableRooms(filters);
+    initTimeline(initialDate, initialMode);
+  }
+
+  getLegendLabels = availability => {
+    const occurrenceTypes = availability.reduce(
+      (types, [, day]) => _.union(types, getOccurrenceTypes(day)),
+      []
+    );
+    return transformToLegendLabels(occurrenceTypes);
+  };
+
+  render() {
+    const {availability, actions, isFetching, onClose, datePicker} = this.props;
+    if (availability.length === 0) {
+      return (
+        <Dimmer active page>
+          <Loader />
+        </Dimmer>
+      );
     }
 
-    getLegendLabels = (availability) => {
-        const occurrenceTypes = availability.reduce((types, [, day]) => _.union(types, getOccurrenceTypes(day)), []);
-        return transformToLegendLabels(occurrenceTypes);
-    };
-
-    render() {
-        const {availability, actions, isFetching, onClose, datePicker} = this.props;
-        if (availability.length === 0) {
-            return <Dimmer active page><Loader /></Dimmer>;
-        }
-
-        return (
-            <Modal open onClose={onClose} size="large" closeIcon>
-                <Modal.Header className="legend-header">
-                    <Translate>Unavailable Rooms</Translate>
-                    <Popup trigger={<Icon name="info circle" className="legend-info-icon" />}
-                           content={<TimelineLegend labels={this.getLegendLabels(availability)} compact />} />
-                    <DateNavigator {...datePicker}
-                                   disabled={isFetching || !availability.length}
-                                   onModeChange={actions.setMode}
-                                   onDateChange={actions.setDate} />
-                </Modal.Header>
-                <Modal.Content>
-                    <BookingTimelineComponent isLoading={isFetching}
-                                              availability={availability}
-                                              datePicker={datePicker}
-                                              fixedHeight="70vh" />
-                </Modal.Content>
-            </Modal>
-        );
-    }
+    return (
+      <Modal open onClose={onClose} size="large" closeIcon>
+        <Modal.Header className="legend-header">
+          <Translate>Unavailable Rooms</Translate>
+          <Popup
+            trigger={<Icon name="info circle" className="legend-info-icon" />}
+            content={<TimelineLegend labels={this.getLegendLabels(availability)} compact />}
+          />
+          <DateNavigator
+            {...datePicker}
+            disabled={isFetching || !availability.length}
+            onModeChange={actions.setMode}
+            onDateChange={actions.setDate}
+          />
+        </Modal.Header>
+        <Modal.Content>
+          <BookingTimelineComponent
+            isLoading={isFetching}
+            availability={availability}
+            datePicker={datePicker}
+            fixedHeight="70vh"
+          />
+        </Modal.Content>
+      </Modal>
+    );
+  }
 }
 
 export default connect(
-    state => ({
-        availability: selectors.getUnavailableRoomInfo(state),
-        filters: selectors.getFilters(state),
-        isFetching: selectors.isFetchingUnavailableRooms(state),
-        datePicker: selectors.getUnavailableDatePicker(state),
-        timelineDatePicker: selectors.getTimelineDatePicker(state),
-        isTimelineVisible: selectors.isTimelineVisible(state),
-    }),
-    dispatch => ({
-        actions: bindActionCreators({
-            fetchUnavailableRooms: unavailableRoomsActions.fetchUnavailableRooms,
-            setDate: (date) => unavailableRoomsActions.setUnavailableNavDate(serializeDate(date)),
-            setMode: unavailableRoomsActions.setUnavailableNavMode,
-            initTimeline: unavailableRoomsActions.initUnavailableTimeline,
-        }, dispatch)
-    })
+  state => ({
+    availability: selectors.getUnavailableRoomInfo(state),
+    filters: selectors.getFilters(state),
+    isFetching: selectors.isFetchingUnavailableRooms(state),
+    datePicker: selectors.getUnavailableDatePicker(state),
+    timelineDatePicker: selectors.getTimelineDatePicker(state),
+    isTimelineVisible: selectors.isTimelineVisible(state),
+  }),
+  dispatch => ({
+    actions: bindActionCreators(
+      {
+        fetchUnavailableRooms: unavailableRoomsActions.fetchUnavailableRooms,
+        setDate: date => unavailableRoomsActions.setUnavailableNavDate(serializeDate(date)),
+        setMode: unavailableRoomsActions.setUnavailableNavMode,
+        initTimeline: unavailableRoomsActions.initUnavailableTimeline,
+      },
+      dispatch
+    ),
+  })
 )(UnavailableRoomsModal);

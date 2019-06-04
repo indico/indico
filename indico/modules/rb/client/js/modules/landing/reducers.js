@@ -12,38 +12,37 @@ import {requestReducer} from 'indico/utils/redux';
 import * as landingActions from './actions';
 import {actions as adminActions} from '../admin';
 
-
 export default combineReducers({
-    stats: combineReducers({
-        request: requestReducer(
-            landingActions.FETCH_STATS_REQUEST,
-            landingActions.FETCH_STATS_SUCCESS,
-            landingActions.FETCH_STATS_ERROR
-        ),
-        data: (state = null, action) => {
-            switch (action.type) {
-                case landingActions.STATS_RECEIVED:
-                    return camelizeKeys(action.data);
-                default:
-                    return state;
-            }
-        }
-    }),
-    upcomingBookings: combineReducers({
-        request: requestReducer(
-            landingActions.FETCH_BOOKINGS_REQUEST,
-            landingActions.FETCH_BOOKINGS_SUCCESS,
-            landingActions.FETCH_BOOKINGS_ERROR
-        ),
-        data: (state = [], action) => {
-            switch (action.type) {
-                case landingActions.BOOKINGS_RECEIVED:
-                    return camelizeKeys(action.data);
-                case adminActions.ROOM_DELETED:
-                    return [];
-                default:
-                    return state;
-            }
-        }
-    })
+  stats: combineReducers({
+    request: requestReducer(
+      landingActions.FETCH_STATS_REQUEST,
+      landingActions.FETCH_STATS_SUCCESS,
+      landingActions.FETCH_STATS_ERROR
+    ),
+    data: (state = null, action) => {
+      switch (action.type) {
+        case landingActions.STATS_RECEIVED:
+          return camelizeKeys(action.data);
+        default:
+          return state;
+      }
+    },
+  }),
+  upcomingBookings: combineReducers({
+    request: requestReducer(
+      landingActions.FETCH_BOOKINGS_REQUEST,
+      landingActions.FETCH_BOOKINGS_SUCCESS,
+      landingActions.FETCH_BOOKINGS_ERROR
+    ),
+    data: (state = [], action) => {
+      switch (action.type) {
+        case landingActions.BOOKINGS_RECEIVED:
+          return camelizeKeys(action.data);
+        case adminActions.ROOM_DELETED:
+          return [];
+        default:
+          return state;
+      }
+    },
+  }),
 });

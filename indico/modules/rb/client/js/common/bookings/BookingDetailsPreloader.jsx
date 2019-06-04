@@ -15,27 +15,36 @@ import {Preloader} from 'indico/react/util';
 import * as bookingsActions from './actions';
 import * as bookingsSelectors from './selectors';
 
-
 const BookingDetailsPreloader = ({bookingId, component: Component, fetchDetails, onClose}) => (
-    <Preloader key={bookingId}
-               checkCached={state => bookingsSelectors.hasDetails(state, {bookingId})}
-               action={() => fetchDetails(bookingId)}
-               dimmer={<Dimmer active page><Loader /></Dimmer>}
-               alwaysLoad>
-        {() => <Component bookingId={bookingId} onClose={onClose} />}
-    </Preloader>
+  <Preloader
+    key={bookingId}
+    checkCached={state => bookingsSelectors.hasDetails(state, {bookingId})}
+    action={() => fetchDetails(bookingId)}
+    dimmer={
+      <Dimmer active page>
+        <Loader />
+      </Dimmer>
+    }
+    alwaysLoad
+  >
+    {() => <Component bookingId={bookingId} onClose={onClose} />}
+  </Preloader>
 );
 
 BookingDetailsPreloader.propTypes = {
-    bookingId: PropTypes.number.isRequired,
-    fetchDetails: PropTypes.func.isRequired,
-    component: PropTypes.elementType.isRequired,
-    onClose: PropTypes.func.isRequired,
+  bookingId: PropTypes.number.isRequired,
+  fetchDetails: PropTypes.func.isRequired,
+  component: PropTypes.elementType.isRequired,
+  onClose: PropTypes.func.isRequired,
 };
 
 export default connect(
-    null,
-    dispatch => bindActionCreators({
+  null,
+  dispatch =>
+    bindActionCreators(
+      {
         fetchDetails: bookingsActions.fetchBookingDetails,
-    }, dispatch)
+      },
+      dispatch
+    )
 )(BookingDetailsPreloader);

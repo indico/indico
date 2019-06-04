@@ -6,33 +6,38 @@
 // LICENSE file for more details.
 
 (function(global) {
+  global.setupColorPickerWidget = function setupColorPickerWidget(options) {
+    options = $.extend(
+      true,
+      {
+        fieldId: null,
+        showField: true,
+      },
+      options
+    );
 
-    global.setupColorPickerWidget = function setupColorPickerWidget(options) {
-        options = $.extend(true, {
-            fieldId: null,
-            showField: true
-        }, options);
+    var $formField = $('#' + options.fieldId);
+    var $colorField = $formField.closest('.i-color-field');
 
-        var $formField = $('#' + options.fieldId);
-        var $colorField = $formField.closest('.i-color-field');
+    $colorField.indicoColorpicker();
+    if (options.showField) {
+      $formField.clearableinput({
+        focusOnClear: false,
+        onClear: () => {
+          $colorField.indicoColorpicker('updateWidget');
+        },
+      });
+    } else {
+      $formField.hide();
+    }
 
-        $colorField.indicoColorpicker();
-        if (options.showField) {
-            $formField.clearableinput({
-                focusOnClear: false,
-                onClear: () => {
-                    $colorField.indicoColorpicker('updateWidget');
-                }
-            });
-        } else {
-            $formField.hide();
-        }
-
-        // Hack to set clearable input whenever the color changes
-        $formField.on('change', () => {
-            $formField.clearableinput('setValue', $formField.val());
-        }).on('cancel', () => {
-            $formField.clearableinput('setValue', $formField.val());
-        });
-    };
+    // Hack to set clearable input whenever the color changes
+    $formField
+      .on('change', () => {
+        $formField.clearableinput('setValue', $formField.val());
+      })
+      .on('cancel', () => {
+        $formField.clearableinput('setValue', $formField.val());
+      });
+  };
 })(window);

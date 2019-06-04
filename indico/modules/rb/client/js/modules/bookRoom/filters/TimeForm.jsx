@@ -14,64 +14,65 @@ import TimeRangePicker from '../../../components/TimeRangePicker';
 
 import './TimeForm.module.scss';
 
-
 export default class TimeForm extends FilterFormComponent {
-    static propTypes = {
-        startTime: PropTypes.string,
-        endTime: PropTypes.string,
-        minTime: PropTypes.string,
-        ...FilterFormComponent.propTypes
-    };
+  static propTypes = {
+    startTime: PropTypes.string,
+    endTime: PropTypes.string,
+    minTime: PropTypes.string,
+    ...FilterFormComponent.propTypes,
+  };
 
-    static defaultProps = {
-        startTime: null,
-        endTime: null,
-        bookingGracePeriod: 1,
-    };
+  static defaultProps = {
+    startTime: null,
+    endTime: null,
+    bookingGracePeriod: 1,
+  };
 
-    static getDerivedStateFromProps({startTime, endTime}, prevState) {
-        // if there is no internal state, get the values from props
-        return {
-            startTime: toMoment(startTime, 'HH:mm'),
-            endTime: toMoment(endTime, 'HH:mm'),
-            ...prevState
-        };
+  static getDerivedStateFromProps({startTime, endTime}, prevState) {
+    // if there is no internal state, get the values from props
+    return {
+      startTime: toMoment(startTime, 'HH:mm'),
+      endTime: toMoment(endTime, 'HH:mm'),
+      ...prevState,
+    };
+  }
+
+  constructor(props) {
+    super(props);
+    this.formRef = React.createRef();
+  }
+
+  setTimes = async (startTime, endTime) => {
+    const {setParentField} = this.props;
+    const {startTime: prevStartTime, endTime: prevEndTime} = this.state;
+
+    // if everything stays the same, do nothing
+    if (startTime === prevStartTime && endTime === prevEndTime) {
+      return;
     }
 
-    constructor(props) {
-        super(props);
-        this.formRef = React.createRef();
-    }
+    // send serialized versions to parent/redux
+    await setParentField('startTime', serializeTime(startTime));
+    await setParentField('endTime', serializeTime(endTime));
 
-    setTimes = async (startTime, endTime) => {
-        const {setParentField} = this.props;
-        const {startTime: prevStartTime, endTime: prevEndTime} = this.state;
+    this.setState({
+      startTime,
+      endTime,
+    });
+  };
 
-        // if everything stays the same, do nothing
-        if (startTime === prevStartTime && endTime === prevEndTime) {
-            return;
-        }
-
-        // send serialized versions to parent/redux
-        await setParentField('startTime', serializeTime(startTime));
-        await setParentField('endTime', serializeTime(endTime));
-
-        this.setState({
-            startTime,
-            endTime
-        });
-    };
-
-    render() {
-        const {startTime, endTime} = this.state;
-        const {minTime} = this.props;
-        return (
-            <div ref={this.formRef}>
-                <TimeRangePicker startTime={startTime}
-                                 endTime={endTime}
-                                 onChange={this.setTimes}
-                                 minTime={minTime} />
-            </div>
-        );
-    }
+  render() {
+    const {startTime, endTime} = this.state;
+    const {minTime} = this.props;
+    return (
+      <div ref={this.formRef}>
+        <TimeRangePicker
+          startTime={startTime}
+          endTime={endTime}
+          onChange={this.setTimes}
+          minTime={minTime}
+        />
+      </div>
+    );
+  }
 }

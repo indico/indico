@@ -12,27 +12,28 @@ import {DateRangePicker as ReactDatesRangePicker} from 'react-dates';
 import 'react-dates/lib/css/_datepicker.css';
 import './style/dates.scss';
 
-
 export default class DateRangePicker extends React.Component {
-    state = {
-        focusedInput: null,
-    };
+  state = {
+    focusedInput: null,
+  };
 
-    onFocusChange = (focusedInput) => {
-        this.setState({focusedInput});
-    };
+  onFocusChange = focusedInput => {
+    this.setState({focusedInput});
+  };
 
-    render() {
-        const {focusedInput} = this.state;
-        return (
-            <ReactDatesRangePicker startDateId="start_date"
-                                   endDateId="end_date"
-                                   focusedInput={focusedInput}
-                                   onFocusChange={this.onFocusChange}
-                                   showDefaultInputIcon
-                                   inputIconPosition="after"
-                                   hideKeyboardShortcutsPanel
-                                   {...this.props} />
-        );
-    }
+  render() {
+    const {focusedInput} = this.state;
+    return (
+      <ReactDatesRangePicker
+        startDateId="start_date"
+        endDateId="end_date"
+        focusedInput={focusedInput}
+        onFocusChange={this.onFocusChange}
+        showDefaultInputIcon
+        inputIconPosition="after"
+        hideKeyboardShortcutsPanel
+        {...this.props}
+      />
+    );
+  }
 }

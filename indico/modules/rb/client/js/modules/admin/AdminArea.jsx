@@ -25,63 +25,76 @@ import * as adminActions from './actions';
 
 import './AdminArea.module.scss';
 
-
 class AdminArea extends React.Component {
-    static propTypes = {
-        isAdmin: PropTypes.bool.isRequired,
-        isMapEnabled: PropTypes.bool.isRequired,
-        actions: PropTypes.exact({
-            fetchLocations: PropTypes.func.isRequired,
-            fetchRooms: PropTypes.func.isRequired,
-        }).isRequired,
-    };
+  static propTypes = {
+    isAdmin: PropTypes.bool.isRequired,
+    isMapEnabled: PropTypes.bool.isRequired,
+    actions: PropTypes.exact({
+      fetchLocations: PropTypes.func.isRequired,
+      fetchRooms: PropTypes.func.isRequired,
+    }).isRequired,
+  };
 
-    componentDidMount() {
-        const {actions: {fetchLocations, fetchRooms}} = this.props;
-        fetchLocations();
-        fetchRooms();
+  componentDidMount() {
+    const {
+      actions: {fetchLocations, fetchRooms},
+    } = this.props;
+    fetchLocations();
+    fetchRooms();
+  }
+
+  render() {
+    const {isAdmin, isMapEnabled} = this.props;
+
+    if (!isAdmin) {
+      return null;
     }
 
-    render() {
-        const {isAdmin, isMapEnabled} = this.props;
-
-        if (!isAdmin) {
-            return null;
-        }
-
-        return (
-            <Container styleName="admin-area">
-                <Grid columns={2}>
-                    <Grid.Column width={4} floated="left">
-                        <AdminMenu />
-                    </Grid.Column>
-                    <Grid.Column width={12}>
-                        <Route exact path="/admin" component={SettingsPage} />
-                        <ConditionalRoute exact path="/admin/map-areas" component={MapAreasPage}
-                                          active={isMapEnabled} />
-                        <Route exact path="/admin/equipment" component={EquipmentPage} />
-                        <Route exact path="/admin/attributes" component={AttributesPage} />
-                        <Route exact path="/admin/locations/" component={LocationPage} />
-                        <Route exact path="/admin/locations/:locationId"
-                               render={({match: {params: {locationId}}}) => (
-                                   <AdminLocationRooms locationId={parseInt(locationId, 10)} />
-                               )} />
-                    </Grid.Column>
-                </Grid>
-            </Container>
-        );
-    }
+    return (
+      <Container styleName="admin-area">
+        <Grid columns={2}>
+          <Grid.Column width={4} floated="left">
+            <AdminMenu />
+          </Grid.Column>
+          <Grid.Column width={12}>
+            <Route exact path="/admin" component={SettingsPage} />
+            <ConditionalRoute
+              exact
+              path="/admin/map-areas"
+              component={MapAreasPage}
+              active={isMapEnabled}
+            />
+            <Route exact path="/admin/equipment" component={EquipmentPage} />
+            <Route exact path="/admin/attributes" component={AttributesPage} />
+            <Route exact path="/admin/locations/" component={LocationPage} />
+            <Route
+              exact
+              path="/admin/locations/:locationId"
+              render={({
+                match: {
+                  params: {locationId},
+                },
+              }) => <AdminLocationRooms locationId={parseInt(locationId, 10)} />}
+            />
+          </Grid.Column>
+        </Grid>
+      </Container>
+    );
+  }
 }
 
 export default connect(
-    state => ({
-        isAdmin: userSelectors.isUserRBAdmin(state),
-        isMapEnabled: mapSelectors.isMapEnabled(state),
-    }),
-    dispatch => ({
-        actions: bindActionCreators({
-            fetchLocations: adminActions.fetchLocations,
-            fetchRooms: adminActions.fetchRooms,
-        }, dispatch),
-    })
+  state => ({
+    isAdmin: userSelectors.isUserRBAdmin(state),
+    isMapEnabled: mapSelectors.isMapEnabled(state),
+  }),
+  dispatch => ({
+    actions: bindActionCreators(
+      {
+        fetchLocations: adminActions.fetchLocations,
+        fetchRooms: adminActions.fetchRooms,
+      },
+      dispatch
+    ),
+  })
 )(AdminArea);

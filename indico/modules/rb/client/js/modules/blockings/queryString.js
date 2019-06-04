@@ -14,46 +14,42 @@ import * as actions from '../../actions';
 import {boolStateField} from '../../util';
 import {actions as filtersActions} from '../../common/filters';
 
-
 const rules = {
-    my_rooms: {
-        stateField: boolStateField('myRooms'),
-        validator: v.isBoolean(),
-        sanitizer: v.toBoolean()
-    },
-    my_blockings: {
-        stateField: boolStateField('myBlockings'),
-        validator: v.isBoolean(),
-        sanitizer: v.toBoolean()
-    },
-    timeframe: {
-        stateField: 'timeframe',
-        validator: v.isIn(['recent', 'year', 'all'])
-    }
+  my_rooms: {
+    stateField: boolStateField('myRooms'),
+    validator: v.isBoolean(),
+    sanitizer: v.toBoolean(),
+  },
+  my_blockings: {
+    stateField: boolStateField('myBlockings'),
+    validator: v.isBoolean(),
+    sanitizer: v.toBoolean(),
+  },
+  timeframe: {
+    stateField: 'timeframe',
+    validator: v.isIn(['recent', 'year', 'all']),
+  },
 };
-
 
 export const routeConfig = {
-    '/blockings': {
-        listen: [filtersActions.SET_FILTER_PARAMETER, filtersActions.SET_FILTERS],
-        select: ({blockings: {filters}}) => filters,
-        serialize: rules,
-    }
+  '/blockings': {
+    listen: [filtersActions.SET_FILTER_PARAMETER, filtersActions.SET_FILTERS],
+    select: ({blockings: {filters}}) => filters,
+    serialize: rules,
+  },
 };
 
-
 export const queryStringReducer = createQueryStringReducer(
-    rules,
-    (state, action) => {
-        if (action.type === actions.INIT) {
-            return {
-                namespace: 'blockings.filters',
-                queryString: history.location.search.slice(1)
-            };
-        }
-        return null;
-    },
-    (state, namespace) => (namespace
-        ? _.merge({}, state, _.set({}, namespace, initialFilterStateFactory()))
-        : state)
+  rules,
+  (state, action) => {
+    if (action.type === actions.INIT) {
+      return {
+        namespace: 'blockings.filters',
+        queryString: history.location.search.slice(1),
+      };
+    }
+    return null;
+  },
+  (state, namespace) =>
+    namespace ? _.merge({}, state, _.set({}, namespace, initialFilterStateFactory())) : state
 );

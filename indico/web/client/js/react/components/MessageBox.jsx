@@ -8,33 +8,35 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-
 export default class MessageBox extends React.Component {
-    static propTypes = {
-        type: PropTypes.oneOf(['info', 'highlight', 'error', 'danger', 'warning', 'success']).isRequired,
-        icon: PropTypes.bool,
-        fixedWidth: PropTypes.bool,
-        largeIcon: PropTypes.bool,
-        children: PropTypes.any.isRequired
-    };
+  static propTypes = {
+    type: PropTypes.oneOf(['info', 'highlight', 'error', 'danger', 'warning', 'success'])
+      .isRequired,
+    icon: PropTypes.bool,
+    fixedWidth: PropTypes.bool,
+    largeIcon: PropTypes.bool,
+    children: PropTypes.any.isRequired,
+  };
 
-    static defaultProps = {
-        icon: true,
-        fixedWidth: false,
-        largeIcon: false,
-    };
+  static defaultProps = {
+    icon: true,
+    fixedWidth: false,
+    largeIcon: false,
+  };
 
-    render() {
-        const {type, icon, fixedWidth, largeIcon, children} = this.props;
-        return (
-            <div className={`${type}-message-box ${fixedWidth ? 'fixed-width' : ''} ${largeIcon ? 'large-icon' : ''}`}>
-                <div className="message-box-content">
-                    {icon && <span className="icon" />}
-                    <div className="message-text">
-                        {children}
-                    </div>
-                </div>
-            </div>
-        );
-    }
+  render() {
+    const {type, icon, fixedWidth, largeIcon, children} = this.props;
+    return (
+      <div
+        className={`${type}-message-box ${fixedWidth ? 'fixed-width' : ''} ${
+          largeIcon ? 'large-icon' : ''
+        }`}
+      >
+        <div className="message-box-content">
+          {icon && <span className="icon" />}
+          <div className="message-text">{children}</div>
+        </div>
+      </div>
+    );
+  }
 }

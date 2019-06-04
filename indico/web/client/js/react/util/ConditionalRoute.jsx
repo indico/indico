@@ -9,27 +9,26 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {Route} from 'react-router-dom';
 
-
 export default function ConditionalRoute({active, component, render, ...props}) {
-    const routeProps = {};
-    if (component) {
-        routeProps.component = active ? component : null;
-    } else if (render) {
-        routeProps.render = active ? render : null;
-    } else {
-        throw new Error('either "component" or "render" should be provided as a prop');
-    }
+  const routeProps = {};
+  if (component) {
+    routeProps.component = active ? component : null;
+  } else if (render) {
+    routeProps.render = active ? render : null;
+  } else {
+    throw new Error('either "component" or "render" should be provided as a prop');
+  }
 
-    return <Route {...props} {...routeProps} />;
+  return <Route {...props} {...routeProps} />;
 }
 
 ConditionalRoute.propTypes = {
-    active: PropTypes.bool.isRequired,
-    component: PropTypes.elementType,
-    render: PropTypes.func,
+  active: PropTypes.bool.isRequired,
+  component: PropTypes.elementType,
+  render: PropTypes.func,
 };
 
 ConditionalRoute.defaultProps = {
-    component: null,
-    render: null,
+  component: null,
+  render: null,
 };

@@ -15,50 +15,45 @@ import {actions as userActions, selectors as userSelectors} from '../common/user
 
 import './AdminOverrideBar.module.scss';
 
-
 const AdminOverrideBar = ({visible, disable}) => {
-    if (!visible) {
-        return null;
-    }
+  if (!visible) {
+    return null;
+  }
 
-    const trigger = (
-        <span>
-            <Icon name="exclamation triangle" />
-            <Translate>
-                Admin override enabled
-            </Translate>
-        </span>
-    );
+  const trigger = (
+    <span>
+      <Icon name="exclamation triangle" />
+      <Translate>Admin override enabled</Translate>
+    </span>
+  );
 
-    return (
-        <header styleName="admin-override-bar">
-            <Popup trigger={trigger}>
-                <Translate>
-                    While in Admin Override mode, you can book any room regardless
-                    of restrictions and edit any booking.
-                </Translate>
-            </Popup>
-            <span styleName="disable" onClick={disable}>
-                <Popup trigger={<Icon name="close" />}>
-                    <Translate>
-                        Disable admin override
-                    </Translate>
-                </Popup>
-            </span>
-        </header>
-    );
+  return (
+    <header styleName="admin-override-bar">
+      <Popup trigger={trigger}>
+        <Translate>
+          While in Admin Override mode, you can book any room regardless of restrictions and edit
+          any booking.
+        </Translate>
+      </Popup>
+      <span styleName="disable" onClick={disable}>
+        <Popup trigger={<Icon name="close" />}>
+          <Translate>Disable admin override</Translate>
+        </Popup>
+      </span>
+    </header>
+  );
 };
 
 AdminOverrideBar.propTypes = {
-    visible: PropTypes.bool.isRequired,
-    disable: PropTypes.func.isRequired,
+  visible: PropTypes.bool.isRequired,
+  disable: PropTypes.func.isRequired,
 };
 
 export default connect(
-    state => ({
-        visible: userSelectors.isUserAdminOverrideEnabled(state),
-    }),
-    dispatch => ({
-        disable: bindActionCreators(userActions.toggleAdminOverride, dispatch),
-    })
+  state => ({
+    visible: userSelectors.isUserAdminOverrideEnabled(state),
+  }),
+  dispatch => ({
+    disable: bindActionCreators(userActions.toggleAdminOverride, dispatch),
+  })
 )(AdminOverrideBar);

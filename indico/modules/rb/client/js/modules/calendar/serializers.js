@@ -7,22 +7,21 @@
 
 import {serializeDate, toMoment} from 'indico/utils/date';
 
-
 export const ajax = {
-    start_date: {
-        onlyIf: ({selectedDate}) => selectedDate,
-        serializer: ({selectedDate, mode}) => serializeDate(toMoment(selectedDate).startOf(mode)),
-    },
-    end_date: {
-        onlyIf: ({selectedDate, mode}) => selectedDate && mode !== 'days',
-        serializer: ({selectedDate, mode}) => serializeDate(toMoment(selectedDate).endOf(mode)),
-    },
-    my_bookings: {
-        onlyIf: ({myBookings}) => myBookings,
-        serializer: ({myBookings}) => myBookings,
-    },
-    show_inactive: {
-        onlyIf: ({showInactive}) => showInactive,
-        serializer: ({showInactive}) => showInactive,
-    }
+  start_date: {
+    onlyIf: ({selectedDate}) => selectedDate,
+    serializer: ({selectedDate, mode}) => serializeDate(toMoment(selectedDate).startOf(mode)),
+  },
+  end_date: {
+    onlyIf: ({selectedDate, mode}) => selectedDate && mode !== 'days',
+    serializer: ({selectedDate, mode}) => serializeDate(toMoment(selectedDate).endOf(mode)),
+  },
+  my_bookings: {
+    onlyIf: ({myBookings}) => myBookings,
+    serializer: ({myBookings}) => myBookings,
+  },
+  show_inactive: {
+    onlyIf: ({showInactive}) => showInactive,
+    serializer: ({showInactive}) => showInactive,
+  },
 };

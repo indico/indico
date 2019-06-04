@@ -10,19 +10,16 @@ import ReactDOM from 'react-dom';
 import {Provider, connect} from 'react-redux';
 import UserMenu from '../components/UserMenu';
 
-
 export default function setupUserMenu(element, store, userInfoSelector, languageSelector) {
-    const Connector = connect(
-        state => ({
-            userData: userInfoSelector(state),
-            languages: languageSelector(state),
-        })
-    )(UserMenu);
+  const Connector = connect(state => ({
+    userData: userInfoSelector(state),
+    languages: languageSelector(state),
+  }))(UserMenu);
 
-    ReactDOM.render(
-        <Provider store={store}>
-            <Connector />
-        </Provider>,
-        element
-    );
+  ReactDOM.render(
+    <Provider store={store}>
+      <Connector />
+    </Provider>,
+    element
+  );
 }

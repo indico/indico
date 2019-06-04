@@ -18,111 +18,114 @@ import * as adminActions from './actions';
 
 import './AdminMenu.module.scss';
 
-
 function renderMenuPlaceholder() {
-    return (
-        <Menu vertical>
-            <Menu.Item>
-                <Menu.Header>
-                    <Placeholder>
-                        <Placeholder.Line length="medium" />
-                    </Placeholder>
-                </Menu.Header>
-                <Menu.Menu>
-                    <Menu.Item>
-                        <Placeholder>
-                            <Placeholder.Line length="short" />
-                            <Placeholder.Line length="short" />
-                            <Placeholder.Line length="short" />
-                            <Placeholder.Line length="short" />
-                        </Placeholder>
-                    </Menu.Item>
-                </Menu.Menu>
-            </Menu.Item>
-        </Menu>
-    );
+  return (
+    <Menu vertical>
+      <Menu.Item>
+        <Menu.Header>
+          <Placeholder>
+            <Placeholder.Line length="medium" />
+          </Placeholder>
+        </Menu.Header>
+        <Menu.Menu>
+          <Menu.Item>
+            <Placeholder>
+              <Placeholder.Line length="short" />
+              <Placeholder.Line length="short" />
+              <Placeholder.Line length="short" />
+              <Placeholder.Line length="short" />
+            </Placeholder>
+          </Menu.Item>
+        </Menu.Menu>
+      </Menu.Item>
+    </Menu>
+  );
 }
 
 function AdminMenu({locations, isFetchingLocations, isMapEnabled, actions: {clearTextFilter}}) {
-    if (isFetchingLocations) {
-        return renderMenuPlaceholder();
-    }
+  if (isFetchingLocations) {
+    return renderMenuPlaceholder();
+  }
 
-    const hasLocations = locations.length !== 0;
-    const locationURL = (locationId) => `/admin/locations/${locationId}`;
-    return (
-        <Menu size="large" styleName="admin-menu" vertical>
-            <Menu.Item>
-                <NavLink exact to="/admin">
-                    <Translate>General settings</Translate>
+  const hasLocations = locations.length !== 0;
+  const locationURL = locationId => `/admin/locations/${locationId}`;
+  return (
+    <Menu size="large" styleName="admin-menu" vertical>
+      <Menu.Item>
+        <NavLink exact to="/admin">
+          <Translate>General settings</Translate>
+        </NavLink>
+      </Menu.Item>
+      {isMapEnabled && (
+        <Menu.Item>
+          <NavLink exact to="/admin/map-areas">
+            <Translate>Map Areas</Translate>
+          </NavLink>
+        </Menu.Item>
+      )}
+      <Menu.Item>
+        <Menu.Header>
+          <Translate>Room Metadata</Translate>
+        </Menu.Header>
+        <Menu.Menu>
+          <Menu.Item>
+            <NavLink exact to="/admin/attributes">
+              <Translate>Attributes</Translate>
+            </NavLink>
+          </Menu.Item>
+          <Menu.Item>
+            <NavLink exact to="/admin/equipment">
+              <Translate>Equipment & Features</Translate>
+            </NavLink>
+          </Menu.Item>
+        </Menu.Menu>
+      </Menu.Item>
+      <Menu.Item>
+        <Menu.Header styleName="locations-header">
+          <Translate>Locations</Translate>
+          <Link to="/admin/locations/">
+            <Icon name="setting" />
+          </Link>
+        </Menu.Header>
+        {hasLocations && (
+          <Menu.Menu>
+            {locations.map(location => (
+              <Menu.Item key={location.id}>
+                <NavLink to={locationURL(location.id)} onClick={clearTextFilter} exact>
+                  {location.name}
                 </NavLink>
-            </Menu.Item>
-            {isMapEnabled && (
-                <Menu.Item>
-                    <NavLink exact to="/admin/map-areas">
-                        <Translate>Map Areas</Translate>
-                    </NavLink>
-                </Menu.Item>
-            )}
-            <Menu.Item>
-                <Menu.Header>
-                    <Translate>Room Metadata</Translate>
-                </Menu.Header>
-                <Menu.Menu>
-                    <Menu.Item>
-                        <NavLink exact to="/admin/attributes">
-                            <Translate>Attributes</Translate>
-                        </NavLink>
-                    </Menu.Item>
-                    <Menu.Item>
-                        <NavLink exact to="/admin/equipment">
-                            <Translate>Equipment & Features</Translate>
-                        </NavLink>
-                    </Menu.Item>
-                </Menu.Menu>
-            </Menu.Item>
-            <Menu.Item>
-                <Menu.Header styleName="locations-header">
-                    <Translate>Locations</Translate>
-                    <Link to="/admin/locations/"><Icon name="setting" /></Link>
-                </Menu.Header>
-                {hasLocations && (
-                    <Menu.Menu>
-                        {locations.map((location) => (
-                            <Menu.Item key={location.id}>
-                                <NavLink to={locationURL(location.id)}
-                                         onClick={clearTextFilter}
-                                         exact>
-                                    {location.name}
-                                </NavLink>
-                            </Menu.Item>
-                        ))}
-                    </Menu.Menu>
-                )}
-            </Menu.Item>
-        </Menu>
-    );
+              </Menu.Item>
+            ))}
+          </Menu.Menu>
+        )}
+      </Menu.Item>
+    </Menu>
+  );
 }
 
 AdminMenu.propTypes = {
-    locations: PropTypes.array.isRequired,
-    isFetchingLocations: PropTypes.bool.isRequired,
-    isMapEnabled: PropTypes.bool.isRequired,
-    actions: PropTypes.exact({
-        clearTextFilter: PropTypes.func.isRequired,
-    }).isRequired,
+  locations: PropTypes.array.isRequired,
+  isFetchingLocations: PropTypes.bool.isRequired,
+  isMapEnabled: PropTypes.bool.isRequired,
+  actions: PropTypes.exact({
+    clearTextFilter: PropTypes.func.isRequired,
+  }).isRequired,
 };
 
-
-export default withRouter(connect(
-    (state) => ({
-        locations: adminSelectors.getAllLocations(state),
-        isMapEnabled: mapSelectors.isMapEnabled(state),
-        isFetchingLocations: adminSelectors.isFetchingLocations(state),
+export default withRouter(
+  connect(
+    state => ({
+      locations: adminSelectors.getAllLocations(state),
+      isMapEnabled: mapSelectors.isMapEnabled(state),
+      isFetchingLocations: adminSelectors.isFetchingLocations(state),
     }),
-    (dispatch) => ({
-        actions: bindActionCreators({
-            clearTextFilter: adminActions.clearTextFilter,
-        }, dispatch),
+    dispatch => ({
+      actions: bindActionCreators(
+        {
+          clearTextFilter: adminActions.clearTextFilter,
+        },
+        dispatch
+      ),
     })
-)(AdminMenu));
+  )(AdminMenu)
+);

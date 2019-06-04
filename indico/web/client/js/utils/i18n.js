@@ -9,19 +9,19 @@ import Jed from 'jed';
 import _ from 'underscore';
 
 export const defaultI18n = new Jed({
-    locale_data: global.TRANSLATIONS,
-    domain: "indico"
+  locale_data: global.TRANSLATIONS,
+  domain: 'indico',
 });
 
 export const $T = _.bind(defaultI18n.gettext, defaultI18n);
 
 ['gettext', 'ngettext', 'pgettext', 'npgettext', 'translate'].forEach(function(name) {
-    $T[name] = _.bind(defaultI18n[name], defaultI18n);
+  $T[name] = _.bind(defaultI18n[name], defaultI18n);
 });
 
 $T.domain = _.memoize(function(domain) {
-    return new Jed({
-        locale_data: global.TRANSLATIONS,
-        domain: domain
-    });
+  return new Jed({
+    locale_data: global.TRANSLATIONS,
+    domain: domain,
+  });
 });

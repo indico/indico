@@ -8,7 +8,6 @@
 import * as actions from './actions';
 import * as selectors from './selectors';
 
-
 export {default} from './BookRoom';
 export {default as reducer} from './reducers';
 export {queryStringReducer, routeConfig, rules as queryStringRules} from './queryString';
