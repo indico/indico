@@ -264,7 +264,8 @@
 
             &:hover {
                 background-color: lighten($other-booking-color, 1%);
-                border: 1px solid darken($other-booking-color, 9%);
+                border: 1px solid darken($other-booking-color, 30%);
+                z-index: 4;
             }
         }
 
