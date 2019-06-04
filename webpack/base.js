@@ -16,6 +16,7 @@ import ExtractTextPlugin from 'extract-text-webpack-plugin';
 import ManifestPlugin from 'webpack-manifest-plugin';
 import ProgressBarPlugin from 'progress-bar-webpack-plugin';
 import importOnce from 'node-sass-import-once';
+import TerserPlugin from 'terser-webpack-plugin';
 
 
 function _resolveTheme(rootPath, indicoClientPath, filePath) {
@@ -331,7 +332,13 @@ export function webpackDefaults(env, config, bundles) {
                         priority: 10,
                     }
                 }
-            }
+            },
+            minimizer: [
+                new TerserPlugin({
+                    // XXX: minification breaks angularjs :(
+                    exclude: /js\/module_events\.registration\.[^.]+\.bundle\.js$/,
+                }),
+            ],
         }
     };
 }
