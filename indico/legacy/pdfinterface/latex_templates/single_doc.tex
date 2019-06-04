@@ -41,6 +41,6 @@
             \VAR{render_abstract(abstract, track_class, contrib_type) | rawlatex}
         \JINJA{endif}
     \JINJA{elif doc_type == 'contribution'}
-        \VAR{render_contribution(contrib) | rawlatex}
+        \VAR{render_contribution(contrib, tz) | rawlatex}
     \JINJA{endif}
 \JINJA{endblock}

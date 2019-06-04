@@ -46,7 +46,7 @@
                 \VAR{render_abstract(item, get_track_classification(item), get_contrib_type(item)) | rawlatex}
             \JINJA{endif}
         \JINJA{elif doc_type == 'contribution'}
-            \VAR{render_contribution(item) | rawlatex}
+            \VAR{render_contribution(item, tz) | rawlatex}
         \JINJA{endif}
 
         \fancyfoot[L]{\small \rmfamily \color{gray} \today}
