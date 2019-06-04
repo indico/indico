@@ -9,7 +9,7 @@ from __future__ import unicode_literals
 
 from collections import OrderedDict, defaultdict
 from datetime import date, datetime, time
-from itertools import groupby
+from itertools import chain, groupby
 from operator import attrgetter, itemgetter
 
 from flask import flash, session
@@ -456,8 +456,10 @@ def get_booking_edit_calendar_data(booking, booking_changes):
     room_availability = data[room.id]
     room_availability['cancellations'] = {}
     room_availability['rejections'] = {}
-    other_bookings = {dt: filter(lambda x: x.reservation.id != booking.id, other)
-                      for dt, other in room_availability['bookings'].iteritems()}
+    others = defaultdict(list)
+    for k, v in chain(room_availability['bookings'].iteritems(), room_availability['pre_bookings'].iteritems()):
+        others[k].extend(v)
+    other_bookings = {dt: filter(lambda x: x.reservation.id != booking.id, other) for dt, other in others.iteritems()}
     cancelled_dates = [occ.start_dt.date() for occ in booking.occurrences if occ.is_cancelled]
     rejected_dates = [occ.start_dt.date() for occ in booking.occurrences if occ.is_rejected]
     candidates = room_availability['candidates']
