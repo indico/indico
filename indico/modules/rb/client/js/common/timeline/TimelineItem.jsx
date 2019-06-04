@@ -296,7 +296,7 @@ class TimelineItem extends React.Component {
         );
 
         return (
-            <Popup trigger={segment} content={popupContent} position="bottom center"
+            <Popup styleName="header-center" trigger={segment} content={popupContent} position="bottom center"
                    header={reservation && reservation.bookedForName}
                    hideOnScroll hoverable />
         );
