@@ -327,7 +327,7 @@ class BookRoomModal extends React.Component {
                         {isPrebooking
                             ? (
                                 <Translate>
-                                    If you create this pre-booking, some of your days may get rejected as they ovelap
+                                    If you create this pre-booking, some of your days may get rejected as they overlap
                                     with the following pre-bookings:
                                 </Translate>
                             ) : (
