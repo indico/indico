@@ -70,6 +70,16 @@ def _get_plugin_bundle_config(plugin_dir):
         raise
 
 
+def _get_plugin_build_deps(plugin_dir):
+    try:
+        with open(os.path.join(plugin_dir, 'required-build-plugins.json')) as f:
+            return json.load(f)
+    except IOError as e:
+        if e.errno == errno.ENOENT:
+            return []
+        raise
+
+
 def _parse_plugin_theme_yaml(plugin_yaml):
     # This is very similar to what ThemeSettingsProxy does
     with open('indico/modules/events/themes.yaml') as f:
@@ -219,9 +229,11 @@ def build_plugin(plugin_dir, dev, clean, watch, url_root):
         _clean(webpack_build_config, plugin_dir)
     force_url_map = ['--force'] if clean or not dev else []
     url_map_path = webpack_build_config['build']['urlMapPath']
+    dump_plugin_args = ['--plugin', webpack_build_config['plugin']]
+    for name in _get_plugin_build_deps(plugin_dir):
+        dump_plugin_args += ['--plugin', name]
     subprocess.check_call(['python', 'bin/maintenance/dump_url_map.py',
-                           '--output', url_map_path,
-                           '--plugin', webpack_build_config['plugin']] + force_url_map)
+                           '--output', url_map_path] + dump_plugin_args + force_url_map)
     webpack_config_file = os.path.join(plugin_dir, 'webpack.config.js')
     if not os.path.exists(webpack_config_file):
         webpack_config_file = 'plugin.webpack.config.js'
