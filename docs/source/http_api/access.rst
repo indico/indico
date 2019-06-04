@@ -99,12 +99,16 @@ A simple example in Python::
 
     import hashlib
     import hmac
-    import urllib
     import time
+
+    try:
+        from urllib.parse import urlencode
+    except ImportError:
+        from urllib import urlencode
 
 
     def build_indico_request(path, params, api_key=None, secret_key=None, only_public=False, persistent=False):
-        items = params.items() if hasattr(params, 'items') else list(params)
+        items = list(params.items()) if hasattr(params, 'items') else list(params)
         if api_key:
             items.append(('apikey', api_key))
         if only_public:
@@ -113,12 +117,13 @@ A simple example in Python::
             if not persistent:
                 items.append(('timestamp', str(int(time.time()))))
             items = sorted(items, key=lambda x: x[0].lower())
-            url = '%s?%s' % (path, urllib.urlencode(items))
-            signature = hmac.new(secret_key, url, hashlib.sha1).hexdigest()
+            url = '%s?%s' % (path, urlencode(items))
+            signature = hmac.new(secret_key.encode('utf-8'), url.encode('utf-8'),
+                                 hashlib.sha1).hexdigest()
             items.append(('signature', signature))
         if not items:
             return path
-        return '%s?%s' % (path, urllib.urlencode(items))
+        return '%s?%s' % (path, urlencode(items))
 
 
     if __name__ == '__main__':
@@ -128,7 +133,7 @@ A simple example in Python::
         PARAMS = {
             'limit': 123
         }
-        print build_indico_request(PATH, PARAMS, API_KEY, SECRET_KEY)
+        print(build_indico_request(PATH, PARAMS, API_KEY, SECRET_KEY))
 
 Request Signing for PHP
 ^^^^^^^^^^^^^^^^^^^^^^^
