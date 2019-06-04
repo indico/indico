@@ -1,5 +1,5 @@
 include indico/*.sample indico/web/indico.wsgi
-recursive-include indico *.html *.tpl *.txt *.js *.yaml
+recursive-include indico *.html *.tpl *.txt *.js *.yaml *.tex
 exclude indico/logging.yaml
 
 graft indico/core/plugins/alembic/
