@@ -192,8 +192,7 @@ def serialize_booking_details(booking):
     end_dt = datetime.combine(booking.end_dt, time.max)
     unbookable_hours = get_rooms_unbookable_hours([booking.room]).get(booking.room.id, [])
     other_bookings = get_existing_room_occurrences(booking.room, start_dt, end_dt, booking.repeat_frequency,
-                                                   booking.repeat_interval, only_accepted=True,
-                                                   skip_booking_id=booking.id)
+                                                   booking.repeat_interval, skip_booking_id=booking.id)
     blocked_rooms = get_rooms_blockings([booking.room], start_dt.date(), end_dt.date())
     overridable_blockings = group_blocked_rooms(filter_blocked_rooms(blocked_rooms,
                                                                      overridable_only=True,
