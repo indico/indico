@@ -8,14 +8,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indico 2.2-dev\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2019-05-29 09:23+0200\n"
+"POT-Creation-Date: 2019-06-04 14:58+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.6.0\n"
+"Generated-By: Babel 2.7.0\n"
 
 #: indico/core/errors.py:29
 msgid "You are not allowed to access this page."
@@ -272,7 +272,7 @@ msgstr ""
 #: indico/modules/events/registration/templates/management/regform_display_form_columns.html:12
 #: indico/modules/events/registration/templates/management/regform_edit.html:26
 #: indico/modules/events/registration/templates/management/regform_tickets.html:8
-#: indico/modules/events/reminders/templates/edit_reminder.html:25 indico/modules/events/requests/base.py:35
+#: indico/modules/events/reminders/templates/edit_reminder.html:25 indico/modules/events/requests/base.py:36
 #: indico/modules/events/surveys/templates/management/edit_survey.html:11
 #: indico/modules/events/templates/forms/session_block_form.html:12 indico/modules/groups/templates/group_edit.html:20
 #: indico/modules/users/templates/personal_data.html:17 indico/modules/users/templates/preferences.html:16
@@ -1403,7 +1403,7 @@ msgstr ""
 #: indico/modules/events/abstracts/templates/reviewing/timeline.html:57
 #: indico/modules/events/abstracts/templates/reviewing/timeline.html:75 indico/modules/events/papers/forms.py:107
 #: indico/modules/events/papers/forms.py:202 indico/modules/events/papers/forms.py:223
-#: indico/modules/events/papers/templates/reviewing/timeline.html:233 indico/modules/events/requests/base.py:33
+#: indico/modules/events/papers/templates/reviewing/timeline.html:233 indico/modules/events/requests/base.py:34
 #: indico/modules/events/requests/templates/event_request_details.html:42
 #: indico/modules/events/requests/templates/event_request_details.html:53
 #: indico/modules/events/templates/reviews/forms.html:97 indico/modules/events/templates/reviews/timeline.html:207
@@ -2252,29 +2252,29 @@ msgid_plural "{0} categories moved to \"{1}\"."
 msgstr[0] ""
 msgstr[1] ""
 
-#: indico/modules/categories/controllers/management.py:357
+#: indico/modules/categories/controllers/management.py:358
 msgid "You have deleted one event"
 msgid_plural "You have deleted {} events"
 msgstr[0] ""
 msgstr[1] ""
 
-#: indico/modules/categories/controllers/management.py:375
+#: indico/modules/categories/controllers/management.py:376
 msgid "Your events have been moved to the category \"{}\""
 msgstr ""
 
-#: indico/modules/categories/controllers/management.py:378
+#: indico/modules/categories/controllers/management.py:379
 msgid "Your events have been split into the categories \"{}\" and \"{}\""
 msgstr ""
 
-#: indico/modules/categories/controllers/management.py:381
+#: indico/modules/categories/controllers/management.py:382
 msgid "Split"
 msgstr ""
 
-#: indico/modules/categories/controllers/management.py:395 indico/modules/events/management/controllers/actions.py:89
+#: indico/modules/categories/controllers/management.py:396 indico/modules/events/management/controllers/actions.py:89
 msgid "You may only move events to categories where you are allowed to create events."
 msgstr ""
 
-#: indico/modules/categories/controllers/management.py:401
+#: indico/modules/categories/controllers/management.py:402
 msgid "You have moved one event to the category \"{cat}\""
 msgid_plural "You have moved {count} events to the category \"{cat}\""
 msgstr[0] ""
@@ -3482,18 +3482,15 @@ msgstr ""
 msgid "My Conference"
 msgstr ""
 
-#: indico/modules/events/clone.py:23 indico/modules/events/contributions/forms.py:48 indico/modules/events/forms.py:58
-#: indico/modules/events/management/forms.py:168 indico/modules/events/sessions/forms.py:73
-#: indico/modules/events/sessions/forms.py:84 indico/modules/events/templates/display/conference.html:33
-#: indico/modules/events/timetable/forms.py:99
-msgid "Location"
+#: indico/modules/events/clone.py:23
+msgid "Venue/Room"
 msgstr ""
 
-#: indico/modules/events/clone.py:38
+#: indico/modules/events/clone.py:41
 msgid "Persons"
 msgstr ""
 
-#: indico/modules/events/abstracts/settings.py:43 indico/modules/events/clone.py:69
+#: indico/modules/events/abstracts/settings.py:43 indico/modules/events/clone.py:72
 #: indico/modules/events/contributions/forms.py:67 indico/modules/events/contributions/forms.py:113
 #: indico/modules/events/forms.py:81 indico/modules/events/management/forms.py:178
 #: indico/modules/events/management/templates/_event_person_list.html:5
@@ -3503,14 +3500,14 @@ msgstr ""
 msgid "Speakers"
 msgstr ""
 
-#: indico/modules/events/clone.py:71 indico/modules/events/management/forms.py:172
+#: indico/modules/events/clone.py:74 indico/modules/events/management/forms.py:172
 #: indico/modules/events/management/templates/_settings.html:129
 #: indico/modules/events/persons/templates/management/person_list.html:134
 #: indico/modules/events/templates/display/conference.html:57
 msgid "Chairpersons"
 msgstr ""
 
-#: indico/modules/events/clone.py:94
+#: indico/modules/events/clone.py:97
 msgid "ACLs and protection settings"
 msgstr ""
 
@@ -3561,6 +3558,13 @@ msgstr ""
 
 #: indico/modules/events/forms.py:56 indico/modules/events/management/forms.py:59
 msgid "Event title"
+msgstr ""
+
+#: indico/modules/events/contributions/forms.py:48 indico/modules/events/forms.py:58
+#: indico/modules/events/management/forms.py:168 indico/modules/events/sessions/forms.py:73
+#: indico/modules/events/sessions/forms.py:84 indico/modules/events/templates/display/conference.html:33
+#: indico/modules/events/timetable/forms.py:99
+msgid "Location"
 msgstr ""
 
 #: indico/modules/events/forms.py:64
@@ -4034,7 +4038,7 @@ msgstr ""
 
 #: indico/modules/events/abstracts/forms.py:439 indico/modules/events/abstracts/models/reviews.py:21
 #: indico/modules/events/abstracts/templates/management/abstract_list.html:99
-#: indico/modules/events/papers/models/reviews.py:21 indico/modules/events/requests/base.py:36
+#: indico/modules/events/papers/models/reviews.py:21 indico/modules/events/requests/base.py:37
 #: indico/modules/users/templates/registration_requests.html:36
 msgid "Accept"
 msgstr ""
@@ -4043,7 +4047,7 @@ msgstr ""
 #: indico/modules/events/abstracts/templates/management/abstract_list.html:111
 #: indico/modules/events/papers/models/reviews.py:21
 #: indico/modules/events/registration/templates/management/_registration_details.html:104
-#: indico/modules/events/requests/base.py:37 indico/modules/users/templates/registration_requests.html:31
+#: indico/modules/events/requests/base.py:38 indico/modules/users/templates/registration_requests.html:31
 msgid "Reject"
 msgstr ""
 
@@ -10712,7 +10716,7 @@ msgstr ""
 msgid "Logistics"
 msgstr ""
 
-#: indico/modules/events/requests/base.py:34
+#: indico/modules/events/requests/base.py:35
 msgid "The comment will be shown only if the request is accepted or rejected."
 msgstr ""
 
@@ -13295,7 +13299,7 @@ msgstr ""
 msgid "Allows moderating bookings (approving/rejecting/editing)"
 msgstr ""
 
-#: indico/modules/rb/schemas.py:302
+#: indico/modules/rb/schemas.py:313
 msgid "Booking cannot end before it starts"
 msgstr ""
 
@@ -13307,16 +13311,16 @@ msgstr ""
 msgid "You are not authorized to access the room booking system."
 msgstr ""
 
-#: indico/modules/rb/controllers/backend/admin.py:111
+#: indico/modules/rb/controllers/backend/admin.py:112
 msgid "Cannot delete location with active rooms"
 msgstr ""
 
-#: indico/modules/rb/controllers/backend/admin.py:159 indico/modules/rb/controllers/backend/admin.py:221
-#: indico/modules/rb/controllers/backend/admin.py:291 indico/modules/rb/controllers/backend/admin.py:365
+#: indico/modules/rb/controllers/backend/admin.py:160 indico/modules/rb/controllers/backend/admin.py:222
+#: indico/modules/rb/controllers/backend/admin.py:292 indico/modules/rb/controllers/backend/admin.py:366
 msgid "Name must be unique"
 msgstr ""
 
-#: indico/modules/rb/controllers/backend/admin.py:410
+#: indico/modules/rb/controllers/backend/admin.py:411
 msgid "Start time should not be later than end time"
 msgstr ""
 
@@ -13356,7 +13360,7 @@ msgstr ""
 msgid "You cannot book this room more than {} days in advance"
 msgstr ""
 
-#: indico/modules/rb/operations/bookings.py:318
+#: indico/modules/rb/operations/bookings.py:321
 msgid "Booking could not be created. Probably somebody else booked the room in the meantime."
 msgstr ""
 
