@@ -57,9 +57,9 @@ const reservationTypes = new Set(['booking', 'pre-booking', 'cancellation', 'rej
 const renderOrder = [
   'other',
   'conflictingCandidates',
+  'cancellations',
   'preBookings',
   'concurrentPreBookings',
-  'cancellations',
   'rejections',
   'bookings',
   'preConflicts',
