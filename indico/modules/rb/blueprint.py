@@ -12,7 +12,7 @@ from flask import jsonify, redirect
 from indico.modules.rb.controllers.backend import admin, blockings, bookings, locations, misc, rooms
 from indico.modules.rb.controllers.frontend import RHRoomBooking
 from indico.modules.rb.event import controllers as event
-from indico.web.flask.util import url_for
+from indico.web.flask.util import make_compat_redirect_func, url_for
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -142,3 +142,8 @@ def my_bookings_link():
 @_bp.route('/blocking/<int:blocking_id>')
 def blocking_link(blocking_id):
     return redirect(url_for('rb.roombooking', path='blockings', modal='blocking-details:{}'.format(blocking_id)))
+
+
+_compat_bp = IndicoBlueprint('compat_rb', __name__, url_prefix='/rooms')
+_compat_bp.add_url_rule('/booking/<location>/<int:booking_id>/', 'display_booking',
+                        make_compat_redirect_func(_bp, 'booking_link'))
