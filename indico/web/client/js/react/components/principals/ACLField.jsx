@@ -115,6 +115,7 @@ const ACLField = props => {
               name={data.name}
               detail={data.detail}
               isGroup={data.group}
+              invalid={data.invalid}
               favorite={!data.group && data.userId in favoriteUsers}
               onDelete={() => !disabled && handleDelete(data.identifier)}
               onAddFavorite={() => !disabled && handleAddFavorite(data.userId)}

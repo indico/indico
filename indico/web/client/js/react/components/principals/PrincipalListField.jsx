@@ -72,6 +72,7 @@ const PrincipalListField = props => {
             name={data.name}
             detail={data.detail}
             isGroup={data.group}
+            invalid={data.invalid}
             isPendingUser={!data.group && data.userId === null}
             favorite={!data.group && data.userId in favoriteUsers}
             onDelete={() => !disabled && handleDelete(data.identifier)}

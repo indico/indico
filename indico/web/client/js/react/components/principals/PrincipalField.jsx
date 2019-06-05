@@ -112,6 +112,7 @@ const PrincipalField = props => {
               detail={details.detail}
               favorite={details.userId in favoriteUsers}
               isPendingUser={details.userId === null}
+              invalid={details.invalid}
               canDelete={!required}
               onDelete={() => !disabled && handleClear()}
               onAddFavorite={() => !disabled && handleAddFavorite(details.userId)}

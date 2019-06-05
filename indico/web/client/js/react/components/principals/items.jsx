@@ -7,7 +7,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Icon, List, Loader} from 'semantic-ui-react';
+import {Icon, List, Loader, Popup} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
 
 import './items.module.scss';
@@ -41,6 +41,7 @@ PendingPrincipalListItem.defaultProps = {
 export const PrincipalListItem = ({
   isPendingUser,
   isGroup,
+  invalid,
   name,
   detail,
   canDelete,
@@ -56,7 +57,26 @@ export const PrincipalListItem = ({
   <List.Item>
     <div styleName="item">
       <div styleName="icon">
-        <Icon name={isGroup ? 'users' : 'user'} size="large" />
+        {invalid ? (
+          <Popup
+            trigger={
+              <Icon.Group size="large">
+                <Icon name={isGroup ? 'users' : 'user'} />
+                <Icon name="exclamation triangle" color="orange" corner />
+              </Icon.Group>
+            }
+          >
+            {isGroup ? (
+              <Translate>
+                This group does not exist anymore. Please choose a different one.
+              </Translate>
+            ) : (
+              <Translate>This user does not exist anymore. Please choose someone else.</Translate>
+            )}
+          </Popup>
+        ) : (
+          <Icon name={isGroup ? 'users' : 'user'} size="large" />
+        )}
       </div>
       <div styleName="content">
         <List.Content>{name}</List.Content>
@@ -107,6 +127,7 @@ export const PrincipalListItem = ({
 PrincipalListItem.propTypes = {
   isGroup: PropTypes.bool,
   isPendingUser: PropTypes.bool,
+  invalid: PropTypes.bool,
   name: PropTypes.string.isRequired,
   detail: PropTypes.string,
   actions: PropTypes.node,
@@ -127,6 +148,7 @@ PrincipalListItem.defaultProps = {
   readOnly: false,
   isGroup: false,
   isPendingUser: false,
+  invalid: false,
   detail: null,
   search: null,
 };

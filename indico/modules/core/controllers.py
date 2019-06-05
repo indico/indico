@@ -227,7 +227,8 @@ class _PrincipalDict(PrincipalList):
         try:
             return {identifier: principal_from_identifier(identifier,
                                                           allow_groups=self.allow_groups,
-                                                          allow_external_users=self.allow_external_users)
+                                                          allow_external_users=self.allow_external_users,
+                                                          soft_fail=True)
                     for identifier in value}
         except ValueError as exc:
             raise ValidationError(unicode(exc))
@@ -246,16 +247,19 @@ class RHPrincipals(RHProtected):
             return {'identifier': identifier,
                     'user_id': principal.id,
                     'group': False,
+                    'invalid': principal.is_deleted,
                     'name': principal.display_full_name,
                     'detail': ('{} ({})'.format(principal.email, principal.affiliation)
                                if principal.affiliation else principal.email)}
         elif principal.principal_type == PrincipalType.local_group:
             return {'identifier': identifier,
                     'group': True,
+                    'invalid': principal.group is None,
                     'name': principal.name}
         elif principal.principal_type == PrincipalType.multipass_group:
             return {'identifier': identifier,
                     'group': True,
+                    'invalid': principal.group is None,
                     'name': principal.name,
                     'detail': principal.provider_title}
 

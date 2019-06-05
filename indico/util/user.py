@@ -100,7 +100,7 @@ def principal_from_fossil(fossil, allow_pending=False, allow_groups=True, allow_
         raise ValueError('Unexpected fossil type: {}'.format(type_))
 
 
-def principal_from_identifier(identifier, allow_groups=False, allow_external_users=False):
+def principal_from_identifier(identifier, allow_groups=False, allow_external_users=False, soft_fail=False):
     # XXX: this is currently only used in PrincipalList
     # if we ever need to support more than just users and groups,
     # make sure to add it in here as well
@@ -116,7 +116,7 @@ def principal_from_identifier(identifier, allow_groups=False, allow_external_use
             user_id = int(data)
         except ValueError:
             raise ValueError('Invalid data')
-        user = User.get(user_id, is_deleted=False)
+        user = User.get(user_id, is_deleted=(None if soft_fail else False))
         if user is None:
             raise ValueError('Invalid user: {}'.format(user_id))
         return user
@@ -154,7 +154,7 @@ def principal_from_identifier(identifier, allow_groups=False, allow_external_use
         else:
             # multipass group
             group = GroupProxy(name, provider)
-        if group.group is None:
+        if not soft_fail and group.group is None:
             raise ValueError('Invalid group: {}'.format(data))
         return group
     else:
