@@ -12,9 +12,10 @@ import React from 'react';
 import {SingleDatePicker as ReactDatesSinglePicker} from 'react-dates';
 import {serializeDate, toMoment} from 'indico/utils/date';
 import {FinalField} from 'indico/react/forms';
+import {responsiveReactDates} from './util';
 
 import 'react-dates/lib/css/_datepicker.css';
-import './style/dates.scss';
+import '../style/dates.scss';
 
 const PROP_BLACKLIST = new Set([
   'name',
@@ -60,17 +61,15 @@ export default class SingleDatePicker extends React.Component {
       filteredProps.isOutsideRange = disabledDate;
     }
 
-    return (
-      <ReactDatesSinglePicker
-        focused={focused}
-        onFocusChange={this.onFocusChange}
-        showDefaultInputIcon
-        inputIconPosition="after"
-        hideKeyboardShortcutsPanel
-        numberOfMonths={1}
-        {...filteredProps}
-      />
-    );
+    return responsiveReactDates(ReactDatesSinglePicker, {
+      onFocusChange: this.onFocusChange,
+      inputIconPosition: 'after',
+      numberOfMonths: 1,
+      hideKeyboardShortcutsPanel: true,
+      showDefaultInputIcon: true,
+      focused,
+      ...filteredProps,
+    });
   }
 }
 

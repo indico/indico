@@ -12,7 +12,7 @@ import PropTypes from 'prop-types';
 import {START_DATE, END_DATE} from 'react-dates/constants';
 import {DateRangePicker} from 'indico/react/components';
 import {serializeDate} from 'indico/utils/date';
-import {FinalField} from '../forms';
+import {FinalField} from '../../forms';
 
 import './DatePeriodField.module.scss';
 

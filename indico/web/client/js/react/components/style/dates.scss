@@ -23,3 +23,8 @@
 .CalendarMonth_caption {
     padding-bottom: 42px !important;
 }
+
+.DateRangePicker_picker.DateRangePicker_picker__fullScreenPortal,
+.SingleDatePicker_picker.SingleDatePicker_picker__fullScreenPortal {
+    z-index: 1001;
+}

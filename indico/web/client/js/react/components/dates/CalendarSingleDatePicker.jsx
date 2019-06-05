@@ -11,7 +11,7 @@ import PropTypes from 'prop-types';
 import {DayPickerSingleDateController as DayPicker} from 'react-dates';
 
 import 'react-dates/lib/css/_datepicker.css';
-import './style/dates.scss';
+import '../style/dates.scss';
 
 export default class CalendarSingleDatePicker extends React.Component {
   static propTypes = {
