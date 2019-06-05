@@ -176,6 +176,10 @@ class BookingTimeline extends React.Component {
     if (!_.isEqual(prevFilters, filters)) {
       initTimeline([], dates, timeSlot, recurrence);
     }
+    // we don't want to fetch timeline data until `searchRooms` finishes
+    if (!searchFinished) {
+      return;
+    }
     if (
       prevIsAdminOverrideEnabled !== isAdminOverrideEnabled ||
       (!prevSearchFinished && searchFinished)

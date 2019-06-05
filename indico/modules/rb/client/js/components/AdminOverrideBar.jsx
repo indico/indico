@@ -36,7 +36,7 @@ const AdminOverrideBar = ({visible, disable}) => {
         </Translate>
       </Popup>
       <span styleName="disable" onClick={disable}>
-        <Popup trigger={<Icon name="close" />}>
+        <Popup trigger={<Icon name="close" />} position="bottom right">
           <Translate>Disable admin override</Translate>
         </Popup>
       </span>
