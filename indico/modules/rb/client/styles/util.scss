@@ -69,6 +69,6 @@ $sui-font-family: Muli, 'Helvetica Neue', Arial, Helvetica, sans-serif;
     repeating-linear-gradient(45deg, $first, $first 15px, $second 15px, $second 30px);
 }
 
-@mixin remaining-screen-height() {
-    height: calc(100vh - (#{$indico-top-bar-height} + #{$menu-height} + var(--extra-bars, 0) * 50px));
+@mixin remaining-screen-height($offset: 0) {
+    height: calc(100vh - (#{$indico-top-bar-height} + #{$menu-height} + var(--extra-bars, 0) * 50px) - #{$offset});
 }
