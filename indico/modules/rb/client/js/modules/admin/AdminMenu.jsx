@@ -50,7 +50,7 @@ function AdminMenu({locations, isFetchingLocations, isMapEnabled, actions: {clea
   const hasLocations = locations.length !== 0;
   const locationURL = locationId => `/admin/locations/${locationId}`;
   return (
-    <Menu size="large" styleName="admin-menu" vertical>
+    <Menu size="large" styleName="admin-menu" vertical fluid>
       <Menu.Item>
         <NavLink exact to="/admin">
           <Translate>General settings</Translate>
