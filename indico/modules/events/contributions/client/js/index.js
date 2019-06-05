@@ -269,7 +269,7 @@ import 'indico/modules/events/util/types_dialog';
 
     $('#subcontribution-list table').sortable({
       items: '.js-sortable-subcontribution-row',
-      handle: '.ui-sortable-handle',
+      handle: '.js-sort-handle',
       placeholder: 'sortable-placeholder',
       tolerance: 'pointer',
       distance: 10,

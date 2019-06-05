@@ -250,7 +250,7 @@ import 'chartist/dist/chartist.css';
     });
     container.find('.js-sortable-survey-items').sortable({
       items: '.survey-item',
-      handle: '.ui-sortable-handle',
+      handle: '.js-sort-handle',
       connectWith: '#survey-questionnaire-preview .js-sortable-survey-items',
       tolerance: 'pointer',
       distance: 10,
