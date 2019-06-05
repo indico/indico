@@ -63,7 +63,7 @@ def _query_managed_rooms(user):
                                 RoomPrincipal.multipass_group_provider == group.provider.name,
                                 db.func.lower(RoomPrincipal.multipass_group_name) == group.name.lower(),
                                 RoomPrincipal.has_management_permission()))
-    return Room.query.filter(~Room.is_deleted, Room.acl_entries.any(db.or_(*criteria)))
+    return Room.query.filter(~Room.is_deleted, Room.acl_entries.any(db.or_(*criteria)) | (Room.owner == user))
 
 
 def _query_all_rooms_for_acl_check():
