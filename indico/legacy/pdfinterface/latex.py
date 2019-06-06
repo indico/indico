@@ -108,6 +108,8 @@ class RawLatex(unicode):
 def _latex_escape(s, ignore_braces=False):
     if not isinstance(s, basestring) or isinstance(s, RawLatex):
         return s
+    if isinstance(s, str):
+        s = s.decode('utf-8')
     return RawLatex(mdx_latex.latex_escape(s, ignore_braces=ignore_braces))
 
 
