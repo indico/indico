@@ -84,8 +84,9 @@ const searchFactory = config => {
   );
 
   // eslint-disable-next-line react/prop-types
-  const SearchForm = ({onSearch, favorites, isAdded, onAdd}) => {
+  const SearchForm = ({onSearch, favorites, isAdded, onAdd, single}) => {
     const initialFormValues = useContext(InitialFormValuesContext);
+    const [dropdownOpen, setDropdownOpen] = useState(false);
     return (
       <FinalForm
         onSubmit={onSearch}
@@ -112,6 +113,9 @@ const searchFactory = config => {
                   labeled
                   text={Translate.string('Select favorite')}
                   disabled={fprops.submitting}
+                  open={dropdownOpen}
+                  onOpen={() => setDropdownOpen(true)}
+                  onClose={() => setDropdownOpen(false)}
                 >
                   <Dropdown.Menu>
                     {_.sortBy(Object.values(favorites), 'name').map(x => (
@@ -120,7 +124,12 @@ const searchFactory = config => {
                         name={x.name}
                         detail={x.detail}
                         added={isAdded(x)}
-                        onAdd={() => onAdd(x)}
+                        onAdd={() => {
+                          onAdd(x);
+                          if (single) {
+                            setDropdownOpen(false);
+                          }
+                        }}
                       />
                     ))}
                   </Dropdown.Menu>
@@ -186,13 +195,19 @@ const searchFactory = config => {
     );
 
   // eslint-disable-next-line react/prop-types
-  const SearchContent = ({onAdd, isAdded, favorites}) => {
+  const SearchContent = ({onAdd, isAdded, favorites, single}) => {
     const [result, setResult] = useState(null);
 
     const handleSearch = data => runSearch(data, setResult);
     return (
       <>
-        <SearchForm onSearch={handleSearch} onAdd={onAdd} isAdded={isAdded} favorites={favorites} />
+        <SearchForm
+          onSearch={handleSearch}
+          onAdd={onAdd}
+          isAdded={isAdded}
+          favorites={favorites}
+          single={single}
+        />
         {result !== null && (
           <SearchResults
             results={result.results}
@@ -213,6 +228,7 @@ const searchFactory = config => {
     favorites,
     triggerFactory,
     single,
+    alwaysConfirm,
     onOpen,
     onClose,
   }) => {
@@ -224,16 +240,16 @@ const searchFactory = config => {
     };
 
     const handleAdd = item => {
-      if (single) {
+      if (single && !alwaysConfirm) {
         onAddItems(item);
         setOpen(false);
       } else if (!isAdded(item)) {
-        setStaged(prev => [...prev, item]);
+        setStaged(prev => (single ? [item] : [...prev, item]));
       }
     };
 
     const handleAddButtonClick = () => {
-      onAddItems(staged);
+      onAddItems(single ? staged[0] : staged);
       setStaged([]);
       setOpen(false);
     };
@@ -270,7 +286,7 @@ const searchFactory = config => {
       >
         <Modal.Header>
           {modalTitle(single)}
-          {!!staged.length && (
+          {!single && !!staged.length && (
             <>
               {' '}
               <Popup trigger={<Label circular>{staged.length}</Label>} position="bottom left">
@@ -282,12 +298,23 @@ const searchFactory = config => {
               </Popup>
             </>
           )}
+          {single && alwaysConfirm && !!staged.length && (
+            <>
+              {' '}
+              <Label circular>{staged[0].name}</Label>
+            </>
+          )}
         </Modal.Header>
         <Modal.Content>
-          <SearchContent favorites={favorites} onAdd={handleAdd} isAdded={isAdded} />
+          <SearchContent
+            favorites={favorites}
+            onAdd={handleAdd}
+            isAdded={isAdded}
+            single={single}
+          />
         </Modal.Content>
         <Modal.Actions>
-          {!single && (
+          {(!single || alwaysConfirm) && (
             <Button onClick={handleAddButtonClick} disabled={!staged.length} primary>
               <Translate>Confirm</Translate>
             </Button>
@@ -307,6 +334,7 @@ const searchFactory = config => {
     favorites: PropTypes.object,
     triggerFactory: PropTypes.func,
     single: PropTypes.bool,
+    alwaysConfirm: PropTypes.bool,
     onOpen: PropTypes.func,
     onClose: PropTypes.func,
   };
@@ -316,6 +344,7 @@ const searchFactory = config => {
     disabled: false,
     triggerFactory: null,
     single: false,
+    alwaysConfirm: false,
     onOpen: () => {},
     onClose: () => {},
   };

@@ -49,6 +49,7 @@ function UserImpersonation() {
       favorites={favoriteUsers}
       withExternalUsers={false}
       single
+      alwaysConfirm
     />
   );
 }
