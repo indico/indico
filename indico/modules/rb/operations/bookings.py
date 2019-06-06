@@ -283,7 +283,7 @@ def check_room_available(room, start_dt, end_dt):
     occurrences = get_existing_room_occurrences(room, start_dt, end_dt, allow_overlapping=True)
     prebookings = [occ for occ in occurrences if not occ.reservation.is_accepted]
     bookings = [occ for occ in occurrences if occ.reservation.is_accepted]
-    unbookable_hours = get_rooms_unbookable_hours([room])
+    unbookable_hours = get_rooms_unbookable_hours([room]).get(room.id, [])
     hours_overlap = any(hours for hours in unbookable_hours
                         if overlaps((start_dt.time(), end_dt.time()), (hours.start_time, hours.end_time)))
     nonbookable_periods = any(get_rooms_nonbookable_periods([room], start_dt, end_dt))
