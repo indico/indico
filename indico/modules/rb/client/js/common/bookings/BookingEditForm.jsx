@@ -65,7 +65,7 @@ class BookingEditForm extends React.Component {
       if (today.isAfter(startDt, 'minute')) {
         dates.startDate = serializeDate(today.add(1, 'day'));
       } else {
-        dates.startDate = serializeDate(today);
+        dates.startDate = serializeDate(startDt);
       }
     }
 

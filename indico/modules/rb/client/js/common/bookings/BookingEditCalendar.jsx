@@ -86,7 +86,7 @@ class BookingEditCalendar extends React.Component {
     const {
       calendars: {
         currentBooking: {
-          data: {bookings, pendingCancellations},
+          data: {bookings, pendingCancellations, cancellations, rejections},
         },
       },
       numberOfBookingOccurrences,
@@ -94,7 +94,10 @@ class BookingEditCalendar extends React.Component {
       willBookingSplit,
     } = this.props;
     const numBookingPastOccurrences = willBookingSplit
-      ? Object.keys(bookings).length - Object.keys(pendingCancellations).length
+      ? Object.keys(bookings).length -
+        Object.keys(pendingCancellations).length -
+        Object.keys(cancellations || {}).length -
+        Object.keys(rejections || {}).length
       : null;
 
     return (
