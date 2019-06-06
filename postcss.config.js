@@ -6,8 +6,5 @@
 // LICENSE file for more details.
 
 module.exports = ({options}) => ({
-    plugins: [
-        require('autoprefixer'),
-        require('postcss-url')(options.postCSSURLOptions || {})
-    ]
+  plugins: [require('autoprefixer'), require('postcss-url')(options.postCSSURLOptions || {})],
 });
