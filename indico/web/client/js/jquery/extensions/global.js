@@ -38,7 +38,7 @@ $(document).ready(function() {
    * data-qtip-html attribute instead of the title attribute. */
   $(document).on(
     'mouseenter',
-    '[title]:not([title=""]):not(iframe), [data-qtip-html], [data-qtip-oldtitle]:not(iframe)',
+    '[title]:not([data-no-qtip]):not([title=""]):not(iframe), [data-qtip-html], [data-qtip-oldtitle]:not(iframe)',
     function(evt) {
       var $target = $(this);
       var title = ($target.attr('title') || $target.data('qtip-oldtitle') || '').trim();
