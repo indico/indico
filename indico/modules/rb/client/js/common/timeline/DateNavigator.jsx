@@ -236,7 +236,6 @@ export default class DateNavigator extends React.Component {
         open={datePickerVisible}
         onOpen={this.onOpen}
         onClose={this.onClose}
-        keepInViewPort={false}
         trigger={
           <Button primary disabled={disabled}>
             {mode === 'days' && this.selectedDate.format('L')}
