@@ -282,6 +282,10 @@ const searchFactory = config => {
         centered={false}
         open={open}
         onClose={handleClose}
+        onClick={evt => {
+          // https://github.com/Semantic-Org/Semantic-UI-React/issues/3644
+          evt.stopPropagation();
+        }}
         closeIcon
       >
         <Modal.Header>
