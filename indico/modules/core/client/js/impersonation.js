@@ -22,9 +22,13 @@ async function sendRequest(data) {
   window.location.reload();
 }
 
-function impersonateUser() {
+export function impersonateUser(id) {
+  sendRequest({user_id: id});
+}
+
+function openUserChooser() {
   function _userSelected(users) {
-    sendRequest({user_id: users[0].id});
+    impersonateUser(users[0].id);
   }
 
   const dialog = new ChooseUsersPopup(
@@ -60,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (loginAs) {
     loginAs.addEventListener('click', e => {
       e.preventDefault();
-      impersonateUser();
+      openUserChooser();
     });
   }
 });

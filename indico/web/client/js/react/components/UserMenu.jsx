@@ -18,8 +18,11 @@ import changeLanguage from 'indico-url:core.change_lang';
 
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
+import {impersonateUser} from 'indico/modules/core/impersonation';
+import {UserSearch} from './principals/Search';
 
 import './UserMenu.module.scss';
+import {useFavoriteUsers} from '../hooks';
 
 async function postAndReload(selectedLanguage) {
   try {
@@ -29,6 +32,25 @@ async function postAndReload(selectedLanguage) {
     return;
   }
   location.reload();
+}
+
+function UserImpersonation() {
+  const [favoriteUsers] = useFavoriteUsers();
+
+  return (
+    <UserSearch
+      triggerFactory={({disabled, onClick}) => (
+        <Dropdown.Item onClick={onClick} disabled={disabled}>
+          <Translate>Impersonate user</Translate>
+        </Dropdown.Item>
+      )}
+      existing={[]}
+      onAddItems={({userId}) => impersonateUser(userId)}
+      favorites={favoriteUsers}
+      withExternalUsers={false}
+      single
+    />
+  );
 }
 
 export default function UserMenu({userData, languages}) {
@@ -92,9 +114,12 @@ export default function UserMenu({userData, languages}) {
         </Dropdown.Header>
         <Dropdown.Divider />
         {isAdmin && (
-          <Dropdown.Item as="a" href={adminDashboard()}>
-            <Translate>Administration</Translate>
-          </Dropdown.Item>
+          <>
+            <Dropdown.Item as="a" href={adminDashboard()}>
+              <Translate>Administration</Translate>
+            </Dropdown.Item>
+            <UserImpersonation />
+          </>
         )}
         <Dropdown.Item as="a" href={authLogout()}>
           <Translate>Logout</Translate>
