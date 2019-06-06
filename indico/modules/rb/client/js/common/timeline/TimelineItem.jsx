@@ -135,6 +135,20 @@ class TimelineItem extends React.Component {
     return (segStartMins / ((endHour - startHour) * 60)) * 100;
   };
 
+  renderMessagePopup = (message, segmentStartDt, segmentEndDt) => {
+    const {dayBased} = this.props;
+    return dayBased && !message ? null : (
+      <div styleName="popup-center">
+        {!dayBased && (
+          <div>
+            {segmentStartDt.format('LT')} - {segmentEndDt.format('LT')}
+          </div>
+        )}
+        <div>{message}</div>
+      </div>
+    );
+  };
+
   renderOccurrence = (occurrence, additionalClasses = '', type = '') => {
     let segmentStartDt, segmentEndDt, popupContent;
     const {
@@ -154,7 +168,6 @@ class TimelineItem extends React.Component {
       onClickCandidate,
       onClickReservation,
       room,
-      dayBased,
       actions: {openBookingDetails},
     } = this.props;
     if (type === 'blocking' || type === 'overridable-blocking') {
@@ -256,16 +269,7 @@ class TimelineItem extends React.Component {
           </div>
         );
       }
-      popupContent = (
-        <div styleName="popup-center">
-          {!dayBased && (
-            <div>
-              {segmentStartDt.format('LT')} - {segmentEndDt.format('LT')}
-            </div>
-          )}
-          <div>{popupMessage}</div>
-        </div>
-      );
+      popupContent = this.renderMessagePopup(popupMessage, segmentStartDt, segmentEndDt);
     } else {
       let popupMessage;
       if (reservation) {
@@ -275,16 +279,7 @@ class TimelineItem extends React.Component {
           ? Translate.string('Click to book it')
           : Translate.string('Click to pre-book it');
       }
-      popupContent = (
-        <div styleName="popup-center">
-          {!dayBased && (
-            <div>
-              {segmentStartDt.format('LT')} - {segmentEndDt.format('LT')}
-            </div>
-          )}
-          <div>{popupMessage}</div>
-        </div>
-      );
+      popupContent = this.renderMessagePopup(popupMessage, segmentStartDt, segmentEndDt);
     }
     const clickable =
       (onClickCandidate && bookable && type === 'candidate') ||
@@ -326,6 +321,7 @@ class TimelineItem extends React.Component {
         content={popupContent}
         position="bottom center"
         header={reservation && reservation.bookedForName}
+        disabled={!popupContent}
         hideOnScroll
         hoverable
       />
