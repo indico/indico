@@ -112,7 +112,8 @@ def rewrite_css_urls(event, css):
                 return "url('../../../{}')".format(rewritten_url)
 
     indico_path = url_parse(config.BASE_URL).path
-    return re.sub(_css_url_pattern.format(indico_path), _replace_url, css, flags=re.MULTILINE), used_urls, used_images
+    new_css = re.sub(_css_url_pattern.format(indico_path), _replace_url, css.decode('utf-8'), flags=re.MULTILINE)
+    return new_css.encode('utf-8'), used_urls, used_images
 
 
 def url_to_static_filename(endpoint, url):
