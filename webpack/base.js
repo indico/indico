@@ -352,6 +352,10 @@ export function webpackDefaults(env, config, bundles) {
         new TerserPlugin({
           // XXX: minification breaks angularjs :(
           exclude: /js\/module_events\.registration\.[^.]+\.bundle\.js$/,
+          // default options from webpack
+          cache: true,
+          parallel: true,
+          sourceMap: true,
         }),
       ],
     },
