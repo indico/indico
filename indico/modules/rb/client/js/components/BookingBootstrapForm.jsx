@@ -29,6 +29,8 @@ import {selectors as userSelectors} from '../common/user';
 import {selectors as configSelectors} from '../common/config';
 import {sanitizeRecurrence} from '../util';
 
+import './BookingBootstrapForm.module.scss';
+
 class BookingBootstrapForm extends React.Component {
   static propTypes = {
     onSearch: PropTypes.func.isRequired,
@@ -231,7 +233,7 @@ class BookingBootstrapForm extends React.Component {
     return (
       <Form>
         {showRecurrenceOptions && (
-          <Form.Group inline>
+          <Form.Group inline styleName="booking-type-field">
             {!hideOptions.single && (
               <Form.Radio
                 label={Translate.string('Single booking')}
@@ -262,7 +264,7 @@ class BookingBootstrapForm extends React.Component {
           </Form.Group>
         )}
         {type === 'every' && (
-          <Form.Group inline>
+          <Form.Group inline styleName="recurrence-field">
             <label>{Translate.string('Every')}</label>
             <Form.Input
               type="number"

@@ -11,7 +11,7 @@ import PropTypes from 'prop-types';
 import {Card, Checkbox, Form, Grid} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
 import {Carousel} from 'indico/react/components';
-import {Overridable} from 'indico/react/util';
+import {Overridable, Responsive} from 'indico/react/util';
 
 import {actions as filtersActions} from '../../common/filters';
 import BookingBootstrapForm from '../../components/BookingBootstrapForm';
@@ -139,13 +139,15 @@ export class Landing extends React.Component {
               </Card.Content>
             </Card>
           </Grid.Row>
-          {(!showUpcomingBookings || fetchedUpcomingBookings) && (
-            <Grid.Row styleName="landing-page-lower-row">
-              <div styleName="lower-row">
-                {hasUpcomingBookings ? this.renderCarousel() : <LandingStatistics />}
-              </div>
-            </Grid.Row>
-          )}
+          <Responsive.Desktop andLarger minDeviceHeigth={900}>
+            {(!showUpcomingBookings || fetchedUpcomingBookings) && (
+              <Grid.Row styleName="landing-page-lower-row">
+                <div styleName="lower-row">
+                  {hasUpcomingBookings ? this.renderCarousel() : <LandingStatistics />}
+                </div>
+              </Grid.Row>
+            )}
+          </Responsive.Desktop>
         </Grid>
       </div>
     );

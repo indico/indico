@@ -9,12 +9,68 @@ import contactURL from 'indico-url:core.contact';
 import tosURL from 'indico-url:legal.display_tos';
 import privacyPolicyURL from 'indico-url:legal.display_privacy';
 
+import _ from 'lodash';
 import React, {useState} from 'react';
 import PropTypes from 'prop-types';
-import {Menu, Modal} from 'semantic-ui-react';
+import {Icon, Menu, Modal, Popup} from 'semantic-ui-react';
 import {connect} from 'react-redux';
 import {Translate} from 'indico/react/i18n';
+import {Responsive} from 'indico/react/util';
 import {selectors as configSelectors} from '../common/config';
+
+const buildMenuItems = (helpURL, hasTOS, hasPrivacyPolicy) => {
+  const menuItems = [
+    [
+      'help',
+      {
+        href: helpURL,
+        target: '_blank',
+        rel: 'noopener noreferrer',
+        caption: Translate.string('Help'),
+        icon: 'question',
+      },
+    ],
+    [
+      'contact',
+      {
+        href: contactURL(),
+        modal: true,
+        caption: Translate.string('Contact'),
+        icon: 'at',
+      },
+    ],
+    [
+      'tos',
+      {
+        href: tosURL(),
+        modal: true,
+        target: '_blank',
+        rel: 'noopener noreferrer',
+        caption: Translate.string('Terms and Conditions'),
+        icon: 'file text',
+      },
+    ],
+    [
+      'privacy',
+      {
+        href: privacyPolicyURL(),
+        modal: true,
+        target: '_blank',
+        rel: 'noopener noreferrer',
+        caption: Translate.string('Privacy Policy'),
+        icon: 'eye',
+      },
+    ],
+  ];
+
+  if (!hasTOS) {
+    _.remove(menuItems, ([id]) => id === 'tos');
+  }
+  if (!hasPrivacyPolicy) {
+    _.remove(menuItems, ([id]) => id === 'privacy');
+  }
+  return menuItems;
+};
 
 function SidebarFooter({
   hasTOS,
@@ -24,60 +80,42 @@ function SidebarFooter({
   helpURL,
   contactEmail,
 }) {
-  const [contactVisible, setContactVisible] = useState(false);
-  const [termsVisible, setTermsVisible] = useState(false);
-  const [privacyPolicyVisible, setPrivacyPolicyVisible] = useState(false);
+  const [currentModal, setModal] = useState(null);
+
+  function openModal(e, id) {
+    setModal(id);
+    e.preventDefault();
+  }
+
+  const items = buildMenuItems(helpURL, hasTOS, hasPrivacyPolicy);
 
   return (
     <>
-      {helpURL && (
-        <Menu.Item as="a" href={helpURL} target="_blank" rel="noopener noreferrer">
-          <Translate>Help</Translate>
+      <Responsive.Phone andLarger minHeight={600}>
+        <Menu.Item>
+          {items.map(([id, {href, icon, modal, caption, ...extraProps}]) => (
+            <Popup
+              key={id}
+              inverted
+              position="bottom right"
+              trigger={
+                <a href={href} onClick={modal && (e => openModal(e, id))} {...extraProps}>
+                  <Icon size="large" name={icon} />
+                </a>
+              }
+            >
+              {caption}
+            </Popup>
+          ))}
         </Menu.Item>
-      )}
+      </Responsive.Phone>
       {contactEmail && (
-        <Menu.Item
-          href={contactURL()}
-          onClick={evt => {
-            evt.preventDefault();
-            setContactVisible(true);
-          }}
+        <Modal
+          open={currentModal === 'contact'}
+          size="tiny"
+          closeIcon
+          onClose={() => setModal(null)}
         >
-          <Translate>Contact</Translate>
-        </Menu.Item>
-      )}
-      {(hasTOS || tosHTML) && (
-        <Menu.Item
-          href={tosURL()}
-          target="_blank"
-          rel="noopener noreferrer"
-          onClick={evt => {
-            if (tosHTML) {
-              evt.preventDefault();
-              setTermsVisible(true);
-            }
-          }}
-        >
-          <Translate>Terms and Conditions</Translate>
-        </Menu.Item>
-      )}
-      {(hasPrivacyPolicy || privacyPolicyHTML) && (
-        <Menu.Item
-          href={privacyPolicyURL()}
-          target="_blank"
-          rel="noopener noreferrer"
-          onClick={evt => {
-            if (privacyPolicyHTML) {
-              evt.preventDefault();
-              setPrivacyPolicyVisible(true);
-            }
-          }}
-        >
-          <Translate>Privacy Policy</Translate>
-        </Menu.Item>
-      )}
-      {contactEmail && (
-        <Modal open={contactVisible} size="tiny" closeIcon onClose={() => setContactVisible(false)}>
           <Modal.Header>
             <Translate>Contact</Translate>
           </Modal.Header>
@@ -94,7 +132,7 @@ function SidebarFooter({
         </Modal>
       )}
       {tosHTML && (
-        <Modal open={termsVisible} closeIcon onClose={() => setTermsVisible(false)}>
+        <Modal open={currentModal === 'tos'} closeIcon onClose={() => setModal(null)}>
           <Modal.Header>
             <Translate>Terms and Conditions</Translate>
           </Modal.Header>
@@ -104,7 +142,7 @@ function SidebarFooter({
         </Modal>
       )}
       {privacyPolicyHTML && (
-        <Modal open={privacyPolicyVisible} closeIcon onClose={() => setPrivacyPolicyVisible(false)}>
+        <Modal open={currentModal === 'privacy'} closeIcon onClose={() => setModal(null)}>
           <Modal.Header>
             <Translate>Privacy Policy</Translate>
           </Modal.Header>

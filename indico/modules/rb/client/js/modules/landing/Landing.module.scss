@@ -80,12 +80,17 @@
         transition: max-height 0.25s ease-out;
         margin: 10vh auto auto auto;
 
+        @media (max-width: 599px) {
+            width: 100%;
+            max-height: 100%;
+            margin-top: 1rem;
+        }
         @media (min-width: 600px) {
             min-width: 520px;
         }
 
         @media (max-height: 600px) {
-            margin-top: 10px;
+            margin-top: auto;
         }
 
         .landing-page-card-content {

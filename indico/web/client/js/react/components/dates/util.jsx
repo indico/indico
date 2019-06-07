@@ -7,8 +7,8 @@
 
 import React from 'react';
 
-import {VERTICAL_ORIENTATION} from 'react-dates/constants';
-import Responsive from 'react-responsive';
+import {VERTICAL_ORIENTATION, HORIZONTAL_ORIENTATION} from 'react-dates/constants';
+import {Responsive} from 'indico/react/util';
 
 /**
  * This is a HOC that sets a full-screen layout when the screen is too small.
@@ -18,24 +18,15 @@ export const responsiveReactDates = (Component, props) => {
   const verticalLayout = (
     <Component {...props} withFullScreenPortal orientation={VERTICAL_ORIENTATION} />
   );
+  const horizontalLayout = (
+    <Component {...props} withFullScreenPortal orientation={HORIZONTAL_ORIENTATION} />
+  );
+  const component = <Component {...props} />;
 
   return (
-    <>
-      <Responsive minWidth={600} minHeight={700}>
-        <Component {...props} />
-      </Responsive>
-      {/* Small screens, Portrait */}
-      <Responsive maxWidth={599} maxHeight={699}>
-        {verticalLayout}
-      </Responsive>
-      {/* Landscape */}
-      <Responsive minWidth={600} maxHeight={699}>
-        <Component {...props} withFullScreenPortal />
-      </Responsive>
-      {/* Portrait */}
-      <Responsive maxWidth={599} minHeight={699}>
-        {verticalLayout}
-      </Responsive>
-    </>
+    <Responsive.Tablet andSmaller orElse={component}>
+      <Responsive orientation="portrait">{verticalLayout}</Responsive>
+      <Responsive orientation="landscape">{horizontalLayout}</Responsive>
+    </Responsive.Tablet>
   );
 };
