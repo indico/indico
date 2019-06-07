@@ -20,6 +20,13 @@ a {
     cursor: pointer;
 }
 
+/* SemanticUI overrides for small screens */
+.ui.selection.dropdown {
+    @media (max-width: 599px) {
+        min-width: auto;
+    }
+}
+
 // TODO: move this to Indico-wide file
 .indico-top-bar {
     background-color: $dark-blue;
