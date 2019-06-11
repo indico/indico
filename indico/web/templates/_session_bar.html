@@ -165,19 +165,19 @@
 {% macro _render_language_selector(languages, lightweight=false) %}
     {% if lightweight %}
         <a id="language-selector-link" class="arrow js-dropdown" data-toggle="dropdown">
-            {% trans lang=languages[session.lang] %}My language ({{ lang }}){% endtrans %}
+            {% trans lang=languages[session.lang][0] %}My language ({{ lang }}){% endtrans %}
         </a>
     {% else %}
         <a id="language-selector-link" class="arrow icon-earth i-button js-dropdown" data-toggle="dropdown">
-            {{ languages[session.lang] }}
+            {{ languages[session.lang][0] }}
         </a>
     {% endif %}
     <ul class="dropdown">
-        {% for name, title in languages|dictsort(by='value') %}
+        {% for name, (title, territory) in languages|dictsort(by='value') %}
             <li>
                 {% if name == session.lang %}
                     <a class="disabled" title="{% trans %}This is your current language.{% endtrans %}">
-                        {{- title -}}
+                        {{- title }} ({{ territory }})
                     </a>
                 {% else %}
                     <a data-href="{{ url_for('core.change_lang') }}"
@@ -185,7 +185,7 @@
                        data-params='{{ {'lang': name}|tojson|forceescape }}'
                        data-reload-after
                        data-ajax>
-                        {{ title }}
+                        {{ title }} ({{ territory }})
                     </a>
                 {% endif %}
             </li>

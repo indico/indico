@@ -54,8 +54,8 @@ function UserImpersonation() {
   );
 }
 
-export default function UserMenu({userData, languages}) {
-  if (!userData) {
+export default function UserMenu({userData, languages, hasLoadedConfig, hasLoadedUserInfo}) {
+  if (!userData || !languages || !hasLoadedConfig || !hasLoadedUserInfo) {
     return '';
   }
 
@@ -73,22 +73,26 @@ export default function UserMenu({userData, languages}) {
     </Label>
   );
 
-  const languageSelector = (
-    <Dropdown
-      value={language}
-      selectOnBlur={false}
-      onChange={(_, {value}) => {
-        if (value !== language) {
-          postAndReload(value);
-        }
-      }}
-      options={Object.entries(languages).map(([key, name]) => ({
-        key,
-        text: name,
-        value: key,
-      }))}
-    />
-  );
+  const languageSelector = trigger => {
+    return (
+      <Dropdown
+        floating
+        trigger={trigger}
+        value={language}
+        selectOnBlur={false}
+        onChange={(_, {value}) => {
+          if (value !== language) {
+            postAndReload(value);
+          }
+        }}
+        options={Object.entries(languages).map(([key, [name, territory]]) => ({
+          key,
+          text: `${name} (${territory})`,
+          value: key,
+        }))}
+      />
+    );
+  };
 
   const headerContent = (
     <div>
@@ -98,6 +102,7 @@ export default function UserMenu({userData, languages}) {
     </div>
   );
 
+  const langInfo = languages[language];
   return (
     <Dropdown trigger={avatar} pointing="top right">
       <Dropdown.Menu>
@@ -110,8 +115,11 @@ export default function UserMenu({userData, languages}) {
           <Translate>My Preferences</Translate>
         </Dropdown.Item>
         <Dropdown.Header>
-          <Icon name="globe" />
-          {languageSelector}
+          {languageSelector(
+            <>
+              <Icon name="globe" /> {`${langInfo[0]} (${langInfo[1]})`}
+            </>
+          )}
         </Dropdown.Header>
         <Dropdown.Divider />
         {isAdmin && (
@@ -140,4 +148,6 @@ UserMenu.propTypes = {
     avatarBgColor: PropTypes.string,
   }).isRequired,
   languages: PropTypes.object.isRequired,
+  hasLoadedConfig: PropTypes.bool.isRequired,
+  hasLoadedUserInfo: PropTypes.bool.isRequired,
 };
