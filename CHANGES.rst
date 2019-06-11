@@ -29,6 +29,7 @@ Improvements
 - Allow event managers to override the name format used in the event
   (:issue:`2455`)
 - Add option to not clone venue/room of an event
+- Show territory/country next to the language name (:issue:`3968`)
 
 Bugfixes
 ^^^^^^^^
