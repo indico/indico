@@ -144,7 +144,7 @@ def _get_ignored_package_files_indico():
     output = subprocess.check_output(['git', 'ls-files', '--others', '--ignored', '--exclude-standard', 'indico/'])
     ignored = {line for line in output.splitlines()}
     dist_path = 'indico/web/static/dist/'
-    i18n_re = re.compile(r'^indico/translations/[a-zA-Z_]+/LC_MESSAGES/messages.mo')
+    i18n_re = re.compile(r'^indico/translations/[a-zA-Z_]+/LC_MESSAGES/(?:messages\.mo|messages-react\.json)')
     return {path for path in ignored & files if not path.startswith(dist_path) and not i18n_re.match(path)}
 
 
