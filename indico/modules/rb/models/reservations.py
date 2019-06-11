@@ -6,7 +6,7 @@
 # LICENSE file for more details.
 
 from collections import OrderedDict, defaultdict
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from sqlalchemy import Date, Time
 from sqlalchemy.event import listens_for
@@ -27,12 +27,11 @@ from indico.core.errors import NoReportError
 from indico.modules.rb.models.reservation_edit_logs import ReservationEditLog
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence, ReservationOccurrenceState
 from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
-from indico.modules.rb.models.util import unimplemented
 from indico.modules.rb.notifications.reservations import (notify_cancellation, notify_confirmation, notify_creation,
                                                           notify_modification, notify_rejection, notify_reset_approval)
 from indico.modules.rb.util import rb_is_admin
 from indico.util.date_time import format_date, format_time, now_utc
-from indico.util.i18n import N_, _
+from indico.util.i18n import _
 from indico.util.serializer import Serializer
 from indico.util.string import format_repr, return_ascii, to_unicode
 from indico.util.struct.enum import IndicoEnum
@@ -52,18 +51,18 @@ class RepeatFrequency(int, IndicoEnum):
 
 class RepeatMapping(object):
     mapping = {
-        (RepeatFrequency.NEVER, 0): (N_('Single reservation'),            None, 'none'),
-        (RepeatFrequency.DAY,   1): (N_('Repeat daily'),                  0,    'daily'),
-        (RepeatFrequency.WEEK,  1): (N_('Repeat once a week'),            1,    'weekly'),
-        (RepeatFrequency.WEEK,  2): (N_('Repeat once every two weeks'),   2,    'everyTwoWeeks'),
-        (RepeatFrequency.WEEK,  3): (N_('Repeat once every three weeks'), 3,    'everyThreeWeeks'),
-        (RepeatFrequency.MONTH, 1): (N_('Repeat every month'),            4,    'monthly')
+        (RepeatFrequency.NEVER, 0): ('Single reservation',            None, 'none'),
+        (RepeatFrequency.DAY,   1): ('Repeat daily',                  0,    'daily'),
+        (RepeatFrequency.WEEK,  1): ('Repeat once a week',            1,    'weekly'),
+        (RepeatFrequency.WEEK,  2): ('Repeat once every two weeks',   2,    'everyTwoWeeks'),
+        (RepeatFrequency.WEEK,  3): ('Repeat once every three weeks', 3,    'everyThreeWeeks'),
+        (RepeatFrequency.MONTH, 1): ('Repeat every month',            4,    'monthly')
     }
 
     @classmethod
     def get_message(cls, repeat_frequency, repeat_interval):
         # XXX: move this somewhere else
-        # not translated since it's only used in log messages now
+        # not translated since it's only used in log messages + emails now
         if repeat_frequency == RepeatFrequency.NEVER:
             return u'single booking'
         elif repeat_frequency == RepeatFrequency.DAY:
@@ -74,10 +73,13 @@ class RepeatMapping(object):
             return u'monthly' if repeat_interval == 1 else u'every {} months'.format(repeat_interval)
 
     @classmethod
-    @unimplemented(exceptions=(KeyError,), message=_('Unimplemented repetition pair'))
     def get_short_name(cls, repeat_frequency, repeat_interval):
         # for the API
-        return cls.mapping[(repeat_frequency, repeat_interval)][2]
+        try:
+            return cls.mapping[(repeat_frequency, repeat_interval)][2]
+        except KeyError:
+            # XXX: this is ugly, let's remove it from the API
+            return 'periodically'
 
 
 class ReservationState(int, IndicoEnum):

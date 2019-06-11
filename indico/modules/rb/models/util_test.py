@@ -9,28 +9,12 @@ from datetime import date, datetime, time, timedelta
 
 import pytest
 
-from indico.core.errors import IndicoError
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrenceState
 from indico.modules.rb.models.reservations import RepeatFrequency
-from indico.modules.rb.models.util import unimplemented
 from indico.testing.util import bool_matrix
 
 
 pytest_plugins = 'indico.modules.rb.testing.fixtures'
-
-
-@pytest.mark.parametrize(('raised', 'caught', 'message'), (
-    (RuntimeError, IndicoError, 'foo'),
-    (Exception,    Exception,   'bar'),
-    (ValueError,   ValueError,  'bar')
-))
-def test_unimplemented(raised, caught, message):
-    @unimplemented(RuntimeError, message='foo')
-    def _func():
-        raise raised('bar')
-
-    exc_info = pytest.raises(caught, _func)
-    assert exc_info.value.message == message
 
 
 @pytest.mark.parametrize(

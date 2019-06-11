@@ -8,7 +8,7 @@ has been {% block prebooked_prefix %}{% endblock %}booked for {{ reservation.boo
 {% if reservation.repeat_frequency == RepeatFrequency.NEVER -%}
     on {{ reservation.start_dt | format_date('EEEE dd/MM/yyyy', locale='en_GB') }} from {{ reservation.start_dt | format_time(locale='en_GB') }} to {{ reservation.end_dt | format_time(locale='en_GB') }}.
 {%- else -%}
-    {{ RepeatMapping.get_short_name(reservation.repeat_frequency, reservation.repeat_interval) }} from {{ reservation.start_dt | format_date('EEEE dd/MM/yyyy', locale='en_GB') }} to {{ reservation.end_dt | format_date('EEEE dd/MM/yyyy', locale='en_GB') }} between {{ reservation.start_dt | format_time(locale='en_GB') }} and {{ reservation.end_dt | format_time(locale='en_GB') }}.
+    {{ RepeatMapping.get_message(reservation.repeat_frequency, reservation.repeat_interval) }} from {{ reservation.start_dt | format_date('EEEE dd/MM/yyyy', locale='en_GB') }} to {{ reservation.end_dt | format_date('EEEE dd/MM/yyyy', locale='en_GB') }} between {{ reservation.start_dt | format_time(locale='en_GB') }} and {{ reservation.end_dt | format_time(locale='en_GB') }}.
 {%- endif %}
 Reason: {{ reservation.booking_reason }}
 {%- endblock -%}

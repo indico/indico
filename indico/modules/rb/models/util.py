@@ -5,24 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from datetime import datetime, timedelta
 from functools import wraps
-
-from indico.core.errors import IndicoError
-
-
-def unimplemented(exceptions=(Exception,), message='Unimplemented'):
-    def _unimplemented(func):
-        @wraps(func)
-        def _wrapper(*args, **kw):
-            try:
-                return func(*args, **kw)
-            except exceptions:
-                raise IndicoError(str(message))
-
-        return _wrapper
-
-    return _unimplemented
 
 
 def proxy_to_reservation_if_last_valid_occurrence(f):
