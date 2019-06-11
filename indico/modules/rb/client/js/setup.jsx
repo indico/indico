@@ -60,8 +60,8 @@ export default function setup(overrides = {}, postReducers = []) {
     setupUserMenu(
       document.getElementById('indico-user-menu-container'),
       store,
-      userSelectors.getUserInfo,
-      configSelectors.getLanguages
+      userSelectors,
+      configSelectors
     );
 
     ReactDOM.render(

@@ -66,7 +66,7 @@
     .language-selector {
         position: fixed;
         z-index: 1;
-        top: 0;
+        top: 10px;
         right: 10px;
 
         padding: 0;
@@ -83,7 +83,7 @@
         }
 
         .dropdown {
-            width: 100px;
+            width: 200px;
 
             text-align: left;
         }

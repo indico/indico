@@ -15,14 +15,14 @@
         <div class="header-subtitle">{% trans %}Indico needs just a little bit more data from you...{% endtrans %}</div>
         <div id="language-selector" class="toolbar language-selector">
             <a class="i-button transparent-button borderless icon-earth arrow js-dropdown" data-toggle="dropdown">
-                {{ languages[session.lang] }}
+                {{ languages[session.lang][0] }}
             </a>
             <ul class="dropdown">
-                {% for name, title in languages|dictsort(by='value') %}
+                {% for name, (title, territory) in languages|dictsort(by='value') %}
                     <li>
                         {% if name == session.lang %}
                             <a class="disabled" title="{% trans %}This is your current language.{% endtrans %}">
-                                {{- title -}}
+                                {{- title }} ({{ territory }})
                             </a>
                         {% else %}
                             <a data-href="{{ url_for('core.change_lang') }}"
@@ -30,7 +30,7 @@
                                data-params='{{ {'lang': name}|tojson|forceescape }}'
                                data-reload-after
                                data-ajax>
-                                {{- title -}}
+                                {{- title }} ({{ territory }})
                             </a>
                         {% endif %}
                     </li>
