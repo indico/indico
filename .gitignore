@@ -18,6 +18,7 @@ logging.yaml
 *.mo
 indico/web/static/dist
 url_map.json
+messages-react.json
 
 # fetched external dependencies
 indico/htdocs/*/lib/
