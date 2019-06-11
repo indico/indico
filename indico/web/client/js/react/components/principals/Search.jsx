@@ -274,6 +274,11 @@ const searchFactory = config => {
       <Button type="button" content={buttonTitle} disabled={disabled} onClick={handleOpenClick} />
     );
 
+    const stopPropagation = evt => {
+      // https://github.com/Semantic-Org/Semantic-UI-React/issues/3644
+      evt.stopPropagation();
+    };
+
     return (
       <Modal
         trigger={trigger}
@@ -282,10 +287,8 @@ const searchFactory = config => {
         centered={false}
         open={open}
         onClose={handleClose}
-        onClick={evt => {
-          // https://github.com/Semantic-Org/Semantic-UI-React/issues/3644
-          evt.stopPropagation();
-        }}
+        onClick={stopPropagation}
+        onFocus={stopPropagation}
         closeIcon
       >
         <Modal.Header>
