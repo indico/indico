@@ -87,7 +87,7 @@ export default function UserMenu({userData, languages, hasLoadedConfig, hasLoade
         }}
         options={Object.entries(languages).map(([key, [name, territory]]) => ({
           key,
-          text: `${name} (${territory})`,
+          text: territory ? `${name} (${territory})` : name,
           value: key,
         }))}
       />
@@ -102,7 +102,7 @@ export default function UserMenu({userData, languages, hasLoadedConfig, hasLoade
     </div>
   );
 
-  const langInfo = languages[language];
+  const langInfo = languages[language] || [language, null];
   return (
     <Dropdown trigger={avatar} pointing="top right">
       <Dropdown.Menu>
@@ -117,7 +117,7 @@ export default function UserMenu({userData, languages, hasLoadedConfig, hasLoade
         <Dropdown.Header>
           {languageSelector(
             <>
-              <Icon name="globe" /> {`${langInfo[0]} (${langInfo[1]})`}
+              <Icon name="globe" /> {langInfo[1] ? `${langInfo[0]} (${langInfo[1]})` : langInfo[0]}
             </>
           )}
         </Dropdown.Header>

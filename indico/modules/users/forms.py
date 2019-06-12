@@ -67,7 +67,7 @@ class UserPreferencesForm(IndicoForm):
     def __init__(self, *args, **kwargs):
         super(UserPreferencesForm, self).__init__(*args, **kwargs)
 
-        locales = [(code, '{} ({})'.format(name, territory))
+        locales = [(code, '{} ({})'.format(name, territory) if territory else name)
                    for code, (name, territory) in get_all_locales().iteritems()]
         self.lang.choices = sorted(locales, key=itemgetter(1))
         self.timezone.choices = zip(common_timezones, common_timezones)
