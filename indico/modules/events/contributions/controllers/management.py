@@ -19,7 +19,7 @@ from indico.core.permissions import get_principal_permissions, update_permission
 from indico.legacy.pdfinterface.latex import ContribsToPDF, ContributionBook
 from indico.modules.attachments.controllers.event_package import AttachmentPackageGeneratorMixin
 from indico.modules.events.abstracts.forms import AbstractContentSettingsForm
-from indico.modules.events.abstracts.settings import abstracts_settings
+from indico.modules.events.abstracts.settings import BOASortField, abstracts_settings
 from indico.modules.events.contributions import contribution_settings, get_contrib_field_types
 from indico.modules.events.contributions.clone import ContributionCloner
 from indico.modules.events.contributions.controllers.common import ContributionListMixin
@@ -457,7 +457,28 @@ class RHContributionsExportPDFBook(RHManageContributionsExportActionsBase):
 class RHContributionsExportPDFBookSorted(RHManageContributionsExportActionsBase):
     def _process(self):
         pdf = ContributionBook(self.event, session.user, self.contribs, tz=self.event.timezone,
-                               sort_by='board_number')
+                               sort_by=BOASortField.board_number)
+        return send_file('book-of-abstracts.pdf', pdf.generate(), 'application/pdf')
+
+
+class RHContributionsExportPDFBookSortedSession(RHManageContributionsExportActionsBase):
+    def _process(self):
+        pdf = ContributionBook(self.event, session.user, self.contribs, tz=self.event.timezone,
+                               sort_by=BOASortField.session_board_number)
+        return send_file('book-of-abstracts.pdf', pdf.generate(), 'application/pdf')
+
+
+class RHContributionsExportPDFBookSortedSchedule(RHManageContributionsExportActionsBase):
+    def _process(self):
+        pdf = ContributionBook(self.event, session.user, self.contribs, tz=self.event.timezone,
+                               sort_by=BOASortField.schedule_board_number)
+        return send_file('book-of-abstracts.pdf', pdf.generate(), 'application/pdf')
+
+
+class RHContributionsExportPDFBookSortedAll(RHManageContributionsExportActionsBase):
+    def _process(self):
+        pdf = ContributionBook(self.event, session.user, self.contribs, tz=self.event.timezone,
+                               sort_by=BOASortField.session_schedule_board)
         return send_file('book-of-abstracts.pdf', pdf.generate(), 'application/pdf')
 
 

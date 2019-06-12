@@ -121,6 +121,25 @@
                             </a>
                         </li>
                         <li>
+                            <a href="#" class="icon-file-pdf js-submit-form js-enable-if-checked disabled"
+                               data-href="{{ url_for('.contributions_pdf_export_book_sorted_schedule', event) }}">
+                                {%- trans %}PDF (book of abstracts - sorted by schedule and board number){% endtrans -%}
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="icon-file-pdf js-submit-form js-enable-if-checked disabled"
+                               data-href="{{ url_for('.contributions_pdf_export_book_sorted_session', event) }}">
+                                {%- trans %}PDF (book of abstracts - sorted by session and board number){% endtrans -%}
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="icon-file-pdf js-submit-form js-enable-if-checked disabled"
+                               data-href="{{ url_for('.contributions_pdf_export_book_sorted_all', event) }}">
+                                {%- trans %}PDF (book of abstracts - sorted by session, schedule and board number)
+                                {% endtrans -%}
+                            </a>
+                        </li>
+                        <li>
                             <a href="#" class="icon-file-spreadsheet js-submit-form js-enable-if-checked disabled"
                                data-href="{{ url_for('.contributions_csv_export', event) }}">
                                 {%- trans %}CSV{% endtrans -%}

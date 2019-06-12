@@ -30,6 +30,8 @@ Improvements
   (:issue:`2455`)
 - Add option to not clone venue/room of an event
 - Show territory/country next to the language name (:issue:`3968`)
+- Add more sorting options to book of abstracts (:issue:`3429`, thanks
+  :user:`bpedersen2`)
 
 Bugfixes
 ^^^^^^^^
@@ -50,6 +52,8 @@ Bugfixes
   has been disabled (:issue:`3852`)
 - Correctly handle merging users in the paper reviewing module (:issue:`3895`)
 - Show correct number of registrations in management area (:issue:`3935`)
+- Fix sorting book of abstracts by board number (:issue:`3429`, thanks
+  :user:`bpedersen2`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

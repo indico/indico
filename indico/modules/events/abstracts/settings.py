@@ -17,9 +17,13 @@ from indico.util.struct.enum import RichEnum
 class BOASortField(RichEnum):
     id = 'id'
     abstract_title = 'title'
+    board_number = 'board_number'
+    session_board_number = 'session_board_number'
     session_title = 'session_title'
     speaker = 'speaker'
     schedule = 'schedule'
+    schedule_board_number = 'schedule_board_number'
+    session_schedule_board = 'session_schedule_board'
 
 
 class BOACorrespondingAuthorType(RichEnum):
@@ -31,9 +35,13 @@ class BOACorrespondingAuthorType(RichEnum):
 BOASortField.__titles__ = {
     BOASortField.id: _('ID'),
     BOASortField.abstract_title: _('Abstract title'),
+    BOASortField.board_number: _('Board Number'),
+    BOASortField.session_board_number: _('Session title, Board Number'),
     BOASortField.session_title: _('Session title'),
     BOASortField.speaker: _('Presenter'),
-    BOASortField.schedule: _('Schedule')
+    BOASortField.schedule: _('Schedule'),
+    BOASortField.schedule_board_number: _('Schedule, Board Number'),
+    BOASortField.session_schedule_board: _('Session, Schedule, Board Number')
 }
 
 

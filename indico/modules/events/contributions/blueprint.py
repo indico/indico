@@ -41,6 +41,12 @@ _bp.add_url_rule('/manage/contributions/book.pdf', 'contributions_pdf_export_boo
                  management.RHContributionsExportPDFBook, methods=('POST',))
 _bp.add_url_rule('/manage/contributions/book-sorted.pdf', 'contributions_pdf_export_book_sorted',
                  management.RHContributionsExportPDFBookSorted, methods=('POST',))
+_bp.add_url_rule('/manage/contributions/book-sorted-schedule.pdf', 'contributions_pdf_export_book_sorted_schedule',
+                 management.RHContributionsExportPDFBookSortedSchedule, methods=('POST',))
+_bp.add_url_rule('/manage/contributions/book-sorted-session.pdf', 'contributions_pdf_export_book_sorted_session',
+                 management.RHContributionsExportPDFBookSortedSession, methods=('POST',))
+_bp.add_url_rule('/manage/contributions/book-sorted-all.pdf', 'contributions_pdf_export_book_sorted_all',
+                 management.RHContributionsExportPDFBookSortedAll, methods=('POST',))
 _bp.add_url_rule('/manage/contributions/import', 'contributions_import',
                  management.RHContributionsImportCSV, methods=('GET', 'POST'))
 

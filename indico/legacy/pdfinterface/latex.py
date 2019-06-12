@@ -402,6 +402,15 @@ class ContributionBook(PDFLaTeXBase):
                 if not c.speakers:
                     return True, None
                 return False, speakers[0].get_full_name(last_name_upper=False, abbrev_first_name=False).lower()
+        elif sort_by == BOASortField.board_number:
+            key_func = attrgetter('board_number')
+        elif sort_by == BOASortField.session_board_number:
+            key_func = lambda c: (c.session is None, c.session.title.lower() if c.session else '', c.board_number)
+        elif sort_by == BOASortField.schedule_board_number:
+            key_func = lambda c: (c.start_dt is None, c.start_dt, c.board_number if c.board_number else '')
+        elif sort_by == BOASortField.session_schedule_board:
+            key_func = lambda c: (c.session is None, c.session.title.lower() if c.session else '',
+                                  c.start_dt is None, c.start_dt, c.board_number if c.board_number else '')
         else:
             key_func = attrgetter(mapping.get(sort_by) or 'title')
         return sorted(contribs, key=key_func)
