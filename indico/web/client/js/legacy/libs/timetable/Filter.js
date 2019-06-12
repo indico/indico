@@ -274,8 +274,8 @@ type(
     },
     show: function(show) {
       this.state.set(!this.state.get());
-      if (show) $(this.div.dom).show('slide', {direction: 'down'}, 200);
-      else $(this.div.dom).hide('slide', {direction: 'down'}, 200);
+      if (show) $(this.div.dom).slideDown(200);
+      else $(this.div.dom).slideUp(200);
     },
     toggle: function() {
       this.show(!this.state.get());
