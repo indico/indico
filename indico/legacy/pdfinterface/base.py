@@ -446,7 +446,7 @@ class PDFBase:
         logo = self.event.logo
         imagePath = ""
         if logo:
-            imagePath = create_event_logo_tmp_file(self.event).name
+            imagePath = create_event_logo_tmp_file(self.event)
         if imagePath:
             try:
                 img = PILImage.open(imagePath)

@@ -45,7 +45,8 @@ class PDFLaTeXBase(object):
         # Markdown -> LaTeX renderer
         # safe_mode - strip out all HTML
         md = markdown.Markdown(safe_mode='remove')
-        latex_mdx = mdx_latex.LaTeXExtension(configs={'apply_br'})
+        self.source_dir = tempfile.mkdtemp(prefix='indico-texgen-', dir=config.TEMP_DIR)
+        latex_mdx = mdx_latex.LaTeXExtension(configs={'apply_br': True, 'tmpdir': self.source_dir})
         latex_mdx.extendMarkdown(md, markdown.__dict__)
 
         def _escape_latex_math(string):
@@ -57,7 +58,7 @@ class PDFLaTeXBase(object):
         self._args = {'markdown': _convert_markdown}
 
     def generate(self):
-        latex = LatexRunner(has_toc=self._table_of_contents)
+        latex = LatexRunner(self.source_dir, has_toc=self._table_of_contents)
         return latex.run(self.LATEX_TEMPLATE, **self._args)
 
 
@@ -116,18 +117,19 @@ def _latex_escape(s, ignore_braces=False):
 class LatexRunner(object):
     """Handles the PDF generation from a chosen LaTeX template"""
 
-    def __init__(self, has_toc=False):
+    def __init__(self, source_dir, has_toc=False):
+        self.source_dir = source_dir
         self.has_toc = has_toc
 
     def run_latex(self, source_file, log_file=None):
         pdflatex_cmd = [config.XELATEX_PATH,
                         '-no-shell-escape',
                         '-interaction', 'nonstopmode',
-                        '-output-directory', self._dir,
+                        '-output-directory', self.source_dir,
                         source_file]
 
         try:
-            subprocess.check_call(pdflatex_cmd, stdout=log_file)
+            subprocess.check_call(pdflatex_cmd, stdout=log_file, cwd=self.source_dir)
             Logger.get('pdflatex').debug("PDF created successfully!")
 
         except subprocess.CalledProcessError:
@@ -166,16 +168,15 @@ class LatexRunner(object):
         return template.render(font_dir=font_dir, **kwargs)
 
     def run(self, template_name, **kwargs):
-        self._dir = tempfile.mkdtemp(prefix="indico-texgen-", dir=config.TEMP_DIR)
-        chmod_umask(self._dir, execute=True)
-        source_filename = os.path.join(self._dir, template_name + '.tex')
-        target_filename = os.path.join(self._dir, template_name + '.pdf')
+        chmod_umask(self.source_dir, execute=True)
+        source_filename = os.path.join(self.source_dir, template_name + '.tex')
+        target_filename = os.path.join(self.source_dir, template_name + '.pdf')
 
         source = self._render_template(template_name + '.tex', kwargs)
         with codecs.open(source_filename, 'wb', encoding='utf-8') as f:
             f.write(source)
 
-        log_filename = os.path.join(self._dir, 'output.log')
+        log_filename = os.path.join(self.source_dir, 'output.log')
         log_file = open(log_filename, 'a+')
         try:
             self.run_latex(source_filename, log_file)
@@ -230,7 +231,7 @@ class AbstractToPDF(PDFLaTeXBase):
             'track_class': self._get_track_classification(abstract),
             'contrib_type': self._get_contrib_type(abstract),
         })
-        self._args['logo_img'] = create_event_logo_tmp_file(event).name if event.logo else None
+        self._args['logo_img'] = create_event_logo_tmp_file(event, self.source_dir) if event.logo else None
 
     @staticmethod
     def _get_track_classification(abstract):
@@ -266,7 +267,7 @@ class AbstractsToPDF(PDFLaTeXBase):
             'url': event.short_external_url,
         })
 
-        self._args['logo_img'] = create_event_logo_tmp_file(event).name if event.logo else None
+        self._args['logo_img'] = create_event_logo_tmp_file(event, self.source_dir) if event.logo else None
 
 
 class ConfManagerAbstractToPDF(AbstractToPDF):
@@ -364,7 +365,7 @@ class ContribToPDF(PDFLaTeXBase):
             'tz': timezone(tz or event.timezone),
         })
 
-        self._args['logo_img'] = create_event_logo_tmp_file(event).name if event.logo else None
+        self._args['logo_img'] = create_event_logo_tmp_file(event, self.source_dir) if event.logo else None
 
 
 class ContribsToPDF(PDFLaTeXBase):
@@ -383,7 +384,7 @@ class ContribsToPDF(PDFLaTeXBase):
             'tz': timezone(tz or event.timezone)
         })
 
-        self._args['logo_img'] = create_event_logo_tmp_file(event).name if event.logo else None
+        self._args['logo_img'] = create_event_logo_tmp_file(event, self.source_dir) if event.logo else None
 
 
 class ContributionBook(PDFLaTeXBase):
@@ -440,7 +441,7 @@ class ContributionBook(PDFLaTeXBase):
             'boa_text': boa_settings.get(event, 'extra_text')
         })
 
-        self._args['logo_img'] = create_event_logo_tmp_file(event).name if event.logo else None
+        self._args['logo_img'] = create_event_logo_tmp_file(event, self.source_dir) if event.logo else None
 
 
 class AbstractBook(ContributionBook):

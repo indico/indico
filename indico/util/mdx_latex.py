@@ -72,6 +72,7 @@ Version 2.1: (August 2013)
 
 from __future__ import absolute_import
 
+import os
 import re
 import textwrap
 import xml.dom.minidom
@@ -234,7 +235,7 @@ def latex_render_error(message):
        \end{tcolorbox}""" % message)
 
 
-def latex_render_image(src, alt, strict=False):
+def latex_render_image(src, alt, tmpdir, strict=False):
     """
     Generate LaTeX code that includes an arbitrary image from a URL.
 
@@ -245,6 +246,7 @@ def latex_render_image(src, alt, strict=False):
 
     :param src: source URL of the image
     :param alt: text to use as ``alt="..."``
+    :param tmpdir: the directory where to put any temporary files
     :param strict: whether a faulty URL should break the whole process
     :returns: a ``(latex_code, file_path)`` tuple, containing the LaTeX code
               and path to the temporary image file.
@@ -277,13 +279,13 @@ def latex_render_image(src, alt, strict=False):
                     extension = IMAGE_FORMAT_EXTENSIONS.get(image.format, '.png')
                 except IOError:
                     raise ImageURLException("Cannot read image data. Maybe not an image file?")
-            with NamedTemporaryFile(prefix='indico-latex-', suffix=extension, delete=False) as tempfile:
+            with NamedTemporaryFile(prefix='indico-latex-', suffix=extension, dir=tmpdir, delete=False) as tempfile:
                 tempfile.write(resp.content)
     except ImageURLException as e:
         if strict:
             raise
         else:
-            return (latex_render_error("Could not include image: {}".format(e.message)), None)
+            return latex_render_error("Could not include image: {}".format(e.message)), None
 
     # Using graphicx and ajustbox package for *max width*
     return (textwrap.dedent(r"""
@@ -292,7 +294,7 @@ def latex_render_image(src, alt, strict=False):
           \includegraphics[max width=\linewidth]{%s}
           \caption{%s}
         \end{figure}
-        """ % (tempfile.name, alt)), tempfile.name)
+        """ % (os.path.basename(tempfile.name), alt)), tempfile.name)
 
 
 def makeExtension(configs=None):
@@ -415,7 +417,7 @@ class LaTeXTreeProcessor(markdown.treeprocessors.Treeprocessor):
         elif ournode.tag == 'q':
             buffer += "`%s'" % subcontent.strip()
         elif ournode.tag == 'p':
-            if 'apply_br' in self.configs:
+            if self.configs.get('apply_br', False):
                 subcontent = subcontent.replace('\n', '\\\\\\relax\n')
             buffer += '\n%s\n' % subcontent.strip()
         elif ournode.tag == 'strong':
@@ -436,7 +438,7 @@ class LaTeXTreeProcessor(markdown.treeprocessors.Treeprocessor):
         elif ournode.tag == 'td':
             buffer += '<td>%s</td>' % subcontent
         elif ournode.tag == 'img':
-            buffer += latex_render_image(ournode.get('src'), ournode.get('alt'))[0]
+            buffer += latex_render_image(ournode.get('src'), ournode.get('alt'), tmpdir=self.configs.get('tmpdir'))[0]
         elif ournode.tag == 'a':
             buffer += '<a href=\"%s\">%s</a>' % (ournode.get('href'), subcontent)
         else:
