@@ -195,6 +195,16 @@ class IndicoTranslations(Translations):
 IndicoTranslations().install(unicode=True)
 
 
+def _normalize_lang_code(lang_code):
+    lang_code = lang_code.replace('-', '_')
+    parts = lang_code.split('_')
+    if len(parts) == 1:
+        return lang_code
+    elif len(parts) >= 2:
+        parts[1] = parts[1].upper()
+        return '_'.join(parts)
+
+
 @babel.localeselector
 def set_best_lang(check_session=True):
     """
@@ -213,7 +223,7 @@ def set_best_lang(check_session=True):
         return session.lang
 
     # try to use browser language
-    preferred = [x.replace('-', '_') for x in request.accept_languages.values()]
+    preferred = [_normalize_lang_code(x) for x in request.accept_languages.values()]
     resolved_lang = negotiate_locale(preferred, list(get_all_locales()), aliases=LOCALE_ALIASES)
 
     if not resolved_lang:
