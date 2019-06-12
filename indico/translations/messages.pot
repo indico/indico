@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indico 2.2-dev\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2019-06-04 14:58+0200\n"
+"POT-Creation-Date: 2019-06-12 11:08+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -464,19 +464,19 @@ msgstr ""
 msgid "ID"
 msgstr ""
 
-#: indico/legacy/pdfinterface/latex.py:260
+#: indico/legacy/pdfinterface/latex.py:262
 msgid "Report of Abstracts"
 msgstr ""
 
-#: indico/legacy/pdfinterface/latex.py:284 indico/legacy/pdfinterface/latex.py:287
+#: indico/legacy/pdfinterface/latex.py:286 indico/legacy/pdfinterface/latex.py:289
 msgid "{} (#{}: {})"
 msgstr ""
 
-#: indico/legacy/pdfinterface/latex.py:325
+#: indico/legacy/pdfinterface/latex.py:327
 msgid "Proposed for other tracks: {}"
 msgstr ""
 
-#: indico/legacy/pdfinterface/latex.py:377
+#: indico/legacy/pdfinterface/latex.py:379
 msgid "Report of Contributions"
 msgstr ""
 
@@ -1318,7 +1318,7 @@ msgstr ""
 msgid "Your password has been changed successfully."
 msgstr ""
 
-#: indico/modules/auth/forms.py:28 indico/modules/users/forms.py:80
+#: indico/modules/auth/forms.py:28 indico/modules/users/forms.py:83
 msgid "This email address is already in use."
 msgstr ""
 
@@ -1354,7 +1354,7 @@ msgstr ""
 
 #: indico/modules/auth/forms.py:70 indico/modules/auth/forms.py:75 indico/modules/auth/forms.py:88
 #: indico/modules/auth/forms.py:96 indico/modules/auth/forms.py:111 indico/modules/bootstrap/forms.py:23
-#: indico/modules/core/forms.py:23 indico/modules/users/forms.py:108
+#: indico/modules/core/forms.py:23 indico/modules/users/forms.py:111
 msgid "Email address"
 msgstr ""
 
@@ -1363,13 +1363,13 @@ msgid "Choose the email address you want to verify."
 msgstr ""
 
 #: indico/modules/auth/forms.py:79 indico/modules/events/persons/forms.py:48
-#: indico/modules/events/registration/forms.py:169 indico/modules/users/forms.py:33 indico/modules/users/forms.py:85
+#: indico/modules/events/registration/forms.py:169 indico/modules/users/forms.py:33 indico/modules/users/forms.py:88
 #: indico/modules/users/templates/registration_requests.html:12
 msgid "First name"
 msgstr ""
 
 #: indico/modules/auth/forms.py:80 indico/modules/auth/forms.py:86 indico/modules/events/persons/forms.py:49
-#: indico/modules/users/forms.py:34 indico/modules/users/forms.py:84
+#: indico/modules/users/forms.py:34 indico/modules/users/forms.py:87
 msgid "Family name"
 msgstr ""
 
@@ -1377,7 +1377,7 @@ msgstr ""
 #: indico/modules/events/management/templates/_event_person_list.html:16 indico/modules/events/persons/forms.py:50
 #: indico/modules/events/persons/templates/management/person_list.html:211 indico/modules/events/registration/forms.py:175
 #: indico/modules/events/registration/templates/management/import_registrations.html:17 indico/modules/users/forms.py:35
-#: indico/modules/users/forms.py:87 indico/modules/users/templates/registration_requests.html:14
+#: indico/modules/users/forms.py:90 indico/modules/users/templates/registration_requests.html:14
 msgid "Affiliation"
 msgstr ""
 
@@ -7462,7 +7462,7 @@ msgstr ""
 #: indico/modules/events/registration/templates/management/regform_invite.html:7
 #: indico/modules/events/registration/templates/management/regform_reglist.html:110
 #: indico/modules/events/surveys/templates/management/survey.html:147
-#: indico/modules/groups/templates/_group_members.html:10 indico/modules/users/forms.py:86
+#: indico/modules/groups/templates/_group_members.html:10 indico/modules/users/forms.py:89
 msgid "Email"
 msgstr ""
 
@@ -12800,7 +12800,7 @@ msgstr ""
 msgid "Group name"
 msgstr ""
 
-#: indico/modules/groups/forms.py:23 indico/modules/users/forms.py:88
+#: indico/modules/groups/forms.py:23 indico/modules/users/forms.py:91
 msgid "Exact match"
 msgstr ""
 
@@ -13348,11 +13348,7 @@ msgstr ""
 msgid "Enter the session block name."
 msgstr ""
 
-#: indico/modules/rb/models/reservations.py:77
-msgid "Unimplemented repetition pair"
-msgstr ""
-
-#: indico/modules/rb/models/reservations.py:350 indico/modules/rb/models/reservations.py:672
+#: indico/modules/rb/models/reservations.py:352 indico/modules/rb/models/reservations.py:674
 msgid "Reservation has no valid occurrences"
 msgstr ""
 
@@ -13392,7 +13388,7 @@ msgstr ""
 msgid "recurring"
 msgstr ""
 
-#: indico/modules/users/__init__.py:57 indico/modules/users/forms.py:126 indico/modules/users/templates/admins.html:5
+#: indico/modules/users/__init__.py:57 indico/modules/users/forms.py:129 indico/modules/users/templates/admins.html:5
 msgid "Admins"
 msgstr ""
 
@@ -13578,47 +13574,47 @@ msgstr ""
 msgid "The previewer is used by default for image and text files, but not for PDF files."
 msgstr ""
 
-#: indico/modules/users/forms.py:76
+#: indico/modules/users/forms.py:79
 msgid "Add new email address"
 msgstr ""
 
-#: indico/modules/users/forms.py:89
+#: indico/modules/users/forms.py:92
 msgid "Include deleted"
 msgstr ""
 
-#: indico/modules/users/forms.py:90
+#: indico/modules/users/forms.py:93
 msgid "Include pending"
 msgstr ""
 
-#: indico/modules/users/forms.py:91
+#: indico/modules/users/forms.py:94
 msgid "External"
 msgstr ""
 
-#: indico/modules/users/forms.py:95
+#: indico/modules/users/forms.py:98
 msgid "Source user"
 msgstr ""
 
-#: indico/modules/users/forms.py:96
+#: indico/modules/users/forms.py:99
 msgid "The user that will be merged into the target one"
 msgstr ""
 
-#: indico/modules/users/forms.py:97
+#: indico/modules/users/forms.py:100
 msgid "Target user"
 msgstr ""
 
-#: indico/modules/users/forms.py:98
+#: indico/modules/users/forms.py:101
 msgid "The user that will remain active in the end"
 msgstr ""
 
-#: indico/modules/users/forms.py:102
+#: indico/modules/users/forms.py:105
 msgid "Registration notifications"
 msgstr ""
 
-#: indico/modules/users/forms.py:103
+#: indico/modules/users/forms.py:106
 msgid "Send an email to all administrators whenever someone registers a new local account."
 msgstr ""
 
-#: indico/modules/users/forms.py:110
+#: indico/modules/users/forms.py:113
 msgid "Set login details"
 msgstr ""
 
