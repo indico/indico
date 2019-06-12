@@ -11,6 +11,7 @@ import {bindActionCreators} from 'redux';
 import {Header, List, Popup, Label} from 'semantic-ui-react';
 import {connect} from 'react-redux';
 import {toMoment} from 'indico/utils/date';
+import {Translate} from 'indico/react/i18n';
 import SpriteImage from '../../components/SpriteImage';
 import {actions as bookingActions} from '../../common/bookings';
 
@@ -68,7 +69,9 @@ class UpcomingBookings extends React.PureComponent {
     const {bookings} = this.props;
     return (
       <div>
-        <Header as="h3">Your bookings</Header>
+        <Header as="h3">
+          <Translate>Your bookings</Translate>
+        </Header>
         <List divided horizontal relaxed styleName="upcoming-bookings-list">
           {bookings.map(booking => this.renderCard(booking))}
         </List>
