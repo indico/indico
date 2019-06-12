@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2019-06-19 11:08+0200\n"
+"POT-Creation-Date: 2019-06-19 11:15+0200\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "MIME-Version: 1.0\n"
@@ -1888,6 +1888,10 @@ msgstr ""
 
 #: indico/modules/rb/client/js/modules/landing/LandingStatistics.jsx:23
 msgid "Active booking requests"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/landing/UpcomingBookings.jsx:73
+msgid "Your bookings"
 msgstr ""
 
 #: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:45
