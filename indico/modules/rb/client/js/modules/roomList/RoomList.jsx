@@ -25,6 +25,7 @@ import roomFilterBarFactory from './RoomFilterBar';
 import searchBarFactory from '../../components/SearchBar';
 import CardPlaceholder from '../../components/CardPlaceholder';
 import {BlockingModal} from '../blockings';
+import {BookingExportModal} from '../../common/bookings';
 import {queryStringRules as queryStringSerializer} from '../../common/roomSearch';
 import {mapControllerFactory, selectors as mapSelectors} from '../../common/map';
 import {actions as roomsActions, RoomRenderer} from '../../common/rooms';
@@ -91,7 +92,7 @@ class RoomList extends React.Component {
     }
   }
 
-  closeBlockingModal = () => {
+  closeModal = () => {
     const {pushState} = this.props;
     pushState('/rooms', true);
     this.clearSelectionMode();
@@ -150,6 +151,12 @@ class RoomList extends React.Component {
         onClick: this.setSelectionMode('blocking'),
         icon: 'lock',
       },
+      {
+        text: Translate.string('Export bookings'),
+        value: 'export-bookings',
+        onClick: this.setSelectionMode('export'),
+        icon: 'file excel',
+      },
     ];
 
     return (
@@ -172,6 +179,8 @@ class RoomList extends React.Component {
                           onClick={() => {
                             if (selectionMode === 'blocking') {
                               pushState('/rooms/blocking/create');
+                            } else if (selectionMode === 'export') {
+                              pushState('/rooms/bookings/export');
                             }
                           }}
                           primary
@@ -251,10 +260,15 @@ class RoomList extends React.Component {
             const blocking = {
               blockedRooms: Object.values(selection).map(room => ({room: camelizeKeys(room)})),
             };
-
-            return (
-              <BlockingModal mode="create" blocking={blocking} onClose={this.closeBlockingModal} />
-            );
+            return <BlockingModal mode="create" blocking={blocking} onClose={this.closeModal} />;
+          }}
+        />
+        <Route
+          exact
+          path="/rooms/bookings/export"
+          render={() => {
+            const rooms = Object.values(selection).map(room => ({...room}));
+            return <BookingExportModal rooms={rooms} onClose={this.closeModal} />;
           }}
         />
       </Grid>
