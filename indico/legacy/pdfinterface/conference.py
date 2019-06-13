@@ -311,6 +311,10 @@ class TimeTablePlain(PDFWithTOC):
         sessionDescriptionStyle.fontSize = modifiedFontSize(10.0, self._fontsize)
         self._styles["session_description"] = sessionDescriptionStyle
 
+        contribDescriptionStyle = stylesheet["Normal"]
+        contribDescriptionStyle.fontSize = modifiedFontSize(9.0, self._fontsize)
+        self._styles["contrib_description"] = contribDescriptionStyle
+
         self._styles["table_body"] = stylesheet["Normal"]
 
         convenersStyle = stylesheet["Normal"]
@@ -341,7 +345,6 @@ class TimeTablePlain(PDFWithTOC):
         lt = []
         date = format_time(contrib.start_dt, timezone=self._tz)
         caption = u'[{}] {}'.format(contrib.friendly_id, escape(contrib.title))
-
         if not self._ttPDFFormat.showContribId():
             caption = escape(contrib.title)
         elif self._ttPDFFormat.showLengthContribs():
@@ -671,6 +674,9 @@ class TimeTablePlain(PDFWithTOC):
 
                 p2 = Paragraph(speakers.encode('utf-8'), self._styles["conveners"])
                 res.append(p2)
+                if self._ttPDFFormat.showContribAbstract():
+                    p3 = Paragraph(escape(unicode(contrib.description)), self._styles["contrib_description"])
+                    res.append(p3)
                 if entry == entries[-1]:  # if it is the last one, we do the page break and remove the previous one.
                     res = list(takewhile(lambda x: not isinstance(x, PageBreak), res))
                     if self._ttPDFFormat.showNewPagePerSession():
