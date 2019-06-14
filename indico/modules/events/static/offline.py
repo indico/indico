@@ -192,7 +192,7 @@ class StaticEventCreator(object):
             for sc in contrib.subcontributions:
                 self._add_material(sc, "%s-subcontribution" % sc.friendly_id)
         for session_ in self.event.sessions:
-            if not session.can_access(None):
+            if not session_.can_access(None):
                 continue
             self._add_material(session_, "%s-session" % session_.friendly_id)
 
