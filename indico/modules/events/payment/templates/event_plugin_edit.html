@@ -25,6 +25,8 @@
     {% endcall %}
 {% endif %}
 
+{{ template_hook('event-manage-payment-plugin-before-form', plugin=plugin, event=event) }}
+
 {{ form_header(form) }}
 {{ form_rows(form, widget_attrs=widget_attrs) }}
 {% call form_footer(form) %}
