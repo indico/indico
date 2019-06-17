@@ -1,0 +1,6 @@
+extends:
+  - '../.eslintrc.yml'
+parserOptions:
+  sourceType: script
+env:
+  node: true
