@@ -13,7 +13,22 @@ import PropTypes from 'prop-types';
 import {Translate} from 'indico/react/i18n';
 
 import {FinalDatePeriod} from 'indico/react/components';
+import {FinalRadio} from 'indico/react/forms';
 import FinalRoomSelector from '../../components/RoomSelector';
+
+function validate({format, dates, rooms}) {
+  const errors = {};
+  if (!format) {
+    errors.type = Translate.string('Please choose a file format to export the bookings.');
+  }
+  if (!dates || !Object.values(dates).every(x => x)) {
+    errors.dates = Translate.string('Please choose a valid period.');
+  }
+  if (!rooms || !rooms.length) {
+    errors.rooms = Translate.string('Please choose at least one room to export its bookings.');
+  }
+  return errors;
+}
 
 const BookingExportModal = props => {
   const {rooms, onClose} = props;
@@ -30,11 +45,14 @@ const BookingExportModal = props => {
           <Translate>Export bookings</Translate>
         </Modal.Header>
         <Modal.Content>
-          <Form
-            id="export-bookings"
-            onSubmit={fprops.handleSubmit}
-            success={fprops.submitSucceeded}
-          >
+          <Form id="export-bookings-form" onSubmit={fprops.handleSubmit} success={submitSucceeded}>
+            <h5>
+              <Translate>File format</Translate>
+            </h5>
+            <Form.Group>
+              <FinalRadio name="format" value="csv" label={Translate.string('CSV')} />
+              <FinalRadio name="format" value="xlsx" label={Translate.string('XLSX')} />
+            </Form.Group>
             <FinalDatePeriod name="dates" label={Translate.string('Period')} required allowNull />
             <FinalRoomSelector name="rooms" label={Translate.string('Rooms to export')} required />
           </Form>
@@ -42,7 +60,7 @@ const BookingExportModal = props => {
         <Modal.Actions>
           <Button
             type="submit"
-            form="blocking-form"
+            form="export-bookings-form"
             disabled={submitting || hasValidationErrors || pristine || submitSucceeded}
             loading={submitting}
             primary
@@ -56,9 +74,11 @@ const BookingExportModal = props => {
       </>
     );
   };
+
   return (
     <Modal open onClose={onClose} size="tiny" closeIcon>
       <FinalForm
+        validate={validate}
         onSubmit={handleSubmit}
         render={renderModalContent}
         initialValues={{rooms, dates: null}}
