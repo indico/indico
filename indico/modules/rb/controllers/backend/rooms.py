@@ -106,6 +106,10 @@ class RHSearchRooms(RHRoomBookingBase):
             rooms_ids = [room[0] for room in rooms]
             missing_rooms = [(room.room_id, room.room.full_name) for room in nonoverridable_blocked_rooms
                              if room.room_id not in rooms_ids]
+            if filters.get('favorite'):
+                favorites = {r.id for r in session.user.favorite_rooms if not r.is_deleted}
+                missing_rooms = [(room_id, room_name) for room_id, room_name in missing_rooms
+                                 if room_id in favorites]
             rooms = sorted(rooms + missing_rooms, key=lambda room: natural_sort_key(room[1]))
         return rooms
 
