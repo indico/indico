@@ -5,18 +5,20 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import exportBookingsURL from 'indico-url:rb.export_bookings';
+
 import _ from 'lodash';
 import React from 'react';
-import {bindActionCreators} from 'redux';
-import {connect} from 'react-redux';
 import {Form as FinalForm} from 'react-final-form';
 import {Button, Form, Modal} from 'semantic-ui-react';
 import PropTypes from 'prop-types';
 
 import {Translate} from 'indico/react/i18n';
+import {indicoAxios} from 'indico/utils/axios';
 import {FinalDatePeriod} from 'indico/react/components';
-import {FinalRadio} from 'indico/react/forms';
-import {actions as bookingActions} from '../bookings';
+import {FinalRadio, handleSubmitError, FinalSubmitButton} from 'indico/react/forms';
+import {snakifyKeys} from 'indico/utils/case';
+
 import FinalRoomSelector from '../../components/RoomSelector';
 
 function validate({format, dates, rooms}) {
@@ -33,30 +35,34 @@ function validate({format, dates, rooms}) {
   return errors;
 }
 
-const BookingExportModal = props => {
-  const {
-    rooms,
-    onClose,
-    actions: {exportBookings},
-  } = props;
-
+export default function BookingExportModal({rooms, onClose}) {
   const handleSubmit = async formData => {
-    const rv = await exportBookings(formData);
-    if (rv.error) {
-      return rv.error;
+    const {
+      rooms: selectedRooms,
+      dates: {startDate, endDate},
+      ...rest
+    } = formData;
+    const roomIds = selectedRooms.map(room => room.id);
+    let response;
+    try {
+      response = await indicoAxios.post(
+        exportBookingsURL(),
+        snakifyKeys({roomIds, startDate, endDate, ...rest})
+      );
+    } catch (error) {
+      return handleSubmitError(error);
     }
-    location.href = rv.data.url;
+    location.href = response.data.url;
   };
 
   const renderModalContent = fprops => {
-    const {submitting, hasValidationErrors, pristine, submitSucceeded} = fprops;
     return (
       <>
         <Modal.Header>
           <Translate>Export bookings</Translate>
         </Modal.Header>
         <Modal.Content>
-          <Form id="export-bookings-form" onSubmit={fprops.handleSubmit} success={submitSucceeded}>
+          <Form id="export-bookings-form" onSubmit={fprops.handleSubmit}>
             <h5>
               <Translate>File format</Translate>
             </h5>
@@ -69,15 +75,7 @@ const BookingExportModal = props => {
           </Form>
         </Modal.Content>
         <Modal.Actions>
-          <Button
-            type="submit"
-            form="export-bookings-form"
-            disabled={submitting || hasValidationErrors || pristine || submitSucceeded}
-            loading={submitting}
-            primary
-          >
-            <Translate>Export</Translate>
-          </Button>
+          <FinalSubmitButton label={Translate.string('Export')} form="export-bookings-form" />
           <Button type="button" onClick={onClose}>
             <Translate>Close</Translate>
           </Button>
@@ -103,28 +101,13 @@ const BookingExportModal = props => {
       />
     </Modal>
   );
-};
+}
 
 BookingExportModal.propTypes = {
   rooms: PropTypes.array,
   onClose: PropTypes.func.isRequired,
-  actions: PropTypes.exact({
-    exportBookings: PropTypes.func.isRequired,
-  }).isRequired,
 };
 
 BookingExportModal.defaultProps = {
   rooms: [],
 };
-
-export default connect(
-  null,
-  dispatch => ({
-    actions: bindActionCreators(
-      {
-        exportBookings: bookingActions.exportBookings,
-      },
-      dispatch
-    ),
-  })
-)(BookingExportModal);
