@@ -56,6 +56,7 @@ Bugfixes
 - Show correct number of registrations in management area (:issue:`3935`)
 - Fix sorting book of abstracts by board number (:issue:`3429`, thanks
   :user:`bpedersen2`)
+- Enforce survey submission limit (:issue:`3256`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

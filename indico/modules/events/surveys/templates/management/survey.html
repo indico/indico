@@ -44,6 +44,8 @@
         {% include 'events/surveys/management/survey_actions/active.html' %}
     {% elif survey.state.name == 'finished' %}
         {% include 'events/surveys/management/survey_actions/finished.html' %}
+    {% elif survey.state.name == 'limit_reached' %}
+        {% include 'events/surveys/management/survey_actions/limit_reached.html' %}
     {% endif %}
 
     <div class="action-box">

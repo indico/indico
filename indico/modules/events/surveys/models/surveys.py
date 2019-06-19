@@ -34,6 +34,7 @@ class SurveyState(IndicoEnum):
     active_and_clean = 3
     active_and_answered = 4
     finished = 5
+    limit_reached = 6
 
 
 class Survey(db.Model):
@@ -230,11 +231,15 @@ class Survey(db.Model):
             return SurveyState.not_ready
         if not self.has_started:
             return SurveyState.ready_to_open
+        if self.limit_reached:
+            return SurveyState.limit_reached
         if not self.has_ended:
-            if not self.submissions:
-                return SurveyState.active_and_clean
-            return SurveyState.active_and_answered
+            return SurveyState.active_and_answered if self.submissions else SurveyState.active_and_clean
         return SurveyState.finished
+
+    @property
+    def limit_reached(self):
+        return self.submission_limit is not None and len(self.submissions) >= self.submission_limit
 
     @property
     def start_notification_recipients(self):
@@ -255,12 +260,19 @@ class Survey(db.Model):
 
     @is_active.expression
     def is_active(cls):
-        return ~cls.is_deleted & cls.questions.any() & cls.has_started & ~cls.has_ended
+        submissions = (db.session.query(db.func.count(db.m.SurveySubmission.id))
+                       .filter(db.m.SurveySubmission.survey_id == cls.id)
+                       .correlate(Survey)
+                       .as_scalar())
+        limit_criterion = db.case([(cls.submission_limit.is_(None), True)],
+                                  else_=(submissions < cls.submission_limit))
+        return ~cls.is_deleted & cls.questions.any() & cls.has_started & ~cls.has_ended & limit_criterion
 
     @hybrid_property
     def is_visible(self):
         return (not self.is_deleted and
-                self.state in {SurveyState.active_and_answered, SurveyState.active_and_clean, SurveyState.finished})
+                self.state in {SurveyState.active_and_answered, SurveyState.active_and_clean, SurveyState.finished,
+                               SurveyState.limit_reached})
 
     @is_visible.expression
     def is_visible(cls):
@@ -279,7 +291,7 @@ class Survey(db.Model):
         self.start_dt = now_utc()
 
     def close(self):
-        if self.state not in (SurveyState.active_and_clean, SurveyState.active_and_answered):
+        if self.state not in (SurveyState.active_and_clean, SurveyState.active_and_answered, SurveyState.limit_reached):
             raise IndicoError("Survey can't be closed")
         self.end_dt = now_utc()
 

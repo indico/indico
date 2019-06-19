@@ -1,0 +1,26 @@
+{% extends 'events/surveys/management/survey_actions/active.html' %}
+
+{% block label %}
+    {% trans %}Submission limit reached{% endtrans %}
+{% endblock %}
+
+{% block survey_icon_classes -%}
+    survey-limit-reached
+{%- endblock %}
+
+{% block text %}
+    {%- trans count=survey.submission_limit -%}
+        The limit of {{ count }} submission has been reached.
+    {%- pluralize -%}
+        The limit of {{ count }} submissions has been reached.
+    {%- endtrans -%}
+{% endblock %}
+
+{% block buttons %}
+    {% if not survey.has_ended %}
+        <a href="#" data-href="{{ url_for('.close_survey', survey) }}" data-method="POST"
+           class="i-button highlight">
+            {% trans %}Close now{% endtrans %}
+        </a>
+    {% endif %}
+{% endblock %}
