@@ -222,3 +222,19 @@ def serialize_availability(availability):
                      for k in ('candidates', 'conflicting_candidates', 'pre_bookings', 'bookings', 'conflicts',
                                'pre_conflicts', 'rejections', 'cancellations')})
     return availability
+
+
+def generate_spreadsheet_from_occurrences(occurrences):
+    """Generate spreadsheet data from a given booking occurrence list.
+
+    :param occurrences: The booking occurrences to include in the spreadsheet
+    """
+    headers = ['Room', 'Booking ID', 'Booked for', 'Reason', 'Occurrence start', 'Occurrence end']
+    rows = [{'Room': occ.reservation.room.full_name,
+             'Booking ID': occ.reservation.id,
+             'Booked for': occ.reservation.booked_for_name,
+             'Reason': occ.reservation.booking_reason,
+             'Occurrence start': occ.start_dt,
+             'Occurrence end': occ.end_dt}
+            for occ in occurrences]
+    return headers, rows

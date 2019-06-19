@@ -7,18 +7,21 @@
 
 from __future__ import unicode_literals
 
+import uuid
 from datetime import date, datetime, time
 
 import dateutil
 from flask import jsonify, request, session
-from marshmallow import fields
+from marshmallow import fields, validate
 from marshmallow_enum import EnumField
-from werkzeug.exceptions import BadRequest, Forbidden, NotFound
+from werkzeug.exceptions import Forbidden
 
 from indico.core import signals
 from indico.core.db import db
 from indico.core.db.sqlalchemy.links import LinkType
+from indico.core.db.sqlalchemy.util.queries import db_dates_overlap
 from indico.core.errors import NoReportError
+from indico.legacy.common.cache import GenericCache
 from indico.modules.rb import rb_settings
 from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.controllers.backend.common import search_room_args
@@ -32,15 +35,21 @@ from indico.modules.rb.operations.suggestions import get_suggestions
 from indico.modules.rb.schemas import (create_booking_args, reservation_details_schema,
                                        reservation_linked_object_data_schema, reservation_occurrences_schema,
                                        reservation_user_event_schema)
-from indico.modules.rb.util import (get_linked_object, group_by_occurrence_date, is_booking_start_within_grace_period,
-                                    serialize_availability, serialize_booking_details, serialize_occurrences)
+from indico.modules.rb.util import (generate_spreadsheet_from_occurrences, get_linked_object, group_by_occurrence_date,
+                                    is_booking_start_within_grace_period, serialize_availability,
+                                    serialize_booking_details, serialize_occurrences)
 from indico.util.date_time import now_utc, utc_to_server
 from indico.util.i18n import _
+from indico.util.spreadsheets import send_csv, send_xlsx
 from indico.web.args import use_args, use_kwargs
+from indico.web.flask.util import url_for
 from indico.web.util import ExpectedError
 
 
 NUM_SUGGESTIONS = 5
+
+
+_cache = GenericCache('Rooms')
 
 
 class RHTimeline(RHRoomBookingBase):
@@ -353,3 +362,36 @@ class RHBookingOccurrenceStateActions(RHBookingBase):
         elif self.action == 'cancel':
             self.occurrence.cancel(session.user)
         return jsonify(occurrence=reservation_occurrences_schema.dump(self.occurrence, many=False))
+
+
+class RHBookingExport(RHRoomBookingBase):
+    @use_kwargs({
+        'room_ids': fields.List(fields.Int(), required=True),
+        'start_date': fields.Date(required=True),
+        'end_date': fields.Date(required=True),
+        'format': fields.Str(validate.OneOf({'csv', 'xlsx'}), required=True),
+    })
+    def _process(self, room_ids, start_date, end_date, format):
+        occurrences = (ReservationOccurrence.query
+                       .join(ReservationOccurrence.reservation)
+                       .filter(Reservation.room_id.in_(room_ids),
+                               ReservationOccurrence.is_valid,
+                               db_dates_overlap(ReservationOccurrence,
+                                                'start_dt', datetime.combine(start_date, time()),
+                                                'end_dt', datetime.combine(end_date, time.max)))).all()
+
+        token = unicode(uuid.uuid4())
+        headers, rows = generate_spreadsheet_from_occurrences(occurrences)
+        _cache.set(token, {'headers': headers, 'rows': rows}, time=1800)
+        download_url = url_for('rb.export_bookings_file', format=format, token=token)
+        return jsonify(url=download_url)
+
+
+class RHBookingExportFile(RHRoomBookingBase):
+    def _process(self):
+        data = _cache.get(request.args['token'])
+        file_format = request.view_args['format']
+        if file_format == 'csv':
+            return send_csv('bookings.csv', **data)
+        elif file_format == 'xlsx':
+            return send_xlsx('bookings.xlsx', **data)

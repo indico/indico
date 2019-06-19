@@ -10,9 +10,11 @@ import bookingStateActionsURL from 'indico-url:rb.booking_state_actions';
 import bookingDeleteURL from 'indico-url:rb.delete_booking';
 import bookingUpdateURL from 'indico-url:rb.update_booking';
 import bookingOccurrenceStateActionsURL from 'indico-url:rb.booking_occurrence_state_actions';
+import exportBookingsURL from 'indico-url:rb.export_bookings';
 
 import {indicoAxios} from 'indico/utils/axios';
 import {ajaxAction, submitFormAction} from 'indico/utils/redux';
+import {snakifyKeys} from 'indico/utils/case';
 import {actions as modalActions} from '../../modals';
 
 export const BOOKING_DETAILS_RECEIVED = 'bookings/BOOKING_DETAILS_RECEIVED';
@@ -41,6 +43,10 @@ export const BOOKING_OCCURRENCE_STATE_CHANGE_SUCCESS =
 export const BOOKING_OCCURRENCE_STATE_CHANGE_ERROR =
   'bookings/BOOKING_OCCURRENCE_STATE_CHANGE_ERROR';
 export const BOOKING_OCCURRENCE_STATE_UPDATED = 'bookings/BOOKING_OCCURRENCE_STATE_UPDATED';
+
+export const EXPORT_BOOKINGS_REQUEST = 'bookings/EXPORT_BOOKINGS_REQUEST';
+export const EXPORT_BOOKINGS_SUCCESS = 'bookings/EXPORT_BOOKINGS_SUCCESS';
+export const EXPORT_BOOKINGS_ERROR = 'bookings/EXPORT_BOOKINGS_ERROR';
 
 export function fetchBookingDetails(id) {
   return ajaxAction(
@@ -88,5 +94,21 @@ export function changeBookingOccurrenceState(id, date, action, params = {}) {
     BOOKING_OCCURRENCE_STATE_CHANGE_REQUEST,
     [BOOKING_OCCURRENCE_STATE_UPDATED, BOOKING_OCCURRENCE_STATE_CHANGE_SUCCESS],
     BOOKING_OCCURRENCE_STATE_CHANGE_ERROR
+  );
+}
+
+export function exportBookings(formData) {
+  const {
+    rooms: selectedRooms,
+    dates: {startDate, endDate},
+    ...rest
+  } = formData;
+  const roomIds = selectedRooms.map(room => room.id);
+  return submitFormAction(
+    () =>
+      indicoAxios.post(exportBookingsURL(), snakifyKeys({roomIds, startDate, endDate, ...rest})),
+    EXPORT_BOOKINGS_REQUEST,
+    EXPORT_BOOKINGS_SUCCESS,
+    EXPORT_BOOKINGS_ERROR
   );
 }

@@ -7,13 +7,16 @@
 
 import _ from 'lodash';
 import React from 'react';
+import {bindActionCreators} from 'redux';
+import {connect} from 'react-redux';
 import {Form as FinalForm} from 'react-final-form';
 import {Button, Form, Modal} from 'semantic-ui-react';
 import PropTypes from 'prop-types';
-import {Translate} from 'indico/react/i18n';
 
+import {Translate} from 'indico/react/i18n';
 import {FinalDatePeriod} from 'indico/react/components';
 import {FinalRadio} from 'indico/react/forms';
+import {actions as bookingActions} from '../bookings';
 import FinalRoomSelector from '../../components/RoomSelector';
 
 function validate({format, dates, rooms}) {
@@ -31,10 +34,18 @@ function validate({format, dates, rooms}) {
 }
 
 const BookingExportModal = props => {
-  const {rooms, onClose} = props;
+  const {
+    rooms,
+    onClose,
+    actions: {exportBookings},
+  } = props;
 
   const handleSubmit = async formData => {
-    console.log('submit!', formData);
+    const rv = await exportBookings(formData);
+    if (rv.error) {
+      return rv.error;
+    }
+    location.href = rv.data.url;
   };
 
   const renderModalContent = fprops => {
@@ -97,10 +108,23 @@ const BookingExportModal = props => {
 BookingExportModal.propTypes = {
   rooms: PropTypes.array,
   onClose: PropTypes.func.isRequired,
+  actions: PropTypes.exact({
+    exportBookings: PropTypes.func.isRequired,
+  }).isRequired,
 };
 
 BookingExportModal.defaultProps = {
   rooms: [],
 };
 
-export default BookingExportModal;
+export default connect(
+  null,
+  dispatch => ({
+    actions: bindActionCreators(
+      {
+        exportBookings: bookingActions.exportBookings,
+      },
+      dispatch
+    ),
+  })
+)(BookingExportModal);
