@@ -84,6 +84,14 @@ function chain(...validators) {
   };
 }
 
+function dates() {
+  return value => {
+    if (!value || !Object.values(value).every(x => x)) {
+      return Translate.string('Please choose a valid period.');
+    }
+  };
+}
+
 export default {
   number,
   min,
@@ -94,4 +102,5 @@ export default {
   required,
   optional,
   chain,
+  dates,
 };

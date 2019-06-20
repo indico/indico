@@ -16,21 +16,20 @@ import PropTypes from 'prop-types';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
 import {FinalDatePeriod} from 'indico/react/components';
-import {FinalRadio, handleSubmitError, FinalSubmitButton} from 'indico/react/forms';
 import {snakifyKeys} from 'indico/utils/case';
+import {
+  validators as v,
+  FinalRadio,
+  handleSubmitError,
+  FinalSubmitButton,
+} from 'indico/react/forms';
 
 import FinalRoomSelector from '../../components/RoomSelector';
 
-function validate({format, dates, rooms}) {
+function validate({format}) {
   const errors = {};
   if (!format) {
-    errors.type = Translate.string('Please choose a file format to export the bookings.');
-  }
-  if (!dates || !Object.values(dates).every(x => x)) {
-    errors.dates = Translate.string('Please choose a valid period.');
-  }
-  if (!rooms || !rooms.length) {
-    errors.rooms = Translate.string('Please choose at least one room to export its bookings.');
+    errors.format = Translate.string('Please choose a file format to export the bookings.');
   }
   return errors;
 }
@@ -70,8 +69,23 @@ export default function BookingExportModal({rooms, onClose}) {
               <FinalRadio name="format" value="csv" label={Translate.string('CSV')} />
               <FinalRadio name="format" value="xlsx" label={Translate.string('XLSX')} />
             </Form.Group>
-            <FinalDatePeriod name="dates" label={Translate.string('Period')} required allowNull />
-            <FinalRoomSelector name="rooms" label={Translate.string('Rooms to export')} required />
+            <FinalDatePeriod
+              name="dates"
+              label={Translate.string('Period')}
+              validate={v.dates()}
+              required
+              allowNull
+            />
+            <FinalRoomSelector
+              name="rooms"
+              label={Translate.string('Rooms to export')}
+              validate={val => {
+                if (!val || !val.length) {
+                  return Translate.string('Please choose at least one room.');
+                }
+              }}
+              required
+            />
           </Form>
         </Modal.Content>
         <Modal.Actions>
@@ -92,22 +106,13 @@ export default function BookingExportModal({rooms, onClose}) {
         render={renderModalContent}
         initialValues={{rooms, dates: null}}
         initialValuesEqual={_.isEqual}
-        subscription={{
-          submitting: true,
-          hasValidationErrors: true,
-          pristine: true,
-          submitSucceeded: true,
-        }}
+        subsciption={{}}
       />
     </Modal>
   );
 }
 
 BookingExportModal.propTypes = {
-  rooms: PropTypes.array,
+  rooms: PropTypes.array.isRequired,
   onClose: PropTypes.func.isRequired,
-};
-
-BookingExportModal.defaultProps = {
-  rooms: [],
 };
