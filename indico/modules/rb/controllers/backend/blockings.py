@@ -9,7 +9,6 @@ from __future__ import unicode_literals
 
 from flask import jsonify, request, session
 from webargs import fields
-from webargs.flaskparser import use_args, use_kwargs
 from werkzeug.exceptions import Forbidden
 
 from indico.core.db import db
@@ -19,6 +18,7 @@ from indico.modules.rb.models.blockings import Blocking
 from indico.modules.rb.operations.blockings import create_blocking, get_room_blockings, update_blocking
 from indico.modules.rb.schemas import blockings_schema
 from indico.util.marshmallow import PrincipalList
+from indico.web.args import use_args, use_kwargs
 
 
 class RHCreateRoomBlocking(RHRoomBookingBase):

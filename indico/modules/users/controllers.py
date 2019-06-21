@@ -18,7 +18,6 @@ from marshmallow import fields
 from sqlalchemy.orm import joinedload, load_only, subqueryload, undefer
 from sqlalchemy.orm.exc import StaleDataError
 from webargs import validate
-from webargs.flaskparser import use_kwargs
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from indico.core import signals
@@ -48,6 +47,7 @@ from indico.util.i18n import _
 from indico.util.marshmallow import validate_with_message
 from indico.util.signals import values_from_signal
 from indico.util.string import make_unique_token
+from indico.web.args import use_kwargs
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults

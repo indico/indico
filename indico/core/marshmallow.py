@@ -21,6 +21,7 @@ from webargs.flaskparser import parser as webargs_flask_parser
 
 from indico.core import signals
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
+from indico.web.args import parser as indico_webargs_flask_parser
 
 
 mm = Marshmallow()
@@ -109,4 +110,5 @@ class IndicoModelSchema(MSQLAModelSchema, IndicoSchema):
 
 mm.Schema = IndicoSchema
 mm.ModelSchema = IndicoModelSchema
-webargs_flask_parser.schema_class = IndicoSchema
+webargs_flask_parser.schema_class = IndicoSchema  # just in case someone uses the wrong import
+indico_webargs_flask_parser.schema_class = IndicoSchema

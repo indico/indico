@@ -10,10 +10,8 @@ from __future__ import unicode_literals
 from operator import attrgetter
 
 from flask import flash, jsonify, redirect, request
-from marshmallow import validate
 from sqlalchemy.orm import joinedload
 from webargs import fields
-from webargs.flaskparser import use_kwargs
 from werkzeug.exceptions import NotFound
 
 from indico.core.auth import multipass
@@ -26,6 +24,7 @@ from indico.modules.groups.util import serialize_group
 from indico.modules.groups.views import WPGroupsAdmin
 from indico.modules.users import User
 from indico.util.i18n import _
+from indico.web.args import use_kwargs
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults

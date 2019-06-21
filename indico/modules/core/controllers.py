@@ -16,7 +16,6 @@ from packaging.version import Version
 from pkg_resources import DistributionNotFound, get_distribution
 from pytz import common_timezones_set
 from webargs import fields
-from webargs.flaskparser import use_kwargs
 from werkzeug.exceptions import NotFound, ServiceUnavailable
 from werkzeug.urls import url_join, url_parse
 
@@ -35,6 +34,7 @@ from indico.modules.core.views import WPContact, WPSettings
 from indico.util.i18n import _, get_all_locales
 from indico.util.marshmallow import PrincipalList
 from indico.util.user import principal_from_identifier
+from indico.web.args import use_kwargs
 from indico.web.errors import load_error_data
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for

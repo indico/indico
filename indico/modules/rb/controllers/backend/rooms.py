@@ -13,7 +13,6 @@ from io import BytesIO
 from flask import jsonify, request, session
 from sqlalchemy.orm import subqueryload
 from webargs import fields
-from webargs.flaskparser import use_args, use_kwargs
 from werkzeug.exceptions import NotFound, UnprocessableEntity
 
 from indico.core.db import db
@@ -31,6 +30,7 @@ from indico.modules.rb.util import rb_is_admin
 from indico.util.caching import memoize_redis
 from indico.util.marshmallow import NaiveDateTime
 from indico.util.string import natural_sort_key
+from indico.web.args import use_args, use_kwargs
 from indico.web.flask.util import send_file
 
 

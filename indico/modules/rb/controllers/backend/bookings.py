@@ -13,7 +13,6 @@ import dateutil
 from flask import jsonify, request, session
 from marshmallow import fields
 from marshmallow_enum import EnumField
-from webargs.flaskparser import use_args, use_kwargs
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from indico.core import signals
@@ -37,6 +36,7 @@ from indico.modules.rb.util import (get_linked_object, group_by_occurrence_date,
                                     serialize_availability, serialize_booking_details, serialize_occurrences)
 from indico.util.date_time import now_utc, utc_to_server
 from indico.util.i18n import _
+from indico.web.args import use_args, use_kwargs
 from indico.web.util import ExpectedError
 
 

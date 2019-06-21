@@ -14,7 +14,7 @@ from marshmallow import missing, validate
 from marshmallow_enum import EnumField
 from sqlalchemy.orm import joinedload
 from webargs import fields
-from webargs.flaskparser import abort, use_args, use_kwargs
+from webargs.flaskparser import abort
 from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.core.db import db
@@ -42,6 +42,7 @@ from indico.modules.rb.util import (build_rooms_spritesheet, get_resized_room_ph
                                     remove_room_spritesheet_photo)
 from indico.util.i18n import _
 from indico.util.marshmallow import ModelList, Principal, PrincipalList, PrincipalPermissionList
+from indico.web.args import use_args, use_kwargs
 from indico.web.flask.util import send_file
 from indico.web.util import ExpectedError
 

@@ -11,7 +11,6 @@ from flask import flash, jsonify, redirect, render_template, request, session
 from itsdangerous import BadData, BadSignature
 from markupsafe import Markup
 from webargs import fields
-from webargs.flaskparser import use_kwargs
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from indico.core import signals
@@ -31,6 +30,7 @@ from indico.modules.users import User
 from indico.modules.users.controllers import RHUserBase
 from indico.util.i18n import _
 from indico.util.signing import secure_serializer
+from indico.web.args import use_kwargs
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults, IndicoForm
