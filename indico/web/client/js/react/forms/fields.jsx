@@ -9,7 +9,7 @@ import _ from 'lodash';
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Checkbox, Dropdown, Form, Input, Popup, Radio, TextArea} from 'semantic-ui-react';
-import {Field, FormSpy} from 'react-final-form';
+import {Field, FormSpy, useField} from 'react-final-form';
 import {OnChange} from 'react-final-form-listeners';
 import formatters from './formatters';
 import parsers from './parsers';
@@ -20,7 +20,7 @@ import './fields.module.scss';
 const identity = v => v;
 
 export function FormFieldAdapter({
-  input,
+  input: {value, ...input},
   label,
   placeholder,
   required,
@@ -31,6 +31,7 @@ export function FormFieldAdapter({
   fieldProps,
   hideValidationError,
   hideErrorWhileActive,
+  undefinedValue,
   meta: {touched, error, submitError, submitting, dirty, dirtySinceLastSubmit, active},
   as: Component,
   getValue,
@@ -72,6 +73,7 @@ export function FormFieldAdapter({
       {label && <label>{label}</label>}
       <Component
         {...input}
+        value={value === undefined ? undefinedValue : value}
         {...props}
         onChange={handleChange}
         label={componentLabel}
@@ -96,6 +98,7 @@ FormFieldAdapter.propTypes = {
   required: PropTypes.bool,
   hideValidationError: PropTypes.bool,
   hideErrorWhileActive: PropTypes.bool,
+  undefinedValue: PropTypes.any,
   label: PropTypes.string,
   componentLabel: PropTypes.oneOfType([
     PropTypes.string,
@@ -115,6 +118,7 @@ FormFieldAdapter.defaultProps = {
   required: false,
   hideValidationError: false,
   hideErrorWhileActive: false,
+  undefinedValue: '',
   placeholder: null,
   label: null,
   componentLabel: null,
@@ -140,13 +144,36 @@ RadioAdapter.propTypes = {
 
 function CheckboxAdapter(props) {
   const {
-    input: {value, ...input},
+    input: {value: valueProp, ...input},
     // eslint-disable-next-line react/prop-types
     type, // unused, just don't pass it along with the ...rest
     ...rest
   } = props;
+  const {
+    input: {value: currentValue},
+  } = useField(input.name);
   return (
-    <FormFieldAdapter input={input} {...rest} as={Checkbox} getValue={(__, {checked}) => checked} />
+    <FormFieldAdapter
+      input={input}
+      {...rest}
+      as={Checkbox}
+      getValue={(__, {checked}) => {
+        // XXX: check for bool because of https://github.com/final-form/react-final-form/issues/543
+        if (valueProp === undefined || typeof valueProp === 'boolean') {
+          // just a simple boolean field
+          return checked;
+        } else if (checked) {
+          // add value to current array value
+          return Array.isArray(currentValue) ? currentValue.concat(valueProp).sort() : [valueProp];
+        } else {
+          // remove value from current array value
+          if (!Array.isArray(currentValue)) {
+            return currentValue;
+          }
+          return currentValue.filter(x => x !== valueProp).sort();
+        }
+      }}
+    />
   );
 }
 
@@ -155,14 +182,16 @@ CheckboxAdapter.propTypes = {
 };
 
 function DropdownAdapter(props) {
-  const {input, required, clearable, ...rest} = props;
+  const {input, required, clearable, isMultiple, ...rest} = props;
   return (
     <FormFieldAdapter
       input={input}
       {...rest}
       required={required}
       as={Dropdown}
-      clearable={clearable === undefined ? !required : clearable}
+      clearable={clearable === undefined ? !required && !isMultiple : clearable}
+      multiple={isMultiple}
+      undefinedValue={isMultiple ? [] : null}
       selectOnBlur={false}
       getValue={(__, {value}) => value}
     />
@@ -173,11 +202,13 @@ DropdownAdapter.propTypes = {
   input: PropTypes.object.isRequired,
   required: PropTypes.bool,
   clearable: PropTypes.bool,
+  isMultiple: PropTypes.bool,
 };
 
 DropdownAdapter.defaultProps = {
   required: false,
   clearable: undefined,
+  isMultiple: false,
 };
 
 /**
@@ -246,9 +277,7 @@ export function FinalInput({name, label, type, nullIfEmpty, noAutoComplete, ...r
   } else if (type === 'text' || type === 'email') {
     extraProps.format = formatters.trim;
     extraProps.formatOnBlur = true;
-    if (nullIfEmpty) {
-      extraProps.parse = parsers.nullIfEmpty;
-    }
+    extraProps.parse = nullIfEmpty ? parsers.nullIfEmpty : identity;
   }
 
   if (noAutoComplete) {
@@ -314,6 +343,7 @@ export function FinalCheckbox({name, label, ...rest}) {
     <FinalField
       name={name}
       adapter={CheckboxAdapter}
+      format={v => v}
       type="checkbox"
       componentLabel={label}
       {...rest}
@@ -343,19 +373,30 @@ FinalRadio.propTypes = {
 /**
  * Like `FinalField` but for a checkbox.
  */
-export function FinalDropdown({name, label, ...rest}) {
+export function FinalDropdown({name, label, multiple, ...rest}) {
   return (
-    <FinalField name={name} adapter={DropdownAdapter} label={label} parse={identity} {...rest} />
+    <FinalField
+      name={name}
+      adapter={DropdownAdapter}
+      label={label}
+      format={identity}
+      parse={identity}
+      // https://github.com/final-form/react-final-form/issues/544
+      isMultiple={multiple}
+      {...rest}
+    />
   );
 }
 
 FinalDropdown.propTypes = {
   name: PropTypes.string.isRequired,
   label: PropTypes.string,
+  multiple: PropTypes.bool,
 };
 
 FinalDropdown.defaultProps = {
   label: null,
+  multiple: false,
 };
 
 /**
