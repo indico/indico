@@ -12,7 +12,7 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 
 import {Translate, Param} from 'indico/react/i18n';
-import {Overridable} from 'indico/react/util';
+import {Overridable, Responsive} from 'indico/react/util';
 
 import CapacityForm from './filters/CapacityForm';
 import EquipmentForm from './filters/EquipmentForm';
@@ -127,10 +127,15 @@ export class RoomFilterBarBase extends React.Component {
     } = this.props;
     const hideShowOnlyForm =
       hideOptions.favorites && !hasOwnedRooms && !onlyMine && !showOnlyAuthorizedFilter;
+    const responsiveTitle = (title, orElse) => (
+      <Responsive.Tablet andLarger orElse={orElse}>
+        {title}
+      </Responsive.Tablet>
+    );
     const equipmentFilter = (!!equipmentTypes.length || !!availableFeatures.length) && (
       <FilterDropdownFactory
         name="equipment"
-        title={<Translate>Equipment</Translate>}
+        title={responsiveTitle(Translate.string('Equipment'), <Icon name="film" />)}
         form={(values, setParentField) => (
           <EquipmentForm
             setParentField={setParentField}
@@ -155,7 +160,7 @@ export class RoomFilterBarBase extends React.Component {
           {!hideOptions.building && (
             <FilterDropdownFactory
               name="building"
-              title={<Translate>Building</Translate>}
+              title={responsiveTitle(Translate.string('Building'), <Icon name="building" />)}
               form={({building: selectedBuilding}, setParentField) => (
                 <BuildingForm
                   setParentField={setParentField}
@@ -172,7 +177,7 @@ export class RoomFilterBarBase extends React.Component {
           {!hideOptions.capacity && (
             <FilterDropdownFactory
               name="capacity"
-              title={<Translate>Min. Capacity</Translate>}
+              title={responsiveTitle(Translate.string('Min. Capacity'), <Icon name="users" />)}
               form={({capacity: selectedCapacity}, setParentField) => (
                 <CapacityForm setParentField={setParentField} capacity={selectedCapacity} />
               )}
@@ -192,7 +197,7 @@ export class RoomFilterBarBase extends React.Component {
           {!hideShowOnlyForm && (
             <FilterDropdownFactory
               name="room-different"
-              title={<Translate>Show only...</Translate>}
+              title={responsiveTitle(Translate.string('Show only...'), '...')}
               form={(data, setParentField) => (
                 <ShowOnlyForm
                   {...data}
