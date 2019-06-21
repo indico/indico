@@ -51,6 +51,7 @@ class EquipmentList extends React.Component {
           onBlur={onBlur}
           disabled={options.length === 0}
           selectOnBlur={false}
+          value={null}
           onChange={(event, values) => {
             onChange([...value, values.value]);
           }}

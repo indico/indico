@@ -739,6 +739,7 @@ class RoomEditModal extends React.Component {
                 search
                 disabled={options.length === 0}
                 selectOnBlur={false}
+                value={null}
                 onChange={(__, {value: name}) => {
                   fields.push({value: null, name});
                 }}
