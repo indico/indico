@@ -825,7 +825,7 @@ class RoomEditModal extends React.Component {
       case 'checkbox':
         return <FinalCheckbox key={key} name={content.name} label={content.label} />;
       case 'textarea':
-        return <FinalTextArea key={key} name={content.name} label={content.label} parse={null} />;
+        return <FinalTextArea key={key} name={content.name} label={content.label} />;
       case 'emails':
         return <FinalEmailList key={key} name={content.name} label={content.label} />;
       case 'photo':

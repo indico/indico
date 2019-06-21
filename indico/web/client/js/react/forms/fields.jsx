@@ -17,6 +17,8 @@ import validators from './validators';
 
 import './fields.module.scss';
 
+const identity = v => v;
+
 export function FormFieldAdapter({
   input,
   label,
@@ -287,7 +289,7 @@ export function FinalTextArea({name, label, nullIfEmpty, ...rest}) {
       component={TextArea}
       format={formatters.trim}
       formatOnBlur
-      parse={nullIfEmpty ? parsers.nullIfEmpty : null}
+      parse={nullIfEmpty ? parsers.nullIfEmpty : identity}
       {...rest}
     />
   );
@@ -342,7 +344,9 @@ FinalRadio.propTypes = {
  * Like `FinalField` but for a checkbox.
  */
 export function FinalDropdown({name, label, ...rest}) {
-  return <FinalField name={name} adapter={DropdownAdapter} label={label} parse={null} {...rest} />;
+  return (
+    <FinalField name={name} adapter={DropdownAdapter} label={label} parse={identity} {...rest} />
+  );
 }
 
 FinalDropdown.propTypes = {
