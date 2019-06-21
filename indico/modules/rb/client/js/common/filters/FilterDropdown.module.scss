@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 @import 'rb:styles/palette';
+@import 'rb:styles/responsive';
 
 .filter-dropdown {
     .filter-dropdown-actions {
@@ -16,6 +17,11 @@
 :global(.ui.button).filter-dropdown-button {
     position: relative;
     transition: width 0.15s ease-out;
+
+    @media (max-width: $tablet-width) {
+        padding-left: 1em;
+        padding-right: 1em;
+    }
 
     > :global(i.icon.angle.down) {
         padding-left: 1em;
