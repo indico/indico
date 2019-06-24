@@ -18,6 +18,7 @@ import validators from './validators';
 import './fields.module.scss';
 
 const identity = v => v;
+const unsortedArraysEqual = (a, b) => _.isEqual((a || []).sort(), (b || []).sort());
 
 export function FormFieldAdapter({
   input: {value, ...input},
@@ -325,7 +326,11 @@ FinalTextArea.defaultProps = {
 /**
  * Like `FinalField` but for a checkbox.
  */
-export function FinalCheckbox({name, label, ...rest}) {
+export function FinalCheckbox({name, label, value, ...rest}) {
+  const extraProps = {};
+  if (value !== undefined) {
+    extraProps.isEqual = unsortedArraysEqual;
+  }
   return (
     <FinalField
       name={name}
@@ -333,6 +338,8 @@ export function FinalCheckbox({name, label, ...rest}) {
       format={v => v}
       type="checkbox"
       componentLabel={label}
+      value={value}
+      {...extraProps}
       {...rest}
     />
   );
@@ -341,6 +348,11 @@ export function FinalCheckbox({name, label, ...rest}) {
 FinalCheckbox.propTypes = {
   name: PropTypes.string.isRequired,
   label: PropTypes.string.isRequired,
+  value: PropTypes.string,
+};
+
+FinalCheckbox.defaultProps = {
+  value: undefined,
 };
 
 /**
@@ -361,6 +373,10 @@ FinalRadio.propTypes = {
  * Like `FinalField` but for a checkbox.
  */
 export function FinalDropdown({name, label, multiple, ...rest}) {
+  const extraProps = {};
+  if (multiple) {
+    extraProps.isEqual = unsortedArraysEqual;
+  }
   return (
     <FinalField
       name={name}
@@ -370,6 +386,7 @@ export function FinalDropdown({name, label, multiple, ...rest}) {
       parse={identity}
       // https://github.com/final-form/react-final-form/issues/544
       isMultiple={multiple}
+      {...extraProps}
       {...rest}
     />
   );
