@@ -9,7 +9,7 @@ import _ from 'lodash';
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Checkbox, Dropdown, Form, Input, Popup, Radio, TextArea} from 'semantic-ui-react';
-import {Field, FormSpy, useField} from 'react-final-form';
+import {Field, FormSpy} from 'react-final-form';
 import {OnChange} from 'react-final-form-listeners';
 import formatters from './formatters';
 import parsers from './parsers';
@@ -144,34 +144,21 @@ RadioAdapter.propTypes = {
 
 function CheckboxAdapter(props) {
   const {
-    input: {value: valueProp, ...input},
+    input: {value, ...input},
     // eslint-disable-next-line react/prop-types
     type, // unused, just don't pass it along with the ...rest
     ...rest
   } = props;
-  const {
-    input: {value: currentValue},
-  } = useField(input.name);
   return (
     <FormFieldAdapter
       input={input}
       {...rest}
       as={Checkbox}
       getValue={(__, {checked}) => {
-        // XXX: check for bool because of https://github.com/final-form/react-final-form/issues/543
-        if (valueProp === undefined || typeof valueProp === 'boolean') {
-          // just a simple boolean field
-          return checked;
-        } else if (checked) {
-          // add value to current array value
-          return Array.isArray(currentValue) ? currentValue.concat(valueProp).sort() : [valueProp];
-        } else {
-          // remove value from current array value
-          if (!Array.isArray(currentValue)) {
-            return currentValue;
-          }
-          return currentValue.filter(x => x !== valueProp).sort();
-        }
+        // https://github.com/final-form/react-final-form/issues/543#issuecomment-504986394
+        // we provide a fake event object which will be handled by the `input.onChange()`
+        // handler inside by react-final-form
+        return {target: {type: 'checkbox', value, checked}};
       }}
     />
   );
