@@ -41,7 +41,9 @@ const renderEquipment = ({equipment, features}) => {
   }
   return (
     <>
-      <Translate>Equipment</Translate>
+      <Responsive.Tablet andLarger orElse={<Icon name="wrench" />}>
+        <Translate>Equipment</Translate>
+      </Responsive.Tablet>
       <Label circular horizontal className="white" size="tiny" styleName="filter-bar-button-label">
         {count}
       </Label>
@@ -57,9 +59,11 @@ const renderBuilding = ({building}) => {
   return (
     <>
       <Icon name="building" />
-      <Translate>
-        Building <Param name="building" value={building} />
-      </Translate>
+      <Responsive.Tablet andLarger orElse={building}>
+        <Translate>
+          Building <Param name="building" value={building} />
+        </Translate>
+      </Responsive.Tablet>
     </>
   );
 };
@@ -135,7 +139,7 @@ export class RoomFilterBarBase extends React.Component {
     const equipmentFilter = (!!equipmentTypes.length || !!availableFeatures.length) && (
       <FilterDropdownFactory
         name="equipment"
-        title={responsiveTitle(Translate.string('Equipment'), <Icon name="film" />)}
+        title={responsiveTitle(Translate.string('Equipment'), <Icon name="wrench" />)}
         form={(values, setParentField) => (
           <EquipmentForm
             setParentField={setParentField}
@@ -177,7 +181,7 @@ export class RoomFilterBarBase extends React.Component {
           {!hideOptions.capacity && (
             <FilterDropdownFactory
               name="capacity"
-              title={responsiveTitle(Translate.string('Min. Capacity'), <Icon name="users" />)}
+              title={responsiveTitle(Translate.string('Min. Capacity'), <Icon name="user" />)}
               form={({capacity: selectedCapacity}, setParentField) => (
                 <CapacityForm setParentField={setParentField} capacity={selectedCapacity} />
               )}
