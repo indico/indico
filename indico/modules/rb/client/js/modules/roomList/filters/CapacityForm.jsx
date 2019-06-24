@@ -9,6 +9,8 @@ import React from 'react';
 
 import {Icon, Input} from 'semantic-ui-react';
 
+import {Translate} from 'indico/react/i18n';
+
 import {FilterFormComponent} from '../../../common/filters';
 
 import './CapacityForm.module.scss';
@@ -30,6 +32,7 @@ export default class CapacityForm extends FilterFormComponent {
       <div styleName="capacity-form">
         <Input
           type="number"
+          placeholder={Translate.string('Min. Capacity')}
           min="1"
           step="1"
           icon={capacity ? icon : null}
