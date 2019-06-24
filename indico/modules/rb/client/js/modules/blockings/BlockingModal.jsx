@@ -49,6 +49,8 @@ class BlockingModal extends React.Component {
       endDate: PropTypes.string,
       reason: PropTypes.string,
       createdBy: PropTypes.string,
+      canDelete: PropTypes.bool,
+      canEdit: PropTypes.bool,
     }),
     actions: PropTypes.exact({
       createBlocking: PropTypes.func.isRequired,

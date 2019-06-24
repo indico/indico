@@ -142,6 +142,7 @@ UserMenu.propTypes = {
   userData: PropTypes.shape({
     firstName: PropTypes.string,
     lastName: PropTypes.string,
+    email: PropTypes.string,
     id: PropTypes.number,
     language: PropTypes.string,
     isAdmin: PropTypes.bool,

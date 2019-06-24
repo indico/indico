@@ -25,7 +25,7 @@ import {selectors as userSelectors} from '../../common/user';
 import {selectors as roomsSelectors} from '../../common/rooms';
 import './RoomFilterBar.module.scss';
 
-// eslint-disable-next-line react/prop-types
+/* eslint-disable react/prop-types */
 const renderCapacity = ({capacity}) =>
   capacity === null ? null : (
     <span>
@@ -34,7 +34,6 @@ const renderCapacity = ({capacity}) =>
     </span>
   );
 
-// eslint-disable-next-line react/prop-types
 const renderEquipment = ({equipment, features}) => {
   const count = equipment.length + features.length;
   if (!count) {
@@ -50,7 +49,6 @@ const renderEquipment = ({equipment, features}) => {
   );
 };
 
-// eslint-disable-next-line react/prop-types
 const renderBuilding = ({building}) => {
   if (!building) {
     return null;
@@ -65,6 +63,7 @@ const renderBuilding = ({building}) => {
     </>
   );
 };
+/* eslint-enable react/prop-types */
 
 export class RoomFilterBarBase extends React.Component {
   static propTypes = {

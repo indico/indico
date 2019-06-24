@@ -53,7 +53,7 @@ const searchFactory = config => {
     validateForm,
   } = config;
 
-  // eslint-disable-next-line react/prop-types
+  /* eslint-disable react/prop-types */
   const FavoriteItem = ({name, detail, added, onAdd}) => (
     <Dropdown.Item
       disabled={added}
@@ -83,7 +83,6 @@ const searchFactory = config => {
     </Dropdown.Item>
   );
 
-  // eslint-disable-next-line react/prop-types
   const SearchForm = ({onSearch, favorites, isAdded, onAdd, single}) => {
     const initialFormValues = useContext(InitialFormValuesContext);
     const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -142,7 +141,6 @@ const searchFactory = config => {
     );
   };
 
-  // eslint-disable-next-line react/prop-types
   const ResultItem = ({name, detail, added, favorite, onAdd}) => (
     <List.Item>
       <div styleName="item">
@@ -171,7 +169,6 @@ const searchFactory = config => {
     </List.Item>
   );
 
-  // eslint-disable-next-line react/prop-types
   const SearchResults = ({results, total, onAdd, isAdded, favorites}) =>
     total !== 0 ? (
       <>
@@ -194,7 +191,6 @@ const searchFactory = config => {
       <Divider horizontal>{noResultsText}</Divider>
     );
 
-  // eslint-disable-next-line react/prop-types
   const SearchContent = ({onAdd, isAdded, favorites, single}) => {
     const [result, setResult] = useState(null);
 
@@ -220,6 +216,7 @@ const searchFactory = config => {
       </>
     );
   };
+  /* eslint-enable react/prop-types */
 
   const Search = ({
     disabled,
