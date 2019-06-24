@@ -47,7 +47,9 @@ export function fetchUserInfo() {
       FETCH_USER_INFO_ERROR
     )(dispatch);
 
-    await setMomentLocale(result.data.language);
+    if (result.data) {
+      await setMomentLocale(result.data.language);
+    }
     return result;
   };
 }
