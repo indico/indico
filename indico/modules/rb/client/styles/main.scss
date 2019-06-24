@@ -8,6 +8,7 @@
 @import 'base/palette';
 @import 'rb:styles/sui_fixes';
 @import 'rb:styles/palette';
+@import 'rb:styles/responsive';
 
 $indico-top-bar-height: 50px;
 
@@ -22,7 +23,7 @@ a {
 
 /* SemanticUI overrides for small screens */
 .ui.selection.dropdown {
-    @media (max-width: 599px) {
+    @media (max-width: $tablet-width) {
         min-width: auto;
     }
 }
