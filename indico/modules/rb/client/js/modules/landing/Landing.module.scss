@@ -7,6 +7,7 @@
 
 @import 'rb:styles/palette';
 @import 'rb:styles/util';
+@import 'rb:styles/responsive';
 
 @keyframes fade-slide-down {
     0% {
@@ -80,12 +81,12 @@
         transition: max-height 0.25s ease-out;
         margin: 10vh auto auto auto;
 
-        @media (max-width: 599px) {
+        @media (max-width: $tablet-width) {
             width: 100%;
             max-height: 100%;
             margin-top: 1rem;
         }
-        @media (min-width: 600px) {
+        @media (min-width: $tablet-width) {
             min-width: 520px;
         }
 
