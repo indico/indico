@@ -358,6 +358,19 @@ class PrincipalMixin(object):
     def principal(cls):
         return PrincipalComparator(cls)
 
+    def get_emails(self):
+        """Get a set of all unique emails associated with this principal.
+
+        For users, this is just the primary email (or nothing for the system user).
+        For groups it is the primary email address of each group members who have
+        an Indico account.
+        """
+        if self.type == PrincipalType.user and not self.user.is_system:
+            return {self.user.email}
+        elif self.type in (PrincipalType.local_group, PrincipalType.multipass_group):
+            return {x.email for x in self.principal.get_members() if not x.is_system}
+        return set()
+
     def merge_privs(self, other):
         """Merges the privileges of another principal
 

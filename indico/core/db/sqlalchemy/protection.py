@@ -7,6 +7,8 @@
 
 from __future__ import unicode_literals
 
+import itertools
+
 from flask import has_request_context, session
 from sqlalchemy import inspect
 from sqlalchemy.event import listens_for
@@ -465,6 +467,17 @@ class ProtectionManagersMixin(ProtectionMixin):
         if recursive and self.protection_parent:
             managers.update(self.protection_parent.get_manager_list(recursive=True))
         return managers
+
+    def get_manager_emails(self, include_groups=True):
+        """Get the emails of all managers.
+
+        :param include_groups: whether to also include group members
+        """
+        return set(itertools.chain.from_iterable(
+            x.get_emails()
+            for x in self.acl_entries
+            if x.has_management_permission() and (include_groups or x.type == PrincipalType.user)
+        ))
 
     def get_access_list(self, skip_managers=False, skip_self_acl=False):
         read_access_list = {x.principal for x in self.acl_entries if x.read_access} if not skip_self_acl else set()
