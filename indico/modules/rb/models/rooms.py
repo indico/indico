@@ -344,10 +344,6 @@ class Room(ProtectionManagersMixin, db.Model, Serializer):
         return self.location.name
 
     @property
-    def manager_emails(self):
-        return {p.principal.email for p in self.acl_entries if p.type == PrincipalType.user and p.full_access}
-
-    @property
     def sprite_position(self):
         sprite_mapping = _cache.get('rooms-sprite-mapping')
         return sprite_mapping.get(self.id, 0) if sprite_mapping else 0  # placeholder at position 0
