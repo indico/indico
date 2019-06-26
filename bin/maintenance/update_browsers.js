@@ -26,8 +26,8 @@ const productionURL = `https://browserl.ist/?q=${encodeURIComponent(productionQu
 
 const template = browsers => `
 | <img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/firefox/firefox_48x48.png" alt="Firefox" width="24px" height="24px" /><br>Firefox | <img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/chrome/chrome_48x48.png" alt="Chrome" width="24px" height="24px" /><br>Chrome | <img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/safari/safari_48x48.png" alt="Safari" width="24px" height="24px" /><br>Safari | <img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/edge/edge_48x48.png" alt="Edge" width="24px" height="24px" /><br>Edge |
-| --------- | --------- | --------- | --------- |
-| ${browsers.firefox} | ${browsers.chrome} | ${browsers.safari} | ${browsers.edge} |
+|:---------:|:---------:|:---------:|:---------:|
+| ${browsers.firefox}+ | ${browsers.chrome}+ | ${browsers.safari}+ | ${browsers.edge}+ |
 
 However, if you have an issue with a browser [on this list](${productionURL}), please feel free to open a bug report.`;
 

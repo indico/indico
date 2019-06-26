@@ -40,11 +40,11 @@ These are the minimum versions of major browsers currently supported by Indico. 
 much as possible, but only issues detected on those will be considered at critical level.
 
 <!-- BROWSERS - this is all machine-generated! Don't change it. -->
-  | <img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/firefox/firefox_48x48.png" alt="Firefox" width="24px" height="24px" /><br>Firefox | <img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/chrome/chrome_48x48.png" alt="Chrome" width="24px" height="24px" /><br>Chrome | <img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/safari/safari_48x48.png" alt="Safari" width="24px" height="24px" /><br>Safari | <img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/edge/edge_48x48.png" alt="Edge" width="24px" height="24px" /><br>Edge |
-  | --------- | --------- | --------- | --------- |
-  | 65 | 73 | 12 | 17 |
+| <img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/firefox/firefox_48x48.png" alt="Firefox" width="24px" height="24px" /><br>Firefox | <img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/chrome/chrome_48x48.png" alt="Chrome" width="24px" height="24px" /><br>Chrome | <img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/safari/safari_48x48.png" alt="Safari" width="24px" height="24px" /><br>Safari | <img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/edge/edge_48x48.png" alt="Edge" width="24px" height="24px" /><br>Edge |
+|:---------:|:---------:|:---------:|:---------:|
+| 66+ | 74+ | 12+ | 17+ |
 
-  However, if you have an issue with a browser [on this list](https://browserl.ist/?q=%3E0.5%25%20in%20alt-eu%20and%20%3E0.5%25%20in%20alt-as%20and%20%3E0.5%25%20in%20alt-na%20and%20%3E0.5%25%20in%20alt-sa%20and%20%3E0.5%25%20in%20alt-af%20and%20%3E0.5%25%20in%20alt-oc%20and%20%3E1%25%2C%20not%20ie%20%3E%200%2C%20last%202%20Chrome%20versions%2C%20last%202%20Edge%20versions%2C%20last%202%20Safari%20versions%2C%20Firefox%20esr), please feel free to open a bug report.
+However, if you have an issue with a browser [on this list](https://browserl.ist/?q=%3E0.5%25%20in%20alt-eu%20and%20%3E0.5%25%20in%20alt-as%20and%20%3E0.5%25%20in%20alt-na%20and%20%3E0.5%25%20in%20alt-sa%20and%20%3E0.5%25%20in%20alt-af%20and%20%3E0.5%25%20in%20alt-oc%20and%20%3E1%25%2C%20not%20ie%20%3E%200%2C%20last%202%20Chrome%20versions%2C%20last%202%20Edge%20versions%2C%20last%202%20Safari%20versions%2C%20Firefox%20esr), please feel free to open a bug report.
 <!-- ENDBROWSERS -->
 
 ## Getting Indico
