@@ -4,17 +4,21 @@ not ie > 0
 last 2 Chrome versions
 last 2 Edge versions
 last 2 Safari versions
+last 2 Firefox versions
+last 2 FirefoxAndroid versions
 Firefox esr
 
 # begin generated code
 # use `npm run update-browsers` to update
 [production]
 and_chr 74
+and_ff 67
 chrome 75
 chrome 74
 chrome 73
 edge 18
 edge 17
+firefox 67
 firefox 66
 firefox 60
 ios_saf 12.2
