@@ -44,7 +44,7 @@ much as possible, but only issues detected on those will be considered at critic
 |:---------:|:---------:|:---------:|:---------:|
 | 66+ | 74+ | 12+ | 17+ |
 
-However, if you have an issue with a browser [on this list](https://browserl.ist/?q=%3E0.5%25%20in%20alt-eu%20and%20%3E0.5%25%20in%20alt-as%20and%20%3E0.5%25%20in%20alt-na%20and%20%3E0.5%25%20in%20alt-sa%20and%20%3E0.5%25%20in%20alt-af%20and%20%3E0.5%25%20in%20alt-oc%20and%20%3E1%25%2C%20not%20ie%20%3E%200%2C%20last%202%20Chrome%20versions%2C%20last%202%20Edge%20versions%2C%20last%202%20Safari%20versions%2C%20Firefox%20esr), please feel free to open a bug report.
+However, if you have an issue with a browser [on this list](https://browserl.ist/?q=and_chr%2074%2C%20chrome%2075%2C%20chrome%2074%2C%20chrome%2073%2C%20edge%2018%2C%20edge%2017%2C%20firefox%2066%2C%20firefox%2060%2C%20ios_saf%2012.2%2C%20safari%2012.1%2C%20safari%2012%2C%20samsung%209.2), please feel free to open a bug report.
 <!-- ENDBROWSERS -->
 
 ## Getting Indico
