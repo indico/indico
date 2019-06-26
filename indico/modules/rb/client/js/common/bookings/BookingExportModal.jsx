@@ -107,7 +107,7 @@ export default function BookingExportModal({rooms, onClose}) {
         render={renderModalContent}
         initialValues={{rooms, dates: null}}
         initialValuesEqual={_.isEqual}
-        subsciption={{}}
+        subscription={{}}
       />
     </Modal>
   );
