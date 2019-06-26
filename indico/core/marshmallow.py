@@ -86,14 +86,14 @@ class IndicoModelConverter(ModelConverter):
 
 class IndicoSchema(mm.Schema):
     @post_dump(pass_many=True, pass_original=True)
-    def _call_post_dump_signal(self, data, many, orig):
+    def _call_post_dump_signal(self, data, many, orig, **kwargs):
         data_list = data if many else [data]
         orig_list = orig if many else [orig]
         signals.plugin.schema_post_dump.send(type(self), data=data_list, orig=orig_list, many=many)
         return data_list if many else data_list[0]
 
     @pre_load
-    def _call_pre_load_signal(self, data):
+    def _call_pre_load_signal(self, data, **kwargs):
         signals.plugin.schema_pre_load.send(type(self), data=data)
         return data
 

@@ -169,7 +169,7 @@ class ReservationEditLogSchema(UserSchema):
         fields = ('id', 'timestamp', 'info', 'user_name')
 
     @post_dump(pass_many=True)
-    def sort_logs(self, data, many):
+    def sort_logs(self, data, many, **kwargs):
         if many:
             data = sorted(data, key=itemgetter('timestamp'), reverse=True)
         return data
@@ -225,7 +225,7 @@ class BlockedRoomSchema(mm.ModelSchema):
         fields = ('room', 'state', 'rejection_reason', 'rejected_by')
 
     @post_dump(pass_many=True)
-    def sort_rooms(self, data, many):
+    def sort_rooms(self, data, many, **kwargs):
         if many:
             data = sorted(data, key=lambda x: natural_sort_key(x['room']['full_name']))
         return data
