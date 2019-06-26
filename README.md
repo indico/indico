@@ -44,7 +44,7 @@ much as possible, but only issues detected on those will be considered at critic
 |:---------:|:---------:|:---------:|:---------:|
 | 66+ | 74+ | 12+ | 17+ |
 
-However, if you have an issue with a browser [on this list](https://browserl.ist/?q=and_chr%2074%2C%20chrome%2075%2C%20chrome%2074%2C%20chrome%2073%2C%20edge%2018%2C%20edge%2017%2C%20firefox%2066%2C%20firefox%2060%2C%20ios_saf%2012.2%2C%20safari%2012.1%2C%20safari%2012%2C%20samsung%209.2), please feel free to open a bug report.
+However, if you have an issue with a browser [on this list](https://browserl.ist/?q=and_chr%2074%2C%20and_ff%2067%2C%20chrome%2075%2C%20chrome%2074%2C%20chrome%2073%2C%20edge%2018%2C%20edge%2017%2C%20firefox%2067%2C%20firefox%2066%2C%20firefox%2060%2C%20ios_saf%2012.2%2C%20safari%2012.1%2C%20safari%2012%2C%20samsung%209.2), please feel free to open a bug report.
 <!-- ENDBROWSERS -->
 
 ## Getting Indico
