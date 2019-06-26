@@ -26,14 +26,6 @@ import {
 
 import FinalRoomSelector from '../../components/RoomSelector';
 
-function validate({format}) {
-  const errors = {};
-  if (!format) {
-    errors.format = Translate.string('Please choose a file format to export the bookings.');
-  }
-  return errors;
-}
-
 export default function BookingExportModal({rooms, onClose}) {
   const handleSubmit = async formData => {
     const {
@@ -66,8 +58,18 @@ export default function BookingExportModal({rooms, onClose}) {
               <Translate>File format</Translate>
             </h5>
             <Form.Group>
-              <FinalRadio name="format" value="csv" label={Translate.string('CSV')} />
-              <FinalRadio name="format" value="xlsx" label={Translate.string('XLSX')} />
+              <FinalRadio
+                name="format"
+                value="csv"
+                validate={v.required}
+                label={Translate.string('CSV')}
+              />
+              <FinalRadio
+                name="format"
+                value="xlsx"
+                validate={v.required}
+                label={Translate.string('XLSX')}
+              />
             </Form.Group>
             <FinalDatePeriod
               name="dates"
@@ -102,7 +104,6 @@ export default function BookingExportModal({rooms, onClose}) {
   return (
     <Modal open onClose={onClose} size="tiny" closeIcon>
       <FinalForm
-        validate={validate}
         onSubmit={handleSubmit}
         render={renderModalContent}
         initialValues={{rooms, dates: null}}
