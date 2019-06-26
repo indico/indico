@@ -8,9 +8,11 @@
 import _ from 'lodash';
 import moment from 'moment';
 import React from 'react';
+import qs from 'qs';
 import {bindActionCreators} from 'redux';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
+import {push as pushRoute} from 'connected-react-router';
 import {Button, Grid, Icon, Modal, Header, Message, List, Segment, Popup} from 'semantic-ui-react';
 import {Translate, Param} from 'indico/react/i18n';
 import {Overridable, IndicoPropTypes, Markdown, Responsive} from 'indico/react/util';
@@ -21,6 +23,8 @@ import RoomStats from './RoomStats';
 import {DailyTimelineContent, TimelineLegend} from '../timeline';
 import * as roomsSelectors from './selectors';
 import {actions as bookRoomActions} from '../../modules/bookRoom';
+import {actions as filtersActions} from '../../common/filters';
+import * as globalActions from '../../actions';
 import RoomEditModal from './RoomEditModal';
 
 import './RoomDetailsModal.module.scss';
@@ -33,6 +37,7 @@ class RoomDetailsModal extends React.Component {
     onClose: PropTypes.func.isRequired,
     promptDatesOnBook: PropTypes.bool,
     title: IndicoPropTypes.i18n,
+    gotoAllBookings: PropTypes.func.isRequired,
     actions: PropTypes.exact({
       openBookRoom: PropTypes.func.isRequired,
       openBookingForm: PropTypes.func.isRequired,
@@ -68,6 +73,7 @@ class RoomDetailsModal extends React.Component {
       attributes,
       promptDatesOnBook,
       title,
+      gotoAllBookings,
       actions: {openBookRoom, openBookingForm},
     } = this.props;
     const {roomEditVisible} = this.state;
@@ -90,6 +96,7 @@ class RoomDetailsModal extends React.Component {
               attributes={attributes}
               availability={availability}
               bookRoom={promptDatesOnBook ? openBookRoom : openBookingForm}
+              gotoAllBookings={gotoAllBookings}
             />
           </Modal.Content>
         </Modal>
@@ -108,6 +115,14 @@ export default connect(
     attributes: roomsSelectors.getAttributes(state, {roomId}),
   }),
   dispatch => ({
+    gotoAllBookings(roomName) {
+      const params = {
+        text: roomName,
+      };
+      dispatch(globalActions.resetPageState('calendar'));
+      dispatch(filtersActions.setFilters('calendar', {text: roomName}, false));
+      dispatch(pushRoute(`/calendar?${qs.stringify(params)}`));
+    },
     actions: bindActionCreators(
       {
         openBookRoom: bookRoomActions.openBookRoom,
@@ -126,7 +141,7 @@ const _getLegendLabels = availability => {
   return transformToLegendLabels(occurrenceTypes);
 };
 
-function RoomDetails({bookRoom, room, availability, attributes}) {
+function RoomDetails({bookRoom, room, availability, attributes, gotoAllBookings}) {
   const legendLabels = _getLegendLabels(availability);
   const rowSerializer = ({
     bookings,
@@ -173,6 +188,16 @@ function RoomDetails({bookRoom, room, availability, attributes}) {
               trigger={<Icon name="info circle" className="legend-info-icon" />}
               content={<TimelineLegend labels={legendLabels} compact />}
             />
+            <Button
+              basic
+              size="tiny"
+              compact
+              color="blue"
+              styleName="all-bookings"
+              onClick={() => gotoAllBookings(room.name)}
+            >
+              <Translate>See all bookings</Translate>
+            </Button>
           </Header>
           <DailyTimelineContent rows={availability.map(rowSerializer)} />
           <RoomStats roomId={room.id} />
@@ -209,6 +234,7 @@ RoomDetails.propTypes = {
   room: PropTypes.object.isRequired,
   availability: PropTypes.array.isRequired,
   attributes: PropTypes.array.isRequired,
+  gotoAllBookings: PropTypes.func.isRequired,
 };
 
 function RoomAvailabilityBox({room}) {
