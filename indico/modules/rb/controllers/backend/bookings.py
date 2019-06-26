@@ -49,7 +49,7 @@ from indico.web.util import ExpectedError
 NUM_SUGGESTIONS = 5
 
 
-_cache = GenericCache('Rooms')
+_export_cache = GenericCache('bookings-export')
 
 
 class RHTimeline(RHRoomBookingBase):
@@ -382,14 +382,14 @@ class RHBookingExport(RHRoomBookingBase):
 
         token = unicode(uuid.uuid4())
         headers, rows = generate_spreadsheet_from_occurrences(occurrences)
-        _cache.set(token, {'headers': headers, 'rows': rows}, time=1800)
+        _export_cache.set(token, {'headers': headers, 'rows': rows}, time=1800)
         download_url = url_for('rb.export_bookings_file', format=format, token=token)
         return jsonify(url=download_url)
 
 
 class RHBookingExportFile(RHRoomBookingBase):
     def _process(self):
-        data = _cache.get(request.args['token'])
+        data = _export_cache.get(request.args['token'])
         file_format = request.view_args['format']
         if file_format == 'csv':
             return send_csv('bookings.csv', **data)
