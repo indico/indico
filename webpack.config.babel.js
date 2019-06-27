@@ -25,7 +25,6 @@ let entryPoints = {
   main: ['./js/index.js'],
   ckeditor: ['./js/jquery/ckeditor.js'],
   conferences: ['./styles/legacy/Conf_Basic.scss'],
-  map_of_rooms: ['./styles/legacy/mapofrooms.css'],
   markdown: ['./js/jquery/markdown.js'],
   mathjax: ['./js/jquery/compat/mathjax.js'],
   statistics: ['./js/jquery/statistics.js'],
