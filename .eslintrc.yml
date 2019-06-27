@@ -11,7 +11,8 @@ extends:
   - 'indico'
   - 'indico/babel'
   - 'indico/react'
-  - 'plugin:prettier/recommended'
+  - 'indico/react-hooks'
+  - 'indico/prettier'
   - 'prettier/babel'
   - 'prettier/react'
 
@@ -30,25 +31,13 @@ settings:
     version: '16.6.3'
 
 rules:
-  func-style:
-    - warn
-    - declaration
-    - allowArrowFunctions: true
   import/no-unresolved:
     - error
     - ignore: ['^indico-url:']
   new-cap:
     - error
     - capIsNewExceptionPattern: '\$\.(Event|Deferred)$'
-  no-unused-vars:
-    - error
-    - ignoreRestSiblings: true
   prefer-template: warn
-  react/forbid-component-props: off
-  react-hooks/rules-of-hooks: error
-  react-hooks/exhaustive-deps: warn
-  # avoid conflicts with prettier
-  import/newline-after-import: off
 
 globals:
   Indico: false
