@@ -31,7 +31,7 @@ export async function setMomentLocale(locale) {
   }
 
   if (momentLocale !== 'en') {
-    await import(`moment/locale/${momentLocale}`);
+    await import(/* webpackChunkName: "moment-locale/[request]" */ `moment/locale/${momentLocale}`);
   }
   moment.locale(momentLocale);
 }
