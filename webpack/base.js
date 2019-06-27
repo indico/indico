@@ -12,7 +12,7 @@ import path from 'path';
 import chalk from 'chalk';
 import webpack from 'webpack';
 
-import ExtractTextPlugin from 'extract-text-webpack-plugin';
+import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import ManifestPlugin from 'webpack-manifest-plugin';
 import ProgressBarPlugin from 'progress-bar-webpack-plugin';
 import importOnce from 'node-sass-import-once';
@@ -158,49 +158,52 @@ export function webpackDefaults(env, config, bundles) {
   }
 
   function buildSCSSLoader(cssLoaderOptions = {}) {
-    return ExtractTextPlugin.extract({
-      fallback: 'style-loader',
-      use: [
-        {
-          loader: 'css-loader',
-          options: {
-            sourceMap: true,
-            url: !config.isPlugin, // FIXME: true breaks plugins, false breaks /indico/ in core
-            ...cssLoaderOptions,
-          },
+    return [
+      {
+        loader: MiniCssExtractPlugin.loader,
+        options: {
+          publicPath: config.build.distURL,
         },
-        {
-          loader: 'resolve-url-loader',
-          options: {
-            keepQuery: true,
-            root: config.isPlugin ? false : config.build.staticPath,
-          },
+      },
+      {
+        loader: 'css-loader',
+        options: {
+          sourceMap: true,
+          url: !config.isPlugin,
+          ...cssLoaderOptions,
         },
-        {
-          loader: 'postcss-loader',
-          options: {
-            sourceMap: true,
-            config: {
-              path: path.join(globalBuildConfig.rootPath, 'postcss.config.js'),
-              ctx: {
-                postCSSURLOptions: {
-                  url: postCSSURLResolver,
-                },
+      },
+      {
+        loader: 'resolve-url-loader',
+        options: {
+          keepQuery: true,
+          root: config.isPlugin ? false : config.build.staticPath,
+        },
+      },
+      {
+        loader: 'postcss-loader',
+        options: {
+          sourceMap: true,
+          config: {
+            path: path.join(globalBuildConfig.rootPath, 'postcss.config.js'),
+            ctx: {
+              postCSSURLOptions: {
+                url: postCSSURLResolver,
               },
             },
           },
         },
-        {
-          loader: 'sass-loader',
-          options: {
-            sourceMap: true,
-            includePaths: [scssIncludePath],
-            outputStyle: 'compact',
-            importer: [sassResolver, importOnce],
-          },
+      },
+      {
+        loader: 'sass-loader',
+        options: {
+          sourceMap: true,
+          includePaths: [scssIncludePath],
+          outputStyle: 'compact',
+          importer: [sassResolver, importOnce],
         },
-      ],
-    });
+      },
+    ];
   }
 
   const indicoClientPath = globalBuildConfig.clientPath;
@@ -251,13 +254,15 @@ export function webpackDefaults(env, config, bundles) {
           oneOf: [
             {
               test: /\.css$/,
-              use: ExtractTextPlugin.extract({
-                fallback: 'style-loader',
-                use: {
+              use: [
+                {
+                  loader: MiniCssExtractPlugin.loader,
+                },
+                {
                   loader: 'css-loader',
                   options: _cssLoaderOptions,
                 },
-              }),
+              ],
             },
             {
               test: /\.module\.scss$/,
@@ -283,8 +288,8 @@ export function webpackDefaults(env, config, bundles) {
       }),
       // Do not load moment locales (we'll load them explicitly)
       new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
-      new ExtractTextPlugin({
-        filename: 'css/[name].[md5:contenthash:hex:8].css',
+      new MiniCssExtractPlugin({
+        filename: 'css/[name].[contenthash].css',
       }),
       new ProgressBarPlugin({
         format:
@@ -327,7 +332,7 @@ export function webpackDefaults(env, config, bundles) {
           // 'common' chunk, which should include common dependencies
           common: module => ({
             name: 'common',
-            chunks: 'initial',
+            chunks: chunk => chunk.canBeInitial() && !/\.print$|^themes_/.test(chunk.name),
             // theme CSS files shouldn't be included in the
             // common.css chunk, otherwise they will interfere
             // with interface CSS
