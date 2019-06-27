@@ -46,9 +46,7 @@ rules:
   prefer-template: warn
   react/forbid-component-props: off
   react-hooks/rules-of-hooks: error
-  react-hooks/exhaustive-deps:
-    - warn
-    - additionalHooks: 'useAsyncEffect'
+  react-hooks/exhaustive-deps: warn
   # avoid conflicts with prettier
   import/newline-after-import: off
 

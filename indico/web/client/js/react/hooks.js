@@ -15,21 +15,6 @@ import useAxios from '@use-hooks/axios';
 import {handleAxiosError, indicoAxios} from '../utils/axios';
 import {camelizeKeys} from '../utils/case';
 
-/**
- * Helper to use async functions with useEffect as the function that is
- * passed to useEffect must not return anything except a cleanup function,
- * so passing async functions directly is not allowed.
- *
- * Using this hook, there is obviously no way to return a cleanup function,
- * but this should be used for simple AJAX calls where no cleanup is needed.
- */
-export const useAsyncEffect = (fn, ...args) => {
-  useEffect(() => {
-    fn();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, ...args);
-};
-
 export const useFavoriteUsers = () => {
   // XXX: this state should ideally be global so if this hook is used more than
   // once on the same page we keep the favorites in sync and don't send multiple
