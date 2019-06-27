@@ -62,13 +62,13 @@ export default function BookingExportModal({rooms, onClose}) {
                 name="format"
                 value="csv"
                 validate={v.required}
-                label={Translate.string('CSV')}
+                label="CSV"
               />
               <FinalRadio
                 name="format"
                 value="xlsx"
                 validate={v.required}
-                label={Translate.string('XLSX')}
+                label="XLSX"
               />
             </Form.Group>
             <FinalDatePeriod
