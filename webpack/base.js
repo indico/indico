@@ -297,7 +297,7 @@ export function webpackDefaults(env, config, bundles) {
       // Do not load moment locales (we'll load them explicitly)
       new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
       new MiniCssExtractPlugin({
-        filename: 'css/[name].[contenthash].css',
+        filename: 'css/[name].[contenthash:8].css',
       }),
       new ProgressBarPlugin({
         format:
