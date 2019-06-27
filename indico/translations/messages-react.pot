@@ -1,11 +1,10 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2019-06-19 11:15+0200\n"
+"POT-Creation-Date: 2019-06-19 13:09+0200\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "MIME-Version: 1.0\n"
 "Generated-By: react-jsx-i18n-extract\n"
-"Content-Type: text/plain;\n"
 
 #: indico/modules/events/logs/client/js/components/LogEntryList.jsx:39
 msgid "This email is pending and will be sent soon."
@@ -71,7 +70,7 @@ msgstr ""
 
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:237
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:255
-#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:138
+#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:140
 msgid "Reason: {rejectionReason}"
 msgstr ""
 
@@ -96,7 +95,7 @@ msgstr ""
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:293
 #: indico/modules/rb/client/js/modules/admin/AdminRoomItem.jsx:48
 #: indico/modules/rb/client/js/modules/admin/EditableListItem.jsx:143
-#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:304
+#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:306
 msgid "Confirm deletion"
 msgstr ""
 
@@ -108,20 +107,20 @@ msgstr ""
 #: indico/modules/rb/client/js/common/rooms/RoomPhoto.jsx:117
 #: indico/modules/rb/client/js/modules/admin/AdminRoomItem.jsx:50
 #: indico/modules/rb/client/js/modules/admin/EditableListItem.jsx:145
-#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:306
+#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:308
 msgid "Delete"
 msgstr ""
 
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:296
 #: indico/modules/rb/client/js/common/filters/FilterDropdown.jsx:169
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:944
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:945
 #: indico/modules/rb/client/js/common/rooms/RoomPhoto.jsx:129
 #: indico/modules/rb/client/js/modules/admin/AdminRoomItem.jsx:51
 #: indico/modules/rb/client/js/modules/admin/EditableListItem.jsx:146
 #: indico/modules/rb/client/js/modules/admin/MapAreasPage.jsx:315
-#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:307
+#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:309
 #: indico/web/client/js/react/components/principals/PrincipalPermissions.jsx:98
-#: indico/web/client/js/react/components/principals/Search.jsx:330
+#: indico/web/client/js/react/components/principals/Search.jsx:327
 msgid "Cancel"
 msgstr ""
 
@@ -131,13 +130,13 @@ msgstr ""
 
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:372
 #: indico/modules/rb/client/js/common/timeline/RowActionsDropdown.jsx:109
-#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:155
+#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:157
 msgid "Provide the rejection reason"
 msgstr ""
 
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:384
 #: indico/modules/rb/client/js/common/timeline/RowActionsDropdown.jsx:122
-#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:167
+#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:169
 msgid "Reject"
 msgstr ""
 
@@ -159,10 +158,11 @@ msgstr ""
 
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:410
 #: indico/modules/rb/client/js/common/bookings/BookingEdit.jsx:230
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:942
+#: indico/modules/rb/client/js/common/bookings/BookingExportModal.jsx:97
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:943
 #: indico/modules/rb/client/js/common/timeline/RowActionsDropdown.jsx:197
 #: indico/modules/rb/client/js/common/timeline/RowActionsDropdown.jsx:209
-#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:427
+#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:429
 #: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:662
 msgid "Close"
 msgstr ""
@@ -299,6 +299,32 @@ msgstr ""
 msgid "Reason for booking"
 msgstr ""
 
+#: indico/modules/rb/client/js/common/bookings/BookingExportModal.jsx:53
+#: indico/modules/rb/client/js/modules/roomList/RoomList.jsx:155
+msgid "Export bookings"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/bookings/BookingExportModal.jsx:58
+msgid "File format"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/bookings/BookingExportModal.jsx:76
+#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:356
+msgid "Period"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/bookings/BookingExportModal.jsx:84
+msgid "Rooms to export"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/bookings/BookingExportModal.jsx:87
+msgid "Please choose at least one room."
+msgstr ""
+
+#: indico/modules/rb/client/js/common/bookings/BookingExportModal.jsx:95
+msgid "Export"
+msgstr ""
+
 #: indico/modules/rb/client/js/common/bookings/BookingObjectLink.jsx:40
 msgid "This booking will be linked to an event:"
 msgstr ""
@@ -383,7 +409,7 @@ msgstr ""
 msgid "No daily availability found"
 msgstr ""
 
-#: indico/modules/rb/client/js/common/rooms/EquipmentList.jsx:77
+#: indico/modules/rb/client/js/common/rooms/EquipmentList.jsx:78
 msgid "No equipment found"
 msgstr ""
 
@@ -549,7 +575,7 @@ msgid "Site"
 msgstr ""
 
 #: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:246
-#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:159
+#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:158
 msgid "Building"
 msgstr ""
 
@@ -656,7 +682,7 @@ msgid "Equipment available"
 msgstr ""
 
 #: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:466
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:845
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:846
 msgid "Add new equipment"
 msgstr ""
 
@@ -664,43 +690,43 @@ msgstr ""
 msgid "Non-bookable periods"
 msgstr ""
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:763
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:764
 msgid "No custom attributes found"
 msgstr ""
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:873
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:874
 msgid "Restricted rooms can only be booked by users defined in the room ACL"
 msgstr ""
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:878
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:879
 msgid "Public"
 msgstr ""
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:882
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:883
 msgid "Restricted"
 msgstr ""
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:913
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:914
 msgid "Add Room"
 msgstr ""
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:913
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:914
 msgid "Edit Room Details"
 msgstr ""
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:927
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:928
 msgid "Room has been successfully created."
 msgstr ""
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:930
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:931
 msgid "Room has been successfully updated."
 msgstr ""
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:933
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:934
 msgid "Room could not be updated."
 msgstr ""
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:954
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:955
 #: indico/modules/rb/client/js/common/rooms/RoomPhoto.jsx:104
 #: indico/modules/rb/client/js/modules/admin/EditableListItem.jsx:117
 #: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:259
@@ -876,7 +902,7 @@ msgid "Room Booking"
 msgstr ""
 
 #: indico/modules/rb/client/js/components/BookingBootstrapForm.jsx:49
-#: indico/web/client/js/react/components/principals/Search.jsx:108
+#: indico/web/client/js/react/components/principals/Search.jsx:107
 msgid "Search"
 msgstr ""
 
@@ -944,7 +970,7 @@ msgid "Room"
 msgstr ""
 
 #: indico/modules/rb/client/js/components/RoomSelector.jsx:197
-msgid "There are no rooms selected for this blocking."
+msgid "There are no rooms selected."
 msgstr ""
 
 #: indico/modules/rb/client/js/components/SidebarFooter.jsx:35
@@ -1422,6 +1448,7 @@ msgid "There are no blockings."
 msgstr ""
 
 #: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:28
+#: indico/web/client/js/react/forms/validators.js:90
 msgid "Please choose a valid period."
 msgstr ""
 
@@ -1433,48 +1460,48 @@ msgstr ""
 msgid "Please choose at least one room for this blocking."
 msgstr ""
 
-#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:128
+#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:130
 msgid "Blocking has been accepted"
 msgstr ""
 
-#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:130
+#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:132
 msgid "Pending approval by a room manager"
 msgstr ""
 
-#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:134
+#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:136
 msgid "Booking rejected by {rejectedBy}"
 msgstr ""
 
-#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:187
+#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:189
 msgid "Accept blocking"
 msgstr ""
 
-#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:224
+#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:226
 msgid "Update blocking"
 msgstr ""
 
-#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:226
-#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:239
+#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:228
+#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:241
 msgid "Block selected spaces"
 msgstr ""
 
-#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:235
+#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:237
 msgid "Blocking details"
 msgstr ""
 
-#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:237
+#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:239
 msgid "Edit blocking"
 msgstr ""
 
-#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:305
+#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:307
 msgid "Are you sure you want to delete this blocking?"
 msgstr ""
 
-#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:324
+#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:326
 msgid "Blocking created by {createdBy}"
 msgstr ""
 
-#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:333
+#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:335
 msgid ""
 "When blocking rooms nobody but you, the rooms' managers and those "
 "users/groups you specify in the \"Allowed users/groups\" list will be able "
@@ -1483,52 +1510,48 @@ msgid ""
 "approved by the owners of those rooms."
 msgstr ""
 
-#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:345
+#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:347
 msgid ""
 "Please take into account that rooms blockings should only be used for short "
 "term events and never for long-lasting periods. If you wish to somehow mark "
 "a room as unusable, please ask its owner to set it as such."
 msgstr ""
 
-#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:354
-msgid "Period"
-msgstr ""
-
-#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:361
+#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:363
 msgid "Reason"
 msgstr ""
 
-#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:362
+#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:364
 msgid "Provide reason for blocking"
 msgstr ""
 
-#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:375
+#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:377
 msgid "Authorized users/groups"
 msgstr ""
 
-#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:385
+#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:387
 msgid "Rooms to block"
 msgstr ""
 
-#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:386
+#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:388
 msgid "Blocked rooms"
 msgstr ""
 
-#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:396
+#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:398
 msgid ""
 "You can accept and reject blockings for your rooms on the list by using the "
 "action buttons on the right side of the room name."
 msgstr ""
 
-#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:404
+#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:406
 msgid "The blocking has been successfully updated."
 msgstr ""
 
-#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:409
+#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:411
 msgid "The blocking has been successfully created."
 msgstr ""
 
-#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:411
+#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:413
 msgid "You can consult your blocking {link}here{/link}."
 msgstr ""
 
@@ -1584,7 +1607,7 @@ msgid "Timeline view"
 msgstr ""
 
 #: indico/modules/rb/client/js/modules/bookRoom/BookRoom.jsx:87
-#: indico/modules/rb/client/js/modules/roomList/RoomList.jsx:232
+#: indico/modules/rb/client/js/modules/roomList/RoomList.jsx:241
 msgid "See details"
 msgstr ""
 
@@ -1894,36 +1917,36 @@ msgstr ""
 msgid "Your bookings"
 msgstr ""
 
-#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:45
-#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:134
+#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:44
+#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:133
 msgid "Equipment"
 msgstr ""
 
-#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:62
+#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:60
 msgid "Building {building}"
 msgstr ""
 
-#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:176
+#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:175
 msgid "Min. Capacity"
 msgstr ""
 
-#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:196
+#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:195
 msgid "Show only..."
 msgstr ""
 
-#: indico/modules/rb/client/js/modules/roomList/RoomList.jsx:148
+#: indico/modules/rb/client/js/modules/roomList/RoomList.jsx:149
 msgid "Block rooms"
 msgstr ""
 
-#: indico/modules/rb/client/js/modules/roomList/RoomList.jsx:184
+#: indico/modules/rb/client/js/modules/roomList/RoomList.jsx:193
 msgid "Actions"
 msgstr ""
 
-#: indico/modules/rb/client/js/modules/roomList/RoomList.jsx:199
+#: indico/modules/rb/client/js/modules/roomList/RoomList.jsx:208
 msgid "There are no rooms matching the criteria"
 msgstr ""
 
-#: indico/modules/rb/client/js/modules/roomList/RoomList.jsx:201
+#: indico/modules/rb/client/js/modules/roomList/RoomList.jsx:210
 msgid "There is {count} match"
 msgid_plural "There are {count} matches"
 msgstr[0] ""
@@ -2040,93 +2063,93 @@ msgstr ""
 msgid "Add permission"
 msgstr ""
 
-#: indico/web/client/js/react/components/principals/Search.jsx:114
+#: indico/web/client/js/react/components/principals/Search.jsx:113
 msgid "Select favorite"
 msgstr ""
 
-#: indico/web/client/js/react/components/principals/Search.jsx:326
+#: indico/web/client/js/react/components/principals/Search.jsx:323
 msgid "Confirm"
 msgstr ""
 
-#: indico/web/client/js/react/components/principals/Search.jsx:384
+#: indico/web/client/js/react/components/principals/Search.jsx:381
 msgid "First name"
 msgstr ""
 
-#: indico/web/client/js/react/components/principals/Search.jsx:386
+#: indico/web/client/js/react/components/principals/Search.jsx:383
 msgid "Last name"
 msgstr ""
 
-#: indico/web/client/js/react/components/principals/Search.jsx:391
+#: indico/web/client/js/react/components/principals/Search.jsx:388
 #: indico/web/client/js/react/errors/component.jsx:77
 msgid "Email address"
 msgstr ""
 
-#: indico/web/client/js/react/components/principals/Search.jsx:393
+#: indico/web/client/js/react/components/principals/Search.jsx:390
 msgid "Affiliation"
 msgstr ""
 
-#: indico/web/client/js/react/components/principals/Search.jsx:397
+#: indico/web/client/js/react/components/principals/Search.jsx:394
 msgid "Include users with no Indico account"
 msgstr ""
 
-#: indico/web/client/js/react/components/principals/Search.jsx:400
-#: indico/web/client/js/react/components/principals/Search.jsx:498
+#: indico/web/client/js/react/components/principals/Search.jsx:397
+#: indico/web/client/js/react/components/principals/Search.jsx:495
 msgid "Exact matches only"
 msgstr ""
 
-#: indico/web/client/js/react/components/principals/Search.jsx:407
+#: indico/web/client/js/react/components/principals/Search.jsx:404
 msgid "User"
 msgstr ""
 
-#: indico/web/client/js/react/components/principals/Search.jsx:408
+#: indico/web/client/js/react/components/principals/Search.jsx:405
 msgid "Select user"
 msgstr ""
 
-#: indico/web/client/js/react/components/principals/Search.jsx:408
+#: indico/web/client/js/react/components/principals/Search.jsx:405
 msgid "Add users"
 msgstr ""
 
-#: indico/web/client/js/react/components/principals/Search.jsx:439
+#: indico/web/client/js/react/components/principals/Search.jsx:436
 msgid "Your query matched too many users. Please try more specific search criteria."
 msgstr ""
 
-#: indico/web/client/js/react/components/principals/Search.jsx:442
+#: indico/web/client/js/react/components/principals/Search.jsx:439
 msgid "No users found"
 msgstr ""
 
-#: indico/web/client/js/react/components/principals/Search.jsx:445
+#: indico/web/client/js/react/components/principals/Search.jsx:442
 msgid "1 user found"
 msgid_plural "{count} users found"
 msgstr[0] ""
 msgstr[1] ""
 
-#: indico/web/client/js/react/components/principals/Search.jsx:484
+#: indico/web/client/js/react/components/principals/Search.jsx:481
 msgid "Group"
 msgstr ""
 
-#: indico/web/client/js/react/components/principals/Search.jsx:486
+#: indico/web/client/js/react/components/principals/Search.jsx:483
 msgid "Select group"
 msgstr ""
 
-#: indico/web/client/js/react/components/principals/Search.jsx:486
+#: indico/web/client/js/react/components/principals/Search.jsx:483
 msgid "Add groups"
 msgstr ""
 
-#: indico/web/client/js/react/components/principals/Search.jsx:496
+#: indico/web/client/js/react/components/principals/Search.jsx:493
 msgid "Group name"
 msgstr ""
 
-#: indico/web/client/js/react/components/principals/Search.jsx:520
+#: indico/web/client/js/react/components/principals/Search.jsx:517
 msgid ""
 "Your query matched too many groups. Please try more specific search "
 "criteria."
 msgstr ""
 
-#: indico/web/client/js/react/components/principals/Search.jsx:523
+#: indico/web/client/js/react/components/principals/Search.jsx:520
 msgid "No groups found"
 msgstr ""
 
-#: indico/web/client/js/react/components/principals/Search.jsx:526
+#: indico/web/client/js/react/components/principals/Search.jsx:523
 msgid "1 group found"
 msgid_plural "{count} groups found"
 msgstr[0] ""
