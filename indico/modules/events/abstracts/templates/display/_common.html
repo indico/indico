@@ -1,5 +1,6 @@
 {% macro render_cfa_infoline(event, cfa, show_icon=true, redirect_first=false) %}
     {% set can_submit_abstracts = cfa.is_open or (session.user and cfa.can_submit_abstracts(session.user)) %}
+    {% set is_future = not cfa.has_started and not cfa.has_ended and cfa.is_scheduled %}
     <div class="action-box highlight">
         <div class="section">
             {% if show_icon %}
@@ -17,6 +18,8 @@
                     <div>
                         {%- trans %}You can submit an abstract for reviewing.{% endtrans -%}
                     </div>
+                {% elif is_future %}
+                    <div class="label">{% trans %}The call for abstracts is not open yet.{% endtrans %}</div>
                 {% else %}
                     <div class="label">{% trans %}The call for abstracts is closed.{% endtrans %}</div>
                     {% if cfa.modification_end_dt and not cfa.modification_ended and abstracts %}

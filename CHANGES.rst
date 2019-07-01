@@ -34,6 +34,8 @@ Improvements
   :user:`bpedersen2`)
 - Add more formatting options to book of abstracts (:issue:`3335`, thanks
   :user:`bpedersen2`)
+- Improve message when the call for abstracts is scheduled to open but
+  hasn't started yet
 
 Bugfixes
 ^^^^^^^^

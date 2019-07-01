@@ -45,6 +45,10 @@ class CallForAbstracts(object):
         return self.end_dt is not None and self.end_dt <= now_utc()
 
     @property
+    def is_scheduled(self):
+        return self.start_dt is not None
+
+    @property
     def is_open(self):
         return self.has_started and not self.has_ended
 
