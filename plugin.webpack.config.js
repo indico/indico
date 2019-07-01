@@ -19,12 +19,10 @@ const bundles = require(path.join(process.env.INDICO_PLUGIN_ROOT, 'webpack-bundl
 const base = require(path.join(config.build.indicoSourcePath, 'webpack'));
 
 const entry = bundles.entry || {};
-const allThemeFiles = [];
 
 if (!_.isEmpty(config.themes)) {
   const themeFiles = base.getThemeEntryPoints(config, './themes/');
   Object.assign(entry, themeFiles);
-  allThemeFiles.push(...Object.values(themeFiles).reduce((acc, current) => acc.concat(current)));
 }
 
 function generateModuleAliases() {
@@ -67,13 +65,11 @@ module.exports = env => {
     optimization: {
       splitChunks: {
         cacheGroups: {
-          common: module => {
-            return {
-              name: 'common',
-              chunks: 'initial',
-              // exclude themes, like we do in the core webpack config
-              minChunks: allThemeFiles.includes(module.resource) ? 9999 : 2,
-            };
+          common: {
+            name: 'common',
+            // exclude themes/print css from common chunk
+            chunks: chunk => chunk.canBeInitial() && !/\.print$|^themes_/.test(chunk.name),
+            minChunks: 2,
           },
         },
       },
