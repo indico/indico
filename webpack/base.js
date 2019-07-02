@@ -357,14 +357,12 @@ export function webpackDefaults(env, config, bundles) {
       splitChunks: {
         cacheGroups: {
           // 'common' chunk, which should include common dependencies
-          common: module => ({
+          common: {
             name: 'common',
+            // having theme/print css in the common css bundle would break the interface
             chunks: chunk => chunk.canBeInitial() && !/\.print$|^themes_/.test(chunk.name),
-            // theme CSS files shouldn't be included in the
-            // common.css chunk, otherwise they will interfere
-            // with interface CSS
-            minChunks: /styles\/themes/.test(module.request) ? 9999 : 2,
-          }),
+            minChunks: 2,
+          },
           // react/redux and friends since they are pretty big
           react: {
             test: /\/node_modules\/(react|redux|prop-types\/|lodash-es\/|fbjs\/)/,
