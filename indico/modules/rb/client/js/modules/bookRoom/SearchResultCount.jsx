@@ -10,7 +10,10 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import PropTypes from 'prop-types';
 import {Icon, Label, Menu, Message, Popup} from 'semantic-ui-react';
+
 import {Translate, Param} from 'indico/react/i18n';
+import {Responsive} from 'indico/react/util';
+
 import {actions as bookRoomActions} from '../../modules/bookRoom';
 import * as selectors from './selectors';
 
@@ -34,20 +37,29 @@ class SearchResultCount extends React.Component {
   };
 
   renderRoomTotal(count) {
+    const label = (
+      <Label horizontal size="small">
+        {count}
+      </Label>
+    );
+    const icon = <Icon name="filter" />;
     const trigger = (
       <Menu.Item as="span">
-        <Icon name="filter" />
-        <Translate>
-          Total
-          <Param
-            name="count"
-            value={
-              <Label horizontal size="small">
-                {count}
-              </Label>
-            }
-          />
-        </Translate>
+        <Responsive.Tablet
+          andLarger
+          orElse={
+            <>
+              {icon}
+              {label}
+            </>
+          }
+        >
+          {icon}
+          <Translate>
+            Total
+            <Param name="count" value={label} />
+          </Translate>
+        </Responsive.Tablet>
       </Menu.Item>
     );
     return (
@@ -63,13 +75,24 @@ class SearchResultCount extends React.Component {
         {count}
       </Label>
     );
+    const icon = <Icon name="calendar alternate outline" />;
     const trigger = (
       <Menu.Item active as="span">
-        <Icon name="calendar alternate outline" />
-        <Translate>
-          Available
-          <Param name="count" value={label} />
-        </Translate>
+        <Responsive.Tablet
+          andLarger
+          orElse={
+            <>
+              {icon}
+              {label}
+            </>
+          }
+        >
+          {icon}
+          <Translate>
+            Available
+            <Param name="count" value={label} />
+          </Translate>
+        </Responsive.Tablet>
       </Menu.Item>
     );
 
@@ -89,13 +112,24 @@ class SearchResultCount extends React.Component {
         {count}
       </Label>
     );
+    const icon = <Icon name="remove" />;
     const trigger = (
       <Menu.Item link onClick={openUnavailableRooms}>
-        <Icon name="remove" />
-        <Translate>
-          Unavailable
-          <Param name="count" value={label} />
-        </Translate>
+        <Responsive.Tablet
+          andLarger
+          orElse={
+            <>
+              {icon}
+              {label}
+            </>
+          }
+        >
+          {icon}
+          <Translate>
+            Unavailable
+            <Param name="count" value={label} />
+          </Translate>
+        </Responsive.Tablet>
       </Menu.Item>
     );
     return (
@@ -111,13 +145,24 @@ class SearchResultCount extends React.Component {
         {count}
       </Label>
     );
+    const icon = <Icon name="lock" />;
     const trigger = (
       <Menu.Item as="span">
-        <Icon name="lock" />
-        <Translate>
-          Unauthorized
-          <Param name="count" value={label} />
-        </Translate>
+        <Responsive.Tablet
+          andLarger
+          orElse={
+            <>
+              {icon}
+              {label}
+            </>
+          }
+        >
+          {icon}
+          <Translate>
+            Unauthorized
+            <Param name="count" value={label} />
+          </Translate>
+        </Responsive.Tablet>
       </Menu.Item>
     );
     return (
