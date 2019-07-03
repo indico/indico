@@ -6,6 +6,9 @@
 // LICENSE file for more details.
 
 import moment from 'moment';
+import React from 'react';
+
+import {Responsive} from 'indico/react/util';
 
 export default function dateRenderer({startDate, endDate}) {
   startDate = startDate ? moment(startDate) : null;
@@ -14,8 +17,19 @@ export default function dateRenderer({startDate, endDate}) {
   if (!startDate && !endDate) {
     return null;
   } else if (!endDate) {
-    return startDate.format('ddd D MMM');
+    return (
+      <Responsive.Tablet andLarger orElse={startDate.format('D MMM')}>
+        {startDate.format('ddd D MMM')}
+      </Responsive.Tablet>
+    );
   } else {
-    return `${startDate.format('ddd D MMM')} - ${endDate.format('ddd D MMM')}`;
+    return (
+      <Responsive.Tablet
+        andLarger
+        orElse={`${startDate.format('D MMM')} - ${endDate.format('D MMM')}`}
+      >
+        {`${startDate.format('ddd D MMM')} - ${endDate.format('ddd D MMM')}`}
+      </Responsive.Tablet>
+    );
   }
 }

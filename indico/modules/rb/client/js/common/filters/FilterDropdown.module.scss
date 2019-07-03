@@ -19,13 +19,24 @@
     transition: width 0.15s ease-out;
 
     @media (max-width: $tablet-width) {
-        padding-left: 1em;
-        padding-right: 1em;
+        padding-left: 0.75em;
+        padding-right: 0.75em;
     }
 
     > :global(i.icon.angle.down) {
         padding-left: 1em;
         transition: padding-left 0.15s ease-out;
+
+        @media (max-width: $tablet-width) {
+            margin: 0;
+            padding-left: 0.5em;
+        }
+    }
+}
+
+:global(.ui.small.buttons .button).filter-dropdown-button {
+    @media (max-width: $tablet-width) {
+        font-size: 0.8rem;
     }
 }
 

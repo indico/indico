@@ -12,6 +12,7 @@ import {Popup} from 'semantic-ui-react';
 import PropTypes from 'prop-types';
 import React from 'react';
 import {serializeDate} from 'indico/utils/date';
+import {Responsive} from 'indico/react/util';
 import {PluralTranslate, Translate, Singular, Plural, Param} from 'indico/react/i18n';
 
 export function preProcessParameters(params, rules) {
@@ -159,26 +160,38 @@ export function renderRecurrence({type, number, interval}) {
     return null;
   }
   if (type === 'single') {
-    return <Translate>Once</Translate>;
+    return (
+      <Responsive.Tablet andLarger orElse="S">
+        <Translate>Once</Translate>
+      </Responsive.Tablet>
+    );
   } else if (type === 'daily') {
-    return <Translate>Daily</Translate>;
+    return (
+      <Responsive.Tablet andLarger orElse="D">
+        <Translate>Daily</Translate>
+      </Responsive.Tablet>
+    );
   } else if (interval === 'week') {
     return (
-      <PluralTranslate count={number}>
-        <Singular>Weekly</Singular>
-        <Plural>
-          Every <Param name="number" value={number} /> weeks
-        </Plural>
-      </PluralTranslate>
+      <Responsive.Tablet andLarger orElse={`${number > 1 ? number : ''}W`}>
+        <PluralTranslate count={number}>
+          <Singular>Weekly</Singular>
+          <Plural>
+            Every <Param name="number" value={number} /> weeks
+          </Plural>
+        </PluralTranslate>
+      </Responsive.Tablet>
     );
   } else {
     return (
-      <PluralTranslate count={number}>
-        <Singular>Monthly</Singular>
-        <Plural>
-          Every <Param name="number" value={number} /> months
-        </Plural>
-      </PluralTranslate>
+      <Responsive.Tablet andLarger orElse={`${number > 1 ? number : ''}M`}>
+        <PluralTranslate count={number}>
+          <Singular>Monthly</Singular>
+          <Plural>
+            Every <Param name="number" value={number} /> months
+          </Plural>
+        </PluralTranslate>
+      </Responsive.Tablet>
     );
   }
 }
