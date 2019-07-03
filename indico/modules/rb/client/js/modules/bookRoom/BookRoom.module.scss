@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 @import 'rb:styles/palette';
+@import 'rb:styles/responsive';
 
 .view-icons {
     height: 100%;
@@ -55,6 +56,16 @@
         .results-count-menu {
             position: relative;
             transition: opacity 0.25s ease-in;
+
+            @media (max-width: $tablet-width) {
+                :global(.item) {
+                    padding: 0.4em;
+
+                    :global(.label) {
+                        margin-left: 0;
+                    }
+                }
+            }
 
             &:global(.loading) {
                 opacity: 0.3;
