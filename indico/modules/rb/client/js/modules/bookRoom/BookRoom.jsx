@@ -16,7 +16,7 @@ import {Button, Card, Grid, Header, Icon, Popup, Divider} from 'semantic-ui-reac
 import LazyScroll from 'redux-lazy-scroll';
 
 import {Translate} from 'indico/react/i18n';
-import {Overridable, Slot, toClasses, IndicoPropTypes} from 'indico/react/util';
+import {Overridable, Slot, toClasses, IndicoPropTypes, Responsive} from 'indico/react/util';
 import {serializeTime, serializeDate} from 'indico/utils/date';
 import {StickyWithScrollBack} from 'indico/react/components';
 
@@ -373,26 +373,27 @@ class BookRoom extends React.Component {
           />
         }
         className={classes}
+        onClick={this.switchToTimeline}
         size="small"
         circular
       />
     );
     return (
       <div styleName="view-icons">
-        <span styleName="icons-wrapper">
-          {isTimelineVisible ? (
-            <Popup trigger={listBtn} content={Translate.string('List view')} />
-          ) : (
-            listBtn
-          )}
-          <Icon.Group onClick={this.switchToTimeline}>
+        <Responsive.Tablet andLarger orElse={isTimelineVisible ? listBtn : timelineBtn}>
+          <span styleName="icons-wrapper">
+            {isTimelineVisible ? (
+              <Popup trigger={listBtn} content={Translate.string('List view')} />
+            ) : (
+              listBtn
+            )}
             {!isTimelineVisible ? (
               <Popup trigger={timelineBtn} content={Translate.string('Timeline view')} />
             ) : (
               timelineBtn
             )}
-          </Icon.Group>
-        </span>
+          </span>
+        </Responsive.Tablet>
       </div>
     );
   }
