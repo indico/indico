@@ -15,7 +15,7 @@ import {Route} from 'react-router-dom';
 import LazyScroll from 'redux-lazy-scroll';
 import {stateToQueryString} from 'redux-router-querystring';
 
-import {Overridable, Slot} from 'indico/react/util';
+import {Overridable, Responsive, Slot} from 'indico/react/util';
 import {StickyWithScrollBack} from 'indico/react/components';
 import {Param, Plural, PluralTranslate, Translate, Singular} from 'indico/react/i18n';
 import {camelizeKeys} from 'indico/utils/case';
@@ -170,35 +170,37 @@ class RoomList extends React.Component {
                   <SearchBar />
                 </div>
                 {!hideActionsDropdown && (
-                  <div styleName="actions">
-                    {selectionMode ? (
-                      <>
-                        <Button
-                          icon="check"
-                          disabled={Object.keys(selection).length === 0}
-                          onClick={() => {
-                            if (selectionMode === 'blocking') {
-                              pushState('/rooms/blocking/create');
-                            } else if (selectionMode === 'export') {
-                              pushState('/rooms/bookings/export');
-                            }
-                          }}
-                          primary
-                          circular
+                  <Responsive.Tablet andLarger>
+                    <div styleName="actions">
+                      {selectionMode ? (
+                        <>
+                          <Button
+                            icon="check"
+                            disabled={Object.keys(selection).length === 0}
+                            onClick={() => {
+                              if (selectionMode === 'blocking') {
+                                pushState('/rooms/blocking/create');
+                              } else if (selectionMode === 'export') {
+                                pushState('/rooms/bookings/export');
+                              }
+                            }}
+                            primary
+                            circular
+                          />
+                          <Button icon="cancel" onClick={this.clearSelectionMode} circular />
+                        </>
+                      ) : (
+                        <Dropdown
+                          text={Translate.string('Actions')}
+                          className="small"
+                          options={menuOptions}
+                          direction="left"
+                          button
+                          floating
                         />
-                        <Button icon="cancel" onClick={this.clearSelectionMode} circular />
-                      </>
-                    ) : (
-                      <Dropdown
-                        text={Translate.string('Actions')}
-                        className="small"
-                        options={menuOptions}
-                        direction="left"
-                        button
-                        floating
-                      />
-                    )}
-                  </div>
+                      )}
+                    </div>
+                  </Responsive.Tablet>
                 )}
               </div>
             </StickyWithScrollBack>
