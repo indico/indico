@@ -9,7 +9,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {Form} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
-import {Responsive} from 'indico/react/util';
 
 import {FilterFormComponent} from '../../../common/filters';
 
@@ -53,11 +52,7 @@ export default class BuildingForm extends FilterFormComponent {
           <Form.Dropdown
             options={options}
             value={building}
-            placeholder={
-              <Responsive.Phone andSmaller>
-                <Translate>Building</Translate>
-              </Responsive.Phone>
-            }
+            placeholder={Translate.string('Building')}
             onChange={(__, {value}) => this.setBuilding(value || null)}
             closeOnChange
             closeOnBlur
