@@ -96,16 +96,12 @@ a {
 
     .filter-row-filters {
         display: flex;
-        align-items: baseline;
         flex-direction: row;
         flex-wrap: wrap;
 
         > :not(:last-child) {
             margin-right: 10px;
-        }
-
-        > :not(:first-child) {
-            margin-top: 10px;
+            margin-bottom: 10px;
         }
     }
 }

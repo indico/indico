@@ -13,7 +13,7 @@ import {Button, Container, Grid, Icon, Popup} from 'semantic-ui-react';
 import {connect} from 'react-redux';
 
 import {Translate} from 'indico/react/i18n';
-import {Overridable} from 'indico/react/util';
+import {Overridable, Responsive} from 'indico/react/util';
 import {StickyWithScrollBack} from 'indico/react/components';
 import {serializeDate} from 'indico/utils/date';
 
@@ -216,41 +216,39 @@ class Calendar extends React.Component {
       isFetching,
       isFetchingActiveBookings,
     } = this.props;
+    const timelineBtn = (
+      <Button
+        icon={<Icon name="calendar" />}
+        primary={view === 'timeline'}
+        onClick={() => changeView('timeline')}
+        disabled={isFetching || isFetchingActiveBookings}
+        size="small"
+        circular
+      />
+    );
+    const listBtn = (
+      <Button
+        icon={<Icon name="list" />}
+        primary={view === 'list'}
+        onClick={() => {
+          setFilterParameter('showInactive', null);
+          changeView('list');
+        }}
+        disabled={isFetching || isFetchingActiveBookings}
+        size="small"
+        circular
+      />
+    );
     return (
       <div styleName="view-switch">
-        <Popup
-          trigger={
-            <Button
-              icon={<Icon name="calendar" />}
-              primary={view === 'timeline'}
-              onClick={() => changeView('timeline')}
-              disabled={isFetching || isFetchingActiveBookings}
-              size="tiny"
-              circular
-            />
-          }
-          position="bottom center"
-        >
-          <Translate>Show calendar view</Translate>
-        </Popup>
-        <Popup
-          trigger={
-            <Button
-              icon={<Icon name="list" />}
-              primary={view === 'list'}
-              onClick={() => {
-                setFilterParameter('showInactive', null);
-                changeView('list');
-              }}
-              disabled={isFetching || isFetchingActiveBookings}
-              size="tiny"
-              circular
-            />
-          }
-          position="bottom center"
-        >
-          <Translate>Show a list of all upcoming bookings</Translate>
-        </Popup>
+        <Responsive.Tablet andLarger orElse={view === 'timeline' ? listBtn : timelineBtn}>
+          <Popup trigger={timelineBtn} position="bottom center">
+            <Translate>Show calendar view</Translate>
+          </Popup>
+          <Popup trigger={listBtn} position="bottom center">
+            <Translate>Show a list of all upcoming bookings</Translate>
+          </Popup>
+        </Responsive.Tablet>
       </div>
     );
   };
