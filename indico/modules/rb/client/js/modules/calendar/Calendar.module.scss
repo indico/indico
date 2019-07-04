@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@import 'rb:styles/responsive';
+
 .calendar-filters {
     display: flex;
     justify-content: space-between;
@@ -15,7 +17,7 @@
 
     .view-switch {
         display: flex;
-        align-items: flex-end;
+        align-items: flex-start;
 
         :global(.icon:last-child) {
             margin-right: 0.75em;
