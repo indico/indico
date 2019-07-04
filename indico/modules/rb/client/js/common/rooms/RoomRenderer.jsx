@@ -71,7 +71,7 @@ class RoomRenderer extends React.Component {
   render() {
     const {rooms, inSelectionMode, selectedRooms} = this.props;
     return (
-      <Card.Group stackable>
+      <Card.Group>
         {rooms.map(room => (
           <this.RoomComponent
             key={room.id}

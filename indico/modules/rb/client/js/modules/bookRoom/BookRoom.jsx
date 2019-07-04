@@ -334,7 +334,7 @@ class BookRoom extends React.Component {
         <Header styleName="header">
           <Translate>Here are some alternatives we've found for you!</Translate>
         </Header>
-        <Card.Group stackable>
+        <Card.Group>
           {suggestions.map(({room, suggestions: roomSuggestions}) => (
             <BookingSuggestion
               key={room.id}

@@ -76,9 +76,7 @@ class BlockingList extends React.Component {
       return <CardPlaceholder.Group count={10} className="blockings-placeholders" />;
     } else if (blockingsList.length !== 0) {
       return (
-        <Card.Group styleName="blockings-list" stackable>
-          {blockingsList.map(this.renderBlocking)}
-        </Card.Group>
+        <Card.Group styleName="blockings-list">{blockingsList.map(this.renderBlocking)}</Card.Group>
       );
     } else {
       return (

@@ -98,7 +98,7 @@ class CalendarListView extends React.Component {
           <Icon name="calendar outline" />
           {moment(day, 'YYYY-MM-DD').format('dddd, LL')}
         </Header>
-        <Card.Group itemsPerRow={4} stackable>
+        <Card.Group itemsPerRow={4} stackable styleName="day-cards-container">
           {bookings.map(this.renderBooking)}
         </Card.Group>
         <Divider hidden />

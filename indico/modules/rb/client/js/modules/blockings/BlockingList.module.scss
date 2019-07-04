@@ -5,10 +5,14 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@import 'rb:styles/responsive';
+
 
 .blockings-container {
     padding: 2em;
-    width: 75% !important;
+    @media (min-width: $computer-width) {
+        width: 75% !important;
+    }
 
     .blockings-list, :global(.blockings-placeholders) {
         margin: 10px 0 0 -5px;
