@@ -35,7 +35,7 @@ export default class RecurrenceForm extends FilterFormComponent {
       this.stateChanger('type')(e.target.value);
     };
     this.onTypeChange = this.stateChanger('type');
-    this.onNumberChange = this.stateChanger('number', num => Math.abs(parseInt(num, 10) || 1));
+    this.onNumberChange = this.stateChanger('number', num => Math.abs(parseInt(num, 10)));
     this.onIntervalChange = this.stateChanger('interval');
   }
 
