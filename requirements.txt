@@ -9,7 +9,7 @@ pyatom==1.4
 pycountry==18.12.8
 mock==3.0.5
 freezegun==0.3.12
-pytest==4.6.3
+pytest==4.6.4
 pytest-cov==2.7.1
 pytest-localserver==0.5.0
 pytest-mock==1.10.4
@@ -22,9 +22,9 @@ wsgiref==0.1.2
 zope.interface==3.8.0
 requests==2.22.0
 Werkzeug==0.15.4
-Flask==1.0.3
+Flask==1.1.0
 bcrypt==3.1.7
-Pillow==6.0.0
+Pillow==6.1.0
 qrcode==6.1
 Markdown==2.3.1
 bleach==3.1.0

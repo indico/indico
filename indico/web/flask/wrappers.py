@@ -87,12 +87,8 @@ class IndicoFlask(PluginFlaskMixin, Flask):
         return super(IndicoFlask, self).add_url_rule(rule, endpoint=endpoint, view_func=view_func, **options)
 
     @property
-    def static_folder(self):
-        return os.path.join(self.root_path, 'web', 'static')
-
-    @property
-    def static_url_path(self):
-        return '/'
+    def has_static_folder(self):
+        return False
 
     @property
     def manifest(self):

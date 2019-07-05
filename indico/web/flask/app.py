@@ -320,7 +320,7 @@ def make_app(set_path=False, testing=False, config_override=None):
     if _app_ctx_stack.top:
         Logger.get('flask').warn('make_app called within app context, using existing app')
         return _app_ctx_stack.top.app
-    app = IndicoFlask('indico', static_folder=None, template_folder='web/templates')
+    app = IndicoFlask('indico', static_folder='web/static', static_url_path='/', template_folder='web/templates')
     app.config['TESTING'] = testing
     app.config['INDICO'] = load_config(only_defaults=testing, override=config_override)
     configure_app(app, set_path)
