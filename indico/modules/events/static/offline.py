@@ -121,10 +121,13 @@ class StaticEventCreator(object):
         global_js = generate_global_file().encode('utf-8')
         user_js = generate_user_file().encode('utf-8')
         i18n_js = u"window.TRANSLATIONS = {};".format(generate_i18n_file(session.lang)).encode('utf-8')
+        react_i18n_js = u"window.REACT_TRANSLATIONS = {};".format(
+            generate_i18n_file(session.lang, react=True)).encode('utf-8')
         gen_path = os.path.join(self._content_dir, 'assets')
         self._zip_file.writestr(os.path.join(gen_path, 'js-vars', 'global.js'), global_js)
         self._zip_file.writestr(os.path.join(gen_path, 'js-vars', 'user.js'), user_js)
         self._zip_file.writestr(os.path.join(gen_path, 'i18n', session.lang + '.js'), i18n_js)
+        self._zip_file.writestr(os.path.join(gen_path, 'i18n', session.lang + '-react.js'), react_i18n_js)
 
     def _copy_static_files(self, used_assets):
         # add favicon
