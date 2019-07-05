@@ -161,19 +161,24 @@ export function renderRecurrence({type, number, interval}) {
   }
   if (type === 'single') {
     return (
-      <Responsive.Tablet andLarger orElse="S">
+      <Responsive.Tablet andLarger orElse={Translate.string('S', 'single booking shortcut')}>
         <Translate>Once</Translate>
       </Responsive.Tablet>
     );
   } else if (type === 'daily') {
     return (
-      <Responsive.Tablet andLarger orElse="D">
+      <Responsive.Tablet andLarger orElse={Translate.string('D', 'daily booking shortcut')}>
         <Translate>Daily</Translate>
       </Responsive.Tablet>
     );
   } else if (interval === 'week') {
     return (
-      <Responsive.Tablet andLarger orElse={`${number > 1 ? number : ''}W`}>
+      <Responsive.Tablet
+        andLarger
+        orElse={Translate.string('{number}W', 'weekly booking shortcut', {
+          number: number > 1 ? number : '',
+        })}
+      >
         <PluralTranslate count={number}>
           <Singular>Weekly</Singular>
           <Plural>
@@ -184,7 +189,12 @@ export function renderRecurrence({type, number, interval}) {
     );
   } else {
     return (
-      <Responsive.Tablet andLarger orElse={`${number > 1 ? number : ''}M`}>
+      <Responsive.Tablet
+        andLarger
+        orElse={Translate.string('{number}M', 'monthly booking shortcut', {
+          number: number > 1 ? number : '',
+        })}
+      >
         <PluralTranslate count={number}>
           <Singular>Monthly</Singular>
           <Plural>
