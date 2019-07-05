@@ -12,7 +12,7 @@ from itertools import groupby
 from operator import attrgetter
 
 from celery.schedules import crontab
-from sqlalchemy.orm import contains_eager
+from sqlalchemy.orm import contains_eager, noload
 
 from indico.core.celery import celery
 from indico.core.config import config
@@ -26,13 +26,13 @@ from indico.modules.rb.notifications.reservations import notify_about_finishing_
 from indico.util.console import cformat
 
 
-def _make_occurrence_date_filter(date_column, default_values, room_columns):
+def _make_occurrence_date_filter(date_column, default_values, room_columns, value_col=Reservation.repeat_frequency):
     notification_before = db.case({RepeatFrequency.WEEK.value: room_columns['weekly'],
                                    RepeatFrequency.MONTH.value: room_columns['monthly']},
-                                  else_=room_columns['default'], value=Reservation.repeat_frequency)
+                                  else_=room_columns['default'], value=value_col)
     notification_before_default = db.case({RepeatFrequency.WEEK.value: default_values['weekly'],
                                            RepeatFrequency.MONTH.value: default_values['monthly']},
-                                          else_=default_values['default'], value=Reservation.repeat_frequency)
+                                          else_=default_values['default'], value=value_col)
     notification_before_days = db.func.coalesce(notification_before, notification_before_default)
     days_until = db.cast(date_column, db.Date) - date.today()
     return days_until == notification_before_days
@@ -142,16 +142,27 @@ def roombooking_end_notifications():
         'monthly': Room.end_notification_monthly
     }
 
+    cte = (db.session.query(Reservation.id, Reservation.repeat_frequency)
+           .add_columns(db.func.max(ReservationOccurrence.start_dt).label('last_valid_end_dt'))
+           .join(Reservation.room)
+           .join(Reservation.occurrences)
+           .filter(ReservationOccurrence.is_valid,
+                   ReservationOccurrence.end_dt >= datetime.now(),
+                   Reservation.is_accepted,
+                   Reservation.repeat_frequency != RepeatFrequency.NEVER,
+                   Room.end_notifications_enabled,
+                   ~Reservation.end_notification_sent,
+                   ~Room.is_deleted)
+           .group_by(Reservation.id)
+           .cte())
+
     reservations = (Reservation.query
+                    .options(noload('created_by_user'))
+                    .join(cte, cte.c.id == Reservation.id)
                     .join(Reservation.room)
-                    .filter(~Room.is_deleted,
-                            Room.end_notifications_enabled,
-                            Reservation.is_accepted,
-                            Reservation.end_dt >= datetime.now(),
-                            Reservation.repeat_frequency != RepeatFrequency.NEVER,
-                            ~Reservation.end_notification_sent,
-                            _make_occurrence_date_filter(Reservation.end_dt, defaults, room_columns))
-                    .order_by(Reservation.booked_for_id, Reservation.start_dt, Room.id)
+                    .filter(_make_occurrence_date_filter(cte.c.last_valid_end_dt, defaults, room_columns,
+                                                         cte.c.repeat_frequency))
+                    .order_by('booked_for_id', 'start_dt', 'room_id')
                     .all())
 
     for user, user_reservations in groupby(reservations, key=attrgetter('booked_for_user')):
