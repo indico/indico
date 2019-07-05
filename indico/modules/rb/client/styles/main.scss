@@ -24,7 +24,7 @@ a {
 /* SemanticUI overrides for small screens */
 .ui.selection.dropdown {
     @media (max-width: $tablet-width) {
-        min-width: auto;
+        min-width: 100%;
     }
 }
 
