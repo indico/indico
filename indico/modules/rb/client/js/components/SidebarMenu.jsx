@@ -7,7 +7,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Icon, Popup, Sidebar, Menu} from 'semantic-ui-react';
+import {Icon, Sidebar, Menu} from 'semantic-ui-react';
 import {connect} from 'react-redux';
 import {push as pushRoute} from 'connected-react-router';
 import {Overridable} from 'indico/react/util';
@@ -96,9 +96,6 @@ function SidebarMenu({
       active: isAdminOverrideEnabled,
       onClick: toggleAdminOverride,
       onlyIf: isAdmin,
-      tooltip: Translate.string(
-        'Admin Override gives you unrestricted access to all rooms and bookings.'
-      ),
     },
   ].filter(({onlyIf}) => onlyIf === undefined || onlyIf);
 
@@ -115,8 +112,8 @@ function SidebarMenu({
       visible={visible}
       styleName="sidebar"
     >
-      {options.map(({key, text, icon, onClick, iconColor, active, tooltip}) => {
-        const item = (
+      {options.map(({key, text, icon, onClick, iconColor, active}) => {
+        return (
           <Menu.Item
             as="a"
             key={key}
@@ -132,10 +129,6 @@ function SidebarMenu({
             {text}
           </Menu.Item>
         );
-        if (!tooltip) {
-          return item;
-        }
-        return <Popup trigger={item} content={tooltip} key={key} position="left center" />;
       })}
       <div styleName="bottom-align">
         <SidebarFooter />
