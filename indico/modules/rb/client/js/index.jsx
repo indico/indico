@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import '@babel/polyfill';
+import 'core-js/es6';
 import setup from './setup';
 import 'indico/modules/core/impersonation';
 import 'indico/modules/core/top_bars';
