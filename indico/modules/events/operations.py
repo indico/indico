@@ -108,12 +108,15 @@ def update_event(event, update_timetable=False, **data):
                                     'organizer_info', 'additional_info', 'contact_title', 'contact_emails',
                                     'contact_phones', 'start_dt_override', 'end_dt_override'}
     old_person_links = event.person_links[:]
+    changes = {}
     if (update_timetable or event.type == EventType.lecture) and 'start_dt' in data:
         # Lectures have no exposed timetable so if we have any timetable entries
         # (e.g. because the event had a different type before) we always update them
         # silently.
-        event.move_start_dt(data.pop('start_dt'))
-    changes = event.populate_from_dict(data)
+        start_dt = data.pop('start_dt')
+        changes['start_dt'] = (event.start_dt, start_dt)
+        event.move_start_dt(start_dt)
+    changes.update(event.populate_from_dict(data))
     # Person links are partially updated when the WTForms field is processed,
     # we we don't have proper change tracking there in some cases
     changes.pop('person_link_data', None)
