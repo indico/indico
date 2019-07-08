@@ -12,6 +12,7 @@ import {DayPickerRangeController as RangePicker} from 'react-dates';
 
 import 'react-dates/lib/css/_datepicker.css';
 import '../style/dates.scss';
+import {responsiveReactDates} from './util';
 
 export default class CalendarRangeDatePicker extends React.Component {
   static propTypes = {
@@ -33,15 +34,13 @@ export default class CalendarRangeDatePicker extends React.Component {
   render() {
     const {focusedInput} = this.state;
     const {disabledDate, ...props} = this.props;
-    return (
-      <RangePicker
-        focusedInput={focusedInput}
-        onFocusChange={this.onFocusChange}
-        isOutsideRange={disabledDate}
-        hideKeyboardShortcutsPanel
-        numberOfMonths={2}
-        {...props}
-      />
-    );
+    return responsiveReactDates(RangePicker, {
+      ...props,
+      focusedInput,
+      onFocusChange: this.onFocusChange,
+      isOutsideRange: disabledDate,
+      hideKeyboardShortcutsPanel: true,
+      numberOfMonths: 2,
+    });
   }
 }
