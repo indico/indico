@@ -100,7 +100,7 @@ def get_existing_rooms_occurrences(rooms, start_dt, end_dt, repeat_frequency, re
 
 
 def get_rooms_availability(rooms, start_dt, end_dt, repeat_frequency, repeat_interval, skip_conflicts_with=None,
-                           admin_override_enabled=False):
+                           admin_override_enabled=False, skip_past_conflicts=False):
     availability = OrderedDict()
     candidates = ReservationOccurrence.create_series(start_dt, end_dt, (repeat_frequency, repeat_interval))
     date_range = sorted(set(cand.start_dt.date() for cand in candidates))
@@ -119,7 +119,7 @@ def get_rooms_availability(rooms, start_dt, end_dt, repeat_frequency, repeat_int
         rooms, start_dt.replace(tzinfo=None), end_dt.replace(tzinfo=None),
         repeat_frequency, repeat_interval, nonoverridable_blocked_rooms,
         nonbookable_periods, unbookable_hours, skip_conflicts_with,
-        allow_admin=admin_override_enabled
+        allow_admin=admin_override_enabled, skip_past_conflicts=skip_past_conflicts
     )
     dates = list(candidate.start_dt.date() for candidate in candidates)
     for room in rooms:
@@ -467,7 +467,8 @@ def get_booking_edit_calendar_data(booking, booking_changes):
 
         response['will_be_split'] = True
     elif not has_same_dates(booking, booking_changes):
-        new_date_range, data = get_rooms_availability([room], skip_conflicts_with=[booking.id], **booking_changes)
+        new_date_range, data = get_rooms_availability([room], skip_conflicts_with=[booking.id],
+                                                      skip_past_conflicts=True, **booking_changes)
     else:
         return response
 

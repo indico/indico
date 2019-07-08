@@ -8,6 +8,7 @@
 from __future__ import unicode_literals
 
 from collections import defaultdict
+from datetime import datetime
 from itertools import combinations
 
 from flask import session
@@ -22,7 +23,8 @@ from indico.util.struct.iterables import group_list
 
 
 def get_rooms_conflicts(rooms, start_dt, end_dt, repeat_frequency, repeat_interval, blocked_rooms,
-                        nonbookable_periods, unbookable_hours, skip_conflicts_with=None, allow_admin=False):
+                        nonbookable_periods, unbookable_hours, skip_conflicts_with=None, allow_admin=False,
+                        skip_past_conflicts=False):
     rooms_conflicts = defaultdict(set)
     rooms_pre_conflicts = defaultdict(set)
     rooms_conflicting_candidates = defaultdict(set)
@@ -40,6 +42,8 @@ def get_rooms_conflicts(rooms, start_dt, end_dt, repeat_frequency, repeat_interv
 
     if skip_conflicts_with:
         query = query.filter(~Reservation.id.in_(skip_conflicts_with))
+    if skip_past_conflicts:
+        query = query.filter(ReservationOccurrence.start_dt > datetime.now())
 
     overlapping_occurrences = group_list(query, key=lambda obj: obj.reservation.room.id)
     for room_id, occurrences in overlapping_occurrences.iteritems():
