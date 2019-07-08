@@ -61,7 +61,7 @@ function TimeInformation({
             <div>
               <Icon name="list" />
               <strong>
-                {renderRecurrence(recurrence)}
+                {renderRecurrence(recurrence, false)}
                 {occurrenceCount > 1 && (
                   <>
                     {', '}

@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 @import 'rb:styles/palette';
+@import 'rb:styles/responsive';
 
 .photo-dimmable-width {
     width: 100%;
@@ -58,6 +59,10 @@
         height: 100%;
         width: 100%;
 
+        @media (max-width: $tablet-width) {
+            border: none;
+        }
+
         &.clickable {
             cursor: zoom-in !important;
         }
@@ -90,6 +95,9 @@ ul.room-basic-details {
 
         &:global(.has-icon) {
             padding-left: 0;
+            @media (max-width: $tablet-width) {
+                padding-left: 1.5em;
+            }
         }
     }
 }

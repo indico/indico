@@ -13,7 +13,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {serializeDate} from 'indico/utils/date';
 import {Responsive} from 'indico/react/util';
-import {PluralTranslate, Translate, Singular, Plural, Param} from 'indico/react/i18n';
+import {PluralTranslate, Translate, Param} from 'indico/react/i18n';
 
 export function preProcessParameters(params, rules) {
   return _pruneNullLeaves(
@@ -155,53 +155,45 @@ PopupParam.defaultProps = {
   children: null,
 };
 
-export function renderRecurrence({type, number, interval}) {
+export function renderRecurrence({type, number, interval}, shortcut = true) {
   if (!type) {
     return null;
   }
   if (type === 'single') {
     return (
-      <Responsive.Tablet andLarger orElse={Translate.string('S', 'single booking shortcut')}>
-        <Translate>Once</Translate>
-      </Responsive.Tablet>
+      <Responsive.Phone andSmaller onlyIf={shortcut} orElse={Translate.string('Once')}>
+        <Translate context="single booking shortcut">S</Translate>
+      </Responsive.Phone>
     );
   } else if (type === 'daily') {
     return (
-      <Responsive.Tablet andLarger orElse={Translate.string('D', 'daily booking shortcut')}>
-        <Translate>Daily</Translate>
-      </Responsive.Tablet>
+      <Responsive.Phone andSmaller onlyIf={shortcut} orElse={Translate.string('Daily')}>
+        <Translate context="daily booking shortcut">D</Translate>
+      </Responsive.Phone>
     );
   } else if (interval === 'week') {
     return (
-      <Responsive.Tablet
-        andLarger
-        orElse={Translate.string('{number}W', 'weekly booking shortcut', {
-          number: number > 1 ? number : '',
-        })}
+      <Responsive.Phone
+        andSmaller
+        onlyIf={shortcut}
+        orElse={PluralTranslate.string('Weekly', 'Every {number} weeks', number, {number})}
       >
-        <PluralTranslate count={number}>
-          <Singular>Weekly</Singular>
-          <Plural>
-            Every <Param name="number" value={number} /> weeks
-          </Plural>
-        </PluralTranslate>
-      </Responsive.Tablet>
+        <Translate context="weekly booking shortcut">
+          <Param name="number" value={number > 1 ? number : ''} />W
+        </Translate>
+      </Responsive.Phone>
     );
   } else {
     return (
-      <Responsive.Tablet
-        andLarger
-        orElse={Translate.string('{number}M', 'monthly booking shortcut', {
-          number: number > 1 ? number : '',
-        })}
+      <Responsive.Phone
+        andSmaller
+        onlyIf={shortcut}
+        orElse={PluralTranslate.string('Monthly', 'Every {number} months', number, {number})}
       >
-        <PluralTranslate count={number}>
-          <Singular>Monthly</Singular>
-          <Plural>
-            Every <Param name="number" value={number} /> months
-          </Plural>
-        </PluralTranslate>
-      </Responsive.Tablet>
+        <Translate context="monthly booking shortcut">
+          <Param name="number" value={number > 1 ? number : ''} />M
+        </Translate>
+      </Responsive.Phone>
     );
   }
 }

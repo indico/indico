@@ -566,7 +566,7 @@ class BookRoomModal extends React.Component {
           {isPrebooking ? defaultTitles.preBooking : defaultTitles.booking}
         </Modal.Header>
         <Modal.Content>
-          <Grid>
+          <Grid stackable>
             <Grid.Column width={8}>
               <RoomBasicDetails room={room} />
               <TimeInformationComponent
@@ -586,7 +586,7 @@ class BookRoomModal extends React.Component {
                     <Icon name="user" />
                     <Translate>Usage</Translate>
                   </h3>
-                  <Form.Group>
+                  <Form.Group styleName="usage-radio">
                     <FinalRadio
                       name="usage"
                       value="myself"

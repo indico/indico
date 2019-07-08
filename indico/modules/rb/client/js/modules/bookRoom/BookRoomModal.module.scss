@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 @import 'rb:styles/palette';
+@import 'rb:styles/responsive';
 
 .pre-booking-color {
     color: $orange;
@@ -56,4 +57,10 @@
 
 :global(.ui.segment).pre-conflicts-segment {
     padding-left: 2em;
+}
+
+.usage-radio :global(.ui.radio) {
+    @media (max-width: $tablet-width) {
+        padding-bottom: 0.5em;
+    }
 }
