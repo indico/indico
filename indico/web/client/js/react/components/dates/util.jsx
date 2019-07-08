@@ -15,11 +15,20 @@ import {Responsive} from 'indico/react/util';
  * It will work with both `react-date`'s `RangePicker`  and `SinglePicker`.
  */
 export const responsiveReactDates = (Component, props) => {
+  const supportsFullScreenPortal = 'withFullScreenPortal' in Component.defaultProps;
   const verticalLayout = (
-    <Component {...props} withFullScreenPortal orientation={VERTICAL_ORIENTATION} />
+    <Component
+      {...props}
+      {...(supportsFullScreenPortal ? {withFullScreenPortal: true} : {})}
+      orientation={VERTICAL_ORIENTATION}
+    />
   );
   const horizontalLayout = (
-    <Component {...props} withFullScreenPortal orientation={HORIZONTAL_ORIENTATION} />
+    <Component
+      {...props}
+      {...(supportsFullScreenPortal ? {withFullScreenPortal: true} : {})}
+      orientation={HORIZONTAL_ORIENTATION}
+    />
   );
   const component = <Component {...props} />;
 
