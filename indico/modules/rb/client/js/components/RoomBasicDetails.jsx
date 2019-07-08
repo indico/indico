@@ -130,7 +130,7 @@ export default class RoomBasicDetails extends React.PureComponent {
       fullName: name,
     } = room;
     return (
-      <Grid columns={2}>
+      <Grid columns={2} stackable>
         <Grid.Column textAlign="center" styleName="photo-column">
           {this.renderImage()}
         </Grid.Column>

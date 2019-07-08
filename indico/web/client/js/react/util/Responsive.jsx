@@ -20,14 +20,14 @@ const factory = (minDimension, maxDimension) => {
    * This component extends `Responsive` from `react-responsive`, adding some
    * useful configuration options.
    */
-  function _SizeSpec({andLarger, andSmaller, orElse, children, ...restProps}) {
+  function _SizeSpec({andLarger, andSmaller, orElse, children, onlyIf, ...restProps}) {
     return (
       <Responsive
         minWidth={andSmaller ? null : minDimension}
         maxWidth={andLarger ? null : maxDimension - 1}
         {...restProps}
       >
-        {matches => (matches ? children : orElse)}
+        {matches => (matches && onlyIf ? children : orElse)}
       </Responsive>
     );
   }
@@ -39,12 +39,15 @@ const factory = (minDimension, maxDimension) => {
     andSmaller: PropTypes.bool,
     /** allows for negative cases to be specified easily */
     orElse: PropTypes.node,
+    /** allows adding an extra condition to render the matching content */
+    onlyIf: PropTypes.bool,
     children: PropTypes.node.isRequired,
   };
 
   _SizeSpec.defaultProps = {
     andLarger: false,
     andSmaller: false,
+    onlyIf: true,
     orElse: null,
   };
 
