@@ -45,5 +45,4 @@ htmlcov/
 
 # node/webpack
 webpack-build-config.json
-package-lock.json
 *.lock
