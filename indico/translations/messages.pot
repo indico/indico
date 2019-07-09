@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indico 2.2-dev\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2019-06-27 13:08+0200\n"
+"POT-Creation-Date: 2019-07-09 12:03+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4565,30 +4565,34 @@ msgid_plural "%(count)s notifications sent"
 msgstr[0] ""
 msgstr[1] ""
 
-#: indico/modules/events/abstracts/templates/display/_common.html:12
+#: indico/modules/events/abstracts/templates/display/_common.html:13
 #: indico/modules/events/abstracts/templates/management/cfa_actions/open.html:4
 msgid "The call for abstracts is open"
 msgstr ""
 
-#: indico/modules/events/abstracts/templates/display/_common.html:14
+#: indico/modules/events/abstracts/templates/display/_common.html:15
 msgid "You have been authorized to submit abstracts"
 msgstr ""
 
-#: indico/modules/events/abstracts/templates/display/_common.html:18
+#: indico/modules/events/abstracts/templates/display/_common.html:19
 msgid "You can submit an abstract for reviewing."
 msgstr ""
 
-#: indico/modules/events/abstracts/templates/display/_common.html:21
-msgid "The call for abstracts is closed."
+#: indico/modules/events/abstracts/templates/display/_common.html:22
+msgid "The call for abstracts is not open yet."
 msgstr ""
 
 #: indico/modules/events/abstracts/templates/display/_common.html:24
+msgid "The call for abstracts is closed."
+msgstr ""
+
+#: indico/modules/events/abstracts/templates/display/_common.html:27
 msgid "You may still modify your abstracts."
 msgstr ""
 
-#: indico/modules/events/abstracts/templates/display/_common.html:33
-#: indico/modules/events/abstracts/templates/display/_common.html:37
-#: indico/modules/events/abstracts/templates/display/_common.html:43
+#: indico/modules/events/abstracts/templates/display/_common.html:36
+#: indico/modules/events/abstracts/templates/display/_common.html:40
+#: indico/modules/events/abstracts/templates/display/_common.html:46
 msgid "Submit new abstract"
 msgstr ""
 

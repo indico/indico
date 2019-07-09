@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2019-06-19 13:09+0200\n"
+"POT-Creation-Date: 2019-07-19 12:03+0200\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "MIME-Version: 1.0\n"
@@ -158,7 +158,7 @@ msgstr ""
 
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:410
 #: indico/modules/rb/client/js/common/bookings/BookingEdit.jsx:230
-#: indico/modules/rb/client/js/common/bookings/BookingExportModal.jsx:97
+#: indico/modules/rb/client/js/common/bookings/BookingExportModal.jsx:87
 #: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:943
 #: indico/modules/rb/client/js/common/timeline/RowActionsDropdown.jsx:197
 #: indico/modules/rb/client/js/common/timeline/RowActionsDropdown.jsx:209
@@ -308,20 +308,20 @@ msgstr ""
 msgid "File format"
 msgstr ""
 
-#: indico/modules/rb/client/js/common/bookings/BookingExportModal.jsx:76
+#: indico/modules/rb/client/js/common/bookings/BookingExportModal.jsx:66
 #: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:356
 msgid "Period"
 msgstr ""
 
-#: indico/modules/rb/client/js/common/bookings/BookingExportModal.jsx:84
+#: indico/modules/rb/client/js/common/bookings/BookingExportModal.jsx:74
 msgid "Rooms to export"
 msgstr ""
 
-#: indico/modules/rb/client/js/common/bookings/BookingExportModal.jsx:87
+#: indico/modules/rb/client/js/common/bookings/BookingExportModal.jsx:77
 msgid "Please choose at least one room."
 msgstr ""
 
-#: indico/modules/rb/client/js/common/bookings/BookingExportModal.jsx:95
+#: indico/modules/rb/client/js/common/bookings/BookingExportModal.jsx:85
 msgid "Export"
 msgstr ""
 
@@ -1014,10 +1014,6 @@ msgstr ""
 
 #: indico/modules/rb/client/js/components/SidebarMenu.jsx:94
 msgid "Admin Override"
-msgstr ""
-
-#: indico/modules/rb/client/js/components/SidebarMenu.jsx:99
-msgid "Admin Override gives you unrestricted access to all rooms and bookings."
 msgstr ""
 
 #: indico/modules/rb/client/js/components/TimeInformation.jsx:49
