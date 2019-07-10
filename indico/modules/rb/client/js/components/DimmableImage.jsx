@@ -8,6 +8,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import {Responsive} from 'indico/react/util';
+
 import './DimmableImage.module.scss';
 
 export default class DimmableImage extends React.Component {
@@ -28,8 +30,10 @@ export default class DimmableImage extends React.Component {
     return (
       <div styleName="dimmable-image">
         {children}
-        <div styleName="content">{content}</div>
-        <div styleName="hover-content">{hoverContent}</div>
+        <Responsive.Tablet andLarger orElse={<div styleName="hover-content">{hoverContent}</div>}>
+          <div styleName="content">{content}</div>
+          <div styleName="hover-content">{hoverContent}</div>
+        </Responsive.Tablet>
       </div>
     );
   }

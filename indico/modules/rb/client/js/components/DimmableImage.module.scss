@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@import 'rb:styles/responsive';
+
 .dimmable-image {
     position: relative;
 
@@ -24,18 +26,30 @@
         transform: translate(-50%, -50%);
         text-align: center;
         width: 160px;
+
+    }
+    @media (max-width: $tablet-width) {
+        .hover-content {
+            opacity: 1;
+        }
+
+        :global(.img) {
+            filter: brightness(80%);
+        }
     }
 
-    &:hover :global(.img) {
-        filter: blur(2px) contrast(150%) brightness(40%);
-        transition: all 30ms ease;
-    }
+    @media (min-width: $tablet-width) {
+        &:hover :global(.img) {
+            filter: blur(2px) contrast(150%) brightness(40%);
+            transition: all 30ms ease;
+        }
 
-    &:hover .hover-content {
-        opacity: 1;
-    }
+        &:hover .hover-content {
+            opacity: 1;
+        }
 
-    &:hover .content {
-        opacity: 0;
+        &:hover .content {
+            opacity: 0;
+        }
     }
 }
