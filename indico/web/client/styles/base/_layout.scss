@@ -9,6 +9,14 @@ body {
     @extend .flexcol;
 }
 
+/* Work arond issues with Firefox which only displays the first page when
+ * printing */
+@media print {
+    body {
+        display: block;
+    }
+}
+
 body > .main {
     flex-grow: 1;
 }
