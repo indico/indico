@@ -10,7 +10,8 @@ body {
 }
 
 /* Work arond issues with Firefox which only displays the first page when
- * printing */
+ * printing
+ */
 @media print {
     body {
         display: block;
@@ -24,7 +25,8 @@ body > .main {
 /* Work around issues in WebKit (used by Safari) which shrinks the contained
  * elements instead of growing the container. The following prevents the
  * children of the flexbox to be shrinked which is ok since we want the page to
- * scroll anyway. */
+ * scroll anyway.
+ */
 body > * {
     flex-shrink: 0;
 }
