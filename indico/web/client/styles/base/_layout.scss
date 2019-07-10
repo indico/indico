@@ -9,7 +9,7 @@ body {
     @extend .flexcol;
 }
 
-/* Work arond issues with Firefox which only displays the first page when
+/* Work around issues with Firefox which only displays the first page when
  * printing
  */
 @media print {
