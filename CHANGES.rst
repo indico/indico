@@ -59,6 +59,7 @@ Bugfixes
 - Fix sorting book of abstracts by board number (:issue:`3429`, thanks
   :user:`bpedersen2`)
 - Enforce survey submission limit (:issue:`3256`)
+- Fix Firefox printing only 1 page issue (:issue:`3782`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
