@@ -150,7 +150,7 @@ class BookFromListModal extends React.Component {
           {isPrebooking ? labels.preBookTitle : labels.bookTitle}
         </Modal.Header>
         <Modal.Content>
-          <Grid>
+          <Grid stackable>
             <Grid.Column width={8}>
               <RoomBasicDetails room={room} />
             </Grid.Column>

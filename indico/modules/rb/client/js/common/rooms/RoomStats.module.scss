@@ -6,12 +6,15 @@
 // LICENSE file for more details.
 
 @import 'rb:styles/palette';
+@import 'rb:styles/responsive';
 
 .room-stats {
     display: flex;
     justify-content: space-around;
     color: $gray;
-    padding: 0 3em;
+    @media (min-width: $tablet-width) {
+        padding: 0 3em;
+    }
 
     .stats-box {
         text-transform: uppercase;

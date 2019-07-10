@@ -13,7 +13,7 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {Button, Grid, Icon, Modal, Header, Message, List, Segment, Popup} from 'semantic-ui-react';
 import {Translate, Param} from 'indico/react/i18n';
-import {Overridable, IndicoPropTypes, Markdown} from 'indico/react/util';
+import {Overridable, IndicoPropTypes, Markdown, Responsive} from 'indico/react/util';
 import {getOccurrenceTypes, transformToLegendLabels} from '../../util';
 import RoomBasicDetails from '../../components/RoomBasicDetails';
 import RoomKeyLocation from '../../components/RoomKeyLocation';
@@ -76,11 +76,13 @@ class RoomDetailsModal extends React.Component {
         <Modal open onClose={this.handleCloseModal} size="large" closeIcon>
           <Modal.Header styleName="room-details-header">
             {title}
-            {room.canUserEdit && (
-              <span>
-                <Button icon="pencil" circular onClick={this.showRoomEditModal} />
-              </span>
-            )}
+            <Responsive.Tablet andLarger>
+              {room.canUserEdit && (
+                <span>
+                  <Button icon="pencil" circular onClick={this.showRoomEditModal} />
+                </span>
+              )}
+            </Responsive.Tablet>
           </Modal.Header>
           <Modal.Content>
             <RoomDetails
@@ -150,7 +152,7 @@ function RoomDetails({bookRoom, room, availability, attributes}) {
 
   return (
     <div styleName="room-details">
-      <Grid columns={2}>
+      <Grid stackable columns={2}>
         <Grid.Column>
           <div>
             <RoomBasicDetails room={room} />

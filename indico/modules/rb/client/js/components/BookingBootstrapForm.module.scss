@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@import 'rb:styles/responsive';
+
 .booking-type-field {
     display: flex;
     justify-content: center;
@@ -27,3 +29,9 @@
         min-width: 0;
     }
 }
+
+@media (max-width: $tablet-width) {
+    :global(.DateInput) {
+        width: 110px;
+    }
+ }
