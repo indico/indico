@@ -65,7 +65,7 @@ i[class^="icon-"]:before {
  *  7. Search for the icon you want to add using the search box
  *  8. Select the icons to add with the selection tool
  *  9. Add the new icons to our set (Click the hamburger icon to the right of our set that
- *     should be displayed as "icomoon" and select "Copy selection to set")
+ *     should be displayed as "icomoon" and select "Move selection here")
  * 10. Clear the search box
  * 11. Remove all icons sets except ours (Click the hamburger icon to the right of the set to remove
  *     and choose "Remove set")
@@ -80,6 +80,7 @@ i[class^="icon-"]:before {
  *      - icomoon.zip/fonts/icommon.{svg,ttf,woff} to indico/htdocs/static/fonts/icomoon/
  *      - icomoon.zip/selection.json to indico/htdocs/static/fonts/icomoon/
  *      - Replace the icon definitions between the comments below with the ones found in icomoon.zip/style.css
+          (pay attention to the indentation!)
  */
 
 /* Icomoon's icon definitions */
