@@ -9,9 +9,7 @@ body {
     @extend .flexcol;
 }
 
-/* Work around issues with Firefox which only displays the first page when
- * printing
- */
+// Work around issues with Firefox which only displays the first page when printing
 @media print {
     body {
         display: block;
@@ -22,11 +20,10 @@ body > .main {
     flex-grow: 1;
 }
 
-/* Work around issues in WebKit (used by Safari) which shrinks the contained
- * elements instead of growing the container. The following prevents the
- * children of the flexbox to be shrinked which is ok since we want the page to
- * scroll anyway.
- */
+// Work around issues in WebKit (used by Safari) which shrinks the contained
+// elements instead of growing the container. The following prevents the
+// children of the flexbox to be shrinked which is ok since we want the page to
+// scroll anyway.
 body > * {
     flex-shrink: 0;
 }
