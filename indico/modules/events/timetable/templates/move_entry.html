@@ -85,7 +85,7 @@
         function toggleMoveButton(item) {
             item.toggleClass('selected');
             if (item.data('item-id') != $initiallySelected.data('item-id')) {
-                item.find('.move-btn').toggle('slide', {direction: 'right'}, 200);
+                item.find('.move-btn').animate({ width: "toggle"});
             }
         }
 

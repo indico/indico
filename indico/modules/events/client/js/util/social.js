@@ -43,7 +43,7 @@
       show: {
         event: 'click',
         effect: function() {
-          $(this).show('slide', {direction: 'down'});
+          $(this).slideDown(200);
         },
         target: $('.social-button'),
       },
