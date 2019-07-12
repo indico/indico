@@ -147,8 +147,7 @@ type('TimetableLayoutManager', [], {
       }
 
       if (exists(lastAssigned[getLastAssignedId(block)])) {
-        assigned[block.assigned] = block;
-        lastAssign(block, block.assigned);
+        lastAssign(block);
       } else {
         // This block has never been assigned before. Just update the lastAssigned.
         lastAssign(block, block.assigned);
@@ -393,7 +392,7 @@ type('CompactLayoutManager', ['IncrementalLayoutManager'], {
       algData.grid.push([(startMin / 60) % 24, algData.topPx]);
     }
 
-    if (algData.active === 0) {
+    if (!algData.active) {
       if (algData.currentGroup.length > 0) {
         algData.groups.push([algData.currentGroup, keys(algData.assigned).length]);
         algData.currentGroup = [];
