@@ -28,7 +28,7 @@ settings:
         - ['indico', './indico/web/client/js']
       extensions: [.js, .jsx, .json]
   react:
-    version: '16.6.3'
+    version: detect
 
 rules:
   import/no-unresolved:
