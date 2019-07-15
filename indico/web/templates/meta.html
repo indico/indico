@@ -1,0 +1,15 @@
+{% if page_metadata.og %}
+    {% for key, value in page_metadata.og.viewitems() %}
+        <meta property="og:{{ key }}" content="{{ value|striptags|truncate(500) }}">
+    {% endfor %}
+{% endif %}
+
+{% if page_metadata.json_ld %}
+    <script type="application/ld+json">
+        {{ page_metadata.json_ld|tojson }}
+    </script>
+{% endif %}
+
+{% if page_metadata.keywords -%}
+    <meta name="keywords" content="{{ page_metadata.keywords|join(',') }}">
+{%- endif %}

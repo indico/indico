@@ -17,12 +17,14 @@ from pytz import common_timezones, common_timezones_set
 
 from indico.core import signals
 from indico.core.config import config
+from indico.modules.core.settings import core_settings
 from indico.modules.legal import legal_settings
 from indico.util.decorators import classproperty
 from indico.util.i18n import _, get_all_locales
 from indico.util.signals import values_from_signal
 from indico.util.string import to_unicode
 from indico.web.flask.templating import get_template_module
+from indico.web.flask.util import url_for
 from indico.web.menu import build_menu_structure
 from indico.web.util import jsonify_template
 
@@ -183,6 +185,17 @@ class WPBundleMixin(object):
                 seen_bundles.add(bundle)
                 yield bundle
 
+    @classproperty
+    @classmethod
+    def page_metadata(self):
+        site_name = core_settings.get('site_title')
+        return {
+            'og': {
+                'site_name': (site_name + ' (Indico)') if site_name != 'Indico' else site_name,
+                'image': url_for('assets.image', filename='indico_square.png', _external=True)
+            }
+        }
+
 
 class WPBase(WPBundleMixin):
     title = ''
@@ -215,7 +228,7 @@ class WPBase(WPBundleMixin):
         Override this method to add your own, page-specific loading of
         JavaScript, CSS and other legal content for HTML <head> tag.
         """
-        return ""
+        return ''
 
     def _fix_path(self, path):
         url_path = urlparse(config.BASE_URL).path or '/'
@@ -257,6 +270,7 @@ class WPBase(WPBundleMixin):
                                bundles=bundles, print_bundles=print_bundles,
                                site_name=core_settings.get('site_title'),
                                social=social_settings.get_all(),
+                               page_metadata=self.page_metadata,
                                page_title=' - '.join(unicode(x) for x in title_parts if x),
                                head_content=to_unicode(self._get_head_content()),
                                body=body)
@@ -309,6 +323,7 @@ class WPNewBase(WPBundleMixin, WPJinjaMixin):
         template = cls._prefix_template(template_name)
         return render_template(template,
                                css_files=css_files, js_files=js_files,
+                               page_metadata=cls.page_metadata,
                                bundles=bundles, print_bundles=print_bundles,
                                site_name=core_settings.get('site_title'),
                                social=social_settings.get_all(),
