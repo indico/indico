@@ -92,6 +92,20 @@ class WPEventBase(WPDecorated):
     ALLOW_JSON = False
     bundles = ('module_events.display.js',)
 
+    @property
+    def page_metadata(self):
+        metadata = super(WPEventBase, self).page_metadata
+        return {
+            'og': dict(metadata['og'], **{
+                'type': 'event',
+                'image': (self.event.logo_url if self.event.has_logo else
+                          url_for('assets.image', filename='indico_square.png', _external=True)),
+                'description': self.event.description
+            }),
+            'json_ld': serialize_event_for_json_ld(self.event, full=True),
+            'keywords': self.event.keywords
+        }
+
     def __init__(self, rh, event_, **kwargs):
         assert event_ == kwargs.setdefault('event', event_)
         self.event = event_
@@ -112,12 +126,6 @@ class WPEventBase(WPDecorated):
 
     def _get_header(self):
         raise NotImplementedError  # must be overridden by meeting/lecture and conference WPs
-
-    def _get_head_content(self):
-        site_name = core_settings.get('site_title')
-        meta = render_template('events/meta.html', event=self.event, site_name=site_name,
-                               json_ld=serialize_event_for_json_ld(self.event, full=True))
-        return WPDecorated._get_head_content(self) + meta
 
 
 class WPSimpleEventDisplayBase(MathjaxMixin, WPEventBase):

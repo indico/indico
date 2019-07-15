@@ -14,7 +14,8 @@
     <meta name="csrf-token" id="csrf-token" content="{{ session.csrf_token }}">
     <link rel="shortcut icon" type="image/x-icon" href="{{ indico_config.IMAGES_BASE_URL }}/indico.ico">
 
-    <meta property="og:site_name" content="{{ site_name }}{% if site_name != 'Indico' %} (Indico){% endif %}">
+    {% include 'meta.html' %}
+
     {% if social.facebook_app_id -%}
         <meta property="fb:app_id" content="{{ social.facebook_app_id }}">
     {% endif %}
