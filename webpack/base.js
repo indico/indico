@@ -235,6 +235,7 @@ export function webpackDefaults(env, config, bundles) {
         basePath: globalBuildConfig.baseURLPath,
       },
     ],
+    'macros',
   ];
 
   return {
