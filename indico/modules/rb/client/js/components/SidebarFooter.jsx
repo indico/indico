@@ -9,7 +9,6 @@ import contactURL from 'indico-url:core.contact';
 import tosURL from 'indico-url:legal.display_tos';
 import privacyPolicyURL from 'indico-url:legal.display_privacy';
 
-import _ from 'lodash';
 import React, {useState} from 'react';
 import PropTypes from 'prop-types';
 import {Icon, Menu, Modal, Popup} from 'semantic-ui-react';
@@ -39,7 +38,10 @@ const buildMenuItems = (helpURL, hasTOS, hasPrivacyPolicy) => {
         icon: 'at',
       },
     ],
-    [
+  ];
+
+  if (hasTOS) {
+    menuItems.push([
       'tos',
       {
         href: tosURL(),
@@ -49,8 +51,10 @@ const buildMenuItems = (helpURL, hasTOS, hasPrivacyPolicy) => {
         caption: Translate.string('Terms and Conditions'),
         icon: 'file text',
       },
-    ],
-    [
+    ]);
+  }
+  if (hasPrivacyPolicy) {
+    menuItems.push([
       'privacy',
       {
         href: privacyPolicyURL(),
@@ -60,14 +64,7 @@ const buildMenuItems = (helpURL, hasTOS, hasPrivacyPolicy) => {
         caption: Translate.string('Privacy Policy'),
         icon: 'eye',
       },
-    ],
-  ];
-
-  if (!hasTOS) {
-    _.remove(menuItems, ([id]) => id === 'tos');
-  }
-  if (!hasPrivacyPolicy) {
-    _.remove(menuItems, ([id]) => id === 'privacy');
+    ]);
   }
   return menuItems;
 };
