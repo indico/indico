@@ -157,23 +157,25 @@ class WPJinjaMixin(object):
 class WPBundleMixin(object):
     print_bundles = tuple()
 
-    @property
-    def additional_bundles(self):
+    @classproperty
+    @classmethod
+    def additional_bundles(cls):
         """Additional bundle objects that will be included."""
         return {
             'screen': (),
             'print': ()
         }
 
-    def _resolve_bundles(self):
+    @classmethod
+    def _resolve_bundles(cls):
         """Add up all bundles, following the MRO."""
         seen_bundles = set()
-        for class_ in reversed(self.__class__.mro()[:-1]):
+        for class_ in reversed(cls.mro()[:-1]):
             attr = class_.__dict__.get('bundles', ())
             if isinstance(attr, classproperty):
                 attr = attr.__get__(None, class_)
             elif isinstance(attr, property):
-                attr = attr.fget(self)
+                attr = attr.fget(cls)
 
             for bundle in attr:
                 if config.DEBUG and bundle in seen_bundles:
@@ -260,36 +262,10 @@ class WPBase(WPBundleMixin):
                                body=body)
 
 
-class WPNewBase(WPJinjaMixin):
+class WPNewBase(WPBundleMixin, WPJinjaMixin):
     title = ''
     bundles = ('outdatedbrowser.js', 'outdatedbrowser.css')
     print_bundles = tuple()
-
-    @classproperty
-    @classmethod
-    def additional_bundles(cls):
-        """Additional bundle objects that will be included."""
-        return {
-            'screen': (),
-            'print': ()
-        }
-
-    @classmethod
-    def _resolve_bundles(cls):
-        """Add up all bundles, following the MRO."""
-        seen_bundles = set()
-        for class_ in reversed(cls.mro()[:-1]):
-            attr = class_.__dict__.get('bundles', ())
-            if isinstance(attr, classproperty):
-                attr = attr.__get__(None, class_)
-            elif isinstance(attr, property):
-                attr = attr.fget(cls)
-
-            for bundle in attr:
-                if config.DEBUG and bundle in seen_bundles:
-                    raise Exception("Duplicate bundle found in {}: '{}'".format(class_.__name__, bundle))
-                seen_bundles.add(bundle)
-                yield bundle
 
     #: Whether the WP is used for management (adds suffix to page title)
     MANAGEMENT = False
