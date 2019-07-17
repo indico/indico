@@ -152,7 +152,10 @@ def search_for_rooms(filters, allow_admin=False, availability=None):
     query = query.filter_by(**criteria)
     if 'text' in filters:
         text = ' '.join(filters['text'].strip().split())
-        query = query.filter(_make_room_text_filter(text))
+        if text.startswith('#') and text[1:].isdigit():
+            query = query.filter(Room.id == text[1:])
+        else:
+            query = query.filter(_make_room_text_filter(text))
     if filters.get('equipment'):
         subquery = (db.session.query(RoomEquipmentAssociation)
                     .with_entities(db.func.count(RoomEquipmentAssociation.c.room_id))
