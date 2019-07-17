@@ -11,6 +11,9 @@ from flask import redirect, session
 from werkzeug.exceptions import Forbidden
 
 from indico.core import signals
+from indico.core.config import config
+from indico.core.db import db
+from indico.core.db.sqlalchemy.util.queries import db_dates_overlap
 from indico.modules.events.management.controllers.base import RHManageEventBase
 from indico.modules.events.management.forms import (EventClassificationForm, EventContactInfoForm, EventDataForm,
                                                     EventDatesForm, EventLocationForm, EventPersonsForm)
@@ -18,6 +21,9 @@ from indico.modules.events.management.util import flash_if_unregistered
 from indico.modules.events.management.views import WPEventSettings, render_event_management_header_right
 from indico.modules.events.operations import update_event
 from indico.modules.events.util import track_time_changes
+from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
+from indico.modules.rb.models.reservations import Reservation
+from indico.modules.rb.models.rooms import Room
 from indico.util.signals import values_from_signal
 from indico.web.flask.templating import get_template_module
 from indico.web.forms.base import FormDefaults
@@ -41,7 +47,26 @@ class RHEventSettings(RHManageEventBase):
         RHManageEventBase._check_access(self)  # mainly to trigger the legacy "event locked" check
 
     def _process(self):
-        return WPEventSettings.render_template('settings.html', self.event, 'settings')
+        show_booking_warning = False
+        if (config.ENABLE_ROOMBOOKING and not self.event.has_ended and self.event.room
+                and not self.event.room_reservation_links):
+            # Check if any of the managers of the event already have a booking that overlaps with the event datetime
+            manager_ids = [p.user.id for p in self.event.acl_entries if p.user]
+            has_overlap = (ReservationOccurrence.query
+                           .filter(ReservationOccurrence.is_valid,
+                                   db.or_(Reservation.booked_for_id.in_(manager_ids),
+                                          Reservation.created_by_id.in_(manager_ids)),
+                                   db_dates_overlap(ReservationOccurrence,
+                                                    'start_dt', self.event.start_dt_local,
+                                                    'end_dt', self.event.end_dt_local),
+                                   Reservation.room_id == self.event.room.id,
+                                   ~Room.is_deleted)
+                           .join(Reservation)
+                           .join(Room)
+                           .has_rows())
+            show_booking_warning = not has_overlap
+        return WPEventSettings.render_template('settings.html', self.event, 'settings',
+                                               show_booking_warning=show_booking_warning)
 
 
 class RHEditEventDataBase(RHManageEventBase):
