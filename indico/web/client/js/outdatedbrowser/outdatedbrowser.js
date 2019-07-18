@@ -10,6 +10,10 @@ import UserAgentParser from 'ua-parser-js';
 // Based on https://github.com/mikemaccana/outdated-browser-rework (MIT-licensed)
 export default function outdatedBrowser({browserSupport, messages}) {
   const main = () => {
+    if (document.cookie.indexOf('outdatedbrowser=hide') !== -1) {
+      return;
+    }
+
     const parsedUserAgent = new UserAgentParser(window.navigator.userAgent).getResult();
     const outdatedUI = document.getElementById('outdated-browser');
 
@@ -120,6 +124,9 @@ export default function outdatedBrowser({browserSupport, messages}) {
       const buttonClose = document.getElementById('close-outdated-browser');
       buttonClose.onmousedown = () => {
         outdatedUI.style.display = 'none';
+        const duration = 86400;
+        const expiry = new Date(new Date().getTime() + duration * 1000).toGMTString();
+        document.cookie = `outdatedbrowser=hide; expires=${expiry}; path=/`;
         return false;
       };
     }
