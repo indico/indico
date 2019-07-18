@@ -12,7 +12,6 @@ import qs from 'qs';
 import {bindActionCreators} from 'redux';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import {push as pushRoute} from 'connected-react-router';
 import {Button, Grid, Icon, Modal, Header, Message, List, Segment, Popup} from 'semantic-ui-react';
 import {Translate, Param} from 'indico/react/i18n';
 import {Overridable, IndicoPropTypes, Markdown, Responsive} from 'indico/react/util';
@@ -116,12 +115,8 @@ export default connect(
   }),
   dispatch => ({
     gotoAllBookings(roomId) {
-      const params = {
-        text: `#${roomId}`,
-      };
       dispatch(globalActions.resetPageState('calendar'));
-      dispatch(filtersActions.setFilters('calendar', params, false));
-      dispatch(pushRoute(`/calendar?${qs.stringify(params)}`));
+      dispatch(filtersActions.setFilters('calendar', {text: `#${roomId}`}, false));
     },
     actions: bindActionCreators(
       {
@@ -165,6 +160,11 @@ function RoomDetails({bookRoom, room, availability, attributes, gotoAllBookings}
     room,
   });
 
+  const params = {
+    text: `#${room.id}`,
+  };
+  const bookingsPath = `calendar?${qs.stringify(params)}`;
+
   return (
     <div styleName="room-details">
       <Grid stackable columns={2}>
@@ -189,9 +189,11 @@ function RoomDetails({bookRoom, room, availability, attributes, gotoAllBookings}
               content={<TimelineLegend labels={legendLabels} compact />}
             />
             <Button
+              as="a"
               basic
               size="tiny"
               compact
+              href={bookingsPath}
               color="blue"
               styleName="all-bookings"
               onClick={() => gotoAllBookings(room.id)}

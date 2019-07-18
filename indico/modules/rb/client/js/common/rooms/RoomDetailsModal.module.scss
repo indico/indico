@@ -20,6 +20,7 @@
     }
 }
 
-:global(.ui.button).all-bookings {
+:global(.ui.basic.blue.button).all-bookings {
     margin-left: auto;
+    box-shadow: none !important;
 }
