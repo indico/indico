@@ -17,7 +17,7 @@ import {Translate} from 'indico/react/i18n';
 import {Responsive} from 'indico/react/util';
 import {selectors as configSelectors} from '../common/config';
 
-const buildMenuItems = (helpURL, hasTOS, hasPrivacyPolicy) => {
+const buildMenuItems = (helpURL, hasTOS, hasPrivacyPolicy, contactEmail) => {
   const menuItems = [
     [
       'help',
@@ -29,7 +29,10 @@ const buildMenuItems = (helpURL, hasTOS, hasPrivacyPolicy) => {
         icon: 'question',
       },
     ],
-    [
+  ];
+
+  if (contactEmail) {
+    menuItems.push([
       'contact',
       {
         href: contactURL(),
@@ -37,9 +40,8 @@ const buildMenuItems = (helpURL, hasTOS, hasPrivacyPolicy) => {
         caption: Translate.string('Contact'),
         icon: 'at',
       },
-    ],
-  ];
-
+    ]);
+  }
   if (hasTOS) {
     menuItems.push([
       'tos',
@@ -84,7 +86,7 @@ function SidebarFooter({
     e.preventDefault();
   }
 
-  const items = buildMenuItems(helpURL, hasTOS, hasPrivacyPolicy);
+  const items = buildMenuItems(helpURL, hasTOS, hasPrivacyPolicy, contactEmail);
 
   return (
     <>
