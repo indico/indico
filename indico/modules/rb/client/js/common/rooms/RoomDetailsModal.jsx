@@ -115,12 +115,12 @@ export default connect(
     attributes: roomsSelectors.getAttributes(state, {roomId}),
   }),
   dispatch => ({
-    gotoAllBookings(roomName) {
+    gotoAllBookings(roomId) {
       const params = {
-        text: roomName,
+        text: `#${roomId}`,
       };
       dispatch(globalActions.resetPageState('calendar'));
-      dispatch(filtersActions.setFilters('calendar', {text: roomName}, false));
+      dispatch(filtersActions.setFilters('calendar', params, false));
       dispatch(pushRoute(`/calendar?${qs.stringify(params)}`));
     },
     actions: bindActionCreators(
@@ -194,7 +194,7 @@ function RoomDetails({bookRoom, room, availability, attributes, gotoAllBookings}
               compact
               color="blue"
               styleName="all-bookings"
-              onClick={() => gotoAllBookings(room.name)}
+              onClick={() => gotoAllBookings(room.id)}
             >
               <Translate>See all bookings</Translate>
             </Button>
