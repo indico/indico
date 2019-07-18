@@ -59,6 +59,8 @@ Bugfixes
 - Fix sorting book of abstracts by board number (:issue:`3429`, thanks
   :user:`bpedersen2`)
 - Enforce survey submission limit (:issue:`3256`)
+- Do not show "Mark as paid" button and checkout link while a transaction
+  is pending (:issue:`3361`, thanks :user:`driehle`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
