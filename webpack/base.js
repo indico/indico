@@ -252,7 +252,7 @@ export function webpackDefaults(env, config, bundles) {
     module: {
       rules: [
         {
-          test: /outdatedbrowser\.js$/,
+          test: /outdatedbrowser\/.+\.js$/,
           loader: 'babel-loader',
           options: {
             // build JS targetting old browsers so they get the warning as well
@@ -360,8 +360,13 @@ export function webpackDefaults(env, config, bundles) {
           // 'common' chunk, which should include common dependencies
           common: {
             name: 'common',
-            // having theme/print css in the common css bundle would break the interface
-            chunks: chunk => chunk.canBeInitial() && !/\.print$|^themes_/.test(chunk.name),
+            chunks: chunk =>
+              chunk.canBeInitial() &&
+              // outdatedbrowser must be fully standalone since we can assume all other
+              // bundles to be broken in legacy browsers
+              chunk.name !== 'outdatedbrowser' &&
+              // having theme/print css in the common css bundle would break the interface
+              !/\.print$|^themes_/.test(chunk.name),
             minChunks: 2,
           },
           // react/redux and friends since they are pretty big

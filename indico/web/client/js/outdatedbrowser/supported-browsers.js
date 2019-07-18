@@ -14,7 +14,7 @@
 const path = require('path');
 const browserslist = require('browserslist');
 const semver = require('semver');
-const BROWSERSLIST_PATH = path.join(__dirname, '..', '..', '..', '..', '.browserslistrc');
+const BROWSERSLIST_PATH = path.join(__dirname, '..', '..', '..', '..', '..', '.browserslistrc');
 
 const browsers = browserslist(null, {
   env: 'production',
