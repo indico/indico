@@ -23,6 +23,7 @@ import RoomKeyLocation from '../../components/RoomKeyLocation';
 import RoomStats from './RoomStats';
 import {DailyTimelineContent, TimelineLegend} from '../timeline';
 import * as roomsSelectors from './selectors';
+import * as globalActions from '../../actions';
 import {actions as bookRoomActions} from '../../modules/bookRoom';
 import {actions as calendarActions} from '../../modules/calendar';
 import {actions as filtersActions} from '../../common/filters';
@@ -116,11 +117,12 @@ export default connect(
     attributes: roomsSelectors.getAttributes(state, {roomId}),
   }),
   dispatch => ({
-    gotoAllBookings(roomId) {
+    gotoAllBookings(roomId, bookingsPath) {
+      dispatch(globalActions.resetPageState('calendar'));
       dispatch(filtersActions.setFilterParameter('calendar', 'text', `#${roomId}`));
       dispatch(calendarActions.setDate(serializeDate(moment().startOf('month'))));
       dispatch(calendarActions.setMode('months'));
-      dispatch(pushRoute(`/calendar`));
+      dispatch(pushRoute(bookingsPath));
     },
     actions: bindActionCreators(
       {
@@ -164,6 +166,13 @@ function RoomDetails({bookRoom, room, availability, attributes, gotoAllBookings}
     room,
   });
 
+  const params = {
+    text: `#${room.id}`,
+    mode: 'months',
+    date: serializeDate(moment().startOf('month')),
+  };
+  const bookingsPath = `calendar?${qs.stringify(params)}`;
+
   return (
     <div styleName="room-details">
       <Grid stackable columns={2}>
@@ -189,19 +198,16 @@ function RoomDetails({bookRoom, room, availability, attributes, gotoAllBookings}
             />
             <Button
               as="a"
-              href={`calendar?${qs.stringify({
-                text: `#${room.id}`,
-              })}&mode=months&date=${serializeDate(moment().startOf('month'))}`}
+              href={bookingsPath}
               basic
               size="tiny"
               compact
               color="blue"
               styleName="all-bookings"
               onClick={evt => {
-                if (evt.button === 1) {
+                if (evt.button === 0) {
                   evt.preventDefault();
-                } else {
-                  gotoAllBookings(room.id);
+                  gotoAllBookings(room.id, bookingsPath);
                 }
               }}
             >

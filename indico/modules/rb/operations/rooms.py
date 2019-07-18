@@ -153,7 +153,7 @@ def search_for_rooms(filters, allow_admin=False, availability=None):
     if 'text' in filters:
         text = ' '.join(filters['text'].strip().split())
         if text.startswith('#') and text[1:].isdigit():
-            query = query.filter(Room.id == text[1:])
+            query = query.filter(Room.id == int(text[1:]))
         else:
             query = query.filter(_make_room_text_filter(text))
     if filters.get('equipment'):
