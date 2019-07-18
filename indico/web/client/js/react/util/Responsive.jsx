@@ -7,7 +7,7 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
-import Responsive from 'react-responsive';
+import Responsive, {useMediaQuery} from 'react-responsive';
 
 const DIMENSIONS = {
   tablet: 768,
@@ -60,3 +60,20 @@ export default Object.assign(Responsive, {
   Tablet: factory(DIMENSIONS.tablet, DIMENSIONS.computer),
   Phone: factory(null, DIMENSIONS.tablet),
 });
+
+export function useResponsive() {
+  return {
+    isWideScreen: useMediaQuery({query: `(min-device-width: ${DIMENSIONS.computer}px)`}),
+    isDesktop: useMediaQuery({
+      query: `(min-device-width: ${
+        DIMENSIONS.computer
+      }px) and (max-device-width: ${DIMENSIONS.wideScreen - 1}px)`,
+    }),
+    isTablet: useMediaQuery({
+      query: `(min-device-width: ${
+        DIMENSIONS.tablet
+      }px) and (max-device-width: ${DIMENSIONS.computer - 1}px)`,
+    }),
+    isPhone: useMediaQuery({query: `(max-device-width: ${DIMENSIONS.tablet - 1}px)`}),
+  };
+}
