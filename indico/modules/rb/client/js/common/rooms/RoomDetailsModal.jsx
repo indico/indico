@@ -15,7 +15,7 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {Button, Grid, Icon, Modal, Header, Message, List, Segment, Popup} from 'semantic-ui-react';
 import {Translate, Param} from 'indico/react/i18n';
-import {Overridable, IndicoPropTypes, Markdown, Responsive} from 'indico/react/util';
+import {Overridable, IndicoPropTypes, Markdown, Responsive, useResponsive} from 'indico/react/util';
 import {serializeDate} from 'indico/utils/date';
 import {getOccurrenceTypes, transformToLegendLabels} from '../../util';
 import RoomBasicDetails from '../../components/RoomBasicDetails';
@@ -183,6 +183,7 @@ function RoomDetails({
     date: serializeDate(moment().startOf('month')),
   };
   const bookingsPath = `calendar?${qs.stringify(params)}`;
+  const {isPhone} = useResponsive();
 
   return (
     <div styleName="room-details">
@@ -203,10 +204,12 @@ function RoomDetails({
         <Grid.Column>
           <Header className="legend-header">
             <Translate>Usage</Translate>
-            <Popup
-              trigger={<Icon name="info circle" className="legend-info-icon" />}
-              content={<TimelineLegend labels={legendLabels} compact />}
-            />
+            {!isPhone && (
+              <Popup
+                trigger={<Icon name="info circle" className="legend-info-icon" />}
+                content={<TimelineLegend labels={legendLabels} compact />}
+              />
+            )}
             <Button
               as="a"
               href={bookingsPath}
@@ -225,10 +228,12 @@ function RoomDetails({
               <Translate>See all bookings</Translate>
             </Button>
           </Header>
-          <DailyTimelineContent
-            rows={availability.map(rowSerializer)}
-            onClickReservation={onClickReservation}
-          />
+          <Responsive.Tablet andLarger>
+            <DailyTimelineContent
+              rows={availability.map(rowSerializer)}
+              onClickReservation={onClickReservation}
+            />
+          </Responsive.Tablet>
           <RoomStats roomId={room.id} />
           {(room.canUserBook || room.canUserPrebook) && (
             <>
