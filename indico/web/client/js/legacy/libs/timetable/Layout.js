@@ -80,7 +80,7 @@ type('TimetableLayoutManager', [], {
 
     for (var key in ks) {
       if (!assigned[key]) {
-        block.assigned = key;
+        block.assigned = parseInt(key, 10);
         assigned[key] = block;
         return;
       }
@@ -89,7 +89,7 @@ type('TimetableLayoutManager', [], {
     // nothing assigned in cycle
     // add a new key
     var newElem = ks.length;
-    block.assigned = newElem;
+    block.assigned = parseInt(newElem, 10);
     assigned[newElem] = block;
   },
 
@@ -100,8 +100,8 @@ type('TimetableLayoutManager', [], {
 
     var correctlyAssigned = function(block) {
       return (
-        exists(lastAssigned[getLastAssignedId(block)]) &&
-        lastAssigned[getLastAssignedId(block)].col == block.assigned
+        lastAssigned[getLastAssignedId(block)] &&
+        lastAssigned[getLastAssignedId(block)].col === block.assigned
       );
     };
 
@@ -112,10 +112,11 @@ type('TimetableLayoutManager', [], {
 
     // Adds/updates a block in the lastAssigned dictionary
     var lastAssign = function(block, col) {
-      if (!exists(lastAssigned[getLastAssignedId(block)])) {
+      if (!lastAssigned[getLastAssignedId(block)]) {
         lastAssigned[getLastAssignedId(block)] = {blocks: {}};
       }
-      if (col !== undefined) {
+      var lastAssignedCol = lastAssigned[getLastAssignedId(block)].col || -1;
+      if (!isNaN(parseInt(col, 10)) && col > lastAssignedCol) {
         lastAssigned[getLastAssignedId(block)].col = col;
       }
       lastAssigned[getLastAssignedId(block)].blocks[block.id] = true;
@@ -124,9 +125,9 @@ type('TimetableLayoutManager', [], {
     // Changes the column of a block
     var reassign = function(block, col) {
       assigned[block.assigned] = null;
-      block.assigned = col;
-      assigned[col] = block;
-      lastAssign(block, col);
+      block.assigned = parseInt(col, 10);
+      assigned[parseInt(col, 10)] = block;
+      lastAssign(block, parseInt(col, 10));
     };
 
     var swap_columns = function(block1, block2) {
@@ -562,7 +563,7 @@ type(
         col = this.roomsCols[roomName];
       }
 
-      block.assigned = col;
+      block.assigned = parseInt(col, 10);
       assigned[col] = block;
     },
 
