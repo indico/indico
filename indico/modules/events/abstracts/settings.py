@@ -42,7 +42,6 @@ class BOALinkFormat(RichEnum):
 
     frame = ('', '')
     colorlinks = ('[colorlinks]', '')
-    ocgx2colorlinks = ('', '\\usepackage[ocgcolorlinks]{ocgx2}[2017/03/30]')
     unstyled = ('[hidelinks]', '')
 
 
@@ -69,7 +68,6 @@ BOACorrespondingAuthorType.__titles__ = {
 BOALinkFormat.__titles__ = {
     BOALinkFormat.frame: _('Border around links (screen only)'),
     BOALinkFormat.colorlinks: _('Color links'),
-    BOALinkFormat.ocgx2colorlinks: _('Color links (screen only)'),
     BOALinkFormat.unstyled: _('Do not highlight links')
 }
 
