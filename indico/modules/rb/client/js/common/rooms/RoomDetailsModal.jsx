@@ -6,15 +6,17 @@
 // LICENSE file for more details.
 
 import _ from 'lodash';
+import qs from 'qs';
 import moment from 'moment';
 import React from 'react';
-import qs from 'qs';
+import {push as pushRoute} from 'connected-react-router';
 import {bindActionCreators} from 'redux';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {Button, Grid, Icon, Modal, Header, Message, List, Segment, Popup} from 'semantic-ui-react';
 import {Translate, Param} from 'indico/react/i18n';
 import {Overridable, IndicoPropTypes, Markdown, Responsive} from 'indico/react/util';
+import {serializeDate} from 'indico/utils/date';
 import {getOccurrenceTypes, transformToLegendLabels} from '../../util';
 import RoomBasicDetails from '../../components/RoomBasicDetails';
 import RoomKeyLocation from '../../components/RoomKeyLocation';
@@ -22,8 +24,8 @@ import RoomStats from './RoomStats';
 import {DailyTimelineContent, TimelineLegend} from '../timeline';
 import * as roomsSelectors from './selectors';
 import {actions as bookRoomActions} from '../../modules/bookRoom';
+import {actions as calendarActions} from '../../modules/calendar';
 import {actions as filtersActions} from '../../common/filters';
-import * as globalActions from '../../actions';
 import RoomEditModal from './RoomEditModal';
 
 import './RoomDetailsModal.module.scss';
@@ -115,8 +117,10 @@ export default connect(
   }),
   dispatch => ({
     gotoAllBookings(roomId) {
-      dispatch(globalActions.resetPageState('calendar'));
-      dispatch(filtersActions.setFilters('calendar', {text: `#${roomId}`}, false));
+      dispatch(filtersActions.setFilterParameter('calendar', 'text', `#${roomId}`));
+      dispatch(calendarActions.setDate(serializeDate(moment().startOf('month'))));
+      dispatch(calendarActions.setMode('months'));
+      dispatch(pushRoute(`/calendar`));
     },
     actions: bindActionCreators(
       {
@@ -160,11 +164,6 @@ function RoomDetails({bookRoom, room, availability, attributes, gotoAllBookings}
     room,
   });
 
-  const params = {
-    text: `#${room.id}`,
-  };
-  const bookingsPath = `calendar?${qs.stringify(params)}`;
-
   return (
     <div styleName="room-details">
       <Grid stackable columns={2}>
@@ -190,13 +189,21 @@ function RoomDetails({bookRoom, room, availability, attributes, gotoAllBookings}
             />
             <Button
               as="a"
+              href={`calendar?${qs.stringify({
+                text: `#${room.id}`,
+              })}&mode=months&date=${serializeDate(moment().startOf('month'))}`}
               basic
               size="tiny"
               compact
-              href={bookingsPath}
               color="blue"
               styleName="all-bookings"
-              onClick={() => gotoAllBookings(room.id)}
+              onClick={evt => {
+                if (evt.button === 1) {
+                  evt.preventDefault();
+                } else {
+                  gotoAllBookings(room.id);
+                }
+              }}
             >
               <Translate>See all bookings</Translate>
             </Button>

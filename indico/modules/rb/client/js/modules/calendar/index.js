@@ -5,6 +5,9 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import * as actions from './actions';
+
 export {default} from './Calendar';
 export {default as reducer} from './reducers';
 export {queryStringReducer, routeConfig} from './queryString';
+export {actions};
