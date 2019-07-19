@@ -22,7 +22,7 @@ import * as calendarActions from './actions';
 import * as calendarSelectors from './selectors';
 import {actions as bookingsActions} from '../../common/bookings';
 import {actions as filtersActions} from '../../common/filters';
-import {selectors as roomsSelectors, actions as roomsActions} from '../../common/rooms';
+import {actions as roomsActions} from '../../common/rooms';
 import {ElasticTimeline, TimelineHeader} from '../../common/timeline';
 import CalendarListView from './CalendarListView';
 import {actions as bookRoomActions} from '../bookRoom';
@@ -324,7 +324,6 @@ export default connect(
     roomFilters: calendarSelectors.getRoomFilters(state),
     calendarFilters: calendarSelectors.getCalendarFilters(state),
     localFilters: calendarSelectors.getLocalFilters(state),
-    rooms: roomsSelectors.getAllRooms(state),
     datePicker: calendarSelectors.getDatePickerInfo(state),
     view: calendarSelectors.getCalendarView(state),
   }),
