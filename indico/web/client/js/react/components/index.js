@@ -27,3 +27,4 @@ export {
   ACLField,
 } from './principals';
 export {default as PopoverDropdownMenu} from './PopoverDropdownMenu';
+export {default as ResponsivePopup} from './ResponsivePopup';

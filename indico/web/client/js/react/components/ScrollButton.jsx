@@ -6,10 +6,11 @@
 // LICENSE file for more details.
 
 import React from 'react';
-import {Button, Popup} from 'semantic-ui-react';
+import {Button} from 'semantic-ui-react';
 import PropTypes from 'prop-types';
 
 import {Translate} from 'indico/react/i18n';
+import {ResponsivePopup} from 'indico/react/components';
 
 import './ScrollButton.module.scss';
 
@@ -19,7 +20,7 @@ export default function ScrollButton({visible}) {
   }
 
   return (
-    <Popup
+    <ResponsivePopup
       trigger={
         <Button
           icon="angle up"

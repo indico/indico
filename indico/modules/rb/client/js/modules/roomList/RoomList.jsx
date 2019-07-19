@@ -10,13 +10,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
-import {Button, Dropdown, Grid, Popup} from 'semantic-ui-react';
+import {Button, Dropdown, Grid} from 'semantic-ui-react';
 import {Route} from 'react-router-dom';
 import LazyScroll from 'redux-lazy-scroll';
 import {stateToQueryString} from 'redux-router-querystring';
 
 import {Overridable, Responsive, Slot} from 'indico/react/util';
-import {StickyWithScrollBack} from 'indico/react/components';
+import {StickyWithScrollBack, ResponsivePopup} from 'indico/react/components';
 import {Param, Plural, PluralTranslate, Translate, Singular} from 'indico/react/i18n';
 import {camelizeKeys} from 'indico/utils/case';
 
@@ -231,7 +231,7 @@ class RoomList extends React.Component {
                 >
                   {({id}) => (
                     <Slot name="actions">
-                      <Popup
+                      <ResponsivePopup
                         trigger={
                           <Button
                             icon="search"
