@@ -145,10 +145,12 @@ def slugify(*args, **kwargs):
 
     :param lower: Whether the slug should be all-lowercase
     :param maxlen: Maximum slug length
+    :param fallback: Fallback in case of an empty slug
     """
 
     lower = kwargs.get('lower', True)
     maxlen = kwargs.get('maxlen')
+    fallback = kwargs.get('fallback', '')
 
     value = u'-'.join(to_unicode(val) for val in args)
     value = value.encode('translit/long')
@@ -160,7 +162,7 @@ def slugify(*args, **kwargs):
     if maxlen:
         value = value[0:maxlen].rstrip(u'-')
 
-    return value
+    return value or fallback
 
 
 def return_ascii(f):

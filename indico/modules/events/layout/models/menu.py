@@ -81,8 +81,8 @@ class MenuEntryMixin(object):
             from indico.core.plugins import url_for_plugin
             return url_for_plugin(self.default_data.endpoint, self.event_ref, _external=False)
         elif self.is_page:
-            return url_for('event_pages.page_display', self.event_ref, page_id=self.page_id, slug=slugify(self.title),
-                           _external=False)
+            return url_for('event_pages.page_display', self.event_ref, page_id=self.page_id,
+                           slug=slugify(self.title, fallback=None), _external=False)
         else:
             return None
 
@@ -417,7 +417,7 @@ class EventPage(db.Model):
 
     @property
     def locator(self):
-        return dict(self.menu_entry.event.locator, page_id=self.id, slug=slugify(self.menu_entry.title))
+        return dict(self.menu_entry.event.locator, page_id=self.id, slug=slugify(self.menu_entry.title, fallback=None))
 
     @property
     def is_default(self):

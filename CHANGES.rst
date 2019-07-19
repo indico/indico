@@ -65,6 +65,8 @@ Bugfixes
 - Enforce survey submission limit (:issue:`3256`)
 - Do not show "Mark as paid" button and checkout link while a transaction
   is pending (:issue:`3361`, thanks :user:`driehle`)
+- Fix 404 error on custom conference pages that do not have any ascii chars
+  in the title (:issue:`3998`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

@@ -158,7 +158,7 @@ class RH(object):
             return unicode(v) if isinstance(v, (int, long)) else v
 
         provided = {k: _convert(v) for k, v in request.view_args.iteritems() if k not in defaults}
-        new_view_args = {k: _convert(v) for k, v in new_view_args.iteritems()}
+        new_view_args = {k: _convert(v) for k, v in new_view_args.iteritems() if v is not None}
         if new_view_args != provided:
             if request.method in {'GET', 'HEAD'}:
                 endpoint = spec['endpoint'] or request.endpoint
