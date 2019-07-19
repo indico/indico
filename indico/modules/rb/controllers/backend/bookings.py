@@ -94,14 +94,15 @@ class RHCalendar(RHRoomBookingBase):
         'end_date': fields.Date(missing=None),
         'my_bookings': fields.Bool(missing=False),
         'show_inactive': fields.Bool(missing=False),
-        'room_ids': fields.List(fields.Int(), missing=None)
+        'room_ids': fields.List(fields.Int(), missing=None),
+        'text': fields.String(missing=None)
     })
-    def _process(self, start_date, end_date, room_ids, my_bookings, show_inactive):
+    def _process(self, start_date, end_date, room_ids, my_bookings, show_inactive, text):
         booked_for_user = session.user if my_bookings else None
         if end_date is None:
             end_date = start_date
         calendar = get_room_calendar(start_date, end_date, room_ids, booked_for_user=booked_for_user,
-                                     include_inactive=show_inactive)
+                                     include_inactive=show_inactive, text=text)
         return jsonify(serialize_availability(calendar).values())
 
 

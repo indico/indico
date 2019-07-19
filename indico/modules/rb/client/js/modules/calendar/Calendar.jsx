@@ -260,6 +260,7 @@ class Calendar extends React.Component {
       isFetchingActiveBookings,
       localFilters: {hideUnused},
       calendarFilters: {showInactive},
+      roomFilters: {text},
       calendarData: {rows},
       actions: {openRoomDetails, setDate, openBookingDetails, setMode},
       datePicker,
@@ -287,7 +288,7 @@ class Calendar extends React.Component {
                 {isTimelineVisible && (
                   <TimelineHeader
                     datePicker={datePicker}
-                    disableDatePicker={isFetching || !rows.length}
+                    disableDatePicker={isFetching || (!rows.length && !text)}
                     onModeChange={setMode}
                     onDateChange={setDate}
                     legendLabels={this.getLegendLabels(rows, showInactive)}

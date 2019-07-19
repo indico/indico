@@ -24,4 +24,8 @@ export const ajax = {
     onlyIf: ({showInactive}) => showInactive,
     serializer: ({showInactive}) => showInactive,
   },
+  text: {
+    onlyIf: ({text}) => text,
+    serializer: ({text}) => text,
+  },
 };
