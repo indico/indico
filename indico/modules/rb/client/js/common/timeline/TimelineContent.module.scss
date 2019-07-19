@@ -11,6 +11,16 @@
 $row-height: 40px;
 $split-row-height: $row-height/2;
 
+@keyframes rotate90 {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(-90deg);
+    }
+}
+
 .timeline-header {
     display: flex;
     min-height: $row-height;
@@ -163,4 +173,9 @@ $split-row-height: $row-height/2;
     .timeline-header {
         margin-right: 2em;
     }
+}
+
+
+.rotate-icon {
+    animation: rotate90 1s ease-out 1s forwards;
 }

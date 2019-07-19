@@ -10,12 +10,13 @@ import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
 import {AutoSizer, List, WindowScroller} from 'react-virtualized';
-import {Popup, Placeholder} from 'semantic-ui-react';
+import {Icon, Message, Popup, Placeholder} from 'semantic-ui-react';
 import LazyScroll from 'redux-lazy-scroll';
 
+import {Translate} from 'indico/react/i18n';
 import {toMoment} from 'indico/utils/date';
 import {TooltipIfTruncated} from 'indico/react/components';
-import {Overridable} from 'indico/react/util';
+import {Overridable, Responsive} from 'indico/react/util';
 
 import RowActionsDropdown from './RowActionsDropdown';
 import TimelineItem from './TimelineItem';
@@ -299,13 +300,29 @@ export default class DailyTimelineContent extends React.Component {
       </div>
     );
 
-    return (
+    const timeline = (
       <div styleName="daily-timeline">
         {(isLoading || !!rows.length) && this.renderHeader()}
         <WrapperComponent {...wrapperProps}>
           {fixedHeight ? autoSizerWrapper(fixedHeight) : windowScrollerWrapper}
         </WrapperComponent>
       </div>
+    );
+
+    return (
+      <>
+        <Responsive orientation="portrait">
+          <Responsive.Phone andSmaller orElse={timeline}>
+            <Message icon info>
+              <Icon name="mobile alternate" styleName="rotate-icon" />
+              <Message.Content>
+                <Translate>Please turn your phone horizontally to view this page.</Translate>
+              </Message.Content>
+            </Message>
+          </Responsive.Phone>
+        </Responsive>
+        <Responsive orientation="landscape">{timeline}</Responsive>
+      </>
     );
   }
 }
