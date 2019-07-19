@@ -7,10 +7,17 @@ Version 2.2
 
 *Unreleased*
 
-Major Features
-^^^^^^^^^^^^^^
+Major Changes
+^^^^^^^^^^^^^
 
-- Rewrite the room booking frontend to be more straightforward
+- ⚠️ **Drop support for Internet Explorer 11 and other outdated or
+  discontinued browser versions.** Indico shows a warning message
+  when accessed using such a browser. The latest list of supported
+  browsers can be found `in the README on GitHub <https://github.com/indico/indico#browser-support>`_,
+  but generally Indico now supports the last two versions of each major
+  browser (determined at release time), plus the current Firefox ESR.
+- Rewrite the room booking frontend to be more straightforward and
+  user-friendly. Check `our blog for details <https://getindico.io/indico/update/release/milestone/2019/02/22/indico-2-2-news.html>`_.
 
 Improvements
 ^^^^^^^^^^^^
