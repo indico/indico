@@ -36,6 +36,7 @@ from indico.modules.rb.util import (group_by_occurrence_date, serialize_availabi
                                     serialize_unbookable_hours)
 from indico.util.date_time import iterdays, overlaps, server_to_utc
 from indico.util.i18n import _
+from indico.util.string import natural_sort_key
 from indico.util.struct.iterables import group_list
 
 
@@ -156,9 +157,12 @@ def get_room_candidates(candidates, conflicts):
             if not (any(candidate.overlaps(conflict) for conflict in conflicts))]
 
 
-def _bookings_query(filters):
+def _bookings_query(filters, noload_room=False):
     reservation_strategy = contains_eager('reservation')
-    reservation_strategy.noload('room')
+    if noload_room:
+        reservation_strategy.raiseload('room')
+    else:
+        reservation_strategy.joinedload('room')
     reservation_strategy.noload('booked_for_user')
     reservation_strategy.noload('created_by_user')
 
@@ -168,8 +172,17 @@ def _bookings_query(filters):
              .filter(~Room.is_deleted)
              .options(reservation_strategy))
 
-    if filters.get('room_ids'):
-        query = query.filter(Room.id.in_(filters['room_ids']))
+    text = filters.get('text')
+    room_ids = filters.get('room_ids')
+    booking_criteria = [Reservation.booking_reason.ilike('%{}%'.format(text)),
+                        Reservation.booked_for_name.ilike('%{}%'.format(text))]
+    if room_ids and text:
+        query = query.filter(db.or_(Room.id.in_(room_ids), *booking_criteria))
+    elif room_ids:
+        query = query.filter(Room.id.in_(room_ids))
+    elif text:
+        query = query.filter(db.or_(*booking_criteria))
+
     if filters.get('start_dt'):
         query = query.filter(ReservationOccurrence.start_dt >= filters['start_dt'])
     if filters.get('end_dt'):
@@ -191,16 +204,18 @@ def get_room_calendar(start_date, end_date, room_ids, include_inactive=False, **
     end_dt = datetime.combine(end_date, time(hour=23, minute=59))
     query = _bookings_query(dict(filters, start_dt=start_dt, end_dt=end_dt, room_ids=room_ids,
                                  include_inactive=include_inactive))
-    query = query.order_by(db.func.indico.natsort(Room.full_name))
-    rooms = (Room.query
-             .filter(~Room.is_deleted, Room.id.in_(room_ids) if room_ids else True)
-             .options(joinedload('location'))
-             .order_by(db.func.indico.natsort(Room.full_name))
-             .all())
+    bookings = query.order_by(db.func.indico.natsort(Room.full_name)).all()
+    rooms = set()
+    if room_ids:
+        rooms = set(Room.query
+                    .filter(~Room.is_deleted, Room.id.in_(room_ids))
+                    .options(joinedload('location')))
 
+    rooms.update(b.reservation.room for b in bookings)
+    rooms = sorted(rooms, key=lambda r: natural_sort_key(r.full_name))
+    occurrences_by_room = groupby(bookings, attrgetter('reservation.room_id'))
     unbookable_hours = get_rooms_unbookable_hours(rooms)
     nonbookable_periods = get_rooms_nonbookable_periods(rooms, start_dt, end_dt)
-    occurrences_by_room = groupby(query, attrgetter('reservation.room_id'))
     blocked_rooms = get_rooms_blockings(rooms, start_dt, end_dt)
     nonoverridable_blocked_rooms = group_blocked_rooms(filter_blocked_rooms(blocked_rooms,
                                                                             nonoverridable_only=True,
@@ -328,7 +343,7 @@ def get_active_bookings(limit, start_dt, last_reservation_id=None, **filters):
         criteria.append(db.and_(db.cast(ReservationOccurrence.start_dt, db.Date) >= start_dt,
                                 ReservationOccurrence.reservation_id > last_reservation_id))
 
-    query = (_bookings_query(filters)
+    query = (_bookings_query(filters, noload_room=True)
              .filter(db.or_(*criteria))
              .order_by(ReservationOccurrence.start_dt,
                        ReservationOccurrence.reservation_id,
