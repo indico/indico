@@ -482,7 +482,7 @@ class RHContributionsExportPDFBookSortedAll(RHManageContributionsExportActionsBa
         return send_file('book-of-abstracts.pdf', pdf.generate(), 'application/pdf')
 
 
-class RHContributionsImportCSV(RHManageContributionsActionsBase):
+class RHContributionsImportCSV(RHManageContributionsBase):
     """Import contributions from a CSV file"""
 
     def _process(self):
