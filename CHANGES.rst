@@ -38,6 +38,8 @@ Improvements
   hasn't started yet
 - Make link color handling for LaTeX pdfs configurable (:issue:`3283`,
   thanks :user:`bpedersen2`)
+- Preserve displayed order in contribution exports that do not apply
+  any specific sorting (:issue:`4005`)
 
 Bugfixes
 ^^^^^^^^

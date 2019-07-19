@@ -114,8 +114,8 @@ class RHManageContributionsActionsBase(RHManageContributionsBase):
 
     def _process_args(self):
         RHManageContributionsBase._process_args(self)
-        ids = {int(x) for x in request.form.getlist('contribution_id')}
-        self.contribs = Contribution.query.with_parent(self.event).filter(Contribution.id.in_(ids)).all()
+        self.contrib_ids = [int(x) for x in request.form.getlist('contribution_id')]
+        self.contribs = Contribution.query.with_parent(self.event).filter(Contribution.id.in_(self.contrib_ids)).all()
 
 
 class RHManageSubContributionsActionsBase(RHManageContributionBase):
@@ -410,6 +410,12 @@ class RHContributionUpdateDuration(RHManageContributionBase):
 
 class RHManageContributionsExportActionsBase(RHManageContributionsActionsBase):
     ALLOW_LOCKED = True
+
+    def _process_args(self):
+        RHManageContributionsActionsBase._process_args(self)
+        # some PDF export options do not sort the contribution list so we keep
+        # the order in which they were displayed when the user selected them
+        self.contribs.sort(key=lambda c: self.contrib_ids.index(c.id))
 
 
 class RHContributionsMaterialPackage(RHManageContributionsExportActionsBase, AttachmentPackageGeneratorMixin):
