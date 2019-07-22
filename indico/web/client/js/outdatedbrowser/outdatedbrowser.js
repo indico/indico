@@ -8,6 +8,15 @@
 import UserAgentParser from 'ua-parser-js';
 
 // Based on https://github.com/mikemaccana/outdated-browser-rework (MIT-licensed)
+
+function parseMajorVersion(version) {
+  return version.replace(/[^\d.]/g, '').split('.')[0];
+}
+
+function parseMinorVersion(version) {
+  return version.replace(/[^\d.]/g, '').split('.')[1];
+}
+
 export default function outdatedBrowser({browserSupport, messages}) {
   const main = () => {
     if (document.cookie.indexOf('outdatedbrowser=hide') !== -1) {
@@ -17,6 +26,9 @@ export default function outdatedBrowser({browserSupport, messages}) {
     const parsedUserAgent = new UserAgentParser(window.navigator.userAgent).getResult();
     const outdatedUI = document.getElementById('outdated-browser');
 
+    let browserMajorVersion = +parsedUserAgent.browser.major;
+    let browserMinorVersion = +parseMinorVersion(parsedUserAgent.browser.version) || 0;
+
     // Determines where we tell users to go for upgrades.
     let updateSource = 'web';
     if (parsedUserAgent.os.name === 'Android') {
@@ -24,6 +36,10 @@ export default function outdatedBrowser({browserSupport, messages}) {
     }
     if (parsedUserAgent.os.name === 'iOS') {
       updateSource = 'appStore';
+      // browserslist goes by iOS version since everything there uses the safari rendering
+      // engine and it's tied to the OS version
+      browserMajorVersion = +parseMajorVersion(parsedUserAgent.os.version);
+      browserMinorVersion = +parseMinorVersion(parsedUserAgent.os.version);
     }
 
     let done = true;
@@ -43,10 +59,6 @@ export default function outdatedBrowser({browserSupport, messages}) {
       }
     };
 
-    const parseMinorVersion = version => {
-      return version.replace(/[^\d.]/g, '').split('.')[1];
-    };
-
     const isBrowserUnsupported = () => {
       const browserName = parsedUserAgent.browser.name;
       return browserSupport[browserName] === false;
@@ -54,7 +66,6 @@ export default function outdatedBrowser({browserSupport, messages}) {
 
     const isBrowserOutOfDate = () => {
       const browserName = parsedUserAgent.browser.name;
-      const browserMajorVersion = +parsedUserAgent.browser.major;
       let isOutOfDate = false;
       if (isBrowserUnsupported()) {
         isOutOfDate = true;
@@ -67,7 +78,6 @@ export default function outdatedBrowser({browserSupport, messages}) {
           if (browserMajorVersion < minMajorVersion) {
             isOutOfDate = true;
           } else if (browserMajorVersion === minMajorVersion) {
-            const browserMinorVersion = +parseMinorVersion(parsedUserAgent.browser.version);
             if (browserMinorVersion < minMinorVersion) {
               isOutOfDate = true;
             }
