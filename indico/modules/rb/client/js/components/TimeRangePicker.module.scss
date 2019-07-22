@@ -11,11 +11,13 @@
     width: 200px;
 
     .start-time-dropdown {
+        max-width: 100px !important;
         min-width: 90px !important;
         text-align: center !important;
     }
 
     .end-time-dropdown {
+        max-width: 100px !important;
         min-width: 90px !important;
         text-align: center !important;
 
