@@ -63,17 +63,14 @@ export default Object.assign(Responsive, {
 
 export function useResponsive() {
   return {
-    isWideScreen: useMediaQuery({query: `(min-device-width: ${DIMENSIONS.computer}px)`}),
+    isWideScreen: useMediaQuery({query: `(min-width: ${DIMENSIONS.computer}px)`}),
     isDesktop: useMediaQuery({
-      query: `(min-device-width: ${
-        DIMENSIONS.computer
-      }px) and (max-device-width: ${DIMENSIONS.wideScreen - 1}px)`,
+      query: `(min-width: ${DIMENSIONS.computer}px) and (max-width: ${DIMENSIONS.wideScreen -
+        1}px)`,
     }),
     isTablet: useMediaQuery({
-      query: `(min-device-width: ${
-        DIMENSIONS.tablet
-      }px) and (max-device-width: ${DIMENSIONS.computer - 1}px)`,
+      query: `(min-width: ${DIMENSIONS.tablet}px) and (max-width: ${DIMENSIONS.computer - 1}px)`,
     }),
-    isPhone: useMediaQuery({query: `(max-device-width: ${DIMENSIONS.tablet - 1}px)`}),
+    isPhone: useMediaQuery({query: `(max-width: ${DIMENSIONS.tablet - 1}px)`}),
   };
 }
