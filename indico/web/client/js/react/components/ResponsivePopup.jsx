@@ -10,8 +10,8 @@ import {Popup} from 'semantic-ui-react';
 import {useResponsive} from 'indico/react/util';
 
 const ResponsivePopup = props => {
-  const {isPhone} = useResponsive();
-  return <Popup {...props} disabled={isPhone} />;
+  const {isPhone, isTablet} = useResponsive();
+  return <Popup {...props} disabled={isPhone || isTablet} />;
 };
 
 export default ResponsivePopup;

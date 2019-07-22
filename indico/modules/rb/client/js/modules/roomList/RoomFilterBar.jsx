@@ -132,9 +132,9 @@ export class RoomFilterBarBase extends React.Component {
     const hideShowOnlyForm =
       hideOptions.favorites && !hasOwnedRooms && !onlyMine && !showOnlyAuthorizedFilter;
     const responsiveTitle = (title, orElse) => (
-      <Responsive.Tablet andLarger orElse={orElse}>
+      <Responsive.Desktop andLarger orElse={orElse}>
         {title}
-      </Responsive.Tablet>
+      </Responsive.Desktop>
     );
     const equipmentFilter = (!!equipmentTypes.length || !!availableFeatures.length) && (
       <FilterDropdownFactory

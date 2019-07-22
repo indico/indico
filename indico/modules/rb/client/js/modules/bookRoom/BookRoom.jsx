@@ -180,7 +180,7 @@ class BookRoom extends React.Component {
 
     const {selectedDate} = datePicker;
     return (
-      <StickyWithScrollBack context={ref}>
+      <StickyWithScrollBack context={ref} responsive>
         <div className="filter-row">
           <div className="filter-row-filters">
             <BookingFilterBar />

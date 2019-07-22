@@ -274,7 +274,7 @@ class Calendar extends React.Component {
         <Grid.Row>
           <Container>
             <div ref={this.contextRef}>
-              <StickyWithScrollBack context={this.contextRef.current}>
+              <StickyWithScrollBack context={this.contextRef.current} responsive>
                 <Grid.Row styleName="calendar-filters">
                   <div className="filter-row">
                     <div className="filter-row-filters">

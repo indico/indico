@@ -72,5 +72,6 @@ export function useResponsive() {
       query: `(min-width: ${DIMENSIONS.tablet}px) and (max-width: ${DIMENSIONS.computer - 1}px)`,
     }),
     isPhone: useMediaQuery({query: `(max-width: ${DIMENSIONS.tablet - 1}px)`}),
+    isLandscape: useMediaQuery({query: '(orientation: landscape)'}),
   };
 }
