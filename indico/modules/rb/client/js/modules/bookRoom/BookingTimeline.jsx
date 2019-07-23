@@ -38,6 +38,7 @@ class _BookingTimelineComponent extends React.Component {
       openBookingForm: PropTypes.func.isRequired,
     }).isRequired,
     fixedHeight: PropTypes.string,
+    onClickReservation: PropTypes.func,
   };
 
   static defaultProps = {
@@ -46,6 +47,7 @@ class _BookingTimelineComponent extends React.Component {
     showEmptyMessage: true,
     bookingAllowed: false,
     fixedHeight: null,
+    onClickReservation: null,
   };
 
   state = {};
@@ -69,6 +71,7 @@ class _BookingTimelineComponent extends React.Component {
       availability,
       bookingAllowed,
       filters: {recurrence},
+      onClickReservation,
     } = this.props;
     const emptyMessage = showEmptyMessage ? (
       <Message warning>
@@ -86,6 +89,7 @@ class _BookingTimelineComponent extends React.Component {
           emptyMessage={emptyMessage}
           onClickCandidate={clickable ? this.handleBook : null}
           onClickLabel={clickable ? openRoomDetails : null}
+          onClickReservation={onClickReservation}
           isLoading={isLoading}
           fixedHeight={fixedHeight}
           roomTimelineAction={recurrence.type !== 'single'}
