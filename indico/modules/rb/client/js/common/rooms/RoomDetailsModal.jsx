@@ -27,6 +27,7 @@ import * as globalActions from '../../actions';
 import {actions as bookRoomActions} from '../../modules/bookRoom';
 import {actions as calendarActions} from '../../modules/calendar';
 import {actions as filtersActions} from '../../common/filters';
+import {actions as bookingsActions} from '../../common/bookings';
 import RoomEditModal from './RoomEditModal';
 
 import './RoomDetailsModal.module.scss';
@@ -43,6 +44,7 @@ class RoomDetailsModal extends React.Component {
     actions: PropTypes.exact({
       openBookRoom: PropTypes.func.isRequired,
       openBookingForm: PropTypes.func.isRequired,
+      openBookingDetails: PropTypes.func.isRequired,
     }).isRequired,
   };
 
@@ -76,12 +78,12 @@ class RoomDetailsModal extends React.Component {
       promptDatesOnBook,
       title,
       gotoAllBookings,
-      actions: {openBookRoom, openBookingForm},
+      actions: {openBookRoom, openBookingForm, openBookingDetails},
     } = this.props;
     const {roomEditVisible} = this.state;
     return (
       <>
-        <Modal open onClose={this.handleCloseModal} size="large" closeIcon>
+        <Modal onClose={this.handleCloseModal} size="large" closeIcon open>
           <Modal.Header styleName="room-details-header">
             {title}
             <Responsive.Tablet andLarger>
@@ -99,6 +101,7 @@ class RoomDetailsModal extends React.Component {
               availability={availability}
               bookRoom={promptDatesOnBook ? openBookRoom : openBookingForm}
               gotoAllBookings={gotoAllBookings}
+              onClickReservation={openBookingDetails}
             />
           </Modal.Content>
         </Modal>
@@ -128,6 +131,7 @@ export default connect(
       {
         openBookRoom: bookRoomActions.openBookRoom,
         openBookingForm: bookRoomActions.openBookingForm,
+        openBookingDetails: bookingsActions.openBookingDetails,
       },
       dispatch
     ),
@@ -142,7 +146,14 @@ const _getLegendLabels = availability => {
   return transformToLegendLabels(occurrenceTypes);
 };
 
-function RoomDetails({bookRoom, room, availability, attributes, gotoAllBookings}) {
+function RoomDetails({
+  bookRoom,
+  room,
+  availability,
+  attributes,
+  gotoAllBookings,
+  onClickReservation,
+}) {
   const legendLabels = _getLegendLabels(availability);
   const rowSerializer = ({
     bookings,
@@ -214,7 +225,10 @@ function RoomDetails({bookRoom, room, availability, attributes, gotoAllBookings}
               <Translate>See all bookings</Translate>
             </Button>
           </Header>
-          <DailyTimelineContent rows={availability.map(rowSerializer)} />
+          <DailyTimelineContent
+            rows={availability.map(rowSerializer)}
+            onClickReservation={onClickReservation}
+          />
           <RoomStats roomId={room.id} />
           {(room.canUserBook || room.canUserPrebook) && (
             <>
@@ -250,6 +264,7 @@ RoomDetails.propTypes = {
   availability: PropTypes.array.isRequired,
   attributes: PropTypes.array.isRequired,
   gotoAllBookings: PropTypes.func.isRequired,
+  onClickReservation: PropTypes.func.isRequired,
 };
 
 function RoomAvailabilityBox({room}) {

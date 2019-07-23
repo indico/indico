@@ -17,6 +17,7 @@ import * as selectors from './selectors';
 import * as unavailableRoomsActions from './actions';
 import {BookingTimelineComponent} from './BookingTimeline';
 import {DateNavigator, TimelineLegend} from '../../common/timeline';
+import {actions as bookingsActions} from '../../common/bookings';
 import {getOccurrenceTypes, transformToLegendLabels} from '../../util';
 
 class UnavailableRoomsModal extends React.Component {
@@ -33,6 +34,7 @@ class UnavailableRoomsModal extends React.Component {
       setDate: PropTypes.func.isRequired,
       setMode: PropTypes.func.isRequired,
       initTimeline: PropTypes.func.isRequired,
+      openBookingDetails: PropTypes.func.isRequired,
     }).isRequired,
   };
 
@@ -96,6 +98,7 @@ class UnavailableRoomsModal extends React.Component {
             availability={availability}
             datePicker={datePicker}
             fixedHeight="70vh"
+            onClickReservation={actions.openBookingDetails}
           />
         </Modal.Content>
       </Modal>
@@ -119,6 +122,7 @@ export default connect(
         setDate: date => unavailableRoomsActions.setUnavailableNavDate(serializeDate(date)),
         setMode: unavailableRoomsActions.setUnavailableNavMode,
         initTimeline: unavailableRoomsActions.initUnavailableTimeline,
+        openBookingDetails: bookingsActions.openBookingDetails,
       },
       dispatch
     ),
