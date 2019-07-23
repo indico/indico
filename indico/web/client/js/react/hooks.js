@@ -139,11 +139,11 @@ export const useScrollUp = (enabled = true) => {
       prevRef.current = window.scrollY;
       window.addEventListener('scroll', _.throttle(handleScroll, 500));
 
-      return function cleanup() {
+      return () => {
         window.removeEventListener('scroll', _.throttle(handleScroll, 500));
       };
     }
   }, [isScrollingUp, enabled]);
 
-  return {isScrollingUp};
+  return isScrollingUp;
 };

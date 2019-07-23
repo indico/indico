@@ -62,16 +62,18 @@ export default Object.assign(Responsive, {
 });
 
 export function useResponsive() {
+  const belowWideScreen = DIMENSIONS.wideScreen - 1;
+  const belowComputingScreen = DIMENSIONS.computer - 1;
+  const belowTabletScreen = DIMENSIONS.tablet - 1;
   return {
     isWideScreen: useMediaQuery({query: `(min-width: ${DIMENSIONS.computer}px)`}),
     isDesktop: useMediaQuery({
-      query: `(min-width: ${DIMENSIONS.computer}px) and (max-width: ${DIMENSIONS.wideScreen -
-        1}px)`,
+      query: `(min-width: ${DIMENSIONS.computer}px) and (max-width: ${belowWideScreen}px)`,
     }),
     isTablet: useMediaQuery({
-      query: `(min-width: ${DIMENSIONS.tablet}px) and (max-width: ${DIMENSIONS.computer - 1}px)`,
+      query: `(min-width: ${DIMENSIONS.tablet}px) and (max-width: ${belowComputingScreen}px)`,
     }),
-    isPhone: useMediaQuery({query: `(max-width: ${DIMENSIONS.tablet - 1}px)`}),
+    isPhone: useMediaQuery({query: `(max-width: ${belowTabletScreen}px)`}),
     isLandscape: useMediaQuery({query: '(orientation: landscape)'}),
   };
 }

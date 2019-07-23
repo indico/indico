@@ -18,7 +18,7 @@ import './StickyWithScrollBack.module.scss';
 
 export default function StickyWithScrollBack({children, context, responsive}) {
   const [scrollButtonVisible, setScrollButtonVisible] = useState(false);
-  const {isScrollingUp} = useScrollUp(responsive);
+  const isScrollingUp = useScrollUp(responsive);
 
   const {isPhone, isTablet, isLandscape} = useResponsive();
   const isResponsiveDevice = responsive && (isPhone || isTablet) && isLandscape;

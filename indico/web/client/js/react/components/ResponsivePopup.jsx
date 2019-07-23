@@ -9,9 +9,7 @@ import React from 'react';
 import {Popup} from 'semantic-ui-react';
 import {useResponsive} from 'indico/react/util';
 
-const ResponsivePopup = props => {
+export default function ResponsivePopup(props) {
   const {isPhone, isTablet} = useResponsive();
   return <Popup {...props} disabled={isPhone || isTablet} />;
-};
-
-export default ResponsivePopup;
+}
