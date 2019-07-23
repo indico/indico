@@ -7,6 +7,12 @@
 
 @import 'rb:styles/responsive';
 
+:global(.ui.container).container {
+    @media (max-width: $tablet-width) {
+        width: $tablet-width !important;
+    }
+}
+
 .calendar-filters {
     display: flex;
     justify-content: space-between;
