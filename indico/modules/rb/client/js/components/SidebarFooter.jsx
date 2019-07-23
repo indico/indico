@@ -92,20 +92,25 @@ function SidebarFooter({
     <>
       <Responsive.Phone andLarger minHeight={600}>
         <Menu.Item>
-          {items.map(([id, {href, icon, modal, caption, ...extraProps}]) => (
-            <Popup
-              key={id}
-              inverted
-              position="bottom right"
-              trigger={
-                <a href={href} onClick={modal && (e => openModal(e, id))} {...extraProps}>
-                  <Icon size="large" name={icon} />
-                </a>
-              }
-            >
-              {caption}
-            </Popup>
-          ))}
+          {items.map(([id, item]) => {
+            // XXX: Babel doesn't transpile [x, {y, ...rest}] correctly
+            // https://github.com/babel/babel/issues/10257
+            const {href, icon, modal, caption, ...extraProps} = item;
+            return (
+              <Popup
+                key={id}
+                inverted
+                position="bottom right"
+                trigger={
+                  <a href={href} onClick={modal && (e => openModal(e, id))} {...extraProps}>
+                    <Icon size="large" name={icon} />
+                  </a>
+                }
+              >
+                {caption}
+              </Popup>
+            );
+          })}
         </Menu.Item>
       </Responsive.Phone>
       {contactEmail && (
