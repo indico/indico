@@ -13,7 +13,7 @@ much more recent versions.
 
 .. code-block:: shell
 
-    apt install -y lsb-release wget
+    apt install -y lsb-release wget gnupg
     echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list
     echo "deb http://nginx.org/packages/$(lsb_release -is | tr '[:upper:]' '[:lower:]')/ $(lsb_release -cs) nginx" > /etc/apt/sources.list.d/nginx.list
     wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
@@ -82,6 +82,7 @@ most cases.
     processes = 4
     enable-threads = true
     chmod-socket = 770
+    chown-socket = indico:nginx
     socket = /opt/indico/web/uwsgi.sock
     stats = /opt/indico/web/uwsgi-stats.sock
     protocol = uwsgi
