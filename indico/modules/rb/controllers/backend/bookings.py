@@ -113,15 +113,17 @@ class RHActiveBookings(RHRoomBookingBase):
         'last_reservation_id': fields.Int(missing=None),
         'my_bookings': fields.Bool(missing=False),
         'limit': fields.Int(missing=40),
+        'text': fields.String(missing=None)
     })
-    def _process(self, room_ids, start_dt, last_reservation_id, my_bookings, limit):
+    def _process(self, room_ids, start_dt, last_reservation_id, my_bookings, limit, text):
         start_dt = start_dt or datetime.combine(date.today(), time(0, 0))
         booked_for_user = session.user if my_bookings else None
         bookings, rows_left = get_active_bookings(limit=limit,
                                                   start_dt=start_dt,
                                                   last_reservation_id=last_reservation_id,
                                                   room_ids=room_ids,
-                                                  booked_for_user=booked_for_user)
+                                                  booked_for_user=booked_for_user,
+                                                  text=text)
         return jsonify(bookings=serialize_occurrences(bookings), rows_left=rows_left)
 
 
