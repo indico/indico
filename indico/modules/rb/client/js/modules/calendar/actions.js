@@ -112,6 +112,7 @@ export function fetchActiveBookings(limit, fetchRooms = true) {
 
     const state = getState();
     const {myBookings} = getCalendarFilters(state);
+    const {text} = getRoomFilters(state);
     const {
       data: {roomIds},
       activeBookings: {data},
@@ -120,13 +121,13 @@ export function fetchActiveBookings(limit, fetchRooms = true) {
 
     if (fetchRooms) {
       newRoomIds = await fetchCalendarRooms(dispatch, state);
-      if (!newRoomIds.length) {
+      if (!text && !newRoomIds.length) {
         dispatch({type: FETCH_ACTIVE_BOOKINGS_SUCCESS});
         return;
       }
     }
 
-    const params = preProcessParameters({myBookings}, ajaxRules);
+    const params = preProcessParameters({myBookings, text}, ajaxRules);
     const body = {room_ids: newRoomIds, limit};
 
     if (Object.keys(data).length) {
