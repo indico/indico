@@ -217,6 +217,10 @@ class CountryField(RegistrationFormFieldBase):
         return OrderedDict(self.wtf_field_kwargs['choices'])
 
     def get_friendly_data(self, registration_data, for_humans=False, for_search=False):
+        if registration_data.data == 'None':
+            # XXX: Not sure where this garbage data is coming from, but it resulted in
+            # this method returning `None` and thus breaking the participant list..
+            return ''
         return get_country(registration_data.data) if registration_data.data else ''
 
 
