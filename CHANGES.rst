@@ -47,6 +47,7 @@ Improvements
   thanks :user:`bpedersen2`)
 - Preserve displayed order in contribution exports that do not apply
   any specific sorting (:issue:`4005`)
+- Add author list button to list of papers (:issue:`3978`)
 
 Bugfixes
 ^^^^^^^^
