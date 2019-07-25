@@ -245,6 +245,14 @@ class Registration(db.Model):
         return ~cls.is_cancelled & ~cls.is_deleted
 
     @hybrid_property
+    def is_publishable(self):
+        return self.is_active and self.state in (RegistrationState.complete, RegistrationState.unpaid)
+
+    @is_publishable.expression
+    def is_publishable(cls):
+        return cls.is_active & (cls.state.in_((RegistrationState.complete, RegistrationState.unpaid)))
+
+    @hybrid_property
     def is_cancelled(self):
         return self.state in (RegistrationState.rejected, RegistrationState.withdrawn)
 

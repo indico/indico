@@ -109,7 +109,7 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
         headers = [PersonalDataType[column_name].get_title() for column_name in column_names]
 
         query = (Registration.query.with_parent(self.event)
-                 .filter(Registration.state.in_([RegistrationState.complete, RegistrationState.unpaid]),
+                 .filter(Registration.is_publishable,
                          RegistrationForm.publish_registrations_enabled,
                          ~RegistrationForm.is_deleted,
                          ~Registration.is_deleted)
@@ -154,7 +154,8 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
                       if column_id in active_fields]
         headers = [active_fields[column_id].title.title() for column_id in column_ids]
         active_registrations = sorted(regform.active_registrations, key=attrgetter('last_name', 'first_name', 'id'))
-        registrations = [_process_registration(reg, column_ids, active_fields) for reg in active_registrations]
+        registrations = [_process_registration(reg, column_ids, active_fields) for reg in active_registrations
+                         if reg.is_publishable]
         return {'headers': headers,
                 'rows': registrations,
                 'title': regform.title,

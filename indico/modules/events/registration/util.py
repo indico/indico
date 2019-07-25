@@ -363,7 +363,7 @@ def get_published_registrations(event):
     :return: list of `Registration` objects
     """
     return (Registration
-            .find(Registration.is_active,
+            .find(Registration.is_publishable,
                   ~RegistrationForm.is_deleted,
                   RegistrationForm.event_id == event.id,
                   RegistrationForm.publish_registrations_enabled,

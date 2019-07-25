@@ -75,6 +75,7 @@ Bugfixes
   is pending (:issue:`3361`, thanks :user:`driehle`)
 - Fix 404 error on custom conference pages that do not have any ascii chars
   in the title (:issue:`3998`)
+- Do not show pending registrants in public participant lists (:issue:`4017`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
