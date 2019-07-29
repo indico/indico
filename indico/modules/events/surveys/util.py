@@ -139,4 +139,6 @@ def query_active_surveys(event):
     if session.user:
         user_pending_criterion = ~SurveySubmission.is_submitted & (SurveySubmission.user == session.user)
         private_criterion |= Survey.submissions.any(user_pending_criterion)
-    return Survey.query.with_parent(event).filter(Survey.is_active, private_criterion)
+    return (Survey.query.with_parent(event)
+            .filter(Survey.is_active, private_criterion)
+            .order_by(db.func.lower(Survey.title)))

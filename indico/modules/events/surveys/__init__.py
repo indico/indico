@@ -54,9 +54,7 @@ def _get_active_surveys(event):
     if not event.has_feature('surveys'):
         return []
     from indico.modules.events.surveys.models.surveys import Survey
-    return (query_active_surveys(event)
-            .order_by(db.func.lower(Survey.title))
-            .all())
+    return query_active_surveys(event).all()
 
 
 @template_hook('event-header')
