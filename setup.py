@@ -46,7 +46,8 @@ class BuildWithTranslations(build):
             json_file = os.path.join('indico/translations', locale, 'LC_MESSAGES', 'messages-react.json')
             if not os.path.exists(po_file):
                 continue
-            output = subprocess.check_output(['npx', 'react-jsx-i18n', 'compile', po_file])
+            with open(os.devnull, 'w') as devnull:
+                output = subprocess.check_output(['npx', 'react-jsx-i18n', 'compile', po_file], stderr=devnull)
             json.loads(output)  # just to be sure the JSON is valid
             with open(json_file, 'wb') as f:
                 f.write(output)
