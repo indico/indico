@@ -15,7 +15,7 @@ Major Features
 Improvements
 ^^^^^^^^^^^^
 
-- TODO
+- Sort survey list by title (:issue:`3802`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
