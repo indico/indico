@@ -47,6 +47,7 @@ class BuildWithTranslations(build):
             if not os.path.exists(po_file):
                 continue
             with open(os.devnull, 'w') as devnull:
+                subprocess.check_call(['npm', 'install', 'react-jsx-i18n'], stdout=devnull, stderr=devnull)
                 output = subprocess.check_output(['npx', 'react-jsx-i18n', 'compile', po_file], stderr=devnull)
             json.loads(output)  # just to be sure the JSON is valid
             with open(json_file, 'wb') as f:
