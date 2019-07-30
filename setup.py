@@ -58,11 +58,16 @@ class BuildWithTranslations(build):
         build.run(self)
 
 
+cmdclass = {}
+if os.environ.get('READTHEDOCS') != 'True':
+    cmdclass = {'build': BuildWithTranslations}
+
+
 if __name__ == '__main__':
     setup(
         name='indico',
         version=get_version(),
-        cmdclass={'build': BuildWithTranslations},
+        cmdclass=cmdclass,
         description='Indico is a full-featured conference lifecycle management and meeting/lecture scheduling tool',
         long_description_content_type='text/markdown',
         author='Indico Team',
