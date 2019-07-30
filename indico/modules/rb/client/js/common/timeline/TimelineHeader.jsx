@@ -7,35 +7,23 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
+import {useResponsive} from 'indico/react/util';
 import TimelineLegend from './TimelineLegend';
 import {legendLabelShape} from '../../props';
 import DateNavigator from './DateNavigator';
 
-export default class TimelineHeader extends React.Component {
-  static propTypes = {
-    datePicker: PropTypes.object.isRequired,
-    legendLabels: PropTypes.arrayOf(legendLabelShape).isRequired,
-    onDateChange: PropTypes.func.isRequired,
-    onModeChange: PropTypes.func.isRequired,
-    disableDatePicker: PropTypes.bool,
-    isLoading: PropTypes.bool,
-  };
-
-  static defaultProps = {
-    isLoading: false,
-    disableDatePicker: false,
-  };
-
-  render() {
-    const {
-      disableDatePicker,
-      isLoading,
-      legendLabels,
-      onModeChange,
-      onDateChange,
-      datePicker,
-    } = this.props;
-    return (
+export default function TimelineHeader({
+  datePicker,
+  legendLabels,
+  onDateChange,
+  onModeChange,
+  disableDatePicker,
+  isLoading,
+}) {
+  const {isPhone, isLandscape} = useResponsive();
+  return (
+    !isPhone &&
+    isLandscape && (
       <TimelineLegend
         labels={legendLabels}
         aside={
@@ -48,6 +36,20 @@ export default class TimelineHeader extends React.Component {
           />
         }
       />
-    );
-  }
+    )
+  );
 }
+
+TimelineHeader.propTypes = {
+  datePicker: PropTypes.object.isRequired,
+  legendLabels: PropTypes.arrayOf(legendLabelShape).isRequired,
+  onDateChange: PropTypes.func.isRequired,
+  onModeChange: PropTypes.func.isRequired,
+  disableDatePicker: PropTypes.bool,
+  isLoading: PropTypes.bool,
+};
+
+TimelineHeader.defaultProps = {
+  isLoading: false,
+  disableDatePicker: false,
+};
