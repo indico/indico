@@ -15,10 +15,15 @@ const DIMENSIONS = {
   wideScreen: 1200,
 };
 
+const ORIENTATIONS = {
+  landscape: 'landscape',
+  portrait: 'portrait',
+};
+
 const factory = (minDimension, maxDimension) => {
   /**
    * This component extends `Responsive` from `react-responsive`, adding some
-   * useful configuration options.
+   * useful dimension configuration options.
    */
   function _SizeSpec({andLarger, andSmaller, orElse, children, onlyIf, ...restProps}) {
     return (
@@ -54,11 +59,42 @@ const factory = (minDimension, maxDimension) => {
   return _SizeSpec;
 };
 
+const orientationFactory = orientation => {
+  /**
+   * This component extends `Responsive` from `react-responsive`, adding some
+   * useful orientation configuration options.
+   */
+  function _OrientationSpec({orElse, children, onlyIf, ...restProps}) {
+    return (
+      <Responsive orientation={orientation} {...restProps}>
+        {matches => (matches && onlyIf ? children : orElse)}
+      </Responsive>
+    );
+  }
+
+  _OrientationSpec.propTypes = {
+    /** allows for negative cases to be specified easily */
+    orElse: PropTypes.node,
+    /** allows adding an extra condition to render the matching content */
+    onlyIf: PropTypes.bool,
+    children: PropTypes.node.isRequired,
+  };
+
+  _OrientationSpec.defaultProps = {
+    onlyIf: true,
+    orElse: null,
+  };
+
+  return _OrientationSpec;
+};
+
 export default Object.assign(Responsive, {
   WideScreen: factory(DIMENSIONS.wideScreen, null),
   Desktop: factory(DIMENSIONS.computer, DIMENSIONS.wideScreen),
   Tablet: factory(DIMENSIONS.tablet, DIMENSIONS.computer),
   Phone: factory(null, DIMENSIONS.tablet),
+  Portrait: orientationFactory(ORIENTATIONS.portrait),
+  Landscape: orientationFactory(ORIENTATIONS.landscape),
 });
 
 export function useResponsive() {
