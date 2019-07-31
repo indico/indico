@@ -20,10 +20,9 @@ export default function TimelineHeader({
   disableDatePicker,
   isLoading,
 }) {
-  const {isPhone, isLandscape} = useResponsive();
+  const {isPhone, isPortrait} = useResponsive();
   return (
-    !isPhone &&
-    isLandscape && (
+    !(isPhone && isPortrait) && (
       <TimelineLegend
         labels={legendLabels}
         aside={

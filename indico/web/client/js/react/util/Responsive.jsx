@@ -110,6 +110,7 @@ export function useResponsive() {
       query: `(min-width: ${DIMENSIONS.tablet}px) and (max-width: ${belowComputingScreen}px)`,
     }),
     isPhone: useMediaQuery({query: `(max-width: ${belowTabletScreen}px)`}),
-    isLandscape: useMediaQuery({query: '(orientation: landscape)'}),
+    isPortrait: useMediaQuery({query: `(orientation: ${ORIENTATIONS.portrait})`}),
+    isLandscape: useMediaQuery({query: `(orientation: ${ORIENTATIONS.landscape})`}),
   };
 }
