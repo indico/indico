@@ -251,9 +251,11 @@ class RoomList extends React.Component {
           </div>
         </Grid.Column>
         {showMap && (
-          <Grid.Column computer={5} only="computer">
-            <MapController onRoomClick={({id}) => openRoomDetails(id)} />
-          </Grid.Column>
+          <Responsive.Desktop andLarger>
+            <Grid.Column computer={5} only="computer">
+              <MapController onRoomClick={({id}) => openRoomDetails(id)} />
+            </Grid.Column>
+          </Responsive.Desktop>
         )}
         <Route
           exact

@@ -439,11 +439,13 @@ class BookRoom extends React.Component {
           {this.renderMainContent()}
         </Grid.Column>
         {showMap && (
-          <Grid.Column computer={5} only="computer">
-            <MapController
-              onRoomClick={({id, canUserBook}) => this.openBookingForm(id, null, !canUserBook)}
-            />
-          </Grid.Column>
+          <Responsive.Desktop andLarger>
+            <Grid.Column computer={5} only="computer">
+              <MapController
+                onRoomClick={({id, canUserBook}) => this.openBookingForm(id, null, !canUserBook)}
+              />
+            </Grid.Column>
+          </Responsive.Desktop>
         )}
       </Grid>
     );
