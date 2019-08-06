@@ -150,11 +150,11 @@ def _git_tag(version, message, sign, dry_run):
     subprocess.check_call(['git', 'tag', '--message', message, tag_name] + sign_args)
 
 
-def _build_wheel(no_deps, dry_run):
+def _build_wheel(no_assets, dry_run):
     step("Building wheel", dry_run=dry_run)
     if dry_run:
         return
-    args = ['--no-deps'] if no_deps else []
+    args = ['--no-assets'] if no_assets else []
     subprocess.check_call(['./bin/maintenance/build-wheel.py', 'indico'] + args)
 
 
@@ -162,9 +162,9 @@ def _build_wheel(no_deps, dry_run):
 @click.argument('version', required=False)
 @click.option('--dry-run', '-n', is_flag=True, help='Do not modify any files or run commands')
 @click.option('--sign', '-s', is_flag=True, help='Sign the Git commit/tag with GPG')
-@click.option('--no-deps', '-D', is_flag=True, help='Skip setup_deps when building the wheel')
+@click.option('--no-assets', '-D', is_flag=True, help='Skip building assets when building the wheel')
 @click.option('--no-changelog', '-C', is_flag=True, help='Do not update the date in the changelog')
-def cli(version, dry_run, sign, no_deps, no_changelog):
+def cli(version, dry_run, sign, no_assets, no_changelog):
     os.chdir(os.path.join(os.path.dirname(__file__), '..', '..'))
     cur_version, new_version, next_version = _get_versions(version)
     _check_tag(new_version)
@@ -183,7 +183,7 @@ def cli(version, dry_run, sign, no_deps, no_changelog):
     _git_tag(new_version, release_msg, sign=sign, dry_run=dry_run)
     prompt = 'Build release wheel before bumping version?' if next_version else 'Build release wheel now?'
     if click.confirm(click.style(prompt, fg='blue', bold=True), default=True):
-        _build_wheel(no_deps, dry_run=dry_run)
+        _build_wheel(no_assets, dry_run=dry_run)
     if next_version:
         next_message = 'Bump version to {}'.format(next_version)
         _set_version(next_version, dry_run=dry_run)
