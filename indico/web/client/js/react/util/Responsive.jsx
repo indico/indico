@@ -20,7 +20,7 @@ const ORIENTATIONS = {
   portrait: 'portrait',
 };
 
-const factory = (minDimension, maxDimension) => {
+const dimensionFactory = (minDimension, maxDimension) => {
   /**
    * This component extends `Responsive` from `react-responsive`, adding some
    * useful dimension configuration options.
@@ -89,10 +89,10 @@ const orientationFactory = orientation => {
 };
 
 export default Object.assign(Responsive, {
-  WideScreen: factory(DIMENSIONS.wideScreen, null),
-  Desktop: factory(DIMENSIONS.computer, DIMENSIONS.wideScreen),
-  Tablet: factory(DIMENSIONS.tablet, DIMENSIONS.computer),
-  Phone: factory(null, DIMENSIONS.tablet),
+  WideScreen: dimensionFactory(DIMENSIONS.wideScreen, null),
+  Desktop: dimensionFactory(DIMENSIONS.computer, DIMENSIONS.wideScreen),
+  Tablet: dimensionFactory(DIMENSIONS.tablet, DIMENSIONS.computer),
+  Phone: dimensionFactory(null, DIMENSIONS.tablet),
   Portrait: orientationFactory(ORIENTATIONS.portrait),
   Landscape: orientationFactory(ORIENTATIONS.landscape),
 });
