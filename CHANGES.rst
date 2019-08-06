@@ -5,7 +5,7 @@ Changelog
 Version 2.2
 -----------
 
-*Unreleased*
+*Released on August 06, 2019*
 
 Major Changes
 ^^^^^^^^^^^^^
