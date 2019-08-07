@@ -17,9 +17,11 @@ from indico.core.db.sqlalchemy.descriptions import RENDER_MODE_WRAPPER_MAP
 from indico.legacy.pdfinterface.conference import ProgrammeToPDF
 from indico.modules.events.controllers.base import RHDisplayEventBase
 from indico.modules.events.management.controllers import RHManageEventBase
-from indico.modules.events.tracks.forms import ProgramForm, TrackForm
+from indico.modules.events.tracks.forms import ProgramForm, TrackForm, TrackGroupForm
+from indico.modules.events.tracks.models.groups import TrackGroup
 from indico.modules.events.tracks.models.tracks import Track
-from indico.modules.events.tracks.operations import create_track, delete_track, update_program, update_track
+from indico.modules.events.tracks.operations import (create_track, create_track_group, delete_track, delete_track_group,
+                                                     update_program, update_track, update_track_group)
 from indico.modules.events.tracks.settings import track_settings
 from indico.modules.events.tracks.views import WPDisplayTracks, WPManageTracks
 from indico.util.i18n import _
@@ -51,6 +53,18 @@ class RHManageTrackBase(RHManageTracksBase):
     def _process_args(self):
         RHManageTracksBase._process_args(self)
         self.track = Track.get_one(request.view_args['track_id'])
+
+
+class RHManageTrackGroupBase(RHManageEventBase):
+    normalize_url_spec = {
+        'locators': {
+            lambda self: self.track_group
+        }
+    }
+
+    def _process_args(self):
+        RHManageEventBase._process_args(self)
+        self.track_group = TrackGroup.get_one(request.view_args['group_id'])
 
 
 class RHManageTracks(RHManageTracksBase):
@@ -127,3 +141,30 @@ class RHTracksPDF(RHDisplayEventBase):
     def _process(self):
         pdf = ProgrammeToPDF(self.event)
         return send_file('program.pdf', BytesIO(pdf.getPDFBin()), 'application/pdf')
+
+
+class RHTrackGroups(RHManageEventBase):
+    def _process(self):
+        pass
+
+
+class RHCreateTrackGroup(RHManageEventBase):
+    def _process(self):
+        form = TrackGroupForm()
+        if form.validate_on_submit():
+            create_track_group(self.event, form.data)
+        return jsonify_form(form)
+
+
+class RHEditTrackGroup(RHManageTrackGroupBase):
+    def _process(self):
+        form = TrackGroupForm(obj=self.track_group)
+        if form.validate_on_submit():
+            update_track_group(self.track_group, form.data)
+        return jsonify_form(form)
+
+
+class RHDeleteTrackGroup(RHManageTrackGroupBase):
+    def _process(self):
+        delete_track_group(self.track_group)
+        flash(_('Track Group "{}" has been deleted.').format(self.track_group.title), 'success')
