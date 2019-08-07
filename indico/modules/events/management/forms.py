@@ -30,7 +30,7 @@ from indico.modules.events import Event, LegacyEventMapping
 from indico.modules.events.cloning import EventCloner
 from indico.modules.events.fields import EventPersonLinkListField, ReferencesField
 from indico.modules.events.models.events import EventType
-from indico.modules.events.models.references import EventReference
+from indico.modules.events.models.references import EventReference, ReferenceType
 from indico.modules.events.sessions import COORDINATOR_PRIV_DESCS, COORDINATOR_PRIV_TITLES
 from indico.modules.events.timetable.util import get_top_level_entries
 from indico.modules.events.util import check_permissions
@@ -211,7 +211,7 @@ class EventClassificationForm(IndicoForm):
     def __init__(self, *args, **kwargs):
         event = kwargs.pop('event')
         super(EventClassificationForm, self).__init__(*args, **kwargs)
-        if event.type_ != EventType.meeting:
+        if event.type_ != EventType.meeting or not ReferenceType.query.has_rows():
             del self.references
 
 
