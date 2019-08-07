@@ -13,10 +13,14 @@ from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii, text_to_repr
 
 
-def _get_next_position(context):
+def get_next_position(context):
+    from indico.modules.events.tracks.models.groups import TrackGroup
+
     event_id = context.current_parameters['event_id']
-    res = db.session.query(db.func.max(Track.position)).filter_by(event_id=event_id).one()
-    return (res[0] or 0) + 1
+    track_max_position = db.session.query(db.func.max(Track.position)).filter_by(event_id=event_id).scalar()
+    track_group_max_position = db.session.query(db.func.max(TrackGroup.position)).filter_by(event_id=event_id).scalar()
+    pos = max(track_max_position, track_group_max_position)
+    return (pos or 0) + 1
 
 
 class Track(DescriptionMixin, db.Model):
@@ -48,11 +52,17 @@ class Track(DescriptionMixin, db.Model):
     position = db.Column(
         db.Integer,
         nullable=False,
-        default=_get_next_position
+        default=get_next_position
     )
     default_session_id = db.Column(
         db.Integer,
         db.ForeignKey('events.sessions.id'),
+        index=True,
+        nullable=True
+    )
+    track_group_id = db.Column(
+        db.Integer,
+        db.ForeignKey('events.track_groups.id', ondelete='SET NULL'),
         index=True,
         nullable=True
     )
@@ -93,6 +103,15 @@ class Track(DescriptionMixin, db.Model):
         'Session',
         lazy=True,
         backref='default_for_tracks'
+    )
+    track_group = db.relationship(
+        'TrackGroup',
+        lazy=True,
+        backref=db.backref(
+            'tracks',
+            lazy=True,
+            passive_deletes=True
+        )
     )
 
     # relationship backrefs:
