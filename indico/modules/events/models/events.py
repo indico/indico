@@ -404,6 +404,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     # - static_sites (StaticSite.event)
     # - surveys (Survey.event)
     # - timetable_entries (TimetableEntry.event)
+    # - track_groups (TrackGroup.event)
     # - tracks (Track.event)
     # - vc_room_associations (VCRoomEventAssociation.linked_event)
 
