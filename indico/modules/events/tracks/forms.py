@@ -42,3 +42,8 @@ class ProgramForm(IndicoForm):
     @generated_data
     def program_render_mode(self):
         return RenderMode.markdown
+
+
+class TrackGroupForm(IndicoForm):
+    title = StringField(_('Title'), [DataRequired()])
+    description = IndicoMarkdownField(_('Description'), editor=True)
