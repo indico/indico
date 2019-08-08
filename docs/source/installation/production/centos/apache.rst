@@ -287,6 +287,7 @@ You are now ready to install Indico:
 
     virtualenv ~/.venv
     source ~/.venv/bin/activate
+    export PATH="$PATH:/usr/pgsql-9.6/bin"
     pip install -U pip setuptools
     pip install indico
 

@@ -24,6 +24,14 @@ Now switch to the *indico* user and activate the virtualenv:
     su - indico
     source ~/.venv/bin/activate
 
+If you are on CentOS, update your PATH to avoid errors in case the new
+Indico version needs to install an updated version of the PostgreSQL client
+library (psycopg2):
+
+.. code-block:: shell
+
+    export PATH="$PATH:/usr/pgsql-9.6/bin"
+
 You are now ready to install the latest version of Indico:
 
 .. code-block:: shell
