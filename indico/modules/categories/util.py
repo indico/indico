@@ -20,13 +20,12 @@ from indico.core.db.sqlalchemy.links import LinkType
 from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.modules.attachments import Attachment
 from indico.modules.attachments.models.folders import AttachmentFolder
-from indico.modules.categories import Category, upcoming_events_settings
+from indico.modules.categories import upcoming_events_settings
 from indico.modules.events import Event
 from indico.modules.events.contributions import Contribution
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.sessions import Session
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
-from indico.modules.events.util import serialize_event_for_json_ld
 from indico.util.caching import memoize_redis
 from indico.util.date_time import now_utc
 from indico.util.i18n import _, ngettext
