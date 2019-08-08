@@ -33,7 +33,7 @@ Version 2.2.1
 Bugfixes
 ^^^^^^^^
 
-- None so far :)
+- Add missing slash to the ``template_prefix`` of the ``designer`` module.
 
 
 Version 2.2
