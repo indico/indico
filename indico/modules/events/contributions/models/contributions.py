@@ -164,6 +164,11 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
         db.String,
         nullable=False
     )
+    code = db.Column(
+        db.String,
+        nullable=False,
+        default=''
+    )
     duration = db.Column(
         db.Interval,
         nullable=False

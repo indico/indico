@@ -67,6 +67,11 @@ class SubContribution(DescriptionMixin, AttachedItemsMixin, AttachedNotesMixin, 
         db.String,
         nullable=False
     )
+    code = db.Column(
+        db.String,
+        nullable=False,
+        default=''
+    )
     duration = db.Column(
         db.Interval,
         nullable=False

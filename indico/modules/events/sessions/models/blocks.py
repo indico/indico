@@ -44,6 +44,11 @@ class SessionBlock(LocationMixin, db.Model):
         nullable=False,
         default=''
     )
+    code = db.Column(
+        db.String,
+        nullable=False,
+        default=''
+    )
     duration = db.Column(
         db.Interval,
         nullable=False
