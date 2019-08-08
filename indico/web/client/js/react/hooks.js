@@ -9,7 +9,7 @@ import favoriteUsersURL from 'indico-url:users.favorites_api';
 import principalsURL from 'indico-url:core.principals';
 
 import _ from 'lodash';
-import {useEffect, useState, useRef} from 'react';
+import {useEffect, useState} from 'react';
 import PropTypes from 'prop-types';
 import useAxios from '@use-hooks/axios';
 import {handleAxiosError, indicoAxios} from '../utils/axios';
@@ -119,31 +119,3 @@ export function useIndicoAxios({camelize, ...args}) {
   }
   return {response, error, loading, reFetch, data};
 }
-
-export const useScrollUp = (enabled = true) => {
-  const [isScrollingUp, setIsScrollingUp] = useState(true);
-  const prevRef = useRef();
-
-  useEffect(() => {
-    const handleScroll = () => {
-      if (
-        prevRef.current !== window.scrollY &&
-        isScrollingUp !== prevRef.current > window.scrollY
-      ) {
-        setIsScrollingUp(prevRef.current > window.scrollY);
-        prevRef.current = window.scrollY;
-      }
-    };
-
-    if (enabled) {
-      prevRef.current = window.scrollY;
-      window.addEventListener('scroll', _.throttle(handleScroll, 500));
-
-      return () => {
-        window.removeEventListener('scroll', _.throttle(handleScroll, 500));
-      };
-    }
-  }, [isScrollingUp, enabled]);
-
-  return isScrollingUp;
-};

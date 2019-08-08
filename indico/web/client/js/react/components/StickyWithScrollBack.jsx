@@ -12,25 +12,23 @@ import {Sticky} from 'semantic-ui-react';
 import {ScrollButton} from 'indico/react/components';
 import {useResponsive} from 'indico/react/util';
 
-import {useScrollUp} from '../hooks';
-
 import './StickyWithScrollBack.module.scss';
 
 export default function StickyWithScrollBack({children, context, responsive}) {
   const [scrollButtonVisible, setScrollButtonVisible] = useState(false);
-  const isScrollingUp = useScrollUp(responsive);
 
   const {isPhone, isTablet, isLandscape} = useResponsive();
   const isResponsiveDevice = responsive && (isPhone || isTablet) && isLandscape;
   return (
     <Sticky
       context={context}
-      styleName={`sticky-content ${isResponsiveDevice && !isScrollingUp ? 'hidden' : ''}`}
+      styleName="sticky-content"
       onStick={() => setScrollButtonVisible(true)}
       onUnstick={() => setScrollButtonVisible(false)}
+      active={!isResponsiveDevice}
     >
       {children}
-      <ScrollButton visible={scrollButtonVisible} />
+      <ScrollButton visible={scrollButtonVisible || isResponsiveDevice} />
     </Sticky>
   );
 }
