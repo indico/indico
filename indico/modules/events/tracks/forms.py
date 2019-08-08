@@ -13,6 +13,7 @@ from wtforms.validators import DataRequired
 
 from indico.core.db.sqlalchemy.descriptions import RenderMode
 from indico.modules.events.sessions.models.sessions import Session
+from indico.modules.events.tracks.models.groups import TrackGroup
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm, generated_data
 from indico.web.forms.fields import IndicoMarkdownField
@@ -21,6 +22,8 @@ from indico.web.forms.fields import IndicoMarkdownField
 class TrackForm(IndicoForm):
     title = StringField(_('Title'), [DataRequired()])
     code = StringField(_('Code'))
+    track_group = QuerySelectField(_('Track group'), default='', allow_blank=True, get_label='title',
+                                   description=_('Select a track group to which this track should belong'))
     default_session = QuerySelectField(_('Default session'), default='', allow_blank=True, get_label='title',
                                        description=_('Indico will preselect this session whenever an abstract is '
                                                      'accepted for the track'))
@@ -30,6 +33,7 @@ class TrackForm(IndicoForm):
         event = kwargs.pop('event')
         super(TrackForm, self).__init__(*args, **kwargs)
         self.default_session.query = Session.query.with_parent(event)
+        self.track_group.query = TrackGroup.query.with_parent(event)
 
 
 class ProgramForm(IndicoForm):
