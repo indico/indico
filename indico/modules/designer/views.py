@@ -12,10 +12,10 @@ from indico.modules.events.management.views import WPEventManagement
 
 
 class WPEventManagementDesigner(WPEventManagement):
-    template_prefix = 'designer'
+    template_prefix = 'designer/'
     bundles = ('module_designer.js',)
 
 
 class WPCategoryManagementDesigner(WPCategoryManagement):
-    template_prefix = 'designer'
+    template_prefix = 'designer/'
     bundles = ('module_designer.js',)

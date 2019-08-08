@@ -138,6 +138,8 @@ class WPJinjaMixin(object):
 
     @classmethod
     def _prefix_template(cls, template):
+        if cls.template_prefix and cls.template_prefix[-1] != '/':
+            raise ValueError('template_prefix needs to end with a slash')
         if isinstance(template, basestring):
             return cls.template_prefix + template
         else:
