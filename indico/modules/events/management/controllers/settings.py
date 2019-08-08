@@ -19,6 +19,7 @@ from indico.modules.events.management.forms import (EventClassificationForm, Eve
                                                     EventDatesForm, EventLocationForm, EventPersonsForm)
 from indico.modules.events.management.util import flash_if_unregistered
 from indico.modules.events.management.views import WPEventSettings, render_event_management_header_right
+from indico.modules.events.models.references import ReferenceType
 from indico.modules.events.operations import update_event
 from indico.modules.events.util import track_time_changes
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
@@ -65,8 +66,10 @@ class RHEventSettings(RHManageEventBase):
                            .join(Room)
                            .has_rows())
             show_booking_warning = not has_overlap
+        has_reference_types = ReferenceType.query.has_rows()
         return WPEventSettings.render_template('settings.html', self.event, 'settings',
-                                               show_booking_warning=show_booking_warning)
+                                               show_booking_warning=show_booking_warning,
+                                               has_reference_types=has_reference_types)
 
 
 class RHEditEventDataBase(RHManageEventBase):
@@ -79,7 +82,9 @@ class RHEditEventDataBase(RHManageEventBase):
     def render_settings_box(self):
         tpl = get_template_module('events/management/_settings.html')
         assert self.section_name
-        return tpl.render_event_settings(self.event, section=self.section_name, with_container=False)
+        has_reference_types = ReferenceType.query.has_rows()
+        return tpl.render_event_settings(self.event, has_reference_types,
+                                         section=self.section_name, with_container=False)
 
     def jsonify_success(self):
         return jsonify_data(settings_box=self.render_settings_box(),
