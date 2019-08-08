@@ -117,7 +117,7 @@ class ContributionEntryForm(EntryFormMixin, ContributionForm):
 class SessionBlockEntryForm(EntryFormMixin, SessionBlockForm):
     _entry_type = TimetableEntryType.SESSION_BLOCK
     _default_duration = timedelta(minutes=60)
-    _display_fields = ('title', 'time', 'duration', 'person_links', 'location_data')
+    _display_fields = ('title', 'time', 'duration', 'person_links', 'location_data', 'code')
 
     @staticmethod
     def _validate_duration(entry, field, start_dt):

@@ -69,6 +69,7 @@ class SessionProtectionForm(IndicoForm):
 
 class SessionBlockForm(IndicoForm):
     title = StringField(_('Title'), description=_('Title of the session block'))
+    code = StringField(_('Programme code'))
     person_links = SessionBlockPersonLinkListField(_('Conveners'))
     location_data = IndicoLocationField(_('Location'))
 
@@ -103,6 +104,7 @@ class SessionTypeForm(IndicoForm):
     name = StringField(_("Name"), [DataRequired()])
     is_poster = BooleanField(_("Poster"), widget=SwitchWidget(),
                              description=_("Whether the session is a poster session or contains normal presentations"))
+    code = StringField(_('Programme code'))
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')

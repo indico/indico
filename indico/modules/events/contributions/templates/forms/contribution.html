@@ -1,6 +1,6 @@
 {% from 'forms/_form.html' import form_header, form_footer, form_row, form_rows, form_fieldset %}
 
-{% set skip_fields = ('title', 'description', 'references', 'board_number') + form.custom_field_names %}
+{% set skip_fields = ('title', 'description', 'references', 'board_number', 'code') + form.custom_field_names %}
 
 {%- block content %}
     {{ form_header(form) }}
@@ -8,7 +8,7 @@
     {{ form_row(form.description, widget_attrs={'rows': 10}) }}
     {{ form_rows(form, fields=fields or none, skip=skip_fields) }}
     {% call form_fieldset(_('Advanced'), collapsible=true) %}
-        {{ form_rows(form, fields=form.custom_field_names + ('references', 'board_number')) }}
+        {{ form_rows(form, fields=form.custom_field_names + ('references', 'board_number', 'code')) }}
     {% endcall %}
     {% call form_footer(form) %}
         <input class="i-button big highlight" type="submit" value="{% trans %}Save{% endtrans %}" data-disabled-until-change>

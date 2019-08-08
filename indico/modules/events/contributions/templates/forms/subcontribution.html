@@ -2,9 +2,9 @@
 
 {%- block content %}
     {{ form_header(form) }}
-    {{ form_rows(form, skip=('references',)) }}
+    {{ form_rows(form, skip=('references', 'code')) }}
     {% call form_fieldset(_('Advanced'), collapsible=true) %}
-        {{ form_rows(form, fields=('references',)) }}
+        {{ form_rows(form, fields=('references', 'code')) }}
     {% endcall %}
     {% call form_footer(form) %}
         <input class="i-button big highlight" type="submit" value="{% trans %}Save{% endtrans %}" data-disabled-until-change>
