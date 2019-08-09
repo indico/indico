@@ -12,6 +12,7 @@ Bugfixes
 
 - Add missing slash to the ``template_prefix`` of the ``designer`` module
 - Always use HH:MM time format in book-from-event link
+- Fix timetable theme when set to "indico weeks view" before 2.2 (:issue:`4027`)
 
 
 Version 2.2
