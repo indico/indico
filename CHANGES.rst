@@ -33,7 +33,8 @@ Version 2.2.1
 Bugfixes
 ^^^^^^^^
 
-- Add missing slash to the ``template_prefix`` of the ``designer`` module.
+- Add missing slash to the ``template_prefix`` of the ``designer`` module
+- Always use HH:MM time format in book-from-event link
 
 
 Version 2.2
