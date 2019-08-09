@@ -19,7 +19,7 @@ from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.event.forms import BookingListForm
 from indico.modules.rb.models.reservations import Reservation, ReservationLink
 from indico.modules.rb.views import WPEventBookingList
-from indico.util.date_time import format_datetime, format_time, now_utc
+from indico.util.date_time import format_datetime, now_utc
 from indico.util.string import to_unicode
 
 
@@ -72,8 +72,8 @@ class RHEventBookingList(RHRoomBookingEventBase):
                            'interval': 'week',
                            'sd': self.event.start_dt_local.date().isoformat(),
                            'ed': None if is_single_day else self.event.end_dt_local.date().isoformat(),
-                           'st': format_time(self.event.start_dt_local.time()),
-                           'et': format_time(self.event.end_dt_local.time()),
+                           'st': self.event.start_dt_local.strftime('%H:%M'),
+                           'et': self.event.end_dt_local.strftime('%H:%M'),
                            'text': self.event.room.name if self.event.room else None}
         return WPEventBookingList.render_template('booking_list.html', self.event,
                                                   form=form,
