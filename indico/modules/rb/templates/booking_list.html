@@ -60,16 +60,16 @@
         {% if links %}
             <div>
                 <h3>Room bookings</h3>
-                <table class="i-table-widget">
+                <table class="i-table-widget js-bookings-table">
                     <thead>
                         <tr>
                             <th class="room-column">{% trans %}Room{% endtrans %}</th>
                             <th>{% trans %}Reason{% endtrans %}</th>
                             <th>{% trans %}For whom{% endtrans %}</th>
-                            <th>{% trans %}Date{% endtrans %}</th>
-                            <th class="time-column">{% trans %}Time{% endtrans %}</th>
+                            <th data-sorter="text">{% trans %}Date{% endtrans %}</th>
+                            <th class="time-column" data-sorter="text">{% trans %}Time{% endtrans %}</th>
                             <th class="link-column">{% trans %}Linked to{% endtrans %}</th>
-                            <th class="action-column"></th>
+                            <th class="action-column" data-sorter="false"></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -88,13 +88,15 @@
                                 </td>
                                 <td>{{ reservation.booking_reason }}</td>
                                 <td>{{ reservation.booked_for_name }}</td>
-                                <td>
+                                <td data-text="{{ reservation.start_dt.date().isoformat() }}">
                                     {{ reservation.start_dt | format_date()}}
                                     {% if reservation.is_repeating %}
                                         ({% trans %}recurring{% endtrans %})
                                     {% endif %}
                                 </td>
-                                <td>{{ reservation.start_dt | format_time() }} - {{ reservation.end_dt | format_time() }}</td>
+                                <td data-text="{{ reservation.start_dt.time().isoformat() }}-{{ reservation.end_dt.time().isoformat() }}">
+                                    {{ reservation.start_dt | format_time() }} - {{ reservation.end_dt | format_time() }}
+                                </td>
                                 <td class="link-data">
                                     {% if link.link_type.name == 'event' %}
                                         {{ link.link_type.title }}
@@ -115,6 +117,13 @@
             </div>
         {% endif %}
     </div>
+    <script>
+        $('.js-bookings-table').tablesorter({
+            cssAsc: 'header-sort-asc',
+            cssDesc: 'header-sort-desc',
+            headerTemplate: '',
+        });
+    </script>
 {% endblock %}
 
 {% macro booking_details_link(reservation) %}
