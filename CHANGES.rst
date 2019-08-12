@@ -111,6 +111,7 @@ Bugfixes
   in the title (:issue:`3998`)
 - Do not show pending registrants in public participant lists (:issue:`4017`)
 - Hide "External IDs" field if none are defined (:issue:`3857`)
+- Order Room Bookings (:issue:`4022`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
