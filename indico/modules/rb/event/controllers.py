@@ -57,7 +57,10 @@ class RHEventBookingList(RHRoomBookingEventBase):
                  .options(joinedload('reservation').joinedload('room'),
                           joinedload('session_block'),
                           joinedload('contribution'))
-                 .filter(~ReservationLink.reservation.has(Reservation.is_cancelled))).all()
+                 .filter(~ReservationLink.reservation.has(Reservation.is_cancelled))
+                 .join(Reservation)
+                 .order_by(Reservation.start_dt)
+                 .all())
 
         contribs_data = {c.id: {'start_dt': c.start_dt.isoformat(), 'end_dt': c.end_dt.isoformat()}
                          for c in _contrib_query(self.event)}
