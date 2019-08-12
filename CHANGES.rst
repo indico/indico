@@ -16,6 +16,7 @@ Improvements
 ^^^^^^^^^^^^
 
 - Sort survey list by title (:issue:`3802`)
+- Hide "External IDs" field if none are defined (:issue:`3857`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
@@ -112,7 +113,6 @@ Bugfixes
 - Fix 404 error on custom conference pages that do not have any ascii chars
   in the title (:issue:`3998`)
 - Do not show pending registrants in public participant lists (:issue:`4017`)
-- Hide "External IDs" field if none are defined (:issue:`3857`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
