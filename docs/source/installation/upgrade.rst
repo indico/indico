@@ -170,6 +170,9 @@ with this one:
 
 Reload nginx using ``systemctl reload nginx.service``.
 
+If you are using customizations using the :data:`CUSTOMIZATION_DIR` setting, see its
+updated documentation as you will have to update those customizations.
+
 
 Upgrading from 1.9.11 to 2.0
 ----------------------------

@@ -227,14 +227,15 @@ Customization
     may break after an Indico update.  Make sure to test all your
     modifications whenever you update Indico!
 
-    To include custom CSS and JavaScript, simply put ``*.scss`` and
-    ``*.js`` files into ``<CUSTOMIZATION_DIR>/scss`` / ``<CUSTOMIZATION_DIR>/js``.
+    To include custom CSS and JavaScript, simply put ``*.css`` and
+    ``*.js`` files into ``<CUSTOMIZATION_DIR>/css`` / ``<CUSTOMIZATION_DIR>/js``.
     If there are multiple files, they will be included in alphabetical
-    order, so prefixing them with a number (e.g. ``00-base.scss``, ``10-events.scss``)
+    order, so prefixing them with a number (e.g. ``00-base.css``, ``10-events.css``)
     is a good idea.
 
-    Static files may be added in ``<CUSTOMIZATION_DIR>/static``.  They can be
-    referenced in templates through the ``assets.custom`` endpoint.
+    Static files may be added in ``<CUSTOMIZATION_DIR>/files``.  They can be
+    referenced in templates through the ``assets.custom`` endpoint.  In CSS/JS,
+    the URL for them needs to be built manually (``/static/custom/files/...``).
 
     For template customizations, see the description of :data:`CUSTOMIZATION_DEBUG`
     as this setting is highly recommended to figure out where exactly to
