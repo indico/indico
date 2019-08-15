@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import bookingLinkURL from 'indico-url:rb.booking_link';
+
 import _ from 'lodash';
 import moment from 'moment';
 import React from 'react';
@@ -144,6 +146,10 @@ class BookingDetails extends React.Component {
   };
 
   renderBookingHistory = (editLogs, createdOn, createdByUser) => {
+    const {
+      actions: {openBookingDetails},
+    } = this.props;
+
     if (createdByUser) {
       const {fullName: createdBy} = createdByUser;
       editLogs = [
@@ -158,8 +164,39 @@ class BookingDetails extends React.Component {
     }
     const items = editLogs.map(log => {
       const {id, timestamp, info, userName} = log;
-      const basicInfo = <strong>{info[0]}</strong>;
-      const details = info[1] ? info[1] : null;
+      let basicInfo = <strong>{info[0]}</strong>;
+      let details = null;
+      let textInfo = info;
+      const match = info[info.length - 1].match(/^booking_link:(\d+)$/);
+      if (match) {
+        // if the last item is `booking_link:12345` the log entry links to that booking.
+        // this is a slightly ugly workaround to allow the otherwise text-only log entries
+        // to link to another booking (used for split bookings)
+        textInfo = info.slice(0, -1);
+        basicInfo = (
+          <a
+            href={bookingLinkURL({booking_id: match[1]})}
+            onClick={evt => {
+              evt.preventDefault();
+              openBookingDetails(match[1]);
+            }}
+          >
+            {basicInfo}
+          </a>
+        );
+      }
+      if (textInfo.length === 2) {
+        details = textInfo[1];
+      } else if (textInfo.length > 2) {
+        details = (
+          <ul style={{textAlign: 'left'}}>
+            {textInfo.slice(1).map((detail, i) => (
+              // eslint-disable-next-line react/no-array-index-key
+              <li key={i}>{detail}</li>
+            ))}
+          </ul>
+        );
+      }
       const logDate = serializeDate(toMoment(timestamp), 'L');
       const popupContent = <span styleName="popup-center">{details}</span>;
       const wrapper = details ? <PopupParam content={popupContent} /> : <span />;

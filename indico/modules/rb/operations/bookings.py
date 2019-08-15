@@ -24,6 +24,7 @@ from indico.core.errors import NoReportError
 from indico.modules.events.models.events import Event
 from indico.modules.events.models.principals import EventPrincipal
 from indico.modules.rb import rb_settings
+from indico.modules.rb.models.reservation_edit_logs import ReservationEditLog
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import RepeatFrequency, Reservation, ReservationLink
 from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
@@ -419,6 +420,15 @@ def split_booking(booking, new_booking_data):
             new_occ.cancel(None, silent=True)
         if new_occ_start in rejected_occs:
             new_occ.reject(None, rejected_occs[new_occ_start], silent=True)
+
+    booking.edit_logs.append(ReservationEditLog(user_name=session.user.full_name, info=[
+        'Split into a new booking',
+        'booking_link:{}'.format(resv.id)
+    ]))
+    resv.edit_logs.append(ReservationEditLog(user_name=session.user.full_name, info=[
+        'Split from another booking',
+        'booking_link:{}'.format(booking.id)
+    ]))
     return resv
 
 
