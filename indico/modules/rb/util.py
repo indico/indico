@@ -11,10 +11,12 @@ import os
 from collections import namedtuple
 from datetime import datetime, time, timedelta
 from io import BytesIO
+from operator import attrgetter
 
 import pytz
 from flask import current_app
 from PIL import Image
+from sqlalchemy import Date, cast
 from sqlalchemy.orm import joinedload
 
 from indico.core.config import config
@@ -25,6 +27,8 @@ from indico.modules.events import Event
 from indico.modules.events.contributions import Contribution
 from indico.modules.events.sessions import Session
 from indico.modules.events.sessions.models.blocks import SessionBlock
+from indico.modules.events.timetable.models.entries import TimetableEntry
+from indico.modules.events.timetable.util import find_latest_entry_end_dt
 from indico.util.caching import memoize_request
 from indico.util.date_time import now_utc, server_to_utc
 from indico.util.string import crc32
@@ -238,3 +242,65 @@ def generate_spreadsheet_from_occurrences(occurrences):
              'Occurrence end': occ.end_dt}
             for occ in occurrences]
     return headers, rows
+
+
+def _find_first_entry_start_dt(event, day):
+    """Find the first timetable entry on a given day."""
+    if not (event.start_dt_local.date() <= day <= event.end_dt_local.date()):
+        raise ValueError("Day out of event bounds.")
+    entries = event.timetable_entries.filter(TimetableEntry.parent_id.is_(None),
+                                             cast(TimetableEntry.start_dt.astimezone(event.tzinfo), Date) == day).all()
+    return min(entries, key=attrgetter('end_dt')).start_dt if entries else None
+
+
+def get_booking_params_for_event(event):
+    """
+    Get a set of RB interface parameters suitable for this event.
+
+    These parameters can then be used to construct a URL that will lead to a
+    pre-filled search that matches the start/end times for a given day.
+
+    :param event: `Event` object
+    """
+    is_single_day = event.start_dt_local.date() == event.end_dt_local.date()
+    params = {
+        'link_type': 'event',
+        'link_id': event.id,
+        'text': event.room.name if event.room else None,
+        'number': 1,
+        'interval': 'week',
+    }
+    all_times = {day: (_find_first_entry_start_dt(event, day), find_latest_entry_end_dt(event, day))
+                 for day in event.iter_days()}
+    # if the timetable is empty on a given day, use (start_dt, end_dt) of the event
+    all_times = [((day, (event.start_dt_local, event.end_dt_local)) if times[0] is None else (day, times))
+                 for day, times in all_times.viewitems()]
+    same_times = len(set(times for (_, times) in all_times)) == 1
+
+    if is_single_day or same_times:
+        params.update({
+            'recurrence': 'single' if is_single_day else 'daily',
+            'sd': event.start_dt_local.date().isoformat(),
+            'ed': None if is_single_day else event.end_dt_local.date().isoformat(),
+            'st': event.start_dt_local.strftime('%H:%M'),
+            'et': event.end_dt_local.strftime('%H:%M')
+        })
+        return {
+            'type': 'same_times',
+            'params': params
+        }
+    else:
+        params['recurrence'] = 'single'
+        time_info = [
+            (day, {
+                'sd': day.isoformat(),
+                'ed': day.isoformat(),
+                'st': start.strftime('%H:%M'),
+                'et': end.strftime('%H:%M')
+            }) for day, (start, end) in all_times
+        ]
+        return {
+            'type': 'mixed_times',
+            'params': params,
+            'time_info': time_info
+        }

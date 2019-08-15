@@ -31,4 +31,18 @@ $(document).ready(() => {
     }
     $bookBtn.toggleClass('disabled', !objectId).attr('href', rbURL({path: 'book', ...params}));
   });
+
+  const eventDay = document.querySelector('#event-day');
+
+  if (eventDay) {
+    eventDay.addEventListener('change', e => {
+      const target = e.target;
+      const link = target.closest('.toolbar').querySelector('a');
+      const defaultParams = link.dataset.defaultParams;
+      link.href = rbURL({
+        path: 'book',
+        ...Object.assign(JSON.parse(defaultParams), JSON.parse(target.value)),
+      });
+    });
+  }
 });
