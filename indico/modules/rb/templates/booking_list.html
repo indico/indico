@@ -16,25 +16,33 @@
                     {{ event.title }}
                 </div>
                 <div class="toolbar">
+                    {% set past_title = _('Event has already finished') %}
                     {% if event_rb_params.type == 'mixed_times' %}
-                        <select id="event-day" autocomplete="off">
-                            {% for day, params in event_rb_params.time_info %}
-                                <option value="{{ params | tojson | forceescape }}">
-                                    {{ day | format_date(timezone=event.tz) }}
-                                </option>
+                        <button type="button"
+                                class="i-button highlight js-dropdown arrow"
+                                title="{{ past_title if is_past_event }}"
+                                data-toggle="dropdown"
+                                {% if is_past_event %}disabled{% endif %}>
+                            {%- trans %}Book{% endtrans -%}
+                        </button>
+                        <ul class="dropdown">
+                            {% for day, day_params in event_rb_params.time_info %}
+                                {% set params = dict(event_rb_params.params, **day_params) %}
+                                <li>
+                                    <a href="{{ url_for('rb.roombooking', path='book', **params) }}" target="_blank">
+                                        {{ day | format_date(timezone=event.tz) }}
+                                    </a>
+                                </li>
                             {% endfor %}
-                        </select>
-                        {% set params = dict(event_rb_params.params, **event_rb_params.time_info[0][1]) %}
+                        </ul>
                     {% else %}
-                        {% set params = event_rb_params.params %}
+                        <a href="{{ url_for('rb.roombooking', path='book', **event_rb_params.params) }}"
+                           target="_blank"
+                           class="i-button highlight {{ 'disabled' if is_past_event }}"
+                           title="{{ past_title if is_past_event }}">
+                            {%- trans %}Book{% endtrans -%}
+                        </a>
                     {% endif %}
-                    {% set title = _('Event has already finished') %}
-                    <a href="{{ url_for('rb.roombooking', path='book', **params) }}"
-                       data-default-params="{{ event_rb_params.params | tojson | forceescape }}"
-                       target="_blank" class="i-button highlight {{ 'disabled' if is_past_event }}"
-                       title="{{ title if is_past_event }}">
-                        {%- trans %}Book{% endtrans -%}
-                    </a>
                 </div>
             </div>
             {% if has_contribs %}
