@@ -20,6 +20,7 @@ Bugfixes
 - Always use HH:MM time format in book-from-event link
 - Fix timetable theme when set to "indico weeks view" before 2.2 (:issue:`4027`)
 - Avoid flickering of booking edit details tooltip
+- Fix outdated browser check on iOS (:issue:`4033`)
 
 Version 2.2
 -----------

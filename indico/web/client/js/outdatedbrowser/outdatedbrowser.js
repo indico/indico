@@ -26,6 +26,7 @@ export default function outdatedBrowser({browserSupport, messages}) {
     const parsedUserAgent = new UserAgentParser(window.navigator.userAgent).getResult();
     const outdatedUI = document.getElementById('outdated-browser');
 
+    let browserName = parsedUserAgent.browser.name;
     let browserMajorVersion = +parsedUserAgent.browser.major;
     let browserMinorVersion = +parseMinorVersion(parsedUserAgent.browser.version) || 0;
 
@@ -40,6 +41,8 @@ export default function outdatedBrowser({browserSupport, messages}) {
       // engine and it's tied to the OS version
       browserMajorVersion = +parseMajorVersion(parsedUserAgent.os.version);
       browserMinorVersion = +parseMinorVersion(parsedUserAgent.os.version);
+      // Every browser on iOS uses webkit, so we pretend it's mobile safari
+      browserName = 'Mobile Safari';
     }
 
     let done = true;
@@ -60,12 +63,10 @@ export default function outdatedBrowser({browserSupport, messages}) {
     };
 
     const isBrowserUnsupported = () => {
-      const browserName = parsedUserAgent.browser.name;
       return browserSupport[browserName] === false;
     };
 
     const isBrowserOutOfDate = () => {
-      const browserName = parsedUserAgent.browser.name;
       let isOutOfDate = false;
       if (isBrowserUnsupported()) {
         isOutOfDate = true;
