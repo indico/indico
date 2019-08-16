@@ -485,6 +485,7 @@ class RHContributionExportTexConfig(RHManageContributionsExportActionsBase):
     """Configure Export via LaTeX"""
 
     ALLOW_LOCKED = True
+
     def _process(self):
         form = ContributionExportTeXForm(contribs=self.contribs)
         form.format.choices = [f[0:2] for f in get_export_formats()]
@@ -498,6 +499,7 @@ class RHContributionExportTexConfig(RHManageContributionsExportActionsBase):
             return jsonify_data(flash=False, redirect=download_url, redirect_no_loading=True)
 
         return jsonify_form(form, disabled_until_change=False)
+
 
 def render_pdf(event, contribs, sort_by, opts):
     pdf = opts(event, session.user, contribs, tz=event.timezone, sort_by=sort_by)
