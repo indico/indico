@@ -311,7 +311,7 @@ def get_booking_params_for_event(event):
                 'st': start.strftime('%H:%M'),
                 'et': end.strftime('%H:%M')
             } if start.time() < end.time() else {
-                # if not (empty days or event end time < event start time), we jus
+                # if not (empty days or event end time < event start time), we just
                 # populate the day and let the user specify the times manually
                 'sd': day.isoformat(),
             }) for day, (start, end) in all_times
