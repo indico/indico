@@ -12,6 +12,7 @@ Improvements
 
 - Make list of event room bookings sortable (:issue:`4022`)
 - Log when a booking is split during editing (:issue:`4031`)
+- Improve "Book" button in multi-day events (:issue:`4021`)
 
 Bugfixes
 ^^^^^^^^
