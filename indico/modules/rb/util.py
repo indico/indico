@@ -250,7 +250,13 @@ def _find_first_entry_start_dt(event, day):
         raise ValueError("Day out of event bounds.")
     entries = event.timetable_entries.filter(TimetableEntry.parent_id.is_(None),
                                              cast(TimetableEntry.start_dt.astimezone(event.tzinfo), Date) == day).all()
-    return min(entries, key=attrgetter('end_dt')).start_dt if entries else None
+    return min(entries, key=attrgetter('start_dt')).start_dt.astimezone(event.tzinfo) if entries else None
+
+
+def _find_latest_entry_end_dt(event, day):
+    dt = find_latest_entry_end_dt(event, day)
+    if dt:
+        return dt.astimezone(event.tzinfo)
 
 
 def get_booking_params_for_event(event):
@@ -267,10 +273,8 @@ def get_booking_params_for_event(event):
         'link_type': 'event',
         'link_id': event.id,
         'text': event.room.name if event.room else None,
-        'number': 1,
-        'interval': 'week',
     }
-    all_times = {day: (_find_first_entry_start_dt(event, day), find_latest_entry_end_dt(event, day))
+    all_times = {day: (_find_first_entry_start_dt(event, day), _find_latest_entry_end_dt(event, day))
                  for day in event.iter_days()}
     # if the timetable is empty on a given day, use (start_dt, end_dt) of the event
     all_times = [((day, (event.start_dt_local, event.end_dt_local)) if times[0] is None else (day, times))
@@ -278,27 +282,40 @@ def get_booking_params_for_event(event):
     same_times = len(set(times for (_, times) in all_times)) == 1
 
     if is_single_day or same_times:
-        params.update({
-            'recurrence': 'single' if is_single_day else 'daily',
-            'sd': event.start_dt_local.date().isoformat(),
-            'ed': None if is_single_day else event.end_dt_local.date().isoformat(),
-            'st': event.start_dt_local.strftime('%H:%M'),
-            'et': event.end_dt_local.strftime('%H:%M')
-        })
+        params['sd'] = event.start_dt_local.date().isoformat()
+        if event.start_dt_local.time() < event.end_dt_local.time():
+            # if we have suitable times we provide enough data to immediately run a search.
+            # XXX: if filtersAreSet also checked for times we could provide dates/recurrence
+            # as well even when we don't know suitable times.. but that would require extra
+            # code to handle the case of a custom RB interface where no times are used at all
+            params.update({
+                'ed': None if is_single_day else event.end_dt_local.date().isoformat(),
+                'recurrence': 'single' if is_single_day else 'daily',
+                'st': event.start_dt_local.strftime('%H:%M'),
+                'et': event.end_dt_local.strftime('%H:%M'),
+                'number': 1,
+                'interval': 'week',
+            })
         return {
             'type': 'same_times',
             'params': params
         }
     else:
-        params['recurrence'] = 'single'
-        time_info = [
+        time_info = sorted([
             (day, {
+                # if we have a proper start/end time, we provide all args to search
+                'number': 1,
+                'interval': 'week',
+                'recurrence': 'single',
                 'sd': day.isoformat(),
-                'ed': day.isoformat(),
                 'st': start.strftime('%H:%M'),
                 'et': end.strftime('%H:%M')
+            } if start.time() < end.time() else {
+                # if not (empty days or event end time < event start time), we jus
+                # populate the day and let the user specify the times manually
+                'sd': day.isoformat(),
             }) for day, (start, end) in all_times
-        ]
+        ])
         return {
             'type': 'mixed_times',
             'params': params,

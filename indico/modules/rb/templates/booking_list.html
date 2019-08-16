@@ -17,7 +17,7 @@
                 </div>
                 <div class="toolbar">
                     {% if event_rb_params.type == 'mixed_times' %}
-                        <select id="event-day">
+                        <select id="event-day" autocomplete="off">
                             {% for day, params in event_rb_params.time_info %}
                                 <option value="{{ params | tojson | forceescape }}">
                                     {{ day | format_date(timezone=event.tz) }}
@@ -30,7 +30,7 @@
                     {% endif %}
                     {% set title = _('Event has already finished') %}
                     <a href="{{ url_for('rb.roombooking', path='book', **params) }}"
-                       data-default-params="{{ event_rb_params.params | tojson | forceescape }}""
+                       data-default-params="{{ event_rb_params.params | tojson | forceescape }}"
                        target="_blank" class="i-button highlight {{ 'disabled' if is_past_event }}"
                        title="{{ title if is_past_event }}">
                         {%- trans %}Book{% endtrans -%}
