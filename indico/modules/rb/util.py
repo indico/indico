@@ -11,10 +11,12 @@ import os
 from collections import namedtuple
 from datetime import datetime, time, timedelta
 from io import BytesIO
+from operator import attrgetter
 
 import pytz
 from flask import current_app
 from PIL import Image
+from sqlalchemy import Date, cast
 from sqlalchemy.orm import joinedload
 
 from indico.core.config import config
@@ -25,6 +27,8 @@ from indico.modules.events import Event
 from indico.modules.events.contributions import Contribution
 from indico.modules.events.sessions import Session
 from indico.modules.events.sessions.models.blocks import SessionBlock
+from indico.modules.events.timetable.models.entries import TimetableEntry
+from indico.modules.events.timetable.util import find_latest_entry_end_dt
 from indico.util.caching import memoize_request
 from indico.util.date_time import now_utc, server_to_utc
 from indico.util.string import crc32
@@ -238,3 +242,82 @@ def generate_spreadsheet_from_occurrences(occurrences):
              'Occurrence end': occ.end_dt}
             for occ in occurrences]
     return headers, rows
+
+
+def _find_first_entry_start_dt(event, day):
+    """Find the first timetable entry on a given day."""
+    if not (event.start_dt_local.date() <= day <= event.end_dt_local.date()):
+        raise ValueError("Day out of event bounds.")
+    entries = event.timetable_entries.filter(TimetableEntry.parent_id.is_(None),
+                                             cast(TimetableEntry.start_dt.astimezone(event.tzinfo), Date) == day).all()
+    return min(entries, key=attrgetter('start_dt')).start_dt.astimezone(event.tzinfo) if entries else None
+
+
+def _find_latest_entry_end_dt(event, day):
+    dt = find_latest_entry_end_dt(event, day)
+    if dt:
+        return dt.astimezone(event.tzinfo)
+
+
+def get_booking_params_for_event(event):
+    """
+    Get a set of RB interface parameters suitable for this event.
+
+    These parameters can then be used to construct a URL that will lead to a
+    pre-filled search that matches the start/end times for a given day.
+
+    :param event: `Event` object
+    """
+    is_single_day = event.start_dt_local.date() == event.end_dt_local.date()
+    params = {
+        'link_type': 'event',
+        'link_id': event.id,
+        'text': event.room.name if event.room else None,
+    }
+    all_times = {day: (_find_first_entry_start_dt(event, day), _find_latest_entry_end_dt(event, day))
+                 for day in event.iter_days()}
+    # if the timetable is empty on a given day, use (start_dt, end_dt) of the event
+    all_times = [((day, (event.start_dt_local, event.end_dt_local)) if times[0] is None else (day, times))
+                 for day, times in all_times.viewitems()]
+    same_times = len(set(times for (_, times) in all_times)) == 1
+
+    if is_single_day or same_times:
+        params['sd'] = event.start_dt_local.date().isoformat()
+        if event.start_dt_local.time() < event.end_dt_local.time():
+            # if we have suitable times we provide enough data to immediately run a search.
+            # XXX: if filtersAreSet also checked for times we could provide dates/recurrence
+            # as well even when we don't know suitable times.. but that would require extra
+            # code to handle the case of a custom RB interface where no times are used at all
+            params.update({
+                'ed': None if is_single_day else event.end_dt_local.date().isoformat(),
+                'recurrence': 'single' if is_single_day else 'daily',
+                'st': event.start_dt_local.strftime('%H:%M'),
+                'et': event.end_dt_local.strftime('%H:%M'),
+                'number': 1,
+                'interval': 'week',
+            })
+        return {
+            'type': 'same_times',
+            'params': params
+        }
+    else:
+        time_info = sorted([
+            (day, {
+                # if we have a proper start/end time, we provide all args to search
+                'number': 1,
+                'interval': 'week',
+                'recurrence': 'single',
+                'sd': day.isoformat(),
+                'st': start.strftime('%H:%M'),
+                'et': end.strftime('%H:%M')
+            } if start.time() < end.time() else {
+                # if not (empty days or event end time < event start time), we just
+                # populate the day and let the user specify the times manually
+                'sd': day.isoformat(),
+            }) for day, (start, end) in all_times
+        ])
+        return {
+            'type': 'mixed_times',
+            'params': params,
+            'time_info': time_info
+        }

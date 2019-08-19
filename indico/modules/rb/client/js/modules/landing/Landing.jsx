@@ -5,6 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import moment from 'moment';
 import React from 'react';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
@@ -12,12 +13,14 @@ import {Card, Checkbox, Form, Grid} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
 import {Carousel} from 'indico/react/components';
 import {Overridable, Responsive} from 'indico/react/util';
+import {toMoment} from 'indico/utils/date';
 
 import {actions as filtersActions} from '../../common/filters';
 import BookingBootstrapForm from '../../components/BookingBootstrapForm';
 import LandingStatistics from './LandingStatistics';
 import UpcomingBookings from './UpcomingBookings';
 import {selectors as userSelectors} from '../../common/user';
+import {selectors as bookRoomSelectors} from '../bookRoom';
 import * as landingActions from './actions';
 import * as landingSelectors from './selectors';
 
@@ -34,6 +37,13 @@ export class Landing extends React.Component {
     fetchedUpcomingBookings: PropTypes.bool.isRequired,
     hasUpcomingBookings: PropTypes.bool.isRequired,
     upcomingBookings: PropTypes.arrayOf(PropTypes.object),
+    filters: PropTypes.shape({
+      text: PropTypes.string,
+      dates: PropTypes.shape({
+        startDate: PropTypes.string,
+        endDate: PropTypes.string,
+      }).isRequired,
+    }).isRequired,
   };
 
   static defaultProps = {
@@ -52,9 +62,13 @@ export class Landing extends React.Component {
     const {
       actions: {fetchUpcomingBookings},
       showUpcomingBookings,
+      filters: {text},
     } = this.props;
     if (showUpcomingBookings) {
       fetchUpcomingBookings();
+    }
+    if (text) {
+      this.updateText(text);
     }
   }
 
@@ -100,8 +114,14 @@ export class Landing extends React.Component {
       showUpcomingBookings,
       hasUpcomingBookings,
       fetchedUpcomingBookings,
+      filters: {
+        dates: {startDate},
+      },
     } = this.props;
-    const {extraState} = this.state;
+    const {extraState, text} = this.state;
+    const defaults = startDate
+      ? {dates: {startDate: toMoment(startDate, moment.HTML5_FMT.DATE)}}
+      : {};
     return (
       <div className="landing-wrapper">
         <Grid centered styleName="landing-page" columns={1}>
@@ -113,12 +133,13 @@ export class Landing extends React.Component {
                 </Card.Header>
               </Card.Content>
               <Card.Content styleName="landing-page-card-content">
-                <BookingBootstrapForm onSearch={this.doSearch}>
+                <BookingBootstrapForm onSearch={this.doSearch} defaults={defaults}>
                   <Form.Group inline>
                     <Form.Input
                       placeholder="e.g. IT Amphitheatre"
                       styleName="search-input"
                       onChange={(event, data) => this.updateText(data.value)}
+                      value={text || ''}
                     />
                   </Form.Group>
                   <Overridable
@@ -160,6 +181,7 @@ export default connect(
     fetchedUpcomingBookings: landingSelectors.hasFetchedUpcomingBookings(state),
     hasUpcomingBookings: landingSelectors.hasUpcomingBookings(state),
     upcomingBookings: landingSelectors.getUpcomingBookings(state),
+    filters: bookRoomSelectors.getFilters(state),
   }),
   dispatch => ({
     actions: {

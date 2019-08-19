@@ -18,6 +18,7 @@ from indico.modules.events.timetable import TimetableEntry
 from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.event.forms import BookingListForm
 from indico.modules.rb.models.reservations import Reservation, ReservationLink
+from indico.modules.rb.util import get_booking_params_for_event
 from indico.modules.rb.views import WPEventBookingList
 from indico.util.date_time import format_datetime, now_utc
 from indico.util.string import to_unicode
@@ -57,24 +58,17 @@ class RHEventBookingList(RHRoomBookingEventBase):
                  .options(joinedload('reservation').joinedload('room'),
                           joinedload('session_block'),
                           joinedload('contribution'))
-                 .filter(~ReservationLink.reservation.has(Reservation.is_cancelled))).all()
+                 .filter(~ReservationLink.reservation.has(Reservation.is_cancelled))
+                 .join(Reservation)
+                 .order_by(Reservation.start_dt)
+                 .all())
 
         contribs_data = {c.id: {'start_dt': c.start_dt.isoformat(), 'end_dt': c.end_dt.isoformat()}
                          for c in _contrib_query(self.event)}
         session_blocks_data = {sb.id: {'start_dt': sb.start_dt.isoformat(), 'end_dt': sb.end_dt.isoformat()}
                                for sb in _session_block_query(self.event)}
         is_past_event = self.event.end_dt < now_utc()
-        is_single_day = self.event.start_dt.date() == self.event.end_dt.date()
-        event_rb_params = {'link_type': 'event',
-                           'link_id': self.event.id,
-                           'recurrence': 'single' if is_single_day else 'daily',
-                           'number': 1,
-                           'interval': 'week',
-                           'sd': self.event.start_dt_local.date().isoformat(),
-                           'ed': None if is_single_day else self.event.end_dt_local.date().isoformat(),
-                           'st': self.event.start_dt_local.strftime('%H:%M'),
-                           'et': self.event.end_dt_local.strftime('%H:%M'),
-                           'text': self.event.room.name if self.event.room else None}
+        event_rb_params = get_booking_params_for_event(self.event)
         return WPEventBookingList.render_template('booking_list.html', self.event,
                                                   form=form,
                                                   links=links,

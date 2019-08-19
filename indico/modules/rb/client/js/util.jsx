@@ -143,7 +143,7 @@ export function isDateWithinRange(date, dateRange, _toMoment) {
 
 export function PopupParam({content, children}) {
   const trigger = <span>{children}</span>;
-  return <Popup trigger={trigger} content={content} />;
+  return <Popup trigger={trigger} content={content} position="right center" />;
 }
 
 PopupParam.propTypes = {

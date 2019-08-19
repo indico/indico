@@ -26,15 +26,27 @@ Internal Changes
 
 ----
 
-Version 2.2.1
+Version 2.2.2
 -------------
 
 *Unreleased*
+
+Bugfixes
+^^^^^^^^
+
+- None so far :)
+
+Version 2.2.1
+-------------
+
+*Released on August 16, 2019*
 
 Improvements
 ^^^^^^^^^^^^
 
 - Make list of event room bookings sortable (:issue:`4022`)
+- Log when a booking is split during editing (:issue:`4031`)
+- Improve "Book" button in multi-day events (:issue:`4021`)
 
 Bugfixes
 ^^^^^^^^
@@ -42,6 +54,8 @@ Bugfixes
 - Add missing slash to the ``template_prefix`` of the ``designer`` module
 - Always use HH:MM time format in book-from-event link
 - Fix timetable theme when set to "indico weeks view" before 2.2 (:issue:`4027`)
+- Avoid flickering of booking edit details tooltip
+- Fix outdated browser check on iOS (:issue:`4033`)
 
 Version 2.2
 -----------

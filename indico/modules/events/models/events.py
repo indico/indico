@@ -825,7 +825,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         if tzinfo:
             start_dt = start_dt.astimezone(tzinfo)
             end_dt = end_dt.astimezone(tzinfo)
-        duration = (end_dt - start_dt).days
+        duration = (end_dt.replace(hour=23, minute=59) - start_dt.replace(hour=0, minute=0)).days
         for offset in xrange(duration + 1):
             yield (start_dt + timedelta(days=offset)).date()
 
