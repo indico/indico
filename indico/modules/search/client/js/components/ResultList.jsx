@@ -7,20 +7,23 @@
 
 import React from 'react';
 import {List} from 'semantic-ui-react';
+import PropTypes from 'prop-types';
 import data from '../../../data/data';
-// import myData from '../../../data/data'
-export default function ResultList() {
-  const list = data.map(item => (
-    <List.Item key={item._id}>
-      <List.Content>
-        <List.Header as="a">{item.name.first}</List.Header>
-        <List.Description as="a">{item.age}</List.Description>
-      </List.Content>
-    </List.Item>
-  ));
+
+export default function ResultList({component: Component}) {
   return (
     <List divided relaxed>
-      {list}
+      {data.map(item => (
+        <List.Item key={item._id}>
+          <List.Content>
+            <Component {...item} />
+          </List.Content>
+        </List.Item>
+      ))}
     </List>
   );
 }
+
+ResultList.propTypes = {
+  component: PropTypes.elementType.isRequired,
+};

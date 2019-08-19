@@ -8,11 +8,12 @@
 import React from 'react';
 import ResultList from './ResultList';
 import './SearchApp.module.scss';
+import Category from './results/Category';
 
 export default function SearchApp() {
   return (
     <div styleName="search">
-      <ResultList />
+      <ResultList component={Category} />
     </div>
   );
 }
