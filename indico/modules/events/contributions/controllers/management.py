@@ -484,7 +484,7 @@ class RHContributionExportTexConfig(RHManageContributionsExportActionsBase):
             download_url = url_for('.contributions_tex_export_book', self.event, uuid=key)
             return jsonify_data(flash=False, redirect=download_url, redirect_no_loading=True)
 
-        return jsonify_form(form, disabled_until_change=False)
+        return jsonify_form(form, submit=_('Export'), disabled_until_change=False)
 
 
 class RHContributionsExportTeXBook(RHManageContributionsExportActionsBase):
