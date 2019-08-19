@@ -208,15 +208,14 @@ class ContributionExportTeXForm(IndicoForm):
     format = SelectField(_('Format'), default='PDF')
     sort_by = IndicoEnumSelectField(_('Sort by'), enum=BOASortField, default=BOASortField.abstract_title,
                                     sorted=True)
-    contrib_ids = HiddenFieldList()
+    contribution_ids = HiddenFieldList()
     submitted = HiddenField()
 
     def __init__(self, *args, **kwargs):
         self.contribs = kwargs.get('contribs')
         super(ContributionExportTeXForm, self).__init__(*args, **kwargs)
-        self.contrib_ids.data = [c.id for c in self.contribs]
-        self.format.choices = {'PDF': 'PDF',
-                               'TeX': 'Zipped TeX directory'}.items()
+        if not self.contribution_ids.data:
+            self.contribution_ids.data = [c.id for c in self.contribs]
 
     def is_submitted(self):
         return super(ContributionExportTeXForm, self).is_submitted() and 'submitted' in request.form

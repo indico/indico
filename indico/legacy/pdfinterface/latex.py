@@ -12,6 +12,7 @@ import os
 import subprocess
 import tempfile
 from operator import attrgetter
+from shutil import copytree
 
 import markdown
 import pkg_resources
@@ -175,12 +176,11 @@ class LatexRunner(object):
         with codecs.open(source_filename, 'wb', encoding='utf-8') as f:
             f.write(source)
 
-
         distribution = pkg_resources.get_distribution('indico-fonts')
         font_dir = os.path.join(distribution.location, 'indico_fonts')
         try:
             os.symlink(font_dir, os.path.join(self.source_dir, 'fonts'))
-        except Exception:
+        except OSError:
             copytree(font_dir, os.path.join(self.source_dir, 'fonts'))
 
         if return_source:
@@ -199,7 +199,6 @@ class LatexRunner(object):
                 # something went terribly wrong, no LaTeX file was produced
                 raise LaTeXRuntimeException(source_filename, log_filename)
 
-	
         return target_filename
 
 
@@ -404,7 +403,6 @@ class ContribsToPDF(PDFLaTeXBase):
 
 class ContributionBook(PDFLaTeXBase):
     LATEX_TEMPLATE = 'contribution_list_book'
-
 
     def __init__(self, event, user, contribs=None, tz=None, sort_by=""):
         super(ContributionBook, self).__init__()
