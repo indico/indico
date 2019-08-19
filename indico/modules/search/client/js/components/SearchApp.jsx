@@ -6,9 +6,13 @@
 // LICENSE file for more details.
 
 import React from 'react';
-
+import ResultList from './ResultList';
 import './SearchApp.module.scss';
 
 export default function SearchApp() {
-  return <div styleName="search">Foo</div>;
+  return (
+    <div styleName="search">
+      <ResultList />
+    </div>
+  );
 }

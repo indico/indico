@@ -14,6 +14,8 @@ from collections import defaultdict
 from datetime import date
 
 import click
+
+
 click.disable_unicode_literals_warning = True
 
 
