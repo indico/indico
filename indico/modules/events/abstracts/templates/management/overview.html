@@ -94,9 +94,17 @@
                 <div class="label">
                     {%- trans %}Book of abstracts{% endtrans -%}
                 </div>
-                {%- trans url=url_for('.export_boa', event) -%}
-                    Customize and <a href={{ url }}>download</a> the book of abstracts
+                {%- trans -%}
+                    Customize and <a class="arrow js-dropdown" data-toggle="dropdown">download</a> the book of abstracts
                 {%- endtrans -%}
+                <ul class="i-dropdown">
+                    <li>
+                        <a href={{ url_for('.export_boa', event) }}>PDF</a>
+                    </li>
+                    <li>
+                        <a href={{ url_for('.export_boa_tex', event) }}>LaTeX</a>
+                    </li>
+                </ul>
             </div>
             <div class="toolbar">
                 <a href="#" class="i-button icon-settings"

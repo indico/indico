@@ -25,6 +25,7 @@ from indico.modules.events.abstracts.models.persons import AbstractPersonLink
 from indico.modules.events.abstracts.models.reviews import AbstractReview
 from indico.modules.events.abstracts.settings import abstracts_settings, boa_settings
 from indico.modules.events.contributions.models.fields import ContributionFieldVisibility
+from indico.modules.events.contributions.util import zip_tex_file
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.tracks.models.tracks import Track
 from indico.modules.users import User
@@ -277,12 +278,13 @@ def get_track_reviewer_abstract_counts(event, user):
             for track, total, reviewed, unreviewed in query}
 
 
-def create_boa(event):
+def create_boa(event, tex_format=False):
     """Create the book of abstracts if necessary
 
-    :return: The path to the PDF file
+    :return: The path to the PDF/zip file
     """
-    path = boa_settings.get(event, 'cache_path')
+    cache_path_setting = 'cache_path_tex' if tex_format else 'cache_path'
+    path = boa_settings.get(event, cache_path_setting)
     if path:
         path = os.path.join(config.CACHE_DIR, path)
         if os.path.exists(path):
@@ -290,24 +292,28 @@ def create_boa(event):
             os.utime(path, None)
             return path
     pdf = AbstractBook(event)
-    tmp_path = pdf.generate()
-    filename = 'boa-{}.pdf'.format(event.id)
+    tmp_path = pdf.generate(return_source=tex_format)
+    if tex_format:
+        tmp_path = zip_tex_file(pdf)
+    filename = 'boa-{}.{}'.format(event.id, 'zip' if tex_format else 'pdf')
     full_path = os.path.join(config.CACHE_DIR, filename)
     shutil.move(tmp_path, full_path)
-    boa_settings.set(event, 'cache_path', filename)
+    boa_settings.set(event, cache_path_setting, filename)
     return full_path
 
 
 def clear_boa_cache(event):
     """Delete the cached book of abstract"""
-    path = boa_settings.get(event, 'cache_path')
-    if path:
-        try:
-            os.remove(os.path.join(config.CACHE_DIR, path))
-        except OSError as e:
-            if e.errno != errno.ENOENT:
-                raise
-        boa_settings.delete(event, 'cache_path')
+    cache_paths = ['cache_path', 'cache_path_tex']
+    for cache_path in cache_paths:
+        path = boa_settings.get(event, cache_path)
+        if path:
+            try:
+                os.remove(os.path.join(config.CACHE_DIR, path))
+            except OSError as e:
+                if e.errno != errno.ENOENT:
+                    raise
+            boa_settings.delete(event, cache_path)
 
 
 def get_events_with_abstract_reviewer_convener(user, dt=None):

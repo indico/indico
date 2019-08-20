@@ -314,13 +314,13 @@ def render_pdf(event, contribs, sort_by, opts):
 def render_archive(event, contribs, sort_by, opts):
     pdf = opts(event, session.user, contribs, tz=event.timezone, sort_by=sort_by)
     pdf.generate(return_source=True)
-    return send_zipped_tex_file(pdf, 'contributions-tex.zip')
+    return send_file('contributions-tex.zip', zip_tex_file(pdf), 'application/zip', inline=False)
 
 
-def send_zipped_tex_file(pdf, filename):
+def zip_tex_file(tex):
     temp_file = NamedTemporaryFile(suffix='indico.tmp', dir=config.TEMP_DIR)
     with ZipFile(temp_file.name, 'w', allowZip64=True) as zip_handler:
-        for dirpath, dirnames, files in os.walk(pdf.source_dir, followlinks=True):
+        for dirpath, dirnames, files in os.walk(tex.source_dir, followlinks=True):
             for f in files:
                 if f.startswith('.'):
                     continue
@@ -328,14 +328,13 @@ def send_zipped_tex_file(pdf, filename):
                     continue
                 pf = os.path.join(dirpath, f)
                 af = os.path.abspath(pf)
-                rp = os.path.relpath(pf, pdf.source_dir)
+                rp = os.path.relpath(pf, tex.source_dir)
                 archivename = rp.encode('utf-8')
                 zip_handler.write(af, archivename)
 
     temp_file.delete = False
-    zip_file_name = filename
     chmod_umask(temp_file.name)
-    return send_file(zip_file_name, temp_file.name, 'application/zip', inline=False)
+    return temp_file.name
 
 
 def get_boa_export_formats():

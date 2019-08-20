@@ -118,6 +118,7 @@ boa_settings = EventSettingsProxy('abstracts_book', {
     'corresponding_author': BOACorrespondingAuthorType.submitter,
     'show_abstract_ids': False,
     'cache_path': None,
+    'cache_path_tex': None,
     'min_lines_per_abstract': 0,
     'link_format': BOALinkFormat.frame,
 }, converters={
