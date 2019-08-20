@@ -23,7 +23,7 @@
   }
 
   $(document).ready(function() {
-    $('.attachments > .dropdown')
+    $('.attachments > .i-dropdown')
       .parent()
       .dropdown();
     if (!$('html').data('static-site')) {

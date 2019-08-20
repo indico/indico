@@ -82,7 +82,7 @@
             border-right: 1px dotted $light-black;
         }
 
-        .dropdown {
+        .i-dropdown {
             @include border-all($color: $black);
             @include single-box-shadow($color: $black);
 
