@@ -16,11 +16,16 @@ import Event from './results/Event';
 import File from './results/File';
 
 export default function SearchApp() {
-  const [active, setActive] = useState('');
+  const [active, setActive] = useState('category');
   return (
-    <div styleName="search">
+    <div>
       <Button.Group widths="4">
-        <Button toggle active={active === 'category'} onClick={() => setActive('category')}>
+        <Button
+          toggle
+          active={active === 'category'}
+          className={active === 'category' ? 'ui blue button' : 'ui red button'}
+          onClick={() => setActive('category')}
+        >
           Category
         </Button>
         <Button toggle active={active === 'contribution'} onClick={() => setActive('contribution')}>
