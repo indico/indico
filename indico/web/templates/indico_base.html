@@ -32,11 +32,11 @@
     <script type="text/javascript" src="{{ url_for('assets.i18n_locale_react', locale_name=session.lang) }}"></script>
     <script type="text/javascript" src="{{ url_for('assets.js_vars_global') }}"></script>
 
-    {% for bundle in bundles %}
+    {% for bundle in bundles -%}
         {{ bundle }}
     {% endfor %}
-    {% for bundle in print_bundles %}
-        {% for path in bundle._paths %}
+    {% for bundle in print_bundles -%}
+        {% for path in bundle._paths -%}
             <link rel="stylesheet" type="text/css" media="print" href="{{ path }}">
         {% endfor %}
     {% endfor %}
