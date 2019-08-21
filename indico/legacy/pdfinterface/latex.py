@@ -178,11 +178,7 @@ class LatexRunner(object):
 
         distribution = pkg_resources.get_distribution('indico-fonts')
         font_dir = os.path.join(distribution.location, 'indico_fonts')
-        try:
-            os.symlink(font_dir, os.path.join(self.source_dir, 'fonts'))
-        except OSError:
-            copytree(font_dir, os.path.join(self.source_dir, 'fonts'))
-
+        os.symlink(font_dir, os.path.join(self.source_dir, 'fonts'))
         if return_source:
             return source_filename
 
