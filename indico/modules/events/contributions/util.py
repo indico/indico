@@ -322,15 +322,13 @@ def zip_tex_file(tex):
     with ZipFile(temp_file.name, 'w', allowZip64=True) as zip_handler:
         for dirpath, dirnames, files in os.walk(tex.source_dir, followlinks=True):
             for f in files:
-                if f.startswith('.'):
+                if f.startswith('.') or f.endswith(('.py', '.pyc', '.pyo')):
                     continue
-                if f.endswith(('.py', '.pyc', '.pyo')):
-                    continue
-                pf = os.path.join(dirpath, f)
-                af = os.path.abspath(pf)
-                rp = os.path.relpath(pf, tex.source_dir)
-                archivename = rp.encode('utf-8')
-                zip_handler.write(af, archivename)
+                path_file = os.path.join(dirpath, f)
+                absolute_path = os.path.abspath(path_file)
+                relative_path = os.path.relpath(path_file, tex.source_dir)
+                archive_name = relative_path.encode('utf-8')
+                zip_handler.write(absolute_path, archive_name)
 
     temp_file.delete = False
     chmod_umask(temp_file.name)
