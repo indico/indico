@@ -2,9 +2,11 @@ import React from 'react';
 import {List} from 'semantic-ui-react';
 import PropTypes from 'prop-types';
 
-const Contribution = ({title, authors, startDate, event}) => (
+const Contribution = ({title, authors, startDate, event, url}) => (
   <>
-    <List.Header>{title}</List.Header>
+    <List.Header>
+      <a href={`https://blackhole.cern.ch${url}`}>{title}</a>
+    </List.Header>
     <List.Description>
       <List>
         <List.Item>Authors: {authors.join(' ')}</List.Item>
@@ -20,5 +22,6 @@ Contribution.propTypes = {
   authors: PropTypes.arrayOf(PropTypes.string).isRequired,
   startDate: PropTypes.string.isRequired,
   event: PropTypes.string.isRequired,
+  url: PropTypes.string.isRequired,
 };
 export default Contribution;

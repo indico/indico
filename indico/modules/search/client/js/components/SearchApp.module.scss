@@ -4,40 +4,5 @@
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
-
-
-@mixin button-base() {
-    &:hover, :focus {
-        cursor: pointer;
-        border-color: currentColor;
-        background-color: white;
-    }
-
-    // &:enabled {
-    //     color: hue($color: blue)
-    // }
-    &:active {
-        border-color: blue;
-        color: blue;
-        background-color: white;
-        // transform: translateY(1px);
-        // filter: saturate(150%);
-    }
-    // &:disabled {
-    //     color: darkgrey;
-    //     cursor: default;
-    //     pointer-events: none;
-    // }
-    // :-moz-focus-inner {
-    //     border: none;
-    // }
-    // outline: none;
-}
-
 .search {
-    @include button-base();
-}
-
-.btn {
-    @include button-base();
 }

@@ -2,7 +2,7 @@
 [
     {
       "_id": "5d5b9c0a15ef17a5542b5039",
-      "title": "File:  Lorie",
+      "title": "FileLorie",
       "authors": [
         "Sparks",
         "Magdalena",
@@ -10,11 +10,12 @@
         "Mercedes",
         "Mcgee"
       ],
-      "date": "Tonia Enid Winifred Robert"
+      "date": "Tonia Enid Winifred Robert",
+      "url": "/category/1/"
     },
     {
       "_id": "5d5b9c0a8a3d3570473dff7b",
-      "title": "File:  Bean",
+      "title": "FileBean",
       "authors": [
         "Guy",
         "Gates",
@@ -22,11 +23,12 @@
         "Cora",
         "Hope"
       ],
-      "date": "Morin Branch Mcknight Stephenson"
+      "date": "Morin Branch Mcknight Stephenson",
+      "url": "/category/2/"
     },
     {
       "_id": "5d5b9c0a2211c9af9433699c",
-      "title": "File:  Buckner",
+      "title": "FileBuckner",
       "authors": [
         "Virgie",
         "Mclean",
@@ -34,11 +36,12 @@
         "Jenifer",
         "Lewis"
       ],
-      "date": "Mckenzie Parrish Zimmerman Lucinda"
+      "date": "Mckenzie Parrish Zimmerman Lucinda",
+      "url": "/category/3/"
     },
     {
       "_id": "5d5b9c0ae5477b8f76e60db7",
-      "title": "File:  Rhonda",
+      "title": "FileRhonda",
       "authors": [
         "Josefa",
         "Hartman",
@@ -46,11 +49,12 @@
         "Byers",
         "Ericka"
       ],
-      "date": "Estella James Bonnie Rhodes"
+      "date": "Estella James Bonnie Rhodes",
+      "url": "/category/4/"
     },
     {
       "_id": "5d5b9c0abdc4791d7fcfde0b",
-      "title": "File:  Jacobs",
+      "title": "FileJacobs",
       "authors": [
         "Herminia",
         "Alice",
@@ -58,11 +62,12 @@
         "Lynnette",
         "Decker"
       ],
-      "date": "Fowler Mai Villarreal Beard"
+      "date": "Fowler Mai Villarreal Beard",
+      "url": "/category/5/"
     },
     {
       "_id": "5d5b9c0a2067200d06e186d1",
-      "title": "File:  Blankenship",
+      "title": "FileBlankenship",
       "authors": [
         "Glenn",
         "Aida",
@@ -70,11 +75,12 @@
         "Madge",
         "Ebony"
       ],
-      "date": "Dotson Tanner Jefferson Nunez"
+      "date": "Dotson Tanner Jefferson Nunez",
+      "url": "/category/6/"
     },
     {
       "_id": "5d5b9c0a65825471a5083fc5",
-      "title": "File:  Lucas",
+      "title": "FileLucas",
       "authors": [
         "Jackson",
         "Christian",
@@ -82,11 +88,12 @@
         "Ayala",
         "Christina"
       ],
-      "date": "Cecilia Madden Leola Dianna"
+      "date": "Cecilia Madden Leola Dianna",
+      "url": "/category/7/"
     },
     {
       "_id": "5d5b9c0ae8b276052683d7c4",
-      "title": "File:  Bonita",
+      "title": "FileBonita",
       "authors": [
         "Burns",
         "Mildred",
@@ -94,6 +101,7 @@
         "Gretchen",
         "Dillard"
       ],
-      "date": "Jasmine Patel Janie Savannah"
+      "date": "Jasmine Patel Janie Savannah",
+      "url": "/category/8/"
     }
   ]

@@ -1,7 +1,7 @@
 [
   {
     "_id": "5d5b9b79ec3f13671c30ddf6",
-    "title": "Contribution: Angel Raymond",
+    "title": "ContribAngel Raymond",
     "authors": [
       "Craig",
       "Carrillo",
@@ -10,11 +10,12 @@
       "Peggy"
     ],
     "startDate": "Vilma Phelps Rivera Mays",
-    "event": "Sanford Christine Tate"
+    "event": "Sanford Christine Tate",
+    "url": "/category/19/"
   },
   {
     "_id": "5d5b9b794e8ff7f3223c7fc6",
-    "title": "Contribution: Lee Corine",
+    "title": "ContribLee Corine",
     "authors": [
       "Leticia",
       "Tracie",
@@ -23,11 +24,12 @@
       "Rose"
     ],
     "startDate": "Stacey Newman Aguirre Louella",
-    "event": "Effie Antoinette Helene"
+    "event": "Effie Antoinette Helene",
+    "url": "/category/20/"
   },
   {
     "_id": "5d5b9b7921473b74c57227f8",
-    "title": "Contribution: Chase Dana",
+    "title": "ContribChase Dana",
     "authors": [
       "Willis",
       "Mckee",
@@ -36,11 +38,12 @@
       "Fitzgerald"
     ],
     "startDate": "Daniels Mack Wolf Summers",
-    "event": "Marcella Nielsen Geneva"
+    "event": "Marcella Nielsen Geneva",
+    "url": "/category/21/"
   },
   {
     "_id": "5d5b9b795689d1d26fddedfd",
-    "title": "Contribution: Carey Melisa",
+    "title": "ContribCarey Melisa",
     "authors": [
       "Benjamin",
       "Estelle",
@@ -49,11 +52,12 @@
       "Lou"
     ],
     "startDate": "Ramona Maldonado Johanna Cote",
-    "event": "Lopez Celia Shirley"
+    "event": "Lopez Celia Shirley",
+    "url": "/category/22/"
   },
   {
     "_id": "5d5b9b79a4cdb9b1f9718a1a",
-    "title": "Contribution: Candice Courtney",
+    "title": "ContribCandice Courtney",
     "authors": [
       "Duffy",
       "Manuela",
@@ -62,11 +66,12 @@
       "Eaton"
     ],
     "startDate": "Whitley Knowles Lucas Blevins",
-    "event": "Krista Carpenter Olive"
+    "event": "Krista Carpenter Olive",
+    "url": "/category/23/"
   },
   {
     "_id": "5d5b9b79cddc69f6a780f50c",
-    "title": "Contribution: Krystal Christina",
+    "title": "ContribKrystal Christina",
     "authors": [
       "West",
       "Collier",
@@ -75,11 +80,12 @@
       "Nannie"
     ],
     "startDate": "Imogene Audra Jacklyn Wilkinson",
-    "event": "Garza Brandy Greer"
+    "event": "Garza Brandy Greer",
+    "url": "/category/24/"
   },
   {
     "_id": "5d5b9b791f5402a955ed356a",
-    "title": "Contribution: Clara Bertie",
+    "title": "ContribClara Bertie",
     "authors": [
       "Ellis",
       "Vickie",
@@ -88,11 +94,12 @@
       "Castro"
     ],
     "startDate": "Wiggins Isabelle Byers Ava",
-    "event": "Whitfield Milagros Haynes"
+    "event": "Whitfield Milagros Haynes",
+    "url": "/category/25/"
   },
   {
     "_id": "5d5b9b794958809316f7b5ee",
-    "title": "Contribution: Church Nicholson",
+    "title": "ContribChurch Nicholson",
     "authors": [
       "Trujillo",
       "Conner",
@@ -101,6 +108,7 @@
       "Gallegos"
     ],
     "startDate": "Ora Cecilia Shari Chandra",
-    "event": "Chen Shawna Hernandez"
+    "event": "Chen Shawna Hernandez",
+    "url": "/category/26/"
   }
 ]

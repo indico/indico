@@ -1,7 +1,7 @@
 [
     {
       "_id": "5d5b9cb9f1a201b7eb9ecf7e",
-      "title": "Event:  Newman",
+      "title": "EventNewman",
       "authors": [
         "Fannie",
         "Hill",
@@ -12,11 +12,11 @@
       "startDate": "Lyons Spencer Lynn Nannie",
       "endDate": "Shana Cash Victoria Byrd",
       "location": "Camacho Theresa",
-      "link": "https://www.google.com"
+      "url": "/category/9/"
     },
     {
       "_id": "5d5b9cb91abd4e39b3a98c06",
-      "title": "Event:  Chan",
+      "title": "EventChan",
       "authors": [
         "Parsons",
         "Burton",
@@ -27,11 +27,11 @@
       "startDate": "Noemi Ross Meyers Rosanne",
       "endDate": "Robbie Palmer Velasquez Lewis",
       "location": "Imogene Antoinette",
-      "link": "https://www.google.com"
+      "url": "/category/10/"
     },
     {
       "_id": "5d5b9cb9638ed9be679d72ee",
-      "title": "Event:  Lauren",
+      "title": "EventLauren",
       "authors": [
         "Stokes",
         "Frazier",
@@ -42,11 +42,11 @@
       "startDate": "Holloway Concetta Morrow Tameka",
       "endDate": "Lloyd Kinney Davidson Cantu",
       "location": "Morales Earnestine",
-      "link": "https://www.google.com"
+      "url": "/category/11/"
     },
     {
       "_id": "5d5b9cb94a134cf10d68cea8",
-      "title": "Event:  Lilly",
+      "title": "EventLilly",
       "authors": [
         "Mable",
         "Marcella",
@@ -57,11 +57,11 @@
       "startDate": "Lea Janice Shelton Good",
       "endDate": "Little Brennan Bates Mabel",
       "location": "Mccarty Gutierrez",
-      "link": "https://www.google.com"
+      "url": "/category/12/"
     },
     {
       "_id": "5d5b9cb90a65f02ef7997aee",
-      "title": "Event:  Winters",
+      "title": "EventWinters",
       "authors": [
         "Isabelle",
         "Karin",
@@ -72,11 +72,11 @@
       "startDate": "Inez Dickson Madge Humphrey",
       "endDate": "Townsend David Adele Alejandra",
       "location": "Merritt Lawson",
-      "link": "https://www.google.com"
+      "url": "/category/13/"
     },
     {
       "_id": "5d5b9cb9acbe2c61bdc4f32f",
-      "title": "Event:  Johnston",
+      "title": "EventJohnston",
       "authors": [
         "Wallace",
         "Esther",
@@ -87,11 +87,11 @@
       "startDate": "Velma Barlow Watson Gail",
       "endDate": "Norma Cervantes Hopkins Raymond",
       "location": "Potter Pickett",
-      "link": "https://www.google.com"
+      "url": "/category/14/"
     },
     {
       "_id": "5d5b9cb9abd4f02ddc0bab92",
-      "title": "Event:  Haney",
+      "title": "EventHaney",
       "authors": [
         "Mcdaniel",
         "Winnie",
@@ -102,11 +102,11 @@
       "startDate": "Copeland Maureen Hurley Anne",
       "endDate": "Toni Kirkland Owen Albert",
       "location": "Willa Andrews",
-      "link": "https://www.google.com"
+      "url": "/category/15/"
     },
     {
       "_id": "5d5b9cb953b277bb5f6d472e",
-      "title": "Event:  Amalia",
+      "title": "EventAmalia",
       "authors": [
         "Powell",
         "Duncan",
@@ -117,11 +117,11 @@
       "startDate": "Barnett Jana Vonda Glenna",
       "endDate": "Smith Bernadette Ivy Laurie",
       "location": "Merle Sandy",
-      "link": "https://www.google.com"
+      "url": "/category/16/"
     },
     {
       "_id": "5d5b9cb97ee32e77a5f8b31a",
-      "title": "Event:  Latisha",
+      "title": "EventLatisha",
       "authors": [
         "Diane",
         "Fay",
@@ -132,11 +132,11 @@
       "startDate": "Curry Yang Franklin Ida",
       "endDate": "Jodi Clayton Mayer Lucia",
       "location": "Dollie Leach",
-      "link": "https://www.google.com"
+      "url": "/category/17/"
     },
     {
       "_id": "5d5b9cb9b30a21d88b6aaae9",
-      "title": "Event:  Tamera",
+      "title": "EventTamera",
       "authors": [
         "Rhonda",
         "Mann",
@@ -147,6 +147,6 @@
       "startDate": "Cherry Darlene Barber Whitfield",
       "endDate": "George Aida Lavonne Molly",
       "location": "Murphy Georgette",
-      "link": "https://www.google.com"
+      "url": "/category/18/"
     }
   ]
