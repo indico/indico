@@ -10,7 +10,7 @@ Version 2.2.2
 Bugfixes
 ^^^^^^^^
 
-- None so far :)
+- Remove dependency on ``pyatom``, which has vanished from PyPI
 
 Version 2.2.1
 -------------
