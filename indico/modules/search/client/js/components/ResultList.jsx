@@ -13,6 +13,7 @@ import data1 from '../../../data/category_data';
 import data2 from '../../../data/contribution_data';
 import data3 from '../../../data/event_data';
 import data4 from '../../../data/file_data';
+// import SearchPagination from './SearchPagination';
 
 const datasetSelector = filter => {
   if (filter === 'Category') {
@@ -29,15 +30,18 @@ const datasetSelector = filter => {
 export default function ResultList({component: Component}) {
   const data = datasetSelector(Component.name);
   return (
-    <List divided relaxed>
-      {data.map(item => (
-        <List.Item key={item.url} styleName="list">
-          <List.Content>
-            <Component {...item} />
-          </List.Content>
-        </List.Item>
-      ))}
-    </List>
+    <div>
+      <List divided relaxed>
+        {data.map(item => (
+          <List.Item key={item.url}>
+            <List.Content styleName="list">
+              <Component {...item} />
+            </List.Content>
+          </List.Item>
+        ))}
+      </List>
+      {/* <SearchPagination /> */}
+    </div>
   );
 }
 

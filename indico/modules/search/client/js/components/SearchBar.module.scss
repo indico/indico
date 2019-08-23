@@ -4,17 +4,7 @@
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
-
-.list {
-    a {
-        font-size: 18px;
-        &:hover {
-            text-decoration: underline;
-        }
-    }
-}
-
-.description {
-    font-weight: bold;
-    font-size: 15px;
-}
+.field {
+    width: 100%;
+    position: relative;
+  }

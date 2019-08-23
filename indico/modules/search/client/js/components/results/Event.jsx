@@ -1,6 +1,7 @@
 import React from 'react';
 import {List} from 'semantic-ui-react';
 import PropTypes from 'prop-types';
+import '../ResultList.module.scss';
 
 const Event = ({title, authors, startDate, endDate, location, url}) => (
   <>
@@ -9,10 +10,10 @@ const Event = ({title, authors, startDate, endDate, location, url}) => (
     </List.Header>
     <List.Description>
       <List>
-        <List.Item>Authors: {authors.join(' ')}</List.Item>
-        <List.Item>Start Date: {startDate}</List.Item>
-        <List.Item>End Date: {endDate}</List.Item>
-        <List.Item>Location: {location}</List.Item>
+        <List.Item>{authors.join(' ')}</List.Item>
+        <List.Item>{startDate}</List.Item>
+        <List.Item>{endDate}</List.Item>
+        <List.Item>{location}</List.Item>
       </List>
     </List.Description>
   </>

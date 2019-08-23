@@ -1,6 +1,7 @@
 import React from 'react';
 import {List} from 'semantic-ui-react';
 import PropTypes from 'prop-types';
+import '../ResultList.module.scss';
 
 const File = ({title, authors, date, url}) => (
   <>
@@ -9,8 +10,8 @@ const File = ({title, authors, date, url}) => (
     </List.Header>
     <List.Description>
       <List>
-        <List.Item>Authors: {authors.join(' ')}</List.Item>
-        <List.Item>Date: {date}</List.Item>
+        <List.Item>{authors.join(' ')}</List.Item>
+        <List.Item>{date}</List.Item>
       </List>
     </List.Description>
   </>

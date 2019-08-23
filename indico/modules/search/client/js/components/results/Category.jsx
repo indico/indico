@@ -1,13 +1,18 @@
 import React from 'react';
 import {List} from 'semantic-ui-react';
 import PropTypes from 'prop-types';
+import '../ResultList.module.scss';
 
 const Category = ({title, path, url}) => (
   <>
     <List.Header>
       <a href={`https://blackhole.cern.ch${url}`}>{title}</a>
     </List.Header>
-    <List.Description>{path.join(' » ')}</List.Description>
+    <List.Description>
+      <List>
+        <List.Item>{path.join(' » ')}</List.Item>
+      </List>
+    </List.Description>
   </>
 );
 
