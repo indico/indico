@@ -2,6 +2,16 @@ Changelog
 =========
 
 
+Version 2.2.3-dev
+-----------------
+
+*Unreleased*
+
+Bugfixes
+^^^^^^^^
+
+- None so far :)
+
 Version 2.2.2
 -------------
 
