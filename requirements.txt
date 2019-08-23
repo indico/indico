@@ -8,7 +8,6 @@ jsmin==2.2.2
 lxml==4.2.1
 pojson==0.7
 pyPdf==1.13
-pyatom==1.4
 pycountry==18.2.23
 mock==2.0.0
 freezegun==0.3.10
