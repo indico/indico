@@ -33,14 +33,16 @@ from indico.util.struct.enum import IndicoEnum, RichIntEnum
 
 
 class AbstractState(RichIntEnum):
-    __titles__ = [None, _("Submitted"), _("Withdrawn"), _("Accepted"), _("Rejected"), _("Merged"), _("Duplicate")]
-    __css_classes__ = [None, '', 'outline dashed', 'success', 'error', 'visited', 'strong']
+    __titles__ = [None, _("Submitted"), _("Withdrawn"), _("Accepted"), _("Rejected"), _("Merged"), _("Duplicate"),
+                  _("Invited")]
+    __css_classes__ = [None, '', 'outline dashed', 'success', 'error', 'visited', 'strong', '']
     submitted = 1
     withdrawn = 2
     accepted = 3
     rejected = 4
     merged = 5
     duplicate = 6
+    invited = 7
 
 
 class AbstractPublicState(RichIntEnum):
@@ -54,6 +56,7 @@ class AbstractPublicState(RichIntEnum):
     rejected = 4
     merged = 5
     duplicate = 6
+    invited = 7
     # special states
     awaiting = -1
     under_review = -2
