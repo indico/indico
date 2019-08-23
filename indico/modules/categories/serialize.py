@@ -14,8 +14,8 @@ import icalendar as ical
 from flask import session
 from lxml import html
 from lxml.etree import ParserError
-from pyatom import AtomFeed
 from sqlalchemy.orm import joinedload, load_only, subqueryload, undefer
+from werkzeug.contrib.atom import AtomFeed
 from werkzeug.urls import url_parse
 
 from indico.core.config import config

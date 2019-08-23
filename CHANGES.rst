@@ -29,12 +29,12 @@ Internal Changes
 Version 2.2.2
 -------------
 
-*Unreleased*
+*Released on August 23, 2019*
 
 Bugfixes
 ^^^^^^^^
 
-- None so far :)
+- Remove dependency on ``pyatom``, which has vanished from PyPI
 
 Version 2.2.1
 -------------
