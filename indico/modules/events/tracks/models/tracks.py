@@ -27,6 +27,8 @@ class Track(DescriptionMixin, db.Model):
     __tablename__ = 'tracks'
     __table_args__ = {'schema': 'events'}
 
+    is_track_group = False
+
     possible_render_modes = {RenderMode.markdown}
     default_render_mode = RenderMode.markdown
 

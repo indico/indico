@@ -9,8 +9,7 @@ from __future__ import unicode_literals
 
 from indico.modules.events.tracks.controllers import (RHCreateTrack, RHCreateTrackGroup, RHDeleteTrack,
                                                       RHDeleteTrackGroup, RHDisplayTracks, RHEditProgram, RHEditTrack,
-                                                      RHEditTrackGroup, RHManageTracks, RHSortTracks, RHTrackGroups,
-                                                      RHTracksPDF)
+                                                      RHEditTrackGroup, RHManageTracks, RHSortTracks, RHTracksPDF)
 from indico.web.flask.util import make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
 
@@ -25,7 +24,6 @@ _bp.add_url_rule('/manage/tracks/sort', 'sort_tracks', RHSortTracks, methods=('P
 _bp.add_url_rule('/manage/tracks/<int:track_id>', 'edit_track', RHEditTrack, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/tracks/<int:track_id>', 'delete_track', RHDeleteTrack, methods=('DELETE',))
 
-_bp.add_url_rule('/manage/track-groups', 'track_groups', RHTrackGroups)
 _bp.add_url_rule('/manage/track-groups/create', 'create_track_group', RHCreateTrackGroup, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/track-groups/<int:track_group_id>', 'edit_track_group', RHEditTrackGroup,
                  methods=('GET', 'POST'))

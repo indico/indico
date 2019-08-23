@@ -12,10 +12,8 @@
     var heightLimit = 50;
     $('#track-list-container')
       .on('indico:htmlUpdated', function() {
-        var $trackList = $('#track-list');
-
-        $trackList.find('.track-content').each(function() {
-          var $this = $(this);
+        const $this = $(this);
+        $this.find('.track-list .track-content').each(function() {
           if ($this.height() > heightLimit) {
             $this.addClass('track-content-collapsed track-content-collapsible');
             $this.on('click', function() {
@@ -24,25 +22,34 @@
           }
         });
 
-        $trackList.sortable({
+        $this.find('.track-list').sortable({
+          items: '.track-row',
+          handle: '.ui-i-box-sortable-handle',
           axis: 'y',
-          containment: 'parent',
           cursor: 'move',
           distance: 2,
-          handle: '.ui-i-box-sortable-handle',
-          items: '> li.track-row',
           tolerance: 'pointer',
           forcePlaceholderSize: true,
+          connectWith: '.track-list',
           update: function() {
-            var sortedList = $trackList
-              .find('li.track-row')
+            const $this = $(this);
+            const sortedList = $this.find('li.track-row')
               .map(function() {
-                return $(this).data('id');
+                const $this = $(this);
+                if ($this.hasClass('track-group-box')) {
+                  return {id: $this.data('id'), type: 'group'};
+                } else {
+                  let parent = null;
+                  const parentDiv = $this.closest('.track-group-box');
+                  if (parentDiv.length) {
+                    parent = parentDiv.data('id');
+                  }
+                  return {id: $this.data('id'), type: 'track', parent};
+                }
               })
               .get();
-
             $.ajax({
-              url: $trackList.data('url'),
+              url: $this.data('url'),
               method: 'POST',
               contentType: 'application/json',
               data: JSON.stringify({sort_order: sortedList}),
@@ -50,8 +57,14 @@
               error: handleAjaxError,
             });
           },
-        });
-      })
-      .trigger('indico:htmlUpdated');
-  };
+          receive: function(event, ui) {
+            const parentDiv = $this.closest('.track-group-box');
+            if (parentDiv.length && ui.item.hasClass('track-group-box')) {
+              $(ui.sender).sortable('cancel');
+            }
+          }
+      });
+    })
+    .trigger('indico:htmlUpdated');
+  }
 })(window);

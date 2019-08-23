@@ -18,6 +18,8 @@ class TrackGroup(DescriptionMixin, db.Model):
     __tablename__ = 'track_groups'
     __table_args__ = {'schema': 'events'}
 
+    is_track_group = True
+
     possible_render_modes = {RenderMode.markdown}
     default_render_mode = RenderMode.markdown
 
@@ -25,25 +27,21 @@ class TrackGroup(DescriptionMixin, db.Model):
         db.Integer,
         primary_key=True
     )
-
     title = db.Column(
         db.String,
         nullable=False
     )
-
     position = db.Column(
         db.Integer,
         nullable=False,
         default=get_next_position
     )
-
     event_id = db.Column(
         db.Integer,
         db.ForeignKey('events.events.id'),
         index=True,
         nullable=False
     )
-
     event = db.relationship(
         'Event',
         lazy=True,

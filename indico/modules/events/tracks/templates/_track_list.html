@@ -1,70 +1,125 @@
 {% from 'message_box.html' import message_box %}
 
-{% macro render_track_list(event) %}
-    {% if not event.tracks %}
+{% macro render_track(track) %}
+    <li class="track-row i-box" data-id="{{ track.id }}">
+        <div class="ui-i-box-sortable-handle hide-if-locked"></div>
+        <div class="i-box-header">
+            <span class="i-box-title">{{ track.title }}</span>
+            <div class="i-box-buttons hide-if-locked">
+                <div class="toolbar">
+                    <div class="group">
+                        <a href="#" class="i-button icon-edit js-edit-item"
+                           title="{% trans %}Edit track{% endtrans %}"
+                           data-href="{{ url_for('tracks.edit_track', track) }}"
+                           data-title='{% trans title=track.title %}Edit track "{{ title }}"{% endtrans %}'
+                           data-update="#track-list-container"
+                           data-ajax-dialog></a>
+                    </div>
+                    <div class="group">
+                        {% if track.can_delete(session.user) %}
+                            <a href="#" class="i-button danger text-color icon-remove js-delete-item"
+                               title="{% trans %}Delete track{% endtrans %}"
+                               data-href="{{ url_for('tracks.delete_track', track) }}"
+                               data-confirm="{% trans %}Are you sure you want to delete this track?{% endtrans %}"
+                               data-title='{% trans title=track.title %}Delete track "{{ title }}"{% endtrans %}'
+                               data-method="DELETE"
+                               data-update="#track-list-container"></a>
+                        {% else %}
+                            <a href="#" class="i-button danger text-color icon-remove disabled"
+                               title="{% trans %}This track cannot be deleted because it contains accepted abstracts{% endtrans %}"></a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% if track.code %}
+                <span class="i-label small">
+                    {{ track.code }}
+                </span>
+            {% endif %}
+            {% if track.default_session %}
+                {% set default_session_tooltip %}
+                    {%- trans title=track.default_session.title -%}
+                        Indico will preselect the session "{{ title }}" whenever an abstract is accepted for
+                        this track.
+                    {%- endtrans -%}
+                {% endset %}
+                <span class="i-label small default-session"
+                      title='{{ default_session_tooltip }}'
+                      style="{{ track.default_session.colors.css }}">
+                    {{ track.default_session.title }}
+                </span>
+            {% endif %}
+        </div>
+        {% if track.description %}
+            <div class="track-content i-box-content">
+                {{ track.description }}
+            </div>
+        {% endif %}
+    </li>
+{% endmacro %}
+
+{% macro render_group(group, event) %}
+    <li class="track-row i-box track-group-box" data-id="{{ group.id }}">
+        <div class="ui-i-box-sortable-handle track-group-handle hide-if-locked"></div>
+        <div class="i-box-header">
+            <span class="i-box-title">{{ group.title }}</span>
+            <div class="i-box-buttons hide-if-locked">
+                <div class="toolbar">
+                    <div class="group">
+                        <a href="#" class="i-button icon-edit js-edit-item"
+                           title="{% trans %}Edit track group{% endtrans %}"
+                           data-href="{{ url_for('tracks.edit_track_group', group) }}"
+                           data-title='{% trans title=group.title %}Edit track group "{{ title }}"{% endtrans %}'
+                           data-update="#track-list-container"
+                           data-ajax-dialog></a>
+                    </div>
+                    <div class="group">
+                        <a href="#" class="i-button danger text-color icon-remove js-delete-item"
+                           title="{% trans %}Delete track group{% endtrans %}"
+                           data-href="{{ url_for('tracks.delete_track_group', group) }}"
+                           data-confirm="{% trans %}Are you sure you want to delete this track group?{% endtrans %}"
+                           data-title='{% trans title=group.title %}Delete track "{{ title }}"{% endtrans %}'
+                           data-method="DELETE"
+                           data-update="#track-list-container"></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% if group.description %}
+            <div class="track-content i-box-content track-group-box-content">
+                {{ group.description }}
+            </div>
+        {% endif %}
+            <div  class="embedded-track-list">
+                <ul class="i-box-group vert track-list" data-url="{{ url_for('.sort_tracks', event) }}">
+                    <div class="no-tracks-message">
+                        <em>{% trans %}No tracks have been added yet.{% endtrans %}</em>
+                        <br>
+                        <em>{% trans %}You can drag and drop tracks here to add them to the group.{% endtrans %}</em>
+                    </div>
+                    {% for track in group.tracks %}
+                        {{ render_track(track) }}
+                    {% endfor %}
+                </ul>
+            </div>
+    </li>
+{% endmacro %}
+
+{% macro render_list(event, items) %}
+    {% if not event.tracks and not event.track_groups %}
         <div id="no-tracks-box">
             {% call message_box('info', classes='no-rules-placeholder') %}
                 {% trans %}No tracks have been added yet.{% endtrans %}
             {% endcall %}
         </div>
     {% else %}
-        <ul id="track-list" class="i-box-group vert" data-url="{{ url_for('.sort_tracks', event) }}">
-            {% for track in event.tracks %}
-                <li class="track-row i-box" data-id="{{ track.id }}">
-                    <div class="ui-i-box-sortable-handle hide-if-locked"></div>
-                    <div class="i-box-header">
-                        <span class="i-box-title">{{ track.title }}</span>
-                        <div class="i-box-buttons hide-if-locked">
-                            <div class="toolbar">
-                                <div class="group">
-                                    <a href="#" class="i-button icon-edit js-edit-item"
-                                       title="{% trans %}Edit track{% endtrans %}"
-                                       data-href="{{ url_for('tracks.edit_track', track) }}"
-                                       data-title='{% trans title=track.title %}Edit track "{{ title }}"{% endtrans %}'
-                                       data-update="#track-list-container"
-                                       data-ajax-dialog></a>
-                                </div>
-                                <div class="group">
-                                    {% if track.can_delete(session.user) %}
-                                        <a href="#" class="i-button danger text-color icon-remove js-delete-item"
-                                           title="{% trans %}Delete track{% endtrans %}"
-                                           data-href="{{ url_for('tracks.delete_track', track) }}"
-                                           data-confirm="{% trans %}Are you sure you want to delete this track?{% endtrans %}"
-                                           data-title='{% trans title = track.title %}Delete track "{{ title }}"{% endtrans %}'
-                                           data-method="DELETE"
-                                           data-update="#track-list-container"></a>
-                                    {% else %}
-                                        <a href="#" class="i-button danger text-color icon-remove disabled"
-                                           title="{% trans %}This track cannot be deleted because it contains accepted abstracts{% endtrans %}"></a>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-                        {% if track.code %}
-                            <span class="i-label small">
-                                {{ track.code }}
-                            </span>
-                        {% endif %}
-                        {% if track.default_session %}
-                            {% set default_session_tooltip %}
-                                {%- trans title=track.default_session.title -%}
-                                    Indico will preselect the session "{{ title }}" whenever an abstract is accepted for
-                                    this track.
-                                {%- endtrans -%}
-                            {% endset %}
-                            <span class="i-label small default-session"
-                                  title='{{ default_session_tooltip }}'
-                                  style="{{ track.default_session.colors.css }}">
-                                {{ track.default_session.title }}
-                            </span>
-                        {% endif %}
-                    </div>
-                    {% if track.description %}
-                        <div class="track-content i-box-content">
-                            {{ track.description }}
-                        </div>
-                    {% endif %}
-                </li>
+        <ul class="i-box-group vert track-list" data-url="{{ url_for('.sort_tracks', event) }}">
+            {% for item in items %}
+                {% if item.is_track_group %}
+                    {{ render_group(item, event)}}
+                {% else %}
+                    {{ render_track(item) }}
+                {% endif %}
             {% endfor %}
         </ul>
     {% endif %}

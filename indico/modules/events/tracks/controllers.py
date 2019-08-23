@@ -8,7 +8,7 @@
 from __future__ import unicode_literals
 
 from io import BytesIO
-from operator import itemgetter
+from operator import attrgetter, itemgetter
 
 from flask import flash, request
 from sqlalchemy.orm import subqueryload
@@ -33,8 +33,11 @@ from indico.web.util import jsonify_data, jsonify_form
 
 
 def _render_track_list(event):
-    tpl = get_template_module('events/tracks/_track_list.html', event=event)
-    return tpl.render_track_list(event)
+    track_groups = event.track_groups
+    tracks = [track for track in event.tracks if not track.track_group]
+    list_items = sorted(tracks + track_groups, key=attrgetter('position'))
+    tpl = get_template_module('events/tracks/_track_list.html', event=event, list_items=list_items)
+    return tpl.render_list(event, list_items)
 
 
 class RHManageTracksBase(RHManageEventBase):
@@ -64,13 +67,15 @@ class RHManageTrackGroupBase(RHManageEventBase):
 
     def _process_args(self):
         RHManageEventBase._process_args(self)
-        self.track_group = TrackGroup.get_one(request.view_args['group_id'])
+        self.track_group = TrackGroup.get_one(request.view_args['track_group_id'])
 
 
 class RHManageTracks(RHManageTracksBase):
     def _process(self):
-        tracks = self.event.tracks
-        return WPManageTracks.render_template('management.html', self.event, tracks=tracks)
+        track_groups = self.event.track_groups
+        tracks = [track for track in self.event.tracks if not track.track_group]
+        list_items = sorted(tracks + track_groups, key=attrgetter('position'))
+        return WPManageTracks.render_template('management.html', self.event, list_items=list_items, tracks=tracks)
 
 
 class RHEditProgram(RHManageTracksBase):
@@ -112,9 +117,17 @@ class RHSortTracks(RHManageTracksBase):
     def _process(self):
         sort_order = request.json['sort_order']
         tracks = {t.id: t for t in self.event.tracks}
-        for position, track_id in enumerate(sort_order, 1):
-            if track_id in tracks:
-                tracks[track_id].position = position
+        track_groups = {tg.id: tg for tg in self.event.track_groups}
+        for position, item in enumerate(sort_order, 1):
+            if item['type'] == 'track':
+                tracks[item['id']].position = position
+                parent_id = item['parent']
+                track_group = (TrackGroup.query.with_parent(self.event)
+                               .filter(TrackGroup.id == parent_id).first())
+                tracks[item['id']].track_group = track_group
+            elif item['type'] == 'group':
+                track_groups[item['id']].position = position
+        return jsonify_data(html=_render_track_list(self.event))
 
 
 class RHDeleteTrack(RHManageTrackBase):
@@ -143,16 +156,12 @@ class RHTracksPDF(RHDisplayEventBase):
         return send_file('program.pdf', BytesIO(pdf.getPDFBin()), 'application/pdf')
 
 
-class RHTrackGroups(RHManageEventBase):
-    def _process(self):
-        pass
-
-
 class RHCreateTrackGroup(RHManageEventBase):
     def _process(self):
         form = TrackGroupForm()
         if form.validate_on_submit():
             create_track_group(self.event, form.data)
+            return jsonify_data(html=_render_track_list(self.event))
         return jsonify_form(form)
 
 
@@ -161,6 +170,7 @@ class RHEditTrackGroup(RHManageTrackGroupBase):
         form = TrackGroupForm(obj=self.track_group)
         if form.validate_on_submit():
             update_track_group(self.track_group, form.data)
+            return jsonify_data(html=_render_track_list(self.event))
         return jsonify_form(form)
 
 
@@ -168,3 +178,4 @@ class RHDeleteTrackGroup(RHManageTrackGroupBase):
     def _process(self):
         delete_track_group(self.track_group)
         flash(_('Track Group "{}" has been deleted.').format(self.track_group.title), 'success')
+        return jsonify_data(html=_render_track_list(self.event))

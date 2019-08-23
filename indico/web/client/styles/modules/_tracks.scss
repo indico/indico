@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-#track-list {
+.track-list {
     list-style-type: none;
     padding-left: 0;
 
@@ -46,8 +46,23 @@
     }
 }
 
-#no-tracks-box {
-    margin-top: 20px;
+.embedded-track-list {
+    padding: 30px 20px;
+    border: 1px solid $pastel-gray;
+    background-color: $light-gray;
+    margin: 10px 0;
+}
+
+.track-group-handle {
+    background-color: $dark-gray !important;
+}
+
+.no-tracks-message {
+    color: $dark-gray;
+}
+
+.no-tracks-message:not(:only-child) {
+    display: none;
 }
 
 .track-review-list {

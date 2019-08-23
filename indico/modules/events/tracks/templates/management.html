@@ -1,6 +1,6 @@
 {% extends 'events/management/base.html' %}
 
-{% from 'events/tracks/_track_list.html' import render_track_list %}
+{% from 'events/tracks/_track_list.html' import render_list %}
 
 {% block title %}
     {%- trans %}Programme{% endtrans -%}
@@ -58,7 +58,7 @@
     </div>
 
     <div id="track-list-container">
-        {{ render_track_list(event) }}
+        {{ render_list(event, list_items) }}
     </div>
     <script>
         setupTrackManagement();
