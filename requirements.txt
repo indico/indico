@@ -5,7 +5,6 @@ icalendar==4.0.3
 lxml[html5]==4.3.4
 pojson==0.7
 pyPdf==1.13
-pyatom==1.4
 pycountry==19.7.15
 mock==3.0.5
 freezegun==0.3.12

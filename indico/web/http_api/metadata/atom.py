@@ -8,8 +8,8 @@
 from datetime import datetime
 
 import dateutil.parser
-from pyatom import AtomFeed
 from pytz import timezone, utc
+from werkzeug.contrib.atom import AtomFeed
 
 from indico.util.string import to_unicode
 from indico.web.http_api.metadata.serializer import Serializer
