@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Form} from 'semantic-ui-react';
+import {Form, Input} from 'semantic-ui-react';
 import './SearchBar.module.scss';
 
 export default function SearchBar() {
@@ -14,22 +14,18 @@ export default function SearchBar() {
   };
 
   return (
-    <Form onSubmit={handleSubmit} size="tiny">
-      <Form.Group>
-        <Form.Input
-          styleName="field"
-          icon="search"
-          placeholder="Search..."
-          value={value}
-          onChange={handleChange}
-        />
-        <Form.Button content="Submit" size="tiny" />
-      </Form.Group>
-      {/* <Grid>
-        <Grid.Column textAlign="center">
-          <Form.Button content="Submit" size="tiny" />
-        </Grid.Column>
-      </Grid> */}
-    </Form>
+    <div>
+      <Form onSubmit={handleSubmit}>
+        <Form.Group>
+          <Input
+            action="Search"
+            placeholder="Search..."
+            value={value}
+            onChange={handleChange}
+            styleName="field"
+          />
+        </Form.Group>
+      </Form>
+    </div>
   );
 }
