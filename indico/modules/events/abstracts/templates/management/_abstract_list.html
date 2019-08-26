@@ -33,7 +33,7 @@
 {% macro _render_abstract_state(abstract) %}
     {% set abstract_css_class = abstract.reviewing_state.css_class if abstract.can_convene(session.user) else abstract.public_state.css_class %}
     <div class="i-tag outline semantic-text state-badge {{ abstract_css_class }}"
-         data-tooltip="{{ render_num_reviews_tooltip(abstract, _render_proposed_contrib_types)|trim|forceescape }}">
+         data-qbubble="{{ render_num_reviews_tooltip(abstract, _render_proposed_contrib_types)|trim|forceescape }}">
         {% if abstract.public_state.name == 'under_review' and abstract.can_judge(session.user) %}
             {% trans count=abstract.reviews|length -%}
                 {{- count }} review
