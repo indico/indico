@@ -11,6 +11,7 @@ Bugfixes
 ^^^^^^^^
 
 - Fix bug in calendar view, due to timezones (:issue:`3903`)
+- Remove dependency on ``pyatom``, which has vanished from PyPI (:issue:`4045`)
 
 Version 2.1.8
 -------------
