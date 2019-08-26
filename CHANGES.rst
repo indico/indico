@@ -5,7 +5,7 @@ Changelog
 Version 2.1.9
 -------------
 
-*Unreleased*
+*Released on August 26, 2019*
 
 Bugfixes
 ^^^^^^^^
