@@ -4,7 +4,7 @@
 {% macro _render_paper_state(paper) %}
     {% set paper_css_class = paper.state.css_class %}
     <div class="i-tag outline semantic-text state-badge {{ paper_css_class }}"
-         data-tooltip="{{ render_num_reviews_tooltip(paper.last_revision)|trim|forceescape }}">
+         data-qbubble="{{ render_num_reviews_tooltip(paper.last_revision)|trim|forceescape }}">
         {% if paper.state.name == 'submitted' and paper.can_judge(session.user) %}
             {% trans count=paper.last_revision.reviews|length -%}
                 {{- count }} review

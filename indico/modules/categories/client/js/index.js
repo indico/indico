@@ -40,7 +40,7 @@ import './display';
           highlighter: {
             location: 'n',
             tooltipAxes: 'yx',
-            tooltipSeparator: $this.data('tooltip'),
+            tooltipSeparator: $this.data('qbubble'),
           },
           series: [
             {

@@ -219,7 +219,7 @@
         at: 'top center',
       },
       content: {
-        attr: 'data-tooltip',
+        attr: 'data-qbubble',
       },
     });
 
