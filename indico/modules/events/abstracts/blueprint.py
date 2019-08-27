@@ -44,7 +44,7 @@ _bp.add_url_rule('/abstracts/reviewing/<int:track_id>/abstracts.xlsx', 'display_
 # Book of Abstracts
 _bp.add_url_rule('/manage/abstracts/boa', 'manage_boa', boa.RHManageBOA, methods=('GET', 'POST'))
 _bp.add_url_rule('/book-of-abstracts.pdf', 'export_boa', boa.RHExportBOA)
-_bp.add_url_rule('/book-of-abstracts.zip', 'export_boa_tex', boa.RHExportBOATeX)
+_bp.add_url_rule('/manage/book-of-abstracts.zip', 'export_boa_tex', boa.RHExportBOATeX)
 
 # Misc
 _bp.add_url_rule('/abstracts/other-list', 'other_abstracts', reviewing.RHListOtherAbstracts, methods=('POST',))

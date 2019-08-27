@@ -94,8 +94,10 @@
                 <div class="label">
                     {%- trans %}Book of abstracts{% endtrans -%}
                 </div>
+                {% set link_start %}<a class="arrow js-dropdown" data-toggle="dropdown">{% endset %}
+                {% set link_end %}</a>{% endset %}
                 {%- trans -%}
-                    Customize and <a class="arrow js-dropdown" data-toggle="dropdown">download</a> the book of abstracts
+                    Customize and {{ link_start }}download{{ link_end }} the book of abstracts
                 {%- endtrans -%}
                 <ul class="i-dropdown">
                     <li>

@@ -39,7 +39,7 @@ class RHExportBOA(RHAbstractsBase):
         return send_file('book-of-abstracts.pdf', create_boa(self.event), 'application/pdf')
 
 
-class RHExportBOATeX(RHAbstractsBase):
+class RHExportBOATeX(RHManageAbstractsBase):
     """Export a zip file with the book of abstracts in TeX format"""
 
     def _process(self):
