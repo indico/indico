@@ -80,6 +80,7 @@ class StateCondition(EmailNotificationCondition):
     required = True
 
     compatible_with = {
+        AbstractState.invited.value: (),
         AbstractState.submitted.value: (),
         AbstractState.rejected.value: (),
         AbstractState.accepted.value: ('contribution_type', 'track'),

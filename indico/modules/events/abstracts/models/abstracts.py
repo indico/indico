@@ -35,7 +35,7 @@ from indico.util.struct.enum import IndicoEnum, RichIntEnum
 class AbstractState(RichIntEnum):
     __titles__ = [None, _("Submitted"), _("Withdrawn"), _("Accepted"), _("Rejected"), _("Merged"), _("Duplicate"),
                   _("Invited")]
-    __css_classes__ = [None, '', 'outline dashed', 'success', 'error', 'visited', 'strong', '']
+    __css_classes__ = [None, '', 'outline dashed', 'success', 'error', 'visited', 'strong', 'warning']
     submitted = 1
     withdrawn = 2
     accepted = 3
@@ -554,7 +554,7 @@ class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFie
             return False
         elif is_manager and self.public_state in (AbstractPublicState.under_review, AbstractPublicState.withdrawn):
             return True
-        elif (self.public_state == AbstractPublicState.awaiting and
+        elif (self.public_state in (AbstractPublicState.awaiting, AbstractPublicState.invited) and
                 (is_manager or self.event.cfa.can_edit_abstracts(user))):
             return True
         else:

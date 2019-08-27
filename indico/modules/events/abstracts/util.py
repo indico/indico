@@ -19,6 +19,7 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.legacy.pdfinterface.latex import AbstractBook
 from indico.modules.events import Event
+from indico.modules.events.abstracts.forms import InvitedAbstractMixin
 from indico.modules.events.abstracts.models.abstracts import Abstract, AbstractState
 from indico.modules.events.abstracts.models.email_templates import AbstractEmailTemplate
 from indico.modules.events.abstracts.models.persons import AbstractPersonLink
@@ -153,7 +154,7 @@ def create_mock_abstract(event):
     return abstract
 
 
-def make_abstract_form(event, user, notification_option=False, management=False):
+def make_abstract_form(event, user, notification_option=False, management=False, invited=False):
     """Extends the abstract WTForm to add the extra fields.
 
     Each extra field will use a field named ``custom_ID``.
@@ -164,6 +165,7 @@ def make_abstract_form(event, user, notification_option=False, management=False)
                                 disable triggering notifications for
                                 the abstract submission.
     :param management: Whether the form is used in the management area
+    :param invited: Whether the form is used to create an invited abstract
     :return: An `AbstractForm` subclass.
     """
     from indico.modules.events.abstracts.forms import (AbstractForm, MultiTrackMixin, SingleTrackMixin, NoTrackMixin,
@@ -178,6 +180,8 @@ def make_abstract_form(event, user, notification_option=False, management=False)
         mixins.append(SingleTrackMixin)
     if notification_option:
         mixins.append(SendNotificationsMixin)
+    if invited:
+        mixins.append(InvitedAbstractMixin)
     form_class = type(b'_AbstractForm', tuple(mixins) + (AbstractForm,), {})
     for custom_field in event.contribution_fields:
         field_impl = custom_field.mgmt_field if management else custom_field.field

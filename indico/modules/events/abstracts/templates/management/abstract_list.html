@@ -41,15 +41,33 @@
                     </button>
                 </div>
                 <div class="group">
-                    <a class="i-button icon-plus js-dialog-action hide-if-locked"
-                       title="{% trans %}Add new abstract{% endtrans %}"
-                       data-title="{% trans %}Add new abstract{% endtrans %}"
-                       data-href="{{ url_for('.manage_create_abstract', event) }}"
-                       data-update='{"html": "#abstract-list", "filter_statistics": "#filter-statistics"}'
-                       data-confirm-close-unsaved
-                       data-ajax-dialog>
-                        {% trans %}New abstract{% endtrans %}
+                    <a class="i-button arrow icon-plus hide-if-locked" data-toggle="dropdown">
+                        {% trans %}New{% endtrans %}
                     </a>
+                    <ul class="i-dropdown">
+                        <li>
+                            <a class="js-dialog-action"
+                               title="{% trans %}Add new abstract{% endtrans %}"
+                               data-title="{% trans %}Add new abstract{% endtrans %}"
+                               data-href="{{ url_for('.manage_create_abstract', event) }}"
+                               data-update='{"html": "#abstract-list", "filter_statistics": "#filter-statistics"}'
+                               data-confirm-close-unsaved
+                               data-ajax-dialog>
+                                {% trans %}Abstract{% endtrans %}
+                            </a>
+                        </li>
+                        <li>
+                            <a class="js-dialog-action"
+                               title="{% trans %}Add new invited abstract{% endtrans %}"
+                               data-title="{% trans %}Add new invited abstract{% endtrans %}"
+                               data-href="{{ url_for('.manage_create_abstract', event, invited=true) }}"
+                               data-update='{"html": "#abstract-list", "filter_statistics": "#filter-statistics"}'
+                               data-confirm-close-unsaved
+                               data-ajax-dialog>
+                                {% trans %}Invited abstract{% endtrans %}
+                            </a>
+                        </li>
+                    </ul>
                 </div>
                 <div class="group hide-if-locked">
                     <a class="i-button arrow icon-remove js-requires-selected-row disabled"
