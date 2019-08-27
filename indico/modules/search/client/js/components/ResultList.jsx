@@ -29,7 +29,23 @@ const datasetSelector = filter => {
 
 export default function ResultList({component: Component}) {
   const data = datasetSelector(Component.name);
-  return <SearchPagination component={Component} data={data} />;
+  return (
+    <div>
+      <SearchPagination data={data}>
+        {items => (
+          <List divided relaxed>
+            {items.map(item => (
+              <List.Item key={item.url}>
+                <List.Content styleName="list">
+                  <Component {...item} />
+                </List.Content>
+              </List.Item>
+            ))}
+          </List>
+        )}
+      </SearchPagination>
+    </div>
+  );
 }
 
 ResultList.propTypes = {

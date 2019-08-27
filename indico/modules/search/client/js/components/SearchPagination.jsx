@@ -1,62 +1,42 @@
 import React, {useState} from 'react';
 import PropTypes from 'prop-types';
-import {List, Pagination} from 'semantic-ui-react';
-import './ResultList.module.scss';
+import {Pagination} from 'semantic-ui-react';
+import './SearchPagination.module.scss';
 
-export default function SearchPagination({component: Component, data}) {
-  const recPerPage = 5;
+export default function SearchPagination({data, children}) {
+  const recPerPage = 2;
   const [activePage, setActivePage] = useState(1);
-  const [arrayStart, setArrayStart] = useState(0);
-  const [arrayEnd, setArrayEnd] = useState(recPerPage);
-  const [dataToShow, setDataToShow] = useState(data.slice(arrayStart, arrayEnd));
+  const [dataToShow, setDataToShow] = useState(data.slice(0, recPerPage));
 
-  const onChange = (e, pageInfo) => {
+  const onChange = (e, {activePage: active}) => {
     e.preventDefault();
-    e.persist();
-    setActivePage(pageInfo.activePage);
-    console.log('activepage ==== ', activePage);
-    setArrayStart(Math.max(activePage - 1, 0) * recPerPage);
-    setArrayEnd(arrayStart + recPerPage);
-    setDataToShow(data.slice(arrayStart, arrayEnd));
-    console.log(
-      'activepage:',
-      activePage,
-      'first:',
-      arrayStart,
-      'last:',
-      arrayEnd,
-      'data::',
-      dataToShow
-    );
+
+    setActivePage(active);
+    setDataToShow(data.slice((active - 1) * recPerPage, active * recPerPage));
   };
+
   const numOfPages = data => Math.ceil(data.length / recPerPage);
 
   return (
     <div>
-      <List divided relaxed>
-        {dataToShow.map(item => (
-          <List.Item key={item.url}>
-            <List.Content styleName="list">
-              <Component {...item} />
-            </List.Content>
-          </List.Item>
-        ))}
-      </List>
-      <Pagination
-        activePage={activePage}
-        onPageChange={onChange}
-        // firstItem={firstItem}
-        // lastItem={lastItem}
-        totalPages={numOfPages(data)}
-        boundaryRange={0}
-        ellipsisItem={null}
-        siblingRange={1}
-      />
+      {children(dataToShow)}
+      <div styleName="pagination">
+        <Pagination
+          activePage={activePage}
+          onPageChange={onChange}
+          totalPages={numOfPages(data)}
+          boundaryRange={1}
+          ellipsisItem={null}
+          siblingRange={2}
+          firstItem={null}
+          lastItem={null}
+        />
+      </div>
     </div>
   );
 }
 
 SearchPagination.propTypes = {
-  component: PropTypes.elementType.isRequired,
   data: PropTypes.array.isRequired,
+  children: PropTypes.func.isRequired,
 };
