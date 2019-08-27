@@ -106,7 +106,7 @@ Configuration Wizard
 --------------------
 
 You will then need to run the Configuration Wizard, following the normal installation guide (Debian/Ubuntu or CentOS).
-When the wizard asks you about the **"Old archvive dir"**, make sure to set it to the archive dir in the
+When the wizard asks you about the **"Old archive dir"**, make sure to set it to the archive dir in the
 ``indico-legacy`` directory.
 
 
