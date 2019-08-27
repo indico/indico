@@ -48,7 +48,7 @@
             </div>
         {% endif %}
 
-        {% if abstract.state.name not in ('submitted', 'withdrawn') %}
+        {% if abstract.state.name not in ('submitted', 'withdrawn', 'invited') %}
             {{ render_abstract_judgment(abstract) }}
         {% endif %}
     </div>

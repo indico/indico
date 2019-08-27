@@ -33,7 +33,7 @@ from indico.web.forms.base import FormDefaults, IndicoForm, generated_data
 from indico.web.forms.fields import (EditableFileField, EmailListField, HiddenEnumField, HiddenFieldList,
                                      IndicoDateTimeField, IndicoEnumSelectField, IndicoMarkdownField,
                                      IndicoQuerySelectMultipleCheckboxField, IndicoQuerySelectMultipleField,
-                                     PrincipalListField)
+                                     PrincipalField, PrincipalListField)
 from indico.web.forms.util import inject_validators
 from indico.web.forms.validators import HiddenUnless, LinkedDateTime, SoftLength, UsedIf, WordCount
 from indico.web.forms.widgets import SwitchWidget
@@ -554,6 +554,11 @@ class MultiTrackMixin(object):
 
 class SendNotificationsMixin(object):
     send_notifications = BooleanField(_("Send email notifications"), default=True)
+
+
+class InvitedAbstractMixin(IndicoForm):
+    submitter = PrincipalField(_('Submitter'), [DataRequired()],
+                               description=_('The person invited to submit the abstract'))
 
 
 class AbstractsScheduleForm(IndicoForm):
