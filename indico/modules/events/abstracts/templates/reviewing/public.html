@@ -458,6 +458,10 @@
                         {% endtrans %}
                     </div>
                 {% endif %}
+            {% elif abstract.state.name == 'invited' %}
+                {% trans name=abstract.submitter.name -%}
+                    <strong>{{ name }}</strong> was invited to submit this abstract
+                {%- endtrans %}
             {% endif %}
         </div>
     </div>
