@@ -2,8 +2,8 @@ Changelog
 =========
 
 
-Version 2.2.3-dev
------------------
+Version 2.2.3
+-------------
 
 *Unreleased*
 
