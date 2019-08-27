@@ -131,12 +131,13 @@ Internal Changes
 Version 2.1.9
 -------------
 
-*Unreleased*
+*Released on August 26, 2019*
 
 Bugfixes
 ^^^^^^^^
 
 - Fix bug in calendar view, due to timezones (:issue:`3903`)
+- Remove dependency on ``pyatom``, which has vanished from PyPI (:issue:`4045`)
 
 Version 2.1.8
 -------------
