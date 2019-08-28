@@ -17,6 +17,8 @@ Improvements
 
 - Sort survey list by title (:issue:`3802`)
 - Hide "External IDs" field if none are defined (:issue:`3857`)
+- Add LaTeX source export for book of abstracts (:issue:`4035`,
+  thanks :user:`bpedersen2`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
