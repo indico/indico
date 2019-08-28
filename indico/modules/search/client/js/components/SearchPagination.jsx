@@ -4,9 +4,16 @@ import {Pagination} from 'semantic-ui-react';
 import './SearchPagination.module.scss';
 
 export default function SearchPagination({data, children}) {
-  const recPerPage = 2;
+  const recPerPage = 4;
   const [activePage, setActivePage] = useState(1);
   const [dataToShow, setDataToShow] = useState(data.slice(0, recPerPage));
+
+  const found = data.some(r => dataToShow.indexOf(r) >= 0);
+
+  if (!found) {
+    setActivePage(1);
+    setDataToShow(data.slice(0, recPerPage));
+  }
 
   const onChange = (e, {activePage: active}) => {
     e.preventDefault();

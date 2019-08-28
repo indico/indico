@@ -30,24 +30,25 @@ const datasetSelector = filter => {
 export default function ResultList({component: Component}) {
   const data = datasetSelector(Component.name);
   return (
-    <div>
-      <SearchPagination data={data}>
-        {items => (
-          <List divided relaxed>
-            {items.map(item => (
-              <List.Item key={item.url}>
-                <List.Content styleName="list">
-                  <Component {...item} />
-                </List.Content>
-              </List.Item>
-            ))}
-          </List>
-        )}
-      </SearchPagination>
-    </div>
+    <SearchPagination data={data}>
+      {items => (
+        <List divided relaxed>
+          {items.map(item => (
+            <List.Item key={item.url}>
+              <List.Content styleName="list">
+                <Component {...item} />
+              </List.Content>
+            </List.Item>
+          ))}
+        </List>
+      )}
+    </SearchPagination>
   );
 }
 
 ResultList.propTypes = {
   component: PropTypes.elementType.isRequired,
 };
+
+// for some reason it doesn't render the items again and have the latest value still there
+// also fix the descriptions in events and files to be more user friendly
