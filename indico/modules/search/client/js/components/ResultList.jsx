@@ -50,5 +50,4 @@ ResultList.propTypes = {
   component: PropTypes.elementType.isRequired,
 };
 
-// for some reason it doesn't render the items again and have the latest value still there
 // also fix the descriptions in events and files to be more user friendly

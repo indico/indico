@@ -4,7 +4,7 @@ import {Pagination} from 'semantic-ui-react';
 import './SearchPagination.module.scss';
 
 export default function SearchPagination({data, children}) {
-  const recPerPage = 4;
+  const recPerPage = 18;
   const [activePage, setActivePage] = useState(1);
   const [dataToShow, setDataToShow] = useState(data.slice(0, recPerPage));
 
@@ -25,8 +25,8 @@ export default function SearchPagination({data, children}) {
   const numOfPages = data => Math.ceil(data.length / recPerPage);
 
   return (
-    <div>
-      {children(dataToShow)}
+    <>
+      <div styleName="bigDiv">{children(dataToShow)}</div>
       <div styleName="pagination">
         <Pagination
           activePage={activePage}
@@ -39,7 +39,7 @@ export default function SearchPagination({data, children}) {
           lastItem={null}
         />
       </div>
-    </div>
+    </>
   );
 }
 

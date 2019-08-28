@@ -13,7 +13,7 @@ const Event = ({title, authors, startDate, endDate, location, url}) => (
         <List.Item>{authors.join(' ')}</List.Item>
         <List.Item>{startDate}</List.Item>
         <List.Item>{endDate}</List.Item>
-        <List.Item>{location}</List.Item>
+        {/* <List.Item>{location}</List.Item> */}
       </List>
     </List.Description>
   </>

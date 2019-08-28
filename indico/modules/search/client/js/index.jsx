@@ -19,11 +19,3 @@ document.addEventListener('DOMContentLoaded', () => {
   const root = document.querySelector('#search-root');
   ReactDOM.render(<SearchApp />, root);
 });
-
-/*
-TODOS:
-search form when press the /search and then redirect you to the result page, can be simple fields form,
-in path make li items and after element renders the >>
-pagination
-ask about occassional rendering of other things as well
-*/

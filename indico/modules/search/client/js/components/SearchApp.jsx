@@ -51,5 +51,5 @@ const panes = [
 ];
 
 export default function SearchApp() {
-  return <Tab menu={{secondary: true, pointing: true}} panes={panes} />;
+  return <Tab stylename="search" menu={{secondary: true, pointing: true}} panes={panes} />;
 }
