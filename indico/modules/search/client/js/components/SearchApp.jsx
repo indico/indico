@@ -6,8 +6,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React from 'react';
-import {Tab} from 'semantic-ui-react';
+import React, {useState} from 'react';
+import {Menu} from 'semantic-ui-react';
 import ResultList from './ResultList';
 import './SearchApp.module.scss';
 import Category from './results/Category';
@@ -15,41 +15,50 @@ import Contribution from './results/Contribution';
 import Event from './results/Event';
 import File from './results/File';
 
-const panes = [
-  {
-    menuItem: 'Category',
-    render: () => (
-      <Tab.Pane attached={false}>
-        <ResultList component={Category} />
-      </Tab.Pane>
-    ),
-  },
-  {
-    menuItem: 'Contribution',
-    render: () => (
-      <Tab.Pane attached={false}>
-        <ResultList component={Contribution} />
-      </Tab.Pane>
-    ),
-  },
-  {
-    menuItem: 'Event',
-    render: () => (
-      <Tab.Pane attached={false}>
-        <ResultList component={Event} />
-      </Tab.Pane>
-    ),
-  },
-  {
-    menuItem: 'File',
-    render: () => (
-      <Tab.Pane attached={false}>
-        <ResultList component={File} />
-      </Tab.Pane>
-    ),
-  },
-];
+import data1 from '../../../data/category_data';
+import data2 from '../../../data/contribution_data';
+import data3 from '../../../data/event_data';
+import data4 from '../../../data/file_data';
+
+const datasetSelector = filter => {
+  if (filter === 'Category') {
+    return data1;
+  } else if (filter === 'Contribution') {
+    return data2;
+  } else if (filter === 'Event') {
+    return data3;
+  } else if (filter === 'File') {
+    return data4;
+  } else return [];
+};
 
 export default function SearchApp() {
-  return <Tab stylename="search" menu={{secondary: true, pointing: true}} panes={panes} />;
+  const [activeMenuItem, setActiveMenuItem] = useState('Category');
+  const [allData, setAllData] = useState(datasetSelector(activeMenuItem));
+  const handleClick = (e, {name}) => {
+    setActiveMenuItem(name);
+    setAllData(datasetSelector(name));
+  };
+
+  return (
+    <div>
+      <Menu pointing secondary>
+        <Menu.Item name="Category" active={activeMenuItem === 'Category'} onClick={handleClick} />
+        <Menu.Item
+          name="Contribution"
+          active={activeMenuItem === 'Contribution'}
+          onClick={handleClick}
+        />
+        <Menu.Item name="Event" active={activeMenuItem === 'Event'} onClick={handleClick} />
+        <Menu.Item name="File" active={activeMenuItem === 'File'} onClick={handleClick} />
+      </Menu>
+
+      {activeMenuItem === 'Category' && <ResultList component={Category} allData={allData} />}
+      {activeMenuItem === 'Contribution' && (
+        <ResultList component={Contribution} allData={allData} />
+      )}
+      {activeMenuItem === 'Event' && <ResultList component={Event} allData={allData} />}
+      {activeMenuItem === 'File' && <ResultList component={File} allData={allData} />}
+    </div>
+  );
 }

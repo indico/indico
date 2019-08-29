@@ -5,7 +5,7 @@ import moment from 'moment';
 
 import '../ResultList.module.scss';
 
-const Contribution = ({title, authors, startDate, event, url}) => (
+const Contribution = ({title, authors, startDate, url}) => (
   <>
     <List.Header>
       <a href={`https://blackhole.cern.ch${url}`}>{title}</a>
@@ -33,7 +33,6 @@ Contribution.propTypes = {
   title: PropTypes.string.isRequired,
   authors: PropTypes.arrayOf(PropTypes.string).isRequired,
   startDate: PropTypes.string.isRequired,
-  event: PropTypes.string.isRequired,
   url: PropTypes.string.isRequired,
 };
 export default Contribution;

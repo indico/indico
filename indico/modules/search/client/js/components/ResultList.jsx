@@ -5,35 +5,28 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React from 'react';
-import {List} from 'semantic-ui-react';
+import React, {useState, useEffect} from 'react';
+import {List, Segment} from 'semantic-ui-react';
 import PropTypes from 'prop-types';
 import './ResultList.module.scss';
-import data1 from '../../../data/category_data';
-import data2 from '../../../data/contribution_data';
-import data3 from '../../../data/event_data';
-import data4 from '../../../data/file_data';
 import SearchPagination from './SearchPagination';
 
-const datasetSelector = filter => {
-  if (filter === 'Category') {
-    return data1;
-  } else if (filter === 'Contribution') {
-    return data2;
-  } else if (filter === 'Event') {
-    return data3;
-  } else if (filter === 'File') {
-    return data4;
-  } else return [];
-};
+export default function ResultList({component: Component, allData}) {
+  // const data = datasetSelector(Component.name);
+  const recPerPage = 7;
+  const [dataToShow, setDataToShow] = useState(allData.slice(0, recPerPage));
+  const [activePage, setActivePage] = useState(1);
+  const numOfPages = allData.length / recPerPage;
 
-export default function ResultList({component: Component}) {
-  const data = datasetSelector(Component.name);
+  useEffect(() => {
+    setDataToShow(allData.slice((activePage - 1) * recPerPage, activePage * recPerPage));
+  }, [activePage, allData]);
+
   return (
-    <SearchPagination data={data}>
-      {items => (
+    <>
+      <Segment>
         <List divided relaxed>
-          {items.map(item => (
+          {dataToShow.map(item => (
             <List.Item key={item.url}>
               <List.Content styleName="list">
                 <Component {...item} />
@@ -41,13 +34,19 @@ export default function ResultList({component: Component}) {
             </List.Item>
           ))}
         </List>
-      )}
-    </SearchPagination>
+      </Segment>
+      <SearchPagination
+        activePage={activePage}
+        numOfPages={numOfPages}
+        setActivePage={setActivePage}
+      />
+    </>
   );
 }
 
 ResultList.propTypes = {
   component: PropTypes.elementType.isRequired,
+  allData: PropTypes.array.isRequired,
 };
 
 // also fix the descriptions in events and files to be more user friendly

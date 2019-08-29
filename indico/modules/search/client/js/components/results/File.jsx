@@ -1,7 +1,8 @@
 import React from 'react';
-import {List} from 'semantic-ui-react';
+import {List, Icon} from 'semantic-ui-react';
 import PropTypes from 'prop-types';
 import '../ResultList.module.scss';
+import moment from 'moment';
 
 const File = ({title, authors, date, url}) => (
   <>
@@ -10,8 +11,18 @@ const File = ({title, authors, date, url}) => (
     </List.Header>
     <List.Description>
       <List>
-        <List.Item>{authors.join(' ')}</List.Item>
-        <List.Item>{date}</List.Item>
+        <List.Item>
+          {authors.join(' ') && (
+            <>
+              <Icon name="pencil alternate" />
+              {authors.join(', ')}{' '}
+            </>
+          )}
+        </List.Item>
+        <List.Item>
+          <Icon name="calendar alternate outline" />
+          {moment(date).format('DD/MM/YYYY')}
+        </List.Item>
       </List>
     </List.Description>
   </>
