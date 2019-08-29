@@ -35,11 +35,13 @@ export default function ResultList({component: Component, allData}) {
           ))}
         </List>
       </Segment>
-      <SearchPagination
-        activePage={activePage}
-        numOfPages={numOfPages}
-        setActivePage={setActivePage}
-      />
+      {numOfPages !== 1 && (
+        <SearchPagination
+          activePage={activePage}
+          numOfPages={numOfPages}
+          setActivePage={setActivePage}
+        />
+      )}
     </>
   );
 }
