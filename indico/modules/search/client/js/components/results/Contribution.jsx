@@ -12,14 +12,13 @@ const Contribution = ({title, authors, startDate, url}) => (
     </List.Header>
     <List.Description>
       <List>
-        <List.Item>
-          {authors.join(' ') && (
-            <>
-              <Icon name="pencil alternate" />
-              {authors.join(', ')}{' '}
-            </>
-          )}
-        </List.Item>
+        {authors.join(' ') && (
+          <List.Item>
+            <Icon name="pencil alternate" />
+            {authors.join(', ')}{' '}
+          </List.Item>
+        )}
+
         <List.Item>
           <Icon name="calendar alternate outline" />
           {moment(startDate).format('DD/MM/YYYY')}

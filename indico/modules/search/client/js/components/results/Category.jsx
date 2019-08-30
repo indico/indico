@@ -13,24 +13,26 @@ const Category = ({title, path, url}) => {
       </List.Header>
       {path.length !== 0 && (
         <List.Description>
-          <span>&nbsp;</span>
-          <Breadcrumb>
-            {array.map(item => (
-              <Breadcrumb.Section key={item}>
-                <span styleName="category">
-                  <a href="https://www.google.com">
-                    {item}
+          <List>
+            <span>&nbsp;</span>
+            <Breadcrumb>
+              {array.map(item => (
+                <Breadcrumb.Section key={item}>
+                  <span styleName="category">
+                    <a href="https://www.google.com">
+                      {item}
+                      <span>&nbsp;</span>
+                    </a>
+                    {' » '}
                     <span>&nbsp;</span>
-                  </a>
-                  {' » '}
-                  <span>&nbsp;</span>
-                </span>
+                  </span>
+                </Breadcrumb.Section>
+              ))}
+              <Breadcrumb.Section active styleName="category">
+                {path[path.length - 1]}
               </Breadcrumb.Section>
-            ))}
-            <Breadcrumb.Section active styleName="category">
-              {path[path.length - 1]}
-            </Breadcrumb.Section>
-          </Breadcrumb>
+            </Breadcrumb>
+          </List>
         </List.Description>
       )}
     </>
