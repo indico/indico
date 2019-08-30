@@ -27,7 +27,7 @@ export default function ResultList({component: Component, allData}) {
       <Segment>
         <List divided relaxed>
           {dataToShow.map(item => (
-            <List.Item key={item.url}>
+            <List.Item key={item.id}>
               <List.Content styleName="list">
                 <Component {...item} />
               </List.Content>

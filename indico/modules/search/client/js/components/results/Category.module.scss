@@ -5,10 +5,21 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-.category {
-    font-size: 13px;
 
-    a {
+.category {
+    padding: 1em 0;
+    .description {
+        padding: 0.5em 0;
+    }
+    .list {
         font-size: 13px;
+            // text-decoration-color: dimgrey;
+            // font-style: italic;
+            // color: dimgrey;
+        a , a:hover {
+            font-size: 13px;
+            font-style: italic;
+            color: dimgrey;
+        }
     }
 }

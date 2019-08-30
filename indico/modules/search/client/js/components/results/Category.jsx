@@ -7,35 +7,35 @@ const Category = ({title, path, url}) => {
   const array = path.slice(0, path.length - 1);
 
   return (
-    <>
+    <div styleName="category">
       <List.Header>
         <a href={`https://blackhole.cern.ch${url}`}>{title}</a>
       </List.Header>
-      {path.length !== 0 && (
-        <List.Description>
-          <List>
-            <span>&nbsp;</span>
+      <div styleName="description">
+        {path.length !== 0 && (
+          <List.Description>
             <Breadcrumb>
               {array.map(item => (
-                <Breadcrumb.Section key={item}>
-                  <span styleName="category">
-                    <a href="https://www.google.com">
-                      {item}
-                      <span>&nbsp;</span>
-                    </a>
-                    {' » '}
+                <Breadcrumb.Section key={item} styleName="list">
+                  <a href="https://www.google.com">
+                    {item}
                     <span>&nbsp;</span>
-                  </span>
+                  </a>
+                  {' » '}
+                  <span>&nbsp;</span>
                 </Breadcrumb.Section>
               ))}
-              <Breadcrumb.Section active styleName="category">
-                {path[path.length - 1]}
+              <Breadcrumb.Section active styleName="list">
+                <a href="https://www.google.com">
+                  {path[path.length - 1]}
+                  <span>&nbsp;</span>
+                </a>
               </Breadcrumb.Section>
             </Breadcrumb>
-          </List>
-        </List.Description>
-      )}
-    </>
+          </List.Description>
+        )}
+      </div>
+    </div>
   );
 };
 

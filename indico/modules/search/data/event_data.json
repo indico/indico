@@ -1,372 +1,76 @@
-[
-  {
-    "title": "EventFlynn",
-    "authors": [
-      "Sharp Alford",
-      "Tracey Holden",
-      "Velez Clayton",
-      "Mosley Mcintosh"
-    ],
-    "startDate": "2019-08-28T12:24:19.313549",
-    "endDate": "2019-08-28T12:24:19.313549",
-    "location": "exercitation voluptate proident",
-    "url": "/event/44260/"
+[{
+  "id": "1211",
+  "event_type": "meeting",
+  "title": "Upgrade Planning Meeting",
+  "URL": "https://indico.cern.ch/event/844788/",
+  "description": "",
+  "category_path": [
+      ["Home", "https://indico.cern.ch/category/0/"],
+      ["Experiments", "https://indico.cern.ch/category/6740/"],
+      ["ATLAS Meetings", "https://indico.cern.ch/category/6733/"]
+  ],
+  "start_dt": "2019-04-01Z16:00",
+  "end_dt": "2019-04-01Z17:15",
+  "location": {
+      "venue": "CERN",
+      "room": "513/1-024"
+  },
+  "speakers": [{
+      "name": "Ted Smith",
+      "affiliation": "University of Bunga Wunga"
+  }]
+},
+{
+  "id": "131442",
+  "event_type": "conference",
+  "title": "New Horizons in Physics",
+  "URL": "https://indico.cern.ch/event/844788/",
+  "description": "This conference will discuss very interesting things, among which the origin of life and why salty popcorn even exists",
+  "category_path": [
+      ["Home", "https://indico.cern.ch/category/0/"],
+      ["Conferences, Workshops and Events", "https://indico.cern.ch/category/6741/"],
+      ["Conferences", "https://indico.cern.ch/category/6725/"]
+  ],
+  "start_dt": "2019-01-02Z11:00",
+  "end_dt": "2019-01-07Z18:00",
+  "location": {
+      "venue": "CERN",
+      "room": "500/1-001 - Main Auditorium"
+  },
+  "chairs": [{
+      "name": "John Martin",
+      "affiliation": "Institute of Amazing Research"
+  }, {
+      "title": "Dr",
+      "name": "Sarah Connor",
+      "affiliation": "Institute of Advanced Cybernetics"
+  }]
+},
+{
+  "id": "784923",
+  "event_type": "lecture",
+  "title": "The Story of my Life",
+  "URL": "https://indico.cern.ch/event/844788/",
+  "description": "It's sad, sometimes tragic, but great for a TED Talk.",
+  "category_path": [
+      ["Home", "https://indico.cern.ch/category/0/"],
+      ["Conferences, Workshops and Events", "https://indico.cern.ch/category/6741/"],
+      ["Events", "https://indico.cern.ch/category/6735/"],
+      ["Commemorations", "https://indico.cern.ch/category/6767/"]
+  ],
+  "start_dt": "2019-08-21Z18:00",
+  "end_dt": "2019-08-21Z19:00",
+  "location": {
+      "venue": "CERN",
+      "room": "500/1-001 - Main Auditorium"
+  },
+  "speakers": [{
+      "title": "Mr",
+      "name": "Ronald Drump",
+      "affiliation": "Very Amazing School of Arts"
   },
   {
-    "title": "EventRobertson",
-    "authors": [
-      "Levy Carson",
-      "Mona Hebert"
-    ],
-    "startDate": "2019-08-28T12:24:19.313549",
-    "endDate": "2019-08-28T12:24:19.313549",
-    "location": "anim quis velit",
-    "url": "/event/48045/"
-  },
-  {
-    "title": "EventHolly",
-    "authors": [],
-    "startDate": "2019-08-28T12:24:19.313549",
-    "endDate": "2019-08-28T12:24:19.313549",
-    "location": "ipsum ex deserunt",
-    "url": "/event/67979/"
-  },
-  {
-    "title": "EventKathleen",
-    "authors": [
-      "Stevenson Zamora"
-    ],
-    "startDate": "2019-08-28T12:24:19.313549",
-    "endDate": "2019-08-28T12:24:19.313549",
-    "location": "elit cupidatat duis",
-    "url": "/event/69708/"
-  },
-  {
-    "title": "EventHale",
-    "authors": [],
-    "startDate": "2019-08-28T12:24:19.313549",
-    "endDate": "2019-08-28T12:24:19.313549",
-    "location": "ullamco id voluptate",
-    "url": "/event/22841/"
-  },
-  {
-    "title": "EventElizabeth",
-    "authors": [
-      "Montgomery Jenkins",
-      "Serrano Hull"
-    ],
-    "startDate": "2019-08-28T12:24:19.313549",
-    "endDate": "2019-08-28T12:24:19.313549",
-    "location": "sint magna eiusmod",
-    "url": "/event/22225/"
-  },
-  {
-    "title": "EventKerri",
-    "authors": [
-      "Meagan Sexton",
-      "Bette Daniels",
-      "Dunlap Delacruz",
-      "Bonner Marks"
-    ],
-    "startDate": "2019-08-28T12:24:19.313549",
-    "endDate": "2019-08-28T12:24:19.313549",
-    "location": "fugiat dolore quis",
-    "url": "/event/65301/"
-  },
-  {
-    "title": "EventReva",
-    "authors": [
-      "Madeline West",
-      "Susie Morse",
-      "Mcguire Ross",
-      "Hillary Nixon"
-    ],
-    "startDate": "2019-08-28T12:24:19.313549",
-    "endDate": "2019-08-28T12:24:19.313549",
-    "location": "nostrud incididunt pariatur",
-    "url": "/event/37117/"
-  },
-  {
-    "title": "EventHelen",
-    "authors": [
-      "Marsha Chase",
-      "Kris Hall"
-    ],
-    "startDate": "2019-08-28T12:24:19.313549",
-    "endDate": "2019-08-28T12:24:19.313549",
-    "location": "sunt voluptate cillum",
-    "url": "/event/60079/"
-  },
-  {
-    "title": "EventWong",
-    "authors": [
-      "Margie Mclean",
-      "Gilda Sykes",
-      "Beth Myers",
-      "Wilkerson Dyer"
-    ],
-    "startDate": "2019-08-28T12:24:19.313549",
-    "endDate": "2019-08-28T12:24:19.313549",
-    "location": "dolor velit ipsum",
-    "url": "/event/22895/"
-  },
-  {
-    "title": "EventTerra",
-    "authors": [
-      "Monique Porter",
-      "Robyn Wynn",
-      "Pierce Crosby"
-    ],
-    "startDate": "2019-08-28T12:24:19.313549",
-    "endDate": "2019-08-28T12:24:19.313549",
-    "location": "pariatur incididunt Lorem",
-    "url": "/event/42174/"
-  },
-  {
-    "title": "EventFrieda",
-    "authors": [],
-    "startDate": "2019-08-28T12:24:19.313549",
-    "endDate": "2019-08-28T12:24:19.313549",
-    "location": "aute ea non",
-    "url": "/event/34137/"
-  },
-  {
-    "title": "EventRoach",
-    "authors": [
-      "Henry Dickson"
-    ],
-    "startDate": "2019-08-28T12:24:19.313549",
-    "endDate": "2019-08-28T12:24:19.313549",
-    "location": "ad et eiusmod",
-    "url": "/event/12951/"
-  },
-  {
-    "title": "EventEugenia",
-    "authors": [
-      "Keri Buckner",
-      "Adriana Juarez"
-    ],
-    "startDate": "2019-08-28T12:24:19.313549",
-    "endDate": "2019-08-28T12:24:19.313549",
-    "location": "aliquip officia adipisicing",
-    "url": "/event/68592/"
-  },
-  {
-    "title": "EventSharon",
-    "authors": [
-      "Lopez Dotson",
-      "Latasha Charles"
-    ],
-    "startDate": "2019-08-28T12:24:19.313549",
-    "endDate": "2019-08-28T12:24:19.313549",
-    "location": "irure aute ullamco",
-    "url": "/event/63560/"
-  },
-  {
-    "title": "EventKerr",
-    "authors": [
-      "Herrera Collins",
-      "Kristine Pena"
-    ],
-    "startDate": "2019-08-28T12:24:19.313549",
-    "endDate": "2019-08-28T12:24:19.313549",
-    "location": "incididunt velit qui",
-    "url": "/event/13484/"
-  },
-  {
-    "title": "EventLindsay",
-    "authors": [
-      "Skinner Kinney",
-      "Amparo Noel",
-      "Koch Mcclure",
-      "Barker Ratliff"
-    ],
-    "startDate": "2019-08-28T12:24:19.313549",
-    "endDate": "2019-08-28T12:24:19.313549",
-    "location": "esse aliqua eiusmod",
-    "url": "/event/37857/"
-  },
-  {
-    "title": "EventMillicent",
-    "authors": [
-      "Bernadette Meyer",
-      "Rochelle Cline"
-    ],
-    "startDate": "2019-08-28T12:24:19.313549",
-    "endDate": "2019-08-28T12:24:19.313549",
-    "location": "ex elit in",
-    "url": "/event/23407/"
-  },
-  {
-    "title": "EventAlvarez",
-    "authors": [
-      "Montoya Conrad"
-    ],
-    "startDate": "2019-08-28T12:24:19.313549",
-    "endDate": "2019-08-28T12:24:19.313549",
-    "location": "esse officia eu",
-    "url": "/event/19772/"
-  },
-  {
-    "title": "EventChurch",
-    "authors": [],
-    "startDate": "2019-08-28T12:24:19.313549",
-    "endDate": "2019-08-28T12:24:19.313549",
-    "location": "consequat ipsum laborum",
-    "url": "/event/10673/"
-  },
-  {
-    "title": "EventElla",
-    "authors": [
-      "Lorraine Rosales",
-      "Teresa Carroll",
-      "Hernandez Clay",
-      "Bishop Dunn"
-    ],
-    "startDate": "2019-08-28T12:24:19.313549",
-    "endDate": "2019-08-28T12:24:19.313549",
-    "location": "tempor eu ut",
-    "url": "/event/30444/"
-  },
-  {
-    "title": "EventAugusta",
-    "authors": [
-      "Mcbride Moran",
-      "Gallagher Maxwell",
-      "Workman Harvey"
-    ],
-    "startDate": "2019-08-28T12:24:19.313549",
-    "endDate": "2019-08-28T12:24:19.313549",
-    "location": "occaecat elit laborum",
-    "url": "/event/39823/"
-  },
-  {
-    "title": "EventCarter",
-    "authors": [
-      "Floyd Holcomb",
-      "Gertrude Ward",
-      "Tricia Campos"
-    ],
-    "startDate": "2019-08-28T12:24:19.313549",
-    "endDate": "2019-08-28T12:24:19.313549",
-    "location": "excepteur nulla nulla",
-    "url": "/event/45458/"
-  },
-  {
-    "title": "EventPayne",
-    "authors": [
-      "Geneva Romero",
-      "Candice Coffey",
-      "Shawn Kirby",
-      "Luann Johnson"
-    ],
-    "startDate": "2019-08-28T12:24:19.313549",
-    "endDate": "2019-08-28T12:24:19.313549",
-    "location": "ad culpa elit",
-    "url": "/event/46113/"
-  },
-  {
-    "title": "EventAdrian",
-    "authors": [
-      "Ilene Downs",
-      "Knight Serrano"
-    ],
-    "startDate": "2019-08-28T12:24:19.313549",
-    "endDate": "2019-08-28T12:24:19.313549",
-    "location": "aliquip eiusmod ex",
-    "url": "/event/30075/"
-  },
-  {
-    "title": "EventSheena",
-    "authors": [
-      "Rosalinda Garner",
-      "Emily Mckenzie",
-      "Toni Rivas"
-    ],
-    "startDate": "2019-08-28T12:24:19.313549",
-    "endDate": "2019-08-28T12:24:19.313549",
-    "location": "laborum dolor ea",
-    "url": "/event/67916/"
-  },
-  {
-    "title": "EventHamilton",
-    "authors": [],
-    "startDate": "2019-08-28T12:24:19.313549",
-    "endDate": "2019-08-28T12:24:19.313549",
-    "location": "laboris occaecat velit",
-    "url": "/event/40685/"
-  },
-  {
-    "title": "EventGrace",
-    "authors": [
-      "Dillon Tran",
-      "Liliana Cochran",
-      "Nettie Mason",
-      "Yates Randolph"
-    ],
-    "startDate": "2019-08-28T12:24:19.313549",
-    "endDate": "2019-08-28T12:24:19.313549",
-    "location": "cillum nisi laborum",
-    "url": "/event/59176/"
-  },
-  {
-    "title": "EventBeverly",
-    "authors": [
-      "Yang Randall",
-      "Booker Knapp",
-      "Ofelia Cooper",
-      "Deirdre Fulton"
-    ],
-    "startDate": "2019-08-28T12:24:19.313549",
-    "endDate": "2019-08-28T12:24:19.313549",
-    "location": "eiusmod tempor est",
-    "url": "/event/21484/"
-  },
-  {
-    "title": "EventBaker",
-    "authors": [
-      "Richard Hancock",
-      "Gallegos Gibson"
-    ],
-    "startDate": "2019-08-28T12:24:19.313549",
-    "endDate": "2019-08-28T12:24:19.313549",
-    "location": "labore incididunt nulla",
-    "url": "/event/31484/"
-  },
-  {
-    "title": "EventHayden",
-    "authors": [],
-    "startDate": "2019-08-28T12:24:19.313549",
-    "endDate": "2019-08-28T12:24:19.313549",
-    "location": "exercitation cillum laboris",
-    "url": "/event/51584/"
-  },
-  {
-    "title": "EventMann",
-    "authors": [],
-    "startDate": "2019-08-28T12:24:19.313549",
-    "endDate": "2019-08-28T12:24:19.313549",
-    "location": "occaecat ea adipisicing",
-    "url": "/event/49875/"
-  },
-  {
-    "title": "EventNancy",
-    "authors": [
-      "Martin Santos"
-    ],
-    "startDate": "2019-08-28T12:24:19.313549",
-    "endDate": "2019-08-28T12:24:19.313549",
-    "location": "enim commodo nostrud",
-    "url": "/event/52203/"
-  },
-  {
-    "title": "EventGomez",
-    "authors": [
-      "Schneider Cotton"
-    ],
-    "startDate": "2019-08-28T12:24:19.313549",
-    "endDate": "2019-08-28T12:24:19.313549",
-    "location": "est nulla nulla",
-    "url": "/event/68909/"
-  }
-]
+    "name": "Tsipras",
+    "affiliation": "Greek Ministry"
+    }]
+}]
