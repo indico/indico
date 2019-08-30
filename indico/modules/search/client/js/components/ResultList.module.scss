@@ -8,13 +8,9 @@
 .list {
     a {
         font-size: 18px;
+
         &:hover {
             text-decoration: underline;
         }
     }
-}
-
-.description {
-    font-weight: bold;
-    font-size: 15px;
 }
