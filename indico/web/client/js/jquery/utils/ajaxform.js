@@ -203,10 +203,12 @@
           } else if (data.html) {
             showForm(data);
             // restore files in dropzone fields
-            $.each(savedFiles, function(id, files) {
-              setDropzoneFiles($('#' + id), files);
+            $form.ready(function() {
+              $.each(savedFiles, function(id, files) {
+                setDropzoneFiles($('#' + id), files);
+              });
+              savedFiles = {};
             });
-            savedFiles = {};
           }
         });
     }
