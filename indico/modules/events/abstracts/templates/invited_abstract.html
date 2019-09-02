@@ -1,0 +1,33 @@
+{% extends 'events/abstracts/display/_base.html' %}
+
+{% from 'message_box.html' import message_box %}
+{% from 'forms/_form.html' import form_header, form_rows, form_footer, form_row %}
+
+{% block page_content_class %}{% endblock %}
+
+{% block title %}
+    {% trans %}
+        Submit an abstract
+    {% endtrans %}
+{% endblock %}
+
+{% block content %}
+    {% call message_box('info') -%}
+        {% trans %}
+            You have been invited to submit an abstract in this event.
+            After you submit the abstract it will subject to the reviewing process.
+        {% endtrans %}
+    {%- endcall %}
+    <div class="invited-abstract-form-container">
+        {% call form_header(form, action=url_for('.submit_invited_abstract', abstract)) %}
+            data-href="{{ url_for('.submit_invited_abstract', abstract) }}"
+            data-form-container=".invited-abstract-form-container"
+            data-ajax-form
+            data-confirm-close-unsaved
+        {% endcall %}
+        {{ form_rows(form) }}
+        {% call form_footer(form) %}
+            <input class="i-button big highlight" data-disabled-until-change type="submit" value="{% trans %}Submit{% endtrans %}">
+        {% endcall %}
+    </div>
+{% endblock %}
