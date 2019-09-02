@@ -557,7 +557,7 @@ class SendNotificationsMixin(object):
 
 
 class InvitedAbstractMixin(IndicoForm):
-    submitter = PrincipalField(_('Submitter'), [DataRequired()],
+    submitter = PrincipalField(_('Submitter'), [DataRequired()], allow_external=True,
                                description=_('The person invited to submit the abstract'))
 
 
