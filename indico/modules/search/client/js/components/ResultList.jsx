@@ -5,42 +5,55 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React, {useState, useEffect} from 'react';
-import {List, Segment} from 'semantic-ui-react';
+import React from 'react';
+import {List, Placeholder, Segment} from 'semantic-ui-react';
 import PropTypes from 'prop-types';
 import './ResultList.module.scss';
 import SearchPagination from './SearchPagination';
 
-export default function ResultList({component: Component, allData}) {
-  // const data = datasetSelector(Component.name);
-  const recPerPage = 7;
-  const [dataToShow, setDataToShow] = useState(allData.slice(0, recPerPage));
-  const [activePage, setActivePage] = useState(1);
-  const numOfPages = allData.length / recPerPage;
-
-  useEffect(() => {
-    setDataToShow(allData.slice((activePage - 1) * recPerPage, activePage * recPerPage));
-  }, [activePage, allData]);
-
+export default function ResultList({
+  component: Component,
+  page,
+  numPages,
+  data,
+  loading,
+  onPageChange,
+}) {
   return (
     <>
       <Segment>
         <List divided relaxed>
-          {dataToShow.map(item => (
-            <List.Item key={item.id}>
-              <List.Content styleName="list">
-                <Component {...item} />
-              </List.Content>
-            </List.Item>
-          ))}
+          {loading ? (
+            <Placeholder>
+              <Placeholder.Paragraph>
+                <Placeholder.Line />
+                <Placeholder.Line />
+                <Placeholder.Line />
+              </Placeholder.Paragraph>
+              <Placeholder.Paragraph>
+                <Placeholder.Line />
+                <Placeholder.Line />
+                <Placeholder.Line />
+              </Placeholder.Paragraph>
+              <Placeholder.Paragraph>
+                <Placeholder.Line />
+                <Placeholder.Line />
+                <Placeholder.Line />
+              </Placeholder.Paragraph>
+            </Placeholder>
+          ) : (
+            data.map(item => (
+              <List.Item key={item.id}>
+                <List.Content styleName="list">
+                  <Component {...item} />
+                </List.Content>
+              </List.Item>
+            ))
+          )}
         </List>
       </Segment>
-      {numOfPages > 1 && (
-        <SearchPagination
-          activePage={activePage}
-          numOfPages={numOfPages}
-          setActivePage={setActivePage}
-        />
+      {numPages > 1 && (
+        <SearchPagination activePage={page} numOfPages={numPages} onPageChange={onPageChange} />
       )}
     </>
   );
@@ -48,5 +61,9 @@ export default function ResultList({component: Component, allData}) {
 
 ResultList.propTypes = {
   component: PropTypes.elementType.isRequired,
-  allData: PropTypes.array.isRequired,
+  page: PropTypes.number.isRequired,
+  numPages: PropTypes.number.isRequired,
+  data: PropTypes.arrayOf(PropTypes.object).isRequired,
+  loading: PropTypes.bool.isRequired,
+  onPageChange: PropTypes.func.isRequired,
 };

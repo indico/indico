@@ -3,17 +3,17 @@ import PropTypes from 'prop-types';
 import {Pagination} from 'semantic-ui-react';
 import './SearchPagination.module.scss';
 
-export default function SearchPagination({activePage, numOfPages, setActivePage}) {
-  const onChange = (e, {activePage: active}) => {
+export default function SearchPagination({activePage, numOfPages, onPageChange}) {
+  const handlePageChange = (e, {activePage: active}) => {
     e.preventDefault();
-    setActivePage(active);
+    onPageChange(active);
   };
 
   return (
     <div styleName="pagination">
       <Pagination
         activePage={activePage}
-        onPageChange={onChange}
+        onPageChange={handlePageChange}
         totalPages={numOfPages}
         boundaryRange={1}
         ellipsisItem={null}
@@ -28,5 +28,5 @@ export default function SearchPagination({activePage, numOfPages, setActivePage}
 SearchPagination.propTypes = {
   activePage: PropTypes.number.isRequired,
   numOfPages: PropTypes.number.isRequired,
-  setActivePage: PropTypes.func.isRequired,
+  onPageChange: PropTypes.func.isRequired,
 };

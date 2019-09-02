@@ -1,16 +1,18 @@
 import React, {useState} from 'react';
+import PropTypes from 'prop-types';
 import {Form, Input} from 'semantic-ui-react';
+import {Translate} from 'indico/react/i18n';
 import './SearchBar.module.scss';
 
-export default function SearchBar() {
+export default function SearchBar({onSearch}) {
   const [value, setValue] = useState('');
   const handleChange = event => {
     setValue(event.target.value);
   };
 
   const handleSubmit = event => {
-    alert(`${value} was submitted`);
     event.preventDefault();
+    onSearch(value);
   };
 
   return (
@@ -18,8 +20,8 @@ export default function SearchBar() {
       <Form onSubmit={handleSubmit}>
         <Form.Group>
           <Input
-            action="Search"
-            placeholder="Search..."
+            action={Translate.string('Search')}
+            placeholder={Translate.string('Enter your search term')}
             value={value}
             onChange={handleChange}
             styleName="field"
@@ -29,3 +31,7 @@ export default function SearchBar() {
     </div>
   );
 }
+
+SearchBar.propTypes = {
+  onSearch: PropTypes.func.isRequired,
+};

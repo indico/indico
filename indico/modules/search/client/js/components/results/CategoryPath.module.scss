@@ -6,10 +6,14 @@
 
 @import 'base/palette';
 
-.category {
-    padding: 1em 0;
+.path:global(.ui.breadcrumb) {
+    :global(a.section), :global(a.section:hover) {
+        font-size: 13px;
+        font-style: italic;
+        color: $dark-gray;
+    }
 
-    .description {
-        padding: 0.5em 0;
+    :global(.divider) {
+        color: $dark-gray;
     }
 }

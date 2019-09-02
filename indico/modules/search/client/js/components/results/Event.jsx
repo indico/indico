@@ -6,32 +6,36 @@ import './Event.module.scss';
 import moment from 'moment';
 
 const Event = ({
-  id,
-  event_type,
+  // id,
+  type,
   title,
-  URL,
-  description,
-  category_path,
-  start_dt,
-  end_dt,
-  location,
+  url,
+  // description,
+  categoryPath,
+  startDt,
+  endDt,
+  // location,
   speakers,
   chairs,
 }) => {
   const singleDay =
-    moment(start_dt, 'YYYY-MM-DDZhh:mm').format('ll') ===
-    moment(end_dt, 'YYYY-MM-DDZhh:mm').format('ll');
-  const multipleDays = !singleDay;
-  const array = category_path.slice(0, category_path.length - 1);
+    moment(startDt, 'YYYY-MM-DDZhh:mm').format('ll') ===
+    moment(endDt, 'YYYY-MM-DDZhh:mm').format('ll');
+
+  const sections = categoryPath.map(item => ({
+    key: item.id,
+    href: item.url,
+    content: item.title,
+  }));
 
   return (
     <div styleName="event">
       <List.Header>
-        <a href={URL}>{title}</a>
+        <a href={url}>{title}</a>
       </List.Header>
       <List.Description styleName="description">
         {/* if it's a lecture print the list of speakers */}
-        {event_type === 'lecture' && speakers.length !== 0 && (
+        {type === 'lecture' && speakers.length !== 0 && (
           <List.Item styleName="high-priority">
             {speakers.map(i => (
               <div key={i.name}>
@@ -45,37 +49,19 @@ const Event = ({
 
         {/* Dates */}
         {/* if end date == start date only show start date */}
-        {singleDay && (
+        {singleDay ? (
           <List.Item styleName="med-priority">
-            {moment(start_dt, 'YYYY-MM-DDZhh:mm').format('DD MMMM YYYY HH:mm')}
+            {moment(startDt, 'YYYY-MM-DDZhh:mm').format('DD MMMM YYYY HH:mm')}
           </List.Item>
-        )}
-        {multipleDays && (
+        ) : (
           <List.Item styleName="med-priority">
-            {`${moment(start_dt, 'YYYY-MM-DDZhh:mm').format('DD MMMM')} -
-              ${moment(end_dt, 'YYYY-MM-DDZhh:mm').format('DD MMMM YYYY')}`}
+            {`${moment(startDt, 'YYYY-MM-DDZhh:mm').format('DD MMMM')} -
+              ${moment(endDt, 'YYYY-MM-DDZhh:mm').format('DD MMMM YYYY')}`}
           </List.Item>
         )}
         {/* Render the path */}
         <List.Item>
-          <Breadcrumb styleName="low-priority">
-            {array.map(item => (
-              <Breadcrumb.Section key={item}>
-                <a href={item[1]}>
-                  {item[0]}
-                  <span>&nbsp;</span>
-                </a>
-                {' » '}
-                <span>&nbsp;</span>
-              </Breadcrumb.Section>
-            ))}
-            <Breadcrumb.Section active>
-              <a href={category_path[category_path.length - 1][1]}>
-                {category_path[category_path.length - 1][0]}
-                <span>&nbsp;</span>
-              </a>
-            </Breadcrumb.Section>
-          </Breadcrumb>
+          <Breadcrumb styleName="low-priority" divider="»" sections={sections} />
         </List.Item>
       </List.Description>
     </div>
@@ -87,18 +73,30 @@ Event.defaultProps = {
   chairs: [],
 };
 
-Event.propTypes = {
-  id: PropTypes.string.isRequired,
-  event_type: PropTypes.string.isRequired,
+const personShape = PropTypes.shape({
   title: PropTypes.string.isRequired,
-  URL: PropTypes.string.isRequired,
-  description: PropTypes.string.isRequired,
-  category_path: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.string)).isRequired,
-  start_dt: PropTypes.string.isRequired,
-  end_dt: PropTypes.string.isRequired,
-  location: PropTypes.object.isRequired,
-  speakers: PropTypes.arrayOf(PropTypes.object),
-  chairs: PropTypes.arrayOf(PropTypes.object),
+  name: PropTypes.string.isRequired,
+  affiliation: PropTypes.string.isRequired,
+});
+
+Event.propTypes = {
+  // id: PropTypes.number.isRequired,
+  type: PropTypes.oneOf(['lecture', 'meeting', 'conference']).isRequired,
+  title: PropTypes.string.isRequired,
+  url: PropTypes.string.isRequired,
+  // description: PropTypes.string.isRequired,
+  categoryPath: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      title: PropTypes.string.isRequired,
+      url: PropTypes.string.isRequired,
+    })
+  ).isRequired,
+  startDt: PropTypes.string.isRequired,
+  endDt: PropTypes.string.isRequired,
+  // location: PropTypes.object.isRequired,
+  speakers: PropTypes.arrayOf(personShape),
+  chairs: PropTypes.arrayOf(personShape),
 };
 
 export default Event;
