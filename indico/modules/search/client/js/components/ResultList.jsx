@@ -35,8 +35,7 @@ export default function ResultList({component: Component, allData}) {
           ))}
         </List>
       </Segment>
-      {console.log('the num of  pages is: ', numOfPages)}
-      {numOfPages !== 1 && (
+      {numOfPages > 1 && (
         <SearchPagination
           activePage={activePage}
           numOfPages={numOfPages}
