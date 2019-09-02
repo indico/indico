@@ -93,6 +93,23 @@ export default function SearchApp() {
   const [categoryResults, setCategoryPage] = useSearch(searchCategoriesURL(), query);
   const [eventResults, setEventPage] = useSearch(searchEventsURL(), query);
 
+  const resultMap = {
+    categories: categoryResults,
+    events: eventResults,
+  };
+  const resultTypes = ['categories', 'events'];
+
+  useEffect(() => {
+    if (Object.values(resultMap).some(x => x.loading) || resultMap[activeMenuItem].total !== 0) {
+      // don't switch while loading or if the currently active type has results
+      return;
+    }
+    const firstTypeWithResults = resultTypes.find(x => resultMap[x].total !== 0);
+    if (firstTypeWithResults) {
+      setActiveMenuItem(firstTypeWithResults);
+    }
+  }, [activeMenuItem, categoryResults, eventResults, resultMap, resultTypes]);
+
   return (
     <div>
       <SearchBar onSearch={setQuery} />
