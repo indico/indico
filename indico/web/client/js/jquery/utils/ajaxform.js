@@ -231,7 +231,7 @@
         url: $form.attr('action') || formUrl,
         dataType: 'json',
         beforeSubmit: function() {
-          if ($form.data('dropzoneField')) {
+          if ($form.data('dropzoneField') && $form.get(0).dropzone.files.length !== 0) {
             // Dropzone takes care of the form submission
             return false;
           }
