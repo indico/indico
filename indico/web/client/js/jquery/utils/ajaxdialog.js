@@ -83,6 +83,7 @@
     var customData = null;
     var oldOnBeforeUnload = null;
     var ignoreOnBeforeUnload = false;
+    var savedFiles = {};
 
     loadDialog();
 
@@ -295,6 +296,7 @@
         $this
           .on('ajaxForm:beforeSubmit', function() {
             killProgress = IndicoUI.Dialogs.Util.progress();
+            $.extend(savedFiles, getDropzoneFiles($this));
           })
           .on('ajaxForm:error', function(e, xhr) {
             if (killProgress) {
@@ -318,6 +320,7 @@
             handleFlashes(data, options.clearFlashes, options.trigger ? $(options.trigger) : null);
 
             if (data.close_dialog || data.success) {
+              savedFiles = {};
               closeDialog(data, true);
               if (data.redirect) {
                 if (!data.redirect_no_loading) {
@@ -327,6 +330,12 @@
               }
             } else if (data.html) {
               popup.contentContainer.html(data.html);
+              $this.ready(function() {
+                $.each(savedFiles, function(id, files) {
+                  setDropzoneFiles($('#' + id), files);
+                });
+                savedFiles = {};
+              });
               ajaxifyForms();
               injectJS(data.js);
             }
