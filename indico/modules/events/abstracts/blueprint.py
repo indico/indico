@@ -48,6 +48,8 @@ _bp.add_url_rule('/manage/book-of-abstracts.zip', 'export_boa_tex', boa.RHExport
 
 # Misc
 _bp.add_url_rule('/abstracts/other-list', 'other_abstracts', reviewing.RHListOtherAbstracts, methods=('POST',))
+_bp.add_url_rule('/abstracts/invited/<int:abstract_id>', 'submit_invited_abstract', display.RHSubmitInvitedAbstract,
+                 methods=('GET', 'POST'))
 
 # Management dashboard
 _bp.add_url_rule('/manage/abstracts/', 'management', management.RHAbstractsDashboard)

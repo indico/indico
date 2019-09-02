@@ -12,14 +12,16 @@ from werkzeug.exceptions import Forbidden
 
 from indico.core.errors import NoReportError
 from indico.legacy.pdfinterface.latex import AbstractsToPDF
-from indico.modules.events.abstracts.controllers.base import RHAbstractsBase
-from indico.modules.events.abstracts.operations import create_abstract
+from indico.modules.events.abstracts.controllers.base import RHAbstractBase, RHAbstractsBase
+from indico.modules.events.abstracts.models.abstracts import AbstractState
+from indico.modules.events.abstracts.operations import create_abstract, update_abstract
 from indico.modules.events.abstracts.util import get_user_abstracts, make_abstract_form
-from indico.modules.events.abstracts.views import WPDisplayCallForAbstracts
+from indico.modules.events.abstracts.views import WPDisplayAbstracts, WPDisplayCallForAbstracts
 from indico.modules.events.util import get_field_values
 from indico.util.i18n import _
 from indico.web.flask.util import send_file, url_for
-from indico.web.util import jsonify_data, jsonify_template
+from indico.web.forms.base import FormDefaults
+from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
 
 class RHCallForAbstracts(RHAbstractsBase):
@@ -68,3 +70,32 @@ class RHSubmitAbstract(RHAbstractsBase):
                   .format(abstract.title, abstract.friendly_id), 'success')
             return jsonify_data(flash=False, redirect=url_for('.call_for_abstracts', self.event))
         return jsonify_template('events/abstracts/display/submission.html', event=self.event, form=form)
+
+
+class RHSubmitInvitedAbstract(RHAbstractBase):
+    def _check_access(self):
+        RHAbstractBase._check_access(self)
+        if self.abstract.state != AbstractState.invited:
+            raise Forbidden
+
+    def _check_abstract_protection(self):
+        return self.abstract.can_edit(session.user) and self.abstract.submitter == session.user
+
+    def _create_form(self):
+        abstract_form_cls = make_abstract_form(self.event, session.user)
+        custom_field_values = {'custom_{}'.format(x.contribution_field_id): x.data for x in self.abstract.field_values}
+        form_defaults = FormDefaults(self.abstract, **custom_field_values)
+        return abstract_form_cls(obj=form_defaults, event=self.event, abstract=self.abstract)
+
+    def _process_GET(self):
+        form = self._create_form()
+        return WPDisplayAbstracts.render_template('invited_abstract.html', self.abstract.event, abstract=self.abstract,
+                                                  form=form)
+
+    def _process_POST(self):
+        form = self._create_form()
+        if form.validate_on_submit():
+            fields, custom_fields = get_field_values(form.data)
+            update_abstract(self.abstract, dict(fields, state=AbstractState.submitted), custom_fields)
+            return jsonify_data(flash=False, redirect=url_for('.call_for_abstracts', self.event))
+        return jsonify_form(form, form_header_kwargs={'action': url_for('.submit_invited_abstract', self.abstract)})

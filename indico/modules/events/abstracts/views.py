@@ -10,7 +10,6 @@ from __future__ import unicode_literals
 from flask import render_template, session
 
 from indico.modules.events.abstracts.util import filter_field_values, get_visible_reviewed_for_tracks
-from indico.modules.events.contributions.models.fields import ContributionFieldVisibility
 from indico.modules.events.management.views import WPEventManagement
 from indico.modules.events.views import WPConferenceDisplayBase
 from indico.util.mathjax import MathjaxMixin
@@ -27,8 +26,7 @@ class WPManageAbstracts(MathjaxMixin, WPEventManagement):
 
 class WPDisplayAbstractsBase(WPConferenceDisplayBase):
     template_prefix = 'events/abstracts/'
-    bundles = ('module_events.abstracts.js', 'module_events.abstracts.css',
-                                                 'markdown.js')
+    bundles = ('module_events.abstracts.js', 'module_events.abstracts.css', 'markdown.js')
 
 
 class WPDisplayAbstracts(WPDisplayAbstractsBase):
