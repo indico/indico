@@ -27,6 +27,7 @@ from indico.legacy.pdfinterface.base import PageBreak, Paragraph, PDFBase, PDFWi
 from indico.modules.events.layout.util import get_menu_entry_by_name
 from indico.modules.events.registration.models.items import PersonalDataType
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
+from indico.modules.events.tracks.models.groups import TrackGroup
 from indico.modules.events.tracks.settings import track_settings
 from indico.util.date_time import format_date, format_datetime, format_human_timedelta, format_time, now_utc
 from indico.util.i18n import _, ngettext
@@ -107,6 +108,7 @@ class ProgrammeToPDF(PDFBase):
         styles = _get_sans_style_sheet()
         style = styles["Normal"]
         style.alignment = TA_JUSTIFY
+        styles["Heading2"].leftIndent = 20
 
         event_program = sanitize_for_platypus(render_markdown(track_settings.get(self.event, 'program')))
         parts = []
@@ -118,13 +120,24 @@ class ProgrammeToPDF(PDFBase):
         story.append(Paragraph(u'\n<br/>\n'.join(parts).encode('utf-8'), style))
 
         story.append(Spacer(1, 0.4*inch))
-        for track in self.event.tracks:
-            bogustext = track.title.encode('utf-8')
+        tracks = [track for track in self.event.tracks if not track.track_group]
+        track_groups = self.event.track_groups
+        items = sorted(tracks + track_groups, key=attrgetter('position'))
+        for item in items:
+            bogustext = item.title.encode('utf-8')
             p = Paragraph(escape(bogustext), styles["Heading1"])
             self._story.append(p)
-            bogustext = track.description.encode('utf-8')
+            bogustext = item.description.encode('utf-8')
             p = Paragraph(escape(bogustext), style)
             story.append(p)
+            if isinstance(item, TrackGroup) and item.tracks:
+                for track in item.tracks:
+                    bogustext = track.title.encode('utf-8')
+                    p = Paragraph(escape(bogustext), styles["Heading2"])
+                    self._story.append(p)
+                    bogustext = track.description.encode('utf-8')
+                    p = Paragraph(escape(bogustext), style)
+                    story.append(p)
             story.append(Spacer(1, 0.4*inch))
 
 
