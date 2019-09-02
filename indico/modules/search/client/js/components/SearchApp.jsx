@@ -8,12 +8,15 @@
 
 import React, {useState} from 'react';
 import {Menu} from 'semantic-ui-react';
+
 import ResultList from './ResultList';
-import './SearchApp.module.scss';
+import SearchBar from './SearchBar';
 import Category from './results/Category';
 import Contribution from './results/Contribution';
 import Event from './results/Event';
 import File from './results/File';
+
+import './SearchApp.module.scss';
 
 import data1 from '../../../data/category_data';
 import data2 from '../../../data/contribution_data';
@@ -42,6 +45,7 @@ export default function SearchApp() {
 
   return (
     <div>
+      <SearchBar />
       <Menu pointing secondary>
         <Menu.Item name="Category" active={activeMenuItem === 'Category'} onClick={handleClick} />
         <Menu.Item

@@ -8,12 +8,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import SearchApp from './components/SearchApp';
-import SearchBar from './components/SearchBar';
-
-document.addEventListener('DOMContentLoaded', () => {
-  const bar = document.querySelector('#search-bar');
-  ReactDOM.render(<SearchBar />, bar);
-});
 
 document.addEventListener('DOMContentLoaded', () => {
   const root = document.querySelector('#search-root');

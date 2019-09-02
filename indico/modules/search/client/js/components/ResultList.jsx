@@ -35,6 +35,7 @@ export default function ResultList({component: Component, allData}) {
           ))}
         </List>
       </Segment>
+      {console.log('the num of  pages is: ', numOfPages)}
       {numOfPages !== 1 && (
         <SearchPagination
           activePage={activePage}
@@ -50,5 +51,3 @@ ResultList.propTypes = {
   component: PropTypes.elementType.isRequired,
   allData: PropTypes.array.isRequired,
 };
-
-// also fix the descriptions in events and files to be more user friendly
