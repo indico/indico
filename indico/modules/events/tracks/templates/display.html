@@ -21,26 +21,52 @@
     {% endif %}
 
     <ul class="tracks flexcol f-j-space-between">
-        {% for track in tracks %}
-            <li>
-                <div class="track-title flexrow f-a-center">
-                    <h3 class="f-self-stretch">{{ track.title }}</h3>
-                    {% if track.code %}
-                        <span class="track-code">
-                            {{- track.code -}}
-                        </span>
-                    {%- endif %}
-                    {% if track.can_convene(session.user) or track.can_review_abstracts(session.user) %}
-                        <a href="{{ url_for('abstracts.display_reviewable_track_abstracts', track) }}"
-                           class="i-link icon-stack-text track-link"
-                           title="{% trans %}Review abstracts in this track{% endtrans %}">
-                        </a>
-                    {% endif %}
-                </div>
-                <div class="description">
-                    {{- track.description -}}
-                </div>
-            </li>
+        {% for item in items %}
+            {% if item.is_track_group %}
+                {{ render_group(item) }}
+            {% else %}
+                {{ render_track(item) }}
+            {% endif %}
         {% endfor %}
     </ul>
 {% endblock %}
+
+{% macro render_track(track) %}
+    <li>
+        <div class="track-title flexrow f-a-center">
+            <h3 class="f-self-stretch">{{ track.title }}</h3>
+            {% if track.code %}
+                <span class="track-code">
+                    {{- track.code -}}
+                </span>
+            {%- endif %}
+            {% if track.can_convene(session.user) or track.can_review_abstracts(session.user) %}
+                <a href="{{ url_for('abstracts.display_reviewable_track_abstracts', track) }}"
+                   class="i-link icon-stack-text track-link"
+                   title="{% trans %}Review abstracts in this track{% endtrans %}">
+                </a>
+            {% endif %}
+        </div>
+        <div class="description">
+            {{- track.description -}}
+        </div>
+    </li>
+{% endmacro %}
+
+{% macro render_group(group) %}
+    <li>
+        <div class="track-title flexrow f-a-center">
+            <h3 class="f-self-stretch">{{ group.title }}</h3>
+        </div>
+        <div class="description">
+            {{- group.description -}}
+        </div>
+        {% if group.tracks %}
+            <ul class="sub-tracks f-j-space-between ">
+                {% for track in group.tracks %}
+                    {{ render_track(track) }}
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </li>
+{% endmacro %}

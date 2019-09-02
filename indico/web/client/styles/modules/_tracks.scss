@@ -46,6 +46,15 @@
     }
 }
 
+ul.sub-tracks {
+    list-style-type: none;
+    padding-left: 30px;
+
+    li h3 {
+        font-size: 14px !important;
+    }
+}
+
 .embedded-track-list {
     padding: 30px 20px;
     border: 1px solid $pastel-gray;

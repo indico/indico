@@ -143,11 +143,13 @@ class RHDisplayTracks(RHDisplayEventBase):
         render_mode = track_settings.get(self.event, 'program_render_mode')
         program = RENDER_MODE_WRAPPER_MAP[render_mode](program)
         tracks = (Track.query.with_parent(self.event)
+                  .filter(~Track.track_group.has())
                   .options(subqueryload('conveners'),
                            subqueryload('abstract_reviewers'))
-                  .order_by(Track.position)
                   .all())
-        return WPDisplayTracks.render_template('display.html', self.event, program=program, tracks=tracks)
+        track_groups = self.event.track_groups
+        items = sorted(tracks + track_groups,  key=attrgetter('position'))
+        return WPDisplayTracks.render_template('display.html', self.event, program=program, items=items)
 
 
 class RHTracksPDF(RHDisplayEventBase):
