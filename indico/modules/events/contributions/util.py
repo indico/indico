@@ -96,7 +96,7 @@ def serialize_contribution_person_link(person_link, is_submitter=None):
 
 
 def sort_contribs(contribs, sort_by):
-    mapping = {'number': 'id', 'name': 'title'}
+    mapping = {'number': 'friendly_id', 'name': 'title'}
     if sort_by == BOASortField.schedule:
         key_func = lambda c: (c.start_dt is None, c.start_dt)
     elif sort_by == BOASortField.session_title:
@@ -116,6 +116,10 @@ def sort_contribs(contribs, sort_by):
     elif sort_by == BOASortField.session_schedule_board:
         key_func = lambda c: (c.session is None, c.session.title.lower() if c.session else '',
                               c.start_dt is None, c.start_dt, c.board_number if c.board_number else '')
+    elif sort_by == BOASortField.id:
+        key_func = attrgetter('friendly_id')
+    elif sort_by == BOASortField.title:
+        key_func = attrgetter('title')
     elif isinstance(sort_by, (str, unicode)) and sort_by:
         key_func = attrgetter(mapping.get(sort_by) or sort_by)
     else:
@@ -300,14 +304,14 @@ def import_contributions_from_csv(event, f):
     return contributions, all_changes
 
 
-def render_pdf(event, contribs, sort_by, opts):
-    pdf = opts(event, session.user, contribs, tz=event.timezone, sort_by=sort_by)
+def render_pdf(event, contribs, sort_by, cls):
+    pdf = cls(event, session.user, contribs, tz=event.timezone, sort_by=sort_by)
     res = pdf.generate()
     return send_file('book-of-abstracts.pdf', res, 'application/pdf')
 
 
-def render_archive(event, contribs, sort_by, opts):
-    tex = opts(event, session.user, contribs, tz=event.timezone, sort_by=sort_by)
+def render_archive(event, contribs, sort_by, cls):
+    tex = cls(event, session.user, contribs, tz=event.timezone, sort_by=sort_by)
     archive = tex.generate_source_archive()
     return send_file('contributions-tex.zip', archive, 'application/zip', inline=False)
 
