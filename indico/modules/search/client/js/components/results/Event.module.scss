@@ -4,26 +4,31 @@
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
-
+@import 'base/palette';
 
 .event {
     padding: 1em 0;
-    color: dimgrey;
+    color: $dark-gray;
+
     .description {
         padding: 0.5em 0;
-        .high_priority {
+
+        .high-priority {
             font-size: 15px;
             font-weight: bold;
         }
-        .med_priority {
+
+        .med-priority {
             font-size: 13px;
         }
-        .low_priority {
+
+        .low-priority {
             font-size: 11px;
             font-style: italic;
+
             a , a:hover {
                 font-size: 11px;
-                color: dimgrey;
+                color: $dark-gray;
             }
         }
     }

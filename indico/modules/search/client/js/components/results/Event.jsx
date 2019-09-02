@@ -32,7 +32,7 @@ const Event = ({
       <List.Description styleName="description">
         {/* if it's a lecture print the list of speakers */}
         {event_type === 'lecture' && speakers.length !== 0 && (
-          <List.Item styleName="high_priority">
+          <List.Item styleName="high-priority">
             {speakers.map(i => (
               <div key={i.name}>
                 {i.title
@@ -46,19 +46,19 @@ const Event = ({
         {/* Dates */}
         {/* if end date == start date only show start date */}
         {singleDay && (
-          <List.Item styleName="med_priority">
+          <List.Item styleName="med-priority">
             {moment(start_dt, 'YYYY-MM-DDZhh:mm').format('DD MMMM YYYY HH:mm')}
           </List.Item>
         )}
         {multipleDays && (
-          <List.Item styleName="med_priority">
+          <List.Item styleName="med-priority">
             {`${moment(start_dt, 'YYYY-MM-DDZhh:mm').format('DD MMMM')} -
               ${moment(end_dt, 'YYYY-MM-DDZhh:mm').format('DD MMMM YYYY')}`}
           </List.Item>
         )}
         {/* Render the path */}
         <List.Item>
-          <Breadcrumb styleName="low_priority">
+          <Breadcrumb styleName="low-priority">
             {array.map(item => (
               <Breadcrumb.Section key={item}>
                 <a href={item[1]}>
