@@ -7,6 +7,7 @@
 
 import searchCategoriesURL from 'indico-url:search.search_categories';
 import searchEventsURL from 'indico-url:search.search_events';
+import searchContributionsURL from 'indico-url:search.search_contributions';
 
 import React, {useEffect, useReducer, useState} from 'react';
 import {Loader, Menu} from 'semantic-ui-react';
@@ -16,7 +17,7 @@ import ResultList from './ResultList';
 import SearchBar from './SearchBar';
 import Category from './results/Category';
 import Event from './results/Event';
-// import Contribution from './results/Contribution';
+import Contribution from './results/Contribution';
 // import File from './results/File';
 
 import './SearchApp.module.scss';
@@ -92,6 +93,7 @@ export default function SearchApp() {
 
   const [categoryResults, setCategoryPage] = useSearch(searchCategoriesURL(), query);
   const [eventResults, setEventPage] = useSearch(searchEventsURL(), query);
+  const [contributionResults, setContributionPage] = useSearch(searchContributionsURL(), query);
 
   const resultMap = {
     categories: categoryResults,
@@ -137,8 +139,8 @@ export default function SearchApp() {
               name="contributions"
               active={activeMenuItem === 'contributions'}
               title={Translate.string('Contributions')}
-              total={0}
-              loading={false}
+              total={contributionResults.total}
+              loading={contributionResults.loading}
               onClick={handleClick}
             />
             <SearchTypeMenuItem
@@ -169,6 +171,16 @@ export default function SearchApp() {
               data={eventResults.data}
               onPageChange={setEventPage}
               loading={eventResults.loading}
+            />
+          )}
+          {activeMenuItem === 'contributions' && (
+            <ResultList
+              component={Contribution}
+              page={contributionResults.page}
+              numPages={contributionResults.pages}
+              data={contributionResults.data}
+              onPageChange={setContributionPage}
+              loading={contributionResults.loading}
             />
           )}
         </>
