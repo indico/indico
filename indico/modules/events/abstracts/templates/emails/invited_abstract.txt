@@ -1,0 +1,20 @@
+{% extends 'emails/base.txt' %}
+
+{% block subject -%}
+    {% trans %}You have been invited to submit an abstract{% endtrans %}
+{%- endblock %}
+
+{% block header_recipient -%}
+    {{ abstract.submitter.first_name }}
+{%- endblock %}
+
+{% block body -%}
+    {%- filter dedent -%}
+        {% trans event_name=event.title %}
+            You have been invited to submit an abstract in the event "{{ event_name }}".
+            In order to submit your abstract please follow the link below:
+        {% endtrans %}
+
+        {{ url }}
+    {%- endfilter -%}
+{%- endblock %}

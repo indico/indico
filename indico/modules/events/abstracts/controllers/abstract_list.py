@@ -21,6 +21,7 @@ from indico.modules.events.abstracts.forms import BulkAbstractJudgmentForm
 from indico.modules.events.abstracts.lists import AbstractListGeneratorManagement
 from indico.modules.events.abstracts.models.abstracts import Abstract, AbstractState
 from indico.modules.events.abstracts.models.persons import AbstractPersonLink
+from indico.modules.events.abstracts.notifications import send_abstract_invitation
 from indico.modules.events.abstracts.operations import create_abstract, delete_abstract, judge_abstract
 from indico.modules.events.abstracts.schemas import abstract_review_questions_schema, abstracts_schema
 from indico.modules.events.abstracts.util import make_abstract_form
@@ -117,12 +118,15 @@ class RHCreateAbstract(RHAbstractListBase):
             del form.attachments
             del form.send_notifications
             del form.person_links
+
         if form.validate_on_submit():
             data = form.data
             send_notifications = data.pop('send_notifications', False)
             invited_submitter = data.pop('submitter', None)
             abstract = create_abstract(self.event, *get_field_values(data), send_notifications=send_notifications,
                                        submitter=invited_submitter)
+            if is_invited:
+                send_abstract_invitation(abstract, invited_submitter)
             flash(_("Abstract '{}' created successfully").format(abstract.title), 'success')
             tpl_components = self.list_generator.render_list(abstract)
             if tpl_components.get('hide_abstract'):

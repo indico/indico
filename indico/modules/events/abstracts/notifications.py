@@ -19,6 +19,7 @@ from indico.util.i18n import _
 from indico.util.placeholders import replace_placeholders
 from indico.util.rules import Condition, check_rule
 from indico.web.flask.templating import get_template_module
+from indico.web.flask.util import url_for
 
 
 class EmailNotificationCondition(Condition):
@@ -179,3 +180,10 @@ def send_abstract_notifications(abstract):
         if email_tpl.stop_on_match and matched:
             break
     return sent
+
+
+def send_abstract_invitation(abstract, submitter):
+    tpl = get_template_module('events/abstracts/emails/invited_abstract.txt', event=abstract.event, abstract=abstract,
+                              url=url_for('.submit_invited_abstract', abstract, _external=True))
+    email = make_email(to_list=[submitter.email], template=tpl)
+    send_email(email, abstract.event, 'Abstracts', submitter)
