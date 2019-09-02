@@ -12,7 +12,7 @@ from flask import flash
 from indico.modules.events.abstracts.controllers.base import RHAbstractsBase, RHManageAbstractsBase
 from indico.modules.events.abstracts.forms import BOASettingsForm
 from indico.modules.events.abstracts.settings import boa_settings
-from indico.modules.events.abstracts.util import clear_boa_cache, create_boa
+from indico.modules.events.abstracts.util import clear_boa_cache, create_boa, create_boa_tex
 from indico.util.i18n import _
 from indico.web.flask.util import send_file
 from indico.web.forms.base import FormDefaults
@@ -43,5 +43,4 @@ class RHExportBOATeX(RHManageAbstractsBase):
     """Export a zip file with the book of abstracts in TeX format"""
 
     def _process(self):
-        return send_file('book-of-abstracts.zip', create_boa(self.event, tex_format=True), 'application/zip',
-                         inline=False)
+        return send_file('book-of-abstracts.zip', create_boa_tex(self.event), 'application/zip', inline=False)

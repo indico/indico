@@ -40,7 +40,7 @@ from indico.modules.events.contributions.operations import (create_contribution,
                                                             update_contribution, update_subcontribution)
 from indico.modules.events.contributions.util import (contribution_type_row, generate_spreadsheet_from_contributions,
                                                       get_boa_export_formats, import_contributions_from_csv,
-                                                      make_contribution_form, zip_tex_file)
+                                                      make_contribution_form)
 from indico.modules.events.contributions.views import WPManageContributions
 from indico.modules.events.logs import EventLogKind, EventLogRealm
 from indico.modules.events.management.controllers import RHManageEventBase
@@ -463,10 +463,9 @@ class RHContributionsExportPDF(RHManageContributionsExportActionsBase):
 
 class RHContributionsExportTeX(RHManageContributionsExportActionsBase):
     def _process(self):
-        pdf = ContribsToPDF(self.event, self.contribs)
-        pdf.generate(return_source=True)
-        return send_file('contributions-tex.zip', zip_tex_file(pdf), 'application/zip',
-                         inline=False)
+        tex = ContribsToPDF(self.event, self.contribs)
+        archive = tex.generate_source_archive()
+        return send_file('contributions-tex.zip', archive, 'application/zip', inline=False)
 
 
 class RHContributionExportTexConfig(RHManageContributionsExportActionsBase):

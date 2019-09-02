@@ -25,7 +25,6 @@ from indico.modules.events.abstracts.models.persons import AbstractPersonLink
 from indico.modules.events.abstracts.models.reviews import AbstractReview
 from indico.modules.events.abstracts.settings import abstracts_settings, boa_settings
 from indico.modules.events.contributions.models.fields import ContributionFieldVisibility
-from indico.modules.events.contributions.util import zip_tex_file
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.tracks.models.tracks import Track
 from indico.modules.users import User
@@ -278,13 +277,12 @@ def get_track_reviewer_abstract_counts(event, user):
             for track, total, reviewed, unreviewed in query}
 
 
-def create_boa(event, tex_format=False):
+def create_boa(event):
     """Create the book of abstracts if necessary
 
-    :return: The path to the PDF/zip file
+    :return: The path to the PDF file
     """
-    cache_path_setting = 'cache_path_tex' if tex_format else 'cache_path'
-    path = boa_settings.get(event, cache_path_setting)
+    path = boa_settings.get(event, 'cache_path')
     if path:
         path = os.path.join(config.CACHE_DIR, path)
         if os.path.exists(path):
@@ -292,28 +290,33 @@ def create_boa(event, tex_format=False):
             os.utime(path, None)
             return path
     pdf = AbstractBook(event)
-    tmp_path = pdf.generate(return_source=tex_format)
-    if tex_format:
-        tmp_path = zip_tex_file(pdf)
-    filename = 'boa-{}.{}'.format(event.id, 'zip' if tex_format else 'pdf')
+    tmp_path = pdf.generate()
+    filename = 'boa-{}.pdf'.format(event.id)
     full_path = os.path.join(config.CACHE_DIR, filename)
     shutil.move(tmp_path, full_path)
-    boa_settings.set(event, cache_path_setting, filename)
+    boa_settings.set(event, 'cache_path', filename)
     return full_path
+
+
+def create_boa_tex(event):
+    """Create the book of abstracts as a LaTeX archive.
+
+    :return: A `BytesIO` containing the zip file.
+    """
+    tex = AbstractBook(event)
+    return tex.generate_source_archive()
 
 
 def clear_boa_cache(event):
     """Delete the cached book of abstract"""
-    cache_paths = ['cache_path', 'cache_path_tex']
-    for cache_path in cache_paths:
-        path = boa_settings.get(event, cache_path)
-        if path:
-            try:
-                os.remove(os.path.join(config.CACHE_DIR, path))
-            except OSError as e:
-                if e.errno != errno.ENOENT:
-                    raise
-            boa_settings.delete(event, cache_path)
+    path = boa_settings.get(event, 'cache_path')
+    if path:
+        try:
+            os.remove(os.path.join(config.CACHE_DIR, path))
+        except OSError as e:
+            if e.errno != errno.ENOENT:
+                raise
+        boa_settings.delete(event, 'cache_path')
 
 
 def get_events_with_abstract_reviewer_convener(user, dt=None):

@@ -11,8 +11,9 @@ import codecs
 import os
 import subprocess
 import tempfile
+from io import BytesIO
 from operator import attrgetter
-from shutil import copytree
+from zipfile import ZipFile
 
 import markdown
 import pkg_resources
@@ -28,7 +29,7 @@ from indico.core.logger import Logger
 from indico.legacy.pdfinterface.base import escape
 from indico.modules.events.abstracts.models.abstracts import AbstractReviewingState, AbstractState
 from indico.modules.events.abstracts.models.reviews import AbstractAction
-from indico.modules.events.abstracts.settings import BOACorrespondingAuthorType, BOASortField, boa_settings
+from indico.modules.events.abstracts.settings import BOACorrespondingAuthorType, boa_settings
 from indico.modules.events.contributions.util import sort_contribs
 from indico.modules.events.util import create_event_logo_tmp_file
 from indico.util import mdx_latex
@@ -59,9 +60,25 @@ class PDFLaTeXBase(object):
 
         self._args = {'markdown': _convert_markdown}
 
-    def generate(self, return_source=False):
+    def generate(self):
         latex = LatexRunner(self.source_dir, has_toc=self._table_of_contents)
-        return latex.run(self.LATEX_TEMPLATE, return_source=return_source, **self._args)
+        return latex.run(self.LATEX_TEMPLATE, **self._args)
+
+    def generate_source_archive(self):
+        latex = LatexRunner(self.source_dir, has_toc=self._table_of_contents)
+        latex.prepare(self.LATEX_TEMPLATE, **self._args)
+
+        buf = BytesIO()
+        with ZipFile(buf, 'w', allowZip64=True) as zip_handler:
+            for dirpath, dirnames, files in os.walk(self.source_dir, followlinks=True):
+                for f in files:
+                    if f.startswith('.') or f.endswith(('.py', '.pyc', '.pyo')):
+                        continue
+                    file_path = os.path.join(dirpath, f)
+                    archive_name = os.path.relpath(file_path, self.source_dir).encode('utf-8')
+                    zip_handler.write(os.path.abspath(file_path), archive_name)
+        buf.seek(0)
+        return buf
 
 
 class LaTeXRuntimeException(Exception):
@@ -167,7 +184,7 @@ class LatexRunner(object):
         template = env.get_or_select_template(template_name)
         return template.render(font_dir='fonts/', **kwargs)
 
-    def run(self, template_name, return_source=False, **kwargs):
+    def prepare(self, template_name, **kwargs):
         chmod_umask(self.source_dir, execute=True)
         source_filename = os.path.join(self.source_dir, template_name + '.tex')
         target_filename = os.path.join(self.source_dir, template_name + '.pdf')
@@ -179,9 +196,10 @@ class LatexRunner(object):
         distribution = pkg_resources.get_distribution('indico-fonts')
         font_dir = os.path.join(distribution.location, 'indico_fonts')
         os.symlink(font_dir, os.path.join(self.source_dir, 'fonts'))
-        if return_source:
-            return source_filename
+        return source_filename, target_filename
 
+    def run(self, template_name, **kwargs):
+        source_filename, target_filename = self.prepare(template_name, **kwargs)
         log_filename = os.path.join(self.source_dir, 'output.log')
         log_file = open(log_filename, 'a+')
         try:

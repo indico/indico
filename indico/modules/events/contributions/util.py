@@ -8,19 +8,15 @@
 from __future__ import unicode_literals
 
 import csv
-import os
 from collections import defaultdict
 from datetime import timedelta
 from io import BytesIO
 from operator import attrgetter
-from tempfile import NamedTemporaryFile
-from zipfile import ZipFile
 
 import dateutil.parser
 from flask import session
 from sqlalchemy.orm import contains_eager, joinedload, load_only, noload
 
-from indico.core.config import config
 from indico.core.db import db
 from indico.core.errors import UserValueError
 from indico.modules.attachments.util import get_attached_items
@@ -35,7 +31,6 @@ from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.persons.util import get_event_person
 from indico.modules.events.util import serialize_person_link, track_time_changes
 from indico.util.date_time import format_human_timedelta
-from indico.util.fs import chmod_umask
 from indico.util.i18n import _
 from indico.util.string import to_unicode, validate_email
 from indico.web.flask.templating import get_template_module
@@ -312,27 +307,9 @@ def render_pdf(event, contribs, sort_by, opts):
 
 
 def render_archive(event, contribs, sort_by, opts):
-    pdf = opts(event, session.user, contribs, tz=event.timezone, sort_by=sort_by)
-    pdf.generate(return_source=True)
-    return send_file('contributions-tex.zip', zip_tex_file(pdf), 'application/zip', inline=False)
-
-
-def zip_tex_file(tex):
-    temp_file = NamedTemporaryFile(suffix='indico.tmp', dir=config.TEMP_DIR)
-    with ZipFile(temp_file.name, 'w', allowZip64=True) as zip_handler:
-        for dirpath, dirnames, files in os.walk(tex.source_dir, followlinks=True):
-            for f in files:
-                if f.startswith('.') or f.endswith(('.py', '.pyc', '.pyo')):
-                    continue
-                path_file = os.path.join(dirpath, f)
-                absolute_path = os.path.abspath(path_file)
-                relative_path = os.path.relpath(path_file, tex.source_dir)
-                archive_name = relative_path.encode('utf-8')
-                zip_handler.write(absolute_path, archive_name)
-
-    temp_file.delete = False
-    chmod_umask(temp_file.name)
-    return temp_file.name
+    tex = opts(event, session.user, contribs, tz=event.timezone, sort_by=sort_by)
+    archive = tex.generate_source_archive()
+    return send_file('contributions-tex.zip', archive, 'application/zip', inline=False)
 
 
 def get_boa_export_formats():
