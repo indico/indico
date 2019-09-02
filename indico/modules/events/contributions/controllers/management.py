@@ -495,7 +495,8 @@ class RHContributionsExportTeXBook(RHManageContributionsExportActionsBase):
         output_format = config_params['format']
         sort_by = config_params['sort_by']
         contribs = (Contribution.query.with_parent(self.event)
-                    .filter(Contribution.id.in_(config_params['contribution_ids'])).all())
+                    .filter(Contribution.id.in_(config_params['contribution_ids']))
+                    .all())
 
         func = get_boa_export_formats()[output_format][1]
         return func(self.event, contribs, sort_by, ContributionBook)
