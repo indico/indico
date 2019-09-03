@@ -111,35 +111,37 @@
 
     <div id="abstract-public">
         {{ _render_abstract_summary(abstract) }}
-        <div class="review-item-content abstract-content js-mathjax">
-            <div class="abstract-authorship-block flexrow f-j-center">
-                <div class="abstract-authorship-label">
-                    {% trans count=abstract.primary_authors|length -%}
-                        Author:
-                    {%- pluralize -%}
-                        Authors:
-                    {%- endtrans %}
-                </div>
-                <div class="abstract-authorship-list">
-                    {{ abstract.primary_authors|map(attribute='name')|join(', ') }}
-                </div>
-            </div>
-            {% if abstract.secondary_authors %}
+        {% if abstract.state.name != 'invited' or abstract.content -%}
+            <div class="review-item-content abstract-content js-mathjax">
                 <div class="abstract-authorship-block flexrow f-j-center">
                     <div class="abstract-authorship-label">
-                        {% trans count=abstract.secondary_authors|length -%}
-                            Co-author:
+                        {% trans count=abstract.primary_authors|length -%}
+                            Author:
                         {%- pluralize -%}
-                            Co-authors:
+                            Authors:
                         {%- endtrans %}
                     </div>
                     <div class="abstract-authorship-list">
-                        {{ abstract.secondary_authors|map(attribute='name')|join(', ') }}
+                        {{ abstract.primary_authors|map(attribute='name')|join(', ') }}
                     </div>
                 </div>
-            {% endif %}
-            {{ abstract.description }}
-        </div>
+                {% if abstract.secondary_authors %}
+                    <div class="abstract-authorship-block flexrow f-j-center">
+                        <div class="abstract-authorship-label">
+                            {% trans count=abstract.secondary_authors|length -%}
+                                Co-author:
+                            {%- pluralize -%}
+                                Co-authors:
+                            {%- endtrans %}
+                        </div>
+                        <div class="abstract-authorship-list">
+                            {{ abstract.secondary_authors|map(attribute='name')|join(', ') }}
+                        </div>
+                    </div>
+                {% endif %}
+                {{ abstract.description }}
+            </div>
+        {%- endif %}
     </div>
 {% endmacro %}
 
@@ -150,9 +152,15 @@
             {{ render_user_avatar(abstract.submitter) }}
             <div class="i-timeline-item-box header-indicator-left">
                 <div class="i-box-header">
-                    {% trans name=abstract.submitter.name -%}
-                        <strong>{{ name }}</strong> submitted this abstract
-                    {%- endtrans %}
+                    {% if abstract.state.name == 'invited' %}
+                        {% trans name=abstract.submitter.name -%}
+                            <strong>{{ name }}</strong> was invited to submit an abstract
+                        {%- endtrans %}
+                    {% else %}
+                        {% trans name=abstract.submitter.name -%}
+                            <strong>{{ name }}</strong> submitted this abstract
+                        {%- endtrans %}
+                    {% endif %}
                     <time datetime="{{ abstract.submitted_dt.isoformat() }}">
                         {{- abstract.submitted_dt|format_human_date -}}
                     </time>

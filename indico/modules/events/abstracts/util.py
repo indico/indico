@@ -219,7 +219,8 @@ def get_user_abstracts(event, user):
             .options(joinedload('reviews'),
                      joinedload('person_links'))
             .filter(db.or_(Abstract.submitter == user,
-                           Abstract.person_links.any(AbstractPersonLink.person.has(user=user))))
+                           Abstract.person_links.any(AbstractPersonLink.person.has(user=user))),
+                    Abstract.state != AbstractState.invited)
             .order_by(Abstract.friendly_id)
             .all())
 
