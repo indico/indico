@@ -2,7 +2,7 @@
     {%- set br = joiner('<br>'|safe) -%}
     {% for placeholder in placeholders if placeholder.advanced == advanced and placeholder.description is not none -%}
         {{ br() }}
-        <span style="font-style: normal;">{{ placeholder.friendly_name }}</span>:
+        <code class="placeholder">{{ placeholder.friendly_name }}</code> -
         {{ placeholder.description }} {% if placeholder.required %}(required){% endif %}
     {% endfor %}
     {% for placeholder in placeholders if placeholder.advanced == advanced and placeholder is subclassof ParametrizedPlaceholder -%}
