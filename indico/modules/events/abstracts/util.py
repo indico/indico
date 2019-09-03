@@ -398,3 +398,10 @@ def filter_field_values(fields, can_manage, owns_abstract):
                 if field.contribution_field.visibility != ContributionFieldVisibility.managers_only}
     return {field for field in active_fields
             if field.contribution_field.visibility == ContributionFieldVisibility.public}
+
+
+def can_create_invited_abstracts(event):
+    return any(AbstractState.invited in rule['state']
+               for tpl in event.abstract_email_templates
+               for rule in tpl.rules
+               if 'state' in rule)

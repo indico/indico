@@ -561,6 +561,16 @@ class InvitedAbstractMixin(IndicoForm):
     submitter = PrincipalField(_('Submitter'), [DataRequired()], allow_external=True,
                                description=_('The person invited to submit the abstract'))
 
+    def __init__(self, *args, **kwargs):
+        self.event = kwargs['event']
+        super(InvitedAbstractMixin, self).__init__(*args, **kwargs)
+
+    def validate(self):
+        from indico.modules.events.abstracts.util import can_create_invited_abstracts
+        if not can_create_invited_abstracts(self.event):
+            raise ValidationError(_('You have to create an "Invited" abstract notification template in order to '
+                                    'be able to create invited abstracts.'))
+
 
 class AbstractsScheduleForm(IndicoForm):
     start_dt = IndicoDateTimeField(_("Start"), [Optional()], default_time=time(0, 0),

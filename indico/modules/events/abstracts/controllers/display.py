@@ -79,7 +79,7 @@ class RHSubmitInvitedAbstract(RHAbstractBase):
             raise Forbidden
 
     def _check_abstract_protection(self):
-        return self.abstract.can_edit(session.user) and self.abstract.submitter == session.user
+        return self.event.can_manage(session.user) or self.abstract.submitter == session.user
 
     def _create_form(self):
         abstract_form_cls = make_abstract_form(self.event, session.user)
@@ -88,9 +88,8 @@ class RHSubmitInvitedAbstract(RHAbstractBase):
         return abstract_form_cls(obj=form_defaults, event=self.event, abstract=self.abstract)
 
     def _process_GET(self):
-        form = self._create_form()
         return WPDisplayAbstracts.render_template('invited_abstract.html', self.abstract.event, abstract=self.abstract,
-                                                  form=form)
+                                                  form=self._create_form())
 
     def _process_POST(self):
         form = self._create_form()
