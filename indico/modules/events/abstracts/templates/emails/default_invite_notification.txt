@@ -1,0 +1,15 @@
+{% extends 'events/abstracts/emails/default_notification.txt' %}
+
+{% block subject -%}
+    Invitation to submit an abstract
+{%- endblock %}
+
+{% block body -%}
+    You have been invited to submit an abstract.
+    In order to submit your abstract please follow the link below:
+
+    {invitation_url}
+
+    Kind regards,
+    The organizers of {event_title}
+{%- endblock %}
