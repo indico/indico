@@ -12,6 +12,7 @@ from sqlalchemy.orm import defaultload, joinedload
 
 from indico.legacy.pdfinterface.latex import AbstractToPDF, ConfManagerAbstractToPDF
 from indico.modules.events.abstracts.controllers.base import RHAbstractBase
+from indico.modules.events.abstracts.models.abstracts import AbstractState
 from indico.modules.events.abstracts.models.files import AbstractFile
 from indico.modules.events.abstracts.operations import update_abstract
 from indico.modules.events.abstracts.util import make_abstract_form
@@ -26,6 +27,11 @@ from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 class RHDisplayAbstract(RHAbstractBase):
     _abstract_query_options = (joinedload('reviewed_for_tracks'),
                                defaultload('reviews').joinedload('ratings').joinedload('question'))
+
+    def _check_abstract_protection(self):
+        if self.abstract.state == AbstractState.invited:
+            return False
+        return RHAbstractBase._check_abstract_protection(self)
 
     @property
     def view_class(self):

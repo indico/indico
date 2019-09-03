@@ -245,12 +245,14 @@ class AbstractListGeneratorDisplay(AbstractListGeneratorBase):
 
     def _build_query(self):
         return (super(AbstractListGeneratorDisplay, self)._build_query()
-                .filter(Abstract.reviewed_for_tracks.contains(self.track)))
+                .filter(Abstract.state != AbstractState.invited,
+                        Abstract.reviewed_for_tracks.contains(self.track)))
 
     def get_user_reviewed_abstracts_for_track(self, user, track):
         return (Abstract.query
                 .join(Abstract.reviews)
                 .filter(AbstractReview.user == user,
+                        Abstract.state != AbstractState.invited,
                         Abstract.reviewed_for_tracks.contains(track),
                         ~Abstract.is_deleted)
                 .all())
