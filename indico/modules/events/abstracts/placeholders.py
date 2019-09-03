@@ -14,12 +14,13 @@ from indico.web.flask.util import url_for
 
 
 __all__ = ('EventTitlePlaceholder', 'EventURLPlaceholder', 'AbstractIDPlaceholder', 'AbstractTitlePlaceholder',
-           'AbstractURLPlaceholder', 'AbstractTrackPlaceholder', 'AbstractSessionPlaceholder',
-           'PrimaryAuthorsPlaceholder', 'CoAuthorsPlaceholder', 'SubmitterNamePlaceholder',
-           'SubmitterFirstNamePlaceholder', 'SubmitterLastNamePlaceholder', 'SubmitterTitlePlaceholder',
-           'TargetAbstractIDPlaceholder', 'TargetAbstractTitlePlaceholder', 'TargetSubmitterNamePlaceholder',
-           'TargetSubmitterFirstNamePlaceholder', 'TargetSubmitterLastNamePlaceholder', 'JudgmentCommentPlaceholder',
-           'ContributionTypePlaceholder', 'ContributionURLPlaceholder')
+           'AbstractURLPlaceholder', 'AbstractInvitationURLPlaceholder', 'AbstractTrackPlaceholder',
+           'AbstractSessionPlaceholder', 'PrimaryAuthorsPlaceholder', 'CoAuthorsPlaceholder',
+           'SubmitterNamePlaceholder', 'SubmitterFirstNamePlaceholder', 'SubmitterLastNamePlaceholder',
+           'SubmitterTitlePlaceholder', 'TargetAbstractIDPlaceholder', 'TargetAbstractTitlePlaceholder',
+           'TargetSubmitterNamePlaceholder', 'TargetSubmitterFirstNamePlaceholder',
+           'TargetSubmitterLastNamePlaceholder', 'JudgmentCommentPlaceholder', 'ContributionTypePlaceholder',
+           'ContributionURLPlaceholder')
 
 
 class EventTitlePlaceholder(Placeholder):
@@ -66,6 +67,15 @@ class AbstractURLPlaceholder(Placeholder):
     @classmethod
     def render(cls, abstract):
         return url_for('abstracts.display_abstract', abstract, management=False, _external=True)
+
+
+class AbstractInvitationURLPlaceholder(Placeholder):
+    name = 'invitation_url'
+    description = _("The direct URL of the submission form for invited abstracts")
+
+    @classmethod
+    def render(cls, abstract):
+        return url_for('abstracts.submit_invited_abstract', abstract, _external=True)
 
 
 class AbstractTrackPlaceholder(Placeholder):
