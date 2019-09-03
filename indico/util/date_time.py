@@ -92,7 +92,7 @@ def utc_to_server(dt):
     return dt.astimezone(server_tz)
 
 
-def format_datetime(dt, format='medium', locale=None, timezone=None):
+def format_datetime(dt, format='medium', locale=None, timezone=None, as_unicode=False):
     """
     Basically a wrapper around Babel's own format_datetime
     """
@@ -106,10 +106,12 @@ def format_datetime(dt, format='medium', locale=None, timezone=None):
         timezone = session.tzinfo
 
     rv = _format_datetime(dt, format=format, locale=locale, tzinfo=timezone)
+    if as_unicode:
+        return rv
     return inject_unicode_debug(rv, 2).encode('utf-8') if inject_unicode else rv.encode('utf-8')
 
 
-def format_date(d, format='medium', locale=None, timezone=None):
+def format_date(d, format='medium', locale=None, timezone=None, as_unicode=False):
     """
     Basically a wrapper around Babel's own format_date
     """
@@ -123,10 +125,12 @@ def format_date(d, format='medium', locale=None, timezone=None):
         d = d.astimezone(pytz.timezone(timezone) if isinstance(timezone, basestring) else timezone)
 
     rv = _format_date(d, format=format, locale=locale)
+    if as_unicode:
+        return rv
     return inject_unicode_debug(rv, 2).encode('utf-8') if inject_unicode else rv.encode('utf-8')
 
 
-def format_time(t, format='short', locale=None, timezone=None, server_tz=False):
+def format_time(t, format='short', locale=None, timezone=None, server_tz=False, as_unicode=False):
     """
     Basically a wrapper around Babel's own format_time
     """
@@ -143,10 +147,12 @@ def format_time(t, format='short', locale=None, timezone=None, server_tz=False):
     if isinstance(timezone, basestring):
         timezone = get_timezone(timezone)
     rv = _format_time(t, format=format, locale=locale, tzinfo=timezone)
+    if as_unicode:
+        return rv
     return inject_unicode_debug(rv, 2).encode('utf-8') if inject_unicode else rv.encode('utf-8')
 
 
-def format_timedelta(td, format='short', threshold=0.85, locale=None):
+def format_timedelta(td, format='short', threshold=0.85, locale=None, as_unicode=False):
     """
     Basically a wrapper around Babel's own format_timedelta
     """
@@ -154,6 +160,8 @@ def format_timedelta(td, format='short', threshold=0.85, locale=None):
         locale = get_current_locale()
 
     rv = _format_timedelta(td, format=format, locale=locale, threshold=threshold)
+    if as_unicode:
+        return rv
     return inject_unicode_debug(rv, 2).encode('utf-8')
 
 
@@ -211,7 +219,7 @@ def format_human_timedelta(delta, granularity='seconds', narrow=False):
         return u' '.join(parts)
 
 
-def format_human_date(dt, format='medium', locale=None):
+def format_human_date(dt, format='medium', locale=None, as_unicode=False):
     """
     Return the date in a human-like format for yesterday, today and tomorrow.
     Format the date otherwise.
@@ -229,7 +237,7 @@ def format_human_date(dt, format='medium', locale=None):
     elif dt == today + oneday:
         return _("tomorrow")
     else:
-        return format_date(dt, format, locale=locale)
+        return format_date(dt, format, locale=locale, as_unicode=as_unicode)
 
 
 def _format_pretty_datetime(dt, locale, tzinfo, formats):
