@@ -12,7 +12,7 @@ from marshmallow.fields import DateTime, Field
 from marshmallow.utils import from_iso_datetime
 from sqlalchemy import inspect
 
-from indico.core.permissions import get_split_permissions, get_unified_permissions
+from indico.core.permissions import get_unified_permissions
 from indico.util.user import principal_from_identifier
 
 
