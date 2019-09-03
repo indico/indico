@@ -1,9 +1,9 @@
 import React from 'react';
-import {List, Breadcrumb} from 'semantic-ui-react';
+import {List} from 'semantic-ui-react';
 import PropTypes from 'prop-types';
 import './Event.module.scss';
-
 import moment from 'moment';
+import CategoryPath from './CategoryPath';
 
 const Event = ({
   // id,
@@ -16,17 +16,17 @@ const Event = ({
   endDt,
   // location,
   speakers,
-  chairs,
+  // chairs,
 }) => {
   const singleDay =
     moment(startDt, 'YYYY-MM-DDZhh:mm').format('ll') ===
     moment(endDt, 'YYYY-MM-DDZhh:mm').format('ll');
 
-  const sections = categoryPath.map(item => ({
-    key: item.id,
-    href: item.url,
-    content: item.title,
-  }));
+  // const sections = categoryPath.map(item => ({
+  //   key: item.id,
+  //   href: item.url,
+  //   content: item.title,
+  // }));
 
   return (
     <div styleName="event">
@@ -60,9 +60,15 @@ const Event = ({
           </List.Item>
         )}
         {/* Render the path */}
-        <List.Item>
-          <Breadcrumb styleName="low-priority" divider="»" sections={sections} />
-        </List.Item>
+        {categoryPath.length !== 0 && (
+          <List.Item>
+            <div styleName="low-priority">
+              <List.Description>
+                <CategoryPath path={categoryPath} />
+              </List.Description>
+            </div>
+          </List.Item>
+        )}
       </List.Description>
     </div>
   );
@@ -70,7 +76,7 @@ const Event = ({
 
 Event.defaultProps = {
   speakers: [],
-  chairs: [],
+  // chairs: [],
 };
 
 const personShape = PropTypes.shape({
@@ -81,10 +87,11 @@ const personShape = PropTypes.shape({
 
 Event.propTypes = {
   // id: PropTypes.number.isRequired,
-  type: PropTypes.oneOf(['lecture', 'meeting', 'conference']).isRequired,
   title: PropTypes.string.isRequired,
   url: PropTypes.string.isRequired,
-  // description: PropTypes.string.isRequired,
+  type: PropTypes.oneOf(['lecture', 'meeting', 'conference']).isRequired,
+  startDt: PropTypes.string.isRequired,
+  endDt: PropTypes.string.isRequired,
   categoryPath: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.number.isRequired,
@@ -92,11 +99,10 @@ Event.propTypes = {
       url: PropTypes.string.isRequired,
     })
   ).isRequired,
-  startDt: PropTypes.string.isRequired,
-  endDt: PropTypes.string.isRequired,
+  // description: PropTypes.string.isRequired,
   // location: PropTypes.object.isRequired,
   speakers: PropTypes.arrayOf(personShape),
-  chairs: PropTypes.arrayOf(personShape),
+  // chairs: PropTypes.arrayOf(personShape),
 };
 
 export default Event;

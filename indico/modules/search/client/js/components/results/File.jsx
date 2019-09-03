@@ -1,36 +1,38 @@
 import React from 'react';
-import {List, Icon} from 'semantic-ui-react';
+import {List} from 'semantic-ui-react';
 import PropTypes from 'prop-types';
-import '../ResultList.module.scss';
+import './File.module.scss';
 import moment from 'moment';
 
-const File = ({title, authors, date, url}) => (
-  <>
+const File = ({title, url, date, persons}) => (
+  <div styleName="file">
     <List.Header>
-      <a href={`https://blackhole.cern.ch${url}`}>{title}</a>
+      <a href={url}>{title}</a>
     </List.Header>
-    <List.Description>
-      <List>
-        {authors.join(' ') && (
-          <List.Item>
-            <Icon name="pencil alternate" />
-            {authors.join(', ')}{' '}
+    <List.Description styleName="description">
+      {persons.length !== 0 &&
+        persons.map(item => (
+          <List.Item key={item.id} styleName="high-priority">
+            {item.title ? `${item.title} ${item.name}` : `${item.name}`}
           </List.Item>
-        )}
-
-        <List.Item>
-          <Icon name="calendar alternate outline" />
-          {moment(date).format('DD/MM/YYYY')}
-        </List.Item>
-      </List>
+        ))}
+      <List.Item styleName="med-priority">
+        {moment(date, 'YYYY-MM-DDZhh:mm').format('DD MMMM YYYY HH:mm')}
+      </List.Item>
     </List.Description>
-  </>
+  </div>
 );
 
 File.propTypes = {
   title: PropTypes.string.isRequired,
-  authors: PropTypes.arrayOf(PropTypes.string).isRequired,
-  date: PropTypes.string.isRequired,
   url: PropTypes.string.isRequired,
+  date: PropTypes.string.isRequired,
+  persons: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      title: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+    })
+  ).isRequired,
 };
 export default File;

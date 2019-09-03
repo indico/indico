@@ -7,7 +7,8 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.search.controllers import RHSearch, RHSearchCategories, RHSearchContributions, RHSearchEvents
+from indico.modules.search.controllers import (RHSearch, RHSearchCategories, RHSearchContributions, RHSearchEvents,
+                                               RHSearchFiles)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -20,3 +21,4 @@ _bp.add_url_rule('/search/', 'search', RHSearch)
 _bp.add_url_rule('/search/api/categories', 'search_categories', RHSearchCategories)
 _bp.add_url_rule('/search/api/events', 'search_events', RHSearchEvents)
 _bp.add_url_rule('/search/api/contributions', 'search_contributions', RHSearchContributions)
+_bp.add_url_rule('/search/api/files', 'search_files', RHSearchFiles)

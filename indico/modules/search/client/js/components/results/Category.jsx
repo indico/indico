@@ -10,13 +10,14 @@ export default function Category({title, path, url}) {
       <List.Header>
         <a href={url}>{title}</a>
       </List.Header>
-      <div styleName="description">
-        {path.length !== 0 && (
+
+      {path.length !== 0 && (
+        <div styleName="description">
           <List.Description>
             <CategoryPath path={path} />
           </List.Description>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }

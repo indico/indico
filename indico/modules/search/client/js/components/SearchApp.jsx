@@ -8,6 +8,7 @@
 import searchCategoriesURL from 'indico-url:search.search_categories';
 import searchEventsURL from 'indico-url:search.search_events';
 import searchContributionsURL from 'indico-url:search.search_contributions';
+import searchFilesURL from 'indico-url:search.search_files';
 
 import React, {useEffect, useReducer, useState} from 'react';
 import {Loader, Menu} from 'semantic-ui-react';
@@ -18,7 +19,8 @@ import SearchBar from './SearchBar';
 import Category from './results/Category';
 import Event from './results/Event';
 import Contribution from './results/Contribution';
-// import File from './results/File';
+import File from './results/File';
+import NoResults from './results/NoResults';
 
 import './SearchApp.module.scss';
 
@@ -94,12 +96,15 @@ export default function SearchApp() {
   const [categoryResults, setCategoryPage] = useSearch(searchCategoriesURL(), query);
   const [eventResults, setEventPage] = useSearch(searchEventsURL(), query);
   const [contributionResults, setContributionPage] = useSearch(searchContributionsURL(), query);
+  const [fileResults, setFilePage] = useSearch(searchFilesURL(), query);
 
   const resultMap = {
     categories: categoryResults,
     events: eventResults,
+    contributions: contributionResults,
+    files: fileResults,
   };
-  const resultTypes = ['categories', 'events'];
+  const resultTypes = ['categories', 'events', 'contributions', 'files'];
 
   useEffect(() => {
     if (Object.values(resultMap).some(x => x.loading) || resultMap[activeMenuItem].total !== 0) {
@@ -110,78 +115,103 @@ export default function SearchApp() {
     if (firstTypeWithResults) {
       setActiveMenuItem(firstTypeWithResults);
     }
-  }, [activeMenuItem, categoryResults, eventResults, resultMap, resultTypes]);
+  }, [
+    activeMenuItem,
+    categoryResults,
+    eventResults,
+    contributionResults,
+    fileResults,
+    resultMap,
+    resultTypes,
+  ]);
 
   return (
     <div>
       <SearchBar onSearch={setQuery} />
-
+      {/* if there's a query submitted and at least one resultsType has some results render the tabs */}
+      {/* still not working very well, needs a bit of fine tuning here */}
       {!!query && (
         <>
-          <Menu pointing secondary>
-            <SearchTypeMenuItem
-              name="categories"
-              active={activeMenuItem === 'categories'}
-              title={Translate.string('Categories')}
-              total={categoryResults.total}
-              loading={categoryResults.loading}
-              onClick={handleClick}
-            />
-            <SearchTypeMenuItem
-              name="events"
-              active={activeMenuItem === 'events'}
-              title={Translate.string('Events')}
-              total={eventResults.total}
-              loading={eventResults.loading}
-              onClick={handleClick}
-            />
-            <SearchTypeMenuItem
-              name="contributions"
-              active={activeMenuItem === 'contributions'}
-              title={Translate.string('Contributions')}
-              total={contributionResults.total}
-              loading={contributionResults.loading}
-              onClick={handleClick}
-            />
-            <SearchTypeMenuItem
-              name="files"
-              active={activeMenuItem === 'files'}
-              title={Translate.string('Materials')}
-              total={0}
-              loading={false}
-              onClick={handleClick}
-            />
-          </Menu>
+          {resultTypes.find(x => resultMap[x].total !== 0) ? (
+            <>
+              <Menu pointing secondary>
+                <SearchTypeMenuItem
+                  name="categories"
+                  active={activeMenuItem === 'categories'}
+                  title={Translate.string('Categories')}
+                  total={categoryResults.total}
+                  loading={categoryResults.loading}
+                  onClick={handleClick}
+                />
+                <SearchTypeMenuItem
+                  name="events"
+                  active={activeMenuItem === 'events'}
+                  title={Translate.string('Events')}
+                  total={eventResults.total}
+                  loading={eventResults.loading}
+                  onClick={handleClick}
+                />
+                <SearchTypeMenuItem
+                  name="contributions"
+                  active={activeMenuItem === 'contributions'}
+                  title={Translate.string('Contributions')}
+                  total={contributionResults.total}
+                  loading={contributionResults.loading}
+                  onClick={handleClick}
+                />
+                <SearchTypeMenuItem
+                  name="files"
+                  active={activeMenuItem === 'files'}
+                  title={Translate.string('Materials')}
+                  total={fileResults.total}
+                  loading={fileResults.loading}
+                  onClick={handleClick}
+                />
+              </Menu>
 
-          {activeMenuItem === 'categories' && (
-            <ResultList
-              component={Category}
-              page={categoryResults.page}
-              numPages={categoryResults.pages}
-              data={categoryResults.data}
-              onPageChange={setCategoryPage}
-              loading={categoryResults.loading}
-            />
-          )}
-          {activeMenuItem === 'events' && (
-            <ResultList
-              component={Event}
-              page={eventResults.page}
-              numPages={eventResults.pages}
-              data={eventResults.data}
-              onPageChange={setEventPage}
-              loading={eventResults.loading}
-            />
-          )}
-          {activeMenuItem === 'contributions' && (
-            <ResultList
-              component={Contribution}
-              page={contributionResults.page}
-              numPages={contributionResults.pages}
-              data={contributionResults.data}
-              onPageChange={setContributionPage}
-              loading={contributionResults.loading}
-            />
+              {activeMenuItem === 'categories' && (
+                <ResultList
+                  component={Category}
+                  page={categoryResults.page}
+                  numPages={categoryResults.pages}
+                  data={categoryResults.data}
+                  onPageChange={setCategoryPage}
+                  loading={categoryResults.loading}
+                />
+              )}
+              {activeMenuItem === 'events' && (
+                <ResultList
+                  component={Event}
+                  page={eventResults.page}
+                  numPages={eventResults.pages}
+                  data={eventResults.data}
+                  onPageChange={setEventPage}
+                  loading={eventResults.loading}
+                />
+              )}
+              {activeMenuItem === 'contributions' && (
+                <ResultList
+                  component={Contribution}
+                  page={contributionResults.page}
+                  numPages={contributionResults.pages}
+                  data={contributionResults.data}
+                  onPageChange={setContributionPage}
+                  loading={contributionResults.loading}
+                />
+              )}
+              {activeMenuItem === 'files' && (
+                <ResultList
+                  component={File}
+                  page={fileResults.page}
+                  numPages={fileResults.pages}
+                  data={fileResults.data}
+                  onPageChange={setFilePage}
+                  loading={fileResults.loading}
+                />
+              )}
+            </>
+          ) : (
+            <NoResults />
           )}
         </>
       )}

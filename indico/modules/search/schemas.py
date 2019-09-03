@@ -32,7 +32,7 @@ class CategoryResultSchema(mm.ModelSchema):
 class EventResultSchema(mm.ModelSchema):
     class Meta:
         model = Event
-        fields = ('id', 'title', 'url', 'type', 'start_dt', 'end_dt', 'category_path')
+        fields = ('id', 'title', 'url', 'type', 'start_dt', 'end_dt', 'category_path', 'speakers')
 
     category_path = mm.Function(lambda event: _get_category_path(event.detailed_category_chain))
 
@@ -46,5 +46,14 @@ class PersonSchema(mm.Schema):
 class ContributionResultSchema(mm.Schema):
     id = mm.Int()
     title = mm.String()
-    start_dt = mm.DateTime()
+    url = mm.String()
+    start_dt = mm.String()
+    persons = mm.Nested(PersonSchema, many=True)
+
+
+class FileResultSchema(mm.Schema):
+    id = mm.Int()
+    title = mm.String()
+    url = mm.String()
+    date = mm.String()
     persons = mm.Nested(PersonSchema, many=True)
