@@ -376,3 +376,10 @@ class CloneRepeatPatternForm(CloneRepeatUntilFormBase):
     week_day = IndicoWeekDayRepetitionField(_('Every'))
     num_months = IntegerField(_('Months'), [DataRequired(), NumberRange(min=1)], default=1,
                               description=_("Number of months between repetitions"))
+
+
+class ProgramCodesForm(IndicoForm):
+    session_template = StringField(_('Sessions'))
+    session_block_template = StringField(_('Session blocks'))
+    contribution_template = StringField(_('Contributions'))
+    subcontribution_template = StringField(_('Subcontributions'))

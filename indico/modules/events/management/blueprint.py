@@ -8,7 +8,7 @@
 from __future__ import unicode_literals
 
 from indico.modules.events import event_management_object_url_prefixes
-from indico.modules.events.management.controllers import actions, cloning, posters, protection, settings
+from indico.modules.events.management.controllers import actions, cloning, posters, program_codes, protection, settings
 from indico.web.flask.util import make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
 
@@ -45,6 +45,10 @@ _bp.add_url_rule('/clone/preview', 'clone_preview', cloning.RHClonePreview, meth
 # Posters
 _bp.add_url_rule('/print-poster/settings', 'poster_settings', posters.RHPosterPrintSettings, methods=('GET', 'POST'))
 _bp.add_url_rule('/print-poster/<int:template_id>/<uuid>', 'print_poster', posters.RHPrintEventPoster)
+# Program Codes
+_bp.add_url_rule('/program-codes/', 'program_codes', program_codes.RHProgramCodes)
+_bp.add_url_rule('/program-codes/templates', 'program_code_templates', program_codes.RHProgramCodeTemplates,
+                 methods=('GET', 'POST'))
 
 
 for object_type, prefixes in event_management_object_url_prefixes.iteritems():

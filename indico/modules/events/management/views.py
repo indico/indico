@@ -69,6 +69,10 @@ class WPEventProtection(WPEventManagement):
     template_prefix = 'events/management/'
 
 
+class WPEventProgramCodes(WPEventManagement):
+    template_prefix = 'events/management/'
+
+
 def render_event_management_header_right(event):
     tpl = get_template_module('events/management/_management_frame.html')
     return tpl.render_event_management_header_right(event=event, event_types=[(et.name, et.title) for et in EventType])

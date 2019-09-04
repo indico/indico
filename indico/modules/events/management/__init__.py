@@ -26,7 +26,50 @@ def _sidemenu_sections(sender, **kwargs):
 
 @signals.menu.items.connect_via('event-management-sidemenu')
 def _sidemenu_items(sender, event, **kwargs):
+    from indico.modules.events.models.events import EventType
     if event.can_manage(session.user):
         yield SideMenuItem('settings', _('Settings'), url_for('event_management.settings', event), 100, icon='settings')
         yield SideMenuItem('protection', _('Protection'), url_for('event_management.protection', event),
                            60, icon='shield')
+        if event.type_ == EventType.conference:
+            yield SideMenuItem('program_codes', _('Programme Codes'), url_for('event_management.program_codes', event),
+                               section='advanced')
+
+
+@signals.get_placeholders.connect_via('program-codes-contribution')
+def _get_placeholders(sender, contribution, **kwargs):
+    from . import program_codes as pc
+    yield pc.ContributionIDPlaceholder
+    yield pc.ContributionSessionCodePlaceholder
+    yield pc.ContributionSessionBlockCodePlaceholder
+    yield pc.ContributionTrackCodePlaceholder
+    yield pc.ContributionYearPlaceholder
+    yield pc.ContributionMonthPlaceholder
+    yield pc.ContributionDayPlaceholder
+    yield pc.ContributionWeekday2Placeholder
+    yield pc.ContributionWeekday3Placeholder
+
+
+@signals.get_placeholders.connect_via('program-codes-subcontribution')
+def _get_placeholders(sender, subcontribution, **kwargs):
+    from . import program_codes as pc
+    yield pc.SubContributionIDPlaceholder
+    yield pc.SubContributionContributionCodePlaceholder
+
+
+@signals.get_placeholders.connect_via('program-codes-session')
+def _get_placeholders(sender, session, **kwargs):
+    from . import program_codes as pc
+    yield pc.SessionIDPlaceholder
+    yield pc.SessionSessionTypeCodePlaceholder
+
+
+@signals.get_placeholders.connect_via('program-codes-session-block')
+def _get_placeholders(sender, session_block, **kwargs):
+    from . import program_codes as pc
+    yield pc.SessionBlockSessionCodePlaceholder
+    yield pc.SessionBlockYearPlaceholder
+    yield pc.SessionBlockMonthPlaceholder
+    yield pc.SessionBlockDayPlaceholder
+    yield pc.SessionBlockWeekday2Placeholder
+    yield pc.SessionBlockWeekday3Placeholder

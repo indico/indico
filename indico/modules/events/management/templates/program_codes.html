@@ -1,0 +1,54 @@
+{% extends 'events/management/base.html' %}
+
+{% block title %}{% trans %}Programme codes{% endtrans %}{% endblock %}
+
+{% block description %}
+    {% trans -%}
+        You can automatically assign programme codes in your event to have more meaningful
+        ways of referencing e.g. certain contributions outside Indico.
+    {%- endtrans %}
+{% endblock %}
+
+{% block content %}
+    <h3>
+        {% trans %}Programme code templates{% endtrans %}
+        <button class="icon-edit i-button i-button-small text-color borderless"
+                data-href="{{ url_for('.program_code_templates', event) }}"
+                data-title="{% trans %}Edit programme code templates{% endtrans %}"
+                data-reload-after
+                data-ajax-dialog></button>
+    </h3>
+    <dl class="i-data-list">
+        <dt>{% trans %}Sessions{% endtrans %}</dt>
+        <dd>
+            {% if templates.session_template %}
+                <code>{{ templates.session_template }}</code>
+            {% else %}
+                <em>{% trans %}No template defined{% endtrans %}</em>
+            {% endif %}
+        </dd>
+        <dt>{% trans %}Session blocks{% endtrans %}</dt>
+        <dd>
+            {% if templates.session_block_template %}
+                <code>{{ templates.session_block_template}}</code>
+            {% else %}
+                <em>{% trans %}No template defined{% endtrans %}</em>
+            {% endif %}
+        <dt>{% trans %}Contributions{% endtrans %}</dt>
+        <dd>
+            {% if templates.contribution_template %}
+                <code>{{ templates.contribution_template }}</code>
+            {% else %}
+                <em>{% trans %}No template defined{% endtrans %}</em>
+            {% endif %}
+        </dd>
+        <dt>{% trans %}Subcontributions{% endtrans %}</dt>
+        <dd>
+            {% if templates.subcontribution_template %}
+                <code>{{ templates.subcontribution_template }}</code>
+            {% else %}
+                <em>{% trans %}No template defined{% endtrans %}</em>
+            {% endif %}
+        </dd>
+    </dl>
+{% endblock %}
