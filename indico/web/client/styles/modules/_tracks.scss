@@ -74,6 +74,12 @@ ul.sub-tracks {
     display: none;
 }
 
+.track-placeholder {
+    background: $light-gray;
+    border: 1px dashed $gray;
+    margin-bottom: 15px;
+}
+
 .track-review-list {
     ul {
         padding-left: 10px;

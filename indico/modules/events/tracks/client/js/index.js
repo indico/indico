@@ -30,6 +30,7 @@
           distance: 2,
           tolerance: 'pointer',
           forcePlaceholderSize: true,
+          placeholder: 'track-placeholder',
           connectWith: '.track-list',
           update: function() {
             const $this = $(this);
