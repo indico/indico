@@ -61,7 +61,7 @@ function useSearch(url, outerQuery) {
     {
       page: data ? data.page : 1,
       pages: data ? data.pages : 1,
-      total: data ? data.total : 0,
+      total: data ? data.total : -1,
       data: data ? data.results : [],
       loading,
     },
@@ -97,7 +97,7 @@ export default function SearchApp() {
   const [eventResults, setEventPage] = useSearch(searchEventsURL(), query);
   const [contributionResults, setContributionPage] = useSearch(searchContributionsURL(), query);
   const [fileResults, setFilePage] = useSearch(searchFilesURL(), query);
-  const [results, setResults] = useState(true);
+  const [results, setResults] = useState('initial state');
 
   const resultMap = {
     categories: categoryResults,
@@ -126,27 +126,23 @@ export default function SearchApp() {
     resultTypes,
   ]);
 
+  // handle the correct rendering of NoResults Placeholder
   useEffect(() => {
-    const firstTypeWithResults = resultTypes.find(x => resultMap[x].total !== 0);
-    // console.log('1st step .....................');
-    if (Object.values(resultMap).some(x => x.loading)) {
-      // don't switch while loading
-      // console.log('1firstTypeWithResults: ', firstTypeWithResults, activeMenuItem);
-      // console.log('cancelling this');
+    if (Object.values(resultMap).some(x => x.total === -1)) {
+      setResults('initial state');
       return;
     }
-    // console.log('2nd step .....................');
-    if (firstTypeWithResults) {
-      if (firstTypeWithResults !== activeMenuItem) {
-        // console.log('2firstTypeWithResults: ', firstTypeWithResults, activeMenuItem);
-        // console.log('cancelling this');
-        return;
-      }
+    if (Object.values(resultMap).some(x => x.loading)) {
+      setResults('loading');
+      return;
     }
-    // console.log('3rd step .....................');
-    // console.log('3firstTypeWithResults: ', firstTypeWithResults, activeMenuItem);
-    setResults(resultTypes.some(x => x === firstTypeWithResults));
-  }, [activeMenuItem, resultMap, resultTypes]);
+    const firstTypeWithResults = resultTypes.find(x => resultMap[x].total !== 0);
+    if (firstTypeWithResults) {
+      setResults('loaded');
+      return;
+    }
+    setResults('empty');
+  }, [resultMap, resultTypes]);
 
   return (
     <div>
@@ -155,7 +151,7 @@ export default function SearchApp() {
       {/* still not working very well, needs a bit of fine tuning here */}
       {!!query && (
         <>
-          {results ? (
+          {results === 'loaded' && (
             <>
               <Menu pointing secondary>
                 <SearchTypeMenuItem
@@ -233,9 +229,8 @@ export default function SearchApp() {
                 />
               )}
             </>
-          ) : (
-            <NoResults />
           )}
+          {results === 'empty' && <NoResults />}
         </>
       )}
     </div>
