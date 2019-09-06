@@ -75,7 +75,7 @@ class AbstractInvitationURLPlaceholder(Placeholder):
 
     @classmethod
     def render(cls, abstract):
-        return url_for('abstracts.submit_invited_abstract', abstract, _external=True)
+        return url_for('abstracts.submit_invited_abstract', abstract, token=abstract.uuid, _external=True)
 
 
 class AbstractTrackPlaceholder(Placeholder):

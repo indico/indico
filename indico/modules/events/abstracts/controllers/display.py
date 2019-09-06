@@ -7,7 +7,7 @@
 
 from __future__ import unicode_literals
 
-from flask import flash, session
+from flask import flash, request, session
 from werkzeug.exceptions import Forbidden
 
 from indico.core.errors import NoReportError
@@ -79,10 +79,14 @@ class RHSubmitInvitedAbstract(RHAbstractBase):
             raise Forbidden
 
     def _check_abstract_protection(self):
+        if 'token' in request.args:
+            token = request.args['token']
+            return self.abstract.uuid == token
         return self.event.can_manage(session.user) or self.abstract.submitter == session.user
 
     def _create_form(self):
-        abstract_form_cls = make_abstract_form(self.event, session.user)
+        form_user = session.user if session.user else self.abstract.submitter
+        abstract_form_cls = make_abstract_form(self.event, form_user)
         custom_field_values = {'custom_{}'.format(x.contribution_field_id): x.data for x in self.abstract.field_values}
         form_defaults = FormDefaults(self.abstract, **custom_field_values)
         return abstract_form_cls(obj=form_defaults, event=self.event, abstract=self.abstract)
@@ -95,6 +99,8 @@ class RHSubmitInvitedAbstract(RHAbstractBase):
         form = self._create_form()
         if form.validate_on_submit():
             fields, custom_fields = get_field_values(form.data)
-            update_abstract(self.abstract, dict(fields, state=AbstractState.submitted), custom_fields)
+            abstract_data = dict(fields, state=AbstractState.submitted, uuid=None)
+            update_abstract(self.abstract, abstract_data, custom_fields)
             return jsonify_data(flash=False, redirect=url_for('.call_for_abstracts', self.event))
-        return jsonify_form(form, form_header_kwargs={'action': url_for('.submit_invited_abstract', self.abstract)})
+        return jsonify_form(form, form_header_kwargs={'action': url_for('.submit_invited_abstract',
+                                                                        self.abstract, token=self.abstract.uuid)})

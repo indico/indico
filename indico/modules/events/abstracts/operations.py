@@ -10,6 +10,7 @@ from __future__ import unicode_literals
 import mimetypes
 from collections import defaultdict
 from operator import attrgetter
+from uuid import uuid4
 
 from flask import session
 
@@ -94,6 +95,7 @@ def delete_abstract_files(abstract, files):
 def create_abstract(event, abstract_data, custom_fields_data=None, send_notifications=False, submitter=None):
     abstract = Abstract(event=event, submitter=session.user if submitter is None else submitter)
     if submitter:
+        abstract.uuid = unicode(uuid4())
         abstract.state = AbstractState.invited
     tracks = abstract_data.pop('submitted_for_tracks', None)
     attachments = abstract_data.pop('attachments', None)

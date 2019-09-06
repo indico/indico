@@ -29,7 +29,7 @@ class RHDisplayAbstract(RHAbstractBase):
                                defaultload('reviews').joinedload('ratings').joinedload('question'))
 
     def _check_abstract_protection(self):
-        if self.abstract.state == AbstractState.invited:
+        if self.abstract.state == AbstractState.invited and not self.management:
             return False
         return RHAbstractBase._check_abstract_protection(self)
 
@@ -51,7 +51,10 @@ class RHEditAbstract(RHAbstractBase):
         defaults = FormDefaults(self.abstract, attachments=self.abstract.files, **custom_field_values)
         form = abstract_form_class(obj=defaults, abstract=self.abstract, event=self.event, management=self.management)
         if form.validate_on_submit():
-            update_abstract(self.abstract, *get_field_values(form.data))
+            fields, custom_fields = get_field_values(form.data)
+            if self.abstract.state == AbstractState.invited:
+                fields['state'] = AbstractState.submitted
+            update_abstract(self.abstract, fields, custom_fields)
             flash(_("Abstract modified successfully"), 'success')
             return jsonify_data(flash=False)
         self.commit = False
