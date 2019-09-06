@@ -24,8 +24,13 @@
             <span class="alpha-order-switch i-button label icon-only icon-sort-alpha-asc {% if not use_custom_order %}active{% endif %}">
             </span>
             <div class="right">
-                <span id="add-existing-{{ field.id }}" class="i-button highlight text-color"
-                      title="{% trans %}Search among Indico users{% endtrans %}">
+                {% if field.disable_user_search %}
+                    {% set msg = _("You have to log in in order to be able to search for Indico users") %}
+                {% else %}
+                    {% set msg = _("Search among Indico users") %}
+                {% endif %}
+                <span id="add-existing-{{ field.id }}" class="i-button highlight text-color {{ 'disabled' if field.disable_user_search }}"
+                      title="{{ msg }}">
                     {% trans %}Search{% endtrans %}
                 </span>
                 <span id="add-new-{{ field.id }}" class="i-button"
@@ -42,6 +47,7 @@
         setupPersonLinkWidget({
             fieldId: {{ field.id | tojson }},
             eventId: {{ (field.event.id if field.event else none) | tojson }},
+            disableUserSearch: {{ field.disable_user_search | default(false) | tojson }},
             authorTypes: {{ (field.author_types or none) | tojson }},
             showEmptyCoauthors: {{ field.show_empty_coauthors | default(true) | tojson }},
             sortByLastName: {{ field.sort_by_last_name | default(false) | tojson }},
