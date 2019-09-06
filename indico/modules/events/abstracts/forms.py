@@ -12,6 +12,7 @@ from datetime import time
 from flask import request, session
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.fields import BooleanField, HiddenField, IntegerField, SelectField, StringField, TextAreaField
+from wtforms.fields.html5 import EmailField
 from wtforms.validators import DataRequired, InputRequired, NumberRange, Optional, ValidationError
 from wtforms.widgets import Select
 
@@ -33,7 +34,7 @@ from indico.web.forms.base import FormDefaults, IndicoForm, generated_data
 from indico.web.forms.fields import (EditableFileField, EmailListField, HiddenEnumField, HiddenFieldList,
                                      IndicoDateTimeField, IndicoEnumSelectField, IndicoMarkdownField,
                                      IndicoQuerySelectMultipleCheckboxField, IndicoQuerySelectMultipleField,
-                                     PrincipalField, PrincipalListField)
+                                     IndicoRadioField, PrincipalField, PrincipalListField)
 from indico.web.forms.util import inject_validators
 from indico.web.forms.validators import HiddenUnless, LinkedDateTime, SoftLength, UsedIf, WordCount
 from indico.web.forms.widgets import SwitchWidget
@@ -558,9 +559,17 @@ class SendNotificationsMixin(object):
     send_notifications = BooleanField(_("Send email notifications"), default=True)
 
 
-class InvitedAbstractMixin(IndicoForm):
-    submitter = PrincipalField(_('Submitter'), [DataRequired()], allow_external=True,
+class InvitedAbstractMixin(object):
+    users_with_no_account = IndicoRadioField(_('Type of user'), [DataRequired()], default='existing',
+                                             choices=(('existing', _('Existing user')),
+                                                      ('new', _('New user'))))
+    submitter = PrincipalField(_('Submitter'),
+                               [HiddenUnless('users_with_no_account', 'existing'), DataRequired()], allow_external=True,
                                description=_('The person invited to submit the abstract'))
+    first_name = StringField(_('First name'), [HiddenUnless('users_with_no_account', 'new'), DataRequired()])
+    last_name = StringField(_('Family name'), [HiddenUnless('users_with_no_account', 'new'), DataRequired()])
+    email = EmailField(_('Email address'), [HiddenUnless('users_with_no_account', 'new'), DataRequired()],
+                       filters=[lambda x: x.lower() if x else x])
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs['event']
@@ -571,6 +580,8 @@ class InvitedAbstractMixin(IndicoForm):
         if not can_create_invited_abstracts(self.event):
             raise ValidationError(_('You have to create an "Invited" abstract notification template in order to '
                                     'be able to create invited abstracts.'))
+        else:
+            return super(InvitedAbstractMixin, self).validate()
 
 
 class AbstractsScheduleForm(IndicoForm):

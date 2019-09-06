@@ -18,14 +18,22 @@
             After you submit the abstract it will subject to the reviewing process.
         {% endtrans %}
     {%- endcall %}
+    {% if session.user and session.user != abstract.submitter %}
+        {% call message_box('warning') -%}
+            {% trans submitter_name=abstract.submitter.full_name %}
+                You are submitting an abstract on behalf of {{ submitter_name }}.
+                Make sure you have been approved to do that.
+            {% endtrans %}
+        {%- endcall %}
+    {% endif -%}
     <div class="invited-abstract-form-container">
-        {% call form_header(form, action=url_for('.submit_invited_abstract', abstract)) %}
-            data-href="{{ url_for('.submit_invited_abstract', abstract) }}"
+        {% call form_header(form, action=url_for('.submit_invited_abstract', abstract, token=abstract.uuid)) -%}
+            data-href="{{ url_for('.submit_invited_abstract', abstract, token=abstract.uuid) }}"
             data-form-container=".invited-abstract-form-container"
             data-ajax-form
             data-confirm-close-unsaved
-        {% endcall %}
-        {{ form_rows(form) }}
+        {%- endcall %}
+        {{- form_rows(form) -}}
         {% call form_footer(form) %}
             <input class="i-button big highlight" data-disabled-until-change type="submit" value="{% trans %}Submit{% endtrans %}">
         {% endcall %}

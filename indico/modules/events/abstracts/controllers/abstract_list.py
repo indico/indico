@@ -13,6 +13,7 @@ from operator import attrgetter
 from flask import flash, jsonify, request, session
 from sqlalchemy.orm import joinedload, subqueryload
 
+from indico.core.db import db
 from indico.modules.events.abstracts.controllers.base import RHManageAbstractsBase
 from indico.modules.events.abstracts.controllers.common import (AbstractsDownloadAttachmentsMixin, AbstractsExportCSV,
                                                                 AbstractsExportExcel, AbstractsExportPDFMixin,
@@ -27,6 +28,7 @@ from indico.modules.events.abstracts.util import can_create_invited_abstracts, m
 from indico.modules.events.abstracts.views import WPManageAbstracts
 from indico.modules.events.contributions.models.persons import AuthorType
 from indico.modules.events.util import get_field_values
+from indico.modules.users.models.users import User
 from indico.util.i18n import _, ngettext
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
@@ -120,11 +122,28 @@ class RHCreateAbstract(RHAbstractListBase):
             del form.person_links
 
         if form.validate_on_submit():
+            if is_invited:
+                if form.data['users_with_no_account'] == 'existing':
+                    submitter = form.data.pop('submitter')
+                else:
+                    submitter = User(first_name=form.data.pop('first_name'), last_name=form.data.pop('last_name'),
+                                     email=form.data.pop('email'), is_pending=True)
+                    db.session.add(submitter)
+                    db.session.flush()
+
+                del form.users_with_no_account
+                del form.first_name
+                del form.last_name
+                del form.email
+                del form.submitter
+            else:
+                submitter = None
+
             data = form.data
             send_notifications = data.pop('send_notifications', is_invited)
-            invited_submitter = data.pop('submitter', None)
-            abstract = create_abstract(self.event, *get_field_values(data), send_notifications=send_notifications,
-                                       submitter=invited_submitter)
+            with db.session.no_autoflush:
+                abstract = create_abstract(self.event, *get_field_values(data), send_notifications=send_notifications,
+                                           submitter=submitter)
             flash(_("Abstract '{}' created successfully").format(abstract.title), 'success')
             tpl_components = self.list_generator.render_list(abstract)
             if tpl_components.get('hide_abstract'):

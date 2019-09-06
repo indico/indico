@@ -11,7 +11,6 @@ from collections import defaultdict
 from itertools import chain
 from operator import attrgetter
 
-from flask import has_request_context, request, session
 from sqlalchemy import inspect
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.declarative import declared_attr
@@ -465,14 +464,6 @@ class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFie
     @locator_property
     def locator(self):
         return dict(self.event.locator, abstract_id=self.id)
-
-    @locator.submitter
-    def locator(self):
-        loc = self.locator
-        if (not self.submitter or not has_request_context() or self.submitter != session.user or
-                request.args.get('token') == self.uuid):
-            loc['token'] = self.uuid
-        return loc
 
     @hybrid_property
     def judgment_comment(self):
