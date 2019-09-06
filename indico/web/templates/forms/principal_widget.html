@@ -2,7 +2,9 @@
 
 
 {% block html %}
-    <input type="hidden" id="{{ field.id }}" name="{{ field.name }}" value="{{ field._value() | tojson | forceescape }}">
+    <input type="hidden" id="{{ field.id }}" name="{{ field.name }}"
+           value="{{ field._value() | tojson | forceescape }}"
+           {{ input_args | html_params }}>
     <input type="text" id="display-{{ field.id }}" placeholder="{% trans %}Choose user...{% endtrans %}" readonly>
     <button type="button" id="choose-{{ field.id }}" class="i-button" data-tooltip-anchor>{% trans %}Choose{% endtrans %}</button>
 {% endblock %}
