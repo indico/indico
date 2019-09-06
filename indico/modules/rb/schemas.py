@@ -85,6 +85,38 @@ class RoomUpdateSchema(RoomSchema):
                                            'acl_entries', 'protection_mode')
 
 
+class RoomUpdateArgsSchema(mm.Schema):
+    verbose_name = fields.String(allow_none=True)
+    site = fields.String(allow_none=True)
+    building = fields.String(validate=lambda x: x is not None)
+    floor = fields.String(validate=lambda x: x is not None)
+    number = fields.String(validate=lambda x: x is not None)
+    longitude = fields.Float(allow_none=True)
+    latitude = fields.Float(allow_none=True)
+    is_reservable = fields.Boolean(allow_none=True)
+    reservations_need_confirmation = fields.Boolean(allow_none=True)
+    notification_emails = fields.List(fields.Email())
+    notification_before_days = fields.Int(validate=lambda x: 1 <= x <= 30, allow_none=True)
+    notification_before_days_weekly = fields.Int(validate=lambda x: 1 <= x <= 30, allow_none=True)
+    notification_before_days_monthly = fields.Int(validate=lambda x: 1 <= x <= 30, allow_none=True)
+    notifications_enabled = fields.Boolean()
+    end_notification_daily = fields.Int(validate=lambda x: 1 <= x <= 30, allow_none=True)
+    end_notification_weekly = fields.Int(validate=lambda x: 1 <= x <= 30, allow_none=True)
+    end_notification_monthly = fields.Int(validate=lambda x: 1 <= x <= 30, allow_none=True)
+    end_notifications_enabled = fields.Boolean()
+    booking_limit_days = fields.Int(validate=lambda x: x >= 1, allow_none=True)
+    owner = Principal(validate=lambda x: x is not None, allow_none=True)
+    key_location = fields.String()
+    telephone = fields.String()
+    capacity = fields.Int(validate=lambda x: x >= 1)
+    division = fields.String(allow_none=True)
+    surface_area = fields.Int(validate=lambda x: x >= 0, allow_none=True)
+    max_advance_days = fields.Int(validate=lambda x: x >= 1, allow_none=True)
+    comments = fields.String()
+    acl_entries = PrincipalPermissionList(RoomPrincipal)
+    protection_mode = EnumField(ProtectionMode)
+
+
 class RoomEquipmentSchema(mm.ModelSchema):
     class Meta:
         model = Room
@@ -347,6 +379,7 @@ rb_user_schema = RBUserSchema()
 rooms_schema = RoomSchema(many=True)
 room_attribute_values_schema = RoomAttributeValuesSchema(many=True)
 room_update_schema = RoomUpdateSchema()
+room_update_args_schema = RoomUpdateArgsSchema()
 room_equipment_schema = RoomEquipmentSchema()
 map_areas_schema = MapAreaSchema(many=True)
 reservation_occurrences_schema = ReservationOccurrenceSchema(many=True)
