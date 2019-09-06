@@ -487,6 +487,7 @@ class AbstractForm(IndicoForm):
             del self.description
         self.person_links.require_speaker_author = abstracts_settings.get(self.event, 'speakers_required')
         self.person_links.allow_speakers = abstracts_settings.get(self.event, 'allow_speakers')
+        self.person_links.disable_user_search = session.user is None
 
     def _get_description_validators(self, description_settings):
         validators = []

@@ -15,6 +15,7 @@
       true,
       {
         fieldId: null,
+        disableUserSearch: false,
         eventId: null,
         authorTypes: null,
         showEmptyCoauthors: true,
@@ -370,9 +371,11 @@
       },
     });
 
-    $buttonAddExisting.on('click', function() {
-      $field.principalfield('choose');
-    });
+    if (!options.disableUserSearch) {
+      $buttonAddExisting.on('click', function() {
+        $field.principalfield('choose');
+      });
+    }
 
     $buttonAddNew.on('click', function() {
       $field.principalfield('enter');

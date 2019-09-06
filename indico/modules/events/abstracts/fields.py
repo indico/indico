@@ -109,6 +109,7 @@ class AbstractPersonLinkListField(PersonLinkListFieldBase):
         self.default_is_speaker = False
         self.require_primary_author = True
         self.sort_by_last_name = True
+        self.disable_user_search = kwargs.pop('disable_user_search', False)
         super(AbstractPersonLinkListField, self).__init__(*args, **kwargs)
 
     def _convert_data(self, data):
