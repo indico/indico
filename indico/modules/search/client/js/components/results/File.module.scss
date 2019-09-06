@@ -15,7 +15,7 @@
 
         .high-priority {
             font-size: 15px;
-            font-weight: bold;
+            // font-weight: bold;
 
             li {
                 display: inline;
@@ -35,6 +35,8 @@
 
         .med-priority {
             font-size: 13px;
+            color: $dark-gray;
+            font-style: italic;
         }
 
         .low-priority {
