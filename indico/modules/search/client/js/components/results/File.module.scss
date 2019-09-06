@@ -16,6 +16,21 @@
         .high-priority {
             font-size: 15px;
             font-weight: bold;
+
+            li {
+                display: inline;
+
+                &::after {
+                    content: ', ';
+                }
+
+                &:last-child {
+
+                    &::after {
+                        content: '';
+                    }
+                }
+            }
         }
 
         .med-priority {

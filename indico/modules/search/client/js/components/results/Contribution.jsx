@@ -11,12 +11,13 @@ const Contribution = ({title, url, startDt, persons}) => (
       <a href={url}>{title}</a>
     </List.Header>
     <List.Description styleName="description">
-      {persons.length !== 0 &&
-        persons.map(item => (
-          <List.Item key={item.id} styleName="high-priority">
-            {item.title ? `${item.title} ${item.name}` : `${item.name}`}
-          </List.Item>
-        ))}
+      {persons.length !== 0 && (
+        <div styleName="high-priority">
+          {persons.map(item => (
+            <li key={item.id}>{item.title ? `${item.title} ${item.name}` : `${item.name}`}</li>
+          ))}
+        </div>
+      )}
       <List.Item styleName="med-priority">
         {moment(startDt, 'YYYY-MM-DDZhh:mm').format('DD MMMM YYYY HH:mm')}
       </List.Item>
