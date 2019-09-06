@@ -114,7 +114,7 @@ class AccessControlListField(PrincipalListField):
 class PrincipalField(PrincipalListField):
     """A field that lets you select an Indico user/group ("principal")"""
 
-    widget = JinjaWidget('forms/principal_widget.html', single_line=True)
+    widget = JinjaWidget('forms/principal_widget.html', single_line=True, single_kwargs=True)
 
     def _get_data(self):
         return [] if self.data is None else [self.data]
