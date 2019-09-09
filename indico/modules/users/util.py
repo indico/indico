@@ -97,7 +97,7 @@ def get_suggested_categories(user):
     return res
 
 
-def get_linked_events(user, dt, limit=None):
+def get_linked_events(user, dt, limit=None, load_also=()):
     """Get the linked events and the user's roles in them
 
     :param user: A `User`
@@ -144,7 +144,7 @@ def get_linked_events(user, dt, limit=None):
                      Event.id.in_(links))
              .options(joinedload('series'),
                       load_only('id', 'category_id', 'title', 'start_dt', 'end_dt',
-                                'series_id', 'series_pos', 'series_count'))
+                                'series_id', 'series_pos', 'series_count', *load_also))
              .order_by(Event.start_dt, Event.id))
     if limit is not None:
         query = query.limit(limit)

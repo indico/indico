@@ -7,13 +7,25 @@
 
 from __future__ import absolute_import, unicode_literals
 
+import re
+
+from dateutil import parser, relativedelta
 from marshmallow import ValidationError
 from marshmallow.fields import DateTime, Field
 from marshmallow.utils import from_iso_datetime
 from sqlalchemy import inspect
 
 from indico.core.permissions import get_unified_permissions
+from indico.util.date_time import now_utc
 from indico.util.user import principal_from_identifier
+
+
+HUMANIZED_DATE_RE = re.compile(r'^(?:(?P<number>-?\d+)(?P<unit>[dwM]))|(?P<iso_date>\d{4}-\d{2}-\d{2})$')
+HUMANIZED_UNIT_MAP = {
+    'M': 'months',
+    'w': 'weeks',
+    'd': 'days'
+}
 
 
 def validate_with_message(fn, reason):
@@ -163,3 +175,28 @@ class PrincipalPermissionList(Field):
             }
         except ValueError as exc:
             raise ValidationError(unicode(exc))
+
+
+class HumanizedDate(Field):
+    """Marshmallow field for human-written dates used in REST APIs.
+
+       This field allows for simple time deltas, e.g.: ``1d`` = "1 day`, ``1w`` = "1 week",
+       ``-2M`` = "2 months ago";
+       Simple ISO dates are also accepted (``YYYY-MM-DD``).
+    """
+
+    def _serialize(self, value, attr, obj):
+        raise NotImplementedError
+
+    def _deserialize(self, value, attr, obj):
+        m = HUMANIZED_DATE_RE.match(value)
+        if not m:
+            raise ValidationError("Can't parse humanized date!")
+
+        if m.group('iso_date'):
+            return parser.isoparse(value)
+        else:
+            unit = m.group('unit')
+            today = now_utc(False)
+            number = int(m.group('number'))
+            return today + relativedelta.relativedelta(**{HUMANIZED_UNIT_MAP[unit]: number})

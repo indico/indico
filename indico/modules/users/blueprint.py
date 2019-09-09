@@ -10,9 +10,9 @@ from __future__ import unicode_literals
 from flask import request
 
 from indico.modules.users.api import RHUserFavoritesAPI, fetch_authenticated_user
-from indico.modules.users.controllers import (RHAcceptRegistrationRequest, RHAdmins, RHPersonalData,
-                                              RHRegistrationRequestList, RHRejectRegistrationRequest, RHUserDashboard,
-                                              RHUserEmails, RHUserEmailsDelete, RHUserEmailsSetPrimary,
+from indico.modules.users.controllers import (RHAcceptRegistrationRequest, RHAdmins, RHExportDashboardICS,
+                                              RHPersonalData, RHRegistrationRequestList, RHRejectRegistrationRequest,
+                                              RHUserDashboard, RHUserEmails, RHUserEmailsDelete, RHUserEmailsSetPrimary,
                                               RHUserEmailsVerify, RHUserFavorites, RHUserFavoritesCategoryAPI,
                                               RHUserFavoritesUserRemove, RHUserFavoritesUsersAdd, RHUserPreferences,
                                               RHUsersAdmin, RHUsersAdminCreate, RHUsersAdminMerge,
@@ -39,7 +39,6 @@ _bp.add_url_rule('!/admin/users/registration-requests/<int:request_id>/accept', 
 _bp.add_url_rule('!/admin/users/registration-requests/<int:request_id>/reject', 'reject_registration_request',
                  RHRejectRegistrationRequest, methods=('POST',))
 
-
 # User profile
 with _bp.add_prefixed_rules('/<int:user_id>'):
     _bp.add_url_rule('/dashboard/', 'user_dashboard', RHUserDashboard)
@@ -57,6 +56,8 @@ with _bp.add_prefixed_rules('/<int:user_id>'):
     _bp.add_url_rule('/emails/verify/<token>', 'user_emails_verify', RHUserEmailsVerify)
     _bp.add_url_rule('/emails/<email>', 'user_emails_delete', RHUserEmailsDelete, methods=('DELETE',))
     _bp.add_url_rule('/emails/make-primary', 'user_emails_set_primary', RHUserEmailsSetPrimary, methods=('POST',))
+
+_bp.add_url_rule('/<int:user_id>/dashboard.ics', 'export_dashboard_ics', RHExportDashboardICS)
 
 # User search
 _bp.add_url_rule('/search/info', 'user_search_info', RHUserSearchInfo)
