@@ -55,5 +55,8 @@ class FileResultSchema(mm.Schema):
     id = mm.Int()
     title = mm.String()
     url = mm.String()
+    type = mm.String()
+    contributionTitle = mm.String()
     date = mm.String()
+    contribURL = mm.String()
     persons = mm.Nested(PersonSchema, many=True)

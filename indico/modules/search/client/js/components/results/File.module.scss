@@ -11,11 +11,18 @@
     color: $dark-gray;
 
     .description {
-        padding: 0.5em 0;
+        padding: 0.4em 0;
+
+        a , a:hover {
+            font-size: 15px;
+            color: black;
+        }
 
         .high-priority {
             font-size: 15px;
-            // font-weight: bold;
+            padding: 0;
+            margin-top: 0.2em;
+            margin-bottom: 0.2em;
 
             li {
                 display: inline;
