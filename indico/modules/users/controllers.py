@@ -8,7 +8,7 @@
 from __future__ import unicode_literals
 
 from collections import namedtuple
-from datetime import datetime
+from io import BytesIO
 from operator import attrgetter, itemgetter
 
 from dateutil.relativedelta import relativedelta
@@ -33,6 +33,7 @@ from indico.modules.auth.models.registration_requests import RegistrationRequest
 from indico.modules.auth.util import register_user
 from indico.modules.categories import Category
 from indico.modules.events import Event
+from indico.modules.events.util import serialize_event_for_ical
 from indico.modules.users import User, logger, user_management_settings
 from indico.modules.users.forms import (AdminAccountRegistrationForm, AdminsForm, AdminUserSettingsForm, MergeForm,
                                         SearchForm, UserDetailsForm, UserEmailsForm, UserPreferencesForm)
@@ -41,22 +42,42 @@ from indico.modules.users.operations import create_user
 from indico.modules.users.util import (get_linked_events, get_related_categories, get_suggested_categories, merge_users,
                                        search_users, serialize_user)
 from indico.modules.users.views import WPUser, WPUsersAdmin
-from indico.util.date_time import now_utc, timedelta_split
+from indico.util.date_time import now_utc
 from indico.util.event import truncate_path
 from indico.util.i18n import _
-from indico.util.marshmallow import validate_with_message
+from indico.util.marshmallow import HumanizedDate, validate_with_message
 from indico.util.signals import values_from_signal
 from indico.util.string import make_unique_token
 from indico.web.args import use_kwargs
 from indico.web.flask.templating import get_template_module
-from indico.web.flask.util import url_for
+from indico.web.flask.util import send_file, url_for
 from indico.web.forms.base import FormDefaults
+from indico.web.http_api.metadata import Serializer
 from indico.web.rh import RHProtected
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
 
 IDENTITY_ATTRIBUTES = {'first_name', 'last_name', 'email', 'affiliation', 'full_name'}
 UserEntry = namedtuple('UserEntry', IDENTITY_ATTRIBUTES | {'profile_url', 'user'})
+
+
+def get_events_in_categories(category_ids, user, limit=None):
+    """Get all the user-accessible events in a given set of categories."""
+    tz = session.tzinfo
+    today = now_utc(False).astimezone(tz).date()
+    query = (Event.query
+             .filter(~Event.is_deleted,
+                     Event.category_chain_overlaps(category_ids),
+                     Event.start_dt.astimezone(session.tzinfo) >= today)
+             .options(joinedload('category').load_only('id', 'title'),
+                      joinedload('series'),
+                      subqueryload('acl_entries'),
+                      load_only('id', 'category_id', 'start_dt', 'end_dt', 'title', 'access_key',
+                                'protection_mode', 'series_id', 'series_pos', 'series_count'))
+             .order_by(Event.start_dt, Event.id))
+    if limit:
+        query = query.limit(limit)
+    return get_n_matching(query, 10, lambda x: x.can_access(user))
 
 
 class RHUserBase(RHProtected):
@@ -102,35 +123,54 @@ class RHUserDashboard(RHUserBase):
 
     def _process(self):
         self.user.settings.set('suggest_categories', True)
-        tz = session.tzinfo
-        hours, minutes = timedelta_split(tz.utcoffset(datetime.now()))[:2]
         categories = get_related_categories(self.user)
         categories_events = []
         if categories:
             category_ids = {c['categ'].id for c in categories.itervalues()}
-            today = now_utc(False).astimezone(tz).date()
-            query = (Event.query
-                     .filter(~Event.is_deleted,
-                             Event.category_chain_overlaps(category_ids),
-                             Event.start_dt.astimezone(session.tzinfo) >= today)
-                     .options(joinedload('category').load_only('id', 'title'),
-                              joinedload('series'),
-                              subqueryload('acl_entries'),
-                              load_only('id', 'category_id', 'start_dt', 'end_dt', 'title', 'access_key',
-                                        'protection_mode', 'series_id', 'series_pos', 'series_count'))
-                     .order_by(Event.start_dt, Event.id))
-            categories_events = get_n_matching(query, 10, lambda x: x.can_access(self.user))
+            categories_events = get_events_in_categories(category_ids, self.user)
         from_dt = now_utc(False) - relativedelta(weeks=1, hour=0, minute=0, second=0)
         linked_events = [(event, {'management': bool(roles & self.management_roles),
                                   'reviewing': bool(roles & self.reviewer_roles),
                                   'attendance': bool(roles & self.attendance_roles)})
                          for event, roles in get_linked_events(self.user, from_dt, 10).iteritems()]
         return WPUser.render_template('dashboard.html', 'dashboard',
-                                      offset='{:+03d}:{:02d}'.format(hours, minutes), user=self.user,
+                                      user=self.user,
                                       categories=categories,
                                       categories_events=categories_events,
                                       suggested_categories=get_suggested_categories(self.user),
                                       linked_events=linked_events)
+
+
+class RHExportDashboardICS(RHUserBase):
+    @use_kwargs({
+        'from_': HumanizedDate(data_key='from', missing=lambda: now_utc(False) - relativedelta(weeks=1)),
+        'include': fields.List(fields.Str(), missing={'linked', 'categories'}),
+        'limit': fields.Integer(missing=100, validate=lambda v: 0 < v <= 500)
+    })
+    def _process(self, from_, include, limit):
+        categories = get_related_categories(self.user)
+        categories_events = []
+        if categories:
+            category_ids = {c['categ'].id for c in categories.itervalues()}
+            categories_events = get_events_in_categories(category_ids, self.user, limit=limit)
+
+        linked_events = get_linked_events(
+            self.user,
+            from_,
+            limit=limit,
+            load_also=('description', 'own_room_id', 'own_venue_id', 'own_room_name', 'own_venue_name')
+        )
+
+        all_events = set()
+        if 'linked' in include:
+            all_events |= set(linked_events)
+        if 'categories' in include:
+            all_events |= set(categories_events)
+        all_events = sorted(all_events, key=lambda e: (e.start_dt, e.id))[:limit]
+
+        response = {'results': [serialize_event_for_ical(event, 'events') for event in all_events]}
+        serializer = Serializer.create('ics')
+        return send_file('event.ics', BytesIO(serializer(response)), 'text/calendar')
 
 
 class RHPersonalData(RHUserBase):
