@@ -33,7 +33,6 @@ const File = ({title, url, type, contributionTitle, date, contribURL, persons}) 
       <a href={url}>{title}</a>
     </List.Header>
     <List.Description styleName="description">
-      {console.log(': contribURL', contribURL)}
       <a href={contribURL}>in Contribution {contributionTitle}</a>
       {persons.length !== 0 && (
         <ul styleName="high-priority">

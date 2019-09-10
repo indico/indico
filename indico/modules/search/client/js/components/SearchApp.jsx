@@ -85,8 +85,16 @@ function SearchTypeMenuItem({name, active, title, total, loading, onClick}) {
   );
 }
 
+function handleURLchange(q, setQ, setQuery) {
+  if (window.location.search.slice(1) !== q) {
+    setQ(window.location.search.slice(1));
+    setQuery(window.location.search.slice(3));
+  }
+}
+
 export default function SearchApp() {
   const [query, setQuery] = useState('');
+  const [q, setQ] = useState('');
   const [activeMenuItem, setActiveMenuItem] = useState('categories');
 
   const handleClick = (e, {name}) => {
@@ -143,6 +151,8 @@ export default function SearchApp() {
     }
     setResults('empty');
   }, [resultMap, resultTypes]);
+
+  handleURLchange(q, setQ, setQuery);
 
   return (
     <div>

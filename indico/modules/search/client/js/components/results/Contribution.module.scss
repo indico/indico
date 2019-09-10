@@ -13,6 +13,11 @@
     .description {
         padding: 0.4em 0;
 
+        a , a:hover {
+            font-size: 15px;
+            color: black;
+        }
+
         .high-priority {
             font-size: 15px;
             padding: 0;

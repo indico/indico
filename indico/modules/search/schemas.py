@@ -48,6 +48,8 @@ class ContributionResultSchema(mm.Schema):
     title = mm.String()
     url = mm.String()
     start_dt = mm.String()
+    eventURL = mm.String()
+    eventTitle = mm.String()
     persons = mm.Nested(PersonSchema, many=True)
 
 

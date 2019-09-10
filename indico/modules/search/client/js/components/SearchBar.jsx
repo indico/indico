@@ -5,13 +5,16 @@ import {Translate} from 'indico/react/i18n';
 import './SearchBar.module.scss';
 
 export default function SearchBar({onSearch}) {
-  const [value, setValue] = useState('');
+  const [value, setValue] = useState(
+    window.location.search === '' ? '' : window.location.search.slice(3)
+  );
   const handleChange = event => {
     setValue(event.target.value);
   };
 
   const handleSubmit = event => {
     event.preventDefault();
+    window.history.pushState('', '', `?q=${value}`);
     onSearch(value);
   };
 
