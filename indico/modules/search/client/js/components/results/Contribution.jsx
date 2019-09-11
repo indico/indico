@@ -11,15 +11,20 @@ const Contribution = ({title, url, startDt, eventURL, eventTitle, persons}) => (
       <a href={url}>{title}</a>
     </List.Header>
     <List.Description styleName="description">
-      <a href={eventURL}>in Event {eventTitle}</a>
-      {persons.length !== 0 && (
-        <ul styleName="high-priority">
-          {'by '}
-          {persons.map(item => (
-            <li key={item.id}>{item.title ? `${item.title} ${item.name}` : `${item.name}`}</li>
-          ))}
-        </ul>
-      )}
+      <List.Item styleName="high-priority">
+        {'in Event '}
+        <a href={eventURL}>{eventTitle}</a>
+      </List.Item>
+      <List.Item>
+        {persons.length !== 0 && (
+          <ul styleName="high-priority">
+            {'by '}
+            {persons.map(item => (
+              <li key={item.id}>{item.title ? `${item.title} ${item.name}` : `${item.name}`}</li>
+            ))}
+          </ul>
+        )}
+      </List.Item>
       <List.Item styleName="med-priority">
         {moment(startDt, 'YYYY-MM-DDZhh:mm').format('DD MMMM YYYY HH:mm')}
       </List.Item>

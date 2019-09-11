@@ -22,12 +22,6 @@ const Event = ({
     moment(startDt, 'YYYY-MM-DDZhh:mm').format('ll') ===
     moment(endDt, 'YYYY-MM-DDZhh:mm').format('ll');
 
-  // const sections = categoryPath.map(item => ({
-  //   key: item.id,
-  //   href: item.url,
-  //   content: item.title,
-  // }));
-
   return (
     <div styleName="event">
       <List.Header>

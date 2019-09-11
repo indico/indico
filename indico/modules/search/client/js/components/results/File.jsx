@@ -5,24 +5,23 @@ import './File.module.scss';
 import moment from 'moment';
 
 const iconSelector = type => {
-  const size = {size: 'large'};
   switch (type) {
     case 'file-word':
-      return {color: 'blue', ...size, name: 'file word outline'};
+      return {color: 'blue', name: 'file word outline'};
     case 'file-zip':
-      return {color: 'yellow', ...size, name: 'file archive outline'};
+      return {color: 'yellow', name: 'file archive outline'};
     case 'file-presentation':
-      return {color: 'red', ...size, name: 'file powerpoint outline'};
+      return {color: 'red', name: 'file powerpoint outline'};
     case 'file-excel':
-      return {color: 'green', ...size, name: 'file excel outline'};
+      return {color: 'green', name: 'file excel outline'};
     case 'file-pdf':
-      return {color: 'red', ...size, name: 'file pdf outline'};
+      return {color: 'red', name: 'file pdf outline'};
     // case 'file-xml':
-    //   return {...size, name: 'file code outline'};
+    //   return {name: 'file code outline'};
     case 'file-spreadsheet':
-      return {color: 'green', ...size, name: 'file excel outline'};
+      return {color: 'green', name: 'file excel outline'};
     default:
-      return {...size, name: 'file outline'};
+      return {name: 'file outline'};
   }
 };
 
@@ -33,15 +32,20 @@ const File = ({title, url, type, contributionTitle, date, contribURL, persons}) 
       <a href={url}>{title}</a>
     </List.Header>
     <List.Description styleName="description">
-      <a href={contribURL}>in Contribution {contributionTitle}</a>
-      {persons.length !== 0 && (
-        <ul styleName="high-priority">
-          {'by '}
-          {persons.map(item => (
-            <li key={item.id}>{item.title ? `${item.title} ${item.name}` : `${item.name}`}</li>
-          ))}
-        </ul>
-      )}
+      <List.Item styleName="high-priority">
+        {'in Contribution '}
+        <a href={contribURL}>{contributionTitle}</a>
+      </List.Item>
+      <List.Item>
+        {persons.length !== 0 && (
+          <ul styleName="high-priority">
+            {'by '}
+            {persons.map(item => (
+              <li key={item.id}>{item.title ? `${item.title} ${item.name}` : `${item.name}`}</li>
+            ))}
+          </ul>
+        )}
+      </List.Item>
       <List.Item styleName="med-priority">
         {moment(date, 'YYYY-MM-DDZhh:mm').format('DD MMMM YYYY HH:mm')}
       </List.Item>

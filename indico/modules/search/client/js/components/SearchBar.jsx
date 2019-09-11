@@ -1,8 +1,7 @@
 import React, {useState} from 'react';
 import PropTypes from 'prop-types';
-import {Form, Input} from 'semantic-ui-react';
+import {Form} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
-import './SearchBar.module.scss';
 
 export default function SearchBar({onSearch}) {
   const [value, setValue] = useState(
@@ -19,19 +18,15 @@ export default function SearchBar({onSearch}) {
   };
 
   return (
-    <div>
-      <Form onSubmit={handleSubmit}>
-        <Form.Group>
-          <Input
-            action={Translate.string('Search')}
-            placeholder={Translate.string('Enter your search term')}
-            value={value}
-            onChange={handleChange}
-            styleName="field"
-          />
-        </Form.Group>
-      </Form>
-    </div>
+    <Form onSubmit={handleSubmit}>
+      <Form.Input
+        action={Translate.string('Search')}
+        placeholder={Translate.string('Enter your search term')}
+        value={value}
+        onChange={handleChange}
+        // styleName="field"
+      />
+    </Form>
   );
 }
 

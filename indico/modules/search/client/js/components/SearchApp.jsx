@@ -240,7 +240,7 @@ export default function SearchApp() {
               )}
             </>
           )}
-          {results === 'empty' && <NoResults />}
+          {results === 'empty' && <NoResults query={query} />}
         </>
       )}
     </div>
