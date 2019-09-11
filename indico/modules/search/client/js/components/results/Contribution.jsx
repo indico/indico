@@ -14,6 +14,7 @@ const Contribution = ({title, url, startDt, eventURL, eventTitle, persons}) => (
       <a href={eventURL}>in Event {eventTitle}</a>
       {persons.length !== 0 && (
         <ul styleName="high-priority">
+          {'by '}
           {persons.map(item => (
             <li key={item.id}>{item.title ? `${item.title} ${item.name}` : `${item.name}`}</li>
           ))}

@@ -36,6 +36,7 @@ const File = ({title, url, type, contributionTitle, date, contribURL, persons}) 
       <a href={contribURL}>in Contribution {contributionTitle}</a>
       {persons.length !== 0 && (
         <ul styleName="high-priority">
+          {'by '}
           {persons.map(item => (
             <li key={item.id}>{item.title ? `${item.title} ${item.name}` : `${item.name}`}</li>
           ))}
