@@ -49,6 +49,14 @@ _bp.add_url_rule('/print-poster/<int:template_id>/<uuid>', 'print_poster', poste
 _bp.add_url_rule('/program-codes/', 'program_codes', program_codes.RHProgramCodes)
 _bp.add_url_rule('/program-codes/templates', 'program_code_templates', program_codes.RHProgramCodeTemplates,
                  methods=('GET', 'POST'))
+_bp.add_url_rule('/program-codes/assign/sessions', 'assign_program_codes_sessions',
+                 program_codes.RHAssignProgramCodesSessions, methods=('GET', 'POST'))
+_bp.add_url_rule('/program-codes/assign/session-blocks', 'assign_program_codes_session_blocks',
+                 program_codes.RHAssignProgramCodesSessionBlocks, methods=('GET', 'POST'))
+_bp.add_url_rule('/program-codes/assign/contributions', 'assign_program_codes_contributions',
+                 program_codes.RHAssignProgramCodesContributions, methods=('GET', 'POST'))
+_bp.add_url_rule('/program-codes/assign/subcontributions', 'assign_program_codes_subcontributions',
+                 program_codes.RHAssignProgramCodesSubContributions, methods=('GET', 'POST'))
 
 
 for object_type, prefixes in event_management_object_url_prefixes.iteritems():

@@ -7,47 +7,39 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.events.contributions.models.subcontributions import SubContribution
-from indico.modules.events.sessions.models.blocks import SessionBlock
+from collections import OrderedDict
+
+from indico.modules.events.management.settings import program_codes_settings
 from indico.util.date_time import format_datetime
 from indico.util.i18n import _
 from indico.util.placeholders import Placeholder, replace_placeholders
 
 
-def assign_program_codes(event, object_type, template, dry_run=False):
+def generate_program_codes(event, object_type, objects):
     if object_type == 'contributions':
-        objects = event.contributions
         kwarg = 'contribution'
         context = 'program-codes-contribution'
+        template_setting = 'contribution_template'
     elif object_type == 'subcontributions':
-        objects = (SubContribution.query
-                   .filter(~SubContribution.is_deleted,
-                           SubContribution.contribution.has(event=event, is_deleted=False))
-                   .all())
         kwarg = 'subcontribution'
         context = 'program-codes-subcontribution'
+        template_setting = 'subcontribution_template'
     elif object_type == 'sessions':
-        objects = event.sessions
         kwarg = 'session'
         context = 'program-codes-session'
-    elif object_type == 'session_blocks':
-        objects = (SessionBlock.query
-                   .filter(SessionBlock.session.has(event=event, is_deleted=False))
-                   .all())
+        template_setting = 'session_template'
+    elif object_type == 'session-blocks':
         kwarg = 'session_block'
-        context = 'program-codes-session-blocks'
+        context = 'program-codes-session-block'
+        template_setting = 'session_block_template'
     else:
         raise ValueError('Invalid object type: {}'.format(object_type))
 
-    changes = {}
-    for obj in objects:
-        code = replace_placeholders(context, template, escape_html=False, **{kwarg: obj})
-        if obj.code == code:
-            continue
-        changes[obj] = [obj.code, code]
-        if not dry_run:
-            obj.code = code
-    return changes
+    template = program_codes_settings.get(event, template_setting)
+    return OrderedDict(
+        (obj, replace_placeholders(context, template, escape_html=False, **{kwarg: obj}))
+        for obj in objects
+    )
 
 
 def _make_date_placeholder(class_name, name, render_kwarg, date_format, description, transform=None):

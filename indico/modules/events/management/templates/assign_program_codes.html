@@ -1,0 +1,63 @@
+{% from 'message_box.html' import message_box %}
+
+{% set has_codes = codes|selectattr('code')|any %}
+
+{% macro render_row(object, code) %}
+    <tr class="i-table">
+        <td class="i-table title-column">{{ object.full_title or object.title }}</td>
+        {% if show_dates %}
+            <td class="i-table date-column">{{ object.start_dt|format_datetime('short', timezone=event.timezone) }}</td>
+        {% endif %}
+        {% if has_codes %}
+            <td class="i-table">{{ object.code }}</td>
+        {% endif %}
+        <td class="i-table">
+            <input type="text" name="code_{{ object.id }}" value="{{ code }}"
+                   placeholder="{% trans %}No code{% endtrans %}">
+        </td>
+    </tr>
+{% endmacro %}
+
+<form method="post" class="program-code-assignment-form">
+    {% if hidden_post_field %}
+        {% for value in request.form.getlist(hidden_post_field) %}
+            <input type="hidden" name="{{ hidden_post_field }}" value="{{ value }}">
+        {% endfor %}
+    {% endif %}
+
+    {% call message_box('info', fixed_width=true) %}
+        {% trans %}
+            Please verify the programme codes that will be assigned.<br>
+            You may edit them before finishing the assignment, but any custom changes here
+            will be overwritten if you assign codes again at a later point.
+        {% endtrans %}
+    {% endcall %}
+
+    <div class="scroll-container">
+        <table class="i-table-widget">
+            <thead>
+                <tr class="i-table">
+                    <th class="i-table title-column">{% trans %}Title{% endtrans %}</th>
+                    {% if show_dates %}
+                        <th class="i-table date-column">{% trans %}Date{% endtrans %}</th>
+                    {% endif %}
+                    {% if has_codes %}
+                        <th class="i-table">{% trans %}Current code{% endtrans %}</th>
+                    {% endif %}
+                    <th class="i-table">{% trans %}New code{% endtrans %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for object, code in codes.viewitems() %}
+                    {{ render_row(object, code) }}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="actions">
+        <input type="hidden" name="assign" value="1" />
+        <button type="submit" class="i-button big highlight">{% trans %}Assign{% endtrans %}</button>
+        <button type="button" class="i-button big" data-button-back>{% trans %}Cancel{% endtrans %}</button>
+    </div>
+</form>

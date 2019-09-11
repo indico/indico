@@ -106,6 +106,15 @@
                         </li>
                     </ul>
                 </div>
+                <button class="i-button js-requires-selected-row disabled"
+                        data-title="{% trans %}Assign programme codes{% endtrans %}"
+                        data-href="{{ url_for('event_management.assign_program_codes_sessions', event) }}"
+                        data-params-selector="#sessions input[name=session_id]:checkbox:checked"
+                        data-method="POST"
+                        data-ajax-dialog
+                        data-reload-after>
+                    {%- trans %}Assign programme codes{% endtrans -%}
+                </button>
             </div>
             <div class="toolbar">
                 <div class="group" id="contributions-counter">

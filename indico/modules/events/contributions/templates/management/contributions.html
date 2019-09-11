@@ -144,6 +144,15 @@
                         {%- trans %}Import{% endtrans -%}
                     </a>
                 </div>
+                <button class="i-button js-enable-if-checked disabled"
+                        data-title="{% trans %}Assign programme codes{% endtrans %}"
+                        data-href="{{ url_for('event_management.assign_program_codes_contributions', event) }}"
+                        data-params-selector="#contribution-list input[name=contribution_id]:checked"
+                        data-method="POST"
+                        data-ajax-dialog
+                        data-reload-after>
+                    {%- trans %}Assign programme codes{% endtrans -%}
+                </button>
             </div>
             <div class="toolbar">
                 <div class="group" id="filter-statistics">

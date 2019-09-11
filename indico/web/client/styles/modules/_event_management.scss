@@ -630,3 +630,25 @@ form.horizontal .clone-event-dialog-footer .form-field {
         display: none !important;
     }
 }
+
+.program-code-assignment-form {
+    .scroll-container {
+        max-height: 50em;
+        overflow: auto;
+    }
+
+    .title-column {
+        max-width: 30em;
+        min-width: 30em;
+    }
+
+    .date-column {
+        max-width: 10em;
+    }
+
+    .actions {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 1em;
+    }
+}
