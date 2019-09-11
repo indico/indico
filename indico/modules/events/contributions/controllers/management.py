@@ -544,6 +544,22 @@ class RHManageDefaultContributionDuration(RHManageContributionsBase):
         return jsonify_form(form)
 
 
+class RHManageContributionPublicationREST(RHManageContributionsBase):
+    """Manage contribution publication setting"""
+
+    def _process_GET(self):
+        published = contribution_settings.get(self.event, 'published')
+        return jsonify(published=published)
+
+    def _process_PUT(self):
+        contribution_settings.set(self.event, 'published', True)
+        return jsonify_data(flash=False)
+
+    def _process_DELETE(self):
+        contribution_settings.set(self.event, 'published', False)
+        return jsonify_data(flash=False)
+
+
 class RHManageContributionTypeBase(RHManageContributionsBase):
     """Manage a contribution type of an event"""
 

@@ -21,6 +21,12 @@
     }
 }
 
+#pub-switch {
+    display: inline-block;
+    position: absolute;
+    right: 0;
+}
+
 .session-item-picker {
     @include picker-root-element-label();
 

@@ -59,6 +59,24 @@ $i-button-spacing: 0.3rem;
         margin-right: 1em;
     }
 
+    // .i-label{
+    //     margin: 0 0 0 0.3em !important;
+    //     cursor: pointer;
+
+    //     &.selected {
+    //         color: $indico-blue !important;
+    //         border-color: $indico-blue;
+    //     }
+
+    //     &.disabled {
+    //         border-color: $default-border-color !important;
+    //         background: $i-button-background-color !important;
+    //         box-shadow: none !important;
+    //         color: $gray !important;
+    //         cursor: default;
+    //     }
+    // }
+
     .i-button {
         height: $toolbar-height;
         padding: 0.2em 0.7em 0.1em 0.7em !important;
