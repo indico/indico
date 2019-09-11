@@ -161,43 +161,42 @@ export default function SearchApp() {
       {/* still not working very well, needs a bit of fine tuning here */}
       {!!query && (
         <>
+          <Menu pointing secondary>
+            <SearchTypeMenuItem
+              name="categories"
+              active={activeMenuItem === 'categories' && results !== 'empty'}
+              title={Translate.string('Categories')}
+              total={categoryResults.total}
+              loading={categoryResults.loading}
+              onClick={handleClick}
+            />
+            <SearchTypeMenuItem
+              name="events"
+              active={activeMenuItem === 'events' && results !== 'empty'}
+              title={Translate.string('Events')}
+              total={eventResults.total}
+              loading={eventResults.loading}
+              onClick={handleClick}
+            />
+            <SearchTypeMenuItem
+              name="contributions"
+              active={activeMenuItem === 'contributions' && results !== 'empty'}
+              title={Translate.string('Contributions')}
+              total={contributionResults.total}
+              loading={contributionResults.loading}
+              onClick={handleClick}
+            />
+            <SearchTypeMenuItem
+              name="files"
+              active={activeMenuItem === 'files' && results !== 'empty'}
+              title={Translate.string('Materials')}
+              total={fileResults.total}
+              loading={fileResults.loading}
+              onClick={handleClick}
+            />
+          </Menu>
           {results === 'loaded' && (
             <>
-              <Menu pointing secondary>
-                <SearchTypeMenuItem
-                  name="categories"
-                  active={activeMenuItem === 'categories'}
-                  title={Translate.string('Categories')}
-                  total={categoryResults.total}
-                  loading={categoryResults.loading}
-                  onClick={handleClick}
-                />
-                <SearchTypeMenuItem
-                  name="events"
-                  active={activeMenuItem === 'events'}
-                  title={Translate.string('Events')}
-                  total={eventResults.total}
-                  loading={eventResults.loading}
-                  onClick={handleClick}
-                />
-                <SearchTypeMenuItem
-                  name="contributions"
-                  active={activeMenuItem === 'contributions'}
-                  title={Translate.string('Contributions')}
-                  total={contributionResults.total}
-                  loading={contributionResults.loading}
-                  onClick={handleClick}
-                />
-                <SearchTypeMenuItem
-                  name="files"
-                  active={activeMenuItem === 'files'}
-                  title={Translate.string('Materials')}
-                  total={fileResults.total}
-                  loading={fileResults.loading}
-                  onClick={handleClick}
-                />
-              </Menu>
-
               {activeMenuItem === 'categories' && (
                 <ResultList
                   component={Category}

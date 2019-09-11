@@ -86,6 +86,7 @@
     "taggle": "^1.15.0",
     "ua-parser-js": "^0.7.21",
     "underscore": "^1.11.0",
+    "use-query-params": "^0.3.3",
     "vanderlee-colorpicker": "^1.2.16"
   },
   "devDependencies": {

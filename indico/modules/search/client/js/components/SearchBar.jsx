@@ -24,7 +24,6 @@ export default function SearchBar({onSearch}) {
         placeholder={Translate.string('Enter your search term')}
         value={value}
         onChange={handleChange}
-        // styleName="field"
       />
     </Form>
   );
