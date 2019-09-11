@@ -8,9 +8,25 @@
 /* global showUndoWarning:false, setupListGenerator:false, setupSearchBox:false */
 /* global reloadManagementAttachmentInfoColumn:false */
 
+import React from 'react';
+import ReactDOM from 'react-dom';
+
 import 'indico/modules/events/util/types_dialog';
+import PublicationSwitch from 'indico/react/components/PublicationSwitch';
+
 
 (function(global) {
+
+  function setupPublicationButton() {
+    const eventId = $('#pub-switch').data('event-id');
+    const element = React.createElement(PublicationSwitch, {confId: eventId})
+    ReactDOM.render(element, document.getElementById('pub-switch'));
+  }
+
+  global.setupContributionConfig = function setupContributionConfig() {
+    setupPublicationButton();
+  }
+
   function setupTableSorter(selector) {
     $(selector).tablesorter({
       cssAsc: 'header-sort-asc',

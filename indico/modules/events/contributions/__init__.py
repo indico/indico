@@ -120,7 +120,8 @@ def _extend_event_menu(sender, **kwargs):
 
 
 contribution_settings = EventSettingsProxy('contributions', {
-    'default_duration': timedelta(minutes=20)
+    'default_duration': timedelta(minutes=20),
+    'published': True
 }, converters={
     'default_duration': TimedeltaConverter
 })

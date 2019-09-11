@@ -43,6 +43,7 @@
             </li>
         </ul>
     {%- endif -%}
+    <div id="pub-switch" data-event-id={{event.id}} ></div>
 {% endblock %}
 
 {% block description %}
@@ -187,6 +188,7 @@
             $('#search-input').val('#{{ selected_entry }}').trigger('change');
         {% endif %}
 
+        setupContributionConfig();
         setupContributionList({
             createSessionURL: {{ url_for('sessions.create_session', event) | tojson }},
             createTrackURL: {{ url_for('tracks.create_track', event) | tojson }},

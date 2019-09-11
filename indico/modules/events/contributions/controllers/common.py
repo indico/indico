@@ -9,6 +9,8 @@ from __future__ import unicode_literals
 
 from flask import redirect
 
+from indico.modules.events.contributions import contribution_settings, get_contrib_field_types
+
 
 class ContributionListMixin:
     """Display list of contributions"""
@@ -22,4 +24,7 @@ class ContributionListMixin:
         return self._render_template(**self.list_generator.get_list_kwargs())
 
     def _render_template(self, selected_entry, **kwargs):
-        return self.view_class.render_template(self.template, self.event, selected_entry=selected_entry, **kwargs)
+        published = contribution_settings.get(self.event, 'published')
+        return self.view_class.render_template(self.template, self.event, selected_entry=selected_entry,
+                                               published=published, **kwargs)
+
