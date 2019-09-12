@@ -74,7 +74,7 @@ function SearchTypeMenuItem({name, active, title, total, loading, onClick}) {
   let indicator = null;
   if (loading) {
     indicator = <Loader active inline size="tiny" style={{marginLeft: '5px'}} />;
-  } else if (total) {
+  } else if (total !== -1) {
     indicator = ` (${total})`;
   }
   return (
