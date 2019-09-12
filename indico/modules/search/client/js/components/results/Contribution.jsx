@@ -1,5 +1,5 @@
 import React from 'react';
-import {List} from 'semantic-ui-react';
+import {List, Icon} from 'semantic-ui-react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 
@@ -12,13 +12,14 @@ const Contribution = ({title, url, startDt, eventURL, eventTitle, persons}) => (
     </List.Header>
     <List.Description styleName="description">
       <List.Item styleName="high-priority">
-        {'in Event '}
+        {/* change to something that reminds an event */}
+        <Icon name="calendar check outline" />
         <a href={eventURL}>{eventTitle}</a>
       </List.Item>
       <List.Item>
         {persons.length !== 0 && (
           <ul styleName="high-priority">
-            {'by '}
+            {persons.length > 1 ? <Icon name="users" /> : <Icon name="user" />}
             {persons.map(item => (
               <li key={item.id}>{item.title ? `${item.title} ${item.name}` : `${item.name}`}</li>
             ))}
@@ -26,6 +27,7 @@ const Contribution = ({title, url, startDt, eventURL, eventTitle, persons}) => (
         )}
       </List.Item>
       <List.Item styleName="med-priority">
+        <Icon name="calendar alternate outline" />
         {moment(startDt, 'YYYY-MM-DDZhh:mm').format('DD MMMM YYYY HH:mm')}
       </List.Item>
     </List.Description>
