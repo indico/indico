@@ -12,6 +12,7 @@ import searchFilesURL from 'indico-url:search.search_files';
 
 import React, {useEffect, useReducer, useState} from 'react';
 import {Loader, Menu} from 'semantic-ui-react';
+import {useQueryParam, StringParam} from 'use-query-params';
 import {useIndicoAxios} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
 import ResultList from './ResultList';
@@ -21,7 +22,6 @@ import Event from './results/Event';
 import Contribution from './results/Contribution';
 import File from './results/File';
 import NoResults from './results/NoResults';
-
 import './SearchApp.module.scss';
 
 const searchReducer = (state, action) => {
@@ -37,7 +37,6 @@ const searchReducer = (state, action) => {
 
 function useSearch(url, outerQuery) {
   const [{query, page}, dispatch] = useReducer(searchReducer, {query: '', page: 1});
-
   useEffect(() => {
     // we have to dispatch an action that sets the query and resets the page.
     // since the axios hook only monitors `query` the request won't be sent
@@ -49,7 +48,7 @@ function useSearch(url, outerQuery) {
     url,
     camelize: true,
     options: {params: {q: query, page}},
-    forceDispatchEffect: () => !!query.length,
+    forceDispatchEffect: () => (query ? !!query.length : 0),
     trigger: [url, query, page],
   });
 
@@ -85,18 +84,9 @@ function SearchTypeMenuItem({name, active, title, total, loading, onClick}) {
   );
 }
 
-function handleURLchange(q, setQ, setQuery) {
-  if (window.location.search.slice(1) !== q) {
-    setQ(window.location.search.slice(1));
-    setQuery(window.location.search.slice(3));
-  }
-}
-
 export default function SearchApp() {
-  const [query, setQuery] = useState('');
-  const [q, setQ] = useState('');
+  const [query, setQuery] = useQueryParam('q', StringParam);
   const [activeMenuItem, setActiveMenuItem] = useState('categories');
-
   const handleClick = (e, {name}) => {
     setActiveMenuItem(name);
   };
@@ -152,11 +142,10 @@ export default function SearchApp() {
     setResults('empty');
   }, [resultMap, resultTypes]);
 
-  handleURLchange(q, setQ, setQuery);
 
   return (
     <div>
-      <SearchBar onSearch={setQuery} />
+      <SearchBar onSearch={setQuery} query={query} />
       {/* if there's a query submitted and at least one resultsType has some results render the tabs */}
       {/* still not working very well, needs a bit of fine tuning here */}
       {!!query && (
@@ -195,6 +184,7 @@ export default function SearchApp() {
               onClick={handleClick}
             />
           </Menu>
+
           {results === 'loaded' && (
             <>
               {activeMenuItem === 'categories' && (
