@@ -22,6 +22,7 @@ import 'dropzone/dist/dropzone.css';
     var $form = $dz.closest('form');
     var $flashArea = $form.find('.flashed-messages');
     var options = {
+      timeout: 0,
       clickable: element + ' .dropzone-inner',
       previewsContainer: element + ' .dropzone-previews',
       autoProcessQueue: false,
