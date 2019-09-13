@@ -10,7 +10,7 @@ Version 2.2.3
 Bugfixes
 ^^^^^^^^
 
-- None so far :)
+- Remove 30s timeout from dropzone file uploads
 
 Version 2.2.2
 -------------
