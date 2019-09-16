@@ -1,7 +1,7 @@
 # Translators:
 # Michito <crossner90@gmail.com>, 2019
 # Thomas Baron <thomas.baron@cern.ch>, 2019
-# 
+#
 msgid ""
 msgstr ""
 "POT-Creation-Date: 2019-07-19 10:16+0200\n"
@@ -1931,7 +1931,7 @@ msgstr "Aucun espace ne correspond à votre demande"
 
 #: indico/modules/rb/client/js/modules/bookRoom/SearchResultCount.jsx:190
 msgid "No spaces are available during that time slot"
-msgstr "Aucun espace n'est disponible pendant cete interval de temps"
+msgstr "Aucun espace n'est disponible pendant cet intervalle de temps"
 
 #: indico/modules/rb/client/js/modules/bookRoom/UnavailableRoomsModal.jsx:81
 msgid "Unavailable Rooms"
