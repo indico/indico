@@ -11,11 +11,11 @@ from io import BytesIO
 from itertools import ifilter
 
 import icalendar as ical
+from feedgen.feed import FeedGenerator
 from flask import session
 from lxml import html
 from lxml.etree import ParserError
 from sqlalchemy.orm import joinedload, load_only, subqueryload, undefer
-from werkzeug.contrib.atom import AtomFeed
 from werkzeug.urls import url_parse
 
 from indico.core.config import config
@@ -121,13 +121,19 @@ def serialize_category_atom(category, url, user, event_filter):
              .order_by(Event.start_dt))
     events = [e for e in query if e.can_access(user)]
 
-    feed = AtomFeed(feed_url=url, title='Indico Feed [{}]'.format(category.title))
+    feed = FeedGenerator()
+    feed.id(url)
+    feed.title('Indico Feed [{}]'.format(category.title))
+    feed.link(href=url, rel='self')
+
     for event in events:
-        feed.add(title=event.title,
-                 summary=unicode(event.description),  # get rid of RichMarkup
-                 url=event.external_url,
-                 updated=event.start_dt)
-    return BytesIO(feed.to_string().encode('utf-8'))
+        entry = feed.add_entry(order='append')
+        entry.id(event.external_url)
+        entry.title(event.title)
+        entry.summary(unicode(event.description))
+        entry.link(href=event.external_url)
+        entry.updated(event.start_dt)
+    return BytesIO(feed.atom_str(pretty=True))
 
 
 def serialize_category(category, with_favorite=False, with_path=False, parent_path=None, child_path=None):
