@@ -70,3 +70,4 @@ email-validator==1.0.4
 pywebpack==1.0.0
 flask-webpackext==1.0.0
 webargs==5.3.2
+feedgen==0.8.0

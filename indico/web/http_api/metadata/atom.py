@@ -8,8 +8,8 @@
 from datetime import datetime
 
 import dateutil.parser
+from feedgen.feed import FeedGenerator
 from pytz import timezone, utc
-from werkzeug.contrib.atom import AtomFeed
 
 from indico.util.string import to_unicode
 from indico.web.http_api.metadata.serializer import Serializer
@@ -33,16 +33,16 @@ class AtomSerializer(Serializer):
         if not isinstance(results, list):
             results = [results]
 
-        feed = AtomFeed(
-            title='Indico Feed',
-            feed_url=fossils['url']
-        )
+        feed = FeedGenerator()
+        feed.id(fossils['url'])
+        feed.title('Indico Feed')
+        feed.link(href=fossils['url'], rel='self')
 
         for fossil in results:
-            feed.add(
-                title=to_unicode(fossil['title']) or None,
-                summary=to_unicode(fossil['description']) or None,
-                url=fossil['url'],
-                updated=_deserialize_date(fossil['startDate'])  # ugh, but that's better than creationDate
-            )
-        return feed.to_string()
+            entry = feed.add_entry(order='append')
+            entry.id(fossil['url'])
+            entry.title(to_unicode(fossil['title']) or None)
+            entry.summary(to_unicode(fossil['description']) or None)
+            entry.link(href=fossil['url'])
+            entry.updated(_deserialize_date(fossil['startDate']))
+        return feed.atom_str(pretty=True)
