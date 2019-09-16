@@ -1,26 +1,30 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import PropTypes from 'prop-types';
 import {Form} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
 
 export default function SearchBar({onSearch, searchTerm}) {
-  const [value, setValue] = useState(searchTerm);
+  const [keyword, setKeyword] = useState(searchTerm);
 
   const handleChange = event => {
-    setValue(event.target.value);
+    setKeyword(event.target.value);
   };
 
   const handleSubmit = event => {
     event.preventDefault();
-    onSearch(value);
+    onSearch(keyword);
   };
+
+  useEffect(() => {
+    setKeyword(searchTerm);
+  }, [searchTerm]);
 
   return (
     <Form onSubmit={handleSubmit}>
       <Form.Input
         action={Translate.string('Search')}
         placeholder={Translate.string('Enter your search term')}
-        value={value}
+        value={keyword}
         onChange={handleChange}
       />
     </Form>

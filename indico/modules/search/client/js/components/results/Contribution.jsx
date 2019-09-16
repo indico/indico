@@ -20,8 +20,10 @@ const Contribution = ({title, url, startDt, eventURL, eventTitle, persons}) => (
         {persons.length !== 0 && (
           <ul styleName="high-priority">
             {persons.length > 1 ? <Icon name="users" /> : <Icon name="user" />}
-            {persons.map(item => (
-              <li key={item.id}>{item.title ? `${item.title} ${item.name}` : `${item.name}`}</li>
+            {persons.map(person => (
+              <li key={person.id}>
+                {person.title ? `${person.title} ${person.name}` : person.name}
+              </li>
             ))}
           </ul>
         )}

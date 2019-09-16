@@ -22,7 +22,6 @@ import Event from './results/Event';
 import Contribution from './results/Contribution';
 import File from './results/File';
 import NoResults from './results/NoResults';
-import './SearchApp.module.scss';
 
 const searchReducer = (state, action) => {
   switch (action.type) {
@@ -48,7 +47,7 @@ function useSearch(url, outerQuery) {
     url,
     camelize: true,
     options: {params: {q: query, page}},
-    forceDispatchEffect: () => (query ? !!query.length : 0),
+    forceDispatchEffect: () => (query ? !!query.length : false),
     trigger: [url, query, page],
   });
 
@@ -106,13 +105,21 @@ export default function SearchApp() {
   const resultTypes = ['categories', 'events', 'contributions', 'files'];
 
   useEffect(() => {
-    if (Object.values(resultMap).some(x => x.loading) || resultMap[activeMenuItem].total !== 0) {
-      // don't switch while loading or if the currently active type has results
+    if (resultMap[activeMenuItem].total !== 0) {
+      // don't switch if the currently active type has results
       return;
     }
-    const firstTypeWithResults = resultTypes.find(x => resultMap[x].total !== 0);
+
+    const firstTypeWithResults = resultTypes.find(x => resultMap[x].total > 0);
     if (firstTypeWithResults) {
       setActiveMenuItem(firstTypeWithResults);
+      return;
+    }
+
+    const firstTypeStillSearching = resultTypes.find(x => resultMap[x].loading);
+    if (firstTypeStillSearching) {
+      setActiveMenuItem(firstTypeStillSearching);
+      return;
     }
   }, [
     activeMenuItem,
@@ -130,10 +137,10 @@ export default function SearchApp() {
       setResults('initial state');
       return;
     }
-    if (Object.values(resultMap).some(x => x.loading)) {
-      setResults('loading');
-      return;
-    }
+    // if (Object.values(resultMap).some(x => x.loading)) {
+    //   setResults('loading');
+    //   return;
+    // }
     const firstTypeWithResults = resultTypes.find(x => resultMap[x].total !== 0);
     if (firstTypeWithResults) {
       setResults('loaded');
@@ -146,8 +153,7 @@ export default function SearchApp() {
 
   return (
     <div>
-      <SearchBar onSearch={handler} searchTerm={query ? query : ''} />
-      {/* Problem, when hitting the back button, the search term showing in the text box is not correctly updating */}
+      <SearchBar onSearch={handler} searchTerm={query || ''} />
       {!!query && (
         <>
           <Menu pointing secondary>
@@ -185,7 +191,7 @@ export default function SearchApp() {
             />
           </Menu>
 
-          {results === 'loaded' && (
+          {results !== 'empty' ? (
             <>
               {activeMenuItem === 'categories' && (
                 <ResultList
@@ -228,8 +234,9 @@ export default function SearchApp() {
                 />
               )}
             </>
+          ) : (
+            <NoResults query={query} />
           )}
-          {results === 'empty' && <NoResults query={query} />}
         </>
       )}
     </div>

@@ -15,7 +15,7 @@ $darken-parameter: 50;
     .description {
         padding: 0.4em 0;
 
-        a , a:hover {
+        a, a:hover {
             font-size: 15px;
             color: $dark-gray;
         }
@@ -27,7 +27,7 @@ $darken-parameter: 50;
             margin-bottom: 0.2em;
             color: $dark-gray;
 
-            a , a:hover {
+            a, a:hover {
                 color: darken($color: $dark-gray, $amount: $darken-parameter);
             }
 

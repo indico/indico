@@ -5,23 +5,28 @@ import './Event.module.scss';
 import moment from 'moment';
 import CategoryPath from './CategoryPath';
 
-const Event = ({
-  // id,
-  type,
-  title,
-  url,
-  // description,
-  categoryPath,
-  startDt,
-  endDt,
-  // location,
-  speakers,
-  // chairs,
-}) => {
+const dateRendering = (startDt, endDt) => {
   const singleDay =
     moment(startDt, 'YYYY-MM-DDZhh:mm').format('ll') ===
     moment(endDt, 'YYYY-MM-DDZhh:mm').format('ll');
+  /* if end date == start date only show start date */
+  return (
+    <>
+      {singleDay ? (
+        <List.Item styleName="med-priority">
+          {moment(startDt, 'YYYY-MM-DDZhh:mm').format('DD MMMM YYYY HH:mm')}
+        </List.Item>
+      ) : (
+        <List.Item styleName="med-priority">
+          {`${moment(startDt, 'YYYY-MM-DDZhh:mm').format('DD MMMM')} -
+        ${moment(endDt, 'YYYY-MM-DDZhh:mm').format('DD MMMM YYYY')}`}
+        </List.Item>
+      )}
+    </>
+  );
+};
 
+const Event = ({type, title, url, categoryPath, startDt, endDt, speakers}) => {
   return (
     <div styleName="event">
       <List.Header>
@@ -42,17 +47,7 @@ const Event = ({
         )}
 
         {/* Dates */}
-        {/* if end date == start date only show start date */}
-        {singleDay ? (
-          <List.Item styleName="med-priority">
-            {moment(startDt, 'YYYY-MM-DDZhh:mm').format('DD MMMM YYYY HH:mm')}
-          </List.Item>
-        ) : (
-          <List.Item styleName="med-priority">
-            {`${moment(startDt, 'YYYY-MM-DDZhh:mm').format('DD MMMM')} -
-              ${moment(endDt, 'YYYY-MM-DDZhh:mm').format('DD MMMM YYYY')}`}
-          </List.Item>
-        )}
+        {dateRendering(startDt, endDt)}
         {/* Render the path */}
         {categoryPath.length !== 0 && (
           <List.Item>
@@ -70,7 +65,6 @@ const Event = ({
 
 Event.defaultProps = {
   speakers: [],
-  // chairs: [],
 };
 
 const personShape = PropTypes.shape({
@@ -80,7 +74,6 @@ const personShape = PropTypes.shape({
 });
 
 Event.propTypes = {
-  // id: PropTypes.number.isRequired,
   title: PropTypes.string.isRequired,
   url: PropTypes.string.isRequired,
   type: PropTypes.oneOf(['lecture', 'meeting', 'conference']).isRequired,
@@ -93,10 +86,7 @@ Event.propTypes = {
       url: PropTypes.string.isRequired,
     })
   ).isRequired,
-  // description: PropTypes.string.isRequired,
-  // location: PropTypes.object.isRequired,
   speakers: PropTypes.arrayOf(personShape),
-  // chairs: PropTypes.arrayOf(personShape),
 };
 
 export default Event;

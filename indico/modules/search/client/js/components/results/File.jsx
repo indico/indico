@@ -5,22 +5,22 @@ import './File.module.scss';
 import moment from 'moment';
 
 const iconSelector = type => {
-  const size = {size: 'large'};
+  const otherAttributes = {size: 'large'};
   switch (type) {
     case 'file-word':
-      return {color: 'blue', ...size, name: 'file word outline'};
+      return {color: 'blue', name: 'file word outline', ...otherAttributes};
     case 'file-zip':
-      return {color: 'yellow', ...size, name: 'file archive outline'};
+      return {color: 'yellow', name: 'file archive outline', ...otherAttributes};
     case 'file-presentation':
-      return {color: 'red', ...size, name: 'file powerpoint outline'};
+      return {color: 'red', name: 'file powerpoint outline', ...otherAttributes};
     case 'file-excel':
-      return {color: 'green', ...size, name: 'file excel outline'};
+      return {color: 'green', name: 'file excel outline', ...otherAttributes};
     case 'file-pdf':
-      return {color: 'red', ...size, name: 'file pdf outline'};
+      return {color: 'red', name: 'file pdf outline', ...otherAttributes};
     case 'file-spreadsheet':
-      return {color: 'green', ...size, name: 'file excel outline'};
+      return {color: 'green', name: 'file excel outline', ...otherAttributes};
     default:
-      return {...size, name: 'file outline'};
+      return {name: 'file outline', ...otherAttributes};
   }
 };
 
