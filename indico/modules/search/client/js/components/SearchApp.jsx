@@ -142,12 +142,12 @@ export default function SearchApp() {
     setResults('empty');
   }, [resultMap, resultTypes]);
 
+  const handler = value => setQuery(value, 'pushIn');
 
   return (
     <div>
-      <SearchBar onSearch={setQuery} query={query} />
-      {/* if there's a query submitted and at least one resultsType has some results render the tabs */}
-      {/* still not working very well, needs a bit of fine tuning here */}
+      <SearchBar onSearch={handler} searchTerm={query ? query : ''} />
+      {/* Problem, when hitting the back button, the search term showing in the text box is not correctly updating */}
       {!!query && (
         <>
           <Menu pointing secondary>

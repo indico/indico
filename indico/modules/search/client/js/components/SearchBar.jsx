@@ -3,15 +3,16 @@ import PropTypes from 'prop-types';
 import {Form} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
 
-export default function SearchBar({onSearch, query}) {
-  const [value, setValue] = useState(query);
+export default function SearchBar({onSearch, searchTerm}) {
+  const [value, setValue] = useState(searchTerm);
+
   const handleChange = event => {
     setValue(event.target.value);
   };
 
   const handleSubmit = event => {
     event.preventDefault();
-    onSearch(value, 'pushIn');
+    onSearch(value);
   };
 
   return (
@@ -28,5 +29,5 @@ export default function SearchBar({onSearch, query}) {
 
 SearchBar.propTypes = {
   onSearch: PropTypes.func.isRequired,
-  query: PropTypes.string.isRequired,
+  searchTerm: PropTypes.string.isRequired,
 };

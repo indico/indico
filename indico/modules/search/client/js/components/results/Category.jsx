@@ -10,7 +10,6 @@ export default function Category({title, path, url}) {
       <List.Header>
         <a href={url}>{title}</a>
       </List.Header>
-
       {path.length !== 0 && (
         <div styleName="description">
           <List.Description>

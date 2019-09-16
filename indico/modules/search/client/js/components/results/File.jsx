@@ -17,8 +17,6 @@ const iconSelector = type => {
       return {color: 'green', ...size, name: 'file excel outline'};
     case 'file-pdf':
       return {color: 'red', ...size, name: 'file pdf outline'};
-    // case 'file-xml':
-    //   return {name: 'file code outline'};
     case 'file-spreadsheet':
       return {color: 'green', ...size, name: 'file excel outline'};
     default:
@@ -34,7 +32,6 @@ const File = ({title, url, type, contributionTitle, date, contribURL, persons}) 
     </List.Header>
     <List.Description styleName="description">
       <List.Item styleName="high-priority">
-        {/* {'Contribution '} */}
         <Icon name="pencil alternate" />
         <a href={contribURL}>{contributionTitle}</a>
       </List.Item>

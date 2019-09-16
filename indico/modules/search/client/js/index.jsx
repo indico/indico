@@ -7,9 +7,18 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
+import {BrowserRouter as Router, Route} from 'react-router-dom';
+import {QueryParamProvider} from 'use-query-params';
 import SearchApp from './components/SearchApp';
 
 document.addEventListener('DOMContentLoaded', () => {
   const root = document.querySelector('#search-root');
-  ReactDOM.render(<SearchApp />, root);
+  ReactDOM.render(
+    <Router>
+      <QueryParamProvider ReactRouterRoute={Route}>
+        <SearchApp />
+      </QueryParamProvider>
+    </Router>,
+    root
+  );
 });
