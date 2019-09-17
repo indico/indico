@@ -71,11 +71,11 @@ class AbstractURLPlaceholder(Placeholder):
 
 class AbstractInvitationURLPlaceholder(Placeholder):
     name = 'invitation_url'
-    description = _("The direct URL of the submission form for invited abstracts")
+    description = _("The link to submit an invited abstract")
 
     @classmethod
     def render(cls, abstract):
-        return url_for('abstracts.submit_invited_abstract', abstract, token=abstract.uuid, _external=True)
+        return url_for('abstracts.submit_invited_abstract', abstract.locator.token, _external=True)
 
 
 class AbstractTrackPlaceholder(Placeholder):

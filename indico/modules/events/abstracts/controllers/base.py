@@ -14,16 +14,23 @@ from indico.modules.events.abstracts.models.abstracts import Abstract
 from indico.modules.events.controllers.base import RHDisplayEventBase
 from indico.modules.events.management.controllers.base import ManageEventMixin
 from indico.modules.events.util import check_event_locked
+from indico.util.decorators import classproperty
 
 
 class SpecificAbstractMixin:
     """Mixin for RHs that deal with a specific abstract"""
 
-    normalize_url_spec = {
-        'locators': {
-            lambda self: self.abstract
+    # whether the RH should use Abstract's UUID when querying
+    USE_ABSTRACT_UUID = False
+
+    @classproperty
+    @classmethod
+    def normalize_url_spec(cls):
+        return {
+            'locators': {
+                lambda self: self.abstract.locator.token if cls.USE_ABSTRACT_UUID else self.abstract
+            }
         }
-    }
 
     _abstract_query_options = ()
 
@@ -35,7 +42,12 @@ class SpecificAbstractMixin:
         return query
 
     def _process_args(self):
-        self.abstract = self._abstract_query.filter_by(id=request.view_args['abstract_id'], is_deleted=False).one()
+        filters = {'is_deleted': False}
+        if self.USE_ABSTRACT_UUID:
+            filters['uuid'] = request.view_args['uuid']
+        else:
+            filters['id'] = request.view_args['abstract_id']
+        self.abstract = self._abstract_query.filter_by(**filters).one()
 
     def _check_access(self):
         if not self._check_abstract_protection():

@@ -465,6 +465,10 @@ class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFie
     def locator(self):
         return dict(self.event.locator, abstract_id=self.id)
 
+    @locator.token
+    def locator(self):
+        return dict(self.event.locator, uuid=self.uuid)
+
     @hybrid_property
     def judgment_comment(self):
         return MarkdownText(self._judgment_comment)

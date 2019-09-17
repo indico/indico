@@ -105,7 +105,14 @@ def create_mock_abstract(event):
     Contribution = namedtuple('Contribution', ['title', 'track', 'session', 'type', 'locator'])
     Abstract = namedtuple('Abstract', ['friendly_id', 'title', 'event', 'submitter', 'contribution',
                                        'primary_authors', 'secondary_authors', 'locator', 'judgment_comment',
-                                       'accepted_track', 'accepted_contrib_type', 'state', 'merged_into', 'uuid'])
+                                       'accepted_track', 'accepted_contrib_type', 'state', 'merged_into'])
+
+    class _MockLocator(dict):
+        def __getattr__(self, attr):
+            try:
+                return self[attr]
+            except KeyError:
+                raise AttributeError
 
     englert = User(full_name="Fran\xe7ois Englert", first_name="Fran\xe7ois", last_name="Englert", title="Prof.")
     brout = User(full_name="Robert Brout", first_name="Robert", last_name="Brout", title="Prof.")
@@ -133,8 +140,8 @@ def create_mock_abstract(event):
                                contribution=contribution,
                                primary_authors=[englert, brout],
                                secondary_authors=[guralnik, hagen, kibble, higgs],
-                               locator={'confId': -314, 'abstract_id': 1235},
-                               uuid=None,
+                               locator=_MockLocator({'confId': -314, 'abstract_id': 1235,
+                                                     'token': {'confId': -314, 'uuid': 1234}}),
                                judgment_comment='Vague but interesting!',
                                merged_into=None)
 
@@ -148,8 +155,8 @@ def create_mock_abstract(event):
                         contribution=contribution,
                         primary_authors=[englert, brout],
                         secondary_authors=[guralnik, hagen, kibble, higgs],
-                        locator={'confId': -314, 'abstract_id': 1234},
-                        uuid=None,
+                        locator=_MockLocator({'confId': -314, 'abstract_id': 1234,
+                                              'token': {'confId': -314, 'uuid': 1234}}),
                         judgment_comment='Vague but interesting!',
                         merged_into=target_abstract)
 

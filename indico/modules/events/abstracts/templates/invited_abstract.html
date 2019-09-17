@@ -22,13 +22,13 @@
         {% call message_box('warning') -%}
             {% trans submitter_name=abstract.submitter.full_name %}
                 You are submitting an abstract on behalf of {{ submitter_name }}.
-                Make sure you have been approved to do that.
+                Please make sure this is really what you want to do.
             {% endtrans %}
         {%- endcall %}
     {% endif -%}
     <div class="invited-abstract-form-container">
-        {% call form_header(form, action=url_for('.submit_invited_abstract', abstract, token=abstract.uuid)) -%}
-            data-href="{{ url_for('.submit_invited_abstract', abstract, token=abstract.uuid) }}"
+        {% call form_header(form, action=url_for('.submit_invited_abstract', abstract.locator.token)) -%}
+            data-href="{{ url_for('.submit_invited_abstract', abstract.locator.token) }}"
             data-form-container=".invited-abstract-form-container"
             data-ajax-form
             data-confirm-close-unsaved
