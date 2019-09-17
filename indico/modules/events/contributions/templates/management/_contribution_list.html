@@ -26,6 +26,9 @@
                         <th class="i-table" data-sorter="false">
                             {% trans %}Presenters{% endtrans %}
                         </th>
+                        <th class="i-table code-column">
+                            {% trans %}Code{% endtrans %}
+                        </th>
                         <th class="i-table type-column">
                             {% trans %}Type{% endtrans %}
                         </th>
@@ -118,6 +121,15 @@
                                     {% for speaker in contrib.speakers | sort(attribute='display_order_key') -%}
                                         <div class="person-row icon-user">{{ speaker.display_full_name }}</div>
                                     {%- endfor %}
+                                </span>
+                            </td>
+                            <td class="i-table code-column" data-text="{{ contrib.code }}">
+                                <span class="vertical-aligner">
+                                    {% if contrib.code -%}
+                                        {{ contrib.code }}
+                                    {%- else %}
+                                        {% trans %}n/a{% endtrans %}
+                                    {%- endif %}
                                 </span>
                             </td>
                             <td class="i-table type-column" data-text="{{ contrib.type.name if contrib.type else '' }}">
