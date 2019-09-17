@@ -138,7 +138,7 @@ class RHAssignProgramCodesContributions(RHAssignProgramCodesBase):
         return (Contribution.query
                 .with_parent(self.event)
                 .filter(Contribution.id.in_(ids) if ids else True)
-                .join(TimetableEntry)
+                .outerjoin(TimetableEntry)
                 .order_by(TimetableEntry.start_dt,
                           db.func.lower(Contribution.title),
                           Contribution.friendly_id)
@@ -154,7 +154,7 @@ class RHAssignProgramCodesSubContributions(RHAssignProgramCodesBase):
                 .filter(~SubContribution.is_deleted,
                         SubContribution.contribution.has(event=self.event, is_deleted=False))
                 .join(Contribution)
-                .join(TimetableEntry)
+                .outerjoin(TimetableEntry)
                 .order_by(TimetableEntry.start_dt,
                           db.func.lower(Contribution.title),
                           SubContribution.position)
