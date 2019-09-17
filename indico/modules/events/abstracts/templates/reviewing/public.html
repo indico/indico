@@ -111,7 +111,7 @@
 
     <div id="abstract-public">
         {{ _render_abstract_summary(abstract) }}
-        {% if abstract.state.name != 'invited' or abstract.content -%}
+        {% if abstract.state.name != 'invited' or abstract.description %}
             <div class="review-item-content abstract-content js-mathjax">
                 <div class="abstract-authorship-block flexrow f-j-center">
                     <div class="abstract-authorship-label">
@@ -141,7 +141,7 @@
                 {% endif %}
                 {{ abstract.description }}
             </div>
-        {%- endif %}
+        {% endif %}
     </div>
 {% endmacro %}
 

@@ -113,37 +113,34 @@ class RHCreateAbstract(RHAbstractListBase):
         is_invited = request.args.get('invited') == '1'
         abstract_form_class = make_abstract_form(self.event, session.user, notification_option=True,
                                                  management=self.management, invited=is_invited)
-        form = abstract_form_class(event=self.event, management=self.management)
+        form = abstract_form_class(event=self.event, management=self.management, invited=is_invited)
         if is_invited:
-            del form.description
             del form.submitted_contrib_type
             del form.attachments
             del form.send_notifications
             del form.person_links
 
         if form.validate_on_submit():
+            data = form.data
+            submitter = None
             if is_invited:
-                if form.data['users_with_no_account'] == 'existing':
-                    submitter = form.data.pop('submitter')
+                if form.users_with_no_account.data == 'existing':
+                    submitter = data['submitter']
                 else:
-                    submitter = User(first_name=form.data.pop('first_name'), last_name=form.data.pop('last_name'),
-                                     email=form.data.pop('email'), is_pending=True)
+                    submitter = User(first_name=data['first_name'], last_name=data['last_name'], email=data['email'],
+                                     is_pending=True)
                     db.session.add(submitter)
                     db.session.flush()
 
-                del form.users_with_no_account
-                del form.first_name
-                del form.last_name
-                del form.email
-                del form.submitter
-            else:
-                submitter = None
+                data.pop('first_name')
+                data.pop('last_name')
+                data.pop('email')
+                data.pop('users_with_no_account')
+                data.pop('submitter')
 
-            data = form.data
             send_notifications = data.pop('send_notifications', is_invited)
-            with db.session.no_autoflush:
-                abstract = create_abstract(self.event, *get_field_values(data), send_notifications=send_notifications,
-                                           submitter=submitter)
+            abstract = create_abstract(self.event, *get_field_values(data), send_notifications=send_notifications,
+                                       submitter=submitter, is_invited=is_invited)
             flash(_("Abstract '{}' created successfully").format(abstract.title), 'success')
             tpl_components = self.list_generator.render_list(abstract)
             if tpl_components.get('hide_abstract'):

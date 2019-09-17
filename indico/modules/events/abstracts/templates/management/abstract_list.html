@@ -60,7 +60,7 @@
                             {%- if can_create_invited_abstracts -%}
                                 {%- set message = _("Add new invited abstract") %}
                             {%- else -%}
-                                {%- set message = _("Define 'Invited' notification template in order to be able to create invited abstracts") %}
+                                {%- set message = _("You first need to create a notification template for invited abstracts") %}
                             {%- endif -%}
                             <a class="js-dialog-action {{ 'disabled' if not can_create_invited_abstracts }}"
                                title="{{ message }}"

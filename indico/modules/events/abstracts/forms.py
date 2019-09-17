@@ -28,6 +28,7 @@ from indico.modules.events.contributions.models.persons import AuthorType
 from indico.modules.events.contributions.models.types import ContributionType
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.tracks.models.tracks import Track
+from indico.modules.users.util import get_user_by_email
 from indico.util.i18n import _
 from indico.util.placeholders import render_placeholder_info
 from indico.web.forms.base import FormDefaults, IndicoForm, generated_data
@@ -462,9 +463,10 @@ class AbstractForm(IndicoForm):
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
         self.abstract = kwargs.pop('abstract', None)
+        is_invited = kwargs.pop('invited', False)
         management = kwargs.pop('management', False)
         description_settings = abstracts_settings.get(self.event, 'description_settings')
-        description_validators = self._get_description_validators(description_settings)
+        description_validators = self._get_description_validators(description_settings) if not is_invited else []
         if description_validators:
             inject_validators(self, 'description', description_validators)
         if abstracts_settings.get(self.event, 'contrib_type_required'):
@@ -574,6 +576,10 @@ class InvitedAbstractMixin(object):
     def __init__(self, *args, **kwargs):
         self.event = kwargs['event']
         super(InvitedAbstractMixin, self).__init__(*args, **kwargs)
+
+    def validate_email(self, field):
+        if get_user_by_email(field.data):
+            raise ValidationError(_('There is already a user with this email address'))
 
     def validate(self):
         from indico.modules.events.abstracts.util import can_create_invited_abstracts

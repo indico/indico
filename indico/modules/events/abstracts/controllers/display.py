@@ -73,19 +73,19 @@ class RHSubmitAbstract(RHAbstractsBase):
 
 
 class RHSubmitInvitedAbstract(RHAbstractBase):
+    USE_ABSTRACT_UUID = True
+
     def _check_access(self):
         RHAbstractBase._check_access(self)
         if self.abstract.state != AbstractState.invited:
             raise Forbidden
 
     def _check_abstract_protection(self):
-        if 'token' in request.args:
-            token = request.args['token']
-            return self.abstract.uuid == token
-        return self.event.can_manage(session.user) or self.abstract.submitter == session.user
+        token = request.view_args['uuid']
+        return self.abstract.uuid == token
 
     def _create_form(self):
-        form_user = session.user if session.user else self.abstract.submitter
+        form_user = session.user or self.abstract.submitter
         abstract_form_cls = make_abstract_form(self.event, form_user)
         custom_field_values = {'custom_{}'.format(x.contribution_field_id): x.data for x in self.abstract.field_values}
         form_defaults = FormDefaults(self.abstract, **custom_field_values)
@@ -103,4 +103,4 @@ class RHSubmitInvitedAbstract(RHAbstractBase):
             update_abstract(self.abstract, abstract_data, custom_fields)
             return jsonify_data(flash=False, redirect=url_for('.call_for_abstracts', self.event))
         return jsonify_form(form, form_header_kwargs={'action': url_for('.submit_invited_abstract',
-                                                                        self.abstract, token=self.abstract.uuid)})
+                                                                        self.abstract.locator.token)})

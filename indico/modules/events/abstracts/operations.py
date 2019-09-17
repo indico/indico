@@ -92,9 +92,10 @@ def delete_abstract_files(abstract, files):
                        data={'Files': ', '.join(f.filename for f in files)})
 
 
-def create_abstract(event, abstract_data, custom_fields_data=None, send_notifications=False, submitter=None):
-    abstract = Abstract(event=event, submitter=session.user if submitter is None else submitter)
-    if submitter:
+def create_abstract(event, abstract_data, custom_fields_data=None, send_notifications=False, submitter=None,
+                    is_invited=False):
+    abstract = Abstract(event=event, submitter=submitter or session.user)
+    if is_invited:
         abstract.uuid = unicode(uuid4())
         abstract.state = AbstractState.invited
     tracks = abstract_data.pop('submitted_for_tracks', None)

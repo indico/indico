@@ -52,8 +52,6 @@ class RHEditAbstract(RHAbstractBase):
         form = abstract_form_class(obj=defaults, abstract=self.abstract, event=self.event, management=self.management)
         if form.validate_on_submit():
             fields, custom_fields = get_field_values(form.data)
-            if self.abstract.state == AbstractState.invited:
-                fields['state'] = AbstractState.submitted
             update_abstract(self.abstract, fields, custom_fields)
             flash(_("Abstract modified successfully"), 'success')
             return jsonify_data(flash=False)

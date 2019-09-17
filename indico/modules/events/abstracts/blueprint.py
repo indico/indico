@@ -25,6 +25,8 @@ _bp = IndicoBlueprint('abstracts', __name__, url_prefix='/event/<confId>', templ
 _bp.add_url_rule('/abstracts/', 'call_for_abstracts', display.RHCallForAbstracts)
 _bp.add_url_rule('/abstracts/mine.pdf', 'my_abstracts_pdf', display.RHMyAbstractsExportPDF)
 _bp.add_url_rule('/abstracts/submit', 'submit', display.RHSubmitAbstract, methods=('GET', 'POST'))
+_bp.add_url_rule('/abstracts/submit/<uuid>', 'submit_invited_abstract', display.RHSubmitInvitedAbstract,
+                 methods=('GET', 'POST'))
 
 # Reviewing pages (display area, not related to any specific abstract)
 _bp.add_url_rule('/abstracts/reviewing/', 'display_reviewable_tracks', reviewing.RHDisplayReviewableTracks)
@@ -48,8 +50,6 @@ _bp.add_url_rule('/manage/book-of-abstracts.zip', 'export_boa_tex', boa.RHExport
 
 # Misc
 _bp.add_url_rule('/abstracts/other-list', 'other_abstracts', reviewing.RHListOtherAbstracts, methods=('POST',))
-_bp.add_url_rule('/abstracts/invited/<int:abstract_id>', 'submit_invited_abstract', display.RHSubmitInvitedAbstract,
-                 methods=('GET', 'POST'))
 
 # Management dashboard
 _bp.add_url_rule('/manage/abstracts/', 'management', management.RHAbstractsDashboard)
