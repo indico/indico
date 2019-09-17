@@ -37,6 +37,7 @@ Bugfixes
 ^^^^^^^^
 
 - Remove 30s timeout from dropzone file uploads
+- Fix bug affecting room booking from an event in another timezone (:issue:`4072`)
 
 Version 2.2.2
 -------------

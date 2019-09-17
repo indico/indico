@@ -105,3 +105,26 @@ def test_get_booking_params_for_event_multiple_times(create_event, create_contri
             (date(2019, 8, 18), dict({'sd': '2019-08-18'}, **expected_params))
         ]
     }
+
+
+def test_get_booking_params_timezone(create_event):
+    chicago_tz = pytz.timezone('America/Chicago')
+    start_dt = chicago_tz.localize(datetime(2019, 8, 16, 8, 0)).astimezone(pytz.utc)
+    end_dt = chicago_tz.localize(datetime(2019, 8, 18, 22, 0)).astimezone(pytz.utc)
+    event = create_event(start_dt=start_dt, end_dt=end_dt, timezone='America/Chicago')
+
+    assert get_booking_params_for_event(event) == {
+        'type': 'same_times',
+        'params': {
+            'sd': '2019-08-16',
+            'st': '08:00',
+            'ed': '2019-08-18',
+            'et': '22:00',
+            'interval': 'week',
+            'number': 1,
+            'recurrence': 'daily',
+            'link_id': event.id,
+            'link_type': 'event',
+            'text': None
+        }
+    }
