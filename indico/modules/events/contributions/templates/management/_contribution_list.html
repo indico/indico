@@ -3,6 +3,8 @@
 
 {% macro render_contrib_list(event, total_entries, contribs, sessions, tracks) %}
     {% if contribs %}
+        {% set has_codes = contribs|selectattr('code')|any %}
+        {% set has_types = contribs|selectattr('type')|any %}
         <form method="POST">
             <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
             <table class="i-table tablesorter" data-session-items="{{ sessions | tojson | forceescape }}"
@@ -26,12 +28,16 @@
                         <th class="i-table" data-sorter="false">
                             {% trans %}Presenters{% endtrans %}
                         </th>
-                        <th class="i-table code-column">
-                            {% trans %}Code{% endtrans %}
-                        </th>
-                        <th class="i-table type-column">
-                            {% trans %}Type{% endtrans %}
-                        </th>
+                        {% if has_codes %}
+                            <th class="i-table code-column">
+                                {% trans %}Code{% endtrans %}
+                            </th>
+                        {% endif %}
+                        {% if has_types %}
+                            <th class="i-table type-column">
+                                {% trans %}Type{% endtrans %}
+                            </th>
+                        {% endif %}
                         <th class="i-table">
                             {% trans %}Subcontributions{% endtrans %}
                         </th>
@@ -123,24 +129,28 @@
                                     {%- endfor %}
                                 </span>
                             </td>
-                            <td class="i-table code-column" data-text="{{ contrib.code }}">
-                                <span class="vertical-aligner">
-                                    {% if contrib.code -%}
-                                        {{ contrib.code }}
-                                    {%- else %}
-                                        {% trans %}n/a{% endtrans %}
-                                    {%- endif %}
-                                </span>
-                            </td>
-                            <td class="i-table type-column" data-text="{{ contrib.type.name if contrib.type else '' }}">
-                                <span class="vertical-aligner">
-                                    {% if contrib.type -%}
-                                        {{ contrib.type.name }}
-                                    {%- else %}
-                                        {% trans %}n/a{% endtrans %}
-                                    {%- endif %}
-                                </span>
-                            </td>
+                            {% if has_codes %}
+                                <td class="i-table code-column" data-text="{{ contrib.code }}">
+                                    <span class="vertical-aligner">
+                                        {% if contrib.code -%}
+                                            {{ contrib.code }}
+                                        {%- else %}
+                                            {% trans %}n/a{% endtrans %}
+                                        {%- endif %}
+                                    </span>
+                                </td>
+                            {% endif %}
+                            {% if has_types %}
+                                <td class="i-table type-column" data-text="{{ contrib.type.name if contrib.type else '' }}">
+                                    <span class="vertical-aligner">
+                                        {% if contrib.type -%}
+                                            {{ contrib.type.name }}
+                                        {%- else %}
+                                            {% trans %}n/a{% endtrans %}
+                                        {%- endif %}
+                                    </span>
+                                </td>
+                            {% endif %}
                             <td class="i-table" data-text="{{ contrib.subcontribution_count }}">
                                 <a href="#" class="i-label subcontribution-count"
                                    title="{% trans %}Manage subcontributions{% endtrans %}"
