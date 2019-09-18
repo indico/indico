@@ -120,9 +120,7 @@ class ProgrammeToPDF(PDFBase):
         story.append(Paragraph(u'\n<br/>\n'.join(parts).encode('utf-8'), style))
 
         story.append(Spacer(1, 0.4*inch))
-        tracks = [track for track in self.event.tracks if not track.track_group]
-        track_groups = self.event.track_groups
-        items = sorted(tracks + track_groups, key=attrgetter('position'))
+        items = self.event.get_sorted_tracks()
         for item in items:
             bogustext = item.title.encode('utf-8')
             p = Paragraph(escape(bogustext), styles["Heading1"])

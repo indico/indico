@@ -33,9 +33,7 @@ from indico.web.util import jsonify_data, jsonify_form
 
 
 def _render_track_list(event):
-    track_groups = event.track_groups
-    tracks = [track for track in event.tracks if not track.track_group]
-    list_items = sorted(tracks + track_groups, key=attrgetter('position'))
+    list_items = event.get_sorted_tracks()
     tpl = get_template_module('events/tracks/_track_list.html', event=event, list_items=list_items)
     return tpl.render_list(event, list_items)
 
@@ -72,9 +70,8 @@ class RHManageTrackGroupBase(RHManageEventBase):
 
 class RHManageTracks(RHManageTracksBase):
     def _process(self):
-        track_groups = self.event.track_groups
-        tracks = [track for track in self.event.tracks if not track.track_group]
-        list_items = sorted(tracks + track_groups, key=attrgetter('position'))
+        tracks = self.event.tracks
+        list_items = self.event.get_sorted_tracks()
         return WPManageTracks.render_template('management.html', self.event, list_items=list_items, tracks=tracks)
 
 

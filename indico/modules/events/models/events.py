@@ -10,6 +10,7 @@ from __future__ import unicode_literals
 from collections import OrderedDict
 from contextlib import contextmanager
 from datetime import timedelta
+from operator import attrgetter
 
 import pytz
 from flask import has_request_context, session
@@ -699,6 +700,12 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     def get_contribution(self, id_):
         """Get a contribution of the event"""
         return get_related_object(self, 'contributions', {'id': id_})
+
+    def get_sorted_tracks(self):
+        """Return tracks and track groups in the correct order"""
+        track_groups = self.track_groups
+        tracks = [track for track in self.tracks if not track.track_group]
+        return sorted(tracks + track_groups, key=attrgetter('position'))
 
     def get_session(self, id_=None, friendly_id=None):
         """Get a session of the event"""
