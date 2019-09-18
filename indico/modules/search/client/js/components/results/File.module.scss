@@ -40,11 +40,8 @@ $darken-parameter: 50;
                     content: ', ';
                 }
 
-                &:last-child {
-
-                    &::after {
-                        content: '';
-                    }
+                &:last-child::after {
+                    content: '';
                 }
             }
         }

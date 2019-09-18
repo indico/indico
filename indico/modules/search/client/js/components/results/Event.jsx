@@ -1,5 +1,5 @@
 import React from 'react';
-import {List} from 'semantic-ui-react';
+import {List, Icon} from 'semantic-ui-react';
 import PropTypes from 'prop-types';
 import './Event.module.scss';
 import moment from 'moment';
@@ -7,19 +7,21 @@ import CategoryPath from './CategoryPath';
 
 const dateRendering = (startDt, endDt) => {
   const singleDay =
-    moment(startDt, 'YYYY-MM-DDZhh:mm').format('ll') ===
-    moment(endDt, 'YYYY-MM-DDZhh:mm').format('ll');
+    moment(startDt, 'YYYY-MM-DDTHH:mm').format('ll') ===
+    moment(endDt, 'YYYY-MM-DDTHH:mm').format('ll');
   /* if end date == start date only show start date */
   return (
     <>
       {singleDay ? (
         <List.Item styleName="med-priority">
-          {moment(startDt, 'YYYY-MM-DDZhh:mm').format('DD MMMM YYYY HH:mm')}
+          <Icon name="calendar alternate outline" />
+          {moment(startDt, 'YYYY-MM-DDTHH:mm').format('DD MMMM YYYY HH:mm')}
         </List.Item>
       ) : (
         <List.Item styleName="med-priority">
-          {`${moment(startDt, 'YYYY-MM-DDZhh:mm').format('DD MMMM')} -
-        ${moment(endDt, 'YYYY-MM-DDZhh:mm').format('DD MMMM YYYY')}`}
+          <Icon name="calendar alternate outline" />
+          {`${moment(startDt, 'YYYY-MM-DDTHH:mm').format('DD MMMM')} -
+        ${moment(endDt, 'YYYY-MM-DDTHH:mm').format('DD MMMM YYYY')}`}
         </List.Item>
       )}
     </>

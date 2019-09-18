@@ -47,7 +47,7 @@ const File = ({title, url, type, contributionTitle, date, contribURL, persons}) 
       </List.Item>
       <List.Item styleName="med-priority">
         <Icon name="calendar alternate outline" />
-        {moment(date, 'YYYY-MM-DDZhh:mm').format('DD MMMM YYYY HH:mm')}
+        {moment(date, 'YYYY-MM-DDTHH:mm').format('DD MMMM YYYY HH:mm')}
       </List.Item>
     </List.Description>
   </div>

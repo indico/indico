@@ -6,6 +6,8 @@
 // LICENSE file for more details.
 @import 'base/palette';
 
+$darken-parameter: 50;
+
 .event {
     padding: 1em 0;
     color: $dark-gray;
@@ -19,6 +21,12 @@
 
         .med-priority {
             font-size: 13px;
+            color: darken($color: $dark-gray, $amount: $darken-parameter);
+            font-style: italic;
+
+            i {
+                color: $dark-gray;
+            }
         }
 
         .low-priority {

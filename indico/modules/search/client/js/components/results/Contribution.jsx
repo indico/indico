@@ -30,7 +30,7 @@ const Contribution = ({title, url, startDt, eventURL, eventTitle, persons}) => (
       </List.Item>
       <List.Item styleName="med-priority">
         <Icon name="calendar alternate outline" />
-        {moment(startDt, 'YYYY-MM-DDZhh:mm').format('DD MMMM YYYY HH:mm')}
+        {moment(startDt, 'YYYY-MM-DDTHH:mm').format('DD MMMM YYYY HH:mm')}
       </List.Item>
     </List.Description>
   </div>
