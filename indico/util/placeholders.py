@@ -155,9 +155,23 @@ def replace_placeholders(context, text, escape_html=True, **kwargs):
     :param escape_html: whether HTML escaping should be done
     :param kwargs: arguments specific to the context
     """
-    for name, placeholder in get_placeholders(context, **kwargs).iteritems():
+    for placeholder in get_placeholders(context, **kwargs).viewvalues():
         text = placeholder.replace(text, escape_html=escape_html, **kwargs)
     return text
+
+
+def get_empty_placeholders(context, text, **kwargs):
+    """Get a list of placeholders that evaluate to an empty string.
+
+    :param context: the context where the placeholders are used
+    :param text: the text containing some placeholders
+    :param kwargs: arguments specific to the context
+    """
+    return set(
+        placeholder.friendly_name
+        for placeholder in get_placeholders(context, **kwargs).viewvalues()
+        if placeholder.is_in(text, **kwargs) and not placeholder.render(**kwargs)
+    )
 
 
 def get_missing_placeholders(context, text, **kwargs):

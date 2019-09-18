@@ -12,7 +12,7 @@ from collections import OrderedDict
 from indico.modules.events.management.settings import program_codes_settings
 from indico.util.date_time import format_datetime
 from indico.util.i18n import _
-from indico.util.placeholders import Placeholder, replace_placeholders
+from indico.util.placeholders import Placeholder, get_empty_placeholders, replace_placeholders
 
 
 def generate_program_codes(event, object_type, objects):
@@ -37,7 +37,8 @@ def generate_program_codes(event, object_type, objects):
 
     template = program_codes_settings.get(event, template_setting)
     return OrderedDict(
-        (obj, replace_placeholders(context, template, escape_html=False, **{kwarg: obj}))
+        (obj, (replace_placeholders(context, template, escape_html=False, **{kwarg: obj}),
+               get_empty_placeholders(context, template, **{kwarg: obj})))
         for obj in objects
     )
 
