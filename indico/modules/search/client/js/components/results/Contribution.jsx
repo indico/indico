@@ -1,7 +1,7 @@
 import React from 'react';
 import {List, Icon} from 'semantic-ui-react';
 import PropTypes from 'prop-types';
-import moment from 'moment';
+import {toMoment, serializeDate} from 'indico/utils/date';
 
 import './Contribution.module.scss';
 
@@ -30,7 +30,7 @@ const Contribution = ({title, url, startDt, eventURL, eventTitle, persons}) => (
       </List.Item>
       <List.Item styleName="med-priority">
         <Icon name="calendar alternate outline" />
-        {moment(startDt, 'YYYY-MM-DDTHH:mm').format('DD MMMM YYYY HH:mm')}
+        {serializeDate(toMoment(startDt), 'DD MMMM YYYY HH:mm')}
       </List.Item>
     </List.Description>
   </div>

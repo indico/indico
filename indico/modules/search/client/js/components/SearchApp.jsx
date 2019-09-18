@@ -47,7 +47,7 @@ function useSearch(url, outerQuery) {
     url,
     camelize: true,
     options: {params: {q: query, page}},
-    forceDispatchEffect: () => (query ? !!query.length : false),
+    forceDispatchEffect: () => !!query,
     trigger: [url, query, page],
   });
 
@@ -71,7 +71,7 @@ function useSearch(url, outerQuery) {
 function SearchTypeMenuItem({name, active, title, total, loading, onClick}) {
   let indicator = null;
   if (loading) {
-    indicator = <Loader active inline size="tiny" style={{marginLeft: '5px'}} />;
+    indicator = <Loader active inline size="tiny" style={{marginLeft: '5'}} />;
   } else if (total !== -1) {
     indicator = ` (${total})`;
   }

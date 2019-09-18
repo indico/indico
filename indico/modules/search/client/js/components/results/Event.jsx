@@ -3,30 +3,26 @@ import {List, Icon} from 'semantic-ui-react';
 import PropTypes from 'prop-types';
 import './Event.module.scss';
 import moment from 'moment';
+import {toMoment, serializeDate} from 'indico/utils/date';
 import CategoryPath from './CategoryPath';
 
-const dateRendering = (startDt, endDt) => {
-  const singleDay =
-    moment(startDt, 'YYYY-MM-DDTHH:mm').format('ll') ===
-    moment(endDt, 'YYYY-MM-DDTHH:mm').format('ll');
-  /* if end date == start date only show start date */
-  return (
-    <>
-      {singleDay ? (
-        <List.Item styleName="med-priority">
-          <Icon name="calendar alternate outline" />
-          {moment(startDt, 'YYYY-MM-DDTHH:mm').format('DD MMMM YYYY HH:mm')}
-        </List.Item>
-      ) : (
-        <List.Item styleName="med-priority">
-          <Icon name="calendar alternate outline" />
-          {`${moment(startDt, 'YYYY-MM-DDTHH:mm').format('DD MMMM')} -
-        ${moment(endDt, 'YYYY-MM-DDTHH:mm').format('DD MMMM YYYY')}`}
-        </List.Item>
-      )}
-    </>
-  );
-};
+/* if end date == start date only show start date */
+const renderDates = (startDt, endDt) => (
+  <>
+    {moment(startDt).isSame(moment(endDt), 'day') ? (
+      <List.Item styleName="med-priority">
+        <Icon name="calendar alternate outline" />
+        {serializeDate(toMoment(startDt), 'DD MMMM YYYY HH:mm')}
+      </List.Item>
+    ) : (
+      <List.Item styleName="med-priority">
+        <Icon name="calendar alternate outline" />
+        {`${serializeDate(toMoment(startDt), 'DD MMMM YYYY')} -
+         ${serializeDate(toMoment(endDt), 'DD MMMM YYYY')}`}
+      </List.Item>
+    )}
+  </>
+);
 
 const Event = ({type, title, url, categoryPath, startDt, endDt, speakers}) => {
   return (
@@ -49,7 +45,7 @@ const Event = ({type, title, url, categoryPath, startDt, endDt, speakers}) => {
         )}
 
         {/* Dates */}
-        {dateRendering(startDt, endDt)}
+        {renderDates(startDt, endDt)}
         {/* Render the path */}
         {categoryPath.length !== 0 && (
           <List.Item>

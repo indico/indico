@@ -2,7 +2,7 @@ import React from 'react';
 import {List, Icon} from 'semantic-ui-react';
 import PropTypes from 'prop-types';
 import './File.module.scss';
-import moment from 'moment';
+import {toMoment, serializeDate} from 'indico/utils/date';
 
 const iconSelector = type => {
   const otherAttributes = {size: 'large'};
@@ -32,7 +32,7 @@ const File = ({title, url, type, contributionTitle, date, contribURL, persons}) 
     </List.Header>
     <List.Description styleName="description">
       <List.Item styleName="high-priority">
-        <Icon name="pencil alternate" />
+        <Icon name="connectdevelop" />
         <a href={contribURL}>{contributionTitle}</a>
       </List.Item>
       <List.Item>
@@ -47,7 +47,7 @@ const File = ({title, url, type, contributionTitle, date, contribURL, persons}) 
       </List.Item>
       <List.Item styleName="med-priority">
         <Icon name="calendar alternate outline" />
-        {moment(date, 'YYYY-MM-DDTHH:mm').format('DD MMMM YYYY HH:mm')}
+        {serializeDate(toMoment(date), 'DD MMMM YYYY HH:mm')}
       </List.Item>
     </List.Description>
   </div>
