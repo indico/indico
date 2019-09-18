@@ -7,10 +7,8 @@
 
 @import 'rb:styles/responsive';
 
-:global(.ui.container).container {
-    @media (max-width: $tablet-width) {
-        width: $tablet-width !important;
-    }
+:global(.ui.grid > .row).row {
+    display: block;
 }
 
 .calendar-filters {

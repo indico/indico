@@ -271,8 +271,8 @@ class Calendar extends React.Component {
     const isTimelineVisible = view === 'timeline';
     return (
       <Grid>
-        <Grid.Row>
-          <Container styleName="container">
+        <Grid.Row styleName="row">
+          <Container>
             <div ref={this.contextRef}>
               <StickyWithScrollBack context={this.contextRef.current} responsive>
                 <Grid.Row styleName="calendar-filters">
