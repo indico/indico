@@ -20,6 +20,8 @@ Improvements
 - Add LaTeX source export for book of abstracts (:issue:`4035`,
   thanks :user:`bpedersen2`)
 - Tracks can now be categorized in track groups (:issue:`4052`)
+- Program codes for sessions, session blocks, contributions and
+  subcontributions can now be auto-generated (:issue:`4026`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
