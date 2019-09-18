@@ -19,6 +19,7 @@ Improvements
 - Hide "External IDs" field if none are defined (:issue:`3857`)
 - Add LaTeX source export for book of abstracts (:issue:`4035`,
   thanks :user:`bpedersen2`)
+- Tracks can now be categorized in track groups (:issue:`4052`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
