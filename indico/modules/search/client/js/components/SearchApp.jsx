@@ -71,7 +71,7 @@ function useSearch(url, outerQuery) {
 function SearchTypeMenuItem({name, active, title, total, loading, onClick}) {
   let indicator = null;
   if (loading) {
-    indicator = <Loader active inline size="tiny" style={{marginLeft: '5'}} />;
+    indicator = <Loader active inline size="tiny" />;
   } else if (total !== -1) {
     indicator = ` (${total})`;
   }
@@ -154,7 +154,7 @@ export default function SearchApp() {
   return (
     <div>
       <SearchBar onSearch={handler} searchTerm={query || ''} />
-      {!!query && (
+      {query && (
         <>
           <Menu pointing secondary>
             <SearchTypeMenuItem

@@ -44,7 +44,6 @@ const Event = ({type, title, url, categoryPath, startDt, endDt, speakers}) => {
           </List.Item>
         )}
 
-        {/* Dates */}
         {renderDates(startDt, endDt)}
         {/* Render the path */}
         {categoryPath.length !== 0 && (
