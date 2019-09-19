@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import PropTypes from 'prop-types';
 import {Sticky} from 'semantic-ui-react';
 
@@ -14,11 +14,24 @@ import {useResponsive} from 'indico/react/util';
 
 import './StickyWithScrollBack.module.scss';
 
+const MIN_RESPONSIVE_OFFSET = 200;
+
 export default function StickyWithScrollBack({children, context, responsive}) {
   const [scrollButtonVisible, setScrollButtonVisible] = useState(false);
+  const [responsiveScrollOffset, setResponsiveScrollOffset] = useState(window.pageYOffset);
 
   const {isPhone, isTablet, isLandscape} = useResponsive();
   const isResponsiveDevice = responsive && (isPhone || isTablet) && isLandscape;
+
+  useEffect(() => {
+    window.addEventListener('scroll', onScroll, false);
+    return () => window.removeEventListener('scroll', onScroll, false);
+  });
+
+  function onScroll() {
+    setResponsiveScrollOffset(window.pageYOffset);
+  }
+
   return (
     <Sticky
       context={context}
@@ -28,7 +41,12 @@ export default function StickyWithScrollBack({children, context, responsive}) {
       active={!isResponsiveDevice}
     >
       {children}
-      <ScrollButton visible={scrollButtonVisible || isResponsiveDevice} />
+      <ScrollButton
+        visible={
+          scrollButtonVisible ||
+          (isResponsiveDevice && responsiveScrollOffset > MIN_RESPONSIVE_OFFSET)
+        }
+      />
     </Sticky>
   );
 }
