@@ -21,6 +21,9 @@
         {% block cat_toolbar %}
             <div id="category-toolbar" class="toolbar">
                 <div class="group">
+                    <div id="search-box"></div>
+                </div>
+                <div class="group">
                     {% block cat_create_event %}
                         {{ create_event_button(category, classes="highlight", text=_("Create event"), with_tooltip=false) }}
                     {% endblock %}
