@@ -18,6 +18,7 @@ from werkzeug.utils import cached_property
 from indico.core.config import config
 from indico.core.db.sqlalchemy.util.models import get_simple_column_attrs
 from indico.modules.categories import Category
+from indico.modules.events.contributions import contribution_settings
 from indico.modules.events.forms import EventCreationForm, LectureCreationForm
 from indico.modules.events.models.events import EventType
 from indico.modules.events.models.persons import EventPerson, EventPersonLink
@@ -115,6 +116,8 @@ class RHCreateEvent(RHProtected):
                 notify_event_creation(event, occurrences=events)
             else:
                 event = self._create_event(form.data)
+                if self.event_type == EventType.conference:
+                    contribution_settings.set(event, 'published', False)
                 notify_event_creation(event)
             return jsonify_data(flash=False, redirect=url_for('event_management.settings', event))
         check_room_availability = rb_check_user_access(session.user) and config.ENABLE_ROOMBOOKING
