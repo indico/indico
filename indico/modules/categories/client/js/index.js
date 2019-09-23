@@ -9,7 +9,7 @@ import searchUrl from 'indico-url:search.search';
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import SearchBar from 'indico/modules/search/components/SearchBar';
+import SearchBox from 'indico/modules/search/components/SearchBox';
 import {setMomentLocale} from 'indico/utils/date';
 import CategoryStatistics from './components/CategoryStatistics';
 import {LocaleContext} from './context.js';
@@ -19,11 +19,10 @@ import './display';
   document.addEventListener('DOMContentLoaded', () => {
     const domContainer = document.querySelector('#search-box');
     ReactDOM.render(
-      React.createElement(SearchBar, {
+      React.createElement(SearchBox, {
         onSearch: keyword => {
           window.location = searchUrl({q: keyword});
         },
-        searchTerm: '',
       }),
       domContainer
     );
