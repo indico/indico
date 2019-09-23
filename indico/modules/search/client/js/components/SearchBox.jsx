@@ -14,7 +14,7 @@ export default function SearchBox({onSearch}) {
   return (
     <Form onSubmit={handleSubmit}>
       <Form.Input
-        action={{icon: 'search', size: 'tiny'}}
+        action={{icon: 'search', size: 'tiny', disabled: !keyword}}
         placeholder={Translate.string('Enter your search term')}
         onChange={handleChange}
         value={keyword}
