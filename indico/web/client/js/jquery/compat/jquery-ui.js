@@ -9,6 +9,7 @@ import 'jquery-ui';
 import 'jquery-ui/ui/effect';
 import 'jquery-ui/ui/effects/effect-pulsate';
 import 'jquery-ui/ui/effects/effect-highlight';
+import 'jquery-ui/ui/effects/effect-blind';
 import 'jquery-ui/ui/widgets/datepicker';
 import 'jquery-ui/ui/widgets/dialog';
 import 'jquery-ui/ui/widgets/draggable';
