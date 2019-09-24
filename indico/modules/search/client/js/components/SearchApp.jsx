@@ -11,7 +11,7 @@ import searchContributionsURL from 'indico-url:search.search_contributions';
 import searchFilesURL from 'indico-url:search.search_files';
 
 import React, {useEffect, useReducer, useState} from 'react';
-import {Loader, Menu} from 'semantic-ui-react';
+import {Loader, Menu, Sidebar} from 'semantic-ui-react';
 import {useQueryParam, StringParam} from 'use-query-params';
 import {useIndicoAxios} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
@@ -22,6 +22,8 @@ import Event from './results/Event';
 import Contribution from './results/Contribution';
 import File from './results/File';
 import NoResults from './results/NoResults';
+import SideBar from './SideBar';
+import './SearchApp.module.scss';
 
 const searchReducer = (state, action) => {
   switch (action.type) {
@@ -95,7 +97,6 @@ export default function SearchApp() {
   const [contributionResults, setContributionPage] = useSearch(searchContributionsURL(), query);
   const [fileResults, setFilePage] = useSearch(searchFilesURL(), query);
   const [results, setResults] = useState('initial state');
-
   const resultMap = {
     categories: categoryResults,
     events: eventResults,
@@ -149,11 +150,11 @@ export default function SearchApp() {
     setResults('empty');
   }, [resultMap, resultTypes]);
 
-  const handler = value => setQuery(value, 'pushIn');
+  const handleQuery = value => setQuery(value, 'pushIn');
 
   return (
     <div>
-      <SearchBar onSearch={handler} searchTerm={query || ''} />
+      <SearchBar onSearch={handleQuery} searchTerm={query || ''} />
       {query && (
         <>
           <Menu pointing secondary>
@@ -190,7 +191,6 @@ export default function SearchApp() {
               onClick={handleClick}
             />
           </Menu>
-
           {results !== 'empty' ? (
             <>
               {activeMenuItem === 'categories' && (
@@ -214,14 +214,19 @@ export default function SearchApp() {
                 />
               )}
               {activeMenuItem === 'contributions' && (
-                <ResultList
-                  component={Contribution}
-                  page={contributionResults.page}
-                  numPages={contributionResults.pages}
-                  data={contributionResults.data}
-                  onPageChange={setContributionPage}
-                  loading={contributionResults.loading}
-                />
+                <Sidebar.Pushable styleName="sidebar">
+                  <SideBar filterType="Contributions" />
+                  <Sidebar.Pusher styleName="space">
+                    <ResultList
+                      component={Contribution}
+                      page={contributionResults.page}
+                      numPages={contributionResults.pages}
+                      data={contributionResults.data}
+                      onPageChange={setContributionPage}
+                      loading={contributionResults.loading}
+                    />
+                  </Sidebar.Pusher>
+                </Sidebar.Pushable>
               )}
               {activeMenuItem === 'files' && (
                 <ResultList

@@ -22,7 +22,7 @@ export default function ResultList({
   return (
     <>
       <Segment>
-        <List divided relaxed>
+        <List divided relaxed stylename="space">
           {loading ? (
             <Placeholder>
               <Placeholder.Paragraph>
