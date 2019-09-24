@@ -48,11 +48,9 @@ const Event = ({type, title, url, categoryPath, startDt, endDt, speakers}) => {
         {/* Render the path */}
         {categoryPath.length !== 0 && (
           <List.Item>
-            <div styleName="low-priority">
-              <List.Description>
-                <CategoryPath path={categoryPath} />
-              </List.Description>
-            </div>
+            <List.Description styleName="low-priority">
+              <CategoryPath path={categoryPath} />
+            </List.Description>
           </List.Item>
         )}
       </List.Description>

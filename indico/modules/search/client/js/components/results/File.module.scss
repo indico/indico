@@ -6,8 +6,6 @@
 // LICENSE file for more details.
 @import 'base/palette';
 
-$darken-parameter: 50;
-
 .file {
     padding: 1em 0;
     color: $dark-gray;
@@ -17,7 +15,7 @@ $darken-parameter: 50;
         padding-left: 2em;
 
         a, a:hover {
-            font-size: 15px;
+            font-size: 16px;
             color: $dark-gray;
         }
 
@@ -29,12 +27,12 @@ $darken-parameter: 50;
             color: $dark-gray;
 
             a, a:hover {
-                color: darken($color: $dark-gray, $amount: $darken-parameter);
+                color: $dark-gray;
             }
 
             li {
                 display: inline;
-                color: darken($color: $dark-gray, $amount: $darken-parameter);
+                color: $dark-gray;
 
                 &::after {
                     content: ', ';
@@ -48,7 +46,7 @@ $darken-parameter: 50;
 
         .med-priority {
             font-size: 13px;
-            color: darken($color: $dark-gray, $amount: $darken-parameter);
+            color: $dark-gray;
             font-style: italic;
 
             i {

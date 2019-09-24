@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Breadcrumb} from 'semantic-ui-react';
+import {Breadcrumb, Icon} from 'semantic-ui-react';
 
 import './CategoryPath.module.scss';
 
@@ -11,7 +11,12 @@ export default function CategoryPath({path}) {
     content: item.title,
   }));
 
-  return <Breadcrumb styleName="path" divider="»" sections={sections} />;
+  return (
+    <>
+      <Icon name="sitemap alternate" />
+      <Breadcrumb styleName="path" divider="»" sections={sections} />
+    </>
+  );
 }
 
 CategoryPath.propTypes = {

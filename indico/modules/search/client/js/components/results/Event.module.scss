@@ -6,8 +6,6 @@
 // LICENSE file for more details.
 @import 'base/palette';
 
-$darken-parameter: 50;
-
 .event {
     padding: 1em 0;
     color: $dark-gray;
@@ -15,18 +13,18 @@ $darken-parameter: 50;
     .description {
         padding: 0.5em 0;
 
+        i {
+            color: $dark-gray;
+        }
+
         .high-priority {
             font-size: 15px;
         }
 
         .med-priority {
             font-size: 13px;
-            color: darken($color: $dark-gray, $amount: $darken-parameter);
+            color: $dark-gray;
             font-style: italic;
-
-            i {
-                color: $dark-gray;
-            }
         }
 
         .low-priority {
@@ -36,6 +34,11 @@ $darken-parameter: 50;
             a, a:hover {
                 font-size: 11px;
                 color: $dark-gray;
+            }
+
+            i {
+                padding-right: 1.4em;
+                padding-left: 0.1em;
             }
         }
     }
