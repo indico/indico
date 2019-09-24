@@ -332,6 +332,10 @@ button::-moz-focus-inner {
     padding: 9px;
 }
 
+.i-button.inline {
+    padding: 0;
+}
+
 .i-button.right {
     margin-left: 5px;
     margin-top: 5px;

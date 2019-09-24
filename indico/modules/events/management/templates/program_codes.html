@@ -23,8 +23,7 @@
         <dd>
             {% if templates.session_template %}
                 <code>{{ templates.session_template }}</code>
-                <button class="icon-play i-button i-button-small text-color borderless"
-                        style="padding: 0;"
+                <button class="icon-play i-button i-button-small text-color borderless inline"
                         title="{% trans %}Assign programme codes to sessions{% endtrans %}"
                         data-href="{{ url_for('.assign_program_codes_sessions', event) }}"
                         data-title="{% trans %}Assign programme codes{% endtrans %}"
@@ -37,8 +36,7 @@
         <dd>
             {% if templates.session_block_template %}
                 <code>{{ templates.session_block_template }}</code>
-                <button class="icon-play i-button i-button-small text-color borderless"
-                        style="padding: 0;"
+                <button class="icon-play i-button i-button-small text-color borderless inline"
                         title="{% trans %}Assign programme codes to session blocks{% endtrans %}"
                         data-href="{{ url_for('.assign_program_codes_session_blocks', event) }}"
                         data-title="{% trans %}Assign programme codes{% endtrans %}"
@@ -50,8 +48,7 @@
         <dd>
             {% if templates.contribution_template %}
                 <code>{{ templates.contribution_template }}</code>
-                <button class="icon-play i-button i-button-small text-color borderless"
-                        style="padding: 0;"
+                <button class="icon-play i-button i-button-small text-color borderless inline"
                         title="{% trans %}Assign programme codes to contributions{% endtrans %}"
                         data-href="{{ url_for('.assign_program_codes_contributions', event) }}"
                         data-title="{% trans %}Assign programme codes{% endtrans %}"
@@ -64,8 +61,7 @@
         <dd>
             {% if templates.subcontribution_template %}
                 <code>{{ templates.subcontribution_template }}</code>
-                <button class="icon-play i-button i-button-small text-color borderless"
-                        style="padding: 0;"
+                <button class="icon-play i-button i-button-small text-color borderless inline"
                         title="{% trans %}Assign programme codes to subcontributions{% endtrans %}"
                         data-href="{{ url_for('.assign_program_codes_subcontributions', event) }}"
                         data-title="{% trans %}Assign programme codes{% endtrans %}"
