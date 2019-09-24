@@ -16,8 +16,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2019-07-19 10:16+0200\n"
-"PO-Revision-Date: 2019-07-26 08:31+0000\n"
+"POT-Creation-Date: 2019-09-24 12:12+0200\n"
+"PO-Revision-Date: 2019-08-27 13:50+0000\n"
 "Last-Translator: Thomas Baron <thomas.baron@cern.ch>\n"
 "Language-Team: French (France) (http://www.transifex.com/indico/indico/language/fr_FR/)\n"
 "MIME-Version: 1.0\n"
@@ -198,7 +198,7 @@ msgstr "Événement"
 #: indico/modules/events/timetable/models/entries.py:29
 #: indico/modules/events/timetable/templates/balloons/contribution.html:22
 #: indico/modules/rb/event/forms.py:18
-#: indico/modules/rb/templates/booking_list.html:31
+#: indico/modules/rb/templates/booking_list.html:52
 #: indico/modules/vc/forms.py:72 indico/modules/vc/forms.py:75
 #: indico/modules/vc/templates/list_vc_rooms.html:33
 msgid "Contribution"
@@ -226,7 +226,7 @@ msgid "Session"
 msgstr "Session"
 
 #: indico/core/db/sqlalchemy/links.py:26 indico/modules/rb/event/forms.py:21
-#: indico/modules/rb/templates/booking_list.html:47
+#: indico/modules/rb/templates/booking_list.html:68
 #: indico/modules/vc/forms.py:78
 msgid "Session block"
 msgstr "Bloc de session"
@@ -606,8 +606,8 @@ msgid "Homepage"
 msgstr "Accueil"
 
 #: indico/modules/admin/__init__.py:34 indico/modules/admin/views.py:25
-#: indico/modules/api/templates/user_profile.html:98 indico/web/views.py:252
-#: indico/web/views.py:309
+#: indico/modules/api/templates/user_profile.html:98 indico/web/views.py:254
+#: indico/web/views.py:311
 msgid "Administration"
 msgstr "Administration"
 
@@ -729,7 +729,7 @@ msgstr "Mode de sécurité"
 
 #: indico/modules/api/forms.py:34
 msgid "Specify if/when people need to use an API key or a signed request."
-msgstr "Spécifiez si/quand les utilisateurs doivent utiliser une clé API ou une requête signée."
+msgstr "Veuillez spécifier si/quand les utilisateurs doivent utiliser une clé API ou une requête signée."
 
 #: indico/modules/api/forms.py:36
 msgid "Cache TTL"
@@ -2377,7 +2377,7 @@ msgstr "Catégories & Sous-catégories"
 msgid ""
 "Specify categories/events shown in the 'upcoming events' list on the home "
 "page."
-msgstr "Spécifie les catégories/événements à afficher dans la liste 'événements à venir' sur la page d'accueil."
+msgstr "Veuillez spécifier les catégories/événements à afficher dans la liste 'événements à venir' sur la page d'accueil."
 
 #: indico/modules/categories/forms.py:167
 msgid "'Days' must be a positive integer"
@@ -5153,7 +5153,7 @@ msgstr "Mes résumés"
 #: indico/modules/events/abstracts/templates/management/abstract_list.html:202
 #: indico/modules/events/contributions/templates/display/contribution_list.html:18
 #: indico/modules/events/contributions/templates/management/contributions.html:181
-#: indico/modules/events/papers/templates/_paper_list.html:367
+#: indico/modules/events/papers/templates/_paper_list.html:375
 #: indico/modules/events/papers/templates/display/call_for_papers.html:58
 #: indico/modules/events/papers/templates/display/reviewing_area.html:61
 #: indico/modules/events/papers/templates/display/reviewing_area.html:87
@@ -5485,6 +5485,8 @@ msgstr "Marquer les résumés sélectionnés comme doublons"
 #: indico/modules/events/abstracts/templates/management/abstract_list.html:147
 #: indico/modules/events/contributions/templates/management/contributions.html:87
 #: indico/modules/events/contributions/templates/management/contributions.html:92
+#: indico/modules/events/papers/templates/_paper_list.html:355
+#: indico/modules/events/papers/templates/_paper_list.html:360
 #: indico/modules/events/sessions/templates/management/session_list.html:79
 #: indico/modules/events/sessions/templates/management/session_list.html:84
 msgid "Author list"
@@ -6245,7 +6247,7 @@ msgid "I disagree"
 msgstr "Je les refuse"
 
 #: indico/modules/events/agreements/forms.py:25
-#: indico/modules/rb/templates/booking_list.html:67
+#: indico/modules/rb/templates/booking_list.html:88
 msgid "Reason"
 msgstr "Motif"
 
@@ -6930,7 +6932,7 @@ msgstr "Il n'y a pas d'orateur"
 #: indico/modules/events/contributions/templates/management/_contribution_list.html:21
 #: indico/modules/events/management/templates/_settings.html:81
 #: indico/modules/events/reminders/forms.py:38
-#: indico/modules/rb/templates/booking_list.html:70
+#: indico/modules/rb/templates/booking_list.html:91
 msgid "Time"
 msgstr "Heure"
 
@@ -7741,8 +7743,8 @@ msgstr "Ajouter un espaceur"
 msgid "Edit page"
 msgstr "Modifier la page"
 
-#: indico/modules/events/logs/models/entries.py:21 indico/web/views.py:250
-#: indico/web/views.py:307
+#: indico/modules/events/logs/models/entries.py:21 indico/web/views.py:252
+#: indico/web/views.py:309
 msgid "Management"
 msgstr "Gestion"
 
@@ -8242,7 +8244,7 @@ msgstr "Modifier les dates de l'événement"
 #: indico/modules/events/management/templates/_settings.html:72
 #: indico/modules/events/reminders/forms.py:37
 #: indico/modules/news/templates/admin/news.html:35
-#: indico/modules/rb/templates/booking_list.html:69
+#: indico/modules/rb/templates/booking_list.html:90
 msgid "Date"
 msgstr "Date"
 
@@ -8256,7 +8258,7 @@ msgid "Edit event location"
 msgstr "Modifier le lieu de l'événement"
 
 #: indico/modules/events/management/templates/_settings.html:106
-#: indico/modules/rb/templates/booking_list.html:66
+#: indico/modules/rb/templates/booking_list.html:87
 #: indico/web/templates/forms/location_widget.html:61
 msgid "Room"
 msgstr "Salle"
@@ -8873,7 +8875,7 @@ msgstr "Refuser les articles sélectionnés"
 msgid "Mark to be corrected selected papers"
 msgstr "Marquer les articles sélectionnés comme devant être corrigés"
 
-#: indico/modules/events/papers/templates/_paper_list.html:356
+#: indico/modules/events/papers/templates/_paper_list.html:364
 msgid "Download papers"
 msgstr "Télécharger les articles"
 
@@ -10268,34 +10270,34 @@ msgstr "Ligne {}: une inscription avec cet adresse électronique existe déjà"
 msgid "Row {}: email address is not unique"
 msgstr "Ligne {}: l'adresse électronique n'est pas unique"
 
-#: indico/modules/events/registration/controllers/display.py:212
+#: indico/modules/events/registration/controllers/display.py:213
 msgid "Your invitation code is not valid."
 msgstr "Votre code d'invitation n'est pas valide."
 
-#: indico/modules/events/registration/controllers/display.py:216
+#: indico/modules/events/registration/controllers/display.py:217
 msgid "This invitation does not exist or has been withdrawn."
 msgstr "Cette invitation n'existe pas ou a été retirée."
 
-#: indico/modules/events/registration/controllers/display.py:248
+#: indico/modules/events/registration/controllers/display.py:249
 msgid ""
 "You are trying to register with a form that requires you to be logged in"
 msgstr "Vous essayez de vous inscrire avec un formulaire qui nécessite que vous soyez connecté"
 
-#: indico/modules/events/registration/controllers/display.py:297
+#: indico/modules/events/registration/controllers/display.py:298
 msgid ""
 "We could not find a registration for you.  If have already registered, "
 "please use the direct access link from the email you received after "
 "registering."
 msgstr "Nous ne pouvons trouver une inscription pour vous. Si vous vous êtes déjà inscrit, veuillez utiliser le lien direct contenu dans le courriel que vous avez reçu après votre inscription."
 
-#: indico/modules/events/registration/controllers/display.py:300
+#: indico/modules/events/registration/controllers/display.py:301
 msgid ""
 "We could not find a registration for you.  If have already registered, "
 "please use the direct access link from the email you received after "
 "registering or log in to your Indico account."
 msgstr "Nous ne pouvons pas trouver d'inscription pour vous. Si vous vous êtes déjà inscrits, veuillez utiliser le lien contenu dans le courriel que vous avez reçu après votre inscription, ou connectez-vous avec votre compte Indico."
 
-#: indico/modules/events/registration/controllers/display.py:320
+#: indico/modules/events/registration/controllers/display.py:321
 msgid "You declined the invitation to register."
 msgstr "Vous avez décliné l'invitation à vous inscrire."
 
@@ -10568,7 +10570,7 @@ msgid "Total registrations"
 msgstr "Nombre d'inscriptions"
 
 #: indico/modules/events/registration/templates/display/conference_home.html:73
-#: indico/modules/rb/templates/booking_list.html:124
+#: indico/modules/rb/templates/booking_list.html:154
 msgid "See details"
 msgstr "Voir les détails"
 
@@ -14270,9 +14272,10 @@ msgid "Room booking"
 msgstr "Réservation de salle"
 
 #: indico/modules/rb/__init__.py:102
-#: indico/modules/rb/templates/booking_list.html:23
-#: indico/modules/rb/templates/booking_list.html:38
-#: indico/modules/rb/templates/booking_list.html:54
+#: indico/modules/rb/templates/booking_list.html:26
+#: indico/modules/rb/templates/booking_list.html:43
+#: indico/modules/rb/templates/booking_list.html:59
+#: indico/modules/rb/templates/booking_list.html:75
 msgid "Book"
 msgstr "Réserver"
 
@@ -14331,11 +14334,11 @@ msgstr "Le nom doit être unique"
 msgid "Start time should not be later than end time"
 msgstr "L'heure de début doit être avant l'heure de fin"
 
-#: indico/modules/rb/controllers/backend/bookings.py:160
+#: indico/modules/rb/controllers/backend/bookings.py:163
 msgid "You cannot create a booking which starts in the past"
 msgstr "Vous pouvez créer une réservation qui commence dans le passé"
 
-#: indico/modules/rb/controllers/backend/bookings.py:165
+#: indico/modules/rb/controllers/backend/bookings.py:168
 msgid "Bookings for the room \"{}\" may not be longer than {} days"
 msgstr "Les réservations pour la salle \"{}\" ne peuvent pas être plus longues que {} jours"
 
@@ -14364,7 +14367,7 @@ msgstr "La réservation n'a pas d'occurrence valide"
 msgid "You cannot book this room more than {} days in advance"
 msgstr "Vous ne pouvez pas réserver cette salle plus de {} jours en avance"
 
-#: indico/modules/rb/operations/bookings.py:321
+#: indico/modules/rb/operations/bookings.py:337
 msgid ""
 "Booking could not be created. Probably somebody else booked the room in the "
 "meantime."
@@ -14378,23 +14381,23 @@ msgstr "Réservations de l'événement"
 msgid "Event has already finished"
 msgstr "L'événement est déjà passé"
 
-#: indico/modules/rb/templates/booking_list.html:68
+#: indico/modules/rb/templates/booking_list.html:89
 msgid "For whom"
 msgstr "Pour lesquelles"
 
-#: indico/modules/rb/templates/booking_list.html:71
+#: indico/modules/rb/templates/booking_list.html:92
 msgid "Linked to"
 msgstr "Liée à"
 
-#: indico/modules/rb/templates/booking_list.html:83
+#: indico/modules/rb/templates/booking_list.html:104
 msgid "Rejected:"
 msgstr "Refusée:"
 
-#: indico/modules/rb/templates/booking_list.html:86
+#: indico/modules/rb/templates/booking_list.html:107
 msgid "Pre-booking"
 msgstr "Pré-réservation"
 
-#: indico/modules/rb/templates/booking_list.html:94
+#: indico/modules/rb/templates/booking_list.html:115
 msgid "recurring"
 msgstr "recurrente"
 
@@ -15342,7 +15345,7 @@ msgstr "option"
 
 #: indico/web/fields/choices.py:45
 msgid "Specify the options the user can choose from"
-msgstr "Spécifier les options que l'utilisateur peut choisir"
+msgstr "Veuillez spécifier les options que l'utilisateur peut choisir"
 
 #: indico/web/fields/choices.py:64
 msgid "Single Choice"
@@ -15350,7 +15353,7 @@ msgstr "Choix simple"
 
 #: indico/web/fields/choices.py:93
 msgid "Specify the answers the user can select"
-msgstr "Spécifier les réponses que l'utilisateur peut choisir"
+msgstr "Veuillez spécifier les réponses que l'utilisateur peut choisir"
 
 #: indico/web/fields/choices.py:94
 msgid "Minimum choices"
@@ -15732,7 +15735,7 @@ msgstr "Votre fuseau horaire par défaut"
 
 #: indico/web/templates/_session_bar.html:80
 msgid "Specify a timezone"
-msgstr "Spécifier un fuseau horaire"
+msgstr "Veuillez spécifier un fuseau horaire"
 
 #: indico/web/templates/_session_bar.html:92
 msgid "Remember these settings"
