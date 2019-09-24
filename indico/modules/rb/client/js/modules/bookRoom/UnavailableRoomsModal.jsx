@@ -13,6 +13,7 @@ import {connect} from 'react-redux';
 import {Dimmer, Icon, Loader, Modal, Popup} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
 import {serializeDate} from 'indico/utils/date';
+import {Responsive} from 'indico/react/util';
 import * as selectors from './selectors';
 import * as unavailableRoomsActions from './actions';
 import {BookingTimelineComponent} from './BookingTimeline';
@@ -77,20 +78,28 @@ class UnavailableRoomsModal extends React.Component {
       );
     }
 
+    const timelineHeader = (
+      <>
+        <Popup
+          trigger={<Icon name="info circle" className="legend-info-icon" />}
+          content={<TimelineLegend labels={this.getLegendLabels(availability)} compact />}
+        />
+        <DateNavigator
+          {...datePicker}
+          disabled={isFetching || !availability.length}
+          onModeChange={actions.setMode}
+          onDateChange={actions.setDate}
+        />
+      </>
+    );
+
     return (
       <Modal open onClose={onClose} size="large" closeIcon>
         <Modal.Header className="legend-header">
           <Translate>Unavailable Rooms</Translate>
-          <Popup
-            trigger={<Icon name="info circle" className="legend-info-icon" />}
-            content={<TimelineLegend labels={this.getLegendLabels(availability)} compact />}
-          />
-          <DateNavigator
-            {...datePicker}
-            disabled={isFetching || !availability.length}
-            onModeChange={actions.setMode}
-            onDateChange={actions.setDate}
-          />
+          <Responsive.Portrait orElse={timelineHeader}>
+            <Responsive.Tablet andLarger>{timelineHeader}</Responsive.Tablet>
+          </Responsive.Portrait>
         </Modal.Header>
         <Modal.Content>
           <BookingTimelineComponent

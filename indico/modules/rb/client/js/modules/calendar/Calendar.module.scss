@@ -7,6 +7,10 @@
 
 @import 'rb:styles/responsive';
 
+:global(.ui.grid > .row).row {
+    display: block;
+}
+
 .calendar-filters {
     display: flex;
     justify-content: space-between;

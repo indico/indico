@@ -45,7 +45,7 @@ class SearchResultCount extends React.Component {
     const icon = <Icon name="filter" />;
     const trigger = (
       <Menu.Item as="span">
-        <Responsive.Tablet
+        <Responsive.Desktop
           andLarger
           orElse={
             <>
@@ -59,7 +59,7 @@ class SearchResultCount extends React.Component {
             Total
             <Param name="count" value={label} />
           </Translate>
-        </Responsive.Tablet>
+        </Responsive.Desktop>
       </Menu.Item>
     );
     return (
@@ -78,7 +78,7 @@ class SearchResultCount extends React.Component {
     const icon = <Icon name="calendar alternate outline" />;
     const trigger = (
       <Menu.Item active as="span">
-        <Responsive.Tablet
+        <Responsive.Desktop
           andLarger
           orElse={
             <>
@@ -92,7 +92,7 @@ class SearchResultCount extends React.Component {
             Available
             <Param name="count" value={label} />
           </Translate>
-        </Responsive.Tablet>
+        </Responsive.Desktop>
       </Menu.Item>
     );
 
@@ -115,7 +115,7 @@ class SearchResultCount extends React.Component {
     const icon = <Icon name="remove" />;
     const trigger = (
       <Menu.Item link onClick={openUnavailableRooms}>
-        <Responsive.Tablet
+        <Responsive.Desktop
           andLarger
           orElse={
             <>
@@ -129,7 +129,7 @@ class SearchResultCount extends React.Component {
             Unavailable
             <Param name="count" value={label} />
           </Translate>
-        </Responsive.Tablet>
+        </Responsive.Desktop>
       </Menu.Item>
     );
     return (
@@ -148,7 +148,7 @@ class SearchResultCount extends React.Component {
     const icon = <Icon name="lock" />;
     const trigger = (
       <Menu.Item as="span">
-        <Responsive.Tablet
+        <Responsive.Desktop
           andLarger
           orElse={
             <>
@@ -162,7 +162,7 @@ class SearchResultCount extends React.Component {
             Unauthorized
             <Param name="count" value={label} />
           </Translate>
-        </Responsive.Tablet>
+        </Responsive.Desktop>
       </Menu.Item>
     );
     return (

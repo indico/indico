@@ -187,7 +187,7 @@ class BookingEdit extends React.Component {
           {actionButtons()}
         </Modal.Header>
         <Modal.Content>
-          <Grid columns={2}>
+          <Grid stackable columns={2}>
             <Grid.Column>
               <RoomBasicDetails room={room} />
               {isOngoingBooking && (

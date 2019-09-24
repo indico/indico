@@ -14,7 +14,7 @@ import {connect} from 'react-redux';
 
 import {Translate} from 'indico/react/i18n';
 import {Overridable, Responsive} from 'indico/react/util';
-import {StickyWithScrollBack} from 'indico/react/components';
+import {StickyWithScrollBack, ResponsivePopup} from 'indico/react/components';
 import {serializeDate} from 'indico/utils/date';
 
 import searchBarFactory from '../../components/SearchBar';
@@ -157,7 +157,7 @@ class Calendar extends React.Component {
 
     return (
       <Button.Group size="small">
-        <Popup
+        <ResponsivePopup
           trigger={
             <Button
               primary={myBookings}
@@ -168,10 +168,10 @@ class Calendar extends React.Component {
           }
         >
           <Translate>Show only my bookings</Translate>
-        </Popup>
+        </ResponsivePopup>
         {view === 'timeline' && (
           <>
-            <Popup
+            <ResponsivePopup
               trigger={
                 <Button
                   primary={showInactive}
@@ -186,8 +186,8 @@ class Calendar extends React.Component {
               ) : (
                 <Translate>Show rejected/cancelled bookings</Translate>
               )}
-            </Popup>
-            <Popup
+            </ResponsivePopup>
+            <ResponsivePopup
               trigger={
                 <Button
                   primary={hideUnused}
@@ -202,7 +202,7 @@ class Calendar extends React.Component {
               ) : (
                 <Translate>Hide unused spaces</Translate>
               )}
-            </Popup>
+            </ResponsivePopup>
           </>
         )}
       </Button.Group>
@@ -271,10 +271,10 @@ class Calendar extends React.Component {
     const isTimelineVisible = view === 'timeline';
     return (
       <Grid>
-        <Grid.Row>
+        <Grid.Row styleName="row">
           <Container>
             <div ref={this.contextRef}>
-              <StickyWithScrollBack context={this.contextRef.current}>
+              <StickyWithScrollBack context={this.contextRef.current} responsive>
                 <Grid.Row styleName="calendar-filters">
                   <div className="filter-row">
                     <div className="filter-row-filters">

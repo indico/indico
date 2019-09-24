@@ -5,9 +5,15 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@import 'rb:styles/responsive';
+
 .room-filters {
     .text-filter input {
         width: 300px;
+
+        @media (max-width: $tablet-width) {
+            width: 275px;
+        }
 
         & + i.icon.remove {
             cursor: pointer;

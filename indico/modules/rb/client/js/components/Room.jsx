@@ -14,7 +14,7 @@ import {Card, Icon, Label, Loader, Popup, Button} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 import {Markdown, Slot} from 'indico/react/util';
-import {TooltipIfTruncated} from 'indico/react/components';
+import {TooltipIfTruncated, ResponsivePopup} from 'indico/react/components';
 import SpriteImage from './SpriteImage';
 import DimmableImage from './DimmableImage';
 import {actions as userActions, selectors as userSelectors} from '../common/user';
@@ -68,7 +68,7 @@ class Room extends React.Component {
     const tooltip = isFavorite
       ? Translate.string('Remove from favourites')
       : Translate.string('Add to favourites');
-    return <Popup trigger={button} content={tooltip} position="top center" />;
+    return <ResponsivePopup trigger={button} content={tooltip} position="top center" />;
   }
 
   renderCardImage = (room, content, actions) => {

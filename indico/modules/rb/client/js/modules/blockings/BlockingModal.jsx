@@ -317,7 +317,7 @@ class BlockingModal extends React.Component {
         </Modal.Header>
         <Modal.Content>
           <Form id="blocking-form" {...formProps}>
-            <Grid>
+            <Grid stackable>
               <Grid.Column width={8}>
                 {mode !== 'create' && (
                   <Message icon info floating>

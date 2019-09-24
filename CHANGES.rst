@@ -34,6 +34,11 @@ Version 2.2.3
 
 *Unreleased*
 
+Improvements
+^^^^^^^^^^^^
+
+- Improve room booking interface on small-screen devices (:issue:`4013`)
+
 Bugfixes
 ^^^^^^^^
 

@@ -161,19 +161,19 @@ export function renderRecurrence({type, number, interval}, shortcut = true) {
   }
   if (type === 'single') {
     return (
-      <Responsive.Phone andSmaller onlyIf={shortcut} orElse={Translate.string('Once')}>
+      <Responsive.Tablet andSmaller onlyIf={shortcut} orElse={Translate.string('Once')}>
         <Translate context="single booking shortcut">S</Translate>
-      </Responsive.Phone>
+      </Responsive.Tablet>
     );
   } else if (type === 'daily') {
     return (
-      <Responsive.Phone andSmaller onlyIf={shortcut} orElse={Translate.string('Daily')}>
+      <Responsive.Tablet andSmaller onlyIf={shortcut} orElse={Translate.string('Daily')}>
         <Translate context="daily booking shortcut">D</Translate>
-      </Responsive.Phone>
+      </Responsive.Tablet>
     );
   } else if (interval === 'week') {
     return (
-      <Responsive.Phone
+      <Responsive.Tablet
         andSmaller
         onlyIf={shortcut}
         orElse={PluralTranslate.string('Weekly', 'Every {number} weeks', number, {number})}
@@ -181,11 +181,11 @@ export function renderRecurrence({type, number, interval}, shortcut = true) {
         <Translate context="weekly booking shortcut">
           <Param name="number" value={number > 1 ? number : ''} />W
         </Translate>
-      </Responsive.Phone>
+      </Responsive.Tablet>
     );
   } else {
     return (
-      <Responsive.Phone
+      <Responsive.Tablet
         andSmaller
         onlyIf={shortcut}
         orElse={PluralTranslate.string('Monthly', 'Every {number} months', number, {number})}
@@ -193,7 +193,7 @@ export function renderRecurrence({type, number, interval}, shortcut = true) {
         <Translate context="monthly booking shortcut">
           <Param name="number" value={number > 1 ? number : ''} />M
         </Translate>
-      </Responsive.Phone>
+      </Responsive.Tablet>
     );
   }
 }

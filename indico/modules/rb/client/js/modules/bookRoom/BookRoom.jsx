@@ -18,7 +18,7 @@ import LazyScroll from 'redux-lazy-scroll';
 import {Translate} from 'indico/react/i18n';
 import {Overridable, Slot, toClasses, IndicoPropTypes, Responsive} from 'indico/react/util';
 import {serializeTime, serializeDate} from 'indico/utils/date';
-import {StickyWithScrollBack} from 'indico/react/components';
+import {StickyWithScrollBack, ResponsivePopup} from 'indico/react/components';
 
 import searchBarFactory from '../../components/SearchBar';
 import CardPlaceholder from '../../components/CardPlaceholder';
@@ -180,7 +180,7 @@ class BookRoom extends React.Component {
 
     const {selectedDate} = datePicker;
     return (
-      <StickyWithScrollBack context={ref}>
+      <StickyWithScrollBack context={ref} responsive>
         <div className="filter-row">
           <div className="filter-row-filters">
             <BookingFilterBar />
@@ -275,7 +275,7 @@ class BookRoom extends React.Component {
                     {room => (
                       <Slot name="actions">
                         {room.canUserBook && (
-                          <Popup
+                          <ResponsivePopup
                             trigger={bookingModalBtn(room)}
                             content={labels.bookButton}
                             position="top center"
@@ -285,7 +285,7 @@ class BookRoom extends React.Component {
                         {room.canUserPrebook && (
                           // eslint-disable-next-line max-len
                           <Icon.Group onClick={() => this.openBookingForm(room.id, null, true)}>
-                            <Popup
+                            <ResponsivePopup
                               trigger={<Button circular icon="check" color="orange" />}
                               content={labels.preBookButton}
                               position="top center"
@@ -294,7 +294,7 @@ class BookRoom extends React.Component {
                             <Icon corner name="wait" styleName="prebooking-corner-icon" />
                           </Icon.Group>
                         )}
-                        <Popup
+                        <ResponsivePopup
                           trigger={showDetailsBtn(room)}
                           content={labels.detailsButton}
                           position="top center"
@@ -439,11 +439,13 @@ class BookRoom extends React.Component {
           {this.renderMainContent()}
         </Grid.Column>
         {showMap && (
-          <Grid.Column computer={5} only="computer">
-            <MapController
-              onRoomClick={({id, canUserBook}) => this.openBookingForm(id, null, !canUserBook)}
-            />
-          </Grid.Column>
+          <Responsive.Desktop andLarger>
+            <Grid.Column computer={5} only="computer">
+              <MapController
+                onRoomClick={({id, canUserBook}) => this.openBookingForm(id, null, !canUserBook)}
+              />
+            </Grid.Column>
+          </Responsive.Desktop>
         )}
       </Grid>
     );

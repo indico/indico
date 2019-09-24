@@ -14,6 +14,7 @@ import {List, Popup} from 'semantic-ui-react';
 import {Translate, Param} from 'indico/react/i18n';
 import {Overridable} from 'indico/react/util';
 import {fullyOverlaps, serializeTime} from 'indico/utils/date';
+import {ResponsivePopup} from 'indico/react/components';
 import {actions as modalActions} from '../../modals';
 
 import './TimelineItem.module.scss';
@@ -313,9 +314,10 @@ class TimelineItem extends React.Component {
         style={{left: `${segmentPosition}%`, width: `${segmentWidth}%`}}
       />
     );
+    const PopupComponent = clickable ? ResponsivePopup : Popup;
 
     return (
-      <Popup
+      <PopupComponent
         styleName="header-center"
         trigger={segment}
         content={popupContent}

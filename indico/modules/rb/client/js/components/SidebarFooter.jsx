@@ -11,10 +11,11 @@ import privacyPolicyURL from 'indico-url:legal.display_privacy';
 
 import React, {useState} from 'react';
 import PropTypes from 'prop-types';
-import {Icon, Menu, Modal, Popup} from 'semantic-ui-react';
+import {Icon, Menu, Modal} from 'semantic-ui-react';
 import {connect} from 'react-redux';
 import {Translate} from 'indico/react/i18n';
 import {Responsive} from 'indico/react/util';
+import {ResponsivePopup} from 'indico/react/components';
 import {selectors as configSelectors} from '../common/config';
 
 const buildMenuItems = (helpURL, hasTOS, hasPrivacyPolicy, contactEmail) => {
@@ -97,7 +98,7 @@ function SidebarFooter({
             // https://github.com/babel/babel/issues/10257
             const {href, icon, modal, caption, ...extraProps} = item;
             return (
-              <Popup
+              <ResponsivePopup
                 key={id}
                 inverted
                 position="bottom right"
@@ -108,7 +109,7 @@ function SidebarFooter({
                 }
               >
                 {caption}
-              </Popup>
+              </ResponsivePopup>
             );
           })}
         </Menu.Item>

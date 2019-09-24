@@ -6,6 +6,8 @@
 // LICENSE file for more details.
 
 @import 'rb:styles/palette';
+@import 'rb:styles/responsive';
+
 
 :global(.ui.icon.message).message-icon :global(.icon) {
     font-size: 2em;
@@ -30,14 +32,22 @@
 
 :global(.ui.modal .header).booking-modal-header {
     display: flex;
+    align-items: center;
 
     .header-text {
         flex: 1;
-        align-self: center;
+
+        @media (max-width: $tablet-width) {
+            flex: 3;
+        }
     }
 
     .booking-status {
         flex: 4;
+
+        @media (max-width: $tablet-width) {
+            flex: 2;
+        }
     }
 }
 

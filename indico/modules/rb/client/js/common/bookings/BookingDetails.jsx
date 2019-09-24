@@ -31,6 +31,7 @@ import {
 import {toMoment, serializeDate} from 'indico/utils/date';
 import {Param, Translate} from 'indico/react/i18n';
 import {FinalTextArea} from 'indico/react/forms';
+import {Responsive} from 'indico/react/util';
 import {DailyTimelineContent, TimelineLegend} from '../timeline';
 import {
   getRecurrenceInfo,
@@ -526,12 +527,14 @@ class BookingDetails extends React.Component {
             </span>
             <span styleName="booking-status">{this.renderBookingStatus()}</span>
             <span>
-              {canEdit && editButton({disabled: bookingStateChangeInProgress})}
+              <Responsive.Tablet andLarger>
+                {canEdit && editButton({disabled: bookingStateChangeInProgress})}
+              </Responsive.Tablet>
               {canDelete && this.renderDeleteButton()}
             </span>
           </Modal.Header>
           <Modal.Content>
-            <Grid columns={2}>
+            <Grid stackable columns={2}>
               <Grid.Column>
                 <RoomBasicDetails room={room} />
                 <RoomKeyLocation room={room} />

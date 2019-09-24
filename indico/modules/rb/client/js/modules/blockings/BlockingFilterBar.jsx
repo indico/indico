@@ -7,12 +7,13 @@
 
 import React from 'react';
 import {bindActionCreators} from 'redux';
-import {Button, Dropdown, Popup} from 'semantic-ui-react';
+import {Button, Dropdown} from 'semantic-ui-react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 
 import {toClasses} from 'indico/react/util';
 import {Translate} from 'indico/react/i18n';
+import {ResponsivePopup} from 'indico/react/components';
 import * as blockingsActions from './actions';
 import * as blockingsSelectors from './selectors';
 
@@ -58,7 +59,7 @@ class BlockingFilterBar extends React.Component {
             floating
           />
           <Button.Group>
-            <Popup
+            <ResponsivePopup
               trigger={
                 <Button
                   content={Translate.string('Blockings in my rooms')}
@@ -68,7 +69,7 @@ class BlockingFilterBar extends React.Component {
               }
               content={Translate.string('Show only blockings in my rooms')}
             />
-            <Popup
+            <ResponsivePopup
               trigger={
                 <Button
                   content={Translate.string('My blockings')}
