@@ -7,8 +7,10 @@
 
 from __future__ import unicode_literals
 
+from uuid import UUID
+
 from flask import request, session
-from werkzeug.exceptions import Forbidden
+from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.modules.events.abstracts.models.abstracts import Abstract
 from indico.modules.events.controllers.base import RHDisplayEventBase
@@ -44,6 +46,10 @@ class SpecificAbstractMixin:
     def _process_args(self):
         filters = {'is_deleted': False}
         if self.USE_ABSTRACT_UUID:
+            try:
+                UUID(request.view_args['uuid'])
+            except ValueError:
+                raise NotFound
             filters['uuid'] = request.view_args['uuid']
         else:
             filters['id'] = request.view_args['abstract_id']
