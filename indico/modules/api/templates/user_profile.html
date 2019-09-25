@@ -91,6 +91,33 @@
             </div>
         </div>
 
+        <div class="i-box">
+            <div class="i-box-header">
+                <div class="i-box-title">
+                    {%- trans %}Token-based links{% endtrans -%}
+                </div>
+                <div class="i-box-buttons toolbar">
+                    <div class="group">
+                        <button type="button"
+                                class="i-button warning icon-remove"
+                                data-href="{{ url_for('core.reset_signature_tokens') }}"
+                                data-method="POST"
+                                data-confirm="{% trans %}Are you sure you'd like to invalidate all your token-based links?{% endtrans %}">
+                            {%- trans %}Invalidate all links{% endtrans -%}
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="i-box-content">
+                {% trans %}
+                    Token-based unique links are secret URLs which Indico uses to allow you to easily fetch data
+                    from within other applications (e.g. calendar schedulers through iCalendar). They are generated
+                    through a digital signature based on a secret key that is unique per Indico user. If one of your
+                    links is compromised, you should click this button. All other links will be invalidated.
+                {% endtrans %}
+            </div>
+        </div>
+
         {% if session.user.is_admin and (key or old_keys) %}
             <div class="i-box">
                 <div class="i-box-header">

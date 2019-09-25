@@ -9,6 +9,7 @@ from __future__ import unicode_literals
 
 import itertools
 from operator import attrgetter
+from uuid import uuid4
 
 from flask import flash, g, has_request_context, session
 from flask_multipass import IdentityRetrievalFailed
@@ -572,6 +573,9 @@ class User(PersonMixin, db.Model):
         db.session.flush()
         secondary.is_primary = True
         db.session.flush()
+
+    def reset_signing_secret(self):
+        self.signing_secret = unicode(uuid4())
 
     def synchronize_data(self, refresh=False):
         """Synchronize the fields of the user from the sync identity.
