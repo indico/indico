@@ -141,7 +141,8 @@ def create_mock_abstract(event):
                                primary_authors=[englert, brout],
                                secondary_authors=[guralnik, hagen, kibble, higgs],
                                locator=_MockLocator({'confId': -314, 'abstract_id': 1235,
-                                                     'token': {'confId': -314, 'uuid': 1234}}),
+                                                     'token': {'confId': -314,
+                                                               'uuid': '12345678-9abc-def0-1234-56789abcdef0'}}),
                                judgment_comment='Vague but interesting!',
                                merged_into=None)
 
@@ -156,7 +157,8 @@ def create_mock_abstract(event):
                         primary_authors=[englert, brout],
                         secondary_authors=[guralnik, hagen, kibble, higgs],
                         locator=_MockLocator({'confId': -314, 'abstract_id': 1234,
-                                              'token': {'confId': -314, 'uuid': 1234}}),
+                                              'token': {'confId': -314,
+                                                        'uuid': '12345678-9abc-def0-1234-56789abcdef0'}}),
                         judgment_comment='Vague but interesting!',
                         merged_into=target_abstract)
 
