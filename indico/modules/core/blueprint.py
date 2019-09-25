@@ -8,7 +8,8 @@
 from __future__ import unicode_literals
 
 from indico.modules.core.controllers import (RHChangeLanguage, RHChangeTimezone, RHContact, RHPrincipals, RHReportError,
-                                             RHReportErrorAPI, RHSettings, RHSignURL, RHVersionCheck)
+                                             RHReportErrorAPI, RHResetSignatureTokens, RHSettings, RHSignURL,
+                                             RHVersionCheck)
 from indico.web.flask.util import redirect_view
 from indico.web.flask.wrappers import IndicoBlueprint
 
@@ -26,6 +27,7 @@ _bp.add_url_rule('/change-language', 'change_lang', RHChangeLanguage, methods=('
 _bp.add_url_rule('/change-timezone', 'change_tz', RHChangeTimezone, methods=('POST',))
 _bp.add_url_rule('/api/principals', 'principals', RHPrincipals, methods=('GET', 'POST'))
 _bp.add_url_rule('/api/sign-url', 'sign_url', RHSignURL, methods=('POST',))
+_bp.add_url_rule('/api/reset-signature-tokens', 'reset_signature_tokens', RHResetSignatureTokens, methods=('POST',))
 
 # Misc pages
 _bp.add_url_rule('/contact', 'contact', RHContact)

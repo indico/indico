@@ -31,6 +31,7 @@ from indico.modules.cephalopod import cephalopod_settings
 from indico.modules.core.forms import ReportErrorForm, SettingsForm
 from indico.modules.core.settings import core_settings, social_settings
 from indico.modules.core.views import WPContact, WPSettings
+from indico.modules.users.controllers import RHUserBase
 from indico.util.i18n import _, get_all_locales
 from indico.util.marshmallow import PrincipalList
 from indico.util.user import principal_from_identifier
@@ -284,3 +285,10 @@ class RHSignURL(RHProtected):
         return jsonify(
             url=signed_url_for(session.user, endpoint, url_params=url_params, _external=True, **query_params)
         )
+
+
+class RHResetSignatureTokens(RHUserBase):
+    def _process(self):
+        self.user.reset_signing_secret()
+        flash(_('All your token-based links have been invalidated'), 'success')
+        return redirect(url_for('api.user_profile'))
