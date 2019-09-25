@@ -466,7 +466,7 @@ class AbstractForm(IndicoForm):
         is_invited = kwargs.pop('invited', False)
         management = kwargs.pop('management', False)
         description_settings = abstracts_settings.get(self.event, 'description_settings')
-        description_validators = self._get_description_validators(description_settings) if not is_invited else []
+        description_validators = self._get_description_validators(description_settings, invited=is_invited)
         if description_validators:
             inject_validators(self, 'description', description_validators)
         if abstracts_settings.get(self.event, 'contrib_type_required'):
@@ -492,9 +492,9 @@ class AbstractForm(IndicoForm):
         self.person_links.allow_speakers = abstracts_settings.get(self.event, 'allow_speakers')
         self.person_links.disable_user_search = session.user is None
 
-    def _get_description_validators(self, description_settings):
+    def _get_description_validators(self, description_settings, invited=False):
         validators = []
-        if description_settings['is_required']:
+        if description_settings['is_required'] and not invited:
             validators.append(DataRequired())
         if description_settings['max_length']:
             validators.append(SoftLength(max=description_settings['max_length']))
