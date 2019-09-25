@@ -47,6 +47,8 @@ Bugfixes
 - Remove 30s timeout from dropzone file uploads
 - Fix bug affecting room booking from an event in another timezone (:issue:`4072`)
 - Fix error when commenting on papers (:issue:`4081`)
+- Fix performance issue in conferences with public registration count and a
+  high amount of registrations
 
 Version 2.2.2
 -------------
