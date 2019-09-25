@@ -1,3 +1,6 @@
 {
-    "name": "users"
+    "name": "users",
+    "partials": {
+        "dashboard": "./dashboard.jsx"
+    }
 }

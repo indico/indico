@@ -43,6 +43,10 @@ class WPUser(WPJinjaMixin, WPDecorated):
         return self._get_page_content(params)
 
 
+class WPUserDashboard(WPUser):
+    bundles = ('module_users.dashboard.js',)
+
+
 class WPUsersAdmin(WPAdmin):
     template_prefix = 'users/'
     bundles = ('module_users.js',)
