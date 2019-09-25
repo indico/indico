@@ -41,7 +41,7 @@ from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.operations import create_user
 from indico.modules.users.util import (get_linked_events, get_related_categories, get_suggested_categories, merge_users,
                                        search_users, serialize_user)
-from indico.modules.users.views import WPUser, WPUsersAdmin
+from indico.modules.users.views import WPUser, WPUserDashboard, WPUsersAdmin
 from indico.util.date_time import now_utc
 from indico.util.event import truncate_path
 from indico.util.i18n import _
@@ -53,15 +53,15 @@ from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file, url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.http_api.metadata import Serializer
-from indico.web.rh import RHProtected
-from indico.web.util import jsonify_data, jsonify_form, jsonify_template
+from indico.web.rh import RH, RHProtected
+from indico.web.util import is_signed_url_valid, jsonify_data, jsonify_form, jsonify_template
 
 
 IDENTITY_ATTRIBUTES = {'first_name', 'last_name', 'email', 'affiliation', 'full_name'}
 UserEntry = namedtuple('UserEntry', IDENTITY_ATTRIBUTES | {'profile_url', 'user'})
 
 
-def get_events_in_categories(category_ids, user, limit=None):
+def get_events_in_categories(category_ids, user, limit=10):
     """Get all the user-accessible events in a given set of categories."""
     tz = session.tzinfo
     today = now_utc(False).astimezone(tz).date()
@@ -75,9 +75,7 @@ def get_events_in_categories(category_ids, user, limit=None):
                       load_only('id', 'category_id', 'start_dt', 'end_dt', 'title', 'access_key',
                                 'protection_mode', 'series_id', 'series_pos', 'series_count'))
              .order_by(Event.start_dt, Event.id))
-    if limit:
-        query = query.limit(limit)
-    return get_n_matching(query, 10, lambda x: x.can_access(user))
+    return get_n_matching(query, limit, lambda x: x.can_access(user))
 
 
 class RHUserBase(RHProtected):
@@ -133,15 +131,23 @@ class RHUserDashboard(RHUserBase):
                                   'reviewing': bool(roles & self.reviewer_roles),
                                   'attendance': bool(roles & self.attendance_roles)})
                          for event, roles in get_linked_events(self.user, from_dt, 10).iteritems()]
-        return WPUser.render_template('dashboard.html', 'dashboard',
-                                      user=self.user,
-                                      categories=categories,
-                                      categories_events=categories_events,
-                                      suggested_categories=get_suggested_categories(self.user),
-                                      linked_events=linked_events)
+        return WPUserDashboard.render_template('dashboard.html', 'dashboard',
+                                               user=self.user,
+                                               categories=categories,
+                                               categories_events=categories_events,
+                                               suggested_categories=get_suggested_categories(self.user),
+                                               linked_events=linked_events)
 
 
-class RHExportDashboardICS(RHUserBase):
+class RHExportDashboardICS(RH):
+    def _process_args(self):
+        self.user = User.get_one(request.view_args['user_id'])
+
+    def _check_access(self):
+        token = request.args.get('token')
+        if not token or not is_signed_url_valid(self.user, request.full_path):
+            raise Forbidden
+
     @use_kwargs({
         'from_': HumanizedDate(data_key='from', missing=lambda: now_utc(False) - relativedelta(weeks=1)),
         'include': fields.List(fields.Str(), missing={'linked', 'categories'}),
