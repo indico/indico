@@ -107,6 +107,8 @@ class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFie
                                             .format(AbstractState.accepted, AbstractState.rejected,
                                                     AbstractState.merged, AbstractState.duplicate),
                                             name='judgment_dt_if_judged'),
+                         db.CheckConstraint('(state != {}) OR (uuid IS NOT NULL)'.format(AbstractState.invited),
+                                            name='uuid_if_invited'),
                          {'schema': 'event_abstracts'})
 
     possible_render_modes = {RenderMode.markdown}

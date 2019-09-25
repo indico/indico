@@ -20,7 +20,10 @@ depends_on = None
 def upgrade():
     op.add_column('abstracts', sa.Column('uuid', postgresql.UUID(), nullable=True), schema='event_abstracts')
     op.create_index(None, 'abstracts', ['uuid'], unique=True, schema='event_abstracts')
+    op.create_check_constraint('uuid_if_invited', 'abstracts', '(state != 7) OR (uuid IS NOT NULL)',
+                               schema='event_abstracts')
 
 
 def downgrade():
+    op.drop_constraint('ck_abstracts_uuid_if_invited', 'abstracts', schema='event_abstracts')
     op.drop_column('abstracts', 'uuid', schema='event_abstracts')
