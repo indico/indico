@@ -33,11 +33,12 @@
 {% block content %}
     <div class="dashboard-tab">
         <div class="quick-access-pane">
-
             <div class="dashboard-col">
                 <div class="your-details clearfix">
                     <div class="avatar-image left">
-                        <i class="icon-user"></i>
+                        <span class="ui large circular label" style="{{ user.avatar_css }}">
+                            {{ user.first_name[0] }}
+                        </span>
                     </div>
                     <div class="your-details-wrapper left">
                         <h3>{{ user.full_name }}</h3>
@@ -61,9 +62,10 @@
                         {% endif %}
                     </div>
                     <div class="toolbar right">
-                        <div class="group">
-                            <a type="button" class="i-button icon-settings" href="{{ url_for('users.user_profile') }}">Settings</a>
-                        </div>
+                        <a class="ui icon button" href="{{ url_for('users.user_profile') }}">
+                            <i aria-hidden="true" class="cog icon"></i>
+                            {% trans %}Settings{% endtrans %}
+                        </a>
                     </div>
                 </div>
                 <div class="dashboard-box">
@@ -73,22 +75,22 @@
                     <ol>
                         {% for event, roles in linked_events %}
                             <li id="event-{{ event.id }}" class="truncate">
-                                <a href="{{ event.url }}" class="truncate">
-                                    <span class="event-date" title="{{ _format_event_times(event) }}">
-                                        {{ _format_event_time(event) }}
-                                    </span>
-                                    <span class="event-title truncate-target">
+                                <span class="event-date" title="{{ _format_event_times(event) }}">
+                                    {{ _format_event_time(event) }}
+                                </span>
+                                <span class="event-title truncate-target">
+                                    <a href="{{ event.url }}" class="truncate">
                                         {{ event.get_verbose_title(show_series_pos=true) }}
-                                    </span>
-                                    <span class="item-legend">
-                                        <span {% if roles.management %}title="{% trans %}You have management rights{% endtrans %}"{% endif %}
-                                              class="icon-medal contextHelp {% if roles.management %}active{% endif %}"></span>
-                                        <span {% if roles.reviewing %}title="{% trans %}You are a reviewer{% endtrans %}"{% endif %}
-                                              class="icon-user-reading contextHelp {% if roles.reviewing %}active{% endif %}"></span>
-                                        <span {% if roles.attendance %}title="{% trans %}You are an attendee{% endtrans %}"{% endif %}
-                                              class="icon-ticket contextHelp {% if roles.attendance %}active{% endif %}"></span>
-                                    </span>
-                                </a>
+                                    </a>
+                                </span>
+                                <span class="item-legend">
+                                    <span {% if roles.management %}title="{% trans %}You have management rights{% endtrans %}"{% endif %}
+                                            class="icon-medal contextHelp {% if roles.management %}active{% endif %}"></span>
+                                    <span {% if roles.reviewing %}title="{% trans %}You are a reviewer{% endtrans %}"{% endif %}
+                                            class="icon-user-reading contextHelp {% if roles.reviewing %}active{% endif %}"></span>
+                                    <span {% if roles.attendance %}title="{% trans %}You are an attendee{% endtrans %}"{% endif %}
+                                            class="icon-ticket contextHelp {% if roles.attendance %}active{% endif %}"></span>
+                                </span>
                             </li>
                         {% else %}
                             <li class="no-event">
@@ -181,7 +183,7 @@
                                 .find('.category-action')
                                 .replaceWith($('<span>', {
                                     'class': 'category-action icon-star active',
-                                    'title': $T('You have favourited this category')
+                                    'title': $T('You have favorited this category')
                                 }));
                             container.appendTo('#yourCategories ol');
                             if(!$('#suggestedCategories ol > li').length) {

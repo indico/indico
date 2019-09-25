@@ -264,19 +264,12 @@
 
             display: block;
         }
-        .category-box-title {
-            font-size: 1em;
-            font-weight: bold;
-        }
         .category-path {
-            font-size: 0.8em;
             line-height: 1;
 
             margin-top: 0.4em;
             ul {
                 font-weight: normal;
-                font-style: italic;
-
                 overflow: hidden;
 
                 max-width: 92%;
@@ -307,6 +300,7 @@
     }
     .category-action {
         width: 1.2em;
+        font-size: 1.2em;
     }
     .category-action-extra {
         font-size: 0.8em;

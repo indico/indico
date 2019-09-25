@@ -5,25 +5,52 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-.user-dashboard, .banner.user-dashboard {
+@import 'base/palette';
+@import 'rb:styles/responsive';
+
+.banner.user-dashboard, .user-dashboard {
     margin-left: auto;
     margin-right: auto;
-    max-width: 1000px;
+    max-width: 90%;
+    display: flex;
+
+    @media (max-width: $wide-screen-width) {
+        max-width: 100%;
+    }
+}
+
+.banner.user-dashboard {
+    justify-content: space-between;
+}
+
+.dashboard-tab {
+    margin-top: 2em;
+}
+
+.quick-access-pane {
+    @media (min-width: $computer-width) {
+        display: flex;
+    }
 }
 
 .dashboard-col {
-    display: table-cell;
-    width: 50%;
+    @media (min-width: $computer-width) {
+        width: 50%;
+    }
     vertical-align: top;
 }
 
 .dashboard-col:last-child {
-    padding-left: 10px;
+    @media (min-width: $computer-width) {
+        padding-left: 10px;
+    }
 }
 
 .dashboard-col:first-child {
-    padding-right: 10px;
-    padding-left: 0; /* overwrite :last-child value in case there is only one column */
+    @media (min-width: $computer-width) {
+        padding-right: 10px;
+        padding-left: 0;
+    }
 }
 
 .dashboard-box {
@@ -58,17 +85,14 @@
 }
 
 .dashboard-box ol li {
+    display: block;
     border-bottom: 1px solid #E5E5E5;
-    padding-bottom: 5px;
-    position: relative;
+    padding: 10px 10px 5px 10px;
 }
 
-.dashboard-box ol li > a, .dashboard-box ol li.no-event span {
-    display: block;
-    font-size: 14px;
-    font-weight: bold;
+.dashboard-box ol li a, .dashboard-box ol li.no-event span {
+    font-size: 1.2em;
     line-height: 18px;
-    padding: 10px 10px 5px 10px;
     position: relative;
     user-select: none;
     -webkit-touch-callout: none;
@@ -109,7 +133,7 @@
 
 .dashboard-box ol .event-date,
 .dashboard-box ol .event-category {
-    color: #666;
+    color: $dark-gray;
     display: inline-block;
     font-weight: normal;
     vertical-align: middle;
@@ -123,10 +147,7 @@
 
 .dashboard-box ol .event-category {
     display: block;
-    font-size: 11px;
-}
-
-.dashboard-box ol .event-category{
+    font-size: 0.8em;
     margin-left: 89px;
 }
 
@@ -156,11 +177,11 @@
 }
 
 .dashboard-box .event-title.truncate-target {
-    max-width: 200px;
+    max-width: 90%;
 }
 
 #happeningCategories .event-title.truncate-target {
-    max-width: 375px;
+    max-width: 90%;
 }
 
 .item-legend [class*=icon-] {
@@ -175,9 +196,9 @@
 .your-details {
     margin-bottom: 15px;
 
-    .avatar-image {
-        font-size: 130px;
-        color: $black;
+    .avatar-image .ui.label {
+        font-size: 70px;
+        color: $light-gray;
         margin-right: 34px;
     }
 
