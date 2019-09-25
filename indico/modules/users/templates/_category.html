@@ -20,7 +20,7 @@
     <li class="category-box">
         <div>
             <span class="category-box-info">
-                <a href="{{ category.url }}" class="category-box-title">{{ category.title }}</a>
+                <a href="{{ category.url }}">{{ category.title }}</a>
                 {{ _category_path(category, truncated_path) }}
                 {{ caller() }}
             {# The caller must provide the closing span tag (</span>). #}
@@ -35,7 +35,7 @@
         {% if is_manager %}
             <span title="{% trans %}You have management rights{% endtrans %}" class="category-action icon-medal active"></span>
         {% else %}
-            <span title="{% trans %}You have favorited this category{% endtrans %}" class="category-action icon-star active"></span>
+            <span title="{% trans %}You have favourited this category{% endtrans %}" class="category-action icon-star active"></span>
         {% endif %}
     {% endcall %}
 {% endmacro %}
