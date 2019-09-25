@@ -49,7 +49,8 @@ class RHEditAbstract(RHAbstractBase):
         abstract_form_class = make_abstract_form(self.event, session.user, management=self.management)
         custom_field_values = {'custom_{}'.format(x.contribution_field_id): x.data for x in self.abstract.field_values}
         defaults = FormDefaults(self.abstract, attachments=self.abstract.files, **custom_field_values)
-        form = abstract_form_class(obj=defaults, abstract=self.abstract, event=self.event, management=self.management)
+        form = abstract_form_class(obj=defaults, abstract=self.abstract, event=self.event, management=self.management,
+                                   invited=(self.abstract.state == AbstractState.invited))
         if form.validate_on_submit():
             fields, custom_fields = get_field_values(form.data)
             update_abstract(self.abstract, fields, custom_fields)
