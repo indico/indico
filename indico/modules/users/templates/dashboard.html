@@ -1,4 +1,4 @@
-{% extends 'users/base.html' %}
+{% extends 'layout/management_page.html' %}
 {% from 'users/_category.html' import suggested_category, user_category %}
 
 {% macro _format_event_times(event) %}
@@ -18,15 +18,19 @@
     {% endif %}
 {% endmacro %}
 
-
-{% block title -%}
-    {% trans %}Dashboard{% endtrans %}
-{%- endblock %}
-
 {% block page_class %}user-dashboard{% endblock %}
 {% block banner_class %}user-dashboard{% endblock %}
 
-{% block user_content %}
+
+{% block banner_title -%}
+    {% trans %}Dashboard{% endtrans %}
+{%- endblock %}
+
+{% block banner_actions -%}
+    <div id="dashboard-calendar-link" class="calendar-ics-link"></div>
+{% endblock %}
+
+{% block content %}
     <div class="dashboard-tab">
         <div class="quick-access-pane">
 
