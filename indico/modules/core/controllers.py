@@ -16,7 +16,7 @@ from packaging.version import Version
 from pkg_resources import DistributionNotFound, get_distribution
 from pytz import common_timezones_set
 from webargs import fields
-from werkzeug.exceptions import NotFound, ServiceUnavailable
+from werkzeug.exceptions import BadRequest, NotFound, ServiceUnavailable
 from werkzeug.urls import url_join, url_parse
 
 import indico
@@ -40,7 +40,7 @@ from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.rh import RH, RHProtected
-from indico.web.util import jsonify_data, jsonify_form
+from indico.web.util import jsonify_data, jsonify_form, signed_url_for
 
 
 class RHContact(RH):
@@ -269,3 +269,18 @@ class RHPrincipals(RHProtected):
     def _process(self, values):
         return jsonify({identifier: self._serialize_principal(identifier, principal)
                         for identifier, principal in values.viewitems()})
+
+
+class RHSignURL(RHProtected):
+    def _process(self):
+        endpoint = request.json.get('endpoint')
+        if not endpoint:
+            raise BadRequest
+        # filter out non-standard args
+        url_params = request.json.get('url_params', {})
+        url_params = {k: v for k, v in url_params.viewitems() if not k.startswith('_')}
+        query_params = request.json.get('query_params', {})
+        query_params = {k: v for k, v in query_params.viewitems() if not k.startswith('_')}
+        return jsonify(
+            url=signed_url_for(session.user, endpoint, url_params=url_params, _external=True, **query_params)
+        )

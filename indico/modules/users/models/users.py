@@ -12,6 +12,7 @@ from operator import attrgetter
 
 from flask import flash, g, has_request_context, session
 from flask_multipass import IdentityRetrievalFailed
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -242,6 +243,12 @@ class User(PersonMixin, db.Model):
         db.Boolean,
         nullable=False,
         default=False
+    )
+    #: a unique secret used to generate signed URLs
+    signing_secret = db.Column(
+        UUID,
+        nullable=False,
+        default=lambda: unicode(uuid4())
     )
 
     _affiliation = db.relationship(
