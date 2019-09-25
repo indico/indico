@@ -59,7 +59,7 @@
             <div class="toolbar">
                 {% if is_number_published %}
                     <span class="i-label icon-user" title="{% trans %}Total registrations{% endtrans %}">
-                        {{- single_regform.active_registrations|length }}
+                        {{- single_regform.active_registration_count }}
                         {%- if single_regform.registration_limit %}
                             / {{ single_regform.registration_limit }}
                         {%- endif -%}
