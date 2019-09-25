@@ -1,0 +1,67 @@
+name: CI
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:9.6
+        ports:
+          - 5432/tcp
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
+    steps:
+      - name: Setup Python
+        uses: actions/setup-python@v1
+        with:
+          python-version: 2.7
+
+      - name: Setup Node
+        uses: actions/setup-node@v1
+        with:
+          node-version: 10.x
+
+      - name: Setup database
+        run: |
+          sudo apt-get install postgresql-client
+          export PGHOST=localhost
+          export PGPORT=${{ job.services.postgres.ports[5432] }}
+          export PGUSER=postgres
+          createuser indicotest
+          createdb -O indicotest indicotest
+          psql indicotest -c 'CREATE EXTENSION unaccent;'
+          psql indicotest -c 'CREATE EXTENSION pg_trgm;'
+
+      - uses: actions/checkout@v1
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get install libpq-dev
+          pip install -U pip setuptools
+          pip install -r requirements.dev.txt
+          pip install -e .
+
+      - name: Check import sorting
+        run: isort -rc --diff --check-only indico/
+
+      - name: Check backref comments
+        run: python bin/maintenance/update_backrefs.py --ci
+
+      - name: Run tests
+        run: |
+          export INDICO_TEST_DATABASE_URI="postgresql://indicotest@localhost:${{ job.services.postgres.ports[5432] }}/indicotest"
+          pytest
+
+      - name: Install node dependencies
+        run: npm ci
+
+      - name: Try extracting i18n strings
+        run: |
+          export FORCE_COLOR=1
+          npx react-jsx-i18n extract --ext jsx indico/web/client/ indico/modules/ >/dev/null
+
+      - name: Try building assets
+        run: python bin/maintenance/build-assets.py indico --dev
