@@ -456,7 +456,7 @@ class AbstractForm(IndicoForm):
     description = IndicoMarkdownField(_('Content'), editor=True, mathjax=True)
     submitted_contrib_type = QuerySelectField(_("Contribution type"), get_label='name', allow_blank=True,
                                               blank_text=_("No type selected"))
-    person_links = AbstractPersonLinkListField(_("Authors"), [DataRequired()], default_author_type=AuthorType.primary)
+    person_links = AbstractPersonLinkListField(_("Authors"), default_author_type=AuthorType.primary)
     submission_comment = TextAreaField(_("Comments"))
     attachments = EditableFileField(_('Attachments'), multiple_files=True, lightweight=True)
 
@@ -469,6 +469,8 @@ class AbstractForm(IndicoForm):
         description_validators = self._get_description_validators(description_settings, invited=is_invited)
         if description_validators:
             inject_validators(self, 'description', description_validators)
+        if not is_invited:
+            inject_validators(self, 'person_links', [DataRequired()])
         if abstracts_settings.get(self.event, 'contrib_type_required'):
             inject_validators(self, 'submitted_contrib_type', [DataRequired()])
         super(AbstractForm, self).__init__(*args, **kwargs)
@@ -488,9 +490,12 @@ class AbstractForm(IndicoForm):
             del self.attachments
         if not description_settings['is_active']:
             del self.description
-        self.person_links.require_speaker_author = abstracts_settings.get(self.event, 'speakers_required')
-        self.person_links.allow_speakers = abstracts_settings.get(self.event, 'allow_speakers')
-        self.person_links.disable_user_search = session.user is None
+        if not is_invited:
+            self.person_links.require_speaker_author = abstracts_settings.get(self.event, 'speakers_required')
+            self.person_links.allow_speakers = abstracts_settings.get(self.event, 'allow_speakers')
+            self.person_links.disable_user_search = session.user is None
+        else:
+            self.person_links.require_primary_author = False
 
     def _get_description_validators(self, description_settings, invited=False):
         validators = []
