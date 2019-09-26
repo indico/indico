@@ -20,6 +20,8 @@ Bugfixes
 - Fix error when commenting on papers (:issue:`4081`)
 - Fix performance issue in conferences with public registration count and a
   high amount of registrations
+- Fix confirmation prompt when disabling conference menu customizations
+  (:issue:`4085`)
 
 Version 2.2.2
 -------------

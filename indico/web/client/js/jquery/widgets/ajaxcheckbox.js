@@ -44,7 +44,7 @@
       var self = this;
       var $this = $(this);
       var checked = this.checked;
-      var message = checked ? $this.data('confirm_enable') : $this.data('confirm_disable');
+      var message = checked ? $this.data('confirmEnable') : $this.data('confirmDisable');
       var deferred = message ? confirmPrompt(message) : $.Deferred().resolve();
       deferred.then(function() {
         // update check state and prevent changes until the request finished
