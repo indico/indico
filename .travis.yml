@@ -16,6 +16,7 @@ script:
   - isort -rc --diff --check-only indico/
   - python bin/maintenance/update_backrefs.py --ci
   - npx eslint --ext .js --ext .jsx indico/modules/rb/ indico/modules/events/logs/ indico/web/client/js/react/
+    indico/modules/users/
   - pytest
   - python bin/maintenance/build-assets.py indico --dev
 notifications:
