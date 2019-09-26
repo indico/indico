@@ -86,7 +86,7 @@ We have since stopped using the ~~*InDiCo*~~ acronym, as it no longer reflects a
 
 |||
 |-|-|
-|<a href="https://home.cern"><img src="https://design-guidelines.web.cern.ch/sites/design-guidelines.web.cern.ch/files/u6/CERN-logo.jpg" width="64"></a>|Made at [CERN](https://home.cern)<br>[Take part!](https://careers.cern/)|
+|<a href="https://home.cern"><img src="https://raw.githubusercontent.com/indico/assets/master/cern_badge.png" width="64"></a>|Made at [CERN](https://home.cern)<br>[Take part!](https://careers.cern/)|
 |||
 
 > ### Note
