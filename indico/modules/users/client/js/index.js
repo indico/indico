@@ -5,22 +5,21 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+/* eslint-disable import/unambiguous */
 (function(global) {
-  'use strict';
-
   global.setupRegistrationRequestList = function setupRegistrationRequestList() {
-    var container = $('#registration-requests');
+    const container = $('#registration-requests');
     container.on('indico:confirmed', '.js-process-request', function(evt) {
       evt.preventDefault();
 
-      var $this = $(this);
+      const $this = $(this);
       $.ajax({
         url: $this.data('href'),
         type: $this.data('method'),
         complete: IndicoUI.Dialogs.Util.progress(),
-        error: handleAjaxError,
-        success: function(data) {
-          handleFlashes(data);
+        error: global.handleAjaxError,
+        success: data => {
+          global.handleFlashes(data);
           $this.closest('tr').remove();
           if (!container.find('tr:not(.js-no-requests)').length) {
             container.find('.js-no-requests').show();
