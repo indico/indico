@@ -1,16 +1,42 @@
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 import {Sidebar, Table, Checkbox} from 'semantic-ui-react';
+import {useQueryParam, StringParam} from 'use-query-params';
+
+import './SideBar.module.scss';
 
 export default function SideBar({filterType}) {
   const [speakerValue, setSpeakerValue] = useState('');
-  const handleChange = (e, {value}) => {
-    setSpeakerValue(speakerValue === value ? '' : value);
+  const [affiliationValue, setAffiliationValue] = useState('');
+
+  const [speakerFilter, setSpeakerFilter] = useQueryParam('speaker', StringParam);
+  const [affiliationFilter, setAffiliationFilter] = useQueryParam('affiliation', StringParam);
+
+  const addSearchFilter = (value, type) => {
+    if (type === 'speaker') {
+      setSpeakerFilter(speakerValue === value ? '' : value, 'pushIn');
+      setSpeakerValue(speakerValue === value ? '' : value);
+    } else if (type === 'affiliation') {
+      setAffiliationFilter(affiliationValue === value ? '' : value, 'pushIn');
+      setAffiliationValue(affiliationValue === value ? '' : value);
+    }
   };
+
+  const handleChange = (e, {value}) => {
+    addSearchFilter(value.name, value.type);
+  };
+
   // it's going to change soon
   if (filterType !== 'Contributions') return;
   return (
-    <Sidebar animation="push" direction="left" visible width="thin" icon="labeled">
+    <Sidebar
+      animation="push"
+      direction="left"
+      visible
+      width="thin"
+      icon="labeled"
+      styleName="shadow"
+    >
       <Table celled padded>
         <Table.Header>
           <Table.Row>
@@ -24,7 +50,7 @@ export default function SideBar({filterType}) {
               <Checkbox
                 label="Aristofanis (45)"
                 name="Aristofanis"
-                value="Aristofanis"
+                value={{name: 'Aristofanis', type: 'speaker'}}
                 checked={speakerValue === 'Aristofanis'}
                 onChange={handleChange}
               />
@@ -35,7 +61,7 @@ export default function SideBar({filterType}) {
               <Checkbox
                 label="Pedro (4555)"
                 name="Pedro"
-                value="Pedro"
+                value={{name: 'Pedro', type: 'speaker'}}
                 checked={speakerValue === 'Pedro'}
                 onChange={handleChange}
               />
@@ -46,7 +72,7 @@ export default function SideBar({filterType}) {
               <Checkbox
                 label="Adrian (455)"
                 name="Adrian"
-                value="Adrian"
+                value={{name: 'Adrian', type: 'speaker'}}
                 checked={speakerValue === 'Adrian'}
                 onChange={handleChange}
               />
@@ -65,17 +91,35 @@ export default function SideBar({filterType}) {
         <Table.Body>
           <Table.Row>
             <Table.Cell>
-              <Checkbox label="Natalia (123)" />
+              <Checkbox
+                label="Natalia's (123)"
+                name="Natalia"
+                value={{name: 'Natalia', type: 'affiliation'}}
+                checked={affiliationValue === 'Natalia'}
+                onChange={handleChange}
+              />
             </Table.Cell>
           </Table.Row>
           <Table.Row>
             <Table.Cell>
-              <Checkbox label="Marco (321)" />
+              <Checkbox
+                label="Marco's (321)"
+                name="Marco"
+                value={{name: 'Marco', type: 'affiliation'}}
+                checked={affiliationValue === 'Marco'}
+                onChange={handleChange}
+              />
             </Table.Cell>
           </Table.Row>
           <Table.Row>
             <Table.Cell>
-              <Checkbox label="Giota (333)" />
+              <Checkbox
+                label="Giota's (333)"
+                name="Giota"
+                value={{name: 'Giota', type: 'affiliation'}}
+                checked={affiliationValue === 'Giota'}
+                onChange={handleChange}
+              />
             </Table.Cell>
           </Table.Row>
         </Table.Body>
