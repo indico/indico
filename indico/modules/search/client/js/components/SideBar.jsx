@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
-import {Sidebar, Table, Checkbox} from 'semantic-ui-react';
+import {Table, Checkbox} from 'semantic-ui-react';
 import {useQueryParam, StringParam} from 'use-query-params';
 
 import './SideBar.module.scss';
@@ -29,14 +29,7 @@ export default function SideBar({filterType}) {
   // it's going to change soon
   if (filterType !== 'Contributions') return;
   return (
-    <Sidebar
-      animation="push"
-      direction="left"
-      visible
-      width="thin"
-      icon="labeled"
-      styleName="shadow"
-    >
+    <div styleName="sidebar">
       <Table celled padded>
         <Table.Header>
           <Table.Row>
@@ -124,7 +117,7 @@ export default function SideBar({filterType}) {
           </Table.Row>
         </Table.Body>
       </Table>
-    </Sidebar>
+    </div>
   );
 }
 
