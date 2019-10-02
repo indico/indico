@@ -37,6 +37,8 @@ class ProtectionMode(RichIntEnum):
 
 
 class ProtectionMixin(object):
+    #: Whether the object protection mode is disabled
+    disable_protection_mode = False
     #: The protection modes that are not allowed.  Can be overridden
     #: in the model that is using the mixin.  Affects the table
     #: structure, so any changes to it should go along with a migration
@@ -72,11 +74,12 @@ class ProtectionMixin(object):
 
     @declared_attr
     def protection_mode(cls):
-        return db.Column(
-            PyIntEnum(ProtectionMode, exclude_values=cls.disallowed_protection_modes),
-            nullable=False,
-            default=cls.default_protection_mode
-        )
+        if not cls.disable_protection_mode:
+            return db.Column(
+                PyIntEnum(ProtectionMode, exclude_values=cls.disallowed_protection_modes),
+                nullable=False,
+                default=cls.default_protection_mode
+            )
 
     @declared_attr
     def access_key(cls):
@@ -105,10 +108,14 @@ class ProtectionMixin(object):
 
     @hybrid_property
     def is_public(self):
+        if self.disable_protection_mode:
+            raise NotImplementedError
         return self.protection_mode == ProtectionMode.public
 
     @hybrid_property
     def is_inheriting(self):
+        if self.disable_protection_mode:
+            raise NotImplementedError
         return self.protection_mode == ProtectionMode.inheriting
 
     @hybrid_property
@@ -118,6 +125,8 @@ class ProtectionMixin(object):
         If you also care about inherited protection from a parent,
         use `is_protected` instead.
         """
+        if self.disable_protection_mode:
+            raise NotImplementedError
         return self.protection_mode == ProtectionMode.protected
 
     @property
@@ -126,6 +135,8 @@ class ProtectionMixin(object):
         Checks whether ths object is protected, either by itself or
         by inheriting from a protected object.
         """
+        if self.disable_protection_mode:
+            raise NotImplementedError
         if self.is_inheriting:
             return self.protection_parent.is_protected
         else:
@@ -133,6 +144,8 @@ class ProtectionMixin(object):
 
     @property
     def protection_repr(self):
+        if self.disable_protection_mode:
+            return 'protection_mode=disabled'
         protection_mode = self.protection_mode.name if self.protection_mode is not None else None
         return 'protection_mode={}'.format(protection_mode)
 
@@ -162,6 +175,8 @@ class ProtectionMixin(object):
                      user is not logged in.
         :param allow_admin: If admin users should always have access
         """
+        if self.disable_protection_mode:
+            raise NotImplementedError
 
         override = self._check_can_access_override(user, allow_admin=allow_admin)
         if override is not None:
