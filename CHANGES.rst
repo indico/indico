@@ -25,6 +25,8 @@ Bugfixes
 - Fix confirmation prompt when disabling conference menu customizations
   (:issue:`4085`)
 - Fix incorrect days shown as weekend in in room booking for some locales
+- Fix ACL entries referencing event roles from the old event when cloning an
+  event with event roles in the ACL (:issue:`4090`)
 
 Version 2.2.2
 -------------
