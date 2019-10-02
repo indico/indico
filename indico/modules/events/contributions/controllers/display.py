@@ -15,6 +15,7 @@ from indico.core.config import config
 from indico.core.db import db
 from indico.legacy.pdfinterface.latex import ContribsToPDF, ContribToPDF
 from indico.modules.events.abstracts.util import filter_field_values
+from indico.modules.events.contributions import contribution_settings
 from indico.modules.events.contributions.lists import ContributionDisplayListGenerator
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.persons import AuthorType, ContributionPersonLink
@@ -53,7 +54,8 @@ class RHContributionDisplayBase(RHDisplayEventBase):
 
     def _check_access(self):
         RHDisplayEventBase._check_access(self)
-        if not self.contrib.can_access(session.user):
+        published = contribution_settings.get(self.event, 'published')
+        if not self.contrib.can_access(session.user) or not published:
             raise Forbidden
 
     def _process_args(self):
@@ -64,6 +66,9 @@ class RHContributionDisplayBase(RHDisplayEventBase):
 class RHDisplayProtectionBase(RHDisplayEventBase):
     def _check_access(self):
         RHDisplayEventBase._check_access(self)
+        published = contribution_settings.get(self.event, 'published')
+        if not published:
+            raise Forbidden
         if not is_menu_entry_enabled(self.MENU_ENTRY_NAME, self.event):
             self._forbidden_if_not_admin()
 
@@ -72,11 +77,6 @@ class RHMyContributions(RHDisplayProtectionBase):
     """Display list of current user contributions"""
 
     MENU_ENTRY_NAME = 'my_contributions'
-
-    def _check_access(self):
-        RHDisplayProtectionBase._check_access(self)
-        if not session.user:
-            raise Forbidden
 
     def _process(self):
         contributions = get_contributions_with_user_as_submitter(self.event, session.user)

@@ -13,6 +13,7 @@ from flask import jsonify, request, session
 from werkzeug.exceptions import Forbidden
 
 from indico.legacy.pdfinterface.conference import SimplifiedTimeTablePlain, TimetablePDFFormat, TimeTablePlain
+from indico.modules.events.contributions import contribution_settings
 from indico.modules.events.controllers.base import RHDisplayEventBase
 from indico.modules.events.layout import layout_settings
 from indico.modules.events.timetable.forms import TimetablePDFExportForm
@@ -26,12 +27,21 @@ from indico.web.flask.util import send_file, url_for
 from indico.web.util import jsonify_data, jsonify_template
 
 
-class RHTimetable(RHDisplayEventBase):
+class RHTimetableProtectionBase(RHDisplayEventBase):
+
+    def _check_access(self):
+        RHDisplayEventBase._check_access(self)
+        published = contribution_settings.get(self.event, 'published')
+        if not published:
+            raise Forbidden
+
+
+class RHTimetable(RHTimetableProtectionBase):
     view_class = WPDisplayTimetable
     view_class_simple = WPSimpleEventDisplay
 
     def _process_args(self):
-        RHDisplayEventBase._process_args(self)
+        RHTimetableProtectionBase._process_args(self)
         self.timetable_layout = request.args.get('layout') or request.args.get('ttLyt')
         self.theme, self.theme_override = get_theme(self.event, request.args.get('view'))
 
@@ -48,15 +58,15 @@ class RHTimetable(RHDisplayEventBase):
             return self.view_class_simple(self, self.event, self.theme, self.theme_override).display()
 
 
-class RHTimetableEntryInfo(RHDisplayEventBase):
+class RHTimetableEntryInfo(RHTimetableProtectionBase):
     """Display timetable entry info balloon."""
 
     def _process_args(self):
-        RHDisplayEventBase._process_args(self)
+        RHTimetableProtectionBase._process_args(self)
         self.entry = self.event.timetable_entries.filter_by(id=request.view_args['entry_id']).first_or_404()
 
     def _check_access(self):
-        RHDisplayEventBase._check_access(self)
+        RHTimetableProtectionBase._check_access(self)
         if not self.entry.can_view(session.user):
             raise Forbidden
 
@@ -65,7 +75,8 @@ class RHTimetableEntryInfo(RHDisplayEventBase):
         return jsonify(html=html)
 
 
-class RHTimetableExportPDF(RHDisplayEventBase):
+class RHTimetableExportPDF(RHTimetableProtectionBase):
+
     def _process(self):
         form = TimetablePDFExportForm(formdata=request.args, csrf_enabled=False)
         if form.validate_on_submit():
@@ -92,7 +103,8 @@ class RHTimetableExportPDF(RHDisplayEventBase):
                                 back_url=url_for('.timetable', self.event))
 
 
-class RHTimetableExportDefaultPDF(RHDisplayEventBase):
+class RHTimetableExportDefaultPDF(RHTimetableProtectionBase):
+
     def _process(self):
         pdf = get_timetable_offline_pdf_generator(self.event)
         return send_file('timetable.pdf', BytesIO(pdf.getPDFBin()), 'application/pdf')
