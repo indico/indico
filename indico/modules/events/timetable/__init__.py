@@ -25,8 +25,13 @@ logger = Logger.get('events.timetable')
 @signals.event.sidemenu.connect
 def _extend_event_menu(sender, **kwargs):
     from indico.modules.events.layout.util import MenuEntryData
+    from indico.modules.events.contributions import contribution_settings
+
+    def _visible_timetable(event):
+        return contribution_settings.get(event, 'published')
+
     yield MenuEntryData(title=_("Timetable"), name='timetable', endpoint='timetable.timetable', position=3,
-                        static_site=True)
+                        visible=_visible_timetable, static_site=True)
 
 
 @signals.menu.items.connect_via('event-management-sidemenu')

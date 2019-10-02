@@ -8,13 +8,14 @@
 from __future__ import unicode_literals
 
 from flask import flash
-from werkzeug.exceptions import NotFound
+from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.core.config import config
 from indico.modules.events.abstracts.controllers.base import RHAbstractsBase, RHManageAbstractsBase
 from indico.modules.events.abstracts.forms import BOASettingsForm
 from indico.modules.events.abstracts.settings import boa_settings
 from indico.modules.events.abstracts.util import clear_boa_cache, create_boa, create_boa_tex
+from indico.modules.events.contributions import contribution_settings
 from indico.util.i18n import _
 from indico.web.flask.util import send_file
 from indico.web.forms.base import FormDefaults
@@ -36,6 +37,12 @@ class RHManageBOA(RHManageAbstractsBase):
 
 class RHExportBOA(RHAbstractsBase):
     """Export the book of abstracts"""
+
+    def _check_access(self):
+        RHAbstractsBase._check_access(self)
+        published = contribution_settings.get(self.event, 'published')
+        if not published:
+            raise Forbidden
 
     def _process(self):
         if not config.LATEX_ENABLED:
