@@ -54,9 +54,8 @@ def _import_tasks(sender, **kwargs):
 
 @signals.users.preferences.connect
 def _get_extra_user_prefs(sender, **kwargs):
-    from indico.modules.rb.operations.rooms import has_managed_rooms
     from indico.modules.rb.user_prefs import RBUserPreferences
-    if has_managed_rooms(session.user):
+    if RBUserPreferences.should_show_setting():
         return RBUserPreferences
 
 
