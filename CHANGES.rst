@@ -22,6 +22,7 @@ Bugfixes
   high amount of registrations
 - Fix confirmation prompt when disabling conference menu customizations
   (:issue:`4085`)
+- Fix incorrect days shown as weekend in in room booking for some locales
 
 Version 2.2.2
 -------------
