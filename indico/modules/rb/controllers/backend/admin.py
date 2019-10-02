@@ -31,6 +31,7 @@ from indico.modules.rb.models.room_features import RoomFeature
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.operations.admin import (create_area, delete_areas, update_area, update_room,
                                                 update_room_attributes, update_room_availability, update_room_equipment)
+from indico.modules.rb.operations.rooms import has_managed_rooms
 from indico.modules.rb.schemas import (AdminRoomSchema, RoomAttributeValuesSchema, admin_equipment_type_schema,
                                        admin_locations_schema, bookable_hours_schema, map_areas_schema,
                                        nonbookable_periods_schema, room_attribute_schema, room_equipment_schema,
@@ -45,15 +46,19 @@ from indico.web.util import ExpectedError
 
 
 class RHRoomBookingAdminBase(RHRoomBookingBase):
+    def _skip_admin_check(self):
+        return False
+
     def _check_access(self):
         RHRoomBookingBase._check_access(self)
-        if not rb_is_admin(session.user):
+        if not rb_is_admin(session.user) and not self._skip_admin_check():
             raise Forbidden
 
 
 class SettingsSchema(mm.Schema):
     admin_principals = PrincipalList(allow_groups=True)
     authorized_principals = PrincipalList(allow_groups=True)
+    managers_edit_rooms = fields.Bool()
     tileserver_url = fields.String(validate=[
         validate.URL(schemes={'http', 'https'}),
         lambda value: all(x in value for x in ('{x}', '{y}', '{z}'))
@@ -291,6 +296,11 @@ class RHEquipmentTypes(RHRoomBookingAdminBase):
 
 
 class RHAttributes(RHRoomBookingAdminBase):
+    def _skip_admin_check(self):
+        # GET on this endpoint does not expose anything sensitive, so
+        # we allow any room manager to use it if they can edit rooms
+        return request.method == 'GET' and rb_settings.get('managers_edit_rooms') and has_managed_rooms(session.user)
+
     def _process_args(self):
         id_ = request.view_args.get('attribute_id')
         self.attribute = RoomAttribute.get_one(id_) if id_ is not None else None
@@ -368,6 +378,9 @@ class RHRoomAdminBase(RHRoomBookingAdminBase):
     def _process_args(self):
         self.room = Room.get_one(request.view_args['room_id'], is_deleted=False)
 
+    def _skip_admin_check(self):
+        return rb_settings.get('managers_edit_rooms') and self.room.can_manage(session.user)
+
 
 class RHRoomAttributes(RHRoomAdminBase):
     def _process(self):
@@ -434,6 +447,8 @@ class RHRoom(RHRoomAdminBase):
         return '', 204
 
     def _process_DELETE(self):
+        if not rb_is_admin(session.user):
+            raise Forbidden
         logger.info('Room %r deleted by %r', self.room, session.user)
         self.room.is_deleted = True
         return '', 204
