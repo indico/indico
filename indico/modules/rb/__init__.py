@@ -52,6 +52,14 @@ def _import_tasks(sender, **kwargs):
     import indico.modules.rb.tasks
 
 
+@signals.users.preferences.connect
+def _get_extra_user_prefs(sender, **kwargs):
+    from indico.modules.rb.operations.rooms import has_managed_rooms
+    from indico.modules.rb.user_prefs import RBUserPreferences
+    if has_managed_rooms(session.user):
+        return RBUserPreferences
+
+
 @signals.menu.items.connect_via('admin-sidemenu')
 def _extend_admin_menu(sender, **kwargs):
     if config.ENABLE_ROOMBOOKING and session.user.is_admin:
