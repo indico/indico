@@ -6,11 +6,29 @@
 # LICENSE file for more details.
 
 from flask import render_template
+from sqlalchemy.orm import load_only
 
 from indico.core.notifications import email_sender, make_email
+from indico.modules.rb.settings import RoomEmailMode, rb_user_settings
+from indico.modules.users import User, UserSetting
 from indico.util.date_time import format_datetime
 from indico.util.string import to_unicode
 from indico.web.flask.templating import get_template_module
+
+
+def get_manager_emails(room):
+    emails = set(room.notification_emails)
+    if rb_user_settings.get(room.owner, 'email_mode') in (RoomEmailMode.owned, RoomEmailMode.all):
+        emails.add(room.owner.email)
+    query = (User.query
+             .join(UserSetting)
+             .options(load_only('id'))
+             .filter(UserSetting.module == 'roombooking',
+                     UserSetting.name == 'email_mode',
+                     UserSetting.value[()].astext.in_([RoomEmailMode.none.name, RoomEmailMode.owned.name])))
+    disabled_emails = {u.email for u in query}
+    emails |= room.get_manager_emails() - disabled_emails
+    return emails
 
 
 class ReservationNotification(object):
@@ -45,10 +63,9 @@ class ReservationNotification(object):
 
     def compose_email_to_manager(self, **mail_params):
         room = self.reservation.room
-        to_list = {room.owner.email} | room.get_manager_emails() | set(room.notification_emails)
         subject = self._get_email_subject(**mail_params)
         body = self._make_body(mail_params, reservation=self.reservation)
-        return make_email(to_list=to_list, subject=subject, body=body)
+        return make_email(to_list=get_manager_emails(room), subject=subject, body=body)
 
 
 @email_sender
