@@ -26,6 +26,7 @@ logger = Logger.get('rb')
 
 
 rb_settings = SettingsProxy('roombooking', {
+    'managers_edit_rooms': False,
     'excluded_categories': [],
     'notification_before_days': 2,
     'notification_before_days_weekly': 5,

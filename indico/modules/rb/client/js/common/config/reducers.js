@@ -37,6 +37,7 @@ export default combineReducers({
         const {
           roomsSpriteToken,
           gracePeriod,
+          managersEditRooms,
           helpURL,
           contactEmail,
           hasPrivacyPolicy,
@@ -51,6 +52,7 @@ export default combineReducers({
           languages,
           tileServerURL,
           gracePeriod,
+          managersEditRooms,
           helpURL,
           hasTOS,
           tosHTML,
