@@ -53,6 +53,7 @@ class LocalGroup(db.Model):
     # - in_room_acls (RoomPrincipal.local_group)
     # - in_session_acls (SessionPrincipal.local_group)
     # - in_settings_acls (SettingPrincipal.local_group)
+    # - in_track_acls (TrackPrincipal.local_group)
 
     @return_ascii
     def __repr__(self):

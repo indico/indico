@@ -17,5 +17,9 @@ class TrackSchema(mm.ModelSchema):
         fields = ('id', 'title', 'code', 'description')
 
 
+class TrackPermissionsSchema(mm.Schema):
+    acl_entries = PrincipalPermissionList(TrackPrincipal)
+
+
 track_schema = TrackSchema()
 track_schema_basic = TrackSchema(only=('id', 'title', 'code'))

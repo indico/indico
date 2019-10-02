@@ -18,6 +18,7 @@ from indico.modules.events.abstracts.notifications import ContributionTypeCondit
 from indico.modules.events.features.base import EventFeature
 from indico.modules.events.models.events import Event, EventType
 from indico.modules.events.timetable.models.breaks import Break
+from indico.modules.events.tracks.models.tracks import Track
 from indico.util.i18n import _
 from indico.util.placeholders import Placeholder
 from indico.web.flask.templating import template_hook
@@ -97,8 +98,28 @@ class AbstractsFeature(EventFeature):
 
 
 @signals.acl.get_management_permissions.connect_via(Event)
-def _get_management_permissions(sender, **kwargs):
-    return AbstractReviewerPermission
+def _get_event_management_permissions(sender, **kwargs):
+    yield AbstractReviewerPermission
+    yield GlobalReviewPermission
+
+
+@signals.acl.get_management_permissions.connect_via(Track)
+def _get_track_management_permissions(sender, **kwargs):
+    yield ReviewPermission
+
+
+class GlobalReviewPermission(ManagementPermission):
+    name = 'review_all_abstracts'
+    friendly_name = _('Review for all tracks')
+    description = _('Grants abstract reviewing rights to all tracks of the event.')
+    color = 'orange'
+
+
+class ReviewPermission(ManagementPermission):
+    name = 'review'
+    friendly_name = _('Review')
+    description = _('Grants track reviewer rights in a track.')
+    user_selectable = True
 
 
 class AbstractReviewerPermission(ManagementPermission):

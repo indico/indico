@@ -73,6 +73,7 @@ class EventRole(db.Model):
     # - in_event_acls (EventPrincipal.event_role)
     # - in_event_settings_acls (EventSettingPrincipal.event_role)
     # - in_session_acls (SessionPrincipal.event_role)
+    # - in_track_acls (TrackPrincipal.event_role)
 
     def __contains__(self, user):
         return user is not None and self in user.event_roles

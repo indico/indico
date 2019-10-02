@@ -522,9 +522,10 @@ class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFie
             return False
         elif not self.event.can_manage(user, permission='track_convener', explicit_permission=True):
             return False
-        elif self.event in user.global_convener_for_events:
+        elif self.event.can_manage(user, permission='convene_all_abstracts', explicit_permission=True):
             return True
-        elif user.convener_for_tracks & self.reviewed_for_tracks:
+        elif any(track.can_manage(user, permission='convene', explicit_permission=True)
+                 for track in self.reviewed_for_tracks):
             return True
         else:
             return False
@@ -540,9 +541,10 @@ class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFie
             return False
         elif not self.event.can_manage(user, permission='abstract_reviewer', explicit_permission=True):
             return False
-        elif self.event in user.global_abstract_reviewer_for_events:
+        elif self.event.can_manage(user, permission='review_all_abstracts', explicit_permission=True):
             return True
-        elif user.abstract_reviewer_for_tracks & self.reviewed_for_tracks:
+        elif any(track.can_manage(user, permission='review', explicit_permission=True)
+                 for track in self.reviewed_for_tracks):
             return True
         else:
             return False
@@ -630,9 +632,11 @@ class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFie
 
     def get_reviewed_for_groups(self, user, include_reviewed=False):
         already_reviewed = {each.track for each in self.get_reviews(user=user)} if include_reviewed else set()
-        if self.event in user.global_abstract_reviewer_for_events:
+        if self.event.can_manage(user, permission='review_all_abstracts', explicit_permission=True):
             return self.reviewed_for_tracks | already_reviewed
-        return (self.reviewed_for_tracks & user.abstract_reviewer_for_tracks) | already_reviewed
+        reviewer_tracks = {track for track in self.reviewed_for_tracks
+                           if track.can_manage(user, permission='review', explicit_permission=True)}
+        return reviewer_tracks | already_reviewed
 
     def get_track_score(self, track):
         if track not in self.reviewed_for_tracks:

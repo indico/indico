@@ -334,32 +334,6 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         )
     )
 
-    #: Users who can review on all tracks
-    global_abstract_reviewers = db.relationship(
-        'User',
-        secondary='events.track_abstract_reviewers',
-        collection_class=set,
-        lazy=True,
-        backref=db.backref(
-            'global_abstract_reviewer_for_events',
-            collection_class=set,
-            lazy=True
-        )
-    )
-
-    #: Users who are conveners on all tracks
-    global_conveners = db.relationship(
-        'User',
-        secondary='events.track_conveners',
-        collection_class=set,
-        lazy=True,
-        backref=db.backref(
-            'global_convener_for_events',
-            collection_class=set,
-            lazy=True
-        )
-    )
-
     # relationship backrefs:
     # - abstract_email_templates (AbstractEmailTemplate.event)
     # - abstract_review_questions (AbstractReviewQuestion.event)
