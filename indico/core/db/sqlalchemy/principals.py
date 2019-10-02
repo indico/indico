@@ -565,18 +565,27 @@ class PrincipalComparator(Comparator):
         return db.and_(self.cls.type == other.principal_type, *criteria)
 
 
-def clone_principals(cls, principals):
+def clone_principals(cls, principals, event_role_map=None):
     """Clone a list of principals.
 
     :param cls: the principal type to use (a `PrincipalMixin` subclass)
     :param principals: a collection of these principals
+    :param event_role_map: the mapping from old to new event roles.
+                           if omitted, event roles are skipped
     :return: A new set of principals that can be added to an object
     """
     rv = set()
     assert all(isinstance(x, cls) for x in principals)
-    attrs = get_simple_column_attrs(cls) | {'user', 'local_group', 'ip_network_group', 'event_role'}
+    attrs = get_simple_column_attrs(cls) | {'user', 'local_group', 'ip_network_group'}
     for old_principal in principals:
+        event_role = None
+        if old_principal.type == PrincipalType.event_role:
+            if event_role_map is None:
+                continue
+            event_role = event_role_map[old_principal.event_role]
         principal = cls()
         principal.populate_from_dict({attr: getattr(old_principal, attr) for attr in attrs})
+        if event_role:
+            principal.event_role = event_role
         rv.add(principal)
     return rv

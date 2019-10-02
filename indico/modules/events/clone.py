@@ -96,8 +96,10 @@ class EventProtectionCloner(EventCloner):
     name = 'event_protection'
     friendly_name = _('ACLs and protection settings')
     is_default = True
+    uses = {'event_roles'}
 
     def run(self, new_event, cloners, shared_data):
+        self._event_role_map = shared_data['event_roles']['event_role_map'] if 'event_roles' in cloners else None
         with db.session.no_autoflush:
             self._clone_protection(new_event)
             self._clone_session_coordinator_privs(new_event)
@@ -120,4 +122,4 @@ class EventProtectionCloner(EventCloner):
         })
 
     def _clone_acl(self, new_event):
-        new_event.acl_entries = clone_principals(EventPrincipal, self.old_event.acl_entries)
+        new_event.acl_entries = clone_principals(EventPrincipal, self.old_event.acl_entries, self._event_role_map)
