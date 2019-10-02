@@ -44,10 +44,8 @@ def _extend_event_menu(sender, **kwargs):
 
 @signals.users.merged.connect
 def _merge_users(target, source, **kwargs):
-    target.abstract_reviewer_for_tracks |= source.abstract_reviewer_for_tracks
-    source.abstract_reviewer_for_tracks.clear()
-    target.convener_for_tracks |= source.convener_for_tracks
-    source.convener_for_tracks.clear()
+    from indico.modules.events.tracks.models.principals import TrackPrincipal
+    TrackPrincipal.merge_users(target, source, 'track')
 
 
 @signals.event_management.get_cloners.connect
@@ -56,11 +54,31 @@ def _get_cloners(sender, **kwargs):
 
 
 @signals.acl.get_management_permissions.connect_via(Event)
-def _get_management_permissions(sender, **kwargs):
-    return TrackConvenerPermission
+def _get_event_management_permissions(sender, **kwargs):
+    yield TrackConvenerPermission
+    yield GlobalConvenePermission
+
+
+@signals.acl.get_management_permissions.connect_via(Track)
+def _get_track_management_permissions(sender, **kwargs):
+    yield ConvenePermission
+
+
+class ConvenePermission(ManagementPermission):
+    name = 'convene'
+    friendly_name = _('Convene')
+    description = _('Grants track convener rights in a track.')
+    user_selectable = True
+
+
+class GlobalConvenePermission(ManagementPermission):
+    name = 'convene_all_abstracts'
+    friendly_name = _('Convene all tracks')
+    description = _('Grants convene rights to all tracks of the event.')
+    color = 'purple'
 
 
 class TrackConvenerPermission(ManagementPermission):
     name = 'track_convener'
     friendly_name = _('Track convener')
-    description = _('Grants track convener rights in an event')
+    description = _('Grants track convener rights in an event.')

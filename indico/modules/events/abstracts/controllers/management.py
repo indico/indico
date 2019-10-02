@@ -134,12 +134,16 @@ class RHManageReviewingRoles(RHManageAbstractsBase):
 
         if form.validate_on_submit():
             role_data = form.roles.role_data
-            self.event.global_conveners = set(role_data['global_conveners'])
-            self.event.global_abstract_reviewers = set(role_data['global_reviewers'])
+            for principal in role_data['global_conveners']:
+                self.event.update_principal(principal, permissions={'convene_all_abstracts'})
+            for principal in role_data['global_reviewers']:
+                self.event.update_principal(principal, permissions={'review_all_abstracts'})
 
             for track, user_roles in role_data['track_roles'].viewitems():
-                track.conveners = set(user_roles['convener'])
-                track.abstract_reviewers = set(user_roles['reviewer'])
+                for principal in user_roles['convener']:
+                    track.update_principal(principal, permissions={'convene'})
+                for principal in user_roles['reviewer']:
+                    track.update_principal(principal, permissions={'review'})
 
             # Update actual ACLs
             update_object_principals(self.event, role_data['all_conveners'], permission='track_convener')

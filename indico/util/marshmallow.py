@@ -223,6 +223,8 @@ class PrincipalPermissionList(Field):
         super(PrincipalPermissionList, self).__init__(**kwargs)
 
     def _serialize(self, value, attr, obj):
+        if self.explicit_permissions:
+            return [(entry.principal.identifier, set(entry.permissions)) for entry in value]
         return [(entry.principal.identifier, sorted(get_unified_permissions(entry))) for entry in value]
 
     def _deserialize(self, value, attr, data):

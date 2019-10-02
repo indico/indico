@@ -12,10 +12,11 @@ import os
 import shutil
 from collections import OrderedDict, defaultdict, namedtuple
 
-from sqlalchemy.orm import joinedload, load_only
+from sqlalchemy.orm import contains_eager, joinedload, load_only, noload, subqueryload
 
 from indico.core.config import config
 from indico.core.db import db
+from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.legacy.pdfinterface.latex import AbstractBook
 from indico.modules.events import Event
@@ -27,6 +28,7 @@ from indico.modules.events.abstracts.models.reviews import AbstractReview
 from indico.modules.events.abstracts.settings import abstracts_settings, boa_settings
 from indico.modules.events.contributions.models.fields import ContributionFieldVisibility
 from indico.modules.events.models.persons import EventPerson
+from indico.modules.events.tracks.models.principals import TrackPrincipal
 from indico.modules.events.tracks.models.tracks import Track
 from indico.modules.users import User
 from indico.util.i18n import _
@@ -212,15 +214,25 @@ def get_roles_for_event(event):
     :return: A dictionary in the form ``{track: {role: [users]}}``
     """
     roles = defaultdict(dict)
-    for track in Track.query.with_parent(event).options(joinedload('conveners'), joinedload('abstract_reviewers')):
+    roles['*'].setdefault('reviewer', [])
+    roles['*'].setdefault('convener', [])
+    for track in Track.query.with_parent(event).options(subqueryload('acl_entries')):
         roles[str(track.id)].setdefault('reviewer', [])
         roles[str(track.id)].setdefault('convener', [])
-        for reviewer in track.abstract_reviewers:
-            roles[str(track.id)]['reviewer'].append(reviewer.id)
-        for convener in track.conveners:
-            roles[str(track.id)]['convener'].append(convener.id)
-    roles['*']['reviewer'] = [reviewer.id for reviewer in event.global_abstract_reviewers]
-    roles['*']['convener'] = [reviewer.id for reviewer in event.global_conveners]
+        for principal in track.acl_entries:
+            if principal.type != PrincipalType.user:
+                continue
+            if 'review' in principal.permissions:
+                roles[str(track.id)]['reviewer'].append(principal.user_id)
+            if 'convene' in principal.permissions:
+                roles[str(track.id)]['convener'].append(principal.user_id)
+    for principal in event.acl_entries:
+        if not principal.user_id:
+            continue
+        if 'review_all_abstracts' in principal.permissions:
+                roles['*']['reviewer'].append(principal.user_id)
+        if 'convene_all_abstracts' in principal.permissions:
+            roles['*']['convener'].append(principal.user_id)
     return roles
 
 
@@ -238,27 +250,27 @@ def get_user_abstracts(event, user):
 
 def get_visible_reviewed_for_tracks(abstract, user):
     event = abstract.event
-    if abstract.can_judge(user, check_state=True) or user in event.global_conveners:
+    if (abstract.can_judge(user, check_state=True) or
+            event.can_manage(user, permission='convene_all_abstracts', explicit_permission=True)):
         return abstract.reviewed_for_tracks
-    convener_tracks = {track for track in event.tracks if track.can_convene(user)}
+    convener_tracks = {track for track in event.tracks
+                       if track.can_manage(user, permission='convene', explicit_permission=True)}
     return abstract.reviewed_for_tracks & convener_tracks
-
-
-def _query_user_tracks(event, user):
-    query = Track.query.with_parent(event)
-    if user not in event.global_abstract_reviewers and user not in event.global_conveners:
-        query = query.filter(db.or_(Track.conveners.any(User.id == user.id),
-                                    Track.abstract_reviewers.any(User.id == user.id)))
-    return query
 
 
 def get_user_tracks(event, user):
     """Get the list of tracks where the user is a reviewer/convener"""
-    return _query_user_tracks(event, user).order_by(Track.title).all()
+    tracks = Track.query.with_parent(event).order_by(Track.title).all()
+    if (event.can_manage(user, permission='review_all_abstracts', explicit_permission=True) or
+            event.can_manage(user, permission='convene_all_abstracts', explicit_permission=True)):
+        return tracks
+    return [track for track in tracks if
+            (track.can_manage(user, permission='review', explicit_permission=True) or
+             track.can_manage(user, permission='convene', explicit_permission=True))]
 
 
 def has_user_tracks(event, user):
-    return _query_user_tracks(event, user).has_rows()
+    return bool(get_user_tracks(event, user))
 
 
 def get_track_reviewer_abstract_counts(event, user):
@@ -345,24 +357,29 @@ def get_events_with_abstract_reviewer_convener(user, dt=None):
     """
     data = defaultdict(set)
     # global reviewer/convener
-    mapping = {'global_abstract_reviewer_for_events': 'abstract_reviewer',
-               'global_convener_for_events': 'track_convener'}
-    for rel, role in mapping.iteritems():
-        query = (Event.query.with_parent(user, rel)
-                 .filter(Event.ends_after(dt), ~Event.is_deleted)
-                 .options(load_only('id')))
-        for event in query:
-            data[event.id].add(role)
-    # track reviewer/convener
-    mapping = {'abstract_reviewer_for_tracks': 'abstract_reviewer',
-               'convener_for_tracks': 'track_convener'}
-    for rel, role in mapping.iteritems():
-        query = (Track.query.with_parent(user, rel)
-                 .join(Track.event)
-                 .filter(Event.ends_after(dt), ~Event.is_deleted)
-                 .options(load_only('event_id')))
-        for track in query:
-            data[track.event_id].add(role)
+
+    event_query = (user.in_event_acls
+                   .join(Event)
+                   .options(noload('*'), load_only('event_id', 'permissions'))
+                   .filter(Event.ends_after(dt), ~Event.is_deleted))
+    for principal in event_query:
+        roles = data[principal.event_id]
+        if 'review_all_abstracts' in principal.permissions:
+            roles.add('abstract_reviewer')
+        if 'convene_all_abstracts' in principal.permissions:
+            roles.add('track_convener')
+
+    query = (user.in_track_acls
+             .options(load_only('track_id', 'permissions'))
+             .options(noload('*'))
+             .options(joinedload(TrackPrincipal.track).load_only('event_id'))
+             .filter(Event.ends_after(dt), ~Event.is_deleted))
+    for principal in query:
+        roles = data[principal.track.event_id]
+        if 'review' in principal.permissions:
+            roles.add('abstract_reviewer')
+        if 'convene' in principal.permissions:
+            roles.add('track_convener')
     return data
 
 

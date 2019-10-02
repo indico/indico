@@ -14,11 +14,7 @@ Models
     :members:
     :undoc-members:
 
-.. automodule:: indico.modules.events.tracks.models.abstract_reviewers
-    :members:
-    :undoc-members:
-
-.. automodule:: indico.modules.events.tracks.models.conveners
+.. automodule:: indico.modules.events.tracks.models.principals
     :members:
     :undoc-members:
 

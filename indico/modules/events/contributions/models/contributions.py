@@ -31,7 +31,6 @@ from indico.modules.events.papers.models.revisions import PaperRevision, PaperRe
 from indico.modules.events.sessions.util import session_coordinator_priv_enabled
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii
-from indico.web.flask.util import url_for
 
 
 def _get_next_friendly_id(context):
