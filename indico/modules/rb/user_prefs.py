@@ -7,6 +7,9 @@
 
 from __future__ import unicode_literals
 
+from flask import session
+
+from indico.modules.rb.operations.rooms import has_managed_rooms
 from indico.modules.rb.settings import RoomEmailMode, rb_user_settings
 from indico.modules.users import ExtraUserPreferences
 from indico.util.i18n import _
@@ -27,3 +30,8 @@ class RBUserPreferences(ExtraUserPreferences):
 
     def save(self, data):
         rb_user_settings.set(self.user, 'email_mode', data['email_mode'])
+
+    @staticmethod
+    def should_show_setting():
+        return (rb_user_settings.get(session.user, 'email_mode', None) is not None or
+                has_managed_rooms(session.user))
