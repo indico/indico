@@ -105,11 +105,11 @@ def _extend_event_menu(sender, **kwargs):
 
     def _visible_my_contributions(event):
         published = contribution_settings.get(event, 'published')
-        return session.user and has_contributions_with_user_as_submitter(event, session.user) and published
+        return session.user and published and has_contributions_with_user_as_submitter(event, session.user)
 
     def _visible_list_of_contributions(event):
         published = contribution_settings.get(event, 'published')
-        return Contribution.query.filter(Contribution.event == event).has_rows() and published
+        return published and Contribution.query.filter(Contribution.event == event).has_rows()
 
     yield MenuEntryData(title=_("My Contributions"), name='my_contributions', visible=_visible_my_contributions,
                         endpoint='contributions.my_contributions', position=2, parent='my_conference')

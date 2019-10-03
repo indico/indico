@@ -10,10 +10,10 @@ import publicationURL from 'indico-url:contributions.manage_publication';
 import React, {useState, useEffect} from 'react';
 import PropTypes from 'prop-types';
 import {Header, Modal, Button, Checkbox, List} from 'semantic-ui-react';
-import indicoAxios, {handleAxiosError} from 'indico/utils/axios';
+import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {Translate} from 'indico/react/i18n';
 
-export default function PublicationSwitch({confId}) {
+export default function PublicationSwitch({eventId}) {
   const [published, setPublished] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
 
@@ -21,27 +21,27 @@ export default function PublicationSwitch({confId}) {
     const fetchPublicationSetting = async () => {
       let response;
       try {
-        response = await indicoAxios.get(publicationURL({confId}));
-        setPublished(response.data.published);
+        response = await indicoAxios.get(publicationURL({confId: eventId}));
       } catch (error) {
         handleAxiosError(error);
       }
+      setPublished(response.data.published);
     };
     fetchPublicationSetting();
-  }, [confId]);
+  }, [eventId]);
 
-  const publish = shouldPublish => {
+  const changeState = shouldPublish => {
     const updatePublicationSetting = async () => {
       try {
         if (shouldPublish) {
-          await indicoAxios.put(publicationURL({confId}));
+          await indicoAxios.put(publicationURL({confId: eventId}));
         } else {
-          await indicoAxios.delete(publicationURL({confId}));
+          await indicoAxios.delete(publicationURL({confId: eventId}));
         }
-        setPublished(shouldPublish);
       } catch (error) {
         handleAxiosError(error);
       }
+      setPublished(shouldPublish);
     };
     updatePublicationSetting();
   };
@@ -86,9 +86,9 @@ export default function PublicationSwitch({confId}) {
     >
       <Header
         content={
-          !published
-            ? Translate.string('Publish Contributions')
-            : Translate.string('Set contribution list in Draft mode')
+          published
+            ? Translate.string('Set contribution list in Draft mode')
+            : Translate.string('Publish Contributions')
         }
       />
       <Modal.Content>
@@ -121,7 +121,7 @@ export default function PublicationSwitch({confId}) {
         <Button
           color="blue"
           onClick={() => {
-            publish(!published);
+            changeState(!published);
             setModalOpen(false);
           }}
         >
@@ -133,5 +133,5 @@ export default function PublicationSwitch({confId}) {
 }
 
 PublicationSwitch.propTypes = {
-  confId: PropTypes.number.isRequired,
+  eventId: PropTypes.number.isRequired,
 };
