@@ -166,6 +166,8 @@ class HTTPAPIHook(object):
     def __call__(self, user):
         """Perform the actual exporting"""
         if self.HTTP_POST != (request.method == 'POST'):
+            # XXX: this should never happen, since HTTP_POST is only used within /api/,
+            # where the flask url rule requires POST
             raise HTTPAPIError('This action requires %s' % ('POST' if self.HTTP_POST else 'GET'), 405)
         if not self.GUEST_ALLOWED and not user:
             raise HTTPAPIError('Guest access to this resource is forbidden.', 403)

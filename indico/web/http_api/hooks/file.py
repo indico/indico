@@ -53,11 +53,9 @@ class FileSerializer(Serializer):
     def _execute(self, fdata):
         return fdata
 
-    def set_headers(self, response):
-        # Usually the serializer would set the mime type on the ResponseUtil. however, this would trigger
-        # the fail-safe that prevents us from returning a response_class while setting custom headers.
-        # Besides that we don't need it since the send_file response already has the correct mime type.
-        pass
+    def get_response_content_type(self):
+        # we already have a response with the correct headers
+        return None
 
 
 Serializer.register('bin', FileSerializer)

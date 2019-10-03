@@ -30,7 +30,6 @@ from indico.modules.api.models.keys import APIKey
 from indico.modules.oauth import oauth
 from indico.modules.oauth.provider import load_token
 from indico.util.string import to_unicode
-from indico.web.flask.util import ResponseUtil
 from indico.web.http_api import HTTPAPIHook
 from indico.web.http_api.fossils import IHTTPAPIExportResultFossil
 from indico.web.http_api.metadata.serializer import Serializer
@@ -153,7 +152,7 @@ def handler(prefix, path):
     ak = error = result = None
     ts = int(time.time())
     typeMap = {}
-    responseUtil = ResponseUtil()
+    status_code = None
     is_response = False
     try:
         used_session = None
@@ -226,9 +225,7 @@ def handler(prefix, path):
     except HTTPAPIError as e:
         error = e
         if e.getCode():
-            responseUtil.status = e.getCode()
-            if responseUtil.status == 405:
-                responseUtil.headers['Allow'] = 'GET' if request.method == 'POST' else 'POST'
+            status_code = e.getCode()
 
     if result is None and error is None:
         # TODO: usage page
@@ -266,8 +263,13 @@ def handler(prefix, path):
 
         try:
             data = serializer(result)
-            serializer.set_headers(responseUtil)
-            return responseUtil.make_response(data)
-        except:
+            response = current_app.make_response(data)
+            content_type = serializer.get_response_content_type()
+            if content_type:
+                response.content_type = content_type
+            if status_code:
+                response.status_code = status_code
+            return response
+        except Exception:
             logger.exception('Serialization error in request %s?%s', path, query)
             raise
