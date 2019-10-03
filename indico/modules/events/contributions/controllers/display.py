@@ -27,6 +27,7 @@ from indico.modules.events.controllers.base import RHDisplayEventBase
 from indico.modules.events.layout.util import is_menu_entry_enabled
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.util import get_base_ical_parameters
+from indico.util.i18n import _
 from indico.web.flask.util import jsonify_data, send_file
 from indico.web.rh import RH
 from indico.web.util import jsonify_template
@@ -57,6 +58,8 @@ class RHContributionDisplayBase(RHDisplayEventBase):
         published = contribution_settings.get(self.event, 'published')
         if not self.contrib.can_access(session.user) or not published:
             raise Forbidden
+        if not published:
+            raise NotFound(_("The contributions of this event haven't been published yet."))
 
     def _process_args(self):
         RHDisplayEventBase._process_args(self)
@@ -68,7 +71,8 @@ class RHDisplayProtectionBase(RHDisplayEventBase):
         RHDisplayEventBase._check_access(self)
         published = contribution_settings.get(self.event, 'published')
         if not published:
-            raise Forbidden
+            raise NotFound(_("The contributions of this event haven't been published yet."))
+
         if not is_menu_entry_enabled(self.MENU_ENTRY_NAME, self.event):
             self._forbidden_if_not_admin()
 

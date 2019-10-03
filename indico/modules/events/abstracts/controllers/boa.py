@@ -8,7 +8,7 @@
 from __future__ import unicode_literals
 
 from flask import flash
-from werkzeug.exceptions import Forbidden, NotFound
+from werkzeug.exceptions import NotFound
 
 from indico.core.config import config
 from indico.modules.events.abstracts.controllers.base import RHAbstractsBase, RHManageAbstractsBase
@@ -42,7 +42,7 @@ class RHExportBOA(RHAbstractsBase):
         RHAbstractsBase._check_access(self)
         published = contribution_settings.get(self.event, 'published')
         if not published:
-            raise Forbidden
+            raise NotFound(_("The contributions of this event haven't been published yet"))
 
     def _process(self):
         if not config.LATEX_ENABLED:
