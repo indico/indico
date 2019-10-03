@@ -462,10 +462,14 @@ class ProtectionManagersMixin(ProtectionMixin):
                                        old_data=old_data, quiet=quiet)
         return entry
 
-    def get_manager_list(self, recursive=False):
-        managers = {x.principal for x in self.acl_entries if x.has_management_permission()}
+    def get_manager_list(self, recursive=False, include_groups=True):
+        managers = {
+            x.principal
+            for x in self.acl_entries
+            if x.has_management_permission() and (include_groups or x.type == PrincipalType.user)
+        }
         if recursive and self.protection_parent:
-            managers.update(self.protection_parent.get_manager_list(recursive=True))
+            managers.update(self.protection_parent.get_manager_list(recursive=True, include_groups=include_groups))
         return managers
 
     def get_manager_emails(self, include_groups=True):

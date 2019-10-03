@@ -148,8 +148,8 @@ class SubContribution(DescriptionMixin, AttachedItemsMixin, AttachedNotesMixin, 
     def get_access_list(self):
         return self.contribution.get_access_list()
 
-    def get_manager_list(self, recursive=False):
-        return self.contribution.get_manager_list(recursive=recursive)
+    def get_manager_list(self, recursive=False, include_groups=True):
+        return self.contribution.get_manager_list(recursive=recursive, include_groups=include_groups)
 
     @return_ascii
     def __repr__(self):
