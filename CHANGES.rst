@@ -26,7 +26,8 @@ Bugfixes
   (:issue:`4085`)
 - Fix incorrect days shown as weekend in in room booking for some locales
 - Fix ACL entries referencing event roles from the old event when cloning an
-  event with event roles in the ACL (:issue:`4090`)
+  event with event roles in the ACL. Run ``indico maint fix-event-role-acls``
+  after updating to fix any affected ACLs (:issue:`4090`)
 
 Version 2.2.2
 -------------
