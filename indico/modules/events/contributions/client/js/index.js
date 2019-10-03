@@ -19,7 +19,7 @@ import PublicationSwitch from 'indico/react/components/PublicationSwitch';
 
   function setupPublicationButton() {
     const eventId = $('#pub-switch').data('event-id');
-    const element = React.createElement(PublicationSwitch, {confId: eventId})
+    const element = React.createElement(PublicationSwitch, {eventId})
     ReactDOM.render(element, document.getElementById('pub-switch'));
   }
 

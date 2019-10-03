@@ -553,11 +553,11 @@ class RHManageContributionPublicationREST(RHManageContributionsBase):
 
     def _process_PUT(self):
         contribution_settings.set(self.event, 'published', True)
-        return jsonify_data(flash=False)
+        return '', 204
 
     def _process_DELETE(self):
         contribution_settings.set(self.event, 'published', False)
-        return jsonify_data(flash=False)
+        return '', 204
 
 
 class RHManageContributionTypeBase(RHManageContributionsBase):
