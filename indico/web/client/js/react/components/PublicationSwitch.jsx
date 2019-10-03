@@ -2,8 +2,9 @@ import publicationURL from 'indico-url:contributions.manage_publication';
 
 import React, {useState, useEffect} from 'react';
 import PropTypes from 'prop-types';
-import {Header, Modal, Button, Checkbox} from 'semantic-ui-react';
+import {Header, Modal, Button, Checkbox, List} from 'semantic-ui-react';
 import indicoAxios, {handleAxiosError} from 'indico/utils/axios';
+import {Translate} from 'indico/react/i18n';
 
 export default function PublicationSwitch({confId}) {
   const [published, setPublished] = useState(true);
@@ -38,6 +39,29 @@ export default function PublicationSwitch({confId}) {
     updatePublicationSetting();
   };
 
+  const menuList = (
+    <List bulleted>
+      <List.Item>
+        <Translate>Contribution List</Translate>
+      </List.Item>
+      <List.Item>
+        <Translate>My Contributions</Translate>
+      </List.Item>
+      <List.Item>
+        <Translate>Author List</Translate>
+      </List.Item>
+      <List.Item>
+        <Translate>Speaker List</Translate>
+      </List.Item>
+      <List.Item>
+        <Translate>Timetable</Translate>
+      </List.Item>
+      <List.Item>
+        <Translate>Book of Abstracts</Translate>
+      </List.Item>
+    </List>
+  );
+
   return (
     <Modal
       open={modalOpen}
@@ -45,7 +69,7 @@ export default function PublicationSwitch({confId}) {
       size="tiny"
       trigger={
         <Checkbox
-          label={published ? 'Published' : 'Draft'}
+          label={published ? Translate.string('Published') : Translate.string('Draft')}
           toggle
           onClick={() => setModalOpen(true)}
           checked={published}
@@ -53,13 +77,40 @@ export default function PublicationSwitch({confId}) {
       }
       closeIcon
     >
-      <Header content={!published ? 'Publish Contributions' : 'Unpublish Contributions'} />
+      <Header
+        content={
+          !published
+            ? Translate.string('Publish Contributions')
+            : Translate.string('Set contribution list in Draft mode')
+        }
+      />
       <Modal.Content>
-        {published && <p>Are you sure you want to set draft mode?</p>}
-        {!published && <p>Are you sure you want to publish contributions?</p>}
+        {published ? (
+          <>
+            <p>
+              <Translate>Are you sure you want to set contribution list in draft mode?</Translate>
+            </p>
+            <p>
+              <Translate>By doing so the following menu items won't be accessible:</Translate>
+            </p>
+            {menuList}
+          </>
+        ) : (
+          <>
+            <p>
+              <Translate>Are you sure you want to publish the contribution list?</Translate>
+            </p>
+            <p>
+              <Translate>By doing so the following menu items will be accessible: </Translate>
+            </p>
+            {menuList}
+          </>
+        )}
       </Modal.Content>
       <Modal.Actions>
-        <Button onClick={() => setModalOpen(false)}>No</Button>
+        <Button onClick={() => setModalOpen(false)}>
+          <Translate>No</Translate>
+        </Button>
         <Button
           color="blue"
           onClick={() => {
@@ -67,7 +118,7 @@ export default function PublicationSwitch({confId}) {
             setModalOpen(false);
           }}
         >
-          Yes
+          <Translate>Yes</Translate>
         </Button>
       </Modal.Actions>
     </Modal>
