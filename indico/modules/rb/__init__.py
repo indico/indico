@@ -26,6 +26,7 @@ logger = Logger.get('rb')
 
 
 rb_settings = SettingsProxy('roombooking', {
+    'managers_edit_rooms': False,
     'excluded_categories': [],
     'notification_before_days': 2,
     'notification_before_days_weekly': 5,
@@ -49,6 +50,13 @@ rb_settings = SettingsProxy('roombooking', {
 @signals.import_tasks.connect
 def _import_tasks(sender, **kwargs):
     import indico.modules.rb.tasks
+
+
+@signals.users.preferences.connect
+def _get_extra_user_prefs(sender, **kwargs):
+    from indico.modules.rb.user_prefs import RBUserPreferences
+    if RBUserPreferences.should_show_setting():
+        return RBUserPreferences
 
 
 @signals.menu.items.connect_via('admin-sidemenu')

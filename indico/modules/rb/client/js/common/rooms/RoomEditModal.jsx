@@ -662,17 +662,18 @@ class RoomEditModal extends React.Component {
       await this.saveEquipment(roomId, availableEquipment);
       await this.saveAttributes(roomId, attributes);
       await this.saveAvailability(roomId, changedValues, nonbookablePeriods, bookableHours);
+
+      // reload room so the form gets new initialValues
+      await this.fetchRoomData(roomId);
+      this.setState({
+        wasEverSaved: true,
+        submitState,
+      });
     } catch (e) {
       submitError = handleSubmitError(e);
       submitState = 'error';
+      this.setState({submitState});
     }
-
-    // reload room so the form gets new initialValues
-    await this.fetchRoomData(roomId);
-    this.setState({
-      wasEverSaved: true,
-      submitState,
-    });
     return camelizeKeys(submitError);
   };
 
@@ -931,7 +932,21 @@ class RoomEditModal extends React.Component {
                   <Translate>Room has been successfully updated.</Translate>
                 </Message>
                 <Message styleName="submit-message" negative hidden={submitState !== 'error'}>
-                  <Translate>Room could not be updated.</Translate>
+                  <p>
+                    <Translate>Room could not be updated.</Translate>
+                  </p>
+                  <Button
+                    type="button"
+                    icon="undo"
+                    size="mini"
+                    color="red"
+                    content={Translate.string('Reset form')}
+                    onClick={() => {
+                      // reset the form
+                      this.setState({submitState: ''});
+                      fprops.form.reset();
+                    }}
+                  />
                 </Message>
               </Grid.Column>
             </Grid>

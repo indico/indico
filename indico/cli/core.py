@@ -81,6 +81,11 @@ def db():
     """Perform database operations."""
 
 
+@cli.group(cls=LazyGroup, import_name='indico.cli.maintenance:cli')
+def maint():
+    """Perform maintenance operations."""
+
+
 @cli.command(context_settings={'ignore_unknown_options': True, 'allow_extra_args': True}, add_help_option=False)
 @click.pass_context
 def celery(ctx):

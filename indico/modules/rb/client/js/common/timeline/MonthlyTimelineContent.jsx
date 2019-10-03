@@ -27,7 +27,7 @@ export default class MonthlyTimelineContent extends WeeklyTimelineContent {
 
   get weekendDays() {
     return this.dates
-      .filter(day => [5, 6].includes(toMoment(day, 'YYYY-MM-DD').weekday()))
+      .filter(day => [6, 7].includes(toMoment(day, 'YYYY-MM-DD').isoWeekday()))
       .map(day => this.dates.findIndex(el => el === day));
   }
 

@@ -40,6 +40,8 @@ Improvements
 ^^^^^^^^^^^^
 
 - Improve room booking interface on small-screen devices (:issue:`4013`)
+- Add user preference for room owners/manager to select if they want to
+  receive notification emails for their rooms (:issue:`4096`)
 
 Bugfixes
 ^^^^^^^^
@@ -51,6 +53,10 @@ Bugfixes
   high amount of registrations
 - Fix confirmation prompt when disabling conference menu customizations
   (:issue:`4085`)
+- Fix incorrect days shown as weekend in room booking for some locales
+- Fix ACL entries referencing event roles from the old event when cloning an
+  event with event roles in the ACL. Run ``indico maint fix-event-role-acls``
+  after updating to fix any affected ACLs (:issue:`4090`)
 
 Version 2.2.2
 -------------

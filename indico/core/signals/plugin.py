@@ -97,3 +97,15 @@ the following arguments:
 If a plugin wants to modify the data the schema will eventually load, it may do so by
 modifying the contents of ``data``.
 """)
+
+schema_post_load = _signals.signal('schema-post-load', """
+Called after a marshmallow schema is loaded. The *sender* is the schema class
+and code using this signal should always specify it. The signal is called with
+the following arguments:
+
+- ``data`` -- the data returned by marshmallow; this is usually a dict which may contain
+              more complex data types than those valid in JSON
+
+If a plugin wants to modify the resulting data, it may do so by modifying the contents of
+``data``.
+""")

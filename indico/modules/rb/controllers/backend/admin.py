@@ -11,14 +11,12 @@ from io import BytesIO
 
 from flask import jsonify, request, session
 from marshmallow import missing, validate
-from marshmallow_enum import EnumField
 from sqlalchemy.orm import joinedload
 from webargs import fields
 from webargs.flaskparser import abort
 from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.core.db import db
-from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.core.marshmallow import mm
 from indico.modules.categories.models.categories import Category
 from indico.modules.rb import logger, rb_settings
@@ -28,35 +26,39 @@ from indico.modules.rb.models.equipment import EquipmentType, RoomEquipmentAssoc
 from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.map_areas import MapArea
 from indico.modules.rb.models.photos import Photo
-from indico.modules.rb.models.principals import RoomPrincipal
 from indico.modules.rb.models.room_attributes import RoomAttribute, RoomAttributeAssociation
 from indico.modules.rb.models.room_features import RoomFeature
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.operations.admin import (create_area, delete_areas, update_area, update_room,
                                                 update_room_attributes, update_room_availability, update_room_equipment)
+from indico.modules.rb.operations.rooms import has_managed_rooms
 from indico.modules.rb.schemas import (AdminRoomSchema, RoomAttributeValuesSchema, admin_equipment_type_schema,
                                        admin_locations_schema, bookable_hours_schema, map_areas_schema,
                                        nonbookable_periods_schema, room_attribute_schema, room_equipment_schema,
-                                       room_feature_schema, room_update_schema)
+                                       room_feature_schema, room_update_args_schema, room_update_schema)
 from indico.modules.rb.util import (build_rooms_spritesheet, get_resized_room_photo, rb_is_admin,
                                     remove_room_spritesheet_photo)
 from indico.util.i18n import _
-from indico.util.marshmallow import ModelList, Principal, PrincipalList, PrincipalPermissionList
+from indico.util.marshmallow import ModelList, PrincipalList
 from indico.web.args import use_args, use_kwargs
 from indico.web.flask.util import send_file
 from indico.web.util import ExpectedError
 
 
 class RHRoomBookingAdminBase(RHRoomBookingBase):
+    def _skip_admin_check(self):
+        return False
+
     def _check_access(self):
         RHRoomBookingBase._check_access(self)
-        if not rb_is_admin(session.user):
+        if not rb_is_admin(session.user) and not self._skip_admin_check():
             raise Forbidden
 
 
 class SettingsSchema(mm.Schema):
     admin_principals = PrincipalList(allow_groups=True)
     authorized_principals = PrincipalList(allow_groups=True)
+    managers_edit_rooms = fields.Bool()
     tileserver_url = fields.String(validate=[
         validate.URL(schemes={'http', 'https'}),
         lambda value: all(x in value for x in ('{x}', '{y}', '{z}'))
@@ -294,6 +296,11 @@ class RHEquipmentTypes(RHRoomBookingAdminBase):
 
 
 class RHAttributes(RHRoomBookingAdminBase):
+    def _skip_admin_check(self):
+        # GET on this endpoint does not expose anything sensitive, so
+        # we allow any room manager to use it if they can edit rooms
+        return request.method == 'GET' and rb_settings.get('managers_edit_rooms') and has_managed_rooms(session.user)
+
     def _process_args(self):
         id_ = request.view_args.get('attribute_id')
         self.attribute = RoomAttribute.get_one(id_) if id_ is not None else None
@@ -371,6 +378,9 @@ class RHRoomAdminBase(RHRoomBookingAdminBase):
     def _process_args(self):
         self.room = Room.get_one(request.view_args['room_id'], is_deleted=False)
 
+    def _skip_admin_check(self):
+        return rb_settings.get('managers_edit_rooms') and self.room.can_manage(session.user)
+
 
 class RHRoomAttributes(RHRoomAdminBase):
     def _process(self):
@@ -426,50 +436,19 @@ class RHUpdateRoomEquipment(RHRoomAdminBase):
         return jsonify(room_update_schema.dump(self.room, many=False))
 
 
-room_update_args = {
-    'verbose_name': fields.Str(allow_none=True),
-    'site': fields.Str(allow_none=True),
-    'building': fields.String(validate=lambda x: x is not None),
-    'floor': fields.String(validate=lambda x: x is not None),
-    'number': fields.String(validate=lambda x: x is not None),
-    'longitude': fields.Float(allow_none=True),
-    'latitude': fields.Float(allow_none=True),
-    'is_reservable': fields.Bool(allow_none=True),
-    'reservations_need_confirmation': fields.Bool(allow_none=True),
-    'notification_emails': fields.List(fields.Email()),
-    'notification_before_days': fields.Int(validate=lambda x: 1 <= x <= 30, allow_none=True),
-    'notification_before_days_weekly': fields.Int(validate=lambda x: 1 <= x <= 30, allow_none=True),
-    'notification_before_days_monthly': fields.Int(validate=lambda x: 1 <= x <= 30, allow_none=True),
-    'notifications_enabled': fields.Bool(),
-    'end_notification_daily': fields.Int(validate=lambda x: 1 <= x <= 30, allow_none=True),
-    'end_notification_weekly': fields.Int(validate=lambda x: 1 <= x <= 30, allow_none=True),
-    'end_notification_monthly': fields.Int(validate=lambda x: 1 <= x <= 30, allow_none=True),
-    'end_notifications_enabled': fields.Bool(),
-    'booking_limit_days': fields.Int(validate=lambda x: x >= 1, allow_none=True),
-    'owner': Principal(validate=lambda x: x is not None, allow_none=True),
-    'key_location': fields.Str(),
-    'telephone': fields.Str(),
-    'capacity': fields.Int(validate=lambda x: x >= 1),
-    'division': fields.Str(allow_none=True),
-    'surface_area': fields.Int(validate=lambda x: x >= 0, allow_none=True),
-    'max_advance_days': fields.Int(validate=lambda x: x >= 1, allow_none=True),
-    'comments': fields.Str(),
-    'acl_entries': PrincipalPermissionList(RoomPrincipal),
-    'protection_mode': EnumField(ProtectionMode)
-}
-
-
 class RHRoom(RHRoomAdminBase):
     def _process_GET(self):
         return jsonify(room_update_schema.dump(self.room))
 
-    @use_args(room_update_args)
+    @use_args(room_update_args_schema)
     def _process_PATCH(self, args):
         update_room(self.room, args)
         RHRoomsPermissions._jsonify_user_permissions.clear_cached(session.user)
         return '', 204
 
     def _process_DELETE(self):
+        if not rb_is_admin(session.user):
+            raise Forbidden
         logger.info('Room %r deleted by %r', self.room, session.user)
         self.room.is_deleted = True
         return '', 204
@@ -498,11 +477,11 @@ class RHRooms(RHRoomBookingAdminBase):
         rooms = Room.query.filter_by(is_deleted=False).order_by(db.func.indico.natsort(Room.full_name)).all()
         return AdminRoomSchema().jsonify(rooms, many=True)
 
-    @use_args(dict(room_update_args, **{
-        'location_id': fields.Int(required=True),
-    }))
-    def _process_POST(self, args):
+    @use_kwargs({'location_id': fields.Int(required=True)})
+    @use_args(room_update_args_schema)
+    def _process_POST(self, args, location_id):
         room = Room()
+        args['location_id'] = location_id
         update_room(room, args)
         db.session.add(room)
         db.session.flush()

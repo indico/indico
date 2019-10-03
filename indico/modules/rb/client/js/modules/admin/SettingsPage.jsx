@@ -107,6 +107,16 @@ const SettingsPage = props => {
                 />
               </Form.Group>
             </Message>
+            <FinalCheckbox
+              name="managers_edit_rooms"
+              label={Translate.string('Allow owners/managers to edit their rooms')}
+              description={
+                <Translate>
+                  By default only admins can modify rooms, but you can allow room owners and
+                  managers to modify them as well.
+                </Translate>
+              }
+            />
             <FinalInput
               name="tileserver_url"
               label={Translate.string('Tileserver URL')}

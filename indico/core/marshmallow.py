@@ -11,7 +11,7 @@ from inspect import getmro
 
 from flask_marshmallow import Marshmallow
 from flask_marshmallow.sqla import SchemaOpts
-from marshmallow import fields, post_dump, pre_load
+from marshmallow import fields, post_dump, post_load, pre_load
 from marshmallow_enum import EnumField
 from marshmallow_sqlalchemy import ModelConverter
 from marshmallow_sqlalchemy import ModelSchema as MSQLAModelSchema
@@ -95,6 +95,11 @@ class IndicoSchema(mm.Schema):
     @pre_load
     def _call_pre_load_signal(self, data, **kwargs):
         signals.plugin.schema_pre_load.send(type(self), data=data)
+        return data
+
+    @post_load
+    def _call_post_load_signal(self, data, **kwargs):
+        signals.plugin.schema_post_load.send(type(self), data=data)
         return data
 
 

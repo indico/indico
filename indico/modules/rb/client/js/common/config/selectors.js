@@ -10,6 +10,7 @@ import {RequestState} from 'indico/utils/redux';
 export const hasLoadedConfig = ({config}) => config.request.state === RequestState.SUCCESS;
 export const getRoomsSpriteToken = ({config}) => config.data.roomsSpriteToken;
 export const getTileServerURL = ({config}) => config.data.tileServerURL;
+export const canManagersEditRooms = ({config}) => config.data.managersEditRooms;
 export const getLanguages = ({config}) => config.data.languages;
 export const getBookingGracePeriod = ({config}) => config.data.gracePeriod;
 export const getHelpURL = ({config}) => config.data.helpURL;

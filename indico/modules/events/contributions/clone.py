@@ -78,6 +78,7 @@ class ContributionCloner(EventCloner):
     name = 'contributions'
     friendly_name = _('Contributions')
     requires = {'event_persons', 'sessions', 'contribution_types', 'contribution_fields'}
+    uses = {'event_roles'}
     is_internal = True
 
     # We do not override `is_available` as we have cloners depending
@@ -112,6 +113,7 @@ class ContributionCloner(EventCloner):
         return new_contribution
 
     def run(self, new_event, cloners, shared_data):
+        self._event_role_map = shared_data['event_roles']['event_role_map'] if 'event_roles' in cloners else None
         self._person_map = shared_data['event_persons']['person_map']
         self._session_map = shared_data['sessions']['session_map']
         self._session_block_map = shared_data['sessions']['session_block_map']
@@ -132,7 +134,7 @@ class ContributionCloner(EventCloner):
         new_contrib = Contribution()
         new_contrib.populate_from_attrs(old_contrib, attrs)
         new_contrib.subcontributions = list(self._clone_subcontribs(old_contrib.subcontributions))
-        new_contrib.acl_entries = clone_principals(ContributionPrincipal, old_contrib.acl_entries)
+        new_contrib.acl_entries = clone_principals(ContributionPrincipal, old_contrib.acl_entries, self._event_role_map)
         new_contrib.references = list(self._clone_references(ContributionReference, old_contrib.references))
         new_contrib.person_links = list(self._clone_person_links(ContributionPersonLink, old_contrib.person_links))
         new_contrib.field_values = list(self._clone_fields(old_contrib.field_values))
