@@ -32,7 +32,7 @@ from indico.legacy.common import fossilize
 from indico.util.i18n import _
 from indico.util.locators import get_locator
 from indico.util.signals import values_from_signal
-from indico.web.flask.util import ResponseUtil, url_for
+from indico.web.flask.util import url_for
 
 
 HTTP_VERBS = {'GET', 'PATCH', 'POST', 'PUT', 'DELETE'}
@@ -76,7 +76,6 @@ class RH(object):
 
     def __init__(self):
         self.commit = True
-        self._responseUtil = ResponseUtil()
 
     # Methods =============================================================
 
@@ -291,9 +290,10 @@ class RH(object):
         logger.debug('Request successful')
 
         if res is None:
-            return self._responseUtil.make_empty()
+            # flask doesn't accept None but we might be returning it in some places...
+            res = ''
 
-        response = self._responseUtil.make_response(res)
+        response = current_app.make_response(res)
         if self.DENY_FRAMES:
             response.headers['X-Frame-Options'] = 'DENY'
         return response
