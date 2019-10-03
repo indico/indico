@@ -16,11 +16,9 @@ from flask import Blueprint, current_app, g, redirect, request
 from flask import send_file as _send_file
 from flask import url_for as _url_for
 from flask.helpers import get_root_path
-from werkzeug.datastructures import Headers
 from werkzeug.exceptions import HTTPException, NotFound
 from werkzeug.routing import BaseConverter, BuildError, RequestRedirect, UnicodeConverter
 from werkzeug.urls import url_parse
-from werkzeug.wrappers import Response as WerkzeugResponse
 
 from indico.core.config import config
 from indico.util.caching import memoize
@@ -330,44 +328,6 @@ class ListConverter(BaseConverter):
         if isinstance(value, (list, tuple, set)):
             value = '-'.join(value)
         return super(ListConverter, self).to_url(value)
-
-
-class ResponseUtil(object):
-    """This class allows "modifying" a Response object before it is actually created.
-
-    The purpose of this is to allow e.g. an Indico RH to trigger a redirect but revoke
-    it later in case of an error or to simply have something to pass around to functions
-    which want to modify headers while there is no response available.
-    """
-
-    def __init__(self):
-        self.headers = Headers()
-        self.status = 200
-        self.content_type = None
-
-    @property
-    def modified(self):
-        return bool(self.headers) or self.status != 200 or self.content_type
-
-    def make_empty(self):
-        return self.make_response('')
-
-    def make_response(self, res):
-        if isinstance(res, (current_app.response_class, WerkzeugResponse, tuple)):
-            if self.modified:
-                # If we receive a response - most likely one created by send_file - we do not allow any
-                # external modifications.
-                raise Exception('Cannot combine response object with custom modifications')
-            return res
-
-        # Return a plain string if that's all we have
-        if not res and not self.modified:
-            return ''
-
-        res = current_app.make_response((res, self.status, self.headers))
-        if self.content_type:
-            res.content_type = self.content_type
-        return res
 
 
 class XAccelMiddleware(object):
