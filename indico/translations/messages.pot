@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indico 2.2.3-dev\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2019-09-24 12:12+0200\n"
+"POT-Creation-Date: 2019-10-03 18:17+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -831,7 +831,7 @@ msgid "There are no old keys."
 msgstr ""
 
 #: indico/modules/attachments/__init__.py:41 indico/modules/attachments/__init__.py:53
-#: indico/modules/attachments/clone.py:23 indico/modules/attachments/templates/attachments.html:4
+#: indico/modules/attachments/clone.py:25 indico/modules/attachments/templates/attachments.html:4
 #: indico/modules/attachments/templates/generate_package.html:14 indico/modules/categories/templates/display/sidebar.html:7
 #: indico/modules/categories/templates/management/attachments.html:5
 #: indico/modules/events/templates/display/conference.html:82
@@ -1204,7 +1204,7 @@ msgstr ""
 #: indico/modules/events/registration/templates/management/regform_reglist.html:21
 #: indico/modules/events/registration/templates/management/reglist_filter.html:62
 #: indico/modules/events/sessions/templates/management/session_list.html:51
-#: indico/modules/events/surveys/templates/management/survey.html:104
+#: indico/modules/events/surveys/templates/management/survey.html:104 indico/modules/rb/settings.py:17
 msgid "None"
 msgstr ""
 
@@ -10895,6 +10895,10 @@ msgstr ""
 msgid "Roles Setup"
 msgstr ""
 
+#: indico/modules/events/roles/clone.py:21
+msgid "Event roles"
+msgstr ""
+
 #: indico/modules/events/roles/forms.py:22
 msgid "The full name of the role"
 msgstr ""
@@ -13331,50 +13335,70 @@ msgstr ""
 msgid "Revoke"
 msgstr ""
 
-#: indico/modules/rb/__init__.py:58 indico/modules/rb/__init__.py:70 indico/modules/rb/views.py:17
+#: indico/modules/rb/__init__.py:66 indico/modules/rb/__init__.py:78 indico/modules/rb/views.py:17
 msgid "Room Booking"
 msgstr ""
 
-#: indico/modules/rb/__init__.py:64
+#: indico/modules/rb/__init__.py:72
 msgid "Room booking"
 msgstr ""
 
-#: indico/modules/rb/__init__.py:102 indico/modules/rb/templates/booking_list.html:26
+#: indico/modules/rb/__init__.py:110 indico/modules/rb/templates/booking_list.html:26
 #: indico/modules/rb/templates/booking_list.html:43 indico/modules/rb/templates/booking_list.html:59
 #: indico/modules/rb/templates/booking_list.html:75
 msgid "Book"
 msgstr ""
 
-#: indico/modules/rb/__init__.py:103
+#: indico/modules/rb/__init__.py:111
 msgid "Allows booking the room"
 msgstr ""
 
-#: indico/modules/rb/__init__.py:110
+#: indico/modules/rb/__init__.py:118
 msgid "Prebook"
 msgstr ""
 
-#: indico/modules/rb/__init__.py:111
+#: indico/modules/rb/__init__.py:119
 msgid "Allows prebooking the room"
 msgstr ""
 
-#: indico/modules/rb/__init__.py:119
+#: indico/modules/rb/__init__.py:127
 msgid "Override"
 msgstr ""
 
-#: indico/modules/rb/__init__.py:120
+#: indico/modules/rb/__init__.py:128
 msgid "Allows overriding restrictions when booking the room"
 msgstr ""
 
-#: indico/modules/rb/__init__.py:127
+#: indico/modules/rb/__init__.py:135
 msgid "Moderate"
 msgstr ""
 
-#: indico/modules/rb/__init__.py:128
+#: indico/modules/rb/__init__.py:136
 msgid "Allows moderating bookings (approving/rejecting/editing)"
 msgstr ""
 
-#: indico/modules/rb/schemas.py:313
+#: indico/modules/rb/schemas.py:345
 msgid "Booking cannot end before it starts"
+msgstr ""
+
+#: indico/modules/rb/settings.py:17
+msgid "Rooms I own"
+msgstr ""
+
+#: indico/modules/rb/settings.py:17
+msgid "Rooms I manage"
+msgstr ""
+
+#: indico/modules/rb/settings.py:17
+msgid "Rooms I own or manage"
+msgstr ""
+
+#: indico/modules/rb/user_prefs.py:21
+msgid "Room notifications"
+msgstr ""
+
+#: indico/modules/rb/user_prefs.py:22
+msgid "If you own or manage any rooms, you can choose whether to receive notifications about activity related to them."
 msgstr ""
 
 #: indico/modules/rb/controllers/__init__.py:24
@@ -13385,16 +13409,16 @@ msgstr ""
 msgid "You are not authorized to access the room booking system."
 msgstr ""
 
-#: indico/modules/rb/controllers/backend/admin.py:113
+#: indico/modules/rb/controllers/backend/admin.py:115
 msgid "Cannot delete location with active rooms"
 msgstr ""
 
-#: indico/modules/rb/controllers/backend/admin.py:161 indico/modules/rb/controllers/backend/admin.py:223
-#: indico/modules/rb/controllers/backend/admin.py:293 indico/modules/rb/controllers/backend/admin.py:367
+#: indico/modules/rb/controllers/backend/admin.py:163 indico/modules/rb/controllers/backend/admin.py:225
+#: indico/modules/rb/controllers/backend/admin.py:295 indico/modules/rb/controllers/backend/admin.py:374
 msgid "Name must be unique"
 msgstr ""
 
-#: indico/modules/rb/controllers/backend/admin.py:412
+#: indico/modules/rb/controllers/backend/admin.py:422
 msgid "Start time should not be later than end time"
 msgstr ""
 
