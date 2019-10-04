@@ -5,7 +5,7 @@
 # 
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2019-09-19 12:12+0200\n"
+"POT-Creation-Date: 2019-10-19 18:17+0200\n"
 "Last-Translator: Thomas Baron <thomas.baron@cern.ch>, 2019\n"
 "Language-Team: French (France) (https://www.transifex.com/indico/teams/6478/fr_FR/)\n"
 "MIME-Version: 1.0\n"
@@ -122,13 +122,13 @@ msgstr "Supprimer"
 
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:334
 #: indico/modules/rb/client/js/common/filters/FilterDropdown.jsx:169
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:945
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:960
 #: indico/modules/rb/client/js/common/rooms/RoomPhoto.jsx:129
 #: indico/modules/rb/client/js/modules/admin/AdminRoomItem.jsx:51
 #: indico/modules/rb/client/js/modules/admin/EditableListItem.jsx:146
 #: indico/modules/rb/client/js/modules/admin/MapAreasPage.jsx:315
 #: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:309
-#: indico/web/client/js/react/components/principals/PrincipalPermissions.jsx:98
+#: indico/web/client/js/react/components/principals/PrincipalPermissions.jsx:103
 #: indico/web/client/js/react/components/principals/Search.jsx:327
 msgid "Cancel"
 msgstr "Annuler"
@@ -170,7 +170,7 @@ msgstr ""
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:448
 #: indico/modules/rb/client/js/common/bookings/BookingEdit.jsx:230
 #: indico/modules/rb/client/js/common/bookings/BookingExportModal.jsx:87
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:943
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:958
 #: indico/modules/rb/client/js/common/timeline/RowActionsDropdown.jsx:197
 #: indico/modules/rb/client/js/common/timeline/RowActionsDropdown.jsx:209
 #: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:429
@@ -710,7 +710,7 @@ msgid "Equipment available"
 msgstr "Equipement disponible"
 
 #: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:466
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:846
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:847
 msgid "Add new equipment"
 msgstr "Ajouter un nouvel équipement"
 
@@ -718,48 +718,52 @@ msgstr "Ajouter un nouvel équipement"
 msgid "Non-bookable periods"
 msgstr "Périodes non-réservables"
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:764
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:765
 msgid "No custom attributes found"
 msgstr "Aucun attribut personnalisé trouvé"
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:874
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:875
 msgid "Restricted rooms can only be booked by users defined in the room ACL"
 msgstr ""
 "Les salles restreintes ne peuvent être réservées que par les utilisateurs "
 "définis dans la liste de contrôle d'accès de la salle."
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:879
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:880
 msgid "Public"
 msgstr "Publique"
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:883
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:884
 msgid "Restricted"
 msgstr "Privée"
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:914
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:915
 msgid "Add Room"
 msgstr "Ajouter une salle"
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:914
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:915
 msgid "Edit Room Details"
 msgstr "Modifier les Détails de la Salle"
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:928
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:929
 msgid "Room has been successfully created."
 msgstr "La salle a été créée avec succès."
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:931
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:932
 msgid "Room has been successfully updated."
 msgstr "La salle a été mise à jour avec succès."
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:934
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:936
 msgid "Room could not be updated."
 msgstr "La salle n'a pas pu être mise à jour."
 
-#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:955
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:943
+msgid "Reset form"
+msgstr "Réinitialiser le formulaire"
+
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:970
 #: indico/modules/rb/client/js/common/rooms/RoomPhoto.jsx:104
 #: indico/modules/rb/client/js/modules/admin/EditableListItem.jsx:117
-#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:259
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:269
 msgid "Save"
 msgstr "Sauver"
 
@@ -1237,7 +1241,7 @@ msgid "Room name format"
 msgstr "Format de nom de salle"
 
 #: indico/modules/rb/client/js/modules/admin/LocationPage.jsx:115
-#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:128
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:138
 msgid "Missing placeholder: {placeholders}"
 msgid_plural "Missing placeholders: {placeholders}"
 msgstr[0] "Paramètre de substitution manquant: {placeholders}"
@@ -1370,10 +1374,22 @@ msgstr ""
 "utilisateurs/groupes."
 
 #: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:112
+msgid "Allow owners/managers to edit their rooms"
+msgstr "Autoriser les responsables et gérants à modifier leurs salles"
+
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:114
+msgid ""
+"By default only admins can modify rooms, but you can allow room owners and "
+"managers to modify them as well."
+msgstr ""
+"Par défaut, seuls les administrateurs peuvent modifier les salles, mais vous"
+" pouvez autoriser les responsables et gérants à les modifier également."
+
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:122
 msgid "Tileserver URL"
 msgstr "URL du tileserver"
 
-#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:114
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:124
 msgid ""
 "If you want to use the map, specify the URL to a tileserver covering the "
 "area in which your rooms are located."
@@ -1381,59 +1397,59 @@ msgstr ""
 "Si vous souhaitez utiliser la carte, veuillez spécifier l'URL vers un "
 "tileserver couvrant la zone dans laquelle se situent vos salles."
 
-#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:124
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:134
 #: indico/web/client/js/react/forms/validators.js:53
 msgid "Please provide a valid URL"
 msgstr "Veuiller entrer un URL valide"
 
-#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:143
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:153
 msgid "Max. booking length"
 msgstr "Durée max. de la réservation"
 
-#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:144
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:154
 msgid "The maximum length (in days) a booking may last."
 msgstr "Durée maximum d'une réservation (en jours)."
 
-#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:149
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:159
 msgid "Send reminders for upcoming bookings"
 msgstr "Envoyer des rappels pour les réservations à venir"
 
-#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:154
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:164
 msgid "Specify how many days in advance booking reminders should be sent"
 msgstr "Rappel initial: nombre de jours avant le début de la réservation"
 
-#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:165
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:175
 msgid "Single/Daily bookings"
 msgstr "Réservations uniques/quotidiennes"
 
-#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:174
-#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:216
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:184
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:226
 msgid "Weekly bookings"
 msgstr "Réservations hebdomadaires"
 
-#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:183
-#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:225
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:193
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:235
 msgid "Monthly bookings"
 msgstr "Réservations mensuelles"
 
-#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:191
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:201
 msgid "Send reminders when bookings are about to end"
 msgstr "Envoyer des rappels quand les réservations vont se terminer"
 
-#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:196
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:206
 msgid ""
 "Specify how many days before the end of a booking reminders should be sent"
 msgstr "Rappel final: nombre de jours avant la fin d'une réservation"
 
-#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:207
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:217
 msgid "Daily bookings"
 msgstr "Réservation quotidiennes"
 
-#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:235
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:245
 msgid "Disable booking during event creation"
 msgstr "Désactiver les réservations pendant la création des événements"
 
-#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:237
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:247
 msgid ""
 "Specify the IDs of categories for which booking a room during event creation"
 " will not be suggested."
@@ -1441,11 +1457,11 @@ msgstr ""
 "Veuillez spécifier les identifiants des catégories pour lesquelles réserver "
 "une salle à la création d'un événement ne sera pas suggéré."
 
-#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:249
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:259
 msgid "Grace period"
 msgstr "Délai de grâce"
 
-#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:251
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:261
 msgid ""
 "Usually booking a space in the past is not allowed. This setting will allow "
 "to book a room with a start date within a specified number of hours in the "
@@ -2151,7 +2167,7 @@ msgstr "Déconnexion"
 msgid "This list is currently empty"
 msgstr "Cette liste est actuellement vide"
 
-#: indico/web/client/js/react/components/principals/PrincipalPermissions.jsx:85
+#: indico/web/client/js/react/components/principals/PrincipalPermissions.jsx:90
 msgid "Add permission"
 msgstr "Ajouter une permission"
 
