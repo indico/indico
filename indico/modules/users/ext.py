@@ -24,15 +24,15 @@ class ExtraUserPreferences(object):
 
     @classmethod
     def is_active(cls, user):
-        """Return whether the preferences are available for the given user"""
+        """Return whether the preferences are available for the given user."""
         return True
 
     def load(self):
-        """Returns a dict with the current values for the user"""
+        """Return a dict with the current values for the user."""
         raise NotImplementedError
 
     def save(self, data):
-        """Saves the updated settings"""
+        """Save the updated settings."""
         raise NotImplementedError
 
     # All the following methods are internal and usually do not need
@@ -47,7 +47,7 @@ class ExtraUserPreferences(object):
             defaults[key] = value
 
     def process_form_data(self, data):
-        """Processes and saves submitted data.
+        """Process and save submitted data.
 
         This modifies `data` so the core code doesn't receive any extra
         data it doesn't expect.
@@ -58,7 +58,7 @@ class ExtraUserPreferences(object):
         self.save(local_data)
 
     def extend_form(self, form_class):
-        """Creates a subclass of the form containing the extra field"""
+        """Create a subclass of the form containing the extra field"""
         form_class = type(b'ExtendedUserPreferencesForm', (form_class,), {})
         for name, field in self.fields.iteritems():
             name = self._prefix + name
