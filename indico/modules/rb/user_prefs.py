@@ -7,7 +7,6 @@
 
 from __future__ import unicode_literals
 
-from flask import session
 from sqlalchemy import func
 
 from indico.modules.rb.models.rooms import Room
@@ -22,7 +21,7 @@ class RBUserPreferences(ExtraUserPreferences):
     @property
     def fields(self):
         query = (Room.query
-                 .filter(~Room.is_deleted, Room.id.in_(get_managed_room_ids(session.user)))
+                 .filter(~Room.is_deleted, Room.id.in_(get_managed_room_ids(self.user)))
                  .order_by(func.indico.natsort(Room.full_name)))
 
         fields = {
@@ -53,8 +52,8 @@ class RBUserPreferences(ExtraUserPreferences):
     def save(self, data):
         rb_user_settings.set_multi(self.user, data)
 
-    @staticmethod
-    def should_show_setting():
-        return (rb_user_settings.get(session.user, 'email_mode', None) is not None or
-                rb_user_settings.get(session.user, 'email_blacklist', None) is not None or
-                get_managed_room_ids(session.user))
+    @classmethod
+    def is_active(cls, user):
+        return (rb_user_settings.get(user, 'email_mode', None) is not None or
+                rb_user_settings.get(user, 'email_blacklist', None) is not None or
+                get_managed_room_ids(user))

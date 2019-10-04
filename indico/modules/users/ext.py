@@ -22,6 +22,11 @@ class ExtraUserPreferences(object):
     def __init__(self, user):
         self.user = user
 
+    @classmethod
+    def is_active(cls, user):
+        """Return whether the preferences are available for the given user"""
+        return True
+
     def load(self):
         """Returns a dict with the current values for the user"""
         raise NotImplementedError

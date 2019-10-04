@@ -150,7 +150,8 @@ class RHPersonalData(RHUserBase):
 
 class RHUserPreferences(RHUserBase):
     def _process(self):
-        extra_preferences = [pref(self.user) for pref in values_from_signal(signals.users.preferences.send(self.user))]
+        extra_preferences = [pref(self.user) for pref in values_from_signal(signals.users.preferences.send(self.user))
+                             if pref.is_active(self.user)]
         form_class = UserPreferencesForm
         defaults = FormDefaults(**self.user.settings.get_all(self.user))
         for pref in extra_preferences:
