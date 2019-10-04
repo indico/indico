@@ -28,7 +28,6 @@ from indico.web.util import jsonify_data, jsonify_template
 
 
 class RHTimetableProtectionBase(RHDisplayEventBase):
-
     def _check_access(self):
         RHDisplayEventBase._check_access(self)
         published = contribution_settings.get(self.event, 'published')
@@ -76,7 +75,6 @@ class RHTimetableEntryInfo(RHTimetableProtectionBase):
 
 
 class RHTimetableExportPDF(RHTimetableProtectionBase):
-
     def _process(self):
         form = TimetablePDFExportForm(formdata=request.args, csrf_enabled=False)
         if form.validate_on_submit():
@@ -104,7 +102,6 @@ class RHTimetableExportPDF(RHTimetableProtectionBase):
 
 
 class RHTimetableExportDefaultPDF(RHTimetableProtectionBase):
-
     def _process(self):
         pdf = get_timetable_offline_pdf_generator(self.event)
         return send_file('timetable.pdf', BytesIO(pdf.getPDFBin()), 'application/pdf')

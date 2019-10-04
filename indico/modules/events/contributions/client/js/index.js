@@ -12,20 +12,19 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import 'indico/modules/events/util/types_dialog';
-import PublicationSwitch from 'indico/react/components/PublicationSwitch';
+import {PublicationSwitch} from 'indico/react/components';
 
 
 (function(global) {
-
   function setupPublicationButton() {
-    const eventId = $('#pub-switch').data('event-id');
-    const element = React.createElement(PublicationSwitch, {eventId})
-    ReactDOM.render(element, document.getElementById('pub-switch'));
+    const element = document.querySelector('#pub-switch');
+    const component = React.createElement(PublicationSwitch, {eventId: element.dataset.eventId});
+    ReactDOM.render(component, element);
   }
 
   global.setupContributionConfig = function setupContributionConfig() {
     setupPublicationButton();
-  }
+  };
 
   function setupTableSorter(selector) {
     $(selector).tablesorter({
