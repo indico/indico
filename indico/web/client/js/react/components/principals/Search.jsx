@@ -374,13 +374,12 @@ const UserSearchFields = () => {
   return (
     <>
       <FinalInput
-        name="first_name"
+        name="last_name"
         autoFocus
-        hideValidationError
         noAutoComplete
-        label={Translate.string('First name')}
+        label={Translate.string('Family name')}
       />
-      <FinalInput name="last_name" noAutoComplete label={Translate.string('Last name')} />
+      <FinalInput name="first_name" noAutoComplete label={Translate.string('Given name')} />
       <FinalInput
         name="email"
         type="email"

@@ -12,6 +12,9 @@ from datetime import timedelta
 import dateutil.parser
 import pytz
 from sqlalchemy import inspect
+from werkzeug.utils import cached_property
+
+from indico.core.db import db
 
 
 class SettingConverter(object):
@@ -78,12 +81,19 @@ class EnumConverter(SettingConverter):
 class ModelConverter(SettingConverter):
     """Convert a SQLAlchemy object from/to its PK.
 
-    :param model: A SQLAlchemy model with a single-column PK.
+    :param model: A SQLAlchemy model with a single-column PK or the name
+                  of a model (if importing the model would cause circular
+                  dependencies).
     """
 
     def __init__(self, model):
-        self.model = model
+        self._model = model
+
+    @cached_property
+    def model(self):
+        model = getattr(db.m, self._model) if isinstance(self._model, basestring) else self._model
         assert len(inspect(model).primary_key) == 1
+        return model
 
     def from_python(self, value):
         if value is None:
@@ -100,18 +110,29 @@ class ModelConverter(SettingConverter):
 class ModelListConverter(SettingConverter):
     """Convert a list of SQLAlchemy objects from/to a list of PKs.
 
-    :param model: A SQLAlchemy model with a single-column PK.
+    :param model: A SQLAlchemy model with a single-column PK or the name
+                  of a model (if importing the model would cause circular
+                  dependencies).
     :param collection_class: The collection to use for the python-side
                              value. Defaults to `list` but could also be
                              `set` for example.
     """
 
     def __init__(self, model, collection_class=list):
-        self.model = model
+        self._model = model
         self.collection_class = collection_class
-        pks = inspect(model).primary_key
+
+    @cached_property
+    def model(self):
+        if isinstance(self._model, basestring):
+            return getattr(db.m, self._model)
+        return self._model
+
+    @cached_property
+    def column(self):
+        pks = inspect(self.model).primary_key
         assert len(pks) == 1
-        self.column = pks[0]
+        return pks[0]
 
     def from_python(self, value):
         if not value:

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indico 2.2.3-dev\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2019-10-03 18:17+0200\n"
+"POT-Creation-Date: 2019-10-04 13:50+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -13393,12 +13393,22 @@ msgstr ""
 msgid "Rooms I own or manage"
 msgstr ""
 
-#: indico/modules/rb/user_prefs.py:21
+#: indico/modules/rb/user_prefs.py:28
 msgid "Room notifications"
 msgstr ""
 
-#: indico/modules/rb/user_prefs.py:22
+#: indico/modules/rb/user_prefs.py:29
 msgid "If you own or manage any rooms, you can choose whether to receive notifications about activity related to them."
+msgstr ""
+
+#: indico/modules/rb/user_prefs.py:32
+msgid "Room blacklist"
+msgstr ""
+
+#: indico/modules/rb/user_prefs.py:36
+msgid ""
+"Regardless of the room notifications selected above, you will never receive notifications for rooms selected in this "
+"list."
 msgstr ""
 
 #: indico/modules/rb/controllers/__init__.py:24
@@ -13526,109 +13536,109 @@ msgstr ""
 msgid "Your personal data was successfully updated."
 msgstr ""
 
-#: indico/modules/users/controllers.py:168
+#: indico/modules/users/controllers.py:169
 msgid "Preferences saved"
 msgstr ""
 
-#: indico/modules/users/controllers.py:254
+#: indico/modules/users/controllers.py:255
 msgid ""
 "We have sent an email to {email}. Please click the link in that email within 24 hours to confirm your new email "
 "address."
 msgstr ""
 
-#: indico/modules/users/controllers.py:266
+#: indico/modules/users/controllers.py:267
 msgid "The verification token is invalid or expired."
 msgstr ""
 
-#: indico/modules/users/controllers.py:270
+#: indico/modules/users/controllers.py:271
 msgid "This token is for a different Indico user. Please login with the correct account"
 msgstr ""
 
-#: indico/modules/users/controllers.py:275
+#: indico/modules/users/controllers.py:276
 msgid "This email address is already attached to your account."
 msgstr ""
 
-#: indico/modules/users/controllers.py:277
+#: indico/modules/users/controllers.py:278
 msgid "This email address is already in use by another account."
 msgstr ""
 
-#: indico/modules/users/controllers.py:297
+#: indico/modules/users/controllers.py:298
 msgid "Merged data from existing '{}' identity"
 msgstr ""
 
-#: indico/modules/users/controllers.py:302
+#: indico/modules/users/controllers.py:303
 msgid "The email address {email} has been added to your account."
 msgstr ""
 
-#: indico/modules/users/controllers.py:319
+#: indico/modules/users/controllers.py:320
 msgid "Your primary email was updated successfully."
 msgstr ""
 
-#: indico/modules/users/controllers.py:338
+#: indico/modules/users/controllers.py:339
 msgid "Admin added: {name} ({email})"
 msgstr ""
 
-#: indico/modules/users/controllers.py:342
+#: indico/modules/users/controllers.py:343
 msgid "Admin removed: {name} ({email})"
 msgstr ""
 
-#: indico/modules/users/controllers.py:415
+#: indico/modules/users/controllers.py:416
 msgid "The account has been created."
 msgstr ""
 
-#: indico/modules/users/controllers.py:417
+#: indico/modules/users/controllers.py:418
 msgid "Show details"
 msgstr ""
 
-#: indico/modules/users/controllers.py:428
+#: indico/modules/users/controllers.py:429
 msgid "Users are the same!"
 msgstr ""
 
-#: indico/modules/users/controllers.py:431
+#: indico/modules/users/controllers.py:432
 msgid "Users' names seem to be different!"
 msgstr ""
 
-#: indico/modules/users/controllers.py:433
+#: indico/modules/users/controllers.py:434
 msgid "Source user has never logged in to Indico!"
 msgstr ""
 
-#: indico/modules/users/controllers.py:435
+#: indico/modules/users/controllers.py:436
 msgid "Target user has never logged in to Indico!"
 msgstr ""
 
-#: indico/modules/users/controllers.py:437
+#: indico/modules/users/controllers.py:438
 msgid "Source user has been deleted!"
 msgstr ""
 
-#: indico/modules/users/controllers.py:439
+#: indico/modules/users/controllers.py:440
 msgid "Target user has been deleted!"
 msgstr ""
 
-#: indico/modules/users/controllers.py:441
+#: indico/modules/users/controllers.py:442
 msgid "Source user is an administrator!"
 msgstr ""
 
-#: indico/modules/users/controllers.py:443
+#: indico/modules/users/controllers.py:444
 msgid "Target user is an administrator!"
 msgstr ""
 
-#: indico/modules/users/controllers.py:445
+#: indico/modules/users/controllers.py:446
 msgid "Source user is an administrator but target user isn't!"
 msgstr ""
 
-#: indico/modules/users/controllers.py:459
+#: indico/modules/users/controllers.py:460
 msgid "Merge aborted due to failed sanity check"
 msgstr ""
 
-#: indico/modules/users/controllers.py:466
+#: indico/modules/users/controllers.py:467
 msgid "The users have been successfully merged."
 msgstr ""
 
-#: indico/modules/users/controllers.py:504
+#: indico/modules/users/controllers.py:505
 msgid "The request has been approved."
 msgstr ""
 
-#: indico/modules/users/controllers.py:515
+#: indico/modules/users/controllers.py:516
 msgid "The request has been rejected."
 msgstr ""
 

@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2019-10-19 18:17+0200\n"
+"POT-Creation-Date: 2019-10-19 13:51+0200\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "MIME-Version: 1.0\n"
@@ -812,7 +812,7 @@ msgstr ""
 msgid "Tip: click and drag to pre-book!"
 msgstr ""
 
-#: indico/modules/rb/client/js/common/timeline/ElasticTimeline.jsx:46
+#: indico/modules/rb/client/js/common/timeline/ElasticTimeline.jsx:48
 msgid "No occurrences found"
 msgstr ""
 
@@ -2091,85 +2091,85 @@ msgstr ""
 msgid "Confirm"
 msgstr ""
 
-#: indico/web/client/js/react/components/principals/Search.jsx:381
-msgid "First name"
+#: indico/web/client/js/react/components/principals/Search.jsx:380
+msgid "Family name"
 msgstr ""
 
-#: indico/web/client/js/react/components/principals/Search.jsx:383
-msgid "Last name"
+#: indico/web/client/js/react/components/principals/Search.jsx:382
+msgid "Given name"
 msgstr ""
 
-#: indico/web/client/js/react/components/principals/Search.jsx:388
+#: indico/web/client/js/react/components/principals/Search.jsx:387
 #: indico/web/client/js/react/errors/component.jsx:77
 msgid "Email address"
 msgstr ""
 
-#: indico/web/client/js/react/components/principals/Search.jsx:390
+#: indico/web/client/js/react/components/principals/Search.jsx:389
 msgid "Affiliation"
 msgstr ""
 
-#: indico/web/client/js/react/components/principals/Search.jsx:394
+#: indico/web/client/js/react/components/principals/Search.jsx:393
 msgid "Include users with no Indico account"
 msgstr ""
 
-#: indico/web/client/js/react/components/principals/Search.jsx:397
-#: indico/web/client/js/react/components/principals/Search.jsx:495
+#: indico/web/client/js/react/components/principals/Search.jsx:396
+#: indico/web/client/js/react/components/principals/Search.jsx:494
 msgid "Exact matches only"
 msgstr ""
 
-#: indico/web/client/js/react/components/principals/Search.jsx:404
+#: indico/web/client/js/react/components/principals/Search.jsx:403
 msgid "User"
 msgstr ""
 
-#: indico/web/client/js/react/components/principals/Search.jsx:405
+#: indico/web/client/js/react/components/principals/Search.jsx:404
 msgid "Select user"
 msgstr ""
 
-#: indico/web/client/js/react/components/principals/Search.jsx:405
+#: indico/web/client/js/react/components/principals/Search.jsx:404
 msgid "Add users"
 msgstr ""
 
-#: indico/web/client/js/react/components/principals/Search.jsx:436
+#: indico/web/client/js/react/components/principals/Search.jsx:435
 msgid "Your query matched too many users. Please try more specific search criteria."
 msgstr ""
 
-#: indico/web/client/js/react/components/principals/Search.jsx:439
+#: indico/web/client/js/react/components/principals/Search.jsx:438
 msgid "No users found"
 msgstr ""
 
-#: indico/web/client/js/react/components/principals/Search.jsx:442
+#: indico/web/client/js/react/components/principals/Search.jsx:441
 msgid "1 user found"
 msgid_plural "{count} users found"
 msgstr[0] ""
 msgstr[1] ""
 
-#: indico/web/client/js/react/components/principals/Search.jsx:481
+#: indico/web/client/js/react/components/principals/Search.jsx:480
 msgid "Group"
 msgstr ""
 
-#: indico/web/client/js/react/components/principals/Search.jsx:483
+#: indico/web/client/js/react/components/principals/Search.jsx:482
 msgid "Select group"
 msgstr ""
 
-#: indico/web/client/js/react/components/principals/Search.jsx:483
+#: indico/web/client/js/react/components/principals/Search.jsx:482
 msgid "Add groups"
 msgstr ""
 
-#: indico/web/client/js/react/components/principals/Search.jsx:493
+#: indico/web/client/js/react/components/principals/Search.jsx:492
 msgid "Group name"
 msgstr ""
 
-#: indico/web/client/js/react/components/principals/Search.jsx:517
+#: indico/web/client/js/react/components/principals/Search.jsx:516
 msgid ""
 "Your query matched too many groups. Please try more specific search "
 "criteria."
 msgstr ""
 
-#: indico/web/client/js/react/components/principals/Search.jsx:520
+#: indico/web/client/js/react/components/principals/Search.jsx:519
 msgid "No groups found"
 msgstr ""
 
-#: indico/web/client/js/react/components/principals/Search.jsx:523
+#: indico/web/client/js/react/components/principals/Search.jsx:522
 msgid "1 group found"
 msgid_plural "{count} groups found"
 msgstr[0] ""
