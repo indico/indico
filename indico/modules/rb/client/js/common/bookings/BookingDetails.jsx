@@ -198,7 +198,7 @@ class BookingDetails extends React.Component {
           </ul>
         );
       }
-      const logDate = serializeDate(toMoment(timestamp), 'L');
+      const logDate = serializeDate(toMoment(timestamp), 'L LT');
       const popupContent = <span styleName="popup-center">{details}</span>;
       const wrapper = details ? <PopupParam content={popupContent} /> : <span />;
       return (
