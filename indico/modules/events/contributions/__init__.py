@@ -18,6 +18,7 @@ from indico.core.settings.converters import TimedeltaConverter
 from indico.modules.events.contributions.contrib_fields import get_contrib_field_types
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.fields import ContributionField
+from indico.modules.events.models.events import EventType
 from indico.modules.events.settings import EventSettingsProxy
 from indico.util.i18n import _, ngettext
 from indico.web.flask.util import url_for
@@ -119,6 +120,12 @@ def _extend_event_menu(sender, **kwargs):
                         is_enabled=False, static_site=True)
     yield MenuEntryData(title=_("Speaker List"), name='speaker_index', endpoint='contributions.speaker_list',
                         position=6, is_enabled=False, static_site=True)
+
+
+@signals.event.created.connect
+def _event_created(event, **kwargs):
+    if event.type_ == EventType.conference:
+        contribution_settings.set(event, 'published', False)
 
 
 contribution_settings = EventSettingsProxy('contributions', {

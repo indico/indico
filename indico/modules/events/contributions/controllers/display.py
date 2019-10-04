@@ -56,7 +56,7 @@ class RHContributionDisplayBase(RHDisplayEventBase):
     def _check_access(self):
         RHDisplayEventBase._check_access(self)
         published = contribution_settings.get(self.event, 'published')
-        if not self.contrib.can_access(session.user) or not published:
+        if not published or not self.contrib.can_access(session.user):
             raise Forbidden
         if not published:
             raise NotFound(_("The contributions of this event haven't been published yet."))
@@ -81,6 +81,11 @@ class RHMyContributions(RHDisplayProtectionBase):
     """Display list of current user contributions"""
 
     MENU_ENTRY_NAME = 'my_contributions'
+
+    def _check_access(self):
+        RHDisplayProtectionBase._check_access(self)
+        if not session.user:
+            raise Forbidden
 
     def _process(self):
         contributions = get_contributions_with_user_as_submitter(self.event, session.user)

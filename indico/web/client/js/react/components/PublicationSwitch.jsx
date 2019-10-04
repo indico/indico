@@ -16,58 +16,42 @@ import {Translate} from 'indico/react/i18n';
 export default function PublicationSwitch({eventId}) {
   const [published, setPublished] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchPublicationSetting = async () => {
+      setLoading(true);
       let response;
       try {
         response = await indicoAxios.get(publicationURL({confId: eventId}));
       } catch (error) {
         handleAxiosError(error);
+        setLoading(false);
+        return;
       }
       setPublished(response.data.published);
+      setLoading(false);
     };
     fetchPublicationSetting();
   }, [eventId]);
 
-  const changeState = shouldPublish => {
-    const updatePublicationSetting = async () => {
-      try {
-        if (shouldPublish) {
-          await indicoAxios.put(publicationURL({confId: eventId}));
-        } else {
-          await indicoAxios.delete(publicationURL({confId: eventId}));
-        }
-      } catch (error) {
-        handleAxiosError(error);
+  const changeState = async shouldPublish => {
+    try {
+      if (shouldPublish) {
+        await indicoAxios.put(publicationURL({confId: eventId}));
+      } else {
+        await indicoAxios.delete(publicationURL({confId: eventId}));
       }
-      setPublished(shouldPublish);
-    };
-    updatePublicationSetting();
+    } catch (error) {
+      handleAxiosError(error);
+      return;
+    }
+    setPublished(shouldPublish);
   };
 
-  const menuList = (
-    <List bulleted>
-      <List.Item>
-        <Translate>Contribution List</Translate>
-      </List.Item>
-      <List.Item>
-        <Translate>My Contributions</Translate>
-      </List.Item>
-      <List.Item>
-        <Translate>Author List</Translate>
-      </List.Item>
-      <List.Item>
-        <Translate>Speaker List</Translate>
-      </List.Item>
-      <List.Item>
-        <Translate>Timetable</Translate>
-      </List.Item>
-      <List.Item>
-        <Translate>Book of Abstracts</Translate>
-      </List.Item>
-    </List>
-  );
+  if (loading) {
+    return null;
+  }
 
   return (
     <Modal
@@ -95,12 +79,13 @@ export default function PublicationSwitch({eventId}) {
         {published ? (
           <>
             <p>
-              <Translate>Are you sure you want to set contribution list in draft mode?</Translate>
+              <Translate>
+                Are you sure you want to change the contribution list back to draft mode?
+              </Translate>
             </p>
             <p>
               <Translate>By doing so the following menu items won't be accessible:</Translate>
             </p>
-            {menuList}
           </>
         ) : (
           <>
@@ -110,16 +95,35 @@ export default function PublicationSwitch({eventId}) {
             <p>
               <Translate>By doing so the following menu items will be accessible: </Translate>
             </p>
-            {menuList}
           </>
         )}
+        <List bulleted>
+          <List.Item>
+            <Translate>Contribution List</Translate>
+          </List.Item>
+          <List.Item>
+            <Translate>My Contributions</Translate>
+          </List.Item>
+          <List.Item>
+            <Translate>Author List</Translate>
+          </List.Item>
+          <List.Item>
+            <Translate>Speaker List</Translate>
+          </List.Item>
+          <List.Item>
+            <Translate>Timetable</Translate>
+          </List.Item>
+          <List.Item>
+            <Translate>Book of Abstracts</Translate>
+          </List.Item>
+        </List>
       </Modal.Content>
       <Modal.Actions>
         <Button onClick={() => setModalOpen(false)}>
           <Translate>No</Translate>
         </Button>
         <Button
-          color="blue"
+          primary
           onClick={() => {
             changeState(!published);
             setModalOpen(false);
@@ -133,5 +137,5 @@ export default function PublicationSwitch({eventId}) {
 }
 
 PublicationSwitch.propTypes = {
-  eventId: PropTypes.number.isRequired,
+  eventId: PropTypes.string.isRequired,
 };
