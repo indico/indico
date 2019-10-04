@@ -1,2 +1,3 @@
 CHANGES.rst merge=union
 docs/* linguist-documentation
+indico/translations/*.pot linguist-generated
