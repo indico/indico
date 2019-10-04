@@ -95,6 +95,7 @@ class ContributionCloner(EventCloner):
         """
         event = contribution.event
         cloner = cls(event)
+        cloner._event_role_map = dict(zip(event.roles, event.roles))
         cloner._person_map = dict(zip(event.persons, event.persons))
         cloner._session_map = {contribution.session: contribution.session}
         cloner._session_block_map = {contribution.session_block: contribution.session_block}
