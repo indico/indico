@@ -38,6 +38,8 @@ export default class ElasticTimeline extends React.Component {
     showUnused: PropTypes.bool,
     fixedHeight: PropTypes.string,
     roomTimelineAction: PropTypes.bool,
+    setDate: PropTypes.func.isRequired,
+    setMode: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
@@ -200,6 +202,8 @@ export default class ElasticTimeline extends React.Component {
       fixedHeight,
       emptyMessage,
       roomTimelineAction,
+      setDate,
+      setMode,
     } = this.props;
     let Component = DailyTimelineContent;
     let rows = this.calcDailyRows(availability);
@@ -245,6 +249,8 @@ export default class ElasticTimeline extends React.Component {
             showUnused={showUnused}
             fixedHeight={fixedHeight}
             rowActions={{roomTimeline: roomTimelineAction}}
+            setDate={setDate}
+            setMode={setMode}
             gutterAllowed
           />
         </>

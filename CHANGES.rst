@@ -14,6 +14,7 @@ Improvements
 - Add user preference for room owners/manager to select if they want to
   receive notification emails for their rooms (:issue:`4096`, :issue:`4098`)
 - Show family name field first in user search dialog (:issue:`4099`)
+- Make date headers clickable in room booking calendar (:issue:`4099`)
 
 Bugfixes
 ^^^^^^^^

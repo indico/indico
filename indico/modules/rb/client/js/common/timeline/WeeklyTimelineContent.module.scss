@@ -47,6 +47,12 @@
     line-height: $row-height;
     text-align: center;
 
+    &:global(.weekly), &:global(.monthly) {
+        .timeline-label-text {
+            cursor: pointer;
+        }
+    }
+
     .timeline-label-text {
         display: inline-block;
         color: $gray;
