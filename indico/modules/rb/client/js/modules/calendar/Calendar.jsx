@@ -304,6 +304,8 @@ class Calendar extends React.Component {
                   onClickReservation={openBookingDetails}
                   onAddSlot={editable ? this.onAddSlot : null}
                   showUnused={!hideUnused}
+                  setDate={setDate}
+                  setMode={setMode}
                   longLabel
                 />
               ) : (

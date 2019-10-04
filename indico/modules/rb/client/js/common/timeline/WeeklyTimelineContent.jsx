@@ -107,7 +107,7 @@ export default class WeeklyTimelineContent extends DailyTimelineContent {
   }
 
   renderHeader() {
-    const {longLabel, selectable} = this.props;
+    const {longLabel, selectable, setDate, setMode} = this.props;
     const labelWidth = longLabel ? 200 : 150;
     return (
       <>
@@ -118,8 +118,17 @@ export default class WeeklyTimelineContent extends DailyTimelineContent {
           <div style={{minWidth: labelWidth}} />
           <div styleName="style.timeline-header-labels">
             {_.map(this.dates, (dt, n) => (
-              <div styleName="style.timeline-header-label" key={`timeline-header-${n}`}>
-                <span styleName="style.timeline-label-text">
+              <div
+                className={`${style['timeline-header-label']} weekly`}
+                key={`timeline-header-${n}`}
+              >
+                <span
+                  styleName="style.timeline-label-text"
+                  onClick={() => {
+                    setDate(dt);
+                    setMode('days');
+                  }}
+                >
                   {toMoment(dt, 'YYYY-MM-DD').format('ddd D MMM')}
                 </span>
               </div>
