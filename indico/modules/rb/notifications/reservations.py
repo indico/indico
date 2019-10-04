@@ -6,6 +6,7 @@
 # LICENSE file for more details.
 
 from flask import render_template
+from sqlalchemy import and_
 from sqlalchemy.orm import load_only
 
 from indico.core.notifications import email_sender, make_email
@@ -18,14 +19,24 @@ from indico.web.flask.templating import get_template_module
 
 def get_manager_emails(room):
     emails = set(room.notification_emails)
-    if rb_user_settings.get(room.owner, 'email_mode') in (RoomEmailMode.owned, RoomEmailMode.all):
+    if (rb_user_settings.get(room.owner, 'email_mode') in (RoomEmailMode.owned, RoomEmailMode.all)
+            and room not in rb_user_settings.get(room.owner, 'email_blacklist')):
         emails.add(room.owner.email)
+    # skip people who don't want manager emails
+    email_mode_filter = and_(
+        UserSetting.name == 'email_mode',
+        UserSetting.value[()].astext.in_([RoomEmailMode.none.name, RoomEmailMode.owned.name])
+    )
+    # skip people who don't want emails for the room
+    room_blacklist_filter = and_(
+        UserSetting.name == 'email_blacklist',
+        UserSetting.value.contains(unicode(room.id))
+    )
     query = (User.query
              .join(UserSetting)
              .options(load_only('id'))
              .filter(UserSetting.module == 'roombooking',
-                     UserSetting.name == 'email_mode',
-                     UserSetting.value[()].astext.in_([RoomEmailMode.none.name, RoomEmailMode.owned.name])))
+                     email_mode_filter | room_blacklist_filter))
     disabled_emails = {u.email for u in query}
     emails |= room.get_manager_emails() - disabled_emails
     return emails

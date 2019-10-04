@@ -55,7 +55,7 @@ def _import_tasks(sender, **kwargs):
 @signals.users.preferences.connect
 def _get_extra_user_prefs(sender, **kwargs):
     from indico.modules.rb.user_prefs import RBUserPreferences
-    if RBUserPreferences.should_show_setting():
+    if config.ENABLE_ROOMBOOKING and RBUserPreferences.should_show_setting():
         return RBUserPreferences
 
 

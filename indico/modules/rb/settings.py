@@ -7,7 +7,7 @@
 
 from __future__ import unicode_literals
 
-from indico.core.settings.converters import EnumConverter
+from indico.core.settings.converters import EnumConverter, ModelListConverter
 from indico.modules.users import UserSettingsProxy
 from indico.util.i18n import _
 from indico.util.struct.enum import RichIntEnum
@@ -23,6 +23,8 @@ class RoomEmailMode(RichIntEnum):
 
 rb_user_settings = UserSettingsProxy('roombooking', {
     'email_mode': RoomEmailMode.all,
+    'email_blacklist': [],
 }, converters={
     'email_mode': EnumConverter(RoomEmailMode),
+    'email_blacklist': ModelListConverter('Room'),
 })
