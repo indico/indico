@@ -711,7 +711,7 @@ class LatexRunner(object):
                         '-no-shell-escape',
                         '-interaction', 'nonstopmode',
                         '-output-directory', self._dir,
-                        source_file]
+                        os.path.relpath(source_file, self._dir)]
 
         try:
             subprocess.check_call(pdflatex_cmd, stdout=log_file)
