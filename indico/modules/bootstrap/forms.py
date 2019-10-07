@@ -20,7 +20,7 @@ from indico.web.forms.widgets import SwitchWidget
 class BootstrapForm(LocalRegistrationForm):
     first_name = StringField('First Name', [DataRequired()])
     last_name = StringField('Last Name', [DataRequired()])
-    email = EmailField(_('Email address'), [DataRequired()])
+    email = EmailField(_('Email address'), [DataRequired(), Email()])
     affiliation = StringField('Affiliation', [DataRequired()])
     enable_tracking = BooleanField('Join the community', widget=SwitchWidget())
     contact_name = StringField('Contact Name', [UsedIfChecked('enable_tracking'), DataRequired()])
