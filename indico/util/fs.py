@@ -121,7 +121,13 @@ def chmod_umask(path, execute=False):
     """
     # XXX: umask cannot be read except when changing it,
     # so we change it and immediately restore it...
-    umask = os.umask(0)
+    # this is not thread safe and in theory prone to a race condition,
+    # the indico home dir is usually set to 710 and thus doesn't allow
+    # 'others' to access it at all. additionally, the temporary 027
+    # umask results in files being created with 640/750 and thus there's
+    # no risk of security issues/bugs in case the race condition actually
+    # happens (which is extremely unlikely anyawy)
+    umask = os.umask(0o027)
     os.umask(umask)
     default = 0o777 if execute else 0o666
     os.chmod(path, default & ~umask)
