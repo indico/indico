@@ -59,8 +59,8 @@ class EventLinkPlaceholder(Placeholder):
 
     @classmethod
     def render(cls, person, event, **kwargs):
-        return Markup('<a href="{url}" title="{title}">{url}</a>'.format(url=event.short_external_url,
-                                                                         title=escape(event.title)))
+        return Markup('<a href="{url}" title="{title}">{url}</a>').format(url=event.short_external_url,
+                                                                          title=event.title)
 
 
 class RegisterLinkPlaceholder(Placeholder):
@@ -70,4 +70,4 @@ class RegisterLinkPlaceholder(Placeholder):
     @classmethod
     def render(cls, person, event, **kwargs):
         url = url_for_register(event.url, email=person.email)
-        return Markup('<a href="{url}">{url}</a>'.format(url=url))
+        return Markup('<a href="{url}">{url}</a>').format(url=url)

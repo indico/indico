@@ -49,8 +49,8 @@ class EventLinkPlaceholder(Placeholder):
     @classmethod
     def render(cls, regform, registration):
         regform = registration.registration_form
-        return Markup('<a href="{url}" title="{title}">{url}</a>'.format(url=regform.event.short_external_url,
-                                                                         title=escape(regform.event.title)))
+        return Markup('<a href="{url}" title="{title}">{url}</a>').format(url=regform.event.short_external_url,
+                                                                          title=regform.event.title)
 
 
 class IDPlaceholder(Placeholder):
@@ -69,7 +69,7 @@ class LinkPlaceholder(Placeholder):
     @classmethod
     def render(cls, regform, registration):
         url = url_for('.display_regform', registration.registration_form, token=registration.uuid, _external=True)
-        return Markup('<a href="{url}">{url}</a>'.format(url=url))
+        return Markup('<a href="{url}">{url}</a>').format(url=url)
 
 
 class FieldPlaceholder(ParametrizedPlaceholder):

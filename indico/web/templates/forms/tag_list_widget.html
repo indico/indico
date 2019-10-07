@@ -22,7 +22,7 @@
             var field = $('#{{ field.id }}');
 
             $(document).ready(function() {
-                $('#{{ field.id }}').nextAll('input[name={{ field.name }}]').remove();
+                $('#{{ field.id }}').nextAll('input[name="{{ field.name }}"]').remove();
 
                 new Taggle('{{ field.id }}', {
                     allowDuplicates: false,
