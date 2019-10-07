@@ -63,8 +63,8 @@
 {% endmacro %}
 
 {% macro render_contribution(contrib, timezone, index) %}
-    <tr bgcolor={{ "silver" if index % 2 != 0 else "#D2D2D2" }}>
-        <td bgcolor=${"#D0D0D0" if index % 2 != 0 else "#E2E2E2"}  valign="top" width="5%">
+    <tr bgcolor="{{ 'silver' if index % 2 != 0 else '#D2D2D2' }}">
+        <td bgcolor="{{ '#D0D0D0' if index % 2 != 0 else '#E2E2E2' }}" valign="top" width="5%">
             {{ contrib.start_dt | format_time(timezone=timezone) }}
         </td>
         <td valign="top">

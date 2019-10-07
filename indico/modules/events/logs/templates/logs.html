@@ -7,6 +7,6 @@
 {% block content %}
     <div class="event-log"
          data-fetch-logs-url="{{ url_for('.logs', event) }}"
-         data-realms={{ realms|tojson|forceescape }}>
+         data-realms="{{ realms|tojson|forceescape }}">
     </div>
 {% endblock %}
