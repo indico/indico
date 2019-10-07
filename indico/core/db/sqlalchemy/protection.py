@@ -259,10 +259,13 @@ class ProtectionMixin(object):
                       that the change should not be logged, trigger
                       emails or result in similar notifications.
         :return: The ACL entry for the given principal or ``None`` if
-                 he was removed (or not added).
+                 there is no corresponding entry in the end.
         """
         principal = _resolve_principal(principal)
         principal_class, entry = _get_acl_data(self, principal)
+        if read_access is None:
+            # nothing to do -> return the entry (which may be None)
+            return entry
         if entry is None and read_access:
             entry = principal_class(principal=principal)
             self.acl_entries.add(entry)
@@ -413,7 +416,7 @@ class ProtectionManagersMixin(ProtectionMixin):
                       that the change should not be logged, trigger
                       emails or result in similar notifications.
         :return: The ACL entry for the given principal or ``None`` if
-                 he was removed (or not added).
+                 there is no corresponding entry in the end.
         """
         if permissions is not None and (add_permissions or del_permissions):
             raise ValueError('add_permissions/del_permissions and permissions are mutually exclusive')
