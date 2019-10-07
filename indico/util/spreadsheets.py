@@ -52,7 +52,7 @@ def _prepare_header(header, as_unicode=True):
 _prepare_header_utf8 = partial(_prepare_header, as_unicode=False)
 
 
-def _prepare_csv_data(data, _linebreak_re=re.compile(ur'(\r?\n)+')):
+def _prepare_csv_data(data, _linebreak_re=re.compile(r'(\r?\n)+'), _dangerous_chars_re=re.compile(r'^[=+@-]+')):
     if isinstance(data, (list, tuple)):
         data = '; '.join(data)
     elif isinstance(data, set):
@@ -61,7 +61,12 @@ def _prepare_csv_data(data, _linebreak_re=re.compile(ur'(\r?\n)+')):
         data = 'Yes' if data else 'No'
     elif data is None:
         data = ''
-    return _linebreak_re.sub('    ', unicode(data)).encode('utf-8')
+    data = _linebreak_re.sub('    ', unicode(data))
+    # https://www.owasp.org/index.php/CSV_Injection
+    # quoting the cell's value does NOT mitigate this, so we need to strip
+    # those characters from the beginning...
+    data = _dangerous_chars_re.sub('', data)
+    return data.encode('utf-8')
 
 
 def generate_csv(headers, rows):
