@@ -7,6 +7,13 @@ Version 2.2.3
 
 *Unreleased*
 
+Security fixes
+^^^^^^^^^^^^^^
+
+- Strip ``@``, ``+``, ``-`` and ``=`` from the beginning of strings when exporting
+  CSV files to avoid `security issues <https://www.owasp.org/index.php/CSV_Injection>`_
+  when opening the CSV file in Excel
+
 Improvements
 ^^^^^^^^^^^^
 
