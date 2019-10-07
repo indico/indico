@@ -128,7 +128,8 @@ safe_mathmode_commands = {
     'triangleleft', 'triangleright', 'tt', 'underbrace', 'underleftarrow', 'underleftrightarrow', 'underline',
     'underrightarrow', 'underset', 'Uparrow', 'uparrow', 'Updownarrow', 'updownarrow', 'uplus', 'uproot', 'Upsilon',
     'upsilon', 'varepsilon', 'varphi', 'varpi', 'varrho', 'varsigma', 'vartheta', 'vcenter', 'vdash', 'vdots', 'vec',
-    'vee', 'Vert', 'vert', 'vphantom', 'wedge', 'widehat', 'widetilde', 'wp', 'wr', 'Xi', 'xi', 'zeta'}
+    'vee', 'Vert', 'vert', 'vphantom', 'wedge', 'widehat', 'widetilde', 'wp', 'wr', 'Xi', 'xi', 'zeta', '\\'
+}
 
 
 class ImageURLException(Exception):
@@ -188,10 +189,10 @@ def latex_escape(text, ignore_math=True, ignore_braces=False):
 
 def sanitize_mathmode(text):
     def _escape_unsafe_command(m):
-        command = m.group(2)
-        return m.group(0) if command in safe_mathmode_commands else m.group(1) + r'\\' + command
+        command = m.group(1)
+        return m.group(0) if command in safe_mathmode_commands else r'\\' + command
 
-    return re.sub(r'(^|[^\\])\\([a-zA-Z]+)', _escape_unsafe_command, text)
+    return re.sub(r'\\([a-zA-Z]+|\\)', _escape_unsafe_command, text)
 
 
 def escape_latex_entities(text):
