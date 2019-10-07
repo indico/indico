@@ -88,25 +88,27 @@
             </div>
         </div>
 
-        <div class="section">
-            <div class="icon icon-book"></div>
-            <div class="text">
-                <div class="label">
-                    {%- trans %}Book of abstracts{% endtrans -%}
+        {% if indico_config.LATEX_ENABLED %}
+            <div class="section">
+                <div class="icon icon-book"></div>
+                <div class="text">
+                    <div class="label">
+                        {%- trans %}Book of abstracts{% endtrans -%}
+                    </div>
+                    {%- trans url=url_for('.export_boa', event) -%}
+                        Customize and <a href={{ url }}>download</a> the book of abstracts
+                    {%- endtrans -%}
                 </div>
-                {%- trans url=url_for('.export_boa', event) -%}
-                    Customize and <a href={{ url }}>download</a> the book of abstracts
-                {%- endtrans -%}
+                <div class="toolbar">
+                    <a href="#" class="i-button icon-settings"
+                       data-href="{{ url_for('.manage_boa', event) }}"
+                       data-title="{% trans %}Configure the book of abstracts{% endtrans %}"
+                       data-ajax-dialog>
+                        {%- trans %}Settings{% endtrans -%}
+                    </a>
+                </div>
             </div>
-            <div class="toolbar">
-                <a href="#" class="i-button icon-settings"
-                   data-href="{{ url_for('.manage_boa', event) }}"
-                   data-title="{% trans %}Configure the book of abstracts{% endtrans %}"
-                   data-ajax-dialog>
-                    {%- trans %}Settings{% endtrans -%}
-                </a>
-            </div>
-        </div>
+        {% endif %}
     </div>
 
     <div class="action-box">

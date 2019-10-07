@@ -168,6 +168,9 @@ class LatexRunner(object):
         return template.render(font_dir=font_dir, **kwargs)
 
     def run(self, template_name, **kwargs):
+        if not config.LATEX_ENABLED:
+            raise RuntimeError('LaTeX is not enabled')
+
         chmod_umask(self.source_dir, execute=True)
         source_filename = os.path.join(self.source_dir, template_name + '.tex')
         target_filename = os.path.join(self.source_dir, template_name + '.pdf')

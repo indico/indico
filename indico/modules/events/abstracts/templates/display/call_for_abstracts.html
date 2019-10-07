@@ -24,11 +24,13 @@
                             <input type="text" id="search-input" placeholder="{% trans %}Enter #id or search string{% endtrans %}">
                         </div>
                     </div>
-                    <div class="group">
-                        <a href="{{ url_for('abstracts.my_abstracts_pdf', event) }}"
-                           title="{% trans %}Export to PDF{% endtrans %}"
-                           class="i-button icon-file-pdf"></a>
-                    </div>
+                    {% if indico_config.LATEX_ENABLED %}
+                        <div class="group">
+                            <a href="{{ url_for('abstracts.my_abstracts_pdf', event) }}"
+                               title="{% trans %}Export to PDF{% endtrans %}"
+                               class="i-button icon-file-pdf"></a>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
         </div>

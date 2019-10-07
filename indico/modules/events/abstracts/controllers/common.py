@@ -11,7 +11,9 @@ import os
 from operator import attrgetter
 
 from flask import redirect
+from werkzeug.exceptions import NotFound
 
+from indico.core.config import config
 from indico.legacy.pdfinterface.latex import AbstractsToPDF, ConfManagerAbstractsToPDF
 from indico.modules.events.abstracts.models.files import AbstractFile
 from indico.modules.events.abstracts.util import generate_spreadsheet_from_abstracts
@@ -66,6 +68,8 @@ class AbstractsExportPDFMixin:
     """Export list of abstracts as PDF"""
 
     def _process(self):
+        if not config.LATEX_ENABLED:
+            raise NotFound
         sorted_abstracts = sorted(self.abstracts, key=attrgetter('friendly_id'))
         cls = ConfManagerAbstractsToPDF if self.management else AbstractsToPDF
         pdf = cls(self.event, sorted_abstracts)

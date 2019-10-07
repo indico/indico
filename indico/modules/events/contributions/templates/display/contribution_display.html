@@ -117,7 +117,9 @@
         {%- endif %}
         {{ template_hook('url-shortener', target=url_for('contributions.display_contribution', contribution),
                          classes='i-button icon-link') }}
-        <a href="{{ url_for('contributions.export_pdf', contribution) }}" class="i-button icon-file-pdf"></a>
+        {% if indico_config.LATEX_ENABLED %}
+            <a href="{{ url_for('contributions.export_pdf', contribution) }}" class="i-button icon-file-pdf"></a>
+        {% endif %}
         {% if contribution.timetable_entry -%}
             {% if g.static_site %}
                 <a href="{{ url_for('contributions.export_ics', contribution) }}"

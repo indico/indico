@@ -8,7 +8,9 @@
 from __future__ import unicode_literals
 
 from flask import flash
+from werkzeug.exceptions import NotFound
 
+from indico.core.config import config
 from indico.modules.events.abstracts.controllers.base import RHAbstractsBase, RHManageAbstractsBase
 from indico.modules.events.abstracts.forms import BOASettingsForm
 from indico.modules.events.abstracts.settings import boa_settings
@@ -36,4 +38,6 @@ class RHExportBOA(RHAbstractsBase):
     """Export the book of abstracts"""
 
     def _process(self):
+        if not config.LATEX_ENABLED:
+            raise NotFound
         return send_file('book-of-abstracts.pdf', create_boa(self.event), 'application/pdf')

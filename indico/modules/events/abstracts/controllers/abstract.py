@@ -9,7 +9,9 @@ from __future__ import unicode_literals
 
 from flask import flash, request, session
 from sqlalchemy.orm import defaultload, joinedload
+from werkzeug.exceptions import NotFound
 
+from indico.core.config import config
 from indico.legacy.pdfinterface.latex import AbstractToPDF, ConfManagerAbstractToPDF
 from indico.modules.events.abstracts.controllers.base import RHAbstractBase
 from indico.modules.events.abstracts.models.files import AbstractFile
@@ -82,6 +84,8 @@ class RHAbstractNotificationLog(RHAbstractBase):
 
 class RHAbstractExportPDF(RHAbstractBase):
     def _process(self):
+        if not config.LATEX_ENABLED:
+            raise NotFound
         pdf = AbstractToPDF(self.abstract)
         filename = 'abstract-{}.pdf'.format(self.abstract.friendly_id)
         return send_file(filename, pdf.generate(), 'application/pdf')
@@ -94,6 +98,8 @@ class RHAbstractExportFullPDF(RHAbstractBase):
         return self.abstract.can_see_reviews(session.user)
 
     def _process(self):
+        if not config.LATEX_ENABLED:
+            raise NotFound
         pdf = ConfManagerAbstractToPDF(self.abstract)
         filename = 'abstract-{}-reviews.pdf'.format(self.abstract.friendly_id)
         return send_file(filename, pdf.generate(), 'application/pdf')

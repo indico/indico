@@ -13,6 +13,7 @@ from flask import flash, jsonify, redirect, request, session
 from sqlalchemy.orm import undefer
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
+from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.protection import ProtectionMode, render_acl
 from indico.core.permissions import get_principal_permissions, update_permissions
@@ -450,18 +451,24 @@ class RHContributionsExportExcel(RHManageContributionsExportActionsBase):
 
 class RHContributionsExportPDF(RHManageContributionsExportActionsBase):
     def _process(self):
+        if not config.LATEX_ENABLED:
+            raise NotFound
         pdf = ContribsToPDF(self.event, self.contribs)
         return send_file('contributions.pdf', pdf.generate(), 'application/pdf')
 
 
 class RHContributionsExportPDFBook(RHManageContributionsExportActionsBase):
     def _process(self):
+        if not config.LATEX_ENABLED:
+            raise NotFound
         pdf = ContributionBook(self.event, session.user, self.contribs, tz=self.event.timezone)
         return send_file('book-of-abstracts.pdf', pdf.generate(), 'application/pdf')
 
 
 class RHContributionsExportPDFBookSorted(RHManageContributionsExportActionsBase):
     def _process(self):
+        if not config.LATEX_ENABLED:
+            raise NotFound
         pdf = ContributionBook(self.event, session.user, self.contribs, tz=self.event.timezone,
                                sort_by=BOASortField.board_number)
         return send_file('book-of-abstracts.pdf', pdf.generate(), 'application/pdf')
@@ -469,6 +476,8 @@ class RHContributionsExportPDFBookSorted(RHManageContributionsExportActionsBase)
 
 class RHContributionsExportPDFBookSortedSession(RHManageContributionsExportActionsBase):
     def _process(self):
+        if not config.LATEX_ENABLED:
+            raise NotFound
         pdf = ContributionBook(self.event, session.user, self.contribs, tz=self.event.timezone,
                                sort_by=BOASortField.session_board_number)
         return send_file('book-of-abstracts.pdf', pdf.generate(), 'application/pdf')
@@ -476,6 +485,8 @@ class RHContributionsExportPDFBookSortedSession(RHManageContributionsExportActio
 
 class RHContributionsExportPDFBookSortedSchedule(RHManageContributionsExportActionsBase):
     def _process(self):
+        if not config.LATEX_ENABLED:
+            raise NotFound
         pdf = ContributionBook(self.event, session.user, self.contribs, tz=self.event.timezone,
                                sort_by=BOASortField.schedule_board_number)
         return send_file('book-of-abstracts.pdf', pdf.generate(), 'application/pdf')
@@ -483,6 +494,8 @@ class RHContributionsExportPDFBookSortedSchedule(RHManageContributionsExportActi
 
 class RHContributionsExportPDFBookSortedAll(RHManageContributionsExportActionsBase):
     def _process(self):
+        if not config.LATEX_ENABLED:
+            raise NotFound
         pdf = ContributionBook(self.event, session.user, self.contribs, tz=self.event.timezone,
                                sort_by=BOASortField.session_schedule_board)
         return send_file('book-of-abstracts.pdf', pdf.generate(), 'application/pdf')
