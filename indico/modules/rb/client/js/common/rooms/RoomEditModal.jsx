@@ -278,9 +278,10 @@ const columns = [
           name: 'longitude',
           label: Translate.string('Longitude'),
           inputArgs: {
-            type: 'number',
+            type: 'text',
             fluid: true,
           },
+          parse: longitude => parseFloat(longitude),
           required: false,
         },
         {
@@ -288,9 +289,10 @@ const columns = [
           name: 'latitude',
           label: Translate.string('Latitude'),
           inputArgs: {
-            type: 'number',
+            type: 'text',
             fluid: true,
           },
+          parse: longitude => parseFloat(longitude),
           required: false,
         },
       ],
@@ -790,6 +792,7 @@ class RoomEditModal extends React.Component {
             name={content.name}
             label={content.label}
             required={content.required}
+            parse={content.parse}
             {...content.inputArgs}
           />
         );
