@@ -129,7 +129,13 @@ class LatexRunner(object):
                         os.path.relpath(source_file, self.source_dir)]
 
         try:
-            subprocess.check_call(pdflatex_cmd, stdout=log_file, cwd=self.source_dir)
+            # set config which limits location of input/output files
+            subprocess.check_call(
+                pdflatex_cmd,
+                stdout=log_file,
+                cwd=self.source_dir,
+                env=dict(os.environ, TEXMFCNF='{}:'.format(os.path.dirname(__file__)))
+            )
             Logger.get('pdflatex').debug("PDF created successfully!")
 
         except subprocess.CalledProcessError:

@@ -8,6 +8,7 @@ graft indico/translations/
 graft indico/web/static
 prune indico/web/client
 prune indico/htdocs
+include indico/legacy/pdfinterface/texmf.cnf
 
 global-exclude *.pyc __pycache__ .keep
 include indico/migrations/versions/.keep
