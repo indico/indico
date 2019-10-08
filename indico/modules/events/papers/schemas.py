@@ -112,7 +112,7 @@ class PaperReviewCommentSchema(mm.ModelSchema):
 
 
 class PaperSchema(mm.Schema):
-    is_in_final_state = Boolean(attribute='is_in_final_state')
+    is_in_final_state = Boolean()
     contribution = Nested(ContributionSchema)
     event = Nested(PaperEventSchema)
     revisions = List(Nested(PaperRevisionSchema))
