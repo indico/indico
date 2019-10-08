@@ -5,7 +5,7 @@ Changelog
 Version 2.2.3
 -------------
 
-*Unreleased*
+*Released on October 08, 2019*
 
 Security fixes
 ^^^^^^^^^^^^^^
