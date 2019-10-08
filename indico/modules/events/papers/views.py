@@ -27,8 +27,7 @@ class WPManagePapers(MathjaxMixin, WPEventManagement):
 
 class WPDisplayPapersBase(WPConferenceDisplayBase):
     template_prefix = 'events/papers/'
-    bundles = ('markdown.js', 'module_events.management.js',
-                                           'module_events.papers.js')
+    bundles = ('markdown.js', 'module_events.management.js', 'module_events.papers.js')
 
 
 class WPDisplayJudgingArea(WPDisplayPapersBase):
@@ -63,3 +62,8 @@ class WPDisplayReviewingArea(WPDisplayPapersBase):
 
 class WPDisplayCallForPapers(WPDisplayPapersBase):
     menu_entry_name = 'call_for_papers'
+
+
+class WPNewDisplayCallForPapers(WPDisplayPapersBase):
+    menu_entry_name = 'call_for_papers'
+    bundles = ('module_events.papers.css',)
