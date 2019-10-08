@@ -1,0 +1,7 @@
+{%- extends 'events/papers/_base.html' -%}
+
+{% block content -%}
+    <div class="paper-timeline"
+         data-event-id="{{ event.id }}"
+         data-contrib-id="{{ paper.contribution.id }}"></div>
+{%- endblock %}

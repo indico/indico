@@ -5,7 +5,16 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-/* global setupListGenerator:false, setupTableSorter:false, setupSearchBox:false */
+/* global setupListGenerator:false, setupTableSorter:false, setupSearchBox:false, enableIfChecked:false */
+
+import React from 'react';
+import ReactDOM from 'react-dom';
+import {Provider} from 'react-redux';
+
+import createReduxStore from 'indico/utils/redux';
+
+import paperReducers from './reducers';
+import Paper from './components/Paper';
 
 import 'indico/modules/events/reviews';
 
@@ -79,3 +88,27 @@ import 'indico/modules/events/reviews';
     }
   };
 })(window);
+
+window.addEventListener('load', () => {
+  const rootElement = document.querySelector('.paper-timeline');
+  if (!rootElement) {
+    return;
+  }
+
+  const eventId = parseInt(rootElement.dataset.eventId, 10);
+  const contributionId = parseInt(rootElement.dataset.contribId, 10);
+  const initialData = {
+    staticData: {
+      user: {
+        fullName: Indico.User.full_name,
+        avatarBgColor: Indico.User.avatar_bg_color,
+      },
+    },
+  };
+  const store = createReduxStore('paper-timeline', {paper: paperReducers}, initialData);
+
+  ReactDOM.render(
+    React.createElement(Provider, {store}, React.createElement(Paper, {eventId, contributionId})),
+    rootElement
+  );
+});

@@ -9,12 +9,26 @@ from __future__ import unicode_literals
 
 from flask import current_app, g
 
-from indico.modules.events.papers.controllers import display, management, paper, templates
+from indico.modules.events.papers.controllers import api, display, management, paper, templates
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
 _bp = IndicoBlueprint('papers', __name__, url_prefix='/event/<confId>', template_folder='templates',
                       virtual_template_folder='events/papers')
+
+# CfP React
+_bp.add_url_rule('/papers/<int:contrib_id>/new', 'new_paper_timeline', display.RHNewPaperTimeline)
+
+# API
+_api_bp = IndicoBlueprint('papers_api', __name__, url_prefix='/event/<confId>/api', template_folder='templates',
+                          virtual_template_folder='events/papers')
+
+_api_bp.add_url_rule('/papers/<int:contrib_id>', 'paper_details', api.RHPaperDetails)
+_api_bp.add_url_rule('/papers/<int:contrib_id>', 'reset_paper_state', api.RHResetPaperState, methods=('DELETE',))
+_api_bp.add_url_rule('/papers/<int:contrib_id>/permissions', 'paper_permissions', api.RHPaperPermissions)
+_api_bp.add_url_rule('/papers/<int:contrib_id>/revision/<int:revision_id>/comment/<int:comment_id>',
+                     'delete_comment', api.RHDeleteComment, methods=('DELETE',))
+_api_bp.add_url_rule('/papers/<int:contrib_id>/judge', 'judge_paper', api.RHJudgePaper, methods=('POST',))
 
 
 # Display pages
