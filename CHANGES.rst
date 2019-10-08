@@ -31,6 +31,7 @@ Bugfixes
 - Fix ACL entries referencing event roles from the old event when cloning an
   event with event roles in the ACL. Run ``indico maint fix-event-role-acls``
   after updating to fix any affected ACLs (:issue:`4090`)
+- Fix validation issues in coordinates fields when editing rooms (:issue:`4103`)
 
 Version 2.2.2
 -------------
