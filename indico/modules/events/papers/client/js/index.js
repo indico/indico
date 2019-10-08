@@ -5,15 +5,17 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-/* global setupListGenerator:false, setupTableSorter:false, setupSearchBox:false */
+/* global setupListGenerator:false, setupTableSorter:false, setupSearchBox:false, enableIfChecked:false */
 
 import 'indico/modules/events/reviews';
+
+import setupReactPaperTimeline from './setup';
 
 (function(global) {
   'use strict';
 
   global.setupPaperAssignmentList = function setupPaperAssignmentList() {
-    var filterConfig = {
+    const filterConfig = {
       itemHandle: 'tr',
       listItems: '#assignment-list tbody tr',
       term: '#search-input',
@@ -35,7 +37,7 @@ import 'indico/modules/events/reviews';
     );
 
     if (options.hasPapers) {
-      var filterConfig = {
+      let filterConfig = {
         itemHandle: 'div.contribution-row',
       };
       if (options.list === 'to-review') {
@@ -59,14 +61,14 @@ import 'indico/modules/events/reviews';
           filterConfig
         );
       }
-      var applySearchFilters = setupSearchBox(filterConfig);
+      const applySearchFilters = setupSearchBox(filterConfig);
       applySearchFilters();
     }
   };
 
   global.setupCallForPapersPage = function setupCallForPapersPage(options) {
     if (options.hasPapers) {
-      var filterConfig = {
+      const filterConfig = {
         itemHandle: 'div.contribution-row',
         listItems: 'div.paper-contribution-list div.contribution-row',
         term: '#search-input',
@@ -74,8 +76,12 @@ import 'indico/modules/events/reviews';
         placeholder: '#filter-placeholder',
       };
 
-      var applySearchFilters = setupSearchBox(filterConfig);
+      const applySearchFilters = setupSearchBox(filterConfig);
       applySearchFilters();
     }
   };
 })(window);
+
+document.addEventListener('DOMContentLoaded', () => {
+  setupReactPaperTimeline();
+});

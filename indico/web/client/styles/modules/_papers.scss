@@ -243,10 +243,14 @@
     .paper-metadata-dt {
         border-bottom: 1px dotted $gray;
         color: $gray;
-        margin: 0 3px 0 3px;
+        margin: 0 3px;
 
         &:hover {
             color: $light-black;
         }
     }
+}
+
+.paper-timeline {
+    min-height: 500px;
 }

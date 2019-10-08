@@ -24,7 +24,8 @@ from indico.modules.events.papers.operations import (create_comment, create_pape
 from indico.modules.events.papers.util import (get_contributions_with_paper_submitted_by_user,
                                                get_user_contributions_to_review, get_user_reviewed_contributions,
                                                get_user_submittable_contributions)
-from indico.modules.events.papers.views import WPDisplayCallForPapers, WPDisplayReviewingArea, render_paper_page
+from indico.modules.events.papers.views import (WPDisplayCallForPapers, WPDisplayReviewingArea,
+                                                WPNewDisplayCallForPapers, render_paper_page)
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
 from indico.web.util import _pop_injected_js, jsonify, jsonify_data, jsonify_form, jsonify_template
@@ -65,6 +66,17 @@ class RHPaperTimeline(RHPaperBase):
                 self.event.cfp.is_manager(session.user) or
                 self.paper.can_review(session.user) or
                 self.paper.can_judge(session.user))
+
+
+class RHNewPaperTimeline(RHPaperBase):
+    def _check_paper_protection(self):
+        return (self.contribution.is_user_associated(session.user, check_abstract=True) or
+                self.event.cfp.is_manager(session.user) or
+                self.paper.can_review(session.user) or
+                self.paper.can_judge(session.user))
+
+    def _process(self):
+        return WPNewDisplayCallForPapers.render_template('paper_new.html', self.paper.event, paper=self.paper)
 
 
 class RHDownloadPaperFile(RHPaperBase):
