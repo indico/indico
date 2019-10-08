@@ -271,6 +271,8 @@
 
   var pd = PageDownMathJax();
 
+  window.mathJax = pd.mathJax.bind(pd);
+
   $.fn.mathJax = function() {
     $(this).each(function() {
       pd.mathJax(this);
