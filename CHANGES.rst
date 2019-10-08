@@ -164,6 +164,22 @@ Internal Changes
 
 ----
 
+Version 2.1.10
+--------------
+
+*Released on October 08, 2019*
+
+Security fixes
+^^^^^^^^^^^^^^
+
+- Strip ``@``, ``+``, ``-`` and ``=`` from the beginning of strings when exporting
+  CSV files to avoid `security issues <https://www.owasp.org/index.php/CSV_Injection>`_
+  when opening the CSV file in Excel
+- Use 027 instead of 000 umask when temporarily changing it to get the current umask
+- Fix LaTeX sanitization to prevent malicious users from running unsafe LaTeX commands
+  through specially crafted abstracts or contribution descriptions, which could lead to
+  the disclosure of local file contents
+
 Version 2.1.9
 -------------
 
