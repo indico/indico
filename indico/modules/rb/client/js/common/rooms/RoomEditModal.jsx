@@ -46,6 +46,7 @@ import {
   FinalInput,
   FinalRadio,
   FinalTextArea,
+  parsers as p,
 } from 'indico/react/forms';
 import {FavoritesProvider} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
@@ -75,6 +76,8 @@ function validate(fields) {
     bookingLimitDays,
     nonbookablePeriods,
     owner,
+    latitude,
+    longitude,
   } = fields;
   const errors = {};
   if (!building) {
@@ -123,6 +126,12 @@ function validate(fields) {
   }
   if (!owner) {
     errors.owner = Translate.string('You need to specify the owner of the room.');
+  }
+  if (latitude !== null && typeof latitude !== 'number') {
+    errors.latitude = Translate.string('Coordinates should be valid numbers.');
+  }
+  if (longitude !== null && typeof longitude !== 'number') {
+    errors.longitude = Translate.string('Coordinates should be valid numbers.');
   }
   return errors;
 }
@@ -278,9 +287,10 @@ const columns = [
           name: 'longitude',
           label: Translate.string('Longitude'),
           inputArgs: {
-            type: 'number',
+            type: 'text',
             fluid: true,
           },
+          parse: v => p.number(v, false),
           required: false,
         },
         {
@@ -288,9 +298,10 @@ const columns = [
           name: 'latitude',
           label: Translate.string('Latitude'),
           inputArgs: {
-            type: 'number',
+            type: 'text',
             fluid: true,
           },
+          parse: v => p.number(v, false),
           required: false,
         },
       ],
@@ -790,6 +801,7 @@ class RoomEditModal extends React.Component {
             name={content.name}
             label={content.label}
             required={content.required}
+            parse={content.parse}
             {...content.inputArgs}
           />
         );
