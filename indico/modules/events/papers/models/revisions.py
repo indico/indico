@@ -155,6 +155,14 @@ class PaperRevision(ProposalRevisionMixin, RenderModeMixin, db.Model):
     def number(self):
         return self.paper.revisions.index(self) + 1
 
+    @property
+    def spotlight_file(self):
+        return self.get_spotlight_file()
+
+    @property
+    def timeline(self):
+        return self.get_timeline()
+
     @paper.setter
     def paper(self, paper):
         self._contribution = paper.contribution
