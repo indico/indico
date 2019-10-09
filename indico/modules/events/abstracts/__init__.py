@@ -10,6 +10,7 @@ from __future__ import unicode_literals
 from flask import render_template, session
 
 from indico.core import signals
+from indico.core.config import config
 from indico.core.logger import Logger
 from indico.core.permissions import ManagementPermission
 from indico.modules.events.abstracts.clone import AbstractSettingsCloner
@@ -120,13 +121,16 @@ def _extend_event_menu(sender, **kwargs):
     from indico.modules.events.abstracts.util import has_user_tracks
     from indico.modules.events.layout.util import MenuEntryData
 
+    def _boa_visible(event):
+        return config.LATEX_ENABLED and event.has_feature('abstracts')
+
     def _reviewing_area_visible(event):
         if not session.user or not event.has_feature('abstracts'):
             return False
         return has_user_tracks(event, session.user)
 
     yield MenuEntryData(title=_("Book of Abstracts"), name='abstracts_book', endpoint='abstracts.export_boa',
-                        position=9, visible=lambda event: event.has_feature('abstracts'), static_site=True)
+                        position=9, visible=_boa_visible, static_site=True)
     yield MenuEntryData(title=_("Call for Abstracts"), name='call_for_abstracts',
                         endpoint='abstracts.call_for_abstracts', position=2,
                         visible=lambda event: event.has_feature('abstracts'))
