@@ -406,14 +406,14 @@ FinalDropdown.defaultProps = {
 /**
  * A submit button that will update according to the final-form state.
  */
-export function FinalSubmitButton({label, form}) {
+export function FinalSubmitButton({label, form, disabledUntilChange}) {
   return (
     <FormSpy subscription={{hasValidationErrors: true, pristine: true, submitting: true}}>
       {({hasValidationErrors, pristine, submitting}) => (
         <Form.Button
           type="submit"
           form={form}
-          disabled={hasValidationErrors || pristine || submitting}
+          disabled={hasValidationErrors || (disabledUntilChange && pristine) || submitting}
           loading={submitting}
           primary
           content={label}
@@ -426,8 +426,10 @@ export function FinalSubmitButton({label, form}) {
 FinalSubmitButton.propTypes = {
   label: PropTypes.string.isRequired,
   form: PropTypes.string,
+  disabledUntilChange: PropTypes.bool,
 };
 
 FinalSubmitButton.defaultProps = {
   form: null,
+  disabledUntilChange: true,
 };
