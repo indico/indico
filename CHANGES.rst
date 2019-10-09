@@ -65,6 +65,7 @@ Improvements
   requires it (such as contribution PDF export or the Book of Abstracts).
   **LaTeX is now disabled by default, unless the :data:`XELATEX_PATH` is
   explicitly set in ``indico.conf``.
+  explicitly set in ``indico.conf``.**
 
 Bugfixes
 ^^^^^^^^
