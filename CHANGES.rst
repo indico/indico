@@ -63,7 +63,7 @@ Improvements
 - Show times in room booking log entries (:issue:`4099`)
 - Support disabling server-side LaTeX altogether and hide anything that
   requires it (such as contribution PDF export or the Book of Abstracts).
-  **LaTeX is now disabled by default, unless the :data:`XELATEX_PATH` i
+  **LaTeX is now disabled by default, unless the :data:`XELATEX_PATH` is
   explicitly set in ``indico.conf``.
 
 Bugfixes
