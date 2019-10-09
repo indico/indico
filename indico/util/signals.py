@@ -54,9 +54,9 @@ def named_objects_from_signal(signal_response, name_attr='name', plugin_attr=Non
 
     The signal needs to return either a single object (which is not a
     generator) or a generator (usually by returning its values using
-    `yield`).
+    ``yield``).
 
-    :param signal_response: The return value of a Signal's `.send()` method
+    :param signal_response: The return value of a Signal's ``.send()`` method
     :param name_attr: The attribute containing each object's unique name
     :param plugin_attr: The attribute that will be set to the plugin containing
                         the object (set to `None` for objects in the core)
@@ -67,6 +67,8 @@ def named_objects_from_signal(signal_response, name_attr='name', plugin_attr=Non
         for plugin, cls in objects:
             setattr(cls, plugin_attr, plugin)
     mapping = {getattr(cls, name_attr): cls for _, cls in objects}
+    # check for two different objects having the same name, e.g. because of
+    # two plugins using a too generic name for their object
     conflicting = {cls for _, cls in objects} - set(mapping.viewvalues())
     if conflicting:
         names = ', '.join(sorted(getattr(x, name_attr) for x in conflicting))

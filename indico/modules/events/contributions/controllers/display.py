@@ -11,6 +11,7 @@ from flask import jsonify, request, session
 from sqlalchemy.orm import joinedload, load_only
 from werkzeug.exceptions import Forbidden, NotFound
 
+from indico.core.config import config
 from indico.core.db import db
 from indico.legacy.pdfinterface.latex import ContribsToPDF, ContribToPDF
 from indico.modules.events.abstracts.util import filter_field_values
@@ -177,12 +178,16 @@ class RHContributionAuthor(RHContributionDisplayBase):
 
 class RHContributionExportToPDF(RHContributionDisplayBase):
     def _process(self):
+        if not config.LATEX_ENABLED:
+            raise NotFound
         pdf = ContribToPDF(self.contrib)
         return send_file('contribution.pdf', pdf.generate(), 'application/pdf')
 
 
 class RHContributionsExportToPDF(RHContributionList):
     def _process(self):
+        if not config.LATEX_ENABLED:
+            raise NotFound
         contribs = self.list_generator.get_list_kwargs()['contribs']
         pdf = ContribsToPDF(self.event, contribs)
         return send_file('contributions.pdf', pdf.generate(), 'application/pdf')

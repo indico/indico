@@ -145,10 +145,16 @@ class LatexRunner(object):
                         '-no-shell-escape',
                         '-interaction', 'nonstopmode',
                         '-output-directory', self.source_dir,
-                        source_file]
+                        os.path.relpath(source_file, self.source_dir)]
 
         try:
-            subprocess.check_call(pdflatex_cmd, stdout=log_file, cwd=self.source_dir)
+            # set config which limits location of input/output files
+            subprocess.check_call(
+                pdflatex_cmd,
+                stdout=log_file,
+                cwd=self.source_dir,
+                env=dict(os.environ, TEXMFCNF='{}:'.format(os.path.dirname(__file__)))
+            )
             Logger.get('pdflatex').debug("PDF created successfully!")
 
         except subprocess.CalledProcessError:
@@ -199,6 +205,8 @@ class LatexRunner(object):
         return source_filename, target_filename
 
     def run(self, template_name, **kwargs):
+        if not config.LATEX_ENABLED:
+            raise RuntimeError('LaTeX is not enabled')
         source_filename, target_filename = self.prepare(template_name, **kwargs)
         log_filename = os.path.join(self.source_dir, 'output.log')
         log_file = open(log_filename, 'a+')

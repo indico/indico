@@ -94,19 +94,27 @@
                 <div class="label">
                     {%- trans %}Book of abstracts{% endtrans -%}
                 </div>
-                {% set link_start %}<a class="arrow js-dropdown" data-toggle="dropdown">{% endset %}
-                {% set link_end %}</a>{% endset %}
-                {%- trans -%}
-                    Customize and {{ link_start }}download{{ link_end }} the book of abstracts
-                {%- endtrans -%}
-                <ul class="i-dropdown">
-                    <li>
-                        <a href={{ url_for('.export_boa', event) }}>PDF</a>
-                    </li>
-                    <li>
-                        <a href={{ url_for('.export_boa_tex', event) }}>LaTeX</a>
-                    </li>
-                </ul>
+                {% if indico_config.LATEX_ENABLED %}
+                    {% set link_start %}<a class="arrow js-dropdown" data-toggle="dropdown">{% endset %}
+                    {% set link_end %}</a>{% endset %}
+                    {%- trans -%}
+                        Customize and {{ link_start }}download{{ link_end }} the book of abstracts
+                    {%- endtrans -%}
+                    <ul class="i-dropdown">
+                        <li>
+                            <a href="{{ url_for('.export_boa', event) }}">PDF</a>
+                        </li>
+                        <li>
+                            <a href="{{ url_for('.export_boa_tex', event) }}">LaTeX</a>
+                        </li>
+                    </ul>
+                {% else %}
+                    {% set link_start %}<a href="{{ url_for('.export_boa_tex', event) }}">{% endset %}
+                    {% set link_end %}</a>{% endset %}
+                    {%- trans -%}
+                        Customize and {{ link_start }}download{{ link_end }} the book of abstracts
+                    {%- endtrans -%}
+                {% endif %}
             </div>
             <div class="toolbar">
                 <a href="#" class="i-button icon-settings"

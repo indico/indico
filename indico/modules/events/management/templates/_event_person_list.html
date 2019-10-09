@@ -24,7 +24,7 @@
         <tr class="i-table" data-person-roles="{{ person_roles | tojson | forceescape }}">
             <td class="i-table thin-column hide-if-locked">
                 <input type="checkbox" value="{{ event_person.id }}" class="select-row"
-                       name={{ 'person_id' if event_person.user_id is defined else 'user_id' }}
+                       name="{{ 'person_id' if event_person.user_id is defined else 'user_id' }}"
                        {{ 'disabled' if not event_person.email }}>
             </td>
             <td class="i-table name-column">{{ event_person.full_name }}</td>

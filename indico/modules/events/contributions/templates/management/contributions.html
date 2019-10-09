@@ -102,12 +102,14 @@
                         {%- trans %}Export{% endtrans -%}
                     </a>
                     <ul class="i-dropdown">
-                        <li>
-                            <a href="#" class="icon-file-pdf js-submit-form js-enable-if-checked disabled"
-                               data-href="{{ url_for('.contributions_pdf_export', event) }}">
-                                {%- trans %}PDF{% endtrans -%}
-                            </a>
-                        </li>
+                        {% if indico_config.LATEX_ENABLED %}
+                            <li>
+                                <a href="#" class="icon-file-pdf js-submit-form js-enable-if-checked disabled"
+                                   data-href="{{ url_for('.contributions_pdf_export', event) }}">
+                                    {%- trans %}PDF{% endtrans -%}
+                                </a>
+                            </li>
+                        {% endif %}
                         <li>
                             <a href="#" class="icon-file-spreadsheet js-submit-form js-enable-if-checked disabled"
                                data-href="{{ url_for('.contributions_csv_export', event) }}">

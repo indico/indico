@@ -8,8 +8,9 @@
 from __future__ import unicode_literals
 
 from flask import flash, request, session
-from werkzeug.exceptions import Forbidden
+from werkzeug.exceptions import Forbidden, NotFound
 
+from indico.core.config import config
 from indico.core.errors import NoReportError
 from indico.legacy.pdfinterface.latex import AbstractsToPDF
 from indico.modules.events.abstracts.controllers.base import RHAbstractBase, RHAbstractsBase
@@ -42,6 +43,8 @@ class RHMyAbstractsExportPDF(RHAbstractsBase):
         RHAbstractsBase._check_access(self)
 
     def _process(self):
+        if not config.LATEX_ENABLED:
+            raise NotFound
         pdf = AbstractsToPDF(self.event, get_user_abstracts(self.event, session.user))
         return send_file('my-abstracts.pdf', pdf.generate(), 'application/pdf')
 

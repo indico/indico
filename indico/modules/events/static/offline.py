@@ -267,9 +267,10 @@ class StaticConferenceCreator(StaticEventCreator):
         # Getting conference timetable in PDF
         self._add_pdf(self.event, 'timetable.export_default_pdf',
                       get_timetable_offline_pdf_generator(self.event))
-        # Generate contributions in PDF
-        self._add_pdf(self.event, 'contributions.contribution_list_pdf', ContribsToPDF, event=self.event,
-                      contribs=[c for c in self.event.contributions if c.can_access(None)])
+        if config.LATEX_ENABLED:
+            # Generate contributions in PDF
+            self._add_pdf(self.event, 'contributions.contribution_list_pdf', ContribsToPDF, event=self.event,
+                          contribs=[c for c in self.event.contributions if c.can_access(None)])
 
         # Getting specific pages for contributions
         for contrib in self.event.contributions:
@@ -301,7 +302,7 @@ class StaticConferenceCreator(StaticEventCreator):
             with override_request_endpoint(obj.view_class.endpoint):
                 obj._process_args()
                 self._add_page(obj._process(), obj.view_class.endpoint, self.event)
-        if entry.name == 'abstracts_book':
+        if entry.name == 'abstracts_book' and config.LATEX_ENABLED:
             self._add_pdf(self.event, 'abstracts.export_boa', AbstractBook, event=self.event)
         if entry.name == 'program':
             self._add_pdf(self.event, 'tracks.program_pdf', ProgrammeToPDF, event=self.event)
@@ -334,7 +335,8 @@ class StaticConferenceCreator(StaticEventCreator):
         self._add_from_rh(RHContributionDisplay, WPStaticContributionDisplay,
                           {'confId': self.event.id, 'contrib_id': contrib.id},
                           contrib)
-        self._add_pdf(contrib, 'contributions.export_pdf', ContribToPDF, contrib=contrib)
+        if config.LATEX_ENABLED:
+            self._add_pdf(contrib, 'contributions.export_pdf', ContribToPDF, contrib=contrib)
 
         for author in contrib.primary_authors:
             self._get_author(contrib, author)

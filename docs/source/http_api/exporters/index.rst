@@ -11,4 +11,3 @@ API Resources
    ./file.rst
    ./user.rst
    ./room_booking.rst
-   ./videoservices.rst

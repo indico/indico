@@ -488,7 +488,11 @@ LaTeX
     If it is installed in a directory in your ``$PATH``, specifying its
     name without a path is sufficient.
 
-    Default: ``xelatex``
+    If the path is not configured, any functionality that requires LaTeX
+    on the server (such as generating the Book of Abstracts or exporting
+    contributions to PDF) will be disabled.
+
+    Default: ``None``
 
 .. data:: STRICT_LATEX
 

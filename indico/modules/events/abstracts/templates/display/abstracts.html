@@ -49,13 +49,15 @@
                         {%- trans %}Export{% endtrans -%}
                     </a>
                     <ul class="i-dropdown">
-                        <li>
-                            <a href="#"
-                               class="icon-file-pdf js-requires-selected-row disabled js-submit-list-form"
-                               data-href="{{ url_for('.display_abstracts_pdf_export', track) }}">
-                                PDF
-                            </a>
-                        </li>
+                        {% if indico_config.LATEX_ENABLED %}
+                            <li>
+                                <a href="#"
+                                   class="icon-file-pdf js-requires-selected-row disabled js-submit-list-form"
+                                   data-href="{{ url_for('.display_abstracts_pdf_export', track) }}">
+                                    PDF
+                                </a>
+                            </li>
+                        {% endif %}
                         <li>
                             <a href="#"
                                class="icon-file-spreadsheet js-requires-selected-row disabled js-submit-list-form"

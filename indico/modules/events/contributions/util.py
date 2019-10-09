@@ -17,6 +17,7 @@ import dateutil.parser
 from flask import session
 from sqlalchemy.orm import contains_eager, joinedload, load_only, noload
 
+from indico.core.config import config
 from indico.core.db import db
 from indico.core.errors import UserValueError
 from indico.modules.attachments.util import get_attached_items
@@ -317,5 +318,8 @@ def render_archive(event, contribs, sort_by, cls):
 
 
 def get_boa_export_formats():
-    return {'PDF': (_('PDF'), render_pdf),
-            'ZIP': (_('TeX archive'), render_archive)}
+    formats = {'PDF': (_('PDF'), render_pdf),
+               'ZIP': (_('TeX archive'), render_archive)}
+    if not config.LATEX_ENABLED:
+        del formats['PDF']
+    return formats

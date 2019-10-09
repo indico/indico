@@ -14,6 +14,7 @@ from flask import flash, jsonify, redirect, request, session
 from sqlalchemy.orm import undefer
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
+from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.protection import ProtectionMode, render_acl
 from indico.core.permissions import get_principal_permissions, update_permissions
@@ -457,6 +458,8 @@ class RHContributionsExportExcel(RHManageContributionsExportActionsBase):
 
 class RHContributionsExportPDF(RHManageContributionsExportActionsBase):
     def _process(self):
+        if not config.LATEX_ENABLED:
+            raise NotFound
         pdf = ContribsToPDF(self.event, self.contribs)
         return send_file('contributions.pdf', pdf.generate(), 'application/pdf')
 

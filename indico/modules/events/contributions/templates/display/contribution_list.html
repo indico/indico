@@ -29,9 +29,11 @@
                 </div>
             {% endif %}
             <div class="group">
-                <a href="{{ url_for('contributions.contribution_list_pdf', event) }}"
-                   title="{% trans %}Export to PDF{% endtrans %}"
-                   class="i-button icon-file-pdf"></a>
+                {% if indico_config.LATEX_ENABLED %}
+                    <a href="{{ url_for('contributions.contribution_list_pdf', event) }}"
+                       title="{% trans %}Export to PDF{% endtrans %}"
+                       class="i-button icon-file-pdf"></a>
+                {% endif %}
                 {% if not g.static_site %}
                    <button class="i-button icon-link js-static-url"
                            data-href="{{ url_for('.contribution_list_static_url', event) }}"

@@ -85,7 +85,7 @@
                     {% endif %}
                 </div>
             {% endif %}
-            {% if abstract.can_see_reviews(session.user) %}
+            {% if indico_config.LATEX_ENABLED and abstract.can_see_reviews(session.user) %}
                 <div class="group">
                     <a class="i-button arrow icon-file-pdf js-dropdown" data-toggle="dropdown"></a>
                     <ul class="i-dropdown">
@@ -99,7 +99,7 @@
                         </li>
                     </ul>
                 </div>
-            {% else %}
+            {% elif indico_config.LATEX_ENABLED %}
                 <div class="group">
                     <a href="{{ url_for('.display_abstract_pdf_export', abstract) }}"
                        class="i-button icon-file-pdf"

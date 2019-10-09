@@ -34,7 +34,18 @@ Internal Changes
 Version 2.2.3
 -------------
 
-*Unreleased*
+*Released on October 08, 2019*
+
+Security fixes
+^^^^^^^^^^^^^^
+
+- Strip ``@``, ``+``, ``-`` and ``=`` from the beginning of strings when exporting
+  CSV files to avoid `security issues <https://www.owasp.org/index.php/CSV_Injection>`_
+  when opening the CSV file in Excel
+- Use 027 instead of 000 umask when temporarily changing it to get the current umask
+- Fix LaTeX sanitization to prevent malicious users from running unsafe LaTeX commands
+  through specially crafted abstracts or contribution descriptions, which could lead to
+  the disclosure of local file contents
 
 Improvements
 ^^^^^^^^^^^^
@@ -45,6 +56,10 @@ Improvements
 - Show family name field first in user search dialog (:issue:`4099`)
 - Make date headers clickable in room booking calendar (:issue:`4099`)
 - Show times in room booking log entries (:issue:`4099`)
+- Support disabling server-side LaTeX altogether and hide anything that
+  requires it (such as contribution PDF export or the Book of Abstracts).
+  **LaTeX is now disabled by default, unless the :data:`XELATEX_PATH` i
+  explicitly set in ``indico.conf``.
 
 Bugfixes
 ^^^^^^^^
@@ -60,6 +75,7 @@ Bugfixes
 - Fix ACL entries referencing event roles from the old event when cloning an
   event with event roles in the ACL. Run ``indico maint fix-event-role-acls``
   after updating to fix any affected ACLs (:issue:`4090`)
+- Fix validation issues in coordinates fields when editing rooms (:issue:`4103`)
 
 Version 2.2.2
 -------------
@@ -176,6 +192,22 @@ Internal Changes
 
 
 ----
+
+Version 2.1.10
+--------------
+
+*Released on October 08, 2019*
+
+Security fixes
+^^^^^^^^^^^^^^
+
+- Strip ``@``, ``+``, ``-`` and ``=`` from the beginning of strings when exporting
+  CSV files to avoid `security issues <https://www.owasp.org/index.php/CSV_Injection>`_
+  when opening the CSV file in Excel
+- Use 027 instead of 000 umask when temporarily changing it to get the current umask
+- Fix LaTeX sanitization to prevent malicious users from running unsafe LaTeX commands
+  through specially crafted abstracts or contribution descriptions, which could lead to
+  the disclosure of local file contents
 
 Version 2.1.9
 -------------

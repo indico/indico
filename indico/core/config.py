@@ -92,7 +92,7 @@ DEFAULTS = {
     'TEMP_DIR': '/opt/indico/tmp',
     'USE_PROXY': False,
     'WORKER_NAME': socket.getfqdn(),
-    'XELATEX_PATH': 'xelatex',
+    'XELATEX_PATH': None,
 }
 
 # Default values for settings that cannot be set in the config file
@@ -254,6 +254,10 @@ class IndicoConfig(object):
     @property
     def IMAGES_BASE_URL(self):
         return 'static/images' if g.get('static_site') else url_parse('{}/images'.format(self.BASE_URL)).path
+
+    @property
+    def LATEX_ENABLED(self):
+        return bool(self.XELATEX_PATH)
 
     def __getattr__(self, name):
         try:

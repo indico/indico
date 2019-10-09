@@ -47,7 +47,7 @@
                 <span>{% trans %}Availability{% endtrans %}</span>
                 <span>
                     <span class="i-progress">
-                        <span class="i-progress-bar" data-progress={{ '{:%}'.format(progress) }}></span>
+                        <span class="i-progress-bar" data-progress="{{ '{:%}'.format(progress) }}"></span>
                         <span class="i-progress-label">
                             {%- if total == taken %}
                                 {%- trans %}event full{% endtrans -%}
