@@ -228,7 +228,7 @@ def latex_render_error(message):
     return textwrap.dedent(r"""
        \begin{tcolorbox}[width=\textwidth,colback=red!5!white,colframe=red!75!black,title={Indico rendering error}]
           \begin{verbatim}%s\end{verbatim}
-       \end{tcolorbox}""" % message)
+       \end{tcolorbox}""" % latex_escape(message))
 
 
 def latex_render_image(src, alt, strict=False):
@@ -289,7 +289,7 @@ def latex_render_image(src, alt, strict=False):
           \includegraphics[max width=\linewidth]{%s}
           \caption{%s}
         \end{figure}
-        """ % (tempfile.name, alt)), tempfile.name)
+        """ % (tempfile.name, latex_escape(alt))), tempfile.name)
 
 
 def makeExtension(configs=None):
@@ -342,7 +342,7 @@ class NonEncodedAutoMailPattern(markdown.inlinepatterns.Pattern):
         mailto = "mailto:" + email
         mailto = "".join([markdown.util.AMP_SUBSTITUTE + '#%d;' %
                           ord(letter) for letter in mailto])
-        el.set('href', mailto)
+        el.set('href', latex_escape(mailto, ignore_math=False))
         return el
 
 
@@ -435,6 +435,7 @@ class LaTeXTreeProcessor(markdown.treeprocessors.Treeprocessor):
         elif ournode.tag == 'img':
             buffer += latex_render_image(ournode.get('src'), ournode.get('alt'))[0]
         elif ournode.tag == 'a':
+            # this one gets escaped in convert_link_to_latex
             buffer += '<a href=\"%s\">%s</a>' % (ournode.get('href'), subcontent)
         else:
             buffer = subcontent
@@ -635,4 +636,4 @@ class LinkTextPostProcessor(markdown.postprocessors.Postprocessor):
 
 def convert_link_to_latex(instr):
     dom = html5parser.fragment_fromstring(instr)
-    return ur'\href{%s}{%s}' % (dom.get('href'), dom.text)
+    return u'\\href{%s}{%s}' % (latex_escape(dom.get('href'), ignore_math=True), dom.text)
