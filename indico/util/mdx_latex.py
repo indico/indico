@@ -68,7 +68,6 @@ from __future__ import absolute_import
 import re
 import textwrap
 import uuid
-import xml.dom.minidom
 from io import BytesIO
 from mimetypes import guess_extension
 from tempfile import NamedTemporaryFile
@@ -313,14 +312,12 @@ class LaTeXExtension(markdown.Extension):
 
         latex_tp = LaTeXTreeProcessor(self.configs)
         math_pp = MathTextPostProcessor()
-        table_pp = TableTextPostProcessor()
         link_pp = LinkTextPostProcessor()
         unescape_html_pp = UnescapeHtmlTextPostProcessor()
 
         md.treeprocessors['latex'] = latex_tp
         md.postprocessors['unescape_html'] = unescape_html_pp
         md.postprocessors['math'] = math_pp
-        md.postprocessors['table'] = table_pp
         md.postprocessors['link'] = link_pp
 
         # Needed for LaTeX postprocessors not to choke on URL-encoded urls
@@ -419,19 +416,8 @@ class LaTeXTreeProcessor(markdown.treeprocessors.Treeprocessor):
             buffer += '\\textbf{%s}' % subcontent.strip()
         elif ournode.tag == 'em':
             buffer += '\\emph{%s}' % subcontent.strip()
-        # Keep table strcuture. TableTextPostProcessor will take care.
-        elif ournode.tag == 'table':
-            buffer += '\n\n<table>%s</table>\n\n' % subcontent
-        elif ournode.tag == 'thead':
-            buffer += '<thead>%s</thead>' % subcontent
-        elif ournode.tag == 'tbody':
-            buffer += '<tbody>%s</tbody>' % subcontent
-        elif ournode.tag == 'tr':
-            buffer += '<tr>%s</tr>' % subcontent
-        elif ournode.tag == 'th':
-            buffer += '<th>%s</th>' % subcontent
-        elif ournode.tag == 'td':
-            buffer += '<td>%s</td>' % subcontent
+        elif ournode.tag in ('table', 'thead', 'tbody', 'tr', 'th', 'td'):
+            raise RuntimeError('Unexpected table in markdown data for LaTeX')
         elif ournode.tag == 'img':
             buffer += latex_render_image(ournode.get('src'), ournode.get('alt'))[0]
         elif ournode.tag == 'a':
@@ -451,7 +437,7 @@ class UnescapeHtmlTextPostProcessor(markdown.postprocessors.Postprocessor):
     def run(self, text):
         return unescape_html_entities(text)
 
-# ========================= MATHS =================================
+# ========================= MATH =================================
 
 
 class MathTextPostProcessor(markdown.postprocessors.Postprocessor):
@@ -489,140 +475,6 @@ class MathTextPostProcessor(markdown.postprocessors.Postprocessor):
         # out = out.replace(' * ', ' \\cdot ')
         # out = out.replace('\\del', '\\partial')
         return out
-
-# ========================= TABLES =================================
-
-
-class TableTextPostProcessor(markdown.postprocessors.Postprocessor):
-
-    def run(self, instr):
-        """This is not very sophisticated and for it to work it is expected
-        that:
-            1. tables to be in a section on their own (that is at least one
-            blank line above and below)
-            2. no nesting of tables
-        """
-        converter = Table2Latex()
-        new_blocks = []
-
-        for block in instr.split('\n\n'):
-            stripped = block.strip()
-            # <table catches modified verions (e.g. <table class="..">
-            if stripped.startswith('<table') and stripped.endswith('</table>'):
-                latex_table = converter.convert(stripped).strip()
-                new_blocks.append(latex_table)
-            else:
-                new_blocks.append(block)
-        return '\n\n'.join(new_blocks)
-
-
-class Table2Latex:
-    """
-    Convert html tables to Latex.
-
-    TODO: escape latex entities.
-    """
-
-    def colformat(self):
-        # centre align everything by default
-        out = '|l' * self.maxcols + '|'
-        return out
-
-    def get_text(self, element):
-        if element.nodeType == element.TEXT_NODE:
-            return escape_latex_entities(element.data)
-        result = ''
-        if element.childNodes:
-            for child in element.childNodes:
-                text = self.get_text(child)
-                if text.strip() != '':
-                    result += text
-        return result
-
-    def process_cell(self, element):
-        # works on both td and th
-        colspan = 1
-        subcontent = self.get_text(element)
-        buffer = ""
-
-        if element.tagName == 'th':
-            subcontent = '\\textbf{%s}' % subcontent
-        if element.hasAttribute('colspan'):
-            colspan = int(element.getAttribute('colspan'))
-            buffer += ' \multicolumn{%s}{|c|}{%s}' % (colspan, subcontent)
-        # we don't support rowspan because:
-        #   1. it needs an extra latex package \usepackage{multirow}
-        #   2. it requires us to mess around with the alignment tags in
-        #   subsequent rows (i.e. suppose the first col in row A is rowspan 2
-        #   then in row B in the latex we will need a leading &)
-        # if element.hasAttribute('rowspan'):
-        #     rowspan = int(element.getAttribute('rowspan'))
-        #     buffer += ' \multirow{%s}{|c|}{%s}' % (rowspan, subcontent)
-        else:
-            buffer += ' %s' % subcontent
-
-        notLast = (element.nextSibling.nextSibling and
-                   element.nextSibling.nextSibling.nodeType ==
-                   element.ELEMENT_NODE and
-                   element.nextSibling.nextSibling.tagName in ['td', 'th'])
-
-        if notLast:
-            buffer += ' &'
-
-        self.numcols += colspan
-        return buffer
-
-    def tolatex(self, element):
-        if element.nodeType == element.TEXT_NODE:
-            return ""
-
-        buffer = ""
-        subcontent = ""
-        if element.childNodes:
-            for child in element.childNodes:
-                text = self.tolatex(child)
-                if text.strip() != "":
-                    subcontent += text
-        subcontent = subcontent.strip()
-
-        if element.tagName == 'thead':
-            buffer += subcontent
-
-        elif element.tagName == 'tr':
-            self.maxcols = max(self.numcols, self.maxcols)
-            self.numcols = 0
-            buffer += '\n\\hline\n%s \\\\' % subcontent
-
-        elif element.tagName == 'td' or element.tagName == 'th':
-            buffer = self.process_cell(element)
-        else:
-            buffer += subcontent
-        return buffer
-
-    def convert(self, instr):
-        self.numcols = 0
-        self.maxcols = 0
-        dom = xml.dom.minidom.parseString(instr)
-        core = self.tolatex(dom.documentElement)
-
-        captionElements = dom.documentElement.getElementsByTagName('caption')
-        caption = ''
-        if captionElements:
-            caption = self.get_text(captionElements[0])
-
-        colformatting = self.colformat()
-        table_latex = \
-            """
-            \\begin{table}[h]
-            \\begin{tabular}{%s}
-            %s
-            \\hline
-            \\end{tabular}
-            \\\\[5pt]
-            \\caption{%s}
-            \\end{table}
-            """ % (colformatting, core, caption)
-        return table_latex
 
 
 # ========================== LINKS =================================
