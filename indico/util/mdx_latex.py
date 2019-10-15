@@ -67,6 +67,7 @@ from __future__ import absolute_import
 
 import re
 import textwrap
+import uuid
 import xml.dom.minidom
 from io import BytesIO
 from mimetypes import guess_extension
@@ -168,9 +169,11 @@ def latex_escape(text, ignore_math=True, ignore_braces=False):
     def substitute(x):
         return chars[x.group()]
 
+    math_placeholder = '[*LaTeXmath-{}*]'.format(unicode(uuid.uuid4()))
+
     def math_replace(m):
         math_segments.append(m.group(0))
-        return "[*LaTeXmath*]"
+        return math_placeholder
 
     if ignore_math:
         # Extract math-mode segments and replace with placeholder
@@ -182,7 +185,7 @@ def latex_escape(text, ignore_math=True, ignore_braces=False):
     if ignore_math:
         # Sanitize math-mode segments and put them back in place
         math_segments = map(sanitize_mathmode, math_segments)
-        res = re.sub(r'\[\*LaTeXmath\*\]', lambda _: "\\protect " + math_segments.pop(0), res)
+        res = re.sub(re.escape(math_placeholder), lambda _: "\\protect " + math_segments.pop(0), res)
 
     return res
 
