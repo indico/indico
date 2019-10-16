@@ -5,7 +5,7 @@ Changelog
 Version 2.1.11
 --------------
 
-*Unreleased*
+*Released on October 16, 2019*
 
 Security fixes
 ^^^^^^^^^^^^^^
