@@ -164,6 +164,19 @@ Internal Changes
 
 ----
 
+Version 2.1.11
+--------------
+
+*Released on October 16, 2019*
+
+Security fixes
+^^^^^^^^^^^^^^
+
+- Fix more places where LaTeX input was not correctly sanitized. While the biggest
+  security impact (reading local files) has already been mitigated when fixing the
+  initial vulnerability in the previous release, it is still strongly recommended
+  to update.
+
 Version 2.1.10
 --------------
 
