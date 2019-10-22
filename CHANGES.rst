@@ -22,6 +22,10 @@ Improvements
 - Tracks can now be categorized in track groups (:issue:`4052`)
 - Program codes for sessions, session blocks, contributions and
   subcontributions can now be auto-generated (:issue:`4026`)
+- Add draft mode for the contribution list of conference events
+  which hides pages like the contribution list and timetable until
+  the event organizers publish the contribution list. (:issue:`4095`)
+- Add ICS export for information in the user dashboard (:issue:`4057`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
