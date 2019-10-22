@@ -282,9 +282,9 @@ class RHSignURL(RHProtected):
         url_params = {k: v for k, v in url_params.viewitems() if not k.startswith('_')}
         query_params = request.json.get('query_params', {})
         query_params = {k: v for k, v in query_params.viewitems() if not k.startswith('_')}
-        return jsonify(
-            url=signed_url_for(session.user, endpoint, url_params=url_params, _external=True, **query_params)
-        )
+        url = signed_url_for(session.user, endpoint, url_params=url_params, _external=True, **query_params)
+        Logger.get('url_signing').info("%s signed URL for endpoint '%s' (%s)", session.user, endpoint, url)
+        return jsonify(url=url)
 
 
 class RHResetSignatureTokens(RHUserBase):
