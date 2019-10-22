@@ -53,8 +53,8 @@ from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file, url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.http_api.metadata import Serializer
-from indico.web.rh import RH, RHProtected
-from indico.web.util import is_signed_url_valid, jsonify_data, jsonify_form, jsonify_template
+from indico.web.rh import RHProtected, RHTokenProtected
+from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
 
 IDENTITY_ATTRIBUTES = {'first_name', 'last_name', 'email', 'affiliation', 'full_name'}
@@ -139,15 +139,7 @@ class RHUserDashboard(RHUserBase):
                                                linked_events=linked_events)
 
 
-class RHExportDashboardICS(RH):
-    def _process_args(self):
-        self.user = User.get_one(request.view_args['user_id'])
-
-    def _check_access(self):
-        token = request.args.get('token')
-        if not token or not is_signed_url_valid(self.user, request.full_path):
-            raise Forbidden
-
+class RHExportDashboardICS(RHTokenProtected):
     @use_kwargs({
         'from_': HumanizedDate(data_key='from', missing=lambda: now_utc(False) - relativedelta(weeks=1)),
         'include': fields.List(fields.Str(), missing={'linked', 'categories'}),
