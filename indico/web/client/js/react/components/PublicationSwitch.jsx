@@ -71,8 +71,8 @@ export default function PublicationSwitch({eventId}) {
       <Header
         content={
           published
-            ? Translate.string('Set contribution list in Draft mode')
-            : Translate.string('Publish Contributions')
+            ? Translate.string('Set contribution list in draft mode')
+            : Translate.string('Publish contributions')
         }
       />
       <Modal.Content>
@@ -93,7 +93,7 @@ export default function PublicationSwitch({eventId}) {
               <Translate>Are you sure you want to publish the contribution list?</Translate>
             </p>
             <p>
-              <Translate>By doing so the following menu items will be accessible: </Translate>
+              <Translate>By doing so the following menu items will be accessible:</Translate>
             </p>
           </>
         )}
