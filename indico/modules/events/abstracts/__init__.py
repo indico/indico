@@ -123,14 +123,13 @@ def _extend_event_menu(sender, **kwargs):
     from indico.modules.events.contributions import contribution_settings
 
     def _boa_visible(event):
-        return config.LATEX_ENABLED and event.has_feature('abstracts') and contribution_settings.get(event, 'published')
-
+        return (config.LATEX_ENABLED and event.has_feature('abstracts')
+                and contribution_settings.get(event, 'published'))
 
     def _reviewing_area_visible(event):
         if not session.user or not event.has_feature('abstracts'):
             return False
         return has_user_tracks(event, session.user)
-
 
     yield MenuEntryData(title=_("Book of Abstracts"), name='abstracts_book', endpoint='abstracts.export_boa',
                         position=9, visible=_boa_visible, static_site=True)

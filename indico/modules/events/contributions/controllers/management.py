@@ -553,13 +553,13 @@ class RHManageContributionPublicationREST(RHManageContributionsBase):
 
     def _process_PUT(self):
         contribution_settings.set(self.event, 'published', True)
-        self.event.log(EventLogRealm.management, EventLogKind.change, 'Contributions',
+        self.event.log(EventLogRealm.management, EventLogKind.positive, 'Contributions',
                        'Contributions published', session.user)
         return '', 204
 
     def _process_DELETE(self):
         contribution_settings.set(self.event, 'published', False)
-        self.event.log(EventLogRealm.management, EventLogKind.change, 'Contributions',
+        self.event.log(EventLogRealm.management, EventLogKind.negative, 'Contributions',
                        'Contributions unpublished', session.user)
         return '', 204
 

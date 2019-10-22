@@ -10,7 +10,7 @@ from __future__ import unicode_literals
 from io import BytesIO
 
 from flask import jsonify, request, session
-from werkzeug.exceptions import Forbidden
+from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.legacy.pdfinterface.conference import SimplifiedTimeTablePlain, TimetablePDFFormat, TimeTablePlain
 from indico.modules.events.contributions import contribution_settings
@@ -32,7 +32,7 @@ class RHTimetableProtectionBase(RHDisplayEventBase):
         RHDisplayEventBase._check_access(self)
         published = contribution_settings.get(self.event, 'published')
         if not published:
-            raise Forbidden
+            raise NotFound(_("The contributions of this event have not been published yet"))
 
 
 class RHTimetable(RHTimetableProtectionBase):
