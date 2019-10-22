@@ -23,6 +23,7 @@ from indico.modules.events.timetable.util import (get_timetable_offline_pdf_gene
 from indico.modules.events.timetable.views import WPDisplayTimetable
 from indico.modules.events.util import get_theme
 from indico.modules.events.views import WPSimpleEventDisplay
+from indico.util.i18n import _
 from indico.web.flask.util import send_file, url_for
 from indico.web.util import jsonify_data, jsonify_template
 
