@@ -23,7 +23,7 @@ requests==2.22.0
 Werkzeug==0.15.5
 Flask==1.1.1
 bcrypt==3.1.7
-Pillow==6.1.0
+Pillow==6.2.0
 qrcode==6.1
 Markdown==2.3.1
 bleach==3.1.0
