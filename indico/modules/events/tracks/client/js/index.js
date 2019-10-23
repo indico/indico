@@ -28,39 +28,41 @@
           axis: 'y',
           cursor: 'move',
           distance: 2,
-          tolerance: 'pointer',
           forcePlaceholderSize: true,
           placeholder: 'track-placeholder',
           connectWith: '.track-list',
-          update: function() {
-            const $this = $(this);
-            const sortedList = $this
-              .find('li.track-row')
-              .map(function() {
-                const $this = $(this);
-                if ($this.hasClass('track-group-box')) {
-                  return {id: $this.data('id'), type: 'group'};
-                } else {
-                  let parent = null;
-                  const parentDiv = $this.closest('.track-group-box');
-                  if (parentDiv.length) {
-                    parent = parentDiv.data('id');
+          update: function(_event, ui) {
+            if (!ui.sender) {
+              // only trigger once when moving from one sortable to another
+              const $this = $(this);
+              const sortedList = $this
+                .find('li.track-row')
+                .map(function() {
+                  const $this = $(this);
+                  if ($this.hasClass('track-group-box')) {
+                    return {id: $this.data('id'), type: 'group'};
+                  } else {
+                    let parent = null;
+                    const parentDiv = $this.closest('.track-group-box');
+                    if (parentDiv.length) {
+                      parent = parentDiv.data('id');
+                    }
+                    return {id: $this.data('id'), type: 'track', parent};
                   }
-                  return {id: $this.data('id'), type: 'track', parent};
-                }
-              })
-              .get();
-            $.ajax({
-              url: $this.data('url'),
-              method: 'POST',
-              contentType: 'application/json',
-              data: JSON.stringify({sort_order: sortedList}),
-              complete: IndicoUI.Dialogs.Util.progress(),
-              error: handleAjaxError,
-            });
+                })
+                .get();
+              $.ajax({
+                url: $this.data('url'),
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({sort_order: sortedList}),
+                complete: IndicoUI.Dialogs.Util.progress(),
+                error: handleAjaxError,
+              });
+            }
           },
           receive: function(event, ui) {
-            const parentDiv = $this.closest('.track-group-box');
+            const parentDiv = $(this).closest('.track-group-box');
             if (parentDiv.length && ui.item.hasClass('track-group-box')) {
               $(ui.sender).sortable('cancel');
             }
