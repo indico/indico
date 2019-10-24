@@ -12,6 +12,7 @@ Bugfixes
 
 - Update the Pillow library to 6.2.1. This fixes an issue where some malformed images
   could result in high memory usage or slow processing.
+- Truncate long speaker names in the timetable instead of hiding them (:issue:`4110`)
 
 Version 2.2.4
 -------------

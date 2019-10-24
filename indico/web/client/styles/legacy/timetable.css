@@ -132,6 +132,10 @@ div.timetableBlockPresenters {
     margin-left: 6px;
     font-size: 11px;
     font-style: italic;
+    max-width: 50%;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
 }
 
 div.timetableBlockTime {

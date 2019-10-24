@@ -413,11 +413,6 @@ type(
           this.locationDiv.dom.style.maxWidth = pixels(parentDivWidth - 20);
         }
 
-        // Presenters information should not take more than half of the space of the block
-        if (this.presentersDiv && this.presentersDiv.dom.offsetWidth > parentDivWidth / 2) {
-          this.presentersDiv.dom.style.display = 'none';
-        }
-
         // Convener information should not take more than half of the space of the block
         // if not truncate the string.
         if (this.convenerDiv && this.convenerDiv.dom.offsetWidth > parentDivWidth / 2) {
