@@ -48,7 +48,8 @@ Version 2.2.5
 Bugfixes
 ^^^^^^^^
 
-- None so far :)
+- Update the Pillow library to 6.2.1. This fixes an issue where some malformed images
+  could result in high memory usage or slow processing.
 
 Version 2.2.4
 -------------
