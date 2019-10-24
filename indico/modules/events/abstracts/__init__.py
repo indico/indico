@@ -112,7 +112,6 @@ class GlobalReviewPermission(ManagementPermission):
     name = 'review_all_abstracts'
     friendly_name = _('Review for all tracks')
     description = _('Grants abstract reviewing rights to all tracks of the event.')
-    color = 'orange'
 
 
 class ReviewPermission(ManagementPermission):
@@ -120,6 +119,8 @@ class ReviewPermission(ManagementPermission):
     friendly_name = _('Review')
     description = _('Grants track reviewer rights in a track.')
     user_selectable = True
+    color = 'orange'
+    default = True
 
 
 class AbstractReviewerPermission(ManagementPermission):

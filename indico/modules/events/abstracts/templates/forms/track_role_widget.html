@@ -1,10 +1,8 @@
 {% extends 'forms/base_widget.html' %}
 {% from 'message_box.html' import message_box %}
 
-{% set user_data = field.users %}
-
-{% macro render_track(track_id, title, role_data, user_data, global=false) %}
-    <li class="i-box no-shadow js-track-config {{ 'highlight' if global else '' }}" data-track-id="{{ track_id }}">
+{% macro render_track(track_id, title, role_data, global=false) %}
+    <li class="i-box no-shadow js-track-config {{ 'highlight' if global else '' }}">
         <div class="i-box-header">
             <span class="i-box-title">{{ title }}</span>
         </div>
@@ -14,41 +12,7 @@
                     {{ caller() }}
                 </p>
             {% endif %}
-            {% for role_id, users in role_data.viewitems() %}
-                <div class="js-role-container reviewer-container" data-role-id="{{ role_id }}">
-                    <div class="role-description flexrow f-a-center">
-                        {% if role_id == 'reviewer' %}
-                            <span class="icon-user-reading title f-self-stretch"
-                                  title="{% trans %}Reviewers can emit their opinion on abstracts{% endtrans %}">
-                                {%- trans %}Reviewers{% endtrans -%}
-                            </span>
-                        {% else %}
-                            <span class="icon-user-chairperson title f-self-stretch"
-                                  title="{% trans %}Conveners can consult the reviewing status{% endtrans %}">
-                                {%- trans %}Conveners{% endtrans -%}
-                            </span>
-                        {% endif %}
-                        <div class="actions">
-                            <input type="hidden" class="js-user-data">
-                            <a class="add-user i-button borderless icon-plus hide-if-locked">
-                                {%- trans %}Add{% endtrans -%}
-                            </a>
-                        </div>
-                    </div>
-                    <div class="placeholder text-superfluous italic {{ 'weak-hidden' if users else '' }}">
-                        {% trans %}No users added so far.{% endtrans %}
-                    </div>
-                    <ul class="user-role-list">
-                        {% for user_id in users %}
-                            <li class="event-user" data-user-id="{{ user_id }}">
-                                {{- user_data[user_id].name -}}
-                                <a class="icon-cross remove-user hide-if-locked" href="#"></a>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                </div>
-            {% endfor %}
-        </div>
+        <div id="track-roles-{{ 'global' if global else track_id }}" data-track-id="{{ track_id }}"></div>
     </li>
 {% endmacro %}
 
@@ -63,11 +27,11 @@
                     {%- endtrans %}
                 {% endcall %}
             {% endif %}
-            {% call render_track('*', _("All Tracks"), field.data['*'], user_data, global=true) -%}
+            {% call render_track('*', _("All Tracks"), field.data['global'], global=true) -%}
                 {% trans %}These users will be able to access/review all tracks in the event.{% endtrans %}
             {%- endcall %}
             {% for track in field.tracks %}
-                {{ render_track(track.id, track.title, field.data[track.id|string], user_data) }}
+                {{ render_track(track.id, track.title, field.data[track.id|string]) }}
             {% endfor %}
         </ul>
     </div>
@@ -77,7 +41,7 @@
     <script>
         $('#{{ field.id }}').trackrolewidget({
             containerElement: $('#role-widget-{{ field.id }}'),
-            userData: {{ user_data | tojson }}
+            permissionsInfo: {{ field.permissions_info|tojson }}
         });
     </script>
 {% endblock %}

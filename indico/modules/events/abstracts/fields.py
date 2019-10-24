@@ -15,6 +15,7 @@ from wtforms.ext.sqlalchemy.fields import QuerySelectField
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
+from indico.core.permissions import get_permissions_info
 from indico.modules.events.abstracts.models.abstracts import Abstract
 from indico.modules.events.abstracts.models.persons import AbstractPersonLink
 from indico.modules.events.abstracts.notifications import ContributionTypeCondition, StateCondition, TrackCondition
@@ -201,44 +202,10 @@ class TrackRoleField(JSONField):
     widget = JinjaWidget('events/abstracts/forms/track_role_widget.html')
 
     @property
-    def users(self):
-        return {user_id: _serialize_user(user) for user_id, user in _get_users_in_roles(self.data)}
+    def permissions_info(self):
+        permissions, tree, default = get_permissions_info(Track)
+        return {'permissions': permissions, 'tree': tree['_full_access']['children'], 'default': default}
 
-    @property
-    def role_data(self):
-        conveners = set()
-        reviewers = set()
-
-        # Handle global reviewers/conveners
-        role_data = self.data.pop('*')
-        global_conveners = _get_users(role_data['convener'])
-        global_reviewers = _get_users(role_data['reviewer'])
-        conveners |= global_conveners
-        reviewers |= global_reviewers
-
-        track_dict = {track.id: track for track in Track.query.with_parent(self.event).filter(Track.id.in_(self.data))}
-        user_dict = dict(_get_users_in_roles(self.data))
-
-        track_roles = {}
-        # Update track-specific reviewers/conveners
-        for track_id, roles in self.data.viewitems():
-            track = track_dict[int(track_id)]
-            track_roles[track] = defaultdict(set)
-            for role_id, user_ids in roles.viewitems():
-                users = {user_dict[user_id] for user_id in user_ids}
-                track_roles[track][role_id] = users
-                if role_id == 'convener':
-                    conveners |= users
-                elif role_id == 'reviewer':
-                    reviewers |= users
-
-        return {
-            'track_roles': track_roles,
-            'global_conveners': global_conveners,
-            'global_reviewers': global_reviewers,
-            'all_conveners': conveners,
-            'all_reviewers': reviewers
-        }
 
     def _value(self):
         return super(TrackRoleField, self)._value() if self.data else '[]'

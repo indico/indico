@@ -26,6 +26,7 @@ const PrincipalPermissions = ({
   onAddPermission,
   onRemovePermission,
   readAccessAllowed,
+  fullAccessAllowed,
   readOnly,
 }) => {
   const [open, setOpen] = useState(false);
@@ -53,6 +54,10 @@ const PrincipalPermissions = ({
 
   if (!readAccessAllowed) {
     permissions = _.without(permissions, 'readAccess');
+  }
+
+  if (!fullAccessAllowed) {
+    permissions = _.without(permissions, 'fullAccess');
   }
 
   return (
@@ -126,12 +131,15 @@ PrincipalPermissions.propTypes = {
   }).isRequired,
   /** Whether the 'read_access' permission is used/allowed */
   readAccessAllowed: PropTypes.bool,
+  /** Whether the 'full_access' permission is used/allowed */
+  fullAccessAllowed: PropTypes.bool,
   /** Whether the field is read-only */
   readOnly: PropTypes.bool,
 };
 
 PrincipalPermissions.defaultProps = {
   readAccessAllowed: true,
+  fullAccessAllowed: true,
   readOnly: false,
 };
 

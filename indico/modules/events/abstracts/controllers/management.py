@@ -7,11 +7,14 @@
 
 from __future__ import unicode_literals
 
+from collections import defaultdict
 from operator import itemgetter
 
 from flask import flash, redirect, request, session
+from sqlalchemy.orm import contains_eager, joinedload, load_only, noload, subqueryload
 from werkzeug.exceptions import NotFound
 
+from indico.core.permissions import get_unified_permissions, update_principals_permissions
 from indico.modules.events.abstracts import logger
 from indico.modules.events.abstracts.controllers.base import RHManageAbstractsBase
 from indico.modules.events.abstracts.forms import (AbstractReviewingRolesForm, AbstractReviewingSettingsForm,
@@ -22,14 +25,17 @@ from indico.modules.events.abstracts.models.review_ratings import AbstractReview
 from indico.modules.events.abstracts.models.reviews import AbstractReview
 from indico.modules.events.abstracts.operations import close_cfa, open_cfa, schedule_cfa
 from indico.modules.events.abstracts.settings import abstracts_reviewing_settings, abstracts_settings
-from indico.modules.events.abstracts.util import get_roles_for_event
 from indico.modules.events.abstracts.views import WPManageAbstracts
 from indico.modules.events.operations import (create_reviewing_question, delete_reviewing_question,
                                               sort_reviewing_questions, update_reviewing_question)
 from indico.modules.events.reviewing_questions_fields import get_reviewing_field_types
+from indico.modules.events.schemas import event_permissions_schema
+from indico.modules.events.tracks.models.tracks import Track
+from indico.modules.events.tracks.schemas import track_permissions_schema
 from indico.modules.events.util import update_object_principals
 from indico.util.i18n import _
 from indico.util.string import handle_legacy_description
+from indico.util.user import principal_from_identifier
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
@@ -128,32 +134,71 @@ class RHManageAbstractReviewing(RHManageAbstractsBase):
 class RHManageReviewingRoles(RHManageAbstractsBase):
     """Configure track roles (reviewers/conveners)."""
 
+    def _map_event_to_track_permissions(self, permissions):
+        filtered_permissions = []
+        for (identifier, permission_list) in permissions:
+            mapped = []
+            if 'convene_all_abstracts' in permission_list:
+                mapped.append('convene')
+            if 'review_all_abstracts' in permission_list:
+                mapped.append('review')
+            if mapped:
+                filtered_permissions.append((identifier, mapped))
+        return filtered_permissions
+
     def _process(self):
-        roles = get_roles_for_event(self.event)
+        roles = {}
+        event_permissions = event_permissions_schema.dump(self.event).get('acl_entries', {})
+        roles['global'] = self._map_event_to_track_permissions(event_permissions)
+        tracks = Track.query.with_parent(self.event).options(subqueryload('acl_entries'))
+        tracks_by_id = {str(track.id): track for track in tracks}
+        for track in tracks:
+            roles[str(track.id)] = track_permissions_schema.dump(track).get('acl_entries', {})
         form = AbstractReviewingRolesForm(event=self.event, obj=FormDefaults(roles=roles))
 
         if form.validate_on_submit():
-            role_data = form.roles.role_data
-            for principal in role_data['global_conveners']:
-                self.event.update_principal(principal, permissions={'convene_all_abstracts'})
-            for principal in role_data['global_reviewers']:
-                self.event.update_principal(principal, permissions={'review_all_abstracts'})
+            role_data = form.data['roles']
 
-            for track, user_roles in role_data['track_roles'].viewitems():
-                for principal in user_roles['convener']:
-                    track.update_principal(principal, permissions={'convene'})
-                for principal in user_roles['reviewer']:
-                    track.update_principal(principal, permissions={'review'})
+            # Update global permissions
+            global_conveners = []
+            global_reviewers = []
+            global_roles = role_data.pop('global')
+            for identifier, permissions in global_roles:
+                principal = principal_from_identifier(identifier, allow_groups=True)
+                if 'convene' in permissions:
+                    global_conveners.append(principal)
+                if 'review' in permissions:
+                    global_reviewers.append(principal)
+            update_object_principals(self.event, global_conveners, permission='convene_all_abstracts')
+            update_object_principals(self.event, global_reviewers, permission='review_all_abstracts')
 
-            # Update actual ACLs
-            update_object_principals(self.event, role_data['all_conveners'], permission='track_convener')
-            update_object_principals(self.event, role_data['all_reviewers'], permission='abstract_reviewer')
+            # Update track specific permissions
+            track_conveners = []
+            track_reviewers = []
+            for (track_id, track_roles) in role_data.items():
+                acl_entries = {}
+                for identifier, permissions in track_roles:
+                    principal = principal_from_identifier(identifier, allow_groups=True)
+                    acl_entries[principal] = set(permissions)
+                    if 'convene' in permissions:
+                        track_conveners.append(principal)
+                    if 'review' in permissions:
+                        track_reviewers.append(principal)
+                track = tracks_by_id[track_id]
+                current = {e.principal: get_unified_permissions(e) for e in track.acl_entries}
+                update_principals_permissions(track, current, acl_entries)
+
+            # Update event ACL for track and global permissions
+            all_conveners = set(global_conveners + track_conveners)
+            all_reviewers = set(global_reviewers + track_reviewers)
+            update_object_principals(self.event, all_conveners, permission='track_convener')
+            update_object_principals(self.event, all_reviewers, permission='abstract_reviewer')
 
             flash(_("Abstract reviewing roles have been updated."), 'success')
             logger.info("Abstract reviewing roles of %s have been updated by %s", self.event, session.user)
             return jsonify_data()
         return jsonify_form(form, skip_labels=True, form_header_kwargs={'id': 'reviewing-role-form'},
-                            disabled_until_change=True)
+                            disabled_until_change=False)
 
 
 class RHManageAbstractReviewingQuestions(RHManageAbstractsBase):

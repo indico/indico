@@ -8,3 +8,4 @@
 export {default as PrincipalField, FinalPrincipal} from './PrincipalField';
 export {default as PrincipalListField, FinalPrincipalList} from './PrincipalListField';
 export {default as ACLField} from './ACLField';
+export {default as TrackACLField} from './TrackACLField';

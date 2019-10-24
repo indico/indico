@@ -10,8 +10,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {Button, List} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
-import {UserSearch, GroupSearch} from '../principals/Search';
-import {useFetchPrincipals, usePermissionInfo} from '../principals/hooks';
+import {DefaultUserSearch, GroupSearch} from '../principals/Search';
+import {useFetchPrincipals} from '../principals/hooks';
 import {PendingPrincipalListItem, PrincipalListItem} from '../principals/items';
 import {getPrincipalList} from '../principals/util';
 
@@ -31,7 +31,7 @@ const isGroup = identifier => identifier.startsWith('Group:');
 
 /**
  * The ACLField is a PrincipalField on steroids. In addition to the functionality
- * present in ACLField, it keeps track of user permissions.
+ * present in PrincipalField, it keeps track of user permissions.
  */
 const ACLField = props => {
   const {
@@ -44,14 +44,13 @@ const ACLField = props => {
     withGroups,
     favoriteUsersController,
     readAccessAllowed,
+    fullAccessAllowed,
+    permissionInfo,
+    permissionManager,
   } = props;
   const [favoriteUsers, [handleAddFavorite, handleDelFavorite]] = favoriteUsersController;
 
   const valueIds = value.map(([identifier]) => identifier);
-
-  // Permission info - description of permission hierarchy
-  const [permissionManager, permissionInfo] = usePermissionInfo();
-
   // keep track of permissions for each entry (ACL)
   const aclMap = Object.assign(
     {},
@@ -73,7 +72,10 @@ const ACLField = props => {
     setValue(prev => _.omit(prev, identifier));
   };
   const handleAddItems = data => {
-    const newACLs = data.map(({identifier}) => ({[identifier]: ['prebook']}));
+    const {
+      permissionInfo: {default: defaultPermission},
+    } = props;
+    const newACLs = data.map(({identifier}) => ({[identifier]: [defaultPermission]}));
     setValue(prev => ({...prev, ...Object.assign({}, ...newACLs)}));
   };
 
@@ -106,6 +108,7 @@ const ACLField = props => {
                 );
               }}
               readAccessAllowed={readAccessAllowed}
+              fullAccessAllowed={fullAccessAllowed}
               readOnly={readOnly}
             />
           );
@@ -138,7 +141,7 @@ const ACLField = props => {
       {!readOnly && (
         <Button.Group>
           <Button icon="add" as="div" disabled />
-          <UserSearch
+          <DefaultUserSearch
             existing={valueIds}
             onAddItems={handleAddItems}
             favorites={favoriteUsers}
@@ -172,12 +175,24 @@ ACLField.propTypes = {
   withGroups: PropTypes.bool,
   /** Whether the 'read_access' permission is used/allowed */
   readAccessAllowed: PropTypes.bool,
+  /** Whether the 'full_access' permission is used/allowed */
+  fullAccessAllowed: PropTypes.bool,
+  /** Object containing metadata about available permissions */
+  permissionInfo: PropTypes.shape({
+    permissions: PropTypes.object,
+    tree: PropTypes.object,
+    default: PropTypes.string,
+  }).isRequired,
+  permissionManager: PropTypes.shape({
+    setPermissionForId: PropTypes.func.isRequired,
+  }).isRequired,
 };
 
 ACLField.defaultProps = {
   withGroups: false,
   readOnly: false,
   readAccessAllowed: true,
+  fullAccessAllowed: true,
 };
 
 export default React.memo(ACLField);

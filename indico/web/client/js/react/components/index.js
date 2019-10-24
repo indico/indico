@@ -25,6 +25,7 @@ export {
   PrincipalField,
   PrincipalListField,
   ACLField,
+  TrackACLField,
 } from './principals';
 export {default as PopoverDropdownMenu} from './PopoverDropdownMenu';
 export {default as ResponsivePopup} from './ResponsivePopup';

@@ -16,7 +16,6 @@ from sqlalchemy.orm import contains_eager, joinedload, load_only, noload, subque
 
 from indico.core.config import config
 from indico.core.db import db
-from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.legacy.pdfinterface.latex import AbstractBook
 from indico.modules.events import Event
@@ -30,7 +29,6 @@ from indico.modules.events.contributions.models.fields import ContributionFieldV
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.tracks.models.principals import TrackPrincipal
 from indico.modules.events.tracks.models.tracks import Track
-from indico.modules.users import User
 from indico.util.i18n import _
 from indico.util.spreadsheets import unique_col
 from indico.web.flask.templating import get_template_module
@@ -205,35 +203,6 @@ def make_abstract_form(event, user, notification_option=False, management=False,
             name = 'custom_{}'.format(custom_field.id)
             setattr(form_class, name, field_impl.create_wtf_field())
     return form_class
-
-
-def get_roles_for_event(event):
-    """Return a dictionary of all abstract reviewing roles for this event.
-
-    :param event: the actual event object.
-    :return: A dictionary in the form ``{track: {role: [users]}}``
-    """
-    roles = defaultdict(dict)
-    roles['*'].setdefault('reviewer', [])
-    roles['*'].setdefault('convener', [])
-    for track in Track.query.with_parent(event).options(subqueryload('acl_entries')):
-        roles[str(track.id)].setdefault('reviewer', [])
-        roles[str(track.id)].setdefault('convener', [])
-        for principal in track.acl_entries:
-            if principal.type != PrincipalType.user:
-                continue
-            if 'review' in principal.permissions:
-                roles[str(track.id)]['reviewer'].append(principal.user_id)
-            if 'convene' in principal.permissions:
-                roles[str(track.id)]['convener'].append(principal.user_id)
-    for principal in event.acl_entries:
-        if not principal.user_id:
-            continue
-        if 'review_all_abstracts' in principal.permissions:
-                roles['*']['reviewer'].append(principal.user_id)
-        if 'convene_all_abstracts' in principal.permissions:
-            roles['*']['convener'].append(principal.user_id)
-    return roles
 
 
 def get_user_abstracts(event, user):
