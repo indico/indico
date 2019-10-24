@@ -70,19 +70,22 @@ def get_permissions_info(_type):
     from indico.modules.events.contributions import Contribution
     from indico.modules.events.sessions import Session
     from indico.modules.rb.models.rooms import Room
+    from indico.modules.events.tracks import Track
 
     description_mapping = {
         FULL_ACCESS_PERMISSION: {
             Event: _('Unrestricted management access for the whole event'),
             Session: _('Unrestricted management access for the selected session'),
             Contribution: _('Unrestricted management access for the selected contribution'),
-            Room: _('Full management access over the room')
+            Room: _('Full management access over the room'),
+            Track: None
         },
         READ_ACCESS_PERMISSION: {
             Event: _('Access the public areas of the event'),
             Session: _('Access the public areas of the selected session'),
             Contribution: _('Access the public areas of the selected contribution'),
-            Room: None
+            Room: None,
+            Track: None
         }
     }
 
@@ -140,11 +143,20 @@ def get_principal_permissions(principal, _type):
     return permissions | (set(principal.permissions) & set(available_permissions))
 
 
-def get_unified_permissions(principal):
-    """Convert principal's permissions into a list including read and full access."""
-    if principal.full_access:
+def get_unified_permissions(principal, all_permissions=False):
+    """Convert principal's permissions into a list including read and full access.
+
+    :param principal: A `User`, `GroupProxy`, `EmailPrincipal` or `EventRole` instance
+    :param all_permissions: Whether to include all permissions, even if principal has full access
+    """
+    if not all_permissions and principal.full_access:
         return {FULL_ACCESS_PERMISSION}
-    return (set(principal.permissions) + {READ_ACCESS_PERMISSION}) if principal.read_access else principal.permissions
+    perms = set(principal.permissions)
+    if principal.full_access:
+        perms.add(FULL_ACCESS_PERMISSION)
+    if principal.read_access:
+        perms.add(READ_ACCESS_PERMISSION)
+    return perms
 
 
 def get_split_permissions(permissions):

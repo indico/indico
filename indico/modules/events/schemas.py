@@ -13,7 +13,7 @@ from indico.util.marshmallow import PrincipalPermissionList
 
 
 class EventPermissionsSchema(mm.Schema):
-    acl_entries = PrincipalPermissionList(EventPrincipal, explicit_permissions=True)
+    acl_entries = PrincipalPermissionList(EventPrincipal, all_permissions=True)
 
 
 event_permissions_schema = EventPermissionsSchema()

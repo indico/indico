@@ -69,13 +69,13 @@ class ConvenePermission(ManagementPermission):
     friendly_name = _('Convene')
     description = _('Grants track convener rights in a track.')
     user_selectable = True
+    color = 'purple'
 
 
 class GlobalConvenePermission(ManagementPermission):
     name = 'convene_all_abstracts'
     friendly_name = _('Convene all tracks')
     description = _('Grants convene rights to all tracks of the event.')
-    color = 'purple'
 
 
 class TrackConvenerPermission(ManagementPermission):

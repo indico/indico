@@ -16,7 +16,7 @@ from marshmallow.fields import DateTime, Field
 from marshmallow.utils import from_iso_datetime
 from sqlalchemy import inspect
 
-from indico.core.permissions import get_unified_permissions
+from indico.core.permissions import get_principal_permissions, get_unified_permissions
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.util.user import principal_from_identifier
@@ -216,16 +216,20 @@ class PrincipalList(Field):
 
 
 class PrincipalPermissionList(Field):
-    """Marshmallow field for a list of principals and their permissions."""
+    """Marshmallow field for a list of principals and their permissions.
 
-    def __init__(self, principal_class, **kwargs):
+    :param principal_class: Object class to get principal permissions for
+    :param all_permissions: Whether to include all permissions, even if principal has full access
+    """
+
+    def __init__(self, principal_class, all_permissions=False, **kwargs):
         self.principal_class = principal_class
+        self.all_permissions = all_permissions
         super(PrincipalPermissionList, self).__init__(**kwargs)
 
     def _serialize(self, value, attr, obj):
-        if self.explicit_permissions:
-            return [(entry.principal.identifier, set(entry.permissions)) for entry in value]
-        return [(entry.principal.identifier, sorted(get_unified_permissions(entry))) for entry in value]
+        return [(entry.principal.identifier, sorted(get_unified_permissions(entry, self.all_permissions)))
+                for entry in value]
 
     def _deserialize(self, value, attr, data):
         try:

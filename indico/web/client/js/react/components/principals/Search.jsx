@@ -447,7 +447,7 @@ const InnerUserSearch = searchFactory({
   ),
 });
 
-const _UserSearch = ({withExternalUsers, initialFormValues, ...props}) => {
+export const DefaultUserSearch = ({withExternalUsers, initialFormValues, ...props}) => {
   if (!withExternalUsers) {
     // ignore form defaults for a field that's hidden
     delete initialFormValues.external;
@@ -461,19 +461,19 @@ const _UserSearch = ({withExternalUsers, initialFormValues, ...props}) => {
   );
 };
 
-_UserSearch.propTypes = {
+DefaultUserSearch.propTypes = {
   ...InnerUserSearch.propTypes,
   withExternalUsers: PropTypes.bool,
   initialFormValues: PropTypes.object,
 };
 
-_UserSearch.defaultProps = {
+DefaultUserSearch.defaultProps = {
   ...InnerUserSearch.defaultProps,
   withExternalUsers: false,
   initialFormValues: {},
 };
 
-export const UserSearch = Overridable.component('UserSearch', _UserSearch);
+export const UserSearch = Overridable.component('UserSearch', DefaultUserSearch);
 
 export const GroupSearch = searchFactory({
   componentName: 'GroupSearch',

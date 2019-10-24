@@ -51,6 +51,7 @@ import {
 import {FavoritesProvider} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
 import {FinalEmailList, FinalPrincipal, ACLField} from 'indico/react/components';
+import {usePermissionInfo} from 'indico/react/components/principals/hooks';
 import EquipmentList from './EquipmentList';
 import DailyAvailability from './DailyAvailability';
 import NonBookablePeriods from './NonBookablePeriods';
@@ -898,22 +899,30 @@ class RoomEditModal extends React.Component {
             </Form.Group>
           </React.Fragment>
         );
-      case 'permissions':
+      case 'permissions': {
+        const [permissionManager, permissionInfo] = usePermissionInfo();
         return (
-          <FavoritesProvider key={key}>
-            {favoriteUsersController => (
-              <FinalField
-                name="aclEntries"
-                component={ACLField}
-                favoriteUsersController={favoriteUsersController}
-                label={content.label}
-                readAccessAllowed={false}
-                isEqual={_.isEqual}
-                withGroups
-              />
-            )}
-          </FavoritesProvider>
+          permissionManager &&
+          permissionInfo && (
+            <FavoritesProvider key={key}>
+              {favoriteUsersController => (
+                <FinalField
+                  name="aclEntries"
+                  component={ACLField}
+                  favoriteUsersController={favoriteUsersController}
+                  label={content.label}
+                  permissions={false}
+                  readAccessAllowed={false}
+                  isEqual={_.isEqual}
+                  withGroups
+                  permissionInfo={permissionInfo}
+                  permissionManager={permissionManager}
+                />
+              )}
+            </FavoritesProvider>
+          )
         );
+      }
     }
   };
 

@@ -8,7 +8,9 @@
 from __future__ import unicode_literals
 
 from indico.core.marshmallow import mm
+from indico.modules.events.tracks.models.principals import TrackPrincipal
 from indico.modules.events.tracks.models.tracks import Track
+from indico.util.marshmallow import PrincipalPermissionList
 
 
 class TrackSchema(mm.ModelSchema):
@@ -23,3 +25,4 @@ class TrackPermissionsSchema(mm.Schema):
 
 track_schema = TrackSchema()
 track_schema_basic = TrackSchema(only=('id', 'title', 'code'))
+track_permissions_schema = TrackPermissionsSchema()
