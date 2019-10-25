@@ -72,7 +72,7 @@ def _require_pg_version(version):
 
 def _require_encoding(encoding):
     cur_encoding = db.engine.execute("SELECT current_setting('server_encoding')").scalar()
-    if cur_encoding >= encoding:
+    if cur_encoding == encoding:
         return True
     print(cformat('%{red}Database encoding must be {}; got {}').format(encoding, cur_encoding))
     print(cformat('%{yellow}Recreate your database using `createdb -E {} -T template0 ...`').format(encoding))
