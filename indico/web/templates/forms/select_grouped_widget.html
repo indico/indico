@@ -1,0 +1,18 @@
+{% extends 'forms/base_widget.html' %}
+
+
+{% block html %}
+    <select name="{{ field.name }}">
+    {% for (group, group_label), objects in field.get_grouped_choices() %}
+        {% if group %}
+            <optgroup label="{{ group_label }}">
+        {% endif %}
+        {% for val, label, selected, _group, _group_label in objects %}
+            <option {% if selected %}selected{% endif %} value="{{ val }}">{{ label }}</option>
+        {% endfor %}
+        {% if group %}
+            </optgroup>
+        {% endif %}
+    {% endfor %}
+    </select>
+{% endblock %}
