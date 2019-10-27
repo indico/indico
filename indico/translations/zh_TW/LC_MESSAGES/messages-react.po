@@ -1,0 +1,5603 @@
+# Translations template for indico.
+# Copyright (C) 2019 ORGANIZATION
+# This file is distributed under the same license as the indico project.
+#
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2019.
+# Franklin Weng <franklin@goodhorse.idv.tw>, 2019.
+msgid ""
+msgstr ""
+"Project-Id-Version: indico 2.2.3-dev\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2019-10-19 13:51+0200\n"
+"PO-Revision-Date: 2019-10-27 20:06+0800\n"
+"Last-Translator: Franklin Weng <franklin@goodhorse.idv.tw>\n"
+"Language-Team: Chinese <zh-l10n@lists.linux.org.tw>\n"
+"Language: zh_TW\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.7.0\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Lokalize 2.0\n"
+
+#: indico/modules/events/logs/client/js/components/LogEntryList.jsx:39
+msgid "This email is pending and will be sent soon."
+msgstr ""
+
+#: indico/modules/events/logs/client/js/components/LogEntryList.jsx:45
+msgid "This email has been sent."
+msgstr ""
+
+#: indico/modules/events/logs/client/js/components/LogEntryList.jsx:51
+msgid "Sending this email failed."
+msgstr ""
+
+#: indico/modules/events/logs/client/js/components/LogEntryModal.jsx:117
+msgid "Previous"
+msgstr "前一個"
+
+#: indico/modules/events/logs/client/js/components/LogEntryModal.jsx:126
+msgid "Next"
+msgstr "下一個"
+
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:88
+msgid "Booked for"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:112
+msgid "Booking reason"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:206
+msgid "{date} - {info} by {user}"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:219
+msgid "Booking history"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:241
+msgid "The booking has been successfully split."
+msgstr ""
+
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:243
+msgid "You can consult your new booking {link}here{/link}."
+msgstr ""
+
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:263
+msgid "Pending Confirmation"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:264
+msgid "This booking is subject to acceptance by the room owner"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:268
+#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:217
+#: indico/modules/rb/client/js/util.jsx:247
+msgid "Cancelled"
+msgstr "已取消"
+
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:271
+msgid "The booking was cancelled."
+msgstr ""
+
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:275
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:293
+#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:140
+msgid "Reason: {rejectionReason}"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:286
+#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:236
+#: indico/modules/rb/client/js/util.jsx:246
+msgid "Rejected"
+msgstr "已拒絕"
+
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:289
+msgid "The booking was rejected."
+msgstr ""
+
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:304
+msgid "Accepted"
+msgstr "已接受"
+
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:305
+msgid "The booking was accepted"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:331
+#: indico/modules/rb/client/js/modules/admin/AdminRoomItem.jsx:48
+#: indico/modules/rb/client/js/modules/admin/EditableListItem.jsx:143
+#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:306
+msgid "Confirm deletion"
+msgstr "確認刪除"
+
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:332
+msgid "Are you sure you want to delete this booking?"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:333
+#: indico/modules/rb/client/js/common/rooms/RoomPhoto.jsx:117
+#: indico/modules/rb/client/js/modules/admin/AdminRoomItem.jsx:50
+#: indico/modules/rb/client/js/modules/admin/EditableListItem.jsx:145
+#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:308
+msgid "Delete"
+msgstr "刪除"
+
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:334
+#: indico/modules/rb/client/js/common/filters/FilterDropdown.jsx:169
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:960
+#: indico/modules/rb/client/js/common/rooms/RoomPhoto.jsx:129
+#: indico/modules/rb/client/js/modules/admin/AdminRoomItem.jsx:51
+#: indico/modules/rb/client/js/modules/admin/EditableListItem.jsx:146
+#: indico/modules/rb/client/js/modules/admin/MapAreasPage.jsx:315
+#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:309
+#: indico/web/client/js/react/components/principals/PrincipalPermissions.jsx:103
+#: indico/web/client/js/react/components/principals/Search.jsx:327
+msgid "Cancel"
+msgstr "取消"
+
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:395
+msgid "Reject booking"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:410
+#: indico/modules/rb/client/js/common/timeline/RowActionsDropdown.jsx:109
+#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:157
+msgid "Provide the rejection reason"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:422
+#: indico/modules/rb/client/js/common/timeline/RowActionsDropdown.jsx:122
+#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:169
+msgid "Reject"
+msgstr "拒絕"
+
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:439
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:447
+msgid "Cancel booking"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:442
+#: indico/modules/rb/client/js/common/timeline/RowActionsDropdown.jsx:189
+msgid "Confirm cancellation"
+msgstr "確認取消"
+
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:443
+msgid ""
+"Are you sure you want to cancel this booking? This will cancel future "
+"occurrences of this booking."
+msgstr ""
+
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:448
+#: indico/modules/rb/client/js/common/bookings/BookingEdit.jsx:230
+#: indico/modules/rb/client/js/common/bookings/BookingExportModal.jsx:87
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:958
+#: indico/modules/rb/client/js/common/timeline/RowActionsDropdown.jsx:197
+#: indico/modules/rb/client/js/common/timeline/RowActionsDropdown.jsx:209
+#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:429
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:662
+msgid "Close"
+msgstr "關閉"
+
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:472
+msgid "Accept booking"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:526
+msgid "Booking Details"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:566
+#: indico/modules/rb/client/js/common/bookings/BookingEditCalendar.jsx:126
+msgid "Occurrences"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/bookings/BookingEdit.jsx:35
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:55
+msgid "Reason must be at least 3 characters"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/bookings/BookingEdit.jsx:186
+msgid "Edit a booking"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/bookings/BookingEdit.jsx:196
+msgid "This booking has already started."
+msgstr ""
+
+#: indico/modules/rb/client/js/common/bookings/BookingEdit.jsx:227
+msgid "Save changes"
+msgstr "儲存變更"
+
+#: indico/modules/rb/client/js/common/bookings/BookingEdit.jsx:250
+msgid "Conflicts with new booking"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/bookings/BookingEdit.jsx:252
+msgid "Your new booking conflicts with another one."
+msgid_plural ""
+"{count} occurrences of your booking are unavailable due to conflicts."
+msgstr[0] ""
+
+#: indico/modules/rb/client/js/common/bookings/BookingEdit.jsx:266
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:212
+msgid "I understand, please skip any days with conflicting occurrences."
+msgstr ""
+
+#: indico/modules/rb/client/js/common/bookings/BookingEditCalendar.jsx:139
+msgid "Your booking has already started and will be split into:"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/bookings/BookingEditCalendar.jsx:142
+msgid "the original booking, which will be shortened;"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/bookings/BookingEditCalendar.jsx:145
+msgid ""
+"a new booking, which will take into account the updated time information."
+msgstr ""
+
+#: indico/modules/rb/client/js/common/bookings/BookingEditCalendar.jsx:161
+msgid "Original booking"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/bookings/BookingEditCalendar.jsx:178
+msgid "New booking"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/bookings/BookingEditCalendar.jsx:180
+msgid "Booking after changes"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/bookings/BookingEditForm.jsx:121
+#: indico/modules/rb/client/js/components/BookingBootstrapForm.jsx:239
+#: indico/modules/rb/client/js/modules/bookRoom/filters/RecurrenceForm.jsx:74
+msgid "Single booking"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/bookings/BookingEditForm.jsx:130
+#: indico/modules/rb/client/js/components/BookingBootstrapForm.jsx:248
+msgid "Daily booking"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/bookings/BookingEditForm.jsx:139
+#: indico/modules/rb/client/js/components/BookingBootstrapForm.jsx:257
+msgid "Recurring booking"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/bookings/BookingEditForm.jsx:150
+#: indico/modules/rb/client/js/components/BookingBootstrapForm.jsx:268
+#: indico/modules/rb/client/js/modules/bookRoom/filters/RecurrenceForm.jsx:93
+msgid "Every"
+msgstr "每"
+
+#: indico/modules/rb/client/js/common/bookings/BookingEditForm.jsx:179
+#: indico/modules/rb/client/js/common/timeline/DateNavigator.jsx:175
+#: indico/modules/rb/client/js/components/BookingBootstrapForm.jsx:221
+#: indico/modules/rb/client/js/modules/bookRoom/filters/RecurrenceForm.jsx:59
+msgid "Week"
+msgid_plural "Weeks"
+msgstr[0] "週"
+
+#: indico/modules/rb/client/js/common/bookings/BookingEditForm.jsx:183
+#: indico/modules/rb/client/js/common/timeline/DateNavigator.jsx:181
+#: indico/modules/rb/client/js/components/BookingBootstrapForm.jsx:222
+#: indico/modules/rb/client/js/modules/bookRoom/filters/RecurrenceForm.jsx:63
+msgid "Month"
+msgid_plural "Months"
+msgstr[0] "個月"
+
+#: indico/modules/rb/client/js/common/bookings/BookingEditForm.jsx:236
+msgid "This booking will require approval!"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/bookings/BookingEditForm.jsx:238
+msgid "Changing date or time will revert it back to a pre-booking."
+msgstr ""
+
+#: indico/modules/rb/client/js/common/bookings/BookingEditForm.jsx:253
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:593
+msgid "I'll be using it myself"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/bookings/BookingEditForm.jsx:263
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:599
+msgid "I'm booking it for someone else"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/bookings/BookingEditForm.jsx:282
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:619
+msgid "Reason for booking"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/bookings/BookingExportModal.jsx:53
+#: indico/modules/rb/client/js/modules/roomList/RoomList.jsx:155
+msgid "Export bookings"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/bookings/BookingExportModal.jsx:58
+msgid "File format"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/bookings/BookingExportModal.jsx:66
+#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:356
+msgid "Period"
+msgstr "期間"
+
+#: indico/modules/rb/client/js/common/bookings/BookingExportModal.jsx:74
+msgid "Rooms to export"
+msgstr "要匯出的會議室"
+
+#: indico/modules/rb/client/js/common/bookings/BookingExportModal.jsx:77
+msgid "Please choose at least one room."
+msgstr "請至少選擇一間會議室"
+
+#: indico/modules/rb/client/js/common/bookings/BookingExportModal.jsx:85
+msgid "Export"
+msgstr "匯出"
+
+#: indico/modules/rb/client/js/common/bookings/BookingObjectLink.jsx:40
+msgid "This booking will be linked to an event:"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/bookings/BookingObjectLink.jsx:41
+msgid "This booking will be linked to a contribution:"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/bookings/BookingObjectLink.jsx:42
+msgid "This booking will be linked to a session block:"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/bookings/BookingObjectLink.jsx:45
+msgid "This booking is linked to an event:"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/bookings/BookingObjectLink.jsx:46
+msgid "This booking is linked to a contribution:"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/bookings/BookingObjectLink.jsx:47
+msgid "This booking is linked to a session block:"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/bookings/OccurrencesCounter.jsx:25
+msgid "Number of booking occurrences"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/bookings/OccurrencesCounter.jsx:37
+msgid "Number of past occurrences that will not be modified"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/bookings/OccurrencesCounter.jsx:53
+msgid "Number of new occurrences after changes"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/filters/FilterDropdown.jsx:163
+msgid "Apply"
+msgstr "套用"
+
+#: indico/modules/rb/client/js/common/filters/validation.js:41
+msgid "Something went wrong"
+msgstr "有點怪怪的"
+
+#: indico/modules/rb/client/js/common/filters/validation.js:42
+msgid "The provided URL was not properly formatted."
+msgstr ""
+
+#: indico/modules/rb/client/js/common/linking/LinkBar.jsx:21
+msgid "Your booking will be linked to an event:"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/linking/LinkBar.jsx:22
+msgid "Your booking will be linked to a contribution:"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/linking/LinkBar.jsx:23
+msgid "Your booking will be linked to a session block:"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/linking/LinkBar.jsx:58
+msgid "Exit linking mode"
+msgstr "離開連結模式"
+
+#: indico/modules/rb/client/js/common/map/MapController.jsx:172
+msgid "Show only rooms in this area"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/map/MapController.jsx:183
+msgid "Select area"
+msgstr "選擇區域"
+
+#: indico/modules/rb/client/js/common/map/MapController.jsx:208
+msgid "Zoom out to include all listed rooms"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/rooms/DailyAvailability.jsx:80
+msgid "Add new Daily Availability"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/rooms/DailyAvailability.jsx:85
+msgid "No daily availability found"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/rooms/EquipmentList.jsx:78
+msgid "No equipment found"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/rooms/NonBookablePeriods.jsx:105
+msgid "Add new Nonbookable Periods"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/rooms/NonBookablePeriods.jsx:110
+msgid "No non-bookable periods found"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/rooms/RoomDetailsModal.jsx:206
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:587
+msgid "Usage"
+msgstr "使用量"
+
+#: indico/modules/rb/client/js/common/rooms/RoomDetailsModal.jsx:228
+msgid "See all bookings"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/rooms/RoomDetailsModal.jsx:242
+msgid "Would you like to use this space?"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/rooms/RoomDetailsModal.jsx:248
+msgid "Start booking"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/rooms/RoomDetailsModal.jsx:254
+msgid "Start pre-booking"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/rooms/RoomDetailsModal.jsx:286
+msgid "Anyone can book this space."
+msgstr ""
+
+#: indico/modules/rb/client/js/common/rooms/RoomDetailsModal.jsx:288
+msgid "You can book this space."
+msgstr ""
+
+#: indico/modules/rb/client/js/common/rooms/RoomDetailsModal.jsx:293
+msgid "Max. {max_advance_days} days in advance"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/rooms/RoomDetailsModal.jsx:308
+msgid "This space cannot be booked at the moment."
+msgstr ""
+
+#: indico/modules/rb/client/js/common/rooms/RoomDetailsModal.jsx:317
+msgid "You are not authorized to book this space."
+msgstr ""
+
+#: indico/modules/rb/client/js/common/rooms/RoomDetailsModal.jsx:53
+msgid "Room Details"
+msgstr "會議室詳細資料"
+
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:81
+msgid "Please provide a building."
+msgstr ""
+
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:84
+msgid "Please provide a floor."
+msgstr ""
+
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:87
+msgid "Please provide a number."
+msgstr ""
+
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:90
+msgid "Please provide a valid capacity number."
+msgstr ""
+
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:93
+msgid "Please provide a valid surface area."
+msgstr ""
+
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:96
+msgid "The max. advance booking time must be at least 1 day or empty."
+msgstr ""
+
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:101
+msgid "The max. booking duration must be at least 1 day or empty."
+msgstr ""
+
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:117
+msgid "Number of days must be between 1 and 30"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:122
+msgid "Please provide valid non-bookable periods."
+msgstr ""
+
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:125
+msgid "You need to specify the owner of the room."
+msgstr ""
+
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:136
+msgid "Photo"
+msgstr "相片"
+
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:143
+#: indico/modules/rb/client/js/components/SidebarFooter.jsx:41
+#: indico/modules/rb/client/js/components/SidebarFooter.jsx:125
+msgid "Contact"
+msgstr "聯絡人"
+
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:148
+msgid "Owner"
+msgstr "擁有者"
+
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:153
+msgid "Where is the key?"
+msgstr "鑰匙在哪裡？"
+
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:159
+msgid "Telephone"
+msgstr "電話"
+
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:164
+msgid "Information"
+msgstr "資訊"
+
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:173
+#: indico/modules/rb/client/js/components/RoomBasicDetails.jsx:159
+msgid "Capacity"
+msgstr "容量"
+
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:184
+msgid "Division"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:195
+msgid "Comments"
+msgstr "註解"
+
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:200
+msgid "Daily availability"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:207
+msgid "Permissions"
+msgstr "權限"
+
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:211
+msgid "Booking mode"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:215
+msgid "User and group permissions"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:222
+#: indico/modules/rb/client/js/components/RoomSelector.jsx:138
+msgid "Location"
+msgstr "位置"
+
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:227
+#: indico/modules/rb/client/js/modules/admin/AttributesPage.jsx:78
+#: indico/modules/rb/client/js/modules/admin/EquipmentTypeList.jsx:79
+#: indico/modules/rb/client/js/modules/admin/LocationPage.jsx:103
+#: indico/modules/rb/client/js/modules/admin/RoomFeatureList.jsx:80
+msgid "Name"
+msgstr "名稱"
+
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:236
+msgid "Site"
+msgstr "站台"
+
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:246
+#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:167
+#: indico/modules/rb/client/js/modules/roomList/filters/BuildingForm.jsx:55
+msgid "Building"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:255
+msgid "Floor"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:264
+msgid "Number"
+msgstr "數字"
+
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:279
+msgid "Longitude"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:289
+msgid "Latitude"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:301
+msgid "Surface Area (m²)"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:311
+msgid "Maximum advance time for bookings (days)"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:321
+msgid "Max duration of a booking (day)"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:330
+msgid "Options"
+msgstr "選項"
+
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:335
+msgid "Bookable"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:340
+msgid "Require confirmation (pre-bookings)"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:345
+msgid "Reminders enabled"
+msgstr "提醒已開啟"
+
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:350
+msgid "Reminders of finishing bookings enabled"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:354
+msgid "Notifications"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:359
+msgid "Notification emails"
+msgstr "電子郵件通知"
+
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:365
+msgid "How many days in advance booking reminders should be sent"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:370
+msgid "Single/Daily"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:382
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:426
+#: indico/modules/rb/client/js/util.jsx:179
+msgid "Weekly"
+msgid_plural "Every {number} weeks"
+msgstr[0] "每 {number} 週"
+
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:394
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:438
+#: indico/modules/rb/client/js/util.jsx:191
+msgid "Monthly"
+msgid_plural "Every {number} months"
+msgstr[0] "每 {number} 個月"
+
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:409
+msgid "How many days before the end of a booking should reminders be sent"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:414
+#: indico/modules/rb/client/js/modules/bookRoom/filters/RecurrenceForm.jsx:83
+#: indico/modules/rb/client/js/util.jsx:170
+msgid "Daily"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:454
+msgid "Custom attributes"
+msgstr "自訂屬性"
+
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:458
+msgid "Add new attributes"
+msgstr "新增屬性"
+
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:462
+msgid "Equipment available"
+msgstr "可用的設備"
+
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:466
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:847
+msgid "Add new equipment"
+msgstr "新增設備"
+
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:470
+msgid "Non-bookable periods"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:765
+msgid "No custom attributes found"
+msgstr "找不到自訂屬性"
+
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:875
+msgid "Restricted rooms can only be booked by users defined in the room ACL"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:880
+msgid "Public"
+msgstr "公開"
+
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:884
+msgid "Restricted"
+msgstr "已限制"
+
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:915
+msgid "Add Room"
+msgstr "新增會議室"
+
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:915
+msgid "Edit Room Details"
+msgstr "編輯會議室詳情"
+
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:929
+msgid "Room has been successfully created."
+msgstr ""
+
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:932
+msgid "Room has been successfully updated."
+msgstr ""
+
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:936
+msgid "Room could not be updated."
+msgstr ""
+
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:943
+msgid "Reset form"
+msgstr "重置表單"
+
+#: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:970
+#: indico/modules/rb/client/js/common/rooms/RoomPhoto.jsx:104
+#: indico/modules/rb/client/js/modules/admin/EditableListItem.jsx:117
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:269
+msgid "Save"
+msgstr "儲存"
+
+#: indico/modules/rb/client/js/common/rooms/RoomPhoto.jsx:91
+msgid "Upload"
+msgstr "上傳"
+
+#: indico/modules/rb/client/js/common/rooms/RoomPhoto.jsx:139
+msgid "Save photo"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/rooms/RoomPhoto.jsx:140
+msgid "Cancel photo upload"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/rooms/RoomPhoto.jsx:144
+msgid "Upload a new photo"
+msgstr "上傳新相片"
+
+#: indico/modules/rb/client/js/common/rooms/RoomPhoto.jsx:145
+msgid "Delete existing photo"
+msgstr "刪除現有的相片"
+
+#: indico/modules/rb/client/js/common/rooms/RoomPhoto.jsx:161
+msgid "No photo found."
+msgstr "找不到相片。"
+
+#: indico/modules/rb/client/js/common/rooms/RoomStats.jsx:71
+msgid "Times booked"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/rooms/RoomStats.jsx:73
+msgid "Occupancy"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/rooms/RoomStats.jsx:74
+msgid "excluding weekends"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/rooms/RoomStats.jsx:88
+msgid "Statistics"
+msgstr "統計"
+
+#: indico/modules/rb/client/js/common/rooms/RoomStats.jsx:100
+msgid "Last day"
+msgid_plural "Last {days} days"
+msgstr[0] "過去 {days} 天"
+
+#: indico/modules/rb/client/js/common/timeline/DailyTimelineContent.jsx:319
+msgid "Please turn your device horizontally to view this page."
+msgstr "請將您的載具打橫來查看此頁面。"
+
+#: indico/modules/rb/client/js/common/timeline/DateNavigator.jsx:169
+msgid "Day"
+msgstr "日"
+
+#: indico/modules/rb/client/js/common/timeline/DateNavigator.jsx:244
+msgid "Week of {date}"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/timeline/EditableTimelineItem.jsx:196
+msgid "Drag the mouse to create a booking"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/timeline/EditableTimelineItem.jsx:268
+msgid "Tip: click and drag to book!"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/timeline/EditableTimelineItem.jsx:270
+msgid "Tip: click and drag to pre-book!"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/timeline/ElasticTimeline.jsx:48
+msgid "No occurrences found"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/timeline/RowActionsDropdown.jsx:101
+msgid "Are you sure you want to reject this occurrence ({date})?"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/timeline/RowActionsDropdown.jsx:169
+#: indico/modules/rb/client/js/common/timeline/RowActionsDropdown.jsx:196
+msgid "Cancel occurrence"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/timeline/RowActionsDropdown.jsx:176
+msgid "Reject occurrence"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/timeline/RowActionsDropdown.jsx:183
+msgid "Show room timeline"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/timeline/RowActionsDropdown.jsx:190
+msgid "Are you sure you want to cancel this occurrence ({serializedDate})?"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/timeline/RowActionsDropdown.jsx:206
+msgid "Confirm rejection"
+msgstr "確認拒絕"
+
+#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:189
+#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:194
+msgid "Space blocked: {reason}"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:195
+msgid "(You are allowed to make a booking)"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:201
+msgid "Not possible to book in this period"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:207
+msgid "Not possible to book between:"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:220
+#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:239
+msgid "Reason: {reason}"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:228
+msgid "This occurrence will be cancelled"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:247
+msgid "This occurrence is conflicting with an existing booking"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:256
+msgid "Full overlap between two pre-bookings:"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:261
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:326
+msgid "{time} by {bookedForName} ({bookingReason})"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:280
+msgid "Click to book it"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:281
+msgid "Click to pre-book it"
+msgstr ""
+
+#: indico/modules/rb/client/js/common/timeline/TimelineLegend.jsx:31
+msgid "No occurrences"
+msgstr ""
+
+#: indico/modules/rb/client/js/components/AdminOverrideBar.jsx:26
+msgid "Admin override enabled"
+msgstr ""
+
+#: indico/modules/rb/client/js/components/AdminOverrideBar.jsx:33
+msgid ""
+"While in Admin Override mode, you can book any room regardless of "
+"restrictions and edit any booking."
+msgstr ""
+
+#: indico/modules/rb/client/js/components/AdminOverrideBar.jsx:40
+msgid "Disable admin override"
+msgstr ""
+
+#: indico/modules/rb/client/js/components/App.jsx:109
+msgid "This page does not exist."
+msgstr "此頁面不存在"
+
+#: indico/modules/rb/client/js/components/App.jsx:49
+msgid "Room Booking"
+msgstr ""
+
+#: indico/modules/rb/client/js/components/BookingBootstrapForm.jsx:51
+#: indico/web/client/js/react/components/principals/Search.jsx:107
+msgid "Search"
+msgstr "搜尋"
+
+#: indico/modules/rb/client/js/components/Menu.jsx:19
+msgid "Book a Room"
+msgstr ""
+
+#: indico/modules/rb/client/js/components/Menu.jsx:20
+msgid "List of Rooms"
+msgstr "會議室清單"
+
+#: indico/modules/rb/client/js/components/Menu.jsx:21
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:671
+msgid "Bookings"
+msgstr ""
+
+#: indico/modules/rb/client/js/components/Room.jsx:110
+msgid "This space is not bookable"
+msgstr ""
+
+#: indico/modules/rb/client/js/components/Room.jsx:120
+msgid "Checking permissions..."
+msgstr ""
+
+#: indico/modules/rb/client/js/components/Room.jsx:130
+msgid "This space is not publicly available"
+msgstr ""
+
+#: indico/modules/rb/client/js/components/Room.jsx:69
+msgid "Remove from favourites"
+msgstr "從最愛移除"
+
+#: indico/modules/rb/client/js/components/Room.jsx:70
+msgid "Add to favourites"
+msgstr "新增到最愛"
+
+#: indico/modules/rb/client/js/components/Room.jsx:179
+msgid "Not specified"
+msgstr "未指定"
+
+#: indico/modules/rb/client/js/components/RoomBasicDetails.jsx:145
+msgid "Room Owner"
+msgstr "會議室擁有者"
+
+#: indico/modules/rb/client/js/components/RoomBasicDetails.jsx:151
+msgid "Phone number"
+msgstr "電話號碼"
+
+#: indico/modules/rb/client/js/components/RoomBasicDetails.jsx:160
+msgid "1 {label}seat{/label}"
+msgid_plural "{count} {label}seats{/label}"
+msgstr[0] "{count} {label}個座位{/label}"
+
+#: indico/modules/rb/client/js/components/RoomBasicDetails.jsx:180
+msgid "Surface Area"
+msgstr "表面積"
+
+#: indico/modules/rb/client/js/components/RoomBasicDetails.jsx:190
+msgid "Geographical Coordinates"
+msgstr "地理位置座標"
+
+#: indico/modules/rb/client/js/components/RoomSelector.jsx:155
+msgid "Room"
+msgstr "會議室"
+
+#: indico/modules/rb/client/js/components/RoomSelector.jsx:197
+msgid "There are no rooms selected."
+msgstr "沒有選擇任何會議室"
+
+#: indico/modules/rb/client/js/components/SidebarFooter.jsx:29
+msgid "Help"
+msgstr "說明"
+
+#: indico/modules/rb/client/js/components/SidebarFooter.jsx:54
+#: indico/modules/rb/client/js/components/SidebarFooter.jsx:142
+msgid "Terms and Conditions"
+msgstr ""
+
+#: indico/modules/rb/client/js/components/SidebarFooter.jsx:67
+#: indico/modules/rb/client/js/components/SidebarFooter.jsx:152
+msgid "Privacy Policy"
+msgstr "隱私政策"
+
+#: indico/modules/rb/client/js/components/SidebarFooter.jsx:129
+msgid "If you need support, you can contact the following email address:"
+msgstr ""
+
+#: indico/modules/rb/client/js/components/SidebarMenu.jsx:60
+msgid "My Bookings"
+msgstr ""
+
+#: indico/modules/rb/client/js/components/SidebarMenu.jsx:66
+msgid "Bookings in My Rooms"
+msgstr ""
+
+#: indico/modules/rb/client/js/components/SidebarMenu.jsx:73
+msgid "List of My Rooms"
+msgstr ""
+
+#: indico/modules/rb/client/js/components/SidebarMenu.jsx:80
+msgid "My Blockings"
+msgstr ""
+
+#: indico/modules/rb/client/js/components/SidebarMenu.jsx:87
+#: indico/web/client/js/react/components/UserMenu.jsx:128
+msgid "Administration"
+msgstr "管理"
+
+#: indico/modules/rb/client/js/components/SidebarMenu.jsx:94
+msgid "Admin Override"
+msgstr ""
+
+#: indico/modules/rb/client/js/components/TimeInformation.jsx:49
+msgid "{startDate} to {endDate}"
+msgstr ""
+
+#: indico/modules/rb/client/js/components/TimeInformation.jsx:68
+msgid "{count} occurrences"
+msgstr ""
+
+#: indico/modules/rb/client/js/components/TimeInformation.jsx:76
+msgid "See on timeline"
+msgstr ""
+
+#: indico/modules/rb/client/js/components/TimeRangePicker.jsx:26
+msgid "1 hour"
+msgstr "1 小時"
+
+#: indico/modules/rb/client/js/components/TimeRangePicker.jsx:28
+msgid "{time} hours"
+msgstr "{time} 小時"
+
+#: indico/modules/rb/client/js/components/TimeRangePicker.jsx:30
+msgid "{time} min"
+msgstr "{time} 分鐘"
+
+#: indico/modules/rb/client/js/modules/admin/AdminLocationRooms.jsx:32
+msgid "This location does not exist."
+msgstr "這個位置不存在。"
+
+#: indico/modules/rb/client/js/modules/admin/AdminLocationRooms.jsx:54
+msgid "Location: {location}"
+msgstr "位置：{location}"
+
+#: indico/modules/rb/client/js/modules/admin/AdminLocationRooms.jsx:59
+msgid "Add room"
+msgstr "新增會議室"
+
+#: indico/modules/rb/client/js/modules/admin/AdminLocationRooms.jsx:75
+msgid "There are no rooms for the specified location."
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/admin/AdminMenu.jsx:56
+msgid "General settings"
+msgstr "一般設定"
+
+#: indico/modules/rb/client/js/modules/admin/AdminMenu.jsx:62
+#: indico/modules/rb/client/js/modules/admin/MapAreasPage.jsx:342
+msgid "Map Areas"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/admin/AdminMenu.jsx:68
+msgid "Room Metadata"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/admin/AdminMenu.jsx:73
+#: indico/modules/rb/client/js/modules/admin/AttributesPage.jsx:124
+msgid "Attributes"
+msgstr "屬性"
+
+#: indico/modules/rb/client/js/modules/admin/AdminMenu.jsx:78
+msgid "Equipment & Features"
+msgstr "設備與功能"
+
+#: indico/modules/rb/client/js/modules/admin/AdminMenu.jsx:85
+#: indico/modules/rb/client/js/modules/admin/LocationPage.jsx:197
+msgid "Locations"
+msgstr "位置"
+
+#: indico/modules/rb/client/js/modules/admin/AdminRoomItem.jsx:49
+msgid "Are you sure you want to delete this room?"
+msgstr "您確定要刪除此會議室嗎？"
+
+#: indico/modules/rb/client/js/modules/admin/AttributesPage.jsx:46
+msgid "This attribute is not shown in the public room details."
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/admin/AttributesPage.jsx:52
+#: indico/modules/rb/client/js/modules/admin/EquipmentTypeList.jsx:48
+#: indico/modules/rb/client/js/modules/admin/RoomFeatureList.jsx:44
+msgid "Currently unused"
+msgstr "目前未使用"
+
+#: indico/modules/rb/client/js/modules/admin/AttributesPage.jsx:54
+msgid "Used in {count}1{/count} room"
+msgid_plural "Used in {count} rooms"
+msgstr[0] "用於 {count} 間會議室"
+
+#: indico/modules/rb/client/js/modules/admin/AttributesPage.jsx:81
+#: indico/modules/rb/client/js/modules/admin/RoomFeatureList.jsx:83
+msgid "Title"
+msgstr "標題"
+
+#: indico/modules/rb/client/js/modules/admin/AttributesPage.jsx:82
+msgid "Hidden"
+msgstr "隱藏"
+
+#: indico/modules/rb/client/js/modules/admin/AttributesPage.jsx:89
+msgid "Are you sure you want to delete the attribute {name}?"
+msgstr "您確定要刪除此屬性 {name} 嗎？"
+
+#: indico/modules/rb/client/js/modules/admin/AttributesPage.jsx:96
+msgid "It is currently used in {count}1{/count} room."
+msgid_plural "It is currently used in {count} rooms."
+msgstr[0] "目前正用於 {count} 個會議室。"
+
+#: indico/modules/rb/client/js/modules/admin/AttributesPage.jsx:125
+msgid "Add attribute"
+msgstr "新增屬性"
+
+#: indico/modules/rb/client/js/modules/admin/CategoryList.jsx:45
+#: indico/modules/rb/client/js/modules/admin/CategoryList.jsx:46
+msgid "Please enter a category ID"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/admin/CategoryList.jsx:47
+msgid "Add category"
+msgstr "新增類別"
+
+#: indico/modules/rb/client/js/modules/admin/EditableList.jsx:58
+#: indico/modules/rb/client/js/modules/admin/EditableList.jsx:145
+msgid "Add"
+msgstr "新增"
+
+#: indico/modules/rb/client/js/modules/admin/EquipmentTypeList.jsx:39
+msgid "This equipment type provides the {name} feature."
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/admin/EquipmentTypeList.jsx:50
+msgid "Available in {count}1{/count} room"
+msgid_plural "Available in {count} rooms"
+msgstr[0] ""
+
+#: indico/modules/rb/client/js/modules/admin/EquipmentTypeList.jsx:87
+#: indico/modules/rb/client/js/modules/admin/RoomFeatureList.jsx:136
+msgid "Features"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/admin/EquipmentTypeList.jsx:96
+msgid "Are you sure you want to delete the equipment type {name}?"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/admin/EquipmentTypeList.jsx:103
+msgid "It is currently used by {count}1{/count} room."
+msgid_plural "It is currently used by {count} rooms."
+msgstr[0] ""
+
+#: indico/modules/rb/client/js/modules/admin/EquipmentTypeList.jsx:130
+msgid "Equipment types"
+msgstr "設備型態"
+
+#: indico/modules/rb/client/js/modules/admin/EquipmentTypeList.jsx:131
+msgid "Add equipment type"
+msgstr "新增設備型態"
+
+#: indico/modules/rb/client/js/modules/admin/LocationPage.jsx:28
+msgid "None"
+msgstr "無"
+
+#: indico/modules/rb/client/js/modules/admin/LocationPage.jsx:32
+msgid "Custom"
+msgstr "自訂"
+
+#: indico/modules/rb/client/js/modules/admin/LocationPage.jsx:83
+msgid "No rooms"
+msgstr "沒有會議室"
+
+#: indico/modules/rb/client/js/modules/admin/LocationPage.jsx:85
+msgid "{count}1{/count} room"
+msgid_plural "{count} rooms"
+msgstr[0] "{count} 間會議室"
+
+#: indico/modules/rb/client/js/modules/admin/LocationPage.jsx:107
+msgid "Room name format"
+msgstr "會議室名稱格式"
+
+#: indico/modules/rb/client/js/modules/admin/LocationPage.jsx:115
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:138
+msgid "Missing placeholder: {placeholders}"
+msgid_plural "Missing placeholders: {placeholders}"
+msgstr[0] ""
+
+#: indico/modules/rb/client/js/modules/admin/LocationPage.jsx:126
+msgid "Map URL template"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/admin/LocationPage.jsx:128
+msgid ""
+"Indico can show a link to an external map when a room is associated to an "
+"event."
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/admin/LocationPage.jsx:146
+msgid ""
+"Specify a custom URL template using any of the following placeholders: "
+"{placeholders}"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/admin/LocationPage.jsx:164
+msgid ""
+"Are you sure you want to delete the location {name} and all data associated "
+"with it?"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/admin/LocationPage.jsx:198
+msgid "Add location"
+msgstr "新增位置"
+
+#: indico/modules/rb/client/js/modules/admin/MapAreasPage.jsx:259
+msgid "Create new area"
+msgstr "建立新區域"
+
+#: indico/modules/rb/client/js/modules/admin/MapAreasPage.jsx:259
+msgid "Update area"
+msgstr "更新區域"
+
+#: indico/modules/rb/client/js/modules/admin/MapAreasPage.jsx:266
+msgid "Name of the area"
+msgstr "區域名稱"
+
+#: indico/modules/rb/client/js/modules/admin/MapAreasPage.jsx:272
+msgid "Default map area"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/admin/MapAreasPage.jsx:278
+msgid "SW Latitude"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/admin/MapAreasPage.jsx:285
+msgid "SW Longitude"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/admin/MapAreasPage.jsx:293
+msgid "NE Latitude"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/admin/MapAreasPage.jsx:300
+msgid "NE Longitude"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/admin/MapAreasPage.jsx:311
+msgid "Create"
+msgstr "建立"
+
+#: indico/modules/rb/client/js/modules/admin/MapAreasPage.jsx:311
+msgid "Update"
+msgstr "更新"
+
+#: indico/modules/rb/client/js/modules/admin/RoomFeatureList.jsx:46
+msgid "Provided by {count}1{/count} equipment type"
+msgid_plural "Provided by {count} equipment types"
+msgstr[0] ""
+
+#: indico/modules/rb/client/js/modules/admin/RoomFeatureList.jsx:89
+msgid "Icon"
+msgstr "圖示"
+
+#: indico/modules/rb/client/js/modules/admin/RoomFeatureList.jsx:100
+msgid "Are you sure you want to delete the feature {name}?"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/admin/RoomFeatureList.jsx:107
+msgid "It is currently provided by {count}1{/count} equipment type."
+msgid_plural "It is currently provided by {count} equipment types."
+msgstr[0] ""
+
+#: indico/modules/rb/client/js/modules/admin/RoomFeatureList.jsx:137
+msgid "Add feature"
+msgstr "新增功能"
+
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:69
+msgid "General Settings"
+msgstr "一般設定"
+
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:82
+msgid "Specify who has access to the room booking system."
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:89
+msgid "Authorized users"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:91
+msgid ""
+"Restrict access to the room booking system to these users/groups. If empty, "
+"all logged-in users have access."
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:101
+msgid "Administrators"
+msgstr "管理員"
+
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:103
+msgid "Grant full room booking admin permissions to these users/groups."
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:112
+msgid "Allow owners/managers to edit their rooms"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:114
+msgid ""
+"By default only admins can modify rooms, but you can allow room owners and "
+"managers to modify them as well."
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:122
+msgid "Tileserver URL"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:124
+msgid ""
+"If you want to use the map, specify the URL to a tileserver covering the "
+"area in which your rooms are located."
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:134
+#: indico/web/client/js/react/forms/validators.js:53
+msgid "Please provide a valid URL"
+msgstr "請輸入正確的網址"
+
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:153
+msgid "Max. booking length"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:154
+msgid "The maximum length (in days) a booking may last."
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:159
+msgid "Send reminders for upcoming bookings"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:164
+msgid "Specify how many days in advance booking reminders should be sent"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:175
+msgid "Single/Daily bookings"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:184
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:226
+msgid "Weekly bookings"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:193
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:235
+msgid "Monthly bookings"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:201
+msgid "Send reminders when bookings are about to end"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:206
+msgid ""
+"Specify how many days before the end of a booking reminders should be sent"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:217
+msgid "Daily bookings"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:245
+msgid "Disable booking during event creation"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:247
+msgid ""
+"Specify the IDs of categories for which booking a room during event creation "
+"will not be suggested."
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:259
+msgid "Grace period"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/admin/SettingsPage.jsx:261
+msgid ""
+"Usually booking a space in the past is not allowed. This setting will allow "
+"to book a room with a start date within a specified number of hours in the "
+"past. Leaving the field empty will allow any start date that is not in the "
+"past without restricting the start time as well."
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/blockings/BlockingCard.jsx:32
+msgid "1 room"
+msgid_plural "{count} rooms"
+msgstr[0] "{count} 間會議室"
+
+#: indico/modules/rb/client/js/modules/blockings/BlockingCard.jsx:71
+msgid "Created by {createdBy}"
+msgstr "由 {createdBy} 建立"
+
+#: indico/modules/rb/client/js/modules/blockings/BlockingFilterBar.jsx:21
+msgid "Active and future"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/blockings/BlockingFilterBar.jsx:22
+msgid "All blockings this year"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/blockings/BlockingFilterBar.jsx:23
+msgid "All blockings"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/blockings/BlockingFilterBar.jsx:52
+msgid "Filter by date"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/blockings/BlockingFilterBar.jsx:65
+msgid "Blockings in my rooms"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/blockings/BlockingFilterBar.jsx:70
+msgid "Show only blockings in my rooms"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/blockings/BlockingFilterBar.jsx:75
+msgid "My blockings"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/blockings/BlockingFilterBar.jsx:80
+msgid "Show only my blockings"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/blockings/BlockingList.jsx:84
+msgid "There are no blockings."
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:28
+#: indico/web/client/js/react/forms/validators.js:90
+msgid "Please choose a valid period."
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:31
+msgid "Please provide the reason for the blocking."
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:34
+msgid "Please choose at least one room for this blocking."
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:130
+msgid "Blocking has been accepted"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:132
+msgid "Pending approval by a room manager"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:136
+msgid "Booking rejected by {rejectedBy}"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:189
+msgid "Accept blocking"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:226
+msgid "Update blocking"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:228
+#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:241
+msgid "Block selected spaces"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:237
+msgid "Blocking details"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:239
+msgid "Edit blocking"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:307
+msgid "Are you sure you want to delete this blocking?"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:326
+msgid "Blocking created by {createdBy}"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:335
+msgid ""
+"When blocking rooms nobody but you, the rooms' managers and those users/"
+"groups you specify in the \"Allowed users/groups\" list will be able to "
+"create bookings for the specified rooms in the given timeframe. You can also "
+"block rooms you do not own - however, those blockings have to be approved by "
+"the owners of those rooms."
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:347
+msgid ""
+"Please take into account that rooms blockings should only be used for short "
+"term events and never for long-lasting periods. If you wish to somehow mark "
+"a room as unusable, please ask its owner to set it as such."
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:363
+msgid "Reason"
+msgstr "理由"
+
+#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:364
+msgid "Provide reason for blocking"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:377
+msgid "Authorized users/groups"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:387
+msgid "Rooms to block"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:388
+msgid "Blocked rooms"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:398
+msgid ""
+"You can accept and reject blockings for your rooms on the list by using the "
+"action buttons on the right side of the room name."
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:406
+msgid "The blocking has been successfully updated."
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:411
+msgid "The blocking has been successfully created."
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/blockings/BlockingModal.jsx:413
+msgid "You can consult your blocking {link}here{/link}."
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/bookRoom/BookFromListModal.jsx:33
+msgid "The space will be free on the selected time slot(s)"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/bookRoom/BookFromListModal.jsx:38
+msgid "The space won't be available on one or more days"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/bookRoom/BookFromListModal.jsx:44
+msgid "Space cannot be booked."
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/bookRoom/BookFromListModal.jsx:46
+msgid "One or more bookings would conflict with yours."
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/bookRoom/BookFromListModal.jsx:169
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:641
+msgid "Bookings in the past are not allowed."
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/bookRoom/BookFromListModal.jsx:84
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoom.jsx:85
+msgid "Book Room"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/bookRoom/BookFromListModal.jsx:85
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoom.jsx:86
+msgid "Pre-Book Room"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/bookRoom/BookFromListModal.jsx:86
+msgid "Book"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/bookRoom/BookFromListModal.jsx:87
+msgid "Pre-Book"
+msgstr "預先登記"
+
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoom.jsx:335
+msgid "Here are some alternatives we've found for you!"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoom.jsx:386
+msgid "List view"
+msgstr "清單檢視"
+
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoom.jsx:391
+msgid "Timeline view"
+msgstr "時間軸檢視"
+
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoom.jsx:87
+#: indico/modules/rb/client/js/modules/roomList/RoomList.jsx:243
+msgid "See details"
+msgstr "查看詳細資料"
+
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:46
+msgid "Please choose an option!"
+msgstr "請選擇一個方式。"
+
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:49
+msgid "Please specify a user"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:52
+msgid "You need to provide a reason"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:411
+msgid "Choose an event"
+msgstr "選擇一個活動"
+
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:460
+msgid "Event"
+msgstr "活動"
+
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:463
+msgid ""
+"You have an event taking place during the selected time. If you are booking "
+"the room for this event, please select it below. The room of the selected "
+"event will automatically be updated."
+msgid_plural ""
+"You have events taking place during the selected time. If you are booking "
+"this room for one of your events, please select it below. The room of the "
+"selected event will automatically be updated."
+msgstr[0] ""
+
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:149
+msgid "The space has been successfully pre-booked!"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:151
+msgid "The space has been successfully booked!"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:155
+msgid "You can consult your pre-booking {link}here{/link}."
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:163
+msgid "You can consult your booking {link}here{/link}."
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:177
+msgid "Couldn't book the room"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:196
+msgid "Booking conflicts"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:198
+msgid "Your booking conflicts with another existing one."
+msgid_plural ""
+"{count} occurrences of your booking conflict with existing bookings."
+msgstr[0] ""
+
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:292
+msgid "You are creating a {highlight}Pre-Booking{/highlight}"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:299
+msgid ""
+"A Pre-Booking has to be approved by the room managers before you can use the "
+"space in question."
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:352
+msgid "Pre-Booking conflicts"
+msgstr "預先登記發生衝突"
+
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:355
+msgid ""
+"If you create this pre-booking, some of your days may get rejected as they "
+"overlap with the following pre-bookings:"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:360
+msgid ""
+"If you create this booking, the following overlapping days of existing pre-"
+"bookings will automatically be rejected:"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:484
+msgid "Assign the room {room} to this event"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:485
+msgid "Assign the room {room} to this contribution"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:488
+msgid "Assign the room {room} to this session block"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:494
+msgid "Assign the room {room} to this event (instead of {oldRoom})"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:500
+msgid "Assign the room {room} to this contribution (instead of {oldRoom})"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:507
+msgid "Assign the room {room} to this session block (instead of {oldRoom})"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:663
+msgid "I've changed my mind!"
+msgstr "算了，別這樣！"
+
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:102
+msgid "Create Booking"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/bookRoom/BookRoomModal.jsx:103
+msgid "Create Pre-booking"
+msgstr "建立預先登記"
+
+#: indico/modules/rb/client/js/modules/bookRoom/BookingFilterBar.jsx:81
+msgid "Recurrence"
+msgstr "循環"
+
+#: indico/modules/rb/client/js/modules/bookRoom/BookingFilterBar.jsx:99
+msgid "Date"
+msgstr "日期"
+
+#: indico/modules/rb/client/js/modules/bookRoom/BookingFilterBar.jsx:117
+msgid "Time"
+msgstr "時間"
+
+#: indico/modules/rb/client/js/modules/bookRoom/BookingSuggestion.jsx:68
+msgid "One minute earlier"
+msgid_plural "{count} minutes earlier"
+msgstr[0] "提早 {count} 分鐘"
+
+#: indico/modules/rb/client/js/modules/bookRoom/BookingSuggestion.jsx:75
+msgid "One minute later"
+msgid_plural "{count} minutes later"
+msgstr[0] "延後 {count} 分鐘"
+
+#: indico/modules/rb/client/js/modules/bookRoom/BookingSuggestion.jsx:94
+msgid "We'll change your booking's starting time to make it fit"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/bookRoom/BookingSuggestion.jsx:100
+msgid "or"
+msgstr "或"
+
+#: indico/modules/rb/client/js/modules/bookRoom/BookingSuggestion.jsx:109
+msgid "One minute shorter"
+msgid_plural "{duration} minutes shorter"
+msgstr[0] "縮短 {duration} 分鐘"
+
+#: indico/modules/rb/client/js/modules/bookRoom/BookingSuggestion.jsx:115
+msgid "We'll shorten your booking to make it fit"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/bookRoom/BookingSuggestion.jsx:122
+msgid "Skip one day"
+msgid_plural "Skip {skip} days"
+msgstr[0] ""
+
+#: indico/modules/rb/client/js/modules/bookRoom/BookingSuggestion.jsx:123
+msgid "We'll skip one occurrence to avoid any conflicts"
+msgid_plural "We'll skip {skip} occurrences to avoid any conflicts"
+msgstr[0] ""
+
+#: indico/modules/rb/client/js/modules/bookRoom/BookingSuggestion.jsx:136
+msgid "Shorten by one day"
+msgid_plural "Shorten by {shorten} days"
+msgstr[0] ""
+
+#: indico/modules/rb/client/js/modules/bookRoom/BookingSuggestion.jsx:142
+msgid ""
+"Bookings in this room cannot last this long and will be shortened accordingly"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/bookRoom/BookingTimeline.jsx:78
+msgid "There are no rooms matching the criteria."
+msgstr "找不到符合條件的會議室。"
+
+#: indico/modules/rb/client/js/modules/bookRoom/SearchResultCount.jsx:58
+msgid "Total{count}"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/bookRoom/SearchResultCount.jsx:67
+msgid "Number of spaces that match your filtering criteria."
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/bookRoom/SearchResultCount.jsx:91
+msgid "Available{count}"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/bookRoom/SearchResultCount.jsx:101
+msgid "Spaces that are free on that time slot."
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/bookRoom/SearchResultCount.jsx:128
+msgid "Unavailable{count}"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/bookRoom/SearchResultCount.jsx:137
+msgid "Spaces unavailable during that time slot (click for details)."
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/bookRoom/SearchResultCount.jsx:161
+msgid "Unauthorized{count}"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/bookRoom/SearchResultCount.jsx:170
+msgid "Spaces you are not authorized to book."
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/bookRoom/SearchResultCount.jsx:180
+msgid "No known spaces match your query"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/bookRoom/SearchResultCount.jsx:190
+msgid "No spaces are available during that time slot"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/bookRoom/UnavailableRoomsModal.jsx:99
+msgid "Unavailable Rooms"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/calendar/Calendar.jsx:170
+msgid "Show only my bookings"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/calendar/Calendar.jsx:185
+msgid "Hide rejected/cancelled bookings"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/calendar/Calendar.jsx:187
+msgid "Show rejected/cancelled bookings"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/calendar/Calendar.jsx:201
+msgid "Show unused spaces"
+msgstr "顯示未使用的空間"
+
+#: indico/modules/rb/client/js/modules/calendar/Calendar.jsx:203
+msgid "Hide unused spaces"
+msgstr "隱藏未使用的空間"
+
+#: indico/modules/rb/client/js/modules/calendar/Calendar.jsx:246
+msgid "Show calendar view"
+msgstr "顯示行事曆檢視"
+
+#: indico/modules/rb/client/js/modules/calendar/Calendar.jsx:249
+msgid "Show a list of all upcoming bookings"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/calendar/CalendarListView.jsx:126
+msgid "This booking is pending confirmation by the room owner"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/calendar/CalendarListView.jsx:142
+msgid "Booked for {bookedFor}"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/calendar/CalendarListView.jsx:177
+msgid "There are no bookings matching the criteria."
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/landing/Landing.jsx:132
+msgid "Start your booking..."
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/landing/Landing.jsx:153
+msgid "Search only my favourites"
+msgstr "只搜尋我的最愛"
+
+#: indico/modules/rb/client/js/modules/landing/LandingStatistics.jsx:20
+msgid "Active rooms"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/landing/LandingStatistics.jsx:21
+msgid "Buildings"
+msgstr "建築物"
+
+#: indico/modules/rb/client/js/modules/landing/LandingStatistics.jsx:22
+msgid "Bookings today"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/landing/LandingStatistics.jsx:23
+msgid "Active booking requests"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/landing/UpcomingBookings.jsx:73
+msgid "Your bookings"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:45
+#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:142
+msgid "Equipment"
+msgstr "設備"
+
+#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:63
+msgid "Building {building}"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:184
+#: indico/modules/rb/client/js/modules/roomList/filters/CapacityForm.jsx:35
+msgid "Min. Capacity"
+msgstr "最小容量"
+
+#: indico/modules/rb/client/js/modules/roomList/RoomFilterBar.jsx:204
+msgid "Show only..."
+msgstr "只顯示..."
+
+#: indico/modules/rb/client/js/modules/roomList/RoomList.jsx:149
+msgid "Block rooms"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/roomList/RoomList.jsx:194
+msgid "Actions"
+msgstr "動作"
+
+#: indico/modules/rb/client/js/modules/roomList/RoomList.jsx:210
+msgid "There are no rooms matching the criteria"
+msgstr "找不到符合條件的會議室"
+
+#: indico/modules/rb/client/js/modules/roomList/RoomList.jsx:212
+msgid "There is {count} match"
+msgid_plural "There are {count} matches"
+msgstr[0] "有 {count} 筆結果"
+
+#: indico/modules/rb/client/js/modules/roomList/filters/BuildingForm.jsx:45
+msgid "Building {buildingNumber}"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/roomList/filters/EquipmentForm.jsx:109
+msgid "See detailed equipment"
+msgstr "查看詳細設備"
+
+#: indico/modules/rb/client/js/modules/roomList/filters/ShowOnlyForm.jsx:48
+msgid "My favorite rooms"
+msgstr ""
+
+#: indico/modules/rb/client/js/modules/roomList/filters/ShowOnlyForm.jsx:62
+msgid "Rooms I manage"
+msgstr "我管理的會議室"
+
+#: indico/modules/rb/client/js/modules/roomList/filters/ShowOnlyForm.jsx:76
+msgid "Rooms I am authorized to book"
+msgstr ""
+
+#: indico/modules/rb/client/js/util.jsx:164
+msgid "Once"
+msgstr ""
+
+#: indico/modules/rb/client/js/util.jsx:233
+msgid "Available"
+msgstr "可用"
+
+#: indico/modules/rb/client/js/util.jsx:234
+msgid "Booking"
+msgstr "登記"
+
+#: indico/modules/rb/client/js/util.jsx:235
+msgid "Pre-Booking"
+msgstr "預先登記"
+
+#: indico/modules/rb/client/js/util.jsx:236
+msgid "Conflict"
+msgstr "衝突"
+
+#: indico/modules/rb/client/js/util.jsx:238
+msgid "Conflict with Pre-Booking"
+msgstr "與預先登記衝突"
+
+#: indico/modules/rb/client/js/util.jsx:242
+msgid "Invalid occurrence"
+msgstr ""
+
+#: indico/modules/rb/client/js/util.jsx:245
+msgid "Other booking"
+msgstr ""
+
+#: indico/modules/rb/client/js/util.jsx:249
+msgid "Will be cancelled"
+msgstr "將被取消"
+
+#: indico/modules/rb/client/js/util.jsx:252
+msgid "Blocking"
+msgstr ""
+
+#: indico/modules/rb/client/js/util.jsx:254
+msgid "Blocking (allowed)"
+msgstr ""
+
+#: indico/modules/rb/client/js/util.jsx:257
+#: indico/modules/rb/client/js/util.jsx:258
+msgid "Not bookable"
+msgstr ""
+
+#: indico/modules/rb/client/js/util.jsx:260
+msgid "Concurrent Pre-Bookings"
+msgstr ""
+
+#: indico/web/client/js/react/components/EmailListField.jsx:44
+#: indico/web/client/js/react/components/EmailListField.jsx:45
+msgid "Please enter an email address"
+msgstr "請輸入電子郵件地址"
+
+#: indico/web/client/js/react/components/EmailListField.jsx:46
+msgid "Add email"
+msgstr "新增電子郵件"
+
+#: indico/web/client/js/react/components/ScrollButton.jsx:31
+msgid "Back to top"
+msgstr ""
+
+#: indico/web/client/js/react/components/UserMenu.jsx:44
+msgid "Impersonate user"
+msgstr ""
+
+#: indico/web/client/js/react/components/UserMenu.jsx:112
+msgid "My Profile"
+msgstr "我的設定檔"
+
+#: indico/web/client/js/react/components/UserMenu.jsx:115
+msgid "My Preferences"
+msgstr "我的喜好設定"
+
+#: indico/web/client/js/react/components/UserMenu.jsx:134
+msgid "Logout"
+msgstr "登出"
+
+#: indico/web/client/js/react/components/principals/ACLField.jsx:134
+#: indico/web/client/js/react/components/principals/PrincipalListField.jsx:90
+msgid "This list is currently empty"
+msgstr "此清單目前是空的"
+
+#: indico/web/client/js/react/components/principals/PrincipalPermissions.jsx:90
+msgid "Add permission"
+msgstr "新增權限"
+
+#: indico/web/client/js/react/components/principals/Search.jsx:113
+msgid "Select favorite"
+msgstr "選擇最愛"
+
+#: indico/web/client/js/react/components/principals/Search.jsx:323
+msgid "Confirm"
+msgstr "確認"
+
+#: indico/web/client/js/react/components/principals/Search.jsx:380
+msgid "Family name"
+msgstr "姓"
+
+#: indico/web/client/js/react/components/principals/Search.jsx:382
+msgid "Given name"
+msgstr "名"
+
+#: indico/web/client/js/react/components/principals/Search.jsx:387
+#: indico/web/client/js/react/errors/component.jsx:77
+msgid "Email address"
+msgstr "電子郵件地址"
+
+#: indico/web/client/js/react/components/principals/Search.jsx:389
+msgid "Affiliation"
+msgstr "所屬單位"
+
+#: indico/web/client/js/react/components/principals/Search.jsx:393
+msgid "Include users with no Indico account"
+msgstr ""
+
+#: indico/web/client/js/react/components/principals/Search.jsx:396
+#: indico/web/client/js/react/components/principals/Search.jsx:494
+msgid "Exact matches only"
+msgstr "只要完全符合"
+
+#: indico/web/client/js/react/components/principals/Search.jsx:403
+msgid "User"
+msgstr "使用者"
+
+#: indico/web/client/js/react/components/principals/Search.jsx:404
+msgid "Select user"
+msgstr "選擇使用者"
+
+#: indico/web/client/js/react/components/principals/Search.jsx:404
+msgid "Add users"
+msgstr "新增使用者"
+
+#: indico/web/client/js/react/components/principals/Search.jsx:435
+msgid ""
+"Your query matched too many users. Please try more specific search criteria."
+msgstr ""
+
+#: indico/web/client/js/react/components/principals/Search.jsx:438
+msgid "No users found"
+msgstr "找不到使用者"
+
+#: indico/web/client/js/react/components/principals/Search.jsx:441
+msgid "1 user found"
+msgid_plural "{count} users found"
+msgstr[0] "找到 {count} 名使用者"
+
+#: indico/web/client/js/react/components/principals/Search.jsx:480
+msgid "Group"
+msgstr "群組"
+
+#: indico/web/client/js/react/components/principals/Search.jsx:482
+msgid "Select group"
+msgstr "選擇群組"
+
+#: indico/web/client/js/react/components/principals/Search.jsx:482
+msgid "Add groups"
+msgstr "新增群組"
+
+#: indico/web/client/js/react/components/principals/Search.jsx:492
+msgid "Group name"
+msgstr "群組名稱"
+
+#: indico/web/client/js/react/components/principals/Search.jsx:516
+msgid ""
+"Your query matched too many groups. Please try more specific search criteria."
+msgstr ""
+
+#: indico/web/client/js/react/components/principals/Search.jsx:519
+msgid "No groups found"
+msgstr "找不到群組-"
+
+#: indico/web/client/js/react/components/principals/Search.jsx:522
+msgid "1 group found"
+msgid_plural "{count} groups found"
+msgstr[0] "找到 {count} 個群組"
+
+#: indico/web/client/js/react/components/principals/items.jsx:23
+msgid "Unknown group"
+msgstr "未知的群組"
+
+#: indico/web/client/js/react/components/principals/items.jsx:23
+msgid "Unknown user"
+msgstr "未知的使用者"
+
+#: indico/web/client/js/react/components/principals/items.jsx:70
+msgid "This group does not exist anymore. Please choose a different one."
+msgstr "此群組已不存在，請選擇其他群組。"
+
+#: indico/web/client/js/react/components/principals/items.jsx:74
+msgid "This user does not exist anymore. Please choose someone else."
+msgstr "此使用者已不存在，請選擇其他使用者。"
+
+#: indico/web/client/js/react/components/principals/items.jsx:164
+msgid "Nobody"
+msgstr "沒有人"
+
+#: indico/web/client/js/react/components/principals/items.jsx:168
+msgid "Select a user"
+msgstr "選擇使用者"
+
+#: indico/web/client/js/react/errors/component.jsx:57
+msgid "Submitting your error report failed"
+msgstr "提交您的錯誤回報時發生錯誤 (嘆"
+
+#: indico/web/client/js/react/errors/component.jsx:67
+msgid "Details"
+msgstr "詳細資料"
+
+#: indico/web/client/js/react/errors/component.jsx:71
+msgid "Please let us know what you were doing when the error showed up."
+msgstr ""
+
+#: indico/web/client/js/react/errors/component.jsx:79
+msgid ""
+"If you enter your email address we can contact you to follow-up on your "
+"error report."
+msgstr ""
+
+#: indico/web/client/js/react/errors/component.jsx:100
+msgid "Submit Report"
+msgstr "提交報告"
+
+#: indico/web/client/js/react/errors/component.jsx:106
+msgid "Report Error"
+msgstr "報告錯誤"
+
+#: indico/web/client/js/react/errors/component.jsx:132
+msgid "Please report this error to us if it persists after reloading the page."
+msgstr ""
+
+#: indico/web/client/js/react/errors/component.jsx:140
+msgid "Thanks for your error report."
+msgstr "感謝您的錯誤回報。"
+
+#: indico/web/client/js/react/errors/component.jsx:153
+msgid "Dismiss (show next error)"
+msgstr ""
+
+#: indico/web/client/js/react/errors/component.jsx:155
+msgid "Dismiss"
+msgstr ""
+
+#: indico/web/client/js/react/forms/unload.jsx:16
+msgid "Are you sure you want to leave this page without saving?"
+msgstr ""
+
+#: indico/web/client/js/react/forms/validators.js:16
+msgid "Value must be a number"
+msgstr "值必須唯一"
+
+#: indico/web/client/js/react/forms/validators.js:25
+msgid "Value must be at least {minValue}"
+msgstr "值最少要 {minValue}"
+
+#: indico/web/client/js/react/forms/validators.js:34
+msgid "Value must be at most {maxValue}"
+msgstr "值最多為 {maxValue}"
+
+#: indico/web/client/js/react/forms/validators.js:46
+msgid "Value must be at least {length} chars"
+msgstr ""
+
+#: indico/web/client/js/react/forms/validators.js:58
+msgid "This field is required."
+msgstr "此欄位是必需的。"
+
+#: indico/modules/rb/client/js/util.jsx:165
+msgctxt "single booking shortcut"
+msgid "S"
+msgstr "單"
+
+#: indico/modules/rb/client/js/util.jsx:171
+msgctxt "daily booking shortcut"
+msgid "D"
+msgstr "天"
+
+#: indico/modules/rb/client/js/util.jsx:181
+msgctxt "weekly booking shortcut"
+msgid "{number}W"
+msgstr "{number}週"
+
+#: indico/modules/rb/client/js/util.jsx:193
+msgctxt "monthly booking shortcut"
+msgid "{number}M"
+msgstr "{number}個月"
+
+#~ msgid "The page you are looking for doesn't exist."
+#~ msgstr "您尋找的頁面不存在。"
+
+#~ msgid "The request was invalid or contained invalid arguments."
+#~ msgstr "此要求不合法，或內含不合法的參數。"
+
+#~ msgid "Manage"
+#~ msgstr "管理"
+
+#~ msgid "Access"
+#~ msgstr "存取"
+
+#~ msgid "Tasks"
+#~ msgstr "工作"
+
+#~ msgid ""
+#~ "The Celery task scheduler does not seem to be running. This means that "
+#~ "email sending and periodic tasks such as event reminders do not work."
+#~ msgstr ""
+#~ "Celery 工作排程器似乎並未執行。這表示傳送電子郵件與週期性工作（如活動提"
+#~ "醒）等功能無法運作。"
+
+#~ msgid "The Celery task scheduler is running a different Indico version."
+#~ msgstr "Celery 工作排程器執行的是不同版本的 Indico。"
+
+#~ msgid ""
+#~ "Monitor Indico's Celery tasks with Flower <a class=\"bold\" href="
+#~ "\"%(flower_url)s\" target=\"_blank\">here</a>."
+#~ msgstr ""
+#~ "用 Flower 來<a class=\"bold\" href=\"%(flower_url)s\" target=\"_blank\">監"
+#~ "控</a> Indico 的 Celery 工作。"
+
+#~ msgid "Periodic Tasks"
+#~ msgstr "週期性工作"
+
+#~ msgid "Schedule"
+#~ msgstr "排程"
+
+#~ msgid "every %(interval)s"
+#~ msgstr "每 %(interval)s"
+
+#~ msgid "disabled"
+#~ msgstr "已關閉"
+
+#~ msgid "custom schedule"
+#~ msgstr "自訂排程"
+
+#~ msgid "default"
+#~ msgstr "預設"
+
+#~ msgid "Category"
+#~ msgstr "類別"
+
+#~ msgid "Contribution"
+#~ msgstr "貢獻"
+
+#~ msgid "Session"
+#~ msgstr "議程"
+
+#~ msgid "Session block"
+#~ msgstr "議程區塊"
+
+#~ msgid "Inheriting"
+#~ msgstr "繼承"
+
+#~ msgid "Protected"
+#~ msgstr "保護"
+
+#~ msgid "Synchronization"
+#~ msgstr "同步"
+
+#~ msgid "Payment"
+#~ msgstr "付款"
+
+#~ msgid "Videoconference"
+#~ msgstr "視訊會議"
+
+#~ msgid "Other"
+#~ msgstr "其他"
+
+#~ msgid "Plugins"
+#~ msgstr "外掛程式"
+
+#~ msgid "Settings saved ({0})"
+#~ msgstr "設定已儲存 ({0})"
+
+#~ msgid "Plugin Details"
+#~ msgstr "外掛程式詳細資料"
+
+#~ msgid "Plugin Settings"
+#~ msgstr "外掛程式設定"
+
+#~ msgid "This plugin has no configurable options"
+#~ msgstr "此外掛程式沒有設定選項"
+
+#~ msgid "Int to Roman Error: Argument must be between 1 and 3999"
+#~ msgstr "轉換成羅馬數字時發生錯誤：數字必須在 1 到 3999 間"
+
+#~ msgid "Table of contents"
+#~ msgstr "目次"
+
+#~ msgid "Programme"
+#~ msgstr "議程"
+
+#~ msgid "Page {}"
+#~ msgstr "頁面 {}"
+
+#~ msgid "Presenter"
+#~ msgid_plural "Presenters"
+#~ msgstr[0] "講者"
+
+#~ msgid "Conveners"
+#~ msgstr "召集人"
+
+#~ msgid "Simplified Programme"
+#~ msgstr "簡化議程"
+
+#~ msgid "Time and Place"
+#~ msgstr "時間與地點"
+
+#~ msgid "Convener"
+#~ msgid_plural "Conveners"
+#~ msgstr[0] "召集人"
+
+#~ msgid "Break"
+#~ msgstr "休息時間"
+
+#~ msgid "Daily Programme"
+#~ msgstr "每日議程"
+
+#~ msgid "Registrant"
+#~ msgstr "參加者"
+
+#~ msgid "Registration details"
+#~ msgstr "註冊詳細資料"
+
+#~ msgid "Registration date"
+#~ msgstr "註冊日期"
+
+#~ msgid "Price"
+#~ msgstr "價格"
+
+#~ msgid "Payment date"
+#~ msgstr "付款日期"
+
+#~ msgid "Checked in"
+#~ msgstr "已入住"
+
+#~ msgid "Check-in date"
+#~ msgstr "入住時間"
+
+#~ msgid "Arrival date"
+#~ msgstr "到達日期"
+
+#~ msgid "Departure date"
+#~ msgstr "離開日期"
+
+#~ msgid "Registrants Book"
+#~ msgstr "參加者預訂"
+
+#~ msgid "Page"
+#~ msgstr "頁面"
+
+#~ msgid "Registrants List"
+#~ msgstr "參加者清單"
+
+#~ msgid "List of registrants"
+#~ msgstr "參加者的清單"
+
+#~ msgid "Report of Abstracts"
+#~ msgstr "摘要報告"
+
+#~ msgid "{} (#{}: {})"
+#~ msgstr "{} (#{}: {})"
+
+#~ msgid "Proposed for other tracks: {}"
+#~ msgstr "提給其他軌的提議：{}"
+
+#~ msgid "Report of Contributions"
+#~ msgstr "貢獻報告"
+
+#~ msgid ""
+#~ "It looks like there was a problem with your current session. Please use "
+#~ "your browser's back button, reload the page and try again."
+#~ msgstr ""
+#~ "看起來您目前的作業階段有些問題。請用瀏覽器上的返回鍵重新載入頁面並再試一"
+#~ "次。"
+
+#~ msgid "Security"
+#~ msgstr "安全"
+
+#~ msgid "User Management"
+#~ msgstr "使用者管理"
+
+#~ msgid "Customization"
+#~ msgstr "客製化"
+
+#~ msgid "Integration"
+#~ msgstr "整合"
+
+#~ msgid "Homepage"
+#~ msgstr "首頁"
+
+#~ msgid "Only Indico administrators may access this page."
+#~ msgstr "只有 Indico 的管理員可以存取此頁面。"
+
+#~ msgid "Announcement"
+#~ msgstr "公告"
+
+#~ msgid "Settings have been saved"
+#~ msgstr "設定已儲存"
+
+#~ msgid "Enabled"
+#~ msgstr "已開啟"
+
+#~ msgid "The announcement is a message shown on top of each Indico page."
+#~ msgstr "公告會顯示在每個 Indico 的頁面上方。"
+
+#~ msgid "API"
+#~ msgstr "API"
+
+#~ msgid "HTTP API"
+#~ msgstr "HTTP API"
+
+#~ msgid "Settings saved"
+#~ msgstr "設定已儲存"
+
+#~ msgid "Your API key has been successfully replaced."
+#~ msgstr "已成功換掉您的 API 金鑰。"
+
+#~ msgid "Please update any applications which use old key."
+#~ msgstr "請記得更新所有還在使用舊金鑰的應用程式。"
+
+#~ msgid "Your API key has been deleted."
+#~ msgstr "已刪除您的 API 金鑰。"
+
+#~ msgid "You can now use persistent signatures."
+#~ msgstr "現在您可以使用永久簽章。"
+
+#~ msgid "Persistent signatures have been disabled for your API key."
+#~ msgstr "已關閉您的 API 金鑰中的永久簽章。"
+
+#~ msgid "The API key has been blocked."
+#~ msgstr "此 API 金鑰已被阻擋。"
+
+#~ msgid "The API key has been unblocked."
+#~ msgstr "此 API 金鑰已取消阻擋。"
+
+#~ msgid "Key for authenticated requests only"
+#~ msgstr "認證要求專用金鑰"
+
+#~ msgid "Key for all requests"
+#~ msgstr "所有要求均可使用的金鑰"
+
+#~ msgid "Key+signature for authenticated requests only"
+#~ msgstr "認證專用金鑰加簽章"
+
+#~ msgid "Key for all requests. Signature for authenticated requests"
+#~ msgstr "金鑰所有要求均可使用，簽章只有認證要求可使用"
+
+#~ msgid "Key+signature for all requests"
+#~ msgstr "所有要求均可使用的金鑰加簽章"
+
+#~ msgid "Persistent signatures"
+#~ msgstr "永久簽章"
+
+#~ msgid "Allow users to enable persistent signatures (without timestamp)."
+#~ msgstr "允許使用者開啟永久簽章（不需時間戳記）。"
+
+#~ msgid "Security mode"
+#~ msgstr "安全模式"
+
+#~ msgid "Specify if/when people need to use an API key or a signed request."
+#~ msgstr "指定使用者是否/何時需要使用 API 金鑰或簽章。"
+
+#~ msgid "Cache TTL"
+#~ msgstr "快取保留時間"
+
+#~ msgid "Time to cache API results (in seconds)"
+#~ msgstr "API 傳回結果保留快取的時間（單位為秒）"
+
+#~ msgid "Signature TTL"
+#~ msgstr "簽章保留時間"
+
+#~ msgid "API Keys"
+#~ msgstr "API 金鑰"
+
+#~ msgid "Uses"
+#~ msgstr "使用次數"
+
+#~ msgid "Last use"
+#~ msgstr "上次使用"
+
+#~ msgid "Token"
+#~ msgstr "令牌"
+
+#~ msgid "This user's API key has been blocked."
+#~ msgstr "此使用者的 API 金鑰已被阻擋。"
+
+#~ msgid "never"
+#~ msgstr "永不"
+
+#~ msgid "API Settings"
+#~ msgstr "API 設定"
+
+#~ msgid ""
+#~ "There is currently <strong><a href=\"%(url)s\">one active API key</a></"
+#~ "strong> in the system."
+#~ msgid_plural ""
+#~ "There are currently <strong><a href=\"%(url)s\">%(count)s active API "
+#~ "keys</a></strong> in the system."
+#~ msgstr[0] ""
+#~ "目前此系統中有 <strong><a href=\"%(url)s\">%(count)s 個作用中的 API 金鑰</"
+#~ "a></strong>。"
+
+#~ msgid "API Key"
+#~ msgstr "API 金鑰"
+
+#~ msgid "Create new API key"
+#~ msgstr "建立新的 API 金鑰"
+
+#~ msgid ""
+#~ "Do you really want to create a new API key? Your old key will stop "
+#~ "working immediately!"
+#~ msgstr "您確定要建立新的 API 金鑰嗎？舊的金鑰會立即失效啊啊啊"
+
+#~ msgid "Delete API key"
+#~ msgstr "刪除 API 金鑰"
+
+#~ msgid "Do you really want to delete your API key?"
+#~ msgstr "您確定要刪除您的 API 金鑰嗎？"
+
+#~ msgid ""
+#~ "You do not have an API key at the moment. If you would like to use our "
+#~ "API, please create an API key using the button below."
+#~ msgstr ""
+#~ "您目前尚無 API 金鑰。如果您要使用我們的 API，請用下方的按鍵建立金鑰。"
+
+#~ msgid "Create API key"
+#~ msgstr "建立 API 金鑰"
+
+#~ msgid ""
+#~ "Your API key has been blocked. Please contact an administrator for "
+#~ "further details."
+#~ msgstr "您的 API 金鑰已被阻擋。詳情請聯繫管理員。"
+
+#~ msgid "Secret"
+#~ msgstr "密碼"
+
+#~ msgid "Created"
+#~ msgstr "建立時間"
+
+#~ msgid "Total uses"
+#~ msgstr "總計使用"
+
+#~ msgid "Last IP"
+#~ msgstr "上次登入 IP"
+
+#~ msgid "Last request"
+#~ msgstr "上次要求"
+
+#~ msgid "Last request could access private data."
+#~ msgstr "上次要求可以存取私密資料。"
+
+#~ msgid "Last request could only access public data."
+#~ msgstr "上次要求只能存取公開資料。"
+
+#~ msgid "On"
+#~ msgstr "開"
+
+#~ msgid "Off"
+#~ msgstr "關"
+
+#~ msgid "Unblock API key"
+#~ msgstr "取消阻擋 API 金鑰"
+
+#~ msgid "Block API key"
+#~ msgstr "阻擋 API 金鑰"
+
+#~ msgid "This is the list of old keys associated with this user."
+#~ msgstr "這是此使用者相關的舊金鑰清單。"
+
+#~ msgid "never used"
+#~ msgstr "從未使用"
+
+#~ msgid "used once"
+#~ msgid_plural "used <strong>%(n)s times</strong>"
+#~ msgstr[0] "使用了 <strong>%(n)s 次</strong>"
+
+#~ msgid "last used on %(date)s"
+#~ msgstr "上次使用於 %(date)s"
+
+#~ msgid "Materials"
+#~ msgstr "素材"
+
+#~ msgid "Folder"
+#~ msgstr "資料夾"
+
+#~ msgid "No folder selected"
+#~ msgstr "沒有選取資料夾"
+
+#~ msgid ""
+#~ "Adding materials to folders allow grouping and easier permission "
+#~ "management."
+#~ msgstr "將素材加入資料夾可以方便群組存取，也方便權限管理。"
+
+#~ msgid "Access control list"
+#~ msgstr "存取控管清單"
+
+#~ msgid "Restrict access to this material"
+#~ msgstr "限制此素材的存取"
+
+#~ msgid "The list of users and groups allowed to access the material"
+#~ msgstr "允許存取此素材的使用者與群組清單"
+
+#~ msgid "Description"
+#~ msgstr "說明"
+
+#~ msgid "Files"
+#~ msgstr "檔案"
+
+#~ msgid "File"
+#~ msgstr "檔案"
+
+#~ msgid "Already uploaded file. Replace it by adding a new file."
+#~ msgstr "檔案已上傳。新增檔案可以取代。"
+
+#~ msgid "URL"
+#~ msgstr "網址"
+
+#~ msgid "Description of the folder and its content"
+#~ msgstr "資料夾與其內容說明"
+
+#~ msgid "Restrict access to this folder"
+#~ msgstr "限制此資料夾的存取"
+
+#~ msgid "The list of users and groups allowed to access the folder"
+#~ msgstr "允許存取此資料夾的使用者與群組清單"
+
+#~ msgid "Always Visible"
+#~ msgstr "永遠可見"
+
+#~ msgid ""
+#~ "By default, folders are always visible, even if a user cannot access "
+#~ "them. You can disable this behavior here, hiding the folder for anyone "
+#~ "who does not have permission to access it."
+#~ msgstr ""
+#~ "資料夾預設是永遠可見的，即使使用者無法存取也一樣。您可以在此改變此行為，讓"
+#~ "無法存取此資料夾的使用者看不到它。"
+
+#~ msgid "Always hidden"
+#~ msgstr "總是隱藏"
+
+#~ msgid ""
+#~ "Always hide the folder and its contents from public display areas of the "
+#~ "event. You can use this for folders to store non-image files used e.g. in "
+#~ "download links. The access permissions still apply."
+#~ msgstr ""
+#~ "將資料夾從活動的公開顯示區域中隱藏起來。例如您用來存放提供下載的檔案的資料"
+#~ "夾，就可以設定為隱藏。存取權限不受此設定影響。"
+
+#~ msgid "Added Since"
+#~ msgstr "新增時間"
+
+#~ msgid "Include only attachments uploaded after this date"
+#~ msgstr "只包含此日期以後上傳的附件"
+
+#~ msgid "Include"
+#~ msgstr "包含"
+
+#~ msgid "Sessions"
+#~ msgstr "議程"
+
+#~ msgid "Include materials from selected sessions"
+#~ msgstr "包含選取的議程的素材"
+
+#~ msgid "Events scheduled on"
+#~ msgstr "活動安排於"
+
+#~ msgid "Everything"
+#~ msgstr "全部"
+
+#~ msgid "Specific sessions"
+#~ msgstr "特定議程"
+
+#~ msgid "Specific days"
+#~ msgstr "特定日期"
+
+#~ msgid "{contrib} (in session \"{session}\")"
+#~ msgstr "{contrib} （於議程 \"{session}\"）"
+
+#~ msgid ""
+#~ "There is no preview available for this file type. Please refresh the page."
+#~ msgstr "這個檔案型態沒有預覽。請刷新頁面。"
+
+#~ msgid "The attachment has been uploaded"
+#~ msgid_plural "{count} attachments have been uploaded"
+#~ msgstr[0] "已上傳 {count} 個附檔"
+
+#~ msgid "The link has been added"
+#~ msgstr "已新增此連結"
+
+#~ msgid "The attachment \"{name}\" has been updated"
+#~ msgstr "附檔 \"{name}\" 已更新"
+
+#~ msgid "Folder \"{name}\" created"
+#~ msgstr "已建立資料夾 \"{name}\""
+
+#~ msgid "Folder \"{name}\" updated"
+#~ msgstr "已更新資料夾 \"{name}\""
+
+#~ msgid "Folder \"{name}\" deleted"
+#~ msgstr "已刪除資料夾 \"{name}\""
+
+#~ msgid "Attachment \"{name}\" deleted"
+#~ msgstr "已刪除附檔 \"{name}\""
+
+#~ msgid "Link"
+#~ msgstr "連結"
+
+#~ msgid ""
+#~ "The access to this material is restricted, regardless of the protection "
+#~ "scheme of the parent."
+#~ msgstr "已對此素材的存取做特別限制，不管原先的保護機制。"
+
+#~ msgid "Edit file &quot;%(name)s&quot;"
+#~ msgstr "編輯檔案 &quot;%(name)s&quot;"
+
+#~ msgid "Edit link &quot;%(name)s&quot;"
+#~ msgstr "編輯連結 &quot;%(name)s&quot;"
+
+#~ msgid "Remove %(name)s?"
+#~ msgstr "要移除 %(name)s 嗎？"
+
+#~ msgid ""
+#~ "Are you sure you want to remove &quot;%(name)s&quot;?<br> This will "
+#~ "remove the attachment permanently."
+#~ msgstr "您確定要移除 &quot;%(name)s&quot; 嗎？<br>這樣會永久移除此附檔。"
+
+#~ msgid ""
+#~ "The access to this folder is restricted, regardless of the protection "
+#~ "scheme of the parent."
+#~ msgstr "已對此資料夾的存取做特別限制，不管原先的保護機制。"
+
+#~ msgid "This folder is always hidden in the frontend."
+#~ msgstr "此資料夾在前端會被隱藏。"
+
+#~ msgid "This folder is always visible in the frontend."
+#~ msgstr "此資料夾在前端會永遠可見。"
+
+#~ msgid "Edit folder: %(name)s"
+#~ msgstr "編輯資料夾：%(name)s"
+
+#~ msgid ""
+#~ "Are you sure you want to remove &quot;%(name)s&quot;?<br> This will "
+#~ "remove the folder and its contents permanently."
+#~ msgstr ""
+#~ "您確定要移除 &quot;%(name)s&quot; 嗎？<br>這樣會永久移除此資料夾跟它的內"
+#~ "容。"
+
+#~ msgid "empty folder"
+#~ msgstr "空白資料夾"
+
+#~ msgid "Create a new folder"
+#~ msgstr "建立新資料夾"
+
+#~ msgid "New folder"
+#~ msgstr "新資料夾"
+
+#~ msgid "Add materials to the category."
+#~ msgstr "新增素材到此類別。"
+
+#~ msgid "Add materials to the event."
+#~ msgstr "新增素材到此活動。"
+
+#~ msgid "Add materials to the session."
+#~ msgstr "新增素材到此議程。"
+
+#~ msgid "You can attach files or links using the buttons on the right."
+#~ msgstr "您可以用右方的按鍵來附加檔案或連結。"
+
+#~ msgid "Upload files"
+#~ msgstr "上傳檔案"
+
+#~ msgid "Add link"
+#~ msgstr "新增連結"
+
+#~ msgid "Generate a material package."
+#~ msgstr "產生素材包。"
+
+#~ msgid "You can generate a ZIP file containing materials from the event."
+#~ msgstr "您可以產生此活動中素材的 ZIP 壓縮檔。"
+
+#~ msgid "Material Package"
+#~ msgstr "素材包"
+
+#~ msgid "Manage materials"
+#~ msgstr "管理素材"
+
+#~ msgid "Manage materials for '%(title)s'"
+#~ msgstr "管理 '%(title)s' 的素材"
+
+#~ msgid "%(count)s file"
+#~ msgid_plural "%(count)s files"
+#~ msgstr[0] "%(count)s 個檔案"
+
+#~ msgid ""
+#~ "This object is not publicly accessible since <strong class=\"folder-name"
+#~ "\"></strong> (Folder) is protected."
+#~ msgstr ""
+#~ "此物件無法公開存取，因為 <strong class=\"folder-name\"></strong> (Folder) "
+#~ "已被保護。"
+
+#~ msgid "Submit"
+#~ msgstr "提交"
+
+#~ msgid "Go back"
+#~ msgstr "返回"
+
+#~ msgid "Download package"
+#~ msgstr "下載素材包"
+
+#~ msgid "Download"
+#~ msgstr "下載"
+
+#~ msgid "Your Indico profile has been deleted."
+#~ msgstr "您的 Indico 設定檔已被刪除。"
+
+#~ msgid "Your Indico profile has been blocked."
+#~ msgstr "您的 Indico 設定檔已被封鎖。"
+
+#~ msgid "Accounts"
+#~ msgstr "帳號"
+
+#~ msgid ""
+#~ "We have sent you a verification email. Please check your mailbox within "
+#~ "the next hour and open the link in that email."
+#~ msgstr ""
+#~ "我們已傳送認證信件給您。請檢查您的電子郵件，並點擊郵件中的連結。若遲未收到"
+#~ "驗證信請檢查垃圾信件。"
+
+#~ msgid ""
+#~ "You have successfully validated your email address and can now proceed "
+#~ "with the login."
+#~ msgstr "您已經成功驗證您的電子郵件，現在可以登入了。"
+
+#~ msgid "The validation email has already been sent."
+#~ msgstr "驗證電子郵件已傳送。"
+
+#~ msgid ""
+#~ "You may change your email address after finishing the registration "
+#~ "process."
+#~ msgstr "您可以在完成註冊程序後變更您的電子郵件地址。"
+
+#~ msgid ""
+#~ "You have successfully validated your email address and can now proceeed "
+#~ "with the registration."
+#~ msgstr "您已經成功驗證您的電子郵件，現在可以註冊了。"
+
+#~ msgid ""
+#~ "There is already some information in Indico that concerns you. We are "
+#~ "going to link it automatically."
+#~ msgstr "Indico 內已經有一些資訊與您有關。我們會自動將它跟您連結。"
+
+#~ msgid ""
+#~ "Your registration request has been received. We will send you an email "
+#~ "once it has been processed."
+#~ msgstr "已收到您的註冊要求。我們會在處理完後發一封電子郵件給您。"
+
+#~ msgid ""
+#~ "You have sucessfully registered your Indico profile. Check <a href="
+#~ "\"{url}\">your profile</a> for further details and settings."
+#~ msgstr ""
+#~ "您已經成功註冊您的 Indico 設定檔。請到<a href=\"{url}\">您的設定檔</a>中做"
+#~ "進一步的設定。"
+
+#~ msgid "Local account added successfully"
+#~ msgstr "已成功新增本地帳號"
+
+#~ msgid "Your local account credentials have been updated successfully"
+#~ msgstr "已成功更新您的本地帳號的登入資訊"
+
+#~ msgid "{provider} ({identifier}) successfully removed from your accounts"
+#~ msgstr "{provider} ({identifier}) 已成功移除您的帳號"
+
+#~ msgid "Your password has been changed successfully."
+#~ msgstr "已成功變更您的密碼。"
+
+#~ msgid "This email address is already in use."
+#~ msgstr "此電子郵件地址已被使用。"
+
+#~ msgid "This username is already in use."
+#~ msgstr "此使用者名稱已被使用。"
+
+#~ msgid "Username"
+#~ msgstr "使用者名稱"
+
+#~ msgid "Password"
+#~ msgstr "密碼"
+
+#~ msgid "Confirm password"
+#~ msgstr "確認密碼"
+
+#~ msgid "New password"
+#~ msgstr "新的密碼"
+
+#~ msgid "Wrong current password"
+#~ msgstr "目前的密碼輸入錯誤"
+
+#~ msgid "Choose the email address you want to verify."
+#~ msgstr "輸入您要用來驗證的電子郵件地址。"
+
+#~ msgid "First Name"
+#~ msgstr "名"
+
+#~ msgid "Address"
+#~ msgstr "地址"
+
+#~ msgid "Comment"
+#~ msgstr "備註"
+
+#~ msgid ""
+#~ "You can provide additional information or a comment for the "
+#~ "administrators who will review your registration."
+#~ msgstr "您可以提供額外資訊或備註給管理者，讓管理者檢閱您的註冊。"
+
+#~ msgid "There is no profile with this email address."
+#~ msgstr "此電子郵件沒有設定檔。"
+
+#~ msgid "This profile has no local account."
+#~ msgstr "此設定檔不屬於任何本地帳號。"
+
+#~ msgid "Forgot my password"
+#~ msgstr "忘記密碼"
+
+#~ msgid "You don't have a local account yet."
+#~ msgstr "您目前還沒有本地帳號。"
+
+#~ msgid "Create account"
+#~ msgstr "建立帳號"
+
+#~ msgid "Modify credentials"
+#~ msgstr "變更登入資訊"
+
+#~ msgid "You have another local account that has been used in the past."
+#~ msgid_plural ""
+#~ "You have %(count)s other local accounts that have been used in the past."
+#~ msgstr[0] "您過去已使用過 %(count)s 個其他的本地帳號。"
+
+#~ msgid "Show"
+#~ msgstr "顯示"
+
+#~ msgid "Hide"
+#~ msgstr "隱藏"
+
+#~ msgid "Last login:"
+#~ msgstr "上次登入："
+
+#~ msgid "Never"
+#~ msgstr "從未登入"
+
+#~ msgid "Remove account"
+#~ msgstr "移除帳號"
+
+#~ msgid "Do you really want to remove this account?"
+#~ msgstr "您確定要移除此帳號嗎？"
+
+#~ msgid "Remove"
+#~ msgstr "移除"
+
+#~ msgid "External Accounts"
+#~ msgstr "外部帳號"
+
+#~ msgid "External accounts linked with your Indico profile."
+#~ msgstr "連結到您的 Indico 設定檔的外部帳號。"
+
+#~ msgid "The account used to log in cannot be unlinked"
+#~ msgstr "用來登入的帳號不能解除連結"
+
+#~ msgid "Unlink"
+#~ msgstr "解除連結"
+
+#~ msgid "Unlink account"
+#~ msgstr "解除帳號連結"
+
+#~ msgid "Do you really want to unlink this account?"
+#~ msgstr "您確定要解除此帳號的連結嗎？"
+
+#~ msgid "You have no external accounts connected"
+#~ msgstr "您尚未連結到任何外部帳號"
+
+#~ msgid "New authentication method"
+#~ msgstr "新增認證方式"
+
+#~ msgid ""
+#~ "You logged in using <strong>%(provider)s</strong> for the first time."
+#~ msgstr "您第一次使用 <strong>%(provider)s</strong> 登入。"
+
+#~ msgid "Add this account and log in"
+#~ msgstr "新增此帳號並登入"
+
+#~ msgid "Send me a verification email"
+#~ msgstr "傳送驗證信件給我"
+
+#~ msgid "Login with %(name)s"
+#~ msgstr "用 %(name)s 登入"
+
+#~ msgid "or change authentication provider"
+#~ msgstr "或是改用其他的驗證提供服務"
+
+#~ msgid "or connect with"
+#~ msgstr "或是連結到"
+
+#~ msgid ""
+#~ "If you do not have an Indico account yet, you can <a href=\"%(url)s"
+#~ "\">create one here</a>."
+#~ msgstr "如果您還沒有 Indico 帳號，您可以<a href=\"%(url)s\">在此建立</a>。"
+
+#~ msgid ""
+#~ "If you do not have an account yet, you can <a href=\"%(url)s\" target="
+#~ "\"_blank\">create one here</a>."
+#~ msgstr ""
+#~ "如果您還沒有帳號，您可以<a href=\"%(url)s\" target=\"_blank\">在此建立</"
+#~ "a>。"
+
+#~ msgid "Back"
+#~ msgstr "返回"
+
+#~ msgid "Create a new Indico profile"
+#~ msgstr "建立新的 Indico 設定檔"
+
+#~ msgid ""
+#~ "To create a new Indico profile you first need to verify your email "
+#~ "address."
+#~ msgstr "要建立新的 Indico 設定檔，您必須先驗證您的電子郵件地址。"
+
+#~ msgid "Account moderation"
+#~ msgstr "帳號管理"
+
+#~ msgid ""
+#~ "Each account needs to be approved by an administrator.<br> We will send "
+#~ "you an email as soon as your request is approved."
+#~ msgstr "每個帳號都要經過管理者批准。<br>完成後我們會立刻發電子郵件通知您。"
+
+#~ msgid "Submit registration request"
+#~ msgstr "提交註冊要求"
+
+#~ msgid "Create my Indico profile"
+#~ msgstr "建立我的 Indico 設定檔"
+
+#~ msgid "Reset your Indico password"
+#~ msgstr "重設您的 Indico 密碼"
+
+#~ msgid "Change my password"
+#~ msgstr "變更我的密碼"
+
+#~ msgid "Verify your email"
+#~ msgstr "驗證您的電子郵件"
+
+#~ msgid "user"
+#~ msgstr "使用者"
+
+#~ msgid "Reset your password"
+#~ msgstr "重設您的密碼"
+
+#~ msgid ""
+#~ "Some fields are invalid. Please, correct them and submit the form again."
+#~ msgstr "有些欄位資料不正確。請重新檢查後再次提交。"
+
+#~ msgid "Hello there!"
+#~ msgstr "哈囉！"
+
+#~ msgid "Indico needs just a little bit more data from you..."
+#~ msgstr "Indico 只需要您提供多一點點資料..."
+
+#~ msgid "Administrator Account"
+#~ msgstr "管理者帳號"
+
+#~ msgid "Insert here all basic information needed to create your account."
+#~ msgstr "在此輸入要建立您的帳號所需要的所有基本資訊。"
+
+#~ msgid "Site configuration"
+#~ msgstr "站台設定"
+
+#~ msgid "These are the default parameters for your Indico site."
+#~ msgstr "這些是您的 Indico 站台的預設參數。"
+
+#~ msgid ""
+#~ "Please note that this information will also be used for your own user "
+#~ "profile. You can change it later."
+#~ msgstr "請注意，此資訊也會用於您個人的設定檔。您可以稍後再去變更設定。"
+
+#~ msgid ""
+#~ "The time zone for the server has been set to %(timezone)s and can be "
+#~ "modified in <span class=\"mono\">indico.conf</span>."
+#~ msgstr ""
+#~ "伺服器的時區設定為 %(timezone)s，您可以在 <span class=\"mono\">indico."
+#~ "conf</span> 中做修改。"
+
+#~ msgid "Let us know you exist!"
+#~ msgstr "一起來加入我們！"
+
+#~ msgid ""
+#~ "Be part of the ever growing Indico community! Choose to receive news on "
+#~ "the latest releases (2–3 times per year) as well as important security "
+#~ "advisories."
+#~ msgstr ""
+#~ "加入 Indico 社群！您可以選擇是否接收最近釋出版本的資訊（一年大約兩到三"
+#~ "次），還有重要的安全性更新資訊。"
+
+#~ msgid "The following data will be sent to the Community Hub:"
+#~ msgstr "以下的資料將會被送到 Community Hub："
+
+#~ msgid "Indico version installed"
+#~ msgstr "安裝的 Indico 版本"
+
+#~ msgid "Python version used"
+#~ msgstr "使用的 Python 版本"
+
+#~ msgid "Postgres version used"
+#~ msgstr "使用的 Postgres 版本"
+
+#~ msgid "Operating system used"
+#~ msgstr "使用的作業系統"
+
+#~ msgid "Debug mode"
+#~ msgstr "除錯模式"
+
+#~ msgid "enabled"
+#~ msgstr "已開啟"
+
+#~ msgid "Basic statistics (number of events, contributions and users)"
+#~ msgstr "基本統計數字（活動數、貢獻與使用者）"
+
+#~ msgid "Server default language"
+#~ msgstr "伺服器預設語言"
+
+#~ msgid "Contact person"
+#~ msgstr "聯絡人"
+
+#~ msgid "Affiliation of your Indico server"
+#~ msgstr "您的 Indico 伺服器的所屬單位"
+
+#~ msgid "Finish"
+#~ msgstr "完成"
+
+#~ msgid ""
+#~ "Indico is now ready and you are logged as %(name)s with administrative "
+#~ "rights!<br> Don't forget to tweak <a href=\"%(settings_link)s\">Indico's "
+#~ "settings</a> and update your <a href=\"%(profile_link)s\">profile</a>."
+#~ msgstr ""
+#~ "Indico 已設定完成，您現在已經用 %(name)s 帳號登入為管理者了。<br>別忘了調"
+#~ "整 <a href=\"%(settings_link)s\">Indico 的設定</a>並更新您的<a href="
+#~ "\"%(profile_link)s\">設定檔</a>。"
+
+#~ msgid ""
+#~ "Welcome to the Indico community, your server has been registered to the "
+#~ "Community Hub!<br> You can manage it <a href=\"%(link)s\">here</a>."
+#~ msgstr ""
+#~ "歡迎加入 Indico 社群！您的伺服器已經註冊到 Community Hub 了。<br>您可以從"
+#~ "<a href=\"%(link)s\">這裡</a>管理。"
+
+#~ msgid ""
+#~ "Registration to the Community Hub timed-out. Please try again in a while "
+#~ "<a href=\"%(link)s\">here</a>."
+#~ msgstr ""
+#~ "向 Community Hub 註冊時發生逾時。請稍後<a href=\"%(link)s\">再試一次</a>。"
+
+#~ msgid "Failed to register to the Community Hub: %(error)s."
+#~ msgstr "註冊到 Community Hub 失敗：%(error)s。"
+
+#~ msgid ""
+#~ "See the logs for details and try again <a href=\"%(link)s\">here</a>."
+#~ msgstr "請檢查紀錄檔，然後<a href=\"%(link)s\">再試一次</a>。"
+
+#~ msgid "Content"
+#~ msgstr "內容"
+
+#~ msgid "Settings"
+#~ msgstr "設定"
+
+#~ msgid "Protection"
+#~ msgstr "保護"
+
+#~ msgid "Upcoming events"
+#~ msgstr "將舉行的活動"
+
+#~ msgid "Event creation"
+#~ msgstr "建立活動"
+
+#~ msgid "Allows creating events in the category"
+#~ msgstr "允許在此類別中建立活動"
+
+#~ msgid ""
+#~ "Default timezone event lists will show up in. It will also be used as a "
+#~ "default for new events."
+#~ msgstr "使用預設時區的活動清單將會顯示出來。它也會做為新增活動時的預設值。"
+
+#~ msgid "Theme for Lectures"
+#~ msgstr "教育訓練主題"
+
+#~ msgid "Default timetable theme used for lecture events"
+#~ msgstr "用於教育訓練活動的預設時間表主題"
+
+#~ msgid "Theme for Meetings"
+#~ msgstr "會議主題"
+
+#~ msgid "Default timetable theme used for meeting events"
+#~ msgstr "用於會議活動的預設時間表主題"
+
+#~ msgid "Disable Suggestions"
+#~ msgstr "關閉建議"
+
+#~ msgid ""
+#~ "Enable this if you don't want Indico to suggest this category as a "
+#~ "possible addition to a user's favourites."
+#~ msgstr "若您不想讓 Indico 建議此類別做為使用者的最愛，則勾選此選項。"
+
+#~ msgid "Message Type"
+#~ msgstr "訊息型態"
+
+#~ msgid ""
+#~ "This message will show up at the top of every event page in this category"
+#~ msgstr "此訊息會在此類別中的每個活動頁面上方顯示"
+
+#~ msgid "Notify managers"
+#~ msgstr "通知管理員"
+
+#~ msgid ""
+#~ "Whether to send email notifications to all managers of this category when "
+#~ "an event is created inside it or in any of its subcategories."
+#~ msgstr ""
+#~ "當在此類別或它的子類別中建立活動時，是否要傳送電子郵件通知給此類別的每個管"
+#~ "理員。"
+
+#~ msgid "Protection mode"
+#~ msgstr "保護模式"
+
+#~ msgid "Restrict access to this category"
+#~ msgstr "限制此類別的存取"
+
+#~ msgid "List of users allowed to access the category."
+#~ msgstr "允許存取此類別的使用者清單。"
+
+#~ msgid "Managers"
+#~ msgstr "管理員"
+
+#~ msgid "Event visibility"
+#~ msgstr "活動可見度"
+
+#~ msgid "Restricted event creation"
+#~ msgstr "限制建立活動"
+
+#~ msgid ""
+#~ "Whether the event creation should be restricted to a list of specific "
+#~ "persons"
+#~ msgstr "是否限制特定使用者才能建立活動"
+
+#~ msgid "Event creators"
+#~ msgstr "活動建立者"
+
+#~ msgid "Users allowed to create events in this category"
+#~ msgstr "允許在此類別中建立活動的使用者"
+
+#~ msgid "Category name #1"
+#~ msgstr "類別名稱 #1"
+
+#~ msgid "Category name #2"
+#~ msgstr "類別名稱 #2"
+
+#~ msgid "Category name"
+#~ msgstr "類別名稱"
+
+#~ msgid "Max. events"
+#~ msgstr "最大活動數"
+
+#~ msgid "Type"
+#~ msgstr "型態"
+
+#~ msgid "Days"
+#~ msgstr "日數"
+
+#~ msgid "Weight"
+#~ msgstr "權重"
+
+#~ msgid "Category & Subcategories"
+#~ msgstr "類別與子類別"
+
+#~ msgid ""
+#~ "Specify categories/events shown in the 'upcoming events' list on the home "
+#~ "page."
+#~ msgstr "指定要在「將舉行的活動」清單中顯示的類別與活動。"
+
+#~ msgid "'Days' must be a positive integer"
+#~ msgstr "「日數」必須是正整數"
+
+#~ msgid "Invalid type"
+#~ msgstr "不合法的型態"
+
+#~ msgid "Invalid category: {}"
+#~ msgstr "不合法的類別：{}"
+
+#~ msgid "Invalid event: {}"
+#~ msgstr "不合法的活動：{}"
+
+#~ msgid "From the category above"
+#~ msgid_plural "From {} categories above"
+#~ msgstr[0] "從上方的 {} 類別"
+
+#~ msgid "From this category only"
+#~ msgstr "只從此類別"
+
+#~ msgid "From the current category only"
+#~ msgstr "只從目前的類別"
+
+#~ msgid "From everywhere"
+#~ msgstr "從每個地方"
+
+#~ msgid "Invisible"
+#~ msgstr "隱藏"
+
+#~ msgid "Everywhere"
+#~ msgstr "每處"
+
+#~ msgid "Indico Atom feed"
+#~ msgstr "Indico Atom feed"
+
+#~ msgid "Settings saved!"
+#~ msgstr "設定已儲存！"
+
+#~ msgid "If you believe you should have access, please contact {}"
+#~ msgstr "如果您認為您應該可以存取，請聯絡 {}"
+
+#~ msgid "Years"
+#~ msgstr "年"
+
+#~ msgid "Number of events"
+#~ msgstr "活動數"
+
+#~ msgid "{value} events in {year}"
+#~ msgstr "{year} 年中的 {value} 個活動"
+
+#~ msgid "Number of attachments"
+#~ msgstr "附檔數量"
+
+#~ msgid "Number of users"
+#~ msgstr "使用者數量"
+
+#~ msgid "Events of \"{}\""
+#~ msgstr "\"{}\" 的活動"
+
+#~ msgid "Category settings saved!"
+#~ msgstr "類別設定已儲存！"
+
+#~ msgid "You cannot upload this file as an icon/logo."
+#~ msgstr "您不能上傳此檔做為圖示或圖標。"
+
+#~ msgid "The file has an invalid format ({format})"
+#~ msgstr "檔案的格式 ({format}) 不正確"
+
+#~ msgid "New icon saved"
+#~ msgstr "新圖示已儲存"
+
+#~ msgid "Icon deleted"
+#~ msgstr "圖示已刪除"
+
+#~ msgid "New logo saved"
+#~ msgstr "新圖標已儲存"
+
+#~ msgid "Logo deleted"
+#~ msgstr "圖標已刪除"
+
+#~ msgid "Protection settings of the category have been updated"
+#~ msgstr "此類別的保護設定已更新"
+
+#~ msgid "Category \"{}\" has been created."
+#~ msgstr "類別 \"{}\" 已建立。"
+
+#~ msgid "Category \"{}\" has been deleted."
+#~ msgstr "類別 \"{}\" 已刪除。"
+
+#~ msgid "You have deleted one event"
+#~ msgid_plural "You have deleted {} events"
+#~ msgstr[0] "您已刪除 {} 個活動"
+
+#~ msgid "Split"
+#~ msgstr "分割"
+
+#~ msgid "Info"
+#~ msgstr "資訊"
+
+#~ msgid "Warning"
+#~ msgstr "警告"
+
+#~ msgid "Download current category:"
+#~ msgstr "下載目前的類別："
+
+#~ msgid "Category page"
+#~ msgstr "類別頁面"
+
+#~ msgid "Total"
+#~ msgstr "總計"
+
+#~ msgid "Last update:"
+#~ msgstr "上次更新："
+
+#~ msgid "There are no statistics available for this category."
+#~ msgstr "沒有此類別的統計資料。"
+
+#~ msgid "Main categories"
+#~ msgstr "主類別"
+
+#~ msgid "All events"
+#~ msgstr "所有活動"
+
+#~ msgid "Create event"
+#~ msgstr "建立活動"
+
+#~ msgid "View"
+#~ msgstr "檢視"
+
+#~ msgid "Calendar"
+#~ msgstr "行事曆"
+
+#~ msgid "protected"
+#~ msgstr "已保護"
+
+#~ msgid "Manage category materials"
+#~ msgstr "主類別素材"
+
+#~ msgid "News"
+#~ msgstr "新聞"
+
+#~ msgid "more..."
+#~ msgstr "更多..."
+
+#~ msgid "Display options"
+#~ msgstr "顯示選項"
+
+#~ msgid "Legend"
+#~ msgstr "圖例"
+
+#~ msgid "Previous month"
+#~ msgstr "上個月"
+
+#~ msgid "Previous day"
+#~ msgstr "前一天"
+
+#~ msgid "Next day"
+#~ msgstr "下一天"
+
+#~ msgid "Next month"
+#~ msgstr "下個月"
+
+#~ msgid "Previous year"
+#~ msgstr "前一年"
+
+#~ msgid "Next year"
+#~ msgstr "下一年"
+
+#~ msgid "Previous week"
+#~ msgstr "前一週"
+
+#~ msgid "Next week"
+#~ msgstr "下一週"
+
+#~ msgid "Move to different category"
+#~ msgstr "移動到不同類別"
+
+#~ msgid "Start date"
+#~ msgstr "開始日期"
+
+#~ msgid "All"
+#~ msgstr "全部"
+
+#~ msgid "%(count)s displayed"
+#~ msgstr "已顯示 %(count)s 個"
+
+#~ msgid "Categories"
+#~ msgstr "類別"
+
+#~ msgid "Events"
+#~ msgstr "活動"
+
+#~ msgid "New event"
+#~ msgstr "新增活動"
+
+#~ msgid "You are about to delete the following category:"
+#~ msgid_plural "You are about to delete the following categories:"
+#~ msgstr[0] "您準備刪除以下的類別："
+
+#~ msgid "Event Header"
+#~ msgstr "活動標頭"
+
+#~ msgid "Delete Icon?"
+#~ msgstr "要刪除圖示嗎？"
+
+#~ msgid "Logo"
+#~ msgstr "圖標"
+
+#~ msgid "Delete Logo?"
+#~ msgstr "要刪除圖標嗎？"
+
+#~ msgid "Community Hub"
+#~ msgstr "Community Hub"
+
+#~ msgid "Synchronize"
+#~ msgstr "同步"
+
+#~ msgid "Services"
+#~ msgstr "服務"
+
+#~ msgid "Home"
+#~ msgstr "首頁"
+
+#~ msgid "Organization"
+#~ msgstr "組織"
+
+#~ msgid "System"
+#~ msgstr "系統"
+
+#~ msgid "Landscape"
+#~ msgstr "橫向"
+
+#~ msgid "Portrait"
+#~ msgstr "縱向"
+
+#~ msgid "Template"
+#~ msgstr "樣本"
+
+#~ msgid "Registrant Data"
+#~ msgstr "註冊資料"
+
+#~ msgid "Event Data"
+#~ msgstr "活動資料"
+
+#~ msgid "{} to {}"
+#~ msgstr "{} 到 {}"
+
+#~ msgid "Full Name"
+#~ msgstr "全名"
+
+#~ msgid "Last Name"
+#~ msgstr "姓"
+
+#~ msgid "E-mail"
+#~ msgstr "電子郵件"
+
+#~ msgid "Price (no currency)"
+#~ msgstr "價格（不標記貨幣）"
+
+#~ msgid "Price (with currency)"
+#~ msgstr "價格（標記貨幣）"
+
+#~ msgid "Institution"
+#~ msgstr "機構"
+
+#~ msgid "Position"
+#~ msgstr "職位"
+
+#~ msgid "Country"
+#~ msgstr "國家"
+
+#~ msgid "Phone"
+#~ msgstr "電話"
+
+#~ msgid "Ticket QR Code"
+#~ msgstr "票券 QR Code"
+
+#~ msgid "Print tickets"
+#~ msgstr "列印票券"
+
+#~ msgid "Print badges"
+#~ msgstr "列印名牌"
+
+#~ msgid "Clone this template"
+#~ msgstr "複製此樣本"
+
+#~ msgid "Edit template"
+#~ msgstr "編輯樣本"
+
+#~ msgid "Delete template"
+#~ msgstr "刪除樣本"
+
+#~ msgid "Width:"
+#~ msgstr "寬度："
+
+#~ msgid "Change orientation"
+#~ msgstr "變更方向"
+
+#~ msgid "Height:"
+#~ msgstr "高度："
+
+#~ msgid "Preset:"
+#~ msgstr "預設定值："
+
+#~ msgid "Landscape orientation"
+#~ msgstr "橫向"
+
+#~ msgid "Business card"
+#~ msgstr "名片"
+
+#~ msgid "Portrait orientation"
+#~ msgstr "縱向"
+
+#~ msgid "Snap to grid"
+#~ msgstr "貼齊格線"
+
+#~ msgid "Template background"
+#~ msgstr "樣本背景"
+
+#~ msgid "Upload file"
+#~ msgstr "上傳檔案"
+
+#~ msgid "Remove background"
+#~ msgstr "移除背景"
+
+#~ msgid "Stretch"
+#~ msgstr "延伸"
+
+#~ msgid "Center"
+#~ msgstr "置中"
+
+#~ msgid "black"
+#~ msgstr "黑色"
+
+#~ msgid "red"
+#~ msgstr "紅色"
+
+#~ msgid "blue"
+#~ msgstr "藍色"
+
+#~ msgid "green"
+#~ msgstr "綠色-"
+
+#~ msgid "yellow"
+#~ msgstr "黃色"
+
+#~ msgid "brown"
+#~ msgstr "棕色"
+
+#~ msgid "gold"
+#~ msgstr "金色"
+
+#~ msgid "pink"
+#~ msgstr "粉紅色"
+
+#~ msgid "gray"
+#~ msgstr "灰色"
+
+#~ msgid "white"
+#~ msgstr "白色"
+
+#~ msgid "Normal"
+#~ msgstr "一般"
+
+#~ msgid "Bold"
+#~ msgstr "粗體"
+
+#~ msgid "Italic"
+#~ msgstr "斜體"
+
+#~ msgid "Bold &amp; Italic"
+#~ msgstr "粗斜體"
+
+#~ msgid "Left"
+#~ msgstr "置左"
+
+#~ msgid "Right"
+#~ msgstr "置右"
+
+#~ msgid "Justified"
+#~ msgstr "兩邊對齊"
+
+#~ msgid "Text:"
+#~ msgstr "文字："
+
+#~ msgid "Insert element:"
+#~ msgstr "插入元素："
+
+#~ msgid "Fixed data"
+#~ msgstr "固定資料"
+
+#~ msgid "Fixed text"
+#~ msgstr "固定文字"
+
+#~ msgid "Insert"
+#~ msgstr "插入"
+
+#~ msgid "Value"
+#~ msgstr "數值"
+
+#~ msgid "Scheme"
+#~ msgstr "機制"
+
+#~ msgid "Event title"
+#~ msgstr "活動名稱"
+
+#~ msgid "Start"
+#~ msgstr "開始"
+
+#~ msgid "End"
+#~ msgstr "結束"
+
+#~ msgid "Dates"
+#~ msgstr "日期"
+
+#~ msgid "Theme"
+#~ msgstr "主題"
+
+#~ msgid "Rating"
+#~ msgstr "評比"
+
+#~ msgid "Call for Abstracts"
+#~ msgstr "徵求摘要"
+
+#~ msgid "Reviewer"
+#~ msgstr "檢閱者"
+
+#~ msgid "Required"
+#~ msgstr "要求"
+
+#~ msgid "Max words"
+#~ msgstr "最大字數"
+
+#~ msgid "Additional text"
+#~ msgstr "額外文字"
+
+#~ msgid "Additional text at end"
+#~ msgstr "尾端額外文字"
+
+#~ msgid "Sort by"
+#~ msgstr "排序依據"
+
+#~ msgid "Corresponding author"
+#~ msgstr "共同作者"
+
+#~ msgid "Minimum lines per abstract"
+#~ msgstr "摘要最小行數"
+
+#~ msgid "Minimum lines to reserve per abstract."
+#~ msgstr "摘要最小保留行數。"
+
+#~ msgid "Track"
+#~ msgstr "音軌"
+
+#~ msgid "Rules"
+#~ msgstr "規則"
+
+#~ msgid "Send to submitter"
+#~ msgstr "傳送給提交者"
+
+#~ msgid "Send to primary authors"
+#~ msgstr "傳送給主要作者"
+
+#~ msgid "Send to co-authors"
+#~ msgstr "傳送給共同作者"
+
+#~ msgid "CC"
+#~ msgstr "副本"
+
+#~ msgid "Subject"
+#~ msgstr "主題"
+
+#~ msgid "Body"
+#~ msgstr "本文"
+
+#~ msgid "Accept"
+#~ msgstr "接受"
+
+#~ msgid "Merge"
+#~ msgstr "合併"
+
+#~ msgid "No type selected"
+#~ msgstr "沒有選擇型態"
+
+#~ msgid "Authors"
+#~ msgstr "作者"
+
+#~ msgid "Attachments"
+#~ msgstr "附加檔"
+
+#~ msgid "Tracks"
+#~ msgstr "議程軌"
+
+#~ msgid "Send email notifications"
+#~ msgstr "傳送電子郵件通知"
+
+#~ msgid "Visibility"
+#~ msgstr "可見度"
+
+#~ msgid "No track"
+#~ msgstr "沒有議程軌"
+
+#~ msgid "No type"
+#~ msgstr "沒有型態"
+
+#~ msgid "Primary authors"
+#~ msgstr "主要作者"
+
+#~ msgid "Accepted type"
+#~ msgstr "已接受型態"
+
+#~ msgid "Submitted type"
+#~ msgstr "已提交型態"
+
+#~ msgid "Score"
+#~ msgstr "分數"
+
+#~ msgid "Submission date"
+#~ msgstr "提交日期"
+
+#~ msgid "Modification date"
+#~ msgstr "變更日期"
+
+#~ msgid "any"
+#~ msgstr "任何"
+
+#~ msgid "none"
+#~ msgstr "無"
+
+#~ msgid "Destination Track"
+#~ msgstr "目標議程軌"
+
+#~ msgid "any track"
+#~ msgstr "任何議程軌"
+
+#~ msgid "no track"
+#~ msgstr "沒有議程軌"
+
+#~ msgid "in"
+#~ msgstr "於"
+
+#~ msgid "any type"
+#~ msgstr "任何型態"
+
+#~ msgid "no type"
+#~ msgstr "沒有型態"
+
+#~ msgid "as"
+#~ msgstr "為"
+
+#~ msgid "The title of the event"
+#~ msgstr "活動名稱"
+
+#~ msgid "The URL of the event"
+#~ msgstr "活動網址"
+
+#~ msgid "Submitted"
+#~ msgstr "已提交"
+
+#~ msgid "Merged"
+#~ msgstr "已合併"
+
+#~ msgid "Duplicate"
+#~ msgstr "複製"
+
+#~ msgid "Awaiting Review"
+#~ msgstr "等待檢閱中"
+
+#~ msgid "Under Review"
+#~ msgstr "檢閱中"
+
+#~ msgid "Not Started"
+#~ msgstr "未開始"
+
+#~ msgid "In progress"
+#~ msgstr "處理中"
+
+#~ msgid "Positive"
+#~ msgstr "正"
+
+#~ msgid "Negative"
+#~ msgstr "負"
+
+#~ msgid "Mixed"
+#~ msgstr "混合"
+
+#~ msgid "Change track"
+#~ msgstr "變更議程軌"
+
+#~ msgid "Mark as duplicate"
+#~ msgstr "標記為重複"
+
+#~ msgid "Submit new abstract"
+#~ msgstr "提交新摘要"
+
+#~ msgid "Customize list"
+#~ msgstr "自訂清單"
+
+#~ msgid "Download attachments"
+#~ msgstr "下載附件"
+
+#~ msgid "My abstracts"
+#~ msgstr "我的摘要"
+
+#~ msgid "Export to PDF"
+#~ msgstr "匯出為 PDF"
+
+#~ msgid "Last modified:"
+#~ msgstr "最後變更："
+
+#~ msgid "Reviewers"
+#~ msgstr "檢閱者"
+
+#~ msgid "Reviewed"
+#~ msgstr "已檢閱"
+
+#~ msgid "n/a"
+#~ msgstr "無"
+
+#~ msgid "Edit"
+#~ msgstr "編輯"
+
+#~ msgid "deleted"
+#~ msgstr "已刪除"
+
+#~ msgid "Email preview"
+#~ msgstr "電子郵件預覽"
+
+#~ msgid "Back to Call for Abstracts"
+#~ msgstr "返回徵求摘要"
+
+#~ msgid "Abstracts"
+#~ msgstr "摘要"
+
+#~ msgid "List of abstracts"
+#~ msgstr "摘要清單"
+
+#~ msgid "New abstract"
+#~ msgstr "新摘要"
+
+#~ msgid "Reviewing"
+#~ msgstr "檢閱中"
+
+#~ msgid "Questions"
+#~ msgstr "問題"
+
+#~ msgid "Show reviews"
+#~ msgstr "顯示檢閱"
+
+#~ msgid "Hide reviews"
+#~ msgstr "隱藏檢閱"
+
+#~ msgid "Restore"
+#~ msgstr "回復"
+
+#~ msgid "Edit abstract"
+#~ msgstr "編輯摘要"
+
+#~ msgid "Author:"
+#~ msgid_plural "Authors:"
+#~ msgstr[0] "作者："
+
+#~ msgid "Do you agree with the stated above?"
+#~ msgstr "您同意以上的聲明嗎？"
+
+#~ msgid "I agree"
+#~ msgstr "我同意"
+
+#~ msgid "I disagree"
+#~ msgstr "我不同意"
+
+#~ msgid "From"
+#~ msgstr "寄件者"
+
+#~ msgid "Email body"
+#~ msgstr "電子郵件主體"
+
+#~ msgid "Answer"
+#~ msgstr "答案"
+
+#~ msgid "Document"
+#~ msgstr "文件"
+
+#~ msgid "Pending"
+#~ msgstr "暫停"
+
+#~ msgid "Send"
+#~ msgstr "傳送"
+
+#~ msgid "To all people"
+#~ msgstr "給所有人"
+
+#~ msgid "Duration"
+#~ msgstr "期間"
+
+#~ msgid "Keywords"
+#~ msgstr "關鍵字"
+
+#~ msgid "Private"
+#~ msgstr "私人"
+
+#~ msgid "Status"
+#~ msgstr "狀態"
+
+#~ msgid "Scheduled"
+#~ msgstr "已排程"
+
+#~ msgid "Not scheduled"
+#~ msgstr "未排程"
+
+#~ msgid "Title:"
+#~ msgstr "標題："
+
+#~ msgid "Advanced"
+#~ msgstr "進階"
+
+#~ msgid "Material"
+#~ msgstr "材料"
+
+#~ msgid "Yes"
+#~ msgstr "是"
+
+#~ msgid "No"
+#~ msgstr "否"
+
+#~ msgid "Import"
+#~ msgstr "匯入"
+
+#~ msgid "Layout"
+#~ msgstr "佈局"
+
+#~ msgid "Menu"
+#~ msgstr "選單"
+
+#~ msgid "Images"
+#~ msgstr "影像"
+
+#~ msgid "Image manager"
+#~ msgstr "影像管理員"
+
+#~ msgid "Orange"
+#~ msgstr "橘色"
+
+#~ msgid "Brown"
+#~ msgstr "棕色"
+
+#~ msgid "Enable search"
+#~ msgstr "開啟搜尋"
+
+#~ msgid "Enable search within the event"
+#~ msgstr "開啟活動內搜尋"
+
+#~ msgid "Show navigation bar"
+#~ msgstr "顯示導覽列"
+
+#~ msgid "Show the navigation bar at the top"
+#~ msgstr "顯示上方導覽列"
+
+#~ msgid "ON"
+#~ msgstr "開"
+
+#~ msgid "OFF"
+#~ msgstr "關"
+
+#~ msgid "Separator"
+#~ msgstr "分隔符號"
+
+#~ msgid "Download CSS"
+#~ msgstr "下載 CSS"
+
+#~ msgid "Image"
+#~ msgstr "影像"
+
+#~ msgid "Delete image"
+#~ msgstr "刪除影像"
+
+#~ msgid "Upload images"
+#~ msgstr "上傳影像"
+
+#~ msgid "General"
+#~ msgstr "一般"
+
+#~ msgid "Timetable"
+#~ msgstr "時間表"
+
+#~ msgid "Preview"
+#~ msgstr "預覽"
+
+#~ msgid "Event Logo"
+#~ msgstr "活動圖標"
+
+#~ msgid "Customize menu"
+#~ msgstr "自訂選單"
+
+#~ msgid "New link"
+#~ msgstr "新連結"
+
+#~ msgid "New page"
+#~ msgstr "新頁面"
+
+#~ msgid "Add page"
+#~ msgstr "加入頁面"
+
+#~ msgid "Management"
+#~ msgstr "管理"
+
+#~ msgid "Participants"
+#~ msgstr "參加者"
+
+#~ msgid "Emails"
+#~ msgstr "電子郵件"
+
+#~ msgid "To"
+#~ msgstr "收件者"
+
+#~ msgid "Logs"
+#~ msgstr "紀錄"
+
+#~ msgid "Reports"
+#~ msgstr "報告"
+
+#~ msgid "Advanced options"
+#~ msgstr "進階選項"
+
+#~ msgid "Clone Once"
+#~ msgstr "一次性複製"
+
+#~ msgid "URL shortcut"
+#~ msgstr "網址捷徑"
+
+#~ msgid "email"
+#~ msgstr "電子郵件"
+
+#~ msgid "Phone numbers"
+#~ msgstr "電話號碼"
+
+#~ msgid "Organizers"
+#~ msgstr "組織者"
+
+#~ msgid "Additional information"
+#~ msgstr "額外資訊"
+
+#~ msgid "Invalid email address: {}"
+#~ msgstr "不正確的電子郵件地址：{}"
+
+#~ msgid "Horizontal margins"
+#~ msgstr "水平邊界"
+
+#~ msgid "Vertical margins"
+#~ msgstr "垂直邊界"
+
+#~ msgid "Page size"
+#~ msgstr "頁面大小"
+
+#~ msgid "How to repeat"
+#~ msgstr "如何重複"
+
+#~ msgid "You have to select a category"
+#~ msgstr "您必須選擇一個類別"
+
+#~ msgid "Clone"
+#~ msgstr "複製"
+
+#~ msgid "Until a given day (inclusive)"
+#~ msgstr "直到指定日期（含）"
+
+#~ msgid "Number of times"
+#~ msgstr "次數"
+
+#~ msgid "You can clone a maximum of 100 times"
+#~ msgstr "您最多可以複製 100 次"
+
+#~ msgid "The time period must be positive"
+#~ msgstr "時間區間必須是正數"
+
+#~ msgid "Months"
+#~ msgstr "個月"
+
+#~ msgid "Lock"
+#~ msgstr "鎖"
+
+#~ msgid "Move"
+#~ msgstr "移動"
+
+#~ msgid "Send emails"
+#~ msgstr "傳送電子郵件"
+
+#~ msgid "Email"
+#~ msgstr "電子郵件"
+
+#~ msgid "Organizer"
+#~ msgstr "發起人"
+
+#~ msgid "1. Repetition"
+#~ msgstr "1. 重覆"
+
+#~ msgid "2. Contents"
+#~ msgstr "2. 內容"
+
+#~ msgid "3. Category"
+#~ msgstr "3. 類別"
+
+#~ msgid "4. Dates"
+#~ msgstr "4. 日期"
+
+#~ msgid "How should the event be cloned?"
+#~ msgstr "此活動要如何複製？"
+
+#~ msgid "What should be cloned?"
+#~ msgstr "要複製哪些內容？"
+
+#~ msgid "Delete events"
+#~ msgstr "刪除活動"
+
+#~ msgid "Meeting"
+#~ msgstr "會議"
+
+#~ msgid "Conference"
+#~ msgstr "研討會"
+
+#~ msgid "Minutes"
+#~ msgstr "分鐘"
+
+#~ msgid "Assign"
+#~ msgstr "指定"
+
+#~ msgid "Enable"
+#~ msgstr "開啟"
+
+#~ msgid "Code"
+#~ msgstr "代碼"
+
+#~ msgid "Currency"
+#~ msgstr "貨幣"
+
+#~ msgid "Conditions"
+#~ msgstr "條件"
+
+#~ msgid "Payment method"
+#~ msgstr "付款方式"
+
+#~ msgid "Payment information"
+#~ msgstr "付款資訊"
+
+#~ msgid "This payment method only supports these currencies:"
+#~ msgstr "此付款方式只支援以下貨幣："
+
+#~ msgid "Amount"
+#~ msgstr "數量"
+
+#~ msgid "Manual"
+#~ msgstr "手動"
+
+#~ msgid "Recipients"
+#~ msgstr "收件者"
+
+#~ msgid "No account"
+#~ msgstr "沒有帳號"
+
+#~ msgid "Edit information"
+#~ msgstr "編輯資訊"
+
+#~ msgid "Registrations"
+#~ msgstr "註冊"
+
+#~ msgid "Introduction"
+#~ msgstr "介紹"
+
+#~ msgid "Contact info"
+#~ msgstr "聯絡人資訊"
+
+#~ msgid "Email subject"
+#~ msgstr "信件主旨"
+
+#~ msgid "Last name"
+#~ msgstr "姓"
+
+#~ msgid "Page layout"
+#~ msgstr "頁面佈局"
+
+#~ msgid "Application"
+#~ msgstr "申請"
+
+#~ msgid "Opened"
+#~ msgstr "已開啟"
+
+#~ msgid "Closed"
+#~ msgstr "已關閉"
+
+#~ msgid "Decline Invitation"
+#~ msgstr "拒絕邀請"
+
+#~ msgid "Decline"
+#~ msgstr "拒絕"
+
+#~ msgid "This field no longer exists"
+#~ msgstr "此欄位已不存在"
+
+#~ msgid "<strong>Arrival:</strong> %(arrival_date)s"
+#~ msgstr "<strong>抵達日期：</strong> %(arrival_date)s"
+
+#~ msgid "<strong>Departure:</strong> %(departure_date)s"
+#~ msgstr "<strong>離開日期：</strong> %(departure_date)s"
+
+#~ msgid "<strong>Accommodation:</strong> %(accommodation)s"
+#~ msgstr "<strong>住宿：</strong> %(accommodation)s"
+
+#~ msgid "Reference:"
+#~ msgstr "參考："
+
+#~ msgid "Date:"
+#~ msgstr "日期："
+
+#~ msgid "Invoice"
+#~ msgstr "發票"
+
+#~ msgid "Cost"
+#~ msgstr "花費"
+
+#~ msgid "%(choice)s (%(nights)s night)"
+#~ msgid_plural "%(choice)s (%(nights)s nights)"
+#~ msgstr[0] "%(choice)s （%(nights)s 個晚上）"
+
+#~ msgid "Get ticket"
+#~ msgstr "取得票券"
+
+#~ msgid "You are registered for this event."
+#~ msgstr "您已註冊此活動。"
+
+#~ msgid "Application for this event is currently open."
+#~ msgstr "此活動目前已經開放申請。"
+
+#~ msgid "Registration for this event is currently open."
+#~ msgstr "此活動目前已經開放註冊。"
+
+#~ msgid "Total registrations"
+#~ msgstr "總共註冊數"
+
+#~ msgid "Apply now"
+#~ msgstr "現在就申請"
+
+#~ msgid "Register now"
+#~ msgstr "現在就註冊"
+
+#~ msgid "This event is open to new participants."
+#~ msgstr "此活動開放給新參加者。"
+
+#~ msgid "Modify registration"
+#~ msgstr "變更註冊"
+
+#~ msgid "Register"
+#~ msgstr "註冊"
+
+#~ msgid "Apply for participation"
+#~ msgstr "申請參加"
+
+#~ msgid "1 participant"
+#~ msgid_plural "%(num)s participants"
+#~ msgstr[0] "%(num)s 個參加者"
+
+#~ msgid "There are no registrations yet."
+#~ msgstr "目前尚無人註冊。"
+
+#~ msgid "Not started"
+#~ msgstr "未開始"
+
+#~ msgid "Modify"
+#~ msgstr "變更"
+
+#~ msgid "Accepted invitations"
+#~ msgstr "已接受的邀請"
+
+#~ msgid "Declined invitations"
+#~ msgstr "已拒絕的邀請"
+
+#~ msgid "Nobody has been invited yet."
+#~ msgstr "尚未邀請任何人。"
+
+#~ msgid "Mark as declined"
+#~ msgstr "標記為拒絕"
+
+#~ msgid "Mark invitation as declined"
+#~ msgstr "將此邀請標記為拒絕"
+
+#~ msgid "Delete invitation"
+#~ msgstr "刪除邀請"
+
+#~ msgid "Do you really want to delete this invitation?"
+#~ msgstr "您確定要刪除此邀請？"
+
+#~ msgid "Last updated by %(updated_by)s on %(timestamp)s."
+#~ msgstr "上次由 %(updated_by)s 於 %(timestamp)s 更新。"
+
+#~ msgid "Mark as paid"
+#~ msgstr "標記為已付款"
+
+#~ msgid "Mark as unpaid"
+#~ msgstr "標記為未付款"
+
+#~ msgid "Payment transaction"
+#~ msgstr "付款交易"
+
+#~ msgid "Approve"
+#~ msgstr "確認"
+
+#~ msgid "Reject registration"
+#~ msgstr "拒絕註冊"
+
+#~ msgid "reset"
+#~ msgstr "重置"
+
+#~ msgid "Full name"
+#~ msgstr "全名"
+
+#~ msgid "Preview email"
+#~ msgstr "預覽電子郵件"
+
+#~ msgid "Phone Number"
+#~ msgstr "電話號碼"
+
+#~ msgid "Page configuration"
+#~ msgstr "頁面設定"
+
+#~ msgid "Registration Form"
+#~ msgstr "註冊表單"
+
+#~ msgid "Add, remove or modify registrations."
+#~ msgstr "新增、移除或變更註冊。"
+
+#~ msgid "Invitations"
+#~ msgstr "邀請"
+
+#~ msgid "Tickets"
+#~ msgstr "票券"
+
+#~ msgid "QR Code"
+#~ msgstr "QR Code"
+
+#~ msgid "Shown columns"
+#~ msgstr "顯示欄位"
+
+#~ msgid "Hidden columns"
+#~ msgstr "隱藏欄位"
+
+#~ msgid "Currency: {}"
+#~ msgstr "貨幣：{}"
+
+#~ msgid "Countries"
+#~ msgstr "國家"
+
+#~ msgid "Reminders"
+#~ msgstr "提醒"
+
+#~ msgid "Relative to the event start time"
+#~ msgstr "相對於活動開始時間"
+
+#~ msgid "Fixed date/time"
+#~ msgstr "固定日期/時間"
+
+#~ msgid "Send immediately"
+#~ msgstr "立即傳送"
+
+#~ msgid "Email addresses"
+#~ msgstr "電子郵件地址"
+
+#~ msgid "Sender"
+#~ msgstr "寄件者"
+
+#~ msgid "Note"
+#~ msgstr "備忘錄"
+
+#~ msgid "Misc"
+#~ msgstr "雜項"
+
+#~ msgid "Edit reminder"
+#~ msgstr "編輯提醒"
+
+#~ msgid "Delete reminder"
+#~ msgstr "刪除提醒"
+
+#~ msgid "Do you really want to delete this reminder?"
+#~ msgstr "您確定要刪除此提醒嗎？"
+
+#~ msgid "Sent Reminders"
+#~ msgstr "已傳送的提醒"
+
+#~ msgid "Logistics"
+#~ msgstr "後勤"
+
+#~ msgid "Your request ({0}) has been accepted."
+#~ msgstr "您的要求 ({0}) 已被接受。"
+
+#~ msgid "Your request ({0}) has been sent."
+#~ msgstr "您的要求 ({0}) 已傳送。"
+
+#~ msgid "Your request ({0}) has been modified."
+#~ msgstr "您的要求 ({0}) 已變更。"
+
+#~ msgid "You have accepted this request."
+#~ msgstr "您已接受此要求。"
+
+#~ msgid "You have rejected this request."
+#~ msgstr "您已拒絕此要求。"
+
+#~ msgid "Send request"
+#~ msgstr "傳送要求"
+
+#~ msgid "Modify request"
+#~ msgstr "變更要求"
+
+#~ msgid "Request details"
+#~ msgstr "要求詳細資料"
+
+#~ msgid "Created at"
+#~ msgstr "建立時間"
+
+#~ msgid "Change colour"
+#~ msgstr "變更顏色"
+
+#~ msgid "Edit this session"
+#~ msgstr "編輯此議程"
+
+#~ msgid "Running"
+#~ msgstr "執行中"
+
+#~ msgid "Success"
+#~ msgstr "成功"
+
+#~ msgid "Failed"
+#~ msgstr "失敗"
+
+#~ msgid "Expired"
+#~ msgstr "逾時"
+
+#~ msgid "Text"
+#~ msgstr "文字"
+
+#~ msgid "Survey"
+#~ msgstr "意見調查"
+
+#~ msgid "Continue"
+#~ msgstr "繼續"
+
+#~ msgid "Results"
+#~ msgstr "結果"
+
+#~ msgid "Anonymous"
+#~ msgstr "匿名"
+
+#~ msgid "Sections"
+#~ msgstr "區段"
+
+#~ msgid "Add section"
+#~ msgstr "新增區段"
+
+#~ msgid "Answered:"
+#~ msgstr "答覆："
+
+#~ msgid "Average:"
+#~ msgstr "平均："
+
+#~ msgid "Min:"
+#~ msgstr "最小值："
+
+#~ msgid "Max:"
+#~ msgstr "最大值："
+
+#~ msgid "Answers"
+#~ msgstr "答覆"
+
+#~ msgid "Submission #%(id)s"
+#~ msgstr "提交編號 #%(id)s"
+
+#~ msgid "Submitter: %(submitter_name)s (%(submitter_email)s)"
+#~ msgstr "提交者：%(submitter_name)s (%(submitter_email)s)"
+
+#~ msgid "Submitter: <em>Anonymous</em>"
+#~ msgstr "提交者：<em>匿名</em>"
+
+#~ msgid "Date of submission: %(submission_dt)s"
+#~ msgstr "提交日期：%(submission_dt)s"
+
+#~ msgid "N/A"
+#~ msgstr "無"
+
+#~ msgid "Share this page"
+#~ msgstr "分享此頁面"
+
+#~ msgid "Direct link"
+#~ msgstr "直接連結"
+
+#~ msgid "Social networks"
+#~ msgstr "社群網路"
+
+#~ msgid "Loading..."
+#~ msgstr "載入中..."
+
+#~ msgid "Tweet"
+#~ msgstr "發推文"
+
+#~ msgid "Printable version"
+#~ msgstr "可列印版本"
+
+#~ msgid "Download material"
+#~ msgstr "下載素材"
+
+#~ msgid "Access Denied"
+#~ msgstr "存取被拒"
+
+#~ msgid "Go to the main page"
+#~ msgstr "回到主頁面"
+
+#~ msgid "Date/Time"
+#~ msgstr "日期與時間"
+
+#~ msgid "Starts"
+#~ msgstr "開始於"
+
+#~ msgid "Ends"
+#~ msgstr "結束於"
+
+#~ msgid "Extra information"
+#~ msgstr "額外資訊"
+
+#~ msgid "Download current event:"
+#~ msgstr "下載目前的活動："
+
+#~ msgid "Detailed timetable calendar file"
+#~ msgstr "詳細時間表行事曆檔案"
+
+#~ msgid "Detailed timetable"
+#~ msgstr "詳細時間表"
+
+#~ msgid ""
+#~ "from <strong>%(start_date)s (%(start_time)s)</strong> to <strong>"
+#~ "%(end_date)s (%(end_time)s)</strong>"
+#~ msgstr ""
+#~ "從 <strong>%(start_date)s (%(start_time)s)</strong> 到 <strong>"
+#~ "%(end_date)s (%(end_time)s)</strong>"
+
+#~ msgid "Edit Event"
+#~ msgstr "編輯活動"
+
+#~ msgid "Material Editor"
+#~ msgstr "素材編輯器"
+
+#~ msgid "%(start)s to %(end)s"
+#~ msgstr "%(start)s 到 %(end)s"
+
+#~ msgid "%(tz)s timezone"
+#~ msgstr "%(tz)s 時區"
+
+#~ msgid "Speaker"
+#~ msgid_plural "Speakers"
+#~ msgstr[0] "講者"
+
+#~ msgid "Start/end date/time of the event"
+#~ msgstr "活動的開始/結束時間"
+
+#~ msgid "Create new lecture"
+#~ msgstr "建立新課程"
+
+#~ msgid "Create new meeting"
+#~ msgstr "建立新會議"
+
+#~ msgid "Create new conference"
+#~ msgstr "建立新研討會"
+
+#~ msgid "Reviews"
+#~ msgstr "檢閱"
+
+#~ msgid "edited"
+#~ msgstr "已編輯"
+
+#~ msgid "Opening day"
+#~ msgstr "開幕日"
+
+#~ msgid "Change review"
+#~ msgstr "變更檢閱"
+
+#~ msgid "Review"
+#~ msgstr "檢閱"
+
+#~ msgid "Change reviews"
+#~ msgstr "變更檢閱"
+
+#~ msgid "Ratings"
+#~ msgstr "評比"
+
+#~ msgid "Proposal"
+#~ msgstr "提案"
+
+#~ msgid "Submit review"
+#~ msgstr "提交檢閱"
+
+#~ msgid "<strong>%(name)s</strong> left a comment"
+#~ msgstr "<strong>%(name)s</strong> 留下了一條意見"
+
+#~ msgid "Remove comment"
+#~ msgstr "移除意見"
+
+#~ msgid "show ratings"
+#~ msgstr "顯示評比"
+
+#~ msgid "hide ratings"
+#~ msgstr "隱藏評比"
+
+#~ msgid "Start time"
+#~ msgstr "開始時間"
+
+#~ msgid "Show speaker title"
+#~ msgstr "顯示講者職稱"
+
+#~ msgid "Show speaker affiliation"
+#~ msgstr "顯示講者所屬單位"
+
+#~ msgid "Advanced timetable"
+#~ msgstr "進階時間表"
+
+#~ msgid "Advanced customization options"
+#~ msgstr "進階自訂選項"
+
+#~ msgid "Miscellaneous"
+#~ msgstr "雜項設定"
+
+#~ msgid "Move to:"
+#~ msgstr "移動到："
+
+#~ msgid "Move here"
+#~ msgstr "移到這裡"
+
+#~ msgid "Session: %(title)s"
+#~ msgstr "議程：%(title)s"
+
+#~ msgid "Generate"
+#~ msgstr "產生"
+
+#~ msgid "PDF Options"
+#~ msgstr "PDF 選項"
+
+#~ msgid "Change time"
+#~ msgstr "變更時間"
+
+#~ msgid "The program has been updated."
+#~ msgstr "議程已更新。"
+
+#~ msgid "Track \"{}\" has been created."
+#~ msgstr "議程軌 \"{}\" 已建立。"
+
+#~ msgid "Track \"{}\" has been modified."
+#~ msgstr "議程軌 \"{}\" 已變更。"
+
+#~ msgid "Track \"{}\" has been deleted."
+#~ msgstr "議程軌 \"{}\" 已刪除。"
+
+#~ msgid "Default session"
+#~ msgstr "預設議程"
+
+#~ msgid "No tracks have been added yet."
+#~ msgstr "尚未新增任何議程軌。"
+
+#~ msgid "Edit track \"%(title)s\""
+#~ msgstr "編輯議程軌 \"%(title)s\""
+
+#~ msgid "Delete track"
+#~ msgstr "移除議程軌"
+
+#~ msgid "Delete track \"%(title)s\""
+#~ msgstr "刪除議程軌 \"%(title)s\""
+
+#~ msgid "Configure programme"
+#~ msgstr "設定議程"
+
+#~ msgid "Add new track"
+#~ msgstr "新增議程軌"
+
+#~ msgid "Add track"
+#~ msgstr "新增議程軌"
+
+#~ msgid "Local Groups"
+#~ msgstr "本地群組"
+
+#~ msgid "Local"
+#~ msgstr "本地"
+
+#~ msgid "Provider"
+#~ msgstr "提供者："
+
+#~ msgid "Group members"
+#~ msgstr "群組成員"
+
+#~ msgid "There are no users in this group."
+#~ msgstr "此群組中沒有使用者。"
+
+#~ msgid "Group Details"
+#~ msgstr "群組詳細資料"
+
+#~ msgid "Do you really want to delete this group?"
+#~ msgstr "您確定要刪除此群組嗎？"
+
+#~ msgid "Loading member list"
+#~ msgstr "載入成員清單中"
+
+#~ msgid "Edit Group"
+#~ msgstr "編輯群組"
+
+#~ msgid "Create Group"
+#~ msgstr "建立群組"
+
+#~ msgid "Members"
+#~ msgstr "成員"
+
+#~ msgid "Local groups"
+#~ msgstr "本地群組"
+
+#~ msgid "Create new group"
+#~ msgstr "建立新群組"
+
+#~ msgid "Search groups"
+#~ msgstr "搜尋群組"
+
+#~ msgid "Legal/Disclaimers"
+#~ msgstr "合法/免責宣告"
+
+#~ msgid "Legal and disclaimer messages"
+#~ msgstr "合法與免責宣告訊息"
+
+#~ msgid "Privacy"
+#~ msgstr "隱私"
+
+#~ msgid "IP Networks"
+#~ msgstr "IP 網路"
+
+#~ msgid "Latest News"
+#~ msgstr "最新的新聞"
+
+#~ msgid "Post news"
+#~ msgstr "刊登新聞"
+
+#~ msgid "Edit news"
+#~ msgstr "編輯新聞"
+
+#~ msgid "Delete news"
+#~ msgstr "刪除新聞"
+
+#~ msgid "Legacy API (read only)"
+#~ msgstr "傳統 API（只允許讀取）"
+
+#~ msgid "Legacy API (write only)"
+#~ msgstr "傳統 API（只允許寫入）"
+
+#~ msgid "Users:"
+#~ msgstr "使用者："
+
+#~ msgid "Register new application"
+#~ msgstr "註冊新的申請"
+
+#~ msgid "Last used:"
+#~ msgstr "上次使用："
+
+#~ msgid "Revoke"
+#~ msgstr "撤銷"
+
+#~ msgid "Moderate"
+#~ msgstr "管理"
+
+#~ msgid "Rooms I own or manage"
+#~ msgstr "我擁有或管理的會議室"
+
+#~ msgid "Room notifications"
+#~ msgstr "會議室通知"
+
+#~ msgid "Start time should not be later than end time"
+#~ msgstr "開始時間不能晚於結束時間"
+
+#~ msgid "Event has already finished"
+#~ msgstr "此活動已結束"
+
+#~ msgid "Linked to"
+#~ msgstr "連結到"
+
+#~ msgid "Rejected:"
+#~ msgstr "已拒絕："
+
+#~ msgid "Admins"
+#~ msgstr "管理員"
+
+#~ msgid "Dashboard"
+#~ msgstr "資訊看板"
+
+#~ msgid "Personal data"
+#~ msgstr "個人資料"
+
+#~ msgid "Preferences"
+#~ msgstr "喜好設定"
+
+#~ msgid "Favourites"
+#~ msgstr "我的最愛"
+
+#~ msgid "My profile"
+#~ msgstr "我的設定檔"
+
+#~ msgid "This user is marked as deleted."
+#~ msgstr "此使用者已被標記刪除。"
+
+#~ msgid "Your personal data was successfully updated."
+#~ msgstr "已成功變更您的個人資料"
+
+#~ msgid "Preferences saved"
+#~ msgstr "喜好設定已儲存"
+
+#~ msgid "This email address is already attached to your account."
+#~ msgstr "此電子郵件地址已附加到您的帳號。"
+
+#~ msgid "This email address is already in use by another account."
+#~ msgstr "此電子郵件地址已被其他帳號使用。"
+
+#~ msgid "Your primary email was updated successfully."
+#~ msgstr "已成功更新您的主要電子郵件地址。"
+
+#~ msgid "Admin added: {name} ({email})"
+#~ msgstr "管理員已新增：{name} ({email})"
+
+#~ msgid "Admin removed: {name} ({email})"
+#~ msgstr "管理員已移除：{name} ({email})"
+
+#~ msgid "Show details"
+#~ msgstr "顯示詳情"
+
+#~ msgid "Users are the same!"
+#~ msgstr "相同的使用者！"
+
+#~ msgid "Users' names seem to be different!"
+#~ msgstr "使用者的姓名似乎不同！"
+
+#~ msgid "The request has been approved."
+#~ msgstr "此要求已被批准。"
+
+#~ msgid "The request has been rejected."
+#~ msgstr "此要求已被拒絕。"
+
+#~ msgid "Language"
+#~ msgstr "語言"
+
+#~ msgid "Use my timezone"
+#~ msgstr "使用我自己的時區"
+
+#~ msgid "Always use my current timezone instead of an event's timezone."
+#~ msgstr "總是使用我自己的時區而非活動的時區。"
+
+#~ msgid "Show future events by default."
+#~ msgstr "預設顯示未來的活動。"
+
+#~ msgid "Show past events"
+#~ msgstr "顯示過去的活動"
+
+#~ msgid "Show past events by default."
+#~ msgstr "預設顯示過去的活動。"
+
+#~ msgid "Use previewer for PDF files"
+#~ msgstr "使用 PDF 檔案預覽器"
+
+#~ msgid "External"
+#~ msgstr "外部"
+
+#~ msgid "Target user"
+#~ msgstr "目標使用者"
+
+#~ msgid "Registration notifications"
+#~ msgstr "註冊通知"
+
+#~ msgid "Set login details"
+#~ msgstr "設定登入詳情"
+
+#~ msgid "Profile of {name}"
+#~ msgstr "{name} 的設定檔"
+
+#~ msgid "Mr"
+#~ msgstr "Mr"
+
+#~ msgid "Ms"
+#~ msgstr "Ms"
+
+#~ msgid "Mrs"
+#~ msgstr "Mrs"
+
+#~ msgid "Dr"
+#~ msgstr "Dr"
+
+#~ msgid "Prof."
+#~ msgstr "Prof."
+
+#~ msgid "John Doe"
+#~ msgstr "John Doe"
+
+#~ msgid "Doe, John"
+#~ msgstr "Doe, John"
+
+#~ msgid "Doe, J."
+#~ msgstr "Doe, J."
+
+#~ msgid "J. Doe"
+#~ msgstr "J. Doe"
+
+#~ msgid "John DOE"
+#~ msgstr "John DOE"
+
+#~ msgid "DOE, John"
+#~ msgstr "DOE, John"
+
+#~ msgid "DOE, J."
+#~ msgstr "DOE, J."
+
+#~ msgid "J. DOE"
+#~ msgstr "J. DOE"
+
+#~ msgid "first name"
+#~ msgstr "名"
+
+#~ msgid "family name"
+#~ msgstr "姓"
+
+#~ msgid "affiliation"
+#~ msgstr "所屬單位"
+
+#~ msgid "address"
+#~ msgstr "地址"
+
+#~ msgid "phone number"
+#~ msgstr "電話號碼"
+
+#~ msgid "Click here to add this category to your favorites."
+#~ msgstr "點擊此處將此類別加到您的最愛。"
+
+#~ msgid "Admins have unrestricted access to everything in Indico."
+#~ msgstr "管理員對 Indico 中所有東西都有無限制的存取權限。"
+
+#~ msgid "Profile of %(name)s"
+#~ msgstr "%(name)s 的設定檔"
+
+#~ msgid "This is the system user. Most user features are not available."
+#~ msgstr "這是系統使用者。大部份使用者的功能都無法使用。"
+
+#~ msgid "Now"
+#~ msgstr "現在"
+
+#~ msgid "User ID"
+#~ msgstr "使用者 ID"
+
+#~ msgid "Your events at hand"
+#~ msgstr "您手上的活動"
+
+#~ msgid "You are a reviewer"
+#~ msgstr "您是檢閱者"
+
+#~ msgid "You are an attendee"
+#~ msgstr "您是參加者"
+
+#~ msgid "You have no events."
+#~ msgstr "您沒有活動。"
+
+#~ msgid "You might be interested in the following categories..."
+#~ msgstr "您可能會對以下的類別有興趣..."
+
+#~ msgid "Your categories"
+#~ msgstr "您的類別"
+
+#~ msgid "You have no categories."
+#~ msgstr "您沒有類別。"
+
+#~ msgid "Set as primary"
+#~ msgstr "設為主要"
+
+#~ msgid "Add Indico user"
+#~ msgstr "新增 Indico 使用者"
+
+#~ msgid "Favourite Categories"
+#~ msgstr "最愛的類別"
+
+#~ msgid "Registration requests"
+#~ msgstr "註冊要求"
+
+#~ msgid "Email Address"
+#~ msgstr "電子郵件地址"
+
+#~ msgid "User settings"
+#~ msgstr "使用者設定"
+
+#~ msgid "Manage users"
+#~ msgstr "管理使用者"
+
+#~ msgid "Merge users"
+#~ msgstr "合併使用者"
+
+#~ msgid "Create new account"
+#~ msgstr "建立新帳號"
+
+#~ msgid "This is the system user."
+#~ msgstr "這是系統使用者。"
+
+#~ msgid "Videoconference Rooms"
+#~ msgstr "視訊會議室"
+
+#~ msgid "Videoconference rooms"
+#~ msgstr "視訊會議室"
+
+#~ msgid "ACL"
+#~ msgstr "存取控制清單"
+
+#~ msgid "Notification email addresses"
+#~ msgstr "通知電子郵件地址"
+
+#~ msgid "Link to"
+#~ msgstr "連結到"
+
+#~ msgid "Display this room on the event page"
+#~ msgstr "在活動頁面上顯示此會議室"
+
+#~ msgid "Sort direction"
+#~ msgstr "排序方向"
+
+#~ msgid "Ascending"
+#~ msgstr "遞增"
+
+#~ msgid "Descending"
+#~ msgstr "遞減"
+
+#~ msgid "Start Date"
+#~ msgstr "開始日期"
+
+#~ msgid "End Date"
+#~ msgstr "結束日期"
+
+#~ msgid "{} (event)"
+#~ msgstr "{} (event)"
+
+#~ msgid "{} (contribution)"
+#~ msgstr "{} (contribution)"
+
+#~ msgid "{} (session block)"
+#~ msgstr "{} (session block)"
+
+#~ msgid "More info"
+#~ msgstr "更多資訊"
+
+#~ msgid "Current videoconference rooms"
+#~ msgstr "目前的視訊會議室"
+
+#~ msgid "Check videoconference room status"
+#~ msgstr "檢查視訊會議室的狀態"
+
+#~ msgid "Detach"
+#~ msgstr "分離"
+
+#~ msgid "No videoconference rooms have been added yet."
+#~ msgstr "尚未新增任何視訊會議室。"
+
+#~ msgid "Create %(plugin_name)s room"
+#~ msgstr "建立 %(plugin_name)s 會議室"
+
+#~ msgid "Create videoconference room"
+#~ msgstr "建立視訊會議室"
+
+#~ msgid "Create new room"
+#~ msgstr "建立新會議室"
+
+#~ msgid "Attach %(plugin_name)s room"
+#~ msgstr "附加 %(plugin_name)s 會議室"
+
+#~ msgid "Attach videoconference room"
+#~ msgstr "附加視訊會議室"
+
+#~ msgid "There are no Videoconference plugins available."
+#~ msgstr "沒有視訊會議的外掛程式可以使用。"
+
+#~ msgid "Attach"
+#~ msgstr "附加"
+
+#~ msgid "%(action)s %(plugin_name)s room"
+#~ msgstr "%(action)s %(plugin_name)s 室"
+
+#~ msgid "{0} second"
+#~ msgid_plural "{0} seconds"
+#~ msgstr[0] "{0} 秒"
+
+#~ msgid "{0} day"
+#~ msgid_plural "{0} days"
+#~ msgstr[0] "{0} 天"
+
+#~ msgid "{0}s"
+#~ msgid_plural "{0}s"
+#~ msgstr[0] "{0}秒"
+
+#~ msgid "{0}m"
+#~ msgid_plural "{0}m"
+#~ msgstr[0] "{0}分"
+
+#~ msgid "{0}h"
+#~ msgid_plural "{0}h"
+#~ msgstr[0] "{0}小時"
+
+#~ msgid "{0}d"
+#~ msgid_plural "{0}d"
+#~ msgstr[0] "{0}天"
+
+#~ msgid "yesterday"
+#~ msgstr "昨天"
+
+#~ msgid "today"
+#~ msgstr "今天"
+
+#~ msgid "tomorrow"
+#~ msgstr "明天"
+
+#~ msgid "'Yesterday'"
+#~ msgstr "'昨天'"
+
+#~ msgid "'Today'"
+#~ msgstr "'今天'"
+
+#~ msgid "'Tomorrow'"
+#~ msgstr "'明天'"
+
+#~ msgid "'Last' EEEE"
+#~ msgstr "'上個' EEEE"
+
+#~ msgid "EEEE"
+#~ msgstr "EEEE"
+
+#~ msgid "{date_fmt}"
+#~ msgstr "{date_fmt}"
+
+#~ msgid "'Yesterday' 'at' {time_fmt}"
+#~ msgstr "'昨天''的'{time_fmt}"
+
+#~ msgid "'Today' 'at' {time_fmt}"
+#~ msgstr "'今天''的'{time_fmt}"
+
+#~ msgid "'Tomorrow' 'at' {time_fmt}"
+#~ msgstr "'明天''的'{time_fmt}"
+
+#~ msgid "'Last' EEEE 'at' {time_fmt}"
+#~ msgstr "'上個' EEEE '的' {time_fmt}"
+
+#~ msgid "EEEE 'at' {time_fmt}"
+#~ msgstr "EEEE '的' {time_fmt}"
+
+#~ msgid "{date_fmt} 'at' {time_fmt}"
+#~ msgstr "{date_fmt} '的' {time_fmt}"
+
+#~ msgid "Fetch the cow"
+#~ msgstr "測試：抓住牛"
+
+#~ msgid "The wheels"
+#~ msgstr "測試：輪子"
+
+#~ msgid "{} cow"
+#~ msgid_plural "{} cows"
+#~ msgstr[0] "測試：{} 頭牛"
+
+#~ msgid "I need a drink."
+#~ msgstr "測試：我要喝點東西。"
+
+#~ msgid "This is not a string"
+#~ msgstr "測試：這不是字串"
+
+#~ msgid "Display type"
+#~ msgstr "顯示型態"
+
+#~ msgid "Radio buttons"
+#~ msgstr "單選圓鈕"
+
+#~ msgid "Drop-down list"
+#~ msgstr "下拉式清單"
+
+#~ msgid "Alignment"
+#~ msgstr "對齊"
+
+#~ msgid "The arrangement of the options"
+#~ msgstr "選項的排列方式"
+
+#~ msgid "Vertical"
+#~ msgstr "垂直"
+
+#~ msgid "Horizontal"
+#~ msgstr "水平"
+
+#~ msgid "option"
+#~ msgstr "選項"
+
+#~ msgid "Specify the options the user can choose from"
+#~ msgstr "指定使用者可選擇的選項"
+
+#~ msgid "Specify the answers the user can select"
+#~ msgstr "指定使用者可以選擇幾個答案"
+
+#~ msgid "Minimum choices"
+#~ msgstr "最小選擇數"
+
+#~ msgid "The minimum amount of options the user has to choose."
+#~ msgstr "使用者要選擇最少幾個選項。"
+
+#~ msgid "Maximum choices"
+#~ msgstr "最多選擇數"
+
+#~ msgid "The maximum amount of options the user may choose."
+#~ msgstr "使用者最多只能選擇幾個選項。"
+
+#~ msgid "Maximum choices must be greater than minimum choices."
+#~ msgstr "最多選擇數必須大於最小選擇數。"
+
+#~ msgid "Minimum choices must be fewer than the total number of options."
+#~ msgstr "最小選擇數必須小於總選項數。"
+
+#~ msgid ""
+#~ "Maximum choices must be fewer or equal than the total number of options."
+#~ msgstr "最多選擇數必須小於總選項數。"
+
+#~ msgid "Please select no more than %(max)d option."
+#~ msgid_plural "Please select no more than %(max)d options."
+#~ msgstr[0] "請不要選擇超過 %(max)d 個選項。"
+
+#~ msgid "Please select between %(min)d and %(max)d options."
+#~ msgstr "請選擇 %(min)d 到 %(max)d 個選項。"
+
+#~ msgid "Multiline"
+#~ msgstr "多行文字"
+
+#~ msgid ""
+#~ "If the field should be rendered as a textarea instead of a single-line "
+#~ "text field."
+#~ msgstr "這個欄位是要用多行文字輸入還是單一行文字輸入。"
+
+#~ msgid "Min value"
+#~ msgstr "最小值"
+
+#~ msgid "Max value"
+#~ msgstr "最大值"
+
+#~ msgid "Yes/No"
+#~ msgstr "是/否"
+
+#~ msgid "Login failed: {error}"
+#~ msgstr "登入失敗：{error}"
+
+#~ msgid "Required argument missing: {}"
+#~ msgstr "遺失了必要的參數：{}"
+
+#~ msgid "Your profile has been deleted."
+#~ msgstr "您的設定檔已被刪除。"
+
+#~ msgid "Invalid email address list"
+#~ msgstr "不正確的電子郵件地址清單"
+
+#~ msgid "Invalid email address"
+#~ msgstr "不正確的電子郵件地址"
+
+#~ msgid "'{}' can't be in the past ({})"
+#~ msgstr "'{}' 不能是過去的時間 ({})"
+
+#~ msgid "'{}' can't be before {} ({})"
+#~ msgstr "'{}' 不能在 {} ({}) 之前"
+
+#~ msgid "'{}' can't be in the future ({})"
+#~ msgstr "'{}' 不能是未來的時間 ({})"
+
+#~ msgid "'{}' can't be after {} ({})"
+#~ msgstr "'{}' 不能在 {} ({}) 之後"
+
+#~ msgid "{} can't be before {}"
+#~ msgstr "{} 不能在 {} 之前"
+
+#~ msgid "{} can't be after {}"
+#~ msgstr "{} 不能在 {} 之後"
+
+#~ msgid "{} can't be equal to {}"
+#~ msgstr "{} 不能等於 {}"
+
+#~ msgid "Duration cannot exceed {}"
+#~ msgstr "期間不能超過 {}"
+
+#~ msgid "Must be between {earliest} and {latest}."
+#~ msgstr "必須在 {earliest} 與 {latest} 之間。"
+
+#~ msgid "Must be later than {earliest}."
+#~ msgstr "必須在 {earliest} 之後。"
+
+#~ msgid "Must be earlier than {latest}."
+#~ msgstr "必須比 {latest} 更早。"
+
+#~ msgid "Field cannot contain more than {max} word."
+#~ msgid_plural "Field cannot contain more than {max} words."
+#~ msgstr[0] "欄位不能超過 {max} 個字。"
+
+#~ msgid "Field must contain between {min} and {max} words."
+#~ msgstr "欄位必須在 {min} 跟 {max} 個字之間。"
+
+#~ msgid "Invalid colors selected"
+#~ msgstr "選擇的顏色不正確"
+
+#~ msgid "Invalid color selected"
+#~ msgstr "選擇的顏色不正確"
+
+#~ msgid "Date must be specified"
+#~ msgstr "必須指定日期"
+
+#~ msgid "Time must be specified"
+#~ msgstr "必須指定時間"
+
+#~ msgid "first"
+#~ msgstr "第一"
+
+#~ msgid "second"
+#~ msgstr "第二"
+
+#~ msgid "third"
+#~ msgstr "第三"
+
+#~ msgid "fourth"
+#~ msgstr "第四"
+
+#~ msgid "last"
+#~ msgstr "最後"
+
+#~ msgid "Copy URL to clipboard"
+#~ msgstr "將網址複製到剪貼簿"
+
+#~ msgid "Calendar file"
+#~ msgstr "行事曆檔案"
+
+#~ msgid "I have read and understood the above."
+#~ msgstr "我已閱讀並瞭解上面所述。"
+
+#~ msgid "Accept & Create"
+#~ msgstr "接受並建立"
+
+#~ msgid "Click to show/hide the password"
+#~ msgstr "點擊以顯示或隱藏密碼"
+
+#~ msgid "Show them."
+#~ msgstr "顯示出來。"
+
+#~ msgid "Choose Timezone"
+#~ msgstr "選擇時區"
+
+#~ msgid "Use the event/category timezone"
+#~ msgstr "使用活動/類別的時區"
+
+#~ msgid "Your default timezone"
+#~ msgstr "您的預設時區"
+
+#~ msgid "Remember these settings"
+#~ msgstr "記住這些設定"
+
+#~ msgid "Login as..."
+#~ msgstr "登入為..."
+
+#~ msgid "Switch back to %(name)s"
+#~ msgstr "切換回 %(name)s"
+
+#~ msgid "English"
+#~ msgstr "英語"
+
+#~ msgid "My language (%(lang)s)"
+#~ msgstr "我的語言 (%(lang)s)"
+
+#~ msgid "Login"
+#~ msgstr "登入"
+
+#~ msgid "I understand what this means. Please go ahead."
+#~ msgstr "我瞭解這個意思。繼續吧。"
+
+#~ msgid "Perform action"
+#~ msgstr "執行動作"
+
+#~ msgid "Powered by %(indico)s"
+#~ msgstr "Powered by %(indico)s"
+
+#~ msgid "toggle"
+#~ msgstr "切換"
+
+#~ msgid "Search among Indico users"
+#~ msgstr "從 Indico 使用者中搜尋"
+
+#~ msgid "Enter person information manually"
+#~ msgstr "手動輸入個人資料"
+
+#~ msgid "Enter manually"
+#~ msgstr "手動輸入"
+
+#~ msgid "Choose category"
+#~ msgstr "選擇類別"
+
+#~ msgid "Clear date and time"
+#~ msgstr "清除日期與時間"
+
+#~ msgid "Drag file here"
+#~ msgstr "把檔案拖到這裡"
+
+#~ msgid "Choose from your computer"
+#~ msgstr "從您的電腦中選擇"
+
+#~ msgid "Copy emails to clipboard"
+#~ msgstr "複製電子郵件地址到剪貼簿中"
+
+#~ msgid "Use default"
+#~ msgstr "使用預設值"
+
+#~ msgid "Action"
+#~ msgstr "動作"
+
+#~ msgid "Duration in minutes"
+#~ msgstr "期間（分）"
+
+#~ msgid "Choose"
+#~ msgstr "選擇"
+
+#~ msgid "User / Group"
+#~ msgstr "使用者 / 群組"
+
+#~ msgid "Role"
+#~ msgstr "角色"
+
+#~ msgid "New role"
+#~ msgstr "新角色"
+
+#~ msgid "IP Network"
+#~ msgstr "IP 網路"
+
+#~ msgid "Choose user..."
+#~ msgstr "選擇使用者..."
+
+#~ msgid "View list"
+#~ msgstr "檢視清單"
