@@ -30,3 +30,4 @@ export {default as PopoverDropdownMenu} from './PopoverDropdownMenu';
 export {default as ResponsivePopup} from './ResponsivePopup';
 export {default as PublicationSwitch} from './PublicationSwitch';
 export {default as MathJax} from './MathJax';
+export {default as FileSubmission} from './FileSubmission';
