@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: indico 2.2.3-dev\n"
+"Project-Id-Version: indico 2.2.5-dev\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2019-10-04 13:50+0200\n"
+"POT-Creation-Date: 2019-10-28 14:40+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -57,7 +57,7 @@ msgstr ""
 msgid "Access the public areas of the selected contribution"
 msgstr ""
 
-#: indico/core/permissions.py:92 indico/modules/events/abstracts/templates/management/overview.html:123
+#: indico/core/permissions.py:92 indico/modules/events/abstracts/templates/management/overview.html:125
 #: indico/modules/events/papers/templates/management/overview.html:158
 #: indico/modules/events/registration/templates/management/regform.html:64
 #: indico/modules/events/registration/templates/management/regform.html:80
@@ -464,19 +464,19 @@ msgstr ""
 msgid "ID"
 msgstr ""
 
-#: indico/legacy/pdfinterface/latex.py:264
+#: indico/legacy/pdfinterface/latex.py:273
 msgid "Report of Abstracts"
 msgstr ""
 
-#: indico/legacy/pdfinterface/latex.py:289 indico/legacy/pdfinterface/latex.py:292
+#: indico/legacy/pdfinterface/latex.py:298 indico/legacy/pdfinterface/latex.py:301
 msgid "{} (#{}: {})"
 msgstr ""
 
-#: indico/legacy/pdfinterface/latex.py:330
+#: indico/legacy/pdfinterface/latex.py:339
 msgid "Proposed for other tracks: {}"
 msgstr ""
 
-#: indico/legacy/pdfinterface/latex.py:383
+#: indico/legacy/pdfinterface/latex.py:392
 msgid "Report of Contributions"
 msgstr ""
 
@@ -891,7 +891,7 @@ msgstr ""
 #: indico/modules/categories/forms.py:117 indico/modules/events/contributions/contrib_fields.py:30
 #: indico/modules/events/contributions/forms.py:37 indico/modules/events/contributions/forms.py:110
 #: indico/modules/events/contributions/forms.py:189
-#: indico/modules/events/contributions/templates/display/contribution_display.html:149
+#: indico/modules/events/contributions/templates/display/contribution_display.html:151
 #: indico/modules/events/contributions/templates/management/types_dialog.html:22 indico/modules/events/forms.py:82
 #: indico/modules/events/management/forms.py:60 indico/modules/events/management/templates/_settings.html:44
 #: indico/modules/events/papers/forms.py:190 indico/modules/events/papers/templates/management/_templates.html:10
@@ -1841,7 +1841,7 @@ msgstr ""
 #: indico/modules/categories/__init__.py:46 indico/modules/categories/templates/management/settings.html:25
 #: indico/modules/events/abstracts/templates/management/overview.html:32
 #: indico/modules/events/abstracts/templates/management/overview.html:80
-#: indico/modules/events/abstracts/templates/management/overview.html:106
+#: indico/modules/events/abstracts/templates/management/overview.html:107
 #: indico/modules/events/contributions/templates/management/contributions.html:13
 #: indico/modules/events/management/__init__.py:30 indico/modules/events/management/templates/settings.html:4
 #: indico/modules/events/papers/templates/management/overview.html:173
@@ -4380,7 +4380,7 @@ msgstr ""
 msgid "Higgs Fields Posters"
 msgstr ""
 
-#: indico/modules/events/abstracts/controllers/abstract.py:49
+#: indico/modules/events/abstracts/controllers/abstract.py:51
 msgid "Abstract modified successfully"
 msgstr ""
 
@@ -4421,15 +4421,15 @@ msgid_plural "{count} linked contributions have been deleted."
 msgstr[0] ""
 msgstr[1] ""
 
-#: indico/modules/events/abstracts/controllers/boa.py:30
+#: indico/modules/events/abstracts/controllers/boa.py:32
 msgid "Book of Abstract settings have been saved"
 msgstr ""
 
-#: indico/modules/events/abstracts/controllers/display.py:55
+#: indico/modules/events/abstracts/controllers/display.py:58
 msgid "The Call for Abstracts is closed. Please contact the event organizer for further assistance."
 msgstr ""
 
-#: indico/modules/events/abstracts/controllers/display.py:66
+#: indico/modules/events/abstracts/controllers/display.py:69
 msgid ""
 "Your abstract '{}' has been successfully submitted. It is registered with the number #{}. You will be notified by "
 "email with the submission details."
@@ -4658,9 +4658,9 @@ msgid "My abstracts"
 msgstr ""
 
 #: indico/modules/events/abstracts/templates/display/call_for_abstracts.html:24
-#: indico/modules/events/abstracts/templates/management/abstract_list.html:202
+#: indico/modules/events/abstracts/templates/management/abstract_list.html:204
 #: indico/modules/events/contributions/templates/display/contribution_list.html:18
-#: indico/modules/events/contributions/templates/management/contributions.html:181
+#: indico/modules/events/contributions/templates/management/contributions.html:183
 #: indico/modules/events/papers/templates/_paper_list.html:375
 #: indico/modules/events/papers/templates/display/call_for_papers.html:58
 #: indico/modules/events/papers/templates/display/reviewing_area.html:61
@@ -4669,13 +4669,13 @@ msgstr ""
 msgid "Enter #id or search string"
 msgstr ""
 
-#: indico/modules/events/abstracts/templates/display/call_for_abstracts.html:29
-#: indico/modules/events/contributions/templates/display/contribution_list.html:33
+#: indico/modules/events/abstracts/templates/display/call_for_abstracts.html:30
+#: indico/modules/events/contributions/templates/display/contribution_list.html:34
 #: indico/modules/events/templates/header.html:207
 msgid "Export to PDF"
 msgstr ""
 
-#: indico/modules/events/abstracts/templates/display/call_for_abstracts.html:52
+#: indico/modules/events/abstracts/templates/display/call_for_abstracts.html:54
 msgid "Last modified:"
 msgstr ""
 
@@ -4918,7 +4918,7 @@ msgid "Abstracts"
 msgstr ""
 
 #: indico/modules/events/abstracts/templates/management/abstract_list.html:18
-#: indico/modules/events/abstracts/templates/management/overview.html:117
+#: indico/modules/events/abstracts/templates/management/overview.html:119
 msgid "List of abstracts"
 msgstr ""
 
@@ -4982,12 +4982,12 @@ msgstr ""
 msgid "Author list"
 msgstr ""
 
-#: indico/modules/events/abstracts/templates/management/abstract_list.html:186
+#: indico/modules/events/abstracts/templates/management/abstract_list.html:188
 #: indico/modules/events/registration/templates/management/regform_reglist.html:199
 msgid "Adapt columns width"
 msgstr ""
 
-#: indico/modules/events/abstracts/templates/management/abstract_list.html:193
+#: indico/modules/events/abstracts/templates/management/abstract_list.html:195
 #: indico/modules/events/registration/templates/management/regform_reglist.html:206
 msgid "Generate a URL for the selected filters and columns."
 msgstr ""
@@ -5126,20 +5126,20 @@ msgstr ""
 msgid "Questions"
 msgstr ""
 
-#: indico/modules/events/abstracts/templates/management/overview.html:95
+#: indico/modules/events/abstracts/templates/management/overview.html:96
 msgid "Book of abstracts"
 msgstr ""
 
-#: indico/modules/events/abstracts/templates/management/overview.html:97
+#: indico/modules/events/abstracts/templates/management/overview.html:98
 #, python-format
 msgid "Customize and <a href=%(url)s>download</a> the book of abstracts"
 msgstr ""
 
-#: indico/modules/events/abstracts/templates/management/overview.html:104
+#: indico/modules/events/abstracts/templates/management/overview.html:105
 msgid "Configure the book of abstracts"
 msgstr ""
 
-#: indico/modules/events/abstracts/templates/management/overview.html:119
+#: indico/modules/events/abstracts/templates/management/overview.html:121
 msgid "View and perform actions on abstracts"
 msgstr ""
 
@@ -6117,51 +6117,51 @@ msgstr ""
 msgid "Row {row}: invalid email address: {email}"
 msgstr ""
 
-#: indico/modules/events/contributions/controllers/management.py:177
+#: indico/modules/events/contributions/controllers/management.py:178
 msgid "Contribution '{}' created successfully"
 msgstr ""
 
-#: indico/modules/events/contributions/controllers/management.py:197
+#: indico/modules/events/contributions/controllers/management.py:198
 msgid "Contribution '{}' successfully updated"
 msgstr ""
 
-#: indico/modules/events/contributions/controllers/management.py:213
+#: indico/modules/events/contributions/controllers/management.py:214
 msgid "The contribution has been deleted."
 msgid_plural "{count} contributions have been deleted."
 msgstr[0] ""
 msgstr[1] ""
 
-#: indico/modules/events/contributions/controllers/management.py:238
+#: indico/modules/events/contributions/controllers/management.py:239
 msgid "Contribution '{}' successfully deleted"
 msgstr ""
 
-#: indico/modules/events/contributions/controllers/management.py:325
+#: indico/modules/events/contributions/controllers/management.py:326
 msgid "Subcontribution '{}' created successfully"
 msgstr ""
 
-#: indico/modules/events/contributions/controllers/management.py:337
+#: indico/modules/events/contributions/controllers/management.py:338
 msgid "Subcontribution '{}' updated successfully"
 msgstr ""
 
-#: indico/modules/events/contributions/controllers/management.py:350
+#: indico/modules/events/contributions/controllers/management.py:351
 msgid "Subcontribution '{}' deleted successfully"
 msgstr ""
 
-#: indico/modules/events/contributions/controllers/management.py:430
+#: indico/modules/events/contributions/controllers/management.py:431
 msgid "The selected contributions do not have any materials."
 msgstr ""
 
-#: indico/modules/events/contributions/controllers/management.py:501
+#: indico/modules/events/contributions/controllers/management.py:514
 msgid "{} contribution has been imported."
 msgid_plural "{} contributions have been imported."
 msgstr[0] ""
 msgstr[1] ""
 
-#: indico/modules/events/contributions/controllers/management.py:503
+#: indico/modules/events/contributions/controllers/management.py:516
 msgid "Event dates/times adjusted due to imported data."
 msgstr ""
 
-#: indico/modules/events/contributions/controllers/management.py:525
+#: indico/modules/events/contributions/controllers/management.py:538
 msgid "Default contribution duration was changed successfully"
 msgstr ""
 
@@ -6225,27 +6225,27 @@ msgstr ""
 msgid "Edit contribution"
 msgstr ""
 
-#: indico/modules/events/contributions/templates/display/contribution_display.html:182
+#: indico/modules/events/contributions/templates/display/contribution_display.html:184
 msgid "Primary author"
 msgid_plural "Primary authors"
 msgstr[0] ""
 msgstr[1] ""
 
-#: indico/modules/events/contributions/templates/display/contribution_display.html:199
+#: indico/modules/events/contributions/templates/display/contribution_display.html:201
 #: indico/modules/events/management/templates/_event_person_list.html:36
 msgid "Co-author"
 msgid_plural "Co-authors"
 msgstr[0] ""
 msgstr[1] ""
 
-#: indico/modules/events/contributions/templates/display/contribution_display.html:217
+#: indico/modules/events/contributions/templates/display/contribution_display.html:219
 #: indico/modules/events/contributions/templates/management/_contribution_list.html:33
 #: indico/modules/events/contributions/templates/management/_contribution_list.html:139
 #: indico/modules/events/timetable/templates/balloons/contribution.html:76
 msgid "Subcontributions"
 msgstr ""
 
-#: indico/modules/events/contributions/templates/display/contribution_display.html:235
+#: indico/modules/events/contributions/templates/display/contribution_display.html:237
 #: indico/modules/events/contributions/templates/display/subcontribution_display.html:35
 #, python-format
 msgid "Edit subcontribution '%(title)s'"
@@ -6256,21 +6256,21 @@ msgid "Download current contribution:"
 msgstr ""
 
 #: indico/modules/events/contributions/templates/display/contribution_list.html:24
-#: indico/modules/events/contributions/templates/management/contributions.html:170
+#: indico/modules/events/contributions/templates/management/contributions.html:172
 msgid "Contribution list configuration"
 msgstr ""
 
 #: indico/modules/events/contributions/templates/display/contribution_list.html:28
-#: indico/modules/events/contributions/templates/management/contributions.html:174
+#: indico/modules/events/contributions/templates/management/contributions.html:176
 msgid "Filters"
 msgstr ""
 
-#: indico/modules/events/contributions/templates/display/contribution_list.html:38
-#: indico/modules/events/contributions/templates/management/contributions.html:178
+#: indico/modules/events/contributions/templates/display/contribution_list.html:40
+#: indico/modules/events/contributions/templates/management/contributions.html:180
 msgid "Generate a URL for the selected filters."
 msgstr ""
 
-#: indico/modules/events/contributions/templates/display/contribution_list.html:49
+#: indico/modules/events/contributions/templates/display/contribution_list.html:51
 #: indico/modules/events/contributions/templates/display/contribution_person_list_base.html:81
 #: indico/modules/events/contributions/templates/display/user_contribution_list.html:40
 #: indico/modules/events/registration/templates/display/regform_list.html:92
@@ -6525,50 +6525,50 @@ msgstr ""
 msgid "Export data"
 msgstr ""
 
-#: indico/modules/events/contributions/templates/management/contributions.html:108
+#: indico/modules/events/contributions/templates/management/contributions.html:109
 #: indico/modules/events/sessions/templates/management/session_list.html:96
 msgid "PDF"
 msgstr ""
 
-#: indico/modules/events/contributions/templates/management/contributions.html:114
+#: indico/modules/events/contributions/templates/management/contributions.html:115
 msgid "PDF (book of abstracts)"
 msgstr ""
 
-#: indico/modules/events/contributions/templates/management/contributions.html:120
+#: indico/modules/events/contributions/templates/management/contributions.html:121
 msgid "PDF (book of abstracts - sorted by board number)"
 msgstr ""
 
-#: indico/modules/events/contributions/templates/management/contributions.html:126
+#: indico/modules/events/contributions/templates/management/contributions.html:127
 msgid "PDF (book of abstracts - sorted by schedule and board number)"
 msgstr ""
 
-#: indico/modules/events/contributions/templates/management/contributions.html:132
+#: indico/modules/events/contributions/templates/management/contributions.html:133
 msgid "PDF (book of abstracts - sorted by session and board number)"
 msgstr ""
 
-#: indico/modules/events/contributions/templates/management/contributions.html:138
+#: indico/modules/events/contributions/templates/management/contributions.html:139
 msgid "PDF (book of abstracts - sorted by session, schedule and board number)"
 msgstr ""
 
-#: indico/modules/events/contributions/templates/management/contributions.html:145
+#: indico/modules/events/contributions/templates/management/contributions.html:147
 #: indico/modules/events/surveys/templates/management/survey.html:119
 msgid "CSV"
 msgstr ""
 
-#: indico/modules/events/contributions/templates/management/contributions.html:151
+#: indico/modules/events/contributions/templates/management/contributions.html:153
 #: indico/modules/events/surveys/templates/management/survey.html:125
 msgid "XLSX (Excel)"
 msgstr ""
 
-#: indico/modules/events/contributions/templates/management/contributions.html:156
+#: indico/modules/events/contributions/templates/management/contributions.html:158
 msgid "Import contributions from CSV file"
 msgstr ""
 
-#: indico/modules/events/contributions/templates/management/contributions.html:158
+#: indico/modules/events/contributions/templates/management/contributions.html:160
 msgid "Import contributions from CSV File"
 msgstr ""
 
-#: indico/modules/events/contributions/templates/management/contributions.html:160
+#: indico/modules/events/contributions/templates/management/contributions.html:162
 #: indico/modules/events/registration/templates/management/regform_reglist.html:97
 #: indico/modules/events/surveys/templates/management/survey_questionnaire.html:22
 msgid "Import"

@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: indico 2.2.3-dev\n"
+"Project-Id-Version: indico 2.2.5-dev\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2019-10-04 13:51+0200\n"
+"POT-Creation-Date: 2019-10-28 14:40+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -740,7 +740,7 @@ msgid "Save"
 msgstr ""
 
 #: indico/web/client/js/jquery/widgets/ajaxqbubble.js:20 indico/web/client/js/legacy/libs/indico/Core/Dialogs/Base.js:63
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:787
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:782
 msgid "Loading..."
 msgstr ""
 
@@ -866,7 +866,7 @@ msgid "Type to add {0}"
 msgstr ""
 
 #: indico/web/client/js/jquery/widgets/jinja/multiple_items_widget.js:34
-#: indico/web/client/js/jquery/widgets/multitextfield.js:278 indico/web/client/js/legacy/libs/timetable/Draw.js:1659
+#: indico/web/client/js/jquery/widgets/multitextfield.js:278 indico/web/client/js/legacy/libs/timetable/Draw.js:1654
 msgid "Delete"
 msgstr ""
 
@@ -924,7 +924,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: indico/web/client/js/jquery/widgets/jinja/multiple_items_widget.js:44
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1591
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1586
 msgid "Edit"
 msgstr ""
 
@@ -1628,55 +1628,55 @@ msgstr ""
 msgid "Please click for more information."
 msgstr ""
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:737
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:732
 msgid "Move entry"
 msgstr ""
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:781 indico/web/client/js/legacy/libs/timetable/Draw.js:792
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:776 indico/web/client/js/legacy/libs/timetable/Draw.js:787
 msgid "This timetable entry does not exist anymore. Please refresh the page."
 msgstr ""
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:793
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:788
 msgid "Refresh"
 msgstr ""
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:896
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:891
 msgid "Move up"
 msgstr ""
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:905
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:900
 msgid "Move down"
 msgstr ""
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1593
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1588
 msgid "Edit poster"
 msgstr ""
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1625
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1620
 msgid "Manage protection"
 msgstr ""
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1627
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1622
 msgid "Manage poster protection"
 msgstr ""
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1655
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1650
 msgid "Unschedule"
 msgstr ""
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1656
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1651
 msgid "Unschedule poster"
 msgstr ""
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1657
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1652
 msgid "Are you sure you want to unschedule the poster?"
 msgstr ""
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1660
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1655
 msgid "Delete poster"
 msgstr ""
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1661
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1656
 msgid "Are you sure you want to delete the poster?"
 msgstr ""
 
