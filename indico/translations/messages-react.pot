@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2019-10-19 14:40+0100\n"
+"POT-Creation-Date: 2019-10-19 14:41+0100\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "MIME-Version: 1.0\n"
@@ -60,7 +60,7 @@ msgstr ""
 
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:268
 #: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:217
-#: indico/modules/rb/client/js/util.jsx:247
+#: indico/modules/rb/client/js/util.jsx:251
 msgid "Cancelled"
 msgstr ""
 
@@ -76,7 +76,7 @@ msgstr ""
 
 #: indico/modules/rb/client/js/common/bookings/BookingDetails.jsx:286
 #: indico/modules/rb/client/js/common/timeline/TimelineItem.jsx:236
-#: indico/modules/rb/client/js/util.jsx:246
+#: indico/modules/rb/client/js/util.jsx:250
 msgid "Rejected"
 msgstr ""
 
@@ -655,19 +655,13 @@ msgstr ""
 
 #: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:393
 #: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:437
-#: indico/modules/rb/client/js/util.jsx:179
 msgid "Weekly"
-msgid_plural "Every {number} weeks"
-msgstr[0] ""
-msgstr[1] ""
+msgstr ""
 
 #: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:405
 #: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:449
-#: indico/modules/rb/client/js/util.jsx:191
 msgid "Monthly"
-msgid_plural "Every {number} months"
-msgstr[0] ""
-msgstr[1] ""
+msgstr ""
 
 #: indico/modules/rb/client/js/common/rooms/RoomEditModal.jsx:420
 msgid "How many days before the end of a booking should reminders be sent"
@@ -1426,7 +1420,7 @@ msgid ""
 msgstr ""
 
 #: indico/modules/rb/client/js/modules/blockings/BlockingCard.jsx:32
-msgid "1 room"
+msgid "{count} room"
 msgid_plural "{count} rooms"
 msgstr[0] ""
 msgstr[1] ""
@@ -2001,52 +1995,52 @@ msgstr ""
 msgid "Once"
 msgstr ""
 
-#: indico/modules/rb/client/js/util.jsx:233
+#: indico/modules/rb/client/js/util.jsx:237
 msgid "Available"
 msgstr ""
 
-#: indico/modules/rb/client/js/util.jsx:234
+#: indico/modules/rb/client/js/util.jsx:238
 msgid "Booking"
 msgstr ""
 
-#: indico/modules/rb/client/js/util.jsx:235
+#: indico/modules/rb/client/js/util.jsx:239
 msgid "Pre-Booking"
 msgstr ""
 
-#: indico/modules/rb/client/js/util.jsx:236
+#: indico/modules/rb/client/js/util.jsx:240
 msgid "Conflict"
 msgstr ""
 
-#: indico/modules/rb/client/js/util.jsx:238
+#: indico/modules/rb/client/js/util.jsx:242
 msgid "Conflict with Pre-Booking"
 msgstr ""
 
-#: indico/modules/rb/client/js/util.jsx:242
+#: indico/modules/rb/client/js/util.jsx:246
 msgid "Invalid occurrence"
 msgstr ""
 
-#: indico/modules/rb/client/js/util.jsx:245
+#: indico/modules/rb/client/js/util.jsx:249
 msgid "Other booking"
 msgstr ""
 
-#: indico/modules/rb/client/js/util.jsx:249
+#: indico/modules/rb/client/js/util.jsx:253
 msgid "Will be cancelled"
 msgstr ""
 
-#: indico/modules/rb/client/js/util.jsx:252
+#: indico/modules/rb/client/js/util.jsx:256
 msgid "Blocking"
 msgstr ""
 
-#: indico/modules/rb/client/js/util.jsx:254
+#: indico/modules/rb/client/js/util.jsx:258
 msgid "Blocking (allowed)"
 msgstr ""
 
-#: indico/modules/rb/client/js/util.jsx:257
-#: indico/modules/rb/client/js/util.jsx:258
+#: indico/modules/rb/client/js/util.jsx:261
+#: indico/modules/rb/client/js/util.jsx:262
 msgid "Not bookable"
 msgstr ""
 
-#: indico/modules/rb/client/js/util.jsx:260
+#: indico/modules/rb/client/js/util.jsx:264
 msgid "Concurrent Pre-Bookings"
 msgstr ""
 
@@ -2280,12 +2274,26 @@ msgctxt "daily booking shortcut"
 msgid "D"
 msgstr ""
 
-#: indico/modules/rb/client/js/util.jsx:181
+#: indico/modules/rb/client/js/util.jsx:179
+msgctxt "repetition"
+msgid "Weekly"
+msgid_plural "Every {number} weeks"
+msgstr[0] ""
+msgstr[1] ""
+
+#: indico/modules/rb/client/js/util.jsx:193
+msgctxt "repetition"
+msgid "Monthly"
+msgid_plural "Every {number} months"
+msgstr[0] ""
+msgstr[1] ""
+
+#: indico/modules/rb/client/js/util.jsx:183
 msgctxt "weekly booking shortcut"
 msgid "{number}W"
 msgstr ""
 
-#: indico/modules/rb/client/js/util.jsx:193
+#: indico/modules/rb/client/js/util.jsx:197
 msgctxt "monthly booking shortcut"
 msgid "{number}M"
 msgstr ""

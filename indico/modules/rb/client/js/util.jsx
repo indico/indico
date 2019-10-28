@@ -176,7 +176,9 @@ export function renderRecurrence({type, number, interval}, shortcut = true) {
       <Responsive.Tablet
         andSmaller
         onlyIf={shortcut}
-        orElse={PluralTranslate.string('Weekly', 'Every {number} weeks', number, {number})}
+        orElse={PluralTranslate.string('Weekly', 'Every {number} weeks', number, 'repetition', {
+          number,
+        })}
       >
         <Translate context="weekly booking shortcut">
           <Param name="number" value={number > 1 ? number : ''} />W
@@ -188,7 +190,9 @@ export function renderRecurrence({type, number, interval}, shortcut = true) {
       <Responsive.Tablet
         andSmaller
         onlyIf={shortcut}
-        orElse={PluralTranslate.string('Monthly', 'Every {number} months', number, {number})}
+        orElse={PluralTranslate.string('Monthly', 'Every {number} months', number, 'repetition', {
+          number,
+        })}
       >
         <Translate context="monthly booking shortcut">
           <Param name="number" value={number > 1 ? number : ''} />M
