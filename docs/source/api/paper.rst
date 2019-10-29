@@ -10,6 +10,22 @@ Paper
 Models
 ++++++
 
+.. indico_uml::
+
+    User "1" --* PaperRevision : submitter
+    User "1" --* PaperRevision : judge
+    PaperRevision *-- "1" Contribution
+    PaperRevision "1" --* PaperFile
+    PaperReview *-- "1" PaperRevision
+    PaperReviewComment *-- "1" PaperRevision
+    PaperReviewComment *-- "1" User : creator
+    User "1" --* PaperReview : reviewer
+    PaperReview "1" --* PaperReviewRating
+    PaperReviewRating  *-- "1" PaperReviewQuestion
+    Contribution *--* User : judge
+    Contribution *--* User : content_reviewer
+    Contribution *--* User : layout_reviewer
+
 .. automodule:: indico.modules.events.papers.models.call_for_papers
     :members:
     :undoc-members:
