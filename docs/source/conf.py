@@ -20,6 +20,7 @@ import warnings
 import sphinx_rtd_theme
 from sqlalchemy.exc import SAWarning
 
+
 # silence sqlalchemy SAWarning
 warnings.simplefilter('ignore', SAWarning)
 
@@ -45,7 +46,8 @@ extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.imgmath',
               'sphinx.ext.intersphinx',
               'sphinx_issues',
-              'exec_directive']
+              'exec_directive',
+              'indico_uml_directive']
 
 # sphinx-issues config
 issues_github_path = 'indico/indico'
@@ -229,3 +231,14 @@ latex_documents = [
 #latex_use_modindex = True
 
 todo_include_todos = True
+
+indico_uml_prelude = """skinparam shadowing false
+skinparam defaultFontColor motivation
+skinparam defaultFontName Helvetica
+skinparam class {
+    FontColor tomato
+    BackgroundColor moccasin
+    BorderColor moccasin
+    ArrowColor slategray
+}
+skinparam classStereotypeFontSize 1"""
