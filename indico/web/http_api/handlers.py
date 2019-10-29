@@ -134,10 +134,12 @@ def handler(prefix, path):
             raise BadRequest('OAuth error: {}'.format(oauth_request.error_message))
         elif g.get('received_oauth_token') and oauth_request.error_message == 'Bearer token not found.':
             raise BadRequest('OAuth error: Invalid token')
-    except ValueError:
+    except (ValueError, AttributeError):
         # XXX: Dirty hack to workaround a bug in flask-oauthlib that causes it
         #      not to properly urlencode request query strings
         #      Related issue (https://github.com/lepture/flask-oauthlib/issues/213)
+        # XXX: Dirty hack to ignore errors from Basic HTTP Authorization headers,
+        #      see https://talk.getindico.io/t/repeated-unexpected-exception-errors/987
         oauth_valid = False
 
     # Get our handler function and its argument and response type
