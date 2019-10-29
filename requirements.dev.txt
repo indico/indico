@@ -11,3 +11,4 @@ sqlparse
 isort
 pycodestyle
 flask_url_map_serializer
+plantweb
