@@ -5,6 +5,12 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+"""
+The ``papers`` module handles the Indico's Paper Reviewing workflow.
+The "inputs" of this module are the conference papers, which will be uploaded
+by the corresponding authors/submitters.
+"""
+
 from __future__ import unicode_literals
 
 from flask import session
