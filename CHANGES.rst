@@ -53,6 +53,7 @@ Bugfixes
 - Truncate long speaker names in the timetable instead of hiding them (:issue:`4110`)
 - Fix an issue causing errors when using translations for languages with no plural
   forms (like Chinese).
+- Fix creating rooms without touching the longitude/latitude fields (:issue:`4115`)
 
 Version 2.2.4
 -------------
