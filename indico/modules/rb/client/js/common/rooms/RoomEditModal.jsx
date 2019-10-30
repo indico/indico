@@ -1025,6 +1025,8 @@ class RoomEditModal extends React.Component {
           owner: null,
           reservationsNeedConfirmation: false,
           capacity: null,
+          longitude: null,
+          latitude: null,
           attributes: roomAttributes,
           protectionMode: 'public',
           ...roomEquipment,
