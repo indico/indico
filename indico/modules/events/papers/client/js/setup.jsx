@@ -14,8 +14,6 @@ import createReduxStore from 'indico/utils/redux';
 import paperReducers from './reducers';
 import Paper from './components/Paper';
 
-import '../style/papers.scss';
-
 export default () => {
   const rootElement = document.querySelector('.paper-timeline');
   if (!rootElement) {

@@ -149,7 +149,7 @@ export function ajaxAction(
         }
         return {data: null, error: error.response.data};
       } else {
-        const message = handleAxiosError(error, true);
+        const message = handleAxiosError(error, true, true);
         if (errorAction) {
           dispatcher(dispatch, errorAction, {error: message});
         }

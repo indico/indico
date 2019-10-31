@@ -11,6 +11,7 @@ import axios from 'axios';
 import isURLSameOrigin from 'axios/lib/helpers/isURLSameOrigin';
 import qs from 'qs';
 
+import showReactErrorDialog from 'indico/react/errors';
 import {$T} from 'indico/utils/i18n';
 
 export const indicoAxios = axios.create({
@@ -32,7 +33,7 @@ indicoAxios.interceptors.request.use(config => {
   return config;
 });
 
-export function handleAxiosError(error, strict = false) {
+export function handleAxiosError(error, strict = false, useReactDialog = false) {
   if (axios.isCancel(error)) {
     return;
   }
@@ -48,14 +49,10 @@ export function handleAxiosError(error, strict = false) {
       report_url: null,
     };
   }
-  if (window.showErrorDialog) {
+  if (window.showErrorDialog && !useReactDialog) {
     showErrorDialog(error);
   } else {
-    import(/* webpackMode: "weak" */ 'indico/react/errors').then(
-      ({default: showReactErrorDialog}) => {
-        showReactErrorDialog(error);
-      }
-    );
+    showReactErrorDialog(error);
   }
   return error.message;
 }
