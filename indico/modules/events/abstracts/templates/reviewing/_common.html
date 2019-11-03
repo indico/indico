@@ -10,9 +10,9 @@
 {%- endmacro %}
 
 {% macro render_track(track, full_title=false) -%}
-    {% set title = track.full_title if full_title else track.short_title %}
+    {% set title = track.full_title_with_group if full_title else track.short_title_with_group %}
     {% if track.can_review_abstracts(session.user) or track.can_convene(session.user) %}
         {% set url = url_for('.display_reviewable_track_abstracts', track) %}
     {% endif %}
-    {{ render_group(title, url, long_title=track.full_title) }}
+    {{ render_group(title, url, long_title=track.full_title_with_group) }}
 {%- endmacro %}

@@ -132,6 +132,18 @@ class Track(DescriptionMixin, db.Model):
     def full_title(self):
         return '{} - {}'.format(self.code, self.title) if self.code else self.title
 
+    @property
+    def title_with_group(self):
+        return '{}: {}'.format(self.track_group.title, self.title) if self.track_group else self.title
+
+    @property
+    def short_title_with_group(self):
+        return '{}: {}'.format(self.track_group.title, self.short_title) if self.track_group else self.short_title
+
+    @property
+    def full_title_with_group(self):
+        return '{}: {}'.format(self.track_group.title, self.full_title) if self.track_group else self.full_title
+
     @locator_property
     def locator(self):
         return dict(self.event.locator, track_id=self.id)

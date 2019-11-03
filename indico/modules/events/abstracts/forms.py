@@ -200,7 +200,8 @@ class AbstractJudgmentFormBase(IndicoForm):
               'merge_persons', 'judgment_comment', 'send_notifications')
 
     accepted_track = QuerySelectField(_("Track"), [HiddenUnless('judgment', AbstractAction.accept)],
-                                      get_label='title', allow_blank=True, blank_text=_("Choose a track..."),
+                                      get_label=lambda obj: obj.title_with_group,
+                                      allow_blank=True, blank_text=_("Choose a track..."),
                                       description=_("The abstract will be accepted in this track"))
     accepted_contrib_type = QuerySelectField(_("Contribution type"), [HiddenUnless('judgment', AbstractAction.accept)],
                                              get_label=lambda x: x.name.title(), allow_blank=True,
@@ -668,7 +669,9 @@ class AbstractCommentForm(IndicoForm):
 
 
 class AbstractReviewedForTracksForm(IndicoForm):
-    reviewed_for_tracks = IndicoQuerySelectMultipleCheckboxField(_("Tracks"), get_label='title', collection_class=set)
+    reviewed_for_tracks = _MultiChoiceQuerySelectMultipleFieldGrouped(_("Tracks"), get_label='title',
+                                                                      collection_class=set,
+                                                                      get_group=lambda obj: obj.track_group)
 
     def __init__(self, *args, **kwargs):
         event = kwargs.pop('event')
