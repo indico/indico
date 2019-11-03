@@ -569,8 +569,26 @@ class SingleTrackMixin(object):
         self.submitted_for_tracks.query = Track.query.with_parent(event).order_by(Track.position)
 
 
+class _MultiChoiceQuerySelectMultipleFieldGrouped(IndicoQuerySelectMultipleField):
+    widget = JinjaWidget('forms/checkbox_group_grouped_widget.html')
+
+    def __init__(self, *args, **kwargs):
+        self.get_group = kwargs.pop('get_group', lambda x: x)
+        super(_MultiChoiceQuerySelectMultipleFieldGrouped, self).__init__(*args, **kwargs)
+
+    def get_grouped_choices(self):
+        return groupby(list(self.iter_choices()), key=lambda x: x[3:])  # group by (group, group label)
+
+    def iter_choices(self):
+        for pk, obj in self._get_object_list():
+            yield (pk, self.get_label(obj), obj in self.data, self.get_group(obj),
+                   self.get_label(self.get_group(obj)) if self.get_group(obj) else None)
+
+
 class MultiTrackMixin(object):
-    submitted_for_tracks = IndicoQuerySelectMultipleCheckboxField(_("Tracks"), get_label='title', collection_class=set)
+    submitted_for_tracks = _MultiChoiceQuerySelectMultipleFieldGrouped(_("Tracks"), get_label='title',
+                                                                       collection_class=set,
+                                                                       get_group=lambda obj: obj.track_group)
 
     def __init__(self, *args, **kwargs):
         event = kwargs['event']

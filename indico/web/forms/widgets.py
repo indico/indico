@@ -20,7 +20,7 @@ from indico.web.flask.templating import get_template_module
 from indico.web.util import inject_js
 
 
-html_commment_re = re.compile(r'<!--.*?-->', re.MULTILINE)
+html_comment_re = re.compile(r'<!--.*?-->', re.MULTILINE)
 
 
 class ConcatWidget(object):
@@ -97,7 +97,7 @@ class JinjaWidget(object):
             html += "\n" + javascript
         elif '<script' in javascript:
             inject_js(template_module.javascript())
-        elif html_commment_re.sub('', javascript).strip():
+        elif html_comment_re.sub('', javascript).strip():
             raise ValueError("Template did not provide valid javascript")
         return HTMLString(html)
 

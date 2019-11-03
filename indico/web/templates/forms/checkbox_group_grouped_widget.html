@@ -1,0 +1,22 @@
+{% extends 'forms/base_widget.html' %}
+
+
+{% block html %}
+    {# cannot use loop.index due to https://github.com/pallets/jinja/issues/555 #}
+    {%- set ns = namespace(i=0) -%}
+    {% for (group, group_label), objects in field.get_grouped_choices() %}
+        {% if group %}
+            <label><strong>{{ group_label }}</strong></label>
+        {% else %}
+            <label><em>No group</em></label>
+        {% endif %}
+        {% for val, label, selected, _group, _group_label in objects %}
+            <div class="i-checkbox">
+                <input id="{{ field.id }}-{{ ns.i }}" name="{{ field.id }}" type="checkbox" value="{{ val }}">
+                <label for="{{ field.id }}-{{ ns.i }}">{{ label }}</label>
+            </div>
+            {% set ns.i = ns.i + 1 %}
+        {% endfor %}
+        <br>
+    {% endfor %}
+{% endblock %}
