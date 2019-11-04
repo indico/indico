@@ -11,8 +11,6 @@ import {RequestState} from 'indico/utils/redux';
 
 export const isFetchingPaperDetails = state =>
   state.paper.requests.details.state === RequestState.STARTED;
-export const isFetchingPaperPermissions = state =>
-  state.paper.requests.permissions.state === RequestState.STARTED;
 export const isJudgingInProgress = state =>
   state.paper.requests.judgment.state === RequestState.STARTED;
 export const isPaperStateResetInProgress = state =>
@@ -25,23 +23,19 @@ export const getCurrentUser = state => state.staticData.user;
 export const getPaperDetails = state => state.paper.details;
 export const getPaperEvent = state => state.paper.details.event;
 export const getPaperContribution = state => state.paper.details.contribution;
-export const getPaperPermissions = state => state.paper.permissions;
 
 export const canJudgePaper = createSelector(
   getPaperDetails,
-  getPaperPermissions,
   getPaperEvent,
-  ({isInFinalState}, {canJudge}, {isLocked}) => !isLocked && !isInFinalState && canJudge
+  ({isInFinalState, canJudge}, {isLocked}) => !isLocked && !isInFinalState && canJudge
 );
 export const canReviewPaper = createSelector(
   getPaperDetails,
   getPaperEvent,
-  getPaperPermissions,
-  ({isInFinalState}, {canReview}, {isLocked}) => !isLocked && !isInFinalState && canReview
+  ({isInFinalState, canReview}, {isLocked}) => !isLocked && !isInFinalState && canReview
 );
 export const canCommentPaper = createSelector(
   getPaperDetails,
   getPaperEvent,
-  getPaperPermissions,
-  ({isInFinalState}, {canComment}, {isLocked}) => !isLocked && !isInFinalState && canComment
+  ({isInFinalState, canComment}, {isLocked}) => !isLocked && !isInFinalState && canComment
 );

@@ -18,39 +18,13 @@ from indico.modules.events.papers.models.reviews import PaperAction
 from indico.modules.events.papers.models.revisions import PaperRevisionState
 from indico.modules.events.papers.operations import (create_paper_revision, delete_comment, judge_paper,
                                                      reset_paper_state)
-from indico.modules.events.papers.schemas import paper_schema
+from indico.modules.events.papers.schemas import PaperSchema, paper_schema
 from indico.web.args import use_kwargs
 
 
 class RHPaperDetails(RHPaperBase):
     def _process(self):
-        return paper_schema.jsonify(self.paper)
-
-
-def _serialize_revision_permissions(paper):
-    permissions = {'reviews': {'edit': [], 'view': []}, 'comments': {'edit': [], 'view': []}}
-    for revision in paper.revisions:
-        items = revision.reviews + revision.comments
-        for item in items:
-            if item.timeline_item_type == 'comment':
-                data = permissions['comments']
-            elif item.timeline_item_type == 'review':
-                data = permissions['reviews']
-            if item.can_edit(session.user):
-                data['edit'].append(item.id)
-            if item.can_view(session.user):
-                data['view'].append(item.id)
-    return permissions
-
-
-class RHPaperPermissions(RHPaperBase):
-    def _process(self):
-        permissions = dict({
-            'can_judge': self.paper.can_judge(session.user),
-            'can_comment': self.paper.can_comment(session.user),
-            'can_review': self.paper.can_review(session.user)
-        }, **_serialize_revision_permissions(self.paper))
-        return jsonify(**permissions)
+        return PaperSchema(context={'user': session.user}).jsonify(self.paper)
 
 
 class RHResetPaperState(RHPaperBase):

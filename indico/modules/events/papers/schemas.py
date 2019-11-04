@@ -8,7 +8,7 @@
 from __future__ import unicode_literals
 
 from markupsafe import escape
-from marshmallow.fields import Boolean, DateTime, Field, Float, Function, Integer, List, Nested, String
+from marshmallow.fields import Boolean, DateTime, Field, Float, Function, Integer, List, Method, Nested, String
 from marshmallow_enum import EnumField
 
 from indico.core.marshmallow import mm
@@ -60,12 +60,14 @@ class PaperRevisionTimelineField(Field):
             return []
 
         serialized = []
+        review_comment_schema = PaperReviewCommentSchema(context=self.context)
+        review_schema = PaperReviewSchema(context=self.context)
         for timeline_item in value:
             serialized_item = {'timeline_item_type': timeline_item.timeline_item_type}
             if timeline_item.timeline_item_type == 'comment':
-                serialized_item.update(paper_review_comment_schema.dump(timeline_item))
+                serialized_item.update(review_comment_schema.dump(timeline_item))
             elif timeline_item.timeline_item_type == 'review':
-                serialized_item.update(paper_review_schema.dump(timeline_item))
+                serialized_item.update(review_schema.dump(timeline_item))
             serialized.append(serialized_item)
         return serialized
 
@@ -93,11 +95,13 @@ class PaperReviewSchema(mm.ModelSchema):
     group = Function(lambda review: {'title': unicode(review.group.title)})
     ratings = Function(lambda review: [{'value': rating.value} for rating in review.ratings])
     comment_html = Function(lambda review: escape(review.comment))
+    can_edit = Function(lambda review, ctx: review.can_edit(ctx['user']))
+    can_view = Function(lambda review, ctx: review.can_view(ctx['user']))
 
     class Meta:
         model = PaperReview
         fields = ('id', 'score', 'created_dt', 'user', 'comment', 'comment_html', 'modified_dt', 'visibility',
-                  'proposed_action', 'group', 'ratings')
+                  'proposed_action', 'group', 'ratings', 'can_edit', 'can_view')
 
 
 class PaperReviewCommentSchema(mm.ModelSchema):
@@ -105,10 +109,13 @@ class PaperReviewCommentSchema(mm.ModelSchema):
     visibility = Nested(PaperCommentVisibilitySchema)
     modified_by = Nested(UserSchema)
     html = Function(lambda comment: escape(comment.text))
+    can_edit = Function(lambda comment, ctx: comment.can_edit(ctx['user']))
+    can_view = Function(lambda comment, ctx: comment.can_view(ctx['user']))
 
     class Meta:
         model = PaperReviewComment
-        fields = ('id', 'user', 'text', 'html', 'visibility', 'created_dt', 'modified_dt', 'modified_by')
+        fields = ('id', 'user', 'text', 'html', 'visibility', 'created_dt', 'modified_dt', 'modified_by', 'can_edit',
+                  'can_view')
 
 
 class PaperSchema(mm.Schema):
@@ -119,6 +126,9 @@ class PaperSchema(mm.Schema):
     last_revision = Nested(PaperRevisionSchema)
     state = Nested(PaperRevisionStateSchema)
     rating_range = List(Integer(), attribute='cfp.rating_range')
+    can_judge = Function(lambda paper, ctx: paper.can_judge(ctx['user']))
+    can_comment = Function(lambda paper, ctx: paper.can_comment(ctx['user']))
+    can_review = Function(lambda paper, ctx: paper.can_review(ctx['user']))
 
 
 paper_schema = PaperSchema()

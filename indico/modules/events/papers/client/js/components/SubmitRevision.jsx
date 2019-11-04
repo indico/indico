@@ -16,7 +16,7 @@ import {Translate} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 
 import UserAvatar from './UserAvatar';
-import {fetchPaperInfo} from '../actions';
+import {fetchPaperDetails} from '../actions';
 import {getCurrentUser, getPaperDetails} from '../selectors';
 
 export default function SubmitRevision() {
@@ -58,7 +58,7 @@ export default function SubmitRevision() {
     }
 
     setFiles([]);
-    dispatch(fetchPaperInfo(eventId, contributionId));
+    dispatch(fetchPaperDetails(eventId, contributionId));
   };
 
   return (

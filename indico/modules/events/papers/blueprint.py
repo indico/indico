@@ -20,15 +20,13 @@ _bp = IndicoBlueprint('papers', __name__, url_prefix='/event/<confId>', template
 _bp.add_url_rule('/papers/<int:contrib_id>/new', 'new_paper_timeline', display.RHNewPaperTimeline)
 
 # API
-
-_bp.add_url_rule('/papers/<int:contrib_id>', 'api_paper_details', api.RHPaperDetails)
-_bp.add_url_rule('/papers/<int:contrib_id>', 'api_reset_paper_state', api.RHResetPaperState, methods=('DELETE',))
-_bp.add_url_rule('/papers/<int:contrib_id>/permissions', 'api_paper_permissions', api.RHPaperPermissions)
-_bp.add_url_rule('/papers/<int:contrib_id>/revision/<int:revision_id>/comment/<int:comment_id>', 'api_delete_comment',
-                 api.RHDeleteComment, methods=('DELETE',))
-_bp.add_url_rule('/papers/<int:contrib_id>/judge', 'api_judge_paper', api.RHJudgePaper, methods=('POST',))
-_bp.add_url_rule('/contributions/<int:contrib_id>/paper/submit', 'api_submit_revision', api.RHSubmitNewRevision,
-                 methods=('POST',))
+_bp.add_url_rule('/papers/api/<int:contrib_id>', 'api_paper_details', api.RHPaperDetails)
+_bp.add_url_rule('/papers/api/<int:contrib_id>', 'api_reset_paper_state', api.RHResetPaperState, methods=('DELETE',))
+_bp.add_url_rule('/papers/api/<int:contrib_id>/revision/<int:revision_id>/comment/<int:comment_id>',
+                 'api_delete_comment', api.RHDeleteComment, methods=('DELETE',))
+_bp.add_url_rule('/papers/api/<int:contrib_id>/judge', 'api_judge_paper', api.RHJudgePaper, methods=('POST',))
+_bp.add_url_rule('/papers/api/contributions/<int:contrib_id>/paper/submit', 'api_submit_revision',
+                 api.RHSubmitNewRevision, methods=('POST',))
 
 # Display pages
 _bp.add_url_rule('/papers/', 'call_for_papers', display.RHCallForPapers)

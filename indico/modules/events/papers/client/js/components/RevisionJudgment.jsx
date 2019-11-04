@@ -15,14 +15,13 @@ import {Param, Translate} from 'indico/react/i18n';
 import {serializeDate} from 'indico/utils/date';
 
 import {resetPaperJudgment} from '../actions';
-import {getPaperDetails, getPaperPermissions, isPaperStateResetInProgress} from '../selectors';
+import {getPaperDetails, isPaperStateResetInProgress} from '../selectors';
 import UserAvatar from './UserAvatar';
 
 export default function RevisionJudgment({revision}) {
   const {state, judge, isLastRevision, judgmentCommentHtml, judgmentDt} = revision;
-  const {event, contribution} = useSelector(getPaperDetails);
+  const {event, contribution, canJudge} = useSelector(getPaperDetails);
   const [confirmOpen, setConfirmOpen] = useState(false);
-  const {canJudge} = useSelector(getPaperPermissions);
   const isResetInProgress = useSelector(isPaperStateResetInProgress);
   const dispatch = useDispatch();
 

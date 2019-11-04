@@ -17,11 +17,6 @@ export default combineReducers({
       paperActions.FETCH_PAPER_DETAILS_SUCCESS,
       paperActions.FETCH_PAPER_DETAILS_ERROR
     ),
-    permissions: requestReducer(
-      paperActions.FETCH_PAPER_PERMISSIONS_REQUEST,
-      paperActions.FETCH_PAPER_PERMISSIONS_SUCCESS,
-      paperActions.FETCH_PAPER_PERMISSIONS_ERROR
-    ),
     judgment: requestReducer(
       paperActions.JUDGE_PAPER_REQUEST,
       paperActions.JUDGE_PAPER_SUCCESS,
@@ -42,22 +37,6 @@ export default combineReducers({
     switch (action.type) {
       case paperActions.FETCH_PAPER_DETAILS_SUCCESS:
         return camelizeKeys(action.data);
-      default:
-        return state;
-    }
-  },
-  permissions: (state = null, action) => {
-    switch (action.type) {
-      case paperActions.FETCH_PAPER_PERMISSIONS_SUCCESS:
-        return camelizeKeys(action.data);
-      case paperActions.DELETE_COMMENT_SUCCESS: {
-        const {commentId} = action.data;
-        const newComments = {
-          view: state.comments.view.filter(id => id !== commentId),
-          edit: state.comments.edit.filter(id => id !== commentId),
-        };
-        return {...state, comments: newComments};
-      }
       default:
         return state;
     }

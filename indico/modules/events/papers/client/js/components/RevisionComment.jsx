@@ -15,20 +15,12 @@ import {serializeDate} from 'indico/utils/date';
 import {Param, Translate} from 'indico/react/i18n';
 
 import {deleteComment} from '../actions';
-import {
-  getPaperContribution,
-  getPaperEvent,
-  getPaperPermissions,
-  isDeletingComment,
-} from '../selectors';
+import {getPaperContribution, getPaperEvent, isDeletingComment} from '../selectors';
 import UserAvatar from './UserAvatar';
 
 export default function RevisionComment({comment, revision}) {
   const dispatch = useDispatch();
   const [confirmOpen, setConfirmOpen] = useState(false);
-  const {
-    comments: {edit: editableComments},
-  } = useSelector(getPaperPermissions);
   const {id: eventId} = useSelector(getPaperEvent);
   const {id: contributionId} = useSelector(getPaperContribution);
   const isDeletingCommentInProgress = useSelector(isDeletingComment);
@@ -66,7 +58,7 @@ export default function RevisionComment({comment, revision}) {
                 </span>
               )}
             </div>
-            {editableComments.includes(comment.id) && (
+            {comment.canEdit && (
               <div className="review-comment-action hide-if-locked">
                 <a
                   href="#"
