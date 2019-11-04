@@ -18,6 +18,7 @@ import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import UserAvatar from './UserAvatar';
 import {fetchPaperDetails} from '../actions';
 import {getCurrentUser, getPaperDetails} from '../selectors';
+import {PaperState} from '../models';
 
 export default function SubmitRevision() {
   const {
@@ -30,7 +31,7 @@ export default function SubmitRevision() {
   const currentUser = useSelector(getCurrentUser);
   const dispatch = useDispatch();
 
-  if (stateName !== 'to_be_corrected') {
+  if (stateName !== PaperState.to_be_corrected) {
     return null;
   }
 
@@ -69,12 +70,12 @@ export default function SubmitRevision() {
           <Translate>Upload corrected revision</Translate>
         </div>
         <div className="i-box-content">
-          <FileSubmission onChange={newFiles => setFiles(newFiles)} />
+          <FileSubmission onChange={newFiles => setFiles(newFiles)} disabled={submitting} />
           <Button
             onClick={submitFiles}
             content={Translate.string('Submit new revision')}
             style={{marginTop: 10}}
-            disabled={files.length === 0}
+            disabled={files.length === 0 || submitting}
             loading={submitting}
             primary
           />

@@ -26,19 +26,19 @@ export default function PaperTimeline() {
   const {revisions, isInFinalState} = useSelector(getPaperDetails);
   const canComment = useSelector(canCommentPaper);
   const canReview = useSelector(canReviewPaper);
-  const [toggled, setToggled] = useState([]);
+  const [visible, setVisible] = useState({});
   const toggleRevisionInfo = id => {
-    if (toggled.includes(id)) {
-      setToggled(toggled.filter(el => el !== id));
+    if (visible[id]) {
+      setVisible({...visible, [id]: false});
     } else {
-      setToggled([...toggled, id]);
+      setVisible({...visible, [id]: true});
     }
   };
 
   return revisions.map((revision, index) => {
     const isLastItem = index === revisions.length - 1;
     const {submitter, isLastRevision, number, submittedDt, files, timeline} = revision;
-    const submitterName = submitter.isSystem ? Translate.string('A User') : submitter.fullName;
+    const submitterName = submitter.isSystem ? Translate.string('A user') : submitter.fullName;
 
     return (
       <React.Fragment key={revision.id}>
@@ -54,7 +54,7 @@ export default function PaperTimeline() {
             <UserAvatar user={submitter} />
             <div
               className={`i-timeline-item-box header-indicator-left ${
-                !isLastRevision && !toggled.includes(revision.id) ? 'header-only' : ''
+                !isLastRevision && !visible[revision.id] ? 'header-only' : ''
               }`}
               id={`revision-info-${revision.id}`}
             >
@@ -73,7 +73,7 @@ export default function PaperTimeline() {
                     className="revision-info-link i-link"
                     onClick={() => toggleRevisionInfo(revision.id)}
                   >
-                    {toggled.includes(revision.id) ? (
+                    {visible[revision.id] ? (
                       <Translate>Hide old revision</Translate>
                     ) : (
                       <Translate>Show old revision</Translate>
@@ -82,7 +82,7 @@ export default function PaperTimeline() {
                 )}
               </div>
               <Transition.Group animation="slide down" duration={200}>
-                {(toggled.includes(revision.id) || isLastRevision) && (
+                {(visible[revision.id] || isLastRevision) && (
                   <div
                     className={`i-box-content submission-info ${
                       !isLastRevision ? 'weak-hidden' : ''
@@ -109,7 +109,7 @@ export default function PaperTimeline() {
           </div>
         </div>
         <Transition.Group animation="slide down" duration={200}>
-          {(toggled.includes(revision.id) || isLastRevision) && (
+          {(visible[revision.id] || isLastRevision) && (
             <div className={`i-timeline ${!isLastRevision ? 'weak-hidden' : ''}`}>
               {(timeline.length > 0 || canReview || canComment) && (
                 <RevisionTimeline revision={revision} />

@@ -95,8 +95,8 @@ class PaperReviewSchema(mm.ModelSchema):
     group = Function(lambda review: {'title': unicode(review.group.title)})
     ratings = Function(lambda review: [{'value': rating.value} for rating in review.ratings])
     comment_html = Function(lambda review: escape(review.comment))
-    can_edit = Function(lambda review, ctx: review.can_edit(ctx['user']))
-    can_view = Function(lambda review, ctx: review.can_view(ctx['user']))
+    can_edit = Function(lambda review, ctx: review.can_edit(ctx.get('user')))
+    can_view = Function(lambda review, ctx: review.can_view(ctx.get('user')))
 
     class Meta:
         model = PaperReview
@@ -109,8 +109,8 @@ class PaperReviewCommentSchema(mm.ModelSchema):
     visibility = Nested(PaperCommentVisibilitySchema)
     modified_by = Nested(UserSchema)
     html = Function(lambda comment: escape(comment.text))
-    can_edit = Function(lambda comment, ctx: comment.can_edit(ctx['user']))
-    can_view = Function(lambda comment, ctx: comment.can_view(ctx['user']))
+    can_edit = Function(lambda comment, ctx: comment.can_edit(ctx.get('user')))
+    can_view = Function(lambda comment, ctx: comment.can_view(ctx.get('user')))
 
     class Meta:
         model = PaperReviewComment
@@ -126,9 +126,9 @@ class PaperSchema(mm.Schema):
     last_revision = Nested(PaperRevisionSchema)
     state = Nested(PaperRevisionStateSchema)
     rating_range = List(Integer(), attribute='cfp.rating_range')
-    can_judge = Function(lambda paper, ctx: paper.can_judge(ctx['user']))
-    can_comment = Function(lambda paper, ctx: paper.can_comment(ctx['user']))
-    can_review = Function(lambda paper, ctx: paper.can_review(ctx['user']))
+    can_judge = Function(lambda paper, ctx: paper.can_judge(ctx.get('user')))
+    can_comment = Function(lambda paper, ctx: paper.can_comment(ctx.get('user')))
+    can_review = Function(lambda paper, ctx: paper.can_review(ctx.get('user')))
 
 
 paper_schema = PaperSchema()

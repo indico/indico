@@ -16,6 +16,7 @@ import {serializeDate} from 'indico/utils/date';
 
 import {resetPaperJudgment} from '../actions';
 import {getPaperDetails, isPaperStateResetInProgress} from '../selectors';
+import {PaperState} from '../models';
 import UserAvatar from './UserAvatar';
 
 export default function RevisionJudgment({revision}) {
@@ -25,7 +26,7 @@ export default function RevisionJudgment({revision}) {
   const isResetInProgress = useSelector(isPaperStateResetInProgress);
   const dispatch = useDispatch();
 
-  if (state === 'submitted') {
+  if (state === PaperState.submitted) {
     return null;
   }
 
@@ -35,19 +36,19 @@ export default function RevisionJudgment({revision}) {
       <div className="i-timeline-item-box header-indicator-left">
         <div className="i-box-header flexrow">
           <div className="f-self-stretch">
-            {state === 'accepted' && (
+            {state === PaperState.accepted && (
               <Translate>
                 <Param name="judgeName" value={judge.fullName} wrapper={<strong />} /> accepted this
                 paper.
               </Translate>
             )}
-            {state === 'rejected' && (
+            {state === PaperState.rejected && (
               <Translate>
                 <Param name="judgeName" value={judge.fullName} wrapper={<strong />} /> rejected this
                 paper.
               </Translate>
             )}
-            {state === 'to_be_corrected' && (
+            {state === PaperState.to_be_corrected && (
               <Translate>
                 <Param name="judgeName" value={judge.fullName} wrapper={<strong />} /> asked for
                 changes.
@@ -93,9 +94,11 @@ export default function RevisionJudgment({revision}) {
           )}
         </div>
         <div className="i-box-content">
-          {state === 'accepted' && <Translate>The paper was accepted.</Translate>}
-          {state === 'rejected' && <Translate>The paper was rejected.</Translate>}
-          {state === 'to_be_corrected' && <Translate>The paper requires changes.</Translate>}
+          {state === PaperState.accepted && <Translate>The paper was accepted.</Translate>}
+          {state === PaperState.rejected && <Translate>The paper was rejected.</Translate>}
+          {state === PaperState.to_be_corrected && (
+            <Translate>The paper requires changes.</Translate>
+          )}
           {judgmentCommentHtml && (
             <>
               <div className="titled-rule">
