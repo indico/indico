@@ -26,6 +26,8 @@ Improvements
   which hides pages like the contribution list and timetable until
   the event organizers publish the contribution list. (:issue:`4095`)
 - Add ICS export for information in the user dashboard (:issue:`4057`)
+- Allow data syncing with multipass providers which do not support
+  refreshing identity information
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

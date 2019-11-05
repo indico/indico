@@ -43,8 +43,7 @@ class IndicoMultipass(Multipass):
 
         This is the identity provider used to sync user data.
         """
-        return next((p for p in self.identity_providers.itervalues()
-                     if p.supports_refresh and p.settings.get('synced_fields')), None)
+        return next((p for p in self.identity_providers.itervalues() if p.settings.get('synced_fields')), None)
 
     @property
     def synced_fields(self):
@@ -72,8 +71,7 @@ class IndicoMultipass(Multipass):
             warn('There is no default group provider but you have providers with group support. '
                  'This will break legacy ACLs referencing external groups and room ACLs will use local group IDs.')
         # Ensure that there is maximum one sync provider
-        sync_providers = [p for p in self.identity_providers.itervalues()
-                          if p.supports_refresh and p.settings.get('synced_fields')]
+        sync_providers = [p for p in self.identity_providers.itervalues() if p.settings.get('synced_fields')]
         if len(sync_providers) > 1:
             raise ValueError('There can only be one sync provider.')
         # Ensure that there is exactly one form-based default auth provider
