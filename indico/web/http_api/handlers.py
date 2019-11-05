@@ -128,16 +128,20 @@ def handler(prefix, path):
     onlyPublic = get_query_parameter(queryParams, ['op', 'onlypublic'], 'no') == 'yes'
     onlyAuthed = get_query_parameter(queryParams, ['oa', 'onlyauthed'], 'no') == 'yes'
     scope = 'read:legacy_api' if request.method == 'GET' else 'write:legacy_api'
-    try:
-        oauth_valid, oauth_request = oauth.verify_request([scope])
-        if not oauth_valid and oauth_request and oauth_request.error_message != 'Bearer token not found.':
-            raise BadRequest('OAuth error: {}'.format(oauth_request.error_message))
-        elif g.get('received_oauth_token') and oauth_request.error_message == 'Bearer token not found.':
-            raise BadRequest('OAuth error: Invalid token')
-    except ValueError:
-        # XXX: Dirty hack to workaround a bug in flask-oauthlib that causes it
-        #      not to properly urlencode request query strings
-        #      Related issue (https://github.com/lepture/flask-oauthlib/issues/213)
+
+    if not request.headers.get('Authorization', '').lower().startswith('basic '):
+        try:
+            oauth_valid, oauth_request = oauth.verify_request([scope])
+            if not oauth_valid and oauth_request and oauth_request.error_message != 'Bearer token not found.':
+                raise BadRequest('OAuth error: {}'.format(oauth_request.error_message))
+            elif g.get('received_oauth_token') and oauth_request.error_message == 'Bearer token not found.':
+                raise BadRequest('OAuth error: Invalid token')
+        except ValueError:
+            # XXX: Dirty hack to workaround a bug in flask-oauthlib that causes it
+            #      not to properly urlencode request query strings
+            #      Related issue (https://github.com/lepture/flask-oauthlib/issues/213)
+            oauth_valid = False
+    else:
         oauth_valid = False
 
     # Get our handler function and its argument and response type

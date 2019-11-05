@@ -56,6 +56,8 @@ Bugfixes
 - Fix an issue causing errors when using translations for languages with no plural
   forms (like Chinese).
 - Fix creating rooms without touching the longitude/latitude fields (:issue:`4115`)
+- Fix error in HTTP API when Basic auth headers are present (:issue:`4123`,
+  thanks :user:`uxmaster`)
 
 Version 2.2.4
 -------------
