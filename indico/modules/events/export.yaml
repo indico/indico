@@ -71,8 +71,6 @@ export:
       - DesignerTemplate.event_id
       - EventPage.event_id
       - MenuEntry.event_id
-      - Event.global_abstract_reviewers.prop.secondary.c.event_id
-      - Event.global_conveners.prop.secondary.c.event_id
       - AbstractEmailTemplate.event_id
       - AbstractReviewQuestion.event_id
       - Abstract.event_id
@@ -129,10 +127,7 @@ export:
   ContributionFieldValue: {}
 
 
-  Track:
-    fks:
-      - Track.abstract_reviewers.prop.secondary.c.track_id
-      - Track.conveners.prop.secondary.c.track_id
+  Track: {}
 
   TrackGroup: {}
 
@@ -194,6 +189,8 @@ export:
   AttachmentFolderPrincipal:
     skipif: ROW.type.name != 'user'
 
+  TrackPrincipal:
+    skipif: ROW.type.name not in ('user', 'local_group', 'multipass_group', 'event_role')
 
   # misc stuff
   EventLogEntry: {}
@@ -418,8 +415,6 @@ import:
     AttachmentFolderPrincipal.user_id: skip
     AbstractComment.user_id: skip
     AbstractReview.user_id: skip
-    Event.global_abstract_reviewers.prop.secondary.c.user_id: skip
-    Event.global_conveners.prop.secondary.c.user_id: skip
     PaperCompetence.user_id: skip
     PaperReview.user_id: skip
     PaperReviewComment.user_id: skip
