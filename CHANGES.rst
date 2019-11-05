@@ -28,6 +28,7 @@ Improvements
 - Add ICS export for information in the user dashboard (:issue:`4057`)
 - Allow data syncing with multipass providers which do not support
   refreshing identity information
+- Allow restricting admin privileges to secure logins (e.g. 2FA)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

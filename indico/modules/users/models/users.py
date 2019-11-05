@@ -21,6 +21,7 @@ from sqlalchemy.orm import object_session
 from werkzeug.utils import cached_property
 
 from indico.core.auth import multipass
+from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
 from indico.core.db.sqlalchemy.custom.unaccent import define_unaccented_lowercase_index
@@ -220,7 +221,8 @@ class User(PersonMixin, db.Model):
         default=False
     )
     #: if the user is an administrator with unrestricted access to everything
-    is_admin = db.Column(
+    _is_admin = db.Column(
+        'is_admin',
         db.Boolean,
         nullable=False,
         default=False,
@@ -412,6 +414,23 @@ class User(PersonMixin, db.Model):
     @staticmethod
     def get_system_user():
         return User.query.filter_by(is_system=True).one()
+
+    @hybrid_property
+    def is_admin(self):
+        return self._is_admin and (
+            not config.ADMINS_REQUIRE_SECURE_LOGIN or
+            not has_request_context() or
+            session.user != self or
+            session.get('login_was_secure', False)
+        )
+
+    @is_admin.setter
+    def is_admin(self, value):
+        self._is_admin = value
+
+    @is_admin.expression
+    def is_admin(cls):
+        return cls._is_admin
 
     @property
     def as_principal(self):

@@ -45,7 +45,7 @@ class RHRooms(RHRoomBookingBase):
 
 class RHRoomsPermissions(RHRoomBookingBase):
     @staticmethod
-    @memoize_redis(900)
+    @memoize_redis(900, depends_on_admin=True)
     def _jsonify_user_permissions(user):
         permissions = Room.get_permissions_for_user(user, allow_admin=False)
         return jsonify(user=permissions, admin=(Room.get_permissions_for_user(user) if rb_is_admin(user) else None))

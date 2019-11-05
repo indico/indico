@@ -8,7 +8,7 @@
 from functools import wraps
 from inspect import getcallargs
 
-from flask import current_app, g, has_request_context
+from flask import current_app, g, has_request_context, session
 
 
 _notset = object()
@@ -61,7 +61,7 @@ def memoize_request(f):
     return memoizer
 
 
-def memoize_redis(ttl):
+def memoize_redis(ttl, depends_on_admin=False):
     """Memoize a function in redis
 
     The cached value can be cleared by calling the method
@@ -72,13 +72,19 @@ def memoize_redis(ttl):
 
     :param ttl: How long the result should be cached.  May be a
                 timedelta or a number (seconds).
+    :param depends_on_admin: Whether the memoized function's result
+                             varies depending on whether the user
+                             is an admin or not.
     """
     from indico.legacy.common.cache import GenericCache
     cache = GenericCache('memoize')
 
     def decorator(f):
         def _get_key(args, kwargs):
-            return f.__module__, f.__name__, make_hashable(getcallargs(f, *args, **kwargs))
+            key = f.__module__, f.__name__, make_hashable(getcallargs(f, *args, **kwargs))
+            if depends_on_admin and has_request_context():
+                key += (bool(session.user and session.user.is_admin),)
+            return key
 
         def _clear_cached(*args, **kwargs):
             cache.delete(_get_key(args, kwargs))

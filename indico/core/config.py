@@ -29,6 +29,7 @@ from indico.util.string import crc32, snakify
 
 
 DEFAULTS = {
+    'ADMINS_REQUIRE_SECURE_LOGIN': False,
     'ATTACHMENT_STORAGE': 'default',
     'AUTH_PROVIDERS': {},
     'BASE_URL': None,

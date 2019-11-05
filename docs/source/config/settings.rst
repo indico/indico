@@ -25,6 +25,15 @@ you will get a warning about unknowing config options being defined.
 Authentication
 --------------
 
+.. data:: ADMINS_REQUIRE_SECURE_LOGIN
+
+    This setting controls whether Indico admins only have their admin
+    privileges when logging in using a "secure" method. This is only
+    supported when using an external login method which provides information
+    on whether the login was "secure" (usually using 2FA).
+
+    Default: ``False``
+
 .. data:: LOCAL_IDENTITIES
 
     This setting controls whether local Indico accounts are available.

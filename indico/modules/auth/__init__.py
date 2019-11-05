@@ -71,10 +71,10 @@ def process_identity(identity_info):
         identity.data = identity_info.data
     if user.is_blocked:
         raise MultipassException(_('Your Indico profile has been blocked.'))
-    login_user(user, identity)
+    login_user(user, identity, secure_login=bool(identity_info.secure_login))
 
 
-def login_user(user, identity=None, admin_impersonation=False):
+def login_user(user, identity=None, admin_impersonation=False, secure_login=False):
     """Set the session user and performs on-login logic
 
     When specifying `identity`, the provider/identitifer information
@@ -86,6 +86,7 @@ def login_user(user, identity=None, admin_impersonation=False):
     :param admin_impersonation: Whether the login is an admin
                                 impersonating the user and thus should not
                                 be considered a login by the user.
+    :param secure_login: Whether the login was considered secure
     """
     if user.settings.get('force_timezone'):
         session.timezone = user.settings.get('timezone', config.DEFAULT_TIMEZONE)
@@ -94,6 +95,7 @@ def login_user(user, identity=None, admin_impersonation=False):
     session.user = user
     session.lang = user.settings.get('lang')
     if not admin_impersonation:
+        session['login_was_secure'] = secure_login
         if identity:
             identity.register_login(request.remote_addr)
             session['login_identity'] = identity.id
