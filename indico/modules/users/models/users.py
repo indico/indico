@@ -610,7 +610,7 @@ class User(PersonMixin, db.Model):
         if not identities:
             return None
         identity = identities[0]
-        if refresh and identity.multipass_data is not None:
+        if refresh and identity.multipass_data is not None and sync_provider.supports_refresh:
             try:
                 identity_info = sync_provider.refresh_identity(identity.identifier, identity.multipass_data)
             except IdentityRetrievalFailed:
