@@ -62,6 +62,9 @@ const PrincipalPermissions = ({
           key={permission}
           position="right center"
           popperModifiers={{
+            hide: {
+              enabled: false,
+            },
             preventOverflow: {
               enabled: false,
             },

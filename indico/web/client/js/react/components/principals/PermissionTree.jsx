@@ -39,6 +39,9 @@ const PermissionTree = ({tree, permissionMap, exclude, hide, disabled, onSelect}
                 content={description}
                 position="right center"
                 popperModifiers={{
+                  hide: {
+                    enabled: false,
+                  },
                   preventOverflow: {
                     enabled: false,
                   },

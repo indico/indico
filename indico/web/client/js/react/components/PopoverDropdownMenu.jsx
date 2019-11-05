@@ -50,6 +50,9 @@ const PopoverDropdownMenu = ({trigger, children, onOpen, onClose, open, placemen
               },
               order: 900,
             },
+            hide: {
+              enabled: !overflow,
+            },
             preventOverflow: {
               enabled: !overflow,
             },
