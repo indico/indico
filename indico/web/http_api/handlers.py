@@ -129,8 +129,8 @@ def handler(prefix, path):
     onlyPublic = get_query_parameter(queryParams, ['op', 'onlypublic'], 'no') == 'yes'
     onlyAuthed = get_query_parameter(queryParams, ['oa', 'onlyauthed'], 'no') == 'yes'
     scope = 'read:legacy_api' if request.method == 'GET' else 'write:legacy_api'
-    authHeader = request.headers.get('Authorization')
-    if authHeader and authHeader[:5].lower() != 'basic':
+
+    if not request.headers.get('Authorization', '').lower().startswith('basic '):
         try:
             oauth_valid, oauth_request = oauth.verify_request([scope])
             if not oauth_valid and oauth_request and oauth_request.error_message != 'Bearer token not found.':
