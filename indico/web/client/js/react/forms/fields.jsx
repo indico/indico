@@ -370,7 +370,7 @@ FinalRadio.propTypes = {
 };
 
 /**
- * Like `FinalField` but for a checkbox.
+ * Like `FinalField` but for a dropdown.
  */
 export function FinalDropdown({name, label, multiple, ...rest}) {
   const extraProps = {};

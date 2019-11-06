@@ -23,14 +23,7 @@ function renderTimelineItem(item, revision) {
 }
 
 export default function RevisionTimeline({revision}) {
-  const timeline = revision.timeline;
-
-  return (
-    <div className="i-timeline with-line">
-      <div className="i-timeline-connect-up" />
-      {timeline.map(item => renderTimelineItem(item, revision))}
-    </div>
-  );
+  return revision.timeline.map(item => renderTimelineItem(item, revision));
 }
 
 RevisionTimeline.propTypes = {

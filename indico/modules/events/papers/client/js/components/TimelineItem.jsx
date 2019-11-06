@@ -25,9 +25,9 @@ import {canCommentPaper, canReviewPaper, getPaperDetails} from '../selectors';
 export default function TimelineItem({revision}) {
   const {submitter, isLastRevision, number, submittedDt, files, timeline} = revision;
   const submitterName = submitter.isSystem ? Translate.string('A user') : submitter.fullName;
-  const {isInFinalState} = useSelector(getPaperDetails);
   const canComment = useSelector(canCommentPaper);
   const canReview = useSelector(canReviewPaper);
+  const {isInFinalState} = useSelector(getPaperDetails);
   const [visible, setVisible] = useState(false);
 
   return (
@@ -61,53 +61,52 @@ export default function TimelineItem({revision}) {
                 </a>
               )}
             </div>
-            <Transition.Group animation="slide down" duration={200}>
-              {(visible || isLastRevision) && (
-                <div
-                  className={`i-box-content submission-info ${
-                    !isLastRevision ? 'weak-hidden' : ''
-                  }`}
-                >
-                  <ul className="file-list">
-                    {_.sortBy(files, 'filename').map(file => (
-                      <li className="truncate-text" key={file.id}>
-                        <a
-                          href={file.downloadURL}
-                          className={`attachment ${file.icon}`}
-                          title={file.filename}
-                        >
-                          {' '}
-                          <span className="title">{file.filename}</span>
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </Transition.Group>
+            <Transition animation="slide down" duration={500} visible={visible || isLastRevision}>
+              <div
+                className={`i-box-content submission-info ${!isLastRevision ? 'weak-hidden' : ''}`}
+              >
+                <ul className="file-list">
+                  {_.sortBy(files, 'filename').map(file => (
+                    <li className="truncate-text" key={file.id}>
+                      <a
+                        href={file.downloadURL}
+                        className={`attachment ${file.icon}`}
+                        title={file.filename}
+                      >
+                        {' '}
+                        <span className="title">{file.filename}</span>
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </Transition>
           </div>
         </div>
       </div>
-      <Transition.Group animation="slide down" duration={200}>
-        {(visible || isLastRevision) && (
-          <div className={`i-timeline ${!isLastRevision ? 'weak-hidden' : ''}`}>
-            {(timeline.length > 0 || canReview || canComment) && (
-              <RevisionTimeline revision={revision} />
-            )}
-            {isLastRevision && (
-              <>
-                {(canComment || canReview) && <PaperReviewForm />}
-                <div className="i-timeline to-separator-wrapper">
-                  <div className="i-timeline-connect-down to-separator" />
-                </div>
-                <div className="i-timeline-separator" />
-                <SubmitRevision />
-                {isInFinalState && <RevisionJudgment revision={revision} />}
-              </>
-            )}
-          </div>
-        )}
-      </Transition.Group>
+      <Transition animation="slide down" duration={500} visible={visible || isLastRevision}>
+        <div className={`i-timeline ${!isLastRevision ? 'weak-hidden' : ''}`}>
+          {(timeline.length > 0 || canReview || canComment) && (
+            <>
+              <div className="i-timeline with-line">
+                <div className="i-timeline-connect-up" />
+                <RevisionTimeline revision={revision} />
+                {isLastRevision && (canComment || canReview) && <PaperReviewForm />}
+              </div>
+            </>
+          )}
+          {isLastRevision && (
+            <>
+              <div className="i-timeline to-separator-wrapper">
+                <div className="i-timeline-connect-down to-separator" />
+              </div>
+              <div className="i-timeline-separator" />
+              <SubmitRevision />
+              {isInFinalState && <RevisionJudgment revision={revision} />}
+            </>
+          )}
+        </div>
+      </Transition>
     </>
   );
 }

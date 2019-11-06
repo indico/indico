@@ -14,9 +14,9 @@ from werkzeug.exceptions import Forbidden
 
 from indico.modules.events.papers.controllers.base import RHPaperBase
 from indico.modules.events.papers.models.comments import PaperReviewComment
-from indico.modules.events.papers.models.reviews import PaperAction
+from indico.modules.events.papers.models.reviews import PaperAction, PaperCommentVisibility
 from indico.modules.events.papers.models.revisions import PaperRevisionState
-from indico.modules.events.papers.operations import (create_paper_revision, delete_comment, judge_paper,
+from indico.modules.events.papers.operations import (create_comment, create_paper_revision, delete_comment, judge_paper,
                                                      reset_paper_state)
 from indico.modules.events.papers.schemas import PaperSchema, paper_schema
 from indico.web.args import use_kwargs
@@ -37,6 +37,19 @@ class RHResetPaperState(RHPaperBase):
     def _process(self):
         if self.paper.state != PaperRevisionState.submitted:
             reset_paper_state(self.paper)
+        return '', 204
+
+
+class RHSubmitPaperComment(RHPaperBase):
+    def _check_paper_protection(self):
+        return self.paper.can_comment(session.user)
+
+    @use_kwargs({
+        'comment': fields.String(required=True),
+        'visibility': EnumField(PaperCommentVisibility, required=True)
+    })
+    def _process(self, comment, visibility):
+        create_comment(self.paper, comment, visibility, session.user)
         return '', 204
 
 
@@ -67,7 +80,7 @@ class RHJudgePaper(RHPaperBase):
 
     @use_kwargs({
         'action': EnumField(PaperAction, required=True),
-        'comment': fields.Str()
+        'comment': fields.String()
     })
     def _process(self, action, comment):
         judge_paper(self.paper, action, comment, judge=session.user)

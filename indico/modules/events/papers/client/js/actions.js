@@ -7,6 +7,7 @@
 
 import paperInfoURL from 'indico-url:papers.api_paper_details';
 import resetPaperStateURL from 'indico-url:papers.api_reset_paper_state';
+import addCommentURL from 'indico-url:papers.api_submit_comment';
 import deleteCommentURL from 'indico-url:papers.api_delete_comment';
 import judgePaperURL from 'indico-url:papers.api_judge_paper';
 
@@ -20,6 +21,10 @@ export const FETCH_PAPER_DETAILS_ERROR = 'papers/FETCH_PAPER_DETAILS_ERROR';
 export const RESET_PAPER_JUDGMENT_REQUEST = 'papers/RESET_PAPER_JUDGMENT_REQUEST';
 export const RESET_PAPER_JUDGMENT_SUCCESS = 'papers/RESET_PAPER_JUDGMENT_SUCCESS';
 export const RESET_PAPER_JUDGMENT_ERROR = 'papers/RESET_PAPER_JUDGMENT_ERROR';
+
+export const ADD_COMMENT_REQUEST = 'papers/ADD_COMMENT_REQUEST';
+export const ADD_COMMENT_SUCCESS = 'papers/ADD_COMMENT_SUCCESS';
+export const ADD_COMMENT_ERROR = 'papers/ADD_COMMENT_ERROR';
 
 export const DELETE_COMMENT_REQUEST = 'papers/DELETE_COMMENT_REQUEST';
 export const DELETE_COMMENT_SUCCESS = 'papers/DELETE_COMMENT_SUCCESS';
@@ -44,6 +49,20 @@ export function resetPaperJudgment(eventId, contributionId) {
     RESET_PAPER_JUDGMENT_REQUEST,
     [RESET_PAPER_JUDGMENT_SUCCESS, () => fetchPaperDetails(eventId, contributionId)],
     RESET_PAPER_JUDGMENT_ERROR
+  );
+}
+
+export function addComment(eventId, contributionId, commentData) {
+  const params = {
+    confId: eventId,
+    contrib_id: contributionId,
+  };
+
+  return ajaxAction(
+    () => indicoAxios.post(addCommentURL(params), commentData),
+    ADD_COMMENT_REQUEST,
+    [ADD_COMMENT_SUCCESS, () => fetchPaperDetails(eventId, contributionId)],
+    ADD_COMMENT_ERROR
   );
 }
 
