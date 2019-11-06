@@ -55,10 +55,10 @@ class RHContributionDisplayBase(RHDisplayEventBase):
 
     def _check_access(self):
         RHDisplayEventBase._check_access(self)
-        published = contribution_settings.get(self.event, 'published')
         if not self.contrib.can_access(session.user):
             raise Forbidden
-        if not published:
+        published = contribution_settings.get(self.event, 'published')
+        if not published and not self.event.can_manage(session.user):
             raise NotFound(_("The contributions of this event have not been published yet."))
 
     def _process_args(self):
@@ -132,6 +132,7 @@ class RHContributionDisplay(RHContributionDisplayBase):
                                                show_author_link=_author_page_active(self.event),
                                                field_values=field_values,
                                                page_title=contrib.title,
+                                               published=contribution_settings.get(self.event, 'published'),
                                                **ical_params)
 
 
