@@ -247,6 +247,9 @@ class RHSubcontributionDisplay(RHDisplayEventBase):
         RHDisplayEventBase._check_access(self)
         if not self.subcontrib.can_access(session.user):
             raise Forbidden
+        published = contribution_settings.get(self.event, 'published')
+        if not published and not self.event.can_manage(session.user):
+            raise NotFound(_("The contributions of this event have not been published yet."))
 
     def _process_args(self):
         RHDisplayEventBase._process_args(self)
