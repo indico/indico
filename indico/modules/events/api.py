@@ -26,6 +26,7 @@ from indico.modules.attachments.api.util import build_folders_api_data, build_ma
 from indico.modules.categories import Category, LegacyCategoryMapping
 from indico.modules.categories.serialize import serialize_categories_ical
 from indico.modules.events import Event
+from indico.modules.events.contributions import contribution_settings
 from indico.modules.events.models.persons import PersonLinkBase
 from indico.modules.events.notes.util import build_note_api_data, build_note_legacy_api_data
 from indico.modules.events.sessions.models.sessions import Session
@@ -74,10 +75,14 @@ class EventTimeTableHook(HTTPAPIHook):
         super(EventTimeTableHook, self)._getParams()
         self._idList = self._pathParams['idlist'].split('-')
 
+    def _serialize_timetable(self, event, user):
+        if not contribution_settings.get(event, 'published') and not event.can_manage(user):
+            return {}
+        return TimetableSerializer(event, management=False, user=user).serialize_timetable()
+
     def export_timetable(self, user):
         events = Event.find_all(Event.id.in_(map(int, self._idList)), ~Event.is_deleted)
-        return {event.id: TimetableSerializer(event, management=False, user=user).serialize_timetable()
-                for event in events}
+        return {event.id: self._serialize_timetable(event, user) for event in events}
 
 
 @HTTPAPIHook.register
@@ -586,13 +591,15 @@ class CategoryEventFetcher(IteratedDataFetcher, SerializerBase):
 
         if can_manage:
             data['allowed'] = self._serialize_access_list(event)
-        if self._detail_level in {'contributions', 'subcontributions'}:
+
+        allow_details = contribution_settings.get(event, 'published') or can_manage
+        if self._detail_level in {'contributions', 'subcontributions'} and allow_details:
             data['contributions'] = []
             for contribution in event.contributions:
                 include_subcontribs = self._detail_level == 'subcontributions'
                 serialized_contrib = self._serialize_contribution(contribution, include_subcontribs)
                 data['contributions'].append(serialized_contrib)
-        elif self._detail_level == 'sessions':
+        elif self._detail_level == 'sessions' and allow_details:
             # Contributions without a session
             data['contributions'] = []
             for contribution in event.contributions:
@@ -653,6 +660,14 @@ class SessionContribFetcher(IteratedDataFetcher):
 class SessionHook(SessionContribHook):
     RE = r'(?P<event>[\w\s]+)/session/(?P<idlist>\w+(?:-\w+)*)'
     METHOD_NAME = 'export_session'
+
+    def _has_access(self, user):
+        event = Event.get(self._eventId, is_deleted=False)
+        if event:
+            can_manage = user is not None and event.can_manage(user)
+            if not can_manage and not contribution_settings.get(event, 'published'):
+                return False
+        return True
 
 
 class SessionFetcher(SessionContribFetcher, SerializerBase):
