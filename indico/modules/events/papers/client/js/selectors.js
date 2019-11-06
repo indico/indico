@@ -13,8 +13,6 @@ export const isFetchingPaperDetails = state =>
   state.paper.requests.details.state === RequestState.STARTED;
 export const isPaperStateResetInProgress = state =>
   state.paper.requests.resetState.state === RequestState.STARTED;
-export const isAddingComment = state =>
-  state.paper.requests.addComment.state === RequestState.STARTED;
 export const isDeletingComment = state =>
   state.paper.requests.deleteComment.state === RequestState.STARTED;
 

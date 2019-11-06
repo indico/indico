@@ -14,7 +14,7 @@ import {FinalDropdown, FinalSubmitButton, FinalTextArea} from 'indico/react/form
 import {Translate} from 'indico/react/i18n';
 
 import {addComment} from '../actions';
-import {canCommentPaper, getPaperDetails, getCurrentUser, isAddingComment} from '../selectors';
+import {canCommentPaper, getPaperDetails, getCurrentUser} from '../selectors';
 import UserAvatar from './UserAvatar';
 
 import './PaperReviewForm.module.scss';
@@ -26,7 +26,6 @@ export default function PaperReviewForm() {
   } = useSelector(getPaperDetails);
   const user = useSelector(getCurrentUser);
   const canComment = useSelector(canCommentPaper);
-  const isCommentBeingAdded = useSelector(isAddingComment);
   const dispatch = useDispatch();
   const [commentFormVisible, setCommentFormVisible] = useState(false);
 
@@ -45,15 +44,18 @@ export default function PaperReviewForm() {
     },
   ];
 
-  const onCommentClickHandler = commentFormVisible
-    ? null
-    : () => {
-        setCommentFormVisible(true);
-      };
+  const onCommentClickHandler = () => {
+    if (!commentFormVisible) {
+      setCommentFormVisible(true);
+    }
+  };
 
   const createComment = useCallback(
-    formData => {
-      dispatch(addComment(eventId, contributionId, formData));
+    async formData => {
+      const rv = await dispatch(addComment(eventId, contributionId, formData));
+      if (rv.error) {
+        return rv.error;
+      }
     },
     [dispatch, eventId, contributionId]
   );
@@ -69,13 +71,10 @@ export default function PaperReviewForm() {
                 <FinalForm
                   onSubmit={createComment}
                   initialValues={{comment: '', visibility: 'judges'}}
+                  subscription={{submitting: true}}
                 >
                   {fprops => (
-                    <Form
-                      id="comment-form"
-                      onSubmit={fprops.handleSubmit}
-                      loading={isCommentBeingAdded}
-                    >
+                    <Form onSubmit={fprops.handleSubmit}>
                       <FinalTextArea
                         onFocus={onCommentClickHandler}
                         name="comment"
@@ -91,13 +90,14 @@ export default function PaperReviewForm() {
                             required
                           />
                           <Form.Group inline>
-                            <FinalSubmitButton
-                              label={Translate.string('Comment')}
-                              form="comment-form"
-                            />
+                            <FinalSubmitButton label={Translate.string('Comment')} />
                             <Button
+                              disabled={fprops.submitting}
                               content={Translate.string('Cancel')}
-                              onClick={() => setCommentFormVisible(false)}
+                              onClick={() => {
+                                setCommentFormVisible(false);
+                                fprops.form.reset();
+                              }}
                             />
                           </Form.Group>
                         </>

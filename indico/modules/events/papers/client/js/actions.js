@@ -22,10 +22,6 @@ export const RESET_PAPER_JUDGMENT_REQUEST = 'papers/RESET_PAPER_JUDGMENT_REQUEST
 export const RESET_PAPER_JUDGMENT_SUCCESS = 'papers/RESET_PAPER_JUDGMENT_SUCCESS';
 export const RESET_PAPER_JUDGMENT_ERROR = 'papers/RESET_PAPER_JUDGMENT_ERROR';
 
-export const ADD_COMMENT_REQUEST = 'papers/ADD_COMMENT_REQUEST';
-export const ADD_COMMENT_SUCCESS = 'papers/ADD_COMMENT_SUCCESS';
-export const ADD_COMMENT_ERROR = 'papers/ADD_COMMENT_ERROR';
-
 export const DELETE_COMMENT_REQUEST = 'papers/DELETE_COMMENT_REQUEST';
 export const DELETE_COMMENT_SUCCESS = 'papers/DELETE_COMMENT_SUCCESS';
 export const DELETE_COMMENT_ERROR = 'papers/DELETE_COMMENT_ERROR';
@@ -54,11 +50,11 @@ export function addComment(eventId, contributionId, commentData) {
     contrib_id: contributionId,
   };
 
-  return ajaxAction(
+  return submitFormAction(
     () => indicoAxios.post(addCommentURL(params), commentData),
-    ADD_COMMENT_REQUEST,
-    [ADD_COMMENT_SUCCESS, () => fetchPaperDetails(eventId, contributionId)],
-    ADD_COMMENT_ERROR
+    null,
+    () => fetchPaperDetails(eventId, contributionId),
+    null
   );
 }
 

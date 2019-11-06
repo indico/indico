@@ -76,6 +76,8 @@ export default function RevisionComment({comment, revision}) {
                   open={confirmOpen}
                   content={Translate.string('Are you sure you want to remove this comment?')}
                   onCancel={() => setConfirmOpen(false)}
+                  closeOnDimmerClick={!isDeletingCommentInProgress}
+                  closeOnEscape={!isDeletingCommentInProgress}
                   onConfirm={() => {
                     dispatch(deleteComment(eventId, contributionId, revision.id, comment.id));
                   }}

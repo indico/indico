@@ -22,11 +22,6 @@ export default combineReducers({
       paperActions.RESET_PAPER_JUDGMENT_SUCCESS,
       paperActions.RESET_PAPER_JUDGMENT_ERROR
     ),
-    addComment: requestReducer(
-      paperActions.ADD_COMMENT_REQUEST,
-      paperActions.ADD_COMMENT_SUCCESS,
-      paperActions.ADD_COMMENT_ERROR
-    ),
     deleteComment: requestReducer(
       paperActions.DELETE_COMMENT_REQUEST,
       paperActions.DELETE_COMMENT_SUCCESS,

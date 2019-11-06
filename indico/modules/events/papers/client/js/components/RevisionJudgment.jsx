@@ -61,7 +61,7 @@ export default function RevisionJudgment({revision}) {
             </div>
             {canJudge && isLastRevision && (
               <>
-                <div className="hide-if-locked">
+                <div>
                   <a
                     className="i-link icon-remove"
                     title={Translate.string('Reset judgment')}
