@@ -17,11 +17,6 @@ export default combineReducers({
       paperActions.FETCH_PAPER_DETAILS_SUCCESS,
       paperActions.FETCH_PAPER_DETAILS_ERROR
     ),
-    judgment: requestReducer(
-      paperActions.JUDGE_PAPER_REQUEST,
-      paperActions.JUDGE_PAPER_SUCCESS,
-      paperActions.JUDGE_PAPER_ERROR
-    ),
     resetState: requestReducer(
       paperActions.RESET_PAPER_JUDGMENT_REQUEST,
       paperActions.RESET_PAPER_JUDGMENT_SUCCESS,

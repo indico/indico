@@ -71,6 +71,7 @@ export default function RevisionComment({comment, revision}) {
                   title={Translate.string('Remove comment')}
                 />
                 <Confirm
+                  size="tiny"
                   header={Translate.string('Remove comment')}
                   open={confirmOpen}
                   content={Translate.string('Are you sure you want to remove this comment?')}

@@ -11,8 +11,6 @@ import {RequestState} from 'indico/utils/redux';
 
 export const isFetchingPaperDetails = state =>
   state.paper.requests.details.state === RequestState.STARTED;
-export const isJudgingInProgress = state =>
-  state.paper.requests.judgment.state === RequestState.STARTED;
 export const isPaperStateResetInProgress = state =>
   state.paper.requests.resetState.state === RequestState.STARTED;
 export const isAddingComment = state =>

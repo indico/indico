@@ -69,8 +69,11 @@ export default function RevisionJudgment({revision}) {
                   />
                 </div>
                 <Confirm
+                  size="tiny"
                   header={Translate.string('Confirm the operation')}
                   open={confirmOpen}
+                  closeOnDimmerClick={!isResetInProgress}
+                  closeOnEscape={!isResetInProgress}
                   content={Translate.string(
                     'Do you really want to reset the judgment? This operation is irreversible.'
                   )}

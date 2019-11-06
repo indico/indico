@@ -14,13 +14,7 @@ import {FinalDropdown, FinalSubmitButton, FinalTextArea} from 'indico/react/form
 import {Translate} from 'indico/react/i18n';
 
 import {judgePaper} from '../actions';
-import {
-  canJudgePaper,
-  getCurrentUser,
-  getPaperDetails,
-  isJudgingInProgress,
-  isEventLocked,
-} from '../selectors';
+import {canJudgePaper, getCurrentUser, getPaperDetails, isEventLocked} from '../selectors';
 import UserAvatar from './UserAvatar';
 
 import './PaperDecisionForm.module.scss';
@@ -48,12 +42,14 @@ export default function PaperDecisionForm() {
   } = useSelector(getPaperDetails);
   const isLocked = useSelector(isEventLocked);
   const currentUser = useSelector(getCurrentUser);
-  const isJudging = useSelector(isJudgingInProgress);
   const canJudge = useSelector(canJudgePaper);
 
   const submitPaperJudgment = useCallback(
-    formData => {
-      dispatch(judgePaper(eventId, contributionId, formData));
+    async formData => {
+      const rv = await dispatch(judgePaper(eventId, contributionId, formData));
+      if (rv.error) {
+        return rv.error;
+      }
     },
     [dispatch, eventId, contributionId]
   );
@@ -73,17 +69,13 @@ export default function PaperDecisionForm() {
         <div className="i-box-footer">
           <FinalForm onSubmit={submitPaperJudgment} initialValues={{action: 'accept', comment: ''}}>
             {fprops => (
-              <Form id="judgment-form" onSubmit={fprops.handleSubmit} loading={isJudging}>
+              <Form onSubmit={fprops.handleSubmit}>
                 <FinalDropdown name="action" options={actionOptions} selection required />
                 <FinalTextArea
                   name="comment"
                   placeholder={Translate.string('Leave a comment for the submitter...')}
                 />
-                <FinalSubmitButton
-                  label={Translate.string('Judge')}
-                  form="judgment-form"
-                  disabledUntilChange={false}
-                />
+                <FinalSubmitButton label={Translate.string('Judge')} disabledUntilChange={false} />
               </Form>
             )}
           </FinalForm>

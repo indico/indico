@@ -12,7 +12,7 @@ import deleteCommentURL from 'indico-url:papers.api_delete_comment';
 import judgePaperURL from 'indico-url:papers.api_judge_paper';
 
 import {indicoAxios} from 'indico/utils/axios';
-import {ajaxAction} from 'indico/utils/redux';
+import {ajaxAction, submitFormAction} from 'indico/utils/redux';
 
 export const FETCH_PAPER_DETAILS_REQUEST = 'papers/FETCH_PAPER_DETAILS_REQUEST';
 export const FETCH_PAPER_DETAILS_SUCCESS = 'papers/FETCH_PAPER_DETAILS_SUCCESS';
@@ -29,10 +29,6 @@ export const ADD_COMMENT_ERROR = 'papers/ADD_COMMENT_ERROR';
 export const DELETE_COMMENT_REQUEST = 'papers/DELETE_COMMENT_REQUEST';
 export const DELETE_COMMENT_SUCCESS = 'papers/DELETE_COMMENT_SUCCESS';
 export const DELETE_COMMENT_ERROR = 'papers/DELETE_COMMENT_ERROR';
-
-export const JUDGE_PAPER_REQUEST = 'papers/JUDGE_PAPER_REQUEST';
-export const JUDGE_PAPER_SUCCESS = 'papers/JUDGE_PAPER_SUCCESS';
-export const JUDGE_PAPER_ERROR = 'papers/JUDGE_PAPER_ERROR';
 
 export function fetchPaperDetails(eventId, contributionId) {
   return ajaxAction(
@@ -83,11 +79,11 @@ export function deleteComment(eventId, contributionId, revisionId, commentId) {
 }
 
 export function judgePaper(eventId, contributionId, judgmentData) {
-  return ajaxAction(
+  return submitFormAction(
     () =>
       indicoAxios.post(judgePaperURL({confId: eventId, contrib_id: contributionId}), judgmentData),
-    JUDGE_PAPER_REQUEST,
-    [JUDGE_PAPER_SUCCESS, () => fetchPaperDetails(eventId, contributionId)],
-    JUDGE_PAPER_ERROR
+    null,
+    () => fetchPaperDetails(eventId, contributionId),
+    null
   );
 }
