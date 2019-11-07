@@ -18,6 +18,13 @@
     {% endif %}
 {% endblock %}
 
+{# Only for development purposes (Remove it at some point) #}
+{% block page_actions %}
+    <a class="i-button highlight" href="{{ url_for('.new_paper_timeline', paper) }}">
+        Switch to new view
+    </a>
+{% endblock -%}
+
 {% block content %}
     {{ render_paper_info(paper) }}
 
