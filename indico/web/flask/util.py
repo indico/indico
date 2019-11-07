@@ -9,7 +9,9 @@ from __future__ import absolute_import, unicode_literals
 
 import inspect
 import os
+import re
 import time
+import unicodedata
 from importlib import import_module
 
 from flask import Blueprint, current_app, g, redirect, request
@@ -18,11 +20,10 @@ from flask import url_for as _url_for
 from flask.helpers import get_root_path
 from werkzeug.exceptions import HTTPException, NotFound
 from werkzeug.routing import BaseConverter, BuildError, RequestRedirect, UnicodeConverter
-from werkzeug.urls import url_parse
+from werkzeug.urls import url_parse, url_quote
 
 from indico.core.config import config
 from indico.util.caching import memoize
-from indico.util.fs import secure_filename
 from indico.util.locators import get_locator
 from indico.web.util import jsonify_data
 
@@ -236,6 +237,19 @@ def _is_office_mimetype(mimetype):
     return False
 
 
+# taken from flask's send_file code
+def make_content_disposition_args(attachment_filename):
+    try:
+        attachment_filename = attachment_filename.encode('ascii')
+    except UnicodeEncodeError:
+        return {
+            'filename': unicodedata.normalize('NFKD', attachment_filename).encode('ascii', 'ignore'),
+            'filename*': "UTF-8''%s" % url_quote(attachment_filename, safe=b''),
+        }
+    else:
+        return {'filename': attachment_filename}
+
+
 def send_file(name, path_or_fd, mimetype, last_modified=None, no_cache=True, inline=None, conditional=False, safe=True,
               **kwargs):
     """Sends a file to the user.
@@ -254,7 +268,7 @@ def send_file(name, path_or_fd, mimetype, last_modified=None, no_cache=True, inl
     text/html mimetypes
     """
 
-    name = secure_filename(name, 'file')
+    name = re.sub(r'\s+', ' ', name).strip()  # get rid of crap like linebreaks
     assert '/' in mimetype
     if inline is None:
         inline = mimetype not in ('text/csv', 'text/xml', 'application/xml')
@@ -276,7 +290,7 @@ def send_file(name, path_or_fd, mimetype, last_modified=None, no_cache=True, inl
         rv.headers.add('Content-Security-Policy', "script-src 'self'; object-src 'self'")
     if inline:
         # send_file does not add this header if as_attachment is False
-        rv.headers.add('Content-Disposition', 'inline', filename=name)
+        rv.headers.add('Content-Disposition', 'inline', **make_content_disposition_args(name))
     if last_modified:
         if not isinstance(last_modified, int):
             last_modified = int(time.mktime(last_modified.timetuple()))
