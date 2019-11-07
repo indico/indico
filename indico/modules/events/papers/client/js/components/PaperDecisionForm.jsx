@@ -67,7 +67,11 @@ export default function PaperDecisionForm() {
       <UserAvatar user={currentUser} />
       <div className="i-timeline-item-box footer-only header-indicator-left review-form">
         <div className="i-box-footer">
-          <FinalForm onSubmit={submitPaperJudgment} initialValues={{action: 'accept', comment: ''}}>
+          <FinalForm
+            onSubmit={submitPaperJudgment}
+            initialValues={{action: 'accept', comment: ''}}
+            subscription={{}}
+          >
             {fprops => (
               <Form onSubmit={fprops.handleSubmit}>
                 <FinalDropdown name="action" options={actionOptions} selection required />

@@ -78,8 +78,11 @@ export default function RevisionJudgment({revision}) {
                     'Do you really want to reset the judgment? This operation is irreversible.'
                   )}
                   onCancel={() => setConfirmOpen(false)}
-                  onConfirm={() => {
-                    dispatch(resetPaperJudgment(event.id, contribution.id));
+                  onConfirm={async () => {
+                    const rv = await dispatch(resetPaperJudgment(event.id, contribution.id));
+                    if (!rv.error) {
+                      setConfirmOpen(false);
+                    }
                   }}
                   cancelButton={
                     <Button content={Translate.string('Cancel')} disabled={isResetInProgress} />

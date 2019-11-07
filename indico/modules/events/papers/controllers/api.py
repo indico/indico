@@ -7,9 +7,9 @@
 
 from __future__ import unicode_literals
 
-from flask import jsonify, request, session
+from flask import request, session
 from marshmallow_enum import EnumField
-from webargs import fields
+from webargs import fields, validate
 from werkzeug.exceptions import Forbidden
 
 from indico.modules.events.papers.controllers.base import RHPaperBase
@@ -18,7 +18,7 @@ from indico.modules.events.papers.models.reviews import PaperAction, PaperCommen
 from indico.modules.events.papers.models.revisions import PaperRevisionState
 from indico.modules.events.papers.operations import (create_comment, create_paper_revision, delete_comment, judge_paper,
                                                      reset_paper_state)
-from indico.modules.events.papers.schemas import PaperSchema, paper_schema
+from indico.modules.events.papers.schemas import PaperSchema
 from indico.web.args import use_kwargs
 
 
@@ -45,7 +45,7 @@ class RHSubmitPaperComment(RHPaperBase):
         return self.paper.can_comment(session.user)
 
     @use_kwargs({
-        'comment': fields.String(required=True),
+        'comment': fields.String(validate=validate.Length(min=1)),
         'visibility': EnumField(PaperCommentVisibility, required=True)
     })
     def _process(self, comment, visibility):

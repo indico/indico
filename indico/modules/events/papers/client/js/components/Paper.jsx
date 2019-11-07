@@ -11,7 +11,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {Loader} from 'semantic-ui-react';
 
 import {fetchPaperDetails} from '../actions';
-import {getPaperDetails, isFetchingPaperDetails} from '../selectors';
+import {getPaperDetails, isFetchingInitialPaperDetails} from '../selectors';
 import PaperInfo from './PaperInfo';
 import PaperTimeline from './PaperTimeline';
 import PaperDecisionForm from './PaperDecisionForm';
@@ -19,13 +19,13 @@ import PaperDecisionForm from './PaperDecisionForm';
 export default function Paper({eventId, contributionId}) {
   const dispatch = useDispatch();
   const paper = useSelector(getPaperDetails);
-  const isFetchingDetails = useSelector(isFetchingPaperDetails);
+  const isInitialPaperDetailsLoading = useSelector(isFetchingInitialPaperDetails);
 
   useEffect(() => {
     dispatch(fetchPaperDetails(eventId, contributionId));
   }, [dispatch, contributionId, eventId]);
 
-  if (isFetchingDetails) {
+  if (isInitialPaperDetailsLoading) {
     return <Loader active />;
   } else if (!paper) {
     return null;

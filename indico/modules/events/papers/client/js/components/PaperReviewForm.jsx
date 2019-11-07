@@ -51,11 +51,13 @@ export default function PaperReviewForm() {
   };
 
   const createComment = useCallback(
-    async formData => {
+    async (formData, form) => {
       const rv = await dispatch(addComment(eventId, contributionId, formData));
       if (rv.error) {
         return rv.error;
       }
+      setCommentFormVisible(false);
+      setTimeout(() => form.reset(), 0);
     },
     [dispatch, eventId, contributionId]
   );
@@ -80,6 +82,8 @@ export default function PaperReviewForm() {
                         name="comment"
                         rows={commentFormVisible ? 3 : 1}
                         placeholder={Translate.string('Leave a comment...')}
+                        hideValidationError
+                        required
                       />
                       {commentFormVisible && (
                         <>

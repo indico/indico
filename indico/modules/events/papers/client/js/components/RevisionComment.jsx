@@ -15,6 +15,7 @@ import {serializeDate} from 'indico/utils/date';
 import {Param, Translate} from 'indico/react/i18n';
 
 import {deleteComment} from '../actions';
+import {CommentVisibility} from '../models';
 import {getPaperContribution, getPaperEvent, isDeletingComment} from '../selectors';
 import UserAvatar from './UserAvatar';
 
@@ -36,7 +37,7 @@ export default function RevisionComment({comment, revision}) {
                 <Param name="userName" value={comment.user.fullName} wrapper={<strong />} /> left a
                 comment
               </Translate>{' '}
-              {comment.visibility !== 'contributors' && (
+              {comment.visibility !== CommentVisibility.contributors && (
                 <i
                   className={`review-comment-visibility ${comment.visibility.name} icon-shield`}
                   title={comment.visibility.title}
@@ -78,8 +79,13 @@ export default function RevisionComment({comment, revision}) {
                   onCancel={() => setConfirmOpen(false)}
                   closeOnDimmerClick={!isDeletingCommentInProgress}
                   closeOnEscape={!isDeletingCommentInProgress}
-                  onConfirm={() => {
-                    dispatch(deleteComment(eventId, contributionId, revision.id, comment.id));
+                  onConfirm={async () => {
+                    const rv = await dispatch(
+                      deleteComment(eventId, contributionId, revision.id, comment.id)
+                    );
+                    if (!rv.error) {
+                      setConfirmOpen(false);
+                    }
                   }}
                   cancelButton={
                     <Button

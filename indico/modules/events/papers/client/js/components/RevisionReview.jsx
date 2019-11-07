@@ -34,12 +34,10 @@ export default function RevisionReview({review}) {
               <Param name="reviewerName" value={review.user.fullName} wrapper={<strong />} /> left a
               review
             </Translate>{' '}
-            {review.visibility !== 'contributors' && (
-              <i
-                className={`review-comment-visibility ${review.visibility.name} icon-shield`}
-                title={review.visibility.title}
-              />
-            )}{' '}
+            <i
+              className={`review-comment-visibility ${review.visibility.name} icon-shield`}
+              title={review.visibility.title}
+            />{' '}
             <time dateTime={serializeDate(review.createdDt, moment.HTML5_FMT.DATETIME_LOCAL)}>
               {serializeDate(review.createdDt, 'LL')}
             </time>

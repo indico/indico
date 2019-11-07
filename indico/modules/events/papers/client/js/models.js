@@ -11,3 +11,9 @@ export const PaperState = {
   submitted: 'submitted',
   to_be_corrected: 'to_be_corrected',
 };
+
+export const CommentVisibility = {
+  judges: 'judges',
+  reviewers: 'reviewers',
+  contributors: 'contributors',
+};

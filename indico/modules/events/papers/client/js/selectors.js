@@ -9,8 +9,8 @@ import {createSelector} from 'reselect';
 
 import {RequestState} from 'indico/utils/redux';
 
-export const isFetchingPaperDetails = state =>
-  state.paper.requests.details.state === RequestState.STARTED;
+export const isFetchingInitialPaperDetails = state =>
+  state.paper.requests.details.state === RequestState.STARTED && !state.paper.details;
 export const isPaperStateResetInProgress = state =>
   state.paper.requests.resetState.state === RequestState.STARTED;
 export const isDeletingComment = state =>
