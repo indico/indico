@@ -6,3 +6,10 @@
 # LICENSE file for more details.
 
 from __future__ import unicode_literals
+
+from indico.modules.events.management.views import WPEventManagement
+
+
+class WPEditing(WPEventManagement):
+    template_prefix = 'events/editing/'
+    bundles = ('module_events.editing.js', 'module_events.editing.css')
