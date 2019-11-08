@@ -28,7 +28,7 @@ class File(StoredFileMixin, db.Model):
         primary_key=True
     )
     uuid = db.Column(
-        UUID,
+        UUID(as_uuid=True),
         index=True,
         unique=True,
         nullable=False,

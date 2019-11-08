@@ -13,5 +13,5 @@ from indico.web.flask.wrappers import IndicoBlueprint
 
 _bp = IndicoBlueprint('files', __name__)
 
-_bp.add_url_rule('/files/<uuid>', 'file_info', RHFileInfo)
-_bp.add_url_rule('/files/<uuid>', 'delete_file', RHDeleteFile, methods=('DELETE',))
+_bp.add_url_rule('/files/<uuid:uuid>', 'file_info', RHFileInfo)
+_bp.add_url_rule('/files/<uuid:uuid>', 'delete_file', RHDeleteFile, methods=('DELETE',))
