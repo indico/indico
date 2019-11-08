@@ -13,6 +13,7 @@ from celery.schedules import crontab
 from sqlalchemy.orm.attributes import flag_modified
 
 from indico.core.celery import celery
+from indico.core.config import config
 from indico.core.db import db
 from indico.core.storage import StorageReadOnlyError
 from indico.modules.files import logger
@@ -31,6 +32,9 @@ def delete_unclaimed_files():
 
     for file in unclaimed_files:
         file_repr = repr(file)
+        if config.DEBUG:
+            logger.info('Would have removed unclaimed file %s (skipped due to debug mode)', file_repr)
+            continue
         try:
             file.delete()
             db.session.delete(file)
