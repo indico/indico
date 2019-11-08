@@ -7,19 +7,18 @@
 
 from __future__ import unicode_literals
 
-from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.ext.declarative import declared_attr
 
 from indico.core.db import db
 from indico.util.string import format_repr, return_ascii
 
 
-class EditingFileType(db.Model):
-    __tablename__ = 'file_types'
+class EditingTag(db.Model):
+    __tablename__ = 'tags'
 
     @declared_attr
     def __table_args__(cls):
-        return (db.Index('ix_uq_file_types_event_id_name_lower', cls.event_id, db.func.lower(cls.name), unique=True),
+        return (db.Index('ix_uq_tags_event_id_name_lower', cls.event_id, db.func.lower(cls.name), unique=True),
                 {'schema': 'event_editing'})
 
     id = db.Column(
@@ -27,6 +26,7 @@ class EditingFileType(db.Model):
         primary_key=True
     )
     event_id = db.Column(
+        db.Integer,
         db.ForeignKey('events.events.id'),
         index=True,
         nullable=False
@@ -35,22 +35,12 @@ class EditingFileType(db.Model):
         db.String,
         nullable=False
     )
-    extensions = db.Column(
-        ARRAY(db.String),
-        nullable=False,
-        default=[]
+    color = db.Column(
+        db.String,
+        nullable=False
     )
-    allow_multiple_files = db.Column(
-        db.Boolean,
-        nullable=False,
-        default=False
-    )
-    required = db.Column(
-        db.Boolean,
-        nullable=False,
-        default=False
-    )
-    publishable = db.Column(
+    #: Whether the tag is system-managed and cannot be modified by event managers.
+    system = db.Column(
         db.Boolean,
         nullable=False,
         default=False
@@ -60,16 +50,36 @@ class EditingFileType(db.Model):
         'Event',
         lazy=True,
         backref=db.backref(
-            'editing_file_types',
+            'editing_tags',
             cascade='all, delete-orphan',
             lazy=True
         )
     )
 
     # relationship backrefs:
-    # - files (EditingRevisionFile.file_type)
+    # - revisions (EditingRevision.tags)
 
     @return_ascii
     def __repr__(self):
-        return format_repr(self, 'id', 'event_id', 'extensions', allow_multiple_files=False, required=False,
-                           publishable=False, _text=self.name)
+        return format_repr(self, 'id', 'event_id', system=False, _text=self.name)
+
+
+db.Table(
+    'revision_tags',
+    db.metadata,
+    db.Column(
+        'revision_id',
+        db.ForeignKey('event_editing.revisions.id'),
+        primary_key=True,
+        autoincrement=False,
+        index=True
+    ),
+    db.Column(
+        'tag_id',
+        db.ForeignKey('event_editing.tags.id'),
+        primary_key=True,
+        autoincrement=False,
+        index=True
+    ),
+    schema='event_editing'
+)
