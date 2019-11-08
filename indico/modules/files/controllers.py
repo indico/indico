@@ -14,14 +14,11 @@ from marshmallow import fields
 from werkzeug.exceptions import Forbidden
 
 from indico.core.db import db
-from indico.core.logger import Logger
+from indico.modules.files import logger
 from indico.modules.files.models.files import File
 from indico.modules.files.schemas import FileSchema
 from indico.web.args import use_kwargs
 from indico.web.rh import RHProtected
-
-
-logger = Logger.get('files')
 
 
 class UploadFileMixin(object):
