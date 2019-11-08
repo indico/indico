@@ -6,3 +6,11 @@
 # LICENSE file for more details.
 
 from __future__ import unicode_literals
+
+from indico.modules.events.controllers.base import RHEventBase
+from indico.modules.events.editing.schemas import EditingFileTypeSchema
+
+
+class RHEditingFileTypes(RHEventBase):
+    def _process(self):
+        return EditingFileTypeSchema(many=True).jsonify(self.event.editing_file_types)
