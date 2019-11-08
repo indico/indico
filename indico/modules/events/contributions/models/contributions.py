@@ -374,6 +374,7 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
     # - _paper_files (PaperFile._contribution)
     # - _paper_revisions (PaperRevision._contribution)
     # - attachment_folders (AttachmentFolder.contribution)
+    # - editables (Editable.contribution)
     # - legacy_mapping (LegacyContributionMapping.contribution)
     # - note (EventNote.contribution)
     # - room_reservation_links (ReservationLink.contribution)
