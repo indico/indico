@@ -64,9 +64,10 @@ class RHDeleteFile(RHFileBase):
             raise Forbidden('Cannot delete claimed file')
 
     def _process(self):
+        file_repr = repr(self.file)
         self.file.delete()
-        logger.info('File %r deleted', self.file)
         db.session.delete(self.file)
+        logger.info('File %s deleted', file_repr)
         return '', 204
 
 
