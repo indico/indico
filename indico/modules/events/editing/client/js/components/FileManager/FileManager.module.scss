@@ -1,0 +1,91 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2019 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@import 'base/palette';
+
+.dropzone {
+    width: 100%;
+    border: 2px dashed $gray;
+    border-radius: 3px;
+    text-align: center;
+    padding: 0.5em;
+    cursor: pointer;
+
+    &:hover {
+        opacity: 0.5;
+    }
+
+    &:global(.active) {
+        opacity: 0.5;
+    }
+}
+
+.file-manager {
+    display: flex;
+
+    .file-type {
+        border: 1px solid $gray;
+        border-radius: 3px;
+        padding: 1em;
+        margin: 1em;
+        width: 33%;
+    }
+}
+
+.file-list {
+    list-style-type: none;
+    padding: 0;
+
+    .file-row {
+        display: flex;
+        justify-content: space-between;
+    }
+}
+
+.delete-icon {
+    color: $red;
+    cursor: pointer;
+
+    &:hover {
+        color: $dark-red;
+    }
+}
+
+.undo-icon {
+    color: $blue;
+    cursor: pointer;
+
+    &:hover {
+        color: $dark-blue;
+    }
+}
+
+.exchange-icon {
+    color: $dark-gray;
+    cursor: pointer;
+
+    &:hover {
+        color: $light-black;
+    }
+}
+
+.file-state {
+    font-weight: bold;
+
+    &:global(.added) {
+        color: $green;
+    }
+
+    &:global(.modified) {
+        color: $dark-orange;
+    }
+
+    &:global(.deleted) {
+        text-decoration: line-through;
+        color: $dark-red;
+    }
+}
