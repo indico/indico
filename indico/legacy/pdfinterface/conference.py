@@ -8,7 +8,6 @@
 import re
 from copy import deepcopy
 from datetime import timedelta
-from itertools import takewhile
 from operator import attrgetter
 
 from reportlab.lib import colors
@@ -678,7 +677,6 @@ class TimeTablePlain(PDFWithTOC):
                     p3 = Paragraph(escape(unicode(contrib.description)), self._styles["contrib_description"])
                     res.append(p3)
                 if entry == entries[-1]:  # if it is the last one, we do the page break and remove the previous one.
-                    res = list(takewhile(lambda x: not isinstance(x, PageBreak), res))
                     if self._ttPDFFormat.showNewPagePerSession():
                         res.append(PageBreak())
             # break
@@ -700,7 +698,6 @@ class TimeTablePlain(PDFWithTOC):
                     self._indexedFlowable[p1] = {'text': escape(break_.title.encode('utf-8')), 'level': 2}
 
                 if entry == entries[-1]:  # if it is the last one, we do the page break and remove the previous one.
-                    res = list(takewhile(lambda x: not isinstance(x, PageBreak), res))
                     if self._ttPDFFormat.showNewPagePerSession():
                         res.append(PageBreak())
         return res
