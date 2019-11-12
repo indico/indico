@@ -8,30 +8,18 @@
 import contributionDisplayURL from 'indico-url:contributions.display_contribution';
 
 import React from 'react';
-import {useSelector} from 'react-redux';
+import PropTypes from 'prop-types';
 
 import {Param, Translate} from 'indico/react/i18n';
 import {MathJax} from 'indico/react/components';
 
-import {getPaperDetails} from '../selectors';
-import PaperContent from './PaperContent';
-
-export default function PaperInfo() {
-  const {
-    contribution,
-    state,
-    lastRevision: {submitter},
-    event: {id: eventId},
-  } = useSelector(getPaperDetails);
-
+export default function TimelineHeader({children, contribution, state, submitter, eventId}) {
   return (
     <>
       <div className="submission-title flexrow">
         <MathJax>
           <h3 className="f-self-strech">
-            <Translate>
-              Paper for <Param name="title" value={contribution.title} />
-            </Translate>{' '}
+            <Param name="title" value={contribution.title} />{' '}
             <span className="submission-id">#{contribution.friendlyId}</span>
           </h3>
         </MathJax>
@@ -45,7 +33,7 @@ export default function PaperInfo() {
             <div>
               <Translate>
                 <Param name="submitterName" value={submitter.fullName} wrapper={<strong />} />{' '}
-                submitted this paper for the contribution{' '}
+                submitted for the contribution{' '}
                 <Param
                   name="contributionLink"
                   value={contribution.title}
@@ -59,10 +47,25 @@ export default function PaperInfo() {
             </div>
           </div>
         </div>
-        <div className="review-item-content">
-          <PaperContent />
-        </div>
+        <div className="review-item-content">{children}</div>
       </div>
     </>
   );
 }
+
+TimelineHeader.propTypes = {
+  contribution: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    friendlyId: PropTypes.string.isRequired,
+    title: PropTypes.string.isRequired,
+  }).isRequired,
+  state: PropTypes.shape({
+    cssClass: PropTypes.string.isRequired,
+    title: PropTypes.string.isRequired,
+  }).isRequired,
+  submitter: PropTypes.shape({
+    fullName: PropTypes.string.isRequired,
+  }).isRequired,
+  eventId: PropTypes.string.isRequired,
+  children: PropTypes.node.isRequired,
+};

@@ -13,11 +13,14 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.core.db.sqlalchemy.descriptions import RenderMode, RenderModeMixin
 from indico.util.date_time import now_utc
+from indico.util.i18n import _
 from indico.util.string import format_repr, return_ascii
-from indico.util.struct.enum import IndicoEnum
+from indico.util.struct.enum import RichIntEnum
 
 
-class InitialRevisionState(int, IndicoEnum):
+class InitialRevisionState(RichIntEnum):
+    __titles__ = [None, _("New"), _("Ready for Review"), _("Needs Confirmation")]
+    __css_classes__ = [None, 'new', 'ready', 'needs_confirmation']
     #: A revision that has been submitted by the user but isn't exposed to editors yet
     new = 1
     #: A revision that can be reviewed by editors
@@ -26,7 +29,9 @@ class InitialRevisionState(int, IndicoEnum):
     needs_submitter_confirmation = 3
 
 
-class FinalRevisionState(int, IndicoEnum):
+class FinalRevisionState(RichIntEnum):
+    __titles__ = [None, _("Replaced"), _("Needs Confirmation"), _("Needs Changes"), _("Accepted"), _("Rejected")]
+    __css_classes__ = [None, 'replaced', 'needs_confirmation', 'needs_change', 'accepted', 'rejected']
     #: A revision that is awaiting some action
     none = 0
     #: A revision that has been replaced by its next revision

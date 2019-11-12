@@ -12,6 +12,7 @@ from marshmallow import ValidationError, fields, post_dump, validates_schema
 from marshmallow_enum import EnumField
 
 from indico.core.marshmallow import mm
+from indico.modules.events.contributions.schemas import ContributionSchema
 from indico.modules.events.editing.models.comments import EditingRevisionComment
 from indico.modules.events.editing.models.editable import Editable
 from indico.modules.events.editing.models.file_types import EditingFileType
@@ -20,6 +21,12 @@ from indico.modules.events.editing.models.revisions import EditingRevision
 from indico.modules.events.editing.models.tags import EditingTag
 from indico.modules.users.schemas import UserSchema
 from indico.util.struct.enum import IndicoEnum
+
+
+class RevisionState(mm.Schema):
+    title = fields.String()
+    name = fields.String()
+    css_class = fields.String()
 
 
 class EditingFileTypeSchema(mm.ModelSchema):
@@ -73,13 +80,16 @@ class EditingRevisionSchema(mm.ModelSchema):
     editor = fields.Nested(UserSchema, only=('id', 'avatar_bg_color', 'full_name'))
     files = fields.List(fields.Nested(EditingRevisionFileSchema))
     comments = fields.List(fields.Nested(EditingRevisionCommentSchema))
+    initial_state = fields.Nested(RevisionState)
+    final_state = fields.Nested(RevisionState)
 
 
 class EditableSchema(mm.ModelSchema):
     class Meta:
         model = Editable
-        fields = ('id', 'type', 'editor', 'revisions')
+        fields = ('id', 'type', 'editor', 'revisions', 'contribution')
 
+    contribution = fields.Nested(ContributionSchema)
     editor = fields.Nested(UserSchema, only=('id', 'avatar_bg_color', 'full_name'))
     revisions = fields.List(fields.Nested(EditingRevisionSchema))
 

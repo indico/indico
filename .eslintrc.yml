@@ -26,6 +26,7 @@ settings:
         - ['indico/modules/core', './indico/modules/core/client/js']
         - ['indico/modules/rb', './indico/modules/rb/client/js']
         - ['indico/modules/users', './indico/modules/users/client/js']
+        - ['indico/modules/events/reviewing', './indico/modules/events/client/js/reviewing']
         - ['indico', './indico/web/client/js']
       extensions: [.js, .jsx, .json]
   react:

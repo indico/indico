@@ -9,9 +9,13 @@ import fileTypesURL from 'indico-url:event_editing.api_file_types';
 
 import React from 'react';
 import ReactDOM from 'react-dom';
+
 import {camelizeKeys} from 'indico/utils/case';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
+
 import FileManager from './components/FileManager';
+import Timeline from './components/Timeline';
+
 
 document.addEventListener('DOMContentLoaded', async () => {
   const fileManager = document.querySelector('#file-manager');
@@ -22,15 +26,23 @@ document.addEventListener('DOMContentLoaded', async () => {
   } catch (e) {
     handleAxiosError(e);
   }
+
   const fileTypes = camelizeKeys(response.data);
   try {
     response = await indicoAxios.get(fileManager.dataset.apiEditableUrl);
   } catch (e) {
     handleAxiosError(e);
   }
+
   const files = camelizeKeys(response.data.revisions[0].files);
   ReactDOM.render(
     <FileManager fileTypes={fileTypes} files={files} uploadURL={fileManager.dataset.uploadUrl} />,
     fileManager
+  );
+
+  const timelineRootElem = document.getElementById('editing-timeline');
+  ReactDOM.render(
+    <Timeline eventId={timelineRootElem.dataset.eventId} editableId={timelineRootElem.dataset.editableId} />,
+    rootElem
   );
 });
