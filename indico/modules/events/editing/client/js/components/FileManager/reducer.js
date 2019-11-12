@@ -11,13 +11,11 @@ export default function reducer(state, action) {
   const fileType = _.find(state, {id: action.fileTypeId});
   switch (action.type) {
     case 'UPLOAD':
-      action.files.forEach(file => {
-        file.state = 'added';
-      });
+      action.file.state = 'added';
       if (fileType.multiple) {
-        fileType.files = fileType.files.concat(action.files);
+        fileType.files = fileType.files.concat(action.file);
       } else {
-        fileType.files = action.files;
+        fileType.files = [action.file];
       }
       return [...state];
 
