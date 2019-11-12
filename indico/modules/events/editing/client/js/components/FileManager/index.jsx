@@ -10,24 +10,21 @@ import React, {useCallback, useReducer, useContext, useRef, useMemo} from 'react
 import PropTypes from 'prop-types';
 import {useDropzone} from 'react-dropzone';
 import {Button, Icon} from 'semantic-ui-react';
-
 import {Translate} from 'indico/react/i18n';
-
-import {deleteFile, FileManagerContext, filePropTypes, mapFileTypes, uploadFiles} from './util';
+import {
+  FileManagerContext,
+  filePropTypes,
+  fileTypePropTypes,
+  uploadFiles,
+  deleteFile,
+  mapFileTypes,
+} from './util';
 import FileList from './FileList';
 import Uploads from './Uploads';
 import reducer from './reducer';
 import * as actions from './actions';
 
 import './FileManager.module.scss';
-
-const fileTypePropTypes = {
-  name: PropTypes.string.isRequired,
-  files: PropTypes.arrayOf(PropTypes.shape(filePropTypes)),
-  extensions: PropTypes.arrayOf(PropTypes.string).isRequired,
-  allowMultipleFiles: PropTypes.bool.isRequired,
-  id: PropTypes.number.isRequired,
-};
 
 export function Dropzone({uploadURL, fileType: {id, allowMultipleFiles, files}}) {
   const dispatch = useContext(FileManagerContext);

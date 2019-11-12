@@ -23,6 +23,14 @@ export const filePropTypes = {
   state: PropTypes.oneOf(['added', 'modified', 'deleted']),
 };
 
+export const fileTypePropTypes = {
+  name: PropTypes.string.isRequired,
+  files: PropTypes.arrayOf(PropTypes.shape(filePropTypes)),
+  extensions: PropTypes.arrayOf(PropTypes.string).isRequired,
+  allowMultipleFiles: PropTypes.bool.isRequired,
+  id: PropTypes.number.isRequired,
+};
+
 async function uploadFile(file, url, onUploadProgress) {
   const formData = new FormData();
   formData.append('file', file);
