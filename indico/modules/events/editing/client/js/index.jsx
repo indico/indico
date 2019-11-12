@@ -34,5 +34,9 @@ const data = [
 ];
 
 document.addEventListener('DOMContentLoaded', () => {
-  ReactDOM.render(<FileManager fileTypes={data} />, document.getElementById('file-manager'));
+  const fileManager = document.querySelector('#file-manager');
+  ReactDOM.render(
+    <FileManager fileTypes={data} eventId={fileManager.dataset.eventId} />,
+    fileManager
+  );
 });
