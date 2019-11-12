@@ -7,11 +7,13 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.events.editing.controllers.backend import RHEditingFileTypes
+from indico.modules.events.editing.controllers import backend
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
 _bp = IndicoBlueprint('event_editing', __name__, url_prefix='/event/<confId>', template_folder='templates',
                       virtual_template_folder='events/editing')
 
-_bp.add_url_rule('/editing/api/file-types', 'api_file_types', RHEditingFileTypes)
+_bp.add_url_rule('/editing/api/file-types', 'api_file_types', backend.RHEditingFileTypes)
+_bp.add_url_rule('/editing/api/tags', 'api_tags', backend.RHEditingTags)
+_bp.add_url_rule('/editing/api/editable/<int:editable_id>', 'api_editable', backend.RHEditable)
