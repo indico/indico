@@ -15,9 +15,11 @@ import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 
 import FileManager from './components/FileManager';
 import Timeline from './components/Timeline';
+import FileDisplay from './components/FileDisplay';
 
 document.addEventListener('DOMContentLoaded', async () => {
   const fileManager = document.querySelector('#file-manager');
+  const fileDisplay = document.querySelector('#file-display');
   const eventId = fileManager.dataset.eventId;
 
   let response;
@@ -44,6 +46,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     />,
     fileManager
   );
+  ReactDOM.render(<FileDisplay fileTypes={fileTypes} files={files} />, fileDisplay);
 
   const timelineRootElem = document.getElementById('editing-timeline');
   ReactDOM.render(
