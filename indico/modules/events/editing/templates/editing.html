@@ -10,4 +10,5 @@
          data-upload-url="{{ url_for('event_editing.api_upload', event, contrib_id=contribution.id, type='paper') }}"
          data-api-editable-url="{{ url_for('event_editing.api_editable', event, contrib_id=contribution.id, type='paper') }}">
     </div>
+    <div data-event-id="{{ event.id }}" data-editable-id="{{ editable.id }}" id="editing-timeline"></div>
 {% endblock %}
