@@ -16,4 +16,7 @@ _bp = IndicoBlueprint('event_editing', __name__, url_prefix='/event/<confId>', t
 
 _bp.add_url_rule('/editing/api/file-types', 'api_file_types', backend.RHEditingFileTypes)
 _bp.add_url_rule('/editing/api/tags', 'api_tags', backend.RHEditingTags)
-_bp.add_url_rule('/editing/api/editable/<int:editable_id>', 'api_editable', backend.RHEditable)
+
+_bp.add_url_rule('/api/contributions/<int:contrib_id>/editing/<type>', 'api_editable', backend.RHEditable)
+_bp.add_url_rule('/api/contributions/<int:contrib_id>/editing/<type>', 'api_create_editable',
+                 backend.RHCreateEditable, methods=('PUT',))
