@@ -45,7 +45,7 @@ class EditingRevisionFileSchema(mm.ModelSchema):
 
     uuid = fields.String(attribute='file.uuid')
     filename = fields.String(attribute='file.filename')
-    size = fields.String(attribute='file.size')
+    size = fields.Int(attribute='file.size')
     content_type = fields.String(attribute='file.content_type')
     download_url = fields.Constant('#')  # TODO: point to an endpoint that allows downloading paper files
 
