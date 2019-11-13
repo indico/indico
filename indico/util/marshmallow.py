@@ -67,6 +67,49 @@ class NaiveDateTime(UnicodeDateTime):
     }
 
 
+class ModelField(Field):
+    """Marshmallow field for a single database object.
+
+    This serializes an SQLAlchemy object to its identifier (usually the PK),
+    and deserializes from the same kind of identifier back to an SQLAlchemy object.
+    """
+
+    default_error_messages = {
+        'not_found': '"{value}" does not exist',
+        'type': 'Invalid input type.'
+    }
+
+    def __init__(self, model, column=None, column_type=None, get_query=lambda m: m.query, **kwargs):
+        self.model = model
+        self.get_query = get_query
+        if column:
+            self.column = getattr(model, column)
+            # Custom column -> most likely a string value
+            self.column_type = column_type or unicode
+        else:
+            pks = inspect(model).primary_key
+            assert len(pks) == 1
+            self.column = pks[0]
+            # Default PK -> most likely an ID
+            self.column_type = column_type or int
+        super(ModelField, self).__init__(**kwargs)
+
+    def _serialize(self, value, attr, obj):
+        return getattr(value, self.column.key) if value is not None else None
+
+    def _deserialize(self, value, attr, data):
+        if value is None:
+            return None
+        try:
+            value = self.column_type(value)
+        except (TypeError, ValueError):
+            self.fail('type')
+        obj = self.get_query(self.model).filter(self.column == value).one_or_none()
+        if obj is None:
+            self.fail('not_found', value=value)
+        return obj
+
+
 class ModelList(Field):
     """Marshmallow field for a list of database objects.
 
