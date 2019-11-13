@@ -14,6 +14,8 @@ Improvements
   :user:`bpedersen2`)
 - Use lat/lng field order instead of lng/lat when editing rooms (:issue:`4150`,
   thanks :user:`bpedersen2`)
+- Add additional fields to the contribution csv/xlsx export (authors and board
+  number) (:issue:`4148`, thanks :user:`bpedersen2`)
 
 Bugfixes
 ^^^^^^^^
