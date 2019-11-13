@@ -7,6 +7,12 @@ Version 2.2.5
 
 *Unreleased*
 
+Improvements
+^^^^^^^^^^^^
+
+- Sort posters in timetable PDF export by board number (:issue:`4147`, thanks
+  :user:`bpedersen2`)
+
 Bugfixes
 ^^^^^^^^
 
