@@ -19,8 +19,7 @@ export default function TimelineHeader({children, contribution, state, submitter
       <div className="submission-title flexrow">
         <MathJax>
           <h3 className="f-self-strech">
-            <Param name="title" value={contribution.title} />{' '}
-            <span className="submission-id">#{contribution.friendlyId}</span>
+            {contribution.title} <span className="submission-id">#{contribution.friendlyId}</span>
           </h3>
         </MathJax>
       </div>
@@ -55,8 +54,8 @@ export default function TimelineHeader({children, contribution, state, submitter
 
 TimelineHeader.propTypes = {
   contribution: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    friendlyId: PropTypes.string.isRequired,
+    id: PropTypes.number.isRequired,
+    friendlyId: PropTypes.number.isRequired,
     title: PropTypes.string.isRequired,
   }).isRequired,
   state: PropTypes.shape({
