@@ -20,7 +20,8 @@ from indico.core.db import db
 from indico.core.errors import UserValueError
 from indico.modules.attachments.util import get_attached_items
 from indico.modules.events.contributions.models.contributions import Contribution
-from indico.modules.events.contributions.models.persons import ContributionPersonLink, SubContributionPersonLink
+from indico.modules.events.contributions.models.persons import (AuthorType, ContributionPersonLink,
+                                                                SubContributionPersonLink)
 from indico.modules.events.contributions.models.principals import ContributionPrincipal
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.contributions.operations import create_contribution
@@ -97,7 +98,13 @@ def generate_spreadsheet_from_contributions(contributions):
     """Return a tuple consisting of spreadsheet columns and respective
     contribution values"""
 
+    has_board_number = any(c.board_number for c in contributions)
+    has_authors = any(pl.author_type != AuthorType.none for c in contributions for pl in c.person_links)
     headers = ['Id', 'Title', 'Description', 'Date', 'Duration', 'Type', 'Session', 'Track', 'Presenters', 'Materials']
+    if has_authors:
+        headers += ['Authors', 'Co-Authors']
+    if has_board_number:
+        headers.append('Board number')
     rows = []
     for c in sorted(contributions, key=attrgetter('friendly_id')):
         contrib_data = {'Id': c.friendly_id, 'Title': c.title, 'Description': c.description,
@@ -108,6 +115,13 @@ def generate_spreadsheet_from_contributions(contributions):
                         'Track': c.track.title if c.track else None,
                         'Materials': None,
                         'Presenters': ', '.join(speaker.full_name for speaker in c.speakers)}
+        if has_authors:
+            contrib_data.update({
+                'Authors': ', '.join(author.full_name for author in c.primary_authors),
+                'Co-Authors': ', '.join(author.full_name for author in c.secondary_authors)
+            })
+        if has_board_number:
+            contrib_data['Board number'] = c.board_number
 
         attachments = []
         attached_items = get_attached_items(c)
