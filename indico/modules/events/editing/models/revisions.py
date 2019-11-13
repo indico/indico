@@ -111,7 +111,8 @@ class EditingRevision(RenderModeMixin, db.Model):
         backref=db.backref(
             'revisions',
             lazy=True,
-            order_by=created_dt
+            order_by=created_dt,
+            cascade='all, delete-orphan'
         )
     )
     submitter = db.relationship(
