@@ -8,6 +8,7 @@
 from __future__ import absolute_import, unicode_literals
 
 import re
+from uuid import UUID
 
 from dateutil import parser, relativedelta
 from marshmallow import ValidationError
@@ -246,3 +247,22 @@ class HumanizedDate(Field):
             today = now_utc(False)
             number = int(m.group('number'))
             return today + relativedelta.relativedelta(**{HUMANIZED_UNIT_MAP[unit]: number})
+
+
+class FilesField(ModelList):
+    """Marshmallow field for a list of previously-uploaded files"""
+
+    default_error_messages = dict(ModelList.default_error_messages, **{
+        'claimed': 'File has already been claimed',
+    })
+
+    def __init__(self, allow_claimed=False, **kwargs):
+        from indico.modules.files.models.files import File
+        self.allow_claimed = allow_claimed
+        super(FilesField, self).__init__(model=File, column='uuid', column_type=UUID, **kwargs)
+
+    def _deserialize(self, value, attr, data):
+        rv = super(FilesField, self)._deserialize(value, attr, data)
+        if not self.allow_claimed and any(f.claimed for f in rv):
+            self.fail('claimed')
+        return rv
