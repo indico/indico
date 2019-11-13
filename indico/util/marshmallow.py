@@ -123,8 +123,9 @@ class ModelList(Field):
         'type': 'Invalid input type.'
     }
 
-    def __init__(self, model, column=None, column_type=None, **kwargs):
+    def __init__(self, model, column=None, column_type=None, get_query=lambda m: m.query, **kwargs):
         self.model = model
+        self.get_query = get_query
         if column:
             self.column = getattr(model, column)
             # Custom column -> most likely a string value
@@ -148,7 +149,7 @@ class ModelList(Field):
         except (TypeError, ValueError):
             self.fail('type')
         requested = set(value)
-        objs = self.model.query.filter(self.column.in_(value)).all()
+        objs = self.get_query(self.model).filter(self.column.in_(value)).all()
         found = {getattr(x, self.column.key) for x in objs}
         invalid = requested - found
         if invalid:
