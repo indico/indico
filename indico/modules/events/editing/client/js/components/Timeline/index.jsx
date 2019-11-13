@@ -10,13 +10,14 @@ import React, {useEffect, useReducer} from 'react';
 import PropTypes from 'prop-types';
 import {Loader} from 'semantic-ui-react';
 
-import UserAvatar from 'indico/modules/events/reviewing/components/UserAvatar';
 import TimelineHeader from 'indico/modules/events/reviewing/components/TimelineHeader';
+import TimelineContent from 'indico/modules/events/reviewing/components/TimelineContent';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {camelizeKeys} from 'indico/utils/case';
 
-import reducer from './reducer';
 import * as actions from './actions';
+import reducer from './reducer';
+import * as selectors from './selectors';
 
 export default function Timeline({eventId, editableId}) {
   const [{details, isLoading}, dispatch] = useReducer(reducer, {
@@ -46,21 +47,24 @@ export default function Timeline({eventId, editableId}) {
     return null;
   }
 
-  const {contribution, revisions} = details;
+  const {contribution, revisions} = selectors.processDetails(details);
 
   const lastRevision = revisions[revisions.length - 1];
   const state =
     lastRevision.finalState.name === 'none' ? lastRevision.initialState : lastRevision.finalState;
 
   return (
-    <TimelineHeader
-      contribution={contribution}
-      state={state}
-      submitter={revisions[0].submitter}
-      eventId={eventId}
-    >
-      STUFF
-    </TimelineHeader>
+    <>
+      <TimelineHeader
+        contribution={contribution}
+        state={state}
+        submitter={revisions[0].submitter}
+        eventId={eventId}
+      >
+        STUFF
+      </TimelineHeader>
+      <TimelineContent revisions={revisions} />
+    </>
   );
 }
 
