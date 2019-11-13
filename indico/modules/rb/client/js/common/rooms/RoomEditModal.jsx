@@ -284,8 +284,8 @@ const columns = [
       content: [
         {
           type: 'input',
-          name: 'longitude',
-          label: Translate.string('Longitude'),
+          name: 'latitude',
+          label: Translate.string('Latitude'),
           inputArgs: {
             type: 'text',
             fluid: true,
@@ -295,8 +295,8 @@ const columns = [
         },
         {
           type: 'input',
-          name: 'latitude',
-          label: Translate.string('Latitude'),
+          name: 'longitude',
+          label: Translate.string('Longitude'),
           inputArgs: {
             type: 'text',
             fluid: true,
