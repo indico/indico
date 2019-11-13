@@ -12,6 +12,8 @@ Improvements
 
 - Sort posters in timetable PDF export by board number (:issue:`4147`, thanks
   :user:`bpedersen2`)
+- Use lat/lng field order instead of lng/lat when editing rooms (:issue:`4150`,
+  thanks :user:`bpedersen2`)
 
 Bugfixes
 ^^^^^^^^
