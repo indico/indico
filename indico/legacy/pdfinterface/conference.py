@@ -30,8 +30,8 @@ from indico.modules.events.timetable.models.entries import TimetableEntry, Timet
 from indico.modules.events.tracks.settings import track_settings
 from indico.util.date_time import format_date, format_datetime, format_human_timedelta, format_time, now_utc
 from indico.util.i18n import _, ngettext
-from indico.util.string import (format_full_name, html_color_to_rgb, render_markdown, sanitize_for_platypus, strip_tags,
-                                to_unicode, truncate)
+from indico.util.string import (format_full_name, html_color_to_rgb, natural_sort_key, render_markdown,
+                                sanitize_for_platypus, strip_tags, to_unicode, truncate)
 
 
 # Change reportlab default pdf font Helvetica to indico ttf font,
@@ -580,7 +580,7 @@ class TimeTablePlain(PDFWithTOC):
                 ts = deepcopy(originalts)
                 contribs = sorted(sess_block.contributions, key=attrgetter('timetable_entry.start_dt'))
                 if sess_block.session.is_poster:
-                    for contrib in contribs:
+                    for contrib in sorted(contribs, key=lambda x: natural_sort_key(x.board_number)):
                         self._processPosterContribution(contrib, l)
 
                     if l:
