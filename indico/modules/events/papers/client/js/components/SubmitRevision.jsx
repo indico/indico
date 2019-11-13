@@ -11,11 +11,11 @@ import React, {useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {Button} from 'semantic-ui-react';
 
+import UserAvatar from 'indico/modules/events/reviewing/components/UserAvatar';
 import {FileSubmission} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 
-import UserAvatar from './UserAvatar';
 import {fetchPaperDetails} from '../actions';
 import {getCurrentUser, getPaperDetails} from '../selectors';
 import {PaperState} from '../models';

@@ -12,6 +12,7 @@ import moment from 'moment';
 import {useSelector} from 'react-redux';
 import {Transition} from 'semantic-ui-react';
 
+import UserAvatar from 'indico/modules/events/reviewing/components/UserAvatar';
 import {Param, Translate} from 'indico/react/i18n';
 import {serializeDate} from 'indico/utils/date';
 
@@ -19,7 +20,6 @@ import PaperReviewForm from './PaperReviewForm';
 import RevisionJudgment from './RevisionJudgment';
 import RevisionTimeline from './RevisionTimeline';
 import SubmitRevision from './SubmitRevision';
-import UserAvatar from './UserAvatar';
 import {canCommentPaper, canReviewPaper, getPaperDetails} from '../selectors';
 
 export default function TimelineItem({revision}) {
