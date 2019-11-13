@@ -11,13 +11,13 @@ import moment from 'moment';
 import {useDispatch, useSelector} from 'react-redux';
 import {Button, Confirm} from 'semantic-ui-react';
 
+import UserAvatar from 'indico/modules/events/reviewing/components/UserAvatar';
 import {Param, Translate} from 'indico/react/i18n';
 import {serializeDate} from 'indico/utils/date';
 
 import {resetPaperJudgment} from '../actions';
 import {getPaperDetails, isPaperStateResetInProgress} from '../selectors';
 import {PaperState} from '../models';
-import UserAvatar from './UserAvatar';
 
 export default function RevisionJudgment({revision}) {
   const {state, judge, isLastRevision, judgmentCommentHtml, judgmentDt} = revision;

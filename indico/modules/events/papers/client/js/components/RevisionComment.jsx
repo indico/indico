@@ -11,13 +11,13 @@ import moment from 'moment';
 import {useDispatch, useSelector} from 'react-redux';
 import {Button, Confirm} from 'semantic-ui-react';
 
+import UserAvatar from 'indico/modules/events/reviewing/components/UserAvatar';
 import {serializeDate} from 'indico/utils/date';
 import {Param, Translate} from 'indico/react/i18n';
 
 import {deleteComment} from '../actions';
 import {CommentVisibility} from '../models';
 import {getPaperContribution, getPaperEvent, isDeletingComment} from '../selectors';
-import UserAvatar from './UserAvatar';
 
 export default function RevisionComment({comment, revision}) {
   const dispatch = useDispatch();

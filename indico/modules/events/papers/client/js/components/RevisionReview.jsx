@@ -10,11 +10,10 @@ import PropTypes from 'prop-types';
 import moment from 'moment';
 import {useSelector} from 'react-redux';
 
+import UserAvatar from 'indico/modules/events/reviewing/components/UserAvatar';
 import {Param, Translate} from 'indico/react/i18n';
 import {serializeDate} from 'indico/utils/date';
 import {getPaperDetails} from '../selectors';
-
-import UserAvatar from './UserAvatar';
 
 export default function RevisionReview({review}) {
   const {

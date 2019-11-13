@@ -10,6 +10,7 @@ import React, {useEffect, useReducer} from 'react';
 import PropTypes from 'prop-types';
 import {Loader} from 'semantic-ui-react';
 
+import UserAvatar from 'indico/modules/events/reviewing/components/UserAvatar';
 import TimelineHeader from 'indico/modules/events/reviewing/components/TimelineHeader';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {camelizeKeys} from 'indico/utils/case';

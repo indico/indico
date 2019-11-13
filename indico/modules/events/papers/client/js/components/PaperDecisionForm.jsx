@@ -10,12 +10,12 @@ import {useDispatch, useSelector} from 'react-redux';
 import {Form as FinalForm} from 'react-final-form';
 import {Form} from 'semantic-ui-react';
 
+import UserAvatar from 'indico/modules/events/reviewing/components/UserAvatar';
 import {FinalDropdown, FinalSubmitButton, FinalTextArea} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 
 import {judgePaper} from '../actions';
 import {canJudgePaper, getCurrentUser, getPaperDetails, isEventLocked} from '../selectors';
-import UserAvatar from './UserAvatar';
 
 import './PaperDecisionForm.module.scss';
 
