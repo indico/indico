@@ -10,10 +10,11 @@ from __future__ import unicode_literals
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.events.editing import logger
+from indico.modules.events.editing.models.comments import EditingRevisionComment
 from indico.modules.events.editing.models.editable import Editable
 from indico.modules.events.editing.models.revision_files import EditingRevisionFile
 from indico.modules.events.editing.models.revisions import EditingRevision, FinalRevisionState, InitialRevisionState
-from indico.modules.events.editing.schemas import EditingReviewAction
+from indico.modules.events.editing.schemas import EditingConfirmationAction, EditingReviewAction
 
 
 def _make_editable_files(editable, files):
@@ -70,3 +71,23 @@ def review_editable_revision(revision, editor, action, comment, tags, files=None
         revision.editable.revisions.append(new_revision)
     db.session.flush()
     logger.info('Revision %r reviewed by %s [%s]', revision, editor, action.name)
+
+
+@no_autoflush
+def create_revision_comment(revision, submitter, comment):
+    revision.comments.append(EditingRevisionComment(user=submitter, text=comment))
+    db.session.flush()
+
+
+@no_autoflush
+def confirm_editable_changes(revision, submitter, action, comment):
+    revision.final_state = {
+        EditingConfirmationAction.accept: FinalRevisionState.accepted,
+        EditingConfirmationAction.reject: FinalRevisionState.needs_submitter_changes,
+    }[action]
+    if comment:
+        create_revision_comment(revision, submitter, comment)
+    if action == EditingConfirmationAction.accept:
+        publish_editable_revision(revision)
+    db.session.flush()
+    logger.info('Revision %r confirmed by %s [%s]', revision, submitter, action.name)

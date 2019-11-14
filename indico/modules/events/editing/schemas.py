@@ -99,3 +99,8 @@ class ReviewEditableArgs(mm.Schema):
     def validate_everything(self, data):
         if data['action'] != EditingReviewAction.accept and not data['comment']:
             raise ValidationError('This field is required', 'comment')
+
+
+class EditingConfirmationAction(IndicoEnum):
+    accept = 'accept'
+    reject = 'reject'

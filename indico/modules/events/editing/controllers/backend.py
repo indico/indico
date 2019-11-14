@@ -8,6 +8,8 @@
 from __future__ import unicode_literals
 
 from flask import request, session
+from marshmallow import fields
+from marshmallow_enum import EnumField
 from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.core.errors import UserValueError
@@ -15,9 +17,10 @@ from indico.modules.events.contributions.controllers.display import RHContributi
 from indico.modules.events.controllers.base import RHEventBase
 from indico.modules.events.editing.fields import EditingFilesField, EditingTagsField
 from indico.modules.events.editing.models.editable import Editable, EditableType
-from indico.modules.events.editing.operations import create_new_editable, review_editable_revision
-from indico.modules.events.editing.schemas import (EditableSchema, EditingFileTypeSchema, EditingReviewAction,
-                                                   EditingTagSchema, ReviewEditableArgs)
+from indico.modules.events.editing.operations import (confirm_editable_changes, create_new_editable,
+                                                      review_editable_revision)
+from indico.modules.events.editing.schemas import (EditableSchema, EditingConfirmationAction, EditingFileTypeSchema,
+                                                   EditingReviewAction, EditingTagSchema, ReviewEditableArgs)
 from indico.util.i18n import _
 from indico.web.args import parser, use_kwargs
 
@@ -101,4 +104,14 @@ class RHReviewEditable(RHContributionEditableRevisionBase):
             argmap['files'] = EditingFilesField(self.event, allow_claimed_files=True, required=True)
         args = parser.parse(argmap)
         review_editable_revision(self.revision, session.user, action, comment, args['tags'], args.get('files'))
+        return '', 204
+
+
+class RHConfirmEditableChanges(RHContributionEditableRevisionBase):
+    @use_kwargs({
+        'action': EnumField(EditingConfirmationAction, required=True),
+        'comment': fields.String(missing='')
+    })
+    def _process(self, action, comment):
+        confirm_editable_changes(self.revision, session.user, action, comment)
         return '', 204

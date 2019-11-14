@@ -23,3 +23,5 @@ _bp.add_url_rule('/api/contributions/<int:contrib_id>/editing/<any(paper):type>'
                  'api_create_editable', backend.RHCreateEditable, methods=('PUT',))
 _bp.add_url_rule('/api/contributions/<int:contrib_id>/editing/<any(paper):type>/<int:revision_id>/review',
                  'api_review_editable', backend.RHReviewEditable, methods=('POST',))
+_bp.add_url_rule('/api/contributions/<int:contrib_id>/editing/<any(paper):type>/<int:revision_id>/confirm',
+                 'api_confirm_changes', backend.RHConfirmEditableChanges, methods=('POST',))
