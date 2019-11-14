@@ -5,79 +5,129 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React, {useContext, useRef} from 'react';
+import React, {useContext, useRef, useState} from 'react';
 import PropTypes from 'prop-types';
 import Dropzone from 'react-dropzone';
 import {Icon} from 'semantic-ui-react';
-import {FileManagerContext, filePropTypes, uploadFiles} from './util';
+import {FileManagerContext, filePropTypes, uploadFiles, deleteFile} from './util';
 import * as actions from './actions';
 
 import './FileManager.module.scss';
 
-export default function FileList({files, fileTypeId, multiple, eventId}) {
-  const dispatch = useContext(FileManagerContext);
+function FileAction({onClick, active, icon, className}) {
+  return (
+    <Icon
+      className={className}
+      name={active ? 'spinner' : icon}
+      loading={active}
+      onClick={() => {
+        if (!active) {
+          onClick();
+        }
+      }}
+    />
+  );
+}
+
+FileAction.propTypes = {
+  onClick: PropTypes.func.isRequired,
+  active: PropTypes.bool.isRequired,
+  icon: PropTypes.string.isRequired,
+  className: PropTypes.string.isRequired,
+};
+
+function FileEntry({eventId, fileTypeId, multiple, file: {uuid, filename, state, claimed}}) {
   const ref = useRef(null);
+  const dispatch = useContext(FileManagerContext);
+  const [activeButton, setActiveButton] = useState(null);
 
   return (
+    <>
+      <span styleName="file-state" className={state || ''}>
+        {filename}
+      </span>
+      <span>
+        {!state && multiple && (
+          <>
+            <FileAction
+              icon="exchange"
+              active={activeButton === 'replace'}
+              styleName="exchange-icon"
+              onClick={() => {
+                ref.current.open();
+              }}
+            />
+            <Dropzone
+              ref={ref}
+              onDrop={async acceptedFiles => {
+                setActiveButton('replace');
+                await uploadFiles(
+                  actions.markModified,
+                  fileTypeId,
+                  acceptedFiles,
+                  eventId,
+                  dispatch,
+                  uuid
+                );
+              }}
+            >
+              {({getRootProps, getInputProps}) => (
+                <span {...getRootProps()}>
+                  <input {...getInputProps()} />
+                </span>
+              )}
+            </Dropzone>
+          </>
+        )}
+        {state !== 'deleted' && state !== 'modified' ? (
+          <FileAction
+            styleName="delete-icon"
+            icon="trash"
+            active={activeButton === 'delete'}
+            onClick={async () => {
+              if (!claimed) {
+                // if the file is not part of the revision yet,
+                // we can safely delete it from the server
+                setActiveButton('delete');
+                await deleteFile(uuid);
+                setActiveButton(null);
+              }
+              dispatch(actions.markDeleted(fileTypeId, uuid));
+            }}
+          />
+        ) : (
+          <FileAction
+            icon="undo"
+            active={activeButton === 'undo'}
+            styleName="undo-icon"
+            onClick={async () => {
+              if (!claimed) {
+                setActiveButton('undo');
+                await deleteFile(uuid);
+                setActiveButton(null);
+              }
+              dispatch((state === 'deleted' ? actions.undelete : actions.revert)(fileTypeId, uuid));
+            }}
+          />
+        )}
+      </span>
+    </>
+  );
+}
+
+FileEntry.propTypes = {
+  eventId: PropTypes.string.isRequired,
+  fileTypeId: PropTypes.string.isRequired,
+  multiple: PropTypes.bool.isRequired,
+  file: PropTypes.shape(filePropTypes).isRequired,
+};
+
+export default function FileList({files, fileTypeId, multiple, eventId}) {
+  return (
     <ul styleName="file-list">
-      {files.map(({name, id, state}) => (
-        <li key={id} styleName="file-row">
-          <span styleName="file-state" className={state || ''}>
-            {name}
-          </span>
-          <span>
-            {!state && multiple && (
-              <>
-                <Icon
-                  styleName="exchange-icon"
-                  name="exchange"
-                  onClick={() => {
-                    ref.current.open();
-                  }}
-                />
-                <Dropzone
-                  ref={ref}
-                  onDrop={acceptedFiles =>
-                    uploadFiles(
-                      actions.markModified,
-                      fileTypeId,
-                      acceptedFiles,
-                      eventId,
-                      dispatch,
-                      id
-                    )
-                  }
-                >
-                  {({getRootProps, getInputProps}) => (
-                    <span {...getRootProps()}>
-                      <input {...getInputProps()} />
-                    </span>
-                  )}
-                </Dropzone>
-              </>
-            )}
-            {state !== 'deleted' && state !== 'modified' && (
-              <Icon
-                styleName="delete-icon"
-                onClick={() => dispatch(actions.markDeleted(fileTypeId, id))}
-                name="trash"
-              />
-            )}
-            {state === 'deleted' && (
-              <Icon
-                styleName="undo-icon"
-                onClick={() => dispatch(actions.undelete(fileTypeId, id))}
-                name="undo"
-              />
-            )}
-            {state === 'modified' && (
-              <Icon
-                styleName="undo-icon"
-                onClick={() => dispatch(actions.revert(fileTypeId, id))}
-                name="undo"
-              />
-            )}
-          </span>
+      {files.map(file => (
+        <li key={file.uuid} styleName="file-row">
+          <FileEntry fileTypeId={fileTypeId} eventId={eventId} multiple={multiple} file={file} />
         </li>
       ))}
     </ul>
@@ -85,7 +135,7 @@ export default function FileList({files, fileTypeId, multiple, eventId}) {
 }
 
 FileList.propTypes = {
-  files: filePropTypes.isRequired,
+  files: PropTypes.arrayOf(PropTypes.shape(filePropTypes)).isRequired,
   fileTypeId: PropTypes.string.isRequired,
   multiple: PropTypes.bool.isRequired,
   eventId: PropTypes.string.isRequired,
