@@ -13,7 +13,8 @@ from marshmallow import ValidationError
 from marshmallow.fields import Dict
 
 from indico.modules.events.editing.models.file_types import EditingFileType
-from indico.util.marshmallow import FilesField, ModelField
+from indico.modules.events.editing.models.tags import EditingTag
+from indico.util.marshmallow import FilesField, ModelField, ModelList
 
 
 class EditingFilesField(Dict):
@@ -55,3 +56,14 @@ class EditingFilesField(Dict):
                                       .format(', '.join(unicode(f.uuid) for f in duplicates)))
 
             seen |= set(files)
+
+
+class EditingTagsField(ModelList):
+    def __init__(self, event, allow_system_tags=False, **kwargs):
+        def _get_query(m):
+            query = m.query.with_parent(event)
+            if not allow_system_tags:
+                query = query.filter_by(system=False)
+            return query
+
+        super(EditingTagsField, self).__init__(model=EditingTag, get_query=_get_query, collection_class=set, **kwargs)

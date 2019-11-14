@@ -8,7 +8,8 @@
 from __future__ import unicode_literals
 
 from markupsafe import escape
-from marshmallow import fields, post_dump
+from marshmallow import ValidationError, fields, post_dump, validates_schema
+from marshmallow_enum import EnumField
 
 from indico.core.marshmallow import mm
 from indico.modules.events.editing.models.comments import EditingRevisionComment
@@ -18,6 +19,7 @@ from indico.modules.events.editing.models.revision_files import EditingRevisionF
 from indico.modules.events.editing.models.revisions import EditingRevision
 from indico.modules.events.editing.models.tags import EditingTag
 from indico.modules.users.schemas import UserSchema
+from indico.util.struct.enum import IndicoEnum
 
 
 class EditingFileTypeSchema(mm.ModelSchema):
@@ -80,3 +82,20 @@ class EditableSchema(mm.ModelSchema):
 
     editor = fields.Nested(UserSchema, only=('id', 'avatar_bg_color', 'full_name'))
     revisions = fields.List(fields.Nested(EditingRevisionSchema))
+
+
+class EditingReviewAction(IndicoEnum):
+    accept = 'accept'
+    reject = 'reject'
+    update = 'update'
+    request_update = 'request_update'
+
+
+class ReviewEditableArgs(mm.Schema):
+    action = EnumField(EditingReviewAction, required=True)
+    comment = fields.String(missing='')
+
+    @validates_schema(skip_on_field_errors=True)
+    def validate_everything(self, data):
+        if data['action'] != EditingReviewAction.accept and not data['comment']:
+            raise ValidationError('This field is required', 'comment')
