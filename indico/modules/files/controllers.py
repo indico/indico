@@ -65,8 +65,7 @@ class RHDeleteFile(RHFileBase):
 
     def _process(self):
         file_repr = repr(self.file)
-        self.file.delete()
-        db.session.delete(self.file)
+        self.file.delete(delete_from_db=True)
         logger.info('File %s deleted', file_repr)
         return '', 204
 
