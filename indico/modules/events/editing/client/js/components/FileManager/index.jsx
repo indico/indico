@@ -70,7 +70,12 @@ function FileType({eventId, fileType, uploads}) {
   return (
     <div styleName="file-type">
       <h3>{fileType.name}</h3>
-      <FileList files={fileType.files} fileTypeId={fileType.id} multiple={fileType.multiple} />
+      <FileList
+        files={fileType.files}
+        fileTypeId={fileType.id}
+        multiple={fileType.multiple}
+        eventId={eventId}
+      />
       {!_.isEmpty(uploads) && <Uploads uploads={uploads} />}
       <Dropzone dropzoneRef={ref} fileType={fileType} eventId={eventId} />
     </div>
