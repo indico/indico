@@ -45,7 +45,7 @@ def _make_state_check():
     return re.sub(r'\s+', ' ', '''
         (initial_state={i_new} AND final_state IN ({f_none}, {f_replaced})) OR
         (initial_state={i_ready_for_review}) OR
-        (initial_state={i_needs_confirmation} AND (final_state IN ({f_needs_changes},{f_accepted})))
+        (initial_state={i_needs_confirmation} AND (final_state IN ({f_none}, {f_needs_changes}, {f_accepted})))
     '''.format(i_new=InitialRevisionState.new,
                i_ready_for_review=InitialRevisionState.ready_for_review,
                i_needs_confirmation=InitialRevisionState.needs_submitter_confirmation,

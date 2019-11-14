@@ -49,7 +49,7 @@ def upgrade():
         sa.ForeignKeyConstraint(['editor_id'], ['users.users.id']),
         sa.ForeignKeyConstraint(['submitter_id'], ['users.users.id']),
         sa.CheckConstraint('(initial_state=1 AND final_state IN (0,1)) OR (initial_state=2) OR '
-                           '(initial_state=3 AND (final_state IN (3,4)))', name='valid_state_combination'),
+                           '(initial_state=3 AND (final_state IN (0,3,4)))', name='valid_state_combination'),
         sa.PrimaryKeyConstraint('id'),
         schema='event_editing'
     )
