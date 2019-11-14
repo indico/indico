@@ -9,29 +9,22 @@ import React, {useContext, useRef} from 'react';
 import PropTypes from 'prop-types';
 import Dropzone from 'react-dropzone';
 import {Icon} from 'semantic-ui-react';
-import {FileManagerContext, filePropTypes} from './util';
-import styles from './FileManager.module.scss';
+import {FileManagerContext, filePropTypes, uploadFiles} from './util';
+import * as actions from './actions';
 
-export default function FileList({files, fileTypeId, multiple}) {
+import './FileManager.module.scss';
+
+export default function FileList({files, fileTypeId, multiple, eventId}) {
   const dispatch = useContext(FileManagerContext);
   const ref = useRef(null);
-
-  function onModifyDrop(fileId) {
-    return acceptedFiles => {
-      dispatch({
-        type: 'MODIFY',
-        fileTypeId,
-        fileId,
-        file: {name: acceptedFiles[0].name, id: 'file2', url: 'file2url', claimed: false},
-      });
-    };
-  }
 
   return (
     <ul styleName="file-list">
       {files.map(({name, id, state}) => (
         <li key={id} styleName="file-row">
-          <span className={`${styles['file-state']} ${state || ''}`}>{name}</span>
+          <span styleName="file-state" className={state || ''}>
+            {name}
+          </span>
           <span>
             {!state && multiple && (
               <>
@@ -42,7 +35,19 @@ export default function FileList({files, fileTypeId, multiple}) {
                     ref.current.open();
                   }}
                 />
-                <Dropzone ref={ref} onDrop={onModifyDrop(id)}>
+                <Dropzone
+                  ref={ref}
+                  onDrop={acceptedFiles =>
+                    uploadFiles(
+                      actions.markModified,
+                      fileTypeId,
+                      acceptedFiles,
+                      eventId,
+                      dispatch,
+                      id
+                    )
+                  }
+                >
                   {({getRootProps, getInputProps}) => (
                     <span {...getRootProps()}>
                       <input {...getInputProps()} />
@@ -83,4 +88,5 @@ FileList.propTypes = {
   files: filePropTypes.isRequired,
   fileTypeId: PropTypes.string.isRequired,
   multiple: PropTypes.bool.isRequired,
+  eventId: PropTypes.string.isRequired,
 };
