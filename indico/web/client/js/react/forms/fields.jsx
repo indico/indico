@@ -170,7 +170,9 @@ CheckboxAdapter.propTypes = {
 };
 
 function DropdownAdapter(props) {
-  const {input, required, clearable, isMultiple, ...rest} = props;
+  const {input, required, clearable, isMultiple, width, ...rest} = props;
+  const fieldProps = width !== null ? {width} : {};
+
   return (
     <FormFieldAdapter
       input={input}
@@ -181,6 +183,7 @@ function DropdownAdapter(props) {
       multiple={isMultiple}
       undefinedValue={isMultiple ? [] : null}
       selectOnBlur={false}
+      fieldProps={fieldProps}
       getValue={(__, {value}) => value}
     />
   );
@@ -191,12 +194,14 @@ DropdownAdapter.propTypes = {
   required: PropTypes.bool,
   clearable: PropTypes.bool,
   isMultiple: PropTypes.bool,
+  width: PropTypes.number,
 };
 
 DropdownAdapter.defaultProps = {
   required: false,
   clearable: undefined,
   isMultiple: false,
+  width: null,
 };
 
 /**
