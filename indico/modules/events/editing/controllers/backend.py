@@ -27,16 +27,22 @@ from indico.web.args import parser, use_kwargs
 
 
 class RHEditingFileTypes(RHEventBase):
+    """Return all editing file types defined in the event."""
+
     def _process(self):
         return EditingFileTypeSchema(many=True).jsonify(self.event.editing_file_types)
 
 
 class RHEditingTags(RHEventBase):
+    """Return all editing tags defined in the event."""
+
     def _process(self):
         return EditingTagSchema(many=True).jsonify(self.event.editing_tags)
 
 
 class RHContributionEditableBase(RHContributionDisplayBase):
+    """Base class for operations on an editable."""
+
     normalize_url_spec = {
         'locators': {
             lambda self: self.contrib
@@ -70,6 +76,8 @@ class RHContributionEditableBase(RHContributionDisplayBase):
 
 
 class RHContributionEditableRevisionBase(RHContributionEditableBase):
+    """Base class for operations on the latest revision of an Editable."""
+
     normalize_url_spec = {
         'locators': {
             lambda self: self.contrib
@@ -95,6 +103,8 @@ class RHContributionEditableRevisionBase(RHContributionEditableBase):
 
 
 class RHEditable(RHContributionEditableBase):
+    """Retrieve an Editable with all its data."""
+
     def _check_access(self):
         RHContributionEditableBase._check_access(self)
         if self.event.can_manage(session.user):
@@ -107,6 +117,8 @@ class RHEditable(RHContributionEditableBase):
 
 
 class RHCreateEditable(RHContributionEditableBase):
+    """Create a new Editable for a contribution."""
+
     def _check_access(self):
         RHContributionEditableBase._check_access(self)
         if not self._user_is_authorized_submitter():
@@ -127,6 +139,8 @@ class RHCreateEditable(RHContributionEditableBase):
 
 
 class RHReviewEditable(RHContributionEditableRevisionBase):
+    """Review the latest revision of an Editable."""
+
     def _check_revision_access(self):
         if not self._user_is_authorized_editor():
             return False
@@ -145,6 +159,8 @@ class RHReviewEditable(RHContributionEditableRevisionBase):
 
 
 class RHConfirmEditableChanges(RHContributionEditableRevisionBase):
+    """Confirm/reject the changes made by the editor on an Editable."""
+
     def _check_revision_access(self):
         if not self._user_is_authorized_submitter():
             return False
