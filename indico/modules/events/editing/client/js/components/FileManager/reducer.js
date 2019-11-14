@@ -23,7 +23,7 @@ export default combineReducers({
         return [...state];
 
       case actions.MARK_DELETED: {
-        const file = _.find(fileType.files, {id: action.fileId});
+        const file = _.find(fileType.files, {uuid: action.fileId});
         if (file.claimed) {
           file.state = 'deleted';
         } else {
@@ -33,10 +33,16 @@ export default combineReducers({
       }
 
       case actions.MARK_MODIFIED: {
-        const originalFile = _.find(fileType.files, {id: action.fileId});
+        const currentFile = _.find(fileType.files, {uuid: action.fileId});
         fileType.files = fileType.files.map(file => {
-          if (file.id === action.fileId) {
-            return {state: 'modified', originalFile, ...action.file};
+          if (file.uuid === action.fileId) {
+            return {
+              state: 'modified',
+              // if the current file is already a "replacement", then let's preserve
+              // the "pointer" to the original file (we only allow undo to the initial file)
+              originalFile: currentFile.originalFile || currentFile,
+              ...action.file,
+            };
           } else {
             return file;
           }
@@ -45,14 +51,14 @@ export default combineReducers({
       }
 
       case actions.UNDELETE: {
-        const file = _.find(fileType.files, {id: action.fileId});
+        const file = _.find(fileType.files, {uuid: action.fileId});
         file.state = null;
         return [...state];
       }
 
       case actions.REVERT: {
         fileType.files = fileType.files.map(file => {
-          if (file.id === action.fileId) {
+          if (file.uuid === action.fileId) {
             return {state: null, ...file.originalFile};
           } else {
             return file;

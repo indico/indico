@@ -15,21 +15,24 @@ const data = [
     name: 'Source file',
     contentTypes: ['text/plain'],
     multiple: false,
-    files: [{name: 'file1.txt', url: 'file1url', id: 'file1', claimed: true}],
+    files: [{filename: 'file1.txt', url: 'file1url', uuid: 'file1', claimed: true}],
   },
   {
     id: '2',
     name: 'PDF file',
     contentTypes: ['application/pdf'],
     multiple: false,
-    files: [{name: 'file1.pdf', url: 'file1url', id: 'file1', claimed: true}],
+    files: [{filename: 'file1.pdf', url: 'file1url', uuid: 'file2', claimed: true}],
   },
   {
     id: '3',
     name: 'Image files',
     contentTypes: ['image/png'],
     multiple: true,
-    files: [{name: 'image.png', url: 'file1url', id: 'file1', claimed: true}],
+    files: [
+      {filename: 'image.png', url: 'file1url', uuid: 'file3', claimed: true},
+      {filename: 'image2.png', url: 'file2url', uuid: 'file4', claimed: true},
+    ],
   },
 ];
 

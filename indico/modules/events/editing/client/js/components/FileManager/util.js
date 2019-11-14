@@ -6,6 +6,8 @@
 // LICENSE file for more details.
 
 import uploadFileURL from 'indico-url:event_editing.file_upload';
+import deleteFileURL from 'indico-url:files.delete_file';
+
 import _ from 'lodash';
 import React from 'react';
 import PropTypes from 'prop-types';
@@ -14,15 +16,13 @@ import * as actions from './actions';
 
 export const FileManagerContext = React.createContext(null);
 
-export const filePropTypes = PropTypes.arrayOf(
-  PropTypes.shape({
-    name: PropTypes.string.isRequired,
-    url: PropTypes.string.isRequired,
-    id: PropTypes.string.isRequired,
-    claimed: PropTypes.bool.isRequired,
-    state: PropTypes.oneOf(['added', 'modified', 'deleted']),
-  })
-);
+export const filePropTypes = {
+  filename: PropTypes.string.isRequired,
+  url: PropTypes.string.isRequired,
+  uuid: PropTypes.string.isRequired,
+  claimed: PropTypes.bool.isRequired,
+  state: PropTypes.oneOf(['added', 'modified', 'deleted']),
+};
 
 async function uploadFile(file, urlParams, onUploadProgress) {
   const formData = new FormData();
@@ -49,29 +49,33 @@ async function uploadFile(file, urlParams, onUploadProgress) {
  * @param {Function} dispatch - the dispatch function for reducer actions
  * @param {String?} fileId - the ID of the file to modify, if any
  */
-export async function uploadFiles(
-  action,
-  fileTypeId,
-  acceptedFiles,
-  eventId,
-  dispatch,
-  fileId = null
-) {
+export function uploadFiles(action, fileTypeId, acceptedFiles, eventId, dispatch, fileId = null) {
   const tmpFileIds = acceptedFiles.map(() => _.uniqueId(_.now()));
 
   dispatch(actions.startUploads(fileTypeId, acceptedFiles, tmpFileIds));
 
-  _.zip(acceptedFiles, tmpFileIds).forEach(async ([acceptedFile, tmpFileId]) => {
-    const uploadedFile = await uploadFile(acceptedFile, {confId: eventId}, e =>
-      dispatch(actions.progress(fileTypeId, tmpFileId, Math.floor((e.loaded / e.total) * 100)))
-    );
-    dispatch(
-      action(fileTypeId, fileId, tmpFileId, {
-        name: uploadedFile.filename,
-        id: uploadedFile.uuid,
-        url: null,
-        claimed: false,
-      })
-    );
-  });
+  return Promise.all(
+    _.zip(acceptedFiles, tmpFileIds).map(async ([acceptedFile, tmpFileId]) => {
+      const uploadedFile = await uploadFile(acceptedFile, {confId: eventId}, e =>
+        dispatch(actions.progress(fileTypeId, tmpFileId, Math.floor((e.loaded / e.total) * 100)))
+      );
+      dispatch(
+        action(fileTypeId, fileId, tmpFileId, {
+          filename: uploadedFile.filename,
+          uuid: uploadedFile.uuid,
+          url: null,
+          claimed: false,
+        })
+      );
+    })
+  );
+}
+
+export async function deleteFile(uuid) {
+  try {
+    const {data} = await indicoAxios.delete(deleteFileURL({uuid}));
+    return data;
+  } catch (e) {
+    handleAxiosError(e, false, true);
+  }
 }

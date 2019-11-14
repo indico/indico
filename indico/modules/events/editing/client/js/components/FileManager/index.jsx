@@ -10,7 +10,7 @@ import React, {useCallback, useReducer, useContext, useRef} from 'react';
 import PropTypes from 'prop-types';
 import {useDropzone} from 'react-dropzone';
 import {Icon} from 'semantic-ui-react';
-import {FileManagerContext, filePropTypes, uploadFiles} from './util';
+import {FileManagerContext, filePropTypes, uploadFiles, deleteFile} from './util';
 import FileList from './FileList';
 import Uploads from './Uploads';
 import reducer from './reducer';
@@ -20,7 +20,7 @@ import './FileManager.module.scss';
 
 const fileTypePropTypes = {
   name: PropTypes.string.isRequired,
-  files: filePropTypes.isRequired,
+  files: PropTypes.arrayOf(PropTypes.shape(filePropTypes)).isRequired,
   contentTypes: PropTypes.arrayOf(PropTypes.string).isRequired,
   multiple: PropTypes.bool.isRequired,
   id: PropTypes.string.isRequired,
@@ -31,19 +31,23 @@ function Dropzone({eventId, fileType: {id, multiple, files}}) {
   const acceptsNewFiles = multiple || !files.length;
 
   const onDrop = useCallback(
-    acceptedFiles => {
+    async acceptedFiles => {
       if (!multiple) {
         acceptedFiles = acceptedFiles.splice(0, 1);
       }
-
-      uploadFiles(
+      await uploadFiles(
         acceptsNewFiles ? actions.markUploaded : actions.markModified,
         id,
         acceptedFiles,
         eventId,
         dispatch,
-        acceptsNewFiles ? null : files[0].id
+        acceptsNewFiles ? null : files[0].uuid
       );
+      if (files[0].state === 'modified') {
+        // we're modifying a "modified" file, so we can get rid of
+        // the current one
+        dispatch(deleteFile(files[0].uuid));
+      }
     },
     [acceptsNewFiles, multiple, files, id, eventId, dispatch]
   );
