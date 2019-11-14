@@ -18,9 +18,9 @@ export const FileManagerContext = React.createContext(null);
 
 export const filePropTypes = {
   filename: PropTypes.string.isRequired,
-  url: PropTypes.string.isRequired,
+  downloadURL: PropTypes.string.isRequired,
   uuid: PropTypes.string.isRequired,
-  claimed: PropTypes.bool.isRequired,
+  claimed: PropTypes.bool,
   state: PropTypes.oneOf(['added', 'modified', 'deleted']),
 };
 
@@ -63,8 +63,9 @@ export function uploadFiles(action, fileTypeId, acceptedFiles, eventId, dispatch
         action(fileTypeId, fileId, tmpFileId, {
           filename: uploadedFile.filename,
           uuid: uploadedFile.uuid,
-          url: null,
+          downloadURL: null,
           claimed: false,
+          fileType: fileTypeId,
         })
       );
     })

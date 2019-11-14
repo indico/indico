@@ -5,41 +5,33 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import fileTypesURL from 'indico-url:event_editing.api_file_types';
+import editableURL from 'indico-url:event_editing.api_editable';
+
 import React from 'react';
 import ReactDOM from 'react-dom';
+import {camelizeKeys} from 'indico/utils/case';
+import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import FileManager from './components/FileManager';
 
-const data = [
-  {
-    id: '1',
-    name: 'Source file',
-    contentTypes: ['text/plain'],
-    multiple: false,
-    files: [{filename: 'file1.txt', url: 'file1url', uuid: 'file1', claimed: true}],
-  },
-  {
-    id: '2',
-    name: 'PDF file',
-    contentTypes: ['application/pdf'],
-    multiple: false,
-    files: [{filename: 'file1.pdf', url: 'file1url', uuid: 'file2', claimed: true}],
-  },
-  {
-    id: '3',
-    name: 'Image files',
-    contentTypes: ['image/png'],
-    multiple: true,
-    files: [
-      {filename: 'image.png', url: 'file1url', uuid: 'file3', claimed: true},
-      {filename: 'image2.png', url: 'file2url', uuid: 'file4', claimed: true},
-    ],
-  },
-];
-
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   const fileManager = document.querySelector('#file-manager');
+  const eventId = fileManager.dataset.eventId;
+  let response;
+  try {
+    response = await indicoAxios.get(fileTypesURL({confId: eventId}));
+  } catch (e) {
+    handleAxiosError(e);
+  }
+  const fileTypes = camelizeKeys(response.data);
+  try {
+    response = await indicoAxios.get(editableURL({confId: eventId, editable_id: 1}));
+  } catch (e) {
+    handleAxiosError(e);
+  }
+  const files = camelizeKeys(response.data.revisions[0].files);
   ReactDOM.render(
-    <FileManager fileTypes={data} eventId={fileManager.dataset.eventId} />,
+    <FileManager fileTypes={fileTypes} files={files} eventId={fileManager.dataset.eventId} />,
     fileManager
   );
 });
