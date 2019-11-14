@@ -123,9 +123,11 @@ class ModelList(Field):
         'type': 'Invalid input type.'
     }
 
-    def __init__(self, model, column=None, column_type=None, get_query=lambda m: m.query, **kwargs):
+    def __init__(self, model, column=None, column_type=None, get_query=lambda m: m.query, collection_class=list,
+                 **kwargs):
         self.model = model
         self.get_query = get_query
+        self.collection_class = collection_class
         if column:
             self.column = getattr(model, column)
             # Custom column -> most likely a string value
@@ -155,7 +157,7 @@ class ModelList(Field):
         if invalid:
             self.fail('not_found', value=next(iter(invalid)))
         assert found == requested, 'Unexpected objects found'
-        return objs
+        return self.collection_class(objs)
 
 
 class Principal(Field):
