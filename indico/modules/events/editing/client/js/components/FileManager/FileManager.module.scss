@@ -75,6 +75,9 @@
 
 .file-state {
     font-weight: bold;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 
     &:global(.added) {
         color: $green;
@@ -87,5 +90,18 @@
     &:global(.deleted) {
         text-decoration: line-through;
         color: $dark-red;
+    }
+
+    &:global(.uploading) {
+        color: $gray;
+    }
+}
+
+.uploading-file-list {
+    @extend .file-list;
+    padding-bottom: 1em;
+
+    .uploading-file-row {
+        display: flex;
     }
 }
