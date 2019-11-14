@@ -25,3 +25,5 @@ _bp.add_url_rule('/api/contributions/<int:contrib_id>/editing/<any(paper):type>/
                  'api_review_editable', backend.RHReviewEditable, methods=('POST',))
 _bp.add_url_rule('/api/contributions/<int:contrib_id>/editing/<any(paper):type>/<int:revision_id>/confirm',
                  'api_confirm_changes', backend.RHConfirmEditableChanges, methods=('POST',))
+_bp.add_url_rule('/api/contributions/<int:contrib_id>/editing/<any(paper):type>/<int:revision_id>/replace',
+                 'api_replace_revision', backend.RHReplaceRevision, methods=('POST',))

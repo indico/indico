@@ -91,3 +91,15 @@ def confirm_editable_changes(revision, submitter, action, comment):
         publish_editable_revision(revision)
     db.session.flush()
     logger.info('Revision %r confirmed by %s [%s]', revision, submitter, action.name)
+
+
+@no_autoflush
+def replace_revision(revision, user, comment, files):
+    revision.comment = comment
+    revision.final_state = FinalRevisionState.replaced
+    new_revision = EditingRevision(submitter=user,
+                                   initial_state=revision.initial_state,
+                                   files=_make_editable_files(revision.editable, files))
+    revision.editable.revisions.append(new_revision)
+    db.session.flush()
+    logger.info('Revision %r replaced by %s', revision, user)

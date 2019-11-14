@@ -18,7 +18,7 @@ from indico.modules.events.controllers.base import RHEventBase
 from indico.modules.events.editing.fields import EditingFilesField, EditingTagsField
 from indico.modules.events.editing.models.editable import Editable, EditableType
 from indico.modules.events.editing.models.revisions import FinalRevisionState, InitialRevisionState
-from indico.modules.events.editing.operations import (confirm_editable_changes, create_new_editable,
+from indico.modules.events.editing.operations import (confirm_editable_changes, create_new_editable, replace_revision,
                                                       review_editable_revision)
 from indico.modules.events.editing.schemas import (EditableSchema, EditingConfirmationAction, EditingFileTypeSchema,
                                                    EditingReviewAction, EditingTagSchema, ReviewEditableArgs)
@@ -91,7 +91,7 @@ class RHContributionEditableRevisionBase(RHContributionEditableBase):
             raise NotFound
         self.revision = self.editable.revisions[-1]
         if self.revision.id != request.view_args['revision_id']:
-            raise UserValueError(_('Only the latest revision can be reviewed'))
+            raise UserValueError(_('Only the latest revision can be updated'))
 
     def _check_revision_access(self):
         raise NotImplementedError
@@ -174,4 +174,26 @@ class RHConfirmEditableChanges(RHContributionEditableRevisionBase):
     })
     def _process(self, action, comment):
         confirm_editable_changes(self.revision, session.user, action, comment)
+        return '', 204
+
+
+class RHReplaceRevision(RHContributionEditableRevisionBase):
+    """Replace the latest revision of an Editable."""
+
+    def _check_revision_access(self):
+        if self.revision.editor is not None:
+            return False
+        if self.revision.initial_state not in (InitialRevisionState.new, InitialRevisionState.ready_for_review):
+            return False
+        return self.revision.final_state == FinalRevisionState.none
+
+    @use_kwargs({
+        'comment': fields.String(missing='')
+    })
+    def _process(self, comment):
+        args = parser.parse({
+            'files': EditingFilesField(self.event, allow_claimed_files=True, required=True)
+        })
+
+        replace_revision(self.revision, session.user, comment, args['files'])
         return '', 204
