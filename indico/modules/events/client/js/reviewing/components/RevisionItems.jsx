@@ -13,6 +13,7 @@ import {Param, Translate} from 'indico/react/i18n';
 import {serializeDate} from 'indico/utils/date';
 
 import UserAvatar from './UserAvatar';
+import StateIndicator from './StateIndicator';
 
 function Comment({comment}) {
   return (
@@ -51,7 +52,7 @@ function Comment({comment}) {
   );
 }
 
-const baseCommentProps = {
+const baseItemPropType = {
   createdDt: PropTypes.string.isRequired,
   html: PropTypes.string.isRequired,
   user: PropTypes.shape({
@@ -61,7 +62,7 @@ const baseCommentProps = {
 };
 
 const CommentPropType = PropTypes.shape({
-  ...baseCommentProps,
+  ...baseItemPropType,
   modifiedDt: PropTypes.string,
 });
 
@@ -71,23 +72,27 @@ const CommentPropTypes = {
 
 Comment.propTypes = CommentPropTypes;
 
-function CustomComment({comment}) {
+function CustomItem({item}) {
   return (
     <div className="i-timeline-item">
-      <UserAvatar user={comment.user} />
+      <UserAvatar user={item.user} />
       <div className="flexrow i-timeline-item-content">
-        <div className="i-timeline-item-box header-indicator-left">
-          <div className={`${comment.html ? 'i-box-header' : ''} flexrow`}>
+        <div className="i-timeline-item-box">
+          <div
+            className={`${item.html ? 'i-box-header' : ''} flexrow`}
+            style={{alignItems: 'center'}}
+          >
             <div className="f-self-stretch">
-              {comment.header}{' '}
-              <time dateTime={serializeDate(comment.createdDt, moment.HTML5_FMT.DATETIME_LOCAL)}>
-                {serializeDate(comment.createdDt, 'LL')}
+              {item.header}{' '}
+              <time dateTime={serializeDate(item.createdDt, moment.HTML5_FMT.DATETIME_LOCAL)}>
+                {serializeDate(item.createdDt, 'LL')}
               </time>
             </div>
+            {item.state && <StateIndicator state={item.state} circular />}
           </div>
-          {comment.html && (
+          {item.html && (
             <div className="i-box-content js-form-container">
-              <div className="markdown-text" dangerouslySetInnerHTML={{__html: comment.html}} />
+              <div className="markdown-text" dangerouslySetInnerHTML={{__html: item.html}} />
             </div>
           )}
         </div>
@@ -96,36 +101,46 @@ function CustomComment({comment}) {
   );
 }
 
-const CustomCommentPropType = PropTypes.shape({
-  ...baseCommentProps,
+const CustomItemPropType = PropTypes.shape({
+  ...baseItemPropType,
   header: PropTypes.string.isRequired,
 });
 
-CustomComment.propTypes = {
-  comment: CustomCommentPropType.isRequired,
+CustomItem.propTypes = {
+  item: CustomItemPropType.isRequired,
 };
 
-export default function RevisionComments({comments, children}) {
+export default function RevisionItems({items, children, separator}) {
   return (
     <div className="i-timeline">
       <div className="i-timeline with-line">
         <div className="i-timeline-connect-up" />
-        {comments.map(comment => {
-          const CommentComponent = comment.custom ? CustomComment : Comment;
-          return <CommentComponent key={comment.id} comment={comment} />;
+        {items.map(item => {
+          const Component = item.custom ? CustomItem : Comment;
+          const props = {[item.custom ? 'item' : 'comment']: item};
+          return <Component key={item.id} {...props} />;
         })}
+        {children}
       </div>
-      {children}
+      {separator && (
+        <>
+          <div className="i-timeline to-separator-wrapper">
+            <div className="i-timeline-connect-down to-separator" />
+          </div>
+          <div className="i-timeline-separator" />
+        </>
+      )}
     </div>
   );
 }
 
-RevisionComments.propTypes = {
-  comments: PropTypes.arrayOf(PropTypes.oneOfType([CommentPropType, CustomCommentPropType]))
-    .isRequired,
+RevisionItems.propTypes = {
+  items: PropTypes.arrayOf(PropTypes.oneOfType([CommentPropType, CustomItemPropType])).isRequired,
   children: PropTypes.node,
+  separator: PropTypes.bool,
 };
 
-RevisionComments.defaultProps = {
+RevisionItems.defaultProps = {
   children: null,
+  separator: false,
 };

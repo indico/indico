@@ -5,74 +5,54 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React, {useCallback, useState} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
+import React, {useState} from 'react';
 import {Form as FinalForm} from 'react-final-form';
 import {Button, Form} from 'semantic-ui-react';
 
-import UserAvatar from 'indico/modules/events/reviewing/components/UserAvatar';
 import {FinalDropdown, FinalSubmitButton, FinalTextArea} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 
-import {addComment} from '../actions';
-import {canCommentPaper, getPaperDetails, getCurrentUser} from '../selectors';
+import JudgmentModal from './JudgmentModal';
+import UserAvatar from './UserAvatar';
 
-import './PaperReviewForm.module.scss';
+import './ReviewForm.module.scss';
 
 const visibilityOptions = [
   {
-    value: 'judges',
-    text: Translate.string('Visible only to judges'),
+    value: 'editors',
+    text: Translate.string('Visible only to editors'),
   },
   {
-    value: 'reviewers',
-    text: Translate.string('Visible to reviewers and judges'),
-  },
-  {
-    value: 'contributors',
-    text: Translate.string('Visible to contributors, reviewers and judges'),
+    value: 'authors',
+    text: Translate.string('Visible to editors and authors'),
   },
 ];
 
-export default function PaperReviewForm() {
-  const {
-    event: {id: eventId},
-    contribution: {id: contributionId},
-  } = useSelector(getPaperDetails);
-  const user = useSelector(getCurrentUser);
-  const canComment = useSelector(canCommentPaper);
-  const dispatch = useDispatch();
-  const [commentFormVisible, setCommentFormVisible] = useState(false);
+export default function ReviewForm() {
+  const currentUser = {
+    fullName: Indico.User.full_name,
+    avatarBgColor: Indico.User.avatar_bg_color,
+  };
 
+  const [commentFormVisible, setCommentFormVisible] = useState(false);
+  const [judgmentModalVisible, setJudgmentModalVisible] = useState(false);
   const onCommentClickHandler = () => {
     if (!commentFormVisible) {
       setCommentFormVisible(true);
     }
   };
 
-  const createComment = useCallback(
-    async (formData, form) => {
-      const rv = await dispatch(addComment(eventId, contributionId, formData));
-      if (rv.error) {
-        return rv.error;
-      }
-      setCommentFormVisible(false);
-      setTimeout(() => form.reset(), 0);
-    },
-    [dispatch, eventId, contributionId]
-  );
-
   return (
-    <div className="i-timeline-item" styleName="review-timeline-input">
-      <UserAvatar user={user} />
-      <div className="i-timeline-item-box footer-only header-indicator-left">
-        <div className="i-box-footer" style={{overflow: 'visible'}}>
-          {canComment && (
+    <>
+      <div className="i-timeline-item review-timeline-input">
+        <UserAvatar user={currentUser} />
+        <div className="i-timeline-item-box footer-only header-indicator-left">
+          <div className="i-box-footer" style={{overflow: 'visible'}}>
             <div className="flexrow">
               <div className="f-self-stretch">
                 <FinalForm
-                  onSubmit={createComment}
-                  initialValues={{comment: '', visibility: 'judges'}}
+                  onSubmit={() => {}}
+                  initialValues={{comment: '', visibility: 'editors'}}
                   subscription={{submitting: true}}
                 >
                   {fprops => (
@@ -82,6 +62,7 @@ export default function PaperReviewForm() {
                         name="comment"
                         rows={commentFormVisible ? 3 : 1}
                         placeholder={Translate.string('Leave a comment...')}
+                        style={{resize: commentFormVisible ? 'vertical' : 'none'}}
                         hideValidationError
                         required
                       />
@@ -90,6 +71,7 @@ export default function PaperReviewForm() {
                           <FinalDropdown
                             name="visibility"
                             options={visibilityOptions}
+                            width={8}
                             selection
                             required
                           />
@@ -110,10 +92,21 @@ export default function PaperReviewForm() {
                   )}
                 </FinalForm>
               </div>
+              {!commentFormVisible && (
+                <div className="review-trigger flexrow">
+                  <span className="comment-or-review">
+                    <Translate>or</Translate>
+                  </span>
+                  <Button onClick={() => setJudgmentModalVisible(!judgmentModalVisible)} primary>
+                    <Translate>Judge</Translate>
+                  </Button>
+                </div>
+              )}
             </div>
-          )}
+          </div>
         </div>
       </div>
-    </div>
+      {judgmentModalVisible && <JudgmentModal onClose={() => setJudgmentModalVisible(false)} />}
+    </>
   );
 }

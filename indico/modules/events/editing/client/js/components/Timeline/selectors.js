@@ -15,7 +15,7 @@ export function processDetails(details) {
   for (const revision of revisionsIterator) {
     if (revision.finalState.name === 'replaced') {
       const nextRevision = revisionsIterator.next().value;
-      const customComment = {
+      const customItem = {
         createdDt: nextRevision.createdDt,
         id: `revision-${nextRevision.id}`,
         system: false,
@@ -24,14 +24,15 @@ export function processDetails(details) {
         user: nextRevision.submitter,
         custom: true,
         header: Translate.string('Revision has been replaced'),
+        state: 'replaced',
       };
 
       newRevisions.push({
         ...revision,
-        comments: [...revision.comments, customComment, ...nextRevision.comments],
+        items: [...revision.comments, customItem, ...nextRevision.comments],
       });
     } else {
-      newRevisions.push(revision);
+      newRevisions.push({...revision, items: revision.comments});
     }
   }
 

@@ -47,9 +47,8 @@ export default function Timeline({eventId, editableId}) {
     return null;
   }
 
+  const lastRevision = details.revisions[details.revisions.length - 1];
   const {contribution, revisions} = selectors.processDetails(details);
-
-  const lastRevision = revisions[revisions.length - 1];
   const state =
     lastRevision.finalState.name === 'none' ? lastRevision.initialState : lastRevision.finalState;
 
@@ -63,7 +62,7 @@ export default function Timeline({eventId, editableId}) {
       >
         STUFF
       </TimelineHeader>
-      <TimelineContent revisions={revisions} />
+      <TimelineContent revisions={revisions} state={state} />
     </>
   );
 }
