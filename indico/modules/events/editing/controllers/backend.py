@@ -17,6 +17,7 @@ from indico.modules.events.contributions.controllers.display import RHContributi
 from indico.modules.events.controllers.base import RHEventBase
 from indico.modules.events.editing.fields import EditingFilesField, EditingTagsField
 from indico.modules.events.editing.models.editable import Editable, EditableType
+from indico.modules.events.editing.models.revisions import FinalRevisionState, InitialRevisionState
 from indico.modules.events.editing.operations import (confirm_editable_changes, create_new_editable,
                                                       review_editable_revision)
 from indico.modules.events.editing.schemas import (EditableSchema, EditingConfirmationAction, EditingFileTypeSchema,
@@ -52,9 +53,20 @@ class RHContributionEditableBase(RHContributionDisplayBase):
 
     def _check_access(self):
         RHContributionDisplayBase._check_access(self)
-        # TODO: check if the user is authorized to submit an editable
         if not session.user:
             raise Forbidden
+
+    def _user_is_authorized_submitter(self):
+        if session.user.is_admin:
+            # XXX: not sure if we want to keep this, but for now it's useful to have!
+            return True
+        return self.contrib.is_user_associated(session.user, check_abstract=True)
+
+    def _user_is_authorized_editor(self):
+        if session.user.is_admin:
+            # XXX: not sure if we want to keep this, but for now it's useful to have!
+            return True
+        return self.editable.editor == session.user
 
 
 class RHContributionEditableRevisionBase(RHContributionEditableBase):
@@ -73,17 +85,35 @@ class RHContributionEditableRevisionBase(RHContributionEditableBase):
         if self.revision.id != request.view_args['revision_id']:
             raise UserValueError(_('Only the latest revision can be reviewed'))
 
+    def _check_revision_access(self):
+        raise NotImplementedError
+
     def _check_access(self):
         RHContributionEditableBase._check_access(self)
-        # TODO: check if the user has the correct permissions on the editable revision
+        if not self._check_revision_access():
+            raise UserValueError(_('You cannot perform this action on this revision'))
 
 
 class RHEditable(RHContributionEditableBase):
+    def _check_access(self):
+        RHContributionEditableBase._check_access(self)
+        if self.event.can_manage(session.user):
+            return
+        if not self._user_is_authorized_editor() and not self._user_is_authorized_editor():
+            raise Forbidden
+
     def _process(self):
         return EditableSchema().jsonify(self.editable)
 
 
 class RHCreateEditable(RHContributionEditableBase):
+    def _check_access(self):
+        RHContributionEditableBase._check_access(self)
+        if not self._user_is_authorized_submitter():
+            # XXX: should event managers be able to submit on behalf of the user?
+            raise Forbidden
+        # TODO: check if submitting papers for editing is allowed in the event
+
     def _process(self):
         if self.editable:
             raise UserValueError('Editable already exists')
@@ -97,6 +127,13 @@ class RHCreateEditable(RHContributionEditableBase):
 
 
 class RHReviewEditable(RHContributionEditableRevisionBase):
+    def _check_revision_access(self):
+        if not self._user_is_authorized_editor():
+            return False
+        if self.revision.initial_state != InitialRevisionState.ready_for_review:
+            return False
+        return self.revision.final_state == FinalRevisionState.none
+
     @use_kwargs(ReviewEditableArgs())
     def _process(self, action, comment):
         argmap = {'tags': EditingTagsField(self.event, missing=set())}
@@ -108,6 +145,13 @@ class RHReviewEditable(RHContributionEditableRevisionBase):
 
 
 class RHConfirmEditableChanges(RHContributionEditableRevisionBase):
+    def _check_revision_access(self):
+        if not self._user_is_authorized_submitter():
+            return False
+        if self.revision.final_state != FinalRevisionState.none:
+            return False
+        return self.revision.initial_state == InitialRevisionState.needs_submitter_confirmation
+
     @use_kwargs({
         'action': EnumField(EditingConfirmationAction, required=True),
         'comment': fields.String(missing='')
