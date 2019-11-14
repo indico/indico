@@ -36,7 +36,12 @@ FileAction.propTypes = {
   className: PropTypes.string.isRequired,
 };
 
-function FileEntry({eventId, fileTypeId, multiple, file: {uuid, filename, state, claimed}}) {
+function FileEntry({
+  eventId,
+  fileTypeId,
+  allowMultipleFiles,
+  file: {uuid, filename, state, claimed},
+}) {
   const ref = useRef(null);
   const dispatch = useContext(FileManagerContext);
   const [activeButton, setActiveButton] = useState(null);
@@ -47,7 +52,7 @@ function FileEntry({eventId, fileTypeId, multiple, file: {uuid, filename, state,
         {filename}
       </span>
       <span>
-        {!state && multiple && (
+        {!state && allowMultipleFiles && (
           <>
             <FileAction
               icon="exchange"
@@ -117,17 +122,22 @@ function FileEntry({eventId, fileTypeId, multiple, file: {uuid, filename, state,
 
 FileEntry.propTypes = {
   eventId: PropTypes.string.isRequired,
-  fileTypeId: PropTypes.string.isRequired,
-  multiple: PropTypes.bool.isRequired,
+  fileTypeId: PropTypes.number.isRequired,
+  allowMultipleFiles: PropTypes.bool.isRequired,
   file: PropTypes.shape(filePropTypes).isRequired,
 };
 
-export default function FileList({files, fileTypeId, multiple, eventId}) {
+export default function FileList({files, fileTypeId, allowMultipleFiles, eventId}) {
   return (
     <ul styleName="file-list">
       {files.map(file => (
         <li key={file.uuid} styleName="file-row">
-          <FileEntry fileTypeId={fileTypeId} eventId={eventId} multiple={multiple} file={file} />
+          <FileEntry
+            fileTypeId={fileTypeId}
+            eventId={eventId}
+            allowMultipleFiles={allowMultipleFiles}
+            file={file}
+          />
         </li>
       ))}
     </ul>
@@ -136,7 +146,7 @@ export default function FileList({files, fileTypeId, multiple, eventId}) {
 
 FileList.propTypes = {
   files: PropTypes.arrayOf(PropTypes.shape(filePropTypes)).isRequired,
-  fileTypeId: PropTypes.string.isRequired,
-  multiple: PropTypes.bool.isRequired,
+  fileTypeId: PropTypes.number.isRequired,
+  allowMultipleFiles: PropTypes.bool.isRequired,
   eventId: PropTypes.string.isRequired,
 };

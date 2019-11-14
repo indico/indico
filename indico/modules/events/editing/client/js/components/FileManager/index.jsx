@@ -20,19 +20,19 @@ import './FileManager.module.scss';
 
 const fileTypePropTypes = {
   name: PropTypes.string.isRequired,
-  files: PropTypes.arrayOf(PropTypes.shape(filePropTypes)).isRequired,
-  contentTypes: PropTypes.arrayOf(PropTypes.string).isRequired,
-  multiple: PropTypes.bool.isRequired,
-  id: PropTypes.string.isRequired,
+  files: PropTypes.arrayOf(PropTypes.shape(filePropTypes)),
+  extensions: PropTypes.arrayOf(PropTypes.string).isRequired,
+  allowMultipleFiles: PropTypes.bool.isRequired,
+  id: PropTypes.number.isRequired,
 };
 
-function Dropzone({eventId, fileType: {id, multiple, files}}) {
+function Dropzone({eventId, fileType: {id, allowMultipleFiles, files}}) {
   const dispatch = useContext(FileManagerContext);
-  const acceptsNewFiles = multiple || !files.length;
+  const acceptsNewFiles = allowMultipleFiles || !files.length;
 
   const onDrop = useCallback(
     async acceptedFiles => {
-      if (!multiple) {
+      if (!allowMultipleFiles) {
         acceptedFiles = acceptedFiles.splice(0, 1);
       }
       await uploadFiles(
@@ -49,7 +49,7 @@ function Dropzone({eventId, fileType: {id, multiple, files}}) {
         dispatch(deleteFile(files[0].uuid));
       }
     },
-    [acceptsNewFiles, multiple, files, id, eventId, dispatch]
+    [acceptsNewFiles, allowMultipleFiles, files, id, eventId, dispatch]
   );
 
   const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop});
@@ -77,7 +77,7 @@ function FileType({eventId, fileType, uploads}) {
       <FileList
         files={fileType.files}
         fileTypeId={fileType.id}
-        multiple={fileType.multiple}
+        allowMultipleFiles={fileType.allowMultipleFiles}
         eventId={eventId}
       />
       {!_.isEmpty(uploads) && <Uploads uploads={uploads} />}
@@ -101,8 +101,18 @@ FileType.defaultProps = {
   uploads: {},
 };
 
-export default function FileManager({eventId, fileTypes}) {
-  const [state, dispatch] = useReducer(reducer, {fileTypes, uploads: {}});
+function mapFileTypes(fileTypes, files) {
+  return fileTypes.map(fileType => {
+    fileType.files = files.filter(file => file.fileType === fileType.id);
+    return fileType;
+  });
+}
+
+export default function FileManager({eventId, fileTypes, files}) {
+  const [state, dispatch] = useReducer(reducer, {
+    fileTypes: mapFileTypes(fileTypes, files),
+    uploads: {},
+  });
 
   return (
     <div styleName="file-manager">
@@ -123,4 +133,5 @@ export default function FileManager({eventId, fileTypes}) {
 FileManager.propTypes = {
   eventId: PropTypes.string.isRequired,
   fileTypes: PropTypes.arrayOf(PropTypes.shape(fileTypePropTypes)).isRequired,
+  files: PropTypes.arrayOf(PropTypes.shape(filePropTypes)).isRequired,
 };

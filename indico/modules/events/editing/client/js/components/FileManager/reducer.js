@@ -15,7 +15,7 @@ export default combineReducers({
     switch (action.type) {
       case actions.MARK_UPLOADED:
         action.file.state = 'added';
-        if (fileType.multiple) {
+        if (fileType.allowMultipleFiles) {
           fileType.files = fileType.files.concat(action.file);
         } else {
           fileType.files = [action.file];
