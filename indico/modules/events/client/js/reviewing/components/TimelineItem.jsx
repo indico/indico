@@ -12,12 +12,13 @@ import PropTypes from 'prop-types';
 import {Param, Translate} from 'indico/react/i18n';
 import {serializeDate} from 'indico/utils/date';
 
-import RevisionComments from './RevisionComments';
+import ReviewForm from './ReviewForm';
+import RevisionItems from './RevisionItems';
 import UserAvatar from './UserAvatar';
 
-export default function TimelineItem({revision, isLastRevision}) {
+export default function TimelineItem({revision, isLastRevision, state}) {
   const {submitter, createdDt} = revision;
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(isLastRevision);
 
   return (
     <>
@@ -65,18 +66,12 @@ export default function TimelineItem({revision, isLastRevision}) {
           </div>
         </div>
       </div>
-      {(visible || isLastRevision) && revision.comments.length !== 0 && (
+      {(visible || isLastRevision) && revision.items.length !== 0 && (
         <>
-          <RevisionComments comments={revision.comments}>
-            {isLastRevision && (
-              <>
-                <div className="i-timeline to-separator-wrapper">
-                  <div className="i-timeline-connect-down to-separator" />
-                </div>
-                <div className="i-timeline-separator" />
-              </>
-            )}
-          </RevisionComments>
+          <RevisionItems items={revision.items} separator={isLastRevision}>
+            {/* TODO: Check whether the current user can actually judge */}
+            {isLastRevision && state.name === 'ready_for_review' && <ReviewForm />}
+          </RevisionItems>
         </>
       )}
     </>
@@ -86,4 +81,5 @@ export default function TimelineItem({revision, isLastRevision}) {
 TimelineItem.propTypes = {
   revision: PropTypes.object.isRequired,
   isLastRevision: PropTypes.bool.isRequired,
+  state: PropTypes.object.isRequired,
 };
