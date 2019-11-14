@@ -18,6 +18,7 @@ Bugfixes
 - Fix creating rooms without touching the longitude/latitude fields (:issue:`4115`)
 - Fix error in HTTP API when Basic auth headers are present (:issue:`4123`,
   thanks :user:`uxmaster`)
+- Fix incorrect font size in some room booking dropdowns (:issue:`4156`)
 
 Version 2.2.4
 -------------
