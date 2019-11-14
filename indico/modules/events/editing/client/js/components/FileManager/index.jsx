@@ -5,16 +5,18 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import uploadFileURL from 'indico-url:event_editing.file_upload';
+import _ from 'lodash';
 import React, {useCallback, useReducer, useContext, useRef} from 'react';
 import PropTypes from 'prop-types';
 import {useDropzone} from 'react-dropzone';
 import {Icon} from 'semantic-ui-react';
-import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
-import {FileManagerContext, filePropTypes} from './util';
+import {FileManagerContext, filePropTypes, uploadFiles} from './util';
 import FileList from './FileList';
+import Uploads from './Uploads';
 import reducer from './reducer';
-import styles from './FileManager.module.scss';
+import * as actions from './actions';
+
+import './FileManager.module.scss';
 
 const fileTypePropTypes = {
   name: PropTypes.string.isRequired,
@@ -24,39 +26,26 @@ const fileTypePropTypes = {
   id: PropTypes.string.isRequired,
 };
 
-const uploadFile = async (type, fileTypeId, acceptedFile, eventId, dispatch, fileId = null) => {
-  const headers = {'content-type': 'multipart/form-data'};
-  const formData = new FormData();
-  let response;
-  formData.append('file', acceptedFile);
-  try {
-    response = await indicoAxios.post(uploadFileURL({confId: eventId}), formData, {headers});
-  } catch (e) {
-    handleAxiosError(e, false, true);
-    return;
-  }
-  const file = response.data;
-  dispatch({
-    type,
-    fileTypeId,
-    fileId,
-    file: {name: file.filename, id: file.uuid, url: 'url2file', claimed: false},
-  });
-};
-
 function Dropzone({eventId, fileType: {id, multiple, files}}) {
   const dispatch = useContext(FileManagerContext);
+  const acceptsNewFiles = multiple || !files.length;
+
   const onDrop = useCallback(
     acceptedFiles => {
-      if (!multiple && files.length) {
-        uploadFile('MODIFY', id, acceptedFiles[0], eventId, dispatch, files[0].id);
-      } else {
-        acceptedFiles.forEach(acceptedFile =>
-          uploadFile('UPLOAD', id, acceptedFile, eventId, dispatch)
-        );
+      if (!multiple) {
+        acceptedFiles = acceptedFiles.splice(0, 1);
       }
+
+      uploadFiles(
+        acceptsNewFiles ? actions.markUploaded : actions.markModified,
+        id,
+        acceptedFiles,
+        eventId,
+        dispatch,
+        acceptsNewFiles ? null : files[0].id
+      );
     },
-    [id, eventId, multiple, files, dispatch]
+    [acceptsNewFiles, multiple, files, id, eventId, dispatch]
   );
 
   const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop});
@@ -64,8 +53,8 @@ function Dropzone({eventId, fileType: {id, multiple, files}}) {
   return (
     <div {...getRootProps()}>
       <input {...getInputProps()} />
-      <div className={`${styles.dropzone} ${isDragActive ? 'active' : ''}`}>
-        <Icon color="grey" size="big" name={multiple ? 'plus circle' : 'exchange'} />
+      <div styleName="dropzone" className={isDragActive ? 'active' : ''}>
+        <Icon color="grey" size="big" name={acceptsNewFiles ? 'plus circle' : 'exchange'} />
       </div>
     </div>
   );
@@ -76,12 +65,13 @@ Dropzone.propTypes = {
   fileType: PropTypes.shape(fileTypePropTypes).isRequired,
 };
 
-function FileType({eventId, fileType}) {
+function FileType({eventId, fileType, uploads}) {
   const ref = useRef(null);
   return (
     <div styleName="file-type">
       <h3>{fileType.name}</h3>
       <FileList files={fileType.files} fileTypeId={fileType.id} multiple={fileType.multiple} />
+      {!_.isEmpty(uploads) && <Uploads uploads={uploads} />}
       <Dropzone dropzoneRef={ref} fileType={fileType} eventId={eventId} />
     </div>
   );
@@ -90,16 +80,31 @@ function FileType({eventId, fileType}) {
 FileType.propTypes = {
   eventId: PropTypes.string.isRequired,
   fileType: PropTypes.shape(fileTypePropTypes).isRequired,
+  uploads: PropTypes.objectOf(
+    PropTypes.shape({
+      file: PropTypes.object.isRequired,
+      progress: PropTypes.number,
+    })
+  ),
+};
+
+FileType.defaultProps = {
+  uploads: {},
 };
 
 export default function FileManager({eventId, fileTypes}) {
-  const [state, dispatch] = useReducer(reducer, fileTypes);
+  const [state, dispatch] = useReducer(reducer, {fileTypes, uploads: {}});
 
   return (
     <div styleName="file-manager">
       <FileManagerContext.Provider value={dispatch}>
-        {state.map(fileType => (
-          <FileType key={fileType.id} eventId={eventId} fileType={fileType} />
+        {state.fileTypes.map(fileType => (
+          <FileType
+            key={fileType.id}
+            eventId={eventId}
+            fileType={fileType}
+            uploads={state.uploads[fileType.id]}
+          />
         ))}
       </FileManagerContext.Provider>
     </div>

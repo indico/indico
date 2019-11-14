@@ -54,39 +54,21 @@ export default function FileList({files, fileTypeId, multiple}) {
             {state !== 'deleted' && state !== 'modified' && (
               <Icon
                 styleName="delete-icon"
-                onClick={() =>
-                  dispatch({
-                    type: 'DELETE',
-                    fileTypeId,
-                    fileId: id,
-                  })
-                }
+                onClick={() => dispatch(actions.markDeleted(fileTypeId, id))}
                 name="trash"
               />
             )}
             {state === 'deleted' && (
               <Icon
                 styleName="undo-icon"
-                onClick={() =>
-                  dispatch({
-                    type: 'UNDELETE',
-                    fileTypeId,
-                    fileId: id,
-                  })
-                }
+                onClick={() => dispatch(actions.undelete(fileTypeId, id))}
                 name="undo"
               />
             )}
             {state === 'modified' && (
               <Icon
                 styleName="undo-icon"
-                onClick={() =>
-                  dispatch({
-                    type: 'REVERT',
-                    fileTypeId,
-                    fileId: id,
-                  })
-                }
+                onClick={() => dispatch(actions.revert(fileTypeId, id))}
                 name="undo"
               />
             )}
