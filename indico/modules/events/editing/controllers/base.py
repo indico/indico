@@ -26,9 +26,10 @@ class RHContributionEditableBase(RHContributionDisplayBase):
 
     def _process_args(self):
         RHContributionDisplayBase._process_args(self)
+        self.editable_type = EditableType[request.view_args['type']]
         self.editable = (Editable.query
                          .with_parent(self.contrib)
-                         .filter_by(type=EditableType[request.view_args['type']])
+                         .filter_by(type=self.editable_type)
                          .first())
 
     def _check_access(self):

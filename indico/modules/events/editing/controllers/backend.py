@@ -16,12 +16,12 @@ from indico.core.errors import UserValueError
 from indico.modules.events.controllers.base import RHEventBase
 from indico.modules.events.editing.controllers.base import RHContributionEditableBase
 from indico.modules.events.editing.fields import EditingFilesField, EditingTagsField
-from indico.modules.events.editing.models.editable import EditableType
 from indico.modules.events.editing.operations import (confirm_editable_changes, create_new_editable,
                                                       create_submitter_revision, replace_revision,
                                                       review_editable_revision, undo_review)
 from indico.modules.events.editing.schemas import (EditableSchema, EditingConfirmationAction, EditingFileTypeSchema,
                                                    EditingReviewAction, EditingTagSchema, ReviewEditableArgs)
+from indico.modules.files.controllers import UploadFileMixin
 from indico.util.i18n import _
 from indico.web.args import parser, use_kwargs
 
@@ -38,6 +38,11 @@ class RHEditingTags(RHEventBase):
 
     def _process(self):
         return EditingTagSchema(many=True).jsonify(self.event.editing_tags)
+
+
+class RHEditingUploadFile(UploadFileMixin, RHContributionEditableBase):
+    def get_file_context(self):
+        return 'event', self.event.id, 'editing', self.contrib.id, self.editable_type.name
 
 
 class RHContributionEditableRevisionBase(RHContributionEditableBase):
@@ -99,7 +104,7 @@ class RHCreateEditable(RHContributionEditableBase):
             'files': EditingFilesField(self.event, required=True)
         })
 
-        create_new_editable(self.contrib, EditableType[request.view_args['type']], session.user, args['files'])
+        create_new_editable(self.contrib, self.editable_type, session.user, args['files'])
         return '', 201
 
 
