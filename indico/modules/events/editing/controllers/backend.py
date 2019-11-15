@@ -17,7 +17,6 @@ from indico.modules.events.contributions.controllers.display import RHContributi
 from indico.modules.events.controllers.base import RHEventBase
 from indico.modules.events.editing.fields import EditingFilesField, EditingTagsField
 from indico.modules.events.editing.models.editable import Editable, EditableType
-from indico.modules.events.editing.models.revisions import FinalRevisionState, InitialRevisionState
 from indico.modules.events.editing.operations import (confirm_editable_changes, create_new_editable,
                                                       create_submitter_revision, replace_revision,
                                                       review_editable_revision, undo_review)
@@ -90,13 +89,9 @@ class RHContributionEditableRevisionBase(RHContributionEditableBase):
         RHContributionEditableBase._process_args(self)
         if not self.editable:
             raise NotFound
-        self.revision = self._get_target_revision()
-
-    def _get_target_revision(self):
-        revision = self.editable.revisions[-1]
-        if revision.id != request.view_args['revision_id']:
-            raise UserValueError(_('Only the latest revision can be updated'))
-        return revision
+        self.revision = next((r for r in self.editable.revisions if r.id == request.view_args['revision_id']), None)
+        if self.revision is None:
+            raise NotFound
 
     def _check_revision_access(self):
         raise NotImplementedError
@@ -147,11 +142,7 @@ class RHReviewEditable(RHContributionEditableRevisionBase):
     """Review the latest revision of an Editable."""
 
     def _check_revision_access(self):
-        if not self._user_is_authorized_editor():
-            return False
-        if self.revision.initial_state != InitialRevisionState.ready_for_review:
-            return False
-        return self.revision.final_state == FinalRevisionState.none
+        return self._user_is_authorized_editor()
 
     @use_kwargs(ReviewEditableArgs())
     def _process(self, action, comment):
@@ -167,11 +158,7 @@ class RHConfirmEditableChanges(RHContributionEditableRevisionBase):
     """Confirm/reject the changes made by the editor on an Editable."""
 
     def _check_revision_access(self):
-        if not self._user_is_authorized_submitter():
-            return False
-        if self.revision.final_state != FinalRevisionState.none:
-            return False
-        return self.revision.initial_state == InitialRevisionState.needs_submitter_confirmation
+        return self._user_is_authorized_submitter()
 
     @use_kwargs({
         'action': EnumField(EditingConfirmationAction, required=True),
@@ -186,11 +173,7 @@ class RHReplaceRevision(RHContributionEditableRevisionBase):
     """Replace the latest revision of an Editable."""
 
     def _check_revision_access(self):
-        if self.revision.editor is not None:
-            return False
-        if self.revision.initial_state not in (InitialRevisionState.new, InitialRevisionState.ready_for_review):
-            return False
-        return self.revision.final_state == FinalRevisionState.none
+        return self._user_is_authorized_submitter() and self.revision.editor is None
 
     @use_kwargs({
         'comment': fields.String(missing='')
@@ -208,33 +191,22 @@ class RHCreateSubmitterRevision(RHContributionEditableRevisionBase):
     """Create new revision from submitter."""
 
     def _check_revision_access(self):
-        if not self._user_is_authorized_submitter():
-            return False
-        return self.revision.final_state == FinalRevisionState.needs_submitter_changes
+        return self._user_is_authorized_submitter()
 
     def _process(self):
         args = parser.parse({
             'files': EditingFilesField(self.event, allow_claimed_files=True, required=True)
         })
 
-        create_submitter_revision(self.revision.editable, session.user, args['files'])
+        create_submitter_revision(self.revision, session.user, args['files'])
         return '', 204
 
 
 class RHUndoReview(RHContributionEditableRevisionBase):
     """Undo the last review/confirmation on an Editable."""
 
-    def _get_target_revision(self):
-        # get last revision with a final state
-        revision = next((r for r in self.editable.revisions[::-1] if r.final_state != FinalRevisionState.none), None)
-        if revision.id != request.view_args['revision_id']:
-            raise UserValueError(_('The decision on this revision cannot be undone'))
-        return revision
-
     def _check_revision_access(self):
-        if not self._user_is_authorized_editor():
-            return False
-        return self.revision.final_state != FinalRevisionState.replaced
+        return self._user_is_authorized_editor()
 
     def _process(self):
         undo_review(self.revision)

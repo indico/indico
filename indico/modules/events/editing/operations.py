@@ -7,6 +7,8 @@
 
 from __future__ import unicode_literals
 
+from werkzeug.exceptions import BadRequest
+
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.events.editing import logger
@@ -15,6 +17,34 @@ from indico.modules.events.editing.models.editable import Editable
 from indico.modules.events.editing.models.revision_files import EditingRevisionFile
 from indico.modules.events.editing.models.revisions import EditingRevision, FinalRevisionState, InitialRevisionState
 from indico.modules.events.editing.schemas import EditingConfirmationAction, EditingReviewAction
+from indico.util.i18n import _
+
+
+class InvalidEditableState(BadRequest):
+    """
+    An error indicating that an operation on an Editable failed because its
+    current state does not permit it, or that the provided revision hint
+    did not match (ie the revisions changed in the meantime).
+    """
+
+    def __init__(self):
+        super(InvalidEditableState, self).__init__(_('The requested action is not possible on this revision'))
+
+
+def _ensure_latest_revision(revision):
+    if revision != revision.editable.revisions[-1]:
+        raise InvalidEditableState
+
+
+def _ensure_state(revision, initial=None, final=None):
+    if isinstance(initial, InitialRevisionState):
+        initial = {initial}
+    if isinstance(final, FinalRevisionState):
+        final = {final}
+    if initial is not None and revision.initial_state not in initial:
+        raise InvalidEditableState
+    if final is not None and revision.final_state not in final:
+        raise InvalidEditableState
 
 
 def _make_editable_files(editable, files):
@@ -43,6 +73,7 @@ def create_new_editable(contrib, type_, submitter, files):
 
 
 def publish_editable_revision(revision):
+    _ensure_latest_revision(revision)
     revision.editable.published_revision = revision
     db.session.flush()
     logger.info('Revision %r marked as published', revision)
@@ -50,7 +81,8 @@ def publish_editable_revision(revision):
 
 @no_autoflush
 def review_editable_revision(revision, editor, action, comment, tags, files=None):
-    assert revision.final_state == FinalRevisionState.none
+    _ensure_latest_revision(revision)
+    _ensure_state(revision, initial=InitialRevisionState.ready_for_review, final=FinalRevisionState.none)
     revision.editor = editor
     revision.comment = comment
     revision.tags = tags
@@ -81,6 +113,8 @@ def create_revision_comment(revision, submitter, comment):
 
 @no_autoflush
 def confirm_editable_changes(revision, submitter, action, comment):
+    _ensure_latest_revision(revision)
+    _ensure_state(revision, initial=InitialRevisionState.needs_submitter_confirmation, final=FinalRevisionState.none)
     revision.final_state = {
         EditingConfirmationAction.accept: FinalRevisionState.accepted,
         EditingConfirmationAction.reject: FinalRevisionState.needs_submitter_changes,
@@ -95,6 +129,10 @@ def confirm_editable_changes(revision, submitter, action, comment):
 
 @no_autoflush
 def replace_revision(revision, user, comment, files):
+    _ensure_latest_revision(revision)
+    _ensure_state(revision,
+                  initial=(InitialRevisionState.new, InitialRevisionState.ready_for_review),
+                  final=FinalRevisionState.none)
     revision.comment = comment
     revision.final_state = FinalRevisionState.replaced
     new_revision = EditingRevision(submitter=user,
@@ -106,24 +144,34 @@ def replace_revision(revision, user, comment, files):
 
 
 @no_autoflush
-def create_submitter_revision(editable, user, files):
+def create_submitter_revision(prev_revision, user, files):
+    _ensure_latest_revision(prev_revision)
+    _ensure_state(prev_revision, final=FinalRevisionState.needs_submitter_changes)
     new_revision = EditingRevision(submitter=user,
                                    initial_state=InitialRevisionState.ready_for_review,
-                                   files=_make_editable_files(editable, files))
-    editable.revisions.append(new_revision)
+                                   files=_make_editable_files(prev_revision.editable, files))
+    prev_revision.editable.revisions.append(new_revision)
     db.session.flush()
     logger.info('Revision %r created by submitter %s', new_revision, user)
 
 
+def _ensure_latest_revision_with_final_state(revision):
+    expected = next((r for r in revision.editable.revisions[::-1] if r.final_state != FinalRevisionState.none), None)
+    if revision != expected:
+        raise InvalidEditableState
+
+
 @no_autoflush
 def undo_review(revision):
+    _ensure_latest_revision_with_final_state(revision)
     latest_revision = revision.editable.revisions[-1]
     if revision != latest_revision:
-        # this is only allowed if the latest revision is in the `needs_submitter_confirmation` state
-        assert revision.editable.revisions[-2:] == [revision, latest_revision]
-        assert latest_revision.final_state == FinalRevisionState.none
-        assert latest_revision.initial_state == InitialRevisionState.needs_submitter_confirmation
-        assert revision.final_state == FinalRevisionState.needs_submitter_confirmation
+        if revision.editable.revisions[-2:] != [revision, latest_revision]:
+            raise InvalidEditableState
+        _ensure_state(revision, final=FinalRevisionState.needs_submitter_confirmation)
+        _ensure_state(latest_revision,
+                      initial=InitialRevisionState.needs_submitter_confirmation,
+                      final=FinalRevisionState.none)
         db.session.delete(latest_revision)
     if revision.final_state == FinalRevisionState.accepted:
         revision.editable.published_revision = None
