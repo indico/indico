@@ -113,3 +113,22 @@ def create_submitter_revision(editable, user, files):
     editable.revisions.append(new_revision)
     db.session.flush()
     logger.info('Revision %r created by submitter %s', new_revision, user)
+
+
+@no_autoflush
+def undo_review(revision):
+    latest_revision = revision.editable.revisions[-1]
+    if revision != latest_revision:
+        # this is only allowed if the latest revision is in the `needs_submitter_confirmation` state
+        assert revision.editable.revisions[-2:] == [revision, latest_revision]
+        assert latest_revision.final_state == FinalRevisionState.none
+        assert latest_revision.initial_state == InitialRevisionState.needs_submitter_confirmation
+        assert revision.final_state == FinalRevisionState.needs_submitter_confirmation
+        db.session.delete(latest_revision)
+    if revision.final_state == FinalRevisionState.accepted:
+        revision.editable.published_revision = None
+    db.session.flush()
+    revision.final_state = FinalRevisionState.none
+    revision.comment = ''
+    db.session.flush()
+    logger.info('Revision %r review undone', revision)

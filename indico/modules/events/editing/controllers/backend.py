@@ -20,7 +20,7 @@ from indico.modules.events.editing.models.editable import Editable, EditableType
 from indico.modules.events.editing.models.revisions import FinalRevisionState, InitialRevisionState
 from indico.modules.events.editing.operations import (confirm_editable_changes, create_new_editable,
                                                       create_submitter_revision, replace_revision,
-                                                      review_editable_revision)
+                                                      review_editable_revision, undo_review)
 from indico.modules.events.editing.schemas import (EditableSchema, EditingConfirmationAction, EditingFileTypeSchema,
                                                    EditingReviewAction, EditingTagSchema, ReviewEditableArgs)
 from indico.util.i18n import _
@@ -90,9 +90,13 @@ class RHContributionEditableRevisionBase(RHContributionEditableBase):
         RHContributionEditableBase._process_args(self)
         if not self.editable:
             raise NotFound
-        self.revision = self.editable.revisions[-1]
-        if self.revision.id != request.view_args['revision_id']:
+        self.revision = self._get_target_revision()
+
+    def _get_target_revision(self):
+        revision = self.editable.revisions[-1]
+        if revision.id != request.view_args['revision_id']:
             raise UserValueError(_('Only the latest revision can be updated'))
+        return revision
 
     def _check_revision_access(self):
         raise NotImplementedError
@@ -129,7 +133,7 @@ class RHCreateEditable(RHContributionEditableBase):
 
     def _process(self):
         if self.editable:
-            raise UserValueError('Editable already exists')
+            raise UserValueError(_('Editable already exists'))
 
         args = parser.parse({
             'files': EditingFilesField(self.event, required=True)
@@ -214,4 +218,24 @@ class RHCreateSubmitterRevision(RHContributionEditableRevisionBase):
         })
 
         create_submitter_revision(self.revision.editable, session.user, args['files'])
+        return '', 204
+
+
+class RHUndoReview(RHContributionEditableRevisionBase):
+    """Undo the last review/confirmation on an Editable."""
+
+    def _get_target_revision(self):
+        # get last revision with a final state
+        revision = next((r for r in self.editable.revisions[::-1] if r.final_state != FinalRevisionState.none), None)
+        if revision.id != request.view_args['revision_id']:
+            raise UserValueError(_('The decision on this revision cannot be undone'))
+        return revision
+
+    def _check_revision_access(self):
+        if not self._user_is_authorized_editor():
+            return False
+        return self.revision.final_state != FinalRevisionState.replaced
+
+    def _process(self):
+        undo_review(self.revision)
         return '', 204

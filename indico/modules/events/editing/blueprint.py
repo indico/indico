@@ -29,3 +29,5 @@ _bp.add_url_rule('/api/contributions/<int:contrib_id>/editing/<any(paper):type>/
                  'api_replace_revision', backend.RHReplaceRevision, methods=('POST',))
 _bp.add_url_rule('/api/contributions/<int:contrib_id>/editing/<any(paper):type>/<int:revision_id>/new',
                  'api_create_submitter_revision', backend.RHCreateSubmitterRevision, methods=('POST',))
+_bp.add_url_rule('/api/contributions/<int:contrib_id>/editing/<any(paper):type>/<int:revision_id>/review',
+                 'api_undo_review', backend.RHUndoReview, methods=('DELETE',))
