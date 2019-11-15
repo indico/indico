@@ -18,7 +18,8 @@ from indico.modules.events.controllers.base import RHEventBase
 from indico.modules.events.editing.fields import EditingFilesField, EditingTagsField
 from indico.modules.events.editing.models.editable import Editable, EditableType
 from indico.modules.events.editing.models.revisions import FinalRevisionState, InitialRevisionState
-from indico.modules.events.editing.operations import (confirm_editable_changes, create_new_editable, replace_revision,
+from indico.modules.events.editing.operations import (confirm_editable_changes, create_new_editable,
+                                                      create_submitter_revision, replace_revision,
                                                       review_editable_revision)
 from indico.modules.events.editing.schemas import (EditableSchema, EditingConfirmationAction, EditingFileTypeSchema,
                                                    EditingReviewAction, EditingTagSchema, ReviewEditableArgs)
@@ -196,4 +197,21 @@ class RHReplaceRevision(RHContributionEditableRevisionBase):
         })
 
         replace_revision(self.revision, session.user, comment, args['files'])
+        return '', 204
+
+
+class RHCreateSubmitterRevision(RHContributionEditableRevisionBase):
+    """Create new revision from submitter."""
+
+    def _check_revision_access(self):
+        if not self._user_is_authorized_submitter():
+            return False
+        return self.revision.final_state == FinalRevisionState.needs_submitter_changes
+
+    def _process(self):
+        args = parser.parse({
+            'files': EditingFilesField(self.event, allow_claimed_files=True, required=True)
+        })
+
+        create_submitter_revision(self.revision.editable, session.user, args['files'])
         return '', 204

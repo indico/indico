@@ -103,3 +103,13 @@ def replace_revision(revision, user, comment, files):
     revision.editable.revisions.append(new_revision)
     db.session.flush()
     logger.info('Revision %r replaced by %s', revision, user)
+
+
+@no_autoflush
+def create_submitter_revision(editable, user, files):
+    new_revision = EditingRevision(submitter=user,
+                                   initial_state=InitialRevisionState.ready_for_review,
+                                   files=_make_editable_files(editable, files))
+    editable.revisions.append(new_revision)
+    db.session.flush()
+    logger.info('Revision %r created by submitter %s', new_revision, user)
