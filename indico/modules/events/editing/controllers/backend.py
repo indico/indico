@@ -16,13 +16,16 @@ from indico.core.errors import UserValueError
 from indico.modules.events.controllers.base import RHEventBase
 from indico.modules.events.editing.controllers.base import RHContributionEditableBase
 from indico.modules.events.editing.fields import EditingFilesField, EditingTagsField
+from indico.modules.events.editing.models.comments import EditingRevisionComment
 from indico.modules.events.editing.operations import (confirm_editable_changes, create_new_editable,
-                                                      create_submitter_revision, replace_revision,
-                                                      review_editable_revision, undo_review)
+                                                      create_revision_comment, create_submitter_revision,
+                                                      delete_revision_comment, replace_revision,
+                                                      review_editable_revision, undo_review, update_revision_comment)
 from indico.modules.events.editing.schemas import (EditableSchema, EditingConfirmationAction, EditingFileTypeSchema,
                                                    EditingReviewAction, EditingTagSchema, ReviewEditableArgs)
 from indico.modules.files.controllers import UploadFileMixin
 from indico.util.i18n import _
+from indico.util.marshmallow import not_empty
 from indico.web.args import parser, use_kwargs
 
 
@@ -180,4 +183,66 @@ class RHUndoReview(RHContributionEditableRevisionBase):
 
     def _process(self):
         undo_review(self.revision)
+        return '', 204
+
+
+class RHCreateRevisionComment(RHContributionEditableRevisionBase):
+    """Create new revision comment"""
+
+    def _check_revision_access(self):
+        return self._user_is_authorized_submitter() or self._user_is_authorized_editor()
+
+    @use_kwargs({
+        'text': fields.String(required=True, validate=not_empty),
+        'internal': fields.Bool(missing=False)
+    })
+    def _process(self, text, internal):
+        if internal and not self._user_is_authorized_editor():
+            internal = False
+        create_revision_comment(self.revision, session.user, text, internal)
+        return '', 201
+
+
+class RHEditRevisionComment(RHContributionEditableRevisionBase):
+    """Edit/delete revision comment"""
+
+    normalize_url_spec = {
+        'locators': {
+            lambda self: self.contrib
+        },
+        'preserved_args': {'type', 'revision_id', 'comment_id'}
+    }
+
+    def _process_args(self):
+        RHContributionEditableRevisionBase._process_args(self)
+        self.comment = (EditingRevisionComment.query
+                        .with_parent(self.revision)
+                        .filter_by(id=request.view_args['comment_id'])
+                        .first_or_404())
+
+    def _check_revision_access(self):
+        if self.comment.system:
+            return False
+        elif self.comment.internal and not self._user_is_authorized_editor():
+            return False
+        elif not self._user_is_authorized_submitter() and not self._user_is_authorized_editor():
+            return False
+        return self.comment.user == session.user
+
+    @use_kwargs({
+        'text': fields.String(missing=None, validate=not_empty),
+        'internal': fields.Bool(missing=None)
+    })
+    def _process_PATCH(self, text, internal):
+        updates = {}
+        if text is not None:
+            updates['text'] = text
+        if internal is not None and self._user_is_authorized_editor():
+            updates['internal'] = internal
+        if updates:
+            update_revision_comment(self.comment, updates)
+        return '', 204
+
+    def _process_DELETE(self):
+        delete_revision_comment(self.comment)
         return '', 204

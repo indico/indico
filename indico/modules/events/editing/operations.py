@@ -17,6 +17,7 @@ from indico.modules.events.editing.models.editable import Editable
 from indico.modules.events.editing.models.revision_files import EditingRevisionFile
 from indico.modules.events.editing.models.revisions import EditingRevision, FinalRevisionState, InitialRevisionState
 from indico.modules.events.editing.schemas import EditingConfirmationAction, EditingReviewAction
+from indico.util.date_time import now_utc
 from indico.util.i18n import _
 
 
@@ -106,12 +107,6 @@ def review_editable_revision(revision, editor, action, comment, tags, files=None
 
 
 @no_autoflush
-def create_revision_comment(revision, submitter, comment):
-    revision.comments.append(EditingRevisionComment(user=submitter, text=comment))
-    db.session.flush()
-
-
-@no_autoflush
 def confirm_editable_changes(revision, submitter, action, comment):
     _ensure_latest_revision(revision)
     _ensure_state(revision, initial=InitialRevisionState.needs_submitter_confirmation, final=FinalRevisionState.none)
@@ -180,3 +175,29 @@ def undo_review(revision):
     revision.comment = ''
     db.session.flush()
     logger.info('Revision %r review undone', revision)
+
+
+@no_autoflush
+def create_revision_comment(revision, user, text, internal=False):
+    _ensure_latest_revision(revision)
+    comment = EditingRevisionComment(user=user, text=text, internal=internal)
+    revision.comments.append(comment)
+    db.session.flush()
+    logger.info('Comment on revision %r created by %r: %r', revision, user, comment)
+
+
+@no_autoflush
+def update_revision_comment(comment, updates):
+    _ensure_latest_revision(comment.revision)
+    comment.populate_from_dict(updates)
+    comment.modified_dt = now_utc()
+    db.session.flush()
+    logger.info('Comment on revision %r updated: %r', comment.revision, comment)
+
+
+@no_autoflush
+def delete_revision_comment(comment):
+    _ensure_latest_revision(comment.revision)
+    comment.is_deleted = True
+    db.session.flush()
+    logger.info('Comment on revision %r deleted: %r', comment.revision, comment)
