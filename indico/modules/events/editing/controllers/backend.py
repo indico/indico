@@ -13,10 +13,10 @@ from marshmallow_enum import EnumField
 from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.core.errors import UserValueError
-from indico.modules.events.contributions.controllers.display import RHContributionDisplayBase
 from indico.modules.events.controllers.base import RHEventBase
+from indico.modules.events.editing.controllers.base import RHContributionEditableBase
 from indico.modules.events.editing.fields import EditingFilesField, EditingTagsField
-from indico.modules.events.editing.models.editable import Editable, EditableType
+from indico.modules.events.editing.models.editable import EditableType
 from indico.modules.events.editing.operations import (confirm_editable_changes, create_new_editable,
                                                       create_submitter_revision, replace_revision,
                                                       review_editable_revision, undo_review)
@@ -38,41 +38,6 @@ class RHEditingTags(RHEventBase):
 
     def _process(self):
         return EditingTagSchema(many=True).jsonify(self.event.editing_tags)
-
-
-class RHContributionEditableBase(RHContributionDisplayBase):
-    """Base class for operations on an editable."""
-
-    normalize_url_spec = {
-        'locators': {
-            lambda self: self.contrib
-        },
-        'preserved_args': {'type'}
-    }
-
-    def _process_args(self):
-        RHContributionDisplayBase._process_args(self)
-        self.editable = (Editable.query
-                         .with_parent(self.contrib)
-                         .filter_by(type=EditableType[request.view_args['type']])
-                         .first())
-
-    def _check_access(self):
-        RHContributionDisplayBase._check_access(self)
-        if not session.user:
-            raise Forbidden
-
-    def _user_is_authorized_submitter(self):
-        if session.user.is_admin:
-            # XXX: not sure if we want to keep this, but for now it's useful to have!
-            return True
-        return self.contrib.is_user_associated(session.user, check_abstract=True)
-
-    def _user_is_authorized_editor(self):
-        if session.user.is_admin:
-            # XXX: not sure if we want to keep this, but for now it's useful to have!
-            return True
-        return self.editable.editor == session.user
 
 
 class RHContributionEditableRevisionBase(RHContributionEditableBase):
