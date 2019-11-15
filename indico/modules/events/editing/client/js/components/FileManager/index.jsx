@@ -6,11 +6,11 @@
 // LICENSE file for more details.
 
 import _ from 'lodash';
-import React, {useCallback, useReducer, useContext, useRef} from 'react';
+import React, {useCallback, useReducer, useContext, useRef, useMemo} from 'react';
 import PropTypes from 'prop-types';
 import {useDropzone} from 'react-dropzone';
 import {Icon} from 'semantic-ui-react';
-import {FileManagerContext, filePropTypes, uploadFiles, deleteFile} from './util';
+import {FileManagerContext, filePropTypes, uploadFiles, deleteFile, mapFileTypes} from './util';
 import FileList from './FileList';
 import Uploads from './Uploads';
 import reducer from './reducer';
@@ -43,7 +43,7 @@ function Dropzone({eventId, fileType: {id, allowMultipleFiles, files}}) {
         dispatch,
         acceptsNewFiles ? null : files[0].uuid
       );
-      if (files[0].state === 'modified') {
+      if (files.length && files[0].state === 'modified') {
         // we're modifying a "modified" file, so we can get rid of
         // the current one
         dispatch(deleteFile(files[0].uuid));
@@ -101,16 +101,10 @@ FileType.defaultProps = {
   uploads: {},
 };
 
-function mapFileTypes(fileTypes, files) {
-  return fileTypes.map(fileType => {
-    fileType.files = files.filter(file => file.fileType === fileType.id);
-    return fileType;
-  });
-}
-
 export default function FileManager({eventId, fileTypes, files}) {
+  const _fileTypes = useMemo(() => mapFileTypes(fileTypes, files), [fileTypes, files]);
   const [state, dispatch] = useReducer(reducer, {
-    fileTypes: mapFileTypes(fileTypes, files),
+    fileTypes: _fileTypes,
     uploads: {},
   });
 

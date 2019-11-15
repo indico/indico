@@ -80,3 +80,10 @@ export async function deleteFile(uuid) {
     handleAxiosError(e, false, true);
   }
 }
+
+export function mapFileTypes(fileTypes, files) {
+  return fileTypes.map(fileType => ({
+    ...fileType,
+    files: files.filter(file => file.fileType === fileType.id).map(f => ({...f, claimed: true})),
+  }));
+}
