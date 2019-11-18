@@ -13,7 +13,7 @@ from pytz import common_timezones, common_timezones_set
 from wtforms.fields.core import BooleanField, SelectField, StringField
 from wtforms.fields.html5 import EmailField
 from wtforms.fields.simple import TextAreaField
-from wtforms.validators import DataRequired, ValidationError
+from wtforms.validators import DataRequired, Email, ValidationError
 
 from indico.core.config import config
 from indico.modules.auth.forms import LocalRegistrationForm, _check_existing_email
@@ -76,7 +76,7 @@ class UserPreferencesForm(IndicoForm):
 
 
 class UserEmailsForm(IndicoForm):
-    email = EmailField(_('Add new email address'), [DataRequired()], filters=[lambda x: x.lower() if x else x])
+    email = EmailField(_('Add new email address'), [DataRequired(), Email()], filters=[lambda x: x.lower() if x else x])
 
     def validate_email(self, field):
         if UserEmail.find(~User.is_pending, is_user_deleted=False, email=field.data, _join=User).count():
@@ -108,7 +108,7 @@ class AdminUserSettingsForm(IndicoForm):
 
 
 class AdminAccountRegistrationForm(LocalRegistrationForm):
-    email = EmailField(_('Email address'), [DataRequired(), _check_existing_email],
+    email = EmailField(_('Email address'), [DataRequired(), Email(), _check_existing_email],
                        filters=[lambda s: s.lower() if s else s])
     create_identity = BooleanField(_("Set login details"), widget=SwitchWidget(), default=True)
 

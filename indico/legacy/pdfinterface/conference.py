@@ -8,7 +8,6 @@
 import re
 from copy import deepcopy
 from datetime import timedelta
-from itertools import takewhile
 from operator import attrgetter
 
 from reportlab.lib import colors
@@ -31,8 +30,8 @@ from indico.modules.events.tracks.models.groups import TrackGroup
 from indico.modules.events.tracks.settings import track_settings
 from indico.util.date_time import format_date, format_datetime, format_human_timedelta, format_time, now_utc
 from indico.util.i18n import _, ngettext
-from indico.util.string import (format_full_name, html_color_to_rgb, render_markdown, sanitize_for_platypus, strip_tags,
-                                to_unicode, truncate)
+from indico.util.string import (format_full_name, html_color_to_rgb, natural_sort_key, render_markdown,
+                                sanitize_for_platypus, strip_tags, to_unicode, truncate)
 
 
 # Change reportlab default pdf font Helvetica to indico ttf font,
@@ -529,7 +528,8 @@ class TimeTablePlain(PDFWithTOC):
         entries = (self.event.timetable_entries
                    .filter(db.cast(TimetableEntry.start_dt.astimezone(self.event.tzinfo), db.Date) == day,
                            TimetableEntry.parent_id.is_(None))
-                   .order_by(TimetableEntry.start_dt))
+                   .order_by(TimetableEntry.start_dt)
+                   .all())
         for entry in entries:
             # Session slot
             if entry.type == TimetableEntryType.SESSION_BLOCK:
@@ -591,7 +591,7 @@ class TimeTablePlain(PDFWithTOC):
                 ts = deepcopy(originalts)
                 contribs = sorted(sess_block.contributions, key=attrgetter('timetable_entry.start_dt'))
                 if sess_block.session.is_poster:
-                    for contrib in contribs:
+                    for contrib in sorted(contribs, key=lambda x: natural_sort_key(x.board_number)):
                         self._processPosterContribution(contrib, l)
 
                     if l:
@@ -689,7 +689,6 @@ class TimeTablePlain(PDFWithTOC):
                     p3 = Paragraph(escape(unicode(contrib.description)), self._styles["contrib_description"])
                     res.append(p3)
                 if entry == entries[-1]:  # if it is the last one, we do the page break and remove the previous one.
-                    res = list(takewhile(lambda x: not isinstance(x, PageBreak), res))
                     if self._ttPDFFormat.showNewPagePerSession():
                         res.append(PageBreak())
             # break
@@ -711,7 +710,6 @@ class TimeTablePlain(PDFWithTOC):
                     self._indexedFlowable[p1] = {'text': escape(break_.title.encode('utf-8')), 'level': 2}
 
                 if entry == entries[-1]:  # if it is the last one, we do the page break and remove the previous one.
-                    res = list(takewhile(lambda x: not isinstance(x, PageBreak), res))
                     if self._ttPDFFormat.showNewPagePerSession():
                         res.append(PageBreak())
         return res

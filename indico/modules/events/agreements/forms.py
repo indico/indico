@@ -9,7 +9,7 @@ from __future__ import unicode_literals
 
 from wtforms.fields import BooleanField, FileField, SelectField, TextAreaField
 from wtforms.fields.html5 import EmailField
-from wtforms.validators import DataRequired, InputRequired, ValidationError
+from wtforms.validators import DataRequired, Email, InputRequired, ValidationError
 
 from indico.util.i18n import _
 from indico.util.placeholders import get_missing_placeholders, render_placeholder_info
@@ -27,7 +27,8 @@ class AgreementForm(IndicoForm):
 
 class AgreementEmailForm(IndicoForm):
     from_address = SelectField(_("From"), [DataRequired()])
-    cc_addresses = EmailField(_("CC"), description=_("Warning: this email address will be able to sign the agreement!"))
+    cc_addresses = EmailField(_("CC"), [Email()],
+                              description=_("Warning: this email address will be able to sign the agreement!"))
     body = TextAreaField(_("Email body"), widget=CKEditorWidget(simple=True))
 
     def __init__(self, *args, **kwargs):

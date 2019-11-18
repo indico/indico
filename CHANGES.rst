@@ -47,6 +47,16 @@ Version 2.2.5
 
 *Unreleased*
 
+Improvements
+^^^^^^^^^^^^
+
+- Sort posters in timetable PDF export by board number (:issue:`4147`, thanks
+  :user:`bpedersen2`)
+- Use lat/lng field order instead of lng/lat when editing rooms (:issue:`4150`,
+  thanks :user:`bpedersen2`)
+- Add additional fields to the contribution csv/xlsx export (authors and board
+  number) (:issue:`4148`, thanks :user:`bpedersen2`)
+
 Bugfixes
 ^^^^^^^^
 
@@ -58,6 +68,12 @@ Bugfixes
 - Fix creating rooms without touching the longitude/latitude fields (:issue:`4115`)
 - Fix error in HTTP API when Basic auth headers are present (:issue:`4123`,
   thanks :user:`uxmaster`)
+- Fix incorrect font size in some room booking dropdowns (:issue:`4156`)
+- Add missing email validation in some places (:issue:`4158`)
+- Reject requests containing NUL bytes in the POST data (:issue:`4159`)
+- Fix truncated timetable PDF when using "Print each session on a separate page" in
+  an event where the last timetable entry of the day is a top-level contribution
+  or break (:issue:`4134`, thanks :user:`bpedersen2`)
 
 Version 2.2.4
 -------------

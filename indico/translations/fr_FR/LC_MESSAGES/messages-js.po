@@ -14,7 +14,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2019-10-04 13:51+0200\n"
+"POT-Creation-Date: 2019-10-28 14:40+0100\n"
 "PO-Revision-Date: 2019-06-11 20:36+0000\n"
 "Last-Translator: Thomas Baron <thomas.baron@cern.ch>\n"
 "Language-Team: French (France) (http://www.transifex.com/indico/indico/language/fr_FR/)\n"
@@ -790,7 +790,7 @@ msgstr "Sauver"
 
 #: indico/web/client/js/jquery/widgets/ajaxqbubble.js:20
 #: indico/web/client/js/legacy/libs/indico/Core/Dialogs/Base.js:63
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:787
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:782
 msgid "Loading..."
 msgstr "Chargement en cours..."
 
@@ -922,7 +922,7 @@ msgstr "Tapez pour ajouter {0}"
 
 #: indico/web/client/js/jquery/widgets/jinja/multiple_items_widget.js:34
 #: indico/web/client/js/jquery/widgets/multitextfield.js:278
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1659
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1654
 msgid "Delete"
 msgstr "Supprimer"
 
@@ -980,7 +980,7 @@ msgstr[0] "<strong>{0}</strong> mot restant"
 msgstr[1] "<strong>{0}</strong> mots restants"
 
 #: indico/web/client/js/jquery/widgets/jinja/multiple_items_widget.js:44
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1591
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1586
 msgid "Edit"
 msgstr "Modifier"
 
@@ -1705,56 +1705,56 @@ msgstr "contribution(s)."
 msgid "Please click for more information."
 msgstr "Veuillez cliquer pour plus d'informations. "
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:737
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:732
 msgid "Move entry"
 msgstr "Déplacer l'entrée"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:781
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:792
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:776
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:787
 msgid "This timetable entry does not exist anymore. Please refresh the page."
 msgstr "Cette entrée de l'ordre du jour n'existe plus. Veuiller rafraichir la page."
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:793
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:788
 msgid "Refresh"
 msgstr "Rafraichir"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:896
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:891
 msgid "Move up"
 msgstr "Déplacer vers le haut"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:905
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:900
 msgid "Move down"
 msgstr "Déplacer vers le bas "
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1593
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1588
 msgid "Edit poster"
 msgstr "Modifier le poster"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1625
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1620
 msgid "Manage protection"
 msgstr "Gérer la protection"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1627
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1622
 msgid "Manage poster protection"
 msgstr "Gérer la protection du poster"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1655
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1650
 msgid "Unschedule"
 msgstr "Déprogrammer"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1656
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1651
 msgid "Unschedule poster"
 msgstr "Déprogrammer le poster"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1657
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1652
 msgid "Are you sure you want to unschedule the poster?"
 msgstr "Êtes-vous sûr de vouloir déprogrammer le poster?"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1660
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1655
 msgid "Delete poster"
 msgstr "Supprimer le poster"
 
-#: indico/web/client/js/legacy/libs/timetable/Draw.js:1661
+#: indico/web/client/js/legacy/libs/timetable/Draw.js:1656
 msgid "Are you sure you want to delete the poster?"
 msgstr "Êtes-vous sur de vouloir supprimer ce poster?"
 
