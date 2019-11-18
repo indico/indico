@@ -18,6 +18,7 @@ from sqlalchemy import inspect
 
 from indico.core.permissions import get_unified_permissions
 from indico.util.date_time import now_utc
+from indico.util.i18n import _
 from indico.util.user import principal_from_identifier
 
 
@@ -37,6 +38,16 @@ def validate_with_message(fn, reason):
             raise ValidationError(reason)
 
     return validate
+
+
+def not_empty(value):
+    """Validator which ensures the value is not empty.
+
+    Any falsy value is considered empty.
+    """
+
+    if not value:
+        raise ValidationError(_('This field cannot be empty.'))
 
 
 def _naive_isoformat(dt, **unused):
