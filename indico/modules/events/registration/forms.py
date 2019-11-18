@@ -15,7 +15,7 @@ import jsonschema
 from flask import request
 from wtforms.fields import BooleanField, FloatField, HiddenField, IntegerField, SelectField, StringField, TextAreaField
 from wtforms.fields.html5 import DecimalField, EmailField
-from wtforms.validators import DataRequired, InputRequired, NumberRange, Optional, ValidationError
+from wtforms.validators import DataRequired, Email, InputRequired, NumberRange, Optional, ValidationError
 from wtforms.widgets.html5 import NumberInput
 
 from indico.core.config import config
@@ -170,7 +170,7 @@ class InvitationFormNew(InvitationFormBase):
                              description=_("The first name of the user you are inviting."))
     last_name = StringField(_('Last name'), [DataRequired()],
                             description=_("The last name of the user you are inviting."))
-    email = EmailField(_('Email'), [DataRequired()], filters=[lambda x: x.lower() if x else x],
+    email = EmailField(_('Email'), [DataRequired(), Email()], filters=[lambda x: x.lower() if x else x],
                        description=_("The invitation will be sent to this address."))
     affiliation = StringField(_('Affiliation'),
                               description=_("The affiliation of the user you are inviting."))
