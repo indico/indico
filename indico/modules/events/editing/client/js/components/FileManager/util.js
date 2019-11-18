@@ -5,7 +5,6 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import uploadFileURL from 'indico-url:event_editing.file_upload';
 import deleteFileURL from 'indico-url:files.delete_file';
 
 import _ from 'lodash';
@@ -24,12 +23,12 @@ export const filePropTypes = {
   state: PropTypes.oneOf(['added', 'modified', 'deleted']),
 };
 
-async function uploadFile(file, urlParams, onUploadProgress) {
+async function uploadFile(file, url, onUploadProgress) {
   const formData = new FormData();
   formData.append('file', file);
 
   try {
-    const {data} = await indicoAxios.post(uploadFileURL(urlParams), formData, {
+    const {data} = await indicoAxios.post(url, formData, {
       headers: {'content-type': 'multipart/form-data'},
       onUploadProgress,
     });
@@ -45,18 +44,18 @@ async function uploadFile(file, urlParams, onUploadProgress) {
  * @param {Function} action - the action to be executed after upload is done
  * @param {String} fileTypeId - the id of the File Type
  * @param {Array} acceptedFiles - the "accepted files" array sent by react-dropzone
- * @param {String} eventId - the id of the event
+ * @param {String} uploadURL - the URL to POST the files to
  * @param {Function} dispatch - the dispatch function for reducer actions
  * @param {String?} fileId - the ID of the file to modify, if any
  */
-export function uploadFiles(action, fileTypeId, acceptedFiles, eventId, dispatch, fileId = null) {
+export function uploadFiles(action, fileTypeId, acceptedFiles, uploadURL, dispatch, fileId = null) {
   const tmpFileIds = acceptedFiles.map(() => _.uniqueId(_.now()));
 
   dispatch(actions.startUploads(fileTypeId, acceptedFiles, tmpFileIds));
 
   return Promise.all(
     _.zip(acceptedFiles, tmpFileIds).map(async ([acceptedFile, tmpFileId]) => {
-      const uploadedFile = await uploadFile(acceptedFile, {confId: eventId}, e =>
+      const uploadedFile = await uploadFile(acceptedFile, uploadURL, e =>
         dispatch(actions.progress(fileTypeId, tmpFileId, Math.floor((e.loaded / e.total) * 100)))
       );
       dispatch(
