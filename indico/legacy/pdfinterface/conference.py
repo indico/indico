@@ -517,7 +517,8 @@ class TimeTablePlain(PDFWithTOC):
         entries = (self.event.timetable_entries
                    .filter(db.cast(TimetableEntry.start_dt.astimezone(self.event.tzinfo), db.Date) == day,
                            TimetableEntry.parent_id.is_(None))
-                   .order_by(TimetableEntry.start_dt))
+                   .order_by(TimetableEntry.start_dt)
+                   .all())
         for entry in entries:
             # Session slot
             if entry.type == TimetableEntryType.SESSION_BLOCK:
