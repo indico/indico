@@ -7,7 +7,7 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.events.editing.controllers import backend
+from indico.modules.events.editing.controllers import backend, frontend
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -39,3 +39,4 @@ _bp.add_url_rule(
     '/api/contributions/<int:contrib_id>/editing/<any(paper):type>/<int:revision_id>/comments/<int:comment_id>',
     'api_edit_comment', backend.RHEditRevisionComment, methods=('PATCH', 'DELETE')
 )
+_bp.add_url_rule('/contributions/<int:contrib_id>/editing/<any(paper):type>', 'editable', frontend.RHEditableTimeline)

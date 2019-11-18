@@ -1,0 +1,13 @@
+{% extends 'events/management/base.html' %}
+
+{% block title %}
+    Paper editing
+{% endblock %}
+
+{% block content %}
+    <div id="file-manager"
+         data-event-id="{{ event.id }}"
+         data-upload-url="{{ url_for('event_editing.api_upload', event, contrib_id=contribution.id, type='paper') }}"
+         data-api-editable-url="{{ url_for('event_editing.api_editable', event, contrib_id=contribution.id, type='paper') }}">
+    </div>
+{% endblock %}
