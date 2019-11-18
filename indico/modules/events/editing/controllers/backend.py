@@ -17,6 +17,7 @@ from indico.modules.events.controllers.base import RHEventBase
 from indico.modules.events.editing.controllers.base import RHContributionEditableBase
 from indico.modules.events.editing.fields import EditingFilesField, EditingTagsField
 from indico.modules.events.editing.models.comments import EditingRevisionComment
+from indico.modules.events.editing.models.revisions import EditingRevision
 from indico.modules.events.editing.operations import (confirm_editable_changes, create_new_editable,
                                                       create_revision_comment, create_submitter_revision,
                                                       delete_revision_comment, replace_revision,
@@ -62,7 +63,10 @@ class RHContributionEditableRevisionBase(RHContributionEditableBase):
         RHContributionEditableBase._process_args(self)
         if not self.editable:
             raise NotFound
-        self.revision = next((r for r in self.editable.revisions if r.id == request.view_args['revision_id']), None)
+        self.revision = (EditingRevision.query
+                         .with_parent(self.editable, 'revisions')
+                         .filter_by(id=request.view_args['revision_id'])
+                         .first_or_404())
         if self.revision is None:
             raise NotFound
 
