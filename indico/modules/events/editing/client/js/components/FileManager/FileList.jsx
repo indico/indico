@@ -5,9 +5,9 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import React, {useContext, useRef, useState} from 'react';
+import React, {useContext, useCallback, useState} from 'react';
 import PropTypes from 'prop-types';
-import Dropzone from 'react-dropzone';
+import {useDropzone} from 'react-dropzone';
 import {Icon} from 'semantic-ui-react';
 import {FileManagerContext, filePropTypes, uploadFiles, deleteFile} from './util';
 import * as actions from './actions';
@@ -37,14 +37,25 @@ FileAction.propTypes = {
 };
 
 function FileEntry({
-  eventId,
+  uploadURL,
   fileTypeId,
   allowMultipleFiles,
   file: {uuid, filename, state, claimed},
 }) {
-  const ref = useRef(null);
   const dispatch = useContext(FileManagerContext);
   const [activeButton, setActiveButton] = useState(null);
+
+  const onDrop = useCallback(
+    async acceptedFiles => {
+      setActiveButton('replace');
+      await uploadFiles(actions.markModified, fileTypeId, acceptedFiles, uploadURL, dispatch, uuid);
+      // when we're done, the component will have been unmounted,
+      // so there's no need to unset the active button
+    },
+    [dispatch, uploadURL, uuid, fileTypeId]
+  );
+
+  const {getRootProps, getInputProps, open} = useDropzone({onDrop});
 
   return (
     <>
@@ -58,30 +69,11 @@ function FileEntry({
               icon="exchange"
               active={activeButton === 'replace'}
               styleName="exchange-icon"
-              onClick={() => {
-                ref.current.open();
-              }}
+              onClick={open}
             />
-            <Dropzone
-              ref={ref}
-              onDrop={async acceptedFiles => {
-                setActiveButton('replace');
-                await uploadFiles(
-                  actions.markModified,
-                  fileTypeId,
-                  acceptedFiles,
-                  eventId,
-                  dispatch,
-                  uuid
-                );
-              }}
-            >
-              {({getRootProps, getInputProps}) => (
-                <span {...getRootProps()}>
-                  <input {...getInputProps()} />
-                </span>
-              )}
-            </Dropzone>
+            <span {...getRootProps()}>
+              <input {...getInputProps()} />
+            </span>
           </>
         )}
         {state !== 'deleted' && state !== 'modified' ? (
@@ -121,20 +113,20 @@ function FileEntry({
 }
 
 FileEntry.propTypes = {
-  eventId: PropTypes.string.isRequired,
+  uploadURL: PropTypes.string.isRequired,
   fileTypeId: PropTypes.number.isRequired,
   allowMultipleFiles: PropTypes.bool.isRequired,
   file: PropTypes.shape(filePropTypes).isRequired,
 };
 
-export default function FileList({files, fileTypeId, allowMultipleFiles, eventId}) {
+export default function FileList({files, fileTypeId, allowMultipleFiles, uploadURL}) {
   return (
     <ul styleName="file-list">
       {files.map(file => (
         <li key={file.uuid} styleName="file-row">
           <FileEntry
             fileTypeId={fileTypeId}
-            eventId={eventId}
+            uploadURL={uploadURL}
             allowMultipleFiles={allowMultipleFiles}
             file={file}
           />
@@ -148,5 +140,5 @@ FileList.propTypes = {
   files: PropTypes.arrayOf(PropTypes.shape(filePropTypes)).isRequired,
   fileTypeId: PropTypes.number.isRequired,
   allowMultipleFiles: PropTypes.bool.isRequired,
-  eventId: PropTypes.string.isRequired,
+  uploadURL: PropTypes.string.isRequired,
 };
