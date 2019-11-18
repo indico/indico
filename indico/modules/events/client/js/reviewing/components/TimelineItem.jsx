@@ -13,12 +13,14 @@ import {Param, Translate} from 'indico/react/i18n';
 import {serializeDate} from 'indico/utils/date';
 
 import ReviewForm from './ReviewForm';
-import RevisionItems from './RevisionItems';
+import RevisionLog from './RevisionLog';
 import UserAvatar from './UserAvatar';
 
 export default function TimelineItem({revision, isLastRevision, state}) {
   const {submitter, createdDt} = revision;
   const [visible, setVisible] = useState(isLastRevision);
+  const headerOnly =
+    !visible || (isLastRevision && revision.items.length === 0 && !revision.comment);
 
   return (
     <>
@@ -27,16 +29,20 @@ export default function TimelineItem({revision, isLastRevision, state}) {
           <UserAvatar user={revision.submitter} />
           <div
             className={`i-timeline-item-box header-indicator-left ${
-              !isLastRevision && !visible ? 'header-only' : ''
+              headerOnly ? 'header-only' : ''
             }`}
             id={`revision-info-${revision.id}`}
           >
             <div className="i-box-header flexrow">
               <div className="f-self-stretch">
-                <Translate>
-                  <Param name="submitterName" value={submitter.fullName} wrapper={<strong />} />{' '}
-                  submitted revision <Param name="revisionNumber" value={`#${revision.number}`} />{' '}
-                </Translate>
+                {revision.header ? (
+                  <strong>{revision.header}</strong>
+                ) : (
+                  <Translate>
+                    <Param name="submitterName" value={submitter.fullName} wrapper={<strong />} />{' '}
+                    submitted revision <Param name="revisionNumber" value={`#${revision.number}`} />{' '}
+                  </Translate>
+                )}
                 <time dateTime={serializeDate(createdDt, moment.HTML5_FMT.DATETIME_LOCAL)}>
                   {serializeDate(createdDt, 'LL')}
                 </time>
@@ -66,12 +72,12 @@ export default function TimelineItem({revision, isLastRevision, state}) {
           </div>
         </div>
       </div>
-      {(visible || isLastRevision) && revision.items.length !== 0 && (
+      {visible && (
         <>
-          <RevisionItems items={revision.items} separator={isLastRevision}>
+          <RevisionLog items={revision.items} separator={isLastRevision}>
             {/* TODO: Check whether the current user can actually judge */}
             {isLastRevision && state.name === 'ready_for_review' && <ReviewForm />}
-          </RevisionItems>
+          </RevisionLog>
         </>
       )}
     </>

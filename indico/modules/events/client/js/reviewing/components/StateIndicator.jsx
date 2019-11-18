@@ -11,7 +11,7 @@ import {Label, Popup} from 'semantic-ui-react';
 
 const colors = {
   replaced: 'grey',
-  needs_confirmation: 'yellow',
+  needs_submitter_confirmation: 'yellow',
   rejected: 'red',
   accepted: 'green',
   assigned: 'purple',

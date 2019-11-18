@@ -81,6 +81,7 @@ export default function PaperReviewForm() {
                         onFocus={onCommentClickHandler}
                         name="comment"
                         rows={commentFormVisible ? 3 : 1}
+                        style={{resize: commentFormVisible ? 'vertical' : 'none'}}
                         placeholder={Translate.string('Leave a comment...')}
                         hideValidationError
                         required

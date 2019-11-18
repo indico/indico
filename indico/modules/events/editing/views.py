@@ -12,4 +12,5 @@ from indico.modules.events.management.views import WPEventManagement
 
 class WPEditing(WPEventManagement):
     template_prefix = 'events/editing/'
-    bundles = ('module_events.editing.js', 'module_events.editing.css')
+    # TODO: remove mathjax later on from here (it is just here to make the timeline work)
+    bundles = ('module_events.editing.js', 'module_events.editing.css', 'mathjax.js')
