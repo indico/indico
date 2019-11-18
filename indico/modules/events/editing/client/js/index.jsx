@@ -6,7 +6,6 @@
 // LICENSE file for more details.
 
 import fileTypesURL from 'indico-url:event_editing.api_file_types';
-import editableURL from 'indico-url:event_editing.api_editable';
 
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -25,13 +24,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
   const fileTypes = camelizeKeys(response.data);
   try {
-    response = await indicoAxios.get(editableURL({confId: eventId, editable_id: 1}));
+    response = await indicoAxios.get(fileManager.dataset.apiEditableUrl);
   } catch (e) {
     handleAxiosError(e);
   }
   const files = camelizeKeys(response.data.revisions[0].files);
   ReactDOM.render(
-    <FileManager fileTypes={fileTypes} files={files} eventId={fileManager.dataset.eventId} />,
+    <FileManager fileTypes={fileTypes} files={files} uploadURL={fileManager.dataset.uploadUrl} />,
     fileManager
   );
 });

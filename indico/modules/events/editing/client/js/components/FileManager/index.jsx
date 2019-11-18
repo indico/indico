@@ -26,7 +26,7 @@ const fileTypePropTypes = {
   id: PropTypes.number.isRequired,
 };
 
-function Dropzone({eventId, fileType: {id, allowMultipleFiles, files}}) {
+function Dropzone({uploadURL, fileType: {id, allowMultipleFiles, files}}) {
   const dispatch = useContext(FileManagerContext);
   const acceptsNewFiles = allowMultipleFiles || !files.length;
 
@@ -39,7 +39,7 @@ function Dropzone({eventId, fileType: {id, allowMultipleFiles, files}}) {
         acceptsNewFiles ? actions.markUploaded : actions.markModified,
         id,
         acceptedFiles,
-        eventId,
+        uploadURL,
         dispatch,
         acceptsNewFiles ? null : files[0].uuid
       );
@@ -49,7 +49,7 @@ function Dropzone({eventId, fileType: {id, allowMultipleFiles, files}}) {
         dispatch(deleteFile(files[0].uuid));
       }
     },
-    [acceptsNewFiles, allowMultipleFiles, files, id, eventId, dispatch]
+    [acceptsNewFiles, allowMultipleFiles, files, id, uploadURL, dispatch]
   );
 
   const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop});
@@ -65,11 +65,11 @@ function Dropzone({eventId, fileType: {id, allowMultipleFiles, files}}) {
 }
 
 Dropzone.propTypes = {
-  eventId: PropTypes.string.isRequired,
+  uploadURL: PropTypes.string.isRequired,
   fileType: PropTypes.shape(fileTypePropTypes).isRequired,
 };
 
-function FileType({eventId, fileType, uploads}) {
+function FileType({uploadURL, fileType, uploads}) {
   const ref = useRef(null);
   return (
     <div styleName="file-type">
@@ -78,16 +78,16 @@ function FileType({eventId, fileType, uploads}) {
         files={fileType.files}
         fileTypeId={fileType.id}
         allowMultipleFiles={fileType.allowMultipleFiles}
-        eventId={eventId}
+        uploadURL={uploadURL}
       />
       {!_.isEmpty(uploads) && <Uploads uploads={uploads} />}
-      <Dropzone dropzoneRef={ref} fileType={fileType} eventId={eventId} />
+      <Dropzone dropzoneRef={ref} fileType={fileType} uploadURL={uploadURL} />
     </div>
   );
 }
 
 FileType.propTypes = {
-  eventId: PropTypes.string.isRequired,
+  uploadURL: PropTypes.string.isRequired,
   fileType: PropTypes.shape(fileTypePropTypes).isRequired,
   uploads: PropTypes.objectOf(
     PropTypes.shape({
@@ -101,7 +101,7 @@ FileType.defaultProps = {
   uploads: {},
 };
 
-export default function FileManager({eventId, fileTypes, files}) {
+export default function FileManager({uploadURL, fileTypes, files}) {
   const _fileTypes = useMemo(() => mapFileTypes(fileTypes, files), [fileTypes, files]);
   const [state, dispatch] = useReducer(reducer, {
     fileTypes: _fileTypes,
@@ -114,7 +114,7 @@ export default function FileManager({eventId, fileTypes, files}) {
         {state.fileTypes.map(fileType => (
           <FileType
             key={fileType.id}
-            eventId={eventId}
+            uploadURL={uploadURL}
             fileType={fileType}
             uploads={state.uploads[fileType.id]}
           />
@@ -125,7 +125,7 @@ export default function FileManager({eventId, fileTypes, files}) {
 }
 
 FileManager.propTypes = {
-  eventId: PropTypes.string.isRequired,
+  uploadURL: PropTypes.string.isRequired,
   fileTypes: PropTypes.arrayOf(PropTypes.shape(fileTypePropTypes)).isRequired,
   files: PropTypes.arrayOf(PropTypes.shape(filePropTypes)).isRequired,
 };
