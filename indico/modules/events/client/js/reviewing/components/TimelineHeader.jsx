@@ -65,6 +65,6 @@ TimelineHeader.propTypes = {
   submitter: PropTypes.shape({
     fullName: PropTypes.string.isRequired,
   }).isRequired,
-  eventId: PropTypes.string.isRequired,
+  eventId: PropTypes.number.isRequired,
   children: PropTypes.node.isRequired,
 };

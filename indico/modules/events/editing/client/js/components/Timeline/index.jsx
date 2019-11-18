@@ -4,6 +4,7 @@
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
+
 import editableDetailsURL from 'indico-url:event_editing.api_editable';
 
 import React, {useEffect, useReducer} from 'react';
@@ -19,7 +20,7 @@ import * as actions from './actions';
 import reducer from './reducer';
 import * as selectors from './selectors';
 
-export default function Timeline({eventId, editableId}) {
+export default function Timeline({eventId, contributionId, type}) {
   const [{details, isLoading}, dispatch] = useReducer(reducer, {
     details: null,
     isLoading: false,
@@ -30,7 +31,7 @@ export default function Timeline({eventId, editableId}) {
       dispatch(actions.setLoading(true));
       try {
         const {data} = await indicoAxios.get(
-          editableDetailsURL({confId: eventId, editable_id: editableId})
+          editableDetailsURL({confId: eventId, contrib_id: contributionId, type})
         );
         dispatch(actions.setDetails(camelizeKeys(data)));
       } catch (error) {
@@ -39,7 +40,7 @@ export default function Timeline({eventId, editableId}) {
         dispatch(actions.setLoading(false));
       }
     })();
-  }, [editableId, eventId]);
+  }, [contributionId, eventId, type]);
 
   if (isLoading) {
     return <Loader active />;
@@ -48,14 +49,14 @@ export default function Timeline({eventId, editableId}) {
   }
 
   const lastRevision = details.revisions[details.revisions.length - 1];
-  const {contribution, revisions} = selectors.processDetails(details);
+  const revisions = selectors.processRevisions(details.revisions);
   const state =
     lastRevision.finalState.name === 'none' ? lastRevision.initialState : lastRevision.finalState;
 
   return (
     <>
       <TimelineHeader
-        contribution={contribution}
+        contribution={details.contribution}
         state={state}
         submitter={revisions[0].submitter}
         eventId={eventId}
@@ -68,6 +69,7 @@ export default function Timeline({eventId, editableId}) {
 }
 
 Timeline.propTypes = {
-  eventId: PropTypes.string.isRequired,
-  editableId: PropTypes.string.isRequired,
+  eventId: PropTypes.number.isRequired,
+  contributionId: PropTypes.number.isRequired,
+  type: PropTypes.string.isRequired,
 };

@@ -42,7 +42,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const timelineRootElem = document.getElementById('editing-timeline');
   ReactDOM.render(
-    <Timeline eventId={timelineRootElem.dataset.eventId} editableId={timelineRootElem.dataset.editableId} />,
-    rootElem
+    <Timeline
+      eventId={parseInt(timelineRootElem.dataset.eventId, 10)}
+      contributionId={parseInt(timelineRootElem.dataset.contributionId, 10)}
+      type={timelineRootElem.dataset.editableType}
+    />,
+    timelineRootElem
   );
 });

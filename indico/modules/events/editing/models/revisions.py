@@ -19,8 +19,8 @@ from indico.util.struct.enum import RichIntEnum
 
 
 class InitialRevisionState(RichIntEnum):
-    __titles__ = [None, _("New"), _("Ready for Review"), _("Needs Confirmation")]
-    __css_classes__ = [None, 'new', 'ready', 'needs_confirmation']
+    __titles__ = [None, _('New'), _('Ready for Review'), _('Needs Confirmation')]
+    __css_classes__ = [None, 'highlight', 'ready', 'warning']
     #: A revision that has been submitted by the user but isn't exposed to editors yet
     new = 1
     #: A revision that can be reviewed by editors
@@ -30,8 +30,8 @@ class InitialRevisionState(RichIntEnum):
 
 
 class FinalRevisionState(RichIntEnum):
-    __titles__ = [None, _("Replaced"), _("Needs Confirmation"), _("Needs Changes"), _("Accepted"), _("Rejected")]
-    __css_classes__ = [None, 'replaced', 'needs_confirmation', 'needs_change', 'accepted', 'rejected']
+    __titles__ = [None, _('Replaced'), _('Needs Confirmation'), _('Needs Changes'), _('Accepted'), _('Rejected')]
+    __css_classes__ = [None, 'highlight', 'warning', 'warning', 'success', 'error']
     #: A revision that is awaiting some action
     none = 0
     #: A revision that has been replaced by its next revision

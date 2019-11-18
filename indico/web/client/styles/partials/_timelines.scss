@@ -49,8 +49,8 @@
     margin-top: 1rem;
 
     .i-timeline-item-label {
-        @include border-all($color: transparent);
         @extend %default-border-radius;
+        @include border-all($color: transparent);
         box-sizing: border-box;
         margin-right: 12px;
         outline: 2px solid white;
@@ -71,6 +71,10 @@
             @extend %time-information;
             // To match i-timeline-item-label height
             min-height: $min-height;
+
+            &.header-only {
+                margin-bottom: -10px;
+            }
         }
 
         &.header-indicator-top {
