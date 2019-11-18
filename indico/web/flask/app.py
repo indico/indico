@@ -283,9 +283,9 @@ def add_plugin_blueprints(app):
 
 
 def reject_nuls():
-    for key, values in request.args.iterlists():
+    for key, values in request.values.iterlists():
         if '\0' in key or any('\0' in x for x in values):
-            raise BadRequest('NUL byte found in query data')
+            raise BadRequest('NUL byte found in request data')
 
 
 def inject_current_url(response):

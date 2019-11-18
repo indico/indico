@@ -30,6 +30,7 @@ Bugfixes
   thanks :user:`uxmaster`)
 - Fix incorrect font size in some room booking dropdowns (:issue:`4156`)
 - Add missing email validation in some places (:issue:`4158`)
+- Reject requests containing NUL bytes in the POST data (:issue:`4159`)
 
 Version 2.2.4
 -------------
