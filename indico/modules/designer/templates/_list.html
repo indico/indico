@@ -168,7 +168,7 @@
     {% if inherited_templates %}
         <section>
             <h3>{% trans %}Inherited templates{% endtrans %}</h3>
-            <table class="i-table-widget" id="template-list">
+            <table class="i-table-widget">
                 <tbody>
                     {% for tpl in inherited_templates | sort(attribute='title') | sort(attribute='type') %}
                         {{ _render_template(tpl, target, inherited=true, event=event, default_template=default_template, not_deletable_templates=not_deletable_templates) }}
@@ -190,7 +190,7 @@
             </button>
         </div>
         {% if templates %}
-            <table class="i-table-widget" id="template-list">
+            <table class="i-table-widget">
                 <tbody>
                     {% for tpl in templates | sort(attribute='title') | sort(attribute='type') %}
                         {{ _render_template(tpl, target, event=event, default_template=default_template, not_deletable_templates=not_deletable_templates) }}
