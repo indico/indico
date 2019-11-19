@@ -9,11 +9,11 @@
 
 .file-display {
     display: flex;
+    flex-wrap: wrap;
 
     .file-type-display {
         padding: 1em;
-        margin: 1em;
-        width: 33%;
+        flex: 0 0 32%;
     }
 }
 
