@@ -335,6 +335,17 @@ class RHRegistrationDisplayEdit(RegistrationEditMixin, RHRegistrationFormRegistr
         return url_for('.display_regform', self.registration.locator.registrant)
 
 
+class RHRegistrationWithdraw(RHRegistrationFormRegistrationBase):
+    """Withdraw a registration"""
+
+    def _process(self):
+        if not self.registration.can_be_withdrawn:
+            raise Forbidden
+        self.registration.update_state(withdrawn=True)
+        flash(_('Your registration has been withdrawn.'), 'success')
+        return redirect(self.event.url)
+
+
 class RHRegistrationFormDeclineInvitation(InvitationMixin, RHRegistrationFormBase):
     """Decline an invitation to register"""
 

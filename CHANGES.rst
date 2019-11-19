@@ -106,6 +106,8 @@ Improvements
   :pr:`4577`)
 - Display each news item on a separate page instead of together with all the
   other news items (:pr:`4587`)
+- Allow registrants to withdraw their application (:issue:`2715`, :pr:`4166`,
+  thanks :user:`brabemi` & :user:`omegak`)
 
 Bugfixes
 ^^^^^^^^

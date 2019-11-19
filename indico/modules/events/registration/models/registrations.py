@@ -290,6 +290,20 @@ class Registration(db.Model):
         return regform.is_modification_open and regform.is_modification_allowed(self)
 
     @property
+    def can_be_withdrawn(self):
+        from indico.modules.events.registration.models.forms import ModificationMode
+        if self.is_paid:
+            return False
+        elif self.event.end_dt < now_utc():
+            return False
+        elif self.registration_form.modification_mode == ModificationMode.not_allowed:
+            return False
+        elif self.registration_form.modification_end_dt and self.registration_form.modification_end_dt < now_utc():
+            return False
+        else:
+            return True
+
+    @property
     def data_by_field(self):
         return {x.field_data.field_id: x for x in self.data}
 
@@ -456,13 +470,13 @@ class Registration(db.Model):
         if self.state != initial_state:
             signals.event.registration_state_updated.send(self, previous_state=initial_state)
 
-    def update_state(self, approved=None, paid=None, rejected=None, _skip_moderation=False):
+    def update_state(self, approved=None, paid=None, rejected=None, withdrawn=None, _skip_moderation=False):
         """Update the state of the registration for a given action
 
         The accepted kwargs are the possible actions. ``True`` means that the
         action occured and ``False`` that it was reverted.
         """
-        if sum(action is not None for action in (approved, paid, rejected)) > 1:
+        if sum(action is not None for action in (approved, paid, rejected, withdrawn)) > 1:
             raise Exception("More than one action specified")
         initial_state = self.state
         regform = self.registration_form
@@ -478,22 +492,35 @@ class Registration(db.Model):
                 self.state = RegistrationState.complete
             elif rejected:
                 self.state = RegistrationState.rejected
+            elif withdrawn:
+                self.state = RegistrationState.withdrawn
         elif self.state == RegistrationState.unpaid:
             if paid:
                 self.state = RegistrationState.complete
             elif approved is False:
                 self.state = RegistrationState.pending
+            elif withdrawn:
+                self.state = RegistrationState.withdrawn
         elif self.state == RegistrationState.complete:
             if approved is False and payment_required is False and moderation_required:
                 self.state = RegistrationState.pending
             elif paid is False and payment_required:
                 self.state = RegistrationState.unpaid
+            elif withdrawn:
+                self.state = RegistrationState.withdrawn
         elif self.state == RegistrationState.rejected:
             if rejected is False and moderation_required:
                 self.state = RegistrationState.pending
             elif rejected is False and payment_required:
                 self.state = RegistrationState.unpaid
             elif rejected is False:
+                self.state = RegistrationState.complete
+        elif self.state == RegistrationState.withdrawn:
+            if withdrawn is False and moderation_required:
+                self.state = RegistrationState.pending
+            elif withdrawn is False and payment_required:
+                self.state = RegistrationState.unpaid
+            elif withdrawn is False:
                 self.state = RegistrationState.complete
         if self.state != initial_state:
             signals.event.registration_state_updated.send(self, previous_state=initial_state)

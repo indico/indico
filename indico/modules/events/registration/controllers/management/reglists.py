@@ -574,6 +574,8 @@ class RHRegistrationReset(RHManageRegistrationBase):
             self.registration.update_state(approved=False)
         elif self.registration.state == RegistrationState.rejected:
             self.registration.update_state(rejected=False)
+        elif self.registration.state == RegistrationState.withdrawn:
+            self.registration.update_state(withdrawn=False)
         else:
             raise BadRequest(_('The registration cannot be reset in its current state.'))
         logger.info('Registration %r was reset by %r', self.registration, session.user)
