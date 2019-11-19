@@ -46,7 +46,7 @@
         \vspace{1.5em}
     \end{addmargin}
 
-    \JINJA{for field in abstract.event.contribution_fields if field.is_active}
+    \JINJA{for field in abstract.event.contribution_fields if field.is_active and (management or field.is_public)}
         {\bf
             \noindent
             \large

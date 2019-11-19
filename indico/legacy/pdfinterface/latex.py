@@ -457,7 +457,6 @@ class ContributionBook(PDFLaTeXBase):
             'event': event,
             'tz': timezone(tz or event.timezone),
             'url': event.url,
-            'fields': [f for f in event.contribution_fields if f.is_active],
             'sorted_by': sort_by,
             'user': user,
             'boa_text': boa_settings.get(event, 'extra_text'),
