@@ -308,6 +308,24 @@ class RHRegistrationDisplayEdit(RegistrationEditMixin, RHRegistrationFormRegistr
         return url_for('.display_regform', self.registration.locator.registrant)
 
 
+class RHRegistrationWithdraw(RHRegistrationFormRegistrationBase):
+    """Withdraw a registration"""
+
+    def _process(self):
+        if not self.registration.can_be_modified:
+            if not self.registration.registration_form.is_modification_open:
+                flash(_("The modification/withdrawal period is over"), "warning")
+            elif self.registration.registration_form.modification_mode.name == 'allowed_until_payment':
+                flash(_("Withdrawal is not allowed after payment"), "warning")
+            else:
+                flash(_("The registration cannot be modified/withdrawn"), "warning")
+            return redirect(url_for('.display_regform', self.registration.locator.registrant))
+
+        self.registration.state = RegistrationState.withdrawn
+        flash(_("Your registration has been withdrawn"), "success")
+        return redirect(self.event.url)
+
+
 class RHRegistrationFormDeclineInvitation(InvitationMixin, RHRegistrationFormBase):
     """Decline an invitation to register"""
 

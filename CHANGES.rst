@@ -28,6 +28,7 @@ Improvements
 - Add ICS export for information in the user dashboard (:issue:`4057`)
 - Allow data syncing with multipass providers which do not support
   refreshing identity information
+- Add withdraw popup in registration summary (:issue:`2715`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

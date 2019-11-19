@@ -46,6 +46,21 @@
                        {% endif %}>
                        {% trans %}Modify{% endtrans %}
                    </a>
+                   <a href="#"
+                      class="i-button icon-remove {% if not registration.can_be_modified %}disabled{% endif %}"
+                      data-method="POST"
+                      data-href="{{ url_for('.withdraw_registration', registration.locator.registrant) }}"
+                      data-title="{% trans %}Withdraw{% endtrans %}"
+                      data-confirm="{% trans %}Do you want to withdraw your registration?{% endtrans %}"
+                       {% if not registration.can_be_modified %}
+                           {% if not registration.registration_form.is_modification_open -%}
+                               title="{% trans %}The modification/withdrawal period is over{% endtrans %}"
+                           {%- elif registration.registration_form.modification_mode.name == 'allowed_until_payment' -%}
+                               title="{% trans %}Withdrawal is not allowed after payment{% endtrans %}"
+                           {%- endif %}
+                       {% endif %}>
+                       {% trans %}Withdraw{% endtrans %}
+                    </a>
                </div>
            {% endif %}
            {% if registration.state.name == 'complete' and registration.registration_form.tickets_enabled and
