@@ -9,4 +9,13 @@
     :global(.disabled.field) {
         background: none;
     }
+
+    textarea {
+        padding-top: 10px;
+        padding-bottom: 5px;
+
+        &::placeholder {
+            line-height: 1.5;
+        }
+    }
 }
