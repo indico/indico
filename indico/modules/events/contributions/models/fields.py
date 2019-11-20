@@ -128,6 +128,10 @@ class ContributionField(db.Model):
         return self._get_field(management=True)
 
     @property
+    def is_public(self):
+        return self.visibility == ContributionFieldVisibility.public
+
+    @property
     def filter_choices(self):
         return {x['id']: x['option'] for x in self.field_data.get('options', {})}
 

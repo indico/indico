@@ -48,11 +48,12 @@
     \end{addmargin}
 
 
-    \JINJA{for field in contrib.event.contribution_fields if field.is_active}
+    \JINJA{for field_value in contrib.field_values
+           if field_value.contribution_field.is_active and field_value.contribution_field.is_public}
         {\bf
             \noindent
             \large
-            \VAR{field.title}
+            \VAR{field_value.contribution_field.title}
         }
 
         \begin{addmargin}[1em]{1em}
@@ -62,7 +63,7 @@
                 \sectionfont{\normalsize\rmfamily}
                 \subsectionfont{\small\rmfamily}
                 \small
-                \VAR{contrib.get_field_value(field.id) | markdown}
+                \VAR{field_value.friendly_data | markdown}
             }
             \vspace{1.5em}
         \end{addmargin}
@@ -180,8 +181,9 @@
         \setlength{\leftskip}{0pt}
     \JINJA{endif}
 
-    \JINJA{for field_value in contrib.field_values}
-        \textbf{\VAR{ field_value.contribution_field.title}}:
+    \JINJA{for field_value in contrib.field_values
+           if field_value.contribution_field.is_active and field_value.contribution_field.is_public}
+        \textbf{\VAR{field_value.contribution_field.title}}:
 
         %% Markdown content
         \rmfamily {
@@ -189,7 +191,9 @@
             \sectionfont{\normalsize\rmfamily}
             \subsectionfont{\small\rmfamily}
             \small
-            \VAR{field_value.friendly_data|markdown}
+            \VAR{field_value.friendly_data | markdown}
         }
+        \vspace{1em}
+        \newline
     \JINJA{endfor}
 \JINJA{endmacro}
