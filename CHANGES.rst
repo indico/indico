@@ -75,6 +75,8 @@ Bugfixes
   an event where the last timetable entry of the day is a top-level contribution
   or break (:issue:`4134`, thanks :user:`bpedersen2`)
 - Only show public contribution fields in PDF exports (:issue:`4165`)
+- Allow single arrival/departure date in accommodation field (:issue:`4164`,
+  thanks :user:`bpedersen2`)
 
 Version 2.2.4
 -------------

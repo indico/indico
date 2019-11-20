@@ -873,13 +873,13 @@ ndRegForm.directive('ndAccommodationField', function(url) {
     controller: function($scope) {
       $scope.tplInput = url.tpl('fields/accommodation.tpl.html');
       $scope.areArrivalDatesValid = function(data) {
-        return moment(data['arrivalDateTo'], 'DD/MM/YYYY').isAfter(
+        return moment(data['arrivalDateTo'], 'DD/MM/YYYY').isSameOrAfter(
           moment(data['arrivalDateFrom'], 'DD/MM/YYYY')
         );
       };
 
       $scope.areDepartureDatesValid = function(data) {
-        return moment(data['departureDateTo'], 'DD/MM/YYYY').isAfter(
+        return moment(data['departureDateTo'], 'DD/MM/YYYY').isSameOrAfter(
           moment(data['departureDateFrom'], 'DD/MM/YYYY')
         );
       };
