@@ -18,6 +18,7 @@ script:
   - npx eslint --ext .js --ext .jsx indico/modules/rb/ indico/modules/events/logs/ indico/web/client/js/react/
     indico/modules/users/
   - pytest
+  - npm test
   - python bin/maintenance/build-assets.py indico --dev
 notifications:
   email: false
