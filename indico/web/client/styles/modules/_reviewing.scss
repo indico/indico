@@ -190,6 +190,13 @@
     .review-trigger {
         white-space: nowrap;
 
+        .judgment-btn, .judgment-btn.active {
+            align-self: center;
+            display: flex;
+            background-color: #2185d0;
+            color: white;
+        }
+
         .i-button {
             height: 2.1rem;
 

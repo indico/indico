@@ -7,7 +7,7 @@
 
 import React, {useState} from 'react';
 import {Form as FinalForm} from 'react-final-form';
-import {Button, Form} from 'semantic-ui-react';
+import {Button, Dropdown, Form} from 'semantic-ui-react';
 
 import {FinalDropdown, FinalSubmitButton, FinalTextArea} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
@@ -28,6 +28,25 @@ const visibilityOptions = [
   },
 ];
 
+const judgmentOptions = [
+  {
+    value: 'accept',
+    text: Translate.string('Accept'),
+  },
+  {
+    value: 'reject',
+    text: Translate.string('Reject'),
+  },
+  {
+    value: 'update',
+    text: Translate.string('Make changes'),
+  },
+  {
+    value: 'request_update',
+    text: Translate.string('Request changes'),
+  },
+];
+
 export default function ReviewForm() {
   const currentUser = {
     fullName: Indico.User.full_name,
@@ -35,7 +54,7 @@ export default function ReviewForm() {
   };
 
   const [commentFormVisible, setCommentFormVisible] = useState(false);
-  const [judgmentModalVisible, setJudgmentModalVisible] = useState(false);
+  const [judgmentModalType, setJudgmentModalType] = useState(null);
   const onCommentClickHandler = () => {
     if (!commentFormVisible) {
       setCommentFormVisible(true);
@@ -97,16 +116,25 @@ export default function ReviewForm() {
                   <span className="comment-or-review">
                     <Translate>or</Translate>
                   </span>
-                  <Button onClick={() => setJudgmentModalVisible(!judgmentModalVisible)} primary>
-                    <Translate>Judge</Translate>
-                  </Button>
+                  <Dropdown
+                    className="judgment-btn"
+                    text={Translate.string('Judge')}
+                    options={judgmentOptions}
+                    direction="left"
+                    onChange={(_, {value}) => {
+                      setJudgmentModalType(value);
+                    }}
+                    button
+                    floating
+                  />
                 </div>
               )}
             </div>
           </div>
         </div>
       </div>
-      {judgmentModalVisible && <JudgmentModal onClose={() => setJudgmentModalVisible(false)} />}
+      {/* TODO: open the right dialog based on the selected action */}
+      {judgmentModalType && <JudgmentModal onClose={() => setJudgmentModalType(null)} />}
     </>
   );
 }
