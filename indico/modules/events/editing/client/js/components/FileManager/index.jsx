@@ -29,7 +29,7 @@ const fileTypePropTypes = {
   id: PropTypes.number.isRequired,
 };
 
-function Dropzone({uploadURL, fileType: {id, allowMultipleFiles, files}}) {
+export function Dropzone({uploadURL, fileType: {id, allowMultipleFiles, files}}) {
   const dispatch = useContext(FileManagerContext);
   const acceptsNewFiles = allowMultipleFiles || !files.length;
 

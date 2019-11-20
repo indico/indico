@@ -62,7 +62,6 @@ export function uploadFiles(action, fileTypeId, acceptedFiles, uploadURL, dispat
         action(fileTypeId, fileId, tmpFileId, {
           filename: uploadedFile.filename,
           uuid: uploadedFile.uuid,
-          downloadURL: null,
           claimed: false,
           fileType: fileTypeId,
         })
