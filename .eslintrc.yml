@@ -2,10 +2,12 @@ env:
   browser: true
   jquery: true
   es6: true
+  jest/globals: true
 
 plugins:
   - react-hooks
   - prettier
+  - jest
 
 extends:
   - 'indico'

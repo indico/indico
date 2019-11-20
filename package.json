@@ -92,6 +92,7 @@
     "@babel/preset-env": "^7.7.1",
     "@babel/preset-react": "^7.7.0",
     "@babel/register": "^7.7.0",
+    "@types/jest": "^24.0.23",
     "autoprefixer": "^9.7.2",
     "babel-eslint": "^10.0.3",
     "babel-loader": "^8.0.6",
@@ -103,6 +104,8 @@
     "copy-webpack-plugin": "^5.0.5",
     "css-loader": "^2.1.1",
     "diff": "^4.0.1",
+    "enzyme": "^3.10.0",
+    "enzyme-adapter-react-16": "^1.15.1",
     "eslint": "^6.6.0",
     "eslint-cli": "^1.1.1",
     "eslint-config-indico": "^1.2.1",
@@ -110,11 +113,15 @@
     "eslint-import-resolver-alias": "^1.1.2",
     "eslint-plugin-babel": "^5.3.0",
     "eslint-plugin-import": "^2.18.2",
+    "eslint-plugin-jest": "^23.0.4",
     "eslint-plugin-prettier": "^3.1.1",
     "eslint-plugin-react": "^7.16.0",
     "eslint-plugin-react-hooks": "^2.3.0",
     "exports-loader": "^0.7.0",
     "file-loader": "^4.2.0",
+    "identity-obj-proxy": "^3.0.0",
+    "jest": "^24.9.0",
+    "jest-mock-axios": "^3.1.2",
     "mini-css-extract-plugin": "^0.8.0",
     "node-glob": "^1.2.0",
     "node-sass": "^4.13.0",
@@ -143,7 +150,8 @@
     "profile": "webpack --profile --json -p --env.NODE_ENV=production > webpack-stats.json",
     "postinstall": "patch --dry-run -N -p0 -d node_modules/jquery-ui < indico/web/client/js/jquery/contrib/jquery-ui-changes.diff && patch -N -p0 -d node_modules/jquery-ui < indico/web/client/js/jquery/contrib/jquery-ui-changes.diff || true",
     "eslint": "eslint ./indico",
-    "update-browsers": "node ./bin/maintenance/update_browsers.js"
+    "update-browsers": "node ./bin/maintenance/update_browsers.js",
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -154,5 +162,24 @@
   "bugs": {
     "url": "https://github.com/indico/indico/issues"
   },
-  "homepage": "https://github.com/indico/indico#readme"
+  "homepage": "https://github.com/indico/indico#readme",
+  "jest": {
+    "moduleNameMapper": {
+      "^indico-url:.*$": "<rootDir>/__mocks__/indico-url",
+      "^.+\\.(s?css)$": "identity-obj-proxy",
+      "^indico/modules/([\\w]+)/(.*)$": "<rootDir>/indico/modules/$1/client/js/$2",
+      "^indico/(.*)$": "<rootDir>/indico/web/client/js/$1"
+    },
+    "setupFilesAfterEnv": [
+      "<rootDir>/setupTests.js"
+    ],
+    "globals": {
+      "REACT_TRANSLATIONS": {
+        "indico": {"": {"domain": "indico", "lang": "en_GB"}}
+      },
+      "TRANSLATIONS": {
+        "indico": {"": {"domain": "indico", "lang": "en_GB"}}
+      }
+    }
+  }
 }
