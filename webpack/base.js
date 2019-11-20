@@ -228,17 +228,6 @@ export function webpackDefaults(env, config, bundles) {
   }
 
   const indicoClientPath = globalBuildConfig.clientPath;
-  const babelPlugins = [
-    [
-      'flask-urls',
-      {
-        importPrefix: 'indico-url',
-        urlMap: require(config.build.urlMapPath).rules,
-        basePath: globalBuildConfig.baseURLPath,
-      },
-    ],
-    'macros',
-  ];
 
   return {
     devtool: 'source-map',
@@ -265,20 +254,11 @@ export function webpackDefaults(env, config, bundles) {
           test: /\.js$/,
           loader: 'babel-loader',
           exclude: /node_modules/,
-          options: {
-            extends: path.resolve(globalBuildConfig.rootPath, '..', '.babelrc'),
-            plugins: babelPlugins,
-          },
         },
         {
           test: /\.jsx$/,
           loader: 'babel-loader',
           exclude: /node_modules/,
-          options: {
-            extends: path.resolve(globalBuildConfig.rootPath, '..', '.babelrc'),
-            presets: ['@babel/react'],
-            plugins: babelPlugins,
-          },
         },
         {
           oneOf: [
