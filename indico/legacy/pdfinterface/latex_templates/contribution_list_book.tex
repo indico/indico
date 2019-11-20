@@ -61,15 +61,15 @@
     %% body
     \mainmatter
     \JINJA{block book_body}
+        \fancyhead[L]{\small \rmfamily \color{gray} \truncateellipses{\VAR{event.title}}{300pt} / \VAR{_('Report of Abstracts')}}
+        \fancyfoot[C]{\small \rmfamily \color{gray} \VAR{(_('Page {}')|latex(true)).format('\\thepage')|rawlatex }}
         \JINJA{for contrib in contribs if contrib.can_access(user)}
-            \fancyhead[L]{\small \rmfamily \color{gray} \truncateellipses{\VAR{event.title}}{300pt} / \VAR{_('Report of Abstracts')}}
             \phantomsection
             \addcontentsline{toc}{chapter}{\VAR{contrib.title}}
 
             \vspace{3em}
             \VAR{render_contribution_condensed(contrib, affiliation_contribs, corresp_authors)|rawlatex}
 
-            \fancyfoot[C]{\small \rmfamily \color{gray} \VAR{(_('Page {}')|latex(true)).format('\\thepage')|rawlatex }}
         \JINJA{endfor}
     \JINJA{endblock}
 
