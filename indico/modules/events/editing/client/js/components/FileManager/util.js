@@ -17,7 +17,7 @@ export const FileManagerContext = React.createContext(null);
 
 export const filePropTypes = {
   filename: PropTypes.string.isRequired,
-  downloadURL: PropTypes.string.isRequired,
+  downloadURL: PropTypes.string,
   uuid: PropTypes.string.isRequired,
   claimed: PropTypes.bool,
   state: PropTypes.oneOf(['added', 'modified', 'deleted']),
