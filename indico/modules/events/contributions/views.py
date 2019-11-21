@@ -23,7 +23,7 @@ class WPManageContributions(MathjaxMixin, WPEventManagement):
 
 class WPContributionsDisplayBase(WPConferenceDisplayBase):
     template_prefix = 'events/contributions/'
-    bundles = ('markdown.js', 'module_events.contributions.js')
+    bundles = ('markdown.js', 'module_events.contributions.js', 'module_events.contributions.css')
 
 
 class WPMyContributions(WPContributionsDisplayBase):

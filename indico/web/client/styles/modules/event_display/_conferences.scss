@@ -143,6 +143,12 @@
                 align-self: center;
             }
 
+            h2 {
+                color: $dark-orange;
+                font-size: 2em;
+                font-weight: normal;
+            }
+
             h3 {
                 flex-grow: 1;
                 color: $dark-orange;

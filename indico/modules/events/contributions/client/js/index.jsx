@@ -8,13 +8,51 @@
 /* global showUndoWarning:false, setupListGenerator:false, setupSearchBox:false */
 /* global reloadManagementAttachmentInfoColumn:false */
 
+import fileTypesURL from 'indico-url:event_editing.api_file_types';
+
 import React from 'react';
 import ReactDOM from 'react-dom';
 
 import 'indico/modules/events/util/types_dialog';
+import EditableSubmissionButton from 'indico/modules/events/editing/components/EditableSubmissionButton';
 import {PublicationSwitch} from 'indico/react/components';
+import {camelizeKeys} from 'indico/utils/case';
+import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 
 (function(global) {
+  global.setupEditableSubmissionButton = async function setupEditableSubmissionButton() {
+    const editableSubmissionButton = document.querySelector('#editable-submission-button');
+    if (!editableSubmissionButton) {
+      return;
+    }
+    const {
+      eventId,
+      contributionId,
+      apiEditableSubmitUrl,
+      type,
+      uploadUrl,
+    } = editableSubmissionButton.dataset;
+
+    let response;
+    try {
+      response = await indicoAxios.get(fileTypesURL({confId: eventId}));
+    } catch (e) {
+      handleAxiosError(e);
+    }
+    const fileTypes = camelizeKeys(response.data);
+    ReactDOM.render(
+      <EditableSubmissionButton
+        uploadURL={uploadUrl}
+        fileTypes={fileTypes}
+        type={type}
+        submitRevisionURL={apiEditableSubmitUrl}
+        eventId={eventId}
+        contributionId={contributionId}
+      />,
+      editableSubmissionButton
+    );
+  };
+
   function setupPublicationButton() {
     const element = document.querySelector('#pub-switch');
     const component = React.createElement(PublicationSwitch, {eventId: element.dataset.eventId});

@@ -11,6 +11,11 @@
         <section>
             <div class="header">
                 <div class="header-row">
+                    <h2>{% trans %}Peer reviewing{% endtrans %}</h2>
+                </div>
+            </div>
+            <div class="header">
+                <div class="header-row">
                     <h3 class="icon-file">{% trans %}Paper{% endtrans %}</h3>
                     {% if show_paper and paper.state.name == 'accepted' %}
                         {{ render_paper_metadata(paper, contribution_page=true) }}
@@ -31,6 +36,56 @@
     {% endif %}
 {% endmacro %}
 
+{% macro render_editables_section(contribution) %}
+    {# TODO: Support different editable types #}
+    {% set editable = contribution.editables|selectattr('type.name', 'equalto', 'paper')|first %}
+    {% set can_submit = contribution.is_user_associated(session.user, check_abstract=true) %}
+
+    {% if can_submit %}
+        <section>
+            <div class="header">
+                <div class="header-row">
+                <h2>{% trans %}Editing{% endtrans %}</h2>
+                </div>
+            </div>
+            <div class="header">
+                <div class="header-row">
+                    <h3 class="icon-file">{% trans %}Paper{% endtrans %}</h3>
+                </div>
+            </div>
+            {% if editable %}
+                <div>
+                    <a href="{{ url_for('event_editing.editable', editable) }}">
+                        {%- trans %}Go to timeline{% endtrans -%}
+                    </a>
+                </div>
+            {% else %}
+                <div class="action-box highlight">
+                    <div class="section flexrow">
+                        <div class="icon icon-file"></div>
+                            <div class="text">
+                                <div class="label">
+                                    {% trans %}Paper submission is open{% endtrans %}
+                                </div>
+                                <div>
+                                    {% trans %}You can submit a paper{% endtrans %}
+                                </div>
+                            </div>
+                        <div class="toolbar">
+                            <div id="editable-submission-button"
+                                 data-event-id="{{ contribution.event_id }}"
+                                 data-contribution-id="{{ contribution.id }}"
+                                 data-type="paper"
+                                 data-upload-url="{{ url_for('event_editing.api_upload', contribution, type='paper') }}"
+                                 data-api-editable-submit-url="{{ url_for('event_editing.api_create_editable', contribution, type='paper') }}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </section>
+    {% endif %}
+{% endmacro %}
 
 {% macro _render_paper_status_box(paper) %}
     {% set state_mapping = {'submitted': '',
