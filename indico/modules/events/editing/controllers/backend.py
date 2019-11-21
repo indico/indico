@@ -7,7 +7,6 @@
 
 from __future__ import unicode_literals
 
-import json
 import os
 from io import BytesIO
 from zipfile import ZipFile
@@ -17,10 +16,8 @@ from marshmallow import fields
 from marshmallow_enum import EnumField
 from werkzeug.exceptions import Forbidden, NotFound
 
-from indico.core.config import config
 from indico.core.errors import UserValueError
-from indico.modules.events.controllers.base import RHEventBase
-from indico.modules.events.editing.controllers.base import RHContributionEditableBase
+from indico.modules.events.editing.controllers.base import RHContributionEditableBase, RHEditingBase
 from indico.modules.events.editing.fields import EditingFilesField, EditingTagsField
 from indico.modules.events.editing.models.comments import EditingRevisionComment
 from indico.modules.events.editing.models.revisions import EditingRevision
@@ -31,22 +28,21 @@ from indico.modules.events.editing.operations import (confirm_editable_changes, 
 from indico.modules.events.editing.schemas import (EditableSchema, EditingConfirmationAction, EditingFileTypeSchema,
                                                    EditingReviewAction, EditingTagSchema, ReviewEditableArgs)
 from indico.modules.files.controllers import UploadFileMixin
-from indico.modules.files.models.files import File
-from indico.util.fs import chmod_umask, secure_filename
+from indico.util.fs import secure_filename
 from indico.util.i18n import _
 from indico.util.marshmallow import not_empty
 from indico.web.args import parser, use_kwargs
 from indico.web.flask.util import send_file
 
 
-class RHEditingFileTypes(RHEventBase):
+class RHEditingFileTypes(RHEditingBase):
     """Return all editing file types defined in the event."""
 
     def _process(self):
         return EditingFileTypeSchema(many=True).jsonify(self.event.editing_file_types)
 
 
-class RHEditingTags(RHEventBase):
+class RHEditingTags(RHEditingBase):
     """Return all editing tags defined in the event."""
 
     def _process(self):

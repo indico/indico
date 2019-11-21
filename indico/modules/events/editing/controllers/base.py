@@ -11,11 +11,20 @@ from flask import request, session
 from werkzeug.exceptions import Forbidden
 
 from indico.modules.events.contributions.controllers.display import RHContributionDisplayBase
+from indico.modules.events.controllers.base import RHEventBase
 from indico.modules.events.editing.models.editable import Editable, EditableType
+
+
+class RHEditingBase(RHEventBase):
+    """Base class for editing RHs that don't reference an editable."""
+
+    EVENT_FEATURE = 'editing'
 
 
 class RHContributionEditableBase(RHContributionDisplayBase):
     """Base class for operations on an editable."""
+
+    EVENT_FEATURE = 'editing'
 
     normalize_url_spec = {
         'locators': {
