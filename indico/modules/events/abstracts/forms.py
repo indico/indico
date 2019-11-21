@@ -537,7 +537,7 @@ class _SingleChoiceQuerySelectMultipleField(IndicoQuerySelectMultipleField):
 
 
 class _SingleChoiceQuerySelectMultipleFieldGrouped(_SingleChoiceQuerySelectMultipleField):
-    widget = JinjaWidget('forms/select_grouped_widget.html')
+    widget = JinjaWidget('events/abstracts/forms/select_grouped_widget.html')
 
     def __init__(self, *args, **kwargs):
         self.get_group = kwargs.pop('get_group', lambda x: x)
@@ -571,7 +571,7 @@ class SingleTrackMixin(object):
 
 
 class _MultiChoiceQuerySelectMultipleFieldGrouped(IndicoQuerySelectMultipleField):
-    widget = JinjaWidget('forms/checkbox_group_grouped_widget.html')
+    widget = JinjaWidget('events/abstracts/forms/checkbox_group_grouped_widget.html')
 
     def __init__(self, *args, **kwargs):
         self.get_group = kwargs.pop('get_group', lambda x: x)
