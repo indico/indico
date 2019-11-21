@@ -217,9 +217,11 @@ export function webpackDefaults(env, config, bundles) {
         loader: 'sass-loader',
         options: {
           sourceMap: true,
-          includePaths: [scssIncludePath],
-          outputStyle: 'compact',
-          importer: [sassResolver, importOnce],
+          sassOptions: {
+            includePaths: [scssIncludePath],
+            outputStyle: 'compact',
+            importer: [sassResolver, importOnce],
+          },
         },
       },
     ];
@@ -388,6 +390,7 @@ export function webpackDefaults(env, config, bundles) {
         new TerserPlugin({
           // XXX: minification breaks angularjs :(
           exclude: /js\/module_events\.registration\.[^.]+\.bundle\.js$/,
+          extractComments: false,
           // default options from webpack
           cache: true,
           parallel: true,
