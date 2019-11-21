@@ -87,13 +87,11 @@ export default function TimelineItem({revision}) {
       <Transition animation="slide down" duration={500} visible={visible || isLastRevision}>
         <div className={`i-timeline ${!isLastRevision ? 'weak-hidden' : ''}`}>
           {(timeline.length > 0 || canReview || canComment) && (
-            <>
-              <div className="i-timeline with-line">
-                <div className="i-timeline-connect-up" />
-                <RevisionTimeline revision={revision} />
-                {isLastRevision && (canComment || canReview) && <PaperReviewForm />}
-              </div>
-            </>
+            <div className="i-timeline with-line">
+              <div className="i-timeline-connect-up" />
+              <RevisionTimeline revision={revision} />
+              {isLastRevision && (canComment || canReview) && <PaperReviewForm />}
+            </div>
           )}
           {isLastRevision && (
             <>

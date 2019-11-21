@@ -231,29 +231,27 @@ export default class ElasticTimeline extends React.Component {
 
     return (
       <div styleName="timeline">
-        <>
-          {extraContent}
-          <Component
-            {...componentProps}
-            rows={rows}
-            minHour={minHour}
-            maxHour={maxHour}
-            hourStep={hourStep}
-            onClickCandidate={onClickCandidate}
-            onClickReservation={onClickReservation}
-            onAddSlot={onAddSlot}
-            longLabel={longLabel}
-            onClickLabel={onClickLabel}
-            isLoading={isLoading}
-            lazyScroll={lazyScroll}
-            showUnused={showUnused}
-            fixedHeight={fixedHeight}
-            rowActions={{roomTimeline: roomTimelineAction}}
-            setDate={setDate}
-            setMode={setMode}
-            gutterAllowed
-          />
-        </>
+        {extraContent}
+        <Component
+          {...componentProps}
+          rows={rows}
+          minHour={minHour}
+          maxHour={maxHour}
+          hourStep={hourStep}
+          onClickCandidate={onClickCandidate}
+          onClickReservation={onClickReservation}
+          onAddSlot={onAddSlot}
+          longLabel={longLabel}
+          onClickLabel={onClickLabel}
+          isLoading={isLoading}
+          lazyScroll={lazyScroll}
+          showUnused={showUnused}
+          fixedHeight={fixedHeight}
+          rowActions={{roomTimeline: roomTimelineAction}}
+          setDate={setDate}
+          setMode={setMode}
+          gutterAllowed
+        />
       </div>
     );
   };

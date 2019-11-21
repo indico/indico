@@ -259,56 +259,54 @@ class BookRoom extends React.Component {
 
     if (!isTimelineVisible) {
       return (
-        <>
-          <div
-            className="ui"
-            styleName="available-room-list"
-            ref={ref => this.handleContextRef(ref, 'tileRef')}
-          >
-            {this.renderFilters('tileRef')}
-            {isSearching ? (
-              <CardPlaceholder.Group count={20} />
-            ) : (
-              <>
-                <LazyScroll hasMore={this.hasMoreRooms()} loadMore={this.loadMoreRooms}>
-                  <RoomRenderer rooms={this.visibleRooms}>
-                    {room => (
-                      <Slot name="actions">
-                        {room.canUserBook && (
-                          <ResponsivePopup
-                            trigger={bookingModalBtn(room)}
-                            content={labels.bookButton}
-                            position="top center"
-                            hideOnScroll
-                          />
-                        )}
-                        {room.canUserPrebook && (
-                          // eslint-disable-next-line max-len
-                          <Icon.Group onClick={() => this.openBookingForm(room.id, null, true)}>
-                            <ResponsivePopup
-                              trigger={<Button circular icon="check" color="orange" />}
-                              content={labels.preBookButton}
-                              position="top center"
-                              hideOnScroll
-                            />
-                            <Icon corner name="wait" styleName="prebooking-corner-icon" />
-                          </Icon.Group>
-                        )}
+        <div
+          className="ui"
+          styleName="available-room-list"
+          ref={ref => this.handleContextRef(ref, 'tileRef')}
+        >
+          {this.renderFilters('tileRef')}
+          {isSearching ? (
+            <CardPlaceholder.Group count={20} />
+          ) : (
+            <>
+              <LazyScroll hasMore={this.hasMoreRooms()} loadMore={this.loadMoreRooms}>
+                <RoomRenderer rooms={this.visibleRooms}>
+                  {room => (
+                    <Slot name="actions">
+                      {room.canUserBook && (
                         <ResponsivePopup
-                          trigger={showDetailsBtn(room)}
-                          content={labels.detailsButton}
+                          trigger={bookingModalBtn(room)}
+                          content={labels.bookButton}
                           position="top center"
                           hideOnScroll
                         />
-                      </Slot>
-                    )}
-                  </RoomRenderer>
-                </LazyScroll>
-                {this.renderSuggestions()}
-              </>
-            )}
-          </div>
-        </>
+                      )}
+                      {room.canUserPrebook && (
+                        // eslint-disable-next-line max-len
+                        <Icon.Group onClick={() => this.openBookingForm(room.id, null, true)}>
+                          <ResponsivePopup
+                            trigger={<Button circular icon="check" color="orange" />}
+                            content={labels.preBookButton}
+                            position="top center"
+                            hideOnScroll
+                          />
+                          <Icon corner name="wait" styleName="prebooking-corner-icon" />
+                        </Icon.Group>
+                      )}
+                      <ResponsivePopup
+                        trigger={showDetailsBtn(room)}
+                        content={labels.detailsButton}
+                        position="top center"
+                        hideOnScroll
+                      />
+                    </Slot>
+                  )}
+                </RoomRenderer>
+              </LazyScroll>
+              {this.renderSuggestions()}
+            </>
+          )}
+        </div>
       );
     } else {
       return (

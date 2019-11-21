@@ -110,38 +110,36 @@ export default class MonthlyTimelineContent extends WeeklyTimelineContent {
     const labelWidth = longLabel ? 200 : 150;
 
     return (
-      <>
-        <div
-          styleName="baseStyle.timeline-header"
-          className={!selectable ? 'timeline-non-selectable' : ''}
-        >
-          <div style={{minWidth: labelWidth}} />
-          <div styleName="style.timeline-header-labels">
-            {this.dates.map((dt, n) => {
-              const indicateWeekend = this.weekendDays.includes(n);
-              return (
-                <div
-                  className={`${style['timeline-header-label']} monthly ${
-                    indicateWeekend ? style.weekend : ''
-                  }`}
-                  key={`timeline-header-${dt}`}
+      <div
+        styleName="baseStyle.timeline-header"
+        className={!selectable ? 'timeline-non-selectable' : ''}
+      >
+        <div style={{minWidth: labelWidth}} />
+        <div styleName="style.timeline-header-labels">
+          {this.dates.map((dt, n) => {
+            const indicateWeekend = this.weekendDays.includes(n);
+            return (
+              <div
+                className={`${style['timeline-header-label']} monthly ${
+                  indicateWeekend ? style.weekend : ''
+                }`}
+                key={`timeline-header-${dt}`}
+              >
+                <span
+                  styleName="style.timeline-label-text"
+                  onClick={() => {
+                    setDate(dt);
+                    setMode('days');
+                  }}
                 >
-                  <span
-                    styleName="style.timeline-label-text"
-                    onClick={() => {
-                      setDate(dt);
-                      setMode('days');
-                    }}
-                  >
-                    {toMoment(dt, 'YYYY-MM-DD').format('D')}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
-          {this.hasActions && <div styleName="baseStyle.timeline-header-actions" />}
+                  {toMoment(dt, 'YYYY-MM-DD').format('D')}
+                </span>
+              </div>
+            );
+          })}
         </div>
-      </>
+        {this.hasActions && <div styleName="baseStyle.timeline-header-actions" />}
+      </div>
     );
   }
 }

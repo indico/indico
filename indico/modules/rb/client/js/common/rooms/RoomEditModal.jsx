@@ -1040,19 +1040,17 @@ class RoomEditModal extends React.Component {
         };
 
     return (
-      <>
-        <Modal open onClose={this.handleCloseModal} size="large" closeIcon>
-          <FinalForm
-            validate={validate}
-            onSubmit={this.handleSubmit}
-            render={this.renderModalContent}
-            initialValues={initialValues}
-            initialValuesEqual={_.isEqual}
-            subscription={{submitting: true, hasValidationErrors: true, pristine: true}}
-            mutators={{...arrayMutators}}
-          />
-        </Modal>
-      </>
+      <Modal open onClose={this.handleCloseModal} size="large" closeIcon>
+        <FinalForm
+          validate={validate}
+          onSubmit={this.handleSubmit}
+          render={this.renderModalContent}
+          initialValues={initialValues}
+          initialValuesEqual={_.isEqual}
+          subscription={{submitting: true, hasValidationErrors: true, pristine: true}}
+          mutators={{...arrayMutators}}
+        />
+      </Modal>
     );
   }
 }

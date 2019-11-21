@@ -85,56 +85,54 @@ export default class EquipmentForm extends FilterFormComponent {
     const {availableEquipment, availableFeatures} = this.props;
     const {equipment, features, showEquipment} = this.state;
     return (
-      <>
-        <Form.Group>
-          {availableFeatures.map(feat => (
+      <Form.Group>
+        {availableFeatures.map(feat => (
+          <Form.Checkbox
+            checked={features.includes(feat.name)}
+            key={feat.name}
+            label={
+              <label>
+                <Icon name={feat.icon} />
+                <strong>{feat.title}</strong>
+              </label>
+            }
+            onChange={(__, {checked}) => {
+              this.setFeature(feat.name, checked);
+            }}
+          />
+        ))}
+        {!!availableFeatures.length && !!availableEquipment.length && (
+          <Accordion styleName="equipment-accordion">
+            <Accordion.Title active={showEquipment} index={0} onClick={this.handleClick}>
+              <Icon name="dropdown" />
+              <Translate>See detailed equipment</Translate>
+            </Accordion.Title>
+            <Accordion.Content active={showEquipment}>
+              {availableEquipment.map(equip => (
+                <Form.Checkbox
+                  checked={equipment.includes(equip)}
+                  key={equip}
+                  label={equip}
+                  onChange={(__, {checked}) => {
+                    this.setEquipment(equip, checked);
+                  }}
+                />
+              ))}
+            </Accordion.Content>
+          </Accordion>
+        )}
+        {!availableFeatures.length &&
+          availableEquipment.map(equip => (
             <Form.Checkbox
-              checked={features.includes(feat.name)}
-              key={feat.name}
-              label={
-                <label>
-                  <Icon name={feat.icon} />
-                  <strong>{feat.title}</strong>
-                </label>
-              }
+              checked={equipment.includes(equip)}
+              key={equip}
+              label={equip}
               onChange={(__, {checked}) => {
-                this.setFeature(feat.name, checked);
+                this.setEquipment(equip, checked);
               }}
             />
           ))}
-          {!!availableFeatures.length && !!availableEquipment.length && (
-            <Accordion styleName="equipment-accordion">
-              <Accordion.Title active={showEquipment} index={0} onClick={this.handleClick}>
-                <Icon name="dropdown" />
-                <Translate>See detailed equipment</Translate>
-              </Accordion.Title>
-              <Accordion.Content active={showEquipment}>
-                {availableEquipment.map(equip => (
-                  <Form.Checkbox
-                    checked={equipment.includes(equip)}
-                    key={equip}
-                    label={equip}
-                    onChange={(__, {checked}) => {
-                      this.setEquipment(equip, checked);
-                    }}
-                  />
-                ))}
-              </Accordion.Content>
-            </Accordion>
-          )}
-          {!availableFeatures.length &&
-            availableEquipment.map(equip => (
-              <Form.Checkbox
-                checked={equipment.includes(equip)}
-                key={equip}
-                label={equip}
-                onChange={(__, {checked}) => {
-                  this.setEquipment(equip, checked);
-                }}
-              />
-            ))}
-        </Form.Group>
-      </>
+      </Form.Group>
     );
   }
 }

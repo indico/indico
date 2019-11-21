@@ -310,18 +310,16 @@ export default class DailyTimelineContent extends React.Component {
     );
 
     return (
-      <>
-        <Responsive.Portrait orElse={timeline}>
-          <Responsive.Phone andSmaller orElse={timeline}>
-            <Message icon info>
-              <Icon name="mobile alternate" styleName="rotate-icon" />
-              <Message.Content>
-                <Translate>Please turn your device horizontally to view this page.</Translate>
-              </Message.Content>
-            </Message>
-          </Responsive.Phone>
-        </Responsive.Portrait>
-      </>
+      <Responsive.Portrait orElse={timeline}>
+        <Responsive.Phone andSmaller orElse={timeline}>
+          <Message icon info>
+            <Icon name="mobile alternate" styleName="rotate-icon" />
+            <Message.Content>
+              <Translate>Please turn your device horizontally to view this page.</Translate>
+            </Message.Content>
+          </Message>
+        </Responsive.Phone>
+      </Responsive.Portrait>
     );
   }
 }

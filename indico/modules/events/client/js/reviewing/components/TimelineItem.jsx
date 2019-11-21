@@ -73,12 +73,10 @@ export default function TimelineItem({revision, isLastRevision, state}) {
         </div>
       </div>
       {visible && (
-        <>
-          <RevisionLog items={revision.items} separator={isLastRevision}>
-            {/* TODO: Check whether the current user can actually judge */}
-            {isLastRevision && state.name === 'ready_for_review' && <ReviewForm />}
-          </RevisionLog>
-        </>
+        <RevisionLog items={revision.items} separator={isLastRevision}>
+          {/* TODO: Check whether the current user can actually judge */}
+          {isLastRevision && state.name === 'ready_for_review' && <ReviewForm />}
+        </RevisionLog>
       )}
     </>
   );

@@ -514,13 +514,11 @@ class BookRoomModal extends React.Component {
       ? {children: replaceMessages[link.type]}
       : assignMessages[link.type];
     return (
-      <>
-        <BookingObjectLink link={link} pending>
-          {!this.alreadyLinked && (
-            <FinalCheckbox name="linkBack" disabled={disabled} toggle label={label} />
-          )}
-        </BookingObjectLink>
-      </>
+      <BookingObjectLink link={link} pending>
+        {!this.alreadyLinked && (
+          <FinalCheckbox name="linkBack" disabled={disabled} toggle label={label} />
+        )}
+      </BookingObjectLink>
     );
   }
 

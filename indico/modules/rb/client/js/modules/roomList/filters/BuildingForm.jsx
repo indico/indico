@@ -47,21 +47,19 @@ export default class BuildingForm extends FilterFormComponent {
     }));
 
     return (
-      <>
-        <Form.Group>
-          <Form.Dropdown
-            options={options}
-            value={building}
-            placeholder={Translate.string('Building')}
-            onChange={(__, {value}) => this.setBuilding(value || null)}
-            closeOnChange
-            closeOnBlur
-            search
-            selection
-            clearable
-          />
-        </Form.Group>
-      </>
+      <Form.Group>
+        <Form.Dropdown
+          options={options}
+          value={building}
+          placeholder={Translate.string('Building')}
+          onChange={(__, {value}) => this.setBuilding(value || null)}
+          closeOnChange
+          closeOnBlur
+          search
+          selection
+          clearable
+        />
+      </Form.Group>
     );
   }
 }

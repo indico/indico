@@ -63,13 +63,11 @@ function AdminLocationRooms({location, isFetching, fetchRooms, filters: {text}})
 
       <SearchBar />
       {rooms.length ? (
-        <>
-          <Item.Group divided>
-            {rooms.map(room => (
-              <AdminRoomItem key={room.id} room={room} />
-            ))}
-          </Item.Group>
-        </>
+        <Item.Group divided>
+          {rooms.map(room => (
+            <AdminRoomItem key={room.id} room={room} />
+          ))}
+        </Item.Group>
       ) : (
         <Message info>
           <Translate>There are no rooms for the specified location.</Translate>

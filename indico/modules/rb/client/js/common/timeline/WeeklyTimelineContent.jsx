@@ -110,33 +110,31 @@ export default class WeeklyTimelineContent extends DailyTimelineContent {
     const {longLabel, selectable, setDate, setMode} = this.props;
     const labelWidth = longLabel ? 200 : 150;
     return (
-      <>
-        <div
-          styleName="baseStyle.timeline-header"
-          className={!selectable ? 'timeline-non-selectable' : ''}
-        >
-          <div style={{minWidth: labelWidth}} />
-          <div styleName="style.timeline-header-labels">
-            {_.map(this.dates, (dt, n) => (
-              <div
-                className={`${style['timeline-header-label']} weekly`}
-                key={`timeline-header-${n}`}
+      <div
+        styleName="baseStyle.timeline-header"
+        className={!selectable ? 'timeline-non-selectable' : ''}
+      >
+        <div style={{minWidth: labelWidth}} />
+        <div styleName="style.timeline-header-labels">
+          {_.map(this.dates, (dt, n) => (
+            <div
+              className={`${style['timeline-header-label']} weekly`}
+              key={`timeline-header-${n}`}
+            >
+              <span
+                styleName="style.timeline-label-text"
+                onClick={() => {
+                  setDate(dt);
+                  setMode('days');
+                }}
               >
-                <span
-                  styleName="style.timeline-label-text"
-                  onClick={() => {
-                    setDate(dt);
-                    setMode('days');
-                  }}
-                >
-                  {toMoment(dt, 'YYYY-MM-DD').format('ddd D MMM')}
-                </span>
-              </div>
-            ))}
-          </div>
-          {this.hasActions && <div styleName="baseStyle.timeline-header-actions" />}
+                {toMoment(dt, 'YYYY-MM-DD').format('ddd D MMM')}
+              </span>
+            </div>
+          ))}
         </div>
-      </>
+        {this.hasActions && <div styleName="baseStyle.timeline-header-actions" />}
+      </div>
     );
   }
 }
