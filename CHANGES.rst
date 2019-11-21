@@ -28,6 +28,8 @@ Improvements
 - Add ICS export for information in the user dashboard (:issue:`4057`)
 - Allow data syncing with multipass providers which do not support
   refreshing identity information
+- Show more verbose error when email validation fails during event
+  registration (:issue:`4177`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
