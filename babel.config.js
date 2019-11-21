@@ -1,6 +1,8 @@
 /* eslint-env commonjs */
 /* eslint-disable import/unambiguous, import/no-commonjs */
 
+const path = require('path');
+
 const plugins = [
   '@babel/plugin-transform-runtime',
   '@babel/plugin-proposal-class-properties',
@@ -23,7 +25,9 @@ const plugins = [
 
 // if there is a valid build config, we can use it to generate proper URLs
 try {
-  const config = require('./webpack-build-config');
+  const config = require(process.env.INDICO_PLUGIN_ROOT
+    ? path.join(process.env.INDICO_PLUGIN_ROOT, 'webpack-build-config')
+    : './webpack-build-config');
   const globalBuildConfig = config.indico ? config.indico.build : config.build;
 
   plugins.push([
