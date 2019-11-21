@@ -7,11 +7,17 @@
 
 from __future__ import unicode_literals
 
+import json
+import os
+from io import BytesIO
+from zipfile import ZipFile
+
 from flask import request, session
 from marshmallow import fields
 from marshmallow_enum import EnumField
 from werkzeug.exceptions import Forbidden, NotFound
 
+from indico.core.config import config
 from indico.core.errors import UserValueError
 from indico.modules.events.controllers.base import RHEventBase
 from indico.modules.events.editing.controllers.base import RHContributionEditableBase
@@ -25,9 +31,12 @@ from indico.modules.events.editing.operations import (confirm_editable_changes, 
 from indico.modules.events.editing.schemas import (EditableSchema, EditingConfirmationAction, EditingFileTypeSchema,
                                                    EditingReviewAction, EditingTagSchema, ReviewEditableArgs)
 from indico.modules.files.controllers import UploadFileMixin
+from indico.modules.files.models.files import File
+from indico.util.fs import chmod_umask, secure_filename
 from indico.util.i18n import _
 from indico.util.marshmallow import not_empty
 from indico.web.args import parser, use_kwargs
+from indico.web.flask.util import send_file
 
 
 class RHEditingFileTypes(RHEventBase):
@@ -250,3 +259,23 @@ class RHEditRevisionComment(RHContributionEditableRevisionBase):
     def _process_DELETE(self):
         delete_revision_comment(self.comment)
         return '', 204
+
+
+class RHExportRevisionFiles(RHContributionEditableRevisionBase):
+    def _check_revision_access(self):
+        return self._user_is_authorized_submitter() or self._user_is_authorized_editor()
+
+    def _process(self):
+        buf = BytesIO()
+        with ZipFile(buf, 'w', allowZip64=True) as zip_handler:
+            for revision_file in self.revision.files:
+                file = revision_file.file
+                filename = secure_filename(file.filename, 'file-{}'.format(file.id))
+                file_type = revision_file.file_type
+                folder_name = secure_filename(file_type.name, 'file-type-{}'.format(file_type.id))
+
+                with file.storage.get_local_path(file.storage_file_id) as filepath:
+                    zip_handler.write(filepath, os.path.join(folder_name, filename))
+
+        buf.seek(0)
+        return send_file('revision-{}.zip'.format(self.revision.id), buf, 'application/zip', inline=False)

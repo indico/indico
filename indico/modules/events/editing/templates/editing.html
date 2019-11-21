@@ -7,6 +7,8 @@
 {% block content %}
     <div id="file-manager"
          data-event-id="{{ event.id }}"
+         data-download-url="{{ url_for('event_editing.revision_files_export', event, contrib_id=contribution.id,
+                                       revision_id=editable.revisions[0].id, type='paper') }}"
          data-upload-url="{{ url_for('event_editing.api_upload', event, contrib_id=contribution.id, type='paper') }}"
          data-api-editable-url="{{ url_for('event_editing.api_editable', event, contrib_id=contribution.id, type='paper') }}">
     </div>

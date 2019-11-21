@@ -17,6 +17,9 @@ _bp = IndicoBlueprint('event_editing', __name__, url_prefix='/event/<confId>', t
 _bp.add_url_rule('/editing/api/file-types', 'api_file_types', backend.RHEditingFileTypes)
 _bp.add_url_rule('/editing/api/tags', 'api_tags', backend.RHEditingTags)
 
+
+_bp.add_url_rule('/contributions/<int:contrib_id>/editing/<any(paper):type>/<int:revision_id>/files.zip',
+                 'revision_files_export', backend.RHExportRevisionFiles)
 _bp.add_url_rule('/api/contributions/<int:contrib_id>/editing/<any(paper):type>/upload', 'api_upload',
                  backend.RHEditingUploadFile, methods=('POST',))
 _bp.add_url_rule('/api/contributions/<int:contrib_id>/editing/<any(paper):type>',

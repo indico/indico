@@ -9,8 +9,11 @@ import _ from 'lodash';
 import React, {useCallback, useReducer, useContext, useRef, useMemo} from 'react';
 import PropTypes from 'prop-types';
 import {useDropzone} from 'react-dropzone';
-import {Icon} from 'semantic-ui-react';
-import {FileManagerContext, filePropTypes, uploadFiles, deleteFile, mapFileTypes} from './util';
+import {Button, Icon} from 'semantic-ui-react';
+
+import {Translate} from 'indico/react/i18n';
+
+import {deleteFile, FileManagerContext, filePropTypes, mapFileTypes, uploadFiles} from './util';
 import FileList from './FileList';
 import Uploads from './Uploads';
 import reducer from './reducer';
@@ -101,7 +104,7 @@ FileType.defaultProps = {
   uploads: {},
 };
 
-export default function FileManager({uploadURL, fileTypes, files}) {
+export default function FileManager({downloadURL, uploadURL, fileTypes, files}) {
   const _fileTypes = useMemo(() => mapFileTypes(fileTypes, files), [fileTypes, files]);
   const [state, dispatch] = useReducer(reducer, {
     fileTypes: _fileTypes,
@@ -109,22 +112,32 @@ export default function FileManager({uploadURL, fileTypes, files}) {
   });
 
   return (
-    <div styleName="file-manager">
-      <FileManagerContext.Provider value={dispatch}>
-        {state.fileTypes.map(fileType => (
-          <FileType
-            key={fileType.id}
-            uploadURL={uploadURL}
-            fileType={fileType}
-            uploads={state.uploads[fileType.id]}
-          />
-        ))}
-      </FileManagerContext.Provider>
+    <div styleName="file-manager-wrapper">
+      <div styleName="file-manager">
+        <FileManagerContext.Provider value={dispatch}>
+          {state.fileTypes.map(fileType => (
+            <FileType
+              key={fileType.id}
+              uploadURL={uploadURL}
+              fileType={fileType}
+              uploads={state.uploads[fileType.id]}
+            />
+          ))}
+        </FileManagerContext.Provider>
+      </div>
+      {downloadURL && files.length !== 0 && (
+        <div>
+          <Button as="a" href={downloadURL} floated="right" icon primary>
+            <Icon name="download" /> <Translate>Download ZIP</Translate>
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
 
 FileManager.propTypes = {
+  downloadURL: PropTypes.string.isRequired,
   uploadURL: PropTypes.string.isRequired,
   fileTypes: PropTypes.arrayOf(PropTypes.shape(fileTypePropTypes)).isRequired,
   files: PropTypes.arrayOf(PropTypes.shape(filePropTypes)).isRequired,

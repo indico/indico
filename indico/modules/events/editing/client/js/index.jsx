@@ -19,6 +19,7 @@ import Timeline from './components/Timeline';
 document.addEventListener('DOMContentLoaded', async () => {
   const fileManager = document.querySelector('#file-manager');
   const eventId = fileManager.dataset.eventId;
+
   let response;
   try {
     response = await indicoAxios.get(fileTypesURL({confId: eventId}));
@@ -35,7 +36,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const files = camelizeKeys(response.data.revisions[0].files);
   ReactDOM.render(
-    <FileManager fileTypes={fileTypes} files={files} uploadURL={fileManager.dataset.uploadUrl} />,
+    <FileManager
+      fileTypes={fileTypes}
+      files={files}
+      uploadURL={fileManager.dataset.uploadUrl}
+      downloadURL={fileManager.dataset.downloadUrl}
+    />,
     fileManager
   );
 
