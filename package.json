@@ -105,7 +105,7 @@
     "diff": "^4.0.1",
     "eslint": "^6.6.0",
     "eslint-cli": "^1.1.1",
-    "eslint-config-indico": "^1.2.0",
+    "eslint-config-indico": "^1.2.1",
     "eslint-config-prettier": "^6.7.0",
     "eslint-import-resolver-alias": "^1.1.2",
     "eslint-plugin-babel": "^5.3.0",
