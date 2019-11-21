@@ -16,7 +16,6 @@ import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import FileManager from './components/FileManager';
 import Timeline from './components/Timeline';
 
-
 document.addEventListener('DOMContentLoaded', async () => {
   const fileManager = document.querySelector('#file-manager');
   const eventId = fileManager.dataset.eventId;

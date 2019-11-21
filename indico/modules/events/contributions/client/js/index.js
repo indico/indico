@@ -14,7 +14,6 @@ import ReactDOM from 'react-dom';
 import 'indico/modules/events/util/types_dialog';
 import {PublicationSwitch} from 'indico/react/components';
 
-
 (function(global) {
   function setupPublicationButton() {
     const element = document.querySelector('#pub-switch');

@@ -34,7 +34,8 @@
           connectWith: '.track-list',
           update: function() {
             const $this = $(this);
-            const sortedList = $this.find('li.track-row')
+            const sortedList = $this
+              .find('li.track-row')
               .map(function() {
                 const $this = $(this);
                 if ($this.hasClass('track-group-box')) {
@@ -63,9 +64,9 @@
             if (parentDiv.length && ui.item.hasClass('track-group-box')) {
               $(ui.sender).sortable('cancel');
             }
-          }
-      });
-    })
-    .trigger('indico:htmlUpdated');
-  }
+          },
+        });
+      })
+      .trigger('indico:htmlUpdated');
+  };
 })(window);
