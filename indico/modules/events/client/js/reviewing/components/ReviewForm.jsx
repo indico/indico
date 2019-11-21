@@ -121,6 +121,8 @@ export default function ReviewForm() {
                     text={Translate.string('Judge')}
                     options={judgmentOptions}
                     direction="left"
+                    value={null}
+                    selectOnNavigation={false}
                     onChange={(_, {value}) => {
                       setJudgmentModalType(value);
                     }}
