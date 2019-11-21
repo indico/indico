@@ -113,7 +113,7 @@
             {% endcall %}
         </div>
     {% else %}
-        <ul class="i-box-group vert track-list parent-track-list" data-url="{{ url_for('.sort_tracks', event) }}">
+        <ul class="i-box-group vert track-list" data-url="{{ url_for('.sort_tracks', event) }}">
             {% for item in items %}
                 {% if item.is_track_group %}
                     {{ render_group(item, event)}}
