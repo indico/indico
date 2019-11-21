@@ -43,7 +43,7 @@ from indico.modules.users.util import get_user_by_email
 from indico.util.date_time import format_date
 from indico.util.i18n import _
 from indico.util.spreadsheets import unique_col
-from indico.util.string import to_unicode, validate_email
+from indico.util.string import to_unicode, validate_email, validate_email_verbose
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.widgets import SwitchWidget
 
@@ -118,9 +118,10 @@ def check_registration_email(regform, email, registration=None, management=False
         elif user:
             return dict(status='ok', user=user.full_name, self=(not management and user == session.user),
                         same=(user == registration.user))
-        elif not validate_email(email):
-            return dict(status='error', conflict='email-invalid')
-        elif regform.require_user and (management or email != registration.email):
+        email_err = validate_email_verbose(email)
+        if email_err:
+            return dict(status='error', conflict='email-invalid', email_error=email_err)
+        if regform.require_user and (management or email != registration.email):
             return dict(status='warning' if management else 'error', conflict='no-user')
         else:
             return dict(status='ok', user=None)
@@ -131,9 +132,10 @@ def check_registration_email(regform, email, registration=None, management=False
             return dict(status='error', conflict='user-already-registered')
         elif user:
             return dict(status='ok', user=user.full_name, self=(not management and user == session.user), same=False)
-        elif not validate_email(email):
-            return dict(status='error', conflict='email-invalid')
-        elif regform.require_user:
+        email_err = validate_email_verbose(email)
+        if email_err:
+            return dict(status='error', conflict='email-invalid', email_error=email_err)
+        if regform.require_user:
             return dict(status='warning' if management else 'error', conflict='no-user')
         else:
             return dict(status='ok', user=None)

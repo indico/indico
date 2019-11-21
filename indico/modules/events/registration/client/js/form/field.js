@@ -201,7 +201,11 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
             )
             .format(name);
         } else if (data.conflict === 'email-invalid') {
-          msg = $T.gettext('This email address is invalid.').format(name);
+          if (data.email_error === 'undeliverable') {
+            msg = $T.gettext('The domain used in the email address does not exist.');
+          } else {
+            msg = $T.gettext('This email address is invalid.');
+          }
         } else if (!data.user) {
           msg = $T.gettext('The registration will not be associated with any Indico account.');
         } else if (data.self) {

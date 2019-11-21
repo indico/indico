@@ -278,6 +278,27 @@ def validate_email(email):
         return True
 
 
+def validate_email_verbose(email):
+    """Validate the given email address.
+
+    This checks both if it looks valid and if it has valid
+    MX (or A/AAAA) records.
+
+    :return: ``None`` for a valid email address, otherwise ``'invalid'`` or
+             ``'undeliverable'`` depending on whether the email address has
+             syntax errors or dns validation failed.
+    """
+    email = to_unicode(email)
+    try:
+        email_validator.validate_email(to_unicode(email))
+    except email_validator.EmailUndeliverableError:
+        return 'undeliverable'
+    except email_validator.EmailNotValidError:
+        return 'invalid'
+    else:
+        return None
+
+
 def validate_emails(emails):
     """Validate a space/semicolon/comma-separated list of email addresses."""
     emails = to_unicode(emails)
