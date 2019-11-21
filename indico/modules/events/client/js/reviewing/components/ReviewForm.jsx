@@ -109,7 +109,6 @@ export default function ReviewForm() {
                   <Dropdown
                     className="judgment-btn"
                     text={Translate.string('Judge')}
-                    options={judgmentOptions}
                     direction="left"
                     value={null}
                     selectOnNavigation={false}
@@ -118,7 +117,20 @@ export default function ReviewForm() {
                     }}
                     button
                     floating
-                  />
+                  >
+                    <Dropdown.Menu>
+                      {judgmentOptions.map(({value, text}) => (
+                        <Dropdown.Item
+                          key={value}
+                          onClick={() => {
+                            setJudgmentModalType(value);
+                          }}
+                        >
+                          {text}
+                        </Dropdown.Item>
+                      ))}
+                    </Dropdown.Menu>
+                  </Dropdown>
                 </div>
               )}
             </div>
