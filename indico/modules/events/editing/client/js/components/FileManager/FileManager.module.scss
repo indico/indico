@@ -34,6 +34,8 @@
     flex-wrap: wrap;
 
     .file-type {
+        overflow: hidden;
+
         &:not(:nth-child(3)) {
             margin-right: 1em;
         }
