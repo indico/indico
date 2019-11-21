@@ -7,6 +7,7 @@
 {% endblock %}
 
 {% block content %}
+    {{ template_hook('before-regform', event=event, regform=regform, registration=registration, management=true) }}
     <div ng-app="nd" ng-controller="AppCtrl">
         <div nd-reg-form
              conf-id="{{ event.id }}"
@@ -21,4 +22,5 @@
              management="true"
              notify-default="{{ session.get('registration_notify_user_default', true) | tojson | forceescape }}"></div>
     </div>
+    {{ template_hook('after-regform', event=event, regform=regform, registration=registration, management=true) }}
 {% endblock %}

@@ -40,6 +40,7 @@ Internal Changes
 ^^^^^^^^^^^^^^^^
 
 - Make React and SemanticUI usable everywhere (:issue:`3955`)
+- Add ``before-regform`` template hook (:issue:`4171`, thanks :user:`giusedb`)
 
 
 ----

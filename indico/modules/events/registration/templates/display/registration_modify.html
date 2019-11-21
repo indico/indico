@@ -16,6 +16,8 @@
 
 {% block content %}
     {% if registration.can_be_modified or registration.invitation %}
+        {{ template_hook('before-regform', event=event, regform=registration.registration_form,
+                         registration=registration, management=false) }}
         <div ng-app="nd" ng-controller="AppCtrl">
             <div nd-reg-form
                  conf-id="{{ event.id }}"
@@ -30,7 +32,7 @@
             </div>
         </div>
         {{ template_hook('after-regform', event=event, regform=registration.registration_form,
-                         registration=registration, management=False) }}
+                         registration=registration, management=false) }}
     {% else %}
         {% call message_box('error') %}
             {% if not registration.registration_form.is_modification_open -%}

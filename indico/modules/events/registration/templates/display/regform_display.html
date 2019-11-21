@@ -98,6 +98,7 @@
             {% endcall %}
         {% endif %}
 
+        {{ template_hook('before-regform', event=event, regform=regform, management=management, registration=none) }}
         <div ng-app="nd" ng-controller="AppCtrl">
             <div nd-reg-form
                  conf-id="{{ event.id }}"
