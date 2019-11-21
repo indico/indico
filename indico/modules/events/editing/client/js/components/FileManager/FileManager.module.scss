@@ -24,15 +24,25 @@
     }
 }
 
+.file-manager-wrapper {
+    display: flex;
+    flex-direction: column;
+}
+
 .file-manager {
     display: flex;
+    flex-wrap: wrap;
 
     .file-type {
+        &:not(:nth-child(3)) {
+            margin-right: 1em;
+        }
+
+        margin-bottom: 1em;
         border: 1px solid $gray;
         border-radius: 3px;
         padding: 1em;
-        margin: 1em;
-        width: 33%;
+        flex: 0 0 32%;
     }
 }
 
@@ -78,6 +88,7 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    max-width: 80%;
 
     &:global(.added) {
         color: $green;
