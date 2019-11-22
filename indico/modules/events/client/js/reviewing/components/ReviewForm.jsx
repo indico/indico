@@ -9,24 +9,13 @@ import React, {useState} from 'react';
 import {Form as FinalForm} from 'react-final-form';
 import {Button, Dropdown, Form} from 'semantic-ui-react';
 
-import {FinalDropdown, FinalSubmitButton, FinalTextArea} from 'indico/react/forms';
+import {FinalCheckbox, FinalInput, FinalSubmitButton, FinalTextArea} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 
 import JudgmentModal from './JudgmentModal';
 import UserAvatar from './UserAvatar';
 
 import './ReviewForm.module.scss';
-
-const visibilityOptions = [
-  {
-    value: 'editors',
-    text: Translate.string('Visible only to editors'),
-  },
-  {
-    value: 'authors',
-    text: Translate.string('Visible to editors and authors'),
-  },
-];
 
 const judgmentOptions = [
   {
@@ -61,6 +50,8 @@ export default function ReviewForm() {
     }
   };
 
+  const InputComponent = commentFormVisible ? FinalTextArea : FinalInput;
+  const inputProps = commentFormVisible ? {autoFocus: true} : {};
   return (
     <>
       <div className="i-timeline-item review-timeline-input">
@@ -71,41 +62,40 @@ export default function ReviewForm() {
               <div className="f-self-stretch">
                 <FinalForm
                   onSubmit={() => {}}
-                  initialValues={{comment: '', visibility: 'editors'}}
+                  initialValues={{comment: '', protected: false}}
                   subscription={{submitting: true}}
                 >
                   {fprops => (
                     <Form onSubmit={fprops.handleSubmit}>
-                      <FinalTextArea
+                      <InputComponent
+                        {...inputProps}
                         onFocus={onCommentClickHandler}
                         name="comment"
-                        rows={commentFormVisible ? 3 : 1}
                         placeholder={Translate.string('Leave a comment...')}
-                        style={{resize: commentFormVisible ? 'vertical' : 'none'}}
                         hideValidationError
                         required
                       />
                       {commentFormVisible && (
-                        <>
-                          <FinalDropdown
-                            name="visibility"
-                            options={visibilityOptions}
-                            width={8}
-                            selection
-                            required
+                        <FinalCheckbox
+                          label={Translate.string(
+                            'Restrict visibility of this comment to other editors'
+                          )}
+                          name="protected"
+                          toggle
+                        />
+                      )}
+                      {commentFormVisible && (
+                        <Form.Group inline>
+                          <FinalSubmitButton label={Translate.string('Comment')} />
+                          <Button
+                            disabled={fprops.submitting}
+                            content={Translate.string('Cancel')}
+                            onClick={() => {
+                              setCommentFormVisible(false);
+                              fprops.form.reset();
+                            }}
                           />
-                          <Form.Group inline>
-                            <FinalSubmitButton label={Translate.string('Comment')} />
-                            <Button
-                              disabled={fprops.submitting}
-                              content={Translate.string('Cancel')}
-                              onClick={() => {
-                                setCommentFormVisible(false);
-                                fprops.form.reset();
-                              }}
-                            />
-                          </Form.Group>
-                        </>
+                        </Form.Group>
                       )}
                     </Form>
                   )}

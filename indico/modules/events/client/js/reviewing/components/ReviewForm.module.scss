@@ -5,17 +5,15 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@import 'base/palette';
+
 :global(.ui.form) {
     :global(.disabled.field) {
         background: none;
     }
 
-    textarea {
-        padding-top: 10px;
-        padding-bottom: 5px;
-
-        &::placeholder {
-            line-height: 1em;
-        }
+    :global(.field) {
+        display: flex;
+        align-items: center;
     }
 }
