@@ -5,6 +5,8 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+# flake8: noqa
+
 """
 ``fossilize`` allows us to "serialize" complex python objects into dictionaries
 and lists. Such operation is very useful for generating JSON data structures
@@ -304,7 +306,7 @@ class Fossilizable(object):
                     if callable(attr):
                         try:
                             methodResult = attr()
-                        except:
+                        except Exception:
                             logging.getLogger('indico.fossilize').error("Problem fossilizing '%r' with '%s'",
                                                                         obj, interfaceArg)
                             raise
@@ -346,7 +348,7 @@ class Fossilizable(object):
                     converterArgs['_obj'] = obj
                 try:
                     methodResult = convertFunction(methodResult, **converterArgs)
-                except:
+                except Exception:
                     logging.getLogger('indico.fossilize').error("Problem fossilizing '%r' with '%s' (%s)",
                                                                 obj, interfaceArg, methodName)
                     raise

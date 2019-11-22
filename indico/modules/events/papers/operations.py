@@ -22,8 +22,7 @@ from indico.modules.events.papers.models.comments import PaperReviewComment
 from indico.modules.events.papers.models.competences import PaperCompetence
 from indico.modules.events.papers.models.files import PaperFile
 from indico.modules.events.papers.models.review_ratings import PaperReviewRating
-from indico.modules.events.papers.models.reviews import (PaperAction, PaperCommentVisibility, PaperReview,
-                                                         PaperReviewType)
+from indico.modules.events.papers.models.reviews import PaperAction, PaperCommentVisibility, PaperReview
 from indico.modules.events.papers.models.revisions import PaperRevision, PaperRevisionState
 from indico.modules.events.papers.models.templates import PaperTemplate
 from indico.modules.events.papers.notifications import (notify_added_to_reviewing_team, notify_comment,

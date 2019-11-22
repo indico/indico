@@ -20,7 +20,6 @@ from sqlalchemy.orm import contains_eager, joinedload
 from sqlalchemy.orm.attributes import get_history, set_committed_value
 from sqlalchemy.orm.exc import NoResultFound
 
-from indico.core import signals
 from indico.util.packaging import get_package_root_path
 
 

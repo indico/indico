@@ -133,7 +133,7 @@ class StaticEventCreator(object):
         # add favicon
         used_assets.add('static/images/indico.ico')
         # assets
-        css_files = {url for url in used_assets if re.match('static/dist/.*\.css$', url)}
+        css_files = {url for url in used_assets if re.match(r'static/dist/.*\.css$', url)}
         for file_path in css_files:
             with open(os.path.join(self._web_dir, file_path)) as f:
                 rewritten_css, used_urls, __ = rewrite_css_urls(self.event, f.read())
@@ -146,7 +146,7 @@ class StaticEventCreator(object):
                             os.path.join(self._web_dir, file_path))
 
     def _copy_plugin_files(self, used_assets):
-        css_files = {url for url in used_assets if re.match('static/plugins/.*\.css$', url)}
+        css_files = {url for url in used_assets if re.match(r'static/plugins/.*\.css$', url)}
         for file_path in css_files:
             plugin_name, path = re.match(r'static/plugins/([^/]+)/(.+.css)', file_path).groups()
             plugin = plugin_engine.get_plugin(plugin_name)
@@ -168,7 +168,7 @@ class StaticEventCreator(object):
         return '/'.join(url.split('/')[2:])
 
     def _copy_customization_files(self, used_assets):
-        css_files = {url for url in used_assets if re.match('static/custom/.*\.css$', url)}
+        css_files = {url for url in used_assets if re.match(r'static/custom/.*\.css$', url)}
         for file_path in css_files:
             with open(os.path.join(config.CUSTOMIZATION_DIR, self._strip_custom_prefix(file_path))) as f:
                 rewritten_css, used_urls, __ = rewrite_css_urls(self.event, f.read())

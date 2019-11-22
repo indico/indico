@@ -23,7 +23,8 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.modules.attachments.api.util import build_folders_api_data, build_material_legacy_api_data
-from indico.modules.categories import Category, LegacyCategoryMapping
+from indico.modules.categories import Category
+from indico.modules.categories.models.legacy_mapping import LegacyCategoryMapping
 from indico.modules.categories.serialize import serialize_categories_ical
 from indico.modules.events import Event
 from indico.modules.events.contributions import contribution_settings

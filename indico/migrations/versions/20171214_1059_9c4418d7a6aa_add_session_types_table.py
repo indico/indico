@@ -42,7 +42,7 @@ def upgrade():
       FROM events.sessions
       WHERE is_poster
       GROUP BY event_id;
-      
+
       UPDATE events.sessions s
       SET type_id = st.id
       FROM events.session_types st

@@ -444,7 +444,7 @@ def track_time_changes(auto_extend=False, user=None):
     changes = defaultdict(dict)
     try:
         yield changes
-    except:
+    except Exception:
         del g.old_times
         raise
     else:

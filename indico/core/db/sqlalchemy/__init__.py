@@ -5,5 +5,5 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from .core import db
-from .custom import *
+from .core import db  # noqa: F401
+from .custom import *  # noqa: F401,F403

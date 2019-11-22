@@ -12,7 +12,7 @@ import re
 from flask import abort, redirect, request
 from werkzeug.exceptions import NotFound
 
-from indico.modules.categories import LegacyCategoryMapping
+from indico.modules.categories.models.legacy_mapping import LegacyCategoryMapping
 from indico.web.flask.util import url_for
 from indico.web.rh import RHSimple
 

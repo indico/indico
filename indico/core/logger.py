@@ -81,7 +81,7 @@ class FormattedSubjectSMTPHandler(logging.handlers.SMTPHandler):
             smtp.quit()
         except (KeyboardInterrupt, SystemExit):
             raise
-        except:
+        except Exception:
             self.handleError(record)
 
 

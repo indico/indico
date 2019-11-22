@@ -10,7 +10,7 @@ from __future__ import unicode_literals
 from datetime import timedelta
 
 from celery.schedules import crontab
-from flask import g, session
+from flask import session
 
 from indico.core.celery import celery
 from indico.core.db import db

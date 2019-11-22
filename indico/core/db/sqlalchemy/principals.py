@@ -173,7 +173,6 @@ class PrincipalMixin(object):
                                       cls.allow_event_roles, 'event_role_id'))
         return tuple(uniques + indexes + checks)
 
-
     @declared_attr
     def type(cls):
         exclude_values = set()

@@ -15,7 +15,7 @@ from indico.web.http_api.responses import HTTPAPIError
 @HTTPAPIHook.register
 class FileHook(EventBaseHook):
     """
-    Example: /export/event/1/session/2/contrib/3/subcontrib/4/material/Slides/5.bin?ak=00000000-0000-0000-0000-000000000000
+    Example: /export/event/1/session/2/contrib/3/subcontrib/4/material/Slides/5.bin
     """
     TYPES = ('file',)
     METHOD_NAME = 'export_file'

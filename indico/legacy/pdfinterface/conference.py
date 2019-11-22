@@ -5,6 +5,8 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+# flake8: noqa
+
 import re
 from copy import deepcopy
 from datetime import timedelta

@@ -26,7 +26,6 @@ from indico.modules.events.sessions.models.sessions import Session
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
-from indico.web.util import jsonify_data
 
 
 def can_manage_sessions(user, event, permission=None):

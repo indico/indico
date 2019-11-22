@@ -31,7 +31,7 @@ def celery_cmd(args):
         # It doesn't really need the celery config anyway (besides the broker url)
 
         try:
-            import flower
+            import flower  # noqa: F401
         except ImportError:
             print(cformat('%{red!}Flower is not installed'))
             sys.exit(1)

@@ -10,7 +10,6 @@ from __future__ import unicode_literals
 from itertools import chain
 
 from indico.core.db.sqlalchemy.custom.unaccent import unaccent_match
-from indico.legacy.common.fossilize import fossilize
 from indico.legacy.fossils.user import IGroupFossil
 from indico.legacy.services.implementation.base import LoggedOnlyService
 from indico.modules.events.models.events import Event
@@ -18,6 +17,7 @@ from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.util import serialize_event_person
 from indico.modules.groups import GroupProxy
 from indico.modules.users.legacy import search_avatars
+from indico.util.fossilize import fossilize
 from indico.util.string import sanitize_email, to_unicode
 
 

@@ -25,7 +25,7 @@ from uuid import uuid4
 import bleach
 import email_validator
 import markdown
-import translitcodec  # this is NOT unused. it needs to be imported to register the codec.
+import translitcodec  # noqa: F401 (this is NOT unused. it needs to be imported to register the codec)
 from html2text import HTML2Text
 from jinja2.filters import do_striptags
 from lxml import etree, html

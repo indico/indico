@@ -5,6 +5,8 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+# flake8: noqa
+
 import string
 from collections import defaultdict
 from datetime import datetime

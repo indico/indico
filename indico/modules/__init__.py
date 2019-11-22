@@ -6,4 +6,4 @@
 # LICENSE file for more details.
 
 # TODO: remove imports below once they're imported from somewhere else:
-import indico.modules.admin
+import indico.modules.admin  # noqa: F401

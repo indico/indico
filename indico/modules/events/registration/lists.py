@@ -13,8 +13,7 @@ from flask import request
 from sqlalchemy.orm import joinedload
 
 from indico.core.db import db
-from indico.modules.events.registration.models.form_fields import (RegistrationFormFieldData,
-                                                                   RegistrationFormPersonalDataField)
+from indico.modules.events.registration.models.form_fields import RegistrationFormFieldData
 from indico.modules.events.registration.models.items import PersonalDataType, RegistrationFormItem
 from indico.modules.events.registration.models.registrations import Registration, RegistrationData, RegistrationState
 from indico.modules.events.util import ListGeneratorBase

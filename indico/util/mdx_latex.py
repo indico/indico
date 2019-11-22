@@ -91,9 +91,9 @@ from requests.exceptions import ConnectionError, InvalidURL
 __version__ = '2.1'
 
 
-start_single_quote_re = re.compile("(^|\s|\")'")
-start_double_quote_re = re.compile("(^|\s|'|`)\"")
-end_double_quote_re = re.compile("\"(,|\.|\s|$)")
+start_single_quote_re = re.compile(r"""(^|\s|")'""")
+start_double_quote_re = re.compile(r'''(^|\s|'|`)"''')
+end_double_quote_re = re.compile(r'"(,|\.|\s|$)')
 
 Image.init()
 IMAGE_FORMAT_EXTENSIONS = {format: ext for (ext, format) in Image.EXTENSION.viewitems()}
@@ -209,9 +209,9 @@ def escape_latex_entities(text):
     """Escape latex reserved characters."""
     out = text
     out = unescape_html_entities(out)
-    out = start_single_quote_re.sub('\g<1>`', out)
-    out = start_double_quote_re.sub('\g<1>``', out)
-    out = end_double_quote_re.sub("''\g<1>", out)
+    out = start_single_quote_re.sub(r'\g<1>`', out)
+    out = start_double_quote_re.sub(r'\g<1>``', out)
+    out = end_double_quote_re.sub(r"''\g<1>", out)
 
     out = latex_escape(out)
 
@@ -383,7 +383,7 @@ class LaTeXTreeProcessor(markdown.treeprocessors.Treeprocessor):
         elif ournode.tag == 'h4':
             buffer += '\n\\paragraph{%s}\n' % subcontent
         elif ournode.tag == 'hr':
-            buffer += '\\noindent\makebox[\linewidth]{\\rule{\paperwidth}{0.4pt}}'
+            buffer += r'\noindent\makebox[\linewidth]{\rule{\paperwidth}{0.4pt}}'
         elif ournode.tag == 'ul':
             # no need for leading \n as one will be provided by li
             buffer += """
@@ -471,10 +471,10 @@ class MathTextPostProcessor(markdown.postprocessors.Postprocessor):
             return '$%s$%s' % (text, matchobj.group(2))
 
         # $$ ..... $$
-        pat = re.compile('^\$\$([^\$]*)\$\$\s*$', re.MULTILINE)
+        pat = re.compile(r'^\$\$([^$]*)\$\$\s*$', re.MULTILINE)
         out = pat.sub(repl_1, instr)
         # Jones, $x=3$, is ...
-        pat3 = re.compile(r'\$([^\$]+)\$(\s|$)')
+        pat3 = re.compile(r'\$([^$]+)\$(\s|$)')
         out = pat3.sub(repl_2, out)
         # # $100 million
         # pat2 = re.compile('([^\$])\$([^\$])')

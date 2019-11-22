@@ -139,7 +139,6 @@ class VCPluginMixin(object):
 
         :param event: the event the videoconference room is for
         :param existing_vc_room: a vc_room from which to retrieve data for the form
-        :param \*\*kwargs: extra data to pass to the form if an existing vc room is passed
         :return: an instance of an :class:`IndicoForm` subclass
         """
         if existing_vc_room and existing_event_vc_room:

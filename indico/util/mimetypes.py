@@ -55,11 +55,11 @@ _regex_mapping = [
     # Video
     ('^video/', 'icon-file-video'),
     # OpenOffice
-    ('application/vnd\.oasis\.opendocument\.', 'icon-file-openoffice'),
+    (r'application/vnd\.oasis\.opendocument\.', 'icon-file-openoffice'),
     # XML
-    ('.+/.+\+xml$', 'icon-file-xml'),
+    (r'.+/.+\+xml$', 'icon-file-xml'),
     # JSON
-    ('.+/.+\+json$', 'icon-file-css')
+    (r'.+/.+\+json$', 'icon-file-css')
 ]
 _regex_mapping = [(re.compile(regex), icon) for regex, icon in _regex_mapping]
 

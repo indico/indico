@@ -8,7 +8,7 @@
 from __future__ import unicode_literals
 
 from markupsafe import escape
-from marshmallow.fields import Boolean, DateTime, Field, Float, Function, Integer, List, Method, Nested, String
+from marshmallow.fields import Boolean, Field, Float, Function, Integer, List, Nested, String
 from marshmallow_enum import EnumField
 
 from indico.core.marshmallow import mm

@@ -9,7 +9,7 @@ from __future__ import unicode_literals
 
 from flask import redirect
 
-from indico.modules.events.contributions import contribution_settings, get_contrib_field_types
+from indico.modules.events.contributions import contribution_settings
 
 
 class ContributionListMixin:
@@ -27,4 +27,3 @@ class ContributionListMixin:
         published = contribution_settings.get(self.event, 'published')
         return self.view_class.render_template(self.template, self.event, selected_entry=selected_entry,
                                                published=published, **kwargs)
-

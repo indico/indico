@@ -1,4 +1,30 @@
 [flake8]
-exclude = .git,build,dist,ext_modules,node_modules,indico.egg-info,__pycache__,docs,htmlcov
 max-line-length = 120
+
+# colored output
 format = ${cyan}%(path)s${reset}:${yellow_bold}%(row)d${reset}:${green_bold}%(col)d${reset}: ${red_bold}%(code)s${reset} %(text)s
+
+exclude =
+    build
+    dist
+    docs
+    ext_modules
+    htmlcov
+    indico.egg-info
+    node_modules
+    # TODO: remove the next two entries and use extend-exclude once flake8 3.8.0 is out
+    .git
+    __pycache__
+
+extend-ignore =
+    # allow assigning lambdas (it's useful for single-line functions defined inside other functions)
+    E731
+
+per-file-ignores =
+    # signals use wildcard imports to expose everything in `indico.core.signals`
+    indico/core/signals/event/__init__.py:E402,F403,F401
+    indico/core/signals/__init__.py:F403,F401
+    # allow long lines in migrations (only do that for raw SQL please)
+    indico/migrations/versions/*.py:E501
+    # allow nicely aligned parametrizations
+    indico/*_test.py:E241

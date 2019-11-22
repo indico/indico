@@ -5,6 +5,8 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+# flake8: noqa
+
 from xml.sax import saxutils
 
 from indico.legacy.common.utils import encodeUnicode

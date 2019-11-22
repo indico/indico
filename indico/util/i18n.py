@@ -124,7 +124,7 @@ gettext_context = make_bound_gettext(_use_context, force_unicode=True)
 ngettext_context = make_bound_ngettext(_use_context, force_unicode=True)
 
 # Just a marker for message extraction
-N_ = lambda text: text
+N_ = lambda text: text  # noqa
 
 
 class NullDomain(Domain):

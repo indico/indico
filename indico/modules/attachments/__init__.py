@@ -20,6 +20,8 @@ from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
 
 
+__all__ = ('logger', 'Attachment', 'AttachmentFolder')
+
 logger = Logger.get('attachments')
 connect_log_signals()
 

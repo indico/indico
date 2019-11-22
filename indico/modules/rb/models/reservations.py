@@ -51,12 +51,12 @@ class RepeatFrequency(int, IndicoEnum):
 
 class RepeatMapping(object):
     mapping = {
-        (RepeatFrequency.NEVER, 0): ('Single reservation',            None, 'none'),
-        (RepeatFrequency.DAY,   1): ('Repeat daily',                  0,    'daily'),
-        (RepeatFrequency.WEEK,  1): ('Repeat once a week',            1,    'weekly'),
-        (RepeatFrequency.WEEK,  2): ('Repeat once every two weeks',   2,    'everyTwoWeeks'),
-        (RepeatFrequency.WEEK,  3): ('Repeat once every three weeks', 3,    'everyThreeWeeks'),
-        (RepeatFrequency.MONTH, 1): ('Repeat every month',            4,    'monthly')
+        (RepeatFrequency.NEVER, 0): ('Single reservation',            None, 'none'),  # noqa: E241
+        (RepeatFrequency.DAY,   1): ('Repeat daily',                  0,    'daily'),  # noqa: E241
+        (RepeatFrequency.WEEK,  1): ('Repeat once a week',            1,    'weekly'),  # noqa: E241
+        (RepeatFrequency.WEEK,  2): ('Repeat once every two weeks',   2,    'everyTwoWeeks'),  # noqa: E241
+        (RepeatFrequency.WEEK,  3): ('Repeat once every three weeks', 3,    'everyThreeWeeks'),  # noqa: E241
+        (RepeatFrequency.MONTH, 1): ('Repeat every month',            4,    'monthly')  # noqa: E241
     }
 
     @classmethod

@@ -9,7 +9,6 @@ from __future__ import unicode_literals
 
 import os
 import re
-from datetime import timedelta
 from functools import wraps
 
 import yaml
@@ -17,7 +16,7 @@ from flask.helpers import get_root_path
 
 from indico.core import signals
 from indico.core.settings import ACLProxyBase, SettingProperty, SettingsProxyBase
-from indico.core.settings.converters import DatetimeConverter, TimedeltaConverter
+from indico.core.settings.converters import DatetimeConverter
 from indico.core.settings.util import get_all_settings, get_setting, get_setting_acl
 from indico.modules.events.models.settings import EventSetting, EventSettingPrincipal
 from indico.util.caching import memoize

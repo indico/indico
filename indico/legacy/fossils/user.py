@@ -5,7 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from indico.legacy.common.fossilize import IFossil
+from indico.util.fossilize import IFossil
 
 
 class IGroupFossil(IFossil):
@@ -45,7 +45,7 @@ class IAvatarMinimalFossil(IFossil):
 
 class IAvatarFossil(IAvatarMinimalFossil):
 
-    def getEmail( self ):
+    def getEmail(self):
         """ Avatar email """
 
     def getFirstName(self):
@@ -54,19 +54,19 @@ class IAvatarFossil(IAvatarMinimalFossil):
     def getFamilyName(self):
         """ Avatar family name """
 
-    def getTitle( self ):
+    def getTitle(self):
         """ Avatar name title (Mr, Mrs..) """
 
-    def getTelephone( self ):
+    def getTelephone(self):
         """ Avatar telephone """
     getTelephone.name = "phone"
 
-    def getOrganisation( self ):
+    def getOrganisation(self):
         """ Avatar organisation / affiliation """
     getOrganisation.name = "affiliation"
 
     def getFax(self):
         """ Avatar fax """
 
-    def getAddress( self ):
+    def getAddress(self):
         """ Avatar address """

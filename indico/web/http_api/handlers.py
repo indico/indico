@@ -24,11 +24,11 @@ from werkzeug.exceptions import BadRequest, NotFound
 from indico.core.db import db
 from indico.core.logger import Logger
 from indico.legacy.common.cache import GenericCache
-from indico.legacy.common.fossilize import clearCache, fossilize
 from indico.modules.api import APIMode, api_settings
 from indico.modules.api.models.keys import APIKey
 from indico.modules.oauth import oauth
 from indico.modules.oauth.provider import load_token
+from indico.util.fossilize import clearCache, fossilize
 from indico.util.string import to_unicode
 from indico.web.http_api import HTTPAPIHook
 from indico.web.http_api.fossils import IHTTPAPIExportResultFossil

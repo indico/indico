@@ -450,8 +450,8 @@ class RHRegistrationsConfigBadges(RHRegistrationsActionBase):
         from indico.modules.designer.pdf import PIXELS_CM
         format_map = self.format_map_landscape if tpl.data['width'] > tpl.data['height'] else self.format_map_portrait
         return next((frm for frm, frm_size in format_map.iteritems()
-                     if (frm_size[0] == float(tpl.data['width']) / PIXELS_CM) and
-                         frm_size[1] == float(tpl.data['height']) / PIXELS_CM), 'custom')
+                     if (frm_size[0] == float(tpl.data['width']) / PIXELS_CM and
+                         frm_size[1] == float(tpl.data['height']) / PIXELS_CM)), 'custom')
 
     @property
     def _default_template_id(self):

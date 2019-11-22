@@ -158,5 +158,6 @@ def _setup_cli():
             command.callback = partial(with_appcontext(_safe_downgrade), _func=command.callback)
         cli.add_command(command)
 
+
 _setup_cli()
 del _setup_cli

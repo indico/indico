@@ -9,7 +9,6 @@ from __future__ import unicode_literals
 
 import os
 from collections import OrderedDict
-from datetime import timedelta
 
 from flask import flash, session
 from markupsafe import escape
@@ -108,7 +107,7 @@ class AttachmentPackageGeneratorMixin(ZipGeneratorMixin):
                 continue
             if (isinstance(linked_obj, SubContribution) and not linked_obj.contribution.is_deleted and
                     linked_obj.contribution_id in contribution_ids):
-                    objs.append(attachment)
+                objs.append(attachment)
             elif isinstance(linked_obj, Contribution) and linked_obj.id in contribution_ids:
                 objs.append(attachment)
 

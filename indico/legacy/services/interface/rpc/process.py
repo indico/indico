@@ -17,6 +17,7 @@ from indico.core.db.sqlalchemy.core import handle_sqlalchemy_database_error
 from indico.core.notifications import flush_email_queue, init_email_queue
 from indico.legacy.services.interface.rpc import handlers
 from indico.util import fossilize
+from indico.util.i18n import _
 
 
 def _lookup_handler(method):

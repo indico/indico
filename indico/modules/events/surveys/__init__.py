@@ -10,13 +10,11 @@ from __future__ import unicode_literals
 from flask import render_template, session
 
 from indico.core import signals
-from indico.core.db import db
 from indico.core.logger import Logger
 from indico.core.permissions import ManagementPermission
 from indico.modules.events import Event
 from indico.modules.events.features.base import EventFeature
 from indico.modules.events.layout.util import MenuEntryData
-from indico.modules.events.surveys.models.submissions import SurveySubmission
 from indico.modules.events.surveys.util import query_active_surveys
 from indico.util.i18n import _
 from indico.web.flask.templating import template_hook
@@ -42,8 +40,6 @@ def _extend_event_management_menu(sender, event, **kwargs):
 
 @signals.event.sidemenu.connect
 def _extend_event_menu(sender, **kwargs):
-    from indico.modules.events.surveys.models.surveys import Survey
-
     def _visible(event):
         return event.has_feature('surveys') and query_active_surveys(event).has_rows()
 
@@ -53,7 +49,6 @@ def _extend_event_menu(sender, **kwargs):
 def _get_active_surveys(event):
     if not event.has_feature('surveys'):
         return []
-    from indico.modules.events.surveys.models.surveys import Survey
     return query_active_surveys(event).all()
 
 
@@ -87,7 +82,7 @@ def _get_management_permissions(sender, **kwargs):
 
 @signals.import_tasks.connect
 def _import_tasks(sender, **kwargs):
-    import indico.modules.events.surveys.tasks
+    import indico.modules.events.surveys.tasks  # noqa: F401
 
 
 class SurveysFeature(EventFeature):

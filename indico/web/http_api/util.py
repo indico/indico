@@ -65,13 +65,13 @@ def generate_public_auth_request(apiKey, path, params=None):
         publicRequestsURL = build_indico_request(path, params, key) if key else None
     elif apiMode == APIMode.SIGNED:
         publicRequestsURL = build_indico_request(path, params)
-        authRequestURL = build_indico_request(path, params, key, secret_key, persistent)  if key and secret_key else None
+        authRequestURL = build_indico_request(path, params, key, secret_key, persistent) if key and secret_key else None
     elif apiMode == APIMode.ONLYKEY_SIGNED:
-        publicRequestsURL = build_indico_request(path, params, key)  if key else None
-        authRequestURL = build_indico_request(path, params, key, secret_key, persistent)  if key and secret_key else None
+        publicRequestsURL = build_indico_request(path, params, key) if key else None
+        authRequestURL = build_indico_request(path, params, key, secret_key, persistent) if key and secret_key else None
     elif apiMode == APIMode.ALL_SIGNED:
-        authRequestURL = build_indico_request(path, params, key, secret_key, persistent)  if key else None
+        authRequestURL = build_indico_request(path, params, key, secret_key, persistent) if key else None
         params["onlypublic"] = "yes"
-        publicRequestsURL = build_indico_request(path, params, key, secret_key, persistent)  if key else None
+        publicRequestsURL = build_indico_request(path, params, key, secret_key, persistent) if key else None
     return {'publicRequestURL': (config.BASE_URL + publicRequestsURL) if publicRequestsURL else '',
             'authRequestURL': (config.BASE_URL + authRequestURL) if authRequestURL else ''}

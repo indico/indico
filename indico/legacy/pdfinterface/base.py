@@ -5,6 +5,8 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+# flake8: noqa
+
 import cgi
 import math
 import os
@@ -507,7 +509,7 @@ class DocTemplateWithTOC(SimpleDocTemplate):
         try:
             if flowable.getPart() != "":
                 self._part = flowable.getPart()
-        except:
+        except Exception:
             pass
 
     def handle_documentBegin(self):

@@ -118,7 +118,7 @@ def rewrite_css_urls(event, css):
 
 def url_to_static_filename(endpoint, url):
     """Handle special endpoint/URLs so that they link to offline content."""
-    if re.match('(events)?\.display(_overview)?$', endpoint):
+    if re.match(r'(events)?\.display(_overview)?$', endpoint):
         return 'index.html'
     elif endpoint == 'event_layout.css_display':
         return 'custom.css'

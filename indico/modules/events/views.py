@@ -14,7 +14,7 @@ from sqlalchemy.orm import load_only
 from werkzeug.utils import cached_property
 
 from indico.modules.admin.views import WPAdmin
-from indico.modules.core.settings import core_settings, social_settings
+from indico.modules.core.settings import social_settings
 from indico.modules.events import Event
 from indico.modules.events.layout import layout_settings, theme_settings
 from indico.modules.events.layout.util import (build_menu_entry_name, get_css_url, get_menu_entry_by_name,

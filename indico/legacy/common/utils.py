@@ -15,7 +15,7 @@ if os.name == 'posix':
 
 def utf8rep(text):
     # \x -> _x keeps windows systems satisfied
-    return text.decode('utf-8').encode('unicode_escape').replace('\\x','_x')
+    return text.decode('utf-8').encode('unicode_escape').replace('\\x', '_x')
 
 
 def isStringHTML(s):
@@ -25,13 +25,13 @@ def isStringHTML(s):
     return any(tag in s for tag in ('<p>', '<p ', '<br', '<li>'))
 
 
-def encodeUnicode(text, sourceEncoding = "utf-8"):
+def encodeUnicode(text, sourceEncoding="utf-8"):
     try:
-        tmp = str(text).decode( sourceEncoding )
-    except:
+        tmp = str(text).decode(sourceEncoding)
+    except UnicodeError:
         try:
-            tmp = str(text).decode( 'iso-8859-1' )
-        except:
+            tmp = str(text).decode('iso-8859-1')
+        except UnicodeError:
             return ""
     return tmp.encode('utf-8')
 

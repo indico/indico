@@ -8,8 +8,8 @@
 from flask import jsonify, request
 
 from indico.core.logger import Logger
-from indico.legacy.common.fossilize import clearCache
 from indico.legacy.services.interface.rpc.process import invoke_method
+from indico.util.fossilize import clearCache
 
 
 def process():

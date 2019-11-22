@@ -107,7 +107,7 @@ class IndicoSQLAlchemy(SQLAlchemy):
         session = db.create_session({'query_cls': IndicoBaseQuery})()
         try:
             yield session
-        except:
+        except Exception:
             session.rollback()
             raise
         finally:

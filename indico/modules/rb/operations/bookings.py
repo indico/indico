@@ -58,14 +58,14 @@ def group_nonbookable_periods(periods, dates):
         return {}
     occurrences = defaultdict(list)
     for period in periods:
-        for date in dates:
-            if period.start_dt.date() <= date <= period.end_dt.date():
+        for d in dates:
+            if period.start_dt.date() <= d <= period.end_dt.date():
                 period_occurrence = NonBookablePeriod()
-                period_occurrence.start_dt = ((datetime.combine(date, time(0)))
-                                              if period.start_dt.date() != date else period.start_dt)
-                period_occurrence.end_dt = ((datetime.combine(date, time(23, 59)))
-                                            if period.end_dt.date() != date else period.end_dt)
-                occurrences[date].append(period_occurrence)
+                period_occurrence.start_dt = ((datetime.combine(d, time(0)))
+                                              if period.start_dt.date() != d else period.start_dt)
+                period_occurrence.end_dt = ((datetime.combine(d, time(23, 59)))
+                                            if period.end_dt.date() != d else period.end_dt)
+                occurrences[d].append(period_occurrence)
     return occurrences
 
 

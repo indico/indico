@@ -31,8 +31,8 @@ def _dispatch(event_rh, category_rh):
     return view_func
 
 
-_bp.add_url_rule('/category/<int:category_id>/manage/designer/<int:template_id>/toggle-default', 'toggle_category_default',
-                 RHToggleTemplateDefaultOnCategory, methods=('POST',))
+_bp.add_url_rule('/category/<int:category_id>/manage/designer/<int:template_id>/toggle-default',
+                 'toggle_category_default', RHToggleTemplateDefaultOnCategory, methods=('POST',))
 
 
 for object_type in ('event', 'category'):

@@ -13,7 +13,7 @@ from indico.core import signals
 from indico.modules.events.layout.util import MenuEntryData
 from indico.modules.users import User
 from indico.modules.vc.forms import VCPluginSettingsFormBase
-from indico.modules.vc.models.vc_rooms import VCRoom, VCRoomEventAssociation, VCRoomLinkType
+from indico.modules.vc.models.vc_rooms import VCRoom, VCRoomEventAssociation
 from indico.modules.vc.plugins import VCPluginMixin
 from indico.modules.vc.util import get_managed_vc_plugins, get_vc_plugins
 from indico.util.i18n import _
@@ -22,7 +22,7 @@ from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem, TopMenuItem
 
 
-__all__ = ('VCPluginMixin', 'VCPluginSettingsFormBase')
+__all__ = ('VCPluginMixin', 'VCPluginSettingsFormBase', 'VCRoomEventAssociation')
 
 
 @template_hook('event-header')

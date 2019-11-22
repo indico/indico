@@ -6,4 +6,4 @@
 # LICENSE file for more details.
 
 
-from indico.web.http_api.metadata.serializer import Serializer
+from indico.web.http_api.metadata.serializer import Serializer  # noqa: F401

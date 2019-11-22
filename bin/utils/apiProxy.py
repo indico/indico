@@ -97,8 +97,7 @@ def main():
         if use_evalex:
             if options.evalex:
                 print('Binding to non-loopback host with evalex enabled.')
-                print('This means anyone with access to this app is able to execute arbitrary' \
-                      ' python code!')
+                print('This means anyone with access to this app is able to execute arbitrary python code!')
             else:
                 print('Binding to non-loopback host; disabling evalex (aka remote code execution).')
                 use_evalex = False
@@ -109,8 +108,8 @@ def main():
     app.config['INDICO_SECRET_KEY'] = options.secret_key
 
     print(' * Using indico at {}'.format(app.config['INDICO_URL']))
-    print(' * To use this script, simply append a valid Indico HTTP API request to the URL shown' \
-          ' below. It MUST NOT contain an API key, secret key or timestamp!')
+    print(' * To use this script, simply append a valid Indico HTTP API request to the URL shown below. '
+          'It MUST NOT contain an API key, secret key or timestamp!')
     app.debug = options.debug
     app.run(host=options.host, port=options.port, use_evalex=use_evalex)
 

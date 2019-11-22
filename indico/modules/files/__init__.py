@@ -16,4 +16,4 @@ logger = Logger.get('files')
 
 @signals.import_tasks.connect
 def _import_tasks(sender, **kwargs):
-    import indico.modules.files.tasks
+    import indico.modules.files.tasks  # noqa: F401

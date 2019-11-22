@@ -333,7 +333,7 @@ class ListConverter(BaseConverter):
 
     def __init__(self, map):
         BaseConverter.__init__(self, map)
-        self.regex = '\w+(?:-\w+)*'
+        self.regex = r'\w+(?:-\w+)*'
 
     def to_python(self, value):
         return value.split('-')

@@ -49,7 +49,7 @@ rb_settings = SettingsProxy('roombooking', {
 
 @signals.import_tasks.connect
 def _import_tasks(sender, **kwargs):
-    import indico.modules.rb.tasks
+    import indico.modules.rb.tasks  # noqa: F401
 
 
 @signals.users.preferences.connect

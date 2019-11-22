@@ -40,7 +40,7 @@ class EmailNotificationCondition(Condition):
 
     @classmethod
     def _iter_available_values(cls, event, **kwargs):
-        raise NotImplemented
+        raise NotImplementedError
 
 
 class TrackCondition(EmailNotificationCondition):

@@ -7,7 +7,7 @@
 
 from __future__ import unicode_literals
 
-from markupsafe import Markup, escape
+from markupsafe import Markup
 
 from indico.modules.auth.util import url_for_register
 from indico.util.i18n import _
