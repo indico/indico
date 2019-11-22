@@ -9,12 +9,12 @@ import React, {useState} from 'react';
 import moment from 'moment';
 import PropTypes from 'prop-types';
 
+import RevisionLog from 'indico/modules/events/reviewing/components/RevisionLog';
+import UserAvatar from 'indico/modules/events/reviewing/components/UserAvatar';
 import {Param, Translate} from 'indico/react/i18n';
 import {serializeDate} from 'indico/utils/date';
 
 import ReviewForm from './ReviewForm';
-import RevisionLog from './RevisionLog';
-import UserAvatar from './UserAvatar';
 
 export default function TimelineItem({revision, isLastRevision, state}) {
   const {submitter, createdDt} = revision;

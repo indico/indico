@@ -19,6 +19,7 @@ import {camelizeKeys} from 'indico/utils/case';
 import * as actions from './actions';
 import reducer from './reducer';
 import * as selectors from './selectors';
+import TimelineItem from './TimelineItem';
 
 export default function Timeline({eventId, contributionId, type}) {
   const [{details, isLoading}, dispatch] = useReducer(reducer, {
@@ -63,7 +64,7 @@ export default function Timeline({eventId, contributionId, type}) {
       >
         STUFF
       </TimelineHeader>
-      <TimelineContent revisions={revisions} state={state} />
+      <TimelineContent revisions={revisions} state={state} itemComponent={TimelineItem} />
     </>
   );
 }

@@ -11,11 +11,12 @@ import {useDispatch, useSelector} from 'react-redux';
 import {Loader} from 'semantic-ui-react';
 
 import TimelineHeader from 'indico/modules/events/reviewing/components/TimelineHeader';
+import TimelineContent from 'indico/modules/events/reviewing/components/TimelineContent';
 import {fetchPaperDetails} from '../actions';
 import {getPaperDetails, isFetchingInitialPaperDetails} from '../selectors';
-import PaperTimeline from './PaperTimeline';
 import PaperDecisionForm from './PaperDecisionForm';
 import PaperContent from './PaperContent';
+import TimelineItem from './TimelineItem';
 
 export default function Paper({eventId, contributionId}) {
   const dispatch = useDispatch();
@@ -36,6 +37,7 @@ export default function Paper({eventId, contributionId}) {
     contribution,
     state,
     lastRevision: {submitter},
+    isInFinalState,
   } = paper;
 
   return (
@@ -48,7 +50,11 @@ export default function Paper({eventId, contributionId}) {
       >
         <PaperContent />
       </TimelineHeader>
-      <PaperTimeline />
+      <TimelineContent
+        itemComponent={TimelineItem}
+        revisions={paper.revisions}
+        state={{...state, isFinal: isInFinalState}}
+      />
       <PaperDecisionForm />
     </>
   );

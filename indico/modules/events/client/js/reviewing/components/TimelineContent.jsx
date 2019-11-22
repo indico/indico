@@ -8,9 +8,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import TimelineItem from './TimelineItem';
-
-export default function TimelineContent({revisions, state}) {
+export default function TimelineContent({revisions, state, itemComponent: Component}) {
   return revisions.map((revision, index) => {
     const isLastRevision = index === revisions.length - 1;
 
@@ -23,7 +21,7 @@ export default function TimelineContent({revisions, state}) {
             </div>
           </div>
         )}
-        <TimelineItem revision={revision} isLastRevision={isLastRevision} state={state} />
+        <Component revision={revision} isLastRevision={isLastRevision} state={state} />
       </React.Fragment>
     );
   });
@@ -32,4 +30,5 @@ export default function TimelineContent({revisions, state}) {
 TimelineContent.propTypes = {
   revisions: PropTypes.array.isRequired,
   state: PropTypes.object.isRequired,
+  itemComponent: PropTypes.elementType.isRequired,
 };
