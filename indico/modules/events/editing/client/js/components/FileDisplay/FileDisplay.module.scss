@@ -7,6 +7,11 @@
 
 @import 'base/palette';
 
+.file-display-wrapper {
+    display: flex;
+    flex-direction: column;
+}
+
 .file-display {
     display: flex;
     flex-wrap: wrap;

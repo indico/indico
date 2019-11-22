@@ -7,6 +7,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
+import {Button, Icon} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
 import {fileTypePropTypes, filePropTypes, mapFileTypes} from '../FileManager/util';
 import './FileDisplay.module.scss';
@@ -47,17 +48,27 @@ FileTypeDisplay.propTypes = {
   fileType: PropTypes.shape(fileTypePropTypes).isRequired,
 };
 
-export default function FileDisplay({fileTypes, files}) {
+export default function FileDisplay({downloadURL, fileTypes, files}) {
   return (
-    <div styleName="file-display">
-      {mapFileTypes(fileTypes, files).map(fileType => (
-        <FileTypeDisplay key={fileType.id} fileType={fileType} />
-      ))}
+    <div styleName="file-display-wrapper">
+      <div styleName="file-display">
+        {mapFileTypes(fileTypes, files).map(fileType => (
+          <FileTypeDisplay key={fileType.id} fileType={fileType} />
+        ))}
+      </div>
+      {downloadURL && files.length !== 0 && (
+        <div>
+          <Button as="a" href={downloadURL} floated="right" icon primary>
+            <Icon name="download" /> <Translate>Download ZIP</Translate>
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
 
 FileDisplay.propTypes = {
+  downloadURL: PropTypes.string.isRequired,
   fileTypes: PropTypes.arrayOf(PropTypes.shape(fileTypePropTypes)).isRequired,
   files: PropTypes.arrayOf(PropTypes.shape(filePropTypes)).isRequired,
 };

@@ -9,8 +9,7 @@ import _ from 'lodash';
 import React, {useCallback, useReducer, useContext, useRef, useMemo} from 'react';
 import PropTypes from 'prop-types';
 import {useDropzone} from 'react-dropzone';
-import {Button, Icon} from 'semantic-ui-react';
-import {Translate} from 'indico/react/i18n';
+import {Icon} from 'semantic-ui-react';
 import {
   FileManagerContext,
   filePropTypes,
@@ -101,7 +100,7 @@ FileType.defaultProps = {
   uploads: {},
 };
 
-export default function FileManager({downloadURL, uploadURL, fileTypes, files}) {
+export default function FileManager({uploadURL, fileTypes, files}) {
   const _fileTypes = useMemo(() => mapFileTypes(fileTypes, files), [fileTypes, files]);
   const [state, dispatch] = useReducer(reducer, {
     fileTypes: _fileTypes,
@@ -122,19 +121,11 @@ export default function FileManager({downloadURL, uploadURL, fileTypes, files}) 
           ))}
         </FileManagerContext.Provider>
       </div>
-      {downloadURL && files.length !== 0 && (
-        <div>
-          <Button as="a" href={downloadURL} floated="right" icon primary>
-            <Icon name="download" /> <Translate>Download ZIP</Translate>
-          </Button>
-        </div>
-      )}
     </div>
   );
 }
 
 FileManager.propTypes = {
-  downloadURL: PropTypes.string.isRequired,
   uploadURL: PropTypes.string.isRequired,
   fileTypes: PropTypes.arrayOf(PropTypes.shape(fileTypePropTypes)).isRequired,
   files: PropTypes.arrayOf(PropTypes.shape(filePropTypes)).isRequired,
