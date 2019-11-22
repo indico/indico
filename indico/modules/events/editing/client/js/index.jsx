@@ -38,15 +38,17 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const files = camelizeKeys(response.data.revisions[0].files);
   ReactDOM.render(
-    <FileManager
-      fileTypes={fileTypes}
-      files={files}
-      uploadURL={fileManager.dataset.uploadUrl}
-      downloadURL={fileManager.dataset.downloadUrl}
-    />,
+    <FileManager fileTypes={fileTypes} files={files} uploadURL={fileManager.dataset.uploadUrl} />,
     fileManager
   );
-  ReactDOM.render(<FileDisplay fileTypes={fileTypes} files={files} />, fileDisplay);
+  ReactDOM.render(
+    <FileDisplay
+      downloadURL={fileManager.dataset.downloadUrl}
+      fileTypes={fileTypes}
+      files={files}
+    />,
+    fileDisplay
+  );
 
   const timelineRootElem = document.getElementById('editing-timeline');
   ReactDOM.render(
