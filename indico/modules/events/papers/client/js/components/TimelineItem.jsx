@@ -20,14 +20,13 @@ import PaperReviewForm from './PaperReviewForm';
 import RevisionJudgment from './RevisionJudgment';
 import RevisionTimeline from './RevisionTimeline';
 import SubmitRevision from './SubmitRevision';
-import {canCommentPaper, canReviewPaper, getPaperDetails} from '../selectors';
+import {canCommentPaper, canReviewPaper} from '../selectors';
 
-export default function TimelineItem({revision}) {
+export default function TimelineItem({revision, state}) {
   const {submitter, isLastRevision, number, submittedDt, files, timeline} = revision;
   const submitterName = submitter.isSystem ? Translate.string('A user') : submitter.fullName;
   const canComment = useSelector(canCommentPaper);
   const canReview = useSelector(canReviewPaper);
-  const {isInFinalState} = useSelector(getPaperDetails);
   const [visible, setVisible] = useState(false);
 
   return (
@@ -100,7 +99,7 @@ export default function TimelineItem({revision}) {
               </div>
               <div className="i-timeline-separator" />
               <SubmitRevision />
-              {isInFinalState && <RevisionJudgment revision={revision} />}
+              {state.isFinal && <RevisionJudgment revision={revision} />}
             </>
           )}
         </div>
@@ -111,4 +110,5 @@ export default function TimelineItem({revision}) {
 
 TimelineItem.propTypes = {
   revision: PropTypes.object.isRequired,
+  state: PropTypes.object.isRequired,
 };

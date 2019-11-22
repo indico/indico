@@ -9,11 +9,11 @@ import React, {useState} from 'react';
 import {Form as FinalForm} from 'react-final-form';
 import {Button, Dropdown, Form} from 'semantic-ui-react';
 
+import UserAvatar from 'indico/modules/events/reviewing/components/UserAvatar';
 import {FinalCheckbox, FinalInput, FinalSubmitButton, FinalTextArea} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 
 import JudgmentModal from './JudgmentModal';
-import UserAvatar from './UserAvatar';
 
 import './ReviewForm.module.scss';
 
