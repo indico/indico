@@ -7,6 +7,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
+import {Translate} from 'indico/react/i18n';
 import {fileTypePropTypes, filePropTypes, mapFileTypes} from '../FileManager/util';
 import './FileDisplay.module.scss';
 
@@ -20,6 +21,11 @@ function FileListDisplay({files}) {
           </span>
         </li>
       ))}
+      {!files.length && (
+        <span styleName="no-files">
+          <Translate>No files uploaded</Translate>
+        </span>
+      )}
     </ul>
   );
 }
