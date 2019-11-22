@@ -14,11 +14,13 @@ import UserAvatar from 'indico/modules/events/reviewing/components/UserAvatar';
 import {Param, Translate} from 'indico/react/i18n';
 import {serializeDate} from 'indico/utils/date';
 
+import ChangesConfirmation from './ChangesConfirmation';
 import RevisionLog from './RevisionLog';
 import ReviewForm from './ReviewForm';
 import {blockPropTypes} from './util';
 import {getDetails, getLastTimelineBlock, getLastState, getStaticData} from '../../selectors';
 import FileDisplay from '../FileDisplay';
+import {FinalRevisionState, InitialRevisionState} from '../../models';
 
 export default function TimelineItem({block}) {
   const {submitter, createdDt} = block;
@@ -80,6 +82,10 @@ export default function TimelineItem({block}) {
                     <div dangerouslySetInnerHTML={{__html: block.commentHtml}} />
                   </>
                 )}
+                {/* TODO: Check whether the current user is submitter */}
+                {isLastBlock &&
+                  block.initialState.name === InitialRevisionState.needs_submitter_confirmation &&
+                  block.finalState.name === FinalRevisionState.none && <ChangesConfirmation />}
               </div>
             )}
           </div>
