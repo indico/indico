@@ -4,11 +4,9 @@
 # Interesting post on max line length:
 # http://stackoverflow.com/questions/88942/why-should-python-pep-8-specify-a-maximum-line-length-of-79-characters
 
-PEP8_CMD='pycodestyle'
-PEP8_OPTIONS='--max-line-length=120'
+FLAKE8_CMD='flake8'
 ESLINT_CMD='npx eslint'
 SASSLINT_CMD='npx sass-lint'
-
 
 RED=$(echo -e $"\033[1;31m")
 YELLOW=$(echo -e $"\033[0;33m")
@@ -61,14 +59,14 @@ if [[ ${#FILES[@]} -ne 0 ]]; then
 fi
 
 
-# PEP8
-if ! RESULT=$(git diff -U0 --staged --no-prefix | $PEP8_CMD --diff $PEP8_OPTIONS); then
-    echo "${RED}There are PEP8 issues in your code:${RESET}"
-    STATUS=1
-fi
-if [[ -n "$RESULT" ]] ; then
-    echo "$RESULT" | sed -e "$RE"
-    echo
+# Flake8
+_get_files '*.py'
+if [[ ${#FILES[@]} -ne 0 ]]; then
+    if ! RESULT=$($FLAKE8_CMD "${FILES[@]}"); then
+        STATUS=1
+        echo "${RED}There are python issues in your code:${RESET}"
+        echo "$RESULT"
+    fi
 fi
 
 

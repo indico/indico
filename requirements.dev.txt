@@ -1,4 +1,6 @@
 babel
+flake8
+flake8-colors
 pojson>=0.4
 termcolor
 sphinx
@@ -9,6 +11,5 @@ repoze.sphinx.autointerface
 pygments
 sqlparse
 isort
-pycodestyle
 flask_url_map_serializer
 plantweb
