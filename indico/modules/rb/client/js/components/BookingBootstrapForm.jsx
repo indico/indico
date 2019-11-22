@@ -32,6 +32,7 @@ import {sanitizeRecurrence} from '../util';
 import './BookingBootstrapForm.module.scss';
 
 class BookingBootstrapForm extends React.Component {
+  // eslint-disable-next-line react/sort-comp
   static propTypes = {
     onSearch: PropTypes.func.isRequired,
     onChange: PropTypes.func,
