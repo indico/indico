@@ -8,12 +8,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-export default function TimelineContent({revisions, state, itemComponent: Component}) {
-  return revisions.map((revision, index) => {
-    const isLastRevision = index === revisions.length - 1;
-
+export default function TimelineContent({blocks, itemComponent: Component}) {
+  return blocks.map((block, index) => {
     return (
-      <React.Fragment key={revision.id}>
+      <React.Fragment key={block.id}>
         {index !== 0 && (
           <div className="i-timeline">
             <div className="i-timeline to-separator-wrapper">
@@ -21,14 +19,13 @@ export default function TimelineContent({revisions, state, itemComponent: Compon
             </div>
           </div>
         )}
-        <Component revision={revision} isLastRevision={isLastRevision} state={state} />
+        <Component block={block} />
       </React.Fragment>
     );
   });
 }
 
 TimelineContent.propTypes = {
-  revisions: PropTypes.array.isRequired,
-  state: PropTypes.object.isRequired,
+  blocks: PropTypes.array.isRequired,
   itemComponent: PropTypes.elementType.isRequired,
 };

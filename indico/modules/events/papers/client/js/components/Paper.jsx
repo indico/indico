@@ -35,9 +35,8 @@ export default function Paper({eventId, contributionId}) {
 
   const {
     contribution,
-    state,
     lastRevision: {submitter},
-    isInFinalState,
+    state,
   } = paper;
 
   return (
@@ -50,11 +49,7 @@ export default function Paper({eventId, contributionId}) {
       >
         <PaperContent />
       </TimelineHeader>
-      <TimelineContent
-        itemComponent={TimelineItem}
-        revisions={paper.revisions}
-        state={{...state, isFinal: isInFinalState}}
-      />
+      <TimelineContent itemComponent={TimelineItem} blocks={paper.revisions} />
       <PaperDecisionForm />
     </>
   );

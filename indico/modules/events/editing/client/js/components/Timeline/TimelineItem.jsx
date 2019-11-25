@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 import React, {useState} from 'react';
+import {useSelector} from 'react-redux';
 import moment from 'moment';
 import PropTypes from 'prop-types';
 
@@ -15,40 +16,44 @@ import {Param, Translate} from 'indico/react/i18n';
 import {serializeDate} from 'indico/utils/date';
 
 import ReviewForm from './ReviewForm';
+import {blockPropTypes} from './util';
+import {getLastTimelineBlock, getLastState} from '../../selectors';
 
-export default function TimelineItem({revision, isLastRevision, state}) {
-  const {submitter, createdDt} = revision;
-  const [visible, setVisible] = useState(isLastRevision);
-  const headerOnly =
-    !visible || (isLastRevision && revision.items.length === 0 && !revision.comment);
+export default function TimelineItem({block}) {
+  const {submitter, createdDt} = block;
+  const lastBlock = useSelector(getLastTimelineBlock);
+  const lastState = useSelector(getLastState);
+  const isLastBlock = lastBlock.id === block.id;
+  const [visible, setVisible] = useState(isLastBlock);
+  const headerOnly = !visible || (isLastBlock && block.items.length === 0 && !block.comment);
 
   return (
     <>
       <div className="i-timeline">
         <div className="i-timeline-item">
-          <UserAvatar user={revision.submitter} />
+          <UserAvatar user={block.submitter} />
           <div
             className={`i-timeline-item-box header-indicator-left ${
               headerOnly ? 'header-only' : ''
             }`}
-            id={`revision-info-${revision.id}`}
+            id={`block-info-${block.id}`}
           >
             <div className="i-box-header flexrow">
               <div className="f-self-stretch">
-                {revision.header ? (
-                  <strong>{revision.header}</strong>
+                {block.header ? (
+                  <strong>{block.header}</strong>
                 ) : (
                   <Translate>
                     <Param name="submitterName" value={submitter.fullName} wrapper={<strong />} />{' '}
-                    submitted revision <Param name="revisionNumber" value={`#${revision.number}`} />{' '}
+                    submitted revision <Param name="revisionNumber" value={`#${block.number}`} />{' '}
                   </Translate>
                 )}
                 <time dateTime={serializeDate(createdDt, moment.HTML5_FMT.DATETIME_LOCAL)}>
                   {serializeDate(createdDt, 'LL')}
                 </time>
               </div>
-              {!isLastRevision && (
-                <a className="revision-info-link i-link" onClick={() => setVisible(!visible)}>
+              {!isLastBlock && (
+                <a className="block-info-link i-link" onClick={() => setVisible(!visible)}>
                   {visible ? (
                     <Translate>Hide old revision</Translate>
                   ) : (
@@ -59,12 +64,12 @@ export default function TimelineItem({revision, isLastRevision, state}) {
             </div>
             {visible && (
               <div className="i-box-content">
-                {revision.comment && (
+                {block.comment && (
                   <>
                     <div className="titled-rule">
                       <Translate>Comment</Translate>
                     </div>
-                    <div dangerouslySetInnerHTML={{__html: revision.commentHtml}} />
+                    <div dangerouslySetInnerHTML={{__html: block.commentHtml}} />
                   </>
                 )}
               </div>
@@ -73,9 +78,9 @@ export default function TimelineItem({revision, isLastRevision, state}) {
         </div>
       </div>
       {visible && (
-        <RevisionLog items={revision.items} separator={isLastRevision}>
+        <RevisionLog items={block.items} separator={isLastBlock}>
           {/* TODO: Check whether the current user can actually judge */}
-          {isLastRevision && state.name === 'ready_for_review' && <ReviewForm />}
+          {isLastBlock && lastState.name === 'ready_for_review' && <ReviewForm block={block} />}
         </RevisionLog>
       )}
     </>
@@ -83,7 +88,5 @@ export default function TimelineItem({revision, isLastRevision, state}) {
 }
 
 TimelineItem.propTypes = {
-  revision: PropTypes.object.isRequired,
-  isLastRevision: PropTypes.bool.isRequired,
-  state: PropTypes.object.isRequired,
+  block: PropTypes.shape(blockPropTypes).isRequired,
 };

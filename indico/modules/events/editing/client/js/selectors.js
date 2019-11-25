@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 import _ from 'lodash';
+import {createSelector} from 'reselect';
 
 import {Translate} from 'indico/react/i18n';
 import {InitialRevisionState, FinalRevisionState} from './models';
@@ -118,3 +119,22 @@ export function processRevisions(revisions) {
 
   return newRevisions;
 }
+
+export const getDetails = state => state.timeline.details;
+export const isLoading = state => state.timeline.isLoading;
+export const getTimelineBlocks = state => state.timeline.timelineBlocks;
+export const getLastTimelineBlock = createSelector(
+  getTimelineBlocks,
+  blocks => blocks && blocks[blocks.length - 1]
+);
+export const getLastRevision = createSelector(
+  getDetails,
+  details => details && details.revisions[details.revisions.length - 1]
+);
+export const getLastState = createSelector(
+  getLastRevision,
+  lastRevision =>
+    lastRevision &&
+    (lastRevision.finalState.name === 'none' ? lastRevision.initialState : lastRevision.finalState)
+);
+export const getStaticData = state => state.staticData;

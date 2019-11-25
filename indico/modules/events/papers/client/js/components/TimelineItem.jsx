@@ -20,14 +20,16 @@ import PaperReviewForm from './PaperReviewForm';
 import RevisionJudgment from './RevisionJudgment';
 import RevisionTimeline from './RevisionTimeline';
 import SubmitRevision from './SubmitRevision';
-import {canCommentPaper, canReviewPaper} from '../selectors';
+import {canCommentPaper, canReviewPaper, getPaperDetails} from '../selectors';
 
-export default function TimelineItem({revision, state}) {
-  const {submitter, isLastRevision, number, submittedDt, files, timeline} = revision;
+export default function TimelineItem({block}) {
+  const {submitter, isLastRevision, number, submittedDt, files, timeline} = block;
   const submitterName = submitter.isSystem ? Translate.string('A user') : submitter.fullName;
   const canComment = useSelector(canCommentPaper);
   const canReview = useSelector(canReviewPaper);
+  const paper = useSelector(getPaperDetails);
   const [visible, setVisible] = useState(false);
+  const headerOnly = !visible || !isLastRevision;
 
   return (
     <>
@@ -36,9 +38,9 @@ export default function TimelineItem({revision, state}) {
           <UserAvatar user={submitter} />
           <div
             className={`i-timeline-item-box header-indicator-left ${
-              !isLastRevision && !visible ? 'header-only' : ''
+              headerOnly ? 'header-only' : ''
             }`}
-            id={`revision-info-${revision.id}`}
+            id={`block-info-${block.id}`}
           >
             <div className="i-box-header flexrow">
               <div className="f-self-stretch">
@@ -51,7 +53,7 @@ export default function TimelineItem({revision, state}) {
                 </time>
               </div>
               {!isLastRevision && (
-                <a className="revision-info-link i-link" onClick={() => setVisible(!visible)}>
+                <a className="block-info-link i-link" onClick={() => setVisible(!visible)}>
                   {visible ? (
                     <Translate>Hide old revision</Translate>
                   ) : (
@@ -61,9 +63,7 @@ export default function TimelineItem({revision, state}) {
               )}
             </div>
             <Transition animation="slide down" duration={500} visible={visible || isLastRevision}>
-              <div
-                className={`i-box-content submission-info ${!isLastRevision ? 'weak-hidden' : ''}`}
-              >
+              <div className="i-box-content submission-info">
                 <ul className="file-list">
                   {_.sortBy(files, 'filename').map(file => (
                     <li className="truncate-text" key={file.id}>
@@ -84,11 +84,11 @@ export default function TimelineItem({revision, state}) {
         </div>
       </div>
       <Transition animation="slide down" duration={500} visible={visible || isLastRevision}>
-        <div className={`i-timeline ${!isLastRevision ? 'weak-hidden' : ''}`}>
+        <div className="i-timeline">
           {(timeline.length > 0 || canReview || canComment) && (
             <div className="i-timeline with-line">
               <div className="i-timeline-connect-up" />
-              <RevisionTimeline revision={revision} />
+              <RevisionTimeline revision={block} />
               {isLastRevision && (canComment || canReview) && <PaperReviewForm />}
             </div>
           )}
@@ -99,7 +99,7 @@ export default function TimelineItem({revision, state}) {
               </div>
               <div className="i-timeline-separator" />
               <SubmitRevision />
-              {state.isFinal && <RevisionJudgment revision={revision} />}
+              {paper.isInFinalState && <RevisionJudgment revision={block} />}
             </>
           )}
         </div>
@@ -109,6 +109,5 @@ export default function TimelineItem({revision, state}) {
 }
 
 TimelineItem.propTypes = {
-  revision: PropTypes.object.isRequired,
-  state: PropTypes.object.isRequired,
+  block: PropTypes.object.isRequired,
 };
