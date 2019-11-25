@@ -7,11 +7,10 @@
 
 from __future__ import unicode_literals
 
-from collections import defaultdict
 from operator import itemgetter
 
 from flask import flash, redirect, request, session
-from sqlalchemy.orm import contains_eager, joinedload, load_only, noload, subqueryload
+from sqlalchemy.orm import subqueryload
 from werkzeug.exceptions import NotFound
 
 from indico.core.permissions import get_unified_permissions, update_principals_permissions

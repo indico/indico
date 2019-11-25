@@ -7,8 +7,6 @@
 
 from __future__ import unicode_literals
 
-from collections import defaultdict
-
 from flask import request, session
 from sqlalchemy.orm import joinedload
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
@@ -205,7 +203,6 @@ class TrackRoleField(JSONField):
     def permissions_info(self):
         permissions, tree, default = get_permissions_info(Track)
         return {'permissions': permissions, 'tree': tree['_full_access']['children'], 'default': default}
-
 
     def _value(self):
         return super(TrackRoleField, self)._value() if self.data else '[]'

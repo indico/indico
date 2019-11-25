@@ -12,7 +12,7 @@ import os
 import shutil
 from collections import OrderedDict, defaultdict, namedtuple
 
-from sqlalchemy.orm import contains_eager, joinedload, load_only, noload, subqueryload
+from sqlalchemy.orm import joinedload, load_only, noload
 
 from indico.core.config import config
 from indico.core.db import db

@@ -11,7 +11,6 @@ from io import BytesIO
 from operator import attrgetter, itemgetter
 
 from flask import flash, request
-from sqlalchemy.orm import subqueryload
 
 from indico.core.db.sqlalchemy.descriptions import RENDER_MODE_WRAPPER_MAP
 from indico.legacy.pdfinterface.conference import ProgrammeToPDF
