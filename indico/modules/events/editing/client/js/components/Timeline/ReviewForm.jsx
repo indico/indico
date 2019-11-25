@@ -23,18 +23,22 @@ export const judgmentOptions = [
   {
     value: 'accept',
     text: Translate.string('Accept'),
+    class: 'accepted',
   },
   {
     value: 'reject',
     text: Translate.string('Reject'),
+    class: 'rejected',
   },
   {
     value: 'update',
     text: Translate.string('Make changes'),
+    class: 'needs-submitter-confirmation',
   },
   {
     value: 'request_update',
     text: Translate.string('Request changes'),
+    class: 'needs-submitter-changes',
   },
 ];
 
@@ -110,12 +114,7 @@ export default function ReviewForm({block}) {
           >
             <Dropdown.Menu>
               {judgmentOptions.map(({value, text}) => (
-                <Dropdown.Item
-                  key={value}
-                  onClick={() => {
-                    setJudgmentModalType(value);
-                  }}
-                >
+                <Dropdown.Item key={value} onClick={() => setJudgmentModalType(value)}>
                   {text}
                 </Dropdown.Item>
               ))}
