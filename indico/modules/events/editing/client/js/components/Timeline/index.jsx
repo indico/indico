@@ -5,43 +5,28 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import editableDetailsURL from 'indico-url:event_editing.api_editable';
-
-import React, {useEffect, useReducer} from 'react';
-import PropTypes from 'prop-types';
+import React, {useEffect} from 'react';
+import {useDispatch, useSelector} from 'react-redux';
 import {Loader} from 'semantic-ui-react';
 
 import TimelineHeader from 'indico/modules/events/reviewing/components/TimelineHeader';
 import TimelineContent from 'indico/modules/events/reviewing/components/TimelineContent';
-import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
-import {camelizeKeys} from 'indico/utils/case';
 
-import * as actions from './actions';
-import reducer from './reducer';
-import * as selectors from './selectors';
+import * as actions from '../../actions';
+import * as selectors from '../../selectors';
 import TimelineItem from './TimelineItem';
 
-export default function Timeline({eventId, contributionId, type}) {
-  const [{details, isLoading}, dispatch] = useReducer(reducer, {
-    details: null,
-    isLoading: false,
-  });
+export default function Timeline() {
+  const dispatch = useDispatch();
+  const details = useSelector(selectors.getDetails);
+  const isLoading = useSelector(selectors.isLoading);
+  const lastState = useSelector(selectors.getLastState);
+  const timelineBlocks = useSelector(selectors.getTimelineBlocks);
+  const {eventId, contributionId, editableType} = useSelector(selectors.getStaticData);
 
   useEffect(() => {
-    (async () => {
-      dispatch(actions.setLoading(true));
-      try {
-        const {data} = await indicoAxios.get(
-          editableDetailsURL({confId: eventId, contrib_id: contributionId, type})
-        );
-        dispatch(actions.setDetails(camelizeKeys(data)));
-      } catch (error) {
-        handleAxiosError(error, false, true);
-      } finally {
-        dispatch(actions.setLoading(false));
-      }
-    })();
-  }, [contributionId, eventId, type]);
+    dispatch(actions.loadTimeline(eventId, contributionId, editableType));
+  }, [contributionId, eventId, editableType, dispatch]);
 
   if (isLoading) {
     return <Loader active />;
@@ -49,28 +34,17 @@ export default function Timeline({eventId, contributionId, type}) {
     return null;
   }
 
-  const lastRevision = details.revisions[details.revisions.length - 1];
-  const revisions = selectors.processRevisions(details.revisions);
-  const state =
-    lastRevision.finalState.name === 'none' ? lastRevision.initialState : lastRevision.finalState;
-
   return (
     <>
       <TimelineHeader
         contribution={details.contribution}
-        state={state}
-        submitter={revisions[0].submitter}
+        state={lastState}
+        submitter={timelineBlocks[0].submitter}
         eventId={eventId}
       >
         STUFF
       </TimelineHeader>
-      <TimelineContent revisions={revisions} state={state} itemComponent={TimelineItem} />
+      <TimelineContent blocks={timelineBlocks} itemComponent={TimelineItem} />
     </>
   );
 }
-
-Timeline.propTypes = {
-  eventId: PropTypes.number.isRequired,
-  contributionId: PropTypes.number.isRequired,
-  type: PropTypes.string.isRequired,
-};

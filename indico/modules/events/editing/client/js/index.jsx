@@ -9,10 +9,12 @@ import fileTypesURL from 'indico-url:event_editing.api_file_types';
 
 import React from 'react';
 import ReactDOM from 'react-dom';
+import {Provider} from 'react-redux';
 
 import {camelizeKeys} from 'indico/utils/case';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 
+import storeFactory from './store';
 import FileManager from './components/FileManager';
 import Timeline from './components/Timeline';
 import FileDisplay from './components/FileDisplay';
@@ -51,12 +53,16 @@ document.addEventListener('DOMContentLoaded', async () => {
   );
 
   const timelineRootElem = document.getElementById('editing-timeline');
+  const store = storeFactory({
+    eventId: parseInt(timelineRootElem.dataset.eventId, 10),
+    contributionId: parseInt(timelineRootElem.dataset.contributionId, 10),
+    editableType: timelineRootElem.dataset.editableType,
+  });
+
   ReactDOM.render(
-    <Timeline
-      eventId={parseInt(timelineRootElem.dataset.eventId, 10)}
-      contributionId={parseInt(timelineRootElem.dataset.contributionId, 10)}
-      type={timelineRootElem.dataset.editableType}
-    />,
+    <Provider store={store}>
+      <Timeline />
+    </Provider>,
     timelineRootElem
   );
 });

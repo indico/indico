@@ -6,18 +6,31 @@
 // LICENSE file for more details.
 
 import React, {useState} from 'react';
+import PropTypes from 'prop-types';
 import {Form as FinalForm} from 'react-final-form';
 import {Button, Dropdown, Form} from 'semantic-ui-react';
 
 import UserAvatar from 'indico/modules/events/reviewing/components/UserAvatar';
-import {FinalCheckbox, FinalInput, FinalSubmitButton, FinalTextArea} from 'indico/react/forms';
+import {FinalCheckbox, FinalInput, FinalSubmitButton, FinalTextArea, FinalDropdown} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 
-import JudgmentModal from './JudgmentModal';
+import JudgmentBox from './judgment/JudgmentBox';
+import {blockPropTypes} from './util';
 
 import './ReviewForm.module.scss';
 
-const judgmentOptions = [
+const visibilityOptions = [
+  {
+    value: 'editors',
+    text: Translate.string('Visible only to editors'),
+  },
+  {
+    value: 'authors',
+    text: Translate.string('Visible to editors and authors'),
+  },
+];
+
+export const judgmentOptions = [
   {
     value: 'accept',
     text: Translate.string('Accept'),
@@ -36,7 +49,7 @@ const judgmentOptions = [
   },
 ];
 
-export default function ReviewForm() {
+export default function ReviewForm({block}) {
   const currentUser = {
     fullName: Indico.User.full_name,
     avatarBgColor: Indico.User.avatar_bg_color,
@@ -52,93 +65,101 @@ export default function ReviewForm() {
 
   const InputComponent = commentFormVisible ? FinalTextArea : FinalInput;
   const inputProps = commentFormVisible ? {autoFocus: true} : {};
-  return (
-    <>
-      <div className="i-timeline-item review-timeline-input">
-        <UserAvatar user={currentUser} />
-        <div className="i-timeline-item-box footer-only header-indicator-left">
-          <div className="i-box-footer" style={{overflow: 'visible'}}>
-            <div className="flexrow">
-              <div className="f-self-stretch">
-                <FinalForm
-                  onSubmit={() => {}}
-                  initialValues={{comment: '', protected: false}}
-                  subscription={{submitting: true}}
-                >
-                  {fprops => (
-                    <Form onSubmit={fprops.handleSubmit}>
-                      <InputComponent
-                        {...inputProps}
-                        onFocus={onCommentClickHandler}
-                        name="comment"
-                        placeholder={Translate.string('Leave a comment...')}
-                        hideValidationError
-                        required
-                      />
-                      {commentFormVisible && (
-                        <FinalCheckbox
-                          label={Translate.string(
-                            'Restrict visibility of this comment to other editors'
-                          )}
-                          name="protected"
-                          toggle
-                        />
-                      )}
-                      {commentFormVisible && (
-                        <Form.Group inline>
-                          <FinalSubmitButton label={Translate.string('Comment')} />
-                          <Button
-                            disabled={fprops.submitting}
-                            content={Translate.string('Cancel')}
-                            onClick={() => {
-                              setCommentFormVisible(false);
-                              fprops.form.reset();
-                            }}
-                          />
-                        </Form.Group>
-                      )}
-                    </Form>
-                  )}
-                </FinalForm>
-              </div>
-              {!commentFormVisible && (
-                <div className="review-trigger flexrow">
-                  <span className="comment-or-review">
-                    <Translate>or</Translate>
-                  </span>
-                  <Dropdown
-                    className="judgment-btn"
-                    text={Translate.string('Judge')}
-                    direction="left"
-                    value={null}
-                    selectOnNavigation={false}
-                    onChange={(_, {value}) => {
-                      setJudgmentModalType(value);
-                    }}
-                    button
-                    floating
-                  >
-                    <Dropdown.Menu>
-                      {judgmentOptions.map(({value, text}) => (
-                        <Dropdown.Item
-                          key={value}
-                          onClick={() => {
-                            setJudgmentModalType(value);
-                          }}
-                        >
-                          {text}
-                        </Dropdown.Item>
-                      ))}
-                    </Dropdown.Menu>
-                  </Dropdown>
-                </div>
+  const judgmentForm = (
+    <div className="flexrow">
+      <div className="f-self-stretch">
+        <FinalForm
+          onSubmit={() => {}}
+          initialValues={{comment: '', protected: false}}
+          subscription={{submitting: true}}
+        >
+          {fprops => (
+            <Form onSubmit={fprops.handleSubmit}>
+              <InputComponent
+                {...inputProps}
+                onFocus={onCommentClickHandler}
+                name="comment"
+                placeholder={Translate.string('Leave a comment...')}
+                hideValidationError
+                required
+              />
+              {commentFormVisible && (
+                <>
+                  <FinalCheckbox
+                    label={Translate.string(
+                      'Restrict visibility of this comment to other editors'
+                    )}
+                    name="protected"
+                    toggle
+                  />
+                  <Form.Group inline>
+                    <FinalSubmitButton label={Translate.string('Comment')} />
+                    <Button
+                      disabled={fprops.submitting}
+                      content={Translate.string('Cancel')}
+                      onClick={() => {
+                        setCommentFormVisible(false);
+                        fprops.form.reset();
+                      }}
+                    />
+                  </Form.Group>
+                </>
               )}
-            </div>
-          </div>
+            </Form>
+          )}
+        </FinalForm>
+      </div>
+      {!commentFormVisible && (
+        <div className="review-trigger flexrow">
+          <span className="comment-or-review">
+            <Translate>or</Translate>
+          </span>
+          <Dropdown
+            className="judgment-btn"
+            text={Translate.string('Judge')}
+            direction="left"
+            button
+            floating
+          >
+            <Dropdown.Menu>
+              {judgmentOptions.map(({value, text}) => (
+                <Dropdown.Item
+                  key={value}
+                  onClick={() => {
+                    setJudgmentModalType(value);
+                  }}
+                >
+                  {text}
+                </Dropdown.Item>
+              ))}
+            </Dropdown.Menu>
+          </Dropdown>
+        </div>
+      )}
+    </div>
+  );
+
+  return (
+    <div className="i-timeline-item review-timeline-input">
+      <UserAvatar user={currentUser} />
+      <div className="i-timeline-item-box footer-only header-indicator-left">
+        <div className="i-box-footer" style={{overflow: 'visible'}}>
+          {judgmentModalType ? (
+            <JudgmentBox
+              block={block}
+              judgmentType={judgmentModalType}
+              onClose={() => setJudgmentModalType(null)}
+              options={judgmentOptions}
+            />
+          ) : (
+            judgmentForm
+          )}
         </div>
       </div>
-      {/* TODO: open the right dialog based on the selected action */}
-      {judgmentModalType && <JudgmentModal onClose={() => setJudgmentModalType(null)} />}
-    </>
+    </div>
   );
 }
+
+ReviewForm.propTypes = {
+  block: PropTypes.shape(blockPropTypes).isRequired,
+};
