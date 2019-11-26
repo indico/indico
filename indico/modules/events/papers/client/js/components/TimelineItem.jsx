@@ -28,8 +28,7 @@ export default function TimelineItem({block}) {
   const canComment = useSelector(canCommentPaper);
   const canReview = useSelector(canReviewPaper);
   const paper = useSelector(getPaperDetails);
-  const [visible, setVisible] = useState(false);
-  const headerOnly = !visible || !isLastRevision;
+  const [visible, setVisible] = useState(isLastRevision);
 
   return (
     <>
@@ -37,9 +36,7 @@ export default function TimelineItem({block}) {
         <div className="i-timeline-item">
           <UserAvatar user={submitter} />
           <div
-            className={`i-timeline-item-box header-indicator-left ${
-              headerOnly ? 'header-only' : ''
-            }`}
+            className={`i-timeline-item-box header-indicator-left ${!visible ? 'header-only' : ''}`}
             id={`block-info-${block.id}`}
           >
             <div className="i-box-header flexrow">
