@@ -245,7 +245,7 @@
 
 
 .review-comment-visibility {
-    &.judges {
+    &.judges, &.internal {
         color: $red;
     }
 

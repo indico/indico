@@ -79,19 +79,31 @@ class EditingRevisionSchema(mm.ModelSchema):
     submitter = fields.Nested(UserSchema, only=('id', 'avatar_bg_color', 'full_name'))
     editor = fields.Nested(UserSchema, only=('id', 'avatar_bg_color', 'full_name'))
     files = fields.List(fields.Nested(EditingRevisionFileSchema))
-    comments = fields.List(fields.Nested(EditingRevisionCommentSchema))
+    comments = fields.Method('_get_comments')
     initial_state = fields.Nested(RevisionState)
     final_state = fields.Nested(RevisionState)
+
+    def _get_comments(self, revision):
+        comments = []
+        editors = self.context.get('editors', [])
+        current_user = self.context.get('user')
+
+        for comment in revision.comments:
+            if not comment.internal or current_user in editors:
+                comments.append(comment)
+        return EditingRevisionCommentSchema().dump(comments, many=True)
 
 
 class EditableSchema(mm.ModelSchema):
     class Meta:
         model = Editable
-        fields = ('id', 'type', 'editor', 'revisions', 'contribution')
+        fields = ('id', 'type', 'editor', 'editors', 'revisions', 'contribution', 'can_comment')
 
     contribution = fields.Nested(ContributionSchema)
     editor = fields.Nested(UserSchema, only=('id', 'avatar_bg_color', 'full_name'))
+    editors = fields.List(fields.Nested(UserSchema, only=('id', 'avatar_bg_color', 'full_name')))
     revisions = fields.List(fields.Nested(EditingRevisionSchema))
+    can_comment = fields.Function(lambda editable, ctx: editable.can_comment(ctx.get('user')))
 
 
 class EditingReviewAction(IndicoEnum):

@@ -17,12 +17,13 @@ import {serializeDate} from 'indico/utils/date';
 import RevisionLog from './RevisionLog';
 import ReviewForm from './ReviewForm';
 import {blockPropTypes} from './util';
-import {getLastTimelineBlock, getLastState} from '../../selectors';
+import {getDetails, getLastTimelineBlock, getLastState} from '../../selectors';
 
 export default function TimelineItem({block}) {
   const {submitter, createdDt} = block;
   const lastBlock = useSelector(getLastTimelineBlock);
   const lastState = useSelector(getLastState);
+  const {canComment} = useSelector(getDetails);
   const isLastBlock = lastBlock.id === block.id;
   const [visible, setVisible] = useState(isLastBlock);
   const headerOnly = !visible || (isLastBlock && block.items.length === 0 && !block.comment);
@@ -79,8 +80,9 @@ export default function TimelineItem({block}) {
       </div>
       {visible && (
         <RevisionLog items={block.items} separator={isLastBlock}>
-          {/* TODO: Check whether the current user can actually judge */}
-          {isLastBlock && lastState.name === 'ready_for_review' && <ReviewForm block={block} />}
+          {isLastBlock && !['accepted', 'rejected'].includes(lastState.name) && canComment && (
+            <ReviewForm block={block} />
+          )}
         </RevisionLog>
       )}
     </>
