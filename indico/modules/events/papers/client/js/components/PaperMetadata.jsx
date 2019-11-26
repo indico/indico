@@ -19,7 +19,7 @@ export default function PaperMetadata() {
   } = useSelector(getPaperDetails);
 
   const date = (
-    <a className="paper-metadata-dt" href={`#revision-info-${id}`}>
+    <a className="paper-metadata-dt" href={`#block-info-${id}`}>
       <time dateTime={serializeDate(submittedDt, moment.HTML5_FMT.DATETIME_LOCAL)}>
         {serializeDate(submittedDt, 'LL')}
       </time>
