@@ -54,10 +54,11 @@ export function processRevisions(revisions) {
       if (index === revisions.length - 1) {
         currentRevision = {...revision};
       } else {
+        items = [...revision.comments];
         currentRevision = {...revisions[index + 1]};
       }
 
-      items = [...currentRevision.comments];
+      items = [...items, ...currentRevision.comments];
     }
 
     if (initialState.name === InitialRevisionState.needs_submitter_confirmation) {
