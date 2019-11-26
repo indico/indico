@@ -13,7 +13,7 @@ import UserAvatar from 'indico/modules/events/reviewing/components/UserAvatar';
 import {Param, Translate} from 'indico/react/i18n';
 import {serializeDate} from 'indico/utils/date';
 
-export default function Comment({user, createdDt, modifiedDt, html}) {
+export default function Comment({user, createdDt, modifiedDt, html, internal}) {
   return (
     <div className="i-timeline-item">
       <UserAvatar user={user} />
@@ -24,6 +24,12 @@ export default function Comment({user, createdDt, modifiedDt, html}) {
               <Translate>
                 <Param name="userName" value={user.fullName} wrapper={<strong />} /> left a comment
               </Translate>{' '}
+              {internal && (
+                <i
+                  className="review-comment-visibility internal icon-shield"
+                  title={Translate.string('Visible only to editors')}
+                />
+              )}
               <time dateTime={serializeDate(createdDt, moment.HTML5_FMT.DATETIME_LOCAL)}>
                 {serializeDate(createdDt, 'LL')}
               </time>
@@ -57,8 +63,10 @@ Comment.propTypes = {
     avatarBgColor: PropTypes.string.isRequired,
   }).isRequired,
   modifiedDt: PropTypes.string,
+  internal: PropTypes.bool,
 };
 
 Comment.defaultProps = {
   modifiedDt: null,
+  internal: false,
 };

@@ -95,7 +95,7 @@ class RHEditable(RHContributionEditableBase):
             raise Forbidden
 
     def _process(self):
-        return EditableSchema().jsonify(self.editable)
+        return EditableSchema(context={'user': session.user, 'editors': self.editable.editors}).jsonify(self.editable)
 
 
 class RHCreateEditable(RHContributionEditableBase):

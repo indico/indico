@@ -82,3 +82,13 @@ class Editable(db.Model):
     @locator_property
     def locator(self):
         return dict(self.contribution.locator, type=self.type.name)
+
+    def can_comment(self, user):
+        return self.editor == user or self.contribution.is_user_associated(user, check_abstract=True)
+
+    @property
+    def editors(self):
+        editors = [self.editor] if self.editor else []
+        editors.extend([revision.editor for revision in self.revisions
+                        if revision.editor and revision.editor != self.editor])
+        return editors

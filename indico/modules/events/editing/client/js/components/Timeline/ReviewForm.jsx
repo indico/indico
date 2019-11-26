@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 import React, {useState} from 'react';
+import {useDispatch, useSelector} from 'react-redux';
 import PropTypes from 'prop-types';
 import {Form as FinalForm} from 'react-final-form';
 import {Button, Dropdown, Form} from 'semantic-ui-react';
@@ -16,7 +17,9 @@ import {Translate} from 'indico/react/i18n';
 
 import JudgmentBox from './judgment/JudgmentBox';
 import {blockPropTypes} from './util';
+import {createRevisionComment} from '../../actions';
 import {EditingReviewAction} from '../../models';
+import {getDetails, getStaticData} from '../../selectors';
 
 import './ReviewForm.module.scss';
 
@@ -44,6 +47,10 @@ const judgmentOptions = [
 ];
 
 export default function ReviewForm({block}) {
+  const dispatch = useDispatch();
+  const {contributionId, eventId, editableType} = useSelector(getStaticData);
+  const {editors} = useSelector(getDetails);
+  const isEditor = editors.find(editor => editor.id === Indico.User.id) !== undefined;
   const currentUser = {
     fullName: Indico.User.full_name,
     avatarBgColor: Indico.User.avatar_bg_color,
@@ -59,12 +66,20 @@ export default function ReviewForm({block}) {
 
   const InputComponent = commentFormVisible ? FinalTextArea : FinalInput;
   const inputProps = commentFormVisible ? {autoFocus: true} : {};
+  const addComment = async formData => {
+    if (commentFormVisible) {
+      await dispatch(
+        createRevisionComment(eventId, contributionId, editableType, block.id, formData)
+      );
+    }
+  };
+
   const judgmentForm = (
     <div className="flexrow">
       <div className="f-self-stretch">
         <FinalForm
-          onSubmit={() => {}}
-          initialValues={{comment: '', protected: false}}
+          onSubmit={addComment}
+          initialValues={{text: '', internal: false}}
           subscription={{submitting: true}}
         >
           {fprops => (
@@ -72,18 +87,22 @@ export default function ReviewForm({block}) {
               <InputComponent
                 {...inputProps}
                 onFocus={onCommentClickHandler}
-                name="comment"
+                name="text"
                 placeholder={Translate.string('Leave a comment...')}
                 hideValidationError
                 required
               />
               {commentFormVisible && (
                 <>
-                  <FinalCheckbox
-                    label={Translate.string('Restrict visibility of this comment to other editors')}
-                    name="protected"
-                    toggle
-                  />
+                  {isEditor && (
+                    <FinalCheckbox
+                      label={Translate.string(
+                        'Restrict visibility of this comment to other editors'
+                      )}
+                      name="internal"
+                      toggle
+                    />
+                  )}
                   <Form.Group inline>
                     <FinalSubmitButton label={Translate.string('Comment')} />
                     <Button
