@@ -10,11 +10,11 @@ import {useSelector} from 'react-redux';
 import moment from 'moment';
 import PropTypes from 'prop-types';
 
-import RevisionLog from 'indico/modules/events/reviewing/components/RevisionLog';
 import UserAvatar from 'indico/modules/events/reviewing/components/UserAvatar';
 import {Param, Translate} from 'indico/react/i18n';
 import {serializeDate} from 'indico/utils/date';
 
+import RevisionLog from './RevisionLog';
 import ReviewForm from './ReviewForm';
 import {blockPropTypes} from './util';
 import {getLastTimelineBlock, getLastState} from '../../selectors';
