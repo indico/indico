@@ -9,10 +9,10 @@ import moment from 'moment';
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import UserAvatar from 'indico/modules/events/reviewing/components/UserAvatar';
 import {serializeDate} from 'indico/utils/date';
 
 import StateIndicator from './StateIndicator';
-import UserAvatar from './UserAvatar';
 
 export default function CustomItem({header, user, createdDt, html, state}) {
   return (

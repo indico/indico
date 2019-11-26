@@ -9,10 +9,9 @@ import moment from 'moment';
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import UserAvatar from 'indico/modules/events/reviewing/components/UserAvatar';
 import {Param, Translate} from 'indico/react/i18n';
 import {serializeDate} from 'indico/utils/date';
-
-import UserAvatar from './UserAvatar';
 
 export default function Comment({user, createdDt, modifiedDt, html}) {
   return (

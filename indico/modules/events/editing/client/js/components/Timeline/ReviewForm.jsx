@@ -11,24 +11,13 @@ import {Form as FinalForm} from 'react-final-form';
 import {Button, Dropdown, Form} from 'semantic-ui-react';
 
 import UserAvatar from 'indico/modules/events/reviewing/components/UserAvatar';
-import {FinalCheckbox, FinalInput, FinalSubmitButton, FinalTextArea, FinalDropdown} from 'indico/react/forms';
+import {FinalCheckbox, FinalInput, FinalSubmitButton, FinalTextArea} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 
 import JudgmentBox from './judgment/JudgmentBox';
 import {blockPropTypes} from './util';
 
 import './ReviewForm.module.scss';
-
-const visibilityOptions = [
-  {
-    value: 'editors',
-    text: Translate.string('Visible only to editors'),
-  },
-  {
-    value: 'authors',
-    text: Translate.string('Visible to editors and authors'),
-  },
-];
 
 export const judgmentOptions = [
   {
@@ -86,9 +75,7 @@ export default function ReviewForm({block}) {
               {commentFormVisible && (
                 <>
                   <FinalCheckbox
-                    label={Translate.string(
-                      'Restrict visibility of this comment to other editors'
-                    )}
+                    label={Translate.string('Restrict visibility of this comment to other editors')}
                     name="protected"
                     toggle
                   />
