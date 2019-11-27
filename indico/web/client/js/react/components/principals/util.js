@@ -6,6 +6,8 @@
 // LICENSE file for more details.
 
 import _ from 'lodash';
+import PropTypes from 'prop-types';
+import {Translate} from 'indico/react/i18n';
 
 /**
  * This class encapsulates the logic of a hierarchical permission system.
@@ -70,23 +72,93 @@ export class PermissionManager {
  * This function will split the list of principals in available and pending entries (and sort them)
  * @param {Array} principalIds - list of displayed principal IDs
  * @param {Object} idMap - an object mapping available IDs and their representations
- * @param {Function} pendingReprFunction - maps each entry id to a provisional representation of a pending entry
- * @param {Function} sortingKeyFunc - maps each available entry to a sorting key
- * @param {Function} pendingSortingKeyFunc - maps each pending entry to a sorting key
  * @returns {Array} [entries, pendingEntries]
  */
-export const getPrincipalList = (
-  principalIds,
-  idMap,
-  pendingReprFunction,
-  sortingKeyFunc,
-  pendingSortingKeyFunc
-) => {
+export const getPrincipalList = (principalIds, idMap) => {
   return [
-    _.sortBy(principalIds.filter(x => x in idMap).map(x => idMap[x]), sortingKeyFunc),
+    // resolved principals
     _.sortBy(
-      principalIds.filter(x => !(x in idMap)).map(pendingReprFunction),
-      pendingSortingKeyFunc
+      principalIds.filter(x => x in idMap).map(x => idMap[x]),
+      entry => `${PrincipalType.getSortOrder(entry.type)}-${entry.name.toLowerCase()}`
+    ),
+    // pending principals
+    _.sortBy(
+      principalIds
+        .filter(x => !(x in idMap))
+        .map(x => ({identifier: x, type: getTypeFromIdentifier(x)})),
+      entry => `${PrincipalType.getSortOrder(entry.type)}-${entry.identifier.toLowerCase()}`
     ),
   ];
 };
+
+export class PrincipalType {
+  /* eslint-disable lines-between-class-members */
+  static user = 'user';
+  static localGroup = 'local_group';
+  static multipassGroup = 'multipass_group';
+  static eventRole = 'event_role';
+  /* eslint-enable lines-between-class-members */
+
+  static propType = PropTypes.oneOf([
+    PrincipalType.user,
+    PrincipalType.localGroup,
+    PrincipalType.multipassGroup,
+    PrincipalType.eventRole,
+  ]);
+
+  static getPendingText(type) {
+    return {
+      [PrincipalType.user]: Translate.string('Unknown user'),
+      [PrincipalType.localGroup]: Translate.string('Unknown group'),
+      [PrincipalType.multipassGroup]: Translate.string('Unknown group'),
+      [PrincipalType.eventRole]: Translate.string('Unknown event role'),
+    }[type];
+  }
+
+  static getDeletedText(type) {
+    return {
+      [PrincipalType.user]: Translate.string(
+        'This user does not exist anymore. Please choose someone else.'
+      ),
+      [PrincipalType.localGroup]: Translate.string(
+        'This group does not exist anymore. Please choose a different one.'
+      ),
+      [PrincipalType.multipassGroup]: Translate.string(
+        'This group does not exist anymore. Please choose a different one.'
+      ),
+      // event roles are hard-deleted
+    }[type];
+  }
+
+  static getIcon(type) {
+    return {
+      [PrincipalType.user]: 'user',
+      [PrincipalType.localGroup]: 'users',
+      [PrincipalType.multipassGroup]: 'users',
+      [PrincipalType.eventRole]: 'users',
+    }[type];
+  }
+
+  static getSortOrder(type) {
+    return {
+      [PrincipalType.localGroup]: 0,
+      [PrincipalType.multipassGroup]: 0,
+      [PrincipalType.eventRole]: 1,
+      [PrincipalType.user]: 2,
+    }[type];
+  }
+}
+
+export function getTypeFromIdentifier(identifier) {
+  if (identifier.startsWith('User:') || identifier.startsWith('ExternalUser:')) {
+    return PrincipalType.user;
+  } else if (identifier.startsWith('Group::')) {
+    return PrincipalType.localGroup;
+  } else if (identifier.startsWith('Group:')) {
+    return PrincipalType.multipassGroup;
+  } else if (identifier.startsWith('EventRole:')) {
+    return PrincipalType.eventRole;
+  } else {
+    throw new Error(`Identifier ${identifier} has unknown type`);
+  }
+}

@@ -32,6 +32,7 @@ import {useIndicoAxios} from 'indico/react/hooks';
 import {Overridable} from 'indico/react/util';
 import {indicoAxios} from 'indico/utils/axios';
 import {camelizeKeys} from 'indico/utils/case';
+import {PrincipalType} from './util';
 
 import './items.module.scss';
 import './Search.module.scss';
@@ -424,10 +425,10 @@ const InnerUserSearch = searchFactory({
     const resultData = camelizeKeys(response.data);
     resultData.results = resultData.users.map(({identifier, id, fullName, email, affiliation}) => ({
       identifier,
+      type: PrincipalType.user,
       userId: id,
       name: fullName,
       detail: affiliation ? `${email} (${affiliation})` : email,
-      group: false,
     }));
     delete resultData.users;
     setResult(resultData);
@@ -504,11 +505,11 @@ export const GroupSearch = searchFactory({
       return handleSubmitError(error);
     }
     const resultData = camelizeKeys(response.data);
-    resultData.results = resultData.groups.map(({identifier, name, providerTitle}) => ({
+    resultData.results = resultData.groups.map(({identifier, name, provider, providerTitle}) => ({
       identifier,
       name,
+      type: provider ? PrincipalType.multipassGroup : PrincipalType.localGroup,
       detail: providerTitle || null,
-      group: true,
     }));
     delete resultData.groups;
     setResult(resultData);

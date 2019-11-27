@@ -223,26 +223,26 @@ class PrincipalsMixin(object):
     def _serialize_principal(self, identifier, principal):
         if principal.principal_type == PrincipalType.user:
             return {'identifier': identifier,
+                    'type': 'user',
                     'user_id': principal.id,
-                    'group': False,
                     'invalid': principal.is_deleted,
                     'name': principal.display_full_name,
                     'detail': ('{} ({})'.format(principal.email, principal.affiliation)
                                if principal.affiliation else principal.email)}
         elif principal.principal_type == PrincipalType.local_group:
             return {'identifier': identifier,
-                    'group': True,
+                    'type': 'local_group',
                     'invalid': principal.group is None,
                     'name': principal.name}
         elif principal.principal_type == PrincipalType.multipass_group:
             return {'identifier': identifier,
-                    'group': True,
+                    'type': 'multipass_group',
                     'invalid': principal.group is None,
                     'name': principal.name,
                     'detail': principal.provider_title}
         elif principal.principal_type == PrincipalType.event_role:
             return {'identifier': identifier,
-                    'group': True,  # XXX: do we need to return an actual type?
+                    'type': 'event_role',
                     'invalid': False,
                     'name': principal.name}
 

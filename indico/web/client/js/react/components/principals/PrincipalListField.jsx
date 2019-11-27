@@ -13,8 +13,8 @@ import {Translate} from 'indico/react/i18n';
 import {UserSearch, GroupSearch} from './Search';
 import {useFetchPrincipals} from './hooks';
 import {PendingPrincipalListItem, PrincipalListItem} from './items';
+import {getPrincipalList, PrincipalType} from './util';
 import {FinalField} from '../../forms';
-import {getPrincipalList} from '../principals/util';
 
 import './PrincipalListField.module.scss';
 
@@ -54,14 +54,7 @@ const PrincipalListField = props => {
     markTouched();
   };
 
-  const isGroup = identifier => identifier.startsWith('Group:');
-  const [entries, pendingEntries] = getPrincipalList(
-    value,
-    informationMap,
-    id => ({identifier: id, group: isGroup(id)}),
-    entry => `${entry.group ? 0 : 1}-${entry.name.toLowerCase()}`,
-    entry => `${entry.group ? 0 : 1}-${entry.identifier.toLowerCase()}`
-  );
+  const [entries, pendingEntries] = getPrincipalList(value, informationMap);
 
   return (
     <>
@@ -71,10 +64,10 @@ const PrincipalListField = props => {
             key={data.identifier}
             name={data.name}
             detail={data.detail}
-            isGroup={data.group}
+            type={data.type}
             invalid={data.invalid}
-            isPendingUser={!data.group && data.userId === null}
-            favorite={!data.group && data.userId in favoriteUsers}
+            isPendingUser={data.type === PrincipalType.user && data.userId === null}
+            favorite={data.type === PrincipalType.user && data.userId in favoriteUsers}
             onDelete={() => !disabled && handleDelete(data.identifier)}
             onAddFavorite={() => !disabled && handleAddFavorite(data.userId)}
             onDelFavorite={() => !disabled && handleDelFavorite(data.userId)}
@@ -83,7 +76,7 @@ const PrincipalListField = props => {
           />
         ))}
         {pendingEntries.map(data => (
-          <PendingPrincipalListItem key={data.identifier} isGroup={data.group} />
+          <PendingPrincipalListItem key={data.identifier} type={data.type} />
         ))}
         {!value.length && (
           <List.Item styleName="empty">

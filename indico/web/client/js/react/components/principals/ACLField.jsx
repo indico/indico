@@ -13,7 +13,7 @@ import {Translate} from 'indico/react/i18n';
 import {DefaultUserSearch, GroupSearch} from '../principals/Search';
 import {useFetchPrincipals} from '../principals/hooks';
 import {PendingPrincipalListItem, PrincipalListItem} from '../principals/items';
-import {getPrincipalList} from '../principals/util';
+import {getPrincipalList, PrincipalType} from '../principals/util';
 
 import '../principals/PrincipalListField.module.scss';
 import PrincipalPermissions from './PrincipalPermissions';
@@ -26,8 +26,6 @@ function buildACL(aclMap) {
     ),
   ]);
 }
-
-const isGroup = identifier => identifier.startsWith('Group:');
 
 /**
  * The ACLField is a PrincipalField on steroids. In addition to the functionality
@@ -83,13 +81,7 @@ const ACLField = props => {
   };
 
   // Handling of list of principals (shared with PrincipalListField)
-  const [entries, pendingEntries] = getPrincipalList(
-    valueIds,
-    informationMap,
-    id => ({identifier: id, group: isGroup(id)}),
-    entry => `${entry.group ? 0 : 1}-${entry.name.toLowerCase()}`,
-    entry => `${entry.group ? 0 : 1}-${entry.identifier.toLowerCase()}`
-  );
+  const [entries, pendingEntries] = getPrincipalList(valueIds, informationMap);
 
   const roleOptions = eventRoles
     .filter(r => !usedIdentifiers.has(r.identifier))
@@ -127,9 +119,9 @@ const ACLField = props => {
               key={data.identifier}
               name={data.name}
               detail={data.detail}
-              isGroup={data.group}
+              type={data.type}
               invalid={data.invalid}
-              favorite={!data.group && data.userId in favoriteUsers}
+              favorite={data.type === PrincipalType.user && data.userId in favoriteUsers}
               onDelete={() => !disabled && handleDelete(data.identifier)}
               onAddFavorite={() => !disabled && handleAddFavorite(data.userId)}
               onDelFavorite={() => !disabled && handleDelFavorite(data.userId)}
@@ -140,7 +132,7 @@ const ACLField = props => {
           );
         })}
         {pendingEntries.map(data => (
-          <PendingPrincipalListItem key={data.identifier} isGroup={data.group} />
+          <PendingPrincipalListItem key={data.identifier} type={data.type} />
         ))}
         {!value.length && (
           <List.Item styleName="empty">
