@@ -87,6 +87,10 @@ class EventRole(db.Model):
         return dict(self.event.locator, role_id=self.id)
 
     @property
+    def identifier(self):
+        return 'EventRole:{}'.format(self.id)
+
+    @property
     def css(self):
         return 'color: #{0} !important; border-color: #{0} !important'.format(self.color)
 

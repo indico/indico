@@ -14,6 +14,8 @@ import {TrackACLField} from 'indico/react/components';
     options: {
       containerElement: null, // the actual widget containing element
       permissionsInfo: null,
+      eventId: null,
+      eventRoles: null,
     },
 
     _updateValue(newValue, trackId) {
@@ -23,10 +25,15 @@ import {TrackACLField} from 'indico/react/components';
     },
 
     _renderACLField(trackId, value) {
-      const permissionInfo = this.options.permissionsInfo;
       const onChange = newValue => this._updateValue(newValue, trackId);
       const element = document.querySelector(`#track-roles-${trackId}`);
-      const component = React.createElement(TrackACLField, {value, permissionInfo, onChange});
+      const component = React.createElement(TrackACLField, {
+        value,
+        permissionInfo: this.options.permissionsInfo,
+        eventId: this.options.eventId,
+        eventRoles: this.options.eventRoles,
+        onChange,
+      });
       ReactDOM.render(component, element);
     },
 

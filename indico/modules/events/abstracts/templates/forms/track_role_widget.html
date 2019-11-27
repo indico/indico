@@ -41,7 +41,9 @@
     <script>
         $('#{{ field.id }}').trackrolewidget({
             containerElement: $('#role-widget-{{ field.id }}'),
-            permissionsInfo: {{ field.permissions_info|tojson }}
+            permissionsInfo: {{ field.permissions_info|tojson }},
+            eventId: {{ field.event.id }},
+            eventRoles: {{ field.event_roles|tojson }},
         });
     </script>
 {% endblock %}

@@ -7,6 +7,7 @@
 
 import permissionInfoURL from 'indico-url:rb.permission_types';
 import principalsURL from 'indico-url:core.principals';
+import eventPrincipalsURL from 'indico-url:event_management.api_principals';
 
 import _ from 'lodash';
 import {useState, useEffect} from 'react';
@@ -17,13 +18,14 @@ import {PermissionManager} from './util';
 /**
  * This hook will fetch information about principals as needed
  * @param {Array} principalIds - list of principal IDs
+ * @param {Number} eventId - list of the event id if event-related principals are allowed
  */
-export const useFetchPrincipals = principalIds => {
+export const useFetchPrincipals = (principalIds, eventId = null) => {
   const [informationMap, setInformationMap] = useState({});
   const missingPrincipalIds = _.difference(principalIds, Object.keys(informationMap));
 
   const {data} = useIndicoAxios({
-    url: principalsURL(),
+    url: eventId === null ? principalsURL() : eventPrincipalsURL({confId: eventId}),
     forceDispatchEffect: () => !!missingPrincipalIds.length,
     trigger: principalIds,
     camelize: true,

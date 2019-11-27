@@ -8,16 +8,23 @@
 from __future__ import unicode_literals
 
 
-def serialize_role(role):
+def serialize_role(role, legacy=True):
     """Serialize role to JSON-like object"""
-    return {
-        'id': role.id,
-        'name': role.name,
-        'code': role.code,
-        'color': role.color,
-        'identifier': 'Role:{}'.format(role.id),
-        '_type': 'EventRole'
-    }
+    if legacy:
+        return {
+            'id': role.id,
+            'name': role.name,
+            'code': role.code,
+            'color': role.color,
+            'identifier': 'Role:{}'.format(role.id),
+            '_type': 'EventRole'
+        }
+    else:
+        return {
+            'id': role.id,
+            'name': role.name,
+            'identifier': 'EventRole:{}'.format(role.id),
+        }
 
 
 def get_role_colors():

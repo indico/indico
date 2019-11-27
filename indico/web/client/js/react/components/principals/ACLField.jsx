@@ -8,7 +8,7 @@
 import _ from 'lodash';
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Button, List} from 'semantic-ui-react';
+import {Button, Dropdown, List} from 'semantic-ui-react';
 import {Translate} from 'indico/react/i18n';
 import {DefaultUserSearch, GroupSearch} from '../principals/Search';
 import {useFetchPrincipals} from '../principals/hooks';
@@ -42,6 +42,8 @@ const ACLField = props => {
     onFocus,
     onBlur,
     withGroups,
+    eventId,
+    eventRoles,
     favoriteUsersController,
     readAccessAllowed,
     fullAccessAllowed,
@@ -51,6 +53,7 @@ const ACLField = props => {
   const [favoriteUsers, [handleAddFavorite, handleDelFavorite]] = favoriteUsersController;
 
   const valueIds = value.map(([identifier]) => identifier);
+  const usedIdentifiers = new Set(valueIds);
   // keep track of permissions for each entry (ACL)
   const aclMap = Object.assign(
     {},
@@ -66,7 +69,7 @@ const ACLField = props => {
   };
 
   // fetch missing principals' information
-  const informationMap = useFetchPrincipals(valueIds);
+  const informationMap = useFetchPrincipals(valueIds, eventId);
 
   const handleDelete = identifier => {
     setValue(prev => _.omit(prev, identifier));
@@ -87,6 +90,13 @@ const ACLField = props => {
     entry => `${entry.group ? 0 : 1}-${entry.name.toLowerCase()}`,
     entry => `${entry.group ? 0 : 1}-${entry.identifier.toLowerCase()}`
   );
+
+  const roleOptions = eventRoles
+    .filter(r => !usedIdentifiers.has(r.identifier))
+    .map(r => ({
+      value: r.identifier,
+      text: r.name,
+    }));
 
   return (
     <>
@@ -150,6 +160,20 @@ const ACLField = props => {
           {withGroups && (
             <GroupSearch existing={valueIds} onAddItems={handleAddItems} disabled={disabled} />
           )}
+          {eventRoles.length !== 0 && (
+            <Dropdown
+              text={Translate.string('Role')}
+              button
+              upward
+              disabled={roleOptions.length === 0}
+              options={roleOptions}
+              value={null}
+              openOnFocus={false}
+              selectOnBlur={false}
+              selectOnNavigation={false}
+              onChange={(e, data) => handleAddItems([{identifier: data.value}])}
+            />
+          )}
         </Button.Group>
       )}
     </>
@@ -177,6 +201,10 @@ ACLField.propTypes = {
   readAccessAllowed: PropTypes.bool,
   /** Whether the 'full_access' permission is used/allowed */
   fullAccessAllowed: PropTypes.bool,
+  /** The ID of the event used in case of event-scoped principals */
+  eventId: PropTypes.number,
+  /** The event roles that are available for the specified eventId */
+  eventRoles: PropTypes.array,
   /** Object containing metadata about available permissions */
   permissionInfo: PropTypes.shape({
     permissions: PropTypes.object,
@@ -193,6 +221,8 @@ ACLField.defaultProps = {
   readOnly: false,
   readAccessAllowed: true,
   fullAccessAllowed: true,
+  eventId: null,
+  eventRoles: [],
 };
 
 export default React.memo(ACLField);

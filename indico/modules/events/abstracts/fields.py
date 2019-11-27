@@ -7,6 +7,8 @@
 
 from __future__ import unicode_literals
 
+from operator import attrgetter
+
 from flask import request, session
 from sqlalchemy.orm import joinedload
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
@@ -19,6 +21,7 @@ from indico.modules.events.abstracts.models.persons import AbstractPersonLink
 from indico.modules.events.abstracts.notifications import ContributionTypeCondition, StateCondition, TrackCondition
 from indico.modules.events.contributions.models.persons import AuthorType
 from indico.modules.events.fields import PersonLinkListFieldBase
+from indico.modules.events.roles.util import serialize_role
 from indico.modules.events.tracks.models.tracks import Track
 from indico.modules.events.util import serialize_person_link
 from indico.modules.users.models.users import User
@@ -203,6 +206,10 @@ class TrackRoleField(JSONField):
     def permissions_info(self):
         permissions, tree, default = get_permissions_info(Track)
         return {'permissions': permissions, 'tree': tree['_full_access']['children'], 'default': default}
+
+    @property
+    def event_roles(self):
+        return [serialize_role(role, legacy=False) for role in sorted(self.event.roles, key=attrgetter('code'))]
 
     def _value(self):
         return super(TrackRoleField, self)._value() if self.data else '[]'
