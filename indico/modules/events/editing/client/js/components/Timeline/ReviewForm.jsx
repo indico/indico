@@ -19,7 +19,7 @@ import {blockPropTypes} from './util';
 
 import './ReviewForm.module.scss';
 
-export const judgmentOptions = [
+const judgmentOptions = [
   {
     value: 'accept',
     text: Translate.string('Accept'),
@@ -49,7 +49,7 @@ export default function ReviewForm({block}) {
   };
 
   const [commentFormVisible, setCommentFormVisible] = useState(false);
-  const [judgmentModalType, setJudgmentModalType] = useState(null);
+  const [judgmentType, setJudgmentType] = useState(null);
   const onCommentClickHandler = () => {
     if (!commentFormVisible) {
       setCommentFormVisible(true);
@@ -114,7 +114,7 @@ export default function ReviewForm({block}) {
           >
             <Dropdown.Menu>
               {judgmentOptions.map(({value, text}) => (
-                <Dropdown.Item key={value} onClick={() => setJudgmentModalType(value)}>
+                <Dropdown.Item key={value} onClick={() => setJudgmentType(value)}>
                   {text}
                 </Dropdown.Item>
               ))}
@@ -130,11 +130,11 @@ export default function ReviewForm({block}) {
       <UserAvatar user={currentUser} />
       <div className="i-timeline-item-box footer-only header-indicator-left">
         <div className="i-box-footer" style={{overflow: 'visible'}}>
-          {judgmentModalType ? (
+          {judgmentType ? (
             <JudgmentBox
               block={block}
-              judgmentType={judgmentModalType}
-              onClose={() => setJudgmentModalType(null)}
+              judgmentType={judgmentType}
+              onClose={() => setJudgmentType(null)}
               options={judgmentOptions}
             />
           ) : (

@@ -36,7 +36,7 @@ export default function AcceptRejectForm({block, action, setLoading}) {
           return ret.error;
         }
       }}
-      subscription={{submitting: true}}
+      subscription={{}}
     >
       {({handleSubmit}) => (
         <>
