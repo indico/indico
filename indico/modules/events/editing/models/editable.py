@@ -9,6 +9,7 @@ from __future__ import unicode_literals
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
+from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii
 from indico.util.struct.enum import IndicoEnum
 
@@ -77,3 +78,7 @@ class Editable(db.Model):
         return format_repr(self, 'id', 'contribution_id', 'type')
 
     # TODO: state - either a column property referencing the newest revision's state or a normal column
+
+    @locator_property
+    def locator(self):
+        return dict(self.contribution.locator, type=self.type.name)
