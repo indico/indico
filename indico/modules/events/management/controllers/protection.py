@@ -12,6 +12,7 @@ from werkzeug.exceptions import NotFound
 
 from indico.core.db.sqlalchemy.protection import ProtectionMode, render_acl
 from indico.core.permissions import get_permissions_info, get_principal_permissions, update_permissions
+from indico.modules.core.controllers import PrincipalsMixin
 from indico.modules.events import Event
 from indico.modules.events.management.controllers.base import RHManageEventBase
 from indico.modules.events.management.forms import EventProtectionForm
@@ -22,6 +23,8 @@ from indico.modules.events.sessions.operations import update_session_coordinator
 from indico.modules.events.util import get_object_from_args
 from indico.util import json
 from indico.util.i18n import _
+from indico.util.marshmallow import PrincipalDict
+from indico.web.args import parser
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.forms.fields.principals import PermissionsField, serialize_principal
@@ -102,3 +105,15 @@ class RHPermissionsDialog(RH):
         permissions_tree = get_permissions_info(PermissionsField.type_mapping[request.view_args['type']])[1]
         return jsonify_template('events/management/permissions_dialog.html', permissions_tree=permissions_tree,
                                 permissions=request.form.getlist('permissions'), principal=principal)
+
+
+class RHEventPrincipals(PrincipalsMixin, RHManageEventBase):
+    ALLOW_LOCKED = True
+
+    def _process_args(self):
+        RHManageEventBase._process_args(self)
+        args = parser.parse({
+            'values': PrincipalDict(allow_groups=True, allow_external_users=True, allow_event_roles=True,
+                                    event_id=self.event.id, missing={})
+        })
+        self.values = args['values']

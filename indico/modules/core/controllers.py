@@ -11,7 +11,6 @@ import re
 
 import requests
 from flask import flash, jsonify, redirect, request, session
-from marshmallow import ValidationError
 from packaging.version import Version
 from pkg_resources import DistributionNotFound, get_distribution
 from pytz import common_timezones_set
@@ -33,8 +32,7 @@ from indico.modules.core.settings import core_settings, social_settings
 from indico.modules.core.views import WPContact, WPSettings
 from indico.modules.users.controllers import RHUserBase
 from indico.util.i18n import _, get_all_locales
-from indico.util.marshmallow import PrincipalList
-from indico.util.user import principal_from_identifier
+from indico.util.marshmallow import PrincipalDict
 from indico.web.args import use_kwargs
 from indico.web.errors import load_error_data
 from indico.web.flask.templating import get_template_module
@@ -221,28 +219,7 @@ class RHVersionCheck(RHAdminBase):
                        plugins=self._check_version('indico-plugins'))
 
 
-class _PrincipalDict(PrincipalList):
-    # We need to keep identifiers separately since for pending users we
-    # can't get the correct one back from the user
-    def _deserialize(self, value, attr, data):
-        try:
-            return {identifier: principal_from_identifier(identifier,
-                                                          allow_groups=self.allow_groups,
-                                                          allow_external_users=self.allow_external_users,
-                                                          soft_fail=True)
-                    for identifier in value}
-        except ValueError as exc:
-            raise ValidationError(unicode(exc))
-
-
-class RHPrincipals(RHProtected):
-    """Resolve principal identifiers to their actual objects.
-
-    This is intended for PrincipalListField which needs to be able
-    to resolve the identifiers provided to it to something more
-    human-friendly.
-    """
-
+class PrincipalsMixin(object):
     def _serialize_principal(self, identifier, principal):
         if principal.principal_type == PrincipalType.user:
             return {'identifier': identifier,
@@ -263,13 +240,30 @@ class RHPrincipals(RHProtected):
                     'invalid': principal.group is None,
                     'name': principal.name,
                     'detail': principal.provider_title}
+        elif principal.principal_type == PrincipalType.event_role:
+            return {'identifier': identifier,
+                    'group': True,  # XXX: do we need to return an actual type?
+                    'invalid': False,
+                    'name': principal.name}
+
+    def _process(self):
+        return jsonify({identifier: self._serialize_principal(identifier, principal)
+                        for identifier, principal in self.values.viewitems()})
+
+
+class RHPrincipals(PrincipalsMixin, RHProtected):
+    """Resolve principal identifiers to their actual objects.
+
+    This is intended for PrincipalListField which needs to be able
+    to resolve the identifiers provided to it to something more
+    human-friendly.
+    """
 
     @use_kwargs({
-        'values': _PrincipalDict(allow_groups=True, allow_external_users=True, missing={})
+        'values': PrincipalDict(allow_groups=True, allow_external_users=True, missing={})
     })
-    def _process(self, values):
-        return jsonify({identifier: self._serialize_principal(identifier, principal)
-                        for identifier, principal in values.viewitems()})
+    def _process_args(self, values):
+        self.values = values
 
 
 class RHSignURL(RHProtected):

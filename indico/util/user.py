@@ -100,10 +100,12 @@ def principal_from_fossil(fossil, allow_pending=False, allow_groups=True, allow_
         raise ValueError('Unexpected fossil type: {}'.format(type_))
 
 
-def principal_from_identifier(identifier, allow_groups=False, allow_external_users=False, soft_fail=False):
+def principal_from_identifier(identifier, allow_groups=False, allow_external_users=False, allow_event_roles=False,
+                              event_id=None, soft_fail=False):
     # XXX: this is currently only used in PrincipalList
-    # if we ever need to support more than just users and groups,
+    # if we ever need to support more than just users, groups and event roles,
     # make sure to add it in here as well
+    from indico.modules.events.models.roles import EventRole
     from indico.modules.groups import GroupProxy
     from indico.modules.users import User
 
@@ -157,5 +159,16 @@ def principal_from_identifier(identifier, allow_groups=False, allow_external_use
         if not soft_fail and group.group is None:
             raise ValueError('Invalid group: {}'.format(data))
         return group
+    elif type_ == 'EventRole':
+        if not allow_event_roles:
+            raise ValueError('Event roles are not allowed')
+        try:
+            event_role_id = int(data)
+        except ValueError:
+            raise ValueError('Invalid data')
+        event_role = EventRole.get(event_role_id)
+        if event_role is None or event_role.event_id != event_id:
+            raise ValueError('Invalid event role: {}'.format(event_role_id))
+        return event_role
     else:
         raise ValueError('Invalid data')
