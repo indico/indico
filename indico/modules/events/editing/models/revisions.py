@@ -14,6 +14,7 @@ from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.core.db.sqlalchemy.descriptions import RenderMode, RenderModeMixin
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
+from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii
 from indico.util.struct.enum import RichIntEnum
 
@@ -160,3 +161,7 @@ class EditingRevision(RenderModeMixin, db.Model):
     @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'editable_id', 'initial_state', final_state=FinalRevisionState.none)
+
+    @locator_property
+    def locator(self):
+        return dict(self.editable.locator, revision_id=self.id)

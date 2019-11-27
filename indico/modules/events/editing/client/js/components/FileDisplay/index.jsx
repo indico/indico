@@ -15,10 +15,10 @@ import './FileDisplay.module.scss';
 function FileListDisplay({files}) {
   return (
     <ul styleName="file-list-display">
-      {files.map(({filename, uuid}) => (
+      {files.map(({filename, uuid, downloadURL}) => (
         <li key={uuid}>
           <span styleName="file-name">
-            <a>{filename}</a>
+            <a href={downloadURL}>{filename}</a>
           </span>
         </li>
       ))}

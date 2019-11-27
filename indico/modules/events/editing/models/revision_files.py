@@ -8,7 +8,10 @@
 from __future__ import unicode_literals
 
 from indico.core.db import db
+from indico.util.fs import secure_filename
+from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii
+from indico.web.flask.util import url_for
 
 
 class EditingRevisionFile(db.Model):
@@ -61,3 +64,12 @@ class EditingRevisionFile(db.Model):
     @return_ascii
     def __repr__(self):
         return format_repr(self, 'revision_id', 'file_id')
+
+    @locator_property
+    def locator(self):
+        return dict(self.revision.locator, file_id=self.file_id,
+                    filename=secure_filename(self.file.filename, 'file-{}'.format(self.file_id)))
+
+    @property
+    def download_url(self):
+        return url_for('event_editing.download_file', self)

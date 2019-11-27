@@ -20,6 +20,7 @@ from indico.core.errors import UserValueError
 from indico.modules.events.editing.controllers.base import RHContributionEditableBase, RHEditingBase
 from indico.modules.events.editing.fields import EditingFilesField, EditingTagsField
 from indico.modules.events.editing.models.comments import EditingRevisionComment
+from indico.modules.events.editing.models.revision_files import EditingRevisionFile
 from indico.modules.events.editing.models.revisions import EditingRevision
 from indico.modules.events.editing.operations import (confirm_editable_changes, create_new_editable,
                                                       create_revision_comment, create_submitter_revision,
@@ -59,9 +60,8 @@ class RHContributionEditableRevisionBase(RHContributionEditableBase):
 
     normalize_url_spec = {
         'locators': {
-            lambda self: self.contrib
-        },
-        'preserved_args': {'type', 'revision_id'}
+            lambda self: self.revision
+        }
     }
 
     def _process_args(self):
@@ -218,8 +218,7 @@ class RHEditRevisionComment(RHContributionEditableRevisionBase):
     normalize_url_spec = {
         'locators': {
             lambda self: self.contrib
-        },
-        'preserved_args': {'type', 'revision_id', 'comment_id'}
+        }
     }
 
     def _process_args(self):
@@ -258,6 +257,8 @@ class RHEditRevisionComment(RHContributionEditableRevisionBase):
 
 
 class RHExportRevisionFiles(RHContributionEditableRevisionBase):
+    """Export revision files as a ZIP archive"""
+
     def _check_revision_access(self):
         return self._user_is_authorized_submitter() or self._user_is_authorized_editor()
 
@@ -275,3 +276,26 @@ class RHExportRevisionFiles(RHContributionEditableRevisionBase):
 
         buf.seek(0)
         return send_file('revision-{}.zip'.format(self.revision.id), buf, 'application/zip', inline=False)
+
+
+class RHDownloadRevisionFile(RHContributionEditableRevisionBase):
+    """Download a revision file"""
+
+    normalize_url_spec = {
+        'locators': {
+            lambda self: self.revision_file
+        }
+    }
+
+    def _process_args(self):
+        RHContributionEditableRevisionBase._process_args(self)
+        self.revision_file = (EditingRevisionFile.query
+                              .with_parent(self.revision)
+                              .filter_by(file_id=request.view_args['file_id'])
+                              .first_or_404())
+
+    def _check_revision_access(self):
+        return self._user_is_authorized_submitter() or self._user_is_authorized_editor()
+
+    def _process(self):
+        return self.revision_file.file.send()

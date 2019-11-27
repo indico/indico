@@ -56,7 +56,7 @@ class EditingRevisionFileSchema(mm.ModelSchema):
     filename = fields.String(attribute='file.filename')
     size = fields.Int(attribute='file.size')
     content_type = fields.String(attribute='file.content_type')
-    download_url = fields.Constant('#')  # TODO: point to an endpoint that allows downloading paper files
+    download_url = fields.String()
 
 
 class EditingRevisionCommentSchema(mm.ModelSchema):

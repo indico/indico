@@ -40,7 +40,7 @@ function FileEntry({
   uploadURL,
   fileTypeId,
   allowMultipleFiles,
-  file: {uuid, filename, state, claimed},
+  file: {uuid, filename, state, claimed, downloadURL},
 }) {
   const dispatch = useContext(FileManagerContext);
   const [activeButton, setActiveButton] = useState(null);
@@ -60,7 +60,7 @@ function FileEntry({
   return (
     <>
       <span styleName="file-state" className={state || ''}>
-        {filename}
+        <a href={downloadURL}>{filename}</a>
       </span>
       <span>
         {!state && allowMultipleFiles && (
