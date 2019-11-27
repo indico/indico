@@ -10,21 +10,13 @@ import getReviewURL from 'indico-url:event_editing.api_review_editable';
 
 import {indicoAxios} from 'indico/utils/axios';
 import {ajaxAction, submitFormAction} from 'indico/utils/redux';
-import {camelizeKeys} from 'indico/utils/case';
 
 export const SET_LOADING = 'SET_LOADING';
 export const SET_DETAILS = 'SET_DETAILS';
 
 export function loadTimeline(eventId, contributionId, type) {
   const url = editableDetailsURL({confId: eventId, contrib_id: contributionId, type});
-  return ajaxAction(
-    async () => {
-      const result = await indicoAxios.get(url);
-      return camelizeKeys(result);
-    },
-    SET_LOADING,
-    SET_DETAILS
-  );
+  return ajaxAction(() => indicoAxios.get(url), SET_LOADING, SET_DETAILS);
 }
 
 export function reviewEditable(eventId, contributionId, type, revision, formData) {

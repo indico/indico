@@ -5,8 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import _ from 'lodash';
-import React, {useState, useMemo} from 'react';
+import React, {useState} from 'react';
 import PropTypes from 'prop-types';
 import {Button, Dropdown} from 'semantic-ui-react';
 
@@ -20,9 +19,7 @@ import './JudgmentBox.module.scss';
 export default function JudgmentBox({block, onClose, judgmentType: _judgmentType, options}) {
   const [judgmentType, setJudgmentType] = useState(_judgmentType);
   const [loading, setLoading] = useState(false);
-  const optionsMap = useMemo(() => _.keyBy(options, 'value'), [options]);
-
-  const option = optionsMap[judgmentType];
+  const option = options.find(x => x.value === judgmentType);
 
   return (
     <>

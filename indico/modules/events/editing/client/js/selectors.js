@@ -121,7 +121,7 @@ export function processRevisions(revisions) {
 }
 
 export const getDetails = state => state.timeline.details;
-export const isLoading = state => state.timeline.isLoading;
+export const isLoading = state => state.timeline.loading;
 export const getTimelineBlocks = state => state.timeline.timelineBlocks;
 export const getLastTimelineBlock = createSelector(
   getTimelineBlocks,
@@ -135,6 +135,8 @@ export const getLastState = createSelector(
   getLastRevision,
   lastRevision =>
     lastRevision &&
-    (lastRevision.finalState.name === 'none' ? lastRevision.initialState : lastRevision.finalState)
+    (lastRevision.finalState.name === FinalRevisionState.none
+      ? lastRevision.initialState
+      : lastRevision.finalState)
 );
 export const getStaticData = state => state.staticData;
