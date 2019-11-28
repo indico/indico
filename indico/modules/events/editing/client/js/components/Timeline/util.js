@@ -3,7 +3,7 @@
 //
 // Indico is free software; you can redistribute it and/or
 // modify it under the terms of the MIT License; see the
-// LICENSE file
+// LICENSE file for more details.
 
 import PropTypes from 'prop-types';
 
