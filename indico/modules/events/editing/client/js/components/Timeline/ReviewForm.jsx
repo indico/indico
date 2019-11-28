@@ -48,9 +48,8 @@ const judgmentOptions = [
 
 export default function ReviewForm({block}) {
   const dispatch = useDispatch();
-  const {contributionId, eventId, editableType} = useSelector(getStaticData);
-  const {editors} = useSelector(getDetails);
-  const isEditor = editors.find(editor => editor.id === Indico.User.id) !== undefined;
+  const staticData = useSelector(getStaticData);
+  const {canCreateInternalComments} = useSelector(getDetails);
   const currentUser = {
     fullName: Indico.User.full_name,
     avatarBgColor: Indico.User.avatar_bg_color,
@@ -66,12 +65,15 @@ export default function ReviewForm({block}) {
 
   const InputComponent = commentFormVisible ? FinalTextArea : FinalInput;
   const inputProps = commentFormVisible ? {autoFocus: true} : {};
-  const addComment = async formData => {
-    if (commentFormVisible) {
-      await dispatch(
-        createRevisionComment(eventId, contributionId, editableType, block.id, formData)
-      );
+  const addComment = async (formData, form) => {
+    const rv = await dispatch(createRevisionComment(block.createCommentURL, formData, staticData));
+
+    if (rv.error) {
+      return rv.error;
     }
+
+    setCommentFormVisible(false);
+    setTimeout(() => form.reset(), 0);
   };
 
   const judgmentForm = (
@@ -94,7 +96,7 @@ export default function ReviewForm({block}) {
               />
               {commentFormVisible && (
                 <>
-                  {isEditor && (
+                  {canCreateInternalComments && (
                     <FinalCheckbox
                       label={Translate.string(
                         'Restrict visibility of this comment to other editors'

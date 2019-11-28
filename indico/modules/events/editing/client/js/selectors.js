@@ -122,7 +122,8 @@ export function processRevisions(revisions) {
 }
 
 export const getDetails = state => state.timeline.details;
-export const isLoading = state => state.timeline.loading;
+export const isInitialEditableDetailsLoading = state =>
+  state.timeline.loading && !state.timeline.details;
 export const getTimelineBlocks = state => state.timeline.timelineBlocks;
 export const getLastTimelineBlock = createSelector(
   getTimelineBlocks,

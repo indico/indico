@@ -7,7 +7,6 @@
 
 import editableDetailsURL from 'indico-url:event_editing.api_editable';
 import getReviewURL from 'indico-url:event_editing.api_review_editable';
-import createCommentURL from 'indico-url:event_editing.api_create_comment';
 
 import {indicoAxios} from 'indico/utils/axios';
 import {ajaxAction, submitFormAction} from 'indico/utils/redux';
@@ -33,15 +32,14 @@ export function reviewEditable(eventId, contributionId, type, revision, formData
   );
 }
 
-export function createRevisionComment(eventId, contributionId, type, revisionId, formData) {
-  const url = createCommentURL({
-    confId: eventId,
-    contrib_id: contributionId,
-    type,
-    revision_id: revisionId,
-  });
-
+export function createRevisionComment(url, formData, {eventId, contributionId, editableType}) {
   return submitFormAction(() => indicoAxios.post(url, formData), null, () =>
-    loadTimeline(eventId, contributionId, type)
+    loadTimeline(eventId, contributionId, editableType)
+  );
+}
+
+export function deleteRevisionComment(url, {eventId, contributionId, editableType}) {
+  return ajaxAction(() => indicoAxios.delete(url), null, () =>
+    loadTimeline(eventId, contributionId, editableType)
   );
 }

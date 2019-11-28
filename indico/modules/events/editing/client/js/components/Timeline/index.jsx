@@ -19,7 +19,7 @@ import TimelineItem from './TimelineItem';
 export default function Timeline() {
   const dispatch = useDispatch();
   const details = useSelector(selectors.getDetails);
-  const isLoading = useSelector(selectors.isLoading);
+  const isInitialEditableDetailsLoading = useSelector(selectors.isInitialEditableDetailsLoading);
   const lastState = useSelector(selectors.getLastState);
   const timelineBlocks = useSelector(selectors.getTimelineBlocks);
   const {eventId, contributionId, editableType} = useSelector(selectors.getStaticData);
@@ -28,7 +28,7 @@ export default function Timeline() {
     dispatch(actions.loadTimeline(eventId, contributionId, editableType));
   }, [contributionId, eventId, editableType, dispatch]);
 
-  if (isLoading) {
+  if (isInitialEditableDetailsLoading) {
     return <Loader active />;
   } else if (!details) {
     return null;

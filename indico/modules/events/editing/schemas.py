@@ -21,6 +21,7 @@ from indico.modules.events.editing.models.revisions import EditingRevision
 from indico.modules.events.editing.models.tags import EditingTag
 from indico.modules.users.schemas import UserSchema
 from indico.util.struct.enum import IndicoEnum
+from indico.web.flask.util import url_for
 
 
 class RevisionState(mm.Schema):
@@ -62,18 +63,20 @@ class EditingRevisionFileSchema(mm.ModelSchema):
 class EditingRevisionCommentSchema(mm.ModelSchema):
     class Meta:
         model = EditingRevisionComment
-        fields = ('id', 'user', 'created_dt', 'modified_dt', 'internal', 'system', 'text', 'html')
+        fields = ('id', 'user', 'created_dt', 'modified_dt', 'internal', 'system', 'text', 'html', 'can_modify',
+                  'modify_comment_url')
 
     user = fields.Nested(UserSchema, only=('id', 'avatar_bg_color', 'full_name'))
     html = fields.Function(lambda comment: escape(comment.text))
-    # TODO: filter out internal comments depending on who's viewing
+    can_modify = fields.Function(lambda comment, ctx: comment.can_modify(ctx.get('user')))
+    modify_comment_url = fields.Function(lambda comment: url_for('event_editing.api_edit_comment', comment))
 
 
 class EditingRevisionSchema(mm.ModelSchema):
     class Meta:
         model = EditingRevision
         fields = ('id', 'created_dt', 'submitter', 'editor', 'files', 'comment', 'comment_html', 'comments',
-                  'initial_state', 'final_state', 'tags')
+                  'initial_state', 'final_state', 'tags', 'create_comment_url')
 
     comment_html = fields.Function(lambda rev: escape(rev.comment))
     submitter = fields.Nested(UserSchema, only=('id', 'avatar_bg_color', 'full_name'))
@@ -82,28 +85,26 @@ class EditingRevisionSchema(mm.ModelSchema):
     comments = fields.Method('_get_comments')
     initial_state = fields.Nested(RevisionState)
     final_state = fields.Nested(RevisionState)
+    create_comment_url = fields.Function(lambda revision: url_for('event_editing.api_create_comment', revision))
 
     def _get_comments(self, revision):
         comments = []
         editors = self.context.get('editors', [])
         current_user = self.context.get('user')
-
-        for comment in revision.comments:
-            if not comment.internal or current_user in editors:
-                comments.append(comment)
-        return EditingRevisionCommentSchema().dump(comments, many=True)
+        comments = [comment for comment in revision.comments if not comment.internal or current_user in editors]
+        return EditingRevisionCommentSchema(context=self.context).dump(comments, many=True)
 
 
 class EditableSchema(mm.ModelSchema):
     class Meta:
         model = Editable
-        fields = ('id', 'type', 'editor', 'editors', 'revisions', 'contribution', 'can_comment')
+        fields = ('id', 'type', 'editor', 'revisions', 'contribution', 'can_comment', 'can_create_internal_comments')
 
     contribution = fields.Nested(ContributionSchema)
     editor = fields.Nested(UserSchema, only=('id', 'avatar_bg_color', 'full_name'))
-    editors = fields.List(fields.Nested(UserSchema, only=('id', 'avatar_bg_color', 'full_name')))
     revisions = fields.List(fields.Nested(EditingRevisionSchema))
     can_comment = fields.Function(lambda editable, ctx: editable.can_comment(ctx.get('user')))
+    can_create_internal_comments = fields.Function(lambda editable, ctx: ctx.get('user') in editable.editors)
 
 
 class EditingReviewAction(IndicoEnum):
